@@ -216,7 +216,7 @@ conhecidas" abaixo).
 - **Loader sincroniza a árvore `core/` inteira**, não mais um arquivo
   único: lista os arquivos via API de árvore do Git (uma chamada,
   recursiva), baixa cada `.py`, espelha em
-  `%LOCALAPPDATA%\ModulacaoAutomatica\pkg_cache\core\...`, e só troca o
+  `%LOCALAPPDATA%\MeuBotaoPushbutton\pkg_cache\core\...`, e só troca o
   cache antigo pelo novo depois que **todos** baixarem com sucesso. Ver
   [`LOADER_SETUP.md`](LOADER_SETUP.md).
 

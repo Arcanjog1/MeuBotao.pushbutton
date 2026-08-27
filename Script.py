@@ -553,7 +553,16 @@ GITHUB_BRANCH = "main"
 # interativa em PySide6 foi removido, ver docstring deste arquivo). Qualquer
 # arquivo .py novo adicionado dentro dessa pasta no GitHub passa a ser
 # baixado automaticamente, sem precisar mexer neste loader de novo.
-CORE_REPO_PREFIX = "core/"
+#
+# `core/` (e tudo que nao seja este Script.py: tests/, diagnosticos/, docs)
+# mora dentro de `nuvem/` no repositorio (2026-08-27) - so' precisa existir
+# no GitHub, nunca localmente. Este Script.py continua sendo o UNICO
+# arquivo que precisa ficar fisicamente solto na pasta do botao do pyRevit;
+# `nuvem/` pode ser apagada do disco local a qualquer momento sem quebrar o
+# botao, porque o loader sempre baixa `core/` de novo (ou usa o cache em
+# %LOCALAPPDATA%) direto do GitHub a cada clique.
+CORE_CLOUD_DIR = "nuvem"
+CORE_REPO_PREFIX = CORE_CLOUD_DIR + "/core/"
 ENTRY_POINT_REPO_PATH = CORE_REPO_PREFIX + "wall_modeling.py"
 
 TREE_API_URL = "https://api.github.com/repos/{0}/{1}/git/trees/{2}?recursive=1".format(
@@ -755,7 +764,7 @@ def _sync_core_package(token):
     os.makedirs(PKG_CACHE_TMP_DIR)
 
     for repo_path in files:
-        relative = repo_path  # "core/xxx/yyy.py"
+        relative = repo_path[len(CORE_CLOUD_DIR) + 1:]  # "core/xxx/yyy.py"
         local_path = os.path.join(PKG_CACHE_TMP_DIR, *relative.split("/"))
         local_dir = os.path.dirname(local_path)
         if not os.path.isdir(local_dir):
