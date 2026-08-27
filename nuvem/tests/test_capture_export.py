@@ -17,15 +17,28 @@ import unittest
 
 _TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 _BUTTON_ROOT = os.path.dirname(_TESTS_DIR)
-# 4 niveis acima de `nuvem/` = raiz do repositorio (nuvem -> .pushbutton ->
-# .panel -> .tab -> raiz). Eram 3 ate' 2026-08-27: o commit que moveu o
-# conteudo para `nuvem/` acrescentou um nivel na arvore e nao ajustou esta
-# conta, entao o caminho caia em `MinhaAba.tab/tests` (inexistente) e a
-# suite inteira morria no import de `revit_stubs`.
-_REPO_ROOT_TESTS = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_BUTTON_ROOT)))),
-    "tests",
-)
+# LAYOUT-AGNOSTICO (2026-08-27): `revit_stubs.py` vive na pasta `tests/` da
+# RAIZ, e essa raiz fica em lugares diferentes dependendo de onde este
+# arquivo esta' sendo lido - na pasta de extensao do pyRevit sao 4 niveis
+# acima de `nuvem/`; no repositorio independente MeuBotao.pushbutton, onde o
+# conteudo do botao esta' na raiz, e' 1 so'. Contar niveis fixos ja quebrou a
+# suite inteira duas vezes (o commit que criou `nuvem/` acrescentou um nivel
+# e ninguem ajustou a conta), entao aqui a busca e' por CONTEUDO: sobe a
+# arvore ate' achar um `tests/revit_stubs.py` de verdade.
+def _find_root_tests():
+    directory = _BUTTON_ROOT
+    for _level in range(6):
+        candidate = os.path.join(directory, "tests")
+        if os.path.isfile(os.path.join(candidate, "revit_stubs.py")):
+            return candidate
+        parent = os.path.dirname(directory)
+        if parent == directory:
+            break
+        directory = parent
+    return os.path.join(_BUTTON_ROOT, "tests")   # fallback: erro claro no import
+
+
+_REPO_ROOT_TESTS = _find_root_tests()
 for _p in (_BUTTON_ROOT, _REPO_ROOT_TESTS):
     if _p not in sys.path:
         sys.path.insert(0, _p)
