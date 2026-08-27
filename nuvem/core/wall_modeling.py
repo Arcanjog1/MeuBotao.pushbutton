@@ -2737,7 +2737,8 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                       variants_per_course=1,
                                       band_cb=None, progress_cb=None,
-                                      wall_start_cb=None, wall_result_cb=None):
+                                      wall_start_cb=None, wall_result_cb=None,
+                                      stage_cb=None):
     """Como `solve_building_blocks`, mas roda uma vez POR GRUPO de fiadas
     fisicas com o mesmo conjunto de aberturas ativas (ver
     _group_course_indices_by_opening_band), em vez de resolver so' UMA vez
@@ -2806,6 +2807,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             allow_compensators=allow_compensators, base_z_abs=base_z_abs,
             variants_per_course=variants_per_course,
             progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+            stage_cb=stage_cb,
         )
         bands.append({"course_indices": list(course_indices), "result": result})
         for course_index in course_indices:
@@ -2859,8 +2861,18 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     # comum de todas as bandas (mutando os proprios dicts - ver docstring
     # de orient_compensator_candidates). Precisa vir ANTES da auditoria de
     # amarracao/relatorio, que so' LE os candidatos.
+    if stage_cb is not None:
+        try:
+            stage_cb("orientando compensadores")
+        except Exception:
+            pass
     orient_compensator_candidates(all_candidates, walls_to_create, openings_per_wall, catalog)
 
+    if stage_cb is not None:
+        try:
+            stage_cb("auditando amarracao entre fiadas")
+        except Exception:
+            pass
     wall_bond_audits = audit_all_walls_bond_quality(
         walls_to_create, course_candidates, catalog, num_courses,
         openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node,
@@ -8375,6 +8387,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 variants_per_course=PIER_LAYOUT_VARIANTS_PER_COURSE,
                 band_cb=cbs.get("band_cb"), progress_cb=cbs.get("progress_cb"),
                 wall_start_cb=cbs.get("wall_start_cb"), wall_result_cb=cbs.get("wall_result_cb"),
+                stage_cb=cbs.get("stage_cb"),
             )
         self.solve_result["num_courses"] = num_courses
         self._save_modulation_state_cache()
@@ -9385,9 +9398,24 @@ class _PostCreationForm(Form):
             except Exception:
                 pass
 
+        def _stage_cb(label):
+            # ETAPA FINAL (depois da ultima parede de cada banda): as
+            # checagens globais - colisoes, vaos de porta, compensadores,
+            # auditoria de amarracao. Nao ha' contador de parede para mostrar
+            # aqui, entao a barra vira marquee e o texto diz o que esta
+            # rodando: sem isso a janela ficava muda justamente no trecho que
+            # ja' travou o script em producao (2026-08-27).
+            try:
+                console.log("Solver 18: {}...".format(label))
+                console.set_status("Solver 18: {}...".format(label))
+                console.set_indeterminate(label)
+            except Exception:
+                pass
+
         self._handler.solve_progress_cb = {
             "band_cb": _band_cb, "progress_cb": _progress_cb,
             "wall_start_cb": _wall_start_cb, "wall_result_cb": _wall_result_cb,
+            "stage_cb": _stage_cb,
         }
         if not self._raise_action("solve", self._on_solve_done, self._solve_status):
             console.stop_watchdog()

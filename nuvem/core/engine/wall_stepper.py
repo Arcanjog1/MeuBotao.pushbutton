@@ -4324,7 +4324,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                              variants_per_course=1,
                              wall_start_cb=None, wall_result_cb=None,
                              dirty_wall_idxs=None, baseline_per_wall=None,
-                             baseline_candidates=None):
+                             baseline_candidates=None, stage_cb=None):
     """PIPELINE PRINCIPAL (regras #3, #4, #5, #8, #9): processa UMA parede
     de cada vez, na ordem geometrica de `order_walls_for_processing`, e
     para cada uma faz o ciclo completo antes de tocar na proxima:
@@ -4636,6 +4636,20 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
             except Exception:
                 pass
 
+    # ETAPA FINAL - roda DEPOIS da ultima parede, entao nenhum dos callbacks
+    # por parede (wall_start_cb/wall_result_cb/progress_cb) dispara mais aqui.
+    # Ate' 2026-08-27 esse trecho era o mais lento do solver inteiro E o unico
+    # sem nenhum feedback na tela - a combinacao que fazia a janela parecer
+    # travada em 99%. O custo ja foi resolvido (indices espaciais); `stage_cb`
+    # resolve o silencio, para que uma futura regressao de desempenho aqui
+    # apareca como "parado em X" em vez de "travado".
+    if stage_cb is not None:
+        try:
+            stage_cb("verificando colisoes entre todas as pecas")
+        except Exception:
+            pass
+    collisions = validate_same_course_collision(all_candidates)
+
     return {
         "order": order,
         "candidates": all_candidates,
@@ -4643,7 +4657,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular,
         "alignment_conflicts": alignment_conflicts,
-        "collisions": validate_same_course_collision(all_candidates),
+        "collisions": collisions,
         "per_wall": per_wall,
         "validations": validations,
         "plans": plans,
@@ -4693,7 +4707,8 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
 def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
                           allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                           base_z_abs=None, variants_per_course=1,
-                          progress_cb=None, wall_start_cb=None, wall_result_cb=None):
+                          progress_cb=None, wall_start_cb=None, wall_result_cb=None,
+                          stage_cb=None):
     """Ponto de entrada UNICO da Etapa 4 completa (X -> T -> L -> jambs ->
     trechos livres): roda solve_all_intersections (X/T/L) e depois entrega
     tudo a `process_walls_one_by_one`, que percorre as paredes UMA A UMA na
@@ -4723,11 +4738,19 @@ def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall
         allow_compensators=allow_compensators, plan_hook=None,
         variants_per_course=variants_per_course,
         progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+        stage_cb=stage_cb,
     )
-    result["door_void_violations"] = (
-        find_door_void_violations(result["candidates"], walls_to_create, openings_per_wall, base_z_abs)
-        if base_z_abs is not None else []
-    )
+    if base_z_abs is not None:
+        if stage_cb is not None:
+            try:
+                stage_cb("conferindo vaos de porta sem peitoril")
+            except Exception:
+                pass
+        result["door_void_violations"] = find_door_void_violations(
+            result["candidates"], walls_to_create, openings_per_wall, base_z_abs
+        )
+    else:
+        result["door_void_violations"] = []
     return result
 
 
