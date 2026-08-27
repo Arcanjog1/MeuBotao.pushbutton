@@ -34,13 +34,19 @@
 1. Acesse, logado como `Arcanjog1`:
    <https://github.com/settings/personal-access-tokens/new>
    (token **fine-grained**, não o clássico).
-2. **Token name:** algo como `MeuBotao-loader`.
+2. **Token name:** algo como `pyrevit-loader`.
 3. **Expiration:** escolha um prazo (ex.: 90 dias) ou "No expiration".
    Prazos mais curtos são mais seguros, mas exigem gerar um token novo
    periodicamente.
 4. **Resource owner:** `Arcanjog1`.
 5. **Repository access:** "Only select repositories" → selecione
-   `MeuBotao.pushbutton`.
+   `MeuBotao.pushbutton` **e** `AbrirModeladorExterno.pushbutton`.
+
+   > Cada botão tem seu próprio repositório desde 2026-08-27 (o antigo
+   > `ModulacaoAutomatica`, que reunia os dois, foi desativado). Um único
+   > token com leitura nos **dois** atende os dois botões — mas cada um
+   > guarda sua própria cópia dele (ver abaixo), então o mesmo valor é
+   > colado duas vezes, uma por botão.
 6. **Permissions → Repository permissions → Contents:** defina como
    **Read-only**. Nenhuma outra permissão é necessária — não marque
    nada além disso.
@@ -58,6 +64,9 @@
   ```
   %LOCALAPPDATA%\MeuBotaoPushbutton\token.dat
   ```
+  (o botão **Abrir Modelador Externo** usa a pasta irmã
+  `%LOCALAPPDATA%\AbrirModeladorExternoPushbutton\` — são cofres separados,
+  um por botão, e por isso o token é pedido uma vez em cada.)
   Ele não é salvo em texto puro e não fica dentro da pasta do
   repositório/extensão — não há risco de ser commitado por engano.
 - Nas próximas execuções, o loader reusa esse token automaticamente e
@@ -89,7 +98,7 @@ token entre pessoas.
   tokens → Fine-grained tokens → localizar o token → "Delete"
   (revoga imediatamente).
 - **No computador:** apague o arquivo
-  `%LOCALAPPDATA%\MeuBotaoPushbutton\token.dat` — o loader vai pedir um
+  `%LOCALAPPDATA%\ModulacaoAutomatica\token.dat` — o loader vai pedir um
   token novo na próxima execução.
 
 ## Solução de problemas
