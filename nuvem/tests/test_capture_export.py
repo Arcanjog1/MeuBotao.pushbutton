@@ -17,7 +17,15 @@ import unittest
 
 _TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 _BUTTON_ROOT = os.path.dirname(_TESTS_DIR)
-_REPO_ROOT_TESTS = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(_BUTTON_ROOT))), "tests")
+# 4 niveis acima de `nuvem/` = raiz do repositorio (nuvem -> .pushbutton ->
+# .panel -> .tab -> raiz). Eram 3 ate' 2026-08-27: o commit que moveu o
+# conteudo para `nuvem/` acrescentou um nivel na arvore e nao ajustou esta
+# conta, entao o caminho caia em `MinhaAba.tab/tests` (inexistente) e a
+# suite inteira morria no import de `revit_stubs`.
+_REPO_ROOT_TESTS = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(_BUTTON_ROOT)))),
+    "tests",
+)
 for _p in (_BUTTON_ROOT, _REPO_ROOT_TESTS):
     if _p not in sys.path:
         sys.path.insert(0, _p)

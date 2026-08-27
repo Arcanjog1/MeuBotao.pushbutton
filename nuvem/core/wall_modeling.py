@@ -3064,11 +3064,55 @@ def _cluster_1d(points, tolerance_cm):
     return out
 
 
-def _wall_course_candidates(wall_idx, course_candidates, num_courses):
+def _index_course_candidates_by_wall(course_candidates, num_courses):
+    """{wall_idx: {course_index: [pecas]}} numa UNICA passada por todas as
+    fiadas - o mesmo criterio de `_wall_course_candidates` (a peca entra na
+    parede "dona" E na secundaria de um encontro), so' que virado do avesso.
+
+    DESEMPENHO (2026-08-27): `audit_all_walls_bond_quality` chamava
+    `_wall_course_candidates` uma vez POR PAREDE, e cada chamada relia as
+    `num_courses` listas INTEIRAS - O(paredes x fiadas x pecas). Numa
+    planta de 306 eixos com 15 fiadas isso era a ordem de dezenas de
+    milhoes de leituras, todas depois do solver ja' ter terminado (parte
+    do "trava em 99%"). Montado uma vez, custa O(fiadas x pecas)."""
+    index = {}
+    for course_index in range(num_courses):
+        for cand in course_candidates.get(course_index, []):
+            for key in ("wall_idx", "secondary_wall_idx"):
+                wall_idx = cand.get(key)
+                if wall_idx is None:
+                    continue
+                per_wall = index.get(wall_idx)
+                if per_wall is None:
+                    per_wall = {}
+                    index[wall_idx] = per_wall
+                bucket = per_wall.get(course_index)
+                if bucket is None:
+                    per_wall[course_index] = [cand]
+                elif bucket[-1] is not cand:
+                    # peca com `wall_idx == secondary_wall_idx` nao pode
+                    # entrar duas vezes no mesmo balde.
+                    bucket.append(cand)
+    return index
+
+
+def _wall_course_candidates(wall_idx, course_candidates, num_courses, index=None):
     """{course_index: [candidatos desta parede]} - inclui pecas cujo
     `wall_idx` OU `secondary_wall_idx` seja esta parede (uma peca de canto
     pertence fisicamente as DUAS paredes do encontro - regra #12: usar a
-    posicao REAL da peca, nao so' a parede "dona")."""
+    posicao REAL da peca, nao so' a parede "dona").
+
+    `index` (opcional): resultado de `_index_course_candidates_by_wall`
+    sobre o MESMO `course_candidates`. Quando dado, so' le' a fatia desta
+    parede em vez de varrer todas as fiadas - mesmo conteudo e mesma ordem,
+    sem a varredura. `None` mantem o caminho antigo, para quem chama esta
+    funcao avulsa (testes) sem ter montado indice nenhum."""
+    if index is not None:
+        per_wall = index.get(wall_idx) or {}
+        return dict(
+            (course_index, per_wall.get(course_index) or [])
+            for course_index in range(num_courses)
+        )
     by_course = {}
     for course_index in range(num_courses):
         by_course[course_index] = [
@@ -3129,7 +3173,8 @@ def _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node):
 
 
 def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalog,
-                            num_courses, openings_per_wall=None, nodes=None, end_to_node=None):
+                            num_courses, openings_per_wall=None, nodes=None, end_to_node=None,
+                            course_candidates_index=None):
     """Validacao MULTI-FIADA de UMA parede - ver cabecalho da secao acima.
     Devolve {"ok": bool, "problems": [str,...], "penalty": float,
     "continuous_joints": [...], "alternating_joints": [...],
@@ -3142,7 +3187,9 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
 
     p0, _p1, wall_dir, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
     length_cm = length_ft / FEET_PER_METER * 100.0
-    by_course = _wall_course_candidates(wall_idx, course_candidates, num_courses)
+    by_course = _wall_course_candidates(
+        wall_idx, course_candidates, num_courses, index=course_candidates_index
+    )
     if not any(by_course.values()):
         return empty
 
@@ -3322,10 +3369,14 @@ def audit_all_walls_bond_quality(walls_to_create, course_candidates, catalog, nu
         c.get("wall_idx") for cs in course_candidates.values() for c in cs
         if c.get("wall_idx") is not None
     ))
+    # Montado UMA vez e reusado por todas as paredes - ver
+    # _index_course_candidates_by_wall.
+    course_candidates_index = _index_course_candidates_by_wall(course_candidates, num_courses)
     return {
         wall_idx: audit_wall_bond_quality(
             wall_idx, walls_to_create, course_candidates, catalog, num_courses,
             openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node,
+            course_candidates_index=course_candidates_index,
         )
         for wall_idx in wall_indexes
     }
@@ -9277,6 +9328,10 @@ class _PostCreationForm(Form):
         # modulo), mesmo cuidado documentado no __init__ desta janela: o
         # handler pode chamar isto bem depois, com o Script.py ja
         # reexecutado por outro clique.
+        # Paredes ja concluidas NESTA banda - ver o comentario em
+        # `_wall_result_cb` (bug da barra parada em 99%).
+        solved_count = {"done": 0}
+
         def _band_cb(band_idx, total_bands, course_indices):
             try:
                 label = "banda {}/{} (fiada(s) {})".format(
@@ -9284,6 +9339,8 @@ class _PostCreationForm(Form):
                 )
                 console.log("Solver 18: iniciando {}...".format(label))
                 console.set_status("Solver 18: processando {}...".format(label))
+                # cada banda percorre as paredes de novo, do zero.
+                solved_count["done"] = 0
             except Exception:
                 pass
 
@@ -9293,11 +9350,25 @@ class _PostCreationForm(Form):
             except Exception:
                 pass
 
+        # BUG REAL (2026-08-27): a barra NUNCA chegava a 100%. `_wall_start_cb`
+        # reportava `pos - 1` ("paredes ja concluidas"), e o laco de
+        # `process_walls_one_by_one` chama `progress_cb` ANTES de
+        # `wall_start_cb` - entao o 306/306 que o `_progress_cb` marcava na
+        # ultima volta era imediatamente sobrescrito de volta para 305/306
+        # (99%) pelo `set_progress(pos - 1, total)` daquela mesma volta. A
+        # barra ficava parada em "305/306 processado(s) - 99%" durante TODA a
+        # etapa final (colisoes, vaos de porta, auditoria de amarracao), que
+        # e' justamente onde o solver mais demorava - dando a impressao de
+        # travamento exatamente onde nada mais estava sendo reportado.
+        # Agora quem avanca a barra e' o RESULTADO de cada parede (a parede
+        # concluida de verdade), contado aqui na closure - `wall_result_cb`
+        # e' chamado uma vez por parede nos DOIS caminhos do laco (resolvida
+        # e reusada do baseline), entao o total bate sempre.
         def _wall_start_cb(wall_idx, total, pos):
             try:
                 console.log("Solver 18 analisando parede (eixo {})... ({}/{})".format(wall_idx, pos, total))
                 console.set_status("Solver 18 buscando solucao - eixo {}...".format(wall_idx))
-                console.set_progress(pos - 1, total)
+                console.set_progress(min(solved_count["done"], pos - 1), total)
             except Exception:
                 pass
 
@@ -9309,6 +9380,8 @@ class _PostCreationForm(Form):
                     console.log("Eixo {}: tentativa falhou ({}) - tentando alternativa/proxima parede.".format(
                         wall_idx, detail
                     ))
+                solved_count["done"] += 1
+                console.set_progress(solved_count["done"], total)
             except Exception:
                 pass
 
