@@ -5314,3 +5314,60 @@ def test_radios_de_modo_de_parede_nao_ficam_no_mesmo_grupo_das_portas_janelas():
     assert pai_modo is _pai_direto(form._wall_mode_continuous)
     assert pai_modo is not _pai_direto(form._openings_pick)
     assert _pai_direto(form._openings_pick) is _pai_direto(form._openings_auto)
+
+
+# ---- regra #2 tem prioridade sobre o desencontro de junta (2026-08-28) ----
+@case
+def test_desencontro_de_junta_nunca_empilha_compensadores():
+    """Bug real medido ao vivo via MCP (2026-08-28): num trecho de 29cm
+    fechado dos dois lados, o baseline `B19+C09` coincidia a junta com a
+    Fiada A, e a busca de desencontro trocava por `C04+C09+C09+C04` -
+    QUATRO compensadores em sequencia, que `validate_wall_modulation`
+    reprova logo em seguida (`sem_compensadores_consecutivos`, regra #2).
+    Trocar uma junta coincidente (registrada em `alignment_conflicts` e
+    escalada para ajuste geometrico) por uma parede REPROVADA nunca e' um
+    bom negocio: a regra #2 passou a ser o criterio PRIMARIO do score."""
+    # A medida em si.
+    assert m._layout_compensator_run_excess([("B19", 0.0, 19.0), ("C09", 20.0, 29.0)], CATALOG) == 0
+    assert m._layout_compensator_run_excess(
+        [("C04", 0.0, 4.0), ("C09", 5.0, 14.0), ("C09", 15.0, 24.0), ("C04", 25.0, 29.0)],
+        CATALOG) == 3
+    assert m._layout_compensator_run_excess(
+        [("C09", 0.0, 9.0), ("B39", 10.0, 49.0), ("C04", 50.0, 54.0)], CATALOG) == 0
+
+    # O caso real: 29cm, junta da Fiada A em 19,5cm.
+    baseline = m._pier_ordered_layout(29.0, CATALOG, 0.0, 0.0)
+    assert [c[0] for c in baseline] == ["B19", "C09"], baseline
+    joints_a = m._layout_internal_joint_positions_cm(baseline, 0.0)
+
+    escolhido = m._pier_layout_avoiding_joints(29.0, CATALOG, 0.0, 0.0, 0.0, joints_a)
+    assert m._layout_compensator_run_excess(escolhido, CATALOG) == 0, [c[0] for c in escolhido]
+
+
+@case
+def test_busca_exata_fecha_trecho_que_o_guloso_nao_fecha():
+    """O guloso pega sempre a maior peca que cabe e nunca volta atras, entao
+    falha em trechos que so' fecham com uma peca menor mais cedo. Medido ao
+    vivo via MCP (2026-08-28): 33 eixos de um projeto real eram reprovados
+    pela regra #2 (compensadores em sequencia) tendo TODOS uma composicao
+    limpa disponivel."""
+    # 139cm = 4xB34 e nenhum B39 - nenhuma escolha de PRIMEIRO bloco leva o
+    # guloso ate' la'.
+    assert m._greedy_fill_blocks(140.0, 0.0, CATALOG, ["B39", "B34"]) is None
+    exato = m._exact_fill_blocks(140.0, 0.0, CATALOG, ["B39", "B34"])
+    assert [c[0] for c in exato] == ["B34"] * 4, exato
+
+    # 469cm = 10xB39 + 2xB34 (o caso real que virava 11xB39 + 3xC09).
+    exato469 = m._exact_fill_blocks(470.0, 0.0, CATALOG, ["B39", "B34"])
+    assert sorted(c[0] for c in exato469) == ["B34"] * 2 + ["B39"] * 10, exato469
+    # fecha exatamente: soma dos blocos + juntas internas
+    total = sum(c[2] - c[1] for c in exato469) + (len(exato469) - 1) * m.BLOCK_JOINT_CM
+    assert abs(total - 469.0) < 1e-6, total
+
+    # Quando o guloso JA' fecha, o resultado nao muda (sem regressao).
+    assert m._greedy_fill_blocks_any_first(
+        200.0, 0.0, CATALOG, ["B39", "B34"]) == m._greedy_fill_blocks(
+        200.0, 0.0, CATALOG, ["B39", "B34"])
+
+    # Trecho que nao fecha com nenhuma combinacao -> None (nunca inventa).
+    assert m._exact_fill_blocks(3.0, 0.0, CATALOG, ["B39", "B34"]) is None

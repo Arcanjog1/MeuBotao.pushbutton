@@ -1285,3 +1285,60 @@ cada um com seu próprio `num_courses` e sua própria cota inicial. Isso
 reaproveita todo o pipeline existente sem mexer na arquitetura. A correção
 definitiva — derivar altura e base **por parede** dentro de um único
 solve — fica registrada como pendência para uma sessão dedicada.
+
+## 16. Regra #2 tem prioridade sobre o desencontro, e o guloso não é suficiente (2026-08-28)
+
+> **Status**: **IMPLEMENTADO (sessão 2026-08-28)**. Dois bugs distintos,
+> os dois medidos ao vivo via MCP sobre o projeto `TESTE MODULAÇÃO` (126
+> paredes, todas conectadas e com altura 300cm). Testes:
+> `test_desencontro_de_junta_nunca_empilha_compensadores` e
+> `test_busca_exata_fecha_trecho_que_o_guloso_nao_fecha`.
+
+### 16.1 — `_score` do desencontro ignorava a regra #2
+
+`_pier_layout_avoiding_joints` comparava candidatos só por
+`(coincidência_de_junta, -alinhamento_de_vazio)`. Num trecho de 29cm
+fechado dos dois lados, o baseline `B19+C09` coincidia a junta com a Fiada
+A, e a busca trocava por **`C04+C09+C09+C04`** — quatro compensadores em
+sequência — só porque desencontrava. Esse layout é reprovado logo em
+seguida por `validate_wall_modulation`
+(`sem_compensadores_consecutivos`): não era uma solução melhor, era uma
+**não-solução** que só parecia boa no critério errado.
+
+`_score` agora é `(excesso_de_compensadores_em_sequência,
+coincidência_de_junta, -alinhamento_de_vazio)` — a regra #2 na frente
+(`_layout_compensator_run_excess`, medida contínua para preferir a menor
+violação quando toda alternativa viola). Trocar uma junta coincidente —
+que o pipeline registra em `alignment_conflicts` e escala para ajuste
+geométrico (seção 11.4) — por uma parede **reprovada** nunca é um bom
+negócio.
+
+### 16.2 — O guloso nunca volta atrás: trechos com solução limpa caíam no tier dos compensadores
+
+`_greedy_fill_blocks` pega sempre a maior peça que ainda cabe e não faz
+backtracking. Consequência medida: **33 eixos** reprovados pela regra #2
+tinham **todos** uma composição sem nenhum compensador disponível — o
+tier 3 (B39+B34) falhava e a parede caía no tier 5.
+
+- Trecho de **469cm**: o guloso põe 11×B39, sobram 29cm, o B34 não cabe
+  mais e o tier 3 devolve `None` → o tier 5 fecha com `11×B39 + 3×C09`.
+  Mas `10×B39 + 2×B34` fecha os mesmos 469cm com **zero** compensadores
+  (existem 5 composições limpas para esse trecho).
+- Trecho de **139cm**: fecha com **4×B34 e nenhum B39** — nenhuma escolha
+  de *primeiro* bloco leva o guloso até lá.
+
+Correção em duas camadas, ambas usadas pelos tiers 3 e 5
+(`_greedy_fill_blocks_any_first`):
+
+1. se o guloso puro não fechar, tentar cada código do pool como **primeiro
+   bloco** (resolve o caso de 469cm);
+2. se ainda assim não fechar, `_exact_fill_blocks` — **programação
+   dinâmica** em décimos de centímetro, critério "menos peças primeiro"
+   (que naturalmente prefere as peças maiores, mesma intenção do guloso),
+   peças ordenadas da maior para a menor (resolve o caso de 139cm).
+
+Nenhuma das duas altera um caso em que o guloso puro já fecha — só
+ampliam o alcance dos tiers **bons**, evitando que a parede desça para um
+tier pior sem necessidade. Resultado medido no projeto real: eixos com
+problema caíram de **82 para 72**, e os reprovados por compensadores
+adjacentes de **40 para 24**.
