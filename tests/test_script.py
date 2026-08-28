@@ -373,8 +373,14 @@ def test_compensadores_ligados_por_default():
 @case
 def test_jamb_nao_e_lancado_sem_espaco_fisico():
     """Abertura colada demais num encontro: o jamb era emitido do mesmo
-    jeito, DENTRO do bloco de amarracao. Agora o trecho e' reportado como
-    conflito SEM_ESPACO e nenhuma peca e' lancada ali."""
+    jeito, DENTRO do bloco de amarracao. No modo HISTORICO (split_first) o
+    trecho e' reportado como conflito SEM_ESPACO e nenhuma peca e' lancada
+    ali.
+
+    Este conflito so' existe porque a abertura vira FRONTEIRA do
+    preenchimento antes de qualquer bloco existir - no pipeline oficial
+    (continuous_first, ver o teste logo abaixo) ele nao pode nem ser
+    formulado, e' justamente uma das patologias que a nova ordem elimina."""
     # parede com uma abertura a 20cm da ponta, e um encontro em T que
     # reserva 34cm daquela ponta -> nao cabe nada entre os dois
     lines = [seg(0, 0, 400, 0), seg(0, -200, 0, 200)]
@@ -382,7 +388,10 @@ def test_jamb_nao_e_lancado_sem_espaco_fisico():
     walls, jmap = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
     nodes, end_to_node = m.build_wall_graph(walls, jmap)
     per_wall = {0: [(ft(20.0), ft(100.0), 0.0, ft(210.0))], 1: []}
-    result = m.solve_building_blocks(nodes, walls, end_to_node, per_wall, CATALOG)
+    result = m.solve_building_blocks(
+        nodes, walls, end_to_node, per_wall, CATALOG,
+        opening_strategy=m.OPENING_STRATEGY_SPLIT_FIRST,
+    )
     conflitos = [e for e in result["non_modular"] if e.get("conflict") == "SEM_ESPACO"]
     assert conflitos, "o trecho sem espaco tem que ser reportado"
     for e in conflitos:
@@ -6300,3 +6309,394 @@ def test_parede_continua_nasce_com_o_tipo_nivel_offset_e_altura_das_originais():
     assert abs(to_cm(argumentos["height"]) - 260.0) < 1e-6, "20cm ate' 280cm"
     assert abs(to_cm(argumentos["curve"].Length) - 400.0) < 1e-6
     assert argumentos["structural"] is False
+
+
+# =====================================================================
+# SECAO 23 - PIPELINE OFICIAL "PAREDE COMPLETA -> MODULACAO -> RECORTE"
+#
+# Os 9 criterios de aceitacao do pedido do usuario (2026-08-28). Ver
+# nuvem/REGRAS_MODULACAO_BLOCOS.md, secao 23.
+# =====================================================================
+
+def _solve_axis(lines, openings_per_wall, strategy=None, thickness_cm=14.0,
+                base_z_abs=0.0):
+    """Resolve uma planta pelo pipeline completo e devolve
+    (resultado, paredes, nos). `strategy=None` usa o PADRAO do motor - que
+    desde 2026-08-28 e' `continuous_first`."""
+    walls = [(l, ft(thickness_cm), (False, False)) for l in lines]
+    walls, jmap = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, jmap)
+    result = m.solve_building_blocks(
+        nodes, walls, end_to_node, openings_per_wall, CATALOG,
+        base_z_abs=base_z_abs, opening_strategy=strategy,
+    )
+    return result, walls, nodes
+
+
+def _blocks_inside_openings(result, walls, openings_per_wall, wall_idx=0):
+    """Pecas que ocupam qualquer parte do VAO de uma abertura - o conjunto
+    que precisa ser SEMPRE vazio (item 19 do pedido)."""
+    p0 = walls[wall_idx][0].GetEndPoint(0)
+    direction = (walls[wall_idx][0].GetEndPoint(1) - p0).Normalize()
+    invasoras = []
+    for cand in result["candidates"]:
+        if cand.get("wall_idx") != wall_idx:
+            continue
+        t_a, t_b = m._candidate_t_range_on_wall(cand, p0, direction)
+        for lo_ft, hi_ft, _sill, _head in openings_per_wall[wall_idx]:
+            overlap = min(max(t_a, t_b), to_cm(hi_ft)) - max(min(t_a, t_b), to_cm(lo_ft))
+            if overlap > m.OPENING_OVERLAP_TOLERANCE_CM:
+                invasoras.append((cand["logical_code"], round(min(t_a, t_b), 1),
+                                  round(max(t_a, t_b), 1), round(overlap, 2)))
+    return invasoras
+
+
+@case
+def test_pipeline_continuo_e_o_padrao_do_motor():
+    """A nova ordem nao e' uma opcao escondida atras de um parametro: e' o
+    que o motor faz quando ninguem pede nada (pedido explicito - "essa passa
+    a ser a nova ordem oficial de processamento")."""
+    assert m.DEFAULT_OPENING_STRATEGY == m.OPENING_STRATEGY_CONTINUOUS_FIRST
+    # e a ordem antiga continua ALCANCAVEL, para comparar as duas no mesmo
+    # projeto - o usuario pediu para abandona-la como estrategia principal,
+    # nao para apaga-la
+    assert m.OPENING_STRATEGY_SPLIT_FIRST != m.OPENING_STRATEGY_CONTINUOUS_FIRST
+
+
+@case
+def test_1_parede_sem_abertura_nao_muda_de_comportamento():
+    """TESTE 1 do pedido. Sem vao nenhum as duas estrategias descrevem
+    literalmente o mesmo problema - a nova ordem nao pode alterar NADA numa
+    parede cheia."""
+    lines = [seg(0, 0, 600, 0)]
+    continuo, _w, _n = _solve_axis(lines, [[]], m.OPENING_STRATEGY_CONTINUOUS_FIRST)
+    antigo, _w2, _n2 = _solve_axis(lines, [[]], m.OPENING_STRATEGY_SPLIT_FIRST)
+    assert continuo["non_modular"] == []
+    codigos = lambda r: sorted(c["logical_code"] for c in r["candidates"])
+    assert codigos(continuo) == codigos(antigo)
+
+
+@case
+def test_2_parede_com_porta_nao_deixa_bloco_no_vao():
+    """TESTE 2 do pedido: parede completa -> blocos completos -> recorte da
+    porta -> remover os blocos sobre a porta. Nenhum bloco pode sobrar
+    dentro da abertura (item 19: "a regiao da abertura deve permanecer
+    completamente livre")."""
+    lines = [seg(0, 0, 600, 0)]
+    ops = [[(ft(250.0), ft(330.0), 0.0, ft(210.0))]]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    assert _blocks_inside_openings(result, walls, ops) == []
+    assert result["non_modular"] == [], result["non_modular"]
+    assert result["candidates"], "a parede tem que ter blocos"
+
+
+@case
+def test_2b_peca_e_removida_inteira_nunca_cortada():
+    """Item 10 do pedido: "nao recortar blocos - o bloco e' uma unidade
+    modular". A classificacao usa o CORPO da peca (item 18), nao o centro:
+    uma peca que so' ENCOSTA na borda continua valendo."""
+    vaos = [(200.0, 280.0)]
+    # peca inteiramente dentro do vao
+    assert m.classify_extent_against_openings(220.0, 259.0, vaos)[0] == m.BLOCK_INSIDE_OPENING
+    # peca atravessando a borda - o centro dela (184,5cm) esta' FORA do vao,
+    # entao um teste por ponto central a aprovaria por engano
+    kind, oi, overlap = m.classify_extent_against_openings(165.0, 204.0, vaos)
+    assert kind == m.BLOCK_PARTIAL_OPENING and oi == 0
+    assert abs(overlap - 4.0) < 1e-6
+    # peca ENCOSTADA na borda (junta de abertura = 0) continua valida
+    assert m.classify_extent_against_openings(161.0, 200.0, vaos)[0] == m.BLOCK_OUTSIDE_OPENING
+    # nenhuma peca do resultado e' redimensionada: todo comprimento lancado
+    # existe no catalogo
+    lines = [seg(0, 0, 600, 0)]
+    ops = [[(ft(250.0), ft(330.0), 0.0, ft(210.0))]]
+    result, _walls, _nodes = _solve_axis(lines, ops)
+    tamanhos = set(CATALOG[c]["length_cm"] for c in CATALOG)
+    for cand in result["candidates"]:
+        assert cand["length_cm"] in tamanhos, cand["logical_code"]
+
+
+@case
+def test_3_porta_perto_da_extremidade_nao_destroi_a_amarracao():
+    """TESTE 3 do pedido: a remocao dos blocos sobre o vao nao pode comer a
+    peca de amarracao da extremidade."""
+    lines = [seg(0, 0, 400, 0), seg(400, 0, 400, 300)]
+    ops = [[(ft(300.0), ft(380.0), 0.0, ft(210.0))], []]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    amarracao = [c for c in result["candidates"] if m._is_tie_candidate(c)]
+    # o canto continua amarrado nas DUAS fiadas
+    assert [c for c in amarracao if c["course"] == "A"], amarracao
+    assert [c for c in amarracao if c["course"] == "B"], amarracao
+    assert _blocks_inside_openings(result, walls, ops) == []
+
+
+@case
+def test_4_pilarete_pequeno_entre_duas_aberturas():
+    """TESTE 4 do pedido: depois do recorte, o sistema tem que achar a
+    melhor combinacao para o pilarete que sobrou entre duas portas - as duas
+    aberturas sao analisadas JUNTAS (item 16), porque o pilarete entre elas
+    nao pode ser decidido olhando so' uma."""
+    lines = [seg(0, 0, 600, 0)]
+    ops = [[(ft(120.0), ft(200.0), 0.0, ft(210.0)),
+            (ft(250.0), ft(330.0), 0.0, ft(210.0))]]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    assert result["non_modular"] == [], result["non_modular"]
+    assert _blocks_inside_openings(result, walls, ops) == []
+    # o pilarete de 50cm entre as duas portas foi preenchido de verdade
+    p0 = walls[0][0].GetEndPoint(0)
+    direction = (walls[0][0].GetEndPoint(1) - p0).Normalize()
+    no_pilarete = [
+        c for c in result["candidates"]
+        if 200.0 <= min(m._candidate_t_range_on_wall(c, p0, direction)) < 250.0
+    ]
+    assert no_pilarete, "o pilarete entre as duas portas ficou vazio"
+    # com o pilarete GRANDE (50cm) a peca entre as duas portas sobrevive, e
+    # cada abertura tem a sua propria regiao - o reparo continua local
+    pecas = [(0.0, 39.0), (40.0, 79.0), (80.0, 119.0), (120.0, 159.0), (160.0, 199.0),
+             (200.0, 239.0), (240.0, 279.0), (280.0, 319.0), (320.0, 359.0)]
+    regioes = m.opening_repair_regions(pecas, [(120.0, 200.0), (250.0, 330.0)], 0.0, 359.0)
+    assert [len(r["opening_indexes"]) for r in regioes] == [1, 1], regioes
+    # ja' com o pilarete PEQUENO (12cm) nao sobra peca inteira entre elas:
+    # as duas caem na MESMA regiao, e o pilarete entre as portas passa a ser
+    # decidido olhando as duas de uma vez (item 16)
+    regioes = m.opening_repair_regions(pecas, [(120.0, 200.0), (212.0, 292.0)], 0.0, 359.0)
+    assert any(len(r["opening_indexes"]) == 2 for r in regioes), regioes
+
+
+@case
+def test_5_cruzamento_sobrevive_ao_recorte():
+    """TESTE 5 do pedido: o recorte das aberturas nao pode destruir as
+    regras de amarracao de um cruzamento."""
+    lines = [seg(0, 0, 600, 0), seg(300, -300, 300, 300)]
+    ops = [[(ft(100.0), ft(180.0), 0.0, ft(210.0))], []]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    cruzamento = [c for c in result["candidates"]
+                  if str(c.get("placement_reason", "")).startswith("X_INTERSECTION")]
+    assert cruzamento, "o cruzamento perdeu a peca de amarracao"
+    assert result["intersection_failures"] == []
+    assert _blocks_inside_openings(result, walls, ops) == []
+
+
+@case
+def test_6_mover_a_abertura_muda_so_a_regiao_dela():
+    """TESTE 6 do pedido: mover uma porta atualiza a modulacao. E o que a
+    nova ordem garante alem disso (item 14, "ajuste pode ser local"): a
+    parede LONGE da porta continua identica - e' isso que diferencia
+    "recalcular a regiao afetada" de "recalcular tudo"."""
+    lines = [seg(0, 0, 600, 0)]
+    antes, walls_a, _n = _solve_axis(lines, [[(ft(250.0), ft(330.0), 0.0, ft(210.0))]])
+    depois, walls_d, _n2 = _solve_axis(lines, [[(ft(290.0), ft(370.0), 0.0, ft(210.0))]])
+
+    def por_posicao(result, walls):
+        p0 = walls[0][0].GetEndPoint(0)
+        direction = (walls[0][0].GetEndPoint(1) - p0).Normalize()
+        saida = {}
+        for c in result["candidates"]:
+            t_a, t_b = m._candidate_t_range_on_wall(c, p0, direction)
+            saida[(c["course"], round(min(t_a, t_b), 1))] = c["logical_code"]
+        return saida
+
+    mapa_antes, mapa_depois = por_posicao(antes, walls_a), por_posicao(depois, walls_d)
+    # a modulacao mudou (a porta andou 40cm)
+    assert mapa_antes != mapa_depois
+    # mas o inicio da parede (bem longe das duas posicoes da porta) nao
+    longe_antes = dict((k, v) for k, v in mapa_antes.items() if k[1] < 150.0)
+    longe_depois = dict((k, v) for k, v in mapa_depois.items() if k[1] < 150.0)
+    assert longe_antes == longe_depois, (longe_antes, longe_depois)
+
+
+@case
+def test_7_mover_a_parede_recalcula_a_sequencia():
+    """TESTE 7 do pedido: mudou a geometria da parede, toda a sequencia e'
+    recalculada (a modulacao continua nasce do comprimento do eixo)."""
+    curta, _w, _n = _solve_axis([seg(0, 0, 600, 0)],
+                                [[(ft(250.0), ft(330.0), 0.0, ft(210.0))]])
+    longa, _w2, _n2 = _solve_axis([seg(0, 0, 800, 0)],
+                                  [[(ft(250.0), ft(330.0), 0.0, ft(210.0))]])
+    assert len(longa["candidates"]) > len(curta["candidates"])
+
+
+@case
+def test_8_ajuste_e_o_menor_possivel():
+    """TESTE 8 do pedido: quando 1cm resolve, o sistema nao pode propor 5cm.
+    O plano e' escolhido pelo MENOR |deslocamento| que produz solucao
+    valida, e "ja' compativel" nunca vira alteracao (item 13)."""
+    # faces de bloco de uma modulacao continua: 0/39, 40/79, 80/119...
+    faces = m.block_edges_cm([(0.0, 39.0), (40.0, 79.0), (80.0, 119.0),
+                              (120.0, 159.0), (160.0, 199.0), (200.0, 239.0)])
+    # abertura ja' compativel -> NAO alterar nada
+    plano = m.plan_minimum_opening_adjustment(faces, 40.0, 120.0, 5.0, 5.0)
+    assert plano["kind"] == "none", plano
+    # abertura 1cm fora -> deslocar exatamente 1cm, nunca mais
+    plano = m.plan_minimum_opening_adjustment(faces, 41.0, 121.0, 5.0, 5.0)
+    assert plano["kind"] == "shift" and abs(plano["delta_cm"] + 1.0) < 1e-6, plano
+    # 38/118 tem DUAS solucoes (+1cm leva a 39/119, -38cm nao cabe): a
+    # busca minimiza |delta| de verdade, entao 1cm - e nao "o proximo
+    # multiplo de bloco"
+    plano = m.plan_minimum_opening_adjustment(faces, 38.0, 118.0, 5.0, 5.0)
+    assert plano["kind"] == "shift" and abs(plano["delta_cm"] - 1.0) < 1e-6, plano
+    # e quando o menor que resolve e' 2cm, e' 2cm que sai - nunca 3, nunca 5
+    plano = m.plan_minimum_opening_adjustment(faces, 42.0, 122.0, 5.0, 5.0)
+    assert plano["kind"] == "shift" and abs(plano["delta_cm"] + 2.0) < 1e-6, plano
+    # so' o alargamento resolve -> alarga o minimo, e nunca REDUZ o vao
+    plano = m.plan_minimum_opening_adjustment(faces, 42.0, 117.0, 0.0, 5.0)
+    assert plano["kind"] == "widen", plano
+    assert plano["delta_left_cm"] >= 0 and plano["delta_right_cm"] >= 0, plano
+    assert abs(plano["delta_left_cm"] - 2.0) < 1e-6, plano
+    assert abs(plano["delta_right_cm"] - 2.0) < 1e-6, plano
+
+
+@case
+def test_9_sem_solucao_valida_reporta_conflito():
+    """TESTE 9 do pedido: quando nao existe solucao valida dentro dos tetos,
+    o sistema INFORMA o conflito - nunca fabrica uma modulacao incorreta."""
+    faces = m.block_edges_cm([(0.0, 39.0), (40.0, 79.0), (80.0, 119.0)])
+    # 13cm de erro: alem do teto de deslocamento (5cm) e do de alargamento
+    assert m.plan_minimum_opening_adjustment(faces, 53.0, 93.0, 5.0, 5.0) is None
+    # e no motor de verdade: a regiao que nao fecha e' reportada, com a
+    # geometria exata - e nenhum bloco e' inventado dentro do vao
+    lines = [seg(0, 0, 600, 0)]
+    ops = [[(ft(253.0), ft(333.0), 0.0, ft(210.0))]]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    conflitos = [e for e in result["non_modular"]
+                 if e.get("conflict") == "ABERTURA_NAO_COMPATIVEL"]
+    assert conflitos, result["non_modular"]
+    for e in conflitos:
+        assert e["seg_end_cm"] > e["seg_start_cm"], e
+        assert "opening_adjustment" in e, e
+    assert _blocks_inside_openings(result, walls, ops) == []
+    # o resto da parede continua modulado - um vao incompativel nao pode
+    # apagar a parede inteira (era o que acontecia na ordem antiga: 0 pecas)
+    assert len(result["candidates"]) >= 20, len(result["candidates"])
+
+
+@case
+def test_bloco_bom_engolido_pela_busca_volta_quando_o_reparo_falha():
+    """A expansao da regiao de reparo (item 22) derruba pecas INTEIRAS para
+    dar espaco ao solver. Se no fim nada fechar, elas voltam: derrubar bloco
+    bom sem colocar nada no lugar seria abrir um buraco na parede para
+    "resolver" um problema que continua sem solucao."""
+    lines = [seg(0, 0, 600, 0)]
+    ops = [[(ft(253.0), ft(333.0), 0.0, ft(210.0))]]
+    result, walls, _nodes = _solve_axis(lines, ops)
+    p0 = walls[0][0].GetEndPoint(0)
+    direction = (walls[0][0].GetEndPoint(1) - p0).Normalize()
+    inicio = [c for c in result["candidates"]
+              if c["course"] == "A"
+              and min(m._candidate_t_range_on_wall(c, p0, direction)) < 200.0]
+    # a modulacao continua da PRIMEIRA metade da parede (longe do vao)
+    # sobreviveu inteira
+    assert len(inicio) >= 4, inicio
+
+
+@case
+def test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo():
+    """Regra #2 do usuario aplicada na GERACAO, nao so' na auditoria: com o
+    trecho continuo indo de no' a no', o tier "B39+B34" fechava a sobra com
+    uma FILEIRA de B34 no meio da parede (medido: 3 seguidos em [475, 579]).
+    MAX_SPECIAL_BOND_PER_TRECHO limita isso."""
+    assert m.MAX_SPECIAL_BOND_PER_TRECHO == 1
+    usou_alguma = False
+    for total_cm in range(40, 900):
+        layout = m._pier_ordered_layout(float(total_cm), CATALOG, 1, 1)
+        if layout is None:
+            continue
+        especiais = [c for c, _a, _b in layout if CATALOG[c]["is_special_bond"]]
+        assert len(especiais) <= m.MAX_SPECIAL_BOND_PER_TRECHO, (total_cm, layout)
+        usou_alguma = usou_alguma or bool(especiais)
+    # e o teto nao virou "proibido": a peca especial continua disponivel
+    # como acerto PONTUAL, que e' a funcao legitima dela
+    assert usou_alguma
+
+
+@case
+def test_peca_de_acerto_prefere_ficar_perto_da_abertura():
+    """Com `variants_per_course=1` (regra 18.4) o layout de uma fiada repete
+    em TODAS as fiadas da mesma paridade - entao um compensador no meio da
+    parede vira faixa vertical, e a auditoria reprova. Perto do vao (ou da
+    ponta) a MESMA peca e' a solucao correta, e a auditoria isenta. A
+    escolha entre composicoes VALIDAS do mesmo trecho passa a olhar isso."""
+    # trecho de 544cm comecando em 35cm, numa parede de 614cm com um vao em
+    # 200-280
+    layout = m._continuous_segment_layout(
+        544.0, CATALOG, 0.0, 0.0, 35.0, [(200.0, 280.0)], 614.0,
+        leading_open=False, trailing_open=False,
+    )
+    assert layout is not None
+    penalidade = m._layout_acerto_penalty(layout, CATALOG, 35.0, [(200.0, 280.0)], 614.0)
+    base = m._pier_ordered_layout(544.0, CATALOG, 0.0, 0.0,
+                                  leading_open_override=False,
+                                  trailing_open_override=False)
+    penalidade_base = m._layout_acerto_penalty(base, CATALOG, 35.0, [(200.0, 280.0)], 614.0)
+    assert penalidade <= penalidade_base, (layout, base)
+    # sem abertura no trecho nao ha' o que preferir: devolve o layout padrao
+    assert m._continuous_segment_layout(
+        544.0, CATALOG, 0.0, 0.0, 35.0, [], 614.0,
+        leading_open=False, trailing_open=False) == base
+
+
+@case
+def test_continuidade_degradada_e_ultimo_recurso_e_fica_registrada():
+    """A nova ordem resolve o eixo INTEIRO de uma vez - o que tambem
+    significa que um eixo cujo comprimento total nao fecha nao lancaria
+    NADA, nem nos pedacos que fecham. Quando isso acontece, e SO' entao, o
+    trecho e' refeito usando as aberturas como ponto de quebra (a ordem
+    antiga, como degradacao local) - e isso fica REGISTRADO, nunca
+    silencioso."""
+    walls = [(seg(0, 0, 407, 0), ft(14.0), (False, False)),
+             (seg(407, 0, 407, 300), ft(14.0), (False, False))]
+    walls, jmap = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, jmap)
+    openings = [[(ft(60.0), ft(140.0), 0.0, ft(210.0))], []]
+    intersections = m.solve_all_intersections(nodes, walls, CATALOG, openings, end_to_node)
+    by_end = m._index_node_candidates_by_wall_end(
+        nodes, intersections["candidates"], walls, end_to_node)
+    midspan = m._index_node_candidates_midspan(
+        nodes, intersections["candidates"], walls, end_to_node)
+    fill = m.solve_wall_free_fill(0, walls, nodes, end_to_node, openings,
+                                  by_end, midspan, CATALOG)
+    # a chave existe SEMPRE (vazia no caminho normal) - quem le' o relatorio
+    # nao precisa adivinhar se o motor caiu na degradacao
+    assert "continuity_degraded" in fill
+    for entrada in fill["continuity_degraded"]:
+        assert entrada["wall_idx"] == 0
+        assert entrada["spans_cm"], entrada
+
+
+@case
+def test_conflito_de_abertura_e_descrito_de_forma_util_no_relatorio():
+    """Item/teste 9 do pedido - "o sistema deve INFORMAR o conflito". Uma
+    regiao que a modulacao continua nao compatibilizou nao e' um pilarete
+    com comprimento errado: formata-la como tal imprimia "mais proximo que
+    fecha em blocos: 0cm", que nao significa nada."""
+    conflito = {
+        "wall_idx": 0, "course": "A", "segment_index": None,
+        "conflict": "ABERTURA_NAO_COMPATIVEL",
+        "seg_start_cm": 240.0, "seg_end_cm": 361.0,
+        "current_length_cm": 121.0,
+        "lower_valid_cm": 0, "upper_valid_cm": 0,
+        "opening_indexes": [0],
+        "opening_adjustment": [{"opening_index": 0, "plan": None}],
+    }
+    texto = m.describe_non_modular_entry(conflito)
+    assert "abertura(s) #0" in texto, texto
+    assert "240.0..361.0cm" in texto, texto
+    assert "0cm)" not in texto.replace("361.0cm)", ""), texto
+
+    # a entrada CLASSICA (pilarete que nao fecha) continua descrita como
+    # sempre - a unificacao nao pode ter mudado a mensagem que ja existia
+    classico = {
+        "wall_idx": 0, "course": "B", "segment_index": 2,
+        "current_length_cm": 118.0, "lower_valid_cm": 119, "upper_valid_cm": 124,
+    }
+    texto = m.describe_non_modular_entry(classico)
+    assert "trecho 2" in texto and "118.0cm" in texto and "119cm" in texto, texto
+
+    # e SEM_ESPACO continua dizendo QUAIS fronteiras se invadem
+    sem_espaco = {
+        "wall_idx": 0, "course": "A", "segment_index": 1,
+        "conflict": "SEM_ESPACO", "current_length_cm": -14.0,
+        "left_kind": "WALL_START", "right_kind": "OPENING_LO",
+        "lower_valid_cm": 0, "upper_valid_cm": 0,
+    }
+    texto = m.describe_non_modular_entry(sem_espaco)
+    assert "WALL_START" in texto and "OPENING_LO" in texto, texto

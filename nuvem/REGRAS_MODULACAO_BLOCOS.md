@@ -1888,3 +1888,190 @@ continuidade lógica entre elas.
   inclusive o fechamento contra vão da seção 18.12 — antes de sinalizar a
   região. Quando ainda não houver solução, informar é obrigatório; inventar
   uma modulação proibida continua vedado.
+## 23. PIPELINE OFICIAL DE ABERTURAS — parede completa primeiro (2026-08-28)
+
+**REGRA OBRIGATÓRIA — muda a ORDEM do algoritmo, não um parâmetro dele.**
+Pedido explícito do usuário, com fluxo desenhado item a item ("essa passa a
+ser a nova ordem oficial de processamento… não voltar à lógica anterior…
+essa abordagem deve ser abandonada como estratégia principal").
+
+### 23.1 A ordem, antes e agora
+
+| | ANTES (`split_first`) | AGORA (`continuous_first`, padrão) |
+|---|---|---|
+| 1 | detectar paredes | analisar a arquitetura |
+| 2 | criar paredes | **gerar as paredes completas** |
+| 3 | detectar portas/janelas | analisar as amarrações |
+| 4 | **recortar as paredes nas aberturas** | **modular os blocos na parede completa** |
+| 5 | modular cada trecho isolado | validar a modulação |
+| 6 | ajustar | **recortar as aberturas** |
+| 7 | — | identificar e **deletar** os blocos sobre o vão |
+| 8 | — | **ajustar a parede o mínimo possível** |
+| 9 | — | **recalcular só o que for necessário** |
+| 10 | — | validação final |
+
+Constantes e funções: `core/engine/continuous_modulation.py`
+(`OPENING_STRATEGY_CONTINUOUS_FIRST` = `DEFAULT_OPENING_STRATEGY`,
+`OPENING_STRATEGY_SPLIT_FIRST` só para comparar as duas ordens no mesmo
+projeto). Integração: `solve_wall_free_fill(..., opening_strategy=...)` e
+`_recut_openings_and_repair`, em `core/engine/wall_stepper.py`.
+
+### 23.2 O que exatamente mudou no solver
+
+- **As aberturas deixaram de ser fronteira do preenchimento.** No modo
+  contínuo, `base_boundaries` tem só `WALL_START`, `MIDSPAN_LO/HI` (encontro
+  no meio da parede) e `WALL_END`. Um eixo de 8m com duas portas é **um**
+  problema de 8m, não três de 2m.
+- **As amarrações continuam intocadas.** Encontros L/T/X são resolvidos
+  ANTES (`solve_all_intersections`, inalterado) e reservam o mesmo espaço de
+  sempre — eles nunca foram fronteira de abertura, e continuam sendo
+  fronteira de trecho. A abertura não pode fazer uma amarração ser perdida.
+- **O recorte é geométrico, por volume real** (item 18 do pedido): uma peça
+  é derrubada se o CORPO dela (`[t_start, t_end]`, via
+  `_candidate_t_range_on_wall`) invade o vão em mais de
+  `OPENING_OVERLAP_TOLERANCE_CM` (0,2cm) — nunca pelo ponto central. Peça
+  que só ENCOSTA na borda (junta de abertura = 0cm) continua valendo.
+- **Bloco nunca é cortado nem redimensionado** (item 10): é removido
+  INTEIRO. `split_extents_by_openings` classifica em `FORA` / `DENTRO` /
+  `PARCIAL`; os dois últimos saem.
+- **Só a região afetada é recalculada** (item 22). As peças derrubadas
+  contíguas viram uma REGIÃO de reparo, ancorada na face da peça que
+  sobreviveu de cada lado (`opening_repair_regions`); os trechos sólidos
+  dentro dela (`region_solid_subsegments`) são re-resolvidos pelo solver de
+  pilarete DE SEMPRE (`_pier_ordered_layout` / `_pier_layout_avoiding_joints`)
+  — nenhuma regra de layout nova. Fora da região, a modulação contínua fica
+  intacta.
+- **Duas aberturas próximas caem na MESMA região** (item 16, pilarete entre
+  aberturas): quando não sobra peça inteira entre elas, o pilarete só pode
+  ser decidido olhando as duas de uma vez.
+- **A região cresce uma peça por vez, e só pelo lado que falhou**
+  (`OPENING_REPAIR_MAX_EXTRA_BLOCKS = 3`). Se no fim nada fechar, **as peças
+  engolidas pela busca voltam**: derrubar bloco bom sem colocar nada no
+  lugar seria abrir um buraco para "resolver" um problema que continua sem
+  solução.
+- **`solve_opening_jamb` não é mais chamado no modo contínuo.** Não existe
+  mais uma "peça de jamb" decidida antes do resto — a peça que encosta no
+  vão é a que o reparo local escolheu, com as mesmas prioridades. O
+  alinhamento de vazio entre as fiadas junto ao vão continua garantido pelo
+  critério PRINCIPAL de `_pier_layout_avoiding_joints`
+  (`target_void_positions_cm`), que sempre cobriu a parede inteira.
+  `jamb_exceptions` sai vazio nesse modo.
+
+### 23.3 Ajuste mínimo (itens 11 a 14) — e a ordem de prioridade
+
+`plan_minimum_opening_adjustment` só é consultado **depois** de o recálculo
+local ter falhado — porque o item 24 põe a POSIÇÃO DA ABERTURA (4º) acima da
+MODULAÇÃO DOS BLOCOS (5º): mexer na arquitetura é o último recurso, não o
+primeiro.
+
+1. `{"kind": "none"}` — já compatível: **não alterar nada** (item 13);
+2. `{"kind": "shift"}` — menor translação rígida do vão (largura preservada),
+   até `AXIS_OPENING_SHIFT_MAX_CM` (5cm);
+3. `{"kind": "widen"}` — alargar o mínimo, até
+   `OPENING_WIDTH_INCREASE_MAX_CM` (5cm). **Nunca reduzir** o vão;
+4. `None` — nenhuma solução dentro dos tetos: reportar CONFLITO
+   (`"conflict": "ABERTURA_NAO_COMPATIVEL"`), nunca fabricar modulação
+   errada (teste 9).
+
+O mínimo é mínimo de verdade: a busca varre os deslocamentos que as FACES
+reais geram, em ordem de `|delta|` — não "tenta 1cm, 2cm, 3cm". As faces de
+referência são as do layout **contínuo inteiro** (antes do recorte), nunca as
+do que sobrou: usar o que sobrou empurraria a proposta para a junta seguinte
+e faria o motor "descobrir" que precisa de 13cm quando a junta certa está a
+1cm.
+
+### 23.4 Duas correções de REGRA que a nova ordem tornou necessárias
+
+Não são ajustes cosméticos — sem elas a nova ordem PIORA a amarração, e
+foram medidas, não supostas.
+
+**(a) `MAX_SPECIAL_BOND_PER_TRECHO = 1`** (`wall_stepper.py`). O trecho agora
+vai de nó a nó, e o tier 3 de `_pier_ordered_layout` (B39+B34, sem limite de
+quantidade) fechava a sobra com uma FILEIRA de B34 no meio da parede —
+medido: `4×B39 + 3×B34` seguidos em [475, 579] numa parede de 6m, que a
+própria auditoria reprovava logo depois
+(`REPEATED_VERTICAL_COMPENSATOR_STRIP`, B34 repetido em 8 fiadas). Mesmo teto
+e mesmo espírito de `MAX_COMPENSATORS_PER_TRECHO`: peça de acerto é PONTUAL,
+nunca sequência. É a regra #2 do usuário aplicada também na GERAÇÃO, e não só
+na auditoria. Com trechos curtos (a ordem antiga) isso quase nunca aparecia.
+
+**(b) `_continuous_segment_layout`** — entre composições **igualmente
+válidas** do mesmo trecho, prefere a que coloca a peça de acerto
+(compensador/pastilha/meio bloco/peça especial) onde ela é natural: perto de
+uma abertura ou perto da ponta da parede, usando exatamente as zonas que a
+auditoria já isenta (`BOND_STRIP_OPENING_INFLUENCE_CM = 60`,
+`BOND_STRIP_EDGE_EXEMPT_CM = 25`, movidas para `continuous_modulation.py`
+para não viverem em dois arquivos). Nenhuma peça nova, nenhuma prioridade de
+tier alterada — só a POSIÇÃO da sobra. Necessário porque o guloso empurra a
+sobra para o FIM do trecho, e o fim de um trecho contínuo é um encontro de
+amarração: o pior lugar possível para um compensador.
+
+### 23.5 Degradação controlada — o único caminho de volta ao `split`
+
+A nova ordem resolve o eixo inteiro de uma vez, o que também significa que um
+eixo cujo COMPRIMENTO TOTAL não fecha em blocos não lançaria **nada**, nem
+nos pedaços que fechariam. Quando (e só quando) isso acontece, aquele trecho
+é refeito usando as aberturas como ponto de quebra — a ordem antiga, aplicada
+como degradação LOCAL e registrada em `continuity_degraded` (chave sempre
+presente no retorno de `solve_wall_free_fill`, vazia no caminho normal).
+Mesma disciplina dos encontros degradados (`L_CORNER_DEGRADED` e família):
+melhor uma solução pior e rotulada do que nenhuma solução. Isso **não** é a
+lógica anterior de volta: ela nunca é o caminho principal, e nunca acontece
+em silêncio.
+
+### 23.6 O que foi MEDIDO (não suposto)
+
+Varredura de 481 combinações reais (eixo de 300 a 800cm × posição de porta de
+80cm, passo 20cm), mesmas paredes nas duas estratégias:
+
+| | `split_first` | `continuous_first` |
+|---|---|---|
+| casos que fecham | 481 (100%) | 481 (100%) |
+| **B34/B54 como enchimento** | **2460** | **0** |
+| **B39 (bloco inteiro)** | 9587 | **11570 (+21%)** |
+| B19 (meio bloco) | 1453 | 1430 |
+| C09/C04 (compensador) | 1200 | **1924 (+60%)** |
+| blocos dentro do vão | 0 | 0 |
+
+Numa planta fechada de 4 paredes com 3 aberturas, 15 fiadas:
+
+| | `split_first` | `continuous_first` |
+|---|---|---|
+| paredes reprovadas na amarração | 3/4 | 3/4 |
+| **`CONTINUOUS_VERTICAL_JOINT`** (regra #1, absoluta) | **1** | **0** |
+| `REPEATED_VERTICAL_COMPENSATOR_STRIP` | 2 | 5 |
+
+**TRADE-OFF REGISTRADO.** O ganho é grande e está no lugar certo: peça de
+amarração deixou de ser usada como enchimento (2460 → 0 — era exatamente o
+que produzia as faixas verticais de peça especial), bloco inteiro subiu 21%,
+e a junta corrida (regra #1, absoluta) zerou. O custo é +60% de
+compensador/pastilha, e com `variants_per_course = 1` (regra 18.4) cada um
+deles vira uma faixa vertical repetida em todas as fiadas da mesma paridade.
+Continua sendo reportado pela auditoria para revisão manual.
+
+### 23.7 Pendência aberta (DOCUMENTADO — pendência de código)
+
+`_continuous_segment_layout` só atua na **variante 0 da fiada A**. A fiada B
+é decidida por `_pier_layout_avoiding_joints`, cujo critério primário é o
+desencontro de junta (regra #1, absoluta, que não pode ser rebaixada) — então
+a peça de acerto de B ainda pode cair no meio da parede e formar faixa
+vertical sozinha. A correção fina é gerar os candidatos reordenados DENTRO da
+busca de `_pier_layout_avoiding_joints`, para que a posição da peça de acerto
+entre como desempate **depois** do desencontro, nunca antes. Medido no
+cenário de 4 paredes: sobram 5 faixas, das quais 3 na mesma parede.
+Relacionada à pendência já registrada na regra 18.4 ("variar a composição
+apenas nos trechos que usam compensador").
+
+### 23.8 Critérios de aceitação — cobertos por teste
+
+`tests/test_script.py`, seção "SECAO 19 - PIPELINE OFICIAL". Os 9 testes do
+pedido, um a um: parede sem abertura (1), parede com porta sem bloco no vão
+(2), porta na extremidade sem perder a amarração (3), pilarete pequeno entre
+aberturas (4), cruzamento (5), mover a abertura (6), mover a parede (7),
+ajuste mínimo de 1cm (8), solução impossível reportada como conflito (9).
+Mais: peça removida inteira e nunca cortada, bloco bom devolvido quando o
+reparo falha, teto de peça especial, posição da peça de acerto, e degradação
+registrada.
+
+`tests/solver_bench.py --fingerprint`: a assinatura MUDOU de propósito
+(`9413aad0…` → `c74c9c1a…`) — é uma mudança de regra, não de desempenho.
