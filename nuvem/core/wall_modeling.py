@@ -8734,18 +8734,53 @@ class _PostCreationEventHandler(IExternalEventHandler):
             t_cleanup = self._Transaction(app_doc, "Remove lote anterior de blocos (recalculo)")
             t_cleanup.Start()
             try:
+                # EXCLUSAO EM LOTE - a UNICA otimizacao que a medicao desta
+                # etapa aprovou (feita ao vivo via MCP em 2026-08-28, com a
+                # instrumentacao que este mesmo arquivo passou a expor).
+                # Nas MESMAS 10.741 pecas de uma planta real de 306 eixos,
+                # apagadas pelos dois caminhos com um RollBack entre as duas
+                # medidas para que ambos removessem exatamente o mesmo
+                # conjunto: Document.Delete(ICollection<ElementId>) leva
+                # 1,82s (0,170 ms/el) contra 6,70s (0,624 ms/el) de um
+                # Delete por elemento - 3,7x mais rapido, 4,9s a menos em
+                # cada recalculo.
+                #
+                # A sondagem GetElement CONTINUA aqui, e nao por inercia:
+                # custa 0,04s no lote inteiro (~0,004 ms/el, medida separada
+                # do Delete) e e' o que torna o lote SEGURO. Delete de uma
+                # colecao com UM unico ElementId invalido lanca e nao apaga
+                # NADA, enquanto o laco antigo simplesmente pulava a peca
+                # invalida; filtrar antes preserva exatamente a tolerancia
+                # que o laco tinha ("peca ja' apagada/invalida nunca trava a
+                # recriacao"), agora numa chamada so'.
+                stale_ids = List[ElementId]()
                 for item in previous_instances:
                     try:
-                        elem = app_doc.GetElement(item["id"])
-                        if elem is not None:
-                            app_doc.Delete(item["id"])
+                        if app_doc.GetElement(item["id"]) is not None:
+                            stale_ids.Add(item["id"])
                     except Exception:
                         pass  # peca ja' apagada/invalida - nunca trava a recriacao
+                if len(stale_ids):
+                    try:
+                        app_doc.Delete(stale_ids)
+                    except Exception:
+                        # Rede de seguranca: se o Revit recusar a colecao
+                        # inteira (uma peca que a sondagem aprovou mas o
+                        # Delete rejeita), volta ao caminho antigo. Apagar
+                        # TUDO importa mais que apagar rapido - um lote
+                        # anterior sobrevivendo pela metade e' exatamente o
+                        # bug de 2026-08-25 ("parte da parede andou e parte
+                        # ficou na posicao antiga") pela porta dos fundos.
+                        for stale_id in stale_ids:
+                            try:
+                                app_doc.Delete(stale_id)
+                            except Exception:
+                                pass
                 t_cleanup.Commit()
             except Exception:
                 t_cleanup.RollBack()
             perf_steps.append((
-                "Exclusao do lote anterior (GetElement + Delete, um a um)",
+                "Exclusao do lote anterior (sondagem + Delete em lote)",
                 _perf_clock() - t_delete_start,
                 "{} instancia(s) do lote anterior".format(len(previous_instances)),
             ))
