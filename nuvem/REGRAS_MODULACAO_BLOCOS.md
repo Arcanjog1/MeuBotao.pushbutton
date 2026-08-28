@@ -1342,3 +1342,60 @@ ampliam o alcance dos tiers **bons**, evitando que a parede desça para um
 tier pior sem necessidade. Resultado medido no projeto real: eixos com
 problema caíram de **82 para 72**, e os reprovados por compensadores
 adjacentes de **40 para 24**.
+
+## 17. Dois bugs de RELATÓRIO já diagnosticados e ainda NÃO corrigidos (2026-08-28)
+
+> **Status**: **DIAGNOSTICADO — pendência de código aberta.** Nenhum dos
+> dois afeta a geometria dos blocos criados: os dois estragam o que o
+> usuário VÊ depois (o realce vermelho e a contagem de peças). Medidos ao
+> vivo via MCP no projeto `TESTE MODULAÇÃO` (126 paredes, 13.766 blocos).
+
+### 17.1 — `_colliding_created_instance_ids` infla o realce em ~127×
+
+`solve_building_blocks_all_courses` gera `variants_per_course`
+(`PIER_LAYOUT_VARIANTS_PER_COURSE`) composições ALTERNATIVAS para a mesma
+fiada e as agrega todas em `candidates`; `course_candidates` é que decide
+qual delas vira peça em cada fiada física. A detecção de colisão roda
+sobre `candidates` INTEIRO, então ela compara candidatos que **nunca
+coexistem no modelo** — duas variantes da mesma fiada ocupam o mesmo
+espaço por construção.
+
+`_colliding_created_instance_ids` marca uma instância criada se o seu
+`candidate_key` aparecer em QUALQUER par de colisão, sem verificar se o
+OUTRO lado do par também foi criado, nem se os dois caíram na mesma fiada
+física. Medição real:
+
+| | |
+|---|---|
+| pares de colisão reportados | 52.575 |
+| descartados: um dos lados nunca foi criado | 50.210 |
+| descartados: os dois existem, mas em fiadas diferentes | 2.310 |
+| **colisões REAIS** | **55** (88 peças) |
+| peças que o cálculo atual marcava | 11.211 |
+
+Com isso o realce cobria **91%** das peças e não informava nada; o
+critério correto marca **0,6%**. **Correção pendente**: exigir que os DOIS
+lados do par tenham sido criados E compartilhem o mesmo `course_index`
+antes de marcar (foi o critério usado manualmente para produzir o realce
+útil desta sessão). O mesmo vale para `collisions` quando ele é usado como
+número no relatório final — hoje ele mede candidatos, não peças.
+
+### 17.2 — `MirrorElement` deixa peças órfãs a cada lançamento
+
+`create_building_blocks` usa `MirrorElement` para orientar compensadores
+(regra #3, seção 12). Essa API **cria uma cópia** em vez de espelhar no
+lugar, e a cópia não entra em `created_instances`. Consequências:
+
+- o documento fica com mais blocos do que `created_count` informa (medido:
+  14.276 no modelo × 13.766 registrados = **510 órfãs**, exatamente o
+  `mirror_calls` do perfil de tempo);
+- a exclusão do lote anterior em `_execute_create` (seção 13.4) apaga por
+  Id e portanto **nunca remove as órfãs** — elas se acumulam a cada clique
+  em "Lançar Blocos - criar", que é o mesmo cenário do bug de
+  reposicionamento parcial de 2026-08-25 entrando pela porta dos fundos.
+
+**Correção pendente**: registrar em `created_instances` o Id devolvido
+pelo espelhamento (ou usar o overload que espelha sem copiar) e apagar a
+peça original quando a cópia a substituir. Enquanto isso não existe, a
+limpeza correta é apagar TODA instância das famílias do catálogo cujo Id
+não esteja em `created_instances`.
