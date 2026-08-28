@@ -1399,3 +1399,32 @@ pelo espelhamento (ou usar o overload que espelha sem copiar) e apagar a
 peça original quando a cópia a substituir. Enquanto isso não existe, a
 limpeza correta é apagar TODA instância das famílias do catálogo cujo Id
 não esteja em `created_instances`.
+
+## 18. Edição dinâmica no Modelador Externo (2026-08-28)
+
+> **Status**: **IMPLEMENTADO no `AbrirModeladorExterno.pushbutton`**. Esta
+> regra é de interação do preview externo; ela não grava uma edição no
+> documento Revit até que exista um fluxo explícito de aprovação/importação.
+
+- Parede, abertura, encontro/amarração e blocos são dependências do mesmo
+  modelo: uma alteração geométrica nunca pode manter candidatos de blocos
+  calculados para a geometria anterior.
+- Ao arrastar uma Wall contínua, suas extremidades podem ser movidas ou o
+  eixo inteiro pode ser transladado. Quando o eixo representa vários
+  fragmentos colineares de origem, todos são transformados na mesma razão
+  paramétrica, impedindo fendas entre fragmentos.
+- Aberturas hospedadas acompanham a alteração da Wall na mesma posição
+  relativa ao eixo. Uma abertura arrastada manualmente só pode permanecer
+  inteiramente dentro da sua hospedeira; não é revertida só por piorar a
+  pontuação do solver.
+- Toda edição válida chama o **mesmo** `solve_capture_block_candidates` da
+  modulação inicial. Não há um algoritmo simplificado para pós-edição:
+  portas, vãos, vergas, quinas, amarrações, tolerâncias e catálogo são
+  recalculados pelas regras originais.
+- A atualização identifica a componente L/T/X conectada e informa as Walls
+  afetadas. O motor continua isolando o cálculo por nível e faixa de base,
+  para que uma alteração não seja tratada como mudança no projeto inteiro.
+- Nenhuma Wall sem resultado pode ser omitida: o payload expõe por Wall um
+  estado (`MODULABLE`, `NON_MODULAR`, `ALIGNMENT_CONFLICT`,
+  `VALIDATION_FAILURE` ou `NOT_PROCESSED`) e o motivo concreto mostrado no
+  inspetor do visualizador.
