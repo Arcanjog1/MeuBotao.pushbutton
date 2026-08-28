@@ -270,17 +270,56 @@ class ElementId(object):
 ElementId.InvalidElementId = ElementId(-1)
 
 
+class _FakeWritableParam(object):
+    """Parametro de instancia gravavel de um _FakeFamilyInstance - guarda o
+    valor escrito para o teste conferir (ver `params` abaixo)."""
+
+    def __init__(self, owner, name):
+        self._owner = owner
+        self._name = name
+        self.IsReadOnly = False
+        self.HasValue = True
+
+    def AsDouble(self):
+        return self._owner.params.get(self._name, 0.0)
+
+    def AsValueString(self):
+        return None
+
+    def Set(self, value):
+        self._owner.params[self._name] = value
+        return True
+
+
 class _FakeFamilyInstance(object):
     """Devolvido por _StubCreate.NewFamilyInstance - so' o suficiente
     (Id) para create_building_blocks montar created_instances/created_count
     de verdade, sem precisar do Revit real. RotateElement/MirrorElement
     (ElementTransformUtils, stubado como _Inert em outro lugar deste
-    arquivo) nunca leem nada desta instancia, so' o Id."""
+    arquivo) nunca leem nada desta instancia, so' o Id.
+
+    Desde 2026-08-28 tambem responde a LookupParameter/flipFacing/flipHand:
+    e' assim que o fluxo de UNIAO de paredes existentes devolve a uma
+    porta/janela recriada os parametros de largura/altura/peitoril e a
+    orientacao que ela tinha na parede antiga (ver recreate_wall_inserts) -
+    sem isso, aquele caminho so' daria para conferir ao vivo no Revit."""
     _next_int = [1000]
 
     def __init__(self):
         self.Id = ElementId(_FakeFamilyInstance._next_int[0])
         _FakeFamilyInstance._next_int[0] += 1
+        self.params = {}
+        self.FacingFlipped = False
+        self.HandFlipped = False
+
+    def LookupParameter(self, name):
+        return _FakeWritableParam(self, name)
+
+    def flipFacing(self):
+        self.FacingFlipped = not self.FacingFlipped
+
+    def flipHand(self):
+        self.HandFlipped = not self.HandFlipped
 
 
 class _FakeOpening(object):
@@ -317,9 +356,21 @@ class _StubCreate(object):
         # Todo NewOpening pedido, em ordem: (wall, p1, p2) - o teste confere
         # os cantos enviados sem precisar de um Revit real.
         self.openings = []
+        # Toda NewFamilyInstance pedida, em ordem:
+        # (point, symbol, rest, instancia_devolvida) - e' assim que o teste
+        # confere que a porta/janela recriada pelo fluxo de UNIAO de paredes
+        # foi hospedada na parede continua certa e voltou com os parametros
+        # e a orientacao da original.
+        self.family_instances = []
 
-    def NewFamilyInstance(self, point, symbol, level, structural_type):
-        return _FakeFamilyInstance()
+    def NewFamilyInstance(self, point, symbol, *rest):
+        # `*rest` de proposito: o motor usa DOIS overloads reais do Revit -
+        # (point, symbol, level, structuralType), em create_building_blocks,
+        # e (point, symbol, host, level, structuralType), em
+        # recreate_wall_inserts (uniao de paredes existentes).
+        instance = _FakeFamilyInstance()
+        self.family_instances.append((point, symbol, rest, instance))
+        return instance
 
     def NewOpening(self, wall, p1, p2):
         self.openings.append((wall, p1, p2))
@@ -332,12 +383,19 @@ class _StubDoc(object):
         self.Application = _Inert()
         self.regenerate_calls = 0
         self.Create = _StubCreate()
+        # Todo Delete pedido, em ordem - o fluxo de uniao de paredes so'
+        # apaga as antigas DEPOIS de validar a continua, e e' isso que o
+        # teste confere (inclusive que NAO apaga quando reprova).
+        self.deleted = []
 
     def Regenerate(self):
         self.regenerate_calls += 1
 
     def GetElement(self, element_id):
         return None
+
+    def Delete(self, element_id):
+        self.deleted.append(element_id)
 
 
 class _StubUIDoc(object):
@@ -850,11 +908,14 @@ def install():
         "FilteredElementCollector", "Level", "Wall", "WallType", "WallKind",
         "WallUtils", "WallLocationLine", "BuiltInCategory",
         "MaterialFunctionAssignment", "FamilyInstance", "LocationPoint",
-        "LocationCurve", "CompoundStructure", "Solid", "ViewDetailLevel",
+        "LocationCurve", "CompoundStructure", "Solid", "ViewDetailLevel", "Opening",
         "OverrideGraphicSettings", "FillPatternElement", "IUpdater",
         "UpdaterId", "UpdaterRegistry", "ChangePriority", "SubTransaction",
         "Element", "ElementClassFilter",
         "FamilySymbol", "PlanarFace", "StorageType", "TransactionGroup",
+        # tratamento de falhas da Transaction - usado so' pelo fluxo de
+        # uniao de paredes existentes (_MergeWarningSwallower)
+        "IFailuresPreprocessor",
     ]
     db_attrs = dict((name, _inert_class(name)) for name in db_names)
     db_attrs["Color"] = _inert_class("RevitColor")
@@ -871,6 +932,11 @@ def install():
         # BuiltInParameter (ver _select_existing_walls_for_modulation em
         # test_script.py).
         "BuiltInParameter": _Enum("BuiltInParameter"),
+        # _Enum (instancias), nao classes inertes: sao namespaces de
+        # constantes (FailureSeverity.Warning, FailureProcessingResult.
+        # Continue), nunca instanciados - mesma razao de BuiltInParameter.
+        "FailureSeverity": _Enum("FailureSeverity"),
+        "FailureProcessingResult": _Enum("FailureProcessingResult"),
     })
     autodesk = module("Autodesk")
     revit_ns = module("Autodesk.Revit")
