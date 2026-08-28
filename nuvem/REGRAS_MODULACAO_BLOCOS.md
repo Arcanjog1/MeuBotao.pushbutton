@@ -312,6 +312,84 @@ nunca aplica um ajuste maior sem autorização explícita do usuário.
   "Offset da base" de `Wall.Create`). Passar a cota já absoluta duplicava
   a elevação (bug real corrigido 2026-08-21).
 
+## 8b. Modo de geração das paredes de referência (2026-08-28)
+
+A janela de configuração (`_SetupForm`, seção *"6. Como gerar as
+paredes"*) oferece **duas alternativas independentes**, para poder
+comparar as duas no mesmo projeto. Constantes em
+`core/wall_modeling.py`: `WALL_BUILD_MODE_SEGMENTED` (padrão) e
+`WALL_BUILD_MODE_CONTINUOUS`.
+
+| | Segmentado (padrão, histórico) | Contínuo com recortes (novo) |
+|---|---|---|
+| Elementos `Wall` por eixo | vários (pilarete, peitoril, verga, pilarete…) | **1**, do nível até a altura cheia |
+| Como a abertura aparece | ausência de parede entre os trechos | **recorte nativo** (`Opening`) na parede |
+| API usada | `Wall.Create` por trecho | `Wall.Create` do eixo inteiro + `Document.Create.NewOpening(wall, p1, p2)` |
+| Funções | `build_wall_segments` | `build_wall_segments(..., wall_build_mode=…)` + `build_wall_opening_cuts` + `create_wall_opening_cuts` |
+
+Ordem obrigatória no modo contínuo (é o que o usuário pediu, e também o
+que o Revit exige para o recorte cair no lugar certo):
+
+1. cria a parede **inteira**, ignorando portas/janelas;
+2. desliga o auto-join e realinha a parede pelo **núcleo**
+   (`WallLocationLine.CoreCenterline` + reescrita da `LocationCurve`) —
+   os mesmos dois passos de sempre;
+3. só **depois** do `doc.Regenerate()` desse realinhamento é que cada
+   abertura vira um `Opening`. Criar o recorte antes o posicionaria
+   contra a parede antiga, reintroduzindo o desvio de ~0,5cm que o passo
+   2 existe para eliminar.
+
+Cada recorte respeita exatamente **posição, largura, altura e peitoril**
+lidos da abertura. A única folga aplicada é
+`OPENING_CUT_EDGE_OVERSHOOT_M = 0.01` (1cm), e **só** na aresta que encosta na
+base ou no topo da parede (porta com peitoril 0, verga que alcança o
+pé-direito) — sem ela o Revit pode tratar o retângulo como tangente e não
+atravessar o sólido. Arestas internas (peitoril de janela, verga com
+parede em cima) ficam na cota exata.
+
+### O que NÃO muda entre os dois modos
+
+- **A modulação de blocos inteira.** `solve_building_blocks_all_courses`
+  trabalha sobre os EIXOS (`walls_to_create`) e sobre `openings_per_wall`
+  — nunca sobre os elementos `Wall` criados. Nível de inserção,
+  alternância de fiadas, encontros L/T/X, amarrações, compensadores e
+  zonas de exclusão de porta seguem idênticos. Conferível com
+  `python tests/solver_bench.py --fingerprint`: a assinatura sha256 não
+  se altera.
+- **A ETAPA 3B** (ajuste pós-criação de parede + abertura). Como no modo
+  contínuo não existem pilaretes como elementos separados,
+  `_classify_continuous_wall_axis` os **sintetiza** a partir do eixo +
+  intervalos das aberturas, marcados `"virtual": True`. O planejador
+  (`plan_axis_opening_fix`) é o mesmo — ele só enxerga comprimentos de
+  pilarete e larguras de vão. Na aplicação
+  (`apply_axis_opening_fix`), pilarete virtual é **pulado** (a parede
+  contínua nunca é reescrita) e o que se move é a instância da abertura
+  **mais o `Opening` que a recorta**, pelo mesmo deslocamento.
+- **A revalidação pós-ajuste** continua existindo, mas medindo a coisa
+  certa: no modo contínuo o comprimento da parede não muda quando a
+  abertura desloca, então `fix_all_wall_modulation_errors` revalida os
+  **pilaretes do plano**, não o comprimento da parede inteira (senão todo
+  eixo cujo total por acaso não fecha em blocos teria suas correções boas
+  desfeitas).
+
+### Escopo consciente
+
+- Os `ElementId` dos recortes **não** entram em `created_wall_ids_all`
+  nem em `created_walls_by_axis` — aquelas listas são de paredes
+  (`evaluate_wall_modulation` lê `LocationCurve`, "Finalizar/Deletar
+  Paredes" apaga o que está lá, o realce azul/vermelho pinta aquilo). Os
+  recortes vivem em `created_cuts_by_axis`, consultado só pela ETAPA 3B.
+  Apagar a parede já leva os recortes dela junto — são hospedados nela.
+- O realce azul/vermelho de comprimento (`evaluate_wall_modulation`) mede
+  o comprimento **total** do eixo no modo contínuo, não os pilaretes. Ele
+  sempre foi uma pré-checagem permissiva para a vista; quem decide de
+  verdade continua sendo o solver de blocos rodado eixo a eixo.
+- Aumentar a largura da abertura (OPÇÃO 3 de `plan_axis_opening_fix`)
+  segue **desligada** nos dois modos. No contínuo há um motivo a mais: um
+  `Opening` é transladado, nunca redimensionado — mudar a largura exigiria
+  recriar o recorte, e `apply_axis_opening_fix` reporta falha (com
+  RollBack) em vez de adivinhar.
+
 ## 9. Testes automatizados
 
 `tests/run_tests.py` (`py -3 tests/run_tests.py`, a partir da raiz do

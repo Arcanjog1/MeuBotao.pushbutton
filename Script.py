@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """LOADER - Modulacao Automatica.
 
-Este arquivo NAO contem mais a logica do script. Ele autentica com um
-Personal Access Token (PAT) do GitHub e baixa a versao mais recente do
-"motor" real (o PACOTE core/, nao mais um arquivo unico - ver secao
-"SINCRONIZACAO DA ARVORE core/" abaixo) direto do repositorio no GitHub,
-antes de executar core/wall_modeling.py.
+Este arquivo NAO contem mais a logica do script. Ele autentica no GitHub
+(o usuario digita apenas uma SENHA - ver "AUTENTICACAO POR SENHA" abaixo)
+e baixa a versao mais recente do "motor" real (o PACOTE core/, nao mais um
+arquivo unico - ver secao "SINCRONIZACAO DA ARVORE core/" abaixo) direto do
+repositorio no GitHub, antes de executar core/wall_modeling.py.
 
 O shebang `#! python3` na PRIMEIRA linha deste arquivo (obrigatorio ser a
 linha 1 - ver docs do pyRevit sobre engines) faz o pyRevit rodar este
@@ -29,22 +29,30 @@ Por que um loader?
     - O codigo real existe em UM lugar so' (GitHub). Um "git push" la'
       atualiza automaticamente todos os computadores que clicam neste
       botao - ninguem precisa copiar arquivo manualmente em cada PC.
-    - O repositorio pode ficar PRIVADO. So' quem tiver um token valido
-      com permissao de leitura consegue baixar e rodar o script.
+    - O repositorio pode ficar PRIVADO. So' quem souber a senha de acesso
+      consegue baixar e rodar o script.
 
-O token e' pedido uma unica vez (janela do pyRevit) e depois fica salvo
-criptografado neste computador, associado a conta do Windows do usuario
-(DPAPI - System.Security.Cryptography.ProtectedData), em:
+AUTENTICACAO POR SENHA (2026-08-28)
+    O botao NAO pede mais um Personal Access Token ao usuario. O PAT de
+    leitura do mantenedor viaja CIFRADO dentro deste proprio arquivo
+    (constante TOKEN_CIFRADO, ou o arquivo `token_cifrado.dat` ao lado
+    dele) e e' aberto com a SENHA que o usuario digita - uma unica vez por
+    computador. Ver o bloco "TOKEN CIFRADO POR SENHA" mais abaixo e
+    LOADER_SETUP.md para gerar/trocar o blob.
+
+A senha e' pedida uma unica vez (janela do pyRevit); o token decifrado
+fica salvo criptografado neste computador, associado a conta do Windows
+do usuario (DPAPI - System.Security.Cryptography.ProtectedData), em:
     %LOCALAPPDATA%\\MeuBotaoPushbutton\\token.dat
 
-Se a internet cair, o token expirar ou o GitHub estiver fora do ar, o
-loader cai para a ULTIMA sincronizacao completa baixada com sucesso
+Se a internet cair, o token embutido expirar ou o GitHub estiver fora do
+ar, o loader cai para a ULTIMA sincronizacao completa baixada com sucesso
 (espelho local em %LOCALAPPDATA%\\MeuBotaoPushbutton\\pkg_cache\\core\\...),
 avisando que a versao pode estar desatualizada - o botao nunca fica
 "quebrado" so' por falta de rede.
 
-Ver LOADER_SETUP.md (nesta mesma pasta) para o passo a passo de como
-gerar o token no GitHub.
+Ver LOADER_SETUP.md (em `nuvem/`, no repositorio) para o passo a passo de
+como gerar o token no GitHub e cifra-lo com a senha.
 """
 
 import io
@@ -593,6 +601,220 @@ PKG_CACHE_TMP_DIR = os.path.join(APP_DATA_DIR, "pkg_cache_tmp")
 
 
 # --------------------------------------------------------------------
+# TOKEN CIFRADO POR SENHA (repositorio PRIVADO - 2026-08-28)
+# --------------------------------------------------------------------
+# O usuario NAO digita mais um Personal Access Token: ele digita uma
+# SENHA. O token de leitura do mantenedor mora aqui embaixo, CIFRADO com
+# essa senha (ver o bloco cripto logo adiante), e so' e' aberto em memoria
+# depois que a senha correta for digitada. Assim:
+#
+#   - os dois repositorios podem voltar a ser PRIVADOS;
+#   - ninguem precisa gerar/colar PAT nenhum em cada computador;
+#   - quem copiar a pasta do botao sem saber a senha nao consegue ler o
+#     token (PBKDF2-HMAC-SHA256, 200000 iteracoes, encrypt-then-MAC).
+#
+# LIMITE HONESTO desta abordagem: quem tiver o arquivo E a senha consegue
+# extrair o token - a senha e' um cadeado, nao um cofre. Por isso o PAT
+# usado aqui DEVE ser fine-grained, com `Contents: Read-only`, e so' nos
+# repositorios MeuBotao.pushbutton e AbrirModeladorExterno.pushbutton.
+#
+# Para preencher/trocar: rode `python3 ferramentas/gerar_token_cifrado.py`
+# e cole a linha `MB1$...` abaixo (ou salve-a em `token_cifrado.dat` ao
+# lado deste Script.py, que tem prioridade sobre a constante e permite
+# trocar o token sem mexer no codigo).
+#
+# Enquanto isto ficar VAZIO, o loader se comporta exatamente como antes
+# (repositorio publico: baixa sem token e so' pede um PAT se levar
+# 401/403) - nada quebra ate' o blob ser gerado.
+TOKEN_CIFRADO = ""
+
+
+def _pasta_do_loader():
+    try:
+        return os.path.dirname(os.path.abspath(__file__))
+    except Exception:
+        # pyRevit sempre define __file__ para o script do botao, mas se um
+        # dia nao definir, um caminho relativo e' melhor que uma excecao.
+        return os.getcwd()
+
+
+TOKEN_CIFRADO_FILE = os.path.join(_pasta_do_loader(), "token_cifrado.dat")
+
+
+# ==== INICIO BLOCO CRIPTO (copia identica em ferramentas/cripto_token.py) ====
+# Cifra/decifra o PAT do GitHub com uma SENHA escolhida pelo mantenedor.
+#
+# Por que existe: com os repositorios PRIVADOS, o download exige um token.
+# Pedir o PAT para cada pessoa e' inviavel (cada uma precisaria gerar o
+# seu no GitHub). Em vez disso, o token do mantenedor viaja CIFRADO dentro
+# do proprio loader (constante TOKEN_CIFRADO / arquivo token_cifrado.dat) e
+# so' e' aberto quando a pessoa digita a senha combinada.
+#
+# Formato do blob (uma unica linha ASCII, seguro para colar no codigo):
+#   MB1$<iteracoes>$<sal_b64>$<nonce_b64>$<cifrado_b64>$<tag_b64>
+#
+# Algoritmo (so' com a biblioteca padrao - nada de AES/.NET, para o MESMO
+# codigo rodar identico no engine CPython do pyRevit, no IronPython e no
+# python3 comum que gera o blob):
+#   chave      = PBKDF2-HMAC-SHA256(senha, sal, iteracoes) -> 64 bytes
+#   k_cifra    = chave[:32]   k_tag = chave[32:]
+#   keystream  = HMAC-SHA256(k_cifra, nonce || contador) por bloco de 32 B
+#   cifrado    = (marcador || token) XOR keystream
+#   tag        = HMAC-SHA256(k_tag, nonce || cifrado)   (encrypt-then-MAC)
+# A tag e' o que diferencia "senha errada" de "arquivo adulterado" de
+# "deu certo" - sem ela, uma senha errada devolveria lixo silenciosamente.
+import base64
+import hashlib
+import hmac
+import os
+import struct
+
+CRIPTO_PREFIXO = "MB1"
+CRIPTO_ITERACOES = 200000
+_CRIPTO_MARCADOR = b"tok1:"
+
+
+class SenhaIncorreta(ValueError):
+    """Senha errada, ou blob adulterado/corrompido (a tag HMAC nao bate)."""
+
+
+class BlobInvalido(ValueError):
+    """O texto passado nao tem o formato MB1$...$...$...$...$..."""
+
+
+def _bytes_senha(senha):
+    if isinstance(senha, bytes):
+        return senha
+    return senha.encode("utf-8")
+
+
+def _pbkdf2(senha_bytes, sal, iteracoes, tamanho):
+    pronto = getattr(hashlib, "pbkdf2_hmac", None)
+    if pronto is not None:
+        return pronto("sha256", senha_bytes, sal, iteracoes, tamanho)
+    # Fallback manual (IronPython 2.7 nao tem pbkdf2_hmac): mesma conta,
+    # so' que em Python puro - custa alguns segundos UMA vez, e o token
+    # decifrado ja' fica salvo em DPAPI depois disso.
+    derivado = b""
+    bloco = 1
+    while len(derivado) < tamanho:
+        u = hmac.new(senha_bytes, sal + struct.pack(">I", bloco), hashlib.sha256).digest()
+        acumulado = bytearray(u)
+        for _ in range(iteracoes - 1):
+            u = hmac.new(senha_bytes, u, hashlib.sha256).digest()
+            for i, byte in enumerate(bytearray(u)):
+                acumulado[i] ^= byte
+        derivado += bytes(acumulado)
+        bloco += 1
+    return derivado[:tamanho]
+
+
+def _keystream_xor(chave, nonce, dados):
+    dados = bytearray(dados)
+    saida = bytearray(len(dados))
+    posicao = 0
+    contador = 0
+    while posicao < len(dados):
+        bloco = bytearray(
+            hmac.new(chave, nonce + struct.pack(">I", contador), hashlib.sha256).digest()
+        )
+        for byte in bloco:
+            if posicao >= len(dados):
+                break
+            saida[posicao] = dados[posicao] ^ byte
+            posicao += 1
+        contador += 1
+    return bytes(saida)
+
+
+def _iguais(a, b):
+    comparar = getattr(hmac, "compare_digest", None)
+    if comparar is not None:
+        return comparar(a, b)
+    if len(a) != len(b):
+        return False
+    diferenca = 0
+    for x, y in zip(bytearray(a), bytearray(b)):
+        diferenca |= x ^ y
+    return diferenca == 0
+
+
+def _b64(dados):
+    return base64.b64encode(dados).decode("ascii")
+
+
+def _de_b64(texto):
+    return base64.b64decode(texto.encode("ascii"))
+
+
+def cifrar_token(token, senha, iteracoes=CRIPTO_ITERACOES, sal=None, nonce=None):
+    """Devolve o blob (str) para colar em TOKEN_CIFRADO / token_cifrado.dat.
+    `sal`/`nonce` so' sao passados nos testes - em uso real vem de
+    os.urandom, entao cifrar duas vezes o mesmo token nunca gera o mesmo
+    texto."""
+    sal = os.urandom(16) if sal is None else sal
+    nonce = os.urandom(16) if nonce is None else nonce
+    chave = _pbkdf2(_bytes_senha(senha), sal, iteracoes, 64)
+    k_cifra, k_tag = chave[:32], chave[32:]
+    aberto = _CRIPTO_MARCADOR + token.encode("utf-8")
+    cifrado = _keystream_xor(k_cifra, nonce, aberto)
+    tag = hmac.new(k_tag, nonce + cifrado, hashlib.sha256).digest()
+    return "$".join(
+        [CRIPTO_PREFIXO, str(iteracoes), _b64(sal), _b64(nonce), _b64(cifrado), _b64(tag)]
+    )
+
+
+def decifrar_token(blob, senha):
+    """Devolve o token em texto puro. Levanta SenhaIncorreta se a senha
+    estiver errada (ou o blob tiver sido adulterado) e BlobInvalido se o
+    texto nem for um blob deste formato."""
+    if not blob:
+        raise BlobInvalido("nenhum token cifrado configurado")
+    partes = blob.strip().split("$")
+    if len(partes) != 6 or partes[0] != CRIPTO_PREFIXO:
+        raise BlobInvalido(
+            "token cifrado fora do formato esperado "
+            "(MB1$iteracoes$sal$nonce$cifrado$tag)"
+        )
+    try:
+        iteracoes = int(partes[1])
+        sal = _de_b64(partes[2])
+        nonce = _de_b64(partes[3])
+        cifrado = _de_b64(partes[4])
+        tag = _de_b64(partes[5])
+    except Exception:
+        raise BlobInvalido("token cifrado corrompido (base64/iteracoes invalidos)")
+    if iteracoes < 1000:
+        raise BlobInvalido("token cifrado com iteracoes de menos")
+
+    chave = _pbkdf2(_bytes_senha(senha), sal, iteracoes, 64)
+    k_cifra, k_tag = chave[:32], chave[32:]
+    tag_conferida = hmac.new(k_tag, nonce + cifrado, hashlib.sha256).digest()
+    if not _iguais(tag, tag_conferida):
+        raise SenhaIncorreta("senha incorreta")
+    aberto = _keystream_xor(k_cifra, nonce, cifrado)
+    if not aberto.startswith(_CRIPTO_MARCADOR):
+        raise SenhaIncorreta("senha incorreta")
+    return aberto[len(_CRIPTO_MARCADOR):].decode("utf-8")
+# ==== FIM BLOCO CRIPTO ====
+
+
+def _blob_cifrado():
+    """Blob do token cifrado: o arquivo `token_cifrado.dat` ao lado do
+    loader tem prioridade (permite trocar o token sem editar codigo);
+    senao, a constante TOKEN_CIFRADO. None quando nada esta' configurado."""
+    try:
+        if os.path.isfile(TOKEN_CIFRADO_FILE):
+            with io.open(TOKEN_CIFRADO_FILE, "r", encoding="utf-8") as fh:
+                do_arquivo = fh.read().strip()
+            if do_arquivo:
+                return do_arquivo
+    except Exception:
+        pass
+    return TOKEN_CIFRADO.strip() or None
+
+
+# --------------------------------------------------------------------
 # TOKEN - guardado criptografado (DPAPI, ligado ao usuario do Windows)
 # --------------------------------------------------------------------
 def _ensure_app_data_dir():
@@ -630,6 +852,9 @@ def _load_token():
 
 
 def _ask_for_token():
+    """Fallback antigo: pede o PAT direto. So' e' usado quando NAO ha'
+    token cifrado configurado (ver _get_token) - com o repositorio privado
+    e o blob preenchido, o usuario nunca ve' esta janela."""
     token = forms.ask_for_string(
         default="",
         prompt=(
@@ -649,11 +874,78 @@ def _ask_for_token():
     return token
 
 
+def _ask_for_password():
+    return forms.ask_for_string(
+        default="",
+        prompt=(
+            "Digite a senha de acesso do botao Modulacao Automatica.\n\n"
+            "Ela sera' pedida UMA UNICA VEZ neste computador: depois disso o "
+            "acesso fica salvo criptografado (ligado a sua conta do Windows) "
+            "e o botao abre direto.\n\n"
+            "Se nao souber a senha, peca ao responsavel pelo botao."
+        ),
+        title="Modulacao Automatica - senha de acesso",
+    )
+
+
+def _token_por_senha(blob, tentativas=3):
+    """Pede a senha e devolve o token decifrado (ja' salvo em DPAPI), ou
+    None se o usuario cancelar/errar todas as tentativas.
+
+    ATENCAO: a caixa de texto usada aqui (`Interaction.InputBox`, ver
+    _compat_ask_for_string) NAO mascara o que e' digitado - montar um
+    TextBox com UseSystemPasswordChar exigiria `Form.Controls.Add`, que
+    esta' quebrado neste engine CPython (ver _patch_pyrevit_forms_for_cpython).
+    A senha aparece na tela enquanto e' digitada."""
+    for tentativa in range(tentativas):
+        senha = _ask_for_password()
+        if senha is None:
+            return None
+        senha = senha.strip()
+        if not senha:
+            return None
+        try:
+            token = decifrar_token(blob, senha)
+        except SenhaIncorreta:
+            restantes = tentativas - tentativa - 1
+            forms.alert(
+                "Senha incorreta." + (
+                    "\n\nTente de novo ({0} tentativa(s) restante(s)).".format(restantes)
+                    if restantes else "\n\nO botao vai tentar rodar a ultima copia em cache."
+                ),
+                title="Modulacao Automatica - senha incorreta",
+            )
+            continue
+        except BlobInvalido as erro:
+            forms.alert(
+                "O token cifrado deste botao esta' invalido ou corrompido "
+                "({0}).\n\nAvise o responsavel: e' preciso gerar o blob de "
+                "novo com ferramentas/gerar_token_cifrado.py.".format(erro),
+                title="Modulacao Automatica - configuracao invalida",
+            )
+            return None
+        _save_token(token)
+        return token
+    return None
+
+
 def _get_token(force_reprompt=False):
-    token = None if force_reprompt else _load_token()
-    if not token:
-        token = _ask_for_token()
-    return token
+    """Ordem: token ja' salvo em DPAPI -> senha (destrava o token cifrado)
+    -> PAT digitado a mao (so' quando nao ha' token cifrado configurado,
+    para manter o comportamento antigo de repositorio publico)."""
+    if not force_reprompt:
+        token = _load_token()
+        if token:
+            return token
+
+    blob = _blob_cifrado()
+    if blob:
+        return _token_por_senha(blob)
+
+    # Sem token cifrado configurado: comportamento de antes.
+    if force_reprompt:
+        return _ask_for_token()
+    return None
 
 
 def _forget_token():
@@ -802,20 +1094,22 @@ def _load_entry_point():
     por arvore de arquivos, nao mais um arquivo unico - ver
     _sync_core_package).
 
-    O repositorio ficou PUBLICO (2026-08-27) - o token NAO e' mais exigido
-    de saida: tenta baixar sem autenticacao primeiro (um token salvo de
-    antes de virar publico e' usado se existir, mas nunca e' pedido aqui).
-    So' pede um token na tela se o download sem token falhar com 401/403
-    (limite de requisicoes do IP atingido, ou o repositorio ter voltado a
-    ficar privado)."""
-    token = _load_token()
+    AUTENTICACAO (2026-08-28): o repositorio voltou a ser PRIVADO, entao o
+    download precisa de token de novo - mas o usuario digita uma SENHA, nao
+    um PAT (ver _get_token / _token_por_senha). Na primeira vez a senha e'
+    pedida antes do download; depois disso o token decifrado fica salvo em
+    DPAPI e nada mais e' perguntado. Se o repositorio estiver publico e
+    nenhum token cifrado estiver configurado, `_get_token` devolve None e o
+    download acontece anonimo, exatamente como antes."""
+    token = _get_token()
     try:
         return _sync_core_package(token)
     except Exception as first_error:
-        # 401/403 sem token pode ser rate limit do IP ou o repo ter voltado
-        # a ser privado; com token salvo, pode ter expirado/sido revogado -
-        # nos dois casos, pede um (novo) token antes de desistir e cair no
-        # cache.
+        # 401/403 com token salvo = token expirado/revogado (ou o blob foi
+        # trocado); sem token = rate limit do IP ou repositorio privado sem
+        # credencial. Nos dois casos, descarta o que estava salvo e pede a
+        # senha de novo (ou o PAT, quando nao ha' token cifrado) antes de
+        # desistir e cair no cache.
         error_text = str(first_error)
         if "401" in error_text or "403" in error_text:
             if token:

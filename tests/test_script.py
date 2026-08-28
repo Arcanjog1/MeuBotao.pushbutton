@@ -4946,3 +4946,371 @@ def test_auditoria_isenta_junta_de_pastilha_encostada_no_vao():
     # Encostada na borda de uma abertura DESTE eixo: isenta.
     assert m._joint_is_opening_aligned_exempt(
         solta_a, solta_b, [144.0, 200.0], length_cm) is True
+
+
+# --------------------------------------------------- paredes continuas
+# (WALL_BUILD_MODE_CONTINUOUS - parede inteira + recortes de abertura)
+
+class _FakeContinuousWall(object):
+    """Parede continua ja criada: tem LocationCurve (o eixo inteiro) e serve
+    de hospedeira dos recortes criados por create_wall_opening_cuts."""
+
+    def __init__(self, curve, element_id):
+        self.Location = m.LocationCurve()
+        self.Location.Curve = curve
+        self.Id = element_id
+
+
+class _FakeCut(object):
+    """Recorte (elemento Opening) ja criado. `Location` NAO e' um
+    LocationCurve - e' exatamente assim que apply_axis_opening_fix
+    reconhece um recorte e o translada em vez de reescrever uma curva."""
+
+    def __init__(self, element_id):
+        self.Id = element_id
+        self.Location = revit_stubs._Inert()
+        self.IsValidObject = True
+
+
+class _FakeOpeningInstance(object):
+    def __init__(self, element_id):
+        self.Id = element_id
+        self.IsValidObject = True
+
+
+@case
+def test_modo_continuo_gera_uma_unica_parede_ignorando_as_aberturas():
+    """Regra 1/2/3 do modo novo: a parede nasce inteira, do nivel ate a
+    altura cheia, sem nenhuma divisao por abertura."""
+    axis = seg(0, 0, 400, 0)
+    openings = [(ft(162.0), ft(242.0), 0.0, ft(210.0))]
+
+    segmentado = m.build_wall_segments(axis, 0.0, ft(280.0), openings)
+    continuo = m.build_wall_segments(
+        axis, 0.0, ft(280.0), openings,
+        wall_build_mode=m.WALL_BUILD_MODE_CONTINUOUS
+    )
+
+    # o metodo atual continua fatiando (pilar + verga + pilar)...
+    assert len(segmentado) == 3
+    # ...e o novo devolve a parede inteira, altura cheia, offset 0.
+    assert len(continuo) == 1
+    sub_line, height_ft, base_offset_ft, origin = continuo[0]
+    assert sub_line is axis
+    assert abs(to_cm(height_ft) - 280.0) < 1e-6
+    assert base_offset_ft == 0.0
+    assert origin == "cad"
+
+
+@case
+def test_recorte_respeita_posicao_largura_altura_e_peitoril_da_abertura():
+    """Regra 6: cada recorte sai exatamente na posicao/largura/altura/
+    peitoril lidos da abertura. Janela com peitoril 100cm e verga 210cm num
+    eixo de 400cm, parede de 280cm."""
+    axis = seg(0, 0, 400, 0)
+    base_z = ft(50.0)  # nivel fora do zero de proposito
+    openings = [(ft(162.0), ft(242.0), base_z + ft(100.0), base_z + ft(210.0))]
+
+    cuts = m.build_wall_opening_cuts(axis, base_z, ft(280.0), openings)
+    assert len(cuts) == 1
+    cut = cuts[0]
+    assert cut["opening_index"] == 0
+    assert abs(to_cm(cut["width_ft"]) - 80.0) < 0.01
+    assert abs(to_cm(cut["height_ft"]) - 110.0) < 0.01
+    # cantos OPOSTOS do retangulo, em coordenadas de mundo
+    assert abs(to_cm(cut["p_start"].X) - 162.0) < 0.01
+    assert abs(to_cm(cut["p_end"].X) - 242.0) < 0.01
+    # nenhuma folga nas arestas internas (peitoril e verga tem parede)
+    assert abs(to_cm(cut["p_start"].Z - base_z) - 100.0) < 0.01
+    assert abs(to_cm(cut["p_end"].Z - base_z) - 210.0) < 0.01
+
+
+@case
+def test_recorte_de_porta_extrapola_a_base_para_atravessar_a_parede():
+    """Porta (peitoril 0) e abertura que alcanca o topo: so' as arestas que
+    ENCOSTAM na parede recebem a folga OPENING_CUT_EDGE_OVERSHOOT_FT - a
+    aresta interna fica na cota exata."""
+    axis = seg(0, 0, 400, 0)
+    base_z = ft(50.0)
+    wall_height_ft = ft(280.0)
+    porta = [(ft(100.0), ft(190.0), base_z, base_z + ft(210.0))]
+    ate_o_topo = [(ft(100.0), ft(190.0), base_z + ft(100.0), base_z + ft(280.0))]
+
+    cut_porta = m.build_wall_opening_cuts(axis, base_z, wall_height_ft, porta)[0]
+    assert cut_porta["p_start"].Z < base_z          # passou por baixo
+    assert abs(to_cm(base_z - cut_porta["p_start"].Z) - 1.0) < 0.01
+    assert abs(to_cm(cut_porta["p_end"].Z - base_z) - 210.0) < 0.01  # verga exata
+    # os valores UTEIS reportados nunca carregam a folga
+    assert abs(cut_porta["sill_z_abs"] - base_z) < 1e-9
+    assert abs(to_cm(cut_porta["height_ft"]) - 210.0) < 0.01
+
+    cut_topo = m.build_wall_opening_cuts(axis, base_z, wall_height_ft, ate_o_topo)[0]
+    assert cut_topo["p_end"].Z > base_z + wall_height_ft
+    assert abs(to_cm(cut_topo["p_start"].Z - base_z) - 100.0) < 0.01  # peitoril exato
+
+
+@case
+def test_recorte_degenerado_e_descartado_em_vez_de_ir_para_o_revit():
+    """Abertura sem altura util (peitoril acima do topo da parede) ou sem
+    largura util (fora do eixo) nao vira recorte - o Revit recusaria."""
+    axis = seg(0, 0, 400, 0)
+    sem_altura = [(ft(100.0), ft(190.0), ft(300.0), ft(320.0))]
+    sem_largura = [(ft(500.0), ft(560.0), 0.0, ft(210.0))]
+    assert m.build_wall_opening_cuts(axis, 0.0, ft(280.0), sem_altura) == []
+    assert m.build_wall_opening_cuts(axis, 0.0, ft(280.0), sem_largura) == []
+    assert m.build_wall_opening_cuts(axis, 0.0, ft(280.0), []) == []
+
+
+@case
+def test_create_wall_opening_cuts_usa_a_ferramenta_nativa_e_indexa_por_abertura():
+    """Regra 5: o recorte e' feito com a Abertura de Parede nativa
+    (Document.Create.NewOpening), um Opening por abertura, indexado pelo
+    MESMO indice de openings_per_wall que o resto do motor usa."""
+    axis = seg(0, 0, 400, 0)
+    openings = [
+        (ft(60.0), ft(140.0), 0.0, ft(210.0)),
+        (ft(220.0), ft(300.0), ft(100.0), ft(210.0)),
+    ]
+    cuts = m.build_wall_opening_cuts(axis, 0.0, ft(280.0), openings)
+    stub_doc = revit_stubs._StubDoc()
+    wall = _FakeContinuousWall(axis, revit_stubs.ElementId(77))
+
+    ids_by_index, failures = m.create_wall_opening_cuts(stub_doc, wall, cuts)
+
+    assert failures == []
+    assert sorted(ids_by_index.keys()) == [0, 1]
+    assert len(ids_by_index[0]) == 1 and len(ids_by_index[1]) == 1
+    assert len(stub_doc.Create.openings) == 2
+    # os pontos enviados ao Revit sao os cantos calculados, sem intermediario
+    for cut, (host, p1, p2) in zip(cuts, stub_doc.Create.openings):
+        assert host is wall
+        assert p1 is cut["p_start"] and p2 is cut["p_end"]
+
+
+@case
+def test_create_wall_opening_cuts_um_recorte_recusado_nao_derruba_os_outros():
+    """Mesma disciplina do try/except por segmento do modo segmentado."""
+    axis = seg(0, 0, 400, 0)
+    openings = [
+        (ft(60.0), ft(140.0), 0.0, ft(210.0)),
+        (ft(220.0), ft(300.0), ft(100.0), ft(210.0)),
+    ]
+    cuts = m.build_wall_opening_cuts(axis, 0.0, ft(280.0), openings)
+
+    class _DocQueRecusaOPrimeiro(object):
+        class Create(object):
+            def __init__(self):
+                self.calls = 0
+
+            def NewOpening(self, wall, p1, p2):
+                self.calls += 1
+                if self.calls == 1:
+                    raise Exception("recusado pelo Revit")
+                return revit_stubs._FakeOpening(wall, p1, p2)
+
+        def __init__(self):
+            self.Create = _DocQueRecusaOPrimeiro.Create()
+
+    stub_doc = _DocQueRecusaOPrimeiro()
+    ids_by_index, failures = m.create_wall_opening_cuts(
+        stub_doc, _FakeContinuousWall(axis, revit_stubs.ElementId(77)), cuts
+    )
+    assert list(ids_by_index.keys()) == [1]
+    assert len(failures) == 1
+    assert "recusado pelo Revit" in failures[0]
+
+
+def _continuous_axis_fixture(pier_left_cm, width_cm, pier_right_cm):
+    """Mesmo eixo de _one_opening_axis_fixture, mas no modo CONTINUO: uma
+    unica parede inteira + um recorte nativo no lugar dos 3 segmentos."""
+    axis_len_cm = pier_left_cm + width_cm + pier_right_cm
+    axis = seg(0, 0, axis_len_cm, 0)
+    id_wall, id_cut, id_opening = 301, 302, 999
+    fake_doc = _FakeDoc({
+        id_wall: _FakeContinuousWall(axis, id_wall),
+        id_cut: _FakeCut(id_cut),
+        id_opening: _FakeOpeningInstance(id_opening),
+    })
+    walls_to_create = [(axis, ft(14.0), (False, False))]
+    openings_per_wall = [[(ft(pier_left_cm), ft(pier_left_cm + width_cm), 0.0, ft(210.0))]]
+    created_walls_by_axis = {0: [(id_wall, "cad")]}
+    created_cuts_by_axis = {0: {0: [id_cut]}}
+    center_t_ft = ft(pier_left_cm + width_cm / 2.0)
+    opening = {
+        "element_id_obj": id_opening, "element_id": str(id_opening),
+        "center_xy": XYZ(axis.GetEndPoint(0).X + center_t_ft, 0.0, 0.0),
+        "width_ft": ft(width_cm),
+    }
+    return (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+            created_cuts_by_axis, [opening], id_wall, id_cut)
+
+
+@case
+def test_modo_continuo_sintetiza_pilaretes_para_a_etapa_3b():
+    """Sem pilaretes como elementos separados, _classify_wall_axis_segments
+    os sintetiza a partir do eixo + aberturas - mesmos comprimentos que o
+    modo segmentado devolve para o mesmo eixo (162/158)."""
+    (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+     created_cuts_by_axis, _openings, id_wall, id_cut) = _continuous_axis_fixture(162.0, 80.0, 158.0)
+
+    result = m._classify_wall_axis_segments(
+        fake_doc, 0, walls_to_create, openings_per_wall, created_walls_by_axis,
+        created_cuts_by_axis=created_cuts_by_axis,
+    )
+    assert result is not None
+    assert len(result["piers"]) == 2
+    assert all(p["virtual"] for p in result["piers"])
+    assert all(p["element_id"] == id_wall for p in result["piers"])
+    assert abs(to_cm(result["piers"][0]["t_b"] - result["piers"][0]["t_a"]) - 162.0) < 0.01
+    assert abs(to_cm(result["piers"][1]["t_b"] - result["piers"][1]["t_a"]) - 158.0) < 0.01
+    assert result["openings"][0]["infill_ids"] == [id_cut]
+
+
+@case
+def test_modo_continuo_fora_de_escopo_quando_o_vao_encosta_na_ponta_do_eixo():
+    """Mesma regra do modo segmentado: sem pilarete de um dos lados o eixo
+    sai do ajuste automatico (nunca vira um plano pela metade)."""
+    (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+     created_cuts_by_axis, _openings, _id_wall, _id_cut) = _continuous_axis_fixture(0.0, 80.0, 158.0)
+    result = m._classify_wall_axis_segments(
+        fake_doc, 0, walls_to_create, openings_per_wall, created_walls_by_axis,
+        created_cuts_by_axis=created_cuts_by_axis,
+    )
+    assert result is None
+
+
+@case
+def test_modo_continuo_fora_de_escopo_quando_o_recorte_nao_foi_criado():
+    (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+     _cuts, _openings, _id_wall, _id_cut) = _continuous_axis_fixture(162.0, 80.0, 158.0)
+    result = m._classify_wall_axis_segments(
+        fake_doc, 0, walls_to_create, openings_per_wall, created_walls_by_axis,
+        created_cuts_by_axis={0: {}},  # NewOpening falhou para este vao
+    )
+    assert result is None
+
+
+@case
+def test_plano_de_ajuste_no_modo_continuo_desloca_abertura_e_recorte_sem_tocar_na_parede():
+    """O mesmo plano de sempre (162/158 -> 160/160, -2cm) tem que sair
+    identico no modo continuo, e ao ser APLICADO nao pode reescrever a
+    curva da parede: so' o recorte e a instancia da abertura se movem."""
+    (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+     created_cuts_by_axis, all_openings, id_wall, id_cut) = _continuous_axis_fixture(162.0, 80.0, 158.0)
+
+    plan = m.plan_axis_opening_fix(
+        fake_doc, 0, walls_to_create, openings_per_wall, created_walls_by_axis,
+        all_openings, created_cuts_by_axis=created_cuts_by_axis,
+    )
+    assert plan["feasible"] is True
+    assert abs(plan["max_shift_cm"] - 2.0) < 0.01
+    assert abs(plan["length_delta_cm"]) < 1e-9
+    assert all(p["virtual"] for p in plan["new_piers"])
+
+    curva_antes = fake_doc.GetElement(id_wall).Location.Curve
+    transform_stub = m.ElementTransformUtils
+    del transform_stub.calls[:]
+
+    # `g` obrigatorio: apply_axis_opening_fix reatribui XYZ/LocationCurve/...
+    # como LOCAIS quando ele existe, entao esses nomes so' resolvem por ele
+    # (mesmo dicionario que _PostCreationEventHandler monta em self._g).
+    g = {name: m.__dict__[name] for name in (
+        "XYZ", "LocationCurve", "Line", "ElementTransformUtils",
+        "_set_opening_width_param", "_opening_center_from_geometry", "FEET_PER_METER",
+    )}
+    applied, failures = m.apply_axis_opening_fix(fake_doc, plan, walls_to_create, g=g)
+
+    assert failures == []
+    assert applied == 1
+    # a parede continua NAO foi reescrita
+    assert fake_doc.GetElement(id_wall).Location.Curve is curva_antes
+    # recorte e instancia da abertura andaram o MESMO -2cm ao longo do eixo
+    moved = [call for call in transform_stub.calls if call[0] == "move"]
+    assert len(moved) == 2
+    assert [call[1] for call in moved] == [id_cut, 999]
+    for _kind, _eid, translation in moved:
+        assert abs(to_cm(translation.X) + 2.0) < 0.01
+        assert abs(translation.Y) < 1e-9
+
+
+@case
+def test_setup_form_oferece_os_dois_modos_de_geracao_de_parede():
+    """A opcao nova e' independente e o padrao continua sendo o metodo
+    atual (segmentado) - trocar de modo nao mexe em mais nada do setup."""
+    lines_by_layer = {"PAREDES": [seg(0, 0, 500, 0), seg(0, 14, 500, 14)]}
+    form = m._SetupForm(lines_by_layer, ["Nivel 1"], {})
+    form._thickness_list.SetItemChecked(0, True)
+    assert form._wall_mode_segmented.Checked is True
+    assert form._wall_mode_continuous.Checked is False
+    form._on_run(None, None)
+    assert form.result["wall_mode"] == m.WALL_BUILD_MODE_SEGMENTED
+
+    lembrado = m._SetupForm(lines_by_layer, ["Nivel 1"],
+                            {"wall_mode": m.WALL_BUILD_MODE_CONTINUOUS})
+    lembrado._thickness_list.SetItemChecked(0, True)
+    assert lembrado._wall_mode_continuous.Checked is True
+    lembrado._on_run(None, None)
+    assert lembrado.result["wall_mode"] == m.WALL_BUILD_MODE_CONTINUOUS
+    # nada mais do setup muda por causa do modo
+    for key in ("layer", "thicknesses_cm", "level", "height_m", "openings_mode"):
+        assert lembrado.result[key] == form.result[key]
+
+
+@case
+def test_ajustar_erros_no_modo_continuo_revalida_os_pilaretes_nao_a_parede_inteira():
+    """Regressao de projeto: no modo continuo a parede e' UM elemento cujo
+    comprimento nao muda quando a abertura se desloca. Revalidar o
+    comprimento DELA reprovaria (e desfaria) toda correcao boa num eixo
+    cujo total por acaso nao fecha em blocos - aqui 402cm (incompativel)
+    com pilaretes que o ajuste leva a 160/160 (compativeis)."""
+    (fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis,
+     created_cuts_by_axis, all_openings, id_wall, id_cut) = _continuous_axis_fixture(162.0, 82.0, 158.0)
+
+    assert abs(to_cm(walls_to_create[0][0].Length) - 402.0) < 0.01
+    assert m.evaluate_wall_block_length(402.0)["compatible"] is False
+
+    plan = m.plan_axis_opening_fix(
+        fake_doc, 0, walls_to_create, openings_per_wall, created_walls_by_axis,
+        all_openings, created_cuts_by_axis=created_cuts_by_axis,
+    )
+    assert plan["feasible"] is True
+
+    rows = [{"wall_idx": 0, "wall_ids": [id_wall],
+             "problem_text": "modulacao nao fecha", "auto_fixable": True, "fix_plan": plan}]
+    g = dict(m.__dict__)
+    del m.ElementTransformUtils.calls[:]
+
+    fixed, manual, updated = m.fix_all_wall_modulation_errors(
+        fake_doc, rows, walls_to_create, openings_per_wall,
+        created_walls_by_axis=created_walls_by_axis, all_openings=all_openings, g=g,
+        created_cuts_by_axis=created_cuts_by_axis,
+    )
+    assert fixed == 1 and manual == 0, (fixed, manual, updated[0]["problem_text"])
+    assert updated[0]["resolved"] is True
+    # openings_per_wall so' e' reescrito apos o Commit - e com a nova posicao
+    novo_t_lo, novo_t_hi, _sill, _head = openings_per_wall[0][0]
+    assert abs(to_cm(novo_t_lo) - 160.0) < 0.01
+    assert abs(to_cm(novo_t_hi) - 242.0) < 0.01
+
+
+@case
+def test_radios_de_modo_de_parede_nao_ficam_no_mesmo_grupo_das_portas_janelas():
+    """Regressao do bug corrigido em 2026-08-28 na tela de preparacao das
+    paredes: no WinForms a exclusao mutua entre RadioButtons vale entre os
+    que tem o MESMO PAI DIRETO. Se as opcoes de modo de parede fossem
+    filhas diretas do mesmo painel que as de portas/janelas, os QUATRO
+    virariam um grupo so' e marcar 'paredes continuas' desmarcaria
+    'selecionar portas/janelas no modelo'."""
+    form = m._SetupForm({"PAREDES": [seg(0, 0, 400, 0), seg(0, 14, 400, 14)]}, ["Nivel 1"], {})
+
+    def _pai_direto(alvo):
+        for control in form.descendants():
+            for filho in control.Controls:
+                if filho is alvo:
+                    return control
+        return None
+
+    pai_modo = _pai_direto(form._wall_mode_segmented)
+    assert pai_modo is _pai_direto(form._wall_mode_continuous)
+    assert pai_modo is not _pai_direto(form._openings_pick)
+    assert _pai_direto(form._openings_pick) is _pai_direto(form._openings_auto)

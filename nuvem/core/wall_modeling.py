@@ -1518,7 +1518,11 @@ def build_opening_trace_log(assignments, walls_to_create, created_opening_segmen
     `created_opening_segments` e' a lista montada no loop de criacao com os
     pontos realmente usados em Wall.Create; a correspondencia com cada
     abertura e' feita por parede + proximidade dos extremos, porque um mesmo
-    eixo pode ter varios trechos de abertura.
+    eixo pode ter varios trechos de abertura. No modo de PAREDE CONTINUA
+    (ver WALL_BUILD_MODE_CONTINUOUS) as entradas trazem kind="recorte" e os
+    pontos sao os dois cantos do retangulo enviado a NewOpening, em vez das
+    pontas de um trecho de parede - o resto do rastreio (largura lida,
+    centro usado, projecao no eixo) e' identico nos dois modos.
     """
     lines = []
     if not assignments:
@@ -1605,7 +1609,9 @@ def build_opening_trace_log(assignments, walls_to_create, created_opening_segmen
             lines.append("      ENVIADO ao Revit             : nenhum segmento criado para este vao")
         for seg in matches:
             lines.append(
-                "      ENVIADO ao Revit  inicio {}  fim {}  (altura {}cm, offset da base {}cm)".format(
+                "      ENVIADO ao Revit ({})  inicio {}  fim {}  "
+                "(altura {}cm, offset da base {}cm)".format(
+                    "recorte nativo" if seg.get("kind") == "recorte" else "parede",
                     fmt_pt(seg["sent_p0"]), fmt_pt(seg["sent_p1"]),
                     round(cm(seg["height_ft"]), 1), round(cm(seg["base_offset_ft"]), 1)
                 )
@@ -1636,7 +1642,59 @@ def build_opening_trace_log(assignments, walls_to_create, created_opening_segmen
     return lines
 
 
-def build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line):
+# ------------------------------------------------------------------------
+# MODO DE GERACAO DAS PAREDES (2026-08-28, pedido do usuario)
+#
+# Duas alternativas INDEPENDENTES, escolhidas na janela de configuracao
+# (ver _SetupForm, secao "6. Como gerar as paredes"), para poder
+# comparar uma com a outra no mesmo projeto:
+#
+#   "segmented"  (padrao, comportamento historico) - cada eixo nasce
+#       FATIADO em varios elementos Wall: um trecho cheio antes/depois de
+#       cada abertura, mais os preenchimentos de peitoril e verga na
+#       largura do vao (ver build_wall_segments).
+#
+#   "continuous" (novo) - cada eixo nasce como UM UNICO elemento Wall
+#       continuo, do nivel de insercao ate' a altura cheia, IGNORANDO
+#       portas/janelas/demais aberturas. So' DEPOIS de todas as paredes
+#       criadas e realinhadas pelo nucleo e' que cada abertura vira um
+#       RECORTE de verdade na parede, com a ferramenta NATIVA do Revit
+#       (Abertura de Parede - Document.Create.NewOpening(wall, p1, p2),
+#       que devolve um elemento `Opening` retangular hospedado na parede).
+#       O resultado e' uma parede inteira com furos, em vez de varias
+#       paredes independentes acima, abaixo e ao lado de cada vao.
+#
+# NADA da modulacao de blocos muda entre os dois modos: o solver
+# (solve_building_blocks_all_courses) trabalha sobre os EIXOS
+# (`walls_to_create`) e sobre `openings_per_wall`, nunca sobre os elementos
+# Wall criados - nivel de insercao, alinhamento pelo nucleo, encontros
+# L/T/X, amarracoes e fiadas seguem IDENTICOS nos dois. O que muda e' so'
+# a forma dos elementos Wall de referencia no modelo.
+#
+# A ETAPA 3B (ajuste pos-criacao de parede+abertura) tambem continua
+# valendo no modo continuo: como nao existem mais pilaretes como elementos
+# separados, _classify_wall_axis_segments passa a SINTETIZAR os pilaretes a
+# partir do proprio eixo + aberturas (marcados "virtual": True), e o que se
+# move de verdade no modelo e' a instancia da abertura mais o Opening que a
+# recorta - a parede continua nunca e' reescrita.
+# ------------------------------------------------------------------------
+WALL_BUILD_MODE_SEGMENTED = "segmented"
+WALL_BUILD_MODE_CONTINUOUS = "continuous"
+DEFAULT_WALL_BUILD_MODE = WALL_BUILD_MODE_SEGMENTED
+
+# Folga aplicada SO' na aresta do recorte que encosta (ou passa) na base/
+# topo da parede: um vao cuja aresta coincide EXATAMENTE com a aresta da
+# parede pode nao atravessar o solido (o Revit trata como tangente). Sair
+# 1cm para fora nesses casos garante um furo passante; o excedente cai fora
+# da parede e nao aparece no modelo. As arestas internas (peitoril de uma
+# janela, verga que ainda tem parede em cima) NUNCA recebem folga - elas
+# precisam ficar na cota exata lida da abertura.
+OPENING_CUT_EDGE_OVERSHOOT_M = 0.01
+OPENING_CUT_EDGE_OVERSHOOT_FT = OPENING_CUT_EDGE_OVERSHOOT_M * FEET_PER_METER
+
+
+def build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line,
+                        wall_build_mode=WALL_BUILD_MODE_SEGMENTED):
     """Fatia a `centerline` de uma parede em um ou mais segmentos, para que
     cada abertura em `openings_on_line` fique livre apenas na sua faixa real
     (peitoril ate verga, na largura do vao) e os vazios entre essa faixa e a
@@ -1652,8 +1710,16 @@ def build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line
     "paredes/trechos gerados a partir de aberturas"), nao afeta a criacao.
     Sem aberturas associadas, devolve a propria `centerline` inteira, altura
     cheia, offset 0, origem "cad" - comportamento identico ao atual.
+
+    `wall_build_mode` (ver WALL_BUILD_MODE_* acima): com
+    WALL_BUILD_MODE_SEGMENTED (padrao) vale tudo o que esta' descrito
+    acima; com WALL_BUILD_MODE_CONTINUOUS esta funcao devolve SEMPRE um
+    unico trecho cheio - o eixo inteiro, altura cheia, offset 0, origem
+    "cad" - IGNORANDO por completo `openings_on_line`, porque nesse modo as
+    aberturas nao fatiam a parede: elas viram recortes nativos DEPOIS que a
+    parede ja' existe (ver build_wall_opening_cuts/create_wall_opening_cuts).
     """
-    if not openings_on_line:
+    if wall_build_mode == WALL_BUILD_MODE_CONTINUOUS or not openings_on_line:
         return [(centerline, wall_height_ft, 0.0, "cad")]
 
     p0 = centerline.GetEndPoint(0)
@@ -1701,6 +1767,124 @@ def build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line
         segments.append(seg)
 
     return segments
+
+
+def build_wall_opening_cuts(centerline, base_z_abs, wall_height_ft, openings_on_line):
+    """Converte as aberturas de UM eixo nos RETANGULOS DE RECORTE que serao
+    abertos na parede continua (modo WALL_BUILD_MODE_CONTINUOUS) - ver
+    create_wall_opening_cuts, que e' quem chama o Revit de verdade.
+
+    Devolve uma lista de dicts, um por abertura que sobrevive ao
+    recorte util, na MESMA ordem de `openings_on_line` (ou seja, de
+    openings_per_wall[wall_idx] - o indice nessa lista e' a identidade da
+    abertura no resto do motor, ver _classify_wall_axis_segments):
+
+        {"opening_index":, "t_lo":, "t_hi":, "sill_z_abs":, "head_z_abs":,
+         "p_start": XYZ, "p_end": XYZ,   # cantos OPOSTOS do retangulo
+         "width_ft":, "height_ft":}
+
+    `t_lo`/`t_hi`/`sill_z_abs`/`head_z_abs` sao os valores UTEIS (ja
+    limitados ao comprimento do eixo e ao pe-direito da parede), SEM
+    nenhuma folga - e' o retangulo real do vao, que continua respeitando
+    exatamente posicao, largura, altura e peitoril lidos da abertura.
+    `p_start`/`p_end` sao os dois pontos que vao para NewOpening e ja'
+    carregam a folga OPENING_CUT_EDGE_OVERSHOOT_FT SO' nas arestas que
+    encostam na base/topo da parede (ver o comentario da constante) - as
+    arestas internas ficam na cota exata.
+
+    Uma abertura sem largura util (fora do eixo) ou sem altura util
+    (peitoril acima do topo, verga abaixo da base) e' DESCARTADA: vira uma
+    entrada a menos na lista, nunca um recorte degenerado que o Revit
+    recusaria de qualquer forma."""
+    cuts = []
+    if not openings_on_line:
+        return cuts
+
+    p0 = centerline.GetEndPoint(0)
+    direction = (centerline.GetEndPoint(1) - p0).Normalize()
+    length_ft = p0.DistanceTo(centerline.GetEndPoint(1))
+    top_z_abs = base_z_abs + wall_height_ft
+
+    for opening_index, (t_lo, t_hi, sill_z_abs, head_z_abs) in enumerate(openings_on_line):
+        t_a = max(0.0, min(t_lo, length_ft))
+        t_b = max(0.0, min(t_hi, length_ft))
+        if t_b - t_a <= MIN_SEGMENT_LENGTH_FT:
+            continue
+        z_lo = max(base_z_abs, min(sill_z_abs, top_z_abs))
+        z_hi = max(base_z_abs, min(head_z_abs, top_z_abs))
+        if z_hi - z_lo <= MIN_SEGMENT_HEIGHT_FT:
+            continue
+
+        # Folga so' quando o vao chega mesmo na aresta da parede - o caso
+        # tipico de uma PORTA (peitoril 0, encosta na base) e o de uma
+        # abertura cuja verga alcanca o pe-direito (o mesmo caso que o modo
+        # segmentado ja' contabiliza em `openings_capped_at_top`).
+        cut_z_lo = z_lo
+        if sill_z_abs <= base_z_abs + MIN_SEGMENT_HEIGHT_FT:
+            cut_z_lo = z_lo - OPENING_CUT_EDGE_OVERSHOOT_FT
+        cut_z_hi = z_hi
+        if head_z_abs >= top_z_abs - MIN_SEGMENT_HEIGHT_FT:
+            cut_z_hi = z_hi + OPENING_CUT_EDGE_OVERSHOOT_FT
+
+        start = p0 + direction * t_a
+        end = p0 + direction * t_b
+        cuts.append({
+            "opening_index": opening_index,
+            "t_lo": t_a, "t_hi": t_b,
+            "sill_z_abs": z_lo, "head_z_abs": z_hi,
+            "p_start": XYZ(start.X, start.Y, cut_z_lo),
+            "p_end": XYZ(end.X, end.Y, cut_z_hi),
+            "width_ft": t_b - t_a,
+            "height_ft": z_hi - z_lo,
+        })
+    return cuts
+
+
+def create_wall_opening_cuts(target_doc, wall, cuts):
+    """Abre, na parede CONTINUA `wall` (ja criada e ja realinhada pelo
+    nucleo), um recorte por item de `cuts` (ver build_wall_opening_cuts)
+    usando a ferramenta NATIVA do Revit:
+    `Document.Create.NewOpening(wall, p1, p2)`, que cria um elemento
+    `Opening` retangular hospedado na parede - exatamente a "Abertura de
+    Parede" da interface, com os dois pontos sendo cantos OPOSTOS do
+    retangulo. Precisa rodar dentro de uma Transacao ja' aberta pelo
+    chamador (nunca abre a propria) e DEPOIS do doc.Regenerate() que
+    resolve a posicao final da parede - um recorte criado antes do
+    realinhamento pelo nucleo nasceria deslocado junto com ela.
+
+    Devolve (opening_ids_by_index, failures):
+      - `opening_ids_by_index`: {opening_index: [ElementId, ...]}, no MESMO
+        formato de lista que `infill_ids` ja' tem no modo segmentado (ver
+        _classify_wall_axis_segments), para os dois modos poderem
+        compartilhar a ETAPA 3B sem nenhum caso especial extra;
+      - `failures`: mensagens das aberturas que o Revit recusou.
+
+    NUNCA lanca: um recorte que falha e' reportado e os demais continuam -
+    mesma disciplina do try/except por segmento do modo segmentado (uma
+    abertura problematica nunca pode fazer sumir os outros vaos da mesma
+    parede)."""
+    opening_ids_by_index = {}
+    failures = []
+    for cut in cuts:
+        try:
+            opening = target_doc.Create.NewOpening(wall, cut["p_start"], cut["p_end"])
+            if opening is None:
+                failures.append(
+                    "recorte da abertura #{} nao foi criado (NewOpening devolveu nada)"
+                    .format(cut["opening_index"])
+                )
+                continue
+            opening_ids_by_index.setdefault(cut["opening_index"], []).append(opening.Id)
+        except Exception as cut_ex:
+            failures.append(
+                "recorte da abertura #{} ({:.1f}cm x {:.1f}cm) falhou: {}".format(
+                    cut["opening_index"],
+                    cut["width_ft"] / FEET_PER_METER * 100.0,
+                    cut["height_ft"] / FEET_PER_METER * 100.0,
+                    cut_ex,
+                )
+            )
+    return opening_ids_by_index, failures
 
 
 def _apply_solid_color_override(view, element_ids, color, target_doc=None):
@@ -4867,9 +5051,82 @@ def _axis_t_of_point(centerline, point):
     return vec.DotProduct(XYZ(direction.X, direction.Y, 0.0))
 
 
+def _classify_continuous_wall_axis(wall_idx, centerline, entries, openings_per_wall, cuts_here):
+    """Versao do _classify_wall_axis_segments para o modo CONTINUO (ver
+    WALL_BUILD_MODE_CONTINUOUS): a parede e' UM elemento so', entao os
+    pilaretes nao existem como Wall separadas e sao SINTETIZADOS aqui a
+    partir do eixo e dos intervalos das aberturas.
+
+    `entries` e' o que created_walls_by_axis guarda para o eixo - neste
+    modo, exatamente UMA entrada "cad" (a parede continua). `cuts_here` e'
+    {opening_index: [ElementId do Opening, ...]}.
+
+    Devolve o MESMO formato de _classify_wall_axis_segments, com duas
+    diferencas que so' apply_axis_opening_fix precisa enxergar:
+      - todo pilarete vem com "virtual": True e com o element_id da PAREDE
+        CONTINUA (nunca deve ser reescrito - a parede nao muda de forma);
+      - "infill_ids" de cada vao sao Ids de `Opening`, nao de Wall.
+
+    Fora de escopo (devolve None) nos MESMOS casos do modo segmentado - ver
+    o docstring de la'."""
+    wall_entries = [eid for eid, seg_origin in entries if seg_origin == "cad"]
+    if len(wall_entries) != 1:
+        return None
+    wall_element_id = wall_entries[0]
+
+    openings_here = openings_per_wall[wall_idx] if wall_idx < len(openings_per_wall) else []
+    if not openings_here:
+        return None
+
+    axis_len_ft = centerline.Length
+
+    # Pilaretes SINTETIZADOS: o que sobra do eixo entre um vao e o proximo
+    # (mais as duas pontas). A ordem de openings_per_wall ja' e' a ordem ao
+    # longo do eixo (assign_openings_to_walls ordena por `t`), mas ordenar
+    # aqui de novo custa nada e protege contra qualquer reescrita futura de
+    # openings_per_wall fora de ordem.
+    ordered = sorted(
+        [(i, row) for i, row in enumerate(openings_here)], key=lambda pair: pair[1][0]
+    )
+
+    boundaries = [0.0]
+    for _i, (t_lo, t_hi, _sill, _head) in ordered:
+        boundaries.append(t_lo)
+        boundaries.append(t_hi)
+    boundaries.append(axis_len_ft)
+
+    pier_rows = []
+    for k in range(len(ordered) + 1):
+        t_a = boundaries[2 * k]
+        t_b = boundaries[2 * k + 1]
+        if (t_b - t_a) <= MIN_SEGMENT_LENGTH_FT:
+            # Mesma saida de escopo do modo segmentado: sem pilarete real
+            # ali, nao ha' o que redistribuir neste eixo.
+            return None
+        pier_rows.append({"index": k, "element_id": wall_element_id,
+                          "t_a": t_a, "t_b": t_b, "virtual": True})
+
+    opening_rows = []
+    for opening_index, (t_lo, t_hi, sill_z_abs, head_z_abs) in ordered:
+        infill_ids = list(cuts_here.get(opening_index) or [])
+        if not infill_ids:
+            # Vao sem recorte registrado (NewOpening falhou na criacao) -
+            # fora de escopo, exatamente como um vao sem trecho de verga/
+            # peitoril no modo segmentado.
+            return None
+        opening_rows.append({
+            "opening_index": opening_index, "t_lo": t_lo, "t_hi": t_hi,
+            "sill_z_abs": sill_z_abs, "head_z_abs": head_z_abs,
+            "infill_ids": infill_ids,
+        })
+
+    return {"wall_idx": wall_idx, "axis_len_ft": axis_len_ft,
+            "piers": pier_rows, "openings": opening_rows}
+
+
 def _classify_wall_axis_segments(target_doc, wall_idx, walls_to_create, openings_per_wall,
                                   created_walls_by_axis, tolerance_ft=PIER_AT_OPENING_TOLERANCE_FT,
-                                  wall_segment_geometry=None):
+                                  wall_segment_geometry=None, created_cuts_by_axis=None):
     """Classifica os segmentos de UM eixo (piares/vaos) contra as aberturas
     de openings_per_wall[wall_idx], projetando as pontas de cada segmento
     sobre o eixo original (mesmo `t` de assign_openings_to_walls) -
@@ -4892,14 +5149,30 @@ def _classify_wall_axis_segments(target_doc, wall_idx, walls_to_create, openings
     apply_wall_group_shift, que roda DEPOIS de escritas reais e precisa
     da geometria mais atual.
 
+    `created_cuts_by_axis`: {wall_idx: {opening_index: [ElementId do
+    Opening, ...]}} do modo CONTINUO (ver WALL_BUILD_MODE_CONTINUOUS e
+    create_wall_opening_cuts). Quando este eixo aparece nele, a parede e'
+    UM elemento so' e nao existem pilaretes nem trechos de verga/peitoril
+    como elementos separados: os pilaretes sao SINTETIZADOS aqui a partir
+    do proprio eixo + intervalos das aberturas (marcados "virtual": True,
+    todos apontando para o Id da parede continua) e `infill_ids` de cada
+    vao passa a ser o Id do `Opening` que o recorta. Tudo o que consome
+    esta funcao (plan_axis_opening_fix e o solver por tras dela) continua
+    igual - o unico que precisa saber a diferenca e' apply_axis_opening_fix,
+    que NAO reescreve pilarete virtual (a parede continua nunca muda de
+    forma) e move o recorte em vez de transladar uma parede de infill.
+
     Devolve None (fora de escopo - nunca lanca excecao) se created_walls_by_axis
     nao tiver entradas para este eixo, se a parede real nao tiver
     LocationCurve (ou o snapshot estiver incompleto), se o eixo nao tiver
     nenhuma abertura, se algum vao nao tiver nenhum segmento "abertura"
-    correspondente, ou se a CONTAGEM de pilaretes reais nao bater com "1 a
-    mais que o numero de aberturas" (ex.: abertura encostada na ponta/
-    juncao do eixo, sem pilar real ali para editar - este motor so' EDITA
-    curvas existentes, nunca cria/apaga topologia).
+    correspondente (no modo continuo: nenhum recorte registrado), ou se a
+    CONTAGEM de pilaretes reais nao bater com "1 a mais que o numero de
+    aberturas" (ex.: abertura encostada na ponta/juncao do eixo, sem pilar
+    real ali para editar - este motor so' EDITA curvas existentes, nunca
+    cria/apaga topologia). No modo continuo vale a MESMA regra: um vao
+    colado na ponta do eixo (pilarete sintetizado de comprimento ~zero) sai
+    de escopo, para que os dois modos aceitem exatamente os mesmos casos.
 
     Senao devolve:
         {"wall_idx":, "axis_len_ft":,
@@ -4911,6 +5184,12 @@ def _classify_wall_axis_segments(target_doc, wall_idx, walls_to_create, openings
     if not entries:
         return None
     centerline, _thickness_ft, _locks = walls_to_create[wall_idx]
+
+    cuts_here = (created_cuts_by_axis or {}).get(wall_idx)
+    if cuts_here is not None:
+        return _classify_continuous_wall_axis(
+            wall_idx, centerline, entries, openings_per_wall, cuts_here
+        )
 
     if wall_segment_geometry is not None:
         snapshot = wall_segment_geometry.get(wall_idx)
@@ -5413,7 +5692,13 @@ def _build_axis_opening_plan(wall_idx, axis, matched, solution, width_deltas_cm,
                     "reason": "pilarete #{} ficaria com comprimento praticamente "
                               "zero apos o ajuste - requer revisao manual".format(k)}
         new_piers.append({"index": k, "element_id": pier["element_id"],
-                           "t_a_new": t_a_new, "t_b_new": t_b_new})
+                           "t_a_new": t_a_new, "t_b_new": t_b_new,
+                           # Modo continuo: pilarete SINTETIZADO (ver
+                           # _classify_continuous_wall_axis). Entra no plano
+                           # so' para a aritmetica dos vaos - a parede
+                           # continua NUNCA e' reescrita (ver
+                           # apply_axis_opening_fix).
+                           "virtual": bool(pier.get("virtual"))})
 
     return {"feasible": True, "wall_idx": wall_idx, "reason": None,
             "already_ok": False, "tier": tier,
@@ -5426,7 +5711,8 @@ def _build_axis_opening_plan(wall_idx, axis, matched, solution, width_deltas_cm,
 
 def plan_axis_opening_fix(target_doc, wall_idx, walls_to_create, openings_per_wall,
                            created_walls_by_axis, all_openings, wall_end_to_node=None,
-                           wall_graph_nodes=None, verify=None, wall_segment_geometry=None):
+                           wall_graph_nodes=None, verify=None, wall_segment_geometry=None,
+                           created_cuts_by_axis=None):
     """Monta o plano de correcao pos-criacao de UM eixo - parede(s) e
     abertura(s) tratadas JUNTAS. NUNCA aplica nada (so' calcula) e NUNCA
     lanca excecao: qualquer impossibilidade vira plan["feasible"]=False com
@@ -5474,10 +5760,17 @@ def plan_axis_opening_fix(target_doc, wall_idx, walls_to_create, openings_per_wa
     `wall_segment_geometry`: repassado direto para _classify_wall_axis_segments
     (ver seu docstring) - quando fornecido, esta funcao inteira roda sem
     tocar `target_doc`.
+
+    `created_cuts_by_axis`: idem, repassado direto - e' o que faz este
+    planejador funcionar tambem no modo de parede continua (os pilaretes
+    chegam sintetizados, ver _classify_continuous_wall_axis). Toda a
+    aritmetica abaixo e' a MESMA nos dois modos: ela so' enxerga
+    comprimentos de pilarete e larguras de vao, nunca elementos.
     """
     axis = _classify_wall_axis_segments(target_doc, wall_idx, walls_to_create,
                                          openings_per_wall, created_walls_by_axis,
-                                         wall_segment_geometry=wall_segment_geometry)
+                                         wall_segment_geometry=wall_segment_geometry,
+                                         created_cuts_by_axis=created_cuts_by_axis)
     if axis is None:
         return {"feasible": False, "wall_idx": wall_idx,
                 "reason": "topologia do eixo fora do escopo do ajuste automatico "
@@ -5662,6 +5955,14 @@ def apply_axis_opening_fix(target_doc, plan, walls_to_create, g=None):
     apply_opening_shift, que so' movia os pilares e deixava peitoril/verga
     para tras) e move so' a FamilyInstance (nunca largura/altura/peitoril).
 
+    MODO CONTINUO (ver WALL_BUILD_MODE_CONTINUOUS): quando o plano vem de
+    um eixo de parede continua, os pilaretes chegam marcados
+    "virtual": True e sao PULADOS (a parede e' um elemento so' e nunca
+    muda de forma), e cada `infill_id` e' um `Opening` (o recorte nativo),
+    que e' TRANSLADADO junto com a instancia da abertura em vez de ter uma
+    curva reescrita. O resultado no modelo e' o mesmo dos dois lados: o vao
+    inteiro (furo + familia) anda o deslocamento pedido pelo plano.
+
     DELIBERADAMENTE NAO toca em `openings_per_wall`/`walls_to_create` - e'
     responsabilidade do CHAMADOR escrever de volta so' DEPOIS de confirmar
     que a Transacao/SubTransacao foi commitada (ver fix_all_wall_modulation_errors),
@@ -5713,6 +6014,14 @@ def apply_axis_opening_fix(target_doc, plan, walls_to_create, g=None):
     dir_xy = XYZ(direction.X, direction.Y, 0.0)
 
     for pier in plan["new_piers"]:
+        if pier.get("virtual"):
+            # Modo CONTINUO (ver WALL_BUILD_MODE_CONTINUOUS): este pilarete
+            # nao existe como elemento - e' so' o pedaco de parede que sobra
+            # entre dois recortes, e o element_id dele aponta para a PAREDE
+            # INTEIRA. Reescrever a curva aqui encolheria a parede continua
+            # ate' o tamanho de um pilarete. O que muda de posicao neste modo
+            # e' unicamente a abertura + o seu recorte, logo abaixo.
+            continue
         try:
             wall = target_doc.GetElement(pier["element_id"])
             if wall is None or not isinstance(wall.Location, LocationCurve):
@@ -5749,8 +6058,29 @@ def apply_axis_opening_fix(target_doc, plan, walls_to_create, g=None):
             # mesmo calculo de _classify_wall_axis_segments.
             for infill_id in row["infill_ids"]:
                 infill_wall = target_doc.GetElement(infill_id)
-                if infill_wall is None or not isinstance(infill_wall.Location, LocationCurve):
+                if infill_wall is None:
                     failures.append("segmento de peitoril/verga {} nao encontrado".format(infill_id))
+                    continue
+                if not isinstance(infill_wall.Location, LocationCurve):
+                    # Modo CONTINUO: `infill_id` e' um `Opening` (recorte
+                    # nativo hospedado na parede), nao uma Wall - nao tem
+                    # LocationCurve para reescrever, entao o recorte inteiro
+                    # e' TRANSLADADO ao longo do eixo, exatamente como a
+                    # instancia da abertura logo abaixo. So' vale para um
+                    # deslocamento rigido (as duas bordas andam junto); se as
+                    # bordas tivessem deltas diferentes (caso "widen", hoje
+                    # desligado - ver OPCAO 3 em plan_axis_opening_fix) o
+                    # recorte precisaria ser recriado, e nao adivinhamos
+                    # isso: vira falha e o SubTransaction do chamador da'
+                    # RollBack.
+                    if abs(t_hi_delta_ft - t_lo_delta_ft) > 1e-9:
+                        failures.append(
+                            "recorte {} nao pode mudar de LARGURA (o modo de parede continua "
+                            "so' desloca o recorte, nunca o redimensiona)".format(infill_id)
+                        )
+                        continue
+                    cut_shift = XYZ(dir_xy.X * t_lo_delta_ft, dir_xy.Y * t_lo_delta_ft, 0.0)
+                    ElementTransformUtils.MoveElement(target_doc, infill_wall.Id, cut_shift)
                     continue
                 curve = infill_wall.Location.Curve
                 p_a = curve.GetEndPoint(0)
@@ -6031,7 +6361,7 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
                                       modulation_results, opening_incompatible_modulation,
                                       progress_cb=None, wall_start_cb=None, wall_result_cb=None,
                                       should_cancel_cb=None, should_pause_cb=None,
-                                      wall_segment_geometry=None):
+                                      wall_segment_geometry=None, created_cuts_by_axis=None):
     """Passo "Analisar Paredes" da janela unica - agora e' o PIPELINE
     INTEGRADO (regras #3/#4/#5/#8/#9): percorre as paredes UMA A UMA na
     ordem geometrica obrigatoria e, para cada uma, lanca os blocos, verifica
@@ -6072,6 +6402,13 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
     o que torna esta funcao segura para rodar fora da thread principal do
     Revit.
 
+    `created_cuts_by_axis`: recortes nativos por eixo do modo de parede
+    continua (ver WALL_BUILD_MODE_CONTINUOUS) - tambem so' repassado a
+    plan_axis_opening_fix. Vazio/None no modo segmentado, e o pipeline de
+    analise/solver e' EXATAMENTE o mesmo nos dois modos: ele trabalha sobre
+    os eixos (`walls_to_create`) e sobre `openings_per_wall`, nunca sobre a
+    forma dos elementos Wall criados.
+
     NOTA (2026-08-26): a ETAPA 3C (deslocamento automatico de uma parede
     CONECTADA, sem relacao com abertura - find_wall_group_shift_fixes em
     core/engine/wall_stepper.py) foi RETIRADA do pipeline por pedido
@@ -6110,6 +6447,7 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
                 target_doc, wall_idx, walls_to_create, openings_per_wall,
                 created_walls_by_axis, all_openings, wall_end_to_node, wall_graph_nodes,
                 verify=verify, wall_segment_geometry=wall_segment_geometry,
+                created_cuts_by_axis=created_cuts_by_axis,
             )
         except Exception as plan_ex:
             plan_failures[wall_idx] = str(plan_ex)
@@ -6231,7 +6569,8 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
     return rows
 def fix_all_wall_modulation_errors(target_doc, error_rows, walls_to_create, openings_per_wall,
                                    created_walls_by_axis=None, all_openings=None, g=None,
-                                   progress_cb=None, should_cancel_cb=None, should_pause_cb=None):
+                                   progress_cb=None, should_cancel_cb=None, should_pause_cb=None,
+                                   created_cuts_by_axis=None):
     """Passo 'Ajustar Erros' da janela unica: aplica plan_axis_opening_fix
     (ou, para linhas kind='group_shift' da ETAPA 3C, apply_wall_group_shift)
     de cada linha auto_fixable, um SubTransaction POR EIXO/GRUPO (isola
@@ -6247,6 +6586,16 @@ def fix_all_wall_modulation_errors(target_doc, error_rows, walls_to_create, open
     TODOS os membros do grupo, nao so' de `wall_idx`) - podem ficar `None`
     se o chamador garantir que nenhuma linha e' group_shift (ex.: testes
     antigos que so' testam plan_axis_opening_fix).
+
+    `created_cuts_by_axis`: recortes por eixo do modo de PAREDE CONTINUA
+    (ver WALL_BUILD_MODE_CONTINUOUS). Muda UMA coisa aqui, a REVALIDACAO
+    apos o ajuste: nesse modo `row["wall_ids"]` e' a parede INTEIRA, cujo
+    comprimento nao muda quando uma abertura se desloca - reler o
+    comprimento dela nao diria nada sobre o ajuste e, pior, reprovaria todo
+    eixo cujo comprimento total por acaso nao fecha em blocos, desfazendo
+    correcoes boas. Para esses eixos a revalidacao passa a medir os
+    PILARETES resultantes do proprio plano (`new_piers`), que e' exatamente
+    o que a revalidacao do modo segmentado le' das paredes reais.
 
     `g`: dicionario opcional (ver _PostCreationEventHandler.__init__/self._g)
     usado para SOMBREAR como variaveis LOCAIS os nomes de modulo usados
@@ -6293,6 +6642,12 @@ def fix_all_wall_modulation_errors(target_doc, error_rows, walls_to_create, open
     _invalidate_opening_gap_cache = (
         g["_invalidate_opening_gap_cache"] if g is not None else globals()["_invalidate_opening_gap_cache"]
     )
+    evaluate_wall_block_length = (
+        g["evaluate_wall_block_length"] if g is not None
+        else globals()["evaluate_wall_block_length"]
+    )
+    FEET_PER_METER = g["FEET_PER_METER"] if g is not None else globals()["FEET_PER_METER"]
+    continuous_axes = set((created_cuts_by_axis or {}).keys())
 
     fixed_count = 0
     updated_rows = []
@@ -6349,8 +6704,18 @@ def fix_all_wall_modulation_errors(target_doc, error_rows, walls_to_create, open
             if failures:
                 raise Exception("; ".join(failures))
             target_doc.Regenerate()
-            revalidated = evaluate_wall_modulation(row["wall_ids"], target_doc)
-            still_bad = [r for r in revalidated if not r["compatible"]]
+            if not is_wall_geometry_plan and plan.get("wall_idx") in continuous_axes:
+                # Modo CONTINUO: mede os PILARETES do plano, nao o
+                # comprimento da parede inteira (ver o docstring).
+                still_bad = [
+                    pier for pier in plan["new_piers"]
+                    if not evaluate_wall_block_length(
+                        (pier["t_b_new"] - pier["t_a_new"]) / FEET_PER_METER * 100.0
+                    )["compatible"]
+                ]
+            else:
+                revalidated = evaluate_wall_modulation(row["wall_ids"], target_doc)
+                still_bad = [r for r in revalidated if not r["compatible"]]
             if still_bad:
                 raise Exception("revalidacao apos o ajuste ainda aponta erro")
             st.Commit()
@@ -7188,8 +7553,11 @@ class _SetupForm(Form):
 
         self.Text = "Modulacao Automatica - Configuracao"
         self.Width = 1010
-        self.Height = 680
-        self.MinimumSize = Size(880, 600)
+        # +80px em relacao aos 680 originais: a secao "6. Como gerar as
+        # paredes" (rotulo + 2 opcoes) acrescentou 90px a' pilha da coluna
+        # direita, que sem isso passaria a estourar a altura util.
+        self.Height = 760
+        self.MinimumSize = Size(880, 680)
         self.StartPosition = FORM_START_POSITION_CENTER_SCREEN
         self.BackColor = UI_BG
 
@@ -7220,6 +7588,50 @@ class _SetupForm(Form):
         self._openings_pick.ForeColor = UI_TEXT
         self._openings_pick.Checked = defaults.get("openings_mode", "pick") != "auto"
         self._openings_auto.Checked = not self._openings_pick.Checked
+
+        # ---- modo de geracao das paredes (ver WALL_BUILD_MODE_*) ----
+        self._wall_mode_continuous = RadioButton()
+        self._wall_mode_continuous.Text = ("Paredes continuas com recortes de abertura "
+                                           "(1 parede por eixo + Abertura de Parede nativa)")
+        self._wall_mode_continuous.Dock = DockStyle.Top
+        self._wall_mode_continuous.Height = 24
+        self._wall_mode_continuous.Font = _ui_font(9.0)
+        self._wall_mode_continuous.ForeColor = UI_TEXT
+
+        self._wall_mode_segmented = RadioButton()
+        self._wall_mode_segmented.Text = ("Paredes segmentadas pelas aberturas "
+                                          "(metodo atual: trechos separados de verga/peitoril)")
+        self._wall_mode_segmented.Dock = DockStyle.Top
+        self._wall_mode_segmented.Height = 24
+        self._wall_mode_segmented.Font = _ui_font(9.0)
+        self._wall_mode_segmented.ForeColor = UI_TEXT
+        self._wall_mode_continuous.Checked = (
+            defaults.get("wall_mode", DEFAULT_WALL_BUILD_MODE) == WALL_BUILD_MODE_CONTINUOUS
+        )
+        self._wall_mode_segmented.Checked = not self._wall_mode_continuous.Checked
+        # Handlers ligados DEPOIS de definir Checked de proposito: no
+        # WinForms real, marcar um RadioButton desmarca o irmao e dispara
+        # CheckedChanged nos dois - se estivessem ligados aqui, _validate()
+        # rodaria antes de self._status existir.
+        self._wall_mode_continuous.CheckedChanged += self._on_changed
+        self._wall_mode_segmented.CheckedChanged += self._on_changed
+
+        # CONTAINER PROPRIO, obrigatorio (ver o commit "Corrige RadioButtons
+        # independentes na tela de preparacao das paredes", 2026-08-28): no
+        # WinForms a exclusao mutua entre RadioButtons vale entre os que tem
+        # o MESMO PAI DIRETO. `self._openings_auto`/`self._openings_pick` ja
+        # sao filhos diretos de `right`; jogar estes dois la' tambem faria os
+        # QUATRO virarem um grupo so' - marcar "paredes continuas"
+        # desmarcaria "selecionar portas/janelas no modelo". Com este Panel
+        # no meio, cada par fica no seu proprio grupo.
+        self._wall_mode_panel = Panel()
+        self._wall_mode_panel.Dock = DockStyle.Top
+        self._wall_mode_panel.Height = 48
+        self._wall_mode_panel.BackColor = UI_PANEL
+        # Dock.Top empilha ao contrario da ordem de insercao - o metodo
+        # ATUAL (segmentado) fica em cima.
+        self._wall_mode_panel.Controls.Add(self._wall_mode_continuous)
+        self._wall_mode_panel.Controls.Add(self._wall_mode_segmented)
 
         self._height_box = TextBox()
         self._height_box.Dock = DockStyle.Top
@@ -7260,6 +7672,12 @@ class _SetupForm(Form):
 
         # ordem de insercao = de baixo para cima (Dock.Top empilha ao
         # contrario da ordem em que os controles entram na colecao)
+        right.Controls.Add(self._wall_mode_panel)
+        right.Controls.Add(_build_section_label(
+            "6. Como gerar as paredes",
+            "A modulacao de blocos, os niveis, os encontros e as amarracoes sao os "
+            "mesmos nos dois - so' muda a forma dos elementos Wall de referencia."
+        ))
         right.Controls.Add(self._openings_auto)
         right.Controls.Add(self._openings_pick)
         right.Controls.Add(_build_section_label(
@@ -7470,11 +7888,13 @@ class _SetupForm(Form):
         self._status.ForeColor = UI_MUTED
         self._status.Text = (
             "Layer '{}' | {} espessura(s): {} | Nivel '{}' | altura {:.2f}m | "
-            "portas/janelas: {}".format(
+            "portas/janelas: {} | paredes: {}".format(
                 self._selected_layer, len(thicknesses),
                 ", ".join("%gcm" % t for t in thicknesses),
                 self._level_combo.SelectedItem, self._parsed_height_m(),
-                "selecionar no modelo" if self._openings_pick.Checked else "deteccao automatica"
+                "selecionar no modelo" if self._openings_pick.Checked else "deteccao automatica",
+                "continuas com recortes" if self._wall_mode_continuous.Checked
+                else "segmentadas pelas aberturas"
             )
         )
         _set_button_enabled(self._run_button, True)
@@ -7512,6 +7932,8 @@ class _SetupForm(Form):
             "level": self._level_combo.SelectedItem,
             "height_m": self._parsed_height_m(),
             "openings_mode": "pick" if self._openings_pick.Checked else "auto",
+            "wall_mode": (WALL_BUILD_MODE_CONTINUOUS if self._wall_mode_continuous.Checked
+                          else WALL_BUILD_MODE_SEGMENTED),
         }
         self.Close()
 
@@ -7526,8 +7948,9 @@ def _setup_defaults_path():
 
 def _recall_setup_defaults():
     """Le as escolhas da ultima execucao (Layer, espessuras, Nivel, altura,
-    modo das aberturas) para ja' vir preenchido - rodar o script duas vezes
-    seguidas no mesmo projeto e' o caso normal, nao a excecao. NUNCA lanca:
+    modo das aberturas, modo de geracao das paredes) para ja' vir
+    preenchido - rodar o script duas vezes seguidas no mesmo projeto e' o
+    caso normal, nao a excecao. NUNCA lanca:
     sem arquivo, ou com arquivo corrompido, a janela abre em branco."""
     try:
         import json
@@ -7551,6 +7974,7 @@ def _remember_setup_defaults(setup):
                 "level": setup.get("level"),
                 "height_m": setup.get("height_m"),
                 "openings_mode": setup.get("openings_mode"),
+                "wall_mode": setup.get("wall_mode"),
             }, handle)
     except Exception:
         pass
@@ -7616,9 +8040,10 @@ def ask_setup(lines_by_layer, level_names):
 
 def _ask_setup_legacy(lines_by_layer, level_names):
     """Sequencia antiga de caixas do pyRevit (Layer -> Nivel -> altura ->
-    portas/janelas), usada so' como plano B de ask_setup. As espessuras
-    ficam de fora aqui: elas continuam sendo perguntadas por
-    ask_wall_thicknesses, ja' com as linhas reconstruidas."""
+    portas/janelas -> modo de geracao das paredes), usada so' como plano B
+    de ask_setup. As espessuras ficam de fora aqui: elas continuam sendo
+    perguntadas por ask_wall_thicknesses, ja' com as linhas
+    reconstruidas."""
     selected_layer = forms.SelectFromList.show(
         sorted(lines_by_layer.keys()), title="Selecione o Layer das Paredes", multiselect=False
     )
@@ -7650,6 +8075,17 @@ def _ask_setup_legacy(lines_by_layer, level_names):
         ),
         title="Selecionar portas/janelas (Mobiliario)", yes=True, no=True
     )
+    wants_continuous = forms.alert(
+        "Como as paredes devem ser GERADAS?\n\n"
+        "Sim = paredes CONTINUAS (1 elemento por eixo, do nivel ate' a altura "
+        "cheia) com as portas/janelas viradas em RECORTE nativo do Revit "
+        "(Abertura de Parede)\n"
+        "Nao = paredes SEGMENTADAS pelas aberturas (metodo atual: trechos "
+        "separados de verga/peitoril)\n\n"
+        "A modulacao de blocos, os niveis, os encontros e as amarracoes sao os "
+        "mesmos nos dois.",
+        title="Como gerar as paredes", yes=True, no=True
+    )
     return {
         "layer": selected_layer,
         "thicknesses_cm": None,  # perguntadas depois, por ask_wall_thicknesses
@@ -7657,6 +8093,8 @@ def _ask_setup_legacy(lines_by_layer, level_names):
         "level": selected_level_name,
         "height_m": height_m,
         "openings_mode": "pick" if wants_manual else "auto",
+        "wall_mode": (WALL_BUILD_MODE_CONTINUOUS if wants_continuous
+                      else WALL_BUILD_MODE_SEGMENTED),
     }
 
 
@@ -7676,9 +8114,14 @@ def build_report_highlights(layer_name, detected_count, axes_count, created_coun
                             all_openings, openings_used, openings_source_note,
                             modulation_results, incompatible_modulation,
                             opening_modulation_results, opening_incompatible_modulation,
-                            wall_error_rows, failures):
+                            wall_error_rows, failures, opening_cuts=None):
     """Bloco de texto curto da aba 'Resumo' - o que aconteceu, em ordem de
-    importancia, sem os detalhes item a item que ficam no log."""
+    importancia, sem os detalhes item a item que ficam no log.
+
+    `opening_cuts` (None no modo segmentado, um numero no modo de PAREDE
+    CONTINUA - ver WALL_BUILD_MODE_CONTINUOUS) troca a linha de trechos
+    fatiados pela contagem de recortes nativos: no modo continuo
+    `opening_segments` e' sempre 0 e a linha antiga nao diria nada."""
     lines = [
         "Layer '{}'  ->  {} par(es) de linha reconhecido(s) como parede.".format(
             layer_name, detected_count
@@ -7688,10 +8131,19 @@ def build_report_highlights(layer_name, detected_count, axes_count, created_coun
         "  {} eixo(s) viraram {} elemento(s) Wall no Nivel '{}'".format(
             axes_count, created_count, level_name
         ),
-        "  {} trecho(s) cheio(s) do CAD + {} trecho(s) de verga/peitoril".format(
-            cad_segments, opening_segments
-        ),
     ]
+    if opening_cuts is None:
+        lines.append(
+            "  {} trecho(s) cheio(s) do CAD + {} trecho(s) de verga/peitoril".format(
+                cad_segments, opening_segments
+            )
+        )
+    else:
+        lines.append(
+            "  paredes CONTINUAS (1 por eixo) com {} recorte(s) de abertura".format(
+                opening_cuts
+            )
+        )
     if failures:
         lines.append("  {} segmento(s) FALHARAM ao ser criados - ver aba Ocorrencias".format(
             len(failures)
@@ -8215,6 +8667,12 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.walls_to_create = []
         self.openings_per_wall = []
         self.created_walls_by_axis = {}
+        # Recortes nativos por eixo do modo de PAREDE CONTINUA (ver
+        # WALL_BUILD_MODE_CONTINUOUS / create_wall_opening_cuts):
+        # {wall_idx: {opening_index: [ElementId do Opening, ...]}}. Fica
+        # VAZIO no modo segmentado - e' a unica coisa que diferencia os dois
+        # modos daqui para frente.
+        self.created_cuts_by_axis = {}
         # snapshot leve de geometria dos segmentos (ver wall_segment_geometry
         # em main(), Etapa 1, e _classify_wall_axis_segments) - permite que
         # "Analisar Paredes" rode sem tocar target_doc, inclusive fora da
@@ -8536,6 +8994,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     wall_start_cb=self.wall_start_cb, wall_result_cb=self.wall_result_cb,
                     should_cancel_cb=self.should_cancel_cb, should_pause_cb=self.should_pause_cb,
                     wall_segment_geometry=self.wall_segment_geometry,
+                    created_cuts_by_axis=self.created_cuts_by_axis,
                 )
             except Exception as worker_ex:
                 error_detail = str(worker_ex) or repr(worker_ex)
@@ -8623,6 +9082,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 g=self._g,
                 progress_cb=self.progress_cb, should_cancel_cb=self.should_cancel_cb,
                 should_pause_cb=self.should_pause_cb,
+                created_cuts_by_axis=self.created_cuts_by_axis,
             )
             t.Commit()
         except Exception:
@@ -10228,7 +10688,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
                                wall_error_rows, catalog=None, catalog_missing=None,
                                wall_segment_geometry=None, initial_solve_result=None,
                                initial_create_result=None, precreated_event=None,
-                               precreated_handler=None):
+                               precreated_handler=None, created_cuts_by_axis=None):
     """Cria o ExternalEvent + handler (_PostCreationEventHandler) e mostra a
     janela unica de modulacao (_PostCreationForm) - guarda a referencia em
     _ACTIVE_MODELESS_WINDOWS pelo mesmo motivo/cuidado documentado no topo
@@ -10286,6 +10746,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     handler.walls_to_create = walls_to_create
     handler.openings_per_wall = openings_per_wall
     handler.created_walls_by_axis = created_walls_by_axis
+    handler.created_cuts_by_axis = created_cuts_by_axis or {}
     handler.wall_segment_geometry = wall_segment_geometry or {}
     handler.all_openings = all_openings
     handler.wall_graph_nodes = wall_graph_nodes
@@ -10800,9 +11261,11 @@ def _show_wall_review_window(stage1_report, handler_data, on_start_modulation):
     (main() retorna assim que a janela abre).
 
     `handler_data`: dict com as chaves walls_to_create/openings_per_wall/
-    created_walls_by_axis/wall_segment_geometry/all_openings/wall_graph_nodes/
-    wall_end_to_node/catalog/catalog_missing/modulation_results/opening_
-    incompatible_modulation/progress_cb - copiadas 1:1 para o handler.
+    created_walls_by_axis/created_cuts_by_axis/wall_segment_geometry/
+    all_openings/wall_graph_nodes/wall_end_to_node/catalog/catalog_missing/
+    modulation_results/opening_incompatible_modulation/progress_cb -
+    copiadas 1:1 para o handler (created_cuts_by_axis e' opcional: so' o
+    modo de parede continua preenche).
 
     `on_start_modulation(wall_error_rows)`: chamado (na UI thread, depois
     de Execute() ja ter terminado) quando a analise termina com sucesso -
@@ -10813,6 +11276,7 @@ def _show_wall_review_window(stage1_report, handler_data, on_start_modulation):
     handler.openings_per_wall = handler_data["openings_per_wall"]
     handler.wall_segment_geometry = handler_data.get("wall_segment_geometry") or {}
     handler.created_walls_by_axis = handler_data["created_walls_by_axis"]
+    handler.created_cuts_by_axis = handler_data.get("created_cuts_by_axis") or {}
     handler.all_openings = handler_data["all_openings"]
     handler.wall_graph_nodes = handler_data["wall_graph_nodes"]
     handler.wall_end_to_node = handler_data["wall_end_to_node"]
@@ -11610,6 +12074,12 @@ def main():
     selected_level = level_dict[selected_level_name]
     wall_height_value = setup["height_m"]
     wall_height_ft = wall_height_value * FEET_PER_METER
+    # Modo de geracao das paredes desta execucao (ver WALL_BUILD_MODE_*).
+    # `.get` com o padrao historico de proposito: um `setup` vindo de um
+    # cache antigo de _recall_setup_defaults (ou de um chamador que ainda
+    # nao conhece a chave) continua rodando exatamente como antes.
+    wall_build_mode = setup.get("wall_mode") or DEFAULT_WALL_BUILD_MODE
+    continuous_walls = (wall_build_mode == WALL_BUILD_MODE_CONTINUOUS)
 
     # WallType base para duplicar (precisa ser uma parede Basica)
     basic_wall_types = get_basic_wall_types()
@@ -11943,6 +12413,13 @@ def main():
     cad_segments_created = 0
     opening_segments_created = 0
     walls_with_opening_segments = set()
+    # Modo CONTINUO (ver WALL_BUILD_MODE_CONTINUOUS): recortes nativos
+    # (elementos Opening) criados por eixo -
+    # {wall_idx: {opening_index: [ElementId, ...]}} - e os contadores do
+    # resumo. Fica vazio no modo segmentado.
+    created_cuts_by_axis = {}
+    opening_cuts_created = 0
+    walls_with_opening_cuts = set()
     # Lista de falhas desta execucao - alimenta o resumo final mais abaixo
     # (a antiga Etapa 1 de ajuste previo de abertura, que tambem escrevia
     # aqui, foi removida - ver comentario logo acima de openings_per_wall).
@@ -11996,7 +12473,18 @@ def main():
                             capped_head_cm_samples.append(
                                 round((head_z_abs - base_z_abs) / FEET_PER_METER * 100.0, 1)
                             )
-            segments = build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line)
+            segments = build_wall_segments(
+                centerline, base_z_abs, wall_height_ft, openings_on_line,
+                wall_build_mode=wall_build_mode
+            )
+            # Modo CONTINUO: os retangulos de recorte deste eixo ja' saem
+            # calculados aqui, mas so' sao abertos no Revit DEPOIS que a
+            # parede existir e estiver realinhada pelo nucleo (ver mais
+            # abaixo, logo apos o passo 2 do reposicionamento).
+            axis_cuts = (
+                build_wall_opening_cuts(centerline, base_z_abs, wall_height_ft, openings_on_line)
+                if continuous_walls else []
+            )
 
             try:
                 wall_type = get_or_create_wall_type(
@@ -12112,6 +12600,52 @@ def main():
                     created_count += 1
                     created_wall_ids_all.append(new_wall.Id)
                     created_walls_by_axis.setdefault(wall_idx, []).append((new_wall.Id, seg_origin))
+
+                    # ---- modo CONTINUO: recortes nativos das aberturas ----
+                    # Feito AQUI, e nao antes, de proposito: a parede so'
+                    # esta' na posicao definitiva depois do passo 2 acima
+                    # (reescrita da curva de localizacao pelo NUCLEO + o
+                    # Regenerate que o segue). Um Opening criado antes disso
+                    # seria posicionado contra a parede ANTIGA e ficaria
+                    # deslocado da meia-espessura de acabamento - o mesmo
+                    # erro de ~0,5cm que o passo 2 existe para eliminar.
+                    #
+                    # Os Ids dos recortes NAO entram em created_wall_ids_all
+                    # nem em created_walls_by_axis: aquelas duas listas sao
+                    # de PAREDES (evaluate_wall_modulation le comprimento de
+                    # LocationCurve, "Finalizar/Deletar Paredes" apaga o que
+                    # esta' la', e o realce azul/vermelho pinta aquilo). Os
+                    # recortes vivem em created_cuts_by_axis, que so' a
+                    # ETAPA 3B consulta (ver _classify_continuous_wall_axis).
+                    # Apagar a parede ja' leva os recortes dela junto - eles
+                    # sao hospedados nela.
+                    if axis_cuts:
+                        cut_ids_by_index, cut_failures = create_wall_opening_cuts(
+                            doc, new_wall, axis_cuts
+                        )
+                        if cut_ids_by_index:
+                            doc.Regenerate()
+                            axis_cut_map = created_cuts_by_axis.setdefault(wall_idx, {})
+                            for _op_index, _cut_ids in cut_ids_by_index.items():
+                                axis_cut_map.setdefault(_op_index, []).extend(_cut_ids)
+                                opening_cuts_created += len(_cut_ids)
+                            walls_with_opening_cuts.add(wall_idx)
+                        failures.extend(cut_failures)
+                        # Mesmo rastreio por abertura do modo segmentado (ver
+                        # build_opening_trace_log): os pontos ENVIADOS ao
+                        # Revit, para poder conferir no log se o recorte
+                        # saiu na posicao/largura da abertura.
+                        for _cut in axis_cuts:
+                            created_opening_segments.append({
+                                "wall_idx": wall_idx,
+                                "kind": "recorte",
+                                "sent_p0": XYZ(_cut["p_start"].X, _cut["p_start"].Y, 0.0),
+                                "sent_p1": XYZ(_cut["p_end"].X, _cut["p_end"].Y, 0.0),
+                                "final_p0": None,
+                                "final_p1": None,
+                                "height_ft": _cut["height_ft"],
+                                "base_offset_ft": _cut["sill_z_abs"] - base_z_abs,
+                            })
                     # Captura do snapshot leve (ver wall_segment_geometry,
                     # declarado antes deste laco) - mesma projecao que
                     # _classify_wall_axis_segments faria ao vivo, feita AQUI
@@ -12402,15 +12936,35 @@ def main():
             lines.append("Paredes detectadas no AutoCAD (pares validos): {}.".format(detected_count))
 
         # --- Paredes criadas ---
-        lines.append(
-            "Paredes criadas: {} eixo(s) de parede -> {} elemento(s) Wall no "
-            "Revit ({} trecho(s) cheio(s) definidos pelo AutoCAD + {} trecho(s) "
-            "de verga/peitoril definidos por abertura selecionada) no Nivel "
-            "'{}'.".format(
-                axes_created_count, created_count, cad_segments_created,
-                opening_segments_created, selected_level.Name
+        if continuous_walls:
+            lines.append(
+                "Modo de geracao das paredes: CONTINUAS com recortes de abertura "
+                "(cada eixo virou UM elemento Wall inteiro, do Nivel ate' a altura "
+                "cheia, e as portas/janelas viraram Abertura de Parede nativa do "
+                "Revit - ver WALL_BUILD_MODE_CONTINUOUS)."
             )
-        )
+            lines.append(
+                "Paredes criadas: {} eixo(s) de parede -> {} elemento(s) Wall "
+                "continuo(s) no Nivel '{}', com {} recorte(s) de abertura em {} "
+                "parede(s).".format(
+                    axes_created_count, created_count, selected_level.Name,
+                    opening_cuts_created, len(walls_with_opening_cuts)
+                )
+            )
+        else:
+            lines.append(
+                "Modo de geracao das paredes: SEGMENTADAS pelas aberturas "
+                "(metodo atual)."
+            )
+            lines.append(
+                "Paredes criadas: {} eixo(s) de parede -> {} elemento(s) Wall no "
+                "Revit ({} trecho(s) cheio(s) definidos pelo AutoCAD + {} trecho(s) "
+                "de verga/peitoril definidos por abertura selecionada) no Nivel "
+                "'{}'.".format(
+                    axes_created_count, created_count, cad_segments_created,
+                    opening_segments_created, selected_level.Name
+                )
+            )
         if duplicates_removed_count:
             lines.append(
                 "  - {} parede(s) duplicada(s)/sobreposta(s) na mesma posicao "
@@ -12507,11 +13061,20 @@ def main():
             lines.append("Analise pos-criacao (ETAPA 3B): nenhum eixo fora da modulacao.")
         lines.append("Aberturas consideradas: {}.".format(len(all_openings)))
         lines.append("Aberturas associadas a alguma parede criada: {}.".format(openings_used))
-        lines.append(
-            "Trechos de parede gerados EXCLUSIVAMENTE a partir de aberturas "
-            "selecionadas no Revit (verga/peitoril): {} segmento(s), em {} "
-            "parede(s) diferentes.".format(opening_segments_created, len(walls_with_opening_segments))
-        )
+        if continuous_walls:
+            lines.append(
+                "Recortes de abertura abertos na parede continua (ferramenta nativa "
+                "Abertura de Parede): {} recorte(s), em {} parede(s) diferentes - "
+                "cada um na posicao, largura, altura e peitoril lidos da propria "
+                "abertura.".format(opening_cuts_created, len(walls_with_opening_cuts))
+            )
+        else:
+            lines.append(
+                "Trechos de parede gerados EXCLUSIVAMENTE a partir de aberturas "
+                "selecionadas no Revit (verga/peitoril): {} segmento(s), em {} "
+                "parede(s) diferentes.".format(
+                    opening_segments_created, len(walls_with_opening_segments))
+            )
         if all_openings and not openings_used:
             lines.append(
                 "  - Aberturas foram detectadas mas NENHUMA ficou perto o bastante "
@@ -12857,7 +13420,8 @@ def main():
                 all_openings, openings_used, openings_source_note,
                 modulation_results, incompatible_modulation,
                 opening_modulation_results, opening_incompatible_modulation,
-                wall_error_rows, failures
+                wall_error_rows, failures,
+                opening_cuts=(opening_cuts_created if continuous_walls else None)
             ),
             "issues": build_report_issues(
                 failures, ambiguous_lines, modulation_results,
@@ -12899,7 +13463,8 @@ def main():
                     created_wall_ids_all, all_openings, wall_graph_nodes, wall_end_to_node,
                     selected_level, base_z_abs, wall_height_ft, wall_error_rows,
                     catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
-                    precreated_event=stage2_external_event, precreated_handler=stage2_handler
+                    precreated_event=stage2_external_event, precreated_handler=stage2_handler,
+                    created_cuts_by_axis=created_cuts_by_axis
                 )
             except Exception as ex:
                 # NUNCA mostrar `summary` (o resumo da Etapa 1, "tudo certo")
@@ -12974,6 +13539,7 @@ def main():
                 "wall_end_to_node": wall_end_to_node,
                 "catalog": catalog,
                 "catalog_missing": catalog_missing,
+                "created_cuts_by_axis": created_cuts_by_axis,
                 "modulation_results": modulation_results,
                 "opening_incompatible_modulation": opening_incompatible_modulation,
                 "progress_cb": _solver_progress_cb,
@@ -13034,6 +13600,7 @@ def main():
                 opening_incompatible_modulation, progress_cb=_solver_progress_cb,
                 wall_start_cb=_solver_wall_start_cb, wall_result_cb=_solver_wall_result_cb,
                 wall_segment_geometry=wall_segment_geometry,
+                created_cuts_by_axis=created_cuts_by_axis,
             )
         except Exception as analyze_ex:
             forms.alert(
