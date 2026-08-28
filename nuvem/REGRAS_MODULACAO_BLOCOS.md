@@ -1652,3 +1652,33 @@ continuidade lógica entre elas.
   ainda é pendência intencional**: ela só será marcada como resolvida quando a
   calculadora receber o grafo L/T/X da captura e chamar o solver completo; não
   pode fingir consistência global com comprimentos isolados.
+
+## 21. Motor único no Modelador Externo e recálculo incremental (2026-08-28)
+
+> **Status**: **IMPLEMENTADO no `AbrirModeladorExterno.pushbutton`**. A
+> calculadora deixa de ser o motor simplificado da captura: para um modelo
+> carregado ela chama a mesma entrada canônica `solve_building_blocks` do
+> `core.engine.wall_stepper` usada na modulação inicial e depois das edições.
+
+- A fonte de verdade é única: catálogo da captura/Revit, `wall_stepper`,
+  validações e as regras deste documento. A tela não decide blocos, juntas,
+  amarrações ou exceções; apenas pede o solve e apresenta o resultado.
+- O cálculo completo recebe geometria, nível/base Z, bandas reais de
+  aberturas, fiadas A/B, setores de parede e grafo L/T/X. Assim portas,
+  janelas, pilaretes, quinas, cruzamentos, alinhamento vertical e restrições
+  de peças são reavaliados no mesmo pipeline, nunca por uma combinação
+  aritmética paralela.
+- Cada edição determina a componente de Walls conectadas e as faixas
+  independentes `(nível, base_z)`. Só essas faixas são recalculadas; os
+  candidatos e estados de grupos sem dependência são preservados. Se uma
+  amarração estiver na componente, a região é expandida em favor da correção.
+- Durante o arraste, a interface solicita uma prévia com debounce de 180ms.
+  A prévia é efêmera e não altera o modelo salvo; ao soltar, o solver executa
+  novamente e só então o resultado é aplicado. Cancelar restaura o último
+  estado confirmado.
+- A saída do motor expõe blocos escolhidos, setores/recortes por abertura,
+  grafo de dependências, estados por Wall e regiões sem solução com motivo.
+  Uma região inválida nunca é preenchida por aproximação silenciosa.
+- A calculadora de comprimento isolado permanece apenas como explorador de
+  alternativas sem geometria. Ela não pode ser declarada validação global nem
+  substituir o solve da captura.
