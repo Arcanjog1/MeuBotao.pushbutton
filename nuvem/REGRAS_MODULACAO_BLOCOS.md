@@ -1597,6 +1597,69 @@ continuidade lógica entre elas.
 > continuidade vertical, repetição entre fiadas, alinhamento de faces e os
 > ajustes de abertura permitidos. Correções devem virar **regra geral**,
 > nunca conserto do exemplo específico.
+### 18.12 — Fechamento contra o vão: a junta de contorno junto à abertura é negociável (2026-08-28)
+
+- **Status**: **IMPLEMENTADO (2026-08-28)** — fallback de junta em
+  `_pier_ordered_layout` (`core/engine/wall_stepper.py`, parâmetro interno
+  `_allow_opening_joint_fallback`).
+- **Regra (palavras do usuário)**: *"lembre-se da regra dos vão, nesses
+  casos você pode colocar bloco de 34 até o final e uma pastilha ou um
+  compensador dependendo da fiada"* — ou seja, um trecho que morre num vão
+  não pode ficar VAZIO: fecha-se com peça inteira até o fim e a peça de
+  ajuste (C04 ou C09) que couber naquela fiada.
+- **Causa-raiz do que impedia isso**: `_pier_remaining_snapped_cm` exige que
+  o trecho, descontadas as juntas de contorno, seja múltiplo de
+  `PIER_MODULE_CM` (5cm). A junta de contorno é 0cm contra abertura e 1cm
+  contra bloco/nó — e essa escolha era **fixa**. Com as duas pontas em
+  abertura (0 e 0), trechos perfeitamente preenchíveis eram reprovados e
+  ficavam **sem nenhuma peça**: os vazios que o usuário fotografou.
+- **O que mudou**: quando o trecho não fecha E a ponta é de ABERTURA, o
+  solver tenta a junta alternativa daquele lado (0 ↔ 1) antes de desistir —
+  encostar a peça direto no vão ou deixar a junta de assentamento normal.
+  Contra um **nó de amarração a junta continua fixa**: ali ela é estrutural
+  e não se negocia.
+- **Medição (mesmos trechos, antes → depois)**: 5cm `None` → `C04`;
+  10cm → `C09`; 25cm → `B19+C04`; 30cm → `B19+C09`; 55cm → `B19+B34`;
+  75cm → `B39+B34`; 85cm → `B39+B39+C04`. No projeto real, os eixos
+  reprovados por "trecho fora de módulo" caíram de **18 para 10**, e o
+  total de eixos com erro de 73 para **71**.
+- **Nota sobre o alcance da regra**: a formulação "B34 até o final" cobre os
+  trechos GRANDES; medindo os casos reais, a maioria dos vazios era **menor
+  que um B34** (5 a 37cm), e ali quem fecha é B19/C09/C04. A implementação
+  cobre os dois, porque libera a junta e deixa a hierarquia normal da
+  seção 2 escolher a peça.
+- **Prioridade**: **REGRA OBRIGATÓRIA** — um trecho contra vão nunca pode
+  ficar sem peça só por causa da junta de contorno.
+
+### 18.13 — Ajuste do pilarete: ALARGAR a abertura, não deslocá-la (2026-08-28)
+
+- **Status**: **IMPLEMENTADO (2026-08-28)** —
+  `plan_pier_opening_widenings` / `apply_pier_opening_widenings`
+  (`core/wall_modeling.py`), com `PIER_MIN_USEFUL_CM = 5.0` como piso.
+- **Regra (pedido do usuário)**: *"pode alterar a dimensão das aberturas,
+  de preferência aumentando elas"*. Por isso o alvo do ajuste é sempre o
+  módulo válido **inferior** — alargar o vão, nunca estreitá-lo.
+- **Por que alargar é melhor que deslocar** (medido ao vivo): a família
+  `Abertura de janela para paredes de blocos` cresce **por um lado só**
+  (largura +2cm ⇒ centro anda 1cm), então a borda oposta fica parada e o
+  trecho do outro lado não é afetado. **Deslocar movia as duas bordas**, e
+  como há paredes "gêmeas" que compartilham a mesma abertura, o empurrão que
+  consertava um eixo quebrava o vizinho — medido: o eixo 4 pedia −1cm
+  exatamente no trecho em que o eixo 6 pedia +1cm, impossível satisfazer os
+  dois movendo. O deslocamento aplicado foi revertido e substituído por
+  alargamento.
+- **Proteções obrigatórias**: (1) set `ja_alargadas` compartilhado entre
+  eixos, para a mesma abertura nunca ser alargada duas vezes — sem ele, dois
+  eixos gêmeos aplicavam +1cm cada e o vão crescia o dobro do planejado
+  (bug real medido nesta sessão); (2) `PIER_MIN_USEFUL_CM` recusa qualquer
+  alvo que zere o pilarete — um eixo chegou a propor "4cm → 0cm", que não é
+  modular, é apagar a parede naquele ponto; (3) `Regenerate()` +
+  `IsValidObject` + RollBack por abertura, a mesma rede de segurança do
+  `MoveElement` (ver o bug de 2026-08-24 em que 8 aberturas sumiram em
+  silêncio).
+- **Parâmetro alterado**: `Largura_abertura`, de **instância** e editável —
+  não exige criar tipos novos na família.
+
 ## 19. Edição dinâmica no Modelador Externo (2026-08-28)
 
 > **Status**: **IMPLEMENTADO no `AbrirModeladorExterno.pushbutton`**. Esta
