@@ -58,3 +58,43 @@ Nenhuma correcao feita pelo usuario sobre a modulacao dos blocos pode
 ficar apenas na conversa ou apenas no codigo. Toda correcao relevante
 deve ser registrada permanentemente no `nuvem/REGRAS_MODULACAO_BLOCOS.md`,
 para que nao seja esquecida nem perdida em alteracoes futuras do sistema.
+
+## TODO conhecimento de AMARRACAO deve ser guardado
+
+Pedido explicito do usuario (2026-08-28). A amarracao e' o nucleo do
+sistema: e' o que diferencia uma parede de alvenaria ESTRUTURAL de um
+empilhamento de blocos. Por isso, qualquer conhecimento novo sobre
+amarracao - venha de onde vier - e' registro OBRIGATORIO em
+`nuvem/REGRAS_MODULACAO_BLOCOS.md`, antes ou junto da implementacao,
+nunca depois nem "quando sobrar tempo".
+
+Conta como conhecimento de amarracao:
+
+- Encontros em L, T e X (quando usar B54/B34, onde encostar, como
+  degradar quando falta espaco);
+- Posicao do VAO MENOR das pecas assimetricas (B34/B54) e o alinhamento
+  dele entre fiadas;
+- Junta vertical entre fiadas: o que e' proibido, o que e' excecao;
+- Continuidade e repeticao entre fiadas (padrao das fiadas impares x
+  pares);
+- Transicao entre pecas de tamanhos diferentes ao longo da altura;
+- Sobreposicao de volume: qual e' amarracao legitima e qual e' colisao;
+- Bonecas, pilaretes e trechos curtos perto de encontros;
+- Qualquer medicao feita no Revit real (via MCP) que confirme, refute ou
+  detalhe uma dessas regras.
+
+### Como registrar
+
+1. Escrever a regra em `nuvem/REGRAS_MODULACAO_BLOCOS.md` com o rotulo de
+   confianca que ela merece (REGRA OBRIGATORIA / PREFERENCIAL / EXCECAO
+   PERMITIDA / PADRAO OBSERVADO AINDA NAO CONFIRMADO / CONFLITO).
+2. Registrar COMO aquilo foi descoberto: medicao no Revit, print do
+   usuario, teste, ou deducao - e o numero medido, quando houver.
+3. Se a regra ainda nao esta' implementada, marcar `DOCUMENTADO -
+   pendencia de codigo aberta` em vez de deixar implicito que ja' funciona.
+4. Nunca apagar uma regra anterior em silencio: se a nova contradiz a
+   antiga, registrar o conflito e qual delas vale agora (a orientacao mais
+   recente do usuario tem prioridade).
+
+Um erro de amarracao que volta a acontecer porque a regra nao foi escrita
+e' considerado falha do processo, nao do solver.

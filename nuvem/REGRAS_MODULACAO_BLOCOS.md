@@ -1399,3 +1399,161 @@ pelo espelhamento (ou usar o overload que espelha sem copiar) e apagar a
 peça original quando a cópia a substituir. Enquanto isso não existe, a
 limpeza correta é apagar TODA instância das famílias do catálogo cujo Id
 não esteja em `created_instances`.
+
+## 18. Revisão geral pedida pelo usuário a partir de prints do Revit (2026-08-28)
+
+> **Origem**: o usuário mandou 9 capturas do modelo `TESTE MODULAÇÃO` já
+> modulado (13.768 blocos, 126 paredes) apontando erros, junto de um
+> documento com 11 exigências. Esta seção registra **todas** elas, cada uma
+> com o status real de implementação — nenhuma foi implementada em
+> silêncio, e nenhuma foi descartada. A ordem de prioridade que o usuário
+> definiu está em 18.10 e vale para qualquer decisão futura do solver.
+
+### 18.1 — Amarração em cruz: B54 correto, sem peça sobreposta
+
+- **Status**: `PARCIAL` — o X_INTERSECTION já usa dois B54 a 90° com
+  células centrais alinhadas e prova geométrica (`validate_x_intersection`,
+  seção 5). O que **falha** é a convivência com o preenchimento e com nós
+  vizinhos: ver 18.7.
+- **Regra**: toda cruz usa B54; o vão menor resultante fica alinhado; não
+  pode existir peça adicional ocupando o mesmo volume; a amarração tem de
+  se manter nas fiadas seguintes. Uma solução que só parece certa
+  visualmente, sem a geometria correta, é erro.
+
+### 18.2 — Pilarete entre duas portas é modulado de forma independente
+
+- **Status**: `DOCUMENTADO — pendência de código aberta.`
+- **Regra**: o trecho entre duas aberturas tem de ser resolvido **por si**,
+  não como sobra do prisma geral da parede. Um pilarete de ~50cm deve
+  buscar a melhor combinação para aquele trecho (ex.: B39 + C09 com as
+  juntas), e **se faltar pouco**, o sistema pode deslocar uma das portas
+  dentro da tolerância (ex.: 1cm) para permitir a modulação.
+- **Ordem**: primeiro tentar modular o pilarete como está; só depois
+  considerar mover a abertura adjacente. Nunca deixar o pilarete sem
+  modulação apenas porque a posição original da abertura não fecha.
+- **Relação com o que existe**: `plan_axis_opening_fix` (seção 7) já sabe
+  deslocar abertura, mas só é acionado quando o eixo TEM abertura e falha
+  como um todo — não a partir do pilarete individual.
+
+### 18.3 — Alinhamento obrigatório de faces em aberturas e pontas
+
+- **Status**: `DOCUMENTADO — pendência de verificação.`
+- **REGRA OBRIGATÓRIA**: as faces dos blocos devem coincidir exatamente
+  com (1) a face lateral das aberturas, (2) o fim das paredes e (3) as
+  faces definidas pelos encontros. É proibido bloco ultrapassando a face
+  do vão, terminando antes dela, ou com desalinhamento pequeno na
+  extremidade. A modulação junto de uma abertura é calculada a partir dos
+  limites geométricos exatos dela.
+
+### 18.4 — Padronização das fiadas: ímpares iguais entre si, pares iguais entre si
+
+- **Status**: `PARCIAL — regride hoje por causa de variants_per_course.`
+- **Regra**: Fiada 1 ≡ Fiada 3 ≡ Fiada 5…, e Fiada 2 ≡ Fiada 4 ≡ Fiada 6…
+  Dois padrões alternados (A e B), repetidos até o topo. O sistema não
+  deve inventar uma solução diferente por fiada sem uma razão geométrica
+  (abertura naquela faixa vertical) ou uma regra que exija.
+- **Conflito registrado com a seção 11.7**: `PIER_LAYOUT_VARIANTS_PER_COURSE`
+  (K=3) foi criado justamente para VARIAR o preenchimento entre fiadas de
+  mesma paridade, para escapar de `ALTERNATING_JOINT_PATTERN`. Medido em
+  2026-08-28: as 15 fiadas usam as variantes 0,0,1,1,2,2,0,0,1,1,2,2,0,0,1
+  — ou seja, a fiada 1 **não** é igual à 3. Como `ALTERNATING_JOINT_PATTERN`
+  deixou de bloquear (ver 11.5), a razão original de K>1 caiu. **A
+  orientação mais recente do usuário tem prioridade**: o padrão deve voltar
+  a repetir. Pendência: reavaliar K=1 medindo o efeito em
+  `CONTINUOUS_VERTICAL_JOINT`.
+
+### 18.5 — B34 só entra com o vão menor sob controle
+
+- **Status**: `PARCIAL` — garantido e validado em L_CORNER e T degradado
+  (seção 5); **não** garantido no B34 de meio de parede (limitação já
+  registrada na seção 6).
+- **Regra**: sempre que houver B34 na amarração, o vão menor entre os
+  blocos envolvidos fica alinhado. O B34 não pode ser usado só para
+  preencher espaço de forma arbitrária — a posição dele faz parte da
+  lógica contínua da amarração e das fiadas.
+
+### 18.6 — Transição B34 para B39 exige olhar a fiada seguinte
+
+- **Status**: `DOCUMENTADO — pendência de código aberta.` Hoje o solver
+  resolve UM par A/B por vez; não existe look-ahead vertical.
+- **Regra**: a troca de B34 para B39 só pode acontecer quando a próxima
+  fiada tiver vão suficiente para o B39 encaixar mantendo a continuidade
+  do prisma. O procedimento é: ler a posição do B34 na fiada atual →
+  analisar a fiada seguinte → verificar o vão → só então permitir a
+  transição. A modulação precisa considerar mais de uma fiada ao mesmo
+  tempo.
+
+### 18.7 — Proibido bloco dentro do volume de outro (colisão medida)
+
+- **Status**: **DETECTADO, mas NÃO bloqueia a criação** (regra de
+  2026-08-26: o diagnóstico não pode impedir a geração dos blocos).
+- **Medição 2026-08-28** (`validate_same_course_collision` sobre uma fiada
+  física real, OBB/SAT — não bounding box): **9 colisões por fiada A**,
+  zero nas fiadas B:
+  - 4x **B34 do preenchimento dentro do B54** de um T_INTERSECTION;
+  - 4x **B19 do preenchimento dentro do B54** de um T_INTERSECTION;
+  - 1x **B54 x B54** de dois nós em T diferentes na MESMA parede, próximos
+    demais para os dois caberem.
+- **REGRA OBRIGATÓRIA**: nenhum bloco pode ser inserido dentro do volume
+  de outro. A única sobreposição legítima é a prevista pelas regras de
+  amarração (peças de fiadas diferentes). Qualquer outra é erro e a peça
+  não deve ser criada.
+- **Cuidado de método**: medir com **OBB (SAT)**, nunca com bounding box
+  alinhado aos eixos — o AABB de um bloco em parede diagonal ou rotacionada
+  superestima muito. Uma medição por AABB nesta mesma sessão acusou 10.319
+  pares onde o teste correto encontra ~9 por fiada.
+
+### 18.8 — Nenhuma parede pode ficar sem modulação sem motivo registrado
+
+- **Status**: `PARCIAL` — `build_final_modulation_report` (seção 13.2) já
+  separa moduladas com sucesso de sem solução com o motivo, mas por EIXO;
+  não há o estado intermediário por trecho.
+- **Regra**: cada parede ou trecho (incluindo pilaretes, bonecas, trechos
+  curtos, finais de parede e regiões perto de cruzamentos) recebe um de
+  três estados: **(1) Modulado com sucesso**; **(2) Necessita ajuste
+  geométrico** — fecha se uma abertura/elemento adjacente for deslocado
+  dentro da tolerância; **(3) Não modulável** — e aí o sistema informa
+  exatamente qual regra impediu. É proibido deixar parede sem modelagem
+  sem identificar o motivo.
+
+### 18.9 — T sem espaço vira L usando C09/C04
+
+- **Status**: `IMPLEMENTADO PARCIALMENTE` — o Nível 3 de
+  `solve_t_intersection` (seção 5) já fecha a boneca com **1 único** C09 ou
+  C04 quando nem o B34 cabe. A novidade do usuário é tratar isso
+  explicitamente como **reinterpretação em L**, e não como degradação.
+- **Regra**: se a boneca de um T não tem comprimento para acomodar a
+  lógica do B54, então: não forçar o B54; não criar sobreposição; não
+  deixar sem modulação; reinterpretar como amarração em L, usando C09 ou
+  C04 para finalizar a geometria.
+
+### 18.10 — Ordem de prioridade quando a situação é difícil
+
+Definida pelo usuário, vale para qualquer decisão do solver:
+
+1. **Manter as amarrações corretas** — nunca sacrificar uma amarração para
+   preencher espaço.
+2. **Garantir a modulação completa** — toda parede, pilarete, boneca e
+   trecho é analisado.
+3. **Manter o padrão entre fiadas** — ímpares entre si, pares entre si.
+4. **Alinhar faces** — portas, aberturas, finais de parede e encontros.
+5. **Ajustar aberturas quando permitido** — dentro da tolerância.
+6. **Evitar soluções improvisadas** — não usar bloco aleatório só para
+   fechar um vão pequeno.
+
+### 18.11 — Checklist da validação final
+
+Antes de dar a modulação por concluída: todas as paredes processadas, sem
+paredes parcialmente moduladas nem trechos sem bloco; faces alinhadas com
+as aberturas e nenhum bloco invadindo vão; pilaretes modulados; cruzes com
+B54 correto e vãos menores alinhados; B34 respeitando o alinhamento; T sem
+espaço reinterpretado como L; nenhuma sobreposição inválida e nenhum bloco
+dentro de outro; Fiada 1 igual à Fiada 3 e Fiada 2 igual à Fiada 4, com
+continuidade lógica entre elas.
+
+> **Objetivo declarado pelo usuário**: o sistema não é um preenchedor de
+> paredes com blocos — é um motor de modulação que analisa ao mesmo tempo
+> geometria, comprimentos, aberturas, pilaretes, bonecas, amarrações L/T/X,
+> continuidade vertical, repetição entre fiadas, alinhamento de faces e os
+> ajustes de abertura permitidos. Correções devem virar **regra geral**,
+> nunca conserto do exemplo específico.

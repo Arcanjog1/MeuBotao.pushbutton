@@ -2916,6 +2916,64 @@ def _group_course_indices_by_opening_band(openings_per_wall, base_z_abs, course_
             for sig in signature_order]
 
 
+TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+
+
+def _is_tie_candidate(candidate):
+    """True quando o candidato e' peca de AMARRACAO (encontro L/T/X, em
+    qualquer variacao incluindo as degradadas) - por oposicao ao
+    preenchimento comum (`STANDARD_FILL`) e ao jamb de abertura."""
+    reason = str(candidate.get("placement_reason") or "")
+    return any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
+
+
+def _drop_fill_colliding_with_ties(course_pieces):
+    """REGRA 18.7 + prioridade #1 do usuario (2026-08-28): "nunca sacrificar
+    uma amarracao correta apenas para preencher um espaco". Recebe as pecas
+    de UMA FIADA FISICA (o conjunto que vira FamilyInstance) e devolve
+    `(pecas_mantidas, descartadas)`, removendo todo candidato de
+    PREENCHIMENTO que interpenetra uma peca de AMARRACAO.
+
+    Motivo (medido ao vivo via MCP, 2026-08-28, e fotografado pelo usuario):
+    cada fiada A do projeto real tinha 9 colisoes de volume - 4 B34 e 4 B19
+    do preenchimento comum nascendo DENTRO do B54 de um T_INTERSECTION, mais
+    1 par B54xB54 de dois nos em T proximos demais. No Revit isso aparece
+    como tres blocos ocupando a mesma regiao (o usuario selecionou 3
+    "Modelos genericos" no mesmo ponto).
+
+    O que NAO e' descartado aqui, de proposito:
+    - amarracao x amarracao (ex.: os dois B54 de nos vizinhos): nao ha'
+      criterio para eleger um vencedor sem quebrar a outra amarracao - o
+      par continua sendo reportado como colisao para revisao manual, e a
+      causa e' geometrica (dois nos a menos de 54cm um do outro);
+    - preenchimento x preenchimento: nao deveria existir (sao trechos
+      disjuntos) e, se existir, e' sintoma de outro bug - some-lo
+      silenciosamente esconderia o problema.
+
+    Usa `validate_same_course_collision` (OBB/SAT), nunca bounding box -
+    ver o cuidado de metodo registrado na secao 18.7."""
+    if not course_pieces:
+        return course_pieces, []
+    colisoes = validate_same_course_collision(course_pieces)
+    if not colisoes:
+        return course_pieces, []
+
+    remover = set()
+    for i, j in colisoes:
+        a, b = course_pieces[i], course_pieces[j]
+        a_tie, b_tie = _is_tie_candidate(a), _is_tie_candidate(b)
+        if a_tie and not b_tie:
+            remover.add(j)
+        elif b_tie and not a_tie:
+            remover.add(i)
+        # os dois tie, ou os dois fill: mantidos (ver docstring)
+    if not remover:
+        return course_pieces, []
+    mantidas = [c for k, c in enumerate(course_pieces) if k not in remover]
+    descartadas = [course_pieces[k] for k in sorted(remover)]
+    return mantidas, descartadas
+
+
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -2973,6 +3031,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     )
 
     course_candidates = {}
+    dropped_by_course = {}
     bands = []
     all_candidates, all_collisions = [], []
     all_intersection_failures, all_jamb_exceptions, all_non_modular = [], [], []
@@ -3009,10 +3068,19 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             # is None` inclui-os em TODAS as variantes, ver solve_wall_free_fill
             # e _jamb_build_course_variants).
             variant_index = (course_index // 2) % variants_per_course
-            course_candidates[course_index] = [
+            fiada = [
                 c for c in result["candidates"]
                 if c["course"] == letter and c.get("course_variant") in (None, variant_index)
             ]
+            # REGRA 18.7 (2026-08-28): nenhum bloco pode ser criado DENTRO
+            # do volume de outro. Aplicada aqui, na fiada FISICA ja'
+            # montada - que e' exatamente o conjunto que
+            # create_building_blocks transforma em FamilyInstance - e nao
+            # sobre `candidates` agregado (que mistura variantes que nunca
+            # coexistem, ver secao 17.1).
+            fiada, descartados = _drop_fill_colliding_with_ties(fiada)
+            dropped_by_course[course_index] = descartados
+            course_candidates[course_index] = fiada
         # AGREGADO para o relatorio (all_candidates/all_collisions): cada
         # banda entra UMA UNICA VEZ aqui, nao uma vez por course_index -
         # `result["collisions"]` sao pares de indice DENTRO da lista
@@ -3065,6 +3133,12 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     return {
         "error": None,
         "course_candidates": course_candidates,
+        # Preenchimento descartado por invadir uma peca de amarracao, por
+        # fiada fisica (regra 18.7) - {course_index: [candidatos]}. Vazio
+        # quando nenhuma fiada tinha esse conflito.
+        "dropped_fill_by_course": dict(
+            (ci, lst) for ci, lst in dropped_by_course.items() if lst
+        ),
         "bands": bands,
         "candidates": all_candidates,
         "collisions": all_collisions,

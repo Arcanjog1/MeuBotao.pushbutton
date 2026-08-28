@@ -5371,3 +5371,49 @@ def test_busca_exata_fecha_trecho_que_o_guloso_nao_fecha():
 
     # Trecho que nao fecha com nenhuma combinacao -> None (nunca inventa).
     assert m._exact_fill_blocks(3.0, 0.0, CATALOG, ["B39", "B34"]) is None
+
+
+# ---- regra 18.7: preenchimento nunca nasce dentro de uma amarracao ----
+@case
+def test_preenchimento_que_invade_amarracao_e_descartado():
+    """Regra 18.7 + prioridade #1 do usuario (2026-08-28): "nunca sacrificar
+    uma amarracao correta apenas para preencher um espaco". Medido ao vivo
+    via MCP e fotografado pelo usuario: cada fiada A tinha 4 B34 e 4 B19 do
+    preenchimento nascendo DENTRO do B54 de um T_INTERSECTION - no Revit,
+    tres blocos ocupando a mesma regiao."""
+    assert m._is_tie_candidate({"placement_reason": "T_INTERSECTION_MAIN"}) is True
+    assert m._is_tie_candidate({"placement_reason": "L_CORNER"}) is True
+    assert m._is_tie_candidate({"placement_reason": "X_INTERSECTION"}) is True
+    assert m._is_tie_candidate({"placement_reason": "T_INTERSECTION_DEGRADED_L"}) is True
+    assert m._is_tie_candidate({"placement_reason": "STANDARD_FILL"}) is False
+
+    walls = [(seg(0, 0, 300, 0), ft(14.0), (False, False))]
+    # B54 de amarracao centrado em x=100 e um B34 de preenchimento DENTRO dele
+    tie = m._make_block_candidate(
+        "B54", CATALOG["B54"], "A", XYZ(ft(100), 0.0, 0.0), XYZ(1, 0, 0),
+        "T_INTERSECTION_MAIN", node_index=1, wall_idx=0)
+    dentro = m._make_block_candidate(
+        "B34", CATALOG["B34"], "A", XYZ(ft(100), 0.0, 0.0), XYZ(1, 0, 0),
+        "STANDARD_FILL", wall_idx=0)
+    longe = m._make_block_candidate(
+        "B39", CATALOG["B39"], "A", XYZ(ft(250), 0.0, 0.0), XYZ(1, 0, 0),
+        "STANDARD_FILL", wall_idx=0)
+
+    mantidas, descartadas = m._drop_fill_colliding_with_ties([tie, dentro, longe])
+    codigos = [c["logical_code"] for c in mantidas]
+    assert "B54" in codigos, codigos          # a amarracao SEMPRE fica
+    assert "B39" in codigos, codigos          # o preenchimento que nao invade fica
+    assert "B34" not in codigos, codigos      # o que invadia foi descartado
+    assert [c["logical_code"] for c in descartadas] == ["B34"], descartadas
+
+    # Sem colisao nenhuma: devolve a lista intacta, sem descarte.
+    mantidas2, descartadas2 = m._drop_fill_colliding_with_ties([tie, longe])
+    assert len(mantidas2) == 2 and descartadas2 == []
+
+    # Duas AMARRACOES colidindo entre si nunca sao descartadas (nao ha'
+    # criterio para eleger um vencedor) - continuam para revisao manual.
+    tie2 = m._make_block_candidate(
+        "B54", CATALOG["B54"], "A", XYZ(ft(110), 0.0, 0.0), XYZ(1, 0, 0),
+        "T_INTERSECTION_MAIN", node_index=2, wall_idx=0)
+    mantidas3, descartadas3 = m._drop_fill_colliding_with_ties([tie, tie2])
+    assert len(mantidas3) == 2 and descartadas3 == [], descartadas3
