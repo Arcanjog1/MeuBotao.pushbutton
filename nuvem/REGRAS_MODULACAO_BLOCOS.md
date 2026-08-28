@@ -1612,8 +1612,9 @@ continuidade lógica entre elas.
   paramétrica, impedindo fendas entre fragmentos.
 - Aberturas hospedadas acompanham a alteração da Wall na mesma posição
   relativa ao eixo. Uma abertura arrastada manualmente só pode permanecer
-  inteiramente dentro da sua hospedeira; não é revertida só por piorar a
-  pontuação do solver.
+  inteiramente dentro da sua hospedeira; sua largura também pode ser
+  alterada dentro desse limite. A edição explícita não é revertida só por
+  piorar a pontuação do solver.
 - Toda edição válida chama o **mesmo** `solve_capture_block_candidates` da
   modulação inicial. Não há um algoritmo simplificado para pós-edição:
   portas, vãos, vergas, quinas, amarrações, tolerâncias e catálogo são
