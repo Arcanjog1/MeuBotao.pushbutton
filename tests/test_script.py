@@ -2343,15 +2343,25 @@ def test_execute_create_apaga_lote_anterior_antes_de_recriar():
     handler.solve_result = {"candidates": [], "course_candidates": {}, "num_courses": 0, "error": None}
 
     deleted_ids = []
+    delete_calls = []
     existing_ids = set([old_id_1, old_id_2])
 
     class _FakeDeletableDoc(object):
         def GetElement(self, element_id):
             return object() if element_id in existing_ids else None
 
-        def Delete(self, element_id):
-            deleted_ids.append(element_id)
-            existing_ids.discard(element_id)
+        def Delete(self, ids_or_id):
+            # DESDE 2026-08-28 o lote anterior e' apagado de uma vez
+            # (Document.Delete(ICollection<ElementId>), 3,7x mais rapido que
+            # um Delete por peca - medido ao vivo via MCP nas 10.741 pecas de
+            # uma planta real). O duble aceita as DUAS formas de proposito: a
+            # colecao e' o caminho normal, e o Id solto e' o fallback que so'
+            # roda se o Revit recusar o lote inteiro.
+            delete_calls.append(ids_or_id)
+            batch = ids_or_id if isinstance(ids_or_id, list) else [ids_or_id]
+            for element_id in batch:
+                deleted_ids.append(element_id)
+                existing_ids.discard(element_id)
 
     events = []
     handler.on_done = lambda kind, err: events.append((kind, err))
@@ -2365,6 +2375,12 @@ def test_execute_create_apaga_lote_anterior_antes_de_recriar():
 
     assert events and events[0] == ("create", None), events
     assert set(deleted_ids) == set([old_id_1, old_id_2]), deleted_ids
+    # UMA chamada so', com a colecao inteira. Se isto voltar a ser um Delete
+    # por peca, a exclusao do lote volta a custar 3,7x mais (6,70s contra
+    # 1,82s nas 10.741 pecas medidas) sem que nada mais quebre - e' o tipo de
+    # regressao que so' um teste pega.
+    assert len(delete_calls) == 1, delete_calls
+    assert isinstance(delete_calls[0], list) and len(delete_calls[0]) == 2, delete_calls
     # create_result foi substituido pelo resultado (vazio) da nova rodada -
     # nunca continua apontando para instancias ja' apagadas do modelo.
     assert handler.create_result["created_instances"] == []
@@ -2376,6 +2392,58 @@ def test_execute_create_apaga_lote_anterior_antes_de_recriar():
     handler.action = "create"
     handler.Execute(fake_uiapp)
     assert len(deleted_ids) == deleted_count_before, deleted_ids
+
+
+@case
+def test_execute_create_volta_a_apagar_uma_a_uma_se_o_lote_for_recusado():
+    """Rede de seguranca da exclusao em lote (2026-08-28).
+    Document.Delete(ICollection) e' tudo-ou-nada: um unico ElementId que o
+    Revit recuse faz a chamada lancar SEM apagar nada. O laco antigo, por ser
+    peca a peca, simplesmente pulava a peca ruim. Deixar o lote falhar em
+    silencio traria de volta o bug de 2026-08-25 pela porta dos fundos - o
+    lote anterior sobreviveria inteiro e o clique em "criar" voltaria a ser
+    uma SOMA em vez de uma substituicao, com metade da modulacao na posicao
+    nova e metade na antiga. Por isso, colecao recusada = cai no caminho
+    antigo e apaga tudo que der, uma a uma."""
+    handler = m._PostCreationEventHandler()
+    old_ids = [revit_stubs.ElementId(201), revit_stubs.ElementId(202),
+               revit_stubs.ElementId(203)]
+    handler.create_result = {
+        "created_count": len(old_ids), "failures": [], "created_instances": [
+            {"id": eid, "logical_code": "B39", "course": "A", "course_index": 0}
+            for eid in old_ids
+        ],
+    }
+    handler.solve_result = {"candidates": [], "course_candidates": {}, "num_courses": 0, "error": None}
+
+    deleted_ids = []
+    batch_attempts = []
+
+    class _FakeDocQueRecusaLote(object):
+        def GetElement(self, element_id):
+            return object() if element_id not in deleted_ids else None
+
+        def Delete(self, ids_or_id):
+            if isinstance(ids_or_id, list):
+                batch_attempts.append(list(ids_or_id))
+                raise Exception("Revit recusou a colecao inteira")
+            deleted_ids.append(ids_or_id)
+
+    events = []
+    handler.on_done = lambda kind, err: events.append((kind, err))
+    handler.action = "create"
+    fake_uidoc = revit_stubs._Inert()
+    fake_uidoc.Document = _FakeDocQueRecusaLote()
+    fake_uiapp = revit_stubs._Inert()
+    fake_uiapp.ActiveUIDocument = fake_uidoc
+
+    handler.Execute(fake_uiapp)
+
+    assert events and events[0] == ("create", None), events
+    assert len(batch_attempts) == 1, "o lote tem que ser tentado UMA vez antes do fallback"
+    assert set(deleted_ids) == set(old_ids), (
+        "com o lote recusado, TODAS as pecas ainda precisam ser apagadas uma a uma"
+    )
 
 
 @case

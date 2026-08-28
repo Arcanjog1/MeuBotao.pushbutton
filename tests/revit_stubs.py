@@ -222,6 +222,32 @@ class _ThreadStub(object):
         self._target()
 
 
+class _DotNetList(list):
+    """Duble de System.Collections.Generic.List<T>: uma list do Python com
+    o `.Add()`/`.Count` do .NET por cima. So' o suficiente para o codigo do
+    motor que monta um ICollection<ElementId> de verdade - `List[ElementId]()`
+    em _execute_create (Delete em lote do lote anterior) e em _execute_zoom."""
+
+    def Add(self, item):
+        self.append(item)
+
+    @property
+    def Count(self):
+        return len(self)
+
+
+class _GenericTypeStub(object):
+    """`List[Tipo]` no .NET fecha um tipo generico; aqui basta devolver algo
+    chamavel que produza um _DotNetList. Aceita tambem `List()` direto, para
+    nao quebrar nenhum chamador antigo do duble anterior (`lambda: []`)."""
+
+    def __getitem__(self, _item_type):
+        return _DotNetList
+
+    def __call__(self, *args, **kwargs):
+        return _DotNetList()
+
+
 class ElementId(object):
     InvalidElementId = None
 
@@ -753,7 +779,7 @@ def install():
         Thread=_ThreadStub, ThreadStart=(lambda target: target),
     )
     module("System.Collections")
-    module("System.Collections.Generic", List=lambda *a, **k: [])
+    module("System.Collections.Generic", List=_GenericTypeStub())
     module(
         "System.Drawing",
         Font=Font, FontFamily=FontFamily, Color=Color, Size=Size,
