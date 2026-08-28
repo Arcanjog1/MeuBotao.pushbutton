@@ -1745,3 +1745,19 @@ continuidade lógica entre elas.
 - A calculadora de comprimento isolado permanece apenas como explorador de
   alternativas sem geometria. Ela não pode ser declarada validação global nem
   substituir o solve da captura.
+
+## 22. Diagnóstico visual obrigatório para regiões reprovadas (2026-08-28)
+
+> **Status**: **IMPLEMENTADO no `AbrirModeladorExterno.pushbutton`**.
+
+- Nenhuma Wall ou trecho sem solução pode desaparecer do modelo externo. A
+  Wall recebe estado e motivo explícitos; candidatos que ainda pertençam a
+  uma Wall reprovada permanecem visíveis em **vermelho**.
+- O vermelho é diagnóstico, não aprovação: os blocos continuam vinculados ao
+  código/motivo (`NON_MODULAR`, `ALIGNMENT_CONFLICT` ou
+  `VALIDATION_FAILURE`) para que o usuário localize a região e aplique apenas
+  os ajustes permitidos. Blocos de Walls válidas mantêm a cor do catálogo.
+- A prioridade é tentar todas as alternativas permitidas pelo solver —
+  inclusive o fechamento contra vão da seção 18.12 — antes de sinalizar a
+  região. Quando ainda não houver solução, informar é obrigatório; inventar
+  uma modulação proibida continua vedado.

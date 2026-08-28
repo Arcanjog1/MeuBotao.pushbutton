@@ -100,6 +100,11 @@ Nenhuma parede é ignorada silenciosamente; "sem solução" é um resultado
 honesto quando esgotadas as correções permitidas — nunca escondido atrás
 de um "sucesso" que não é real (REGRAS §13.3).
 
+No modelador externo, os candidatos ligados a uma Wall reprovada ficam em
+vermelho e carregam o código/motivo da reprovação. Esse destaque é uma
+obrigação de diagnóstico — não transforma uma solução inválida em aprovada
+(REGRAS §22).
+
 ## 8. Cuidados de método (evitar falso positivo/negativo no próprio validador)
 
 - **Colisão**: comparar só candidatos que de fato coexistem no modelo
