@@ -82,6 +82,7 @@ __all__ = [
     "_greedy_fill_blocks", "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
     "_layout_internal_joint_positions_cm", "_count_joint_coincidences_cm",
+    "OPENING_ALIGNED_EXEMPT_CODES",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
     "_half_block_leading_layout", "_pier_forced_bypass_layouts",
     "_pier_layout_avoiding_joints", "_place_pier_layout",
@@ -2762,16 +2763,46 @@ VERTICAL_JOINT_STAGGER_TOLERANCE_CM = 1.0  # secao 6: juntas mais proximas que
 # junta vertical continua" entre Fiada A e Fiada B.
 
 
-def _layout_internal_joint_positions_cm(layout, seg_start_cm):
+# Pecas de FECHAMENTO pequenas cuja junta contra o vizinho NAO conta como
+# junta vertical continua quando elas estao encostadas numa ABERTURA (regra
+# do usuario, 2026-08-28, a partir de uma parede modulada a mao: "os blocos
+# B4, B9 e B19 podem ficar alinhados quando estao encostados nas aberturas,
+# principalmente o b4 e o b9"). Ver EXCECAO na secao 11 de
+# REGRAS_MODULACAO_BLOCOS.md.
+OPENING_ALIGNED_EXEMPT_CODES = ("C04", "C09", "B19")
+
+
+def _layout_internal_joint_positions_cm(layout, seg_start_cm,
+                                        leading_is_open=False, trailing_is_open=False):
     """Posicao absoluta (cm, ao longo do eixo da parede) do CENTRO de cada
     junta INTERNA de `layout` (a lista devolvida por _pier_ordered_layout) -
     isto e', as juntas entre dois blocos consecutivos do mesmo trecho, sem
     contar as juntas de CONTORNO (contra abertura/no'/ponta livre, essas nao
     sao "verticais continuas entre fiadas" no sentido da secao 6). `layout`
     guarda posicoes relativas ao inicio do trecho (pos_cm comeca em
-    leading_joint_cm) - `seg_start_cm` converte para absoluto na parede."""
+    leading_joint_cm) - `seg_start_cm` converte para absoluto na parede.
+
+    `leading_is_open`/`trailing_is_open`: quando a ponta correspondente do
+    trecho e' uma ABERTURA (nao um no' de amarracao), a junta que separa a
+    peca de fechamento dessa ponta do seu vizinho e' OMITIDA da lista -
+    isto e', deixa de contar como coincidencia de junta vertical entre
+    fiadas - desde que essa peca seja uma das
+    `OPENING_ALIGNED_EXEMPT_CODES` (C04/C09/B19). E' a EXCECAO a' regra #1
+    pedida pelo usuario (2026-08-28): pastilha/compensador/meio-bloco
+    encostados no vao PODEM ficar alinhados entre a Fiada A e a Fiada B.
+    Os defaults `False` preservam exatamente o comportamento anterior para
+    todo chamador que ainda nao informa as pontas."""
     joints = []
-    for i in range(len(layout) - 1):
+    n = len(layout)
+    for i in range(n - 1):
+        # Junta i separa layout[i] de layout[i+1]. Ela e' isenta quando a
+        # peca ENCOSTADA na ponta aberta e' pequena (C04/C09/B19): na ponta
+        # inicial isso e' layout[0] (junta 0); na final, layout[-1] (junta
+        # n-2).
+        if i == 0 and leading_is_open and layout[0][0] in OPENING_ALIGNED_EXEMPT_CODES:
+            continue
+        if i == n - 2 and trailing_is_open and layout[-1][0] in OPENING_ALIGNED_EXEMPT_CODES:
+            continue
         gap_center_local = layout[i][2] + BLOCK_JOINT_CM / 2.0
         joints.append(seg_start_cm + gap_center_local)
     return joints
@@ -3154,6 +3185,13 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
         # align = melhor]) - comparado como (joint_coinc, -align), MENOR e'
         # melhor. Ver o comentario longo no docstring sobre a inversao de
         # prioridade (2026-08-25) e por que o align nao pode vir primeiro.
+        # NAO aplica a isencao de peca-encostada-em-abertura aqui de
+        # proposito (ver _layout_internal_joint_positions_cm): a isencao diz
+        # que essa junta PODE coincidir, nao que ela deva ser ignorada na
+        # BUSCA. Contando todas as juntas, a busca continua preferindo uma
+        # composicao que desencontra de verdade quando ela existe; a isencao
+        # so' entra na hora de VALIDAR o resultado (alignment_conflicts /
+        # audit_wall_bond_quality), para nao reprovar o que a regra permite.
         joint_coinc = _count_joint_coincidences_cm(
             _layout_internal_joint_positions_cm(layout, seg_start_cm), avoid_positions_cm
         ) if avoid_positions_cm else 0
@@ -3418,14 +3456,35 @@ def _node_default_reservation_cm(walls_to_create, node):
 
 def _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, end_index):
     """(reserva_cm, junta_cm) para a ponta `end_index` de `wall_idx` quando
-    esta fiada NAO tem candidato de encontro proprio ali: FREE_END (ou
-    ponta fora do grafo) -> nada para encostar (0, 0 - BLOCK_OPENING_JOINT_
-    CM); qualquer outro tipo de no' -> reserva ao menos meia espessura da
-    MAIOR parede deste no' (ver _node_default_reservation_cm) mais uma
-    junta normal depois dela."""
+    esta fiada NAO tem candidato de encontro proprio ali: FREE_END/
+    STRAIGHT_CONTINUATION (ou ponta fora do grafo) -> nada para encostar
+    (0, 0 - BLOCK_OPENING_JOINT_CM); qualquer outro tipo de no' -> reserva
+    ao menos meia espessura da MAIOR parede deste no' (ver
+    _node_default_reservation_cm) mais uma junta normal depois dela.
+
+    STRAIGHT_CONTINUATION nao reserva nada (bug real corrigido 2026-08-28,
+    medido ao vivo via MCP contra uma parede que o usuario modulou a mao
+    para servir de referencia): a reserva de `_node_default_reservation_cm`
+    existe para cobrir o CORPO de uma peca de amarracao da parede vizinha
+    que atravessa esta regiao - e numa continuacao reta essa peca NAO
+    EXISTE. `solve_all_intersections` ignora explicitamente os nos
+    FREE_END/STRAIGHT_CONTINUATION/AMBIGUOUS ("nao sao encontros de
+    amarracao especial"), entao nenhum candidato e' gerado ali; reservar
+    meia espessura + junta so' encolhia o trecho livre em ~8cm e fazia a
+    modulacao "nao fechar" por poucos centimetros. Numa parede real de
+    319cm (L_CORNER de um lado, STRAIGHT_CONTINUATION do outro) isso
+    derrubava as duas fiadas; com a reserva zerada, a Fiada A passou a
+    sair IDENTICA, peca por peca e posicao por posicao, a' que o usuario
+    montou a mao (B34 + 7xB39 + C04).
+
+    AMBIGUOUS continua reservando de proposito: neste projeto ele aparece
+    onde duas paredes ocupam o MESMO eixo em planta em faixas de altura
+    diferentes (peitoril x acima da verga), e ali existe peca de verdade -
+    zerar a reserva nesses nos dobrou as colisoes na medicao (44 mil ->
+    73 mil)."""
     node_index = end_to_node.get((wall_idx, end_index))
     node = nodes[node_index] if node_index is not None else None
-    if node is None or node["kind"] == "FREE_END":
+    if node is None or node["kind"] in ("FREE_END", "STRAIGHT_CONTINUATION"):
         return 0.0, BLOCK_OPENING_JOINT_CM
     # A reserva e' medida a partir do PONTO DO NO' (o encontro fisico), que
     # nao coincide com a ponta da parede: extend_wall_ends_to_junctions puxa
@@ -3805,6 +3864,11 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
                     if layout:
+                        # Lista de juntas a EVITAR - sem isencao, pelo mesmo
+                        # motivo do `_score` de _pier_layout_avoiding_joints:
+                        # a Fiada B deve continuar tentando desencontrar
+                        # todas, inclusive as isentas (a isencao so' vale na
+                        # hora de validar o resultado final).
                         seg_joints_cm = _layout_internal_joint_positions_cm(layout, seg_start_cm)
                         own_family_joint_positions_cm.extend(seg_joints_cm)
                         course_a_joint_positions_cm.extend(seg_joints_cm)
@@ -3828,6 +3892,8 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                     )
                     if layout:
+                        # Sem isencao aqui tambem - esta lista alimenta a
+                        # BUSCA das variantes seguintes (ver acima).
                         own_family_joint_positions_cm.extend(
                             _layout_internal_joint_positions_cm(layout, seg_start_cm)
                         )
@@ -3857,7 +3923,10 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     # compensadores desligados, ou um caso realmente sem
                     # solucao dentro do catalogo) - nunca aceitar isso calado.
                     residual = _count_joint_coincidences_cm(
-                        _layout_internal_joint_positions_cm(layout, seg_start_cm),
+                        _layout_internal_joint_positions_cm(
+                            layout, seg_start_cm,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        ),
                         course_a_joint_positions_cm,
                     )
                     if residual:

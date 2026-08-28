@@ -21,8 +21,13 @@
 > em silêncio — um exemplo que contradiz uma regra existente é registrado
 > como CONFLITO (ver seção 10.7), nunca resolvido por suposição.
 >
-> Última atualização: 2026-08-26 — nova seção 14 (auditoria de conformidade:
-> o script atende ao que este documento descreve?).
+> Última atualização: 2026-08-28 — nova EXCEÇÃO à regra #1 (seção 11.8:
+> C04/C09/B19 encostados numa abertura podem ficar alinhados entre fiadas),
+> bug real corrigido no `STRAIGHT_CONTINUATION` (seção 11.9) e nova seção 15
+> (paredes de peitoril/verga têm altura e cota de base próprias — origem dos
+> nós `AMBIGUOUS` e das colisões em massa). Tudo medido ao vivo via MCP
+> contra o projeto `TESTE MODULAÇÃO`, a partir de uma parede que o usuário
+> modulou à mão para servir de referência.
 >
 > **Mudanças da sessão de 2026-08-25** (pedido explícito do usuário, com
 > log de execução real e imagens): regra #1 (alinhamento vertical) deixou
@@ -832,6 +837,77 @@ mesma rede de segurança da seção 11.5, nunca aceita em silêncio) para o
 pipeline tentar um ajuste geométrico — exatamente o comportamento que a
 regra #1 exige.
 
+### 11.8 — EXCEÇÃO PERMITIDA: peça pequena de fechamento encostada numa abertura pode ficar alinhada (2026-08-28)
+
+- **Status**: **IMPLEMENTADO (sessão 2026-08-28)** —
+  `OPENING_ALIGNED_EXEMPT_CODES` + o parâmetro
+  `leading_is_open`/`trailing_is_open` de
+  `_layout_internal_joint_positions_cm` (`core/engine/wall_stepper.py`), e
+  `_joint_is_opening_aligned_exempt` (`core/wall_modeling.py`, usada por
+  `audit_wall_bond_quality`). Testes:
+  `test_junta_de_peca_pequena_encostada_em_abertura_e_isenta_da_regra_1` e
+  `test_auditoria_isenta_junta_de_pastilha_encostada_no_vao`.
+- **Regra** (pedido explícito do usuário, a partir de uma parede que ele
+  modulou **à mão** no Revit para servir de referência): *"os blocos B4, B9
+  e B19 podem ficar alinhados quando estão encostados nas aberturas,
+  principalmente o b4 e o b9"*. Ou seja: a junta que separa uma
+  **pastilha (C04)**, **compensador (C09)** ou **meio-bloco (B19)** do seu
+  vizinho **pode coincidir** entre a Fiada A e a Fiada B **quando essa peça
+  encosta num vão** — não conta como a "junta corrida" que a regra #1
+  proíbe.
+- **Motivo**: essas três são peças de **ajuste do fechamento contra o vão**,
+  não blocos de preenchimento do corpo da parede. A junta corrida que a
+  regra #1 combate é a do corpo da alvenaria (onde ela realmente enfraquece
+  a amarração); a última junta contra a abertura é consequência do vão ter
+  uma posição fixa nas duas fiadas.
+- **"Encostada num vão" cobre dois casos**, ambos medidos no projeto real:
+  a borda da peça coincide com a borda de uma abertura **deste** eixo, ou
+  com a **ponta do próprio eixo** — o segundo é o caso da parede de
+  referência, em que a janela pertence ao eixo **colinear vizinho** e por
+  isso nem aparece em `openings_per_wall` deste.
+- **A exceção vale na VALIDAÇÃO, nunca na BUSCA.** `_pier_layout_avoiding_
+  joints` e as listas `course_a_joint_positions_cm`/`own_family_joint_
+  positions_cm` continuam contando **todas** as juntas: a regra diz que
+  essa junta *pode* coincidir, não que deva ser ignorada. Assim o solver
+  continua preferindo uma composição que desencontra de verdade quando ela
+  existe, e a exceção só impede que o resultado seja **reprovado** quando
+  não existe. (Aplicar a isenção também na busca quebrou dois testes
+  existentes — `test_fiada_b_desencontra_junta_vertical_da_fiada_a` e
+  `test_solve_building_blocks_all_courses_variantes_evitam_alternating_
+  joint_pattern` — porque o layout idêntico ao da Fiada A passava a
+  empatar com as alternativas reais e vencia por ser o baseline.)
+- **Prioridade**: **EXCEÇÃO PERMITIDA** à regra #1 (seção 11), que continua
+  obrigatória e bloqueante para todo o resto.
+
+### 11.9 — Bug real corrigido: `STRAIGHT_CONTINUATION` reservava espaço de uma amarração inexistente (2026-08-28)
+
+- **Status**: **CORRIGIDO (sessão 2026-08-28)** —
+  `_wall_end_default_start_cm` (`core/engine/wall_stepper.py`). Teste:
+  `test_straight_continuation_nao_reserva_espaco_de_amarracao`.
+- **Sintoma**: o usuário modulou **à mão** uma parede de 319cm (`L_CORNER`
+  de um lado, `STRAIGHT_CONTINUATION` do outro) que fecha perfeitamente, e
+  o solver a reportava como "modulação não fecha" por poucos centímetros
+  nas duas fiadas.
+- **Causa-raiz**: `_wall_end_default_start_cm` só isentava `FREE_END` —
+  qualquer outro tipo de nó reservava meia espessura da parede mais larga
+  (`_node_default_reservation_cm`) mais uma junta. Essa reserva existe para
+  cobrir o **corpo de uma peça de amarração da parede vizinha** que
+  atravessa a região; numa **continuação reta essa peça não existe**:
+  `solve_all_intersections` ignora explicitamente
+  `FREE_END`/`STRAIGHT_CONTINUATION`/`AMBIGUOUS` ("não são encontros de
+  amarração especial") e nunca gera candidato ali. O solver reservava ~8cm
+  para o nada, e o trecho livre deixava de fechar.
+- **Prova**: com a reserva zerada, a Fiada A da parede de referência passou
+  a sair **idêntica à do usuário, peça por peça e posição por posição**:
+  `B34 + 7×B39 + C04` em X = 857,7 / 895,2 / 935,2 / 975,2 / 1015,2 /
+  1055,2 / 1095,2 / 1135,2 / 1157,7.
+- **`AMBIGUOUS` continua reservando, de propósito**: neste projeto ele
+  aparece onde **duas paredes ocupam o mesmo eixo em planta em faixas de
+  altura diferentes** (peitoril × acima da verga — ver seção 15), e ali
+  existe peça de verdade. Zerar a reserva nesses nós **dobrou as colisões**
+  na medição ao vivo (44 mil → 73 mil) e quase dobrou as paredes reprovadas
+  na auditoria de amarração (62 → 116).
+
 ## 12. Orientação dos compensadores (regra #3, 2026-08-25)
 
 > **Status**: IMPLEMENTADO (sessão 2026-08-25), com uma premissa física
@@ -1059,3 +1135,75 @@ chamada mais cedo (antes de criar) em vez de só depois (ETAPA 3B).
   (criação de parede não é modulation-aware ainda) — documentado acima,
   **não implementado nesta sessão** por decisão explícita do usuário de
   auditar/confirmar primeiro.
+
+## 15. Paredes de peitoril e de verga: altura e cota de base variam por parede (2026-08-28)
+
+> **Status**: **DOCUMENTADO — pendência de código aberta.** Medido ao vivo
+> via MCP no projeto `TESTE MODULAÇÃO` (306 paredes). O solver e a criação
+> já sabem trabalhar por faixa vertical (`course_candidates`, seção 4); o
+> que **não** existe ainda é derivar `num_courses` e `base_z_abs` **por
+> parede** — hoje os dois são globais.
+
+### 15.1 — O achado
+
+Nem toda parede da seleção vai do nível ao pé-direito. Num projeto real de
+alvenaria estrutural, o trecho **abaixo do peitoril** e o trecho **acima da
+verga** costumam ser paredes SEPARADAS, cada uma com sua própria
+`WALL_USER_HEIGHT_PARAM` e seu próprio `WALL_BASE_OFFSET`. Medição no
+projeto de referência:
+
+| Altura | Offset da base | Qtd | O que é |
+|---|---|---|---|
+| 300cm | 0cm | 203 | parede cheia (piso ao teto) |
+| 80cm | 220cm | 57 | trecho acima da verga |
+| 100cm | 0cm | 20 | peitoril (abaixo da janela) |
+| 60cm | 240cm | 10 | trecho acima da verga |
+| outras (20–160cm) | 140–260cm | 16 | mistas |
+
+Duas dessas paredes podem ocupar **exatamente o mesmo eixo em planta** (um
+peitoril de 0–100cm e um trecho de verga de 220–300cm no mesmo lugar) sem
+serem duplicatas: elas não se tocam, porque vivem em faixas de altura
+diferentes. Uma varredura ingênua por "mesmo eixo em planta" as acusa como
+duplicadas — **não são**, e `deduplicate_walls` (que só olha planta) as
+apagaria indevidamente. Note que `deduplicate_walls` hoje só roda no fluxo
+clássico do CAD (`main()`), nunca em `run_modulation_on_existing_walls`.
+
+### 15.2 — Consequência para o grafo de encontros: os `AMBIGUOUS`
+
+É essa sobreposição em planta que produz a maioria dos nós `AMBIGUOUS`.
+Medição: dos 92 nós `AMBIGUOUS` do projeto, apenas **4** são o caso
+documentado de duas paredes num ângulo oblíquo (nem 90° nem 180°); os
+outros **88 têm 3 a 7 pontas de parede chegando ao mesmo ponto**, e em
+**todos** eles duas pontas apontam para a **mesma direção** (0° entre si) —
+a assinatura de peitoril + verga colineares terminando juntos. Com braços a
+mais, o nó deixa de casar com os padrões de `T_INTERSECTION` (duas pontas
+colineares opostas + uma perpendicular) e de `X_INTERSECTION` (dois pares
+colineares perpendiculares entre si), e cai no ramo final `AMBIGUOUS`.
+
+Por isso `AMBIGUOUS` **continua reservando** espaço de amarração (seção
+11.9): ali existe peça de verdade, só que na outra faixa de altura.
+
+### 15.3 — Pendência: `num_courses`/`base_z_abs` são globais
+
+`_select_existing_walls_for_modulation` devolve **um** `max_height_ft` (a
+MAIOR altura entre as paredes selecionadas) e
+`run_modulation_on_existing_walls` usa **um** `base_z_abs`
+(`selected_level.Elevation`) para toda a modulação. Numa seleção
+homogênea isso é correto; numa seleção com peitoris/vergas, não:
+
+- uma parede de 80cm recebe as mesmas 15 fiadas de uma de 300cm — **~11
+  fiadas a mais do que cabem nela**;
+- uma parede com `base_offset` de 220cm tem os blocos criados a partir da
+  cota do NÍVEL, e não de 220cm acima dele — o lote inteiro nasce **220cm
+  abaixo** do lugar certo, atravessando as paredes vizinhas.
+
+Medido: com altura/base globais, o solver acusou **43.988 colisões** no
+projeto de 306 paredes. As peças de peitoril/verga fora de lugar são a
+fonte dominante.
+
+**Desenho combinado com o usuário (2026-08-28)**: agrupar as paredes por
+`(altura, offset_de_base)` e rodar solver + criação **uma vez por grupo**,
+cada um com seu próprio `num_courses` e sua própria cota inicial. Isso
+reaproveita todo o pipeline existente sem mexer na arquitetura. A correção
+definitiva — derivar altura e base **por parede** dentro de um único
+solve — fica registrada como pendência para uma sessão dedicada.

@@ -3184,6 +3184,42 @@ def _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node):
     return positions
 
 
+# Folga (cm) para considerar a borda de uma peca "encostada" na borda de um
+# vao (ou na ponta do eixo, onde o vao da parede vizinha comeca) - uma junta
+# de assentamento (1cm) mais uma margem de arredondamento.
+OPENING_ALIGNED_TOUCH_TOLERANCE_CM = 2.0
+
+
+def _joint_is_opening_aligned_exempt(extent_a, extent_b, opening_edges_cm, length_cm):
+    """True quando a junta ENTRE `extent_a` e `extent_b` (dois
+    `(t_start, t_end, code)` consecutivos e encostados) esta' isenta da
+    regra #1 por separar uma peca PEQUENA DE FECHAMENTO encostada num vao.
+
+    EXCECAO pedida pelo usuario (2026-08-28, a partir de uma parede que ele
+    modulou a mao para servir de referencia): "os blocos B4, B9 e B19 podem
+    ficar alinhados quando estao encostados nas aberturas, principalmente o
+    b4 e o b9". Pastilha (C04), compensador (C09) e meio-bloco (B19) sao
+    pecas de AJUSTE do fechamento contra o vao - a junta que os separa do
+    bloco vizinho pode coincidir entre a Fiada A e a Fiada B sem que isso
+    seja a "junta corrida" que a regra #1 proibe (essa e' a junta entre
+    blocos de preenchimento, no corpo da parede).
+
+    "Encostada num vao" cobre os DOIS casos reais medidos: a borda da peca
+    coincide com a borda de uma abertura DESTE eixo, ou com a PONTA do
+    proprio eixo - o segundo e' o caso da parede de referencia, em que a
+    janela pertence ao eixo VIZINHO (colinear) e por isso nao aparece em
+    `openings_per_wall` deste. Ver secao 11 de REGRAS_MODULACAO_BLOCOS.md."""
+    tol = OPENING_ALIGNED_TOUCH_TOLERANCE_CM
+    limites = list(opening_edges_cm or []) + [0.0, length_cm]
+    for t_start, t_end, code in (extent_a, extent_b):
+        if code not in OPENING_ALIGNED_EXEMPT_CODES:
+            continue
+        for borda in limites:
+            if abs(t_start - borda) <= tol or abs(t_end - borda) <= tol:
+                return True
+    return False
+
+
 def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalog,
                             num_courses, openings_per_wall=None, nodes=None, end_to_node=None,
                             course_candidates_index=None):
@@ -3237,6 +3273,11 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
             if gap_cm > BOND_MAX_ADJACENT_GAP_CM:
                 # Nao encostados de verdade - ha' uma abertura (ou outro
                 # vazio) entre eles, nao uma junta de assentamento.
+                continue
+            if _joint_is_opening_aligned_exempt(extents[i], extents[i + 1],
+                                                opening_edges_cm, length_cm):
+                # EXCECAO a' regra #1 (2026-08-28) - ver
+                # _joint_is_opening_aligned_exempt.
                 continue
             joint_points.append(((extents[i][1] + extents[i + 1][0]) / 2.0, course_index))
         for t_start, t_end, code in extents:

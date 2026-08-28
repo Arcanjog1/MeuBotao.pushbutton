@@ -4862,3 +4862,87 @@ def test_show_post_creation_window_reaproveita_resultado_anterior():
         # limpeza - nunca deixar uma janela falsa "ativa" contaminando
         # outros testes que iteram _ACTIVE_MODELESS_WINDOWS.
         del m._ACTIVE_MODELESS_WINDOWS[len(original_active):]
+
+
+# --------- STRAIGHT_CONTINUATION nao reserva amarracao (2026-08-28) -------
+@case
+def test_straight_continuation_nao_reserva_espaco_de_amarracao():
+    """Bug real medido ao vivo via MCP (2026-08-28) contra uma parede que o
+    usuario modulou a mao para servir de referencia: `_wall_end_default_
+    start_cm` so' isentava FREE_END, entao uma ponta STRAIGHT_CONTINUATION
+    reservava meia espessura + junta para uma peca de amarracao que NUNCA e'
+    criada ali (`solve_all_intersections` ignora esse tipo de no'). O trecho
+    livre encolhia ~8cm e a modulacao "nao fechava" por poucos centimetros.
+    AMBIGUOUS continua reservando de proposito - ver docstring da funcao."""
+    walls = [(seg(0, 0, 100, 0), ft(14.0), (False, False))]
+    nodes = [
+        {"kind": "STRAIGHT_CONTINUATION", "point": None, "arms": [(0, 0)]},
+        {"kind": "L_CORNER", "point": None, "arms": [(0, 1)]},
+        {"kind": "FREE_END", "point": None, "arms": [(0, 0)]},
+        {"kind": "AMBIGUOUS", "point": None, "arms": [(0, 1)]},
+    ]
+
+    reserva, junta = m._wall_end_default_start_cm(nodes, {(0, 0): 0}, walls, 0, 0)
+    assert reserva == 0.0, reserva
+    assert junta == m.BLOCK_OPENING_JOINT_CM, junta
+
+    # FREE_END: mesmo resultado (comportamento historico, inalterado).
+    assert m._wall_end_default_start_cm(nodes, {(0, 0): 2}, walls, 0, 0) == (reserva, junta)
+
+    # L_CORNER continua reservando meia espessura (14/2 = 7cm) + junta normal.
+    reserva_l, junta_l = m._wall_end_default_start_cm(nodes, {(0, 1): 1}, walls, 0, 1)
+    assert abs(reserva_l - 7.0) < 1e-6, reserva_l
+    assert junta_l == m.BLOCK_JOINT_CM, junta_l
+
+    # AMBIGUOUS tambem continua reservando (peca real da outra faixa de
+    # altura ocupa esse espaco - zerar aqui dobrou as colisoes na medicao).
+    reserva_amb, _ = m._wall_end_default_start_cm(nodes, {(0, 1): 3}, walls, 0, 1)
+    assert abs(reserva_amb - 7.0) < 1e-6, reserva_amb
+
+
+# ------ EXCECAO regra #1: peca pequena encostada em abertura (2026-08-28) --
+@case
+def test_junta_de_peca_pequena_encostada_em_abertura_e_isenta_da_regra_1():
+    """Regra do usuario (2026-08-28): "os blocos B4, B9 e B19 podem ficar
+    alinhados quando estao encostados nas aberturas, principalmente o b4 e o
+    b9". A junta que separa C04/C09/B19 do vizinho, quando a peca encosta no
+    vao, deixa de contar como junta vertical continua."""
+    layout = [("B39", 0.0, 39.0), ("C04", 40.0, 44.0)]
+    # Sem informar as pontas: comportamento historico (conta a junta).
+    assert len(m._layout_internal_joint_positions_cm(layout, 0.0)) == 1
+    # Ponta final aberta e ultima peca C04 -> junta isenta.
+    assert m._layout_internal_joint_positions_cm(layout, 0.0, trailing_is_open=True) == []
+    # A mesma ponta aberta NAO isenta quando a peca final e' bloco comum.
+    comum = [("B39", 0.0, 39.0), ("B39", 40.0, 79.0)]
+    assert len(m._layout_internal_joint_positions_cm(comum, 0.0, trailing_is_open=True)) == 1
+    # Ponta inicial: simetrico.
+    inicio = [("C09", 0.0, 9.0), ("B39", 10.0, 49.0)]
+    assert m._layout_internal_joint_positions_cm(inicio, 0.0, leading_is_open=True) == []
+    assert len(m._layout_internal_joint_positions_cm(inicio, 0.0, trailing_is_open=True)) == 1
+
+
+@case
+def test_auditoria_isenta_junta_de_pastilha_encostada_no_vao():
+    """Mesma excecao, na SEGUNDA verificacao independente (secao 11.5), que
+    trabalha sobre a posicao REAL das pecas ja' lancadas. Reproduz a parede
+    de referencia: a pastilha final encosta na PONTA do eixo (a janela
+    pertence ao eixo colinear vizinho, entao nao aparece em
+    openings_per_wall deste)."""
+    length_cm = 319.0
+    b39 = (275.0, 314.0, "B39")
+    c04 = (315.0, 319.0, "C04")
+    assert m._joint_is_opening_aligned_exempt(b39, c04, [], length_cm) is True
+
+    # Dois blocos comuns no meio da parede: junta normal, nunca isenta.
+    meio_a = (100.0, 139.0, "B39")
+    meio_b = (140.0, 179.0, "B39")
+    assert m._joint_is_opening_aligned_exempt(meio_a, meio_b, [], length_cm) is False
+
+    # Pastilha no MEIO da parede (longe de vao/ponta): tambem nao isenta.
+    solta_a = (100.0, 139.0, "B39")
+    solta_b = (140.0, 144.0, "C04")
+    assert m._joint_is_opening_aligned_exempt(solta_a, solta_b, [], length_cm) is False
+
+    # Encostada na borda de uma abertura DESTE eixo: isenta.
+    assert m._joint_is_opening_aligned_exempt(
+        solta_a, solta_b, [144.0, 200.0], length_cm) is True
