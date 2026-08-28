@@ -127,6 +127,16 @@ O processo só termina quando a solução atende a todas as regras — ou
 quando a parede é marcada explicitamente como não modulável, com o motivo
 exato [REGRAS §18.8], nunca por omissão silenciosa.
 
+### Modelador externo — mesma entrada do solver [REGRAS §21]
+
+Para uma captura de Walls no modelador externo, a calculadora deve chamar o
+mesmo `solve_building_blocks` do `core.engine.wall_stepper`; ela não pode
+reimplementar uma regra de preenchimento, amarração ou validação na UI. A
+edição descobre a componente L/T/X e recalcula somente as faixas de
+`(nível, base_z)` atingidas, preservando resultados independentes. A prévia
+durante arraste é descartável; ao soltar, o solve e a validação canônicos são
+executados novamente antes de aplicar qualquer bloco.
+
 ## Testes
 
 Antes de considerar qualquer alteração de lógica de modulação pronta,
