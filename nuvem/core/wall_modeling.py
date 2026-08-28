@@ -10866,6 +10866,7 @@ class _WallSourceModeForm(Form):
         self._rb_cad.AutoSize = False
         self._rb_cad.Height = 24
         self._rb_cad.Dock = DockStyle.Top
+        self._rb_cad.GroupName = "wall_source_mode"
 
         desc_cad = Label()
         desc_cad.Text = ("Importa as linhas de um arquivo CAD (.dwg) e cria as "
@@ -10894,6 +10895,7 @@ class _WallSourceModeForm(Form):
         self._rb_existing.AutoSize = False
         self._rb_existing.Height = 24
         self._rb_existing.Dock = DockStyle.Top
+        self._rb_existing.GroupName = "wall_source_mode"
 
         desc_existing = Label()
         desc_existing.Text = ("Pula a criacao e verificacao inicial - usa Walls "
