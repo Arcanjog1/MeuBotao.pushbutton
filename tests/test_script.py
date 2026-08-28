@@ -5230,3 +5230,785 @@ def test_radios_de_modo_de_parede_nao_ficam_no_mesmo_grupo_das_portas_janelas():
     assert pai_modo is _pai_direto(form._wall_mode_continuous)
     assert pai_modo is not _pai_direto(form._openings_pick)
     assert _pai_direto(form._openings_pick) is _pai_direto(form._openings_auto)
+
+
+# ==========================================
+# UNIAO DE PAREDES EXISTENTES (2026-08-28, pedido do usuario) - a 3a opcao
+# da tela "Preparacao das paredes": parte das Wall JA MODELADAS (nunca da
+# planta baixa), descobre quais trechos pertencem a mesma parede, cria UMA
+# parede continua e recria os vazios como Abertura de Parede. Ver o
+# cabecalho da secao "FLUXO UNIR PAREDES EXISTENTES" em
+# core/wall_modeling.py e a secao 8c de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+# ==========================================
+
+class _FakeWallTypeForMerge(object):
+    def __init__(self):
+        self.Id = _next_fake_selection_id()
+
+
+class _FakeMergeParam(object):
+    """Parametro de instancia gravavel - o suficiente para o motor ler
+    deslocamento de base/topo e para escrever a Linha de Referencia."""
+
+    def __init__(self, value, read_only=False):
+        self.value = value
+        self.IsReadOnly = read_only
+        self.HasValue = True
+
+    def AsDouble(self):
+        return self.value
+
+    def AsValueString(self):
+        # None faz _param_value_as_feet devolver o valor cru - nestes testes
+        # os valores ja estao em pes (ver ft()).
+        return None
+
+    def AsInteger(self):
+        return int(self.value)
+
+    def AsElementId(self):
+        return self.value
+
+    def Set(self, value):
+        self.value = value
+        return True
+
+
+class _StubbornLocationCurve(m.LocationCurve):
+    """LocationCurve que NAO obedece: toda curva escrita nela sai encurtada
+    em `shrink_ft`. E' o unico jeito de exercitar offline a reprovacao da
+    validacao da uniao - no duble comum, reescrever a curva ja deixaria a
+    parede exatamente onde o plano pediu, e a validacao nunca reprovaria."""
+
+    def __init__(self, curve, shrink_ft=0.0):
+        self._curve = curve
+        self._shrink_ft = shrink_ft
+
+    def _get_curve(self):
+        return self._curve
+
+    def _set_curve(self, value):
+        p0, p1 = value.GetEndPoint(0), value.GetEndPoint(1)
+        if self._shrink_ft:
+            direction = (p1 - p0).Normalize()
+            p1 = p1 - direction * self._shrink_ft
+        self._curve = Line.CreateBound(p0, p1)
+
+    Curve = property(_get_curve, _set_curve)
+
+
+class _FakeMergeWall(m.Wall):
+    """Wall ja modelada no projeto, do ponto de vista da UNIAO: eixo reto,
+    espessura, tipo, nivel, cotas de base/topo e o que esta' hospedado
+    nela. `inserts` sao os ElementId que Wall.FindInserts devolveria."""
+
+    def __init__(self, curve, width_ft, level, base_z_abs, top_z_abs,
+                 wall_type=None, inserts=None, location_line=0, shrink_ft=0.0):
+        self.Location = _StubbornLocationCurve(curve, shrink_ft)
+        self.Width = width_ft
+        self.Id = _next_fake_selection_id()
+        self.LevelId = level.Id
+        self.WallType = wall_type if wall_type is not None else _FakeWallTypeForMerge()
+        self.IsValidObject = True
+        self.Flipped = False
+        self._inserts = list(inserts or [])
+        self._params = {
+            "WALL_BASE_OFFSET": _FakeMergeParam(base_z_abs - level.Elevation),
+            "WALL_USER_HEIGHT_PARAM": _FakeMergeParam(top_z_abs - base_z_abs),
+            "WALL_HEIGHT_TYPE": _FakeMergeParam(None),
+            "WALL_TOP_OFFSET": _FakeMergeParam(0.0),
+            "WALL_KEY_REF_PARAM": _FakeMergeParam(location_line),
+            "WALL_STRUCTURAL_SIGNIFICANT": _FakeMergeParam(0),
+        }
+
+    def get_Parameter(self, param_id):
+        # BuiltInParameter e' um _Enum nos dubles: BuiltInParameter.X vira a
+        # string "BuiltInParameter.X".
+        return self._params.get(str(param_id).split(".")[-1])
+
+    def get_BoundingBox(self, view):
+        return None
+
+    def FindInserts(self, *flags):
+        return list(self._inserts)
+
+
+class _FakeMergeDoc(object):
+    """Documento para o fluxo de uniao: resolve ElementId, cria (via
+    _StubCreate, que registra NewOpening/NewFamilyInstance) e registra o
+    que foi apagado."""
+
+    def __init__(self, elements=None):
+        self.elements = dict(elements or {})
+        self.Create = revit_stubs._StubCreate()
+        self.deleted = []
+        self.regenerate_calls = 0
+
+    def GetElement(self, element_id):
+        return self.elements.get(element_id)
+
+    def Regenerate(self):
+        self.regenerate_calls += 1
+
+    def Delete(self, element_id):
+        self.deleted.append(element_id)
+        self.elements.pop(element_id, None)
+
+
+def _merge_level(name="Nivel 1", elevation_cm=0.0):
+    return _FakeLevelForSelection(name, ft(elevation_cm))
+
+
+def _merge_wall(level, x0_cm, x1_cm, base_cm, top_cm, width_cm=14.0,
+                wall_type=None, y_cm=0.0, inserts=None):
+    return _FakeMergeWall(
+        seg(x0_cm, y_cm, x1_cm, y_cm), ft(width_cm), level,
+        ft(base_cm) + level.Elevation, ft(top_cm) + level.Elevation,
+        wall_type=wall_type, inserts=inserts
+    )
+
+
+def _plan_for(walls, doc=None):
+    fake_doc = doc if doc is not None else _FakeMergeDoc(
+        dict((w.LevelId, w) for w in [])
+    )
+    return m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+
+
+def _doc_for(level, walls, extra=None):
+    elements = {level.Id: level}
+    for wall in walls:
+        elements[wall.Id] = wall
+    elements.update(extra or {})
+    return _FakeMergeDoc(elements)
+
+
+@case
+def test_uniao_reconstroi_o_vao_da_janela_a_partir_dos_trechos_existentes():
+    """O caso central do pedido: uma parede que no modelo esta' quebrada em
+    quatro Wall por causa de uma janela (pilarete, peitoril, verga,
+    pilarete) vira UMA parede continua com UM recorte, e o recorte tem
+    exatamente a posicao, a largura, a altura e o peitoril do vao que os
+    trechos antigos deixavam - tudo deduzido da GEOMETRIA MODELADA, sem
+    olhar a planta baixa."""
+    level = _merge_level()
+    # eixo 0..400cm, altura 0..280cm; janela de 100cm a 220cm, peitoril
+    # 100cm, verga 210cm.
+    tipo = _FakeWallTypeForMerge()
+    pilarete_esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo)
+    peitoril = _merge_wall(level, 100, 220, 0, 100, wall_type=tipo)
+    verga = _merge_wall(level, 100, 220, 210, 280, wall_type=tipo)
+    pilarete_dir = _merge_wall(level, 220, 400, 0, 280, wall_type=tipo)
+    walls = [verga, pilarete_dir, peitoril, pilarete_esq]  # ordem embaralhada
+
+    plans, skipped, untouched = m.plan_existing_wall_merges(
+        walls, target_doc=_doc_for(level, walls)
+    )
+
+    assert skipped == [] and untouched == []
+    assert len(plans) == 1, "os quatro trechos sao UMA continuidade so'"
+    plan = plans[0]
+    assert len(plan["segments"]) == 4
+    assert abs(to_cm(plan["length_ft"]) - 400.0) < 1e-6
+    assert abs(to_cm(plan["height_ft"]) - 280.0) < 1e-6, (
+        "a parede continua vai da base MAIS BAIXA ate' o topo MAIS ALTO"
+    )
+    assert abs(to_cm(plan["width_ft"]) - 14.0) < 1e-6
+
+    assert len(plan["cuts"]) == 1, plan["cuts"]
+    cut = plan["cuts"][0]
+    assert abs(to_cm(cut["t_lo"]) - 100.0) < 1e-6
+    assert abs(to_cm(cut["t_hi"]) - 220.0) < 1e-6
+    assert abs(to_cm(cut["width_ft"]) - 120.0) < 1e-6
+    assert abs(to_cm(cut["sill_z_abs"]) - 100.0) < 1e-6, "peitoril preservado"
+    assert abs(to_cm(cut["head_z_abs"]) - 210.0) < 1e-6, "verga preservada"
+    assert abs(to_cm(cut["height_ft"]) - 110.0) < 1e-6
+
+
+@case
+def test_recorte_da_uniao_so_extrapola_nas_arestas_que_encostam_na_parede():
+    """Mesma disciplina do modo continuo do fluxo do CAD: a folga de 1cm
+    (OPENING_CUT_EDGE_OVERSHOOT) so' vale na aresta que encosta na base ou
+    no topo da parede - uma porta (peitoril 0) extrapola por baixo, a
+    janela do teste anterior nao extrapola em nenhum dos dois lados."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+    # porta de 90cm a 180cm, com verga de 210 ao topo: o vao vai da BASE
+    # (0) ate' 210.
+    esq = _merge_wall(level, 0, 90, 0, 280, wall_type=tipo)
+    verga = _merge_wall(level, 90, 180, 210, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 180, 300, 0, 280, wall_type=tipo)
+    walls = [esq, verga, dir_]
+
+    plans, _skipped, _untouched = m.plan_existing_wall_merges(
+        walls, target_doc=_doc_for(level, walls)
+    )
+    cut = plans[0]["cuts"][0]
+    assert abs(to_cm(cut["sill_z_abs"]) - 0.0) < 1e-6
+    assert abs(to_cm(cut["head_z_abs"]) - 210.0) < 1e-6
+    assert abs(to_cm(cut["p_start"].Z) - (-1.0)) < 1e-6, (
+        "a aresta de baixo encosta na base da parede - extrapola 1cm"
+    )
+    assert abs(to_cm(cut["p_end"].Z) - 210.0) < 1e-6, (
+        "a aresta de cima tem parede acima (verga) - fica na cota exata"
+    )
+
+
+@case
+def test_uniao_nao_mistura_niveis_tipos_espessuras_nem_retas_diferentes():
+    """"Nao unir paredes que nao pertencam a mesma continuidade logica" /
+    "Nao alterar paredes com funcoes ou caracteristicas incompativeis" /
+    "Respeitar espessuras, niveis e alturas das paredes originais": cada
+    uma dessas diferencas sozinha ja separa as paredes em grupos, mesmo
+    quando elas estao perfeitamente encostadas na mesma reta."""
+    level1 = _merge_level("Nivel 1", 0.0)
+    level2 = _merge_level("Nivel 2", 300.0)
+    tipo_a, tipo_b = _FakeWallTypeForMerge(), _FakeWallTypeForMerge()
+
+    base = _merge_wall(level1, 0, 200, 0, 280, wall_type=tipo_a)
+    outro_nivel = _merge_wall(level2, 200, 400, 0, 280, wall_type=tipo_a)
+    outro_tipo = _merge_wall(level1, 200, 400, 0, 280, wall_type=tipo_b)
+    outra_espessura = _merge_wall(level1, 200, 400, 0, 280, width_cm=19.0, wall_type=tipo_a)
+    outra_reta = _merge_wall(level1, 200, 400, 0, 280, wall_type=tipo_a, y_cm=50.0)
+
+    for concorrente, motivo in (
+        (outro_nivel, "nivel diferente"),
+        (outro_tipo, "WallType diferente"),
+        (outra_espessura, "espessura diferente"),
+        (outra_reta, "outra reta em planta"),
+    ):
+        walls = [base, concorrente]
+        grupos = m.group_existing_walls_for_merge([
+            m.read_existing_wall_for_merge(w, _doc_for(level1, walls, {level2.Id: level2}))[0]
+            for w in walls
+        ])
+        assert len(grupos) == 2, "{} nao pode entrar no mesmo grupo".format(motivo)
+
+
+@case
+def test_uniao_atravessa_o_vao_de_uma_porta_sem_verga_mas_nao_uma_distancia_grande():
+    """Paredes separadas nas laterais de uma abertura que vai do piso ao
+    teto (nenhum trecho cobre o vao) TAMBEM sao unidas - o vazio vira um
+    recorte de altura cheia, entao a geometria final e' a mesma. O limite e'
+    WALL_MERGE_MAX_AXIAL_GAP: acima dele sao duas paredes distintas que so'
+    por acaso caem na mesma reta, e cada uma fica como esta'."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo)
+    dir_perto = _merge_wall(level, 190, 400, 0, 280, wall_type=tipo)  # vao de 90cm
+    walls = [esq, dir_perto]
+
+    plans, _s, untouched = m.plan_existing_wall_merges(
+        walls, target_doc=_doc_for(level, walls)
+    )
+    assert len(plans) == 1
+    assert len(plans[0]["cuts"]) == 1
+    cut = plans[0]["cuts"][0]
+    assert abs(to_cm(cut["width_ft"]) - 90.0) < 1e-6
+    assert abs(to_cm(cut["height_ft"]) - 280.0) < 1e-6, "vao do piso ao teto"
+    assert plans[0]["bridged_gaps"], "o vao atravessado fica registrado para o relatorio"
+
+    dir_longe = _merge_wall(level, 700, 900, 0, 280, wall_type=tipo)  # vao de 6m
+    walls = [esq, dir_longe]
+    plans, _s, untouched = m.plan_existing_wall_merges(
+        walls, target_doc=_doc_for(level, walls)
+    )
+    assert plans == [], "6m de distancia nao e' abertura - nao une"
+    assert len(untouched) == 2, "as duas ficam exatamente como estao"
+
+
+@case
+def test_parede_ja_inteira_nao_vira_plano_nenhum():
+    """"Evitar a criacao de paredes duplicadas ou sobrepostas": uma parede
+    que ja esta' inteira (sozinha no grupo e sem nenhum vazio) NAO gera
+    plano - ela nao e' recriada nem apagada, so' reportada como intocada."""
+    level = _merge_level()
+    sozinha = _merge_wall(level, 0, 400, 0, 280)
+    plans, skipped, untouched = m.plan_existing_wall_merges(
+        [sozinha], target_doc=_doc_for(level, [sozinha])
+    )
+    assert plans == [] and skipped == []
+    assert len(untouched) == 1 and untouched[0]["wall_id"] == sozinha.Id
+
+
+@case
+def test_compute_wall_merge_voids_junta_faixas_vizinhas_e_descarta_degenerado():
+    """O calculo dos vazios e' exato (complemento dos retangulos ocupados),
+    junta faixas vizinhas com o MESMO vazio num retangulo unico e descarta
+    o que for menor que o minimo geometrico - o Revit recusaria o recorte."""
+    # Parede 0..10 x 0..10, com dois trechos que deixam um vao 4..6 x 3..7.
+    rects = [
+        (0.0, 4.0, 0.0, 10.0),
+        (6.0, 10.0, 0.0, 10.0),
+        (4.0, 5.0, 0.0, 3.0), (5.0, 6.0, 0.0, 3.0),    # peitoril em 2 pedacos
+        (4.0, 5.0, 7.0, 10.0), (5.0, 6.0, 7.0, 10.0),  # verga em 2 pedacos
+    ]
+    voids = m.compute_wall_merge_voids(rects, 0.0, 10.0, 0.0, 10.0)
+    assert voids == [(4.0, 6.0, 3.0, 7.0)], voids
+
+    # Um vazio mais fino que MIN_SEGMENT_LENGTH_FT nunca sai da funcao.
+    fino = [(0.0, 5.0, 0.0, 10.0), (5.0 + m.MIN_SEGMENT_LENGTH_FT / 2.0, 10.0, 0.0, 10.0)]
+    assert m.compute_wall_merge_voids(fino, 0.0, 10.0, 0.0, 10.0) == []
+
+
+@case
+def test_read_existing_wall_for_merge_recusa_arco_parede_curta_e_nao_parede():
+    """Toda recusa tem MOTIVO (vai para o relatorio) - nunca some em
+    silencio. Parede em arco nao entra na uniao: ela nao pode ser
+    reconstruida como um unico segmento reto continuo."""
+    level = _merge_level()
+
+    class _Arco(m.Wall):
+        def __init__(self):
+            self.Location = m.LocationCurve()
+            self.Location.Curve = revit_stubs._Inert()  # nao e' Line
+            self.Id = _next_fake_selection_id()
+
+    curta = _merge_wall(level, 0, 0.5, 0, 280)
+    doc_fake = _doc_for(level, [curta])
+
+    assert m.read_existing_wall_for_merge(revit_stubs._Inert(), doc_fake)[1] == (
+        "nao e' uma parede (Wall)"
+    )
+    assert "arco" in m.read_existing_wall_for_merge(_Arco(), doc_fake)[1]
+    assert m.read_existing_wall_for_merge(curta, doc_fake)[1] == "eixo curto demais"
+
+
+def _with_fake_wall_create(created_walls, factory):
+    """Instala Wall.Create nos dubles (a classe inerte do stub nao tem
+    fabrica estatica) e devolve um contexto para remove-la depois."""
+    class _Ctx(object):
+        def __enter__(self_inner):
+            m.Wall.Create = staticmethod(factory)
+            return created_walls
+
+        def __exit__(self_inner, *exc):
+            try:
+                del m.Wall.Create
+            except AttributeError:
+                pass
+            return False
+    return _Ctx()
+
+
+@case
+def test_execute_wall_merge_plan_so_apaga_as_antigas_depois_de_validar():
+    """A ordem exigida pelo usuario, ponta a ponta: cria a parede continua,
+    abre os recortes com a ferramenta nativa, valida e SO' ENTAO apaga as
+    paredes antigas - e o Commit acontece com as antigas ja fora."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo)
+    peitoril = _merge_wall(level, 100, 220, 0, 100, wall_type=tipo)
+    verga = _merge_wall(level, 100, 220, 210, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 220, 400, 0, 280, wall_type=tipo)
+    walls = [esq, peitoril, verga, dir_]
+    fake_doc = _doc_for(level, walls)
+
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+    plan = plans[0]
+
+    criadas = []
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        nova = _FakeMergeWall(
+            curve, ft(14.0), level,
+            level.Elevation + offset, level.Elevation + offset + height,
+            wall_type=tipo
+        )
+        criadas.append(nova)
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    revit_stubs._StubTransaction.log = []
+    with _with_fake_wall_create(criadas, _create):
+        result = m.execute_wall_merge_plan(fake_doc, plan)
+
+    assert result["ok"], result["problems"]
+    assert len(criadas) == 1
+    assert result["new_wall_id"] == criadas[0].Id
+    assert len(fake_doc.Create.openings) == 1, "o vao da janela virou UM recorte nativo"
+    _hospedeira, p1, p2 = fake_doc.Create.openings[0]
+    assert _hospedeira is criadas[0], "o recorte foi aberto na parede CONTINUA"
+    assert abs(to_cm(p1.Z) - 100.0) < 1e-6 and abs(to_cm(p2.Z) - 210.0) < 1e-6
+    assert sorted(_eid(i) for i in fake_doc.deleted) == sorted(
+        _eid(w.Id) for w in walls
+    ), "as quatro paredes antigas foram apagadas"
+    assert ("commit", "Unir paredes existentes") in revit_stubs._StubTransaction.log
+    assert ("rollback", "Unir paredes existentes") not in revit_stubs._StubTransaction.log
+
+
+def _eid(element_id):
+    return m._eid_int(element_id)
+
+
+@case
+def test_execute_wall_merge_plan_reprovado_faz_rollback_e_nao_apaga_nada():
+    """"Antes de excluir qualquer parede original, validar que a nova
+    parede continua foi criada corretamente": quando a parede nasce fora do
+    lugar/comprimento, a Transaction inteira e' revertida e NENHUMA parede
+    antiga e' apagada."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 100, 400, 0, 100, wall_type=tipo)
+    walls = [esq, dir_]
+    fake_doc = _doc_for(level, walls)
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+
+    def _create_torta(document, curve, type_id, level_id, height, offset, flip, structural):
+        # nasce - e CONTINUA, mesmo depois de reposicionada - 50cm mais
+        # curta do que o plano pediu
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo,
+                              shrink_ft=ft(50.0))
+        nova.Location.Curve = curve
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    revit_stubs._StubTransaction.log = []
+    with _with_fake_wall_create([], _create_torta):
+        result = m.execute_wall_merge_plan(fake_doc, plans[0])
+
+    assert not result["ok"]
+    assert fake_doc.deleted == [], "nenhuma parede original pode ser apagada"
+    assert result["removed_wall_ids"] == []
+    assert any("comprimento" in problema for problema in result["problems"]), result["problems"]
+    assert ("rollback", "Unir paredes existentes") in revit_stubs._StubTransaction.log
+
+
+@case
+def test_uniao_recria_a_porta_hospedada_antes_de_apagar_a_parede_antiga():
+    """Apagar a parede hospedeira apagaria junto a porta/janela dela. Por
+    isso o que estava hospedado nos trechos antigos e' recriado na parede
+    continua - mesmo simbolo, mesmo ponto, mesmo nivel e os parametros de
+    largura/altura/peitoril copiados - ANTES de qualquer exclusao."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+
+    class _FakeSymbol(object):
+        def __init__(self):
+            self.Id = _next_fake_selection_id()
+            self.IsActive = True
+
+        def LookupParameter(self, name):
+            return None
+
+    class _FakePorta(m.FamilyInstance):
+        def __init__(self):
+            self.Id = _next_fake_selection_id()
+            self.Symbol = _FakeSymbol()
+            self.Location = m.LocationPoint()
+            self.Location.Point = XYZ(ft(140.0), 0.0, 0.0)
+            self.LevelId = level.Id
+            self.FacingFlipped = False
+            self.HandFlipped = False
+            self._params = {
+                m.OPENING_WIDTH_PARAM: ft(90.0),
+                m.OPENING_HEIGHT_PARAM: ft(210.0),
+                m.OPENING_SILL_PARAM: 0.0,
+            }
+
+        def LookupParameter(self, name):
+            valor = self._params.get(name)
+            return _FakeMergeParam(valor) if valor is not None else None
+
+    porta = _FakePorta()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo, inserts=[porta.Id])
+    verga = _merge_wall(level, 100, 220, 210, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 220, 400, 0, 280, wall_type=tipo)
+    walls = [esq, verga, dir_]
+    fake_doc = _doc_for(level, walls, {porta.Id: porta})
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+
+    criadas = []
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo)
+        criadas.append(nova)
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create(criadas, _create):
+        result = m.execute_wall_merge_plan(fake_doc, plans[0])
+
+    assert result["ok"], result["problems"]
+    assert len(fake_doc.Create.family_instances) == 1, "a porta foi recriada"
+    ponto, simbolo, resto, nova_porta = fake_doc.Create.family_instances[0]
+    assert simbolo is porta.Symbol
+    assert abs(to_cm(ponto.X) - 140.0) < 1e-6
+    assert resto[0] is criadas[0], "hospedada na parede CONTINUA"
+    assert resto[1] is level
+    assert len(result["reinserted_ids"]) == 1
+    # largura, altura e peitoril voltam iguais aos da original
+    assert abs(to_cm(nova_porta.params[m.OPENING_WIDTH_PARAM]) - 90.0) < 1e-6
+    assert abs(to_cm(nova_porta.params[m.OPENING_HEIGHT_PARAM]) - 210.0) < 1e-6
+    assert abs(to_cm(nova_porta.params[m.OPENING_SILL_PARAM]) - 0.0) < 1e-6
+    assert nova_porta.FacingFlipped is False and nova_porta.HandFlipped is False
+    assert fake_doc.deleted, "so' depois disso as antigas sairam"
+
+    # a mesma porta, agora espelhada na parede antiga, volta espelhada
+    porta.HandFlipped = True
+    fake_doc2 = _doc_for(level, walls, {porta.Id: porta})
+    for wall in walls:
+        fake_doc2.elements[wall.Id] = wall
+    plans2, _s2, _u2 = m.plan_existing_wall_merges(walls, target_doc=fake_doc2)
+
+    def _create2(document, curve, type_id, level_id, height, offset, flip, structural):
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo)
+        fake_doc2.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create([], _create2):
+        result2 = m.execute_wall_merge_plan(fake_doc2, plans2[0])
+    assert result2["ok"], result2["problems"]
+    _p, _s, _r, porta_espelhada = fake_doc2.Create.family_instances[0]
+    assert porta_espelhada.HandFlipped is True
+
+
+@case
+def test_uniao_recria_o_recorte_retangular_que_ja_existia_na_parede_antiga():
+    """Um `Opening` que ja existia numa parede antiga volta na parede
+    continua com os MESMOS dois cantos (Opening.BoundaryRect)."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+
+    class _FakeOpeningExistente(m.Opening):
+        def __init__(self):
+            self.Id = _next_fake_selection_id()
+            self.IsRectBoundary = True
+            self.BoundaryRect = [
+                XYZ(ft(30.0), 0.0, ft(120.0)), XYZ(ft(80.0), 0.0, ft(200.0))
+            ]
+
+    recorte = _FakeOpeningExistente()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo, inserts=[recorte.Id])
+    verga = _merge_wall(level, 100, 220, 210, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 220, 400, 0, 280, wall_type=tipo)
+    walls = [esq, verga, dir_]
+    fake_doc = _doc_for(level, walls, {recorte.Id: recorte})
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+
+    criadas = []
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo)
+        criadas.append(nova)
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create(criadas, _create):
+        result = m.execute_wall_merge_plan(fake_doc, plans[0])
+
+    assert result["ok"], result["problems"]
+    # 1 recorte do vao da porta (calculado) + 1 recorte antigo recriado
+    assert len(fake_doc.Create.openings) == 2
+    cantos = [(p1, p2) for _w, p1, p2 in fake_doc.Create.openings]
+    assert any(
+        abs(to_cm(a.X) - 30.0) < 1e-6 and abs(to_cm(b.Z) - 200.0) < 1e-6
+        for a, b in cantos
+    ), "o recorte que ja existia voltou com os mesmos cantos"
+
+
+@case
+def test_merge_existing_walls_uma_reprovada_nao_derruba_as_outras():
+    """Cada continuidade e' uma Transaction propria: uma que reprova na
+    validacao e' revertida sozinha, as demais seguem unidas."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+    # continuidade A (y=0) e continuidade B (y=500cm), independentes
+    a1 = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo)
+    a2 = _merge_wall(level, 100, 300, 0, 100, wall_type=tipo)
+    b1 = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo, y_cm=500.0)
+    b2 = _merge_wall(level, 100, 300, 0, 100, wall_type=tipo, y_cm=500.0)
+    walls = [a1, a2, b1, b2]
+    fake_doc = _doc_for(level, walls)
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+    assert len(plans) == 2
+
+    chamadas = {"n": 0}
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        chamadas["n"] += 1
+        encolhe = ft(40.0) if chamadas["n"] == 1 else 0.0  # a 1a reprova
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo,
+                              shrink_ft=encolhe)
+        nova.Location.Curve = curve
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create([], _create):
+        results, summary = m.merge_existing_walls(fake_doc, plans)
+
+    assert summary["planned"] == 2
+    assert summary["merged"] == 1 and summary["failed"] == 1
+    assert summary["removed_walls"] == 2, "so' os trechos da continuidade aprovada sairam"
+    ok_plan = plans[1] if results[1]["ok"] else plans[0]
+    assert sorted(_eid(i) for i in fake_doc.deleted) == sorted(
+        _eid(s["wall_id"]) for s in ok_plan["segments"]
+    )
+    relatorio = m.build_wall_merge_report(plans, results, summary, [], [])
+    assert "REVERTIDA" in relatorio and "UNIDA" in relatorio
+
+
+@case
+def test_tela_de_preparacao_oferece_a_terceira_opcao_unir_paredes():
+    """A opcao de UNIR e' a TERCEIRA da tela "Preparacao das paredes" - as
+    duas que ja existiam continuam la', inalteradas (pedido explicito:
+    "sem substituir ou remover as opcoes ja existentes")."""
+    form = m._WallSourceModeForm()
+    radios = [c for c in form.descendants() if isinstance(c, revit_stubs.RadioButton)]
+    assert len(radios) == 3, [r.Text for r in radios]
+    assert form._rb_cad.Checked, "o padrao continua sendo o fluxo do CAD"
+    assert not form._rb_existing.Checked and not form._rb_merge.Checked
+    # os tres compartilham o mesmo GroupName (exclusao mutua)
+    assert len(set(r.GroupName for r in radios)) == 1
+
+    form._rb_merge.Checked = True
+    form._rb_cad.Checked = False
+    form._on_ok(None, None)
+    assert form.result == "merge"
+
+
+@case
+def test_ask_wall_source_mode_e_run_despacham_a_uniao():
+    """_ask_wall_source_mode devolve "merge" e run() despacha para
+    run_merge_existing_walls - sem tocar nos outros dois caminhos."""
+    class _FormMerge(object):
+        def __init__(self_inner):
+            self_inner.result = None
+        def ShowDialog(self_inner):
+            self_inner.result = "merge"
+
+    chamadas = []
+    original_form = m._WallSourceModeForm
+    original_merge = m.run_merge_existing_walls
+    original_existing = m.run_modulation_on_existing_walls
+    original_main = m.main
+    try:
+        m._WallSourceModeForm = _FormMerge
+        m.run_merge_existing_walls = lambda: chamadas.append("merge")
+        m.run_modulation_on_existing_walls = lambda *a, **k: chamadas.append("existing")
+        m.main = lambda: chamadas.append("cad")
+        assert m._ask_wall_source_mode() == "merge"
+        m.run()
+        assert chamadas == ["merge"]
+    finally:
+        m._WallSourceModeForm = original_form
+        m.run_merge_existing_walls = original_merge
+        m.run_modulation_on_existing_walls = original_existing
+        m.main = original_main
+
+
+@case
+def test_build_existing_walls_selection_aceita_paredes_ja_em_maos():
+    """O fluxo de uniao oferece seguir direto para a modulacao com as
+    paredes continuas que acabou de criar - por isso o corpo da selecao foi
+    extraido para _build_existing_walls_selection, que recebe os elementos
+    prontos (e conta None como ignorado, como sempre fez)."""
+    level = _FakeLevelForSelection("Nivel 1", ft(0.0))
+    parede = _FakeExistingWall(seg(0, 0, 400, 0), ft(14.0), level.Id, height_ft=ft(280.0))
+    fake_doc = _FakeSelectionDoc({parede.Id: parede, level.Id: level})
+
+    original_doc = m.doc
+    m.doc = fake_doc
+    try:
+        walls_to_create, by_axis, wall_ids, nivel, altura, ignorados = (
+            m._build_existing_walls_selection([parede, None, revit_stubs._Inert()])
+        )
+    finally:
+        m.doc = original_doc
+
+    assert len(walls_to_create) == 1 and wall_ids == [parede.Id]
+    assert by_axis == {0: [(parede.Id, "cad")]}
+    assert nivel is level and abs(to_cm(altura) - 280.0) < 1e-6
+    assert ignorados == 2
+
+
+@case
+def test_recorte_nao_retangular_reprova_a_uniao_em_vez_de_perder_a_geometria():
+    """Um `Opening` de contorno NAO retangular nao pode ser reproduzido com
+    NewOpening (que so' aceita dois cantos). Em vez de perde-lo em silencio
+    ao apagar a parede hospedeira, a uniao daquela continuidade e'
+    reprovada e revertida - as paredes originais ficam intactas."""
+    level = _merge_level()
+    tipo = _FakeWallTypeForMerge()
+
+    class _RecorteRedondo(m.Opening):
+        def __init__(self):
+            self.Id = _next_fake_selection_id()
+            self.IsRectBoundary = False
+            self.BoundaryRect = None
+
+    redondo = _RecorteRedondo()
+    esq = _merge_wall(level, 0, 100, 0, 280, wall_type=tipo, inserts=[redondo.Id])
+    verga = _merge_wall(level, 100, 220, 210, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 220, 400, 0, 280, wall_type=tipo)
+    walls = [esq, verga, dir_]
+    fake_doc = _doc_for(level, walls, {redondo.Id: redondo})
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo)
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create([], _create):
+        result = m.execute_wall_merge_plan(fake_doc, plans[0])
+
+    assert not result["ok"]
+    assert fake_doc.deleted == [], "nenhuma parede original pode ser apagada"
+    assert any("nao e' retangular" in p for p in result["problems"]), result["problems"]
+
+
+@case
+def test_parede_continua_nasce_com_o_tipo_nivel_offset_e_altura_das_originais():
+    """"Respeitar espessuras, niveis e alturas das paredes originais": os
+    argumentos enviados a Wall.Create sao os das paredes que estao sendo
+    substituidas - mesmo WallType, mesmo Nivel, o deslocamento de base do
+    trecho mais baixo e a altura total ate' o topo mais alto."""
+    level = _merge_level("Nivel 1", 300.0)  # nivel a 3m do zero do projeto
+    tipo = _FakeWallTypeForMerge()
+    # base 20cm acima do nivel; topo 280cm acima do nivel
+    esq = _merge_wall(level, 0, 100, 20, 280, wall_type=tipo)
+    dir_ = _merge_wall(level, 100, 400, 20, 100, wall_type=tipo)
+    walls = [esq, dir_]
+    fake_doc = _doc_for(level, walls)
+    plans, _s, _u = m.plan_existing_wall_merges(walls, target_doc=fake_doc)
+    plan = plans[0]
+
+    argumentos = {}
+
+    def _create(document, curve, type_id, level_id, height, offset, flip, structural):
+        argumentos.update({
+            "type_id": type_id, "level_id": level_id, "height": height,
+            "offset": offset, "flip": flip, "structural": structural,
+            "curve": curve,
+        })
+        nova = _FakeMergeWall(curve, ft(14.0), level,
+                              level.Elevation + offset,
+                              level.Elevation + offset + height, wall_type=tipo)
+        fake_doc.elements[nova.Id] = nova
+        return nova
+
+    with _with_fake_wall_create([], _create):
+        result = m.execute_wall_merge_plan(fake_doc, plan)
+
+    assert result["ok"], result["problems"]
+    assert argumentos["type_id"] is tipo.Id, "mesmo WallType das originais"
+    assert argumentos["level_id"] == level.Id, "mesmo Nivel das originais"
+    assert abs(to_cm(argumentos["offset"]) - 20.0) < 1e-6, "base do trecho mais baixo"
+    assert abs(to_cm(argumentos["height"]) - 260.0) < 1e-6, "20cm ate' 280cm"
+    assert abs(to_cm(argumentos["curve"].Length) - 400.0) < 1e-6
+    assert argumentos["structural"] is False

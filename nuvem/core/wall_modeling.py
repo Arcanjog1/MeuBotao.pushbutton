@@ -129,6 +129,11 @@ from Autodesk.Revit.DB import (
     WallLocationLine, Transaction, BuiltInParameter, MaterialFunctionAssignment,
     FamilyInstance, LocationPoint, LocationCurve, CompoundStructure,
     Curve, Solid, ViewDetailLevel, OverrideGraphicSettings, FillPatternElement,
+    # `Opening` e' o elemento de Abertura de Parede - o que
+    # Document.Create.NewOpening devolve e o que a uniao de paredes
+    # existentes precisa reconhecer entre o que estava hospedado nas
+    # paredes antigas (ver collect_wall_inserts_for_merge).
+    Opening,
     # `Color` do Revit importado com APELIDO de proposito: a secao de
     # interface, mais abaixo, importa System.Drawing.Color com o mesmo nome
     # `Color` no MESMO escopo de modulo. Como o corpo de uma funcao resolve
@@ -139,7 +144,14 @@ from Autodesk.Revit.DB import (
     Color as RevitColor, IUpdater, UpdaterId, UpdaterRegistry, ChangePriority,
     SubTransaction,
     Element, ElementTransformUtils, ElementClassFilter, FamilySymbol, PlanarFace,
-    StorageType, Transform, TransactionGroup, BuiltInCategory, Plane
+    StorageType, Transform, TransactionGroup, BuiltInCategory, Plane,
+    # Tratamento de falhas da Transaction - usado SO' pelo fluxo de uniao de
+    # paredes existentes (ver _suppress_transaction_warnings/
+    # _MergeWarningSwallower): criar a parede continua por cima das antigas e
+    # recriar as portas/janelas antes de apagar as originais gera avisos
+    # previsiveis ("paredes sobrepostas", "instancias identicas no mesmo
+    # lugar") que a propria Transaction resolve no fim dela mesma.
+    IFailuresPreprocessor, FailureProcessingResult, FailureSeverity
 )
 # StructuralType mora em Autodesk.Revit.DB.Structure, NAO em Autodesk.Revit.DB
 # (import direto de Autodesk.Revit.DB falha com ImportException em tempo de
@@ -11305,7 +11317,9 @@ class _WallSourceModeForm(Form):
 
         self.Text = "Modulacao Automatica"
         self.Width = 520
-        self.Height = 400
+        # 3 cartoes (o de UNIR paredes entrou em 2026-08-28) - a janela
+        # cresceu junto, senao o ultimo nasceria cortado pelo rodape.
+        self.Height = 500
         self.StartPosition = FORM_START_POSITION_CENTER_SCREEN
         self.BackColor = UI_BG
         self.MaximizeBox = False
@@ -11380,12 +11394,50 @@ class _WallSourceModeForm(Form):
         card_existing.Click += lambda s, e: setattr(self._rb_existing, "Checked", True)
         desc_existing.Click += lambda s, e: setattr(self._rb_existing, "Checked", True)
 
+        # ---- cartao: unir paredes existentes (2026-08-28) ----
+        self._rb_merge = RadioButton()
+        self._rb_merge.Text = "Unir paredes existentes (paredes continuas)"
+        self._rb_merge.Font = _ui_font(10.0, True)
+        self._rb_merge.ForeColor = UI_TEXT
+        self._rb_merge.AutoSize = False
+        self._rb_merge.Height = 24
+        self._rb_merge.Dock = DockStyle.Top
+        self._rb_merge.GroupName = "wall_source_mode"
+
+        desc_merge = Label()
+        desc_merge.Text = ("Reconstroi as paredes ja modeladas que estao "
+                           "quebradas por portas/janelas como UMA parede "
+                           "continua, recriando os vazios como Abertura de "
+                           "Parede. Nao usa a planta baixa.")
+        desc_merge.Font = _ui_font(8.75)
+        desc_merge.ForeColor = UI_MUTED
+        desc_merge.Dock = DockStyle.Fill
+        desc_merge.Padding = Padding(22, 2, 4, 4)
+        desc_merge.AutoSize = False
+
+        card_merge = Panel()
+        card_merge.Dock = DockStyle.Top
+        card_merge.Height = 96
+        card_merge.BackColor = UI_PANEL
+        card_merge.Padding = Padding(12, 14, 12, 4)
+        card_merge.Controls.Add(desc_merge)
+        card_merge.Controls.Add(self._rb_merge)
+        card_merge.Click += lambda s, e: setattr(self._rb_merge, "Checked", True)
+        desc_merge.Click += lambda s, e: setattr(self._rb_merge, "Checked", True)
+
         spacer = Panel()
         spacer.Height = 8
         spacer.Dock = DockStyle.Top
         spacer.BackColor = UI_BG
 
+        spacer2 = Panel()
+        spacer2.Height = 8
+        spacer2.Dock = DockStyle.Top
+        spacer2.BackColor = UI_BG
+
         # DockStyle.Top: ultimo Add = mais ao topo visualmente
+        body.Controls.Add(card_merge)
+        body.Controls.Add(spacer2)
         body.Controls.Add(card_existing)
         body.Controls.Add(spacer)
         body.Controls.Add(card_cad)
@@ -11420,7 +11472,12 @@ class _WallSourceModeForm(Form):
         self.Controls.Add(header)
 
     def _on_ok(self, sender, event):
-        self.result = "existing" if self._rb_existing.Checked else "cad"
+        if self._rb_merge.Checked:
+            self.result = "merge"
+        elif self._rb_existing.Checked:
+            self.result = "existing"
+        else:
+            self.result = "cad"
         self.Close()
 
     def _on_cancel(self, sender, event):
@@ -11433,7 +11490,9 @@ def _ask_wall_source_mode():
     como as paredes desta modulacao devem ser preparadas. Devolve "cad"
     (fluxo classico - gera Walls novas a partir de um CAD), "existing"
     (pula a geracao/verificacao inicial - usa Walls JA' MODELADAS,
-    escolhidas pelo usuario) ou None (cancelou, ESC/fechar).
+    escolhidas pelo usuario), "merge" (UNE as Walls ja modeladas em paredes
+    continuas com recortes de abertura, ver run_merge_existing_walls) ou
+    None (cancelou, ESC/fechar).
 
     Usa _WallSourceModeForm (WinForms estilizado) com fallback para
     forms.SelectFromList quando a janela nao pode ser construida."""
@@ -11445,12 +11504,15 @@ def _ask_wall_source_mode():
         # Fallback: SelectFromList basico - funciona em qualquer ambiente
         option_cad = "Criar paredes a partir da planta (CAD)"
         option_existing = "Utilizar paredes existentes (pular criacao/verificacao inicial)"
+        option_merge = "Unir paredes existentes (criar paredes continuas com recortes)"
         choice = forms.SelectFromList.show(
-            [option_cad, option_existing],
+            [option_cad, option_existing, option_merge],
             title="Modulacao Automatica - Preparacao das paredes",
             button_name="Continuar",
             multiselect=False
         )
+        if choice == option_merge:
+            return "merge"
         if choice == option_existing:
             return "existing"
         if choice == option_cad:
@@ -11493,6 +11555,22 @@ def _select_existing_walls_for_modulation():
     except Exception:
         return None, None, None, None, None, 0  # ESC
 
+    return _build_existing_walls_selection(
+        [doc.GetElement(ref.ElementId) for ref in refs]
+    )
+
+
+def _build_existing_walls_selection(wall_elements):
+    """Monta a estrutura interna da modulacao a partir de uma LISTA DE
+    ELEMENTOS ja resolvidos - o corpo que _select_existing_walls_for_modulation
+    usava direto ate' 2026-08-28, extraido para poder ser reaproveitado pelo
+    fluxo de UNIAO de paredes (run_merge_existing_walls), que ja tem em maos
+    as paredes continuas recem criadas e nao pode pedir uma nova selecao ao
+    usuario. Entradas None (um Reference que nao resolve para elemento
+    nenhum) contam como ignoradas, exatamente como antes.
+
+    Devolve a mesma tupla de sempre: (walls_to_create, created_walls_by_axis,
+    wall_ids, selected_level, wall_height_ft, skipped_count)."""
     walls_to_create = []
     created_walls_by_axis = {}
     wall_ids = []
@@ -11500,8 +11578,7 @@ def _select_existing_walls_for_modulation():
     level_votes = {}
     max_height_ft = 0.0
 
-    for ref in refs:
-        wall = doc.GetElement(ref.ElementId)
+    for wall in wall_elements:
         if not isinstance(wall, Wall):
             skipped += 1
             continue
@@ -11566,15 +11643,22 @@ def _select_existing_walls_for_modulation():
     return walls_to_create, created_walls_by_axis, wall_ids, selected_level, max_height_ft, skipped
 
 
-def run_modulation_on_existing_walls():
+def run_modulation_on_existing_walls(preselected=None):
     """Fluxo "utilizar paredes existentes" - ver cabecalho da secao acima.
     Nunca cria nenhuma Wall nova; monta a mesma estrutura de dados interna
     que o fluxo classico (main(), abaixo) monta depois da Etapa 1, e abre
-    a MESMA janela de revisao/modulacao (_show_wall_review_window)."""
+    a MESMA janela de revisao/modulacao (_show_wall_review_window).
+
+    `preselected` (2026-08-28): a mesma tupla que
+    _select_existing_walls_for_modulation devolve, quando o chamador JA tem
+    as paredes em maos e nao deve pedir uma nova selecao ao usuario - e' o
+    caso do fluxo de UNIAO (run_merge_existing_walls), que oferece seguir
+    direto para a modulacao com as paredes continuas que acabou de criar.
+    Sem ele, o comportamento e' o de sempre (pergunta ao usuario)."""
     output = script.get_output()
 
     walls_to_create, created_walls_by_axis, wall_ids, selected_level, wall_height_ft, skipped_count = (
-        _select_existing_walls_for_modulation()
+        preselected if preselected is not None else _select_existing_walls_for_modulation()
     )
     if walls_to_create is None:
         return
@@ -11864,6 +11948,1478 @@ def run_modulation_on_existing_walls():
         if not quer_modular:
             return
         _run_stage2_existing_walls(None)
+
+
+# ==========================================
+# FLUXO "UNIR PAREDES EXISTENTES" (2026-08-28, pedido explicito do
+# usuario) - a TERCEIRA opcao da tela "Preparacao das paredes", INDEPENDENTE
+# das duas que ja existiam (nenhuma delas foi tocada):
+#
+#   1. "Criar paredes a partir da planta (CAD)"  -> main()
+#      (com sub-opcao "6. Como gerar as paredes": segmentado OU continuo
+#      com recortes - ver WALL_BUILD_MODE_*)
+#   2. "Utilizar paredes existentes"             -> run_modulation_on_existing_walls()
+#   3. "Unir paredes existentes"  (ESTA SECAO)   -> run_merge_existing_walls()
+#
+# O objetivo, dito pelo usuario, e' poder COMPARAR dois caminhos que
+# chegam ao mesmo lugar (uma parede continua com recortes nativos) por
+# rotas opostas:
+#
+#   - o caminho (1)+continuo NASCE continuo a partir da PLANTA BAIXA;
+#   - o caminho (3) parte das paredes JA MODELADAS no Revit e as RECONSTROI
+#     como uma unica parede continua - a planta baixa nao e' usada em
+#     momento nenhum aqui (regra explicita do pedido).
+#
+# O problema que (3) resolve: no modelo real uma mesma parede quase sempre
+# aparece fatiada em varios elementos Wall por causa das aberturas - o
+# trecho abaixo do peitoril de uma janela, o trecho acima da verga, e as
+# "bonecas"/pilaretes de cada lado do vao. Para a modulacao (e para o
+# proprio projeto) o que interessa e' UMA parede continua com furos, nao
+# quatro paredes soltas.
+#
+# ORDEM OBRIGATORIA (a mesma que o usuario descreveu, e a mesma que o modo
+# continuo do fluxo do CAD ja usa - ver secao 8b de
+# nuvem/REGRAS_MODULACAO_BLOCOS.md):
+#
+#   a) le as Wall existentes (geometria, posicao, alinhamento, espessura,
+#      alturas, nivel, tipo) - NUNCA a planta baixa;
+#   b) agrupa em CONTINUIDADES LOGICAS: mesmo nivel, mesmo WallType, mesma
+#      espessura, mesma linha de referencia, MESMA RETA em planta, e
+#      encostadas/sobrepostas ao longo dessa reta (ou separadas por um vao
+#      que cabe numa abertura - ver WALL_MERGE_MAX_AXIAL_GAP_M);
+#   c) para cada continuidade calcula o RETANGULO CHEIO (comprimento total
+#      x da base mais baixa ate' o topo mais alto) e, por diferenca, os
+#      VAZIOS que os trechos antigos deixavam - sao exatamente eles que
+#      viram os recortes;
+#   d) cria UMA parede continua, do nivel de base ate' a altura total,
+#      desligando o auto-join e realinhando pela MESMA linha de referencia
+#      das paredes originais (nao pelo nucleo: aqui o alvo e' reproduzir
+#      onde a parede JA ESTAVA, nao um eixo medido no CAD);
+#   e) so' DEPOIS do Regenerate desse realinhamento abre os recortes com a
+#      ferramenta nativa (Document.Create.NewOpening -> elemento Opening),
+#      reaproveitando create_wall_opening_cuts sem nenhuma alteracao;
+#   f) recria na parede nova o que estava HOSPEDADO nas antigas: os
+#      elementos Opening (recortes que ja existiam, pelo BoundaryRect) e as
+#      instancias de familia de porta/janela/abertura (mesmo simbolo, mesmo
+#      ponto, mesmo nivel, mesmos parametros de largura/altura/peitoril,
+#      mesma orientacao) - sem isso, apagar a parede hospedeira apagaria
+#      junto todas as portas e janelas dela;
+#   g) VALIDA a parede nova (existe, comprimento/posicao/altura conferem,
+#      todos os recortes e reinsercoes deram certo);
+#   h) SO' ENTAO apaga as paredes antigas. Se a validacao reprovar, a
+#      Transaction inteira daquela continuidade e' revertida (RollBack) e
+#      as paredes originais continuam intactas - nunca fica um estado
+#      intermediario com a parede nova por cima das antigas.
+#
+# Cada continuidade e' uma Transaction propria (atomicidade por parede),
+# todas dentro de um TransactionGroup para o Ctrl+Z do usuario desfazer a
+# operacao inteira de uma vez.
+# ==========================================
+
+# Desvio lateral maximo (metros) entre os eixos de duas paredes para elas
+# ainda serem consideradas "na mesma reta". 5mm: apertado o bastante para
+# nunca juntar duas paredes paralelas vizinhas (a menor espessura real e'
+# de alguns centimetros), folgado o bastante para absorver o arredondamento
+# de quem modelou trecho a trecho.
+WALL_MERGE_LATERAL_TOLERANCE_M = 0.005
+WALL_MERGE_LATERAL_TOLERANCE_FT = WALL_MERGE_LATERAL_TOLERANCE_M * FEET_PER_METER
+
+# Desalinhamento angular maximo (graus) entre duas paredes da mesma
+# continuidade. Nao e' folga de projeto: e' so' para nao reprovar paredes
+# que o Revit guarda com o ultimo digito diferente.
+WALL_MERGE_ANGLE_TOLERANCE_DEG = 0.25
+
+# Diferenca maxima de espessura (metros) - ver "Respeitar espessuras" nas
+# regras do pedido. Paredes de espessuras diferentes NUNCA sao unidas.
+WALL_MERGE_THICKNESS_TOLERANCE_M = 0.002
+WALL_MERGE_THICKNESS_TOLERANCE_FT = WALL_MERGE_THICKNESS_TOLERANCE_M * FEET_PER_METER
+
+# Tolerancia vertical (metros) usada para comparar cotas de base/topo entre
+# trechos e para validar a parede criada contra o plano.
+WALL_MERGE_Z_TOLERANCE_M = 0.002
+WALL_MERGE_Z_TOLERANCE_FT = WALL_MERGE_Z_TOLERANCE_M * FEET_PER_METER
+
+# Maior vao AXIAL (metros) que pode ser "atravessado" ao unir dois trechos
+# colineares que nao se tocam em nenhuma altura. E' o caso das paredes
+# separadas nas laterais de uma abertura que vai do piso ao teto (porta sem
+# verga, passagem livre): o vazio vira um recorte na parede continua, entao
+# a geometria final e' a MESMA - o que este limite evita e' juntar duas
+# paredes que so' por acaso caem na mesma reta e estao a metros de
+# distancia (dois comodos diferentes). Vaos cobertos por qualquer outro
+# trecho do grupo (verga acima da porta, peitoril abaixo da janela) NAO
+# passam por aqui - ali a continuidade ja esta' provada pela propria
+# geometria.
+WALL_MERGE_MAX_AXIAL_GAP_M = 3.0
+WALL_MERGE_MAX_AXIAL_GAP_FT = WALL_MERGE_MAX_AXIAL_GAP_M * FEET_PER_METER
+
+# Desvio maximo (metros) aceito na VALIDACAO da parede continua criada,
+# medido de volta no proprio Revit (comprimento, posicao em planta das duas
+# pontas e cotas de base/topo). Acima disso a Transaction daquela
+# continuidade e' revertida e as paredes originais ficam como estavam.
+WALL_MERGE_VALIDATION_TOLERANCE_M = 0.005
+WALL_MERGE_VALIDATION_TOLERANCE_FT = WALL_MERGE_VALIDATION_TOLERANCE_M * FEET_PER_METER
+
+# Parametros de INSTANCIA copiados para a porta/janela recriada na parede
+# continua. Os de TIPO vem de graca (o simbolo e' o mesmo); os de instancia
+# precisam ser copiados um a um - e sao exatamente os que o pedido do
+# usuario manda preservar: largura, altura e peitoril do vao.
+WALL_MERGE_INSERT_PARAMS_TO_COPY = (
+    OPENING_WIDTH_PARAM, OPENING_HEIGHT_PARAM, OPENING_SILL_PARAM,
+)
+
+
+def _merge_axis_t(origin_xy, direction_xy, point):
+    """Posicao (em pes) de `point` ao longo da reta (origin_xy, direction_xy),
+    medida SO' EM PLANTA (a cota Z do ponto e' irrelevante para o eixo)."""
+    return ((point.X - origin_xy.X) * direction_xy.X +
+            (point.Y - origin_xy.Y) * direction_xy.Y)
+
+
+def _merge_lateral_distance(origin_xy, direction_xy, point):
+    """Distancia perpendicular (em planta) de `point` ate' a reta."""
+    dx = point.X - origin_xy.X
+    dy = point.Y - origin_xy.Y
+    return abs(dx * (-direction_xy.Y) + dy * direction_xy.X)
+
+
+def _wall_vertical_extent(wall, level, target_doc):
+    """Cotas ABSOLUTAS de base e topo de uma Wall ja modelada, na ordem de
+    confiabilidade: nivel de base + "Deslocamento da base"; topo pelo nivel
+    de topo + "Deslocamento do topo" quando a parede esta' presa a um nivel
+    superior, senao pela "Altura desconectada". Se nenhum dos dois caminhos
+    responder, cai na bounding box (mesmo fallback que
+    _select_existing_walls_for_modulation e _build_opening_dict ja usam).
+
+    Devolve (base_z_abs, top_z_abs) ou (None, None)."""
+    def _param_double(param_id):
+        try:
+            param = wall.get_Parameter(param_id)
+            if param is None:
+                return None
+            return param.AsDouble()
+        except Exception:
+            return None
+
+    level_elevation = None
+    if level is not None:
+        try:
+            level_elevation = level.Elevation
+        except Exception:
+            level_elevation = None
+
+    base_offset = _param_double(BuiltInParameter.WALL_BASE_OFFSET) or 0.0
+    base_z_abs = None
+    if level_elevation is not None:
+        base_z_abs = level_elevation + base_offset
+
+    top_z_abs = None
+    # 1) parede presa a um nivel de topo.
+    try:
+        top_constraint = wall.get_Parameter(BuiltInParameter.WALL_HEIGHT_TYPE)
+        top_level_id = top_constraint.AsElementId() if top_constraint is not None else None
+        top_level = target_doc.GetElement(top_level_id) if top_level_id is not None else None
+        if isinstance(top_level, Level):
+            top_offset = _param_double(BuiltInParameter.WALL_TOP_OFFSET) or 0.0
+            top_z_abs = top_level.Elevation + top_offset
+    except Exception:
+        top_z_abs = None
+    # 2) altura desconectada.
+    if top_z_abs is None and base_z_abs is not None:
+        height_ft = _param_double(BuiltInParameter.WALL_USER_HEIGHT_PARAM)
+        if height_ft is not None and height_ft > MIN_SEGMENT_HEIGHT_FT:
+            top_z_abs = base_z_abs + height_ft
+    # 3) bounding box - ultima linha de defesa.
+    if base_z_abs is None or top_z_abs is None:
+        try:
+            bbox = wall.get_BoundingBox(None)
+        except Exception:
+            bbox = None
+        if bbox is None:
+            return None, None
+        if base_z_abs is None:
+            base_z_abs = bbox.Min.Z
+        if top_z_abs is None:
+            top_z_abs = bbox.Max.Z
+
+    if top_z_abs - base_z_abs <= MIN_SEGMENT_HEIGHT_FT:
+        return None, None
+    return base_z_abs, top_z_abs
+
+
+def read_existing_wall_for_merge(wall, target_doc=None):
+    """Le UMA Wall ja modelada e devolve o "segmento" que ela ocupa, no
+    formato que o resto desta secao usa - ou (None, motivo) quando a parede
+    nao pode participar de nenhuma uniao.
+
+    Nada aqui vem da planta baixa: e' tudo lido do proprio elemento
+    (Location.Curve, Width, WallType, Nivel, deslocamentos de base/topo,
+    linha de referencia, flip, uso estrutural).
+
+    Motivos de recusa (todos reportados ao usuario, nunca silenciosos):
+    nao e' Wall; sem LocationCurve; eixo curvo (uma parede em arco nao pode
+    ser reconstruida como um segmento reto continuo); curta demais; sem
+    altura utilizavel."""
+    if not isinstance(wall, Wall):
+        return None, "nao e' uma parede (Wall)"
+    location = getattr(wall, "Location", None)
+    if not isinstance(location, LocationCurve):
+        return None, "parede sem eixo (LocationCurve)"
+    try:
+        curve = location.Curve
+    except Exception:
+        return None, "parede sem eixo legivel"
+    if not isinstance(curve, Line):
+        return None, "eixo curvo (parede em arco nao entra na uniao)"
+    try:
+        p0 = curve.GetEndPoint(0)
+        p1 = curve.GetEndPoint(1)
+        length_ft = p0.DistanceTo(p1)
+    except Exception:
+        return None, "eixo sem pontas legiveis"
+    if length_ft < MIN_SEGMENT_LENGTH_FT:
+        return None, "eixo curto demais"
+
+    dx, dy = p1.X - p0.X, p1.Y - p0.Y
+    plan_length = math.sqrt(dx * dx + dy * dy)
+    if plan_length <= 1e-9:
+        return None, "eixo sem projecao em planta"
+    direction_xy = XYZ(dx / plan_length, dy / plan_length, 0.0)
+
+    used_doc = target_doc if target_doc is not None else doc
+    try:
+        level = used_doc.GetElement(wall.LevelId)
+    except Exception:
+        level = None
+    if not isinstance(level, Level):
+        return None, "parede sem Nivel de base"
+
+    base_z_abs, top_z_abs = _wall_vertical_extent(wall, level, used_doc)
+    if base_z_abs is None:
+        return None, "altura da parede nao pode ser determinada"
+
+    try:
+        wall_type_id = wall.WallType.Id
+    except Exception:
+        wall_type_id = None
+    if wall_type_id is None:
+        # Sem o tipo nao da' para criar a parede continua com a MESMA
+        # espessura/composicao - e uni-la mudando o tipo violaria
+        # "Respeitar espessuras" / "nao alterar caracteristicas".
+        return None, "parede sem WallType legivel"
+
+    def _safe(getter, default=None):
+        try:
+            return getter()
+        except Exception:
+            return default
+
+    location_line = None
+    param = _safe(lambda: wall.get_Parameter(BuiltInParameter.WALL_KEY_REF_PARAM))
+    if param is not None:
+        location_line = _safe(lambda: param.AsInteger())
+
+    return {
+        "wall_id": wall.Id,
+        "wall": wall,
+        "curve": curve,
+        "p0": p0,
+        "p1": p1,
+        "direction_xy": direction_xy,
+        "length_ft": length_ft,
+        "width_ft": wall.Width,
+        "wall_type_id": wall_type_id,
+        "level": level,
+        "level_id": _eid_int(level.Id),
+        "level_elevation_ft": level.Elevation,
+        "base_z_abs": base_z_abs,
+        "top_z_abs": top_z_abs,
+        "height_ft": top_z_abs - base_z_abs,
+        "location_line": location_line,
+        "flipped": bool(_safe(lambda: wall.Flipped, False)),
+        "structural": bool(_safe(
+            lambda: wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_SIGNIFICANT).AsInteger(),
+            0
+        )),
+        "join_at_end": (
+            _safe(lambda: WallUtils.IsWallJoinAllowedAtEnd(wall, 0), True),
+            _safe(lambda: WallUtils.IsWallJoinAllowedAtEnd(wall, 1), True),
+        ),
+    }, None
+
+
+def wall_merge_compatibility_key(segment):
+    """Chave de COMPATIBILIDADE de uma parede: duas paredes com chaves
+    diferentes NUNCA sao unidas, por mais alinhadas que estejam ("Nao
+    alterar paredes que possuem funcoes ou caracteristicas incompativeis" /
+    "Respeitar espessuras, niveis e alturas das paredes originais").
+
+    Entram: o Nivel de base, o WallType, a espessura (arredondada na
+    tolerancia de WALL_MERGE_THICKNESS_TOLERANCE_M - o WallType ja decide
+    isso, mas paredes de tipos distintos com a MESMA espessura tambem sao
+    barradas pelo id do tipo), a Linha de Referencia (a curva de
+    localizacao de duas paredes so' e' comparavel quando medida no MESMO
+    plano de referencia) e o uso estrutural."""
+    thickness_step = max(WALL_MERGE_THICKNESS_TOLERANCE_FT, 1e-9)
+    return (
+        segment["level_id"],
+        _eid_int(segment["wall_type_id"]) if segment["wall_type_id"] is not None else None,
+        int(round(segment["width_ft"] / thickness_step)),
+        segment["location_line"],
+        bool(segment["structural"]),
+    )
+
+
+def walls_share_infinite_line(segment_a, segment_b,
+                              angle_tolerance_deg=WALL_MERGE_ANGLE_TOLERANCE_DEG,
+                              lateral_tolerance_ft=WALL_MERGE_LATERAL_TOLERANCE_FT):
+    """True quando os eixos das duas paredes estao sobre a MESMA RETA em
+    planta - paralelos (no mesmo sentido ou em sentidos opostos, que e' so'
+    a ordem em que cada uma foi desenhada) E sem desvio lateral. E' o teste
+    geometrico central de "mesma continuidade logica": sem ele, duas
+    paredes paralelas de comodos vizinhos entrariam no mesmo grupo."""
+    da, db = segment_a["direction_xy"], segment_b["direction_xy"]
+    cross = abs(da.X * db.Y - da.Y * db.X)
+    if cross > math.sin(math.radians(angle_tolerance_deg)):
+        return False
+    origin, direction = segment_a["p0"], da
+    return (_merge_lateral_distance(origin, direction, segment_b["p0"]) <= lateral_tolerance_ft and
+            _merge_lateral_distance(origin, direction, segment_b["p1"]) <= lateral_tolerance_ft)
+
+
+def group_existing_walls_for_merge(segments, max_gap_ft=WALL_MERGE_MAX_AXIAL_GAP_FT):
+    """Agrupa os segmentos lidos por read_existing_wall_for_merge nas
+    CONTINUIDADES LOGICAS do modelo. Devolve uma lista de grupos; cada
+    grupo e' um dict:
+
+        {"segments": [...],          # em ordem crescente ao longo do eixo
+         "origin_xy": XYZ, "direction_xy": XYZ,
+         "t_min":, "t_max":,
+         "bridged_gaps": [(t_a, t_b), ...]}   # vaos atravessados sem parede
+
+    Passo 1 - separa por wall_merge_compatibility_key (nivel/tipo/espessura/
+    linha de referencia/uso estrutural).
+    Passo 2 - dentro de cada chave, separa por RETA (walls_share_infinite_line).
+    Passo 3 - dentro de cada reta, separa em continuidades: percorre a UNIAO
+    dos intervalos axiais (a projecao de todos os trechos sobre o eixo,
+    independente da altura) e corta onde houver um vazio maior que
+    `max_gap_ft`. Um vao coberto por qualquer trecho do grupo (a verga
+    acima de uma porta, o peitoril abaixo de uma janela) simplesmente nao
+    aparece nessa uniao - a continuidade ja esta' provada pela geometria.
+
+    100% geometrico e puro: nao toca no documento, nao abre Transaction."""
+    by_key = {}
+    for segment in segments:
+        by_key.setdefault(wall_merge_compatibility_key(segment), []).append(segment)
+
+    groups = []
+    for _key in sorted(by_key.keys(), key=lambda k: [(x is None, x) for x in k]):
+        line_groups = []
+        for segment in by_key[_key]:
+            for line_group in line_groups:
+                if walls_share_infinite_line(line_group[0], segment):
+                    line_group.append(segment)
+                    break
+            else:
+                line_groups.append([segment])
+
+        for line_group in line_groups:
+            origin = line_group[0]["p0"]
+            direction = line_group[0]["direction_xy"]
+            entries = []
+            for segment in line_group:
+                t_a = _merge_axis_t(origin, direction, segment["p0"])
+                t_b = _merge_axis_t(origin, direction, segment["p1"])
+                if t_a > t_b:
+                    t_a, t_b = t_b, t_a
+                entries.append((t_a, t_b, segment))
+            entries.sort(key=lambda item: (item[0], item[1]))
+
+            current = []
+            current_end = None
+            bridged = []
+
+            def _flush(cluster, gaps):
+                if not cluster:
+                    return
+                groups.append({
+                    "segments": [item[2] for item in cluster],
+                    "entries": list(cluster),
+                    "origin_xy": origin,
+                    "direction_xy": direction,
+                    "t_min": min(item[0] for item in cluster),
+                    "t_max": max(item[1] for item in cluster),
+                    "bridged_gaps": list(gaps),
+                })
+
+            for t_a, t_b, segment in entries:
+                if current_end is None:
+                    current = [(t_a, t_b, segment)]
+                    current_end = t_b
+                    bridged = []
+                    continue
+                gap = t_a - current_end
+                if gap > max_gap_ft:
+                    _flush(current, bridged)
+                    current = [(t_a, t_b, segment)]
+                    current_end = t_b
+                    bridged = []
+                    continue
+                if gap > MIN_SEGMENT_LENGTH_FT:
+                    bridged.append((current_end, t_a))
+                current.append((t_a, t_b, segment))
+                current_end = max(current_end, t_b)
+            _flush(current, bridged)
+
+    return groups
+
+
+def compute_wall_merge_voids(rects, t_min, t_max, z_min, z_max,
+                             min_width_ft=MIN_SEGMENT_LENGTH_FT,
+                             min_height_ft=MIN_SEGMENT_HEIGHT_FT):
+    """O CORACAO da uniao: dado o retangulo cheio da parede continua
+    (`t_min..t_max` x `z_min..z_max`) e os retangulos que as paredes
+    antigas de fato ocupavam (`rects`, cada um (t_lo, t_hi, z_lo, z_hi)),
+    devolve os VAZIOS - as regioes onde havia abertura e onde a parede
+    continua precisa ser recortada.
+
+    E' a operacao INVERSA de build_wall_segments: la' as aberturas fatiam a
+    parede em trechos; aqui os trechos existentes revelam onde estavam as
+    aberturas. Por isso o resultado nao depende de saber que familia de
+    porta/janela estava ali - a propria geometria modelada conta a
+    historia (nada e' lido da planta baixa).
+
+    Algoritmo (exato, sem heuristica): corta o eixo nas FAIXAS delimitadas
+    por todas as pontas de trecho; dentro de cada faixa, a cobertura
+    vertical e' constante, entao basta unir os intervalos z dos trechos que
+    cobrem a faixa e tirar o complemento em [z_min, z_max]; por fim junta
+    faixas VIZINHAS cujo conjunto de vazios seja identico, para um vao unico
+    sair como UM retangulo em vez de varios pedacos colados.
+
+    Vazios mais estreitos que `min_width_ft` ou mais baixos que
+    `min_height_ft` sao descartados (o Revit recusaria o recorte de
+    qualquer forma). Devolve [(t_lo, t_hi, z_lo, z_hi), ...] em ordem."""
+    if t_max - t_min <= min_width_ft or z_max - z_min <= min_height_ft:
+        return []
+
+    edges = set([t_min, t_max])
+    for t_lo, t_hi, _z_lo, _z_hi in rects:
+        for value in (t_lo, t_hi):
+            if t_min < value < t_max:
+                edges.add(value)
+    ordered_edges = sorted(edges)
+
+    def _round(value):
+        return round(value / max(WALL_MERGE_Z_TOLERANCE_FT, 1e-9))
+
+    bands = []
+    for index in range(len(ordered_edges) - 1):
+        band_a, band_b = ordered_edges[index], ordered_edges[index + 1]
+        if band_b - band_a <= 1e-9:
+            continue
+        middle = (band_a + band_b) * 0.5
+        covered = sorted(
+            (z_lo, z_hi) for t_lo, t_hi, z_lo, z_hi in rects
+            if t_lo <= middle <= t_hi
+        )
+        merged = []
+        for z_lo, z_hi in covered:
+            if merged and z_lo <= merged[-1][1] + WALL_MERGE_Z_TOLERANCE_FT:
+                merged[-1][1] = max(merged[-1][1], z_hi)
+            else:
+                merged.append([z_lo, z_hi])
+
+        voids = []
+        cursor = z_min
+        for z_lo, z_hi in merged:
+            if z_lo - cursor > 1e-9:
+                voids.append((cursor, min(z_lo, z_max)))
+            cursor = max(cursor, z_hi)
+            if cursor >= z_max:
+                break
+        if z_max - cursor > 1e-9:
+            voids.append((cursor, z_max))
+        voids = [(a, b) for a, b in voids if b - a > 1e-9]
+        bands.append([band_a, band_b, voids, tuple((_round(a), _round(b)) for a, b in voids)])
+
+    result = []
+    index = 0
+    while index < len(bands):
+        band_a, band_b, voids, signature = bands[index]
+        while (index + 1 < len(bands) and bands[index + 1][3] == signature and
+               abs(bands[index + 1][0] - band_b) <= 1e-9):
+            index += 1
+            band_b = bands[index][1]
+        for z_lo, z_hi in voids:
+            if band_b - band_a >= min_width_ft and z_hi - z_lo >= min_height_ft:
+                result.append((band_a, band_b, z_lo, z_hi))
+        index += 1
+
+    result.sort(key=lambda item: (item[0], item[2]))
+    return result
+
+
+def build_wall_merge_plan(group):
+    """Transforma um grupo de group_existing_walls_for_merge no PLANO da
+    parede continua que vai substitui-lo. Puro (nenhuma chamada ao
+    documento) - quem escreve no Revit e' execute_wall_merge_plan.
+
+    A parede continua vai do t_min ao t_max do grupo, da base MAIS BAIXA
+    ate' o topo MAIS ALTO entre os trechos (e' isso que reconstroi "desde o
+    nivel base ate' a altura total correspondente"), com a espessura, o
+    WallType, o Nivel e a Linha de Referencia das paredes originais (todos
+    iguais dentro do grupo - garantido por wall_merge_compatibility_key).
+
+    Os recortes saem no MESMO formato que build_wall_opening_cuts devolve,
+    para que create_wall_opening_cuts seja reaproveitada sem nenhuma
+    alteracao - inclusive a folga OPENING_CUT_EDGE_OVERSHOOT_FT, aplicada
+    so' na aresta que encosta na base/topo da parede (um vao que vai do piso
+    ao teto pode ser tratado como tangente pelo Revit e nao atravessar o
+    solido).
+
+    Devolve None quando o grupo tem um unico trecho E nenhum vazio: ali nao
+    ha' nada para unir, e criar uma parede nova por cima seria exatamente a
+    duplicata que as regras do pedido mandam evitar."""
+    segments = group["segments"]
+    if not segments:
+        return None
+
+    origin, direction = group["origin_xy"], group["direction_xy"]
+    t_min, t_max = group["t_min"], group["t_max"]
+    base_z_abs = min(segment["base_z_abs"] for segment in segments)
+    top_z_abs = max(segment["top_z_abs"] for segment in segments)
+
+    rects = []
+    for t_a, t_b, segment in group["entries"]:
+        rects.append((t_a, t_b, segment["base_z_abs"], segment["top_z_abs"]))
+
+    voids = compute_wall_merge_voids(rects, t_min, t_max, base_z_abs, top_z_abs)
+    if len(segments) == 1 and not voids:
+        return None
+
+    reference = max(segments, key=lambda segment: segment["length_ft"])
+    curve_z = reference["p0"].Z
+
+    # Auto-join das PONTAS da parede continua: o estado da ponta inicial vem
+    # do trecho mais no comeco do eixo, o da ponta final do trecho mais no
+    # fim - e de qual das DUAS pontas DAQUELE trecho cai naquele extremo (a
+    # parede pode ter sido desenhada no sentido contrario ao do grupo).
+    def _outer_end_index(segment, at_start):
+        t_a = _merge_axis_t(origin, direction, segment["p0"])
+        t_b = _merge_axis_t(origin, direction, segment["p1"])
+        if at_start:
+            return 0 if t_a <= t_b else 1
+        return 1 if t_b >= t_a else 0
+
+    join_at_end = (
+        segments[0]["join_at_end"][_outer_end_index(segments[0], True)],
+        segments[-1]["join_at_end"][_outer_end_index(segments[-1], False)],
+    )
+    p_start = XYZ(origin.X + direction.X * t_min, origin.Y + direction.Y * t_min, curve_z)
+    p_end = XYZ(origin.X + direction.X * t_max, origin.Y + direction.Y * t_max, curve_z)
+
+    # `t` dos recortes e' medido a partir do INICIO DA PAREDE CONTINUA (e
+    # nao da origem arbitraria do grupo, que e' a ponta de um trecho
+    # qualquer): e' a mesma convencao de build_wall_opening_cuts, e e' o que
+    # permite os dois modos compartilharem create_wall_opening_cuts e a
+    # leitura do relatorio.
+    #
+    # Estes recortes NUNCA se sobrepoem ao vao que uma porta/janela
+    # hospedada ja abre por conta propria: um vazio e', por definicao,
+    # regiao onde NENHUM trecho antigo tinha material - e uma familia
+    # hospedada mora DENTRO de um trecho (o elemento Wall cobre o vao; e' a
+    # familia que o recorta). Onde ha' familia, portanto, ha' trecho, e
+    # aquela regiao nao entra em `voids`.
+    cuts = []
+    for index, (t_lo, t_hi, z_lo, z_hi) in enumerate(voids):
+        cut_z_lo = z_lo
+        if z_lo <= base_z_abs + MIN_SEGMENT_HEIGHT_FT:
+            cut_z_lo = z_lo - OPENING_CUT_EDGE_OVERSHOOT_FT
+        cut_z_hi = z_hi
+        if z_hi >= top_z_abs - MIN_SEGMENT_HEIGHT_FT:
+            cut_z_hi = z_hi + OPENING_CUT_EDGE_OVERSHOOT_FT
+        cuts.append({
+            "opening_index": index,
+            "t_lo": t_lo - t_min, "t_hi": t_hi - t_min,
+            "sill_z_abs": z_lo, "head_z_abs": z_hi,
+            "p_start": XYZ(p_start.X + direction.X * (t_lo - t_min),
+                           p_start.Y + direction.Y * (t_lo - t_min), cut_z_lo),
+            "p_end": XYZ(p_start.X + direction.X * (t_hi - t_min),
+                         p_start.Y + direction.Y * (t_hi - t_min), cut_z_hi),
+            "width_ft": t_hi - t_lo,
+            "height_ft": z_hi - z_lo,
+        })
+
+    return {
+        "segments": segments,
+        "wall_ids": [segment["wall_id"] for segment in segments],
+        "reference_segment": reference,
+        "origin_xy": origin,
+        "direction_xy": direction,
+        # t_min/t_max ficam na coordenada do INICIO DA PAREDE (0 ->
+        # comprimento), igual aos recortes acima.
+        "t_min": 0.0, "t_max": t_max - t_min,
+        "p_start": p_start, "p_end": p_end,
+        "length_ft": t_max - t_min,
+        "base_z_abs": base_z_abs,
+        "top_z_abs": top_z_abs,
+        "height_ft": top_z_abs - base_z_abs,
+        "base_offset_ft": base_z_abs - reference["level_elevation_ft"],
+        "width_ft": reference["width_ft"],
+        "wall_type_id": reference["wall_type_id"],
+        "level": reference["level"],
+        "level_id": reference["level_id"],
+        "location_line": reference["location_line"],
+        "flipped": reference["flipped"],
+        "structural": reference["structural"],
+        "join_at_end": join_at_end,
+        "voids": voids,
+        "cuts": cuts,
+        "bridged_gaps": group.get("bridged_gaps", []),
+    }
+
+
+def plan_existing_wall_merges(walls, target_doc=None, max_gap_ft=WALL_MERGE_MAX_AXIAL_GAP_FT):
+    """Le as Wall dadas, agrupa por continuidade e devolve
+    (plans, skipped, untouched):
+
+      - `plans`: uma entrada por parede continua a criar;
+      - `skipped`: [(wall, motivo)] das paredes que nem chegaram a ser
+        consideradas (arco, sem eixo, sem altura...);
+      - `untouched`: os segmentos que formam grupo sozinhos e sem vazio -
+        paredes que ja estao inteiras e por isso NAO sao tocadas."""
+    segments = []
+    skipped = []
+    for wall in walls:
+        segment, reason = read_existing_wall_for_merge(wall, target_doc)
+        if segment is None:
+            skipped.append((wall, reason))
+        else:
+            segments.append(segment)
+
+    plans, untouched = [], []
+    for group in group_existing_walls_for_merge(segments, max_gap_ft=max_gap_ft):
+        plan = build_wall_merge_plan(group)
+        if plan is None:
+            untouched.extend(group["segments"])
+        else:
+            plans.append(plan)
+    return plans, skipped, untouched
+
+
+# ------------------------------------------------------------------
+# O QUE ESTAVA HOSPEDADO NAS PAREDES ANTIGAS
+#
+# Apagar uma parede apaga TUDO o que ela hospeda - portas, janelas e os
+# recortes (Opening) que ja existiam nela. Por isso, antes de apagar,
+# tudo isso e' lido, recriado na parede continua e so' entao a antiga sai.
+# ------------------------------------------------------------------
+
+def collect_wall_inserts_for_merge(target_doc, wall):
+    """Le o que esta' hospedado em `wall`. Devolve
+    (family_instances, openings, unreadable):
+
+      - `family_instances`: dicts com simbolo, ponto de insercao, nivel,
+        orientacao (facing/hand) e os parametros de instancia que precisam
+        ser copiados (WALL_MERGE_INSERT_PARAMS_TO_COPY);
+      - `openings`: dicts dos elementos Opening RETANGULARES ja existentes,
+        com os dois cantos lidos de Opening.BoundaryRect (o par
+        minimo/maximo do retangulo, na mesma convencao que NewOpening
+        espera);
+      - `unreadable`: mensagens do que foi encontrado mas nao pode ser
+        reproduzido (um Opening de contorno nao retangular, por exemplo) -
+        reportado ao usuario e tratado como REPROVACAO da uniao daquele
+        grupo, nunca descartado em silencio.
+
+    Usa Wall.FindInserts(True, False, False, False) - recortes retangulares
+    e insercoes normais, sem sombras nem paredes embutidas - e, se ele nao
+    responder, cai numa varredura de FamilyInstance por Host."""
+    family_instances, openings, unreadable = [], [], []
+
+    insert_ids = None
+    try:
+        # (recortes retangulares SIM, sombras NAO, paredes embutidas NAO,
+        # insercoes compartilhadas NAO) - so' o que precisa voltar para a
+        # parede continua: portas/janelas e Openings.
+        insert_ids = list(wall.FindInserts(True, False, False, False))
+    except Exception:
+        insert_ids = None
+    if insert_ids is None:
+        try:
+            insert_ids = [
+                inst.Id for inst in FilteredElementCollector(target_doc)
+                .OfClass(FamilyInstance).WhereElementIsNotElementType()
+                if getattr(inst, "Host", None) is not None and
+                _eid_int(inst.Host.Id) == _eid_int(wall.Id)
+            ]
+        except Exception:
+            insert_ids = []
+
+    for insert_id in insert_ids:
+        element = None
+        try:
+            element = target_doc.GetElement(insert_id)
+        except Exception:
+            element = None
+        if element is None:
+            continue
+
+        # Recorte (Abertura de Parede) que ja existia na parede antiga. A
+        # identificacao e' por CLASSE (`Opening`), nunca por "tem o atributo
+        # BoundaryRect": um FamilyInstance nao tem esse atributo no Revit
+        # real, mas confiar nisso deixaria a deteccao a merce de qualquer
+        # objeto que responda a qualquer atributo.
+        if isinstance(element, Opening):
+            points = []
+            try:
+                if element.IsRectBoundary:
+                    points = list(element.BoundaryRect)
+            except Exception:
+                points = []
+            if len(points) >= 2:
+                openings.append({
+                    "element_id": insert_id,
+                    "p_start": points[0],
+                    "p_end": points[1],
+                })
+            else:
+                unreadable.append(
+                    "recorte existente {} nao e' retangular - a uniao dessa "
+                    "parede foi cancelada para nao perder a geometria dele"
+                    .format(insert_id)
+                )
+            continue
+
+        if not isinstance(element, FamilyInstance):
+            # Sombras/paredes embutidas nao sao pedidas a FindInserts (ver a
+            # chamada acima) - qualquer outra coisa que apareca aqui nao e'
+            # abertura e nao precisa ser recriada.
+            continue
+
+        location = getattr(element, "Location", None)
+        if not isinstance(location, LocationPoint):
+            unreadable.append(
+                "abertura {} sem ponto de insercao - nao da' para recria-la "
+                "na parede continua".format(insert_id)
+            )
+            continue
+
+        symbol = getattr(element, "Symbol", None)
+        if symbol is None:
+            unreadable.append("abertura {} sem tipo (Symbol)".format(insert_id))
+            continue
+
+        params = {}
+        for param_name in WALL_MERGE_INSERT_PARAMS_TO_COPY:
+            value = _lookup_param_value(element, [param_name])
+            if value is not None:
+                params[param_name] = value
+
+        def _safe(getter, default=None):
+            try:
+                return getter()
+            except Exception:
+                return default
+
+        family_instances.append({
+            "element_id": insert_id,
+            "symbol": symbol,
+            "point": location.Point,
+            "level_id": getattr(element, "LevelId", None),
+            "facing_flipped": bool(_safe(lambda: element.FacingFlipped, False)),
+            "hand_flipped": bool(_safe(lambda: element.HandFlipped, False)),
+            "params": params,
+        })
+
+    return family_instances, openings, unreadable
+
+
+def recreate_wall_inserts(target_doc, new_wall, level, family_instances, openings):
+    """Recria na parede continua `new_wall` o que estava hospedado nas
+    antigas. Devolve (created_ids, failures) - NUNCA lanca: uma insercao
+    que falha vira uma mensagem, e e' a validacao (validate_merged_wall)
+    que decide reprovar a uniao inteira por causa dela.
+
+    As portas/janelas voltam com o MESMO simbolo, o MESMO ponto de
+    insercao, o MESMO nivel, os MESMOS parametros de largura/altura/
+    peitoril e a MESMA orientacao (facing/hand) - e' isso que atende
+    "posicao, largura, altura, altura da base/peitoril, nivel
+    correspondente, geometria e dimensoes originais" do pedido.
+
+    Precisa rodar dentro de uma Transaction ja aberta pelo chamador, e
+    DEPOIS do Regenerate que resolve a posicao final da parede continua."""
+    created_ids, failures = [], []
+
+    for opening in openings:
+        try:
+            element = target_doc.Create.NewOpening(
+                new_wall, opening["p_start"], opening["p_end"]
+            )
+            if element is None:
+                failures.append(
+                    "recorte existente {} nao pode ser recriado (NewOpening "
+                    "devolveu nada)".format(opening["element_id"])
+                )
+                continue
+            created_ids.append(element.Id)
+        except Exception as ex:
+            failures.append(
+                "recorte existente {} nao pode ser recriado: {}"
+                .format(opening["element_id"], ex)
+            )
+
+    for insert in family_instances:
+        try:
+            symbol = insert["symbol"]
+            if not symbol.IsActive:
+                symbol.Activate()
+                target_doc.Regenerate()
+        except Exception:
+            pass
+        try:
+            insert_level = level
+            if insert["level_id"] is not None:
+                candidate = target_doc.GetElement(insert["level_id"])
+                if isinstance(candidate, Level):
+                    insert_level = candidate
+            instance = target_doc.Create.NewFamilyInstance(
+                insert["point"], insert["symbol"], new_wall, insert_level,
+                StructuralType.NonStructural
+            )
+            if instance is None:
+                failures.append(
+                    "abertura {} nao pode ser recriada (NewFamilyInstance "
+                    "devolveu nada)".format(insert["element_id"])
+                )
+                continue
+            created_ids.append(instance.Id)
+        except Exception as ex:
+            failures.append(
+                "abertura {} nao pode ser recriada na parede continua: {}"
+                .format(insert["element_id"], ex)
+            )
+            continue
+
+        # Parametros de instancia + orientacao. Falhar aqui e' falha da
+        # uniao (a abertura voltaria com dimensao/lado errado), entao entra
+        # em `failures` como qualquer outra.
+        for param_name, value in insert["params"].items():
+            try:
+                param = instance.LookupParameter(param_name)
+                if param is not None and not param.IsReadOnly:
+                    param.Set(value)
+            except Exception as ex:
+                failures.append(
+                    "abertura {}: parametro '{}' nao pode ser copiado: {}"
+                    .format(insert["element_id"], param_name, ex)
+                )
+        try:
+            if bool(instance.FacingFlipped) != insert["facing_flipped"]:
+                instance.flipFacing()
+            if bool(instance.HandFlipped) != insert["hand_flipped"]:
+                instance.flipHand()
+        except Exception:
+            # Nem toda familia aceita inverter (algumas nao tem simetria de
+            # mao/face). Nao e' falha de geometria do vao - o recorte na
+            # parede continua sai igual - entao nao reprova a uniao.
+            pass
+
+    return created_ids, failures
+
+
+def validate_merged_wall(target_doc, new_wall, plan, created_cut_count, failures):
+    """Confere, MEDINDO DE VOLTA NO PROPRIO REVIT, se a parede continua
+    nasceu como o plano pedia - o passo que o usuario exigiu ANTES de
+    qualquer exclusao ("Somente depois de confirmar que a nova parede
+    continua e suas aberturas foram criadas corretamente, remover as
+    paredes antigas"). Devolve (ok, problemas).
+
+    Confere: a parede existe e e' valida; tem eixo; o comprimento bate; as
+    duas pontas caem onde o plano mandou (em planta); base e topo batem;
+    todos os recortes planejados foram abertos; e nenhuma insercao/recorte
+    falhou pelo caminho."""
+    problems = list(failures or [])
+
+    if new_wall is None:
+        problems.append("a parede continua nao foi criada")
+        return False, problems
+    try:
+        if not new_wall.IsValidObject:
+            problems.append("a parede continua criada nao e' um elemento valido")
+            return False, problems
+    except Exception:
+        pass
+
+    location = getattr(new_wall, "Location", None)
+    if not isinstance(location, LocationCurve):
+        problems.append("a parede continua criada ficou sem eixo (LocationCurve)")
+        return False, problems
+
+    try:
+        curve = location.Curve
+        got_a, got_b = curve.GetEndPoint(0), curve.GetEndPoint(1)
+    except Exception as ex:
+        problems.append("nao foi possivel ler o eixo da parede continua: {}".format(ex))
+        return False, problems
+
+    length_error = abs(got_a.DistanceTo(got_b) - plan["length_ft"])
+    if length_error > WALL_MERGE_VALIDATION_TOLERANCE_FT:
+        problems.append(
+            "comprimento da parede continua saiu {:.2f}cm diferente do planejado"
+            .format(length_error / FEET_PER_METER * 100.0)
+        )
+
+    def _xy_gap(point_a, point_b):
+        return math.sqrt((point_a.X - point_b.X) ** 2 + (point_a.Y - point_b.Y) ** 2)
+
+    ends_error = min(
+        max(_xy_gap(got_a, plan["p_start"]), _xy_gap(got_b, plan["p_end"])),
+        max(_xy_gap(got_a, plan["p_end"]), _xy_gap(got_b, plan["p_start"])),
+    )
+    if ends_error > WALL_MERGE_VALIDATION_TOLERANCE_FT:
+        problems.append(
+            "a parede continua ficou {:.2f}cm fora da posicao das paredes originais"
+            .format(ends_error / FEET_PER_METER * 100.0)
+        )
+
+    base_z_abs, top_z_abs = _wall_vertical_extent(new_wall, plan["level"], target_doc)
+    if base_z_abs is None:
+        problems.append("nao foi possivel medir a altura da parede continua criada")
+    else:
+        if abs(base_z_abs - plan["base_z_abs"]) > WALL_MERGE_VALIDATION_TOLERANCE_FT:
+            problems.append(
+                "a base da parede continua ficou {:.2f}cm fora do planejado"
+                .format(abs(base_z_abs - plan["base_z_abs"]) / FEET_PER_METER * 100.0)
+            )
+        if abs(top_z_abs - plan["top_z_abs"]) > WALL_MERGE_VALIDATION_TOLERANCE_FT:
+            problems.append(
+                "o topo da parede continua ficou {:.2f}cm fora do planejado"
+                .format(abs(top_z_abs - plan["top_z_abs"]) / FEET_PER_METER * 100.0)
+            )
+
+    if created_cut_count < len(plan["cuts"]):
+        problems.append(
+            "so' {} de {} recorte(s) de abertura foram abertos na parede continua"
+            .format(created_cut_count, len(plan["cuts"]))
+        )
+
+    return (not problems), problems
+
+
+def execute_wall_merge_plan(target_doc, plan):
+    """Executa UM plano de uniao, inteiro, dentro de UMA Transaction
+    propria - e' a unidade de atomicidade: ou a parede continua nasce
+    validada e as antigas somem, ou nada muda naquela continuidade.
+
+    Sequencia (a ordem e' a que o usuario pediu e a que o Revit exige):
+      1. le o que estava hospedado nas paredes antigas (portas/janelas e
+         recortes) ANTES de mexer em qualquer coisa;
+      2. cria a parede continua do nivel de base ate' a altura total;
+      3. desliga o auto-join das duas pontas, fixa a MESMA Linha de
+         Referencia das originais e reescreve a curva de localizacao - so'
+         assim a parede nova cai exatamente onde as antigas estavam,
+         qualquer que seja a assimetria de camadas do WallType;
+      4. Regenerate;
+      5. abre os recortes dos vazios (create_wall_opening_cuts, a mesma
+         funcao do modo continuo do fluxo do CAD);
+      6. recria portas/janelas e recortes que estavam hospedados;
+      7. Regenerate + VALIDA;
+      8. so' se passar, apaga as paredes antigas e faz Commit. Se
+         reprovar, RollBack - as paredes originais ficam intactas.
+
+    Devolve um dict de resultado (sempre, nunca lanca)."""
+    result = {
+        "ok": False, "new_wall_id": None, "removed_wall_ids": [],
+        "cut_ids": [], "reinserted_ids": [], "problems": [],
+        "source_wall_ids": list(plan["wall_ids"]),
+    }
+
+    transaction = Transaction(target_doc, "Unir paredes existentes")
+    transaction.Start()
+    try:
+        _suppress_transaction_warnings(transaction)
+
+        # Cada abertura/recorte e' hospedado por UMA parede so', mas paredes
+        # unidas (join) podem faze-lo aparecer na consulta de mais de uma -
+        # por isso a deduplicacao por ElementId: recriar a mesma porta duas
+        # vezes na parede continua deixaria duas folhas no mesmo vao.
+        family_instances, openings, unreadable = [], [], []
+        seen_inserts = set()
+        for segment in plan["segments"]:
+            inst_here, openings_here, unreadable_here = collect_wall_inserts_for_merge(
+                target_doc, segment["wall"]
+            )
+            for item, bucket in (
+                [(i, family_instances) for i in inst_here] +
+                [(o, openings) for o in openings_here]
+            ):
+                key = _eid_int(item["element_id"])
+                if key in seen_inserts:
+                    continue
+                seen_inserts.add(key)
+                bucket.append(item)
+            unreadable.extend(unreadable_here)
+
+        new_wall = Wall.Create(
+            target_doc,
+            Line.CreateBound(plan["p_start"], plan["p_end"]),
+            plan["wall_type_id"],
+            plan["level"].Id,
+            plan["height_ft"],
+            plan["base_offset_ft"],
+            plan["flipped"],
+            plan["structural"],
+        )
+
+        # Auto-join desligado nas duas pontas ANTES de reposicionar: sem
+        # isso o Revit "limpa" o encontro com as paredes vizinhas esticando
+        # a ponta, e a parede continua deixaria de bater com a extensao
+        # medida nas originais. O estado original de cada ponta e'
+        # restaurado no fim, ja com a parede no lugar certo.
+        try:
+            WallUtils.DisallowWallJoinAtEnd(new_wall, 0)
+            WallUtils.DisallowWallJoinAtEnd(new_wall, 1)
+        except Exception:
+            pass
+        target_doc.Regenerate()
+
+        # MESMA Linha de Referencia das paredes originais (nao o nucleo,
+        # como no fluxo do CAD): aqui o alvo nao e' um eixo medido na
+        # planta, e' reproduzir exatamente onde a parede JA ESTAVA - e a
+        # curva que foi lida das originais esta' medida nesse plano.
+        if plan["location_line"] is not None:
+            try:
+                loc_line_param = new_wall.get_Parameter(BuiltInParameter.WALL_KEY_REF_PARAM)
+                if loc_line_param is not None and not loc_line_param.IsReadOnly:
+                    loc_line_param.Set(int(plan["location_line"]))
+                    target_doc.Regenerate()
+            except Exception:
+                pass
+
+        location = new_wall.Location
+        if isinstance(location, LocationCurve):
+            current_z = location.Curve.GetEndPoint(0).Z
+            location.Curve = Line.CreateBound(
+                XYZ(plan["p_start"].X, plan["p_start"].Y, current_z),
+                XYZ(plan["p_end"].X, plan["p_end"].Y, current_z),
+            )
+        target_doc.Regenerate()
+
+        cut_ids_by_index, cut_failures = create_wall_opening_cuts(
+            target_doc, new_wall, plan["cuts"]
+        )
+        cut_ids = [eid for ids in cut_ids_by_index.values() for eid in ids]
+
+        reinserted_ids, insert_failures = recreate_wall_inserts(
+            target_doc, new_wall, plan["level"], family_instances, openings
+        )
+        target_doc.Regenerate()
+
+        ok, problems = validate_merged_wall(
+            target_doc, new_wall, plan, len(cut_ids),
+            list(unreadable) + list(cut_failures) + list(insert_failures)
+        )
+        result["problems"] = problems
+        result["cut_ids"] = cut_ids
+        result["reinserted_ids"] = reinserted_ids
+
+        if not ok:
+            transaction.RollBack()
+            return result
+
+        # Validado: agora sim as antigas saem. O `Delete` leva junto tudo o
+        # que ainda estava hospedado nelas (as copias ja estao na parede
+        # continua).
+        removed = []
+        for segment in plan["segments"]:
+            try:
+                target_doc.Delete(segment["wall_id"])
+                removed.append(segment["wall_id"])
+            except Exception as ex:
+                result["problems"].append(
+                    "a parede antiga {} nao pode ser apagada: {}"
+                    .format(segment["wall_id"], ex)
+                )
+        if len(removed) != len(plan["segments"]):
+            # Apagar so' parte delas deixaria parede duplicada por cima da
+            # continua - exatamente o que as regras do pedido proibem.
+            transaction.RollBack()
+            result["removed_wall_ids"] = []
+            return result
+
+        # Restaura o auto-join das pontas como estava nas originais.
+        for end_index, allowed in enumerate(plan["join_at_end"]):
+            if allowed:
+                try:
+                    WallUtils.AllowWallJoinAtEnd(new_wall, end_index)
+                except Exception:
+                    pass
+
+        result["removed_wall_ids"] = removed
+        result["new_wall_id"] = new_wall.Id
+        result["ok"] = True
+        transaction.Commit()
+        return result
+    except Exception as ex:
+        result["problems"].append(
+            "a uniao desta parede falhou e foi revertida: {}".format(_format_exception_detail(ex))
+        )
+        try:
+            transaction.RollBack()
+        except Exception:
+            pass
+        return result
+
+
+def _suppress_transaction_warnings(transaction):
+    """Silencia os AVISOS (nunca os erros) da Transaction da uniao. Criar a
+    parede continua por cima das antigas e recriar as portas/janelas antes
+    de apagar as originais gera, no meio do caminho, os avisos previsiveis
+    de "paredes sobrepostas"/"instancias identicas no mesmo lugar" - todos
+    resolvidos no fim da propria Transaction, quando as antigas sao
+    apagadas. Sem isso o usuario levaria uma caixa de dialogo por parede
+    unida. Erros de verdade continuam chegando normalmente.
+
+    Tudo em try/except: se a API de tratamento de falhas nao responder, a
+    uniao segue com o tratamento padrao do Revit."""
+    try:
+        options = transaction.GetFailureHandlingOptions()
+        options = options.SetFailuresPreprocessor(_MergeWarningSwallower())
+        options = options.SetClearAfterRollback(True)
+        transaction.SetFailureHandlingOptions(options)
+    except Exception:
+        pass
+
+
+class _MergeWarningSwallower(IFailuresPreprocessor):
+    """Apaga so' as mensagens de severidade "aviso" da Transaction da uniao
+    - ver _suppress_transaction_warnings."""
+
+    def PreprocessFailures(self, failures_accessor):
+        try:
+            for failure in failures_accessor.GetFailureMessages():
+                if failure.GetSeverity() == FailureSeverity.Warning:
+                    failures_accessor.DeleteWarning(failure)
+        except Exception:
+            pass
+        return FailureProcessingResult.Continue
+
+
+def merge_existing_walls(target_doc, plans, progress_cb=None):
+    """Roda todos os planos de uniao, um a um, dentro de um TransactionGroup
+    (para o Ctrl+Z do usuario desfazer a operacao inteira de uma vez) -
+    cada plano com a sua propria Transaction, entao uma continuidade que
+    reprova na validacao nao derruba as outras.
+
+    Devolve (results, summary)."""
+    results = []
+    group = None
+    try:
+        group = TransactionGroup(target_doc, "Unir paredes existentes")
+        group.Start()
+    except Exception:
+        group = None
+
+    try:
+        for index, plan in enumerate(plans):
+            if progress_cb:
+                try:
+                    progress_cb(index, len(plans), plan)
+                except Exception:
+                    pass
+            results.append(execute_wall_merge_plan(target_doc, plan))
+    finally:
+        if group is not None:
+            try:
+                group.Assimilate()
+            except Exception:
+                pass
+
+    merged = [r for r in results if r["ok"]]
+    summary = {
+        "planned": len(plans),
+        "merged": len(merged),
+        "failed": len(results) - len(merged),
+        "removed_walls": sum(len(r["removed_wall_ids"]) for r in merged),
+        "cuts": sum(len(r["cut_ids"]) for r in merged),
+        "reinserted": sum(len(r["reinserted_ids"]) for r in merged),
+        "new_wall_ids": [r["new_wall_id"] for r in merged],
+    }
+    return results, summary
+
+
+def build_wall_merge_report(plans, results, summary, skipped, untouched):
+    """Texto do relatorio da uniao (o mesmo conteudo que vai para o log em
+    disco e para a janela) - sem nenhuma chamada ao Revit, para poder ser
+    conferido pelos testes."""
+    lines = ["=== Uniao de paredes existentes ===", ""]
+    lines.append(
+        "{} continuidade(s) identificada(s) a partir das paredes ja modeladas "
+        "(a planta baixa NAO foi usada).".format(summary["planned"])
+    )
+    lines.append(
+        "{} parede(s) continua(s) criada(s) e validada(s); {} substituida(s) e "
+        "apagada(s); {} recorte(s) de abertura aberto(s); {} abertura(s) "
+        "hospedada(s) recriada(s).".format(
+            summary["merged"], summary["removed_walls"], summary["cuts"],
+            summary["reinserted"]
+        )
+    )
+    if summary["failed"]:
+        lines.append(
+            "{} continuidade(s) REPROVARAM na validacao e foram revertidas - as "
+            "paredes originais dessas continuidades continuam intactas."
+            .format(summary["failed"])
+        )
+    if untouched:
+        lines.append(
+            "{} parede(s) ja estavam inteiras (nenhum vazio a reconstruir) e nao "
+            "foram tocadas.".format(len(untouched))
+        )
+    if skipped:
+        lines.append(
+            "{} elemento(s) selecionado(s) ficaram de fora da uniao.".format(len(skipped))
+        )
+
+    lines.append("")
+    lines.append("--- continuidade a continuidade ---")
+    for index, (plan, result) in enumerate(zip(plans, results)):
+        status = "UNIDA" if result["ok"] else "REVERTIDA"
+        lines.append(
+            "#{} [{}] {} trecho(s) -> 1 parede de {:.1f}cm de comprimento x "
+            "{:.1f}cm de altura, {} recorte(s) de abertura{}".format(
+                index + 1, status, len(plan["segments"]),
+                plan["length_ft"] / FEET_PER_METER * 100.0,
+                plan["height_ft"] / FEET_PER_METER * 100.0,
+                len(plan["cuts"]),
+                " (atravessando {} vao(s) sem parede)".format(len(plan["bridged_gaps"]))
+                if plan["bridged_gaps"] else ""
+            )
+        )
+        for cut in plan["cuts"]:
+            lines.append(
+                "      recorte: {:.1f}cm de largura x {:.1f}cm de altura, "
+                "peitoril {:.1f}cm acima da base da parede".format(
+                    cut["width_ft"] / FEET_PER_METER * 100.0,
+                    cut["height_ft"] / FEET_PER_METER * 100.0,
+                    (cut["sill_z_abs"] - plan["base_z_abs"]) / FEET_PER_METER * 100.0,
+                )
+            )
+        for problem in result["problems"]:
+            lines.append("      PROBLEMA: {}".format(problem))
+
+    if skipped:
+        lines.append("")
+        lines.append("--- elementos fora da uniao ---")
+        for wall, reason in skipped:
+            lines.append("  {}: {}".format(getattr(wall, "Id", "?"), reason))
+
+    return "\n".join(lines)
+
+
+def _select_existing_walls_for_merge():
+    """Selecao das paredes a UNIR, no proprio modelo. Devolve a lista de
+    elementos escolhidos (crua - quem separa o que serve e'
+    plan_existing_wall_merges, que reporta o motivo de cada recusa) ou None
+    se o usuario cancelar (ESC)."""
+    forms.alert(
+        "Selecione no modelo as paredes que devem ser UNIDAS (pode selecionar "
+        "os trechos separados por portas/janelas de uma vez - o script "
+        "descobre sozinho quais pertencem a mesma parede) e clique em "
+        "'Concluir' na barra de opcoes do Revit (ou Esc para cancelar).\n\n"
+        "Nada e' apagado antes de a parede continua ser criada e validada.",
+        title="Modulacao Automatica - Unir paredes: selecao"
+    )
+    try:
+        refs = uidoc.Selection.PickObjects(
+            ObjectType.Element,
+            "Selecione as paredes a unir e clique em Concluir na barra de opcoes"
+        )
+    except Exception:
+        return None
+
+    elements = []
+    for ref in refs:
+        element = doc.GetElement(ref.ElementId)
+        if element is not None:
+            elements.append(element)
+    return elements
+
+
+def run_merge_existing_walls():
+    """Fluxo "UNIR paredes existentes" (3a opcao da tela "Preparacao das
+    paredes") - ver o cabecalho desta secao para a ordem completa.
+
+    Nada da planta baixa e' lido aqui: a analise sai inteira das Wall ja
+    modeladas. No fim, oferece seguir direto para a modulacao dos blocos
+    sobre as paredes CONTINUAS recem criadas, que e' o que permite comparar
+    este caminho com o modo continuo do fluxo do CAD (ver
+    WALL_BUILD_MODE_CONTINUOUS)."""
+    output = script.get_output()
+
+    selected = _select_existing_walls_for_merge()
+    if selected is None:
+        return
+    if not selected:
+        forms.alert(
+            "Nenhum elemento foi selecionado - nada a unir.",
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        return
+
+    try:
+        plans, skipped, untouched = plan_existing_wall_merges(selected, target_doc=doc)
+    except Exception as ex:
+        # Nada foi alterado ainda (o planejamento so' LE o modelo) - e' o
+        # unico momento em que da' para afirmar isso com certeza, entao o
+        # alerta diz exatamente isso, alem do erro de verdade.
+        detail = _format_exception_detail(ex)
+        try:
+            output.print_md(
+                "- **A analise das paredes para uniao FALHOU**.\n\n```\n{}\n```".format(detail)
+            )
+        except Exception:
+            pass
+        forms.alert(
+            "A analise das paredes selecionadas falhou - NENHUMA parede foi "
+            "criada, alterada ou apagada.\n\nErro: {}".format(
+                traceback.format_exc().splitlines()[-1]
+            ),
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        return
+
+    if not plans:
+        forms.alert(
+            "Nenhuma continuidade para unir foi encontrada entre as {} "
+            "selecao(oes).\n\n"
+            "{} parede(s) ja estavam inteiras (nada a reconstruir) e {} "
+            "elemento(s) ficaram de fora (arco, sem eixo, sem altura ou nao "
+            "sao paredes).\n\n"
+            "Duas paredes so' sao unidas quando estao no mesmo Nivel, com o "
+            "mesmo tipo, a mesma espessura, a mesma Linha de Referencia e "
+            "sobre a MESMA reta em planta.".format(
+                len(selected), len(untouched), len(skipped)
+            ),
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        return
+
+    total_segments = sum(len(plan["segments"]) for plan in plans)
+    total_cuts = sum(len(plan["cuts"]) for plan in plans)
+    confirmed = forms.alert(
+        "{} continuidade(s) identificada(s) a partir das paredes ja "
+        "modeladas.\n\n"
+        "O que vai acontecer:\n"
+        "  - {} trecho(s) de parede serao substituidos por {} parede(s) "
+        "continua(s);\n"
+        "  - {} recorte(s) de abertura serao abertos com a ferramenta "
+        "nativa do Revit (Abertura de Parede), preservando posicao, "
+        "largura, altura e peitoril;\n"
+        "  - portas/janelas hospedadas nos trechos antigos sao recriadas na "
+        "parede continua antes de qualquer exclusao;\n"
+        "  - as paredes antigas so' sao apagadas DEPOIS de a parede "
+        "continua ser criada e validada. Se a validacao reprovar, aquela "
+        "continuidade e' revertida e nada muda nela.\n\n"
+        "Continuar?".format(len(plans), total_segments, len(plans), total_cuts),
+        title="Modulacao Automatica - Unir paredes existentes",
+        yes=True, no=True
+    )
+    if not confirmed:
+        return
+
+    def _progress(index, total, plan):
+        try:
+            output.print_md(
+                "- unindo continuidade {}/{} ({} trecho(s), {} recorte(s))..."
+                .format(index + 1, total, len(plan["segments"]), len(plan["cuts"]))
+            )
+        except Exception:
+            pass
+
+    results, summary = merge_existing_walls(doc, plans, progress_cb=_progress)
+
+    # Daqui para baixo a uniao JA ACONTECEU no modelo. Qualquer falha na
+    # montagem do relatorio/da tela seguinte nao pode aparecer como se a
+    # uniao nao tivesse rodado (foi exatamente esse o bug real do fluxo de
+    # paredes existentes em 2026-08-27: uma excecao fora da execucao da API
+    # do Revit e' engolida pelo engine e o usuario ve' "nada acontece").
+    try:
+        report_text = build_wall_merge_report(plans, results, summary, skipped, untouched)
+        log_path = _save_log_to_file(report_text)
+        try:
+            output.print_md("```\n{}\n```".format(report_text))
+        except Exception:
+            pass
+    except Exception as ex:
+        detail = _format_exception_detail(ex)
+        try:
+            output.print_md(
+                "- **A uniao rodou, mas o relatorio dela falhou**.\n\n```\n{}\n```"
+                .format(detail)
+            )
+        except Exception:
+            pass
+        forms.alert(
+            "A uniao das paredes JA FOI EXECUTADA ({} parede(s) continua(s) "
+            "criada(s)), mas o relatorio dela falhou: {}\n\nConfira o "
+            "resultado no modelo - use Ctrl+Z se quiser desfazer."
+            .format(summary["merged"], traceback.format_exc().splitlines()[-1]),
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        log_path = "(relatorio nao pode ser salvo)"
+
+    if summary["merged"] == 0:
+        forms.alert(
+            "Nenhuma parede continua sobreviveu a validacao - TODAS as {} "
+            "continuidade(s) foram revertidas e o modelo continua exatamente "
+            "como estava.\n\nO relatorio com o motivo de cada reprovacao "
+            "esta' em:\n{}".format(summary["planned"], log_path),
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        return
+
+    # As paredes que existem AGORA no modelo, para a modulacao: as continuas
+    # recem criadas + as que ja estavam inteiras + as originais das
+    # continuidades que foram revertidas (essas nao mudaram).
+    walls_now = []
+    for wall_id in summary["new_wall_ids"]:
+        element = doc.GetElement(wall_id)
+        if element is not None:
+            walls_now.append(element)
+    for segment in untouched:
+        walls_now.append(segment["wall"])
+    for plan, result in zip(plans, results):
+        if not result["ok"]:
+            walls_now.extend(segment["wall"] for segment in plan["segments"])
+
+    seguir = forms.alert(
+        "Uniao concluida.\n\n"
+        "  {} parede(s) continua(s) criada(s) e validada(s)\n"
+        "  {} parede(s) antiga(s) substituida(s) e apagada(s)\n"
+        "  {} recorte(s) de abertura abertos\n"
+        "  {} abertura(s) hospedada(s) recriada(s)\n"
+        "  {} continuidade(s) revertida(s) na validacao\n\n"
+        "Relatorio completo em:\n{}\n\n"
+        "Seguir agora para a modulacao dos blocos sobre estas paredes?"
+        .format(summary["merged"], summary["removed_walls"], summary["cuts"],
+                summary["reinserted"], summary["failed"], log_path),
+        title="Modulacao Automatica - Unir paredes existentes",
+        yes=True, no=True
+    )
+    if not seguir:
+        return
+
+    selection = _build_existing_walls_selection(walls_now)
+    if selection[0] is None:
+        forms.alert(
+            "As paredes continuas foram criadas, mas nenhuma delas pode ser "
+            "usada como eixo de modulacao (sem eixo ou sem altura legivel). "
+            "Nada foi desfeito - rode a opcao 'Utilizar paredes existentes' "
+            "quando quiser modular.",
+            title="Modulacao Automatica - Unir paredes existentes"
+        )
+        return
+    run_modulation_on_existing_walls(preselected=selection)
 
 
 # ==========================================
@@ -13574,13 +15130,16 @@ def run():
     """Ponto de entrada real do script - primeiro pergunta COMO as
     paredes devem ser preparadas (Etapa 1 do fluxo pedido pelo usuario,
     2026-08-26: "Selecionar a planta/gerar as paredes" OU "Pular criacao/
-    verificacao inicial das paredes - usar as que ja existem"), so' depois
-    despacha para o fluxo escolhido. Ver _ask_wall_source_mode/
-    run_modulation_on_existing_walls (fluxo novo) e main() (fluxo classico,
-    inalterado)."""
+    verificacao inicial das paredes - usar as que ja existem"; e, desde
+    2026-08-28, "Unir paredes existentes"), so' depois despacha para o
+    fluxo escolhido. Ver _ask_wall_source_mode/
+    run_modulation_on_existing_walls, run_merge_existing_walls (uniao de
+    paredes ja modeladas) e main() (fluxo classico, inalterado)."""
     mode = _ask_wall_source_mode()
     if mode == "existing":
         run_modulation_on_existing_walls()
+    elif mode == "merge":
+        run_merge_existing_walls()
     elif mode == "cad":
         main()
     # None (ESC/fechou sem escolher) - nao faz nada, mesma convencao do

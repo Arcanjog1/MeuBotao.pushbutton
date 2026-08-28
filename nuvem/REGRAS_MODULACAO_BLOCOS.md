@@ -385,6 +385,133 @@ parede em cima) ficam na cota exata.
   recriar o recorte, e `apply_axis_opening_fix` reporta falha (com
   RollBack) em vez de adivinhar.
 
+## 8c. Unir paredes já existentes no Revit (2026-08-28)
+
+Terceira opção **independente** da tela *"Preparação das paredes"*
+(`_WallSourceModeForm` → `_ask_wall_source_mode` → `run()`), pedida pelo
+usuário para poder **comparar dois caminhos** que chegam ao mesmo lugar
+(uma parede contínua com recortes nativos) por rotas opostas. Nenhuma das
+opções anteriores foi alterada ou removida:
+
+| Opção da tela | O que faz | Fonte da geometria |
+|---|---|---|
+| Criar paredes a partir da planta (CAD) | `main()` — com a sub-opção 8b (segmentado **ou** contínuo com recortes) | planta baixa (DWG) |
+| Utilizar paredes existentes | `run_modulation_on_existing_walls()` — só modula, nunca cria/apaga | Walls já modeladas |
+| **Unir paredes existentes** | `run_merge_existing_walls()` — reconstrói as Walls fatiadas como **uma parede contínua** e recria os vazios como Abertura de Parede | **Walls já modeladas** |
+
+### Regra: nesta opção a planta baixa NÃO é usada
+
+Toda a análise sai do próprio modelo — `Location.Curve`, `Wall.Width`,
+`WallType`, Nível, deslocamentos de base/topo, Linha de Referência, flip e
+uso estrutural (`read_existing_wall_for_merge`). Nada é lido do CAD.
+
+### Continuidade lógica — quando duas paredes podem ser unidas
+
+`wall_merge_compatibility_key` + `walls_share_infinite_line` +
+`group_existing_walls_for_merge`. Duas paredes só entram no mesmo grupo se
+**todas** estas condições valerem:
+
+- mesmo **Nível** de base;
+- mesmo **WallType** e mesma **espessura**
+  (`WALL_MERGE_THICKNESS_TOLERANCE_M = 0.002`);
+- mesma **Linha de Referência** (a curva de localização de duas paredes só
+  é comparável quando medida no mesmo plano de referência);
+- mesmo **uso estrutural**;
+- sobre a **mesma reta em planta** — paralelas dentro de
+  `WALL_MERGE_ANGLE_TOLERANCE_DEG = 0.25` e sem desvio lateral acima de
+  `WALL_MERGE_LATERAL_TOLERANCE_M = 0.005`;
+- **encostadas/sobrepostas** ao longo dessa reta, ou separadas por um vão
+  de no máximo `WALL_MERGE_MAX_AXIAL_GAP_M = 3.0`.
+
+Paredes em **arco** ficam de fora (não podem virar um único segmento reto
+contínuo), assim como paredes sem eixo, curtas demais ou sem altura
+determinável — cada recusa vai ao relatório com o motivo, nunca some em
+silêncio.
+
+O limite de vão axial só entra em cena quando **nenhum** trecho do grupo
+cobre aquele intervalo — é o caso das paredes separadas nas laterais de uma
+abertura que vai do piso ao teto. Quando existe verga acima da porta ou
+peitoril abaixo da janela, a continuidade já está provada pela geometria e
+o vão nem chega a aparecer. Atravessar um vão desses **não muda a geometria
+final**: o vazio vira um recorte de altura cheia na parede contínua.
+
+### Os vazios são calculados, não adivinhados
+
+`compute_wall_merge_voids` é a operação **inversa** de
+`build_wall_segments`: lá as aberturas fatiam a parede em trechos; aqui os
+trechos existentes revelam onde estavam as aberturas. Dado o retângulo
+cheio (comprimento total × da base mais baixa ao topo mais alto) e os
+retângulos que os trechos ocupavam, o complemento exato é decomposto em
+retângulos — corta o eixo nas faixas delimitadas pelas pontas dos trechos,
+tira o complemento vertical dentro de cada faixa e junta faixas vizinhas
+com o mesmo conjunto de vazios (um vão único sai como **um** retângulo).
+Vazios abaixo de `MIN_SEGMENT_LENGTH_FT`/`MIN_SEGMENT_HEIGHT_FT` são
+descartados — o Revit recusaria o recorte.
+
+### Ordem obrigatória (`execute_wall_merge_plan`)
+
+1. lê o que estava **hospedado** nas paredes antigas (portas/janelas e
+   `Opening`s) — antes de mexer em qualquer coisa;
+2. cria **uma** parede contínua, do nível de base até a altura total
+   (`Wall.Create` com o WallType, o Nível, o offset de base e a altura das
+   originais);
+3. desliga o auto-join das duas pontas, fixa a **mesma Linha de
+   Referência** das originais (aqui o alvo é reproduzir onde a parede **já
+   estava**, não um eixo medido no CAD — diferença deliberada em relação ao
+   fluxo do CAD, que alinha pelo núcleo) e reescreve a `LocationCurve`;
+4. `doc.Regenerate()`;
+5. só **então** abre os recortes dos vazios, com a **mesma**
+   `create_wall_opening_cuts` do modo contínuo (item 8b) — inclusive a
+   folga `OPENING_CUT_EDGE_OVERSHOOT_M` de 1cm, só na aresta que encosta na
+   base/topo da parede;
+6. recria na parede contínua o que estava hospedado
+   (`recreate_wall_inserts`);
+7. `Regenerate` + **valida**;
+8. **só se passar**, apaga as paredes antigas e faz `Commit`.
+
+### Preservação das aberturas
+
+- **Vazios entre trechos** → `Opening` retangular novo, com a posição, a
+  largura, a altura e o peitoril que a geometria dos trechos definia.
+- **`Opening`s que já existiam** nas paredes antigas → recriados na parede
+  contínua com os **mesmos dois cantos** (`Opening.BoundaryRect`). Um
+  `Opening` de contorno **não retangular** reprova a união daquele grupo em
+  vez de ser perdido.
+- **Portas/janelas hospedadas** → recriadas na parede contínua com o mesmo
+  símbolo, o mesmo ponto de inserção, o mesmo Nível, a mesma orientação
+  (facing/hand) e os parâmetros de instância `Largura_abertura`,
+  `Altura_abertura` e `Peitoril` copiados. Sem isso, apagar a parede
+  hospedeira apagaria a porta junto.
+
+### Validar antes de apagar — e nunca deixar estado intermediário
+
+`validate_merged_wall` mede **de volta no próprio Revit**: a parede existe
+e é válida, tem eixo, o comprimento bate, as duas pontas caem onde o plano
+mandou (em planta), base e topo batem, todos os recortes planejados foram
+abertos e nenhuma reinserção falhou — tudo dentro de
+`WALL_MERGE_VALIDATION_TOLERANCE_M = 0.005`.
+
+Cada continuidade roda na **sua própria `Transaction`** (todas dentro de um
+`TransactionGroup`, para o Ctrl+Z desfazer a operação inteira de uma vez).
+Reprovou → `RollBack`: as paredes originais daquela continuidade continuam
+**intactas**, e as demais continuidades seguem normalmente. Se só parte das
+paredes antigas puder ser apagada, também é `RollBack` — parede antiga
+sobrevivente por baixo da contínua seria exatamente a duplicata/sobreposição
+que as regras proíbem.
+
+Uma parede que já está inteira (sozinha no grupo e sem nenhum vazio) **não
+gera plano**: não é recriada nem apagada, só reportada como intocada.
+
+### Depois da união
+
+O fluxo oferece seguir direto para a modulação dos blocos sobre as paredes
+contínuas recém-criadas, reusando `run_modulation_on_existing_walls
+(preselected=...)` — e é isso que permite comparar este caminho com o modo
+contínuo do fluxo do CAD (8b) no mesmo projeto. A modulação em si continua
+idêntica: o solver trabalha sobre os eixos e sobre `openings_per_wall`,
+nunca sobre os elementos `Wall` (fingerprint de `tests/solver_bench.py`
+inalterado).
+
 ## 9. Testes automatizados
 
 `tests/run_tests.py` (`py -3 tests/run_tests.py`, a partir da raiz do
