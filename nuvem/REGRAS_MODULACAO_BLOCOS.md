@@ -1626,3 +1626,29 @@ continuidade lógica entre elas.
   estado (`MODULABLE`, `NON_MODULAR`, `ALIGNMENT_CONFLICT`,
   `VALIDATION_FAILURE` ou `NOT_PROCESSED`) e o motivo concreto mostrado no
   inspetor do visualizador.
+
+## 20. Calculadora manual de alternativas de modulação (2026-08-28)
+
+> **Status**: **IMPLEMENTADO no `AbrirModeladorExterno.pushbutton`** para
+> parede individual e lista de paredes independentes. O motor fica separado
+> da interface e recebe o catálogo exportado do Revit quando há uma captura
+> carregada; sem captura usa o catálogo oficial padrão B54/B39/B34/B19/C09/C04.
+
+- A entrada é comprimento, amarração esquerda/direita, fiada, catálogo,
+  restrições e critério de ordenação. A composição sempre é validada por
+  `soma dos blocos + juntas internas de 1cm`; nunca por soma nominal ou por
+  uma subtração manual de reserva.
+- Uma ponta L/quina exige B34; cruzamento exige B54. Um T sem o papel
+  geométrico declarado apresenta as duas hipóteses possíveis — parede
+  principal com B54 e boneca com B34 — marcadas explicitamente como hipótese,
+  nunca como certeza geométrica.
+- B19 só pode fechar uma ponta livre; não entra no meio nem junto de L/T/X.
+  C09/C04 não podem ser consecutivos e há no máximo um compensador por trecho.
+- Todas as soluções retornadas são classificadas por validade construtiva,
+  número de compensadores/pastilhas/meio-blocos, peças especiais e quantidade
+  total de blocos. A calculadora mostra várias ordens das peças, suas posições
+  e o motivo das hipóteses/rejeições.
+- O modo de lista calcula cada Wall de forma independente. **Otimização global
+  ainda é pendência intencional**: ela só será marcada como resolvida quando a
+  calculadora receber o grafo L/T/X da captura e chamar o solver completo; não
+  pode fingir consistência global com comprimentos isolados.
