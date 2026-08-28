@@ -1,4 +1,4 @@
-# Loader do GitHub — configuração do token
+# Loader do GitHub — senha de acesso e token cifrado
 
 > Este documento explica como configurar a autenticação usada pelo
 > [`Script.py`](Script.py), que agora é apenas um **loader**: ele baixa a
@@ -20,8 +20,10 @@
   `git push` no repositório atualiza instantaneamente qualquer PC que
   clicar no botão depois — sem sincronização manual, e sem precisar tocar
   no loader quando um arquivo novo é adicionado dentro de `core/`.
-- Como o repositório pode ficar **privado**, é exigido um token de
-  acesso (PAT) para o download funcionar.
+- Como os repositórios são **privados**, o download exige um token de
+  acesso (PAT) do GitHub. Só que **o usuário não digita token nenhum**:
+  ele digita apenas uma **senha**, que abre o token já embutido
+  (cifrado) no loader — ver a seção seguinte.
 - **Engine CPython:** a primeira linha de `Script.py` é `#! python3` — o
   botão roda no engine CPython do pyRevit (não mais o IronPython padrão).
   A UI interativa em PySide6 que motivou essa troca foi **removida**
@@ -29,49 +31,112 @@
   qualquer engine, sem nenhuma instalação extra. Isso não muda nada deste
   guia — autenticação/DPAPI funcionam igual nos dois engines.
 
-## Passo a passo — gerar o token (uma vez por computador/usuário)
+## Como funciona a senha (2026-08-28)
+
+Antes, cada pessoa precisava gerar um PAT no GitHub e colá-lo na janela do
+botão. Agora:
+
+1. **Você (mantenedor)** gera **um** token fine-grained de leitura e o
+   cifra com uma senha escolhida por você — uma vez só, ver abaixo.
+2. A linha cifrada (`MB1$...`) vai para dentro do loader, na constante
+   `TOKEN_CIFRADO` (ou no arquivo `token_cifrado.dat`, ao lado do
+   `Script.py`, que tem prioridade sobre a constante).
+3. **O usuário** só digita a **senha**, uma vez por computador. O loader
+   decifra o token em memória, baixa o `core/` e salva o token decifrado
+   com DPAPI — nas próximas execuções nada é perguntado.
+
+> **Limite honesto desta abordagem.** Quem tiver o arquivo do loader **e**
+> souber a senha consegue extrair o token — a senha é um cadeado, não um
+> cofre. É por isso que o PAT usado aqui precisa ser **fine-grained**, com
+> **apenas** `Contents: Read-only`, **apenas** nos dois repositórios dos
+> botões. Mesmo vazando, ele não escreve nada e não alcança mais nada.
+> Sem a senha, o token não é legível: PBKDF2-HMAC-SHA256 com 200 000
+> iterações + HMAC de integridade (ver `ferramentas/cripto_token.py`).
+>
+> A senha aparece **visível** enquanto é digitada: a caixa usada
+> (`Interaction.InputBox`) não tem máscara, e montar um campo de senha de
+> verdade exigiria `Form.Controls.Add`, que está quebrado no engine
+> CPython desta instalação do pyRevit (ver `_patch_pyrevit_forms_for_cpython`
+> no `Script.py`).
+
+## Passo 1 — gerar o token no GitHub (uma vez, só o mantenedor)
 
 1. Acesse, logado como `Arcanjog1`:
    <https://github.com/settings/personal-access-tokens/new>
    (token **fine-grained**, não o clássico).
 2. **Token name:** algo como `pyrevit-loader`.
-3. **Expiration:** escolha um prazo (ex.: 90 dias) ou "No expiration".
-   Prazos mais curtos são mais seguros, mas exigem gerar um token novo
-   periodicamente.
+3. **Expiration:** escolha o prazo. **Atenção:** quando o token expirar,
+   todos os computadores param de baixar atualizações (caem no cache) até
+   o blob ser regerado e o loader redistribuído — prazos longos dão menos
+   trabalho, prazos curtos são mais seguros.
 4. **Resource owner:** `Arcanjog1`.
 5. **Repository access:** "Only select repositories" → selecione
-   `MeuBotao.pushbutton` **e** `AbrirModeladorExterno.pushbutton`.
+   `MeuBotao.pushbutton` **e** `AbrirModeladorExterno.pushbutton`
+   (um único token atende os dois botões).
+6. **Permissions → Repository permissions → Contents:** **Read-only**.
+   Nada além disso.
+7. **Generate token** e copie o valor (`github_pat_...`). Ele só aparece
+   uma vez.
 
-   > Cada botão tem seu próprio repositório desde 2026-08-27 (o antigo
-   > `ModulacaoAutomatica`, que reunia os dois, foi desativado). Um único
-   > token com leitura nos **dois** atende os dois botões — mas cada um
-   > guarda sua própria cópia dele (ver abaixo), então o mesmo valor é
-   > colado duas vezes, uma por botão.
-6. **Permissions → Repository permissions → Contents:** defina como
-   **Read-only**. Nenhuma outra permissão é necessária — não marque
-   nada além disso.
-7. Clique em **Generate token** e copie o valor (começa com
-   `github_pat_...`). **Ele só aparece uma vez** — se perder, é preciso
-   gerar outro.
-8. **Nunca** cole esse token em um chat, e-mail ou qualquer lugar fora
-   da própria caixa de diálogo do Revit/pyRevit. Cole-o **somente** na
-   janela que o botão abre pedindo o token.
+## Passo 2 — cifrar o token com a senha
 
-## O que acontece depois de colar o token
+Na sua máquina (nunca na do usuário final), dentro do repositório:
 
-- O loader salva o token **criptografado** (Windows DPAPI, ligado à
-  conta do Windows do usuário) em:
+```bash
+python3 ferramentas/gerar_token_cifrado.py
+```
+
+Ele pergunta o PAT e a senha (as duas digitadas ocultas) e imprime uma
+linha assim:
+
+```
+MB1$200000$Q2hh...$c2Fs...$Y2lm...$dGFn...
+```
+
+Para conferir depois que já existe um blob:
+
+```bash
+python3 ferramentas/gerar_token_cifrado.py --verificar
+```
+
+## Passo 3 — colocar a linha nos dois loaders
+
+Duas formas (a primeira é a recomendada):
+
+- **No código:** cole em `TOKEN_CIFRADO = "..."` no `Script.py` (deste
+  repositório) **e** no `script.py` do `AbrirModeladorExterno.pushbutton`.
+  Commite e distribua os loaders atualizados para os PCs (o loader é o
+  único arquivo que **não** se atualiza sozinho — ver "Solução de
+  problemas").
+- **Fora do código:** salve a linha num arquivo `token_cifrado.dat` ao
+  lado do loader, em cada PC. Ele tem prioridade sobre a constante e
+  permite trocar o token sem mexer no `Script.py`.
+
+Enquanto `TOKEN_CIFRADO` estiver **vazio** e não houver `token_cifrado.dat`,
+o loader se comporta como antes (tenta baixar sem autenticação e só pede um
+PAT digitado se levar 401/403) — nada quebra antes de o blob existir.
+
+## Passo 4 — passar a senha para as pessoas
+
+Diga a senha **por um canal direto** (pessoalmente, ligação, mensagem
+privada) — não a coloque no repositório, no README nem em comentário de
+código. Ela é pedida uma única vez por computador.
+
+## O que acontece depois de digitar a senha
+
+- O loader decifra o token e o salva **criptografado** (Windows DPAPI,
+  ligado à conta do Windows do usuário) em:
   ```
   %LOCALAPPDATA%\MeuBotaoPushbutton\token.dat
   ```
   (o botão **Abrir Modelador Externo** usa a pasta irmã
   `%LOCALAPPDATA%\AbrirModeladorExternoPushbutton\` — são cofres separados,
-  um por botão, e por isso o token é pedido uma vez em cada.)
-  Ele não é salvo em texto puro e não fica dentro da pasta do
-  repositório/extensão — não há risco de ser commitado por engano.
-- Nas próximas execuções, o loader reusa esse token automaticamente e
-  não pergunta de novo — a menos que o token seja revogado/expire (aí
-  ele detecta o erro 401 e pede um novo).
+  um por botão, e por isso a senha é pedida uma vez em cada.)
+  O token nunca é escrito em texto puro, nem dentro da pasta do
+  repositório/extensão.
+- Nas próximas execuções o loader reusa esse token e não pergunta nada —
+  a menos que ele seja revogado/expire (aí detecta o 401/403, apaga o
+  token salvo e pede a senha de novo).
 - Uma cópia espelhada de todo o pacote `core/` baixado com sucesso fica em
   cache local:
   ```
@@ -83,30 +148,27 @@
   depois que **todos** os arquivos baixarem com sucesso — nunca fica pela
   metade.
 
-## Cada computador/usuário precisa do seu próprio token
+## Trocar a senha ou o token
 
-O token fica salvo por usuário do Windows, então cada pessoa que for
-usar o botão em cada máquina precisa gerar (ou receber com cautela) um
-token próprio com acesso de leitura ao repositório. Adicionar alguém
-como colaborador do repositório no GitHub e pedir que gere seu próprio
-fine-grained PAT é a forma recomendada — evita compartilhar o mesmo
-token entre pessoas.
-
-## Revogar / trocar o token
-
-- **No GitHub:** Settings → Developer settings → Personal access
-  tokens → Fine-grained tokens → localizar o token → "Delete"
-  (revoga imediatamente).
-- **No computador:** apague o arquivo
-  `%LOCALAPPDATA%\ModulacaoAutomatica\token.dat` — o loader vai pedir um
-  token novo na próxima execução.
+- **Trocar a senha:** rode `gerar_token_cifrado.py` de novo com o mesmo
+  token e a senha nova, substitua o blob nos loaders e redistribua. Quem
+  já tiver o token salvo em DPAPI **não** será perguntado de novo (só
+  quem instalar do zero, ou depois que o token expirar).
+- **Revogar o token:** GitHub → Settings → Developer settings → Personal
+  access tokens → Fine-grained tokens → "Delete". Gere outro, cifre e
+  redistribua os loaders.
+- **Forçar um PC a pedir a senha de novo:** apague
+  `%LOCALAPPDATA%\MeuBotaoPushbutton\token.dat` (e o equivalente do outro
+  botão).
 
 ## Solução de problemas
 
 | Sintoma | Causa provável |
 | --- | --- |
-| "Token invalido ou expirado (HTTP 401)" | Token errado, expirado ou revogado. O loader já tenta pedir um novo automaticamente. |
-| "Acesso negado ... (HTTP 403)" | Token sem permissão de `Contents: Read` neste repositório, ou repositório errado no PAT. |
+| "Senha incorreta" | A senha digitada não abre o token cifrado deste loader — confira com o responsável (o loader dá 3 tentativas). |
+| "O token cifrado deste botao esta invalido ou corrompido" | A linha `MB1$...` foi colada pela metade/alterada. Gere de novo com `ferramentas/gerar_token_cifrado.py`. |
+| "Token invalido ou expirado (HTTP 401)" | O token embutido expirou ou foi revogado no GitHub — gere um novo, cifre e redistribua os loaders. |
+| "Acesso negado ... (HTTP 403)" | O token embutido não tem `Contents: Read` neste repositório (ou o repositório não foi marcado no PAT). |
 | "... nao encontrado no repositorio (HTTP 404)" | Caminho/branch mudou no GitHub e não foi atualizado nas constantes `GITHUB_OWNER`/`GITHUB_REPO`/`GITHUB_BRANCH` no topo do [`Script.py`](Script.py). |
 | "A API do GitHub truncou a listagem da arvore..." | O pacote `core/` cresceu além do limite de uma chamada `recursive=1` da API do Git (muito raro) — avise o mantenedor. |
 | Roda uma versão claramente desatualizada, sem erro nenhum | Provavelmente caiu no cache local (sem internet/GitHub fora do ar) — a mensagem de alerta do loader informa isso. |
