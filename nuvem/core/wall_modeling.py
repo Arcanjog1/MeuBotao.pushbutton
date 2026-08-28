@@ -2980,7 +2980,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       variants_per_course=1,
                                       band_cb=None, progress_cb=None,
                                       wall_start_cb=None, wall_result_cb=None,
-                                      stage_cb=None):
+                                      stage_cb=None, opening_strategy=None):
     """Como `solve_building_blocks`, mas roda uma vez POR GRUPO de fiadas
     fisicas com o mesmo conjunto de aberturas ativas (ver
     _group_course_indices_by_opening_band), em vez de resolver so' UMA vez
@@ -3049,6 +3049,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             nodes, walls_to_create, end_to_node, filtered_openings, catalog,
             allow_compensators=allow_compensators, base_z_abs=base_z_abs,
             variants_per_course=variants_per_course,
+            opening_strategy=opening_strategy,
             progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
             stage_cb=stage_cb,
         )
@@ -3276,9 +3277,11 @@ BOND_STRIP_MIN_COURSES = 3
 BOND_STRIP_RATIO = 0.5
 # Zona de excecao local (regra #15/#20): perto da ponta da parede ou de
 # uma abertura, peca especial repetida NAO e' um defeito - e' a funcao
-# normal dela.
-BOND_STRIP_EDGE_EXEMPT_CM = 25.0
-BOND_STRIP_OPENING_INFLUENCE_CM = 60.0
+# normal dela. BOND_STRIP_EDGE_EXEMPT_CM/BOND_STRIP_OPENING_INFLUENCE_CM
+# MOVERAM para core/engine/continuous_modulation.py em 2026-08-28 (a
+# escolha do layout continuo passou a usar o MESMO criterio para decidir
+# ONDE colocar a peca de acerto); chegam aqui por nome solto, via o
+# `import *` da ETAPA 4 acima.
 
 # BUG REAL corrigido (2026-08-25, log de execucao real do usuario): um no'
 # T/X no MEIO de uma parede (a "parede principal" de um T, ou qualquer das
@@ -4913,18 +4916,13 @@ RECTANGLE_PERPENDICULAR_TOLERANCE = 0.05   # mesma escala/ordem de are_lines_par
 RECTANGLE_SIDE_LENGTH_TOLERANCE_M = 0.05
 RECTANGLE_SIDE_LENGTH_TOLERANCE_FT = RECTANGLE_SIDE_LENGTH_TOLERANCE_M * FEET_PER_METER
 
-# Teto (cm) de deslocamento AUTOMATICO de uma abertura - pedido explicito
-# do usuario: acima disso a correcao existe matematicamente mas e' grande
-# demais para aplicar sozinha, o eixo inteiro vai para revisao manual (ver
-# ETAPA 3B mais abaixo, solve_axis_opening_modulation/plan_axis_opening_fix).
-AXIS_OPENING_SHIFT_MAX_CM = 5.0
-
-# Teto (cm) de AUMENTO de largura de abertura - ultimo recurso da ETAPA 3B
-# (ver cabecalho mais abaixo): so' e' tentado quando nem o deslocamento
-# simples nem esticar uma ponta livre da parede resolvem. Pedido explicito
-# do usuario (2026-08-20): NUNCA reduzir, NUNCA passar deste teto, e sempre
-# preferir a menor alteracao possivel dentre as combinacoes validas.
-OPENING_WIDTH_INCREASE_MAX_CM = 5.0
+# AXIS_OPENING_SHIFT_MAX_CM (teto de deslocamento automatico de abertura) e
+# OPENING_WIDTH_INCREASE_MAX_CM (teto de aumento de largura, ultimo recurso
+# da ETAPA 3B) MOVERAM para core/engine/continuous_modulation.py em
+# 2026-08-28: o pipeline "parede completa primeiro" precisa dos MESMOS tetos
+# dentro do motor puro, e duplicar o numero nos dois arquivos e' exatamente
+# como um teto acaba mudando so' num deles. Continuam acessiveis aqui por
+# nome solto, via o `import *` da ETAPA 4 (core.engine.wall_stepper) acima.
 
 # _axis_free_end_sides MOVEU para core/engine/wall_stepper.py (junto com a
 # ETAPA 4/3C) porque find_wall_group_shift_fixes tambem depende dela -
@@ -7052,7 +7050,49 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             # isso. Quando o conflito e' SEM_ESPACO, mostra os DOIS limites do
             # trecho (tipo + posicao bruta) em vez do par lower/upper, que
             # nesse caso e' sempre (0, 0) e nao ajuda.
+            def _opening_adjustment_text(s):
+                """Texto do MENOR ajuste proposto para a(s) abertura(s) de uma
+                regiao que o reparo local nao fechou (secao 22.3). Sem isso, o
+                relatorio diria so' "nao fecha" e o usuario teria de descobrir
+                sozinho de quanto e' o desencontro."""
+                partes = []
+                for item in s.get("opening_adjustment") or []:
+                    plano = item.get("plan")
+                    if plano is None:
+                        partes.append(
+                            "abertura #{}: nenhum ajuste resolve dentro dos limites "
+                            "({:.0f}cm de deslocamento / {:.0f}cm de alargamento) - "
+                            "revisao manual".format(
+                                item["opening_index"],
+                                AXIS_OPENING_SHIFT_MAX_CM, OPENING_WIDTH_INCREASE_MAX_CM)
+                        )
+                    elif plano["kind"] == "shift":
+                        partes.append("abertura #{}: deslocar {:+.1f}cm".format(
+                            item["opening_index"], plano["delta_cm"]))
+                    elif plano["kind"] == "widen":
+                        partes.append("abertura #{}: alargar {:.1f}cm/{:.1f}cm".format(
+                            item["opening_index"], plano["delta_left_cm"],
+                            plano["delta_right_cm"]))
+                return "; ".join(partes)
+
             def _seg_desc_one(s):
+                # ABERTURA_NAO_COMPATIVEL (2026-08-28, secao 22): a modulacao
+                # CONTINUA fechou, mas a posicao do vao nao coincide com
+                # nenhuma junta e nem o recalculo local da regiao resolveu.
+                # O par lower/upper nao diz nada aqui (o trecho e' a regiao,
+                # nao um pilarete) - o que ajuda e' onde esta' a regiao e de
+                # quanto seria o menor ajuste.
+                if s.get("conflict") == "ABERTURA_NAO_COMPATIVEL":
+                    ajuste = _opening_adjustment_text(s)
+                    return (
+                        "abertura(s) {} incompativel(is) com a modulacao (fiada {}), "
+                        "regiao t={:.1f}..{:.1f}cm{}"
+                    ).format(
+                        ", ".join("#%d" % oi for oi in (s.get("opening_indexes") or []))
+                        or "?",
+                        s["course"], float(s["seg_start_cm"]), float(s["seg_end_cm"]),
+                        " - " + ajuste if ajuste else "",
+                    )
                 if s.get("conflict") == "SEM_ESPACO":
                     return (
                         "trecho #{} (fiada {}) SEM ESPACO: limite esquerdo {} em t={:.1f}cm, "
@@ -8896,6 +8936,33 @@ ZOOM_TO_ERROR_MARGIN_M = 2.5
 ZOOM_TO_ERROR_MARGIN_FT = ZOOM_TO_ERROR_MARGIN_M * FEET_PER_METER
 
 
+def describe_non_modular_entry(entry):
+    """Uma linha dizendo o que ha' de errado com UMA entrada de
+    `non_modular`, sem prefixo (parede/fiada ficam a cargo de quem chama).
+
+    Existe porque o pipeline "parede completa primeiro" (secao 22) trouxe um
+    segundo TIPO de entrada: ABERTURA_NAO_COMPATIVEL nao e' "este pilarete
+    tem Xcm e o mais proximo que fecha e' Ycm" - e' "a modulacao continua
+    fechou, mas a posicao do vao nao coincide com nenhuma junta". Formatar
+    as duas com o mesmo texto imprimia "mais proximo que fecha: 0cm", que
+    nao significa nada."""
+    if entry.get("conflict") == "ABERTURA_NAO_COMPATIVEL":
+        aberturas = ", ".join("#%d" % oi for oi in (entry.get("opening_indexes") or []))
+        return "abertura(s) {} incompativel(is) com a modulacao (regiao t={:.1f}..{:.1f}cm)".format(
+            aberturas or "?", float(entry.get("seg_start_cm") or 0.0),
+            float(entry.get("seg_end_cm") or 0.0),
+        )
+    if entry.get("conflict") == "SEM_ESPACO":
+        return "trecho {} sem espaco fisico ({:.1f}cm entre {} e {})".format(
+            entry.get("segment_index"), float(entry.get("current_length_cm") or 0.0),
+            entry.get("left_kind"), entry.get("right_kind"),
+        )
+    return "trecho {}: {:.1f}cm (mais proximo que fecha em blocos: {}cm)".format(
+        entry.get("segment_index"), float(entry.get("current_length_cm") or 0.0),
+        entry.get("lower_valid_cm"),
+    )
+
+
 def _format_block_solve_report(result, catalog):
     """Texto do relatorio do passo "Lancar Blocos" (solver) - contagem por
     peca (com % de B39, o indicador de eficiencia do preenchimento comum
@@ -8965,13 +9032,8 @@ def _format_block_solve_report(result, catalog):
     non_modular = result["non_modular"]
     lines.append("Trechos NAO-MODULARES (nenhuma combinacao de blocos fecha): {}".format(len(non_modular)))
     for entry in non_modular[:15]:
-        lines.append(
-            "  - parede {} / fiada {} / trecho {}: {:.1f}cm (mais proximo que fecha "
-            "em blocos: {}cm)".format(
-                entry["wall_idx"], entry["course"], entry["segment_index"],
-                entry["current_length_cm"], entry["lower_valid_cm"]
-            )
-        )
+        lines.append("  - parede {} / fiada {} / {}".format(
+            entry["wall_idx"], entry["course"], describe_non_modular_entry(entry)))
     if len(non_modular) > 15:
         lines.append("  - ... e mais {}.".format(len(non_modular) - 15))
 
@@ -11092,12 +11154,8 @@ class _PostCreationForm(Form):
                 ])
         for entry in (solve_result.get("non_modular") or []):
             problem_walls.setdefault(entry["wall_idx"], []).append(
-                "trecho nao-modular: fiada {} trecho {} ({:.1f}cm, mais proximo que fecha: "
-                "{}cm)".format(
-                    entry["course"], entry["segment_index"],
-                    entry["current_length_cm"], entry["lower_valid_cm"]
-                )
-            )
+                "modulacao nao fecha: fiada {} - {}".format(
+                    entry["course"], describe_non_modular_entry(entry)))
         for failure_text in (create_result.get("failures") or []):
             problem_walls.setdefault("?", []).append(str(failure_text))
 

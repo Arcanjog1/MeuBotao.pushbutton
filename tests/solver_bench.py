@@ -64,7 +64,16 @@ m = load_script.load()
 F = m.FEET_PER_METER
 
 # Assinatura esperada dos SCENARIOS abaixo - ver o docstring do modulo.
-REFERENCE_FINGERPRINT = "9413aad03627387d3a3ca548ab6705ee76bf36bf027ca2debb54f6dc5b28e88d"
+#
+# ATUALIZADA EM 2026-08-28 (de 9413aad0... para c74c9c1a...) por uma mudanca
+# de REGRA INTENCIONAL, nao por uma otimizacao: o pipeline de aberturas
+# passou a ser "parede completa -> modulacao completa -> recorte das
+# aberturas -> remocao dos blocos conflitantes -> ajuste minimo" (secao 22
+# de nuvem/REGRAS_MODULACAO_BLOCOS.md, pedido explicito do usuario). As
+# pecas MUDAM de posicao e de tipo de proposito - medido nos mesmos
+# cenarios: peca de amarracao (B34/B54) usada como enchimento 2460 -> 0,
+# bloco inteiro B39 9587 -> 11570, compensador 1200 -> 1924.
+REFERENCE_FINGERPRINT = "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316"
 
 # Pe-direito tipico do projeto: 3,00m / 20cm por fiada = 15 fiadas fisicas.
 NUM_COURSES = 15
