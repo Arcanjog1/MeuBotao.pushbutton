@@ -3233,7 +3233,38 @@ BOND_ALTERNATING_JOINT_RATIO = 0.6
 # NAO basta (e' exatamente o bug original: 100% de repeticao dentro da
 # paridade sempre que a banda tem >=1 vao); K=3 e' o menor K>=3 (a
 # constante so' tem efeito pratico a partir dai) com margem confortavel.
-PIER_LAYOUT_VARIANTS_PER_COURSE = 3
+#
+# REVERTIDO PARA K=1 EM 2026-08-28 (regra 18.4, pedido explicito do usuario
+# a partir de prints do modelo real): "Fiada 1 deve ser o mais semelhante
+# possivel a' Fiada 3... o sistema nao deve gerar uma solucao completamente
+# diferente para cada fiada se nao houver uma razao geometrica ou uma regra
+# especifica que exija isso". O rodizio K=3 fazia exatamente o contrario, de
+# proposito - as 15 fiadas do projeto real usavam as variantes
+# 0,0,1,1,2,2,0,0,1,1,2,2,0,0,1, entao a fiada 1 NUNCA era igual a' 3.
+#
+# A razao original de K>1 (escapar de ALTERNATING_JOINT_PATTERN) CAIU: essa
+# checagem deixou de bloquear em `abb46b5` (ver secao 11.5) porque, sob esta
+# arquitetura, ela e' tautologicamente verdadeira - e' o proprio
+# funcionamento correto de fiadas alternadas, nao um defeito. O defeito real
+# (a MESMA junta nas DUAS paridades) e' coberto por
+# CONTINUOUS_VERTICAL_JOINT, que continua bloqueando.
+#
+# Medido ao vivo via MCP no projeto real (126 paredes, 15 fiadas) ao trocar
+# K=3 por K=1: junta corrida 95 -> 80 (MELHOROU - e' a regra #1, absoluta),
+# faixa de compensador repetida 28 -> 108 (piorou), paredes reprovadas na
+# amarracao 61 -> 65. Com K=1 a fiada 2 passa a ser IDENTICA a' 4, e as
+# fiadas 0 e 2 diferem em UMA unica peca - diferenca que vem das BANDAS de
+# abertura (secao 4: fiadas com conjuntos diferentes de vao ativo sao
+# resolvidas separadamente), ou seja, exatamente a "razao geometrica" que a
+# propria regra 18.4 admite como excecao.
+#
+# TRADE-OFF REGISTRADO (secao 18.4): a faixa vertical de compensador
+# repetida e' consequencia direta de repetir o layout, e continua sendo
+# reportada pela auditoria para revisao manual. A solucao fina - variar a
+# composicao APENAS nos trechos que usam compensador, mantendo o resto
+# repetido - fica como pendencia; a orientacao mais recente do usuario
+# (repetir) tem prioridade sobre a otimizacao anterior.
+PIER_LAYOUT_VARIANTS_PER_COURSE = 1
 
 # Peca especial (B34/B54/B19/compensador) repetindo na mesma regiao X: a
 # tolerancia e' maior que a de junta (BOND_JOINT_CLUSTER_TOLERANCE_CM)
@@ -5781,6 +5812,120 @@ def _build_axis_opening_plan(wall_idx, axis, matched, solution, width_deltas_cm,
             "length_delta_cm": (end_t - start_t - axis_len_ft) * ft_to_cm,
             "axis_start_t_ft": start_t, "axis_end_t_ft": end_t,
             "new_openings": new_openings, "new_piers": new_piers}
+
+
+# Deslocamento MAXIMO (cm) que o ajuste POR PILARETE (regra 18.2) pode
+# pedir de uma borda de abertura. Bem menor que AXIS_OPENING_SHIFT_MAX_CM
+# (5cm, do ajuste do eixo inteiro): aqui a intencao do usuario e' o
+# "empurrao" minimo - "deslocar uma das portas 1 cm para um dos lados".
+PIER_NUDGE_MAX_CM = 3.0
+
+
+def _pier_bounds_from_non_modular(entry):
+    """(inicio_cm, fim_cm) do trecho descrito por uma entrada de
+    `non_modular` (ver solve_wall_free_fill)."""
+    return entry.get("seg_start_cm"), entry.get("seg_end_cm")
+
+
+def plan_pier_opening_nudges(wall_idx, walls_to_create, openings_per_wall, catalog,
+                             nodes, end_to_node, max_nudge_cm=PIER_NUDGE_MAX_CM):
+    """REGRA 18.2 (2026-08-28, pedido explicito do usuario): o pilarete
+    entre duas aberturas e' analisado POR SI, nao como sobra do prisma geral
+    da parede - e, quando falta pouco para ele fechar, propoe o menor
+    deslocamento possivel de uma borda de abertura adjacente ("deslocar uma
+    das portas 1 cm para um dos lados").
+
+    Devolve `{"wall_idx", "nudges": [...], "reason"}` ou None quando nao ha'
+    nada a propor. Cada nudge e'
+    `{"seg_start_cm", "seg_end_cm", "atual_cm", "alvo_cm", "delta_cm",
+    "lado"}` - `lado` e' "inicio" ou "fim" do trecho, indicando QUAL borda
+    precisa andar, e `delta_cm` e' com sinal (positivo = a borda anda no
+    sentido de AUMENTAR o trecho).
+
+    Esta funcao NUNCA aplica nada e NUNCA levanta excecao - so' calcula.
+
+    Por que ela existe, tendo `plan_axis_opening_fix`: aquele planejador
+    trabalha no EIXO INTEIRO e desiste com "topologia do eixo fora do escopo
+    do ajuste automatico" sempre que uma abertura encosta na ponta/juncao.
+    Medido ao vivo via MCP em 2026-08-28: as 77 aberturas do projeto real
+    encostam na ponta do seu segmento, entao NENHUM eixo com abertura
+    conseguia plano - 0 auto-corrigiveis em 72 eixos com erro. O ajuste por
+    pilarete nao depende da topologia do eixo: ele olha um trecho de cada
+    vez e o que o cerca."""
+    try:
+        aberturas = openings_for_wall(openings_per_wall, wall_idx)
+        if not aberturas:
+            return None
+        node_by_end = _index_node_candidates_by_wall_end(
+            nodes, [], walls_to_create, end_to_node) if nodes is not None else {}
+        fill = solve_wall_free_fill(
+            wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
+            node_by_end, {}, catalog,
+        )
+    except Exception:
+        return None
+
+    nao_fecham = fill.get("non_modular") or []
+    if not nao_fecham:
+        return None
+
+    # Bordas de abertura deste eixo, em cm ao longo do eixo.
+    bordas = []
+    for op in aberturas:
+        bordas.append(op[0] / FEET_PER_METER * 100.0)
+        bordas.append(op[1] / FEET_PER_METER * 100.0)
+
+    vistos = set()
+    nudges = []
+    for entry in nao_fecham:
+        ini, fim = _pier_bounds_from_non_modular(entry)
+        if ini is None or fim is None:
+            continue
+        chave = (round(ini, 1), round(fim, 1))
+        if chave in vistos:
+            continue          # o mesmo trecho aparece em varias fiadas/variantes
+        vistos.add(chave)
+
+        atual = entry.get("current_length_cm")
+        lower = entry.get("lower_valid_cm")
+        upper = entry.get("upper_valid_cm")
+        if atual is None or (lower is None and upper is None):
+            continue
+        # menor alteracao que faz o trecho fechar
+        candidatos = []
+        if lower is not None:
+            candidatos.append(lower - atual)      # negativo: encolher
+        if upper is not None:
+            candidatos.append(upper - atual)      # positivo: crescer
+        delta = min(candidatos, key=abs)
+        if abs(delta) > max_nudge_cm + 1e-6:
+            continue                              # falta demais para um empurrao
+
+        # Qual das duas pontas do trecho e' borda de ABERTURA (a unica que
+        # pode andar - um no' de amarracao nunca se move por aqui).
+        tol = OPENING_ALIGNED_TOUCH_TOLERANCE_CM
+        ini_e_abertura = any(abs(ini - b) <= tol for b in bordas)
+        fim_e_abertura = any(abs(fim - b) <= tol for b in bordas)
+        if fim_e_abertura:
+            lado = "fim"
+        elif ini_e_abertura:
+            lado = "inicio"
+        else:
+            continue                              # trecho entre dois nos: fora do escopo
+        nudges.append({
+            "seg_start_cm": ini, "seg_end_cm": fim,
+            "atual_cm": atual, "alvo_cm": atual + delta,
+            "delta_cm": delta, "lado": lado,
+        })
+
+    if not nudges:
+        return None
+    return {
+        "wall_idx": wall_idx,
+        "nudges": nudges,
+        "reason": "{} pilarete(s) fecham deslocando uma borda de abertura em ate {:.1f}cm".format(
+            len(nudges), max(abs(n["delta_cm"]) for n in nudges)),
+    }
 
 
 def plan_axis_opening_fix(target_doc, wall_idx, walls_to_create, openings_per_wall,

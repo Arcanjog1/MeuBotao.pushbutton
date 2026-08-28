@@ -1422,7 +1422,21 @@ não esteja em `created_instances`.
 
 ### 18.2 — Pilarete entre duas portas é modulado de forma independente
 
-- **Status**: `DOCUMENTADO — pendência de código aberta.`
+- **Status**: **IMPLEMENTADO (2026-08-28)** — `plan_pier_opening_nudges`
+  (`core/wall_modeling.py`) + `PIER_NUDGE_MAX_CM = 3.0`. Teste:
+  `test_pilarete_entre_aberturas_propoe_deslocamento_pequeno`.
+- **Causa-raiz do que faltava**: `plan_axis_opening_fix` trabalha no EIXO
+  INTEIRO e desiste com "topologia do eixo fora do escopo do ajuste
+  automático" sempre que uma abertura encosta na ponta/junção. Medido ao
+  vivo: as 77 aberturas do projeto real encostam na ponta do seu segmento,
+  então **nenhum** eixo com abertura conseguia plano — 0 auto-corrigíveis
+  em 72 eixos com erro. O novo planejador não depende da topologia do
+  eixo: olha um trecho por vez e o que o cerca. Resultado medido: **7
+  eixos passaram a ter proposta**, com deslocamentos de 1 a 2cm.
+- **Escopo**: só propõe mover uma borda que seja de ABERTURA (um nó de
+  amarração nunca se move por aqui) e só até `PIER_NUDGE_MAX_CM` — o
+  "empurrão" mínimo que o usuário descreveu, bem abaixo dos 5cm do ajuste
+  de eixo inteiro. Calcula, nunca aplica.
 - **Regra**: o trecho entre duas aberturas tem de ser resolvido **por si**,
   não como sobra do prisma geral da parede. Um pilarete de ~50cm deve
   buscar a melhor combinação para aquele trecho (ex.: B39 + C09 com as
@@ -1447,7 +1461,20 @@ não esteja em `created_instances`.
 
 ### 18.4 — Padronização das fiadas: ímpares iguais entre si, pares iguais entre si
 
-- **Status**: `PARCIAL — regride hoje por causa de variants_per_course.`
+- **Status**: **IMPLEMENTADO (2026-08-28)** —
+  `PIER_LAYOUT_VARIANTS_PER_COURSE` voltou de 3 para **1**. Teste:
+  `test_fiadas_de_mesma_paridade_repetem_com_o_default`.
+- **Medição da troca K=3 → K=1** no projeto real (126 paredes, 15 fiadas):
+  junta corrida **95 → 80** (melhorou — é a regra #1, absoluta), faixa de
+  compensador repetida **28 → 108** (piorou), paredes reprovadas na
+  amarração 61 → 65. A fiada 2 passou a ser **idêntica** à 4; as fiadas 0 e
+  2 diferem em **uma única peça**, e essa diferença vem das BANDAS de
+  abertura (seção 4) — ou seja, exatamente a "razão geométrica" que a
+  própria regra admite como exceção.
+- **TRADE-OFF REGISTRADO**: a faixa vertical de compensador repetida é
+  consequência direta de repetir o layout, e segue sendo reportada pela
+  auditoria. A solução fina — variar a composição APENAS nos trechos que
+  usam compensador, mantendo o resto repetido — fica como pendência.
 - **Regra**: Fiada 1 ≡ Fiada 3 ≡ Fiada 5…, e Fiada 2 ≡ Fiada 4 ≡ Fiada 6…
   Dois padrões alternados (A e B), repetidos até o topo. O sistema não
   deve inventar uma solução diferente por fiada sem uma razão geométrica
@@ -1474,8 +1501,21 @@ não esteja em `created_instances`.
 
 ### 18.6 — Transição B34 para B39 exige olhar a fiada seguinte
 
-- **Status**: `DOCUMENTADO — pendência de código aberta.` Hoje o solver
-  resolve UM par A/B por vez; não existe look-ahead vertical.
+- **Status**: **IMPLEMENTADO (2026-08-28)** —
+  `_layout_min_joint_stagger_cm` + `MIN_JOINT_STAGGER_TARGET_CM = 10.0`
+  (`core/engine/wall_stepper.py`), como critério de desempate em
+  `_pier_layout_avoiding_joints`. Teste:
+  `test_desempate_prefere_a_composicao_que_trava_melhor`.
+- **Como foi resolvido**: o que faltava não era prever a fiada seguinte, e
+  sim medir o TRAVAMENTO. Duas composições podem ter zero coincidência de
+  junta (as duas passam na regra #1) e ainda assim uma travar muito melhor
+  que a outra — a que deixa a junta mais longe da junta oposta é a que
+  "permite a continuidade do prisma". O score agora é
+  `(excesso_de_compensador, coincidência_de_junta, -travamento,
+  -alinhamento_de_vazio)`, com o travamento saturando no alvo de 10cm.
+- **Valor do alvo**: conservador de propósito, abaixo dos ~15cm medidos num
+  projeto real (seção 10.6), que continuam rotulados como PADRÃO OBSERVADO
+  AINDA NÃO CONFIRMADO. É preferência, nunca bloqueio.
 - **Regra**: a troca de B34 para B39 só pode acontecer quando a próxima
   fiada tiver vão suficiente para o B39 encaixar mantendo a continuidade
   do prisma. O procedimento é: ler a posição do B34 na fiada atual →

@@ -83,6 +83,7 @@ __all__ = [
     "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
     "_layout_internal_joint_positions_cm", "_count_joint_coincidences_cm",
+    "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
     "_half_block_leading_layout", "_pier_forced_bypass_layouts",
@@ -3248,6 +3249,46 @@ def _layout_compensator_run_excess(layout, catalog):
     return excess + max(0, run - 1)
 
 
+# Afastamento (cm) que se BUSCA entre uma junta desta fiada e a junta mais
+# proxima da fiada oposta - o "travamento" vertical do prisma. Nao e' um
+# bloqueio: e' o alvo a partir do qual a composicao ja' e' considerada boa o
+# bastante, usado como criterio de DESEMPATE em `_pier_layout_avoiding_
+# joints` (regra 18.6). Conservador de proposito, abaixo dos ~15cm medidos
+# num projeto real (secao 10.6), que ainda estao rotulados como PADRAO
+# OBSERVADO AINDA NAO CONFIRMADO.
+MIN_JOINT_STAGGER_TARGET_CM = 10.0
+
+
+def _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid_positions_cm):
+    """Menor distancia entre uma junta INTERNA de `layout` e a junta mais
+    proxima da fiada oposta (`avoid_positions_cm`). Quanto MAIOR, melhor o
+    travamento vertical: e' o quanto o bloco de cima "monta" sobre a junta
+    de baixo antes de terminar.
+
+    Devolve `None` quando nao ha' com o que comparar (trecho de uma peca so,
+    ou fiada oposta sem junta interna).
+
+    REGRA 18.6 (2026-08-28, pedido do usuario): "a transicao entre um bloco
+    de 34cm e um bloco de 39cm nao pode acontecer de forma aleatoria... so'
+    deve ocorrer quando existir espaco suficiente na proxima fiada para que
+    o bloco de 39cm seja encaixado corretamente e permita a continuidade do
+    prisma". Duas composicoes podem ter ZERO coincidencia de junta (as duas
+    passam na regra #1) e ainda assim uma travar muito melhor que a outra -
+    e' esse o criterio que faltava."""
+    if not avoid_positions_cm:
+        return None
+    juntas = _layout_internal_joint_positions_cm(layout, seg_start_cm)
+    if not juntas:
+        return None
+    menor = None
+    for pos in juntas:
+        for outra in avoid_positions_cm:
+            d = abs(pos - outra)
+            if menor is None or d < menor:
+                menor = d
+    return menor
+
+
 def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
                                  seg_start_cm, avoid_positions_cm,
                                  allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -3353,12 +3394,21 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
         align = _count_void_alignment_cm(
             _layout_void_positions_cm(layout, catalog, seg_start_cm), target_void_positions_cm
         ) if target_void_positions_cm else 0
-        return (comp_excess, joint_coinc, -align)
+        # REGRA 18.6: entre candidatos que ja' empataram nos criterios
+        # acima (mesma violacao da regra #2, mesma coincidencia de junta),
+        # prefere o que TRAVA melhor - a junta mais proxima da fiada oposta
+        # o mais longe possivel. Satura em MIN_JOINT_STAGGER_TARGET_CM:
+        # passar disso nao e' melhor, so' diferente, e continuar premiando
+        # empurraria o layout para extremos sem ganho construtivo.
+        stagger = _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid_positions_cm)
+        trava = MIN_JOINT_STAGGER_TARGET_CM if stagger is None else min(
+            stagger, MIN_JOINT_STAGGER_TARGET_CM)
+        return (comp_excess, joint_coinc, -trava, -align)
 
     best = baseline
     best_score = _score(baseline)
     max_align = len(target_void_positions_cm) if target_void_positions_cm else 0
-    perfect_score = (0, 0, -max_align)
+    perfect_score = (0, 0, -MIN_JOINT_STAGGER_TARGET_CM, -max_align)
     if best_score == perfect_score:
         return best
 

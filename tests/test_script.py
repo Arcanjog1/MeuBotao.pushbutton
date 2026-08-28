@@ -1804,9 +1804,14 @@ def test_solve_building_blocks_all_courses_variantes_evitam_alternating_joint_pa
     # abaixo, que confere que a variacao extra FAZ a lista ficar vazia.
     assert old_audit["alternating_joints"], old_audit["problems"]
 
+    # ATUALIZADO 2026-08-28 (regra 18.4): o default voltou a ser K=1 por
+    # pedido explicito do usuario - "a Fiada 1 deve ser o mais semelhante
+    # possivel a' Fiada 3". Para continuar exercitando o MECANISMO de
+    # variacao (que a constante deixou de acionar por padrao, mas que segue
+    # existindo e sendo usavel), este trecho passa K=3 explicitamente.
     new = m.solve_building_blocks_all_courses(
         nodes, walls, end_to_node, openings_per_wall, CATALOG, ft(0.0), num_courses,
-        variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE,
+        variants_per_course=3,
     )
     assert new["error"] is None
     new_audit = new["wall_bond_audits"][0]
@@ -5417,3 +5422,101 @@ def test_preenchimento_que_invade_amarracao_e_descartado():
         "T_INTERSECTION_MAIN", node_index=2, wall_idx=0)
     mantidas3, descartadas3 = m._drop_fill_colliding_with_ties([tie, tie2])
     assert len(mantidas3) == 2 and descartadas3 == [], descartadas3
+
+
+# ---- regra 18.4: fiadas de mesma paridade repetem (K=1) ----
+@case
+def test_fiadas_de_mesma_paridade_repetem_com_o_default():
+    """Regra 18.4 (2026-08-28, pedido explicito do usuario a partir de
+    prints do modelo real): "Fiada 1 deve ser o mais semelhante possivel a'
+    Fiada 3; Fiada 2 ... a' Fiada 4". O default
+    `PIER_LAYOUT_VARIANTS_PER_COURSE` voltou a 1 justamente para isso - com
+    K=3 as fiadas usavam as variantes 0,0,1,1,2,2,... e a fiada 1 NUNCA era
+    igual a' 3."""
+    assert m.PIER_LAYOUT_VARIANTS_PER_COURSE == 1, m.PIER_LAYOUT_VARIANTS_PER_COURSE
+
+    walls = [(seg(0, 0, 399, 0), ft(14.0), (False, False))]
+    walls, junction_map = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, junction_map)
+    res = m.solve_building_blocks_all_courses(
+        nodes, walls, end_to_node, [[]], CATALOG, ft(0.0), 15,
+    )
+    assert res["error"] is None
+    cc = res["course_candidates"]
+
+    def assinatura(ci):
+        return sorted(
+            (c["logical_code"], round(c["origin_world"].X, 3), round(c["origin_world"].Y, 3))
+            for c in cc[ci]
+        )
+
+    # sem abertura nenhuma nao ha' banda diferente: as fiadas de mesma
+    # paridade tem de sair IDENTICAS, peca por peca e posicao por posicao.
+    for ci in (2, 4, 6, 8, 10, 12, 14):
+        assert assinatura(ci) == assinatura(0), "fiada {} difere da fiada 0".format(ci)
+    for ci in (3, 5, 7, 9, 11, 13):
+        assert assinatura(ci) == assinatura(1), "fiada {} difere da fiada 1".format(ci)
+
+    # e as duas paridades continuam DIFERENTES entre si (a amarracao
+    # depende disso - se A e B fossem iguais, a junta seria corrida).
+    assert assinatura(0) != assinatura(1)
+
+
+# ---- regra 18.6: transicao entre pecas trava o prisma ----
+@case
+def test_desempate_prefere_a_composicao_que_trava_melhor():
+    """Regra 18.6 (2026-08-28): duas composicoes podem ter ZERO
+    coincidencia de junta (as duas passam na regra #1) e ainda assim uma
+    travar muito melhor que a outra. O desempate agora olha o AFASTAMENTO
+    da junta mais proxima da fiada oposta - "so' permitir a transicao se o
+    bloco puder ser corretamente encaixado e permitir a continuidade do
+    prisma"."""
+    # junta interna em 39,5cm (dois B39 de 39cm com junta de 1cm)
+    layout = [("B39", 0.0, 39.0), ("B39", 40.0, 79.0)]
+    assert m._layout_internal_joint_positions_cm(layout, 0.0) == [39.5]
+
+    # fiada oposta com junta em 20cm -> afastamento de 19,5cm (trava bem)
+    assert abs(m._layout_min_joint_stagger_cm(layout, 0.0, [20.0]) - 19.5) < 1e-6
+    # fiada oposta com junta em 37cm -> afastamento de 2,5cm (trava mal)
+    assert abs(m._layout_min_joint_stagger_cm(layout, 0.0, [37.0]) - 2.5) < 1e-6
+    # pega o MENOR afastamento quando ha varias juntas opostas
+    assert abs(m._layout_min_joint_stagger_cm(layout, 0.0, [20.0, 37.0]) - 2.5) < 1e-6
+
+    # sem com o que comparar: None (nunca quebra o chamador)
+    assert m._layout_min_joint_stagger_cm(layout, 0.0, []) is None
+    assert m._layout_min_joint_stagger_cm([("B39", 0.0, 39.0)], 0.0, [20.0]) is None
+
+
+# ---- regra 18.2: pilarete entre aberturas propoe o proprio ajuste ----
+@case
+def test_pilarete_entre_aberturas_propoe_deslocamento_pequeno():
+    """Regra 18.2 (2026-08-28): o trecho entre duas aberturas e' analisado
+    POR SI. Quando falta pouco, propoe deslocar uma borda de abertura -
+    "deslocar uma das portas 1 cm para um dos lados". Diferente de
+    `plan_axis_opening_fix`, que desiste do EIXO INTEIRO quando a topologia
+    nao bate (medido: com as 77 aberturas do projeto real encostando na
+    ponta do segmento, nenhum eixo conseguia plano)."""
+    # eixo de 400cm com duas aberturas, deixando um pilarete no meio
+    walls = [(seg(0, 0, 400, 0), ft(14.0), (False, False))]
+    walls, junction_map = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, junction_map)
+    # (t_inicio, t_fim, peitoril, topo) em pes - duas portas
+    openings_per_wall = [[
+        (ft(80.0), ft(160.0), ft(0.0), ft(210.0)),
+        (ft(240.0), ft(320.0), ft(0.0), ft(210.0)),
+    ]]
+
+    plano = m.plan_pier_opening_nudges(
+        0, walls, openings_per_wall, CATALOG, nodes, end_to_node)
+    # pode ou nao haver proposta (depende da aritmetica do trecho), mas a
+    # funcao nunca pode levantar excecao nem devolver formato invalido
+    if plano is not None:
+        assert plano["wall_idx"] == 0
+        assert plano["nudges"]
+        for n in plano["nudges"]:
+            assert n["lado"] in ("inicio", "fim"), n
+            assert abs(n["delta_cm"]) <= m.PIER_NUDGE_MAX_CM + 1e-6, n
+            assert abs((n["atual_cm"] + n["delta_cm"]) - n["alvo_cm"]) < 1e-6, n
+
+    # eixo SEM abertura nenhuma: nada a propor, nunca quebra
+    assert m.plan_pier_opening_nudges(0, walls, [[]], CATALOG, nodes, end_to_node) is None
