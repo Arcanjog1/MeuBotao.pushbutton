@@ -2019,6 +2019,40 @@ melhor uma solução pior e rotulada do que nenhuma solução. Isso **não** é 
 lógica anterior de volta: ela nunca é o caminho principal, e nunca acontece
 em silêncio.
 
+### 23.5b A ordem vale para a GEOMETRIA também, não só para o solver
+
+**REGRA OBRIGATÓRIA — correção do usuário, medida ao vivo (2026-08-28).** Na
+primeira execução real deste pipeline via MCP, as 128 paredes foram criadas
+**já com os 77 recortes de abertura**, na mesma transação, antes de existir um
+único bloco — e só depois a modulação foi resolvida. O usuário interrompeu:
+*"você gerou as paredes com recortes sem lançar os blocos antes"*.
+
+Estava certo. Ter o solver na ordem nova não basta: a ordem é do **processo
+inteiro**, e a geometria de referência (as `Wall` e seus `Opening`) faz parte
+dela. A sequência obrigatória ao gerar no Revit é:
+
+1. criar as paredes **completas** — `build_wall_segments(...,
+   WALL_BUILD_MODE_CONTINUOUS)`, altura cheia, **sem chamar
+   `create_wall_opening_cuts`**;
+2. resolver a modulação (`solve_building_blocks_all_courses`) e **lançar os
+   blocos** (`create_building_blocks`);
+3. **só então** abrir os recortes (`create_wall_opening_cuts`) sobre as
+   paredes já moduladas;
+4. validar que nenhum bloco ocupa o vão.
+
+`build_wall_opening_cuts` (que só CALCULA os retângulos) pode rodar antes — é
+`create_wall_opening_cuts` (que ESCREVE no modelo) que precisa esperar. O
+requisito antigo de recortar depois do realinhamento pelo núcleo (seção 8b)
+continua valendo: agora ele é o piso, não o teto — o recorte vem depois do
+núcleo **e** depois dos blocos.
+
+Por que importa, mesmo o solver já ignorando os recortes: com a parede
+recortada antes, qualquer etapa que leia a geometria REAL (a prévia, a
+validação pós-criação, `evaluate_wall_modulation`, o realce por comprimento)
+enxerga a parede já fragmentada pelo vão — exatamente o estado que a nova
+ordem existe para evitar. A parede inteira tem de existir no modelo enquanto
+os blocos são decididos.
+
 ### 23.6 O que foi MEDIDO (não suposto)
 
 Varredura de 481 combinações reais (eixo de 300 a 800cm × posição de porta de
