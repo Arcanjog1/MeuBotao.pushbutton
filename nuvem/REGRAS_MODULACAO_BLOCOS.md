@@ -1804,10 +1804,16 @@ continuidade lógica entre elas.
   fragmentos colineares de origem, todos são transformados na mesma razão
   paramétrica, impedindo fendas entre fragmentos.
 - Aberturas hospedadas acompanham a alteração da Wall na mesma posição
-  relativa ao eixo. Uma abertura arrastada manualmente só pode permanecer
-  inteiramente dentro da sua hospedeira; sua largura também pode ser
-  alterada dentro desse limite. A edição explícita não é revertida só por
-  piorar a pontuação do solver.
+  relativa ao eixo. Uma abertura arrastada ou editada numericamente só pode
+  permanecer inteiramente dentro do prisma da sua hospedeira. Posição no
+  eixo, largura, altura e peitoril são propriedades explícitas do usuário e
+  devem ser validadas em conjunto, de forma atômica. A edição explícita não
+  é revertida só por piorar a pontuação do solver; uma geometria válida que
+  não module deve permanecer aplicada e expor o diagnóstico correspondente.
+- Mover, redimensionar, duplicar ou excluir uma abertura e regenerar seus
+  blocos constitui **uma única operação de histórico**. Desfazer/refazer
+  restaura juntos a captura editada e o resultado calculado, sem deixar
+  blocos pertencentes a uma revisão anterior.
 - Toda edição válida chama o **mesmo** `solve_capture_block_candidates` da
   modulação inicial. Não há um algoritmo simplificado para pós-edição:
   portas, vãos, vergas, quinas, amarrações, tolerâncias e catálogo são
@@ -1869,6 +1875,11 @@ continuidade lógica entre elas.
   A prévia é efêmera e não altera o modelo salvo; ao soltar, o solver executa
   novamente e só então o resultado é aplicado. Cancelar restaura o último
   estado confirmado.
+- A renderização pode reconstruir somente as Walls da componente afetada,
+  mas isso é uma otimização de apresentação: não autoriza simplificar nem
+  duplicar as regras do solver na interface. Revisões antigas ou respostas
+  de prévia fora de ordem são descartadas e nunca substituem um estado mais
+  recente.
 - A saída do motor expõe blocos escolhidos, setores/recortes por abertura,
   grafo de dependências, estados por Wall e regiões sem solução com motivo.
   Uma região inválida nunca é preenchida por aproximação silenciosa.
