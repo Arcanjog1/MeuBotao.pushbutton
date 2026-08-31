@@ -1,0 +1,482 @@
+{
+  "seeds": [
+    1,
+    2,
+    3,
+    10,
+    42
+  ],
+  "strategies": {
+    "cur": {
+      "baseline_accepted": 203,
+      "baseline_walls": 154,
+      "baseline_wall_fp": "bf9e047a70b5c603027ba1dc77e53f152fac7fcaad3ca667d5b28a9969b68502",
+      "seeds": [
+        {
+          "seed": 1,
+          "accepted": 201,
+          "diff_pairs": 12,
+          "diff_axes": 21,
+          "walls": 154,
+          "wall_fp": "1943a6ae3f459ff4ac3ee2024eacf25248e044e7f1ba7ee2e91c109cba1da79b",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 2,
+          "accepted": 201,
+          "diff_pairs": 12,
+          "diff_axes": 17,
+          "walls": 151,
+          "wall_fp": "0e47c093f163b17c38de00bc8be34fc143650704df61f54f1c579d8c85b23f4b",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 3,
+          "accepted": 201,
+          "diff_pairs": 16,
+          "diff_axes": 22,
+          "walls": 151,
+          "wall_fp": "6a7356ca67a1e45a02c775fd34641c025010f84bcb50ba490e059258a27ffbf3",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 10,
+          "accepted": 203,
+          "diff_pairs": 12,
+          "diff_axes": 20,
+          "walls": 156,
+          "wall_fp": "bc8c303fe2ab05c4de6980410544bd604cfc5b570ac32c94d5acc0aa4d550631",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 42,
+          "accepted": 201,
+          "diff_pairs": 16,
+          "diff_axes": 22,
+          "walls": 153,
+          "wall_fp": "4f6d7bd85236e645ed766204a7446b892b638d6ebb3ea92f6ce8fce4af4b40d2",
+          "wall_fp_igual": false
+        }
+      ]
+    },
+    "A_mean": {
+      "baseline_accepted": 199,
+      "baseline_walls": 149,
+      "baseline_wall_fp": "54fc4ce75657c398759309dc2cd6653cb147df3b1d8941166b97b98baac66464",
+      "seeds": [
+        {
+          "seed": 1,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 23,
+          "walls": 151,
+          "wall_fp": "5c4595185689d279c2cd1237d37f3a0ccb70c8fc08d8e92e288ffd0ce9d8b7af",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 2,
+          "accepted": 199,
+          "diff_pairs": 0,
+          "diff_axes": 18,
+          "walls": 149,
+          "wall_fp": "5fa228c0edec0f1516688eeed43f4e936365f3119f46106424a0095a0ef2a8ee",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 3,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 25,
+          "walls": 149,
+          "wall_fp": "f60b6abf4431fd5794bf86ca45b8ca11779607322275535cbd49158423d1e3bb",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 10,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 19,
+          "walls": 150,
+          "wall_fp": "60ee3104eaf72886e3e84309211be12c67424ca50d63518b99d9182e3e4ad6d7",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 42,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 26,
+          "walls": 151,
+          "wall_fp": "96258fc73f5bb1fcdc0ae69fa16d4788b8ea444ed726cb0225cab7b9908d7bc7",
+          "wall_fp_igual": false
+        }
+      ]
+    },
+    "E_bis": {
+      "baseline_accepted": 199,
+      "baseline_walls": 149,
+      "baseline_wall_fp": "54fc4ce75657c398759309dc2cd6653cb147df3b1d8941166b97b98baac66464",
+      "seeds": [
+        {
+          "seed": 1,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 23,
+          "walls": 151,
+          "wall_fp": "5c4595185689d279c2cd1237d37f3a0ccb70c8fc08d8e92e288ffd0ce9d8b7af",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 2,
+          "accepted": 199,
+          "diff_pairs": 0,
+          "diff_axes": 18,
+          "walls": 149,
+          "wall_fp": "5fa228c0edec0f1516688eeed43f4e936365f3119f46106424a0095a0ef2a8ee",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 3,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 25,
+          "walls": 149,
+          "wall_fp": "f60b6abf4431fd5794bf86ca45b8ca11779607322275535cbd49158423d1e3bb",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 10,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 19,
+          "walls": 150,
+          "wall_fp": "60ee3104eaf72886e3e84309211be12c67424ca50d63518b99d9182e3e4ad6d7",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 42,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 26,
+          "walls": 151,
+          "wall_fp": "96258fc73f5bb1fcdc0ae69fa16d4788b8ea444ed726cb0225cab7b9908d7bc7",
+          "wall_fp_igual": false
+        }
+      ]
+    },
+    "E_ovl": {
+      "baseline_accepted": 199,
+      "baseline_walls": 148,
+      "baseline_wall_fp": "9e1ff87d55988fdaef9d1f8a8d9e102eabb44f161598878eea9d24c981713d97",
+      "seeds": [
+        {
+          "seed": 1,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 23,
+          "walls": 151,
+          "wall_fp": "83c21f22f624380d9f1a8eb6c94c026f6c0d95a421079ebe059f901d54cfd340",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 2,
+          "accepted": 199,
+          "diff_pairs": 0,
+          "diff_axes": 19,
+          "walls": 149,
+          "wall_fp": "c7d2027d19ffa2cc744458a42d46f3cb9eb0a5ed50a559fc8b04511551fea0d6",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 3,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 24,
+          "walls": 148,
+          "wall_fp": "e6894c136bd884d63f41a6bdfbaeb0d8824073e4732f5415278d8c799bddebf5",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 10,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 20,
+          "walls": 150,
+          "wall_fp": "771f87f50dcc958a685e682ff33134b207f35ead8f5faf889668fe2923b4880c",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 42,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 26,
+          "walls": 150,
+          "wall_fp": "38d3c4d00e53a27c024752f36cbeba51b9b9d0c2b76a1e349c3fe9fbe2157f24",
+          "wall_fp_igual": false
+        }
+      ]
+    },
+    "D_long": {
+      "baseline_accepted": 199,
+      "baseline_walls": 148,
+      "baseline_wall_fp": "9e1ff87d55988fdaef9d1f8a8d9e102eabb44f161598878eea9d24c981713d97",
+      "seeds": [
+        {
+          "seed": 1,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 23,
+          "walls": 151,
+          "wall_fp": "83c21f22f624380d9f1a8eb6c94c026f6c0d95a421079ebe059f901d54cfd340",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 2,
+          "accepted": 199,
+          "diff_pairs": 0,
+          "diff_axes": 19,
+          "walls": 149,
+          "wall_fp": "c7d2027d19ffa2cc744458a42d46f3cb9eb0a5ed50a559fc8b04511551fea0d6",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 3,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 24,
+          "walls": 148,
+          "wall_fp": "e6894c136bd884d63f41a6bdfbaeb0d8824073e4732f5415278d8c799bddebf5",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 10,
+          "accepted": 199,
+          "diff_pairs": 4,
+          "diff_axes": 20,
+          "walls": 150,
+          "wall_fp": "771f87f50dcc958a685e682ff33134b207f35ead8f5faf889668fe2923b4880c",
+          "wall_fp_igual": false
+        },
+        {
+          "seed": 42,
+          "accepted": 199,
+          "diff_pairs": 2,
+          "diff_axes": 26,
+          "walls": 150,
+          "wall_fp": "38d3c4d00e53a27c024752f36cbeba51b9b9d0c2b76a1e349c3fe9fbe2157f24",
+          "wall_fp_igual": false
+        }
+      ]
+    }
+  },
+  "centerline_asymmetry": {
+    "n_accepted": 199,
+    "n_diff": 47,
+    "worst_delta_cm": 2421.340276,
+    "examples": [
+      {
+        "pair": [
+          89,
+          1350
+        ],
+        "delta_cm": 61.9914,
+        "ab": [
+          [
+            -1878.4886,
+            767.049254
+          ],
+          [
+            -408.48,
+            767.049254
+          ]
+        ],
+        "ba": [
+          [
+            -1878.4886,
+            767.049254
+          ],
+          [
+            -346.4886,
+            767.049254
+          ]
+        ]
+      },
+      {
+        "pair": [
+          90,
+          1349
+        ],
+        "delta_cm": 255.0,
+        "ab": [
+          [
+            600.5113,
+            767.049254
+          ],
+          [
+            2056.52,
+            767.049254
+          ]
+        ],
+        "ba": [
+          [
+            345.5113,
+            767.049254
+          ],
+          [
+            2267.7272,
+            767.049254
+          ]
+        ]
+      },
+      {
+        "pair": [
+          92,
+          265
+        ],
+        "delta_cm": 84.46000000000004,
+        "ab": [
+          [
+            1581.4713,
+            628.7988
+          ],
+          [
+            1586.56,
+            628.7988
+          ]
+        ],
+        "ba": [
+          [
+            1497.0113,
+            628.7988
+          ],
+          [
+            1671.0113,
+            628.7988
+          ]
+        ]
+      },
+      {
+        "pair": [
+          94,
+          264
+        ],
+        "delta_cm": 164.91129999999987,
+        "ab": [
+          [
+            871.5113,
+            628.7988
+          ],
+          [
+            880.6,
+            628.7988
+          ]
+        ],
+        "ba": [
+          [
+            871.5113,
+            628.7988
+          ],
+          [
+            1045.5113,
+            628.7988
+          ]
+        ]
+      },
+      {
+        "pair": [
+          96,
+          263
+        ],
+        "delta_cm": 84.46000000000004,
+        "ab": [
+          [
+            -769.0286,
+            628.7988
+          ],
+          [
+            -763.94,
+            628.7988
+          ]
+        ],
+        "ba": [
+          [
+            -853.4886,
+            628.7988
+          ],
+          [
+            -679.4886,
+            628.7988
+          ]
+        ]
+      },
+      {
+        "pair": [
+          98,
+          262
+        ],
+        "delta_cm": 164.91140000000019,
+        "ab": [
+          [
+            -1478.9886,
+            628.7988
+          ],
+          [
+            -1469.9,
+            628.7988
+          ]
+        ],
+        "ba": [
+          [
+            -1478.9886,
+            628.7988
+          ],
+          [
+            -1304.9886,
+            628.7988
+          ]
+        ]
+      }
+    ]
+  },
+  "ties": {
+    "cur": {
+      "n_groups": 86,
+      "n_cands": 250,
+      "n_contested": 10
+    },
+    "A_mean": {
+      "n_groups": 84,
+      "n_cands": 244,
+      "n_contested": 10
+    },
+    "B_min": {
+      "n_groups": 82,
+      "n_cands": 242,
+      "n_contested": 10
+    },
+    "C_max": {
+      "n_groups": 86,
+      "n_cands": 249,
+      "n_contested": 10
+    },
+    "D_long": {
+      "n_groups": 81,
+      "n_cands": 238,
+      "n_contested": 10
+    },
+    "E_bis": {
+      "n_groups": 87,
+      "n_cands": 253,
+      "n_contested": 10
+    },
+    "E_ovl": {
+      "n_groups": 87,
+      "n_cands": 253,
+      "n_contested": 10
+    },
+    "F_lex": {
+      "n_groups": 84,
+      "n_cands": 244,
+      "n_contested": 10
+    }
+  }
+}

@@ -2668,7 +2668,15 @@ conexas**, a maior com 25 arestas, e 38 com uma aresta so'.
 **Consequencia:** nao introduzir matching global. Fica registrado como
 alternativa avaliada e descartada por evidencia.
 
-### 26.6 PADRAO OBSERVADO AINDA NAO CONFIRMADO - ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS
+### 26.6 CONFIRMADO E MEDIDO - ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS
+
+> **ATUALIZACAO (2026-08-31, Etapas 2F e 2G).** Este item deixou de ser
+> "padrao observado ainda nao confirmado": a dependencia de ordem foi
+> reproduzida, minimizada e decomposta em CINCO causas independentes.
+> A suspeita registrada abaixo estava PARCIALMENTE errada - o culpado no
+> pareamento NAO e' `_are_parallel_cached`, que e' simetrico (0
+> divergencias). Sao `_distance_between_parallel_cached` e
+> `_line_pair_overlap_ft_cached`. Ver 26.8.
 
 **Identificador da pendencia:** `ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS`.
 
@@ -2700,3 +2708,137 @@ executam `find_wall_pairs` em nenhuma linha.
 capturado do Revit deve gravar `input_real.json` **com os `segments` do
 Layer de CAD**, senao o benchmark continua com um unico caso de FASE A e
 nenhuma correcao de pareamento podera' ser validada cross-project.
+
+### 26.8 A ESPESSURA MEDIDA ENTRE DUAS FACES NAO PODE DEPENDER DE QUAL DELAS E' A REGUA (2026-08-31)
+
+Conhecimento das Etapas 2F (diagnostico) e 2G (projeto da correcao).
+Medicao completa em `nuvem/benchmark/RELATORIO_ETAPA_2F.md` e
+`nuvem/benchmark/PLANO_ETAPA_2G.md`; scripts em
+`nuvem/benchmark/diagnostics_2f/` e `diagnostics_2g/`.
+
+#### 26.8.1 REGRA OBRIGATORIA - o predicado de pareamento tem que ser simetrico
+
+Ao decidir se duas linhas do CAD sao as duas faces da MESMA parede, a
+distancia medida entre elas e a sobreposicao entre elas **nao podem depender
+da ordem em que o par foi enumerado**. `f(A,B)` tem que ser exatamente igual
+a `f(B,A)`.
+
+**FATO MEDIDO** (censo exaustivo dos 4.111.278 pares das 2.868 linhas
+mescladas do `torre_easy_lo_r00_tgd`, `diagnostics_2g/run_a_census.py`):
+
+| predicado de hoje | maior `|f(A,B) - f(B,A)|` | pares assimetricos |
+|---|---:|---:|
+| `_distance_between_parallel_cached` | **185,206785 cm** | **118.307** |
+| `_line_pair_overlap_ft_cached` | **99,771653 cm** | **15.858** |
+| `_are_parallel_cached` | **0** (simetrico, usa `abs(cross.Z)`) | 0 |
+
+**Causa exata.** `_distance_between_parallel_cached(1,2)` vale
+`| n2 . (mid1 - mid2) |`, e `(2,1)` vale `| n1 . (mid1 - mid2) |`: o vetor
+medido e' o mesmo, muda so' a NORMAL sobre a qual ele e' projetado. As duas
+normais so' coincidem se as retas forem EXATAMENTE paralelas - e
+`_are_parallel_cached` aceita ate' **2,87°**. O erro cresce com a distancia
+entre os pontos medios: 2,75° projetados ao longo de 30 m valem mais de
+1,4 m.
+
+**Consequencia medida:** embaralhar a lista (sem mudar nenhuma geometria)
+troca **15 a 24** pares candidatos, **12 a 16** pares aceitos, e faz
+W001/W010/W037 sumirem e a abertura `6558457` ficar orfa, dependendo da
+semente.
+
+#### 26.8.2 REGRA OBRIGATORIA - a espessura se mede ONDE as duas faces se encaram
+
+Nao no ponto medio de uma delas. Medir no ponto medio de uma face permite
+que a reta INFINITA de um fragmento de 8 cm, prolongada por metros, defina a
+"espessura" de uma parede a que ele nem pertence.
+
+**FATO MEDIDO** (caso minimo real, linhas 16 x 295):
+
+```
+linha 16  : 152,01 cm
+linha 295 :   8,43 cm, inclinada 2,7535°
+janela aceita para 14 cm +/- 2,5 cm = [11,50 ; 16,50] cm
+
+hoje:  d(16,295) = 11,830631 cm -> ACEITA como parede
+       d(295,16) =  8,997001 cm -> RECUSA
+folga real onde as duas se encaram = 8,999600 cm  -> NAO e' parede de 14 cm
+```
+
+**FATO MEDIDO** (diferencial entre medir no ponto medio e medir na
+sobreposicao, `diagnostics_2g/run_e_finalists.py`): **24 pares** entram como
+candidatos so' porque a medicao e' feita no ponto medio. Todos sao
+fragmentos de **8 a 21 cm** inclinados **~2,75°** contra faces de 4 a 11
+metros, cuja folga real e' **18,5 cm** - fora da janela. Isso reforca o
+26.4: a linha de esquadria e' combatida por ESPESSURA; basta medir a
+espessura direito.
+
+#### 26.8.3 Formula definida (DOCUMENTADO - pendencia de codigo aberta)
+
+Estrategia vencedora da 2G entre oito avaliadas (`E_ovl`): folga
+perpendicular media medida sobre a sobreposicao mutua, num referencial sem
+lado (bissetriz das duas direcoes, origem no meio dos dois pontos medios).
+Formula completa no item H do `PLANO_ETAPA_2G.md`.
+
+**Descartadas por evidencia, nao por gosto:**
+
+- **maximo das duas direcoes** e **orientacao canonica lexicografica**:
+  simetricas, mas eternizam o valor ERRADO (aceitam o falso candidato
+  16 x 295). A lexicografica ainda falha estruturalmente sob rotacao
+  (pares com **2,2 a 2,5 cm** de folga mudam de veredito ao girar a planta);
+- **minimo das duas**: enviesa a espessura para baixo e faz MAIS pares
+  entrarem na janela;
+- **media das duas**: media entre uma medicao boa e uma ruim; o valor
+  resultante nao corresponde a nada fisico.
+
+**FATO MEDIDO - a correcao nao regride nada do CR-1:** cobertura do gabarito
+**87**, eixo correto **96**, aberturas **91 de 91**, e as sete paredes
+vigiadas (W001, W010, W037, W053, W054, W068, W074) continuam cobertas. As
+paredes caem de 154 para **148** e o comprimento total de 46.373 para
+**45.876 cm** - a queda e' de parede espuria (espurias 6 -> **4**, paredes
+com menos de 20 cm 19 -> **16**), nao de parede real.
+
+**Status:** `DOCUMENTADO - pendencia de codigo aberta` (`CR-2F-B`).
+
+#### 26.8.4 DETERMINISMO nao e' INVARIANCIA - sao propriedades diferentes
+
+Registrar as duas separadamente, sempre.
+
+- **DETERMINISMO:** mesma lista -> mesmo resultado. **JA' PASSA** hoje
+  (garantido pelo desempate `(i, j)` do CR-1, ver 26.1).
+- **INVARIANCIA A' ORDEM:** mesma geometria em ordem diferente -> mesmo
+  resultado. **FALHA** hoje, em tres niveis independentes.
+
+E' PROIBIDO usar "o resultado e' deterministico" como prova de que a
+geometria esta' correta: o CR-1 deixou o pipeline deterministico e a
+assimetria continuou inteira embaixo.
+
+**Registrado tambem:** rotacionar ou transladar a planta muda o resultado em
+**12 a 40** pares - e o numero e' **identico para as oito estrategias
+testadas, inclusive a de hoje**. A causa e' condicionamento de ponto
+flutuante na comparacao `<= tolerancia`, nao assimetria. E' causa PROPRIA,
+ainda sem correcao associada, e nao pode ser cobrada de nenhuma correcao de
+simetria.
+
+#### 26.8.5 PENDENCIA NOVA - `CENTERLINE_ARGUMENT_ASYMMETRY` (2F-E)
+
+**DOCUMENTADO - pendencia de codigo aberta.** Descoberto na 2G, nao previsto
+na 2F.
+
+`create_centerline(l1, l2)` ancora o eixo em `p0` de **`l1`** e comeca o
+intervalo em `[0, len(l1)]`; `l2` so' ESTENDE, e no maximo
+`CENTERLINE_MAX_EXTENSION = 40 cm` por ponta. **Quem entra como `l1` decide
+o comprimento da parede.**
+
+**FATO MEDIDO** (`diagnostics_2g/run_d_locate.py`, sobre os 199 pares aceitos
+com predicado ja' simetrico): **47 eixos (23,6%) mudam** so' invertendo a
+ordem dos argumentos, com desvio maximo de **2.421,34 cm (24,2 m)**.
+
+```
+par [90,1349]  len 1456,01 x 1922,22 cm  ->  eixo 1456,01 cm  ou  1922,22 cm
+par [94, 264]  len    5,09 x  174,00 cm  ->  eixo    9,09 cm  ou   174,00 cm
+```
+
+O docstring da propria funcao ja' afirma que ela "deveria ser simetrica
+entre as duas faces da parede": a DIRECAO foi simetrizada (bissetriz), mas a
+ANCORA e o ALCANCE nao. E' a maior causa restante de instabilidade
+geometrica do pareamento, maior que o proprio `CR-2F-B`, e tem que virar
+correcao propria (`CR-2F-E`), nunca ser misturada com outra.
