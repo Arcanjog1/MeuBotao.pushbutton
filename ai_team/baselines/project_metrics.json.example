@@ -1,0 +1,22 @@
+{
+  "openings": {
+    "value": 91,
+    "direction": "higher_is_better",
+    "tolerance": 0
+  },
+  "critical_errors": {
+    "value": 1205,
+    "direction": "lower_is_better",
+    "tolerance": 0
+  },
+  "walls": {
+    "value": 96,
+    "direction": "exact",
+    "tolerance": 0
+  },
+  "success_rate": {
+    "value": 0.125,
+    "direction": "higher_is_better",
+    "tolerance": 0.001
+  }
+}
