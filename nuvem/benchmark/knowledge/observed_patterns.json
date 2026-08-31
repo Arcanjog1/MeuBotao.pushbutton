@@ -1,0 +1,360 @@
+{
+ "schema_version": 1,
+ "projects": [
+  "torre_easy_lo_r00_tp1"
+ ],
+ "n_projects": 1,
+ "note": "PADRAO OBSERVADO nao e' regra. Promover algo daqui a regra obrigatoria e' decisao humana, registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md.",
+ "junctions": [
+  {
+   "context": [
+    "L",
+    "impar"
+   ],
+   "dominant": "B34",
+   "count": 183,
+   "total": 230,
+   "ratio": 0.7957,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": []
+  },
+  {
+   "context": [
+    "L",
+    "par"
+   ],
+   "dominant": "B34",
+   "count": 166,
+   "total": 260,
+   "ratio": 0.6385,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B19",
+     "count": 41,
+     "ratio": 0.1577,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "T",
+    "impar"
+   ],
+   "dominant": "B34",
+   "count": 285,
+   "total": 616,
+   "ratio": 0.4627,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B19",
+     "count": 84,
+     "ratio": 0.1364,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B54",
+     "count": 83,
+     "ratio": 0.1347,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "T",
+    "par"
+   ],
+   "dominant": "B54",
+   "count": 224,
+   "total": 681,
+   "ratio": 0.3289,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B34",
+     "count": 218,
+     "ratio": 0.3201,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B19",
+     "count": 77,
+     "ratio": 0.1131,
+     "confidence": "EXCECAO"
+    }
+   ]
+  }
+ ],
+ "openings": [
+  {
+   "context": [
+    "door",
+    "jamba_direita"
+   ],
+   "dominant": "B19",
+   "count": 214,
+   "total": 655,
+   "ratio": 0.3267,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B39",
+     "count": 144,
+     "ratio": 0.2198,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C04",
+     "count": 141,
+     "ratio": 0.2153,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C09",
+     "count": 78,
+     "ratio": 0.1191,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "door",
+    "jamba_esquerda"
+   ],
+   "dominant": "B19",
+   "count": 207,
+   "total": 657,
+   "ratio": 0.3151,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B39",
+     "count": 140,
+     "ratio": 0.2131,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C04",
+     "count": 135,
+     "ratio": 0.2055,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C09",
+     "count": 88,
+     "ratio": 0.1339,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "door",
+    "sobre_a_verga"
+   ],
+   "dominant": "CJ19",
+   "count": 140,
+   "total": 379,
+   "ratio": 0.3694,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B39_C",
+     "count": 82,
+     "ratio": 0.2164,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B34_C",
+     "count": 51,
+     "ratio": 0.1346,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "window",
+    "jamba_direita"
+   ],
+   "dominant": "B19",
+   "count": 44,
+   "total": 132,
+   "ratio": 0.3333,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B34",
+     "count": 18,
+     "ratio": 0.1364,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C09",
+     "count": 16,
+     "ratio": 0.1212,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B39",
+     "count": 14,
+     "ratio": 0.1061,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B39_C",
+     "count": 14,
+     "ratio": 0.1061,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "window",
+    "jamba_esquerda"
+   ],
+   "dominant": "B19",
+   "count": 44,
+   "total": 132,
+   "ratio": 0.3333,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "B34",
+     "count": 18,
+     "ratio": 0.1364,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "C09",
+     "count": 16,
+     "ratio": 0.1212,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B39",
+     "count": 14,
+     "ratio": 0.1061,
+     "confidence": "EXCECAO"
+    },
+    {
+     "variant": "B39_C",
+     "count": 14,
+     "ratio": 0.1061,
+     "confidence": "EXCECAO"
+    }
+   ]
+  },
+  {
+   "context": [
+    "window",
+    "sobre_a_verga"
+   ],
+   "dominant": "CJ19",
+   "count": 77,
+   "total": 109,
+   "ratio": 0.7064,
+   "confidence": "OBSERVADO",
+   "projects_with_dominant": 1,
+   "alternatives": [
+    {
+     "variant": "CAN39",
+     "count": 32,
+     "ratio": 0.2936,
+     "confidence": "EXCECAO"
+    }
+   ]
+  }
+ ],
+ "block_usage": [
+  {
+   "code": "B39",
+   "role": "standard",
+   "count": 5122
+  },
+  {
+   "code": "B34",
+   "role": "standard",
+   "count": 3096
+  },
+  {
+   "code": "B19",
+   "role": "half_block",
+   "count": 848
+  },
+  {
+   "code": "C09",
+   "role": "compensator",
+   "count": 628
+  },
+  {
+   "code": "CJ19",
+   "role": "channel_block",
+   "count": 616
+  },
+  {
+   "code": "C04",
+   "role": "compensator",
+   "count": 509
+  },
+  {
+   "code": "B54",
+   "role": "standard",
+   "count": 492
+  },
+  {
+   "code": "CAN39",
+   "role": "channel_block",
+   "count": 405
+  },
+  {
+   "code": "B39_C",
+   "role": "cut_block",
+   "count": 276
+  },
+  {
+   "code": "CAN34",
+   "role": "channel_block",
+   "count": 220
+  },
+  {
+   "code": "B19_C",
+   "role": "cut_block",
+   "count": 180
+  },
+  {
+   "code": "B34_C",
+   "role": "cut_block",
+   "count": 178
+  },
+  {
+   "code": "CM19",
+   "role": "channel_block",
+   "count": 70
+  },
+  {
+   "code": "C09_C",
+   "role": "cut_block",
+   "count": 36
+  },
+  {
+   "code": "B54_C",
+   "role": "cut_block",
+   "count": 27
+  }
+ ]
+}

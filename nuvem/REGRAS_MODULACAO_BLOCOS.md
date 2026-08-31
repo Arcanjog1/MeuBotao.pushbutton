@@ -21,7 +21,10 @@
 > em silêncio — um exemplo que contradiz uma regra existente é registrado
 > como CONFLITO (ver seção 10.7), nunca resolvido por suposição.
 >
-> Última atualização: 2026-08-28 — nova EXCEÇÃO à regra #1 (seção 11.8:
+> Última atualização: 2026-08-31 — nova seção 24 (BENCHMARK: projeto
+> entregue vira gabarito medível, com o piso de ruído medido contra o
+> projeto humano, o CONFLITO da regra #2 registrado em 24.3 e as medições
+> novas de 24.5). Antes disso, 2026-08-28 — nova EXCEÇÃO à regra #1 (seção 11.8:
 > C04/C09/B19 encostados numa abertura podem ficar alinhados entre fiadas),
 > bug real corrigido no `STRAIGHT_CONTINUATION` (seção 11.9) e nova seção 15
 > (paredes de peitoril/verga têm altura e cota de base próprias — origem dos
@@ -2109,3 +2112,145 @@ registrada.
 
 `tests/solver_bench.py --fingerprint`: a assinatura MUDOU de propósito
 (`9413aad0…` → `c74c9c1a…`) — é uma mudança de regra, não de desempenho.
+
+## 24. BENCHMARK: projeto entregue vira gabarito medível (2026-08-31)
+
+Pedido explícito do usuário: transformar projeto Revit já modulado e
+aprovado em **base de referência estruturada, mensurável e reutilizável**,
+com validadores independentes, comparação entre versões e testes de
+regressão — para que "cada erro corrigido vire conhecimento permanente" e
+o mesmo problema não seja corrigido duas vezes.
+
+Implementação: `nuvem/benchmark/` (ver o `README.md` de lá para os
+comandos, o formato e o passo a passo de extração). Fora de
+`nuvem/core/**` de propósito — o loader do botão não baixa nem executa
+nada disto.
+
+### 24.1 — Princípio: regra OBRIGATÓRIA ≠ preferência
+
+Uma solução diferente da do projetista humano **não é erro** se cumprir
+todas as regras obrigatórias. Por isso todo achado do benchmark carrega
+um nível:
+
+- **NÍVEL 1 (obrigatório)** — prisma, vão livre, amarração válida, sem
+  sobreposição, cobertura da parede, geometria válida, limite de
+  compensadores. Falhar aqui é erro.
+- **NÍVEL 2 (preferência)** — peça escolhida, sequência, quantidade de
+  compensadores, solução preferencial. Divergir do humano aqui é
+  informação, nunca reprovação.
+
+O nível é propriedade da CLASSE DE ERRO, definida uma única vez em
+`benchmark/validators/base.py`; `benchmark/knowledge/error_classes.json`
+é **gerado** dali, nunca escrito à mão (28 classes hoje).
+
+### 24.2 — O gabarito também é medido: o "piso de ruído"
+
+**REGRA DE MÉTODO (nova).** Os validadores rodam também sobre o PRÓPRIO
+GABARITO. O projeto humano foi entregue e aprovado, então todo achado que
+aparece nele é (a) limitação da reconstrução geométrica ou (b) validador
+exigindo mais do que o escritório pratica — nos dois casos, o piso de
+ruído daquele validador.
+
+Nenhum número do solver deve ser citado sem a coluna do humano ao lado.
+Medido em TORRE EASY-LO-R00, nível 05. TP1 (12.758 peças reais, extração
+100% leitura em 2026-08-31), com o MESMO código nos dois lados:
+
+| Classe | Solver | Humano | Leitura |
+|---|---|---|---|
+| COMPENSATOR_CONSECUTIVE | 1567 | 52 | solver 30,1× |
+| COMPENSATOR_EXCESS_IN_RUN | 1038 | 54 | solver 19,2× |
+| PRISM_CONTINUOUS_JOINT | 968 | 122 | solver 7,9× |
+| PRISM_STAGGER_BELOW_TARGET | 687 | 101 | solver 6,8× |
+| COMPENSATOR_VERTICAL_STRIP | 180 | 26 | solver 6,9× |
+| POSITION_OVERLAP | 18 | 1 | solver 18× |
+| COVERAGE_GAP_IN_ROW | 289 | 615 | ruído do validador |
+| JUNCTION_MISSING_BINDING | 8 | 365 | ruído do validador |
+| JUNCTION_HALF_BLOCK_ADJACENT | 0 | 259 | ruído do validador |
+
+Blocos: humano 12.703, solver 18.092 na mesma planta. Similaridade exata
+10,9%; estrutural (contando substituição equivalente) 11,8%.
+
+**PENDÊNCIA DE CÓDIGO ABERTA** — os dois maiores desvios reais medidos,
+nesta ordem de prioridade: (1) compensadores consecutivos/excesso, (2)
+junta corrida entre fiadas. Nenhum dos dois foi corrigido nesta sessão:
+esta entrega é a INFRAESTRUTURA DE MEDIÇÃO, não a correção.
+
+### 24.3 — CONFLITO REGISTRADO: regra #2 (meio-bloco perto da amarração)
+
+`JUNCTION_HALF_BLOCK_ADJACENT` aparece **259 vezes no projeto humano
+aprovado** e **0 vezes no solver**. A regra #2 (seção 11.6) diz que
+meio-bloco não pode ficar encostado na amarração; o projeto de referência
+faz isso sistematicamente.
+
+Não é resolvido por suposição. Registrado como CONFLITO: ou a regra #2 é
+mais restrita do que a prática real do escritório, ou a reconstrução de
+encontros está marcando como "encontro" pontos que não são. **Pendência
+de investigação** — decidir com o usuário e/ou com um segundo projeto
+antes de mexer na regra ou no validador. Até lá o validador continua como
+está (nível 1), e o piso de ruído documenta o desvio.
+
+### 24.4 — Identidade nunca é ElementId
+
+`ElementId` muda entre arquivos e **some** quando as paredes de referência
+são apagadas — que é exatamente o que o processo real faz (Walls/Doors/
+Windows = 0 nos projetos entregues, já registrado em PADRAO_MODULACAO.md).
+Toda chave do benchmark é geométrica (`model.wall_stable_key` e família,
+invariante ao sentido do desenho), e o casamento gabarito × resultado é
+por tolerância geométrica em três níveis: pontas iguais → mesma reta com
+sobreposição ≥60% → sem par (registrado, nunca casado à força).
+
+### 24.5 — Medições novas confirmadas neste projeto (leitura, sem alterar o .rvt)
+
+- **Passo de fiada = 20cm** — confirmado pela terceira vez, agora medido
+  sobre as cotas Z povoadas do nível inteiro. ✅ bate com
+  PADRAO_MODULACAO.md.
+- **Meias-fiadas de ajuste FORA da grade de 20cm são legítimas**: 359 peças
+  do nível 05. TP1 estão em cotas intermediárias (722, 742, 762, 782, 802,
+  822, 842, 872), todas de peça CORTADA de 9cm — é o ajuste de altura
+  antes da canaleta de topo. Confirma e detalha o "~+11cm na última fiada"
+  que estava como PADRÃO OBSERVADO em PADRAO_MODULACAO.md. Consequência de
+  código: a fiada é a POSIÇÃO na pilha, nunca `(z - base) / passo` (pelo
+  índice de grade, 712 e 722 caíam na mesma fiada e uma apagava a outra).
+- **Catálogo real tem 33 tipos**, o solver conhece 6. Canaleta, canaleta J,
+  verga, contraverga, vedação e as variantes CORTADO continuam fora do
+  escopo do solver. Entregar o catálogo cru a ele faz o solver recusar
+  tudo ("os blocos usados têm alturas diferentes: 9, 19, 29cm") e gerar
+  ZERO peça — o benchmark filtra e registra em
+  `solver_notes.catalog_codes_dropped`.
+- **Padrão de amarração observado** (1 projeto, rótulo OBSERVADO — não vira
+  regra com uma amostra só): canto L resolvido com **B34 em 80% das fiadas
+  ímpares** e 64% das pares, com B19 aparecendo como exceção real em 16%.
+  Isso é evidência independente a favor da regra #5 já implementada
+  (L = 2×B34).
+
+### 24.6 — Todo erro corrigido vira teste
+
+`tests/regression/` (84 testes, pytest). Os que nasceram de defeito real
+medido, e que existem para o defeito não voltar em silêncio:
+
+- fiada quase vazia ao lado de fiada cheia (o solver perdeu uma das
+  famílias A/B numa parede — medido no piloto sintético);
+- amarração conferida no NÓ e não na parede (a primeira versão reprovou
+  120 encontros corretos, porque num canto L a peça que amarra está na
+  parede vizinha);
+- vazio preenchido por peça de OUTRA parede não é buraco (1.619 falsos
+  positivos no projeto humano, corrigido com `analysis.OccupancyIndex`);
+- passo de fiada ignora cotas pouco povoadas (dava 10cm em vez de 20);
+- ponta encostada no meio de outra parede é T, não L (um pavimento
+  inteiro saiu com 286 "L" e nenhum T por contar paredes em vez de
+  braços);
+- solver que gera zero peça é catálogo recusado, não parede não modulada.
+
+`tests/regression/test_engine_constants_match.py` importa o motor de
+verdade e falha se qualquer constante espelhada em
+`benchmark/analysis.py` divergir — o benchmark repete os números do solver
+para poder rodar sem Revit, e número repetido é número que um dia diverge.
+
+### 24.7 — Score nunca esconde erro crítico
+
+`benchmark/scoring.py`: contagem PASS/FAIL por categoria, taxa de sucesso
+por parede, e `critical_errors`/`blocking` **fora da média**. Um score de
+98% com 3 paredes não moduladas continua reprovando. `compare_runs`
+classifica cada categoria em MELHORIA / REGRESSÃO / INALTERADO, e erro
+crítico novo é **REGRESSÃO CRÍTICA** mesmo que o total de erros caia —
+uma correção que quebra outra parte não pode ser aceita.

@@ -1,0 +1,7 @@
+{
+ "project_id": "piloto_sintetico_2x2",
+ "titulo": "Grade sintetica 2x2 - 12 eixos, 8 fiadas",
+ "origem": "GERADO por benchmark/extract/synthetic.py - NAO e' projeto real",
+ "reference_confiabilidade": "SEM GABARITO - so' validadores de nivel 1 sobre o resultado",
+ "uso": "teste barato e reproduzivel da infraestrutura e regressao do solver"
+}

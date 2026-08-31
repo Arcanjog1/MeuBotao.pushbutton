@@ -12,3 +12,14 @@ __pycache__/
 # Token cifrado colocado a mao ao lado do loader (por PC) - o blob em si
 # nao e legivel sem a senha, mas nao ha motivo para versionar copias locais.
 token_cifrado.dat
+
+# Benchmark: saidas REGERAVEIS de uma rodada (runner.py --run). O que fica
+# versionado e' o dado durável - input.json, reference.json, metadata.json,
+# e as MEDICOES (score.json, baseline.json, reference_score.json). O
+# resultado bruto do solver e a lista completa de achados sao grandes
+# (12MB e 3MB no projeto piloto) e voltam identicos rodando o benchmark de
+# novo.
+nuvem/benchmark/projects/*/result.json
+nuvem/benchmark/projects/*/findings.json
+nuvem/benchmark/projects/*/comparison.json
+nuvem/benchmark/projects/*/reference_findings.json

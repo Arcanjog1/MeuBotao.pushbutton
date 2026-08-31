@@ -1,0 +1,241 @@
+{
+ "schema_version": 1,
+ "levels": {
+  "1": "regra obrigatoria - falhar e' erro",
+  "2": "preferencia/similaridade - divergir do projeto humano NAO e' erro se todo o nivel 1 passar"
+ },
+ "categories": [
+  "prism",
+  "compensators",
+  "junctions",
+  "openings",
+  "wall_coverage",
+  "block_positions"
+ ],
+ "classes": [
+  {
+   "code": "PRISM_CONTINUOUS_JOINT",
+   "category": "prism",
+   "level": 1,
+   "severity": "critical",
+   "summary": "junta vertical alinhada em fiadas consecutivas (prisma)",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11 (regra #1)"
+  },
+  {
+   "code": "PRISM_JOINT_STACK",
+   "category": "prism",
+   "level": 1,
+   "severity": "major",
+   "summary": "junta vertical repetida em muitas fiadas da mesma paridade",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.7"
+  },
+  {
+   "code": "PRISM_STAGGER_BELOW_TARGET",
+   "category": "prism",
+   "level": 2,
+   "severity": "minor",
+   "summary": "desencontro menor que o alvo, sem chegar a alinhar",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 10.6"
+  },
+  {
+   "code": "COMPENSATOR_CONSECUTIVE",
+   "category": "compensators",
+   "level": 1,
+   "severity": "major",
+   "summary": "dois ou mais compensadores encostados na mesma fiada",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)"
+  },
+  {
+   "code": "COMPENSATOR_EXCESS_IN_RUN",
+   "category": "compensators",
+   "level": 1,
+   "severity": "major",
+   "summary": "compensadores acima do teto permitido no trecho",
+   "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)"
+  },
+  {
+   "code": "COMPENSATOR_VERTICAL_STRIP",
+   "category": "compensators",
+   "level": 1,
+   "severity": "major",
+   "summary": "faixa vertical de compensadores empilhados entre fiadas",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5"
+  },
+  {
+   "code": "COMPENSATOR_AVOIDABLE",
+   "category": "compensators",
+   "level": 2,
+   "severity": "minor",
+   "summary": "compensador usado onde o vao fecharia com peca inteira",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2"
+  },
+  {
+   "code": "JUNCTION_MISSING_BINDING",
+   "category": "junctions",
+   "level": 1,
+   "severity": "critical",
+   "summary": "encontro sem nenhuma peca de amarracao",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 5"
+  },
+  {
+   "code": "JUNCTION_NOT_ALTERNATING",
+   "category": "junctions",
+   "level": 1,
+   "severity": "major",
+   "summary": "amarracao do encontro nao alterna entre fiadas",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 5 / 18.4"
+  },
+  {
+   "code": "JUNCTION_WRONG_PIECE",
+   "category": "junctions",
+   "level": 2,
+   "severity": "minor",
+   "summary": "peca de amarracao diferente da usada pelo projetista no mesmo tipo de encontro",
+   "rule_ref": "padrao observado (benchmark/patterns.py)"
+  },
+  {
+   "code": "JUNCTION_HALF_BLOCK_ADJACENT",
+   "category": "junctions",
+   "level": 1,
+   "severity": "major",
+   "summary": "meio-bloco encostado na amarracao do encontro",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.6 (regra #2)"
+  },
+  {
+   "code": "OPENING_BLOCK_INSIDE_DOOR",
+   "category": "openings",
+   "level": 1,
+   "severity": "critical",
+   "summary": "bloco dentro do vao de uma porta (peitoril 0)",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 3 (zona de exclusao absoluta)"
+  },
+  {
+   "code": "OPENING_BLOCK_INSIDE_WINDOW",
+   "category": "openings",
+   "level": 1,
+   "severity": "critical",
+   "summary": "bloco dentro da faixa vertical do vao de uma janela",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 4"
+  },
+  {
+   "code": "OPENING_BLOCK_CROSSES_JAMB",
+   "category": "openings",
+   "level": 1,
+   "severity": "critical",
+   "summary": "bloco atravessa a jamba, entrando parcialmente no vao",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 3"
+  },
+  {
+   "code": "OPENING_MISSING_LINTEL",
+   "category": "openings",
+   "level": 2,
+   "severity": "major",
+   "summary": "vao sem verga/canaleta na fiada imediatamente acima",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 10.2/10.3"
+  },
+  {
+   "code": "OPENING_MISSING_COUNTER_LINTEL",
+   "category": "openings",
+   "level": 2,
+   "severity": "minor",
+   "summary": "janela sem contraverga abaixo do peitoril",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 10.4"
+  },
+  {
+   "code": "OPENING_SOLID_BELOW_SILL_MISSING",
+   "category": "openings",
+   "level": 1,
+   "severity": "major",
+   "summary": "fiada abaixo do peitoril da janela ficou vazia (deveria ser solida)",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 4"
+  },
+  {
+   "code": "COVERAGE_WALL_NOT_MODULATED",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "critical",
+   "summary": "parede sem nenhum bloco",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.8"
+  },
+  {
+   "code": "COVERAGE_MISSING_ROW",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "critical",
+   "summary": "fiada faltando no meio da parede",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.8"
+  },
+  {
+   "code": "COVERAGE_GAP_IN_ROW",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "major",
+   "summary": "trecho sem blocos numa fiada, fora de qualquer abertura",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.8"
+  },
+  {
+   "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "critical",
+   "summary": "fiada praticamente vazia numa parede que tem outras fiadas cheias",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.8"
+  },
+  {
+   "code": "COVERAGE_PARTIAL_WALL",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "major",
+   "summary": "parede modulada so' em parte do comprimento",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.8"
+  },
+  {
+   "code": "COVERAGE_ORPHAN_BLOCKS",
+   "category": "wall_coverage",
+   "level": 1,
+   "severity": "major",
+   "summary": "blocos que nao pertencem a nenhuma parede reconstruida",
+   "rule_ref": "benchmark/extract/reconstruct.py"
+  },
+  {
+   "code": "POSITION_OVERLAP",
+   "category": "block_positions",
+   "level": 1,
+   "severity": "critical",
+   "summary": "dois blocos ocupando o mesmo volume na mesma fiada",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 18.7"
+  },
+  {
+   "code": "POSITION_OUTSIDE_WALL",
+   "category": "block_positions",
+   "level": 1,
+   "severity": "major",
+   "summary": "bloco alem da ponta da parede",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 7 (regra #1: nunca aumentar a parede)"
+  },
+  {
+   "code": "POSITION_OFF_AXIS",
+   "category": "block_positions",
+   "level": 1,
+   "severity": "major",
+   "summary": "bloco fora do eixo da parede (desvio perpendicular)",
+   "rule_ref": "BLOCK_TO_WALL_PERP_TOLERANCE_CM (benchmark/model.py)"
+  },
+  {
+   "code": "POSITION_BAD_ORIENTATION",
+   "category": "block_positions",
+   "level": 1,
+   "severity": "major",
+   "summary": "bloco com orientacao incompativel com o eixo da parede",
+   "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 12"
+  },
+  {
+   "code": "POSITION_LENGTH_MISMATCH",
+   "category": "block_positions",
+   "level": 1,
+   "severity": "major",
+   "summary": "comprimento ocupado nao bate com o comprimento da peca do catalogo",
+   "rule_ref": "benchmark/extract"
+  }
+ ]
+}

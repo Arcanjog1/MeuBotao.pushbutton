@@ -1,0 +1,16 @@
+{
+ "project_id": "torre_easy_lo_r00_tp1",
+ "titulo": "TORRE EASY-LO-R00 (JARDIM DA COSTA BEACH CLUB) - nivel 05. TP1",
+ "origem": "projeto Revit ENTREGUE e aprovado, modulado por pessoa",
+ "documento": "TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt",
+ "extraido_em": "2026-08-31",
+ "extraido_por": "benchmark/extract/revit_dump.py via mcp__revit-pyrevit__execute_revit_code (READ-ONLY)",
+ "nivel": "05. TP1",
+ "instancias_no_nivel": 12758,
+ "reference_confiabilidade": "RECONSTRUIDO - o .rvt entregue nao tem mais Walls nem Doors/Windows (0 de cada). Eixos, vaos e encontros vem do layout dos blocos (benchmark/extract/reconstruct.py), nao de elementos nativos. Ver README, secao piso de ruido.",
+ "limitacoes_conhecidas": [
+  "aberturas marcadas confidence=reconstructed (deduzidas do vazio entre blocos)",
+  "catalogo tem 33 tipos; o solver so' usa 6 - o resto e' escopo pendente, nao erro",
+  "celulas (furos) das pecas nao extraidas: EdgeLoops nao lido nesta rodada"
+ ]
+}
