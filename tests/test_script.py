@@ -8,7 +8,12 @@ de janela falsos que guardam a arvore de controles. Ver o cabecalho de la'.
 Rodar:  python tests/run_tests.py
 """
 
+import json
 import math
+import os
+import random
+
+import pytest
 
 import load_script
 import revit_stubs
@@ -556,6 +561,156 @@ def test_INV_06_determinismo_execucoes_repetidas_byte_a_byte():
         walls, unused = _pair(lines, [14.0])
         sigs.add(_pair006_signature(walls, unused))
     assert len(sigs) == 1, sigs
+
+
+# ------------------------------------------------- INV-PAIR-001/002 (CR-2F-B)
+# PAIR_PREDICATE_ASYMMETRY (nuvem/benchmark/PLANO_ETAPA_2G.md): os predicados
+# antigos `_distance_between_parallel_cached`/`_line_pair_overlap_ft_cached`
+# medem a partir de UMA das duas linhas do par (a que entra como `cache1`) -
+# a escolha e' so' o INDICE na lista, entao invertar a ordem do par mudava o
+# resultado (ate' 185,21cm na espessura, medido no censo exaustivo de
+# 4.111.278 pares da Etapa 2G). `find_wall_pairs` agora usa os predicados
+# NOVOS e simetricos (`_pair_symmetric_thickness_ft_cached`/
+# `_pair_symmetric_overlap_ft_cached`, core/engine/geometry.py) - as duas
+# funcoes antigas continuam intactas e em uso por `merge_collinear_fragments`
+# (CR-2F-A, fora deste escopo). Os dois testes abaixo promovem os prototipos
+# ja' medidos no plano (item K) para testes permanentes.
+
+@case
+def test_INV_PAIR_001_caso_minimo_fragmento_inclinado_2_75_graus():
+    """Caso minimo REAL da Etapa 2F (linhas 16 x 295 do
+    torre_easy_lo_r00_tgd), congeladas em coordenadas literais em cm - o
+    teste NAO depende de rodar o merge nem de ler input_real.json. E' um
+    fragmento de 8,43cm inclinado 2,7535 graus ao lado de uma face de
+    152,01cm: a formula ANTIGA media 11,83cm partindo de A (DENTRO da janela
+    [11,50;16,50]cm de 14cm+-2,5cm - aceita) e 8,997cm partindo de B (FORA -
+    recusa), so' por causa da ordem do par. A formula simetrica mede
+    8,9996cm nas duas direcoes - a folga REAL, medida onde as duas faces se
+    encaram, nao chega a 14cm, e o par e' recusado nas duas ordens."""
+    A = seg(-1082.980000, 220.548800, -1234.988600, 220.548800)   # 152,01 cm
+    B = seg(-1095.572500, 229.343304, -1103.993200, 229.748299)   #   8,43 cm, 2,75 graus
+
+    def invert(line):
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        return Line.CreateBound(p1, p0)
+
+    for tag, (X, Y) in (("dir", (A, B)), ("rev", (invert(A), invert(B)))):
+        cx, cy = m._line_geom_cache(X), m._line_geom_cache(Y)
+
+        d_xy = m._pair_symmetric_thickness_ft_cached(cx, cy)
+        d_yx = m._pair_symmetric_thickness_ft_cached(cy, cx)
+        assert d_xy == d_yx, (tag, "espessura simetrica nao bate bit-a-bit", d_xy, d_yx)
+        assert abs(to_cm(d_xy) - 8.9996) < 0.001, (tag, to_cm(d_xy))
+
+        o_xy = m._pair_symmetric_overlap_ft_cached(cx, cy)[0]
+        o_yx = m._pair_symmetric_overlap_ft_cached(cy, cx)[0]
+        assert o_xy == o_yx, (tag, "overlap simetrico nao bate bit-a-bit", o_xy, o_yx)
+
+        walls_xy, _ = _pair([X, Y], [14.0])
+        walls_yx, _ = _pair([Y, X], [14.0])
+        assert len(walls_xy) == len(walls_yx) == 0, (
+            tag, "par nao pode virar candidato em NENHUMA ordem - a folga "
+            "real (~9cm) fica fora da janela 14cm+-2,5cm",
+            len(walls_xy), len(walls_yx),
+        )
+
+    # sanidade: a formula ANTIGA (ainda em uso por merge_collinear_fragments,
+    # CR-2F-A - fora do escopo aqui) REPROVA este mesmo caso, provando que o
+    # teste cobre uma assimetria real, nao um par trivialmente simetrico.
+    cache_a, cache_b = m._line_geom_cache(A), m._line_geom_cache(B)
+    d_ab_old = m._distance_between_parallel_cached(cache_a, cache_b)
+    d_ba_old = m._distance_between_parallel_cached(cache_b, cache_a)
+    assert d_ab_old != d_ba_old
+    assert abs(to_cm(d_ab_old) - 11.830630) < 0.001
+    assert abs(to_cm(d_ba_old) - 8.997001) < 0.001
+
+
+_MERGED_2868_CACHE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "nuvem", "benchmark", "diagnostics_2f", "out_merged_baseline.json",
+)
+
+
+def _load_merged_2868_lines():
+    with open(_MERGED_2868_CACHE, encoding="utf-8") as fh:
+        data = json.load(fh)
+    return [seg(*row) for row in data["lines_cm"]]
+
+
+def _line_identity_key(line):
+    """Chave GEOMETRICA (nao o indice na lista) de uma linha: par de
+    endpoints em cm arredondado a 0,01cm, em ordem canonica - independente
+    do sentido em que a linha foi desenhada."""
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    a = (round(to_cm(p0.X), 2), round(to_cm(p0.Y), 2))
+    b = (round(to_cm(p1.X), 2), round(to_cm(p1.Y), 2))
+    return (a, b) if a <= b else (b, a)
+
+
+def _candidate_geometry_set(lines):
+    """O CONJUNTO GEOMETRICO de pares candidatos de `find_wall_pairs` (a
+    mesma varredura O(n^2), com os predicados simetricos novos), traduzido
+    de volta para a IDENTIDADE geometrica de cada linha - nao o indice dela
+    na lista, que e' exatamente o que este teste tem que ignorar (ver
+    PLANO_ETAPA_2G.md item K/INV-PAIR-002)."""
+    th_ft = [ft(14.0)]
+    tol_ft = m.compute_detection_tolerance_ft(th_ft)
+    caches = [m._line_geom_cache(l) for l in lines]
+    keys = [_line_identity_key(l) for l in lines]
+
+    out = set()
+    n = len(lines)
+    for i in range(n):
+        ci = caches[i]
+        for j in range(i + 1, n):
+            cj = caches[j]
+            if not m._are_parallel_cached(ci, cj):
+                continue
+            dist = m._pair_symmetric_thickness_ft_cached(ci, cj)
+            if not (m.MIN_WALL_THICKNESS_FT <= dist <= m.MAX_WALL_THICKNESS_FT):
+                continue
+            matched = m._closest_target_thickness_ft(dist, th_ft, tol_ft)
+            if matched is None:
+                continue
+            overlap_ft, l1, l2 = m._pair_symmetric_overlap_ft_cached(ci, cj)
+            if overlap_ft < m.MIN_WALL_SEGMENT_ABS_FLOOR_FT:
+                continue
+            shorter = min(l1, l2)
+            if shorter < 1e-9:
+                continue
+            if (overlap_ft / shorter) < m.MIN_WALL_SEGMENT_OVERLAP_RATIO:
+                continue
+            out.add(frozenset((keys[i], keys[j])))
+    return out
+
+
+@case
+@pytest.mark.slow
+def test_INV_PAIR_002_2868_linhas_mescladas_invariante_a_permutacao():
+    """2.868 linhas mescladas e CONGELADAS do torre_easy_lo_r00_tgd (o mesmo
+    cache em disco da Etapa 2G,
+    nuvem/benchmark/diagnostics_2f/out_merged_baseline.json - NAO roda o
+    merge de novo aqui, so' le' o resultado ja' medido). ANTES da correcao,
+    o conjunto de candidatos de find_wall_pairs mudava so' de embaralhar a
+    ordem da lista de entrada (15-24 pares de diferenca em 5 seeds, medido
+    no censo da Etapa 2G, item D.3) - a MESMA geometria produzia conjuntos
+    DIFERENTES de candidatos. O teste compara o CONJUNTO GEOMETRICO (nao a
+    contagem, nao o indice): zero diferencas em 5 permutacoes e' o resultado
+    exigido pelo CR-2F-B."""
+    lines = _load_merged_2868_lines()
+    assert len(lines) == 2868
+    baseline = _candidate_geometry_set(lines)
+    assert len(baseline) > 0
+
+    for seed in (1, 2, 3, 10, 42):
+        rng = random.Random(seed)
+        shuffled = list(lines)
+        rng.shuffle(shuffled)
+        permuted = _candidate_geometry_set(shuffled)
+        assert permuted == baseline, (
+            seed, "conjunto geometrico de candidatos mudou so' de permutar a lista",
+            len(baseline ^ permuted),
+        )
 
 
 @case

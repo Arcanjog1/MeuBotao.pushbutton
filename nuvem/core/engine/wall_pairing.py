@@ -371,7 +371,26 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
             if not _are_parallel_cached(cache_i, cache_j):
                 continue
 
-            dist = _distance_between_parallel_cached(cache_i, cache_j)
+            # CR-2F-B (PAIR_PREDICATE_ASYMMETRY): predicados simetricos -
+            # `_distance_between_parallel_cached`/`_line_pair_overlap_ft_cached`
+            # medem a partir de UMA das duas linhas (a que entra como
+            # `cache_i`), entao trocar a ordem do par mudava o resultado em
+            # ate' 185,21 cm na espessura e 99,77 cm no overlap (censo
+            # exaustivo, ver nuvem/benchmark/PLANO_ETAPA_2G.md item D.1) e
+            # fazia o conjunto de candidatos depender da ORDEM da lista de
+            # entrada, nao so' da geometria (item D.3: 15-24 pares mudavam
+            # so' de permutar a lista). `_pair_symmetric_thickness_ft_cached`/
+            # `_pair_symmetric_overlap_ft_cached` medem num referencial que
+            # NAO tem lado (bissetriz das duas direcoes, origem no meio dos
+            # dois pontos medios) - a espessura e' a folga MEDIA no trecho
+            # em que as duas faces realmente se encaram, nao no ponto medio
+            # de uma delas. 0 divergencias medidas trocando a ordem do par
+            # em 4.111.278 pares (item H.1/H.3). As funcoes antigas
+            # continuam intactas e em uso por merge_collinear_fragments/
+            # _bridge_clusters_via_openings (CR-2F-A) e por
+            # scan_possible_missed_bonecas (diagnostico, abaixo) - fora do
+            # escopo desta correcao (PLANO_ETAPA_2G.md item B).
+            dist = _pair_symmetric_thickness_ft_cached(cache_i, cache_j)
 
             if diagnostics is not None:
                 diagnostics["parallel_pairs"] += 1
@@ -387,7 +406,7 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
             if matched_thickness is None:
                 continue  # distancia nao corresponde a nenhuma espessura escolhida pelo usuario
 
-            overlap_ft, length1, length2 = _line_pair_overlap_ft_cached(cache_i, cache_j)
+            overlap_ft, length1, length2 = _pair_symmetric_overlap_ft_cached(cache_i, cache_j)
             if overlap_ft < MIN_WALL_SEGMENT_ABS_FLOOR_FT:
                 continue
             shorter_length = min(length1, length2)

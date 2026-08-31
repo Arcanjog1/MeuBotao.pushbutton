@@ -23,6 +23,8 @@ Modulo PURO: as unicas dependencias de "Revit" aqui sao os TIPOS `XYZ`/
 sem nenhum Revit de verdade (ver tests/revit_stubs.py).
 """
 
+import math
+
 from Autodesk.Revit.DB import XYZ, Line
 
 from core.engine.tolerances import (
@@ -39,6 +41,8 @@ __all__ = [
     "_cluster_axis", "_cluster_interval", "_clusters_bridge_via_opening",
     "_bridge_clusters_via_openings", "merge_collinear_fragments",
     "_line_pair_overlap_ft", "lines_overlap_enough",
+    "_pair_frame_cached", "_pair_symmetric_overlap_ft_cached",
+    "_pair_symmetric_thickness_ft_cached",
 ]
 
 
@@ -139,6 +143,133 @@ def _line_pair_overlap_ft_cached(cache1, cache2):
     overlap_hi = min(length1, t2_hi)
     overlap_ft = max(0.0, overlap_hi - overlap_lo)
     return overlap_ft, length1, length2
+
+
+# --- CR-2F-B (PAIR_PREDICATE_ASYMMETRY) ------------------------------------
+#
+# `_distance_between_parallel_cached` e `_line_pair_overlap_ft_cached` acima
+# medem a partir de UMA das duas linhas (a que entra como `cache1`) - a
+# escolha de qual e' `cache1` e' so' o indice na lista, entao invertar a
+# ordem do par muda o resultado (ate' 185,21 cm de diferenca na espessura e
+# 99,77 cm no overlap, medido no censo exaustivo da Etapa 2G - ver
+# nuvem/benchmark/PLANO_ETAPA_2G.md, itens A e D.1). Isso faz o conjunto de
+# pares candidatos de `find_wall_pairs` depender da ORDEM da lista de
+# entrada, nao so' da geometria.
+#
+# As tres funcoes abaixo sao NOVAS e so' sao usadas por `find_wall_pairs`
+# (nuvem/core/engine/wall_pairing.py). `_distance_between_parallel_cached` e
+# `_line_pair_overlap_ft_cached` continuam intocadas e em uso por
+# `merge_collinear_fragments`/`_bridge_clusters_via_openings`
+# (CR-2F-A, fora de escopo aqui - ver PLANO_ETAPA_2G.md item B).
+#
+# A ideia: em vez de medir a partir de uma das duas linhas, construir um
+# referencial (base + normal + origem) que NAO tem lado - a bissetriz das
+# duas direcoes, com origem no meio dos dois pontos medios. Trocar
+# cache1<->cache2 da o mesmo referencial (ou o mesmo com os dois eixos
+# negados, que os `abs()`/diferencas de projecao abaixo absorvem). Prova de
+# simetria e medicao (0 divergencias em 4.111.278 pares) no plano, item H.1.
+#
+# Tudo em float puro sobre os componentes do cache (nunca um XYZ
+# intermediario): e' o que faz o custo caber no orcamento de performance
+# (+74,6% de aritmetica do predicado simetrico e' compensado por -41,9% da
+# reescrita em float, ver PLANO_ETAPA_2G.md item J) - nao e' micro-otimizacao.
+
+def _pair_frame_cached(cache1, cache2):
+    """Referencial 2D simetrico do par (cache1, cache2): base = bissetriz
+    das duas direcoes (orientadas para o mesmo lado), normal = perpendicular
+    a' base, origem = ponto medio entre os dois pontos medios. Devolve
+    (bx, by, nx, ny, ox, oy). Ver PLANO_ETAPA_2G.md item H.1 para a prova de
+    simetria exata em IEEE-754."""
+    d1 = cache1[2]
+    d2 = cache2[2]
+    m1 = cache1[4]
+    m2 = cache2[4]
+
+    dot = d1.X * d2.X + d1.Y * d2.Y
+    s = 1.0 if dot >= 0.0 else -1.0
+    bx = d1.X + d2.X * s
+    by = d1.Y + d2.Y * s
+    nb = math.hypot(bx, by)
+    if nb < 1e-9:
+        bx, by = d1.X, d1.Y
+    else:
+        bx, by = bx / nb, by / nb
+
+    nx, ny = -by, bx
+    ox, oy = (m1.X + m2.X) * 0.5, (m1.Y + m2.Y) * 0.5
+    return bx, by, nx, ny, ox, oy
+
+
+def _pair_symmetric_overlap_ft_cached(cache1, cache2):
+    """Equivalente simetrico de `_line_pair_overlap_ft_cached`: projeta as
+    quatro pontas sobre a base do referencial de `_pair_frame_cached` (em
+    vez da direcao de UMA das duas linhas) e recorta a intersecao dos dois
+    intervalos - sem privilegiar `cache1` nem `cache2`. `length1`/`length2`
+    continuam sendo os comprimentos ORIGINAIS de cada linha (o denominador
+    `min(length1, length2)` do overlap_ratio em find_wall_pairs nao muda,
+    ver PLANO_ETAPA_2G.md item H.2/secao G.2.5)."""
+    bx, by, _nx, _ny, ox, oy = _pair_frame_cached(cache1, cache2)
+
+    p0_i, p1_i = cache1[0], cache1[1]
+    p0_j, p1_j = cache2[0], cache2[1]
+
+    ti0 = bx * (p0_i.X - ox) + by * (p0_i.Y - oy)
+    ti1 = bx * (p1_i.X - ox) + by * (p1_i.Y - oy)
+    tj0 = bx * (p0_j.X - ox) + by * (p0_j.Y - oy)
+    tj1 = bx * (p1_j.X - ox) + by * (p1_j.Y - oy)
+
+    ai, zi = (ti0, ti1) if ti0 <= ti1 else (ti1, ti0)
+    aj, zj = (tj0, tj1) if tj0 <= tj1 else (tj1, tj0)
+
+    lo = max(ai, aj)
+    hi = min(zi, zj)
+    overlap_ft = (hi - lo) if hi > lo else 0.0
+
+    length1, length2 = cache1[3], cache2[3]
+    return overlap_ft, length1, length2
+
+
+def _pair_symmetric_thickness_ft_cached(cache1, cache2):
+    """Equivalente simetrico de `_distance_between_parallel_cached`: a folga
+    perpendicular MEDIA entre as duas faces, medida so' no trecho em que as
+    duas realmente se encaram (a sobreposicao mutua no referencial de
+    `_pair_frame_cached`), em vez do ponto medio de UMA das duas linhas -
+    que pode estar metros fora desse trecho (caso real medido no
+    PLANO_ETAPA_2G.md, item D.2: fragmento de 8,43 cm inclinado 2,75 graus
+    ao lado de uma face de 152 cm). Quando as duas faces nao se sobrepoem no
+    referencial (retas quase paralelas mas sem trecho comum), cai no
+    fallback E_bis (folga na bissetriz entre os dois pontos medios) - guarda
+    defensiva, nunca exercida pelos 569 candidatos medidos na 2G (item G.3).
+    Ver PLANO_ETAPA_2G.md item H.3 para o raciocinio fisico completo."""
+    bx, by, nx, ny, ox, oy = _pair_frame_cached(cache1, cache2)
+
+    p0_i, p1_i = cache1[0], cache1[1]
+    p0_j, p1_j = cache2[0], cache2[1]
+
+    ti0 = bx * (p0_i.X - ox) + by * (p0_i.Y - oy)
+    si0 = nx * (p0_i.X - ox) + ny * (p0_i.Y - oy)
+    ti1 = bx * (p1_i.X - ox) + by * (p1_i.Y - oy)
+    si1 = nx * (p1_i.X - ox) + ny * (p1_i.Y - oy)
+    tj0 = bx * (p0_j.X - ox) + by * (p0_j.Y - oy)
+    sj0 = nx * (p0_j.X - ox) + ny * (p0_j.Y - oy)
+    tj1 = bx * (p1_j.X - ox) + by * (p1_j.Y - oy)
+    sj1 = nx * (p1_j.X - ox) + ny * (p1_j.Y - oy)
+
+    lo = max(min(ti0, ti1), min(tj0, tj1))
+    hi = min(max(ti0, ti1), max(tj0, tj1))
+
+    if (hi - lo) <= 1e-12:
+        m1, m2 = cache1[4], cache2[4]
+        return abs(nx * (m1.X - m2.X) + ny * (m1.Y - m2.Y))
+
+    def _sa(t0, s0, t1, s1, t):
+        if abs(t1 - t0) < 1e-12:
+            return s0
+        return s0 + (s1 - s0) * (t - t0) / (t1 - t0)
+
+    g_lo = abs(_sa(ti0, si0, ti1, si1, lo) - _sa(tj0, sj0, tj1, sj1, lo))
+    g_hi = abs(_sa(ti0, si0, ti1, si1, hi) - _sa(tj0, sj0, tj1, sj1, hi))
+    return (g_lo + g_hi) * 0.5
 
 
 def _xy_deviation_ft(curve_a, curve_b):

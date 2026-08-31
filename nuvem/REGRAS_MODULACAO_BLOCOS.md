@@ -2796,7 +2796,44 @@ paredes caem de 154 para **148** e o comprimento total de 46.373 para
 **45.876 cm** - a queda e' de parede espuria (espurias 6 -> **4**, paredes
 com menos de 20 cm 19 -> **16**), nao de parede real.
 
-**Status:** `DOCUMENTADO - pendencia de codigo aberta` (`CR-2F-B`).
+**Status:** `IMPLEMENTADO` (`CR-2F-B`, branch
+`fix/cr2fb-symmetric-pair-predicates`). Implementado como planejado, sem
+desvio de formula: `_pair_frame_cached`/`_pair_symmetric_thickness_ft_cached`/
+`_pair_symmetric_overlap_ft_cached` novas em `core/engine/geometry.py`
+(float puro, sem `XYZ` intermediario), usadas so' pelas duas chamadas de
+`find_wall_pairs` em `core/engine/wall_pairing.py`.
+`_distance_between_parallel_cached`/`_line_pair_overlap_ft_cached`
+continuam intocadas, em uso por `merge_collinear_fragments`/
+`_bridge_clusters_via_openings` (CR-2F-A) e por `scan_possible_missed_bonecas`
+(diagnostico).
+
+**Medido sobre o codigo REAL** (`wall_modeling_bridge.run_wall_modeling`,
+2.868 linhas mescladas congeladas do `torre_easy_lo_r00_tgd`, ver
+`nuvem/benchmark/diagnostics_2d/run_real_cr1_result.json`): 199 pares
+aceitos, 148 paredes, cobertura **87 de 97**, ausentes **4**, eixo correto
+**96 de 148**, eixo 10-16cm fora **3**, espurias **4**, paredes < 20cm
+**16**, aberturas **91 de 91**, comprimento total **45.875,68 cm** - bate
+campo a campo com a previsao de `E_ovl` no `PLANO_ETAPA_2G.md` (item D.4).
+As sete paredes vigiadas e a abertura `6558457` continuam cobertas/
+atribuida. `solver_decision_fingerprint` (`tests/solver_bench.py`, grade
+sintetica - nao passa por `find_wall_pairs`) permanece `c74c9c1a...`,
+inalterado, como esperado (o solver de blocos nao foi tocado).
+
+**Custo medido** (mesma maquina, `find_wall_pairs` real sobre as 2.868
+linhas, mediana de 5 execucoes): formula antiga **11,39 s** -> formula nova
+(`E_ovl` + float puro) **10,41 s** - **-8,6%**, dentro do orcamento HARD de
++-10% (o plano previa ate' +0,51% na FASE A inteira; medido diretamente no
+codigo real ficou ainda melhor, nao pior, porque a reescrita em float puro
+compensou o custo extra de `E_ovl` com folga maior que a estimada por
+monkeypatch).
+
+**Testes permanentes** (`tests/test_script.py`): `INV-PAIR-001` (caso
+minimo real, linhas 16x295 da 2F, congelado em cm) e `INV-PAIR-002`
+(2.868 linhas mescladas, 5 permutacoes, conjunto GEOMETRICO de candidatos
+comparado - nao contagem, nao indice). Confirmado por reversao manual: as
+duas linhas de chamada em `find_wall_pairs` revertidas para a formula
+antiga fazem `INV-PAIR-001` reprovar (1 parede aceita so' numa direcao),
+provando que o teste cobre uma assimetria real.
 
 #### 26.8.4 DETERMINISMO nao e' INVARIANCIA - sao propriedades diferentes
 
