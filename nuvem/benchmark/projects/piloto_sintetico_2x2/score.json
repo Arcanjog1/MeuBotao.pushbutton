@@ -1,0 +1,229 @@
+{
+ "project_id": "piloto_sintetico_2x2",
+ "source": "solver",
+ "walls": 12,
+ "blocks": 768,
+ "categories": [
+  {
+   "category": "block_positions",
+   "pass": 12,
+   "fail": 0,
+   "findings": 0,
+   "findings_level_1": 0,
+   "findings_level_2": 0,
+   "success_rate": 1.0
+  },
+  {
+   "category": "compensators",
+   "pass": 2,
+   "fail": 10,
+   "findings": 81,
+   "findings_level_1": 81,
+   "findings_level_2": 0,
+   "success_rate": 0.1667
+  },
+  {
+   "category": "junctions",
+   "pass": 12,
+   "fail": 0,
+   "findings": 0,
+   "findings_level_1": 0,
+   "findings_level_2": 0,
+   "success_rate": 1.0
+  },
+  {
+   "category": "openings",
+   "pass": 12,
+   "fail": 0,
+   "findings": 4,
+   "findings_level_1": 0,
+   "findings_level_2": 4,
+   "success_rate": 1.0
+  },
+  {
+   "category": "prism",
+   "pass": 11,
+   "fail": 1,
+   "findings": 8,
+   "findings_level_1": 8,
+   "findings_level_2": 0,
+   "success_rate": 0.9167
+  },
+  {
+   "category": "wall_coverage",
+   "pass": 8,
+   "fail": 4,
+   "findings": 24,
+   "findings_level_1": 24,
+   "findings_level_2": 0,
+   "success_rate": 0.6667
+  }
+ ],
+ "findings_total": 117,
+ "findings_level_1": 113,
+ "findings_level_2": 4,
+ "critical_errors": 15,
+ "critical_by_code": {
+  "PRISM_CONTINUOUS_JOINT": 7,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 8
+ },
+ "findings_by_code": {
+  "PRISM_CONTINUOUS_JOINT": 7,
+  "PRISM_JOINT_STACK": 1,
+  "COMPENSATOR_CONSECUTIVE": 36,
+  "COMPENSATOR_EXCESS_IN_RUN": 28,
+  "COMPENSATOR_VERTICAL_STRIP": 17,
+  "OPENING_MISSING_COUNTER_LINTEL": 4,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 8,
+  "COVERAGE_GAP_IN_ROW": 16
+ },
+ "success_rate": 0.1667,
+ "walls_failing": [
+  "W001",
+  "W002",
+  "W003",
+  "W004",
+  "W005",
+  "W006",
+  "W007",
+  "W009",
+  "W010",
+  "W011"
+ ],
+ "blocking": true,
+ "per_wall": [
+  {
+   "wall": "W001",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 25
+  },
+  {
+   "wall": "W002",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "FAIL",
+   "block_positions": "PASS",
+   "findings": 9
+  },
+  {
+   "wall": "W003",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 5
+  },
+  {
+   "wall": "W004",
+   "status": "FAIL",
+   "prism": "FAIL",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 33
+  },
+  {
+   "wall": "W005",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 5
+  },
+  {
+   "wall": "W006",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 5
+  },
+  {
+   "wall": "W007",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "FAIL",
+   "block_positions": "PASS",
+   "findings": 15
+  },
+  {
+   "wall": "W008",
+   "status": "PASS",
+   "prism": "PASS",
+   "compensators": "PASS",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 0
+  },
+  {
+   "wall": "W009",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "FAIL",
+   "block_positions": "PASS",
+   "findings": 9
+  },
+  {
+   "wall": "W010",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "FAIL",
+   "block_positions": "PASS",
+   "findings": 6
+  },
+  {
+   "wall": "W011",
+   "status": "FAIL",
+   "prism": "PASS",
+   "compensators": "FAIL",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 5
+  },
+  {
+   "wall": "W012",
+   "status": "PASS",
+   "prism": "PASS",
+   "compensators": "PASS",
+   "junctions": "PASS",
+   "openings": "PASS",
+   "wall_coverage": "PASS",
+   "block_positions": "PASS",
+   "findings": 0
+  }
+ ],
+ "validator_errors": []
+}

@@ -1,0 +1,178 @@
+{
+ "schema_version": 2,
+ "project_id": "piloto_sintetico_2x2",
+ "source": "input",
+ "settings": {
+  "base_z_cm": 0.0,
+  "course_step_cm": 20.0,
+  "block_height_cm": 19.0,
+  "num_courses": 8,
+  "expected_rows": 8,
+  "wall_thickness_cm": 14.0,
+  "walls_already_extended": false
+ },
+ "catalog": {
+  "B39": {
+   "code": "B39",
+   "length_cm": 39.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": false,
+   "is_compensator": false,
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -9.9,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      9.9,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    }
+   ]
+  },
+  "B34": {
+   "code": "B34",
+   "length_cm": 34.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": true,
+   "is_compensator": false,
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -10.2,
+      0.0
+     ],
+     "size_cm": [
+      10.7,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      7.4,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    }
+   ]
+  },
+  "B54": {
+   "code": "B54",
+   "length_cm": 54.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": true,
+   "is_compensator": false,
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -19.5,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      0.0,
+      0.0
+     ],
+     "size_cm": [
+      12.5,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      19.5,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    }
+   ]
+  },
+  "B19": {
+   "code": "B19",
+   "length_cm": 19.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": false,
+   "is_compensator": false,
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      0.0,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    }
+   ]
+  },
+  "C09": {
+   "code": "C09",
+   "length_cm": 9.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": false,
+   "is_compensator": true,
+   "cells_local_cm": []
+  },
+  "C04": {
+   "code": "C04",
+   "length_cm": 4.0,
+   "height_cm": 19.0,
+   "width_cm": 14.0,
+   "is_special_bond": false,
+   "is_compensator": true,
+   "cells_local_cm": []
+  }
+ },
+ "orphan_blocks": [],
+ "metadata": {
+  "synthetic": true,
+  "generator": "benchmark/extract/synthetic.py",
+  "grid": [
+   2,
+   2
+  ],
+  "step_cm": 350.0
+ },
+ "walls": [
+  {"id":"W001","key":"W|0.0,0.0|350.0,0.0|t14.0","start_cm":[0.0,0.0],"end_cm":[350.0,0.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"door","t_start_cm":120.0,"t_end_cm":200.0,"width_cm":80.0,"sill_cm":0.0,"head_cm":210.0,"height_cm":210.0,"source_element_id":null,"confidence":"synthetic","id":"W001-O01","key":"W|0.0,0.0|350.0,0.0|t14.0|O|120.0-200.0|s0.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W002","key":"W|0.0,0.0|0.0,350.0|t14.0","start_cm":[0.0,0.0],"end_cm":[0.0,350.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"door","t_start_cm":120.0,"t_end_cm":200.0,"width_cm":80.0,"sill_cm":0.0,"head_cm":210.0,"height_cm":210.0,"source_element_id":null,"confidence":"synthetic","id":"W002-O01","key":"W|0.0,0.0|0.0,350.0|t14.0|O|120.0-200.0|s0.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W003","key":"W|350.0,0.0|700.0,0.0|t14.0","start_cm":[350.0,0.0],"end_cm":[700.0,0.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"window","t_start_cm":100.0,"t_end_cm":220.0,"width_cm":120.0,"sill_cm":90.0,"head_cm":200.0,"height_cm":110.0,"source_element_id":null,"confidence":"synthetic","id":"W003-O01","key":"W|350.0,0.0|700.0,0.0|t14.0|O|100.0-220.0|s90.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W004","key":"W|350.0,0.0|350.0,350.0|t14.0","start_cm":[350.0,0.0],"end_cm":[350.0,350.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W005","key":"W|700.0,0.0|700.0,350.0|t14.0","start_cm":[700.0,0.0],"end_cm":[700.0,350.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"window","t_start_cm":100.0,"t_end_cm":220.0,"width_cm":120.0,"sill_cm":90.0,"head_cm":200.0,"height_cm":110.0,"source_element_id":null,"confidence":"synthetic","id":"W005-O01","key":"W|700.0,0.0|700.0,350.0|t14.0|O|100.0-220.0|s90.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W006","key":"W|0.0,350.0|350.0,350.0|t14.0","start_cm":[0.0,350.0],"end_cm":[350.0,350.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W007","key":"W|0.0,350.0|0.0,700.0|t14.0","start_cm":[0.0,350.0],"end_cm":[0.0,700.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"window","t_start_cm":100.0,"t_end_cm":220.0,"width_cm":120.0,"sill_cm":90.0,"head_cm":200.0,"height_cm":110.0,"source_element_id":null,"confidence":"synthetic","id":"W007-O01","key":"W|0.0,350.0|0.0,700.0|t14.0|O|100.0-220.0|s90.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W008","key":"W|350.0,350.0|700.0,350.0|t14.0","start_cm":[350.0,350.0],"end_cm":[700.0,350.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"door","t_start_cm":120.0,"t_end_cm":200.0,"width_cm":80.0,"sill_cm":0.0,"head_cm":210.0,"height_cm":210.0,"source_element_id":null,"confidence":"synthetic","id":"W008-O01","key":"W|350.0,350.0|700.0,350.0|t14.0|O|120.0-200.0|s0.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W009","key":"W|350.0,350.0|350.0,700.0|t14.0","start_cm":[350.0,350.0],"end_cm":[350.0,700.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"door","t_start_cm":120.0,"t_end_cm":200.0,"width_cm":80.0,"sill_cm":0.0,"head_cm":210.0,"height_cm":210.0,"source_element_id":null,"confidence":"synthetic","id":"W009-O01","key":"W|350.0,350.0|350.0,700.0|t14.0|O|120.0-200.0|s0.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W010","key":"W|700.0,350.0|700.0,700.0|t14.0","start_cm":[700.0,350.0],"end_cm":[700.0,700.0],"length_cm":350.0,"angle_deg":90.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W011","key":"W|0.0,700.0|350.0,700.0|t14.0","start_cm":[0.0,700.0],"end_cm":[350.0,700.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[{"kind":"window","t_start_cm":100.0,"t_end_cm":220.0,"width_cm":120.0,"sill_cm":90.0,"head_cm":200.0,"height_cm":110.0,"source_element_id":null,"confidence":"synthetic","id":"W011-O01","key":"W|0.0,700.0|350.0,700.0|t14.0|O|100.0-220.0|s90.0"}],"junctions":[],"rows":[],"source_element_ids":[]},
+  {"id":"W012","key":"W|350.0,700.0|700.0,700.0|t14.0","start_cm":[350.0,700.0],"end_cm":[700.0,700.0],"length_cm":350.0,"angle_deg":0.0,"thickness_cm":14.0,"base_z_cm":0.0,"height_cm":160.0,"openings":[],"junctions":[],"rows":[],"source_element_ids":[]}
+ ]
+}
