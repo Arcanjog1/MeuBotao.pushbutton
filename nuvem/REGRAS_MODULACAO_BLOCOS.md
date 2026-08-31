@@ -2528,7 +2528,9 @@ Conhecimento extraido da Etapa 2D (PLANO da correcao do CR-1) e
 ainda NAO mesclada na main - aguardando revisao do usuario). Medicao
 completa em `nuvem/benchmark/PLANO_ETAPA_2D.md`; scripts de reproducao em
 `nuvem/benchmark/diagnostics_2d/` (`run_real_cr1.py`, novo nesta sessao,
-mede o CODIGO REAL via `wall_modeling_bridge.run_wall_modeling`).
+mede o CODIGO REAL via `wall_modeling_bridge.run_wall_modeling`, e grava o
+resultado versionado em `run_real_cr1_result.json` - ver 26.1 abaixo para a
+evidencia canonica de runtime).
 
 ### 26.1 REGRA OBRIGATORIA - entre duas faces candidatas, vence a que MEDE a espessura pedida
 
@@ -2576,8 +2578,25 @@ usa):
 | paredes < 50cm | 31 | **25** |
 | paredes < 20cm | 22 | **19** |
 | comprimento total | 43.033cm | **46.373cm** |
-| runtime FASE A | 23,97s | 24,08s (+0,46%) |
+| runtime FASE A | 23,97s | **25,42s (+6,0%)** |
 | `solver_decision_fingerprint` | `c74c9c1a...` | `c74c9c1a...` **inalterado** |
+
+**Sobre o runtime:** foram tres execucoes reais de `run_real_cr1.py` nesta
+sessao, nao um numero forcado - 23,97s (baseline, antes da correcao),
+24,08s (primeira execucao depois da correcao, script ainda com uma metrica
+de "espessura exata" que se mostrou incorreta - ver abaixo) e 25,42s
+(segunda execucao depois da correcao, ja' com o script corrigido - a que
+efetivamente ficou versionada em
+`nuvem/benchmark/diagnostics_2d/run_real_cr1_result.json`). A variacao
+entre as tres (23,97 / 24,08 / 25,42s) e' ruido normal de execucao
+headless (cache de disco, agendamento de CPU) - a correcao do CR-1 nao
+mexeu em nada que afete o custo dominante da FASE A (`merge_collinear_fragments`
+e a varredura O(n^2) de candidatos, ver item M do plano), e a edicao do
+script de diagnostico entre a 2a e a 3a execucao (remover uma metrica
+derivada, ela mesma O(paredes finais)) e' irrelevante perto do custo
+dominante. **Evidencia canonica: 25,42s** (a que esta' no JSON
+versionado). Comparado ao baseline (23,97s), e' um aumento de **~6,0%** -
+dentro do requisito HARD H12 (<=10%).
 
 Espessura exata dos pares aceitos e roubos de face (`err`/`steal`), que
 exigem o dado por-candidato (nao exposto pelo pipeline de producao), foram
