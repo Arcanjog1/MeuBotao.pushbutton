@@ -23,3 +23,16 @@ nuvem/benchmark/projects/*/result.json
 nuvem/benchmark/projects/*/findings.json
 nuvem/benchmark/projects/*/comparison.json
 nuvem/benchmark/projects/*/reference_findings.json
+
+# Etapa 2B.1 - mesma regra de cima, para os artefatos novos:
+# `scoped_comparison.json` é irmão de `comparison.json` (5 MB, sai idêntico
+# rodando `runner.py --run <id> --scoped`).
+nuvem/benchmark/projects/*/scoped_comparison.json
+
+# A rodada PROVISÓRIA da Etapa 2B fica preservada para auditoria, mas só o
+# que não se regenera: `README.txt`, `score.json` e o `input.json` daquela
+# rodada. O resultado bruto e os achados (17 MB somados) voltam idênticos
+# refazendo o caminho descrito no README.
+nuvem/benchmark/projects/*/provisional_2b/result.json
+nuvem/benchmark/projects/*/provisional_2b/findings.json
+nuvem/benchmark/projects/*/provisional_2b/comparison.json

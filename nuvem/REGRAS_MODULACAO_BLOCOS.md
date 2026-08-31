@@ -2254,3 +2254,160 @@ por parede, e `critical_errors`/`blocking` **fora da média**. Um score de
 classifica cada categoria em MELHORIA / REGRESSÃO / INALTERADO, e erro
 crítico novo é **REGRESSÃO CRÍTICA** mesmo que o total de erros caia —
 uma correção que quebra outra parte não pode ser aceita.
+
+### 24.8 — O INPUT do benchmark passa a ser MEDIDO, não reconstruído
+
+Correção do usuário (2026-08-31): há **dois documentos Revit abertos na
+mesma instância** — o projeto CRU e o projeto JÁ MODULADO. O benchmark não
+pode mais tomar `ActiveUIDocument.Document` como entrada, e o `input.json`
+não pode mais ser deduzido do próprio gabarito (era circular: o problema
+saía da solução).
+
+**REGRA OBRIGATÓRIA — todo extrator recebe o `Document` explícito.**
+`benchmark/extract/revit_input_real_dump.py` exige `DOC_TITLE_PREFIX` e
+levanta se ele casar com zero ou com mais de um documento; não existe
+fallback para o documento ativo. Trocar de aba no Revit no meio da
+extração não pode mudar de onde os dados vieram.
+
+**REGRA OBRIGATÓRIA — todo artefato carrega `source_document`**
+(`title`, `path`, `role`). Dados dos dois documentos nunca podem se
+misturar em silêncio.
+
+**REGRA OBRIGATÓRIA — provar o par antes de comparar.** Mesmo projeto não
+implica mesmo referencial. Medido em 2026-08-31 (MCP, read-only):
+
+- os dois documentos contêm o MESMO CAD, `'T01 LIMPA'` — 9 layers, mesma
+  contagem por layer (19533/13146/9258/2972/2153/1142/528/391/4) e mesmo
+  comprimento total até 0,1 cm;
+- **49.127 de 49.127 segmentos casam** com translação pura de
+  `(7678,7371 ; 1102,9024) cm`, resíduo máximo **0,000141 cm**, rotação
+  identidade, escala 1,000000000 (momentos de 2ª ordem iguais até a 9ª
+  casa);
+- Z: a base dos blocos do gabarito (341,0 cm) é exatamente o Z do
+  `ImportInstance` do CAD naquele documento — **o plano do CAD é o plano
+  da 1ª fiada**.
+
+**PADRÃO OBSERVADO / CONFIRMADO — qual nível é o par.** O input casa
+**91 de 91 aberturas com o nível `04. TGD`** e apenas 89 de 91 com os
+`TP1`. As duas que diferenciam: uma porta de 121 cm (x=7654, coord. nativa
+da TORRE) que no TP1 vira janela de 71 cm com peitoril 160, e uma abertura
+de 91 cm deslocada 29 cm. Ou seja: **`torre_easy_lo_r00_tp1`, já existente
+no repo, NÃO é o par deste input** — o par correto é
+`torre_easy_lo_r00_tgd`. Escolher nível por nome de arquivo é erro de
+método; escolher por conteúdo é a regra.
+
+**MEDIÇÃO — o layer de parede é `Arquitetura`.** Descoberto por medição,
+não pelo nome: é o único layer que explica os eixos do gabarito — 95,22%
+dos pontos amostrados nos eixos caem a ≤ 8 cm de uma linha dele, e só
+23,95% a ≤ 1 cm (o eixo passa ENTRE as duas faces, como tem de ser numa
+parede de 14 cm). O segundo colocado, `Mobiliário`, fica em 6,84%.
+
+**MEDIÇÃO — as aberturas são famílias de Mobiliário.** As 91 aberturas do
+input são `FamilyInstance` de categoria Mobiliário hospedadas em Nível,
+identificadas só pelos parâmetros `Largura_abertura` / `Altura_abertura` /
+`Peitoril` (é o modo `auto` de `collect_opening_instances`). Não há nenhuma
+Porta/Janela nativa em nenhum dos dois documentos.
+
+**MEDIÇÃO — gabarito 04. TGD:** 12.564 instâncias, 97 paredes, todas de
+14,0 cm, 17 fiadas, passo de 20 cm, altura dominante 260 cm (69 das 97).
+
+**DOIS FINGERPRINTS DIFERENTES — não confundir.** São coisas distintas e
+ambas legítimas. Desde 2026-08-31 os nomes na infraestrutura são
+EXPLÍCITOS, justamente porque já foram confundidos uma vez:
+
+- **`solver_decision_fingerprint`** =
+  `c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316` —
+  `py tests/solver_bench.py --fingerprint`, constante
+  `REFERENCE_SOLVER_DECISION_FINGERPRINT`. Mede as PEÇAS que o solver
+  decide; só muda quando a modulação muda de resultado.
+- **`wall_modeling_engine_sha256`** =
+  `f017124964a806fba8d4249add34db665f86282ae2a8c6fecb1018713d3bad8a` —
+  campo do `wall_modeling_snapshot.json`. Mede o sha256 do ARQUIVO
+  `nuvem/core/wall_modeling.py`; muda a cada edição do fonte, mesmo que o
+  resultado seja idêntico.
+
+Os nomes antigos (`fingerprint`, `engine_fingerprint`,
+`REFERENCE_FINGERPRINT`) não existem mais —
+`tests/regression/test_wall_modeling_snapshot_serialization.py` falha se
+`engine_fingerprint` reaparecer no snapshot.
+
+**PENDÊNCIA DE CÓDIGO ABERTA — 167 paredes contra 97.** (A explicação dada neste parágrafo foi MEDIDA e REFUTADA na seção 24.9 — não é região extra, é fragmentação. Mantido aqui para o histórico.) O Wall Modeling
+sobre o CAD cru forma 167 paredes; a pessoa modulou 97. O layer
+`Arquitetura` cobre área maior que a região modulada (o input chega a
+Y = −739 cm, o gabarito para em Y = −570 cm). Ainda **não está decidido**
+se isso é recorte de escopo do projetista ou falha de filtro do benchmark
+— não tratar como erro do solver antes de decidir. Na mesma rodada, 9 das
+91 aberturas não foram atribuídas a nenhuma parede pela FASE A.
+
+
+### 24.9 - Hardening da baseline real (Etapa 2B.1)
+
+Correcao do usuario (2026-08-31), aplicada ANTES de congelar qualquer
+numero como historico. Tres contaminacoes metodologicas foram removidas.
+
+**REGRA OBRIGATORIA - o catalogo NUNCA pode vir do gabarito.** A primeira
+rodada (2B) montou o catalogo do solver a partir do `reference.json`, ou
+seja, das pecas que a PESSOA usou. Isso e' vazamento da solucao para dentro
+da entrada. O catalogo agora sai dos `FamilySymbol` CARREGADOS no proprio
+documento INPUT (`benchmark/extract/revit_catalog_dump.py`), pelos nomes
+exatos de `BLOCK_FAMILY_CATALOG_DEFINITIONS`, sem depender de nenhuma
+instancia colocada e sem `Activate()` (que exigiria Transaction).
+
+MEDIDO: os 6 codigos (B19/B34/B39/B54/C04/C09) estavam todos carregados no
+INPUT, com os simbolos ja ativos, entao ate' as CELULAS vieram da geometria
+real (B19=1, B34=2, B39=2, B54=3, compensadores=0) - nada reconstruido.
+Comparando com o catalogo do gabarito: **zero divergencia dimensional** nos
+6 codigos. O gabarito tem 9 codigos a mais (B19_C, B34_C, B39_C, B54_C,
+C09_C, CAN34, CAN39, CJ19, CM19 - pecas cortadas e canaletas), que o solver
+de hoje nao implementa e que `solver_supported_catalog` ja descartava.
+
+**REGRA OBRIGATORIA - separar EXECUTION SCOPE de EVALUATION SCOPE.** O
+solver roda sobre o INPUT INTEIRO, sempre. A comparacao com o gabarito so'
+vale onde existe gabarito. `benchmark/evaluation_scope.py` grava esse
+escopo em `evaluation_scope.json`, derivado do gabarito e aplicado SO'
+DEPOIS do solver. Fazer o contrario (`REFERENCE -> recortar INPUT ->
+solver`) vazaria a solucao humana para a execucao.
+
+**CORRECAO DE UM DIAGNOSTICO ANTERIOR (secao 24.8).** Estava escrito ali
+que as 70 paredes a mais viriam de o layer `Arquitetura` cobrir area maior
+que a regiao modulada. **MEDIDO e REFUTADO**: das 167 paredes, 164 tem 100%
+da extensao dentro da mascara de ocupacao do gabarito; o comprimento total
+das duas leituras bate a 5% (43.033 cm contra 45.363 cm); e 96,5% da
+extensao dos eixos do input cai a <= 15 cm de um eixo do gabarito. A
+diferenca 167 x 97 e' **FRAGMENTACAO**, nao regiao extra: mediana de 169 cm
+contra 269 cm, mais uma cauda de lascas de 8 a 16 cm. Por isso o escopo tem
+DOIS criterios - ocupacao E suporte de eixo. Com os dois, 152 paredes ficam
+dentro e 15 fora (926,5 cm, 2,2% do comprimento), todas por
+`sem_eixo_de_gabarito_por_baixo`.
+
+**PADRAO OBSERVADO - as 9 aberturas nao atribuidas sao todas de FASE A.**
+Classificadas uma a uma (`benchmark/unassigned_openings.py`): 9 de 9 sao
+`WALL_MODELING_ERROR`. Todas dentro do escopo, todas com eixo do gabarito a
+0,00-0,24 cm por baixo (a pessoa construiu parede exatamente ali), e nenhuma
+parede da FASE A cobre o vao - em 3 casos nem existe parede dentro da
+distancia perpendicular. Nenhuma e' erro do solver de blocos.
+`DOCUMENTADO - pendencia de codigo aberta`, junto com a fragmentacao (e' o
+mesmo defeito visto de outro angulo).
+
+**NUMEROS DA BASELINE OFICIAL `baseline_real_v1` (2026-08-31).** A rodada
+anterior (score 6,6% com catalogo do gabarito) fica marcada como
+PROVISIONAL/DIAGNOSTIC ONLY em `provisional_2b/` e NAO e' historico oficial.
+
+| | FULL | SCOPED |
+|---|---|---|
+| taxa de sucesso | 6,6% | 5,9% |
+| erros criticos | 1.671 | 1.584 |
+| achados nivel 1 | 4.986 | 4.782 |
+| paredes | 167 | 152 |
+| blocos | 10.657 | 10.237 |
+
+SCOPED sair MENOR que FULL nao e' contradicao: o recorte tira 15 paredes
+curtas que passavam nas checagens sem esforco, entao a media cai. O que
+importa e' a coluna do humano ao lado.
+
+**Piso de ruido DENTRO do escopo** (mesmo validador nos dois lados):
+`JUNCTION_NOT_ALTERNATING` 287 x 9 (31,9x), `COMPENSATOR_CONSECUTIVE`
+444 x 52 (8,5x), `PRISM_CONTINUOUS_JOINT` 897 x 126 (7,1x),
+`COVERAGE_PARTIAL_WALL` 56 x 4 (14x). Continuam classificados como
+**validador ruidoso** (o humano incide mais): `JUNCTION_MISSING_BINDING`
+24 x 373 e `JUNCTION_HALF_BLOCK_ADJACENT` 0 x 264.

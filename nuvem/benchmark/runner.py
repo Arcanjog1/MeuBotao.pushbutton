@@ -67,6 +67,12 @@ def project_paths(project_id):
         # ANTES do solver de blocos.
         "input_real": os.path.join(directory, "input_real.json"),
         "wall_modeling_snapshot": os.path.join(directory, "wall_modeling_snapshot.json"),
+        # Etapa 2B.1: a regiao onde EXISTE gabarito humano. Derivada do
+        # reference, aplicada SO' depois do solver (ver `evaluation_scope.py`).
+        "evaluation_scope": os.path.join(directory, "evaluation_scope.json"),
+        "scoped_score": os.path.join(directory, "scoped_score.json"),
+        "scoped_comparison": os.path.join(directory, "scoped_comparison.json"),
+        "scope_summary": os.path.join(directory, "scope_summary.json"),
     }
 
 
@@ -149,7 +155,111 @@ def run_wall_modeling_only(project_id, write_files=True):
     snapshot = wall_modeling_snapshot.build_snapshot(bridge_result, project_id)
     if write_files:
         wall_modeling_snapshot.save(snapshot, paths["wall_modeling_snapshot"])
+
+    # FASE B (Etapa 2B.1): snapshot + catalogo -> input.json do solver. So'
+    # acontece quando `input_real.json` traz catalogo PROPRIO - o benchmark
+    # nao cai no catalogo do `reference.json`, que seria a solucao humana
+    # vazando para dentro da entrada.
+    catalog = input_real.get("catalog")
+    if catalog and write_files:
+        from .extract import input_from_snapshot
+
+        snapshot_for_input = dict(snapshot)
+        settings = dict(snapshot_for_input.get("settings") or {})
+        if settings.get("course_step_cm") is None:
+            # A FASE A decide GEOMETRIA de parede, nunca fiada - o passo vem
+            # do `setup_frozen`, medido no projeto, nunca de um default.
+            settings["course_step_cm"] = (
+                input_real.get("setup_frozen", {}).get("course_step_cm"))
+        snapshot_for_input["settings"] = settings
+
+        input_project = input_from_snapshot.build_input(
+            snapshot_for_input, catalog, project_id,
+            catalog_source=input_real.get("metadata", {}).get("catalog_source"))
+        input_project["source_document"] = input_real.get("source_document")
+        input_project["metadata"]["pair"] = input_real.get("metadata", {}).get("pair")
+        model.save(input_project, paths["input"])
+
     return snapshot
+
+
+def run_scoped_evaluation(project_id, write_files=True):
+    """Metrica SCOPED (Etapa 2B.1): compara o resultado JA PRONTO do solver
+    contra o gabarito, considerando so' a regiao onde existe gabarito.
+
+    NAO roda o solver e NAO toca no `input.json` - de proposito. O escopo e'
+    derivado do reference, e derivar entrada a partir do gabarito vazaria a
+    solucao humana para dentro da execucao (ver `evaluation_scope.py`). Le'
+    o `result.json` da rodada FULL e recorta DEPOIS.
+
+    A rodada FULL continua sendo o resultado oficial do solver; as paredes de
+    fora do escopo aparecem no resumo, apenas nao sao chamadas de erro."""
+    from . import evaluation_scope as scope_module
+
+    paths = project_paths(project_id)
+    result_project = _read_json(paths["result"])
+    reference = _read_json(paths["reference"])
+    if result_project is None or reference is None:
+        raise RuntimeError(
+            "projeto '{0}' precisa de result.json (rode --run antes) e "
+            "reference.json para a metrica SCOPED.".format(project_id))
+
+    scope = _read_json(paths["evaluation_scope"])
+    if scope is None:
+        scope = scope_module.build_scope(reference)
+        if write_files:
+            scope_module.save(scope, paths["evaluation_scope"])
+
+    summary = scope_module.summarize(scope, result_project, reference)
+    classification = summary.pop("classification")
+    reference_class = scope_module.classify_walls(scope, reference)
+
+    scoped_result = scope_module.scoped_project(result_project, classification)
+    scoped_reference = scope_module.scoped_project(reference, reference_class)
+
+    matching = matcher.match_walls(scoped_result, scoped_reference)
+    summary["matched_inside_scope"] = len(matching["pairs"])
+    summary["solver_only_inside_scope"] = (
+        summary["walls_inside_evaluation_scope"] - len(matching["pairs"]))
+    summary["reference_only_inside_scope"] = (
+        len(scoped_reference["walls"]) - len(matching["pairs"]))
+
+    findings, score, comparison = evaluate_project(scoped_result, scoped_reference)
+    score["evaluation_scope"] = summary
+    score["is_scoped_evaluation"] = True
+
+    # Piso de ruido DENTRO do mesmo recorte - sem isso a coluna do humano
+    # contaria paredes que o solver nem foi avaliado em.
+    reference_findings, reference_errors = validators.run_all(scoped_reference, {})
+    reference_score = scoring.score_project(
+        scoped_reference, reference_findings, reference_errors)
+    reference_score["is_reference_calibration"] = True
+    reference_score["is_scoped_evaluation"] = True
+
+    if write_files:
+        _write_json(paths["scoped_score"], score)
+        _write_json(paths["scope_summary"], summary)
+        if comparison is not None:
+            _write_json(paths["scoped_comparison"], comparison)
+        _write_json(os.path.join(paths["dir"], "scoped_reference_score.json"),
+                    reference_score)
+        text = report_module.full_report(score, findings, comparison, None,
+                                         reference_score)
+        if not os.path.isdir(REPORTS_DIR):
+            os.makedirs(REPORTS_DIR)
+        with open(os.path.join(REPORTS_DIR, "{0}_scoped.txt".format(project_id)),
+                  "w", encoding="utf-8") as handle:
+            handle.write(text)
+
+    return {
+        "project_id": project_id,
+        "scope": scope,
+        "summary": summary,
+        "score": score,
+        "reference_score": reference_score,
+        "comparison": comparison,
+        "findings": findings,
+    }
 
 
 def run_project(project_id, save_baseline=False, write_files=True):
@@ -224,7 +334,32 @@ def main(argv=None):
                         help="roda os validadores no GABARITO e grava o piso de ruido")
     parser.add_argument("--wall-modeling-only", action="store_true",
                         help="roda so' a FASE A (input_real.json -> wall_modeling_snapshot.json), sem o solver")
+    parser.add_argument("--scoped", action="store_true",
+                        help="metrica SCOPED: compara o result.json ja pronto contra o "
+                             "gabarito so' na regiao com gabarito humano (evaluation_scope)")
     args = parser.parse_args(argv)
+
+    if args.scoped:
+        if not (args.run or args.all):
+            print("--scoped precisa de --run <project_id> ou --all")
+            return 1
+        for project_id in (list_projects() if args.all else [args.run]):
+            try:
+                outcome = run_scoped_evaluation(project_id)
+            except RuntimeError as exc:
+                print("{0}: {1}".format(project_id, exc))
+                continue
+            summary = outcome["summary"]
+            score = outcome["score"]
+            print("{0} [SCOPED]: {1:.1f}% | criticos {2} | achados n1 {3}".format(
+                project_id, (score.get("success_rate") or 0.0) * 100.0,
+                score.get("critical_errors"), score.get("findings_level_1")))
+            for key in ("walls_total_solver", "walls_inside_evaluation_scope",
+                        "walls_outside_evaluation_scope", "reference_walls",
+                        "reference_walls_inside_scope", "matched_inside_scope",
+                        "solver_only_inside_scope", "reference_only_inside_scope"):
+                print("   {0:<34} {1}".format(key, summary[key]))
+        return 0
 
     if args.wall_modeling_only:
         if not (args.run or args.all):

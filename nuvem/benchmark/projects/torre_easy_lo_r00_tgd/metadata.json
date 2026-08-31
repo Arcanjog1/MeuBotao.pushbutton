@@ -1,0 +1,63 @@
+{
+ "project_id": "torre_easy_lo_r00_tgd",
+ "titulo": "TORRE EASY-LO-R00 nivel 04. TGD (referencia humana) x TESTE MODULACAO 2026 (input cru)",
+ "origem": "PAR de documentos Revit abertos na mesma instancia - o primeiro benchmark do repo em que o INPUT NAO e' reconstruido a partir do gabarito",
+ "extraido_em": "2026-08-31",
+ "extraido_por": "benchmark/extract/revit_input_real_dump.py (INPUT) + benchmark/extract/revit_dump.py (REFERENCE), ambos via mcp__revit-pyrevit__execute_revit_code (READ-ONLY, Document EXPLICITO)",
+ "input_document": {
+  "title": "TESTE MODULACAO (2026)",
+  "role": "INPUT_REAL",
+  "level": "00. 000",
+  "evidencia": "1 ImportInstance ('T01 LIMPA'), 91 aberturas de Mobiliario com Largura_abertura/Altura_abertura/Peitoril, 0 Wall, 0 Modelo Generico colocado (122 tipos carregados, nenhuma instancia)",
+  "filename": "TESTE MODULACAO (2026).rvt",
+  "original_path_redacted": true
+ },
+ "reference_document": {
+  "title": "TORRE EASY-LO-R00_desanexado_joaoC9CL7",
+  "role": "HUMAN_REFERENCE",
+  "level": "04. TGD",
+  "evidencia": "67.712 Modelos Genericos (12.564 no nivel 04. TGD), 0 Wall nativa, 0 Porta/Janela nativa - modulacao humana final ja entregue",
+  "filename": "TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt",
+  "original_path_redacted": true
+ },
+ "pareamento": {
+  "veredito": "MATCHED",
+  "confianca": 0.999,
+  "transform_input_to_reference": {
+   "translation_cm": [
+    7678.7371,
+    1102.9024,
+    341.0
+   ],
+   "rotation_deg": 0.0,
+   "scale": 1.0,
+   "residuo_max_cm": 0.000141
+  },
+  "provas": [
+   "o MESMO CAD ('T01 LIMPA') existe nos dois documentos: 9 layers iguais, contagem por layer identica (19533/13146/9258/2972/2153/1142/528/391/4) e comprimento total identico ate 0,1 cm",
+   "49.127 de 49.127 segmentos casam apos translacao pura: residuo maximo 0,000141 cm, mediano 0,0",
+   "momentos de 2a ordem identicos ate a 9a casa (Sxx B/A = 1,000000000) - rotacao identidade, escala 1",
+   "91 de 91 aberturas do INPUT casam com as 91 do nivel 04. TGD (residuo max 0,24 cm); com 05/08/10/20 TP1 casam apenas 89 de 91",
+   "95,22% dos pontos amostrados nos eixos de parede do gabarito caem a <= 8 cm de uma linha do layer 'Arquitetura' do CAD do INPUT (e so 23,95% a <= 1 cm) - o eixo passa ENTRE as duas faces, como esperado para parede de 14 cm"
+  ]
+ },
+ "por_que_TGD_e_nao_TP1": "as duas aberturas que diferenciam TGD de TP1 (uma porta de 121 cm em x=7654 e uma abertura de 91 cm em x=9400, coordenadas nativas da TORRE) estao no INPUT exatamente como em TGD. O nivel TP1 tem no lugar uma janela de 71 cm com peitoril 160 e a abertura de 91 cm deslocada 29 cm. O projeto torre_easy_lo_r00_tp1, ja existente no repo, NAO e o par deste input.",
+ "setup_frozen_justificativa": {
+  "layer": "'Arquitetura' - escolhido por medicao, nao por nome: e o unico layer que explica os eixos do gabarito (95,22% a <=8 cm; o segundo melhor, 'Mobiliario', fica em 6,84%)",
+  "thicknesses_cm": "[14.0] - as 97 paredes do gabarito tem espessura 14,0 cm, sem excecao",
+  "openings_mode": "'auto' - as aberturas deste projeto sao familias de Mobiliario hospedadas em Nivel, identificadas pelos 3 parametros; a varredura automatica acha as 91",
+  "wall_mode": "'segmented' - DEFAULT_WALL_BUILD_MODE da producao",
+  "level": "'00. 000' - unico nivel do documento INPUT",
+  "base_z_cm": "0.0 - elevacao do nivel do INPUT",
+  "wall_height_cm": "260.0 - altura dominante no gabarito (69 das 97 paredes)",
+  "num_courses": "17 - numero de fiadas medido no gabarito"
+ },
+ "reference_confiabilidade": "RECONSTRUIDO no lado do gabarito - o .rvt entregue nao tem mais Wall nem Porta/Janela (0 de cada). Eixos, vaos e encontros do REFERENCE vem do layout dos blocos (benchmark/extract/reconstruct.py). O lado INPUT, ao contrario do projeto torre_easy_lo_r00_tp1, e MEDIDO: linhas de CAD e aberturas reais.",
+ "limitacoes_conhecidas": [
+  "coordenadas do reference.json estao GRAVADAS no referencial do INPUT (ver source_document.frame_transform_applied); somar translation para voltar ao referencial nativo da TORRE",
+  "catalogo do input.json veio do reference.json - o documento INPUT tem os 122 tipos de bloco carregados mas nenhuma instancia, entao as dimensoes nao podiam ser medidas la",
+  "o Wall Modeling achou 167 paredes contra 97 do gabarito: o layer 'Arquitetura' cobre area maior que a regiao modulada pela pessoa (INPUT chega a Y=-739, gabarito para em Y=-570)",
+  "9 das 91 aberturas nao foram atribuidas a nenhuma parede pela FASE A",
+  "celulas (furos) das pecas nao extraidas: EdgeLoops nao lido nesta rodada"
+ ]
+}

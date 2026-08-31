@@ -1,0 +1,100 @@
+{
+ "in_both": [
+  "B19",
+  "B34",
+  "B39",
+  "B54",
+  "C04",
+  "C09"
+ ],
+ "only_in_input": [],
+ "only_in_reference": [
+  "B19_C",
+  "B34_C",
+  "B39_C",
+  "B54_C",
+  "C09_C",
+  "CAN34",
+  "CAN39",
+  "CJ19",
+  "CM19"
+ ],
+ "divergent_dimensions": [],
+ "aliases_same_dimensions": [
+  {
+   "dims_cm": [
+    19.0,
+    19.0,
+    14.0
+   ],
+   "codes": [
+    [
+     "input",
+     "B19"
+    ],
+    [
+     "reference",
+     "B19"
+    ],
+    [
+     "reference",
+     "B19_C"
+    ],
+    [
+     "reference",
+     "CM19"
+    ]
+   ]
+  },
+  {
+   "dims_cm": [
+    34.0,
+    19.0,
+    14.0
+   ],
+   "codes": [
+    [
+     "input",
+     "B34"
+    ],
+    [
+     "reference",
+     "B34"
+    ],
+    [
+     "reference",
+     "B34_C"
+    ],
+    [
+     "reference",
+     "CAN34"
+    ]
+   ]
+  },
+  {
+   "dims_cm": [
+    39.0,
+    19.0,
+    14.0
+   ],
+   "codes": [
+    [
+     "input",
+     "B39"
+    ],
+    [
+     "reference",
+     "B39"
+    ],
+    [
+     "reference",
+     "CAN39"
+    ]
+   ]
+  }
+ ],
+ "note": "comparacao e' DIAGNOSTICO: nao altera o catalogo entregue ao solver",
+ "compared_at": "2026-08-31",
+ "input_catalog_origin": "FamilySymbol carregados no documento INPUT",
+ "reference_catalog_origin": "tipos das pecas colocadas pela pessoa"
+}

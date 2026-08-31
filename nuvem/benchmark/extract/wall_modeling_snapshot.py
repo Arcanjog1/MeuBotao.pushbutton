@@ -9,7 +9,7 @@ cabecalho de `wall_modeling_bridge.py`):
 O snapshot e' JSON PURO e DETERMINISTICO: dois `run_wall_modeling()` com o
 mesmo `input_real` produzem o mesmo snapshot byte a byte (exceto
 `generated_at`, que fica isolado em `metadata` e nunca entra no
-`engine_fingerprint`).
+`wall_modeling_engine_sha256`).
 
 Reutiliza `model.wall_stable_key`/`model.canonical_segment` - NAO reimplementa
 uma segunda nocao de identidade de parede.
@@ -37,11 +37,15 @@ def _round(value, places=3):
     return round(float(value), places)
 
 
-def _engine_fingerprint(module):
-    """sha256 do arquivo fonte do motor carregado (`core/wall_modeling.py`).
-    Serve para a Etapa 2A confirmar que nenhuma alteracao no core aconteceu
-    durante a implementacao (item 15 do pedido) - e para qualquer sessao
-    futura notar, so' de olhar o snapshot, que o motor usado era outro."""
+def _wall_modeling_engine_sha256(module):
+    """sha256 do ARQUIVO fonte do motor carregado (`core/wall_modeling.py`).
+
+    NAO CONFUNDIR com o `solver_decision_fingerprint` de
+    `tests/solver_bench.py`: aquele e' o sha256 das PECAS QUE O SOLVER
+    DECIDE (muda quando a modulacao muda de resultado); este e' o sha256 do
+    arquivo (muda a cada edicao do fonte, mesmo que o resultado seja
+    identico). Ja houve confusao entre os dois (2026-08-31) - o nome longo
+    existe justamente para isso nao se repetir."""
     path = getattr(module, "__file__", None)
     if not path:
         return None
@@ -165,6 +169,67 @@ def _openings_per_wall_entries(bridge_result, wall_entries):
     return result
 
 
+def _op_summary(module, op):
+    """`op` (dict do motor, com `XYZ` VIVO) -> dict JSON-puro em cm.
+
+    NAO recalcula nada: so' converte para numero o que o motor ja decidiu."""
+    def xy(value):
+        return None if value is None else [
+            _round(_cm(module, value.X)), _round(_cm(module, value.Y))]
+
+    return {
+        "element_id": (None if op.get("element_id") is None
+                       else str(op.get("element_id"))),
+        "center_cm": xy(op.get("center_xy")),
+        "bbox_center_cm": xy(op.get("bbox_center_xy")),
+        "width_cm": _round(_cm(module, op["width_ft"])) if op.get("width_ft") is not None else None,
+        "sill_cm": _round(_cm(module, op["sill_z_abs"])) if op.get("sill_z_abs") is not None else None,
+        "head_cm": _round(_cm(module, op["head_z_abs"])) if op.get("head_z_abs") is not None else None,
+    }
+
+
+def _diagnostics_entry(bridge_result):
+    """`bridge_result["diagnostics"]` em JSON PURO.
+
+    `assign_openings_to_walls` (core/engine/wall_pairing.py) guarda dentro de
+    `diagnostics["openings"]` os dicts `op` ORIGINAIS - e esses carregam
+    `XYZ` vivo em `center_xy`/`bbox_center_xy`. Jogar isso direto no snapshot
+    fazia `save()` estourar com `TypeError: Object of type XYZ is not JSON
+    serializable` assim que a primeira abertura era atribuida a uma parede.
+
+    Nao aparecia nos testes da Etapa 2A porque eles param em
+    `build_snapshot()` (dict em memoria) e porque o `_opening()` de
+    `tests/regression/test_wall_modeling_bridge.py` nao preenche
+    `bbox_center_cm`. So' uma planta REAL - que tem os dois - chega aqui.
+
+    Convertido, nao descartado: a informacao de diagnostico continua toda no
+    snapshot, agora em cm. NENHUMA geometria muda - `_openings_per_wall_entries`
+    continua lendo `assignments` de `bridge_result`, nunca daqui."""
+    module = bridge_result["module"]
+    diagnostics = dict(bridge_result["diagnostics"])
+    openings = dict(diagnostics.get("openings") or {})
+
+    openings["assignments"] = [
+        {
+            "op": _op_summary(module, record["op"]),
+            "wall_index": record["wall_idx"],
+            "t_start_cm": _round(_cm(module, record["t_lo"])),
+            "t_end_cm": _round(_cm(module, record["t_hi"])),
+            "perp_dist_cm": (None if record.get("perp_dist_ft") is None
+                             else _round(_cm(module, record["perp_dist_ft"]))),
+        }
+        for record in (openings.get("assignments") or [])
+    ]
+    openings["unassigned_openings"] = [
+        _op_summary(module, op) for op in (openings.get("unassigned_openings") or [])
+    ]
+    openings["opening_center_gap_max_cm"] = _round(
+        _cm(module, openings.get("opening_center_gap_max_ft") or 0.0))
+
+    diagnostics["openings"] = openings
+    return diagnostics
+
+
 def build_snapshot(bridge_result, project_id, metadata=None):
     """`wall_modeling_bridge.run_wall_modeling()` -> dict pronto para
     `save()`. Puro - nao toca disco."""
@@ -180,13 +245,13 @@ def build_snapshot(bridge_result, project_id, metadata=None):
         "project_id": project_id,
         "source": "wall_modeling",
         "setup_frozen": bridge_result["setup_frozen"],
-        "engine_fingerprint": _engine_fingerprint(module),
+        "wall_modeling_engine_sha256": _wall_modeling_engine_sha256(module),
         "walls": wall_entries,
         "nodes": _node_entries(bridge_result, wall_keys_by_index),
         "end_to_node": _end_to_node_entries(bridge_result),
         "openings_per_wall": _openings_per_wall_entries(bridge_result, wall_entries),
         "unused_lines": bridge_result["unused_lines"],
-        "diagnostics": bridge_result["diagnostics"],
+        "diagnostics": _diagnostics_entry(bridge_result),
         "settings": settings,
         "metadata": dict(metadata or {}),
     }
@@ -273,6 +338,6 @@ def to_solver_input(snapshot, project_id=None):
             "walls_already_extended": True,
         },
         metadata={"derived_from": "wall_modeling_snapshot",
-                  "engine_fingerprint": snapshot.get("engine_fingerprint")},
+                  "wall_modeling_engine_sha256": snapshot.get("wall_modeling_engine_sha256")},
     )
     return model.assign_ids(project)

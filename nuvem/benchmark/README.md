@@ -260,3 +260,79 @@ diferença e investigar causa — a validação final é sempre calculada.
    `JUNCTION_MISSING_BINDING` melhorando a reconstrução de encontros.
 4. Extrair as células reais das peças (`EdgeLoops`) na próxima extração.
 5. Ligar `runner.py --all --check` num hook de pré-commit.
+
+
+## Baseline REAL (Etapa 2B/2B.1)
+
+`torre_easy_lo_r00_tgd` é o primeiro projeto em que o INPUT é **medido**,
+não reconstruído a partir do gabarito. São **dois** documentos Revit,
+provados como o mesmo projeto/região (ver `metadata.json`, chave
+`pareamento`).
+
+```
+INPUT     TESTE MODULAÇÃO (2026)                 nível 00. 000
+REFERENCE TORRE EASY-LO-R00_desanexado_joao…   nível 04. TGD
+transform INPUT → REFERENCE  (7678,7371 ; 1102,9024 ; 341,0) cm, 0°, escala 1
+```
+
+### Os comandos, na ordem
+
+```bash
+py -3 -c "import sys; sys.path.insert(0,'nuvem'); from benchmark.extract import revit_input_real_dump as r; print(r.build_code('TESTE','Arquitetura','T01 LIMPA'))"
+```
+
+```bash
+py -3 -c "import sys; sys.path.insert(0,'nuvem'); from benchmark.extract import revit_catalog_dump as r; print(r.build_code('TESTE'))"
+```
+
+```bash
+py -3 -c "import sys; sys.path.insert(0,'nuvem'); from benchmark.extract import revit_dump; print(revit_dump.build_code('TORRE','04. TGD'))"
+```
+
+As três saídas vão como `code` para `mcp__revit-pyrevit__execute_revit_code`
+(READ-ONLY, `Document` EXPLÍCITO em todas). Depois
+`extract/assemble_real_project.py::assemble()` monta `input_real.json`,
+`reference.json` e `catalog_comparison.json`, e o runner segue:
+
+```bash
+py -3 nuvem/benchmark/runner.py --run torre_easy_lo_r00_tgd --wall-modeling-only
+```
+
+```bash
+py -3 nuvem/benchmark/runner.py --run torre_easy_lo_r00_tgd
+```
+
+```bash
+py -3 nuvem/benchmark/runner.py --run torre_easy_lo_r00_tgd --scoped
+```
+
+### Três regras que este projeto impõe
+
+1. **`Document` explícito.** Com dois `.rvt` abertos na mesma instância,
+   `revit_input_real_dump.py` e `revit_catalog_dump.py` exigem
+   `DOC_TITLE_PREFIX` e falham se ele não casar com exatamente um
+   documento. Não existe fallback para o documento ativo.
+
+2. **O catálogo não vem do gabarito.** Ele vem dos `FamilySymbol`
+   carregados no próprio INPUT. A rodada que usou o catálogo do
+   `reference.json` está guardada em `provisional_2b/`, marcada
+   PROVISIONAL/DIAGNOSTIC ONLY — não é histórico oficial.
+
+3. **EXECUTION SCOPE ≠ EVALUATION SCOPE.** O solver roda sobre o input
+   inteiro; a comparação com o gabarito só vale onde há gabarito
+   (`evaluation_scope.py`). O escopo é aplicado DEPOIS do solver — nunca
+   antes, senão o gabarito vazaria para a execução. Paredes de fora do
+   escopo aparecem no resumo; só não são chamadas de erro.
+
+### Os dois hashes, com nome
+
+| nome | valor | mede |
+|---|---|---|
+| `solver_decision_fingerprint` | `c74c9c1a…` | as peças que o solver decide (`tests/solver_bench.py`) |
+| `wall_modeling_engine_sha256` | `f0171249…` | o sha256 do arquivo `core/wall_modeling.py` (campo do snapshot) |
+
+Cópias em `extract/revit_catalog_dump.py` (`BLOCK_FAMILY_CATALOG_DEFINITIONS`)
+e em `revit_input_real_dump.py` (`extract_lines_by_layer`,
+`_param_value_as_feet`, `_opening_center_from_geometry`) são deliberadas —
+a produção só roda dentro do botão, com `doc` global e UI. **Se a produção
+mudar alguma delas, a cópia tem que ser revista junto.**

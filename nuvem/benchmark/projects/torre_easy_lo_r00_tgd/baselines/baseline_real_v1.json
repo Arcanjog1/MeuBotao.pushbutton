@@ -1,0 +1,103 @@
+{
+ "baseline_id": "baseline_real_v1",
+ "frozen_at": "2026-08-31",
+ "status": "OFICIAL",
+ "solver_decision_fingerprint": "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316",
+ "wall_modeling_engine_sha256": "f017124964a806fba8d4249add34db665f86282ae2a8c6fecb1018713d3bad8a",
+ "catalog_source": "documento INPUT (FamilySymbol carregados) - sem vazamento do gabarito",
+ "evaluation_scope": "evaluation_scope.json (ocupacao + suporte de eixo)",
+ "supersedes": "provisional_2b/ (catalogo vindo do reference.json) - PROVISIONAL/DIAGNOSTIC ONLY",
+ "full": {
+  "success_rate": 0.0659,
+  "critical_errors": 1671,
+  "findings_level_1": 4986,
+  "walls": 167,
+  "blocks": 10657
+ },
+ "scoped": {
+  "success_rate": 0.0592,
+  "critical_errors": 1584,
+  "findings_level_1": 4782,
+  "walls": 152,
+  "blocks": 10237,
+  "scope_summary": {
+   "walls_total_solver": 167,
+   "walls_inside_evaluation_scope": 152,
+   "walls_outside_evaluation_scope": 15,
+   "reference_walls": 97,
+   "reference_walls_inside_scope": 97,
+   "outside_wall_ids": [
+    "W062",
+    "W063",
+    "W064",
+    "W065",
+    "W067",
+    "W077",
+    "W083",
+    "W092",
+    "W094",
+    "W095",
+    "W096",
+    "W097",
+    "W103",
+    "W164",
+    "W166"
+   ],
+   "outside_by_reason": {
+    "sem_eixo_de_gabarito_por_baixo": 15
+   },
+   "outside_total_length_cm": 926.5,
+   "inside_total_length_cm": 42106.2,
+   "outside_walls": [
+    {
+     "id": "W062"
+    },
+    {
+     "id": "W063"
+    },
+    {
+     "id": "W064"
+    },
+    {
+     "id": "W065"
+    },
+    {
+     "id": "W067"
+    },
+    {
+     "id": "W077"
+    },
+    {
+     "id": "W083"
+    },
+    {
+     "id": "W092"
+    },
+    {
+     "id": "W094"
+    },
+    {
+     "id": "W095"
+    },
+    {
+     "id": "W096"
+    },
+    {
+     "id": "W097"
+    },
+    {
+     "id": "W103"
+    },
+    {
+     "id": "W164"
+    },
+    {
+     "id": "W166"
+    }
+   ],
+   "matched_inside_scope": 84,
+   "solver_only_inside_scope": 68,
+   "reference_only_inside_scope": 13
+  }
+ }
+}

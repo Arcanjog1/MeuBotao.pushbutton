@@ -1,0 +1,424 @@
+{
+ "schema_version": 1,
+ "generated_at": "2026-08-31T11:51:17.946490",
+ "openings_total": 91,
+ "assigned": 82,
+ "unassigned": 9,
+ "tolerances": {
+  "source": "motor real (core/engine/tolerances.py)",
+  "opening_assoc_tolerance_cm": 5.0,
+  "min_segment_length_cm": 1.0,
+  "gabarito_hit_tolerance_cm": 20.0
+ },
+ "counts": {
+  "WALL_MODELING_ERROR": 9
+ },
+ "note": "auditoria APENAS - nenhuma correcao de Wall Modeling ou de solver",
+ "openings": [
+  {
+   "element_id": "6558406",
+   "center_cm": [
+    1015.998,
+    -562.709
+   ],
+   "bbox_center_cm": [
+    1015.998,
+    -562.709
+   ],
+   "width_cm": 321.0,
+   "sill_cm": 0.0,
+   "head_cm": 251.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 1,
+    "wall_key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0",
+    "perp_dist_cm": 0.242,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -1249.98
+    ],
+    "interval_width_cm": -1249.98,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 165,
+    "wall_key": "W|723.5,-562.0|727.5,-562.0|t14.0",
+    "perp_dist_cm": 0.708,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     132.196,
+     4.445
+    ],
+    "interval_width_cm": -127.751,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 3,
+   "nearest_reference_axis_dist_cm": 0.24,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 2,
+   "nearest_cad_line_dist_cm": 7.24,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.24 cm), mas nenhuma parede da FASE A cobre o vao: 3 parede(s) passam na distancia perpendicular e a melhor delas cobre -127.8 cm"
+  },
+  {
+   "element_id": "6558407",
+   "center_cm": [
+    1510.998,
+    -562.709
+   ],
+   "bbox_center_cm": [
+    1510.998,
+    -562.709
+   ],
+   "width_cm": 321.0,
+   "sill_cm": 0.0,
+   "head_cm": 251.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 1,
+    "wall_key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0",
+    "perp_dist_cm": 0.242,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -1744.98
+    ],
+    "interval_width_cm": -1744.98,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 165,
+    "wall_key": "W|723.5,-562.0|727.5,-562.0|t14.0",
+    "perp_dist_cm": 0.708,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     627.196,
+     4.445
+    ],
+    "interval_width_cm": -622.751,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 3,
+   "nearest_reference_axis_dist_cm": 0.24,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 2,
+   "nearest_cad_line_dist_cm": 7.24,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.24 cm), mas nenhuma parede da FASE A cobre o vao: 3 parede(s) passam na distancia perpendicular e a melhor delas cobre -622.8 cm"
+  },
+  {
+   "element_id": "6558411",
+   "center_cm": [
+    -1558.989,
+    357.29
+   ],
+   "bbox_center_cm": [
+    -1558.989,
+    357.29
+   ],
+   "width_cm": 91.0,
+   "sill_cm": 0.0,
+   "head_cm": 221.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 35,
+    "wall_key": "W|-1878.5,370.0|-1494.5,370.0|t14.0",
+    "perp_dist_cm": 12.759,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     19.009,
+     110.009
+    ],
+    "interval_width_cm": 91.0,
+    "within_perp": false,
+    "interval_ok": true
+   },
+   "best_eligible_wall": null,
+   "walls_within_perp_tolerance": 0,
+   "nearest_reference_axis_dist_cm": 0.24,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 153,
+   "nearest_cad_line_dist_cm": 3.24,
+   "rejection_reason": "nenhuma parede dentro de thickness/2 + OPENING_ASSOC_TOLERANCE",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.24 cm), mas nenhuma parede da FASE A cobre o vao: 0 parede(s) passam na distancia perpendicular e a melhor delas cobre nenhum cm"
+  },
+  {
+   "element_id": "6558426",
+   "center_cm": [
+    -1806.488,
+    229.79
+   ],
+   "bbox_center_cm": [
+    -1806.488,
+    229.79
+   ],
+   "width_cm": 131.0,
+   "sill_cm": 110.0,
+   "head_cm": 231.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 161,
+    "wall_key": "W|-1805.5,-87.5|-1805.5,-83.0|t14.0",
+    "perp_dist_cm": 0.956,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     251.836,
+     4.445
+    ],
+    "interval_width_cm": -247.391,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 161,
+    "wall_key": "W|-1805.5,-87.5|-1805.5,-83.0|t14.0",
+    "perp_dist_cm": 0.956,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     251.836,
+     4.445
+    ],
+    "interval_width_cm": -247.391,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 4,
+   "nearest_reference_axis_dist_cm": 0.0,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 66,
+   "nearest_cad_line_dist_cm": 0.65,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.00 cm), mas nenhuma parede da FASE A cobre o vao: 4 parede(s) passam na distancia perpendicular e a melhor delas cobre -247.4 cm"
+  },
+  {
+   "element_id": "6558433",
+   "center_cm": [
+    1880.998,
+    -562.709
+   ],
+   "bbox_center_cm": [
+    1880.998,
+    -562.709
+   ],
+   "width_cm": 131.0,
+   "sill_cm": 110.0,
+   "head_cm": 231.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 1,
+    "wall_key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0",
+    "perp_dist_cm": 0.242,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -2209.98
+    ],
+    "interval_width_cm": -2209.98,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 165,
+    "wall_key": "W|723.5,-562.0|727.5,-562.0|t14.0",
+    "perp_dist_cm": 0.708,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     1092.196,
+     4.445
+    ],
+    "interval_width_cm": -1087.751,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 3,
+   "nearest_reference_axis_dist_cm": 0.24,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 56,
+   "nearest_cad_line_dist_cm": 0.9,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.24 cm), mas nenhuma parede da FASE A cobre o vao: 3 parede(s) passam na distancia perpendicular e a melhor delas cobre -1087.8 cm"
+  },
+  {
+   "element_id": "6558458",
+   "center_cm": [
+    1998.499,
+    229.79
+   ],
+   "bbox_center_cm": [
+    1998.499,
+    229.79
+   ],
+   "width_cm": 131.0,
+   "sill_cm": 110.0,
+   "head_cm": 231.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 162,
+    "wall_key": "W|1997.5,-87.5|1997.5,-83.0|t14.0",
+    "perp_dist_cm": 0.931,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     251.836,
+     4.445
+    ],
+    "interval_width_cm": -247.391,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 162,
+    "wall_key": "W|1997.5,-87.5|1997.5,-83.0|t14.0",
+    "perp_dist_cm": 0.931,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     251.836,
+     4.445
+    ],
+    "interval_width_cm": -247.391,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 4,
+   "nearest_reference_axis_dist_cm": 0.0,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 66,
+   "nearest_cad_line_dist_cm": 0.68,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.00 cm), mas nenhuma parede da FASE A cobre o vao: 4 parede(s) passam na distancia perpendicular e a melhor delas cobre -247.4 cm"
+  },
+  {
+   "element_id": "6558461",
+   "center_cm": [
+    1750.998,
+    357.289
+   ],
+   "bbox_center_cm": [
+    1750.998,
+    357.289
+   ],
+   "width_cm": 91.0,
+   "sill_cm": 0.0,
+   "head_cm": 221.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 35,
+    "wall_key": "W|-1878.5,370.0|-1494.5,370.0|t14.0",
+    "perp_dist_cm": 12.76,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -3199.978
+    ],
+    "interval_width_cm": -3199.978,
+    "within_perp": false,
+    "interval_ok": false
+   },
+   "best_eligible_wall": null,
+   "walls_within_perp_tolerance": 0,
+   "nearest_reference_axis_dist_cm": 0.24,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 159,
+   "nearest_cad_line_dist_cm": 3.24,
+   "rejection_reason": "nenhuma parede dentro de thickness/2 + OPENING_ASSOC_TOLERANCE",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.24 cm), mas nenhuma parede da FASE A cobre o vao: 0 parede(s) passam na distancia perpendicular e a melhor delas cobre nenhum cm"
+  },
+  {
+   "element_id": "6558475",
+   "center_cm": [
+    163.51,
+    329.789
+   ],
+   "bbox_center_cm": [
+    163.51,
+    329.789
+   ],
+   "width_cm": 81.0,
+   "sill_cm": 140.0,
+   "head_cm": 251.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 55,
+    "wall_key": "W|-663.5,342.0|-394.5,342.0|t14.0",
+    "perp_dist_cm": 12.26,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     786.499,
+     269.009
+    ],
+    "interval_width_cm": -517.49,
+    "within_perp": false,
+    "interval_ok": false
+   },
+   "best_eligible_wall": null,
+   "walls_within_perp_tolerance": 0,
+   "nearest_reference_axis_dist_cm": 0.0,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 120,
+   "nearest_cad_line_dist_cm": 4.01,
+   "rejection_reason": "nenhuma parede dentro de thickness/2 + OPENING_ASSOC_TOLERANCE",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.00 cm), mas nenhuma parede da FASE A cobre o vao: 0 parede(s) passam na distancia perpendicular e a melhor delas cobre nenhum cm"
+  },
+  {
+   "element_id": "6558476",
+   "center_cm": [
+    163.51,
+    449.789
+   ],
+   "bbox_center_cm": [
+    163.51,
+    449.789
+   ],
+   "width_cm": 81.0,
+   "sill_cm": 20.0,
+   "head_cm": 131.0,
+   "inside_evaluation_scope": true,
+   "nearest_wall": {
+    "wall_index": 48,
+    "wall_key": "W|586.5,444.0|855.5,444.0|t14.0",
+    "perp_dist_cm": 5.74,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -382.501
+    ],
+    "interval_width_cm": -382.501,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "best_eligible_wall": {
+    "wall_index": 48,
+    "wall_key": "W|586.5,444.0|855.5,444.0|t14.0",
+    "perp_dist_cm": 5.74,
+    "max_perp_allowed_cm": 12.0,
+    "interval_cm": [
+     0.0,
+     -382.501
+    ],
+    "interval_width_cm": -382.501,
+    "within_perp": true,
+    "interval_ok": false
+   },
+   "walls_within_perp_tolerance": 4,
+   "nearest_reference_axis_dist_cm": 0.0,
+   "has_reference_axis_under_it": true,
+   "cad_lines_within_100cm": 101,
+   "nearest_cad_line_dist_cm": 2.91,
+   "rejection_reason": "ha' parede na distancia perpendicular, mas o vao projeta fora do trecho de todas elas (t_hi - t_lo <= MIN_SEGMENT_LENGTH)",
+   "classification": "WALL_MODELING_ERROR",
+   "rationale": "a pessoa construiu parede exatamente aqui (eixo do gabarito a 0.00 cm), mas nenhuma parede da FASE A cobre o vao: 4 parede(s) passam na distancia perpendicular e a melhor delas cobre -382.5 cm"
+  }
+ ]
+}

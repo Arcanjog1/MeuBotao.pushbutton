@@ -1,0 +1,79 @@
+{
+ "walls_total_solver": 167,
+ "walls_inside_evaluation_scope": 152,
+ "walls_outside_evaluation_scope": 15,
+ "reference_walls": 97,
+ "reference_walls_inside_scope": 97,
+ "outside_wall_ids": [
+  "W062",
+  "W063",
+  "W064",
+  "W065",
+  "W067",
+  "W077",
+  "W083",
+  "W092",
+  "W094",
+  "W095",
+  "W096",
+  "W097",
+  "W103",
+  "W164",
+  "W166"
+ ],
+ "outside_by_reason": {
+  "sem_eixo_de_gabarito_por_baixo": 15
+ },
+ "outside_total_length_cm": 926.5,
+ "inside_total_length_cm": 42106.2,
+ "outside_walls": [
+  {
+   "id": "W062"
+  },
+  {
+   "id": "W063"
+  },
+  {
+   "id": "W064"
+  },
+  {
+   "id": "W065"
+  },
+  {
+   "id": "W067"
+  },
+  {
+   "id": "W077"
+  },
+  {
+   "id": "W083"
+  },
+  {
+   "id": "W092"
+  },
+  {
+   "id": "W094"
+  },
+  {
+   "id": "W095"
+  },
+  {
+   "id": "W096"
+  },
+  {
+   "id": "W097"
+  },
+  {
+   "id": "W103"
+  },
+  {
+   "id": "W164"
+  },
+  {
+   "id": "W166"
+  }
+ ],
+ "matched_inside_scope": 84,
+ "solver_only_inside_scope": 68,
+ "reference_only_inside_scope": 13
+}

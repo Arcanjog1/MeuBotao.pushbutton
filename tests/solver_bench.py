@@ -73,7 +73,7 @@ F = m.FEET_PER_METER
 # pecas MUDAM de posicao e de tipo de proposito - medido nos mesmos
 # cenarios: peca de amarracao (B34/B54) usada como enchimento 2460 -> 0,
 # bloco inteiro B39 9587 -> 11570, compensador 1200 -> 1924.
-REFERENCE_FINGERPRINT = "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316"
+REFERENCE_SOLVER_DECISION_FINGERPRINT = "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316"
 
 # Pe-direito tipico do projeto: 3,00m / 20cm por fiada = 15 fiadas fisicas.
 NUM_COURSES = 15
@@ -165,7 +165,7 @@ def solve(nx, ny, num_courses=NUM_COURSES):
 
 # ------------------------------------------------------------- assinatura
 # Cenarios da assinatura de referencia - NAO alterar sem trocar tambem
-# REFERENCE_FINGERPRINT (ver docstring do modulo).
+# REFERENCE_SOLVER_DECISION_FINGERPRINT (ver docstring do modulo).
 SCENARIOS = [(2, 2), (3, 2), (3, 3)]
 
 
@@ -210,7 +210,7 @@ def _scenario_signature(result):
     }
 
 
-def fingerprint(scenarios=None):
+def solver_decision_fingerprint(scenarios=None):
     """(sha256, dados) dos `scenarios` - ver o docstring do modulo."""
     data = {}
     for nx, ny in (scenarios or SCENARIOS):
@@ -313,14 +313,14 @@ DEFAULT_SIZES = [(3, 3), (6, 6), (8, 8), (12, 12)]
 
 def main(argv):
     if "--fingerprint" in argv:
-        digest, _data = fingerprint()
+        digest, _data = solver_decision_fingerprint()
         print("sha256    : {}".format(digest))
-        print("referencia: {}".format(REFERENCE_FINGERPRINT))
-        if digest == REFERENCE_FINGERPRINT:
+        print("referencia: {}".format(REFERENCE_SOLVER_DECISION_FINGERPRINT))
+        if digest == REFERENCE_SOLVER_DECISION_FINGERPRINT:
             print("OK - o solver decide exatamente as mesmas pecas de sempre.")
             return 0
         print("DIVERGIU - alguma peca mudou de posicao/tipo/orientacao. Se a")
-        print("mudanca era INTENCIONAL, atualizar REFERENCE_FINGERPRINT e")
+        print("mudanca era INTENCIONAL, atualizar REFERENCE_SOLVER_DECISION_FINGERPRINT e")
         print("explicar no commit o que mudou e por que.")
         return 1
 
