@@ -1,5 +1,21 @@
 # HANDOFF - ETAPA 2C (diagnostico de causa raiz) - INTERROMPIDA
 
+> **[2026-08-31 - ETAPA 2C CONCLUIDA EM SESSAO POSTERIOR]**
+> Este documento continua valido como registro do que foi medido ate' a
+> interrupcao, mas **nao e' mais o documento de referencia**. O diagnostico
+> foi terminado a partir daqui, sem refazer nada das secoes 8.1-8.10, e o
+> resultado final (entregas A-S, causas raiz agrupadas, cadeia causal,
+> casos de regressao e riscos) esta' em:
+>
+> **`nuvem/benchmark/RELATORIO_ETAPA_2C.md`**
+>
+> Duas correcoes a este handoff, feitas la': (1) `provenance_walls.json`
+> tem **209** entradas (pares aceitos, antes do dedup), nao 167 como diz a
+> secao 13; (2) as pendencias 11.1 a 11.5 e 11.8 foram fechadas.
+> Continuam pendentes 11.6 e 11.7.
+>
+> ---
+>
 > Documento de CHECKPOINT. A sessao foi encerrada por limite de tokens no
 > meio da analise. Nada foi corrigido: nenhum arquivo de `nuvem/core/**`,
 > do solver, do Wall Modeling, de tolerancias, de catalogo ou de aberturas

@@ -2422,3 +2422,101 @@ importa e' a coluna do humano ao lado.
 `COVERAGE_PARTIAL_WALL` 56 x 4 (14x). Continuam classificados como
 **validador ruidoso** (o humano incide mais): `JUNCTION_MISSING_BINDING`
 24 x 373 e `JUNCTION_HALF_BLOCK_ADJACENT` 0 x 264.
+
+## 25. ABERTURAS E BONECAS: o que o projeto humano realmente faz (2026-08-31)
+
+Conhecimento extraido da Etapa 2C do benchmark, projeto
+`torre_easy_lo_r00_tgd` (nivel 04. TGD). Medicao completa em
+`nuvem/benchmark/RELATORIO_ETAPA_2C.md`. Registro obrigatorio (CLAUDE.md:
+"todo conhecimento de AMARRACAO deve ser guardado").
+
+### 25.1 REGRA OBRIGATORIA - a abertura NAO se move para a modulacao fechar
+
+**CONFLITO RESOLVIDO.** A hipotese de trabalho anterior era que o
+projetista humano deslocava portas/janelas alguns cm ao longo da parede
+(aumentando uma boneca e diminuindo a outra) para a modulacao fechar.
+**Isso esta' REFUTADO com medicao.**
+
+Como foi descoberto: casamento estrito INPUT (CAD) x HUMANO (fiadas reais
+reconstruidas) das 91 aberturas, 75 pares.
+
+- deslocamento AO LONGO da parede: **maximo 0,2442 cm em 75 de 75 pares**
+  (media 0,0807; mediana 0,0047). Nao ha' um unico caso acima do piso de
+  ruido de 0,5 cm.
+- largura: `dw = 0` em **74 de 75**; peitoril: `dsill = 0` em **75 de 75**.
+- bonecas: **150 bonecas medidas** (2 por abertura), diferenca maxima
+  **0,244 cm**, nenhuma acima de 0,5 cm.
+- o residuo de 0,24 cm e' um offset rigido global (`dy = -0,243 cm`) da
+  reconstrucao do gabarito, nao movimento.
+
+**Consequencia para o solver:** e' PROIBIDO mover uma abertura para fechar
+a modulacao. A abertura e' dado de entrada fixo.
+
+### 25.2 REGRA OBRIGATORIA - a abertura e' fronteira dura da fiada
+
+**FATO MEDIDO:** distancia da lateral do vao ate' a junta vertical humana
+mais proxima = **0,000 cm de maximo**, nos dois lados, em todas as fiadas
+de todas as paredes com abertura. A fiada humana **para exatamente** na
+lateral do vao - nunca atravessa, nunca sobra, nunca falta.
+
+### 25.3 PADRAO OBSERVADO CONFIRMADO - o residuo e' absorvido por compensador ENCOSTADO na abertura
+
+**FATO MEDIDO** (1.582 encostes de bloco em lateral de vao, fiada a fiada):
+
+| bloco encostado na lateral do vao | esquerda | direita |
+|---|---|---|
+| B19 | 262 | 268 |
+| **C04** | **147** | **151** |
+| B39 | 105 | 108 |
+| **C09** | **97** | **94** |
+| B34 | 74 | 64 |
+| B54 | 39 | 37 |
+
+**502 dos 1.582 encostes (31,7%) sao compensador (C04/C09).**
+
+Ou seja: o humano nao move a abertura - ele **encosta o compensador na
+lateral do vao**. Essa e' a manobra real que fecha a modulacao ao redor de
+portas e janelas.
+
+Isso NAO autoriza compensadores consecutivos (regra existente continua
+valendo); autoriza compensador **na lateral do vao**, que e' posicao
+legitima e frequente no projeto humano.
+
+### 25.4 REGRA OBRIGATORIA (verificacao) - a malha modular do projeto
+
+**FATO MEDIDO** no gabarito humano:
+
+| grandeza | regra medida |
+|---|---|
+| comprimento de parede | **96 de 97 sao `comprimento % 5 == 4` cm** |
+| largura de abertura | **91 de 91 (INPUT) sao `largura % 5 == 1` cm** |
+| boneca (lateral do vao ate' o vizinho) | **as 26 distintas sao `% 5 == 4` cm** |
+
+Valores de boneca efetivamente encontrados: 19, 24, 34, 39, 44, 49, 54,
+59, 64, 69, 74, 124, 134, 159, 164, 204, 274, 289, 309, 314, 519, 534,
+754, 1024 cm.
+
+**Uso obrigatorio:** `comprimento % 5 == 4` e' teste de sanidade barato
+para qualquer parede reconstruida do CAD. Hoje **so' 82 das 167 paredes**
+do Wall Modeling passam nesse teste (o gabarito passa em 96 de 97) - as 85
+restantes sao suspeitas de pareamento errado.
+
+**DOCUMENTADO - pendencia de codigo aberta:** esse teste ainda nao existe
+no validador nem no benchmark.
+
+### 25.5 REGRA OBRIGATORIA - a geometria esta' errada ANTES do solver
+
+**FATO MEDIDO.** As 9 aberturas hoje rotuladas `WALL_MODELING_ERROR` nao
+sao erro de abertura: 5 estao em paredes que o Wall Modeling **nao criou**
+e 4 estao a 12,8-13,0 cm de um eixo que ficou **13 cm fora do lugar**.
+Causa raiz: o desempate de `find_wall_pairs` premia a MENOR distancia
+entre faces em vez da distancia mais proxima da espessura pedida (em
+**71 de 72** disputas medidas o par vencedor tinha espessura pior).
+
+**Consequencia para toda analise de modulacao:** enquanto isso nao for
+corrigido, medir `COMPENSATOR_CONSECUTIVE`, `PRISM_CONTINUOUS_JOINT` ou
+`JUNCTION_NOT_ALTERNATING` sobre este projeto **mede ruido** - 31 das 167
+paredes nao deveriam existir e 27 das 97 paredes reais estao faltando.
+
+**DOCUMENTADO - pendencia de codigo aberta.** Nenhuma correcao foi
+aplicada; o plano e' tratado em sessao propria.

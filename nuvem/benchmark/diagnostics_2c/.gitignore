@@ -1,0 +1,5 @@
+# Regeneraveis, nao sao evidencia canonica da Etapa 2C (ver RELATORIO_ETAPA_2C.md
+# Anexo - auditoria de 2026-08-31). Regenerar com trace_stage.py se precisar.
+trace9.py
+trace_stage.py
+unused.py
