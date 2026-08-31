@@ -60,6 +60,13 @@ def project_paths(project_id):
         "metadata": os.path.join(directory, "metadata.json"),
         "result": os.path.join(directory, "result.json"),
         "baseline": os.path.join(directory, "baseline.json"),
+        # Etapa 2A: FASE A do pipeline de Wall Modeling (ver
+        # `wall_modeling_bridge.py`/`extract/wall_modeling_snapshot.py`) -
+        # `input_real.json` e' o problema (linhas do CAD por Layer, aberturas,
+        # setup_frozen); `wall_modeling_snapshot.json` e' a saida, ainda
+        # ANTES do solver de blocos.
+        "input_real": os.path.join(directory, "input_real.json"),
+        "wall_modeling_snapshot": os.path.join(directory, "wall_modeling_snapshot.json"),
     }
 
 
@@ -121,6 +128,28 @@ def calibrate_project(project_id, write_files=True):
         _write_json(os.path.join(paths["dir"], "reference_score.json"), score)
         _write_json(os.path.join(paths["dir"], "reference_findings.json"), findings)
     return score
+
+
+def run_wall_modeling_only(project_id, write_files=True):
+    """FASE A isolada (Etapa 2A): `input_real.json` -> `wall_modeling_bridge`
+    -> `wall_modeling_snapshot.json`. NAO roda o solver de blocos - e' o
+    modo para medir/depurar so' a etapa de eixos/encontros/aberturas, sem
+    esperar o pipeline inteiro."""
+    from . import wall_modeling_bridge
+    from .extract import wall_modeling_snapshot
+
+    paths = project_paths(project_id)
+    input_real = _read_json(paths["input_real"])
+    if input_real is None:
+        raise RuntimeError(
+            "projeto '{0}' nao tem input_real.json (ver "
+            "benchmark/README.md, secao Wall Modeling).".format(project_id)
+        )
+    bridge_result = wall_modeling_bridge.run_wall_modeling(input_real)
+    snapshot = wall_modeling_snapshot.build_snapshot(bridge_result, project_id)
+    if write_files:
+        wall_modeling_snapshot.save(snapshot, paths["wall_modeling_snapshot"])
+    return snapshot
 
 
 def run_project(project_id, save_baseline=False, write_files=True):
@@ -193,7 +222,25 @@ def main(argv=None):
     parser.add_argument("--quiet", action="store_true", help="so' o resumo")
     parser.add_argument("--calibrate", action="store_true",
                         help="roda os validadores no GABARITO e grava o piso de ruido")
+    parser.add_argument("--wall-modeling-only", action="store_true",
+                        help="roda so' a FASE A (input_real.json -> wall_modeling_snapshot.json), sem o solver")
     args = parser.parse_args(argv)
+
+    if args.wall_modeling_only:
+        if not (args.run or args.all):
+            print("--wall-modeling-only precisa de --run <project_id> ou --all")
+            return 1
+        targets = list_projects() if args.all else [args.run]
+        for project_id in targets:
+            try:
+                snapshot = run_wall_modeling_only(project_id)
+            except RuntimeError as exc:
+                print("{0}: {1}".format(project_id, exc))
+                continue
+            print("{0}: {1} parede(s), {2} no(s), {3} linha(s) nao usada(s)".format(
+                project_id, len(snapshot["walls"]), len(snapshot["nodes"]),
+                len(snapshot["unused_lines"])))
+        return 0
 
     if args.list or not (args.run or args.all):
         names = list_projects()

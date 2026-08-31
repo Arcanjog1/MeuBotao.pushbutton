@@ -62,6 +62,65 @@ abaixo).
 py -3 -m pytest tests/regression -q
 ```
 
+## Wall Modeling (Etapa 2A) - FASE A
+
+Premissa arquitetural (confirmada antes da Etapa 2A, vale para toda sessao
+futura): **a Revit Wall nativa NAO e' entrada do solver - e' so'
+materializacao**. `Wall.Create` acontece dentro de uma `Transaction`, bem
+depois de tudo que decide geometria. O Wall Modeling de verdade - o que
+calcula os EIXOS, os NOS de encontro (L/T/X) e qual abertura pertence a
+qual parede - roda ANTES de qualquer `Transaction`, sobre linhas de CAD e
+dicts de abertura, e e' isso que o solver consome (`nodes`,
+`walls_to_create`, `end_to_node`, `openings_per_wall`). Nenhum arquivo de
+entrada do benchmark deve exigir Wall nativa.
+
+```
+input_real.json
+   └─ wall_modeling_bridge.run_wall_modeling()   (headless, mesma ordem da producao)
+      │   merge_collinear_fragments -> find_wall_pairs -> deduplicate_walls
+      │   -> extend_wall_ends_to_junctions -> build_wall_graph
+      │   -> assign_openings_to_walls
+      └─ extract/wall_modeling_snapshot.py
+         └─ wall_modeling_snapshot.json
+            └─ (proxima etapa) solver_bridge.run_solver -> result.json
+```
+
+`wall_modeling_bridge.py` reutiliza DIRETO as funcoes de
+`core/engine/geometry.py`/`core/engine/wall_pairing.py` (via
+`solver_bridge.engine()`, o mesmo motor carregado com os dubles de
+`tests/revit_stubs.py`) - nao reimplementa nenhuma regra geometrica, nao
+abre `Transaction`, nao acessa `doc`, nao cria Wall.
+
+`setup_frozen` (dentro de `input_real.json`) e' a versao CONGELADA das
+escolhas que `ask_setup` faz interativamente no botao real (layer,
+espessuras, nivel, altura, `openings_mode`, `wall_mode`) - o benchmark
+nunca pode depender de um clique. Campos obrigatorios: `layer`,
+`thicknesses_cm`, `openings_mode`, `wall_mode`, `level`, `base_z_cm`,
+`wall_height_cm`. Falta um deles -> `WallModelingBridgeError` explicito,
+nunca um default silencioso (um default errado mudaria a geometria).
+
+`wall_modeling_snapshot.json` grava as paredes DEPOIS de
+`extend_wall_ends_to_junctions` (`settings.walls_already_extended: true`,
+respeitado por `solver_bridge.plan_from_input` - sem isso a mesma ponta
+seria esticada duas vezes) e guarda tambem a geometria de ANTES da
+extensao (`walls[].before_extension`), os nos do grafo L/T/X/FREE_END, as
+aberturas ja atribuidas por parede e as linhas do Layer que NAO viraram
+parede (`unused_lines[].reason`, reconstruido geometricamente depois do
+fato, sem mexer na assinatura de `find_wall_pairs`).
+
+```bash
+py -3 nuvem/benchmark/runner.py --run <project_id> --wall-modeling-only
+```
+
+roda so' a FASE A (le' `input_real.json`, grava
+`wall_modeling_snapshot.json`) - sem o solver de blocos.
+
+**Limitacao explicita desta etapa:** a extracao REAL de `input_real.json`
+a partir de um projeto Revit (via MCP) e a execucao do pipeline completo
+(`wall_modeling_snapshot -> solver -> result.json`) ficam para a proxima
+sessao. Nesta etapa so' o CONTRATO e os testes headless foram
+implementados.
+
 ## Como extrair um projeto correto
 
 1. Abrir o `.rvt` no Revit (`open_document`, `detach=True` se workshared).
