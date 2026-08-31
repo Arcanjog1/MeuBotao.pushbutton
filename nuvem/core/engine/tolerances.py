@@ -273,3 +273,27 @@ CAP_ENDPOINT_TOUCH_TOLERANCE_FT = CAP_ENDPOINT_TOUCH_TOLERANCE_M * FEET_PER_METE
 # como limite (ver _cap_falls_inside_opening).
 CAP_OPENING_SLACK_M = 0.20
 CAP_OPENING_SLACK_FT = CAP_OPENING_SLACK_M * FEET_PER_METER
+
+# ==========================================
+# RANKING DE PARES (CR-1, Etapa 2E) - ver nuvem/REGRAS_MODULACAO_BLOCOS.md
+# secao 26.1 e nuvem/benchmark/PLANO_ETAPA_2D.md (item G).
+# ==========================================
+
+# Baldes de erro de espessura (metros) usados para ordenar os candidatos de
+# find_wall_pairs: dois pares cujo erro de espessura (|distancia_medida -
+# espessura_escolhida|) difere menos que isto sao considerados IGUALMENTE
+# corretos em espessura, e o desempate entre eles volta a ser a sobreposicao
+# (overlap_ratio). 0,05cm e' o MESMO limiar que o benchmark usa para
+# "espessura exata" (ver nuvem/benchmark/scoring.py).
+#
+# Substitui o desempate anterior (empate em overlap_ratio -> vence a MENOR
+# distancia bruta), que causava "roubo de face": entre duas linhas
+# candidatas com a MESMA fracao de sobreposicao, a que media a espessura
+# pedida com MENOR ERRO deve vencer - nao a que por coincidencia tem a
+# distancia numericamente menor. Medido no projeto real
+# torre_easy_lo_r00_tgd (ver PLANO_ETAPA_2D.md, item B): uma face verdadeira
+# a d=14,000cm (erro 0,000) perdia para a folha de porta a d=12,100cm (erro
+# 1,900) so' porque 12,1 < 14,0 - deslocando o eixo da parede ~1cm e
+# deixando a face verdadeira orfa.
+THICKNESS_RANK_BUCKET_M = 0.0005
+THICKNESS_RANK_BUCKET_FT = THICKNESS_RANK_BUCKET_M * FEET_PER_METER

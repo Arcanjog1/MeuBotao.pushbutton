@@ -8,6 +8,8 @@ de janela falsos que guardam a arvore de controles. Ver o cabecalho de la'.
 Rodar:  python tests/run_tests.py
 """
 
+import math
+
 import load_script
 import revit_stubs
 
@@ -151,6 +153,409 @@ def test_scan_possible_missed_bonecas_prioridade_preservada_apos_otimizacao():
     assert len(found) == 2, found
     dists = sorted(round(item[0]) for item in found)
     assert dists == [14, 14], found
+
+
+# --------------------------------------------------------- CR-1 (Etapa 2E)
+# PAIR-001..014: casos minimos de find_wall_pairs definidos em
+# nuvem/benchmark/PLANO_ETAPA_2D.md (item O/P) para a correcao do CR-1
+# (ranking por erro de espessura, nao por menor distancia - ver secao 26.1
+# de nuvem/REGRAS_MODULACAO_BLOCOS.md). PAIR-006 e' o teste critico: falha
+# ANTES da correcao (eixo em y=6,050) e passa DEPOIS (eixo em y=7,000) -
+# ver item P do plano. Os demais (001-005, 007-012, 014) documentam que o
+# resto do comportamento de find_wall_pairs NAO muda.
+
+def _pair_diag():
+    return {
+        "parallel_pairs": 0, "min_dist_ft": None, "max_dist_ft": None,
+        "offset_suspect_count": 0, "offset_suspect_max_ft": 0.0, "cap_clipped_count": 0,
+    }
+
+
+def _pair(lines, thicknesses_cm):
+    th_ft = sorted(ft(t) for t in thicknesses_cm)
+    tol_ft = m.compute_detection_tolerance_ft(th_ft)
+    return m.find_wall_pairs(lines, th_ft, tol_ft, lines, [], _pair_diag())
+
+
+@case
+def test_PAIR_001_par_unico_exato():
+    lines = [seg(0, 0, 400, 0), seg(0, 14, 400, 14)]
+    walls, unused = _pair(lines, [14.0])
+    assert len(walls) == 1, walls
+    assert not unused
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(1).Y) - 7.0) < 0.01
+
+
+@case
+def test_PAIR_002_candidatos_12_e_14_vence_14():
+    """NOTA (medido nesta sessao): o plano previa este caso como "ja' passa
+    hoje", mas a medicao mostrou o contrario - com desempate por MENOR
+    distancia, a linha a d=12 (erro=2,0) vence a de d=14 (erro=0,0) porque
+    12 < 14, exatamente a mesma assinatura de bug do PAIR-006. Registrado
+    como achado da Etapa 2E; a formula do CR-1 corrige os dois."""
+    a = seg(0, 0, 400, 0)
+    b12 = seg(0, 12, 400, 12)
+    b14 = seg(0, 14, 400, 14)
+    walls, unused = _pair([a, b12, b14], [14.0])
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01
+    assert len(unused) == 1, unused
+    assert abs(to_cm(unused[0].GetEndPoint(0).Y) - 12.0) < 0.01, unused
+
+
+@case
+def test_PAIR_003_candidatos_14_e_16_vence_14():
+    a = seg(0, 0, 400, 0)
+    b14 = seg(0, 14, 400, 14)
+    b16 = seg(0, 16, 400, 16)
+    walls, unused = _pair([a, b14, b16], [14.0])
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01
+    assert len(unused) == 1, unused
+    assert abs(to_cm(unused[0].GetEndPoint(0).Y) - 16.0) < 0.01, unused
+
+
+@case
+def test_PAIR_004_multiplas_espessuras_9_e_14():
+    wall9_a = seg(0, 0, 300, 0)
+    wall9_b = seg(0, 9, 300, 9)
+    wall14_a = seg(0, 100, 300, 100)
+    wall14_b = seg(0, 114, 300, 114)
+    walls, unused = _pair([wall9_a, wall9_b, wall14_a, wall14_b], [9.0, 14.0, 19.0])
+    assert len(walls) == 2, walls
+    assert not unused
+    thicknesses = sorted(round(to_cm(w[1]), 1) for w in walls)
+    assert thicknesses == [9.0, 14.0], thicknesses
+
+
+@case
+def test_PAIR_005_face_central_compartilhada_documenta_comportamento_atual():
+    """Documenta o comportamento ATUAL (nao e' requisito do CR-1 - e' CR-3,
+    repescagem de faces orfas, registrado como pendencia separada no plano):
+    tres linhas equidistantes (y=0/14/28) tem a linha central compartilhada
+    por dois candidatos EMPATADOS em erro de espessura (rank 0 nos dois) e
+    em overlap_ratio; o desempate final por (i, j) escolhe UM par so' - a
+    outra face fica orfa. NAO afirma qual dos dois pares vence (isso e'
+    responsabilidade do desempate (i, j), fora do escopo do CR-1) - so' que
+    exatamente 1 parede nasce e 1 linha sobra."""
+    lines = [seg(0, 0, 400, 0), seg(0, 14, 400, 14), seg(0, 28, 400, 28)]
+    walls, unused = _pair(lines, [14.0])
+    assert len(walls) == 1, walls
+    assert len(unused) == 1, unused
+
+
+@case
+def test_PAIR_006_CR1_face_stealing_eixo_correto_e_face_correta():
+    """TESTE CRITICO do CR-1 (ver item P do plano). Reproduz exatamente a
+    disputa medida no projeto real: A (face longa, y=0, 0..1456cm) tem DOIS
+    candidatos que empatam em overlap_ratio=1,0000 - B (a face verdadeira,
+    y=14, d=14,000, erro=0) e F (folha de porta, y=12,1, d=12,100, erro=1,9).
+
+    ANTES da correcao (desempate por MENOR distancia): A-F vence (12,1 < 14)
+    -> eixo nasce em y=6,050 (0,95cm fora do lugar) e B (a face verdadeira)
+    fica ORFA. Este teste FALHA no codigo antigo.
+
+    DEPOIS da correcao (desempate por MENOR erro de espessura): A-B vence
+    (erro 0 < erro 1,9) -> eixo exato em y=7,000, e F (a folha de porta)
+    fica orfa. Este teste PASSA.
+
+    Deliberadamente NAO valida so' o comprimento da parede (create_centerline
+    usa as duas linhas INTEIRAS - a parede errada tambem nasce com 1.456cm de
+    comprimento, entao um teste que so' olhasse comprimento passaria nos dois
+    casos e nao provaria nada, ver item P do plano). O discriminante e' a
+    POSICAO DO EIXO e QUAL LINHA SOBRA."""
+    a = seg(0, 0, 1456, 0)          # face longa
+    b = seg(0, 14, 1681, 14)        # face verdadeira (par correto, d=14,000)
+    f = seg(700, 12.1, 704.445, 12.1)  # folha de porta (4,445cm = 1,75")
+    walls, unused = _pair([a, b, f], [14.0])
+
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01, (
+        "eixo deveria estar em y=7,0 (par correto A-B) - deu %.3f "
+        "(assinatura do bug: y=6,050, par errado A-F)" % to_cm(centerline.GetEndPoint(0).Y)
+    )
+    assert abs(to_cm(centerline.GetEndPoint(1).Y) - 7.0) < 0.01
+
+    assert len(unused) == 1, unused
+    assert abs(to_cm(unused[0].GetEndPoint(0).Y) - 12.1) < 0.01, (
+        "a linha orfa deveria ser F (folha de porta, y=12,1) - a face "
+        "verdadeira B (y=14) foi roubada" if unused else "nenhuma linha orfa"
+    )
+
+
+@case
+def test_PAIR_007_encontro_em_T():
+    h_a = seg(0, 0, 500, 0)
+    h_b = seg(0, 14, 500, 14)
+    v_a = seg(200, 14, 200, 500)
+    v_b = seg(214, 14, 214, 500)
+    walls, unused = _pair([h_a, h_b, v_a, v_b], [14.0])
+    assert len(walls) == 2, walls
+    assert not unused
+    axes_y = sorted(round(to_cm(w[0].GetEndPoint(0).Y)) for w in walls if
+                     abs(w[0].GetEndPoint(0).Y - w[0].GetEndPoint(1).Y) < 1e-6)
+    assert axes_y == [7], axes_y
+
+
+@case
+def test_PAIR_008_encontro_em_L():
+    h_a = seg(0, 0, 500, 0)
+    h_b = seg(0, 14, 500, 14)
+    v_a = seg(486, 14, 486, 500)
+    v_b = seg(500, 14, 500, 500)
+    walls, unused = _pair([h_a, h_b, v_a, v_b], [14.0])
+    assert len(walls) == 2, walls
+    assert not unused
+
+
+@case
+def test_PAIR_009_boneca_curta_r_long_baixo_nao_perde_para_toco_mais_perto():
+    """Blindagem contra a tentacao de introduzir piso de r_long (PROIBIDO -
+    ver secao 26.2 das regras): reproduz a proporcao real medida em
+    W001/W068 (face longa 1513,15cm x face curta 424cm, d=14,000,
+    r_long=0,2802) - MAIS um "toco" competindo pela mesma face longa a
+    d=12,000 (erro=2,0), que uma politica so' de menor-distancia poderia
+    preferir por estar mais perto. O par correto (erro 0) tem que vencer o
+    toco (erro 2,0) mesmo tendo sobreposicao relativa (r_long) muito menor
+    que 1,0 - a boneca NUNCA pode perder so' por ser curta.
+
+    NOTA (medido nesta sessao): o plano (item R, H4) previa este caso como
+    ja' passando hoje; medido aqui, a VARIANTE COM CONCORRENCIA (o toco a
+    d=12) falha no codigo antigo pelo mesmo motivo do PAIR-006/PAIR-002 -
+    consistente com o item O do plano, que classifica exatamente esta
+    variante ("com concorrencia") como so' passando depois da correcao."""
+    a = seg(0, 0, 1513.15, 0)        # face longa
+    boneca = seg(0, 14, 424, 14)     # boneca real, d=14,000, r_long=0,2802
+    toco = seg(0, 12, 424, 12)       # toco competindo, d=12,000, erro=2,0
+    walls, unused = _pair([a, boneca, toco], [14.0])
+
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01, (
+        "a boneca (d=14, r_long=0,28) deveria vencer o toco mais perto "
+        "(d=12) - deu eixo em y=%.3f" % to_cm(centerline.GetEndPoint(0).Y)
+    )
+    assert len(unused) == 1, unused
+    assert abs(to_cm(unused[0].GetEndPoint(0).Y) - 12.0) < 0.01, unused
+
+
+@case
+def test_PAIR_010_ordem_das_linhas_embaralhada_e_identica_ao_PAIR_002():
+    """Falha ANTES da correcao pelo mesmo motivo do PAIR-002 (ver nota la')
+    - o que importa aqui e' que o resultado e' identico independente da
+    ordem das linhas de entrada, o que ja' e' verdade hoje E depois."""
+    a = seg(0, 0, 400, 0)
+    b12 = seg(0, 12, 400, 12)
+    b14 = seg(0, 14, 400, 14)
+    walls, unused = _pair([b14, a, b12], [14.0])
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+    assert abs(to_cm(centerline.GetEndPoint(0).Y) - 7.0) < 0.01
+    assert len(unused) == 1, unused
+    assert abs(to_cm(unused[0].GetEndPoint(0).Y) - 12.0) < 0.01, unused
+
+
+@case
+def test_PAIR_011_ordem_das_espessuras_embaralhada_e_identica_ao_PAIR_004():
+    wall9_a = seg(0, 0, 300, 0)
+    wall9_b = seg(0, 9, 300, 9)
+    wall14_a = seg(0, 100, 300, 100)
+    wall14_b = seg(0, 114, 300, 114)
+    walls, unused = _pair([wall9_a, wall9_b, wall14_a, wall14_b], [19.0, 9.0, 14.0])
+    assert len(walls) == 2, walls
+    assert not unused
+    thicknesses = sorted(round(to_cm(w[1]), 1) for w in walls)
+    assert thicknesses == [9.0, 14.0], thicknesses
+
+
+@case
+def test_PAIR_012_espessuras_vizinhas_12_e_14_sem_ambiguidade():
+    """[12, 14] estao a so' 2cm um do outro -> compute_detection_tolerance_ft
+    aperta a tolerancia para ~1,0cm (metade do gap). Uma unica parede de
+    12cm (faces y=0/y=12): a distancia medida (12,0) bate exatamente com o
+    alvo 12 (erro 0) - a tolerancia apertada garante que ela NUNCA seria mal
+    interpretada como uma tentativa fraca de bater com o alvo 14 (que
+    exigiria erro 2,0, fora da tolerancia de 1,0)."""
+    lines = [seg(0, 0, 400, 0), seg(0, 12, 400, 12)]
+    tol_ft = m.compute_detection_tolerance_ft([ft(12.0), ft(14.0)])
+    assert abs(to_cm(tol_ft) - 1.0) < 0.01, to_cm(tol_ft)
+    walls, unused = m.find_wall_pairs(
+        lines, [ft(12.0), ft(14.0)], tol_ft, lines, [], _pair_diag()
+    )
+    assert len(walls) == 1, walls
+    assert not unused
+    _centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 12.0) < 0.01
+
+
+@case
+def test_PAIR_013_espessura_verdadeira_fora_do_balde_0_ainda_cria_parede():
+    """Blindagem contra a tentacao de introduzir corte por erro de espessura
+    (PROIBIDO nesta etapa - ver item 10 do pedido / secao 26.3 das regras):
+    reproduz W074, cujo UNICO candidato tem d=15,060cm (erro=1,060cm para o
+    alvo de 14) - fora do balde 0 (0,05cm) mas dentro da tolerancia de
+    deteccao (2,5cm). Precisa continuar criando a parede."""
+    lines = [seg(0, 0, 189, 0), seg(0, 15.06, 189, 15.06)]
+    walls, unused = _pair(lines, [14.0])
+    assert len(walls) == 1, walls
+    assert not unused
+    _centerline, thickness_ft, _locks = walls[0]
+    assert abs(to_cm(thickness_ft) - 14.0) < 0.01
+
+
+@case
+def test_PAIR_014_determinismo_mesma_entrada_duas_execucoes_identicas():
+    a = seg(0, 0, 1456, 0)
+    b = seg(0, 14, 1681, 14)
+    f = seg(700, 12.1, 704.445, 12.1)
+    lines = [a, b, f]
+    walls1, unused1 = _pair(lines, [14.0])
+    walls2, unused2 = _pair(lines, [14.0])
+    assert len(walls1) == len(walls2) == 1
+    c1, t1, _l1 = walls1[0]
+    c2, t2, _l2 = walls2[0]
+    assert to_cm(t1) == to_cm(t2)
+    assert to_cm(c1.GetEndPoint(0).Y) == to_cm(c2.GetEndPoint(0).Y)
+    assert to_cm(c1.GetEndPoint(1).Y) == to_cm(c2.GetEndPoint(1).Y)
+    assert len(unused1) == len(unused2) == 1
+    assert to_cm(unused1[0].GetEndPoint(0).Y) == to_cm(unused2[0].GetEndPoint(0).Y)
+
+
+# --------------------------------------------------------- INV-01..06 (CR-1)
+# Invariancia geometrica de find_wall_pairs sobre a fixture do PAIR-006
+# (deliberadamente pequena/sintetica - a invariancia SOBRE OS 2.868 SEGMENTOS
+# REAIS do torre_easy_lo_r00_tgd ja' foi medida em
+# nuvem/benchmark/diagnostics_2d/run_sim4.py, ver item Q do plano; repetir
+# aqui, num teste unitario, cobriria o mesmo caminho de codigo com um custo
+# de execucao muito maior). INV-07 (ordem das linhas JA' MESCLADAS) e'
+# pendencia separada (ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS, secao 26.6
+# das regras) - NAO e' testada aqui de proposito: e' de merge_collinear_fragments,
+# nao de find_wall_pairs, e nao deve ser corrigida junto com o CR-1.
+
+def _pair006_lines():
+    return [seg(0, 0, 1456, 0), seg(0, 14, 1681, 14), seg(700, 12.1, 704.445, 12.1)]
+
+
+def _pair006_signature(walls, unused):
+    """Assinatura independente de rotacao/translacao: so' a espessura e o
+    comprimento da parede formada, mais o comprimento da linha orfa - NAO as
+    coordenadas absolutas (que mudam de proposito nos testes de invariancia)."""
+    assert len(walls) == 1, walls
+    centerline, thickness_ft, _locks = walls[0]
+    wall_len_cm = round(to_cm(centerline.GetEndPoint(0).DistanceTo(centerline.GetEndPoint(1))), 2)
+    assert len(unused) == 1, unused
+    orphan_len_cm = round(to_cm(unused[0].GetEndPoint(0).DistanceTo(unused[0].GetEndPoint(1))), 2)
+    return (round(to_cm(thickness_ft), 2), wall_len_cm, orphan_len_cm)
+
+
+@case
+def test_INV_01_rotacao_90_180_270_graus_preserva_o_par_escolhido():
+    base_walls, base_unused = _pair(_pair006_lines(), [14.0])
+    base_sig = _pair006_signature(base_walls, base_unused)
+    for angle_deg in (90, 180, 270):
+        rad = math.radians(angle_deg)
+        cos_a, sin_a = math.cos(rad), math.sin(rad)
+
+        def rot(line):
+            p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+            return Line.CreateBound(
+                XYZ(p0.X * cos_a - p0.Y * sin_a, p0.X * sin_a + p0.Y * cos_a, 0.0),
+                XYZ(p1.X * cos_a - p1.Y * sin_a, p1.X * sin_a + p1.Y * cos_a, 0.0),
+            )
+        rotated = [rot(line) for line in _pair006_lines()]
+        walls, unused = _pair(rotated, [14.0])
+        sig = _pair006_signature(walls, unused)
+        assert sig == base_sig, (angle_deg, sig, base_sig)
+
+
+@case
+def test_INV_02_translacao_arbitraria_preserva_o_par_escolhido():
+    base_walls, base_unused = _pair(_pair006_lines(), [14.0])
+    base_sig = _pair006_signature(base_walls, base_unused)
+
+    dx, dy = ft(1234.5), ft(-411.5)
+
+    def translate(line):
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        return Line.CreateBound(
+            XYZ(p0.X + dx, p0.Y + dy, 0.0), XYZ(p1.X + dx, p1.Y + dy, 0.0)
+        )
+    translated = [translate(line) for line in _pair006_lines()]
+    walls, unused = _pair(translated, [14.0])
+    sig = _pair006_signature(walls, unused)
+    assert sig == base_sig, (sig, base_sig)
+
+
+@case
+def test_INV_03_inversao_dos_endpoints_preserva_o_par_escolhido():
+    """ANTES da correcao, o CR-1 fazia o resultado depender do SENTIDO em
+    que cada linha foi desenhada no CAD (ver item Q do plano - a inversao de
+    endpoints mudava 6 pares no projeto real). Com o desempate por erro de
+    espessura, isso deixa de acontecer."""
+    base_walls, base_unused = _pair(_pair006_lines(), [14.0])
+    base_sig = _pair006_signature(base_walls, base_unused)
+
+    def invert(line):
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        return Line.CreateBound(p1, p0)
+    inverted = [invert(line) for line in _pair006_lines()]
+    walls, unused = _pair(inverted, [14.0])
+    sig = _pair006_signature(walls, unused)
+    assert sig == base_sig, (sig, base_sig)
+
+
+@case
+def test_INV_04_espelhamento_em_x_e_em_y_preserva_o_par_escolhido():
+    base_walls, base_unused = _pair(_pair006_lines(), [14.0])
+    base_sig = _pair006_signature(base_walls, base_unused)
+
+    def mirror(sign_x, sign_y):
+        def _mirror(line):
+            p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+            return Line.CreateBound(
+                XYZ(p0.X * sign_x, p0.Y * sign_y, 0.0),
+                XYZ(p1.X * sign_x, p1.Y * sign_y, 0.0),
+            )
+        return _mirror
+
+    for sign_x, sign_y in ((-1, 1), (1, -1)):
+        mirrored = [mirror(sign_x, sign_y)(line) for line in _pair006_lines()]
+        walls, unused = _pair(mirrored, [14.0])
+        sig = _pair006_signature(walls, unused)
+        assert sig == base_sig, ((sign_x, sign_y), sig, base_sig)
+
+
+@case
+def test_INV_05_ordem_das_espessuras_nao_muda_o_resultado():
+    lines = _pair006_lines()
+    walls_a, unused_a = _pair(lines, [14.0])
+    walls_b, unused_b = m.find_wall_pairs(
+        lines, [ft(19.0), ft(9.0), ft(14.0)], m.compute_detection_tolerance_ft(
+            [ft(19.0), ft(9.0), ft(14.0)]), lines, [], _pair_diag()
+    )
+    # so' 14cm bate fisicamente nesta fixture - 9 e 19 nao mudam nada.
+    assert _pair006_signature(walls_a, unused_a) == _pair006_signature(walls_b, unused_b)
+
+
+@case
+def test_INV_06_determinismo_execucoes_repetidas_byte_a_byte():
+    lines = _pair006_lines()
+    sigs = set()
+    for _ in range(5):
+        walls, unused = _pair(lines, [14.0])
+        sigs.add(_pair006_signature(walls, unused))
+    assert len(sigs) == 1, sigs
 
 
 @case

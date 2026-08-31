@@ -2523,9 +2523,12 @@ aplicada; o plano e' tratado em sessao propria.
 
 ## 26. PAREAMENTO DE FACES: a espessura decide, nao a proximidade (2026-08-31)
 
-Conhecimento extraido da Etapa 2D (PLANO da correcao do CR-1). Medicao
+Conhecimento extraido da Etapa 2D (PLANO da correcao do CR-1) e
+**IMPLEMENTADO na Etapa 2E** (2026-08-31, branch `fix/cr1-wall-pair-ranking`,
+ainda NAO mesclada na main - aguardando revisao do usuario). Medicao
 completa em `nuvem/benchmark/PLANO_ETAPA_2D.md`; scripts de reproducao em
-`nuvem/benchmark/diagnostics_2d/`. Nenhuma correcao foi aplicada ainda.
+`nuvem/benchmark/diagnostics_2d/` (`run_real_cr1.py`, novo nesta sessao,
+mede o CODIGO REAL via `wall_modeling_bridge.run_wall_modeling`).
 
 ### 26.1 REGRA OBRIGATORIA - entre duas faces candidatas, vence a que MEDE a espessura pedida
 
@@ -2549,8 +2552,46 @@ Como foi descoberto: simulacao offline sobre os 589 candidatos reais do
 | roubos de face | 52 | **7** |
 | paredes do gabarito PERDIDAS | - | **0** |
 
-**DOCUMENTADO - pendencia de codigo aberta.** A formula aprovada esta' no
-item G do plano; a implementacao e' a proxima sessao.
+**IMPLEMENTADO (Etapa 2E, 2026-08-31).** Formula do item G do plano, sem
+alteracao: `sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, i, j)`,
+com `THICKNESS_RANK_BUCKET_FT = 0,05cm` em `nuvem/core/engine/tolerances.py`
+e o `sort_key` em `nuvem/core/engine/wall_pairing.py::find_wall_pairs`
+(unica linha alterada no algoritmo, ver `THICKNESS_RANK_BUCKET_FT`). Nenhum
+outro criterio de elegibilidade, tolerancia ou constante geometrica mudou.
+
+**FATO MEDIDO sobre o CODIGO REAL** (nao mais simulacao offline -
+`nuvem/benchmark/diagnostics_2d/run_real_cr1.py`, que chama
+`wall_modeling_bridge.run_wall_modeling`, o MESMO caminho que a producao
+usa):
+
+| | antes (medido) | depois (medido, codigo real) |
+|---|---|---|
+| pares aceitos | 209 | 203 |
+| paredes finais (pos-dedup) | 167 | **154** |
+| paredes do gabarito cobertas | 70 de 97 | **87 de 97** |
+| paredes do gabarito ausentes | 11 | **4** |
+| eixo correto (<=0,5cm) | 76 de 167 | **96 de 154** |
+| eixo a 10-16cm fora | 33 | **4** |
+| aberturas atribuidas | 82 de 91 | **91 de 91** |
+| paredes < 50cm | 31 | **25** |
+| paredes < 20cm | 22 | **19** |
+| comprimento total | 43.033cm | **46.373cm** |
+| runtime FASE A | 23,97s | 24,08s (+0,46%) |
+| `solver_decision_fingerprint` | `c74c9c1a...` | `c74c9c1a...` **inalterado** |
+
+Espessura exata dos pares aceitos e roubos de face (`err`/`steal`), que
+exigem o dado por-candidato (nao exposto pelo pipeline de producao), foram
+confirmados por reproducao EXATA da mesma formula do item G sobre os
+mesmos candidatos reais (589) via `diagnostics_2d/simlib.py`: **122 de 203
+exatos (60%, era 77 de 209 = 37%)**, **7 roubos de face (era 52)** - e os
+demais numeros estruturais dessa reproducao (aceitos/paredes/cobertura/eixo/
+aberturas) batem, campo a campo, com a medicao do codigo real acima -
+confirmando que a reproducao e' fiel.
+
+Todos os numeros batem EXATAMENTE com a previsao da simulacao offline da
+Etapa 2D (secao D deste documento e item L do plano). **Zero regressao**:
+nenhuma das 70 paredes antes cobertas ou das 82 aberturas antes atribuidas
+deixou de ser (H1/H2 do item R do plano, ambos PASS).
 
 ### 26.2 REGRA OBRIGATORIA - NUNCA por piso de sobreposicao pela linha mais longa
 

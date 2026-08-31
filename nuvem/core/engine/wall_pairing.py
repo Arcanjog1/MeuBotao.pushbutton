@@ -34,6 +34,7 @@ from core.engine.tolerances import (  # noqa: F401
     CAP_MAX_CENTER_OFFSET_RATIO, CAP_SEARCH_MARGIN_FT,
     CAP_ENDPOINT_TOUCH_TOLERANCE_FT, CAP_OPENING_SLACK_FT,
     MIN_WALL_THICKNESS_M, MAX_WALL_THICKNESS_M,
+    THICKNESS_RANK_BUCKET_FT,
 )
 from core.engine.geometry import *  # noqa: F401,F403
 from Autodesk.Revit.DB import XYZ, Line
@@ -284,21 +285,29 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
     para a deteccao.
 
     Processa por RODADAS: em cada rodada, escolhe entre todos os candidatos
-    validos (ainda nao usados) o par MAIS CONFIAVEL - primeiro pela MAIOR
-    fracao de sobreposicao mutua (ver lines_overlap_enough/
-    MIN_WALL_SEGMENT_OVERLAP_RATIO: as duas faces de uma mesma parede
-    cobrem quase 100% uma da outra), so' desempatando pela MENOR distancia
-    perpendicular quando a fracao de sobreposicao empata. Isso importa
-    especialmente perto de cantos e aberturas, onde varias linhas de
-    paredes DIFERENTES ficam a poucos cm umas das outras: escolher so' pela
-    menor distancia podia "roubar" a face verdadeira de uma boneca curta
-    (sobreposicao quase total, porem a poucos mm de bater com a espessura
-    escolhida) em favor de um pareamento parcial/marginal com outra linha
-    vizinha cuja distancia batesse por uma fracao de mm mais perto -
-    deixando a boneca sem parede. O eixo (centerline) e' calculado a partir
-    das duas linhas INTEIRAS - nao ha recorte, aparo ou divisao de nenhuma
-    linha, e cada linha e' usada em NO MAXIMO um par (sem redistribuir
-    "sobras" para outras rodadas).
+    validos (ainda nao usados) o par MAIS CONFIAVEL - primeiro pelo MENOR
+    ERRO DE ESPESSURA, em baldes de THICKNESS_RANK_BUCKET_FT (ver
+    tolerances.py): o par que MEDE a espessura pedida com menos erro vence,
+    e so' entre pares IGUALMENTE corretos em espessura (mesmo balde) o
+    desempate cai na MAIOR fracao de sobreposicao mutua (ver
+    lines_overlap_enough/MIN_WALL_SEGMENT_OVERLAP_RATIO: as duas faces de
+    uma mesma parede cobrem quase 100% uma da outra), depois na MAIOR
+    sobreposicao absoluta, e por ultimo no par de indices `(i, j)` -
+    desempate final deterministico, para o resultado nao depender da
+    estabilidade do `sort()` nem da ordem de insercao das linhas (CR-1,
+    ver nuvem/REGRAS_MODULACAO_BLOCOS.md secao 26.1).
+    ATE' A CORRECAO DO CR-1 (2026-08-31), o desempate entre candidatos com a
+    MESMA sobreposicao era pela MENOR distancia perpendicular bruta - o que
+    causava "roubo de face": perto de cantos e aberturas, onde varias
+    linhas de paredes DIFERENTES ficam a poucos cm umas das outras, uma
+    face verdadeira (distancia exatamente na espessura pedida) podia perder
+    para uma linha de esquadria (folha de porta, marco) so' porque a
+    distancia bruta dela era numericamente menor, mesmo tendo um erro de
+    espessura muito maior. Ver PLANO_ETAPA_2D.md, item B, para a medicao
+    completa. O eixo (centerline) e' calculado a partir das duas linhas
+    INTEIRAS - nao ha recorte, aparo ou divisao de nenhuma linha, e cada
+    linha e' usada em NO MAXIMO um par (sem redistribuir "sobras" para
+    outras rodadas).
 
     Isso significa que, em encontros em T, L, Cruz (+) ou qualquer outra
     configuracao, as paredes resultantes podem ficar sobrepostas entre si -
@@ -353,7 +362,7 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
     # Unica passada O(n^2): reune TODOS os pares geometricamente validos
     # (ver docstring/PERFORMANCE acima) - cada par e' avaliado uma vez so',
     # nunca mais re-testado a cada rodada.
-    candidates = []  # (sort_key, i, j, matched_thickness_ft) - sort_key = (-overlap_ratio, dist)
+    candidates = []  # (sort_key, i, j, matched_thickness_ft) - sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, i, j), ver CR-1
     for i in range(n):
         cache_i = caches[i]
         for j in range(i + 1, n):
@@ -388,7 +397,14 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
             if overlap_ratio < MIN_WALL_SEGMENT_OVERLAP_RATIO:
                 continue  # paralelas e na espessura certa, mas nao correm lado a lado (nao e' a mesma parede)
 
-            candidates.append(((-overlap_ratio, dist), i, j, matched_thickness))
+            # CR-1: o par que MEDE a espessura pedida com MENOR ERRO vence -
+            # so' entre pares IGUALMENTE corretos em espessura (mesmo
+            # balde de THICKNESS_RANK_BUCKET_FT) o desempate cai na maior
+            # sobreposicao (ver docstring acima e tolerances.py).
+            thickness_error = abs(dist - matched_thickness)
+            thickness_rank = int(thickness_error / THICKNESS_RANK_BUCKET_FT)
+            sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, i, j)
+            candidates.append((sort_key, i, j, matched_thickness))
 
     # Ordena uma unica vez pelo mesmo sort_key da versao original e aceita
     # greedily, pulando pares que ja tenham uma ponta usada por um par

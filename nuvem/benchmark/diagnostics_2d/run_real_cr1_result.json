@@ -1,0 +1,19 @@
+{
+  "lines_in_layer": 9258,
+  "lines_after_merge": 2868,
+  "parallel_pairs": 1332676,
+  "accepted_pairs": 203,
+  "dedup_removed": 49,
+  "final_walls": 154,
+  "cobertas": 87,
+  "ausentes": 4,
+  "eixo_ok": 96,
+  "eixo_10_16": 4,
+  "espurias": 6,
+  "walls_lt50": 25,
+  "walls_lt20": 19,
+  "openings_assigned": 91,
+  "openings_total": 91,
+  "total_len_cm": 46372.7014801305,
+  "runtime_s": 25.415344715118408
+}
