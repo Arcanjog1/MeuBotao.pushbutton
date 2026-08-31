@@ -359,10 +359,16 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
     # zero em cada uma das O(n) comparacoes contra `j`.
     caches = [_line_geom_cache(line) for line in pending]
 
+    # CR-2F-C (PAIR_GREEDY_INDEX_DEPENDENCE): chave geometrica canonica de
+    # cada linha, calculada uma unica vez (mesmo padrao de performance do
+    # cache acima) - usada no desempate final do sort_key no lugar de
+    # `(i, j)` (ver abaixo).
+    identity_keys = [_line_identity_key_cached(c) for c in caches]
+
     # Unica passada O(n^2): reune TODOS os pares geometricamente validos
     # (ver docstring/PERFORMANCE acima) - cada par e' avaliado uma vez so',
     # nunca mais re-testado a cada rodada.
-    candidates = []  # (sort_key, i, j, matched_thickness_ft) - sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, i, j), ver CR-1
+    candidates = []  # (sort_key, i, j, matched_thickness_ft) - sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, par_key), ver CR-1/CR-2F-C
     for i in range(n):
         cache_i = caches[i]
         for j in range(i + 1, n):
@@ -420,9 +426,24 @@ def find_wall_pairs(lines_to_process, target_thicknesses_ft, tolerance_ft,
             # so' entre pares IGUALMENTE corretos em espessura (mesmo
             # balde de THICKNESS_RANK_BUCKET_FT) o desempate cai na maior
             # sobreposicao (ver docstring acima e tolerances.py).
+            #
+            # CR-2F-C (PAIR_GREEDY_INDEX_DEPENDENCE): quando thickness_rank,
+            # overlap_ratio E overlap_ft empatam TAMBEM (84 grupos de empate
+            # medidos nas 2.868 linhas mescladas, 336 linhas disputadas), o
+            # desempate final usava `(i, j)` - a POSICAO na lista de
+            # entrada, nao a geometria. Renumerar as linhas trocava qual dos
+            # dois pares empatados vencia (1-2 pares por permutacao). A
+            # chave `pair_key` usa a IDENTIDADE geometrica canonica de cada
+            # linha (`_line_identity_key_cached`, CR-2F-B) em vez do indice,
+            # com a menor das duas primeiro - invariante ao indice da linha
+            # na lista E a qual delas entrou como `cache_i`/`cache_j`.
+            # Medido: 0 diferencas no conjunto de pares aceitos em 5
+            # permutacoes das 2.868 linhas mescladas (antes: 1-2 por seed).
             thickness_error = abs(dist - matched_thickness)
             thickness_rank = int(thickness_error / THICKNESS_RANK_BUCKET_FT)
-            sort_key = (thickness_rank, -overlap_ratio, -overlap_ft, i, j)
+            key_i, key_j = identity_keys[i], identity_keys[j]
+            pair_key = (key_i, key_j) if key_i <= key_j else (key_j, key_i)
+            sort_key = (thickness_rank, -overlap_ratio, -overlap_ft) + pair_key
             candidates.append((sort_key, i, j, matched_thickness))
 
     # Ordena uma unica vez pelo mesmo sort_key da versao original e aceita

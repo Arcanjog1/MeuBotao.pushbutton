@@ -29,7 +29,7 @@ from Autodesk.Revit.DB import XYZ, Line
 
 from core.engine.tolerances import (
     MIN_WALL_SEGMENT_OVERLAP_RATIO, MIN_WALL_SEGMENT_ABS_FLOOR_FT,
-    OPENING_BRIDGE_TOLERANCE_FT,
+    OPENING_BRIDGE_TOLERANCE_FT, FEET_PER_METER,
 )
 
 __all__ = [
@@ -42,7 +42,7 @@ __all__ = [
     "_bridge_clusters_via_openings", "merge_collinear_fragments",
     "_line_pair_overlap_ft", "lines_overlap_enough",
     "_pair_frame_cached", "_pair_symmetric_overlap_ft_cached",
-    "_pair_symmetric_thickness_ft_cached",
+    "_pair_symmetric_thickness_ft_cached", "_line_identity_key_cached",
 ]
 
 
@@ -270,6 +270,39 @@ def _pair_symmetric_thickness_ft_cached(cache1, cache2):
     g_lo = abs(_sa(ti0, si0, ti1, si1, lo) - _sa(tj0, sj0, tj1, sj1, lo))
     g_hi = abs(_sa(ti0, si0, ti1, si1, hi) - _sa(tj0, sj0, tj1, sj1, hi))
     return (g_lo + g_hi) * 0.5
+
+
+# --- CR-2F-C (PAIR_GREEDY_INDEX_DEPENDENCE) ---------------------------------
+#
+# O desempate final de `find_wall_pairs` (CR-1, ver `sort_key` em
+# `wall_pairing.py`) terminava em `(i, j)` - a POSICAO de cada linha na
+# lista de entrada. Isso garante DETERMINISMO (mesma lista -> mesmo
+# resultado), mas nao INVARIANCIA A' ORDEM: a mesma geometria, renumerada,
+# pode trocar qual dos dois candidatos empatados (mesmo thickness_rank,
+# overlap_ratio e overlap_ft) vence. Medido no censo real (2.868 linhas
+# mescladas, predicados ja' simetricos do CR-2F-B): 84 grupos de empate,
+# 336 linhas disputadas - renumerar a lista muda 1-2 pares aceitos.
+#
+# `_line_identity_key_cached` substitui `(i, j)` por uma chave GEOMETRICA
+# canonica: os dois endpoints da linha em cm, arredondados a 0,01cm (abaixo
+# de qualquer tolerancia usada em `find_wall_pairs`), com o menor primeiro -
+# portanto invariante ao indice da linha na lista E ao sentido em que ela
+# foi desenhada. O par usa o MENOR das duas chaves de linha primeiro (ver
+# uso em `find_wall_pairs`), o que torna o desempate tambem invariante a
+# qual das duas linhas entrou como `cache1`/`cache2`. Medido: 0 diferencas
+# no conjunto de pares aceitos em 5 permutacoes de 2.868 linhas (antes: 1-2
+# pares mudavam por permutacao).
+
+def _line_identity_key_cached(cache, nd=2):
+    """Chave geometrica canonica de UMA linha (nd=2 -> 0,01cm de
+    precisao) - nao depende do indice da linha na lista nem do sentido em
+    que foi desenhada (o endpoint menor, em ordem lexicografica, vem
+    primeiro)."""
+    scale = 100.0 / FEET_PER_METER
+    p0, p1 = cache[0], cache[1]
+    a = (round(p0.X * scale, nd), round(p0.Y * scale, nd))
+    b = (round(p1.X * scale, nd), round(p1.Y * scale, nd))
+    return (a, b) if a <= b else (b, a)
 
 
 def _xy_deviation_ft(curve_a, curve_b):

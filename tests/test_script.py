@@ -23,6 +23,11 @@ Line = revit_stubs.Line
 m = load_script.load()
 F = m.FEET_PER_METER
 
+# so' importavel DEPOIS de load_script.load(): e' o proprio wall_modeling.py
+# (exec'ado por load_script.load(), ver o cabecalho de la') que insere a
+# pasta do botao em sys.path, tornando `core.*` importavel.
+from core.engine.tolerances import THICKNESS_RANK_BUCKET_FT as _THICKNESS_RANK_BUCKET_FT  # noqa: E402
+
 CASES = []
 
 
@@ -709,6 +714,97 @@ def test_INV_PAIR_002_2868_linhas_mescladas_invariante_a_permutacao():
         permuted = _candidate_geometry_set(shuffled)
         assert permuted == baseline, (
             seed, "conjunto geometrico de candidatos mudou so' de permutar a lista",
+            len(baseline ^ permuted),
+        )
+
+
+def _accepted_pairs_geometry_set(lines):
+    """O conjunto GEOMETRICO de pares ACEITOS (nao so' candidatos) pelo
+    desempate guloso REAL de find_wall_pairs - traduzido de volta para a
+    IDENTIDADE geometrica de cada linha (nao o indice dela na lista).
+
+    Deliberadamente NAO compara o centerline final (`create_centerline`):
+    essa funcao tem uma assimetria PROPRIA e conhecida (`CR-2F-E`,
+    `CENTERLINE_ARGUMENT_ASYMMETRY` - 47/199 eixos mudam so' de inverter a
+    ordem dos argumentos, ate' 2.421 cm de desvio, ver
+    PLANO_ETAPA_2G.md item E) que e' explicitamente FORA DO ESCOPO do
+    CR-2F-C. Comparar o centerline testaria os DOIS bugs misturados; este
+    teste isola so' o desempate (QUAIS duas linhas formam par), repetindo
+    a mesma varredura O(n^2) de find_wall_pairs com as funcoes REAIS de
+    producao (nenhum predicado geometrico e' reimplementado aqui - so' o
+    laco de aceitacao gulosa, no mesmo padrao ja' usado pelos scripts de
+    nuvem/benchmark/diagnostics_2f/lib2f.py)."""
+    th_ft = [ft(14.0)]
+    tol_ft = m.compute_detection_tolerance_ft(th_ft)
+    caches = [m._line_geom_cache(l) for l in lines]
+    keys = [m._line_identity_key_cached(c) for c in caches]
+
+    candidates = []
+    n = len(lines)
+    for i in range(n):
+        ci = caches[i]
+        for j in range(i + 1, n):
+            cj = caches[j]
+            if not m._are_parallel_cached(ci, cj):
+                continue
+            dist = m._pair_symmetric_thickness_ft_cached(ci, cj)
+            if not (m.MIN_WALL_THICKNESS_FT <= dist <= m.MAX_WALL_THICKNESS_FT):
+                continue
+            matched = m._closest_target_thickness_ft(dist, th_ft, tol_ft)
+            if matched is None:
+                continue
+            overlap_ft, l1, l2 = m._pair_symmetric_overlap_ft_cached(ci, cj)
+            if overlap_ft < m.MIN_WALL_SEGMENT_ABS_FLOOR_FT:
+                continue
+            shorter = min(l1, l2)
+            if shorter < 1e-9:
+                continue
+            overlap_ratio = overlap_ft / shorter
+            if overlap_ratio < m.MIN_WALL_SEGMENT_OVERLAP_RATIO:
+                continue
+            thickness_error = abs(dist - matched)
+            thickness_rank = int(thickness_error / _THICKNESS_RANK_BUCKET_FT)
+            key_i, key_j = keys[i], keys[j]
+            pair_key = (key_i, key_j) if key_i <= key_j else (key_j, key_i)
+            sort_key = (thickness_rank, -overlap_ratio, -overlap_ft) + pair_key
+            candidates.append((sort_key, i, j))
+
+    candidates.sort(key=lambda c: c[0])
+    used = [False] * n
+    out = set()
+    for _, i, j in candidates:
+        if used[i] or used[j]:
+            continue
+        used[i] = used[j] = True
+        out.add(frozenset((keys[i], keys[j])))
+    return out
+
+
+@case
+@pytest.mark.slow
+def test_INV_PAIR_003_desempate_final_invariante_a_renumeracao():
+    """CR-2F-C (PAIR_GREEDY_INDEX_DEPENDENCE): com o predicado JA'
+    simetrico (CR-2F-B), o desempate final do CR-1 ainda terminava em
+    `(i, j)` - a posicao da linha na lista de entrada, nao a geometria dela.
+    Quando dois candidatos empatavam em thickness_rank, overlap_ratio E
+    overlap_ft (84 grupos de empate medidos nas 2.868 linhas mescladas, 336
+    linhas disputadas), renumerar as linhas trocava qual dos dois vencia
+    (1-2 pares aceitos por permutacao). `find_wall_pairs` agora desempata
+    por `_line_identity_key_cached` (geometria canonica, nao indice) - este
+    teste compara o CONJUNTO GEOMETRICO de paredes REALMENTE criadas (nao
+    so' candidatas) em 5 permutacoes das 2.868 linhas mescladas e congeladas
+    do torre_easy_lo_r00_tgd."""
+    lines = _load_merged_2868_lines()
+    baseline = _accepted_pairs_geometry_set(lines)
+    assert len(baseline) > 0
+
+    for seed in (1, 2, 3, 10, 42):
+        rng = random.Random(seed)
+        shuffled = list(lines)
+        rng.shuffle(shuffled)
+        permuted = _accepted_pairs_geometry_set(shuffled)
+        assert permuted == baseline, (
+            seed, "conjunto geometrico de PAREDES ACEITAS mudou so' de permutar a lista",
             len(baseline ^ permuted),
         )
 

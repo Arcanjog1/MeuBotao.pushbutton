@@ -2879,3 +2879,36 @@ entre as duas faces da parede": a DIRECAO foi simetrizada (bissetriz), mas a
 ANCORA e o ALCANCE nao. E' a maior causa restante de instabilidade
 geometrica do pareamento, maior que o proprio `CR-2F-B`, e tem que virar
 correcao propria (`CR-2F-E`), nunca ser misturada com outra.
+
+#### 26.8.6 REGRA OBRIGATORIA - o desempate final de find_wall_pairs nao pode
+depender da posicao da linha na lista (`CR-2F-C`, `PAIR_GREEDY_INDEX_DEPENDENCE`)
+
+**Status:** `IMPLEMENTADO` (2026-08-31, branch
+`fix/cr2fb-symmetric-pair-predicates`, commit separado do `CR-2F-B`).
+
+Com o predicado ja' simetrico (26.8.3), o `sort_key` do CR-1 (26.1) ainda
+terminava em `(i, j)` - a POSICAO de cada linha na lista de entrada, nao a
+geometria dela. Quando dois candidatos empatam em `thickness_rank`,
+`overlap_ratio` **e** `overlap_ft` (medido: **84 grupos de empate**, **336
+linhas** disputadas, nas 2.868 linhas mescladas), renumerar as linhas trocava
+qual dos dois pares vencia.
+
+**Correcao:** `_line_identity_key_cached` (`core/engine/geometry.py`) - chave
+geometrica canonica de UMA linha (os dois endpoints em cm, arredondados a
+0,01cm, o menor primeiro). O `sort_key` de `find_wall_pairs` passou a
+terminar na chave do PAR (a menor das duas identidades primeiro, em vez de
+`(i, j)`).
+
+**FATO MEDIDO:** com o `(i, j)` antigo, embaralhar as 2.868 linhas mudava
+**2, 0, 4, 4, 2** pares aceitos (5 seeds). Com a chave geometrica canonica,
+**0** em todas as 5. Producao real (`wall_modeling_bridge`) inalterada: 199
+pares aceitos, 148 paredes, cobertura 87/97, eixo 96, aberturas 91/91, as 7
+paredes vigiadas e a abertura 6558457 preservadas,
+`solver_decision_fingerprint` (`c74c9c1a...`) inalterado. Custo: desprezivel
+(chave calculada uma vez por linha, O(n), igual ao cache de geometria que ja'
+existia).
+
+**Teste permanente:** `INV-PAIR-003` (`tests/test_script.py`) - mesma
+varredura com as funcoes reais de producao, comparando o conjunto GEOMETRICO
+de pares aceitos (nao o centerline final, que tem a assimetria PROPRIA e
+FORA DE ESCOPO do `2F-E`/26.8.5) em 5 permutacoes das 2.868 linhas.
