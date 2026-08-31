@@ -481,3 +481,26 @@ Os 14 pontos exigidos viram asserts na suite `tests/ai_team/`.
 7. **Merge em `main` continua humano por decisao de projeto** (secao 12
    do pedido), mesmo o `CLAUDE.md` do repositorio autorizando merge
    direto para trabalho manual.
+
+---
+
+## 13. O que foi verificado ao vivo (nao so' em fixture)
+
+Alem da suite offline, estes pontos foram exercitados contra os binarios
+reais nesta sessao:
+
+| Verificacao | Como | Resultado |
+|---|---|---|
+| `--effort` muda o raciocinio de verdade | mesmo prompt/modelo, `low` vs `high` | 0 vs 371 thinking tokens |
+| O adaptador do Claude casa com o CLI real | `ClaudeAgent` + `SubprocessExecutor` + `claude` de verdade | `structured_output` no schema, `ok=True`, custo capturado |
+| O argv leva modelo e effort | mesma chamada real | `--model claude-haiku-4-5 --effort low` |
+| **O hook de guarda BLOQUEIA de verdade** | pedido real ao Claude para rodar `git push origin HEAD --dry-run` | negado, com `permission_denials` preenchido e a razao do guard chegando ao modelo |
+| `$CLAUDE_PROJECT_DIR` e' expandido no comando do hook | mesma prova, com o caminho absoluto | bloqueio manteve-se; o hook nao depende do cwd |
+| Flags do Codex sao aceitas | `codex exec -s read-only -c model_reasoning_effort=...` | cabecalho de sessao confirmou modelo, sandbox e effort |
+| O Codex CLI nao valida o effort | `-c model_reasoning_effort="bogusvalue"` | aceito pelo cliente -> por isso a whitelist e' obrigatoria |
+| Loop completo encadeia sozinho | `--mode selftest`, offline | rodada 1 `sonnet/medium` -> revisor pede `opus/high` -> rodada 2 executa em `opus/high` -> `READY_FOR_HUMAN_REVIEW` |
+
+O que **nao** pode ser provado deste ambiente: o loop live com o Codex
+real, porque `api.openai.com` esta' bloqueado pelo proxy de egress
+(`HTTP CONNECT 403`). Isso e' limitacao do ambiente desta sessao, nao do
+sistema - o runner do GitHub Actions tem egress aberto.

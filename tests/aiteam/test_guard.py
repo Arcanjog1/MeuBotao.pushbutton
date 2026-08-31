@@ -133,3 +133,36 @@ class TestProtocoloDoHook:
         """Nao conseguir ler o evento nao pode virar permissao."""
         out = self._run("{ isso nao e json")
         assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+class TestRegistroDoHook:
+    """O hook so' protege se estiver realmente registrado no CLI."""
+
+    def _settings(self) -> dict:
+        return json.loads(
+            (REPO_ROOT / "ai_team" / "guard" / "claude_settings.json")
+            .read_text(encoding="utf-8"))
+
+    def test_hook_registrado_para_bash_e_escrita(self):
+        entrada = self._settings()["hooks"]["PreToolUse"][0]
+        for ferramenta in ("Bash", "Write", "Edit"):
+            assert ferramenta in entrada["matcher"]
+
+    def test_comando_do_hook_independe_do_diretorio(self):
+        """Caminho relativo so' funcionaria com cwd na raiz do repositorio."""
+        comando = self._settings()["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+        assert "$CLAUDE_PROJECT_DIR" in comando
+        assert comando.endswith("pretooluse_git_guard.py")
+
+    def test_o_script_apontado_existe(self):
+        comando = self._settings()["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+        relativo = comando.split("$CLAUDE_PROJECT_DIR/", 1)[1]
+        assert (REPO_ROOT / relativo).is_file()
+
+    def test_o_agente_recebe_o_settings_do_guard(self, cfg):
+        """De nada adianta o hook existir se o argv nao o carregar."""
+        from ai_team.agents import claude_agent
+        from ai_team.routing import AgentConfig
+        argv = claude_agent.build_argv(cfg, AgentConfig("claude-sonnet-5", "medium"), "x")
+        assert "--settings" in argv
+        assert argv[argv.index("--settings") + 1].endswith("claude_settings.json")
