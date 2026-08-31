@@ -1,0 +1,142 @@
+{
+  "fase_a": [
+    {
+      "tag": "s1",
+      "cobertas_base": 87,
+      "cobertas": 87,
+      "walls_lost": [],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 5,
+      "espurias": 7
+    },
+    {
+      "tag": "s2",
+      "cobertas_base": 87,
+      "cobertas": 87,
+      "walls_lost": [],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 5,
+      "espurias": 7
+    },
+    {
+      "tag": "s3",
+      "cobertas_base": 87,
+      "cobertas": 87,
+      "walls_lost": [],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 6,
+      "espurias": 8
+    },
+    {
+      "tag": "s10",
+      "cobertas_base": 87,
+      "cobertas": 86,
+      "walls_lost": [
+        "W037"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 4,
+      "espurias": 7
+    },
+    {
+      "tag": "s42",
+      "cobertas_base": 87,
+      "cobertas": 85,
+      "walls_lost": [
+        "W053",
+        "W054"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 95,
+      "eixo_10_16": 10,
+      "espurias": 7
+    }
+  ],
+  "merge_congelado": [
+    {
+      "tag": "s1",
+      "cobertas_base": 87,
+      "cobertas": 86,
+      "walls_lost": [
+        "W037"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 99,
+      "eixo_10_16": 4,
+      "espurias": 5
+    },
+    {
+      "tag": "s2",
+      "cobertas_base": 87,
+      "cobertas": 87,
+      "walls_lost": [],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 4,
+      "espurias": 4
+    },
+    {
+      "tag": "s3",
+      "cobertas_base": 87,
+      "cobertas": 86,
+      "walls_lost": [
+        "W037"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 96,
+      "eixo_10_16": 3,
+      "espurias": 6
+    },
+    {
+      "tag": "s10",
+      "cobertas_base": 87,
+      "cobertas": 86,
+      "walls_lost": [
+        "W001"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [],
+      "openings_recovered": [],
+      "eixo_ok": 97,
+      "eixo_10_16": 4,
+      "espurias": 6
+    },
+    {
+      "tag": "s42",
+      "cobertas_base": 87,
+      "cobertas": 85,
+      "walls_lost": [
+        "W010",
+        "W037"
+      ],
+      "walls_gained": [],
+      "openings_newly_unassigned": [
+        "6558457"
+      ],
+      "openings_recovered": [],
+      "eixo_ok": 99,
+      "eixo_10_16": 4,
+      "espurias": 5
+    }
+  ]
+}

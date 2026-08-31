@@ -1,0 +1,1252 @@
+{
+  "n_raw": 9258,
+  "orders": {
+    "orig": {
+      "stage1": 1704,
+      "stage2": 1702
+    },
+    "s1": {
+      "stage1": 1700,
+      "stage2": 1699,
+      "stage1_equal": false,
+      "stage2_equal": false,
+      "bad_blocks_stage1": 28,
+      "lines_in_bad_blocks": 330,
+      "bad_blocks_stage2": 29,
+      "bad_block_sizes": [
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          14,
+          3
+        ],
+        [
+          19,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          28,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          42,
+          1
+        ],
+        [
+          51,
+          1
+        ]
+      ]
+    },
+    "s2": {
+      "stage1": 1705,
+      "stage2": 1700,
+      "stage1_equal": false,
+      "stage2_equal": false,
+      "bad_blocks_stage1": 22,
+      "lines_in_bad_blocks": 183,
+      "bad_blocks_stage2": 25,
+      "bad_block_sizes": [
+        [
+          2,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          14,
+          3
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          34,
+          1
+        ]
+      ]
+    },
+    "s3": {
+      "stage1": 1705,
+      "stage2": 1700,
+      "stage1_equal": false,
+      "stage2_equal": false,
+      "bad_blocks_stage1": 25,
+      "lines_in_bad_blocks": 228,
+      "bad_blocks_stage2": 26,
+      "bad_block_sizes": [
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          17,
+          1
+        ],
+        [
+          34,
+          1
+        ]
+      ]
+    },
+    "s10": {
+      "stage1": 1703,
+      "stage2": 1700,
+      "stage1_equal": false,
+      "stage2_equal": false,
+      "bad_blocks_stage1": 26,
+      "lines_in_bad_blocks": 248,
+      "bad_blocks_stage2": 27,
+      "bad_block_sizes": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          12,
+          2
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          15,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          18,
+          1
+        ],
+        [
+          19,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          34,
+          1
+        ]
+      ]
+    },
+    "s42": {
+      "stage1": 1700,
+      "stage2": 1698,
+      "stage1_equal": false,
+      "stage2_equal": false,
+      "bad_blocks_stage1": 27,
+      "lines_in_bad_blocks": 294,
+      "bad_blocks_stage2": 27,
+      "bad_block_sizes": [
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          20,
+          1
+        ],
+        [
+          33,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          35,
+          1
+        ]
+      ]
+    }
+  },
+  "blocks": [],
+  "smallest_block": {
+    "order": "s1",
+    "size": 2,
+    "idxs": [
+      3469,
+      5694
+    ],
+    "near_opening_cm": 33.7447119507635,
+    "lines_cm": [
+      {
+        "idx": 3469,
+        "x0": 61.9124,
+        "y0": 265.5834,
+        "x1": 65.7409,
+        "y1": 265.186,
+        "len_cm": 3.8491
+      },
+      {
+        "idx": 5694,
+        "x0": -565.0587,
+        "y0": 330.7485,
+        "x1": -569.3569,
+        "y1": 331.1459,
+        "len_cm": 4.3165
+      }
+    ],
+    "partition_orig": [
+      [
+        3469
+      ],
+      [
+        5694
+      ]
+    ],
+    "partition_other": [
+      [
+        3469,
+        5694
+      ]
+    ]
+  },
+  "bad_block_stats": [
+    {
+      "order": "s1",
+      "size": 19,
+      "min_len_cm": 2.5,
+      "max_len_cm": 236.0,
+      "near_opening_cm": 28.1
+    },
+    {
+      "order": "s1",
+      "size": 28,
+      "min_len_cm": 2.268,
+      "max_len_cm": 70.0,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s1",
+      "size": 42,
+      "min_len_cm": 3.0,
+      "max_len_cm": 87.996,
+      "near_opening_cm": 25.4
+    },
+    {
+      "order": "s1",
+      "size": 6,
+      "min_len_cm": 3.0,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 11.6
+    },
+    {
+      "order": "s1",
+      "size": 10,
+      "min_len_cm": 0.965,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 34.4
+    },
+    {
+      "order": "s1",
+      "size": 6,
+      "min_len_cm": 4.0,
+      "max_len_cm": 161.001,
+      "near_opening_cm": 30.0
+    },
+    {
+      "order": "s1",
+      "size": 51,
+      "min_len_cm": 3.175,
+      "max_len_cm": 138.0,
+      "near_opening_cm": 3.2
+    },
+    {
+      "order": "s1",
+      "size": 14,
+      "min_len_cm": 1.27,
+      "max_len_cm": 4.445,
+      "near_opening_cm": 14.1
+    },
+    {
+      "order": "s1",
+      "size": 22,
+      "min_len_cm": 4.221,
+      "max_len_cm": 75.38,
+      "near_opening_cm": 2.8
+    },
+    {
+      "order": "s1",
+      "size": 34,
+      "min_len_cm": 4.221,
+      "max_len_cm": 5.08,
+      "near_opening_cm": 2.2
+    },
+    {
+      "order": "s1",
+      "size": 3,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.5
+    },
+    {
+      "order": "s1",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.5
+    },
+    {
+      "order": "s1",
+      "size": 14,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s1",
+      "size": 10,
+      "min_len_cm": 0.5,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 34.5
+    },
+    {
+      "order": "s1",
+      "size": 14,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s1",
+      "size": 3,
+      "min_len_cm": 4.221,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 29.9
+    },
+    {
+      "order": "s1",
+      "size": 2,
+      "min_len_cm": 3.849,
+      "max_len_cm": 4.317,
+      "near_opening_cm": 33.7
+    },
+    {
+      "order": "s1",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.9
+    },
+    {
+      "order": "s1",
+      "size": 4,
+      "min_len_cm": 3.993,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 25.4
+    },
+    {
+      "order": "s1",
+      "size": 2,
+      "min_len_cm": 0.606,
+      "max_len_cm": 4.153,
+      "near_opening_cm": 25.3
+    },
+    {
+      "order": "s1",
+      "size": 2,
+      "min_len_cm": 0.606,
+      "max_len_cm": 4.153,
+      "near_opening_cm": 25.3
+    },
+    {
+      "order": "s1",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s1",
+      "size": 12,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s1",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s1",
+      "size": 3,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s1",
+      "size": 3,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 34.3
+    },
+    {
+      "order": "s1",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.1
+    },
+    {
+      "order": "s1",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s2",
+      "size": 6,
+      "min_len_cm": 3.0,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 11.2
+    },
+    {
+      "order": "s2",
+      "size": 10,
+      "min_len_cm": 0.965,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 34.4
+    },
+    {
+      "order": "s2",
+      "size": 6,
+      "min_len_cm": 4.0,
+      "max_len_cm": 161.001,
+      "near_opening_cm": 30.0
+    },
+    {
+      "order": "s2",
+      "size": 34,
+      "min_len_cm": 3.175,
+      "max_len_cm": 138.0,
+      "near_opening_cm": 16.8
+    },
+    {
+      "order": "s2",
+      "size": 14,
+      "min_len_cm": 1.27,
+      "max_len_cm": 4.445,
+      "near_opening_cm": 14.1
+    },
+    {
+      "order": "s2",
+      "size": 14,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s2",
+      "size": 14,
+      "min_len_cm": 0.5,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 30.5
+    },
+    {
+      "order": "s2",
+      "size": 8,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.1
+    },
+    {
+      "order": "s2",
+      "size": 10,
+      "min_len_cm": 4.221,
+      "max_len_cm": 14.0,
+      "near_opening_cm": 35.3
+    },
+    {
+      "order": "s2",
+      "size": 6,
+      "min_len_cm": 4.221,
+      "max_len_cm": 75.46,
+      "near_opening_cm": 27.9
+    },
+    {
+      "order": "s2",
+      "size": 2,
+      "min_len_cm": 3.849,
+      "max_len_cm": 4.317,
+      "near_opening_cm": 33.7
+    },
+    {
+      "order": "s2",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.9
+    },
+    {
+      "order": "s2",
+      "size": 4,
+      "min_len_cm": 3.993,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 25.4
+    },
+    {
+      "order": "s2",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.7
+    },
+    {
+      "order": "s2",
+      "size": 16,
+      "min_len_cm": 2.5,
+      "max_len_cm": 236.0,
+      "near_opening_cm": 28.1
+    },
+    {
+      "order": "s2",
+      "size": 2,
+      "min_len_cm": 0.606,
+      "max_len_cm": 4.153,
+      "near_opening_cm": 25.3
+    },
+    {
+      "order": "s2",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s2",
+      "size": 8,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s2",
+      "size": 5,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s2",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s2",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s2",
+      "size": 8,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.1
+    },
+    {
+      "order": "s3",
+      "size": 17,
+      "min_len_cm": 2.5,
+      "max_len_cm": 236.0,
+      "near_opening_cm": 28.2
+    },
+    {
+      "order": "s3",
+      "size": 14,
+      "min_len_cm": 3.0,
+      "max_len_cm": 70.0,
+      "near_opening_cm": 45.0
+    },
+    {
+      "order": "s3",
+      "size": 6,
+      "min_len_cm": 3.0,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 11.2
+    },
+    {
+      "order": "s3",
+      "size": 10,
+      "min_len_cm": 0.965,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 34.4
+    },
+    {
+      "order": "s3",
+      "size": 16,
+      "min_len_cm": 2.2,
+      "max_len_cm": 161.001,
+      "near_opening_cm": 27.6
+    },
+    {
+      "order": "s3",
+      "size": 34,
+      "min_len_cm": 3.175,
+      "max_len_cm": 138.0,
+      "near_opening_cm": 16.8
+    },
+    {
+      "order": "s3",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.2
+    },
+    {
+      "order": "s3",
+      "size": 12,
+      "min_len_cm": 2.2,
+      "max_len_cm": 4.4,
+      "near_opening_cm": 28.1
+    },
+    {
+      "order": "s3",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.6
+    },
+    {
+      "order": "s3",
+      "size": 12,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s3",
+      "size": 8,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.5
+    },
+    {
+      "order": "s3",
+      "size": 11,
+      "min_len_cm": 2.268,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s3",
+      "size": 12,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s3",
+      "size": 8,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.1
+    },
+    {
+      "order": "s3",
+      "size": 10,
+      "min_len_cm": 4.221,
+      "max_len_cm": 14.0,
+      "near_opening_cm": 35.3
+    },
+    {
+      "order": "s3",
+      "size": 6,
+      "min_len_cm": 4.221,
+      "max_len_cm": 75.46,
+      "near_opening_cm": 27.9
+    },
+    {
+      "order": "s3",
+      "size": 3,
+      "min_len_cm": 4.221,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 29.9
+    },
+    {
+      "order": "s3",
+      "size": 2,
+      "min_len_cm": 0.606,
+      "max_len_cm": 4.153,
+      "near_opening_cm": 25.3
+    },
+    {
+      "order": "s3",
+      "size": 5,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s3",
+      "size": 8,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s3",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s3",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s3",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s3",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.1
+    },
+    {
+      "order": "s3",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s10",
+      "size": 19,
+      "min_len_cm": 2.5,
+      "max_len_cm": 236.0,
+      "near_opening_cm": 28.2
+    },
+    {
+      "order": "s10",
+      "size": 5,
+      "min_len_cm": 0.5,
+      "max_len_cm": 216.0,
+      "near_opening_cm": 28.1
+    },
+    {
+      "order": "s10",
+      "size": 22,
+      "min_len_cm": 0.965,
+      "max_len_cm": 61.0,
+      "near_opening_cm": 25.2
+    },
+    {
+      "order": "s10",
+      "size": 18,
+      "min_len_cm": 3.0,
+      "max_len_cm": 70.0,
+      "near_opening_cm": 11.2
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 3.0,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 11.6
+    },
+    {
+      "order": "s10",
+      "size": 15,
+      "min_len_cm": 2.268,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s10",
+      "size": 16,
+      "min_len_cm": 2.2,
+      "max_len_cm": 161.001,
+      "near_opening_cm": 27.6
+    },
+    {
+      "order": "s10",
+      "size": 34,
+      "min_len_cm": 3.175,
+      "max_len_cm": 138.0,
+      "near_opening_cm": 16.8
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 4.221,
+      "max_len_cm": 75.38,
+      "near_opening_cm": 27.9
+    },
+    {
+      "order": "s10",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.2
+    },
+    {
+      "order": "s10",
+      "size": 12,
+      "min_len_cm": 2.2,
+      "max_len_cm": 4.4,
+      "near_opening_cm": 28.1
+    },
+    {
+      "order": "s10",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.6
+    },
+    {
+      "order": "s10",
+      "size": 14,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s10",
+      "size": 12,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s10",
+      "size": 10,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.1
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 3.993,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 30.5
+    },
+    {
+      "order": "s10",
+      "size": 3,
+      "min_len_cm": 4.221,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 29.9
+    },
+    {
+      "order": "s10",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.9
+    },
+    {
+      "order": "s10",
+      "size": 4,
+      "min_len_cm": 3.993,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 25.4
+    },
+    {
+      "order": "s10",
+      "size": 2,
+      "min_len_cm": 0.606,
+      "max_len_cm": 4.153,
+      "near_opening_cm": 25.3
+    },
+    {
+      "order": "s10",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s10",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s10",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s10",
+      "size": 8,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.1
+    },
+    {
+      "order": "s42",
+      "size": 33,
+      "min_len_cm": 1.5,
+      "max_len_cm": 70.0,
+      "near_opening_cm": 35.7
+    },
+    {
+      "order": "s42",
+      "size": 6,
+      "min_len_cm": 3.0,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 11.6
+    },
+    {
+      "order": "s42",
+      "size": 10,
+      "min_len_cm": 0.965,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 34.4
+    },
+    {
+      "order": "s42",
+      "size": 34,
+      "min_len_cm": 4.221,
+      "max_len_cm": 5.08,
+      "near_opening_cm": 1.8
+    },
+    {
+      "order": "s42",
+      "size": 6,
+      "min_len_cm": 4.221,
+      "max_len_cm": 75.38,
+      "near_opening_cm": 27.9
+    },
+    {
+      "order": "s42",
+      "size": 12,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.1
+    },
+    {
+      "order": "s42",
+      "size": 4,
+      "min_len_cm": 3.21,
+      "max_len_cm": 4.221,
+      "near_opening_cm": 25.6
+    },
+    {
+      "order": "s42",
+      "size": 12,
+      "min_len_cm": 4.0,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 35.4
+    },
+    {
+      "order": "s42",
+      "size": 35,
+      "min_len_cm": 1.5,
+      "max_len_cm": 139.5,
+      "near_opening_cm": 7.7
+    },
+    {
+      "order": "s42",
+      "size": 12,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s42",
+      "size": 11,
+      "min_len_cm": 2.268,
+      "max_len_cm": 4.215,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s42",
+      "size": 12,
+      "min_len_cm": 1.5,
+      "max_len_cm": 80.0,
+      "near_opening_cm": 4.4
+    },
+    {
+      "order": "s42",
+      "size": 10,
+      "min_len_cm": 1.717,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 25.1
+    },
+    {
+      "order": "s42",
+      "size": 10,
+      "min_len_cm": 4.221,
+      "max_len_cm": 14.0,
+      "near_opening_cm": 35.3
+    },
+    {
+      "order": "s42",
+      "size": 6,
+      "min_len_cm": 3.993,
+      "max_len_cm": 4.771,
+      "near_opening_cm": 30.5
+    },
+    {
+      "order": "s42",
+      "size": 3,
+      "min_len_cm": 4.221,
+      "max_len_cm": 4.388,
+      "near_opening_cm": 29.9
+    },
+    {
+      "order": "s42",
+      "size": 2,
+      "min_len_cm": 3.849,
+      "max_len_cm": 4.317,
+      "near_opening_cm": 33.7
+    },
+    {
+      "order": "s42",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.9
+    },
+    {
+      "order": "s42",
+      "size": 20,
+      "min_len_cm": 4.215,
+      "max_len_cm": 269.0,
+      "near_opening_cm": 55.7
+    },
+    {
+      "order": "s42",
+      "size": 2,
+      "min_len_cm": 4.147,
+      "max_len_cm": 4.788,
+      "near_opening_cm": 25.7
+    },
+    {
+      "order": "s42",
+      "size": 16,
+      "min_len_cm": 2.5,
+      "max_len_cm": 236.0,
+      "near_opening_cm": 28.2
+    },
+    {
+      "order": "s42",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s42",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.433,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s42",
+      "size": 6,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.2
+    },
+    {
+      "order": "s42",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 31.3
+    },
+    {
+      "order": "s42",
+      "size": 4,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.6,
+      "near_opening_cm": 34.2
+    },
+    {
+      "order": "s42",
+      "size": 12,
+      "min_len_cm": 0.5,
+      "max_len_cm": 2.601,
+      "near_opening_cm": 36.1
+    }
+  ]
+}

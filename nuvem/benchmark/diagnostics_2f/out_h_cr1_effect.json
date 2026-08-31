@@ -1,0 +1,46 @@
+{
+  "n_lines": 2868,
+  "n_cands": 589,
+  "tie_groups": 106,
+  "tied_candidates": 433,
+  "conflicting_tie_groups": 14,
+  "accepted_baseline": 203,
+  "permutations": [
+    {
+      "seed": 1,
+      "accepted": 203,
+      "only_base": 0,
+      "only_perm": 0,
+      "identical": true
+    },
+    {
+      "seed": 2,
+      "accepted": 203,
+      "only_base": 2,
+      "only_perm": 2,
+      "identical": false
+    },
+    {
+      "seed": 3,
+      "accepted": 203,
+      "only_base": 1,
+      "only_perm": 1,
+      "identical": false
+    },
+    {
+      "seed": 10,
+      "accepted": 203,
+      "only_base": 1,
+      "only_perm": 1,
+      "identical": false
+    },
+    {
+      "seed": 42,
+      "accepted": 203,
+      "only_base": 0,
+      "only_perm": 0,
+      "identical": true
+    }
+  ],
+  "ij_invariant": false
+}

@@ -1,0 +1,489 @@
+{
+  "synthetic": [
+    {
+      "case": "SYM-01 paralelas exatas",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 14.0,
+      "d_ji_cm": 14.0,
+      "d_symmetric": true,
+      "ov_ij_cm": 400.0,
+      "ov_ji_cm": 400.0,
+      "ov_symmetric": true
+    },
+    {
+      "case": "SYM-02 paralelas exatas, comprimentos diferentes",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 14.0,
+      "d_ji_cm": 14.0,
+      "d_symmetric": true,
+      "ov_ij_cm": 424.0,
+      "ov_ji_cm": 424.0,
+      "ov_symmetric": true
+    },
+    {
+      "case": "SYM-03 quase-paralelas (0,5 grau)",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 15.744774,
+      "d_ji_cm": 15.745374,
+      "d_symmetric": false,
+      "ov_ij_cm": 400.0,
+      "ov_ji_cm": 399.862598,
+      "ov_symmetric": false
+    },
+    {
+      "case": "SYM-04 quase-paralelas (2,0 graus)",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 20.971371,
+      "d_ji_cm": 20.984154,
+      "d_symmetric": false,
+      "ov_ij_cm": 400.0,
+      "ov_ji_cm": 399.267738,
+      "ov_symmetric": false
+    },
+    {
+      "case": "SYM-05 quase-paralelas + comprimentos muito diferentes",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 15.736446,
+      "d_ji_cm": 15.746038,
+      "d_symmetric": false,
+      "ov_ij_cm": 100.0,
+      "ov_ji_cm": 100.060954,
+      "ov_symmetric": false
+    },
+    {
+      "case": "SYM-06 endpoints invertidos (mesma geometria de SYM-01)",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 14.0,
+      "d_ji_cm": 14.0,
+      "d_symmetric": true,
+      "ov_ij_cm": 400.0,
+      "ov_ji_cm": 400.0,
+      "ov_symmetric": true
+    },
+    {
+      "case": "SYM-07 sem sobreposicao no eixo",
+      "parallel_ij": true,
+      "parallel_ji": true,
+      "d_ij_cm": 14.0,
+      "d_ji_cm": 14.0,
+      "d_symmetric": true,
+      "ov_ij_cm": 0.0,
+      "ov_ji_cm": 0.0,
+      "ov_symmetric": true
+    }
+  ],
+  "merge_relation": {
+    "tag": "merge(2mm)",
+    "pairs": 121272,
+    "par_flip": 0,
+    "dist_max_abs_diff_ft": 5.688383750720822,
+    "dist_max_rel": 0.9999049672969624,
+    "compat_flip": 393,
+    "ov_flip": 732,
+    "ov_max_abs_diff_ft": 0.001126185037482158,
+    "examples_compat": [
+      {
+        "i": 23,
+        "j": 4634,
+        "d_ij_cm": 0.189222,
+        "d_ji_cm": 61.10415,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 24,
+        "j": 4634,
+        "d_ij_cm": 0.189222,
+        "d_ji_cm": 61.10415,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 27,
+        "j": 5877,
+        "d_ij_cm": 0.129563,
+        "d_ji_cm": 56.9016,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 66,
+        "j": 3851,
+        "d_ij_cm": 0.182605,
+        "d_ji_cm": 58.40175,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 73,
+        "j": 3851,
+        "d_ij_cm": 0.182605,
+        "d_ji_cm": 58.40175,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 78,
+        "j": 3851,
+        "d_ij_cm": 0.182605,
+        "d_ji_cm": 58.40175,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 157,
+        "j": 5939,
+        "d_ij_cm": 0.136266,
+        "d_ji_cm": 22.09845,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 167,
+        "j": 3672,
+        "d_ij_cm": 0.120914,
+        "d_ji_cm": 0.89585,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 167,
+        "j": 3682,
+        "d_ij_cm": 0.154485,
+        "d_ji_cm": 1.09835,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 188,
+        "j": 6019,
+        "d_ij_cm": 0.146557,
+        "d_ji_cm": 22.0984,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 230,
+        "j": 6197,
+        "d_ij_cm": 0.145726,
+        "d_ji_cm": 22.0984,
+        "tol_cm": 0.2
+      },
+      {
+        "i": 240,
+        "j": 3841,
+        "d_ij_cm": 0.121662,
+        "d_ji_cm": 0.89575,
+        "tol_cm": 0.2
+      }
+    ],
+    "examples_dist": [
+      {
+        "i": 5,
+        "j": 34,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 5,
+        "j": 35,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 5,
+        "j": 36,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 6,
+        "j": 34,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 6,
+        "j": 35,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 6,
+        "j": 36,
+        "d_ij_cm": 0.001396,
+        "d_ji_cm": 0.002512,
+        "diff_cm": 0.001116
+      },
+      {
+        "i": 13,
+        "j": 4634,
+        "d_ij_cm": 0.315796,
+        "d_ji_cm": 61.60415,
+        "diff_cm": 61.288354
+      },
+      {
+        "i": 13,
+        "j": 4648,
+        "d_ij_cm": 0.285615,
+        "d_ji_cm": 61.4016,
+        "diff_cm": 61.115985
+      }
+    ],
+    "dist_max_abs_diff_cm": 173.381937,
+    "ov_max_abs_diff_cm": 0.034326
+  },
+  "pair_predicates": {
+    "tag": "pairing",
+    "pairs": 60556,
+    "par_flip": 0,
+    "dist_max_abs_diff_ft": 5.999439933377338,
+    "dist_max_rel": 0.9999818503844508,
+    "compat_flip": 5397,
+    "ov_flip": 799,
+    "ov_max_abs_diff_ft": 0.04149593112051536,
+    "examples_compat": [
+      {
+        "i": 0,
+        "j": 379,
+        "d_ij_cm": 0.600095,
+        "d_ji_cm": 61.002876,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 0,
+        "j": 417,
+        "d_ij_cm": 11.215241,
+        "d_ji_cm": 61.004846,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 0,
+        "j": 430,
+        "d_ij_cm": 12.117048,
+        "d_ji_cm": 61.004848,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 1,
+        "j": 379,
+        "d_ij_cm": 1.111514,
+        "d_ji_cm": 61.502876,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 1,
+        "j": 417,
+        "d_ij_cm": 11.703172,
+        "d_ji_cm": 61.504846,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 1,
+        "j": 430,
+        "d_ij_cm": 12.628051,
+        "d_ji_cm": 61.504848,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 206,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 66.636505,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 207,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 62.46188,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 209,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 44.392473,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 210,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 72.728873,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 211,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 92.335141,
+        "tol_cm": 35.0
+      },
+      {
+        "i": 2,
+        "j": 212,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 96.509767,
+        "tol_cm": 35.0
+      }
+    ],
+    "examples_dist": [
+      {
+        "i": 0,
+        "j": 379,
+        "d_ij_cm": 0.600095,
+        "d_ji_cm": 61.002876,
+        "diff_cm": 60.402781
+      },
+      {
+        "i": 0,
+        "j": 417,
+        "d_ij_cm": 11.215241,
+        "d_ji_cm": 61.004846,
+        "diff_cm": 49.789605
+      },
+      {
+        "i": 0,
+        "j": 430,
+        "d_ij_cm": 12.117048,
+        "d_ji_cm": 61.004848,
+        "diff_cm": 48.8878
+      },
+      {
+        "i": 1,
+        "j": 379,
+        "d_ij_cm": 1.111514,
+        "d_ji_cm": 61.502876,
+        "diff_cm": 60.391362
+      },
+      {
+        "i": 1,
+        "j": 417,
+        "d_ij_cm": 11.703172,
+        "d_ji_cm": 61.504846,
+        "diff_cm": 49.801674
+      },
+      {
+        "i": 1,
+        "j": 430,
+        "d_ij_cm": 12.628051,
+        "d_ji_cm": 61.504848,
+        "diff_cm": 48.876797
+      },
+      {
+        "i": 2,
+        "j": 206,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 66.636505,
+        "diff_cm": 55.297281
+      },
+      {
+        "i": 2,
+        "j": 207,
+        "d_ij_cm": 11.339224,
+        "d_ji_cm": 62.46188,
+        "diff_cm": 51.122656
+      }
+    ],
+    "dist_max_abs_diff_cm": 182.862929,
+    "ov_max_abs_diff_cm": 1.264796
+  },
+  "candidate_gate": {
+    "pairs_scanned": 60556,
+    "valid_both": 562,
+    "only_ij": 27,
+    "only_ji": 13,
+    "rank_differs": 27,
+    "examples": [
+      {
+        "i": 16,
+        "j": 295,
+        "kind": "only_ij",
+        "d_ij_cm": 11.83063,
+        "d_ji_cm": 8.997
+      },
+      {
+        "i": 17,
+        "j": 300,
+        "kind": "only_ji",
+        "d_ij_cm": 8.75645,
+        "d_ji_cm": 11.50485
+      },
+      {
+        "i": 17,
+        "j": 302,
+        "rank_ij": 6,
+        "rank_ji": 49,
+        "d_ij_cm": 14.33173,
+        "d_ji_cm": 11.50287
+      },
+      {
+        "i": 20,
+        "j": 300,
+        "kind": "only_ji",
+        "d_ij_cm": 9.25592,
+        "d_ji_cm": 12.00485
+      },
+      {
+        "i": 20,
+        "j": 302,
+        "rank_ij": 16,
+        "rank_ji": 39,
+        "d_ij_cm": 14.83115,
+        "d_ji_cm": 12.00287
+      },
+      {
+        "i": 50,
+        "j": 285,
+        "kind": "only_ij",
+        "d_ij_cm": 15.70935,
+        "d_ji_cm": 18.50282
+      },
+      {
+        "i": 128,
+        "j": 379,
+        "kind": "only_ij",
+        "d_ij_cm": 14.02996,
+        "d_ji_cm": 18.50288
+      },
+      {
+        "i": 128,
+        "j": 431,
+        "kind": "only_ij",
+        "d_ij_cm": 13.35574,
+        "d_ji_cm": 18.50287
+      },
+      {
+        "i": 129,
+        "j": 420,
+        "kind": "only_ij",
+        "d_ij_cm": 13.35594,
+        "d_ji_cm": 18.50287
+      },
+      {
+        "i": 200,
+        "j": 384,
+        "kind": "only_ij",
+        "d_ij_cm": 14.12354,
+        "d_ji_cm": 18.50287
+      },
+      {
+        "i": 203,
+        "j": 342,
+        "kind": "only_ij",
+        "d_ij_cm": 14.12395,
+        "d_ji_cm": 18.50287
+      },
+      {
+        "i": 291,
+        "j": 300,
+        "rank_ij": 8,
+        "rank_ji": 7,
+        "d_ij_cm": 13.59078,
+        "d_ji_cm": 13.60185
+      }
+    ]
+  }
+}

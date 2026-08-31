@@ -1,0 +1,777 @@
+{
+  "cases": [
+    {
+      "cid": "MERGE-001",
+      "desc": "3 colineares perfeitos sobrepostos",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                260.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-002",
+      "desc": "3 colineares com gaps de 10cm (dentro do gap tolerado)",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                320.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-003",
+      "desc": "curto (5cm) entre dois longos (400cm)",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                805.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-004",
+      "desc": "offsets 0,05cm (abaixo da tolerancia de 0,2cm)",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.05
+              ],
+              [
+                400.0,
+                0.05
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-005",
+      "desc": "offsets 0,5cm (acima da tolerancia de 0,2cm)",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 3,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                400.0,
+                0.0
+              ]
+            ],
+            [
+              [
+                0.0,
+                0.5
+              ],
+              [
+                400.0,
+                0.5
+              ]
+            ],
+            [
+              [
+                0.0,
+                1.0
+              ],
+              [
+                400.0,
+                1.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-006",
+      "desc": "gap de 80cm explicado por abertura real de 80cm",
+      "n_perms": 2,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                480.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-007",
+      "desc": "MERGE-001 com endpoints invertidos",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                260.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-008",
+      "desc": "MERGE-001 rotacionado 90 graus",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                260.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-009",
+      "desc": "MERGE-001 transladado (+1234,5 / -987,6)",
+      "n_perms": 6,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                1234.5,
+                -987.6
+              ],
+              [
+                1494.5,
+                -987.6
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-010",
+      "desc": "5 fragmentos, todas as 120 permutacoes",
+      "n_perms": 120,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 120,
+          "perm": "ABCDE",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                500.0,
+                0.0
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-011",
+      "desc": "cadeia A~B ~C com offsets de 0,15cm (A~C = FALSO)",
+      "n_perms": 6,
+      "distinct_partitions": 3,
+      "distinct_outputs": 3,
+      "invariant": false,
+      "partition_invariant": false,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "ABC",
+          "n_out": 2,
+          "lines": [
+            [
+              [
+                0.0,
+                0.075
+              ],
+              [
+                400.0,
+                0.075
+              ]
+            ],
+            [
+              [
+                0.0,
+                0.3
+              ],
+              [
+                400.0,
+                0.3
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2
+            ]
+          ]
+        },
+        {
+          "count": 2,
+          "perm": "BAC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.15
+              ],
+              [
+                400.0,
+                0.15
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        },
+        {
+          "count": 2,
+          "perm": "CAB",
+          "n_out": 2,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                400.0,
+                0.0
+              ]
+            ],
+            [
+              [
+                0.0,
+                0.225
+              ],
+              [
+                400.0,
+                0.225
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-012",
+      "desc": "dois fragmentos de MESMO comprimento, offsets opostos",
+      "n_perms": 2,
+      "distinct_partitions": 1,
+      "distinct_outputs": 1,
+      "invariant": true,
+      "partition_invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.075
+              ],
+              [
+                400.0,
+                0.075
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "MERGE-013",
+      "desc": "quase-paralelas (0,02 grau) coladas",
+      "n_perms": 6,
+      "distinct_partitions": 3,
+      "distinct_outputs": 3,
+      "invariant": false,
+      "partition_invariant": false,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "ABC",
+          "n_out": 2,
+          "lines": [
+            [
+              [
+                0.0,
+                -0.045
+              ],
+              [
+                800.0,
+                0.234
+              ]
+            ],
+            [
+              [
+                0.0,
+                0.1
+              ],
+              [
+                800.0,
+                0.379
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2
+            ]
+          ]
+        },
+        {
+          "count": 2,
+          "perm": "BAC",
+          "n_out": 1,
+          "lines": [
+            [
+              [
+                0.0,
+                0.003
+              ],
+              [
+                800.0,
+                0.283
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0,
+              1,
+              2
+            ]
+          ]
+        },
+        {
+          "count": 2,
+          "perm": "CAB",
+          "n_out": 2,
+          "lines": [
+            [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                800.0,
+                0.0
+              ]
+            ],
+            [
+              [
+                0.0,
+                0.075
+              ],
+              [
+                800.0,
+                0.354
+              ]
+            ]
+          ],
+          "partition": [
+            [
+              0
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "cluster_reference": [
+    {
+      "cid": "CLU-01 empate de comprimento, offsets opostos",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "lines": [
+            [
+              [
+                0.0,
+                0.075
+              ],
+              [
+                400.0,
+                0.075
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "CLU-02 empate de comprimento, quase-paralelas",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "lines": [
+            [
+              [
+                0.0,
+                -0.0373
+              ],
+              [
+                400.0001,
+                0.3118
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "CLU-03 tres fragmentos, dois empatados no maior comprimento",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "lines": [
+            [
+              [
+                0.0,
+                0.05
+              ],
+              [
+                800.0,
+                0.05
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "CLU-04 comprimentos distintos (referencia nao ambigua)",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "lines": [
+            [
+              [
+                0.0,
+                0.0579
+              ],
+              [
+                900.0,
+                0.0579
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "CLU-05 EMPATE EXATO de comprimento com direcoes diferentes",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 2,
+          "perm": "AB",
+          "lines": [
+            [
+              [
+                0.0,
+                0.1373
+              ],
+              [
+                400.0,
+                0.1373
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "cid": "CLU-06 EMPATE EXATO de comprimento, tres fragmentos",
+      "distinct_outputs": 1,
+      "invariant": true,
+      "variants": [
+        {
+          "count": 6,
+          "perm": "ABC",
+          "lines": [
+            [
+              [
+                0.0,
+                0.1276
+              ],
+              [
+                400.0,
+                0.1276
+              ]
+            ],
+            [
+              [
+                600.0,
+                0.1276
+              ],
+              [
+                700.0,
+                0.1276
+              ]
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
