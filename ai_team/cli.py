@@ -182,8 +182,21 @@ def main(argv: list[str] | None = None) -> int:
 
     # Branch propria por tarefa (secao 10 do pedido).
     if not args.no_branch:
-        branch = args.branch or repo.branch_name(
+        default_branch = repo.branch_name(
             str(cfg.git.get("branch_prefix", "ai/")), slugify(args.task))
+        if args.branch:
+            safe, resultado = repo.sanitize_branch_name(args.branch)
+            if safe:
+                branch = resultado
+            else:
+                # --branch veio do input `branch_name` da UI: nunca cru no
+                # git. Invalido degrada para a branch gerada, e o desvio
+                # fica registrado - mesmo principio de routing.py.
+                state.note(f"--branch {args.branch!r} recusado ({resultado}) "
+                          f"-> usando {default_branch!r}")
+                branch = default_branch
+        else:
+            branch = default_branch
         ok, message = repo.ensure_branch(branch, base_branch, args.cwd)
         state.note(f"branch: {message}")
         if not ok:
