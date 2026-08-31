@@ -1,0 +1,17 @@
+{
+  "$comment": "Registra o hook de guarda no Claude Code CLI. Passado via --settings. O hook roda ANTES de cada Bash/Write e pode negar o comando.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ai_team/guard/pretooluse_git_guard.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

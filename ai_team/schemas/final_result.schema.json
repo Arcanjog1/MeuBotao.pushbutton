@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AiTeamFinalResult",
+  "description": "Resultado consolidado de uma run do AI Team.",
+  "type": "object",
+  "required": ["run_id", "status", "task", "rounds", "gate"],
+  "properties": {
+    "run_id": {"type": "string"},
+    "status": {
+      "type": "string",
+      "enum": ["READY_FOR_HUMAN_REVIEW", "NEEDS_HUMAN", "NEEDS_REVIT",
+               "FAILED", "MAX_ROUNDS", "TIMEOUT", "ERROR"]
+    },
+    "do_not_merge": {"type": "boolean"},
+    "task": {"type": "string"},
+    "mode": {"type": "string"},
+    "branch": {"type": "string"},
+    "base_sha": {"type": "string"},
+    "head_sha": {"type": "string"},
+    "rounds_used": {"type": "integer"},
+    "max_rounds": {"type": "integer"},
+    "total_cost_usd": {"type": "number"},
+    "claude_calls": {"type": "integer"},
+    "codex_calls": {"type": "integer"},
+    "gate": {"type": "object", "description": "Resultado do gate deterministico da ultima rodada."},
+    "rounds": {"type": "array", "items": {"type": "object"}},
+    "revit_capture_request": {"type": "array", "items": {"type": "string"}},
+    "human_question": {"type": "string"},
+    "summary": {"type": "string"},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  }
+}

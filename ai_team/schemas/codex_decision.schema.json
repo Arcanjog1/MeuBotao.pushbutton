@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodexRoutingDecision",
+  "description": "Revisao + roteamento da proxima rodada, decididos pelo Codex.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "why", "routing_reason"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["CONTINUE", "APPROVED", "NEEDS_HUMAN", "NEEDS_REVIT", "FAILED"]
+    },
+    "next_agent": {
+      "type": "string",
+      "enum": ["claude"],
+      "description": "V1: o unico executor e' o Claude."
+    },
+    "next_model": {
+      "type": "string",
+      "description": "Modelo do Claude na proxima rodada. Deve estar na whitelist da politica."
+    },
+    "next_reasoning": {
+      "type": "string",
+      "description": "Nivel de raciocinio na proxima rodada. Deve estar na whitelist da politica."
+    },
+    "next_prompt": {
+      "type": "string",
+      "description": "Instrucao COMPLETA e autocontida para a proxima rodada do Claude. Obrigatoria quando verdict=CONTINUE."
+    },
+    "issues": {
+      "type": "array",
+      "description": "Problemas encontrados na revisao.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "detail"],
+        "properties": {
+          "severity": {"type": "string", "enum": ["BLOCKER", "MAJOR", "MINOR", "NIT"]},
+          "file": {"type": "string"},
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "routing_reason": {
+      "type": "string",
+      "description": "POR QUE este modelo e este nivel de raciocinio. Obrigatorio - a politica exige justificativa de cada escolha."
+    },
+    "why": {
+      "type": "string",
+      "description": "Justificativa do verdict."
+    },
+    "revit_capture_request": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Se verdict=NEEDS_REVIT: exatamente o que precisa ser capturado do Revit vivo."
+    }
+  }
+}

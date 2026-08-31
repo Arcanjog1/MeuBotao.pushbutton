@@ -1,0 +1,7 @@
+Arquivo-alvo do teste sintetico do AI Team.
+
+Existe unicamente para que o orquestrador possa ser exercitado ponta a
+ponta sem tocar no solver, no wall modeling ou na modulacao (secao 22 do
+pedido). Alterar ou apagar este arquivo nao afeta o projeto.
+
+contador_de_rodadas_sinteticas: 0
