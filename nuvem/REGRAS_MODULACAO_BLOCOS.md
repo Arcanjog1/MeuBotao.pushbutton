@@ -2520,3 +2520,123 @@ paredes nao deveriam existir e 27 das 97 paredes reais estao faltando.
 
 **DOCUMENTADO - pendencia de codigo aberta.** Nenhuma correcao foi
 aplicada; o plano e' tratado em sessao propria.
+
+## 26. PAREAMENTO DE FACES: a espessura decide, nao a proximidade (2026-08-31)
+
+Conhecimento extraido da Etapa 2D (PLANO da correcao do CR-1). Medicao
+completa em `nuvem/benchmark/PLANO_ETAPA_2D.md`; scripts de reproducao em
+`nuvem/benchmark/diagnostics_2d/`. Nenhuma correcao foi aplicada ainda.
+
+### 26.1 REGRA OBRIGATORIA - entre duas faces candidatas, vence a que MEDE a espessura pedida
+
+Ao escolher com qual linha parear uma face de parede, o criterio primario
+e' o **erro de espessura** (`|distancia_medida - espessura_escolhida|`), e
+so' depois a sobreposicao. O criterio anterior - "no empate de
+sobreposicao, vence a MENOR distancia" - esta' **REVOGADO**.
+
+Como foi descoberto: simulacao offline sobre os 589 candidatos reais do
+`torre_easy_lo_r00_tgd`, trocando apenas a chave de ordenacao.
+
+**FATO MEDIDO** (o mesmo pipeline, so' o ranking diferente):
+
+| | criterio antigo | criterio novo |
+|---|---|---|
+| pares com espessura exata | 77 de 209 (37%) | **122 de 203 (60%)** |
+| paredes do gabarito reproduzidas | 70 de 97 | **87 de 97** |
+| paredes no eixo certo | 76 de 167 | **96 de 154** |
+| paredes com eixo 10-16 cm fora | 33 | **4** |
+| aberturas atribuidas | 82 de 91 | **91 de 91** |
+| roubos de face | 52 | **7** |
+| paredes do gabarito PERDIDAS | - | **0** |
+
+**DOCUMENTADO - pendencia de codigo aberta.** A formula aprovada esta' no
+item G do plano; a implementacao e' a proxima sessao.
+
+### 26.2 REGRA OBRIGATORIA - NUNCA por piso de sobreposicao pela linha mais longa
+
+E' PROIBIDO filtrar candidatos por `overlap / comprimento_da_linha_mais_longa`
+(`r_long`) ou por comprimento minimo de linha, para tentar eliminar linhas
+de esquadria.
+
+**FATO MEDIDO - por que:** as paredes **W001** e **W068** (424 cm, reais,
+com `d = 13,999` cm, sobreposicao total) sao formadas por uma face de
+**1.513,15 cm** contra uma de **424,00 cm** -> `r_long = 0,2802`. Um piso
+de `r_long >= 0,30` mata as duas e devolve 4 aberturas para o limbo. Com
+`r_long >= 0,50`, morre W037 junto.
+
+Isso confirma, com numero, o aviso que ja' estava no docstring de
+`find_wall_pairs`: uma boneca legitima pode ter sobreposicao pequena em
+relacao a' face longa vizinha. O aviso estava certo; o remedio (desempate
+por menor distancia) e' que estava errado.
+
+### 26.3 EXCECAO PERMITIDA - existe parede real com 15,06 cm entre faces
+
+**FATO MEDIDO:** a parede **W074** (189 cm no gabarito) tem como **unico**
+candidato um par a `d = 15,060 cm` (`erro = 1,060 cm` para a espessura
+pedida de 14). Ela e' uma parede legitima do projeto humano.
+
+**Consequencia:** qualquer corte por erro de espessura tem que ser
+`> 1,06 cm`. O valor medido como seguro e' **1,5 cm** (preserva W074, W001,
+W068, mantem 87 paredes cobertas e 91 de 91 aberturas). Um corte em
+`1,0 cm` **mata W074** - esta' medido.
+
+### 26.4 REGRA OBRIGATORIA - as linhas de esquadria sao combatidas por ESPESSURA, nunca por numero
+
+O Layer 'Arquitetura' mistura face de parede com folha de porta
+(4,445 cm = 1,75"), marco (5,08 cm = 2"), batente e testa. E' PROIBIDO
+criar filtro que cite esses valores: seria overfitting ao
+`torre_easy_lo_r00_tgd`.
+
+**FATO MEDIDO:** so' corrigir o ranking ja' reduz os pares "linha curta
+(<20 cm) x face longa (>=100 cm)" de **30 para 20**, e as paredes com menos
+de 20 cm de 22 para 19. Um corte adicional por erro de espessura
+(`<= 1,0 cm`) levaria esses pares a **9**. A propriedade usada e'
+generalizavel (erro de espessura), nao o comprimento da linha.
+
+### 26.5 PADRAO OBSERVADO CONFIRMADO - guloso basta; matching global nao acrescenta
+
+**FATO MEDIDO:** sob o mesmo conjunto de candidatos e o mesmo criterio de
+qualidade, o pareamento guloso com ranking corrigido e o matching global de
+peso maximo produzem **exatamente o mesmo resultado** (176 pares /
+122 exatos / 87 paredes cobertas / 96 eixos corretos / 91 aberturas).
+Com peso que premia cardinalidade, o matching global fica **pior** que o
+guloso (85 cobertas, 25 eixos a 10-16 cm, 39 paredes < 50 cm).
+
+Motivo estrutural medido: o grafo de candidatos tem **133 componentes
+conexas**, a maior com 25 arestas, e 38 com uma aresta so'.
+
+**Consequencia:** nao introduzir matching global. Fica registrado como
+alternativa avaliada e descartada por evidencia.
+
+### 26.6 PADRAO OBSERVADO AINDA NAO CONFIRMADO - ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS
+
+**Identificador da pendencia:** `ORDER_DEPENDENCE_MERGE_COLLINEAR_FRAGMENTS`.
+
+**FATO MEDIDO:** embaralhar a ordem das 9.258 linhas de entrada muda a
+saida do `merge_collinear_fragments` (**2868 -> 2879 / 2873** linhas
+mescladas, em duas sementes distintas), sem mudar nenhuma geometria de
+verdade. Embaralhar so' as 2.868 linhas ja' mescladas tambem muda o numero
+de candidatos validos gerados por `find_wall_pairs` (**589 -> 583**),
+indicando que `_are_parallel_cached` e/ou `_line_pair_overlap_ft_cached`
+nao sao simetricos em `i`/`j`.
+
+**Nao e' o CR-1, NAO deve ser corrigida no mesmo commit que ele, e NAO deve
+ser misturada com nenhuma outra correcao futura de `core`** - e' uma causa
+raiz propria (provavelmente em `merge_collinear_fragments`, fora de
+`find_wall_pairs`), precisa da sua propria medicao isolada antes de
+qualquer edicao.
+
+**DOCUMENTADO - pendencia de codigo aberta**, registrada independentemente
+do plano do CR-1 em `nuvem/benchmark/PLANO_ETAPA_2D.md` (item Q).
+
+### 26.7 LIMITACAO REGISTRADA - so' existe UM projeto que exercita o pareamento
+
+**FATO MEDIDO:** `torre_easy_lo_r00_tp1` e `piloto_sintetico_2x2` tem
+`input.json` com paredes **ja' construidas** (96 e 12 walls) e **zero**
+`segments` de CAD. Eles entram no pipeline depois do Wall Modeling e nao
+executam `find_wall_pairs` em nenhuma linha.
+
+**Consequencia obrigatoria para as proximas capturas:** todo projeto novo
+capturado do Revit deve gravar `input_real.json` **com os `segments` do
+Layer de CAD**, senao o benchmark continua com um unico caso de FASE A e
+nenhuma correcao de pareamento podera' ser validada cross-project.
