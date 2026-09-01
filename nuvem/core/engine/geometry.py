@@ -46,6 +46,7 @@ __all__ = [
     "_pair_frame_cached", "_pair_symmetric_overlap_ft_cached",
     "_pair_symmetric_thickness_ft_cached", "_line_identity_key_cached",
     "_symmetric_within_distance_cached", "symmetric_lines_within_distance",
+    "_pair_symmetric_axis_gap_ft_cached", "symmetric_axis_gap_ft",
 ]
 
 
@@ -389,6 +390,114 @@ def symmetric_lines_within_distance(l1, l2, tolerance_ft):
     return get_distance_between_parallel_lines(l2, l1) <= tolerance_ft
 
 
+# --- CR-2F-D (DEDUP_MIDPOINT_SAMPLING) --------------------------------------
+#
+# O `CR-2F-A` tornou a relacao de duplicidade SIMETRICA, mas ela continuou
+# sendo amostrada num UNICO PONTO: `get_distance_between_parallel_lines` mede
+# o PONTO MEDIO de um eixo contra a RETA INFINITA do outro. Quando os dois
+# eixos nao sao exatamente paralelos (`are_lines_parallel` aceita ate' 2,87
+# graus), eles SE CRUZAM em algum lugar - e se o cruzamento cair perto desse
+# ponto de amostragem, a medida da "quase zero" enquanto a separacao real nas
+# pontas do trecho compartilhado e' varias vezes a tolerancia.
+#
+# Caso medido no projeto real (`torre_easy_lo_r00_tgd`, ver
+# nuvem/benchmark/diagnostics_2d/render_w097.py e as duas imagens que ele
+# gera): a parede estrutural de 707,01 cm que cobre 100% da `W097` do
+# gabarito era removida como "duplicata" do eixo espurio de 4.394,25 cm
+# nascido de uma LINHA AUXILIAR do CAD (4.394,45 cm, inclinada 1,1125 grau).
+#
+#   distancia pelos pontos medios (predicado do CR-2F-A) :   0,3633 cm  <= 2 cm
+#   separacao MAXIMA no trecho compartilhado (707 cm)    :   3,7952 cm  >  2 cm
+#
+# Declaradas duplicatas, a politica "mantem a mais longa do grupo" escolhia a
+# espuria de 44 m e apagava a parede boa. Censo sobre as 57 remocoes do
+# baseline: a da `W097` mede 3,7952 cm e TODAS as outras 56 (duplicatas
+# legitimas) ficam em no maximo 1,5306 cm - a tolerancia de 2 cm ja'
+# existente separa as duas classes com folga, sem nenhum valor novo.
+#
+# A CORRECAO e' medir a separacao ao longo do trecho que as duas de fato
+# COMPARTILHAM - o mesmo raciocinio fisico que o `CR-2F-B` ja' aplicou a'
+# espessura dentro de `find_wall_pairs` ("a folga no trecho em que as duas
+# faces realmente se encaram, nao no ponto medio de uma delas"). Duas
+# diferencas em relacao a `_pair_symmetric_thickness_ft_cached`:
+#
+#   1. aqui interessa o PIOR caso (o MAXIMO das duas pontas), nao a media:
+#      dois eixos que se cruzam no meio do trecho comum tem media pequena e
+#      NAO sao a mesma parede;
+#   2. o resultado e' uma DISTANCIA (nao um predicado), porque quem chama
+#      compara com `DUPLICATE_AXIS_TOLERANCE_FT`.
+#
+# Simetria exata em IEEE-754: trocar `cache1`<->`cache2` da o mesmo
+# referencial ou o mesmo com os dois eixos negados (prova no
+# PLANO_ETAPA_2G.md item H.1); negar `bx,by,nx,ny` troca `lo`<->`hi` e nega
+# as duas diferencas, que os `abs()` absorvem - os dois pontos FISICOS
+# medidos sao os mesmos. Invariante tambem ao SENTIDO dos endpoints, pelos
+# `min`/`max` sobre `t`.
+#
+# A interpolacao `_axis_gap_at` abaixo repete, de proposito, a formula que
+# `_pair_symmetric_thickness_ft_cached` tem embutida: fatorar as duas numa
+# unica funcao mexeria numa primitiva ja' congelada e em uso por
+# `find_wall_pairs` (fora do escopo do CR-2F-D, ver secao 31 do CR).
+
+def _axis_gap_at(t0, s0, t1, s1, t):
+    """Coordenada perpendicular do eixo (t0,s0)-(t1,s1) na abscissa `t` do
+    referencial - interpolacao linear, porque um eixo e' uma reta."""
+    if abs(t1 - t0) < 1e-12:
+        return s0
+    return s0 + (s1 - s0) * (t - t0) / (t1 - t0)
+
+
+def _pair_symmetric_axis_gap_ft_cached(cache1, cache2):
+    """Separacao perpendicular MAXIMA entre os dois eixos, medida SO' no
+    trecho em que eles realmente se sobrepoem, no referencial sem lado de
+    `_pair_frame_cached`. Ver o bloco CR-2F-D acima.
+
+    Quando os dois nao se sobrepoem no referencial (retas quase paralelas sem
+    trecho comum), cai no mesmo fallback de
+    `_pair_symmetric_thickness_ft_cached`: a folga na bissetriz entre os dois
+    pontos medios. Guarda defensiva - quem chama (`deduplicate_walls`) so'
+    chega aqui para pares que `lines_overlap_enough` ainda vai confirmar."""
+    bx, by, nx, ny, ox, oy = _pair_frame_cached(cache1, cache2)
+
+    p0_i, p1_i = cache1[0], cache1[1]
+    p0_j, p1_j = cache2[0], cache2[1]
+
+    ti0 = bx * (p0_i.X - ox) + by * (p0_i.Y - oy)
+    si0 = nx * (p0_i.X - ox) + ny * (p0_i.Y - oy)
+    ti1 = bx * (p1_i.X - ox) + by * (p1_i.Y - oy)
+    si1 = nx * (p1_i.X - ox) + ny * (p1_i.Y - oy)
+    tj0 = bx * (p0_j.X - ox) + by * (p0_j.Y - oy)
+    sj0 = nx * (p0_j.X - ox) + ny * (p0_j.Y - oy)
+    tj1 = bx * (p1_j.X - ox) + by * (p1_j.Y - oy)
+    sj1 = nx * (p1_j.X - ox) + ny * (p1_j.Y - oy)
+
+    lo = max(min(ti0, ti1), min(tj0, tj1))
+    hi = min(max(ti0, ti1), max(tj0, tj1))
+
+    if (hi - lo) <= 1e-12:
+        m1, m2 = cache1[4], cache2[4]
+        return abs(nx * (m1.X - m2.X) + ny * (m1.Y - m2.Y))
+
+    gap_lo = abs(_axis_gap_at(ti0, si0, ti1, si1, lo)
+                 - _axis_gap_at(tj0, sj0, tj1, sj1, lo))
+    gap_hi = abs(_axis_gap_at(ti0, si0, ti1, si1, hi)
+                 - _axis_gap_at(tj0, sj0, tj1, sj1, hi))
+    return gap_lo if gap_lo >= gap_hi else gap_hi
+
+
+def symmetric_axis_gap_ft(l1, l2):
+    """Gemea de `_pair_symmetric_axis_gap_ft_cached` para os sitios que
+    trabalham direto com `Line` (sem o cache de `_line_geom_cache`).
+
+    Ao contrario do par `_symmetric_within_distance_cached` /
+    `symmetric_lines_within_distance` - que existem separados porque cada
+    sitio ja' usava uma primitiva numerica diferente (ver a nota la') - aqui
+    ha' uma unica primitiva, entao esta funcao apenas monta os caches e
+    delega: as duas NAO PODEM divergir por construcao."""
+    return _pair_symmetric_axis_gap_ft_cached(_line_geom_cache(l1),
+                                              _line_geom_cache(l2))
+
+
 def _xy_deviation_ft(curve_a, curve_b):
     """Maior distancia, medida SO' no plano XY (planta), entre as pontas
     correspondentes de duas linhas - testando as duas correspondencias
@@ -510,11 +619,19 @@ def _axis_offset_in_frame(frame, l1, l2):
 
 def _line_span_key(line):
     """Chave geometrica canonica de UMA linha em PES (mesma ideia de
-    `_line_identity_key_cached`, que trabalha em cm sobre o cache) - usada
-    APENAS para desempatar duas faces de comprimento exatamente igual em
-    `create_centerline`. Nesse empate os dois intervalos ja' sao identicos,
-    entao a escolha nao muda o eixo: a chave existe so' para o codigo nao
-    ter um ramo indefinido."""
+    `_line_identity_key_cached`, que trabalha em cm sobre o cache).
+
+    Dois usos, ambos de DESEMPATE - nunca de decisao geometrica:
+
+      - `create_centerline`: desempatar duas faces de comprimento exatamente
+        igual. Nesse empate os dois intervalos ja' sao identicos, entao a
+        escolha nao muda o eixo: a chave existe so' para o codigo nao ter um
+        ramo indefinido.
+      - `CR-2F-D`: fixar uma ordem de processamento CANONICA (a passada 1 de
+        `merge_collinear_fragments`, os membros de `_merge_collinear_cluster`
+        e o ranking de `deduplicate_walls`), no lugar da posicao da linha na
+        lista de entrada. Em PRECISAO TOTAL - de proposito: arredondar aqui
+        reintroduziria empates que so' a ordem da lista poderia desfazer."""
     p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
     a = (p0.X, p0.Y)
     b = (p1.X, p1.Y)
@@ -700,12 +817,36 @@ def _merge_collinear_cluster(cluster, gap_tolerance_ft, openings, opening_perp_t
     teriam eixo nenhum de parede passando por ali. Fragmentos separados por
     um vao maior que nao corresponde a nenhuma abertura real permanecem
     como linhas distintas - nada e' religado nesse caso."""
+    # CR-2F-D: ORDEM CANONICA dos membros antes de qualquer conta. Duas
+    # coisas dependiam da ordem de chegada dos fragmentos (que e' so' a ordem
+    # da lista de entrada):
+    #   - o desempate do `max()` abaixo, quando dois fragmentos tem o MESMO
+    #     comprimento;
+    #   - a ordem da soma ponderada mais adiante: a adicao de ponto flutuante
+    #     NAO e' associativa, entao somar os mesmos fragmentos em ordens
+    #     diferentes da `p0` diferentes nos ultimos bits - o bastante para
+    #     virar o comparador `lo <= cur_hi + gap_tolerance_ft` quando um gap
+    #     cai exatamente na tolerancia, e ai o cluster devolve 1 linha em vez
+    #     de 2.
+    ordered_cluster = sorted(cluster, key=_line_span_key)
+
     # DIRECAO de referencia: a do fragmento MAIS LONGO do cluster - nao
     # simplesmente `cluster[0]` (a ordem de chegada dos fragmentos, ditada
     # so' pela ordem de travessia da geometria do CAD, e' arbitraria).
-    base = max(cluster, key=lambda line: line.GetEndPoint(0).DistanceTo(line.GetEndPoint(1)))
-    base_p0 = base.GetEndPoint(0)
-    direction = (base.GetEndPoint(1) - base_p0).Normalize()
+    base = max(ordered_cluster,
+               key=lambda line: line.GetEndPoint(0).DistanceTo(line.GetEndPoint(1)))
+
+    # CR-2F-D: SENTIDO CANONICO da referencia (ponta menor primeiro). O CAD
+    # pode desenhar o mesmo fragmento em qualquer um dos dois sentidos, e o
+    # sentido escolhia tanto `direction` quanto a ANCORA `base_p0` - duas
+    # ancoras diferentes sobre a MESMA reta dao a mesma reta reconstruida em
+    # matematica exata, mas caminhos de arredondamento diferentes. Mesma
+    # invariancia que o `CR-2F-E` ja' garantiu em `create_centerline`.
+    base_a, base_b = base.GetEndPoint(0), base.GetEndPoint(1)
+    if (base_b.X, base_b.Y, base_b.Z) < (base_a.X, base_a.Y, base_a.Z):
+        base_a, base_b = base_b, base_a
+    base_p0 = base_a
+    direction = (base_b - base_p0).Normalize()
 
     # POSICAO de referencia: media dos fragmentos PONDERADA PELO COMPRIMENTO
     # de cada um - nao a posicao do fragmento mais longo. Uma versao anterior
@@ -724,7 +865,7 @@ def _merge_collinear_cluster(cluster, gap_tolerance_ft, openings, opening_perp_t
     # simplesmente descartados.
     total_weight = 0.0
     weighted_offset_sum = XYZ(0.0, 0.0, 0.0)
-    for line in cluster:
+    for line in ordered_cluster:
         a_pt, b_pt = line.GetEndPoint(0), line.GetEndPoint(1)
         weight = a_pt.DistanceTo(b_pt)
         if weight < 1e-12:
@@ -740,7 +881,7 @@ def _merge_collinear_cluster(cluster, gap_tolerance_ft, openings, opening_perp_t
     p0 = base_p0 + (weighted_offset_sum / total_weight if total_weight > 1e-12 else XYZ(0.0, 0.0, 0.0))
 
     intervals = []
-    for line in cluster:
+    for line in ordered_cluster:
         a = (line.GetEndPoint(0) - p0).DotProduct(direction)
         b = (line.GetEndPoint(1) - p0).DotProduct(direction)
         intervals.append((min(a, b), max(a, b)))
@@ -957,7 +1098,10 @@ def merge_collinear_fragments(lines, collinear_tolerance_ft, gap_tolerance_ft, o
     Feita em DUAS passadas:
       1. Agrupamento "cru", com a tolerancia APERTADA `collinear_tolerance_ft`
          (2mm) - idem ao comportamento original, preservando o alinhamento
-         exato em juncoes/cruzamentos sem nenhuma abertura envolvida.
+         exato em juncoes/cruzamentos sem nenhuma abertura envolvida. A ordem
+         em que os fragmentos viram `base` e' CANONICA (mais longo primeiro,
+         desempate pela chave geometrica) e nao a ordem da lista de entrada -
+         ver o bloco CR-2F-D no corpo da funcao.
       2. Fusao adicional de clusters DISTINTOS da passada 1 quando (e so'
          quando) uma abertura real do projeto explica o espaco entre eles -
          ver _clusters_bridge_via_opening - usando a tolerancia mais
@@ -975,26 +1119,58 @@ def merge_collinear_fragments(lines, collinear_tolerance_ft, gap_tolerance_ft, o
     # _line_geom_cache) - o agrupamento abaixo compara cada linha `base`
     # contra todas as `remaining`, o que sem cache recalcularia a direcao/
     # ponto medio da MESMA linha repetidas vezes.
-    remaining = [(line, _line_geom_cache(line)) for line in lines]
+    items = [(line, _line_geom_cache(line)) for line in lines]
+
+    # CR-2F-D: ORDEM CANONICA das bases. O agrupamento e' ESTRELA (quem vira
+    # `base` arrasta todo mundo compativel COM ELA) sobre uma relacao que NAO
+    # e' transitiva - com 2 mm de tolerancia, `A~B` e `B~C` nao implicam
+    # `A~C` (caso real medido: fragmentos verticais em x = -563,29 / -563,49 /
+    # -563,69). Enquanto a base saia de `remaining.pop(0)`, quem seria a base
+    # era a POSICAO da linha na lista, entao permutar a entrada mudava a
+    # particao: medidas as 6 ordens de referencia (producao + seeds 1, 2, 3,
+    # 10 e 42), o merge devolvia 6 conjuntos DIFERENTES de linhas mescladas,
+    # e com eles 3 conjuntos diferentes de paredes finais.
+    #
+    # A base passa a ser escolhida pela GEOMETRIA: o fragmento MAIS LONGO
+    # primeiro. E' o mesmo criterio que `_merge_collinear_cluster` e
+    # `_bridge_clusters_via_openings` ja' usam para eleger a linha de
+    # referencia de um cluster - o fragmento mais longo e' a evidencia mais
+    # confiavel de onde a face realmente esta', e a pertinencia ao cluster
+    # passa a ser decidida por proximidade A ESSA evidencia, nao a um
+    # fragmento qualquer que calhou de vir antes na lista. O desempate e'
+    # `_line_span_key` (chave geometrica canonica, precisao total), nunca a
+    # posicao na lista.
+    items.sort(key=lambda item: (-item[1][3], _line_span_key(item[0])))
+
+    # PERFORMANCE: varredura por indice com marcador `taken`, no lugar de
+    # reconstruir a lista `remaining` a cada cluster (o `rest` da versao
+    # anterior copiava O(n) tuplas por cluster, 1.714 vezes no projeto real).
+    # A particao devolvida e' IDENTICA - so' muda como as linhas ja'
+    # consumidas sao puladas. Entra junto com a ordenacao acima porque
+    # compensa exatamente o custo que ela introduz (processar as longas
+    # primeiro deixa a lista cheia por mais iteracoes): medido no projeto
+    # real, a passada 1 sai de 8,43 s (ordem de entrada, com `rest`) para
+    # 9,19 s so' com a ordenacao + 10,09 s sem esta otimizacao.
+    taken = [False] * len(items)
     raw_clusters = []
 
-    while remaining:
-        base, base_cache = remaining.pop(0)
+    for index, (base, base_cache) in enumerate(items):
+        if taken[index]:
+            continue
         cluster = [base]
-        rest = []
-        for other, other_cache in remaining:
+        for other_index in range(index + 1, len(items)):
+            if taken[other_index]:
+                continue
+            other, other_cache = items[other_index]
             # CR-2F-A: a compatibilidade "colinear" passa a ser exigida
             # nas DUAS direcoes. Sem isso, medir a partir de `base` ou a
             # partir de `other` dava vereditos diferentes em 393 pares do
-            # projeto real (ver o bloco CR-2F-A em geometry.py), e quem era
-            # `base` era so' a posicao da linha na lista de entrada.
+            # projeto real (ver o bloco CR-2F-A em geometry.py).
             if (_are_parallel_cached(base_cache, other_cache) and
                     _symmetric_within_distance_cached(base_cache, other_cache,
                                                       collinear_tolerance_ft)):
+                taken[other_index] = True
                 cluster.append(other)
-            else:
-                rest.append((other, other_cache))
-        remaining = rest
         raw_clusters.append(cluster)
 
     # Segunda passada (ver docstring): funde clusters distintos quando uma

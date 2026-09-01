@@ -1346,6 +1346,13 @@ def deduplicate_walls(walls_to_create):
     ver a nota nessa constante) e com sobreposicao real ao longo do
     comprimento. Mantem apenas a MAIS LONGA de cada grupo duplicado.
 
+    O criterio de "eixos praticamente colineares" e' exigido nas DUAS
+    direcoes (CR-2F-A) E ao longo de TODO o trecho compartilhado pelas duas
+    paredes (CR-2F-D) - ver `symmetric_axis_gap_ft` em
+    core/engine/geometry.py. So' a primeira condicao deixava passar como
+    "duplicata" um par em que os dois eixos apenas SE CRUZAM perto dos
+    pontos medios amostrados, sem serem a mesma parede.
+
     Cobre o caso do CAD ter mais de duas linhas paralelas e proximas
     representando a MESMA parede (ex.: contorno + linha de hachura/cota
     duplicada no mesmo Layer) - sem este filtro, tanto o pareamento normal
@@ -1354,9 +1361,16 @@ def deduplicate_walls(walls_to_create):
     num canto)."""
     # Mais longa primeiro, para preferir manter a parede mais completa de
     # cada grupo duplicado.
+    #
+    # CR-2F-D: o desempate entre paredes de comprimento EXATAMENTE igual
+    # passa a ser a chave geometrica canonica (`_line_span_key`, precisao
+    # total) em vez da estabilidade do `sorted`, que preservava a ordem de
+    # entrada. Sem isso, o REPRESENTANTE de um grupo de duplicatas empatadas
+    # dependia de qual parede `find_wall_pairs` tinha devolvido primeiro.
     ordered = sorted(
         walls_to_create,
-        key=lambda w: -w[0].GetEndPoint(0).DistanceTo(w[0].GetEndPoint(1))
+        key=lambda w: (-w[0].GetEndPoint(0).DistanceTo(w[0].GetEndPoint(1)),
+                       _line_span_key(w[0]))
     )
 
     kept = []
@@ -1372,11 +1386,21 @@ def deduplicate_walls(walls_to_create):
             # DUAS direcoes (ver o bloco CR-2F-A em core/engine/geometry.py).
             # Medido sobre os 199 pares aceitos do projeto real: 1 violacao
             # de `compat(A,B) == compat(B,A)` antes, 0 depois. So' o
-            # PREDICADO muda - a ordenacao por comprimento e a politica de
-            # manter a mais longa do grupo continuam exatamente as mesmas
-            # (isso e' CR-2F-D).
+            # PREDICADO mudou naquele CR - a politica de manter a mais longa
+            # do grupo continua sendo exatamente a mesma, aqui e depois do
+            # CR-2F-D.
             if not symmetric_lines_within_distance(line, kept_line,
                                                    DUPLICATE_AXIS_TOLERANCE_FT):
+                continue
+            # CR-2F-D: o teste acima amostra a distancia num UNICO PONTO (o
+            # ponto medio de cada eixo contra a reta infinita do outro). Dois
+            # eixos que se CRUZAM perto desse ponto medem "quase zero" ali e
+            # varios centimetros nas pontas do trecho que compartilham. Este
+            # segundo teste exige que eles fiquem dentro da MESMA tolerancia
+            # ao longo de TODO o trecho comum - ver o bloco CR-2F-D em
+            # core/engine/geometry.py. Entra em CONJUNCAO com o de cima: a
+            # relacao de duplicidade so' pode ficar mais RESTRITIVA.
+            if symmetric_axis_gap_ft(line, kept_line) > DUPLICATE_AXIS_TOLERANCE_FT:
                 continue
             if not lines_overlap_enough(line, kept_line):
                 continue

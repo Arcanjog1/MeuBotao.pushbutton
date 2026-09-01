@@ -14,9 +14,11 @@ sequência de CRs (Change Requests) para eliminar dependências de ordem de
 entrada (assimetrias e não-determinismo) na formação das paredes a partir
 de segmentos de CAD. O `CR-2F-E` (centerline) e o `CR-2F-A` (simetria de
 merge/pairing/deduplicação) já foram concluídos e mergeados na `main`. O
-CR em andamento é o `CR-2F-D`, que ataca o não-determinismo residual
-(agrupamento em estrela, não transitivo) e a perda da parede `W097`. A
-modulação de blocos em si (o objetivo final do produto) ainda não foi
+`CR-2F-D` — não-determinismo residual (agrupamento em estrela, não
+transitivo) e perda da parede `W097` — está **concluído e validado na
+branch, aguardando autorização de merge**: o fingerprint das paredes foi
+de 3 distintos para 1 e a `W097` foi recuperada. O próximo passo depois
+do merge é o **teste visual no Revit**. A modulação de blocos em si (o objetivo final do produto) ainda não foi
 retomada — ela está registrada como roadmap futuro (seção 10), a ser
 iniciada somente depois que a geometria das paredes estiver estável e
 determinística.
@@ -25,38 +27,65 @@ determinística.
 
 ```
 branch: main
-HEAD:   c21a4297a6ff372358cbb81da5ca6a65f91a955b
+HEAD:   d16965dba45b81c2a109bc24b23ab2fcb959db10
 ```
 
 Últimos commits em `main` (mais recente primeiro):
 
 ```
+d16965d  Merge branch 'claude/ci-check-fix'
+bfa3155  ci: corrige check-project-status para branches novas (before=0)
+b140503  Merge branch 'claude/project-status-tracking-qm3r56'
+03afd3b  ci: alerta automatico quando o motor muda sem atualizar PROJECT_STATUS.md
+351d607  docs: add project development status and roadmap
 c21a429  Merge pull request #4: CR-2F-A MERGE_RELATION_ASYMMETRY (T2/MAX)
 33bb516  fix(wall-modeling): make the merge/dedup relation symmetric (CR-2F-A)
 902bc70  Merge pull request #3: CR-2F-E CENTERLINE_ARGUMENT_ASYMMETRY
 9bca561  fix(wall-modeling): make wall centerline order invariant (CR-2F-E)
 ```
 
+Os cinco commits acima de `c21a429` são **documentais/CI** (este arquivo e
+o workflow) — não tocam `nuvem/core/**`, testes nem benchmark.
+
 O merge do CR-2F-A foi feito por **merge commit** (sem squash, sem rebase,
 sem force push).
+
+**Branch com trabalho concluído aguardando merge:**
+
+```
+branch:              claude/cr-2f-d-determinism-ewnru5
+SHA inicial (baseline original do CR-2F-D): c21a4297a6ff372358cbb81da5ca6a65f91a955b
+merge-base ATUAL com a main (pós git merge origin/main): d16965dba45b81c2a109bc24b23ab2fcb959db10
+```
+
+A `main` foi trazida **para dentro** da branch por `git merge origin/main`
+(único conflito: este arquivo, resolvido por integração semântica). A
+branch **não** foi mesclada na `main`.
 
 ## 3. Baseline funcional atual
 
 Produção + seeds (permutações da ordem de entrada: seed 1, seed 2, seed 3,
 seed 10, seed 42) — projeto de referência `torre_easy_lo_r00_tgd`:
 
-| métrica | valor (estável nas 6 execuções) |
-|---|---|
-| pares aceitos | 201 |
-| paredes finais | 144 |
-| cobertura do gabarito | 86/97 |
-| eixos corretos (≤ 0,5 cm) | 96 |
-| aberturas | 91/91 |
-| paredes monitoradas | 7/7 |
-| paredes espúrias | 4 |
+| métrica | `main` (CR-2F-A) | branch `CR-2F-D` |
+|---|---|---|
+| **fingerprints distintos das paredes** | **3** | **1** |
+| fingerprints distintos do merge | 6 | **1** |
+| pares aceitos | 201 | 201 |
+| paredes finais | 144 | **145** |
+| cobertura do gabarito | 86/97 | **87/97** |
+| eixos corretos (≤ 0,5 cm) | 96 | 96 |
+| aberturas | 91/91 | 91/91 |
+| paredes monitoradas | 7/7 | 7/7 |
+| paredes espúrias | 4 | 4 |
+| `W097` | ausente | **recuperada** |
+
+Os valores da coluna `main` são estáveis nas 6 execuções **em métrica**,
+mas produziam 3 conjuntos geométricos diferentes; os da branch são
+estáveis **também em geometria** (um único fingerprint).
 
 Fingerprint oficial do solver (`solver_decision_fingerprint`), **inalterado**
-por todo o CR-2F-A e CR-2F-E:
+por todo o CR-2F-E, CR-2F-A e CR-2F-D:
 
 ```
 c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316
@@ -64,12 +93,13 @@ c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316
 
 ## 4. Testes e invariantes aprovados
 
-```
-tests/test_script.py : 245 passed
-tests/regression      : 113 passed
-```
+| suíte | `main` | branch `CR-2F-D` |
+|---|---|---|
+| `tests/test_script.py` | 245 passed | **256 passed** (245 + 11 novos) |
+| `tests/regression` | 113 passed | **113 passed** |
 
-11 invariantes aprovados (`11/11 PASSED`):
+11 invariantes aprovados (`11/11 PASSED`), preservados pelo CR-2F-D **sem
+nenhuma edição de teste**:
 
 ```
 INV-PAIR-001
@@ -94,6 +124,36 @@ Censo de assimetria aprovado (`nuvem/benchmark/diagnostics_2j/`):
 |---|---|---|
 | `merge` — vereditos dependentes da direção | 393 | **0** / 281.162 pares próximos |
 | `deduplicate_walls` — vereditos dependentes da direção | 1 | **0** / 1.670 candidatos |
+
+11 invariantes novos do CR-2F-D (`nuvem/benchmark/diagnostics_2k/`), todos
+sobre geometria **sintética** — nenhum id, coordenada, comprimento ou seed
+do projeto real:
+
+```
+INV-DET-001   permutar a entrada não altera o conjunto final
+INV-DET-002   inverter endpoints não altera o resultado
+INV-DET-003   o representante de um grupo não depende da ordem
+INV-DET-004   grupos transitivos independem da ordem
+INV-DET-005   a orientação das paredes finais é canônica
+INV-DET-006   a ordenação final é canônica
+INV-DET-007   um único fingerprint em todas as permutações
+
+INV-DEDUP-D-001  linha auxiliar longa não apaga parede válida
+INV-DEDUP-D-002  a parede recuperada não vira duplicata
+INV-DEDUP-D-003  duplicatas reais continuam sendo removidas
+INV-DEDUP-D-004  o critério do trecho comum é simétrico
+```
+
+Censo de assimetria do CR-2F-D (`nuvem/benchmark/diagnostics_2k/`), sobre a
+relação de duplicidade **completa** que ficou em produção:
+
+| | resultado |
+|---|---|
+| `merge` — vereditos dependentes da direção | **0** / 281.162 pares |
+| `deduplicate_walls` — relação completa | **0** / 1.646 candidatos |
+
+> O número de candidatos cai de 1.670 para 1.646 porque o conjunto de linhas
+> mescladas mudou (o merge agora é determinístico) — não é regressão.
 
 ## 5. Histórico de CRs
 
@@ -159,76 +219,146 @@ Censo de assimetria aprovado (`nuvem/benchmark/diagnostics_2j/`):
     `REGRAS_MODULACAO_BLOCOS.md` §26.9.5) — é dívida exclusiva do
     CR-2F-D.
 
-### CR-2F-D — EM ANDAMENTO
+### CR-2F-D — CONCLUÍDO NA BRANCH (aguardando autorização de merge)
 
-- **Objetivo:**
-  1. eliminar o não determinismo restante;
-  2. estabilizar o fingerprint das paredes;
-  3. investigar a causa da perda da `W097`;
-  4. corrigir a classe estrutural do problema sem hardcode;
-  5. preservar integralmente os resultados já aprovados (baseline da
-     seção 3 e invariantes da seção 4).
-- **Problema atual:** mesmo com a relação de compatibilidade já
-  simétrica (CR-2F-A), permutar a ordem de entrada ainda muda o
-  conjunto de linhas mescladas. Causa identificada: a relação continua
-  **não transitiva** e o agrupamento continua sendo por **estrela**
-  (quem sai do `pop(0)` vira a `base` e arrasta quem for compatível
-  *com ela*, não com o cluster inteiro).
-- **Fingerprint:** hoje as métricas (pares, paredes, cobertura, eixo,
-  aberturas, monitoradas) são **idênticas** entre as seeds, mas existem
-  **3 fingerprints distintos** das paredes finais entre as 6 execuções
-  (produção + 5 seeds). Meta do CR-2F-D: **3 → 1** — o mesmo conjunto
-  geométrico de entrada deve produzir sempre a mesma saída,
-  independentemente da ordem de entrada.
-- **W097:** parede do gabarito (`(-153,5; 817,0) -> (345,5; 817,0)`, 499
-  cm) formalmente atribuída ao CR-2F-D. A parede boa que a cobre (707 cm
-  em y=815, cobertura 1,000 antes do `deduplicate_walls`) é removida por
-  ele, tratada como duplicata de uma parede **espúria de ~43,9 m**
-  (`4.394,2 cm`, par `(474, 2306)`) — um segmento **cru do CAD** (cluster
-  de 1 fragmento, não fabricado pelo merge). A causa raiz é a política
-  de retenção "mantém a mais longa do grupo": quando o eixo passou a ser
-  melhor centralizado (CR-2F-E), a espúria caiu a 0,363 cm da parede boa
-  (abaixo de `DUPLICATE_AXIS_TOLERANCE` = 2 cm) e "venceu" por ser mais
-  longa. Essa política histórica **não deve ser alterada de forma
-  arbitrária** — o CR-2F-D deve primeiro demonstrar a causa real antes
-  de propor qualquer mudança nela.
-- **Critérios de conclusão** (mínimo esperado, sujeitos a validação do
-  usuário ao fechar o CR):
-  - fingerprint das paredes finais idêntico nas 6 execuções (produção +
-    5 seeds) — 3 → 1;
-  - causa estrutural do não-determinismo corrigida sem hardcode
-    (não é permitido "fixar" a ordem de entrada como paliativo);
-  - decisão explícita e documentada sobre a `W097` (recuperada com
-    justificativa geométrica, ou mantida ausente com a causa
-    formalmente registrada — não é permitido simplesmente ignorar);
-  - todo o baseline da seção 3 e todos os 11 invariantes da seção 4
-    continuam passando sem regressão;
-  - `tests/test_script.py` e `tests/regression` verdes.
+- **Branch:** `claude/cr-2f-d-determinism-ewnru5`
+- **Commits:**
+  ```
+  c81ff59  fix(wall-modeling): determinismo do merge e recuperacao da W097 (CR-2F-D)
+  5f7bfc4  docs: PROJECT_STATUS com o estado do CR-2F-D
+  d2e3604  test(benchmark): laboratorio 2K com a bateria e o censo do CR-2F-D
+  1857de4  docs: fecha o PENDENTE do PROJECT_STATUS com os numeros da bateria
+  ```
+- **Objetivo (atingido):** eliminar o não-determinismo restante,
+  estabilizar o fingerprint das paredes, corrigir estruturalmente a perda
+  da `W097` sem hardcode e preservar tudo que já estava aprovado.
+
+**Diagnóstico — a primeira divergência estava na passada 1 do merge**
+
+| camada, nas 6 ordens | fingerprints distintos |
+|---|---|
+| linhas mescladas (`merge_collinear_fragments`) | **6** |
+| paredes finais | **3** |
+| paredes finais, **congelando** o conjunto mesclado e permutando-o | **1** |
+
+A terceira linha é a prova causal: de `find_wall_pairs` para a frente o
+pipeline **já estava invariante** desde o CR-2F-B/C/E. A causa é o
+agrupamento **estrela** sobre uma relação **não transitiva** (com 2 mm,
+`A~B` e `B~C` não implicam `A~C` — caso real: fragmentos em
+`x = -563,29 / -563,49 / -563,69`), com a base saindo de
+`remaining.pop(0)`, isto é, da **posição na lista**.
+
+**Diagnóstico — a `W097`**
+
+A parede boa de 707,01 cm era removida como duplicata do eixo espúrio de
+4.394,25 cm (par `(474, 2306)`). O predicado do CR-2F-A amostra a distância
+num **único ponto** — o ponto médio de cada eixo contra a reta infinita do
+outro — e os dois eixos **se cruzam** perto desse ponto:
+
+| medição | valor | veredito |
+|---|---|---|
+| distância pelos pontos médios | **0,3633 cm** | "duplicata" |
+| separação **máxima no trecho compartilhado** (707 cm) | **3,7952 cm** | não é duplicata |
+
+Censo das 57 remoções do comportamento anterior: **1** acima da tolerância
+de 2 cm (a da `W097`); pior remoção legítima **1,5306 cm**. A tolerância já
+existente separa as classes com folga — nenhum valor novo calibrado.
+
+> **Atribuição corrigida.** A causa **não** era a política "mantém a mais
+> longa" (ela acerta nas 56 remoções legítimas e não foi alterada); era a
+> amostragem por ponto médio do predicado que declarava o par duplicata.
+> Ver `REGRAS_MODULACAO_BLOCOS.md` §26.10.5, que substitui §26.8.7.8 e
+> §26.8.8.4.
+
+**Correção implementada**
+
+- `nuvem/core/engine/geometry.py`
+  - `merge_collinear_fragments` — a base da passada 1 passa a ser escolhida
+    pela **geometria** (fragmento mais longo primeiro, desempate por
+    `_line_span_key`), não pela posição na lista; varredura por índice
+    (marcador `taken`) no lugar da reconstrução da lista `rest`.
+  - `_merge_collinear_cluster` — membros em ordem canônica antes das contas
+    (soma de ponto flutuante não é associativa) e **sentido** da direção de
+    referência canonizado.
+  - `_pair_symmetric_axis_gap_ft_cached` / `symmetric_axis_gap_ft` — novos:
+    separação **máxima** entre dois eixos ao longo do trecho compartilhado,
+    no referencial sem lado da bissetriz.
+- `nuvem/core/engine/wall_pairing.py`
+  - `deduplicate_walls` — o critério novo entra em **conjunção** com o do
+    CR-2F-A (a relação só fica mais restritiva); desempate do representante
+    por `_line_span_key`.
+
+`create_centerline`, `find_wall_pairs` e `tolerances.py` **não foram
+tocados**. Nenhum hardcode de id, coordenada, comprimento ou seed.
+
+**Resultado (produção + seeds 1, 2, 3, 10 e 42)**
+
+```
+merge fingerprints distintos : 6 → 1
+wall  fingerprints distintos : 3 → 1     ← gate do CR
+201 pares aceitos | 145 paredes | 87/97 cobertura | 96 eixos
+91/91 aberturas   | 7/7 monitoradas | 4 espúrias | W097 recuperada
+```
+
+Ausentes: as mesmas 10 de antes, **sem a `W097`**, sem perda nem ganho novo.
+
+**Testes:** `tests/test_script.py` 256 passed (245 antigos + 11 novos);
+`tests/regression` 113 passed; 11 invariantes anteriores preservados sem
+edição; `solver_decision_fingerprint` inalterado.
+
+**Performance:** passada 1 do merge de 9,15 s para **8,67 s (−5,2 %)** — a
+ordenação canônica sozinha custaria 9,64 s (+5,4 %), e a varredura `taken`
+(partição idêntica, medida nas 6 ordens) paga esse custo.
+
+**Divergência gabarito × CAD registrada na `W097`**
+
+```
+CAD:            faces em y = 808,049 e 822,050  (14,000 cm)
+eixo calculado: y = 815,049                      (centrado — correto)
+reference.json: y = 817,048                      (faces 810,048 / 824,048)
+```
+
+Não existe segmento do CAD em 810,048 nem 824,048, e o eixo do gabarito
+dista 5,001/8,999 cm das faces quando deveria ser 7/7. **É proibido mover a
+parede para satisfazer o gabarito** (§26.10.6 das REGRAS). Consequência
+aceita: a `W097` conta como coberta, mas **não entra no `eixo_ok`** (≤ 0,5 cm).
+Diagnóstico visual aprovado pelo usuário em
+`nuvem/benchmark/diagnostics_2d/w097_geometry.png` e `_zoom.png`.
+
+**Próximo passo após o merge: TESTE VISUAL NO REVIT.**
 
 ## 6. Dívidas técnicas conhecidas
 
-- **Não-determinismo residual do agrupamento** (não transitividade +
-  agrupamento em estrela) — objeto central do CR-2F-D (seção 5).
-- **Perda da `W097`** — objeto do CR-2F-D (seção 5 e seção 7).
+- ~~**Não-determinismo residual do agrupamento**~~ — **RESOLVIDO** pelo
+  CR-2F-D (seção 5): 6 → 1 no merge, 3 → 1 nas paredes.
+- ~~**Perda da `W097`**~~ — **RESOLVIDA** pelo CR-2F-D (seção 5).
 - **Pareamento `(474, 2306)`** — uma face de 155,61 cm pareada com uma
-  linha auxiliar de 4.394,45 cm inclinada 1,1125 grau; não é merge, não
-  é `deduplicate_walls` em si, é um dado bruto do CAD que interage mal
-  com a política de retenção. Acompanha a investigação da `W097`.
+  linha auxiliar de 4.394,45 cm inclinada 1,1125 grau, que gera o **eixo
+  espúrio de 43,9 m**. Ele **continua no resultado**, como uma das 4
+  espúrias: o CR-2F-D impediu que ele *apagasse* uma parede válida, não que
+  ele *nascesse*. Não é merge, não é eixo e não é deduplicação — é
+  **pareamento**. Continua **sem CR atribuído**.
+- **Deslocamento de ~2 cm do `reference.json` na `W097`** — o gabarito
+  coloca a parede 2 cm acima das faces que o CAD desenha (seção 5). É
+  problema do **gabarito**, não do solver; convém verificar se se repete em
+  outras paredes antes de usar `eixo_ok` como métrica fina.
 
 ## 7. Paredes ausentes conhecidas
 
 Em relação ao gabarito de referência (`torre_easy_lo_r00_tgd`), continuam
-ausentes 11 paredes:
+ausentes **10** paredes (eram 11 — a `W097` foi recuperada pelo CR-2F-D):
 
 ```
-W004, W005, W006, W007, W025, W026, W046, W047, W084, W085, W097
+W004, W005, W006, W007, W025, W026, W046, W047, W084, W085
 ```
 
-A `W097` é a única atribuída formalmente ao CR-2F-D (as outras 10 já
-estavam ausentes antes do CR-2F-E/CR-2F-A e não fazem parte do escopo
-declarado desses CRs). Existe também uma linha auxiliar de
-aproximadamente **43,9 m** (segmento cru do CAD, par `(474, 2306)`) que
-precisa ser considerada durante a investigação da `W097`.
+Essas 10 já estavam ausentes antes do CR-2F-E/CR-2F-A e **não fazem parte
+do escopo declarado** de nenhum CR até agora. O CR-2F-D não as perseguiu e
+nenhuma voltou por acaso.
+
+A linha auxiliar de aproximadamente **43,9 m** (segmento cru do CAD, par
+`(474, 2306)`) continua existindo e continua gerando um eixo espúrio — ver
+seção 6.
 
 ## 8. Não reabrir sem evidência de regressão
 
@@ -247,6 +377,20 @@ mais limpo".
   (`INV-CENTER-001` a `004`, `INV-MERGE-SYM-001` a `003`,
   `INV-DEDUP-SYM-001`).
 
+**CR-2F-D — já resolvido:**
+- ordem de agrupamento da passada 1 do `merge_collinear_fragments`
+  (base canônica por geometria);
+- ordem dos membros e sentido da direção de referência em
+  `_merge_collinear_cluster`;
+- medição da relação de duplicidade ao longo do trecho compartilhado
+  (`symmetric_axis_gap_ft`), em conjunção com o predicado do CR-2F-A;
+- desempate do representante em `deduplicate_walls`.
+
+A política **"mantém a mais longa do grupo"** foi medida e está **correta**
+(acerta nas 56 remoções legítimas) — **não deve ser alterada** sem evidência
+objetiva de regressão. Coberto por `INV-DET-001` a `007` e `INV-DEDUP-D-001`
+a `004`.
+
 **Evitar especialmente mudanças sem necessidade em:**
 ```
 create_centerline
@@ -260,13 +404,17 @@ invariantes antes de propor merge.
 
 ## 9. Próximas etapas
 
-1. Concluir o **CR-2F-D** (não-determinismo, fingerprint 3→1, causa da
-   `W097`), respeitando os critérios da seção 5.
-2. Validar o baseline completo (seção 3) e os 11 invariantes (seção 4)
-   sem regressão.
-3. Depois que a geometria das paredes estiver estável e determinística,
-   avançar para a revisão/correção da **modulação dos blocos** — ver
-   roadmap na seção 10.
+1. ~~Concluir o **CR-2F-D**~~ — **concluído e validado na branch**
+   (seção 5). Falta apenas a **autorização de merge** do usuário.
+2. ~~Validar o baseline e os 11 invariantes sem regressão~~ — **feito**
+   (seções 3 e 4): 256 + 113 verdes, 11 invariantes anteriores preservados,
+   11 novos, fingerprint do solver inalterado.
+3. **TESTE VISUAL NO REVIT** — próximo passo imediato depois do merge do
+   CR-2F-D. É a primeira validação da geometria determinística no modelo
+   real, e não é substituível pelo benchmark headless.
+4. Depois que a geometria das paredes estiver estável e determinística
+   **e confirmada visualmente no Revit**, avançar para a revisão/correção
+   da **modulação dos blocos** — ver roadmap na seção 10.
 
 ## 10. Modulação dos blocos — roadmap futuro
 
@@ -308,6 +456,13 @@ As regras técnicas e funcionais de amarração e modulação (o "como", não o
   detalhadas, com rótulo de confiança (REGRA OBRIGATORIA / PREFERENCIAL
   / EXCECAO PERMITIDA / PADRAO OBSERVADO AINDA NAO CONFIRMADO /
   CONFLITO) e evidência de medição.
+- `nuvem/benchmark/diagnostics_2k/` — verificação reproduzível do
+  CR-2F-D (`run_a_census.py` — assimetria e censo do discriminador;
+  `run_b_downstream.py` — 3 variantes da passada 1 × produção + 5 seeds,
+  identidade da partição e runtime).
+- `nuvem/benchmark/diagnostics_2d/render_w097.py` — diagnóstico visual da
+  `W097` (gera `w097_geometry.png` e `w097_geometry_zoom.png` a partir da
+  geometria real carregada pelo solver).
 - `nuvem/benchmark/diagnostics_2j/` — verificação reproduzível do
   CR-2F-A (`run_a_census.py`, `run_b_downstream.py`).
 - `nuvem/benchmark/diagnostics_2i/` — verificação reproduzível do
@@ -410,4 +565,52 @@ itens ainda pendentes: CR-2F-D completo (seção 5); roadmap de modulação
                de blocos (seção 10)
 próximo passo recomendado: avançar o CR-2F-D conforme seção 5 e
                atualizar este documento ao concluí-lo
+```
+
+### 2026-09-01 — CR-2F-D concluído na branch
+
+```
+data:          2026-09-01
+CR:            CR-2F-D (determinismo do merge + recuperação da W097)
+branch:        claude/cr-2f-d-determinism-ewnru5
+SHA inicial:   c21a4297a6ff372358cbb81da5ca6a65f91a955b (baseline original do CR-2F-D)
+merge-base ATUAL com a main (pós git merge origin/main): d16965dba45b81c2a109bc24b23ab2fcb959db10
+SHA final:     (ver commit de merge desta atualização)
+status:        CONCLUÍDO na branch — main NÃO alterada, aguardando
+               autorização de merge
+o que foi alterado:
+  - nuvem/core/engine/geometry.py: base canônica na passada 1 de
+    merge_collinear_fragments (+ varredura `taken`), ordem e sentido
+    canônicos em _merge_collinear_cluster, e os novos
+    _pair_symmetric_axis_gap_ft_cached / symmetric_axis_gap_ft
+  - nuvem/core/engine/wall_pairing.py: deduplicate_walls passa a exigir o
+    critério do trecho compartilhado EM CONJUNÇÃO com o do CR-2F-A, e o
+    desempate do representante deixa de depender da ordem de entrada
+  - tests/test_script.py: 11 invariantes novos (INV-DET-001..007,
+    INV-DEDUP-D-001..004), todos sobre geometria sintética
+  - nuvem/REGRAS_MODULACAO_BLOCOS.md: seção 26.10 (10 subseções), incluindo
+    a correção de atribuição de 26.8.7.8/26.8.8.4 e o gate H6' de volta a
+    87/97
+  - nuvem/benchmark/diagnostics_2k/: censo e bateria reproduzíveis
+  - nuvem/benchmark/diagnostics_2d/render_w097.py + 2 PNG: diagnóstico
+    visual da W097, aprovado pelo usuário antes da implementação
+  - NÃO tocados: create_centerline, find_wall_pairs, tolerances.py
+testes:        tests/test_script.py 256 passed (245 antigos + 11 novos);
+               tests/regression 113 passed
+invariantes:   11 anteriores PASSED sem nenhuma edição de teste;
+               11 novos PASSED
+benchmarks:    produção + 5 seeds — merge fingerprints 6 → 1, wall
+               fingerprints 3 → 1, 201 pares, 145 paredes, 87/97, 96
+               eixos, 91/91, 7/7, 4 espúrias, W097 recuperada;
+               assimetria 0/281.162 (merge) e 0/1.646 (dedup);
+               solver_decision_fingerprint inalterado;
+               passada 1 do merge 9,15 s → 8,67 s (−5,2 %)
+novas dívidas: divergência gabarito × CAD na W097 (~2 cm) — problema do
+               reference.json, não do solver (seção 6)
+itens resolvidos:  não-determinismo residual do agrupamento; perda da W097
+itens ainda pendentes: eixo espúrio de 43,9 m do par (474, 2306), sem CR
+               atribuído; as 10 paredes ausentes remanescentes; roadmap de
+               modulação de blocos (seção 10)
+próximo passo recomendado: autorizar o merge do CR-2F-D na main e, em
+               seguida, fazer o TESTE VISUAL NO REVIT (seção 9)
 ```
