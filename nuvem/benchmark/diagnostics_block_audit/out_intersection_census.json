@@ -1,0 +1,549 @@
+{
+  "L_CORNER": {
+    "total_nodes": 63,
+    "placement_reason_histogram": {
+      "L_CORNER": 62,
+      "L_CORNER_DEGRADED": 14
+    },
+    "classified": {
+      "TRUE": 62,
+      "DEGRADED": 0,
+      "NONE_NO_CANDIDATE": 1
+    },
+    "failure_entries_reported_by_solver": 8,
+    "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+    "unique_nodes_with_failure": 1,
+    "failures_sample": [
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 226,
+        "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      }
+    ],
+    "independent_resolve_and_validate_sample": [
+      {
+        "node_index": 0,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 2,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 4,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 6,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 7,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 8,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 226,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=-1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 226,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=-1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 226,
+        "kind": "L_CORNER",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=-1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      }
+    ]
+  },
+  "T_INTERSECTION": {
+    "total_nodes": 118,
+    "placement_reason_histogram": {
+      "T_INTERSECTION_MAIN": 80,
+      "T_INTERSECTION_INCOMING": 80,
+      "T_INTERSECTION_DEGRADED_L": 36,
+      "T_INTERSECTION_INCOMING_DEGRADED": 31
+    },
+    "classified": {
+      "TRUE": 80,
+      "DEGRADED": 23,
+      "NONE_NO_CANDIDATE": 15
+    },
+    "failure_entries_reported_by_solver": 120,
+    "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+    "unique_nodes_with_failure": 15,
+    "failures_sample": [
+      {
+        "node_index": 215,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 216,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 217,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 218,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 220,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 222,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (2.6cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 223,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (2.6cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 240,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 241,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      },
+      {
+        "node_index": 242,
+        "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+      }
+    ],
+    "independent_resolve_and_validate_sample": [
+      {
+        "node_index": 3,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_t_intersection"
+      },
+      {
+        "node_index": 23,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 24,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 26,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_t_intersection"
+      },
+      {
+        "node_index": 27,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_t_intersection"
+      },
+      {
+        "node_index": 28,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_t_intersection"
+      },
+      {
+        "node_index": 215,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 216,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      },
+      {
+        "node_index": 217,
+        "kind": "T_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": true,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Encontro em L precisa de B34 nas duas fiadas.",
+            "Pecas do L nao estao a 90 graus (dot=1.000).",
+            "Peca sem celulas legiveis - nao da' para validar o vao menor."
+          ]
+        },
+        "independent_validation_used": "validate_l_corner"
+      }
+    ]
+  },
+  "X_INTERSECTION": {
+    "total_nodes": 17,
+    "placement_reason_histogram": {
+      "X_INTERSECTION": 8,
+      "X_INTERSECTION_DEGRADED": 1
+    },
+    "classified": {
+      "TRUE": 8,
+      "DEGRADED": 0,
+      "NONE_NO_CANDIDATE": 9
+    },
+    "failure_entries_reported_by_solver": 72,
+    "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+    "unique_nodes_with_failure": 9,
+    "failures_sample": [
+      {
+        "node_index": 264,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 265,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 266,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 267,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 268,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 269,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 270,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 271,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 272,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      },
+      {
+        "node_index": 264,
+        "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+      }
+    ],
+    "independent_resolve_and_validate_sample": [
+      {
+        "node_index": 256,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 257,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 258,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 259,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 260,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 261,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": true,
+          "problems": []
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 264,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Cruz precisa de B54 nas duas fiadas.",
+            "Peca sem celulas legiveis - nao da' para validar a celula central."
+          ]
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 265,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Cruz precisa de B54 nas duas fiadas.",
+            "Pecas da cruz nao estao a 90 graus (dot=-0.065).",
+            "Celulas centrais dos dois B54 nao ficam alinhadas (dist=6.63cm)."
+          ]
+        },
+        "independent_validation_used": "validate_x_intersection"
+      },
+      {
+        "node_index": 266,
+        "kind": "X_INTERSECTION",
+        "ok": true,
+        "reason": null,
+        "degraded": false,
+        "independent_validation": {
+          "ok": false,
+          "problems": [
+            "Cruz precisa de B54 nas duas fiadas.",
+            "Peca sem celulas legiveis - nao da' para validar a celula central."
+          ]
+        },
+        "independent_validation_used": "validate_x_intersection"
+      }
+    ]
+  },
+  "_meta": {
+    "total_nodes": 273,
+    "kinds_histogram": {
+      "L_CORNER": 63,
+      "FREE_END": 55,
+      "T_INTERSECTION": 118,
+      "AMBIGUOUS": 11,
+      "STRAIGHT_CONTINUATION": 9,
+      "X_INTERSECTION": 17
+    },
+    "total_collisions": 1069,
+    "collisions_touching_a_node_piece": 380,
+    "total_intersection_failures": 200
+  },
+  "project_id": "torre_easy_lo_r00_tgd"
+}

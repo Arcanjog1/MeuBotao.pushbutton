@@ -1,0 +1,5722 @@
+{
+  "provenance": {
+    "generated_at": "2026-09-01T19:11:10.020181",
+    "primary_project_id": "torre_easy_lo_r00_tgd",
+    "engine_file": "/home/user/MeuBotao.pushbutton/nuvem/core/wall_modeling.py",
+    "engine_sha256": "e5414dd7fc50e05e5785543728cc14b54d5d8839fd13ddd3e6c84788c4e42917",
+    "solver_decision_fingerprint_official": "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316 (REFERENCE_SOLVER_DECISION_FINGERPRINT, tests/solver_bench.py --fingerprint, referencia - nao recalculado aqui)",
+    "audit_project_fingerprint_baseline": "fb521bcd8fc125981eadc487652632569461c26b4acb76f3b2a229fa6d4343fe",
+    "audit_project_pieces_baseline": 10657,
+    "total_wall_time_s": 42.2
+  },
+  "wall_modeling_notes": {
+    "cells_reconstructed": [],
+    "catalog_codes_used": [
+      "B19",
+      "B34",
+      "B39",
+      "B54",
+      "C04",
+      "C09"
+    ],
+    "catalog_codes_dropped": []
+  },
+  "course_bond_prism": {
+    "method": "Censo independente — PRISMA / FIADAS (missão CONTA 2, seção 8) + uma",
+    "coincident_tolerance_cm": 1.0,
+    "pairs_of_consecutive_courses_measured": 7444,
+    "joint_coincidence": {
+      "suspect_continuous_vertical_joint": 1086,
+      "exempt_opening_touch_11_8": 10,
+      "ambiguous_near_edge_not_confirmed_touch": 157,
+      "not_coincident": 6191
+    },
+    "walls_with_suspect_continuous_joint": 47,
+    "stagger_cm_summary": {
+      "count": 7444,
+      "min": 0.0,
+      "median": 15.0,
+      "mean": 21.532,
+      "max": 994.876,
+      "histogram_cm": {
+        ">20": 1134,
+        "10-20": 3660,
+        "3-10": 1385,
+        "0-1": 1253,
+        "1-3": 12
+      }
+    },
+    "suspects_sample": [
+      {
+        "wall_idx": 1,
+        "course_a": 0,
+        "course_b": 1,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 1,
+        "course_b": 2,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 2,
+        "course_b": 3,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 3,
+        "course_b": 4,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 4,
+        "course_b": 5,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 5,
+        "course_b": 6,
+        "t_cm": 139.51,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B19",
+          "C09"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 5,
+        "course_b": 6,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 5,
+        "course_b": 6,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 6,
+        "course_b": 7,
+        "t_cm": 139.5,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 6,
+        "course_b": 7,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 6,
+        "course_b": 7,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 7,
+        "course_b": 8,
+        "t_cm": 139.51,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B19",
+          "C09"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 7,
+        "course_b": 8,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 7,
+        "course_b": 8,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 8,
+        "course_b": 9,
+        "t_cm": 139.5,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 8,
+        "course_b": 9,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 8,
+        "course_b": 9,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 9,
+        "course_b": 10,
+        "t_cm": 139.51,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B19",
+          "C09"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 9,
+        "course_b": 10,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 9,
+        "course_b": 10,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 10,
+        "course_b": 11,
+        "t_cm": 139.5,
+        "delta_cm": 0.002,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 10,
+        "course_b": 11,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "B19"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 10,
+        "course_b": 11,
+        "t_cm": 1294.51,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C04",
+          "C09"
+        ],
+        "nearest_edge_cm": 65.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 11,
+        "course_b": 12,
+        "t_cm": 924.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C09"
+        ],
+        "codes_b": [
+          "C04",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 13,
+        "course_b": 14,
+        "t_cm": 1449.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C09",
+          "C09"
+        ],
+        "nearest_edge_cm": 34.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 14,
+        "course_b": 15,
+        "t_cm": 1449.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C09",
+          "C09"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 34.5
+      },
+      {
+        "wall_idx": 1,
+        "course_a": 15,
+        "course_b": 16,
+        "t_cm": 1449.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C09",
+          "C09"
+        ],
+        "nearest_edge_cm": 34.5
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 5,
+        "course_b": 6,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B19",
+          "C04"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 5,
+        "course_b": 6,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C09",
+          "B19"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 6,
+        "course_b": 7,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C04"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 6,
+        "course_b": 7,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C09",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 7,
+        "course_b": 8,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B19",
+          "C04"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 7,
+        "course_b": 8,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C09",
+          "B19"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 8,
+        "course_b": 9,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C04"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 8,
+        "course_b": 9,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C09",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 9,
+        "course_b": 10,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B19",
+          "C04"
+        ],
+        "codes_b": [
+          "B39",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 9,
+        "course_b": 10,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C09",
+          "B19"
+        ],
+        "codes_b": [
+          "B34",
+          "B34"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 10,
+        "course_b": 11,
+        "t_cm": 139.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B39",
+          "B19"
+        ],
+        "codes_b": [
+          "B19",
+          "C04"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 2,
+        "course_a": 10,
+        "course_b": 11,
+        "t_cm": 1294.49,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "B34",
+          "B34"
+        ],
+        "codes_b": [
+          "C09",
+          "B19"
+        ],
+        "nearest_edge_cm": 65.49
+      },
+      {
+        "wall_idx": 3,
+        "course_a": 0,
+        "course_b": 1,
+        "t_cm": 559.5,
+        "delta_cm": 0.0,
+        "codes_a": [
+          "C04",
+          "C04"
+        ],
+        "codes_b": [
+          "C09",
+          "B19"
+        ],
+        "nearest_edge_cm": 160.5
+      }
+    ],
+    "variants_per_course_used": 1,
+    "alternative_solutions_same_segment_different_variant": {
+      "note": "so' populado quando variants_per_course > 1 na rodada; producao real usa variants_per_course=1 (secao 18.4 das REGRAS) - ver run_full_census para uma rodada extra com K=3",
+      "count_segments_with_alternatives": 0,
+      "examples": []
+    }
+  },
+  "special_blocks": {
+    "C09": {
+      "code": "C09",
+      "total": 1185,
+      "per_wall_top20": {
+        "3": 64,
+        "5": 55,
+        "1": 54,
+        "56": 54,
+        "6": 45,
+        "19": 44,
+        "2": 43,
+        "127": 42,
+        "20": 40,
+        "4": 40,
+        "80": 35,
+        "7": 34,
+        "61": 30,
+        "81": 30,
+        "82": 30,
+        "112": 27,
+        "69": 22,
+        "73": 22,
+        "74": 22,
+        "75": 22
+      },
+      "per_course": {
+        "0": 68,
+        "1": 67,
+        "2": 68,
+        "3": 67,
+        "4": 68,
+        "5": 74,
+        "6": 72,
+        "7": 78,
+        "8": 72,
+        "9": 78,
+        "10": 72,
+        "11": 70,
+        "12": 67,
+        "13": 55,
+        "14": 77,
+        "15": 55,
+        "16": 77
+      },
+      "reason_bucket_histogram": {
+        "MID_WALL_FILL": 898,
+        "NODE_DEGRADED": 287
+      },
+      "run_length_histogram": {
+        "1": 706,
+        "2": 130,
+        "3": 65,
+        "4+": 6
+      },
+      "run_examples_len_ge2": [
+        {
+          "wall_idx": 3,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            375.0,
+            394.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 19,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            520.0,
+            549.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 61,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            215.0,
+            234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 56,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            95.0,
+            124.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 56,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            260.0,
+            289.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 112,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            40.0,
+            69.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 80,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            130.0,
+            149.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 81,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            130.0,
+            149.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 82,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            15.0,
+            34.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 20,
+          "course_index": 0,
+          "run_len": 4,
+          "t_range_cm": [
+            265.0,
+            569.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            870.0,
+            889.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 1,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            590.0,
+            609.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 81,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            110.0,
+            129.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 80,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            110.0,
+            129.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 82,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            54.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 74,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            155.0,
+            174.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 75,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            155.0,
+            174.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 127,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            19.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 2,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            590.0,
+            609.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            375.0,
+            394.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 19,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            520.0,
+            549.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 61,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            215.0,
+            234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 56,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            95.0,
+            124.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 56,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            260.0,
+            289.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 112,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            40.0,
+            69.0
+          ],
+          "all_mid_wall_fill": true
+        }
+      ],
+      "consecutive_2plus_runs": 201,
+      "consecutive_3plus_runs": 71,
+      "consecutive_runs_mid_wall_fill_only": 183,
+      "consecutive_runs_touching_a_node_piece": 18,
+      "dist_to_opening_or_end_cm_summary": {
+        "count": 1185,
+        "min": 0.26,
+        "max": 324.48,
+        "median": 19.5,
+        "mean": 42.74
+      },
+      "mid_wall_far_from_edge_count": 147,
+      "dist_to_node_cm_summary": {
+        "count": 1185,
+        "min": 2.5,
+        "max": 179.4,
+        "median": 13.22,
+        "mean": 27.11
+      },
+      "vertical_strips_ge_3_courses": [
+        {
+          "wall_idx": 3,
+          "t_center_cm": 389.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "consecutive_run": 13
+        },
+        {
+          "wall_idx": 5,
+          "t_center_cm": 944.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 61,
+          "t_center_cm": 244.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 12
+        },
+        {
+          "wall_idx": 69,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 73,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 74,
+          "t_center_cm": 169.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 75,
+          "t_center_cm": 169.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 85,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 86,
+          "t_center_cm": 162.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 87,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 93,
+          "t_center_cm": 111.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 95,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 96,
+          "t_center_cm": 111.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 104,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 114,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 115,
+          "t_center_cm": 79.2,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 80,
+          "t_center_cm": 4.5,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 127,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 127,
+          "t_center_cm": 59.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 124,
+          "t_center_cm": 74.5,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 122,
+          "t_center_cm": 4.5,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 166,
+          "t_center_cm": 4.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 121,
+          "t_center_cm": 74.5,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 88,
+          "t_center_cm": 4.5,
+          "courses": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 6
+        },
+        {
+          "wall_idx": 83,
+          "t_center_cm": 178.7,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        }
+      ],
+      "vertical_strips_total_found": 25
+    },
+    "C04": {
+      "code": "C04",
+      "total": 584,
+      "per_wall_top20": {
+        "3": 46,
+        "2": 41,
+        "1": 38,
+        "80": 22,
+        "140": 17,
+        "143": 17,
+        "153": 17,
+        "154": 17,
+        "166": 17,
+        "81": 17,
+        "82": 17,
+        "94": 17,
+        "112": 16,
+        "23": 16,
+        "5": 16,
+        "7": 16,
+        "88": 16,
+        "47": 11,
+        "77": 11,
+        "78": 11
+      },
+      "per_course": {
+        "0": 27,
+        "1": 42,
+        "2": 27,
+        "3": 42,
+        "4": 27,
+        "5": 51,
+        "6": 35,
+        "7": 55,
+        "8": 29,
+        "9": 53,
+        "10": 29,
+        "11": 48,
+        "12": 19,
+        "13": 33,
+        "14": 17,
+        "15": 33,
+        "16": 17
+      },
+      "reason_bucket_histogram": {
+        "MID_WALL_FILL": 432,
+        "NODE_DEGRADED": 152
+      },
+      "run_length_histogram": {
+        "1": 550,
+        "2": 17
+      },
+      "run_examples_len_ge2": [
+        {
+          "wall_idx": 3,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 5,
+          "run_len": 2,
+          "t_range_cm": [
+            890.0,
+            1234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 7,
+          "run_len": 2,
+          "t_range_cm": [
+            890.0,
+            1234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 9,
+          "run_len": 2,
+          "t_range_cm": [
+            890.0,
+            1234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 10,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 94,
+          "course_index": 10,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            102.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 11,
+          "run_len": 2,
+          "t_range_cm": [
+            890.0,
+            1234.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 12,
+          "run_len": 2,
+          "t_range_cm": [
+            395.0,
+            724.0
+          ],
+          "all_mid_wall_fill": true
+        }
+      ],
+      "consecutive_2plus_runs": 17,
+      "consecutive_3plus_runs": 0,
+      "consecutive_runs_mid_wall_fill_only": 11,
+      "consecutive_runs_touching_a_node_piece": 6,
+      "dist_to_opening_or_end_cm_summary": {
+        "count": 584,
+        "min": 1.98,
+        "max": 112.01,
+        "median": 12.0,
+        "mean": 15.26
+      },
+      "mid_wall_far_from_edge_count": 8,
+      "dist_to_node_cm_summary": {
+        "count": 584,
+        "min": 1.0,
+        "max": 181.77,
+        "median": 10.0,
+        "mean": 25.01
+      },
+      "vertical_strips_ge_3_courses": [
+        {
+          "wall_idx": 1,
+          "t_center_cm": 762.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "consecutive_run": 13
+        },
+        {
+          "wall_idx": 47,
+          "t_center_cm": 295.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 88,
+          "t_center_cm": 2.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 93,
+          "t_center_cm": 2.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 94,
+          "t_center_cm": 100.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 95,
+          "t_center_cm": 114.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 96,
+          "t_center_cm": 2.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 80,
+          "t_center_cm": 92.0,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 140,
+          "t_center_cm": 37.1,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 143,
+          "t_center_cm": 37.1,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 153,
+          "t_center_cm": 37.6,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 154,
+          "t_center_cm": 2.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 83,
+          "t_center_cm": 171.2,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        }
+      ],
+      "vertical_strips_total_found": 13
+    },
+    "B19": {
+      "code": "B19",
+      "total": 840,
+      "per_wall_top20": {
+        "4": 54,
+        "5": 49,
+        "89": 34,
+        "90": 34,
+        "91": 34,
+        "92": 34,
+        "32": 23,
+        "23": 22,
+        "6": 22,
+        "1": 20,
+        "2": 19,
+        "100": 17,
+        "101": 17,
+        "102": 17,
+        "103": 17,
+        "16": 17,
+        "18": 17,
+        "29": 17,
+        "65": 17,
+        "7": 17
+      },
+      "per_course": {
+        "0": 49,
+        "1": 53,
+        "2": 49,
+        "3": 53,
+        "4": 49,
+        "5": 57,
+        "6": 53,
+        "7": 61,
+        "8": 50,
+        "9": 53,
+        "10": 50,
+        "11": 50,
+        "12": 39,
+        "13": 48,
+        "14": 39,
+        "15": 48,
+        "16": 39
+      },
+      "reason_bucket_histogram": {
+        "MID_WALL_FILL": 840
+      },
+      "run_length_histogram": {
+        "1": 760,
+        "2": 40
+      },
+      "run_examples_len_ge2": [
+        {
+          "wall_idx": 89,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 90,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 91,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 92,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 89,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 90,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 91,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 92,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 89,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 90,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 91,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 92,
+          "course_index": 4,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 89,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 90,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 91,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 92,
+          "course_index": 6,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 67,
+          "course_index": 7,
+          "run_len": 2,
+          "t_range_cm": [
+            80.0,
+            149.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 68,
+          "course_index": 7,
+          "run_len": 2,
+          "t_range_cm": [
+            80.0,
+            149.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 77,
+          "course_index": 7,
+          "run_len": 2,
+          "t_range_cm": [
+            40.0,
+            109.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 78,
+          "course_index": 7,
+          "run_len": 2,
+          "t_range_cm": [
+            40.0,
+            109.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 89,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 90,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 91,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 92,
+          "course_index": 8,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        },
+        {
+          "wall_idx": 89,
+          "course_index": 10,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            89.0
+          ],
+          "all_mid_wall_fill": true
+        }
+      ],
+      "consecutive_2plus_runs": 40,
+      "consecutive_3plus_runs": 0,
+      "consecutive_runs_mid_wall_fill_only": 40,
+      "consecutive_runs_touching_a_node_piece": 0,
+      "dist_to_opening_or_end_cm_summary": {
+        "count": 840,
+        "min": 0.26,
+        "max": 279.5,
+        "median": 24.5,
+        "mean": 45.13
+      },
+      "mid_wall_far_from_edge_count": 100,
+      "dist_to_node_cm_summary": {
+        "count": 840,
+        "min": 2.49,
+        "max": 132.72,
+        "median": 17.5,
+        "mean": 27.45
+      },
+      "vertical_strips_ge_3_courses": [
+        {
+          "wall_idx": 5,
+          "t_center_cm": 959.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 59,
+          "t_center_cm": 149.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 60,
+          "t_center_cm": 119.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "consecutive_run": 11
+        },
+        {
+          "wall_idx": 65,
+          "t_center_cm": 10.5,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        }
+      ],
+      "vertical_strips_total_found": 4
+    },
+    "B34": {
+      "code": "B34",
+      "total": 2530,
+      "per_wall_top20": {
+        "4": 69,
+        "6": 59,
+        "5": 58,
+        "13": 51,
+        "56": 48,
+        "1": 47,
+        "10": 42,
+        "11": 42,
+        "3": 42,
+        "48": 42,
+        "50": 42,
+        "53": 42,
+        "54": 42,
+        "8": 42,
+        "9": 42,
+        "7": 41,
+        "23": 39,
+        "18": 34,
+        "33": 34,
+        "49": 34
+      },
+      "per_course": {
+        "0": 106,
+        "1": 193,
+        "2": 106,
+        "3": 193,
+        "4": 106,
+        "5": 196,
+        "6": 110,
+        "7": 192,
+        "8": 116,
+        "9": 192,
+        "10": 116,
+        "11": 203,
+        "12": 99,
+        "13": 207,
+        "14": 94,
+        "15": 207,
+        "16": 94
+      },
+      "reason_bucket_histogram": {
+        "NODE_TRUE": 1423,
+        "NODE_DEGRADED": 443,
+        "MID_WALL_FILL": 664
+      },
+      "run_length_histogram": {
+        "1": 1682,
+        "2": 424
+      },
+      "run_examples_len_ge2": [
+        {
+          "wall_idx": 4,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            705.0,
+            774.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 5,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            870.0,
+            939.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 6,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            470.0,
+            539.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 13,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            573.0,
+            642.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 18,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            515.0,
+            584.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 52,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            256.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 29,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            235.0,
+            386.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            69.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 41,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            7.0,
+            324.3
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 1,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            1415.0,
+            1484.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 39,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            7.0,
+            324.3
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 40,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            317.3
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 12,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            642.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 110,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            134.5
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 106,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            134.2
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 13,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            573.0,
+            642.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 23,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            215.0,
+            499.6
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 36,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            315.0,
+            384.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 120,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            69.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 48,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            200.0,
+            269.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 53,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            200.0,
+            269.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 50,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            200.0,
+            269.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 54,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            200.0,
+            269.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 43,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            0.0,
+            317.3
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 45,
+          "course_index": 1,
+          "run_len": 2,
+          "t_range_cm": [
+            7.0,
+            324.3
+          ],
+          "all_mid_wall_fill": false
+        }
+      ],
+      "consecutive_2plus_runs": 424,
+      "consecutive_3plus_runs": 0,
+      "consecutive_runs_mid_wall_fill_only": 40,
+      "consecutive_runs_touching_a_node_piece": 384,
+      "dist_to_opening_or_end_cm_summary": {
+        "count": 2530,
+        "min": 1.76,
+        "max": 381.98,
+        "median": 17.0,
+        "mean": 29.5
+      },
+      "mid_wall_far_from_edge_count": 106,
+      "dist_to_node_cm_summary": {
+        "count": 2530,
+        "min": 0.0,
+        "max": 172.07,
+        "median": 10.0,
+        "mean": 17.89
+      },
+      "vertical_strips_ge_3_courses": [
+        {
+          "wall_idx": 4,
+          "t_center_cm": 1157.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 6,
+          "t_center_cm": 922.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 12,
+          "t_center_cm": 625.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 110,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 106,
+          "t_center_cm": 117.2,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 13,
+          "t_center_cm": 590.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 13,
+          "t_center_cm": 625.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 36,
+          "t_center_cm": 367.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 33,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 30,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 48,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 48,
+          "t_center_cm": 252.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 53,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 53,
+          "t_center_cm": 252.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 50,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 50,
+          "t_center_cm": 252.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 54,
+          "t_center_cm": 17.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 54,
+          "t_center_cm": 252.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 65,
+          "t_center_cm": 158.0,
+          "courses": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "consecutive_run": 17
+        },
+        {
+          "wall_idx": 124,
+          "t_center_cm": 52.0,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        },
+        {
+          "wall_idx": 121,
+          "t_center_cm": 52.0,
+          "courses": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "consecutive_run": 5
+        }
+      ],
+      "vertical_strips_total_found": 21
+    },
+    "B54": {
+      "code": "B54",
+      "total": 636,
+      "per_wall_top20": {
+        "0": 50,
+        "1": 29,
+        "2": 29,
+        "3": 29,
+        "4": 28,
+        "14": 26,
+        "15": 26,
+        "16": 26,
+        "25": 24,
+        "26": 21,
+        "6": 21,
+        "7": 21,
+        "5": 19,
+        "13": 18,
+        "37": 18,
+        "17": 17,
+        "10": 15,
+        "11": 15,
+        "8": 15,
+        "9": 15
+      },
+      "per_course": {
+        "0": 55,
+        "1": 8,
+        "2": 55,
+        "3": 8,
+        "4": 55,
+        "5": 8,
+        "6": 55,
+        "7": 8,
+        "8": 47,
+        "9": 8,
+        "10": 47,
+        "11": 8,
+        "12": 84,
+        "13": 8,
+        "14": 87,
+        "15": 8,
+        "16": 87
+      },
+      "reason_bucket_histogram": {
+        "NODE_TRUE": 636
+      },
+      "run_length_histogram": {
+        "4+": 7,
+        "1": 343,
+        "3": 42,
+        "2": 66
+      },
+      "run_examples_len_ge2": [
+        {
+          "wall_idx": 0,
+          "course_index": 0,
+          "run_len": 5,
+          "t_range_cm": [
+            235.3,
+            1109.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 1,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 2,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 0,
+          "run_len": 3,
+          "t_range_cm": [
+            725.0,
+            889.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 13,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            172.5,
+            372.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 37,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            132.0,
+            240.5
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 25,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            47.0,
+            437.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 15,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            63.0,
+            559.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 16,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            531.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 26,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            47.0,
+            437.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 14,
+          "course_index": 0,
+          "run_len": 2,
+          "t_range_cm": [
+            63.0,
+            559.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 0,
+          "course_index": 2,
+          "run_len": 5,
+          "t_range_cm": [
+            235.3,
+            1109.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 1,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 2,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 3,
+          "course_index": 2,
+          "run_len": 3,
+          "t_range_cm": [
+            725.0,
+            889.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 13,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            172.5,
+            372.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 37,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            132.0,
+            240.5
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 25,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            47.0,
+            437.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 15,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            63.0,
+            559.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 16,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            35.0,
+            531.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 26,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            47.0,
+            437.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 14,
+          "course_index": 2,
+          "run_len": 2,
+          "t_range_cm": [
+            63.0,
+            559.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 0,
+          "course_index": 4,
+          "run_len": 5,
+          "t_range_cm": [
+            235.3,
+            1109.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 1,
+          "course_index": 4,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        },
+        {
+          "wall_idx": 2,
+          "course_index": 4,
+          "run_len": 3,
+          "t_range_cm": [
+            595.0,
+            759.0
+          ],
+          "all_mid_wall_fill": false
+        }
+      ],
+      "consecutive_2plus_runs": 115,
+      "consecutive_3plus_runs": 49,
+      "consecutive_runs_mid_wall_fill_only": 0,
+      "consecutive_runs_touching_a_node_piece": 115,
+      "dist_to_opening_or_end_cm_summary": {
+        "count": 636,
+        "min": 1.98,
+        "max": 336.98,
+        "median": 62.0,
+        "mean": 96.88
+      },
+      "mid_wall_far_from_edge_count": 0,
+      "dist_to_node_cm_summary": {
+        "count": 636,
+        "min": 0.0,
+        "max": 0.0,
+        "median": 0.0,
+        "mean": 0.0
+      },
+      "vertical_strips_ge_3_courses": [],
+      "vertical_strips_total_found": 0
+    }
+  },
+  "intersections_l_t_x": {
+    "L_CORNER": {
+      "total_nodes": 63,
+      "placement_reason_histogram": {
+        "L_CORNER": 62,
+        "L_CORNER_DEGRADED": 14
+      },
+      "classified": {
+        "TRUE": 62,
+        "DEGRADED": 0,
+        "NONE_NO_CANDIDATE": 1
+      },
+      "failure_entries_reported_by_solver": 8,
+      "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+      "unique_nodes_with_failure": 1,
+      "failures_sample": [
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 226,
+          "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        }
+      ],
+      "independent_resolve_and_validate_sample": [
+        {
+          "node_index": 0,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 2,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 4,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 6,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 7,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 8,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 226,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=-1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 226,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=-1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 226,
+          "kind": "L_CORNER",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=-1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        }
+      ]
+    },
+    "T_INTERSECTION": {
+      "total_nodes": 118,
+      "placement_reason_histogram": {
+        "T_INTERSECTION_MAIN": 80,
+        "T_INTERSECTION_INCOMING": 80,
+        "T_INTERSECTION_DEGRADED_L": 36,
+        "T_INTERSECTION_INCOMING_DEGRADED": 31
+      },
+      "classified": {
+        "TRUE": 80,
+        "DEGRADED": 23,
+        "NONE_NO_CANDIDATE": 15
+      },
+      "failure_entries_reported_by_solver": 120,
+      "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+      "unique_nodes_with_failure": 15,
+      "failures_sample": [
+        {
+          "node_index": 215,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 216,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 217,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 218,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 220,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 222,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (2.6cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 223,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (2.6cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 240,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 241,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        },
+        {
+          "node_index": 242,
+          "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro."
+        }
+      ],
+      "independent_resolve_and_validate_sample": [
+        {
+          "node_index": 3,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_t_intersection"
+        },
+        {
+          "node_index": 23,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 24,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 26,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_t_intersection"
+        },
+        {
+          "node_index": 27,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_t_intersection"
+        },
+        {
+          "node_index": 28,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_t_intersection"
+        },
+        {
+          "node_index": 215,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 216,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        },
+        {
+          "node_index": 217,
+          "kind": "T_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": true,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Encontro em L precisa de B34 nas duas fiadas.",
+              "Pecas do L nao estao a 90 graus (dot=1.000).",
+              "Peca sem celulas legiveis - nao da' para validar o vao menor."
+            ]
+          },
+          "independent_validation_used": "validate_l_corner"
+        }
+      ]
+    },
+    "X_INTERSECTION": {
+      "total_nodes": 17,
+      "placement_reason_histogram": {
+        "X_INTERSECTION": 8,
+        "X_INTERSECTION_DEGRADED": 1
+      },
+      "classified": {
+        "TRUE": 8,
+        "DEGRADED": 0,
+        "NONE_NO_CANDIDATE": 9
+      },
+      "failure_entries_reported_by_solver": 72,
+      "note_failure_entries": "cada entrada de intersection_failures e' por TENTATIVA (courso/banda), um mesmo no' pode aparecer mais de uma vez - ver unique_nodes_with_failure",
+      "unique_nodes_with_failure": 9,
+      "failures_sample": [
+        {
+          "node_index": 264,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 265,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 266,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 267,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 268,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 269,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 270,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 271,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 272,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        },
+        {
+          "node_index": 264,
+          "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro."
+        }
+      ],
+      "independent_resolve_and_validate_sample": [
+        {
+          "node_index": 256,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 257,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 258,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 259,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 260,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 261,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": true,
+            "problems": []
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 264,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Cruz precisa de B54 nas duas fiadas.",
+              "Peca sem celulas legiveis - nao da' para validar a celula central."
+            ]
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 265,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Cruz precisa de B54 nas duas fiadas.",
+              "Pecas da cruz nao estao a 90 graus (dot=-0.065).",
+              "Celulas centrais dos dois B54 nao ficam alinhadas (dist=6.63cm)."
+            ]
+          },
+          "independent_validation_used": "validate_x_intersection"
+        },
+        {
+          "node_index": 266,
+          "kind": "X_INTERSECTION",
+          "ok": true,
+          "reason": null,
+          "degraded": false,
+          "independent_validation": {
+            "ok": false,
+            "problems": [
+              "Cruz precisa de B54 nas duas fiadas.",
+              "Peca sem celulas legiveis - nao da' para validar a celula central."
+            ]
+          },
+          "independent_validation_used": "validate_x_intersection"
+        }
+      ]
+    },
+    "_meta": {
+      "total_nodes": 273,
+      "kinds_histogram": {
+        "L_CORNER": 63,
+        "FREE_END": 55,
+        "T_INTERSECTION": 118,
+        "AMBIGUOUS": 11,
+        "STRAIGHT_CONTINUATION": 9,
+        "X_INTERSECTION": 17
+      },
+      "total_collisions": 1069,
+      "collisions_touching_a_node_piece": 380,
+      "total_intersection_failures": 200
+    }
+  },
+  "openings": {
+    "openings_input": {
+      "total": 82,
+      "doors_no_sill": 57,
+      "windows_or_sill_gt_threshold": 25,
+      "door_no_sill_threshold_cm": 1.0,
+      "width_cm_summary": {
+        "count": 82,
+        "min": 1.78,
+        "max": 321.0,
+        "median": 91.0,
+        "mean": 108.68
+      }
+    },
+    "solver_reported": {
+      "non_modular_segments": 3023,
+      "non_modular_distinct_walls": 124,
+      "alignment_conflicts": 30,
+      "jamb_exceptions": 172,
+      "door_void_violations": 290,
+      "door_void_violations_sample": [
+        {
+          "wall_idx": 4,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "A",
+            "origin_world": {
+              "x_cm": 853.52,
+              "y_cm": 17.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": -30.48,
+              "y_cm": -0.0,
+              "z_cm": -0.0
+            },
+            "y_dir": {
+              "x_cm": 0.0,
+              "y_cm": -30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 862.645,
+                  "y_cm": 17.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 846.895,
+                  "y_cm": 17.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 197,
+            "wall_idx": 4,
+            "secondary_wall_idx": 119,
+            "rotation_deg": 180.0
+          },
+          "overlap_cm": 5.021999999999963
+        },
+        {
+          "wall_idx": 4,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "B",
+            "origin_world": {
+              "x_cm": 863.52,
+              "y_cm": 7.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 0.0,
+              "y_cm": -30.48,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": 30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 863.52,
+                  "y_cm": 16.174,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 863.52,
+                  "y_cm": 0.424,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 197,
+            "wall_idx": 119,
+            "secondary_wall_idx": 4,
+            "rotation_deg": 270.0
+          },
+          "overlap_cm": 5.021999999999963
+        },
+        {
+          "wall_idx": 5,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "A",
+            "origin_world": {
+              "x_cm": -661.484,
+              "y_cm": 17.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -0.0,
+              "y_cm": 30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": -670.609,
+                  "y_cm": 17.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": -654.859,
+                  "y_cm": 17.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 195,
+            "wall_idx": 5,
+            "secondary_wall_idx": 118,
+            "rotation_deg": 0.0
+          },
+          "overlap_cm": 4.995000000000056
+        },
+        {
+          "wall_idx": 5,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "B",
+            "origin_world": {
+              "x_cm": -671.484,
+              "y_cm": 7.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 0.0,
+              "y_cm": -30.48,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": 30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": -671.484,
+                  "y_cm": 16.174,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": -671.484,
+                  "y_cm": 0.424,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 195,
+            "wall_idx": 118,
+            "secondary_wall_idx": 5,
+            "rotation_deg": 270.0
+          },
+          "overlap_cm": 4.995000000000056
+        },
+        {
+          "wall_idx": 6,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "A",
+            "origin_world": {
+              "x_cm": -661.484,
+              "y_cm": 187.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 30.48,
+              "y_cm": -0.0,
+              "z_cm": -0.0
+            },
+            "y_dir": {
+              "x_cm": 0.0,
+              "y_cm": 30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": -670.609,
+                  "y_cm": 187.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": -654.859,
+                  "y_cm": 187.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 192,
+            "wall_idx": 6,
+            "secondary_wall_idx": 116,
+            "rotation_deg": 0.0
+          },
+          "overlap_cm": 4.995000000000164
+        },
+        {
+          "wall_idx": 6,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "B",
+            "origin_world": {
+              "x_cm": -671.484,
+              "y_cm": 197.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 0.0,
+              "y_cm": 30.48,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": -671.484,
+                  "y_cm": 187.924,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": -671.484,
+                  "y_cm": 203.674,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 192,
+            "wall_idx": 116,
+            "secondary_wall_idx": 6,
+            "rotation_deg": 90.0
+          },
+          "overlap_cm": 4.995000000000164
+        },
+        {
+          "wall_idx": 7,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "A",
+            "origin_world": {
+              "x_cm": 853.52,
+              "y_cm": 187.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": -30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -0.0,
+              "y_cm": -30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 862.645,
+                  "y_cm": 187.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 846.895,
+                  "y_cm": 187.049,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 194,
+            "wall_idx": 7,
+            "secondary_wall_idx": 117,
+            "rotation_deg": 180.0
+          },
+          "overlap_cm": 5.021999999999963
+        },
+        {
+          "wall_idx": 7,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "B",
+            "origin_world": {
+              "x_cm": 863.52,
+              "y_cm": 197.049,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 0.0,
+              "y_cm": 30.48,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 863.52,
+                  "y_cm": 187.924,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 863.52,
+                  "y_cm": 203.674,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 194,
+            "wall_idx": 117,
+            "secondary_wall_idx": 7,
+            "rotation_deg": 90.0
+          },
+          "overlap_cm": 5.021999999999963
+        },
+        {
+          "wall_idx": 8,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "A",
+            "origin_world": {
+              "x_cm": 1055.511,
+              "y_cm": 634.708,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": 30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -0.0,
+              "y_cm": 30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 1046.386,
+                  "y_cm": 634.708,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 1062.136,
+                  "y_cm": 634.708,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 123,
+            "wall_idx": 8,
+            "secondary_wall_idx": 76,
+            "rotation_deg": 0.0
+          },
+          "overlap_cm": 2.9980000000000553
+        },
+        {
+          "wall_idx": 8,
+          "opening_index": 0,
+          "candidate": {
+            "logical_code": "B34",
+            "course": "B",
+            "origin_world": {
+              "x_cm": 1028.511,
+              "y_cm": 634.708,
+              "z_cm": 0.0
+            },
+            "x_dir": {
+              "x_cm": -30.48,
+              "y_cm": 0.0,
+              "z_cm": 0.0
+            },
+            "y_dir": {
+              "x_cm": -0.0,
+              "y_cm": -30.48,
+              "z_cm": 0.0
+            },
+            "length_cm": 34.0,
+            "width_cm": 14.0,
+            "cells_world": [
+              {
+                "point": {
+                  "x_cm": 1037.636,
+                  "y_cm": 634.708,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.3526902887139107,
+                  0.2952755905511811
+                ]
+              },
+              {
+                "point": {
+                  "x_cm": 1021.886,
+                  "y_cm": 634.708,
+                  "z_cm": 0.0
+                },
+                "size_local": [
+                  0.5167322834645669,
+                  0.2952755905511811
+                ]
+              }
+            ],
+            "placement_reason": "T_INTERSECTION_DEGRADED_L",
+            "node_index": 123,
+            "wall_idx": 76,
+            "secondary_wall_idx": 8,
+            "rotation_deg": 180.0
+          },
+          "overlap_cm": 11.591000000000138
+        }
+      ]
+    },
+    "block_extent_vs_opening_own_measurement": {
+      "tolerance_cm": 0.2,
+      "classification_counts": {
+        "FORA": 3502,
+        "DENTRO": 5,
+        "PARCIAL": 108
+      },
+      "partial_or_inside_examples": [
+        {
+          "wall_idx": 4,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            740.01,
+            774.01
+          ]
+        },
+        {
+          "wall_idx": 5,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            400.01,
+            434.01
+          ]
+        },
+        {
+          "wall_idx": 6,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            505.0,
+            539.0
+          ]
+        },
+        {
+          "wall_idx": 7,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            400.0,
+            434.0
+          ]
+        },
+        {
+          "wall_idx": 49,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            222.01,
+            256.01
+          ]
+        },
+        {
+          "wall_idx": 51,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.01,
+            47.01
+          ]
+        },
+        {
+          "wall_idx": 55,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.0,
+            47.0
+          ]
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            197.0,
+            231.0
+          ]
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            628.5,
+            662.5
+          ]
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            197.01,
+            231.01
+          ]
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            628.5,
+            662.5
+          ]
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            181.5,
+            215.5
+          ]
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            613.0,
+            647.0
+          ]
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            181.5,
+            215.5
+          ]
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            612.99,
+            646.99
+          ]
+        },
+        {
+          "wall_idx": 28,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.01,
+            47.01
+          ]
+        },
+        {
+          "wall_idx": 27,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            338.0,
+            372.0
+          ]
+        },
+        {
+          "wall_idx": 29,
+          "course_index": 0,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            352.0,
+            386.0
+          ]
+        },
+        {
+          "wall_idx": 88,
+          "course_index": 1,
+          "code": "B34",
+          "verdict": "DENTRO",
+          "t_range_cm": [
+            7.0,
+            41.0
+          ]
+        },
+        {
+          "wall_idx": 4,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            740.01,
+            774.01
+          ]
+        },
+        {
+          "wall_idx": 5,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            400.01,
+            434.01
+          ]
+        },
+        {
+          "wall_idx": 6,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            505.0,
+            539.0
+          ]
+        },
+        {
+          "wall_idx": 7,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            400.0,
+            434.0
+          ]
+        },
+        {
+          "wall_idx": 49,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            222.01,
+            256.01
+          ]
+        },
+        {
+          "wall_idx": 51,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.01,
+            47.01
+          ]
+        },
+        {
+          "wall_idx": 55,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.0,
+            47.0
+          ]
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            197.0,
+            231.0
+          ]
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            628.5,
+            662.5
+          ]
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            197.01,
+            231.01
+          ]
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            628.5,
+            662.5
+          ]
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            181.5,
+            215.5
+          ]
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            613.0,
+            647.0
+          ]
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            181.5,
+            215.5
+          ]
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            612.99,
+            646.99
+          ]
+        },
+        {
+          "wall_idx": 28,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            13.01,
+            47.01
+          ]
+        },
+        {
+          "wall_idx": 27,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            338.0,
+            372.0
+          ]
+        },
+        {
+          "wall_idx": 29,
+          "course_index": 2,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            352.0,
+            386.0
+          ]
+        },
+        {
+          "wall_idx": 88,
+          "course_index": 3,
+          "code": "B34",
+          "verdict": "DENTRO",
+          "t_range_cm": [
+            7.0,
+            41.0
+          ]
+        },
+        {
+          "wall_idx": 4,
+          "course_index": 4,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            740.01,
+            774.01
+          ]
+        },
+        {
+          "wall_idx": 5,
+          "course_index": 4,
+          "code": "B34",
+          "verdict": "PARCIAL",
+          "t_range_cm": [
+            400.01,
+            434.01
+          ]
+        }
+      ]
+    },
+    "cross_check_against_classify_extent_against_openings": {
+      "sampled": 60,
+      "agree": 60,
+      "disagree": 0,
+      "samples": [
+        {
+          "wall_idx": 4,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 5,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 6,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 7,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 49,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 51,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 55,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 8,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 11,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 9,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 10,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 28,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 27,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 29,
+          "course_index": 0,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        },
+        {
+          "wall_idx": 88,
+          "course_index": 1,
+          "code": "B34",
+          "own_verdict": "DENTRO",
+          "production_verdict": "DENTRO",
+          "agree": true
+        },
+        {
+          "wall_idx": 4,
+          "course_index": 2,
+          "code": "B34",
+          "own_verdict": "PARCIAL",
+          "production_verdict": "PARCIAL",
+          "agree": true
+        }
+      ]
+    }
+  },
+  "coverage_and_performance": {
+    "total_walls": 167,
+    "walls_not_modulated_at_all": 29,
+    "walls_not_modulated_idx": [
+      63,
+      64,
+      97,
+      136,
+      137,
+      138,
+      139,
+      141,
+      142,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165
+    ],
+    "walls_with_at_least_one_non_modular_segment": 124,
+    "cause_ranking": {
+      "L_T_X_FAILURE": 13,
+      "LENGTH_ARITHMETIC": 9,
+      "OPENING": 7
+    },
+    "cause_examples": {
+      "L_T_X_FAILURE": [
+        {
+          "wall_idx": 63,
+          "length_cm": 197.943,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            217,
+            270
+          ]
+        },
+        {
+          "wall_idx": 64,
+          "length_cm": 197.943,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            216,
+            271
+          ]
+        },
+        {
+          "wall_idx": 97,
+          "length_cm": 99.754,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            265,
+            272
+          ]
+        },
+        {
+          "wall_idx": 137,
+          "length_cm": 24.451,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            215,
+            216
+          ]
+        },
+        {
+          "wall_idx": 138,
+          "length_cm": 22.08,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            217,
+            218
+          ]
+        },
+        {
+          "wall_idx": 139,
+          "length_cm": 27.003,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            220
+          ]
+        },
+        {
+          "wall_idx": 141,
+          "length_cm": 36.577,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            222
+          ]
+        },
+        {
+          "wall_idx": 142,
+          "length_cm": 36.577,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            223
+          ]
+        },
+        {
+          "wall_idx": 145,
+          "length_cm": 16.532,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            226
+          ]
+        },
+        {
+          "wall_idx": 155,
+          "length_cm": 5.08,
+          "thickness_cm": 14.0,
+          "failing_node_idxs": [
+            240,
+            241
+          ]
+        }
+      ],
+      "LENGTH_ARITHMETIC": [
+        {
+          "wall_idx": 136,
+          "length_cm": 15.0,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 144,
+          "length_cm": 15.708,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 146,
+          "length_cm": 8.267,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 147,
+          "length_cm": 8.0,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 148,
+          "length_cm": 14.0,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 149,
+          "length_cm": 8.0,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 150,
+          "length_cm": 8.0,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 151,
+          "length_cm": 16.551,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 152,
+          "length_cm": 15.728,
+          "thickness_cm": 14.0
+        }
+      ],
+      "OPENING": [
+        {
+          "wall_idx": 159,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 160,
+          "length_cm": 4.446,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 161,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 162,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 163,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 164,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        },
+        {
+          "wall_idx": 165,
+          "length_cm": 4.445,
+          "thickness_cm": 14.0
+        }
+      ]
+    },
+    "not_modulated_length_cm_buckets": {
+      "100-300": 2,
+      "50-100": 1,
+      "<50": 26
+    },
+    "performance": {
+      "solver_elapsed_s": 3.468,
+      "num_courses": 17,
+      "num_bands": 8,
+      "total_candidates_all_variants": 10158,
+      "total_materialized_pieces": 10657,
+      "note": "hotspot conhecido, ja' documentado em REGRAS_MODULACAO_BLOCOS.md 26.1 (item M do plano): merge_collinear_fragments e a varredura O(n^2) de find_wall_pairs na FASE A, ANTES deste solver de blocos - nao remedido aqui, so' referenciado."
+    }
+  },
+  "determinism": {
+    "project_id": "torre_easy_lo_r00_tgd",
+    "runs": [
+      {
+        "name": "baseline",
+        "fingerprint": "fb521bcd8fc125981eadc487652632569461c26b4acb76f3b2a229fa6d4343fe",
+        "n_pieces": 10657,
+        "elapsed_s": 3.732,
+        "n_walls": 167,
+        "n_non_modular": 3023,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "reversed",
+        "fingerprint": "2ba28e9d45267f36a320c2a18619213d95c43a25fc0172c9b3bf2444be639e8f",
+        "n_pieces": 10611,
+        "elapsed_s": 3.875,
+        "n_walls": 167,
+        "n_non_modular": 3063,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "endpoint_reversal",
+        "fingerprint": "4f22d62c23dddb261366c9ef8e79da430d00ed3ea06836b621111291885346f7",
+        "n_pieces": 10635,
+        "elapsed_s": 3.558,
+        "n_walls": 167,
+        "n_non_modular": 3048,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "shuffle_seed_1",
+        "fingerprint": "50ddb9dac74a43fba4ca77d32b39e4fda00f5a21b95c7f0dc10f68fde20e4a31",
+        "n_pieces": 10626,
+        "elapsed_s": 3.846,
+        "n_walls": 167,
+        "n_non_modular": 3055,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "shuffle_seed_2",
+        "fingerprint": "98238ce850349137995e0e260049568af7add0b06e8ae0c5c442b68a4e7d3f51",
+        "n_pieces": 10695,
+        "elapsed_s": 3.588,
+        "n_walls": 167,
+        "n_non_modular": 3087,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "shuffle_seed_3",
+        "fingerprint": "731939426d75f49e94027a7dbce88eaf2ed8aa833e2e5be9e820b576d14e4ef2",
+        "n_pieces": 10706,
+        "elapsed_s": 3.805,
+        "n_walls": 167,
+        "n_non_modular": 3039,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "shuffle_seed_10",
+        "fingerprint": "f5f1c421067a760121af6ec5307b93928f985c75c05087b9469c403089c14ced",
+        "n_pieces": 10579,
+        "elapsed_s": 4.003,
+        "n_walls": 167,
+        "n_non_modular": 3063,
+        "n_intersection_failures": 200
+      },
+      {
+        "name": "shuffle_seed_42",
+        "fingerprint": "c1e7ebc1a535400180b2fa627d99acb2f25d68babc19a00567880a96cc090f01",
+        "n_pieces": 10576,
+        "elapsed_s": 3.917,
+        "n_walls": 167,
+        "n_non_modular": 3103,
+        "n_intersection_failures": 200
+      }
+    ],
+    "distinct_fingerprints": 8,
+    "fingerprints": [
+      "2ba28e9d45267f36a320c2a18619213d95c43a25fc0172c9b3bf2444be639e8f",
+      "4f22d62c23dddb261366c9ef8e79da430d00ed3ea06836b621111291885346f7",
+      "50ddb9dac74a43fba4ca77d32b39e4fda00f5a21b95c7f0dc10f68fde20e4a31",
+      "731939426d75f49e94027a7dbce88eaf2ed8aa833e2e5be9e820b576d14e4ef2",
+      "98238ce850349137995e0e260049568af7add0b06e8ae0c5c442b68a4e7d3f51",
+      "c1e7ebc1a535400180b2fa627d99acb2f25d68babc19a00567880a96cc090f01",
+      "f5f1c421067a760121af6ec5307b93928f985c75c05087b9469c403089c14ced",
+      "fb521bcd8fc125981eadc487652632569461c26b4acb76f3b2a229fa6d4343fe"
+    ],
+    "deterministic": false,
+    "divergences": [
+      {
+        "variant": "reversed",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "reversed": {
+            "STRAIGHT_CONTINUATION": 9,
+            "T_INTERSECTION": 120,
+            "AMBIGUOUS": 11,
+            "FREE_END": 55,
+            "L_CORNER": 63,
+            "X_INTERSECTION": 17
+          }
+        }
+      },
+      {
+        "variant": "endpoint_reversal",
+        "first_divergent_layer": {
+          "layer": "piece_count_per_wall_geometry",
+          "diverging_wall_keys_sample": [
+            [
+              -1078.49,
+              187.05,
+              -139.48,
+              187.05,
+              14.0
+            ],
+            [
+              -1878.49,
+              -153.21,
+              -1494.48,
+              -153.21,
+              14.0
+            ],
+            [
+              103.52,
+              -559.95,
+              103.52,
+              24.05,
+              14.0
+            ],
+            [
+              586.52,
+              766.1,
+              2056.52,
+              766.1,
+              14.0
+            ],
+            [
+              1686.51,
+              370.05,
+              2056.52,
+              370.05,
+              14.0
+            ]
+          ]
+        }
+      },
+      {
+        "variant": "shuffle_seed_1",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "shuffle_seed_1": {
+            "L_CORNER": 63,
+            "STRAIGHT_CONTINUATION": 9,
+            "AMBIGUOUS": 11,
+            "T_INTERSECTION": 119,
+            "FREE_END": 55,
+            "X_INTERSECTION": 17
+          }
+        }
+      },
+      {
+        "variant": "shuffle_seed_2",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "shuffle_seed_2": {
+            "T_INTERSECTION": 120,
+            "FREE_END": 55,
+            "L_CORNER": 63,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          }
+        }
+      },
+      {
+        "variant": "shuffle_seed_3",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "shuffle_seed_3": {
+            "T_INTERSECTION": 120,
+            "AMBIGUOUS": 11,
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          }
+        }
+      },
+      {
+        "variant": "shuffle_seed_10",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "shuffle_seed_10": {
+            "FREE_END": 55,
+            "T_INTERSECTION": 119,
+            "L_CORNER": 63,
+            "STRAIGHT_CONTINUATION": 9,
+            "AMBIGUOUS": 11,
+            "X_INTERSECTION": 17
+          }
+        }
+      },
+      {
+        "variant": "shuffle_seed_42",
+        "first_divergent_layer": {
+          "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+          "baseline": {
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "T_INTERSECTION": 118,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          },
+          "shuffle_seed_42": {
+            "T_INTERSECTION": 119,
+            "L_CORNER": 63,
+            "FREE_END": 55,
+            "AMBIGUOUS": 11,
+            "STRAIGHT_CONTINUATION": 9,
+            "X_INTERSECTION": 17
+          }
+        }
+      }
+    ]
+  },
+  "secondary_projects_summary": [
+    {
+      "project_id": "piloto_sintetico_2x2",
+      "n_walls": 12,
+      "n_pieces_materialized": 768,
+      "n_non_modular": 32,
+      "n_intersection_failures": 0,
+      "elapsed_s": 0.075
+    },
+    {
+      "project_id": "torre_easy_lo_r00_tp1",
+      "n_walls": 96,
+      "n_pieces_materialized": 18092,
+      "n_non_modular": 278,
+      "n_intersection_failures": 0,
+      "elapsed_s": 3.35
+    }
+  ]
+}

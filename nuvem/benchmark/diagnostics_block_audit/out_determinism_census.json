@@ -1,0 +1,266 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "runs": [
+    {
+      "name": "baseline",
+      "fingerprint": "fb521bcd8fc125981eadc487652632569461c26b4acb76f3b2a229fa6d4343fe",
+      "n_pieces": 10657,
+      "elapsed_s": 3.135,
+      "n_walls": 167,
+      "n_non_modular": 3023,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "reversed",
+      "fingerprint": "2ba28e9d45267f36a320c2a18619213d95c43a25fc0172c9b3bf2444be639e8f",
+      "n_pieces": 10611,
+      "elapsed_s": 3.432,
+      "n_walls": 167,
+      "n_non_modular": 3063,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "endpoint_reversal",
+      "fingerprint": "4f22d62c23dddb261366c9ef8e79da430d00ed3ea06836b621111291885346f7",
+      "n_pieces": 10635,
+      "elapsed_s": 3.333,
+      "n_walls": 167,
+      "n_non_modular": 3048,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "shuffle_seed_1",
+      "fingerprint": "50ddb9dac74a43fba4ca77d32b39e4fda00f5a21b95c7f0dc10f68fde20e4a31",
+      "n_pieces": 10626,
+      "elapsed_s": 3.578,
+      "n_walls": 167,
+      "n_non_modular": 3055,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "shuffle_seed_2",
+      "fingerprint": "98238ce850349137995e0e260049568af7add0b06e8ae0c5c442b68a4e7d3f51",
+      "n_pieces": 10695,
+      "elapsed_s": 3.422,
+      "n_walls": 167,
+      "n_non_modular": 3087,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "shuffle_seed_3",
+      "fingerprint": "731939426d75f49e94027a7dbce88eaf2ed8aa833e2e5be9e820b576d14e4ef2",
+      "n_pieces": 10706,
+      "elapsed_s": 3.803,
+      "n_walls": 167,
+      "n_non_modular": 3039,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "shuffle_seed_10",
+      "fingerprint": "f5f1c421067a760121af6ec5307b93928f985c75c05087b9469c403089c14ced",
+      "n_pieces": 10579,
+      "elapsed_s": 3.585,
+      "n_walls": 167,
+      "n_non_modular": 3063,
+      "n_intersection_failures": 200
+    },
+    {
+      "name": "shuffle_seed_42",
+      "fingerprint": "c1e7ebc1a535400180b2fa627d99acb2f25d68babc19a00567880a96cc090f01",
+      "n_pieces": 10576,
+      "elapsed_s": 3.651,
+      "n_walls": 167,
+      "n_non_modular": 3103,
+      "n_intersection_failures": 200
+    }
+  ],
+  "distinct_fingerprints": 8,
+  "fingerprints": [
+    "2ba28e9d45267f36a320c2a18619213d95c43a25fc0172c9b3bf2444be639e8f",
+    "4f22d62c23dddb261366c9ef8e79da430d00ed3ea06836b621111291885346f7",
+    "50ddb9dac74a43fba4ca77d32b39e4fda00f5a21b95c7f0dc10f68fde20e4a31",
+    "731939426d75f49e94027a7dbce88eaf2ed8aa833e2e5be9e820b576d14e4ef2",
+    "98238ce850349137995e0e260049568af7add0b06e8ae0c5c442b68a4e7d3f51",
+    "c1e7ebc1a535400180b2fa627d99acb2f25d68babc19a00567880a96cc090f01",
+    "f5f1c421067a760121af6ec5307b93928f985c75c05087b9469c403089c14ced",
+    "fb521bcd8fc125981eadc487652632569461c26b4acb76f3b2a229fa6d4343fe"
+  ],
+  "deterministic": false,
+  "divergences": [
+    {
+      "variant": "reversed",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "reversed": {
+          "STRAIGHT_CONTINUATION": 9,
+          "T_INTERSECTION": 120,
+          "AMBIGUOUS": 11,
+          "FREE_END": 55,
+          "L_CORNER": 63,
+          "X_INTERSECTION": 17
+        }
+      }
+    },
+    {
+      "variant": "endpoint_reversal",
+      "first_divergent_layer": {
+        "layer": "piece_count_per_wall_geometry",
+        "diverging_wall_keys_sample": [
+          [
+            -1078.49,
+            187.05,
+            -139.48,
+            187.05,
+            14.0
+          ],
+          [
+            -1878.49,
+            -153.21,
+            -1494.48,
+            -153.21,
+            14.0
+          ],
+          [
+            103.52,
+            -559.95,
+            103.52,
+            24.05,
+            14.0
+          ],
+          [
+            586.52,
+            766.1,
+            2056.52,
+            766.1,
+            14.0
+          ],
+          [
+            1686.51,
+            370.05,
+            2056.52,
+            370.05,
+            14.0
+          ]
+        ]
+      }
+    },
+    {
+      "variant": "shuffle_seed_1",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "shuffle_seed_1": {
+          "L_CORNER": 63,
+          "STRAIGHT_CONTINUATION": 9,
+          "AMBIGUOUS": 11,
+          "T_INTERSECTION": 119,
+          "FREE_END": 55,
+          "X_INTERSECTION": 17
+        }
+      }
+    },
+    {
+      "variant": "shuffle_seed_2",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "shuffle_seed_2": {
+          "T_INTERSECTION": 120,
+          "FREE_END": 55,
+          "L_CORNER": 63,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        }
+      }
+    },
+    {
+      "variant": "shuffle_seed_3",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "shuffle_seed_3": {
+          "T_INTERSECTION": 120,
+          "AMBIGUOUS": 11,
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        }
+      }
+    },
+    {
+      "variant": "shuffle_seed_10",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "shuffle_seed_10": {
+          "FREE_END": 55,
+          "T_INTERSECTION": 119,
+          "L_CORNER": 63,
+          "STRAIGHT_CONTINUATION": 9,
+          "AMBIGUOUS": 11,
+          "X_INTERSECTION": 17
+        }
+      }
+    },
+    {
+      "variant": "shuffle_seed_42",
+      "first_divergent_layer": {
+        "layer": "wall_graph_nodes (L/T/X/FREE_END/...)",
+        "baseline": {
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "T_INTERSECTION": 118,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        },
+        "shuffle_seed_42": {
+          "T_INTERSECTION": 119,
+          "L_CORNER": 63,
+          "FREE_END": 55,
+          "AMBIGUOUS": 11,
+          "STRAIGHT_CONTINUATION": 9,
+          "X_INTERSECTION": 17
+        }
+      }
+    }
+  ]
+}
