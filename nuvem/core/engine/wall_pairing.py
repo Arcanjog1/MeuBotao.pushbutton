@@ -1368,7 +1368,15 @@ def deduplicate_walls(walls_to_create):
                 continue
             if not are_lines_parallel(line, kept_line):
                 continue
-            if get_distance_between_parallel_lines(line, kept_line) > DUPLICATE_AXIS_TOLERANCE_FT:
+            # CR-2F-A: o predicado de duplicidade passa a ser exigido nas
+            # DUAS direcoes (ver o bloco CR-2F-A em core/engine/geometry.py).
+            # Medido sobre os 199 pares aceitos do projeto real: 1 violacao
+            # de `compat(A,B) == compat(B,A)` antes, 0 depois. So' o
+            # PREDICADO muda - a ordenacao por comprimento e a politica de
+            # manter a mais longa do grupo continuam exatamente as mesmas
+            # (isso e' CR-2F-D).
+            if not symmetric_lines_within_distance(line, kept_line,
+                                                   DUPLICATE_AXIS_TOLERANCE_FT):
                 continue
             if not lines_overlap_enough(line, kept_line):
                 continue
