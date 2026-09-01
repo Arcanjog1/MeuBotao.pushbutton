@@ -1,0 +1,11 @@
+{
+ "segments": 9258,
+ "near_pairs": 281162,
+ "merge_asym_before": 393,
+ "merge_asym_after": 0,
+ "merge_worst_delta_cm": 182.9642290829286,
+ "dedup_candidates": 1670,
+ "dedup_asym_before": 1,
+ "dedup_asym_after": 0,
+ "accepted_walls": 199
+}

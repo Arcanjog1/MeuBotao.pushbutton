@@ -7535,3 +7535,256 @@ def test_conflito_de_abertura_e_descrito_de_forma_util_no_relatorio():
     }
     texto = m.describe_non_modular_entry(sem_espaco)
     assert "WALL_START" in texto and "OPENING_LO" in texto, texto
+
+
+# --------------------------------- CR-2F-A (INV-MERGE-SYM / INV-DEDUP-SYM)
+# MERGE_RELATION_ASYMMETRY (nuvem/benchmark/RELATORIO_ETAPA_2F.md item R):
+# a relacao de compatibilidade que forma os clusters do merge - e a relacao
+# de duplicidade de `deduplicate_walls` - media o PONTO MEDIO da PRIMEIRA
+# linha contra a RETA INFINITA da segunda. Como `are_lines_parallel` aceita
+# ate' 2,87 graus, `d(A,B) != d(B,A)`, e quem entrava como primeiro argumento
+# era so' a POSICAO na lista. Censo medido no projeto real: 393 pares com
+# veredito dependente da direcao no merge, 1 no `deduplicate_walls`.
+#
+# O CR-2F-A troca `d(A,B) <= tol` por `max(d(A,B), d(B,A)) <= tol` (estrategia
+# T2), nos QUATRO sitios de producao. Os testes abaixo travam a PROPRIEDADE
+# `compat(A,B) == compat(B,A)` - nao o placar do gabarito.
+#
+# ESCOPO: o CR-2F-A entrega SIMETRIA DA RELACAO. Ele NAO entrega invariancia
+# do merge a' ordem da lista: a relacao continua NAO TRANSITIVA e o
+# agrupamento continua sendo ESTRELA. Isso e' o CR-2F-D, e nenhum teste aqui
+# pode cobrar isso deste CR.
+
+def _sym_asymmetric_pair_cm():
+    """Par sintetico (em cm) em que a formula ANTIGA da vereditos OPOSTOS
+    conforme a ordem, para QUALQUER tolerancia entre ~0 e 10cm.
+
+      base : reta longa inclinada 0,5729 grau, de (-2000;0) a (2000;40);
+             passa exatamente por (1000;30) e tem ponto medio em (0;20).
+      frag : fragmento horizontal curto em y=30, centrado em x=1000.
+
+    d(frag, base) = 0     -> o ponto medio do fragmento cai EM CIMA da reta
+    d(base, frag) = 10cm  -> o ponto medio da reta longa esta' a 10cm da
+                             reta do fragmento
+
+    Nao ha nada de excepcional na geometria: e' so' uma reta longa levemente
+    inclinada (dentro dos 2,87 graus aceitos como "paralelo") ao lado de um
+    trecho curto - a configuracao mais comum de um Layer de CAD real."""
+    base = seg(-2000.0, 0.0, 2000.0, 40.0)
+    frag = seg(995.0, 30.0, 1005.0, 30.0)
+    return base, frag
+
+
+def _sym_directional_distances_cm(a, b):
+    ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+    return (to_cm(m._distance_between_parallel_cached(ca, cb)),
+            to_cm(m._distance_between_parallel_cached(cb, ca)))
+
+
+@case
+def test_INV_MERGE_SYM_001_compat_A_B_igual_compat_B_A():
+    """INV-MERGE-SYM-001: `compat(A,B) == compat(B,A)` para a relacao que o
+    merge usa, varrida sobre uma GRADE sintetica de inclinacoes e
+    afastamentos - nenhum id, comprimento ou par do projeto real aparece
+    aqui.
+
+    O bloco de controle no fim prova que a grade EXERCITA a assimetria: a
+    primitiva antiga, sozinha, discorda de si mesma em varios desses pares.
+    Sem esse controle o teste passaria trivialmente numa grade simetrica."""
+    tol = m.COLLINEAR_MATCH_TOLERANCE_FT
+    grade = []
+    for angulo_grau in (0.0, 0.05, 0.2, 0.5, 1.0, 2.0, 2.8):
+        dy = 4000.0 * math.tan(math.radians(angulo_grau))
+        longa = seg(-2000.0, 0.0, 2000.0, dy)
+        for centro_x in (-1500.0, -800.0, 0.0, 800.0, 1500.0):
+            # o fragmento fica exatamente sobre a reta longa naquele x
+            y = dy * 0.5 + centro_x * (dy / 4000.0)
+            for comprimento in (4.0, 40.0, 400.0):
+                for offset in (0.0, 0.1, 0.19, 0.25, 1.0):
+                    curta = seg(centro_x - comprimento / 2.0, y + offset,
+                                centro_x + comprimento / 2.0, y + offset)
+                    grade.append((longa, curta))
+    assert len(grade) == 525, len(grade)
+
+    def agrupou(lines):
+        """CAIXA-PRETA: o merge de producao juntou os dois num cluster so'?"""
+        out = m.merge_collinear_fragments(
+            lines, tol, m.MAX_JUNCTION_GAP_FT, [],
+            m.OPENING_GAP_PERP_TOLERANCE_FT, m.OPENING_GAP_WIDTH_SLACK_FT)
+        return len(out) == 1
+
+    violacoes = []
+    for a, b in grade:
+        if agrupou([a, b]) != agrupou([b, a]):
+            violacoes.append((_sym_directional_distances_cm(a, b),
+                              agrupou([a, b]), agrupou([b, a])))
+    assert violacoes == [], violacoes[:5]
+
+    # a MESMA propriedade, agora no predicado que os quatro sitios chamam
+    for a, b in grade:
+        ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+        ab = (m._are_parallel_cached(ca, cb) and
+              m._symmetric_within_distance_cached(ca, cb, tol))
+        ba = (m._are_parallel_cached(cb, ca) and
+              m._symmetric_within_distance_cached(cb, ca, tol))
+        assert ab == ba, (_sym_directional_distances_cm(a, b), ab, ba)
+
+    # CONTROLE: a mesma grade, com a primitiva ANTIGA, e' assimetrica. Se
+    # este numero virar zero, a grade parou de exercitar o defeito e o teste
+    # acima deixou de provar qualquer coisa.
+    assimetricos = 0
+    for a, b in grade:
+        ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+        if not m._are_parallel_cached(ca, cb):
+            continue
+        ab = m._distance_between_parallel_cached(ca, cb) <= tol
+        ba = m._distance_between_parallel_cached(cb, ca) <= tol
+        if ab != ba:
+            assimetricos += 1
+    assert assimetricos >= 50, assimetricos
+
+
+@case
+def test_INV_MERGE_SYM_002_caso_angular_minimo_ordem_da_lista():
+    """INV-MERGE-SYM-002: caso sintetico minimo (2 segmentos) em que a
+    implementacao ANTIGA dava vereditos diferentes conforme quem entrava
+    como A e quem entrava como B - agora `merge_collinear_fragments` tem de
+    devolver a MESMA geometria nas duas ordens.
+
+    E' o teste de caixa-preta do CR-2F-A: nao toca em nenhum helper novo,
+    so' na funcao de producao."""
+    base, frag = _sym_asymmetric_pair_cm()
+
+    # o defeito, medido: as duas direcoes caem em lados OPOSTOS da tolerancia
+    d_bf, d_fb = _sym_directional_distances_cm(base, frag)
+    tol_cm = to_cm(m.COLLINEAR_MATCH_TOLERANCE_FT)
+    assert d_fb <= tol_cm < d_bf, (d_bf, d_fb, tol_cm)
+    assert abs(d_bf - 10.0) < 0.01, d_bf
+    assert d_fb < 1e-6, d_fb
+
+    def merge(lines):
+        out = m.merge_collinear_fragments(
+            lines, m.COLLINEAR_MATCH_TOLERANCE_FT, m.MAX_JUNCTION_GAP_FT,
+            [], m.OPENING_GAP_PERP_TOLERANCE_FT, m.OPENING_GAP_WIDTH_SLACK_FT)
+        chaves = []
+        for line in out:
+            p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+            a = (round(to_cm(p0.X), 3), round(to_cm(p0.Y), 3))
+            b = (round(to_cm(p1.X), 3), round(to_cm(p1.Y), 3))
+            chaves.append((a, b) if a <= b else (b, a))
+        return sorted(chaves)
+
+    direto = merge([base, frag])
+    invertido = merge([frag, base])
+    assert direto == invertido, (direto, invertido)
+
+    # e o veredito correto e' NAO agrupar: um fragmento cujo ponto medio
+    # cai sobre a reta longa, mas que esta' 10cm fora dela nas pontas, nao
+    # e' colinear com ela.
+    assert len(direto) == 2, direto
+
+
+@case
+def test_INV_MERGE_SYM_003_todos_os_sitios_usam_a_mesma_propriedade():
+    """INV-MERGE-SYM-003: os QUATRO sitios de producao que criam ou removem
+    geometria com essa relacao usam a MESMA propriedade simetrica.
+
+    Duas travas independentes:
+      (a) COMPORTAMENTO - as duas gemeas (`_symmetric_within_distance_cached`,
+          sobre o cache, e `symmetric_lines_within_distance`, sobre `Line`)
+          concordam par a par numa grade sintetica;
+      (b) FONTE - nenhum dos quatro sitios voltou a chamar a primitiva
+          assimetrica direto. E' o que impede a divergencia futura entre
+          eles, que e' exatamente como este defeito nasceu em quatro lugares
+          diferentes."""
+    raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    fontes = {}
+    for nome in ("geometry", "wall_pairing"):
+        caminho = os.path.join(raiz, "nuvem", "core", "engine", nome + ".py")
+        with open(caminho, encoding="utf-8") as fh:
+            fontes[nome] = fh.read()
+
+    def corpo(fonte, nome_funcao):
+        marca = "\ndef " + nome_funcao + "("
+        ini = fonte.index(marca) + 1
+        resto = fonte[ini:]
+        fim = resto.index("\ndef ", 1)
+        return resto[:fim]
+
+    sitios = (
+        ("geometry", "merge_collinear_fragments"),
+        ("geometry", "_bridge_clusters_via_openings"),
+        ("geometry", "_clusters_bridge_via_opening"),
+        ("wall_pairing", "deduplicate_walls"),
+    )
+    for arquivo, funcao in sitios:
+        texto = corpo(fontes[arquivo], funcao)
+        # linhas de CODIGO (comentario nao conta)
+        codigo = "\n".join(l for l in texto.splitlines()
+                           if not l.lstrip().startswith("#"))
+        assert ("_symmetric_within_distance_cached(" in codigo or
+                "symmetric_lines_within_distance(" in codigo), (arquivo, funcao)
+        assert "_distance_between_parallel_cached(" not in codigo, (arquivo, funcao)
+        assert "get_distance_between_parallel_lines(" not in codigo, (arquivo, funcao)
+
+    tol = m.COLLINEAR_MATCH_TOLERANCE_FT
+    base, frag = _sym_asymmetric_pair_cm()
+    grade = [(base, frag), (frag, base), (base, base), (frag, frag),
+             (seg(0, 0, 500, 0), seg(0, 0.1, 500, 0.1)),
+             (seg(0, 0, 500, 0), seg(0, 5.0, 500, 5.0))]
+    for a, b in grade:
+        cached = m._symmetric_within_distance_cached(
+            m._line_geom_cache(a), m._line_geom_cache(b), tol)
+        direta = m.symmetric_lines_within_distance(a, b, tol)
+        assert cached == direta, (cached, direta)
+        # e as duas sao simetricas
+        assert cached == m._symmetric_within_distance_cached(
+            m._line_geom_cache(b), m._line_geom_cache(a), tol)
+        assert direta == m.symmetric_lines_within_distance(b, a, tol)
+
+
+@case
+def test_INV_DEDUP_SYM_001_predicado_de_duplicidade_e_simetrico():
+    """INV-DEDUP-SYM-001: o predicado de duplicidade de `deduplicate_walls`
+    e' simetrico - e a POLITICA de retencao continua exatamente a mesma.
+
+    Primeira parte: duas paredes em que a formula antiga dizia "duplicata"
+    numa direcao e "nao duplicata" na outra. As duas ordens de entrada tem
+    de devolver o MESMO conjunto de paredes, e nenhuma pode ser removida:
+    uma reta longa levemente inclinada nao e' duplicata de um trecho curto
+    que so' encosta nela no meio.
+
+    Segunda parte (nao-regressao da politica, que pertence ao CR-2F-D e NAO
+    foi tocada): duas paredes que sao duplicatas de verdade - proximas nas
+    DUAS direcoes - continuam colapsando numa so', e a mantida continua
+    sendo A MAIS LONGA do grupo."""
+    espessura = ft(14.0)
+
+    longa_incl = seg(-2000.0, 0.0, 2000.0, 40.0)
+    curta = seg(950.0, 30.0, 1050.0, 30.0)
+    d_lc, d_cl = _sym_directional_distances_cm(longa_incl, curta)
+    tol_cm = to_cm(m.DUPLICATE_AXIS_TOLERANCE_FT)
+    assert d_cl <= tol_cm < d_lc, (d_lc, d_cl, tol_cm)
+
+    def dedup(lines):
+        kept, removed = m.deduplicate_walls([(l, espessura, (False, False))
+                                             for l in lines])
+        chaves = sorted(round(to_cm(w[0].Length), 3) for w in kept)
+        return chaves, removed
+
+    direto = dedup([longa_incl, curta])
+    invertido = dedup([curta, longa_incl])
+    assert direto == invertido, (direto, invertido)
+    assert direto[1] == 0, direto
+    assert len(direto[0]) == 2, direto
+
+    # POLITICA INTACTA: duplicata de verdade continua sendo removida, e
+    # sobra a MAIS LONGA.
+    longa = seg(0.0, 0.0, 800.0, 0.0)
+    sobreposta = seg(100.0, 1.0, 500.0, 1.0)
+    d_ab, d_ba = _sym_directional_distances_cm(longa, sobreposta)
+    assert max(d_ab, d_ba) <= tol_cm, (d_ab, d_ba, tol_cm)
+    for ordem in ([longa, sobreposta], [sobreposta, longa]):
+        chaves, removed = dedup(ordem)
+        assert removed == 1, (ordem, chaves, removed)
+        assert chaves == [800.0], chaves

@@ -45,6 +45,7 @@ __all__ = [
     "_line_pair_overlap_ft", "lines_overlap_enough",
     "_pair_frame_cached", "_pair_symmetric_overlap_ft_cached",
     "_pair_symmetric_thickness_ft_cached", "_line_identity_key_cached",
+    "_symmetric_within_distance_cached", "symmetric_lines_within_distance",
 ]
 
 
@@ -160,9 +161,9 @@ def _line_pair_overlap_ft_cached(cache1, cache2):
 #
 # As tres funcoes abaixo sao NOVAS e so' sao usadas por `find_wall_pairs`
 # (nuvem/core/engine/wall_pairing.py). `_distance_between_parallel_cached` e
-# `_line_pair_overlap_ft_cached` continuam intocadas e em uso por
-# `merge_collinear_fragments`/`_bridge_clusters_via_openings`
-# (CR-2F-A, fora de escopo aqui - ver PLANO_ETAPA_2G.md item B).
+# `_line_pair_overlap_ft_cached` continuam intocadas: o merge nunca deixou de
+# medir cada direcao com elas - o CR-2F-A (bloco mais abaixo) passou a exigir
+# as DUAS direcoes, sem mudar nenhuma das duas medicoes.
 #
 # A ideia: em vez de medir a partir de uma das duas linhas, construir um
 # referencial (base + normal + origem) que NAO tem lado - a bissetriz das
@@ -305,6 +306,87 @@ def _line_identity_key_cached(cache, nd=2):
     a = (round(p0.X * scale, nd), round(p0.Y * scale, nd))
     b = (round(p1.X * scale, nd), round(p1.Y * scale, nd))
     return (a, b) if a <= b else (b, a)
+
+
+# --- CR-2F-A (MERGE_RELATION_ASYMMETRY) -------------------------------------
+#
+# `get_distance_between_parallel_lines` / `_distance_between_parallel_cached`
+# medem o PONTO MEDIO da PRIMEIRA linha contra a RETA INFINITA da segunda.
+# Isso nao e' simetrico: `_are_parallel_cached` aceita ate' 2,87 graus de
+# desvio, e nessa faixa `d(A,B)` e `d(B,A)` projetam o MESMO vetor sobre
+# normais DIFERENTES - a diferenca cresce com a distancia entre os pontos
+# medios. Como quem entra como primeiro argumento e' so' a POSICAO na lista,
+# a relacao de compatibilidade que decide o agrupamento passa a depender da
+# ordem da entrada, nao so' da geometria.
+#
+# Censo medido no projeto real (9.258 segmentos de CAD, 281.162 pares
+# proximos, ver nuvem/benchmark/diagnostics_2j/):
+#   - 393 pares em que o VEREDITO de compatibilidade muda com a direcao;
+#   - pior |d(A,B) - d(B,A)| = 182,96 cm;
+#   - caso minimo: d(A,B) = 173,4015 cm (incompativel) contra
+#     d(B,A) = 0,0196 cm (compativel) - razao 8.841x, entre um fragmento de
+#     4,22 cm e uma linha de 65,00 cm cujos pontos medios distam 36,1 m.
+# E, ja' na ordem de producao: 39 fragmentos deslocados acima da propria
+# tolerancia de 0,20 cm, 21 acima de 10 cm, pior deslocamento 159,14 cm.
+#
+# A CORRECAO (estrategia T2 do RELATORIO_ETAPA_2F.md item T, aprovada pelo
+# usuario em 2026-09-01) e' exigir a compatibilidade nas DUAS direcoes:
+#
+#     max(d(A,B), d(B,A)) <= tolerancia
+#
+# que e' o mesmo que `d(A,B) <= tol E d(B,A) <= tol`. As duas funcoes abaixo
+# expoem exatamente essa propriedade como um PREDICADO (e nao como uma
+# distancia), por dois motivos:
+#
+#   1. A conjuncao e' COMUTATIVA, entao a simetria e' exata em IEEE-754 -
+#      nao depende de nenhum epsilon nem de desempate.
+#   2. Permite CURTO-CIRCUITO: quando a primeira direcao ja' reprova, a
+#      segunda nem e' calculada. Na passada 1 do merge (~7,9 M avaliacoes
+#      contra uma tolerancia de 2 mm) a esmagadora maioria dos pares reprova
+#      logo na primeira, entao o custo extra so' incide sobre os pares que
+#      realmente sao candidatos.
+#
+# CADA direcao continua sendo medida pela MESMA primitiva de sempre, bit a
+# bit - o que muda e' so' passar a exigir as duas. As primitivas assimetricas
+# seguem intactas e em uso pelos DIAGNOSTICOS que nao criam geometria
+# (`scan_possible_missed_bonecas`, `classify_unused_line_reason`,
+# `scan_candidate_thicknesses_cm`).
+#
+# ESCOPO: o CR-2F-A entrega a PROPRIEDADE `compat(A,B) == compat(B,A)`. Ele
+# NAO torna o merge invariante a' ordem da lista - a relacao continua NAO
+# TRANSITIVA e o agrupamento continua sendo ESTRELA (quem sai do `pop(0)`
+# vira a base e arrasta quem for compativel COM ELA). Isso e' o CR-2F-D, e
+# esta' medido: mesmo com a relacao simetrica, permutar a entrada ainda muda
+# o conjunto de linhas mescladas. Ver REGRAS_MODULACAO_BLOCOS.md 26.9.
+
+def _symmetric_within_distance_cached(cache1, cache2, tolerance_ft):
+    """`max(d(1,2), d(2,1)) <= tolerance_ft`, com as duas direcoes medidas
+    por `_distance_between_parallel_cached` e avaliadas com curto-circuito.
+
+    E' a versao SIMETRICA do teste de compatibilidade usado pelo merge:
+    trocar `cache1` por `cache2` devolve exatamente o mesmo booleano, porque
+    o `and` de baixo e' comutativo e cada parcela e' a mesma conta com os
+    argumentos trocados. Ver o bloco CR-2F-A acima."""
+    if _distance_between_parallel_cached(cache1, cache2) > tolerance_ft:
+        return False
+    return _distance_between_parallel_cached(cache2, cache1) <= tolerance_ft
+
+
+def symmetric_lines_within_distance(l1, l2, tolerance_ft):
+    """Gemea de `_symmetric_within_distance_cached` para os sitios que
+    trabalham direto com `Line` (sem o cache de `_line_geom_cache`): a MESMA
+    propriedade `max(d(1,2), d(2,1)) <= tolerance_ft`, medida pela primitiva
+    `get_distance_between_parallel_lines`.
+
+    As duas existem separadas para que cada sitio continue usando a MESMA
+    primitiva numerica que ja' usava (a versao cacheada reconstroi o ponto
+    medio como `p0 + direcao * (comprimento / 2)`, a de `Line` usa
+    `Evaluate(0.5, True)` - matematicamente identicas, ver `_line_geom_cache`).
+    O teste `INV-MERGE-SYM-003` prende as duas a' mesma propriedade, para
+    que nao possam divergir no futuro."""
+    if get_distance_between_parallel_lines(l1, l2) > tolerance_ft:
+        return False
+    return get_distance_between_parallel_lines(l2, l1) <= tolerance_ft
 
 
 def _xy_deviation_ft(curve_a, curve_b):
@@ -728,7 +810,12 @@ def _clusters_bridge_via_opening(cluster_a, cluster_b, bridge_tolerance_ft, open
     ref_b = max(cluster_b, key=lambda line: line.GetEndPoint(0).DistanceTo(line.GetEndPoint(1)))
     if not are_lines_parallel(ref_a, ref_b):
         return False
-    if get_distance_between_parallel_lines(ref_a, ref_b) > bridge_tolerance_ft:
+    # CR-2F-A: compatibilidade exigida nas DUAS direcoes (ver o bloco
+    # CR-2F-A em geometry.py). Tem de ser o MESMO predicado do pre-filtro de
+    # _bridge_clusters_via_openings, senao o pre-filtro (que so' pode
+    # PARTICIONAR clusters que jamais se fundiriam) passaria a separar pares
+    # que este teste ainda aceitaria.
+    if not symmetric_lines_within_distance(ref_a, ref_b, bridge_tolerance_ft):
         return False
 
     p0, direction = _cluster_axis(cluster_a)
@@ -806,8 +893,11 @@ def _bridge_clusters_via_openings(raw_clusters, bridge_tolerance_ft, openings,
         cache_i = ref_caches[i]
         for j in range(i + 1, n):
             cache_j = ref_caches[j]
+            # CR-2F-A: mesmo predicado simetrico de
+            # _clusters_bridge_via_opening (ver o bloco CR-2F-A acima).
             if (_are_parallel_cached(cache_i, cache_j) and
-                    _distance_between_parallel_cached(cache_i, cache_j) <= bridge_tolerance_ft):
+                    _symmetric_within_distance_cached(cache_i, cache_j,
+                                                      bridge_tolerance_ft)):
                 union(i, j)
 
     groups = {}
@@ -893,8 +983,14 @@ def merge_collinear_fragments(lines, collinear_tolerance_ft, gap_tolerance_ft, o
         cluster = [base]
         rest = []
         for other, other_cache in remaining:
+            # CR-2F-A: a compatibilidade "colinear" passa a ser exigida
+            # nas DUAS direcoes. Sem isso, medir a partir de `base` ou a
+            # partir de `other` dava vereditos diferentes em 393 pares do
+            # projeto real (ver o bloco CR-2F-A em geometry.py), e quem era
+            # `base` era so' a posicao da linha na lista de entrada.
             if (_are_parallel_cached(base_cache, other_cache) and
-                    _distance_between_parallel_cached(base_cache, other_cache) <= collinear_tolerance_ft):
+                    _symmetric_within_distance_cached(base_cache, other_cache,
+                                                      collinear_tolerance_ft)):
                 cluster.append(other)
             else:
                 rest.append((other, other_cache))

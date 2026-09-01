@@ -2697,6 +2697,11 @@ qualquer edicao.
 **DOCUMENTADO - pendencia de codigo aberta**, registrada independentemente
 do plano do CR-1 em `nuvem/benchmark/PLANO_ETAPA_2D.md` (item Q).
 
+> **ATUALIZACAO (2026-09-01, `CR-2F-A`).** A causa `MERGE_RELATION_ASYMMETRY`
+> desta pendencia foi corrigida - ver **26.9**. A pendencia **continua
+> aberta**: a relacao ficou simetrica, mas o merge ainda depende da ordem
+> por NAO TRANSITIVIDADE + agrupamento ESTRELA (`CR-2F-D`, ver 26.9.4).
+
 ### 26.7 LIMITACAO REGISTRADA - so' existe UM projeto que exercita o pareamento
 
 **FATO MEDIDO:** `torre_easy_lo_r00_tp1` e `piloto_sintetico_2x2` tem
@@ -3097,6 +3102,13 @@ Alem disso, `deduplicate_walls` (`core/engine/wall_pairing.py`) usa
 mantem a ordem de entrada. **E' o quarto lugar do motor com a mesma
 assimetria de relacao, e pertence ao `CR-2F-A`/`CR-2F-D`.**
 
+> **CONFLITO RESOLVIDO (2026-09-01, `CR-2F-A`) - ver 26.9.5.** A ASSIMETRIA
+> do `deduplicate_walls` era mesmo do `CR-2F-A` e ja' foi corrigida. Mas a
+> perda da `W097` **NAO** e' causada por ela: medido, `d(boa, espuria) =
+> 0,3633 cm` e `d(espuria, boa) = 0,2577 cm` - **as duas abaixo dos 2 cm**,
+> entao a relacao simetrica continua vendo duplicata. Quem mata a `W097` e' a
+> politica "mantem a mais longa": **divida exclusiva do `CR-2F-D`.**
+
 #### 26.8.7.9 REGRA OBRIGATORIA - testes permanentes previstos para a
 implementacao
 
@@ -3214,6 +3226,14 @@ paredes**, com `W097` coberta.
 **E' PROIBIDO** corrigir isso dentro do `CR-2F-E` ou tratar o `>= 86` como
 tolerancia generica de regressao.
 
+> **ATRIBUICAO CORRIGIDA (2026-09-01, `CR-2F-A`) - ver 26.9.5.** A divida e'
+> do **`CR-2F-D` apenas**. O `CR-2F-A` foi implementado, simetrizou o
+> predicado do `deduplicate_walls` (1 violacao -> 0) e a `W097` **continua
+> ausente** - como previsto pela medicao feita antes de implementar. Alem
+> disso, a parede espuria de 43,9 m **nao nasce no merge**: e' um segmento
+> CRU do CAD (cluster de 1 fragmento), entao nenhuma correcao da relacao do
+> merge poderia elimina-la. O `H6'` segue valendo exatamente como esta'.
+
 #### 26.8.8.5 REGRA OBRIGATORIA - o gate `H6'` e a restricao de regressao
 
 `CONFIRMED`. Redacao aprovada pelo usuario em 2026-09-01. Um resultado do
@@ -3239,3 +3259,183 @@ exigir **87/97**.
 (`W004, W005, W006, W007, W025, W026, W046, W047, W084, W085`) e depois (as
 mesmas **mais `W097`**). Perdidas: `['W097']`. Ganhas: nenhuma. Identico nas
 5 permutacoes. Condicao 5 e 7 satisfeitas.
+
+---
+
+### 26.9 `CR-2F-A` IMPLEMENTADO - `MERGE_RELATION_ASYMMETRY` (2026-09-01)
+
+**Status:** `IMPLEMENTADO`. Branch `claude/cr-2f-a-baseline-scope-7036f5`.
+Contrato aprovado pelo usuario em 2026-09-01: **somente simetria da
+relacao (estrategia `T2`/`MAX`)**, com a `W097` explicitamente **fora**
+deste CR. Verificacao reproduzivel em
+`nuvem/benchmark/diagnostics_2j/run_a_census.py` e `run_b_downstream.py`.
+
+#### 26.9.1 REGRA OBRIGATORIA - uma relacao de compatibilidade geometrica tem de ser SIMETRICA
+
+`CONFIRMED`. Descoberto por censo exaustivo sobre o projeto real
+(`torre_easy_lo_r00_tgd`, 9.258 segmentos de CAD, 281.162 pares proximos),
+reproduzido no codigo de producao antes de qualquer alteracao.
+
+`get_distance_between_parallel_lines(A, B)` e sua gemea cacheada medem **o
+ponto medio de `A` contra a RETA INFINITA de `B`**. Isso nao e' simetrico:
+`are_lines_parallel` aceita ate' **2,87 graus**, e nessa faixa `d(A,B)` e
+`d(B,A)` projetam o MESMO vetor sobre normais DIFERENTES - o erro cresce
+com a distancia entre os pontos medios.
+
+**Como quem entra como primeiro argumento e' apenas a POSICAO na lista, a
+relacao que decide o agrupamento passava a depender da ORDEM DA ENTRADA, e
+nao so' da geometria.**
+
+Numeros medidos (antes da correcao):
+
+| | |
+|---|---|
+| pares com VEREDITO dependente da direcao (merge) | **393** |
+| pior `\|d(A,B) - d(B,A)\|` | **182,9642 cm** |
+| caso minimo (2 segmentos) | `d(A,B) = 173,4015 cm` (recusa) contra `d(B,A) = 0,0196 cm` (aceita) - razao **8.841x**, entre um fragmento de **4,22 cm** e uma linha de **65,00 cm** cujos pontos medios distam **36,1 m** |
+| fragmentos deslocados acima da propria tolerancia (0,20 cm), na ordem de PRODUCAO | **39** (21 acima de 10 cm, pior **159,14 cm**) |
+| pares com veredito dependente da direcao (`deduplicate_walls`) | **1** em 1.670 candidatos |
+
+**A REGRA:** onde uma relacao geometrica decide agrupar, fundir ou remover,
+ela tem de valer nas DUAS direcoes:
+
+```
+compat(A, B)  :=  max( d(A,B), d(B,A) ) <= tolerancia
+```
+
+que e' o mesmo que `d(A,B) <= tol E d(B,A) <= tol`. A conjuncao e'
+COMUTATIVA, entao a simetria e' **exata em IEEE-754** - nao depende de
+epsilon nem de desempate. Medido depois da correcao: **0 e 0**.
+
+#### 26.9.2 REGRA OBRIGATORIA - os QUATRO sitios usam a MESMA propriedade
+
+`CONFIRMED`. O mesmo defeito nasceu em quatro lugares porque cada sitio
+escreveu a comparacao por conta propria. A correcao centraliza a
+PROPRIEDADE em duas gemeas de `core/engine/geometry.py`:
+
+- `_symmetric_within_distance_cached(cache1, cache2, tolerance_ft)`
+- `symmetric_lines_within_distance(l1, l2, tolerance_ft)`
+
+| sitio | funcao | tratamento |
+|---|---|---|
+| `geometry.py` | `merge_collinear_fragments` (passada 1) | gemea cacheada |
+| `geometry.py` | `_bridge_clusters_via_openings` (pre-filtro Union-Find) | gemea cacheada |
+| `geometry.py` | `_clusters_bridge_via_opening` | gemea de `Line` |
+| `wall_pairing.py` | `deduplicate_walls` | gemea de `Line` |
+
+Os sitios 2 e 3 **tem** de mudar juntos: o pre-filtro so' pode particionar
+clusters que jamais se fundiriam, e isso deixa de valer se um dos dois for
+mais estrito que o outro.
+
+**Cada direcao continua sendo medida pela MESMA primitiva de sempre, bit a
+bit.** As primitivas assimetricas seguem intactas e em uso pelos
+DIAGNOSTICOS que nao criam geometria (`scan_possible_missed_bonecas`,
+`classify_unused_line_reason`, `scan_candidate_thicknesses_cm`).
+
+`INV-MERGE-SYM-003` (`tests/test_script.py`) le' o FONTE dos quatro sitios e
+reprova se algum voltar a chamar a primitiva assimetrica direto - e' o que
+impede a divergencia futura entre eles.
+
+#### 26.9.3 FATO MEDIDO - pipeline headless real, merge INCLUIDO (nao congelado)
+
+Producao + 5 permutacoes (seeds 1, 2, 3, 10, 42):
+
+| | ANTES | DEPOIS |
+|---|---|---|
+| linhas mescladas (producao) | 2868 | **2866** |
+| pares aceitos, nas 5 seeds | **197 a 209** | **201 em todas** |
+| paredes finais, nas 5 seeds | **148 a 159** | **144 em todas** |
+| cobertura do gabarito, nas 5 seeds | **84 a 86** | **86 em todas** |
+| eixos corretos, nas 5 seeds | **94 a 96** | **96 em todas** |
+| aberturas, nas 5 seeds | 91/91 | **91/91** |
+| 7 paredes monitoradas, nas 5 seeds | **5 a 7** | **7/7 em todas** |
+| espurias, nas 5 seeds | **4 a 6** | **4 em todas** |
+| `walls_lt50` / `walls_lt20` (producao) | 12 / 9 | **10 / 4** |
+| `solver_decision_fingerprint` | `c74c9c1a...` | **`c74c9c1a...` INALTERADO** |
+| custo de `merge_collinear_fragments` | 10,13 s | **9,48 s (-6,4%)** |
+
+> **Leitura obrigatoria do `148 -> 144`:** o `148` nao era uma propriedade da
+> geometria. Sob permutacao a mesma formula entregava `148, 154, 152, 153,
+> 153, 159`, perdendo `W053`/`W054` e duas monitoradas no seed 42. O `144`
+> de hoje e' **o mesmo nas seis execucoes**, com cobertura, eixo, aberturas
+> e monitoradas TAMBEM estaveis. As 4 paredes a menos sao fragmentos que so'
+> existiam porque um fragmento curto era declarado colinear com uma reta
+> longa que passava a 10 cm dele - `walls_lt20` cai de 9 para 4.
+
+> **O custo caiu, nao subiu.** A estimativa da 2F (`T2` = +30 a 50%) partia
+> de avaliar sempre as duas direcoes. A implementacao usa **curto-circuito**
+> (`d(A,B) > tol` ja' reprova sem calcular a segunda), e a relacao mais
+> estrita produz clusters menores - o laco interno encolhe mais do que a
+> segunda direcao custa.
+
+#### 26.9.4 REGRA OBRIGATORIA - o `CR-2F-A` entrega SIMETRIA, nao INVARIANCIA
+
+`CONFIRMED`, e **medido antes de implementar** para nao virar promessa
+falsa: mesmo com a relacao perfeitamente simetrica, permutar a entrada
+**ainda muda o conjunto de linhas mescladas** (2866 / 2867 / 2870 / 2871 /
+2866 / 2866; tres fingerprints distintos de parede final).
+
+O motivo nao e' a assimetria - e' que a relacao continua **NAO TRANSITIVA**
+e o agrupamento continua sendo **ESTRELA**: quem sai do `pop(0)` vira a
+`base` e arrasta quem for compativel **com ela**. Isso e' o `CR-2F-D`.
+
+**E' PROIBIDO** cobrar do `CR-2F-A` o gate "as 5 permutacoes produzem
+exatamente as mesmas paredes finais". Esse gate pertence ao `CR-2F-D`.
+
+#### 26.9.5 CONFLITO RESOLVIDO - a `W097` NAO pertence ao `CR-2F-A`
+
+`CONFIRMED`. **Corrige a atribuicao registrada em 26.8.7.8 e 26.8.8.4**, que
+dizia que a divida da `W097` pertencia ao `CR-2F-A`/`CR-2F-D`. Medido nesta
+etapa: **e' do `CR-2F-D` apenas.** Tres provas independentes:
+
+1. **A parede espuria de 43,9 m nao nasce no merge.** Reproduzindo a passada
+   1 e abrindo os clusters, a linha mesclada de `4.394,45 cm` a `1,1125
+   grau` vem de um cluster de **exatamente 1 fragmento** - e' um **segmento
+   CRU do CAD**, uma linha auxiliar ja' desenhada assim. Nenhuma correcao da
+   relacao do merge pode elimina-la, porque o merge nao a fabricou.
+2. **A assimetria do `deduplicate_walls` nao e' o que mata a `W097`.**
+   Medido nas duas direcoes: `d(boa, espuria) = 0,3633 cm` e
+   `d(espuria, boa) = 0,2577 cm` - **as DUAS abaixo de
+   `DUPLICATE_AXIS_TOLERANCE` (2 cm)**. A relacao simetrica continua
+   classificando a parede boa como duplicata.
+3. **Nenhuma familia de relacao simetrica no merge a recupera.** `MAX`,
+   `MIN` e `SPAN` (`T3` num referencial sem lado) foram medidas: as tres
+   mantem exatamente as mesmas 11 paredes ausentes, `W097` inclusive.
+
+**O que mata a `W097` e' a politica "mantem a MAIS LONGA do grupo"** -
+exatamente o `OUT_OF_SCOPE_CR_2F_D` de `PLANO_ETAPA_2I_CR_2F_E.md` item 9.
+**A divida do `H6'` e' do `CR-2F-D`.**
+
+**A politica de retencao do `deduplicate_walls` NAO foi tocada neste CR** -
+so' o predicado. `INV-DEDUP-SYM-001` trava as duas metades: o predicado tem
+de ser simetrico **e** uma duplicata de verdade tem de continuar colapsando
+na mais longa.
+
+#### 26.9.6 REGRA OBRIGATORIA - testes permanentes do `CR-2F-A`
+
+`IMPLEMENTADO` (2026-09-01), em `tests/test_script.py`. Os quatro reprovam
+no baseline `902bc70e` **pelo motivo geometrico correto** (verificado
+revertendo so' o motor e mantendo os testes):
+
+| id | trava | como reprova no baseline |
+|---|---|---|
+| `INV-MERGE-SYM-001` | `compat(A,B) == compat(B,A)` numa grade sintetica de 525 pares (7 inclinacoes x 5 posicoes x 3 comprimentos x 5 afastamentos), medida em CAIXA-PRETA pelo proprio `merge_collinear_fragments` | 216 pares agrupam numa ordem e nao na outra |
+| `INV-MERGE-SYM-002` | caso angular minimo (2 segmentos): `merge_collinear_fragments([A,B])` tem de dar a mesma geometria de `([B,A])` | uma ordem devolve 1 linha, a outra 2 |
+| `INV-MERGE-SYM-003` | as duas gemeas concordam par a par, **e** os quatro sitios nao chamam a primitiva assimetrica direto (leitura do FONTE) | `merge_collinear_fragments` ainda usa a primitiva assimetrica |
+| `INV-DEDUP-SYM-001` | predicado de duplicidade simetrico **e** politica de retencao intacta | remove 1 parede que nao e' duplicata nas duas direcoes |
+
+Nenhum deles cita `W097`, o par `(474, 2306)`, id de projeto, comprimento
+do gabarito ou qualquer numero do `input_real.json`: a geometria e' toda
+sintetica, construida no proprio teste.
+
+#### 26.9.7 DIVIDA CONHECIDA que continua aberta depois do `CR-2F-A`
+
+`CONFIRMED`. Registrado para nao se perder:
+
+- **`CR-2F-D`** - nao transitividade + agrupamento estrela + politica
+  "mantem a mais longa". Enquanto ele nao vier: as 5 permutacoes continuam
+  dando fingerprints de parede diferentes (26.9.4) e a `W097` continua
+  ausente (26.9.5). O `H6'` de 26.8.8.5 segue valendo como esta'.
+- **O pareamento `(474, 2306)`** - uma face de 155,61 cm pareada com uma
+  linha auxiliar de 4.394,45 cm inclinada 1,1125 grau. Nao e' merge, nao e'
+  eixo e nao e' deduplicacao: e' **pareamento**. Continua sem CR atribuido.
