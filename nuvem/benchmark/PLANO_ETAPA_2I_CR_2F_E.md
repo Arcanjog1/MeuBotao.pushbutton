@@ -1,7 +1,10 @@
 # ETAPA 2I — DIAGNÓSTICO E PLANO DO `CR-2F-E` (`CENTERLINE_ARGUMENT_ASYMMETRY`)
 
-> **Esta etapa é SOMENTE diagnóstico, análise de alternativas e plano.**
-> Nenhum arquivo de `nuvem/core/**` foi alterado. Todas as alternativas
+> **A análise foi SOMENTE diagnóstico.** O `S7` foi depois **aprovado e
+> implementado** (2026-09-01) — ver `REGRAS_MODULACAO_BLOCOS.md` §26.8.8 e
+> `diagnostics_2i/run_g_postimpl.py`. O texto abaixo é o registro da
+> investigação **como ela foi feita**, antes de qualquer alteração de
+> produção; os números do baseline referem-se ao estado pré-`CR-2F-E`. Todas as alternativas
 > foram avaliadas por injeção em memória (`lib2i.patched`), do mesmo jeito
 > que a Etapa 2G fez com os predicados do par.
 

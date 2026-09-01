@@ -2918,8 +2918,10 @@ FORA DE ESCOPO do `2F-E`/26.8.5) em 5 permutacoes das 2.868 linhas.
 
 ### 26.8.7 `CR-2F-E` diagnosticado - causa-raiz, censo e plano (Etapa 2I, 2026-09-01)
 
-**Status:** `DOCUMENTADO - pendencia de codigo aberta`. Nenhum arquivo de
-`nuvem/core/**` foi alterado nesta etapa. Diagnostico completo em
+**Status:** `IMPLEMENTADO` (2026-09-01, branch
+`claude/cr-2f-e-centerline-asymmetry-t4mc20`) - ver 26.8.8 para o resultado
+medido depois da implementacao. O diagnostico abaixo continua valendo como
+registro de COMO a causa foi encontrada. Diagnostico completo em
 `nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md`; laboratorio reproduzivel em
 `nuvem/benchmark/diagnostics_2i/`.
 
@@ -3038,8 +3040,8 @@ O criterio de aceitacao e' o erro de centralizacao medido por
 #### 26.8.7.7 EXCECAO PERMITIDA - o eixo cobre a UNIAO do alcance das duas
 faces, e a face MAIS LONGA e' a referencia legitima
 
-`PREFERRED` (proposta vencedora da 2I, `SYMMETRIC_LONGEST_SPAN` -
-`DOCUMENTADO, pendencia de codigo aberta`).
+`CONFIRMED` (vencedora da 2I, `SYMMETRIC_LONGEST_SPAN` - **`IMPLEMENTADA`**
+em 2026-09-01, ver 26.8.8).
 
 A regra ja' esta' declarada no proprio docstring de `create_centerline`: *"o
 eixo cobre a UNIAO do alcance das duas linhas... em cada ponta, usa a que for
@@ -3098,8 +3100,8 @@ assimetria de relacao, e pertence ao `CR-2F-A`/`CR-2F-D`.**
 #### 26.8.7.9 REGRA OBRIGATORIA - testes permanentes previstos para a
 implementacao
 
-`DOCUMENTADO - pendencia de codigo aberta`. Nada foi promovido para
-`tests/**` na etapa de analise. Na implementacao, em `tests/test_script.py`:
+`IMPLEMENTADO` (2026-09-01). Os quatro testes estao em
+`tests/test_script.py`:
 
 | id | trava |
 |---|---|
@@ -3110,3 +3112,130 @@ implementacao
 
 `INV-CENTER-003` fecha a lacuna que o `INV-PAIR-003` (26.8.6) deixou
 explicita: ele compara o conjunto de PARES, nunca o centerline.
+
+---
+
+### 26.8.8 `CR-2F-E` IMPLEMENTADO - `SYMMETRIC_LONGEST_SPAN` (2026-09-01)
+
+**Status:** `IMPLEMENTADO`. Branch `claude/cr-2f-e-centerline-asymmetry-t4mc20`.
+Aprovado pelo usuario com a emenda `H6'` e a restricao formal de regressao
+registrada em 26.8.8.4. Verificacao completa em
+`nuvem/benchmark/diagnostics_2i/run_g_postimpl.py` /
+`out_g_postimpl.json`.
+
+#### 26.8.8.1 O que mudou
+
+**Um unico arquivo de producao: `nuvem/core/engine/geometry.py`.**
+
+- `create_centerline(l1, l2, max_extension_ft)` - **mesma assinatura**,
+  mesmo retorno. O eixo passou a ser construido num referencial SEM LADO
+  (bissetriz das duas direcoes, origem no meio das quatro pontas), com a
+  face de REFERENCIA escolhida pelo COMPRIMENTO, nao pela posicao na lista.
+  Intervalo = **UNIAO** do alcance das duas faces, limitada a
+  `CENTERLINE_MAX_EXTENSION_FT` alem do alcance da face mais longa em cada
+  ponta. As pontas do eixo saem em ordem canonica (a menor primeiro).
+- Funcoes novas: `_pair_frame_lines`, `_interval_in_frame`,
+  `_axis_offset_in_frame`, `_line_span_key`.
+- **Nenhuma constante nova. Nenhuma chamada alterada** (`create_centerline`
+  tem um unico call-site de producao, em `find_wall_pairs`). Nenhuma funcao
+  removida.
+
+**NAO foram tocados:** `find_wall_pairs` (ranking, `thickness_rank`,
+predicados simetricos, chave de desempate, conjunto de candidatos, guloso),
+`merge_collinear_fragments`, **`deduplicate_walls`**,
+`extend_wall_ends_to_junctions`, `clip_centerline_to_caps`,
+`assign_openings_to_walls`, qualquer tolerancia.
+
+#### 26.8.8.2 FATO MEDIDO - pipeline headless real (2.868 linhas mescladas)
+
+| | antes | depois |
+|---|---|---|
+| `create_centerline(A,B)` != `(B,A)` | **47 / 199** | **0 / 199** |
+| eixo muda com o sentido dos endpoints | **14 / 199** | **0 / 597** (3 variantes) |
+| eixos que mudam por permutacao | **22 a 29** | **0, 0, 0, 0, 0** |
+| fingerprint das paredes finais | **difere nas 5 seeds** | **identico nas 5** |
+| pares aceitos | 199 | **199 (0 difs)** |
+| paredes finais | 148 | **148** |
+| cobertura do gabarito | 87/97 (mas **85-87** sob permutacao) | **86/97 nas 5 permutacoes** |
+| eixos corretos (<= 0,5 cm) | 96 | **96** |
+| aberturas | 91/91 | **91/91** |
+| 7 paredes monitoradas | 7/7 (mas **5-7** sob permutacao) | **7/7 nas 5 permutacoes** |
+| abertura 6558457 | atribuida | **atribuida** |
+| `walls_lt50` / `walls_lt20` | 23 / 16 | **12 / 9** |
+| erro de centralizacao (media) | 0,01781 cm | **0,01187 cm** |
+| erro de centralizacao (pior) | 1,1438 cm | 1,1541 cm |
+| custo de `create_centerline` | 4,38 ms / 199 pares | **1,24 ms (-71,7%)** |
+| `solver_decision_fingerprint` | `c74c9c1a...` | **`c74c9c1a...` INALTERADO** |
+
+`test_script.py` 241 passed · `tests/regression` 113 passed.
+
+> **Leitura obrigatoria dos `87 -> 86`:** o `87` anterior **nao era uma
+> propriedade da formula**. Sob permutacao a mesma formula entregava
+> `86, 87, 86, 86, 85` e perdia `W037`, `W001` ou `W010` conforme o sorteio.
+> O `86` de hoje e' **o mesmo nas cinco permutacoes**, e as paredes ausentes
+> sao **nominalmente as mesmas** em todas. Trocou-se um numero maior e
+> instavel por um numero estavel.
+
+#### 26.8.8.3 REGRA OBRIGATORIA - o eixo devolvido tem sentido CANONICO
+
+`CONFIRMED`. `create_centerline` devolve a `Line` sempre com a ponta
+lexicograficamente menor primeiro. O sentido nao muda a geometria da parede,
+mas muda a IDENTIDADE do objeto para os estagios seguintes
+(`deduplicate_walls`, `extend_wall_ends_to_junctions`, `build_wall_graph`) -
+sem isso, inverter o sentido em que uma face foi desenhada no CAD ainda
+mudaria o resultado final, mesmo com a geometria do eixo ja' simetrica.
+
+#### 26.8.8.4 DIVIDA CONHECIDA - `W097`, `OUT_OF_SCOPE_CR_2F_E`
+
+`CONFIRMED`. **Registro explicito exigido pelo usuario na aprovacao.**
+
+A unica parede do gabarito perdida em relacao ao numero anterior e' a
+**`W097`** (`(-153,5; 817,0) -> (345,5; 817,0)`, 499 cm), e a causa **nao e'
+`create_centerline`**:
+
+```
+ANTES do deduplicate_walls : parede (-346,5; 815,0) -> (360,5; 815,0), 707,0 cm  -> cobertura de W097 = 1,000
+DEPOIS do deduplicate_walls: removida                                            -> cobertura de W097 = 0,000
+```
+
+`deduplicate_walls` a trata como duplicata da parede **espuria de 4.394,2 cm**
+gerada pelo par `(474, 2306)`, e mantem "a mais longa do grupo" - que e' a
+espuria. A parede boa morre **porque o eixo passou a ser MAIS bem
+centralizado**: a espuria, agora bem centrada, cai a **0,363 cm** dela
+(`DUPLICATE_AXIS_TOLERANCE` = 2 cm); com a formula antiga ficava a
+**10,315 cm** e nao a alcancava.
+
+**Prova causal, refeita sobre o codigo de producao:** removendo do conjunto
+**apenas** os eixos com mais de 40 m (exatamente 1 parede) antes do
+`deduplicate_walls`, o resultado e' **87/97, eixo 96, 91/91, 7/7, 148
+paredes**, com `W097` coberta.
+
+**Divida a ser paga no `CR-2F-A`/`CR-2F-D`**, onde `deduplicate_walls` mora.
+**E' PROIBIDO** corrigir isso dentro do `CR-2F-E` ou tratar o `>= 86` como
+tolerancia generica de regressao.
+
+#### 26.8.8.5 REGRA OBRIGATORIA - o gate `H6'` e a restricao de regressao
+
+`CONFIRMED`. Redacao aprovada pelo usuario em 2026-09-01. Um resultado do
+Wall Modeling so' passa em `H6'` se **todas** as condicoes valerem:
+
+1. cobertura **>= 86/97**;
+2. resultado **identico nas 5 permutacoes** (seeds 1, 2, 3, 10, 42);
+3. **7/7** paredes monitoradas preservadas;
+4. todos os demais gates originais (`H1`-`H5`, `H7`-`H11`) **inalterados**;
+5. se a cobertura for **86** em vez de 87, a **UNICA** perda admissivel e' a
+   **`W097`**;
+6. a perda da `W097` tem de continuar sendo **reproduzida e atribuida** ao
+   mesmo falso positivo de `deduplicate_walls` com a parede espuria de
+   ~43,9 m (26.8.8.4);
+7. **qualquer outra parede perdida, mesmo mantendo 86/97, reprova `H6'`.**
+
+**O `>= 86` NAO e' uma tolerancia generica de regressao.** Ele vale
+exclusivamente para a divida nominal da `W097`, enquanto ela existir.
+Quando o `CR-2F-A`/`CR-2F-D` corrigir o `deduplicate_walls`, `H6'` volta a
+exigir **87/97**.
+
+**Verificado nesta implementacao:** paredes nao cobertas antes
+(`W004, W005, W006, W007, W025, W026, W046, W047, W084, W085`) e depois (as
+mesmas **mais `W097`**). Perdidas: `['W097']`. Ganhas: nenhuma. Identico nas
+5 permutacoes. Condicao 5 e 7 satisfeitas.

@@ -37,7 +37,9 @@ __all__ = [
     "get_distance_between_parallel_lines", "_line_geom_cache",
     "_are_parallel_cached", "_distance_between_parallel_cached",
     "_line_pair_overlap_ft_cached", "_xy_deviation_ft", "_axis_offset_error_ft",
-    "create_centerline", "_opening_bridges_gap", "_merge_collinear_cluster",
+    "_pair_frame_lines", "_interval_in_frame", "_axis_offset_in_frame",
+    "_line_span_key", "create_centerline",
+    "_opening_bridges_gap", "_merge_collinear_cluster",
     "_cluster_axis", "_cluster_interval", "_clusters_bridge_via_opening",
     "_bridge_clusters_via_openings", "merge_collinear_fragments",
     "_line_pair_overlap_ft", "lines_overlap_enough",
@@ -354,11 +356,94 @@ def _axis_offset_error_ft(centerline, l1, l2):
     return worst
 
 
+def _pair_frame_lines(l1, l2):
+    """Referencial 2D SIMETRICO do par (l1, l2), a partir das duas `Line`:
+    base = bissetriz das duas direcoes (orientadas para o mesmo lado),
+    normal = perpendicular a' base, origem = ponto medio entre os dois
+    pontos medios. Devolve (bx, by, nx, ny, ox, oy).
+
+    E' a MESMA construcao geometrica de `_pair_frame_cached` (CR-2F-B, ver
+    a prova de simetria em nuvem/benchmark/PLANO_ETAPA_2G.md item H.1) -
+    aquela trabalha sobre o cache de `_line_geom_cache` (usado nos lacos
+    O(n^2) de `find_wall_pairs`), esta trabalha sobre as `Line` cruas, que
+    e' o que `create_centerline` recebe. Trocar l1<->l2 devolve o mesmo
+    referencial, ou o mesmo com os dois eixos negados - e as projecoes que
+    consomem o referencial absorvem essa troca de sinal (diferencas e
+    `min`/`max` de projecao).
+
+    Tudo em float puro sobre os componentes dos pontos (nunca um XYZ
+    intermediario): e' o que faz o eixo simetrico custar MENOS que a versao
+    anterior, apesar de projetar quatro pontas em vez de amostrar tres
+    pontos (medido: -47%, ver PLANO_ETAPA_2I_CR_2F_E.md item 8)."""
+    p0, p1 = l1.GetEndPoint(0), l1.GetEndPoint(1)
+    q0, q1 = l2.GetEndPoint(0), l2.GetEndPoint(1)
+
+    d1x, d1y = p1.X - p0.X, p1.Y - p0.Y
+    n1 = math.hypot(d1x, d1y)
+    if n1 > 1e-12:
+        d1x, d1y = d1x / n1, d1y / n1
+    d2x, d2y = q1.X - q0.X, q1.Y - q0.Y
+    n2 = math.hypot(d2x, d2y)
+    if n2 > 1e-12:
+        d2x, d2y = d2x / n2, d2y / n2
+
+    s = 1.0 if (d1x * d2x + d1y * d2y) >= 0.0 else -1.0
+    bx, by = d1x + d2x * s, d1y + d2y * s
+    nb = math.hypot(bx, by)
+    if nb < 1e-9:
+        bx, by = d1x, d1y
+    else:
+        bx, by = bx / nb, by / nb
+
+    nx, ny = -by, bx
+    ox = (p0.X + p1.X + q0.X + q1.X) * 0.25
+    oy = (p0.Y + p1.Y + q0.Y + q1.Y) * 0.25
+    return bx, by, nx, ny, ox, oy
+
+
+def _interval_in_frame(frame, line):
+    """Intervalo [t_lo, t_hi] que a linha ocupa ao longo da BASE do
+    referencial, e a coordenada perpendicular MEDIA dela. Devolve
+    (t_lo, t_hi, s_medio). Nao depende do sentido em que a linha foi
+    desenhada (o `min`/`max` absorve a inversao)."""
+    bx, by, nx, ny, ox, oy = frame
+    a, b = line.GetEndPoint(0), line.GetEndPoint(1)
+    ax, ay = a.X - ox, a.Y - oy
+    bx_, by_ = b.X - ox, b.Y - oy
+    ta = bx * ax + by * ay
+    tb = bx * bx_ + by * by_
+    sa = nx * ax + ny * ay
+    sb = nx * bx_ + ny * by_
+    return (ta if ta <= tb else tb), (tb if ta <= tb else ta), (sa + sb) * 0.5
+
+
+def _axis_offset_in_frame(frame, l1, l2):
+    """Coordenada perpendicular do EIXO no referencial: o meio caminho
+    entre as duas faces. Media das duas coordenadas perpendiculares medias -
+    simetrica por construcao (trocar l1<->l2 nao muda a media)."""
+    _t0a, _t1a, s1 = _interval_in_frame(frame, l1)
+    _t0b, _t1b, s2 = _interval_in_frame(frame, l2)
+    return (s1 + s2) * 0.5
+
+
+def _line_span_key(line):
+    """Chave geometrica canonica de UMA linha em PES (mesma ideia de
+    `_line_identity_key_cached`, que trabalha em cm sobre o cache) - usada
+    APENAS para desempatar duas faces de comprimento exatamente igual em
+    `create_centerline`. Nesse empate os dois intervalos ja' sao identicos,
+    entao a escolha nao muda o eixo: a chave existe so' para o codigo nao
+    ter um ramo indefinido."""
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    a = (p0.X, p0.Y)
+    b = (p1.X, p1.Y)
+    return (a, b) if a <= b else (b, a)
+
+
 def create_centerline(l1, l2, max_extension_ft):
     """Gera a linha do eixo central entre duas linhas paralelas do CAD.
 
     O eixo cobre a UNIAO do alcance das duas linhas (nao apenas o alcance
-    de `l1`): em cada ponta, usa a que for MAIS LONGA das duas faces
+    de uma delas): em cada ponta, usa a que for MAIS LONGA das duas faces
     pareadas. Isso evita que a parede nasca curta num encontro em L ou T
     so' porque, naquele ponto, uma das duas faces do CAD (interna/externa)
     foi desenhada um pouco mais curta que a outra - a face mais longa
@@ -366,92 +451,107 @@ def create_centerline(l1, l2, max_extension_ft):
     correto em vez de deixar um recuo/mordida no canto.
 
     Essa extensao, porem, e' LIMITADA a `max_extension_ft` alem do proprio
-    comprimento de `l1` em cada ponta: sem esse teto, um pareamento
-    equivocado (l2 pertencendo na verdade a outra parede bem mais longa que
-    apenas passa perto/cruza ali) faria o eixo disparar muito alem dos
-    limites reais desenhados no CAD. Um encontro T/L legitimo normalmente
-    precisa de pouca extensao (da ordem da espessura da parede perpendicular
-    que chega ali) - bem menor que esse teto.
+    alcance da face MAIS LONGA em cada ponta: sem esse teto, um pareamento
+    equivocado (uma linha bem mais longa que apenas passa perto/cruza ali)
+    faria o eixo disparar muito alem dos limites reais desenhados no CAD.
+    Um encontro T/L legitimo normalmente precisa de pouca extensao (da ordem
+    da espessura da parede perpendicular que chega ali) - bem menor que esse
+    teto.
+
+    --- CR-2F-E (CENTERLINE_ARGUMENT_ASYMMETRY) -------------------------
+
+    ATE' 2026-09-01 esta funcao ancorava tudo em `l1`: o eixo comecava em
+    `p0` de `l1`, o intervalo era `[0, len(l1)]` e `l2` so' podia ESTENDER,
+    no maximo `max_extension_ft` por ponta. **Quem entrava como `l1` decidia
+    o comprimento da parede** - e `l1` e' simplesmente a linha de indice
+    menor na lista de entrada de `find_wall_pairs`, ou seja, a ordem em que
+    o CAD foi lido.
+
+    A regra da UNIAO acima ja' estava escrita neste docstring, mas o codigo
+    so' a cumpria quando `l1` por acaso ja' era a face mais longa. Medido nos
+    199 pares aceitos do benchmark real (Etapa 2I, ver
+    nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md):
+
+      - `create_centerline(A,B) != create_centerline(B,A)` em **47 pares
+        (23,6%)**, com desvio de ate' **2.121,71 cm** (o mesmo par produzia
+        uma parede de 1,56 m ou de 43,9 m);
+      - **14 pares** mudavam tambem so' invertendo o SENTIDO dos endpoints
+        de `l1` (`Line(p0,p1)` contra `Line(p1,p0)`) - invariancia
+        DIFERENTE da anterior, e que nunca havia sido medida;
+      - era a UNICA camada do Wall Modeling que ainda dependia da ordem da
+        lista (as camadas de candidatos e de pares aceitos ja' estavam
+        congeladas pelo CR-2F-B e pelo CR-2F-C): **22 a 29 eixos** mudavam
+        por permutacao, e com eles as paredes finais.
+
+    Duas fontes, ambas medidas por ablacao: o INTERVALO ancorado em `l1`
+    (33 das 47 divergencias e 100% dos desvios grandes) e o deslocamento
+    perpendicular amostrado SOBRE `l1` (as outras 14, ate' 10,29 cm). A
+    DIRECAO ja' era simetrica - a bissetriz abaixo e' anterior a esta
+    correcao e os 47 pares divergentes tinham todos a mesma direcao.
+
+    **Correcao:** construir o eixo num referencial que NAO tem lado
+    (`_pair_frame_lines` - a bissetriz das duas direcoes, com origem no
+    meio das quatro pontas) e escolher a face de referencia pela GEOMETRIA
+    (o COMPRIMENTO), nao pela posicao na lista. Resultado medido: 0
+    divergencias de ordem dos argumentos, 0 de sentido dos endpoints e 0 em
+    5 permutacoes das 2.868 linhas do benchmark; erro medio de
+    centralizacao (`_axis_offset_error_ft`) de 0,0178 cm para 0,0119 cm; e
+    custo -47%, por trabalhar em float puro no referencial em vez de
+    construir XYZ intermediarios.
+
+    **E' PROIBIDO "resolver" esta assimetria ordenando (l1, l2) por uma
+    chave canonica e chamando a formula antiga.** Medido: isso zera a
+    variacao mas PIORA a geometria - o erro de centralizacao vai de 1,14 cm
+    para 21,33 cm no pior caso (7,1x na media), porque fixar a referencia
+    escolhe sistematicamente a resposta menos centrada das duas; e deixa de
+    pe' a invariancia ao sentido dos endpoints. Ver
+    REGRAS_MODULACAO_BLOCOS.md 26.8.7.6.
     """
-    p0 = l1.GetEndPoint(0)
-    p1 = l1.GetEndPoint(1)
-    dir1 = (p1 - p0).Normalize()
+    frame = _pair_frame_lines(l1, l2)
 
-    q0, q1 = l2.GetEndPoint(0), l2.GetEndPoint(1)
-    dir2_raw = (q1 - q0).Normalize()
-    # l2 pode estar desenhada em qualquer sentido no CAD (nao
-    # necessariamente "andando" no mesmo sentido de l1, mesmo sendo
-    # paralela a ela) - alinha o sentido antes de somar/tirar a media,
-    # senao os dois vetores quase se cancelariam.
-    dir2 = dir2_raw if dir1.DotProduct(dir2_raw) >= 0.0 else -dir2_raw
+    t1_lo, t1_hi, _s1 = _interval_in_frame(frame, l1)
+    t2_lo, t2_hi, _s2 = _interval_in_frame(frame, l2)
 
-    # Direcao do eixo: BISSETRIZ entre l1 e l2, nao simplesmente a direcao
-    # de l1. are_lines_parallel tolera um pequeno desvio angular entre as
-    # duas linhas (ate' uns 3 graus) - havendo esse desvio (mesmo pequeno),
-    # a direcao "certa" do eixo central e' a MEDIA entre as duas, nao a de
-    # uma delas sozinha. Usar so' a direcao de l1 (versao anterior) faz o
-    # eixo herdar TODO o desvio angular de l1 em vez de dividi-lo ao meio,
-    # deslocando lateralmente as pontas do eixo em relacao as duas linhas
-    # originais (mais fora do centro nas extremidades do que no meio) - um
-    # vies pequeno mas sistematico, e que tambem tornava o resultado
-    # dependente da ORDEM dos argumentos (l1 vs l2), quando deveria ser
-    # simetrico entre as duas faces da parede.
-    bisector_vec = dir1 + dir2
-    direction = bisector_vec.Normalize() if bisector_vec.GetLength() > 1e-9 else dir1
+    # Face de REFERENCIA: a mais longa (medida no referencial, que e' o
+    # mesmo para as duas ordens). Empate exato -> chave geometrica canonica,
+    # e nesse caso os dois intervalos sao identicos, entao a escolha nao
+    # muda o eixo.
+    len1, len2 = t1_hi - t1_lo, t2_hi - t2_lo
+    if abs(len1 - len2) <= 1e-9:
+        ref_is_l1 = _line_span_key(l1) <= _line_span_key(l2)
+    else:
+        ref_is_l1 = len1 > len2
+    ref_lo, ref_hi = (t1_lo, t1_hi) if ref_is_l1 else (t2_lo, t2_hi)
 
-    # Ancoragem do eixo: SEMPRE em `p0` (um ponto real de l1, garantidamente
-    # perto da parede de verdade) - nunca no ponto de intersecao das duas
-    # retas infinitas. Uma versao anterior desta funcao ancorava no ponto de
-    # intersecao quando havia desvio angular entre l1/l2, porque ali o eixo
-    # fica EXATAMENTE equidistante (propriedade geometrica de bissetriz) -
-    # matematicamente correto, mas numericamente perigoso na pratica: para
-    # o desvio angular pequeno tipico de QUALQUER CAD real (nunca
-    # perfeitamente paralelo), esse ponto de intersecao fica MUITO longe do
-    # trecho real da parede (facilmente centenas de metros, para um desvio
-    # de fracoes de grau) - e qualquer imprecisao residual na direcao
-    # calculada fica AMPLIFICADA pela distancia ate' esse ponto distante ao
-    # projetar de volta para perto da parede (pior ainda em projetos que
-    # usam coordenadas de implantacao/levantamento longe da origem, comuns
-    # em vinculos de CAD). Na pratica isso corrompia a geometria de
-    # praticamente toda parede gerada (pontas nao alcancando cantos, vaos
-    # inesperados) - regressao bem pior que o pequeno vies residual que a
-    # media de amostras (abaixo) deixa para desvios angulares realistas.
-    len1 = (p1 - p0).DotProduct(direction)
+    # UNIAO do alcance das duas faces, limitada a `max_extension_ft` alem
+    # do alcance da face de referencia em cada ponta.
+    t_lo = max(min(t1_lo, t2_lo), ref_lo - max_extension_ft)
+    t_hi = min(max(t1_hi, t2_hi), ref_hi + max_extension_ft)
 
-    # Deslocamento perpendicular de l1 para l2: MEDIA do deslocamento medido
-    # em TRES pontos ao longo do eixo (inicio, meio, fim de l1, projetados
-    # na direcao ja' calculada acima - a bissetriz, nao mais so' a direcao
-    # de l1). Para linhas verdadeiramente paralelas essa distancia e'
-    # constante ao longo do comprimento, entao a media e' exata; para um
-    # desvio angular real (mesmo pequeno) ela varia um pouco ao longo do
-    # comprimento - amostrar as duas pontas + o meio e tirar a media cancela
-    # a maior parte desse vies, sem depender de nenhum ponto distante.
-    sample_ts = (0.0, len1 * 0.5, len1)
-    offset_sum = XYZ(0.0, 0.0, 0.0)
-    for t in sample_ts:
-        sample_pt = p0 + direction * t
-        proj = project_point_on_line(sample_pt, l2)
-        offset_sum += (proj - sample_pt)
-    half_offset = (offset_sum / len(sample_ts)) * 0.5
+    s_axis = _axis_offset_in_frame(frame, l1, l2)
 
-    t_lo = 0.0
-    t_hi = len1
+    bx, by, nx, ny, ox, oy = frame
+    x_start = ox + bx * t_lo + nx * s_axis
+    y_start = oy + by * t_lo + ny * s_axis
+    x_end = ox + bx * t_hi + nx * s_axis
+    y_end = oy + by * t_hi + ny * s_axis
 
-    t_q0 = (q0 - p0).DotProduct(direction)
-    t_q1 = (q1 - p0).DotProduct(direction)
-    for t in (t_q0, t_q1):
-        if t < t_lo and (t_lo - t) <= max_extension_ft:
-            t_lo = t
-        if t > t_hi and (t - t_hi) <= max_extension_ft:
-            t_hi = t
-
-    mid_start = p0 + direction * t_lo + half_offset
-    mid_end = p0 + direction * t_hi + half_offset
-
-    if mid_start.DistanceTo(mid_end) < 0.01:
+    if math.hypot(x_end - x_start, y_end - y_start) < 0.01:
         return None
 
-    return Line.CreateBound(mid_start, mid_end)
+    # Sentido CANONICO das pontas (a menor primeiro): sem isso, inverter o
+    # sentido em que uma face foi desenhada no CAD ainda mudaria o sentido
+    # da Line devolvida. O sentido nao muda a geometria da parede, mas muda
+    # a IDENTIDADE do objeto para os estagios seguintes (deduplicate_walls,
+    # extend_wall_ends_to_junctions, build_wall_graph), entao tem que ser
+    # estavel como o resto.
+    if (x_end, y_end) < (x_start, y_start):
+        x_start, y_start, x_end, y_end = x_end, y_end, x_start, y_start
+
+    # `l1` preserva a elevacao original do CAD (o eixo e' plano: as duas
+    # faces vem do mesmo Layer, na mesma elevacao).
+    z = l1.GetEndPoint(0).Z
+    return Line.CreateBound(XYZ(x_start, y_start, z), XYZ(x_end, y_end, z))
 
 
 def _opening_bridges_gap(p0, direction, gap_lo, gap_hi, openings, perp_tolerance_ft, width_slack_ft):

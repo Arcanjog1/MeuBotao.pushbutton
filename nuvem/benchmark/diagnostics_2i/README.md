@@ -1,7 +1,12 @@
 # `diagnostics_2i` — laboratório do `CR-2F-E` (`CENTERLINE_ARGUMENT_ASYMMETRY`)
 
-**SOMENTE LEITURA de `nuvem/core/**`.** Nenhum arquivo do motor é alterado
-por esta etapa. As alternativas de eixo são definidas em `lib2i.py` e
+> **`S7` foi aprovado e implementado em 2026-09-01.** `IMPL["cur"]` passou a
+> chamar o `create_centerline` novo, então `cur` e `S7` agora coincidem.
+> `run_g_postimpl.py` é a verificação pós-implementação; os demais scripts
+> continuam válidos como registro da investigação.
+
+**SOMENTE LEITURA de `nuvem/core/**`.** Nenhum script deste diretório altera
+o motor. As alternativas de eixo são definidas em `lib2i.py` e
 injetadas em memória dentro do `find_wall_pairs` **real**
 (`lib2i.patched`, pelo dict de globais de `core.engine.wall_pairing`),
 exatamente como a Etapa 2G fez com os predicados do par.
@@ -50,6 +55,7 @@ python3 nuvem/benchmark/diagnostics_2i/run_c_rootcause.py         # ~30 s
 python3 nuvem/benchmark/diagnostics_2i/run_d_downstream.py        # ~7 min
 python3 nuvem/benchmark/diagnostics_2i/run_e_finalists.py         # ~30 s
 python3 nuvem/benchmark/diagnostics_2i/run_f_gates.py             # ~1 min  (lê out_d/out_e)
+python3 nuvem/benchmark/diagnostics_2i/run_g_postimpl.py          # ~1 min  (pós-implementação)
 ```
 
 `run_f_gates.py` depende de `out_d_downstream.json` e `out_e_finalists.json`.
@@ -68,6 +74,7 @@ python3 nuvem/benchmark/diagnostics_2i/run_f_gates.py             # ~1 min  (lê
 | `run_d_downstream.py` | 8 (camada por camada), 9, 11 (benchmark humano) | `out_d_downstream.json` |
 | `run_e_finalists.py` | 9, 10 (correção geométrica, não só simetria) | `out_e_finalists.json` |
 | `run_f_gates.py` | 12 (gates `H1`–`H11`), atribuição causal, runtime | `out_f_gates.json` |
+| `run_g_postimpl.py` | verificação pós-implementação: `H1`/`H2` na função de produção, downstream, `H6′` nominal, 5 permutações, centralização, runtime | `out_g_postimpl.json` |
 
 ## Métricas novas desta etapa
 
