@@ -173,11 +173,6 @@ def test_inv_002_layout_corretamente_desencontrado_nao_e_marcado():
 # candidatos gerados eram identicos ao baseline (so' variavam o PRIMEIRO
 # bloco), e a busca nao tinha o que escolher.
 # =====================================================================
-@pytest.mark.xfail(strict=True, reason=(
-    "CR-BLOCK-01 CHECKPOINT B - reproducao da causa-raiz: a enumeracao de "
-    "candidatos de _pier_layout_avoiding_joints so' varia o PRIMEIRO bloco, "
-    "entao os 7 candidatos gerados para este trecho sao TODOS identicos ao "
-    "baseline. Removido no CHECKPOINT C."))
 def test_inv_005_segunda_fiada_considera_juntas_da_anterior():
     avoid = [54.5, 94.5]
     baseline = m._pier_ordered_layout(99.0, CATALOG, 0.0, 0.0,
