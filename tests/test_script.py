@@ -809,6 +809,185 @@ def test_INV_PAIR_003_desempate_final_invariante_a_renumeracao():
         )
 
 
+# ------------------------------------------- CR-2F-E (INV-CENTER-001..004)
+#
+# `create_centerline` ancorava tudo em `l1` (a linha de indice menor na lista
+# de entrada de `find_wall_pairs`): o eixo comecava em `p0` de `l1` e o
+# intervalo era `[0, len(l1)]`, com `l2` podendo apenas ESTENDER. Quem entrava
+# como `l1` decidia o comprimento da parede. Medido nos 199 pares aceitos do
+# benchmark real (Etapa 2I): 47 eixos (23,6%) mudavam so' invertendo a ordem
+# dos argumentos, ate' 2.121,71 cm; e 14 mudavam so' invertendo o SENTIDO dos
+# endpoints de `l1`. Era a unica camada do Wall Modeling que ainda dependia da
+# ordem da lista. Ver nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md.
+
+def _centerline_geometry_key(line, nd=6):
+    """Chave GEOMETRICA canonica de um eixo, em cm: ponta menor primeiro.
+    Uma linha invertida NAO e' um eixo diferente - e' o mesmo segmento
+    escrito ao contrario, e comparar os endpoints crus acusaria uma
+    diferenca que nao existe na parede."""
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    a = (round(to_cm(p0.X), nd) + 0.0, round(to_cm(p0.Y), nd) + 0.0)
+    b = (round(to_cm(p1.X), nd) + 0.0, round(to_cm(p1.Y), nd) + 0.0)
+    return (a, b) if a <= b else (b, a)
+
+
+def _reversed_seg(line):
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    return Line.CreateBound(XYZ(p1.X, p1.Y, p1.Z), XYZ(p0.X, p0.Y, p0.Z))
+
+
+# Tres pares em coordenadas literais (cm). Os dois ultimos sao reducoes de
+# pares REAIS do benchmark, e sao um contraexemplo um do outro: no primeiro a
+# resposta certa e' a face LONGA (sem ela o gabarito perde W001), no segundo
+# e' a CURTA (a linha de 4.394 cm apenas passa perto, inclinada ~1,11 grau).
+# Nenhuma regra de eixo distingue os dois - por isso o criterio e' a UNIAO do
+# alcance com teto, nao "a resposta menor" nem "a maior".
+_CENTERLINE_CASES = (
+    # sintetico minimo: face curta dentro de uma face longa, gap > 2*ext
+    ("sintetico_curta_dentro_de_longa",
+     (0.0, 0.0, 100.0, 0.0), (-500.0, 14.0, 600.0, 14.0)),
+    # real, reduzido: par (1461, 1464) - faces exatamente paralelas
+    ("real_1461_1464",
+     (2070.52, 774.05, 2070.52, -739.10), (2056.52, 774.05, 2056.52, 350.05)),
+    # real, reduzido: par (474, 2306) - 1,11 grau de desvio, razao 1:28
+    ("real_474_2306",
+     (-4.48, 807.55, 151.13, 807.55), (2267.73, 865.75, -2125.90, 780.43)),
+)
+
+
+@case
+def test_INV_CENTER_001_eixo_invariante_a_ordem_dos_argumentos():
+    """INV-CENTER-001 / CR-2F-E, gate H1: `create_centerline(A, B)` tem que
+    produzir o MESMO SEGMENTO que `create_centerline(B, A)`.
+
+    Antes da correcao, o caso sintetico abaixo devolvia 100 cm ou 1.100 cm
+    conforme a ordem, e o par real (474, 2306) devolvia 155,61 cm ou
+    4.394,25 cm - a mesma geometria virando uma parede de 1,5 m ou de 44 m."""
+    for name, a, b in _CENTERLINE_CASES:
+        la, lb = seg(*a), seg(*b)
+        ab = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        ba = m.create_centerline(lb, la, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert ab is not None and ba is not None, name
+        assert _centerline_geometry_key(ab) == _centerline_geometry_key(ba), (
+            name, _centerline_geometry_key(ab), _centerline_geometry_key(ba))
+
+
+@case
+def test_INV_CENTER_002_eixo_invariante_ao_sentido_dos_endpoints():
+    """INV-CENTER-002 / CR-2F-E, gate H2: inverter o SENTIDO em que uma face
+    foi desenhada no CAD (`Line(p0,p1)` -> `Line(p1,p0)`) nao pode mudar o
+    eixo. E' uma invariancia DIFERENTE da de INV-CENTER-001 - confundir as
+    duas foi o que deixou esta passar despercebida por duas etapas: uma
+    ordenacao canonica dos argumentos zera H1 e deixa H2 inteira de pe'
+    (medido: 14/199 eixos ainda mudavam, com o erro subindo de 1,15 cm para
+    21,33 cm). Testa as quatro combinacoes de sentido das duas faces."""
+    for name, a, b in _CENTERLINE_CASES:
+        la, lb = seg(*a), seg(*b)
+        base = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert base is not None, name
+        expected = _centerline_geometry_key(base)
+        for flip_a in (False, True):
+            for flip_b in (False, True):
+                ca = _reversed_seg(la) if flip_a else la
+                cb = _reversed_seg(lb) if flip_b else lb
+                got = m.create_centerline(ca, cb, m.CENTERLINE_MAX_EXTENSION_FT)
+                assert got is not None, (name, flip_a, flip_b)
+                assert _centerline_geometry_key(got) == expected, (
+                    name, flip_a, flip_b, _centerline_geometry_key(got), expected)
+
+
+def _centerline_geometry_set(lines):
+    """Conjunto GEOMETRICO dos eixos que `find_wall_pairs` REAL devolve -
+    a camada imediatamente depois do pareamento, que e' onde o CR-2F-E
+    atua. Sem `cap_candidate_lines`/`openings`: o recorte nas testas
+    (`clip_centerline_to_caps`) e' um estagio proprio e nao faz parte
+    desta invariancia."""
+    th_ft = [ft(14.0)]
+    tol_ft = m.compute_detection_tolerance_ft(th_ft)
+    walls, _unused = m.find_wall_pairs(lines, th_ft, tol_ft)
+    return sorted(_centerline_geometry_key(w[0]) for w in walls)
+
+
+@case
+def test_INV_CENTER_003_conjunto_de_eixos_invariante_a_ordem_da_lista():
+    """INV-CENTER-003 / CR-2F-E, gate H3: o conjunto GEOMETRICO de eixos
+    devolvido por `find_wall_pairs` nao pode mudar quando a lista de entrada
+    e' permutada.
+
+    Fecha a lacuna que o INV-PAIR-003 (CR-2F-C) deixou explicita: aquele
+    compara o conjunto de PARES, nunca o centerline, porque na epoca o
+    centerline tinha a assimetria PROPRIA do 2F-E. Medido antes da correcao:
+    22 a 29 eixos mudavam por permutacao, mesmo com os pares congelados.
+
+    A nuvem sintetica tem faces de comprimentos DIFERENTES (o gatilho da
+    assimetria: nos 199 pares reais, todo par com faces de comprimento igual
+    ja' era simetrico) e um desvio angular de ~1 grau numa delas."""
+    lines = [
+        # parede horizontal: face de baixo mais longa que a de cima
+        seg(0.0, 0.0, 900.0, 0.0),
+        seg(120.0, 14.0, 700.0, 14.0),
+        # parede vertical: face esquerda longa, direita curta (caso W001)
+        seg(300.0, 200.0, 300.0, 1100.0),
+        seg(314.0, 500.0, 314.0, 900.0),
+        # parede vertical isolada, faces do mesmo tamanho
+        seg(1500.0, 100.0, 1500.0, 800.0),
+        seg(1514.0, 100.0, 1514.0, 800.0),
+        # face curta ao lado de uma linha longa com ~1,1 grau de desvio
+        seg(2000.0, 400.0, 2155.0, 400.0),
+        seg(1400.0, 425.7, 2600.0, 402.4),
+    ]
+    baseline = _centerline_geometry_set(lines)
+    assert len(baseline) >= 3, baseline
+
+    for seed in (1, 2, 3, 10, 42):
+        rng = random.Random(seed)
+        shuffled = list(lines)
+        rng.shuffle(shuffled)
+        assert _centerline_geometry_set(shuffled) == baseline, (
+            seed, "conjunto GEOMETRICO de eixos mudou so' de permutar a lista")
+
+
+@case
+def test_INV_CENTER_004_pares_ja_univocos_mantem_o_mesmo_eixo():
+    """INV-CENTER-004 / CR-2F-E: nao-regressao dos pares que JA' eram
+    univocos. Dos 199 pares aceitos do benchmark, 152 ja' davam o mesmo eixo
+    nas duas ordens - neles nao havia ambiguidade nenhuma a resolver, e o
+    CR-2F-E nao pode toca-los.
+
+    Isto e' o que separa a solucao adotada (SYMMETRIC_LONGEST_SPAN) das
+    alternativas MUTUAL_OVERLAP / ENDPOINT_AVERAGING / BANDED_SPAN, que
+    zeravam H1 e H2 mas reescreviam 86 desses 152 eixos - uma ate' 37,01 cm.
+
+    O primeiro caso e' o que DISCRIMINA: duas faces da mesma parede com
+    alcances ligeiramente diferentes, a diferenca dentro de
+    CENTERLINE_MAX_EXTENSION. A formula antiga ja' devolvia [0, 500] nas
+    duas ordens (univoco), e e' isso que tem que ser preservado -
+    MUTUAL_OVERLAP devolveria [20, 480] e ENDPOINT_AVERAGING [10, 490]."""
+    fixtures = (
+        # faces com alcances diferentes -> o eixo cobre a UNIAO, nao a
+        # sobreposicao mutua nem a media dos extremos
+        ((0.0, 0.0, 500.0, 0.0), (20.0, 14.0, 480.0, 14.0),
+         ((0.0, 7.0), (500.0, 7.0))),
+        # faces exatamente gemeas -> eixo na mediana, alcance comum
+        ((0.0, 0.0, 500.0, 0.0), (0.0, 14.0, 500.0, 14.0),
+         ((0.0, 7.0), (500.0, 7.0))),
+        # vertical, reducao do par real (1461/1464) com as faces alinhadas
+        ((2070.52, 774.05, 2070.52, 350.05), (2056.52, 774.05, 2056.52, 350.05),
+         ((2063.52, 350.05), (2063.52, 774.05))),
+        # horizontal, reducao do par real (89/1350)
+        ((-1878.4886, 767.0493, -408.48, 767.0493),
+         (-1878.4886, 781.0493, -408.48, 781.0493),
+         ((-1878.4886, 774.0493), (-408.48, 774.0493))),
+    )
+    for a, b, expected in fixtures:
+        la, lb = seg(*a), seg(*b)
+        got = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert got is not None, (a, b)
+        key = _centerline_geometry_key(got, nd=4)
+        for pt_got, pt_exp in zip(key, expected):
+            assert abs(pt_got[0] - pt_exp[0]) < 0.002, (a, b, key, expected)
+            assert abs(pt_got[1] - pt_exp[1]) < 0.002, (a, b, key, expected)
+
 @case
 def test_merge_collinear_fragments_religamento_em_cascata_apos_particionamento():
     """Regressao de PERFORMANCE: a fusao de clusters via abertura real

@@ -1,0 +1,155 @@
+{
+  "gates": {
+    "cur": {
+      "H1": false,
+      "H2": false,
+      "H3": false,
+      "H4": true,
+      "H5": true,
+      "H6": true,
+      "H7": true,
+      "H8": true,
+      "H9": true
+    },
+    "S1": {
+      "H1": true,
+      "H2": false,
+      "H3": true,
+      "H4": true,
+      "H5": true,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": true
+    },
+    "S2": {
+      "H1": true,
+      "H2": false,
+      "H3": true,
+      "H4": true,
+      "H5": true,
+      "H6": true,
+      "H7": true,
+      "H8": true,
+      "H9": true
+    },
+    "S3": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": false,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": false
+    },
+    "S4": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": false,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": false
+    },
+    "S5": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": true,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": true
+    },
+    "S6": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": false,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": false
+    },
+    "S7": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": true,
+      "H6": false,
+      "H7": true,
+      "H8": true,
+      "H9": true
+    },
+    "S8": {
+      "H1": true,
+      "H2": true,
+      "H3": true,
+      "H4": true,
+      "H5": false,
+      "H6": false,
+      "H7": true,
+      "H8": false,
+      "H9": false
+    },
+    "_causal": {
+      "cur": {
+        "full": {
+          "cobertas": 87,
+          "eixo_ok": 96,
+          "openings_assigned": 91,
+          "watch_ok": 7,
+          "walls": 148,
+          "excess_len_cm": 3039.397623278722
+        },
+        "without_40m": {
+          "cobertas": 87,
+          "eixo_ok": 96,
+          "openings_assigned": 91,
+          "watch_ok": 7,
+          "walls": 148,
+          "excess_len_cm": 3039.397623278722
+        },
+        "removed": 0
+      },
+      "S7": {
+        "full": {
+          "cobertas": 86,
+          "eixo_ok": 96,
+          "openings_assigned": 91,
+          "watch_ok": 7,
+          "walls": 148,
+          "excess_len_cm": 9177.567993392482
+        },
+        "without_40m": {
+          "cobertas": 87,
+          "eixo_ok": 96,
+          "openings_assigned": 91,
+          "watch_ok": 7,
+          "walls": 148,
+          "excess_len_cm": 5460.658064474538
+        },
+        "removed": 1
+      }
+    }
+  },
+  "runtime": {
+    "cur": 0.004381632804870606,
+    "S1": 0.005636954307556152,
+    "S2": 0.0053162813186645504,
+    "S3": 0.002224636077880859,
+    "S4": 0.001766538619995117,
+    "S5": 0.002019500732421875,
+    "S6": 0.002067828178405762,
+    "S7": 0.0023227691650390624,
+    "S8": 0.00426785945892334
+  },
+  "solver_fingerprint_expected": "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316"
+}
