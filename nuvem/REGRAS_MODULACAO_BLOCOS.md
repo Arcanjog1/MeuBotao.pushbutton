@@ -3439,3 +3439,256 @@ sintetica, construida no proprio teste.
 - **O pareamento `(474, 2306)`** - uma face de 155,61 cm pareada com uma
   linha auxiliar de 4.394,45 cm inclinada 1,1125 grau. Nao e' merge, nao e'
   eixo e nao e' deduplicacao: e' **pareamento**. Continua sem CR atribuido.
+
+---
+
+### 26.10 `CR-2F-D` IMPLEMENTADO - `DETERMINISMO` e recuperacao da `W097` (2026-09-01)
+
+**Status:** `IMPLEMENTADO`. Branch `claude/cr-2f-d-determinism-ewnru5`.
+Verificacao reproduzivel em `nuvem/benchmark/diagnostics_2k/` (censo e
+bateria) e `nuvem/benchmark/diagnostics_2d/render_w097.py` (as duas imagens
+do caso da `W097`, aprovadas pelo usuario antes da implementacao).
+
+#### 26.10.1 REGRA OBRIGATORIA - a PRIMEIRA divergencia entre ordens estava na passada 1 do merge
+
+`CONFIRMED`. Medido no projeto real antes de qualquer alteracao, nas 6
+ordens de referencia (producao + seeds 1, 2, 3, 10 e 42):
+
+| camada | fingerprints distintos |
+|---|---|
+| linhas MESCLADAS (saida de `merge_collinear_fragments`) | **6** |
+| paredes finais | **3** |
+| paredes finais, **congelando** o conjunto mesclado e permutando-o | **1** |
+
+A terceira linha e' a prova causal: de `find_wall_pairs` para a frente
+(pares -> `deduplicate_walls` -> extensao -> grafo -> aberturas) o pipeline
+**ja' estava invariante a' ordem** desde o `CR-2F-B`/`CR-2F-C`/`CR-2F-E`.
+Todo o nao determinismo que sobrava nascia na **passada 1 do merge**.
+
+**A CAUSA:** o agrupamento e' ESTRELA (quem vira `base` arrasta todos os
+compativeis COM ELA) sobre uma relacao que **nao e' transitiva**. Com 2 mm
+de tolerancia, `A~B` e `B~C` nao implicam `A~C`. Caso real capturado:
+fragmentos verticais em `x = -563,29 / -563,49 / -563,69` (0,20 cm entre
+vizinhos, 0,40 cm entre os extremos). Enquanto a base saia de
+`remaining.pop(0)`, **quem seria a base era a POSICAO da linha na lista**.
+
+Efeito no resultado final: apenas **2 paredes em 144** mudavam - uma boneca
+de 8 cm (`x = 1351,76` ou `1350,23`) e uma parede de 639,51 cm cujo eixo caia
+em `y = 95,05` ou `y = 109,05` (exatamente uma espessura de diferenca: tres
+faces paralelas a 14 cm, e o par vencedor trocava).
+
+#### 26.10.2 REGRA OBRIGATORIA - a base de um agrupamento estrela e' escolhida pela GEOMETRIA
+
+`CONFIRMED`. **`IMPLEMENTADA`** em `merge_collinear_fragments`
+(`core/engine/geometry.py`).
+
+A base passa a ser o fragmento **MAIS LONGO**, com desempate pela chave
+geometrica canonica (`_line_span_key`, precisao total) - nunca a posicao na
+lista. Nao e' criterio novo: e' o MESMO que `_merge_collinear_cluster` e
+`_bridge_clusters_via_openings` ja' usavam para eleger a linha de referencia
+de um cluster. **O fragmento mais longo e' a evidencia mais confiavel de
+onde a face realmente esta'**, e a pertinencia ao cluster passa a ser
+decidida por proximidade A ESSA evidencia.
+
+**E' PROIBIDO** "resolver" isto ordenando a colecao FINAL de paredes antes
+do fingerprint: isso esconderia a divergencia de agrupamento sem corrigi-la.
+A trava e' o `INV-DET-001`, que verifica o conjunto MESCLADO **e** o conjunto
+final.
+
+#### 26.10.3 REGRA OBRIGATORIA - o SENTIDO em que o CAD desenhou um fragmento nao pode influenciar nada
+
+`CONFIRMED`. **`IMPLEMENTADA`** em `_merge_collinear_cluster`.
+
+Depois de canonizar a ordem das bases, **ainda sobrava 1 fingerprint de
+merge divergente** (2.866 x 2.867 linhas). Causa: quando dois fragmentos
+empatam em comprimento mas foram desenhados em sentidos opostos, o
+`max()` escolhia um ou outro, e com ele mudava a ANCORA `base_p0` de
+`_merge_collinear_cluster`. Duas ancoras diferentes sobre a MESMA reta dao a
+mesma reta em matematica exata, mas caminhos de arredondamento diferentes -
+o bastante para virar o comparador `lo <= cur_hi + gap_tolerance_ft` quando
+um vao cai exatamente na tolerancia, e ai o cluster devolve 1 linha em vez
+de 2.
+
+Tres canonizacoes, todas em `_merge_collinear_cluster`:
+
+1. **membros ordenados** por `_line_span_key` antes de qualquer conta - a
+   adicao de ponto flutuante NAO e' associativa, entao somar os mesmos
+   fragmentos em ordens diferentes da `p0` diferentes nos ultimos bits;
+2. **sentido da referencia canonico** (ponta menor primeiro) - mesma
+   invariancia que o `CR-2F-E` ja' garantiu em `create_centerline`;
+3. o `max()` do fragmento mais longo passa a operar sobre a lista ja'
+   ordenada.
+
+Com as tres: **1 fingerprint de merge e 1 de paredes** nas 6 ordens.
+
+#### 26.10.4 REGRA OBRIGATORIA - uma relacao de duplicidade se mede ao longo do TRECHO COMPARTILHADO, nao num ponto
+
+`CONFIRMED`. **`IMPLEMENTADA`** (`symmetric_axis_gap_ft` /
+`_pair_symmetric_axis_gap_ft_cached` em `core/engine/geometry.py`, usadas por
+`deduplicate_walls`).
+
+O `CR-2F-A` tornou a relacao SIMETRICA, mas ela continuou sendo amostrada
+num **UNICO PONTO**: o ponto medio de cada eixo contra a reta infinita do
+outro. Dois eixos quase paralelos **SE CRUZAM** em algum lugar - e se o
+cruzamento cair perto desse ponto, a medida da quase zero enquanto a
+separacao real nas pontas do trecho comum e' varias vezes a tolerancia.
+
+Medido no caso da `W097` (parede boa de 707,01 cm x eixo espurio de
+4.394,25 cm, inclinado 0,5562 grau):
+
+| medicao | valor | veredito |
+|---|---|---|
+| distancia pelos pontos medios (predicado do `CR-2F-A`) | **0,3633 cm** | "duplicata" |
+| separacao MAXIMA no trecho compartilhado (707 cm) | **3,7952 cm** | **nao e' duplicata** |
+
+**Censo sobre as 57 remocoes do comportamento anterior**
+(`diagnostics_2k/run_a_census.py`, secao C):
+
+| | |
+|---|---|
+| remocoes com separacao **acima** da tolerancia de 2 cm | **1** (a da `W097`) |
+| pior separacao entre as **56 remocoes legitimas** | **1,5306 cm** |
+
+**A tolerancia de 2 cm ja' existente (`DUPLICATE_AXIS_TOLERANCE`) separa as
+duas classes com folga.** Nenhum valor novo foi calibrado, nenhuma regra de
+angulo, nenhum id, coordenada ou comprimento do projeto.
+
+O novo criterio entra em **CONJUNCAO** com o do `CR-2F-A`, nunca no lugar
+dele: a relacao de duplicidade so' pode ficar mais RESTRITIVA. Isso preserva
+o `INV-DEDUP-SYM-001`, cuja primeira parte trava o caso oposto (uma reta
+longa inclinada que so' ENCOSTA num trecho curto e cujo ponto medio esta'
+longe dele).
+
+Diferenca deliberada em relacao a `_pair_symmetric_thickness_ft_cached`
+(que o `CR-2F-B` usa para a ESPESSURA): la' interessa a folga **MEDIA**;
+aqui interessa o **PIOR caso** (o maximo das duas pontas do trecho comum) -
+dois eixos que se cruzam no meio tem media pequena e **nao sao a mesma
+parede**.
+
+#### 26.10.5 REGRA OBRIGATORIA - o representante de um grupo de duplicatas nao pode depender da ordem
+
+`CONFIRMED`. **`IMPLEMENTADA`** em `deduplicate_walls`.
+
+A politica continua sendo **manter a MAIS LONGA do grupo** - ela esta'
+correta e nao foi alterada: nas 56 remocoes legitimas ela acerta em todas.
+O que mudou e' o DESEMPATE entre paredes de comprimento exatamente igual,
+que era a estabilidade do `sorted` (isto e', a ordem de entrada) e passa a
+ser `_line_span_key`.
+
+**A `W097` nao morria pela politica.** Ela morria porque o par **nunca foi
+duplicata** - ver 26.10.4. Com o predicado correto nao ha' grupo, e portanto
+nao ha' representante a escolher.
+
+> **ATRIBUICAO CORRIGIDA - substitui 26.8.7.8 e 26.8.8.4.** Aquelas duas
+> secoes registraram, com a medicao disponivel entao, que *"quem mata a
+> `W097` e' a politica 'mantem a mais longa'"*. **Isso esta' incorreto e a
+> redacao de 26.10.4/26.10.5 e' a que vale.** A politica esta' certa; o
+> defeito era a AMOSTRAGEM POR PONTO MEDIO do predicado que declarava o par
+> duplicata. As secoes antigas ficam onde estao, como registro do que se
+> sabia na epoca.
+
+#### 26.10.6 CONFIRMADO E MEDIDO - os ~2 cm da `W097` sao gabarito x CAD, NAO erro do solver
+
+`CONFIRMED`. Medido diretamente sobre os segmentos crus do
+`input_real.json` e desenhado em
+`nuvem/benchmark/diagnostics_2d/w097_geometry_zoom.png`.
+
+```
+CAD (segmentos crus, x de -153 a 345):  face inferior  y = 808,049
+                                        face superior  y = 822,050   -> 14,000 cm
+eixo calculado pelo solver           =  (808,049 + 822,050)/2 = 815,049   CENTRADO
+reference.json diz W097              =  y = 817,048  (faces em 810,048 / 824,048)
+```
+
+Nao existe **nenhum** segmento do CAD em `y = 810,048` nem em `y = 824,048`.
+E o eixo do gabarito **nao esta' centrado** entre as faces desenhadas: dista
+**5,001 cm** da face superior e **8,999 cm** da inferior, quando numa parede
+de 14 cm teria de ser 7/7.
+
+**REGRA:** a parede modelada no `reference.json` esta' ~2 cm deslocada em
+relacao ao desenho do CAD. **E' PROIBIDO mover a parede para `y = 817,048`
+para fazer o gabarito passar** - isso afastaria o eixo das faces reais, que
+e' a unica fonte de verdade geometrica do pipeline. Consequencia aceita e
+registrada: a `W097` conta como **coberta** (cobertura 1,000) mas **nao entra
+no `eixo_ok`**, que exige <= 0,5 cm.
+
+O comprimento de 707,01 cm (contra 499 cm do gabarito) vem da face superior
+do CAD, contínua de `x = -346,49` a `360,52`: e' a regra
+`SYMMETRIC_LONGEST_SPAN` ja' aprovada no `CR-2F-E` (26.8.7.7), nao uma
+novidade deste CR.
+
+#### 26.10.7 REGRA OBRIGATORIA - o gate `H6'` volta a exigir 87/97
+
+`CONFIRMED`. Substitui a condicao 5 de 26.8.8.5.
+
+O `>= 86` era uma excecao nominal, valida **enquanto a divida da `W097`
+existisse**. Ela foi paga. A partir do `CR-2F-D`:
+
+1. cobertura **>= 87/97**;
+2. resultado **identico nas 6 ordens** (producao + seeds 1, 2, 3, 10, 42) -
+   **um unico fingerprint de paredes**, e nao apenas metricas iguais;
+3. **7/7** paredes monitoradas preservadas;
+4. **91/91** aberturas; **<= 4** espurias; **>= 96** eixos;
+5. qualquer parede perdida reprova `H6'`.
+
+Resultado medido nas 6 ordens: **201 pares aceitos, 145 paredes, 87/97,
+96 eixos, 91/91, 7/7, 4 espurias, 1 fingerprint**. Ausentes: `W004`, `W005`,
+`W006`, `W007`, `W025`, `W026`, `W046`, `W047`, `W084`, `W085` - as mesmas
+de antes, **sem a `W097`**, e sem nenhuma parede nova perdida ou ganha.
+
+#### 26.10.8 REGRA OBRIGATORIA - testes permanentes do `CR-2F-D`
+
+`IMPLEMENTADO` (2026-09-01), em `tests/test_script.py`. Toda a geometria e'
+SINTETICA: nenhum id, coordenada, comprimento ou seed do projeto real.
+
+| id | trava |
+|---|---|
+| `INV-DET-001` | permutar a entrada nao muda o conjunto MESCLADO **nem** o conjunto final de paredes |
+| `INV-DET-002` | inverter o sentido dos endpoints nao muda o resultado |
+| `INV-DET-003` | o representante de um grupo nao depende da ordem, inclusive em empate exato de comprimento |
+| `INV-DET-004` | numa cadeia nao transitiva (`A~B`, `B~C`, `A!~C`, com bloco de controle que prova a nao transitividade) a particao independe da ordem |
+| `INV-DET-005` | toda parede sai com a ponta MENOR primeiro |
+| `INV-DET-006` | a SEQUENCIA devolvida (nao so' o conjunto) e' canonica |
+| `INV-DET-007` | um unico fingerprint em 10 permutacoes |
+| `INV-DEDUP-D-001` | uma linha auxiliar longa que apenas CRUZA uma parede valida nao a elimina (com bloco de controle provando que o predicado do `CR-2F-A`, sozinho, ainda diria "duplicata") |
+| `INV-DEDUP-D-002` | a parede recuperada nao vira duplicata, e uma segunda passada nao remove nada |
+| `INV-DEDUP-D-003` | duplicatas reais continuam sendo removidas, e sobra a MAIS LONGA (tres regimes) |
+| `INV-DEDUP-D-004` | `symmetric_axis_gap_ft` e' simetrico na ordem dos argumentos (exato em IEEE-754) e invariante ao sentido dos endpoints (< 1e-9 ft) |
+
+Os **11 invariantes do `CR-2F-A`/`CR-2F-B`/`CR-2F-C`/`CR-2F-E`** continuam
+passando sem nenhuma edicao - em particular o `INV-MERGE-SYM-003`, que le' o
+FONTE de `deduplicate_walls` e exige a presenca de
+`symmetric_lines_within_distance(`: a conjuncao de 26.10.4 preserva essa
+chamada.
+
+#### 26.10.9 EXCECAO PERMITIDA - a otimizacao da passada 1 entra junto com a correcao
+
+`CONFIRMED`. Autorizada pelo usuario em 2026-09-01.
+
+Processar as linhas mais longas primeiro deixa a lista de candidatas cheia
+por mais iteracoes, entao a ordenacao canonica de 26.10.2, sozinha, **custa
+tempo**. A varredura por indice com marcador `taken` (no lugar de
+reconstruir a lista `rest` a cada cluster, o que copiava O(n) tuplas 1.714
+vezes) devolve **particao IDENTICA** e paga esse custo.
+
+**Nao e' refatoracao oportunista:** ela so' e' aceita porque neutraliza o
+custo introduzido pela propria correcao, e a identidade da particao e' medida
+nas 6 ordens (`diagnostics_2k/run_b_downstream.py`, secao "A OTIMIZACAO NAO
+MUDA COMPORTAMENTO").
+
+#### 26.10.10 DIVIDA CONHECIDA que continua aberta depois do `CR-2F-D`
+
+`CONFIRMED`. Registrado para nao se perder:
+
+- **O pareamento `(474, 2306)`** - uma face de 155,61 cm pareada com uma
+  linha auxiliar de 4.394,45 cm inclinada 1,1125 grau, que gera o eixo
+  espurio de 43,9 m. Ele **continua no resultado**, como uma das 4 espurias:
+  o `CR-2F-D` impediu que ele APAGASSE uma parede valida, nao que ele
+  nascesse. Nao e' merge, nao e' eixo e nao e' deduplicacao: e'
+  **pareamento**. Continua sem CR atribuido.
+- **As 10 paredes ausentes** (`W004`, `W005`, `W006`, `W007`, `W025`,
+  `W026`, `W046`, `W047`, `W084`, `W085`). Fora do escopo do `CR-2F-D` por
+  decisao explicita; nenhuma foi perseguida e nenhuma voltou por acaso.
+- **O deslocamento de ~2 cm do `reference.json` na `W097`** (26.10.6). E' um
+  problema do GABARITO, nao do solver - mas convem verificar se ele se repete
+  em outras paredes do gabarito antes de usar `eixo_ok` como metrica fina.
