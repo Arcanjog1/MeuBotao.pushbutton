@@ -2858,7 +2858,8 @@ simetria.
 #### 26.8.5 PENDENCIA NOVA - `CENTERLINE_ARGUMENT_ASYMMETRY` (2F-E)
 
 **DOCUMENTADO - pendencia de codigo aberta.** Descoberto na 2G, nao previsto
-na 2F.
+na 2F. **Diagnosticado por completo na Etapa 2I** - ver 26.8.7, que corrige
+e detalha os numeros abaixo. Nenhuma linha de producao foi alterada ainda.
 
 `create_centerline(l1, l2)` ancora o eixo em `p0` de **`l1`** e comeca o
 intervalo em `[0, len(l1)]`; `l2` so' ESTENDE, e no maximo
@@ -2912,3 +2913,200 @@ existia).
 varredura com as funcoes reais de producao, comparando o conjunto GEOMETRICO
 de pares aceitos (nao o centerline final, que tem a assimetria PROPRIA e
 FORA DE ESCOPO do `2F-E`/26.8.5) em 5 permutacoes das 2.868 linhas.
+
+---
+
+### 26.8.7 `CR-2F-E` diagnosticado - causa-raiz, censo e plano (Etapa 2I, 2026-09-01)
+
+**Status:** `DOCUMENTADO - pendencia de codigo aberta`. Nenhum arquivo de
+`nuvem/core/**` foi alterado nesta etapa. Diagnostico completo em
+`nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md`; laboratorio reproduzivel em
+`nuvem/benchmark/diagnostics_2i/`.
+
+#### 26.8.7.1 CORRECAO DE REGISTRO - o numero `2.421,34 cm` de 26.8.5
+
+`CONFIRMED`. O desvio maximo de **2.421,34 cm** citado em 26.8.5 foi medido
+sob os predicados **`E_bis`** com o desempate `(i, j)` (o estado da arvore em
+`0ec7f2b`, ANTES de `865373c`/`c5447fe`), no par `(477, 2306)`. A producao
+adotou **`E_ovl`** e a chave geometrica canonica; nessa configuracao o par
+aceito naquela regiao e' `(474, 2306)` e o pior desvio e' **2.121,69 cm**
+(metrica da 2G) / **2.121,71 cm** (Hausdorff).
+
+Reproduzido nas duas configuracoes (`diagnostics_2i/run_a_baseline_census.py`).
+**O fato central - `47/199` eixos divergentes - e' identico nas duas.** A
+regra anterior nao esta' errada no mecanismo, so' no numero; a partir de agora
+vale **2.121,69 cm**, e `2.421,34 cm` so' pode ser citado com a ressalva
+"sob os predicados `E_bis` da 2G".
+
+#### 26.8.7.2 REGRA OBRIGATORIA - o eixo da parede nao pode depender de qual
+face entrou primeiro, NEM do sentido em que a face foi desenhada
+
+`CONFIRMED`. Sao **duas invariancias diferentes** e tem que ser medidas
+separadamente - confundi-las foi o que deixou a segunda passar despercebida
+por duas etapas:
+
+- **ARGUMENT ORDER:** `create_centerline(A, B)` contra `create_centerline(B, A)`.
+  **47 de 199 pares aceitos (23,6%)** mudam de eixo. Pior desvio
+  **2.121,71 cm**.
+- **ENDPOINT DIRECTION:** `Line(p0,p1)` contra `Line(p1,p0)` da MESMA face.
+  **14 de 199 pares** mudam de eixo, ate' **1,15 cm**. **FATO NOVO da 2I -
+  nunca havia sido medido.** Inverter `l2` nao muda nada (a funcao ja'
+  realinha `dir2`); e' a inversao de `l1` que muda, porque a ancora e' a
+  ponta `p0` dela.
+
+Comparacao sempre **geometrica** (chave canonica com a ponta menor primeiro):
+uma linha invertida **nao** e' um eixo diferente.
+
+#### 26.8.7.3 CAUSA-RAIZ medida por ablacao
+
+`CONFIRMED` (`diagnostics_2i/run_c_rootcause.py`; a dissecacao foi validada
+contra a funcao real em 199/199 pares antes de qualquer conclusao).
+
+A **direcao ja' e' simetrica** - a bissetriz introduzida numa correcao
+anterior resolveu isso, e os 47 pares divergentes tem todos a MESMA direcao
+de eixo. Sobram duas fontes, ambas em `core/engine/geometry.py`:
+
+| fonte | linha | divergencias | pior desvio |
+|---|---|---|---|
+| **INTERVALO** ancorado em `l1` | `t_lo, t_hi = 0.0, len1` + o clamp `<= max_extension_ft` | **33 / 47** | **2.121,71 cm** |
+| **OFFSET perpendicular** amostrado sobre `l1` | `sample_ts = (0.0, len1*0.5, len1)` projetado em `l2` | **14 / 47** | 10,29 cm |
+
+A ancora `p0 = l1.GetEndPoint(0)` muda em 199/199 mas **nao e' causa**: e' so'
+a origem parametrica. Ela vira causa porque o intervalo e a amostragem sao
+escritos *relativos a ela*.
+
+#### 26.8.7.4 PADRAO OBSERVADO - que geometria provoca
+
+`CONFIRMED`. Censo dos 199 pares aceitos:
+
+- **razao de comprimentos** - mediana **0,999** nos 152 pares identicos
+  contra **0,434** nos 47 divergentes. **Todo par com faces de comprimento
+  igual e' simetrico.**
+- **desvio angular** - os 152 identicos tem angulo **0,0000 grau SEM
+  EXCECAO**; todo par com angulo > 0 esta' entre os divergentes.
+- **espessura e razao de sobreposicao NAO discriminam nada** (identicas nos
+  dois grupos).
+
+Nao e' problema de tolerancia. E' problema de **referencia**: a assimetria
+aparece exatamente quando as duas faces do par **nao sao gemeas**.
+
+#### 26.8.7.5 REGRA OBRIGATORIA - toda a instabilidade de ordem restante do
+Wall Modeling nasce em `create_centerline`
+
+`CONFIRMED`. Isolamento camada por camada, 5 permutacoes das 2.868 linhas
+(seeds 1, 2, 3, 10, 42):
+
+| camada | hoje (`cur`) |
+|---|---|
+| candidatos | 0 diferencas |
+| **pares aceitos** | **0 diferencas** (`CR-2F-B` + `CR-2F-C`) |
+| **`create_centerline`** | **22, 23, 24, 28, 29 eixos divergem** |
+| paredes finais | fingerprint DIFERE nas 5 seeds |
+
+Efeito real medido no gabarito: a cobertura do `cur` oscila entre **85 e 87
+de 97** e as 7 paredes monitoradas entre **5 e 7**, perdendo `W037`, `W001`
+ou `W010` conforme a ordem da lista.
+
+> **Consequencia que precisa ficar registrada:** os `87/97` do baseline
+> **nao sao uma propriedade da formula** - sao o melhor resultado de um
+> sorteio. Nos dois casos criticos medidos, a face certa caiu como `l1` por
+> acaso. Comparar uma correcao deterministica contra esse `87` e' comparar
+> contra a melhor sorte de um processo nao-deterministico.
+
+#### 26.8.7.6 REGRA OBRIGATORIA - ordenacao canonica NAO e' correcao de
+simetria
+
+`CONFIRMED`. Medido nas duas estrategias canonicas
+(`CANONICAL_ARGUMENT_ORDER` e `LONGEST_REFERENCE` delegando a' formula atual):
+
+| | erro de centralizacao do eixo (pior) | media |
+|---|---|---|
+| hoje (`cur`) | 1,1438 cm | 0,01781 cm |
+| **canonicas** | **21,3331 cm** | **0,12718 cm (7,1x pior)** |
+
+Elas zeram a ARGUMENT ORDER e **deixam a ENDPOINT DIRECTION de pe'** (14
+divergencias, agora com **21,33 cm** em vez de 1,15 cm - a canonicalizacao
+**piorou** a segunda invariancia). Ao fixar qual face e' a referencia,
+escolhem sistematicamente a resposta **menos centrada** entre as duas que a
+funcao ja' produzia.
+
+**E' PROIBIDO aceitar uma ordenacao canonica como correcao de `CR-2F-E`.**
+O criterio de aceitacao e' o erro de centralizacao medido por
+`_axis_offset_error_ft` (a autoverificacao que o proprio motor ja' roda), nao
+"o resultado parou de variar".
+
+#### 26.8.7.7 EXCECAO PERMITIDA - o eixo cobre a UNIAO do alcance das duas
+faces, e a face MAIS LONGA e' a referencia legitima
+
+`PREFERRED` (proposta vencedora da 2I, `SYMMETRIC_LONGEST_SPAN` -
+`DOCUMENTADO, pendencia de codigo aberta`).
+
+A regra ja' esta' declarada no proprio docstring de `create_centerline`: *"o
+eixo cobre a UNIAO do alcance das duas linhas... em cada ponta, usa a que for
+MAIS LONGA das duas faces pareadas"*. O codigo de hoje cumpre essa regra
+**ancorado em `l1`**, e por isso so' acerta quando `l1` ja' e' a face mais
+longa. A correcao e' escolher a referencia pela **GEOMETRIA** (comprimento),
+num referencial sem lado (a bissetriz, o mesmo `_pair_frame_cached` que o
+`CR-2F-B` ja' usa em producao), mantendo o teto `CENTERLINE_MAX_EXTENSION`
+(40 cm) fazendo o mesmo trabalho de sempre.
+
+Medido no pipeline headless real: **199 pares aceitos (identicos ao
+baseline), 148 paredes, eixo 96, aberturas 91/91, as 7 paredes monitoradas e
+a abertura 6558457 preservadas**, `walls_lt50` 23 -> 12, `walls_lt20`
+16 -> 9, erro medio de centralizacao 0,0178 -> 0,0119 cm, custo de
+`create_centerline` **-48,1%**. Invariante a' ordem dos argumentos, ao
+sentido dos endpoints e a' ordem da lista: **0 divergencias em todos os
+testes**.
+
+**Contraexemplo que impede simplificar a regra:** no par `(1461, 1464)` a
+resposta correta e' a face **LONGA** (1.513 cm - sem ela o gabarito perde
+`W001`); no par `(474, 2306)` a resposta correta e' a face **CURTA**
+(155 cm - a linha de 4.394 cm e' auxiliar, inclinada 1,11 grau). Nenhuma
+regra de eixo distingue os dois: **isso e' pareamento, nao eixo.**
+
+#### 26.8.7.8 CONFLITO ABERTO - `deduplicate_walls` pune um eixo mais bem
+centralizado
+
+`CONFIRMED`. `OUT_OF_SCOPE_CR_2F_A` / `OUT_OF_SCOPE_CR_2F_D` - registrado
+aqui porque foi medido, **nao corrigido nesta etapa**.
+
+Com o eixo simetrico, a parede boa que cobre `W097` (707 cm em y=815) existe
+corretamente **antes** do `deduplicate_walls` (cobertura 1,000) e e'
+**removida por ele**, tratada como duplicata da parede **espuria de
+4.394,2 cm** do par `(474, 2306)`:
+
+| | distancia eixo-bom -> eixo-espurio | sobrevive? |
+|---|---|---|
+| formula ancorada em `l1` (canonica) | **10,315 cm** (> 2 cm) | sim |
+| formula simetrica | **0,363 cm** (<= `DUPLICATE_AXIS_TOLERANCE` = 2 cm) | **NAO** |
+
+**A parede boa morre porque o eixo passou a ser MAIS bem centralizado** - o
+eixo espurio, agora bem centrado, cai praticamente em cima dela, e
+`deduplicate_walls` mantem "a mais longa do grupo", que e' a espuria de 44 m.
+
+Prova causal: removendo do conjunto **apenas** os eixos com mais de 40 m
+(exatamente 1 parede) antes do `deduplicate_walls`, a formula simetrica
+devolve **87/97, eixo 96, 91/91, 7/7, 148 paredes** - identico ao baseline.
+
+Alem disso, `deduplicate_walls` (`core/engine/wall_pairing.py`) usa
+`get_distance_between_parallel_lines(line, kept_line)` - a versao
+**assimetrica**, a mesma familia que o `CR-2F-B` corrigiu dentro de
+`find_wall_pairs` - e um `sorted` estavel, que em empate de comprimento
+mantem a ordem de entrada. **E' o quarto lugar do motor com a mesma
+assimetria de relacao, e pertence ao `CR-2F-A`/`CR-2F-D`.**
+
+#### 26.8.7.9 REGRA OBRIGATORIA - testes permanentes previstos para a
+implementacao
+
+`DOCUMENTADO - pendencia de codigo aberta`. Nada foi promovido para
+`tests/**` na etapa de analise. Na implementacao, em `tests/test_script.py`:
+
+| id | trava |
+|---|---|
+| `INV-CENTER-001` | `create_centerline(A,B)` identico a `create_centerline(B,A)` |
+| `INV-CENTER-002` | as 4 combinacoes de sentido dos endpoints dao o mesmo segmento |
+| `INV-CENTER-003` | conjunto GEOMETRICO de centerlines identico em 5 permutacoes, com `find_wall_pairs` real |
+| `INV-CENTER-004` | os 152 pares que ja' eram univocos mantem o MESMO eixo |
+
+`INV-CENTER-003` fecha a lacuna que o `INV-PAIR-003` (26.8.6) deixou
+explicita: ele compara o conjunto de PARES, nunca o centerline.
