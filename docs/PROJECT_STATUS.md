@@ -75,13 +75,24 @@ dista 5,001/8,999 cm das faces (deveria ser 7/7). **É PROIBIDO mover a
 parede para satisfazer o gabarito** — ver REGRAS §26.10.6. Consequência
 aceita: a `W097` conta como coberta mas não entra no `eixo_ok` (≤ 0,5 cm).
 
+## Performance
+
+Passada 1 do merge, 3 amostras cada (`diagnostics_2k/run_b_downstream.py`):
+
+| variante | média |
+|---|---|
+| antes (ordem de entrada + `rest`) | 9,15 s |
+| só a ordem canônica (sem a otimização) | 9,64 s |
+| **produção** (ordem canônica + `taken`) | **8,67 s** (−5,2 %) |
+
+Partição idêntica entre `rest` e `taken` nas 6 ordens (1.714 clusters).
+
 ## PENDENTE
 
-- [ ] Autorização do usuário para o merge na `main`. **Nada foi mesclado.**
-- [ ] `diagnostics_2k/run_b_downstream.py` — bateria comparativa completa
-      (3 variantes × 6 ordens + runtime). Executada; ver
-      `nuvem/benchmark/diagnostics_2k/out_b_downstream.json` para os
-      números finais gravados.
+- [ ] **Autorização do usuário para o merge na `main`. Nada foi mesclado.**
+- [x] Bateria completa (3 variantes × produção + 5 seeds), censo de
+      assimetria, 256 + 113 testes, fingerprint do solver — todos
+      executados; resultados em `nuvem/benchmark/diagnostics_2k/`.
 
 ## Dívida conhecida (fora do escopo do CR-2F-D)
 
