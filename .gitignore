@@ -36,9 +36,3 @@ nuvem/benchmark/projects/*/scoped_comparison.json
 nuvem/benchmark/projects/*/provisional_2b/result.json
 nuvem/benchmark/projects/*/provisional_2b/findings.json
 nuvem/benchmark/projects/*/provisional_2b/comparison.json
-
-# AI Team: estado de execucao de cada run. E' volumoso e regeneravel; o
-# workflow sobe o diretorio como artifact do GitHub Actions. O que fica
-# versionado e' a arquitetura, o codigo e as baselines.
-.ai-team/runs/
-.ai-team/metrics.json
