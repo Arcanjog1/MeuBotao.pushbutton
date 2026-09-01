@@ -53,8 +53,9 @@ sem force push).
 **Branch com trabalho concluído aguardando merge:**
 
 ```
-branch: claude/cr-2f-d-determinism-ewnru5
-base:   c21a4297a6ff372358cbb81da5ca6a65f91a955b (merge-base com a main)
+branch:              claude/cr-2f-d-determinism-ewnru5
+SHA inicial (baseline original do CR-2F-D): c21a4297a6ff372358cbb81da5ca6a65f91a955b
+merge-base ATUAL com a main (pós git merge origin/main): d16965dba45b81c2a109bc24b23ab2fcb959db10
 ```
 
 A `main` foi trazida **para dentro** da branch por `git merge origin/main`
@@ -572,7 +573,8 @@ próximo passo recomendado: avançar o CR-2F-D conforme seção 5 e
 data:          2026-09-01
 CR:            CR-2F-D (determinismo do merge + recuperação da W097)
 branch:        claude/cr-2f-d-determinism-ewnru5
-SHA inicial:   c21a4297a6ff372358cbb81da5ca6a65f91a955b (merge-base com a main)
+SHA inicial:   c21a4297a6ff372358cbb81da5ca6a65f91a955b (baseline original do CR-2F-D)
+merge-base ATUAL com a main (pós git merge origin/main): d16965dba45b81c2a109bc24b23ab2fcb959db10
 SHA final:     (ver commit de merge desta atualização)
 status:        CONCLUÍDO na branch — main NÃO alterada, aguardando
                autorização de merge
