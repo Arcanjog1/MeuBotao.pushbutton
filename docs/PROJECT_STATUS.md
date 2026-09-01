@@ -697,7 +697,9 @@ data:          2026-09-01
 CR:            CR-BLOCK-01 (CONTA 1 de um par de sessões paralelas)
 branch:        claude/block-01-prisma-fiadas-rik42t
 SHA inicial:   9f3bab41b35f0e2a5f9782583ead8e1ee7755f49 (main)
-SHA final:     bff84e5fb690d03faff83e87a678eff1a42fce66
+SHA final:     995e884 (docs) — a correção de PRODUÇÃO é bff84e5
+               (nuvem/core/engine/wall_stepper.py); c71e06c traz o
+               benchmark e 01b7361 a suíte nova de invariantes
 status:        IMPLEMENTADO — NÃO MESCLADO. Aguardando revisão e auditoria
                cruzada com a CONTA 2.
 
