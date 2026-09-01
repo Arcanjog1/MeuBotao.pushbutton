@@ -1,0 +1,169 @@
+{
+  "dissect_matches_engine": true,
+  "op_changes_argument_order": {
+    "anchor": 199,
+    "len1_cm": 132,
+    "t_lo_cm": 69,
+    "t_hi_cm": 95,
+    "span_cm": 36,
+    "half_offset_norm_cm": 14
+  },
+  "worst_span_delta_cm": 4238.640758562215,
+  "diff_seg_same_direction": 47,
+  "endpoint_direction": {
+    "cur": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 14,
+        "worst_haus_cm": 1.1527769867161333,
+        "worst_span_cm": 2.1671553440683056e-13
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 14,
+        "worst_haus_cm": 1.1527769867161333,
+        "worst_span_cm": 2.1671553440683056e-13
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 47,
+        "worst_haus_cm": 2121.7140608391583,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S1": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 8,
+        "worst_haus_cm": 1.1527769867161333,
+        "worst_span_cm": 2.1671553440683056e-13
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 6,
+        "worst_haus_cm": 21.33362040003692,
+        "worst_span_cm": 4.3165471197426086e-13
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 14,
+        "worst_haus_cm": 21.33362040003692,
+        "worst_span_cm": 4.3165471197426086e-13
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S2": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 7,
+        "worst_haus_cm": 1.1527769867161333,
+        "worst_span_cm": 2.1671553440683056e-13
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 7,
+        "worst_haus_cm": 21.33362040003692,
+        "worst_span_cm": 4.3165471197426086e-13
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 14,
+        "worst_haus_cm": 21.33362040003692,
+        "worst_span_cm": 4.3165471197426086e-13
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S3": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S4": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S5": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    },
+    "S6": {
+      "A(p1,p0) B(p0,p1)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p0,p1) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "A(p1,p0) B(p1,p0)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      },
+      "ARGUMENT ORDER (B,A)": {
+        "n_diff": 0,
+        "worst_haus_cm": 0.0,
+        "worst_span_cm": 0.0
+      }
+    }
+  }
+}

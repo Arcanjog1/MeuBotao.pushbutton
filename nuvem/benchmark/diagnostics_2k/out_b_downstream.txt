@@ -1,0 +1,55 @@
+
+### ANTES (ordem de entrada, pre-CR-2F-D)
+ordem        mescl      merge_fp  aceitos  dedup  walls  cobertas  eixo  abert.  monit   esp       wall_fp  t_merge
+producao      2866  a5857b31ac39      201     56    145        87    96      91      7     4  159c946e2c12    10.2s
+seed 1        2866  e9a598461652      201     56    145        87    96      91      7     4  159c946e2c12     9.9s
+seed 2        2870  58f254988091      201     56    145        87    96      91      7     4  159c946e2c12    11.6s
+seed 3        2869  be40ec350f31      201     56    145        87    96      91      7     4  159c946e2c12    10.2s
+seed 10       2866  a15c4fc86b31      201     56    145        87    96      91      7     4  159c946e2c12    10.7s
+seed 42       2866  d28fcc858591      201     56    145        87    96      91      7     4  159c946e2c12    11.1s
+  fingerprints DISTINTOS do merge   : 6
+  fingerprints DISTINTOS das paredes: 1   <- gate do CR-2F-D
+  ausentes (producao)               : W004,W005,W006,W007,W025,W026,W046,W047,W084,W085
+  W097 coberta                      : True
+
+### SO' A ORDEM CANONICA (sem a otimizacao)
+ordem        mescl      merge_fp  aceitos  dedup  walls  cobertas  eixo  abert.  monit   esp       wall_fp  t_merge
+producao      2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    13.2s
+seed 1        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.9s
+seed 2        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.9s
+seed 3        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.0s
+seed 10       2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.0s
+seed 42       2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.5s
+  fingerprints DISTINTOS do merge   : 1
+  fingerprints DISTINTOS das paredes: 1   <- gate do CR-2F-D
+  ausentes (producao)               : W004,W005,W006,W007,W025,W026,W046,W047,W084,W085
+  W097 coberta                      : True
+
+### PRODUCAO (CR-2F-D: ordem canonica + taken)
+ordem        mescl      merge_fp  aceitos  dedup  walls  cobertas  eixo  abert.  monit   esp       wall_fp  t_merge
+producao      2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    12.0s
+seed 1        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    13.9s
+seed 2        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    13.0s
+seed 3        2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    13.4s
+seed 10       2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    10.7s
+seed 42       2866  3530f5d4c8bd      201     56    145        87    96      91      7     4  159c946e2c12    11.1s
+  fingerprints DISTINTOS do merge   : 1
+  fingerprints DISTINTOS das paredes: 1   <- gate do CR-2F-D
+  ausentes (producao)               : W004,W005,W006,W007,W025,W026,W046,W047,W084,W085
+  W097 coberta                      : True
+
+### A OTIMIZACAO NAO MUDA COMPORTAMENTO
+  producao   particao `rest` == particao `taken`: True  (1714 clusters)
+  seed 1     particao `rest` == particao `taken`: True  (1714 clusters)
+  seed 2     particao `rest` == particao `taken`: True  (1714 clusters)
+  seed 3     particao `rest` == particao `taken`: True  (1714 clusters)
+  seed 10    particao `rest` == particao `taken`: True  (1714 clusters)
+  seed 42    particao `rest` == particao `taken`: True  (1714 clusters)
+
+### RUNTIME da passada 1 do merge (3 amostras cada)
+  antes      : 9.34 9.13 8.99   media=9.15s
+  so a ordem : 9.52 9.45 9.95   media=9.64s
+  producao   : 9.05 8.84 8.11   media=8.67s
+  antes -> producao: -0.48s  (-5.2%)
+
+-> out_b_downstream.json

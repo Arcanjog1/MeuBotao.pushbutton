@@ -8,6 +8,7 @@ de janela falsos que guardam a arvore de controles. Ver o cabecalho de la'.
 Rodar:  python tests/run_tests.py
 """
 
+import hashlib
 import json
 import math
 import os
@@ -887,6 +888,185 @@ def test_INV_PAIR_003_desempate_final_invariante_a_renumeracao():
             len(baseline ^ permuted),
         )
 
+
+# ------------------------------------------- CR-2F-E (INV-CENTER-001..004)
+#
+# `create_centerline` ancorava tudo em `l1` (a linha de indice menor na lista
+# de entrada de `find_wall_pairs`): o eixo comecava em `p0` de `l1` e o
+# intervalo era `[0, len(l1)]`, com `l2` podendo apenas ESTENDER. Quem entrava
+# como `l1` decidia o comprimento da parede. Medido nos 199 pares aceitos do
+# benchmark real (Etapa 2I): 47 eixos (23,6%) mudavam so' invertendo a ordem
+# dos argumentos, ate' 2.121,71 cm; e 14 mudavam so' invertendo o SENTIDO dos
+# endpoints de `l1`. Era a unica camada do Wall Modeling que ainda dependia da
+# ordem da lista. Ver nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md.
+
+def _centerline_geometry_key(line, nd=6):
+    """Chave GEOMETRICA canonica de um eixo, em cm: ponta menor primeiro.
+    Uma linha invertida NAO e' um eixo diferente - e' o mesmo segmento
+    escrito ao contrario, e comparar os endpoints crus acusaria uma
+    diferenca que nao existe na parede."""
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    a = (round(to_cm(p0.X), nd) + 0.0, round(to_cm(p0.Y), nd) + 0.0)
+    b = (round(to_cm(p1.X), nd) + 0.0, round(to_cm(p1.Y), nd) + 0.0)
+    return (a, b) if a <= b else (b, a)
+
+
+def _reversed_seg(line):
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    return Line.CreateBound(XYZ(p1.X, p1.Y, p1.Z), XYZ(p0.X, p0.Y, p0.Z))
+
+
+# Tres pares em coordenadas literais (cm). Os dois ultimos sao reducoes de
+# pares REAIS do benchmark, e sao um contraexemplo um do outro: no primeiro a
+# resposta certa e' a face LONGA (sem ela o gabarito perde W001), no segundo
+# e' a CURTA (a linha de 4.394 cm apenas passa perto, inclinada ~1,11 grau).
+# Nenhuma regra de eixo distingue os dois - por isso o criterio e' a UNIAO do
+# alcance com teto, nao "a resposta menor" nem "a maior".
+_CENTERLINE_CASES = (
+    # sintetico minimo: face curta dentro de uma face longa, gap > 2*ext
+    ("sintetico_curta_dentro_de_longa",
+     (0.0, 0.0, 100.0, 0.0), (-500.0, 14.0, 600.0, 14.0)),
+    # real, reduzido: par (1461, 1464) - faces exatamente paralelas
+    ("real_1461_1464",
+     (2070.52, 774.05, 2070.52, -739.10), (2056.52, 774.05, 2056.52, 350.05)),
+    # real, reduzido: par (474, 2306) - 1,11 grau de desvio, razao 1:28
+    ("real_474_2306",
+     (-4.48, 807.55, 151.13, 807.55), (2267.73, 865.75, -2125.90, 780.43)),
+)
+
+
+@case
+def test_INV_CENTER_001_eixo_invariante_a_ordem_dos_argumentos():
+    """INV-CENTER-001 / CR-2F-E, gate H1: `create_centerline(A, B)` tem que
+    produzir o MESMO SEGMENTO que `create_centerline(B, A)`.
+
+    Antes da correcao, o caso sintetico abaixo devolvia 100 cm ou 1.100 cm
+    conforme a ordem, e o par real (474, 2306) devolvia 155,61 cm ou
+    4.394,25 cm - a mesma geometria virando uma parede de 1,5 m ou de 44 m."""
+    for name, a, b in _CENTERLINE_CASES:
+        la, lb = seg(*a), seg(*b)
+        ab = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        ba = m.create_centerline(lb, la, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert ab is not None and ba is not None, name
+        assert _centerline_geometry_key(ab) == _centerline_geometry_key(ba), (
+            name, _centerline_geometry_key(ab), _centerline_geometry_key(ba))
+
+
+@case
+def test_INV_CENTER_002_eixo_invariante_ao_sentido_dos_endpoints():
+    """INV-CENTER-002 / CR-2F-E, gate H2: inverter o SENTIDO em que uma face
+    foi desenhada no CAD (`Line(p0,p1)` -> `Line(p1,p0)`) nao pode mudar o
+    eixo. E' uma invariancia DIFERENTE da de INV-CENTER-001 - confundir as
+    duas foi o que deixou esta passar despercebida por duas etapas: uma
+    ordenacao canonica dos argumentos zera H1 e deixa H2 inteira de pe'
+    (medido: 14/199 eixos ainda mudavam, com o erro subindo de 1,15 cm para
+    21,33 cm). Testa as quatro combinacoes de sentido das duas faces."""
+    for name, a, b in _CENTERLINE_CASES:
+        la, lb = seg(*a), seg(*b)
+        base = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert base is not None, name
+        expected = _centerline_geometry_key(base)
+        for flip_a in (False, True):
+            for flip_b in (False, True):
+                ca = _reversed_seg(la) if flip_a else la
+                cb = _reversed_seg(lb) if flip_b else lb
+                got = m.create_centerline(ca, cb, m.CENTERLINE_MAX_EXTENSION_FT)
+                assert got is not None, (name, flip_a, flip_b)
+                assert _centerline_geometry_key(got) == expected, (
+                    name, flip_a, flip_b, _centerline_geometry_key(got), expected)
+
+
+def _centerline_geometry_set(lines):
+    """Conjunto GEOMETRICO dos eixos que `find_wall_pairs` REAL devolve -
+    a camada imediatamente depois do pareamento, que e' onde o CR-2F-E
+    atua. Sem `cap_candidate_lines`/`openings`: o recorte nas testas
+    (`clip_centerline_to_caps`) e' um estagio proprio e nao faz parte
+    desta invariancia."""
+    th_ft = [ft(14.0)]
+    tol_ft = m.compute_detection_tolerance_ft(th_ft)
+    walls, _unused = m.find_wall_pairs(lines, th_ft, tol_ft)
+    return sorted(_centerline_geometry_key(w[0]) for w in walls)
+
+
+@case
+def test_INV_CENTER_003_conjunto_de_eixos_invariante_a_ordem_da_lista():
+    """INV-CENTER-003 / CR-2F-E, gate H3: o conjunto GEOMETRICO de eixos
+    devolvido por `find_wall_pairs` nao pode mudar quando a lista de entrada
+    e' permutada.
+
+    Fecha a lacuna que o INV-PAIR-003 (CR-2F-C) deixou explicita: aquele
+    compara o conjunto de PARES, nunca o centerline, porque na epoca o
+    centerline tinha a assimetria PROPRIA do 2F-E. Medido antes da correcao:
+    22 a 29 eixos mudavam por permutacao, mesmo com os pares congelados.
+
+    A nuvem sintetica tem faces de comprimentos DIFERENTES (o gatilho da
+    assimetria: nos 199 pares reais, todo par com faces de comprimento igual
+    ja' era simetrico) e um desvio angular de ~1 grau numa delas."""
+    lines = [
+        # parede horizontal: face de baixo mais longa que a de cima
+        seg(0.0, 0.0, 900.0, 0.0),
+        seg(120.0, 14.0, 700.0, 14.0),
+        # parede vertical: face esquerda longa, direita curta (caso W001)
+        seg(300.0, 200.0, 300.0, 1100.0),
+        seg(314.0, 500.0, 314.0, 900.0),
+        # parede vertical isolada, faces do mesmo tamanho
+        seg(1500.0, 100.0, 1500.0, 800.0),
+        seg(1514.0, 100.0, 1514.0, 800.0),
+        # face curta ao lado de uma linha longa com ~1,1 grau de desvio
+        seg(2000.0, 400.0, 2155.0, 400.0),
+        seg(1400.0, 425.7, 2600.0, 402.4),
+    ]
+    baseline = _centerline_geometry_set(lines)
+    assert len(baseline) >= 3, baseline
+
+    for seed in (1, 2, 3, 10, 42):
+        rng = random.Random(seed)
+        shuffled = list(lines)
+        rng.shuffle(shuffled)
+        assert _centerline_geometry_set(shuffled) == baseline, (
+            seed, "conjunto GEOMETRICO de eixos mudou so' de permutar a lista")
+
+
+@case
+def test_INV_CENTER_004_pares_ja_univocos_mantem_o_mesmo_eixo():
+    """INV-CENTER-004 / CR-2F-E: nao-regressao dos pares que JA' eram
+    univocos. Dos 199 pares aceitos do benchmark, 152 ja' davam o mesmo eixo
+    nas duas ordens - neles nao havia ambiguidade nenhuma a resolver, e o
+    CR-2F-E nao pode toca-los.
+
+    Isto e' o que separa a solucao adotada (SYMMETRIC_LONGEST_SPAN) das
+    alternativas MUTUAL_OVERLAP / ENDPOINT_AVERAGING / BANDED_SPAN, que
+    zeravam H1 e H2 mas reescreviam 86 desses 152 eixos - uma ate' 37,01 cm.
+
+    O primeiro caso e' o que DISCRIMINA: duas faces da mesma parede com
+    alcances ligeiramente diferentes, a diferenca dentro de
+    CENTERLINE_MAX_EXTENSION. A formula antiga ja' devolvia [0, 500] nas
+    duas ordens (univoco), e e' isso que tem que ser preservado -
+    MUTUAL_OVERLAP devolveria [20, 480] e ENDPOINT_AVERAGING [10, 490]."""
+    fixtures = (
+        # faces com alcances diferentes -> o eixo cobre a UNIAO, nao a
+        # sobreposicao mutua nem a media dos extremos
+        ((0.0, 0.0, 500.0, 0.0), (20.0, 14.0, 480.0, 14.0),
+         ((0.0, 7.0), (500.0, 7.0))),
+        # faces exatamente gemeas -> eixo na mediana, alcance comum
+        ((0.0, 0.0, 500.0, 0.0), (0.0, 14.0, 500.0, 14.0),
+         ((0.0, 7.0), (500.0, 7.0))),
+        # vertical, reducao do par real (1461/1464) com as faces alinhadas
+        ((2070.52, 774.05, 2070.52, 350.05), (2056.52, 774.05, 2056.52, 350.05),
+         ((2063.52, 350.05), (2063.52, 774.05))),
+        # horizontal, reducao do par real (89/1350)
+        ((-1878.4886, 767.0493, -408.48, 767.0493),
+         (-1878.4886, 781.0493, -408.48, 781.0493),
+         ((-1878.4886, 774.0493), (-408.48, 774.0493))),
+    )
+    for a, b, expected in fixtures:
+        la, lb = seg(*a), seg(*b)
+        got = m.create_centerline(la, lb, m.CENTERLINE_MAX_EXTENSION_FT)
+        assert got is not None, (a, b)
+        key = _centerline_geometry_key(got, nd=4)
+        for pt_got, pt_exp in zip(key, expected):
+            assert abs(pt_got[0] - pt_exp[0]) < 0.002, (a, b, key, expected)
+            assert abs(pt_got[1] - pt_exp[1]) < 0.002, (a, b, key, expected)
 
 @case
 def test_merge_collinear_fragments_religamento_em_cascata_apos_particionamento():
@@ -7435,3 +7615,655 @@ def test_conflito_de_abertura_e_descrito_de_forma_util_no_relatorio():
     }
     texto = m.describe_non_modular_entry(sem_espaco)
     assert "WALL_START" in texto and "OPENING_LO" in texto, texto
+
+
+# --------------------------------- CR-2F-A (INV-MERGE-SYM / INV-DEDUP-SYM)
+# MERGE_RELATION_ASYMMETRY (nuvem/benchmark/RELATORIO_ETAPA_2F.md item R):
+# a relacao de compatibilidade que forma os clusters do merge - e a relacao
+# de duplicidade de `deduplicate_walls` - media o PONTO MEDIO da PRIMEIRA
+# linha contra a RETA INFINITA da segunda. Como `are_lines_parallel` aceita
+# ate' 2,87 graus, `d(A,B) != d(B,A)`, e quem entrava como primeiro argumento
+# era so' a POSICAO na lista. Censo medido no projeto real: 393 pares com
+# veredito dependente da direcao no merge, 1 no `deduplicate_walls`.
+#
+# O CR-2F-A troca `d(A,B) <= tol` por `max(d(A,B), d(B,A)) <= tol` (estrategia
+# T2), nos QUATRO sitios de producao. Os testes abaixo travam a PROPRIEDADE
+# `compat(A,B) == compat(B,A)` - nao o placar do gabarito.
+#
+# ESCOPO: o CR-2F-A entrega SIMETRIA DA RELACAO. Ele NAO entrega invariancia
+# do merge a' ordem da lista: a relacao continua NAO TRANSITIVA e o
+# agrupamento continua sendo ESTRELA. Isso e' o CR-2F-D, e nenhum teste aqui
+# pode cobrar isso deste CR.
+
+def _sym_asymmetric_pair_cm():
+    """Par sintetico (em cm) em que a formula ANTIGA da vereditos OPOSTOS
+    conforme a ordem, para QUALQUER tolerancia entre ~0 e 10cm.
+
+      base : reta longa inclinada 0,5729 grau, de (-2000;0) a (2000;40);
+             passa exatamente por (1000;30) e tem ponto medio em (0;20).
+      frag : fragmento horizontal curto em y=30, centrado em x=1000.
+
+    d(frag, base) = 0     -> o ponto medio do fragmento cai EM CIMA da reta
+    d(base, frag) = 10cm  -> o ponto medio da reta longa esta' a 10cm da
+                             reta do fragmento
+
+    Nao ha nada de excepcional na geometria: e' so' uma reta longa levemente
+    inclinada (dentro dos 2,87 graus aceitos como "paralelo") ao lado de um
+    trecho curto - a configuracao mais comum de um Layer de CAD real."""
+    base = seg(-2000.0, 0.0, 2000.0, 40.0)
+    frag = seg(995.0, 30.0, 1005.0, 30.0)
+    return base, frag
+
+
+def _sym_directional_distances_cm(a, b):
+    ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+    return (to_cm(m._distance_between_parallel_cached(ca, cb)),
+            to_cm(m._distance_between_parallel_cached(cb, ca)))
+
+
+@case
+def test_INV_MERGE_SYM_001_compat_A_B_igual_compat_B_A():
+    """INV-MERGE-SYM-001: `compat(A,B) == compat(B,A)` para a relacao que o
+    merge usa, varrida sobre uma GRADE sintetica de inclinacoes e
+    afastamentos - nenhum id, comprimento ou par do projeto real aparece
+    aqui.
+
+    O bloco de controle no fim prova que a grade EXERCITA a assimetria: a
+    primitiva antiga, sozinha, discorda de si mesma em varios desses pares.
+    Sem esse controle o teste passaria trivialmente numa grade simetrica."""
+    tol = m.COLLINEAR_MATCH_TOLERANCE_FT
+    grade = []
+    for angulo_grau in (0.0, 0.05, 0.2, 0.5, 1.0, 2.0, 2.8):
+        dy = 4000.0 * math.tan(math.radians(angulo_grau))
+        longa = seg(-2000.0, 0.0, 2000.0, dy)
+        for centro_x in (-1500.0, -800.0, 0.0, 800.0, 1500.0):
+            # o fragmento fica exatamente sobre a reta longa naquele x
+            y = dy * 0.5 + centro_x * (dy / 4000.0)
+            for comprimento in (4.0, 40.0, 400.0):
+                for offset in (0.0, 0.1, 0.19, 0.25, 1.0):
+                    curta = seg(centro_x - comprimento / 2.0, y + offset,
+                                centro_x + comprimento / 2.0, y + offset)
+                    grade.append((longa, curta))
+    assert len(grade) == 525, len(grade)
+
+    def agrupou(lines):
+        """CAIXA-PRETA: o merge de producao juntou os dois num cluster so'?"""
+        out = m.merge_collinear_fragments(
+            lines, tol, m.MAX_JUNCTION_GAP_FT, [],
+            m.OPENING_GAP_PERP_TOLERANCE_FT, m.OPENING_GAP_WIDTH_SLACK_FT)
+        return len(out) == 1
+
+    violacoes = []
+    for a, b in grade:
+        if agrupou([a, b]) != agrupou([b, a]):
+            violacoes.append((_sym_directional_distances_cm(a, b),
+                              agrupou([a, b]), agrupou([b, a])))
+    assert violacoes == [], violacoes[:5]
+
+    # a MESMA propriedade, agora no predicado que os quatro sitios chamam
+    for a, b in grade:
+        ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+        ab = (m._are_parallel_cached(ca, cb) and
+              m._symmetric_within_distance_cached(ca, cb, tol))
+        ba = (m._are_parallel_cached(cb, ca) and
+              m._symmetric_within_distance_cached(cb, ca, tol))
+        assert ab == ba, (_sym_directional_distances_cm(a, b), ab, ba)
+
+    # CONTROLE: a mesma grade, com a primitiva ANTIGA, e' assimetrica. Se
+    # este numero virar zero, a grade parou de exercitar o defeito e o teste
+    # acima deixou de provar qualquer coisa.
+    assimetricos = 0
+    for a, b in grade:
+        ca, cb = m._line_geom_cache(a), m._line_geom_cache(b)
+        if not m._are_parallel_cached(ca, cb):
+            continue
+        ab = m._distance_between_parallel_cached(ca, cb) <= tol
+        ba = m._distance_between_parallel_cached(cb, ca) <= tol
+        if ab != ba:
+            assimetricos += 1
+    assert assimetricos >= 50, assimetricos
+
+
+@case
+def test_INV_MERGE_SYM_002_caso_angular_minimo_ordem_da_lista():
+    """INV-MERGE-SYM-002: caso sintetico minimo (2 segmentos) em que a
+    implementacao ANTIGA dava vereditos diferentes conforme quem entrava
+    como A e quem entrava como B - agora `merge_collinear_fragments` tem de
+    devolver a MESMA geometria nas duas ordens.
+
+    E' o teste de caixa-preta do CR-2F-A: nao toca em nenhum helper novo,
+    so' na funcao de producao."""
+    base, frag = _sym_asymmetric_pair_cm()
+
+    # o defeito, medido: as duas direcoes caem em lados OPOSTOS da tolerancia
+    d_bf, d_fb = _sym_directional_distances_cm(base, frag)
+    tol_cm = to_cm(m.COLLINEAR_MATCH_TOLERANCE_FT)
+    assert d_fb <= tol_cm < d_bf, (d_bf, d_fb, tol_cm)
+    assert abs(d_bf - 10.0) < 0.01, d_bf
+    assert d_fb < 1e-6, d_fb
+
+    def merge(lines):
+        out = m.merge_collinear_fragments(
+            lines, m.COLLINEAR_MATCH_TOLERANCE_FT, m.MAX_JUNCTION_GAP_FT,
+            [], m.OPENING_GAP_PERP_TOLERANCE_FT, m.OPENING_GAP_WIDTH_SLACK_FT)
+        chaves = []
+        for line in out:
+            p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+            a = (round(to_cm(p0.X), 3), round(to_cm(p0.Y), 3))
+            b = (round(to_cm(p1.X), 3), round(to_cm(p1.Y), 3))
+            chaves.append((a, b) if a <= b else (b, a))
+        return sorted(chaves)
+
+    direto = merge([base, frag])
+    invertido = merge([frag, base])
+    assert direto == invertido, (direto, invertido)
+
+    # e o veredito correto e' NAO agrupar: um fragmento cujo ponto medio
+    # cai sobre a reta longa, mas que esta' 10cm fora dela nas pontas, nao
+    # e' colinear com ela.
+    assert len(direto) == 2, direto
+
+
+@case
+def test_INV_MERGE_SYM_003_todos_os_sitios_usam_a_mesma_propriedade():
+    """INV-MERGE-SYM-003: os QUATRO sitios de producao que criam ou removem
+    geometria com essa relacao usam a MESMA propriedade simetrica.
+
+    Duas travas independentes:
+      (a) COMPORTAMENTO - as duas gemeas (`_symmetric_within_distance_cached`,
+          sobre o cache, e `symmetric_lines_within_distance`, sobre `Line`)
+          concordam par a par numa grade sintetica;
+      (b) FONTE - nenhum dos quatro sitios voltou a chamar a primitiva
+          assimetrica direto. E' o que impede a divergencia futura entre
+          eles, que e' exatamente como este defeito nasceu em quatro lugares
+          diferentes."""
+    raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    fontes = {}
+    for nome in ("geometry", "wall_pairing"):
+        caminho = os.path.join(raiz, "nuvem", "core", "engine", nome + ".py")
+        with open(caminho, encoding="utf-8") as fh:
+            fontes[nome] = fh.read()
+
+    def corpo(fonte, nome_funcao):
+        marca = "\ndef " + nome_funcao + "("
+        ini = fonte.index(marca) + 1
+        resto = fonte[ini:]
+        fim = resto.index("\ndef ", 1)
+        return resto[:fim]
+
+    sitios = (
+        ("geometry", "merge_collinear_fragments"),
+        ("geometry", "_bridge_clusters_via_openings"),
+        ("geometry", "_clusters_bridge_via_opening"),
+        ("wall_pairing", "deduplicate_walls"),
+    )
+    for arquivo, funcao in sitios:
+        texto = corpo(fontes[arquivo], funcao)
+        # linhas de CODIGO (comentario nao conta)
+        codigo = "\n".join(l for l in texto.splitlines()
+                           if not l.lstrip().startswith("#"))
+        assert ("_symmetric_within_distance_cached(" in codigo or
+                "symmetric_lines_within_distance(" in codigo), (arquivo, funcao)
+        assert "_distance_between_parallel_cached(" not in codigo, (arquivo, funcao)
+        assert "get_distance_between_parallel_lines(" not in codigo, (arquivo, funcao)
+
+    tol = m.COLLINEAR_MATCH_TOLERANCE_FT
+    base, frag = _sym_asymmetric_pair_cm()
+    grade = [(base, frag), (frag, base), (base, base), (frag, frag),
+             (seg(0, 0, 500, 0), seg(0, 0.1, 500, 0.1)),
+             (seg(0, 0, 500, 0), seg(0, 5.0, 500, 5.0))]
+    for a, b in grade:
+        cached = m._symmetric_within_distance_cached(
+            m._line_geom_cache(a), m._line_geom_cache(b), tol)
+        direta = m.symmetric_lines_within_distance(a, b, tol)
+        assert cached == direta, (cached, direta)
+        # e as duas sao simetricas
+        assert cached == m._symmetric_within_distance_cached(
+            m._line_geom_cache(b), m._line_geom_cache(a), tol)
+        assert direta == m.symmetric_lines_within_distance(b, a, tol)
+
+
+@case
+def test_INV_DEDUP_SYM_001_predicado_de_duplicidade_e_simetrico():
+    """INV-DEDUP-SYM-001: o predicado de duplicidade de `deduplicate_walls`
+    e' simetrico - e a POLITICA de retencao continua exatamente a mesma.
+
+    Primeira parte: duas paredes em que a formula antiga dizia "duplicata"
+    numa direcao e "nao duplicata" na outra. As duas ordens de entrada tem
+    de devolver o MESMO conjunto de paredes, e nenhuma pode ser removida:
+    uma reta longa levemente inclinada nao e' duplicata de um trecho curto
+    que so' encosta nela no meio.
+
+    Segunda parte (nao-regressao da politica, que pertence ao CR-2F-D e NAO
+    foi tocada): duas paredes que sao duplicatas de verdade - proximas nas
+    DUAS direcoes - continuam colapsando numa so', e a mantida continua
+    sendo A MAIS LONGA do grupo."""
+    espessura = ft(14.0)
+
+    longa_incl = seg(-2000.0, 0.0, 2000.0, 40.0)
+    curta = seg(950.0, 30.0, 1050.0, 30.0)
+    d_lc, d_cl = _sym_directional_distances_cm(longa_incl, curta)
+    tol_cm = to_cm(m.DUPLICATE_AXIS_TOLERANCE_FT)
+    assert d_cl <= tol_cm < d_lc, (d_lc, d_cl, tol_cm)
+
+    def dedup(lines):
+        kept, removed = m.deduplicate_walls([(l, espessura, (False, False))
+                                             for l in lines])
+        chaves = sorted(round(to_cm(w[0].Length), 3) for w in kept)
+        return chaves, removed
+
+    direto = dedup([longa_incl, curta])
+    invertido = dedup([curta, longa_incl])
+    assert direto == invertido, (direto, invertido)
+    assert direto[1] == 0, direto
+    assert len(direto[0]) == 2, direto
+
+    # POLITICA INTACTA: duplicata de verdade continua sendo removida, e
+    # sobra a MAIS LONGA.
+    longa = seg(0.0, 0.0, 800.0, 0.0)
+    sobreposta = seg(100.0, 1.0, 500.0, 1.0)
+    d_ab, d_ba = _sym_directional_distances_cm(longa, sobreposta)
+    assert max(d_ab, d_ba) <= tol_cm, (d_ab, d_ba, tol_cm)
+    for ordem in ([longa, sobreposta], [sobreposta, longa]):
+        chaves, removed = dedup(ordem)
+        assert removed == 1, (ordem, chaves, removed)
+        assert chaves == [800.0], chaves
+
+
+# ------------------------------------- CR-2F-D (INV-DET / INV-DEDUP-D)
+# DETERMINISMO E RECUPERACAO DA W097. Duas classes de defeito, medidas no
+# projeto real (`torre_easy_lo_r00_tgd`) antes de qualquer alteracao:
+#
+# 1. NAO DETERMINISMO. Congelando o conjunto de linhas JA' MESCLADAS e
+#    permutando-o, o resto do pipeline (`find_wall_pairs` ->
+#    `deduplicate_walls` -> extensao -> grafo -> aberturas) devolvia UM
+#    unico fingerprint - ele ja' estava invariante desde o CR-2F-B/C/E. Todo
+#    o nao determinismo restante nascia na PASSADA 1 de
+#    `merge_collinear_fragments`: a base saia de `remaining.pop(0)`, ou
+#    seja, da POSICAO da linha na lista, e a relacao de compatibilidade NAO
+#    E' TRANSITIVA (com 2 mm de tolerancia, `A~B` e `B~C` nao implicam
+#    `A~C`). Medida nas 6 ordens de referencia: 6 conjuntos mesclados
+#    diferentes -> 3 conjuntos de paredes diferentes.
+#
+# 2. `W097`. `deduplicate_walls` apagava uma parede estrutural de 707 cm
+#    tratando-a como duplicata do eixo espurio de 4.394 cm nascido de uma
+#    LINHA AUXILIAR do CAD. O predicado do CR-2F-A amostra a distancia num
+#    UNICO PONTO (o ponto medio de cada eixo contra a reta infinita do
+#    outro) e os dois eixos se CRUZAM perto desse ponto: media 0,3633 cm ali
+#    e 3,7952 cm nas pontas do trecho compartilhado.
+#
+# Os testes abaixo travam as PROPRIEDADES, sobre geometria SINTETICA - nao o
+# placar do gabarito, nenhum id, coordenada ou comprimento do projeto real
+# (a medicao sobre os 9.258 segmentos reais mora em
+# nuvem/benchmark/diagnostics_2k/, mesmo padrao do INV-01..06).
+
+def _det_merge(lines):
+    """`merge_collinear_fragments` de producao, sem aberturas."""
+    return m.merge_collinear_fragments(
+        lines, m.COLLINEAR_MATCH_TOLERANCE_FT, m.MAX_JUNCTION_GAP_FT, [],
+        m.OPENING_GAP_PERP_TOLERANCE_FT, m.OPENING_GAP_WIDTH_SLACK_FT)
+
+
+def _det_pipeline(lines, thickness_cm=14.0):
+    """merge -> find_wall_pairs -> deduplicate_walls, na MESMA ordem da
+    producao (ver run_wall_modeling)."""
+    merged = _det_merge(lines)
+    walls, _unused = m.find_wall_pairs(merged, [ft(thickness_cm)],
+                                       m.WALL_DETECTION_TOLERANCE_FT)
+    kept, removed = m.deduplicate_walls(walls)
+    return merged, kept, removed
+
+
+def _det_line_key(line, nd=4):
+    """Chave GEOMETRICA de uma linha: as duas pontas em cm, a menor
+    primeiro - independente do sentido em que a linha foi construida."""
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    a = (round(to_cm(p0.X), nd) + 0.0, round(to_cm(p0.Y), nd) + 0.0)
+    b = (round(to_cm(p1.X), nd) + 0.0, round(to_cm(p1.Y), nd) + 0.0)
+    return (a, b) if a <= b else (b, a)
+
+
+def _det_wall_set(walls, nd=4):
+    """CONJUNTO canonico das paredes (geometria + espessura), ordenado -
+    independente da ordem da colecao e do sentido de cada eixo."""
+    return sorted((_det_line_key(w[0], nd), round(to_cm(w[1]), 3))
+                  for w in walls)
+
+
+def _det_fingerprint(walls, nd=4):
+    blob = json.dumps(_det_wall_set(walls, nd), separators=(",", ":"))
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def _det_cena():
+    """Planta sintetica que EXERCITA as duas classes de defeito.
+
+      - duas faces de uma parede de 14 cm, cada uma QUEBRADA em fragmentos
+        (obriga o merge a religa-las);
+      - uma parede vertical cruzando, tambem em fragmentos;
+      - uma CADEIA NAO TRANSITIVA de fragmentos verticais em x = 300,00 /
+        300,15 / 300,30: com a tolerancia de 2 mm, o primeiro casa com o
+        segundo e o segundo com o terceiro, mas o primeiro NAO casa com o
+        terceiro. E' exatamente a configuracao em que a base do agrupamento
+        estrela decide a particao;
+      - um par de fragmentos com o MESMO comprimento (desempate);
+      - o sentido de varios fragmentos e' invertido de proposito.
+    """
+    linhas = []
+    # face inferior (y=0), quebrada em 3 pedacos, um deles ao contrario
+    linhas += [seg(0.0, 0.0, 180.0, 0.0), seg(360.0, 0.0, 180.0, 0.0),
+               seg(360.0, 0.0, 520.0, 0.0)]
+    # face superior (y=14), quebrada em 2
+    linhas += [seg(0.0, 14.0, 300.0, 14.0), seg(520.0, 14.0, 300.0, 14.0)]
+    # parede vertical de 14 cm cruzando em x=600 / 614
+    linhas += [seg(600.0, -200.0, 600.0, 0.0), seg(600.0, 14.0, 600.0, 200.0),
+               seg(614.0, 200.0, 614.0, -200.0)]
+    # cadeia NAO TRANSITIVA (0,15 cm entre vizinhos, 0,30 cm entre extremos)
+    linhas += [seg(300.00, 100.0, 300.00, 160.0),
+               seg(300.15, 160.0, 300.15, 220.0),
+               seg(300.30, 220.0, 300.30, 280.0)]
+    # dois fragmentos de comprimento EXATAMENTE igual, colineares entre si
+    linhas += [seg(-100.0, 400.0, -40.0, 400.0), seg(-40.0, 400.0, 20.0, 400.0)]
+    return linhas
+
+
+def _det_permutacoes(linhas, quantas=8):
+    saida = [list(linhas)]
+    for semente in range(1, quantas):
+        embaralhada = list(linhas)
+        random.Random(semente).shuffle(embaralhada)
+        saida.append(embaralhada)
+    saida.append(list(reversed(linhas)))
+    return saida
+
+
+@case
+def test_INV_DET_001_permutar_a_entrada_nao_altera_o_conjunto_final():
+    """INV-DET-001: permutar a lista de entrada nao muda o CONJUNTO
+    geometrico final de paredes - nem o conjunto de linhas mescladas que o
+    produz.
+
+    O teste verifica as DUAS camadas de proposito: se so' o conjunto final
+    fosse verificado, uma correcao que apenas ordenasse a saida passaria sem
+    ter corrigido o agrupamento (proibido explicitamente pelo CR-2F-D)."""
+    cena = _det_cena()
+    referencia = None
+    for ordem in _det_permutacoes(cena):
+        merged, kept, _removed = _det_pipeline(ordem)
+        atual = (sorted(_det_line_key(l) for l in merged), _det_wall_set(kept))
+        if referencia is None:
+            referencia = atual
+        assert atual[0] == referencia[0], "conjunto MESCLADO mudou com a ordem"
+        assert atual[1] == referencia[1], "conjunto de PAREDES mudou com a ordem"
+    assert referencia[1], referencia
+
+
+@case
+def test_INV_DET_002_inverter_endpoints_nao_altera_o_resultado():
+    """INV-DET-002: inverter o SENTIDO em que cada linha do CAD foi
+    desenhada (`Line(p0,p1)` -> `Line(p1,p0)`) nao muda o resultado. E' uma
+    invariancia DIFERENTE da INV-DET-001: a ordem da lista fica igual, so' o
+    sentido de cada fragmento muda.
+
+    Era a fonte que sobrava depois de canonizar a ordem das bases: o sentido
+    escolhia a ANCORA (`base_p0`) de `_merge_collinear_cluster` e, com ela, o
+    caminho de arredondamento da media ponderada."""
+    cena = _det_cena()
+    _merged, base_kept, _r = _det_pipeline(cena)
+    base = _det_wall_set(base_kept)
+
+    def invertida(line):
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        return Line.CreateBound(p1, p0)
+
+    for quais in (range(len(cena)), range(0, len(cena), 2), range(1, len(cena), 2)):
+        alvo = set(quais)
+        virada = [invertida(l) if k in alvo else l for k, l in enumerate(cena)]
+        _m2, kept, _r2 = _det_pipeline(virada)
+        assert _det_wall_set(kept) == base, sorted(quais)[:5]
+
+
+@case
+def test_INV_DET_003_representante_do_grupo_nao_depende_da_ordem():
+    """INV-DET-003: o REPRESENTANTE mantido por `deduplicate_walls` nao
+    depende da ordem de entrada - inclusive quando duas duplicatas tem o
+    comprimento EXATAMENTE igual, caso em que o `sorted` estavel devolvia a
+    que viesse primeiro na lista."""
+    espessura = ft(14.0)
+    # tres paredes que sao duplicatas entre si; DUAS com o mesmo comprimento
+    a = seg(0.0, 0.0, 400.0, 0.0)          # 400 cm
+    b = seg(600.0, 0.5, 1000.0, 0.5)       # 400 cm, mesmo comprimento
+    longa = seg(-50.0, 0.2, 1050.0, 0.2)   # cobre as duas
+    for ordem in ([a, b, longa], [longa, a, b], [b, longa, a],
+                  [longa, b, a], [a, longa, b], [b, a, longa]):
+        kept, removed = m.deduplicate_walls(
+            [(l, espessura, (False, False)) for l in ordem])
+        assert removed == 2, (removed, _det_wall_set(kept))
+        assert _det_wall_set(kept) == _det_wall_set(
+            [(longa, espessura, (False, False))]), _det_wall_set(kept)
+
+    # empate PURO: duas paredes de mesmo comprimento que sao duplicatas uma
+    # da outra - quem sobra tem de ser sempre a mesma.
+    par = [seg(0.0, 0.0, 400.0, 0.0), seg(0.0, 0.5, 400.0, 0.5)]
+    vencedor = None
+    for ordem in (par, list(reversed(par))):
+        kept, removed = m.deduplicate_walls(
+            [(l, espessura, (False, False)) for l in ordem])
+        assert removed == 1, removed
+        if vencedor is None:
+            vencedor = _det_wall_set(kept)
+        assert _det_wall_set(kept) == vencedor, (vencedor, _det_wall_set(kept))
+
+
+@case
+def test_INV_DET_004_grupos_transitivos_independem_da_ordem():
+    """INV-DET-004: numa CADEIA em que a relacao nao e' transitiva
+    (`A~B`, `B~C`, `A!~C`), a particao produzida pelo merge e' a mesma em
+    qualquer permutacao da entrada.
+
+    O bloco de controle prova que a cadeia e' REALMENTE nao transitiva - sem
+    ele o teste passaria trivialmente numa geometria em que a relacao fosse
+    de equivalencia e qualquer agrupamento desse o mesmo resultado."""
+    passo_cm = to_cm(m.COLLINEAR_MATCH_TOLERANCE_FT) * 0.75
+    cadeia = [seg(0.0, 0.0, 0.0, 60.0),
+              seg(passo_cm, 60.0, passo_cm, 120.0),
+              seg(2 * passo_cm, 120.0, 2 * passo_cm, 180.0)]
+    # CONTROLE: vizinhos compativeis, extremos NAO
+    tol = m.COLLINEAR_MATCH_TOLERANCE_FT
+    assert m.symmetric_lines_within_distance(cadeia[0], cadeia[1], tol)
+    assert m.symmetric_lines_within_distance(cadeia[1], cadeia[2], tol)
+    assert not m.symmetric_lines_within_distance(cadeia[0], cadeia[2], tol)
+
+    referencia = None
+    for ordem in _det_permutacoes(cadeia, quantas=6):
+        merged = _det_merge(ordem)
+        atual = sorted(_det_line_key(l) for l in merged)
+        if referencia is None:
+            referencia = atual
+        assert atual == referencia, (referencia, atual)
+
+
+@case
+def test_INV_DET_005_orientacao_das_paredes_finais_e_canonica():
+    """INV-DET-005: o eixo de toda parede devolvida sai com a ponta MENOR
+    primeiro (ordem lexicografica). O sentido nao muda a geometria, mas muda
+    a IDENTIDADE do objeto para as etapas seguintes."""
+    _merged, kept, _r = _det_pipeline(_det_cena())
+    assert kept, kept
+    for centerline, _th, _lk in kept:
+        p0, p1 = centerline.GetEndPoint(0), centerline.GetEndPoint(1)
+        assert (p0.X, p0.Y, p0.Z) <= (p1.X, p1.Y, p1.Z), (
+            (p0.X, p0.Y), (p1.X, p1.Y))
+
+
+@case
+def test_INV_DET_006_ordenacao_final_e_canonica():
+    """INV-DET-006: a SEQUENCIA em que as paredes sao devolvidas (nao apenas
+    o conjunto) e' a mesma em qualquer permutacao da entrada - o que os
+    estagios seguintes (`extend_wall_ends_to_junctions`, `build_wall_graph`)
+    consomem por indice."""
+    referencia = None
+    for ordem in _det_permutacoes(_det_cena()):
+        _merged, kept, _r = _det_pipeline(ordem)
+        atual = [(_det_line_key(w[0]), round(to_cm(w[1]), 3)) for w in kept]
+        if referencia is None:
+            referencia = atual
+        assert atual == referencia, (referencia, atual)
+
+
+@case
+def test_INV_DET_007_fingerprint_igual_em_todas_as_permutacoes():
+    """INV-DET-007: um unico fingerprint (sha256 do conjunto geometrico
+    canonico) para todas as permutacoes.
+
+    E' o mesmo gate da bateria real do CR-2F-D (producao + seeds 1, 2, 3, 10
+    e 42: de 3 fingerprints distintos para 1), aqui sobre a cena sintetica -
+    a medicao sobre os 9.258 segmentos reais mora em
+    nuvem/benchmark/diagnostics_2k/run_b_downstream.py."""
+    digests = set()
+    for ordem in _det_permutacoes(_det_cena(), quantas=10):
+        _merged, kept, _r = _det_pipeline(ordem)
+        digests.add(_det_fingerprint(kept))
+    assert len(digests) == 1, digests
+
+
+def _dedup_w097_cena():
+    """Reproduz, em geometria SINTETICA, a classe de erro da `W097`:
+
+      - `valida`  : parede estrutural horizontal;
+      - `auxiliar`: eixo MUITO mais longo, levemente inclinado, que CRUZA a
+        valida perto do meio do trecho compartilhado.
+
+    O cruzamento e' o que engana a amostragem por ponto medio: ali a
+    distancia e' quase zero, enquanto nas pontas do trecho comum ela passa
+    da tolerancia. Nenhum numero do projeto real - so' a configuracao.
+
+    O auxiliar e' centrado no MESMO x da valida de proposito: e' o que faz
+    os DOIS pontos medios amostrados pelo predicado do CR-2F-A cairem perto
+    do cruzamento (0,30 cm nas duas direcoes), que e' exatamente a situacao
+    do projeto real (0,3633 cm e 0,2577 cm). Sem isso a cena nao exercita o
+    defeito - o predicado antigo ja' recusaria o par pelo outro motivo, e o
+    teste passaria sem provar nada."""
+    valida = seg(0.0, 0.0, 700.0, 0.0)
+    # ~0,72 grau, ponto medio em (350; 0,30) - o mesmo x do da `valida`
+    auxiliar = seg(-1850.0, -27.3, 2550.0, 27.9)
+    return valida, auxiliar
+
+
+@case
+def test_INV_DEDUP_D_001_linha_auxiliar_longa_nao_apaga_parede_valida():
+    """INV-DEDUP-D-001: um eixo auxiliar longo e levemente inclinado, que
+    apenas CRUZA uma parede estrutural valida, nao pode elimina-la.
+
+    O bloco de controle prova que a cena EXERCITA o defeito: o predicado do
+    CR-2F-A, sozinho, ainda diz "duplicata" (a amostragem por ponto medio cai
+    perto do cruzamento), e e' o criterio do CR-2F-D que a salva."""
+    espessura = ft(14.0)
+    valida, auxiliar = _dedup_w097_cena()
+    tol = m.DUPLICATE_AXIS_TOLERANCE_FT
+
+    # CONTROLE 1: o predicado do CR-2F-A sozinho ainda aceitaria
+    assert m.symmetric_lines_within_distance(valida, auxiliar, tol)
+    assert m.are_lines_parallel(valida, auxiliar)
+    assert m.lines_overlap_enough(valida, auxiliar)
+    # CONTROLE 2: no trecho COMPARTILHADO a separacao estoura a tolerancia
+    assert m.symmetric_axis_gap_ft(valida, auxiliar) > tol, to_cm(
+        m.symmetric_axis_gap_ft(valida, auxiliar))
+
+    for ordem in ([valida, auxiliar], [auxiliar, valida]):
+        kept, removed = m.deduplicate_walls(
+            [(l, espessura, (False, False)) for l in ordem])
+        assert removed == 0, (removed, _det_wall_set(kept))
+        assert len(kept) == 2, _det_wall_set(kept)
+
+
+@case
+def test_INV_DEDUP_D_002_parede_recuperada_nao_vira_duplicata():
+    """INV-DEDUP-D-002: recuperar a parede valida nao cria duplicata - as
+    duas sobrevivem UMA VEZ cada, em qualquer ordem, e uma segunda passada de
+    `deduplicate_walls` sobre o resultado nao remove mais nada (o mesmo
+    teste de duplicata RESIDUAL que o benchmark ja' faz em producao)."""
+    espessura = ft(14.0)
+    valida, auxiliar = _dedup_w097_cena()
+    for ordem in ([valida, auxiliar], [auxiliar, valida]):
+        kept, _r = m.deduplicate_walls(
+            [(l, espessura, (False, False)) for l in ordem])
+        chaves = _det_wall_set(kept)
+        assert len(chaves) == len(set(chaves)) == 2, chaves
+        _kept2, residual = m.deduplicate_walls(kept)
+        assert residual == 0, residual
+
+
+@case
+def test_INV_DEDUP_D_003_duplicatas_reais_continuam_sendo_removidas():
+    """INV-DEDUP-D-003: a relacao so' pode ter ficado mais RESTRITIVA - uma
+    duplicata de verdade (dois eixos que ficam juntos ao longo de TODO o
+    trecho comum) continua colapsando numa so', e a mantida continua sendo a
+    MAIS LONGA do grupo.
+
+    Cobre os tres regimes: paralelas exatas, paralelas com um deslocamento
+    dentro da tolerancia, e um trecho curto inteiramente dentro de uma parede
+    longa (o caso "fatia empilhada" da docstring de `deduplicate_walls`)."""
+    espessura = ft(14.0)
+    casos = (
+        ("paralelas exatas", seg(0.0, 0.0, 800.0, 0.0), seg(100.0, 0.0, 500.0, 0.0)),
+        ("deslocada 1 cm", seg(0.0, 0.0, 800.0, 0.0), seg(100.0, 1.0, 500.0, 1.0)),
+        ("fatia curta", seg(0.0, 0.0, 1200.0, 0.0), seg(600.0, 0.3, 690.0, 0.3)),
+    )
+    for nome, longa, curta in casos:
+        gap_cm = to_cm(m.symmetric_axis_gap_ft(longa, curta))
+        assert gap_cm <= to_cm(m.DUPLICATE_AXIS_TOLERANCE_FT), (nome, gap_cm)
+        esperado = round(to_cm(longa.Length), 3)
+        for ordem in ([longa, curta], [curta, longa]):
+            kept, removed = m.deduplicate_walls(
+                [(l, espessura, (False, False)) for l in ordem])
+            assert removed == 1, (nome, removed)
+            assert [k[1] for k in _det_wall_set(kept)] == [14.0], (nome, kept)
+            assert round(to_cm(kept[0][0].Length), 3) == esperado, (nome, kept)
+
+
+@case
+def test_INV_DEDUP_D_004_criterio_do_trecho_comum_e_simetrico():
+    """Complemento dos anteriores: `symmetric_axis_gap_ft(A,B)` tem de ser
+    IDENTICO a `symmetric_axis_gap_ft(B,A)` e ao valor obtido invertendo o
+    sentido dos endpoints - senao o novo criterio reintroduziria, dentro do
+    proprio CR-2F-D, a assimetria que o CR-2F-A eliminou.
+
+    Varre uma grade de inclinacoes e afastamentos, e trava tambem a gemea
+    cacheada contra a versao que recebe `Line` (mesma ideia do
+    INV-MERGE-SYM-003)."""
+    def invertida(line):
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        return Line.CreateBound(p1, p0)
+
+    vistos = 0
+    for angulo_grau in (0.0, 0.1, 0.5, 1.0, 2.0, 2.8):
+        dy = 4000.0 * math.tan(math.radians(angulo_grau))
+        longa = seg(-2000.0, 0.0, 2000.0, dy)
+        for centro_x in (-1500.0, -400.0, 0.0, 400.0, 1500.0):
+            for desloc in (0.0, 0.5, 2.0, 8.0):
+                y = dy * (centro_x + 2000.0) / 4000.0 + desloc
+                curta = seg(centro_x - 60.0, y, centro_x + 60.0, y)
+                direto = m.symmetric_axis_gap_ft(longa, curta)
+                # ORDEM DOS ARGUMENTOS: exata em IEEE-754 (trocar cache1 por
+                # cache2 da o mesmo referencial, ou o mesmo com os dois eixos
+                # negados - e negar os dois nega as duas diferencas, que os
+                # `abs()` absorvem).
+                assert direto == m.symmetric_axis_gap_ft(curta, longa)
+                # a gemea cacheada e' a MESMA funcao, nao uma reimplementacao
+                assert direto == m._pair_symmetric_axis_gap_ft_cached(
+                    m._line_geom_cache(longa), m._line_geom_cache(curta))
+                # SENTIDO DOS ENDPOINTS: nao e' exato bit a bit, e nao pode
+                # ser - `_line_geom_cache` reconstroi o ponto medio como
+                # `p0 + direcao * (comprimento/2)`, e partir da OUTRA ponta e'
+                # outro caminho de arredondamento. O que se exige e' que o
+                # desvio fique ordens de grandeza abaixo de qualquer
+                # tolerancia em jogo (a menor e' 0,2 cm).
+                for virada in (m.symmetric_axis_gap_ft(invertida(longa), curta),
+                               m.symmetric_axis_gap_ft(longa, invertida(curta)),
+                               m.symmetric_axis_gap_ft(invertida(longa),
+                                                       invertida(curta))):
+                    assert abs(virada - direto) < 1e-9, (
+                        angulo_grau, centro_x, desloc, to_cm(virada - direto))
+                vistos += 1
+    assert vistos == 120, vistos

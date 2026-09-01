@@ -1,0 +1,356 @@
+{
+ "segments": 9258,
+ "near_pairs": 281162,
+ "merge_asym_primitiva_antiga": 393,
+ "merge_asym_producao": 0,
+ "merge_worst_delta_cm": 182.9642290829286,
+ "dedup_candidates": 1646,
+ "dedup_asym_primitiva_antiga": 0,
+ "dedup_asym_cr_2f_a": 0,
+ "dedup_asym_producao": 0,
+ "accepted_walls": 201,
+ "discriminador": [
+  {
+   "removida_cm": 707.0082,
+   "representante_cm": 4394.246625536154,
+   "d_pontos_medios_cm": 0.3633483919715958,
+   "sep_trecho_comum_cm": 3.795199141094348
+  },
+  {
+   "removida_cm": 8.000000000000023,
+   "representante_cm": 8.000000000000023,
+   "d_pontos_medios_cm": 1.5305667642741687,
+   "sep_trecho_comum_cm": 1.5305667642741687
+  },
+  {
+   "removida_cm": 8.000000000000004,
+   "representante_cm": 8.000000000000023,
+   "d_pontos_medios_cm": 1.528094984816384,
+   "sep_trecho_comum_cm": 1.528094984816384
+  },
+  {
+   "removida_cm": 423.9973,
+   "representante_cm": 1513.1517999999999,
+   "d_pontos_medios_cm": 0.9969004311758329,
+   "sep_trecho_comum_cm": 0.9969004311758329
+  },
+  {
+   "removida_cm": 4.965432158912186,
+   "representante_cm": 9.055092772058979,
+   "d_pontos_medios_cm": 0.8861662345208956,
+   "sep_trecho_comum_cm": 0.8988478627548736
+  },
+  {
+   "removida_cm": 4.938911648574812,
+   "representante_cm": 9.041137936161018,
+   "d_pontos_medios_cm": 0.8866523988802965,
+   "sep_trecho_comum_cm": 0.8988406720535689
+  },
+  {
+   "removida_cm": 4.965358424575891,
+   "representante_cm": 9.055092161922087,
+   "d_pontos_medios_cm": 0.8861576296067399,
+   "sep_trecho_comum_cm": 0.8988308950834798
+  },
+  {
+   "removida_cm": 4.938911648574811,
+   "representante_cm": 9.041207478299977,
+   "d_pontos_medios_cm": 0.8866429838191356,
+   "sep_trecho_comum_cm": 0.8988270986020657
+  },
+  {
+   "removida_cm": 423.9973,
+   "representante_cm": 1513.1517999999999,
+   "d_pontos_medios_cm": 0.24414182992889213,
+   "sep_trecho_comum_cm": 0.24414182992889213
+  },
+  {
+   "removida_cm": 7.988491530876142,
+   "representante_cm": 9.055092772058979,
+   "d_pontos_medios_cm": 0.015946334570739032,
+   "sep_trecho_comum_cm": 0.03494530999952429
+  },
+  {
+   "removida_cm": 7.988491488766239,
+   "representante_cm": 9.055092161922087,
+   "d_pontos_medios_cm": 0.015935322170075133,
+   "sep_trecho_comum_cm": 0.03493429879884256
+  },
+  {
+   "removida_cm": 8.001722421876478,
+   "representante_cm": 9.041207478299977,
+   "d_pontos_medios_cm": 0.015881214431489144,
+   "sep_trecho_comum_cm": 0.03464110323748797
+  },
+  {
+   "removida_cm": 8.001748370934129,
+   "representante_cm": 9.041137936161018,
+   "d_pontos_medios_cm": 0.01586368489117621,
+   "sep_trecho_comum_cm": 0.03454282731313018
+  },
+  {
+   "removida_cm": 100.00860000000003,
+   "representante_cm": 145.00919999999996,
+   "d_pontos_medios_cm": 0.03001379310343339,
+   "sep_trecho_comum_cm": 0.03001379310343339
+  },
+  {
+   "removida_cm": 90.00869999999985,
+   "representante_cm": 269.00869999999986,
+   "d_pontos_medios_cm": 0.007948002705377207,
+   "sep_trecho_comum_cm": 0.007948002705377207
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 269.00860000000023,
+   "d_pontos_medios_cm": 0.007948002705377207,
+   "sep_trecho_comum_cm": 0.007948002705377207
+  },
+  {
+   "removida_cm": 90.0087000000005,
+   "representante_cm": 384.00870000000083,
+   "d_pontos_medios_cm": 0.007948002705350135,
+   "sep_trecho_comum_cm": 0.007948002705350135
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 384.00859999999983,
+   "d_pontos_medios_cm": 0.007948002705350135,
+   "sep_trecho_comum_cm": 0.007948002705350135
+  },
+  {
+   "removida_cm": 90.00870000000006,
+   "representante_cm": 269.0087000000001,
+   "d_pontos_medios_cm": 0.007948002705323063,
+   "sep_trecho_comum_cm": 0.007948002705323063
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 269.0086,
+   "d_pontos_medios_cm": 0.007948002705323063,
+   "sep_trecho_comum_cm": 0.007948002705323063
+  },
+  {
+   "removida_cm": 90.0087000000005,
+   "representante_cm": 384.00870000000083,
+   "d_pontos_medios_cm": 0.007947855340642606,
+   "sep_trecho_comum_cm": 0.007947855340642606
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 384.00859999999983,
+   "d_pontos_medios_cm": 0.007947855340642606,
+   "sep_trecho_comum_cm": 0.007947855340642606
+  },
+  {
+   "removida_cm": 90.00869999999996,
+   "representante_cm": 969.0128000000002,
+   "d_pontos_medios_cm": 0.006203510458862757,
+   "sep_trecho_comum_cm": 0.006203510458862757
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 1174.0109,
+   "d_pontos_medios_cm": 0.006203510458862757,
+   "sep_trecho_comum_cm": 0.006203510458862757
+  },
+  {
+   "removida_cm": 90.00869999999985,
+   "representante_cm": 1114.0099,
+   "d_pontos_medios_cm": 0.00620295260144559,
+   "sep_trecho_comum_cm": 0.00620295260144559
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 939.0085999999999,
+   "d_pontos_medios_cm": 0.00620295260144559,
+   "sep_trecho_comum_cm": 0.00620295260144559
+  },
+  {
+   "removida_cm": 90.00000000000007,
+   "representante_cm": 101.0,
+   "d_pontos_medios_cm": 0.002361048119574605,
+   "sep_trecho_comum_cm": 0.002361048119574605
+  },
+  {
+   "removida_cm": 90.00000000000001,
+   "representante_cm": 101.00000000000007,
+   "d_pontos_medios_cm": 0.002361048119574605,
+   "sep_trecho_comum_cm": 0.002361048119574605
+  },
+  {
+   "removida_cm": 90.00000000000007,
+   "representante_cm": 101.0,
+   "d_pontos_medios_cm": 0.002361048119466318,
+   "sep_trecho_comum_cm": 0.002361048119466318
+  },
+  {
+   "removida_cm": 90.00000000000001,
+   "representante_cm": 101.00000000000007,
+   "d_pontos_medios_cm": 0.002361048119466318,
+   "sep_trecho_comum_cm": 0.002361048119466318
+  },
+  {
+   "removida_cm": 90.00000000000001,
+   "representante_cm": 152.71680000000003,
+   "d_pontos_medios_cm": 0.001694431245802548,
+   "sep_trecho_comum_cm": 0.001694431245802548
+  },
+  {
+   "removida_cm": 89.9999999999999,
+   "representante_cm": 154.99999999999997,
+   "d_pontos_medios_cm": 0.001694431245802548,
+   "sep_trecho_comum_cm": 0.001694431245802548
+  },
+  {
+   "removida_cm": 90.00000000000001,
+   "representante_cm": 152.71680000000003,
+   "d_pontos_medios_cm": 0.001656150703793742,
+   "sep_trecho_comum_cm": 0.001656150703793742
+  },
+  {
+   "removida_cm": 89.9999999999999,
+   "representante_cm": 152.71669999999986,
+   "d_pontos_medios_cm": 0.001656150703793742,
+   "sep_trecho_comum_cm": 0.001656150703793742
+  },
+  {
+   "removida_cm": 100.00869999999999,
+   "representante_cm": 499.62050000000005,
+   "d_pontos_medios_cm": 0.0012861692749919485,
+   "sep_trecho_comum_cm": 0.0012861692749919485
+  },
+  {
+   "removida_cm": 208.0,
+   "representante_cm": 484.0,
+   "d_pontos_medios_cm": 0.0001026416648613804,
+   "sep_trecho_comum_cm": 0.0001026416648613804
+  },
+  {
+   "removida_cm": 208.0,
+   "representante_cm": 484.0,
+   "d_pontos_medios_cm": 0.00010146187570967415,
+   "sep_trecho_comum_cm": 0.00010146187570967415
+  },
+  {
+   "removida_cm": 90.00870000000006,
+   "representante_cm": 843.9957999999996,
+   "d_pontos_medios_cm": 5.4143356464919635e-14,
+   "sep_trecho_comum_cm": 5.4143356464919635e-14
+  },
+  {
+   "removida_cm": 90.00870000000006,
+   "representante_cm": 843.9957999999999,
+   "d_pontos_medios_cm": 5.4143356464919635e-14,
+   "sep_trecho_comum_cm": 5.4143356464919635e-14
+  },
+  {
+   "removida_cm": 90.00859999999975,
+   "representante_cm": 843.9957999999996,
+   "d_pontos_medios_cm": 5.4143356464919635e-14,
+   "sep_trecho_comum_cm": 5.4143356464919635e-14
+  },
+  {
+   "removida_cm": 90.00859999999975,
+   "representante_cm": 843.9957999999999,
+   "d_pontos_medios_cm": 5.4143356464919635e-14,
+   "sep_trecho_comum_cm": 5.4143356464919635e-14
+  },
+  {
+   "removida_cm": 8.268449999999866,
+   "representante_cm": 8.765549999999987,
+   "d_pontos_medios_cm": 2.7071678232459817e-14,
+   "sep_trecho_comum_cm": 2.7071678232459817e-14
+  },
+  {
+   "removida_cm": 216.0,
+   "representante_cm": 216.5,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 100.00859999999999,
+   "representante_cm": 296.0073,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00870000000006,
+   "representante_cm": 269.00870000000003,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00870000000006,
+   "representante_cm": 844.0,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00869999999996,
+   "representante_cm": 269.00869999999986,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00869999999964,
+   "representante_cm": 844.0,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00869999999964,
+   "representante_cm": 385.00870000000015,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00869999999964,
+   "representante_cm": 385.00870000000015,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00860000000007,
+   "representante_cm": 269.0086,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 385.00859999999983,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 385.00859999999983,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 843.9999999999995,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00859999999996,
+   "representante_cm": 269.00860000000023,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 90.00859999999975,
+   "representante_cm": 843.9999999999995,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  },
+  {
+   "removida_cm": 8.268450000000083,
+   "representante_cm": 8.765549999999987,
+   "d_pontos_medios_cm": 0.0,
+   "sep_trecho_comum_cm": 0.0
+  }
+ ]
+}
