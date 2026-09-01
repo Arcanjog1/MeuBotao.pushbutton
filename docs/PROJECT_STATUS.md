@@ -12,13 +12,12 @@
 O motor de modelagem de paredes (`nuvem/core/engine`) passou por uma
 sequência de CRs (Change Requests) para eliminar dependências de ordem de
 entrada (assimetrias e não-determinismo) na formação das paredes a partir
-de segmentos de CAD. O `CR-2F-E` (centerline) e o `CR-2F-A` (simetria de
-merge/pairing/deduplicação) já foram concluídos e mergeados na `main`. O
-`CR-2F-D` — não-determinismo residual (agrupamento em estrela, não
-transitivo) e perda da parede `W097` — está **concluído e validado na
-branch, aguardando autorização de merge**: o fingerprint das paredes foi
-de 3 distintos para 1 e a `W097` foi recuperada. O próximo passo depois
-do merge é o **teste visual no Revit**. A modulação de blocos em si (o objetivo final do produto) ainda não foi
+de segmentos de CAD. O `CR-2F-E` (centerline), o `CR-2F-A` (simetria de
+merge/pairing/deduplicação) e o `CR-2F-D` (determinismo do agrupamento e
+recuperação da `W097`) já foram concluídos e **mergeados na `main`**: o
+fingerprint das paredes foi de 3 distintos para 1 e a `W097` foi
+recuperada. **PRÓXIMO PASSO: TESTE VISUAL NO REVIT.** A modulação de
+blocos em si (o objetivo final do produto) ainda não foi
 retomada — ela está registrada como roadmap futuro (seção 10), a ser
 iniciada somente depois que a geometria das paredes estiver estável e
 determinística.
@@ -27,12 +26,19 @@ determinística.
 
 ```
 branch: main
-HEAD:   d16965dba45b81c2a109bc24b23ab2fcb959db10
+HEAD:   f7055c7e71c02415ffffe36f1f041b11c559df92
 ```
 
 Últimos commits em `main` (mais recente primeiro):
 
 ```
+f7055c7  Merge branch 'claude/cr-2f-d-determinism-ewnru5': CR-2F-D DETERMINISM
+55f7f8c  docs: corrige merge-base atual em PROJECT_STATUS.md
+7771170  Merge remote-tracking branch 'origin/main' into claude/cr-2f-d-determinism-ewnru5
+1857de4  docs: fecha o PENDENTE do PROJECT_STATUS com os numeros da bateria
+d2e3604  test(benchmark): laboratorio 2K com a bateria e o censo do CR-2F-D
+5f7bfc4  docs: PROJECT_STATUS com o estado do CR-2F-D
+c81ff59  fix(wall-modeling): determinismo do merge e recuperacao da W097 (CR-2F-D)
 d16965d  Merge branch 'claude/ci-check-fix'
 bfa3155  ci: corrige check-project-status para branches novas (before=0)
 b140503  Merge branch 'claude/project-status-tracking-qm3r56'
@@ -44,32 +50,27 @@ c21a429  Merge pull request #4: CR-2F-A MERGE_RELATION_ASYMMETRY (T2/MAX)
 9bca561  fix(wall-modeling): make wall centerline order invariant (CR-2F-E)
 ```
 
-Os cinco commits acima de `c21a429` são **documentais/CI** (este arquivo e
-o workflow) — não tocam `nuvem/core/**`, testes nem benchmark.
+O merge do `CR-2F-D` (`f7055c7`) foi feito por **merge commit**, sem
+squash, sem rebase, sem force push — mesma prática do `CR-2F-A`. Commit
+funcional: `c81ff59` (determinismo do merge + `deduplicate_walls`).
 
-O merge do CR-2F-A foi feito por **merge commit** (sem squash, sem rebase,
-sem force push).
-
-**Branch com trabalho concluído aguardando merge:**
+**Branch mesclada:**
 
 ```
-branch:              claude/cr-2f-d-determinism-ewnru5
+branch:                claude/cr-2f-d-determinism-ewnru5
 SHA inicial (baseline original do CR-2F-D): c21a4297a6ff372358cbb81da5ca6a65f91a955b
-merge-base ATUAL com a main (pós git merge origin/main): d16965dba45b81c2a109bc24b23ab2fcb959db10
+merge-base usado no merge (main antes do CR-2F-D): d16965dba45b81c2a109bc24b23ab2fcb959db10
+SHA do merge na main: f7055c7e71c02415ffffe36f1f041b11c559df92
 ```
-
-A `main` foi trazida **para dentro** da branch por `git merge origin/main`
-(único conflito: este arquivo, resolvido por integração semântica). A
-branch **não** foi mesclada na `main`.
 
 ## 3. Baseline funcional atual
 
 Produção + seeds (permutações da ordem de entrada: seed 1, seed 2, seed 3,
 seed 10, seed 42) — projeto de referência `torre_easy_lo_r00_tgd`:
 
-| métrica | `main` (CR-2F-A) | branch `CR-2F-D` |
+| métrica | antes (CR-2F-A) | **`main` atual (CR-2F-D)** |
 |---|---|---|
-| **fingerprints distintos das paredes** | **3** | **1** |
+| **fingerprints distintos das paredes** | 3 | **1** |
 | fingerprints distintos do merge | 6 | **1** |
 | pares aceitos | 201 | 201 |
 | paredes finais | 144 | **145** |
@@ -80,12 +81,12 @@ seed 10, seed 42) — projeto de referência `torre_easy_lo_r00_tgd`:
 | paredes espúrias | 4 | 4 |
 | `W097` | ausente | **recuperada** |
 
-Os valores da coluna `main` são estáveis nas 6 execuções **em métrica**,
-mas produziam 3 conjuntos geométricos diferentes; os da branch são
-estáveis **também em geometria** (um único fingerprint).
+Antes do CR-2F-D, as métricas eram estáveis nas 6 execuções, mas
+produziam 3 conjuntos geométricos diferentes; agora a `main` é estável
+**também em geometria** (um único fingerprint).
 
 Fingerprint oficial do solver (`solver_decision_fingerprint`), **inalterado**
-por todo o CR-2F-E, CR-2F-A e CR-2F-D:
+por todo o CR-2F-E, CR-2F-A e CR-2F-D (confirmado após o merge na `main`):
 
 ```
 c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316
@@ -93,7 +94,7 @@ c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316
 
 ## 4. Testes e invariantes aprovados
 
-| suíte | `main` | branch `CR-2F-D` |
+| suíte | antes (CR-2F-A) | **`main` atual (CR-2F-D)** |
 |---|---|---|
 | `tests/test_script.py` | 245 passed | **256 passed** (245 + 11 novos) |
 | `tests/regression` | 113 passed | **113 passed** |
@@ -219,16 +220,19 @@ relação de duplicidade **completa** que ficou em produção:
     `REGRAS_MODULACAO_BLOCOS.md` §26.9.5) — é dívida exclusiva do
     CR-2F-D.
 
-### CR-2F-D — CONCLUÍDO NA BRANCH (aguardando autorização de merge)
+### CR-2F-D — CONCLUÍDO E MERGEADO NA MAIN
 
-- **Branch:** `claude/cr-2f-d-determinism-ewnru5`
+- **Branch:** `claude/cr-2f-d-determinism-ewnru5` (mesclada e preservada)
 - **Commits:**
   ```
   c81ff59  fix(wall-modeling): determinismo do merge e recuperacao da W097 (CR-2F-D)
   5f7bfc4  docs: PROJECT_STATUS com o estado do CR-2F-D
   d2e3604  test(benchmark): laboratorio 2K com a bateria e o censo do CR-2F-D
   1857de4  docs: fecha o PENDENTE do PROJECT_STATUS com os numeros da bateria
+  7771170  Merge remote-tracking branch 'origin/main' into claude/cr-2f-d-determinism-ewnru5
+  55f7f8c  docs: corrige merge-base atual em PROJECT_STATUS.md
   ```
+- **Merge na `main`:** `f7055c7` — merge commit, sem squash/rebase/force push
 - **Objetivo (atingido):** eliminar o não-determinismo restante,
   estabilizar o fingerprint das paredes, corrigir estruturalmente a perda
   da `W097` sem hardcode e preservar tudo que já estava aprovado.
@@ -325,7 +329,7 @@ aceita: a `W097` conta como coberta, mas **não entra no `eixo_ok`** (≤ 0,5 cm
 Diagnóstico visual aprovado pelo usuário em
 `nuvem/benchmark/diagnostics_2d/w097_geometry.png` e `_zoom.png`.
 
-**Próximo passo após o merge: TESTE VISUAL NO REVIT.**
+**MESCLADO NA MAIN em `f7055c7`. PRÓXIMO PASSO: TESTE VISUAL NO REVIT.**
 
 ## 6. Dívidas técnicas conhecidas
 
@@ -404,14 +408,14 @@ invariantes antes de propor merge.
 
 ## 9. Próximas etapas
 
-1. ~~Concluir o **CR-2F-D**~~ — **concluído e validado na branch**
-   (seção 5). Falta apenas a **autorização de merge** do usuário.
+1. ~~Concluir o **CR-2F-D**~~ — **concluído, validado e MESCLADO NA MAIN**
+   (`f7055c7`, seção 5).
 2. ~~Validar o baseline e os 11 invariantes sem regressão~~ — **feito**
    (seções 3 e 4): 256 + 113 verdes, 11 invariantes anteriores preservados,
    11 novos, fingerprint do solver inalterado.
-3. **TESTE VISUAL NO REVIT** — próximo passo imediato depois do merge do
-   CR-2F-D. É a primeira validação da geometria determinística no modelo
-   real, e não é substituível pelo benchmark headless.
+3. **TESTE VISUAL NO REVIT** — próximo passo imediato. É a primeira
+   validação da geometria determinística no modelo real, e não é
+   substituível pelo benchmark headless.
 4. Depois que a geometria das paredes estiver estável e determinística
    **e confirmada visualmente no Revit**, avançar para a revisão/correção
    da **modulação dos blocos** — ver roadmap na seção 10.
@@ -613,4 +617,22 @@ itens ainda pendentes: eixo espúrio de 43,9 m do par (474, 2306), sem CR
                modulação de blocos (seção 10)
 próximo passo recomendado: autorizar o merge do CR-2F-D na main e, em
                seguida, fazer o TESTE VISUAL NO REVIT (seção 9)
+```
+
+### 2026-09-01 — CR-2F-D mesclado na main
+
+```
+data:          2026-09-01
+CR:            CR-2F-D (determinismo do merge + recuperação da W097)
+branch:        claude/cr-2f-d-determinism-ewnru5 (mesclada, preservada)
+SHA da main ANTES do merge: d16965dba45b81c2a109bc24b23ab2fcb959db10
+SHA do commit documental (correção do merge-base): 55f7f8c0be643455498827828aa615792efec8d5
+SHA do merge na main:       f7055c7e71c02415ffffe36f1f041b11c559df92
+status:        CONCLUÍDO E MERGEADO NA MAIN, por merge commit (sem
+               squash, sem rebase, sem force push)
+verificação pós-merge: 256 passed (tests/test_script.py), 113 passed
+               (tests/regression), solver_decision_fingerprint
+               inalterado, merge fingerprint = 1, wall fingerprint = 1,
+               201/145/87/96/91/7/4/W097 confirmados nas 6 ordens
+próximo passo: TESTE VISUAL NO REVIT
 ```
