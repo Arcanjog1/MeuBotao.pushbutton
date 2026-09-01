@@ -257,6 +257,18 @@ def measure_project(project_id, project_dir, variants_per_course=None,
     # ---- juntas e coincidencias fiada a fiada -------------------------
     counts = {"FORBIDDEN_JOINT_ALIGNMENT": 0, "DOCUMENTED_EXCEPTION": 0,
               "UNCLASSIFIED_RULE_CONFLICT": 0, "NO_ALIGNMENT": 0}
+    # A qual BANDA (conjunto de aberturas ativas) cada fiada pertence. Duas
+    # fiadas vizinhas de bandas DIFERENTES foram resolvidas por chamadas
+    # independentes de `solve_building_blocks` e nunca se viram - separar as
+    # duas populacoes e' o que distingue o que ESTE CR pode corrigir
+    # (`same_band`, o par A/B) do que exigiria mexer em
+    # `solve_building_blocks_all_courses` (`cross_band`, fora do escopo).
+    band_of = {}
+    for band_pos, band in enumerate(solve_result.get("bands") or []):
+        for course_index in band.get("course_indices") or []:
+            band_of[course_index] = band_pos
+    forbidden_same_band = 0
+    forbidden_cross_band = 0
     forbidden_by_wall = {}
     unclassified_samples = []
     staggers = []
@@ -279,9 +291,15 @@ def measure_project(project_id, project_dir, variants_per_course=None,
             if prev is None:
                 continue
             comparable_pairs += 1
+            cross_band = band_of.get(course_index) != band_of.get(course_index - 1)
             for joint in per_course[course_index]:
                 klass, stagger = _classify(joint, prev, tol["joint_coincidence_cm"])
                 counts[klass] += 1
+                if klass == "FORBIDDEN_JOINT_ALIGNMENT":
+                    if cross_band:
+                        forbidden_cross_band += 1
+                    else:
+                        forbidden_same_band += 1
                 if stagger is not None:
                     staggers.append(stagger)
                 if klass == "FORBIDDEN_JOINT_ALIGNMENT":
@@ -369,6 +387,8 @@ def measure_project(project_id, project_dir, variants_per_course=None,
         "comparable_course_pairs": comparable_pairs,
         "internal_joints_total": total_joints,
         "joint_classes": counts,
+        "forbidden_by_band": {"same_band": forbidden_same_band,
+                              "cross_band": forbidden_cross_band},
         "forbidden_walls": len(forbidden_by_wall),
         "forbidden_top_walls": sorted(
             forbidden_by_wall.items(), key=lambda kv: (-kv[1], kv[0]))[:10],
@@ -425,6 +445,11 @@ def measure_all(project_ids=PROJECT_IDS, variants_per_course=None):
         for name, value in project["joint_classes"].items():
             classes[name] = classes.get(name, 0) + value
     totals["joint_classes"] = classes
+    bandas = {"same_band": 0, "cross_band": 0}
+    for project in out["projects"].values():
+        for name, value in (project.get("forbidden_by_band") or {}).items():
+            bandas[name] = bandas.get(name, 0) + value
+    totals["forbidden_by_band"] = bandas
     codes = {}
     for project in out["projects"].values():
         for code, value in project["blocks_by_code"].items():

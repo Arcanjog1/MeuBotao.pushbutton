@@ -1,20 +1,19 @@
 {
  "projects": {
   "piloto_sintetico_2x2": {
-   "alignment_conflicts": 2,
+   "alignment_conflicts": 0,
    "audit_problems": {
-    "CONTINUOUS_VERTICAL_JOINT": 1,
-    "REPEATED_VERTICAL_COMPENSATOR_STRIP": 12
+    "REPEATED_VERTICAL_COMPENSATOR_STRIP": 13
    },
    "blocks_by_code": {
-    "B19": 48,
-    "B34": 168,
+    "B19": 52,
+    "B34": 164,
     "B39": 440,
-    "C04": 56,
-    "C09": 56
+    "C04": 52,
+    "C09": 64
    },
    "blocks_inside_opening": 0,
-   "blocks_total": 768,
+   "blocks_total": 772,
    "collisions": 0,
    "comparable_course_pairs": 84,
    "consecutive_compensator_pairs": 28,
@@ -24,8 +23,8 @@
    },
    "door_void_violations": 0,
    "fingerprint": {
-    "rows": 768,
-    "sha256": "9d856d4bcae3fa6503393b7e8fdfe7f9b67fe58001966545234883a357f04f42"
+    "rows": 772,
+    "sha256": "b26b49b6ab0653aa0c98534481bec3abf0b250d9e5bbd673948703d5763a15b6"
    },
    "forbidden_by_band": {
     "cross_band": 0,
@@ -33,34 +32,34 @@
    },
    "forbidden_top_walls": [],
    "forbidden_walls": 0,
-   "internal_joints_total": 628,
+   "internal_joints_total": 632,
    "intersection_failures": 0,
    "intersection_failures_by_kind": {},
    "jamb_exceptions": 4,
    "joint_classes": {
-    "DOCUMENTED_EXCEPTION": 7,
+    "DOCUMENTED_EXCEPTION": 0,
     "FORBIDDEN_JOINT_ALIGNMENT": 0,
-    "NO_ALIGNMENT": 530,
-    "UNCLASSIFIED_RULE_CONFLICT": 7
+    "NO_ALIGNMENT": 548,
+    "UNCLASSIFIED_RULE_CONFLICT": 0
    },
    "non_modular": 32,
    "num_courses": 8,
    "project_id": "piloto_sintetico_2x2",
-   "runtime_s": 0.055,
+   "runtime_s": 0.059,
    "stagger": {
-    "count": 488,
+    "count": 492,
     "histogram": [
      [
       "[0,1)",
-      14
-     ],
-     [
-      "[1,5)",
       0
      ],
      [
+      "[1,5)",
+      7
+     ],
+     [
       "[5,10)",
-      17
+      38
      ],
      [
       "[10,15)",
@@ -68,62 +67,26 @@
      ],
      [
       "[15,20)",
-      193
+      210
      ],
      [
       "[20,40)",
-      224
+      197
      ],
      [
       ">=40",
       21
      ]
     ],
-    "mean_cm": 23.135,
-    "min_cm": 0.0
+    "mean_cm": 22.622,
+    "min_cm": 5.0
    },
    "tolerances_cm": {
     "cluster_cm": 1.5,
     "joint_coincidence_cm": 1.0,
     "max_adjacent_gap_cm": 5.0
    },
-   "unclassified_samples": [
-    {
-     "course": 1,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 2,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 3,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 4,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 5,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 6,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    },
-    {
-     "course": 7,
-     "wall_idx": 0,
-     "x_cm": 34.5
-    }
-   ],
+   "unclassified_samples": [],
    "wall_course_pairs_with_blocks": 96,
    "walls_audit_failed": 8,
    "walls_considered": 12,
@@ -131,58 +94,50 @@
    "walls_without_blocks": 0
   },
   "torre_easy_lo_r00_tgd": {
-   "alignment_conflicts": 30,
+   "alignment_conflicts": 0,
    "audit_problems": {
-    "CONTINUOUS_VERTICAL_JOINT": 79,
+    "CONTINUOUS_VERTICAL_JOINT": 61,
     "REPEATED_VERTICAL_COMPENSATOR_STRIP": 12
    },
    "blocks_by_code": {
-    "B19": 840,
-    "B34": 2530,
-    "B39": 4882,
+    "B19": 853,
+    "B34": 2565,
+    "B39": 4852,
     "B54": 636,
-    "C04": 584,
-    "C09": 1185
+    "C04": 570,
+    "C09": 1171
    },
    "blocks_inside_opening": 113,
-   "blocks_total": 10657,
-   "collisions": 1069,
+   "blocks_total": 10647,
+   "collisions": 1034,
    "comparable_course_pairs": 1695,
-   "consecutive_compensator_pairs": 312,
+   "consecutive_compensator_pairs": 279,
    "consecutive_compensator_runs_by_len": {
-    "2": 133,
-    "3": 173,
+    "2": 118,
+    "3": 155,
     "4": 6
    },
    "door_void_violations": 290,
    "fingerprint": {
-    "rows": 10657,
-    "sha256": "4dd5a3b14c0107cabb43105151084dc20ab16574cd4867580df67165d857d4f8"
+    "rows": 10647,
+    "sha256": "3d1da15756181161d36503bc3548d8526b86143318b80efc10774c4348a77993"
    },
    "forbidden_by_band": {
-    "cross_band": 109,
-    "same_band": 138
+    "cross_band": 5,
+    "same_band": 0
    },
    "forbidden_top_walls": [
     [
-     13,
-     80
-    ],
-    [
-     36,
-     75
-    ],
-    [
-     65,
-     48
-    ],
-    [
      30,
-     44
+     4
+    ],
+    [
+     5,
+     1
     ]
    ],
-   "forbidden_walls": 4,
-   "internal_joints_total": 7303,
+   "forbidden_walls": 2,
+   "internal_joints_total": 7293,
    "intersection_failures": 200,
    "intersection_failures_by_kind": {
     "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro.": 8,
@@ -192,48 +147,48 @@
    },
    "jamb_exceptions": 172,
    "joint_classes": {
-    "DOCUMENTED_EXCEPTION": 124,
-    "FORBIDDEN_JOINT_ALIGNMENT": 247,
-    "NO_ALIGNMENT": 5637,
-    "UNCLASSIFIED_RULE_CONFLICT": 714
+    "DOCUMENTED_EXCEPTION": 108,
+    "FORBIDDEN_JOINT_ALIGNMENT": 5,
+    "NO_ALIGNMENT": 5902,
+    "UNCLASSIFIED_RULE_CONFLICT": 697
    },
    "non_modular": 3023,
    "num_courses": 17,
    "project_id": "torre_easy_lo_r00_tgd",
-   "runtime_s": 2.227,
+   "runtime_s": 2.246,
    "stagger": {
-    "count": 6369,
+    "count": 6359,
     "histogram": [
      [
       "[0,1)",
-      1085
+      810
      ],
      [
       "[1,5)",
-      138
+      191
      ],
      [
       "[5,10)",
-      699
+      553
      ],
      [
       "[10,15)",
-      886
+      930
      ],
      [
       "[15,20)",
-      2069
+      2307
      ],
      [
       "[20,40)",
-      1177
+      1258
      ],
      [
       ">=40",
-      315
+      310
      ]
     ],
-    "mean_cm": 16.818,
+    "mean_cm": 17.714,
     "min_cm": 0.0
    },
    "tolerances_cm": {
@@ -304,73 +259,69 @@
     }
    ],
    "wall_course_pairs_with_blocks": 2057,
-   "walls_audit_failed": 48,
+   "walls_audit_failed": 46,
    "walls_considered": 167,
    "walls_with_blocks": 138,
    "walls_without_blocks": 29
   },
   "torre_easy_lo_r00_tp1": {
-   "alignment_conflicts": 32,
+   "alignment_conflicts": 0,
    "audit_problems": {
-    "CONTINUOUS_VERTICAL_JOINT": 89,
+    "CONTINUOUS_VERTICAL_JOINT": 77,
     "REPEATED_VERTICAL_COMPENSATOR_STRIP": 19
    },
    "blocks_by_code": {
     "B19": 1268,
-    "B34": 2266,
-    "B39": 9612,
+    "B34": 2282,
+    "B39": 9596,
     "B54": 1087,
-    "C04": 820,
-    "C09": 3039
+    "C04": 804,
+    "C09": 3051
    },
    "blocks_inside_opening": 168,
-   "blocks_total": 18092,
+   "blocks_total": 18088,
    "collisions": 14,
    "comparable_course_pairs": 1504,
-   "consecutive_compensator_pairs": 1002,
+   "consecutive_compensator_pairs": 903,
    "consecutive_compensator_runs_by_len": {
-    "2": 525,
-    "3": 401,
+    "2": 431,
+    "3": 396,
     "4": 64,
     "5": 12
    },
    "door_void_violations": 348,
    "fingerprint": {
-    "rows": 18092,
-    "sha256": "821af55fd687fc96e510f172a7ab609b29470b59f5754a660864b76b7808cc31"
+    "rows": 18088,
+    "sha256": "c559d99272a0596e50a1218e271a1430fe412d9f036374333923df6f3a55eb83"
    },
    "forbidden_by_band": {
-    "cross_band": 73,
-    "same_band": 98
+    "cross_band": 28,
+    "same_band": 0
    },
    "forbidden_top_walls": [
     [
-     38,
-     33
-    ],
-    [
-     70,
-     33
-    ],
-    [
      3,
-     25
+     5
     ],
     [
      6,
-     25
+     5
+    ],
+    [
+     38,
+     3
+    ],
+    [
+     70,
+     3
     ],
     [
      1,
-     22
+     2
     ],
     [
      8,
-     22
-    ],
-    [
-     16,
-     1
+     2
     ],
     [
      22,
@@ -383,56 +334,60 @@
     [
      41,
      1
+    ],
+    [
+     42,
+     1
     ]
    ],
-   "forbidden_walls": 17,
+   "forbidden_walls": 14,
    "internal_joints_total": 14410,
    "intersection_failures": 0,
    "intersection_failures_by_kind": {},
    "jamb_exceptions": 44,
    "joint_classes": {
-    "DOCUMENTED_EXCEPTION": 507,
-    "FORBIDDEN_JOINT_ALIGNMENT": 171,
-    "NO_ALIGNMENT": 12095,
-    "UNCLASSIFIED_RULE_CONFLICT": 797
+    "DOCUMENTED_EXCEPTION": 487,
+    "FORBIDDEN_JOINT_ALIGNMENT": 28,
+    "NO_ALIGNMENT": 12246,
+    "UNCLASSIFIED_RULE_CONFLICT": 809
    },
-   "non_modular": 278,
+   "non_modular": 281,
    "num_courses": 17,
    "project_id": "torre_easy_lo_r00_tp1",
-   "runtime_s": 2.257,
+   "runtime_s": 2.475,
    "stagger": {
     "count": 13378,
     "histogram": [
      [
       "[0,1)",
-      1475
+      1324
      ],
      [
       "[1,5)",
-      242
+      254
      ],
      [
       "[5,10)",
-      1529
+      940
      ],
      [
       "[10,15)",
-      1956
+      1679
      ],
      [
       "[15,20)",
-      5919
+      6505
      ],
      [
       "[20,40)",
-      1865
+      2284
      ],
      [
       ">=40",
       392
      ]
     ],
-    "mean_cm": 17.757,
+    "mean_cm": 18.701,
     "min_cm": 0.0
    },
    "tolerances_cm": {
@@ -479,6 +434,11 @@
     {
      "course": 1,
      "wall_idx": 2,
+     "x_cm": 114.48
+    },
+    {
+     "course": 1,
+     "wall_idx": 2,
      "x_cm": 1309.5
     },
     {
@@ -494,12 +454,7 @@
     {
      "course": 2,
      "wall_idx": 2,
-     "x_cm": 1309.5
-    },
-    {
-     "course": 3,
-     "wall_idx": 2,
-     "x_cm": 34.5
+     "x_cm": 114.49
     }
    ],
    "wall_course_pairs_with_blocks": 1614,
@@ -510,36 +465,36 @@
   }
  },
  "totals": {
-  "alignment_conflicts": 64,
+  "alignment_conflicts": 0,
   "blocks_by_code": {
-   "B19": 2156,
-   "B34": 4964,
-   "B39": 14934,
+   "B19": 2173,
+   "B34": 5011,
+   "B39": 14888,
    "B54": 1723,
-   "C04": 1460,
-   "C09": 4280
+   "C04": 1426,
+   "C09": 4286
   },
   "blocks_inside_opening": 281,
-  "blocks_total": 29517,
-  "collisions": 1083,
+  "blocks_total": 29507,
+  "collisions": 1048,
   "comparable_course_pairs": 3283,
-  "consecutive_compensator_pairs": 1342,
+  "consecutive_compensator_pairs": 1210,
   "door_void_violations": 638,
   "forbidden_by_band": {
-   "cross_band": 182,
-   "same_band": 236
+   "cross_band": 33,
+   "same_band": 0
   },
-  "internal_joints_total": 22341,
+  "internal_joints_total": 22335,
   "intersection_failures": 200,
   "joint_classes": {
-   "DOCUMENTED_EXCEPTION": 638,
-   "FORBIDDEN_JOINT_ALIGNMENT": 418,
-   "NO_ALIGNMENT": 18262,
-   "UNCLASSIFIED_RULE_CONFLICT": 1518
+   "DOCUMENTED_EXCEPTION": 595,
+   "FORBIDDEN_JOINT_ALIGNMENT": 33,
+   "NO_ALIGNMENT": 18696,
+   "UNCLASSIFIED_RULE_CONFLICT": 1506
   },
-  "non_modular": 3333,
-  "runtime_s": 4.539,
-  "walls_audit_failed": 106,
+  "non_modular": 3336,
+  "runtime_s": 4.78,
+  "walls_audit_failed": 104,
   "walls_considered": 275,
   "walls_with_blocks": 246,
   "walls_without_blocks": 29

@@ -559,6 +559,9 @@ invariantes antes de propor merge.
    usuário priorizar.
 5. **PRÓXIMA FASE AUTORIZADA (2026-09-01): MODULAÇÃO DOS BLOCOS** — ver
    roadmap na seção 10. Autorizada mesmo com o item 4 pendente.
+6. **`CR-BLOCK-01` (prisma / fiadas / amarração vertical)** — implementado
+   na branch `claude/block-01-prisma-fiadas-rik42t`, **AGUARDANDO REVISÃO
+   E AUDITORIA CRUZADA**. Não mesclado.
 
 ## 10. Modulação dos blocos — roadmap futuro
 
@@ -567,8 +570,12 @@ geometria das paredes (CR-2F-A/E/D) está estável e determinística; o
 teste visual integrado completo continua pendente (seção 9, item 4), mas
 não bloqueia mais o início desta fase, por decisão do usuário.
 
-- prisma entre fiadas;
-- evitar blocos verticalmente alinhados indevidamente;
+- ~~prisma entre fiadas~~ — **`CR-BLOCK-01` implementado**, aguardando
+  revisão. Coincidência de junta proibida entre fiadas da MESMA banda de
+  abertura: **236 → 0** nos 3 projetos de benchmark; o resíduo de 33 é
+  **entre bandas** e exige `wall_modeling.py` (fora do escopo daquela
+  branch — ver `REGRAS_MODULACAO_BLOCOS.md` 27.7);
+- ~~evitar blocos verticalmente alinhados indevidamente~~ — mesmo CR;
 - impedir compensadores de 9 cm repetidos;
 - impedir pastilhas repetidas;
 - controlar uso de meio bloco de 19 cm;
@@ -682,6 +689,122 @@ Antes de iniciar qualquer alteração relevante neste repositório:
    subjetiva).
 
 ## 13. Histórico de atualizações deste documento
+
+### 2026-09-01 — `CR-BLOCK-01` (prisma, fiadas e amarração vertical)
+
+```
+data:          2026-09-01
+CR:            CR-BLOCK-01 (CONTA 1 de um par de sessões paralelas)
+branch:        claude/block-01-prisma-fiadas-rik42t
+SHA inicial:   9f3bab41b35f0e2a5f9782583ead8e1ee7755f49 (main)
+SHA final:     bff84e5fb690d03faff83e87a678eff1a42fce66
+status:        IMPLEMENTADO — NÃO MESCLADO. Aguardando revisão e auditoria
+               cruzada com a CONTA 2.
+
+objetivo:      eliminar juntas verticais coincidentes entre fiadas
+               consecutivas (quebra de prisma), escolhendo a modulação da
+               fiada N+1 a partir da geometria REAL da fiada N — nunca por
+               um deslocamento fixo nem por regra de caso particular.
+
+baseline:      benchmark HEADLESS reprodutível criado nesta branch
+               (nuvem/benchmark/diagnostics_block_prisma/), rodando o
+               SOLVER REAL sobre os 3 projetos de nuvem/benchmark/projects:
+               275 paredes, 17 fiadas, 22.341 juntas internas.
+               FORBIDDEN_JOINT_ALIGNMENT=418 (236 dentro da mesma banda de
+               abertura, 182 entre bandas), DOCUMENTED_EXCEPTION=638,
+               UNCLASSIFIED_RULE_CONFLICT=1518, NO_ALIGNMENT=18262,
+               alignment_conflicts=64, CONTINUOUS_VERTICAL_JOINT=169.
+
+causa-raiz:    PROVADA por tracing + ablação, não por dedução (ver
+               diagnostics_block_prisma/trace_segment.py). NÃO era "as
+               fiadas são resolvidas independentemente" nem "as juntas
+               anteriores são ignoradas" — as juntas da fiada A CHEGAM ao
+               solver e SÃO usadas. Era a ENUMERAÇÃO de candidatos:
+               _pier_layout_avoiding_joints só variava o PRIMEIRO bloco e
+               deixava o mesmo guloso (que nunca volta atrás) preencher o
+               resto. Num trecho de 99cm fechado dos dois lados, os SETE
+               candidatos gerados eram literalmente IDÊNTICOS entre si,
+               com as duas juntas coincidindo — embora a MESMA composição
+               com o B19 na outra ponta desencontrasse as duas.
+
+solução:       _pier_full_search_layout — busca EXATA por programação
+               dinâmica sobre a posição. Todo passo do catálogo
+               (comprimento + junta) é múltiplo de PIER_MODULE_CM=5
+               (B39->40, B34->35, B19->20, C09->10, C04->5), então o trecho
+               é uma composição de remaining/5 unidades e dá para percorrer
+               TODAS. Minimiza EXATAMENTE a mesma tupla lexicográfica do
+               _score que já existia (regra #2, regra #1, travamento,
+               alinhamento de vazio) + nº de peças. Tetos de peça especial
+               derivados do próprio baseline (_layout_piece_profile), a
+               mesma licença que _pier_forced_bypass_layouts já tinha.
+               Só roda quando a regra #1 ou a #2 ainda estão violadas:
+               430 de 5.122 chamadas (8,4%), 0,49ms cada, 4% do runtime.
+
+arquivos:      nuvem/core/engine/wall_stepper.py (produção)
+               tests/test_block_bonding.py (suíte NOVA)
+               nuvem/benchmark/diagnostics_block_prisma/** (benchmark)
+               nuvem/REGRAS_MODULACAO_BLOCOS.md (nova seção 27)
+               docs/PROJECT_STATUS.md (este registro)
+
+protegidos:    geometry.py, wall_pairing.py, tolerances.py,
+               continuous_modulation.py, modulation_math.py,
+               wall_modeling.py, tests/test_script.py — NENHUM alterado.
+               Arquivos exclusivos da CONTA 2 (diagnostics_block_audit/**,
+               RELATORIO_BASELINE_BLOCOS.md, docs/BLOCK_MODULATION_AUDIT.md)
+               — nenhum criado, editado, apagado ou renomeado.
+
+testes:        tests/test_block_bonding.py  32 passed  (0,18s) — NOVA
+               tests/regression             113 passed (22,9s)
+               nuvem/tests                  18 passed  (0,03s)
+               tests/test_script.py         259 passed, 1 FALHA ESPERADA
+                 (test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada:
+                  assert 'shift' == 'trim'). NÃO é regressão de qualidade:
+                  a asserção codificava a limitação antiga — medido nos
+                  dois estados do código, o plano `shift` (ajuste MENOR,
+                  comprimento do eixo inalterado) era rejeitado
+                  EXCLUSIVAMENTE por sem_alinhamento_vertical. Com a regra
+                  #1 satisfeita ele passa e o `trim` deixa de ser
+                  necessário — exatamente a ordem de prioridade que a
+                  seção 7 de REGRAS_MODULACAO_BLOCOS.md documenta. A
+                  correção é de UMA LINHA ("trim" -> "shift"), mas
+                  tests/test_script.py não pode ser editado nesta branch
+                  (contrato de isolamento do CR). Ver REGRAS 27.9.
+
+benchmark:     FORBIDDEN_JOINT_ALIGNMENT  418 -> 33   (-92,1%)
+                 ... mesma banda (escopo)  236 -> 0    (-100%)
+                 ... entre bandas          182 -> 33   (-81,9%)
+               alignment_conflicts          64 -> 0    (-100%)
+               CONTINUOUS_VERTICAL_JOINT   169 -> 138  (-18,3%)
+               compensadores consecutivos 1342 -> 1210 (-9,8%)
+               colisões                   1083 -> 1048 (-3,2%)
+               paredes reprovadas          106 -> 104
+               blocos dentro de abertura   281 -> 281  (inalterado)
+               door_void_violations        638 -> 638  (inalterado)
+               paredes com blocos      246/275 -> 246/275 (inalterado)
+               falhas de encontro L/T/X    200 -> 200  (inalterado)
+               non_modular                3333 -> 3336 (+3, redistribuição)
+               runtime                   4,54s -> 4,78s (+5,3%)
+               fingerprint canônico estável entre execuções repetidas
+
+dívidas:       1) BANDAS de abertura fragmentam a memória entre fiadas —
+                  as 33 coincidências restantes são TODAS na fronteira
+                  entre bandas, que solve_building_blocks_all_courses
+                  (core/wall_modeling.py) resolve independentemente.
+                  NECESSIDADE DE ESCOPO ADICIONAL, registrada em
+                  REGRAS_MODULACAO_BLOCOS.md 27.7 — não foi tocada porque
+                  wall_modeling.py está fora da área de escrita do CR.
+               2) UNCLASSIFIED_RULE_CONFLICT = 1506 — coincidências que
+                  envolvem peça de amarração de nó, que a seção 5 manda
+                  repetir e a regra #1 proíbe. CONFLITO REGISTRADO, nunca
+                  resolvido por suposição (REGRAS 27.8).
+               3) non_modular +3 — o reparo local de abertura não conhece
+                  o critério de _layout_acerto_penalty (REGRAS 27.8).
+               4) asserção estale em tests/test_script.py (REGRAS 27.9).
+
+próximo passo: revisão + auditoria cruzada com a CONTA 2. Depois: o CR das
+               BANDAS (dívida 1), que é onde estão 100% das coincidências
+               proibidas que sobraram.
+```
 
 ### 2026-09-01 — criação do documento
 

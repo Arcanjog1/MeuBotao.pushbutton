@@ -19,6 +19,7 @@ LOWER_IS_BETTER = (
     "consecutive_compensator_pairs", "blocks_inside_opening", "collisions",
     "door_void_violations", "non_modular", "alignment_conflicts",
     "walls_audit_failed", "walls_without_blocks", "intersection_failures",
+    "same_band", "cross_band",
 )
 # Metricas em que ENCOLHER e' regressao.
 HIGHER_IS_BETTER = ("walls_with_blocks",)
@@ -28,7 +29,7 @@ def _flat(project):
     out = {}
     for key, value in project.items():
         if key in ("joint_classes", "blocks_by_code", "audit_problems",
-                   "consecutive_compensator_runs_by_len"):
+                   "consecutive_compensator_runs_by_len", "forbidden_by_band"):
             for name, count in (value or {}).items():
                 out["{0}.{1}".format(key, name)] = count
         elif isinstance(value, (int, float)):
