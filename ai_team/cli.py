@@ -27,6 +27,82 @@ MODES = ("diagnose", "implement", "review", "benchmark", "full", "selftest")
 #: Marca uma run em andamento no processo, para barrar recursao.
 RUN_ACTIVE_ENV = "AI_TEAM_RUN_ACTIVE"
 
+#: Marcador pytest (registrado em pytest.ini) para qualquer teste que
+#: spawna `python -m ai_team` como subprocesso. O gate escopado do
+#: selftest (`_scope_pytest_gate_for_selftest`) exclui este marcador -
+#: sem isso, o gate do proprio `--mode selftest` colecionaria esses
+#: testes e tentaria iniciar outra run do AI Team dentro de si mesma.
+AI_TEAM_E2E_MARKER = "ai_team_e2e"
+
+
+def _allow_protected_head(mode: str, no_branch: bool) -> bool:
+    """Unica condicao que libera HEAD em branch protegida no gate.
+
+    So' verdadeiro quando as DUAS coisas valem ao mesmo tempo:
+    `mode == "selftest"` E `no_branch` (o `--no-branch` interno usado pelo
+    workflow para o selftest). Nenhuma delas sozinha libera nada, e nenhuma
+    vem de um input que o usuario controle diretamente para os modos reais
+    (diagnose/implement/review/benchmark/full sempre usam branch propria).
+    """
+    return mode == "selftest" and no_branch
+
+
+def _scope_pytest_gate_for_selftest(cfg: Config) -> str:
+    """Escopa o gate pytest do MODO selftest para nao recursar em si mesmo.
+
+    O `--mode selftest` roda 100% offline (agentes roteirizados), mas o
+    gate dele continua rodando a suite pytest de verdade - e' isso que
+    prova que o encanamento (roteamento, gate, estado, parada) funciona de
+    ponta a ponta. O problema: a propria suite contem testes marcados
+    `AI_TEAM_E2E_MARKER` que spawnam `python -m ai_team` como subprocesso
+    para se testar. Rodar esses testes DENTRO do gate de uma run que ja'
+    esta' com `AI_TEAM_RUN_ACTIVE=1` faria cada um deles tentar iniciar
+    outra run - a guarda de recursao (corretamente) aborta, e o teste
+    reportaria falha, derrubando o gate por um motivo que nao e' uma
+    regressao real.
+
+    A correcao e' escopar por MARCADOR pytest (`-m "... and not
+    ai_team_e2e"`), nao por nome de arquivo: qualquer teste futuro que
+    tambem spawne `python -m ai_team` so' precisa herdar o marcador para
+    ficar automaticamente fora do proprio gate do selftest, sem precisar
+    tocar nesta funcao de novo.
+
+    So' mexe na config quando o usuario NAO passou `--gate-command` (isso
+    continua tendo prioridade absoluta - e' o que o teste ponta a ponta
+    usa para escopar ainda mais, para `tests/aiteam/test_routing.py`
+    isolado). Devolve uma nota para o log da run, ou "" se nao mexeu em
+    nada.
+    """
+    pytest_gate = cfg.gates.get("pytest")
+    if not isinstance(pytest_gate, dict) or not pytest_gate.get("enabled"):
+        return ""
+    command = [str(c) for c in (pytest_gate.get("command") or [])]
+    if not command:
+        return ""
+
+    marker_expr = f"not {AI_TEAM_E2E_MARKER}"
+    # A marcacao `-m` do PYTEST (o filtro de markers) nao e' o primeiro
+    # `-m` do comando: `python3 -m pytest ... -m "not slow"` tem DOIS, e o
+    # primeiro e' o `-m modulo` do proprio interpretador Python. Por isso
+    # procuramos o `-m` que vem DEPOIS do token `pytest`, nunca o primeiro
+    # que aparecer cru na lista.
+    scoped = list(command)
+    try:
+        pytest_idx = scoped.index("pytest")
+    except ValueError:
+        pytest_idx = -1
+    marker_flag_idx = next(
+        (i for i in range(pytest_idx + 1, len(scoped)) if scoped[i] == "-m"), None)
+    if marker_flag_idx is not None and marker_flag_idx + 1 < len(scoped):
+        scoped[marker_flag_idx + 1] = f"({scoped[marker_flag_idx + 1]}) and {marker_expr}"
+    else:
+        scoped += ["-m", marker_expr]
+
+    pytest_gate["command"] = scoped
+    return (f"mode=selftest: gate pytest escopado automaticamente para "
+            f"-m \"{marker_expr}\" (evita recursao do proprio AI Team "
+            f"dentro do seu gate)")
+
 
 def build_selftest_executor() -> ScenarioExecutor:
     """Cenario padrao do `--mode selftest`: 2 rodadas e aprovacao.
@@ -95,6 +171,24 @@ def resolve_max_rounds(cfg: Config, requested: int | None) -> tuple[int, str]:
 def write_summary(path: str, final: dict) -> None:
     """Resumo markdown para o step summary do GitHub. Ja' redigido."""
     gate = final.get("gate") or {}
+    is_selftest = final.get("mode") == "selftest"
+    if is_selftest:
+        # Secao 23 do pedido: nunca apresentar o custo sintetico dos
+        # agentes roteirizados como se fosse cobranca real de API.
+        custo_linha = (
+            f"- **Custo API real:** US$ {final.get('api_cost_usd', 0.0)} (selftest offline) "
+            f"| custo simulado (fixture): US$ {final.get('simulated_cost_usd', 0)}"
+        )
+        chamadas_linha = (
+            f"- **Chamadas (SIMULATED INVOCATIONS, nenhuma API real):** "
+            f"claude={final.get('claude_calls')} codex={final.get('codex_calls')}"
+        )
+    else:
+        custo_linha = f"- **Custo (Claude):** US$ {final.get('total_cost_usd', 0)}"
+        chamadas_linha = (
+            f"- **Chamadas:** claude={final.get('claude_calls')} "
+            f"codex={final.get('codex_calls')}"
+        )
     lines = [
         f"## AI Team - `{final.get('status')}`",
         "",
@@ -102,8 +196,8 @@ def write_summary(path: str, final: dict) -> None:
         f"- **Modo:** `{final.get('mode')}`  |  **Branch:** `{final.get('branch')}`",
         f"- **Rodadas:** {final.get('rounds_used')}/{final.get('max_rounds')}",
         f"- **Gate:** `{gate.get('status')}` - {gate.get('summary', '')}",
-        f"- **Custo (Claude):** US$ {final.get('total_cost_usd', 0)}",
-        f"- **Chamadas:** claude={final.get('claude_calls')} codex={final.get('codex_calls')}",
+        custo_linha,
+        chamadas_linha,
         f"- **DO_NOT_MERGE:** {final.get('do_not_merge')}",
         "",
         f"**Resumo:** {final.get('summary', '')}",
@@ -157,6 +251,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     os.environ[RUN_ACTIVE_ENV] = "1"
 
+    gate_scope_note = ""
     if args.gate_command:
         try:
             comando = json.loads(args.gate_command)
@@ -170,15 +265,27 @@ def main(argv: list[str] | None = None) -> int:
         pytest_gate = cfg.gates.get("pytest")
         if isinstance(pytest_gate, dict):
             pytest_gate["command"] = comando
+    elif args.mode == "selftest":
+        # Automatico: a UI/workflow nao precisa (nem deve) passar
+        # --gate-command para o selftest funcionar. So' entra aqui quando
+        # o usuario nao escolheu um gate-command proprio.
+        gate_scope_note = _scope_pytest_gate_for_selftest(cfg)
 
     max_rounds, clamp_note = resolve_max_rounds(cfg, args.max_rounds)
     state = create_run(args.task, args.mode, max_rounds, root=args.runs_dir)
     if clamp_note:
         state.note(clamp_note)
+    if gate_scope_note:
+        state.note(gate_scope_note)
 
     base_branch = args.base_branch or str(cfg.git.get("base_branch", "main"))
     state.base_sha = repo.head_sha(args.cwd)
     snapshot_main = repo.rev_parse(base_branch, args.cwd)
+    # Snapshot da working tree ANTES da run: o invariante do selftest
+    # compara contra ISTO (nao contra "vazio"), para nao confundir
+    # alteracoes locais preexistentes (fora do selftest) com algo que a
+    # run produziu.
+    dirty_snapshot = repo.git(["status", "--porcelain"], args.cwd)
 
     # Branch propria por tarefa (secao 10 do pedido).
     if not args.no_branch:
@@ -236,6 +343,9 @@ def main(argv: list[str] | None = None) -> int:
         base_branch=base_branch,
         base_sha_snapshot=snapshot_main,
         deadline=time.monotonic() + cfg.timeout_minutes * 60,
+        allow_protected_head=_allow_protected_head(args.mode, args.no_branch),
+        dirty_before=dirty_snapshot,
+        head_sha_before=state.base_sha,
     )
 
     try:

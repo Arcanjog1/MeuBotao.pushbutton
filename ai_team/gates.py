@@ -197,14 +197,37 @@ def _git(args: list[str], cwd: str = ".") -> str:
 
 def run_repo_invariants_check(spec: dict[str, Any], cwd: str = ".",
                               expected_branch: str = "",
-                              base_sha_before: str = "") -> CheckResult:
-    """Invariantes do repositorio: main intocada e branch correta."""
+                              base_sha_before: str = "",
+                              allow_protected_head: bool = False,
+                              dirty_before: str = "",
+                              head_sha_before: str = "") -> CheckResult:
+    """Invariantes do repositorio: main intocada e branch correta.
+
+    `allow_protected_head` e' a UNICA excecao aceita para HEAD estar numa
+    branch protegida, e so' o orquestrador decide quando ela vale - nunca a
+    config nem input de usuario (ver `cli.py::_allow_protected_head`). Mesmo
+    com a excecao ligada, o resto do invariante continua HARD: nenhum commit
+    pode ter sido criado (HEAD nao pode ter se mexido) e a working tree do
+    motor tem que continuar exatamente como estava (`dirty_before`) -
+    comparamos contra os snapshots de ANTES da run, nao contra "vazio": um
+    checkout de desenvolvimento pode ja' ter alteracoes locais legitimas
+    (fora do selftest) que nao sao culpa desta run.
+
+    `base_sha_before` e `head_sha_before` sao DELIBERADAMENTE dois campos
+    diferentes: `base_sha_before` e' o snapshot da BRANCH PROTEGIDA (ex.:
+    `main`), que pode divergir do HEAD atual (o checkout local pode estar
+    numa branch de tarefa cujo ref local de `main` esta' desatualizado -
+    isso e' normal em dev e NAO e' o commit que o invariante de "nenhum
+    commit foi criado" precisa vigiar). `head_sha_before` e' o HEAD de
+    verdade no INICIO desta run - e' contra ele, nao contra o snapshot de
+    `main`, que comparamos para saber se a run criou um commit.
+    """
     hard = bool(spec.get("hard", True))
     protected = [str(b) for b in (spec.get("protected_branches") or ["main"])]
     problems: list[str] = []
 
     current_branch = _git(["rev-parse", "--abbrev-ref", "HEAD"], cwd)
-    if current_branch and current_branch in protected:
+    if current_branch and current_branch in protected and not allow_protected_head:
         problems.append(f"HEAD esta' na branch protegida {current_branch!r}")
     if expected_branch and current_branch and current_branch != expected_branch:
         problems.append(f"branch esperada {expected_branch!r}, atual {current_branch!r}")
@@ -216,7 +239,33 @@ def run_repo_invariants_check(spec: dict[str, Any], cwd: str = ".",
             if now and now != base_sha_before and name == (spec.get("_base_branch") or "main"):
                 problems.append(f"{name} mudou de {base_sha_before[:8]} para {now[:8]}")
 
-    data = {"branch": current_branch, "protected": protected}
+    # Selftest sem branch: nada deveria ter se mexido no motor. Nem HEAD
+    # (nenhum commit deveria ter sido criado), nem a working tree (nenhum
+    # agente real rodou, entao nenhuma alteracao NOVA deveria existir).
+    if allow_protected_head and head_sha_before:
+        head_now = _git(["rev-parse", "HEAD"], cwd)
+        if head_now and head_now != head_sha_before:
+            problems.append(
+                f"HEAD mudou de {head_sha_before[:8]} para {head_now[:8]} "
+                "durante o selftest (nenhum commit deveria ter sido criado)"
+            )
+        # `.strip()` normaliza os DOIS lados antes de comparar: `_git()`
+        # (interno deste modulo) tira o espaco inicial da PRIMEIRA linha
+        # de `git status --porcelain` (o formato usa um espaco antes da
+        # letra de status, ex.: " M arquivo"); `repo.git()` (usado por
+        # `cli.py` para capturar o snapshot ANTES da run) so' faz
+        # `.rstrip()` e preserva esse espaco. Sem normalizar os dois
+        # lados do mesmo jeito, a comparacao dava falso-positivo mesmo
+        # quando a working tree nao mudou nada.
+        dirty_now = _git(["status", "--porcelain"], cwd)
+        if dirty_now.strip() != dirty_before.strip():
+            problems.append(
+                "working tree do motor mudou durante o selftest (nenhuma "
+                f"alteracao real deveria ter sido produzida): {dirty_now[:200]!r}"
+            )
+
+    data = {"branch": current_branch, "protected": protected,
+            "allow_protected_head": allow_protected_head}
     if problems:
         return CheckResult("repo_invariants", "FAIL", hard, "; ".join(problems), data)
     return CheckResult("repo_invariants", "PASS", hard,
@@ -224,7 +273,9 @@ def run_repo_invariants_check(spec: dict[str, Any], cwd: str = ".",
 
 
 def run_gates(cfg: Config, cwd: str = ".", expected_branch: str = "",
-              base_sha_before: str = "", base_branch: str = "main") -> GateResult:
+              base_sha_before: str = "", base_branch: str = "main",
+              allow_protected_head: bool = False, dirty_before: str = "",
+              head_sha_before: str = "") -> GateResult:
     """Roda todos os checks habilitados na config."""
     started = time.monotonic()
     result = GateResult()
@@ -238,7 +289,10 @@ def run_gates(cfg: Config, cwd: str = ".", expected_branch: str = "",
     if invariants_spec.get("enabled"):
         invariants_spec["_base_branch"] = base_branch
         result.checks.append(
-            run_repo_invariants_check(invariants_spec, cwd, expected_branch, base_sha_before)
+            run_repo_invariants_check(invariants_spec, cwd, expected_branch, base_sha_before,
+                                      allow_protected_head=allow_protected_head,
+                                      dirty_before=dirty_before,
+                                      head_sha_before=head_sha_before)
         )
 
     metrics_spec = specs.get("metrics") or {}

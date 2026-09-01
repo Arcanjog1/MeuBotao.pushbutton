@@ -69,8 +69,17 @@ class TestEnsureBranchSegundaCamada:
         assert "protegida" in message
 
 
+@pytest.mark.ai_team_e2e
 class TestCliRecusaNomePerigosoDeVerdade:
-    """Prova pela CLI real: `--branch` hostil nunca chega ao `git checkout`."""
+    """Prova pela CLI real: `--branch` hostil nunca chega ao `git checkout`.
+
+    Spawna `python -m ai_team` de verdade - por isso carrega
+    `ai_team_e2e`: se isto rodar DENTRO do gate de uma run que ja' esta'
+    com `AI_TEAM_RUN_ACTIVE=1` (ex.: o gate escopado do `--mode
+    selftest`), a guarda de recursao aborta o subprocesso (corretamente),
+    e o teste falharia por um motivo que nao e' uma regressao real. Ver
+    `ai_team/cli.py::_scope_pytest_gate_for_selftest`.
+    """
 
     def _run(self, tmp_path, branch: str) -> subprocess.CompletedProcess:
         repo_dir = tmp_path / "repo"

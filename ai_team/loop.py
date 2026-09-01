@@ -60,6 +60,20 @@ class Orchestrator:
     base_branch: str = "main"
     base_sha_snapshot: str = ""
     deadline: float | None = None
+    #: So' `cli.py::_allow_protected_head` liga isto, e so' quando
+    #: mode == "selftest" e --no-branch: nenhum agente real roda, nenhuma
+    #: branch e' criada, entao HEAD ficar em `main` e' esperado - nao um
+    #: desvio de tarefa real. Runs reais nunca tem este campo True.
+    allow_protected_head: bool = False
+    #: `git status --porcelain` capturado ANTES da run comecar. So' usado
+    #: junto com `allow_protected_head`: o invariante compara contra ISTO,
+    #: nao contra "vazio" - um checkout de desenvolvimento pode ja' ter
+    #: alteracoes locais legitimas que nao sao culpa do selftest.
+    dirty_before: str = ""
+    #: HEAD de verdade no INICIO da run (nao o snapshot de `base_branch`,
+    #: que pode ser uma ref local desatualizada). So' usado junto com
+    #: `allow_protected_head`, para provar que nenhum commit foi criado.
+    head_sha_before: str = ""
 
     # ---------------- limites ----------------
 
@@ -91,6 +105,9 @@ class Orchestrator:
             expected_branch=self.state.branch,
             base_sha_before=self.base_sha_snapshot,
             base_branch=self.base_branch,
+            allow_protected_head=self.allow_protected_head,
+            dirty_before=self.dirty_before,
+            head_sha_before=self.head_sha_before,
         )
         self.state.write_json(f"gate_round_{round_no:03d}.json", gate.to_dict())
         return gate
@@ -305,4 +322,15 @@ def build_final_result(state: RunState, outcome: LoopOutcome, cwd: str = ".") ->
         payload["human_question"] = outcome.human_question
     if outcome.revit_capture_request:
         payload["revit_capture_request"] = outcome.revit_capture_request
+
+    # Secao 23 do pedido: no selftest o agente e' roteirizado
+    # (`selftest.claude_stdout(cost=...)`), entao `total_cost_usd` e'
+    # SINTETICO - nenhuma API foi chamada. Isto fica explicito no
+    # artefato para nunca ser lido como cobranca real.
+    if state.mode == "selftest":
+        payload["api_cost_usd"] = 0.0
+        payload["simulated_cost_usd"] = round(state.total_cost_usd, 6)
+        payload["claude_calls_simulated"] = True
+        payload["codex_calls_simulated"] = True
+
     return redact_obj(payload)

@@ -22,6 +22,22 @@
     "total_cost_usd": {"type": "number"},
     "claude_calls": {"type": "integer"},
     "codex_calls": {"type": "integer"},
+    "api_cost_usd": {
+      "type": "number",
+      "description": "Custo de API real. So' aparece em mode=selftest, sempre 0.0 (nenhuma chamada real e' feita)."
+    },
+    "simulated_cost_usd": {
+      "type": "number",
+      "description": "Custo sintetico devolvido pelos agentes roteirizados do selftest - NAO e' cobranca real."
+    },
+    "claude_calls_simulated": {
+      "type": "boolean",
+      "description": "true quando claude_calls conta invocacoes roteirizadas (mode=selftest), nao chamadas reais de API."
+    },
+    "codex_calls_simulated": {
+      "type": "boolean",
+      "description": "true quando codex_calls conta invocacoes roteirizadas (mode=selftest), nao chamadas reais de API."
+    },
     "gate": {"type": "object", "description": "Resultado do gate deterministico da ultima rodada."},
     "rounds": {"type": "array", "items": {"type": "object"}},
     "revit_capture_request": {"type": "array", "items": {"type": "string"}},

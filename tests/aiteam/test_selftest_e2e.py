@@ -17,6 +17,13 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+#: Todo teste deste modulo spawna `python -m ai_team` como subprocesso -
+#: nunca pode rodar dentro do proprio gate do `--mode selftest`, senao
+#: recursa (AI_TEAM_RUN_ACTIVE ja' estaria "1", herdado pelo subprocesso).
+#: O gate escopado automaticamente exclui este marcador; ver
+#: ai_team/cli.py::_scope_pytest_gate_for_selftest.
+pytestmark = pytest.mark.ai_team_e2e
+
 
 @pytest.fixture(scope="module")
 def run_selftest(tmp_path_factory):
