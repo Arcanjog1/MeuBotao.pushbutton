@@ -318,12 +318,24 @@ As regras técnicas e funcionais de amarração e modulação (o "como", não o
   e planejamento que antecedeu o CR-2F-E e o CR-2F-A.
 - `tests/test_script.py`, `tests/regression/` — suíte de testes e
   invariantes.
+- `.github/workflows/check-project-status.yml` — lembrete automático
+  (GitHub Actions): falha o check, sem bloquear o merge, quando um push
+  ou PR altera `nuvem/core/engine/**` sem tocar este arquivo no mesmo
+  diff. Não substitui a atualização manual — só reduz a chance de
+  esquecimento.
 
 ## 12. Regra permanente de atualização
 
 **Ao concluir qualquer CR, este documento deve ser atualizado antes de
 encerrar o trabalho.** Não é opcional e não deve ficar apenas registrado
 em commits ou em conversa.
+
+Há um lembrete automático (`.github/workflows/check-project-status.yml`)
+que sinaliza no GitHub quando `nuvem/core/engine/**` muda sem que este
+arquivo seja atualizado no mesmo push/PR. Ele **não substitui** este
+processo manual: é só um alerta (não bloqueia push nem merge direto na
+`main`), então a responsabilidade de atualizar continua sendo do agente
+ou do usuário que fecha o CR.
 
 Toda atualização futura deve registrar, no histórico abaixo (seção 13),
 no mínimo:
