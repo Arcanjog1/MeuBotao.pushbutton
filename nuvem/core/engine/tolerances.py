@@ -297,3 +297,5 @@ CAP_OPENING_SLACK_FT = CAP_OPENING_SLACK_M * FEET_PER_METER
 # deixando a face verdadeira orfa.
 THICKNESS_RANK_BUCKET_M = 0.0005
 THICKNESS_RANK_BUCKET_FT = THICKNESS_RANK_BUCKET_M * FEET_PER_METER
+
+# comentario temporario - teste do workflow check-project-status.yml (sera revertido)
