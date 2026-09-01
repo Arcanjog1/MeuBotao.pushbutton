@@ -16,11 +16,25 @@ de segmentos de CAD. O `CR-2F-E` (centerline), o `CR-2F-A` (simetria de
 merge/pairing/deduplicação) e o `CR-2F-D` (determinismo do agrupamento e
 recuperação da `W097`) já foram concluídos e **mergeados na `main`**: o
 fingerprint das paredes foi de 3 distintos para 1 e a `W097` foi
-recuperada. **PRÓXIMO PASSO: TESTE VISUAL NO REVIT.** A modulação de
-blocos em si (o objetivo final do produto) ainda não foi
-retomada — ela está registrada como roadmap futuro (seção 10), a ser
-iniciada somente depois que a geometria das paredes estiver estável e
-determinística.
+recuperada.
+
+O **primeiro teste visual no Revit** foi iniciado em 2026-09-01 e bateu
+num **bloqueio de integração real** (`ArgumentsInconsistentException` /
+`ShortCurveTolerance`) na extração do CAD — **corrigido e validado** (ver
+seção 5, "CORREÇÃO REVIT — SHORT CURVES"). Durante esse teste também foi
+diagnosticado (não corrigido — dívida de UX registrada na seção 6) que o
+detector de espessuras da tela de configuração amostra só as primeiras
+900 linhas cruas do Layer, o que pode subcontar/ocultar espessuras reais
+na sugestão da UI sem limitar o solver de verdade.
+
+O teste visual **integrado completo** (extração → paredes criadas →
+inspeção visual das paredes no Revit) foi **adiado por decisão do
+usuário**: a correção do `ShortCurveTolerance` está mesclada e validada,
+mas a criação de paredes em si ainda não foi exercitada ponta-a-ponta no
+Revit real. **PRÓXIMA FASE AUTORIZADA: MODULAÇÃO DOS BLOCOS** (seção 10)
+— a geometria das paredes (CR-2F-A/E/D) está estável e determinística o
+suficiente para o usuário autorizar o avanço, mesmo com o teste visual
+integrado ainda pendente.
 
 ## 2. Estado atual da main
 
@@ -331,11 +345,112 @@ Diagnóstico visual aprovado pelo usuário em
 
 **MESCLADO NA MAIN em `f7055c7`. PRÓXIMO PASSO: TESTE VISUAL NO REVIT.**
 
+### CORREÇÃO REVIT — SHORT CURVES (`ShortCurveTolerance`) — CONCLUÍDA E MERGEADA NA MAIN
+
+- **Branch:** `fix/revit-short-cad-curves` (mesclada e preservada)
+- **Contexto:** primeiro teste visual real no Revit (2026-09-01), fora do
+  pipeline headless via MCP.
+- **Bloqueio encontrado** antes da criação de qualquer parede, na etapa
+  "Extraindo linhas do CAD...", no CAD real `T01 LIMPA` (Revit 2026):
+
+  ```
+  Autodesk.Revit.Exceptions.ArgumentsInconsistentException:
+  Curve length is too small for Revit's tolerance
+  (as identified by Application.ShortCurveTolerance).
+  Parameter name: endpoints
+  ```
+
+  Stack: `extract_lines_by_layer` (`nuvem/core/wall_modeling.py`), na
+  chamada `DB.Line.CreateBound(p0, p1)` ao explodir uma `PolyLine` do CAD
+  em segmentos.
+
+- **Causa confirmada:** o CAD `T01 LIMPA` contém milhares de segmentos
+  (vértices de `PolyLine` quase duplicados, sobretudo no layer `P-PIPE`)
+  com comprimento **abaixo de `Application.ShortCurveTolerance`** (a
+  tolerância oficial do Revit, medida diretamente via MCP:
+  `0,00256026455729 pé`). O filtro antigo do script descartava só
+  segmentos com comprimento `< 1e-6` pé — muito menor que a tolerância
+  real do Revit — então esses segmentos passavam pelo filtro e derrubavam
+  `Line.CreateBound`.
+- **Diagnóstico comparativo Revit 2026 × 2027** (antes de corrigir):
+  `Application.ShortCurveTolerance` é **idêntico** nas duas versões
+  (`0,00256026455729` pé, builds 26.3.0.37 e 27.2.0.39); o teste de 2027
+  que "funcionou" usava um CAD de origem **diferente** (`TORRE`, 1.196
+  segmentos, sem a camada `P-PIPE`), não o `T01 LIMPA`. **Não há evidência
+  de diferença de comportamento entre os motores 2026 e 2027** — o
+  bloqueio é dado real do CAD, não regressão de versão do Revit.
+- **Correção aplicada** (`nuvem/core/wall_modeling.py`): `extract_lines_by_layer`
+  agora lê `Application.ShortCurveTolerance` diretamente (via
+  `doc.Application`, cacheado em `_get_short_curve_tolerance()`) e usa a
+  decisão pura `_segment_too_short_for_revit(distance, tolerance)` para
+  IGNORAR (sem enviar a `Line.CreateBound`) qualquer segmento com
+  `distance <= ShortCurveTolerance`, nos ramos `Line` e `PolyLine`.
+  Segmentos normais continuam extraídos exatamente como antes. Um resumo
+  (total analisado, ignorados, menor comprimento visto, layers afetados)
+  é logado uma única vez após a extração. Nenhuma tolerância hardcoded,
+  nenhum `except` genérico, nenhum endpoint alterado.
+- **Validação real no Revit 2026 + CAD `T01 LIMPA`** (via MCP, chamando a
+  função de produção, não uma reimplementação):
+  - total examinado: **49.127** segmentos (todos os layers);
+  - válidos: **40.028**; ignorados por `ShortCurveTolerance`: **9.099**;
+  - menor comprimento visto: `1,3384461397e-06` pé;
+  - layers afetados pelo descarte: `A-DETL-HDLN`, `M-EQPM`, `P-PIPE`,
+    `P-PIPE-CNTR`, `Sanitário`;
+  - **layer `Arquitetura` (o layer de paredes usado no teste): 0 linhas
+    perdidas** — as 9.258 linhas válidas desse layer chegam intactas;
+  - a extração terminou **sem exceção**, o script avançou até a tela de
+    configuração (Layer/espessuras/Nível/altura).
+- **Achado durante o mesmo teste (não é regressão desta correção — ver
+  subseção seguinte):** o detector de espessuras da tela mostrou "14 cm →
+  7 pares", número aparentemente baixo demais.
+- **Não tocados:** `create_centerline`, `find_wall_pairs`,
+  `core/engine/{geometry,wall_pairing,tolerances}.py`. CR-2F-D permanece
+  encerrado e não foi reaberto.
+- **Testes:** 4 testes de regressão novos em `tests/test_script.py`
+  (decisão pura no limite/abaixo/acima da tolerância; `extract_lines_by_layer`
+  com `Line` e `PolyLine` degeneradas, confirmando que só o segmento
+  degenerado é descartado e o processo não cai); `tests/revit_stubs.py`
+  ganhou um `ShortCurveTolerance` real (1/32" em pés) no stub de
+  `Application`.
+- **Merge:** merge commit na `main`, sem squash/rebase/force push (SHAs no
+  histórico da seção 13).
+
+#### Diagnóstico anexo — detector de espessuras da UI ("7 pares")
+
+Investigado **antes de qualquer correção**, a pedido do usuário, para não
+confundir com regressão do `ShortCurveTolerance` nem do CR-2F-D:
+
+- Função: `scan_candidate_thicknesses_cm` (`core/engine/wall_pairing.py`),
+  chamada por `_SetupForm._scan_layer` com
+  `lines[:SETUP_THICKNESS_SCAN_MAX_LINES]` (`SETUP_THICKNESS_SCAN_MAX_LINES
+  = 900`) — **apenas as primeiras 900 linhas cruas** (sem religamento de
+  fragmentos colineares) do layer, de um total de 9.258 no layer
+  `Arquitetura` do CAD `T01 LIMPA`.
+- Reproduzido exatamente via MCP: `raw[:900]` → `14 cm → 7 par(es)`,
+  batendo com o que a tela mostrou.
+- **O solver real (`find_wall_pairs`) NÃO usa essa amostra** — ele recebe
+  `lines_to_process = merge_collinear_fragments(...)`, calculado sobre as
+  **9.258 linhas inteiras**, sem nenhum teto de 900. Medido via MCP,
+  restringindo o alvo a 14 cm: **199 paredes formadas** pelo solver real
+  (contra as "7" mostradas na tela).
+- `ShortCurveTolerance` não influencia esse número: o layer `Arquitetura`
+  perdeu 0 linhas para a correção acima.
+- Outras espessuras "estranhas" mostradas na tela (6,5 cm, 9 cm — faces de
+  ~4 cm de comprimento) são ruído geométrico do CAD (jambas, mobiliário,
+  cotas), não paredes; 14 cm e 19 cm (faces de 0,55 m a 6,4 m) são
+  plausivelmente paredes reais.
+- **Conclusão oficial (aceita pelo usuário):** "7 pares" é **apenas
+  amostragem da tela de configuração** e **não limita o solver real**.
+  **NÃO corrigido agora** — decisão explícita do usuário. Registrado como
+  dívida de UX (seção 6).
+
 ## 6. Dívidas técnicas conhecidas
 
 - ~~**Não-determinismo residual do agrupamento**~~ — **RESOLVIDO** pelo
   CR-2F-D (seção 5): 6 → 1 no merge, 3 → 1 nas paredes.
 - ~~**Perda da `W097`**~~ — **RESOLVIDA** pelo CR-2F-D (seção 5).
+- ~~**Bloqueio `ShortCurveTolerance` na extração do CAD**~~ —
+  **RESOLVIDO** pela correção "REVIT — SHORT CURVES" (seção 5).
 - **Pareamento `(474, 2306)`** — uma face de 155,61 cm pareada com uma
   linha auxiliar de 4.394,45 cm inclinada 1,1125 grau, que gera o **eixo
   espúrio de 43,9 m**. Ele **continua no resultado**, como uma das 4
@@ -346,6 +461,18 @@ Diagnóstico visual aprovado pelo usuário em
   coloca a parede 2 cm acima das faces que o CAD desenha (seção 5). É
   problema do **gabarito**, não do solver; convém verificar se se repete em
   outras paredes antes de usar `eixo_ok` como métrica fina.
+- **Detector de espessuras da tela de configuração amostra só 900 linhas
+  cruas (`SETUP_THICKNESS_SCAN_MAX_LINES`), sem religar fragmentos
+  colineares** — diagnosticado em 2026-09-01 (subseção acima). Não limita
+  o solver real (`find_wall_pairs` roda sobre a lista inteira, religada),
+  mas pode: (a) subcontar a "confiança" mostrada ao lado de uma espessura
+  real (ex.: "7 pares" quando existem 199 paredes de verdade); (b), em
+  CADs mais extremos que este, **ocultar completamente** uma espessura
+  real da lista de sugestão se ela só aparecer além do índice 900 na
+  ordem de travessia do CAD (que não é espacial). **DÍVIDA DE UX — não
+  corrigida, por decisão explícita do usuário** (não mexer no detector
+  agora). Quando for endereçada: religar fragmentos antes de amostrar
+  e/ou aumentar ou remover o teto, sem alterar `find_wall_pairs`.
 
 ## 7. Paredes ausentes conhecidas
 
@@ -395,6 +522,15 @@ A política **"mantém a mais longa do grupo"** foi medida e está **correta**
 objetiva de regressão. Coberto por `INV-DET-001` a `007` e `INV-DEDUP-D-001`
 a `004`.
 
+**REVIT — SHORT CURVES — já resolvido:**
+- descarte de segmentos de CAD `<= Application.ShortCurveTolerance` antes
+  de `Line.CreateBound`, em `extract_lines_by_layer`.
+
+**Detector de espessuras da UI (`scan_candidate_thicknesses_cm` /
+`SETUP_THICKNESS_SCAN_MAX_LINES`) — diagnosticado, EXPLICITAMENTE NÃO
+corrigido** por decisão do usuário (2026-09-01). Não confundir uma
+contagem baixa na tela com um limite do solver real — ver seção 5.
+
 **Evitar especialmente mudanças sem necessidade em:**
 ```
 create_centerline
@@ -413,18 +549,23 @@ invariantes antes de propor merge.
 2. ~~Validar o baseline e os 11 invariantes sem regressão~~ — **feito**
    (seções 3 e 4): 256 + 113 verdes, 11 invariantes anteriores preservados,
    11 novos, fingerprint do solver inalterado.
-3. **TESTE VISUAL NO REVIT** — próximo passo imediato. É a primeira
-   validação da geometria determinística no modelo real, e não é
-   substituível pelo benchmark headless.
-4. Depois que a geometria das paredes estiver estável e determinística
-   **e confirmada visualmente no Revit**, avançar para a revisão/correção
-   da **modulação dos blocos** — ver roadmap na seção 10.
+3. ~~**TESTE VISUAL NO REVIT** — bloqueio de extração do CAD
+   (`ShortCurveTolerance`)~~ — **corrigido e mesclado na main** (seção 5).
+   O detector de espessuras da UI foi diagnosticado (não limita o solver)
+   e a dívida de amostragem foi registrada (seção 6).
+4. **Teste visual INTEGRADO completo** (extração → criação de paredes →
+   inspeção visual no Revit) — **ADIADO por decisão do usuário**. Ainda
+   não foi exercitado ponta-a-ponta no Revit real; retomar quando o
+   usuário priorizar.
+5. **PRÓXIMA FASE AUTORIZADA (2026-09-01): MODULAÇÃO DOS BLOCOS** — ver
+   roadmap na seção 10. Autorizada mesmo com o item 4 pendente.
 
 ## 10. Modulação dos blocos — roadmap futuro
 
-Estes itens são **roadmap**, não trabalho em andamento. Não devem ser
-implementados antes de a geometria das paredes (CR-2F-D) estar fechada e
-estável, exceto se o usuário pedir explicitamente uma exceção pontual.
+Estes itens são o **próximo trabalho autorizado** (2026-09-01). A
+geometria das paredes (CR-2F-A/E/D) está estável e determinística; o
+teste visual integrado completo continua pendente (seção 9, item 4), mas
+não bloqueia mais o início desta fase, por decisão do usuário.
 
 - prisma entre fiadas;
 - evitar blocos verticalmente alinhados indevidamente;
@@ -635,4 +776,92 @@ verificação pós-merge: 256 passed (tests/test_script.py), 113 passed
                inalterado, merge fingerprint = 1, wall fingerprint = 1,
                201/145/87/96/91/7/4/W097 confirmados nas 6 ordens
 próximo passo: TESTE VISUAL NO REVIT
+```
+
+### 2026-09-01 — REVIT SHORT CURVES: bloqueio encontrado e corrigido na branch
+
+```
+data:          2026-09-01
+CR:            REVIT — SHORT CURVES (bloqueio de integração, extração de CAD)
+branch:        fix/revit-short-cad-curves
+SHA inicial:   c5447fe72ad1d2933b3eef74d63f1279c6a76cf6 (main, antes do CR-2F-D
+               ser corrigido de merge-base — ver nota abaixo)
+SHA da branch (fix aplicado): 751846a1d08fd98b1e897852ded8cdaac1b41568
+status:        CONCLUÍDO na branch — aguardando sincronização com a main
+               atual (25 commits à frente do baseline original) e merge
+o que foi alterado:
+  - nuvem/core/wall_modeling.py: extract_lines_by_layer passa a ler
+    Application.ShortCurveTolerance (via doc.Application, cacheada em
+    _get_short_curve_tolerance()) e ignora, ANTES de Line.CreateBound,
+    qualquer segmento com distance <= ShortCurveTolerance
+    (_segment_too_short_for_revit), nos ramos Line e PolyLine; log-resumo
+    único da extração (total/ignorados/menor comprimento/layers)
+  - tests/revit_stubs.py: Application do stub ganha ShortCurveTolerance
+    real (1/32" em pés) em vez de inerte
+  - tests/test_script.py: 4 testes de regressão novos
+  - docs/PROJECT_STATUS.md: criado (depois reconciliado com a versão
+    completa da main nesta atualização)
+  - NÃO tocados: create_centerline, find_wall_pairs,
+    core/engine/{geometry,wall_pairing,tolerances}.py
+testes:        241 passed (tests/test_script.py, branch isolada, antes da
+               sincronização com a main)
+diagnóstico comparativo Revit 2026 × 2027 (antes da correção): mesma
+               ShortCurveTolerance (0,00256026455729 pé) nas duas
+               versões; teste "que funcionou" no 2027 usava CAD diferente
+               (TORRE, sem P-PIPE) — sem evidência de diferença de motor
+validação real no Revit 2026 + T01 LIMPA (via MCP, função de produção):
+               49.127 segmentos examinados, 40.028 válidos, 9.099
+               ignorados por ShortCurveTolerance, menor comprimento
+               1,3384461397e-06 pé, layers afetados A-DETL-HDLN/M-EQPM/
+               P-PIPE/P-PIPE-CNTR/Sanitário; layer Arquitetura (usado no
+               teste) perdeu 0 linhas; extração terminou sem exceção
+diagnóstico anexo — detector de espessuras da UI: "14cm → 7 pares" é
+               amostragem de scan_candidate_thicknesses_cm sobre
+               raw[:900] (SETUP_THICKNESS_SCAN_MAX_LINES), sem religar
+               fragmentos, de um total de 9.258 linhas no layer
+               Arquitetura; o solver real (find_wall_pairs, sobre as
+               9.258 linhas inteiras religadas) formou 199 paredes reais
+               para o alvo 14cm; não é regressão, não limita o solver;
+               NÃO corrigido agora, por decisão do usuário
+novas dívidas: detector de espessuras da UI amostra só 900 linhas cruas,
+               sem religamento — pode ocultar espessuras reais da lista
+               de sugestão em CADs mais extremos (seção 6); registrado
+               como dívida de UX, não corrigido
+itens resolvidos:  bloqueio ShortCurveTolerance na extração do CAD
+itens ainda pendentes: teste visual INTEGRADO completo (criação de
+               paredes + inspeção visual no Revit) — adiado por decisão
+               do usuário; dívida de amostragem do detector de
+               espessuras
+próximo passo recomendado: sincronizar a branch com a main atual (git
+               merge origin/main, sem rebase/force), rodar a suíte
+               completa e mesclar por merge commit
+```
+
+### 2026-09-01 — REVIT SHORT CURVES: sincronizada e mesclada na main
+
+```
+data:          2026-09-01
+CR:            REVIT — SHORT CURVES (bloqueio de integração, extração de CAD)
+branch:        fix/revit-short-cad-curves (mesclada, preservada)
+SHA da main ANTES do merge: (ver seção 2 / commit deste merge)
+SHA da branch pós-sincronização (git merge origin/main, sem rebase): (ver
+               commit de merge desta atualização)
+SHA do merge na main: (ver commit de merge desta atualização)
+status:        CONCLUÍDO E MERGEADO NA MAIN, por merge commit (sem
+               squash, sem rebase, sem force push)
+conflitos na sincronização: só em docs/PROJECT_STATUS.md (add/add — as
+               duas branches criaram o arquivo independentemente),
+               resolvido preservando a versão completa da main e
+               acrescentando o histórico desta correção. Nenhum conflito
+               em core/engine/geometry.py, core/engine/wall_pairing.py,
+               tolerances.py, create_centerline ou find_wall_pairs — os
+               commits do CR-2F-D vieram limpos (a branch nunca os havia
+               tocado).
+verificação pós-sincronização: ver testes na próxima seção do log (após
+               a suíte completa)
+detector de espessuras da UI: mantido como está — dívida de UX registrada
+               (seção 6), correção NÃO autorizada nesta rodada
+próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10).
+               Teste visual integrado completo no Revit continua
+               pendente, retomar quando o usuário priorizar.
 ```

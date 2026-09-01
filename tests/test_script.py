@@ -87,6 +87,85 @@ def solve_layout(raw_lines, thickness_cm=14.0, openings=None):
 
 
 # ------------------------------------------------------------- geometria
+# --------------------------------------------------------- CAD short-curve
+# Bloqueio real no primeiro teste visual no Revit (01/09): CADs reais tem
+# segmentos degenerados (vertices duplicados/quase duplicados) que passavam
+# pelo filtro antigo (< 1e-6 pe, bem menor que a tolerancia oficial do
+# Revit) e derrubavam a extracao inteira em Line.CreateBound com
+# ArgumentsInconsistentException. Ver docs/PROJECT_STATUS.md.
+@case
+def test_segmento_no_limite_ou_abaixo_do_short_curve_tolerance_e_marcado_curto():
+    tol = m._get_short_curve_tolerance()
+    assert m._segment_too_short_for_revit(tol, tol) is True  # exatamente no limite
+    assert m._segment_too_short_for_revit(tol / 2.0, tol) is True  # abaixo do limite
+
+
+@case
+def test_segmento_normal_nao_e_marcado_curto():
+    tol = m._get_short_curve_tolerance()
+    assert m._segment_too_short_for_revit(tol * 10.0, tol) is False
+    assert m._segment_too_short_for_revit(ft(500.0), tol) is False
+
+
+@case
+def test_extract_lines_by_layer_ignora_linha_degenerada_sem_derrubar_o_processo():
+    tol = m._get_short_curve_tolerance()
+    layer = "PAREDES"
+    original_get_layer_name = m.get_layer_name
+    m.get_layer_name = lambda geom_obj: layer
+    try:
+        good = Line.CreateBound(XYZ(0.0, 0.0, 0.0), XYZ(ft(500.0), 0.0, 0.0))
+        # abaixo da tolerancia oficial, mas acima do 1e-9 do stub de
+        # CreateBound - e' exatamente o caso real que derrubava o Revit
+        # (o filtro antigo, < 1e-6, deixava passar).
+        degenerate = Line.CreateBound(XYZ(1.0, 1.0, 0.0), XYZ(1.0 + tol / 2.0, 1.0, 0.0))
+
+        lines_by_layer = {}
+        stats = {"total": 0, "ignored": 0, "min_length": None, "ignored_layers": set()}
+        m.extract_lines_by_layer([good, degenerate], lines_by_layer, stats)
+
+        assert lines_by_layer[layer] == [good]  # so' a linha normal sobrevive
+        assert stats["total"] == 2
+        assert stats["ignored"] == 1
+        assert stats["ignored_layers"] == {layer}
+        assert abs(stats["min_length"] - tol / 2.0) < 1e-12
+    finally:
+        m.get_layer_name = original_get_layer_name
+
+
+@case
+def test_extract_lines_by_layer_polyline_ignora_apenas_o_segmento_degenerado():
+    tol = m._get_short_curve_tolerance()
+    layer = "PAREDES"
+    original_get_layer_name = m.get_layer_name
+    m.get_layer_name = lambda geom_obj: layer
+    try:
+        # vertices: 0 -> 500cm normal, 500cm -> quase o mesmo ponto (degenerado)
+        points = [
+            XYZ(0.0, 0.0, 0.0),
+            XYZ(ft(500.0), 0.0, 0.0),
+            XYZ(ft(500.0) + tol / 2.0, 0.0, 0.0),
+        ]
+
+        class _FakePolyLine(m.PolyLine):
+            def GetCoordinates(self):
+                return points
+
+        lines_by_layer = {}
+        stats = {"total": 0, "ignored": 0, "min_length": None, "ignored_layers": set()}
+        m.extract_lines_by_layer([_FakePolyLine()], lines_by_layer, stats)
+
+        assert len(lines_by_layer[layer]) == 1  # so' o 1o segmento (normal) sobrevive
+        kept = lines_by_layer[layer][0]
+        assert abs(kept.GetEndPoint(0).X - 0.0) < 1e-9
+        assert abs(kept.GetEndPoint(1).X - ft(500.0)) < 1e-9
+        assert stats["total"] == 2
+        assert stats["ignored"] == 1
+        assert stats["ignored_layers"] == {layer}
+    finally:
+        m.get_layer_name = original_get_layer_name
+
+
 @case
 def test_par_de_linhas_vira_uma_parede_no_eixo():
     lines = [seg(0, 0, 500, 0), seg(0, 14, 500, 14)]

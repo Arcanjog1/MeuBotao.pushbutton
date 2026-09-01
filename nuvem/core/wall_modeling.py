@@ -601,7 +601,38 @@ def get_layer_name(geom_obj):
     return None
 
 
-def extract_lines_by_layer(geom_element, lines_by_layer):
+_SHORT_CURVE_TOLERANCE = None
+
+
+def _get_short_curve_tolerance():
+    """Le `Application.ShortCurveTolerance` (pes) uma unica vez e guarda em
+    cache no modulo.
+
+    E' a tolerancia OFICIAL do Revit abaixo da qual `Line.CreateBound`
+    recusa o segmento com `ArgumentsInconsistentException: Curve length is
+    too small for Revit's tolerance` - nao e' um valor arbitrario escolhido
+    pelo script (ver bloqueio de integracao registrado em
+    docs/PROJECT_STATUS.md).
+    """
+    global _SHORT_CURVE_TOLERANCE
+    if _SHORT_CURVE_TOLERANCE is None:
+        _SHORT_CURVE_TOLERANCE = doc.Application.ShortCurveTolerance
+    return _SHORT_CURVE_TOLERANCE
+
+
+def _segment_too_short_for_revit(distance, tolerance):
+    """Decisao pura (sem tocar a API do Revit): esse comprimento de segmento
+    e' curto demais para `Line.CreateBound` aceitar?
+
+    Extraida da extracao de geometria so' para poder ser testada fora do
+    Revit (ver tests/test_script.py) sem precisar instanciar XYZ/Line reais.
+    Espelha o proprio criterio do Revit: `distance <= ShortCurveTolerance`
+    e' rejeitado, distancias maiores passam.
+    """
+    return distance <= tolerance
+
+
+def extract_lines_by_layer(geom_element, lines_by_layer, stats=None):
     """Percorre recursivamente a geometria do CAD agrupando linhas por Layer.
 
     CADs importados/vinculados (ImportInstance) quase sempre expoe suas
@@ -614,15 +645,38 @@ def extract_lines_by_layer(geom_element, lines_by_layer):
     varios `Line` separados. Sem tratar esse tipo, essas paredes ficam
     invisiveis para o script mesmo estando no Layer correto - por isso a
     polilinha e' "explodida" aqui em segmentos Line ponta-a-ponta.
+
+    Segmentos com comprimento <= Application.ShortCurveTolerance (a
+    tolerancia oficial do Revit, nao um numero arbitrario do script) sao
+    IGNORADOS em vez de enviados para `Line.CreateBound` - abaixo dela o
+    Revit levanta `ArgumentsInconsistentException` e derruba a extracao
+    inteira antes de qualquer parede ser criada. `stats`, quando passado
+    (um dict mutavel), acumula observabilidade (total analisado, quantos
+    foram ignorados, o menor comprimento visto e os layers afetados) para
+    um resumo unico no log do chamador - ver bloqueio de integracao
+    registrado em docs/PROJECT_STATUS.md.
     """
+    tolerance = _get_short_curve_tolerance()
+
     for geom_obj in geom_element:
         if isinstance(geom_obj, GeometryInstance):
-            extract_lines_by_layer(geom_obj.GetInstanceGeometry(), lines_by_layer)
+            extract_lines_by_layer(geom_obj.GetInstanceGeometry(), lines_by_layer, stats)
             continue
 
         if isinstance(geom_obj, Line):
-            if geom_obj.ApproximateLength < 1e-6:
-                continue  # descarta linhas degeneradas (comprimento ~0)
+            if stats is not None:
+                stats["total"] += 1
+            length = geom_obj.ApproximateLength
+            if stats is not None and (stats["min_length"] is None or length < stats["min_length"]):
+                stats["min_length"] = length
+            if _segment_too_short_for_revit(length, tolerance):
+                # descarta linha degenerada demais para Line.CreateBound
+                if stats is not None:
+                    stats["ignored"] += 1
+                    layer = get_layer_name(geom_obj)
+                    if layer:
+                        stats["ignored_layers"].add(layer)
+                continue
             layer = get_layer_name(geom_obj)
             if layer:
                 lines_by_layer.setdefault(layer, []).append(geom_obj)
@@ -634,8 +688,18 @@ def extract_lines_by_layer(geom_element, lines_by_layer):
                 continue
             points = list(geom_obj.GetCoordinates())
             for p0, p1 in zip(points, points[1:]):
-                if p0.DistanceTo(p1) < 1e-6:
-                    continue  # descarta segmentos degenerados (vertices duplicados)
+                if stats is not None:
+                    stats["total"] += 1
+                distance = p0.DistanceTo(p1)
+                if stats is not None and (stats["min_length"] is None or distance < stats["min_length"]):
+                    stats["min_length"] = distance
+                if _segment_too_short_for_revit(distance, tolerance):
+                    # descarta segmento degenerado demais para Line.CreateBound
+                    # (inclui vertices duplicados, ja' cobertos por distance <= tolerance)
+                    if stats is not None:
+                        stats["ignored"] += 1
+                        stats["ignored_layers"].add(layer)
+                    continue
                 lines_by_layer.setdefault(layer, []).append(Line.CreateBound(p0, p1))
 
 
@@ -14207,13 +14271,26 @@ def main():
         return
 
     cad_lines_by_layer = {}
-    extract_lines_by_layer(geom_element, cad_lines_by_layer)
+    cad_extract_stats = {"total": 0, "ignored": 0, "min_length": None, "ignored_layers": set()}
+    extract_lines_by_layer(geom_element, cad_lines_by_layer, cad_extract_stats)
     t_step = _perf_mark(
         t_step, "Extracao de linhas do CAD",
         "{} layer(s), {} linha(s) no total".format(
             len(cad_lines_by_layer), sum(len(v) for v in cad_lines_by_layer.values())
         )
     )
+    if cad_extract_stats["ignored"]:
+        output.print_md(
+            "    - CAD: {} segmento(s) validos, {} degenerado(s) ignorado(s) "
+            "(<= ShortCurveTolerance = {:.6f} pe), menor segmento visto: {:.6f} pe, "
+            "layer(s) afetado(s): {}".format(
+                cad_extract_stats["total"] - cad_extract_stats["ignored"],
+                cad_extract_stats["ignored"],
+                _get_short_curve_tolerance(),
+                cad_extract_stats["min_length"] if cad_extract_stats["min_length"] is not None else float("nan"),
+                ", ".join(sorted(cad_extract_stats["ignored_layers"])) or "desconhecido",
+            )
+        )
 
     if not cad_lines_by_layer:
         forms.alert(

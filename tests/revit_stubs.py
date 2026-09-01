@@ -377,10 +377,24 @@ class _StubCreate(object):
         return _FakeOpening(wall, p1, p2)
 
 
+class _StubApplication(_Inert):
+    """Duble de Autodesk.Revit.ApplicationServices.Application - so'
+    ShortCurveTolerance e' um valor de verdade (usado por
+    extract_lines_by_layer/_get_short_curve_tolerance em wall_modeling.py
+    para descartar segmentos de CAD curtos demais para Line.CreateBound);
+    o resto continua inerte."""
+
+    def __init__(self, *args, **kwargs):
+        super(_StubApplication, self).__init__(*args, **kwargs)
+        # Valor real do Revit (pes) = 1/32 polegada, o default documentado
+        # de Application.ShortCurveTolerance.
+        self.ShortCurveTolerance = 1.0 / 32.0 / 12.0
+
+
 class _StubDoc(object):
     def __init__(self):
         self.ActiveView = _Inert()
-        self.Application = _Inert()
+        self.Application = _StubApplication()
         self.regenerate_calls = 0
         self.Create = _StubCreate()
         # Todo Delete pedido, em ordem - o fluxo de uniao de paredes so'
