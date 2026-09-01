@@ -411,3 +411,5 @@ itens ainda pendentes: CR-2F-D completo (seção 5); roadmap de modulação
 próximo passo recomendado: avançar o CR-2F-D conforme seção 5 e
                atualizar este documento ao concluí-lo
 ```
+
+<!-- linha de teste - sera revertida, so' para validar o workflow -->
