@@ -43,12 +43,20 @@ jobs:
             HEAD="${{ github.event.after }}"
           fi
 
-          # Push de branch nova (before = 40 zeros) ou forcado sem base
-          # valida: nao da' para diffar com seguranca, pula o check.
+          # Push de branch NOVA vem com before = 40 zeros - e' o caso mais
+          # comum aqui (cada CR nasce numa branch claude/... nova). Nesse
+          # caso nao da' para usar "before"; comparamos contra o ponto onde
+          # a branch saiu de origin/main (merge-base), senao o check nunca
+          # rodaria de verdade nas branches novas.
           if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Sem base valida para diff (branch nova ou push forcado) - pulando o check." >&2
-            exit 0
+            git fetch origin main --quiet
+            MB="$(git merge-base origin/main "$HEAD" 2>/dev/null || true)"
+            if [ -z "$MB" ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "Branch nova sem merge-base com origin/main - pulando o check." >&2
+              exit 0
+            fi
+            BASE="$MB"
           fi
 
           if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
