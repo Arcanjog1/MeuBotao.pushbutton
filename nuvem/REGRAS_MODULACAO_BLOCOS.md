@@ -4321,10 +4321,17 @@ planta invertida fica com **cada vão deslocado em 2× a extensão** (medido:
 Nesse caso o grupo de reversão compara **plantas diferentes** e não mede
 determinismo nenhum.
 
-Consequência prática: em `piloto_sintetico_2x2` só o grupo de **permutação**
-(19 variantes) é válido — e nele o resultado é **1 fingerprint**. Em
+Consequência prática, **medida** (`run_variant_validity.py`):
+
+| projeto | `walls_already_extended` | vãos deslocados pela reversão | permutação (19) | reversão (5) |
+|---|---|---|---|---|
+| `piloto_sintetico_2x2` | **False** | **8 vãos, 14,0 cm cada** | 1 fingerprint | 5 fingerprints (plantas diferentes) |
+| `torre_easy_lo_r00_tgd` | True | 3 vãos, **0,001 cm** (ruído) | 1 fingerprint | **o mesmo** 1 fingerprint |
+
+Ou seja: em `piloto_sintetico_2x2` só o grupo de **permutação** é conclusivo
+— e nele o resultado é **1 fingerprint**. Em
 `torre_easy_lo_r00_tgd`/`tp1` (`walls_already_extended: True`) as 24 são
-válidas e todas convergem. Ao reaproveitar a bateria, **conferir a flag
+válidas e **todas** convergem para o mesmo fingerprint. Ao reaproveitar a bateria, **conferir a flag
 antes de interpretar o grupo de reversão**. Qualquer teste que inverta
 endpoints deve reparametrizar contra o comprimento do eixo **já esticado**
 — é o que `tests/test_block_pipeline_determinism.py::flip_wall` faz.

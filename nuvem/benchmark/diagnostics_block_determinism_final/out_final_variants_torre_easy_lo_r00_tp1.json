@@ -419,9 +419,9 @@
       "spread": 0
     },
     "runtime_s": {
-      "min": 2.809,
-      "max": 3.499,
-      "spread": 0.69
+      "min": 2.87,
+      "max": 3.337,
+      "spread": 0.467
     }
   },
   "placement_reason_range": {
@@ -539,7 +539,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.951,
+        "runtime_s": 3.091,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -622,7 +622,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.809,
+        "runtime_s": 2.91,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -705,7 +705,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.963,
+        "runtime_s": 2.925,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -788,7 +788,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.92,
+        "runtime_s": 2.948,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -871,7 +871,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.855,
+        "runtime_s": 2.946,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -954,7 +954,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.97,
+        "runtime_s": 2.87,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1037,7 +1037,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 2.911,
+        "runtime_s": 2.97,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1120,7 +1120,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.073,
+        "runtime_s": 3.075,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1203,7 +1203,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.028,
+        "runtime_s": 3.162,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1286,7 +1286,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.24,
+        "runtime_s": 3.273,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1369,7 +1369,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.499,
+        "runtime_s": 3.042,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1452,7 +1452,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.215,
+        "runtime_s": 3.056,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1535,7 +1535,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.013,
+        "runtime_s": 2.993,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1618,7 +1618,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.363,
+        "runtime_s": 2.916,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1701,7 +1701,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.09,
+        "runtime_s": 2.971,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1784,7 +1784,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.083,
+        "runtime_s": 3.261,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1867,7 +1867,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.033,
+        "runtime_s": 2.982,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -1950,7 +1950,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.011,
+        "runtime_s": 3.083,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2033,7 +2033,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.034,
+        "runtime_s": 3.078,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2116,7 +2116,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.016,
+        "runtime_s": 3.017,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2199,7 +2199,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.324,
+        "runtime_s": 3.142,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2282,7 +2282,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.019,
+        "runtime_s": 3.116,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2365,7 +2365,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.014,
+        "runtime_s": 3.337,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
@@ -2448,7 +2448,7 @@
         "C09": 2916,
         "C04": 864,
         "B19": 1306,
-        "runtime_s": 3.363,
+        "runtime_s": 3.222,
         "by_placement_reason": {
           "L_CORNER": 542,
           "T_INTERSECTION_MAIN": 711,
