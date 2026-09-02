@@ -328,11 +328,15 @@ def test_manifest_oficial_do_repo_nao_tem_nenhum_golden_confirmed_inventado():
         assert manifest.validate_entry(entry) == []
 
 
-def test_manifesto_oficial_classifica_baseline_como_legacy_nas_notas():
+def test_manifesto_oficial_classifica_baseline_como_solver_low_nas_notas():
+    """A partir do CR-BLOCK-REFERENCE-CORPUS, baseline.json e' descrito no
+    manifesto pelos dois EIXOS (reference_kind=SOLVER, confidence=LOW),
+    nao mais so' pelo rotulo legado LEGACY_BASELINE - mas o fato que
+    importa (nunca e' tratado como golden) continua o mesmo."""
     data = manifest.load_default()
     torre = manifest.get(data, "torre_easy_lo_r00_tgd")
     assert torre is not None
-    assert "LEGACY_BASELINE" in torre["notes"]
+    assert "SOLVER" in torre["notes"] and "LOW" in torre["notes"]
 
 
 def test_get_de_projeto_inexistente_devolve_none_sem_lancar_excecao():
