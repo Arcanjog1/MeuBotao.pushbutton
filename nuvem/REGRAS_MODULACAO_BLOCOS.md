@@ -4517,3 +4517,225 @@ Registrar isto importa porque a seção 29.6 atribui a regressão inteira à
 finalização. **Metade dela é do wall graph**, e o custo real de mesclar as
 duas metades juntas na `main` é **0 → 14**, não 7 → 14. As duas caem na
 MESMA correção (seção 30.4).
+
+## 31. `CR-BLOCK-NODE-FILL-JOINT` IMPLEMENTADO — a junta "PEÇA DE NÓ | PREENCHIMENTO" agora é uma junta de verdade (2026-09-02)
+
+> Implementação da correção que a seção 30 documentou e deixou em aberto.
+> Produção alterada: **só** `nuvem/core/engine/wall_stepper.py`.
+> Nenhum `baseline.json`/`reference.json` tocado, nenhum nó redesenhado.
+
+### 31.1 REGRA OBRIGATÓRIA — a junta contra a peça de nó conta como junta
+
+**A junta que separa o preenchimento da PEÇA DE AMARRAÇÃO DO NÓ (L/T/X) é
+uma junta vertical como qualquer outra.** A fiada oposta não pode empilhar
+junta em cima dela — a regra #1 (seção 11) vale integralmente ali.
+
+Antes desta correção ela **não existia em lista nenhuma**:
+`_layout_internal_joint_positions_cm` devolve `for i in range(n - 1)`, ou
+seja, só as juntas ENTRE dois blocos do MESMO layout de preenchimento; a
+junta de FRONTEIRA do trecho, por construção, ficava de fora. Resultado
+medido em `piloto_sintetico_2x2`: `PRISM_CONTINUOUS_JOINT` = 14 (W004 e
+W011, t = 34,5 cm, nas 8 fiadas) com `alignment_conflicts` = **0**. O gate
+do solver era cego.
+
+- **Descoberto por:** cross-audit do `CR-BLOCK-DETERMINISM`
+  (`docs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md`), instrumentação em
+  memória de `_layout_internal_joint_positions_cm`.
+- **Confirmado por medição:** as juntas de fronteira do piloto são
+  14,5 / 34,5 / 74,5 / 94,5 / 199,5 / 219,5 cm, e QUATRO delas (34,5, 74,5,
+  94,5, 219,5) coincidem com uma junta interna registrada por outro trecho.
+
+### 31.2 REGRA OBRIGATÓRIA — geometria da junta de nó
+
+A peça de nó de uma ponta inicial termina em `border`; o preenchimento
+começa em `border + BLOCK_JOINT_CM`. Logo:
+
+```
+junta inicial  =  seg_start_cm - BLOCK_JOINT_CM / 2
+junta final    =  seg_end_cm   + BLOCK_JOINT_CM / 2
+```
+
+Vale igual para encontro de MEIO DE PAREDE (`MIDSPAN_LO`/`MIDSPAN_HI`):
+a faixa reservada do nó tem junta dos dois lados.
+Implementado em `_segment_node_boundary_joints_cm` (função pura).
+
+### 31.3 REGRA OBRIGATÓRIA — ABERTURA NÃO É NÓ
+
+O discriminador é `leading_is_node`/`trailing_is_node`, **nunca** a negação
+de `leading_is_open`/`trailing_is_open`.
+
+```
+WALL_START com `border` de nó   -> É NÓ
+WALL_END   com `border` de nó   -> É NÓ
+MIDSPAN_HI / MIDSPAN_LO         -> É NÓ
+OPENING_HI / OPENING_LO         -> NÃO É NÓ (abertura)
+ponta livre de verdade          -> NÃO É NÓ
+ramo de rede de segurança
+   (`oi_left is None`)          -> NÃO É NÓ  <-- aqui `leading_is_open`
+                                               também é False, e é por isso
+                                               que a negação não serve
+```
+
+Borda de vão, jamba, recorte e reparo de abertura **não** viram junta de
+nó. A **exceção da seção 11.8** (C04/C09/B19 encostado no vão PODE ficar
+alinhado entre fiadas) continua valendo integralmente e não foi tocada.
+
+### 31.4 REGRA OBRIGATÓRIA — uma junta sem peça dos dois lados não é junta
+
+No pipeline contínuo (`continuous_first`, o único default) o layout da
+FASE 1 ainda passa pelo recorte da abertura e pelo reparo local: a peça que
+encostava no nó pode ter sido derrubada. Uma junta sem peça dos dois lados
+não existe fisicamente e **não pode** virar restrição para a fiada oposta —
+senão a correção inventaria restrição onde há vão.
+
+Implementado em `_node_boundary_joints_backed_by_pieces_cm`: a junta só
+sobrevive quando alguma BORDA de peça posicionada está a meia junta dela.
+
+### 31.5 REGRA OBRIGATÓRIA — a correção é nos DOIS sentidos
+
+Não basta a Fiada B enxergar a junta de nó da Fiada A. A Fiada A roda
+primeiro e, sem ajuda, nunca veria a junta de nó da Fiada B.
+
+**A posição da peça de nó NÃO depende de layout** — sai de
+`node_candidates_by_wall_end` e de `node_midspan_by_wall_course`, que já
+estão decididos antes do preenchimento começar e dependem só de `course`
+(par/ímpar), nunca de `variant_index` nem da ordem de entrada. Dá para
+saber onde estarão as juntas de nó da fiada OPOSTA antes de resolver a
+própria: é o que `_wall_node_boundary_joints_cm` faz.
+
+Medição que prova que o sentido inverso é real (célula fechada de 350 cm,
+4 × `L_CORNER`, no código anterior):
+
+```
+4 violações em t = 34,5 cm  ->  2 do sentido "nó da fiada A x junta interna da B"
+                                2 do sentido "nó da fiada B x junta interna da A"
+```
+
+Só com os dois sentidos a célula fecha em ZERO.
+
+### 31.6 PADRÃO OBSERVADO — o defeito exige NÓ NAS DUAS PONTAS
+
+Medido por varredura de 150 a 600 cm, de 10 em 10, no código anterior:
+
+```
+L isolado (uma ponta livre)      0 violações  em TODOS os comprimentos
+T isolado                        0 violações
+X isolado                        0 violações
+célula FECHADA (nó nas 2 pontas) 4 violações  em TODOS os comprimentos
+grade 2x2 (topologia do piloto)  2 violações
+```
+
+**Explicação construtiva:** com uma ponta livre o preenchimento tem o
+meio-bloco (B19) para deslocar meio módulo e a coincidência não se forma.
+Com nó nas duas pontas o B19 é proibido (seção 2: B19 só encosta em ponta
+aberta) e o trecho fica sem folga. É por isso que o piloto — uma grade
+2 x 2, todas as paredes entre dois `L_CORNER` — é o projeto que reprova.
+
+### 31.7 EXCEÇÃO PERMITIDA (e MEDIDA) — a boneca curta entre dois nós
+
+Existe configuração em que **nenhuma composição do catálogo** resolve.
+Medido em `torre_easy_lo_r00_tgd`, paredes 121 a 124:
+
+```
+trecho de 29 cm, as DUAS pontas fechadas contra peça de nó
+fiada A: seg 35,0 -> 64,0   layout 3 x C09   juntas 44,5 e 54,5 + nó em 34,5 e 64,5
+fiada B: seg 15,0 -> 44,0   layout 3 x C09   juntas 24,5 e 34,5  <-- 34,5 colide
+```
+
+`_pier_forced_bypass_layouts` devolve **lista vazia** para esse pilarete: a
+busca não tem alternativa nenhuma. Existem composições que resolveriam
+(`C04+B19+C04` daria 19,5 e 39,5), mas o gerador de candidatos só varia o
+PRIMEIRO bloco e o B19 é proibido nas duas pontas fechadas.
+
+> **PENDÊNCIA DE CÓDIGO ABERTA** — ampliar o gerador de candidatos
+> (`_pier_forced_bypass_layouts`) para pilaretes curtos com as duas pontas
+> fechadas. NÃO feito neste CR: é redesenho da busca de preenchimento, com
+> raio de impacto em todos os projetos, e o risco principal apontado pelo
+> cross-audit é justamente compensador. Fica registrado, não resolvido.
+
+### 31.8 REGRA OBRIGATÓRIA — o gate não pode voltar a ser cego, e as duas famílias são contadas em SEPARADO
+
+```
+alignment_conflicts      junta interna da Fiada A  x  junta interna da Fiada B
+                         CONSEQUÊNCIA DE ESCOLHA: quase sempre existe outra
+                         composição que evita. Continua tendo de dar ZERO.
+
+node_boundary_conflicts  junta NÓ|FILL             x  junta interna da fiada oposta
+                         GEOMETRIA FIXA da peça de nó: nenhum layout a move.
+                         Quando o único fechamento possível cai em cima dela,
+                         não há solução no catálogo (ver 31.7).
+```
+
+Contá-las juntas seria errado nos dois sentidos: dispararia o ajuste de
+abertura (`needs_fix`) para um defeito que abertura nenhuma resolve, e
+apagaria o significado do gate histórico do `CR-BLOCK-01`.
+
+`node_boundary_conflicts` vive em `solve_wall_free_fill` e chega ao
+`per_wall` de cada parede.
+
+> **PENDÊNCIA DE CÓDIGO ABERTA** — a chave ainda não sobe até o topo do
+> `solve_result`: isso exigiria uma linha em `nuvem/core/wall_modeling.py`,
+> fora do escopo autorizado deste CR. Ler por
+> `solve_result["per_wall"][i]["node_boundary_conflicts"]`.
+
+### 31.9 Resultado medido (3 projetos, `main` = `21add6ec`)
+
+```
+                                MAIN    HEAD(auditoria)   DEPOIS
+piloto  PRISM_CONTINUOUS_JOINT     0          14             0
+piloto  PRISM_JOINT_STACK          0           2             0
+tgd     PRISM_CONTINUOUS_JOINT   702         562           318
+tp1     PRISM_CONTINUOUS_JOINT   837         730           169
+same-band forbidden                0           0             0
+cross-band forbidden              33          60            48
+compensadores consecutivos      1210        1168          1114
+alignment_conflicts                0           0             0
+UNCLASSIFIED_RULE_CONFLICT      1506        1246           439
+```
+
+Cobertura (`COVERAGE_MISSING_ROW` / `COVERAGE_ROW_MOSTLY_EMPTY`) fica
+**idêntica** ao ponto de auditoria nos três projetos: a dívida de cobertura
+é do wall graph (`wall_pairing.py`), não desta correção.
+
+### 31.10 CONFLITO REGISTRADO — o custo em abertura
+
+`torre_easy_lo_r00_tgd`, `OPENING_BLOCK_INSIDE_DOOR`:
+
+```
+baseline.json  45      main  43      HEAD  44      DEPOIS  49
+```
+
+Medido peça a peça: **nenhuma parede nova** entra na lista — as mesmas 18
+paredes de sempre, seis delas (W019, W045, W051, W090, W131, W146) com
+**+1 achado cada**, quase todos na fiada de cima. São paredes cujo vão já
+invade a reserva do nó (TGD tem 200 `intersection_failures` e 1024
+colisões na própria `main`). `door_void_violations` (290) e
+`jamb_exceptions` (172) ficam **intactos**.
+
+Não é churn desprezível e não está escondido: o Reference Corpus classifica
+como `CRITICAL_REGRESSION`. **Nenhuma versão da correção evita isso** — o
+fix mínimo (só o sentido A→B) já leva o número a 46. Registrado como
+conflito real entre a regra #1 (junta de nó) e a seção 3 (zona de exclusão
+do vão); a orientação do usuário decide se o ganho de prisma paga.
+
+### 31.11 Determinismo — preservado
+
+Bateria do cross-audit (31 entradas por projeto: baseline + 20 permutações
++ 10 reversões de endpoint), **depois** da correção:
+
+```
+piloto  11/11 camadas com 1 fingerprint, global = 1
+tgd     11/11 camadas com 1 fingerprint, global = 1  (as 31 entradas colapsam num só)
+tp1     11/11 camadas com 1 fingerprint, global = 1  (idem)
+```
+
+A lista nova é derivada de `seg_start_cm` e das bordas das peças de nó —
+tudo já na grade de snap (`PIER_LENGTH_SNAP_DECIMALS`). Nenhuma dependência
+nova de `wall_idx`, ordem de lista ou `GetEndPoint(0)`.
+
+### 31.12 Onde isto é testado
+
+`tests/test_block_node_fill_joint.py` (20 testes, toda a geometria
+sintética). Os casos que DISCRIMINAM — falham no código anterior e passam
+no novo — são a célula fechada (5 comprimentos) e a grade 2 x 2. L, T e X
+isolados entram como cobertura de não-regressão.

@@ -1,0 +1,56 @@
+{
+ "projects": {
+  "piloto_sintetico_2x2": {
+   "graph": {
+    "mean": 0.0225,
+    "median": 0.0023,
+    "min": 0.0021
+   },
+   "solver": {
+    "mean": 0.0731,
+    "median": 0.0728,
+    "min": 0.0718
+   },
+   "total": {
+    "mean": 0.0956,
+    "median": 0.0751,
+    "min": 0.074
+   }
+  },
+  "torre_easy_lo_r00_tgd": {
+   "graph": {
+    "mean": 0.7326,
+    "median": 0.7345,
+    "min": 0.7133
+   },
+   "solver": {
+    "mean": 2.9216,
+    "median": 2.8709,
+    "min": 2.8354
+   },
+   "total": {
+    "mean": 3.6542,
+    "median": 3.6106,
+    "min": 3.5486
+   }
+  },
+  "torre_easy_lo_r00_tp1": {
+   "graph": {
+    "mean": 0.2356,
+    "median": 0.2365,
+    "min": 0.2315
+   },
+   "solver": {
+    "mean": 3.2382,
+    "median": 3.2211,
+    "min": 3.1455
+   },
+   "total": {
+    "mean": 3.4738,
+    "median": 3.4576,
+    "min": 3.3782
+   }
+  }
+ },
+ "repeat": 5
+}

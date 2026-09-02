@@ -1,0 +1,8812 @@
+{
+ "ATENCAO": "As listas abaixo sao um POOL GLOBAL (todas as paredes, fiadas e variantes juntas) - e' o instrumento do cross-audit, reproduzido aqui para a evidencia do item 3, e NAO uma contagem de violacao. Duas juntas no mesmo `t` de PAREDES DIFERENTES aparecem como 'coincidencia' aqui e nao sao defeito nenhum. A medida de violacao e' PRISM_CONTINUOUS_JOINT (validate_prism) e o invariante por parede/fiada de tests/test_block_node_fill_joint.py.",
+ "alignment_conflicts": 0,
+ "chamadas": 436,
+ "fronteiras_que_colidem_com_junta_interna": [
+  34.5,
+  74.5,
+  94.5,
+  219.5
+ ],
+ "juntas_de_fronteira": [
+  14.5,
+  34.5,
+  74.5,
+  94.5,
+  199.5,
+  219.5
+ ],
+ "project_id": "piloto_sintetico_2x2",
+ "trechos": [
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    99.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    99.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "B39",
+    "B39",
+    "B39",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    244.5,
+    284.5,
+    324.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "B39",
+    "B39",
+    "B39",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    244.5,
+    284.5,
+    324.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    249.5,
+    289.5
+   ],
+   "leading_is_open": true,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    104.5,
+    114.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    99.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 94.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    99.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 95.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    209.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    204.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    219.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    214.5,
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    69.5,
+    109.5,
+    149.5,
+    189.5,
+    229.5,
+    269.5,
+    309.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 34.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 35.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    84.5,
+    94.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 74.5,
+   "codes": [
+    "C04",
+    "B19"
+   ],
+   "internal_cm": [
+    79.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 75.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    229.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09"
+   ],
+   "internal_cm": [
+    224.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "B19",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    224.5,
+    234.5,
+    244.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 219.5,
+   "codes": [
+    "C04",
+    "C09",
+    "C09",
+    "C04"
+   ],
+   "internal_cm": [
+    224.5,
+    234.5,
+    244.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 220.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "C09"
+   ],
+   "internal_cm": [
+    239.5,
+    279.5,
+    319.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "B39",
+    "B39",
+    "B39",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    244.5,
+    284.5,
+    324.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C04",
+    "B39",
+    "B39",
+    "B39",
+    "C04"
+   ],
+   "internal_cm": [
+    204.5,
+    244.5,
+    284.5,
+    324.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 199.5,
+   "codes": [
+    "C09",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    249.5,
+    289.5
+   ],
+   "leading_is_open": true,
+   "seg_start_cm": 200.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B19",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    34.5,
+    74.5,
+    114.5,
+    154.5,
+    194.5,
+    234.5,
+    274.5,
+    314.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B34",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39"
+   ],
+   "internal_cm": [
+    49.5,
+    89.5,
+    129.5,
+    169.5,
+    209.5,
+    249.5,
+    289.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  },
+  {
+   "boundary_cm": 14.5,
+   "codes": [
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B39",
+    "B34"
+   ],
+   "internal_cm": [
+    54.5,
+    94.5,
+    134.5,
+    174.5,
+    214.5,
+    254.5,
+    294.5
+   ],
+   "leading_is_open": false,
+   "seg_start_cm": 15.0,
+   "trailing_is_open": false
+  }
+ ]
+}

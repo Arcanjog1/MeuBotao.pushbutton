@@ -1,0 +1,3890 @@
+{
+ "summary": {
+  "total": 5,
+  "counts": {
+   "IMPROVED": 0,
+   "NEUTRAL": 0,
+   "REGRESSED": 2,
+   "MIXED": 1,
+   "NOT_COMPARABLE": 2
+  },
+  "overall": "CRITICAL_REGRESSION_PRESENT",
+  "critical_regressions": [
+   {
+    "code": "COVERAGE_MISSING_ROW",
+    "before": 265,
+    "after": 293,
+    "delta": 28,
+    "status": "REGRESSAO CRITICA",
+    "project_id": "torre_easy_lo_r00_tgd"
+   },
+   {
+    "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+    "before": 171,
+    "after": 187,
+    "delta": 16,
+    "status": "REGRESSAO CRITICA",
+    "project_id": "torre_easy_lo_r00_tgd"
+   },
+   {
+    "code": "OPENING_BLOCK_INSIDE_DOOR",
+    "before": 45,
+    "after": 49,
+    "delta": 4,
+    "status": "REGRESSAO CRITICA",
+    "project_id": "torre_easy_lo_r00_tgd"
+   },
+   {
+    "code": "COVERAGE_MISSING_ROW",
+    "before": 16,
+    "after": 18,
+    "delta": 2,
+    "status": "REGRESSAO CRITICA",
+    "project_id": "torre_easy_lo_r00_tp1"
+   }
+  ]
+ },
+ "matrix": {
+  "columns": [
+   "coverage",
+   "prism",
+   "openings",
+   "L/T/X",
+   "collisions",
+   "non_modular",
+   "compensators"
+  ],
+  "rows": [
+   {
+    "project_id": "torre_easy_lo_r00_tgd",
+    "cells": {
+     "coverage": "UNCHANGED",
+     "prism": "IMPROVED",
+     "openings": "REGRESSED",
+     "L/T/X": "IMPROVED",
+     "collisions": "UNCHANGED",
+     "non_modular": "UNCHANGED",
+     "compensators": "IMPROVED"
+    }
+   },
+   {
+    "project_id": "torre_easy_lo_r00_tp1",
+    "cells": {
+     "coverage": "UNCHANGED",
+     "prism": "IMPROVED",
+     "openings": "UNCHANGED",
+     "L/T/X": "UNCHANGED",
+     "collisions": "UNCHANGED",
+     "non_modular": "UNCHANGED",
+     "compensators": "IMPROVED"
+    }
+   },
+   {
+    "project_id": "piloto_sintetico_2x2",
+    "cells": {
+     "coverage": "UNCHANGED",
+     "prism": "IMPROVED",
+     "openings": "UNCHANGED",
+     "L/T/X": "UNCHANGED",
+     "collisions": "UNCHANGED",
+     "non_modular": "UNCHANGED",
+     "compensators": "REGRESSED"
+    }
+   },
+   {
+    "project_id": "chacara_torre_easy_lo_tropicale",
+    "cells": {
+     "coverage": "NOT_COMPARABLE",
+     "prism": "NOT_COMPARABLE",
+     "openings": "NOT_COMPARABLE",
+     "L/T/X": "NOT_COMPARABLE",
+     "collisions": "NOT_COMPARABLE",
+     "non_modular": "NOT_COMPARABLE",
+     "compensators": "NOT_COMPARABLE"
+    }
+   },
+   {
+    "project_id": "torre_easy_lo_r00_full_building",
+    "cells": {
+     "coverage": "NOT_COMPARABLE",
+     "prism": "NOT_COMPARABLE",
+     "openings": "NOT_COMPARABLE",
+     "L/T/X": "NOT_COMPARABLE",
+     "collisions": "NOT_COMPARABLE",
+     "non_modular": "NOT_COMPARABLE",
+     "compensators": "NOT_COMPARABLE"
+    }
+   }
+  ]
+ },
+ "projects": [
+  {
+   "project_id": "torre_easy_lo_r00_tgd",
+   "comparable": true,
+   "reason": null,
+   "comparison": {
+    "schema_version": 1,
+    "project_id": "torre_easy_lo_r00_tgd",
+    "verdict": "REGRESSED",
+    "overall_counts": {
+     "IMPROVED": 8,
+     "REGRESSED": 4,
+     "UNCHANGED": 12,
+     "INFORMATIONAL": 3,
+     "NOT_AVAILABLE": 16
+    },
+    "categories": {
+     "blocks": {
+      "metrics": [
+       {
+        "metric": "B19",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B34",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B39",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B54",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C04",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C09",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "outros",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "total_blocks",
+        "direction": "INFORMATIONAL",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 8
+      }
+     },
+     "courses": {
+      "metrics": [
+       {
+        "metric": "gaps_in_row",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 1944,
+        "current": 1913,
+        "delta_abs": -31,
+        "delta_pct": -1.59,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "missing_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 265,
+        "current": 293,
+        "delta_abs": 28,
+        "delta_pct": 10.57,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "mostly_empty_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 171,
+        "current": 187,
+        "delta_abs": 16,
+        "delta_pct": 9.36,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "partial_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 56,
+        "current": 55,
+        "delta_abs": -1,
+        "delta_pct": -1.79,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "total_rows",
+        "direction": "INFORMATIONAL",
+        "unit": "fiadas",
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 2,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "junctions": {
+      "metrics": [
+       {
+        "metric": "degraded_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_intersections",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 303,
+        "current": 303,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "half_block_adjacent_to_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 24,
+        "current": 23,
+        "delta_abs": -1,
+        "delta_pct": -4.17,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "missing_binding_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 1,
+       "REGRESSED": 0,
+       "UNCHANGED": 2,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 6
+      }
+     },
+     "openings": {
+      "metrics": [
+       {
+        "metric": "blocks_crossing_jamb",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 147,
+        "current": 146,
+        "delta_abs": -1,
+        "delta_pct": -0.68,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "blocks_inside_door",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 45,
+        "current": 49,
+        "delta_abs": 4,
+        "delta_pct": 8.89,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "blocks_inside_window",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_counter_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 25,
+        "current": 25,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 82,
+        "current": 82,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "solid_below_sill_missing",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 32,
+        "current": 32,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 1,
+       "REGRESSED": 1,
+       "UNCHANGED": 4,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "performance": {
+      "metrics": [
+       {
+        "metric": "runtime_seconds",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "prism": {
+      "metrics": [
+       {
+        "metric": "alignment_conflicts",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "juntas",
+        "reference": 961,
+        "current": 318,
+        "delta_abs": -643,
+        "delta_pct": -66.91,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "continuous_vertical_joints",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "pilhas de juntas",
+        "reference": 64,
+        "current": 21,
+        "delta_abs": -43,
+        "delta_pct": -67.19,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "stagger_below_target",
+        "direction": "INFORMATIONAL",
+        "unit": "juntas",
+        "reference": 562,
+        "current": 796,
+        "delta_abs": 234,
+        "delta_pct": 41.64,
+        "status": "INFORMATIONAL"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "quality": {
+      "metrics": [
+       {
+        "metric": "avoidable_compensators",
+        "direction": "INFORMATIONAL",
+        "unit": "ocorrencias",
+        "reference": 34,
+        "current": 35,
+        "delta_abs": 1,
+        "delta_pct": 2.94,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "collisions",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "colisoes",
+        "reference": 29,
+        "current": 29,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "compensator_excess_in_run",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "trechos",
+        "reference": 360,
+        "current": 392,
+        "delta_abs": 32,
+        "delta_pct": 8.89,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "consecutive_compensators",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 497,
+        "current": 483,
+        "delta_abs": -14,
+        "delta_pct": -2.82,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "critical_errors_total",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 1671,
+        "current": 1074,
+        "delta_abs": -597,
+        "delta_pct": -35.73,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "non_modular_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 29,
+        "current": 29,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "orphan_blocks",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 1,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "walls": {
+      "metrics": [
+       {
+        "metric": "coverage_pct",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "%",
+        "reference": 82.63,
+        "current": 82.63,
+        "delta_abs": 0.0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "total_walls",
+        "direction": "INFORMATIONAL",
+        "unit": "paredes",
+        "reference": 167,
+        "current": 167,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "walls_modulated",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 138,
+        "current": 138,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "walls_not_modulated",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 29,
+        "current": 29,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     }
+    },
+    "critical_invariants": {
+     "available": true,
+     "regressions": [
+      {
+       "code": "COVERAGE_MISSING_ROW",
+       "before": 265,
+       "after": 293,
+       "delta": 28,
+       "status": "REGRESSAO CRITICA"
+      },
+      {
+       "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+       "before": 171,
+       "after": 187,
+       "delta": 16,
+       "status": "REGRESSAO CRITICA"
+      },
+      {
+       "code": "OPENING_BLOCK_INSIDE_DOOR",
+       "before": 45,
+       "after": 49,
+       "delta": 4,
+       "status": "REGRESSAO CRITICA"
+      }
+     ],
+     "fixed_codes": [
+      {
+       "code": "COMPENSATOR_CONSECUTIVE",
+       "before": 497,
+       "after": 483
+      },
+      {
+       "code": "COVERAGE_GAP_IN_ROW",
+       "before": 1944,
+       "after": 1913
+      },
+      {
+       "code": "COVERAGE_PARTIAL_WALL",
+       "before": 56,
+       "after": 55
+      },
+      {
+       "code": "JUNCTION_MISSING_BINDING",
+       "before": 24,
+       "after": 23
+      },
+      {
+       "code": "OPENING_BLOCK_CROSSES_JAMB",
+       "before": 147,
+       "after": 146
+      },
+      {
+       "code": "PRISM_CONTINUOUS_JOINT",
+       "before": 961,
+       "after": 318
+      },
+      {
+       "code": "PRISM_JOINT_STACK",
+       "before": 64,
+       "after": 21
+      }
+     ],
+     "new_codes": [
+      {
+       "code": "COMPENSATOR_AVOIDABLE",
+       "before": 34,
+       "after": 35
+      },
+      {
+       "code": "COMPENSATOR_EXCESS_IN_RUN",
+       "before": 360,
+       "after": 392
+      },
+      {
+       "code": "COVERAGE_MISSING_ROW",
+       "before": 265,
+       "after": 293
+      },
+      {
+       "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+       "before": 171,
+       "after": 187
+      },
+      {
+       "code": "OPENING_BLOCK_INSIDE_DOOR",
+       "before": 45,
+       "after": 49
+      },
+      {
+       "code": "PRISM_STAGGER_BELOW_TARGET",
+       "before": 562,
+       "after": 796
+      }
+     ],
+     "walls_broken": [
+      "W106"
+     ],
+     "walls_fixed": [
+      "W012",
+      "W013",
+      "W056",
+      "W073",
+      "W074",
+      "W086",
+      "W108",
+      "W157",
+      "W158",
+      "W164"
+     ],
+     "core_scoring_verdict": "REGRESSAO CRITICA"
+    },
+    "reference_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 167,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 138,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 82.63,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 265,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 171,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 1944,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 56,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 961,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 64,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 562,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 24,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 303,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 45,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 147,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 82,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 25,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 32,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 497,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 360,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 34,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 1671,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    },
+    "current_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 167,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 138,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 82.63,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 293,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 187,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 1913,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 55,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 318,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 21,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 796,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 23,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 303,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 49,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 146,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 82,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 25,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 32,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 29,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 483,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 392,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 35,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 1074,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    }
+   }
+  },
+  {
+   "project_id": "torre_easy_lo_r00_tp1",
+   "comparable": true,
+   "reason": null,
+   "comparison": {
+    "schema_version": 1,
+    "project_id": "torre_easy_lo_r00_tp1",
+    "verdict": "REGRESSED",
+    "overall_counts": {
+     "IMPROVED": 7,
+     "REGRESSED": 2,
+     "UNCHANGED": 15,
+     "INFORMATIONAL": 3,
+     "NOT_AVAILABLE": 16
+    },
+    "categories": {
+     "blocks": {
+      "metrics": [
+       {
+        "metric": "B19",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B34",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B39",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B54",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C04",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C09",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "outros",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "total_blocks",
+        "direction": "INFORMATIONAL",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 8
+      }
+     },
+     "courses": {
+      "metrics": [
+       {
+        "metric": "gaps_in_row",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 289,
+        "current": 263,
+        "delta_abs": -26,
+        "delta_pct": -9.0,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "missing_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 16,
+        "current": 18,
+        "delta_abs": 2,
+        "delta_pct": 12.5,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "mostly_empty_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 27,
+        "current": 26,
+        "delta_abs": -1,
+        "delta_pct": -3.7,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "partial_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 5,
+        "current": 5,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "total_rows",
+        "direction": "INFORMATIONAL",
+        "unit": "fiadas",
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 1,
+       "UNCHANGED": 1,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "junctions": {
+      "metrics": [
+       {
+        "metric": "degraded_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_intersections",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "half_block_adjacent_to_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 8,
+        "current": 8,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_binding_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 6
+      }
+     },
+     "openings": {
+      "metrics": [
+       {
+        "metric": "blocks_crossing_jamb",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 168,
+        "current": 154,
+        "delta_abs": -14,
+        "delta_pct": -8.33,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "blocks_inside_door",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "blocks_inside_window",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_counter_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 21,
+        "current": 21,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 92,
+        "current": 92,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "solid_below_sill_missing",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 1,
+       "REGRESSED": 0,
+       "UNCHANGED": 5,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "performance": {
+      "metrics": [
+       {
+        "metric": "runtime_seconds",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "prism": {
+      "metrics": [
+       {
+        "metric": "alignment_conflicts",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "juntas",
+        "reference": 968,
+        "current": 169,
+        "delta_abs": -799,
+        "delta_pct": -82.54,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "continuous_vertical_joints",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "pilhas de juntas",
+        "reference": 61,
+        "current": 8,
+        "delta_abs": -53,
+        "delta_pct": -86.89,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "stagger_below_target",
+        "direction": "INFORMATIONAL",
+        "unit": "juntas",
+        "reference": 687,
+        "current": 1310,
+        "delta_abs": 623,
+        "delta_pct": 90.68,
+        "status": "INFORMATIONAL"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "quality": {
+      "metrics": [
+       {
+        "metric": "avoidable_compensators",
+        "direction": "INFORMATIONAL",
+        "unit": "ocorrencias",
+        "reference": 81,
+        "current": 85,
+        "delta_abs": 4,
+        "delta_pct": 4.94,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "collisions",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "colisoes",
+        "reference": 18,
+        "current": 18,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "compensator_excess_in_run",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "trechos",
+        "reference": 1038,
+        "current": 1068,
+        "delta_abs": 30,
+        "delta_pct": 2.89,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "consecutive_compensators",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 1567,
+        "current": 1325,
+        "delta_abs": -242,
+        "delta_pct": -15.44,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "critical_errors_total",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 1205,
+        "current": 393,
+        "delta_abs": -812,
+        "delta_pct": -67.39,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "non_modular_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "orphan_blocks",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 1,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "walls": {
+      "metrics": [
+       {
+        "metric": "coverage_pct",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "%",
+        "reference": 100.0,
+        "current": 100.0,
+        "delta_abs": 0.0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "total_walls",
+        "direction": "INFORMATIONAL",
+        "unit": "paredes",
+        "reference": 96,
+        "current": 96,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "walls_modulated",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 96,
+        "current": 96,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "walls_not_modulated",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     }
+    },
+    "critical_invariants": {
+     "available": true,
+     "regressions": [
+      {
+       "code": "COVERAGE_MISSING_ROW",
+       "before": 16,
+       "after": 18,
+       "delta": 2,
+       "status": "REGRESSAO CRITICA"
+      }
+     ],
+     "fixed_codes": [
+      {
+       "code": "COMPENSATOR_CONSECUTIVE",
+       "before": 1567,
+       "after": 1325
+      },
+      {
+       "code": "COVERAGE_GAP_IN_ROW",
+       "before": 289,
+       "after": 263
+      },
+      {
+       "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+       "before": 27,
+       "after": 26
+      },
+      {
+       "code": "OPENING_BLOCK_CROSSES_JAMB",
+       "before": 168,
+       "after": 154
+      },
+      {
+       "code": "PRISM_CONTINUOUS_JOINT",
+       "before": 968,
+       "after": 169
+      },
+      {
+       "code": "PRISM_JOINT_STACK",
+       "before": 61,
+       "after": 8
+      }
+     ],
+     "new_codes": [
+      {
+       "code": "COMPENSATOR_AVOIDABLE",
+       "before": 81,
+       "after": 85
+      },
+      {
+       "code": "COMPENSATOR_EXCESS_IN_RUN",
+       "before": 1038,
+       "after": 1068
+      },
+      {
+       "code": "COMPENSATOR_VERTICAL_STRIP",
+       "before": 180,
+       "after": 196
+      },
+      {
+       "code": "COVERAGE_MISSING_ROW",
+       "before": 16,
+       "after": 18
+      },
+      {
+       "code": "PRISM_STAGGER_BELOW_TARGET",
+       "before": 687,
+       "after": 1310
+      }
+     ],
+     "walls_broken": [
+      "W041",
+      "W059"
+     ],
+     "walls_fixed": [
+      "W020",
+      "W031",
+      "W067",
+      "W070"
+     ],
+     "core_scoring_verdict": "REGRESSAO CRITICA"
+    },
+    "reference_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 96,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 96,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 100.0,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 16,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 27,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 289,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 5,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 968,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 61,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 687,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 168,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 92,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 21,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 18,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 1567,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 1038,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 81,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 1205,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    },
+    "current_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 96,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 96,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 100.0,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 18,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 26,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 263,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 5,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 169,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 1310,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 154,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 92,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 21,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 18,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 1325,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 1068,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 85,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 393,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    }
+   }
+  },
+  {
+   "project_id": "piloto_sintetico_2x2",
+   "comparable": true,
+   "reason": null,
+   "comparison": {
+    "schema_version": 1,
+    "project_id": "piloto_sintetico_2x2",
+    "verdict": "MIXED",
+    "overall_counts": {
+     "IMPROVED": 3,
+     "REGRESSED": 1,
+     "UNCHANGED": 20,
+     "INFORMATIONAL": 3,
+     "NOT_AVAILABLE": 16
+    },
+    "categories": {
+     "blocks": {
+      "metrics": [
+       {
+        "metric": "B19",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B34",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B39",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "B54",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C04",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "C09",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "outros",
+        "direction": "CONTEXT_DEPENDENT",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "total_blocks",
+        "direction": "INFORMATIONAL",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 8
+      }
+     },
+     "courses": {
+      "metrics": [
+       {
+        "metric": "gaps_in_row",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 16,
+        "current": 16,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "mostly_empty_rows",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 8,
+        "current": 8,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "partial_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "total_rows",
+        "direction": "INFORMATIONAL",
+        "unit": "fiadas",
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 4,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "junctions": {
+      "metrics": [
+       {
+        "metric": "degraded_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "degraded_intersections",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "half_block_adjacent_to_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_binding",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "encontros",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_binding_by_type_L",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_T",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       },
+       {
+        "metric": "missing_binding_by_type_X",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 6
+      }
+     },
+     "openings": {
+      "metrics": [
+       {
+        "metric": "blocks_crossing_jamb",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "blocks_inside_door",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "blocks_inside_window",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_counter_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 4,
+        "current": 4,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "missing_lintel",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "vaos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "solid_below_sill_missing",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "fiadas",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 6,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "performance": {
+      "metrics": [
+       {
+        "metric": "runtime_seconds",
+        "direction": "LOWER_IS_BETTER",
+        "unit": null,
+        "reference": null,
+        "current": null,
+        "delta_abs": null,
+        "delta_pct": null,
+        "status": "NOT_AVAILABLE"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 0,
+       "NOT_AVAILABLE": 1
+      }
+     },
+     "prism": {
+      "metrics": [
+       {
+        "metric": "alignment_conflicts",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "juntas",
+        "reference": 7,
+        "current": 0,
+        "delta_abs": -7,
+        "delta_pct": -100.0,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "continuous_vertical_joints",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "pilhas de juntas",
+        "reference": 1,
+        "current": 0,
+        "delta_abs": -1,
+        "delta_pct": -100.0,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "stagger_below_target",
+        "direction": "INFORMATIONAL",
+        "unit": "juntas",
+        "reference": 0,
+        "current": 14,
+        "delta_abs": 14,
+        "delta_pct": null,
+        "status": "INFORMATIONAL"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 2,
+       "REGRESSED": 0,
+       "UNCHANGED": 0,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "quality": {
+      "metrics": [
+       {
+        "metric": "avoidable_compensators",
+        "direction": "INFORMATIONAL",
+        "unit": "ocorrencias",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "collisions",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "colisoes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "compensator_excess_in_run",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "trechos",
+        "reference": 28,
+        "current": 28,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "consecutive_compensators",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 36,
+        "current": 38,
+        "delta_abs": 2,
+        "delta_pct": 5.56,
+        "status": "REGRESSED"
+       },
+       {
+        "metric": "critical_errors_total",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "ocorrencias",
+        "reference": 15,
+        "current": 8,
+        "delta_abs": -7,
+        "delta_pct": -46.67,
+        "status": "IMPROVED"
+       },
+       {
+        "metric": "non_modular_walls",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "orphan_blocks",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "blocos",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 1,
+       "REGRESSED": 1,
+       "UNCHANGED": 4,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     },
+     "walls": {
+      "metrics": [
+       {
+        "metric": "coverage_pct",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "%",
+        "reference": 100.0,
+        "current": 100.0,
+        "delta_abs": 0.0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "total_walls",
+        "direction": "INFORMATIONAL",
+        "unit": "paredes",
+        "reference": 12,
+        "current": 12,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "INFORMATIONAL"
+       },
+       {
+        "metric": "walls_modulated",
+        "direction": "HIGHER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 12,
+        "current": 12,
+        "delta_abs": 0,
+        "delta_pct": 0.0,
+        "status": "UNCHANGED"
+       },
+       {
+        "metric": "walls_not_modulated",
+        "direction": "LOWER_IS_BETTER",
+        "unit": "paredes",
+        "reference": 0,
+        "current": 0,
+        "delta_abs": 0,
+        "delta_pct": null,
+        "status": "UNCHANGED"
+       }
+      ],
+      "counts": {
+       "IMPROVED": 0,
+       "REGRESSED": 0,
+       "UNCHANGED": 3,
+       "INFORMATIONAL": 1,
+       "NOT_AVAILABLE": 0
+      }
+     }
+    },
+    "critical_invariants": {
+     "available": true,
+     "regressions": [],
+     "fixed_codes": [
+      {
+       "code": "PRISM_CONTINUOUS_JOINT",
+       "before": 7,
+       "after": 0
+      },
+      {
+       "code": "PRISM_JOINT_STACK",
+       "before": 1,
+       "after": 0
+      }
+     ],
+     "new_codes": [
+      {
+       "code": "COMPENSATOR_CONSECUTIVE",
+       "before": 36,
+       "after": 38
+      },
+      {
+       "code": "COMPENSATOR_VERTICAL_STRIP",
+       "before": 17,
+       "after": 18
+      },
+      {
+       "code": "PRISM_STAGGER_BELOW_TARGET",
+       "before": 0,
+       "after": 14
+      }
+     ],
+     "walls_broken": [],
+     "walls_fixed": [
+      "W011"
+     ],
+     "core_scoring_verdict": "MELHORIA"
+    },
+    "reference_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 12,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 12,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 100.0,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 16,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 7,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 1,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 0,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 4,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 36,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 28,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 0,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 15,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    },
+    "current_metrics": {
+     "walls": {
+      "total_walls": {
+       "value": 12,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_modulated": {
+       "value": 12,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "walls_not_modulated": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "coverage_pct": {
+       "value": 100.0,
+       "status": "OK",
+       "direction": "HIGHER_IS_BETTER",
+       "unit": "%",
+       "note": null
+      }
+     },
+     "courses": {
+      "total_rows": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": "fiadas",
+       "note": null
+      },
+      "missing_rows": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "mostly_empty_rows": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      },
+      "gaps_in_row": {
+       "value": 16,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "partial_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      }
+     },
+     "blocks": {
+      "total_blocks": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "INFORMATIONAL",
+       "unit": null,
+       "note": null
+      },
+      "B39": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B34": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B54": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "B19": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C09": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "C04": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      },
+      "outros": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "CONTEXT_DEPENDENT",
+       "unit": null,
+       "note": null
+      }
+     },
+     "prism": {
+      "alignment_conflicts": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "juntas",
+       "note": null
+      },
+      "continuous_vertical_joints": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "pilhas de juntas",
+       "note": null
+      },
+      "stagger_below_target": {
+       "value": 14,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "juntas",
+       "note": null
+      }
+     },
+     "junctions": {
+      "missing_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "degraded_intersections": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "encontros",
+       "note": null
+      },
+      "half_block_adjacent_to_binding": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "missing_binding_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "missing_binding_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_L": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_T": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      },
+      "degraded_by_type_X": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": "precisa da lista de findings (nao so' do score) para quebrar por tipo"
+      }
+     },
+     "openings": {
+      "blocks_inside_door": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_inside_window": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "blocks_crossing_jamb": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "missing_lintel": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "missing_counter_lintel": {
+       "value": 4,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "vaos",
+       "note": null
+      },
+      "solid_below_sill_missing": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "fiadas",
+       "note": null
+      }
+     },
+     "quality": {
+      "collisions": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "colisoes",
+       "note": null
+      },
+      "non_modular_walls": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "paredes",
+       "note": null
+      },
+      "consecutive_compensators": {
+       "value": 38,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "compensator_excess_in_run": {
+       "value": 28,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "trechos",
+       "note": null
+      },
+      "avoidable_compensators": {
+       "value": 0,
+       "status": "OK",
+       "direction": "INFORMATIONAL",
+       "unit": "ocorrencias",
+       "note": null
+      },
+      "orphan_blocks": {
+       "value": 0,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "blocos",
+       "note": null
+      },
+      "critical_errors_total": {
+       "value": 8,
+       "status": "OK",
+       "direction": "LOWER_IS_BETTER",
+       "unit": "ocorrencias",
+       "note": null
+      }
+     },
+     "performance": {
+      "runtime_seconds": {
+       "value": null,
+       "status": "NOT_AVAILABLE",
+       "direction": "LOWER_IS_BETTER",
+       "unit": null,
+       "note": null
+      }
+     }
+    }
+   }
+  },
+  {
+   "project_id": "chacara_torre_easy_lo_tropicale",
+   "comparable": false,
+   "reason": "reference_kind=ANALYSIS_ONLY nao e' reproduzivel (input.json/input_real.json (linhas de CAD por layer + aberturas medidas), reference.json (posicao XY/Z, rotacao e codigo de CADA instancia de bloco, nao so' a contagem agregada por tipo), wall_modeling_snapshot.json (eixos/nos L-T-X reconstruidos), confirmacao de qual dos 22 niveis ('00. FUN' a '21. COB') vira o par input/reference, como foi feito para TGD/TP1 dentro de TORRE_EASY-LO-R00)",
+   "comparison": null
+  },
+  {
+   "project_id": "torre_easy_lo_r00_full_building",
+   "comparable": false,
+   "reason": "reference_kind=ANALYSIS_ONLY nao e' reproduzivel (extracao (input_real.json + reference.json) de cada um dos ~19 niveis alem de 04. TGD e 05. TP1 (ja catalogados como torre_easy_lo_r00_tgd/torre_easy_lo_r00_tp1), confirmacao de pareamento input x referencia por nivel, como foi feito para TGD)",
+   "comparison": null
+  }
+ ]
+}
