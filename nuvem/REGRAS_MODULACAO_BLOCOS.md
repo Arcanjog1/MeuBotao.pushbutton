@@ -2435,7 +2435,7 @@ Conhecimento extraido da Etapa 2C do benchmark, projeto
 `nuvem/benchmark/RELATORIO_ETAPA_2C.md`. Registro obrigatorio (CLAUDE.md:
 "todo conhecimento de AMARRACAO deve ser guardado").
 
-### 25.1 REGRA OBRIGATORIA - a abertura NAO se move para a modulacao fechar
+### 25.1 REGRA OBRIGATORIA - a abertura NAO se move automaticamente para a modulacao fechar
 
 **CONFLITO RESOLVIDO.** A hipotese de trabalho anterior era que o
 projetista humano deslocava portas/janelas alguns cm ao longo da parede
@@ -2454,8 +2454,26 @@ reconstruidas) das 91 aberturas, 75 pares.
 - o residuo de 0,24 cm e' um offset rigido global (`dy = -0,243 cm`) da
   reconstrucao do gabarito, nao movimento.
 
-**Consequencia para o solver:** e' PROIBIDO mover uma abertura para fechar
-a modulacao. A abertura e' dado de entrada fixo.
+**Consequencia para o solver:** e' PROIBIDO mover uma abertura
+**automaticamente** para fechar a modulacao. Sem uma acao explicita do
+usuario, a abertura e' dado de entrada fixo.
+
+**ATUALIZACAO OFICIAL - manipulacao manual direta no editor 3D
+(2026-08-31).** O usuario pode selecionar e arrastar deliberadamente uma
+porta ou janela no viewport. Isso e' uma edicao manual explicita, nao uma
+licenca para o solver reposicionar aberturas por conta propria.
+
+- o movimento fica restrito ao eixo da Wall hospedeira; janela pode ter o
+  peitoril movido verticalmente quando permitido pelo prisma da parede;
+- handles laterais podem alterar a largura mantendo a abertura hospedada;
+- durante o arraste, o preview visual acompanha o mouse imediatamente e o
+  solver recalcula somente a regiao afetada em segundo plano;
+- snap de interface apenas quantiza a intencao apontada pelo usuario; ele
+  nunca procura sozinho uma posicao que feche a modulacao. Shift permite
+  movimento livre, sem snap;
+- ao soltar, a geometria apontada e' validada pelo solver e registrada como
+  uma unica operacao atomica de Undo/Redo. Se a validacao falhar, a captura
+  confirmada anterior permanece intacta.
 
 ### 25.2 REGRA OBRIGATORIA - a abertura e' fronteira dura da fiada
 
