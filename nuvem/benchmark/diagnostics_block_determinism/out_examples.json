@@ -1,0 +1,266 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "causa_1_cluster_nao_transitivo": {
+    "descricao": "trios (A~B, A~C, B!~C) - a composicao do no' depende de quem `_cluster_wall_arms` visitou primeiro",
+    "total": 2,
+    "exemplos": [
+      {
+        "pivot": "((-1493.49, 632.3, -649.49, 632.3, 14.0), 1)",
+        "pivot_anchor_cm": [
+          -656.49,
+          632.3
+        ],
+        "arm_b": "((-853.49, 634.71, -649.49, 634.71, 14.0), 1)",
+        "arm_b_anchor_cm": [
+          -656.49,
+          634.71
+        ],
+        "arm_c": "((-688.56, 628.8, -649.49, 628.8, 14.0), 1)",
+        "arm_c_anchor_cm": [
+          -656.49,
+          628.8
+        ],
+        "d_pivot_b_cm": 2.41,
+        "d_pivot_c_cm": 3.5,
+        "d_b_c_cm": 5.91,
+        "tolerance_cm": 5.0
+      },
+      {
+        "pivot": "((-1493.49, -428.2, -649.49, -428.2, 14.0), 1)",
+        "pivot_anchor_cm": [
+          -656.49,
+          -428.2
+        ],
+        "arm_b": "((-853.49, -430.61, -649.49, -430.61, 14.0), 1)",
+        "arm_b_anchor_cm": [
+          -656.49,
+          -430.61
+        ],
+        "arm_c": "((-688.56, -424.7, -649.49, -424.7, 14.0), 1)",
+        "arm_c_anchor_cm": [
+          -656.49,
+          -424.7
+        ],
+        "d_pivot_b_cm": 2.41,
+        "d_pivot_c_cm": 3.5,
+        "d_b_c_cm": 5.91,
+        "tolerance_cm": 5.0
+      }
+    ]
+  },
+  "causa_2_ponto_do_no_pelo_group0": {
+    "descricao": "paredes mais curtas que a tolerancia entram no grupo com as DUAS pontas; `point = group[0].anchor` escolhe uma delas pela ORDEM, nao pela geometria",
+    "total": 11,
+    "exemplos": [
+      {
+        "wall": "(-139.49, 462.55, -139.49, 477.55, 14.0)",
+        "length_cm": 15.0,
+        "anchors_cm": [
+          [
+            -139.49,
+            470.05
+          ],
+          [
+            -139.49,
+            470.05
+          ]
+        ],
+        "node_point_taken_cm": [
+          -139.49,
+          470.05
+        ],
+        "group_size": 3
+      },
+      {
+        "wall": "(-1159.74, 215.0, -1159.74, 229.0, 14.0)",
+        "length_cm": 14.0,
+        "anchors_cm": [
+          [
+            -1159.74,
+            222.0
+          ],
+          [
+            -1159.74,
+            222.0
+          ]
+        ],
+        "node_point_taken_cm": [
+          -1159.74,
+          222.0
+        ],
+        "group_size": 3
+      },
+      {
+        "wall": "(1280.31, -19.55, 1296.01, -19.55, 14.0)",
+        "length_cm": 15.71,
+        "anchors_cm": [
+          [
+            1287.32,
+            -19.55
+          ],
+          [
+            1287.32,
+            -19.55
+          ]
+        ],
+        "node_point_taken_cm": [
+          1287.32,
+          -19.55
+        ],
+        "group_size": 3
+      },
+      {
+        "wall": "(529.72, -347.13, 534.17, -347.13, 14.0)",
+        "length_cm": 4.45,
+        "anchors_cm": [
+          [
+            534.17,
+            -347.13
+          ],
+          [
+            529.72,
+            -347.13
+          ]
+        ],
+        "node_point_taken_cm": [
+          534.17,
+          -347.13
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(-337.12, 551.1, -332.68, 551.1, 14.0)",
+        "length_cm": 4.45,
+        "anchors_cm": [
+          [
+            -337.12,
+            551.1
+          ],
+          [
+            -332.68,
+            551.1
+          ]
+        ],
+        "node_point_taken_cm": [
+          -337.12,
+          551.1
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(-1805.53, -87.55, -1805.53, -83.1, 14.0)",
+        "length_cm": 4.44,
+        "anchors_cm": [
+          [
+            -1805.53,
+            -87.55
+          ],
+          [
+            -1805.53,
+            -83.1
+          ]
+        ],
+        "node_point_taken_cm": [
+          -1805.53,
+          -87.55
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(1997.57, -87.55, 1997.57, -83.1, 14.0)",
+        "length_cm": 4.44,
+        "anchors_cm": [
+          [
+            1997.57,
+            -87.55
+          ],
+          [
+            1997.57,
+            -83.1
+          ]
+        ],
+        "node_point_taken_cm": [
+          1997.57,
+          -87.55
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(-277.25, -347.13, -272.81, -347.13, 14.0)",
+        "length_cm": 4.44,
+        "anchors_cm": [
+          [
+            -272.81,
+            -347.13
+          ],
+          [
+            -277.25,
+            -347.13
+          ]
+        ],
+        "node_point_taken_cm": [
+          -272.81,
+          -347.13
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(464.85, 551.1, 469.29, 551.1, 14.0)",
+        "length_cm": 4.44,
+        "anchors_cm": [
+          [
+            464.85,
+            551.1
+          ],
+          [
+            469.29,
+            551.1
+          ]
+        ],
+        "node_point_taken_cm": [
+          464.85,
+          551.1
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(723.3, -562.0, 727.75, -562.0, 14.0)",
+        "length_cm": 4.44,
+        "anchors_cm": [
+          [
+            723.3,
+            -562.0
+          ],
+          [
+            727.75,
+            -562.0
+          ]
+        ],
+        "node_point_taken_cm": [
+          723.3,
+          -562.0
+        ],
+        "group_size": 2
+      },
+      {
+        "wall": "(-1878.49, 103.3, -1864.48, 103.3, 14.0)",
+        "length_cm": 14.01,
+        "anchors_cm": [
+          [
+            -1871.48,
+            103.3
+          ],
+          [
+            -1871.48,
+            103.3
+          ]
+        ],
+        "node_point_taken_cm": [
+          -1871.48,
+          103.3
+        ],
+        "group_size": 2
+      }
+    ]
+  }
+}
