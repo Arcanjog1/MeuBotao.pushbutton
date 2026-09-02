@@ -21,7 +21,13 @@
 > em silêncio — um exemplo que contradiz uma regra existente é registrado
 > como CONFLITO (ver seção 10.7), nunca resolvido por suposição.
 >
-> Última atualização: 2026-09-01 — nova seção 27 (`CR-BLOCK-01`: a busca de
+> Última atualização: 2026-09-02 — nova abertura **REGRAS FUNDAMENTAIS DO
+> MOTOR** (determinismo geométrico; ordem oficial das paredes, com a
+> ETAPA 2 das verticais corrigida; parede completa primeiro/abertura
+> depois) e nova seção 29 (`CR-BLOCK-DETERMINISM` FINALIZADO: o SENTIDO
+> dos endpoints decidia a modulação — 24 ordens passam a produzir 1
+> fingerprint; dívida da junta contra a peça de nó registrada em 29.6).
+> Antes disso, 2026-09-01 — seção 27 (`CR-BLOCK-01`: a busca de
 > amarração vertical era INCOMPLETA — causa-raiz provada por tracing,
 > busca exata por programação dinâmica sobre múltiplos de `PIER_MODULE_CM`,
 > coincidência proibida entre fiadas da MESMA banda zerada nos 3 projetos
@@ -48,6 +54,148 @@
 > bug real de reposicionamento parcial ("parte da parede andou, parte
 > ficou parada" ao recalcular) foi corrigido tornando "Lançar Blocos -
 > criar" idempotente (nova seção 13.4).
+
+# REGRAS FUNDAMENTAIS DO MOTOR
+
+> Três regras que valem **acima** de qualquer seção detalhada deste
+> documento. Se alguma seção abaixo parecer contradizer uma delas, é a
+> seção que está desatualizada. Registradas por pedido explícito do
+> usuário (2026-09-02, `CR-BLOCK-DETERMINISM`).
+
+--------------------------------------------------
+
+## REGRA FUNDAMENTAL 1 — DETERMINISMO GEOMÉTRICO
+
+**A mesma geometria produz exatamente o mesmo resultado**, independentemente:
+
+- da ordem de entrada das paredes;
+- da ordem da lista (`walls_to_create`, `input.json`, ordem de extração do CAD);
+- do **sentido dos endpoints** de cada parede.
+
+`GetEndPoint(0)` e `GetEndPoint(1)` são detalhe de **representação**. A mesma
+parede física desenhada `A→B` ou `B→A` **é a mesma parede** e tem de produzir a
+mesma solução física de blocos. Eles nunca podem decidir:
+
+início lógico da parede · sequência de preenchimento · escolha de bloco ·
+posição de compensador · onde cai o B19 · reparo de abertura · juntas ·
+resultado da fiada.
+
+Nada na decisão pode olhar `wall_idx`, posição na lista, ordem de descoberta
+ou `id()`. **Toda** desambiguação é por chave geométrica canônica.
+
+Implementação: `wall_axis_is_reversed` / `canonical_wall_axis` /
+`_canonical_wall_solving_view` (`nuvem/core/engine/wall_stepper.py`) e
+`build_wall_graph` (`nuvem/core/engine/wall_pairing.py`, união por componente
+conexa + centróide canônico).
+Testes permanentes: `tests/test_block_pipeline_determinism.py` e
+`tests/test_block_graph_determinism.py`.
+
+**Nota de engenharia (medida, não suposta):** determinismo geométrico exige
+também que o motor **não decida no ruído de ponto flutuante**. Duas
+representações do mesmo ponto físico chegam ao solver com diferenças de
+último bit (medido: `pier_cm` = `364.00899999999984` num sentido e
+`364.0089999999998` no outro), e um limiar de comparação pode cair entre as
+duas. Por isso toda coordenada **longitudinal** do preenchimento vive numa
+grade fixa de `1e-6 cm` (10 nanômetros — `PIER_LENGTH_SNAP_DECIMALS`), cinco
+ordens de grandeza abaixo da menor tolerância física do motor (0,1 cm).
+
+--------------------------------------------------
+
+## REGRA FUNDAMENTAL 2 — ORDEM OFICIAL DAS PAREDES
+
+Atenção: **ordem ENTRE paredes** é diferente de **sentido DENTRO da parede**.
+As duas são decididas só pela geometria.
+
+### Ordem ENTRE paredes (`order_walls_for_processing`)
+
+1. **HORIZONTAIS primeiro** — de **cima para baixo**; em faixa equivalente
+   (tolerância `WALL_ALIGNMENT_TOLERANCE_FT`), da **esquerda para a direita**.
+2. **Depois as VERTICAIS** — de **baixo para cima**; em faixa equivalente, da
+   **esquerda para a direita**.
+3. **Por fim as INCLINADAS** — por **ângulo canônico da reta** (módulo 180°,
+   igual nos dois sentidos de desenho), depois posição geométrica, depois a
+   chave geométrica canônica.
+
+Desempate é sempre `wall_processing_geom_key` (pontas ordenadas + espessura),
+**nunca** a posição na lista. Inverter o sentido de desenho de uma parede
+nunca muda a posição dela na ordem: tudo sai de `min`/`max` dos dois
+endpoints e do ângulo módulo 180°.
+
+### Sentido DENTRO da parede (`canonical_wall_axis`)
+
+- **HORIZONTAL** → esquerda → direita;
+- **VERTICAL** → baixo → cima;
+- **INCLINADA** → chave geométrica canônica (lexicográfica em X, Y).
+
+> **CORREÇÃO 2026-09-02 (conflito registrado, não apagado).** Até esta data a
+> ETAPA 2 estava **invertida** em relação ao enunciado do usuário: as
+> verticais eram ordenadas por X (esquerda→direita) como critério
+> **principal** e por Y só no empate. O enunciado oficial é o contrário —
+> baixo→cima é o principal, esquerda→direita é o desempate. A `cross-audit`
+> anterior (`docs/BLOCK_DETERMINISM_CROSS_AUDIT.md`) havia classificado a
+> regra como já implementada; a verificação direta contra o enunciado mostrou
+> a troca. Vale a orientação mais recente do usuário. Os três grupos também
+> desempatavam por `wall_idx` — corrigido. Medido: a correção de ordem não
+> altera nenhuma métrica crítica dos 3 projetos de benchmark.
+
+--------------------------------------------------
+
+## REGRA FUNDAMENTAL 3 — PAREDE COMPLETA PRIMEIRO, ABERTURA DEPOIS
+
+Portas e janelas são **conhecidas desde o início** (posição, largura, altura,
+peitoril, parede associada). Mas a abertura **não** transforma a parede em
+vários problemas de modulação independentes.
+
+> **Uma abertura é um VAZIO DENTRO de uma parede contínua.**
+> **Não é uma fronteira que transforma a parede em 2, 3 ou 4 paredes
+> independentes para o solver.**
+
+Pipeline oficial:
+
+```
+GRAFO L/T/X
+  → PAREDE COMPLETA
+  → MODULAÇÃO CONTÍNUA DA PAREDE
+  → FIADAS
+  → PRISMA / AMARRAÇÃO ENTRE FIADAS
+  → APLICAR PORTAS E JANELAS
+  → IDENTIFICAR PEÇAS QUE INTERSECTAM O VÃO
+  → REMOVER PEÇAS CONFLITANTES (inteiras, nunca mutiladas)
+  → REPARAR SOMENTE A REGIÃO LOCAL AFETADA
+  → VERGA / CONTRAVERGA / CANALETA
+  → VALIDAÇÃO FINAL DA PAREDE COMPLETA
+```
+
+Proibido como estratégia principal: resolver `TRECHO → PORTA → TRECHO →
+JANELA → TRECHO` isoladamente — isso destrói a continuidade da parede e das
+fiadas.
+
+O reparo depois do recorte é **local** (só a região afetada é recalculada),
+mas a **validação final é da parede inteira**. Um bloco que cruza um vão é
+**removido inteiro**, nunca cortado para caber: o solver trabalha com peças
+válidas do catálogo. Mover porta/janela, alterar largura ou mover parede são
+**último recurso**, nesta prioridade: preservar geometria → preservar abertura
+→ reorganizar blocos localmente → usar peças válidas → só então avaliar
+ajuste geométrico permitido.
+
+Implementação: `OPENING_STRATEGY_CONTINUOUS_FIRST` é o único
+`DEFAULT_OPENING_STRATEGY` (`nuvem/core/engine/continuous_modulation.py`);
+`_recut_openings_and_repair` (`wall_stepper.py`) faz o recorte e o reparo
+local. `OPENING_STRATEGY_SPLIT_FIRST` (o modo histórico) permanece para
+comparação/benchmark e como degradação **bounded e rotulada**
+(`continuity_degraded`) — nunca como padrão silencioso. Detalhe completo na
+seção 23.
+
+--------------------------------------------------
+
+### Onde cada regra fundamental é detalhada
+
+| Regra | Seções detalhadas |
+|---|---|
+| 1 — Determinismo geométrico | 27 (`CR-BLOCK-01`), 28 (`CR-BLOCK-DETERMINISM`) |
+| 2 — Ordem oficial das paredes | 5 (encontros L/T/X), 13 (pipeline integrado) |
+| 3 — Parede completa primeiro | 23 (pipeline oficial de aberturas), 10 (vergas/contravergas) |
+
 
 ## 1. Catálogo de blocos
 
@@ -4076,3 +4224,154 @@ uma medição, não uma suposição — refazer antes de mudar.
   simétrica em relação ao sentido. Enquanto não for, **não afirmar** que o
   pipeline de blocos é invariante ao sentido de desenho — ele é invariante
   à **ordem da lista**, que é o que este CR entregou.
+
+---
+
+## 29. `CR-BLOCK-DETERMINISM` FINALIZADO — o SENTIDO DOS ENDPOINTS decidia a modulação (2026-09-02)
+
+> Fecha a segunda causa que a seção 28 deixou explicitamente em aberto
+> ("NECESSIDADE DE ESCOPO ADICIONAL"). Produção alterada: **só**
+> `nuvem/core/engine/wall_stepper.py`. `wall_pairing.py` (o wall graph já
+> auditado e **APROVADO** pela cross-audit independente) **não foi tocado**.
+
+### 29.1 O que estava errado
+
+A seção 28 entregou o grafo determinístico e registrou que o PREENCHIMENTO
+ainda corria de `GetEndPoint(0)` para `GetEndPoint(1)`. A cross-audit
+independente (`docs/BLOCK_DETERMINISM_CROSS_AUDIT.md`) mediu o tamanho do
+problema com uma bateria de **24 ordens de entrada**:
+
+| grupo | variantes | resultado |
+|---|---|---|
+| pura reordenação da lista | 19 | **convergiam** para 1 fingerprint |
+| inversão do sentido de algum eixo | 5 | 5 fingerprints **distintos entre si** |
+
+Total: **6 fingerprints globais em 24 ordens**. As camadas de grafo
+(`node_positions`, `node_types`, `node_arms`, `midspan_crossings`) já eram
+1; a primeira camada realmente divergente era o preenchimento
+(`STANDARD_FILL` 7207→7205 e, principalmente, `OPENING_REPAIR_FILL`
+423→402, ~5%).
+
+### 29.2 As três causas, medidas uma a uma
+
+**(a) O eixo lógico era o eixo de desenho.** Todo `t` de
+`solve_wall_free_fill` é medido de `p0` na direção `p0→p1`. Inverter o
+desenho invertia a sequência de preenchimento — a sobra (e com ela o
+compensador e o B19) caía na outra ponta do trecho.
+
+**(b) Ruído de último bit decidindo layout.** Mesmo com o sentido
+canonizado, o mesmo trecho chegava ao solver de pilarete como
+`pier_cm = 364.00899999999984` num sentido e `364.0089999999998` no outro
+(num caso o valor vem de `L - t`, no outro de `t` direto). Diferença de
+`4e-14 cm` — fisicamente zero, mas suficiente para cair do outro lado de um
+limiar de comparação. Reproduzido peça a peça em
+`nuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py`,
+que prova que `_pier_layout_avoiding_joints` recebia argumentos **iguais em
+todas as casas medidas** e devolvia layouts diferentes.
+
+**(c) Peça assimétrica espelhada num X degradado.** `solve_x_intersection`
+centrava a peça usando o sentido de DESENHO. Para o B54 (células
+simétricas) isso é indiferente fisicamente; mas a degradação começa por
+**B34**, que é **assimétrico** — e a mesma parede desenhada ao contrário
+recebia o mesmo B34, no mesmo lugar, **espelhado** (célula menor do outro
+lado). Medido: 8 peças numa parede vertical da planta real.
+
+### 29.3 O que foi implementado
+
+1. **Convenção oficial de sentido** — `wall_axis_is_reversed` /
+   `canonical_wall_axis`: horizontal esquerda→direita, vertical baixo→cima,
+   inclinada pela chave geométrica canônica. Função pura da geometria.
+2. **Vista canônica no preenchimento** — `_canonical_wall_solving_view`:
+   quando o eixo foi desenhado ao contrário, a parede e **tudo que é
+   indexado por `t`/`end_index` dela** (aberturas, `end_to_node`, reservas
+   de nó, faixas de meio-de-parede) chegam espelhados a
+   `solve_wall_free_fill`, que passa a receber literalmente o mesmo
+   problema nos dois sentidos. Os diagnósticos voltam ao eixo de
+   representação em `_unmirror_fill_result` — relatório e
+   `plan_axis_opening_fix` continuam falando o `t` do chamador.
+3. **Grade longitudinal** — `PIER_LENGTH_SNAP_DECIMALS` (1e-6 cm = 10
+   nanômetros): comprimento do eixo, vãos, fronteiras de trecho, `pier_cm`,
+   juntas, vazios e os *extents* do reparo de abertura. Ver a nota de
+   engenharia na REGRA FUNDAMENTAL 1.
+4. **Eixo canônico em X e no B54 do T** — nenhuma regra de L/T/X mudou:
+   mesma peça, mesma posição, mesma reserva; só a escolha entre duas
+   orientações equivalentes deixou de depender do desenho.
+
+### 29.4 Resultado medido (bateria integral de 24 ordens, sem redução)
+
+| projeto | antes | depois |
+|---|---|---|
+| `torre_easy_lo_r00_tgd` | 6 fingerprints | **1** |
+| `torre_easy_lo_r00_tp1` | 4 fingerprints | **1** |
+
+`spread` entre as 24 ordens: `pieces` 41→0, `collisions` 17→0,
+`non_modular` 9→0, `B19`/`C09`/`C04` 31/42/39→0.
+`alignment_conflicts = 0` e `same-band forbidden = 0` preservados
+(`CR-BLOCK-01` não regride).
+
+### 29.5 Achado de METODOLOGIA — a bateria de variantes não é válida em todo projeto
+
+**PADRÃO OBSERVADO, confirmado por medição.** A variante `endpoint_reversal`
+reparametriza as aberturas contra o comprimento do `input.json`. Quando
+`settings.walls_already_extended` é **False**,
+`extend_wall_ends_to_junctions` alonga o eixo **depois** disso, e as
+aberturas passam a ser medidas contra um comprimento maior: a "mesma"
+planta invertida fica com **cada vão deslocado em 2× a extensão** (medido:
+**14 cm** em `piloto_sintetico_2x2`, exatamente uma espessura de parede).
+Nesse caso o grupo de reversão compara **plantas diferentes** e não mede
+determinismo nenhum.
+
+Consequência prática: em `piloto_sintetico_2x2` só o grupo de **permutação**
+(19 variantes) é válido — e nele o resultado é **1 fingerprint**. Em
+`torre_easy_lo_r00_tgd`/`tp1` (`walls_already_extended: True`) as 24 são
+válidas e todas convergem. Ao reaproveitar a bateria, **conferir a flag
+antes de interpretar o grupo de reversão**. Qualquer teste que inverta
+endpoints deve reparametrizar contra o comprimento do eixo **já esticado**
+— é o que `tests/test_block_pipeline_determinism.py::flip_wall` faz.
+
+### 29.6 DÍVIDA ABERTA — a busca de amarração não enxerga a junta contra a peça de nó
+
+**CONFLITO REGISTRADO, correção fora do escopo deste CR.**
+
+`_layout_internal_joint_positions_cm` devolve só as juntas **internas** do
+layout. A junta entre a **peça de amarração do nó** e o **primeiro bloco de
+preenchimento** não entra na lista `avoid_positions_cm` que a Fiada B
+recebe — então a fiada oposta pode colocar uma junta interna **exatamente
+ali**, e `alignment_conflicts` continua zero porque o solver nunca viu a
+coincidência. Quem vê é o validador independente, que a reporta como
+`PRISM_CONTINUOUS_JOINT`.
+
+Medido em `piloto_sintetico_2x2` (12 paredes, 780 blocos): a parede W004,
+que começa com reserva de nó em `t=34,0`, tem a primeira junta de
+preenchimento em `t=34,5`; a fiada oposta começa em `t=15,0` com um B19
+(15→34) e coloca a junta interna dela também em `t=34,5` —
+`desencontro 0,00cm, limite 1,50cm`, em todos os 7 pares de fiadas.
+
+Efeito desta CR sobre isso: W004 e W011 são **paredes geometricamente
+idênticas** (364 cm, 14 cm, horizontais). Antes recebiam layouts
+**diferentes** — não por decisão, mas porque o ruído descrito em 29.2(b)
+caía de lados opostos em cada uma; W011 pegava o layout com a junta corrida
+e W004 não. Com a grade longitudinal, **as duas passam a receber o mesmo
+layout** — que é o correto pela REGRA FUNDAMENTAL 1 (geometria igual,
+resultado igual), mas é o layout que carrega o defeito. Por isso
+`PRISM_CONTINUOUS_JOINT` sobe de **7 (1 parede × 7 pares)** para **14
+(2 paredes × 7 pares)** nesse projeto.
+
+**Não é uma regressão da convenção de direção** (nenhuma parede do piloto
+está invertida — `wall_axis_is_reversed` é `False` nas 12) e **não é uma
+regressão do `CR-BLOCK-01`** (a busca de amarração não mudou). É um defeito
+**pré-existente** que deixou de ser mascarado por uma assimetria acidental.
+
+**O que fazer quando for autorizado**: incluir a junta contra a peça de nó
+(as bordas de `node_candidates_by_wall_end`) na lista de juntas a evitar da
+fiada oposta, e re-medir os 3 projetos. É mudança na REGRA DE AMARRAÇÃO —
+CR próprio, não este.
+
+### 29.7 Arquivos
+
+Produção: `nuvem/core/engine/wall_stepper.py` (único).
+Testes: `tests/test_block_pipeline_determinism.py` (novo, 52 invariantes),
+`tests/test_script.py::test_ordem_de_processamento_e_geometrica`
+(atualizado para a regra oficial das verticais).
+Laboratório reproduzível:
+`nuvem/benchmark/diagnostics_block_determinism_final/`.
