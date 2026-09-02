@@ -1,0 +1,87 @@
+{
+  "modo": "legacy (main 24ada98)",
+  "gates_CR_BLOCK_01": {
+    "CR-BLOCK-01 same_band_forbidden (exigido 0)": 0,
+    "CR-BLOCK-01 alignment_conflicts (exigido 0)": 0,
+    "CR-BLOCK-01 cobertura paredes com blocos (exigido >= 246)": "246/275"
+  },
+  "pieces": 29477,
+  "non_modular": 3438,
+  "collisions": 1048,
+  "door_void_violations": 638,
+  "intersection_failures": 200,
+  "joint_classes": {
+    "FORBIDDEN_JOINT_ALIGNMENT": 51,
+    "DOCUMENTED_EXCEPTION": 687,
+    "UNCLASSIFIED_RULE_CONFLICT": 1428,
+    "NO_ALIGNMENT": 18690
+  },
+  "forbidden_by_band": {
+    "same_band": 0,
+    "cross_band": 51
+  },
+  "blocks_by_code": {
+    "B19": 2268,
+    "B34": 4951,
+    "B39": 14911,
+    "B54": 1722,
+    "C04": 1487,
+    "C09": 4138
+  },
+  "runtime_total_s": 4.296,
+  "runtime_por_projeto_s": {
+    "piloto_sintetico_2x2": 0.048,
+    "torre_easy_lo_r00_tp1": 2.008,
+    "torre_easy_lo_r00_tgd": 1.858
+  },
+  "por_projeto": {
+    "piloto_sintetico_2x2": {
+      "walls_with_blocks": 12,
+      "walls_considered": 12,
+      "alignment_conflicts": 0,
+      "non_modular": 32,
+      "collisions": 0,
+      "door_void_violations": 0,
+      "forbidden_by_band": {
+        "same_band": 0,
+        "cross_band": 0
+      },
+      "fingerprint": {
+        "sha256": "b26b49b6ab0653aa0c98534481bec3abf0b250d9e5bbd673948703d5763a15b6",
+        "rows": 772
+      }
+    },
+    "torre_easy_lo_r00_tp1": {
+      "walls_with_blocks": 96,
+      "walls_considered": 96,
+      "alignment_conflicts": 0,
+      "non_modular": 295,
+      "collisions": 14,
+      "door_void_violations": 348,
+      "forbidden_by_band": {
+        "same_band": 0,
+        "cross_band": 46
+      },
+      "fingerprint": {
+        "sha256": "6c5ece0b5bb26d7838f3e258ff0c01ab97c84710cde25cb47c4b3e1aa39aef3e",
+        "rows": 18154
+      }
+    },
+    "torre_easy_lo_r00_tgd": {
+      "walls_with_blocks": 138,
+      "walls_considered": 167,
+      "alignment_conflicts": 0,
+      "non_modular": 3111,
+      "collisions": 1034,
+      "door_void_violations": 290,
+      "forbidden_by_band": {
+        "same_band": 0,
+        "cross_band": 5
+      },
+      "fingerprint": {
+        "sha256": "4a7c42559d0fa7cdb04b17abd4ddbe8bad9770386291e15a8402153df6e3cb6f",
+        "rows": 10551
+      }
+    }
+  }
+}

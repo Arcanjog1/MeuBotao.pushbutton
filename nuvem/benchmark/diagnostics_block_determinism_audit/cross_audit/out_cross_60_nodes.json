@@ -1,0 +1,199 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "n_baseline_divergent_identities": 60,
+  "n_baseline_missing_case_identities": 6,
+  "n_still_divergent_now": 0,
+  "n_fixed_now": 60,
+  "n_new_divergent_now": 0,
+  "still_divergent_identities": [],
+  "new_divergent_identities": [],
+  "n_cross_divergent_total_now": 0,
+  "missing_case_gate": {
+    "n_cases": 6,
+    "n_now_present_in_all_24_with_single_point_and_kind": 2,
+    "cases": [
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            -428.2,
+            -649.49,
+            -428.2,
+            14.0
+          ],
+          [
+            -688.56,
+            -424.7,
+            -649.49,
+            -424.7,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": false,
+        "n_distinct_points_now": 0,
+        "n_distinct_kinds_now": 0,
+        "single_canonical_point": false,
+        "single_kind": false,
+        "oracle_verdicts": []
+      },
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            -428.2,
+            -649.49,
+            -428.2,
+            14.0
+          ],
+          [
+            -853.49,
+            -430.61,
+            -649.49,
+            -430.61,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": false,
+        "n_distinct_points_now": 0,
+        "n_distinct_kinds_now": 0,
+        "single_canonical_point": false,
+        "single_kind": false,
+        "oracle_verdicts": []
+      },
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            -428.2,
+            -649.49,
+            -428.2,
+            14.0
+          ],
+          [
+            -853.49,
+            -430.61,
+            -649.49,
+            -430.61,
+            14.0
+          ],
+          [
+            -688.56,
+            -424.7,
+            -649.49,
+            -424.7,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": true,
+        "n_distinct_points_now": 1,
+        "n_distinct_kinds_now": 1,
+        "single_canonical_point": true,
+        "single_kind": true,
+        "oracle_verdicts": [
+          {
+            "point_cm": [
+              -656.49,
+              -427.84
+            ],
+            "oracle_kind": "AMBIGUOUS",
+            "agrees_with_engine": true
+          }
+        ]
+      },
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            632.3,
+            -649.49,
+            632.3,
+            14.0
+          ],
+          [
+            -688.56,
+            628.8,
+            -649.49,
+            628.8,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": false,
+        "n_distinct_points_now": 0,
+        "n_distinct_kinds_now": 0,
+        "single_canonical_point": false,
+        "single_kind": false,
+        "oracle_verdicts": []
+      },
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            632.3,
+            -649.49,
+            632.3,
+            14.0
+          ],
+          [
+            -853.49,
+            634.71,
+            -649.49,
+            634.71,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": false,
+        "n_distinct_points_now": 0,
+        "n_distinct_kinds_now": 0,
+        "single_canonical_point": false,
+        "single_kind": false,
+        "oracle_verdicts": []
+      },
+      {
+        "identity_kind": "AMBIGUOUS",
+        "identity_arm_wall_keys": [
+          [
+            -1493.49,
+            632.3,
+            -649.49,
+            632.3,
+            14.0
+          ],
+          [
+            -853.49,
+            634.71,
+            -649.49,
+            634.71,
+            14.0
+          ],
+          [
+            -688.56,
+            628.8,
+            -649.49,
+            628.8,
+            14.0
+          ]
+        ],
+        "present_in_all_24_now": true,
+        "n_distinct_points_now": 1,
+        "n_distinct_kinds_now": 1,
+        "single_canonical_point": true,
+        "single_kind": true,
+        "oracle_verdicts": [
+          {
+            "point_cm": [
+              -656.49,
+              631.93
+            ],
+            "oracle_kind": "AMBIGUOUS",
+            "agrees_with_engine": true
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -3932,3 +3932,147 @@ Coberto por teste permanente (`tests/test_block_bonding.py`):
   original (`claude/block-01-prisma-fiadas-rik42t`) por causa do contrato
   de isolamento entre as contas — `tests/test_script.py` não estava na
   área de escrita autorizada dela.
+
+---
+
+## 28. `CR-BLOCK-DETERMINISM` IMPLEMENTADO — o GRAFO que alimenta a amarração dependia da ORDEM DE ENTRADA (2026-09-02)
+
+> Branch `claude/block-pipeline-determinism-uj7cvq`, a partir da `main`
+> `24ada98`. Medição 100% HEADLESS
+> (`nuvem/benchmark/diagnostics_block_determinism/`), sem Revit/MCP, sobre
+> os 3 projetos de `nuvem/benchmark/projects/`.
+> Este conhecimento é de AMARRAÇÃO, não de "engenharia": quem decide onde
+> entra B34 (L) e B54 (T/X) é o nó do grafo — sua composição, sua posição e
+> o papel de cada parede dentro dele. Se essas três coisas mudam com a
+> ordem da lista de entrada, a amarração muda com ela.
+
+### 28.1 REGRA OBRIGATÓRIA — um encontro físico é UM nó: a relação "mesma junção" é a COMPONENTE CONEXA, não uma bola em volta da primeira ponta
+
+- **Status**: **CORRIGIDO** — `_cluster_wall_arms`
+  (`core/engine/wall_pairing.py`) passou a agrupar por componente conexa
+  (union-find). Testes: `tests/test_block_graph_determinism.py`
+  (`INV-GRAPH-DET-001..003`, `016`).
+- **Como foi descoberto**: censo headless das 8 variantes de entrada do CR
+  (`run_baseline.py`) + descida camada a camada dentro de
+  `build_wall_graph` (`run_rootcause.py`), com exemplos numéricos
+  (`run_examples.py`). Não foi dedução.
+- **O achado**: agrupar pontas cujas âncoras estão a **≤ 5 cm**
+  (`WALL_GRAPH_NODE_SNAP_TOLERANCE_M`) **não é uma relação transitiva**.
+  Medidos na planta real `torre_easy_lo_r00_tgd` **dois trios** em que:
+
+  | par | distância entre âncoras | dentro da tolerância? |
+  |---|---|---|
+  | A–B | 3,50 cm | sim |
+  | A–C | 2,41 cm | sim |
+  | B–C | **5,91 cm** | **não** |
+
+  O algoritmo antigo tomava a primeira ponta ainda não usada e absorvia
+  tudo que estivesse a 5 cm **dela**. Começando por A saía **um** nó de
+  três braços; começando por B ou C saíam **dois** nós. Consequência
+  medida: `273 → 274/275` nós e `T_INTERSECTION 118 → 119/120`, só de
+  embaralhar a lista de entrada.
+- **Qual é a resposta CORRETA (não é "a do baseline")**: as três paredes
+  de cada trio são **fragmentos sobrepostos do mesmo trecho físico** —
+  três paredes de 14 cm com os eixos a menos de 6 cm uma da outra, todas
+  morrendo na mesma parede vertical. Ali existe **um** encontro. Parti-lo
+  em dois nós a 5,9 cm um do outro faz o solver reservar amarração **duas
+  vezes praticamente no mesmo lugar** — exatamente o modo de falha (peças
+  duplicadas colidindo) que o cabeçalho de `_wall_node_arms` já
+  documentava para o caso do canto em L.
+- **Por que a componente conexa não "encadeia" a planta inteira**: a
+  tolerância (5 cm) é **menor que meia espessura de parede** (7 cm), então
+  fundir dois encontros distintos exigiria uma fila de pontas a menos de
+  5 cm cada — o que não descreve nenhum encontro real. Medido: a maior
+  componente da planta tem **4 pontas**, o tamanho de uma cruz.
+
+### 28.2 REGRA OBRIGATÓRIA — o PONTO do nó é função das âncoras do grupo, nunca de quem a lista trouxe primeiro
+
+- **Status**: **CORRIGIDO** — `_wall_node_group_point` (novo) usa o
+  **centroide das âncoras distintas**. Teste: `INV-GRAPH-DET-017`.
+- **O achado**: `point = group[0]["anchor"]`. Medidos **11 grupos** em que
+  a **mesma parede entra com as DUAS pontas** — porque ela é **mais curta
+  que a tolerância de agrupamento** (a menor tem 4,45 cm). Em pelo menos
+  dois deles as duas âncoras são distintas, e o nó — com ele a peça de
+  amarração que o solver encosta nele — **andava 4,45 cm** só de inverter
+  o sentido em que o eixo foi desenhado no CAD.
+- **Onde não muda nada**: quando todas as pontas de um encontro ancoram na
+  **mesma** interseção de eixos (o caso normal), o centroide **é** essa
+  âncora, e o nó fica exatamente onde estava.
+
+### 28.3 REGRA OBRIGATÓRIA — a ORDEM dos braços dentro do nó é semântica, não decorativa
+
+- **Status**: **CORRIGIDO** — `_wall_graph_arm_key` (novo) ordena os
+  braços por identidade **geométrica** da parede + qual extremidade (dita
+  pela **posição**, nunca por `end_index`, que troca de valor quando o
+  mesmo eixo é desenhado ao contrário). Testes: `INV-GRAPH-DET-009`, `011`.
+- **Por que importa para a AMARRAÇÃO**:
+  - `_l_corner_wall_pair` lê literalmente `arms[0]` e `arms[1]` para
+    decidir **qual parede do canto recebe o B34 da fiada A e qual recebe o
+    da fiada B**;
+  - `solve_x_intersection` faz o mesmo com `crossing_walls[0]`/`[1]` para
+    os dois B54 de uma cruz;
+  - `_corner_reference_wall` e `_wall_group_shift_targets` leem `arms[0]`.
+- **O achado**: medidos **22 a 63 nós geometricamente IDÊNTICOS** com
+  `main`/`incoming`/`neighbor` trocados entre variantes, **4 a 55** com
+  `arms` em ordem diferente, e **17 cruzamentos em X** com o par
+  `crossing_walls` invertido — tudo só por permutar a lista de entrada.
+- **CONFLITO REGISTRADO (a orientação nova vence, mas o custo fica
+  anotado)**: o papel A/B dos cantos em L **não era função da geometria** —
+  saía da posição da parede na lista. Por isso **nenhuma** ordenação
+  canônica consegue reproduzi-lo: alguma mudança de A/B é inevitável. Três
+  convenções defensáveis foram medidas nos **três** projetos:
+
+  | ordem dos braços | códigos em regressão | `PRISM_CONTINUOUS_JOINT` |
+  |---|---|---|
+  | **enumeração canônica (adotada)** | 4 | **não mexe** |
+  | ângulo de saída (sistema de rotação) | 5 | **7 → 20** no piloto |
+  | parede mais longa primeiro | 7 | **7 → 20** no piloto |
+
+  Adotada a **enumeração canônica**: é a que menos mexe no que já estava
+  validado e a **única que não toca em `PRISM_CONTINUOUS_JOINT` nem em
+  `JUNCTION_MISSING_BINDING`** — continuidade de junta vertical (regra #1,
+  seção 11) e amarração de encontro (seção 5) **não podem piorar para
+  pagar determinismo**.
+- **AVISO DE MÉTODO**: medir isto em **um** projeto só leva à escolha
+  errada. Foi o que aconteceu na primeira medição deste CR — com apenas o
+  `torre_easy_lo_r00_tgd` o ângulo parecia melhor, e é justamente ele que
+  quebra a amarração vertical do `piloto_sintetico_2x2`.
+
+### 28.4 REGRA OBRIGATÓRIA — empate geométrico exige desempate geométrico, nunca "o primeiro da lista"
+
+- **Status**: **CORRIGIDO** — `_wall_end_geometric_anchor` e
+  `_find_wall_touching_point` desempatam por `(distância, chave geométrica
+  da parede)` no lugar de `<` estrito. Teste: `INV-GRAPH-DET-011`.
+- **Não introduz tolerância nova**: o empate tratado é o de floats
+  **exatamente iguais** (geometria simétrica), não "quase iguais".
+
+### 28.5 PADRÃO OBSERVADO — as chaves canônicas não precisam de arredondamento
+
+Foi **medido** que âncora, ponta e direção de cada braço saem
+**bit-idênticas** nas 8 permutações do censo (inclusive na inversão de
+todos os eixos). Por isso as chaves canônicas comparam **float cru**:
+arredondar criaria uma borda artificial onde não existe nenhuma. Isto é
+uma medição, não uma suposição — refazer antes de mudar.
+
+### 28.6 DOCUMENTADO — pendência de código aberta: o preenchimento comum ainda depende do SENTIDO do eixo
+
+- **Status**: **NÃO corrigido** — fora do escopo deste CR
+  (`core/engine/wall_stepper.py` não estava na área de escrita autorizada).
+- **O achado**: depois de canonizar o grafo, **7 das 8** variantes passam a
+  dar o **mesmo** fingerprint final de blocos. A que sobra é a inversão do
+  sentido de desenho de todos os eixos — e **a causa já não é o grafo**:
+
+  | camada | pares (parede, fiada) que divergem |
+  |---|---|
+  | peças de amarração L/T/X | **0 de 1.581** |
+  | peças de preenchimento | 727 de 1.354 |
+
+  `_greedy_fill_blocks` corre de `GetEndPoint(0)` para `GetEndPoint(1)`,
+  então inverter o eixo faz a **sobra** (compensador / B19) cair na outra
+  ponta do trecho. As **âncoras** de amarração ficam nos mesmos lugares.
+- **O que fazer quando for autorizado**: o preenchimento precisa de um
+  referencial longitudinal canônico (por exemplo correr sempre da ponta
+  geometricamente menor para a maior), ou a escolha do layout precisa ser
+  simétrica em relação ao sentido. Enquanto não for, **não afirmar** que o
+  pipeline de blocos é invariante ao sentido de desenho — ele é invariante
+  à **ordem da lista**, que é o que este CR entregou.
