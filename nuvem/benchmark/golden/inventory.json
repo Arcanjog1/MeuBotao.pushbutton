@@ -1,0 +1,107 @@
+{
+ "schema_version": 1,
+ "note": "Inventario MECANICO (so' o que existe em disco). A classificacao de confiabilidade fica em manifest.json - regenerar este arquivo com `python -m nuvem.benchmark.golden.inventory` nunca muda aquela classificacao sozinho.",
+ "projects_dir": "projects",
+ "projects": [
+  {
+   "project_id": "piloto_sintetico_2x2",
+   "files_present": [
+    "baseline.json",
+    "input.json",
+    "metadata.json",
+    "score.json"
+   ],
+   "has_input": true,
+   "has_input_real": false,
+   "has_reference": false,
+   "has_metadata": true,
+   "input_walls": 12,
+   "reference_walls": null,
+   "reference_confiabilidade": "SEM GABARITO - so' validadores de nivel 1 sobre o resultado",
+   "origem": "GERADO por benchmark/extract/synthetic.py - NAO e' projeto real",
+   "extraido_em": null,
+   "legacy_baselines": [
+    {
+     "path": "projects/piloto_sintetico_2x2/baseline.json",
+     "kind": "solver_score_snapshot",
+     "source_field": "solver",
+     "success_rate": 0.1667,
+     "critical_errors": 15
+    }
+   ]
+  },
+  {
+   "project_id": "torre_easy_lo_r00_tgd",
+   "files_present": [
+    "baseline.json",
+    "catalog_comparison.json",
+    "evaluation_scope.json",
+    "input.json",
+    "input_real.json",
+    "metadata.json",
+    "reference.json",
+    "reference_score.json",
+    "scope_summary.json",
+    "scoped_reference_score.json",
+    "scoped_score.json",
+    "score.json",
+    "unassigned_openings_audit.json",
+    "wall_modeling_snapshot.json"
+   ],
+   "has_input": true,
+   "has_input_real": true,
+   "has_reference": true,
+   "has_metadata": true,
+   "input_walls": 167,
+   "reference_walls": 97,
+   "reference_confiabilidade": "RECONSTRUIDO no lado do gabarito - o .rvt entregue nao tem mais Wall nem Porta/Janela (0 de cada). Eixos, vaos e encontros do REFERENCE vem do layout dos blocos (benchmark/extract/reconstruct.py). O lado INPUT, ao contrario do projeto torre_easy_lo_r00_tp1, e MEDIDO: linhas de CAD e aberturas reais.",
+   "origem": "PAR de documentos Revit abertos na mesma instancia - o primeiro benchmark do repo em que o INPUT NAO e' reconstruido a partir do gabarito",
+   "extraido_em": "2026-08-31",
+   "legacy_baselines": [
+    {
+     "path": "projects/torre_easy_lo_r00_tgd/baseline.json",
+     "kind": "solver_score_snapshot",
+     "source_field": "solver",
+     "success_rate": 0.0659,
+     "critical_errors": 1671
+    },
+    {
+     "path": "projects/torre_easy_lo_r00_tgd/baselines/baseline_real_v1.json",
+     "kind": "solver_decision_record",
+     "status_field": "OFICIAL",
+     "frozen_at": "2026-08-31",
+     "solver_decision_fingerprint": "c74c9c1ae0e3f169f76e05fe53c01a858fce0af5b4e9d5f1b86fd71e92d2a316"
+    }
+   ]
+  },
+  {
+   "project_id": "torre_easy_lo_r00_tp1",
+   "files_present": [
+    "baseline.json",
+    "input.json",
+    "metadata.json",
+    "reference.json",
+    "reference_score.json",
+    "score.json"
+   ],
+   "has_input": true,
+   "has_input_real": false,
+   "has_reference": true,
+   "has_metadata": true,
+   "input_walls": 96,
+   "reference_walls": 96,
+   "reference_confiabilidade": "RECONSTRUIDO - o .rvt entregue nao tem mais Walls nem Doors/Windows (0 de cada). Eixos, vaos e encontros vem do layout dos blocos (benchmark/extract/reconstruct.py), nao de elementos nativos. Ver README, secao piso de ruido.",
+   "origem": "projeto Revit ENTREGUE e aprovado, modulado por pessoa",
+   "extraido_em": "2026-08-31",
+   "legacy_baselines": [
+    {
+     "path": "projects/torre_easy_lo_r00_tp1/baseline.json",
+     "kind": "solver_score_snapshot",
+     "source_field": "solver",
+     "success_rate": 0.125,
+     "critical_errors": 1205
+    }
+   ]
+  }
+ ]
+}
