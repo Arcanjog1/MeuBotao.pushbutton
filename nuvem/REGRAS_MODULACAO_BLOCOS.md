@@ -3906,7 +3906,11 @@ Coberto por teste permanente (`tests/test_block_bonding.py`):
   seção 7 documenta. A asserção `plan["tier"] == "trim"` registrava um
   artefato do bug. As demais asserções do mesmo teste continuam válidas
   (`length_delta_cm <= 1e-9` — com `shift` o delta é exatamente 0).
-- **Pendência**: `tests/test_script.py` **não pode ser editado nesta
-  branch** (contrato de isolamento do `CR-BLOCK-01`). A correção é de uma
-  linha — trocar `"trim"` por `"shift"` — e fica registrada aqui para ser
-  aplicada em quem mesclar/auditar.
+- **Status da correção**: **APLICADA** — confirmada pelo cross-audit
+  independente da CONTA 2 (`claude/block-01-cross-audit`, veredito
+  APROVADO COM CORREÇÃO DE TESTE) e corrigida na branch de finalização
+  (`claude/block-01-finalize`): a asserção passou a exigir
+  `plan["tier"] == "shift"` explicitamente. Não foi feita nesta branch
+  original (`claude/block-01-prisma-fiadas-rik42t`) por causa do contrato
+  de isolamento entre as contas — `tests/test_script.py` não estava na
+  área de escrita autorizada dela.
