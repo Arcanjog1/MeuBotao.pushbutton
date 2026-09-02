@@ -12,6 +12,8 @@ sobre o motor que a produz.
 import os
 import sys
 
+import pytest
+
 # `nuvem/` precisa estar no sys.path para `benchmark.*` ser importavel -
 # mesma busca de `tests/test_script.py` (nao ha' `conftest.py` na raiz de
 # `tests/`, so' em `tests/regression/`, e este arquivo fica fora dali).
@@ -23,8 +25,8 @@ if os.path.isfile(os.path.join(_NUVEM_DIR, "benchmark", "__init__.py")) \
 
 from benchmark import model, scoring
 from benchmark.golden import (
-    compare, fingerprint, inventory, manifest, metrics, pipeline_order,
-    wall_diff, wall_order,
+    capabilities, compare, corpus, fingerprint, human_reference, inventory,
+    manifest, metrics, pipeline_order, pipeline_trace, wall_diff, wall_order,
 )
 from benchmark.validators import base
 
@@ -563,3 +565,424 @@ def test_manifest_json_existe_e_carrega_sem_erro():
     data = manifest.load_default()
     assert data["schema_version"] == manifest.SCHEMA_VERSION
     assert len(data["projects"]) >= 3
+
+
+# ======================================================================
+# CR-BLOCK-REFERENCE-CORPUS - a partir daqui
+# ======================================================================
+
+# ------------------------------------------------- dois eixos do manifesto
+def test_new_entry_deriva_kind_e_confidence_do_rotulo_legado():
+    """Item 16/48: chamada NO FORMATO ANTIGO (so' reference_type, sem
+    reference_kind/confidence) continua funcionando - os dois eixos novos
+    saem de LEGACY_TO_AXES sozinhos."""
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste")
+    assert entry["reference_kind"] == manifest.KIND_HUMAN
+    assert entry["confidence"] == manifest.CONFIDENCE_MEDIUM
+    assert entry["reproducible"] is True
+
+
+def test_projeto_nao_golden_participa_normalmente():
+    """Item 39: reference_type != GOLDEN_CONFIRMED nao impede nada - so'
+    muda o nivel de confianca. Um HUMAN_REFERENCE_AVAILABLE tem que
+    validar limpo e ser 'reproducible'."""
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste")
+    assert manifest.validate_entry(entry) == []
+    assert entry["reproducible"] is True
+    assert entry["reference_type"] != manifest.GOLDEN_CONFIRMED
+
+
+def test_projeto_golden_participa_normalmente():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.GOLDEN_CONFIRMED,
+        source="teste", validated_at="2026-09-02", approved_by_human=True)
+    assert manifest.validate_entry(entry) == []
+    assert entry["confidence"] == manifest.CONFIDENCE_GOLDEN
+
+
+def test_analysis_only_exige_missing_requirements_e_nao_reproduzivel():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.ANALYSIS_ONLY_REFERENCE,
+        source="teste")
+    problems = manifest.validate_entry(entry)
+    assert any("missing_requirements" in p for p in problems)
+
+    entry["missing_requirements"] = ["input.json com geometria"]
+    assert manifest.validate_entry(entry) == []
+    assert entry["reproducible"] is False
+
+
+def test_filter_by_reference_kind_e_confidence():
+    data = manifest.load_default()
+    human = manifest.filter_by_reference_kind(data, manifest.KIND_HUMAN)
+    assert {"torre_easy_lo_r00_tgd", "torre_easy_lo_r00_tp1"} <= set(
+        e["project_id"] for e in human)
+
+    medium_or_above = manifest.filter_by_confidence(data, minimum=manifest.CONFIDENCE_MEDIUM)
+    for entry in medium_or_above:
+        assert manifest.CONFIDENCE_RANK[entry["confidence"]] >= manifest.CONFIDENCE_RANK[manifest.CONFIDENCE_MEDIUM]
+
+    none_only = manifest.filter_by_confidence(data, exact=manifest.CONFIDENCE_NONE)
+    assert all(e["confidence"] == manifest.CONFIDENCE_NONE for e in none_only)
+
+
+# ------------------------------------------------------------- promocao
+def test_promote_recusa_promocao_sem_evidencia():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste")
+    with pytest.raises(manifest.PromotionError):
+        manifest.promote(entry, manifest.CONFIDENCE_HIGH, evidence="")
+
+
+def test_promote_recusa_degradar_confianca():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste")
+    with pytest.raises(manifest.PromotionError):
+        manifest.promote(entry, manifest.CONFIDENCE_LOW, evidence="tentativa invalida")
+
+
+def test_promote_medium_para_high_registra_verified_at_e_historico():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste")
+    promoted = manifest.promote(
+        entry, manifest.CONFIDENCE_HIGH,
+        evidence="revisei a extracao contra o .rvt original, bate 100%",
+        by="alguem@escritorio")
+    assert promoted["confidence"] == manifest.CONFIDENCE_HIGH
+    assert promoted["verified_at"]
+    assert len(promoted["promotion_history"]) == 1
+    assert manifest.validate_entry(promoted) == []
+    # original NAO foi mutado (item 33: nao sobrescrever historia em silencio)
+    assert entry["confidence"] == manifest.CONFIDENCE_MEDIUM
+
+
+def test_promote_high_para_golden_exige_approved_by_human():
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste", confidence=manifest.CONFIDENCE_HIGH, verified_at="2026-09-01")
+    with pytest.raises(manifest.PromotionError):
+        manifest.promote(entry, manifest.CONFIDENCE_GOLDEN, evidence="sem aprovacao formal ainda")
+
+    promoted = manifest.promote(
+        entry, manifest.CONFIDENCE_GOLDEN,
+        evidence="aprovado formalmente pelo responsavel tecnico em reuniao registrada",
+        by="responsavel_tecnico", extra_fields={"approved_by_human": True})
+    assert promoted["confidence"] == manifest.CONFIDENCE_GOLDEN
+    assert promoted["approved_by_human"] is True
+    assert manifest.validate_entry(promoted) == []
+
+
+def test_promocao_invalida_para_golden_sem_kind_human_e_recusada():
+    """GOLDEN so' faz sentido com reference_kind=HUMAN (item 3/38)."""
+    entry = manifest.new_entry(
+        project_id="x", name="x", reference_type=manifest.SOLVER_GENERATED_ONLY,
+        source="teste", reference_kind=manifest.KIND_SOLVER,
+        confidence=manifest.CONFIDENCE_HIGH, verified_at="2026-09-01")
+    with pytest.raises(manifest.PromotionError):
+        manifest.promote(
+            entry, manifest.CONFIDENCE_GOLDEN, evidence="tentativa invalida",
+            extra_fields={"approved_by_human": True})
+
+
+def test_manifesto_oficial_nao_tem_nenhum_confidence_golden_inventado():
+    """Item 6/39 continua valendo com os dois eixos: nenhum projeto do
+    repositorio tem confidence=GOLDEN hoje."""
+    data = manifest.load_default()
+    for entry in data["projects"]:
+        assert entry["confidence"] != manifest.CONFIDENCE_GOLDEN
+
+
+# ---------------------------------------------------------- capabilities
+def test_infer_capabilities_sem_scan_e_vazio():
+    assert capabilities.infer_capabilities(None) == []
+
+
+def test_infer_capabilities_detecta_abertura_prisma_e_ltx():
+    wall = _wall((0, 0), (300, 0), wall_id="W",
+                rows=[_row_with_blocks(0, [("B39", 0, 39)]),
+                     _row_with_blocks(1, [("B39", 0, 39)])])
+    wall["openings"] = [model.make_opening(model.OPENING_DOOR, 100, 180, 0, 210)]
+    wall["junctions"] = [{"type": model.JUNCTION_L, "point_cm": [300.0, 0.0], "neighbors": []}]
+    project = _project("p", "solver", [wall])
+
+    caps = capabilities.infer_capabilities(
+        {"has_reference": True, "has_input": True}, reference_kind=manifest.KIND_HUMAN,
+        reference_project=project)
+    assert capabilities.CAN_TEST_WALL_COVERAGE in caps
+    assert capabilities.CAN_TEST_BLOCK_LAYOUT in caps
+    assert capabilities.CAN_TEST_PRISM in caps
+    assert capabilities.CAN_TEST_OPENINGS in caps
+    assert capabilities.CAN_TEST_LTX in caps
+    assert capabilities.CAN_COMPARE_TO_HUMAN in caps
+    assert capabilities.CAN_TEST_DETERMINISM in caps
+
+
+def test_infer_capabilities_projeto_sem_abertura_nem_ltx_nao_reclama():
+    wall = _wall((0, 0), (300, 0), wall_id="W", rows=[_row_with_blocks(0, [("B39", 0, 39)])])
+    project = _project("p", "solver", [wall])
+    caps = capabilities.infer_capabilities({"has_input": True}, reference_project=project)
+    assert capabilities.CAN_TEST_OPENINGS not in caps
+    assert capabilities.CAN_TEST_LTX not in caps
+    assert capabilities.CAN_TEST_PRISM not in caps  # so' 1 fiada
+
+
+def test_manifesto_oficial_reflete_capabilities_reais():
+    data = manifest.load_default()
+    tgd = manifest.get(data, "torre_easy_lo_r00_tgd")
+    for cap in (capabilities.CAN_TEST_WALL_COVERAGE, capabilities.CAN_TEST_OPENINGS,
+               capabilities.CAN_TEST_LTX, capabilities.CAN_COMPARE_TO_HUMAN):
+        assert cap in tgd["capabilities"]
+    analysis_only = manifest.get(data, "chacara_torre_easy_lo_tropicale")
+    assert analysis_only["capabilities"] == []
+
+
+# --------------------------------------------------------------- corpus
+def test_reference_corpus_lista_os_projetos_do_manifesto():
+    rc = corpus.ReferenceCorpus.load_default()
+    ids = set(rc.list_projects())
+    assert {"torre_easy_lo_r00_tgd", "torre_easy_lo_r00_tp1",
+           "piloto_sintetico_2x2"} <= ids
+
+
+def test_reference_corpus_get_project_inexistente_e_none():
+    rc = corpus.ReferenceCorpus.load_default()
+    assert rc.get_project("nao-existe-de-verdade") is None
+
+
+def test_reference_corpus_filter_by_capability():
+    rc = corpus.ReferenceCorpus.load_default()
+    entries = rc.filter_by_capability(capabilities.CAN_COMPARE_TO_HUMAN)
+    assert entries
+    for entry in entries:
+        assert capabilities.CAN_COMPARE_TO_HUMAN in entry["capabilities"]
+
+
+def test_reference_corpus_golden_projects_vazio_hoje():
+    rc = corpus.ReferenceCorpus.load_default()
+    assert rc.golden_projects() == []
+
+
+def test_reference_corpus_analysis_only_projects_nao_reproducible():
+    rc = corpus.ReferenceCorpus.load_default()
+    entries = rc.analysis_only_projects()
+    assert entries
+    for entry in entries:
+        assert entry["reproducible"] is False
+
+
+def test_run_corpus_marca_analysis_only_como_not_comparable_com_motivo():
+    rc = corpus.ReferenceCorpus.load_default()
+    rows = corpus.run_corpus(rc, project_ids=["chacara_torre_easy_lo_tropicale"])
+    assert len(rows) == 1
+    assert rows[0]["comparable"] is False
+    assert rows[0]["reason"]
+
+
+def test_run_corpus_projeto_reproduzivel_compara_baseline_consigo_mesmo():
+    rc = corpus.ReferenceCorpus.load_default()
+    rows = corpus.run_corpus(rc, project_ids=["piloto_sintetico_2x2"],
+                             reference_artifact="baseline", current_artifact="baseline")
+    assert rows[0]["comparable"] is True
+    assert rows[0]["comparison"]["verdict"] == compare.VERDICT_NEUTRAL
+
+
+def test_summarize_corpus_run_nunca_esconde_regressao_critica_atras_de_media():
+    """Item 19, literal: 2 projetos melhoram/ficam neutros, 1 tem
+    regressao critica -> overall NUNCA pode ser IMPROVED/NEUTRAL."""
+    reference_score = _score_with_critical(0, wall_count=3)
+    current_score_ok = _score_with_critical(0, wall_count=3)
+    current_score_critical = _score_with_critical(2, wall_count=3)
+
+    rows = [
+        {"project_id": "bom_1", "comparable": True, "reason": None,
+         "comparison": compare.compare({"score": reference_score}, {"score": current_score_ok})},
+        {"project_id": "bom_2", "comparable": True, "reason": None,
+         "comparison": compare.compare({"score": reference_score}, {"score": current_score_ok})},
+        {"project_id": "quebrou_porta", "comparable": True, "reason": None,
+         "comparison": compare.compare({"score": reference_score}, {"score": current_score_critical})},
+    ]
+    summary = corpus.summarize_corpus_run(rows)
+    assert summary["overall"] == corpus.CRITICAL_REGRESSION_PRESENT
+    assert summary["critical_regressions"]
+    assert summary["critical_regressions"][0]["project_id"] == "quebrou_porta"
+
+
+def test_build_matrix_marca_not_comparable_quando_projeto_nao_comparavel():
+    rows = [{"project_id": "x", "comparable": False, "reason": "sem dado", "comparison": None}]
+    matrix = corpus.build_matrix(rows)
+    assert matrix["rows"][0]["cells"]["coverage"] == corpus.NOT_COMPARABLE
+
+
+def test_teste_fundamental_corpus_com_human_solver_e_synthetic_sem_nenhum_golden():
+    """Item 45, literal: um corpus com 1 HUMAN_REFERENCE, 1 SOLVER_REFERENCE
+    (aqui: LEGACY_BASELINE, que e' reference_kind=SOLVER) e 1
+    SYNTHETIC_REFERENCE executa os tres - nenhum precisa ser
+    GOLDEN_CONFIRMED."""
+    human_entry = manifest.new_entry(
+        project_id="humano", name="humano", reference_type=manifest.HUMAN_REFERENCE_AVAILABLE,
+        source="teste", available_metrics=["quality"])
+    solver_entry = manifest.new_entry(
+        project_id="solver", name="solver", reference_type=manifest.LEGACY_BASELINE,
+        source="teste", available_metrics=["quality"])
+    synthetic_entry = manifest.new_entry(
+        project_id="sintetico", name="sintetico", reference_type=manifest.SOLVER_GENERATED_ONLY,
+        reference_kind=manifest.KIND_SYNTHETIC, confidence=manifest.CONFIDENCE_NONE,
+        source="teste", available_metrics=["quality"])
+
+    for entry in (human_entry, solver_entry, synthetic_entry):
+        assert entry["reference_type"] != manifest.GOLDEN_CONFIRMED
+        assert entry["confidence"] != manifest.CONFIDENCE_GOLDEN
+        assert manifest.validate_entry(entry) == []
+
+    rc = corpus.ReferenceCorpus(manifest.make_manifest(
+        [human_entry, solver_entry, synthetic_entry]))
+    assert rc.list_projects() == ["humano", "solver", "sintetico"]
+    assert len(rc.human_reference_projects()) == 1
+    assert len(rc.filter_by_reference_kind(manifest.KIND_SOLVER)) == 1
+    assert len(rc.filter_by_reference_kind(manifest.KIND_SYNTHETIC)) == 1
+    assert rc.golden_projects() == []
+
+    # Todos os tres sao reproduzeis o bastante para "executar" (item 45)
+    # mesmo sem golden - reproducible e' derivado do EIXO, nunca de golden.
+    assert all(e["reproducible"] for e in rc.all_entries())
+
+
+# ---------------------------------------------------------- pipeline_trace
+def test_pipeline_trace_evento_com_estagio_desconhecido_e_rejeitado():
+    with pytest.raises(ValueError):
+        pipeline_trace.make_trace_event("W001", "ESTAGIO_INVENTADO", 1)
+
+
+def test_pipeline_trace_ordem_correta_valida_ok():
+    events = [
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_WALL_START, 1),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_INTERSECTIONS_RESOLVED, 2),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_CONTINUOUS_FILL, 3),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_PRISM_VALIDATED, 4),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_OPENING_APPLIED, 5, opening_id="O1"),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_CONFLICTING_BLOCK_REMOVED, 6, opening_id="O1"),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_LOCAL_REPAIR, 7, opening_id="O1"),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_FINAL_VALIDATION, 8),
+    ]
+    result = pipeline_trace.validate_trace(events)
+    assert result["ok"] is True
+    assert result["walls_checked"] == 1
+
+
+def test_pipeline_trace_parede_sem_abertura_pode_pular_estagios_de_abertura():
+    events = [
+        pipeline_trace.make_trace_event("W002", pipeline_trace.STAGE_WALL_START, 1),
+        pipeline_trace.make_trace_event("W002", pipeline_trace.STAGE_CONTINUOUS_FILL, 2),
+        pipeline_trace.make_trace_event("W002", pipeline_trace.STAGE_PRISM_VALIDATED, 3),
+        pipeline_trace.make_trace_event("W002", pipeline_trace.STAGE_FINAL_VALIDATION, 4),
+    ]
+    assert pipeline_trace.validate_trace(events)["ok"] is True
+
+
+def test_pipeline_trace_estagio_fora_de_ordem_e_apontado():
+    events = [
+        pipeline_trace.make_trace_event("W003", pipeline_trace.STAGE_OPENING_APPLIED, 1),
+        pipeline_trace.make_trace_event("W003", pipeline_trace.STAGE_WALL_START, 2),
+    ]
+    result = pipeline_trace.validate_trace(events)
+    assert result["ok"] is False
+    assert result["problems"][0]["wall_id"] == "W003"
+
+
+def test_pipeline_trace_sequence_repetida_e_apontada():
+    events = [
+        pipeline_trace.make_trace_event("W004", pipeline_trace.STAGE_WALL_START, 1),
+        pipeline_trace.make_trace_event("W004", pipeline_trace.STAGE_CONTINUOUS_FILL, 1),
+    ]
+    result = pipeline_trace.validate_trace(events)
+    assert result["ok"] is False
+
+
+def test_pipeline_trace_parse_trace_reporta_evento_malformado_sem_derrubar_os_outros():
+    raw = [
+        {"wall_id": "W001", "stage": pipeline_trace.STAGE_WALL_START, "sequence": 1},
+        {"wall_id": "W001", "stage": "NAO_EXISTE", "sequence": 2},
+        {"stage": pipeline_trace.STAGE_FINAL_VALIDATION, "sequence": 3},  # sem wall_id
+    ]
+    events, problems = pipeline_trace.parse_trace(raw)
+    assert len(events) == 1
+    assert len(problems) == 2
+
+
+def test_pipeline_order_from_trace_sem_eventos_e_not_available():
+    result = pipeline_order.continuous_first_evidence_from_trace()
+    assert result["status"] == pipeline_order.STATUS_NOT_AVAILABLE
+
+
+def test_pipeline_order_from_trace_com_eventos_ok_da_matches():
+    events = [
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_WALL_START, 1),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_FINAL_VALIDATION, 2),
+    ]
+    result = pipeline_order.continuous_first_evidence_from_trace(events)
+    assert result["status"] == pipeline_order.STATUS_MATCHES
+
+
+def test_pipeline_order_from_trace_com_eventos_fora_de_ordem_da_diverges():
+    events = [
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_FINAL_VALIDATION, 1),
+        pipeline_trace.make_trace_event("W001", pipeline_trace.STAGE_WALL_START, 2),
+    ]
+    result = pipeline_order.continuous_first_evidence_from_trace(events)
+    assert result["status"] == pipeline_order.STATUS_DIVERGES
+    assert result["problems"]
+
+
+# ------------------------------------------------------- human_reference
+def test_classify_difference_changed_code_sem_findings_e_equivalent():
+    diff = {"action": wall_diff.ACTION_CHANGED_CODE, "wall": "W001"}
+    assert human_reference.classify_difference(diff) == human_reference.CLASS_EQUIVALENT
+
+
+def test_classify_difference_layout_sem_findings_e_unknown_nunca_adivinhado():
+    """Item 41: nao inventar equivalencia sem base - sem achados para
+    checar nivel 1, ADDED/REMOVED/MOVED fica UNKNOWN, nunca DIFFERENT_VALID."""
+    diff = {"action": wall_diff.ACTION_ADDED, "wall": "W001"}
+    assert human_reference.classify_difference(diff) == human_reference.CLASS_UNKNOWN
+
+
+def test_classify_difference_layout_com_nivel1_e_potential_regression():
+    diff = {"action": wall_diff.ACTION_MOVED, "wall": "W001"}
+    findings = [base.finding("POSITION_OVERLAP", wall="W001", detail="colisao")]
+    assert (human_reference.classify_difference(diff, findings=findings)
+           == human_reference.CLASS_POTENTIAL_REGRESSION)
+
+
+def test_classify_difference_layout_sem_nivel1_e_different_valid():
+    diff = {"action": wall_diff.ACTION_ADDED, "wall": "W001"}
+    findings = [base.finding("PRISM_STAGGER_BELOW_TARGET", wall="W001", detail="nivel 2")]
+    assert (human_reference.classify_difference(diff, findings=findings)
+           == human_reference.CLASS_DIFFERENT_VALID)
+
+
+def test_classify_difference_changed_code_com_nivel1_e_rule_violation():
+    diff = {"action": wall_diff.ACTION_CHANGED_CODE, "wall": "W001"}
+    findings = [base.finding("JUNCTION_MISSING_BINDING", wall="W001", detail="sem amarracao")]
+    assert (human_reference.classify_difference(diff, findings=findings)
+           == human_reference.CLASS_RULE_VIOLATION)
+
+
+def test_human_vs_solver_report_conta_por_classe():
+    current = _one_wall_project("cur", "solver", [[("B39", 0, 39), ("B19", 40, 59)]])
+    reference = _one_wall_project("ref", "revit_reference", [[("B34", 0, 39)]])
+    comparison = wall_diff.compute_wall_diff(current, reference)
+    wall_diff_result = wall_diff.wall_diff_report(comparison)
+    report = human_reference.human_vs_solver_report(wall_diff_result, findings=None)
+    assert report["findings_available"] is False
+    assert sum(report["totals"].values()) > 0
+
+
+# =================================================================== fim
+
