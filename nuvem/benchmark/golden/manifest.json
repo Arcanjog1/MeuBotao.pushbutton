@@ -1,0 +1,83 @@
+{
+ "schema_version": 1,
+ "generated_by": "nuvem/benchmark/golden/manifest.py",
+ "principle": "Um baseline.json produzido pelo proprio solver NUNCA e' tratado como golden automaticamente (ver README desta secao). Promover um projeto a GOLDEN_CONFIRMED e' acao manual, com prova de validacao humana registrada.",
+ "reference_types": {
+  "GOLDEN_CONFIRMED": "Referencia com PROVA registrada de validacao/aprovacao humana explicita (data + quem aprovou, ou processo formal descrito em metadata.json). Pode ser tratada como verdade.",
+  "HUMAN_REFERENCE_AVAILABLE": "Projeto Revit real, entregue, com blocos posicionados por uma pessoa (nao pelo solver). Nao ha' registro formal de aprovacao capturado - e' o melhor candidato a golden, mas AINDA NAO E' um.",
+  "LEGACY_BASELINE": "Snapshot congelado de uma execucao ANTERIOR DO PROPRIO SOLVER (ex.: baseline.json gravado por `runner.py --save-baseline`). Prova reprodutibilidade/determinismo, NUNCA correcao.",
+  "SOLVER_GENERATED_ONLY": "Nao existe gabarito humano nem baseline de regressao - so' entrada + o que o solver decidir agora. Usado como fixture de infraestrutura (ex.: piloto_sintetico_2x2), nao como referencia.",
+  "UNKNOWN": "Origem nao determinada a partir do que esta' gravado no repositorio - precisa de investigacao antes de qualquer uso."
+ },
+ "projects": [
+  {
+   "project_id": "torre_easy_lo_r00_tgd",
+   "name": "TORRE EASY-LO-R00 - nivel 04. TGD (input medido x referencia humana reconstruida)",
+   "status": "HUMAN_REFERENCE_AVAILABLE",
+   "reference_type": "HUMAN_REFERENCE_AVAILABLE",
+   "source": "PAR de documentos Revit reais (TESTE MODULACAO (2026) = input medido; TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt nivel 04. TGD = projeto entregue) - extraidos via mcp__revit-pyrevit__execute_revit_code, READ-ONLY",
+   "created_at": "2026-08-31",
+   "validated_at": null,
+   "baseline_commit": null,
+   "has_revit_model": true,
+   "produced_by_solver": false,
+   "approved_by_human": false,
+   "available_metrics": [
+    "blocks",
+    "courses",
+    "junctions",
+    "openings",
+    "prism",
+    "quality",
+    "walls"
+   ],
+   "notes": "reference.json e RECONSTRUIDO a partir do layout dos blocos (o .rvt entregue nao tem mais Wall/Door/Window nativos - 0 de cada, ver metadata.json). Os blocos em si foram posicionados por uma PESSOA (nao pelo solver): e por isso HUMAN_REFERENCE_AVAILABLE e nao SOLVER_GENERATED_ONLY. Nao ha, porem, nenhum registro de aprovacao formal (data/responsavel/processo de sign-off) em metadata.json - por isso NAO e GOLDEN_CONFIRMED (item 6 do pedido: nao inventar golden). baseline.json e baselines/baseline_real_v1.json sao LEGACY_BASELINE (saida do proprio solver, congelada para regressao/determinismo) - ver entradas separadas em legacy_baselines."
+  },
+  {
+   "project_id": "torre_easy_lo_r00_tp1",
+   "name": "TORRE EASY-LO-R00 (JARDIM DA COSTA BEACH CLUB) - nivel 05. TP1",
+   "status": "HUMAN_REFERENCE_AVAILABLE",
+   "reference_type": "HUMAN_REFERENCE_AVAILABLE",
+   "source": "Projeto Revit entregue e aprovado no fluxo do escritorio, extraido via mcp__revit-pyrevit__execute_revit_code (READ-ONLY)",
+   "created_at": "2026-08-31",
+   "validated_at": null,
+   "baseline_commit": null,
+   "has_revit_model": true,
+   "produced_by_solver": false,
+   "approved_by_human": false,
+   "available_metrics": [
+    "blocks",
+    "courses",
+    "junctions",
+    "openings",
+    "prism",
+    "quality",
+    "walls"
+   ],
+   "notes": "reference.json e RECONSTRUIDO (mesma limitacao do TGD: 0 Wall/Door/Window nativos no .rvt entregue). aberturas marcadas confidence=reconstructed. Blocos posicionados por pessoa => HUMAN_REFERENCE_AVAILABLE. Sem registro de aprovacao formal => NAO GOLDEN_CONFIRMED. input.json deste projeto (diferente do TGD) e RECONSTRUIDO a partir do proprio gabarito (reconstruct.input_from_reference), nao medido - ver README secao \"Como extrair\"."
+  },
+  {
+   "project_id": "piloto_sintetico_2x2",
+   "name": "Grade sintetica 2x2 - 12 eixos, 8 fiadas",
+   "status": "SOLVER_GENERATED_ONLY",
+   "reference_type": "SOLVER_GENERATED_ONLY",
+   "source": "Gerado por benchmark/extract/synthetic.py - nao e projeto real, sem par humano",
+   "created_at": "2026-08-31",
+   "validated_at": null,
+   "baseline_commit": null,
+   "has_revit_model": false,
+   "produced_by_solver": true,
+   "approved_by_human": false,
+   "available_metrics": [
+    "blocks",
+    "courses",
+    "junctions",
+    "openings",
+    "prism",
+    "quality",
+    "walls"
+   ],
+   "notes": "Sem reference.json (\"SEM GABARITO\" no metadata.json) - so existe input.json + o que o solver decide agora. Usado como fixture barata e reproduzivel de regressao/determinismo da infraestrutura, nunca como fonte de verdade sobre modulacao correta."
+  }
+ ]
+}
