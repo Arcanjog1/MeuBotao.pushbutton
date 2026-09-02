@@ -73,22 +73,124 @@ def test_fingerprint_ignora_ordem_das_paredes_na_lista():
 
 
 def test_fingerprint_nao_muda_com_reversao_de_ponta():
-    """Item 16: nunca depender de GetEndPoint(0)/GetEndPoint(1) cru - a
-    MESMA parede desenhada ao contrario tem que dar o mesmo fingerprint,
-    porque a chave (`model.wall_stable_key`) ja' normaliza o sentido."""
+    """Item 16/22: nunca depender de GetEndPoint(0)/GetEndPoint(1) cru - a
+    MESMA parede FISICA desenhada ao contrario tem que dar o mesmo
+    fingerprint. O bloco fisico ocupa x=[0,39] no mundo; desenhada
+    (300,0)->(0,0), o MESMO bloco fica em t=[261,300] relativo a' nova
+    origem (300 - 39 = 261, 300 - 0 = 300) - e' o espelhamento que
+    `fingerprint._canonical_t_range` desfaz antes de assinar."""
     forward = _wall((0, 0), (300, 0), wall_id="W",
                     rows=[_row_with_blocks(0, [("B39", 0, 39)])])
     backward = _wall((300, 0), (0, 0), wall_id="W",
-                     rows=[_row_with_blocks(0, [("B39", 0, 39)])])
+                     rows=[_row_with_blocks(0, [("B39", 261, 300)])])
     p1 = _project("p", "solver", [forward])
     p2 = _project("p", "solver", [backward])
     assert fingerprint.canonical_fingerprint(p1) == fingerprint.canonical_fingerprint(p2)
+
+
+def test_fingerprint_reversao_de_ponta_realmente_espelha_nao_e_tautologia():
+    """Guarda contra o proprio erro que este teste tinha antes de ser
+    corrigido: se a parede reversa levar o MESMO t_start/t_end cru (sem
+    espelhar), o fingerprint deve dar DIFERENTE - senao o teste anterior
+    passaria so' porque comparava o bloco errado do lado errado, nunca
+    provando reversao de verdade."""
+    forward = _wall((0, 0), (300, 0), wall_id="W",
+                    rows=[_row_with_blocks(0, [("B39", 0, 39)])])
+    backward_sem_espelhar = _wall((300, 0), (0, 0), wall_id="W",
+                                  rows=[_row_with_blocks(0, [("B39", 0, 39)])])
+    p1 = _project("p", "solver", [forward])
+    p2 = _project("p", "solver", [backward_sem_espelhar])
+    assert fingerprint.canonical_fingerprint(p1) != fingerprint.canonical_fingerprint(p2)
 
 
 def test_fingerprint_muda_quando_uma_peca_muda():
     a = _one_wall_project("p", "solver", [[("B39", 0, 39)]])
     b = _one_wall_project("p", "solver", [[("B34", 0, 34), ("B04", 34, 38)]])
     assert fingerprint.canonical_fingerprint(a) != fingerprint.canonical_fingerprint(b)
+
+
+# --------------------------------------------------- fingerprint: aberturas
+def test_opening_signature_nao_muda_com_reversao_de_ponta():
+    """Item 23: a MESMA abertura fisica (x=[100,150] no mundo, peitoril
+    90) numa parede desenhada (0,0)->(300,0) ou (300,0)->(0,0) tem que
+    gerar a mesma assinatura - t espelhado (300-150=150, 300-100=200)."""
+    janela_fwd = model.make_opening(model.OPENING_WINDOW, 100, 150, 90, 200)
+    wall_fwd = _wall((0, 0), (300, 0), wall_id="W")
+    wall_fwd["openings"] = [janela_fwd]
+
+    janela_bwd = model.make_opening(model.OPENING_WINDOW, 150, 200, 90, 200)
+    wall_bwd = _wall((300, 0), (0, 0), wall_id="W")
+    wall_bwd["openings"] = [janela_bwd]
+
+    sig_fwd = fingerprint.canonical_opening_signatures(_project("p", "solver", [wall_fwd]))
+    sig_bwd = fingerprint.canonical_opening_signatures(_project("p", "solver", [wall_bwd]))
+    assert sig_fwd == sig_bwd
+    assert sig_fwd[0]["kind"] == model.OPENING_WINDOW
+    assert sig_fwd[0]["width_cm"] == 50.0
+
+
+def test_opening_signature_entra_no_fingerprint_do_projeto():
+    wall_com_abertura = _wall((0, 0), (300, 0), wall_id="W")
+    wall_com_abertura["openings"] = [model.make_opening(model.OPENING_DOOR, 100, 180, 0, 210)]
+    wall_sem_abertura = _wall((0, 0), (300, 0), wall_id="W")
+
+    a = fingerprint.canonical_fingerprint(_project("p", "solver", [wall_com_abertura]))
+    b = fingerprint.canonical_fingerprint(_project("p", "solver", [wall_sem_abertura]))
+    assert a != b
+
+
+# ---------------------------------------------------------- fingerprint: L/T/X
+def test_junction_signature_agrupa_por_ponto_nunca_por_indice():
+    """Item 22/24: `neighbors` no dado bruto e' um indice de lista da
+    extracao (proibido). Mesmo com indices ERRADOS/trocados nas duas
+    copias, agrupar pelo PONTO fisico (`point_cm`) + a CHAVE ESTAVEL de
+    cada parede tem que continuar dando o no' certo."""
+    wall_a = _wall((0, 0), (300, 0), wall_id="A")
+    wall_a["junctions"] = [{
+        "type": model.JUNCTION_L, "t_cm": 300.0, "point_cm": [300.0, 0.0],
+        "neighbors": [999], "at_end": True,  # indice de lista propositalmente absurdo
+    }]
+    wall_b = _wall((300, 0), (300, 300), wall_id="B")
+    wall_b["junctions"] = [{
+        "type": model.JUNCTION_L, "t_cm": 0.0, "point_cm": [300.0, 0.0],
+        "neighbors": [-7], "at_end": True,  # idem
+    }]
+    project = _project("p", "solver", [wall_a, wall_b])
+    signatures = fingerprint.canonical_junction_signatures(project)
+    assert len(signatures) == 1
+    node = signatures[0]
+    assert node["point_cm"] == [300.0, 0.0]
+    assert node["type"] == [model.JUNCTION_L]
+    assert len(node["walls"]) == 2  # as DUAS chaves de parede, nunca os indices 999/-7
+
+
+def test_junction_signature_independe_da_ordem_das_paredes_na_lista():
+    wall_a = _wall((0, 0), (300, 0), wall_id="A")
+    wall_a["junctions"] = [{"type": model.JUNCTION_T, "point_cm": [300.0, 0.0], "neighbors": []}]
+    wall_b = _wall((300, 0), (300, 300), wall_id="B")
+    wall_b["junctions"] = [{"type": model.JUNCTION_T, "point_cm": [300.0, 0.0], "neighbors": []}]
+
+    p1 = _project("p", "solver", [wall_a, wall_b])
+    p2 = _project("p", "solver", [wall_b, wall_a])
+    assert (fingerprint.canonical_junction_signatures(p1)
+           == fingerprint.canonical_junction_signatures(p2))
+
+
+def test_junction_signature_marca_conflito_de_tipo_em_vez_de_esconder():
+    wall_a = _wall((0, 0), (300, 0), wall_id="A")
+    wall_a["junctions"] = [{"type": model.JUNCTION_L, "point_cm": [300.0, 0.0], "neighbors": []}]
+    wall_b = _wall((300, 0), (300, 300), wall_id="B")
+    wall_b["junctions"] = [{"type": model.JUNCTION_T, "point_cm": [300.0, 0.0], "neighbors": []}]
+    project = _project("p", "solver", [wall_a, wall_b])
+    node = fingerprint.canonical_junction_signatures(project)[0]
+    assert node["type"] == [model.JUNCTION_L, model.JUNCTION_T]
+
+
+def test_component_fingerprints_tem_as_tres_partes_e_o_geral():
+    project = _one_wall_project("p", "solver", [[("B39", 0, 39)]])
+    parts = fingerprint.component_fingerprints(project)
+    assert set(parts) == {"walls_blocks", "openings", "junctions", "overall"}
+    assert parts["overall"] == fingerprint.canonical_fingerprint(project)
 
 
 def test_multi_run_report_detecta_determinismo():
