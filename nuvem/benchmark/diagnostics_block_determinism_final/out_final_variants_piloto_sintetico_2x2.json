@@ -1,0 +1,2389 @@
+{
+  "project_id": "piloto_sintetico_2x2",
+  "n_variants_total": 24,
+  "global_distinct_fingerprints": 6,
+  "deterministic": false,
+  "per_layer_distinct_fingerprints": {
+    "input_wall_geometry": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "a89e70706315": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "wall_graph_node_positions": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "aa31cffdf716": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "node_types": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "e84a4b724fbc": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "node_arms": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "4144ed360ed3": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "wall_end_to_node_canonical": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "04ab2cab01d2": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "midspan_crossings": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "4f53cda18c2b": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "physical_ties": {
+      "distinct_fingerprints": 1,
+      "deterministic": true,
+      "groups": {
+        "cd889e1072a8": [
+          "baseline",
+          "reversed",
+          "endpoint_reversal",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "physical_standard_fill": {
+      "distinct_fingerprints": 6,
+      "deterministic": false,
+      "groups": {
+        "b62a6c25d492": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ],
+        "90739725eb8a": [
+          "endpoint_reversal"
+        ],
+        "8865076f5a1e": [
+          "reverse_horizontal_only"
+        ],
+        "fa56c8fff938": [
+          "reverse_vertical_only"
+        ],
+        "64e7e90660d4": [
+          "random_endpoint_reversal_seed_1"
+        ],
+        "4e1ae456dded": [
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "physical_opening_repair_fill": {
+      "distinct_fingerprints": 6,
+      "deterministic": false,
+      "groups": {
+        "8b863275d2da": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ],
+        "ad32fbcb31e0": [
+          "endpoint_reversal"
+        ],
+        "fb5de68ee19d": [
+          "reverse_horizontal_only"
+        ],
+        "8e346f110cf7": [
+          "reverse_vertical_only"
+        ],
+        "52cbb2bdcec5": [
+          "random_endpoint_reversal_seed_1"
+        ],
+        "0f58b9c16365": [
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "physical_block_layouts": {
+      "distinct_fingerprints": 6,
+      "deterministic": false,
+      "groups": {
+        "6af5ab4b81ff": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ],
+        "477cf0c27371": [
+          "endpoint_reversal"
+        ],
+        "e2074278bb9f": [
+          "reverse_horizontal_only"
+        ],
+        "3889f8d8b63f": [
+          "reverse_vertical_only"
+        ],
+        "7f81f1d22e48": [
+          "random_endpoint_reversal_seed_1"
+        ],
+        "1b200ca3ec56": [
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    },
+    "global_result": {
+      "distinct_fingerprints": 6,
+      "deterministic": false,
+      "groups": {
+        "3066f0a295e9": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ],
+        "c6cfea9fe552": [
+          "endpoint_reversal"
+        ],
+        "5933c52cedbe": [
+          "reverse_horizontal_only"
+        ],
+        "2957fd72185c": [
+          "reverse_vertical_only"
+        ],
+        "c892338a4a5e": [
+          "random_endpoint_reversal_seed_1"
+        ],
+        "0fa70ccffcb4": [
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    }
+  },
+  "downstream_range": {
+    "pieces": {
+      "min": 692,
+      "max": 780,
+      "spread": 88
+    },
+    "non_modular": {
+      "min": 32,
+      "max": 32,
+      "spread": 0
+    },
+    "intersection_failures": {
+      "min": 0,
+      "max": 0,
+      "spread": 0
+    },
+    "alignment_conflicts": {
+      "min": 0,
+      "max": 0,
+      "spread": 0
+    },
+    "collisions": {
+      "min": 0,
+      "max": 0,
+      "spread": 0
+    },
+    "door_void_violations": {
+      "min": 0,
+      "max": 0,
+      "spread": 0
+    },
+    "B39": {
+      "min": 434,
+      "max": 444,
+      "spread": 10
+    },
+    "B34": {
+      "min": 152,
+      "max": 162,
+      "spread": 10
+    },
+    "B54": {
+      "min": 0,
+      "max": 0,
+      "spread": 0
+    },
+    "B19": {
+      "min": 60,
+      "max": 88,
+      "spread": 28
+    },
+    "C09": {
+      "min": 8,
+      "max": 72,
+      "spread": 64
+    },
+    "C04": {
+      "min": 0,
+      "max": 50,
+      "spread": 50
+    },
+    "runtime_s": {
+      "min": 0.054,
+      "max": 0.232,
+      "spread": 0.178
+    }
+  },
+  "placement_reason_range": {
+    "L_CORNER": {
+      "min": 32,
+      "max": 32,
+      "spread": 0
+    },
+    "OPENING_REPAIR_FILL": {
+      "min": 40,
+      "max": 140,
+      "spread": 100
+    },
+    "STANDARD_FILL": {
+      "min": 568,
+      "max": 580,
+      "spread": 12
+    },
+    "T_INTERSECTION_DEGRADED_L": {
+      "min": 32,
+      "max": 32,
+      "spread": 0
+    },
+    "X_INTERSECTION_DEGRADED": {
+      "min": 8,
+      "max": 8,
+      "spread": 0
+    }
+  },
+  "divergences": [
+    {
+      "variant": "endpoint_reversal",
+      "first_divergent_layer": "physical_standard_fill"
+    },
+    {
+      "variant": "reverse_horizontal_only",
+      "first_divergent_layer": "physical_standard_fill"
+    },
+    {
+      "variant": "reverse_vertical_only",
+      "first_divergent_layer": "physical_standard_fill"
+    },
+    {
+      "variant": "random_endpoint_reversal_seed_1",
+      "first_divergent_layer": "physical_standard_fill"
+    },
+    {
+      "variant": "random_endpoint_reversal_seed_2",
+      "first_divergent_layer": "physical_standard_fill"
+    }
+  ],
+  "results": [
+    {
+      "name": "baseline",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.232,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "reversed",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.073,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "endpoint_reversal",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "90739725eb8af03b9b7ed417e37b2d3144a86872c8efb879da0f2c69ec01a732",
+          "n_rows": 580
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "ad32fbcb31e03c45c2c6bccbc6bc2425ab4c1a75dbc84926d439f58f36b55452",
+          "n_rows": 40
+        },
+        "physical_block_layouts": {
+          "fingerprint": "477cf0c27371d553ffb1cb9015840a2301c51c160719019f577f14729e410fbc",
+          "n_rows": 692
+        },
+        "global_result": {
+          "fingerprint": "c6cfea9fe552396e7f916b252aaa560a695b9abed4e7fc7e7aa4c7b14f37922f",
+          "n_rows": 1447
+        }
+      },
+      "downstream": {
+        "pieces": 692,
+        "coverage_pieces_by_code": {
+          "B34": 152,
+          "C09": 8,
+          "B19": 88,
+          "B39": 444
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 8,
+        "C04": 0,
+        "B19": 88,
+        "runtime_s": 0.07,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 580,
+          "OPENING_REPAIR_FILL": 40
+        },
+        "B39": 444,
+        "B34": 152,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_1",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.063,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_2",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.063,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_3",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.065,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_10",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.061,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_42",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.06,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_5",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.062,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_7",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.061,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_11",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.059,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_13",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.063,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_17",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.065,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_23",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.071,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_50",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.064,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_99",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.066,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_123",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.063,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_seed_999",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.061,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "reverse_horizontal_only",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "8865076f5a1e819c2be75298bc06e496144a800fd86dd7c5480d734c6e815cf7",
+          "n_rows": 576
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "fb5de68ee19db24c5d447f40705d44627dfee9d9f10ceb95bbe6d767c5252632",
+          "n_rows": 84
+        },
+        "physical_block_layouts": {
+          "fingerprint": "e2074278bb9f6c55c2b8627351aeccea24dbc5390ec983f81bf370331016435c",
+          "n_rows": 732
+        },
+        "global_result": {
+          "fingerprint": "5933c52cedbea09d1f99b5e8c1cf73efe4c79fbfd309fd997b14bbbf7a2c4e6e",
+          "n_rows": 1527
+        }
+      },
+      "downstream": {
+        "pieces": 732,
+        "coverage_pieces_by_code": {
+          "B34": 154,
+          "C09": 44,
+          "B19": 68,
+          "B39": 444,
+          "C04": 22
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 44,
+        "C04": 22,
+        "B19": 68,
+        "runtime_s": 0.054,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 576,
+          "OPENING_REPAIR_FILL": 84
+        },
+        "B39": 444,
+        "B34": 154,
+        "B54": 0
+      }
+    },
+    {
+      "name": "reverse_vertical_only",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "fa56c8fff938410359012f1ede2e9088b3e27a0897e441dfb458781551dacc78",
+          "n_rows": 572
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8e346f110cf7f529b39d73e4dd516c79a608316093e5df78f5c443c567ec0c9b",
+          "n_rows": 96
+        },
+        "physical_block_layouts": {
+          "fingerprint": "3889f8d8b63f2cb5254155ce370e65348b13008fd21df195ec052da7cbd3581c",
+          "n_rows": 740
+        },
+        "global_result": {
+          "fingerprint": "2957fd72185c9c6bfa175a5a53f764377bf6ba33626182ad4f34e2878dc8b1d5",
+          "n_rows": 1543
+        }
+      },
+      "downstream": {
+        "pieces": 740,
+        "coverage_pieces_by_code": {
+          "B34": 160,
+          "C09": 36,
+          "B19": 80,
+          "B39": 436,
+          "C04": 28
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 36,
+        "C04": 28,
+        "B19": 80,
+        "runtime_s": 0.056,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 572,
+          "OPENING_REPAIR_FILL": 96
+        },
+        "B39": 436,
+        "B34": 160,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_within_orientation_seed_1",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.066,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "shuffle_within_orientation_seed_2",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "b62a6c25d492b2adcc2937f60490829ab6141c2ee59210acdb6c6621f5e0c405",
+          "n_rows": 568
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "8b863275d2daa7057d9632483e09e36e485d0f515d2a46c6ac5526771e85b10d",
+          "n_rows": 140
+        },
+        "physical_block_layouts": {
+          "fingerprint": "6af5ab4b81ff3f44978c7cd7fe4a83c81b814a9c8c35d24de32d1fdffb44c9e0",
+          "n_rows": 780
+        },
+        "global_result": {
+          "fingerprint": "3066f0a295e99318f382372bac3d03e81f95a80c2ace39bb7cb79de82717c0b7",
+          "n_rows": 1623
+        }
+      },
+      "downstream": {
+        "pieces": 780,
+        "coverage_pieces_by_code": {
+          "B34": 162,
+          "C09": 72,
+          "B19": 60,
+          "B39": 436,
+          "C04": 50
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 72,
+        "C04": 50,
+        "B19": 60,
+        "runtime_s": 0.069,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 568,
+          "OPENING_REPAIR_FILL": 140
+        },
+        "B39": 436,
+        "B34": 162,
+        "B54": 0
+      }
+    },
+    {
+      "name": "random_endpoint_reversal_seed_1",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "64e7e90660d4eec937d5d66dc5cb2404b590dc6172a2a1cda8583612da6c207a",
+          "n_rows": 570
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "52cbb2bdcec50629d103841a99f882e587e155c898b9a27fd751b4d6aac1011e",
+          "n_rows": 108
+        },
+        "physical_block_layouts": {
+          "fingerprint": "7f81f1d22e488d6586aceafc72a44fb77ad3a63553c050d63a30ec122f7f5e85",
+          "n_rows": 750
+        },
+        "global_result": {
+          "fingerprint": "c892338a4a5e2c8f197e670b67411ad4cd929ad9af162f79b6975a33537f2503",
+          "n_rows": 1563
+        }
+      },
+      "downstream": {
+        "pieces": 750,
+        "coverage_pieces_by_code": {
+          "B34": 160,
+          "C09": 46,
+          "B19": 78,
+          "B39": 434,
+          "C04": 32
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 46,
+        "C04": 32,
+        "B19": 78,
+        "runtime_s": 0.056,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 570,
+          "OPENING_REPAIR_FILL": 108
+        },
+        "B39": 434,
+        "B34": 160,
+        "B54": 0
+      }
+    },
+    {
+      "name": "random_endpoint_reversal_seed_2",
+      "layers": {
+        "input_wall_geometry": {
+          "fingerprint": "a89e70706315bc9f95c3010cafe64ec83ca3d5d20b5e008ac9f6d806f28f5e42",
+          "n_rows": 12
+        },
+        "wall_graph_node_positions": {
+          "fingerprint": "aa31cffdf7161a4d84a407d201645467f055a8bfa9c18ca68256f9bb65fb3cf0",
+          "n_rows": 9
+        },
+        "node_types": {
+          "fingerprint": "e84a4b724fbcc557c5e9a693fd722cd5b47474186029a856d4667d052d8e2539",
+          "n_rows": 9
+        },
+        "node_arms": {
+          "fingerprint": "4144ed360ed38374c4fcd8e223dcd0ef8c91342a45b941fdac6203ecfbdb83e4",
+          "n_rows": 9
+        },
+        "wall_end_to_node_canonical": {
+          "fingerprint": "04ab2cab01d2c971341f794350ddf79f064bc95f5565179713a67daf1a2f6763",
+          "n_rows": 24
+        },
+        "midspan_crossings": {
+          "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "n_rows": 0
+        },
+        "physical_ties": {
+          "fingerprint": "cd889e1072a87b1302b36911e0a3a25414da9f05c15da23e0e9c063d4d83e8db",
+          "n_rows": 72
+        },
+        "physical_standard_fill": {
+          "fingerprint": "4e1ae456dded859c09d8556bdee29f45cffbeeedfe5868c365f12b34c0c0a3cb",
+          "n_rows": 570
+        },
+        "physical_opening_repair_fill": {
+          "fingerprint": "0f58b9c163651642709cd22c95e11ba2a72d52e570e7dd8decc3d6d26fa2ae56",
+          "n_rows": 116
+        },
+        "physical_block_layouts": {
+          "fingerprint": "1b200ca3ec56524897407e8105694c2e214e86d1972992602a253ae201b26897",
+          "n_rows": 758
+        },
+        "global_result": {
+          "fingerprint": "0fa70ccffcb493dc04d06caae2b554f56dddd477e3318d359ac05d68256c9578",
+          "n_rows": 1579
+        }
+      },
+      "downstream": {
+        "pieces": 758,
+        "coverage_pieces_by_code": {
+          "B34": 156,
+          "C09": 66,
+          "B19": 62,
+          "B39": 438,
+          "C04": 36
+        },
+        "non_modular": 32,
+        "intersection_failures": 0,
+        "alignment_conflicts": 0,
+        "collisions": 0,
+        "door_void_violations": 0,
+        "C09": 66,
+        "C04": 36,
+        "B19": 62,
+        "runtime_s": 0.058,
+        "by_placement_reason": {
+          "L_CORNER": 32,
+          "T_INTERSECTION_DEGRADED_L": 32,
+          "X_INTERSECTION_DEGRADED": 8,
+          "STANDARD_FILL": 570,
+          "OPENING_REPAIR_FILL": 116
+        },
+        "B39": 438,
+        "B34": 156,
+        "B54": 0
+      }
+    }
+  ]
+}

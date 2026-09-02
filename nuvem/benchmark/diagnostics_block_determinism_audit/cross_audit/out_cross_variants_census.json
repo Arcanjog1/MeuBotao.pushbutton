@@ -56,49 +56,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.178
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.313
       }
     },
     {
@@ -129,49 +129,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.056
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.276
       }
     },
     {
@@ -202,49 +202,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "bf2711a541fbd7b4d375c39504587af030206d56d7c747e73fed945200828d68",
-          "n_rows": 1532
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "e5143d52f3c432fb21c3ad2361d539b3f9af0328cbece12091865381c89729f2",
-          "n_rows": 2290
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "7552033535e2780d02af1050787bad241a023decaf451c67456746d5aa28727b",
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
           "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "91fd66c2a55fc1040dc38f6f5c83580fe430f39894c1c12386bf651e883c688b",
-          "n_rows": 3343
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "3313df325a9658338b2b279ddb697970e91c88f3b0b88503a6ed09f0d37a5abb",
-          "n_rows": 10548
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "6c0821f4ad8699fe406883585fa69ec60803738b87ff143ecb8da3dcaa2da2b2",
-          "n_rows": 19492
+          "fingerprint": "404be01002104a801f8d9a7f3c7a9411799ce6a27098283d0a78397bd996a366",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10548,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2483,
-          "C09": 1272,
-          "C04": 533,
-          "B19": 634,
-          "B39": 4989
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3120,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1050,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1272,
-        "C04": 533,
-        "B19": 634,
-        "runtime_s": 2.216
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.295
       }
     },
     {
@@ -275,49 +275,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.365
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.338
       }
     },
     {
@@ -348,49 +348,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.305
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.333
       }
     },
     {
@@ -421,49 +421,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.368
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.315
       }
     },
     {
@@ -494,49 +494,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.298
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.461
       }
     },
     {
@@ -567,49 +567,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.351
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.451
       }
     },
     {
@@ -640,49 +640,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.365
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.513
       }
     },
     {
@@ -713,49 +713,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.43
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.446
       }
     },
     {
@@ -786,49 +786,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.016
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.553
       }
     },
     {
@@ -859,49 +859,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.467
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.245
       }
     },
     {
@@ -932,49 +932,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.061
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.691
       }
     },
     {
@@ -1005,49 +1005,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.625
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.235
       }
     },
     {
@@ -1078,49 +1078,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.006
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.791
       }
     },
     {
@@ -1151,49 +1151,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.731
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.225
       }
     },
     {
@@ -1224,49 +1224,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.125
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.99
       }
     },
     {
@@ -1297,49 +1297,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.796
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.541
       }
     },
     {
@@ -1370,49 +1370,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "182248773440260248b71c677c735f1075106533c133738526ef2dc0bbd44d41",
-          "n_rows": 1532
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "674a863459cebc52aacb8868f2a7f52881b69bedd7c889441956faddedcaf35f",
-          "n_rows": 2290
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1183caa5536a75ec793d51d98fbe1b62dc0e63dcc2da683df828ea3d3c67457c",
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
           "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "3c500dce54e592be0edf4c065d1bd091bf5f3063be05b805d380077aeae65e74",
-          "n_rows": 3343
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "b23180ec6202a17692889da39cc0b476ba16d1f3a7ac1f128bf0b767f6f535b3",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "30f34209230674f9759679157e94d8102dc7d93451b7293ce99fb03c38e50ffa",
-          "n_rows": 19515
+          "fingerprint": "bdae010ed20b83d57a4fc50e0bf0a1fcd717f6a22e285d205adb11c6e736f3f3",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2475,
-          "C09": 1280,
-          "C04": 557,
-          "B19": 615,
-          "B39": 5007
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3116,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1050,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1280,
-        "C04": 557,
-        "B19": 615,
-        "runtime_s": 2.037
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.408
       }
     },
     {
@@ -1443,49 +1443,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "45b643987084adc8af495abc936519fc71c1a6e7943b033a67208d460c033363",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "65a07383000d25694148b2c6546e0ad8856dbda1cd0ab0c524e13c3228c927fa",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "3149cb9afa68c600844201f828ea030a2e935a9290cea1a8a09f6b06e993dacc",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "baf0dc637a422557197dd56d3a4a68b16f8d0612ea73688ca1c38c9cc7c0b767",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "49d56eed6952579118d5196293437ab9c5c7fe0c13ec116da997216dd34d2cc6",
-          "n_rows": 10548
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "57a08f5dacdc69aabe764ff4691ecc1267b7d8f3b45cb577f5deb9cdc33d890e",
-          "n_rows": 19532
+          "fingerprint": "a6b8b420065a1c792d11c788e963a351f1847b55d8f228c2d3d6e3cef1c40e80",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10548,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2547,
-          "C09": 1246,
-          "C04": 548,
-          "B19": 622,
-          "B39": 4948
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3115,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1246,
-        "C04": 548,
-        "B19": 622,
-        "runtime_s": 2.089
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 3.148
       }
     },
     {
@@ -1516,49 +1516,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 3.05
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.324
       }
     },
     {
@@ -1589,49 +1589,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "c70b69e8f572456dd7517497560d8b89ea12ff24e8755be437be4f3a52ecffa9",
-          "n_rows": 1541
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "b62399d3a665e6e6938b64e0d76955df9d302f4a6b832a23c81eafc1776f5549",
-          "n_rows": 2294
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "1e095074079cb2bc3f505557514f970a4bb06d3c5806c9ccd9b2e1fbd53c0758",
-          "n_rows": 448
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
+          "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "5e096e79d6aba516fb54314b9f675576901ccd0b80afe7cbcb4e6cfcaf626d7d",
-          "n_rows": 3364
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "4bb68c60c4482db5fab6bfb6ef104f757d91f4c498e54b12dfeb98efe97ab8ac",
-          "n_rows": 10571
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de",
-          "n_rows": 19555
+          "fingerprint": "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10571,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2539,
-          "C09": 1254,
-          "C04": 572,
-          "B19": 603,
-          "B39": 4966
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3111,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
-        "collisions": 1034,
+        "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1254,
-        "C04": 572,
-        "B19": 603,
-        "runtime_s": 2.243
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.334
       }
     },
     {
@@ -1662,49 +1662,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "74d0b402afa060c88f3905802c3a484c61c04b87eccc9fa077b5c0be1a8470f2",
-          "n_rows": 1537
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "467ae2370d6c9137f82194be30272c5232501bcb6020b5f63afd75ee9170ed51",
-          "n_rows": 2289
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "61dcc52cf5217233637b06e608906fa21c38b9687a7a55385d54c7a52150a9ed",
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
           "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "8bece71b0ef1585bbf50668b2df62c03b7ee9222f1c961921b94f83f8beeb75b",
-          "n_rows": 3329
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "c1a76f3e049c00d1dedf91e87dd23c6343ee2b8f269ef73bc2903ca131813268",
-          "n_rows": 10531
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "74ac649b2cbfd2e9b0ca0b055538a5259021c34c9d18058f0413dbe8917199ed",
-          "n_rows": 19465
+          "fingerprint": "709089054af8ee5bcd602bfc526f8b60853a9f32f5281f636b192774c6a353ab",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10531,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2516,
-          "C09": 1242,
-          "C04": 537,
-          "B19": 629,
-          "B39": 4970
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3113,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
         "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1242,
-        "C04": 537,
-        "B19": 629,
-        "runtime_s": 2.072
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 3.216
       }
     },
     {
@@ -1735,49 +1735,49 @@
           "n_rows": 17
         },
         "l_solutions": {
-          "fingerprint": "e3baa87b45f314eb9c269ca726f5ffbd1a0a200cb700e0b7c3af7e00ad806307",
-          "n_rows": 1529
+          "fingerprint": "1f2b2ba2ddda03eafb6b34fb15c6e77fd771e4f0836a2f4542c37952b0f8d74b",
+          "n_rows": 1536
         },
         "t_solutions": {
-          "fingerprint": "030476bf2e559a0d62011cf91172ab6ed705652059ca8c35a6bd862292401be0",
-          "n_rows": 2291
+          "fingerprint": "4fa42a759d5fb8cb78ffd429b29b379d019405e99cfb62dcde276b5831f32060",
+          "n_rows": 2292
         },
         "x_solutions": {
-          "fingerprint": "9ed8229c7b6a366386f963ee23386388cc21b193bf413663cc98800e6cf4e6aa",
+          "fingerprint": "6f90be2709aae65f01f02238fe13c44c38c09147b4b95727e6a7acb45a25062f",
           "n_rows": 442
         },
         "block_reservations": {
-          "fingerprint": "755f34a936e28d6452b45d27867d7b06582f1514cf79b03a9d05b759cbd13769",
-          "n_rows": 3339
+          "fingerprint": "52c0767b8882581aafd2ceaee72ecbbfd70b6b54ab174e17458bd71bede65a6a",
+          "n_rows": 3367
         },
         "block_layouts": {
-          "fingerprint": "6032053cb9a191e1c18020480563ab4b54a8680227aac83ae2e2f5826a123676",
-          "n_rows": 10530
+          "fingerprint": "237c5f3194e38c4aae12d95d2ff8f407e14baff75715ccdb6e0bf38efeb3b9c3",
+          "n_rows": 10591
         },
         "global_result": {
-          "fingerprint": "5101f1ea65b8219dffbdda6155bd4a12a3ccaecb95ffbeae9c94ccbe38e6d517",
-          "n_rows": 19468
+          "fingerprint": "8290705b33c13b946ae9ca7833861f842a4e51778e88460457d4d324f7ffe84e",
+          "n_rows": 19565
         }
       },
       "downstream": {
-        "pieces": 10530,
+        "pieces": 10591,
         "coverage_pieces_by_code": {
           "B54": 637,
-          "B34": 2513,
-          "C09": 1238,
-          "C04": 541,
-          "B19": 615,
-          "B39": 4986
+          "B34": 2507,
+          "C09": 1286,
+          "C04": 587,
+          "B19": 595,
+          "B39": 4979
         },
-        "non_modular": 3113,
+        "non_modular": 3127,
         "intersection_failures": 200,
         "alignment_conflicts": 0,
         "collisions": 1051,
         "door_void_violations": 290,
-        "C09": 1238,
-        "C04": 541,
-        "B19": 615,
-        "runtime_s": 3.066
+        "C09": 1286,
+        "C04": 587,
+        "B19": 595,
+        "runtime_s": 2.434
       }
     }
   ],
@@ -1807,24 +1807,24 @@
       "deterministic": true
     },
     "l_solutions": {
-      "distinct_fingerprints": 6,
-      "deterministic": false
+      "distinct_fingerprints": 1,
+      "deterministic": true
     },
     "t_solutions": {
-      "distinct_fingerprints": 6,
-      "deterministic": false
+      "distinct_fingerprints": 1,
+      "deterministic": true
     },
     "x_solutions": {
-      "distinct_fingerprints": 6,
-      "deterministic": false
+      "distinct_fingerprints": 1,
+      "deterministic": true
     },
     "block_reservations": {
-      "distinct_fingerprints": 6,
-      "deterministic": false
+      "distinct_fingerprints": 1,
+      "deterministic": true
     },
     "block_layouts": {
-      "distinct_fingerprints": 6,
-      "deterministic": false
+      "distinct_fingerprints": 1,
+      "deterministic": true
     },
     "global_result": {
       "distinct_fingerprints": 6,
@@ -1833,12 +1833,12 @@
   },
   "global_distinct_fingerprints": 6,
   "global_fingerprints": [
-    "30f34209230674f9759679157e94d8102dc7d93451b7293ce99fb03c38e50ffa",
-    "5101f1ea65b8219dffbdda6155bd4a12a3ccaecb95ffbeae9c94ccbe38e6d517",
-    "57a08f5dacdc69aabe764ff4691ecc1267b7d8f3b45cb577f5deb9cdc33d890e",
-    "6c0821f4ad8699fe406883585fa69ec60803738b87ff143ecb8da3dcaa2da2b2",
-    "74ac649b2cbfd2e9b0ca0b055538a5259021c34c9d18058f0413dbe8917199ed",
-    "daf4aee8257ac73607624bbd9cb7fad0aebfeb60c13be55f5603c464c46966de"
+    "32f5df306a5e89d17c0d33e8a58ee419f80eab3d8513cacafdf08568dab39743",
+    "404be01002104a801f8d9a7f3c7a9411799ce6a27098283d0a78397bd996a366",
+    "709089054af8ee5bcd602bfc526f8b60853a9f32f5281f636b192774c6a353ab",
+    "8290705b33c13b946ae9ca7833861f842a4e51778e88460457d4d324f7ffe84e",
+    "a6b8b420065a1c792d11c788e963a351f1847b55d8f228c2d3d6e3cef1c40e80",
+    "bdae010ed20b83d57a4fc50e0bf0a1fcd717f6a22e285d205adb11c6e736f3f3"
   ],
   "deterministic": false,
   "divergences": [
@@ -1865,14 +1865,14 @@
   ],
   "downstream_range": {
     "pieces": {
-      "min": 10530,
-      "max": 10571,
-      "spread": 41
+      "min": 10591,
+      "max": 10591,
+      "spread": 0
     },
     "non_modular": {
-      "min": 3111,
-      "max": 3120,
-      "spread": 9
+      "min": 3127,
+      "max": 3127,
+      "spread": 0
     },
     "intersection_failures": {
       "min": 200,
@@ -1885,9 +1885,9 @@
       "spread": 0
     },
     "collisions": {
-      "min": 1034,
+      "min": 1051,
       "max": 1051,
-      "spread": 17
+      "spread": 0
     },
     "door_void_violations": {
       "min": 290,
@@ -1895,24 +1895,24 @@
       "spread": 0
     },
     "C09": {
-      "min": 1238,
-      "max": 1280,
-      "spread": 42
+      "min": 1286,
+      "max": 1286,
+      "spread": 0
     },
     "C04": {
-      "min": 533,
-      "max": 572,
-      "spread": 39
+      "min": 587,
+      "max": 587,
+      "spread": 0
     },
     "B19": {
-      "min": 603,
-      "max": 634,
-      "spread": 31
+      "min": 595,
+      "max": 595,
+      "spread": 0
     },
     "runtime_s": {
-      "min": 2.006,
-      "max": 3.066,
-      "spread": 1.06
+      "min": 2.225,
+      "max": 3.216,
+      "spread": 0.991
     }
   }
 }
