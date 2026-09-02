@@ -1,0 +1,229 @@
+{
+  "total_walls": 167,
+  "walls_not_modulated_at_all": 29,
+  "walls_not_modulated_idx": [
+    63,
+    64,
+    97,
+    136,
+    137,
+    138,
+    139,
+    141,
+    142,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161,
+    162,
+    163,
+    164,
+    165
+  ],
+  "walls_with_at_least_one_non_modular_segment": 124,
+  "cause_ranking": {
+    "L_T_X_FAILURE": 13,
+    "LENGTH_ARITHMETIC": 9,
+    "OPENING": 7
+  },
+  "cause_examples": {
+    "L_T_X_FAILURE": [
+      {
+        "wall_idx": 63,
+        "length_cm": 197.943,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          217,
+          270
+        ]
+      },
+      {
+        "wall_idx": 64,
+        "length_cm": 197.943,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          216,
+          271
+        ]
+      },
+      {
+        "wall_idx": 97,
+        "length_cm": 99.754,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          265,
+          272
+        ]
+      },
+      {
+        "wall_idx": 137,
+        "length_cm": 24.451,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          215,
+          216
+        ]
+      },
+      {
+        "wall_idx": 138,
+        "length_cm": 22.08,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          217,
+          218
+        ]
+      },
+      {
+        "wall_idx": 139,
+        "length_cm": 27.003,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          220
+        ]
+      },
+      {
+        "wall_idx": 141,
+        "length_cm": 36.577,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          222
+        ]
+      },
+      {
+        "wall_idx": 142,
+        "length_cm": 36.577,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          223
+        ]
+      },
+      {
+        "wall_idx": 145,
+        "length_cm": 16.532,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          226
+        ]
+      },
+      {
+        "wall_idx": 155,
+        "length_cm": 5.08,
+        "thickness_cm": 14.0,
+        "failing_node_idxs": [
+          240,
+          241
+        ]
+      }
+    ],
+    "LENGTH_ARITHMETIC": [
+      {
+        "wall_idx": 136,
+        "length_cm": 15.0,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 144,
+        "length_cm": 15.708,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 146,
+        "length_cm": 8.267,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 147,
+        "length_cm": 8.0,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 148,
+        "length_cm": 14.0,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 149,
+        "length_cm": 8.0,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 150,
+        "length_cm": 8.0,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 151,
+        "length_cm": 16.551,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 152,
+        "length_cm": 15.728,
+        "thickness_cm": 14.0
+      }
+    ],
+    "OPENING": [
+      {
+        "wall_idx": 159,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 160,
+        "length_cm": 4.446,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 161,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 162,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 163,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 164,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      },
+      {
+        "wall_idx": 165,
+        "length_cm": 4.445,
+        "thickness_cm": 14.0
+      }
+    ]
+  },
+  "not_modulated_length_cm_buckets": {
+    "100-300": 2,
+    "50-100": 1,
+    "<50": 26
+  },
+  "performance": {
+    "solver_elapsed_s": 3.233,
+    "num_courses": 17,
+    "num_bands": 8,
+    "total_candidates_all_variants": 10158,
+    "total_materialized_pieces": 10657,
+    "note": "hotspot conhecido, ja' documentado em REGRAS_MODULACAO_BLOCOS.md 26.1 (item M do plano): merge_collinear_fragments e a varredura O(n^2) de find_wall_pairs na FASE A, ANTES deste solver de blocos - nao remedido aqui, so' referenciado."
+  },
+  "project_id": "torre_easy_lo_r00_tgd"
+}
