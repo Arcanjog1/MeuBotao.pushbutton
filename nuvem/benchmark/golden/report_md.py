@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Relatorio Markdown do golden benchmark (item 23 do pedido). O JSON
-completo (`compare.compare(...)`) e' a fonte da verdade; isto e' so' uma
-projecao legivel dele - texto puro, sem template engine nova.
+"""Relatorio Markdown do benchmark de referencia (item 23 do CR anterior +
+item 46 do CR-BLOCK-REFERENCE-CORPUS: relatorio POR PROJETO e relatorio DO
+CORPUS). O JSON completo (`compare.compare(...)`/`corpus.run_corpus(...)`)
+e' sempre a fonte da verdade; isto e' so' uma projecao legivel dele - texto
+puro, sem template engine nova.
 """
 
 from . import compare as compare_module
+from . import corpus as corpus_module
 from . import wall_diff as wall_diff_module
 
 _ARROW = "->"
@@ -127,4 +130,85 @@ def full_report(comparison, wall_diff_result=None, title=None):
     if wall_diff_result is not None:
         parts.append("")
         parts.append(render_wall_diff(wall_diff_result))
+    return "\n".join(parts)
+
+
+# ======================================================= RELATORIO DO CORPUS
+#
+# item 46: dois niveis de relatorio - por projeto (acima) e do corpus
+# inteiro (abaixo). "REFERENCE CORPUS SUMMARY" e' o exemplo literal do
+# pedido (item 18).
+
+def render_corpus_summary(summary):
+    lines = []
+    lines.append("# REFERENCE CORPUS SUMMARY")
+    lines.append("")
+    lines.append("Projetos executados: {0}".format(summary["total"]))
+    lines.append("")
+    counts = summary["counts"]
+    lines.append("- IMPROVED: {0}".format(counts.get(compare_module.VERDICT_IMPROVED, 0)))
+    lines.append("- NEUTRAL: {0}".format(counts.get(compare_module.VERDICT_NEUTRAL, 0)))
+    lines.append("- REGRESSED: {0}".format(counts.get(compare_module.VERDICT_REGRESSED, 0)))
+    lines.append("- MIXED: {0}".format(counts.get(compare_module.VERDICT_MIXED, 0)))
+    lines.append("- NOT_COMPARABLE: {0}".format(counts.get(corpus_module.NOT_COMPARABLE, 0)))
+    lines.append("")
+    lines.append("**OVERALL: {0}**".format(summary["overall"]))
+    if summary["overall"] == corpus_module.CRITICAL_REGRESSION_PRESENT:
+        lines.append("")
+        lines.append(
+            "Uma media boa NUNCA esconde isto (item 19) - pelo menos um "
+            "projeto tem regressao em invariante critico:"
+        )
+    lines.append("")
+    if summary["critical_regressions"]:
+        lines.append("## REGRESSOES CRITICAS")
+        lines.append("")
+        for row in summary["critical_regressions"]:
+            lines.append("- **{0}**: `{1}` {2} {3} {4}".format(
+                row["project_id"], row["code"], row["before"], _ARROW, row["after"]))
+    else:
+        lines.append("sem regressao critica em nenhum projeto comparavel.")
+    return "\n".join(lines)
+
+
+def render_corpus_matrix(matrix):
+    lines = ["## Matriz projeto x metrica", ""]
+    header = "| projeto | " + " | ".join(matrix["columns"]) + " |"
+    sep = "|---|" + "---|" * len(matrix["columns"])
+    lines.append(header)
+    lines.append(sep)
+    for row in matrix["rows"]:
+        cells = [row["cells"].get(label, "-") for label in matrix["columns"]]
+        lines.append("| {0} | {1} |".format(row["project_id"], " | ".join(cells)))
+    return "\n".join(lines)
+
+
+def render_corpus_projects_table(rows):
+    lines = ["## Projetos", ""]
+    lines.append("| projeto | kind | confidence | comparavel | veredito/motivo |")
+    lines.append("|---|---|---|---|---|")
+    for row in rows:
+        entry = row.get("entry") or {}
+        if row["comparable"]:
+            outcome = row["comparison"]["verdict"]
+        else:
+            outcome = row.get("reason") or corpus_module.NOT_COMPARABLE
+        lines.append("| {0} | {1} | {2} | {3} | {4} |".format(
+            row["project_id"], entry.get("reference_kind", "-"),
+            entry.get("confidence", "-"), "sim" if row["comparable"] else "nao",
+            outcome))
+    return "\n".join(lines)
+
+
+def full_corpus_report(rows, summary, matrix):
+    """Relatorio DO CORPUS inteiro (item 46) - resumo + tabela de projetos
+    + matriz projeto x metrica. Para o diagnostico de UM projeto dentro
+    disso, usar `full_report(row['comparison'], ...)`."""
+    parts = [
+        render_corpus_summary(summary),
+        "",
+        render_corpus_projects_table(rows),
+        "",
+        render_corpus_matrix(matrix),
+    ]
     return "\n".join(parts)

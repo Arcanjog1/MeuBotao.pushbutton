@@ -1,5 +1,18 @@
 # Golden Benchmark — comparação com projetos de referência
 
+> **Este documento descreve o estado do `CR-BLOCK-GOLDEN-BENCHMARK`
+> (histórico).** A partir do `CR-BLOCK-REFERENCE-CORPUS`, o sistema
+> inteiro passou a se chamar **Reference Corpus** / **Reference
+> Benchmark** — ver **[`docs/REFERENCE_CORPUS.md`](REFERENCE_CORPUS.md)**,
+> que é a documentação atual e ponto de entrada. `GOLDEN_CONFIRMED`
+> continua existindo, mas agora é só o nível mais alto de confiança
+> dentro do corpus, nunca requisito de entrada — a ideia de que só um
+> projeto "golden o suficiente" participava do benchmark, descrita
+> abaixo, **não vale mais**. Este arquivo fica como registro do raciocínio
+> original (inventário, classificação item a item) e continua preciso
+> sobre os módulos que não mudaram de forma (validadores, comparator,
+> scoring, matching geométrico).
+
 `CR-BLOCK-GOLDEN-BENCHMARK`. Infraestrutura para responder, de forma
 estruturada e reprodutível: **"essa nova versão do solver ficou melhor,
 igual ou pior que a versão de referência?"** — por categoria, nunca com
