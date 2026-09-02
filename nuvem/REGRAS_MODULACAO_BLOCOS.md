@@ -4382,3 +4382,138 @@ Testes: `tests/test_block_pipeline_determinism.py` (novo, 52 invariantes),
 (atualizado para a regra oficial das verticais).
 Laboratório reproduzível:
 `nuvem/benchmark/diagnostics_block_determinism_final/`.
+
+---
+
+## 30. JUNTA "PEÇA DE NÓ × PREENCHIMENTO" — a junta que o solver não enxerga
+
+> Origem: **CROSS-AUDIT FINAL do `CR-BLOCK-DETERMINISM`** (CONTA 3,
+> 2026-09-02). Descoberto por MEDIÇÃO no motor real, não por dedução —
+> instrumentação em memória de `_layout_internal_joint_positions_cm` e diff
+> por violação nos três pontos de produção (`origin/main`, `+wall graph`,
+> `+finalização`). Laboratório:
+> `nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/`.
+> Relatório: `docs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md`.
+
+### 30.1 REGRA OBRIGATÓRIA (DOCUMENTADO — pendência de código aberta)
+
+A junta de argamassa entre uma **PEÇA DE AMARRAÇÃO DE NÓ** (L/T/X, ou a
+reserva de uma parede que cruza no meio do vão) e o **PRIMEIRO BLOCO DO
+PREENCHIMENTO** que encosta nela **é uma junta vertical como qualquer
+outra**. A fiada oposta é obrigada a desencontrá-la, exatamente como
+desencontra as juntas internas do preenchimento (regra #1, seção 11).
+
+Hoje o motor **não faz isso**, e o pior: **não sabe que não faz**.
+`_layout_internal_joint_positions_cm` (`wall_stepper.py`) percorre
+`for i in range(n-1)` — só as juntas ENTRE dois blocos do mesmo layout. A
+junta de FRONTEIRA do trecho não existe nessa lista, por construção. E essa
+lista é a única fonte de:
+
+- `course_a_joint_positions_cm` → o `avoid_positions_cm` que a Fiada B
+  recebe em `_pier_layout_avoiding_joints`;
+- `_count_joint_coincidences_cm` → o que alimenta `alignment_conflicts`.
+
+Resultado medido: `alignment_conflicts == 0` **com 14 violações reais de
+junta corrida** no `piloto_sintetico_2x2`.
+
+### 30.2 A medição (não suposição)
+
+Instrumentação do `piloto_sintetico_2x2` (436 chamadas de layout):
+
+```
+juntas de FRONTEIRA distintas               14,5  34,5  74,5  94,5  199,5  219,5
+  ... que COINCIDEM com uma junta interna         34,5  74,5  94,5  219,5
+alignment_conflicts reportados                                  0
+PRISM_CONTINUOUS_JOINT reais                                   14
+```
+
+Caso concreto, idêntico nos 14:
+
+```
+fiada PAR    B34(0–34, peça de nó L_CORNER) | B19(35–54, STANDARD_FILL)   junta em t=34,50
+fiada ÍMPAR  B19(15–34, STANDARD_FILL)      | B39(35–74, STANDARD_FILL)   junta em t=34,50
+desencontro 0,00 cm   (limite 1,50 cm)   nó L_CORNER a 27,5 cm
+```
+
+### 30.3 Três medidores discordam — registrar, não "resolver" por suposição
+
+| medidor | veredito sobre a MESMA junta |
+|---|---|
+| `validators/validate_prism.py` (gate de regressão) | `PRISM_CONTINUOUS_JOINT`, nível 1 |
+| `audit_wall_bond_quality` (o próprio motor) | `CONTINUOUS_VERTICAL_JOINT`, penalty 50000 |
+| taxonomia do `CR-BLOCK-01` | `UNCLASSIFIED_RULE_CONFLICT` (não `FORBIDDEN`) |
+| `alignment_conflicts` (gate do solver) | **não vê nada** |
+
+O `CR-BLOCK-01` classifica como conflito de regra não resolvido porque um
+dos lados é peça de nó, que a seção 5 manda repetir na mesma posição em
+toda fiada da mesma paridade. **CONFLITO REGISTRADO**: a seção 5 (repetir a
+peça de nó) e a regra #1 (nunca alinhar junta entre fiadas) se cruzam nessa
+fronteira e o documento ainda não diz qual vence. A orientação desta
+auditoria — a ser confirmada pelo usuário — é que a regra #1 vence: a peça
+de nó pode se repetir, mas o preenchimento da fiada oposta não pode
+encostar uma junta na borda dela.
+
+### 30.4 O que o motor já tem, e onde falta
+
+O discriminador **já está calculado** e não precisa de estrutura nova:
+
+- `kind_left == "WALL_START"` com `node_candidates_by_wall_end[(wall_idx, 0,
+  course)]` não-`None` → `seg_start_cm = border + BLOCK_JOINT_CM`, junta em
+  `seg_start_cm − BLOCK_JOINT_CM/2`, e `leading_is_open = False`;
+- `kind_left == "MIDSPAN_HI"` → idem;
+- espelhado em `WALL_END` / `MIDSPAN_LO` → junta em
+  `seg_end_cm + BLOCK_JOINT_CM/2`;
+- fronteira de VÃO ou ponta livre → `leading_is_open/trailing_is_open =
+  True`, e **NÃO** entra (é a exceção 11.8, C04/C09/B19 encostado no vão,
+  que continua valendo).
+
+Falta só levar essa junta às três listas: `course_a_joint_positions_cm`,
+`own_family_joint_positions_cm` e o `_count_joint_coincidences_cm` do gate.
+`_layout_internal_joint_positions_cm` **não deve mudar de contrato** — ela
+tem outros chamadores (`_layout_min_joint_stagger_cm`, o `_score` da busca).
+
+`DOCUMENTADO — pendência de código aberta.` CR próprio
+(`CR-BLOCK-NODE-FILL-JOINT`), com medição obrigatória de compensadores
+(`COMPENSATOR_CONSECUTIVE`, `COMPENSATOR_EXCESS_IN_RUN`,
+`COMPENSATOR_VERTICAL_STRIP`) e de aberturas antes e depois, nos 3 projetos:
+restringir a busca da Fiada B é exatamente o que empurra o solver para
+composições com compensador.
+
+### 30.5 CORREÇÃO de um registro anterior (seção 29.6)
+
+A seção 29.6 afirma que **W004 e W011 do `piloto_sintetico_2x2` são
+"paredes geometricamente idênticas (364 cm, 14 cm, horizontais)"** e que
+"as duas passam a receber o mesmo layout". **Medido, isso está errado:**
+
+```
+W011  p0=(-7, 700)  p1=(357, 700)   HORIZONTAL  L=364  t=14  vão 100–220 (peitoril 90)
+W004  p0=(350, -7)  p1=(350, 357)   VERTICAL    L=364  t=14  vão 120–200 (peitoril 0)
+```
+
+São **congruentes**, não idênticas: orientações diferentes e vãos
+diferentes, e os layouts finais delas continuam diferentes. O que a
+finalização de fato faz é mudar o layout da **fiada ÍMPAR de W004**:
+
+```
+antes  f1:  B34(15–49) B39(50–89) C09(90–99) B19(100–119) …   1ª junta em 49,50  (não colide)
+depois f1:  B19(15–34) B39(35–74) B34(75–109) C09(110–119) …  1ª junta em 34,50  (COLIDE com a fiada par)
+```
+
+A CAUSA descrita em 29.6 (a junta nó/fill invisível) está **certa**; a
+descrição da geometria estava errada. Prevalece esta seção 30.
+
+### 30.6 Divisão de responsabilidade, medida nos três pontos
+
+`PRISM_CONTINUOUS_JOINT` do `piloto_sintetico_2x2`:
+
+```
+baseline.json (f693dcf)   7
+origin/main               0     <-- o baseline ja estava velho, na direcao BOA
++ wall graph              7     <-- W011 (wall_pairing.py)
++ finalizacao            14     <-- W004 (wall_stepper.py, esta CR)
+```
+
+Registrar isto importa porque a seção 29.6 atribui a regressão inteira à
+finalização. **Metade dela é do wall graph**, e o custo real de mesclar as
+duas metades juntas na `main` é **0 → 14**, não 7 → 14. As duas caem na
+MESMA correção (seção 30.4).

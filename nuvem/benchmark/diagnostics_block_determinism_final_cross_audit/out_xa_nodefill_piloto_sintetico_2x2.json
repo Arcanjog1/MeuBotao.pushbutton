@@ -1,0 +1,342 @@
+{
+  "alignment_conflicts_reportados": 0,
+  "amostra_trechos": [
+    {
+      "boundary_joint_cm": 34.5,
+      "internal_joints_cm": [
+        54.5,
+        94.5,
+        134.5,
+        174.5,
+        214.5,
+        254.5,
+        294.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 35.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        34.5,
+        74.5,
+        114.5,
+        154.5,
+        194.5,
+        234.5,
+        274.5,
+        314.5
+      ],
+      "layout_codes": [
+        "B19",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    },
+    {
+      "boundary_joint_cm": 14.5,
+      "internal_joints_cm": [
+        54.5,
+        94.5,
+        134.5,
+        174.5,
+        214.5,
+        254.5,
+        294.5
+      ],
+      "layout_codes": [
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "B34"
+      ],
+      "leading_is_open": false,
+      "seg_start_cm": 15.0,
+      "trailing_is_open": false
+    }
+  ],
+  "juntas_de_fronteira_distintas": [
+    14.5,
+    34.5,
+    74.5,
+    94.5,
+    199.5,
+    219.5
+  ],
+  "juntas_de_fronteira_que_coincidem_com_junta_interna": [
+    34.5,
+    74.5,
+    94.5,
+    219.5
+  ],
+  "n_chamadas_layout": 436,
+  "project_id": "piloto_sintetico_2x2",
+  "veredito": "A junta de fronteira (peca de no'/vao | primeiro bloco do trecho) NUNCA entra em `_layout_internal_joint_positions_cm` - a funcao so' devolve juntas ENTRE blocos do mesmo layout. Logo ela nunca chega a `course_a_joint_positions_cm` nem ao `_count_joint_coincidences_cm` que alimenta `alignment_conflicts`."
+}
