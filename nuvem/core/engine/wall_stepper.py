@@ -128,6 +128,7 @@ __all__ = [
     "WALL_ORIENTATION_TOLERANCE", "WALL_ALIGNMENT_TOLERANCE_FT",
     "WALL_NO_GROWTH_TOLERANCE_CM", "WALL_COLLISION_REACH_CM",
     "classify_wall_orientation", "_cluster_values_ft", "order_walls_for_processing",
+    "wall_processing_geom_key", "_wall_canonical_angle_deg",
     "openings_for_wall", "_copy_openings_per_wall", "_wall_opening_intervals_cm",
     "_find_consecutive_compensators", "validate_wall_modulation",
     "_apply_axis_plan_in_memory", "_rebase_node_indexes_for_wall",
@@ -5562,18 +5563,55 @@ def _cluster_values_ft(values, tolerance_ft):
     return keys
 
 
-def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLERANCE_FT):
-    """Ordem OBRIGATORIA de processamento (regra #5), decidida so' pela
-    geometria:
+def wall_processing_geom_key(walls_to_create, wall_idx):
+    """Chave GEOMETRICA canonica de desempate da ordem de processamento:
+    pontas ORDENADAS + espessura. Nao muda quando a lista e' embaralhada nem
+    quando o eixo e' desenhado ao contrario - e' o que substitui o antigo
+    desempate por `wall_idx`, que era literalmente a posicao na lista de
+    entrada (a ultima dependencia de ordem que sobrava nesta funcao)."""
+    p0, p1, _wall_dir, _length_ft, thickness_ft = _wall_axis_and_length(walls_to_create, wall_idx)
+    r = WALL_CANONICAL_ENDPOINT_ROUND_FT
+    a = (round(p0.X, r) + 0.0, round(p0.Y, r) + 0.0)
+    b = (round(p1.X, r) + 0.0, round(p1.Y, r) + 0.0)
+    lo, hi = (a, b) if a <= b else (b, a)
+    return (lo[0], lo[1], hi[0], hi[1], round(thickness_ft, r) + 0.0)
 
-        ETAPA 1 - HORIZONTAIS: de cima para baixo (Y decrescente) e, dentro
-                  de cada nivel, da esquerda para a direita (X crescente).
-        ETAPA 2 - VERTICAIS: da esquerda para a direita (X crescente) e,
-                  dentro de cada alinhamento, de baixo para cima (Y
-                  crescente).
-        ETAPA 3 - o que nao for nem uma nem outra (paredes diagonais), em
-                  cima->baixo / esquerda->direita, so' para a ordem ser
-                  deterministica em vez de arbitraria.
+
+def _wall_canonical_angle_deg(walls_to_create, wall_idx):
+    """Angulo da RETA (nao do vetor) em [0, 180) graus. Como a reta A->B e a
+    reta B->A sao a MESMA reta, o angulo e' reduzido modulo 180 - assim
+    inverter os endpoints nao muda a posicao da parede na ordem."""
+    _start, _end, direction, _length_ft, _thickness = canonical_wall_axis(walls_to_create, wall_idx)
+    return round(math.degrees(math.atan2(direction.Y, direction.X)) % 180.0,
+                 WALL_CANONICAL_ENDPOINT_ROUND_FT) + 0.0
+
+
+def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLERANCE_FT):
+    """Ordem OBRIGATORIA de processamento entre paredes (REGRA FUNDAMENTAL 2,
+    regra #5), decidida SO' pela geometria - nunca pela ordem em que as
+    paredes vieram do CAD/`input.json`:
+
+        ETAPA 1 - HORIZONTAIS primeiro: de CIMA PARA BAIXO (Y decrescente);
+                  em faixa equivalente, da ESQUERDA PARA A DIREITA.
+        ETAPA 2 - depois as VERTICAIS: de BAIXO PARA CIMA (Y crescente);
+                  em faixa equivalente, da ESQUERDA PARA A DIREITA.
+        ETAPA 3 - por fim as INCLINADAS: por ANGULO canonico da reta, depois
+                  posicao geometrica, depois a chave geometrica canonica.
+
+    ATENCAO - ORDEM ENTRE paredes nao e' SENTIDO DENTRO da parede: o sentido
+    interno (horizontal esquerda->direita, vertical baixo->cima) e'
+    `canonical_wall_axis`, aplicado dentro de `solve_wall_free_fill`.
+
+    CORRECAO 2026-09-02 (CR-BLOCK-DETERMINISM/FINALIZACAO): a ETAPA 2 estava
+    INVERTIDA em relacao ao enunciado do usuario - ordenava as verticais por
+    X (esquerda->direita) como criterio PRINCIPAL e por Y so' no empate. O
+    enunciado oficial e' o contrario: BAIXO->CIMA e' o principal, ESQUERDA->
+    DIREITA e' o desempate. E os tres grupos desempatavam por `wall_idx` (a
+    POSICAO NA LISTA de entrada) - trocado por `wall_processing_geom_key`.
+
+    Inverter o sentido de desenho de uma parede (`GetEndPoint(0)` <->`(1)`)
+    NUNCA muda a ordem: tudo aqui sai de `min`/`max` dos dois endpoints, do
+    angulo modulo 180 e da chave de pontas ordenadas.
 
     Devolve a lista de `wall_idx` na ordem em que devem ser processados."""
     info = []
@@ -5584,6 +5622,7 @@ def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLE
             "orientation": classify_wall_orientation(walls_to_create, wall_idx),
             "x_min": min(p0.X, p1.X), "x_max": max(p0.X, p1.X),
             "y_min": min(p0.Y, p1.Y), "y_max": max(p0.Y, p1.Y),
+            "key": wall_processing_geom_key(walls_to_create, wall_idx),
         })
 
     horizontals = [w for w in info if w["orientation"] == "H"]
@@ -5595,16 +5634,22 @@ def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLE
         bands = _cluster_values_ft([w["y_min"] for w in horizontals], tolerance_ft)
         for pos, w in enumerate(horizontals):
             w["band"] = bands[pos]
-        horizontals.sort(key=lambda w: (-w["band"], w["x_min"], w["idx"]))
+        # -band: faixa mais ALTA primeiro (cima -> baixo). Empate: x_min
+        # crescente (esquerda -> direita).
+        horizontals.sort(key=lambda w: (-w["band"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in horizontals)
     if verticals:
-        bands = _cluster_values_ft([w["x_min"] for w in verticals], tolerance_ft)
+        # A faixa das verticais e' agrupada por Y (a altura em que a parede
+        # COMECA), nao por X: o criterio PRINCIPAL delas e' baixo -> cima.
+        bands = _cluster_values_ft([w["y_min"] for w in verticals], tolerance_ft)
         for pos, w in enumerate(verticals):
             w["band"] = bands[pos]
-        verticals.sort(key=lambda w: (w["band"], w["y_min"], w["idx"]))
+        verticals.sort(key=lambda w: (w["band"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in verticals)
     if diagonals:
-        diagonals.sort(key=lambda w: (-w["y_max"], w["x_min"], w["idx"]))
+        for w in diagonals:
+            w["angle"] = _wall_canonical_angle_deg(walls_to_create, w["idx"])
+        diagonals.sort(key=lambda w: (w["angle"], -w["y_max"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in diagonals)
     return ordered
 
