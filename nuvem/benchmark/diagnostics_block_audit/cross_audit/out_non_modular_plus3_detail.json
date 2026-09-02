@@ -1,0 +1,36 @@
+{
+  "method": "Rodado solve_building_blocks_all_courses sobre torre_easy_lo_r00_tp1 em dois checkouts (MAIN via git worktree temporario da 9f3bab4, e esta branch/CR-BLOCK-01), comparando solve_result['non_modular'] por chave (wall_idx, course, variant_index, segment_index, seg_start_cm arredondado, seg_end_cm arredondado). Nenhuma logica de deteccao nova - leitura direta do campo ja existente do solver.",
+  "project": "torre_easy_lo_r00_tp1",
+  "non_modular_count": {"MAIN": 278, "CR_BLOCK_01": 281, "delta": 3},
+  "distinct_segment_signatures": {"MAIN": 56, "CR_BLOCK_01": 57},
+  "signatures_removed_by_CR_BLOCK_01": [
+    {
+      "wall_idx": 70, "course": "B", "variant_index": 0, "segment_index": 4,
+      "seg_start_cm": 270.0, "seg_end_cm": 370.0, "current_length_cm": 100.0,
+      "occurrences_in_raw_list_MAIN": 3,
+      "note": "lower_valid_cm=0, upper_valid_cm=0, delta_to_lower_cm=0, delta_to_upper_cm=0 nos dois lados - padrao degenerado que ja existia antes do CR (ver nota abaixo), so' migrou de parede."
+    }
+  ],
+  "signatures_added_by_CR_BLOCK_01": [
+    {
+      "wall_idx": 71, "course": "B", "variant_index": 0, "segment_index": 0,
+      "seg_start_cm": 14.0, "seg_end_cm": 114.0, "current_length_cm": 100.0,
+      "occurrences_in_raw_list_BLOCK01": 3,
+      "note": "mesmo padrao degenerado (lower_valid_cm=0/upper_valid_cm=0/delta=0) do sinal removido acima"
+    },
+    {
+      "wall_idx": 39, "course": "B", "variant_index": 0, "segment_index": 0,
+      "seg_start_cm": 14.0, "seg_end_cm": 114.0, "current_length_cm": 100.0,
+      "occurrences_in_raw_list_BLOCK01": 3,
+      "note": "mesmo padrao degenerado (lower_valid_cm=0/upper_valid_cm=0/delta=0) do sinal removido acima"
+    }
+  ],
+  "arithmetic_check": "1 assinatura removida (3 ocorrencias) + 2 assinaturas adicionadas (3 ocorrencias cada = 6) => delta bruto = 6 - 3 = +3. Bate exatamente com non_modular_count.delta=3.",
+  "coverage_impact": {
+    "walls_not_modulated_before_and_after": "29 -> 29 (identico, ver compare_main_vs_block01.json::walls_not_modulated)",
+    "interpretation": "as paredes 39/70/71 ja recebem OUTRAS pecas normalmente (nao estao na lista de 'paredes sem nenhuma peca') - este e' um residuo de SEGMENTO PARCIAL dentro de uma parede que continua majoritariamente modulada, nao uma parede inteira perdida."
+  },
+  "root_cause_hypothesis": "As tres ocorrencias tem exatamente o mesmo comprimento de segmento (100,0cm) e o mesmo padrao degenerado 'lower_valid_cm=0 / upper_valid_cm=0 / delta_to_lower_cm=0 / delta_to_upper_cm=0' nos dois lados (MAIN e CR-BLOCK-01) - isso sugere uma condicao de contorno pre-existente em nearest_block_lengths_cm/pier_closes_with_blocks_cm (core/engine/modulation_math.py) para um comprimento remanescente especifico, e NAO uma regra nova introduzida pelo CR-BLOCK-01. O que o CR mudou foi QUAL parede aciona a busca completa (_pier_full_search_layout so' roda quando ainda ha violacao de regra #1/#2 a resolver) - ao resolver o desencontro da parede 70 nesse trecho, o layout escolhido para as paredes vizinhas/relacionadas (39 e 71, que aparentemente compartilham a mesma forma de segmento de 100cm) mudou o suficiente para cair na MESMA condicao degenerada que a parede 70 tinha antes.",
+  "classification": "NEUTRO — achado real (nao e' ruido de medicao: as 3 novas entradas existem e sao reprodutiveis), mas de severidade desprezivel: nao reduz walls_not_modulated (29->29), afeta so' um pedaco de 100cm em paredes que continuam recebendo blocos no resto da extensao, e a causa-raiz (a condicao degenerada 0/0/0/0) e' uma limitacao PRE-EXISTENTE de nearest_block_lengths_cm que so' mudou de endereco, nao de natureza. Não é 'redistribuição sem perda' no sentido literal (2 paredes NOVAS passam a ter o problema que so' 1 parede tinha antes) — mas tambem não é regressão de cobertura.",
+  "not_a_regression_because": "nenhuma parede inteira deixou de ser modulada, e o numero de paredes com pelo menos 1 segmento nao-modular (com_pelo_menos_1_non_modular) nao foi medido separadamente aqui, mas o total de paredes SEM NENHUMA peca ficou identico (29/29)."
+}

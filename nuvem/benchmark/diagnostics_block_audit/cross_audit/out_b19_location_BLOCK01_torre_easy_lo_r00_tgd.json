@@ -1,0 +1,13 @@
+{
+  "code": "B19",
+  "touch_tolerance_cm": 5.0,
+  "total": 853,
+  "location_breakdown": {
+    "NEAR_OPENING": 215,
+    "NEAR_WALL_END": 118,
+    "MID_WALL": 520,
+    "AMBIGUOUS_BOTH": 0
+  },
+  "vertical_alignment_clusters_2plus_courses": 123,
+  "project_id": "torre_easy_lo_r00_tgd"
+}
