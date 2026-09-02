@@ -1,0 +1,380 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "repeats": 5,
+  "fingerprints": [
+    "1bdcfb98b5ea5ce5d08d956c3ff700eea8481d8a5294aee92c2b9a00bbc55ea8",
+    "1bdcfb98b5ea5ce5d08d956c3ff700eea8481d8a5294aee92c2b9a00bbc55ea8",
+    "1bdcfb98b5ea5ce5d08d956c3ff700eea8481d8a5294aee92c2b9a00bbc55ea8",
+    "1bdcfb98b5ea5ce5d08d956c3ff700eea8481d8a5294aee92c2b9a00bbc55ea8",
+    "1bdcfb98b5ea5ce5d08d956c3ff700eea8481d8a5294aee92c2b9a00bbc55ea8"
+  ],
+  "CANONICAL_SORT_MAKES_REPEATABLE": true,
+  "note": "repetivel != correto - ver node_agreement_with_oracle abaixo para saber se o resultado (mesmo estavel) bate com uma reconstrucao geometrica independente",
+  "node_agreement_with_oracle": {
+    "agree": 183,
+    "disagree": 88,
+    "no_oracle_point_nearby": 2
+  },
+  "sample_disagreements": [
+    {
+      "point_cm": [
+        -1501.48,
+        -153.21
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 7.06
+    },
+    {
+      "point_cm": [
+        -1871.48,
+        103.3
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "T_INTERSECTION",
+      "oracle_dist_cm": 0.02
+    },
+    {
+      "point_cm": [
+        -1501.48,
+        -165.95
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.84
+    },
+    {
+      "point_cm": [
+        -1805.53,
+        -87.55
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "FREE_END",
+      "oracle_dist_cm": 2.25
+    },
+    {
+      "point_cm": [
+        -1616.49,
+        370.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 3.39
+    },
+    {
+      "point_cm": [
+        -1611.44,
+        449.02
+      ],
+      "engine_kind": "FREE_END",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.04
+    },
+    {
+      "point_cm": [
+        -1609.62,
+        370.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 3.48
+    },
+    {
+      "point_cm": [
+        -1478.99,
+        -430.61
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -1304.99,
+        -430.61
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -1304.99,
+        634.71
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -1478.99,
+        634.71
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -1389.44,
+        -424.7
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 2.56
+    },
+    {
+      "point_cm": [
+        -1394.52,
+        -424.7
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 2.52
+    },
+    {
+      "point_cm": [
+        -1389.44,
+        628.8
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 2.56
+    },
+    {
+      "point_cm": [
+        -1394.52,
+        628.8
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 2.52
+    },
+    {
+      "point_cm": [
+        -1246.48,
+        115.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 3.89
+    },
+    {
+      "point_cm": [
+        -1254.56,
+        109.8
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.07
+    },
+    {
+      "point_cm": [
+        -1246.48,
+        109.8
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 3.27
+    },
+    {
+      "point_cm": [
+        -1252.36,
+        201.29
+      ],
+      "engine_kind": "FREE_END",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.04
+    },
+    {
+      "point_cm": [
+        -1159.74,
+        222.0
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "L_CORNER",
+      "oracle_dist_cm": 2.06
+    },
+    {
+      "point_cm": [
+        -853.49,
+        -430.61
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -853.49,
+        634.71
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.01
+    },
+    {
+      "point_cm": [
+        -688.56,
+        -424.7
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.04
+    },
+    {
+      "point_cm": [
+        -688.56,
+        628.8
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 0.04
+    },
+    {
+      "point_cm": [
+        -656.49,
+        -252.69
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 7.07
+    },
+    {
+      "point_cm": [
+        -401.49,
+        -252.69
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 7.06
+    },
+    {
+      "point_cm": [
+        -401.49,
+        -239.95
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.84
+    },
+    {
+      "point_cm": [
+        -656.49,
+        -239.95
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.85
+    },
+    {
+      "point_cm": [
+        -656.49,
+        444.05
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.85
+    },
+    {
+      "point_cm": [
+        -401.49,
+        444.05
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.84
+    },
+    {
+      "point_cm": [
+        -401.49,
+        456.79
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 7.06
+    },
+    {
+      "point_cm": [
+        -656.49,
+        456.79
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 7.07
+    },
+    {
+      "point_cm": [
+        -526.49,
+        -252.69
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.19
+    },
+    {
+      "point_cm": [
+        -526.49,
+        456.79
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.19
+    },
+    {
+      "point_cm": [
+        -337.12,
+        551.1
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "FREE_END",
+      "oracle_dist_cm": 2.22
+    },
+    {
+      "point_cm": [
+        -272.81,
+        -347.13
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "FREE_END",
+      "oracle_dist_cm": 2.19
+    },
+    {
+      "point_cm": [
+        -139.49,
+        470.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 2.13
+    },
+    {
+      "point_cm": [
+        150.52,
+        277.29
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 3.11
+    },
+    {
+      "point_cm": [
+        -133.48,
+        470.05
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 4.37
+    },
+    {
+      "point_cm": [
+        353.02,
+        525.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS",
+      "oracle_dist_cm": 6.52
+    }
+  ]
+}
