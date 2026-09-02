@@ -1,0 +1,89 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "agree": 183,
+  "disagree": 88,
+  "no_oracle_point_nearby": 2,
+  "total_nodes": 273,
+  "sample_disagreements": [
+    {
+      "point_cm": [
+        -1871.48,
+        103.3
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "T_INTERSECTION"
+    },
+    {
+      "point_cm": [
+        -1805.53,
+        -85.32
+      ],
+      "engine_kind": "STRAIGHT_CONTINUATION",
+      "oracle_kind": "FREE_END"
+    },
+    {
+      "point_cm": [
+        -1616.49,
+        370.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1611.44,
+        449.02
+      ],
+      "engine_kind": "FREE_END",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1609.62,
+        370.05
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1501.48,
+        -165.95
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1501.48,
+        -153.21
+      ],
+      "engine_kind": "L_CORNER",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1478.99,
+        -430.61
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1478.99,
+        634.71
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS"
+    },
+    {
+      "point_cm": [
+        -1394.52,
+        -424.7
+      ],
+      "engine_kind": "T_INTERSECTION",
+      "oracle_kind": "AMBIGUOUS"
+    }
+  ]
+}
