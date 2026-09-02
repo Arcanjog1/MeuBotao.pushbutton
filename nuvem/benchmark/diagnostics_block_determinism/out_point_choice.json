@@ -1,0 +1,93 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "combinacoes": [
+    {
+      "ponto": "centroide",
+      "ordem_bracos": "enum",
+      "fingerprints_grafo": 1,
+      "fingerprints_blocos": 2,
+      "regressoes_criticas": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          293
+        ],
+        "COVERAGE_ROW_MOSTLY_EMPTY": [
+          171,
+          181
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          148
+        ]
+      }
+    },
+    {
+      "ponto": "centroide",
+      "ordem_bracos": "angulo",
+      "fingerprints_grafo": 1,
+      "fingerprints_blocos": 2,
+      "regressoes_criticas": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          270
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          149
+        ]
+      }
+    },
+    {
+      "ponto": "centroide",
+      "ordem_bracos": "comprimento",
+      "fingerprints_grafo": 1,
+      "fingerprints_blocos": 2,
+      "regressoes_criticas": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          277
+        ],
+        "COVERAGE_ROW_MOSTLY_EMPTY": [
+          171,
+          181
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          148
+        ]
+      }
+    },
+    {
+      "ponto": "min_ancora",
+      "ordem_bracos": "angulo",
+      "fingerprints_grafo": 1,
+      "fingerprints_blocos": 2,
+      "regressoes_criticas": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          270
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          149
+        ]
+      }
+    },
+    {
+      "ponto": "legacy_group0",
+      "ordem_bracos": "angulo",
+      "fingerprints_grafo": 1,
+      "fingerprints_blocos": 2,
+      "regressoes_criticas": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          270
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          149
+        ]
+      }
+    }
+  ]
+}

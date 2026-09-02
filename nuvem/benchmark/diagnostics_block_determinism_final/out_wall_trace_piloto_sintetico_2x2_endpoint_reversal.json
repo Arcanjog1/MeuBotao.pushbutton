@@ -1,0 +1,3662 @@
+{
+  "variant": "endpoint_reversal",
+  "project_id": "piloto_sintetico_2x2",
+  "walls": [
+    {
+      "wall_key": [
+        -7.0,
+        0.0,
+        357.0,
+        0.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 19,
+          "n_pieces_variant": 14,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            -7.0,
+            0.0
+          ],
+          "variant_canonical_start_cm": [
+            -7.0,
+            0.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              202.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              85.0,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              242.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              282.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              322.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              110.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              205.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              92.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              102.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              107.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              197.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              217.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              117.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              217.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              325.0,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              87.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              107.5,
+              0.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              247.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              287.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 19,
+          "n_pieces_variant": 14,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            -7.0,
+            0.0
+          ],
+          "variant_canonical_start_cm": [
+            -7.0,
+            0.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              202.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              85.0,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              242.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              282.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              322.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              110.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              205.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              92.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              102.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              107.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              197.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              217.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              117.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              217.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              325.0,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              87.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              107.5,
+              0.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              247.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              287.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": 0
+    },
+    {
+      "wall_key": [
+        -7.0,
+        700.0,
+        357.0,
+        700.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            -7.0,
+            700.0
+          ],
+          "variant_canonical_start_cm": [
+            -7.0,
+            700.0
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 12,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              114.0,
+              234.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              130.0,
+              250.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            -7.0,
+            700.0
+          ],
+          "variant_canonical_start_cm": [
+            -7.0,
+            700.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              82.5,
+              700.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              230.0,
+              700.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              70.0,
+              700.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              90.0,
+              700.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              225.0,
+              700.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              217.5,
+              700.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              97.5,
+              700.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              237.5,
+              700.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B39",
+              87.5,
+              700.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 1,
+      "first_input_divergent_call": 1
+    },
+    {
+      "wall_key": [
+        0.0,
+        -7.0,
+        0.0,
+        357.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 18,
+          "n_pieces_variant": 13,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            0.0,
+            -7.0
+          ],
+          "variant_canonical_start_cm": [
+            0.0,
+            -7.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              0.0,
+              202.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              45.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              82.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              242.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              282.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              322.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              110.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              205.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              92.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              102.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              107.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              197.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              0.0,
+              117.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              0.0,
+              217.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              325.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              47.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              87.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              107.5,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              247.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              287.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 18,
+          "n_pieces_variant": 13,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            0.0,
+            -7.0
+          ],
+          "variant_canonical_start_cm": [
+            0.0,
+            -7.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              0.0,
+              202.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              45.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              82.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              242.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              282.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              322.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              110.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              205.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              92.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              102.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              107.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              197.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              0.0,
+              117.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              0.0,
+              217.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              325.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              47.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              87.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              107.5,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              247.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              287.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": 0
+    },
+    {
+      "wall_key": [
+        0.0,
+        343.0,
+        0.0,
+        707.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            0.0,
+            343.0
+          ],
+          "variant_canonical_start_cm": [
+            0.0,
+            343.0
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 12,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              114.0,
+              234.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              130.0,
+              250.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            0.0,
+            343.0
+          ],
+          "variant_canonical_start_cm": [
+            0.0,
+            343.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              0.0,
+              572.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              375.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              412.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              612.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              652.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              440.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              0.0,
+              575.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              422.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              432.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              437.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              567.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              0.0,
+              587.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              0.0,
+              447.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              0.0,
+              587.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              0.0,
+              655.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              377.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              417.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              437.5,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              0.0,
+              617.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 1,
+      "first_input_divergent_call": 1
+    },
+    {
+      "wall_key": [
+        343.0,
+        0.0,
+        707.0,
+        0.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            343.0,
+            0.0
+          ],
+          "variant_canonical_start_cm": [
+            343.0,
+            0.0
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 12,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              114.0,
+              234.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              130.0,
+              250.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            343.0,
+            0.0
+          ],
+          "variant_canonical_start_cm": [
+            343.0,
+            0.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              432.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              580.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              420.0,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              440.0,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              575.0,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              567.5,
+              0.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              447.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              587.5,
+              0.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B39",
+              437.5,
+              0.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 1,
+      "first_input_divergent_call": 1
+    },
+    {
+      "wall_key": [
+        343.0,
+        350.0,
+        707.0,
+        350.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 9,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              11.5
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              11.5
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            343.0,
+            350.0
+          ],
+          "variant_canonical_start_cm": [
+            343.0,
+            350.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              452.5,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              560.0,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              597.5,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              440.0,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              555.0,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              547.5,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              607.5,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              457.5,
+              350.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 67.5,
+              "seg_start_cm": 12.5,
+              "seg_end_cm": 80.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 121.5,
+              "seg_start_cm": 230.0,
+              "seg_end_cm": 351.5
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 9,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              11.5
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              11.5
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            343.0,
+            350.0
+          ],
+          "variant_canonical_start_cm": [
+            343.0,
+            350.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              452.5,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              560.0,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              597.5,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              440.0,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              555.0,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              547.5,
+              350.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              607.5,
+              350.0,
+              "A",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              457.5,
+              350.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 67.5,
+              "seg_start_cm": 12.5,
+              "seg_end_cm": 80.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 121.5,
+              "seg_start_cm": 230.0,
+              "seg_end_cm": 351.5
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": 0
+    },
+    {
+      "wall_key": [
+        350.0,
+        343.0,
+        350.0,
+        707.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 12,
+          "n_pieces_variant": 11,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              11.5
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              11.5
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            350.0,
+            343.0
+          ],
+          "variant_canonical_start_cm": [
+            350.0,
+            343.0
+          ],
+          "pieces_only_base": [
+            [
+              "B34",
+              350.0,
+              560.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              572.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              612.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              652.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              350.0,
+              460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              350.0,
+              547.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              350.0,
+              467.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              350.0,
+              567.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              350.0,
+              587.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B34",
+              350.0,
+              655.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              617.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 87.5,
+              "seg_start_cm": 12.5,
+              "seg_end_cm": 100.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 121.5,
+              "seg_start_cm": 230.0,
+              "seg_end_cm": 351.5
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 12,
+          "n_pieces_variant": 11,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              134.0,
+              214.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              11.5
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              11.5
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              330.0
+            ]
+          ],
+          "base_midspan": [],
+          "variant_midspan": [],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              120.0,
+              200.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              150.0,
+              230.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            350.0,
+            343.0
+          ],
+          "variant_canonical_start_cm": [
+            350.0,
+            343.0
+          ],
+          "pieces_only_base": [
+            [
+              "B34",
+              350.0,
+              560.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              572.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              612.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              652.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              350.0,
+              460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              350.0,
+              547.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              350.0,
+              467.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              350.0,
+              567.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              350.0,
+              587.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B34",
+              350.0,
+              655.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "B39",
+              350.0,
+              617.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 87.5,
+              "seg_start_cm": 12.5,
+              "seg_end_cm": 100.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 0,
+              "current_length_cm": 121.5,
+              "seg_start_cm": 230.0,
+              "seg_end_cm": 351.5
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": 0
+    },
+    {
+      "wall_key": [
+        700.0,
+        -7.0,
+        700.0,
+        357.0,
+        14.0
+      ],
+      "n_calls_base": 2,
+      "n_calls_variant": 2,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": true,
+          "n_pieces_base": 16,
+          "n_pieces_variant": 16,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            700.0,
+            -7.0
+          ],
+          "variant_canonical_start_cm": [
+            700.0,
+            -7.0
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 14,
+          "n_pieces_variant": 11,
+          "openings_equal": false,
+          "max_opening_delta_cm": 14.0,
+          "base_canonical_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              114.0,
+              234.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              330.0
+            ],
+            [
+              1,
+              "B",
+              350.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  330.0,
+                  364.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  350.0,
+                  364.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              100.0,
+              220.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              130.0,
+              250.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 364.0,
+          "variant_length_cm": 364.0,
+          "base_canonical_start_cm": [
+            700.0,
+            -7.0
+          ],
+          "variant_canonical_start_cm": [
+            700.0,
+            -7.0
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              700.0,
+              82.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B34",
+              700.0,
+              230.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              700.0,
+              70.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              700.0,
+              90.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              700.0,
+              225.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C09",
+              700.0,
+              217.5,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "B19",
+              700.0,
+              97.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B19",
+              700.0,
+              237.5,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "B39",
+              700.0,
+              87.5,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 330.0,
+              "seg_end_cm": 329.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 350.0,
+              "seg_end_cm": 349.0,
+              "left_kind": "MIDSPAN_LO",
+              "right_kind": "WALL_END"
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 35.0,
+              "seg_end_cm": 34.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 1,
+              "current_length_cm": -1.0,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 14.0,
+              "left_kind": "WALL_START",
+              "right_kind": "MIDSPAN_HI"
+            }
+          ]
+        }
+      ],
+      "first_divergent_call": 1,
+      "first_input_divergent_call": 1
+    }
+  ]
+}

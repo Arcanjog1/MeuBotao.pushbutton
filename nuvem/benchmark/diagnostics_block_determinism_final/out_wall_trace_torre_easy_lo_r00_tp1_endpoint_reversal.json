@@ -1,0 +1,6732 @@
+{
+  "variant": "endpoint_reversal",
+  "project_id": "torre_easy_lo_r00_tp1",
+  "walls": [
+    {
+      "wall_key": [
+        5800.25,
+        794.95,
+        6199.25,
+        794.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              795.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            794.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    },
+    {
+      "wall_key": [
+        5800.25,
+        949.95,
+        6184.25,
+        949.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              950.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            949.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    },
+    {
+      "wall_key": [
+        5800.25,
+        1459.95,
+        6184.25,
+        1459.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 13,
+          "n_pieces_variant": 15,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              375.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              274.0,
+              365.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [
+            [
+              "C04",
+              6072.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6167.2,
+              1460.0,
+              "A",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [
+            {
+              "course": "A",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 370.0,
+              "current_length_cm": 100.0
+            },
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 270.0,
+              "seg_end_cm": 369.0,
+              "current_length_cm": 99.0
+            }
+          ],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 4,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 114.0,
+              "current_length_cm": 99.0
+            }
+          ]
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              34.0
+            ],
+            [
+              0,
+              "B",
+              14.0
+            ],
+            [
+              1,
+              "A",
+              350.0
+            ],
+            [
+              1,
+              "B",
+              370.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  45.0,
+                  99.0
+                ],
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  65.0,
+                  79.0
+                ],
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 384.0,
+          "variant_length_cm": 384.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1459.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    },
+    {
+      "wall_key": [
+        5800.25,
+        1614.95,
+        6199.25,
+        1614.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": false,
+          "n_pieces_base": 15,
+          "n_pieces_variant": 13,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              390.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              289.0,
+              380.0
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              19.0,
+              110.0
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [
+            [
+              "B19",
+              6079.8,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ],
+            [
+              "C04",
+              6182.2,
+              1615.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": [
+            {
+              "course": "B",
+              "variant_index": 0,
+              "segment_index": 2,
+              "seg_start_cm": 15.0,
+              "seg_end_cm": 129.0,
+              "current_length_cm": 114.0
+            }
+          ]
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 17,
+          "n_pieces_variant": 17,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              365.0
+            ],
+            [
+              1,
+              "B",
+              385.0
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  235.0,
+                  289.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  255.0,
+                  269.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 399.0,
+          "variant_length_cm": 399.0,
+          "base_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "variant_canonical_start_cm": [
+            5800.25,
+            1614.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    },
+    {
+      "wall_key": [
+        6185.25,
+        674.95,
+        7029.24,
+        674.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              675.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              675.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              675.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              675.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              675.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            674.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    },
+    {
+      "wall_key": [
+        6185.25,
+        1734.95,
+        7029.24,
+        1734.95,
+        14.0
+      ],
+      "n_calls_base": 7,
+      "n_calls_variant": 7,
+      "calls": [
+        {
+          "call_index": 0,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              1735.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 1,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              1735.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 2,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              1735.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 3,
+          "pieces_equal": false,
+          "n_pieces_base": 28,
+          "n_pieces_variant": 27,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_canonical_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              9.0
+            ],
+            [
+              0,
+              "B",
+              9.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [
+            [
+              19.0,
+              185.0
+            ],
+            [
+              249.0,
+              340.0
+            ],
+            [
+              504.0,
+              595.0
+            ],
+            [
+              644.0,
+              809.99
+            ]
+          ],
+          "variant_openings_cm": [
+            [
+              658.99,
+              824.99
+            ],
+            [
+              503.99,
+              594.99
+            ],
+            [
+              248.99,
+              339.99
+            ],
+            [
+              34.0,
+              199.99
+            ]
+          ],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [
+            [
+              "C04",
+              6197.2,
+              1735.0,
+              "B",
+              0,
+              "STANDARD_FILL"
+            ],
+            [
+              "C04",
+              6202.2,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "pieces_only_variant": [
+            [
+              "C09",
+              6199.8,
+              1735.0,
+              "B",
+              0,
+              "OPENING_REPAIR_FILL"
+            ]
+          ],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 4,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 5,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        },
+        {
+          "call_index": 6,
+          "pieces_equal": true,
+          "n_pieces_base": 40,
+          "n_pieces_variant": 40,
+          "openings_equal": true,
+          "max_opening_delta_cm": 0.0,
+          "base_canonical_openings_cm": [],
+          "variant_canonical_openings_cm": [],
+          "node_borders_equal": true,
+          "midspan_equal": true,
+          "base_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "variant_node_borders": [
+            [
+              0,
+              "A",
+              14.0
+            ],
+            [
+              0,
+              "B",
+              34.0
+            ],
+            [
+              1,
+              "A",
+              830.0
+            ],
+            [
+              1,
+              "B",
+              809.99
+            ]
+          ],
+          "base_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "variant_midspan": [
+            [
+              "A",
+              [
+                [
+                  395.0,
+                  449.0
+                ]
+              ]
+            ],
+            [
+              "B",
+              [
+                [
+                  415.0,
+                  429.0
+                ]
+              ]
+            ]
+          ],
+          "base_variants_per_course": 1,
+          "variant_variants_per_course": 1,
+          "canonical_axis_equal": true,
+          "base_openings_cm": [],
+          "variant_openings_cm": [],
+          "base_axis_reversed": false,
+          "variant_axis_reversed": true,
+          "base_length_cm": 843.99,
+          "variant_length_cm": 843.99,
+          "base_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "variant_canonical_start_cm": [
+            6185.25,
+            1734.95
+          ],
+          "pieces_only_base": [],
+          "pieces_only_variant": [],
+          "base_non_modular": [],
+          "variant_non_modular": []
+        }
+      ],
+      "first_divergent_call": 0,
+      "first_input_divergent_call": null
+    }
+  ]
+}

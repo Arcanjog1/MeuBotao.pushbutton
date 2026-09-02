@@ -1,0 +1,83 @@
+{
+  "mission_item": "19/20 - CENSO da REGRA OFICIAL #2 (parede completa primeiro / abertura depois) - so' censo, NENHUMA implementacao",
+  "search_terms": ["split_first", "continuous_first", "opening", "opening intervals",
+                    "free segments", "segment", "jamb", "pier", "repair", "recut",
+                    "solve_wall_free_fill", "solve_building_blocks", "modulation",
+                    "legacy", "fallback"],
+  "finding_summary": "A arquitetura pedida pelo usuario (GRAFO -> PAREDE INTEIRA -> MODULACAO CONTINUA -> FIADAS/PRISMA -> APLICAR ABERTURAS -> REMOVER PECAS -> REPARAR SO' A REGIAO AFETADA -> VERGA/CONTRAVERGA -> VALIDACAO) JA' EXISTE em producao desde 2026-08-28 (pedido explicito do usuario anterior, REGRAS_MODULACAO_BLOCOS.md secao 23), com o nome `OPENING_STRATEGY_CONTINUOUS_FIRST`, e JA' E' O PADRAO (`DEFAULT_OPENING_STRATEGY = OPENING_STRATEGY_CONTINUOUS_FIRST`). O modo antigo (`split_first`) so' e' alcancado quando EXPLICITAMENTE passado como parametro (testes/benchmark comparativo) - nenhum caminho de producao (solver_bridge, wall_modeling.py) passa outra coisa alem de None (= usa o padrao). Existe UM ponto de degradacao interna documentado (secao 23.5b das REGRAS) e UM item de investigacao ja' aberto (jamb_exceptions=172 inesperado) - ver 'ambiguous_or_open_items' abaixo.",
+  "entries": [
+    {
+      "file": "nuvem/core/engine/continuous_modulation.py",
+      "symbol": "modulo inteiro (OPENING_STRATEGY_CONTINUOUS_FIRST, DEFAULT_OPENING_STRATEGY, classify_extent_against_openings, opening_repair_regions, plan_minimum_opening_adjustment)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "Modulo PURO (so' aritmetica em cm, sem XYZ/Revit/catalogo) dedicado a' nova ordem: decide quais pecas do layout continuo sobrevivem ao recorte de abertura, qual e' a regiao MINIMA a recalcular, e o menor ajuste geometrico. `DEFAULT_OPENING_STRATEGY = OPENING_STRATEGY_CONTINUOUS_FIRST` na linha 58 - a mudanca de padrao esta' no codigo, nao so' documentada."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "solve_wall_free_fill (linha 4590), parametro opening_strategy (linhas 4644-4693)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "`strategy = opening_strategy or DEFAULT_OPENING_STRATEGY` (4670) - resolve para CONTINUOUS_FIRST sempre que o chamador nao especifica. `continuous_first = bool(openings_sorted) and (strategy == OPENING_STRATEGY_CONTINUOUS_FIRST)` (4674): sem abertura nenhuma as duas estrategias sao o MESMO problema, entao so' importa quando ha' vao de verdade. No modo continuo, `base_boundaries` NAO inclui OPENING_LO/OPENING_HI (a parede e' modulada inteira, no'-a-no')."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "_recut_openings_and_repair (linha 4393)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "A etapa 'REMOVER PECAS QUE INTERSECTAM O VAO -> REPARAR SOMENTE A REGIAO AFETADA' do pipeline pedido pelo usuario: derruba a peca INTEIRA que invade o vao (nunca corta uma peca ao meio), e so' recalcula a regiao minima afetada (`opening_repair_regions`, ver continuous_modulation.py) - bate com o item 19 literalmente ('nao e' uma fronteira que transforma a parede em 2/3/4 problemas independentes')."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "solve_opening_jamb (linha 2134)",
+      "classification": "LEGACY_SPLIT_FIRST_FOR_COMPARISON",
+      "note": "Decide a peca ENCOSTADA num vao ANTES do resto existir - e' literalmente o comportamento `split_first`. So' e' chamado quando `opening_strategy=OPENING_STRATEGY_SPLIT_FIRST` e' passado explicitamente (ver `solve_all_opening_jambs`) - nenhum caminho de producao faz isso hoje."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "OPENING_STRATEGY_SPLIT_FIRST / OPENING_STRATEGY_CONTINUOUS_FIRST (re-exportados de continuous_modulation.py)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "Apenas re-exporta as constantes do modulo puro para o namespace principal do motor - nao redefine estrategia propria."
+    },
+    {
+      "file": "nuvem/core/wall_modeling.py",
+      "symbol": "solve_building_blocks_all_courses (linha ~3059), parametro opening_strategy=None repassado (linha 3128)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "O ENTRY POINT que `solver_bridge.run_solver` (usado por TODO este laboratorio de auditoria, baseline e cross-audit) chama passa `opening_strategy=opening_strategy` sem override - resolve para o padrao CONTINUOUS_FIRST. Confirmado por grep: nenhum arquivo de producao (`solver_bridge.py`, `wall_modeling_bridge.py`, UI do pyRevit) passa `OPENING_STRATEGY_SPLIT_FIRST` em lugar nenhum - so' `tests/test_script.py` (comparacao explicita) o faz."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "_pier_layout_avoiding_joints / _pier_ordered_layout / _greedy_fill_blocks",
+      "classification": "NOT_RELEVANT",
+      "note": "Camada de LAYOUT DE BLOCO (qual peca de qual tamanho, em que ordem, dentro de um trecho ja' delimitado) - nao decide SE a abertura vira fronteira ou nao (isso e' decidido antes, em `boundaries`/`continuous_first`). E' a mesma camada onde a CONTA 1 aponta a SEGUNDA causa do nao-determinismo (item 12 deste cross-audit) - relacionada mas ortogonal a esta arquitetura."
+    },
+    {
+      "file": "tests/test_script.py",
+      "symbol": "testes que comparam explicitamente split_first vs continuous_first (linhas 1291-1308, 7295-7305 e outras)",
+      "classification": "LEGACY_SPLIT_FIRST_FOR_COMPARISON",
+      "note": "Uso EXATAMENTE do tipo permitido pelo item 21 da missao ('pode permanecer se for teste/benchmark comparativo') - confirma que a comparacao entre os dois modos continua coberta por teste permanente, nao e' codigo morto sem uso."
+    },
+    {
+      "file": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+      "symbol": "secao 23 'PIPELINE OFICIAL DE ABERTURAS — parede completa primeiro' (linha 1910)",
+      "classification": "OFFICIAL_CONTINUOUS_FIRST",
+      "note": "A regra JA' ESTA' DOCUMENTADA por extenso, com o pipeline completo (GRAFO L/T/X -> PAREDE INTEIRA -> MODULACAO -> RECORTE -> REPARO -> VALIDACAO) - e' basicamente o MESMO enunciado que o item 19 desta missao pede para propor. Ver 'PROPOSTA DE DUAS REGRAS ARQUITETURAIS OFICIAIS' no relatorio: a recomendacao aqui e' so' reforcar/cross-referenciar esta secao a partir do CR-BLOCK-DETERMINISM, nao criar regra nova do zero."
+    },
+    {
+      "file": "nuvem/benchmark/RELATORIO_BASELINE_BLOCOS.md",
+      "symbol": "nota 'pipeline de producao hoje e' continuous_first' (linha 38) + jamb_exceptions=172 (linha 206)",
+      "classification": "AMBIGUOUS",
+      "note": "Confirma o padrao em producao, mas registra `jamb_exceptions=172` em modo continuous_first como 'esperado ser 0' - ver item aberto correspondente abaixo."
+    },
+    {
+      "file": "docs/BLOCK_MODULATION_AUDIT.md",
+      "symbol": "secao 23.5b (degradacao para split_first) + P2-3 (linha 679, jamb_exceptions=172 inesperado)",
+      "classification": "AMBIGUOUS",
+      "note": "Documenta um mecanismo de DEGRADACAO interna para o comportamento split_first (nao e' 'estrategia principal silenciosa' - e' bounded, documentado e MEDIDO: `jamb_exceptions`), mas a propria auditoria anterior (CONTA 2, item P2-3 do backlog) ja' registrou que o NUMERO observado (172) e' inesperado a' luz da doc ('deveria ser 0 no modo continuous_first'). Este cross-audit NAO investigou P2-3 a fundo (fora do escopo do determinismo) - fica como item aberto pre-existente, nao criado por este CR."
+    }
+  ],
+  "ambiguous_or_open_items": [
+    {
+      "item": "jamb_exceptions=172 em modo continuous_first",
+      "status": "ja' estava aberto ANTES deste CR (docs/BLOCK_MODULATION_AUDIT.md P2-3), nao investigado por este cross-audit (fora de escopo - nao e' sobre determinismo). Nao classificar como CONTRADICTS_OFFICIAL_ARCHITECTURE sem investigar: pode ser degradacao legitima e documentada (secao 23.5b) contada corretamente, ou residuo de instrumentacao. Recomendado para um proximo CR dedicado, nao para o CR-BLOCK-DETERMINISM."
+    }
+  ],
+  "conclusion_for_item_21": "NAO existe split_first como estrategia PRINCIPAL SILENCIOSA em nenhum caminho de producao encontrado. O legado permanece por dois motivos EXPLICITAMENTE permitidos pelo item 21: (1) comparacao em teste permanente (tests/test_script.py), (2) mecanismo de degradacao BOUNDED e documentado (secao 23.5b), nao um fallback silencioso e ilimitado."
+}

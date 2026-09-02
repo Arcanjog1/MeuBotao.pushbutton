@@ -1,0 +1,567 @@
+{
+  "label": "head",
+  "n": 14,
+  "project_id": "piloto_sintetico_2x2",
+  "violacoes": [
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 0,
+      "COURSE_B": 1,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 1,
+      "COURSE_B": 2,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 2,
+      "COURSE_B": 3,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 3,
+      "COURSE_B": 4,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 4,
+      "COURSE_B": 5,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 5,
+      "COURSE_B": 6,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 6,
+      "COURSE_B": 7,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        0.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W004"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 0,
+      "COURSE_B": 1,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 1,
+      "COURSE_B": 2,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 2,
+      "COURSE_B": 3,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 3,
+      "COURSE_B": 4,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 4,
+      "COURSE_B": 5,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 5,
+      "COURSE_B": 6,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    },
+    {
+      "A_BLOCK_LEFT": {
+        "code": "B34",
+        "origem": "L_CORNER",
+        "t_end_cm": 34.0,
+        "t_start_cm": 0.0
+      },
+      "A_BLOCK_RIGHT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 54.0,
+        "t_start_cm": 35.0
+      },
+      "B_BLOCK_LEFT": {
+        "code": "B19",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 34.0,
+        "t_start_cm": 15.0
+      },
+      "B_BLOCK_RIGHT": {
+        "code": "B39",
+        "origem": "STANDARD_FILL",
+        "t_end_cm": 74.0,
+        "t_start_cm": 35.0
+      },
+      "COURSE_A": 6,
+      "COURSE_B": 7,
+      "DISTANCE_CM": 0.0,
+      "DISTANCE_TO_NODE_CM": 27.5,
+      "JOINT_POSITION_A": 34.5,
+      "JOINT_POSITION_B": 34.5,
+      "NEAREST_NODE": [
+        0.0,
+        700.0
+      ],
+      "NODE_TYPE": "L_CORNER",
+      "PROJECT": "piloto_sintetico_2x2",
+      "REASON": "JUNTA_PECA_DE_NO_x_PREENCHIMENTO nao entra em `_layout_internal_joint_positions_cm`: a fiada oposta nao a ve' como junta a evitar (origens: ['L_CORNER'])",
+      "WALL": "W011"
+    }
+  ]
+}

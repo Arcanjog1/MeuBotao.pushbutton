@@ -1,0 +1,145 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "ablacoes": [
+    {
+      "ablacao": "A0_main_sem_correcao",
+      "trios_PARTIDOS_por_variante": [
+        0,
+        1,
+        2
+      ],
+      "regressoes_criticas_vs_baseline": {},
+      "config": {
+        "cluster": "legacy",
+        "point": "legacy",
+        "sort_input": false
+      },
+      "fingerprints_grafo_distintos": 8,
+      "fingerprints_blocos_distintos": 8,
+      "classificacoes_distintas": 3,
+      "contagens_de_pecas_distintas": [
+        10516,
+        10544,
+        10551,
+        10587,
+        10589,
+        10595,
+        10644,
+        10686
+      ],
+      "trios_nao_transitivos_na_planta": 2
+    },
+    {
+      "ablacao": "A1_so_ordenar_entrada",
+      "trios_PARTIDOS_por_variante": [
+        0
+      ],
+      "regressoes_criticas_vs_baseline": {},
+      "config": {
+        "cluster": "legacy",
+        "point": "legacy",
+        "sort_input": true
+      },
+      "fingerprints_grafo_distintos": 2,
+      "fingerprints_blocos_distintos": 2,
+      "classificacoes_distintas": 1,
+      "contagens_de_pecas_distintas": [
+        10548,
+        10571
+      ],
+      "trios_nao_transitivos_na_planta": 2
+    },
+    {
+      "ablacao": "A2_componente_conexa",
+      "trios_PARTIDOS_por_variante": [
+        0
+      ],
+      "regressoes_criticas_vs_baseline": {},
+      "config": {
+        "cluster": "components_unordered",
+        "point": "legacy",
+        "sort_input": false
+      },
+      "fingerprints_grafo_distintos": 8,
+      "fingerprints_blocos_distintos": 8,
+      "classificacoes_distintas": 1,
+      "contagens_de_pecas_distintas": [
+        10516,
+        10527,
+        10546,
+        10551,
+        10561,
+        10570,
+        10572,
+        10588
+      ],
+      "trios_nao_transitivos_na_planta": 2
+    },
+    {
+      "ablacao": "A3_mais_ordem_canonica",
+      "trios_PARTIDOS_por_variante": [
+        0
+      ],
+      "regressoes_criticas_vs_baseline": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          293
+        ],
+        "COVERAGE_ROW_MOSTLY_EMPTY": [
+          171,
+          181
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          148
+        ]
+      },
+      "config": {
+        "cluster": "current",
+        "point": "legacy",
+        "sort_input": false
+      },
+      "fingerprints_grafo_distintos": 1,
+      "fingerprints_blocos_distintos": 2,
+      "classificacoes_distintas": 1,
+      "contagens_de_pecas_distintas": [
+        10548,
+        10571
+      ],
+      "trios_nao_transitivos_na_planta": 2
+    },
+    {
+      "ablacao": "A4_correcao_completa",
+      "trios_PARTIDOS_por_variante": [
+        0
+      ],
+      "regressoes_criticas_vs_baseline": {
+        "COVERAGE_MISSING_ROW": [
+          265,
+          293
+        ],
+        "COVERAGE_ROW_MOSTLY_EMPTY": [
+          171,
+          181
+        ],
+        "OPENING_BLOCK_CROSSES_JAMB": [
+          147,
+          148
+        ]
+      },
+      "config": {
+        "cluster": "current",
+        "point": "current",
+        "sort_input": false
+      },
+      "fingerprints_grafo_distintos": 1,
+      "fingerprints_blocos_distintos": 2,
+      "classificacoes_distintas": 1,
+      "contagens_de_pecas_distintas": [
+        10548,
+        10571
+      ],
+      "trios_nao_transitivos_na_planta": 2
+    }
+  ]
+}

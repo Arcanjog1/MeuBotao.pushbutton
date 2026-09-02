@@ -36,6 +36,19 @@ Revit real. **PRÓXIMA FASE AUTORIZADA: MODULAÇÃO DOS BLOCOS** (seção 10)
 suficiente para o usuário autorizar o avanço, mesmo com o teste visual
 integrado ainda pendente.
 
+**Onde a modulação de blocos está (2026-09-02).** `CR-BLOCK-01` (amarração
+vertical / prisma) está **mergeado na `main`**. `CR-BLOCK-DETERMINISM` está
+em duas metades: o **wall graph** foi implementado e **aprovado por
+cross-audit independente**, e a **finalização** (o sentido dos endpoints)
+está implementada na branch `claude/cr-block-determinism-finalization-chkixk`
+e **parada antes do merge**, aguardando cross-audit final. Depois dela, as
+24 ordens de entrada da bateria produzem **1 único resultado físico** nos
+dois projetos reais de benchmark. As três **REGRAS FUNDAMENTAIS DO MOTOR**
+(determinismo geométrico; ordem oficial das paredes; parede completa
+primeiro / abertura depois) passaram a abrir
+`nuvem/REGRAS_MODULACAO_BLOCOS.md`. Detalhe completo na seção 13
+("2026-09-02 — `CR-BLOCK-DETERMINISM` FINALIZADO").
+
 ## 2. Estado atual da main
 
 ```
@@ -699,6 +712,132 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-02 — `CR-BLOCK-DETERMINISM` FINALIZADO (aguardando cross-audit final)
+
+```
+data:          2026-09-02
+CR:            CR-BLOCK-DETERMINISM (finalização — fecha a segunda causa,
+               o SENTIDO DOS ENDPOINTS)
+status:        IMPLEMENTADO / PARADO ANTES DO MERGE
+               DETERMINISM_FIXED + QUALITY_GATE_PENDING (ver 13.x abaixo)
+
+branches e SHAs:
+  main de referência (baseline do CR):  24ada98f5a8d4e7aa4cf0b30621d7818e4bb4fdc
+  main atual no início desta sessão:    c65f1a9d49248406e30d616061191f7ec8428b9e
+  wall graph (CONTA 1, APROVADO):       claude/block-pipeline-determinism-uj7cvq
+    SHA auditado:                        45161900bce82c65749328f0702571b89bfef2ac
+  cross-audit (CONTA 2):                claude/block-determinism-cross-audit
+    SHA:                                 9a0757bfb8f92e94ebafb2353119ffc24bfc11f4
+  finalização (esta):                   claude/cr-block-determinism-finalization-chkixk
+```
+
+**WALL GRAPH: APROVADO POR CROSS-AUDIT — PRESERVADO.**
+`nuvem/core/engine/wall_pairing.py` **não foi alterado** nesta finalização
+(gate G16). A branch de finalização parte da cross-audit (que já contém o
+wall graph canônico) mesclada sobre a `main` atual.
+
+**ENDPOINT DIRECTION: CORRIGIDO.**
+
+Causas medidas (não supostas — laboratório reproduzível em
+`nuvem/benchmark/diagnostics_block_determinism_final/`):
+
+1. o eixo lógico do preenchimento era o eixo de DESENHO (`p0→p1`);
+2. ruído de ponto flutuante de `4e-14 cm` (`pier_cm` = `364.00899999999984`
+   contra `364.0089999999998`) caindo dos dois lados de um limiar de
+   comparação — provado com `run_layout_trace.py`, que mostra
+   `_pier_layout_avoiding_joints` recebendo argumentos iguais em todas as
+   casas medidas e devolvendo layouts diferentes;
+3. `solve_x_intersection` centrava a peça no sentido de desenho — para o
+   **B34 assimétrico** da degradação isso ESPELHAVA fisicamente a peça.
+
+Correções (produção: **só** `nuvem/core/engine/wall_stepper.py`):
+`wall_axis_is_reversed` / `canonical_wall_axis` /
+`_canonical_wall_solving_view` / `_unmirror_fill_result` /
+`PIER_LENGTH_SNAP_DECIMALS` (grade de 1e-6 cm) / eixo canônico em X e no
+B54 do T.
+
+**Benchmark — 24 ordens, bateria integral da CONTA 2, sem redução:**
+
+```
+torre_easy_lo_r00_tgd    6 fingerprints  ->  1
+torre_easy_lo_r00_tp1    4 fingerprints  ->  1
+spread entre as 24 ordens:
+  pieces 41->0   collisions 17->0   non_modular 9->0
+  B19 31->0      C09 42->0          C04 39->0
+alignment_conflicts = 0 e same-band forbidden = 0 (CR-BLOCK-01 preservado)
+```
+
+**REGRAS FUNDAMENTAIS documentadas** — `nuvem/REGRAS_MODULACAO_BLOCOS.md`
+ganhou uma abertura própria (antes da seção 1) com as três regras:
+determinismo geométrico, ordem oficial das paredes e parede completa
+primeiro/abertura depois. Detalhe do CR na nova seção 29.
+
+**ORDEM OFICIAL — correção real encontrada.** A cross-audit havia
+classificado `order_walls_for_processing` como já conforme; a verificação
+direta contra o enunciado do usuário mostrou que as **verticais estavam com
+os dois critérios trocados** (X como principal em vez de Y) e que os três
+grupos desempatavam por `wall_idx` (posição na lista). Corrigido; medido:
+nenhuma métrica crítica dos 3 projetos muda com isso.
+
+**PAREDE COMPLETA PRIMEIRO — censo confirmado, nada a corrigir.**
+`DEFAULT_OPENING_STRATEGY == OPENING_STRATEGY_CONTINUOUS_FIRST` é o único
+default de produção; `split_first` só é alcançado por parâmetro explícito
+(testes comparativos) e pela degradação bounded e rotulada
+(`continuity_degraded`). Nenhum arquivo em produção contradiz a regra.
+
+**Testes:** `tests/test_block_pipeline_determinism.py` (novo, 52
+invariantes permanentes). A suíte REPRODUZ a falha: contra o código
+anterior a esta CR são **36 falhas / 16 passes**; contra o corrigido,
+**52 passes**. Árvore inteira: **494 passed, 3 failed** — as 3 falhas são
+os baselines de benchmark (item abaixo).
+
+**BASELINES — NENHUM `baseline.json` FOI ALTERADO** (gate G17). Classificação:
+
+| projeto | código | baseline | agora | classificação |
+|---|---|---|---|---|
+| tgd | `COVERAGE_MISSING_ROW` | 265 | 293 | BASELINE_STALE_SAFE_TO_REFRESH (já vinha do wall graph, seção 28) |
+| tgd | `COVERAGE_ROW_MOSTLY_EMPTY` | 171 | 187 | BASELINE_STALE_SAFE_TO_REFRESH |
+| tgd | `OPENING_BLOCK_CROSSES_JAMB` | 147 | **147** | resolvido — voltou ao baseline |
+| tgd | `PRISM_CONTINUOUS_JOINT` | 961 | **562** | MELHORIA |
+| tp1 | `COVERAGE_MISSING_ROW` | 16 | 18 | BASELINE_STALE_SAFE_TO_REFRESH |
+| tp1 | `OPENING_BLOCK_CROSSES_JAMB` | 168 | **154** | MELHORIA |
+| tp1 | `PRISM_CONTINUOUS_JOINT` | 968 | **730** | MELHORIA |
+| piloto | `PRISM_CONTINUOUS_JOINT` | 7 | 14 | **REAL_QUALITY_REGRESSION** (localizada — ver abaixo) |
+
+Evidência que sustenta "BASELINE STALE": rodando as 24 ordens **no código
+anterior**, `COVERAGE_ROW_MOSTLY_EMPTY` do tgd variava 181–187,
+`OPENING_BLOCK_CROSSES_JAMB` 146–148 e `PRISM_CONTINUOUS_JOINT` 556–581 —
+o `baseline.json` gravou **uma** dessas ordens. Depois da correção, todos
+esses códigos têm `spread = 0` nas 24 ordens.
+
+**QUALITY_GATE_PENDING — o único item aberto.** No `piloto_sintetico_2x2`
+(sintético, 12 paredes, 780 blocos) `PRISM_CONTINUOUS_JOINT` sobe de 7 para
+14. Diagnosticado parede a parede: W004 e W011 são **geometricamente
+idênticas** (364 cm, 14 cm, horizontais) e antes recebiam layouts
+**diferentes** — não por decisão, mas porque o ruído de último bit caía de
+lados opostos em cada uma. Com a grade longitudinal as duas passam a
+receber o **mesmo** layout (o correto pela REGRA FUNDAMENTAL 1), e esse
+layout carrega um defeito **pré-existente**: a junta entre a peça de nó e o
+primeiro bloco (`t=34,5`) não entra na lista de juntas a evitar da fiada
+oposta, então a fiada B coloca uma junta interna exatamente ali
+(`desencontro 0,00cm`). Nenhuma parede do piloto está invertida
+(`wall_axis_is_reversed` é `False` nas 12), então **não é regressão da
+convenção de direção**; e a busca de amarração não foi tocada, então
+**não é regressão do `CR-BLOCK-01`**. Registrado como dívida em
+`REGRAS_MODULACAO_BLOCOS.md` seção 29.6 — a correção é mudança na REGRA DE
+AMARRAÇÃO e pede CR próprio.
+
+**Achado de metodologia (importante para a cross-audit final):** a variante
+`endpoint_reversal` da bateria só é geometricamente válida quando
+`settings.walls_already_extended` é `True`. Com `False` (caso do
+`piloto_sintetico_2x2`) ela reparametriza as aberturas contra o comprimento
+do `input.json` enquanto o motor usa o eixo já esticado — cada vão sai
+deslocado em 2× a extensão (medido: 14 cm). Detalhe em
+`REGRAS_MODULACAO_BLOCOS.md` seção 29.5.
+
+**PARADO ANTES DO MERGE.** Nada foi mesclado na `main`.
+
+
 ### 2026-09-02 — `CR-BLOCK-01` CONCLUÍDO / APROVADO POR CROSS-AUDIT
 
 ```
@@ -1086,3 +1225,165 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+### 2026-09-02 — `CR-BLOCK-DETERMINISM` (determinismo do wall graph e do pipeline de blocos)
+
+```
+data:          2026-09-02
+CR:            CR-BLOCK-DETERMINISM (CONTA 1 de um par de sessões paralelas;
+               a CONTA 2 faz auditoria independente e não altera produção)
+branch:        claude/block-pipeline-determinism-uj7cvq
+SHA baseline:  24ada98f5a8d4e7aa4cf0b30621d7818e4bb4fdc
+status:        IMPLEMENTADO — AGUARDANDO CROSS-AUDIT
+merge:         NÃO feito (o CR proíbe explicitamente; a autorização
+               permanente de merge direto do CLAUDE.md NÃO se aplica aqui)
+```
+
+**PROBLEMA (reproduzido, não herdado)** — sobre a mesma geometria, as 8
+execuções do censo (`baseline`, `reversed`, `endpoint_reversal`,
+`shuffle_seed_{1,2,3,10,42}`) produziam **8 fingerprints distintos**. O
+`run_determinism_census.py` da CONTA 2, re-rodado sobre esta `main`,
+devolve exatamente as mesmas contagens de peças — o JSON versionado dela
+era de um commit anterior ao merge do `CR-BLOCK-01`.
+
+**PRIMEIRA DIVERGÊNCIA** — fingerprint canônico por camada
+(`nuvem/benchmark/diagnostics_block_determinism/out_baseline.json`;
+nenhum deles olha `wall_idx`, ordem de lista, `id()` ou ordem de `dict`):
+
+| camada | antes | depois |
+|---|---|---|
+| `fp_input_walls` | 1 | 1 |
+| `fp_nodes` | **8** | **1** |
+| `fp_node_classifications` | 8 | 1 |
+| `fp_end_to_node` | 8 | 1 |
+| `fp_midspan` | 1 | 1 |
+| `fp_ltx_reservations` | 7 | 1 |
+| `fp_candidates` | 8 | 2 |
+| `fp_blocks` | 8 | 2 |
+
+A primeira camada divergente era `fp_nodes` nas 7 variantes: o problema
+estava **inteiramente dentro de `build_wall_graph`**. `find_wall_pairs`,
+`extend_wall_ends_to_junctions` e o `junction_map` ficam **bit-idênticos**
+— o conjunto de paredes que ENTRA no grafo nunca mudou.
+
+**CAUSA-RAIZ** (sub-camadas, `out_rootcause.json` / `out_examples.json`):
+
+1. `_cluster_wall_arms` — agrupamento guloso em bola de raio fixo em volta
+   da **primeira ponta visitada**. "Âncoras a ≤ 5 cm" **não é transitiva**:
+   dois trios medidos com `d(A,B)=3,50`, `d(A,C)=2,41`, `d(B,C)=5,91` cm.
+   Efeito: 256 → 257/258 clusters, 273 → 274/275 nós, `T_INTERSECTION`
+   118 → 119/120.
+2. `_classify_wall_node` — `point = group[0]["anchor"]`. 11 grupos têm a
+   mesma parede com as **duas** pontas (parede mais curta que a
+   tolerância); em ≥ 2 deles o nó andava **4,45 cm** com a inversão do eixo.
+3. `_classify_wall_node` — papéis por **posição** em `arm_ids`. Medidos
+   22–63 nós geometricamente idênticos com `main`/`incoming`/`neighbor`
+   trocados e 4–55 com `arms` em ordem diferente.
+4. `_find_wall_midspan_crossings` — `crossing_walls = (i, j)` por **índice**;
+   17 cruzamentos em X trocavam a ordem do par, que decide qual parede
+   recebe o B54 da fiada A e qual o da fiada B.
+5. (latente) `_wall_end_geometric_anchor` / `_find_wall_touching_point` —
+   desempate "primeiro vence", isto é, pelo índice na lista.
+
+**IMPLEMENTAÇÃO** — único arquivo de produção tocado:
+`nuvem/core/engine/wall_pairing.py`, e dentro dele só `build_wall_graph` e
+os helpers de construção/classificação de nó. Componente conexa
+(union-find) no agrupamento; chaves canônicas puras
+(`_wall_graph_wall_key` / `_wall_graph_arm_key` / `_wall_graph_group_key`);
+centroide das âncoras distintas como ponto do nó; `crossing_walls` e a
+lista de cruzamentos em ordem canônica; desempate geométrico nas duas
+buscas. **Sem tolerância nova** — foi medido que âncora, ponta e direção
+saem bit-idênticas nas 8 permutações, então as chaves comparam float cru.
+
+**SORT × CORREÇÃO ESTRUTURAL** (ablação obrigatória, `out_ablation.json`):
+
+| ablação | fp grafo | fp blocos | trios PARTIDOS por variante |
+|---|---|---|---|
+| A0 `main` sem correção | 8 | 8 | **[0, 1, 2]** |
+| A1 só ordenar a entrada | **2** | 2 | [0] |
+| A2 componente conexa | 8 | 8 | [0] |
+| A3 + ordem canônica | **1** | 2 | [0] |
+| A4 correção completa | **1** | 2 | [0] |
+
+**Só ordenar a entrada NÃO fecha o CR**: sobram 2 fingerprints, e a
+partição continua decidida por ordem de visita (só que uma ordem fixa).
+A2 mostra que a componente conexa já resolve a **ambiguidade estrutural**
+(trios partidos: 0 em toda variante) mas não dá determinismo, porque os
+papéis ainda vinham da ordem. A3 é a combinação que fecha o grafo.
+
+**SEGUNDA CAUSA, LOCALIZADA E NÃO ESCONDIDA** — as **7 permutações** da
+lista dão fingerprint de blocos **idêntico**. Sobra `endpoint_reversal`, e
+a causa já não é o grafo: as peças de amarração L/T/X ficam iguais em
+**1.581 de 1.581** pares (parede, fiada); quem diverge é só o
+preenchimento (727 de 1.354), porque `_greedy_fill_blocks`
+(`core/engine/wall_stepper.py`) corre de `GetEndPoint(0)` para
+`GetEndPoint(1)`.
+
+> **NECESSIDADE_DE_ESCOPO_ADICIONAL (1)** — `core/engine/wall_stepper.py`:
+> o preenchimento comum precisa de referencial longitudinal canônico para
+> o pipeline ficar invariante também ao **sentido de desenho**. Fora da
+> área de escrita autorizada deste CR.
+
+**NÃO-REGRESSÃO** (3 projetos, `diagnostics_block_prisma/metrics.py`):
+
+| métrica | antes | depois |
+|---|---|---|
+| `same_band` forbidden (gate `CR-BLOCK-01`) | 0 | **0** |
+| `alignment_conflicts` (gate `CR-BLOCK-01`) | 0 | **0** |
+| paredes com blocos (gate `CR-BLOCK-01`) | 246/275 | **246/275** |
+| `collisions` | 1048 | 1048 |
+| `door_void_violations` | 638 | 638 |
+| `intersection_failures` | 200 | 200 |
+| `non_modular` | 3438 | 3435 |
+| `pieces` | 29477 | 29359 |
+| `cross_band` forbidden | 51 | 57 |
+
+**PERFORMANCE** — `build_wall_graph` isolado, melhor de 7, cinco medições:
+−7,2%, −1,0%, +0,4%, +3,1%, +3,5%. Diferença absoluta ≤ 0,02 s numa planta
+de 167 paredes: **indistinguível de ruído**. Mesma classe de complexidade
+(O(n²) em comparações de âncora); a componente conexa faz exatamente
+`n(n−1)/2` comparações onde a bola gulosa fazia ≤ isso, mais union-find
+(quase O(1) amortizado) e ordenação canônica de grupos de 1 a 4 pontas.
+
+**TESTES**
+
+| suíte | resultado |
+|---|---|
+| `tests/test_block_graph_determinism.py` (nova) | **27 passed** (2 `slow` inclusos) |
+| `tests/test_script.py` | **260 passed** |
+| `tests/test_block_bonding.py` | **32 passed** |
+| `tests/regression` | **111 passed, 2 failed** |
+| `nuvem/tests` | **18 passed** |
+
+**RISCOS E DÍVIDAS**
+
+1. As 2 falhas são `test_benchmark_baselines.py` (`torre_easy_lo_r00_tgd`:
+   `COVERAGE_MISSING_ROW` 265→270, `OPENING_BLOCK_CROSSES_JAMB` 147→149;
+   `tp1`: `COVERAGE_MISSING_ROW` 16→18). São consequência direta da
+   canonização do papel A/B dos cantos em L — que **não era função da
+   geometria**, saía da posição na lista, e por isso nenhuma ordenação
+   canônica consegue reproduzi-lo. Nenhuma delas é violação de regra de
+   amarração: `PRISM_CONTINUOUS_JOINT` e `JUNCTION_MISSING_BINDING` **não
+   se movem** com a convenção adotada (as outras duas convenções medidas
+   mexiam — ver `REGRAS_MODULACAO_BLOCOS.md` §28.3).
+
+   > **NECESSIDADE_DE_ESCOPO_ADICIONAL (2)** — `nuvem/benchmark/projects/**`:
+   > os `baseline.json` congelaram a ordem antiga e precisam ser
+   > regravados. Fora da área de escrita autorizada deste CR. Mesma
+   > situação do `CR-BLOCK-01`, cuja correção de teste ficou para a branch
+   > de finalização.
+
+2. A convenção de ordem dos braços foi escolhida por **medição nos três
+   projetos**, não por princípio puro — a geometria genuinamente não
+   decide esse empate. Está documentada em `REGRAS_MODULACAO_BLOCOS.md`
+   §28.3 com a tabela das três candidatas, para que uma revisão futura
+   não a troque sem refazer a medição.
+
+3. `cross_band` forbidden 51 → 57: população que o `CR-BLOCK-01` deixou
+   explicitamente fora de escopo (exigiria mexer em
+   `solve_building_blocks_all_courses`). Não é o `same_band`, que continua 0.
+
+4. `_classify_point_along_wall` testa `near_start` antes de `near_end`:
+   numa parede vizinha mais curta que a própria espessura os dois podem
+   ser verdadeiros. É **determinístico** (não depende de ordem), mas é uma
+   ambiguidade geométrica não resolvida — registrada, não corrigida.

@@ -1,0 +1,137 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "walls_already_extended": true,
+  "reversal_variants_are_valid_here": true,
+  "n_permutation_variants": 19,
+  "n_reversal_variants": 5,
+  "codes": {
+    "COVERAGE_MISSING_ROW": {
+      "baseline_json": 265,
+      "current_baseline_order": 293,
+      "permutation": {
+        "min": 293,
+        "max": 293,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 293,
+        "max": 293,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "COVERAGE_ROW_MOSTLY_EMPTY": {
+      "baseline_json": 171,
+      "current_baseline_order": 181,
+      "permutation": {
+        "min": 181,
+        "max": 181,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 181,
+        "max": 187,
+        "spread": 6,
+        "distinct": 2
+      }
+    },
+    "COVERAGE_WALL_NOT_MODULATED": {
+      "baseline_json": 29,
+      "current_baseline_order": 29,
+      "permutation": {
+        "min": 29,
+        "max": 29,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 29,
+        "max": 29,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "JUNCTION_MISSING_BINDING": {
+      "baseline_json": 24,
+      "current_baseline_order": 23,
+      "permutation": {
+        "min": 23,
+        "max": 23,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 23,
+        "max": 23,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "OPENING_BLOCK_CROSSES_JAMB": {
+      "baseline_json": 147,
+      "current_baseline_order": 148,
+      "permutation": {
+        "min": 148,
+        "max": 148,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 146,
+        "max": 148,
+        "spread": 2,
+        "distinct": 3
+      }
+    },
+    "OPENING_BLOCK_INSIDE_DOOR": {
+      "baseline_json": 45,
+      "current_baseline_order": 43,
+      "permutation": {
+        "min": 43,
+        "max": 43,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 43,
+        "max": 46,
+        "spread": 3,
+        "distinct": 3
+      }
+    },
+    "POSITION_OVERLAP": {
+      "baseline_json": 29,
+      "current_baseline_order": 29,
+      "permutation": {
+        "min": 29,
+        "max": 29,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 29,
+        "max": 29,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "PRISM_CONTINUOUS_JOINT": {
+      "baseline_json": 961,
+      "current_baseline_order": 563,
+      "permutation": {
+        "min": 563,
+        "max": 563,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 556,
+        "max": 581,
+        "spread": 25,
+        "distinct": 4
+      }
+    }
+  }
+}

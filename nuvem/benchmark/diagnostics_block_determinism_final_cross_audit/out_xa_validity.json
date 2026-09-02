@@ -1,0 +1,618 @@
+{
+  "piloto_sintetico_2x2": {
+    "detalhe": [
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "baseline"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversed_order"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_3"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_10"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_42"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_5"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_7"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_11"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_13"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_17"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_23"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_50"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_99"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_123"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_999"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort_reversed"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_2"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_all"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_all"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_vertical_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_vertical_only"
+      },
+      {
+        "deslocamento_cm": 700.139986,
+        "detalhe": "deslocamento maximo 700.1400 cm / diferenca de dimensao 90.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_2"
+      }
+    ],
+    "invalidas": [
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_all"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_vertical_only"
+      },
+      {
+        "deslocamento_cm": 700.139986,
+        "detalhe": "deslocamento maximo 700.1400 cm / diferenca de dimensao 90.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 14.0,
+        "detalhe": "deslocamento maximo 14.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "INVALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_2"
+      }
+    ],
+    "n_invalidas": 5,
+    "n_validas": 26,
+    "tolerancia_cm": 0.05,
+    "walls_already_extended": false
+  },
+  "torre_easy_lo_r00_tgd": {
+    "detalhe": [
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "baseline"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversed_order"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_3"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_10"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_42"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_5"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_7"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_11"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_13"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_17"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_23"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_50"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_99"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_123"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_999"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort_reversed"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_all"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_all"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_vertical_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_vertical_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_2"
+      }
+    ],
+    "invalidas": [],
+    "n_invalidas": 0,
+    "n_validas": 31,
+    "tolerancia_cm": 0.05,
+    "walls_already_extended": true
+  },
+  "torre_easy_lo_r00_tp1": {
+    "detalhe": [
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "baseline"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversed_order"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_3"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_10"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_42"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_5"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_7"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_11"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_13"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_17"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_23"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_50"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_99"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_123"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_seed_999"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "geometric_sort_reversed"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "shuffle_within_orientation_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_all"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_all"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_horizontal_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_vertical_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_vertical_only"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_1"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_naive_random_seed_2"
+      },
+      {
+        "deslocamento_cm": 0.0,
+        "detalhe": "deslocamento maximo 0.0000 cm / diferenca de dimensao 0.0000 cm",
+        "validity": "VALID_METAMORPHIC_VARIANT",
+        "variant": "reversal_geometric_random_seed_2"
+      }
+    ],
+    "invalidas": [],
+    "n_invalidas": 0,
+    "n_validas": 31,
+    "tolerancia_cm": 0.05,
+    "walls_already_extended": true
+  }
+}
