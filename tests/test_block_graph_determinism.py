@@ -134,8 +134,16 @@ def node_full(walls, node):
         tuple(str(arm_key(walls, w, e)) for w, e in (node.get("arms") or [])),
         str(wall_key(walls, node.get("main_wall_idx"))),
         str(wall_key(walls, node.get("incoming_wall_idx"))),
-        str(wall_key(walls, node.get("neighbor_wall_idx"))),
-        node.get("neighbor_end_index"),
+        # `neighbor_end_index` e' o indice FISICO (0/1) da ponta da parede
+        # vizinha, e ele MUDA de valor quando aquele eixo e' desenhado ao
+        # contrario - `end_index` 0 e 1 sao literalmente GetEndPoint(0) e
+        # GetEndPoint(1). Comparar o numero cru acusaria como divergencia o
+        # comportamento CORRETO, entao o par (parede vizinha, ponta dela)
+        # entra aqui pela chave canonica de PONTA, que aponta para a mesma
+        # extremidade fisica nos dois sentidos de desenho.
+        str(arm_key(walls, node.get("neighbor_wall_idx"),
+                    node.get("neighbor_end_index"))
+            if node.get("neighbor_end_index") is not None else None),
         tuple(str(wall_key(walls, w)) for w in (node.get("crossing_walls") or [])),
     )
 
@@ -498,10 +506,20 @@ def _block_fingerprint(walls_to_create, solve_result):
 
 @pytest.mark.slow
 def test_INV_GRAPH_DET_013_fingerprint_de_blocos_independe_da_permutacao():
-    """INV-GRAPH-DET-013 - o invariante-alvo do CR: sobre o projeto real,
-    o fingerprint FINAL das pecas materializadas tem que ser o mesmo em
-    todas as ordens de entrada. Baseline do CR: 8 execucoes, 8
-    fingerprints."""
+    """INV-GRAPH-DET-013 - o invariante-alvo do CR: sobre o projeto real, o
+    fingerprint FINAL das pecas materializadas tem que ser o mesmo em toda
+    ORDEM DA LISTA de paredes. Baseline do CR: 8 execucoes, 8 fingerprints.
+
+    ESCOPO DELIBERADO: este invariante cobre PERMUTACAO da lista, nao a
+    inversao do sentido de desenho de cada eixo (`endpoint_reversal`).
+    Depois deste CR o GRAFO ficou invariante tambem a' inversao (e as
+    pecas de amarracao L/T/X com ele - medido: 0 de 1715 pares parede-fiada
+    divergem), mas o PREENCHIMENTO comum ainda nao: `_greedy_fill_blocks`
+    (wall_stepper.py) corre de `GetEndPoint(0)` para `GetEndPoint(1)`,
+    entao inverter o eixo faz a sobra cair na outra ponta do trecho.
+    Isso e' uma SEGUNDA causa, posterior ao grafo, fora do escopo deste CR
+    - ver docs/PROJECT_STATUS.md, NECESSIDADE_DE_ESCOPO_ADICIONAL. Afirmar
+    invariancia a' inversao aqui seria afirmar mais do que o codigo faz."""
     solver_bridge = _solver_bridge()
     input_project = _load_real_project()
     n = len(input_project["walls"])

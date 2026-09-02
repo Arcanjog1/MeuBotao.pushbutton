@@ -1,0 +1,14 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "n_paredes": 167,
+  "n_pontas_de_parede": 334,
+  "n_nos_legacy": 273,
+  "n_nos_atual": 273,
+  "pares_de_ancoras_no_pior_caso": 55611,
+  "build_wall_graph_legacy_s": 0.3361,
+  "build_wall_graph_atual_s": 0.3478,
+  "delta_s": 0.0117,
+  "delta_pct": 3.5,
+  "repeticoes_melhor_de": 7,
+  "nota": "As duas versoes sao O(n^2) em comparacoes de ancora. A bola gulosa PULA pares ja' usados, entao faz <= `pares`; a componente conexa faz exatamente `pares`. O custo extra e' esse, mais o union-find (quase O(1) amortizado) e a ordenacao canonica (O(n log n) por grupo, grupos de 1 a 4 pontas nesta planta)."
+}
