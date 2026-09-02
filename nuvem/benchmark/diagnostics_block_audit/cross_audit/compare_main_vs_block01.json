@@ -1,0 +1,578 @@
+{
+  "methodology_note": "Todos os numeros vem do MESMO laboratorio (lib_audit.py + run_*_census.py da CONTA 2, NAO modificados) rodado duas vezes: uma vez sobre um worktree temporario da MAIN pura (9f3bab41b35f0e2a5f9782583ead8e1ee7755f49) e uma vez sobre esta branch (CR-BLOCK-01 + ferramentas da CONTA 2 mescladas). '_tgd' = so' o projeto principal (torre_easy_lo_r00_tgd, 167 paredes). '_aggregate' = soma dos 3 projetos de benchmark (piloto_sintetico_2x2 + torre_easy_lo_r00_tgd + torre_easy_lo_r00_tp1 = 275 paredes), na MESMA granularidade que a CONTA 1 reportou no PROJECT_STATUS.md (para permitir comparacao direta) - recalculado aqui de forma independente, nao copiado do relato dela.",
+  "projects": {
+    "primary_detail": "torre_easy_lo_r00_tgd",
+    "aggregate": [
+      "piloto_sintetico_2x2",
+      "torre_easy_lo_r00_tgd",
+      "torre_easy_lo_r00_tp1"
+    ]
+  },
+  "total_pieces": {
+    "_tgd": {
+      "MAIN": 10657,
+      "CR_BLOCK_01": 10647,
+      "DELTA": -10,
+      "DELTA_PCT": -0.09
+    },
+    "_aggregate": {
+      "MAIN": 29517,
+      "CR_BLOCK_01": 29507,
+      "DELTA": -10,
+      "DELTA_PCT": -0.03
+    }
+  },
+  "walls_modulated": {
+    "_tgd": {
+      "MAIN": 138,
+      "CR_BLOCK_01": 138,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "_aggregate": {
+      "MAIN": 246,
+      "CR_BLOCK_01": 246,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "walls_not_modulated": {
+    "_tgd": {
+      "MAIN": 29,
+      "CR_BLOCK_01": 29,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "_aggregate": {
+      "MAIN": 29,
+      "CR_BLOCK_01": 29,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "cause_ranking_tgd": {
+      "MAIN": {
+        "L_T_X_FAILURE": 13,
+        "LENGTH_ARITHMETIC": 9,
+        "OPENING": 7
+      },
+      "CR_BLOCK_01": {
+        "L_T_X_FAILURE": 13,
+        "LENGTH_ARITHMETIC": 9,
+        "OPENING": 7
+      }
+    }
+  },
+  "non_modular_segments": {
+    "_tgd": {
+      "MAIN": 3023,
+      "CR_BLOCK_01": 3023,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "_aggregate": {
+      "MAIN": 3333,
+      "CR_BLOCK_01": 3336,
+      "DELTA": 3,
+      "DELTA_PCT": 0.09
+    }
+  },
+  "prism": {
+    "pairs_of_consecutive_courses_measured": {
+      "_tgd": {
+        "MAIN": 7444,
+        "CR_BLOCK_01": 7434,
+        "DELTA": -10,
+        "DELTA_PCT": -0.13
+      },
+      "_aggregate": {
+        "MAIN": 23260,
+        "CR_BLOCK_01": 23249,
+        "DELTA": -11,
+        "DELTA_PCT": -0.05
+      }
+    },
+    "suspect_continuous_vertical_joint": {
+      "_tgd": {
+        "MAIN": 1086,
+        "CR_BLOCK_01": 827,
+        "DELTA": -259,
+        "DELTA_PCT": -23.85
+      },
+      "_aggregate": {
+        "MAIN": 2936,
+        "CR_BLOCK_01": 2539,
+        "DELTA": -397,
+        "DELTA_PCT": -13.52
+      }
+    },
+    "walls_with_suspect_continuous_joint_tgd": {
+      "MAIN": 47,
+      "CR_BLOCK_01": 46,
+      "DELTA": -1,
+      "DELTA_PCT": -2.13
+    },
+    "stagger_cm_tgd": {
+      "min": {
+        "MAIN": 0.0,
+        "CR_BLOCK_01": 0.0
+      },
+      "mean": {
+        "MAIN": 21.532,
+        "CR_BLOCK_01": 22.179
+      },
+      "median": {
+        "MAIN": 15.0,
+        "CR_BLOCK_01": 15.0
+      }
+    },
+    "stagger_distribution_cm_tgd": {
+      "0-1": {
+        "MAIN": 1253,
+        "CR_BLOCK_01": 978,
+        "DELTA": -275,
+        "DELTA_PCT": -21.95
+      },
+      "1-3": {
+        "MAIN": 12,
+        "CR_BLOCK_01": 14,
+        "DELTA": 2,
+        "DELTA_PCT": 16.67
+      },
+      "3-10": {
+        "MAIN": 1385,
+        "CR_BLOCK_01": 1253,
+        "DELTA": -132,
+        "DELTA_PCT": -9.53
+      },
+      "10-20": {
+        "MAIN": 3660,
+        "CR_BLOCK_01": 4048,
+        "DELTA": 388,
+        "DELTA_PCT": 10.6
+      },
+      ">20": {
+        "MAIN": 1134,
+        "CR_BLOCK_01": 1141,
+        "DELTA": 7,
+        "DELTA_PCT": 0.62
+      }
+    },
+    "node_conflict_breakdown_proxy_for_UNCLASSIFIED_RULE_CONFLICT_aggregate": {
+      "note": "proxy INDEPENDENTE (nao a categoria da CONTA 1) - coincidencias que tocam pelo menos 1 peca de no' L/T/X, medidas com a MESMA deteccao/tolerancia do censo original de prisma",
+      "total_suspect_recount": {
+        "MAIN": 2936,
+        "CR_BLOCK_01": 2539,
+        "DELTA": -397,
+        "DELTA_PCT": -13.52
+      },
+      "touching_L": {
+        "MAIN": 484,
+        "CR_BLOCK_01": 477,
+        "DELTA": -7,
+        "DELTA_PCT": -1.45
+      },
+      "touching_T": {
+        "MAIN": 810,
+        "CR_BLOCK_01": 773,
+        "DELTA": -37,
+        "DELTA_PCT": -4.57
+      },
+      "touching_X": {
+        "MAIN": 348,
+        "CR_BLOCK_01": 380,
+        "DELTA": 32,
+        "DELTA_PCT": 9.2
+      },
+      "touching_any_node_L_T_X": {
+        "MAIN": 1642,
+        "CR_BLOCK_01": 1630,
+        "DELTA": -12,
+        "DELTA_PCT": -0.73
+      },
+      "near_opening_jamb_no_node": {
+        "MAIN": 580,
+        "CR_BLOCK_01": 459,
+        "DELTA": -121,
+        "DELTA_PCT": -20.86
+      },
+      "other_no_node_no_opening": {
+        "MAIN": 714,
+        "CR_BLOCK_01": 450,
+        "DELTA": -264,
+        "DELTA_PCT": -36.97
+      }
+    }
+  },
+  "c09": {
+    "total": {
+      "_tgd": {
+        "MAIN": 1185,
+        "CR_BLOCK_01": 1171,
+        "DELTA": -14,
+        "DELTA_PCT": -1.18
+      },
+      "_aggregate": {
+        "MAIN": 4280,
+        "CR_BLOCK_01": 4286,
+        "DELTA": 6,
+        "DELTA_PCT": 0.14
+      }
+    },
+    "sequences_2plus": {
+      "_tgd": {
+        "MAIN": 201,
+        "CR_BLOCK_01": 180,
+        "DELTA": -21,
+        "DELTA_PCT": -10.45
+      },
+      "_aggregate": {
+        "MAIN": 890,
+        "CR_BLOCK_01": 866,
+        "DELTA": -24,
+        "DELTA_PCT": -2.7
+      }
+    },
+    "sequences_2plus_mid_wall_fill_only_tgd": {
+      "MAIN": 183,
+      "CR_BLOCK_01": 162,
+      "DELTA": -21,
+      "DELTA_PCT": -11.48
+    },
+    "vertical_strips_tgd": {
+      "MAIN": 25,
+      "CR_BLOCK_01": 26,
+      "DELTA": 1,
+      "DELTA_PCT": 4.0
+    }
+  },
+  "c04": {
+    "total": {
+      "_tgd": {
+        "MAIN": 584,
+        "CR_BLOCK_01": 570,
+        "DELTA": -14,
+        "DELTA_PCT": -2.4
+      },
+      "_aggregate": {
+        "MAIN": 1460,
+        "CR_BLOCK_01": 1426,
+        "DELTA": -34,
+        "DELTA_PCT": -2.33
+      }
+    },
+    "sequences_2plus": {
+      "_tgd": {
+        "MAIN": 17,
+        "CR_BLOCK_01": 13,
+        "DELTA": -4,
+        "DELTA_PCT": -23.53
+      },
+      "_aggregate": {
+        "MAIN": 46,
+        "CR_BLOCK_01": 42,
+        "DELTA": -4,
+        "DELTA_PCT": -8.7
+      }
+    },
+    "sequences_2plus_mid_wall_fill_only_tgd": {
+      "MAIN": 11,
+      "CR_BLOCK_01": 7,
+      "DELTA": -4,
+      "DELTA_PCT": -36.36
+    },
+    "vertical_strips_tgd": {
+      "MAIN": 13,
+      "CR_BLOCK_01": 13,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "b19": {
+    "total": {
+      "_tgd": {
+        "MAIN": 840,
+        "CR_BLOCK_01": 853,
+        "DELTA": 13,
+        "DELTA_PCT": 1.55
+      },
+      "_aggregate": {
+        "MAIN": 2156,
+        "CR_BLOCK_01": 2173,
+        "DELTA": 17,
+        "DELTA_PCT": 0.79
+      }
+    },
+    "location_breakdown_tgd_note": "borda do BLOCO (nao centro) a <=5cm de abertura/ponta",
+    "mid_wall_far_from_any_edge": {
+      "MAIN": 525,
+      "CR_BLOCK_01": 520,
+      "DELTA": -5,
+      "DELTA_PCT": -0.95
+    },
+    "near_opening": {
+      "MAIN": 197,
+      "CR_BLOCK_01": 215,
+      "DELTA": 18,
+      "DELTA_PCT": 9.14
+    },
+    "near_wall_end": {
+      "MAIN": 118,
+      "CR_BLOCK_01": 118,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "vertical_alignment_clusters_2plus_courses": {
+      "MAIN": 119,
+      "CR_BLOCK_01": 123,
+      "DELTA": 4,
+      "DELTA_PCT": 3.36
+    }
+  },
+  "l_corner_tgd": {
+    "total": {
+      "MAIN": 63,
+      "CR_BLOCK_01": 63
+    },
+    "valid_true": {
+      "MAIN": 62,
+      "CR_BLOCK_01": 62,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "failures_unique_nodes": {
+      "MAIN": 1,
+      "CR_BLOCK_01": 1,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "t_intersection_tgd": {
+    "total": {
+      "MAIN": 118,
+      "CR_BLOCK_01": 118
+    },
+    "valid_true": {
+      "MAIN": 80,
+      "CR_BLOCK_01": 80,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "valid_degraded": {
+      "MAIN": 23,
+      "CR_BLOCK_01": 23,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "failures_unique_nodes": {
+      "MAIN": 15,
+      "CR_BLOCK_01": 15,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "x_intersection_tgd": {
+    "total": {
+      "MAIN": 17,
+      "CR_BLOCK_01": 17
+    },
+    "valid_true": {
+      "MAIN": 8,
+      "CR_BLOCK_01": 8,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "failures_unique_nodes": {
+      "MAIN": 9,
+      "CR_BLOCK_01": 9,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "openings": {
+    "blocks_inside_opening_tgd": {
+      "MAIN": 5,
+      "CR_BLOCK_01": 5,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "blocks_partial_opening_tgd": {
+      "MAIN": 108,
+      "CR_BLOCK_01": 108,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "door_void_violations": {
+      "_tgd": {
+        "MAIN": 290,
+        "CR_BLOCK_01": 290,
+        "DELTA": 0,
+        "DELTA_PCT": 0.0
+      },
+      "_aggregate": {
+        "MAIN": 638,
+        "CR_BLOCK_01": 638,
+        "DELTA": 0,
+        "DELTA_PCT": 0.0
+      }
+    },
+    "alignment_conflicts": {
+      "_tgd": {
+        "MAIN": 30,
+        "CR_BLOCK_01": 0,
+        "DELTA": -30,
+        "DELTA_PCT": -100.0
+      },
+      "_aggregate": {
+        "MAIN": 64,
+        "CR_BLOCK_01": 0,
+        "DELTA": -64,
+        "DELTA_PCT": -100.0
+      }
+    },
+    "jamb_exceptions": {
+      "_tgd": {
+        "MAIN": 172,
+        "CR_BLOCK_01": 172,
+        "DELTA": 0,
+        "DELTA_PCT": 0.0
+      },
+      "_aggregate": {
+        "MAIN": 220,
+        "CR_BLOCK_01": 220,
+        "DELTA": 0,
+        "DELTA_PCT": 0.0
+      }
+    }
+  },
+  "collisions": {
+    "_tgd": {
+      "MAIN": 1069,
+      "CR_BLOCK_01": 1034,
+      "DELTA": -35,
+      "DELTA_PCT": -3.27
+    },
+    "_aggregate": {
+      "MAIN": 1083,
+      "CR_BLOCK_01": 1048,
+      "DELTA": -35,
+      "DELTA_PCT": -3.23
+    }
+  },
+  "intersection_failures_raw_entries": {
+    "_tgd": {
+      "MAIN": 200,
+      "CR_BLOCK_01": 200,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    },
+    "_aggregate": {
+      "MAIN": 200,
+      "CR_BLOCK_01": 200,
+      "DELTA": 0,
+      "DELTA_PCT": 0.0
+    }
+  },
+  "runtime_tgd_solver_seconds": {
+    "MAIN": 2.104,
+    "CR_BLOCK_01": 2.211,
+    "DELTA": 0.10699999999999976,
+    "DELTA_PCT": 5.09
+  },
+  "determinism": {
+    "distinct_fingerprints_8_runs": {
+      "MAIN": 8,
+      "CR_BLOCK_01": 8
+    },
+    "pieces_spread_across_8_runs_tgd": {
+      "MAIN": 130,
+      "CR_BLOCK_01": 130
+    },
+    "runs_detail": {
+      "MAIN": [
+        {
+          "name": "baseline",
+          "n_pieces": 10657,
+          "fingerprint16": "fb521bcd8fc12598"
+        },
+        {
+          "name": "reversed",
+          "n_pieces": 10611,
+          "fingerprint16": "2ba28e9d45267f36"
+        },
+        {
+          "name": "endpoint_reversal",
+          "n_pieces": 10635,
+          "fingerprint16": "4f22d62c23dddb26"
+        },
+        {
+          "name": "shuffle_seed_1",
+          "n_pieces": 10626,
+          "fingerprint16": "50ddb9dac74a43fb"
+        },
+        {
+          "name": "shuffle_seed_2",
+          "n_pieces": 10695,
+          "fingerprint16": "98238ce850349137"
+        },
+        {
+          "name": "shuffle_seed_3",
+          "n_pieces": 10706,
+          "fingerprint16": "731939426d75f49e"
+        },
+        {
+          "name": "shuffle_seed_10",
+          "n_pieces": 10579,
+          "fingerprint16": "f5f1c421067a7601"
+        },
+        {
+          "name": "shuffle_seed_42",
+          "n_pieces": 10576,
+          "fingerprint16": "c1e7ebc1a5354001"
+        }
+      ],
+      "CR_BLOCK_01": [
+        {
+          "name": "baseline",
+          "n_pieces": 10647,
+          "fingerprint16": "8903447d28c9b22a"
+        },
+        {
+          "name": "reversed",
+          "n_pieces": 10601,
+          "fingerprint16": "f319d9ad36a5c8a7"
+        },
+        {
+          "name": "endpoint_reversal",
+          "n_pieces": 10612,
+          "fingerprint16": "2b99d166463eea63"
+        },
+        {
+          "name": "shuffle_seed_1",
+          "n_pieces": 10616,
+          "fingerprint16": "5dac43c6b889e1b6"
+        },
+        {
+          "name": "shuffle_seed_2",
+          "n_pieces": 10685,
+          "fingerprint16": "accb0c22fa391bae"
+        },
+        {
+          "name": "shuffle_seed_3",
+          "n_pieces": 10696,
+          "fingerprint16": "e7bb5ea5fb900195"
+        },
+        {
+          "name": "shuffle_seed_10",
+          "n_pieces": 10569,
+          "fingerprint16": "3ce66efae671604b"
+        },
+        {
+          "name": "shuffle_seed_42",
+          "n_pieces": 10566,
+          "fingerprint16": "cfe4b11d1da54762"
+        }
+      ]
+    },
+    "verdict": "NEUTRA - mesmo numero de fingerprints distintos (8/8) e mesma amplitude de variacao de pecas (130 em ambas); CR-BLOCK-01 nao mexeu em build_wall_graph/extend_wall_ends_to_junctions (a camada onde a maior parte da divergencia nasce, ver docs/BLOCK_MODULATION_AUDIT.md secao 14) e nao piorou nem melhorou a sensibilidade a ordem."
+  }
+}

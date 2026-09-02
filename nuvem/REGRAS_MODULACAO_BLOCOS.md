@@ -21,7 +21,12 @@
 > em silêncio — um exemplo que contradiz uma regra existente é registrado
 > como CONFLITO (ver seção 10.7), nunca resolvido por suposição.
 >
-> Última atualização: 2026-08-31 — nova seção 24 (BENCHMARK: projeto
+> Última atualização: 2026-09-01 — nova seção 27 (`CR-BLOCK-01`: a busca de
+> amarração vertical era INCOMPLETA — causa-raiz provada por tracing,
+> busca exata por programação dinâmica sobre múltiplos de `PIER_MODULE_CM`,
+> coincidência proibida entre fiadas da MESMA banda zerada nos 3 projetos
+> medidos; a pendência das BANDAS de abertura fica registrada em 27.7 como
+> NECESSIDADE DE ESCOPO ADICIONAL). Antes disso, 2026-08-31 — nova seção 24 (BENCHMARK: projeto
 > entregue vira gabarito medível, com o piso de ruído medido contra o
 > projeto humano, o CONFLITO da regra #2 registrado em 24.3 e as medições
 > novas de 24.5). Antes disso, 2026-08-28 — nova EXCEÇÃO à regra #1 (seção 11.8:
@@ -3692,3 +3697,220 @@ MUDA COMPORTAMENTO").
 - **O deslocamento de ~2 cm do `reference.json` na `W097`** (26.10.6). E' um
   problema do GABARITO, nao do solver - mas convem verificar se ele se repete
   em outras paredes do gabarito antes de usar `eixo_ok` como metrica fina.
+
+---
+
+## 27. `CR-BLOCK-01` IMPLEMENTADO — PRISMA: a busca de amarração vertical era INCOMPLETA (2026-09-01)
+
+> Branch `claude/block-01-prisma-fiadas-rik42t`, a partir da `main`
+> `9f3bab4`. Medição 100% HEADLESS (`nuvem/benchmark/diagnostics_block_prisma/`),
+> sem Revit/MCP, sobre os 3 projetos de `nuvem/benchmark/projects/`
+> (275 paredes, 17 fiadas, 22.341 juntas internas).
+
+### 27.1 REGRA OBRIGATÓRIA — a regra #1 não falhava por CRITÉRIO, falhava por ESPAÇO DE BUSCA
+
+- **Status**: **CORRIGIDO** — `_pier_full_search_layout` +
+  `_layout_piece_profile` + `PIER_STAGGER_DP_MAX_UNITS`
+  (`core/engine/wall_stepper.py`), ligados no fim de
+  `_pier_layout_avoiding_joints`. Testes: `tests/test_block_bonding.py`
+  (`INV-BLOCK-BOND-001..010`).
+- **Como foi descoberto**: *tracing* de um trecho isolado
+  (`diagnostics_block_prisma/trace_segment.py`) + benchmark headless do
+  estado inicial. Não foi dedução.
+- **O achado**: `_pier_layout_avoiding_joints` gerava seus candidatos
+  **variando apenas o PRIMEIRO bloco** (baseline,
+  `_half_block_leading_layout`, `_pier_forced_bypass_layouts`,
+  `_pier_ordered_layout(first_code=…)` para cada código de
+  `OPENING_JAMB_BLOCK_CODES`) e deixava o **mesmo guloso**, que nunca volta
+  atrás, preencher o resto. Num trecho real de **99cm fechado dos dois
+  lados** (nó de amarração nas duas pontas), com a fiada anterior tendo
+  juntas em 54,5 e 94,5cm, os **SETE candidatos gerados eram literalmente
+  idênticos entre si** — `B19+B39+B39`, score `(0, 2, 0.0)`, as duas
+  juntas coincidindo. A busca tinha o critério certo e **nada para
+  escolher**.
+- **A alternativa existia e era trivial**: a **MESMA** composição com o
+  B19 na outra ponta (`B39+B39+B19`) põe as juntas em 74,5 e 114,5 — zero
+  coincidência, mesmas peças, mesmo tier. Nenhum candidato do mecanismo
+  antigo alcança uma reordenação.
+- **Portanto**: a hipótese "as fiadas são resolvidas independentemente"
+  (A) e "as juntas chegam mas são ignoradas" (B) estão **REFUTADAS** por
+  medição. `course_a_joint_positions_cm` chega ao solver e é usado. A
+  causa é **(E) enumeração incompleta**, agravada por **(F) o guloso podar
+  cedo**.
+
+### 27.2 REGRA OBRIGATÓRIA — o trecho é uma COMPOSIÇÃO de módulos de 5cm, e dá para percorrer todas
+
+Todo passo do catálogo (comprimento + junta de assentamento) é múltiplo de
+`PIER_MODULE_CM = 5`: **B39→40, B34→35, B19→20, C09→10, C04→5**. Logo um
+trecho de `remaining` cm é uma composição de `remaining/5` unidades, e
+existe busca **EXATA** por programação dinâmica sobre a posição — sem
+heurística, sem enumerar permutação por permutação, sem poda arbitrária.
+
+`_pier_full_search_layout` usa:
+
+* **estado** — `(unidade, peça anterior é compensador, n_compensadores,
+  n_meio_blocos, n_peças_de_amarração, n_meio_blocos fora de ponta aberta)`;
+* **valor minimizado** — **exatamente a mesma tupla lexicográfica** do
+  `_score` que já existia, mais o número de peças como último desempate:
+  `(excesso de compensador em sequência [regra #2, seção 16.1],
+  coincidência de junta [regra #1, seção 11], −travamento [regra 18.6],
+  −alinhamento de vazio [seção 6], nº de peças)`.
+
+**Por que vale como programação dinâmica** (não é suposição): todo
+componente é **monótono sob extensão** — excesso, coincidência,
+alinhamento e nº de peças **somam**; o travamento é um **mínimo**, e
+`min(prefixo, sufixo)` nunca melhora ao estender. O único acoplamento
+entre prefixo e sufixo (um compensador colado no seguinte) está **dentro
+do estado**. Logo um prefixo lexicograficamente melhor no MESMO estado
+continua melhor depois de qualquer sufixo.
+
+### 27.3 REGRA OBRIGATÓRIA — o desencontro NUNCA compra qualidade enchendo a parede de peça especial
+
+`_layout_piece_profile` lê o **perfil de tier** (compensadores,
+meio-blocos, peças de amarração, meio-blocos fora de ponta aberta) da
+**geometria do layout**, não do tier que por acaso o produziu. A busca
+completa respeita tetos:
+
+| peça | teto |
+|---|---|
+| compensador/pastilha | `max(perfil já aceito, MAX_COMPENSATORS_PER_TRECHO)` |
+| peça de amarração (B34/B54) | `max(perfil já aceito, MAX_SPECIAL_BOND_PER_TRECHO)` |
+| meio-bloco (B19) | perfil já aceito **+1 só se houver ponta ABERTA de verdade** |
+| B19 **fora** de ponta aberta | nunca mais do que o baseline já tinha |
+
+Isso é **exatamente a mesma licença** que `_pier_forced_bypass_layouts` já
+tinha (trocar 1 peça por causa da regra #1) — nenhuma permissão nova. A
+regra #2 (B19 nunca encosta num nó de amarração) continua intocada: a
+busca **não pode criar** um meio-bloco contra um nó que o baseline já não
+tivesse.
+
+**Medido** (3 projetos): B39 −46, B34 +47, B19 +17, C09 +6, C04 −34 — o
+mix de peças praticamente não se moveu (−10 peças no total, −0,03%), e os
+**compensadores consecutivos CAÍRAM** de 1.342 para 1.210 (−9,8%).
+
+### 27.4 REGRA OBRIGATÓRIA — a busca completa só roda quando a regra #1 ou a #2 ainda estão violadas
+
+Quando o desencontro já saiu limpo da busca histórica, o resultado
+histórico é preservado **bit a bit**, sem custo nenhum de tempo. Medido
+nos dois projetos reais: **430 de 5.122** chamadas (8,4%), **0,49ms** por
+chamada, **4%** do tempo total; pior caso 2,2ms num trecho de 77 unidades
+(385cm). O teto `PIER_STAGGER_DP_MAX_UNITS = 400` (20m) nunca foi
+alcançado — o maior trecho real mediu 77 unidades. Acima do teto a busca
+**desiste** (devolve `None`, comportamento histórico intacto); nunca poda
+escolhendo pior.
+
+### 27.5 CONFIRMADO E MEDIDO — resultado do `CR-BLOCK-01`
+
+Benchmark headless, 3 projetos, mesmo comando antes e depois
+(`diagnostics_block_prisma/run_baseline.py`):
+
+| métrica | antes | depois | Δ |
+|---|---|---|---|
+| `FORBIDDEN_JOINT_ALIGNMENT` **dentro da mesma banda** (o par A/B — escopo deste CR) | **236** | **0** | **−100%** |
+| `FORBIDDEN_JOINT_ALIGNMENT` entre bandas (fora do escopo, ver 27.7) | 182 | 33 | −81,9% |
+| `FORBIDDEN_JOINT_ALIGNMENT` total | 418 | 33 | −92,1% |
+| `alignment_conflicts` (resíduo reportado pelo solver) | 64 | **0** | −100% |
+| `CONTINUOUS_VERTICAL_JOINT` (auditoria oficial, bloqueante) | 169 | 138 | −18,3% |
+| compensadores consecutivos (regra #2) | 1.342 | 1.210 | −9,8% |
+| colisões | 1.083 | 1.048 | −3,2% |
+| paredes reprovadas na auditoria | 106 | 104 | −1,9% |
+| blocos dentro de abertura | 281 | 281 | **0** |
+| `door_void_violations` (bloco em vão de porta) | 638 | 638 | **0** |
+| paredes com blocos | 246/275 | 246/275 | **0** |
+| falhas de encontro L/T/X | 200 | 200 | **0** |
+| `non_modular` | 3.333 | 3.336 | +3 (ver 27.8) |
+| runtime | 4,54s | 4,78s | +5,3% |
+
+Distribuição de *stagger* deslocada para a direita em todos os projetos
+(faixa 15–20cm e 20–40cm crescem; a faixa 0–1cm encolhe de 2.574 para
+2.134). O **fingerprint canônico** da solução é idêntico entre execuções
+repetidas.
+
+### 27.6 REGRA OBRIGATÓRIA — a solução tem de ser DETERMINÍSTICA e independente da ordem
+
+Coberto por teste permanente (`tests/test_block_bonding.py`):
+
+* a **ordem de inserção do catálogo** não muda o layout vencedor
+  (`INV-BLOCK-BOND-004`) — a busca ordena os passos por
+  `(−comprimento, código)`, nunca pela ordem do `dict`;
+* a **ordem da lista de juntas a evitar** não muda o vencedor (a lista é
+  ordenada e consultada por busca binária, `_nearest_distance_cm`);
+* **inverter os endpoints** da parede não muda o veredito
+  (`INV-BLOCK-BOND-003`);
+* **permutar a lista de candidatos** não muda o fingerprint
+  (`INV-BLOCK-BOND-010`);
+* a mesma planta resolvida duas vezes dá o mesmo fingerprint.
+
+### 27.7 NECESSIDADE DE ESCOPO ADICIONAL — as BANDAS de abertura fragmentam a memória entre fiadas
+
+- **Status**: **DIAGNOSTICADO — pendência de código aberta, FORA do escopo
+  do `CR-BLOCK-01`** (exige alterar `solve_building_blocks_all_courses`
+  em `core/wall_modeling.py`, arquivo que o CR desta branch não autoriza
+  escrever).
+- **O achado**: `solve_building_blocks_all_courses` agrupa as fiadas
+  físicas em **bandas** por conjunto de aberturas ativas
+  (`_group_course_indices_by_opening_band`) e chama
+  `solve_building_blocks` **uma vez por banda**. Cada banda resolve seu
+  próprio par A/B **do zero**: a fiada A da banda 2 nunca vê a fiada B da
+  banda 1, embora sejam **fisicamente vizinhas**. Na fronteira entre duas
+  bandas a regra #1 simplesmente **não é avaliada**.
+- **Medição**: das 33 coincidências proibidas que sobram depois do
+  `CR-BLOCK-01`, **as 33 são cross-band** (fronteiras de banda,
+  tipicamente entre as fiadas 11 e 12 dos projetos medidos). Dentro da
+  mesma banda o número é **ZERO** nos 3 projetos.
+- **Correção proposta** (não implementada): propagar as juntas/vazios da
+  ÚLTIMA fiada física da banda anterior para a primeira busca da banda
+  seguinte, em vez de cada banda começar com as listas vazias.
+
+### 27.8 DÍVIDA CONHECIDA que fica aberta depois do `CR-BLOCK-01`
+
+1. **`non_modular` +3** (3.333 → 3.336, +0,09%): redistribuição, não
+   crescimento — a parede 70 do `torre_easy_lo_r00_tp1` deixou de ter 3
+   `ABERTURA_NAO_COMPATIVEL` e as paredes 39 e 71 passaram a ter 3 cada.
+   Nenhuma parede perdeu blocos (246/275 antes e depois). O reparo local
+   de abertura (`_recut_openings_and_repair`) fecha em torno das novas
+   fronteiras de peça em alguns trechos e não em outros; a busca completa
+   ainda **não** conhece o critério de `_layout_acerto_penalty` (pôr a peça
+   de acerto onde ela é natural em relação ao vão). Candidato natural ao
+   próximo CR.
+2. **`UNCLASSIFIED_RULE_CONFLICT` = 1.506** — coincidências de junta que
+   envolvem uma **peça de amarração de nó**, que a **seção 5** manda
+   repetir na mesma posição X em toda fiada da mesma paridade, enquanto a
+   **regra #1** (seção 11) proíbe junta coincidente. As duas regras se
+   cruzam e **nenhum documento diz qual vence**. Registrado, **nunca
+   resolvido por suposição** — precisa de decisão do usuário ou de medição
+   nova no Revit.
+3. **Asserção estale em `tests/test_script.py`** — ver 27.9.
+
+### 27.9 CONFLITO RESOLVIDO — `test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada` codificava a limitação antiga
+
+- **Sintoma**: depois da correção, esse teste falha com
+  `assert 'shift' == 'trim'`.
+- **Causa medida** (não suposta): a fixture tem pilaretes 162/80/158. O
+  ajuste geométrico da **Etapa 3B** (seção 7) tenta os tiers na ordem
+  `boneca → shift → trim → widen`, "a MENOR alteração possível primeiro",
+  e cada tentativa só é aceita se o **solver de blocos de verdade**
+  confirmar. Medido nos dois estados do código, com os pilaretes 161/159
+  que o `shift` produz:
+
+  | | `non_modular` | `alignment_conflicts` | `verify` |
+  |---|---|---|---|
+  | antes do `CR-BLOCK-01` | 0 | **1** (`sem_alinhamento_vertical`) | **rejeita** |
+  | depois | 0 | **0** | **aceita** |
+
+  Ou seja: o `shift` era rejeitado **exclusivamente** porque o solver não
+  conseguia desencontrar as juntas. Com a regra #1 satisfeita, o ajuste
+  **menor** (deslocar o vão 1cm, comprimento do eixo **inalterado**) passa
+  a bastar, e o `trim` (encurtar uma ponta livre) deixa de ser necessário.
+- **Veredito**: é **melhora**, exatamente a ordem de prioridade que a
+  seção 7 documenta. A asserção `plan["tier"] == "trim"` registrava um
+  artefato do bug. As demais asserções do mesmo teste continuam válidas
+  (`length_delta_cm <= 1e-9` — com `shift` o delta é exatamente 0).
+- **Status da correção**: **APLICADA** — confirmada pelo cross-audit
+  independente da CONTA 2 (`claude/block-01-cross-audit`, veredito
+  APROVADO COM CORREÇÃO DE TESTE) e corrigida na branch de finalização
+  (`claude/block-01-finalize`): a asserção passou a exigir
+  `plan["tier"] == "shift"` explicitamente. Não foi feita nesta branch
+  original (`claude/block-01-prisma-fiadas-rik42t`) por causa do contrato
+  de isolamento entre as contas — `tests/test_script.py` não estava na
+  área de escrita autorizada dela.

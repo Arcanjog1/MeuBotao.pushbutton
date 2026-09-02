@@ -37,6 +37,7 @@ antes desta mudanca), e o caminho sem pausa (o unico usado pelo
 visualizador externo e por todos os testes) nunca toca nesse import.
 """
 
+import bisect
 import math
 
 from Autodesk.Revit.DB import XYZ, Line
@@ -91,6 +92,8 @@ __all__ = [
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
     "_half_block_leading_layout", "_pier_forced_bypass_layouts",
+    "PIER_STAGGER_DP_MAX_UNITS", "_layout_piece_profile",
+    "_nearest_distance_cm", "_pier_full_search_layout",
     "_pier_layout_avoiding_joints", "_place_pier_layout",
     "_candidate_extent_on_wall_axis", "_node_candidates_by_index",
     "_node_involved_wall_ends", "_index_node_candidates_by_wall_end",
@@ -3396,6 +3399,278 @@ def _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid_positions_cm):
     return menor
 
 
+# ==========================================
+# CR-BLOCK-01 - BUSCA COMPLETA DE AMARRACAO VERTICAL (2026-09-01)
+#
+# CAUSA-RAIZ medida (ver nuvem/benchmark/diagnostics_block_prisma):
+# `_pier_layout_avaliando_joints` tinha o CRITERIO certo e o espaco de
+# busca errado. Todos os candidatos que ele gerava saiam de VARIAR O
+# PRIMEIRO BLOCO (baseline + _half_block_leading_layout +
+# _pier_forced_bypass_layouts + _pier_ordered_layout(first_code=...)), e o
+# resto do trecho continuava sendo preenchido pelo MESMO guloso - que
+# nunca volta atras. Consequencia: para um trecho de 99cm fechado dos dois
+# lados, os SETE candidatos gerados eram literalmente identicos entre si
+# (tracing em `diagnostics_block_prisma/trace_segment.py`), com as DUAS
+# juntas coincidindo com a fiada anterior - embora a MESMA composicao
+# (B19+B39+B39) com o B19 na outra ponta desencontrasse as duas.
+#
+# A correcao NAO e' uma regra nova de deslocamento ("fiada 2 = andar
+# 19cm") nem um caso particular: e' completar a ENUMERACAO. Toda peca do
+# catalogo tem comprimento+junta multiplo de PIER_MODULE_CM (B39->40,
+# B34->35, B19->20, C09->10, C04->5), entao um trecho e' uma COMPOSICAO
+# de `remaining / 5` unidades e da' para percorrer TODAS elas por
+# programacao dinamica sobre a posicao - sem heuristica, sem poda
+# arbitraria, sem enumerar permutacao por permutacao.
+# ==========================================
+
+# Teto de seguranca do vetor da busca: 400 unidades de PIER_MODULE_CM =
+# 20m de trecho continuo, muito acima de qualquer pilarete real. Acima
+# disso a busca simplesmente nao roda (devolve None) e o comportamento
+# historico fica intacto - nunca uma poda que escolhe pior, sempre uma que
+# desiste.
+PIER_STAGGER_DP_MAX_UNITS = 400
+
+
+def _layout_piece_profile(layout, catalog, leading_open, trailing_open):
+    """`(compensadores, meio-blocos, pecas de amarracao, meio-blocos FORA
+    de ponta aberta)` de `layout`.
+
+    E' o PERFIL DE TIER da secao 2 de REGRAS_MODULACAO_BLOCOS.md lido da
+    GEOMETRIA do layout, nao do tier que por acaso o produziu. Serve para
+    exigir de qualquer candidato alternativo que ele nao use peca mais
+    "cara" do que o trecho ja' precisava - o desencontro nunca compra
+    qualidade de amarracao enchendo a parede de peca especial (secao 17 do
+    CR-BLOCK-01)."""
+    itens = list(layout or [])
+    total = len(itens)
+    comp = half = special = misplaced = 0
+    for i, item in enumerate(itens):
+        entry = (catalog or {}).get(item[0]) or {}
+        if entry.get("is_compensator"):
+            comp += 1
+        if entry.get("is_special_bond"):
+            special += 1
+        if item[0] == HALF_BLOCK_CODE:
+            half += 1
+            at_open = ((i == 0 and leading_open)
+                       or (i == total - 1 and trailing_open))
+            if not at_open:
+                misplaced += 1
+    return comp, half, special, misplaced
+
+
+def _nearest_distance_cm(sorted_positions, value_cm):
+    """Distancia de `value_cm` ate' a posicao mais proxima de
+    `sorted_positions` (lista JA' ordenada), ou None se estiver vazia.
+    Busca binaria - a lista de juntas a evitar cresce com a parede
+    inteira, e a busca abaixo consulta uma posicao por unidade de trecho."""
+    if not sorted_positions:
+        return None
+    i = bisect.bisect_left(sorted_positions, value_cm)
+    melhor = None
+    for j in (i - 1, i):
+        if 0 <= j < len(sorted_positions):
+            d = abs(sorted_positions[j] - value_cm)
+            if melhor is None or d < melhor:
+                melhor = d
+    return melhor
+
+
+def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm,
+                             target_void_positions_cm=None,
+                             allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                             leading_open=True, trailing_open=True,
+                             extra_profile=None):
+    """A MELHOR composicao do MESMO trecho de `baseline` sob os criterios
+    de amarracao ja' documentados, procurada por programacao dinamica sobre
+    TODAS as composicoes possiveis - nao so' as que variam o primeiro
+    bloco. Devolve None quando a busca nao se aplica (trecho fora do modulo
+    de 5cm, longo demais, ou de uma peca so').
+
+    COMO: cada peca ocupa `comprimento + BLOCK_JOINT_CM`, e todos esses
+    passos sao multiplos de `PIER_MODULE_CM` - entao o trecho e' uma
+    composicao de `remaining / PIER_MODULE_CM` unidades. O estado da
+    programacao dinamica e'
+    `(unidade, peca_anterior_e_compensador, n_compensadores, n_meio_blocos,
+      n_pecas_de_amarracao, n_meio_blocos_fora_de_ponta_aberta)`
+    e o valor minimizado e' EXATAMENTE a mesma tupla lexicografica que
+    `_pier_layout_avoiding_joints._score` usa, mais o numero de pecas como
+    ultimo desempate:
+
+        (excesso de compensador em sequencia   -> regra #2, seccao 16.1
+         coincidencia de junta                 -> regra #1, seccao 11
+         -travamento (saturado no alvo)        -> regra 18.6
+         -alinhamento de vazio                 -> seccao 6
+         numero de pecas)                      -> intencao do guloso
+
+    Isso e' valido como programacao dinamica porque cada componente e'
+    MONOTONO sob extensao: excesso, coincidencia, alinhamento e numero de
+    pecas SOMAM; o travamento e' um MINIMO (e `min(prefixo, sufixo)` nunca
+    melhora ao estender). Logo um prefixo lexicograficamente melhor no
+    MESMO estado continua melhor depois de qualquer sufixo - o unico
+    acoplamento entre prefixo e sufixo (um compensador colado no
+    seguinte) esta' dentro do estado.
+
+    TETOS (`extra_profile`, opcional: o perfil de outro candidato ja'
+    aceito, tipicamente o vencedor corrente): a busca nunca usa mais
+    compensador, meio-bloco ou peca de amarracao do que o trecho ja'
+    precisava. O teto de compensador/peca de amarracao e' elevado ate'
+    MAX_COMPENSATORS_PER_TRECHO / MAX_SPECIAL_BOND_PER_TRECHO - a MESMA
+    licenca que `_pier_forced_bypass_layouts` ja' tinha para trocar 1 peca
+    por causa da regra #1 - e o de MEIO BLOCO so' sobe quando existe ponta
+    ABERTA de verdade (regra #2: B19 nunca encosta num no' de amarracao).
+    Nenhum meio-bloco fora de ponta aberta e' criado que o baseline ja'
+    nao tivesse."""
+    if not baseline or len(baseline) <= 1:
+        return None
+
+    pos0_cm = baseline[0][1]
+    remaining_cm = 0.0
+    for item in baseline:
+        entry = catalog.get(item[0])
+        if entry is None:
+            return None
+        remaining_cm += entry["length_cm"] + BLOCK_JOINT_CM
+
+    unidade = PIER_MODULE_CM
+    total_u = int(round(remaining_cm / unidade))
+    if abs(total_u * unidade - remaining_cm) > PIER_LAYOUT_TOLERANCE_CM:
+        return None
+    if total_u <= 0 or total_u > PIER_STAGGER_DP_MAX_UNITS:
+        return None
+
+    passos = []
+    for code in sorted(COMMON_FILL_BLOCK_CODES):
+        entry = catalog.get(code)
+        if not entry or not entry.get("length_cm"):
+            continue
+        if entry.get("is_compensator") and not allow_compensators:
+            continue
+        passo_cm = entry["length_cm"] + BLOCK_JOINT_CM
+        passo_u = int(round(passo_cm / unidade))
+        if passo_u <= 0 or abs(passo_u * unidade - passo_cm) > PIER_LAYOUT_TOLERANCE_CM:
+            continue
+        passos.append((passo_u, code, entry))
+    # Ordem ESTAVEL e independente da ordem de insercao do catalogo (maior
+    # peca primeiro, nome como desempate) - e' o que torna a reconstrucao
+    # deterministica quando duas composicoes empatam no valor.
+    passos.sort(key=lambda p: (-p[2]["length_cm"], p[1]))
+    if not passos:
+        return None
+
+    base_profile = _layout_piece_profile(baseline, catalog, leading_open, trailing_open)
+    perfil = list(base_profile)
+    if extra_profile:
+        perfil = [max(a, b) for a, b in zip(perfil, extra_profile)]
+    max_comp = max(perfil[0], MAX_COMPENSATORS_PER_TRECHO if allow_compensators else 0)
+    max_half = perfil[1] + (1 if (leading_open or trailing_open) else 0)
+    max_special = max(perfil[2], MAX_SPECIAL_BOND_PER_TRECHO)
+    max_misplaced = perfil[3]
+
+    avoid = sorted(avoid_positions_cm or [])
+    alvo_vazio = sorted(target_void_positions_cm or [])
+
+    # Custo de junta por UNIDADE (uma junta nasce sempre que uma peca
+    # comeca depois do inicio do trecho) - mesma conta de
+    # `_layout_internal_joint_positions_cm`.
+    coinc_por_u = [0] * (total_u + 1)
+    trava_por_u = [MIN_JOINT_STAGGER_TARGET_CM] * (total_u + 1)
+    if avoid:
+        for v in range(1, total_u):
+            junta_cm = seg_start_cm + pos0_cm + v * unidade - BLOCK_JOINT_CM / 2.0
+            d = _nearest_distance_cm(avoid, junta_cm)
+            if d is not None:
+                if d <= VERTICAL_JOINT_STAGGER_TOLERANCE_CM:
+                    coinc_por_u[v] = 1
+                trava_por_u[v] = min(d, MIN_JOINT_STAGGER_TARGET_CM)
+
+    align_cache = {}
+
+    def _align_ganho(v, code, entry):
+        if not alvo_vazio:
+            return 0
+        chave = (v, code)
+        if chave not in align_cache:
+            inicio_cm = seg_start_cm + pos0_cm + v * unidade
+            ganho = 0
+            for offset_cm in _block_void_offsets_cm(entry):
+                d = _nearest_distance_cm(alvo_vazio, inicio_cm + offset_cm)
+                if d is not None and d <= VOID_ALIGNMENT_TOLERANCE_CM:
+                    ganho += 1
+            align_cache[chave] = ganho
+        return align_cache[chave]
+
+    # dp[v] = {estado: (valor, estado_anterior, codigo_usado)}
+    inicial = (False, 0, 0, 0, 0)
+    dp = [dict() for _ in range(total_u + 1)]
+    dp[0][inicial] = ((0, 0, -MIN_JOINT_STAGGER_TARGET_CM, 0, 0), None, None)
+
+    for v in range(total_u):
+        nivel = dp[v]
+        if not nivel:
+            continue
+        for estado, (valor, _prev, _code) in sorted(nivel.items()):
+            prev_comp, n_comp, n_half, n_special, n_misplaced = estado
+            excesso, coinc, neg_trava, neg_align, n_pecas = valor
+            for passo_u, code, entry in passos:
+                v2 = v + passo_u
+                if v2 > total_u:
+                    continue
+                is_comp = bool(entry.get("is_compensator"))
+                novo_comp = n_comp + (1 if is_comp else 0)
+                if novo_comp > max_comp:
+                    continue
+                novo_special = n_special + (1 if entry.get("is_special_bond") else 0)
+                if novo_special > max_special:
+                    continue
+                novo_half, novo_misplaced = n_half, n_misplaced
+                if code == HALF_BLOCK_CODE:
+                    novo_half += 1
+                    if novo_half > max_half:
+                        continue
+                    encostado = ((v == 0 and leading_open)
+                                 or (v2 == total_u and trailing_open))
+                    if not encostado:
+                        novo_misplaced += 1
+                        if novo_misplaced > max_misplaced:
+                            continue
+                novo_valor = (
+                    excesso + (1 if (is_comp and prev_comp) else 0),
+                    coinc + (coinc_por_u[v] if v else 0),
+                    max(neg_trava, -trava_por_u[v]) if v else neg_trava,
+                    neg_align - _align_ganho(v, code, entry),
+                    n_pecas + 1,
+                )
+                novo_estado = (is_comp, novo_comp, novo_half, novo_special,
+                               novo_misplaced)
+                atual = dp[v2].get(novo_estado)
+                if atual is None or novo_valor < atual[0]:
+                    dp[v2][novo_estado] = (novo_valor, (v, estado), code)
+
+    if not dp[total_u]:
+        return None
+    melhor_estado = None
+    melhor_valor = None
+    for estado, (valor, _prev, _code) in sorted(dp[total_u].items()):
+        if melhor_valor is None or valor < melhor_valor:
+            melhor_estado, melhor_valor = estado, valor
+
+    sequencia = []
+    v, estado = total_u, melhor_estado
+    while v > 0:
+        _valor, anterior, code = dp[v][estado]
+        sequencia.append(code)
+        v, estado = anterior
+    sequencia.reverse()
+
+    layout = []
+    pos_cm = pos0_cm
+    for code in sequencia:
+        comprimento_cm = catalog[code]["length_cm"]
+        layout.append((code, pos_cm, pos_cm + comprimento_cm))
+        pos_cm += comprimento_cm + BLOCK_JOINT_CM
+    return layout
+
 def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
                                  seg_start_cm, avoid_positions_cm,
                                  allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -3580,7 +3855,33 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
         if alt_score < best_score:
             best, best_score = alt, alt_score
             if best_score == perfect_score:
-                break
+                return best
+
+    # BUSCA COMPLETA (CR-BLOCK-01, 2026-09-01). Tudo acima varia apenas o
+    # PRIMEIRO bloco e deixa o guloso - que nunca volta atras - decidir o
+    # resto; medido no projeto real, para muitos trechos os SETE candidatos
+    # gerados saem IDENTICOS entre si, e a busca fica sem o que escolher
+    # mesmo existindo uma composicao limpa. `_pier_full_search_layout`
+    # percorre TODAS as composicoes do trecho (o catalogo inteiro fecha em
+    # multiplos de PIER_MODULE_CM) pelos MESMOS criterios, com os tetos de
+    # peca especial/compensador/meio-bloco do que ja' foi aceito acima.
+    #
+    # So' roda quando ainda ha' o que ganhar nos criterios ABSOLUTOS (regra
+    # #2 ou regra #1 ainda violadas) - quando o desencontro ja' esta' limpo,
+    # o resultado historico e' preservado sem custo nenhum de tempo.
+    if avoid_positions_cm and (best_score[0] > 0 or best_score[1] > 0):
+        completa = _pier_full_search_layout(
+            baseline, catalog, seg_start_cm, avoid_positions_cm,
+            target_void_positions_cm=target_void_positions_cm,
+            allow_compensators=allow_compensators,
+            leading_open=leading_is_open, trailing_open=trailing_is_open,
+            extra_profile=_layout_piece_profile(best, catalog, leading_is_open,
+                                                trailing_is_open),
+        )
+        if completa is not None:
+            completa_score = _score(completa)
+            if completa_score < best_score:
+                best, best_score = completa, completa_score
     return best
 
 

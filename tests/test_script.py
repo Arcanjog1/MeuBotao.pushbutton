@@ -2903,8 +2903,25 @@ def test_plano_de_ajuste_prioriza_boneca_quando_ponta_encosta_em_encontro():
 @case
 def test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada():
     """Regra #3: o ajuste so' e' aceito porque o RE-LANCAMENTO dos blocos
-    comprovou que fechou - e o ajuste escolhido ENCURTA a parede, nunca a
-    aumenta (regra #1)."""
+    comprovou que fechou - e o ajuste escolhido ENCURTA/DESLOCA a parede,
+    nunca a aumenta (regra #1).
+
+    ATUALIZADO (CR-BLOCK-01, 2026-09-01): antes da busca completa de
+    amarracao vertical (`_pier_full_search_layout`,
+    core/engine/wall_stepper.py), o tier "shift" (seção 7 -
+    OPCAO 1: desloca so' as aberturas, comprimento do eixo intacto) era
+    rejeitado para esta fixture EXCLUSIVAMENTE por
+    `sem_alinhamento_vertical` - o solver de blocos nao conseguia
+    desencontrar as juntas entre fiadas nos pilaretes 161/159 que o shift
+    produz. Com a regra #1 satisfeita, "shift" (ajuste MENOR, comprimento
+    do eixo inalterado) passa a fechar e vence "trim" (que ENCURTA uma
+    ponta livre) na ordem de prioridade "a MENOR alteracao possivel
+    primeiro" que a propria secao 7 documenta - nao e' regressao, e' a
+    ordem de tiers funcionando melhor. Medido nos dois estados do codigo
+    (ver nuvem/REGRAS_MODULACAO_BLOCOS.md secao 27.9 e
+    docs/PROJECT_STATUS.md, entrada CR-BLOCK-01): a asserção antiga
+    (`tier == "trim"`) registrava esse bug, nao um comportamento
+    obrigatorio."""
     fake_doc, walls_to_create, openings_per_wall, created_walls_by_axis, all_openings, _infill = (
         _one_opening_axis_fixture(162.0, 80.0, 158.0)
     )
@@ -2922,7 +2939,7 @@ def test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada():
     row = rows[0]
     assert row["auto_fixable"] is True, row["problem_text"]
     plan = row["fix_plan"]
-    assert plan["tier"] == "trim"
+    assert plan["tier"] == "shift"
     assert plan["length_delta_cm"] <= 1e-9, "o ajuste NAO pode aumentar a parede"
     assert plan["axis_start_t_ft"] >= -1e-9
     assert plan["axis_end_t_ft"] <= walls_to_create[0][0].Length + 1e-9

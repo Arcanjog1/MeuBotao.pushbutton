@@ -559,6 +559,13 @@ invariantes antes de propor merge.
    usuário priorizar.
 5. **PRÓXIMA FASE AUTORIZADA (2026-09-01): MODULAÇÃO DOS BLOCOS** — ver
    roadmap na seção 10. Autorizada mesmo com o item 4 pendente.
+6. **`CR-BLOCK-01` (prisma / fiadas / amarração vertical)** —
+   **CONCLUÍDO / APROVADO POR CROSS-AUDIT**. Implementado na branch
+   `claude/block-01-prisma-fiadas-rik42t` (CONTA 1), auditado
+   independentemente na `claude/block-audit-baseline-350nav` (CONTA 2) e
+   cruzado na `claude/block-01-cross-audit` — veredito **APROVADO COM
+   CORREÇÃO DE TESTE**. Finalizado na `claude/block-01-finalize`. Ver
+   seção 5 para o registro completo.
 
 ## 10. Modulação dos blocos — roadmap futuro
 
@@ -567,8 +574,17 @@ geometria das paredes (CR-2F-A/E/D) está estável e determinística; o
 teste visual integrado completo continua pendente (seção 9, item 4), mas
 não bloqueia mais o início desta fase, por decisão do usuário.
 
-- prisma entre fiadas;
-- evitar blocos verticalmente alinhados indevidamente;
+- **PRISMA / ESCOLHA DE LAYOUT SAME-BAND: CORRIGIDO** — `CR-BLOCK-01`
+  concluído e aprovado por cross-audit. Coincidência de junta proibida
+  entre fiadas da MESMA banda de abertura: **236 → 0** nos 3 projetos de
+  benchmark, confirmado de forma independente pela CONTA 2
+  (`alignment_conflicts_total = 0`);
+  **ALINHAMENTO CROSS-BAND: DÍVIDA PENDENTE** — o resíduo (33 no
+  recálculo da CONTA 1; a CONTA 2 mede a mesma família de problema com
+  metodologia própria, não é contradição) é **entre bandas** de abertura
+  e exige `wall_modeling.py` (fora do escopo do `CR-BLOCK-01`) — ver
+  `REGRAS_MODULACAO_BLOCOS.md` 27.7. Próximo CR recomendado:
+  `CR-BLOCK-DETERMINISM`;
 - impedir compensadores de 9 cm repetidos;
 - impedir pastilhas repetidas;
 - controlar uso de meio bloco de 19 cm;
@@ -682,6 +698,211 @@ Antes de iniciar qualquer alteração relevante neste repositório:
    subjetiva).
 
 ## 13. Histórico de atualizações deste documento
+
+### 2026-09-02 — `CR-BLOCK-01` CONCLUÍDO / APROVADO POR CROSS-AUDIT
+
+```
+data:          2026-09-02
+CR:            CR-BLOCK-01 (finalização — conclui a investigação de duas
+               contas em paralelo)
+status:        CONCLUÍDO / APROVADO POR CROSS-AUDIT
+
+branches:
+  implementação (CONTA 1):  claude/block-01-prisma-fiadas-rik42t
+    SHA aprovado:            3e6d937116466198c79d51b85928788766657a41
+  auditoria independente (CONTA 2): claude/block-audit-baseline-350nav
+  cross-audit (CONTA 2, fase 2):    claude/block-01-cross-audit
+    commit:                  6c91c93450fa5f3074d45c29cc447d461db75e55
+  finalização:               claude/block-01-finalize
+
+veredito do cross-audit: APROVADO COM CORREÇÃO DE TESTE. A auditoria
+  independente (metodologia própria, sem ler a branch da CONTA 1) e o
+  cross-audit (mesma biblioteca da CONTA 2, rodada duas vezes — MAIN pura
+  via worktree temporário, e CR-BLOCK-01) confirmam, sem aceitar nenhum
+  número da CONTA 1 como verdade:
+    - cobertura 246/275 paredes com blocos — INALTERADA;
+    - L/T/X (intersection_failures=200) — INALTERADO;
+    - aberturas (door_void_violations=638) — INALTERADO;
+    - alignment_conflicts: 0 (confirmado independentemente);
+    - prisma (suspect_continuous_vertical_joint, metodologia própria da
+      CONTA 2): 2936 → 2539 (-13,52%) — melhora confirmada por vias
+      independentes, com classificação diferente da CONTA 1 (não é
+      contradição, é outra régua sobre o mesmo fenômeno);
+    - colisões: melhoram como efeito colateral;
+    - compensadores: melhoram parcialmente como efeito colateral, NÃO
+      considerados resolvidos;
+    - non_modular +3 (3333→3336): investigado evento por evento,
+      classificado NEUTRO — não reduz cobertura;
+    - determinismo GLOBAL: 8 execuções, 8 fingerprints distintos —
+      NÃO-DETERMINÍSTICO antes e depois, classificado NEUTRO (o CR não
+      piora nem resolve; a causa é anterior ao preenchimento, no wall
+      graph — vira CR próprio, `CR-BLOCK-DETERMINISM`);
+    - teste `test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada`:
+      classificado TESTE DESATUALIZADO (não regressão) — prova
+      independente de que `shift` é uma solução MENOS invasiva que
+      `trim` (mantém o comprimento do eixo; `trim` reduzia), respeita a
+      ordem de prioridade já documentada, não introduz colisão nem bloco
+      em abertura, não piora modulação.
+
+correção aplicada nesta branch: ÚNICA alteração de código — a asserção
+  stale de tests/test_script.py::
+  test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada trocada de
+  `plan["tier"] == "trim"` para `plan["tier"] == "shift"` (exigência
+  explícita do comportamento correto, sem relaxar para
+  `in ("trim","shift")`), com docstring atualizada explicando a prova.
+  Nenhuma linha de produção tocada nesta etapa.
+
+testes (branch de finalização, depois da correção):
+  tests/test_block_bonding.py   32 passed
+  tests/test_script.py         260 passed
+  tests/regression             113 passed
+  nuvem/tests                   18 passed
+  TOTAL                        423 passed, 0 failed
+
+benchmark reproduzido nesta etapa (Conta 1 + Conta 2, sem alterar
+  metodologia): alignment_conflicts=0, cobertura 246/275, L/T/X e
+  aberturas inalterados, colisões 1048 (mesmo valor da cross-audit),
+  determinismo global continua conhecido como não-determinístico e não
+  piorou — todos os números batem exatamente com o cross-audit já
+  aprovado.
+
+produção alterada nesta etapa: NENHUMA (só teste + documentação).
+produção alterada pelo CR-BLOCK-01 como um todo (herdada da CONTA 1):
+  SOMENTE nuvem/core/engine/wall_stepper.py.
+produção protegida (confirmada intacta): geometry.py, wall_pairing.py,
+  tolerances.py, modulation_math.py, continuous_modulation.py,
+  wall_modeling.py.
+
+dívidas oficiais que ficam abertas:
+  - determinismo global (wall graph) — CR-BLOCK-DETERMINISM;
+  - alinhamento cross-band (REGRAS_MODULACAO_BLOCOS.md 27.7);
+  - C09/C04 (compensadores/pastilhas repetidos) — não resolvido, só
+    melhorou como efeito colateral;
+  - degradação de X;
+  - exclusão preventiva de bloco em vão de porta (door exclusion);
+  - reparo de abertura (opening repair) — non_modular +3.
+
+próximo passo: CR-BLOCK-DETERMINISM. NÃO iniciado nesta sessão — parado
+  por decisão explícita, aguardando autorização do usuário.
+```
+
+### 2026-09-01 — `CR-BLOCK-01` (prisma, fiadas e amarração vertical)
+
+```
+data:          2026-09-01
+CR:            CR-BLOCK-01 (CONTA 1 de um par de sessões paralelas)
+branch:        claude/block-01-prisma-fiadas-rik42t
+SHA inicial:   9f3bab41b35f0e2a5f9782583ead8e1ee7755f49 (main)
+SHA final:     995e884 (docs) — a correção de PRODUÇÃO é bff84e5
+               (nuvem/core/engine/wall_stepper.py); c71e06c traz o
+               benchmark e 01b7361 a suíte nova de invariantes
+status:        IMPLEMENTADO — NÃO MESCLADO. Aguardando revisão e auditoria
+               cruzada com a CONTA 2.
+
+objetivo:      eliminar juntas verticais coincidentes entre fiadas
+               consecutivas (quebra de prisma), escolhendo a modulação da
+               fiada N+1 a partir da geometria REAL da fiada N — nunca por
+               um deslocamento fixo nem por regra de caso particular.
+
+baseline:      benchmark HEADLESS reprodutível criado nesta branch
+               (nuvem/benchmark/diagnostics_block_prisma/), rodando o
+               SOLVER REAL sobre os 3 projetos de nuvem/benchmark/projects:
+               275 paredes, 17 fiadas, 22.341 juntas internas.
+               FORBIDDEN_JOINT_ALIGNMENT=418 (236 dentro da mesma banda de
+               abertura, 182 entre bandas), DOCUMENTED_EXCEPTION=638,
+               UNCLASSIFIED_RULE_CONFLICT=1518, NO_ALIGNMENT=18262,
+               alignment_conflicts=64, CONTINUOUS_VERTICAL_JOINT=169.
+
+causa-raiz:    PROVADA por tracing + ablação, não por dedução (ver
+               diagnostics_block_prisma/trace_segment.py). NÃO era "as
+               fiadas são resolvidas independentemente" nem "as juntas
+               anteriores são ignoradas" — as juntas da fiada A CHEGAM ao
+               solver e SÃO usadas. Era a ENUMERAÇÃO de candidatos:
+               _pier_layout_avoiding_joints só variava o PRIMEIRO bloco e
+               deixava o mesmo guloso (que nunca volta atrás) preencher o
+               resto. Num trecho de 99cm fechado dos dois lados, os SETE
+               candidatos gerados eram literalmente IDÊNTICOS entre si,
+               com as duas juntas coincidindo — embora a MESMA composição
+               com o B19 na outra ponta desencontrasse as duas.
+
+solução:       _pier_full_search_layout — busca EXATA por programação
+               dinâmica sobre a posição. Todo passo do catálogo
+               (comprimento + junta) é múltiplo de PIER_MODULE_CM=5
+               (B39->40, B34->35, B19->20, C09->10, C04->5), então o trecho
+               é uma composição de remaining/5 unidades e dá para percorrer
+               TODAS. Minimiza EXATAMENTE a mesma tupla lexicográfica do
+               _score que já existia (regra #2, regra #1, travamento,
+               alinhamento de vazio) + nº de peças. Tetos de peça especial
+               derivados do próprio baseline (_layout_piece_profile), a
+               mesma licença que _pier_forced_bypass_layouts já tinha.
+               Só roda quando a regra #1 ou a #2 ainda estão violadas:
+               430 de 5.122 chamadas (8,4%), 0,49ms cada, 4% do runtime.
+
+arquivos:      nuvem/core/engine/wall_stepper.py (produção)
+               tests/test_block_bonding.py (suíte NOVA)
+               nuvem/benchmark/diagnostics_block_prisma/** (benchmark)
+               nuvem/REGRAS_MODULACAO_BLOCOS.md (nova seção 27)
+               docs/PROJECT_STATUS.md (este registro)
+
+protegidos:    geometry.py, wall_pairing.py, tolerances.py,
+               continuous_modulation.py, modulation_math.py,
+               wall_modeling.py, tests/test_script.py — NENHUM alterado.
+               Arquivos exclusivos da CONTA 2 (diagnostics_block_audit/**,
+               RELATORIO_BASELINE_BLOCOS.md, docs/BLOCK_MODULATION_AUDIT.md)
+               — nenhum criado, editado, apagado ou renomeado.
+
+testes:        tests/test_block_bonding.py  32 passed  (0,18s) — NOVA
+               tests/regression             113 passed (22,9s)
+               nuvem/tests                  18 passed  (0,03s)
+               tests/test_script.py         259 passed, 1 FALHA ESPERADA
+                 (test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada:
+                  assert 'shift' == 'trim'). NÃO é regressão de qualidade:
+                  a asserção codificava a limitação antiga — medido nos
+                  dois estados do código, o plano `shift` (ajuste MENOR,
+                  comprimento do eixo inalterado) era rejeitado
+                  EXCLUSIVAMENTE por sem_alinhamento_vertical. Com a regra
+                  #1 satisfeita ele passa e o `trim` deixa de ser
+                  necessário — exatamente a ordem de prioridade que a
+                  seção 7 de REGRAS_MODULACAO_BLOCOS.md documenta. A
+                  correção é de UMA LINHA ("trim" -> "shift"), mas
+                  tests/test_script.py não pode ser editado nesta branch
+                  (contrato de isolamento do CR). Ver REGRAS 27.9.
+
+benchmark:     FORBIDDEN_JOINT_ALIGNMENT  418 -> 33   (-92,1%)
+                 ... mesma banda (escopo)  236 -> 0    (-100%)
+                 ... entre bandas          182 -> 33   (-81,9%)
+               alignment_conflicts          64 -> 0    (-100%)
+               CONTINUOUS_VERTICAL_JOINT   169 -> 138  (-18,3%)
+               compensadores consecutivos 1342 -> 1210 (-9,8%)
+               colisões                   1083 -> 1048 (-3,2%)
+               paredes reprovadas          106 -> 104
+               blocos dentro de abertura   281 -> 281  (inalterado)
+               door_void_violations        638 -> 638  (inalterado)
+               paredes com blocos      246/275 -> 246/275 (inalterado)
+               falhas de encontro L/T/X    200 -> 200  (inalterado)
+               non_modular                3333 -> 3336 (+3, redistribuição)
+               runtime                   4,54s -> 4,78s (+5,3%)
+               fingerprint canônico estável entre execuções repetidas
+
+dívidas:       1) BANDAS de abertura fragmentam a memória entre fiadas —
+                  as 33 coincidências restantes são TODAS na fronteira
+                  entre bandas, que solve_building_blocks_all_courses
+                  (core/wall_modeling.py) resolve independentemente.
+                  NECESSIDADE DE ESCOPO ADICIONAL, registrada em
+                  REGRAS_MODULACAO_BLOCOS.md 27.7 — não foi tocada porque
+                  wall_modeling.py está fora da área de escrita do CR.
+               2) UNCLASSIFIED_RULE_CONFLICT = 1506 — coincidências que
+                  envolvem peça de amarração de nó, que a seção 5 manda
+                  repetir e a regra #1 proíbe. CONFLITO REGISTRADO, nunca
+                  resolvido por suposição (REGRAS 27.8).
+               3) non_modular +3 — o reparo local de abertura não conhece
+                  o critério de _layout_acerto_penalty (REGRAS 27.8).
+               4) asserção estale em tests/test_script.py (REGRAS 27.9).
+
+próximo passo: revisão + auditoria cruzada com a CONTA 2. Depois: o CR das
+               BANDAS (dívida 1), que é onde estão 100% das coincidências
+               proibidas que sobraram.
+```
 
 ### 2026-09-01 — criação do documento
 

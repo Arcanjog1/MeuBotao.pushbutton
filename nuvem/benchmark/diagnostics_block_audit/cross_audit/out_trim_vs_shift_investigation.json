@@ -1,0 +1,36 @@
+{
+  "test": "tests/test_script.py::test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada",
+  "fixture": "_one_opening_axis_fixture(pier_left_cm=162.0, width_cm=80.0, pier_right_cm=158.0) -- eixo reto de 400cm, 1 porta sem peitoril (sill=0, head=210cm), FREE_END nas duas pontas (sem no L/T/X)",
+  "method": "Reproduzido chamando diretamente m.analyze_created_walls_for_errors com a MESMA fixture do teste, em dois checkouts (MAIN via git worktree da 9f3bab4, e esta branch/CR-BLOCK-01). Nao alterei tests/test_script.py.",
+  "MAIN_result": {
+    "tier": "trim",
+    "length_delta_cm": -1.0,
+    "trim_info": {"side": 0, "delta_cm": -1.0},
+    "axis_start_t_ft_before": 0.0,
+    "axis_start_t_ft_after": 0.0328083989501312,
+    "problem_text": "modulacao so' fecha com um ajuste - correcao automatica JA VERIFICADA pelo solver de blocos via ENCURTAR uma ponta livre da parede (desloca ate 1.0cm; comprimento da parede -1.0cm)",
+    "new_opening_t_lo_ft": 5.2821522309711275,
+    "new_opening_t_hi_ft": 7.906824146981625
+  },
+  "CR_BLOCK_01_result": {
+    "tier": "shift",
+    "length_delta_cm": 0.0,
+    "max_shift_cm": 1.0,
+    "axis_start_t_ft_before": 0.0,
+    "axis_start_t_ft_after": 0.0,
+    "problem_text": "modulacao so' fecha com um ajuste - correcao automatica JA VERIFICADA pelo solver de blocos via deslocar a(s) abertura(s) (desloca ate 1.0cm; comprimento da parede inalterado)",
+    "new_opening_t_lo_ft": 5.2821522309711275,
+    "new_opening_t_hi_ft": 7.906824146981625
+  },
+  "key_observation": "A posicao FINAL da abertura (t_lo/t_hi) e' EXATAMENTE IGUAL nas duas versoes. A UNICA diferenca e' COMO essa posicao e' alcancada: MAIN encurta o eixo em 1cm (trim, tier 3 da secao 7 das REGRAS); CR-BLOCK-01 preserva o eixo inteiro e so' desloca a abertura (shift, tier 2 da secao 7 das REGRAS) - E' TIER MAIS CEDO/MENOS INVASIVO NA PROPRIA ORDEM DE PRIORIDADE JA DOCUMENTADA (REGRAS_MODULACAO_BLOCOS.md secao 7: boneca > shift > trim > widen, 'a menor alteracao possivel primeiro').",
+  "why_it_changed": "O plano 'shift' so' e' aceito se o RE-LANCAMENTO dos blocos confirmar que a modulacao fecha SEM violar a regra #1 (alinhamento vertical, bloqueante desde a secao 11 das REGRAS). Antes do CR-BLOCK-01, a busca de layout (_pier_layout_avoiding_joints) para os comprimentos de pilar resultantes do 'shift' nao encontrava uma composicao sem junta corrida (mesma causa-raiz documentada pela CONTA 1: a busca so' variava o PRIMEIRO bloco). Por isso o 'shift' era REJEITADO e o fluxo caia para o tier seguinte, 'trim'. Com _pier_full_search_layout (busca completa por programacao dinamica), a mesma composicao para os MESMOS comprimentos de pilar do 'shift' agora existe e fecha sem coincidencia de junta - entao o 'shift' passa a ser aceito no tier correto (mais cedo, mais barato) da propria ordem de prioridade ja documentada.",
+  "regression_check_against_independent_aggregate_census": {
+    "note": "Nao auditei so' este 1 caso isoladamente - cruzei com o censo agregado dos 3 projetos (compare_main_vs_block01.json), que cobre TODAS as paredes reais, nao so' esta fixture sintetica.",
+    "walls_modulated_aggregate": "246/275 -> 246/275 (identico)",
+    "door_void_violations_aggregate": "638 -> 638 (identico)",
+    "collisions_aggregate": "1083 -> 1048 (melhorou)",
+    "l_t_x_failures_tgd": "identico nos 3 tipos de no'",
+    "conclusion": "nenhuma regressao de cobertura, colisao, vao ou no' detectada na amostra real associada a esta mudanca de comportamento"
+  },
+  "verdict": "A) TESTE DESATUALIZADO. O resultado 'shift' e' semanticamente identico ao 'trim' antigo na posicao final da abertura, ESTRITAMENTE MENOS INVASIVO na geometria da parede (0cm de alteracao de comprimento contra -1cm), e consistente com a ordem de prioridade JA DOCUMENTADA em REGRAS_MODULACAO_BLOCOS.md secao 7 (shift e' tier 2, trim e' tier 3 - 'nunca aumenta o comprimento total de um eixo' e 'a MENOR alteracao possivel primeiro'). A asssercao antiga (`plan['tier'] == 'trim'`) codificava uma LIMITACAO da busca antiga, nao uma regra de negocio - nao ha' nenhuma regra em REGRAS_MODULACAO_BLOCOS.md que exija 'trim' sobre 'shift' quando os dois fecham; ao contrario, a secao 7 prefere shift. Recomendacao para a CONTA 1/dono do CR: atualizar a asserção para `plan['tier'] == 'shift'` (e o docstring do teste, que hoje descreve so' o comportamento antigo)."
+}

@@ -1,0 +1,17 @@
+{
+  "branch": "claude/block-01-cross-audit (CR-BLOCK-01 + ferramentas da CONTA 2 mescladas)",
+  "note": "Nenhum teste foi alterado. Rodado literalmente pytest sobre os arquivos como estao na branch da CONTA 1 (mesclada com os artefatos read-only da CONTA 2).",
+  "results": {
+    "tests/test_block_bonding.py": {"passed": 32, "failed": 0, "time_s": 0.18},
+    "tests/test_script.py": {
+      "passed": 259, "failed": 1, "time_s": 47.87,
+      "failures": [
+        "test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada: AssertionError: assert 'shift' == 'trim' -- ver out_trim_vs_shift_investigation.json"
+      ]
+    },
+    "tests/regression": {"passed": 113, "failed": 0, "time_s": 20.22},
+    "nuvem/tests": {"passed": 18, "failed": 0, "time_s": 0.03}
+  },
+  "matches_conta1_reported_numbers": true,
+  "comment": "Os numeros batem EXATAMENTE com o que a CONTA 1 registrou em docs/PROJECT_STATUS.md (32 passed / 259 passed + 1 falha esperada / 113 passed / 18 passed) - confirmado por execucao independente, nao copiado do relato dela."
+}

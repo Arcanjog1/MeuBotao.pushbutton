@@ -1,0 +1,502 @@
+{
+ "projects": {
+  "piloto_sintetico_2x2": {
+   "alignment_conflicts": 0,
+   "audit_problems": {
+    "REPEATED_VERTICAL_COMPENSATOR_STRIP": 13
+   },
+   "blocks_by_code": {
+    "B19": 52,
+    "B34": 164,
+    "B39": 440,
+    "C04": 52,
+    "C09": 64
+   },
+   "blocks_inside_opening": 0,
+   "blocks_total": 772,
+   "collisions": 0,
+   "comparable_course_pairs": 84,
+   "consecutive_compensator_pairs": 28,
+   "consecutive_compensator_runs_by_len": {
+    "2": 20,
+    "3": 8
+   },
+   "door_void_violations": 0,
+   "fingerprint": {
+    "rows": 772,
+    "sha256": "b26b49b6ab0653aa0c98534481bec3abf0b250d9e5bbd673948703d5763a15b6"
+   },
+   "forbidden_by_band": {
+    "cross_band": 0,
+    "same_band": 0
+   },
+   "forbidden_top_walls": [],
+   "forbidden_walls": 0,
+   "internal_joints_total": 632,
+   "intersection_failures": 0,
+   "intersection_failures_by_kind": {},
+   "jamb_exceptions": 4,
+   "joint_classes": {
+    "DOCUMENTED_EXCEPTION": 0,
+    "FORBIDDEN_JOINT_ALIGNMENT": 0,
+    "NO_ALIGNMENT": 548,
+    "UNCLASSIFIED_RULE_CONFLICT": 0
+   },
+   "non_modular": 32,
+   "num_courses": 8,
+   "project_id": "piloto_sintetico_2x2",
+   "runtime_s": 0.059,
+   "stagger": {
+    "count": 492,
+    "histogram": [
+     [
+      "[0,1)",
+      0
+     ],
+     [
+      "[1,5)",
+      7
+     ],
+     [
+      "[5,10)",
+      38
+     ],
+     [
+      "[10,15)",
+      19
+     ],
+     [
+      "[15,20)",
+      210
+     ],
+     [
+      "[20,40)",
+      197
+     ],
+     [
+      ">=40",
+      21
+     ]
+    ],
+    "mean_cm": 22.622,
+    "min_cm": 5.0
+   },
+   "tolerances_cm": {
+    "cluster_cm": 1.5,
+    "joint_coincidence_cm": 1.0,
+    "max_adjacent_gap_cm": 5.0
+   },
+   "unclassified_samples": [],
+   "wall_course_pairs_with_blocks": 96,
+   "walls_audit_failed": 8,
+   "walls_considered": 12,
+   "walls_with_blocks": 12,
+   "walls_without_blocks": 0
+  },
+  "torre_easy_lo_r00_tgd": {
+   "alignment_conflicts": 0,
+   "audit_problems": {
+    "CONTINUOUS_VERTICAL_JOINT": 61,
+    "REPEATED_VERTICAL_COMPENSATOR_STRIP": 12
+   },
+   "blocks_by_code": {
+    "B19": 853,
+    "B34": 2565,
+    "B39": 4852,
+    "B54": 636,
+    "C04": 570,
+    "C09": 1171
+   },
+   "blocks_inside_opening": 113,
+   "blocks_total": 10647,
+   "collisions": 1034,
+   "comparable_course_pairs": 1695,
+   "consecutive_compensator_pairs": 279,
+   "consecutive_compensator_runs_by_len": {
+    "2": 118,
+    "3": 155,
+    "4": 6
+   },
+   "door_void_violations": 290,
+   "fingerprint": {
+    "rows": 10647,
+    "sha256": "3d1da15756181161d36503bc3548d8526b86143318b80efc10774c4348a77993"
+   },
+   "forbidden_by_band": {
+    "cross_band": 5,
+    "same_band": 0
+   },
+   "forbidden_top_walls": [
+    [
+     30,
+     4
+    ],
+    [
+     5,
+     1
+    ]
+   ],
+   "forbidden_walls": 2,
+   "internal_joints_total": 7293,
+   "intersection_failures": 200,
+   "intersection_failures_by_kind": {
+    "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L (precisa de 34cm) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro.": 8,
+    "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X (precisa de 27cm para cada lado) e nem o menor compensador (4cm) cabe - requer ajuste de geometria (mover abertura) antes de modular este encontro.": 72,
+    "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (0.0cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro.": 104,
+    "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem para degradar para um canto em L (precisa de 27cm para cada lado na parede principal e 34cm na boneca para o T; 34cm na boneca para o L) - e nem o menor compensador (4cm) cabe no espaco real da boneca (2.6cm). Requer ajuste de geometria (mover abertura/crescer a boneca) antes de modular este encontro.": 16
+   },
+   "jamb_exceptions": 172,
+   "joint_classes": {
+    "DOCUMENTED_EXCEPTION": 108,
+    "FORBIDDEN_JOINT_ALIGNMENT": 5,
+    "NO_ALIGNMENT": 5902,
+    "UNCLASSIFIED_RULE_CONFLICT": 697
+   },
+   "non_modular": 3023,
+   "num_courses": 17,
+   "project_id": "torre_easy_lo_r00_tgd",
+   "runtime_s": 2.246,
+   "stagger": {
+    "count": 6359,
+    "histogram": [
+     [
+      "[0,1)",
+      810
+     ],
+     [
+      "[1,5)",
+      191
+     ],
+     [
+      "[5,10)",
+      553
+     ],
+     [
+      "[10,15)",
+      930
+     ],
+     [
+      "[15,20)",
+      2307
+     ],
+     [
+      "[20,40)",
+      1258
+     ],
+     [
+      ">=40",
+      310
+     ]
+    ],
+    "mean_cm": 17.714,
+    "min_cm": 0.0
+   },
+   "tolerances_cm": {
+    "cluster_cm": 1.5,
+    "joint_coincidence_cm": 1.0,
+    "max_adjacent_gap_cm": 5.0
+   },
+   "unclassified_samples": [
+    {
+     "course": 14,
+     "wall_idx": 1,
+     "x_cm": 1449.5
+    },
+    {
+     "course": 15,
+     "wall_idx": 1,
+     "x_cm": 1449.5
+    },
+    {
+     "course": 16,
+     "wall_idx": 1,
+     "x_cm": 1449.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 4,
+     "x_cm": 34.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 4,
+     "x_cm": 269.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 4,
+     "x_cm": 524.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 4,
+     "x_cm": 1139.51
+    },
+    {
+     "course": 2,
+     "wall_idx": 4,
+     "x_cm": 34.5
+    },
+    {
+     "course": 2,
+     "wall_idx": 4,
+     "x_cm": 269.5
+    },
+    {
+     "course": 2,
+     "wall_idx": 4,
+     "x_cm": 524.5
+    },
+    {
+     "course": 2,
+     "wall_idx": 4,
+     "x_cm": 1139.51
+    },
+    {
+     "course": 3,
+     "wall_idx": 4,
+     "x_cm": 34.5
+    }
+   ],
+   "wall_course_pairs_with_blocks": 2057,
+   "walls_audit_failed": 46,
+   "walls_considered": 167,
+   "walls_with_blocks": 138,
+   "walls_without_blocks": 29
+  },
+  "torre_easy_lo_r00_tp1": {
+   "alignment_conflicts": 0,
+   "audit_problems": {
+    "CONTINUOUS_VERTICAL_JOINT": 77,
+    "REPEATED_VERTICAL_COMPENSATOR_STRIP": 19
+   },
+   "blocks_by_code": {
+    "B19": 1268,
+    "B34": 2282,
+    "B39": 9596,
+    "B54": 1087,
+    "C04": 804,
+    "C09": 3051
+   },
+   "blocks_inside_opening": 168,
+   "blocks_total": 18088,
+   "collisions": 14,
+   "comparable_course_pairs": 1504,
+   "consecutive_compensator_pairs": 903,
+   "consecutive_compensator_runs_by_len": {
+    "2": 431,
+    "3": 396,
+    "4": 64,
+    "5": 12
+   },
+   "door_void_violations": 348,
+   "fingerprint": {
+    "rows": 18088,
+    "sha256": "c559d99272a0596e50a1218e271a1430fe412d9f036374333923df6f3a55eb83"
+   },
+   "forbidden_by_band": {
+    "cross_band": 28,
+    "same_band": 0
+   },
+   "forbidden_top_walls": [
+    [
+     3,
+     5
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     38,
+     3
+    ],
+    [
+     70,
+     3
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     22,
+     1
+    ],
+    [
+     34,
+     1
+    ],
+    [
+     41,
+     1
+    ],
+    [
+     42,
+     1
+    ]
+   ],
+   "forbidden_walls": 14,
+   "internal_joints_total": 14410,
+   "intersection_failures": 0,
+   "intersection_failures_by_kind": {},
+   "jamb_exceptions": 44,
+   "joint_classes": {
+    "DOCUMENTED_EXCEPTION": 487,
+    "FORBIDDEN_JOINT_ALIGNMENT": 28,
+    "NO_ALIGNMENT": 12246,
+    "UNCLASSIFIED_RULE_CONFLICT": 809
+   },
+   "non_modular": 281,
+   "num_courses": 17,
+   "project_id": "torre_easy_lo_r00_tp1",
+   "runtime_s": 2.475,
+   "stagger": {
+    "count": 13378,
+    "histogram": [
+     [
+      "[0,1)",
+      1324
+     ],
+     [
+      "[1,5)",
+      254
+     ],
+     [
+      "[5,10)",
+      940
+     ],
+     [
+      "[10,15)",
+      1679
+     ],
+     [
+      "[15,20)",
+      6505
+     ],
+     [
+      "[20,40)",
+      2284
+     ],
+     [
+      ">=40",
+      392
+     ]
+    ],
+    "mean_cm": 18.701,
+    "min_cm": 0.0
+   },
+   "tolerances_cm": {
+    "cluster_cm": 1.5,
+    "joint_coincidence_cm": 1.0,
+    "max_adjacent_gap_cm": 5.0
+   },
+   "unclassified_samples": [
+    {
+     "course": 12,
+     "wall_idx": 1,
+     "x_cm": 34.5
+    },
+    {
+     "course": 13,
+     "wall_idx": 1,
+     "x_cm": 34.5
+    },
+    {
+     "course": 14,
+     "wall_idx": 1,
+     "x_cm": 34.5
+    },
+    {
+     "course": 15,
+     "wall_idx": 1,
+     "x_cm": 34.5
+    },
+    {
+     "course": 16,
+     "wall_idx": 1,
+     "x_cm": 34.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 2,
+     "x_cm": 34.5
+    },
+    {
+     "course": 1,
+     "wall_idx": 2,
+     "x_cm": 79.48
+    },
+    {
+     "course": 1,
+     "wall_idx": 2,
+     "x_cm": 114.48
+    },
+    {
+     "course": 1,
+     "wall_idx": 2,
+     "x_cm": 1309.5
+    },
+    {
+     "course": 2,
+     "wall_idx": 2,
+     "x_cm": 34.5
+    },
+    {
+     "course": 2,
+     "wall_idx": 2,
+     "x_cm": 79.48
+    },
+    {
+     "course": 2,
+     "wall_idx": 2,
+     "x_cm": 114.49
+    }
+   ],
+   "wall_course_pairs_with_blocks": 1614,
+   "walls_audit_failed": 50,
+   "walls_considered": 96,
+   "walls_with_blocks": 96,
+   "walls_without_blocks": 0
+  }
+ },
+ "totals": {
+  "alignment_conflicts": 0,
+  "blocks_by_code": {
+   "B19": 2173,
+   "B34": 5011,
+   "B39": 14888,
+   "B54": 1723,
+   "C04": 1426,
+   "C09": 4286
+  },
+  "blocks_inside_opening": 281,
+  "blocks_total": 29507,
+  "collisions": 1048,
+  "comparable_course_pairs": 3283,
+  "consecutive_compensator_pairs": 1210,
+  "door_void_violations": 638,
+  "forbidden_by_band": {
+   "cross_band": 33,
+   "same_band": 0
+  },
+  "internal_joints_total": 22335,
+  "intersection_failures": 200,
+  "joint_classes": {
+   "DOCUMENTED_EXCEPTION": 595,
+   "FORBIDDEN_JOINT_ALIGNMENT": 33,
+   "NO_ALIGNMENT": 18696,
+   "UNCLASSIFIED_RULE_CONFLICT": 1506
+  },
+  "non_modular": 3336,
+  "runtime_s": 4.78,
+  "walls_audit_failed": 104,
+  "walls_considered": 275,
+  "walls_with_blocks": 246,
+  "walls_without_blocks": 29
+ }
+}

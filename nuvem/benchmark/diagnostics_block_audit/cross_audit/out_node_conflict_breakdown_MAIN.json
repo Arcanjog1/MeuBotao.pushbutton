@@ -1,0 +1,42 @@
+{
+  "per_project": {
+    "piloto_sintetico_2x2": {
+      "total_suspect_recount": 33,
+      "breakdown_by_touching_node_kind": {
+        "L": 7,
+        "T": 0,
+        "X": 0,
+        "OPENING_JAMB": 26,
+        "OTHER_NONE": 0
+      }
+    },
+    "torre_easy_lo_r00_tgd": {
+      "total_suspect_recount": 1086,
+      "breakdown_by_touching_node_kind": {
+        "L": 297,
+        "T": 280,
+        "X": 144,
+        "OPENING_JAMB": 67,
+        "OTHER_NONE": 298
+      }
+    },
+    "torre_easy_lo_r00_tp1": {
+      "total_suspect_recount": 1817,
+      "breakdown_by_touching_node_kind": {
+        "L": 180,
+        "T": 530,
+        "X": 204,
+        "OPENING_JAMB": 487,
+        "OTHER_NONE": 416
+      }
+    }
+  },
+  "aggregate_total_suspect": 2936,
+  "aggregate_breakdown": {
+    "L": 484,
+    "T": 810,
+    "X": 348,
+    "OPENING_JAMB": 580,
+    "OTHER_NONE": 714
+  }
+}

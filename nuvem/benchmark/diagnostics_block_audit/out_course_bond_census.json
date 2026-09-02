@@ -1,0 +1,675 @@
+{
+  "method": "Censo independente — PRISMA / FIADAS (missão CONTA 2, seção 8) + uma",
+  "coincident_tolerance_cm": 1.0,
+  "pairs_of_consecutive_courses_measured": 7444,
+  "joint_coincidence": {
+    "suspect_continuous_vertical_joint": 1086,
+    "exempt_opening_touch_11_8": 10,
+    "ambiguous_near_edge_not_confirmed_touch": 157,
+    "not_coincident": 6191
+  },
+  "walls_with_suspect_continuous_joint": 47,
+  "stagger_cm_summary": {
+    "count": 7444,
+    "min": 0.0,
+    "median": 15.0,
+    "mean": 21.532,
+    "max": 994.876,
+    "histogram_cm": {
+      ">20": 1134,
+      "10-20": 3660,
+      "3-10": 1385,
+      "0-1": 1253,
+      "1-3": 12
+    }
+  },
+  "suspects_sample": [
+    {
+      "wall_idx": 1,
+      "course_a": 0,
+      "course_b": 1,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 1,
+      "course_b": 2,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 2,
+      "course_b": 3,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 3,
+      "course_b": 4,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 4,
+      "course_b": 5,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 5,
+      "course_b": 6,
+      "t_cm": 139.51,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B19",
+        "C09"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 5,
+      "course_b": 6,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 5,
+      "course_b": 6,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 6,
+      "course_b": 7,
+      "t_cm": 139.5,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 6,
+      "course_b": 7,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 6,
+      "course_b": 7,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 7,
+      "course_b": 8,
+      "t_cm": 139.51,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B19",
+        "C09"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 7,
+      "course_b": 8,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 7,
+      "course_b": 8,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 8,
+      "course_b": 9,
+      "t_cm": 139.5,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 8,
+      "course_b": 9,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 8,
+      "course_b": 9,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 9,
+      "course_b": 10,
+      "t_cm": 139.51,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B19",
+        "C09"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 9,
+      "course_b": 10,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 9,
+      "course_b": 10,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 10,
+      "course_b": 11,
+      "t_cm": 139.5,
+      "delta_cm": 0.002,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 10,
+      "course_b": 11,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "B19"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 10,
+      "course_b": 11,
+      "t_cm": 1294.51,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C04",
+        "C09"
+      ],
+      "nearest_edge_cm": 65.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 11,
+      "course_b": 12,
+      "t_cm": 924.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C09"
+      ],
+      "codes_b": [
+        "C04",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 13,
+      "course_b": 14,
+      "t_cm": 1449.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C09",
+        "C09"
+      ],
+      "nearest_edge_cm": 34.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 14,
+      "course_b": 15,
+      "t_cm": 1449.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C09",
+        "C09"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 34.5
+    },
+    {
+      "wall_idx": 1,
+      "course_a": 15,
+      "course_b": 16,
+      "t_cm": 1449.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C09",
+        "C09"
+      ],
+      "nearest_edge_cm": 34.5
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 5,
+      "course_b": 6,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B19",
+        "C04"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 5,
+      "course_b": 6,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C09",
+        "B19"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 6,
+      "course_b": 7,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C04"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 6,
+      "course_b": 7,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C09",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 7,
+      "course_b": 8,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B19",
+        "C04"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 7,
+      "course_b": 8,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C09",
+        "B19"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 8,
+      "course_b": 9,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C04"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 8,
+      "course_b": 9,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C09",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 9,
+      "course_b": 10,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B19",
+        "C04"
+      ],
+      "codes_b": [
+        "B39",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 9,
+      "course_b": 10,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C09",
+        "B19"
+      ],
+      "codes_b": [
+        "B34",
+        "B34"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 10,
+      "course_b": 11,
+      "t_cm": 139.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B39",
+        "B19"
+      ],
+      "codes_b": [
+        "B19",
+        "C04"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 2,
+      "course_a": 10,
+      "course_b": 11,
+      "t_cm": 1294.49,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "B34",
+        "B34"
+      ],
+      "codes_b": [
+        "C09",
+        "B19"
+      ],
+      "nearest_edge_cm": 65.49
+    },
+    {
+      "wall_idx": 3,
+      "course_a": 0,
+      "course_b": 1,
+      "t_cm": 559.5,
+      "delta_cm": 0.0,
+      "codes_a": [
+        "C04",
+        "C04"
+      ],
+      "codes_b": [
+        "C09",
+        "B19"
+      ],
+      "nearest_edge_cm": 160.5
+    }
+  ],
+  "variants_per_course_used": 1,
+  "alternative_solutions_same_segment_different_variant": {
+    "note": "so' populado quando variants_per_course > 1 na rodada; producao real usa variants_per_course=1 (secao 18.4 das REGRAS) - ver run_full_census para uma rodada extra com K=3",
+    "count_segments_with_alternatives": 0,
+    "examples": []
+  },
+  "project_id": "torre_easy_lo_r00_tgd"
+}
