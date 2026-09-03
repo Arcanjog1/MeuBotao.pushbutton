@@ -1,14 +1,13 @@
 # Modulacao Automatica (pyRevit) - instrucoes para o Codex
 
-## Merge direto na main
+## Merge na main
 
-O usuario autorizou (2026-08-26): correcoes/commits feitos em branches
-`Codex/...` podem ser mesclados DIRETO na `main` (merge commit local +
-`git push origin main`), sem precisar abrir Pull Request nem esperar
-aprovacao. Isso vale para toda sessao futura deste projeto, nao so' a
-que recebeu o pedido.
+REVOGADO (2026-09-03) o "ok" permanente que existia aqui: NUNCA fazer
+merge na `main` sem autorizacao explicita do usuario PARA AQUELE MERGE
+especifico. Commit e push na branch de trabalho continuam permitidos
+quando a tarefa autorizar.
 
-Antes de mesclar:
+Quando o usuario autorizar um merge especifico:
 - `git fetch origin main` + garantir que a branch local `main` esta'
   atualizada (`git pull`/fast-forward) antes do merge.
 - Rodar a suite de testes (`python3 -m pytest tests/test_script.py -q`,
@@ -17,8 +16,22 @@ Antes de mesclar:
 - Resolver qualquer conflito de merge antes de dar push; se o conflito
   for em logica (nao so' trivial), avisar o usuario antes de decidir.
 
-So' NAO mesclar direto (voltar a pedir/abrir PR) se o usuario disser
-explicitamente o contrario numa sessao futura.
+## Check-ins e monitoramento automatico
+
+NUNCA criar por iniciativa propria: check-in horario, monitoramento de
+PR, polling, tarefa recorrente ou rechecagem agendada. So' fazer isso se
+o usuario pedir explicitamente.
+
+## Recuperacao progressiva de contexto
+
+Mesma politica descrita em `CLAUDE.md` ("Recuperacao progressiva de
+contexto") vale aqui: carregar so' o contexto necessario para a tarefa
+atual, mas nunca deixar de investigar por economia quando houver duvida
+razoavel sobre uma regra/contrato relevante. Buscar por termo exato,
+depois sinonimo/pt-BR-EN, depois entidade relacionada, depois heading,
+antes de ler um arquivo inteiro ou concluir que uma regra nao existe.
+`nuvem/REGRAS_MODULACAO_BLOCOS.md` continua sendo a fonte oficial —
+localizar a secao antes de ler o arquivo inteiro.
 
 ## Documentacao da API RevitAPI
 
