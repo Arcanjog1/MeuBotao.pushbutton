@@ -5,15 +5,14 @@
 Sempre responder ao usuario em portugues do Brasil (pt-BR), em toda
 sessao futura deste projeto - independente do idioma usado na pergunta.
 
-## Merge direto na main
+## Merge na main
 
-O usuario autorizou (2026-08-26): correcoes/commits feitos em branches
-`claude/...` podem ser mesclados DIRETO na `main` (merge commit local +
-`git push origin main`), sem precisar abrir Pull Request nem esperar
-aprovacao. Isso vale para toda sessao futura deste projeto, nao so' a
-que recebeu o pedido.
+REVOGADO (2026-09-03) o "ok" permanente que existia aqui: NUNCA fazer
+merge na `main` sem autorizacao explicita do usuario PARA AQUELE MERGE
+especifico. Commit e push na branch de trabalho continuam permitidos
+quando a tarefa autorizar.
 
-Antes de mesclar:
+Quando o usuario autorizar um merge especifico:
 - `git fetch origin main` + garantir que a branch local `main` esta'
   atualizada (`git pull`/fast-forward) antes do merge.
 - Rodar a suite de testes (`python3 -m pytest tests/test_script.py -q`,
@@ -22,8 +21,54 @@ Antes de mesclar:
 - Resolver qualquer conflito de merge antes de dar push; se o conflito
   for em logica (nao so' trivial), avisar o usuario antes de decidir.
 
-So' NAO mesclar direto (voltar a pedir/abrir PR) se o usuario disser
-explicitamente o contrario numa sessao futura.
+## Check-ins e monitoramento automatico
+
+NUNCA criar por iniciativa propria: check-in horario, monitoramento de
+PR, polling, tarefa recorrente ou rechecagem agendada. So' fazer isso se
+o usuario pedir explicitamente. Nunca re-armar um monitoramento por
+conta propria.
+
+## Recuperacao progressiva de contexto
+
+Carregar somente o contexto necessario para a tarefa atual, mas ECONOMIA
+DE CONTEXTO NUNCA TEM PRIORIDADE SOBRE CORRECAO: havendo duvida razoavel
+sobre a existencia de uma regra/contrato/decisao relevante, ampliar a
+busca antes de concluir que ela nao existe.
+
+Fluxo padrao: entender o problema -> identificar conceitos relevantes ->
+buscar (termo exato, depois sinonimos/pt-BR-EN, depois entidades
+relacionadas, depois headings `rg "^#"`, depois simbolo de codigo `git
+grep`) -> localizar arquivo/secao -> ler o trecho minimo suficiente
+(assinatura + entradas/saidas + chamadas relacionadas, nao so' uma linha
+isolada) -> ampliar (secao vizinha, depois arquivo completo) somente se
+a busca em camadas anterior ficou inconclusiva ou o assunto e' critico
+(amarracao, prisma, L/T/X, aberturas, B34/B54, compensadores,
+pilaretes, validacao final) -> so' entao registrar "regra nao
+localizada", sem nunca inventar uma regra.
+
+Antes de declarar uma regra ausente: nunca concluir isso apos uma unica
+busca sem resultado — o termo pode estar em outro idioma, sinonimo,
+nome antigo ou descrito por consequencia. Testar termo original + pelo
+menos um sinonimo/conceito relacionado antes de desistir.
+
+`nuvem/REGRAS_MODULACAO_BLOCOS.md` continua sendo a fonte oficial das
+regras de modulacao (autoridade preservada) — nao e' preciso ler o
+arquivo inteiro para toda alteracao pequena; localizar a secao pelo
+heading/ID/termo primeiro, e so' ler o arquivo completo quando a busca
+em camadas ficar inconclusiva ou o risco de erro for alto.
+
+Ao alterar codigo: preferir busca por simbolo (`git grep`/`rg`) antes de
+abrir arquivos grandes; localizar callers e testes relacionados quando o
+contrato de uma estrutura estiver em duvida (nao e' obrigatorio para
+toda tarefa). Evitar reler o mesmo conteudo na mesma sessao sem motivo
+concreto. Rodar suites de teste de forma progressiva durante o
+diagnostico (reproducao minima -> modulo -> CR especifico -> suite
+completa) e so' rodar a suite completa antes da entrega final ou de um
+merge autorizado — isso nao dispensa os gates finais de determinismo.
+Nao pesquisar na web por padrao, exceto quando a informacao local for
+insuficiente ou o usuario pedir (a obrigacao de consultar o
+RevitApiDocs abaixo continua valendo sempre que houver uso real da
+API).
 
 ## Documentacao da API RevitAPI
 

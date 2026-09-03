@@ -15,9 +15,18 @@ essa parede", "lança os blocos", ou qualquer pedido relacionado a:
 - amarração, encontros L/T/X, aberturas, pilaretes, fiadas;
 - qualquer correção de erro de modulação apontado pelo usuário.
 
-**Consultar esta Skill inteira ANTES de gerar ou alterar qualquer
-bloco.** Ela não é documentação opcional — é a fonte de regras que a
+Esta Skill não é documentação opcional — é a fonte de regras que a
 geração deve obedecer, em qualquer arquitetura, em qualquer projeto.
+Não é preciso ler todos os módulos inteiros antes de todo pedido: usar
+este `SKILL.md` como **roteador** — 1) identificar o(s) domínio(s) que o
+pedido toca (ex.: bloco preso em porta → OPENINGS + VALIDATION; blocos
+alinhados verticalmente → BONDING + VALIDATION; dúvida de catálogo →
+BLOCKS); 2) carregar só os módulos relevantes da tabela abaixo antes de
+tocar no Revit. O roteador é um ponto de partida, não um limitador: se a
+investigação revelar necessidade de outro módulo não listado, consultá-lo
+também. Em caso de dúvida sobre a existência de uma regra relevante,
+ampliar a busca (inclusive lendo um módulo inteiro) em vez de presumir
+que ela não existe.
 
 ## Fonte única da verdade (não duplicar, não divergir)
 
@@ -56,8 +65,10 @@ junto (ver "Como esta Skill aprende" abaixo).
 
 ## Fluxo obrigatório (resumo — detalhe em RULES.md)
 
-1. **Carregar a Skill** — ler RULES/BLOCKS/BONDING/OPENINGS/VALIDATION/
-   ERROR_HISTORY relevantes ao pedido antes de tocar no Revit.
+1. **Carregar a Skill (por roteador)** — usar `SKILL.md` para identificar
+   os módulos (RULES/BLOCKS/BONDING/OPENINGS/VALIDATION/ERROR_HISTORY)
+   relevantes ao pedido e lê-los antes de tocar no Revit; ampliar para
+   outros módulos se a investigação exigir.
 2. **Ler o projeto no Revit via MCP** — paredes, níveis, aberturas,
    interseções, catálogo de famílias reais. Nunca assumir que o projeto
    novo tem a mesma arquitetura do anterior.
