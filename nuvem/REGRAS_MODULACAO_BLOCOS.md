@@ -4200,17 +4200,63 @@ de paridade — linhas ímpares↔pares — sem ser um defeito novo), este
 padrão aparece em paredes que simplesmente não tinham NENHUM problema de
 prisma antes.
 
-- **Hipótese, NÃO CONFIRMADA**: ao trocar `node["arms"]` numa ponta
-  `L_CORNER`, a coordenação muda qual parede recebe a peça de canto
-  assimétrica (B34/B54) — mas a regra fixa que decide a fiada física A/B
-  (`letter = "A" if course_index % 2 == 0 else "B"`, em
-  `solve_building_blocks_all_courses`) não é ajustada em conjunto, então
-  o "vão menor" da peça de canto pode ficar do lado errado em relação ao
-  padrão par/ímpar que o resto da parede espera.
-- **Escopo do fix, se confirmado**: provavelmente dentro de
-  `wall_stepper.py` (`solve_l_corner`/`solve_wall_free_fill`), sem
-  precisar tocar `wall_pairing.py` — mas não verificado nesta sessão.
-- **Status**: bloqueia o veredito de `CR-BLOCK-ARM-ROLE-CONSISTENCY`
-  (NECESSITA AJUSTE — ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`, seção
-  "Riscos"). Próxima sessão sobre este tema deve começar por confirmar ou
-  refutar esta hipótese antes de qualquer nova mudança de código.
+- **Hipótese original, REFUTADA** (`CR-BLOCK-ARM-ROLE-PRISM-STAGGER`,
+  2026-09-03): "ao trocar `node['arms']` numa ponta `L_CORNER`, a
+  coordenação muda qual parede recebe a peça de canto assimétrica
+  (B34/B54) mas a regra fixa `letter = par/ímpar` não é ajustada em
+  conjunto, então o vão menor fica do lado errado" — **não é isto**.
+  Medido diretamente: a posição/orientação (`origin_world`, `x_dir`,
+  `rotation_deg`) da peça de canto em cada nó é IDÊNTICA antes e depois
+  da troca de papel (só o RÓTULO course_a/course_b muda) —
+  `_asymmetric_bond_origin_and_axis` nunca lê `course`/arms, só a
+  geometria do canto. O vão menor sempre aponta pro lado certo; nunca
+  foi a causa.
+- **Causa raiz real, PROVADA** (ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`
+  para a cadeia completa e a tabela de hipóteses H1-H7): a junta entre a
+  peça de canto de um nó (posicionada por `solve_l_corner`, fora do
+  preenchimento comum) e o primeiro/último bloco do preenchimento
+  adjacente NUNCA foi rastreada pelo mecanismo de desencontro de junta
+  vertical (`course_a_joint_positions_cm`/`_pier_layout_avoiding_joints`,
+  seção 6) — só juntas INTERNAS ao preenchimento eram contadas, por
+  design documentado na própria `_layout_internal_joint_positions_cm`
+  ("sem contar as juntas de CONTORNO"). Isso era inofensivo enquanto só
+  uma família tinha candidato de nó real num dado encontro; com a
+  coordenação de papel dando às duas famílias um candidato real no MESMO
+  encontro — e ambas escolhendo a MESMA peça (B34, decisão geométrica
+  correta e independente da coordenação) —, a junta de contorno de uma
+  família coincide com a da outra sem que a busca de desencontro jamais
+  soubesse.
+- **Fix IMPLEMENTADO** (`wall_stepper.py`, `_pier_boundary_joint_
+  positions_cm` + `course_a_boundary_joint_positions_cm`/`own_family_
+  boundary_joint_positions_cm`, listas SEPARADAS das internas para não
+  afetar o reparo de abertura `_recut_openings_and_repair`): resolve por
+  completo os casos com liberdade real de composição de preenchimento
+  (2 de 11 paredes regredidas: `W117`/TGD, `W041`/TP1) e reduz
+  substancialmente o total de `PRISM_CONTINUOUS_JOINT` nos dois projetos
+  reais (TGD 691→476, TP1 896→576 — abaixo até do estado anterior a
+  QUALQUER CR desta série), sem retroceder a cobertura ganha por
+  `CR-BLOCK-ARM-ROLE-CONSISTENCY`.
+- **Limite genuíno, não corrigido**: as outras 9 paredes têm o pier
+  cabendo EXATAMENTE 1 bloco (ou, em `W061`/`W062`, uma cadeia de
+  compensadores simétrica) entre a peça de canto e o próximo limite — a
+  posição da junta de contorno é matematicamente fixada pelo comprimento
+  da peça de canto nas duas pontas (`border + BLOCK_JOINT_CM/2`, igual
+  nas duas famílias quando a peça é a mesma), e NENHUMA composição de
+  preenchimento alternativa pode mover isso. A busca agora DETECTA e
+  REPORTA essas 9 coincidências (`alignment_conflicts`, antes escondido
+  pelo filtro `len(layout) > 1`), mas não as elimina — eliminá-las
+  exigiria mudar QUAL peça é escolhida num dos dois nós (ex. B54 em vez
+  de B34), uma mudança na lógica de SELEÇÃO de peça de
+  `solve_l_corner`, mais invasiva e não implementada.
+- **Regressão colateral, real e não totalmente diagnosticada**:
+  `OPENING_BLOCK_INSIDE_DOOR` sobe +3 no TGD (3 paredes já afetadas,
+  nenhuma nova) mesmo depois de separar as listas de contorno do reparo
+  de abertura — a causa exata não foi isolada nesta sessão.
+- **Status**: `DOCUMENTADO — fix parcial implementado, pendência de
+  código aberta` para as 9 paredes restantes e para a regressão de
+  `OPENING_BLOCK_INSIDE_DOOR`. Veredito de `CR-BLOCK-ARM-ROLE-PRISM-
+  STAGGER`: NECESSITA AJUSTE — ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`
+  para o relatório completo (gates G1-G14). Próxima sessão sobre este
+  tema deve decidir, com autorização explícita do usuário, se vale a
+  pena mudar a seleção de peça de canto para as paredes restantes, e
+  diagnosticar a regressão de `OPENING_BLOCK_INSIDE_DOOR`.
