@@ -699,6 +699,105 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-PRISM-STAGGER` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-PRISM-STAGGER (continuação de
+               CR-BLOCK-ARM-ROLE-CONSISTENCY, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   d813f457108ef187b35dd581c35821d22ad23c4d
+SHA final:     ver commit desta entrega, topo do log
+status:        NECESSITA AJUSTE (gates G7/G8/G9 falharam - ver relatorio
+               completo docs/BLOCK_ARM_ROLE_INVARIANCE.md, reescrito
+               para este CR)
+
+o que foi investigado: a regressao de PRISM_CONTINUOUS_JOINT introduzida
+  por CR-BLOCK-ARM-ROLE-CONSISTENCY (11 paredes reais - 3 TGD, 8 TP1 -
+  que antes nao tinham nenhum achado de prisma passaram a ter TODAS as
+  juntas entre fiadas consecutivas alinhadas). Causa-raiz provada por
+  cadeia completa (papel coordenado -> solve_l_corner -> peca ->
+  orientacao -> posicao da junta -> fill -> junta na fiada oposta), nao
+  so' pelo validador final: a junta entre a peca de canto de um no' e o
+  primeiro/ultimo bloco do preenchimento comum adjacente NUNCA foi
+  rastreada pelo mecanismo de desencontro de junta vertical (secao 6,
+  `_layout_internal_joint_positions_cm` so' conta juntas INTERNAS ao
+  preenchimento, por design documentado) - inofensivo enquanto so' uma
+  familia tinha candidato de no' real num dado encontro; a coordenacao
+  de papel deu as duas familias um candidato real no MESMO encontro, e
+  quando ambas escolhem a MESMA peca (B34, decisao geometrica correta,
+  independente da coordenacao) a junta de contorno coincide sem a busca
+  de desencontro saber. Hipotese inicial (vao menor B34/B54
+  dessincronizado da paridade par/impar) REFUTADA - a orientacao/posicao
+  da peca de canto e' sempre determinada por geometria pura, nunca por
+  course_a/course_b.
+
+fix implementado (nuvem/core/engine/wall_stepper.py, unica alteracao de
+  producao): `_pier_boundary_joint_positions_cm` computa a posicao da
+  junta de contorno contra um no'; duas listas NOVAS e SEPARADAS
+  (`course_a_boundary_joint_positions_cm`/`own_family_boundary_joint_
+  positions_cm`) alimentam a busca de desencontro e a checagem residual
+  (`alignment_conflicts`, que agora tambem dispara para pier de 1 bloco
+  so', antes escondido por `len(layout) > 1`) - mas NUNCA o reparo de
+  abertura (`_recut_openings_and_repair`), separacao necessaria depois
+  de medir uma regressao real em OPENING_BLOCK_INSIDE_DOOR na primeira
+  versao do fix (misturando as listas).
+
+testes: 5 testes novos e permanentes
+  (tests/test_block_arm_role_prism_stagger.py), rodando o corpus real
+  via nuvem.benchmark.solver_bridge (o caso minimo de W076 depende da
+  reserva "emprestada" do quadrado do canto, so' existe com topologia
+  real de mais de 2 paredes por no'). 2 deles falham no codigo anterior
+  ao fix pela razao certa (confirmado via git stash). Suite rapida
+  completa: 518 passed (513 + 5 novos).
+
+benchmarks (torre_easy_lo_r00_tgd/tp1/piloto_sintetico_2x2, comparacao
+  A=origin/main limpo (7c9a681) / C=d813f45 (ARM-ROLE-CONSISTENCY) /
+  D=este fix):
+    - coverage (MISSING_ROW/MOSTLY_EMPTY): IDENTICO entre C e D nos 3
+      projetos - o ganho de cobertura do commit d813f45 esta' 100%
+      preservado;
+    - PRISM_CONTINUOUS_JOINT: TGD 702(A)->691(C)->476(D); TP1
+      837(A)->896(C)->576(D) - cai ABAIXO ate' do estado anterior a
+      qualquer CR desta serie nos dois projetos reais;
+    - NEW_PRISM_WALLS: 11 antes do fix -> 9 depois (W117/TGD e
+      W041/TP1 resolvidos por completo - tinham liberdade real de
+      composicao; as 9 restantes tem o pier cabendo EXATAMENTE 1 bloco,
+      coincidencia matematicamente forcada pela mesma peca B34 nas duas
+      pontas - detectada e reportada via alignment_conflicts, mas nao
+      eliminavel sem mudar qual peca e' escolhida num dos dois nos,
+      mudanca mais invasiva nao implementada);
+    - OPENING_BLOCK_INSIDE_DOOR (TGD): 43(A)->43(C)->46(D) - REGRESSAO
+      REAL, +3, em 3 paredes ja' afetadas (nenhuma nova), causa exata
+      nao totalmente diagnosticada mesmo apos a separacao de listas;
+    - POSITION_OVERLAP (colisoes): identico nos 3 estados, nenhuma
+      mudanca.
+
+novas dividas: (1) 9 paredes com PRISM_CONTINUOUS_JOINT geometricamente
+  forcado - eliminar exigiria mudar a selecao de peca de canto em
+  solve_l_corner (B54 em vez de B34), decisao que precisa de
+  autorizacao explicita do usuario antes de qualquer tentativa; (2)
+  regressao de OPENING_BLOCK_INSIDE_DOOR (+3, TGD) precisa de
+  investigacao propria. Documentado como secao 28.6 (atualizada) de
+  REGRAS_MODULACAO_BLOCOS.md.
+
+itens resolvidos: causa-raiz completa da regressao de prisma provada
+  (cadeia completa, hipoteses H1-H7 testadas e documentadas); 2 de 11
+  paredes com prisma novo resolvidas por completo; reducao substancial
+  do total de PRISM_CONTINUOUS_JOINT nos dois projetos reais.
+
+itens ainda pendentes: as 9 paredes com coincidencia geometricamente
+  forcada; a regressao de OPENING_BLOCK_INSIDE_DOOR.
+
+proximo passo recomendado: decidir, com o usuario, se vale a pena
+  investigar mudanca na selecao de peca de canto para as 9 paredes
+  restantes; diagnosticar a regressao de OPENING_BLOCK_INSIDE_DOOR antes
+  de qualquer nova tentativa. Ver docs/BLOCK_ARM_ROLE_INVARIANCE.md para
+  o relatorio completo, gate a gate. PR #9 (draft) permanece; NAO
+  MESCLADO.
+```
+
 ### 2026-09-03 — `CR-BLOCK-ARM-ROLE-CONSISTENCY` NECESSITA AJUSTE (não mesclado)
 
 ```

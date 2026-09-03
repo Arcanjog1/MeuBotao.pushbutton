@@ -88,7 +88,8 @@ __all__ = [
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
-    "_layout_internal_joint_positions_cm", "_count_joint_coincidences_cm",
+    "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
+    "_count_joint_coincidences_cm",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
@@ -3197,6 +3198,37 @@ def _layout_internal_joint_positions_cm(layout, seg_start_cm,
     return joints
 
 
+def _pier_boundary_joint_positions_cm(seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                      leading_is_open, trailing_is_open):
+    """Posicao (cm, absoluta na parede) da junta de CONTORNO de um trecho
+    contra um NO' de amarracao (L/T/X ou encontro de meio-de-parede) -
+    nunca contra abertura nem ponta livre de verdade (por isso o filtro
+    por `kind_*`/`*_is_open`, os mesmos que decidem a isencao em
+    `_layout_internal_joint_positions_cm`).
+
+    CR-BLOCK-ARM-ROLE-PRISM-STAGGER (causa-raiz provada, ver relatorio):
+    esta junta - entre a peca de amarracao do no' (ja' posicionada fora
+    de `layout`, por `solve_l_corner`/`solve_t_intersection`/
+    `solve_x_intersection`) e o PRIMEIRO/ULTIMO bloco do preenchimento
+    comum deste trecho - NUNCA foi rastreada por `course_a_joint_
+    positions_cm`/`_pier_layout_avoiding_joints` (que so' enxergam
+    juntas INTERNAS de `layout`, secao 6). Isso era inofensivo enquanto
+    normalmente so' uma das duas familias tinha candidato de no' de
+    verdade num dado encontro (o defeito que CR-BLOCK-ARM-ROLE-
+    CONSISTENCY corrigiu). Com as duas familias podendo ter candidato de
+    no' real no MESMO encontro, a junta de contorno de uma familia pode
+    coincidir com a da OUTRA sem a busca de desencontro nunca saber -
+    produzindo `PRISM_CONTINUOUS_JOINT` em paredes que antes nunca
+    tinham as duas familias com no' real ali. Devolve 0, 1 ou 2 posicoes
+    (uma por ponta do trecho que for, de fato, um no')."""
+    positions = []
+    if kind_left in ("WALL_START", "MIDSPAN_HI") and not leading_is_open:
+        positions.append(seg_start_cm - BLOCK_JOINT_CM / 2.0)
+    if kind_right in ("WALL_END", "MIDSPAN_LO") and not trailing_is_open:
+        positions.append(seg_end_cm + BLOCK_JOINT_CM / 2.0)
+    return positions
+
+
 def _count_joint_coincidences_cm(positions_cm, avoid_positions_cm,
                                  tolerance_cm=VERTICAL_JOINT_STAGGER_TOLERANCE_CM):
     """Quantas posicoes de `positions_cm` caem a menos de `tolerance_cm` de
@@ -4859,6 +4891,18 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     # "B")` abaixo) e consultado ao resolver "B", para o desencontro de
     # junta vertical entre fiadas da secao 6 (_pier_layout_avoiding_joints).
     course_a_joint_positions_cm = []
+    # Juntas de CONTORNO contra um no' (ver _pier_boundary_joint_positions_cm,
+    # CR-BLOCK-ARM-ROLE-PRISM-STAGGER) - SEPARADAS de course_a_joint_
+    # positions_cm de proposito: alimentam a BUSCA de desencontro
+    # (_pier_layout_avoiding_joints) e a checagem residual, mas NUNCA
+    # `avoid_joint_positions_cm` do reparo continuo (_recut_openings_and_
+    # repair, mais abaixo) - esse reparo so' espera juntas INTERNAS de
+    # verdade (testado ao vivo: incluir a de contorno ali criava jambs
+    # POSICIONADOS DIFERENTE perto de porta/janela em paredes sem nenhuma
+    # relacao com o defeito original, regressao real medida em
+    # OPENING_BLOCK_INSIDE_DOOR no TGD - revertida restringindo o escopo
+    # desta lista a busca/relatorio, nunca ao recorte de abertura).
+    course_a_boundary_joint_positions_cm = []
     # Centros dos vazios/celulas internas (cm, absolutos) ja' usados pela
     # Fiada A nos mesmos trechos - consultado ao resolver "B" para alinhar
     # os vazios entre fiadas (mesma secao 6, ver _pier_layout_avoiding_joints
@@ -4901,6 +4945,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         # que "A" acumulou (course_a_joint_positions_cm, abaixo), exatamente
         # como antes (regra #1, preservada integralmente).
         own_family_joint_positions_cm = []
+        own_family_boundary_joint_positions_cm = []
 
         for variant_index in range(variants_per_course):
             # FASE 1 do pipeline continuo: onde esta variante comeca em
@@ -5117,16 +5162,28 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             # fixa aqui para alinhar).
                             layout = _pier_layout_avoiding_joints(
                                 pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
-                                own_family_joint_positions_cm, allow_compensators=allow_compensators,
+                                own_family_joint_positions_cm
+                                + own_family_boundary_joint_positions_cm,
+                                allow_compensators=allow_compensators,
                                 leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                             )
                         if layout:
-                            # Lista de juntas a EVITAR - sem isencao, pelo mesmo
-                            # motivo do `_score` de _pier_layout_avoiding_joints:
-                            # a Fiada B deve continuar tentando desencontrar
-                            # todas, inclusive as isentas (a isencao so' vale na
-                            # hora de validar o resultado final).
+                            # Juntas INTERNAS (sem isencao, pelo mesmo motivo do
+                            # `_score` de _pier_layout_avoiding_joints: a Fiada B
+                            # deve continuar tentando desencontrar todas,
+                            # inclusive as isentas - a isencao so' vale na hora
+                            # de validar o resultado final) e junta de CONTORNO
+                            # contra um no' (ver _pier_boundary_joint_positions_cm)
+                            # SEPARADAS de proposito - ver a declaracao de
+                            # `course_a_boundary_joint_positions_cm` acima: a de
+                            # contorno alimenta busca/checagem, nunca o reparo de
+                            # abertura (`avoid_joint_positions_cm` do recut, mais
+                            # abaixo).
                             seg_joints_cm = _layout_internal_joint_positions_cm(layout, seg_start_cm)
+                            seg_boundary_joints_cm = _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
+                            )
                             seg_voids_cm = _layout_void_positions_cm(layout, catalog, seg_start_cm)
                             if continuous_first:
                                 variant_joint_positions_cm.extend(seg_joints_cm)
@@ -5135,6 +5192,8 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                 own_family_joint_positions_cm.extend(seg_joints_cm)
                                 course_a_joint_positions_cm.extend(seg_joints_cm)
                                 course_a_void_positions_cm.extend(seg_voids_cm)
+                            own_family_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
+                            course_a_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
                     else:
                         # Fiada B (todas as variantes): tenta ALINHAR os vazios
                         # internos com os ja' usados por QUALQUER variante da
@@ -5143,10 +5202,13 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         # familia A e das variantes B ja' geradas (criterio de
                         # desempate) - secao 6/11.7. `course_a_joint_positions_cm`
                         # sozinho (sem own_family) e' EXATAMENTE o avoid-list
-                        # historico quando variants_per_course=1.
+                        # historico quando variants_per_course=1. Inclui tambem a
+                        # junta de CONTORNO de A/B ja' usada (ver acima).
                         layout = _pier_layout_avoiding_joints(
                             pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
-                            course_a_joint_positions_cm + own_family_joint_positions_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm,
                             allow_compensators=allow_compensators,
                             target_void_positions_cm=course_a_void_positions_cm,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
@@ -5155,10 +5217,15 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             # Sem isencao aqui tambem - esta lista alimenta a
                             # BUSCA das variantes seguintes (ver acima).
                             seg_joints_cm = _layout_internal_joint_positions_cm(layout, seg_start_cm)
+                            seg_boundary_joints_cm = _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
+                            )
                             if continuous_first:
                                 variant_joint_positions_cm.extend(seg_joints_cm)
                             else:
                                 own_family_joint_positions_cm.extend(seg_joints_cm)
+                            own_family_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
                     if layout is None:
                         if continuous_first:
                             variant_failed_spans.append((seg_start_cm, seg_end_cm))
@@ -5179,19 +5246,31 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                 "upper_valid_cm": upper, "delta_to_upper_cm": upper - length_rounded,
                             })
                         continue
-                    if course == "B" and len(layout) > 1 and course_a_joint_positions_cm:
+                    if course == "B" and layout and (
+                            course_a_joint_positions_cm or course_a_boundary_joint_positions_cm):
                         # Segunda checagem, INDEPENDENTE da busca de
                         # `_pier_layout_avoiding_joints` (regra #1, absoluta - ver
                         # docstring): mesmo com a busca melhorada, um trecho pode
                         # nao ter NENHUMA composicao sem coincidencia (ex.:
                         # compensadores desligados, ou um caso realmente sem
                         # solucao dentro do catalogo) - nunca aceitar isso calado.
+                        # Inclui a junta de CONTORNO contra um no' (ver
+                        # _pier_boundary_joint_positions_cm) e roda mesmo com
+                        # `layout` de 1 peca so' - um trecho de UM bloco entre um
+                        # no' e outro limite nao tem junta INTERNA nenhuma, mas
+                        # ainda assim pode coincidir na junta de contorno com a
+                        # da Fiada A (CR-BLOCK-ARM-ROLE-PRISM-STAGGER; antes
+                        # disto o `len(layout) > 1` escondia exatamente este
+                        # caso, o mais comum nas paredes curtas afetadas).
                         residual = _count_joint_coincidences_cm(
                             _layout_internal_joint_positions_cm(
                                 layout, seg_start_cm,
                                 leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                            ) + _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
                             ),
-                            course_a_joint_positions_cm,
+                            course_a_joint_positions_cm + course_a_boundary_joint_positions_cm,
                         )
                         if residual:
                             alignment_conflicts.append({
