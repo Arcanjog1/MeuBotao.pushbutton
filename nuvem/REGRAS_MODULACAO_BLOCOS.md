@@ -4209,15 +4209,67 @@ prisma antes.
   exigiria mudar QUAL peça é escolhida num dos dois nós (ex. B54 em vez
   de B34), uma mudança na lógica de SELEÇÃO de peça de
   `solve_l_corner`, mais invasiva e não implementada.
-- **Regressão colateral, real e não totalmente diagnosticada**:
-  `OPENING_BLOCK_INSIDE_DOOR` sobe +3 no TGD (3 paredes já afetadas,
-  nenhuma nova) mesmo depois de separar as listas de contorno do reparo
-  de abertura — a causa exata não foi isolada nesta sessão.
-- **Status**: `DOCUMENTADO — fix parcial implementado, pendência de
-  código aberta` para as 9 paredes restantes e para a regressão de
-  `OPENING_BLOCK_INSIDE_DOOR`. Veredito de `CR-BLOCK-ARM-ROLE-PRISM-
-  STAGGER`: NECESSITA AJUSTE — ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`
-  para o relatório completo (gates G1-G14). Próxima sessão sobre este
-  tema deve decidir, com autorização explícita do usuário, se vale a
-  pena mudar a seleção de peça de canto para as paredes restantes, e
-  diagnosticar a regressão de `OPENING_BLOCK_INSIDE_DOOR`.
+- **Regressão colateral `OPENING_BLOCK_INSIDE_DOOR` +3 no TGD —
+  CAUSA PROVADA (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03): não é uma
+  invasão física nova. As mesmas 3 paredes (`W045`, `W051`, `W112`), na
+  MESMA fiada 11, já tinham este achado no estado `origin/main` limpo
+  (SHA `7c9a681`), ANTES de qualquer CR desta série — é artefato
+  pré-existente de `opening_active_in_row` (binário: a fiada 11 tem
+  elevação 220–239cm contra uma porta com `head_cm=221` — só 1 dos
+  19cm, 5,3%, está de fato dentro do vão; os outros 94,7% são a verga,
+  onde bloco é fisicamente correto). O fix de prisma só mudou a
+  COMPOSIÇÃO de blocos nessa fiada de fronteira (efeito colateral de
+  segmentos anteriores da mesma parede), fatiando o MESMO intervalo já
+  "invasor" em mais blocos (1-2 achados → 2-3), sem nenhuma parede
+  nova. Não corrigido em produção (decisão explícita: é um problema de
+  medição do benchmark, não do motor) — corrigir de verdade exige
+  regravar `baseline.json` ou graduar `opening_active_in_row` por
+  fração de altura, fora do escopo de `wall_stepper.py`.
+- **Status das 9 paredes restantes**: `DOCUMENTADO — pendência de
+  código aberta`, com evidência humana forte (ver 28.7). Veredito de
+  `CR-BLOCK-ARM-ROLE-RESIDUALS`: BLOQUEADO POR ESCOPO — ver
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para o relatório completo (gates
+  G1-G16).
+
+### 28.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
+alterna qual nó ancora qual família; às vezes concentra as duas peças
+de canto na MESMA fiada (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03)
+
+Comparação sistemática das 9 paredes com `PRISM_CONTINUOUS_JOINT`
+residual (28.6) contra o Reference Corpus humano (casamento geométrico
+via `nuvem/benchmark/comparator/match.py`, nunca por `id` — confirmado
+que IDs não são estáveis entre `input.json`/resultado e
+`reference.json`): 8 de 9 têm correspondente humano; nas 8, a fiada par
+e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
+
+- **Paredes curtas** (`W003`, `W076`, `W021`, `W092`, `W061`, `W062`,
+  provavelmente `W137`): o humano dá as DUAS peças de canto (dos dois
+  nós) à MESMA fiada física — a fiada oposta fica sem NENHUMA amarração
+  de nó, só um preenchimento comum solto (caso extremo, `W076`↔`W077`:
+  `B39` de 39cm que nem toca nenhuma das duas pontas da parede). Sem
+  junta de contorno na fiada "vazia", não há nada para coincidir.
+- **Paredes longas** (`W010`, `W037`): o humano mantém as duas âncoras
+  em nós opostos (mesma direção da coordenação atual) mas usa `B34`
+  também como peça de preenchimento comum (não só de canto), numa
+  sequência que nunca sincroniza entre as duas fiadas.
+
+- **Confiança**: `PADRÃO OBSERVADO AINDA NÃO CONFIRMADO` — evidência
+  forte (8/8 concordância) mas estreita (1 topologia: 2 nós L_CORNER de
+  2 braços, mesma peça B34 nas duas pontas; 2 projetos). Não promovido
+  a regra obrigatória.
+- **Conflito com 28.5**: a coordenação determinística atual (28.5,
+  `REGRA OBRIGATÓRIA`) resolve corretamente o defeito ORIGINAL
+  (`COVERAGE_MISSING_ROW`), mas o critério de DESEMPATE que ela usa
+  hoje (geométrico, `_canonical_node_sort_key`) não necessariamente
+  reproduz a escolha humana nestes 9 casos — a hipótese, não verificada,
+  é que o processo humano decide fiada a fiada (evitar coincidência com
+  a fiada JÁ COLOCADA, seja par ou ímpar), não por uma partição global
+  "família A / família B" fixada por parede como a arquitetura atual do
+  solver.
+- **Não implementado**: mudar o desempate da coordenação para permitir/
+  preferir concentrar as duas âncoras na mesma fiada é, em espírito,
+  alterar a POLÍTICA da coordenação — precisa de autorização explícita
+  e verificação ampla (garantir que não reabre o `COVERAGE_MISSING_ROW`
+  original em outro caso) antes de qualquer tentativa. Ver
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para os 9 casos individuais e o
+  caso `W076` detalhado.

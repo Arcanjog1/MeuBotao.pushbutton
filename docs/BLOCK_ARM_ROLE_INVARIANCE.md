@@ -1,433 +1,447 @@
-# RELATÓRIO — ARM-ROLE PRISM-STAGGER
+# RELATÓRIO FINAL — ARM-ROLE RESIDUALS
 
 ## Estado inicial
 
-Branch `claude/cr-block-arm-role-invariance-7tezx4`, HEAD recebido e
-confirmado `d813f457108ef187b35dd581c35821d22ad23c4d` (working tree
-limpo, nada perdido/descartado). Nenhum rebase, nenhum pull da main,
-nenhum merge — conforme instruído. NODE-FILL não foi tocado nem
-incorporado.
+Continuação de `CR-BLOCK-ARM-ROLE-PRISM-STAGGER`. Estado recebido:
+coordenação A/B resolvida e preservada; ganho de cobertura preservado;
+workaround inward-reserve removido; junta de contorno nó↔preenchimento
+agora rastreada; `PRISM_CONTINUOUS_JOINT` melhorou fortemente (2 de 11
+paredes resolvidas por completo); 9 paredes com coincidência descrita
+como "geometricamente forçada"; regressão real `OPENING_BLOCK_INSIDE_DOOR`
++3 no TGD, não diagnosticada.
 
-Ponto de partida (commit `d813f45`, CR-BLOCK-ARM-ROLE-CONSISTENCY já
-resolvido e aceito como base): a coordenação determinística de papel
-`course_a`/`course_b` entre os dois nós `L_CORNER` que fecham as duas
-pontas de uma mesma parede eliminou o defeito original (fiada inteira
-ausente), com ganho real e comprovado de cobertura em TGD e TP1. Efeito
-colateral, medido e documentado no relatório anterior mas **não
-corrigido**: `PRISM_CONTINUOUS_JOINT` passou a aparecer em paredes que
-antes não tinham nenhum achado desse código — 3 no TGD (`W003`, `W117`,
-`W137`), 8 no TP1 (`W010`, `W021`, `W037`, `W041`, `W061`, `W062`,
-`W076`, `W092`).
-
-## Paredes com regressão (inventário)
-
-Todas as 11 paredes têm a MESMA estrutura de topologia: exatamente 2 nós
-`L_CORNER` de 2 arms, um em cada ponta, ambos agora com candidato de nó
-real (efeito do CR anterior). Detalhe completo (peça, orientação,
-posição de junta) para as 3 mais simples, medidas ao vivo:
-
-| parede | projeto | comprimento | nós (pontas) | papel coordenado |
-|---|---|---|---|---|
-| W076 | TP1 (wall_idx 75) | 69,0cm | nó126 (arms=[(75,0),(76,1)]) / nó127 (arms=[(81,0),(75,1)] após coordenação) | A no nó126, B no nó127 |
-| W021 | TP1 (wall_idx 20) | 123,98cm | nó21 / nó23 | A / B |
-| W010 | TP1 (wall_idx 9, 1 abertura) | 424,0cm | nó18 (course_b) / nó19 (course_a) | B no nó18, A no nó19 |
-| W003 | TGD | 69,0cm | 2× L_CORNER | A / B |
-| W137 | TGD | 69,0cm | 2× L_CORNER | A / B |
-
-`course_index` → letra física: fixo, `"A" if course_index % 2 == 0 else
-"B"` (`solve_building_blocks_all_courses`, nunca afetado por
-coordenação de papel — confirmado no relatório anterior e reconfirmado
-aqui).
-
-Peça de amarração em TODAS as 11 paredes: `B34` (34cm) nas duas pontas
-— antes de qualquer fix as duas famílias tinham colisão de junta com
-STAGGER=0.00cm em TODA fiada consecutiva (16 pares de fiada por parede
-de 17 fiadas).
-
-## Caso mínimo
-
-`W076`/TP1 (wall_idx 75, 69cm, sem abertura) — a mais simples: pier de
-UM bloco só de cada lado do nó.
+## Branch / HEAD
 
 ```
-ANTES do fix (commit d813f45):
-  fiada 0 (A): B34[0.0,34.0]  B19[35.0,54.0]
-  fiada 1 (B): B19[15.0,34.0] B34[35.0,69.0]
+branch de trabalho    claude/cr-block-arm-role-invariance-7tezx4
+HEAD inicial (sessão)  77bda141df0038c973971075b09f3320e274adb2 (confere)
+HEAD final              mesmo commit — NENHUMA alteração de produção
+                        nesta continuação (ver veredito)
 ```
 
-## Diff fiada-a-fiada
+Working tree preservado sem `reset`/`checkout`/`pull`/`rebase`. NODE-FILL,
+BENCH-Z, `wall_pairing.py`, baseline/reference não tocados.
 
-Junta interna de fiada 0: entre `B34[0,34]` e `B19[35,54]` → centro em
-**t=34.5cm**. Junta interna de fiada 1: entre `B19[15,34]` e
-`B34[35,69]` → centro em **t=34.5cm**. Idêntica — `PRISM_CONTINUOUS_JOINT`
-dispara nas 16 fiadas consecutivas, sempre no mesmo ponto.
+## OPENING_BLOCK_INSIDE_DOOR +3
 
-## Primeira divergência
+### Casos
 
-Localizada na cadeia exigida (papel coordenado → solve_l_corner → peça
-→ orientação → posição da junta → fill → junta na fiada oposta), **não**
-no validador final:
+Os 3 achados adicionais (TGD, contra o estado `d813f45`/pré-fix de
+prisma) estão TODOS na fiada 11, em 3 paredes que JÁ apareciam neste
+código antes de qualquer CR desta série:
 
-1. Papel coordenado: nó126 dá `wall75=course_a` (arms[0], inalterado);
-   nó127 dá `wall75=course_b` (arms[1], **trocado** pela coordenação —
-   antes desta CR nó127 dava `course_a` também, e a família B ficava
-   com zero candidato de nó ali — o defeito original). Isto está
-   **correto**: é exatamente o que CR-BLOCK-ARM-ROLE-CONSISTENCY foi
-   pedido para fazer.
-2. `solve_l_corner`: em CADA nó, escolhe `B34` (34cm) — decisão
-   puramente geométrica (espaço disponível no canto), **idêntica** com
-   ou sem coordenação (confirmado comparando a peça gerada em nó127
-   antes/depois da troca de papel: mesma posição `t=52`, mesma
-   `rotation_deg=270` — só o RÓTULO course_a→course_b mudou, nunca a
-   geometria).
-3. Orientação/vão menor: `_asymmetric_bond_origin_and_axis` posiciona a
-   peça pela GEOMETRIA do nó (ponto de canto + direção), nunca por
-   `course_a`/`course_b` — **correta**, não é a causa.
-4. Posição da junta (fill): `solve_wall_free_fill` reserva, em cada
-   ponta fechada por nó, `seg_start_cm = border + BLOCK_JOINT_CM` (ou
-   `seg_end_cm = border - BLOCK_JOINT_CM` na ponta oposta) — a JUNTA
-   entre a peça do nó e o primeiro bloco do preenchimento fica em
-   `border ± BLOCK_JOINT_CM/2`, **fixada pela geometria do nó**, nunca
-   pela composição do preenchimento.
-5. **A DIVERGÊNCIA**: `_layout_internal_joint_positions_cm` (a função
-   que alimenta `course_a_joint_positions_cm`, a lista que
-   `_pier_layout_avoiding_joints` usa para a Fiada B tentar
-   desencontrar da Fiada A) **por design, documentado na própria
-   docstring**, só conta juntas ENTRE BLOCOS CONSECUTIVOS do
-   preenchimento — "sem contar as juntas de CONTORNO (contra
-   abertura/nó/ponta livre, essas não são 'verticais contínuas entre
-   fiadas' no sentido da seção 6)". A junta nó→preenchimento (item 4)
-   **nunca foi rastreada nem verificada** por este mecanismo — nem
-   antes nem depois deste CR. É aqui, e só aqui, que a família B "não
-   sabe" que a família A já usa t=34.5.
-6. Fill/fiada oposta: como cada família tem exatamente 1 bloco de
-   preenchimento (pier de 19cm, sem alternativa de composição), mesmo
-   se a família B "soubesse" da junta de A, não haveria NENHUMA
-   composição alternativa capaz de evitá-la — a posição é
-   matematicamente fixada pelas duas peças de nó (ver "Causa raiz").
+| parede | opening | tipo | course_index | overlap medido | achados antes (`d813f45`) | achados depois (`77bda14`) |
+|---|---|---|---|---|---|---|
+| W045 | W045-O01 | door (sill=0, head=221cm) | 11 | 19,0cm + 4,0cm (2 blocos) | 1 (`B39`, overlap 39,0cm) | 2 (`B19` 19,0cm + `C04` 4,0cm) |
+| W051 | W051-O02 | door (sill=0, head=221cm) | 11 | 4,0 + 19,0 + 34,0cm (3 blocos) | 2 (`B19` 19,0 + `B39` 39,0) | 3 (`C04` 4,0 + `B19` 19,0 + `B34` 34,0) |
+| W112 | W112-O02 | door (sill=0, head=221cm) | 11 | 34,0 + 19,0 + 4,0cm (3 blocos) | 2 (`B19` 19,0 + `B39` 39,0) | 3 (`B34` 34,0 + `B19` 19,0 + `C04` 4,0) |
 
-## Hipóteses H1–H7
+Nas 3 paredes, o intervalo TOTAL coberto pelos blocos "dentro do vão" é
+praticamente o MESMO antes e depois (só a composição — quantos blocos e
+quais códigos — mudou); nenhuma parede nova apareceu.
+
+### Primeira divergência
+
+Rastreada a cadeia completa (boundary joint → avoid_positions → escolha
+do layout → recorte de abertura → repair → peça final →
+`OPENING_BLOCK_INSIDE_DOOR`):
+
+1. `_pier_boundary_joint_positions_cm`/as listas separadas (fix do CR
+   anterior) alteram QUAL composição a busca escolhe em segmentos
+   ANTERIORES da mesma parede (efeito colateral esperado e já medido —
+   ver o relatório anterior).
+2. Essa composição diferente, ainda em FASE 1 (antes do recorte de
+   abertura), muda o conteúdo de `candidates[variant_candidates_start:]`
+   que `_recut_openings_and_repair` recebe como entrada.
+3. **A divergência real não está no recorte em si** (o parâmetro
+   `avoid_joint_positions_cm` do recut permanece INALTERADO — ver o
+   fix anterior, que deliberadamente manteve essas duas listas
+   separadas): é que o recut, ao remover os blocos que cruzam o vão e
+   reconstituir a região, o faz a partir de uma composição de ENTRADA
+   já diferente — e o resultado final (quantos blocos "cabem" na fiada
+   11) muda de composição, mas cobre PRATICAMENTE O MESMO intervalo
+   físico.
+4. **A causa raiz não está em nenhuma decisão de composição em si**:
+   está em `analysis.opening_active_in_row`/`opening_active_in_row`
+   (mesma função usada pelo validador `validate_openings.py`), que
+   trata a fiada 11 (elevação 220–239cm) como "ativa" para a porta
+   inteira (`head_cm=221`) porque a faixa vertical da fiada 11
+   INTERCEPTA o intervalo [0, 221] em 1cm — quando na realidade **apenas
+   1 dos 19cm de altura da fiada 11 (5,3%) está de fato dentro do vão**;
+   os outros 94,7% da fiada já são a verga/travamento acima da porta,
+   onde blocos SÃO fisicamente corretos. O modelo de "fiada ativa"
+   binário (tudo ou nada) do validador — e do próprio motor, que usa a
+   MESMA regra para decidir se essa fiada precisa de vão — não tem
+   graduação por fração de altura.
+
+### H1–H6
 
 | # | hipótese | veredito | evidência |
 |---|---|---|---|
-| H1 | orientação B34/B54 usa convenção antiga do nó | **REFUTADA** | posição/rotação da peça em nó127 idêntica antes/depois da troca de papel (t=52, rot=270°) — só o rótulo course_a/b mudou |
-| H2 | orientação depende de arms[0]/[1], papel depende do coordenado | **REFUTADA** | `_asymmetric_bond_origin_and_axis` nunca lê `course`/arms — só geometria do nó |
-| H3 | fill comum escolhe a mesma fase nas duas famílias | **PROVADA (refinada)** | não é "a mesma fase" em geral — é a junta de CONTORNO contra o nó (item 5 acima), nunca rastreada pelo mecanismo de desencontro, que coincide quando as duas pontas usam a MESMA peça (mesmo comprimento) |
-| H4 | inversão de significado course_a/b × vão menor | **REFUTADA** | vão menor sempre aponta pro canto físico certo (rotation_deg mirror correto entre as duas pontas, confirmado em W076/W010/W021) |
-| H5 | só ocorre com dois L_CORNER | **PROVADA** | as 11 paredes regredidas são TODAS de 2 nós L_CORNER de 2 arms; nenhuma parede com nó T/X regrediu |
-| H6 | também ocorre com T/X | **REFUTADA (nesta regressão)** | T usa geometria própria (`main_wall_idx`/`incoming_wall_idx`, sem ambiguidade de papel — nunca alterado por esta CR); X tem 4 arms, fora da elegibilidade de `_coordinate_arm_role_nodes`. A junta de contorno TAMBÉM não é rastreada em T/X, mas como T/X não tiveram papel recém-coordenado, o padrão simétrico "as duas famílias usam a mesma peça" que dispara a coincidência não surgiu ali nesta regressão |
-| H7 | interação com compensador/B19, não com B34/B54 | **REFUTADA como causa principal** | a peça de nó em todas as 11 paredes é B34; B19/C09 aparecem só como preenchimento ao lado, não como origem da coincidência (embora contribuam a coincidências SECUNDÁRIAS em W061/W062, ver "Riscos") |
+| H1 | novo boundary joint altera composição antes do recorte | **PROVADA (como mecanismo, não como causa raiz)** | confirmado nos 3 casos — mas a composição diferente cobre o MESMO intervalo físico, então não é em si o defeito |
+| H2 | recut remove peça e repair recoloca outra dentro do vão | **PARCIALMENTE PROVADA** | é exatamente o que acontece — mas o "vão" em si só é vão por 1 dos 19cm da fiada (ver H4) |
+| H3 | informação de NODE-FILL vazando apesar da separação | **REFUTADA** | NODE-FILL não foi tocado nem incorporado nesta linha de CRs; a separação de listas do fix anterior é auto-contida em `solve_wall_free_fill`, sem qualquer acoplamento com NODE-FILL |
+| H4 | regressão é consequência de medição vertical antiga | **PROVADA — causa raiz** | fiada 11 (elevação 220–239cm) contra porta com `head_cm=221`: a fiada é marcada "ativa" pela função binária `opening_active_in_row`, mas só 1cm dos 19cm (5,3%) está de fato dentro do vão — as MESMAS 3 paredes, na MESMA fiada 11, já tinham este código no estado A (pré-CR, `origin/main` limpo, `SHA 7c9a681`) com a MESMA lista de 3 paredes, ANTES de qualquer alteração desta série de CRs |
+| H5 | regressão é física real mesmo com convenção vertical correta | **REFUTADA** | fisicamente, colocar bloco na fiada 11 é CORRETO em 94,7% da sua altura (é a região da verga) — o achado é uma leitura binária de um caso de fronteira pré-existente, não uma invasão real de vão |
+| H6 | layout mudou só de fase, peça que cruzava a jamba passou a ficar majoritariamente dentro do vão | **PROVADA (efeito colateral, não causa)** | confirma H1/H2 — é o MECANISMO da amplificação de contagem (1-2 blocos → 2-3 blocos cobrindo a mesma área), não uma causa nova |
 
-## Causa raiz
+### Causa raiz
 
-**PROVADA.** A junta entre a peça de amarração de um nó `L_CORNER`
-(posicionada por `solve_l_corner`, fora de `layout`) e o primeiro/último
-bloco do preenchimento comum adjacente nunca foi rastreada pelo
-mecanismo de desencontro de junta vertical (`course_a_joint_positions_cm`
-/ `_pier_layout_avoiding_joints`, seção 6) — só juntas INTERNAS ao
-preenchimento eram contadas, por decisão de design documentada na
-própria função (`_layout_internal_joint_positions_cm`). Isso era
-inofensivo enquanto normalmente só UMA das duas famílias tinha candidato
-de nó real num dado encontro (o defeito que CR-BLOCK-ARM-ROLE-CONSISTENCY
-corrigiu). Com as duas famílias podendo ter candidato de nó real no
-MESMO encontro — e, nas 11 paredes afetadas, ambas escolhendo a MESMA
-peça (B34, 34cm, decisão puramente geométrica e correta) —, a junta de
-contorno de uma família coincide com a da outra em `border +
-BLOCK_JOINT_CM/2`, sem que a busca de desencontro jamais soubesse disso.
+**PROVADA — é um artefato de medição/benchmark pré-existente, não uma
+regressão física introduzida por esta série de CRs.** Confirmado
+decisivamente: as MESMAS 3 paredes (`W045`, `W051`, `W112`), na MESMA
+fiada 11, já tinham `OPENING_BLOCK_INSIDE_DOOR` no estado A
+(`origin/main` limpo, `SHA 7c9a681`, ANTES de `CR-BLOCK-ARM-ROLE-*`
+inteiro) — 43 achados totais nas mesmas 18 paredes, incluindo estas 3.
+O fix de prisma do CR anterior não criou o defeito: mudou a composição
+de blocos usada nessa fiada de fronteira (efeito colateral de segmentos
+anteriores na mesma parede), o que fez o MESMO intervalo físico
+"dentro do vão" (que já era um falso positivo do validador antes)
+aparecer fatiado em mais blocos — de 1-2 achados para 2-3 achados por
+parede, sem nenhuma parede nova.
 
-## Contrato course-role × orientação física
+### Fix
 
-Confirmado — **já estava correto, não precisou de mudança**:
+**Nenhum.** É um problema de medição do benchmark (H4 provada), não uma
+regressão física do motor — conforme a instrução explícita desta
+continuação ("Se for problema de benchmark: NÃO tocar produção"), a
+produção NÃO foi alterada para isto. O gate mecânico "OPENING_BLOCK_
+INSIDE_DOOR não pode ser pior que o estado anterior à regressão" **não
+passa em contagem bruta** (43→46) mas **passa em paredes afetadas**
+(mesmas 3, 0 novas) — documentado explicitamente, não escondido.
 
-> Dado `wall_idx + node + endpoint + course_role`, a orientação física
-> da peça (`origin_world`, `x_dir`, `rotation_deg`) é determinada
-> inteiramente por `_asymmetric_bond_origin_and_axis(entry, point,
-> dir_away, small_sign)` — uma função de GEOMETRIA (ponto de canto do
-> nó, direção de afastamento, sinal do lado do vão menor), nunca de
-> `course_a`/`course_b` nem de `arms[0]`/`arms[1]`. O papel coordenado
-> decide APENAS o RÓTULO (qual família recebe aquele candidato já
-> posicionado) — nunca a posição nem a orientação da peça.
+## Prisma residual
 
-Isso é invariante a arms/nodes/paredes/endpoints por construção (a
-mesma prova de `_coordinate_arm_role_nodes` do relatório anterior se
-aplica — este CR não mexeu nessa função).
+### 9 paredes
 
-O problema real estava numa camada diferente: o CONTRATO entre "onde a
-peça do nó termina" (`node_candidates_by_wall_end`) e "o que a busca de
-desencontro enxerga" (`course_a_joint_positions_cm`) estava incompleto —
-o primeiro sempre incluía a fronteira do nó; o segundo nunca a
-propagava como uma junta "real" a evitar.
+Nenhuma nova investigação de causa nesta fase — a causa (junta de
+contorno geometricamente forçada quando as duas pontas usam a mesma
+peça, `B34`) já estava provada no relatório anterior. Esta fase usa o
+Reference Corpus para responder: **o humano acha isso inevitável?**
 
-## Fix
+### Solver × Humano
 
-Único arquivo de produção alterado: `nuvem/core/engine/wall_stepper.py`.
-`wall_pairing.py`, NODE-FILL, BENCH-Z e baseline/reference não foram
-tocados.
+Casamento geométrico correto feito via `nuvem/benchmark/comparator/match.py`
+(`match_walls`) — **NÃO por `id`**: confirmado que IDs não são
+estáveis entre `input.json`/resultado e `reference.json` (ex.: "W003"
+do resultado do TGD é uma parede de 69cm; "W003" da referência do TGD é
+uma parede de 1344cm completamente diferente — casadas corretamente
+via geometria, resultando no par real W003→W014). Para as 8 paredes do
+TP1 o casamento por geometria confirmou o mesmo `id` (coincidência,
+não presunção).
 
-1. Nova função `_pier_boundary_joint_positions_cm(seg_start_cm,
-   seg_end_cm, kind_left, kind_right, leading_is_open, trailing_is_open)`
-   — computa a posição da junta de contorno contra um nó/encontro de
-   meio-de-parede (nunca contra abertura ou ponta livre — mesmo filtro
-   `leading_is_open`/`trailing_is_open`/`kind_*` que o resto da função
-   já usa), simétrica a `_layout_internal_joint_positions_cm`.
-2. Duas listas NOVAS e SEPARADAS, `course_a_boundary_joint_positions_cm`
-   / `own_family_boundary_joint_positions_cm`, paralelas às já
-   existentes `course_a_joint_positions_cm`/`own_family_joint_
-   positions_cm` — alimentam a BUSCA (`_pier_layout_avoiding_joints`,
-   avoid-list ampliado) e a checagem residual (`alignment_conflicts`),
-   mas **nunca** o `avoid_joint_positions_cm` de
-   `_recut_openings_and_repair` (o reparo de abertura) — ver "Por que
-   separado" abaixo.
-3. Checagem residual (`alignment_conflicts`, "regra #1... nunca aceito
-   calado"): antes só disparava com `len(layout) > 1` (pier de
-   múltiplos blocos) — agora dispara também com pier de 1 bloco só
-   (`layout` não-vazio), incluindo a junta de contorno na comparação —
-   é exatamente o caso mais comum nas paredes afetadas (W076, W021 etc.
-   têm pier de 1 bloco).
+**Resultado, decisivo e unânime**: nas 9 paredes, a fiada par e a fiada
+ímpar da parede humana **NUNCA têm junta coincidente** — 8 de 9 têm
+correspondente na referência (W137/TGD não tem, fora do escopo do
+gabarito). Dois mecanismos distintos, medidos:
 
-**Por que a lista de contorno é separada da lista de recut** (achado
-DURANTE o desenvolvimento, não hipotético): a primeira versão do fix
-misturava as duas listas — resultado, `OPENING_BLOCK_INSIDE_DOOR` subiu
-de 43 para 46 no TGD (3 paredes: `W045`, `W051`, `W112`, nenhuma nova,
-+1 achado cada), porque `_recut_openings_and_repair` passou a receber um
-avoid-list diferente e escolheu composições diferentes perto de
-aberturas sem relação com o defeito original. Corrigido mantendo as
-listas de contorno fora do parâmetro que o recorte de abertura recebe —
-a regressão de `OPENING_BLOCK_INSIDE_DOOR` **persistiu com a mesma
-magnitude mesmo depois dessa separação** (ver "Riscos" — não foi a causa
-completa, mas a separação é a arquitetura correta e não piora nada;
-mantida).
+**Mecanismo 1 (paredes curtas — `W003`, `W076`, `W021`, `W092`, `W061`,
+`W062`, e provavelmente `W137`)**: o humano NÃO ancora as duas famílias
+em nós opostos como a coordenação determinística faz — em vez disso,
+as DUAS peças de canto (dos dois nós) vão para a MESMA fiada física
+(par OU ímpar), e a fiada OPOSTA fica sem nenhuma peça de nó, com um
+preenchimento solto (às vezes nem tocando nenhuma das duas pontas).
+Como a fiada "sem nó" não tem NENHUMA junta de contorno, não há nada
+para coincidir com a fiada que tem as duas.
+
+Exemplo medido, `W076`↔`W077` (par mínimo, ver "Caso 69cm" abaixo).
+
+**Mecanismo 2 (paredes longas — `W010`, `W037`)**: aqui o humano AINDA
+ancora as duas famílias em nós opostos (mesma direção da coordenação
+atual do solver) — mas usa `B34` também como peça de preenchimento
+COMUM ao longo da parede (não só como peça de canto), numa sequência
+que nunca se repete de forma sincronizada entre as duas fiadas.
+Resultado: nenhuma junta interna cai na mesma posição em toda a
+extensão da parede, mesmo com as duas ancoragens presentes.
+
+`W041` (já resolvida pelo fix do CR anterior, fora dos 9 residuais):
+confirmado que a referência humana TAMBÉM não tem coincidência —
+validação independente de que a direção do fix está correta.
+
+### Classificação A/B/C/D/E
+
+| parede | mecanismo | classificação |
+|---|---|---|
+| W003/TGD (↔W014) | ancoragem assimétrica (1 fiada com nó, outra sem) | **B — HUMAN_RESOLVE_COM_OUTRA_PECA/CONVENÇÃO** |
+| W137/TGD (↔W077) | mesmo padrão de W076 (par mínimo) | **B** |
+| W076/TP1 (↔W077, mesma referência de W137 — par simétrico) | ancoragem assimétrica, ver "Caso 69cm" | **B** |
+| W021/TP1 | ancoragem assimétrica (uma fiada com B34+B19 nas duas pontas, outra sem nenhuma) | **B** |
+| W092/TP1 | idêntico a W021 (mesma geometria, mesma referência) | **B** |
+| W061/TP1 | ancoragem assimétrica + compensador C09 | **B** |
+| W062/TP1 | idêntico a W061 (mirror) | **B** |
+| W010/TP1 | ancoragem simétrica preservada, composição rica evita coincidência | **C — HUMAN_RESOLVE_COM_OUTRO_LAYOUT** |
+| W037/TP1 | idêntico mecanismo de W010 | **C** |
+
+Nenhuma parede classificada A (humano também alinha), D (geometria do
+solver difere da humana) ou E (referência insuficiente) — as 8 com
+referência têm evidência clara e concorde.
+
+## Caso 69cm
+
+### Solver (estado atual, commit `77bda14`)
+
+```
+fiada A: B34[0,34]  B19[35,54]   -> junta interna em t=34.5
+fiada B: B19[15,34] B34[35,69]   -> junta interna em t=34.5  (COINCIDE)
+```
+
+### Humano (W076↔W077, referência)
+
+```
+fiada par:  B34[0,34]  B34[35,69]   -> junta interna em t=34.5 (só nesta fiada)
+fiada ímpar: B39[15,54]             -> NENHUMA junta interna (peça única,
+                                        nem toca t=0 nem toca t=69)
+```
+
+### Diferença
+
+O humano **não alterna qual nó ancora qual família** — as DUAS peças
+de canto (`B34` de cada ponta) vão para a MESMA fiada; a fiada oposta
+fica com um único bloco de preenchimento comum (`B39`), sem amarração
+de nó em NENHUMA das duas pontas, e sem sequer tocar as extremidades da
+parede. Isso elimina a coincidência por construção: uma fiada sem
+nenhuma junta interna nunca pode coincidir com a outra. Não é "outra
+peça" nem "outro layout" no preenchimento — é uma CONVENÇÃO DIFERENTE
+de qual nó amarra qual fiada, incompatível com a premissa central da
+coordenação determinística (`_coordinate_arm_role_nodes`) de que as
+duas famílias devem, sempre que possível, receber uma peça de nó real
+em cada ponta.
+
+## Regra de domínio
+
+### Regra existente
+
+Nenhuma regra em `REGRAS_MODULACAO_BLOCOS.md` documenta ou permite
+"as duas peças de canto do mesmo nó par indo para a mesma fiada,
+deixando a fiada oposta sem amarração de nó" — pesquisado (termos
+"mesma familia", "duas pontas", "flutuante", sinônimos) sem resultado.
+A seção 28.5 (`REGRA OBRIGATÓRIA`) documenta a coordenação
+determinística atual, mas não proíbe nem prescreve qual dos dois
+resultados válidos (mesma fiada vs. fiadas alternadas) a coordenação
+deve preferir quando ambos evitariam o defeito original
+(`COVERAGE_MISSING_ROW`) — a implementação atual resolve isso por um
+critério de desempate geométrico determinístico (`_canonical_node_
+sort_key`), não por uma regra de amarração explícita.
+
+### Nova regra necessária?
+
+**Possivelmente, mas NÃO confirmada com evidência suficiente para virar
+regra obrigatória agora.** A hipótese, sustentada pelos 9 casos (100%
+de concordância, mas mesma topologia — 2 nós L_CORNER de 2 braços,
+mesma peça B34 nas duas pontas): o processo humano de amarração pode
+não trabalhar com a abstração "família A/família B fixada globalmente
+por parede" que a arquitetura atual do solver usa (`course_a` sempre
+resolvida primeiro, `course_b` sempre evitando `course_a`) — pode
+decidir fiada a fiada, evitando coincidência com a fiada JÁ COLOCADA
+(seja ela par ou ímpar), o que naturalmente permite (e talvez prefira)
+concentrar as duas amarrações de nó na mesma fiada quando isso evita
+melhor a junta corrida.
+
+### Confiança
+
+**PADRÃO OBSERVADO AINDA NÃO CONFIRMADO.** Evidência forte mas estreita
+(9 casos, 1 topologia, 2 projetos). Registrado em
+`REGRAS_MODULACAO_BLOCOS.md` seção 28.7 com este rótulo — não promovido
+a `REGRA OBRIGATÓRIA` nem usado para justificar mudança de código nesta
+sessão. **CONFLITA** com a leitura de que a seção 28.5 (coordenação
+determinística atual) representa "a" solução correta — na prática,
+28.5 resolve o defeito ORIGINAL (família inteira ausente) mas o critério
+de desempate específico que ela usa hoje (geométrico, por
+`_canonical_node_sort_key`) não necessariamente reproduz a escolha
+humana nestes 9 casos.
+
+## Implementação
+
+**Nenhuma.** As 4 condições da Fase 4 não estão simultaneamente
+satisfeitas: (1) causa provada — sim; (2) referência humana mostra
+padrão inequívoco — sim, mas (3) a regra existente NÃO sustenta a
+mudança (28.5 é `REGRA OBRIGATÓRIA` vigente, e mudar o critério de
+desempate da coordenação para "permitir/preferir ambas as peças de nó
+na mesma fiada" é, em espírito, alterar a POLÍTICA da coordenação
+determinística — não apenas a peça ou o layout do preenchimento) — e a
+instrução explícita desta continuação proíbe exatamente isso ("NÃO
+desfaça a coordenação A/B só para recuperar prisma"). Tecnicamente a
+mudança ficaria dentro de `wall_stepper.py` (condição 4 satisfeita),
+mas o ESCOPO AUTORIZADO desta continuação — não o arquivo — é o que
+bloqueia: mudar a política de desempate da coordenação é uma decisão
+de produto/engenharia que precisa de autorização explícita e de uma
+verificação MUITO mais ampla (confirmar que "permitir ambas as
+ancoragens na mesma fiada" não reintroduz o defeito original em algum
+outro caso da topologia geral) do que esta sessão pode fazer com
+segurança.
+
+**Veredito da Fase 4: BLOQUEADO POR ESCOPO** para os 9 casos residuais
+— não por faltar informação (a causa e a evidência humana estão
+provadas), mas porque a correção plausível exige revisar uma decisão
+de política já tomada e explicitamente protegida nesta continuação.
 
 ## Testes
 
-`tests/test_block_arm_role_prism_stagger.py` (5 testes novos,
-permanentes, rodam o corpus real via `nuvem.benchmark.solver_bridge` —
-o caso mínimo de W076 depende da reserva "emprestada" do quadrado do
-canto, que só existe com a topologia real de mais de 2 paredes por nó,
-não reproduzível no plano sintético de 3 paredes de
-`test_block_arm_role_invariance.py`):
+Nenhum teste novo nesta fase (nenhuma mudança de código). Os 5 testes
+de `tests/test_block_arm_role_prism_stagger.py` (CR anterior) continuam
+válidos e passando — incluem exatamente o caso W076 (prova da
+coincidência geometricamente forçada) e W041 (prova do caso resolvido).
+Suíte rápida completa: `518 passed` (inalterada).
 
-- `test_w076_tp1_coincidencia_de_contorno_e_geometricamente_forcada_mas_agora_visivel`
-  — prova a causa-raiz (a coincidência em t=34.5 é geometricamente
-  forçada, permanece) E o fix (agora aparece em `alignment_conflicts`,
-  nunca mais silenciosa). **Falha no código anterior ao fix, pela razão
-  certa** (confirmado via `git stash`): `alignment_conflicts` vazio
-  (o antigo `len(layout) > 1` escondia o caso de 1 bloco só).
-- `test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado` — prova
-  que, quando há liberdade real de composição, o fix RESOLVE de
-  verdade (zero junta contínua entre todas as fiadas consecutivas), não
-  só reporta. **Falha no código anterior** (`{274.5}` coincide).
-- `test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada` —
-  nenhuma fiada de W022/W093 fica sem bloco (G6).
-- `test_determinismo_w076_w041_duas_rodadas_identicas` — mesma entrada,
-  mesma saída (peça a peça).
-- `test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao` — nenhum bloco
-  invade o vão da janela de W010 nas fiadas onde ela está ativa (G12).
+## Coverage A/B/C/D
 
-Suíte completa (rápida): `518 passed` (513 anteriores + 5 novos, `-m
-"not slow"`).
+A = `origin/main` limpo | B = `d813f45` (ARM-ROLE-CONSISTENCY) | C =
+`77bda14` (PRISM-STAGGER) | D = este candidato (idêntico a C, nenhuma
+mudança de código).
 
-## Coverage A/B/C
-
-A = `origin/main` limpo (SHA `7c9a681`) | C = `d813f45`
-(CR-BLOCK-ARM-ROLE-CONSISTENCY) | D = este fix.
-
-| métrica | TGD (A→C→D) | TP1 (A→C→D) | Piloto (A→C→D) |
+| métrica | TGD | TP1 | Piloto |
 |---|---|---|---|
-| COVERAGE_MISSING_ROW | 265→258→**258** | 16→0→**0** | 0→0→0 |
-| COVERAGE_ROW_MOSTLY_EMPTY | 171→153→**153** | 27→18→**18** | 8→8→8 |
-| COVERAGE_GAP_IN_ROW | 1934→1961→1958 | 293→319→327 | 16→16→16 |
+| COVERAGE_MISSING_ROW (A→C→D) | 265→258→**258** | 16→0→**0** | 0→0→0 |
+| COVERAGE_ROW_MOSTLY_EMPTY (A→C→D) | 171→153→**153** | 27→18→**18** | 8→8→8 |
+| TOTAL_COVERAGE_CRITICAL (A→C→D) | 436→411→**411** | 43→18→**18** | 8→8→8 |
+| COVERAGE_GAP_IN_ROW (A→C→D) | 1934→1958→**1958** | 293→327→**327** | 16→16→16 |
 
-**Gate: nenhuma mudança em MISSING_ROW/MOSTLY_EMPTY entre C e D — o
-ganho de cobertura do commit `d813f45` está 100% preservado.**
+**G9 confirmado: nenhuma mudança entre C e D — o ganho de cobertura
+está 100% preservado.**
 
-## Prisma A/B/C
+## Prisma A/B/C/D
 
-| métrica | TGD (A→C→D) | TP1 (A→C→D) |
+| métrica | TGD | TP1 |
 |---|---|---|
-| PRISM_CONTINUOUS_JOINT | 702→691→**476** | 837→896→**576** |
-| PRISM_JOINT_STACK | 46→46→**29** | 49→52→**33** |
-| PRISM_STAGGER_BELOW_TARGET (nível 2) | 514→(n/d)→690 | 813→(n/d)→1140 |
+| PRISM_CONTINUOUS_JOINT (A→C→D) | 702→476→**476** | 837→576→**576** |
+| PRISM_JOINT_STACK (A→C→D) | 46→29→**29** | 49→33→**33** |
+| NEW_PRISM_WALLS (vs A) | 3→2→**2** (W003,W137) | 8→7→**7** | 
+| alignment_conflicts (diagnóstico interno) | não medido isolado por projeto nesta fase | ver total abaixo |
 
-`PRISM_CONTINUOUS_JOINT` cai bem ABAIXO até do estado A original (antes
-de qualquer CR desta série) nos dois projetos — o fix não só neutraliza
-a regressão introduzida por ARM-ROLE-CONSISTENCY, como melhora o
-resultado geral (a busca de desencontro, agora com mais informação,
-encontra composições melhores em paredes que já tinham os dois nós
-antes deste CR também). `PRISM_STAGGER_BELOW_TARGET` (nível 2, não
-bloqueia) sobe — esperado: parte das coincidências exatas (0cm) virou
-desencontro pequeno mas não-zero (ainda abaixo do alvo de 10cm) em vez
-de continuar exatamente alinhada.
+Diagnóstico independente (`nuvem/benchmark/diagnostics_block_prisma/`,
+ferramenta de outra CR, usada aqui só como CROSS-CHECK, classificação
+própria e mais estrita — não substitui `PRISM_CONTINUOUS_JOINT` como
+gate): `same_band=0`, `cross_band=24`, `FORBIDDEN_JOINT_ALIGNMENT=24`
+no total dos 3 projetos no estado atual — ordem de grandeza compatível
+com as 9 paredes residuais (algumas com mais de uma posição de
+coincidência, ex. `W061`/`W062`), confirmando de forma independente que
+o que resta é uma quantidade pequena e localizada, não um problema
+difuso.
 
-## NEW_PRISM_WALLS
+## Openings
 
-**NÃO É ZERO — gate G7 falha.**
-
-| projeto | antes do fix (11 no total) | depois do fix |
-|---|---|---|
-| TGD | W003, W117, W137 (3) | W003, W137 (2) — **W117 resolvido** |
-| TP1 | W010, W021, W037, W041, W061, W062, W076, W092 (8) | W010, W021, W037, W061, W062, W076, W092 (7) — **W041 resolvido** |
-| Piloto | 0 | 0 |
-
-2 de 11 paredes totalmente resolvidas (W117, W041— tinham liberdade
-real de composição). As 9 restantes têm o MESMO padrão: as duas pontas
-usam `B34` (34cm) e o comprimento da parede não deixa espaço para uma
-composição alternativa que desloque a junta de contorno — a coincidência
-é **geometricamente forçada** dada a peça escolhida em cada nó (ver
-"Riscos").
-
-## TGD
-
-`W003`/`W137` (69cm, mesma geometria de W076): pier de 1 bloco só de
-cada lado, coincidência forçada, agora reportada em
-`alignment_conflicts` mas não eliminável sem trocar a peça de um dos
-nós. `W117`: resolvido (tinha um pier maior, com liberdade real).
-
-## TP1
-
-`W010`/`W021`/`W037`/`W061`/`W062`/`W076`/`W092`: mesmo padrão (`B34`
-nas duas pontas, coincidência em t=34.5cm forçada pela geometria).
-`W061`/`W062` têm uma coincidência SECUNDÁRIA (compensadores `C09`
-empilhados simetricamente perto de cada nó, criando um segundo par de
-juntas coincidentes em cascata) — mecanismo relacionado mas distinto,
-não corrigido por este fix (fora do escopo provado). `W041`: resolvido.
-
-## Piloto
-
-Nenhuma mudança em nenhuma métrica (projeto pequeno demais para conter
-a topologia do defeito).
-
-## Aberturas
-
-`OPENING_BLOCK_CROSSES_JAMB`: inalterado nos dois projetos (147 TGD,
-168 TP1). `OPENING_BLOCK_INSIDE_DOOR`: TGD sobe de 43 (estado A/pré-CR,
-que é o mesmo valor de C) para 46 — **regressão real, não eliminada**
-pela separação de listas (ver "Fix"), localizada em 3 paredes já
-afetadas (`W045` 1→2, `W051` 2→3, `W112` 2→3), nenhuma parede NOVA.
-Causa exata não totalmente diagnosticada nesta sessão (a separação
-arquitetural é necessária mas não suficiente — a mudança na composição
-RAW de FASE 1, antes do recorte de abertura, ainda se propaga para o
-resultado final por um caminho não identificado). TP1: 0→0 (sem
-aberturas nas paredes afetadas).
+`OPENING_BLOCK_CROSSES_JAMB`: inalterado (147 TGD, 168 TP1).
+`OPENING_BLOCK_INSIDE_DOOR`: 43(A)=43(C)=**46(D, inalterado nesta
+fase)** — regressão JÁ EXISTENTE desde o commit anterior, agora
+explicada (ver acima), não corrigida por decisão explícita (H4/benchmark).
 
 ## Compensadores
 
-Pequenas variações mistas, esperadas como efeito colateral de
-composições diferentes: TGD `COMPENSATOR_CONSECUTIVE` -8,
+Não investigados nesta fase (nenhuma mudança de código desde o estado
+já reportado no relatório anterior — TGD `COMPENSATOR_CONSECUTIVE` -8,
 `COMPENSATOR_AVOIDABLE` +2; TP1 `COMPENSATOR_EXCESS_IN_RUN` +44,
-`COMPENSATOR_VERTICAL_STRIP` -4. Nenhum são código crítico
-(`severity != critical` nestes); não investigados individualmente nesta
-sessão — risco secundário, não bloqueante.
+`COMPENSATOR_VERTICAL_STRIP` -4, nenhum crítico).
 
 ## Collisions
 
-`POSITION_OVERLAP`: idêntico nos três estados (TGD 29/29/29, TP1
-18/18/18, piloto 0/0/0) — nenhuma colisão nova.
+`POSITION_OVERLAP`: idêntico nos três estados (TGD 29, TP1 18, piloto
+0) — sem mudança nesta fase.
 
 ## Determinismo
 
-Confirmado por teste permanente (`test_determinismo_w076_w041_duas_rodadas_identicas`,
-rodando o projeto real 2x e comparando peça a peça). `_pier_boundary_
-joint_positions_cm` é uma função pura de `seg_start_cm`/`seg_end_cm`/
-`kind_*`/`*_is_open` — nenhuma dependência de ordem de lista.
+Preservado por construção (nenhuma mudança de código nesta fase); os
+testes de determinismo do CR anterior continuam passando.
 
 ## Performance
 
-Não medida separadamente nesta sessão — o fix adiciona duas listas e
-uma chamada de função pura por trecho fechado por nó (custo desprezível
-frente ao resto do solver); a suíte rápida completa roda em ~17s (518
-testes), mesma ordem de grandeza de antes.
+Não medida separadamente (nenhuma mudança de código). Suíte rápida
+completa roda em ~17s (518 testes), mesma ordem de grandeza reportada
+antes.
 
 ## Production diff
 
-Único arquivo de produção alterado: `nuvem/core/engine/wall_stepper.py`
-(confirmado via `git diff --stat`: 101 linhas, 90 inserções/11
-remoções). `wall_pairing.py`, NODE-FILL, BENCH-Z, baseline/reference
-intactos.
+**Nenhum.** `git diff --stat -- nuvem/` vazio para código de produção
+nesta continuação — só documentação foi alterada
+(`docs/BLOCK_ARM_ROLE_INVARIANCE.md`, `docs/PROJECT_STATUS.md`,
+`nuvem/REGRAS_MODULACAO_BLOCOS.md`).
 
 ## Baselines
 
-`nuvem/benchmark/projects/*/baseline.json` não regravados (regra do
-repositório: só em commit dedicado, quando uma melhoria é aceita
-explicitamente — não é o caso aqui, dado o veredito). A suíte de
-regressão (`tests/regression/test_benchmark_baselines.py -m slow`)
-continua com 2 falhas: TP1 `JUNCTION_MISSING_BINDING` +1 (já
-documentado no relatório anterior como mirror de paridade benigno, sem
-mudança nesta sessão) e **TGD `OPENING_BLOCK_INSIDE_DOOR` +1** (novo
-neste fix, contra o baseline.json armazenado — que já estava com 45,
-3 a mais que o estado A real de 43; comparado contra o estado A real, a
-regressão é +3, ver "Aberturas").
+Não regravados. `tests/regression/test_benchmark_baselines.py -m slow`
+continua com as mesmas 2 falhas já documentadas no relatório anterior
+(TP1 `JUNCTION_MISSING_BINDING` +1, mirror de paridade benigno; TGD
+`OPENING_BLOCK_INSIDE_DOOR` +1 contra o baseline.json armazenado — H4
+provada nesta sessão, artefato pré-existente de medição, não regressão
+física nova).
 
-## Gates G1–G14
+## Gates G1–G16
 
 | gate | descrição | status |
 |---|---|---|
-| G1 | regressão de prisma reproduzida | ✅ (W076/W010/W021 e as 11 paredes inventariadas) |
-| G2 | primeira divergência localizada | ✅ (junta de contorno não rastreada por `_layout_internal_joint_positions_cm`) |
-| G3 | causa provada | ✅ (H3 confirmada e refinada; H1/H2/H4/H6/H7 refutadas; H5 confirmada) |
-| G4 | orientação física tem contrato explícito | ✅ (já era correto — `_asymmetric_bond_origin_and_axis`, geometria pura) |
-| G5 | invariância arms/endpoints/input | ✅ (herdada de `_coordinate_arm_role_nodes`, intocada; `_pier_boundary_joint_positions_cm` é pura, sem dependência de ordem) |
-| G6 | coverage preservada | ✅ (MISSING_ROW/MOSTLY_EMPTY idênticos C→D nos 3 projetos) |
-| G7 | NEW_PRISM_WALLS = 0 | ❌ (9 de 11 permanecem — coincidência geometricamente forçada, ver "Riscos") |
-| G8 | TP1 sem regressão | ❌ (`OPENING_BLOCK_INSIDE_DOOR` 0→0 OK, mas 7 paredes de prisma seguem afetadas; `JUNCTION_MISSING_BINDING`+1 pré-existente) |
-| G9 | TGD sem regressão | ❌ (`OPENING_BLOCK_INSIDE_DOOR` +3, 3 paredes já afetadas, nenhuma nova; 2 paredes de prisma seguem afetadas) |
-| G10 | piloto sem regressão | ✅ (idêntico em tudo) |
-| G11 | determinismo preservado | ✅ (teste permanente) |
-| G12 | baseline/reference intactos | ✅ (não regravados; `W010` com abertura testado explicitamente, sem invasão de vão) |
-| G13 | production diff restrito | ✅ (só `wall_stepper.py`) |
-| G14 | suíte final passa | ✅ (518 passed, `-m "not slow"`; suíte lenta com as 2 falhas já documentadas, nenhuma nova além de `OPENING_BLOCK_INSIDE_DOOR`) |
+| G1 | OPENING +3 reproduzido exatamente | ✅ (3 casos, tabela completa) |
+| G2 | primeira divergência da regressão OPENING localizada | ✅ (composição de FASE 1 mudando antes do recut) |
+| G3 | causa de OPENING provada | ✅ (H4 — artefato de medição pré-existente, mesmas 3 paredes desde o estado A) |
+| G4 | nenhuma regressão física nova dentro de porta | ✅ (mesmo intervalo físico coberto, mesmas 3 paredes, 0 novas) |
+| G5 | as 9 paredes de prisma comparadas contra o humano | ✅ (8/9 com referência, casamento geométrico correto) |
+| G6 | todas as 9 classificadas A/B/C/D/E | ✅ (7×B, 2×C, 0×A/D/E) |
+| G7 | caso de 69cm explicado | ✅ (W076↔W077, mecanismo exato identificado) |
+| G8 | nenhuma regra inventada | ✅ (padrão registrado como "AINDA NÃO CONFIRMADO", não promovido) |
+| G9 | coverage do 77bda141 preservada | ✅ (idêntica, C=D) |
+| G10 | prisma não piora | ✅ (idêntico, C=D — nenhuma mudança de código) |
+| G11 | nenhuma nova parede de prisma criada | ✅ (mesmas 9, nenhuma nova) |
+| G12 | determinismo preservado | ✅ (nenhuma mudança de código) |
+| G13 | baseline/reference intactos | ✅ |
+| G14 | production diff restrito ao escopo autorizado | ✅ (diff de produção vazio) |
+| G15 | testes focados passam | ✅ (os 5 do CR anterior, inalterados) |
+| G16 | suíte final passa, caso exista candidato de fix | N/A — nenhum candidato de fix de código nesta continuação |
 
 ## Riscos
 
-**Risco principal**: 9 de 11 paredes com `PRISM_CONTINUOUS_JOINT` novo
-continuam com o achado — a coincidência é **matematicamente forçada**
-pela mesma peça (B34, 34cm) sendo escolhida nas duas pontas, combinada
-com o comprimento da parede não deixar espaço para uma composição
-alternativa. `_pier_layout_avoiding_joints` não tem NENHUMA composição
-para buscar quando o pier cabe exatamente 1 bloco (ou, no caso de
-W061/W062, quando a cadeia de compensadores é simétrica por
-construção). A ÚNICA forma de eliminar isso completamente seria mudar
-QUAL peça é escolhida num dos dois nós (ex.: B54 em vez de B34) — uma
-mudança na lógica de SELEÇÃO de peça em `solve_l_corner`, mais
-invasiva, não verificada nesta sessão, e que arrisca efeitos em cascata
-não medidos. Não implementada — reportada como identificação clara do
-que é impossível dentro do fix atual, não escondida atrás de uma
-heurística arriscada.
+**OPENING_BLOCK_INSIDE_DOOR** continuará aparecendo como "REGRESSAO
+CRITICA" no teste mecânico de regressão contra `baseline.json` enquanto
+o baseline não for atualizado (decisão que exige merge/aprovação
+humana, fora desta sessão) — o risco REAL (invasão física de porta) foi
+refutado (H4/H5), mas o GATE MECÂNICO continua vermelho até alguém
+decidir regravar o baseline ou ajustar a granularidade de
+`opening_active_in_row` (mudança de escopo maior, não avaliada aqui).
 
-**Risco secundário, real**: `OPENING_BLOCK_INSIDE_DOOR` +3 no TGD (3
-paredes já afetadas, nenhuma nova) — causa não totalmente diagnosticada;
-a separação de listas (contorno vs. recorte de abertura) foi necessária
-mas não suficiente para eliminar esta regressão. Precisa de
-investigação própria antes de qualquer integração.
+**As 9 paredes de prisma residual** continuarão sinalizando
+`PRISM_CONTINUOUS_JOINT` até uma futura CR, com autorização explícita,
+revisar a política de desempate da coordenação (`_coordinate_arm_role_
+nodes`) à luz da evidência humana levantada aqui — risco de regressão
+SE essa mudança for feita sem verificação ampla (o critério atual
+resolve corretamente o defeito original; mudar o desempate podia
+reabri-lo em algum caso não testado).
 
-**Risco terciário, não bloqueante**: variações pequenas em códigos de
-compensador (nível não-crítico), não investigadas individualmente.
+## Próximo passo recomendado
+
+1. Decisão humana explícita: regravar `baseline.json` do TGD (ou
+   refinar `opening_active_in_row` para graduar por fração de altura em
+   vez de binário) para eliminar o falso positivo mecânico de
+   `OPENING_BLOCK_INSIDE_DOOR` — mudança de benchmark, não de produção.
+2. Nova CR, com autorização explícita para revisar o critério de
+   desempate de `_coordinate_arm_role_nodes` (não a coordenação em si,
+   que deve continuar), usando a evidência humana desta sessão (seção
+   28.7 de `REGRAS_MODULACAO_BLOCOS.md`) como ponto de partida — testar
+   amplamente antes de mudar, para não reabrir o defeito original de
+   `COVERAGE_MISSING_ROW`.
 
 ## Veredito
 
-**NECESSITA AJUSTE**
+**BLOQUEADO POR ESCOPO**
 
-Causa-raiz da regressão de prisma provada com rigor (cadeia completa,
-não só o validador final) — a junta de CONTORNO contra um nó nunca foi
-rastreada pelo mecanismo de desencontro, e isso passou a importar
-quando a coordenação de papel (CR anterior) deu às duas famílias um
-candidato de nó real no mesmo encontro. O fix implementado corrige
-totalmente os casos com liberdade real de composição (2 de 11 paredes,
-prova positiva de que a abordagem é correta) e reduz substancialmente o
-total de achados de prisma nos dois projetos reais (TGD -215, TP1 -320,
-abaixo até do estado anterior a QUALQUER CR desta série) — sem
-retroceder um milímetro do ganho de cobertura do commit `d813f45`
-(G6 ok).
+Ambas as investigações desta continuação chegaram a causas PROVADAS,
+com evidência concreta (medição direta e comparação sistemática com o
+Reference Corpus humano, 8 de 9 paredes com correspondência
+geométrica correta). Nenhuma das duas admite um "fix mínimo" seguro
+dentro do escopo autorizado:
 
-Mas: G7 (NEW_PRISM_WALLS=0) falha para 9 paredes cuja coincidência é
-geometricamente forçada pela escolha atual de peça de canto — uma
-limitação genuína, identificada e explicada, não uma heurística
-arriscada aplicada às pressas. E uma regressão real, pequena mas não
-diagnosticada por completo, apareceu em `OPENING_BLOCK_INSIDE_DOOR`
-(+3, TGD). Por isso a entrega não está pronta para integração — precisa
-de uma iteração adicional focada em (a) decidir, com autorização
-explícita do usuário, se vale a pena investigar uma mudança na seleção
-de peça de canto para as 9 paredes restantes, e (b) diagnosticar e
-corrigir a regressão de `OPENING_BLOCK_INSIDE_DOOR`.
+- `OPENING_BLOCK_INSIDE_DOOR`: é um artefato de medição do benchmark,
+  não uma regressão física — corrigi-lo corretamente significa mudar o
+  benchmark (`baseline.json` ou `opening_active_in_row`), não a
+  produção. Instrução explícita: não tocar produção neste caso.
+- As 9 paredes de prisma residual: a evidência humana é clara e
+  unânime, mas a correção implícita (permitir/preferir que as duas
+  peças de canto de um nó vão para a mesma fiada, em vez de sempre
+  alternar) significa revisar a POLÍTICA de desempate da coordenação
+  determinística — algo que esta continuação foi explicitamente
+  instruída a NÃO fazer ("não desfazer a coordenação A/B").
+
+O estado técnico em `77bda141` — coordenação A/B correta, cobertura
+preservada, prisma reduzido a 9 casos residuais bem compreendidos, e
+agora também `OPENING_BLOCK_INSIDE_DOOR` totalmente explicado como
+artefato pré-existente — permanece o melhor estado íntegro disponível.
+Nenhum código de produção foi alterado nesta continuação; nada foi
+commitado além de documentação.
 
 **Pare antes de qualquer merge.**
