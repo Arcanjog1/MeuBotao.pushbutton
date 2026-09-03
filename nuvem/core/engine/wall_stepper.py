@@ -86,7 +86,7 @@ __all__ = [
     "describe_opening_jamb_exception", "_pier_codes_by_len_desc",
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
-    "_pier_remaining_snapped_cm", "_pier_ordered_layout",
+    "_pier_remaining_snapped_cm", "_node_boundary_module_snap_cm", "_pier_ordered_layout",
     "_layout_internal_joint_positions_cm", "_count_joint_coincidences_cm",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
@@ -97,6 +97,7 @@ __all__ = [
     "_pier_layout_avoiding_joints", "_place_pier_layout",
     "_candidate_extent_on_wall_axis", "_node_candidates_by_index",
     "_node_involved_wall_ends", "_index_node_candidates_by_wall_end",
+    "_index_node_candidates_borrowed_by_wall_end",
     "_candidate_t_range_on_wall", "_node_default_reservation_cm",
     "_wall_end_default_start_cm", "_node_offset_along_wall_cm",
     "_midspan_node_wall_ids", "_index_node_candidates_midspan",
@@ -2713,6 +2714,60 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     return snapped
 
 
+def _node_boundary_module_snap_cm(seg_start_cm, seg_end_cm, leading_joint_cm,
+                                  trailing_joint_cm, snap_start, snap_end):
+    """CR-BLOCK-ARM-ROLE-INVARIANCE: quando o trecho (seg_start_cm,
+    seg_end_cm) NAO fecha em blocos so' por uma fracao de cm (ver
+    pier_closes_with_blocks_cm), devolve (seg_start_cm, seg_end_cm)
+    encolhidos do EXATO deficit que falta para o proximo multiplo valido
+    de PIER_MODULE_CM ABAIXO - sempre reservando MAIS, nunca menos (sem
+    risco novo de colisao) - tirado so' dos lados marcados por
+    `snap_start`/`snap_end` (nunca do lado de uma abertura: a peca de jamb
+    ja' e' exata e nao deve ser tocada).
+
+    Existe porque a fronteira de um trecho contra um no' L_CORNER/
+    X_INTERSECTION as vezes vem da peca de amarracao da parede VIZINHA
+    projetada neste eixo, nao da peca PROPRIA desta parede (ver
+    _index_node_candidates_by_wall_end: "a borda considera TODAS as pecas
+    do no' naquela fiada, nao so' a que pertence aquela parede"). A peca
+    PROPRIA (colocada por _asymmetric_bond_origin_and_axis a partir do
+    ponto/eixo desta parede) fecha o modulo de 5cm por construcao; a peca
+    EMPRESTADA (projecao de um retangulo de outra parede, quase sempre
+    fora de eixo) normalmente NAO fecha. Qual das duas familias (A/B)
+    herda a peca propria e qual herda a emprestada num no' depende so' da
+    ordem/papel canonico dos arms daquele no' (wall_pairing.py) - nunca
+    deveria decidir se a parede toda perde uma familia inteira de fiadas
+    (medido ao vivo: W042/TGD, 8/17 fiadas -> 17/17 so' com este
+    arredondamento, mesma geometria, so' o papel do no' mudando).
+
+    Devolve (None, None) quando nenhum dos dois lados pode absorver o
+    deficit (nenhum `snap_start`/`snap_end` marcado, ou o deficit e' maior
+    que o proprio trecho) - o chamador mantem o comportamento historico
+    (NON_MODULAR_WALL) nesse caso."""
+    if not (snap_start or snap_end):
+        return None, None
+    pier_cm = seg_end_cm - seg_start_cm
+    remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
+    if remaining <= PIER_LAYOUT_TOLERANCE_CM:
+        return None, None
+    floor_units = math.floor(remaining / PIER_MODULE_CM + 1e-6)
+    deficit_cm = remaining - PIER_MODULE_CM * floor_units
+    if deficit_cm <= PIER_LAYOUT_TOLERANCE_CM or deficit_cm >= pier_cm:
+        return None, None
+    if snap_start and snap_end:
+        # Divide entre os dois lados (metade para cada, arredondada ao
+        # lado de saida) - nenhum dos dois e' mais "certo" que o outro
+        # para absorver o deficit quando ambos vieram de no'.
+        start_share = deficit_cm / 2.0
+        seg_start_cm = seg_start_cm + start_share
+        seg_end_cm = seg_end_cm - (deficit_cm - start_share)
+    elif snap_start:
+        seg_start_cm = seg_start_cm + deficit_cm
+    else:
+        seg_end_cm = seg_end_cm - deficit_cm
+    return seg_start_cm, seg_end_cm
+
+
 def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
                          first_code=None, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                          leading_open_override=None, trailing_open_override=None,
@@ -3991,19 +4046,28 @@ def _node_involved_wall_ends(node, node_candidates, walls_to_create, end_to_node
     return ends
 
 
-def _index_node_candidates_by_wall_end(nodes, intersection_candidates, walls_to_create,
-                                       end_to_node):
-    """{(wall_idx, end_index, course): borda_cm} - ate' onde, na direcao do
-    interior da parede, o preenchimento daquela fiada NAO pode entrar
-    porque uma peca de amarracao do no' ja' esta' la'.
+def _index_node_candidates_by_wall_end_with_donor(nodes, intersection_candidates, walls_to_create,
+                                                   end_to_node):
+    """Nucleo comum de `_index_node_candidates_by_wall_end` (index) e
+    `_index_node_candidates_borrowed_by_wall_end` (donor) - devolve os
+    DOIS dicts calculados NA MESMA passada, para que a atribuicao "esta
+    borda e' propria ou emprestada" nunca divirja de QUAL candidato
+    realmente decidiu o max/min de `border_cm` (ver `index` abaixo).
 
-    A borda considera TODAS as pecas do no' naquela fiada, nao so' a que
-    "pertence" aquela parede: num canto em L, a fiada A tem uma unica peca
-    (o B34 de uma das duas paredes), e o corpo dela ocupa o quadrado do
-    canto - ou seja, tambem o inicio da parede VIZINHA. Contabilizar so' a
-    peca propria era o que fazia o preenchimento da vizinha nascer dentro
-    do canto e colidir (reproduzido em L e em X nos testes)."""
+    Existe porque, quando a mesma ponta de parede e' "envolvida"
+    (`_node_involved_wall_ends`) por MAIS DE UM no' fisico proximo (ex.:
+    um L_CORNER e um T_INTERSECTION a poucos cm um do outro - o caso real
+    coberto por
+    test_reserva_de_ponta_ignora_encontro_de_meio_de_parede_proximo), cada
+    no' contribui seu proprio candidato "propria/emprestada" para a MESMA
+    chave (wall_idx, end_index, course); calcular `donor` numa passada
+    SEPARADA, so' pelo ultimo no' iterado, atribuia a chave a um doador
+    ERRADO (dependente da ordem de `nodes`, o que este CR proibe) sempre
+    que o no' que realmente venceu o max/min (aqui, `index`) nao foi o
+    ultimo. Uma passada so', com `donor` atualizado JUNTO do max/min,
+    garante que os dois sempre descrevem o MESMO candidato vencedor."""
     index = {}
+    donor = {}
     by_node = _node_candidates_by_index(intersection_candidates)
     for node_index, node in enumerate(nodes):
         node_candidates = by_node.get(node_index)
@@ -4019,13 +4083,73 @@ def _index_node_candidates_by_wall_end(nodes, intersection_candidates, walls_to_
                 border_cm = t_end_cm if end_index == 0 else t_start_cm
                 key = (wall_idx, end_index, cand["course"])
                 current = index.get(key)
-                if current is None:
-                    index[key] = border_cm
-                elif end_index == 0:
-                    index[key] = max(current, border_cm)
-                else:
-                    index[key] = min(current, border_cm)
+                is_winner = (
+                    current is None
+                    or (end_index == 0 and border_cm > current)
+                    or (end_index == 1 and border_cm < current)
+                )
+                if not is_winner:
+                    continue
+                index[key] = border_cm
+                cand_wall_idx = cand.get("wall_idx")
+                donor[key] = None if cand_wall_idx == wall_idx else cand_wall_idx
+    return index, donor
+
+
+def _index_node_candidates_by_wall_end(nodes, intersection_candidates, walls_to_create,
+                                       end_to_node):
+    """{(wall_idx, end_index, course): borda_cm} - ate' onde, na direcao do
+    interior da parede, o preenchimento daquela fiada NAO pode entrar
+    porque uma peca de amarracao do no' ja' esta' la'.
+
+    A borda considera TODAS as pecas do no' naquela fiada, nao so' a que
+    "pertence" aquela parede: num canto em L, a fiada A tem uma unica peca
+    (o B34 de uma das duas paredes), e o corpo dela ocupa o quadrado do
+    canto - ou seja, tambem o inicio da parede VIZINHA. Contabilizar so' a
+    peca propria era o que fazia o preenchimento da vizinha nascer dentro
+    do canto e colidir (reproduzido em L e em X nos testes)."""
+    index, _donor = _index_node_candidates_by_wall_end_with_donor(
+        nodes, intersection_candidates, walls_to_create, end_to_node
+    )
     return index
+
+
+def _index_node_candidates_borrowed_by_wall_end(nodes, intersection_candidates, walls_to_create,
+                                                end_to_node):
+    """{(wall_idx, end_index, course): donor_wall_idx} - so' as chaves de
+    `_index_node_candidates_by_wall_end` cuja borda VENCEDORA (o mesmo
+    max/min que aquela funcao calcula - ver
+    `_index_node_candidates_by_wall_end_with_donor`) NAO tem peca PROPRIA
+    de `wall_idx`: pertence a' OUTRA parede, `donor_wall_idx`, projetada
+    neste eixo (ver a docstring de `_index_node_candidates_by_wall_end`).
+
+    CR-BLOCK-ARM-ROLE-INVARIANCE: existe so' para restringir o
+    arredondamento de `_node_boundary_module_snap_cm` (ver
+    `solve_wall_free_fill`) exatamente ao mecanismo que ele corrige - a
+    projecao "emprestada" de uma peca de OUTRA parede, que nao tem por que
+    cair num multiplo de PIER_MODULE_CM. Uma borda com peca PROPRIA (a
+    fiada em que esta parede E' a dona do no') fecha o modulo por
+    construcao (`_asymmetric_bond_origin_and_axis`); se mesmo assim nao
+    fechar, e' porque o comprimento da PROPRIA parede genuinamente nao
+    fecha ali - caso legitimo de NON_MODULAR_WALL (secao 15 do CR), que
+    este arredondamento NAO deve mascarar (bug real medido escrevendo o
+    teste desta correcao: sem esta distincao, o arredondamento tambem
+    "consertava" paredes deliberadamente curtas demais nos testes de
+    `find_wall_group_shift_fixes`, escondendo o proprio caso que aquele
+    mecanismo de reparo existe para tratar).
+
+    `donor_wall_idx` e' devolvido (em vez de so' `True`) para o chamador
+    tambem poder exigir que a parede DOADORA nao tenha abertura propria -
+    medido ao vivo (TGD/TP1) que preencher um trecho vizinho a um no'
+    compartilhado com uma parede COM abertura podia empurrar o
+    `plan_hook`/deteccao de colisao daquela parede vizinha a escolher outra
+    composicao, aumentando OPENING_BLOCK_CROSSES_JAMB/INSIDE_DOOR nela -
+    efeito colateral fora do escopo deste CR (secao 17/25), evitado
+    exigindo as DUAS paredes do no' sem abertura nenhuma."""
+    _index, donor = _index_node_candidates_by_wall_end_with_donor(
+        nodes, intersection_candidates, walls_to_create, end_to_node
+    )
+    return dict((key, value) for key, value in donor.items() if value is not None)
 
 
 def _candidate_t_range_on_wall(candidate, wall_p0, wall_dir):
@@ -4590,7 +4714,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
-                         variants_per_course=1, opening_strategy=None):
+                         variants_per_course=1, opening_strategy=None,
+                         node_candidates_borrowed_by_wall_end=None):
     """Preenchimento comum (secao 13: 'no -> abertura, abertura ->
     abertura, abertura -> no') de UMA parede, nas duas FAMILIAS de fiada
     (par/impar - "A"/"B"). Para cada abertura, materializa tambem o bloco
@@ -4666,6 +4791,30 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
 
     openings_sorted = sorted(openings_per_wall[wall_idx], key=lambda o: o[0]) \
         if openings_per_wall[wall_idx] else []
+
+    # CR-BLOCK-ARM-ROLE-INVARIANCE: {"A": bool, "B": bool} - True quando
+    # ESTA parede tem, em QUALQUER das suas duas pontas, uma peca de no'
+    # PROPRIA (nao emprestada) naquela familia - ver
+    # _index_node_candidates_borrowed_by_wall_end. Usado abaixo para
+    # restringir _node_boundary_module_snap_cm ao caso que o CR pede
+    # (secao 15): so' intervem quando, SEM ele, a familia ficaria
+    # COMPLETAMENTE ausente desta parede (nenhuma peca de no' propria em
+    # nenhuma ponta) - nunca em cima de uma familia que ja' tem uma peca de
+    # no' de verdade em algum lugar (mesmo que UM OUTRO trecho dela falhe
+    # em fechar - NON_MODULAR_WALL legitimo, nao mascarado por este
+    # arredondamento). Medido ao vivo: sem esta restricao, o arredondamento
+    # tambem "adiantava" trechos de paredes que ja' tinham cobertura em
+    # outro lugar, trocando COVERAGE_MISSING_ROW por
+    # COVERAGE_ROW_MOSTLY_EMPTY em vez de fechar a familia por completo -
+    # regressao critica medida no benchmark (TGD).
+    _borrowed_map = node_candidates_borrowed_by_wall_end or {}
+    course_has_own_tie = {}
+    for _course_key in ("A", "B"):
+        course_has_own_tie[_course_key] = any(
+            (wall_idx, _end_idx, _course_key) in node_candidates_by_wall_end
+            and (wall_idx, _end_idx, _course_key) not in _borrowed_map
+            for _end_idx in (0, 1)
+        )
 
     strategy = opening_strategy or DEFAULT_OPENING_STRATEGY
     # `continuous_first` so' muda alguma coisa quando ha' abertura: sem vao
@@ -4891,6 +5040,140 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         trailing_is_open = True
 
                     raw_pier_cm = seg_end_cm - seg_start_cm
+                    # CR-BLOCK-ARM-ROLE-INVARIANCE: um trecho fechado nos
+                    # dois lados so' por NO' (nunca abertura - a peca de
+                    # jamb continua exata) pode falhar em fechar em blocos
+                    # so' porque a fronteira de um dos nos' veio da peca de
+                    # amarracao da parede VIZINHA projetada neste eixo, nao
+                    # da peca PROPRIA desta parede (ver
+                    # _index_node_candidates_by_wall_end) - essa projecao
+                    # raramente cai num multiplo de PIER_MODULE_CM, ao
+                    # contrario da peca propria. Qual das duas familias
+                    # A/B herda a peca propria vs a emprestada num no'
+                    # L_CORNER/X_INTERSECTION depende so' do papel/ordem
+                    # canonica dos arms daquele no' (wall_pairing.py) -
+                    # nunca deveria decidir se a parede TODA perde uma
+                    # familia inteira de fiadas (medido ao vivo: W042/TGD,
+                    # 8/17 fiadas -> 17/17 so' com este arredondamento,
+                    # mesma geometria, so' o papel do no' mudando). Testa
+                    # ANTES de desistir, so' quando a checagem RAPIDA
+                    # (pier_closes_with_blocks_cm - nao olha o catalogo
+                    # real, so' descarta o caso comum de "ja fecha") diz
+                    # que a versao EXATA nao fecha; nunca toca um trecho
+                    # que ja' fechava (comportamento historico intacto).
+                    # So' os lados FECHADOS contra um no' de verdade (border
+                    # ja' ocupado por um candidato de no', ou MIDSPAN -
+                    # `leading_is_open`/`trailing_is_open` ja' distinguem
+                    # exatamente isso, ver o bloco WALL_START/MIDSPAN_HI
+                    # acima) - NUNCA ponta livre (sem no' nenhum ali, so'
+                    # reserva generica) nem abertura (peca de jamb, ja'
+                    # exata) - os dois usam `leading_is_open`/
+                    # `trailing_is_open = True`, ficam de fora aqui. E, DENTRO
+                    # dos lados fechados por no', so' quando a borda e'
+                    # EMPRESTADA de outra parede (node_candidates_borrowed_by_
+                    # wall_end) E essa parede DOADORA tambem nao tem abertura
+                    # propria (ver a docstring de
+                    # _index_node_candidates_borrowed_by_wall_end - efeito
+                    # colateral real medido: preencher perto de um no'
+                    # compartilhado com parede COM abertura podia mudar a
+                    # composicao dela via colisao/plan_hook). Uma borda com
+                    # peca PROPRIA desta parede ja' fecha o modulo por
+                    # construcao; se mesmo assim nao fechar, e' o comprimento
+                    # da PROPRIA parede que genuinamente nao fecha ali
+                    # (NON_MODULAR_WALL legitimo, secao 15 do CR - nunca
+                    # mascarado por este arredondamento). MIDSPAN (T/X de
+                    # meio de parede) fica de fora por enquanto - nao faz
+                    # parte do caso medido (W042/TGD nao tem no' de
+                    # meio-de-parede) e o doador ali nao esta' indexado neste
+                    # dict (so' `_index_node_candidates_by_wall_end` cobre
+                    # pontas de verdade).
+                    borrowed = node_candidates_borrowed_by_wall_end or {}
+                    donor_left = borrowed.get((wall_idx, 0, course))
+                    donor_right = borrowed.get((wall_idx, 1, course))
+                    node_anchored_left = (
+                        kind_left == "WALL_START" and not leading_is_open
+                        and donor_left is not None
+                        and not (0 <= donor_left < len(openings_per_wall) and openings_per_wall[donor_left])
+                    )
+                    node_anchored_right = (
+                        kind_right == "WALL_END" and not trailing_is_open
+                        and donor_right is not None
+                        and not (0 <= donor_right < len(openings_per_wall) and openings_per_wall[donor_right])
+                    )
+                    # `not openings_sorted` (nenhuma abertura NESTA parede,
+                    # nao so' neste trecho): mantem este arredondamento
+                    # totalmente fora do pipeline de recorte/reparo de
+                    # aberturas (_recut_openings_and_repair, FASES 2/3) -
+                    # medido ao vivo que tocar um trecho cujo resultado a
+                    # FASE 2/3 depois recorta/repara podia empurrar blocos
+                    # NOVOS para perto demais de um vao (regressao real nos
+                    # projetos TGD/TP1/piloto do benchmark:
+                    # OPENING_BLOCK_CROSSES_JAMB/OPENING_BLOCK_INSIDE_DOOR/
+                    # PRISM_CONTINUOUS_JOINT) - fora do escopo deste CR
+                    # (secao 25/17: nao usar abertura para mascarar nem para
+                    # ser mascarada por este mecanismo). W042/TGD (o caso
+                    # medido que prova a causa-raiz) nao tem abertura
+                    # nenhuma, entao esta restricao nao reduz a cobertura do
+                    # fix para o mecanismo que ele foi escrito para corrigir.
+                    # `len(active_boundaries) == 2`: SO' quando este trecho e'
+                    # a parede INTEIRA (WALL_START ao WALL_END, sem no' de
+                    # meio-de-parede no caminho) - garante que rescatar este
+                    # trecho da familia rescata a familia TODA de uma vez, em
+                    # vez de deixar outros trechos (que este arredondamento
+                    # nao alcanca, ex.: MIDSPAN) sem peca nenhuma, trocando
+                    # COVERAGE_MISSING_ROW por COVERAGE_ROW_MOSTLY_EMPTY sem
+                    # de fato consertar a parede (regressao critica real
+                    # medida no TGD sem esta restricao - a mesma familia
+                    # ficava com UM trecho coberto e o resto vazio). W042/TGD
+                    # (o caso medido que prova a causa-raiz) e' exatamente
+                    # este formato: um unico trecho no'-a-no', sem
+                    # meio-de-parede.
+                    # `course_has_own_tie[sibling]`: exige que a familia
+                    # OPOSTA (a que ja' tem peca de no' propria) exista de
+                    # verdade - rescatar uma familia inteiramente ausente so'
+                    # vale a pena quando ha' uma familia irma' de verdade para
+                    # equilibrar (o padrao exato de COVERAGE_ROW_MOSTLY_EMPTY:
+                    # "fiada vazia numa parede que tem OUTRAS fiadas cheias").
+                    # Sem esta condicao, uma parede em que as DUAS familias
+                    # sao emprestadas em nos' DIFERENTES (uma com doador sem
+                    # abertura, outra com doador COM abertura) rescatava so'
+                    # uma das duas, criando exatamente essa assimetria -
+                    # medido ao vivo como a fatia residual da regressao
+                    # critica no TGD que sobrevivia mesmo depois das
+                    # restricoes acima.
+                    sibling_course = "B" if course == "A" else "A"
+                    if ((node_anchored_left or node_anchored_right)
+                            and not openings_sorted
+                            and not course_has_own_tie[course]
+                            and course_has_own_tie[sibling_course]
+                            and len(active_boundaries) == 2
+                            and raw_pier_cm > PIER_LAYOUT_TOLERANCE_CM
+                            and not pier_closes_with_blocks_cm(raw_pier_cm, lead_cm, trail_cm)):
+                        snap_start_cm, snap_end_cm = _node_boundary_module_snap_cm(
+                            seg_start_cm, seg_end_cm, lead_cm, trail_cm,
+                            node_anchored_left, node_anchored_right,
+                        )
+                        # REDE DE SEGURANCA: o arredondamento so' pode
+                        # ENCOLHER o trecho original (mais reserva, nunca
+                        # menos) - nunca empurrar uma borda para FORA do
+                        # intervalo (seg_start_cm, seg_end_cm) que ja' teria
+                        # sido usado sem ele. Protege contra qualquer
+                        # interacao nao prevista entre nos' proximos (varios
+                        # nos' "envolvendo" a mesma ponta - ver
+                        # _node_involved_wall_ends) sem exigir entender cada
+                        # topologia possivel: se a saida nao respeita esse
+                        # invariante, descarta e mantem o comportamento
+                        # historico (NON_MODULAR_WALL) em vez de arriscar um
+                        # trecho maior que a propria parede.
+                        if (snap_start_cm is not None
+                                and not (seg_start_cm <= snap_start_cm <= snap_end_cm <= seg_end_cm)):
+                            snap_start_cm = None
+                        if snap_start_cm is not None:
+                            snap_pier_cm = snap_end_cm - snap_start_cm
+                            if (snap_pier_cm > PIER_LAYOUT_TOLERANCE_CM
+                                    and pier_closes_with_blocks_cm(snap_pier_cm, lead_cm, trail_cm)):
+                                seg_start_cm, seg_end_cm = snap_start_cm, snap_end_cm
+                                raw_pier_cm = snap_pier_cm
                     if raw_pier_cm < -PIER_LAYOUT_TOLERANCE_CM:
                         # NAO HA' ESPACO FISICO entre os dois limites deste trecho:
                         # tipicamente a abertura esta' dentro (ou colada demais) do
@@ -5690,6 +5973,9 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
     midspan = _index_node_candidates_midspan(
         nodes, intersections["candidates"], walls_to_create, end_to_node
     )
+    borrowed_by_end = _index_node_candidates_borrowed_by_wall_end(
+        nodes, intersections["candidates"], walls_to_create, end_to_node
+    )
 
     order = order_walls_for_processing(walls_to_create)
     all_candidates = list(intersections["candidates"])
@@ -5769,11 +6055,17 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         )
 
         def _solve(walls_arg, openings_arg, by_end_arg, midspan_arg):
+            # `borrowed_by_end` (CR-BLOCK-ARM-ROLE-INVARIANCE) e' puramente
+            # TOPOLOGICO (qual parede e' a DONA da peca de cada no'/fiada) -
+            # nao muda quando `by_end_arg`/`midspan_arg` sao "trial" (posicao
+            # reajustada pelo plan_hook via _rebase_node_indexes_for_wall),
+            # entao reusa a versao unica computada uma vez para toda a planta.
             return solve_wall_free_fill(
                 wall_idx, walls_arg, nodes, end_to_node, openings_arg,
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
+                node_candidates_borrowed_by_wall_end=borrowed_by_end,
             )
 
         result = _solve(working_walls, working_openings, wall_by_end, wall_midspan)
@@ -5950,6 +6242,9 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
     node_midspan_by_wall_course = _index_node_candidates_midspan(
         nodes, intersection_candidates, walls_to_create, end_to_node
     )
+    node_candidates_borrowed_by_wall_end = _index_node_candidates_borrowed_by_wall_end(
+        nodes, intersection_candidates, walls_to_create, end_to_node
+    )
     candidates = []
     jamb_exceptions = []
     non_modular = []
@@ -5962,6 +6257,7 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
             wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
             node_candidates_by_wall_end, node_midspan_by_wall_course, catalog, allow_compensators,
             opening_strategy=opening_strategy,
+            node_candidates_borrowed_by_wall_end=node_candidates_borrowed_by_wall_end,
         )
         candidates.extend(result["candidates"])
         jamb_exceptions.extend(result["jamb_exceptions"])
