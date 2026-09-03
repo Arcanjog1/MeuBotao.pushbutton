@@ -45,3 +45,24 @@ de trabalho.
 | `out_nf_experimento_troca_so_trecho_fechado.json` | prova de que a troca simétrica só acontece em trecho fechado dos dois lados |
 | `out_nf_intermediario_so_sentido_A_para_B.json` | versão intermediária (só o sentido "nó da A → junta da B"), medida para isolar o ganho do sentido simétrico |
 | `out_nf_trace_evidencia_{HEAD,DEPOIS}_piloto_sintetico_2x2.json` | antes/depois do instrumento do cross-audit (pool GLOBAL — ver o campo `ATENCAO` dentro do arquivo) |
+
+## Fechamento (2026-09-03) — o gate `OPENING_BLOCK_INSIDE_DOOR`
+
+Relatório: `docs/BLOCK_NODE_FILL_JOINT_FECHAMENTO.md`. Regras: §32.
+
+| script | responde a |
+|---|---|
+| `run_nf_door_table.py` | itens 3 e 4 — tabela PEÇA A PEÇA dos blocos que invadem vão de porta, com o ESTÁGIO (`placement_reason`) que criou cada um |
+| `run_nf_door_volume.py` | item 6 — MATERIAL físico dentro do vão (comprimento e área), separado por ALTURA da interseção; não depende da fronteira de 90 % do validador |
+| `run_nf_z_origin.py` | item 5 — as DUAS origens verticais e o efeito de alinhá-las em TODOS os códigos |
+
+| arquivo | ponto |
+|---|---|
+| `out_nf_door_table_{before_HEAD,after}.json` | tabela peça a peça |
+| `out_nf_door_volume_{before_HEAD,after}.json` | material físico |
+| `out_nf_z_origin_{before_HEAD,after}.json` | origens verticais + efeito do alinhamento |
+
+**Resultado:** 44 dos 49 achados são fantasma de 1 cm (fiada 11 do modelo do
+benchmark contra uma verga de 221 cm que, no motor, é a própria fronteira da
+fiada). Com as origens alinhadas: **5 antes, 5 depois**. Nenhuma linha de
+produção foi alterada nesta etapa.

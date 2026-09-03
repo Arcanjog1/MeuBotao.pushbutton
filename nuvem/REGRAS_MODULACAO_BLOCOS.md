@@ -4739,3 +4739,125 @@ nova de `wall_idx`, ordem de lista ou `GetEndPoint(0)`.
 sintética). Os casos que DISCRIMINAM — falham no código anterior e passam
 no novo — são a célula fechada (5 comprimentos) e a grade 2 x 2. L, T e X
 isolados entram como cobertura de não-regressão.
+
+## 32. DUAS ORIGENS VERTICAIS: a régua do benchmark inventa 1 cm de bloco dentro de porta (2026-09-03)
+
+> Descoberto ao fechar o `CR-BLOCK-NODE-FILL-JOINT`. **PENDÊNCIA DE CÓDIGO
+> ABERTA** — medido, provado e reproduzível, NÃO corrigido (a correção é
+> fora do motor e mexe em `baseline.json`; precisa de CR próprio).
+
+### 32.1 REGRA OBRIGATÓRIA — a fiada começa em `base + 1 cm + n × 20`
+
+```
+_course_z_abs(base, n) = base + FIRST_COURSE_Z_OFFSET_CM + n * passo
+FIRST_COURSE_Z_OFFSET_CM = 1.0
+```
+
+Regra do projeto, **confirmada pelo usuário no Revit** (2026-08-21, "segunda
+fiada seja lançada no nível 21") e medida em 15.000 instâncias
+(`PADRAO_MODULACAO.md`: progressão exata 21/41/61/81/101/121/141/161/181/
+201/**221** cm). Fiada 1 nunca em 0 cm.
+
+Consequência que precisa estar sempre à vista: **as fronteiras de fiada
+reais são 1, 21, 41, … 221, 241 — não 0, 20, 40, …** Qualquer código que
+compare uma cota de abertura com uma cota de fiada TEM de usar a mesma
+origem nos dois lados.
+
+### 32.2 CONFLITO REGISTRADO — o modelo do benchmark mistura as duas origens
+
+`nuvem/benchmark/extract/from_solver.py` monta o modelo assim:
+
+```
+elevation_cm (fiada)     = base + n * passo          ->  0, 20, ..., 220   SEM o offset
+sill_cm / head_cm (vao)  = Z ABSOLUTO do motor        ->  221              COM o offset
+```
+
+`analysis.opening_active_in_row` compara os dois. **Estão a 1 cm de
+distância**, e a diferença é sistemática, não ruído.
+
+Efeito medido em `torre_easy_lo_r00_tgd` (portas com verga em 221,0 cm —
+exatamente a fronteira entre a fiada 10 e a 11):
+
+```
+                        MOTOR (com offset)      MODELO (sem offset)
+fiada 10                201.00 .. 220.00        200.00 .. 219.00
+fiada 11                221.00 .. 240.00        220.00 .. 239.00
+
+porta sill=0 head=221
+  fiada 11              ativo=False  0.00cm     ativo=True   1.00cm   <-- FANTASMA
+```
+
+**44 dos 49 achados `OPENING_BLOCK_INSIDE_DOOR` do TGD são esse fantasma de
+1 cm**, todos na fiada 11. Os reais são 5 (fiadas 1, 3, 5, 7, 9). O mesmo
+fantasma infla `OPENING_BLOCK_CROSSES_JAMB` (146 → 108 quando alinhado),
+`COVERAGE_ROW_MOSTLY_EMPTY` do TGD (187 → **136**) e
+`OPENING_MISSING_LINTEL` do TP1 (92 → **0**).
+
+### 32.3 PADRÃO OBSERVADO — só aparece quando a verga cai em fronteira de fiada
+
+```
+tgd     verga 221 = fronteira exata da fiada 11  ->  fantasma em TODA porta
+tp1     nenhuma verga em fronteira               ->  sem fantasma de INSIDE_DOOR
+piloto  verga 210, no MEIO da fiada 10           ->  nenhum efeito
+```
+
+Uma verga bem modulada (múltiplo exato de fiadas) é justamente a que dispara
+o falso positivo. Registrar isto importa: o projeto MELHOR modulado é o que
+mais "reprova" na régua atual.
+
+### 32.4 REGRA OBRIGATÓRIA — não confundir régua com geometria
+
+Antes de tratar qualquer variação de `OPENING_BLOCK_INSIDE_DOOR` como
+regressão, medir as DUAS coisas que não dependem da fronteira de 90 % do
+validador (`INSIDE_RATIO`):
+
+1. **material físico** dentro do vão — comprimento e área (comprimento ×
+   altura real da interseção vertical);
+2. **altura da interseção**, separada — 1 cm e 19 cm não são o mesmo defeito.
+
+Medição que fechou o caso (`run_nf_door_volume.py`, TGD, antes → depois do
+`CR-BLOCK-NODE-FILL-JOINT`):
+
+```
+comprimento    3311,66 cm    ->  3306,66 cm     (-5,00)
+area          29503,21 cm2   -> 29498,21 cm2    (-5,00)
+pecas                187     ->        191      (+4)
+```
+
+**O material diminuiu e a contagem de peças aumentou.** Só a FASE da
+corrente de blocos mudou: peças que cruzavam a jamba (< 90 % dentro)
+passaram a cair inteiras no intervalo e atravessaram a fronteira de
+classificação. Contar peças, sozinho, não distingue "piorou" de "cortou o
+mesmo material em mais pedaços".
+
+### 32.5 EXCEÇÃO PERMITIDA — `door_void_violations` está CERTO
+
+`find_door_void_violations` (motor) usa a convenção do motor e por isso não
+vê o fantasma: 290 no TGD nos três pontos de medição. Quando as duas
+métricas discordam sobre porta, **a do motor é a que descreve o prédio**; a
+do benchmark descreve o modelo exportado.
+
+### 32.6 Como corrigir (ainda NÃO feito)
+
+Alinhar as duas origens em `extract/from_solver.py`. Duas formas:
+
+| variante | o que faz | risco |
+|---|---|---|
+| R1 | fiada passa a `base + FIRST_COURSE_Z_OFFSET_CM + n*passo` | quebra o pareamento de fiada contra o `reference.json` (fiadas em 0, 20, …) |
+| R2 | `sill_cm`/`head_cm` passam para a origem nominal das fiadas | mexe só na abertura — foi a variante medida |
+
+Move quatro códigos rastreados por `baseline.json` em dois projetos, então
+**exige CR próprio com decisão explícita de refresh de baseline**
+(`CR-BENCH-Z-ORIGIN`). Enquanto não for feito, toda leitura de
+`OPENING_BLOCK_INSIDE_DOOR`, `OPENING_BLOCK_CROSSES_JAMB`,
+`COVERAGE_ROW_MOSTLY_EMPTY` e `OPENING_MISSING_LINTEL` tem de ser feita
+sabendo que parte do número é régua.
+
+### 32.7 Onde isto é testado
+
+`tests/test_block_node_fill_joint.py::INV-NODEFILL-030/031/032` — NÓ nas
+duas pontas + porta + múltiplas fiadas, verificando na MESMA rodada que o
+prisma está correto E que nenhum bloco ocupa o vazio da porta, medindo o vão
+na convenção vertical **do motor** (`_course_z_band` /
+`_opening_active_in_course_band`). O 032 é o CONTROLE: resolve a mesma
+planta sem abertura e confere que o medidor acusa mesmo.

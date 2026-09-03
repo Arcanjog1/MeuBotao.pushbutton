@@ -363,3 +363,116 @@ def test_inv_nodefill_021_a_junta_de_no_entra_na_busca_da_fiada_oposta():
     assert m._count_joint_coincidences_cm(
         m._layout_internal_joint_positions_cm(escolhido, seg_start_cm),
         [junta_de_no]) == 0
+
+
+# =====================================================================
+# INV-NODEFILL-030/031 - o NODE-FILL nao pode por bloco dentro de PORTA
+#
+# Fecha o unico gate que sobrou do CR: a correcao muda o layout do
+# preenchimento, e o preenchimento e' exatamente quem poderia invadir um
+# vao. Os dois invariantes sao verificados NA MESMA rodada, sobre a MESMA
+# geometria, para que nunca se troque um pelo outro:
+#
+#   PRISMA           nenhuma junta NO'|FILL empilhada     (o objetivo do CR)
+#   VAO DE PORTA     nenhum bloco dentro do vazio fisico  (regra absoluta)
+#
+# O vao e' medido na convencao VERTICAL DO MOTOR (`_course_z_abs`, que
+# inclui FIRST_COURSE_Z_OFFSET_CM) - a mesma que decide quais fiadas o
+# solver esvazia. Medir noutra origem mede outra coisa.
+# =====================================================================
+PORTA_T0_CM, PORTA_T1_CM = 120.0, 200.0
+PORTA_SILL_CM, PORTA_HEAD_CM = 0.0, 210.0
+NUM_COURSES = 13
+
+
+def _catalogo_de_altura():
+    """O catalogo do teste com `height_cm` - `_course_height_ft` precisa
+    dele para deduzir o passo de fiada."""
+    return build_catalog()
+
+
+def solve_all_courses(lines, openings=None, thickness_cm=14.0):
+    walls = [(line, ft(thickness_cm), (False, False)) for line in lines]
+    walls, junction_map = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, junction_map)
+    # `solve_building_blocks_all_courses` indexa `openings_per_wall` por
+    # POSICAO (lista), nao por chave.
+    per_wall = [list((openings or {}).get(i) or []) for i in range(len(walls))]
+    result = m.solve_building_blocks_all_courses(
+        nodes, walls, end_to_node, per_wall, _catalogo_de_altura(),
+        base_z_abs=0.0, num_courses=NUM_COURSES,
+    )
+    return result, walls
+
+
+def blocos_dentro_de_porta(result, walls, openings_por_parede):
+    """Blocos que ocupam o VAZIO FISICO de uma porta, na convencao vertical
+    do MOTOR. [] e' a unica resposta aceitavel (regra absoluta da secao 3)."""
+    catalog = _catalogo_de_altura()
+    course_height_ft, _e = m._course_height_ft(catalog, None)
+    block_height_ft, _e2 = m._block_height_ft(catalog, None)
+    violacoes = []
+    for course_index in range(NUM_COURSES):
+        z_lo, z_hi = m._course_z_band(0.0, course_index, course_height_ft, block_height_ft)
+        for cand in result["course_candidates"].get(course_index) or []:
+            wall_idx = cand.get("wall_idx")
+            if wall_idx is None:
+                continue
+            for (t_lo, t_hi, sill, head) in (openings_por_parede.get(wall_idx) or []):
+                if not m._opening_active_in_course_band(sill, head, z_lo, z_hi):
+                    continue   # fiada inteiramente abaixo do peitoril ou acima da verga
+                p0, _p1, wall_dir, _len, _t = m._wall_axis_and_length(walls, wall_idx)
+                a, b = m._candidate_extent_on_wall_axis(cand, p0, wall_dir)
+                bloco = (min(a, b), max(a, b))
+                vao = (m._ft_to_cm(t_lo), m._ft_to_cm(t_hi))
+                sobreposicao = min(bloco[1], vao[1]) - max(bloco[0], vao[0])
+                if sobreposicao > m.BOND_COLLISION_EPS_CM:
+                    violacoes.append((wall_idx, course_index, cand.get("logical_code"),
+                                      round(bloco[0], 2), round(bloco[1], 2),
+                                      round(sobreposicao, 2)))
+    return sorted(violacoes)
+
+
+def test_inv_nodefill_030_no_nas_duas_pontas_mais_porta_mais_fiadas():
+    """O caso que o item 12 pede: NO' nas duas pontas + PORTA + varias
+    fiadas, numa geometria em que o NODE-FILL MUDA o layout (a celula
+    fechada - 4 violacoes de prisma no codigo anterior, ZERO neste).
+
+    Os dois invariantes juntos: prisma correto E vao livre."""
+    linhas = celula_fechada()
+    porta = (ft(PORTA_T0_CM), ft(PORTA_T1_CM), ft(PORTA_SILL_CM), ft(PORTA_HEAD_CM))
+    aberturas = {0: [porta], 1: [], 2: [], 3: []}
+    result, walls = solve_all_courses(linhas, openings=aberturas)
+    assert not result.get("error")
+    assert result["candidates"]
+
+    # 1) PRISMA - nenhuma junta NO'|FILL empilhada
+    assert node_fill_prism_violations(walls, result["candidates"]) == []
+    # 2) VAO DE PORTA - nenhum bloco dentro do vazio fisico
+    assert blocos_dentro_de_porta(result, walls, aberturas) == []
+
+
+def test_inv_nodefill_031_porta_em_parede_horizontal_e_vertical():
+    """O mesmo, com porta na HORIZONTAL e na VERTICAL ao mesmo tempo - o
+    NODE-FILL age nas duas orientacoes e o vao tem de continuar livre nas
+    duas."""
+    linhas = celula_fechada()
+    porta = (ft(PORTA_T0_CM), ft(PORTA_T1_CM), ft(PORTA_SILL_CM), ft(PORTA_HEAD_CM))
+    aberturas = {0: [porta], 1: [porta], 2: [], 3: []}
+    result, walls = solve_all_courses(linhas, openings=aberturas)
+    assert not result.get("error")
+    assert node_fill_prism_violations(walls, result["candidates"]) == []
+    assert blocos_dentro_de_porta(result, walls, aberturas) == []
+
+
+def test_inv_nodefill_032_o_medidor_de_vao_nao_e_vazio():
+    """CONTROLE: o medidor acima acusa mesmo, quando ha' bloco no vao.
+    Sem isto, os dois testes anteriores passariam por engano se
+    `blocos_dentro_de_porta` estivesse quebrado."""
+    linhas = celula_fechada()
+    porta = (ft(PORTA_T0_CM), ft(PORTA_T1_CM), ft(PORTA_SILL_CM), ft(PORTA_HEAD_CM))
+    # resolve SEM abertura nenhuma (parede cheia) e mede contra a MESMA porta
+    result, walls = solve_all_courses(linhas)
+    achados = blocos_dentro_de_porta(result, walls, {0: [porta]})
+    assert achados, "o medidor de vao nao esta' medindo nada"
+    assert all(v[0] == 0 for v in achados)

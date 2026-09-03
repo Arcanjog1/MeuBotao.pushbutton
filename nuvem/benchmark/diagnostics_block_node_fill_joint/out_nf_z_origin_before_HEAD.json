@@ -1,0 +1,208 @@
+{
+ "FIRST_COURSE_Z_OFFSET_CM": 1.0,
+ "codes_COMO_ESTA": {
+  "COMPENSATOR_AVOIDABLE": 34,
+  "COMPENSATOR_CONSECUTIVE": 551,
+  "COMPENSATOR_EXCESS_IN_RUN": 397,
+  "COMPENSATOR_VERTICAL_STRIP": 62,
+  "COVERAGE_GAP_IN_ROW": 1913,
+  "COVERAGE_MISSING_ROW": 293,
+  "COVERAGE_PARTIAL_WALL": 55,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 187,
+  "COVERAGE_WALL_NOT_MODULATED": 29,
+  "JUNCTION_MISSING_BINDING": 23,
+  "JUNCTION_NOT_ALTERNATING": 303,
+  "OPENING_BLOCK_CROSSES_JAMB": 147,
+  "OPENING_BLOCK_INSIDE_DOOR": 44,
+  "OPENING_MISSING_COUNTER_LINTEL": 25,
+  "OPENING_MISSING_LINTEL": 82,
+  "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+  "POSITION_OVERLAP": 29,
+  "PRISM_CONTINUOUS_JOINT": 562,
+  "PRISM_JOINT_STACK": 39,
+  "PRISM_STAGGER_BELOW_TARGET": 612
+ },
+ "codes_ORIGENS_ALINHADAS": {
+  "COMPENSATOR_AVOIDABLE": 34,
+  "COMPENSATOR_CONSECUTIVE": 551,
+  "COMPENSATOR_EXCESS_IN_RUN": 397,
+  "COMPENSATOR_VERTICAL_STRIP": 62,
+  "COVERAGE_GAP_IN_ROW": 1913,
+  "COVERAGE_MISSING_ROW": 293,
+  "COVERAGE_PARTIAL_WALL": 59,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 136,
+  "COVERAGE_WALL_NOT_MODULATED": 29,
+  "JUNCTION_MISSING_BINDING": 23,
+  "JUNCTION_NOT_ALTERNATING": 303,
+  "OPENING_BLOCK_CROSSES_JAMB": 108,
+  "OPENING_BLOCK_INSIDE_DOOR": 5,
+  "OPENING_MISSING_COUNTER_LINTEL": 25,
+  "OPENING_MISSING_LINTEL": 82,
+  "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+  "POSITION_OVERLAP": 29,
+  "PRISM_CONTINUOUS_JOINT": 562,
+  "PRISM_JOINT_STACK": 39,
+  "PRISM_STAGGER_BELOW_TARGET": 612
+ },
+ "convencoes_verticais": [
+  {
+   "fiada": 0,
+   "modelo_cm": [
+    0.0,
+    19.0
+   ],
+   "motor_cm": [
+    1.0,
+    20.0
+   ]
+  },
+  {
+   "fiada": 1,
+   "modelo_cm": [
+    20.0,
+    39.0
+   ],
+   "motor_cm": [
+    21.0,
+    40.0
+   ]
+  },
+  {
+   "fiada": 2,
+   "modelo_cm": [
+    40.0,
+    59.0
+   ],
+   "motor_cm": [
+    41.0,
+    60.0
+   ]
+  },
+  {
+   "fiada": 3,
+   "modelo_cm": [
+    60.0,
+    79.0
+   ],
+   "motor_cm": [
+    61.0,
+    80.0
+   ]
+  },
+  {
+   "fiada": 4,
+   "modelo_cm": [
+    80.0,
+    99.0
+   ],
+   "motor_cm": [
+    81.0,
+    100.0
+   ]
+  },
+  {
+   "fiada": 5,
+   "modelo_cm": [
+    100.0,
+    119.0
+   ],
+   "motor_cm": [
+    101.0,
+    120.0
+   ]
+  },
+  {
+   "fiada": 6,
+   "modelo_cm": [
+    120.0,
+    139.0
+   ],
+   "motor_cm": [
+    121.0,
+    140.0
+   ]
+  },
+  {
+   "fiada": 7,
+   "modelo_cm": [
+    140.0,
+    159.0
+   ],
+   "motor_cm": [
+    141.0,
+    160.0
+   ]
+  },
+  {
+   "fiada": 8,
+   "modelo_cm": [
+    160.0,
+    179.0
+   ],
+   "motor_cm": [
+    161.0,
+    180.0
+   ]
+  },
+  {
+   "fiada": 9,
+   "modelo_cm": [
+    180.0,
+    199.0
+   ],
+   "motor_cm": [
+    181.0,
+    200.0
+   ]
+  },
+  {
+   "fiada": 10,
+   "modelo_cm": [
+    200.0,
+    219.0
+   ],
+   "motor_cm": [
+    201.0,
+    220.0
+   ]
+  },
+  {
+   "fiada": 11,
+   "modelo_cm": [
+    220.0,
+    239.0
+   ],
+   "motor_cm": [
+    221.0,
+    240.0
+   ]
+  },
+  {
+   "fiada": 12,
+   "modelo_cm": [
+    240.0,
+    259.0
+   ],
+   "motor_cm": [
+    241.0,
+    260.0
+   ]
+  }
+ ],
+ "inside_door_por_fiada_ALINHADO": {
+  "1": 1,
+  "3": 1,
+  "5": 1,
+  "7": 1,
+  "9": 1
+ },
+ "inside_door_por_fiada_COMO_ESTA": {
+  "1": 1,
+  "3": 1,
+  "5": 1,
+  "7": 1,
+  "9": 1,
+  "11": 39
+ },
+ "project_id": "torre_easy_lo_r00_tgd"
+}

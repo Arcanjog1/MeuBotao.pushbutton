@@ -1,0 +1,3822 @@
+[
+ {
+  "block_code": "B39",
+  "block_id": "W011-R11-B002",
+  "block_t_cm": [
+   55.0,
+   94.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W011-O01",
+  "opening_t_cm": [
+   68.99,
+   189.99
+  ],
+  "overlap_cm": 25.012,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W011"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W011-R11-B003",
+  "block_t_cm": [
+   95.0,
+   134.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W011-O01",
+  "opening_t_cm": [
+   68.99,
+   189.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W011"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W011-R11-B004",
+  "block_t_cm": [
+   135.0,
+   174.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W011-O01",
+  "opening_t_cm": [
+   68.99,
+   189.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W011"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W011-R11-B005",
+  "block_t_cm": [
+   175.0,
+   214.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W011-O01",
+  "opening_t_cm": [
+   68.99,
+   189.99
+  ],
+  "overlap_cm": 14.988,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W011"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R00-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R00-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R02-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R02-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R04-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R04-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R06-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R06-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R08-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R08-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R10-B001",
+  "block_t_cm": [
+   197.01,
+   231.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W019-O01",
+  "opening_t_cm": [
+   34.01,
+   200.0
+  ],
+  "overlap_cm": 2.996,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W019-R10-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W019-O04",
+  "opening_t_cm": [
+   659.0,
+   825.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W019-R11-B002",
+  "block_t_cm": [
+   215.0,
+   254.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W019-O02",
+  "opening_t_cm": [
+   249.0,
+   340.0
+  ],
+  "overlap_cm": 4.997,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W019-R11-B003",
+  "block_t_cm": [
+   255.0,
+   294.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W019-O02",
+  "opening_t_cm": [
+   249.0,
+   340.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W019-R11-B004",
+  "block_t_cm": [
+   295.0,
+   334.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W019-O02",
+  "opening_t_cm": [
+   249.0,
+   340.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W019-R11-B005",
+  "block_t_cm": [
+   335.0,
+   374.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W019-O02",
+  "opening_t_cm": [
+   249.0,
+   340.0
+  ],
+  "overlap_cm": 5.003,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W019"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R00-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R00-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R02-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R02-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R04-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R04-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R06-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R06-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R08-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R08-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R10-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W020-R10-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W020-O04",
+  "opening_t_cm": [
+   644.0,
+   810.0
+  ],
+  "overlap_cm": 2.993,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W020"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W020-R11-B001",
+  "block_t_cm": [
+   49.5,
+   58.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B002",
+  "block_t_cm": [
+   59.5,
+   98.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W020-R11-B003",
+  "block_t_cm": [
+   99.5,
+   108.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B004",
+  "block_t_cm": [
+   109.5,
+   148.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "C04",
+  "block_id": "W020-R11-B005",
+  "block_t_cm": [
+   149.5,
+   153.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O01",
+  "opening_t_cm": [
+   19.01,
+   185.01
+  ],
+  "overlap_cm": 4.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B007",
+  "block_t_cm": [
+   470.0,
+   509.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W020-O03",
+  "opening_t_cm": [
+   504.01,
+   595.01
+  ],
+  "overlap_cm": 4.982,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B008",
+  "block_t_cm": [
+   510.0,
+   549.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O03",
+  "opening_t_cm": [
+   504.01,
+   595.01
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B009",
+  "block_t_cm": [
+   550.0,
+   589.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W020-O03",
+  "opening_t_cm": [
+   504.01,
+   595.01
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W020-R11-B010",
+  "block_t_cm": [
+   590.0,
+   629.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W020-O03",
+  "opening_t_cm": [
+   504.01,
+   595.01
+  ],
+  "overlap_cm": 5.018,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W020"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R00-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R02-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R04-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R06-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R08-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W028-R10-B008",
+  "block_t_cm": [
+   352.0,
+   386.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W028-O01",
+  "opening_t_cm": [
+   289.0,
+   380.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W028"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R00-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R02-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R04-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R06-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R08-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W029-R10-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W029-O01",
+  "opening_t_cm": [
+   18.99,
+   109.99
+  ],
+  "overlap_cm": 28.019,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W029"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W032-R11-B001",
+  "block_t_cm": [
+   55.01,
+   94.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W032-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W032"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W032-R11-B002",
+  "block_t_cm": [
+   95.01,
+   129.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W032-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 14.998,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W032"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W033-R11-B003",
+  "block_t_cm": [
+   140.0,
+   179.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W033-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 20.02,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W033"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W033-R11-B004",
+  "block_t_cm": [
+   180.0,
+   219.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W033-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W033"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W034-R11-B001",
+  "block_t_cm": [
+   0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W034-O01",
+  "opening_t_cm": [
+   6.24,
+   97.24
+  ],
+  "overlap_cm": 27.758,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W034"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W034-R11-B002",
+  "block_t_cm": [
+   82.0,
+   116.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W034-O01",
+  "opening_t_cm": [
+   6.24,
+   97.24
+  ],
+  "overlap_cm": 15.242,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W034"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W045-R11-B001",
+  "block_t_cm": [
+   55.0,
+   89.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W045-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W045"
+ },
+ {
+  "block_code": "B19",
+  "block_id": "W045-R11-B002",
+  "block_t_cm": [
+   90.0,
+   109.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W045-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 19.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "half_block",
+  "row": 11,
+  "wall": "W045"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W046-R11-B008",
+  "block_t_cm": [
+   255.0,
+   294.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W046-O01",
+  "opening_t_cm": [
+   274.02,
+   365.02
+  ],
+  "overlap_cm": 19.981,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W046"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W046-R11-B009",
+  "block_t_cm": [
+   295.0,
+   329.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W046-O01",
+  "opening_t_cm": [
+   274.02,
+   365.02
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W046"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W048-R11-B001",
+  "block_t_cm": [
+   0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W048-O01",
+  "opening_t_cm": [
+   23.5,
+   114.5
+  ],
+  "overlap_cm": 10.5,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W048"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W050-R11-B001",
+  "block_t_cm": [
+   0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W050-O01",
+  "opening_t_cm": [
+   4.76,
+   95.76
+  ],
+  "overlap_cm": 29.243,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 11,
+  "wall": "W050"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W050-R11-B002",
+  "block_t_cm": [
+   68.0,
+   102.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W050-O01",
+  "opening_t_cm": [
+   4.76,
+   95.76
+  ],
+  "overlap_cm": 27.757,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W050"
+ },
+ {
+  "block_code": "C04",
+  "block_id": "W051-R11-B001",
+  "block_t_cm": [
+   263.0,
+   267.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W051-O02",
+  "opening_t_cm": [
+   259.24,
+   350.24
+  ],
+  "overlap_cm": 4.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W051"
+ },
+ {
+  "block_code": "B19",
+  "block_id": "W051-R11-B002",
+  "block_t_cm": [
+   268.0,
+   287.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W051-O02",
+  "opening_t_cm": [
+   259.24,
+   350.24
+  ],
+  "overlap_cm": 19.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "half_block",
+  "row": 11,
+  "wall": "W051"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W051-R11-B003",
+  "block_t_cm": [
+   288.0,
+   322.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W051-O02",
+  "opening_t_cm": [
+   259.24,
+   350.24
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W051"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W051-R11-B004",
+  "block_t_cm": [
+   323.0,
+   362.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W051-O02",
+  "opening_t_cm": [
+   259.24,
+   350.24
+  ],
+  "overlap_cm": 27.242,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W051"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R00-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R02-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R04-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R06-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R08-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W053-R10-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W053-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W053"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R00-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R02-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R04-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R06-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R08-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W069-R10-B009",
+  "block_t_cm": [
+   400.01,
+   434.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W069"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W069-R11-B010",
+  "block_t_cm": [
+   310.01,
+   319.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 5.002,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W069-R11-B011",
+  "block_t_cm": [
+   320.01,
+   359.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W069-R11-B012",
+  "block_t_cm": [
+   360.01,
+   399.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W069-O01",
+  "opening_t_cm": [
+   314.0,
+   405.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W069"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R00-B021",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R02-B021",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R04-B021",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R06-B021",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R08-B022",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W070-R10-B022",
+  "block_t_cm": [
+   740.01,
+   774.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W070"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W070-R11-B022",
+  "block_t_cm": [
+   775.01,
+   784.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W070-R11-B023",
+  "block_t_cm": [
+   785.01,
+   824.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W070-R11-B024",
+  "block_t_cm": [
+   825.01,
+   864.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W070-O01",
+  "opening_t_cm": [
+   768.99,
+   859.99
+  ],
+  "overlap_cm": 34.978,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W070"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R00-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R02-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R04-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R06-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R08-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W089-R10-B015",
+  "block_t_cm": [
+   505.0,
+   539.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 4.995,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W089"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W089-R11-B016",
+  "block_t_cm": [
+   540.01,
+   549.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W089-R11-B017",
+  "block_t_cm": [
+   550.01,
+   589.01
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W089-R11-B018",
+  "block_t_cm": [
+   590.01,
+   629.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W089-O01",
+  "opening_t_cm": [
+   534.01,
+   625.01
+  ],
+  "overlap_cm": 35.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W089"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R00-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R02-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R04-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R06-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R08-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R10-B009",
+  "block_t_cm": [
+   400.0,
+   434.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 5.022,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W090"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W090-R11-B010",
+  "block_t_cm": [
+   315.0,
+   324.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W090-R11-B011",
+  "block_t_cm": [
+   325.0,
+   359.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W090-R11-B012",
+  "block_t_cm": [
+   360.0,
+   399.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W090-O01",
+  "opening_t_cm": [
+   314.02,
+   405.02
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W090"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W104-R11-B001",
+  "block_t_cm": [
+   263.0,
+   297.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W104-O01",
+  "opening_t_cm": [
+   190.0,
+   291.0
+  ],
+  "overlap_cm": 27.995,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W104"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W109-R11-B001",
+  "block_t_cm": [
+   0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W109-O01",
+  "opening_t_cm": [
+   19.24,
+   110.24
+  ],
+  "overlap_cm": 14.758,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W109"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W109-R11-B002",
+  "block_t_cm": [
+   82.0,
+   116.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W109-O01",
+  "opening_t_cm": [
+   19.24,
+   110.24
+  ],
+  "overlap_cm": 28.242,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W109"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R00-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R02-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R04-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R06-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R08-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W110-R10-B001",
+  "block_t_cm": [
+   13.01,
+   47.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W110-O01",
+  "opening_t_cm": [
+   19.0,
+   110.0
+  ],
+  "overlap_cm": 28.005,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W110"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R00-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R02-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R04-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R06-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R08-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W111-R10-B005",
+  "block_t_cm": [
+   222.01,
+   256.01
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W111-O01",
+  "opening_t_cm": [
+   158.98,
+   249.98
+  ],
+  "overlap_cm": 27.974,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W111"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W112-R11-B001",
+  "block_t_cm": [
+   263.0,
+   302.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W112-O02",
+  "opening_t_cm": [
+   258.76,
+   349.76
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W112"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W112-R11-B002",
+  "block_t_cm": [
+   303.0,
+   342.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W112-O02",
+  "opening_t_cm": [
+   258.76,
+   349.76
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W112"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W112-R11-B003",
+  "block_t_cm": [
+   343.0,
+   377.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W112-O02",
+  "opening_t_cm": [
+   258.76,
+   349.76
+  ],
+  "overlap_cm": 6.758,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W112"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W115-R11-B001",
+  "block_t_cm": [
+   0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W115-O01",
+  "opening_t_cm": [
+   21.96,
+   112.96
+  ],
+  "overlap_cm": 12.041,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W115"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W126-R11-B001",
+  "block_t_cm": [
+   -0.0,
+   34.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W126-O01",
+  "opening_t_cm": [
+   5.76,
+   96.76
+  ],
+  "overlap_cm": 28.243,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W126"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W126-R11-B002",
+  "block_t_cm": [
+   82.0,
+   116.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W126-O01",
+  "opening_t_cm": [
+   5.76,
+   96.76
+  ],
+  "overlap_cm": 14.757,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W126"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W127-R11-B003",
+  "block_t_cm": [
+   140.0,
+   174.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W127-O01",
+  "opening_t_cm": [
+   159.0,
+   250.0
+  ],
+  "overlap_cm": 14.999,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W127"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W127-R11-B004",
+  "block_t_cm": [
+   175.0,
+   214.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W127-O01",
+  "opening_t_cm": [
+   159.0,
+   250.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W127"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W128-R11-B001",
+  "block_t_cm": [
+   50.0,
+   89.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W128-O01",
+  "opening_t_cm": [
+   19.02,
+   110.02
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W128"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W128-R11-B002",
+  "block_t_cm": [
+   90.0,
+   129.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W128-O01",
+  "opening_t_cm": [
+   19.02,
+   110.02
+  ],
+  "overlap_cm": 20.02,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W128"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R01-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 20.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 1,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R03-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 60.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 3,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R05-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 100.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 5,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R07-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 140.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 7,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R09-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 180.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 9,
+  "wall": "W131"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W131-R11-B001",
+  "block_t_cm": [
+   0.0,
+   9.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 3.005,
+  "placement_reason": "T_INTERSECTION_INCOMING_DEGRADED",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W131-R11-B002",
+  "block_t_cm": [
+   7.0,
+   41.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 34.0,
+  "placement_reason": "L_CORNER",
+  "role": "L_binding",
+  "row": 11,
+  "wall": "W131"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W131-R11-B003",
+  "block_t_cm": [
+   42.0,
+   51.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W131-R11-B004",
+  "block_t_cm": [
+   52.0,
+   91.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W131-R11-B005",
+  "block_t_cm": [
+   92.0,
+   131.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W131-O01",
+  "opening_t_cm": [
+   6.0,
+   107.0
+  ],
+  "overlap_cm": 14.995,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W131"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R00-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R02-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R04-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R06-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R08-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W134-R10-B008",
+  "block_t_cm": [
+   338.0,
+   372.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W134-O01",
+  "opening_t_cm": [
+   275.14,
+   366.14
+  ],
+  "overlap_cm": 28.136,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W134"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W135-R11-B002",
+  "block_t_cm": [
+   132.47,
+   166.47
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W135-O01",
+  "opening_t_cm": [
+   53.51,
+   144.51
+  ],
+  "overlap_cm": 12.041,
+  "placement_reason": "T_INTERSECTION_INCOMING",
+  "role": "T_binding",
+  "row": 11,
+  "wall": "W135"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R00-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R00-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R02-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R02-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R04-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R04-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R06-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R06-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R08-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R08-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R10-B001",
+  "block_t_cm": [
+   181.5,
+   215.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W145-O01",
+  "opening_t_cm": [
+   19.0,
+   185.0
+  ],
+  "overlap_cm": 3.5,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W145-R10-B007",
+  "block_t_cm": [
+   613.0,
+   647.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W145-O04",
+  "opening_t_cm": [
+   644.0,
+   809.99
+  ],
+  "overlap_cm": 3.0,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W145-R11-B002",
+  "block_t_cm": [
+   470.0,
+   509.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W145-O03",
+  "opening_t_cm": [
+   504.0,
+   595.0
+  ],
+  "overlap_cm": 5.003,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W145-R11-B003",
+  "block_t_cm": [
+   510.0,
+   549.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W145-O03",
+  "opening_t_cm": [
+   504.0,
+   595.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W145-R11-B004",
+  "block_t_cm": [
+   550.0,
+   589.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W145-O03",
+  "opening_t_cm": [
+   504.0,
+   595.0
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W145-R11-B005",
+  "block_t_cm": [
+   590.0,
+   629.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W145-O03",
+  "opening_t_cm": [
+   504.0,
+   595.0
+  ],
+  "overlap_cm": 4.997,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W145"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R00-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R00-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 0.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 0,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R02-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R02-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 40.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 2,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R04-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R04-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 80.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 4,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R06-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R06-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 120.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 6,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R08-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R08-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 160.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 8,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R10-B001",
+  "block_t_cm": [
+   197.0,
+   231.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W146-O01",
+  "opening_t_cm": [
+   34.0,
+   200.0
+  ],
+  "overlap_cm": 2.998,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B34",
+  "block_id": "W146-R10-B007",
+  "block_t_cm": [
+   628.5,
+   662.5
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 200.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 3.513,
+  "placement_reason": "T_INTERSECTION_DEGRADED_L",
+  "role": "T_binding",
+  "row": 10,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B002",
+  "block_t_cm": [
+   215.0,
+   254.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W146-O02",
+  "opening_t_cm": [
+   248.99,
+   339.99
+  ],
+  "overlap_cm": 5.013,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B003",
+  "block_t_cm": [
+   255.0,
+   294.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O02",
+  "opening_t_cm": [
+   248.99,
+   339.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B004",
+  "block_t_cm": [
+   295.0,
+   334.0
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O02",
+  "opening_t_cm": [
+   248.99,
+   339.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B005",
+  "block_t_cm": [
+   335.0,
+   374.0
+  ],
+  "code": "OPENING_BLOCK_CROSSES_JAMB",
+  "elevation_cm": 220.0,
+  "opening": "W146-O02",
+  "opening_t_cm": [
+   248.99,
+   339.99
+  ],
+  "overlap_cm": 4.987,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "C04",
+  "block_id": "W146-R11-B007",
+  "block_t_cm": [
+   690.5,
+   694.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 4.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B008",
+  "block_t_cm": [
+   695.5,
+   734.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W146-R11-B009",
+  "block_t_cm": [
+   735.5,
+   744.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "B39",
+  "block_id": "W146-R11-B010",
+  "block_t_cm": [
+   745.5,
+   784.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 39.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "standard",
+  "row": 11,
+  "wall": "W146"
+ },
+ {
+  "block_code": "C09",
+  "block_id": "W146-R11-B011",
+  "block_t_cm": [
+   785.5,
+   794.5
+  ],
+  "code": "OPENING_BLOCK_INSIDE_DOOR",
+  "elevation_cm": 220.0,
+  "opening": "W146-O04",
+  "opening_t_cm": [
+   658.99,
+   824.99
+  ],
+  "overlap_cm": 9.0,
+  "placement_reason": "STANDARD_FILL",
+  "role": "compensator",
+  "row": 11,
+  "wall": "W146"
+ }
+]
