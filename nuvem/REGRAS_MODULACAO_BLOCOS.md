@@ -3963,3 +3963,167 @@ host; eventuais conflitos são devolvidos pelo diagnóstico do solver.
    montagem/serialização da carga, total, tamanho da resposta, quantidade de
    Walls afetadas/contexto e blocos adicionados/removidos, para que regressões
    de desempenho possam ser verificadas na captura real.
+
+## 29. `CR-BLOCK-ARM-ROLE-INVARIANCE` — o papel `course_a`/`course_b` num
+encontro L/T/X nunca pode fazer uma parede perder uma família inteira de
+fiadas (2026-09-03)
+
+NOTA (2026-09-04, `CR-BLOCK-ARM-ROLE-HUMAN-POLICY`): esta seção foi
+renumerada de "28" para "29" ao integrar `CR-BLOCK-ARM-ROLE-*` (PR #9,
+SHAs `963aa9b`/`d813f45`/`77bda14`) numa branch derivada de uma `main`
+que já tinha sua própria seção 28 (recálculo incremental do editor
+externo, acima). Nenhum conteúdo foi alterado, só a numeração do
+heading e das subseções (28.1→29.1 ... 28.7→29.7) para eliminar a
+colisão.
+
+### 29.1 REGRA OBRIGATÓRIA — o papel do braço num nó é bookkeeping, não
+geometria: uma parede não pode perder `course_a` OU `course_b` por causa
+dele
+
+Contexto: `_l_corner_wall_pair`/`solve_l_corner` (`wall_stepper.py`) lêem
+`node["arms"][0]`/`[1]` para decidir qual das duas paredes de um
+`L_CORNER` simétrico recebe a peça `course_a` (fiadas pares) e qual recebe
+`course_b` (fiadas ímpares). Essa ordem `arms[0]`/`[1]` vem de
+`wall_pairing.py` (hoje: ordem de enumeração das paredes de entrada —
+`build_wall_graph`/`_wall_node_arms` percorre `walls_to_create` em ordem;
+uma futura ordenação canônica por identidade geométrica, se/quando
+`wall_pairing.py` ganhar uma, teria exatamente o mesmo efeito aqui,
+confirmado neste CR sem tocar `wall_pairing.py`). **Trocar qual parede é
+`wall_a`/`wall_b` só pode, no máximo, ESPELHAR o padrão da amarração
+(seção 29.3 abaixo, custo já aceito) — nunca fazer uma parede ficar com
+ZERO peças numa das duas famílias.**
+
+**Causa-raiz medida, com um caso real totalmente instrumentado**
+(`W042`/TGD, `wall_idx` 41, torre_easy_lo_r00_tgd): esta parede tem um
+`L_CORNER` em CADA ponta — um nó com `wall1` (arms=[(1,0),(41,1)]), outro
+com `wall50` (arms=[(41,0),(50,0)]). Cada um desses DOIS nós decide,
+**de forma totalmente independente do outro**, qual das duas paredes ali
+recebe `course_a`/`course_b`. Não há NADA no código que force os dois nós
+da MESMA parede a alternar (`course_a` numa ponta, `course_b` na outra) —
+é perfeitamente possível (e medido, ao vivo, com a ordem de `arms` que
+`wall_pairing.py` devolve hoje) que os DOIS nós, cada um agindo sozinho,
+deem à `W042` o MESMO papel (`course_b`) nas duas pontas. Quando isso
+acontece, a família OPOSTA (`course_a`, as fiadas pares) fica sem NENHUM
+candidato de nó nesta parede — e o preenchimento comum (`solve_wall_free_
+fill`) também falhava em fechar sozinho o trecho todo (ver 29.2), levando
+a `COVERAGE_MISSING_ROW` em TODAS as fiadas pares da parede (medido: 8/17
+fiadas com bloco, as 9 pares 100% ausentes).
+
+Reproduzido de forma independente e determinística: trocar `arms[0]`/`[1]`
+de UM SÓ dos dois nós (sem tocar `wall_pairing.py`, só manipulando a lista
+`nodes` em memória depois de `build_wall_graph`) muda a cobertura de
+`W042` de 8/17 para 17/17 fiadas — mesma geometria física, só o papel do
+nó mudando. Generaliza para `W022`/`W093` (TP1) e para o mecanismo
+citado em `PRISM_CONTINUOUS_JOINT` do piloto (nó de `W011`), todos com o
+mesmo padrão: duas paredes com um nó de amarração em cada ponta, papel
+decidido nó a nó sem alternância forçada.
+
+- **Status**: DOCUMENTADO — fix parcial IMPLEMENTADO (ver 29.2). Testes
+  sintéticos permanentes em `tests/test_block_arm_role_invariance.py`
+  (não tocam `wall_pairing.py` — manipulam `node["arms"]`/
+  `node["crossing_walls"]` diretamente, provando o consumidor
+  `wall_stepper.py` robusto a QUALQUER ordem, hoje ou futura).
+
+### 29.2 REGRA OBRIGATÓRIA — a fronteira "emprestada" de uma peça de nó
+que pertence à parede VIZINHA precisa reservar um múltiplo de
+`PIER_MODULE_CM`, nunca a extensão exata da peça
+
+Causa mecânica de POR QUE a "família ausente" acima também fazia o
+preenchimento comum (não só a peça do nó) falhar: `_index_node_
+candidates_by_wall_end` (por bom motivo — ver seção 8/13, evitar colisão
+com o corpo físico da peça de amarração) reserva, em CADA ponta de
+parede, a extensão da peça de encontro que ocupa aquele espaço — mesmo
+quando essa peça pertence à parede VIZINHA (projetada no eixo desta
+parede). A peça PRÓPRIA de uma parede num nó (`_asymmetric_bond_origin_
+and_axis`, calibrada a partir do ponto/eixo desta mesma parede) fecha o
+módulo de 5cm (`PIER_MODULE_CM`) por construção; a projeção da peça da
+parede VIZINHA (um retângulo quase sempre fora de eixo, medido: ~0,26cm a
+~2,26cm de folga em relação ao módulo mais próximo, no caso real `W042`)
+**normalmente não fecha** — e como o preenchimento contínuo (`OPENING_
+STRATEGY_CONTINUOUS_FIRST`) resolve o trecho de nó a nó como "tudo ou
+nada" quando não há abertura para servir de ponto de quebra, essa
+fração de cm sobrando derrubava o trecho INTEIRO (não só a borda).
+
+- **Fix IMPLEMENTADO** (`wall_stepper.py`,
+  `_node_boundary_module_snap_cm`/`_index_node_candidates_borrowed_by_
+  wall_end`): quando o trecho falha em fechar SÓ por causa dessa fração
+  de módulo, e a fronteira em questão vem de uma peça EMPRESTADA (nunca
+  da peça própria — essa continua tratada como hoje, uma falha real de
+  comprimento, `NON_MODULAR_WALL` legítimo), a reserva é arredondada PARA
+  DENTRO (mais reserva, nunca menos — sem risco novo de colisão) até o
+  próximo múltiplo de `PIER_MODULE_CM`.
+- **Escopo do fix, restrito de propósito** (medido ao vivo contra
+  regressão real no benchmark, ver 29.4): só ativa quando (a) a parede
+  não tem NENHUMA abertura própria e a parede DOADORA da peça emprestada
+  também não; (b) o trecho é a parede INTEIRA (nó-a-nó, sem meio-de-
+  parede no caminho); (c) esta família não tem NENHUMA peça de nó
+  própria em NENHUMA ponta desta parede (a família estaria total e
+  legitimamente ausente sem o arredondamento); (d) a família OPOSTA desta
+  MESMA parede tem uma peça de nó própria de verdade (o padrão exato que
+  `COVERAGE_ROW_MOSTLY_EMPTY` descreve — "família ausente numa parede que
+  tem outras fiadas cheias" — nunca ativa numa parede em que as duas
+  famílias já eram emprestadas). Fora desse escopo, o trecho continua
+  `NON_MODULAR_WALL`, reportado normalmente (seção 15 do prompt do CR:
+  "se a fiada realmente não couber por geometria, isso continua
+  permitido").
+
+### 29.3 PADRÃO OBSERVADO, AINDA NÃO CORRIGIDO — troca de papel simétrica
+é aceita como espelhamento inofensivo (custo já conhecido)
+
+Confirma o que já estava registrado antes deste CR: quando um `L_CORNER`
+simétrico troca `arms[0]`/`[1]`, o efeito NORMAL (a maioria dos casos,
+inclusive medido em geometria sintética redonda — sem o ruído de CAD que
+o 29.1/29.2 exigem) é só espelhar qual parede desenha o padrão em qual
+fiada, sem perda nenhuma. `wall_pairing.py` não precisa (e não deve, por
+este CR) tentar "preservar" o papel antigo — ele nunca teve significado
+geométrico (saía da ordem da lista de entrada). O problema tratado nas
+seções 29.1/29.2 só aparece quando (a) a mesma parede tem DOIS nós desse
+tipo, cada um decidindo sozinho, e por coincidência escolhem o mesmo
+papel; e (b) a geometria real (coordenadas de CAD, não redondas) faz a
+fronteira emprestada cair fora do módulo de blocos.
+
+### 29.4 CONFLITO CONHECIDO, NÃO RESOLVIDO — o fix de 29.2 recupera
+`COVERAGE_MISSING_ROW` mas ainda troca parte dele por `COVERAGE_ROW_
+MOSTLY_EMPTY` no TGD real (regressão crítica medida, sem solução limpa
+dentro do escopo autorizado deste CR)
+
+Medido no benchmark real (`torre_easy_lo_r00_tgd`, contra o próprio
+`origin/main` sem nenhuma alteração, não contra baseline.json desatualizado):
+
+| métrica | main (limpo) | com o fix (29.2) | delta |
+|---|---|---|---|
+| `COVERAGE_MISSING_ROW` | 265 | 145 | **-120** |
+| `COVERAGE_ROW_MOSTLY_EMPTY` | 171 | 309 | **+138** |
+| `OPENING_BLOCK_CROSSES_JAMB`/`INSIDE_DOOR` | 147 / 43 | 147 / 43 | 0 |
+| total de achados (todos os códigos) | 5307 | 5430 | +123 |
+
+Mecanismo do resíduo (medido, não suposto): algumas paredes do TGD têm as
+DUAS famílias emprestadas em nós DIFERENTES, um com parede doadora SEM
+abertura (rescatável pela regra 29.2) e outro com doadora COM abertura
+(fora do escopo — ver 29.2, restrição (a)). O resultado: a família
+rescatável fecha 100%, a outra continua 0% (comportamento idêntico ao de
+antes deste CR — não piorou o que já era genuinamente `NON_MODULAR_WALL`/
+`COVERAGE_WALL_NOT_MODULATED` nessas paredes) — mas o validador
+`COVERAGE_ROW_MOSTLY_EMPTY` (ver `validators/validate_wall_coverage.py`,
+"fiada quase vazia numa parede que tem outras fiadas cheias") passa a
+enxergar exatamente esse padrão, onde antes a parede tinha as DUAS
+famílias ruins e caía noutro código (`COVERAGE_MISSING_ROW`/`COVERAGE_
+PARTIAL_WALL`/`COVERAGE_WALL_NOT_MODULATED`). Não é uma parede NOVA
+quebrada — é uma RECLASSIFICAÇÃO de um defeito que já existia (confirmado
+achado a achado, nenhuma parede nova aparece na lista de `COVERAGE_ROW_
+MOSTLY_EMPTY` que não tivesse ALGUM achado de cobertura antes) —, mas o
+TOTAL de achados sobe (+123), então não é um resultado limpo.
+
+- **Fix completo exigiria**: forçar ALTERNÂNCIA de papel entre os DOIS
+  nós de uma mesma parede (nunca os dois com o mesmo papel) — um
+  problema de 2-coloração num grafo onde cada `L_CORNER`/`X_INTERSECTION`
+  de 2 braços é uma aresta entre duas paredes-vértice; ciclos de
+  comprimento ímpar (topologicamente possíveis) tornam alternância
+  PERFEITA impossível em geral, exigindo um critério de desempate
+  determinístico e explicitamente documentado para esse caso residual.
+  Investigado, não implementado — mudança de escopo maior que o
+  autorizado para este CR (só `wall_stepper.py`, sem tocar
+  `wall_pairing.py`, sem "resolver todo o prisma"/toda a cobertura).
+- **Recomendação**: CR próprio, mesmo espírito do `CR-BLOCK-NODE-FILL-
+  JOINT` já aberto — ver o relatório final
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md`.
