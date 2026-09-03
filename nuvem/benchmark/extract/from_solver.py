@@ -18,6 +18,7 @@ Precisa dos objetos vivos do motor (XYZ do Revit ou os dubles de
 geometria em pes. A conversao para cm acontece toda aqui.
 """
 
+from .. import analysis
 from .. import model
 
 FEET_TO_CM = 30.48
@@ -175,7 +176,10 @@ def project_from_solver(project_id, solve_result, walls_to_create, nodes,
         direction, length_cm = model.direction_of(start, end)
         rows = []
         for course_index in range(num_courses):
-            elevation_cm = base_z_cm + course_index * course_step_cm
+            # CR-BENCH-Z-ORIGIN: mesma origem vertical do motor (Fiada 1
+            # nasce em base_z_cm + FIRST_COURSE_Z_OFFSET_CM, nao em
+            # base_z_cm) - ver `analysis.course_z_abs_cm`.
+            elevation_cm = analysis.course_z_abs_cm(base_z_cm, course_index, course_step_cm)
             blocks = []
             for candidate in course_candidates.get(course_index) or []:
                 if candidate.get("wall_idx") != wall_idx:
