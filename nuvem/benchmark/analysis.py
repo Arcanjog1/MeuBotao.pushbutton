@@ -54,6 +54,15 @@ BLOCK_OPENING_JOINT_CM = 0.0
 PIER_MODULE_CM = 5.0
 BLOCK_LENGTHS_CM = (39.0, 34.0, 19.0, 9.0, 4.0)
 
+# --- espelhado de core/wall_modeling.py::FIRST_COURSE_Z_OFFSET_CM ------
+# CR-BENCH-Z-ORIGIN: a Fiada 1 do motor NAO nasce em `base_z_abs` - nasce
+# em `base_z_abs + FIRST_COURSE_Z_OFFSET_CM` (ver `_course_z_abs` no
+# motor). E' a UNICA convencao vertical valida; `course_z_abs_cm` abaixo
+# e' o unico lugar do benchmark que aplica esse offset - todo extrator
+# que precisar da cota Z de uma fiada tem que passar por aqui, nunca
+# reescrever `base_z_cm + n * course_step_cm` local.
+FIRST_COURSE_Z_OFFSET_CM = 1.0
+
 # Tolerancia de "encostado na abertura/ponta" da excecao da regra #1
 # (secao 11.8) - `OPENING_ALIGNED_TOUCH_TOLERANCE_CM` no motor.
 OPENING_ALIGNED_TOUCH_TOLERANCE_CM = 2.0
@@ -203,6 +212,20 @@ def course_step_cm(project, default_cm=20.0):
     if settings.get("course_step_cm"):
         return float(settings["course_step_cm"])
     return default_cm
+
+
+def course_z_abs_cm(base_z_cm, course_index, course_step_cm_value):
+    """Cota Z absoluta (cm) da fiada `course_index` (0-based) - MESMA
+    convencao/formula do motor (`core/wall_modeling.py::_course_z_abs`,
+    so' em cm em vez de ft): a Fiada 1 (course_index=0) nasce em
+    `base_z_cm + FIRST_COURSE_Z_OFFSET_CM`, nunca em `base_z_cm`.
+
+    CR-BENCH-Z-ORIGIN: esta e' a UNICA formula de origem vertical do
+    benchmark - qualquer extrator que precise da cota de uma fiada usa
+    esta funcao, nunca `base_z_cm + course_index * course_step_cm` direto
+    (foi exatamente essa omissao, em `extract/from_solver.py`, que fazia
+    o benchmark medir 1cm de sobreposicao fisica que nao existe)."""
+    return base_z_cm + FIRST_COURSE_Z_OFFSET_CM + course_index * course_step_cm_value
 
 
 def is_compensator(block):
