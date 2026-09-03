@@ -699,6 +699,44 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-RESIDUALS` BLOQUEADO POR ESCOPO (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-RESIDUALS (continuação de
+               CR-BLOCK-ARM-ROLE-PRISM-STAGGER, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft)
+HEAD:          77bda141df0038c973971075b09f3320e274adb2 (inalterado -
+               nenhum código de producao mudou nesta continuacao)
+status:        BLOQUEADO POR ESCOPO
+
+resumo: investigou as duas pendencias do CR anterior. (1)
+  OPENING_BLOCK_INSIDE_DOOR +3 no TGD: causa provada - artefato
+  pre-existente de opening_active_in_row (fiada de fronteira contada
+  como "ativa" por so' 5% da sua altura); as mesmas 3 paredes ja'
+  tinham este achado no estado limpo antes de qualquer CR desta serie -
+  nao e' invasao fisica nova, e' problema de medicao do benchmark, nao
+  tocado em producao. (2) as 9 paredes de prisma residual: comparadas
+  sistematicamente contra o Reference Corpus humano (casamento
+  geometrico correto, nao por id) - 8 de 9 tem correspondente humano, e
+  NENHUMA tem junta coincidente na referencia; o humano evita a
+  coincidencia concentrando as duas pecas de canto na MESMA fiada (nao
+  alternando como a coordenacao atual faz) ou usando composicao mais
+  rica. Corrigir isso exigiria revisar a POLITICA de desempate da
+  coordenacao deterministica - explicitamente fora do escopo autorizado
+  desta continuacao ("nao desfazer a coordenacao A/B").
+
+detalhe completo: docs/BLOCK_ARM_ROLE_INVARIANCE.md (gates G1-G16,
+  classificacao das 9 paredes, caso W076 detalhado). Nova secao 28.7 de
+  REGRAS_MODULACAO_BLOCOS.md registra o padrao observado (ainda nao
+  confirmado, nao promovido a regra).
+
+proximo passo: (1) decisao humana sobre regravar baseline.json do TGD
+  ou refinar opening_active_in_row; (2) nova CR, com autorizacao
+  explicita, para revisar o desempate da coordenacao a luz da
+  evidencia humana. PR #9 (draft) permanece; NAO MESCLADO.
+```
+
 ### 2026-09-03 — `CR-BLOCK-ARM-ROLE-PRISM-STAGGER` NECESSITA AJUSTE (não mesclado)
 
 ```
