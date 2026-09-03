@@ -1352,23 +1352,33 @@ def test_largura_de_abertura_mantem_a_regra_propria():
 
 @case
 def test_ordem_de_processamento_e_geometrica():
-    """Horizontais primeiro (cima -> baixo, esquerda -> direita); depois
-    verticais (esquerda -> direita, baixo -> cima). A ordem NAO pode
-    depender da ordem em que as paredes aparecem na lista."""
-    # 4 horizontais em 2 niveis + 4 verticais em 2 alinhamentos, embaralhadas
+    """REGRA FUNDAMENTAL 2 (enunciado oficial do usuario, 2026-09-02):
+    horizontais primeiro, de CIMA para BAIXO e, em faixa equivalente, da
+    ESQUERDA para a DIREITA; depois as verticais, de BAIXO para CIMA e, em
+    faixa equivalente, da ESQUERDA para a DIREITA. A ordem NAO pode depender
+    da ordem em que as paredes aparecem na lista.
+
+    ATUALIZADO no CR-BLOCK-DETERMINISM/FINALIZACAO: ate' aqui este teste
+    congelava `[..., 5, 7, 6, 4]` - as verticais ordenadas por X como
+    criterio PRINCIPAL e por Y so' no empate, o INVERSO do enunciado. O
+    usuario reafirmou a regra por extenso ("VERTICAIS: processar DE BAIXO
+    PARA CIMA; empate: DA ESQUERDA PARA A DIREITA") e `order_walls_for_
+    processing` foi corrigida; a expectativa passa a ser `[..., 5, 6, 7, 4]`
+    (primeiro a faixa de baixo inteira, esquerda->direita; depois a de cima)."""
+    # 4 horizontais em 2 niveis + 4 verticais em 2 faixas, embaralhadas
     raw = [
         seg(0, 0, 100, 0),      # 0 H  nivel y=0   (o mais BAIXO)
         seg(300, 200, 400, 200),  # 1 H  nivel y=200 (o mais ALTO), direita
         seg(0, 200, 100, 200),  # 2 H  nivel y=200, esquerda
         seg(300, 0, 400, 0),    # 3 H  nivel y=0, direita
-        seg(400, 100, 400, 200),  # 4 V  x=400, em cima
-        seg(0, 0, 0, 100),      # 5 V  x=0, embaixo
-        seg(400, 0, 400, 100),  # 6 V  x=400, embaixo
-        seg(0, 100, 0, 200),    # 7 V  x=0, em cima
+        seg(400, 100, 400, 200),  # 4 V  faixa y=100 (a de CIMA), direita
+        seg(0, 0, 0, 100),      # 5 V  faixa y=0 (a de BAIXO), esquerda
+        seg(400, 0, 400, 100),  # 6 V  faixa y=0 (a de BAIXO), direita
+        seg(0, 100, 0, 200),    # 7 V  faixa y=100 (a de CIMA), esquerda
     ]
     walls = [(line, ft(14.0), (False, False)) for line in raw]
     order = m.order_walls_for_processing(walls)
-    assert order == [2, 1, 0, 3, 5, 7, 6, 4], order
+    assert order == [2, 1, 0, 3, 5, 6, 7, 4], order
     assert m.classify_wall_orientation(walls, 0) == "H"
     assert m.classify_wall_orientation(walls, 5) == "V"
 

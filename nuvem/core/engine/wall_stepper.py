@@ -60,6 +60,12 @@ from core.engine.continuous_modulation import (  # noqa: F401
 __all__ = [
     # ---- ETAPA 4 - encontros L/T/X ----
     "_wall_axis_and_length", "_wall_end_and_dir_near_point", "_perp_dir",
+    # ---- direcao canonica dentro da parede (REGRA FUNDAMENTAL 1/2) ----
+    "WALL_CANONICAL_ENDPOINT_ROUND_FT", "_canonical_endpoint_sort_key",
+    "wall_axis_is_reversed", "canonical_wall_axis", "_flip_wall_entry",
+    "_mirror_openings_entry", "_canonical_wall_solving_view",
+    "_unmirror_fill_result",
+    "PIER_LENGTH_SNAP_DECIMALS", "_snap_cm", "_snap_cm_list", "_snap_cm_intervals",
     "_block_smaller_cell", "_block_more_central_cell", "_block_smaller_cell_sign",
     "_node_contact_point_for_wall", "_asymmetric_bond_origin_and_axis",
     "_make_block_candidate", "_obb_2d", "_obb_corners", "_obb_min_overlap",
@@ -122,6 +128,7 @@ __all__ = [
     "WALL_ORIENTATION_TOLERANCE", "WALL_ALIGNMENT_TOLERANCE_FT",
     "WALL_NO_GROWTH_TOLERANCE_CM", "WALL_COLLISION_REACH_CM",
     "classify_wall_orientation", "_cluster_values_ft", "order_walls_for_processing",
+    "wall_processing_geom_key", "_wall_canonical_angle_deg",
     "openings_for_wall", "_copy_openings_per_wall", "_wall_opening_intervals_cm",
     "_find_consecutive_compensators", "validate_wall_modulation",
     "_apply_axis_plan_in_memory", "_rebase_node_indexes_for_wall",
@@ -298,6 +305,102 @@ def _wall_axis_and_length(walls_to_create, wall_idx):
     length = vec.GetLength()
     direction = vec.Normalize() if length > 1e-9 else XYZ(1.0, 0.0, 0.0)
     return p0, p1, direction, length, thickness_ft
+
+
+# ==========================================
+# DIRECAO CANONICA DENTRO DA PAREDE (REGRA FUNDAMENTAL 1 e 2, 2026-09-02 -
+# CR-BLOCK-DETERMINISM/FINALIZACAO).
+#
+# `GetEndPoint(0)`/`GetEndPoint(1)` sao detalhe de REPRESENTACAO: a mesma
+# parede fisica desenhada A->B ou B->A e' A MESMA PAREDE e tem que produzir
+# exatamente a mesma solucao de blocos. Ate' aqui isso NAO era verdade -
+# o preenchimento comum corre de `p0` para `p1`, entao inverter o sentido de
+# desenho jogava a sobra (e o compensador, e o B19) na outra ponta do trecho.
+# Medido pela cross-audit independente (docs/BLOCK_DETERMINISM_CROSS_AUDIT.md):
+# 24 ordens de entrada -> 6 fingerprints globais, sendo que as 19 que so'
+# REORDENAM a lista ja' convergiam; divergiam exatamente as 5 que invertem o
+# SENTIDO de pelo menos um eixo.
+#
+# CONVENCAO OFICIAL do usuario (2026-09-02), puramente geometrica - nunca
+# `wall_idx`, posicao na lista, ordem de descoberta ou `id()`:
+#   HORIZONTAL -> ESQUERDA para DIREITA  (X crescente; empate: Y crescente)
+#   VERTICAL   -> BAIXO para CIMA        (Y crescente; empate: X crescente)
+#   INCLINADA  -> chave geometrica canonica lexicografica (X, Y) crescente
+#
+# Como a chave ordena as DUAS pontas e escolhe o minimo, ela devolve o MESMO
+# ponto de partida para A->B e para B->A - e' isso que torna a convencao
+# invariante a' inversao de endpoints, em vez de so' trocar uma arbitrariedade
+# por outra.
+# ==========================================
+
+# Arredondamento (em pes) da chave de ponta canonica. 1e-9 pe = 3e-8 cm, cinco
+# ordens de grandeza abaixo da MENOR tolerancia do motor - so' impede que ruido
+# de ultimo bit escolha uma ponta diferente para a mesma geometria.
+WALL_CANONICAL_ENDPOINT_ROUND_FT = 9
+
+
+def _canonical_endpoint_sort_key(point, orientation):
+    """A chave que ordena as duas pontas de uma parede segundo a convencao
+    oficial de sentido. Depende SO' das coordenadas do ponto e da orientacao
+    geometrica do eixo."""
+    r = WALL_CANONICAL_ENDPOINT_ROUND_FT
+    x = round(point.X, r) + 0.0   # + 0.0 normaliza -0.0
+    y = round(point.Y, r) + 0.0
+    if orientation == "V":
+        return (y, x)
+    return (x, y)   # "H" e "D" - esquerda->direita, empate por Y
+
+
+def wall_axis_is_reversed(walls_to_create, wall_idx):
+    """True quando `wall_idx` foi DESENHADA contra a convencao oficial de
+    sentido (ver o cabecalho desta secao) - ou seja, quando `GetEndPoint(0)`
+    e' a ponta que deveria ser o FIM. Funcao pura da geometria: devolve o
+    resultado OPOSTO para a mesma parede desenhada ao contrario, que e'
+    exatamente o que permite canonizar as duas para o mesmo eixo logico."""
+    p0, p1, _dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    orientation = classify_wall_orientation(walls_to_create, wall_idx)
+    return _canonical_endpoint_sort_key(p1, orientation) < \
+        _canonical_endpoint_sort_key(p0, orientation)
+
+
+def canonical_wall_axis(walls_to_create, wall_idx):
+    """(inicio, fim, direcao_unitaria, comprimento_ft, espessura_ft) de
+    `wall_idx` no SENTIDO OFICIAL - identico para a parede desenhada A->B e
+    para a mesma parede desenhada B->A. E' o eixo logico que toda decisao de
+    modulacao deve usar; `_wall_axis_and_length` continua existindo (e sendo
+    o eixo de REPRESENTACAO) para tudo que precisa falar em `end_index` cru
+    com o resto do pipeline."""
+    p0, p1, direction, length_ft, thickness_ft = _wall_axis_and_length(walls_to_create, wall_idx)
+    if wall_axis_is_reversed(walls_to_create, wall_idx):
+        return p1, p0, direction * -1.0, length_ft, thickness_ft
+    return p0, p1, direction, length_ft, thickness_ft
+
+
+def _flip_wall_entry(entry):
+    """A MESMA parede fisica com as duas pontas trocadas - geometria
+    IDENTICA, so' o sentido de parametrizacao muda."""
+    line, thickness_ft, locks = entry
+    p0 = line.GetEndPoint(0)
+    p1 = line.GetEndPoint(1)
+    flipped_locks = locks
+    try:
+        flipped_locks = (locks[1], locks[0])
+    except (TypeError, IndexError):
+        pass
+    return (Line.CreateBound(XYZ(p1.X, p1.Y, p1.Z), XYZ(p0.X, p0.Y, p0.Z)),
+            thickness_ft, flipped_locks)
+
+
+def _mirror_openings_entry(openings, length_ft):
+    """As aberturas de UMA parede reparametrizadas para o eixo invertido:
+    `t' = L - t`, com lo/hi trocados para continuarem crescentes. Peitoril e
+    verga (op[2]/op[3]) sao alturas - nao dependem do sentido do eixo."""
+    mirrored = []
+    for opening in openings or []:
+        t_lo, t_hi = opening[0], opening[1]
+        mirrored.append((length_ft - t_hi, length_ft - t_lo) + tuple(opening[2:]))
+    mirrored.sort(key=lambda o: o[0])
+    return mirrored
 
 
 def _wall_end_and_dir_near_point(walls_to_create, wall_idx, point):
@@ -1131,7 +1234,17 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
 
     point = node["point"]
     contact_i = _node_contact_point_for_wall(node, inc_idx)
-    _p0, _p1, main_dir, _len_m, _t_m = _wall_axis_and_length(walls_to_create, main_idx)
+    # EIXO CANONICO em vez do sentido de DESENHO (CR-BLOCK-DETERMINISM /
+    # FINALIZACAO, 2026-09-02): o B54 abaixo fica CENTRADO no ponto do no' e
+    # tem celulas simetricas (-19,5 / 0 / +19,5), entao o sentido nao muda a
+    # peca FISICA - mas muda `rotation_deg` em 180 graus, e com isso a
+    # SERIALIZACAO da mesma peca variava conforme o eixo tivesse sido
+    # desenhado A->B ou B->A (medido: 509 B54 na planta real, todos no mesmo
+    # lugar e com as mesmas celulas, so' girados). Item 40 da missao: p0/p1
+    # invertidos nao podem gerar diferenca nem na serializacao.
+    # `_wall_end_and_dir_near_point` (a incomingWall, logo abaixo) ja' era
+    # invariante por construcao - ele escolhe a ponta pelo ponto de contato.
+    _p0, _p1, main_dir, _len_m, _t_m = canonical_wall_axis(walls_to_create, main_idx)
     _end_i, dir_i, _len_i, _t_i = _wall_end_and_dir_near_point(walls_to_create, inc_idx, contact_i)
 
     # Celula central do B54 fica em local (0,0) (medido na familia real,
@@ -1257,8 +1370,20 @@ def solve_x_intersection(node, walls_to_create, catalog, node_index=None,
     wall_a_idx, wall_b_idx = walls_pair
 
     point = node["point"]
-    _pa0, _pa1, dir_a, _len_a, _t_a = _wall_axis_and_length(walls_to_create, wall_a_idx)
-    _pb0, _pb1, dir_b, _len_b, _t_b = _wall_axis_and_length(walls_to_create, wall_b_idx)
+    # EIXO CANONICO, nunca o sentido de DESENHO (CR-BLOCK-DETERMINISM /
+    # FINALIZACAO, 2026-09-02). As duas pecas do X ficam CENTRADAS no ponto
+    # do no', entao para o B54 (celulas simetricas: -19,5 / 0 / +19,5) tanto
+    # faz o sentido - mas a degradacao (X_INTERSECTION_DEGRADED_CODES)
+    # comeca por B34, que e' ASSIMETRICO: a celula MENOR dele cai de um lado
+    # ou do outro conforme `dir_a`/`dir_b`. Com o sentido de desenho, a
+    # MESMA parede desenhada A->B e B->A produzia o mesmo B34 no mesmo
+    # lugar mas ESPELHADO - uma diferenca fisica de verdade (medida: 8 pecas
+    # numa parede vertical da planta real, a ultima divergencia que sobrava
+    # das 24 ordens). Trocar por `canonical_wall_axis` NAO muda nenhuma
+    # regra de X: mesma peca, mesma posicao, mesma reserva - so' fixa QUAL
+    # das duas orientacoes equivalentes e' escolhida, por geometria.
+    _pa0, _pa1, dir_a, _len_a, _t_a = canonical_wall_axis(walls_to_create, wall_a_idx)
+    _pb0, _pb1, dir_b, _len_b, _t_b = canonical_wall_axis(walls_to_create, wall_b_idx)
 
     if openings_per_wall is None:
         course_a = _make_block_candidate("B54", entry, "A", point, dir_a, "X_INTERSECTION",
@@ -2713,6 +2838,56 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     return snapped
 
 
+# ==========================================
+# SNAP LONGITUDINAL DO SOLVER DE PILARETE (CR-BLOCK-DETERMINISM /
+# FINALIZACAO, 2026-09-02).
+#
+# CAUSA-RAIZ MEDIDA (nao suposta - ver
+# `nuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py`):
+# depois de canonizar o SENTIDO do eixo, a MESMA parede desenhada A->B e
+# B->A ainda chegava ao solver de pilarete com `pier_cm` =
+# 364.00899999999984 num caso e 364.0089999999998 no outro - 4e-14 cm de
+# diferenca, puro ruido de ultimo bit (num sentido o valor vem de `L - t`,
+# no outro vem de `t` direto). Na esmagadora maioria dos trechos isso nao
+# muda nada; num punhado deles cai exatamente em cima de um limiar de
+# comparacao e o layout inteiro troca - era o que sobrava das 5 paredes
+# (104 pecas de 10587) que ainda divergiam depois da canonizacao.
+#
+# O snap resolve na RAIZ, e nao caso a caso: toda coordenada LONGITUDINAL
+# que entra numa decisao de layout e' arredondada para uma grade fixa de
+# 1e-6 cm (10 NANOMETROS). Isso e' cinco ordens de grandeza abaixo da MENOR
+# tolerancia fisica do motor (0,1 cm - WALL_NO_GROWTH_TOLERANCE_CM /
+# BOND_COLLISION_EPS_CM) e sete abaixo da junta de argamassa (1 cm):
+# nenhuma decisao construtiva muda por causa dele - so' deixa de existir a
+# chance de duas representacoes do MESMO ponto fisico cairem em lados
+# opostos de um limiar.
+# ==========================================
+
+# Grade de arredondamento (casas decimais de cm) das coordenadas
+# longitudinais do solver de pilarete. 6 casas = 1e-6 cm = 10 nanometros.
+PIER_LENGTH_SNAP_DECIMALS = 6
+
+
+def _snap_cm(value):
+    """Arredonda UMA coordenada/comprimento longitudinal para a grade de
+    `PIER_LENGTH_SNAP_DECIMALS`. `None` passa direto."""
+    if value is None:
+        return None
+    return round(float(value), PIER_LENGTH_SNAP_DECIMALS) + 0.0
+
+
+def _snap_cm_list(values):
+    if not values:
+        return values
+    return [_snap_cm(v) for v in values]
+
+
+def _snap_cm_intervals(intervals):
+    if not intervals:
+        return intervals
+    return [(_snap_cm(a), _snap_cm(b)) for a, b in intervals]
+
+
 def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
                          first_code=None, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                          leading_open_override=None, trailing_open_override=None,
@@ -2798,6 +2973,9 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
     Devolve None se `pier_cm` nao fechar (nao e' multiplo de 5 depois de
     descontar as juntas de contorno, ou e' negativo) - o chamador trata
     isso como NON_MODULAR_WALL, nunca em silencio."""
+    pier_cm = _snap_cm(pier_cm)
+    leading_joint_cm = _snap_cm(leading_joint_cm)
+    trailing_joint_cm = _snap_cm(trailing_joint_cm)
     remaining = _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
     if remaining is None:
         # FECHAMENTO CONTRA VAO (regra do usuario, 2026-08-28): "nesses
@@ -3742,6 +3920,12 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
     regressao real (2026-08-24): a permissao anterior "mesmo numa ponta
     FECHADA contra outro bloco/no'" (2026-08-21) fazia B19 aparecer
     repetido em praticamente todo encontro L/T/X do predio."""
+    pier_cm = _snap_cm(pier_cm)
+    leading_joint_cm = _snap_cm(leading_joint_cm)
+    trailing_joint_cm = _snap_cm(trailing_joint_cm)
+    seg_start_cm = _snap_cm(seg_start_cm)
+    avoid_positions_cm = _snap_cm_list(avoid_positions_cm)
+    target_void_positions_cm = _snap_cm_list(target_void_positions_cm)
     baseline = _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
                                     allow_compensators=allow_compensators,
                                     leading_open_override=leading_is_open,
@@ -4274,6 +4458,12 @@ def _continuous_segment_layout(pier_cm, catalog, leading_joint_cm, trailing_join
     cai contra um encontro de amarracao, o pior lugar possivel para um
     compensador. Com trechos curtos (a ordem antiga) a sobra caia
     naturalmente ao lado de um vao, e o problema nao existia."""
+    pier_cm = _snap_cm(pier_cm)
+    leading_joint_cm = _snap_cm(leading_joint_cm)
+    trailing_joint_cm = _snap_cm(trailing_joint_cm)
+    seg_start_cm = _snap_cm(seg_start_cm)
+    wall_length_cm = _snap_cm(wall_length_cm)
+    opening_intervals_cm = _snap_cm_intervals(opening_intervals_cm)
     base = _pier_ordered_layout(
         pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
         allow_compensators=allow_compensators,
@@ -4313,7 +4503,15 @@ def _candidate_extents_on_wall(candidates, wall_p0, wall_dir):
     extents = []
     for candidate in candidates:
         t_a, t_b = _candidate_t_range_on_wall(candidate, wall_p0, wall_dir)
-        extents.append((min(t_a, t_b), max(t_a, t_b)))
+        # MESMA grade de snap do solver de pilarete (ver PIER_LENGTH_SNAP_
+        # DECIMALS): estes extents nascem de uma projecao de coordenada de
+        # MUNDO no eixo, entao carregam ruido proporcional a' magnitude da
+        # coordenada (~1e-12 cm num projeto a 7000cm da origem) - e sao
+        # exatamente o que decide, POR LIMIAR, quantas sub-faixas o reparo
+        # de abertura recalcula. Sem o snap, o mesmo eixo desenhado A->B e
+        # B->A expandia a regiao de reparo uma vez a mais num dos sentidos
+        # (medido em torre_easy_lo_r00_tp1, 6 paredes).
+        extents.append((_snap_cm(min(t_a, t_b)), _snap_cm(max(t_a, t_b))))
     return extents
 
 
@@ -4587,6 +4785,129 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
     }
 
 
+# --------------------------------------------------------------------------
+# VISTA CANONICA DE UMA PAREDE PARA O PREENCHIMENTO (CR-BLOCK-DETERMINISM /
+# FINALIZACAO, 2026-09-02).
+#
+# `solve_wall_free_fill` inteira raciocina em `t` ao longo de `p0 -> p1`. Em
+# vez de reescrever as ~600 linhas dela (e as de `_recut_openings_and_repair`,
+# `_pier_layout_avoiding_joints`, `_greedy_fill_blocks`...) para falar um eixo
+# canonico, monta-se aqui uma VISTA da parede ja' virada no sentido oficial:
+# a mesma geometria, a mesma planta, so' que `walls_to_create[wall_idx]` tem as
+# pontas trocadas e TODA estrutura indexada por `t`/`end_index` daquela parede
+# vem espelhada junto. O corpo do solver continua exatamente igual e passa a
+# receber sempre o MESMO problema para A->B e para B->A.
+#
+# A vista e' LOCAL (copia rasa: so' a entrada daquela parede muda) e nunca
+# escapa - o que sai de `solve_wall_free_fill` sao pecas em coordenadas de
+# MUNDO (invariantes por construcao) mais diagnosticos, e esses voltam para o
+# eixo de REPRESENTACAO original em `_unmirror_fill_result`, para que
+# relatorio, `plan_axis_opening_fix` e censo continuem falando o mesmo `t` que
+# `walls_to_create` (a lista do chamador, que NAO e' virada) descreve.
+# --------------------------------------------------------------------------
+
+def _canonical_wall_solving_view(walls_to_create, openings_per_wall, end_to_node,
+                                 node_candidates_by_wall_end, node_midspan_by_wall_course,
+                                 wall_idx):
+    """Espelha `wall_idx` (e SO' ela) para o sentido oficial. Devolve a mesma
+    tupla de estruturas, com copias rasas onde algo mudou."""
+    length_ft = _wall_axis_and_length(walls_to_create, wall_idx)[3]
+    length_cm = length_ft / FEET_PER_METER * 100.0
+
+    walls_view = list(walls_to_create)
+    walls_view[wall_idx] = _flip_wall_entry(walls_to_create[wall_idx])
+
+    openings_view = _copy_openings_per_wall(openings_per_wall)
+    openings_view[wall_idx] = _mirror_openings_entry(
+        openings_for_wall(openings_per_wall, wall_idx), length_ft)
+
+    end_to_node_view = dict(end_to_node or {})
+    end_to_node_view.pop((wall_idx, 0), None)
+    end_to_node_view.pop((wall_idx, 1), None)
+    for end_index in (0, 1):
+        node_index = (end_to_node or {}).get((wall_idx, end_index))
+        if node_index is not None:
+            end_to_node_view[(wall_idx, 1 - end_index)] = node_index
+
+    by_end_view = dict(node_candidates_by_wall_end or {})
+    for key, border_cm in (node_candidates_by_wall_end or {}).items():
+        if key[0] != wall_idx:
+            continue
+        by_end_view.pop(key, None)
+    for key, border_cm in (node_candidates_by_wall_end or {}).items():
+        if key[0] != wall_idx:
+            continue
+        by_end_view[(wall_idx, 1 - key[1], key[2])] = length_cm - border_cm
+
+    midspan_view = dict(node_midspan_by_wall_course or {})
+    for key, intervals in (node_midspan_by_wall_course or {}).items():
+        if key[0] != wall_idx:
+            continue
+        midspan_view[key] = [
+            (length_cm - hi_cm, length_cm - lo_cm) for lo_cm, hi_cm in intervals
+        ]
+
+    return walls_view, openings_view, end_to_node_view, by_end_view, midspan_view
+
+
+# Fronteiras de trecho que trocam de lado quando o eixo e' espelhado.
+_MIRRORED_BOUNDARY_KIND = {
+    "WALL_START": "WALL_END", "WALL_END": "WALL_START",
+    "OPENING_LO": "OPENING_HI", "OPENING_HI": "OPENING_LO",
+    "MIDSPAN_LO": "MIDSPAN_HI", "MIDSPAN_HI": "MIDSPAN_LO",
+}
+# Pares de chaves `t` que trocam de papel ao espelhar (a MENOR vira a MAIOR).
+_MIRRORED_CM_PAIRS = (
+    ("seg_start_cm", "seg_end_cm"),
+    ("t_start_cm", "t_end_cm"),
+    ("lo", "hi"),
+)
+
+
+def _unmirror_fill_result(result, length_cm, opening_count):
+    """Traduz os DIAGNOSTICOS de `solve_wall_free_fill` do eixo canonico de
+    volta para o eixo de representacao (`p0 -> p1`) da parede. As pecas
+    (`candidates`) nao entram aqui: ja' saem em coordenadas de mundo, que sao
+    as mesmas nos dois eixos."""
+    def _mirror_entry(entry):
+        if not isinstance(entry, dict):
+            return entry
+        out = dict(entry)
+        for lo_key, hi_key in _MIRRORED_CM_PAIRS:
+            if lo_key in out and hi_key in out:
+                lo_value, hi_value = out[lo_key], out[hi_key]
+                if lo_value is not None and hi_value is not None:
+                    out[lo_key] = length_cm - hi_value
+                    out[hi_key] = length_cm - lo_value
+        if "left_t_cm" in out or "right_t_cm" in out:
+            left_t, right_t = out.get("left_t_cm"), out.get("right_t_cm")
+            if left_t is not None and right_t is not None:
+                out["left_t_cm"], out["right_t_cm"] = length_cm - right_t, length_cm - left_t
+        if "left_kind" in out or "right_kind" in out:
+            left_kind, right_kind = out.get("left_kind"), out.get("right_kind")
+            out["left_kind"] = _MIRRORED_BOUNDARY_KIND.get(right_kind, right_kind)
+            out["right_kind"] = _MIRRORED_BOUNDARY_KIND.get(left_kind, left_kind)
+        if out.get("side") in ("left", "right"):
+            out["side"] = "right" if out["side"] == "left" else "left"
+        if out.get("opening_index") is not None and opening_count:
+            out["opening_index"] = opening_count - 1 - out["opening_index"]
+        if out.get("spans_cm"):
+            out["spans_cm"] = [
+                (length_cm - hi_cm, length_cm - lo_cm) for lo_cm, hi_cm in out["spans_cm"]
+            ]
+        return out
+
+    mirrored = {}
+    for key, value in result.items():
+        if key == "candidates":
+            mirrored[key] = value
+        elif isinstance(value, list):
+            mirrored[key] = [_mirror_entry(item) for item in value]
+        else:
+            mirrored[key] = value
+    return mirrored
+
+
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -4660,9 +4981,24 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         fronteira do preenchimento, `solve_opening_jamb` decide a peca
         encostada nele). Mantido para poder comparar as duas ordens no mesmo
         projeto - nao e' mais o padrao."""
+    # REGRA FUNDAMENTAL 1/2 (2026-09-02): a parede e' resolvida SEMPRE no
+    # sentido oficial (horizontal esquerda->direita, vertical baixo->cima,
+    # inclinada pela chave geometrica canonica). Quando o eixo foi DESENHADO
+    # ao contrario, troca-se a parede - e tudo que e' indexado por `t`/
+    # `end_index` dela - por uma vista espelhada; o corpo desta funcao entao
+    # recebe literalmente o mesmo problema nos dois sentidos de desenho.
+    # Ver `_canonical_wall_solving_view`.
+    axis_reversed = wall_axis_is_reversed(walls_to_create, wall_idx)
+    if axis_reversed:
+        (walls_to_create, openings_per_wall, end_to_node,
+         node_candidates_by_wall_end, node_midspan_by_wall_course) = \
+            _canonical_wall_solving_view(
+                walls_to_create, openings_per_wall, end_to_node,
+                node_candidates_by_wall_end, node_midspan_by_wall_course, wall_idx)
+
     _centerline, _thickness_ft, _locks = walls_to_create[wall_idx]
     p0, _p1, wall_dir, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
-    length_cm = length_ft / FEET_PER_METER * 100.0
+    length_cm = _snap_cm(length_ft / FEET_PER_METER * 100.0)
 
     openings_sorted = sorted(openings_per_wall[wall_idx], key=lambda o: o[0]) \
         if openings_per_wall[wall_idx] else []
@@ -4674,15 +5010,15 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         strategy == OPENING_STRATEGY_CONTINUOUS_FIRST
     )
     opening_intervals_cm = [
-        (op[0] / FEET_PER_METER * 100.0, op[1] / FEET_PER_METER * 100.0)
+        (_snap_cm(op[0] / FEET_PER_METER * 100.0), _snap_cm(op[1] / FEET_PER_METER * 100.0))
         for op in openings_sorted
     ]
 
     base_boundaries = [(0.0, "WALL_START", None)]
     if not continuous_first:
         for oi, op in enumerate(openings_sorted):
-            base_boundaries.append((op[0] / FEET_PER_METER * 100.0, "OPENING_LO", oi))
-            base_boundaries.append((op[1] / FEET_PER_METER * 100.0, "OPENING_HI", oi))
+            base_boundaries.append((_snap_cm(op[0] / FEET_PER_METER * 100.0), "OPENING_LO", oi))
+            base_boundaries.append((_snap_cm(op[1] / FEET_PER_METER * 100.0), "OPENING_HI", oi))
     base_boundaries.append((length_cm, "WALL_END", None))
 
     candidates = []
@@ -4733,8 +5069,8 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         for t_start_cm, t_end_cm in _merge_intervals_cm(
             node_midspan_by_wall_course.get((wall_idx, course), [])
         ):
-            boundaries.append((t_start_cm, "MIDSPAN_LO", None))
-            boundaries.append((t_end_cm, "MIDSPAN_HI", None))
+            boundaries.append((_snap_cm(t_start_cm), "MIDSPAN_LO", None))
+            boundaries.append((_snap_cm(t_end_cm), "MIDSPAN_HI", None))
         boundaries.sort(key=lambda b: b[0])
 
         # Juntas internas ja' usadas por VARIANTES ANTERIORES desta MESMA
@@ -4890,6 +5226,13 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             trail_cm = BLOCK_OPENING_JOINT_CM
                         trailing_is_open = True
 
+                    # TODA coordenada longitudinal do preenchimento vive na
+                    # grade de snap (ver PIER_LENGTH_SNAP_DECIMALS): daqui
+                    # saem `pier_cm`, as juntas internas, os vazios e as
+                    # faixas de reparo - se o ruido de ultimo bit sobreviver
+                    # aqui, ele reaparece em todas elas.
+                    seg_start_cm = _snap_cm(seg_start_cm)
+                    seg_end_cm = _snap_cm(seg_end_cm)
                     raw_pier_cm = seg_end_cm - seg_start_cm
                     if raw_pier_cm < -PIER_LAYOUT_TOLERANCE_CM:
                         # NAO HA' ESPACO FISICO entre os dois limites deste trecho:
@@ -5129,7 +5472,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     course_a_joint_positions_cm.extend(variant_joint_positions_cm)
                     course_a_void_positions_cm.extend(variant_void_positions_cm)
 
-    return {
+    result = {
         "candidates": candidates, "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular, "alignment_conflicts": alignment_conflicts,
         # Diagnostico do pipeline "parede completa primeiro" (vazio no modo
@@ -5143,6 +5486,11 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         # comprimento quando nao esta'.
         "continuity_degraded": continuity_degraded,
     }
+    if axis_reversed:
+        # As PECAS ja' saem em coordenadas de mundo (iguais nos dois eixos);
+        # os DIAGNOSTICOS voltam para o eixo de representacao do chamador.
+        result = _unmirror_fill_result(result, length_cm, len(openings_sorted))
+    return result
 
 
 # ==========================================
@@ -5215,18 +5563,55 @@ def _cluster_values_ft(values, tolerance_ft):
     return keys
 
 
-def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLERANCE_FT):
-    """Ordem OBRIGATORIA de processamento (regra #5), decidida so' pela
-    geometria:
+def wall_processing_geom_key(walls_to_create, wall_idx):
+    """Chave GEOMETRICA canonica de desempate da ordem de processamento:
+    pontas ORDENADAS + espessura. Nao muda quando a lista e' embaralhada nem
+    quando o eixo e' desenhado ao contrario - e' o que substitui o antigo
+    desempate por `wall_idx`, que era literalmente a posicao na lista de
+    entrada (a ultima dependencia de ordem que sobrava nesta funcao)."""
+    p0, p1, _wall_dir, _length_ft, thickness_ft = _wall_axis_and_length(walls_to_create, wall_idx)
+    r = WALL_CANONICAL_ENDPOINT_ROUND_FT
+    a = (round(p0.X, r) + 0.0, round(p0.Y, r) + 0.0)
+    b = (round(p1.X, r) + 0.0, round(p1.Y, r) + 0.0)
+    lo, hi = (a, b) if a <= b else (b, a)
+    return (lo[0], lo[1], hi[0], hi[1], round(thickness_ft, r) + 0.0)
 
-        ETAPA 1 - HORIZONTAIS: de cima para baixo (Y decrescente) e, dentro
-                  de cada nivel, da esquerda para a direita (X crescente).
-        ETAPA 2 - VERTICAIS: da esquerda para a direita (X crescente) e,
-                  dentro de cada alinhamento, de baixo para cima (Y
-                  crescente).
-        ETAPA 3 - o que nao for nem uma nem outra (paredes diagonais), em
-                  cima->baixo / esquerda->direita, so' para a ordem ser
-                  deterministica em vez de arbitraria.
+
+def _wall_canonical_angle_deg(walls_to_create, wall_idx):
+    """Angulo da RETA (nao do vetor) em [0, 180) graus. Como a reta A->B e a
+    reta B->A sao a MESMA reta, o angulo e' reduzido modulo 180 - assim
+    inverter os endpoints nao muda a posicao da parede na ordem."""
+    _start, _end, direction, _length_ft, _thickness = canonical_wall_axis(walls_to_create, wall_idx)
+    return round(math.degrees(math.atan2(direction.Y, direction.X)) % 180.0,
+                 WALL_CANONICAL_ENDPOINT_ROUND_FT) + 0.0
+
+
+def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLERANCE_FT):
+    """Ordem OBRIGATORIA de processamento entre paredes (REGRA FUNDAMENTAL 2,
+    regra #5), decidida SO' pela geometria - nunca pela ordem em que as
+    paredes vieram do CAD/`input.json`:
+
+        ETAPA 1 - HORIZONTAIS primeiro: de CIMA PARA BAIXO (Y decrescente);
+                  em faixa equivalente, da ESQUERDA PARA A DIREITA.
+        ETAPA 2 - depois as VERTICAIS: de BAIXO PARA CIMA (Y crescente);
+                  em faixa equivalente, da ESQUERDA PARA A DIREITA.
+        ETAPA 3 - por fim as INCLINADAS: por ANGULO canonico da reta, depois
+                  posicao geometrica, depois a chave geometrica canonica.
+
+    ATENCAO - ORDEM ENTRE paredes nao e' SENTIDO DENTRO da parede: o sentido
+    interno (horizontal esquerda->direita, vertical baixo->cima) e'
+    `canonical_wall_axis`, aplicado dentro de `solve_wall_free_fill`.
+
+    CORRECAO 2026-09-02 (CR-BLOCK-DETERMINISM/FINALIZACAO): a ETAPA 2 estava
+    INVERTIDA em relacao ao enunciado do usuario - ordenava as verticais por
+    X (esquerda->direita) como criterio PRINCIPAL e por Y so' no empate. O
+    enunciado oficial e' o contrario: BAIXO->CIMA e' o principal, ESQUERDA->
+    DIREITA e' o desempate. E os tres grupos desempatavam por `wall_idx` (a
+    POSICAO NA LISTA de entrada) - trocado por `wall_processing_geom_key`.
+
+    Inverter o sentido de desenho de uma parede (`GetEndPoint(0)` <->`(1)`)
+    NUNCA muda a ordem: tudo aqui sai de `min`/`max` dos dois endpoints, do
+    angulo modulo 180 e da chave de pontas ordenadas.
 
     Devolve a lista de `wall_idx` na ordem em que devem ser processados."""
     info = []
@@ -5237,6 +5622,7 @@ def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLE
             "orientation": classify_wall_orientation(walls_to_create, wall_idx),
             "x_min": min(p0.X, p1.X), "x_max": max(p0.X, p1.X),
             "y_min": min(p0.Y, p1.Y), "y_max": max(p0.Y, p1.Y),
+            "key": wall_processing_geom_key(walls_to_create, wall_idx),
         })
 
     horizontals = [w for w in info if w["orientation"] == "H"]
@@ -5248,16 +5634,22 @@ def order_walls_for_processing(walls_to_create, tolerance_ft=WALL_ALIGNMENT_TOLE
         bands = _cluster_values_ft([w["y_min"] for w in horizontals], tolerance_ft)
         for pos, w in enumerate(horizontals):
             w["band"] = bands[pos]
-        horizontals.sort(key=lambda w: (-w["band"], w["x_min"], w["idx"]))
+        # -band: faixa mais ALTA primeiro (cima -> baixo). Empate: x_min
+        # crescente (esquerda -> direita).
+        horizontals.sort(key=lambda w: (-w["band"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in horizontals)
     if verticals:
-        bands = _cluster_values_ft([w["x_min"] for w in verticals], tolerance_ft)
+        # A faixa das verticais e' agrupada por Y (a altura em que a parede
+        # COMECA), nao por X: o criterio PRINCIPAL delas e' baixo -> cima.
+        bands = _cluster_values_ft([w["y_min"] for w in verticals], tolerance_ft)
         for pos, w in enumerate(verticals):
             w["band"] = bands[pos]
-        verticals.sort(key=lambda w: (w["band"], w["y_min"], w["idx"]))
+        verticals.sort(key=lambda w: (w["band"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in verticals)
     if diagonals:
-        diagonals.sort(key=lambda w: (-w["y_max"], w["x_min"], w["idx"]))
+        for w in diagonals:
+            w["angle"] = _wall_canonical_angle_deg(walls_to_create, w["idx"])
+        diagonals.sort(key=lambda w: (w["angle"], -w["y_max"], w["x_min"], w["key"]))
         ordered.extend(w["idx"] for w in diagonals)
     return ordered
 

@@ -1,0 +1,41 @@
+{
+  "project_id": "piloto_sintetico_2x2",
+  "walls_already_extended": false,
+  "reversal_variants_are_valid_here": false,
+  "n_permutation_variants": 19,
+  "n_reversal_variants": 5,
+  "codes": {
+    "COVERAGE_ROW_MOSTLY_EMPTY": {
+      "baseline_json": 8,
+      "current_baseline_order": 8,
+      "permutation": {
+        "min": 8,
+        "max": 8,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 12,
+        "max": 16,
+        "spread": 4,
+        "distinct": 2
+      }
+    },
+    "PRISM_CONTINUOUS_JOINT": {
+      "baseline_json": 7,
+      "current_baseline_order": 14,
+      "permutation": {
+        "min": 14,
+        "max": 14,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 14,
+        "max": 14,
+        "spread": 0,
+        "distinct": 1
+      }
+    }
+  }
+}

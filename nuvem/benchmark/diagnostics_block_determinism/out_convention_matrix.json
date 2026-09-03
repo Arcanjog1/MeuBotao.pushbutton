@@ -1,0 +1,120 @@
+{
+  "projetos": [
+    "piloto_sintetico_2x2",
+    "torre_easy_lo_r00_tgd",
+    "torre_easy_lo_r00_tp1"
+  ],
+  "linhas": [
+    {
+      "ordem_bracos": "legacy",
+      "regressoes_criticas": {
+        "piloto_sintetico_2x2": {},
+        "torre_easy_lo_r00_tgd": {},
+        "torre_easy_lo_r00_tp1": {}
+      },
+      "n_codigos_em_regressao": 0
+    },
+    {
+      "ordem_bracos": "enum",
+      "regressoes_criticas": {
+        "piloto_sintetico_2x2": {},
+        "torre_easy_lo_r00_tgd": {
+          "COVERAGE_MISSING_ROW": [
+            265,
+            293
+          ],
+          "COVERAGE_ROW_MOSTLY_EMPTY": [
+            171,
+            181
+          ],
+          "OPENING_BLOCK_CROSSES_JAMB": [
+            147,
+            148
+          ]
+        },
+        "torre_easy_lo_r00_tp1": {
+          "COVERAGE_MISSING_ROW": [
+            16,
+            18
+          ]
+        }
+      },
+      "n_codigos_em_regressao": 4,
+      "fingerprints_grafo": 1
+    },
+    {
+      "ordem_bracos": "angulo",
+      "regressoes_criticas": {
+        "piloto_sintetico_2x2": {
+          "COVERAGE_MISSING_ROW": [
+            0,
+            4
+          ],
+          "PRISM_CONTINUOUS_JOINT": [
+            7,
+            20
+          ]
+        },
+        "torre_easy_lo_r00_tgd": {
+          "COVERAGE_MISSING_ROW": [
+            265,
+            270
+          ],
+          "OPENING_BLOCK_CROSSES_JAMB": [
+            147,
+            149
+          ]
+        },
+        "torre_easy_lo_r00_tp1": {
+          "JUNCTION_MISSING_BINDING": [
+            8,
+            9
+          ]
+        }
+      },
+      "n_codigos_em_regressao": 5,
+      "fingerprints_grafo": 1
+    },
+    {
+      "ordem_bracos": "comprimento",
+      "regressoes_criticas": {
+        "piloto_sintetico_2x2": {
+          "COVERAGE_MISSING_ROW": [
+            0,
+            4
+          ],
+          "PRISM_CONTINUOUS_JOINT": [
+            7,
+            42
+          ]
+        },
+        "torre_easy_lo_r00_tgd": {
+          "COVERAGE_MISSING_ROW": [
+            265,
+            277
+          ],
+          "COVERAGE_ROW_MOSTLY_EMPTY": [
+            171,
+            181
+          ],
+          "OPENING_BLOCK_CROSSES_JAMB": [
+            147,
+            148
+          ]
+        },
+        "torre_easy_lo_r00_tp1": {
+          "COVERAGE_MISSING_ROW": [
+            16,
+            18
+          ],
+          "JUNCTION_MISSING_BINDING": [
+            8,
+            9
+          ]
+        }
+      },
+      "n_codigos_em_regressao": 7,
+      "fingerprints_grafo": 1
+    }
+  ]
+}

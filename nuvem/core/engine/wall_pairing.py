@@ -51,6 +51,8 @@ __all__ = [
     "extend_wall_ends_to_junctions", "_wall_node_arms",
     "_wall_end_geometric_anchor", "_wall_end_junction_anchor",
     "_cluster_wall_arms", "_classify_point_along_wall",
+    "_wall_graph_wall_key", "_wall_graph_arm_key", "_wall_graph_group_key",
+    "_wall_node_group_point",
     "_find_wall_touching_point", "_classify_wall_node",
     "_find_wall_midspan_crossings", "build_wall_graph", "build_plan_bounds",
     "deduplicate_walls", "build_no_pairs_message",
@@ -825,6 +827,104 @@ WALL_GRAPH_PERPENDICULAR_TOLERANCE = 0.05
 WALL_GRAPH_COLLINEAR_TOLERANCE = 0.05
 
 
+# ------------------------------------------------------------------
+# CHAVES CANONICAS (CR-BLOCK-DETERMINISM, 2026-09-02)
+#
+# O grafo tem que sair IGUAL para a mesma planta desenhada em qualquer
+# ordem e com os eixos em qualquer sentido. Para isso, toda decisao de
+# ORDEM aqui dentro (quem representa um no', qual parede e' `main`, qual
+# e' `crossing_walls[0]`) passa por estas chaves, que sao funcoes PURAS da
+# geometria - nunca do indice na lista, da ordem de descoberta, de `id()`
+# ou de ElementId.
+#
+# NAO ha' arredondamento nem tolerancia nova aqui, de proposito: foi
+# MEDIDO (nuvem/benchmark/diagnostics_block_determinism) que ancora, ponta
+# e direcao de cada braco saem BIT-IDENTICAS nas 8 permutacoes do censo -
+# entao comparar os floats crus ja' e' exato, e arredondar so' criaria uma
+# borda artificial onde nao existe nenhuma.
+# ------------------------------------------------------------------
+
+def _wall_graph_wall_key(walls_to_create, wall_idx):
+    """Identidade GEOMETRICA de uma parede: as duas pontas ORDENADAS entre
+    si + a espessura. Independe da posicao na lista e do sentido em que o
+    eixo foi desenhado (A->B e B->A dao a mesma chave)."""
+    if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+        return ()
+    line, thickness_ft, _locks = walls_to_create[wall_idx]
+    p0 = line.GetEndPoint(0)
+    p1 = line.GetEndPoint(1)
+    a = (p0.X, p0.Y)
+    b = (p1.X, p1.Y)
+    lo, hi = (a, b) if a <= b else (b, a)
+    return (lo[0], lo[1], hi[0], hi[1], thickness_ft)
+
+
+def _wall_graph_arm_key(walls_to_create, arm):
+    """Chave de ordenacao CANONICA de uma PONTA de parede DENTRO de um no'.
+
+    E' a CANONIZACAO DA ENUMERACAO QUE JA' EXISTIA, nao uma convencao
+    nova: `_wall_node_arms` sempre percorreu as paredes em ordem, duas
+    pontas por parede. O unico defeito daquela ordem era o CRITERIO - a
+    posicao na lista de entrada. Aqui o criterio passa a ser a identidade
+    GEOMETRICA da parede; a enumeracao continua sendo a mesma.
+
+    `end_pos` (qual das duas extremidades) e' dito pela POSICAO da ponta,
+    nunca por `end_index`: `end_index` 0 e 1 sao literalmente
+    GetEndPoint(0)/(1) e trocam de valor quando o mesmo eixo e' desenhado
+    ao contrario.
+
+    Duas pontas com a chave inteira igual sao geometricamente
+    INDISTINGUIVEIS - qualquer ordem entre elas produz o mesmo grafo.
+
+    POR QUE ESTA ORDEM IMPORTA, E POR QUE E' ESTA.
+    `_l_corner_wall_pair` (wall_stepper) le' literalmente `arms[0]` e
+    `arms[1]` para decidir qual parede do canto recebe o B34 da fiada A e
+    qual recebe o da fiada B. Antes deste CR essa decisao saia da POSICAO
+    NA LISTA DE ENTRADA - era arbitraria. Como ela nao era funcao da
+    geometria, NENHUMA ordenacao canonica consegue reproduzi-la: alguma
+    mudanca de papel A/B e' inevitavel, e a escolha aqui e' de qual
+    convencao adotar. Tres candidatas defensaveis foram medidas nos TRES
+    projetos versionados, todas com fingerprint de grafo = 1
+    (nuvem/benchmark/diagnostics_block_determinism/out_convention_matrix.json):
+
+        ordem dos bracos      codigos em regressao   PRISM_CONTINUOUS_JOINT
+        enumeracao (esta)             4              nao mexe
+        angulo de saida               5              7 -> 20 no piloto
+        parede mais longa             7              7 -> 20 no piloto
+
+    A enumeracao canonica ganha nos dois criterios que importam aqui: e' a
+    que menos mexe no que ja' estava validado, e e' a UNICA que nao toca em
+    PRISM_CONTINUOUS_JOINT nem em JUNCTION_MISSING_BINDING - continuidade
+    de junta vertical e amarracao de encontro sao a regra #1 e o assunto do
+    CR-BLOCK-01, e nao podem piorar para pagar determinismo. O que sobra
+    dela cai em COVERAGE_MISSING_ROW/ROW_MOSTLY_EMPTY (fiada que faltou no
+    preenchimento), nao em violacao de regra de amarracao.
+
+    ATENCAO para quem for mexer aqui: medir isto em UM projeto so' leva a'
+    escolha errada. Foi o que aconteceu na primeira medicao deste CR - com
+    apenas `torre_easy_lo_r00_tgd` o angulo parecia melhor, e ele e' o que
+    quebra a amarracao vertical do piloto."""
+    wall_key = _wall_graph_wall_key(walls_to_create, arm["wall_idx"])
+    line = walls_to_create[arm["wall_idx"]][0]
+    p0 = line.GetEndPoint(0)
+    p1 = line.GetEndPoint(1)
+    a = (p0.X, p0.Y)
+    b = (p1.X, p1.Y)
+    mine = a if arm["end_index"] == 0 else b
+    lo = a if a <= b else b
+    return (wall_key, 0 if mine == lo else 1)
+
+
+def _wall_graph_group_key(walls_to_create, group):
+    """Chave de ordenacao CANONICA de um NO' inteiro, para a lista `nodes`
+    sair sempre na mesma ordem (e' ela que define o `node_index` que cada
+    peca carrega). Ordena pelo LUGAR do no' primeiro - o criterio natural
+    para uma lista de nos - e so' entao pelos bracos."""
+    point = _wall_node_group_point(group)
+    return (point.X, point.Y,
+            tuple(_wall_graph_arm_key(walls_to_create, arm) for arm in group))
+
+
 def _wall_node_arms(walls_to_create, junction_map=None):
     """Uma entrada por PONTA de parede (2 por parede): {"wall_idx",
     "end_index", "point" (XYZ, Z=0), "anchor" (XYZ, Z=0), "outward_dir"
@@ -918,8 +1018,16 @@ def _wall_end_geometric_anchor(walls_to_create, wall_idx, end_index, point, dire
         margin_ft = own_thickness / 2.0 + WALL_GRAPH_NODE_SNAP_TOLERANCE_FT
         if t_other < -margin_ft or t_other > other_len + margin_ft:
             continue
-        if best_dist is None or distance < best_dist:
-            best_dist = distance
+        # DESEMPATE CANONICO (CR-BLOCK-DETERMINISM): duas vizinhas
+        # EXATAMENTE a' mesma distancia (geometria simetrica) davam
+        # resultados diferentes conforme a ordem da lista, porque o
+        # `<` estrito mantinha "a primeira que apareceu". Comparar
+        # (distancia, chave geometrica da vizinha) resolve o empate pela
+        # geometria. Nao e' tolerancia nova: o empate testado aqui e' o
+        # de floats exatamente iguais, nao "quase iguais".
+        candidate_rank = (distance, _wall_graph_wall_key(walls_to_create, other_idx))
+        if best_dist is None or candidate_rank < best_dist:
+            best_dist = candidate_rank
             best_point = XYZ(crossing.X, crossing.Y, 0.0)
     return best_point if best_point is not None else point
 
@@ -971,29 +1079,76 @@ def _wall_end_junction_anchor(walls_to_create, wall_idx, end_index, point, direc
     return XYZ(crossing.X, crossing.Y, 0.0)
 
 
-def _cluster_wall_arms(arms, tolerance_ft):
-    """Agrupa `arms` (ver _wall_node_arms) cujos pontos caem a `tolerance_ft`
-    um do outro - CADA GRUPO e' um NO' fisico (ponta(s) de parede que se
-    encontram no mesmo lugar). Algoritmo guloso O(n^2): para ~600 pontas
-    (308 paredes) e' rapido o bastante e nao vale a complexidade extra de
-    um indice espacial (mesma decisao ja tomada em outras partes do
-    arquivo, ver secao DESEMPENHO do prompt de especificacao)."""
-    clusters = []
-    used = [False] * len(arms)
-    for i, arm in enumerate(arms):
-        if used[i]:
-            continue
-        group = [arm]
-        used[i] = True
-        for j in range(i + 1, len(arms)):
-            if used[j]:
-                continue
-            # Agrupa pelo ANCORA (ponto fisico do encontro), nao pela ponta
-            # em si - ver _wall_node_arms para o porque.
-            if arm["anchor"].DistanceTo(arms[j]["anchor"]) <= tolerance_ft:
-                group.append(arms[j])
-                used[j] = True
-        clusters.append(group)
+def _cluster_wall_arms(arms, tolerance_ft, walls_to_create=None):
+    """Agrupa `arms` (ver _wall_node_arms) pelo ANCORA (o ponto fisico do
+    encontro, nao a ponta em si - ver _wall_node_arms para o porque):
+    CADA GRUPO e' um NO' fisico.
+
+    COMPONENTE CONEXA, nao bola gulosa (CR-BLOCK-DETERMINISM, 2026-09-02).
+    A versao anterior tomava a PRIMEIRA ponta ainda nao usada e absorvia
+    todas as que estivessem a `tolerance_ft` DELA. Como "estar a 5 cm" NAO
+    e' uma relacao transitiva, a particao dependia de quem a lista trouxe
+    primeiro: medidos na planta real (torre_easy_lo_r00_tgd) dois trios
+    com d(A,B)=3,50 cm, d(A,C)=2,41 cm e d(B,C)=5,91 cm - visitando A
+    primeiro sai UM no' de tres pontas, visitando B ou C saem DOIS nos.
+    So' de embaralhar a lista de entrada, 273 nos viravam 274 ou 275 e
+    T_INTERSECTION ia de 118 para 119/120.
+
+    A definicao geometrica que vale e' a componente conexa: "estas pontas
+    pertencem ao MESMO encontro fisico". Parti-las em dois nos a 5,9 cm um
+    do outro faz o solver da Etapa 4 reservar amarracao duas vezes
+    praticamente no mesmo lugar - exatamente a falha de pecas duplicadas
+    que o cabecalho de _wall_node_arms documenta. Na planta real os tres
+    bracos de cada trio sao fragmentos SOBREPOSTOS do mesmo trecho (tres
+    paredes de 14 cm com os eixos a menos de 6 cm um do outro), o que
+    confirma que ali ha' um encontro so'.
+
+    O encadeamento que uma componente conexa poderia causar e' limitado
+    pela propria escala: a tolerancia (5 cm) e' menor que meia espessura
+    de parede (7 cm), entao para dois encontros distintos se fundirem
+    seria preciso uma fila de pontas a menos de 5 cm cada, o que nao
+    descreve nenhum encontro real - e nao acontece nesta planta (a maior
+    componente medida tem 4 pontas, o tamanho de uma cruz).
+
+    Continua O(n^2) nas comparacoes, a mesma decisao de antes: para ~600
+    pontas e' rapido o bastante e nao vale um indice espacial.
+
+    `walls_to_create` e' opcional so' para nao quebrar quem chame esta
+    funcao sem ele; com ele, a ordem DENTRO de cada grupo e a ordem dos
+    grupos ficam canonicas (ver _wall_graph_arm_key) - e e' dessa ordem
+    que _classify_wall_node tira os papeis (`main`, `neighbor`,
+    `crossing_walls[0]`)."""
+    n = len(arms)
+    parent = list(range(n))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if arms[i]["anchor"].DistanceTo(arms[j]["anchor"]) <= tolerance_ft:
+                root_i = find(i)
+                root_j = find(j)
+                if root_i != root_j:
+                    # Une sempre para a raiz de menor indice: a particao
+                    # final nao depende disso (componente conexa e' a
+                    # mesma de qualquer jeito), so' mantem o passo barato.
+                    parent[max(root_i, root_j)] = min(root_i, root_j)
+
+    groups = {}
+    for i in range(n):
+        groups.setdefault(find(i), []).append(arms[i])
+    clusters = list(groups.values())
+
+    if walls_to_create is None:
+        return clusters
+
+    for group in clusters:
+        group.sort(key=lambda arm: _wall_graph_arm_key(walls_to_create, arm))
+    clusters.sort(key=lambda group: _wall_graph_group_key(walls_to_create, group))
     return clusters
 
 
@@ -1058,12 +1213,57 @@ def _find_wall_touching_point(point, walls_to_create, exclude_idx, tolerance_ft)
         distance = point.DistanceTo(closest)
         if distance > tolerance_ft:
             continue
-        if best is None or distance < best[4]:
-            best = (idx, s_clamped, seg_len, thickness_ft, distance)
+        # DESEMPATE CANONICO (CR-BLOCK-DETERMINISM) - mesmo motivo de
+        # _wall_end_geometric_anchor: com `<` estrito, duas paredes
+        # exatamente a' mesma distancia da ponta eram desempatadas pelo
+        # INDICE na lista.
+        rank = (distance, _wall_graph_wall_key(walls_to_create, idx))
+        if best is None or rank < best[4]:
+            best = (idx, s_clamped, seg_len, thickness_ft, rank)
     if best is None:
         return None
-    idx, s, seg_len, thickness_ft, _distance = best
+    idx, s, seg_len, thickness_ft, _rank = best
     return idx, s, seg_len, thickness_ft
+
+
+def _wall_node_group_point(group):
+    """O PONTO de um no', como funcao das ANCORAS do grupo - nunca da
+    ordem da lista (CR-BLOCK-DETERMINISM, 2026-09-02).
+
+    Antes era `group[0]["anchor"]`: a ancora de quem a lista trouxe
+    primeiro. Na maioria dos nos isso e' inofensivo (todas as pontas de um
+    encontro ancoram exatamente na MESMA intersecao de eixos, e ai' a
+    escolha e' irrelevante), mas nao em todos: medidos 11 grupos da planta
+    real em que a MESMA parede entra com as DUAS pontas, porque ela e' mais
+    curta que a tolerancia de agrupamento - e em pelo menos dois deles as
+    duas ancoras distam 4,45 cm. Nesses, o no' - e com ele a peca de
+    amarracao que o solver encosta nele - mudava de lugar 4,45 cm so' por
+    inverter o sentido em que o eixo foi desenhado.
+
+    A resposta geometrica e' o CENTROIDE das ancoras DISTINTAS: a estimativa
+    nao-enviesada do lugar do encontro, invariante a qualquer permutacao.
+    Ancoras distintas (nao uma por braco) porque um encontro nao deve pesar
+    mais por ter mais paredes chegando na mesma intersecao. Quando todas as
+    ancoras coincidem - o caso normal - o centroide E' essa ancora, e o
+    ponto do no' fica exatamente como estava."""
+    seen = []
+    for arm in group:
+        anchor = arm.get("anchor") or arm["point"]
+        key = (anchor.X, anchor.Y)
+        if key not in seen:
+            seen.append(key)
+    if len(seen) == 1:
+        return XYZ(seen[0][0], seen[0][1], 0.0)
+    # Soma em ordem canonica: soma de float nao e' associativa, entao somar
+    # "na ordem em que apareceu" reintroduziria a dependencia de ordem que
+    # esta funcao existe para eliminar.
+    seen.sort()
+    total_x = 0.0
+    total_y = 0.0
+    for x, y in seen:
+        total_x += x
+        total_y += y
+    return XYZ(total_x / len(seen), total_y / len(seen), 0.0)
 
 
 def _classify_wall_node(group, junction_map, walls_to_create, tolerance_ft):
@@ -1087,7 +1287,7 @@ def _classify_wall_node(group, junction_map, walls_to_create, tolerance_ft):
     # _wall_node_arms. E' esse ponto que o solver da Etapa 4 usa para
     # encostar a celula de amarracao das pecas (B34 no L, B54 no T/X), entao
     # usar a ponta puxada deslocava a peca em meia espessura de parede.
-    point = group[0].get("anchor") or group[0]["point"]
+    point = _wall_node_group_point(group)
     arm_ids = [(a["wall_idx"], a["end_index"]) for a in group]
     node = {
         "point": point, "arms": arm_ids,
@@ -1281,7 +1481,23 @@ def _find_wall_midspan_crossings(walls_to_create, tolerance_ft):
             if not (margin_j <= t_j <= len_j - margin_j):
                 continue
 
-            crossings.append({"wall_a": i, "wall_b": j, "point": hit})
+            # ORDEM CANONICA DO PAR (CR-BLOCK-DETERMINISM, 2026-09-02).
+            # Era `(i, j)`, os INDICES na lista - e a ordem do par nao e'
+            # decorativa: solve_x_intersection da' a `crossing_walls[0]` o
+            # B54 da fiada A e a `crossing_walls[1]` o da fiada B. Sem
+            # canonizar, 17 cruzamentos da planta real trocavam as duas
+            # orientacoes de lugar so' de embaralhar a entrada.
+            key_i = _wall_graph_wall_key(walls_to_create, i)
+            key_j = _wall_graph_wall_key(walls_to_create, j)
+            wall_a, wall_b = (i, j) if key_i <= key_j else (j, i)
+            crossings.append({"wall_a": wall_a, "wall_b": wall_b, "point": hit})
+
+    # A lista tambem sai em ordem canonica: e' ela que define a posicao
+    # destes nos em `nodes`, e portanto o `node_index` que as pecas
+    # carregam.
+    crossings.sort(key=lambda c: ((c["point"].X, c["point"].Y),
+                                  _wall_graph_wall_key(walls_to_create, c["wall_a"]),
+                                  _wall_graph_wall_key(walls_to_create, c["wall_b"])))
     return crossings
 
 
@@ -1299,7 +1515,13 @@ def build_wall_graph(walls_to_create, junction_map,
         entram aqui, ja' que nao ha' end_index para eles).
     """
     arms = _wall_node_arms(walls_to_create, junction_map)
-    clusters = _cluster_wall_arms(arms, tolerance_ft)
+    # `walls_to_create` entra aqui so' para o agrupamento poder ordenar
+    # grupos e bracos por GEOMETRIA (ver _wall_graph_arm_key): a
+    # composicao de cada no' e' decidida pela componente conexa das
+    # ancoras, a ordem serve apenas para representar o no' e desempatar
+    # papeis simetricos (qual parede e' `main`, qual e' `crossing_walls[0]`)
+    # de um jeito que nao dependa da ordem de entrada.
+    clusters = _cluster_wall_arms(arms, tolerance_ft, walls_to_create)
 
     nodes = []
     end_to_node = {}

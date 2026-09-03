@@ -1,0 +1,106 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "ordem": "baseline (a ordem do input.json)",
+  "item_da_missao": 31,
+  "colunas": {
+    "MAIN_24ada98": "codigo da main ANTES do wall graph - numeros citados pela cross-audit (docs/BLOCK_DETERMINISM_CROSS_AUDIT.md, D6), nao remedidos aqui",
+    "WALL_GRAPH": "45161900 - wall graph canonico, APROVADO pela cross-audit",
+    "FINALIZACAO": "esta CR"
+  },
+  "MAIN_24ada98": {
+    "pieces": 10647,
+    "B19": 853,
+    "fonte": "cross-audit, secao D6"
+  },
+  "WALL_GRAPH": {
+    "alignment_conflicts": 0,
+    "by_code": {
+      "B19": 603,
+      "B34": 2539,
+      "B39": 4966,
+      "B54": 637,
+      "C04": 572,
+      "C09": 1254
+    },
+    "by_placement_reason": {
+      "L_CORNER": 969,
+      "L_CORNER_DEGRADED": 85,
+      "OPENING_REPAIR_FILL": 423,
+      "STANDARD_FILL": 7207,
+      "T_INTERSECTION_DEGRADED_L": 434,
+      "T_INTERSECTION_INCOMING": 454,
+      "T_INTERSECTION_INCOMING_DEGRADED": 354,
+      "T_INTERSECTION_MAIN": 509,
+      "X_INTERSECTION": 128,
+      "X_INTERSECTION_DEGRADED": 8
+    },
+    "collisions": 1034,
+    "door_void_violations": 290,
+    "intersection_failures": 200,
+    "n_rows_physical_layout": 10571,
+    "non_modular": 3111,
+    "pieces": 10571,
+    "project_id": "torre_easy_lo_r00_tgd",
+    "runtime_s": 2.749
+  },
+  "FINALIZACAO": {
+    "alignment_conflicts": 0,
+    "by_code": {
+      "B19": 595,
+      "B34": 2507,
+      "B39": 4979,
+      "B54": 637,
+      "C04": 587,
+      "C09": 1286
+    },
+    "by_placement_reason": {
+      "L_CORNER": 969,
+      "L_CORNER_DEGRADED": 85,
+      "OPENING_REPAIR_FILL": 426,
+      "STANDARD_FILL": 7224,
+      "T_INTERSECTION_DEGRADED_L": 434,
+      "T_INTERSECTION_INCOMING": 454,
+      "T_INTERSECTION_INCOMING_DEGRADED": 354,
+      "T_INTERSECTION_MAIN": 509,
+      "X_INTERSECTION": 128,
+      "X_INTERSECTION_DEGRADED": 8
+    },
+    "collisions": 1051,
+    "door_void_violations": 290,
+    "intersection_failures": 200,
+    "n_rows_physical_layout": 10591,
+    "non_modular": 3143,
+    "pieces": 10591,
+    "project_id": "torre_easy_lo_r00_tgd",
+    "runtime_s": 2.967
+  },
+  "delta_wall_graph_para_finalizacao": {
+    "pieces": 20,
+    "non_modular": 32,
+    "collisions": 17,
+    "intersection_failures": 0,
+    "alignment_conflicts": 0,
+    "door_void_violations": 0,
+    "by_code": {
+      "B19": -8,
+      "B34": -32,
+      "B39": 13,
+      "B54": 0,
+      "C04": 15,
+      "C09": 32
+    },
+    "by_placement_reason": {
+      "L_CORNER": 0,
+      "L_CORNER_DEGRADED": 0,
+      "OPENING_REPAIR_FILL": 3,
+      "STANDARD_FILL": 17,
+      "T_INTERSECTION_DEGRADED_L": 0,
+      "T_INTERSECTION_INCOMING": 0,
+      "T_INTERSECTION_INCOMING_DEGRADED": 0,
+      "T_INTERSECTION_MAIN": 0,
+      "X_INTERSECTION": 0,
+      "X_INTERSECTION_DEGRADED": 0
+    }
+  },
+  "leitura": "As pecas de AMARRACAO (L_CORNER, L_CORNER_DEGRADED, T_INTERSECTION_*, X_INTERSECTION*) tem delta ZERO em TODAS as categorias - a resolucao de L/T/X nao mudou (item 45 da missao). Todo o delta esta' no preenchimento: STANDARD_FILL +17 e OPENING_REPAIR_FILL +3. `alignment_conflicts` continua 0 e `door_void_violations`/`intersection_failures` nao se movem. `non_modular` sobe 32 em 10591 pecas - efeito de o solver deixar de escolher o layout pelo ruido de ultimo bit; a contrapartida e' que o mesmo eixo passa a fechar (ou nao fechar) IGUAL nas 24 ordens, em vez de variar entre 3111 e 3120."
+}

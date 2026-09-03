@@ -1,0 +1,134 @@
+{
+  "project_id": "piloto_sintetico_2x2",
+  "walls_already_extended": false,
+  "variantes_de_reversao_sao_validas_aqui": false,
+  "n_aberturas_deslocadas_pela_reversao": 8,
+  "deslocamentos_distintos_cm": [
+    14.0
+  ],
+  "amostra_deslocamentos": [
+    {
+      "wall": "(-7.0, 0.0, 357.0, 0.0, 14.0)",
+      "base_cm": [
+        153.0,
+        0.0
+      ],
+      "endpoint_reversal_cm": [
+        167.0,
+        0.0
+      ],
+      "deslocamento_cm": 14.0
+    },
+    {
+      "wall": "(-7.0, 700.0, 357.0, 700.0, 14.0)",
+      "base_cm": [
+        153.0,
+        700.0
+      ],
+      "endpoint_reversal_cm": [
+        167.0,
+        700.0
+      ],
+      "deslocamento_cm": 14.0
+    },
+    {
+      "wall": "(0.0, -7.0, 0.0, 357.0, 14.0)",
+      "base_cm": [
+        0.0,
+        153.0
+      ],
+      "endpoint_reversal_cm": [
+        0.0,
+        167.0
+      ],
+      "deslocamento_cm": 14.0
+    },
+    {
+      "wall": "(0.0, 343.0, 0.0, 707.0, 14.0)",
+      "base_cm": [
+        0.0,
+        503.0
+      ],
+      "endpoint_reversal_cm": [
+        0.0,
+        517.0
+      ],
+      "deslocamento_cm": 14.0
+    },
+    {
+      "wall": "(343.0, 0.0, 707.0, 0.0, 14.0)",
+      "base_cm": [
+        503.0,
+        0.0
+      ],
+      "endpoint_reversal_cm": [
+        517.0,
+        0.0
+      ],
+      "deslocamento_cm": 14.0
+    },
+    {
+      "wall": "(343.0, 350.0, 707.0, 350.0, 14.0)",
+      "base_cm": [
+        503.0,
+        350.0
+      ],
+      "endpoint_reversal_cm": [
+        517.0,
+        350.0
+      ],
+      "deslocamento_cm": 14.0
+    }
+  ],
+  "fingerprints_por_grupo": {
+    "permutacao": {
+      "n_variantes": 19,
+      "distintos": 1,
+      "grupos": {
+        "3066f0a295e9": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ]
+      }
+    },
+    "reversao": {
+      "n_variantes": 5,
+      "distintos": 5,
+      "grupos": {
+        "c6cfea9fe552": [
+          "endpoint_reversal"
+        ],
+        "5933c52cedbe": [
+          "reverse_horizontal_only"
+        ],
+        "2957fd72185c": [
+          "reverse_vertical_only"
+        ],
+        "c892338a4a5e": [
+          "random_endpoint_reversal_seed_1"
+        ],
+        "0fa70ccffcb4": [
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    }
+  },
+  "veredito": "As variantes de reversao NAO sao geometricamente equivalentes neste projeto: 8 abertura(s) mudam de lugar fisico (deslocamento [14.0] cm). Comparar esse grupo NAO mede determinismo - ele compara plantas diferentes. So' o grupo de PERMUTACAO e' conclusivo aqui."
+}

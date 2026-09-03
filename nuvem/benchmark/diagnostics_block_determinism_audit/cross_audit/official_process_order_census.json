@@ -1,0 +1,68 @@
+{
+  "mission_item": "18 - CENSO da REGRA OFICIAL #1 (ordem das paredes) - so' censo, NENHUMA implementacao",
+  "search_terms": ["order_walls_for_processing", "classify_wall_orientation", "sort",
+                    "wall order", "processing order", "stepper", "horizontal", "vertical"],
+  "official_rule_requested_by_user": {
+    "horizontals_first": "cima->baixo (Y decrescente), empate esquerda->direita (X crescente)",
+    "then_verticals": "esquerda->direita (X crescente), empate baixo->cima (Y crescente)",
+    "then_diagonals": "angulo canonico + posicao geometrica",
+    "endpoint_reversal_invariance": "endpoint reversal nunca pode alterar a ordem"
+  },
+  "finding_summary": "A regra pedida pelo usuario ja' existe em PRODUCAO, ja' e' a UNICA forma de decidir ordem de processamento entre paredes (nao ha' fallback que use ordem de lista), e e' EXATAMENTE a mesma regra (H top->bottom/L->R, depois V L->R/bottom->top, depois diagonais por posicao) - so' falta o TEXTO da regra estar em REGRAS_MODULACAO_BLOCOS.md (hoje so' referenciada como 'regra #5', sem o enunciado completo).",
+  "entries": [
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "order_walls_for_processing",
+      "lines": "5218-5300 (aprox)",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "Implementa EXATAMENTE a regra pedida: horizontais (Y decrescente, empate X crescente) -> verticais (X crescente, empate Y crescente) -> diagonais (cima->baixo/esquerda->direita, so' para nao ser arbitrario). Usa min/max de X/Y dos DOIS endpoints (x_min,x_max,y_min,y_max), nunca p0/p1 diretamente - e' geometricamente insensivel a endpoint reversal por construcao (trocar p0<->p1 nao muda min/max)."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "classify_wall_orientation",
+      "lines": "5185-5195",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "H/V/D a partir do vetor unitario do eixo (dx,dy), tolerancia de ~3 graus (WALL_ORIENTATION_TOLERANCE). Independente de sentido de desenho (usa abs(dx)/abs(dy))."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "_cluster_values_ft",
+      "lines": "5198-5215",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "Agrupa niveis/alinhamentos por varredura ORDENADA (sort + tolerancia), nao por ordem de descoberta - determinista, mesmo padrao que o CR-BLOCK-DETERMINISM usou para o grafo de paredes (union-find/ordenacao geometrica em vez de 'primeiro que chegou')."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "solve_wall_free_fill / solve_all_wall_free_fills (linha ~5694, ~5960)",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "`order = order_walls_for_processing(walls_to_create)` e' usado para decidir em que ordem as paredes sao processadas no loop principal de preenchimento (Etapa 'PAREDE INTEIRA' do pipeline oficial de aberturas, ver item 19/secao 23 do REGRAS_MODULACAO_BLOCOS.md). Nenhum outro caminho de codigo usa a ordem crua de `walls_to_create`/`input.json` para decidir SEQUENCIA de processamento entre paredes diferentes."
+    },
+    {
+      "file": "nuvem/core/wall_modeling.py",
+      "symbol": "comentario de topo mencionando order_walls_for_processing",
+      "lines": "~65",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "So' referencia a funcao (documentacao de arquitetura), nao redefine ordem propria."
+    },
+    {
+      "file": "tests/test_script.py",
+      "symbol": "testes de order_walls_for_processing/classify_wall_orientation",
+      "lines": "1370-1373, 2956",
+      "classification": "ALREADY_COMPLIANT",
+      "note": "Testes permanentes existentes confirmam H/V e a ordem resultante batem com a regra (nao encontrado teste que force endpoint-reversal-invariance explicitamente - GAP para o proximo CR, ver secao 'Proximos CRs' do relatorio)."
+    },
+    {
+      "file": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+      "symbol": "referencias a 'regra #5' (linhas 1198, 2239) e ao pedido do usuario (linha 1914) sem o ENUNCIADO completo em nenhuma secao numerada propria",
+      "classification": "PARTIALLY_COMPLIANT",
+      "note": "A regra E' seguida pelo codigo e E' citada como 'regra #5 ja' implementada', mas o ENUNCIADO completo (H top->bottom/L->R, V L->R/bottom->top, diagonais por posicao, invariancia a endpoint reversal) nunca aparece por extenso em nenhuma secao - so' no docstring de `order_walls_for_processing`. Recomendacao: seccao nova dedicada, ver 'PROPOSTA DE DUAS REGRAS ARQUITETURAIS OFICIAIS' no relatorio principal."
+    },
+    {
+      "file": "nuvem/core/engine/wall_stepper.py",
+      "symbol": "sort(...) em outros contextos (ex.: `_cluster_wall_arms`/wall_pairing.py, ja' auditado separadamente no CR-BLOCK-DETERMINISM)",
+      "classification": "NOT_RELEVANT",
+      "note": "Sao ordenacoes INTERNAS a uma unica parede/no' (posicao de peca dentro do vao, bracos de um mesmo no'), nao a SEQUENCIA de PROCESSAMENTO entre paredes diferentes que a regra oficial #1 rege. Fora do escopo deste censo."
+    }
+  ],
+  "gap_identified_for_next_cr": "Nenhum teste permanente encontrado que rode `order_walls_for_processing` numa planta com endpoint reversal aplicado a TODAS as paredes e confirme ordem identica (a invariancia e' hoje uma PROPRIEDADE MATEMATICA da implementacao - usa min/max - mas nao esta' testada explicitamente como tal)."
+}

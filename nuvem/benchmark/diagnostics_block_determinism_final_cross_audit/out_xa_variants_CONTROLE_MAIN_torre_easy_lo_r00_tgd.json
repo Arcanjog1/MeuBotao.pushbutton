@@ -1,0 +1,1780 @@
+{
+  "detalhe": [
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 3.997,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "b4c6b1e5c977860732dd7241e914a6ef21d32215aaa7da0aa89f1d32eb61159d",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "bcbece5f4400dec9a8ad71a11171ba67fa216ca9a68532717e6f9e14efaae3e6",
+        "node_positions": "e39e9782f32edf07926687214407d735055c4db78d0d68c8fbc07fa584fcc620",
+        "node_types": "aee66ca2295fe22427b50da66afa809512108702ce3a5cfe63985bd67973638e",
+        "physical_block_layouts": "012be6ab77d695c271bdb017a12136d3bf99ebcfb4576b66351ccf36ad265f21",
+        "physical_opening_repair_fill": "abacb4e8d6b261dd7dfdfe0f1e41ad1637cdd4ebfcc7436e439628b0868e56a5",
+        "physical_standard_fill": "4d7a68fa3fdfe33aea468c48da48d1a0985ae24c0384c1953c6eb24076076c4f",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "fa2c9a66b2078dc9fa2be382b29486a4ed92a6face70536b1986ea42d8037fbf"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22631,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10647,
+        "physical_opening_repair_fill": 432,
+        "physical_standard_fill": 7274,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "baseline"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.285,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "3df41c4b1ca775cdcdfe34aefc7992145d5f4eea4fee0651c44bf92a2e304211",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "be545b7fe37adbe38c6ace580b6cec9000ef73795f0897be78f6006263fca5ce",
+        "node_positions": "ac5475239ebc89f246a98c93bf6d8058430bb07adddb1e97c80aa72c3c53c6db",
+        "node_types": "0de25e8ccfe1c67d8464ab1dad749cd19f55fd2263c49e4b1dfdd768df57832d",
+        "physical_block_layouts": "90ab7059b5ddb7734c8f0f8dc8b02d34060e6daa7b2671ee93c05781599616d4",
+        "physical_opening_repair_fill": "d6ec3de92178e32f64f3795e0a29604e056e383d417914f76d6911edbf1e4f2a",
+        "physical_standard_fill": "88e5e5448d72a6571af070834123959749c4e2e90a462f999a5baad0a6c1fa7c",
+        "physical_ties": "71673ffcc648a332bacf0a7c90e5e816cd77c8e4daf29e59d14e4011ecb528d6",
+        "wall_end_to_node_canonical": "83eddc04bc3c1ba77e3f95dd15bc8417838af29af9cc81547f94d62497bf5752"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22545,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10601,
+        "physical_opening_repair_fill": 403,
+        "physical_standard_fill": 7223,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "reversed_order"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.349,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "e2f0c0773f5c47ebd3cfb04117fe81fcdb4722d3b7cc9bfc2ae60e3a2cd29090",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "74729d8f43ec03147e0322edad10549c10bcaae08f06da26bd0529adbd6b0143",
+        "node_positions": "62fdd4e1ee1b60a1e2bfaa1d132bda3db2045115b4b84897116c2aef1286b29d",
+        "node_types": "5eff4000fd34ab3af9ed5929b8794136ee392a1569f1173ccd669a9cc3f06dff",
+        "physical_block_layouts": "4d30fb8cc8e738472e5473eda1d51fe94946ac0889acc068412bdc4820605348",
+        "physical_opening_repair_fill": "9db1283cb198527b46bb489f94154c234c8a80f82280008ba711f4323dd2fdeb",
+        "physical_standard_fill": "4f5c8061808405fe9bd88b2fad7373b383463f3bc50a8517e49f36791c42ba54",
+        "physical_ties": "843b6360f1d117057cd858c3ee77e082a3f7ca207cf53d2012f2901264ae4f44",
+        "wall_end_to_node_canonical": "8e8777a100358117ce86b79ddd880ea1630285bcd867376a2578a211a2342929"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22572,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10616,
+        "physical_opening_repair_fill": 412,
+        "physical_standard_fill": 7246,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_1"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.298,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "86bd18c6243439bf5df207931926d4f9b66ee6ffc6c29cedef64c37bb9a90c10",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "9fb095364be3eec6ca9d7793a149f5c99dfe6be69cded38f561ddb9e229fe586",
+        "node_positions": "14543fbc480307e620b3c738f6c34bcda87b1f21607187f0ea3a32b184ad6666",
+        "node_types": "435ee659d387d7edbb286e0f8423560fe6e64044162ce98fe6f32817b5238792",
+        "physical_block_layouts": "dea06512b43c707e3aa54786caa28b6c85492a24f1071f49f430ec67370b3d59",
+        "physical_opening_repair_fill": "57336e14aa02a77b15c9237f7fe8ca5765d2e5d9e2d7ad398592d27fab883548",
+        "physical_standard_fill": "e90b68f9510eba47bc9b2dffaaa527085c15d1150068643d4924a87a81d616ce",
+        "physical_ties": "e33014782180643a8b7debc680bccdf5c76bdf880686078087922ab022bc3e39",
+        "wall_end_to_node_canonical": "591445e0ec730feff1fbc567888b0b434ed2dd8cc792c67958a361fa0d17aa48"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22713,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10685,
+        "physical_opening_repair_fill": 429,
+        "physical_standard_fill": 7281,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_2"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.378,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "ad50cb244271641eee6d4fc47c4f2cb4744e465a43554277a1c5fdbc8a05caa5",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "623167f3eb4e7715e17e0d98b4e4eabdca53dcfb9cb90b29ca100496920e546a",
+        "node_positions": "1d7a8503e4164beacb4fe85ad9027cf74aa12443d7a2042105c569d51f6b10cc",
+        "node_types": "cf3c119ece0f5060655bb188e79a2055a8d0aa803f4ae518f62e2a2a478b7424",
+        "physical_block_layouts": "ba405b34ba23a5bafe2f6980d378c5fba2857fc619c4032ca85ec970a6325eed",
+        "physical_opening_repair_fill": "7d1e1c62310e6764d40523285bc4e7683f1454be4ed11a41d848005a6b7f4d03",
+        "physical_standard_fill": "07b178f99a2ebfb773302e1e00f1504bf9b4cb8a886a0acf0495d62a8e5f2693",
+        "physical_ties": "6357a4f0a542bc2f02135b46a56f4ab5b37beb2e251e58cee1219f87a10ed59a",
+        "wall_end_to_node_canonical": "af2714f8633a4e2b63a9dc8fc99107b2cd1f6d3b3add2d734c96fbf5aced5a9c"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22735,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10696,
+        "physical_opening_repair_fill": 421,
+        "physical_standard_fill": 7300,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_3"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.542,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "9f4e657b9772a65083cbb4b06fc5ff848dae9fcca42e3bc5623dcf836bffa7aa",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "1d3002b2029de18b851cab69ced7072f0db596ca7c61b905cac24379b2cb6bb3",
+        "node_positions": "a040f171e00156ee8c7ca8430513e2ee1af883b81889c2ed1946475af5a7f540",
+        "node_types": "cdec669ee72b1452f4beee36dbc603b9988de3ff38d79c948f47661667109c6e",
+        "physical_block_layouts": "f735ca91eeb6a303de2034bbac047646f7c97a546dc9b19e6d8e1b2458c327ca",
+        "physical_opening_repair_fill": "3dcd74f1f83a96af535cff155ec620ec4ef516d5cc70480609283126524ea794",
+        "physical_standard_fill": "963804027aed55b498dc206947234a8bfbf8b502eb05d5a680caadc897ca91d2",
+        "physical_ties": "ad0ab5bf6ec382dee9e9b998684614924b1b4fe37ab144c8bae44f8c45e80a74",
+        "wall_end_to_node_canonical": "93316cca731aa7885f61854ae2d8d3157a2e413746ae79a64adcb92a5c2f59ac"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22478,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10569,
+        "physical_opening_repair_fill": 416,
+        "physical_standard_fill": 7195,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_10"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.406,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "4dd09ab7f6ab3cb0db58cce00bf9985dcf6d1704eee12280a7eec9a32eaae5de",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "f4f60685b6f230eec1e89314c1146225a03c1a5df8581e3c6a7b1c062dea9781",
+        "node_positions": "2a4df37f815d6defeb592c3dbf4d37fdf2b9b7606d3a69e670305edd044757cd",
+        "node_types": "26b688e491847a1eef0369af215471e57616db8580a95636cfe5970ce3880592",
+        "physical_block_layouts": "6da33f2fd298185123595abd3510575c48039052c10425adafae2dfcc43db445",
+        "physical_opening_repair_fill": "269edf7ba4144fb48fd0f3acd1b8560d374e047235012552c774c40c1ee05d12",
+        "physical_standard_fill": "ba70c84d00fd736d10cd2709207565d646996795d3dae262f0c4fe8db4193357",
+        "physical_ties": "017d2c88129f40cf83c8b514fceb11e9f3c69bb4cd89ef8a81a9072a8cccb102",
+        "wall_end_to_node_canonical": "8bd928a89b09baee173f54f22f6c0bf3d6fdc420a51b03190c14c9eb3039d666"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22472,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10566,
+        "physical_opening_repair_fill": 424,
+        "physical_standard_fill": 7184,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_42"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.422,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "512df18e4f6c7c91862b38d23d788e06721c57f2ae3db47198ede686cd47d3d4",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "adf6c41d57074ba42a601eb681e939c9ac10f70cfb78d525e47c9656aa2fca7c",
+        "node_positions": "9c2e5999921a26a0368ff8e75f42d33a4c6884643a9efbf80fec4f687a71346f",
+        "node_types": "88e54ccdcd5a188190540a0c665272cd33b7fc8067da539f1788bb80166a6e35",
+        "physical_block_layouts": "7d074208733c44698f8394c1609ac04154f470f7cdee82bc585465117ca4246e",
+        "physical_opening_repair_fill": "c60b97eda49ec4a0029d2db7ff09df013080032ae49a36805b7e6990efcc11b7",
+        "physical_standard_fill": "9800261d9c1490119c4904e489c3b36b310246409f5ffe5343b9ec57fe860268",
+        "physical_ties": "78e9fa618eeeb0989a14a154f5cbe48b93c3f32e216576fbdf37711f7eafccc3",
+        "wall_end_to_node_canonical": "38b212a83a551b7666e0e42836849afc097c3ffc3dd5c006ca47b0b5a3ae8568"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22526,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10593,
+        "physical_opening_repair_fill": 425,
+        "physical_standard_fill": 7210,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_5"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.534,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "9cafbf04d68f27717103238cbb3ebf8c0a7422ead221146f1bf01a0edabf46c8",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "5a3fac03453db5843daa474c4353613bfbf9c67f7db8eeb36d18a744d5de6e7f",
+        "node_positions": "d29eaa3e70e520d03262b7b4671e0563433cfd7d88277b3a45b860514c64c172",
+        "node_types": "db9f3ce9367cc063b37d2529dced579c298fe4f9ec96f36eca70f71ce0a8ca4c",
+        "physical_block_layouts": "02dc9af598825c53a0574255ccc300510b3be2b676e3e6a482e8bb57900141c3",
+        "physical_opening_repair_fill": "82e6ea6929e06d45904a5f43763d335b51e9fb1810eba27e39a0a9023ed0d05e",
+        "physical_standard_fill": "364e74279f2fb573583de2be2abdee49e19d55a499e9632c42586f9133d673f7",
+        "physical_ties": "2dd5f641c658bde859ad01161e2577c69af524e7e396181f2ea0f10af4f8bc49",
+        "wall_end_to_node_canonical": "0f5b7511d5a05fe99a6f59a20ad726a4c9e41a44ad6c7904165e7ed57afe5a9a"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22647,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10652,
+        "physical_opening_repair_fill": 423,
+        "physical_standard_fill": 7254,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_7"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.3,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "dad539f8af5cb9791115c76a2b05b5ca90936350585876e615c8c1c8940a28e4",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "7cd12adb600919d28f93a2b85b6825ef2c5c5023d4263870027f2fbe6447cda6",
+        "node_positions": "a3e962b1cf5b449b1f2a5dda21746016179a557bf631873d3ad4e0b92c4e3c93",
+        "node_types": "0b35b8349a05a081fa4cef4b4c8590dbdc06f5e3ebc933c47415a90f69a1713a",
+        "physical_block_layouts": "56153b4ef08e797047883cc96d25ccb58e00db8b02c3f66a1828b2b13c1e0010",
+        "physical_opening_repair_fill": "8ceff0f88147775f56245e5ea83b8c33a10dec37bc8ae40be880bd53a6a87e1e",
+        "physical_standard_fill": "41f02b13d4289cfbeec504bed69a16b6e761d75d2759901f58e601795c9c5542",
+        "physical_ties": "85dbfde514c9e30bb9f20f76a8d9d0333b94afdcb806fb348304ac048b0e4716",
+        "wall_end_to_node_canonical": "d7d8db441260140e69538b824a5a1fc9dbed458d8ac0c201ef24fb660dc33c0e"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22486,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10573,
+        "physical_opening_repair_fill": 423,
+        "physical_standard_fill": 7192,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_11"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.883,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "d95e4abb00084b1f4db17607a1bd31d81a9b7c0db773ba1fd648d48e484ea4f0",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "4199af8b95e274ade4f4ab0704766f46f179a019b21b012a1b8c82325ece51a0",
+        "node_positions": "c0b6961fdc32ad5befd18b4bb82b1b5719f0ae1414cebf0231699dbd29d8ed5b",
+        "node_types": "4c7573d499a7a7f68b30584d0c5f18db3f0c62b71ea26864b1939cf7eee7cd6b",
+        "physical_block_layouts": "08b49603dace8f198d6761cca073274803587758b35934ce1b21e5fd95766671",
+        "physical_opening_repair_fill": "2c53ef7bb21bb9ebd5b04e768faf1ae41c91c81789f1685e474ea3b2d849db4c",
+        "physical_standard_fill": "178e44dcc816fc6394f25d975ac69ab453618afa7022e26c50aac1ba7b5c4328",
+        "physical_ties": "699afe1522c4d2ba012c2d4fa5e7062b750358af2f25bcd8375a8da0115316e0",
+        "wall_end_to_node_canonical": "92c15b7b47dafe646bc5884e670d208bf66bc854a6ee776ffa72be61f094e030"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22494,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10577,
+        "physical_opening_repair_fill": 416,
+        "physical_standard_fill": 7203,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_13"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.362,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "3bfcd64d80ef57ac36c2df54b42c559d345bcdd33e781a477b2665c0dd36ab68",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "fd475c0a70c7c3506180127624e6672c83023bdba0c989f6a9297f420f73c589",
+        "node_positions": "11a304f3c74028948231289d7c303100b5e621040dddfb50de1c243fd4b8e3e2",
+        "node_types": "7e12b85713e24d72dd5625470f5f7e097bf595c3ce97d059cc1783021625116b",
+        "physical_block_layouts": "d9b7c32d2149ea115a06058dc82630f616ea587cd81a281a8755024a3f6c1e95",
+        "physical_opening_repair_fill": "d937c73b4637fbb590ccb1de323c8c764d6bef7832c7488c2bef0081abf99c7c",
+        "physical_standard_fill": "52853e19bf2544a4b78dfeb3eb67237b63d1413feeb2527f7091181e626c4720",
+        "physical_ties": "7e28db3c00c77f5cad805f217b6387fe9e6cd92553d3bd184a85f23fe5d10c8d",
+        "wall_end_to_node_canonical": "608dbbe476cc7c3e21bf0ff3509292cb8d828c4262204d92b5a0c883b75f2c4a"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22480,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10570,
+        "physical_opening_repair_fill": 423,
+        "physical_standard_fill": 7189,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_17"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.417,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "25b3705af276da5ad40abc7a3d4d143ea103b1e7b1b453b4169af774b4e9a895",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "e088b26629136c75aa233b5855f193b574dd0d3c0b2ef1411521912adba70e20",
+        "node_positions": "82678080d25a5404fab8a5a24a1cb017793f11e5a40caec5c2b1df223a3b6e8f",
+        "node_types": "5393958c60c6bb99a87d79b72e24b46cd8e8f93bb3ffd7d8760d19949a744323",
+        "physical_block_layouts": "bb782af21c8562be4b8de49c9f39063406ec31a65031255222a36f5e47d6bda7",
+        "physical_opening_repair_fill": "d1affaa0ec6dd7085969cab9139d945c377208e8de42509fc4ac406d95105011",
+        "physical_standard_fill": "3d5d26e170434834fdd3d9aed3109204de27def8c18000d02a2e5f6e7131d313",
+        "physical_ties": "47c21034d3e14c5a5fd3d3ba5b050f0cb6411106c7e0493805c2906eb9dbd946",
+        "wall_end_to_node_canonical": "74832d4f556ca87849da7a0189707003b960b75e608a29d889eb9b0d7737a5ea"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22497,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10577,
+        "physical_opening_repair_fill": 420,
+        "physical_standard_fill": 7182,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_23"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.807,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "5163d63245296d6b3e9f8ed331b5b13f68ef687d5ed82afb85deaf5d7f919bb6",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "8864bc12f20f4fcea5f24aced5db7a2c5e832808d710f957b51c9308fb01ff50",
+        "node_positions": "c00cc2b028cc1b83ce9f4a10ece6f82f07c3987f5923a4ddf2eb77c1b98de042",
+        "node_types": "3e307076e178b816451b6da376ffbef4e315e027556f2d7ef178ce42fb4102b5",
+        "physical_block_layouts": "f4af94605836215d8275fe78a12cf14193e98f6a62a5eae11e01074a13dcb7f1",
+        "physical_opening_repair_fill": "403e1d4a2a9e0f4e26e55fff0ca9dabee8dd73c08a71ffc04b7a3a0a182e7b27",
+        "physical_standard_fill": "d1514d825116b7aac0504c15785d7cc15ba0e5e734489d75725a3a129ca8e973",
+        "physical_ties": "43173ec15b0f270f9cc1845345a8b5318ab0de2abad859e85f9fa96a38ba4511",
+        "wall_end_to_node_canonical": "6dc5f9a4dfa15854ed5323d8698d1ebcb949c4c953d6e623cfc4c91931f756fb"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22611,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10634,
+        "physical_opening_repair_fill": 410,
+        "physical_standard_fill": 7249,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_50"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.549,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "d3402a8f5c93f8b76443a8bd48e97c27281c6e51883f0d6a9dca5893a375d348",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "5cecd93b5d93a85fd14b4acee40b300ce6f6b2767f0a05e54f59cfc071ef4846",
+        "node_positions": "668c89a6c59190d767ffb725b560e1aa7a2cf42f3cdb17cbdaa441cce247d96f",
+        "node_types": "b40c231fb78289fcae9fdfdec73e62b7657343308fdff4a18c5462bcbf5fbbfb",
+        "physical_block_layouts": "5d06a5b13fa86d2fffefa84567a7dbd27bc4dbd1803d7e046b7e75d2b05536b3",
+        "physical_opening_repair_fill": "5bfd616e70a33758463042ec7dde2102ba476496cd1e285aa289dce7eddfed6e",
+        "physical_standard_fill": "a49318584fe466ba9898fa70420340bff85327597757aa6efd692c921572ff64",
+        "physical_ties": "6e0a500e1a5c0c4f060c71cdafd961a97f548e2a31e2336cc4bef51c67d9618c",
+        "wall_end_to_node_canonical": "93ced493ecdd9ddffbd2107aecfdbf7d848fd19eab27d7cd4ab23329ef759b9f"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22605,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10631,
+        "physical_opening_repair_fill": 420,
+        "physical_standard_fill": 7236,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_99"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.427,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "078d317d73b4542f9b8e4c12b5fdcc2a6c32cb62998b3b5ed5a3638de3ef52e9",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "ba57c9de2e6cd5b1ca8c5c0518975aa9feda3d2e9974ea1323f12649612792ac",
+        "node_positions": "82678080d25a5404fab8a5a24a1cb017793f11e5a40caec5c2b1df223a3b6e8f",
+        "node_types": "60765593fc3f788b82ea2facb657ff26818693cdf5dc59b80ded6aed0b84f2fe",
+        "physical_block_layouts": "e7442593ce1fdf44e80e7ed3e550897eef4c79cdcff0d803136e0a6e0cf402ef",
+        "physical_opening_repair_fill": "f8b75d64506238ba7abb8c9ff8cadc3f8112992a815fc6357dc3d7090bf8a781",
+        "physical_standard_fill": "56398f4382498b45279cc0256ecaea695d55b2af90063f1471870f709d2f59f5",
+        "physical_ties": "6a9b066e0d76b69e780cd6ec38854773700317e54c8ed789b73eaad0198a2a4f",
+        "wall_end_to_node_canonical": "2445d78a612653d8edae4c0249d98cdf45ffaa44fb3b0898ee6f2015442dbba1"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22621,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10639,
+        "physical_opening_repair_fill": 420,
+        "physical_standard_fill": 7244,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_123"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.525,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "bc3ecb6d0700ba1fffaa23bff06f3d2aba6a8cd0d2bac1f176eefcad775aa9a8",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "479b3e230c9ddc104551099170d3ff56c7c0dda110d9caa27daa8878654281a2",
+        "node_positions": "037ace1b52a363926c73f7c15b6af76c2d62b6ee67378cfc98b2b51b328b23d9",
+        "node_types": "70814c94d39fac7609e92addb0d75843d0dcc062c8dddc0532805c283dbb8745",
+        "physical_block_layouts": "36fe46a0c87b7ee71ee343ad48905d3e21660bb4526a90097a1c4214472f6b33",
+        "physical_opening_repair_fill": "33497d7aabecca119bcf4ede65160b78934aa8d992d9718e8df2648b17bf1eb9",
+        "physical_standard_fill": "0de1a8292e0051b56307c78211024cddc30f61b047a1fcd6a5e6aafebbf96796",
+        "physical_ties": "86c906cd1043b5cee7ba59c5967311cebe8da086c42d4f593fffea4d02e85ce4",
+        "wall_end_to_node_canonical": "1fe9238c2e9b8e05bb706ed83ff1715162e8187322edef4716f76e812c167121"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22474,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10567,
+        "physical_opening_repair_fill": 417,
+        "physical_standard_fill": 7192,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_seed_999"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.396,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "996d238a6f45d7e7b5298094be190004b10693616940715cd766eb64a6985e04",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "69f9fab03c1ae3134d43fc965112c1931d0d370e6e3db3632063c53149d7e433",
+        "node_positions": "f1dc4f61c0bb8176ca81272d0f68e513a1e45a236b083276e141dcbed526be37",
+        "node_types": "7f487e46cc401ae5d854cc55b157ee4e3c13147db35ec8f12bdb3807c0302ffa",
+        "physical_block_layouts": "e771a5f7bc713b77cc54878ef4e8e5babf7ebfdfe2e5ad8adfda44b115041635",
+        "physical_opening_repair_fill": "d937c73b4637fbb590ccb1de323c8c764d6bef7832c7488c2bef0081abf99c7c",
+        "physical_standard_fill": "5c282feda7b717dfdd731971317d17a677850375e7a3b225bcf29cd2cd65edb0",
+        "physical_ties": "0328169af2dfc300c41829edc0e166ed6a0761650703716f7b26946c76b15a6b",
+        "wall_end_to_node_canonical": "ee6aa06ff079667e17106157d3f674170d02cf43bb2d3e5d4040c1d35d5c9fcb"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22479,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10571,
+        "physical_opening_repair_fill": 423,
+        "physical_standard_fill": 7207,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "geometric_sort"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.198,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "7c23094ab2bd9c30fe09b09d6575082a089499de62999da29fa44474e6a796e1",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "76ac83e5e4e93998a66c6bc8ad7dafebf45b0e1e00f19a7dc4f4699365743652",
+        "node_positions": "2064117a98619c589bb7881a7ae71ab457c181949de80dc83569d10785a19dce",
+        "node_types": "94f06c142d8f25294f6248e8be8292dffbb686442ab94204fc500b07f0b285f5",
+        "physical_block_layouts": "d539507ef53ad99e031f7d93096b1d52471bc4607226aee4cea834cf2c83c5e0",
+        "physical_opening_repair_fill": "6ee92476af0780c15f3047cf6461a7ce818cf036622f94d141dd1f0aefabbd6e",
+        "physical_standard_fill": "74d486c23742dbae546ac66c9edda75295ab23d6f22355c8d8f28f6c6597b7ef",
+        "physical_ties": "83824424d0a19bea1f515e4363b8d74c9840ad418a74d982d615337532b2d258",
+        "wall_end_to_node_canonical": "a40fade51e12aa9ccfb08a51dd2d78c657d7cb2edf12cf9ccc5023ca0e93d418"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22425,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10541,
+        "physical_opening_repair_fill": 412,
+        "physical_standard_fill": 7154,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "geometric_sort_reversed"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.392,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "828470134c80333d7e41fc99d71847faa4facb191d1a6104293250f9e048a279",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "c550efebc1ed52e0a012490cdf22dae70680c644a76beaec164358769bdbf220",
+        "node_positions": "a9a9a198e367f0a8936fefbf8b0f50313d467373bfe86051f53ae094a5a959d2",
+        "node_types": "60da6559b52444ed7dfe6003d5e2405c6d269b59597e70945f607108faf3684f",
+        "physical_block_layouts": "5e1b968e51a1becea73e2093212660a97b86a4f3f164b6c540fc6f06e2598fc2",
+        "physical_opening_repair_fill": "2c53ef7bb21bb9ebd5b04e768faf1ae41c91c81789f1685e474ea3b2d849db4c",
+        "physical_standard_fill": "662d8895d3d87bf90ffe0c5f446180002ca1259679e21803921214b994058bb6",
+        "physical_ties": "656f328d7c6e857bac07d114779c270f84a667142bb2496a399bf7449df31d34",
+        "wall_end_to_node_canonical": "677ffdc01665b54745ba0230980f1022feca4597b794801122d572014702a966"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22618,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 274,
+        "node_positions": 274,
+        "node_types": 274,
+        "physical_block_layouts": 10639,
+        "physical_opening_repair_fill": 416,
+        "physical_standard_fill": 7265,
+        "physical_ties": 2958,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_within_orientation_seed_1"
+    },
+    {
+      "aberturas_iguais": true,
+      "eixos_iguais": true,
+      "elapsed_s": 4.597,
+      "family": "permutacao",
+      "layers": {
+        "global_result": "04bb07feae973f7ab42a857bde022ce1caa65499946b452f7996ad073fd232ae",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "6bfe589bac6758aa4fb814e73816a5d82d42511251060fff4430f5dea820f540",
+        "node_positions": "65007c9c4e4e2b0029810488266783b7eeb1a51a8a1b2a4b90d3cadae2e9d726",
+        "node_types": "78a1bbf07251e9a9fd4d115358b4a751ca8d820de26feffbc987607e803d84a5",
+        "physical_block_layouts": "74d87a6644695b7153232c6c84a959066d6f3429b44c1d03ebe0f9a636953e7c",
+        "physical_opening_repair_fill": "55ba972f9133a0359f37ea79df50aa3448b2b219e441b3132c6e3704d39f6961",
+        "physical_standard_fill": "30d8a4dfde488809dcae2fa41d8f807782743dd04b4f188c6586855b555de0d8",
+        "physical_ties": "517d40eafd720a70e3168619e9b961d2ae5644eb00b60189a1982dbb650f5146",
+        "wall_end_to_node_canonical": "acf9a0f0fad24f9a73b9c2fdea33c78e6882207d4402ba08eccd9af0f9ff6871"
+      },
+      "maior_deslocamento_de_abertura_cm": null,
+      "n_rows": {
+        "global_result": 22593,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 275,
+        "node_positions": 275,
+        "node_types": 275,
+        "physical_block_layouts": 10625,
+        "physical_opening_repair_fill": 414,
+        "physical_standard_fill": 7236,
+        "physical_ties": 2975,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "VALID_METAMORPHIC_VARIANT",
+      "variant": "shuffle_within_orientation_seed_2"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.363,
+      "family": "reversao_ingenua",
+      "layers": {
+        "global_result": "2d0157bad7a10d24bcd4a1a9ba8f8931c4d3247a84a8259080ab6b3b52b18f44",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "0fb1722e498ad8d4bdda2d76c1960064095cc5154f3bcf511ab86ea572d6a7f7",
+        "node_positions": "dd3f41d1cc1244998c82eecd07fbabac9e7bcdb540ed69c2393d1b2643f80107",
+        "node_types": "2fe2d0fb352540f9dc5ead3d0a21c0e76b65c15476fc9087a632ad63e2b2ecdf",
+        "physical_block_layouts": "80dca57f9dbeaab8f7cf0762dae1519121ea4d1a13cd6b0f7c92087d0918a1a2",
+        "physical_opening_repair_fill": "135091fcf0b505b2353eb223dba20ee35e17182d35ffa1321a6d21532d9076d8",
+        "physical_standard_fill": "227e0e641966929af3372500ca6b29440c0cd1af809e2d21624b4aa70d03a9c3",
+        "physical_ties": "56200600c85ec0c9f3f39daa629e3307ef9a7c22be7d32f2d82e6357176423ab",
+        "wall_end_to_node_canonical": "a0a0980e8b91a18d956d7ff5a6f575a4c6563f2c5161a382e795d1150eda2cd2"
+      },
+      "maior_deslocamento_de_abertura_cm": 709.48,
+      "n_rows": {
+        "global_result": 22561,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10612,
+        "physical_opening_repair_fill": 406,
+        "physical_standard_fill": 7265,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_naive_all"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.385,
+      "family": "reversao_geometrica",
+      "layers": {
+        "global_result": "2d0157bad7a10d24bcd4a1a9ba8f8931c4d3247a84a8259080ab6b3b52b18f44",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "0fb1722e498ad8d4bdda2d76c1960064095cc5154f3bcf511ab86ea572d6a7f7",
+        "node_positions": "dd3f41d1cc1244998c82eecd07fbabac9e7bcdb540ed69c2393d1b2643f80107",
+        "node_types": "2fe2d0fb352540f9dc5ead3d0a21c0e76b65c15476fc9087a632ad63e2b2ecdf",
+        "physical_block_layouts": "80dca57f9dbeaab8f7cf0762dae1519121ea4d1a13cd6b0f7c92087d0918a1a2",
+        "physical_opening_repair_fill": "135091fcf0b505b2353eb223dba20ee35e17182d35ffa1321a6d21532d9076d8",
+        "physical_standard_fill": "227e0e641966929af3372500ca6b29440c0cd1af809e2d21624b4aa70d03a9c3",
+        "physical_ties": "56200600c85ec0c9f3f39daa629e3307ef9a7c22be7d32f2d82e6357176423ab",
+        "wall_end_to_node_canonical": "a0a0980e8b91a18d956d7ff5a6f575a4c6563f2c5161a382e795d1150eda2cd2"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22561,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10612,
+        "physical_opening_repair_fill": 406,
+        "physical_standard_fill": 7265,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_geometric_all"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.552,
+      "family": "reversao_ingenua",
+      "layers": {
+        "global_result": "f22356cb18bba8e300f7fa96ad6b45ed87313369bac31ac70032718b38d4b4a2",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "f6bb680f45aa8b282273a78398640e261eebff93aecbaea41b434501f366bf60",
+        "node_positions": "787bbe708da109bfddafdc9f745f798e824580ddf73895ca0b26158cbab93824",
+        "node_types": "9c1e690aef2b16356b30242d160835681032929b32f63bbcc789e59528f8e131",
+        "physical_block_layouts": "501571eaa0b51c6232650314e33c45f23007e310635960c76ca51f4c9c8241ec",
+        "physical_opening_repair_fill": "135091fcf0b505b2353eb223dba20ee35e17182d35ffa1321a6d21532d9076d8",
+        "physical_standard_fill": "6fd782d4b9ebea5d85ac701b45167e379ba761400908f19ae1940fc38ce73be0",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "abd21e4266482923a5e6185b267d54987ab5d44844d64b8d1d4098cee95e51f5"
+      },
+      "maior_deslocamento_de_abertura_cm": 709.48,
+      "n_rows": {
+        "global_result": 22607,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10635,
+        "physical_opening_repair_fill": 406,
+        "physical_standard_fill": 7288,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_naive_horizontal_only"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.653,
+      "family": "reversao_geometrica",
+      "layers": {
+        "global_result": "f22356cb18bba8e300f7fa96ad6b45ed87313369bac31ac70032718b38d4b4a2",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "f6bb680f45aa8b282273a78398640e261eebff93aecbaea41b434501f366bf60",
+        "node_positions": "787bbe708da109bfddafdc9f745f798e824580ddf73895ca0b26158cbab93824",
+        "node_types": "9c1e690aef2b16356b30242d160835681032929b32f63bbcc789e59528f8e131",
+        "physical_block_layouts": "501571eaa0b51c6232650314e33c45f23007e310635960c76ca51f4c9c8241ec",
+        "physical_opening_repair_fill": "135091fcf0b505b2353eb223dba20ee35e17182d35ffa1321a6d21532d9076d8",
+        "physical_standard_fill": "6fd782d4b9ebea5d85ac701b45167e379ba761400908f19ae1940fc38ce73be0",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "abd21e4266482923a5e6185b267d54987ab5d44844d64b8d1d4098cee95e51f5"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22607,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10635,
+        "physical_opening_repair_fill": 406,
+        "physical_standard_fill": 7288,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_geometric_horizontal_only"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.55,
+      "family": "reversao_ingenua",
+      "layers": {
+        "global_result": "c1986092c63670dc1c54cb03e5bf393d41f68c02171d04fe44924c00889c9e3b",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "1e8da95b9ad530fc79f7401b1594e7971587dd7ddb632c105883bbf25ae56dab",
+        "node_positions": "da3739c939a0009290ed56738bcef7655b0afa52af17c62f60004111b07851ba",
+        "node_types": "92bb82f7978698b6499f85f9165ca1d0ee2163585c3770be01c0d6530367ace8",
+        "physical_block_layouts": "9cc3d26775c681334f00437cfee9b008ccd2af3169cc44c4a8d2db18653eb27e",
+        "physical_opening_repair_fill": "abacb4e8d6b261dd7dfdfe0f1e41ad1637cdd4ebfcc7436e439628b0868e56a5",
+        "physical_standard_fill": "05a6ade82df5d89b3d384c0926ce539141da220fb07a4e5db430b866d2f1b125",
+        "physical_ties": "56200600c85ec0c9f3f39daa629e3307ef9a7c22be7d32f2d82e6357176423ab",
+        "wall_end_to_node_canonical": "7f590843a3428a0027f48ea67e72b4eb2475b45251478c46ba2dbf18234b2b60"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22585,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10624,
+        "physical_opening_repair_fill": 432,
+        "physical_standard_fill": 7251,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_naive_vertical_only"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.622,
+      "family": "reversao_geometrica",
+      "layers": {
+        "global_result": "c1986092c63670dc1c54cb03e5bf393d41f68c02171d04fe44924c00889c9e3b",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "1e8da95b9ad530fc79f7401b1594e7971587dd7ddb632c105883bbf25ae56dab",
+        "node_positions": "da3739c939a0009290ed56738bcef7655b0afa52af17c62f60004111b07851ba",
+        "node_types": "92bb82f7978698b6499f85f9165ca1d0ee2163585c3770be01c0d6530367ace8",
+        "physical_block_layouts": "9cc3d26775c681334f00437cfee9b008ccd2af3169cc44c4a8d2db18653eb27e",
+        "physical_opening_repair_fill": "abacb4e8d6b261dd7dfdfe0f1e41ad1637cdd4ebfcc7436e439628b0868e56a5",
+        "physical_standard_fill": "05a6ade82df5d89b3d384c0926ce539141da220fb07a4e5db430b866d2f1b125",
+        "physical_ties": "56200600c85ec0c9f3f39daa629e3307ef9a7c22be7d32f2d82e6357176423ab",
+        "wall_end_to_node_canonical": "7f590843a3428a0027f48ea67e72b4eb2475b45251478c46ba2dbf18234b2b60"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22585,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10624,
+        "physical_opening_repair_fill": 432,
+        "physical_standard_fill": 7251,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_geometric_vertical_only"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.41,
+      "family": "reversao_ingenua",
+      "layers": {
+        "global_result": "940b8f814ab16d14011a31358647639d2d7fb497ef9365c7a4a878fc2439b14f",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "4a4216534cc1b47ba6d79893bbb3883d67fb54f0eeb8676c883450fbad0becf7",
+        "node_positions": "a641450eb95567b8447a5335a16ddfac25b6185eceeced1f6addbd7d7e9e3408",
+        "node_types": "814028003b4138b0a89fcaf834284c5acc9acbb04718f075e699b6f7ecf88870",
+        "physical_block_layouts": "aa5a7a1f19aa25343aa034f89cb6653ff639e9736fa49cdd4ff60d94ba1ba9b4",
+        "physical_opening_repair_fill": "a5a4f36baf99a4c44107c281eb4dfe77b830341717f8f755cc3018ead53688ff",
+        "physical_standard_fill": "727d22b9a0ae648be46d451aba531f429211b9435684b3fb13982cd08109c7ff",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "1f3601d05bd334293743f7d6104dff66c9c795238289cf33915001ce93344a46"
+      },
+      "maior_deslocamento_de_abertura_cm": 709.48,
+      "n_rows": {
+        "global_result": 22527,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10595,
+        "physical_opening_repair_fill": 392,
+        "physical_standard_fill": 7262,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_naive_random_seed_1"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.363,
+      "family": "reversao_geometrica",
+      "layers": {
+        "global_result": "940b8f814ab16d14011a31358647639d2d7fb497ef9365c7a4a878fc2439b14f",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "4a4216534cc1b47ba6d79893bbb3883d67fb54f0eeb8676c883450fbad0becf7",
+        "node_positions": "a641450eb95567b8447a5335a16ddfac25b6185eceeced1f6addbd7d7e9e3408",
+        "node_types": "814028003b4138b0a89fcaf834284c5acc9acbb04718f075e699b6f7ecf88870",
+        "physical_block_layouts": "aa5a7a1f19aa25343aa034f89cb6653ff639e9736fa49cdd4ff60d94ba1ba9b4",
+        "physical_opening_repair_fill": "a5a4f36baf99a4c44107c281eb4dfe77b830341717f8f755cc3018ead53688ff",
+        "physical_standard_fill": "727d22b9a0ae648be46d451aba531f429211b9435684b3fb13982cd08109c7ff",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "1f3601d05bd334293743f7d6104dff66c9c795238289cf33915001ce93344a46"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22527,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10595,
+        "physical_opening_repair_fill": 392,
+        "physical_standard_fill": 7262,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_geometric_random_seed_1"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.563,
+      "family": "reversao_ingenua",
+      "layers": {
+        "global_result": "7e0bd1436c6bd94bab877ee4b94c2ca54fa0e82e6c557b1af0845d682f4fbddd",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "97c7def7cbc4d9d546ed78b01ef06a7038fc6f0526562c34821d68386a944a05",
+        "node_positions": "c5c63e0678a0af4bc3c4bbb3df321cf679f05208cbccaed50ca4c84dea3ffaa0",
+        "node_types": "f8393d451f593f2a4f348b7c0d0d29203e70b7038d074ab64f0869ee8f3a0a6a",
+        "physical_block_layouts": "4b76f09918e1289cfc0f7c05046d7725039d7ff967f667457cf954101c65a027",
+        "physical_opening_repair_fill": "e99a543fa671f1217933fdd44c8200ef193f00e474cb4597c4b9da1fd9408c5c",
+        "physical_standard_fill": "c1d4356187976ed20c5c51e20362de82b8ec8d0dc7ce397b79a3a7e1c679ddf9",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "90c0f88b080e3e115c60e3ab96944cbea7d97ad8146bb3c6e5b7948c746aa825"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22531,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10597,
+        "physical_opening_repair_fill": 402,
+        "physical_standard_fill": 7254,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_naive_random_seed_2"
+    },
+    {
+      "aberturas_iguais": false,
+      "eixos_iguais": true,
+      "elapsed_s": 4.42,
+      "family": "reversao_geometrica",
+      "layers": {
+        "global_result": "7e0bd1436c6bd94bab877ee4b94c2ca54fa0e82e6c557b1af0845d682f4fbddd",
+        "input_wall_geometry": "cf612bae376823a78fc39c892127bc55e9fec37cd3e84035d8b07d03f957e15a",
+        "midspan_crossings": "2eabab20e2ce9b87d9c695712752b85c6f63c34a84ead161c04d4bfff758d5dc",
+        "node_arms": "97c7def7cbc4d9d546ed78b01ef06a7038fc6f0526562c34821d68386a944a05",
+        "node_positions": "c5c63e0678a0af4bc3c4bbb3df321cf679f05208cbccaed50ca4c84dea3ffaa0",
+        "node_types": "f8393d451f593f2a4f348b7c0d0d29203e70b7038d074ab64f0869ee8f3a0a6a",
+        "physical_block_layouts": "4b76f09918e1289cfc0f7c05046d7725039d7ff967f667457cf954101c65a027",
+        "physical_opening_repair_fill": "e99a543fa671f1217933fdd44c8200ef193f00e474cb4597c4b9da1fd9408c5c",
+        "physical_standard_fill": "c1d4356187976ed20c5c51e20362de82b8ec8d0dc7ce397b79a3a7e1c679ddf9",
+        "physical_ties": "bbb77693154706ad09c780e652fc6d68bb302d08908455e4ca19899d09c98301",
+        "wall_end_to_node_canonical": "90c0f88b080e3e115c60e3ab96944cbea7d97ad8146bb3c6e5b7948c746aa825"
+      },
+      "maior_deslocamento_de_abertura_cm": 0.0,
+      "n_rows": {
+        "global_result": 22531,
+        "input_wall_geometry": 167,
+        "midspan_crossings": 17,
+        "node_arms": 273,
+        "node_positions": 273,
+        "node_types": 273,
+        "physical_block_layouts": 10597,
+        "physical_opening_repair_fill": 402,
+        "physical_standard_fill": 7254,
+        "physical_ties": 2941,
+        "wall_end_to_node_canonical": 334
+      },
+      "validity": "INVALID_METAMORPHIC_VARIANT",
+      "variant": "reversal_geometric_random_seed_2"
+    }
+  ],
+  "fingerprints_por_camada_SOMENTE_VARIANTES_VALIDAS": {
+    "global_result": {
+      "grupos": {
+        "04bb07feae97": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "078d317d73b4": [
+          "shuffle_seed_123"
+        ],
+        "25b3705af276": [
+          "shuffle_seed_23"
+        ],
+        "3bfcd64d80ef": [
+          "shuffle_seed_17"
+        ],
+        "3df41c4b1ca7": [
+          "reversed_order"
+        ],
+        "4dd09ab7f6ab": [
+          "shuffle_seed_42"
+        ],
+        "512df18e4f6c": [
+          "shuffle_seed_5"
+        ],
+        "5163d6324529": [
+          "shuffle_seed_50"
+        ],
+        "7c23094ab2bd": [
+          "geometric_sort_reversed"
+        ],
+        "828470134c80": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "86bd18c62434": [
+          "shuffle_seed_2"
+        ],
+        "996d238a6f45": [
+          "geometric_sort"
+        ],
+        "9cafbf04d68f": [
+          "shuffle_seed_7"
+        ],
+        "9f4e657b9772": [
+          "shuffle_seed_10"
+        ],
+        "ad50cb244271": [
+          "shuffle_seed_3"
+        ],
+        "b4c6b1e5c977": [
+          "baseline"
+        ],
+        "bc3ecb6d0700": [
+          "shuffle_seed_999"
+        ],
+        "d3402a8f5c93": [
+          "shuffle_seed_99"
+        ],
+        "d95e4abb0008": [
+          "shuffle_seed_13"
+        ],
+        "dad539f8af5c": [
+          "shuffle_seed_11"
+        ],
+        "e2f0c0773f5c": [
+          "shuffle_seed_1"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "input_wall_geometry": {
+      "grupos": {
+        "cf612bae3768": [
+          "baseline",
+          "geometric_sort",
+          "geometric_sort_reversed",
+          "reversed_order",
+          "shuffle_seed_1",
+          "shuffle_seed_10",
+          "shuffle_seed_11",
+          "shuffle_seed_123",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_2",
+          "shuffle_seed_23",
+          "shuffle_seed_3",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_50",
+          "shuffle_seed_7",
+          "shuffle_seed_99",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ]
+      },
+      "n_fingerprints": 1
+    },
+    "midspan_crossings": {
+      "grupos": {
+        "2eabab20e2ce": [
+          "baseline",
+          "geometric_sort",
+          "geometric_sort_reversed",
+          "reversed_order",
+          "shuffle_seed_1",
+          "shuffle_seed_10",
+          "shuffle_seed_11",
+          "shuffle_seed_123",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_2",
+          "shuffle_seed_23",
+          "shuffle_seed_3",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_50",
+          "shuffle_seed_7",
+          "shuffle_seed_99",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ]
+      },
+      "n_fingerprints": 1
+    },
+    "node_arms": {
+      "grupos": {
+        "1d3002b2029d": [
+          "shuffle_seed_10"
+        ],
+        "4199af8b95e2": [
+          "shuffle_seed_13"
+        ],
+        "479b3e230c9d": [
+          "shuffle_seed_999"
+        ],
+        "5a3fac03453d": [
+          "shuffle_seed_7"
+        ],
+        "5cecd93b5d93": [
+          "shuffle_seed_99"
+        ],
+        "623167f3eb4e": [
+          "shuffle_seed_3"
+        ],
+        "69f9fab03c1a": [
+          "geometric_sort"
+        ],
+        "6bfe589bac67": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "74729d8f43ec": [
+          "shuffle_seed_1"
+        ],
+        "76ac83e5e4e9": [
+          "geometric_sort_reversed"
+        ],
+        "7cd12adb6009": [
+          "shuffle_seed_11"
+        ],
+        "8864bc12f20f": [
+          "shuffle_seed_50"
+        ],
+        "9fb095364be3": [
+          "shuffle_seed_2"
+        ],
+        "adf6c41d5707": [
+          "shuffle_seed_5"
+        ],
+        "ba57c9de2e6c": [
+          "shuffle_seed_123"
+        ],
+        "bcbece5f4400": [
+          "baseline"
+        ],
+        "be545b7fe37a": [
+          "reversed_order"
+        ],
+        "c550efebc1ed": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "e088b2662913": [
+          "shuffle_seed_23"
+        ],
+        "f4f60685b6f2": [
+          "shuffle_seed_42"
+        ],
+        "fd475c0a70c7": [
+          "shuffle_seed_17"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "node_positions": {
+      "grupos": {
+        "037ace1b52a3": [
+          "shuffle_seed_999"
+        ],
+        "11a304f3c740": [
+          "shuffle_seed_17"
+        ],
+        "14543fbc4803": [
+          "shuffle_seed_2"
+        ],
+        "1d7a8503e416": [
+          "shuffle_seed_3"
+        ],
+        "2064117a9861": [
+          "geometric_sort_reversed"
+        ],
+        "2a4df37f815d": [
+          "shuffle_seed_42"
+        ],
+        "62fdd4e1ee1b": [
+          "shuffle_seed_1"
+        ],
+        "65007c9c4e4e": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "668c89a6c591": [
+          "shuffle_seed_99"
+        ],
+        "82678080d25a": [
+          "shuffle_seed_123",
+          "shuffle_seed_23"
+        ],
+        "9c2e5999921a": [
+          "shuffle_seed_5"
+        ],
+        "a040f171e001": [
+          "shuffle_seed_10"
+        ],
+        "a3e962b1cf5b": [
+          "shuffle_seed_11"
+        ],
+        "a9a9a198e367": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "ac5475239ebc": [
+          "reversed_order"
+        ],
+        "c00cc2b028cc": [
+          "shuffle_seed_50"
+        ],
+        "c0b6961fdc32": [
+          "shuffle_seed_13"
+        ],
+        "d29eaa3e70e5": [
+          "shuffle_seed_7"
+        ],
+        "e39e9782f32e": [
+          "baseline"
+        ],
+        "f1dc4f61c0bb": [
+          "geometric_sort"
+        ]
+      },
+      "n_fingerprints": 20
+    },
+    "node_types": {
+      "grupos": {
+        "0b35b8349a05": [
+          "shuffle_seed_11"
+        ],
+        "0de25e8ccfe1": [
+          "reversed_order"
+        ],
+        "26b688e49184": [
+          "shuffle_seed_42"
+        ],
+        "3e307076e178": [
+          "shuffle_seed_50"
+        ],
+        "435ee659d387": [
+          "shuffle_seed_2"
+        ],
+        "4c7573d499a7": [
+          "shuffle_seed_13"
+        ],
+        "5393958c60c6": [
+          "shuffle_seed_23"
+        ],
+        "5eff4000fd34": [
+          "shuffle_seed_1"
+        ],
+        "60765593fc3f": [
+          "shuffle_seed_123"
+        ],
+        "60da6559b524": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "70814c94d39f": [
+          "shuffle_seed_999"
+        ],
+        "78a1bbf07251": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "7e12b85713e2": [
+          "shuffle_seed_17"
+        ],
+        "7f487e46cc40": [
+          "geometric_sort"
+        ],
+        "88e54ccdcd5a": [
+          "shuffle_seed_5"
+        ],
+        "94f06c142d8f": [
+          "geometric_sort_reversed"
+        ],
+        "aee66ca2295f": [
+          "baseline"
+        ],
+        "b40c231fb782": [
+          "shuffle_seed_99"
+        ],
+        "cdec669ee72b": [
+          "shuffle_seed_10"
+        ],
+        "cf3c119ece0f": [
+          "shuffle_seed_3"
+        ],
+        "db9f3ce9367c": [
+          "shuffle_seed_7"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "physical_block_layouts": {
+      "grupos": {
+        "012be6ab77d6": [
+          "baseline"
+        ],
+        "02dc9af59882": [
+          "shuffle_seed_7"
+        ],
+        "08b49603dace": [
+          "shuffle_seed_13"
+        ],
+        "36fe46a0c87b": [
+          "shuffle_seed_999"
+        ],
+        "4d30fb8cc8e7": [
+          "shuffle_seed_1"
+        ],
+        "56153b4ef08e": [
+          "shuffle_seed_11"
+        ],
+        "5d06a5b13fa8": [
+          "shuffle_seed_99"
+        ],
+        "5e1b968e51a1": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "6da33f2fd298": [
+          "shuffle_seed_42"
+        ],
+        "74d87a664469": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "7d074208733c": [
+          "shuffle_seed_5"
+        ],
+        "90ab7059b5dd": [
+          "reversed_order"
+        ],
+        "ba405b34ba23": [
+          "shuffle_seed_3"
+        ],
+        "bb782af21c85": [
+          "shuffle_seed_23"
+        ],
+        "d539507ef53a": [
+          "geometric_sort_reversed"
+        ],
+        "d9b7c32d2149": [
+          "shuffle_seed_17"
+        ],
+        "dea06512b43c": [
+          "shuffle_seed_2"
+        ],
+        "e7442593ce1f": [
+          "shuffle_seed_123"
+        ],
+        "e771a5f7bc71": [
+          "geometric_sort"
+        ],
+        "f4af94605836": [
+          "shuffle_seed_50"
+        ],
+        "f735ca91eeb6": [
+          "shuffle_seed_10"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "physical_opening_repair_fill": {
+      "grupos": {
+        "269edf7ba414": [
+          "shuffle_seed_42"
+        ],
+        "2c53ef7bb21b": [
+          "shuffle_seed_13",
+          "shuffle_within_orientation_seed_1"
+        ],
+        "33497d7aabec": [
+          "shuffle_seed_999"
+        ],
+        "3dcd74f1f83a": [
+          "shuffle_seed_10"
+        ],
+        "403e1d4a2a9e": [
+          "shuffle_seed_50"
+        ],
+        "55ba972f9133": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "57336e14aa02": [
+          "shuffle_seed_2"
+        ],
+        "5bfd616e70a3": [
+          "shuffle_seed_99"
+        ],
+        "6ee92476af07": [
+          "geometric_sort_reversed"
+        ],
+        "7d1e1c62310e": [
+          "shuffle_seed_3"
+        ],
+        "82e6ea6929e0": [
+          "shuffle_seed_7"
+        ],
+        "8ceff0f88147": [
+          "shuffle_seed_11"
+        ],
+        "9db1283cb198": [
+          "shuffle_seed_1"
+        ],
+        "abacb4e8d6b2": [
+          "baseline"
+        ],
+        "c60b97eda49e": [
+          "shuffle_seed_5"
+        ],
+        "d1affaa0ec6d": [
+          "shuffle_seed_23"
+        ],
+        "d6ec3de92178": [
+          "reversed_order"
+        ],
+        "d937c73b4637": [
+          "geometric_sort",
+          "shuffle_seed_17"
+        ],
+        "f8b75d645062": [
+          "shuffle_seed_123"
+        ]
+      },
+      "n_fingerprints": 19
+    },
+    "physical_standard_fill": {
+      "grupos": {
+        "07b178f99a2e": [
+          "shuffle_seed_3"
+        ],
+        "0de1a8292e00": [
+          "shuffle_seed_999"
+        ],
+        "178e44dcc816": [
+          "shuffle_seed_13"
+        ],
+        "30d8a4dfde48": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "364e74279f2f": [
+          "shuffle_seed_7"
+        ],
+        "3d5d26e17043": [
+          "shuffle_seed_23"
+        ],
+        "41f02b13d428": [
+          "shuffle_seed_11"
+        ],
+        "4d7a68fa3fdf": [
+          "baseline"
+        ],
+        "4f5c80618084": [
+          "shuffle_seed_1"
+        ],
+        "52853e19bf25": [
+          "shuffle_seed_17"
+        ],
+        "56398f438249": [
+          "shuffle_seed_123"
+        ],
+        "5c282feda7b7": [
+          "geometric_sort"
+        ],
+        "662d8895d3d8": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "74d486c23742": [
+          "geometric_sort_reversed"
+        ],
+        "88e5e5448d72": [
+          "reversed_order"
+        ],
+        "963804027aed": [
+          "shuffle_seed_10"
+        ],
+        "9800261d9c14": [
+          "shuffle_seed_5"
+        ],
+        "a49318584fe4": [
+          "shuffle_seed_99"
+        ],
+        "ba70c84d00fd": [
+          "shuffle_seed_42"
+        ],
+        "d1514d825116": [
+          "shuffle_seed_50"
+        ],
+        "e90b68f9510e": [
+          "shuffle_seed_2"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "physical_ties": {
+      "grupos": {
+        "017d2c88129f": [
+          "shuffle_seed_42"
+        ],
+        "0328169af2df": [
+          "geometric_sort"
+        ],
+        "2dd5f641c658": [
+          "shuffle_seed_7"
+        ],
+        "43173ec15b0f": [
+          "shuffle_seed_50"
+        ],
+        "47c21034d3e1": [
+          "shuffle_seed_23"
+        ],
+        "517d40eafd72": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "6357a4f0a542": [
+          "shuffle_seed_3"
+        ],
+        "656f328d7c6e": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "699afe1522c4": [
+          "shuffle_seed_13"
+        ],
+        "6a9b066e0d76": [
+          "shuffle_seed_123"
+        ],
+        "6e0a500e1a5c": [
+          "shuffle_seed_99"
+        ],
+        "71673ffcc648": [
+          "reversed_order"
+        ],
+        "78e9fa618eee": [
+          "shuffle_seed_5"
+        ],
+        "7e28db3c00c7": [
+          "shuffle_seed_17"
+        ],
+        "83824424d0a1": [
+          "geometric_sort_reversed"
+        ],
+        "843b6360f1d1": [
+          "shuffle_seed_1"
+        ],
+        "85dbfde514c9": [
+          "shuffle_seed_11"
+        ],
+        "86c906cd1043": [
+          "shuffle_seed_999"
+        ],
+        "ad0ab5bf6ec3": [
+          "shuffle_seed_10"
+        ],
+        "bbb776931547": [
+          "baseline"
+        ],
+        "e33014782180": [
+          "shuffle_seed_2"
+        ]
+      },
+      "n_fingerprints": 21
+    },
+    "wall_end_to_node_canonical": {
+      "grupos": {
+        "0f5b7511d5a0": [
+          "shuffle_seed_7"
+        ],
+        "1fe9238c2e9b": [
+          "shuffle_seed_999"
+        ],
+        "2445d78a6126": [
+          "shuffle_seed_123"
+        ],
+        "38b212a83a55": [
+          "shuffle_seed_5"
+        ],
+        "591445e0ec73": [
+          "shuffle_seed_2"
+        ],
+        "608dbbe476cc": [
+          "shuffle_seed_17"
+        ],
+        "677ffdc01665": [
+          "shuffle_within_orientation_seed_1"
+        ],
+        "6dc5f9a4dfa1": [
+          "shuffle_seed_50"
+        ],
+        "74832d4f556c": [
+          "shuffle_seed_23"
+        ],
+        "83eddc04bc3c": [
+          "reversed_order"
+        ],
+        "8bd928a89b09": [
+          "shuffle_seed_42"
+        ],
+        "8e8777a10035": [
+          "shuffle_seed_1"
+        ],
+        "92c15b7b47da": [
+          "shuffle_seed_13"
+        ],
+        "93316cca731a": [
+          "shuffle_seed_10"
+        ],
+        "93ced493ecdd": [
+          "shuffle_seed_99"
+        ],
+        "a40fade51e12": [
+          "geometric_sort_reversed"
+        ],
+        "acf9a0f0fad2": [
+          "shuffle_within_orientation_seed_2"
+        ],
+        "af2714f8633a": [
+          "shuffle_seed_3"
+        ],
+        "d7d8db441260": [
+          "shuffle_seed_11"
+        ],
+        "ee6aa06ff079": [
+          "geometric_sort"
+        ],
+        "fa2c9a66b207": [
+          "baseline"
+        ]
+      },
+      "n_fingerprints": 21
+    }
+  },
+  "n_invalidas": 10,
+  "n_validas": 21,
+  "n_variantes": 31,
+  "project_id": "torre_easy_lo_r00_tgd",
+  "variantes_invalidas": {
+    "2d0157bad7a1": [
+      "reversal_naive_all",
+      "reversal_geometric_all"
+    ],
+    "7e0bd1436c6b": [
+      "reversal_naive_random_seed_2",
+      "reversal_geometric_random_seed_2"
+    ],
+    "940b8f814ab1": [
+      "reversal_naive_random_seed_1",
+      "reversal_geometric_random_seed_1"
+    ],
+    "c1986092c636": [
+      "reversal_naive_vertical_only",
+      "reversal_geometric_vertical_only"
+    ],
+    "f22356cb18bb": [
+      "reversal_naive_horizontal_only",
+      "reversal_geometric_horizontal_only"
+    ]
+  },
+  "walls_already_extended": true
+}

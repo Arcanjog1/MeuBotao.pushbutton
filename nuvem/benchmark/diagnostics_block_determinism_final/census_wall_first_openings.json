@@ -1,0 +1,93 @@
+{
+  "cr": "CR-BLOCK-DETERMINISM / FINALIZACAO",
+  "data": "2026-09-02",
+  "regra": "REGRA FUNDAMENTAL 3 - parede completa primeiro, abertura depois",
+  "metodo": "busca global no repositorio por continuous_first / split_first / OPENING_STRATEGY / DEFAULT_OPENING_STRATEGY / opening / recut / repair / jamb / pier / solve_wall_free_fill / solve_building_blocks, em .py, .md, testes e benchmarks",
+  "ocorrencias": [
+    {
+      "arquivo": "nuvem/core/engine/continuous_modulation.py",
+      "secao": "linhas 56-58",
+      "comportamento_atual": "OPENING_STRATEGY_SPLIT_FIRST = 'split_first'; OPENING_STRATEGY_CONTINUOUS_FIRST = 'continuous_first'; DEFAULT_OPENING_STRATEGY = OPENING_STRATEGY_CONTINUOUS_FIRST",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO - e' o unico ponto que define o default e ja' aponta para continuous_first"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "solve_wall_free_fill - strategy = opening_strategy or DEFAULT_OPENING_STRATEGY",
+      "comportamento_atual": "sem parametro explicito cai sempre em continuous_first; com continuous_first as aberturas NAO entram em `base_boundaries` (a parede e' modulada de no' a no')",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "_recut_openings_and_repair / _solve_repair_subsegments / opening_repair_regions",
+      "comportamento_atual": "FASES 2 e 3: recorta os vaos sobre a modulacao pronta, REMOVE INTEIRAS as pecas que os invadem e recalcula SO' a regiao afetada",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO (so' os extents passaram a viver na grade de snap, sem mudanca de regra)"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "solve_wall_free_fill - degradacao controlada (continuity_degraded)",
+      "comportamento_atual": "quando o eixo INTEIRO nao fecha, e SO' entao, a variante e' refeita usando as aberturas daquele trecho como quebra - registrado explicitamente em `continuity_degraded`",
+      "classificacao": "LEGACY_SPLIT_FIRST (degradacao bounded e ROTULADA, permitida pelo item 21 da missao)",
+      "acao": "PRESERVADO - nao e' caminho principal e nunca e' silencioso"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "solve_opening_jamb / solve_all_opening_jambs",
+      "comportamento_atual": "so' alcancado no modo split_first (ou na degradacao acima); em continuous_first `jamb_exceptions` sai vazio",
+      "classificacao": "LEGACY_SPLIT_FIRST",
+      "acao": "PRESERVADO"
+    },
+    {
+      "arquivo": "nuvem/core/wall_modeling.py",
+      "secao": "solve_building_blocks_all_courses(..., opening_strategy=None)",
+      "comportamento_atual": "repassa None -> DEFAULT_OPENING_STRATEGY; nenhum chamador de producao passa split_first",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO"
+    },
+    {
+      "arquivo": "nuvem/core/wall_modeling.py",
+      "secao": "analyze_created_walls_for_errors -> process_walls_one_by_one",
+      "comportamento_atual": "nao passa opening_strategy - cai no default",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO"
+    },
+    {
+      "arquivo": "tests/test_script.py",
+      "secao": "linhas ~1291-1308 e ~7273-7315",
+      "comportamento_atual": "unicos pontos do repositorio que passam OPENING_STRATEGY_SPLIT_FIRST, sempre explicitamente, para COMPARAR os dois modos",
+      "classificacao": "LEGACY_SPLIT_FIRST (uso legitimo, comparativo)",
+      "acao": "PRESERVADO"
+    },
+    {
+      "arquivo": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+      "secao": "23. PIPELINE OFICIAL DE ABERTURAS",
+      "comportamento_atual": "regra ja' documentada por extenso desde 2026-08-28",
+      "classificacao": "OFFICIAL_CONTINUOUS_FIRST",
+      "acao": "PRESERVADO + referencia cruzada nova a partir da REGRA FUNDAMENTAL 3"
+    },
+    {
+      "arquivo": "docs/BLOCK_MODULATION_AUDIT.md",
+      "secao": "P2-3, jamb_exceptions=172 em modo continuous_first",
+      "comportamento_atual": "pendencia PRE-EXISTENTE ja' registrada, nao criada por este CR",
+      "classificacao": "AMBIGUOUS",
+      "acao": "nenhuma - fora do escopo (item 47 da missao)"
+    }
+  ],
+  "resumo": {
+    "OFFICIAL_CONTINUOUS_FIRST": 5,
+    "LEGACY_SPLIT_FIRST": 3,
+    "CONTRADICTS": 0,
+    "AMBIGUOUS": 1,
+    "NOT_RELEVANT": 0
+  },
+  "veredito": "NENHUMA CONTRADICAO EM PRODUCAO. continuous_first e' o unico default; split_first so' e' alcancado por parametro explicito (testes comparativos) e pela degradacao bounded e rotulada. Confirma a cross-audit anterior. NADA foi reescrito.",
+  "testes_permanentes": [
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_040_continuous_first_e_o_default",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_041_split_first_so_roda_quando_pedido_explicitamente",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_042_uma_parede_com_duas_aberturas_nao_vira_tres_paredes",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_043_duas_aberturas_invariantes_a_inversao_no_modo_continuo",
+    "tests/test_script.py (linha ~7301) - DEFAULT_OPENING_STRATEGY == CONTINUOUS_FIRST"
+  ]
+}

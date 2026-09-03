@@ -1,0 +1,421 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "n_variants": 8,
+  "runs": [
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "c8da06d82097451291954d334fb1f4bfdaa03868f4b5d85524fd9959aed1c38c",
+      "fp_node_classifications": "316867808732d052d3079e4b48855b1807f50fb6b34188e69c6e4483de0b3b63",
+      "fp_end_to_node": "b21baaf3ec470af7f6e325886a6c7400b14ad4910ec2b7158034d1ca98b9931d",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "b0bbf6fb74f4bbe0fdbc7060c5978e009205f2697f1bd8d0386b9802ea03d7c7",
+      "n_walls": 167,
+      "n_nodes": 273,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5368,
+      "fp_blocks": "d415620a319ad0de6583e02325bbde67b1cbce477a662e6667300ac066be0df5",
+      "n_pieces": 10647,
+      "fp_candidates": "b824447f892c18803e4a7fab5ba4b907dc8eb06c6903fb2612e63a2e4d163341",
+      "n_candidates": 10145,
+      "n_non_modular": 3023,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.5607,
+      "name": "baseline",
+      "total_elapsed_s": 2.0975
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "5e4dbe6289de557271c934cd05809fb9885e1c21ce1eaa1138445b15f50d38d3",
+      "fp_node_classifications": "bf9e8d0fe2c4b7e51318db18f526432eb4e4abada7a1dde1dde1abe214e1bbc9",
+      "fp_end_to_node": "4483875b3a01ad8d99612edc223660650ee92c4f38d4f1d3596e56c1cd822fc2",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "3879d2949443dc4e8d0007f080645e1fb0dde13dea842337b3da1926424a9cfb",
+      "n_walls": 167,
+      "n_nodes": 275,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5299,
+      "fp_blocks": "78e62f7eea5f24ccf63791eb14837127c73e113af980d8c475441b52a62a0291",
+      "n_pieces": 10601,
+      "fp_candidates": "d8b0dab546e9bea8e44bf42473bf80cda1b7675913117248ec32ba61b738ebb9",
+      "n_candidates": 10098,
+      "n_non_modular": 3063,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.6661,
+      "name": "reversed",
+      "total_elapsed_s": 2.196
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "c87fdecc0b44198e5e8f34643091ec6788e5c16e136114772bb655d81757328f",
+      "fp_node_classifications": "b8a0082f3bfa11f0db1d0c586464eccfbd4b85938cba6a8f43788294b9bf194d",
+      "fp_end_to_node": "cdb60f5e59308869bc571ec31f7d0a1fe26dbe87018ad5dfce9cbc3965190d4c",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "b0bbf6fb74f4bbe0fdbc7060c5978e009205f2697f1bd8d0386b9802ea03d7c7",
+      "n_walls": 167,
+      "n_nodes": 273,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5511,
+      "fp_blocks": "75cc5bf4e1db9297bfe39189c1578cee894126366cfb5c09dbf3e365e103dc63",
+      "n_pieces": 10612,
+      "fp_candidates": "79e72afe70cb268fc7535d5ae8e8c8084ef24152f34af104748db5df612e4bf7",
+      "n_candidates": 10113,
+      "n_non_modular": 3048,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1050,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.5486,
+      "name": "endpoint_reversal",
+      "total_elapsed_s": 2.0997
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "a0233a697d3e820ef5a288a74e3ac14cd5beaab05685525b17add259693eca48",
+      "fp_node_classifications": "d7bea6f983d8b5aabd0c3e75d444f772dc897682fa2e642eea37fc2047e4f65f",
+      "fp_end_to_node": "49907f5922f6db50e0010ad07414e490c0d75c919b7749a848e64502205b3cc8",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "4232febca0a2e7d155c8233e94fa54d85f20623567d763602f37d81e7bf4f308",
+      "n_walls": 167,
+      "n_nodes": 274,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.4784,
+      "fp_blocks": "7e1b8b7ca428e829812dca29e0d4aac2ca26a57985176ac46e25a08ce2e6e5da",
+      "n_pieces": 10616,
+      "fp_candidates": "e64b4dc7063b0cbab7f55297a53c9c3d7af86c03219fc0584aa72c053bcd6825",
+      "n_candidates": 10105,
+      "n_non_modular": 3055,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.5202,
+      "name": "shuffle_seed_1",
+      "total_elapsed_s": 1.9986
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "0db9a5f1698cf3463ab9222629b2e45c21ca884f95de772ec21b27cadd636806",
+      "fp_node_classifications": "c488d8830833f66f53262a52c632ad677432eb6ec599b45e6a9fc3e6fac0d08f",
+      "fp_end_to_node": "14f36580d4bcdecceaa2e3160078c6132a6d4d41d24570d241d2d370405f2ae1",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "a1b1d6359ef4aa15af64f63cb18d5b719a7d05666057f8b2db260f25bacb466a",
+      "n_walls": 167,
+      "n_nodes": 275,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5269,
+      "fp_blocks": "0263958ffdf655fd65e4bf8431af7e37d1dffecdded5d75d8ae1bee733ddd163",
+      "n_pieces": 10685,
+      "fp_candidates": "8eca5b4e9306a85bd7e8b1ae3cde687f38f82df9f3ba43506877f6ca1e0bb996",
+      "n_candidates": 10178,
+      "n_non_modular": 3087,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.5697,
+      "name": "shuffle_seed_2",
+      "total_elapsed_s": 2.0966
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "12666a105041fdf5148a5e280201aae9872edc7027b66a84a7e3f42b52ed7b2a",
+      "fp_node_classifications": "ac5bec2e8008c87bcbc5298115e84af4c4015af536e9b02bec24bdd31505dae0",
+      "fp_end_to_node": "26e663a1c14c8c798b810c6f411c68bb9aec627f2441b089dfa648facba16b00",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "f48e9bbdff89037ecb7ffd8365c874db7b9c71b88ab45dffc96de67919703116",
+      "n_walls": 167,
+      "n_nodes": 275,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5036,
+      "fp_blocks": "8f126ed17406f1f1b5b407837f130888f896c3d74216f720c4830910440eb6fb",
+      "n_pieces": 10696,
+      "fp_candidates": "4eb6dade0e7a0ebebcf692a59fa8c1efedfad6aa4d457a3f65d0aa36071d4427",
+      "n_candidates": 10194,
+      "n_non_modular": 3039,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.4566,
+      "name": "shuffle_seed_3",
+      "total_elapsed_s": 1.9602
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "2872f09a6dd10d5d67b329f2287acd21b7b3d81a9cc292bd4818efb63882ef50",
+      "fp_node_classifications": "3a08f039c848f0ebe18b2a2bbe7457d5e9132924488a43d0ed51de2d6898eee6",
+      "fp_end_to_node": "3a23d91b3aaab2a5afb78d1a5b98b5da3b0b56ea94523d7ded1d219482d7dcff",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "cf80c3a1b569017572fc43a30690a39323c12f1752413e8462e30f939dc7c927",
+      "n_walls": 167,
+      "n_nodes": 274,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5153,
+      "fp_blocks": "355067bf2289d5ff4978e6f83cb3cc9f2c9be9f03c289fdeeb4824ff8b839952",
+      "n_pieces": 10569,
+      "fp_candidates": "7d3df0009047ed0ec02bf0c45b37eb3ca6121ad9ffb812b54266569c07cc2bb9",
+      "n_candidates": 10074,
+      "n_non_modular": 3063,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.4828,
+      "name": "shuffle_seed_10",
+      "total_elapsed_s": 1.9981
+    },
+    {
+      "fp_input_walls": "d326ea6d7fc8aafefb2283c71c8baf9246e13d525f04ed8e450a839d5cf1ce4e",
+      "fp_nodes": "fedc312ca1135b75fe25bf267efb71f342c548e3981731006cad975401640f07",
+      "fp_node_classifications": "a81a35de83b6a6988a42caeefe519b02dde84c78b310d3fe4126ca603f351362",
+      "fp_end_to_node": "4d2bbaed93fc07647384fdd7082fed5046b3df327fb9fcb49b2720e65e68baf9",
+      "fp_midspan": "68ca22438f047cb03b2d7653e48eebd4d45b50a0760336a42057afb1297506fe",
+      "fp_ltx_reservations": "874a52bfcbd608309d89de0b07b4ac5f8d7f796805410d80fddb6aab28086e83",
+      "n_walls": 167,
+      "n_nodes": 274,
+      "kinds": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "plan_elapsed_s": 0.5473,
+      "fp_blocks": "20a9235e112d82c7acb1e15a4aa5b57f75690dea2d5f38c2dfc735018e4e359f",
+      "n_pieces": 10566,
+      "fp_candidates": "7d39ce70688bdfa152f7086b876ef24862d2e9a95fcea3724cb3ea53832ac503",
+      "n_candidates": 10062,
+      "n_non_modular": 3103,
+      "n_intersection_failures": 200,
+      "n_alignment_conflicts": 0,
+      "n_collisions": 1034,
+      "n_door_void_violations": 290,
+      "solve_elapsed_s": 1.6043,
+      "name": "shuffle_seed_42",
+      "total_elapsed_s": 2.1516
+    }
+  ],
+  "distinct_fingerprints_by_layer": {
+    "fp_input_walls": 1,
+    "fp_nodes": 8,
+    "fp_node_classifications": 8,
+    "fp_end_to_node": 8,
+    "fp_midspan": 1,
+    "fp_ltx_reservations": 7,
+    "fp_candidates": 8,
+    "fp_blocks": 8
+  },
+  "divergences": [
+    {
+      "variant": "reversed",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 275
+    },
+    {
+      "variant": "endpoint_reversal",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 273
+    },
+    {
+      "variant": "shuffle_seed_1",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 274
+    },
+    {
+      "variant": "shuffle_seed_2",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 275
+    },
+    {
+      "variant": "shuffle_seed_3",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 120,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 275
+    },
+    {
+      "variant": "shuffle_seed_10",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 274
+    },
+    {
+      "variant": "shuffle_seed_42",
+      "first_divergent_layer": "fp_nodes",
+      "kinds_baseline": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 118,
+        "X_INTERSECTION": 17
+      },
+      "kinds_variant": {
+        "AMBIGUOUS": 11,
+        "FREE_END": 55,
+        "L_CORNER": 63,
+        "STRAIGHT_CONTINUATION": 9,
+        "T_INTERSECTION": 119,
+        "X_INTERSECTION": 17
+      },
+      "n_nodes_baseline": 273,
+      "n_nodes_variant": 274
+    }
+  ],
+  "deterministic": false
+}

@@ -1,0 +1,105 @@
+{
+  "project_id": "torre_easy_lo_r00_tp1",
+  "walls_already_extended": true,
+  "reversal_variants_are_valid_here": true,
+  "n_permutation_variants": 19,
+  "n_reversal_variants": 5,
+  "codes": {
+    "COVERAGE_MISSING_ROW": {
+      "baseline_json": 16,
+      "current_baseline_order": 18,
+      "permutation": {
+        "min": 18,
+        "max": 18,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 18,
+        "max": 18,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "COVERAGE_ROW_MOSTLY_EMPTY": {
+      "baseline_json": 27,
+      "current_baseline_order": 26,
+      "permutation": {
+        "min": 26,
+        "max": 26,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 26,
+        "max": 26,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "JUNCTION_MISSING_BINDING": {
+      "baseline_json": 8,
+      "current_baseline_order": 8,
+      "permutation": {
+        "min": 8,
+        "max": 8,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 8,
+        "max": 8,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "OPENING_BLOCK_CROSSES_JAMB": {
+      "baseline_json": 168,
+      "current_baseline_order": 154,
+      "permutation": {
+        "min": 154,
+        "max": 154,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 154,
+        "max": 154,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "POSITION_OVERLAP": {
+      "baseline_json": 18,
+      "current_baseline_order": 18,
+      "permutation": {
+        "min": 18,
+        "max": 18,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 18,
+        "max": 18,
+        "spread": 0,
+        "distinct": 1
+      }
+    },
+    "PRISM_CONTINUOUS_JOINT": {
+      "baseline_json": 968,
+      "current_baseline_order": 730,
+      "permutation": {
+        "min": 730,
+        "max": 730,
+        "spread": 0,
+        "distinct": 1
+      },
+      "reversal": {
+        "min": 717,
+        "max": 748,
+        "spread": 31,
+        "distinct": 5
+      }
+    }
+  }
+}

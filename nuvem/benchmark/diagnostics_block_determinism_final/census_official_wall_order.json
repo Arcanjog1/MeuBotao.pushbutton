@@ -1,0 +1,95 @@
+{
+  "cr": "CR-BLOCK-DETERMINISM / FINALIZACAO",
+  "data": "2026-09-02",
+  "regra": "REGRA FUNDAMENTAL 2 - ordem oficial das paredes",
+  "enunciado_do_usuario": {
+    "horizontais": "todas primeiro; de CIMA para BAIXO; empate/faixa equivalente: ESQUERDA para DIREITA; sentido interno esquerda->direita",
+    "verticais": "depois das horizontais; de BAIXO para CIMA; empate/faixa equivalente: ESQUERDA para DIREITA; sentido interno baixo->cima",
+    "inclinadas": "depois de H e V; angulo/orientacao canonica + posicao geometrica + chave geometrica canonica de desempate; inverter endpoints nao pode mudar a posicao na ordem"
+  },
+  "metodo": "leitura direta de order_walls_for_processing + execucao dos testes de ordem; NAO se confiou na classificacao da cross-audit anterior (que reportou EXACT_MATCH para a regra inteira)",
+  "ocorrencias": [
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "order_walls_for_processing - ETAPA 1 (horizontais)",
+      "comportamento_anterior": "sort(key=(-band(y_min), x_min, wall_idx)) - cima->baixo, empate esquerda->direita",
+      "classificacao": "COMPLIANT (o desempate por wall_idx e' tratado a parte, abaixo)"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "order_walls_for_processing - ETAPA 2 (verticais)",
+      "comportamento_anterior": "sort(key=(band(x_min), y_min, wall_idx)) - X (esquerda->direita) como criterio PRINCIPAL e Y (baixo->cima) so' no empate",
+      "classificacao": "CONTRADICTS",
+      "motivo": "o enunciado oficial e' o inverso: BAIXO->CIMA e' o principal, ESQUERDA->DIREITA e' o desempate",
+      "acao": "CORRIGIDO - faixa agrupada por y_min, desempate por x_min",
+      "impacto_medido": "nenhuma metrica critica dos 3 projetos de benchmark muda"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "order_walls_for_processing - ETAPA 3 (inclinadas)",
+      "comportamento_anterior": "sort(key=(-y_max, x_min, wall_idx)) - so' posicao, sem angulo canonico",
+      "classificacao": "PARTIALLY_COMPLIANT",
+      "acao": "CORRIGIDO - angulo canonico da RETA (modulo 180 graus, igual nos dois sentidos) como criterio principal, depois posicao, depois chave geometrica"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "order_walls_for_processing - desempate final dos TRES grupos",
+      "comportamento_anterior": "w['idx'] = POSICAO NA LISTA DE ENTRADA",
+      "classificacao": "CONTRADICTS",
+      "motivo": "viola a REGRA FUNDAMENTAL 1 (nada pode olhar wall_idx/posicao na lista); e' a ultima dependencia de ordem de entrada que restava nesta funcao",
+      "acao": "CORRIGIDO - wall_processing_geom_key (pontas ordenadas + espessura)"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "classify_wall_orientation",
+      "comportamento_anterior": "H/V/D por WALL_ORIENTATION_TOLERANCE (~3 graus) sobre a direcao unitaria; usa abs(), entao ja' e' invariante a inversao",
+      "classificacao": "COMPLIANT",
+      "acao": "nenhuma"
+    },
+    {
+      "arquivo": "nuvem/core/engine/wall_stepper.py",
+      "secao": "process_walls_one_by_one / find_wall_group_shift_fixes",
+      "comportamento_anterior": "unicos consumidores de order_walls_for_processing; nao reordenam nada por conta propria",
+      "classificacao": "COMPLIANT",
+      "acao": "nenhuma"
+    },
+    {
+      "arquivo": "nuvem/core/wall_modeling.py",
+      "secao": "comentario de cabecalho (linha ~65)",
+      "comportamento_anterior": "descreve a ordem antiga das verticais em comentario",
+      "classificacao": "LEGACY (comentario, nao codigo)",
+      "acao": "nenhuma alteracao de codigo; a regra oficial passa a estar escrita por extenso em REGRAS_MODULACAO_BLOCOS.md (REGRA FUNDAMENTAL 2)"
+    },
+    {
+      "arquivo": "tests/test_script.py",
+      "secao": "test_ordem_de_processamento_e_geometrica",
+      "comportamento_anterior": "congelava [2,1,0,3,5,7,6,4] - a regra ANTIGA das verticais",
+      "classificacao": "CONTRADICTS",
+      "acao": "ATUALIZADO para [2,1,0,3,5,6,7,4] com o motivo escrito no proprio teste"
+    },
+    {
+      "arquivo": "nuvem/ARQUITETURA_INTERATIVA.md",
+      "secao": "linha ~195",
+      "comportamento_anterior": "cita 'regra #5 ja existente (order_walls_for_processing)' sem enunciar a ordem",
+      "classificacao": "NOT_RELEVANT",
+      "acao": "nenhuma"
+    }
+  ],
+  "resumo": {
+    "COMPLIANT": 3,
+    "PARTIALLY_COMPLIANT": 1,
+    "CONTRADICTS": 3,
+    "LEGACY": 1,
+    "NOT_RELEVANT": 1
+  },
+  "testes_permanentes": [
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_030_horizontais_vem_antes_das_verticais",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_031_horizontal_de_cima_para_baixo_e_empate_esquerda_direita",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_032_vertical_de_baixo_para_cima_e_empate_esquerda_direita",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_033_ordem_oficial_independe_da_ordem_de_entrada",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_034_ordem_oficial_independe_da_inversao_de_endpoints",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_035_inclinadas_vem_por_ultimo_com_chave_canonica",
+    "tests/test_block_pipeline_determinism.py::test_INV_DET_036_desempate_nao_usa_mais_a_posicao_na_lista",
+    "tests/test_script.py::test_ordem_de_processamento_e_geometrica"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "repeats": 5,
+  "item_da_missao": 58,
+  "antes": {
+    "codigo": "main + wall graph canonico (45161900), ANTES desta CR",
+    "wall_graph_s": {"min": 0.4489, "mean": 0.477, "max": 0.5165},
+    "fill_s": {"min": 0.6506, "mean": 0.6623, "max": 0.677},
+    "opening_repair_s": {"min": 0.0643, "mean": 0.074, "max": 0.088},
+    "pipeline_s": {"min": 2.5368, "mean": 2.5962, "max": 2.676}
+  },
+  "depois": {
+    "codigo": "CR-BLOCK-DETERMINISM / FINALIZACAO",
+    "wall_graph_s": {"min": 0.4629, "mean": 0.4889, "max": 0.5375},
+    "fill_s": {"min": 0.7903, "mean": 0.799, "max": 0.8171},
+    "opening_repair_s": {"min": 0.0724, "mean": 0.0775, "max": 0.0908},
+    "pipeline_s": {"min": 2.6952, "mean": 2.7877, "max": 2.8696}
+  },
+  "leitura": {
+    "wall_graph": "+2,5% (0,477 -> 0,489 s) - dentro do ruido; wall_pairing.py nao foi tocado",
+    "fill": "+20,6% (0,662 -> 0,799 s) - custo do snap por coordenada e da vista canonica (copia rasa por parede invertida); NAO ha' mudanca de complexidade, so' trabalho constante a mais por trecho",
+    "opening_repair": "+4,7% (0,074 -> 0,078 s)",
+    "pipeline_completo": "+7,4% (2,596 -> 2,788 s)",
+    "veredito": "ACEITAVEL - mesma ordem de grandeza, nenhuma explosao de complexidade. O pipeline continua abaixo de 3s para 167 paredes / 17 fiadas."
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "project_id": "torre_easy_lo_r00_tgd",
+  "walls_already_extended": true,
+  "variantes_de_reversao_sao_validas_aqui": true,
+  "n_aberturas_deslocadas_pela_reversao": 3,
+  "deslocamentos_distintos_cm": [
+    0.001
+  ],
+  "amostra_deslocamentos": [
+    {
+      "wall": "(-1805.53, -87.55, -1805.53, -83.1, 14.0)",
+      "base_cm": [
+        -1805.532,
+        -85.323
+      ],
+      "endpoint_reversal_cm": [
+        -1805.532,
+        -85.324
+      ],
+      "deslocamento_cm": 0.001
+    },
+    {
+      "wall": "(1997.57, -87.55, 1997.57, -83.1, 14.0)",
+      "base_cm": [
+        1997.568,
+        -85.323
+      ],
+      "endpoint_reversal_cm": [
+        1997.568,
+        -85.324
+      ],
+      "deslocamento_cm": 0.001
+    },
+    {
+      "wall": "(2062.52, 363.05, 2062.52, 461.65, 14.0)",
+      "base_cm": [
+        2062.523,
+        427.969
+      ],
+      "endpoint_reversal_cm": [
+        2062.523,
+        427.97
+      ],
+      "deslocamento_cm": 0.001
+    }
+  ],
+  "fingerprints_por_grupo": {
+    "permutacao": {
+      "n_variantes": 19,
+      "distintos": 1,
+      "grupos": {
+        "af0811249968": [
+          "baseline",
+          "reversed",
+          "shuffle_seed_1",
+          "shuffle_seed_2",
+          "shuffle_seed_3",
+          "shuffle_seed_10",
+          "shuffle_seed_42",
+          "shuffle_seed_5",
+          "shuffle_seed_7",
+          "shuffle_seed_11",
+          "shuffle_seed_13",
+          "shuffle_seed_17",
+          "shuffle_seed_23",
+          "shuffle_seed_50",
+          "shuffle_seed_99",
+          "shuffle_seed_123",
+          "shuffle_seed_999",
+          "shuffle_within_orientation_seed_1",
+          "shuffle_within_orientation_seed_2"
+        ]
+      }
+    },
+    "reversao": {
+      "n_variantes": 5,
+      "distintos": 1,
+      "grupos": {
+        "af0811249968": [
+          "endpoint_reversal",
+          "reverse_horizontal_only",
+          "reverse_vertical_only",
+          "random_endpoint_reversal_seed_1",
+          "random_endpoint_reversal_seed_2"
+        ]
+      }
+    }
+  },
+  "veredito": "As variantes de reversao NAO sao geometricamente equivalentes neste projeto: 3 abertura(s) mudam de lugar fisico (deslocamento [0.001] cm). Comparar esse grupo NAO mede determinismo - ele compara plantas diferentes. So' o grupo de PERMUTACAO e' conclusivo aqui."
+}
