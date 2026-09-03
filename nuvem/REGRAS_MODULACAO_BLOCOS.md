@@ -4185,6 +4185,33 @@ Coberto por teste permanente (`tests/test_block_bonding.py`):
   errada. Foi o que aconteceu na primeira medição deste CR — com apenas o
   `torre_easy_lo_r00_tgd` o ângulo parecia melhor, e é justamente ele que
   quebra a amarração vertical do `piloto_sintetico_2x2`.
+- **ATUALIZAÇÃO (CR-BLOCK-WALL-GRAPH-QUALITY, 2026-09-03) — o "custo
+  anotado" acima tem nome e é `COVERAGE_MISSING_ROW`/
+  `COVERAGE_ROW_MOSTLY_EMPTY`, não amarração**: comparando `origin/main`
+  (sem grafo) contra `main` + só este commit do grafo (`cb9ef99`), TODA
+  parede nova em `COVERAGE_MISSING_ROW`/`COVERAGE_ROW_MOSTLY_EMPTY` medida
+  (`W042` do TGD; `W022`/`W093` do TP1) tem exatamente este mecanismo: um
+  nó `L_CORNER` de 2 braços, mesma composição e mesmo ponto físico nos dois
+  pontos, só com `arms[0]`/`arms[1]` (e portanto `neighbor_wall_idx`)
+  trocados — o que muda qual parede recebe `course_a`/`course_b` em
+  `_l_corner_wall_pair`. `_find_wall_midspan_crossings` faz o mesmo com
+  `crossing_walls[0]`/`[1]` (o mesmo nó em X do piloto que expõe o defeito
+  da seção 30 pela primeira vez, ver 30.2). **Não há composição de nó
+  diferente** (union-find/componente conexa da seção 28.1 não muda nenhum
+  nó nos três projetos do corpus — checado par a par) **nem nó com ponto
+  físico deslocado** nessas paredes especificamente — só o papel. Também
+  medido: pelo menos 3 paredes do TGD (`W050`, `W052`, `W119`) ganham
+  `COVERAGE_MISSING_ROW` sem NENHUM nó próprio mudar — é propagação
+  colateral pelo solver (`wall_stepper.py`), não outro mecanismo do grafo.
+  **Não implementado fix**: a escolha entre as duas paredes de um
+  `L_CORNER` simétrico já não tem "certo" geométrico (28.3 acima); a tabela
+  de convenções já mostra que a adotada é a que menos regride; o mecanismo
+  que transforma "trocar qual parede é `course_a`" em **perda de uma
+  família inteira de fiadas** (em vez de só espelhar o padrão, como
+  acontece nas paredes onde a troca é inofensiva) mora inteiramente em
+  `wall_stepper.py`, fora do escopo autorizado deste CR. Ver
+  `docs/BLOCK_WALL_GRAPH_QUALITY.md` para a lista completa de nós/paredes
+  medidos e o experimento que descarta as outras duas hipóteses (28.1/28.2).
 
 ### 28.4 REGRA OBRIGATÓRIA — empate geométrico exige desempate geométrico, nunca "o primeiro da lista"
 
