@@ -3932,3 +3932,34 @@ Coberto por teste permanente (`tests/test_block_bonding.py`):
   original (`claude/block-01-prisma-fiadas-rik42t`) por causa do contrato
   de isolamento entre as contas — `tests/test_script.py` não estava na
   área de escrita autorizada dela.
+
+## 28. REGRA OBRIGATÓRIA — recálculo incremental do editor externo preserva a solução canônica
+
+Uma edição manual de abertura ou Wall no visualizador externo 3D não
+autoriza uma regra geométrica alternativa, nem reposiciona automaticamente a
+abertura. A posição/dimensão escolhida pelo usuário é válida se permanecer no
+host; eventuais conflitos são devolvidos pelo diagnóstico do solver.
+
+1. A invalidação começa na Wall hospedeira/editada e inclui somente os
+   vizinhos de encontro L/T/X **diretos**. Um anel adicional pode ser lido
+   exclusivamente como contexto do solver; ele não entra no delta visual nem
+   substitui blocos de Walls não afetadas.
+2. O recorte deve passar pelo mesmo solver canônico de blocos, incluindo todas
+   as fiadas e bandas de abertura relevantes. Não é permitido introduzir
+   cálculo simplificado de vergas, canaletas, encontros ou compensadores para
+   ganhar desempenho.
+3. Os candidatos recalculados substituem apenas os da componente afetada; os
+   demais candidatos da solução confirmada são preservados. A igualdade deve
+   ser conferida pelo fingerprint estável da geometria (IDs/índices internos
+   do solver podem mudar quando a entrada é recortada).
+4. Pré-visualizações são efêmeras e descartáveis: somente a intenção de
+   arraste mais recente pode ser exibida. O commit de uma edição continua
+   atômico e cria uma única entrada de desfazer/refazer.
+5. O cliente recebe e renderiza somente o delta de Walls, aberturas e blocos,
+   preservando câmera, seleção e objetos não afetados. Cache pode reutilizar
+   uma prévia de mesma geometria/revisão, mas nunca dispensar validação pelo
+   solver canônico.
+6. A resposta incremental deve registrar tempos de detecção, solver,
+   montagem/serialização da carga, total, tamanho da resposta, quantidade de
+   Walls afetadas/contexto e blocos adicionados/removidos, para que regressões
+   de desempenho possam ser verificadas na captura real.
