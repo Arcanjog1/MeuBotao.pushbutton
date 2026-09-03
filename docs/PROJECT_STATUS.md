@@ -699,6 +699,177 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-CONSISTENCY` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-CONSISTENCY (continuação de
+               CR-BLOCK-ARM-ROLE-INVARIANCE, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   963aa9b227d0e635ee020494c9891591af18531d
+SHA final:     ver commit desta entrega, topo do log
+status:        NECESSITA AJUSTE (gate G10 falhou — ver relatório completo
+               docs/BLOCK_ARM_ROLE_INVARIANCE.md, agora reescrito para
+               este CR)
+
+o que foi alterado: o workaround "reserva de fronteira emprestada"
+  (28.2/entrada anterior deste histórico) foi REMOVIDO — o usuário
+  rejeitou esse fix por só reclassificar COVERAGE_MISSING_ROW em
+  COVERAGE_ROW_MOSTLY_EMPTY, sem resolver a causa raiz. No lugar,
+  implementado `_coordinate_arm_role_nodes` (nuvem/core/engine/
+  wall_stepper.py, única alteração de produção): coordena
+  deterministicamente, via 2-coloring de grafo (formalizado ANTES de
+  assumir essa estrutura — ver relatório, seção "Contrato formal"), o
+  papel course_a/course_b entre os DOIS nós L_CORNER de 2 braços que
+  fecham as duas pontas da MESMA parede, para que nunca escolham papéis
+  contraditórios. Raiz e ordem de visita do BFS sempre por identidade
+  geométrica do nó (nunca por ordem de lista), garantindo invariância a
+  arms/paredes de entrada/reversão de endpoint.
+
+  Prova combinatória (não apenas geométrica) de que ciclos — pares OU
+  ímpares — de nós L_CORNER de 2 braços são SEMPRE 2-coloráveis (soma
+  XOR de paridade ao redor de qualquer ciclo é sempre 0, por
+  telescopagem): o ramo de conflito residual da coordenação é
+  matematicamente inalcançável para esta regra de elegibilidade, mantido
+  como rede de segurança determinística.
+
+testes: 16 testes em tests/test_block_arm_role_invariance.py (2 novos:
+  retângulo fechado real / ciclo par sem conflito; prova geral de ciclo
+  par-ou-ímpar sem conflito residual, por construção, várias
+  combinações de ordem de arms) + 1 teste atualizado em
+  tests/test_script.py (colisão de mesma-fiada deixa de ocorrer + as
+  duas pontas da parede curta passam a alternar A/B). Suíte rápida
+  completa: 513 passed. Suíte lenta (regressão contra baseline.json):
+  2 failed (TGD, TP1 — ver "novas dívidas" abaixo, não escondido).
+
+benchmarks (torre_easy_lo_r00_tgd/tp1/piloto_sintetico_2x2, comparação
+  A=origin/main limpo (7c9a681) / B=workaround anterior (963aa9b) /
+  C=este estado):
+    - TGD: COVERAGE_MISSING_ROW 265→258 (-7); COVERAGE_ROW_MOSTLY_EMPTY
+      171→153 (-18, a regressão de +138 do workaround anterior NÃO
+      ocorre mais); TOTAL_COVERAGE_CRITICAL 436→411 (-25);
+      PRISM_CONTINUOUS_JOINT por parede 39→41 (+2, ver "novas dívidas");
+    - TP1: COVERAGE_MISSING_ROW 16→0 (eliminado); COVERAGE_ROW_
+      MOSTLY_EMPTY 27→18 (-9); TOTAL_COVERAGE_CRITICAL 43→18 (-58%);
+      PRISM_CONTINUOUS_JOINT por parede 50→53 (+3, defeito NOVO em 8
+      paredes, não reclassificação — ver "novas dívidas");
+      JUNCTION_MISSING_BINDING 8→9 (+1, confirmado mesma junção
+      W039/W041, mirror de paridade, não é uma junção nova);
+    - piloto: nenhuma mudança em nenhuma métrica.
+  Casos nomeados verificados individualmente: W022/TP1 e W093/TP1 —
+  COVERAGE_MISSING_ROW/MOSTLY_EMPTY eliminados, substituídos por
+  COVERAGE_GAP_IN_ROW (severidade menor, reclassificação explícita);
+  W011/piloto — nenhuma mudança (fora da topologia do defeito).
+
+novas dívidas: PRISM_CONTINUOUS_JOINT regride em paredes que antes não
+  tinham NENHUM achado desse código (8 no TP1 com TODAS as junções de
+  fiada alinhadas, 2-3 no TGD) — hipótese não confirmada de que a
+  coordenação desincroniza a alternância do vão menor (B34/B54) da
+  regra fixa de paridade par/ímpar das fiadas. Documentado como seção
+  28.6 de REGRAS_MODULACAO_BLOCOS.md ("DOCUMENTADO — pendência de código
+  aberta"). Este é o motivo do veredito NECESSITA AJUSTE.
+
+itens resolvidos: causa-raiz completa do mecanismo "arms order → course
+  role → perda de fiada" (o workaround anterior só mitigava parte dela);
+  a regressão COVERAGE_ROW_MOSTLY_EMPTY do fix anterior não existe mais.
+
+itens ainda pendentes: root-cause e fix do efeito colateral em
+  PRISM_CONTINUOUS_JOINT (seção 28.6); baseline.json não regravado
+  (não deve ser, dado o veredito).
+
+próximo passo recomendado: confirmar/corrigir a hipótese de 28.6 antes
+  de qualquer nova iteração. PR #9 (draft) permanece; NÃO MESCLADO.
+```
+
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-INVARIANCE` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-INVARIANCE
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   7c9a681aeda2027f8fc072c0f57c62454a80d669 (origin/main)
+SHA final:     963aa9b227d0e635ee020494c9891591af18531d
+status:        NECESSITA AJUSTE (gate G9 falhou — ver relatório completo
+               docs/BLOCK_ARM_ROLE_INVARIANCE.md)
+
+o que foi alterado: causa-raiz provada (caso real W042/TGD, wall_idx 41)
+  de que dois nós L_CORNER/X_INTERSECTION de UMA MESMA parede decidem o
+  papel course_a/course_b de forma totalmente independente entre si —
+  sem alternância forçada, podem escolher o MESMO papel nas duas pontas,
+  apagando a família oposta inteira quando combinado com a fronteira
+  "emprestada" de uma parede vizinha raramente caindo no módulo de 5cm
+  de blocos (preenchimento contínuo, tudo-ou-nada sem abertura para
+  servir de ponto de quebra). Fix restrito a
+  nuvem/core/engine/wall_stepper.py (wall_pairing.py intocado, conforme
+  exigido pelo CR): arredonda a reserva "para dentro" (nunca menos) até
+  o próximo múltiplo de PIER_MODULE_CM quando a família não tem NENHUMA
+  peça de nó própria em nenhuma ponta, a família oposta TEM, e nem esta
+  parede nem a doadora têm abertura própria.
+
+  AVISO: o "wall graph determinístico"/ordenação canônica de arms que um
+  CR anterior (CR-BLOCK-WALL-GRAPH-QUALITY) documentou NÃO está mesclado
+  em origin/main neste SHA — só em branches não mescladas. O mecanismo e
+  o fix são os mesmos independente disso (reproduzido manipulando
+  node["arms"] em memória, sem depender de nenhuma convenção específica
+  de wall_pairing.py).
+
+testes: 14 testes sintéticos novos e permanentes
+  (tests/test_block_arm_role_invariance.py) — 6 falham no estado
+  anterior pelo motivo correto (confirmado via git stash). Suíte
+  completa: 521 passed, 1 failed (a regressão documentada abaixo, não
+  escondida).
+
+invariantes: determinismo preservado (mesmo código/entrada → mesma
+  saída, 3x confirmado); performance na mesma ordem de grandeza
+  (TGD/TP1/piloto, ver relatório); wall_pairing.py/continuous_
+  modulation.py/wall_modeling.py/geometry.py/tolerances.py/modulation_
+  math.py NÃO alterados (git diff --stat confere).
+
+benchmarks (torre_easy_lo_r00_tgd, contra origin/main LIMPO — não
+  baseline.json, que está desatualizado para PRISM_CONTINUOUS_JOINT/
+  OPENING_BLOCK_INSIDE_DOOR neste projeto, achado colateral não causado
+  por este CR):
+    - COVERAGE_MISSING_ROW: 265 → 145 (-120, melhoria grande);
+    - COVERAGE_ROW_MOSTLY_EMPTY: 171 → 309 (+138, REGRESSÃO CRÍTICA —
+      reclassificação medida de paredes que já tinham as duas famílias
+      ruins: uma fica rescatável pelo fix, a outra continua exatamente
+      como estava, nenhuma parede NOVA quebra, mas o total de achados
+      sobe +123);
+    - OPENING_BLOCK_CROSSES_JAMB/INSIDE_DOOR/PRISM_CONTINUOUS_JOINT:
+      inalterados;
+    - torre_easy_lo_r00_tp1 e piloto_sintetico_2x2: NENHUMA mudança em
+      nenhum código (nenhuma parede desses dois projetos se qualificou
+      para o escopo restrito do fix).
+
+novas dívidas: resolução completa do resíduo COVERAGE_ROW_MOSTLY_EMPTY
+  exige forçar ALTERNÂNCIA de papel entre os DOIS nós de uma mesma
+  parede (problema de 2-coloração de grafo — cada nó de 2 braços é uma
+  aresta entre duas paredes-vértice; ciclos de comprimento ímpar tornam
+  alternância perfeita impossível em geral) — fora do escopo autorizado
+  desta CR (só wall_stepper.py, sem "resolver toda a cobertura").
+  Documentado como seção 28.4 de REGRAS_MODULACAO_BLOCOS.md.
+  baseline.json e REFERENCE_SOLVER_DECISION_FINGERPRINT
+  (tests/solver_bench.py) confirmados DESATUALIZADOS em relação a
+  origin/main limpo (não causado por esta CR) — recomenda-se CR de
+  manutenção próprio para atualizar os dois.
+
+itens resolvidos: causa-raiz do mecanismo "arms order → course role →
+  perda de fiada" provada e corrigida para o subconjunto de casos sem
+  abertura envolvida nos dois lados do nó.
+
+itens ainda pendentes: alternância de papel forçada entre nós da mesma
+  parede (ver "novas dívidas"); resolução do caso com abertura numa das
+  duas paredes do nó (fora do escopo, intencionalmente).
+
+próximo passo recomendado: CR próprio para a alternância de papel
+  (2-coloração), mesmo espírito do CR-BLOCK-NODE-FILL-JOINT já aberto —
+  ver docs/BLOCK_ARM_ROLE_INVARIANCE.md para o relatório completo,
+  gate a gate. PR #9 (draft) aberto para registro; NÃO MESCLADO — decisão
+  humana explícita necessária sobre o trade-off G4/G9 documentado.
+```
+
 ### 2026-09-02 — `CR-BLOCK-01` CONCLUÍDO / APROVADO POR CROSS-AUDIT
 
 ```

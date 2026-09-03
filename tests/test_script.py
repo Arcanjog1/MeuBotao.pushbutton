@@ -1775,12 +1775,28 @@ def test_solve_l_corner_considera_reserva_do_encontro_na_outra_ponta_da_mesma_pa
     kinds = [n.get("kind") for n in nodes]
     assert kinds.count("L_CORNER") == 2, kinds  # as duas pontas da parede curta (indice 2)
 
-    # SEM a checagem cruzada (comportamento antigo, chamador que nao
-    # passa nodes/end_to_node): reproduz o bug - os dois lados forcam B34
-    # cheio e colidem entre si.
+    # CR-BLOCK-ARM-ROLE-CONSISTENCY (2026-09-03): a colisao que este teste
+    # reproduzia SEM a checagem cruzada tambem era, na raiz, o MESMO
+    # defeito do CR - os dois L_CORNER da parede curta escolhiam o MESMO
+    # papel (course_a/course_b) de forma independente, entao as duas
+    # pecas B34 caiam na MESMA fiada fisica e colidiam em projecao 2D.
+    # `solve_all_intersections` agora roda `_coordinate_arm_role_nodes`
+    # incondicionalmente ANTES de resolver qualquer no' (nao depende de
+    # `end_to_node` ser passado) - os dois L_CORNER da parede curta
+    # passam a alternar papel (uma peca em course_a, a outra em
+    # course_b), e como validate_same_course_collision so' compara pecas
+    # DENTRO da MESMA fiada, as duas paredes de 34cm em fiadas diferentes
+    # nunca colidem mais, mesmo SEM a checagem cruzada de reserva. A
+    # checagem cruzada continua necessaria para o caso que ela resolve
+    # (duas amarracoes em pontas opostas da MESMA parede reservando sem
+    # saber uma da outra) - so' deixou de ser a UNICA defesa contra esta
+    # colisao especifica.
     old = m.solve_all_intersections(nodes, walls, CATALOG, openings_per_wall=per_wall)
     old_collisions = m.validate_same_course_collision(old["candidates"])
-    assert old_collisions, "esperava reproduzir a colisao SEM a checagem cruzada"
+    assert not old_collisions, old_collisions
+    bottom_courses = sorted(c["course"] for c in old["candidates"] if c.get("wall_idx") == 2)
+    assert bottom_courses == ["A", "B"], (
+        "a coordenacao de papel devia alternar as duas pontas da parede curta: %s" % bottom_courses)
 
     # COM a checagem cruzada (a correcao, thread'ando nodes/end_to_node):
     # sem colisao nenhuma. A ESTRATEGIA que resolve isso mudou desde que

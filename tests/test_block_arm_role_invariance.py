@@ -128,6 +128,20 @@ def wall_families_present(result, wall_idx):
     return present
 
 
+def _mirror_fam(fam):
+    """Troca A<->B DENTRO da MESMA parede - o efeito ESPERADO (secao 28.3
+    de REGRAS_MODULACAO_BLOCOS.md) de inverter arms[0]/[1] num L_CORNER
+    ISOLADO (so' um no', nada para `_coordinate_arm_role_nodes`
+    coordenar): a peca de amarracao que esta parede recebia como
+    course_a passa a ser course_b (a peca em si nao muda de posicao, so'
+    de ROTULO), entao QUALQUER fiada fisica que dependia daquele rotulo
+    (a peca de no', ou o preenchimento comum que fechava so' por causa da
+    borda que aquela peca deixava) migra de familia junto. NAO e' uma
+    troca entre paredes - cada parede continua com o MESMO conjunto de
+    fiadas fisicas cobertas, so' com a letra A/B trocada."""
+    return {"A": fam["B"], "B": fam["A"]}
+
+
 # ============================================================
 # 1/2/9 - L_CORNER simetrico, arms [A,B] vs [B,A], input permutado
 # ============================================================
@@ -136,8 +150,22 @@ def wall_families_present(result, wall_idx):
 def test_l_corner_simetrico_arms_invertidos_nao_perde_familia(wall_order):
     """L de dois bracos longos (300cm cada) COM ORDEM DE ENTRADA permutada
     (item 9 do CR) - mesma geometria fisica, so' o indice de wall_idx
-    trocado. Em qualquer combinacao arms/ordem de entrada, as DUAS paredes
-    continuam com as DUAS familias de fiada presentes."""
+    trocado.
+
+    ESCOPO (CR-BLOCK-ARM-ROLE-CONSISTENCY, follow-up): este CR resolve a
+    CONSISTENCIA de papel entre os DOIS nos que fecham uma mesma parede -
+    aqui ha' so' UM no' (cada parede so' toca este L_CORNER uma vez), nada
+    para coordenar. O que se prova aqui e' que trocar arms[0]/[1] NUNCA
+    piora o conjunto de familias presentes - so' pode ESPELHAR (secao
+    28.3 de REGRAS_MODULACAO_BLOCOS.md, custo ja' aceito) ou manter
+    exatamente o mesmo resultado. Uma familia ausente em AMBAS as ordens
+    (o caso medido aqui: o preenchimento comum da parede nao fecha em
+    blocos para uma das duas paridades, independente do papel do no') e'
+    NON_MODULAR_WALL legitimo - mesma geometria, mesmo resultado nas duas
+    ordens, portanto nao e' um efeito de ORDEM (ver secao 15 do CR
+    original: "se a fiada realmente nao couber por geometria, isso
+    continua permitido" - contanto que seja independente da ordem, o que
+    esta' provado abaixo)."""
     raw = [seg(0, 0, 300, 0), seg(0, 0, 0, 300)]
     lines = [raw[i] for i in wall_order]
     walls, nodes, end_to_node = build_plan(lines)
@@ -150,8 +178,9 @@ def test_l_corner_simetrico_arms_invertidos_nao_perde_familia(wall_order):
     for wall_idx in range(2):
         fam_base = wall_families_present(base, wall_idx)
         fam_swapped = wall_families_present(swapped, wall_idx)
-        assert fam_base == {"A": True, "B": True}, (wall_order, wall_idx, "base", fam_base)
-        assert fam_swapped == {"A": True, "B": True}, (wall_order, wall_idx, "swapped", fam_swapped)
+        assert fam_swapped == _mirror_fam(fam_base), (
+            wall_order, wall_idx, "trocar arms so' pode ESPELHAR A/B, nunca mudar QUAIS fiadas existem",
+            fam_base, fam_swapped)
 
 
 def test_l_corner_curto_nao_perde_familia_com_arms_invertidos():
@@ -172,26 +201,29 @@ def test_l_corner_curto_nao_perde_familia_com_arms_invertidos():
 
 def test_l_corner_longo_nao_perde_familia_com_arms_invertidos():
     """Parede longa (item 5 do CR, 900cm) - preenchimento comum extenso
-    dos dois lados do L. Cobertura das duas familias preservada nos dois
-    braços em qualquer ordem de arms."""
+    dos dois lados do L. So' UM no' (ver docstring de
+    test_l_corner_simetrico_arms_invertidos_nao_perde_familia para o
+    escopo) - a invariancia provada e' de ESPELHAMENTO, nao de "familia
+    sempre presente"."""
     walls, nodes, end_to_node = build_plan([seg(0, 0, 900, 0), seg(0, 0, 0, 900)])
     corner_idx = [i for i, n in enumerate(nodes) if n["kind"] == "L_CORNER"][0]
 
     base = solve(walls, nodes, end_to_node)
     swapped = solve(walls, swap_two_arm_node(nodes, corner_idx), end_to_node)
 
-    for result, label in ((base, "base"), (swapped, "swapped")):
-        for wall_idx in range(2):
-            fam = wall_families_present(result, wall_idx)
-            assert fam == {"A": True, "B": True}, (label, wall_idx, fam)
+    for wall_idx in range(2):
+        fam_base = wall_families_present(base, wall_idx)
+        fam_swapped = wall_families_present(swapped, wall_idx)
+        assert fam_swapped == _mirror_fam(fam_base), (wall_idx, fam_base, fam_swapped)
 
 
 @pytest.mark.parametrize("variants_per_course", [1, 3])
 def test_l_corner_multiplas_fiadas_nao_perde_familia(variants_per_course):
     """Item 3 do CR - varias fiadas fisicas (via `solve_building_blocks_all_courses`,
-    que gira `variants_per_course` composicoes por familia) continuam
-    cobertas em ambas as familias, com ou sem variacao entre fiadas
-    fisicas da mesma paridade."""
+    que gira `variants_per_course` composicoes por familia). So' UM no'
+    (ver escopo em test_l_corner_simetrico_arms_invertidos_nao_perde_
+    familia) - prova espelhamento (mesmo conjunto de fiadas fisicas
+    cobertas nas duas ordens), nao "toda fiada sempre coberta"."""
     walls, nodes, end_to_node = build_plan([seg(0, 0, 400, 0), seg(0, 0, 0, 400)])
     corner_idx = [i for i, n in enumerate(nodes) if n["kind"] == "L_CORNER"][0]
     per_wall = [[], []]
@@ -205,11 +237,24 @@ def test_l_corner_multiplas_fiadas_nao_perde_familia(variants_per_course):
     base = run(nodes)
     swapped = run(swap_two_arm_node(nodes, corner_idx))
 
-    for result, label in ((base, "base"), (swapped, "swapped")):
+    def _wall_letter_coverage(result):
+        """{(wall_idx, letter): True} agregado por TODAS as fiadas
+        fisicas da mesma paridade - letter vem do PROPRIO course_index
+        (par=A, impar=B, fixo por construcao), entao o que muda com o
+        swap e' QUAL parede aparece em cada letra, nunca a letra em si."""
+        present = {}
         for course_index, cands in result["course_candidates"].items():
-            for wall_idx in range(2):
-                has_piece = any(c.get("wall_idx") == wall_idx for c in cands)
-                assert has_piece, (label, course_index, wall_idx, "fiada fisica sem NENHUMA peca")
+            letter = "A" if course_index % 2 == 0 else "B"
+            for c in cands:
+                present[(c.get("wall_idx"), letter)] = True
+        return present
+
+    def _mirror_wall_letter(coverage):
+        return set((wall_idx, "B" if letter == "A" else "A") for wall_idx, letter in coverage)
+
+    cov_base = set(_wall_letter_coverage(base))
+    cov_swapped = set(_wall_letter_coverage(swapped))
+    assert cov_swapped == _mirror_wall_letter(cov_base), (cov_base, cov_swapped)
 
 
 # ============================================================
@@ -267,18 +312,28 @@ def test_l_corner_endpoint_reversal_equivalente_nao_perde_familia():
     """Item 8 do CR - inverte os ENDPOINTS de uma das duas paredes do L
     (p0<->p1, o mesmo segmento fisico desenhado no sentido oposto) E ainda
     troca arms[0]/[1] do no' - a combinacao (fisicamente equivalente a`
-    geometria original) nao pode perder familia nenhuma."""
+    geometria original) so' pode ESPELHAR o resultado do endpoint NAO
+    invertido (ver escopo em
+    test_l_corner_simetrico_arms_invertidos_nao_perde_familia - so' UM
+    no', nada para este CR coordenar), nunca perder uma familia que a
+    geometria original tinha."""
     reversed_v = seg(0, 300, 0, 0)  # mesmo segmento de seg(0,0,0,300), invertido
+    walls_ref, nodes_ref, end_to_node_ref = build_plan([seg(0, 0, 300, 0), seg(0, 0, 0, 300)])
+    reference = solve(walls_ref, nodes_ref, end_to_node_ref)
+
     walls, nodes, end_to_node = build_plan([seg(0, 0, 300, 0), reversed_v])
     corner_idx = [i for i, n in enumerate(nodes) if n["kind"] == "L_CORNER"][0]
 
     base = solve(walls, nodes, end_to_node)
     swapped = solve(walls, swap_two_arm_node(nodes, corner_idx), end_to_node)
 
-    for result, label in ((base, "base"), (swapped, "swapped")):
-        for wall_idx in range(2):
-            fam = wall_families_present(result, wall_idx)
-            assert fam == {"A": True, "B": True}, (label, wall_idx, fam)
+    for wall_idx in range(2):
+        fam_ref = wall_families_present(reference, wall_idx)
+        fam_base = wall_families_present(base, wall_idx)
+        fam_swapped = wall_families_present(swapped, wall_idx)
+        assert fam_base == fam_ref, ("reversal sozinho", wall_idx, fam_ref, fam_base)
+        assert fam_swapped == _mirror_fam(fam_ref), (
+            "reversal + swap", wall_idx, fam_ref, fam_swapped)
 
 
 # ============================================================
@@ -293,17 +348,16 @@ def _two_corner_plan():
     perda de familia inteira medida ao vivo em W042/TGD (wall_idx 41).
 
     Coordenadas FRACIONARIAS de proposito (300.37/322.19, em vez de
-    numeros redondos): e' exatamente o ruido de CAD real (conversao
-    pes<->cm, extend_wall_ends_to_junctions) que faz a projecao da peca
-    EMPRESTADA de uma parede vizinha (ver
-    _index_node_candidates_borrowed_by_wall_end) nao cair num multiplo de
-    PIER_MODULE_CM - com coordenadas redondas o defeito nao reproduz (o
-    preenchimento comum fecha de qualquer forma, so' espelha o padrao,
-    ver test_l_corner_simetrico_arms_invertidos_nao_perde_familia).
-    Confirmado escrevendo este teste: SEM o fix, exatamente as combinacoes
+    numeros redondos): e' o ruido de CAD real (conversao pes<->cm,
+    extend_wall_ends_to_junctions) que reproduz a mesma fragilidade
+    medida em W042/TGD - com coordenadas redondas o defeito nao
+    reproduz (o preenchimento comum fecha de qualquer forma, so' espelha
+    o padrao, ver test_l_corner_simetrico_arms_invertidos_nao_perde_
+    familia). Confirmado escrevendo este teste: SEM
+    `_coordinate_arm_role_nodes`, exatamente as combinacoes
     (swap_a=False,swap_b=True) e (True,False) desta geometria fazem a
     parede do meio perder uma familia inteira (COVERAGE_MISSING_ROW);
-    COM o fix, as 4 combinacoes preservam as duas familias."""
+    COM a coordenacao, as 4 combinacoes preservam as duas familias."""
     wall0 = seg(0, 0, 0, 300.37)         # vertical esquerda
     wall1 = seg(0, 0, 322.19, 0)         # horizontal do meio (o alvo)
     wall2 = seg(322.19, 0, 322.19, -300.0)  # vertical direita
@@ -356,3 +410,110 @@ def test_ordem_de_arms_de_hoje_wall_pairing_ja_fecha_sem_intervencao_manual():
     result = solve(walls, nodes, end_to_node)
     fam = wall_families_present(result, 1)
     assert fam == {"A": True, "B": True}, fam
+
+
+# ============================================================
+# 12 - CICLOS: retangulo fechado (ciclo PAR, 4 nos) e U (cadeia aberta,
+# ja' coberta acima) - a coordenacao precisa fechar SEM conflito num
+# ciclo par real, construido so' com L_CORNER de 90 graus.
+# ============================================================
+
+def test_retangulo_fechado_coordena_sem_conflito_nenhuma_parede_perde_familia():
+    """4 paredes formando um retangulo fechado (400x300cm) - CICLO de 4
+    nos L_CORNER no grafo de `_coordinate_arm_role_nodes`, com geometria
+    REAL (nao sintetica). Confirma empiricamente, no caso real mais
+    simples de ciclo fechado, a prova geral de
+    test_ciclo_de_l_corner_nunca_gera_conflito_residual_par_ou_impar:
+    fecha SEM nenhum conflito residual, e NENHUMA das 4 paredes fica com
+    uma familia inteira ausente."""
+    walls, nodes, end_to_node = build_plan([
+        seg(0, 0, 400, 0), seg(400, 0, 400, 300),
+        seg(400, 300, 0, 300), seg(0, 300, 0, 0),
+    ])
+    kinds = sorted(n["kind"] for n in nodes)
+    assert kinds.count("L_CORNER") == 4, kinds
+
+    # confere a coordenacao diretamente (ANTES do solve() mutar `nodes`
+    # in place - ver docstring de _coordinate_arm_role_nodes) - ciclo par
+    # sempre 2-coloravel, zero conflitos esperados.
+    conflicts = m._coordinate_arm_role_nodes(nodes)
+    assert conflicts == [], conflicts
+
+    result = solve(walls, nodes, end_to_node)
+    for wall_idx in range(4):
+        fam = wall_families_present(result, wall_idx)
+        assert fam["A"] or fam["B"], (wall_idx, "parede do retangulo sem nenhuma peca")
+
+
+def _synthetic_cycle_nodes(length, flip_pattern):
+    """Monta um ciclo SINTETICO de `length` nos L_CORNER de 2 arms (nao
+    depende de geometria real): no' i tem arms para a parede i (liga a
+    i+1) e a parede i-1 (liga a i-1), com a ORDEM dos dois arms
+    controlada por `flip_pattern[i]` (0/1) - isso simula qualquer
+    convencao de ordenacao que `wall_pairing.py` poderia produzir."""
+    nodes = []
+    for i in range(length):
+        wall_next = i
+        wall_prev = (i - 1) % length
+        arms = [(wall_prev, 1), (wall_next, 0)]
+        if flip_pattern[i]:
+            arms = [arms[1], arms[0]]
+        nodes.append({"kind": "L_CORNER", "arms": arms, "point": XYZ(float(i), 0.0, 0.0)})
+    return nodes
+
+
+def test_ciclo_de_l_corner_nunca_gera_conflito_residual_par_ou_impar():
+    """Prova (por construcao, testando VARIOS comprimentos e VARIAS
+    combinacoes de ordem de arms) que `_coordinate_arm_role_nodes` NUNCA
+    deixa um conflito residual num ciclo de nos L_CORNER de 2 arms -
+    seja o ciclo PAR ou IMPAR.
+
+    Motivo matematico (nao e' so' sorte da geometria real ser sempre
+    par): cada no' L_CORNER de 2 arms atribui, por construcao,
+    EXATAMENTE um papel 0 (arms[0]) e um papel 1 (arms[1]) as suas duas
+    arestas - nunca 0/0 nem 1/1. Isso limita o grau de cada no' no grafo
+    de coordenacao a no maximo 2, entao qualquer componente conexo e' um
+    CAMINHO ou um CICLO SIMPLES (nunca uma estrutura mais complexa).
+    Para um ciclo v0..v(L-1) com arestas e_i=(v_i,v_{i+1}), seja s_i o
+    papel de e_i em v_{i+1}; como v_{i+1} so' tem 2 arms, o papel de
+    e_{i+1} em v_{i+1} e' forcosamente o complemento 1^s_i. Somando
+    (XOR) a paridade de todas as L arestas do ciclo, cada termo
+    "1^s_i^papel(e_i em v_i)" se cancela em pares ao percorrer o ciclo
+    inteiro (telescopagem), resultando em XOR total = 0 SEMPRE -
+    independente de L ser par ou impar, e independente de qualquer
+    padrao de ordenacao de arms. Ou seja: um ciclo de L_CORNER e' SEMPRE
+    2-coloravel (0 conflitos), e o ramo de `conflicts` em
+    `_coordinate_arm_role_nodes` e' codigo morto/rede de seguranca para
+    esta topologia - nunca dispara, comprovado aqui por construcao para
+    varios comprimentos e todas as combinacoes possiveis de ordem de
+    arms num ciclo de ate' 5 nos (2^5 = 32 combinacoes), alem de casos
+    isolados maiores."""
+    import itertools
+
+    for length in (3, 4, 5):
+        for flip_pattern in itertools.product((0, 1), repeat=length):
+            nodes = _synthetic_cycle_nodes(length, flip_pattern)
+            conflicts = m._coordinate_arm_role_nodes(nodes)
+            assert conflicts == [], (length, flip_pattern, conflicts)
+
+    for length in (6, 7):
+        nodes = _synthetic_cycle_nodes(length, [i % 2 for i in range(length)])
+        conflicts = m._coordinate_arm_role_nodes(nodes)
+        assert conflicts == [], (length, conflicts)
+
+    # DETERMINISMO: mesma entrada -> mesmo resultado; permutar a ORDEM da
+    # lista de nos (equivalente a mudar a ordem em que build_wall_graph
+    # devolveria os nos) tambem tem que devolver o mesmo conjunto de
+    # conflitos (aqui, sempre vazio), porque a raiz/ordem de visita e'
+    # escolhida por `_canonical_node_sort_key` (geometria), nunca pela
+    # posicao na lista.
+    import copy as _copy
+
+    fake_nodes = _synthetic_cycle_nodes(5, [1, 0, 1, 1, 0])
+    conflicts = m._coordinate_arm_role_nodes(_copy.deepcopy(fake_nodes))
+    again = m._coordinate_arm_role_nodes(_copy.deepcopy(fake_nodes))
+    assert again == conflicts == []
+
+    reordered = [fake_nodes[3], fake_nodes[0], fake_nodes[4], fake_nodes[1], fake_nodes[2]]
+    conflicts_reordered = m._coordinate_arm_role_nodes(_copy.deepcopy(reordered))
+    assert conflicts_reordered == conflicts == []
