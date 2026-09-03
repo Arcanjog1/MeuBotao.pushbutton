@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Biblioteca compartilhada do laboratório de auditoria independente de
-blocos (CONTA 2 — auditoria/benchmark, ver docs/BLOCK_MODULATION_AUDIT.md).
+blocos (CONTA 2 — auditoria/benchmark, ver docs/archive/BLOCK_MODULATION_AUDIT.md).
 
 Contrato desta pasta inteira (`nuvem/benchmark/diagnostics_block_audit/`):
   - SÓ LEITURA do motor (`core/wall_modeling.py`, `core/engine/**`) e da
@@ -189,7 +189,7 @@ def project_fingerprint(walls_to_create, solve_result):
     """sha256 de todo o conjunto de peças materializadas (fingerprint do
     RESULTADO, análogo em espírito ao `solver_decision_fingerprint` já
     oficial, mas por peça física em vez de por decisão de tier — ver
-    docs/BLOCK_MODULATION_AUDIT.md, seção Determinismo)."""
+    docs/archive/BLOCK_MODULATION_AUDIT.md, seção Determinismo)."""
     rows = sorted(
         candidate_fingerprint_tuple(walls_to_create, course_index, candidate)
         for course_index, candidate in physical_course_candidates(solve_result)

@@ -4,9 +4,9 @@ Auditoria **independente** do estado da modulação de blocos na `main`
 baseline (`9f3bab41b35f0e2a5f9782583ead8e1ee7755f49`), feita em paralelo
 ao `CR-BLOCK-01` (CONTA 1, sobre prisma/fiadas) e **sem ler a branch da
 CONTA 1**. Ver o produto principal desta auditoria em
-[`docs/BLOCK_MODULATION_AUDIT.md`](../../../docs/BLOCK_MODULATION_AUDIT.md)
+[`docs/archive/BLOCK_MODULATION_AUDIT.md`](../../../docs/archive/BLOCK_MODULATION_AUDIT.md)
 e o relatório de dados em
-[`../RELATORIO_BASELINE_BLOCOS.md`](../RELATORIO_BASELINE_BLOCOS.md).
+[`../archive/RELATORIO_BASELINE_BLOCOS.md`](../archive/RELATORIO_BASELINE_BLOCOS.md).
 
 ## Contrato desta pasta
 
@@ -97,5 +97,5 @@ python3 run_coverage_census.py torre_easy_lo_r00_tp1
   Este censo permuta a ordem das paredes já resolvidas (`input.json`,
   saída da Fase A) e mede o resultado do grafo de nós +
   `solve_building_blocks_all_courses` — uma camada acima do que o CR-2F-D
-  cobriu. Ver `docs/BLOCK_MODULATION_AUDIT.md`, seção Determinismo, para o
+  cobriu. Ver `docs/archive/BLOCK_MODULATION_AUDIT.md`, seção Determinismo, para o
   resultado e a camada exata onde a primeira divergência aparece.

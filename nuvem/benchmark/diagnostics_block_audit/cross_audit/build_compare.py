@@ -236,7 +236,7 @@ def main():
             },
             "verdict": "NEUTRA - mesmo numero de fingerprints distintos (8/8) e mesma amplitude de variacao "
                        "de pecas (130 em ambas); CR-BLOCK-01 nao mexeu em build_wall_graph/extend_wall_ends_to_junctions "
-                       "(a camada onde a maior parte da divergencia nasce, ver docs/BLOCK_MODULATION_AUDIT.md secao 14) "
+                       "(a camada onde a maior parte da divergencia nasce, ver docs/archive/BLOCK_MODULATION_AUDIT.md secao 14) "
                        "e nao piorou nem melhorou a sensibilidade a ordem.",
         },
     }

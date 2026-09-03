@@ -9,7 +9,7 @@ inteira.
 > Ate' 2026-08-24 estes testes carregavam `Script.py` diretamente (ele
 > continha toda a logica). Desde entao `Script.py` virou so' um loader que
 > baixa `core/wall_modeling.py` do GitHub (ver
-> `MinhaAba.tab/MeuPainel.panel/MeuBotao.pushbutton/LOADER_SETUP.md`) - o
+> `nuvem/LOADER_SETUP.md`) - o
 > loader usa `System.Net`/`System.Security.Cryptography` de verdade, que
 > `revit_stubs.py` nao simula (nao precisa: nada disso e' logica de
 > modulacao). `load_script.py` foi repontado para importar

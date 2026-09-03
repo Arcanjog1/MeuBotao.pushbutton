@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Orquestrador do laboratório de auditoria independente de blocos (CONTA
 2). Roda TODOS os censos sobre a MAIN baseline (`main` @
-9f3bab41b35f0e2a5f9782583ead8e1ee7755f49, ver docs/BLOCK_MODULATION_AUDIT.md)
+9f3bab41b35f0e2a5f9782583ead8e1ee7755f49, ver docs/archive/BLOCK_MODULATION_AUDIT.md)
 e escreve:
 
   - um `out_<censo>.json` por censo (mesmo arquivo que cada script escreve

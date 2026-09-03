@@ -42,7 +42,7 @@ def _load_json_or_none(path):
 
 
 # Metricas disponiveis para os 3 projetos reproduzíveis - todos rodam os
-# mesmos 6 validadores (ver docs/GOLDEN_BENCHMARK.md); "performance" nunca
+# mesmos 6 validadores (ver docs/archive/GOLDEN_BENCHMARK.md); "performance" nunca
 # entra aqui porque nenhum projeto tem tempo de execucao gravado ainda.
 _STANDARD_METRICS = ("blocks", "courses", "junctions", "openings", "prism",
                     "quality", "walls")

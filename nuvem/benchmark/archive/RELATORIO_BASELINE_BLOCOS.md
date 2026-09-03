@@ -6,7 +6,7 @@
 > lida. Nenhuma correção de produção foi implementada.
 >
 > Análise completa (pipeline, catálogo, matriz regra×código, backlog
-> detalhado): **`docs/BLOCK_MODULATION_AUDIT.md`**. Este documento é o
+> detalhado): **`docs/archive/BLOCK_MODULATION_AUDIT.md`**. Este documento é o
 > relatório de dados/prestação de contas da missão, no formato pedido.
 
 ## Git
@@ -25,7 +25,7 @@ criar a branch. Nenhum merge, nenhum rebase, nenhum force push.
 
 ## Pipeline completo
 
-Ver `docs/BLOCK_MODULATION_AUDIT.md` seção 1 — mapa arquivo/função/
+Ver `docs/archive/BLOCK_MODULATION_AUDIT.md` seção 1 — mapa arquivo/função/
 entrada/saída/responsabilidade completo, com a fronteira motor puro ×
 integração Revit marcada explicitamente. Resumo do fluxo:
 
@@ -43,7 +43,7 @@ do audit).
 ## Catálogo
 
 6 peças (B39/B34/B54/B19/C09/C04), família "14x19". Ver
-`docs/BLOCK_MODULATION_AUDIT.md` seção 2 para a tabela completa com
+`docs/archive/BLOCK_MODULATION_AUDIT.md` seção 2 para a tabela completa com
 confiança por regra (OBRIGATÓRIA/PREFERENCIAL/EXCEÇÃO/OBSERVADO) e o
 breakdown de `NODE_TRUE`/`NODE_DEGRADED`/`MID_WALL_FILL` medido por
 código. Catálogo real do escritório tem 33 tipos; o solver só implementa
@@ -176,7 +176,7 @@ documentada como o gargalo real, ~25s, fora do escopo desta auditoria).
 
 ## Regras vs implementação
 
-Matriz completa em `docs/BLOCK_MODULATION_AUDIT.md` seção 16. Destaque:
+Matriz completa em `docs/archive/BLOCK_MODULATION_AUDIT.md` seção 16. Destaque:
 `PIER_LAYOUT_VARIANTS_PER_COURSE` — a seção 11.7 das REGRAS documenta
 K=3 como escolha deliberada; a seção 18.4 (mais recente) já registra que
 o usuário revogou isso de volta para K=1, **com o conflito anotado no
@@ -223,7 +223,7 @@ Ordenados por severidade/frequência (P0 primeiro):
 ## Priorização P0/P1/P2/P3/P4
 
 Tabela completa com frequência/severidade/evidência/função provável/CR
-sugerido/risco de regressão: `docs/BLOCK_MODULATION_AUDIT.md` seção 17.
+sugerido/risco de regressão: `docs/archive/BLOCK_MODULATION_AUDIT.md` seção 17.
 Resumo:
 
 - **P0** (quebra de regra obrigatória, dado real): compensador em
@@ -264,8 +264,8 @@ cortados — 27 dos 33 tipos do catálogo real do escritório.
 ## Arquivos criados
 
 ```
-docs/BLOCK_MODULATION_AUDIT.md
-nuvem/benchmark/RELATORIO_BASELINE_BLOCOS.md   (este arquivo)
+docs/archive/BLOCK_MODULATION_AUDIT.md
+nuvem/benchmark/archive/RELATORIO_BASELINE_BLOCOS.md   (este arquivo; movido de nuvem/benchmark/ para nuvem/benchmark/archive/ na CR-REPO-HYGIENE-CLEANUP)
 nuvem/benchmark/diagnostics_block_audit/README.md
 nuvem/benchmark/diagnostics_block_audit/lib_audit.py
 nuvem/benchmark/diagnostics_block_audit/run_course_bond_census.py

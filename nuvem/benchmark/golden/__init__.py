@@ -11,5 +11,5 @@ organiza tudo aqui:
     NUNCA prova CORRECAO. So' um projeto com prova de validacao humana
     pode ser GOLDEN_REFERENCE.
 
-Ver `docs/GOLDEN_BENCHMARK.md` para a arquitetura completa.
+Ver `docs/archive/GOLDEN_BENCHMARK.md` para a arquitetura completa.
 """

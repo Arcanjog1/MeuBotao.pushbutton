@@ -44,9 +44,13 @@ para empurrar as duas a partir de um repositorio unico por fora.
   rotacao e espelhamento de cada peca decidida pelo solver.
 - Antes de empurrar, rodar as suites: `python -m pytest tests/test_script.py -q`
   e, no MeuBotao, tambem `python -m pytest nuvem/tests -q`.
-- Merge de branches `claude/...` direto na `main` (sem PR) ja' esta'
-  autorizado pelo usuario - ver `CLAUDE.md` na raiz da extensao para as
-  regras completas (rodar testes antes, resolver conflitos, etc).
+- **Merge na `main` exige autorizacao humana explicita para AQUELE merge
+  especifico.** Nao existe autorizacao permanente - qualquer texto anterior
+  neste arquivo (ou em qualquer outro) sugerindo o contrario esta'
+  REVOGADO. Commit e push na branch de trabalho continuam permitidos
+  quando a tarefa autorizar. Ver `CLAUDE.md` na raiz da extensao para as
+  regras completas de governanca (rodar testes antes, resolver conflitos,
+  etc) - as regras la' definidas prevalecem.
 - **O token do GitHub e' por botao.** Cada loader guarda o seu em
   `%LOCALAPPDATA%\MeuBotaoPushbutton\` e
   `%LOCALAPPDATA%\AbrirModeladorExternoPushbutton\`. Um unico PAT

@@ -116,7 +116,7 @@ consistente em ambos os códigos e nas duas granularidades — projeto
 principal e agregado). Não é dramático (não era esperado ser — este CR
 não mira compensadores) e não chega perto de zerar a violação, que
 continua sendo uma classe de defeito real e não resolvida (ver
-`docs/BLOCK_MODULATION_AUDIT.md`, achado P0-1). A mission pediu
+`docs/archive/BLOCK_MODULATION_AUDIT.md`, achado P0-1). A mission pediu
 explicitamente para não exigir zeragem aqui — não exigida.
 
 ## B19
@@ -270,7 +270,7 @@ internamente em cada um sob permutação — o **grafo de nós**
 (`build_wall_graph`/`extend_wall_ends_to_junctions`), que o CR-BLOCK-01
 não tocou. **Não há evidência de que o CR piorou o não-determinismo
 existente**, que continua sendo um problema real e não-atribuído a este
-CR (ver `docs/BLOCK_MODULATION_AUDIT.md`, achado P0-2).
+CR (ver `docs/archive/BLOCK_MODULATION_AUDIT.md`, achado P0-2).
 
 ## Teste trim → shift
 
