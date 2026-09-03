@@ -4088,3 +4088,90 @@ TOTAL de achados sobe (+123), então não é um resultado limpo.
 - **Recomendação**: CR próprio, mesmo espírito do `CR-BLOCK-NODE-FILL-
   JOINT` já aberto — ver o relatório final
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md`.
+
+### 28.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
+entre os dois nós de UMA MESMA parede é resolvida por coordenação
+determinística (2-coloring), não por reserva de fronteira
+(`CR-BLOCK-ARM-ROLE-CONSISTENCY`, superam 28.2/28.4, 2026-09-03)
+
+A previsão feita em 28.4 ("Fix completo exigiria... um problema de
+2-coloração num grafo onde cada `L_CORNER`/`X_INTERSECTION` de 2 braços é
+uma aresta entre duas paredes-vértice") **foi implementada e confirmada
+correta** — mas a formalização do contrato (feita ANTES de assumir
+2-coloring, por exigência explícita do usuário) mostrou que a hipótese de
+28.4 sobre ciclos ímpares estava **incompleta**: ciclos de comprimento
+ímpar NÃO tornam a alternância perfeita impossível. Prova (por
+telescopagem da paridade XOR ao redor de qualquer ciclo, ver
+`docs/BLOCK_ARM_ROLE_INVARIANCE.md`, seção "Ciclos e casos impossíveis"):
+como cada nó `L_CORNER` de 2 braços atribui, por construção, EXATAMENTE
+um papel 0 e um papel 1 às suas duas arestas, qualquer componente do
+grafo de coordenação tem grau ≤ 2 (caminho ou ciclo simples), e a soma
+XOR das paridades ao redor de QUALQUER ciclo — par OU ímpar — é sempre 0.
+**Não existe caso residual/conflito nesta topologia** — o critério de
+desempate determinístico previsto em 28.4 foi implementado mesmo assim
+(`_coordinate_arm_role_nodes`, `wall_stepper.py`), mas é código morto
+para a regra de elegibilidade atual (só dispara se a elegibilidade for
+estendida no futuro a nós com mais de 2 braços participando).
+
+- **Mecanismo**: `_coordinate_arm_role_nodes(nodes)` monta um grafo onde
+  vértice = nó `L_CORNER` de 2 braços, aresta = parede que toca
+  EXATAMENTE 2 desses nós, com peso de paridade calculado a partir de
+  como cada nó já referencia a parede em `arms[0]`/`[1]`. Resolve por
+  BFS/2-coloring, com raiz e ordem de visita SEMPRE por identidade
+  geométrica (`point.X, point.Y`, nunca índice de lista) para não
+  depender da ordem de `nodes`/`walls`/`arms` de entrada. Quando um nó
+  precisa trocar de papel, `node["arms"]` é invertido antes do restante
+  de `solve_all_intersections` rodar — todo consumidor downstream já vê
+  o papel coordenado.
+- **Fix de 28.2 (reserva de fronteira "emprestada" arredondada) foi
+  REMOVIDO do código de produção** — a coordenação de papéis resolve a
+  causa raiz diretamente (as duas pontas da parede nunca mais escolhem
+  papéis contraditórios), então a reserva-de-módulo deixou de ser
+  necessária. Comparação empírica no benchmark real confirmou que
+  coordenação sozinha supera qualquer combinação testada de
+  coordenação+reserva nos dois eixos (`COVERAGE_MISSING_ROW` e
+  `COVERAGE_ROW_MOSTLY_EMPTY` simultaneamente) — a regressão de
+  `COVERAGE_ROW_MOSTLY_EMPTY` (+138 no TGD) registrada em 28.4 **não
+  ocorre mais**: medido no mesmo projeto, `MOSTLY_EMPTY` cai de 171
+  (`origin/main` limpo) para 153 (coordenação, sem a reserva de 28.2).
+- **Status**: 28.2 e o número "+138 MOSTLY_EMPTY" de 28.4 estão
+  SUPERADOS — mantidos no texto acima por registro histórico (nunca
+  apagar regra anterior em silêncio), mas não representam mais o
+  comportamento do código. A regra vigente é esta (28.5). Detalhe
+  completo, gate a gate, com números reais de TGD/TP1/piloto:
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` (relatório
+  `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 28.6).
+
+### 28.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
+pode dessincronizar a alternância do vão menor (B34/B54) entre fiadas em
+paredes cujas duas pontas são `L_CORNER` (`DOCUMENTADO — pendência de
+código aberta`, 2026-09-03)
+
+Medido no benchmark real ao comparar `origin/main` limpo contra o estado
+com a coordenação de papéis (28.5) aplicada: `PRISM_CONTINUOUS_JOINT`
+(seção 11, regra #1 — junta vertical alinhada entre fiadas consecutivas,
+quebra a alternância do vão menor das peças B34/B54) aparece em paredes
+que ANTES não tinham nenhum achado desse código: 8 paredes no TP1
+(`W010, W021, W037, W041, W061, W062, W076, W092`, com TODAS as junções
+consecutivas de fiada, 0 a 16, alinhadas em 0.00cm de desencontro — perda
+TOTAL de stagger ao longo da altura da parede) e um padrão análogo em 2-3
+paredes do TGD (`W003`, `W137`, `W117` parcial). Diferente do achado
+"benigno" já documentado (mesma junção W039/W041 do TP1, que só espelha
+de paridade — linhas ímpares↔pares — sem ser um defeito novo), este
+padrão aparece em paredes que simplesmente não tinham NENHUM problema de
+prisma antes.
+
+- **Hipótese, NÃO CONFIRMADA**: ao trocar `node["arms"]` numa ponta
+  `L_CORNER`, a coordenação muda qual parede recebe a peça de canto
+  assimétrica (B34/B54) — mas a regra fixa que decide a fiada física A/B
+  (`letter = "A" if course_index % 2 == 0 else "B"`, em
+  `solve_building_blocks_all_courses`) não é ajustada em conjunto, então
+  o "vão menor" da peça de canto pode ficar do lado errado em relação ao
+  padrão par/ímpar que o resto da parede espera.
+- **Escopo do fix, se confirmado**: provavelmente dentro de
+  `wall_stepper.py` (`solve_l_corner`/`solve_wall_free_fill`), sem
+  precisar tocar `wall_pairing.py` — mas não verificado nesta sessão.
+- **Status**: bloqueia o veredito de `CR-BLOCK-ARM-ROLE-CONSISTENCY`
+  (NECESSITA AJUSTE — ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`, seção
+  "Riscos"). Próxima sessão sobre este tema deve começar por confirmar ou
+  refutar esta hipótese antes de qualquer nova mudança de código.
