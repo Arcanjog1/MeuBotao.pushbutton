@@ -4470,3 +4470,140 @@ formalizar/implementar a política. Relatório completo:
   G1-G18, hipóteses H1-H5 com veredito, tabela de causa por
   `wall_idx`). Veredito: **NECESSITA AJUSTE**. Nenhuma alteração de
   produção commitada nesta continuação.
+
+## 31. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
+segurança para candidatos de papel; SAFE REPAIR ATIVADO em produção
+(2026-09-04)
+
+**REGRA OBRIGATÓRIA (nova).** Decisão formalizada nesta CR: um candidato
+de troca de papel `course_a`/`course_b` numa aresta ISOLADA do grafo de
+`_coordinate_arm_role_nodes` só pode ser aceito se uma RE-RESOLUÇÃO
+COMPLETA (nunca estimativa) confirmar, contra o ORIGINAL, por DELTA (nunca
+contagem bruta nem `candidato corrigiu o alvo` sozinho):
+
+1. nenhuma parede que fechava passa a falhar (`_no_wall_regression`);
+2. nenhum par de colisão novo, GLOBAL (`_no_new_collisions`, por
+   assinatura geométrica);
+3. nenhuma parede VIZINHA (nunca a própria alvo) ganha prisma forçado
+   novo (`_no_new_forced_corner_prism_in_neighbors`, reusa
+   `wall_bond_audits`/`continuous_joints` já calculado);
+4. nenhuma sequência nova de compensadores consecutivos em nenhuma
+   parede DIRTY (`_no_new_consecutive_compensators`, reusa
+   `_find_consecutive_compensators`, já produção);
+5. nenhuma fiada de nenhuma parede DIRTY perde comprimento coberto além
+   de uma folga RELATIVA de 10% (ou 5cm, o que for maior) —
+   `_no_new_row_coverage_regression`/`_wall_row_covered_length_cm`
+   (único mecanismo NOVO desta CR).
+
+"DIRTY" = a própria parede da aresta isolada + a parede vizinha em CADA
+um dos dois nós (nunca proximidade por tolerância numérica, nunca um
+cluster de 3+ paredes — medido, ver "Inventário" abaixo).
+
+**Tolerância RELATIVA (não absoluta), motivo medido**: qualquer troca de
+papel isolada realoca a peça de canto de um nó entre a família A e a
+família B da parede VIZINHA — efeito esperado e inofensivo de QUALQUER
+candidato, inclusive o aceitável. Medido ao vivo (TGD, `wall_idx=23`,
+ver "Candidato aceito" abaixo): a fiada que perde o nó cai de 555cm para
+541cm (~2.5%) enquanto a que ganha sobe para 570cm — redistribuição
+balanceada. Uma tolerância absoluta de poucos cm (a primeira versão desta
+função usava `BLOCK_JOINT_CM`) rejeitava esse candidato SEGURO por
+engano — corrigido para 10% relativo (ou 5cm, o que for maior) do
+comprimento ANTES, por fiada.
+
+### Inventário de validadores (G1/G2 desta CR)
+
+Todos os 15 identificadores de erro pedidos (`COVERAGE_*`,
+`PRISM_CONTINUOUS_JOINT`, `PRISM_STAGGER_BELOW_TARGET`,
+`FORBIDDEN_JOINT_ALIGNMENT`, `JUNCTION_*`, `OPENING_BLOCK_*`,
+`COMPENSATOR_CONSECUTIVE`, `POSITION_OVERLAP`) só existem como código
+literal em `nuvem/benchmark/validators/*` — **BENCHMARK-ONLY**. Produção
+já tinha equivalentes PUROS e reutilizáveis para `COMPENSATOR_CONSECUTIVE`
+(`_find_consecutive_compensators`), `POSITION_OVERLAP`/`collisions`
+(`validate_same_course_collision`/`collisions_between`) e prisma forçado
+de altura total (`wall_bond_audits[...]["continuous_joints"]`, já
+calculado por `audit_wall_bond_quality`/`solve_building_blocks_all_
+courses`) — reusados sem duplicação. `COVERAGE_GAP_IN_ROW`/
+`COVERAGE_PARTIAL_WALL`/`COVERAGE_ROW_MOSTLY_EMPTY` não tinham
+equivalente de produção — coberto por um helper NOVO, LOCAL e PURO
+(`_wall_row_covered_length_cm`, sem `OccupancyIndex`/cobertura emprestada
+de amarração — seguro porque usado só em DELTA, nunca como validação
+absoluta). `PRISM_STAGGER_BELOW_TARGET` é **SOFT PREFERENCE** na própria
+taxonomia do benchmark (`LEVEL_PREFERENCE`, nível 2) — não ganhou gate
+dedicado de propósito (candidatos que o pioram junto de um achado HARD
+seguem rejeitados pelo gate HARD correspondente). `JUNCTION_NOT_
+ALTERNATING` não precisou de um sexto gate: prevenido ESTRUTURALMENTE
+pelo marcador `_arm_role_pinned` (ver seção 30 acima) — a causa raiz
+(inconsistência de persistência de papel do nó ENTRE BANDAS) deixa de
+poder acontecer, por construção, em vez de ser detectada depois do fato.
+
+### Persistência entre bandas
+
+`_arm_role_pinned` (proposto na seção 30, agora IMPLEMENTADO): um nó com
+esse marcador fica fora do grafo de `_coordinate_arm_role_nodes`
+inteiramente (`_arm_role_coordination_graph(nodes, respect_pins=True)`).
+Identidade estável = o NÓ (índice em `nodes`, mas o papel em si é
+travado por `node["arms"]`, nunca por posição de lista externa) — como o
+SAFE REPAIR só atua em ARESTAS ISOLADAS (grau 1 nos dois nós), excluí-las
+nunca afeta a alternância de nenhuma OUTRA parede coordenada.
+
+### Arquitetura escolhida
+
+**D (candidato completo + validação final)**, com os gates como helpers
+PUROS compartilhados (arquitetura B) — tudo dentro de
+`nuvem/core/engine/wall_stepper.py`
+(`repair_arm_role_isolated_edges`/`_evaluate_corner_role_candidate`/
+`_arm_role_isolated_edges`/`_set_l_corner_role_bits`/gates). ÚNICA
+exceção, disclosed conscientemente (nunca escondida — seção 12 do pedido
+desta CR): `nuvem/core/wall_modeling.py::solve_building_blocks_all_
+courses` virou um wrapper fino (a função original renomeada para
+`_solve_building_blocks_all_courses_core`) que injeta `rebuild_fn`
+(callback, nunca importado por `wall_stepper.py` — evita import
+circular) — o rebuild multi-banda em si mora ali, não podia ser movido
+sem duplicar `_group_course_indices_by_opening_band`. Nenhum validador de
+benchmark importado em produção (G10).
+
+### Medido (TGD, TP1, Piloto — 3 chamadas `run_project` na mesma sessão
+Python, sem git stash, sem escrever `baseline.json`/`score.json`)
+
+- **TGD**: 8 arestas isoladas com prisma forçado detectadas
+  (`wall_idx` 4, 23, 54, 89, 90, 91, 92, 120 — numeração desta sessão,
+  não precisa coincidir com a numeração de sessões anteriores). **1
+  aceito** (`wall_idx=23`, `SAME_A`) — `PRISM_CONTINUOUS_JOINT` 476→444,
+  `PRISM_JOINT_STACK` 29→27, zero achados novos em qualquer outra
+  categoria (a única "diferença" — `COMPENSATOR_EXCESS_IN_RUN` reposicionado
+  em W011, 5 antigos por 5 novos na mesma parede — é a MESMA sequência
+  deslocada 15cm, contagem líquida inalterada). **7 rejeitados**, cada um
+  por um motivo HARD reproduzível: `does_not_resolve_target` (a troca não
+  removia o prisma alvo), `closure_regression`, `new_forced_prism_in_
+  neighbor`, `new_consecutive_compensators`, `row_coverage_regression`.
+- **TP1**: 3 arestas isoladas detectadas (`wall_idx` 20, 75, 91) —
+  **0 aceitos** (todas rejeitadas por `new_consecutive_compensators`
+  ou `does_not_resolve_target`). Score B==C IDÊNTICO em toda categoria —
+  zero regressão, zero melhoria (nenhum candidato seguro disponível
+  neste projeto).
+- **Piloto**: 0 arestas isoladas com prisma forçado — no-op, B==C
+  idêntico.
+
+Nenhuma regressão global em NENHUM projeto. `baseline.json`/
+`reference.json`/`score.json` de todos os projetos permanecem intactos
+(rodado só em memória, `write_files=False`).
+
+### Testes
+
+`tests/test_block_arm_role_candidate_safety_contract.py` (T1-T16 do
+pedido desta CR): unitários e diretos para os gates (compensador,
+cobertura por fiada, colisão, taxonomia soft/hard do stagger),
+sintéticos para persistência entre bandas/invariância de
+permutação/ordem, e contra o corpus real (TGD) para aceitação do
+candidato seguro, fallback ORIGINAL e determinismo de execução repetida.
+
+### Status
+
+`ARM_ROLE_SAFE_REPAIR_ENABLED = True` (default, `wall_modeling.py`) —
+SAFE REPAIR **ATIVO em produção** a partir desta CR, restrito por
+construção às arestas isoladas do grafo de coordenação (nunca paredes T/X
+numa ponta, nunca paredes com componente maior do grafo — `W010`/`W037`-
+like, ver seção 30). Pendências residuais explicitamente NÃO corrigidas
+nesta CR (fora de escopo — seção 13 do pedido): as 7 paredes rejeitadas
+no TGD e as 3 no TP1 continuam com o prisma forçado original, sem
+regressão nova introduzida por tentar corrigi-las.

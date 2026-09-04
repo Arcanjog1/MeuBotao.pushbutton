@@ -3050,13 +3050,24 @@ def _drop_fill_colliding_with_ties(course_pieces):
     return mantidas, descartadas
 
 
-def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
-                                      catalog, base_z_abs, num_courses,
-                                      allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
-                                      variants_per_course=1,
-                                      band_cb=None, progress_cb=None,
-                                      wall_start_cb=None, wall_result_cb=None,
-                                      stage_cb=None, opening_strategy=None):
+# CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT (2026-09-04): liga/desliga o
+# SAFE REPAIR (`repair_arm_role_isolated_edges`, wall_stepper.py) sem
+# precisar mudar nenhum chamador - default True porque o contrato de
+# seguranca (hard gates de fechamento/colisao/prisma-em-vizinha/
+# compensador/cobertura, TODOS avaliados contra um rebuild COMPLETO antes
+# de aceitar) ja' foi verificado contra TGD/TP1/Piloto (ver
+# docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md e REGRAS_MODULACAO_BLOCOS.md secao
+# 30 para o historico; relatorio desta CR para a verificacao final).
+ARM_ROLE_SAFE_REPAIR_ENABLED = True
+
+
+def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                            catalog, base_z_abs, num_courses,
+                                            allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                            variants_per_course=1,
+                                            band_cb=None, progress_cb=None,
+                                            wall_start_cb=None, wall_result_cb=None,
+                                            stage_cb=None, opening_strategy=None):
     """Como `solve_building_blocks`, mas roda uma vez POR GRUPO de fiadas
     fisicas com o mesmo conjunto de aberturas ativas (ver
     _group_course_indices_by_opening_band), em vez de resolver so' UMA vez
@@ -3239,6 +3250,70 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         # a fiada isolada) - ver secao "ETAPA 4C" logo acima desta funcao.
         "wall_bond_audits": wall_bond_audits,
     }
+
+
+def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                      catalog, base_z_abs, num_courses,
+                                      allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                      variants_per_course=1,
+                                      band_cb=None, progress_cb=None,
+                                      wall_start_cb=None, wall_result_cb=None,
+                                      stage_cb=None, opening_strategy=None,
+                                      arm_role_safe_repair=None):
+    """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+    CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
+    courses_core` (a funcao original, inalterada - mesma docstring,
+    mesmos parametros): roda o rebuild ORIGINAL uma vez, e entao chama
+    `repair_arm_role_isolated_edges` (wall_stepper.py - TODA a logica de
+    candidatos/gates/delta mora la', ver o comentario no topo daquela
+    secao) passando `rebuild_fn` como um CALLBACK que roda a MESMA
+    resolucao de novo sobre o `nodes` mutado (nunca a si mesma - reentrar
+    aqui, no wrapper, dispararia o SAFE REPAIR de novo a cada tentativa
+    interna, que e' so' auditoria/tentativa, nao a resolucao "de verdade"
+    que o chamador externo pediu).
+
+    Este e' o UNICO lugar em `wall_modeling.py` tocado por esta CR - a
+    unica razao de nao caber inteiramente em `wall_stepper.py` (escopo
+    originalmente autorizado) e' que o REBUILD multi-banda em si (o loop
+    de bandas acima) mora aqui; `wall_stepper.py` nunca importa este
+    modulo (evita import circular - este modulo ja' faz `from
+    core.engine.wall_stepper import *`), entao a injecao de `rebuild_fn` e'
+    a unica ponte necessaria. Escopo consciente e minimo, nunca logica de
+    validacao duplicada aqui (ver CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+    CONTRACT secao 12).
+
+    `arm_role_safe_repair` (None usa o default do modulo,
+    `ARM_ROLE_SAFE_REPAIR_ENABLED`) permite religar/desligar por chamada,
+    sem precisar mudar nenhum outro codigo."""
+    enabled = ARM_ROLE_SAFE_REPAIR_ENABLED if arm_role_safe_repair is None else arm_role_safe_repair
+    result = _solve_building_blocks_all_courses_core(
+        nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
+        allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+        band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
+        wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
+    )
+    if not enabled or result.get("error") is not None:
+        return result
+
+    def _rebuild():
+        return _solve_building_blocks_all_courses_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
+            allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+            opening_strategy=opening_strategy,
+        )
+
+    repair_outcome = repair_arm_role_isolated_edges(
+        nodes, walls_to_create, catalog, num_courses,
+        baseline_result=result, rebuild_fn=_rebuild,
+    )
+    result["arm_role_safe_repair"] = {
+        "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
+    }
+    if repair_outcome["changed"]:
+        final_result = repair_outcome["final_result"]
+        final_result["arm_role_safe_repair"] = result["arm_role_safe_repair"]
+        return final_result
+    return result
 
 
 # ==========================================
