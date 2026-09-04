@@ -699,6 +699,35 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` NECESSITA AJUSTE (não mesclado, nenhum código alterado no estado final)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-HUMAN-POLICY (continuação de
+               CR-BLOCK-ARM-ROLE-RESIDUALS, entrada abaixo)
+branch:        claude/cr-block-arm-role-policy-q0qepg (esta branch, não
+               PR #9) — main + cherry-pick dos 3 commits de produção do
+               PR #9 (963aa9b/d813f45/77bda14) + 997ce46 (docs)
+status:        NECESSITA AJUSTE — relatório completo
+               docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md (gates G1-G18)
+
+resumo: causa provada (não mais hipótese) do prisma forçado em paredes
+  curtas isoladas (6 das 9 residuais): quando as duas pontas usam a
+  mesma peça de canto e o vão restante não tem composição alternativa,
+  a alternância "sempre-diferente" força a mesma junta nas 17 fiadas.
+  Política formal escrita. Implementação tentada em wall_stepper.py
+  (detector de arestas isoladas + prisma forçado, provado correto
+  contra os projetos reais) mas REVERTIDA antes do commit: o reparo (a
+  troca de papel) usava verificação local de 1 salto que não checava
+  colisão, e introduzia POSITION_OVERLAP real (medido: 18→74270 no
+  TP1) quando ativo. Nenhum código de produção no estado final
+  entregue (idêntico ao já relatado em CR-BLOCK-ARM-ROLE-RESIDUALS).
+
+próximo passo recomendado: reimplementar o reparo com verificação
+  completa (estilo ETAPA 3C — reconstruir e resolver de novo, checando
+  `result["collisions"]`) em vez do resolve parcial de 1 salto.
+```
+
 ### 2026-09-03 — `CR-BLOCK-ARM-ROLE-RESIDUALS` BLOQUEADO POR ESCOPO (não mesclado, nenhum código alterado)
 
 ```

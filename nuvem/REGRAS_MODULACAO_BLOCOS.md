@@ -4312,3 +4312,83 @@ e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
   original em outro caso) antes de qualquer tentativa. Ver
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para os 9 casos individuais e o
   caso `W076` detalhado.
+- **ATUALIZAÇÃO (`CR-BLOCK-ARM-ROLE-HUMAN-POLICY`, 2026-09-04)**: a
+  autorização explícita chegou nesta CR seguinte — ver seção 30 abaixo
+  para a causa PROVADA (não mais hipótese), a política formalizada, e o
+  motivo pelo qual a implementação tentada foi revertida antes do commit.
+
+## 30. `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` — causa provada do prisma forçado
+em paredes curtas; política formalizada; implementação tentada e
+REVERTIDA por gap de segurança (2026-09-04)
+
+Continuação direta da seção 29.7 acima, com autorização explícita para
+formalizar/implementar a política. Relatório completo:
+`docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`.
+
+- **CAUSA PROVADA (não mais "padrão observado")**: quando as duas pontas
+  de uma parede usam a MESMA peça de canto (tipicamente `B34`) e o vão
+  restante é curto/constrangido o bastante para que a busca de
+  preenchimento (`_pier_full_search_layout`/`_layout_min_joint_stagger_
+  cm`, já instrumentada por `CR-BLOCK-ARM-ROLE-PRISM-STAGGER` para EVITAR
+  coincidência sempre que existir alternativa) não tenha NENHUMA
+  composição alternativa dentro do vão, a alternância "sempre-diferente"
+  de 29.5 é FORÇADA a produzir a MESMA junta relativa nas duas fiadas —
+  medido: `stagger_cm≈0` em TODAS as 17 fiadas da parede (prisma corrido
+  de altura total), não um caso de fronteira ocasional. Verificado
+  diretamente (não só herdado da seção 29.7) nas 9 paredes residuais via
+  `nuvem/benchmark/validators/validate_prism.py` rodado contra os
+  projetos reais.
+- **Variável causal generalizada** (respondendo à seção 29.7, que ainda
+  chamava a evidência "estreita — 1 topologia, mesma peça B34"): a causa
+  NÃO é "comprimento" nem "B34+B19" especificamente — é **ser uma ARESTA
+  ISOLADA do grafo de coordenação de `_coordinate_arm_role_nodes`**
+  (nenhuma outra parede coordenada toca qualquer um dos dois nós L_CORNER
+  da parede) **combinada com** ausência de composição alternativa no vão
+  livre. Confirma-se com o mesmo mecanismo aparecendo com compensador C09
+  no meio (`W061`/`W062`), não só B34+B19 puro.
+- **Achado novo**: 3 das 9 paredes residuais (`W003`, `W061`, `W062`) têm
+  um nó `T_INTERSECTION` numa das duas pontas, não dois `L_CORNER` — essas
+  paredes NUNCA estiveram sob o controle de `_coordinate_arm_role_nodes`
+  (que só enxerga nós `L_CORNER` de 2 braços); a coincidência nelas vem de
+  `solve_l_corner`/`solve_t_intersection` decidindo o papel de forma
+  totalmente independente, sem NENHUM mecanismo de alternância ou
+  concentração — fora do alcance desta política, registrado como escopo
+  futuro (seção "Próximo passo recomendado" de
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`).
+- **Paredes longas (`W010`/`W037`) são um mecanismo DIFERENTE**: o humano
+  mantém a alternância (não concentra as duas âncoras) e evita a
+  coincidência com uma composição de preenchimento mais rica no trecho
+  livre não ancorado (medido: humano usa `B34+B34` onde o solver usa
+  `B19+B39` no mesmo trecho, deslocando o primeiro joint de 34.5cm para
+  49.5cm) — a causa-raiz exata de por que a busca de preenchimento não
+  escolhe essa composição (poda, desempate, ou nunca gerada) **não foi
+  isolada** nesta sessão; mudar `_coordinate_arm_role_nodes` não ajudaria
+  aqui (a alternância nessas duas paredes já está correta).
+- **Política formal**: ver `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção
+  "Política candidata" — resumo: para uma parede que é aresta ISOLADA do
+  grafo de coordenação E cuja alternância padrão produz junta corrida,
+  é seguro TENTAR a alternativa "mesma família" (por construção, aresta
+  isolada nunca pode afetar a alternância de nenhuma OUTRA parede
+  coordenada), mas só ACEITAR se uma re-solução real (nunca estimativa)
+  confirmar que a junta corrida desaparece E nenhuma parede que fechava
+  antes passa a falhar E nenhuma colisão nova aparece.
+- **Implementação tentada e REVERTIDA**: escrita em
+  `nuvem/core/engine/wall_stepper.py` (`_arm_role_isolated_edges`,
+  `_wall_has_forced_corner_prism`, `try_same_family_corner_role_repair`,
+  `_repair_forced_corner_prism`) — o DETECTOR (arestas isoladas + prisma
+  forçado) foi provado correto contra os projetos reais (identificou
+  exatamente `W021`/`W092`/`W076` no TP1, nenhuma a mais, nenhuma a
+  menos), mas o REPARO (a troca em si) usava uma verificação LOCAL (1
+  salto de vizinhança de nó, machinery de `find_wall_group_shift_fixes`/
+  ETAPA 3C) que não checava colisão — medido ao vivo, isso introduzia
+  colisões reais (`POSITION_OVERLAP` 18→74270 no TP1 quando ativo).
+  Revertido integralmente ANTES de qualquer commit — nenhuma alteração de
+  produção no estado final entregue desta CR.
+- **Status**: `DOCUMENTADO — causa provada, política formalizada,
+  pendência de código aberta` (não `REGRA OBRIGATÓRIA` — nada foi
+  implementado com segurança confirmada). Veredito de
+  `CR-BLOCK-ARM-ROLE-HUMAN-POLICY`: NECESSITA AJUSTE — ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md` para o relatório completo (gates
+  G1-G18) e o próximo passo recomendado (reimplementar o reparo com
+  verificação de colisão real, no estilo mais caro-porém-seguro da ETAPA
+  3C, em vez do resolve parcial de 1 salto).
