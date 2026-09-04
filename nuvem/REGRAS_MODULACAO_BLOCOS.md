@@ -21,7 +21,9 @@
 > em silêncio — um exemplo que contradiz uma regra existente é registrado
 > como CONFLITO (ver seção 10.7), nunca resolvido por suposição.
 >
-> Última atualização: 2026-09-01 — nova seção 27 (`CR-BLOCK-01`: a busca de
+> Última atualização: 2026-09-04 — regra obrigatória da seção 6: B34 de
+> preenchimento corrente é válido, mas seu vão menor deve travar a fiada
+> oposta; antes disso, 2026-09-01 — nova seção 27 (`CR-BLOCK-01`: a busca de
 > amarração vertical era INCOMPLETA — causa-raiz provada por tracing,
 > busca exata por programação dinâmica sobre múltiplos de `PIER_MODULE_CM`,
 > coincidência proibida entre fiadas da MESMA banda zerada nos 3 projetos
@@ -86,8 +88,9 @@ anterior não fechar o trecho:
    Tenta a ponta de entrada primeiro, depois a de saída.
 3. **B39 + B34** (sem B19, sem compensador) — o B34 pode cair em
    **qualquer posição** do trecho, inclusive no meio, quando isso reduz o
-   uso de compensadores. *(Alinhamento de vão entre fiadas para B34 de
-   meio-de-parede: ver limitação na seção 6.)*
+   uso de compensadores. Quando houver B34 de preenchimento em uma fiada,
+   a fiada oposta deve respeitar a regra obrigatória de alinhamento do vão
+   menor registrada na seção 6.
 4. **1 único B19** numa ponta aberta, preenchendo o resto com B39+B34.
 5. **1 único B19 mesmo sem ponta aberta** (ainda fecha com zero
    compensadores — prioridade maior que qualquer compensador).
@@ -255,14 +258,33 @@ Dois B54 a 90°, ambos centrados no ponto do nó, células centrais
 alinhadas (`validate_x_intersection`). Cobre tanto o cruzamento no meio
 de duas paredes contínuas quanto o caso raro de 4 pontas coincidindo.
 
-## 6. Limitações conhecidas (não são bugs, são escopo pendente)
+## 6. Amarração de B34 no preenchimento corrente
 
-- **B34 de meio-de-parede** (seção 2, nível 3) **não** alinha ainda o vão
-  menor entre Fiada A e Fiada B quando usado como preenchimento comum
-  arbitrário (fora de um encontro L/T) — a orientação usada é uma
-  convenção fixa, não otimizada por alinhamento cruzado entre fiadas.
-  Diferente do L_CORNER/T-degradado, onde o alinhamento É garantido e
-  validado (seção 5).
+### 6.1 Regra obrigatória — B34 pode ficar no meio, mas deve travar as duas fiadas
+
+**REGRA OBRIGATÓRIA** (orientação explícita do usuário, 2026-09-04, a partir
+do print do Modelador Externo): o B34 é uma peça válida de preenchimento
+comum e pode ficar no meio da parede; ele não é um erro apenas por não estar
+em canto L/T/X. O que deve ser validado é a amarração entre as duas fiadas:
+
+- se uma fiada usa B34 no trecho corrente, a fiada oposta deve usar B34 com
+  o **vão menor alinhado verticalmente** ao vão menor do B34 da primeira;
+- a posição do B34 da segunda fiada deve avançar até a metade de um B39 da
+  primeira quando essa for a geometria que preserva esse alinhamento;
+- o fechamento restante pode usar B19 **somente na ponta aberta** do trecho
+  (por exemplo, no final junto a um vão), nunca espremido contra encontro
+  L/T/X; a regra de ponta aberta da seção 2 continua valendo;
+- se não existir composição que alinhe o vão menor sem violar junta corrida,
+  abertura ou a regra do B19, a solução é reprovada para revisão — nunca se
+  declara erro simplesmente porque o B34 está no meio.
+
+Implementação: o solver carrega os centros e dimensões reais das células da
+família, procura o B34 correspondente na fiada oposta e exige a coincidência
+do centro da sua célula de menor área dentro da tolerância geométrica. A
+captura/visualizador não deve gerar `invalid_b34_count` somente pelo
+`placement_reason` ser `STANDARD_FILL`.
+
+## 6.2 Limitações conhecidas (não são bugs, são escopo pendente)
 - **Desencontro de junta vertical** entre Fiada A e Fiada B nos trechos de
   preenchimento comum (`_pier_layout_avoiding_joints`) — **ATUALIZADO
   2026-08-25**: deixou de ser best-effort. Ver seção 11 para a regra
