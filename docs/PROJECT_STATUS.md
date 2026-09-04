@@ -699,6 +699,407 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-JUNCTION-GATE` (causa raiz provada) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-JUNCTION-GATE
+status:        NECESSITA AJUSTE — docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md,
+               seção "CONTINUAÇÃO — CR-BLOCK-ARM-ROLE-JUNCTION-GATE"
+
+resumo: a atribuição anterior ("W137 causa JUNCTION_NOT_ALTERNATING em
+  W011/W088") estava ERRADA (comparação corrompida por conflito de git
+  stash) — corrigida: W137 isolado produz 0 achados de junção novos. Os
+  candidatos reais que causam a regressão sao wall_idx=7 (=W090, afeta a
+  vizinha W088) e wall_idx=23 (=W011, afeta a si mesma) — sempre um par,
+  nunca um cluster de 3+ paredes. CAUSA RAIZ PROVADA: inconsistência de
+  persistência do papel do nó ENTRE BANDAS de
+  solve_building_blocks_all_courses — _coordinate_arm_role_nodes
+  reconstrói o estado alternante do zero em cada banda, e um reparo
+  acionado só quando a banda atual mostra prisma forçado fica ativo em
+  algumas bandas e revertido ao padrão oposto nas outras, produzindo
+  duas convenções internas incompatíveis na mesma parede. Correção
+  estrutural provada em script (marcador `_arm_role_pinned`, exclui nós
+  já decididos do filtro de `_coordinate_arm_role_nodes`, sem tocar
+  wall_pairing.py/wall_modeling.py): zera JUNCTION_NOT_ALTERNATING novo
+  nos 5 candidatos do TGD. Achado adicional fora do escopo desta CR: com
+  verificação completa (todos os validadores), 4 dos 5 candidatos ainda
+  introduzem COMPENSATOR_CONSECUTIVE/COVERAGE_GAP_IN_ROW/etc. novos em
+  categorias que nenhum gate hoje autorizado detecta — só wall_idx=23
+  (W011) passa limpo em tudo. Nenhuma alteração de produção commitada.
+
+próximo passo: (1) commitar o pin-fix isolado (seguro, no-op sem
+  chamador) se autorizado; (2) decidir com o usuário se um sexto gate
+  de compensador/cobertura em vizinhas precisa de nova auditoria de
+  produção, ou se a política deve por ora restringir aceitação a
+  candidatos que não tocam nenhuma parede vizinha; (3) só depois
+  reativar o SAFE REPAIR completo.
+```
+
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` (continuação SAFE REPAIR) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-HUMAN-POLICY, continuação SAFE REPAIR
+status:        NECESSITA AJUSTE — docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md,
+               seção "CONTINUAÇÃO — SAFE REPAIR"
+
+resumo: corrigido o gap de colisão da tentativa anterior (causa: nó
+  duplicado no RESOLVE PARCIAL, não a vizinhança de 1 salto) reusando
+  `result["collisions"]` (já completa, já existente) como gate. 3
+  paredes (W021/W092/W076, TP1) reparadas com seguranca TOTAL medida
+  (fechamento + colisão global + prisma em vizinhas). Um SEGUNDO gap,
+  diferente, foi achado ao testar W137/TGD: introduz
+  JUNCTION_NOT_ALTERNATING (nível 1) em 2 paredes vizinhas antes limpas,
+  via um agrupamento de nó por proximidade que o benchmark faz e
+  wall_stepper.py não replica. Revertido por completo de novo (nenhum
+  código de produção no estado entregue) — sem 5º gate que cubra isso,
+  nem os 3 candidatos "limpos" do TP1 têm prova de que ficariam limpos
+  sempre.
+
+próximo passo: construir esse 5º gate (replicar o agrupamento por
+  proximidade localmente) ou obter autorização explícita de escopo para
+  reusar nuvem/benchmark/validators/validate_junctions.py como
+  dependência de produção.
+```
+
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` (primeira tentativa) NECESSITA AJUSTE (não mesclado, nenhum código alterado no estado final)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-HUMAN-POLICY (continuação de
+               CR-BLOCK-ARM-ROLE-RESIDUALS, entrada abaixo)
+branch:        claude/cr-block-arm-role-policy-q0qepg (esta branch, não
+               PR #9) — main + cherry-pick dos 3 commits de produção do
+               PR #9 (963aa9b/d813f45/77bda14) + 997ce46 (docs)
+status:        NECESSITA AJUSTE — relatório completo
+               docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md (gates G1-G18)
+
+resumo: causa provada (não mais hipótese) do prisma forçado em paredes
+  curtas isoladas (6 das 9 residuais): quando as duas pontas usam a
+  mesma peça de canto e o vão restante não tem composição alternativa,
+  a alternância "sempre-diferente" força a mesma junta nas 17 fiadas.
+  Política formal escrita. Implementação tentada em wall_stepper.py
+  (detector de arestas isoladas + prisma forçado, provado correto
+  contra os projetos reais) mas REVERTIDA antes do commit: o reparo (a
+  troca de papel) usava verificação local de 1 salto que não checava
+  colisão, e introduzia POSITION_OVERLAP real (medido: 18→74270 no
+  TP1) quando ativo. Nenhum código de produção no estado final
+  entregue (idêntico ao já relatado em CR-BLOCK-ARM-ROLE-RESIDUALS).
+
+próximo passo recomendado: reimplementar o reparo com verificação
+  completa (estilo ETAPA 3C — reconstruir e resolver de novo, checando
+  `result["collisions"]`) em vez do resolve parcial de 1 salto.
+```
+
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-RESIDUALS` BLOQUEADO POR ESCOPO (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-RESIDUALS (continuação de
+               CR-BLOCK-ARM-ROLE-PRISM-STAGGER, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft)
+HEAD:          77bda141df0038c973971075b09f3320e274adb2 (inalterado -
+               nenhum código de producao mudou nesta continuacao)
+status:        BLOQUEADO POR ESCOPO
+
+resumo: investigou as duas pendencias do CR anterior. (1)
+  OPENING_BLOCK_INSIDE_DOOR +3 no TGD: causa provada - artefato
+  pre-existente de opening_active_in_row (fiada de fronteira contada
+  como "ativa" por so' 5% da sua altura); as mesmas 3 paredes ja'
+  tinham este achado no estado limpo antes de qualquer CR desta serie -
+  nao e' invasao fisica nova, e' problema de medicao do benchmark, nao
+  tocado em producao. (2) as 9 paredes de prisma residual: comparadas
+  sistematicamente contra o Reference Corpus humano (casamento
+  geometrico correto, nao por id) - 8 de 9 tem correspondente humano, e
+  NENHUMA tem junta coincidente na referencia; o humano evita a
+  coincidencia concentrando as duas pecas de canto na MESMA fiada (nao
+  alternando como a coordenacao atual faz) ou usando composicao mais
+  rica. Corrigir isso exigiria revisar a POLITICA de desempate da
+  coordenacao deterministica - explicitamente fora do escopo autorizado
+  desta continuacao ("nao desfazer a coordenacao A/B").
+
+detalhe completo: docs/BLOCK_ARM_ROLE_INVARIANCE.md (gates G1-G16,
+  classificacao das 9 paredes, caso W076 detalhado). Nova secao 29.7 de
+  REGRAS_MODULACAO_BLOCOS.md registra o padrao observado (ainda nao
+  confirmado, nao promovido a regra).
+
+proximo passo: (1) decisao humana sobre regravar baseline.json do TGD
+  ou refinar opening_active_in_row; (2) nova CR, com autorizacao
+  explicita, para revisar o desempate da coordenacao a luz da
+  evidencia humana. PR #9 (draft) permanece; NAO MESCLADO.
+```
+
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-PRISM-STAGGER` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-PRISM-STAGGER (continuação de
+               CR-BLOCK-ARM-ROLE-CONSISTENCY, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   d813f457108ef187b35dd581c35821d22ad23c4d
+SHA final:     ver commit desta entrega, topo do log
+status:        NECESSITA AJUSTE (gates G7/G8/G9 falharam - ver relatorio
+               completo docs/BLOCK_ARM_ROLE_INVARIANCE.md, reescrito
+               para este CR)
+
+o que foi investigado: a regressao de PRISM_CONTINUOUS_JOINT introduzida
+  por CR-BLOCK-ARM-ROLE-CONSISTENCY (11 paredes reais - 3 TGD, 8 TP1 -
+  que antes nao tinham nenhum achado de prisma passaram a ter TODAS as
+  juntas entre fiadas consecutivas alinhadas). Causa-raiz provada por
+  cadeia completa (papel coordenado -> solve_l_corner -> peca ->
+  orientacao -> posicao da junta -> fill -> junta na fiada oposta), nao
+  so' pelo validador final: a junta entre a peca de canto de um no' e o
+  primeiro/ultimo bloco do preenchimento comum adjacente NUNCA foi
+  rastreada pelo mecanismo de desencontro de junta vertical (secao 6,
+  `_layout_internal_joint_positions_cm` so' conta juntas INTERNAS ao
+  preenchimento, por design documentado) - inofensivo enquanto so' uma
+  familia tinha candidato de no' real num dado encontro; a coordenacao
+  de papel deu as duas familias um candidato real no MESMO encontro, e
+  quando ambas escolhem a MESMA peca (B34, decisao geometrica correta,
+  independente da coordenacao) a junta de contorno coincide sem a busca
+  de desencontro saber. Hipotese inicial (vao menor B34/B54
+  dessincronizado da paridade par/impar) REFUTADA - a orientacao/posicao
+  da peca de canto e' sempre determinada por geometria pura, nunca por
+  course_a/course_b.
+
+fix implementado (nuvem/core/engine/wall_stepper.py, unica alteracao de
+  producao): `_pier_boundary_joint_positions_cm` computa a posicao da
+  junta de contorno contra um no'; duas listas NOVAS e SEPARADAS
+  (`course_a_boundary_joint_positions_cm`/`own_family_boundary_joint_
+  positions_cm`) alimentam a busca de desencontro e a checagem residual
+  (`alignment_conflicts`, que agora tambem dispara para pier de 1 bloco
+  so', antes escondido por `len(layout) > 1`) - mas NUNCA o reparo de
+  abertura (`_recut_openings_and_repair`), separacao necessaria depois
+  de medir uma regressao real em OPENING_BLOCK_INSIDE_DOOR na primeira
+  versao do fix (misturando as listas).
+
+testes: 5 testes novos e permanentes
+  (tests/test_block_arm_role_prism_stagger.py), rodando o corpus real
+  via nuvem.benchmark.solver_bridge (o caso minimo de W076 depende da
+  reserva "emprestada" do quadrado do canto, so' existe com topologia
+  real de mais de 2 paredes por no'). 2 deles falham no codigo anterior
+  ao fix pela razao certa (confirmado via git stash). Suite rapida
+  completa: 518 passed (513 + 5 novos).
+
+benchmarks (torre_easy_lo_r00_tgd/tp1/piloto_sintetico_2x2, comparacao
+  A=origin/main limpo (7c9a681) / C=d813f45 (ARM-ROLE-CONSISTENCY) /
+  D=este fix):
+    - coverage (MISSING_ROW/MOSTLY_EMPTY): IDENTICO entre C e D nos 3
+      projetos - o ganho de cobertura do commit d813f45 esta' 100%
+      preservado;
+    - PRISM_CONTINUOUS_JOINT: TGD 702(A)->691(C)->476(D); TP1
+      837(A)->896(C)->576(D) - cai ABAIXO ate' do estado anterior a
+      qualquer CR desta serie nos dois projetos reais;
+    - NEW_PRISM_WALLS: 11 antes do fix -> 9 depois (W117/TGD e
+      W041/TP1 resolvidos por completo - tinham liberdade real de
+      composicao; as 9 restantes tem o pier cabendo EXATAMENTE 1 bloco,
+      coincidencia matematicamente forcada pela mesma peca B34 nas duas
+      pontas - detectada e reportada via alignment_conflicts, mas nao
+      eliminavel sem mudar qual peca e' escolhida num dos dois nos,
+      mudanca mais invasiva nao implementada);
+    - OPENING_BLOCK_INSIDE_DOOR (TGD): 43(A)->43(C)->46(D) - REGRESSAO
+      REAL, +3, em 3 paredes ja' afetadas (nenhuma nova), causa exata
+      nao totalmente diagnosticada mesmo apos a separacao de listas;
+    - POSITION_OVERLAP (colisoes): identico nos 3 estados, nenhuma
+      mudanca.
+
+novas dividas: (1) 9 paredes com PRISM_CONTINUOUS_JOINT geometricamente
+  forcado - eliminar exigiria mudar a selecao de peca de canto em
+  solve_l_corner (B54 em vez de B34), decisao que precisa de
+  autorizacao explicita do usuario antes de qualquer tentativa; (2)
+  regressao de OPENING_BLOCK_INSIDE_DOOR (+3, TGD) precisa de
+  investigacao propria. Documentado como secao 29.6 (atualizada) de
+  REGRAS_MODULACAO_BLOCOS.md.
+
+itens resolvidos: causa-raiz completa da regressao de prisma provada
+  (cadeia completa, hipoteses H1-H7 testadas e documentadas); 2 de 11
+  paredes com prisma novo resolvidas por completo; reducao substancial
+  do total de PRISM_CONTINUOUS_JOINT nos dois projetos reais.
+
+itens ainda pendentes: as 9 paredes com coincidencia geometricamente
+  forcada; a regressao de OPENING_BLOCK_INSIDE_DOOR.
+
+proximo passo recomendado: decidir, com o usuario, se vale a pena
+  investigar mudanca na selecao de peca de canto para as 9 paredes
+  restantes; diagnosticar a regressao de OPENING_BLOCK_INSIDE_DOOR antes
+  de qualquer nova tentativa. Ver docs/BLOCK_ARM_ROLE_INVARIANCE.md para
+  o relatorio completo, gate a gate. PR #9 (draft) permanece; NAO
+  MESCLADO.
+```
+
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-CONSISTENCY` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-CONSISTENCY (continuação de
+               CR-BLOCK-ARM-ROLE-INVARIANCE, entrada anterior abaixo)
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   963aa9b227d0e635ee020494c9891591af18531d
+SHA final:     ver commit desta entrega, topo do log
+status:        NECESSITA AJUSTE (gate G10 falhou — ver relatório completo
+               docs/BLOCK_ARM_ROLE_INVARIANCE.md, agora reescrito para
+               este CR)
+
+o que foi alterado: o workaround "reserva de fronteira emprestada"
+  (29.2/entrada anterior deste histórico) foi REMOVIDO — o usuário
+  rejeitou esse fix por só reclassificar COVERAGE_MISSING_ROW em
+  COVERAGE_ROW_MOSTLY_EMPTY, sem resolver a causa raiz. No lugar,
+  implementado `_coordinate_arm_role_nodes` (nuvem/core/engine/
+  wall_stepper.py, única alteração de produção): coordena
+  deterministicamente, via 2-coloring de grafo (formalizado ANTES de
+  assumir essa estrutura — ver relatório, seção "Contrato formal"), o
+  papel course_a/course_b entre os DOIS nós L_CORNER de 2 braços que
+  fecham as duas pontas da MESMA parede, para que nunca escolham papéis
+  contraditórios. Raiz e ordem de visita do BFS sempre por identidade
+  geométrica do nó (nunca por ordem de lista), garantindo invariância a
+  arms/paredes de entrada/reversão de endpoint.
+
+  Prova combinatória (não apenas geométrica) de que ciclos — pares OU
+  ímpares — de nós L_CORNER de 2 braços são SEMPRE 2-coloráveis (soma
+  XOR de paridade ao redor de qualquer ciclo é sempre 0, por
+  telescopagem): o ramo de conflito residual da coordenação é
+  matematicamente inalcançável para esta regra de elegibilidade, mantido
+  como rede de segurança determinística.
+
+testes: 16 testes em tests/test_block_arm_role_invariance.py (2 novos:
+  retângulo fechado real / ciclo par sem conflito; prova geral de ciclo
+  par-ou-ímpar sem conflito residual, por construção, várias
+  combinações de ordem de arms) + 1 teste atualizado em
+  tests/test_script.py (colisão de mesma-fiada deixa de ocorrer + as
+  duas pontas da parede curta passam a alternar A/B). Suíte rápida
+  completa: 513 passed. Suíte lenta (regressão contra baseline.json):
+  2 failed (TGD, TP1 — ver "novas dívidas" abaixo, não escondido).
+
+benchmarks (torre_easy_lo_r00_tgd/tp1/piloto_sintetico_2x2, comparação
+  A=origin/main limpo (7c9a681) / B=workaround anterior (963aa9b) /
+  C=este estado):
+    - TGD: COVERAGE_MISSING_ROW 265→258 (-7); COVERAGE_ROW_MOSTLY_EMPTY
+      171→153 (-18, a regressão de +138 do workaround anterior NÃO
+      ocorre mais); TOTAL_COVERAGE_CRITICAL 436→411 (-25);
+      PRISM_CONTINUOUS_JOINT por parede 39→41 (+2, ver "novas dívidas");
+    - TP1: COVERAGE_MISSING_ROW 16→0 (eliminado); COVERAGE_ROW_
+      MOSTLY_EMPTY 27→18 (-9); TOTAL_COVERAGE_CRITICAL 43→18 (-58%);
+      PRISM_CONTINUOUS_JOINT por parede 50→53 (+3, defeito NOVO em 8
+      paredes, não reclassificação — ver "novas dívidas");
+      JUNCTION_MISSING_BINDING 8→9 (+1, confirmado mesma junção
+      W039/W041, mirror de paridade, não é uma junção nova);
+    - piloto: nenhuma mudança em nenhuma métrica.
+  Casos nomeados verificados individualmente: W022/TP1 e W093/TP1 —
+  COVERAGE_MISSING_ROW/MOSTLY_EMPTY eliminados, substituídos por
+  COVERAGE_GAP_IN_ROW (severidade menor, reclassificação explícita);
+  W011/piloto — nenhuma mudança (fora da topologia do defeito).
+
+novas dívidas: PRISM_CONTINUOUS_JOINT regride em paredes que antes não
+  tinham NENHUM achado desse código (8 no TP1 com TODAS as junções de
+  fiada alinhadas, 2-3 no TGD) — hipótese não confirmada de que a
+  coordenação desincroniza a alternância do vão menor (B34/B54) da
+  regra fixa de paridade par/ímpar das fiadas. Documentado como seção
+  29.6 de REGRAS_MODULACAO_BLOCOS.md ("DOCUMENTADO — pendência de código
+  aberta"). Este é o motivo do veredito NECESSITA AJUSTE.
+
+itens resolvidos: causa-raiz completa do mecanismo "arms order → course
+  role → perda de fiada" (o workaround anterior só mitigava parte dela);
+  a regressão COVERAGE_ROW_MOSTLY_EMPTY do fix anterior não existe mais.
+
+itens ainda pendentes: root-cause e fix do efeito colateral em
+  PRISM_CONTINUOUS_JOINT (seção 29.6); baseline.json não regravado
+  (não deve ser, dado o veredito).
+
+próximo passo recomendado: confirmar/corrigir a hipótese de 29.6 antes
+  de qualquer nova iteração. PR #9 (draft) permanece; NÃO MESCLADO.
+```
+
+### 2026-09-03 — `CR-BLOCK-ARM-ROLE-INVARIANCE` NECESSITA AJUSTE (não mesclado)
+
+```
+data:          2026-09-03
+CR:            CR-BLOCK-ARM-ROLE-INVARIANCE
+branch:        claude/cr-block-arm-role-invariance-7tezx4 (PR #9, draft,
+               não mesclado)
+SHA inicial:   7c9a681aeda2027f8fc072c0f57c62454a80d669 (origin/main)
+SHA final:     963aa9b227d0e635ee020494c9891591af18531d
+status:        NECESSITA AJUSTE (gate G9 falhou — ver relatório completo
+               docs/BLOCK_ARM_ROLE_INVARIANCE.md)
+
+o que foi alterado: causa-raiz provada (caso real W042/TGD, wall_idx 41)
+  de que dois nós L_CORNER/X_INTERSECTION de UMA MESMA parede decidem o
+  papel course_a/course_b de forma totalmente independente entre si —
+  sem alternância forçada, podem escolher o MESMO papel nas duas pontas,
+  apagando a família oposta inteira quando combinado com a fronteira
+  "emprestada" de uma parede vizinha raramente caindo no módulo de 5cm
+  de blocos (preenchimento contínuo, tudo-ou-nada sem abertura para
+  servir de ponto de quebra). Fix restrito a
+  nuvem/core/engine/wall_stepper.py (wall_pairing.py intocado, conforme
+  exigido pelo CR): arredonda a reserva "para dentro" (nunca menos) até
+  o próximo múltiplo de PIER_MODULE_CM quando a família não tem NENHUMA
+  peça de nó própria em nenhuma ponta, a família oposta TEM, e nem esta
+  parede nem a doadora têm abertura própria.
+
+  AVISO: o "wall graph determinístico"/ordenação canônica de arms que um
+  CR anterior (CR-BLOCK-WALL-GRAPH-QUALITY) documentou NÃO está mesclado
+  em origin/main neste SHA — só em branches não mescladas. O mecanismo e
+  o fix são os mesmos independente disso (reproduzido manipulando
+  node["arms"] em memória, sem depender de nenhuma convenção específica
+  de wall_pairing.py).
+
+testes: 14 testes sintéticos novos e permanentes
+  (tests/test_block_arm_role_invariance.py) — 6 falham no estado
+  anterior pelo motivo correto (confirmado via git stash). Suíte
+  completa: 521 passed, 1 failed (a regressão documentada abaixo, não
+  escondida).
+
+invariantes: determinismo preservado (mesmo código/entrada → mesma
+  saída, 3x confirmado); performance na mesma ordem de grandeza
+  (TGD/TP1/piloto, ver relatório); wall_pairing.py/continuous_
+  modulation.py/wall_modeling.py/geometry.py/tolerances.py/modulation_
+  math.py NÃO alterados (git diff --stat confere).
+
+benchmarks (torre_easy_lo_r00_tgd, contra origin/main LIMPO — não
+  baseline.json, que está desatualizado para PRISM_CONTINUOUS_JOINT/
+  OPENING_BLOCK_INSIDE_DOOR neste projeto, achado colateral não causado
+  por este CR):
+    - COVERAGE_MISSING_ROW: 265 → 145 (-120, melhoria grande);
+    - COVERAGE_ROW_MOSTLY_EMPTY: 171 → 309 (+138, REGRESSÃO CRÍTICA —
+      reclassificação medida de paredes que já tinham as duas famílias
+      ruins: uma fica rescatável pelo fix, a outra continua exatamente
+      como estava, nenhuma parede NOVA quebra, mas o total de achados
+      sobe +123);
+    - OPENING_BLOCK_CROSSES_JAMB/INSIDE_DOOR/PRISM_CONTINUOUS_JOINT:
+      inalterados;
+    - torre_easy_lo_r00_tp1 e piloto_sintetico_2x2: NENHUMA mudança em
+      nenhum código (nenhuma parede desses dois projetos se qualificou
+      para o escopo restrito do fix).
+
+novas dívidas: resolução completa do resíduo COVERAGE_ROW_MOSTLY_EMPTY
+  exige forçar ALTERNÂNCIA de papel entre os DOIS nós de uma mesma
+  parede (problema de 2-coloração de grafo — cada nó de 2 braços é uma
+  aresta entre duas paredes-vértice; ciclos de comprimento ímpar tornam
+  alternância perfeita impossível em geral) — fora do escopo autorizado
+  desta CR (só wall_stepper.py, sem "resolver toda a cobertura").
+  Documentado como seção 29.4 de REGRAS_MODULACAO_BLOCOS.md.
+  baseline.json e REFERENCE_SOLVER_DECISION_FINGERPRINT
+  (tests/solver_bench.py) confirmados DESATUALIZADOS em relação a
+  origin/main limpo (não causado por esta CR) — recomenda-se CR de
+  manutenção próprio para atualizar os dois.
+
+itens resolvidos: causa-raiz do mecanismo "arms order → course role →
+  perda de fiada" provada e corrigida para o subconjunto de casos sem
+  abertura envolvida nos dois lados do nó.
+
+itens ainda pendentes: alternância de papel forçada entre nós da mesma
+  parede (ver "novas dívidas"); resolução do caso com abertura numa das
+  duas paredes do nó (fora do escopo, intencionalmente).
+
+próximo passo recomendado: CR próprio para a alternância de papel
+  (2-coloração), mesmo espírito do CR-BLOCK-NODE-FILL-JOINT já aberto —
+  ver docs/BLOCK_ARM_ROLE_INVARIANCE.md para o relatório completo,
+  gate a gate. PR #9 (draft) aberto para registro; NÃO MESCLADO — decisão
+  humana explícita necessária sobre o trade-off G4/G9 documentado.
+```
+
 ### 2026-09-02 — `CR-BLOCK-01` CONCLUÍDO / APROVADO POR CROSS-AUDIT
 
 ```
