@@ -350,4 +350,319 @@ de achado, e rejeita os demais candidatos do mesmo projeto pela razão
 HARD correta e reproduzível — sem nenhuma regressão global em TGD, TP1
 ou Piloto. `ARM_ROLE_SAFE_REPAIR_ENABLED = True` em produção.
 
-**Não mergeado. PR #11 continua DRAFT.**
+**Não mergeado. PR #12 continua DRAFT.**
+
+============================================================
+
+# CONTINUAÇÃO — PRE-INTEGRATION AUDIT (2026-09-04)
+
+Auditoria final antes de qualquer integração do PR #12, pedida
+explicitamente: (A) sincronizar a branch com `origin/main`; (B)
+determinar exatamente o que significa `JUNCTION_MISSING_BINDING` 8→9 no
+TP1 antes de qualquer decisão sobre `baseline.json`.
+
+## Git
+
+```
+main anterior (merge-base)   a2577797f40048413207d11ea7e7b385e97c1813
+main atual (origin/main)     0ff784e70869ae48b232f416ac0784f45f7f1703
+                              (1 commit: "docs: define reviewed
+                              geometry proposals" - docs-only,
+                              nuvem/REGRAS_MODULACAO_BLOCOS.md)
+branch antes                 69153f59f65dc21cdd7091b8cf4987c6eefa8a9d
+branch depois (merge)        5bb5553 (merge commit, MERGE normal -
+                              nunca rebase)
+```
+
+## Conflitos
+
+Um único conflito, em `nuvem/REGRAS_MODULACAO_BLOCOS.md`: `origin/main`
+adicionou uma NOVA seção `## 29.` ("assistente de propostas
+geométricas") no mesmo ponto onde esta branch já tinha `## 29.
+CR-BLOCK-ARM-ROLE-INVARIANCE` (renumerada de 28→29 pelo PR#9, antes
+desta CR). Resolvido preservando os DOIS lados integralmente: a seção
+nova da main manteve o número 29; as três seções ARM-ROLE desta branch
+foram renumeradas 29→30, 30→31, 31→32 (incluindo as subseções 29.1-29.7
+→ 30.1-30.7 e todas as referências cruzadas internas - "ver seção 30"
+→ "ver seção 31", etc.). Nenhum conteúdo apagado. Nenhum outro arquivo
+conflitou.
+
+## Regra nova da main preservada
+
+Confirmado: `## 29. REGRA OBRIGATÓRIA — assistente de propostas
+geométricas, com aprovação explícita` (5 itens sobre propor alterações
+geométricas com aprovação humana explícita) está intacta, verbatim, no
+arquivo final.
+
+## `JUNCTION_MISSING_BINDING` — investigação completa
+
+### A — origin/main (0ff784e)
+
+8 ocorrências, TODAS no mesmo nó físico: encontro L em `(6177.25,
+949.95)`, paredes `W039`↔`W041`, fiadas **ÍMPARES** (1, 3, 5, 7, 9, 11,
+13, 15).
+
+### B — branch, SAFE REPAIR OFF
+
+9 ocorrências, MESMO nó físico, fiadas **PARES** (0, 2, 4, 6, 8, 10, 12,
+14, 16).
+
+### C — branch, SAFE REPAIR ON
+
+Idêntico a B (9 ocorrências, mesmas fiadas pares) — confirma que o
+Candidate Safety Contract não participa deste achado.
+
+## 9ª ocorrência (na verdade: TODAS as ocorrências de B são "novas" em
+relação a A, por identidade geométrica — nó + fiada)
+
+`NEW_BINDING_FINDINGS = findings(B) - findings(A)` por identidade
+geométrica (ponto do nó + índice de fiada, nunca posição de lista nem
+`wall_idx`, que é só diagnóstico): as 9 fiadas pares de B são todas
+"novas" em relação às 8 fiadas ímpares de A (nenhuma delas coincide) —
+e as 8 fiadas ímpares de A deixam de aparecer em B (resolvidas). Não há
+uma "9ª ocorrência isolada": é o MESMO defeito espelhado de paridade
+por completo.
+
+- **Projeto**: `torre_easy_lo_r00_tp1`.
+- **Parede geométrica**: encontro L entre `W039` e `W041`, ponto
+  `(6177.25, 949.95)` (nó `node_index=64` do grafo do solver, `arms:
+  [[38,1],[40,0]]` — `wall_idx` 38/40 só como diagnóstico, instável
+  entre execuções).
+- **Fiadas**: pares (0,2,4,6,8,10,12,14,16) em B/C; ímpares
+  (1,3,5,7,9,11,13,15) em A.
+- **Encontro**: tipo `L` (`L_CORNER`, dois braços).
+- **Paredes envolvidas**: `W039` (o único lado que algum dia cobre o
+  ponto) e `W041` (nunca cobre, em nenhum estado).
+- **Node**: `node_index=64` do grafo de `wall_pairing.py`/
+  `wall_stepper.py` (o mesmo nó em A e B/C — geometria idêntica, walls_
+  to_create idêntico, só a decisão de papel do nó muda).
+- **Geometria**: `block_covers_point` (a MESMA função do validador,
+  chamada diretamente) prova que `W041` fica sistematicamente ~8cm
+  curta do ponto do nó em TODAS as fiadas, em TODOS os estados (A, B,
+  C) — nunca cobre. Só `W039` cobre, e só na fiada cuja família foi
+  ancorada nesse nó pela coordenação de papel.
+- **Blocos envolvidos**: em A, fiadas pares de `W039` têm `C09`/`B34`
+  (papel `L_binding`) cobrindo o ponto; fiadas ímpares não têm NENHUM
+  bloco a menos de ~120cm do ponto (buraco real de preenchimento, não
+  só "falta uma peça específica"). Em B/C, o padrão inverte (ímpares
+  cobertas, pares com o buraco).
+- **Binding esperado vs produzido**: esperado - alguma peça de amarração
+  cobrindo o ponto em TODA fiada; produzido - cobertura alternada por
+  família (metade das fiadas cobertas, metade não), em AMBOS os
+  estados A e B/C - o defeito em si não é novo, só a paridade afetada.
+- **Regra que dispara o validator**: `JUNCTION_MISSING_BINDING`
+  (`nuvem/benchmark/validators/validate_junctions.py:validate_node`,
+  "alguma fiada em que NENHUMA parede do nó pôs peça no encontro").
+
+## Primeira introdução
+
+Isolado por commit, comparação DIRETA (nunca `git stash`) via `git
+worktree` para cada um dos 3 commits do PR#9 aplicados sobre
+`origin/main`:
+
+| commit | `JUNCTION_MISSING_BINDING` (TP1) |
+|---|---|
+| `a2577797` (main, antes de qualquer ARM-ROLE) | 8 |
+| `963aa9b` (`CR-BLOCK-ARM-ROLE-INVARIANCE`) | 8 (inalterado) |
+| `d813f45` (`CR-BLOCK-ARM-ROLE-CONSISTENCY` — introduz `_coordinate_arm_role_nodes`) | **9** |
+| `77bda14` (`CR-BLOCK-ARM-ROLE-PRISM-STAGGER`) | 9 (inalterado) |
+
+**Primeiro commit/mecanismo**: `d813f45`, especificamente
+`_coordinate_arm_role_nodes` decidindo qual família ancora o nó 64 (a
+ponta distante de `W039`). Este commit já estava integrado nesta branch
+ANTES de qualquer trabalho desta CR (`CR-BLOCK-ARM-ROLE-CANDIDATE-
+SAFETY-CONTRACT`) — nenhum commit desta CR participa.
+
+## Causa
+
+`W041` nunca fisicamente alcança o ponto do nó (gap sistemático de
+~8cm, presente em TODOS os estados testados — não introduzido por
+nenhum commit ARM-ROLE). A cobertura deste encontro depende 100% de
+`W039` ter uma peça de amarração real na sua ponta distante (nó 64) na
+fiada em questão — decisão que `_coordinate_arm_role_nodes` faz por
+família (par/ímpar), não por fiada individual. `W039` tem 17 fiadas
+(9 pares, 8 ímpares) — qualquer coordenação de papel necessariamente
+deixa UMA das duas famílias sem a peça nesse nó específico (o vão livre
+da família não-ancorada simplesmente não fecha até a ponta, um limite
+de busca de preenchimento pré-existente, não uma regra de amarração
+nova). Antes de `d813f45` não havia coordenação nenhuma (o resultado
+"por acaso" deixava a família ímpar sem peça); depois, a coordenação
+determinística escolhe a família PAR para ancorar esse nó especifico -
+inverte QUAL família sofre, não CRIA o sofrimento.
+
+## Humano × Solver
+
+Nó físico casado geometricamente (`match_walls`-equivalente por
+proximidade, nunca por `id`): humano tem o MESMO nó em
+`(6184.25, 949.95)` (offset 7cm, dentro da tolerância de reconstrução).
+
+- **O humano possui binding nesse encontro?** Parcialmente - sim na
+  maioria das fiadas (0-7, 9-11), mas **NÃO** nas fiadas 8 e 12
+  (`JUNCTION_MISSING_BINDING` real no PRÓPRIO gabarito aprovado).
+- **Qual parede ocupa o encontro por fiada?** Só `W039`, em TODAS as
+  fiadas onde há alguma peça - `W041` nunca aparece, exatamente como no
+  solver.
+- **Qual peça faz a amarração?** Um MEIO-BLOCO (`B19`) repetido, quase
+  sempre o MESMO em fiadas consecutivas - dispara `JUNCTION_NOT_
+  ALTERNATING` no próprio gabarito humano (10 ocorrências medidas) e
+  `JUNCTION_HALF_BLOCK_ADJACENT` (11 ocorrências) - o humano não trata
+  este encontro como uma amarração B34/B54 alternada "de livro".
+- **O solver novo reproduz ou diverge do humano?** Reproduz o padrão
+  estrutural central (só `W039` cobre, nunca `W041`) mas diverge no
+  detalhe (solver alterna B34/C09 por família; humano repete B19 sem
+  alternar). Nenhum dos dois fecha 100% das fiadas.
+- **Seria erro real na modulação aprovada?** O PRÓPRIO gabarito humano
+  tem 2 fiadas sem binding neste encontro e falha `JUNCTION_NOT_
+  ALTERNATING` nele - a régua "toda fiada deve alternar com peça de
+  amarração real" já não se aplica de forma limpa a este encontro
+  específico, nem no projeto aprovado.
+
+## Classificação P1-P5
+
+**P3 — BENCHMARK_ARTIFACT.**
+
+Não é P1 (`PHYSICAL_REGRESSION`): nada foi perdido - o mesmo defeito
+(uma família sem peça neste nó específico) já existia em `origin/main`,
+só na paridade ímpar; `d813f45` apenas inverteu QUAL paridade sofre,
+nunca criou um defeito novo. Não é P2 (`EXPECTED_RULE_CHANGE`): nenhum
+dos dois estados (A ou B/C) é "fisicamente correto" neste encontro -
+os dois têm o mesmo tipo de buraco, só em fiadas diferentes; não há uma
+"solução nova correta" substituindo uma "antiga errada". Não é P5
+(inconclusivo): a causa foi isolada por commit E por geometria, com
+evidência direta e reproduzível.
+
+O que É um artefato: o DELTA "8→9" tratado por `scoring.compare_runs`
+como `REGRESSAO CRITICA`. Ele conta o mesmo mecanismo de defeito como
+se fosse "uma unidade a mais de dano" quando na verdade é o mesmo
+defeito relocado de paridade, e a contagem bruta muda de 8 para 9 só
+porque este prédio tem uma fiada par a mais que ímpar (17 fiadas totais)
+- um artefato de contagem por paridade desigual, não uma nova extensão
+de defeito físico. Reforçado pela prova humano×solver: o próprio
+gabarito aprovado já falha a regra de alternância "de livro" neste
+encontro específico.
+
+## Decisão sobre baseline
+
+`baseline.json` do TP1 **NÃO regravado** (nem nesta auditoria, nem na
+CR anterior). Por ser P3 (não P2), não se aplica sequer
+`BASELINE_UPDATE_RECOMMENDED` no sentido de "a nova solução é a
+correta, adote-a" - o achado é documentado como o artefato que é;
+regravar o baseline exigiria decisão humana sobre COMO tratar este
+encontro atípico (aceitar meio-bloco repetido como o humano faz? exigir
+peça de amarração real nas 17 fiadas, o que nem o humano cumpre?) -
+fora do escopo desta auditoria.
+
+## Candidate Safety Contract
+
+Sem alteração de comportamento em relação ao relatório anterior -
+confirmado por reexecução completa pós-merge (ver TGD/TP1/Piloto
+abaixo): SAFE REPAIR nunca toca este nó (não é uma aresta isolada do
+grafo de coordenação relevante para nenhum candidato do TGD/TP1) e
+produz B==C idêntico também para `JUNCTION_MISSING_BINDING`.
+
+## TGD / TP1 / Piloto (reexecutado pós-merge, números NOVOS)
+
+| projeto | aceitos/rejeitados | regressão global |
+|---|---|---|
+| TGD | 1 (`wall_idx=23`, `SAME_A`) / 7 | zero (`PRISM_CONTINUOUS_JOINT` 476→444, `PRISM_JOINT_STACK` 29→27; `COMPENSATOR_EXCESS_IN_RUN` reposicionado em W011, líquido zero) |
+| TP1 | 0 / 3 | zero (B==C idêntico em todas as 13 categorias, incluindo `JUNCTION_MISSING_BINDING`=9 nos dois) |
+| Piloto | — / — | zero (no-op, 0 arestas candidatas) |
+
+Números idênticos aos medidos antes do merge da main - confirma que
+sincronizar `origin/main` (mudança docs-only) não afetou o mecanismo.
+
+## Testes focados
+
+`tests/test_block_arm_role_invariance.py` + `tests/test_block_arm_role_
+prism_stagger.py` + `tests/test_block_arm_role_candidate_safety_
+contract.py`: **39 passaram** (287.80s), reexecutados do zero
+pós-merge.
+
+## Suíte completa
+
+`tests/` completo reexecutado do zero pós-merge: **565 passaram / 1
+falhou** (534.22s) - resultado NUMERICAMENTE IDÊNTICO ao medido antes
+do merge (não reaproveitado, reexecutado). A única falha é a já
+investigada e classificada P3 acima (`test_projeto_nao_regrediu_contra_
+o_baseline[torre_easy_lo_r00_tp1]`).
+
+## Determinismo
+
+Confirmado por teste automatizado (T16, reexecutado nesta sessão dentro
+da suíte completa) e pela reexecução B/C pós-merge produzindo números
+byte-idênticos aos pré-merge.
+
+## Performance
+
+Suíte completa: 534s (~8min54s). Testes focados ARM: 288s. Sem
+degradação perceptível em relação à medição anterior.
+
+## Production diff (contra `origin/main`)
+
+```
+nuvem/core/engine/wall_stepper.py   | 811 ++++++++++++++++++++++++++-
+nuvem/core/wall_modeling.py         |  89 ++-
+```
+
+Exatamente os dois arquivos esperados, nenhum outro arquivo de
+PRODUÇÃO. Dois arquivos adicionais aparecem no diff completo mas são
+NÃO-produção e PRÉ-EXISTENTES a esta CR (confirmado via `git log
+origin/main..HEAD -- <arquivo>`, ambos introduzidos por commits do
+PR#9 - `5327d61`/outros - muito antes de qualquer commit desta CR):
+`docs/PROJECT_STATUS.md` (documentação) e `tests/test_script.py` (teste
+- atualizado quando `_coordinate_arm_role_nodes` mudou o comportamento
+de um teste antigo de colisão em L_CORNER).
+
+## Baseline diff / Reference diff
+
+```
+git diff --stat origin/main HEAD -- '**/baseline.json' '**/reference.json'
+```
+
+**ZERO** em ambos - confirmado, nenhum arquivo de baseline/reference
+tocado por esta branch em nenhum momento.
+
+## Gates G1-G18
+
+| gate | status |
+|---|---|
+| G1 branch sincronizada com origin/main atual | ✅ |
+| G2 regra nova de propostas geométricas preservada integralmente | ✅ |
+| G3 nenhum conflito de produção escondido | ✅ (conflito único foi documental, resolvido preservando os dois lados) |
+| G4 main TP1 JUNCTION_MISSING_BINDING medido | ✅ (8) |
+| G5 branch SAFE OFF medido | ✅ (9) |
+| G6 branch SAFE ON medido | ✅ (9, idêntico a OFF) |
+| G7 ocorrências novas identificadas geometricamente | ✅ (mesmo nó, paridade espelhada - não uma "9ª" isolada) |
+| G8 primeiro commit/mecanismo identificado | ✅ (`d813f45`) |
+| G9 comparação humano × solver feita | ✅ |
+| G10 classificação P1-P5 justificada | ✅ (P3) |
+| G11 baseline intacto | ✅ |
+| G12 reference intacto | ✅ |
+| G13 SAFE REPAIR sem regressão própria | ✅ |
+| G14 TGD/TP1/Piloto reexecutados | ✅ (números idênticos aos pré-merge) |
+| G15 determinismo passa | ✅ |
+| G16 testes focados passam | ✅ (39/39) |
+| G17 suíte completa executada | ✅ (565/566, mesma falha pré-existente e já classificada) |
+| G18 production diff compreendido | ✅ |
+
+## Veredito
+
+**APROVADO PARA MERGE**
+
+Branch sincronizada com `origin/main` por merge normal (sem rebase),
+conflito documental resolvido preservando 100% do conteúdo dos dois
+lados. `JUNCTION_MISSING_BINDING` 8→9 no TP1 investigado até a causa
+raiz geométrica e classificado `P3 — BENCHMARK_ARTIFACT`: o mesmo
+defeito pré-existente (uma família sem amarração real num encontro L
+atípico onde até o gabarito humano falha a regra de alternância),
+apenas espelhado de paridade por um commit já integrado antes desta CR
+(`d813f45`, `CR-BLOCK-ARM-ROLE-CONSISTENCY`) - nenhuma alteração desta
+CR participa. Nenhuma atualização de baseline necessária ou realizada.
+Nenhuma regressão nova em TGD/TP1/Piloto. Suíte completa reexecutada do
+zero: 565/566 (mesma falha pré-existente e já compreendida). Production
+diff restrito aos dois arquivos esperados.
+
+**Não mergeado. PR #12 continua DRAFT.** `PR #9`/`#11` intocados.
+Arestas rejeitadas (7 no TGD, 3 no TP1) não investigadas nesta
+auditoria (fora de escopo). NODE-FILL não iniciado. Monitoramento
+automático não ativado.

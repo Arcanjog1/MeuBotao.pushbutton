@@ -4636,12 +4636,56 @@ nesta CR (fora de escopo — seção 13 do pedido): as 7 paredes rejeitadas
 no TGD e as 3 no TP1 continuam com o prisma forçado original, sem
 regressão nova introduzida por tentar corrigi-las.
 
-**Achado durante a suíte completa (`tests/`, 565 passaram/1 falhou)**:
-`test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]`
-falha (`JUNCTION_MISSING_BINDING` 8→9 contra `baseline.json`) — provado
-INDEPENDENTE desta CR (reproduz identicamente com
-`ARM_ROLE_SAFE_REPAIR_ENABLED=False`): o `baseline.json` do TP1 nunca
-foi regravado desde a integração de `CR-BLOCK-ARM-ROLE-CONSISTENCY`/PR#9
-(o mesmo 8→9 já estava documentado como "benigno, mirror de paridade"
-naquela época). Não regravado nesta CR — decisão humana pendente, fora
-de escopo.
+**Achado durante a suíte completa (`tests/`, 565 passaram/1 falhou),
+causa raiz provada em auditoria pré-integração posterior
+(2026-09-04)**: `test_projeto_nao_regrediu_contra_o_baseline
+[torre_easy_lo_r00_tp1]` falha (`JUNCTION_MISSING_BINDING` 8→9 contra
+`baseline.json`). Investigação completa (não só reproduzida com
+`ARM_ROLE_SAFE_REPAIR_ENABLED=False` — isolada por commit, um a um,
+sobre `963aa9b`/`d813f45`/`77bda14`):
+
+- **Primeiro commit que introduz o 8→9**: `d813f45` (`CR-BLOCK-ARM-ROLE-
+  CONSISTENCY`, o que introduz `_coordinate_arm_role_nodes`) —
+  `963aa9b` sozinho mantém 8; `d813f45` muda para 9; `77bda14` mantém 9.
+  Nenhum commit desta CR (`CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`)
+  participa — confirmado tanto por `ARM_ROLE_SAFE_REPAIR_ENABLED=False`
+  (idêntico) quanto pelo isolamento por commit acima.
+- **As 8/9 ocorrências são TODAS o MESMO nó físico**: encontro L em
+  `(6177.25, 949.95)`, paredes `W039`↔`W041` — nunca um nó novo, nunca
+  outro encontro.
+- **Prova geométrica direta** (`block_covers_point`, o mesmo calculo do
+  validador, chamado diretamente sobre `result_project`): `W041` NUNCA
+  cobre este ponto em NENHUMA fiada, em NENHUM dos dois estados (main ou
+  branch) — a peça mais próxima de `W041` (meio-bloco B19 ou B34) fica
+  sistematicamente ~8cm curta do ponto real do nó. A cobertura deste
+  encontro depende inteiramente de `W039`; qual fiada tem/não tem peça
+  de `W039` ali é decidido por `_coordinate_arm_role_nodes` (que família
+  ancora o canto no nó distante desta parede) — em `main` (sem
+  coordenação), as fiadas ÍMPARES ficam sem peça (8 ocorrências, já que
+  a parede tem 17 fiadas: 8 ímpares/9 pares); com a coordenação
+  (branch), as fiadas PARES é que ficam sem peça (9 ocorrências) — o
+  MESMO defeito pré-existente, só espelhado de paridade. A contagem
+  muda de 8 para 9 apenas porque o prédio tem uma fiada par a mais que
+  ímpar (17 fiadas, índices 0-16) — não porque um novo defeito físico
+  foi criado.
+- **Comparação com o Reference Corpus humano**: o mesmo nó físico (casado
+  geometricamente, `(6184.25, 949.95)`, offset de 7cm dentro da
+  tolerância) no projeto humano APROVADO também só recebe peça de
+  `W039` (nunca de `W041`, mesmo padrão), majoritariamente com um
+  meio-bloco repetido (não uma peça de amarração B34/B54 alternada -
+  dispara `JUNCTION_NOT_ALTERNATING` no PRÓPRIO gabarito humano) e TEM
+  `JUNCTION_MISSING_BINDING` real em 2 fiadas (8 e 12) mesmo na
+  modulação aprovada. Ou seja: este encontro específico já é um caso
+  atípico onde nem o humano fecha a amarração "de livro" em toda fiada.
+- **Classificação**: `P3 — BENCHMARK_ARTIFACT`. Não é `P1` (nada foi
+  perdido - o mesmo defeito já existia em `main`, só na paridade
+  oposta); não é `P2` (nenhum dos dois estados está "correto" nesse
+  encontro especificamente). O que é artefato é o DELTA 8→9 usado pelo
+  gate de regressão como "piorou" - na verdade é o mesmo defeito
+  relocado por um efeito colateral já conhecido de `d813f45`, amplificado
+  numericamente só pelo desbalanceamento par/ímpar de fiadas do prédio.
+- **Decisão**: `baseline.json` do TP1 NÃO regravado (nem nesta CR nem na
+  auditoria pré-integração) — decisão humana pendente, fora de escopo
+  de ambas. `test_projeto_nao_regrediu_contra_o_baseline[...tp1]`
+  continua falhando por este motivo já documentado e comprovadamente
+  não relacionado a `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`.
