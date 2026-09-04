@@ -91,6 +91,8 @@ __all__ = [
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
+    "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
+    "NODE_FILL_OPPOSITE_COURSE_ENABLED",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
@@ -3282,6 +3284,78 @@ def _pier_boundary_joint_positions_cm(seg_start_cm, seg_end_cm, kind_left, kind_
     return positions
 
 
+# CR-BLOCK-NODE-FILL-REVALIDATION (2026-09-04): a METADE SIMETRICA da junta
+# NO'|FILL. `_pier_boundary_joint_positions_cm` (CR-BLOCK-ARM-ROLE-PRISM-
+# STAGGER) publica a junta de contorno da Fiada A contra a peca de no' e a
+# Fiada B a evita - mas a Fiada A roda PRIMEIRO e nunca via a junta NO'|FILL
+# que a Fiada B vai ter. Medido no corpus real (TGD/TP1): junta interna
+# `B19|B39` da Fiada A em t=34,5 cm exatamente em cima da junta `B34(no')|
+# fill` da Fiada B, em todas as fiadas da mesma paridade. Como a posicao da
+# peca de no' depende so' da geometria do encontro (`node_candidates_by_
+# wall_end` / `node_midspan_by_wall_course`, decididos ANTES do
+# preenchimento e dependentes so' de `course`, nunca de layout ou de
+# `variant_index`), ela e' deduzivel antes de resolver a propria fiada -
+# ver `_wall_node_boundary_joints_cm` e o uso em `solve_wall_free_fill`.
+# Constante (nao heuristica): True em producao; False reproduz exatamente a
+# main anterior - usado pelos testes para provar que o defeito existe e que
+# a reducao e' fisica (tests/test_block_node_fill_revalidation.py).
+NODE_FILL_OPPOSITE_COURSE_ENABLED = True
+
+
+def _wall_node_boundary_joints_cm(wall_idx, course, node_candidates_by_wall_end,
+                                  node_midspan_by_wall_course):
+    """Todas as juntas NO'|FILL de UMA fiada de UMA parede, deduzidas SO' da
+    geometria das pecas de amarracao (`node_candidates_by_wall_end` nas
+    pontas, `node_midspan_by_wall_course` nos encontros de meio de parede),
+    sem depender de layout nenhum. Mesma aritmetica do trecho em
+    `solve_wall_free_fill` / `_pier_boundary_joint_positions_cm`: o
+    preenchimento comeca em `border + BLOCK_JOINT_CM`, logo a junta esta'
+    em `border + BLOCK_JOINT_CM / 2` (espelhado na ponta final e nos dois
+    lados de um meio de parede). E' uma lista de POSICOES A EVITAR, nao um
+    censo: uma junta cujo trecho acabe sem peca (vao colado no no', trecho
+    que nao fecha) entra mesmo assim - conservador, custa liberdade de
+    busca, nunca inventa geometria. Ponta livre e abertura NAO produzem
+    junta de no' (nao ha' `border`), preservando a excecao da secao 11.8.
+    Funcao pura."""
+    joints = []
+    for end_index, sign in ((0, +1.0), (1, -1.0)):
+        border_cm = (node_candidates_by_wall_end or {}).get((wall_idx, end_index, course))
+        if border_cm is not None:
+            joints.append(border_cm + sign * BLOCK_JOINT_CM / 2.0)
+    for t_start_cm, t_end_cm in _merge_intervals_cm(
+        (node_midspan_by_wall_course or {}).get((wall_idx, course), [])
+    ):
+        joints.append(t_start_cm - BLOCK_JOINT_CM / 2.0)
+        joints.append(t_end_cm + BLOCK_JOINT_CM / 2.0)
+    return joints
+
+
+def _layout_joints_surviving_openings_cm(layout, seg_start_cm, opening_intervals_cm):
+    """Juntas INTERNAS de `layout` (cm, absolutas) que EXISTEM depois do
+    recorte das aberturas: so' as que separam duas pecas que
+    `split_extents_by_openings` MANTEM (o mesmo criterio de
+    `_recut_openings_and_repair`, sem tolerancia nova). No pipeline
+    continuo o layout da FASE 1 atravessa os vaos; a junta de uma peca que
+    o recorte vai derrubar e' fantasma e nao pode decidir uma troca de
+    layout (medido no TGD: uma troca por junta fantasma ao lado de uma
+    jamba deixava o reparo local sem fechamento naquela fiada). Sem
+    aberturas devolve exatamente `_layout_internal_joint_positions_cm`.
+    Funcao pura."""
+    if not layout:
+        return []
+    if not opening_intervals_cm:
+        return _layout_internal_joint_positions_cm(layout, seg_start_cm)
+    extents = [(seg_start_cm + start_cm, seg_start_cm + end_cm)
+               for _code, start_cm, end_cm in layout]
+    kept, _removed = split_extents_by_openings(extents, opening_intervals_cm)
+    kept = set(kept)
+    joints = []
+    for i in range(len(layout) - 1):
+        if i in kept and (i + 1) in kept:
+            joints.append(seg_start_cm + layout[i][2] + BLOCK_JOINT_CM / 2.0)
+    return joints
+
+
 def _count_joint_coincidences_cm(positions_cm, avoid_positions_cm,
                                  tolerance_cm=VERTICAL_JOINT_STAGGER_TOLERANCE_CM):
     """Quantas posicoes de `positions_cm` caem a menos de `tolerance_cm` de
@@ -4992,6 +5066,26 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
             boundaries.append((t_end_cm, "MIDSPAN_HI", None))
         boundaries.sort(key=lambda b: b[0])
 
+        # METADE SIMETRICA da junta NO'|FILL (CR-BLOCK-NODE-FILL-
+        # REVALIDATION): onde estarao as juntas NO'|FILL da fiada OPOSTA.
+        # A Fiada A roda primeiro e nunca veria as juntas de contorno que
+        # a B publica; mas a posicao da PECA DE NO' nao depende de layout,
+        # so' de `course`, entao da' para saber onde ela vai cair antes de
+        # resolver (ver `_wall_node_boundary_joints_cm`). So' a Fiada A
+        # consome esta lista (abaixo): a Fiada B ja' recebe as juntas de
+        # contorno REAIS da A por `course_a_boundary_joint_positions_cm`, e
+        # somar a lista deduzida la' so' acrescentava restricao fantasma
+        # onde o preenchimento da A nao existe (medido: mais compensador e
+        # colisao rearranjada em paredes sobrepostas do TGD, sem ganho de
+        # prisma).
+        opposite_course = "B" if course == "A" else "A"
+        opposite_node_joints_cm = (
+            _wall_node_boundary_joints_cm(
+                wall_idx, opposite_course, node_candidates_by_wall_end,
+                node_midspan_by_wall_course)
+            if NODE_FILL_OPPOSITE_COURSE_ENABLED else []
+        )
+
         # Juntas internas ja' usadas por VARIANTES ANTERIORES desta MESMA
         # familia (secao 11.7) - comeca vazia a cada familia nova; a
         # familia "B" comeca sua PROPRIA busca considerando tambem tudo
@@ -5206,6 +5300,37 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                                               allow_compensators=allow_compensators,
                                                               leading_open_override=leading_is_open,
                                                               trailing_open_override=trailing_is_open)
+                            # METADE SIMETRICA (CR-BLOCK-NODE-FILL-
+                            # REVALIDATION): o layout PADRAO continua sendo o
+                            # primeiro e o normal; so' e' trocado se empilhar
+                            # uma junta interna em cima de uma junta NO'|FILL
+                            # da fiada OPOSTA e existir composicao do MESMO
+                            # trecho (a mesma busca que a Fiada B sempre usou,
+                            # `_pier_layout_avoiding_joints`) com ESTRITAMENTE
+                            # menos coincidencia. Nunca troca por empate -
+                            # quem ja' estava correto nao se mexe. Conta so'
+                            # as juntas que SOBREVIVEM ao recorte das
+                            # aberturas (`_layout_joints_surviving_openings_
+                            # cm`): a junta de uma peca que o vao vai derrubar
+                            # e' fantasma e nao pode decidir a troca.
+                            if layout is not None and opposite_node_joints_cm:
+                                colide = _count_joint_coincidences_cm(
+                                    _layout_joints_surviving_openings_cm(
+                                        layout, seg_start_cm, opening_intervals_cm),
+                                    opposite_node_joints_cm)
+                                if colide:
+                                    alternativa = _pier_layout_avoiding_joints(
+                                        pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                                        opposite_node_joints_cm,
+                                        allow_compensators=allow_compensators,
+                                        leading_is_open=leading_is_open,
+                                        trailing_is_open=trailing_is_open,
+                                    )
+                                    if alternativa is not None and _count_joint_coincidences_cm(
+                                            _layout_joints_surviving_openings_cm(
+                                                alternativa, seg_start_cm, opening_intervals_cm),
+                                            opposite_node_joints_cm) < colide:
+                                        layout = alternativa
                         else:
                             # Variantes 1+ da PROPRIA familia A (secao 11.7):
                             # desencontram as juntas das variantes A anteriores

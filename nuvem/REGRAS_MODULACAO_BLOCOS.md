@@ -4689,3 +4689,133 @@ sobre `963aa9b`/`d813f45`/`77bda14`):
   de ambas. `test_projeto_nao_regrediu_contra_o_baseline[...tp1]`
   continua falhando por este motivo já documentado e comprovadamente
   não relacionado a `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`.
+
+## 33. `CR-BLOCK-NODE-FILL-REVALIDATION` — a METADE SIMÉTRICA da junta
+NÓ|FILL: a Fiada A também tem de desencontrar da junta de nó da Fiada B
+(2026-09-04)
+
+Revalidação do fix histórico NODE-FILL (`claude/cr-block-node-fill-joint-
+9tv0kd`, `d1fc4abb`) sobre a `main` atual (`68a62693`). Relatório completo
+com gates G1-G26: `docs/BLOCK_NODE_FILL_REVALIDATION.md`. **Não
+mergeado** (PR draft).
+
+### 33.1 REGRA OBRIGATÓRIA — a junta PEÇA DE NÓ | PREENCHIMENTO é uma junta
+vertical de verdade NOS DOIS SENTIDOS
+
+- A seção 30.6 (`CR-BLOCK-ARM-ROLE-PRISM-STAGGER`) já estabelece que a
+  junta de contorno entre a peça de amarração do nó (L/T/X, posicionada
+  fora do preenchimento comum) e o primeiro/último bloco do preenchimento
+  é tão física quanto uma junta interna, e a Fiada B tem de evitá-la
+  (`_pier_boundary_joint_positions_cm` → `course_a_boundary_joint_
+  positions_cm`).
+- **O que faltava (medido no corpus real):** a Fiada A roda PRIMEIRO e
+  nunca via a junta NÓ|FILL que a Fiada B vai ter. Assinatura em TGD e
+  TP1: junta interna `B19|B39` (ou `B19|B34`) da Fiada A em t = 34,5 cm
+  (comprimento do `B34` de nó + junta) exatamente em cima da junta
+  `B34(nó)|fill` da Fiada B, em toda fiada da mesma paridade da parede
+  (TP1: 16 findings por parede em `W004`, `W007`, `W010`, `W012`,
+  `W028`, `W036`, `W037`, `W038`, `W055`, `W056`, `W080`…; TGD: `W007`,
+  `W028`, `W073`, `W086`, `W166`…).
+- **Como foi descoberto:** rodando os testes comportamentais da suíte
+  histórica sobre a `main`: só o invariante de ORDEM DE ENTRADA falhava
+  (grade 2×2 sintética: 1 a 3 violações conforme a ordem das paredes,
+  todas "junta interna da A × junta de nó da B em 34,5"). Depois
+  confirmado no corpus (TGD 108, TP1 308 findings com essa assinatura).
+- **Regra:** a posição da peça de nó de uma fiada depende só da geometria
+  do encontro (`node_candidates_by_wall_end` / `node_midspan_by_wall_
+  course`, decididos ANTES do preenchimento e só por `course`, nunca por
+  layout ou `variant_index`) — logo a junta NÓ|FILL da fiada OPOSTA é
+  deduzível antes de resolver a própria fiada
+  (`_wall_node_boundary_joints_cm`: `border ± BLOCK_JOINT_CM/2`; meio de
+  parede `t_start − J/2` e `t_end + J/2`). A Fiada A (variante 0,
+  layout padrão) SÓ troca de layout quando empilha uma junta interna
+  sobre uma dessas juntas E existe composição do mesmo trecho
+  (`_pier_layout_avoiding_joints`, a mesma busca da B) com ESTRITAMENTE
+  menos coincidência — nunca por empate.
+- **Implementado** em `wall_stepper.py` (`NODE_FILL_OPPOSITE_COURSE_
+  ENABLED = True`; `False` reproduz a main bit a bit). Medido (todos os
+  demais validadores com delta zero — cobertura, aberturas, colisões,
+  junções; ARM accepted/rejected idênticos):
+
+  ```
+  PRISM_CONTINUOUS_JOINT   TGD 444 → 336   TP1 576 → 272   piloto 0 → 0
+  PRISM_JOINT_STACK        TGD  27 → 20    TP1  33 → 17
+  COMPENSATOR_CONSECUTIVE  TGD 410 → 379   TP1 1469 → 1461
+  ```
+
+- **Confirmação humana (Reference Corpus):** dos findings removidos
+  casados com o humano, 226 CONFIRMED (o humano tem a junta em 34,5 numa
+  fiada e desencontra na outra — tipicamente `B34+B19`, junta 49,5) e 47
+  CONSISTENT; **0 CONFLICTS** (nenhum caso em que o humano também tenha a
+  junta corrida).
+
+### 33.2 REGRA OBRIGATÓRIA — só junta de PEÇA DE NÓ; abertura e ponta livre
+continuam sem junta de nó (11.8 preservada)
+
+`_wall_node_boundary_joints_cm` só produz junta onde há `border` de peça
+de nó (ou faixa de meio de parede). Ponta livre e borda de vão não
+entram — a exceção 18.12/11.8 (C04/C09/B19 encostado no vão pode
+alinhar) segue intacta. Testado (T2): o layout de um L com ponta livre
+não muda com a regra ligada.
+
+### 33.3 REGRA OBRIGATÓRIA — a troca de layout é decidida só por juntas que
+SOBREVIVEM ao recorte das aberturas
+
+No pipeline contínuo o layout da Fase 1 atravessa os vãos. A junta de
+uma peça que `split_extents_by_openings` vai derrubar é FANTASMA e não
+pode decidir a troca (`_layout_joints_surviving_openings_cm`, o mesmo
+critério do recorte, sem tolerância nova). Medido no TGD `W075` (584 cm,
+duas aberturas, nó `B34` da B em `[550..584]`): sem esta regra, uma junta
+em 549,5 de uma peça `[510..549]` que cruza a jamba 544,8 forçava a troca
+do layout inteiro, o reparo local não fechava `[550..569]` e a fiada A
+perdia 2×`C09` (+6 `COVERAGE_ROW_MOSTLY_EMPTY`). Com a regra: cobertura
+idêntica à main.
+
+### 33.4 REGRA OBRIGATÓRIA — a lista deduzida NÃO entra na busca da Fiada B
+
+A Fiada B já recebe as juntas de contorno REAIS da Fiada A
+(`course_a_boundary_joint_positions_cm`). Somar a lista deduzida ali só
+acrescentava restrição onde o preenchimento da A não existe (fiada
+vazia, trecho que não fecha): medido no TGD, mais compensador contra o
+nó e colisões rearranjadas em paredes SOBREPOSTAS (`W011∥W075`,
+`W009∥W070`, eixos a 2,4 cm — artefato de extração pré-existente), sem
+nenhum ganho de prisma. O sentido "A evita nó da B" é o único que
+faltava.
+
+### 33.5 DOCUMENTADO — pendência de código aberta: o REPARO LOCAL recria a
+junta a partir da peça mantida
+
+Em bandas em que a peça adjacente à junta de nó cruza uma jamba (TP1
+`W036`/`W038`, fiadas 5–12, janela ativa): o layout da A é `[15..34 B19]
+[35..74 B39]…`, `[35..74]` cruza a jamba (≈70) → pela regra 33.3 a junta
+34,5 não decide a troca → o recorte derruba `[35..74]` e o reparo refaz
+`[35..69]` com `B34` a partir da peça mantida `B19 [15..34]` → a junta
+34,5 renasce (16 findings residuais no TP1). Passar a junta de nó da
+fiada oposta ao reparo (`_solve_repair_subsegments`) NÃO resolve: a
+junta é o CONTORNO da região de reparo, fixado pela peça mantida. Correção
+exige o reparo consciente da junta de nó da fiada oposta E da posição da
+peça mantida (expandir a região por cima dela) — fora do mínimo desta CR.
+
+Segundo residual, limite GENUÍNO (mesma natureza de 30.6): quando o
+espaço entre a largura do nó vizinho e uma peça de X/T degradado só
+fecha com uma cadeia de compensadores (TP1 `W003`/`W008`/`W061`: 30 cm =
+3×`C09`, juntas fixas 24,5/34,5/44,5), nenhuma composição alternativa
+existe e a junta 34,5 coincide com a junta de nó da fiada oposta. Só a
+seleção da peça de nó (ou a degradação do X/T) resolve — fora de
+`solve_wall_free_fill`.
+
+### 33.6 MEDIDO — o que NÃO foi integrado do fix histórico, e por quê
+
+| parte histórica | medição sobre a main | decisão |
+|---|---|---|
+| gate `node_boundary_conflicts` separado de `alignment_conflicts` | fingerprint idêntico (só representação); mostra que INTERNA×INTERNA residual = 0 nos 3 projetos; mas muda a semântica de `needs_fix` e do check `sem_alinhamento_vertical` usado pelo gate de fechamento do SAFE REPAIR | não integrado |
+| filtro pela geometria final (`_node_boundary_joints_backed_by_pieces_cm`) | nenhum efeito (fingerprint idêntico) | não integrado |
+| juntas de nó no reparo de abertura | sem ganho de prisma; rearranja compensadores (`W159`/`W095`); a seção 30.6 já registrou regressão de porta ao incluir contorno no reparo | não integrado |
+
+### 33.7 CONFLITO REGISTRADO — hipótese "junta NÓ|FILL contada a mais"
+
+O pedido desta CR formulava a hipótese de que uma junta NÓ|FILL estaria
+sendo contabilizada como junta estrutural "a mais". **Refutada**: nem no
+histórico nem na main há contagem a mais; o defeito é a contagem A MENOS
+(a junta invisível para a busca de desencontro da fiada oposta). Nenhum
+validador foi alterado e nenhuma redução vem de reclassificação (N3 = 0).

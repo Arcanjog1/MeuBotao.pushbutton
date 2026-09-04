@@ -38,9 +38,16 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
-Nenhum CR de engine em andamento no momento. A única atividade em curso é
-esta própria CR de otimização de contexto/onboarding (só documentação —
-não toca solver, benchmark, baseline, reference ou regras de domínio).
+- **CR-BLOCK-NODE-FILL-REVALIDATION** (branch
+  `claude/cr-block-node-fill-revalidation-iahuyg`, PR draft, **não
+  mergeado**) — metade simétrica da junta NÓ|FILL: a Fiada A passa a
+  desencontrar da junta de nó da Fiada B (`wall_stepper.py`,
+  `NODE_FILL_OPPOSITE_COURSE_ENABLED`). Medido sobre `68a62693`:
+  `PRISM_CONTINUOUS_JOINT` TGD 444→336, TP1 576→272, piloto 0→0;
+  cobertura, aberturas, colisões, junções e ARM accepted/rejected com
+  delta zero; 0 conflitos com o Reference Corpus humano. Relatório e
+  gates: `docs/BLOCK_NODE_FILL_REVALIDATION.md`; regras: seção 33 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda autorização de merge.
 
 `PR #9` e `PR #11` (série ARM) permanecem **open/draft como histórico**,
 **congelados**, e não são trabalho ativo — ver
@@ -91,7 +98,10 @@ Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 1. Aguardar autorização/priorização do usuário para o próximo CR de
    engine (candidatos: `CR-BLOCK-DETERMINISM`, alinhamento cross-band,
    compensadores/pastilhas, arestas rejeitadas do SAFETY-CONTRACT).
-2. `NODE-FILL` — **não iniciar** sem autorização explícita do usuário.
+2. `NODE-FILL` — revalidado em `CR-BLOCK-NODE-FILL-REVALIDATION` (PR
+   draft); merge só com autorização explícita. Pendência registrada
+   (33.5): o reparo local junto ao vão ainda recria a junta 34,5 em
+   `W036`/`W038` (TP1, bandas com janela).
 3. Teste visual integrado no Revit — retomar quando o usuário priorizar.
 
 ## Não reabrir sem evidência de regressão

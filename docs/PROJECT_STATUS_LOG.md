@@ -705,6 +705,62 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` APROVADO PARA INTEGRAÇÃO (PR draft, NÃO mesclado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-NODE-FILL-REVALIDATION
+branch:        claude/cr-block-node-fill-revalidation-iahuyg (base origin/main 68a62693)
+status:        APROVADO PARA INTEGRAÇÃO — aguarda autorização explícita de merge.
+               Relatório completo (gates G1-G26): docs/BLOCK_NODE_FILL_REVALIDATION.md
+               Regras: nuvem/REGRAS_MODULACAO_BLOCOS.md seção 33
+
+resumo: revalidação do fix histórico NODE-FILL (d1fc4abb, base em
+  branch de determinismo que NÃO está na main). A main já tinha a metade
+  "A→B" (PRISM-STAGGER: junta de contorno da Fiada A publicada para a B).
+  Faltava a METADE SIMÉTRICA: a Fiada A roda primeiro e nunca via a junta
+  NÓ|FILL da Fiada B — assinatura no corpus: junta interna B19|B39 da A
+  em t=34,5 sobre a junta B34(nó)|fill da B. Como a peça de nó depende só
+  da geometria do encontro, a junta da fiada oposta é deduzível antes
+  (_wall_node_boundary_joints_cm); a Fiada A só troca de layout se
+  colide e existe composição com estritamente menos coincidência,
+  contando só juntas que sobrevivem ao recorte das aberturas
+  (_layout_joints_surviving_openings_cm — evita troca por junta fantasma
+  que regredia cobertura em W075/TGD). Produção: só wall_stepper.py
+  (+125 linhas, NODE_FILL_OPPOSITE_COURSE_ENABLED=True).
+
+medido (STATE_A = main → STATE_B):
+  PRISM_CONTINUOUS_JOINT   TGD 444→336  TP1 576→272  piloto 0→0
+  PRISM_JOINT_STACK        TGD 27→20    TP1 33→17
+  COMPENSATOR_CONSECUTIVE  TGD 410→379  TP1 1469→1461
+  cobertura / aberturas / colisões / junções: delta ZERO nos 3 projetos
+  ARM accepted/rejected: idênticos (TGD 23|SAME_A preservado; 7+3 arestas
+  rejeitadas com as mesmas razões, exceto 91|SAME_B que troca de gate)
+  humano: 226 CONFIRMED / 47 CONSISTENT / 0 CONFLICTS
+  determinismo: fingerprint idêntico em repetição (mesmo e outro processo)
+  performance: TGD +2,3 %, TP1 +5,5 %, piloto 0
+  N1 = 108 (TGD) + 308 (TP1); N2 = 0; N3 = 0 (nenhum validador tocado)
+  baseline/reference: diff zero
+
+não integrado do histórico (medido): gate node_boundary_conflicts
+  separado (só representação; muda semântica de needs_fix e do check do
+  SAFE REPAIR), filtro pela geometria final (sem efeito), juntas de nó no
+  reparo de abertura (sem ganho de prisma). Metade simétrica no reparo
+  local (B4) medida e descartada (sem efeito em finding).
+
+pendências registradas (33.5): reparo local recria a junta 34,5 a partir
+  da peça mantida junto ao vão (TP1 W036/W038, bandas com janela, 16
+  findings); cadeia forçada de 3 compensadores contra X/T degradado
+  (TP1 W003/W008/W061) — limite genuíno de geometria.
+
+testes: tests/test_block_node_fill_revalidation.py 28 passed; ARM 39
+  passed; suíte completa: mesma única falha conhecida
+  (test_projeto_nao_regrediu_contra_o_baseline[tp1], JUNCTION_MISSING_
+  BINDING 8→9, P3 BENCHMARK_ARTIFACT) antes e depois.
+
+próximo passo: decisão humana de merge. Sem monitoramento automático.
+```
+
 ### 2026-09-04 — `CR-BLOCK-ARM-ROLE-JUNCTION-GATE` (causa raiz provada) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
 
 ```
