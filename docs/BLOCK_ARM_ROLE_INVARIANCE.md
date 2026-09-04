@@ -215,7 +215,7 @@ Nenhuma regra em `REGRAS_MODULACAO_BLOCOS.md` documenta ou permite
 "as duas peças de canto do mesmo nó par indo para a mesma fiada,
 deixando a fiada oposta sem amarração de nó" — pesquisado (termos
 "mesma familia", "duas pontas", "flutuante", sinônimos) sem resultado.
-A seção 28.5 (`REGRA OBRIGATÓRIA`) documenta a coordenação
+A seção 29.5 (`REGRA OBRIGATÓRIA`) documenta a coordenação
 determinística atual, mas não proíbe nem prescreve qual dos dois
 resultados válidos (mesma fiada vs. fiadas alternadas) a coordenação
 deve preferir quando ambos evitariam o defeito original
@@ -241,11 +241,11 @@ melhor a junta corrida.
 
 **PADRÃO OBSERVADO AINDA NÃO CONFIRMADO.** Evidência forte mas estreita
 (9 casos, 1 topologia, 2 projetos). Registrado em
-`REGRAS_MODULACAO_BLOCOS.md` seção 28.7 com este rótulo — não promovido
+`REGRAS_MODULACAO_BLOCOS.md` seção 29.7 com este rótulo — não promovido
 a `REGRA OBRIGATÓRIA` nem usado para justificar mudança de código nesta
-sessão. **CONFLITA** com a leitura de que a seção 28.5 (coordenação
+sessão. **CONFLITA** com a leitura de que a seção 29.5 (coordenação
 determinística atual) representa "a" solução correta — na prática,
-28.5 resolve o defeito ORIGINAL (família inteira ausente) mas o critério
+29.5 resolve o defeito ORIGINAL (família inteira ausente) mas o critério
 de desempate específico que ela usa hoje (geométrico, por
 `_canonical_node_sort_key`) não necessariamente reproduz a escolha
 humana nestes 9 casos.
@@ -255,7 +255,7 @@ humana nestes 9 casos.
 **Nenhuma.** As 4 condições da Fase 4 não estão simultaneamente
 satisfeitas: (1) causa provada — sim; (2) referência humana mostra
 padrão inequívoco — sim, mas (3) a regra existente NÃO sustenta a
-mudança (28.5 é `REGRA OBRIGATÓRIA` vigente, e mudar o critério de
+mudança (29.5 é `REGRA OBRIGATÓRIA` vigente, e mudar o critério de
 desempate da coordenação para "permitir/preferir ambas as peças de nó
 na mesma fiada" é, em espírito, alterar a POLÍTICA da coordenação
 determinística — não apenas a peça ou o layout do preenchimento) — e a
@@ -412,7 +412,7 @@ reabri-lo em algum caso não testado).
 2. Nova CR, com autorização explícita para revisar o critério de
    desempate de `_coordinate_arm_role_nodes` (não a coordenação em si,
    que deve continuar), usando a evidência humana desta sessão (seção
-   28.7 de `REGRAS_MODULACAO_BLOCOS.md`) como ponto de partida — testar
+   29.7 de `REGRAS_MODULACAO_BLOCOS.md`) como ponto de partida — testar
    amplamente antes de mudar, para não reabrir o defeito original de
    `COVERAGE_MISSING_ROW`.
 

@@ -4128,17 +4128,17 @@ TOTAL de achados sobe (+123), então não é um resultado limpo.
   JOINT` já aberto — ver o relatório final
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md`.
 
-### 28.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
+### 29.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
 entre os dois nós de UMA MESMA parede é resolvida por coordenação
 determinística (2-coloring), não por reserva de fronteira
-(`CR-BLOCK-ARM-ROLE-CONSISTENCY`, superam 28.2/28.4, 2026-09-03)
+(`CR-BLOCK-ARM-ROLE-CONSISTENCY`, superam 29.2/29.4, 2026-09-03)
 
-A previsão feita em 28.4 ("Fix completo exigiria... um problema de
+A previsão feita em 29.4 ("Fix completo exigiria... um problema de
 2-coloração num grafo onde cada `L_CORNER`/`X_INTERSECTION` de 2 braços é
 uma aresta entre duas paredes-vértice") **foi implementada e confirmada
 correta** — mas a formalização do contrato (feita ANTES de assumir
 2-coloring, por exigência explícita do usuário) mostrou que a hipótese de
-28.4 sobre ciclos ímpares estava **incompleta**: ciclos de comprimento
+29.4 sobre ciclos ímpares estava **incompleta**: ciclos de comprimento
 ímpar NÃO tornam a alternância perfeita impossível. Prova (por
 telescopagem da paridade XOR ao redor de qualquer ciclo, ver
 `docs/BLOCK_ARM_ROLE_INVARIANCE.md`, seção "Ciclos e casos impossíveis"):
@@ -4147,7 +4147,7 @@ um papel 0 e um papel 1 às suas duas arestas, qualquer componente do
 grafo de coordenação tem grau ≤ 2 (caminho ou ciclo simples), e a soma
 XOR das paridades ao redor de QUALQUER ciclo — par OU ímpar — é sempre 0.
 **Não existe caso residual/conflito nesta topologia** — o critério de
-desempate determinístico previsto em 28.4 foi implementado mesmo assim
+desempate determinístico previsto em 29.4 foi implementado mesmo assim
 (`_coordinate_arm_role_nodes`, `wall_stepper.py`), mas é código morto
 para a regra de elegibilidade atual (só dispara se a elegibilidade for
 estendida no futuro a nós com mais de 2 braços participando).
@@ -4162,7 +4162,7 @@ estendida no futuro a nós com mais de 2 braços participando).
   precisa trocar de papel, `node["arms"]` é invertido antes do restante
   de `solve_all_intersections` rodar — todo consumidor downstream já vê
   o papel coordenado.
-- **Fix de 28.2 (reserva de fronteira "emprestada" arredondada) foi
+- **Fix de 29.2 (reserva de fronteira "emprestada" arredondada) foi
   REMOVIDO do código de produção** — a coordenação de papéis resolve a
   causa raiz diretamente (as duas pontas da parede nunca mais escolhem
   papéis contraditórios), então a reserva-de-módulo deixou de ser
@@ -4170,24 +4170,24 @@ estendida no futuro a nós com mais de 2 braços participando).
   coordenação sozinha supera qualquer combinação testada de
   coordenação+reserva nos dois eixos (`COVERAGE_MISSING_ROW` e
   `COVERAGE_ROW_MOSTLY_EMPTY` simultaneamente) — a regressão de
-  `COVERAGE_ROW_MOSTLY_EMPTY` (+138 no TGD) registrada em 28.4 **não
+  `COVERAGE_ROW_MOSTLY_EMPTY` (+138 no TGD) registrada em 29.4 **não
   ocorre mais**: medido no mesmo projeto, `MOSTLY_EMPTY` cai de 171
-  (`origin/main` limpo) para 153 (coordenação, sem a reserva de 28.2).
-- **Status**: 28.2 e o número "+138 MOSTLY_EMPTY" de 28.4 estão
+  (`origin/main` limpo) para 153 (coordenação, sem a reserva de 29.2).
+- **Status**: 29.2 e o número "+138 MOSTLY_EMPTY" de 29.4 estão
   SUPERADOS — mantidos no texto acima por registro histórico (nunca
   apagar regra anterior em silêncio), mas não representam mais o
-  comportamento do código. A regra vigente é esta (28.5). Detalhe
+  comportamento do código. A regra vigente é esta (29.5). Detalhe
   completo, gate a gate, com números reais de TGD/TP1/piloto:
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` (relatório
-  `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 28.6).
+  `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 29.6).
 
-### 28.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
+### 29.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
 pode dessincronizar a alternância do vão menor (B34/B54) entre fiadas em
 paredes cujas duas pontas são `L_CORNER` (`DOCUMENTADO — pendência de
 código aberta`, 2026-09-03)
 
 Medido no benchmark real ao comparar `origin/main` limpo contra o estado
-com a coordenação de papéis (28.5) aplicada: `PRISM_CONTINUOUS_JOINT`
+com a coordenação de papéis (29.5) aplicada: `PRISM_CONTINUOUS_JOINT`
 (seção 11, regra #1 — junta vertical alinhada entre fiadas consecutivas,
 quebra a alternância do vão menor das peças B34/B54) aparece em paredes
 que ANTES não tinham nenhum achado desse código: 8 paredes no TP1
@@ -4265,17 +4265,17 @@ prisma antes.
   regravar `baseline.json` ou graduar `opening_active_in_row` por
   fração de altura, fora do escopo de `wall_stepper.py`.
 - **Status das 9 paredes restantes**: `DOCUMENTADO — pendência de
-  código aberta`, com evidência humana forte (ver 28.7). Veredito de
+  código aberta`, com evidência humana forte (ver 29.7). Veredito de
   `CR-BLOCK-ARM-ROLE-RESIDUALS`: BLOQUEADO POR ESCOPO — ver
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para o relatório completo (gates
   G1-G16).
 
-### 28.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
+### 29.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
 alterna qual nó ancora qual família; às vezes concentra as duas peças
 de canto na MESMA fiada (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03)
 
 Comparação sistemática das 9 paredes com `PRISM_CONTINUOUS_JOINT`
-residual (28.6) contra o Reference Corpus humano (casamento geométrico
+residual (29.6) contra o Reference Corpus humano (casamento geométrico
 via `nuvem/benchmark/comparator/match.py`, nunca por `id` — confirmado
 que IDs não são estáveis entre `input.json`/resultado e
 `reference.json`): 8 de 9 têm correspondente humano; nas 8, a fiada par
@@ -4296,7 +4296,7 @@ e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
   forte (8/8 concordância) mas estreita (1 topologia: 2 nós L_CORNER de
   2 braços, mesma peça B34 nas duas pontas; 2 projetos). Não promovido
   a regra obrigatória.
-- **Conflito com 28.5**: a coordenação determinística atual (28.5,
+- **Conflito com 29.5**: a coordenação determinística atual (29.5,
   `REGRA OBRIGATÓRIA`) resolve corretamente o defeito ORIGINAL
   (`COVERAGE_MISSING_ROW`), mas o critério de DESEMPATE que ela usa
   hoje (geométrico, `_canonical_node_sort_key`) não necessariamente

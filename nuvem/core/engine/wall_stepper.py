@@ -1307,7 +1307,7 @@ def solve_x_intersection(node, walls_to_create, catalog, node_index=None,
 
 # ---- CR-BLOCK-ARM-ROLE-CONSISTENCY: coerencia de papel entre os dois -----
 # nos L_CORNER de uma mesma parede (ver docs/BLOCK_ARM_ROLE_INVARIANCE.md e
-# REGRAS_MODULACAO_BLOCOS.md 28.1/28.5).
+# REGRAS_MODULACAO_BLOCOS.md 29.1/29.5).
 
 def _canonical_node_sort_key(node):
     """Chave de ordenacao 100% GEOMETRICA (ponto do no', nunca indice de
@@ -1344,7 +1344,7 @@ def _coordinate_arm_role_nodes(nodes):
     duas pontas) - o mecanismo medido (`W042`/TGD, ver
     docs/BLOCK_ARM_ROLE_INVARIANCE.md) que apaga uma familia inteira de
     fiadas quando combinado com a fronteira "emprestada" nao caindo no
-    modulo de blocos (REGRAS_MODULACAO_BLOCOS.md 28.1/28.2).
+    modulo de blocos (REGRAS_MODULACAO_BLOCOS.md 29.1/29.2).
 
     Muta `nodes` IN PLACE: troca `arms[0]`/`arms[1]` (e
     `neighbor_wall_idx`/`neighbor_end_index` junto, exatamente como

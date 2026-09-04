@@ -727,7 +727,7 @@ resumo: investigou as duas pendencias do CR anterior. (1)
   desta continuacao ("nao desfazer a coordenacao A/B").
 
 detalhe completo: docs/BLOCK_ARM_ROLE_INVARIANCE.md (gates G1-G16,
-  classificacao das 9 paredes, caso W076 detalhado). Nova secao 28.7 de
+  classificacao das 9 paredes, caso W076 detalhado). Nova secao 29.7 de
   REGRAS_MODULACAO_BLOCOS.md registra o padrao observado (ainda nao
   confirmado, nao promovido a regra).
 
@@ -817,7 +817,7 @@ novas dividas: (1) 9 paredes com PRISM_CONTINUOUS_JOINT geometricamente
   solve_l_corner (B54 em vez de B34), decisao que precisa de
   autorizacao explicita do usuario antes de qualquer tentativa; (2)
   regressao de OPENING_BLOCK_INSIDE_DOOR (+3, TGD) precisa de
-  investigacao propria. Documentado como secao 28.6 (atualizada) de
+  investigacao propria. Documentado como secao 29.6 (atualizada) de
   REGRAS_MODULACAO_BLOCOS.md.
 
 itens resolvidos: causa-raiz completa da regressao de prisma provada
@@ -851,7 +851,7 @@ status:        NECESSITA AJUSTE (gate G10 falhou — ver relatório completo
                este CR)
 
 o que foi alterado: o workaround "reserva de fronteira emprestada"
-  (28.2/entrada anterior deste histórico) foi REMOVIDO — o usuário
+  (29.2/entrada anterior deste histórico) foi REMOVIDO — o usuário
   rejeitou esse fix por só reclassificar COVERAGE_MISSING_ROW em
   COVERAGE_ROW_MOSTLY_EMPTY, sem resolver a causa raiz. No lugar,
   implementado `_coordinate_arm_role_nodes` (nuvem/core/engine/
@@ -904,7 +904,7 @@ novas dívidas: PRISM_CONTINUOUS_JOINT regride em paredes que antes não
   fiada alinhadas, 2-3 no TGD) — hipótese não confirmada de que a
   coordenação desincroniza a alternância do vão menor (B34/B54) da
   regra fixa de paridade par/ímpar das fiadas. Documentado como seção
-  28.6 de REGRAS_MODULACAO_BLOCOS.md ("DOCUMENTADO — pendência de código
+  29.6 de REGRAS_MODULACAO_BLOCOS.md ("DOCUMENTADO — pendência de código
   aberta"). Este é o motivo do veredito NECESSITA AJUSTE.
 
 itens resolvidos: causa-raiz completa do mecanismo "arms order → course
@@ -912,10 +912,10 @@ itens resolvidos: causa-raiz completa do mecanismo "arms order → course
   a regressão COVERAGE_ROW_MOSTLY_EMPTY do fix anterior não existe mais.
 
 itens ainda pendentes: root-cause e fix do efeito colateral em
-  PRISM_CONTINUOUS_JOINT (seção 28.6); baseline.json não regravado
+  PRISM_CONTINUOUS_JOINT (seção 29.6); baseline.json não regravado
   (não deve ser, dado o veredito).
 
-próximo passo recomendado: confirmar/corrigir a hipótese de 28.6 antes
+próximo passo recomendado: confirmar/corrigir a hipótese de 29.6 antes
   de qualquer nova iteração. PR #9 (draft) permanece; NÃO MESCLADO.
 ```
 
@@ -986,7 +986,7 @@ novas dívidas: resolução completa do resíduo COVERAGE_ROW_MOSTLY_EMPTY
   aresta entre duas paredes-vértice; ciclos de comprimento ímpar tornam
   alternância perfeita impossível em geral) — fora do escopo autorizado
   desta CR (só wall_stepper.py, sem "resolver toda a cobertura").
-  Documentado como seção 28.4 de REGRAS_MODULACAO_BLOCOS.md.
+  Documentado como seção 29.4 de REGRAS_MODULACAO_BLOCOS.md.
   baseline.json e REFERENCE_SOLVER_DECISION_FINGERPRINT
   (tests/solver_bench.py) confirmados DESATUALIZADOS em relação a
   origin/main limpo (não causado por esta CR) — recomenda-se CR de
