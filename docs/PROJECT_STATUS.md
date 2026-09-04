@@ -73,9 +73,10 @@ não é append-only).
 - **Degradação de encontros em X, exclusão de bloco em vão de porta,
   reparo de abertura (`non_modular` +3)** — pendentes, sem CR aberto.
 - **Arestas rejeitadas no `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`**
-  (7 no TGD, 3 no TP1) — não investigadas, fora de escopo daquela CR.
-  Spec de preimplementação para 2 dos gates (compensador agregado por
-  banda, cobertura local cega a crédito de nó) pronta em
+  (7 no TGD, 3 no TP1) — fora de escopo daquela CR; diagnosticadas em
+  `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`. Spec de preimplementação
+  para 2 dos gates (compensador agregado por banda, cobertura local
+  cega a crédito de nó) pronta em
   `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md`
   (`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY-PREIMPLEMENTATION`,
   READY_FOR_IMPLEMENTATION_AFTER_NODE_FILL) — implementação aguarda

@@ -12,34 +12,54 @@ branch de trabalho = claude/cr-block-arm-safe-repair-spec-gjkvm3
 
 ## Evidências herdadas do diagnóstico
 
-O pedido desta CR presume um documento
-`docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md` de uma sessão anterior.
-**Esse arquivo não existe no repositório** (`git log --all` confirma que
-nunca foi commitado sob esse nome nem um equivalente) — busca em camadas
-completa (termo exato, sinônimos "rejected"/"diagnosis"/"diagnóstico",
-`docs/`, `docs/archive/`, histórico completo de commits) não encontrou o
-arquivo. As conclusões A-D do pedido (TP1 `wall_idx=75`, TGD 89/90, "8 de
-10 arestas com candidato compatível", NODE-FILL independente) são,
-portanto, tratadas como **hipóteses herdadas a verificar**, não fatos já
-provados — e foram reverificadas nesta sessão diretamente contra o
-código de produção atual e o relatório commitado mais próximo,
-`docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md` (`PR #12`, que já
-documenta 7 arestas rejeitadas no TGD + 3 no TP1 = 10, e explicita que a
-numeração de `wall_idx` **não é estável entre sessões/scripts diferentes
-de reexecução** — por isso os números "75"/"89"/"90"/"91"/"120"/"20" do
-pedido não precisam bater com os números do relatório do PR #12, que usa
-sua própria reexecução independente com `wall_idx` 4/23/54/89/90/91/92/120).
+**Correção de proveniência (2026-09-04):** a afirmação original desta
+spec — de que `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md` "não existe em
+nenhum lugar do histórico do repositório" — estava incorreta. Formulação
+correta: **o diagnóstico não estava presente na `main` nem na branch de
+trabalho desta sessão quando ela começou** (busca em `git log --all`
+sobre a árvore então disponível não encontrou o arquivo). Ele existe numa
+branch de investigação separada, nunca integrada à `main`:
+`claude/cr-block-arm-rejected-edges-yqdred`, commit
+`744cb1fa01848bb9089bf41ca7be4e3659ed94bb`
+(`CR-BLOCK-ARM-REJECTED-EDGES-DIAGNOSIS`, medido sobre `4c89e12` ==
+`main` de então). O arquivo foi trazido para esta branch (só o arquivo,
+sem merge/cherry-pick do commit inteiro) — ver
+`docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`, conteúdo confirmado
+byte-idêntico ao daquele commit (`sha256`
+`06a181de9706075ebd1bbae1296a718c6926855a1762f8f9ac97c6cb8037c4cb`).
 
-O mecanismo por trás de cada achado (A, B) foi **reconfirmado por leitura
-direta do código de produção atual** (não apenas herdado por citação) —
-ver seções "Compensator gate" e "Coverage gate" abaixo, com linha exata.
-O achado (D) foi confirmado como CR aberto e documentado
+As conclusões A-D do pedido original desta CR (TP1 `wall_idx=75`, TGD
+89/90, "8 de 10 arestas com candidato compatível", NODE-FILL
+independente) **batem com o diagnóstico agora recuperado**: `TP1
+wall_idx=75/SAME_A` rejeitado por um "run fantasma" do gate de
+compensadores (mesmo mecanismo, mesma linguagem — "agregado de 7
+bandas, course = letra da banda"); TGD 89/90 com o motivo declarado
+como artefato do proxy LOCAL de cobertura (quadrado de canto movido para
+a vizinha); 8/10 arestas com o gabarito humano coincidindo com o próprio
+candidato de papel gerado pelo solver; TGD 4/54 como cantos girados sem
+alavanca ARM; NODE-FILL `RELATED` só para TP1 20/91, `INDEPENDENT` para
+os demais 8 casos e para os gates. Esta spec, portanto, tem **duas
+fontes de evidência independentes e consistentes**: o diagnóstico
+instrumentado original (`BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`, medição
+ao vivo contra o corpus real, achados numéricos) e a rederivação feita
+nesta sessão por leitura direta do código de produção atual, sem
+conhecimento prévio do diagnóstico (ver seções "Compensator gate" e
+"Coverage gate" abaixo, com linha exata) — a segunda **confirma** a
+primeira por um caminho totalmente independente (código-fonte vs.
+instrumentação ao vivo), o que reforça a confiança na causa-raiz. Esta
+spec não duplica o relatório original — só referencia; o texto completo
+com os números medidos (102 achados resolvidos, cobertura 92→78cm etc.)
+vive em `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`.
+
+O achado (D) também está confirmado como CR aberto e documentado
 (`CR-BLOCK-NODE-FILL-JOINT`, citado em `nuvem/REGRAS_MODULACAO_BLOCOS.md`
 seção 30.4/`docs/BLOCK_ARM_ROLE_INVARIANCE.md`) — não iniciado, não
 tocado nesta sessão. O achado (C) ("8 de 10 arestas rejeitadas têm
-candidato ARM compatível com o humano") **não foi reverificado** nesta
-sessão (exigiria comparação humano×solver por aresta, fora do escopo
-"não alterar produção, só especificar contrato" — ver "Expected Gain").
+candidato ARM compatível com o humano") agora está confirmado pelo
+diagnóstico recuperado (ver acima) — não foi reverificado de novo nesta
+sessão por leitura de código (isso exigiria comparação humano×solver
+por aresta, fora do escopo "não alterar produção, só especificar
+contrato" — ver "Expected Gain").
 
 ---
 
@@ -257,10 +277,16 @@ candidato (nunca para paredes fora do grafo do candidato).
 
 Achado (E) do pedido: `TGD 120/SAME_B`, `TP1 20/SAME_B`, `TP1 91/SAME_B`
 teriam sido classificados como PROVÁVEL espelho de paridade sem aumento
-real de achados. Essa classificação específica não foi reverificada
-nesta sessão (o diagnóstico de origem não existe no repo — ver "Evidências
-herdadas"), mas o MECANISMO de espelho de paridade **já está documentado
-e provado** para um caso adjacente: `JUNCTION_MISSING_BINDING` 8→9 no TP1
+real de achados. Confirmado no diagnóstico recuperado
+(`docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`, categoria `R3`): `TGD
+120/SAME_B` — "R2 espelho de paridade numa parede já quebrada"; `TP1
+20/SAME_B` — "espelho de paridade do `C09×4` da vizinha de 54 cm; alvo
+melhora"; `TP1 91/SAME_B` — idem. Não remedido de novo nesta sessão por
+leitura de código (essa classificação depende de medição ao vivo contra
+o corpus real, não de leitura estática), mas o MECANISMO de espelho de
+paridade **também já está documentado e provado** por uma via
+independente para um caso adjacente: `JUNCTION_MISSING_BINDING` 8→9 no
+TP1
 (`docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`, seção "CONTINUAÇÃO —
 PRE-INTEGRATION AUDIT", classificado `P3 — BENCHMARK_ARTIFACT`: as 9
 fiadas pares "novas" do candidato são, uma a uma, a MESMA fiada ímpar
@@ -459,7 +485,8 @@ de geometria real do TGD/TP1).
   `course` = letra, não `course_index`) é real e está no código de
   produção atual, confirmado por leitura direta de
   `wall_stepper.py:5988-5995`/`6190-6194` e
-  `wall_modeling.py:3143-3189` — não depende do diagnóstico ausente.
+  `wall_modeling.py:3143-3189` — independente do diagnóstico original
+  (rederivado sem consultá-lo), e depois confirmado consistente com ele.
 - O mecanismo do bug do coverage gate (filtro por `wall_idx` dono, cego
   a presença física da peça de canto no nó) é real e está no código de
   produção atual, confirmado por leitura direta de
@@ -484,19 +511,29 @@ de geometria real do TGD/TP1).
   (a condição 5 preserva a rejeição correta).
 - O padrão TP1 `wall_idx=75`/`SAME_A` do pedido é consistente com o
   mecanismo comprovado do compensator gate (mesma assinatura: `SAME_A`
-  força repetição de família em mais bandas) — mas a aresta específica
-  não foi reidentificada nem reexecutada nesta sessão.
+  força repetição de família em mais bandas) — a aresta específica não
+  foi reidentificada nem reexecutada NESTA sessão (por leitura de
+  código), mas o diagnóstico original recuperado
+  (`docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`) já mediu ao vivo, sobre
+  o corpus real, exatamente esse caso: "0 achados novos / 102
+  resolvidos" para TP1 `wall_idx=75/SAME_A`.
 
-### NÃO GARANTIDO
+### NÃO GARANTIDO (por esta sessão, via leitura de código)
 
-- Número global de achados resolvidos ("102 resolvidos" citado no
-  pedido) — **não medido nesta sessão, não prometido**. Só pode ser
-  determinado executando o CR de implementação contra o corpus real.
+- O número "102 resolvidos" **não foi medido de novo nesta sessão** —
+  vem do diagnóstico instrumentado original
+  (`docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`, medição ao vivo sobre o
+  corpus real), não de uma reexecução própria desta spec. Tratado aqui
+  como evidência de uma fonte independente, não como fato reestabelecido
+  por este documento — o CR de implementação deve remedir contra o
+  estado então-atual da `main` antes de reportar qualquer número como
+  seu.
 - Que os 8 de 10 casos "compatíveis com humano" citados no pedido (E)
   realmente ficam aceitáveis depois dos dois fixes — depende de gates
   não relacionados a este CR (colisão, fechamento, prisma forçado em
   vizinha) que continuam vetando candidatos independentemente do fix de
-  fidelidade.
+  fidelidade; o diagnóstico original já aponta esse achado (8/10), mas
+  a aceitação FINAL pós-fix ainda não foi medida por nenhuma sessão.
 - Qualquer resultado numérico do TGD/TP1/Piloto pós-fix — requer rebuild
   completo, fora do escopo "read-only/spec" desta sessão.
 
