@@ -5,13 +5,13 @@ Auditoria cruzada do `CR-BLOCK-01` (CONTA 1, branch
 integração exclusiva para auditoria (`claude/block-01-cross-audit`,
 criada a partir da branch da CONTA 1 + merge dos artefatos read-only da
 CONTA 2). Produto principal:
-**`docs/BLOCK_MODULATION_CROSS_AUDIT.md`**.
+**`docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md`**.
 
 ## Contrato
 
 Mesmo contrato da auditoria da fase 1 (`../README.md`): só leitura do
 motor, nada de MCP/Revit, não corrige nada. Escrita restrita a esta
-pasta (`cross_audit/**`) e a `docs/BLOCK_MODULATION_CROSS_AUDIT.md`.
+pasta (`cross_audit/**`) e a `docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md`.
 `nuvem/core/**`, `tests/test_script.py`, `tests/test_block_bonding.py`,
 `nuvem/REGRAS_MODULACAO_BLOCOS.md` e `docs/PROJECT_STATUS.md` não foram
 tocados.

@@ -1,5 +1,17 @@
 # Testes
 
+> **HISTÓRICO.** O texto abaixo e' um snapshot da sessao de 2026-08-26 e
+> nao reflete o estado atual do repositorio. Em particular: `tests/`
+> (raiz do repo) hoje TEM `run_tests.py` e um `test_script.py` grande -
+> a afirmacao "esse arquivo especifico tambem nao existe mais" (final
+> deste arquivo) e a afirmacao de que a suite antiga "nao existe mais
+> neste repositorio" (abaixo) estao desatualizadas. Para o estado atual
+> da suite em `tests/`, ver `tests/README.md`. O caminho local
+> `C:\Users\CIVIX\.claude\plans\quiet-painting-petal.md` citado abaixo e'
+> de uma maquina especifica de uma sessao anterior - nao e' uma
+> dependencia deste repositorio. Preservado aqui como registro do
+> raciocinio daquela sessao, nao como documentacao atual.
+
 **Estado atual (2026-08-26):** esta pasta e' NOVA - a suite antiga
 referenciada no docstring de `core/wall_modeling.py` (linhas ~107-111,
 "`tests/run_tests.py` carrega este arquivo com a API do Revit/WinForms

@@ -1,7 +1,7 @@
 # Reference Corpus — benchmark de referência da modulação
 
 `CR-BLOCK-REFERENCE-CORPUS`. Evolução do `CR-BLOCK-GOLDEN-BENCHMARK`
-(ver [`docs/GOLDEN_BENCHMARK.md`](GOLDEN_BENCHMARK.md) para o histórico).
+(ver [`docs/archive/GOLDEN_BENCHMARK.md`](archive/GOLDEN_BENCHMARK.md) para o histórico).
 Este é o ponto de entrada atual.
 
 > Paralela ao `CR-BLOCK-DETERMINISM` (outra conta, em
@@ -72,7 +72,7 @@ só `promote()`/`make_manifest()` recusam ativamente uma entrada inválida.
 
 **Hoje, nenhum projeto do repositório é `confidence=GOLDEN`** — não há
 prova de validação humana formal registrada para nenhum (mesmo
-raciocínio do CR anterior, ver `docs/GOLDEN_BENCHMARK.md`).
+raciocínio do CR anterior, ver `docs/archive/GOLDEN_BENCHMARK.md`).
 
 ## Capabilities — o que cada projeto sustenta testar (item 12)
 
