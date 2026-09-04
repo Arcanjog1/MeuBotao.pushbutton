@@ -4392,3 +4392,24 @@ formalizar/implementar a política. Relatório completo:
   G1-G18) e o próximo passo recomendado (reimplementar o reparo com
   verificação de colisão real, no estilo mais caro-porém-seguro da ETAPA
   3C, em vez do resolve parcial de 1 salto).
+- **ATUALIZAÇÃO — continuação SAFE REPAIR (mesma CR, 2026-09-04)**: o
+  gap de colisão acima foi encontrado e CORRIGIDO (causa raiz: duplicação
+  de candidatos de nó no RESOLVE PARCIAL, não a vizinhança de 1 salto em
+  si) — `result["collisions"]` (já calculada, completa, por
+  `process_walls_one_by_one`) foi reutilizada com sucesso como gate,
+  medido: `POSITION_OVERLAP` no TP1 ficou 18→18 (inalterado) com o reparo
+  ativo, 3 paredes (`W021`, `W092`, `W076`) tiveram o prisma forçado
+  eliminado com segurança completa (fechamento + colisão + prisma em
+  vizinhas, as três checadas). Um SEGUNDO gap, de categoria DIFERENTE, foi
+  então descoberto: reparar `W137`/TGD introduz `JUNCTION_NOT_ALTERNATING`
+  (nível 1, `nuvem/benchmark/validators/validate_junctions.py`) em duas
+  paredes vizinhas (`W011`, `W088`) que estavam limpas — mecanismo
+  envolve agrupamento de nó por proximidade física (`NODE_MERGE_
+  TOLERANCE_CM`) que inclui uma TERCEIRA parede (`W090`) e não tem
+  equivalente no grafo interno de `wall_stepper.py` (`node["arms"]`,
+  sempre 2 paredes). Implementação revertida de novo, por completo
+  (não só o candidato de `W137`) — sem um quinto gate que replique esse
+  agrupamento fielmente, não há prova de que os candidatos hoje "limpos"
+  (TP1) continuariam limpos em outro projeto. Ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção "CONTINUAÇÃO — SAFE
+  REPAIR", para o relatório completo desta segunda tentativa.

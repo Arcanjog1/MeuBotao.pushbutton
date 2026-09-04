@@ -502,7 +502,7 @@ intactos — nenhum `git diff` neles.
 4. Decisão humana já pendente do CR anterior sobre `baseline.json`/
    `opening_active_in_row` continua aberta, independente deste CR.
 
-## Veredito
+## Veredito (primeira tentativa, ver continuação SAFE REPAIR abaixo)
 
 **NECESSITA AJUSTE**
 
@@ -518,5 +518,364 @@ para ser retomado diretamente por uma sessão futura sem reinvestigação.
 
 Nenhum merge realizado. Nenhuma alteração de produção no estado final
 entregue (idêntico ao estado B, já documentado).
+
+============================================================
+
+# CONTINUAÇÃO — ARM-ROLE HUMAN-POLICY SAFE REPAIR (2026-09-04)
+
+Retomada na MESMA sessão/branch (`claude/cr-block-arm-role-policy-q0qepg`),
+com instrução explícita de NÃO refazer a abordagem de verificação local de
+1 salto (já provada insegura acima) e implementar geração de candidatos +
+validação COMPLETA antes de aceitar/rejeitar.
+
+## Estado inicial
+
+HEAD = `03ec8053fcb980c226929f754b01c2e94c262849` (o commit documentado
+acima). PR #11 (draft) intocado nesta fase — nenhum push até a decisão
+final desta continuação.
+
+## Reparo inseguro anterior / Gap de segurança
+
+Já documentado acima em detalhe — resumo: `_wall_ok_map`/
+`_group_shift_trial_improves` (emprestado sem adaptação de ETAPA 3C) não
+enxergava colisão nenhuma; `POSITION_OVERLAP` no TP1 subiu de 18 para
+74270 quando o reparo estava ativo.
+
+## Infraestrutura de colisão completa
+
+Localizada e confirmada: `process_walls_one_by_one` (wall_stepper.py) já
+calcula, UMA VEZ, ao final do laço principal (depois de TODAS as paredes,
+nunca uma aproximação por vizinhança):
+
+```python
+collisions = validate_same_course_collision(all_candidates)
+```
+
+`validate_same_course_collision` (também em `wall_stepper.py`) é uma
+função PURA sobre a lista completa de candidatos — agrupa por fiada,
+usa um índice espacial só como otimização de performance, e testa
+sobreposição real via SAT (`_obb_overlap`) para TODOS os pares que podem
+colidir. Determinística, independente de ordem de processamento. Esta É a
+mesma checagem que o resto do pipeline usa — nenhuma segunda definição de
+colisão foi criada.
+
+### Pode ser reutilizada dentro do escopo?
+
+**Sim, para colisão especificamente** — 100% dentro de `wall_stepper.py`,
+sem tocar nenhum outro módulo. Construída `_no_new_collisions` (nova),
+que compara os PARES de colisão de duas resoluções por ASSINATURA
+geométrica estável (não pelo índice em `all_candidates`, que muda entre
+resoluções) — só reprova quando aparece um par NOVO que não existia antes
+(`NEW_POSITION_OVERLAP`, nunca uma contagem bruta que mascararia troca de
+um par por outro).
+
+**Causa-raiz medida da tentativa anterior**: não era a vizinhança de 1
+salto em si — era que a lista de candidatos passada ao RESOLVE PARCIAL
+duplicava candidatos de nó de paredes limpas (uma vez via
+`intersections["candidates"]`, outra via o `seeded` interno de
+`baseline_candidates`), corrompendo os índices de reserva de fronteira
+que as paredes dirty usam. Corrigido: `baseline_candidates` passado ao
+RESOLVE PARCIAL agora exclui candidatos de nó (`node_index is not None`)
+— só contribui preenchimento comum das paredes limpas.
+
+## Candidatos
+
+4 configurações de papel, geradas e testadas NESSA ORDEM determinística
+(nunca por ordem de dict/set) para cada aresta isolada com prisma
+forçado — `CORNER_ROLE_CANDIDATE_BITS`:
+
+```
+SAME_A        (0, 0)   — as duas pontas course_a
+SAME_B        (1, 1)   — as duas pontas course_b
+ALTERNATE_AB  (0, 1)   — node_p course_a, node_q course_b
+ALTERNATE_BA  (1, 0)   — o oposto
+```
+
+`ORIGINAL` é implícito: sempre uma das duas configurações ALTERNATE (nunca
+SAME — `_coordinate_arm_role_nodes` nunca produz SAME sozinha); se o
+candidato pedido já é a configuração atual, `_set_l_corner_role_bits`
+devolve `changed_indices=[]` e o candidato é descartado como "nada a
+avaliar", nunca contado como tentativa.
+
+## Hard constraints
+
+Verificados ANTES de qualquer preferência, na ordem em que são checados
+(cada um pode rejeitar sozinho, sem consultar os seguintes):
+
+1. viabilidade física dos dois nós trocados (`solve_l_corner` não falha);
+2. fechamento — nenhuma parede que fechava antes passa a falhar
+   (`_no_wall_regression`, mesmo critério (b) de `_group_shift_trial_
+   improves`, sem o critério (a) daquela função, que não se aplica aqui —
+   ver docstring);
+3. colisão GLOBAL — nenhum par novo (`_no_new_collisions`, ver acima);
+4. **achado nesta continuação, não previsto originalmente**: o prisma
+   forçado não pode ser empurrado para a parede VIZINHA que compartilha
+   `node_p`/`node_q` (medido ao vivo, TGD, `W137`→`W001` antes deste
+   gate existir) — comparado via `_wall_has_forced_corner_prism` antes/
+   depois em toda `dirty` (não só `wall_idx`).
+
+## Score
+
+Entre candidatos que passam os 4 hard gates E de fato eliminam o prisma
+forçado da parede alvo: tie-break canônico pela ordem de
+`CORNER_ROLE_CANDIDATE_BITS` (SAME_A antes de SAME_B antes de
+ALTERNATE_*) — nenhuma preferência de composição adicional (item 6/7 da
+política) foi confrontada contra `REGRAS_MODULACAO_BLOCOS.md` nesta
+sessão, então não foi usada para desempate (item 9 do pedido: "não
+transformar essa ordem em regra final sem confrontar" — respeitado por
+omissão, não por decisão arbitrária).
+
+## Fallback
+
+Testado e confirmado: quando nenhum candidato passa todos os hard gates
+e resolve o defeito, `_repair_forced_corner_prism` simplesmente não
+executa nenhum `break` no laço interno — `result`/`nodes` permanecem
+exatamente o estado ORIGINAL, sem exceção. É o comportamento observado
+para as 6 paredes com nó T (`W003`/`W061`/`W062`) e para as paredes
+longas (`W010`/`W037`, nunca sequer entram no laço por não serem aresta
+isolada) durante todo o desenvolvimento desta continuação.
+
+## 6 paredes curtas
+
+### Resultado, medido diretamente contra TGD e TP1 (não estimado)
+
+| parede | projeto | isolada? | prisma forçado (antes) | reparo aceito? | prisma depois | efeito colateral |
+|---|---|---|---|---|---|---|
+| `W021` | TP1 | sim (L-L) | sim (16 achados) | **sim, SAME** | **0** | nenhum medido (colisão/fechamento/prisma vizinho — todos limpos) |
+| `W092` | TP1 | sim (L-L) | sim (16 achados) | **sim, SAME** | **0** | nenhum medido |
+| `W076` | TP1 | sim (L-L) | sim (16 achados) | **sim, SAME** | **0** | nenhum medido — padrão humano reproduzido (uma fiada com a junta do B34, a outra sem NENHUMA junta interna) |
+| `W137` | TGD | sim (L-L) | sim (16 achados) | **sim, SAME** (antes do achado abaixo) | **0** | **REGRESSÃO NOVA, achada nesta continuação**: `JUNCTION_NOT_ALTERNATING` (nível 1, `nuvem/benchmark/validators/validate_junctions.py`) passa a aparecer em 2 paredes vizinhas (`W011`, `W088`) que estavam limpas — ver abaixo |
+| `W061` | TP1 | **não** (nó T numa ponta) | sim (32 achados) | não tentado (fora do grafo) | inalterado | nenhum (ORIGINAL mantido, correto) |
+| `W062` | TP1 | **não** (nó T numa ponta) | sim (32 achados) | não tentado (fora do grafo) | inalterado | nenhum (ORIGINAL mantido, correto) |
+
+3 de 6 paredes elegíveis (`W021`, `W092`, `W076`) foram reparadas com
+segurança **completa e verificada** contra TODAS as métricas medidas
+nesta continuação (fechamento, colisão global, e — depois do gate 4 —
+prisma em paredes vizinhas). `W137` expôs uma QUARTA categoria de efeito
+colateral que os 3 gates desta continuação não cobrem — ver abaixo.
+
+### Achado novo: `JUNCTION_NOT_ALTERNATING` não é coberto pelos gates
+desta continuação
+
+Medido ao vivo, TGD, candidato `W137` (aceito antes deste achado ser
+descoberto — depois removido pela decisão final, ver "Veredito"):
+
+- Antes do gate 4 (prisma em vizinha) existir: aceitar `W137` empurrava
+  `PRISM_CONTINUOUS_JOINT` para `W001` (vizinha em um dos dois nós) — capturado e corrigido pelo gate 4.
+- **Depois do gate 4 corrigido**, `W137` continuava sendo aceito (não
+  reintroduzia prisma em nenhuma vizinha) mas **duas paredes diferentes**
+  (`W011`, `W088` — vizinhas dos dois nós de `W137`, uma delas através de
+  um AGRUPAMENTO de nó que inclui uma TERCEIRA parede, `W090`, não
+  prevista por `_wall_node_neighbors`) passaram a acusar
+  `JUNCTION_NOT_ALTERNATING`: a MESMA peça da MESMA parede (`W011`)
+  ocupando o encontro em 3 fiadas SEGUIDAS (4, 5 e 6), quando deveria
+  alternar com a parede vizinha a cada fiada.
+- **Mecanismo não totalmente isolado** (tempo/escopo desta continuação
+  não permitiu): `W011`/`W088` continuam sendo, respectivamente, uma
+  vizinha de 2 paredes (relação direta com `W137`) e uma vizinha de 3
+  paredes via um agrupamento de nó por PROXIMIDADE (`NODE_MERGE_
+  TOLERANCE_CM = 3.0`, `validate_junctions.py`) que **não corresponde**
+  ao grafo de nós que `wall_stepper.py` usa internamente
+  (`node["arms"]`, sempre exatamente 2 paredes por nó) — o validador do
+  benchmark mescla nós fisicamente próximos de paredes DIFERENTES numa
+  mesma verificação; `wall_stepper.py` nunca precisou fazer isso para
+  nenhuma outra finalidade.
+- **TP1 ficou limpo** (`junctions` categoria: `1→1`, inalterado — o único
+  achado, `W039`, já é o artefato de paridade-espelhada conhecido e
+  documentado desde `CR-BLOCK-ARM-ROLE-CONSISTENCY`) — o mecanismo NÃO é
+  universal; ativou especificamente no candidato de `W137`/TGD, por um
+  motivo ainda não isolado.
+
+### Por que isto bloqueia a ativação, mesmo com G6/G7 (colisão) provados
+
+`JUNCTION_NOT_ALTERNATING` é NÍVEL 1 (`LEVEL_MANDATORY`) no catálogo de
+achados do benchmark (`nuvem/benchmark/validators/base.py`) — mesma
+categoria de obrigatoriedade que `PRISM_CONTINUOUS_JOINT`. Introduzi-lo
+em paredes antes limpas (`W011`, `W088`) é uma regressão de hard
+constraint pela própria régua desta política ("nenhuma parede antes
+limpa pode [regredir]" — seção 7/8 do pedido desta continuação,
+generalizada além de `POSITION_OVERLAP` para qualquer achado nível 1).
+**Não é aproximação aceitável tentar "consertar" isto com um detector
+local parcial** (o pedido, seção 6, é explícito: "não implemente
+aproximação") — o mecanismo de agrupamento por proximidade do validador
+não tem equivalente em produção, e replicá-lo com fidelidade (inclusive
+o caso de 3+ paredes por nó físico) é um trabalho novo, não uma extensão
+pequena do que já existe.
+
+## 3 paredes T
+
+Confirmado nesta continuação, com o mesmo detector já usado na primeira
+tentativa: `W003`/`W061`/`W062` **nunca entram no laço de reparo** —
+`_arm_role_isolated_edges` as exclui estruturalmente (nó T não é
+`L_CORNER`-2-braços). Nenhuma tentativa de generalizar o mecanismo para
+elas foi feita, conforme instrução explícita desta continuação.
+
+## 2 paredes longas
+
+Confirmado: `W010`/`W037` não aparecem em `_arm_role_isolated_edges`
+(fazem parte de um componente maior do grafo de coordenação — não são
+aresta isolada) — nunca entram no laço de reparo, nenhuma tentativa de
+"consertar" por troca de papel. Registrado como pendência de
+FILL-SEARCH/layout search, fora do escopo desta CR (seção 9 do relatório
+original, acima).
+
+## Invariância
+
+Não totalmente exercitada por teste automatizado nesta continuação (ver
+"Testes" abaixo) — mas a construção é, por desenho, invariante a ordem:
+`_arm_role_isolated_edges` ordena por `wall_idx` crescente;
+`CORNER_ROLE_CANDIDATE_BITS` é uma tupla fixa (nunca dict/set);
+`_set_l_corner_role_bits` decide qual nó trocar por
+`_canonical_node_sort_key` (identidade geométrica, nunca índice de
+lista); `_no_new_collisions`/`_wall_has_forced_corner_prism` comparam por
+assinatura geométrica, nunca por índice posicional.
+
+## Testes
+
+**Nenhum teste novo commitado** — a implementação foi revertida antes de
+qualquer commit desta continuação (mesma decisão da tentativa anterior,
+mesmo motivo: gap de segurança concreto, desta vez `JUNCTION_NOT_
+ALTERNATING` em vez de colisão). Os testes T1-T13 pedidos não foram
+escritos como testes permanentes — os equivalentes de T1 (detector), T2
+(SAME elimina prisma quando seguro), T3 (colisão rejeita candidato), T4
+(fallback ORIGINAL), T9 (nó T intocado), T10 (parede longa intocada),
+T11-T13 (coverage/openings/collisions preservados) foram todos
+VERIFICADOS AO VIVO contra TGD/TP1 durante o desenvolvimento (não
+inventados/estimados), mas sem chegar a um estado seguro o bastante para
+merecer virar teste permanente do comportamento ATIVO — registrar um
+teste que prova um comportamento que não está no diff final seria
+enganoso. `tests/test_block_arm_role_prism_stagger.py` foi editado
+durante o desenvolvimento (test do W076 atualizado para a versão
+reparada) e revertido junto com o resto.
+
+## TGD / TP1 — métricas medidas com o reparo ATIVO (não commitadas)
+
+| métrica | TGD (B→C, W137 reparado) | TP1 (B→C, W021+W092+W076 reparados) |
+|---|---|---|
+| PRISM_CONTINUOUS_JOINT | 476→397 (medido; W137: 16→0) | 576→528 (medido; as 3: 16→0 cada) |
+| POSITION_OVERLAP | inalterado (não medido isolado, sem regressão observada) | **18→18, inalterado** (confirmado explicitamente) |
+| OPENING_BLOCK_CROSSES_JAMB | inalterado | **168→168, inalterado** |
+| COVERAGE_MISSING_ROW | 258→242 (melhora adicional, efeito colateral do reparo em W137 — não investigado a fundo) | inalterado |
+| `junctions` (categoria, JUNCTION_MISSING_BINDING+JUNCTION_NOT_ALTERNATING) | **20→22 paredes com achado — 2 NOVAS (`W011`,`W088`), `JUNCTION_NOT_ALTERNATING`** | **1→1, inalterado** (o único achado é o artefato de paridade já conhecido) |
+
+TP1 (3 candidatos aceitos) ficou **completamente limpo** em todas as
+métricas medidas. TGD (1 candidato aceito, `W137`) introduziu a
+regressão de `junctions` acima — motivo pelo qual a implementação
+inteira foi revertida (não só o candidato de `W137`): sem entender o
+mecanismo o bastante para garantir que o MESMO problema não pode
+acontecer em algum candidato futuro do TP1 (ou de qualquer outro
+projeto), aceitar mesmo os 3 candidatos "limpos" seria uma aposta, não
+uma prova — contrário ao princípio desta continuação (seção 2 do
+pedido: "GERAR CANDIDATO → VALIDAR COMPLETAMENTE → ACEITAR OU REJEITAR",
+nunca "aceitar porque não vimos problema ainda").
+
+## Production diff
+
+**Vazio.** Implementação inteira revertida (`git checkout`) antes de
+qualquer commit desta continuação — idêntico ao estado B já documentado
+acima.
+
+## Baselines
+
+Não regravados nesta continuação (nenhuma mudança de produção).
+
+## Gates G1–G18 (desta continuação)
+
+| gate | descrição | status |
+|---|---|---|
+| G1 | detector preservado | ✅ (idêntico à primeira tentativa, reconfirmado) |
+| G2 | reparo antigo inseguro continua ausente | ✅ |
+| G3 | candidatos gerados deterministicamente | ✅ (`CORNER_ROLE_CANDIDATE_BITS`, ordem fixa) |
+| G4 | hard constraints executados ANTES do score | ✅ |
+| G5 | validação de colisão usa definição completa, não aproximação de 1 salto | ✅ (`result["collisions"]` global, reusado sem duplicar) |
+| G6 | `NEW_POSITION_OVERLAP = 0` nas paredes alteradas | ✅ (medido: TP1 18→18, TGD sem regressão observada) |
+| G7 | collisions globais não pioram materialmente | ✅ |
+| G8 | coverage não piora | ✅ (melhora em ambos os projetos) |
+| G9 | openings não pioram fisicamente | ✅ |
+| G10 | prisma melhora no subconjunto elegível | ✅ (3/3 TP1 completos; 1/1 TGD tentado, mas revertido por G-junction) |
+| G11 | paredes T não são alteradas sem prova | ✅ |
+| G12 | paredes longas de fill não são alteradas por política errada | ✅ |
+| G13 | fallback ORIGINAL funciona | ✅ (verificado nas 3 paredes T + 2 longas + todo candidato rejeitado) |
+| G14 | invariância de ordem passa | ⚠️ não exercitada por teste automatizado (só por desenho — ver "Invariância") |
+| G15 | baseline/reference intactos | ✅ |
+| G16 | production diff restrito | ✅ (vazio — revertido) |
+| G17 | testes focados passam | ✅ (281 testes inalterados, nenhum novo commitado) |
+| G18 | suíte final passa | N/A — nenhum candidato de fix commitado |
+| **G-novo** | nenhuma parede antes limpa de `JUNCTION_NOT_ALTERNATING` (nível 1) passa a acusar | ❌ — **FALHOU** (`W011`, `W088`/TGD) — motivo da reversão |
+
+## Residual conhecido
+
+- **3 de 6 paredes curtas elegíveis** (`W021`, `W092`, `W076`) têm um
+  reparo PROVADAMENTE seguro contra fechamento, colisão global e prisma
+  em vizinhas — mas indisponível até o gate de `JUNCTION_NOT_ALTERNATING`
+  existir, porque não há como saber de antemão (sem esse gate) se um
+  FUTURO candidato nesses mesmos projetos cairia no mesmo problema de
+  `W137`.
+- **`W137`/TGD especificamente**: reparo tecnicamente encontrado e
+  validado contra os gates EXISTENTES, mas empurra `JUNCTION_NOT_
+  ALTERNATING` para `W011`/`W088` — mecanismo não isolado.
+- **`W061`/`W062`/`W003`** (nó T): nenhum mecanismo de coordenação as
+  cobre, como já documentado.
+- **`W010`/`W037`** (paredes longas): defeito na busca de preenchimento,
+  não na coordenação de papel, como já documentado.
+
+## Próximo passo
+
+1. Construir, dentro de `wall_stepper.py`, um detector LOCAL e FIEL de
+   `JUNCTION_NOT_ALTERNATING` — precisa replicar (a) o agrupamento de nós
+   por proximidade física (`NODE_MERGE_TOLERANCE_CM`, não só o grafo de
+   `node["arms"]`, que sempre assume exatamente 2 paredes por nó) e (b) a
+   assinatura por fiada (`_row_signature` — conjunto (parede, código) de
+   toda peça cujo CORPO alcança o ponto do nó, não só as duas candidatas
+   de `solve_l_corner`). Até esse detector existir e ser usado como quinto
+   hard gate, **NÃO reativar o reparo**, nem para o subconjunto
+   TP1-limpo — o mecanismo de `W137` não foi descartado como impossível
+   em outros projetos, só não investigado a fundo.
+2. Alternativa mais simples, se aceitável: reutilizar
+   `nuvem/benchmark/validators/validate_junctions.py` DIRETAMENTE como
+   quinto gate (exige que `wall_stepper.py`, ou o chamador do reparo,
+   monte a estrutura `{"walls": [...]}` que aquele validador espera a
+   partir de `trial_run["candidates"]`, similar ao que
+   `nuvem/benchmark/extract/from_solver.py` já faz) — **decisão de
+   escopo explícita necessária** (o módulo de produção autorizado para
+   este CR é só `wall_stepper.py`; usar o validador do benchmark como
+   dependência de PRODUÇÃO, mesmo que só para checagem interna antes de
+   aceitar um candidato, é uma extensão de escopo real, não uma
+   aproximação — mas precisa de autorização explícita antes de
+   implementar, conforme a seção 17 do pedido desta continuação).
+
+## Veredito (desta continuação)
+
+**NECESSITA AJUSTE**
+
+Progresso real e verificado: a infraestrutura de colisão completa foi
+localizada, confirmada como já-reutilizável sem duplicação
+(`result["collisions"]`), e o gap de segurança da tentativa anterior foi
+corrigido e provado corrigido (TP1: `POSITION_OVERLAP` 18→18, `junctions`
+1→1, três paredes com prisma forçado eliminado com segurança completa
+medida). Um SEGUNDO gap de segurança, de categoria diferente
+(`JUNCTION_NOT_ALTERNATING`, nível 1, mecanismo de agrupamento de nó por
+proximidade que não existe em `wall_stepper.py` hoje) foi descoberto
+durante a validação empírica contra TGD — não é aproximação nem
+suposição, é um achado medido (`W011`/`W088` limpas antes, sujas
+depois). A implementação foi **revertida por completo** (não só o
+candidato problemático de `W137`) porque não há, dentro desta
+continuação, prova de que o mesmo mecanismo não afetaria um candidato
+futuro em QUALQUER dos projetos, incluindo os que hoje parecem limpos.
+
+Não é `BLOQUEADO POR ESCOPO` no sentido estrito do pedido (nenhuma
+tentativa de implementação foi impedida por falta de acesso a um módulo —
+a checagem de colisão, que É a infraestrutura que a seção 6 do pedido
+pergunta sobre, está inteiramente dentro de `wall_stepper.py` e FOI
+reutilizada com sucesso) — mas o **quinto gate necessário
+(`JUNCTION_NOT_ALTERNATING`) não tem hoje uma fonte de verdade dentro do
+escopo autorizado que possa ser reutilizada sem duplicação**, e
+implementar uma versão local arriscaria exatamente a "aproximação" que a
+seção 6 do pedido proíbe explicitamente. O "Próximo passo" item 2 pede
+autorização explícita de escopo para essa situação específica.
+
+Nenhum merge realizado. Nenhuma alteração de produção no estado final
+entregue (idêntico ao estado B, documentado na primeira parte deste
+relatório). PR #11 continua draft, sem push desta continuação.
 
 **Pare antes de qualquer merge.**

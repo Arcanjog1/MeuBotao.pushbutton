@@ -699,7 +699,34 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
-### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` NECESSITA AJUSTE (não mesclado, nenhum código alterado no estado final)
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` (continuação SAFE REPAIR) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-HUMAN-POLICY, continuação SAFE REPAIR
+status:        NECESSITA AJUSTE — docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md,
+               seção "CONTINUAÇÃO — SAFE REPAIR"
+
+resumo: corrigido o gap de colisão da tentativa anterior (causa: nó
+  duplicado no RESOLVE PARCIAL, não a vizinhança de 1 salto) reusando
+  `result["collisions"]` (já completa, já existente) como gate. 3
+  paredes (W021/W092/W076, TP1) reparadas com seguranca TOTAL medida
+  (fechamento + colisão global + prisma em vizinhas). Um SEGUNDO gap,
+  diferente, foi achado ao testar W137/TGD: introduz
+  JUNCTION_NOT_ALTERNATING (nível 1) em 2 paredes vizinhas antes limpas,
+  via um agrupamento de nó por proximidade que o benchmark faz e
+  wall_stepper.py não replica. Revertido por completo de novo (nenhum
+  código de produção no estado entregue) — sem 5º gate que cubra isso,
+  nem os 3 candidatos "limpos" do TP1 têm prova de que ficariam limpos
+  sempre.
+
+próximo passo: construir esse 5º gate (replicar o agrupamento por
+  proximidade localmente) ou obter autorização explícita de escopo para
+  reusar nuvem/benchmark/validators/validate_junctions.py como
+  dependência de produção.
+```
+
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` (primeira tentativa) NECESSITA AJUSTE (não mesclado, nenhum código alterado no estado final)
 
 ```
 data:          2026-09-04
