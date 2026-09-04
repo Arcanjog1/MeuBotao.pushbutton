@@ -3963,3 +3963,32 @@ host; eventuais conflitos são devolvidos pelo diagnóstico do solver.
    montagem/serialização da carga, total, tamanho da resposta, quantidade de
    Walls afetadas/contexto e blocos adicionados/removidos, para que regressões
    de desempenho possam ser verificadas na captura real.
+
+## 29. REGRA OBRIGATÓRIA — assistente de propostas geométricas, com aprovação explícita
+
+O modulador deve ajudar a destravar uma modulação reprovada propondo alterações
+geométricas, mas não pode alterar automaticamente o projeto Revit. Toda
+proposta é uma simulação reversível; só a ação **Aplicar proposta** escolhida
+explicitamente pelo usuário cria uma transação no Revit.
+
+1. Para cada conflito, o assistente deve gerar alternativas ordenadas pelo
+   menor impacto: deslocar abertura dentro da Wall hospedeira, ajustar
+   pilarete/trecho livre, alterar dimensão de abertura quando permitido e,
+   por último, estender/encurtar o extremo de uma Wall. A extensão de Wall é
+   sempre uma sugestão manual — nunca um ajuste automático — pois pode afetar
+   ambiente, estrutura, cotas e elementos hospedados.
+2. Cada cartão de proposta deve declarar: elementos a alterar, valores antes e
+   depois, variação em centímetros, fiadas/encontros que serão recalculados,
+   quantidade de conflitos resolvidos/criados e o veredito do solver canônico.
+   Propostas que introduzam colisão, abertura fora do host, bloco em vão ou
+   regra de encontro inválida não podem ser oferecidas como aplicáveis.
+3. A prévia destaca apenas a geometria e os blocos que mudariam, preserva a
+   cena confirmada e permite comparar "atual × proposta". Rejeitar, fechar ou
+   desfazer uma proposta não muda a geometria original.
+4. A aplicação no Revit deve ser atômica e revalidada depois da escrita. Se a
+   validação falhar, faz RollBack e informa a causa; o assistente não pode
+   escolher uma segunda alternativa por conta própria.
+5. O ranking deve favorecer primeiro a solução com menor deslocamento e menor
+   quantidade de elementos modificados, e exibir a justificativa técnica em
+   linguagem de obra (por exemplo, "mover janela 2 cm para liberar B34 na
+   jamba").
