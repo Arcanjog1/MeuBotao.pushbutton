@@ -84,6 +84,11 @@ não é append-only).
   `CR-BLOCK-NODE-FILL-JOINT` mesclar primeiro.
 - **Pareamento `(474, 2306)`** — eixo espúrio de ~43,9 m continua no
   resultado; sem CR atribuído.
+- **Regra do meio-bloco (B19) perto de amarração** — evidência de domínio
+  coletada (`docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`): a regra atual
+  estrita diverge do corpus humano em 259 ocorrências (TP1); proposta de
+  flexibilização mínima aguarda `REQUIRES_HUMAN_DOMAIN_APPROVAL`. Regra
+  **não alterada**.
 - **Detector de espessuras da UI** amostra só as primeiras 900 linhas
   cruas do layer — não limita o solver real, mas pode ocultar espessuras
   raras na sugestão da tela. Dívida de UX, não corrigida por decisão
