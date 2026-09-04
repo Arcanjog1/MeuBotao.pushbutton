@@ -11,11 +11,12 @@
 
 ```
 branch: main
-SHA:    4c89e1216cc6b5708c590f495e1584497e2df583
+SHA:    68a62693ba4ac3a1def43be8b84d526372a4ee9a
 ```
 
-Último marco: `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`
-integrado ("SAFE REPAIR ativado") — detalhes completos em
+Último marco: `PR #13` (docs-only, minimização do onboarding) integrado
+sobre o `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` ("SAFE
+REPAIR ativado") — detalhes completos em
 `docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`. Histórico anterior
 completo: `docs/PROJECT_STATUS_LOG.md`.
 
