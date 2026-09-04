@@ -74,6 +74,12 @@ não é append-only).
   reparo de abertura (`non_modular` +3)** — pendentes, sem CR aberto.
 - **Arestas rejeitadas no `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`**
   (7 no TGD, 3 no TP1) — não investigadas, fora de escopo daquela CR.
+  Spec de preimplementação para 2 dos gates (compensador agregado por
+  banda, cobertura local cega a crédito de nó) pronta em
+  `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md`
+  (`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY-PREIMPLEMENTATION`,
+  READY_FOR_IMPLEMENTATION_AFTER_NODE_FILL) — implementação aguarda
+  `CR-BLOCK-NODE-FILL-JOINT` mesclar primeiro.
 - **Pareamento `(474, 2306)`** — eixo espúrio de ~43,9 m continua no
   resultado; sem CR atribuído.
 - **Detector de espessuras da UI** amostra só as primeiras 900 linhas
