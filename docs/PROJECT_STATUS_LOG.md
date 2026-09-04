@@ -705,6 +705,125 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` PRE-MERGE REFRESH (`PR #17`, docs-only, NÃO mesclado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-NODE-FILL-REVALIDATION (refresh, não uma CR nova)
+PR:            #17 (open, draft, mergeable_state: clean)
+branch:        claude/cr-block-node-fill-revalidation-iahuyg
+HEAD antes:    c94470c8b943e82f6662391a50256a93797b16d2
+HEAD depois:   ver commit deste refresh (merge de origin/main + docs)
+
+resumo: refresh de integração/documentação antes da autorização humana
+  de merge. NENHUMA alteração de lógica NODE-FILL, de teste de
+  comportamento, do Gate-Fidelity nem de B19.
+
+  1. Confirmado origin/main = 789f44227145ecc681c714fb952e10dd1de507d9
+     (avançou de 68a62693 por PR #14/#15/#16, todos docs-only, merged).
+  2. PRODUCTION_EQUIVALENT = TRUE provado por diff explícito: nenhuma
+     mudança em nuvem/core/**, nuvem/benchmark/** (código/validators),
+     tests/** nem em baseline.json/reference.json entre 68a62693 e
+     789f4422 — só docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md,
+     docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md,
+     docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md (novos),
+     docs/CURRENT_REFERENCE_SNAPSHOT.md e docs/PROJECT_STATUS.md
+     mudaram. Portanto as medições NODE-FILL (STATE_A/STATE_B, testes,
+     suíte 593 passed/1 known failure) continuam válidas sem remedição.
+  3. Branch atualizada com merge normal de origin/main (sem
+     cherry-pick, sem reconstrução do NODE-FILL) — merge automático,
+     sem conflitos.
+  4. Proveniência corrigida em docs/BLOCK_NODE_FILL_REVALIDATION.md
+     (seção "Proveniência pós-medição", nomenclatura
+     MEASUREMENT_BASE/CURRENT_MAIN_AT_PREMERGE) e
+     nuvem/REGRAS_MODULACAO_BLOCOS.md seção 33 (removida linguagem
+     efêmera "main atual"/"PR draft" do corpo da regra; estado do PR
+     apontado para docs/PROJECT_STATUS.md, nunca hardcoded na regra de
+     domínio). Conteúdo técnico da seção 33 NÃO alterado.
+  5. docs/PROJECT_STATUS.md: SHA de "Main atual" corrigido para
+     789f4422 (estava referenciando 68a62693, pré PR#14/15/16
+     docs-only); PR #9 corrigido para CLOSED/merged=false (branch
+     histórica preservada) e PR #11 para CLOSED/merged=true
+     (superseded), confirmado via GitHub API — não assumido.
+  6. Confirmada, sem inconsistência, a reconciliação aritmética
+     TP1 N1=308 (medidor físico por wall/row/t) vs delta do validador
+     PRISM_CONTINUOUS_JOINT −304: removidos(308) − novos(4) = 304 nos
+     dois caminhos de código; nota explícita adicionada ao relatório.
+
+diff de produção deste refresh: ZERO (só nuvem/core/engine/wall_stepper.py
+  já commitado em c94470c permanece; nenhuma linha de produção nova).
+diff de teste: ZERO (tests/test_block_node_fill_revalidation.py já
+  commitado em c94470c permanece inalterado).
+baseline diff: ZERO. reference diff: ZERO.
+
+testes rodados: sintéticos NODE-FILL (grade 2x2, célula fechada) e
+  suíte anterior (593 passed / 1 known failure P3) referenciados como
+  válidos por PRODUCTION_EQUIVALENT=TRUE — não re-executada a
+  investigação completa do laboratório (nenhum código de produção
+  mudou, item 7 do pedido).
+
+PR: permanece open/draft/mergeable. NÃO marcado ready. NÃO mesclado.
+monitoramento: OFF (nenhuma subscription criada).
+
+próximo passo: aguardar autorização humana explícita de merge.
+```
+
+### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` APROVADO PARA INTEGRAÇÃO (PR draft, NÃO mesclado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-NODE-FILL-REVALIDATION
+branch:        claude/cr-block-node-fill-revalidation-iahuyg (base origin/main 68a62693)
+status:        APROVADO PARA INTEGRAÇÃO — aguarda autorização explícita de merge.
+               Relatório completo (gates G1-G26): docs/BLOCK_NODE_FILL_REVALIDATION.md
+               Regras: nuvem/REGRAS_MODULACAO_BLOCOS.md seção 33
+
+resumo: revalidação do fix histórico NODE-FILL (d1fc4abb, base em
+  branch de determinismo que NÃO está na main). A main já tinha a metade
+  "A→B" (PRISM-STAGGER: junta de contorno da Fiada A publicada para a B).
+  Faltava a METADE SIMÉTRICA: a Fiada A roda primeiro e nunca via a junta
+  NÓ|FILL da Fiada B — assinatura no corpus: junta interna B19|B39 da A
+  em t=34,5 sobre a junta B34(nó)|fill da B. Como a peça de nó depende só
+  da geometria do encontro, a junta da fiada oposta é deduzível antes
+  (_wall_node_boundary_joints_cm); a Fiada A só troca de layout se
+  colide e existe composição com estritamente menos coincidência,
+  contando só juntas que sobrevivem ao recorte das aberturas
+  (_layout_joints_surviving_openings_cm — evita troca por junta fantasma
+  que regredia cobertura em W075/TGD). Produção: só wall_stepper.py
+  (+125 linhas, NODE_FILL_OPPOSITE_COURSE_ENABLED=True).
+
+medido (STATE_A = main → STATE_B):
+  PRISM_CONTINUOUS_JOINT   TGD 444→336  TP1 576→272  piloto 0→0
+  PRISM_JOINT_STACK        TGD 27→20    TP1 33→17
+  COMPENSATOR_CONSECUTIVE  TGD 410→379  TP1 1469→1461
+  cobertura / aberturas / colisões / junções: delta ZERO nos 3 projetos
+  ARM accepted/rejected: idênticos (TGD 23|SAME_A preservado; 7+3 arestas
+  rejeitadas com as mesmas razões, exceto 91|SAME_B que troca de gate)
+  humano: 226 CONFIRMED / 47 CONSISTENT / 0 CONFLICTS
+  determinismo: fingerprint idêntico em repetição (mesmo e outro processo)
+  performance: TGD +2,3 %, TP1 +5,5 %, piloto 0
+  N1 = 108 (TGD) + 308 (TP1); N2 = 0; N3 = 0 (nenhum validador tocado)
+  baseline/reference: diff zero
+
+não integrado do histórico (medido): gate node_boundary_conflicts
+  separado (só representação; muda semântica de needs_fix e do check do
+  SAFE REPAIR), filtro pela geometria final (sem efeito), juntas de nó no
+  reparo de abertura (sem ganho de prisma). Metade simétrica no reparo
+  local (B4) medida e descartada (sem efeito em finding).
+
+pendências registradas (33.5): reparo local recria a junta 34,5 a partir
+  da peça mantida junto ao vão (TP1 W036/W038, bandas com janela, 16
+  findings); cadeia forçada de 3 compensadores contra X/T degradado
+  (TP1 W003/W008/W061) — limite genuíno de geometria.
+
+testes: tests/test_block_node_fill_revalidation.py 28 passed; ARM 39
+  passed; suíte completa: mesma única falha conhecida
+  (test_projeto_nao_regrediu_contra_o_baseline[tp1], JUNCTION_MISSING_
+  BINDING 8→9, P3 BENCHMARK_ARTIFACT) antes e depois.
+
+próximo passo: decisão humana de merge. Sem monitoramento automático.
+```
+
 ### 2026-09-04 — `CR-BLOCK-ARM-ROLE-JUNCTION-GATE` (causa raiz provada) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
 
 ```

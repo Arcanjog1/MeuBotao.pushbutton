@@ -11,14 +11,18 @@
 
 ```
 branch: main
-SHA:    68a62693ba4ac3a1def43be8b84d526372a4ee9a
+SHA:    789f44227145ecc681c714fb952e10dd1de507d9
 ```
 
-Último marco: `PR #13` (docs-only, minimização do onboarding) integrado
-sobre o `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` ("SAFE
-REPAIR ativado") — detalhes completos em
-`docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`. Histórico anterior
-completo: `docs/PROJECT_STATUS_LOG.md`.
+Último marco de PRODUÇÃO: `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-
+SAFETY-CONTRACT` ("SAFE REPAIR ativado") — detalhes completos em
+`docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`. Desde então só
+merges **docs-only** (`PR #13` onboarding; `PR #14` snapshot refresh;
+`PR #15` Gate-Fidelity spec; `PR #16` evidência de domínio B19) — todos
+com diff de produção declarado ZERO. `nuvem/core/**`,
+`nuvem/benchmark/**` (código/validators), `tests/**` e todo
+`baseline.json`/`reference.json` seguem idênticos ao estado do `PR
+#12`. Histórico anterior completo: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Estado oficial do solver
 
@@ -39,12 +43,26 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
-Nenhum CR de engine em andamento no momento. A única atividade em curso é
-esta própria CR de otimização de contexto/onboarding (só documentação —
-não toca solver, benchmark, baseline, reference ou regras de domínio).
+- **CR-BLOCK-NODE-FILL-REVALIDATION** (`PR #17`, branch
+  `claude/cr-block-node-fill-revalidation-iahuyg`, **open/draft, não
+  mergeado**, `mergeable_state: clean`) — metade simétrica da junta
+  NÓ|FILL: a Fiada A passa a desencontrar da junta de nó da Fiada B
+  (`wall_stepper.py`, `NODE_FILL_OPPOSITE_COURSE_ENABLED`). Medido
+  contra a base de medição `68a62693` — produção equivalente à `main`
+  atual (só `PR #14`/`#15`/`#16`, docs-only, entraram depois; ver
+  "Main atual" acima), medições continuam válidas sem remedição:
+  `PRISM_CONTINUOUS_JOINT` TGD 444→336, TP1 576→272, piloto 0→0;
+  cobertura, aberturas, colisões, junções e ARM accepted/rejected com
+  delta zero; 0 conflitos com o Reference Corpus humano. Relatório e
+  gates: `docs/BLOCK_NODE_FILL_REVALIDATION.md`; regras: seção 33 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda autorização de merge; sem
+  monitoramento automático.
 
-`PR #9` e `PR #11` (série ARM) permanecem **open/draft como histórico**,
-**congelados**, e não são trabalho ativo — ver
+`PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
+NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
+(`CR-BLOCK-ARM-ROLE-HUMAN-POLICY`, **CLOSED, mesclado** — docs-only,
+conteúdo de produção idêntico ao já presente via `PR #9`/histórico,
+superseded pela integração posterior) não são trabalho ativo — ver
 `docs/PROJECT_STATUS_LOG.md` para o registro completo dessa série.
 
 ## Reference Corpus
@@ -104,7 +122,10 @@ Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 1. Aguardar autorização/priorização do usuário para o próximo CR de
    engine (candidatos: `CR-BLOCK-DETERMINISM`, alinhamento cross-band,
    compensadores/pastilhas, arestas rejeitadas do SAFETY-CONTRACT).
-2. `NODE-FILL` — **não iniciar** sem autorização explícita do usuário.
+2. `NODE-FILL` — revalidado em `CR-BLOCK-NODE-FILL-REVALIDATION` (PR
+   draft); merge só com autorização explícita. Pendência registrada
+   (33.5): o reparo local junto ao vão ainda recria a junta 34,5 em
+   `W036`/`W038` (TP1, bandas com janela).
 3. Teste visual integrado no Revit — retomar quando o usuário priorizar.
 
 ## Não reabrir sem evidência de regressão
