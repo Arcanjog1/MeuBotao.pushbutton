@@ -1,5 +1,11 @@
 # Modulacao Automatica (pyRevit) - instrucoes para o Codex
 
+## Onboarding
+
+Comece por `docs/START_HERE.md`. Use recuperacao progressiva de
+contexto (ver secao abaixo): nao leia recursivamente todo o repo sem
+necessidade.
+
 ## Merge na main
 
 REVOGADO (2026-09-03) o "ok" permanente que existia aqui: NUNCA fazer
