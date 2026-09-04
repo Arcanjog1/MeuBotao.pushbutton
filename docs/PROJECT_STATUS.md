@@ -699,6 +699,43 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-ARM-ROLE-JUNCTION-GATE` (causa raiz provada) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-ROLE-JUNCTION-GATE
+status:        NECESSITA AJUSTE — docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md,
+               seção "CONTINUAÇÃO — CR-BLOCK-ARM-ROLE-JUNCTION-GATE"
+
+resumo: a atribuição anterior ("W137 causa JUNCTION_NOT_ALTERNATING em
+  W011/W088") estava ERRADA (comparação corrompida por conflito de git
+  stash) — corrigida: W137 isolado produz 0 achados de junção novos. Os
+  candidatos reais que causam a regressão sao wall_idx=7 (=W090, afeta a
+  vizinha W088) e wall_idx=23 (=W011, afeta a si mesma) — sempre um par,
+  nunca um cluster de 3+ paredes. CAUSA RAIZ PROVADA: inconsistência de
+  persistência do papel do nó ENTRE BANDAS de
+  solve_building_blocks_all_courses — _coordinate_arm_role_nodes
+  reconstrói o estado alternante do zero em cada banda, e um reparo
+  acionado só quando a banda atual mostra prisma forçado fica ativo em
+  algumas bandas e revertido ao padrão oposto nas outras, produzindo
+  duas convenções internas incompatíveis na mesma parede. Correção
+  estrutural provada em script (marcador `_arm_role_pinned`, exclui nós
+  já decididos do filtro de `_coordinate_arm_role_nodes`, sem tocar
+  wall_pairing.py/wall_modeling.py): zera JUNCTION_NOT_ALTERNATING novo
+  nos 5 candidatos do TGD. Achado adicional fora do escopo desta CR: com
+  verificação completa (todos os validadores), 4 dos 5 candidatos ainda
+  introduzem COMPENSATOR_CONSECUTIVE/COVERAGE_GAP_IN_ROW/etc. novos em
+  categorias que nenhum gate hoje autorizado detecta — só wall_idx=23
+  (W011) passa limpo em tudo. Nenhuma alteração de produção commitada.
+
+próximo passo: (1) commitar o pin-fix isolado (seguro, no-op sem
+  chamador) se autorizado; (2) decidir com o usuário se um sexto gate
+  de compensador/cobertura em vizinhas precisa de nova auditoria de
+  produção, ou se a política deve por ora restringir aceitação a
+  candidatos que não tocam nenhuma parede vizinha; (3) só depois
+  reativar o SAFE REPAIR completo.
+```
+
 ### 2026-09-04 — `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` (continuação SAFE REPAIR) NECESSITA AJUSTE (não mesclado, nenhum código alterado)
 
 ```

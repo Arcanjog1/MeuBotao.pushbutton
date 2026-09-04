@@ -4413,3 +4413,60 @@ formalizar/implementar a política. Relatório completo:
   (TP1) continuariam limpos em outro projeto. Ver
   `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção "CONTINUAÇÃO — SAFE
   REPAIR", para o relatório completo desta segunda tentativa.
+- **CORREÇÃO (`CR-BLOCK-ARM-ROLE-JUNCTION-GATE`, 2026-09-04, terceira
+  continuação)**: a atribuição acima ("reparar `W137` introduz
+  `JUNCTION_NOT_ALTERNATING` em `W011`/`W088`") está **ERRADA** — foi
+  produto de uma comparação corrompida por conflito de `git stash` com
+  `score.json`/`reports/*.txt` regenerados. Reproduzido com mapeamento
+  id↔`wall_idx` geométrico e diff de assinatura exato: `W137`
+  (`wall_idx=120`) isolado produz **0** achados de junção novos. Os
+  candidatos que REALMENTE causam a regressão são `wall_idx=7`
+  (=`W090`, causa 1 novo em `W088`, a própria vizinha) e `wall_idx=23`
+  (=`W011`, causa 1 novo na PRÓPRIA `W011`) — nunca um cluster de 3+
+  paredes; sempre um par (parede reparada + vizinha imediata).
+- **CAUSA RAIZ REAL, PROVADA**: não é agrupamento de nó por proximidade
+  (`NODE_MERGE_TOLERANCE_CM`) nem grafo incompleto — é uma
+  **inconsistência de persistência do papel do nó ENTRE BANDAS** de
+  `solve_building_blocks_all_courses` (`wall_modeling.py`, resolve o
+  edifício em bandas de fiadas com o mesmo conjunto de aberturas
+  ativas). `_coordinate_arm_role_nodes` reconstrói o estado alternante
+  do ZERO em cada banda (nenhum estado de decisão manual sobrevive
+  entre bandas); um reparo de aresta isolada, acionado só quando a
+  banda ATUAL mostra prisma forçado, fica ativo nas bandas onde a
+  coincidência ocorre e INATIVO (revertendo para o padrão alternante
+  natural, que é a família OPOSTA) nas bandas onde não ocorre — a MESMA
+  parede acaba com duas convenções internas opostas em fiadas
+  diferentes, o que o validador de junção lê como "não alterna" na
+  fronteira entre as duas convenções. Medido e reproduzido com
+  instrumentação banda-a-banda (8 bandas no TGD, `W090`/`wall_idx=7`
+  como caso de prova).
+- **Correção estrutural provada (não commitada)**: marcador
+  `_arm_role_pinned` nos dois nós de uma aresta isolada ao aceitar um
+  candidato SAME/ALTERNATE, excluído do filtro `eligible` de
+  `_coordinate_arm_role_nodes` — como o reparo só age em arestas
+  ISOLADAS (grau 1, nenhuma outra parede coordenada os toca), excluí-las
+  do grafo de coordenação nunca afeta nenhuma OUTRA parede. Testado em
+  script: zera `JUNCTION_NOT_ALTERNATING` novo nos 5 candidatos
+  elegíveis do TGD (antes: +2; depois: 0) e até melhora
+  `PRISM_CONTINUOUS_JOINT` (79→80 resolvidos, 1→0 novo na própria
+  parede reparada). Fica inteiramente dentro de `wall_stepper.py`
+  (`_coordinate_arm_role_nodes`), sem tocar `wall_pairing.py` nem
+  `wall_modeling.py`.
+- **Achado adicional, fora do escopo desta CR**: verificando o conjunto
+  COMPLETO de validadores (não só junção/prisma/colisão) com o pin
+  ativo, 4 dos 5 candidatos do TGD introduzem `COMPENSATOR_CONSECUTIVE`/
+  `COVERAGE_GAP_IN_ROW`/`COVERAGE_PARTIAL_WALL`/
+  `COVERAGE_ROW_MOSTLY_EMPTY`/`PRISM_STAGGER_BELOW_TARGET` novos na
+  própria parede reparada ou numa vizinha — categorias que os gates
+  hoje autorizados (fechamento via `_wall_ok_map`, colisão global,
+  prisma forçado em vizinha, alternância de junção) não capturam,
+  porque não existe hoje uma função de produção equivalente aos
+  validadores de benchmark para essas categorias. Só `wall_idx=23`
+  (`W011`) passa limpo em TODAS as categorias. Documentado como
+  `DOCUMENTADO — pendência de código aberta` (sexto gate necessário
+  antes de reativar o SAFE REPAIR em produção) — ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção "CONTINUAÇÃO —
+  `CR-BLOCK-ARM-ROLE-JUNCTION-GATE`", para o relatório completo (gates
+  G1-G18, hipóteses H1-H5 com veredito, tabela de causa por
+  `wall_idx`). Veredito: **NECESSITA AJUSTE**. Nenhuma alteração de
+  produção commitada nesta continuação.

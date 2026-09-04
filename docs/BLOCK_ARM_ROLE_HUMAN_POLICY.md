@@ -879,3 +879,275 @@ entregue (idêntico ao estado B, documentado na primeira parte deste
 relatório). PR #11 continua draft, sem push desta continuação.
 
 **Pare antes de qualquer merge.**
+
+## CONTINUAÇÃO — `CR-BLOCK-ARM-ROLE-JUNCTION-GATE` (2026-09-04, segunda continuação)
+
+Investigação da causa REAL do `JUNCTION_NOT_ALTERNATING` acima, ANTES de
+qualquer nova implementação de produção. Toda esta seção foi produzida
+com scripts temporários em `/tmp` (nunca em `nuvem/`); diff de produção
+manteve-se em ZERO durante toda a investigação (`git status`/`git diff
+--stat` vazios, `HEAD` inalterado em `fe36e87`).
+
+### Correção de um erro da continuação anterior
+
+A atribuição "reparar `W137` introduz `JUNCTION_NOT_ALTERNATING` em
+`W011`/`W088`" (parágrafo acima e seção 30 de
+`REGRAS_MODULACAO_BLOCOS.md`) está **provadamente ERRADA**. Reproduzida
+com mapeamento id↔`wall_idx` correto (por GEOMETRIA — `wall_idx` de
+`from_solver.py` NÃO é `id` menos 1; casar `walls_to_create[i]` com
+`result.json` por distância de ponta ≤1cm) e diff de assinatura exato
+(`finding_signature`, ignora índice de lista): reparar **só** `W137`
+(`wall_idx=120`) isolado produz **0 achados novos e 0 resolvidos** em
+`JUNCTION_NOT_ALTERNATING`/`JUNCTION_MISSING_BINDING` — nenhuma
+regressão em `W011`/`W088`. O erro veio de um `git stash`/`stash pop`
+que colidiu com `score.json`/`reports/*.txt` regenerados durante a
+sessão anterior, corrompendo a comparação real.
+
+Os candidatos que REALMENTE causam `JUNCTION_NOT_ALTERNATING` novo,
+isolados um a um contra o mesmo baseline (5 candidatos elegíveis do TGD:
+`wall_idx` 7, 23, 89, 90, 120):
+
+| `wall_idx` reparado | id | `JUNCTION_NOT_ALTERNATING` novo |
+|---|---|---|
+| 7 | `W090` | 1 novo em **`W088`** (a própria vizinha do reparo) |
+| 23 | `W011` | 1 novo em **`W011`** (a PRÓPRIA parede reparada) |
+| 89 | — | 0 |
+| 90 | — | 0 |
+| 120 | `W137` | **0** (confirma a correção acima) |
+
+Ou seja: cada regressão aparece exatamente na parede que foi reparada ou
+na parede geometricamente colada a ela — não existe cluster de 3+
+paredes causando o efeito. `W137` nunca teve nenhum papel nisso.
+
+### Primeira divergência — mecanismo real (banda, não nó/agrupamento)
+
+`solve_building_blocks_all_courses` (`nuvem/core/wall_modeling.py:3053`)
+resolve o edifício em **bandas** de fiadas fisicas com o mesmo conjunto
+de aberturas ativas (`_group_course_indices_by_opening_band`) — TGD tem
+8 bandas mesmo para uma parede sem abertura própria (`W090`:
+`openings: []`), porque o agrupamento é do PROJETO inteiro (aberturas de
+QUALQUER parede cortam as bandas de TODAS as fiadas físicas
+compartilhadas). `nodes` é passado por REFERÊNCIA (mesmo objeto) a cada
+chamada de `solve_building_blocks` — sem cópia por banda — então
+mutações deveriam persistir.
+
+Instrumentando `_coordinate_arm_role_nodes` (chamada dentro de CADA
+banda, antes do reparo rodar) e `_wall_has_forced_corner_prism`
+banda-a-banda para o par de nós isolado de `wall_idx=7`
+(`node_p=13`/`node_q=14`):
+
+- **Sem reparo ativo (baseline)**: `_coordinate_arm_role_nodes` converge
+  para o MESMO estado alternante estável em todas as 8 bandas (banda 1
+  o define, bandas 2-8 só o confirmam sem mudar nada) — o mecanismo de
+  alternância em si é **idempotente e correto** entre bandas.
+- **Com o candidato `SAME_A` de `wall_idx=7` sendo aceito banda a
+  banda** (arquitetura da tentativa anterior — o reparo roda dentro do
+  `solve_building_blocks` corrigido por banda, sem persistência
+  explícita): bandas 1-5 têm `forced_corner_prism=True` e o reparo
+  reaplica `SAME_A` (`changed_indices=[13]`) em CADA UMA das 5 — sucesso
+  aparente repetido. Bandas 6-8 têm `forced_corner_prism=False` — o
+  reparo NUNCA roda nelas.
+- Medindo qual FAMÍLIA (curso `A`/`B`) toca o nó 13 por banda, via
+  `node_index` dos candidatos de canto de `wall_idx=7`:
+  - Bandas 1-5 (reparadas): `course_A_node_idx=[13,...]`,
+    `course_B_node_idx=[]` — família A sempre toca.
+  - Bandas 6-8 (NÃO reparadas, estado natural/`_coordinate_arm_role_
+    nodes` puro): `course_A_node_idx=[...]` (sem 13),
+    `course_B_node_idx=[13]` — família **B** sempre toca.
+
+**Causa raiz provada**: como `course_index % 2` → letra `A`/`B` é FIXO
+globalmente (não depende de banda), e o papel do nó isolado É persistido
+fisicamente em `nodes` entre bandas, mas o *reparo* só é ACIONADO quando
+a banda ATUAL, isoladamente, mostra `forced_corner_prism=True` — bandas
+onde essa condição local não se repete (6-8) usam o estado alternante
+PADRÃO (`_coordinate_arm_role_nodes`, sem override), que por construção
+é a família OPOSTA à que o reparo escolheu nas bandas 1-5. O resultado
+físico: fiadas 0-10 (bandas 1-5) têm "família A sempre toca t=0", fiadas
+11-16 (bandas 6-8) têm "família B sempre toca t=0" — a MESMA parede,
+DUAS convenções opostas, cada uma internamente consistente mas
+incompatíveis entre si. Isso produz (a) `PRISM_CONTINUOUS_JOINT` novo na
+fronteira 10/11 da própria `W090` e (b) `JUNCTION_NOT_ALTERNATING` na
+parede vizinha que compartilha o nó (`W088`), porque a fiada 11 (family
+B) "repete" o código da fiada 10 (que também era `B34` na convenção
+antiga) na leitura por proximidade do validador.
+
+Isso **refuta** a hipótese anterior (agrupamento de nó por proximidade
+física / `NODE_MERGE_TOLERANCE_CM` fundindo 3+ paredes) como causa —
+confirmado adicionalmente por inspeção direta do cluster
+`W090`↔`W167` (`NODE_MERGE_TOLERANCE_CM`, ponto `[339.764, 187.049]`):
+esse cluster de fato mostra `JUNCTION_NOT_ALTERNATING` em TODAS as 17
+fiadas, mas **idêntico no baseline e no reparado** — é um defeito
+PRÉ-EXISTENTE e não relacionado (`W167` deveria a alternar com `W090`
+mas nunca alternou, com ou sem qualquer reparo desta CR).
+
+### `validate_junctions.py` como oráculo — é regra de domínio real?
+
+Lido por completo (não importado em produção). `collect_nodes` agrupa
+por proximidade (tolerância 3cm X/Y independente); `validate_node`
+calcula `_row_signature` = conjunto `(parede, código)` de toda peça cujo
+CORPO cobre o ponto do nó, fiada a fiada, e reporta
+`JUNCTION_NOT_ALTERNATING` (nível 1/obrigatório) quando duas fiadas
+CONSECUTIVAS têm assinatura idêntica.
+
+Isso corresponde diretamente à regra já documentada na seção 29 deste
+arquivo e ao mecanismo de produção `_coordinate_arm_role_nodes`
+(docstring: "garante que os dois nós L_CORNER... NUNCA deem
+`course_a`/`course_b` a essa parede da MESMA forma") — não é um
+artefato só-de-benchmark: é a MESMA regra de amarração ("continuidade e
+repetição entre fiadas", item explícito de TODO de amarração no
+`CLAUDE.md`) verificada de um ângulo diferente (por geometria do ponto,
+não pelo grafo `node["arms"]`). **H5 REFUTADA** (não é artefato de
+benchmark). Nenhum falso positivo conhecido foi encontrado nos casos
+investigados aqui — os dois achados novos (`W088`, `W011`) e o
+pré-existente (`W090`↔`W167`) são todos regressões/defeitos reais, não
+ruído do validador.
+
+### Hipóteses H1-H5 — veredito
+
+| Hipótese | Veredito |
+|---|---|
+| H1 — grafo `node["arms"]` incompleto | **REFUTADA** — o grafo de 2 paredes por nó está correto; o problema nunca foi topológico |
+| H2 — validação precisa olhar além do grafo (agrupamento por proximidade) | **REFUTADA como causa** do bug medido (é um fato real sobre o validador, mas não explica nenhuma das regressões encontradas — todas são pares de 2 paredes, nunca clusters de 3+) |
+| H3 — `NODE_MERGE_TOLERANCE_CM` funde nós fisicamente distintos incorretamente | **REFUTADA** para os casos medidos (`W088`/`W090`, `W011`/`W074`/`W076` são de fato o MESMO ponto físico; o cluster de 3 do `W090`↔`W167` é pré-existente, não causado pelo reparo) |
+| H4 — uma terceira parede é genuinamente necessária pra regra real | **REFUTADA** como explicação do bug (mecanismo é 100% par-a-par); a REGRA em si (`validate_junctions.py`) trata cada cluster com quantas paredes ele de fato tiver, mas nenhum caso medido precisou de 3 |
+| H5 — `JUNCTION_NOT_ALTERNATING` é artefato de benchmark | **REFUTADA** — corresponde à regra de amarração já documentada (seção 29) |
+| **H-nova** (não estava na lista original) — inconsistência de persistência do papel do nó ENTRE BANDAS de `solve_building_blocks_all_courses` | **PROVADA** — é a causa raiz real, medida e reproduzida (ver acima) |
+
+### Arquitetura do quinto gate — decisão
+
+Opção escolhida: **B — regra corrigível dentro de `wall_stepper.py`**,
+mas não como um "quinto gate" de checagem pós-hoc — como correção
+ESTRUTURAL do mecanismo em si. `_coordinate_arm_role_nodes`
+(`wall_stepper.py:1340`) hoje reconstrói o estado alternante do zero em
+CADA banda a partir de `node.get("kind")=="L_CORNER" and
+len(arms)==2` — nenhum estado de decisão manual sobrevive entre bandas.
+Correção mínima testada e comprovada em script (não commitada):
+adicionar um marcador `_arm_role_pinned` nos dois nós de uma aresta
+isolada quando um candidato SAME/ALTERNATE não-padrão é aceito, e
+excluir nós marcados da lista `eligible` de `_coordinate_arm_role_nodes`
+(equivalente a `and not node.get("_arm_role_pinned")` no filtro). Como o
+reparo só atua em ARESTAS ISOLADAS (por construção — grau 1 nos dois
+nós, nenhuma outra parede coordenada os toca), excluí-las do grafo de
+`_coordinate_arm_role_nodes` nunca afeta a alternância de nenhuma OUTRA
+parede — mudança local, sem efeito colateral em nenhum outro nó.
+
+**Testado empiricamente** (mesmo script de diagnóstico, 8 bandas do
+TGD, `wall_idx=7`): com o marcador de pin, `course_A_node_idx` inclui o
+nó 13 em TODAS as 8 bandas (antes: só nas bandas 1-5) — a inconsistência
+desaparece por construção, não por filtro pós-hoc.
+
+Rodando o SAFE REPAIR completo (5 candidatos elegíveis do TGD) com o
+pin ativo e comparando TODOS os achados (`bench_validators.run_all`,
+não só junções) contra o mesmo baseline:
+
+| código | antes (sem pin) | com pin |
+|---|---|---|
+| `JUNCTION_NOT_ALTERNATING` novo | **+2** (`W011`, `W088`) | **0** |
+| `PRISM_CONTINUOUS_JOINT` novo (própria parede) | +1 (`W090`) | **0** |
+| `PRISM_CONTINUOUS_JOINT` resolvido | 79 | **80** |
+
+O quinto gate (`NEW_JUNCTION_NOT_ALTERNATING = 0`) fica **estruturalmente
+garantido** pelo pin, não precisa de uma checagem separada que replique
+`validate_junctions.py` — não há duplicação de regra (opção C/D
+descartadas: nenhum módulo novo, nenhuma dependência de benchmark em
+produção).
+
+### Achado NÃO PEDIDO por esta CR, mas descoberto durante a verificação completa
+
+Isolando os 5 candidatos individualmente COM o pin ativo e comparando o
+conjunto COMPLETO de achados (não só junção/prisma/colisão), 4 dos 5
+mostram regressão em categorias que os gates hoje existentes (fechamento
+via `_wall_ok_map`/`_no_wall_regression`, colisão via
+`result["collisions"]`, prisma forçado em vizinha) **não capturam**,
+porque `validation.ok` de produção não modela essas categorias:
+
+| `wall_idx` | achados NOVOS (parede afetada) |
+|---|---|
+| 7 (`W090`) | `COMPENSATOR_CONSECUTIVE` ×11, `COMPENSATOR_EXCESS_IN_RUN` ×11, `PRISM_STAGGER_BELOW_TARGET` ×21 — todos na própria `W090` |
+| 23 (`W011`) | nenhum — **único candidato limpo em TODAS as categorias** |
+| 89 | `COVERAGE_GAP_IN_ROW` ×17, `COVERAGE_PARTIAL_WALL` ×1 — na parede vizinha `W155` |
+| 90 | `COVERAGE_GAP_IN_ROW` ×17, `COVERAGE_PARTIAL_WALL` ×1 — na parede vizinha `W153` |
+| 120 (`W137`) | `COMPENSATOR_CONSECUTIVE` ×6, `COMPENSATOR_EXCESS_IN_RUN` ×3, `COVERAGE_ROW_MOSTLY_EMPTY` ×6 — na parede vizinha `W131` |
+
+Isso NÃO estava na lista dos 5 gates pedidos por esta CR (que tratava
+especificamente de `JUNCTION_NOT_ALTERNATING`), e catalogar/rejeitar por
+essas categorias exigiria um SEXTO gate com fonte de verdade de produção
+para `COMPENSATOR_CONSECUTIVE`/`COVERAGE_GAP_IN_ROW`/etc. — essas
+categorias só existem hoje em validadores do BENCHMARK
+(`nuvem/benchmark/validators/`), não em nenhuma função de produção
+equivalente a `_wall_ok_map`. Implementar essa fonte de verdade em
+produção é uma extensão de escopo REAL (novo código de auditoria, não
+uma checagem trivial), fora do que esta CR autorizou. Reportado aqui em
+vez de ser ignorado ou "resolvido" com uma aproximação.
+
+### Escopo necessário
+
+Nenhum. O pin-fix fica inteiramente dentro de `wall_stepper.py`
+(`_coordinate_arm_role_nodes`), sem tocar `wall_pairing.py` nem
+`wall_modeling.py`. O achado adicional (compensador/cobertura em
+vizinhas) FICA fora do escopo desta CR — não bloqueia por falta de
+acesso a um módulo, mas por precisar de uma nova PEÇA de infraestrutura
+de produção que não existe hoje (auditoria fina equivalente aos
+validadores de benchmark) — registrado como próximo passo, não como
+`BLOQUEADO POR ESCOPO` no sentido estrito.
+
+### Comparação humano × solver (`W011`/`W088`/`W090`)
+
+Nenhuma das três paredes está no Corpus de Referência humano (tabela da
+seção 5 deste documento, 8 paredes: `W042`, `W061`, `W062`, `W021`,
+`W092`, `W076`, `W010`, `W037`). Não há gabarito humano direto para
+julgar qual família deveria tocar o nó `13`/`W088`↔`W090` — a validação
+aqui é 100% baseada em `validate_junctions.py` (regra de alternância já
+documentada na seção 29, não uma preferência estética observada em
+projeto humano).
+
+### Estado final e veredito
+
+**NECESSITA AJUSTE** (mesmo veredito da continuação anterior, motivo
+diferente).
+
+O que MUDOU: a causa raiz do `JUNCTION_NOT_ALTERNATING` foi provada (não
+mais "mecanismo não isolado") — é uma inconsistência de persistência
+de papel de nó entre bandas de `solve_building_blocks_all_courses`,
+corrigível com um marcador de pin dentro de `_coordinate_arm_role_nodes`
+(`wall_stepper.py`, sem tocar `wall_pairing.py`/`wall_modeling.py`). O
+quinto gate pedido por esta CR (`NEW_JUNCTION_NOT_ALTERNATING = 0`) é
+estruturalmente alcançável e foi comprovado em script (0 regressões nos
+5 candidatos do TGD, incluindo a correção do erro anterior sobre
+`W137`).
+
+O que ainda falta antes de `APROVADO PARA INTEGRAÇÃO`: dos 5 candidatos
+elegíveis do TGD, só **1** (`wall_idx=23`/`W011`) passa limpo em TODAS as
+categorias de achado quando verificado com o conjunto completo de
+validadores (não só os 5 gates desta CR) — os outros 4 introduzem
+regressões reais de compensador/cobertura em paredes vizinhas que os
+gates hoje autorizados não detectam nem rejeitam. Ativar o pin-fix +
+SAFE REPAIR em produção hoje aceitaria esses 4 candidatos sem um gate
+que os rejeite — não é seguro no espírito de "gerar candidato → validar
+completamente → aceitar ou rejeitar" desta CR.
+
+**Nenhuma alteração de produção foi commitada nesta continuação** (diff
+de `wall_stepper.py` permanece ZERO — verificado via `git status`/`git
+diff --stat` antes desta escrita). O pin-fix foi provado em script de
+diagnóstico, não escrito no arquivo de produção, porque sozinho (sem o
+sexto gate que rejeitaria os 4 candidatos problemáticos) ativaria uma
+regressão real assim que qualquer chamador acionasse o reparo.
+
+### Próximo passo recomendado
+
+1. Implementar o marcador de pin em `_coordinate_arm_role_nodes`
+   (mudança pequena, comprovada, sem efeito colateral em nós não
+   isolados) — seguro de commitar independentemente, mesmo sem o SAFE
+   REPAIR ativo, porque é um no-op enquanto nenhum chamador define
+   `_arm_role_pinned`.
+2. Antes de reativar o SAFE REPAIR (aceitar candidatos automaticamente):
+   decidir com o usuário se o sexto gate (compensador/cobertura em
+   vizinhas) precisa de uma nova função de auditoria de produção, ou se
+   a política deve restringir aceitação a candidatos que não tocam
+   nenhuma parede vizinha por enquanto (mais simples, mais conservador,
+   cobre só `W011`-like).
+3. Só depois disso, reintroduzir `CORNER_ROLE_CANDIDATE_BITS`/
+   `_arm_role_isolated_edges`/`_evaluate_corner_role_candidate` em
+   `wall_stepper.py` com os 5 gates desta CR MAIS o sexto gate decidido.
+
+**Pare antes de qualquer merge.**
