@@ -1,6 +1,6 @@
 name: Checa atualizacao do PROJECT_STATUS.md
 
-# Ver docs/PROJECT_STATUS.md secao 12 ("Regra permanente de atualizacao")
+# Ver docs/PROJECT_STATUS.md secao "Regra permanente de atualizacao"
 # e CLAUDE.md ("Atualizacao obrigatoria das regras de modulacao").
 #
 # Este workflow NAO bloqueia merge automaticamente (o repositorio usa
@@ -94,8 +94,8 @@ jobs:
               echo '```'
               echo
               echo "Se esta mudanca conclui, avanca ou reabre um CR, atualize"
-              echo "\`docs/PROJECT_STATUS.md\` (secao 12 - Regra permanente de"
-              echo "atualizacao) antes de finalizar. Se for uma mudanca trivial"
+              echo "\`docs/PROJECT_STATUS.md\` (secao \"Regra permanente de"
+              echo "atualizacao\") antes de finalizar. Se for uma mudanca trivial"
               echo "que nao muda o estado do projeto (typo, comentario, etc.),"
               echo "pode ignorar este aviso."
             } >> "$GITHUB_STEP_SUMMARY"

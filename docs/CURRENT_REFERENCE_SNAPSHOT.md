@@ -1,7 +1,11 @@
 # CURRENT REFERENCE SNAPSHOT
 
-> **THIS FILE IS NOT A BASELINE.**
-> **THIS FILE MAY BE REWRITTEN WHEN A NEW OFFICIAL SNAPSHOT IS MEASURED.**
+> **CURRENT STATE ONLY — REPLACEABLE SNAPSHOT.**
+> **THIS FILE IS NOT A BASELINE, NOT HISTORY, NOT APPEND-ONLY.**
+> Quando uma nova medição oficial for feita, o conteúdo abaixo deve ser
+> SUBSTITUÍDO pela nova fotografia — não acumulado. Histórico de medições
+> anteriores fica no Git (histórico deste arquivo) ou em relatórios
+> específicos, nunca aqui.
 
 Fotografia humana e legível do último estado oficialmente medido da
 `main`, para dar contexto rápido a um agente sem precisar rodar o
@@ -10,18 +14,19 @@ vivo sobre o corpus) nem os arquivos de dados versionados em
 `nuvem/benchmark/projects/*/` (`baseline.json`, `reference.json`,
 `reference_score.json` - esses sim são a fonte de verdade numérica).
 
-Este arquivo não é append-only: quando um novo solver oficial for
-medido, ele deve ser SUBSTITUÍDO pela nova fotografia, não acumulado.
-
 ## Medição
 
 ```
-MEASURED_AT: d214c11a40fc7520bddab2e73e08d30615595656
+MEASURED_AT:  d214c11a40fc7520bddab2e73e08d30615595656
+CURRENT_MAIN: 4c89e1216cc6b5708c590f495e1584497e2df583
+STATUS:       DESATUALIZADO — medido antes da integração do PR #9
+              (ARM-ROLE invariance) e do PR #12 (ARM-ROLE candidate
+              safety contract, já mesclado). Os números abaixo NÃO
+              incluem nenhum resultado desses dois PRs. Repetir a
+              medição (`py -3 nuvem/benchmark/runner.py --run
+              <project_id>`) é recomendado antes de usar estes números
+              para decisão fina.
 ```
-
-Este SHA é a `main` **antes** da integração do PR #9 (ARM-ROLE
-invariance, branch `claude/cr-block-arm-role-invariance-7tezx4`, ainda
-DRAFT). Os números abaixo **não incluem** nenhum resultado do PR #9.
 
 ## TGD (`torre_easy_lo_r00_tgd`)
 

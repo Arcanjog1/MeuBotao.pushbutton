@@ -4,12 +4,18 @@ Manual operacional curto para agentes (Claude/Codex/Antigravity ou humanos)
 que forem trabalhar neste repositório. Não duplica regras de domínio nem
 histórico de CRs - só o processo.
 
+## Onboarding
+
+Nova sessão? Comece por `docs/START_HERE.md` (roteador por domínio).
+
 ## Fonte de verdade
 
 - regras de domínio (modulação de blocos):
   `nuvem/REGRAS_MODULACAO_BLOCOS.md`
-- estado do projeto:
+- estado do projeto (atual):
   `docs/PROJECT_STATUS.md`
+- histórico de CRs e log cronológico:
+  `docs/PROJECT_STATUS_LOG.md`
 - corpus de referência (benchmark atual):
   `docs/REFERENCE_CORPUS.md`
 - snapshot legível do último estado medido oficialmente:

@@ -5,6 +5,12 @@
 Sempre responder ao usuario em portugues do Brasil (pt-BR), em toda
 sessao futura deste projeto - independente do idioma usado na pergunta.
 
+## Onboarding
+
+Comece por `docs/START_HERE.md`. Use recuperacao progressiva de
+contexto (ver secao abaixo): nao leia recursivamente todo o repo sem
+necessidade.
+
 ## Merge na main
 
 REVOGADO (2026-09-03) o "ok" permanente que existia aqui: NUNCA fazer
