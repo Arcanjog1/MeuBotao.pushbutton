@@ -705,6 +705,69 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` PRE-MERGE REFRESH (`PR #17`, docs-only, NÃO mesclado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-NODE-FILL-REVALIDATION (refresh, não uma CR nova)
+PR:            #17 (open, draft, mergeable_state: clean)
+branch:        claude/cr-block-node-fill-revalidation-iahuyg
+HEAD antes:    c94470c8b943e82f6662391a50256a93797b16d2
+HEAD depois:   ver commit deste refresh (merge de origin/main + docs)
+
+resumo: refresh de integração/documentação antes da autorização humana
+  de merge. NENHUMA alteração de lógica NODE-FILL, de teste de
+  comportamento, do Gate-Fidelity nem de B19.
+
+  1. Confirmado origin/main = 789f44227145ecc681c714fb952e10dd1de507d9
+     (avançou de 68a62693 por PR #14/#15/#16, todos docs-only, merged).
+  2. PRODUCTION_EQUIVALENT = TRUE provado por diff explícito: nenhuma
+     mudança em nuvem/core/**, nuvem/benchmark/** (código/validators),
+     tests/** nem em baseline.json/reference.json entre 68a62693 e
+     789f4422 — só docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md,
+     docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md,
+     docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md (novos),
+     docs/CURRENT_REFERENCE_SNAPSHOT.md e docs/PROJECT_STATUS.md
+     mudaram. Portanto as medições NODE-FILL (STATE_A/STATE_B, testes,
+     suíte 593 passed/1 known failure) continuam válidas sem remedição.
+  3. Branch atualizada com merge normal de origin/main (sem
+     cherry-pick, sem reconstrução do NODE-FILL) — merge automático,
+     sem conflitos.
+  4. Proveniência corrigida em docs/BLOCK_NODE_FILL_REVALIDATION.md
+     (seção "Proveniência pós-medição", nomenclatura
+     MEASUREMENT_BASE/CURRENT_MAIN_AT_PREMERGE) e
+     nuvem/REGRAS_MODULACAO_BLOCOS.md seção 33 (removida linguagem
+     efêmera "main atual"/"PR draft" do corpo da regra; estado do PR
+     apontado para docs/PROJECT_STATUS.md, nunca hardcoded na regra de
+     domínio). Conteúdo técnico da seção 33 NÃO alterado.
+  5. docs/PROJECT_STATUS.md: SHA de "Main atual" corrigido para
+     789f4422 (estava referenciando 68a62693, pré PR#14/15/16
+     docs-only); PR #9 corrigido para CLOSED/merged=false (branch
+     histórica preservada) e PR #11 para CLOSED/merged=true
+     (superseded), confirmado via GitHub API — não assumido.
+  6. Confirmada, sem inconsistência, a reconciliação aritmética
+     TP1 N1=308 (medidor físico por wall/row/t) vs delta do validador
+     PRISM_CONTINUOUS_JOINT −304: removidos(308) − novos(4) = 304 nos
+     dois caminhos de código; nota explícita adicionada ao relatório.
+
+diff de produção deste refresh: ZERO (só nuvem/core/engine/wall_stepper.py
+  já commitado em c94470c permanece; nenhuma linha de produção nova).
+diff de teste: ZERO (tests/test_block_node_fill_revalidation.py já
+  commitado em c94470c permanece inalterado).
+baseline diff: ZERO. reference diff: ZERO.
+
+testes rodados: sintéticos NODE-FILL (grade 2x2, célula fechada) e
+  suíte anterior (593 passed / 1 known failure P3) referenciados como
+  válidos por PRODUCTION_EQUIVALENT=TRUE — não re-executada a
+  investigação completa do laboratório (nenhum código de produção
+  mudou, item 7 do pedido).
+
+PR: permanece open/draft/mergeable. NÃO marcado ready. NÃO mesclado.
+monitoramento: OFF (nenhuma subscription criada).
+
+próximo passo: aguardar autorização humana explícita de merge.
+```
+
 ### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` APROVADO PARA INTEGRAÇÃO (PR draft, NÃO mesclado)
 
 ```

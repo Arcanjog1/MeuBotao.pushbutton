@@ -1,8 +1,10 @@
 # RELATÓRIO FINAL — NODE-FILL REVALIDATION
 
-`CR-BLOCK-NODE-FILL-REVALIDATION` (2026-09-04). Revalidação do fix
-histórico NODE-FILL (`claude/cr-block-node-fill-joint-9tv0kd`) sobre a
-`main` atual. **NÃO MERGEADO.** PR em DRAFT.
+`CR-BLOCK-NODE-FILL-REVALIDATION` (2026-09-04, PR `#17`). Revalidação
+do fix histórico NODE-FILL (`claude/cr-block-node-fill-joint-9tv0kd`)
+sobre a base de medição descrita abaixo. **NÃO MERGEADO** — estado do
+PR/branch em `docs/PROJECT_STATUS.md` (não repetido aqui, para este
+documento não ficar obsoleto a cada refresh).
 
 > Regra de leitura: tudo aqui foi medido de novo nesta sessão. Os
 > números históricos (TGD 702→318, TP1 837→169, piloto 14→0) NÃO são
@@ -11,12 +13,30 @@ histórico NODE-FILL (`claude/cr-block-node-fill-joint-9tv0kd`) sobre a
 ## Base
 
 ```
-origin/main:  68a62693ba4ac3a1def43be8b84d526372a4ee9a   (G1: exato)
-contém:       PR #12 (ARM Candidate Safety Contract, SAFE REPAIR ativo),
-              PR #13 (Context Optimization V2), START_HERE/PROJECT_STATUS
-              current-only, CR-BENCH-Z-ORIGIN (benchmark na mesma origem
-              vertical do motor).
+MEASUREMENT_BASE (origin/main no momento da medição):
+  68a62693ba4ac3a1def43be8b84d526372a4ee9a   (G1: exato)
+  contém: PR #12 (ARM Candidate Safety Contract, SAFE REPAIR ativo),
+          PR #13 (Context Optimization V2), START_HERE/PROJECT_STATUS
+          current-only, CR-BENCH-Z-ORIGIN (benchmark na mesma origem
+          vertical do motor).
 ```
+
+### Proveniência pós-medição (refresh 2026-09-04, sem remedir)
+
+A `main` avançou depois da medição acima por três merges **docs-only**
+(`PR #14` snapshot refresh, `PR #15` Gate-Fidelity spec, `PR #16`
+evidência de domínio B19 — os três com diff de produção declarado ZERO
+e confirmados via `git diff --stat`). Comparação direta entre
+`MEASUREMENT_BASE` e a ponta da `main` no momento deste refresh
+(`CURRENT_MAIN_AT_PREMERGE = 789f44227145ecc681c714fb952e10dd1de507d9`)
+confirma: **`nuvem/core/**`, `nuvem/benchmark/**` (código/validators),
+`tests/**` e todo `baseline.json`/`reference.json` são byte-idênticos**
+entre as duas bases — só documentação mudou. `PRODUCTION_EQUIVALENT =
+TRUE`: as medições abaixo (STATE_A/STATE_B, todas as métricas, os
+testes e a suíte completa) continuam válidas sem remedição. A branch
+desta CR foi atualizada com um merge normal de `origin/main` (sem
+cherry-pick, sem reconstrução do NODE-FILL) para carregar essa
+documentação; nenhum código de produção mudou nesse merge.
 
 ## Branch / HEAD
 
@@ -172,6 +192,17 @@ t = 34,5 cm (o comprimento do B34 de nó + junta), `B19|B39` ou
 Contagens pela chave com códigos de peça (`a`/`b`) dão "removidos 110 /
 novos 2" (TGD) e "310 / 6" (TP1): os "novos" adicionais são re-rótulos
 do mesmo (`wall,rows,t`) com outra peça adjacente, não juntas novas.
+
+**Reconciliação explícita (item 8 — sem inconsistência matemática
+escondida):** o medidor físico independente (N1, por `wall,row_a,row_b,t`)
+e o delta do validador `PRISM_CONTINUOUS_JOINT` do benchmark medem a
+MESMA coisa por dois caminhos de código diferentes, e batem
+aritmeticamente: `removidos − novos = |delta|` em ambos os projetos —
+TGD `108 − 0 = 108` (444→336, delta −108) e TP1 `308 − 4 = 304`
+(576→272, delta −304). Os "4 novos" do TP1 não são juntas inventadas:
+são o MESMO par de fiadas cross-band (`W036`/`W038`) trocando de posição
+de coincidência (34,5→54,5 cm) — ainda um `N1`, apenas contado como
+"novo" pela chave `wall,row_a,row_b,t` porque `t` mudou.
 
 ## Exemplos TGD
 
@@ -705,7 +736,7 @@ ARM rejected: 0 → 0; só ANTES: []; só DEPOIS: []
 
 | gate | status | evidência |
 |---|---|---|
-| G1 base exata | PASS | `origin/main` = `68a62693…` |
+| G1 base exata | PASS | `MEASUREMENT_BASE` = `68a62693…`; produção equivalente confirmada contra `CURRENT_MAIN_AT_PREMERGE` = `789f4422…` (ver "Proveniência pós-medição") |
 | G2 branch nova da main | PASS | `git log origin/main..HEAD` só commits desta CR |
 | G3 fix histórico entendido antes de portar | PASS | "diff de produção histórico" (inventário por função/condição) |
 | G4 STATE_A medido | PASS | tabela |

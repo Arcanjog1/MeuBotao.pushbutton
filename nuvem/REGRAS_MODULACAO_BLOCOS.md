@@ -4695,9 +4695,14 @@ NÓ|FILL: a Fiada A também tem de desencontrar da junta de nó da Fiada B
 (2026-09-04)
 
 Revalidação do fix histórico NODE-FILL (`claude/cr-block-node-fill-joint-
-9tv0kd`, `d1fc4abb`) sobre a `main` atual (`68a62693`). Relatório completo
-com gates G1-G26: `docs/BLOCK_NODE_FILL_REVALIDATION.md`. **Não
-mergeado** (PR draft).
+9tv0kd`, `d1fc4abb`), medida sobre `origin/main @ 68a62693` (`PR #17`,
+`CR-BLOCK-NODE-FILL-REVALIDATION`) e reconfirmada equivalente à `main`
+pós PRs #14/#15/#16 (docs-only, produção idêntica). Comportamento
+técnico e evidência: seções 33.1-33.7 abaixo. Regra resultante:
+`NODE_FILL_OPPOSITE_COURSE_ENABLED` (`wall_stepper.py`). Relatório
+completo com gates G1-G26: `docs/BLOCK_NODE_FILL_REVALIDATION.md`.
+Estado do PR/merge: `docs/PROJECT_STATUS.md` (não repetido aqui — regra
+de domínio não deve ficar obsoleta quando o PR mudar de estado).
 
 ### 33.1 REGRA OBRIGATÓRIA — a junta PEÇA DE NÓ | PREENCHIMENTO é uma junta
 vertical de verdade NOS DOIS SENTIDOS
