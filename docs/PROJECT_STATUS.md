@@ -11,11 +11,12 @@
 
 ```
 branch: main
-SHA:    4c89e1216cc6b5708c590f495e1584497e2df583
+SHA:    68a62693ba4ac3a1def43be8b84d526372a4ee9a
 ```
 
-Último marco: `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`
-integrado ("SAFE REPAIR ativado") — detalhes completos em
+Último marco: `PR #13` (docs-only, minimização do onboarding) integrado
+sobre o `PR #12` / `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` ("SAFE
+REPAIR ativado") — detalhes completos em
 `docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`. Histórico anterior
 completo: `docs/PROJECT_STATUS_LOG.md`.
 
@@ -80,9 +81,21 @@ não é append-only).
 - **Degradação de encontros em X, exclusão de bloco em vão de porta,
   reparo de abertura (`non_modular` +3)** — pendentes, sem CR aberto.
 - **Arestas rejeitadas no `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`**
-  (7 no TGD, 3 no TP1) — não investigadas, fora de escopo daquela CR.
+  (7 no TGD, 3 no TP1) — fora de escopo daquela CR; diagnosticadas em
+  `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`. Spec de preimplementação
+  para 2 dos gates (compensador agregado por banda, cobertura local
+  cega a crédito de nó) pronta em
+  `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md`
+  (`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY-PREIMPLEMENTATION`,
+  READY_FOR_IMPLEMENTATION_AFTER_NODE_FILL) — implementação aguarda
+  `CR-BLOCK-NODE-FILL-JOINT` mesclar primeiro.
 - **Pareamento `(474, 2306)`** — eixo espúrio de ~43,9 m continua no
   resultado; sem CR atribuído.
+- **Regra do meio-bloco (B19) perto de amarração** — evidência de domínio
+  coletada (`docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`): a regra atual
+  estrita diverge do corpus humano em 259 ocorrências (TP1); proposta de
+  flexibilização mínima aguarda `REQUIRES_HUMAN_DOMAIN_APPROVAL`. Regra
+  **não alterada**.
 - **Detector de espessuras da UI** amostra só as primeiras 900 linhas
   cruas do layer — não limita o solver real, mas pode ocultar espessuras
   raras na sugestão da tela. Dívida de UX, não corrigida por decisão
