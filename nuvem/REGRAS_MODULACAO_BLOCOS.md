@@ -3964,7 +3964,35 @@ host; eventuais conflitos são devolvidos pelo diagnóstico do solver.
    Walls afetadas/contexto e blocos adicionados/removidos, para que regressões
    de desempenho possam ser verificadas na captura real.
 
-## 29. `CR-BLOCK-ARM-ROLE-INVARIANCE` — o papel `course_a`/`course_b` num
+## 29. REGRA OBRIGATÓRIA — assistente de propostas geométricas, com aprovação explícita
+
+O modulador deve ajudar a destravar uma modulação reprovada propondo alterações
+geométricas, mas não pode alterar automaticamente o projeto Revit. Toda
+proposta é uma simulação reversível; só a ação **Aplicar proposta** escolhida
+explicitamente pelo usuário cria uma transação no Revit.
+
+1. Para cada conflito, o assistente deve gerar alternativas ordenadas pelo
+   menor impacto: deslocar abertura dentro da Wall hospedeira, ajustar
+   pilarete/trecho livre, alterar dimensão de abertura quando permitido e,
+   por último, estender/encurtar o extremo de uma Wall. A extensão de Wall é
+   sempre uma sugestão manual — nunca um ajuste automático — pois pode afetar
+   ambiente, estrutura, cotas e elementos hospedados.
+2. Cada cartão de proposta deve declarar: elementos a alterar, valores antes e
+   depois, variação em centímetros, fiadas/encontros que serão recalculados,
+   quantidade de conflitos resolvidos/criados e o veredito do solver canônico.
+   Propostas que introduzam colisão, abertura fora do host, bloco em vão ou
+   regra de encontro inválida não podem ser oferecidas como aplicáveis.
+3. A prévia destaca apenas a geometria e os blocos que mudariam, preserva a
+   cena confirmada e permite comparar "atual × proposta". Rejeitar, fechar ou
+   desfazer uma proposta não muda a geometria original.
+4. A aplicação no Revit deve ser atômica e revalidada depois da escrita. Se a
+   validação falhar, faz RollBack e informa a causa; o assistente não pode
+   escolher uma segunda alternativa por conta própria.
+5. O ranking deve favorecer primeiro a solução com menor deslocamento e menor
+   quantidade de elementos modificados, e exibir a justificativa técnica em
+   linguagem de obra (por exemplo, "mover janela 2 cm para liberar B34 na
+   jamba").
+## 30. `CR-BLOCK-ARM-ROLE-INVARIANCE` — o papel `course_a`/`course_b` num
 encontro L/T/X nunca pode fazer uma parede perder uma família inteira de
 fiadas (2026-09-03)
 
@@ -3976,7 +4004,7 @@ externo, acima). Nenhum conteúdo foi alterado, só a numeração do
 heading e das subseções (28.1→29.1 ... 28.7→29.7) para eliminar a
 colisão.
 
-### 29.1 REGRA OBRIGATÓRIA — o papel do braço num nó é bookkeeping, não
+### 30.1 REGRA OBRIGATÓRIA — o papel do braço num nó é bookkeeping, não
 geometria: uma parede não pode perder `course_a` OU `course_b` por causa
 dele
 
@@ -3990,7 +4018,7 @@ uma futura ordenação canônica por identidade geométrica, se/quando
 `wall_pairing.py` ganhar uma, teria exatamente o mesmo efeito aqui,
 confirmado neste CR sem tocar `wall_pairing.py`). **Trocar qual parede é
 `wall_a`/`wall_b` só pode, no máximo, ESPELHAR o padrão da amarração
-(seção 29.3 abaixo, custo já aceito) — nunca fazer uma parede ficar com
+(seção 30.3 abaixo, custo já aceito) — nunca fazer uma parede ficar com
 ZERO peças numa das duas famílias.**
 
 **Causa-raiz medida, com um caso real totalmente instrumentado**
@@ -4024,7 +4052,7 @@ decidido nó a nó sem alternância forçada.
   `node["crossing_walls"]` diretamente, provando o consumidor
   `wall_stepper.py` robusto a QUALQUER ordem, hoje ou futura).
 
-### 29.2 REGRA OBRIGATÓRIA — a fronteira "emprestada" de uma peça de nó
+### 30.2 REGRA OBRIGATÓRIA — a fronteira "emprestada" de uma peça de nó
 que pertence à parede VIZINHA precisa reservar um múltiplo de
 `PIER_MODULE_CM`, nunca a extensão exata da peça
 
@@ -4067,7 +4095,7 @@ fração de cm sobrando derrubava o trecho INTEIRO (não só a borda).
   "se a fiada realmente não couber por geometria, isso continua
   permitido").
 
-### 29.3 PADRÃO OBSERVADO, AINDA NÃO CORRIGIDO — troca de papel simétrica
+### 30.3 PADRÃO OBSERVADO, AINDA NÃO CORRIGIDO — troca de papel simétrica
 é aceita como espelhamento inofensivo (custo já conhecido)
 
 Confirma o que já estava registrado antes deste CR: quando um `L_CORNER`
@@ -4082,7 +4110,7 @@ tipo, cada um decidindo sozinho, e por coincidência escolhem o mesmo
 papel; e (b) a geometria real (coordenadas de CAD, não redondas) faz a
 fronteira emprestada cair fora do módulo de blocos.
 
-### 29.4 CONFLITO CONHECIDO, NÃO RESOLVIDO — o fix de 29.2 recupera
+### 30.4 CONFLITO CONHECIDO, NÃO RESOLVIDO — o fix de 30.2 recupera
 `COVERAGE_MISSING_ROW` mas ainda troca parte dele por `COVERAGE_ROW_
 MOSTLY_EMPTY` no TGD real (regressão crítica medida, sem solução limpa
 dentro do escopo autorizado deste CR)
@@ -4128,7 +4156,7 @@ TOTAL de achados sobe (+123), então não é um resultado limpo.
   JOINT` já aberto — ver o relatório final
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md`.
 
-### 29.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
+### 30.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
 entre os dois nós de UMA MESMA parede é resolvida por coordenação
 determinística (2-coloring), não por reserva de fronteira
 (`CR-BLOCK-ARM-ROLE-CONSISTENCY`, superam 29.2/29.4, 2026-09-03)
@@ -4181,7 +4209,7 @@ estendida no futuro a nós com mais de 2 braços participando).
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` (relatório
   `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 29.6).
 
-### 29.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
+### 30.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
 pode dessincronizar a alternância do vão menor (B34/B54) entre fiadas em
 paredes cujas duas pontas são `L_CORNER` (`DOCUMENTADO — pendência de
 código aberta`, 2026-09-03)
@@ -4270,7 +4298,7 @@ prisma antes.
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para o relatório completo (gates
   G1-G16).
 
-### 29.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
+### 30.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
 alterna qual nó ancora qual família; às vezes concentra as duas peças
 de canto na MESMA fiada (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03)
 
@@ -4313,15 +4341,15 @@ e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para os 9 casos individuais e o
   caso `W076` detalhado.
 - **ATUALIZAÇÃO (`CR-BLOCK-ARM-ROLE-HUMAN-POLICY`, 2026-09-04)**: a
-  autorização explícita chegou nesta CR seguinte — ver seção 30 abaixo
+  autorização explícita chegou nesta CR seguinte — ver seção 31 abaixo
   para a causa PROVADA (não mais hipótese), a política formalizada, e o
   motivo pelo qual a implementação tentada foi revertida antes do commit.
 
-## 30. `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` — causa provada do prisma forçado
+## 31. `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` — causa provada do prisma forçado
 em paredes curtas; política formalizada; implementação tentada e
 REVERTIDA por gap de segurança (2026-09-04)
 
-Continuação direta da seção 29.7 acima, com autorização explícita para
+Continuação direta da seção 30.7 acima, com autorização explícita para
 formalizar/implementar a política. Relatório completo:
 `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`.
 
@@ -4335,10 +4363,10 @@ formalizar/implementar a política. Relatório completo:
   de 29.5 é FORÇADA a produzir a MESMA junta relativa nas duas fiadas —
   medido: `stagger_cm≈0` em TODAS as 17 fiadas da parede (prisma corrido
   de altura total), não um caso de fronteira ocasional. Verificado
-  diretamente (não só herdado da seção 29.7) nas 9 paredes residuais via
+  diretamente (não só herdado da seção 30.7) nas 9 paredes residuais via
   `nuvem/benchmark/validators/validate_prism.py` rodado contra os
   projetos reais.
-- **Variável causal generalizada** (respondendo à seção 29.7, que ainda
+- **Variável causal generalizada** (respondendo à seção 30.7, que ainda
   chamava a evidência "estreita — 1 topologia, mesma peça B34"): a causa
   NÃO é "comprimento" nem "B34+B19" especificamente — é **ser uma ARESTA
   ISOLADA do grafo de coordenação de `_coordinate_arm_role_nodes`**
@@ -4471,7 +4499,7 @@ formalizar/implementar a política. Relatório completo:
   `wall_idx`). Veredito: **NECESSITA AJUSTE**. Nenhuma alteração de
   produção commitada nesta continuação.
 
-## 31. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
+## 32. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
 segurança para candidatos de papel; SAFE REPAIR ATIVADO em produção
 (2026-09-04)
 
@@ -4532,13 +4560,13 @@ taxonomia do benchmark (`LEVEL_PREFERENCE`, nível 2) — não ganhou gate
 dedicado de propósito (candidatos que o pioram junto de um achado HARD
 seguem rejeitados pelo gate HARD correspondente). `JUNCTION_NOT_
 ALTERNATING` não precisou de um sexto gate: prevenido ESTRUTURALMENTE
-pelo marcador `_arm_role_pinned` (ver seção 30 acima) — a causa raiz
+pelo marcador `_arm_role_pinned` (ver seção 31 acima) — a causa raiz
 (inconsistência de persistência de papel do nó ENTRE BANDAS) deixa de
 poder acontecer, por construção, em vez de ser detectada depois do fato.
 
 ### Persistência entre bandas
 
-`_arm_role_pinned` (proposto na seção 30, agora IMPLEMENTADO): um nó com
+`_arm_role_pinned` (proposto na seção 31, agora IMPLEMENTADO): um nó com
 esse marcador fica fora do grafo de `_coordinate_arm_role_nodes`
 inteiramente (`_arm_role_coordination_graph(nodes, respect_pins=True)`).
 Identidade estável = o NÓ (índice em `nodes`, mas o papel em si é
@@ -4603,7 +4631,7 @@ candidato seguro, fallback ORIGINAL e determinismo de execução repetida.
 SAFE REPAIR **ATIVO em produção** a partir desta CR, restrito por
 construção às arestas isoladas do grafo de coordenação (nunca paredes T/X
 numa ponta, nunca paredes com componente maior do grafo — `W010`/`W037`-
-like, ver seção 30). Pendências residuais explicitamente NÃO corrigidas
+like, ver seção 31). Pendências residuais explicitamente NÃO corrigidas
 nesta CR (fora de escopo — seção 13 do pedido): as 7 paredes rejeitadas
 no TGD e as 3 no TP1 continuam com o prisma forçado original, sem
 regressão nova introduzida por tentar corrigi-las.
