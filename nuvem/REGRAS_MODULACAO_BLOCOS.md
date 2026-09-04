@@ -4607,3 +4607,13 @@ like, ver seção 30). Pendências residuais explicitamente NÃO corrigidas
 nesta CR (fora de escopo — seção 13 do pedido): as 7 paredes rejeitadas
 no TGD e as 3 no TP1 continuam com o prisma forçado original, sem
 regressão nova introduzida por tentar corrigi-las.
+
+**Achado durante a suíte completa (`tests/`, 565 passaram/1 falhou)**:
+`test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]`
+falha (`JUNCTION_MISSING_BINDING` 8→9 contra `baseline.json`) — provado
+INDEPENDENTE desta CR (reproduz identicamente com
+`ARM_ROLE_SAFE_REPAIR_ENABLED=False`): o `baseline.json` do TP1 nunca
+foi regravado desde a integração de `CR-BLOCK-ARM-ROLE-CONSISTENCY`/PR#9
+(o mesmo 8→9 já estava documentado como "benigno, mirror de paridade"
+naquela época). Não regravado nesta CR — decisão humana pendente, fora
+de escopo.

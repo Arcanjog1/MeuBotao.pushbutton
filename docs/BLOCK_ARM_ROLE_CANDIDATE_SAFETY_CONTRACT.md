@@ -289,6 +289,24 @@ orquestrador) + 2 mudanças pequenas em código existente (pin em
 intactos — nenhuma escrita em disco durante toda a verificação (`write_
 files=False`/execução em memória).
 
+## Suíte completa (`tests/`)
+
+Rodada por completo nesta sessão (565 testes + 1 falha, 572s):
+**1 falha pré-existente, comprovadamente independente desta CR**:
+`tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_
+contra_o_baseline[torre_easy_lo_r00_tp1]` — `JUNCTION_MISSING_BINDING`
+8→9 contra o `baseline.json` gravado do TP1. Reproduzida
+IDENTICAMENTE com `ARM_ROLE_SAFE_REPAIR_ENABLED=False` (código desta CR
+completamente desligado) — prova que o `baseline.json` do TP1 está
+DESATUALIZADO em relação ao estado atual de `main` (já documentado em
+`docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`: "`JUNCTION_MISSING_BINDING` 8→9,
+mirror de paridade, benigno, já documentado" desde a integração de
+`CR-BLOCK-ARM-ROLE-CONSISTENCY`/PR#9) — o `baseline.json` nunca foi
+regravado depois daquele merge. **Não corrigido nem regravado nesta
+CR** (fora de escopo — regravar baseline exige decisão humana explícita,
+nunca "para fazer o teste passar"). Todos os demais 565 testes passam,
+incluindo toda a suíte focada de ARM-ROLE e os 18 testes novos desta CR.
+
 ## Gates G1-G18
 
 | gate | status |
@@ -307,13 +325,15 @@ files=False`/execução em memória).
 | G15 baseline/reference intactos | ✅ |
 | G16 production diff restrito | ✅ (só os 2 arquivos autorizados/disclosed) |
 | G17 testes passam | ✅ (18 novos + 21 da suíte focada existente) |
-| G18 suíte final | ver "Próximo passo" |
+| G18 suíte final | ✅ com ressalva — 565/566 (`tests/` completo); a 1 falha é pré-existente e comprovadamente independente desta CR (ver "Suíte completa") |
 
 ## Próximo passo
 
-- Rodar `tests/test_script.py` completo (suíte geral) antes de qualquer
-  merge — não rodada nesta sessão por custo/tempo, mas nenhuma mudança
-  de produção fora do escopo desta CR arrisca regressão ali.
+- Decisão humana pendente (fora do escopo desta CR): regravar
+  `baseline.json` do TP1 para refletir o estado atual de `main`
+  (`JUNCTION_MISSING_BINDING` 8→9, já documentado como benigno desde a
+  integração de `CR-BLOCK-ARM-ROLE-CONSISTENCY`/PR#9 — nunca regravado
+  desde então, comprovadamente não relacionado a esta CR).
 - As 7 arestas rejeitadas no TGD e as 3 no TP1 continuam com o prisma
   forçado original — corrigi-las exigiria um MECANISMO DIFERENTE (busca
   de preenchimento alternativa, não troca de papel), fora do escopo
