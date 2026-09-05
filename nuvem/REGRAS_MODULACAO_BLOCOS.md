@@ -136,6 +136,31 @@ anterior não fechar o trecho:
   novo, a partir da posição REAL de cada B19 já lançado, se ele está perto
   de uma amarração (nó L/T/X, ponta ou meio de parede) — e bloqueia a
   criação da parede se estiver (`HALF_BLOCK_NEAR_TIE`).
+- **EXCEÇÃO APROVADA (2026-09-05, `CR-BLOCK-B19-RESIDUAL-FILL-
+  IMPLEMENTATION`, ver seção 35)** — decisão humana explícita do usuário,
+  registrada aqui por obrigação da seção "Atualização obrigatória das
+  regras de modulação" do `CLAUDE.md`: a proibição "B19 só encosta em
+  ponta aberta, nunca perto de amarração" descrita acima é a
+  **INTERPRETAÇÃO ESTRITA histórica** e CONTINUA valendo como regra geral
+  — mas o corpus humano aprovado (TGD/TP1, 259 ocorrências medidas em
+  `docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`) mostra uma exceção
+  sistemática e legítima que a interpretação estrita não cobria: **B19
+  PODE fechar um trecho residual de 15-20cm ADJACENTE a uma peça de
+  amarração de nó (B34/B54) já presente e ÍNTEGRA NA MESMA FIADA** —
+  nunca sendo ele mesmo a peça de amarração, nunca ocupando o ponto físico
+  do nó da OUTRA ponta, nunca substituindo B34/B54. Fora dessa faixa
+  (15-20cm) e fora dessa condição (peça de nó real já formada na mesma
+  fiada), a proibição estrita de sempre continua valendo — **não foi
+  liberado B19 genericamente perto de nó, nem por comprimento total de
+  parede, nem por projeto/wall_idx**. Implementado como reparo pós-hoc
+  isolado (`repair_b19_residual_fill`, `nuvem/core/engine/wall_stepper.py`)
+  — nunca uma mudança na regra de geração em si (a proibição incondicional
+  "nunca no meio de um trecho" e a regra de ponta aberta acima **não foram
+  tocadas**). A rede de segurança `HALF_BLOCK_NEAR_TIE` foi refinada (não
+  desligada) para distinguir os dois casos só por prova geométrica
+  construtiva (`placement_reason == "B19_RESIDUAL_FILL"`, marcado só
+  depois de o candidato passar todos os hard gates) — ver seção 35 para o
+  relatório completo, os hard gates e a medição contra TGD/TP1/Piloto.
 
 ### Regra dos compensadores/pastilhas (C09/C04)
 
@@ -949,6 +974,17 @@ usuário pediu para "penalizar fortemente". Diferente das checagens de
 faixa repetitiva (que exigem um padrão em várias fiadas), esta dispara
 com uma ÚNICA ocorrência — a regra #2 é uma proibição incondicional por
 peça, não uma busca por padrão.
+
+**Refinamento aprovado (2026-09-05, `CR-BLOCK-B19-RESIDUAL-FILL-
+IMPLEMENTATION`, seção 35)**: esta rede de segurança continua bloqueando
+QUALQUER B19 perto de amarração, **exceto** quando o próprio candidato já
+foi construído e validado pelo reparo `repair_b19_residual_fill` como fill
+residual legítimo — identificado só pelo `placement_reason ==
+"B19_RESIDUAL_FILL"` (nunca por distância genérica; essa marca só existe
+depois que o candidato passou TODOS os hard gates do reparo contra um
+rebuild completo). Qualquer B19 com outro `placement_reason` perto de uma
+amarração continua bloqueado exatamente como antes — nenhuma mudança de
+comportamento para o resto do motor.
 
 ### 11.7 — Causa-raiz do bug real "118/128 paredes reprovadas": geração de
 apenas 2 layouts fixos ("A"/"B") repetidos para sempre, contra uma
@@ -4902,3 +4938,240 @@ descartado, `_set_l_corner_role_bits(..., pinned=False)`). Delta de
 projetos do Reference Corpus; toda mudança de finding vem exclusivamente
 das arestas que passaram a ser ACEITAS (TGD 91, TP1 75). Determinismo
 provado (fingerprint idêntico em processos novos separados, TGD e TP1).
+
+## 35. `CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION` — B19 como FILL
+residual de nó, decisão humana aprovada (2026-09-05, corrigida na
+revisão final de integração do PR #19)
+
+Implementa, sobre a `main` pós-Gate-Fidelity (`209695d5`), a decisão
+aprovada pelo usuário sobre B19 (`docs/BLOCK_B19_JUNCTION_DOMAIN_
+EVIDENCE.md`, investigação apenas, `REQUIRES_HUMAN_DOMAIN_APPROVAL`).
+Relatório completo: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`.
+
+**HISTÓRICO DESTA SEÇÃO**: a primeira versão implementada (PR #19,
+2026-09-05) foi revisada em revisão final de integração e um achado
+crítico foi confirmado: os 8 candidatos que ela aceitava no TP1 não
+tinham NENHUMA peça de amarração cobrindo o MESMO nó na MESMA fiada
+(0/102 fiadas) — a peça de amarração real formava-se sempre na OUTRA
+ponta da parede, nunca no nó onde o B19 estava. Esta seção documenta a
+versão CORRIGIDA, com a decisão de domínio explícita que fecha essa
+lacuna.
+
+### 35.1 Regra aprovada (versão final)
+
+B19 é FILL, **NUNCA TIE**. Para toda fiada física onde existir um B19
+marcado como fill residual, tem que existir, no **MESMO NÓ** e na
+**MESMA FIADA**, uma peça de amarração real e íntegra (B34/B54) que
+cubra geometricamente o ponto físico do nó — vinda de **qualquer**
+parede participante do nó (a própria parede do B19 ou a perpendicular).//
+B19 nunca é a peça de amarração, nunca ocupa fisicamente mais do que o
+seu próprio corpo, nunca substitui B34/B54. **Não é suficiente que a
+OUTRA ponta da mesma parede feche com peça real na mesma fiada** — essa
+era a condição da versão original do PR #19, e é exatamente o que a
+revisão provou insuficiente.
+
+Continua valendo, sem alteração: depende do TRECHO RESIDUAL medido,
+nunca do comprimento total da parede; a proibição estrita histórica (ver
+"Regra do meio-bloco (B19)", início deste arquivo, e 11.6) continua
+valendo fora dessa condição específica — não foi liberado B19
+genericamente perto de nó, nem por comprimento de parede/wall_idx/
+projeto.
+
+### 35.2 Causa-raiz medida (duas camadas)
+
+**Camada 1 (primeira divergência, ainda válida)**: `_wall_reserved_
+range_ft` reservava um valor **FIXO** (o topo da faixa, 20cm) na ponta
+oposta quando um nó era marcado como fill — isso só produzia o room
+exato exigido (`CORNER_B34_ROOM_FT`, 34cm) na ponta TIE quando o resíduo
+real da parede era EXATAMENTE 20cm (o caso do TP1, 54cm). Para qualquer
+parede com resíduo real entre 15-19cm, a reserva fixa de 20cm teria
+**subestimado** o que a ponta TIE precisa, deixando-a com menos de 34cm
+de room e portanto ainda degradada — o mecanismo nunca destravaria a
+ponta oposta fora do caso de 20cm exatos. Corrigido com reserva
+**dinâmica** (`length_ft - CORNER_B34_ROOM_FT`, calculada por parede) —
+ver 35.3.
+
+**Camada 2 (achado da revisão, o motivo real dos 0 aceitos)**: mesmo com
+a reserva corrigida, medir o TP1 real mostrou que a ponta TIE (a que
+recebe B34 real) e a ponta FILL (a que recebe B19) são nós **diferentes**
+da mesma parede — e o nó de FILL nunca é amarrado por NENHUMA peça em
+NENHUMA fiada onde o B19 esteja. Nas 8 paredes-alvo (TP1
+`wall_idx=12,13,14,15,87,88,89,90`), o nó de fill É amarrado — mas pela
+parede perpendicular, em fiadas de PARIDADE OPOSTA à do B19 (o padrão de
+alternância par/ímpar do canto L: o nó 146, por exemplo, recebe um B34
+real da parede 91 nas fiadas ÍMPARES, exatamente quando a parede 87 NÃO
+tem B19 lá; nas fiadas PARES, quando a parede 87 tem B19 no nó 146,
+NENHUMA peça de amarração cobre aquele ponto). Medido explicitamente:
+**0 de 102 fiadas** com `B19_RESIDUAL_FILL` (nos 8 candidatos que a
+versão original aceitava) tinham amarração real cobrindo o MESMO nó na
+MESMA fiada.
+
+### 35.3 Implementação corrigida
+
+Reparo pós-hoc isolado (`repair_b19_residual_fill`, `nuvem/core/engine/
+wall_stepper.py`), MESMO padrão seguro de `repair_arm_role_isolated_
+edges` — candidato → pin → reconstrução REAL multi-banda → hard gates →
+aceita ou reverte.
+
+**Correções desta revisão** (todas em `wall_stepper.py`, exceto a
+última):
+
+1. **Fórmula única de resíduo** (`_b19_residual_span_cm`): `comprimento -
+   CORNER_B34_ROOM_FT` — a MESMA fórmula usada para elegibilidade,
+   reserva e colocação (antes havia 3 fórmulas quase-iguais que só
+   coincidiam por acidente aritmético nos 54cm do TP1).
+2. **Reserva DINÂMICA** (não mais uma constante fixa
+   `B19_RESIDUAL_RESERVE_FT`, removida): `_wall_reserved_range_ft` calcula
+   `length_ft - CORNER_B34_ROOM_FT` por parede — garante room EXATO de
+   34cm na ponta TIE para qualquer resíduo na faixa aprovada, nunca só
+   para 20cm.
+3. **Gate de integridade do nó** (`_b19_tie_integrity_ok`, NOVO — o gate
+   central desta revisão): para toda fiada onde `wall_idx` tem um
+   `B19_RESIDUAL_FILL` ancorado num nó, exige uma peça de amarração real
+   (`_b19_is_tie_piece`: B34/B54, com `placement_reason` de amarração —
+   nunca um B34/B54 de preenchimento comum) cujo CORPO cubra
+   geometricamente o ponto físico DESTE MESMO nó (`_b19_node_has_
+   covering_tie`, mesma checagem geométrica de `block_covers_point` do
+   benchmark) — vinda de QUALQUER parede participante do nó. Falta em
+   QUALQUER fiada → candidato inteiro rejeitado.
+4. **Estado por nó é um CONJUNTO** (`_b19_residual_fill_for_walls`, nunca
+   mais um escalar único `_b19_residual_fill_for_wall`) — duas paredes
+   candidatas podem compartilhar o mesmo nó sem uma apagar a marca aceita
+   da outra.
+5. **Ordem de tentativa CANÔNICA GEOMÉTRICA** (`_canonical_node_sort_
+   key`, a mesma função já usada por `_coordinate_arm_role_nodes`) —
+   nunca por `end_index`/orientação de desenho da parede
+   (`GetEndPoint(0)`/`(1)`).
+6. **Escopo dos hard gates ampliado** (`_b19_candidate_dirty_scope`):
+   `dirty_wall_idxs` passa a incluir as paredes perpendiculares dos dois
+   nós envolvidos (MESMO padrão do SAFE REPAIR do ARM) — os gates de
+   compensador consecutivo e regressão de cobertura agora rodam em TODAS
+   elas, não só na parede alvo. Achado real que isto pega: a versão
+   original teria deixado passar uma regressão em `wall_idx=93` do TP1
+   (18 sequências novas de compensador consecutivo, medida na revisão) —
+   com o escopo corrigido, esse mesmo cenário é corretamente rejeitado
+   (`new_consecutive_compensators:93`, coberto por teste sintético).
+   `wall_credit_node_indices` é repassado ao gate de cobertura, mesmo
+   mecanismo de crédito físico de nó do PR #18.
+7. **Revalidação final** (`repair_b19_residual_fill`): depois de aceitar
+   candidatos individualmente, um REBUILD FINAL com a combinação completa
+   de marcas é feito, e cada candidato aceito é revalidado contra esse
+   resultado final — um candidato cujo efeito não sobreviva na combinação
+   é removido de `accepted`, sua marca é revertida, e um rebuild final é
+   refeito. Garante `accepted[] ⟹ efeito físico presente no resultado
+   final entregue`.
+8. **`audit_wall_bond_quality`** (`wall_modeling.py`, rede de segurança
+   `HALF_BLOCK_NEAR_TIE`): a isenção por `placement_reason ==
+   "B19_RESIDUAL_FILL"` agora verifica a condição geométrica DIRETAMENTE
+   (defesa em profundidade, reusando `_b19_node_has_covering_tie`),
+   nunca confia só na etiqueta — mesmo que o hard gate do reparo já
+   garanta isso antes de aceitar qualquer candidato.
+9. **Contrato de `arm_role_safe_repair=False` preservado**: voltou a
+   desligar TODO o pós-processamento (ARM e B19), idêntico ao
+   comportamento anterior a esta CR — não é mais uma porta lateral para
+   ligar o B19 fora do pipeline normal.
+
+### 35.4 RESULTADO MEDIDO — zero efeito no corpus atual (achado central
+da revisão)
+
+Com o gate de integridade do nó corretamente implementado, **os 8
+candidatos que a versão original aceitava no TP1 passam a ser
+rejeitados** (`no_tie_covering_node`, nas 16 tentativas — 8 paredes × 2
+atribuições cada). TGD e Piloto continuam com 0 candidatos elegíveis
+(já era assim antes). Resultado:
+
+| projeto | candidatos elegíveis | aceitos | fingerprint com B19 vs sem B19 |
+|---|---|---|---|
+| TP1 | 8 | **0** | idêntico |
+| TGD | 0 | 0 | idêntico |
+| Piloto | 0 | 0 | idêntico |
+
+**O mecanismo, corretamente implementado e testado, não produz NENHUM
+efeito físico no corpus de referência atual** — nenhuma parede do TGD,
+TP1 ou Piloto tem hoje uma atribuição fill/tie onde o nó de fill fique
+coberto por amarração real na MESMA fiada (o padrão de alternância
+par/ímpar do canto L sistematicamente amarra o nó só nas fiadas
+complementares às que o B19 ocuparia). Isto significa:
+
+- **Zero risco de regressão** — o resultado é byte-a-byte idêntico ao
+  estado sem o reparo B19 (fingerprint `walls_blocks` idêntico nos três
+  projetos, com e sem `B19_RESIDUAL_FILL_REPAIR_ENABLED`).
+- **Zero ganho prático hoje** — os números de melhoria reportados na
+  versão original desta seção (`COMPENSATOR_CONSECUTIVE` −168 no TP1,
+  etc.) vinham exatamente dos 8 candidatos agora corretamente
+  rejeitados — não se sustentam sob a condição de domínio correta.
+- O mecanismo fica pronto, correto e testado para o dia em que o corpus
+  tiver um caso onde a condição de domínio seja fisicamente satisfeita
+  (ou para quando uma CR futura, decisão de domínio à parte, tratar a
+  alternância par/ímpar como uma forma válida de amarração "ao longo da
+  altura" em vez de "na mesma fiada" — mudança de regra que NÃO foi
+  autorizada aqui e não deve ser inferida).
+
+### 35.5 Achado adicional (não bloqueante): faixa aprovada mais larga do
+que a colocação física permite
+
+`B19_RESIDUAL_FILL_MIN_CM = 15.0` permite ELEGIBILIDADE de parede
+(`_b19_residual_edge_candidates`) para resíduos tão baixos quanto 15cm —
+mas B19 é um bloco de catálogo FIXO de 19cm: nunca cabe fisicamente em
+menos de 19cm de room. Na prática, nenhuma parede com resíduo entre 15 e
+18cm jamais produz um B19 na colocação real (`_corner_single_element_
+candidate` cai no C09/C04 mesmo com o nó marcado) — o candidato é
+tentado (custo de um rebuild extra) mas nunca pode ser aceito (`_b19_
+tie_integrity_ok` exige `saw_any_fill=True`, que nunca acontece). Não é
+um bug de comportamento incorreto (nunca gera um B19 mal colocado), só
+uma faixa de elegibilidade mais permissiva do que a física do bloco
+permite — decisão do usuário se vale a pena estreitar `B19_RESIDUAL_
+FILL_MIN_CM` para ~19cm (eliminaria tentativas de rebuild fadadas ao
+fracasso) ou manter como está (documentado, inofensivo).
+
+### 35.6 Testes
+
+`tests/test_block_b19_residual_fill_implementation.py` — reescrita
+completa na revisão (T1-T53): **65 rápidos + 5 `slow`, todos passing**.
+Cobre: topologia; fórmula única de resíduo na matriz completa
+(14,9/15/18/19/20/20,1cm); reserva dinâmica (prova que dá 34cm de room
+para QUALQUER resíduo na faixa, não só 20cm); isolamento do estado por
+`(nó, parede)` via conjunto; preferência B19 só quando marcado E com
+room fisicamente suficiente (19-20cm); **o gate de integridade do nó em
+11 variações** (próprio nó/parede perpendicular, fiada errada, nó
+errado, peça não-amarração, peça longe demais, B54 também conta, B19
+sozinho rejeita, uma fiada sem tie reprova a parede inteira, corpo
+inteiro da peça — não só o centro); os 7 hard gates; orquestração com
+`rebuild_fn` falso (reversibilidade, `accepted ⟹ efeito no resultado
+final`, revalidação pós-combinação, ordem canônica); invariância à
+reversão dos endpoints da parede; a rede de segurança `HALF_BLOCK_NEAR_
+TIE` com defesa em profundidade (isento só com prova geométrica direta,
+não só a etiqueta); corpus real (TP1/TGD/Piloto, resultado honesto de
+zero aceitos, determinismo, contrato de `arm_role_safe_repair=False`
+preservado).
+
+### 35.7 Determinismo e regressão
+
+Fingerprint `walls_blocks` idêntico em duas execuções separadas
+(processos novos) sobre o TP1 (accepted=[] nas duas). NODE-FILL
+(`NODE_FILL_OPPOSITE_COURSE_ENABLED=True`) e Gate Fidelity (ARM SAFE
+REPAIR) preservados e intactos — nenhuma mudança de comportamento
+(`tests/test_block_node_fill_revalidation.py`, `tests/test_block_arm_
+role_prism_stagger.py`, `tests/test_block_arm_safe_repair_gate_
+fidelity.py`, `tests/test_block_arm_role_candidate_safety_contract.py`
+passam integralmente). Suíte completa sem falha nova além da já
+conhecida (`JUNCTION_MISSING_BINDING` TP1 8→9, seção 32).
+
+### 35.8 Veredito
+
+**APROVADO PARA INTEGRAÇÃO — SEM EFEITO PRÁTICO HOJE.** O mecanismo
+implementa exatamente a decisão de domínio aprovada (B19 nunca é
+amarração; exige peça real cobrindo o MESMO nó na MESMA fiada, prova
+geométrica contra o rebuild real, nunca só a etiqueta), com todos os
+hard gates do SAFE REPAIR mais os acréscimos desta CR (integridade do
+nó, escopo de vizinhas, revalidação final), determinismo provado,
+NODE-FILL/Gate Fidelity/rotated corners/`W039`-`W041` preservados
+intactos, `baseline.json`/`reference.json` intocados (diff zero — nunca
+houve necessidade de decidir sobre atualização de baseline, já que o
+resultado é idêntico ao estado sem o reparo). **Efeito medido no corpus
+de referência atual: ZERO** (0 candidatos aceitos em TGD/TP1/Piloto) —
+risco de integração é, por isso, também zero, mas o benefício prático
+imediato também é zero até que o corpus tenha um caso fisicamente
+compatível com a condição de domínio aprovada. **NÃO MESCLADO. Aguarda
+autorização explícita do usuário para merge. Nenhum monitoramento
+automático ativado.**
