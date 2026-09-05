@@ -58,6 +58,16 @@ ou reverte). Cobre:
          ORIGINAL (reversivel, sem marca residual)
     T28  nenhum candidato -> nao chama rebuild_fn nenhuma vez
 
+  Rede de seguranca HALF_BLOCK_NEAR_TIE (`audit_wall_bond_quality`,
+  wall_modeling.py) - os DOIS casos, lado a lado, MESMA geometria:
+    T34  B19 com `placement_reason="B19_RESIDUAL_FILL"` encostado numa
+         amarracao NAO produz HALF_BLOCK_NEAR_TIE (isencao aprovada)
+    T35  B19 IDENTICO em geometria, com qualquer OUTRO placement_reason,
+         CONTINUA produzindo HALF_BLOCK_NEAR_TIE (rede de seguranca
+         intacta para todo o resto do motor)
+    T36  a isencao e' SO' para o codigo B19: nenhum outro efeito da
+         auditoria (junta corrida/faixa de compensador) muda
+
   Corpus real (TP1/TGD) - prova fisica contra o corpus humano:
     T29  TP1: exatamente os 8 candidatos esperados (12,13,14,15,87,88,89,
          90), todos aceitos, zero rejeitados
@@ -679,3 +689,66 @@ def test_t33_determinismo_duas_execucoes_separadas():
     assert fingerprints[0] == fingerprints[1]
     assert accepted_sets[0] == accepted_sets[1]
     assert accepted_sets[0] and set(w for w, _f in accepted_sets[0]) == EXPECTED_TP1_WALLS
+
+
+# =====================================================================
+# T34-T36 - rede de seguranca HALF_BLOCK_NEAR_TIE: os DOIS casos
+# =====================================================================
+
+def _audit_setup(placement_reason, num_courses=6):
+    """Parede de 54cm com L_CORNER em t=0 (amarracao real na ponta) e um
+    B19 encostado nessa amarracao. `placement_reason` decide se ele e' o
+    fill residual aprovado ou um B19 qualquer."""
+    walls = [_wall(0, 0, 54, 0), _wall(0, 0, 0, 100)]
+    p0 = walls[0][0].GetEndPoint(0)
+    p1 = walls[0][0].GetEndPoint(1)
+    nodes = [_l_node(p0, 0, 0, 1, 0), _l_node(p1, 0, 1, 2, 0)]
+    end_to_node = {(0, 0): 0, (0, 1): 1, (1, 0): 0}
+    course_candidates = {}
+    for ci in range(num_courses):
+        course_candidates[ci] = [
+            _place(walls, 0, "B19", 9.5, "A", node_index=0,
+                  placement_reason=placement_reason),
+            _place(walls, 0, "B34", 37.0, "A", node_index=1,
+                  placement_reason="L_CORNER"),
+        ]
+    return walls, nodes, end_to_node, course_candidates, num_courses
+
+
+def _half_block_problems(placement_reason):
+    walls, nodes, end_to_node, cc, nc = _audit_setup(placement_reason)
+    audit = m.audit_wall_bond_quality(
+        0, walls, cc, CATALOG, nc, openings_per_wall=[[], []],
+        nodes=nodes, end_to_node=end_to_node)
+    return audit, [p for p in audit["problems"] if p.startswith("HALF_BLOCK_NEAR_TIE")]
+
+
+def test_t34_b19_residual_fill_isento_da_rede_de_seguranca():
+    """A isencao aprovada (CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION,
+    secao 11.6 das regras): o fill residual VALIDADO nao dispara
+    HALF_BLOCK_NEAR_TIE."""
+    audit, problems = _half_block_problems("B19_RESIDUAL_FILL")
+    assert problems == []
+    assert audit["half_blocks_near_ties"] == []
+
+
+def test_t35_b19_com_outro_placement_reason_continua_bloqueado():
+    """MESMA geometria, MESMA distancia da amarracao - so' muda o
+    `placement_reason`. A rede de seguranca historica continua valendo
+    para todo o resto do motor (nunca foi desligada)."""
+    for reason in ("STANDARD_FILL", "L_CORNER_DEGRADED", "OPENING_REPAIR", ""):
+        audit, problems = _half_block_problems(reason)
+        assert problems, "B19 com placement_reason={0!r} deveria disparar HALF_BLOCK_NEAR_TIE".format(reason)
+        assert audit["half_blocks_near_ties"], reason
+        assert audit["penalty"] >= m.PENALTY_HALF_BLOCK_NEAR_TIE
+
+
+def test_t36_isencao_nao_muda_o_resto_da_auditoria():
+    """A isencao toca SO' a contagem de meio-bloco perto de amarracao -
+    junta corrida e faixa de compensador continuam medidas igual nos dois
+    casos (mesma geometria => mesmo resultado)."""
+    audit_fill, _p = _half_block_problems("B19_RESIDUAL_FILL")
+    audit_other, _q = _half_block_problems("STANDARD_FILL")
+    assert audit_fill["continuous_joints"] == audit_other["continuous_joints"]
+    assert audit_fill["compensator_strips"] == audit_other["compensator_strips"]
+    assert audit_fill["alternating_joints"] == audit_other["alternating_joints"]
