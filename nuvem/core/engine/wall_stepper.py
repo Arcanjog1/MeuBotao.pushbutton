@@ -135,6 +135,10 @@ __all__ = [
     "_wall_has_forced_corner_prism", "_wall_compensator_run_signatures",
     "_no_new_consecutive_compensators", "_wall_row_covered_length_cm",
     "_no_new_row_coverage_regression", "_candidate_identity_signature",
+    # ---- CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY ----
+    "_find_consecutive_compensators_in_course", "_wall_row_own_extents_cm",
+    "_subtract_intervals_cm", "_wall_row_node_credit_cm",
+    "_wall_row_covered_length_cm_with_node_credit",
     "_collision_signatures", "_no_new_collisions", "_multi_band_wall_ok_map",
     "_no_wall_regression", "_no_new_forced_corner_prism_in_neighbors",
     "_evaluate_corner_role_candidate", "repair_arm_role_isolated_edges",
@@ -6098,25 +6102,85 @@ def _wall_has_forced_corner_prism(wall_idx, wall_bond_audits):
     return bool(_wall_forced_corner_prism_signature(wall_idx, wall_bond_audits))
 
 
-def _wall_compensator_run_signatures(wall_idx, walls_to_create, candidates, catalog):
-    """Assinatura ESTAVEL (fiada + codigos + posicao, nunca indice de
-    lista) das sequencias de `_find_consecutive_compensators` para
-    `wall_idx`, usada para comparar ORIGINAL x CANDIDATO por DELTA (uma
-    troca de 1 sequencia por outra NA MESMA posicao nao conta como
-    nova)."""
-    runs = _find_consecutive_compensators(
-        wall_idx, walls_to_create,
-        [c for c in candidates if c.get("wall_idx") == wall_idx], catalog)
-    return set((run["course"], tuple(run["codes"]), round(run["start_cm"], 1)) for run in runs)
+def _find_consecutive_compensators_in_course(wall_idx, walls_to_create, course_items, catalog,
+                                             tolerance_cm=None):
+    """Como `_find_consecutive_compensators`, mas para uma lista JA'
+    filtrada a UMA fiada FISICA isolada (`course_candidates[course_index]`,
+    filtrada por `wall_idx`) - nunca agrupa por `course` (letra "A"/"B"),
+    porque a lista de entrada e' inerentemente UMA fiada fisica so' (nenhuma
+    agregacao cross-banda e' possivel aqui - CR-BLOCK-ARM-SAFE-REPAIR-GATE-
+    FIDELITY, ver docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md, secao
+    "Compensator gate"). Usada SO' pelo gate `_no_new_consecutive_
+    compensators` (SAFE REPAIR) - `_find_consecutive_compensators` em si
+    continua servindo `validate_wall_modulation` (fora do escopo desta
+    CR)."""
+    if tolerance_cm is None:
+        tolerance_cm = BLOCK_JOINT_CM + PIER_LAYOUT_TOLERANCE_CM
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    items = []
+    for c in course_items:
+        entry = catalog.get(c.get("logical_code")) if catalog else None
+        if not entry or not entry.get("is_compensator"):
+            continue
+        t_lo_cm, t_hi_cm = _candidate_t_range_on_wall(c, p0, wall_dir)
+        items.append((t_lo_cm, t_hi_cm, c.get("logical_code")))
+    items.sort(key=lambda it: it[0])
+    runs = []
+    i = 0
+    while i < len(items) - 1:
+        run = [items[i]]
+        j = i
+        while j + 1 < len(items) and (items[j + 1][0] - items[j][1]) <= tolerance_cm:
+            run.append(items[j + 1])
+            j += 1
+        if len(run) >= 2:
+            runs.append({"codes": [r[2] for r in run], "start_cm": run[0][0], "end_cm": run[-1][1]})
+        i = j + 1
+    return runs
 
 
-def _no_new_consecutive_compensators(wall_idx, walls_to_create, catalog,
-                                     baseline_candidates, trial_candidates):
-    """HARD GATE: nenhuma sequencia NOVA de compensadores adjacentes
-    (`COMPENSATOR_CONSECUTIVE` - ja' producao, regra #2/#8) pode aparecer
-    em `wall_idx` depois do candidato."""
-    before = _wall_compensator_run_signatures(wall_idx, walls_to_create, baseline_candidates, catalog)
-    after = _wall_compensator_run_signatures(wall_idx, walls_to_create, trial_candidates, catalog)
+def _wall_compensator_run_signatures(wall_idx, walls_to_create, num_courses,
+                                     course_candidates, catalog):
+    """Assinatura ESTAVEL (course_index FISICO + codigos + posicao, nunca
+    indice de lista NEM letra de familia "A"/"B") das sequencias de
+    compensadores consecutivos de `wall_idx`, usada para comparar ORIGINAL x
+    CANDIDATO por DELTA (uma troca de 1 sequencia por outra NA MESMA
+    posicao/fiada nao conta como nova).
+
+    CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY: identidade de fiada e'
+    `course_index` (0..num_courses-1), a partir de `course_candidates`
+    (mesma estrutura que o gate de cobertura ja' usa) - NUNCA `candidates`
+    agregado entre bandas de abertura (uma banda cobre varias fiadas
+    fisicas com a MESMA letra "A"/"B"; agrupar por letra faz o MESMO
+    compensador solitario, repetido em N bandas na mesma posicao X, virar
+    uma cadeia fantasma de N compensadores "consecutivos" - PROVADO,
+    docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md, TP1 wall_idx=75/SAME_A: 0
+    achados novos/102 resolvidos no validador real, mas o proxy antigo
+    rejeitava por uma cadeia de 7 copias do mesmo C04). Cada chamada de
+    `_find_consecutive_compensators_in_course` ja' recebe UMA fiada fisica
+    isolada - elimina a agregacao cross-banda por construcao, sem agrupar
+    por letra."""
+    signatures = set()
+    for course_index in range(num_courses):
+        items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+        runs = _find_consecutive_compensators_in_course(wall_idx, walls_to_create, items, catalog)
+        for run in runs:
+            signatures.add((course_index, tuple(run["codes"]), round(run["start_cm"], 1)))
+    return signatures
+
+
+def _no_new_consecutive_compensators(wall_idx, walls_to_create, catalog, num_courses,
+                                     baseline_course_candidates, trial_course_candidates):
+    """HARD GATE: nenhuma sequencia NOVA de compensadores REALMENTE
+    consecutivos NA MESMA FIADA FISICA (`COMPENSATOR_CONSECUTIVE` - ja'
+    producao, regra #2/#8) pode aparecer em `wall_idx` depois do candidato.
+    Identidade de fiada = `course_index` (ver `_wall_compensator_run_
+    signatures`) - nunca agrega compensadores entre `course_index`
+    diferentes."""
+    before = _wall_compensator_run_signatures(
+        wall_idx, walls_to_create, num_courses, baseline_course_candidates, catalog)
+    after = _wall_compensator_run_signatures(
+        wall_idx, walls_to_create, num_courses, trial_course_candidates, catalog)
     return not (after - before)
 
 
@@ -6160,8 +6224,115 @@ ROW_COVERAGE_RELATIVE_TOLERANCE = 0.10
 ROW_COVERAGE_ABSOLUTE_FLOOR_CM = 5.0 * BLOCK_JOINT_CM
 
 
+def _wall_row_own_extents_cm(wall_idx, course_index, course_candidates, walls_to_create):
+    """Intervalos (uniao, MESCLADOS - `_merge_intervals_cm`) que as pecas
+    'donas' de `wall_idx` ocupam na fiada FISICA `course_index`, projetados
+    no proprio eixo de `wall_idx`. Base tanto de `_wall_row_covered_
+    length_cm` (delta simples) quanto do credito de no' abaixo."""
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+    return _merge_intervals_cm([_candidate_extent_on_wall_axis(c, p0, wall_dir) for c in items])
+
+
+def _subtract_intervals_cm(base_intervals, remove_intervals, tolerance_cm=1e-6):
+    """`base_intervals` MENOS `remove_intervals` (ambos ja' mesclados,
+    disjuntos) - devolve os pedacos de `base` que sobram depois de remover
+    qualquer sobreposicao com `remove` - usado para achar o trecho que
+    REALMENTE deixou de ser coberto (ANTES menos DEPOIS), nunca um limiar
+    absoluto."""
+    result = []
+    for b_lo, b_hi in base_intervals:
+        pieces = [(b_lo, b_hi)]
+        for r_lo, r_hi in remove_intervals:
+            next_pieces = []
+            for p_lo, p_hi in pieces:
+                if r_hi <= p_lo + tolerance_cm or r_lo >= p_hi - tolerance_cm:
+                    next_pieces.append((p_lo, p_hi))
+                    continue
+                if r_lo > p_lo + tolerance_cm:
+                    next_pieces.append((p_lo, r_lo))
+                if r_hi < p_hi - tolerance_cm:
+                    next_pieces.append((r_hi, p_hi))
+            pieces = next_pieces
+        result.extend(pieces)
+    return result
+
+
+def _wall_row_node_credit_cm(wall_idx, course_index, node_indices, missing_intervals,
+                             course_candidates, walls_to_create):
+    """Credito FISICO (cm) que pecas ancoradas em QUALQUER no' de
+    `node_indices` mas 'donas', nos dados (`c.get("wall_idx")`), de OUTRA
+    parede podem dar a `wall_idx`/`course_index` -
+    CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY, contrato de credito de no'
+    (docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md, secao "Coverage
+    gate"):
+
+        1. MESMO no' - `node_indices` e' um parametro EXPLICITO (os nos'
+           ISOLADOS de `wall_idx` que participam do candidato ARM - o
+           ALVO tem DOIS, `node_p`/`node_q`; uma parede VIZINHA tem UM
+           so', o que a liga ao alvo), nunca deduzido por proximidade/
+           tolerancia numerica. O credito flui nos DOIS sentidos (alvo <-
+           vizinha E vizinha <- alvo): a peca de canto de QUALQUER um dos
+           dois nos ISOLADOS deste candidato pode ter trocado de dono, e
+           os DOIS lados do no' (a parede que perdeu E a parede que
+           ganhou) precisam poder creditar da OUTRA.
+        2. MESMA regiao geometrica - o credito e' recortado (`max`/`min`)
+           contra `missing_intervals` (o trecho que REALMENTE deixou de
+           ser coberto, nunca "a peca existe em algum lugar da parede").
+        3. MESMA fiada fisica - `course_index` explicito (nunca letra de
+           familia), so' olha `course_candidates[course_index]`.
+        4. PECA REALMENTE PRESENTE - `course_candidates` aqui e' sempre o
+           do `trial_result` (resultado REAL do rebuild), nunca hipotese.
+        5. AUSENCIA DE GAP FISICO - nao verificado aqui: o credito e'
+           limitado a `missing_intervals` por construcao (nunca pode
+           exceder o gap real); quem decide se ainda sobra gap e'
+           `_no_new_row_coverage_regression`, comparando o total (com
+           credito) contra a tolerancia."""
+    if not missing_intervals or not node_indices:
+        return 0.0
+    node_index_set = set(node_indices)
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    credit_intervals = []
+    for c in (course_candidates.get(course_index) or []):
+        if c.get("wall_idx") == wall_idx:
+            continue  # ja' e' peca propria - nao e' credito "emprestado"
+        if c.get("node_index") not in node_index_set:
+            continue  # condicao 1 - nunca peca de outro no'
+        lo, hi = _candidate_extent_on_wall_axis(c, p0, wall_dir)
+        for gap_lo, gap_hi in missing_intervals:
+            ov_lo, ov_hi = max(lo, gap_lo), min(hi, gap_hi)
+            if ov_hi >= ov_lo:  # condicao 2 - so' o trecho que sobrepoe o gap
+                credit_intervals.append((ov_lo, ov_hi))
+    merged = _merge_intervals_cm(credit_intervals)
+    return sum(hi - lo for lo, hi in merged)
+
+
+def _wall_row_covered_length_cm_with_node_credit(wall_idx, course_index, node_indices,
+                                                  baseline_course_candidates,
+                                                  trial_course_candidates,
+                                                  walls_to_create):
+    """Como `_wall_row_covered_length_cm(wall_idx, course_index,
+    trial_course_candidates, walls_to_create)`, mas soma tambem o credito
+    FISICO de no' (`_wall_row_node_credit_cm`) quando `node_indices` nao e'
+    vazio/None - usado SO' pelo lado DEPOIS (`trial`) de `_no_new_row_
+    coverage_regression`; o lado ANTES continua a medida simples (nunca
+    precisa de credito - e' a base contra a qual o gap e' calculado)."""
+    after_own = _wall_row_own_extents_cm(wall_idx, course_index, trial_course_candidates, walls_to_create)
+    after_own_total = sum(hi - lo for lo, hi in after_own)
+    if not node_indices:
+        return after_own_total
+    before_own = _wall_row_own_extents_cm(wall_idx, course_index, baseline_course_candidates, walls_to_create)
+    missing = _subtract_intervals_cm(before_own, after_own)
+    if not missing:
+        return after_own_total
+    credit_cm = _wall_row_node_credit_cm(
+        wall_idx, course_index, node_indices, missing, trial_course_candidates, walls_to_create)
+    return after_own_total + credit_cm
+
+
 def _no_new_row_coverage_regression(wall_idx, walls_to_create, num_courses,
                                     baseline_course_candidates, trial_course_candidates,
+                                    node_indices=None,
                                     relative_tolerance=ROW_COVERAGE_RELATIVE_TOLERANCE,
                                     absolute_floor_cm=ROW_COVERAGE_ABSOLUTE_FLOOR_CM):
     """HARD GATE: nenhuma fiada FISICA de `wall_idx` pode perder
@@ -6191,12 +6362,24 @@ def _no_new_row_coverage_regression(wall_idx, walls_to_create, num_courses,
 
     DELTA por fiada (identidade = `wall_idx` + `course_index`, ambos
     estaveis DENTRO da mesma resolucao - nunca ElementId/ordem de
-    processamento) - ver docstring de `_wall_row_covered_length_cm`."""
+    processamento) - ver docstring de `_wall_row_covered_length_cm`.
+
+    `node_indices` (CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY, opcional -
+    None/vazio preserva o comportamento antigo, sem credito): quando
+    informado, o lado DEPOIS aceita o credito FISICO de `_wall_row_
+    covered_length_cm_with_node_credit` para uma peca de amarracao
+    ancorada em QUALQUER um desses nos que hoje 'pertence', nos dados, a
+    OUTRA parede (troca de posse pura, nao perda fisica - ver docstring de
+    `_wall_row_node_credit_cm`). So' o chamador (`_evaluate_corner_role_
+    candidate`) sabe quais nos ISOLADOS do candidato ARM tocam esta parede
+    `wall_idx` (o alvo tem DOIS - `node_p`/`node_q`; uma vizinha tem UM) -
+    nunca inferido aqui por proximidade."""
     for course_index in range(num_courses):
         before = _wall_row_covered_length_cm(
             wall_idx, course_index, baseline_course_candidates, walls_to_create)
-        after = _wall_row_covered_length_cm(
-            wall_idx, course_index, trial_course_candidates, walls_to_create)
+        after = _wall_row_covered_length_cm_with_node_credit(
+            wall_idx, course_index, node_indices,
+            baseline_course_candidates, trial_course_candidates, walls_to_create)
         if before <= absolute_floor_cm:
             continue  # ja' era (quase) vazia antes - nada a regredir
         allowed_drop = max(absolute_floor_cm, relative_tolerance * before)
@@ -6296,12 +6479,22 @@ def _no_new_forced_corner_prism_in_neighbors(target_wall_idx, neighbor_wall_idxs
 
 def _evaluate_corner_role_candidate(target_wall_idx, dirty_wall_idxs, neighbor_wall_idxs,
                                     walls_to_create, catalog, num_courses,
-                                    baseline_result, trial_result):
+                                    baseline_result, trial_result,
+                                    wall_credit_node_indices=None):
     """Roda os HARD GATES desta CR NESTA ORDEM (cada um pode rejeitar
     sozinho, sem depender dos seguintes - CR-BLOCK-ARM-ROLE-CANDIDATE-
     SAFETY-CONTRACT secoes 4/16/17): fechamento -> colisao -> prisma
     forcado em vizinha -> compensadores consecutivos (por parede dirty) ->
     regressao de cobertura por fiada (por parede dirty).
+
+    `wall_credit_node_indices` (CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY,
+    opcional): {wall_idx: [node_index, ...]} - os nos' ISOLADOS deste
+    candidato ARM que tocam cada parede `dirty` (o ALVO tem DOIS -
+    `node_p`/`node_q`; cada vizinha tem UM, o que a liga ao alvo). So' o
+    chamador (`repair_arm_role_isolated_edges`, que conhece essa topologia)
+    sabe essa relacao; repassado ao gate de cobertura para o credito
+    FISICO de no' fluir nos DOIS sentidos (alvo credita da vizinha E
+    vizinha credita do alvo - nunca inferido aqui por proximidade).
 
     Devolve `(aceito: bool, motivo: str ou None)` - o motivo nunca e'
     descartado (relatorio/auditoria dos 4 candidatos negativos)."""
@@ -6314,13 +6507,14 @@ def _evaluate_corner_role_candidate(target_wall_idx, dirty_wall_idxs, neighbor_w
         return False, "new_forced_prism_in_neighbor"
     for wall_idx in sorted(dirty_wall_idxs):
         if not _no_new_consecutive_compensators(
-                wall_idx, walls_to_create, catalog,
-                baseline_result["candidates"], trial_result["candidates"]):
+                wall_idx, walls_to_create, catalog, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"]):
             return False, "new_consecutive_compensators:{}".format(wall_idx)
     for wall_idx in sorted(dirty_wall_idxs):
         if not _no_new_row_coverage_regression(
                 wall_idx, walls_to_create, num_courses,
-                baseline_result["course_candidates"], trial_result["course_candidates"]):
+                baseline_result["course_candidates"], trial_result["course_candidates"],
+                node_indices=(wall_credit_node_indices or {}).get(wall_idx)):
             return False, "row_coverage_regression:{}".format(wall_idx)
     return True, None
 
@@ -6387,6 +6581,19 @@ def repair_arm_role_isolated_edges(nodes, walls_to_create, catalog, num_courses,
         other_wall_q = next((w for w, _e in nodes[node_q]["arms"] if w != wall_idx), None)
         neighbor_wall_idxs = set(w for w in (other_wall_p, other_wall_q) if w is not None)
         dirty_wall_idxs = {wall_idx} | neighbor_wall_idxs
+        # CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY: quais nos ISOLADOS deste
+        # candidato tocam cada parede `dirty` - o gate de cobertura usa
+        # isto (nunca proximidade) para saber de qual no' uma peca de
+        # amarracao emprestada pode dar credito fisico (ver
+        # `_evaluate_corner_role_candidate`/`_wall_row_node_credit_cm`). O
+        # ALVO (`wall_idx`) tem os DOIS nos (a peca de canto de QUALQUER
+        # um dos dois pode ter trocado de dono, nos dois sentidos); cada
+        # VIZINHA tem so' o no' que a liga ao alvo.
+        wall_credit_node_indices = {wall_idx: [node_p, node_q]}
+        if other_wall_p is not None:
+            wall_credit_node_indices.setdefault(other_wall_p, []).append(node_p)
+        if other_wall_q is not None:
+            wall_credit_node_indices.setdefault(other_wall_q, []).append(node_q)
 
         picked_bits = None
         for bit_name, (bit_p, bit_q) in CORNER_ROLE_CANDIDATE_BITS:
@@ -6401,7 +6608,8 @@ def repair_arm_role_isolated_edges(nodes, walls_to_create, catalog, num_courses,
             if resolved:
                 ok, reason = _evaluate_corner_role_candidate(
                     wall_idx, dirty_wall_idxs, neighbor_wall_idxs,
-                    walls_to_create, catalog, num_courses, baseline_result, trial_result)
+                    walls_to_create, catalog, num_courses, baseline_result, trial_result,
+                    wall_credit_node_indices=wall_credit_node_indices)
             else:
                 ok, reason = False, "does_not_resolve_target"
 

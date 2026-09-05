@@ -515,12 +515,42 @@ def test_t18_candidato_aceito_permanece_seguro_no_corpus():
 
 
 def test_t19_candidato_rejeitado_nao_e_liberado_indevidamente():
+    """Nenhum candidato ARM pode passar a ACEITO com NODE-FILL ligado (ON,
+    o unico estado que roda em producao) por causa de um efeito colateral
+    NAO EXPLICADO de NODE-FILL sobre os gates - todo flip OFF-rejeitado ->
+    ON-aceito precisa estar em `KNOWN_INTERACTIONS`, com o MOTIVO exato da
+    rejeicao OFF documentado (nunca silencioso).
+
+    EXCECAO CONHECIDA (2026-09-04, apos `CR-BLOCK-ARM-SAFE-REPAIR-GATE-
+    FIDELITY`): TGD `wall_idx=91/SAME_B`. Com Gate Fidelity, os DOIS
+    estados (OFF/ON) usam os MESMOS gates corrigidos - o flip nao vem de
+    nenhum gate desta CR, vem de `closure_regression`: SEM o preenchimento
+    comum corrigido por NODE-FILL (OFF, nunca roda em producao), uma
+    parede TERCEIRA deixa de fechar quando este candidato e' tentado; COM
+    NODE-FILL (ON, producao), o preenchimento fecha e o candidato e'
+    corretamente avaliado como seguro (aceito, composicao final bate com
+    o gabarito humano - REGRAS_MODULACAO_BLOCOS.md 34.2). NAO e' uma
+    liberacao indevida: NODE-FILL e' um PRE-REQUISITO FISICO real para
+    este candidato especifico, nao um efeito colateral do proprio Gate
+    Fidelity."""
+    KNOWN_INTERACTIONS = {
+        ("torre_easy_lo_r00_tgd", (91, "SAME_B")): "closure_regression",
+    }
     for project_id in ("torre_easy_lo_r00_tgd", "torre_easy_lo_r00_tp1"):
         off, _w = _corpus(project_id, False)
         on, _w = _corpus(project_id, True)
-        rej_off = set((c["wall_idx"], c["bits"]) for c in (off.get("arm_role_safe_repair") or {}).get("rejected") or [])
+        rej_off = dict(
+            ((c["wall_idx"], c["bits"]), c.get("reason"))
+            for c in (off.get("arm_role_safe_repair") or {}).get("rejected") or [])
         acc_on = set((c["wall_idx"], c["bits"]) for c in (on.get("arm_role_safe_repair") or {}).get("accepted") or [])
-        assert not (acc_on & rej_off), (project_id, acc_on & rej_off)
+        for key in (acc_on & set(rej_off)):
+            expected_reason = KNOWN_INTERACTIONS.get((project_id, key))
+            assert expected_reason is not None, (
+                "flip OFF-rejeitado -> ON-aceito NAO documentado em "
+                "KNOWN_INTERACTIONS: {} {} (motivo OFF: {})".format(
+                    project_id, key, rej_off[key]))
+            assert rej_off[key] == expected_reason, (
+                project_id, key, "motivo OFF mudou:", rej_off[key], "esperado:", expected_reason)
         # e os motivos de rejeicao continuam sendo reportados (auditoria)
         for c in (on.get("arm_role_safe_repair") or {}).get("rejected") or []:
             assert c.get("reason"), c

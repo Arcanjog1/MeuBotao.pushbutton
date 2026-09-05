@@ -705,6 +705,86 @@ Antes de iniciar qualquer alteração relevante neste repositório:
 
 ## 13. Histórico de atualizações deste documento
 
+### 2026-09-04 — `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` APROVADO PARA INTEGRAÇÃO (branch, NÃO mesclado)
+
+```
+data:          2026-09-04
+CR:            CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY
+branch:        claude/cr-block-arm-safe-repair-gate-fidelity-ne5cdz
+base:          origin/main = 4344c76225f12569b3776b0121bbfc1b49f7256a
+               (PR #17 / CR-BLOCK-NODE-FILL-REVALIDATION já mesclado)
+
+resumo: implementação da spec READY_FOR_IMPLEMENTATION_AFTER_NODE_FILL
+  (docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md). Corrige os 2 gates
+  do SAFE REPAIR (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT, PR #12)
+  que mediam PROXY de representação em vez do defeito físico real:
+
+  1. Compensator gate: `_no_new_consecutive_compensators`/`_wall_
+     compensator_run_signatures` usavam `candidates` AGREGADO entre
+     bandas de abertura, agrupando por letra de família ("A"/"B", que se
+     repete em toda banda) — um compensador solitário repetido em N
+     bandas virava uma cadeia FANTASMA de N "consecutivos". Corrigido
+     para `course_candidates`/`course_index` físico (mesma estrutura que
+     o gate de cobertura já usava) — nenhuma agregação cross-banda
+     possível por construção.
+  2. Coverage gate: `_wall_row_covered_length_cm` filtrava só peças cujo
+     `wall_idx` dono é a própria parede — uma peça de canto de nó L/T/X
+     muda de dono numa troca de papel ARM sem sair fisicamente do nó,
+     derrubando a cobertura LOCAL de ~100% para ~0% (falso positivo).
+     Corrigido com crédito FÍSICO de nó, 5 condições (mesmo node_index,
+     mesma região geométrica projetada no eixo da parede, mesma fiada
+     física, peça realmente presente no rebuild real, nunca exceder o
+     gap medido) — **achado desta sessão, além da spec original**: o
+     crédito precisa fluir nos DOIS sentidos (alvo↔vizinha, não só
+     vizinha→alvo) para cobrir o mecanismo real medido em TGD 89-92.
+
+STATE_A (main pura, medida via git stash): TGD accepted=1(23|SAME_A)/
+  rejected=21; TP1 accepted=0/rejected=9; piloto 0/0.
+STATE_B (com o fix): TGD accepted=2 (23|SAME_A, 91|SAME_B novo)/
+  rejected=19; TP1 accepted=1 (75|SAME_A novo)/rejected=6; piloto 0/0.
+  Ambos os novos aceitos CONFIRMED_BY_HUMAN (Reference Corpus).
+  PRISM_CONTINUOUS_JOINT: TGD 336→320 (−16), TP1 272→256 (−16).
+  Cobertura/aberturas/colisões/junções: delta ZERO nos 3 projetos.
+  Delta de achados TP1 = exatamente −102 (bate com o número medido no
+  diagnóstico original para o candidato TP1 75/SAME_A).
+  6 das 10 arestas conhecidas continuam corretamente rejeitadas (razão
+  migra para o gate/parede certos, mas a causa física real — Grupo B/
+  reserva pior-caso em parede curta, espelho de paridade — está fora do
+  escopo desta CR); 2 (TGD 4/54) permanecem OUT_OF_SCOPE_ROTATED_CORNER.
+
+testes: tests/test_block_arm_safe_repair_gate_fidelity.py (NOVO, 13
+  passed, T1-T10 + wiring + H/V, só sintético/puro). tests/test_block_
+  arm_role_candidate_safety_contract.py (T2 adaptado para course_
+  candidates/num_courses, 18 passed, corpus real). tests/test_block_
+  node_fill_revalidation.py + tests/test_block_arm_role_prism_stagger.py
+  (2 testes atualizados por mudança FÍSICA real e correta — não
+  regressão; ver docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
+  IMPLEMENTATION.md seção "Tests NODE-FILL" — 33 passed). Suíte
+  completa: 606 passed / 1 failed (a mesma falha conhecida e
+  pré-existente, JUNCTION_MISSING_BINDING TP1 8→9, P3 —
+  BENCHMARK_ARTIFACT). Nenhum teste desabilitado, nenhuma falha nova.
+
+determinismo: fingerprint `walls_blocks` idêntico em processos NOVOS
+  separados (TGD `c66b14a534f29022`, TP1 `2d107366ad6b81a2`, 2 rodadas
+  cada), mesma contagem de blocos, mesmo ARM accepted.
+performance: TGD 39,5-40,5s → 36,3-38,7s; TP1 20,9-24,2s → 20,3-21,1s;
+  piloto ~0,05s — sem crescimento de rebuilds (mesmos 4 bits canônicos
+  por aresta; gates só trocaram a fonte de dados que já liam).
+
+diff de produção: só nuvem/core/engine/wall_stepper.py (seção SAFE
+  REPAIR) — nenhum outro arquivo de produção tocado; sem special-case
+  por wall_idx/projeto; sem mudança de tolerância; wall_pairing.py e
+  canonical ordering intactos.
+baseline diff: ZERO. reference diff: ZERO.
+
+relatório completo: docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
+  IMPLEMENTATION.md (STATE_A/STATE_B completos, tabela das 10 arestas,
+  gates G1-G18). Regras: nuvem/REGRAS_MODULACAO_BLOCOS.md seção 34.
+
+veredito: APROVADO PARA INTEGRAÇÃO. NÃO MESCLADO — aguarda autorização
+  humana explícita de merge. Sem monitoramento automático.
+```
+
 ### 2026-09-04 — `CR-BLOCK-NODE-FILL-REVALIDATION` PRE-MERGE REFRESH (`PR #17`, docs-only, NÃO mesclado)
 
 ```

@@ -115,21 +115,17 @@ def _course_candidates(walls_to_create, wall_idx, placements):
 
 def test_t2_compensador_consecutivo_novo_e_rejeitado():
     walls = _straight_wall()
-    baseline_candidates = [
-        _place(walls, 0, "B39", 20, "A"),
-        _place(walls, 0, "C09", 60, "A"),
-        _place(walls, 0, "B39", 100, "A"),
-    ]
-    trial_candidates = [
-        _place(walls, 0, "B39", 20, "A"),
-        _place(walls, 0, "C09", 55, "A"),
-        _place(walls, 0, "C09", 62, "A"),  # NOVO - encostado no C09 anterior
-        _place(walls, 0, "B39", 100, "A"),
-    ]
+    baseline = _course_candidates(walls, 0, {
+        0: [("B39", 20, "A"), ("C09", 60, "A"), ("B39", 100, "A")],
+    })
+    trial = _course_candidates(walls, 0, {
+        0: [("B39", 20, "A"), ("C09", 55, "A"), ("C09", 62, "A"),  # NOVO - encostado
+            ("B39", 100, "A")],
+    })
     assert m._no_new_consecutive_compensators(
-        0, walls, CATALOG, baseline_candidates, baseline_candidates) is True
+        0, walls, CATALOG, 1, baseline, baseline) is True
     assert m._no_new_consecutive_compensators(
-        0, walls, CATALOG, baseline_candidates, trial_candidates) is False
+        0, walls, CATALOG, 1, baseline, trial) is False
 
 
 # ============================================================

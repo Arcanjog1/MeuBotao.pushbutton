@@ -98,7 +98,24 @@ def _wall_by_id(result_project, wall_id):
 # (`alignment_conflicts`), em vez de nunca ter sido checado.
 # ============================================================
 
-def test_w076_tp1_coincidencia_de_contorno_e_geometricamente_forcada_mas_agora_visivel():
+def test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair():
+    """Historico (G1/G2/G3 - ver cabecalho do modulo): a coincidencia de
+    34,5cm em W076 era GEOMETRICAMENTE FORCADA para qualquer FILL, porque
+    as duas familias usam a MESMA peca de no' (B34, mesmo comprimento) nos
+    dois L_CORNER - so' TROCAR A PECA ESCOLHIDA num dos dois nos
+    resolveria, fora do escopo desta CR (PRISM-STAGGER, so' fill).
+
+    `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` (2026-09-04) fecha exatamente
+    essa lacuna: o candidato ARM `wall_idx=75/SAME_A` (numeracao desta
+    sessao; W076 no benchmark) TROCA o papel do no' - aceito depois do fix
+    do compensator gate (a rejeicao antiga era um FANTASMA do agregado
+    multi-banda por letra de familia, nao uma regressao real - ver
+    REGRAS_MODULACAO_BLOCOS.md 34.1 e docs/BLOCK_ARM_SAFE_REPAIR_GATE_
+    FIDELITY_SPEC.md). Com SAFE REPAIR ativo (producao), W076 deixa de ter
+    a coincidencia - a "prova da causa-raiz" antiga (a coincidencia
+    persistir) so' valia enquanto o papel do no' ficava fixo; a causa-raiz
+    do PRISM-STAGGER (junta de contorno invisivel a busca) continua real e
+    provada por W041/`test_w041_...` abaixo, que nao depende de ARM."""
     input_project, solve_result, walls_to_create, result_project = _run(
         "torre_easy_lo_r00_tp1")
     wall_idx = next(i for i, w in enumerate(input_project["walls"]) if w["id"] == "W076")
@@ -106,23 +123,17 @@ def test_w076_tp1_coincidencia_de_contorno_e_geometricamente_forcada_mas_agora_v
     wall = _wall_by_id(result_project, "W076")
     joints_a = _wall_row_joints(wall, 0)
     joints_b = _wall_row_joints(wall, 1)
-    # A coincidencia em si (34.5cm - comprimento do B34 + meia junta) e'
-    # a causa-raiz PROVADA (ver docstring do modulo): permanece, porque
-    # nenhuma composicao de preenchimento pode mover a posicao da peca
-    # de no' em si.
-    assert joints_a & joints_b, (
-        "esperava a coincidencia geometricamente forcada em W076 "
-        "(prova da causa-raiz) - se isto passou a nao coincidir, a causa-"
-        "raiz mudou e este teste precisa ser revisto: %s / %s" % (joints_a, joints_b)
+    assert not (joints_a & joints_b), (
+        "esperava a coincidencia de contorno de W076 RESOLVIDA pelo ARM "
+        "SAFE REPAIR (wall_idx=75/SAME_A aceito) - se voltou a coincidir, "
+        "o candidato deixou de ser aceito (regressao no Gate Fidelity ou "
+        "no SAFE REPAIR, investigar antes de ajustar este teste): "
+        "%s / %s" % (joints_a, joints_b)
     )
-
-    # O que o FIX garante: a coincidencia agora aparece em
-    # `alignment_conflicts` (nunca mais silenciosa) - antes do fix, um
-    # pier de 1 bloco so' (`len(layout) > 1` no residual check antigo)
-    # nunca disparava esta checagem.
-    ac = [c for c in (solve_result.get("alignment_conflicts") or [])
-          if c.get("wall_idx") == wall_idx]
-    assert ac, "W076 devia aparecer em alignment_conflicts (junta de contorno detectada)"
+    arm = solve_result.get("arm_role_safe_repair") or {}
+    accepted_here = [c for c in (arm.get("accepted") or []) if c["wall_idx"] == wall_idx]
+    assert accepted_here, (
+        "esperava um candidato ARM aceito para W076 (wall_idx={})".format(wall_idx))
 
 
 # ============================================================

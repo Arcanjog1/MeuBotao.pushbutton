@@ -4824,3 +4824,81 @@ sendo contabilizada como junta estrutural "a mais". **Refutada**: nem no
 histórico nem na main há contagem a mais; o defeito é a contagem A MENOS
 (a junta invisível para a busca de desencontro da fiada oposta). Nenhum
 validador foi alterado e nenhuma redução vem de reclassificação (N3 = 0).
+
+## 34. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — os dois gates do SAFE
+REPAIR mediam PROXY, não o defeito real
+
+Continuação de `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` (seção 32) e
+de `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`/`docs/BLOCK_ARM_SAFE_
+REPAIR_GATE_FIDELITY_SPEC.md`. Implementação sobre a main pós-NODE-FILL
+(seção 33). Relatório completo:
+`docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md`.
+
+### 34.1 REGRA OBRIGATÓRIA — identidade de fiada física é `course_index`,
+nunca a letra de família
+
+`_no_new_consecutive_compensators` (gate 4 do SAFE REPAIR) media
+sequências de compensadores sobre `result["candidates"]` **agregado entre
+todas as bandas de abertura**, agrupando por `c["course"]` (a letra
+"A"/"B", que se repete em TODA banda). Uma banda cobre várias fiadas
+físicas; o MESMO compensador solitário, reaparecendo em N bandas na MESMA
+posição X, virava uma cadeia FANTASMA de N compensadores "consecutivos" —
+**PROVADO**: `TP1 wall_idx=75/SAME_A`, medido ao vivo, rejeitado por
+`new_consecutive_compensators:81` com o código antigo; medido de novo
+nesta CR sobre a main pós-fix: candidato ACEITO, delta de achados do
+projeto inteiro = **exatamente -102** (bate com o número medido no
+diagnóstico original, sem nenhum outro candidato ARM ter mudado).
+
+Fix: os dois gates de compensador (`_wall_compensator_run_signatures`/
+`_no_new_consecutive_compensators`) passaram a usar `course_candidates`
+(a mesma estrutura, por `course_index` físico, que o gate de cobertura já
+usava) em vez de `candidates` agregado — cada chamada já recebe UMA fiada
+física isolada, elimina a agregação cross-banda por construção. Nenhuma
+mudança na definição de compensador nem nas tolerâncias.
+
+### 34.2 REGRA OBRIGATÓRIA — crédito de cobertura de nó flui nos DOIS
+sentidos (alvo↔vizinha), restrito a 5 condições
+
+`_wall_row_covered_length_cm` (gate 5) media cobertura só das peças cujo
+`wall_idx` "dono" nos dados é a própria parede — uma peça de amarração de
+canto fica fisicamente sobre o VÉRTICE de um nó L/T/X e se estende sobre
+o eixo de AMBAS as paredes, mas é registrada com um único `wall_idx`
+dono; uma troca de papel ARM muda esse dono sem a peça sair fisicamente
+do nó, derrubando a cobertura LOCAL medida de 100% para perto de 0% —
+falso positivo de regressão.
+
+Fix: crédito físico restrito a 5 condições (nunca por proximidade/
+heurística de `wall_idx`): (1) mesmo `node_index` — `wall_credit_node_
+indices` é construído pelo chamador (`repair_arm_role_isolated_edges`),
+nunca deduzido por distância; o ALVO tem os DOIS nós isolados do
+candidato (`node_p`/`node_q` — o crédito flui NOS DOIS SENTIDOS, alvo
+credita da vizinha que hoje possui a peça E vizinha credita do alvo),
+cada VIZINHA tem só o nó que a liga ao alvo; (2) mesma região geométrica —
+o crédito é recortado contra o trecho que REALMENTE deixou de ser
+coberto (`_wall_row_own_extents_cm` ANTES menos DEPOIS), nunca "a peça
+existe em algum lugar da parede"; (3) mesma fiada física (`course_index`
+explícito); (4) peça realmente presente no `trial_result` (resultado REAL
+do rebuild); (5) o crédito nunca pode exceder o gap medido — se ainda
+sobrar gap real, a regressão continua bloqueada.
+
+**PROVADO** (corpus real, main pós-fix): `TGD wall_idx=91/SAME_B`
+(antes rejeitado por `new_consecutive_compensators:128`, resolvido pela
+seção 34.1) passou a ser ACEITO após o crédito de cobertura também
+aprovar seu vizinho — composição final idêntica ao gabarito humano
+(`os dois B34 de canto na MESMA família`, seção 30.7/`docs/BLOCK_ARM_
+REJECTED_EDGES_DIAGNOSIS.md` "Solver × Humano") →
+`CONFIRMED_BY_HUMAN`. `TGD wall_idx=89/90/92` e `TGD 120`/`TP1 20/91`
+continuam corretamente rejeitados (o crédito não fecha o gap real, ou o
+gate que rejeita é outro, não relacionado a esta CR) — o objetivo é
+FIDELIDADE do gate, não forçar aceitação (ver seção 16 do pedido da CR).
+
+### 34.3 PADRÃO CONFIRMADO — os dois fixes só mudam O QUE o contrato mede,
+nunca o solver
+
+Nenhum bloco físico do resultado final muda para as arestas que
+CONTINUAM rejeitadas (o rebuild de um candidato rejeitado é sempre
+descartado, `_set_l_corner_role_bits(..., pinned=False)`). Delta de
+`COVERAGE_*`/`JUNCTION_*`/`OPENING_*`/`POSITION_OVERLAP` = ZERO nos três
+projetos do Reference Corpus; toda mudança de finding vem exclusivamente
+das arestas que passaram a ser ACEITAS (TGD 91, TP1 75). Determinismo
+provado (fingerprint idêntico em processos novos separados, TGD e TP1).
