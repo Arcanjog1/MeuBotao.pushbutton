@@ -11,17 +11,16 @@
 
 ```
 branch: main
-SHA:    4344c76225f12569b3776b0121bbfc1b49f7256a
+SHA:    209695d5559b53fe4cc8a92300779a8ae73b7c1d
 ```
 
-Último marco de PRODUÇÃO: `PR #17` / `CR-BLOCK-NODE-FILL-REVALIDATION`
-(metade simétrica da junta NÓ|FILL) — **mesclado** (a `main` avançou de
-`789f4422` para `4344c76`; ver "Estado oficial do solver" abaixo).
-Detalhes: `docs/BLOCK_NODE_FILL_REVALIDATION.md`. Antes dele, `PR #12` /
-`CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` ("SAFE REPAIR ativado") —
-`docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md`. Entre os dois, só
-merges **docs-only** (`PR #13`-`#16`, diff de produção declarado ZERO).
-Histórico anterior completo: `docs/PROJECT_STATUS_LOG.md`.
+Último marco de PRODUÇÃO: `PR #18` / `CR-BLOCK-ARM-SAFE-REPAIR-GATE-
+FIDELITY` — **mesclado** (a `main` avançou de `4344c76` para `209695d`;
+ver "Estado oficial do solver" abaixo). Antes dele, `PR #17` /
+`CR-BLOCK-NODE-FILL-REVALIDATION` (metade simétrica da junta NÓ|FILL) —
+`docs/BLOCK_NODE_FILL_REVALIDATION.md`. Entre os dois, só merges
+**docs-only** (diff de produção declarado ZERO). Histórico anterior
+completo: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Estado oficial do solver
 
@@ -44,28 +43,45 @@ Só o que está realmente mesclado na `main`, na ordem em que foi integrado:
   cobertura/aberturas/colisões/junções/ARM com delta zero; 0 conflitos
   com o Reference Corpus humano. Regras: seção 33 de
   `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
+- **CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY** (`PR #18`) — os 2 gates do
+  SAFE REPAIR (compensador consecutivo, cobertura por fiada) mediam PROXY
+  (agregado cross-banda por letra de família; posse local cega à peça de
+  canto emprestada de nó), não o defeito real. Corrigidos para
+  `course_index` físico (compensador) e crédito FÍSICO de nó com 5
+  condições, nos dois sentidos alvo↔vizinha (cobertura). 2 novos
+  candidatos ARM aceitos — `TGD wall_idx=91/SAME_B`, `TP1 wall_idx=75/
+  SAME_A` — ambos `CONFIRMED_BY_HUMAN`; `PRISM_CONTINUOUS_JOINT` TGD
+  336→320, TP1 272→256; cobertura/aberturas/colisões/junções com delta
+  zero. Relatório: `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
+  IMPLEMENTATION.md`; regras: seção 34 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
 
 Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
-- **CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY** (branch
-  `claude/cr-block-arm-safe-repair-gate-fidelity-ne5cdz`, **não
-  mergeado**) — os 2 gates do SAFE REPAIR (compensador consecutivo,
-  cobertura por fiada) mediam PROXY (agregado cross-banda por letra de
-  família; posse local cega à peça de canto emprestada de nó), não o
-  defeito real. Corrigidos para `course_index` físico (compensador) e
-  crédito FÍSICO de nó com 5 condições, nos dois sentidos alvo↔vizinha
-  (cobertura). Resultado medido sobre a base pós-NODE-FILL (`4344c76`):
-  2 novos candidatos ARM aceitos — `TGD wall_idx=91/SAME_B`, `TP1
-  wall_idx=75/SAME_A` — ambos `CONFIRMED_BY_HUMAN`; `PRISM_CONTINUOUS_
-  JOINT` TGD 336→320, TP1 272→256; cobertura/aberturas/colisões/junções
-  com delta zero; suíte completa sem regressão nova (1 falha
-  pré-existente e conhecida, `JUNCTION_MISSING_BINDING` TP1 8→9).
-  Relatório e gates: `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
-  IMPLEMENTATION.md`; regras: seção 34 de
-  `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda autorização de merge; sem
-  monitoramento automático.
+- **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (branch
+  `claude/cr-block-b19-residual-fill-uythsk`, **não mergeado**) —
+  decisão humana aprovada sobre B19: pode fechar um trecho residual de
+  15-20cm ADJACENTE a uma peça de amarração de nó (B34/B54) já presente e
+  ÍNTEGRA na mesma fiada, nunca sendo ele mesmo a peça de amarração.
+  Implementado como reparo pós-hoc isolado (`repair_b19_residual_fill`,
+  mesmo padrão seguro do SAFE REPAIR do ARM — candidato → pin →
+  reconstrução completa → hard gates → aceita ou reverte).
+  TP1: 8 candidatos elegíveis, **8 aceitos, 0 rejeitados**
+  (`wall_idx` 12,13,14,15,87,88,89,90 — as paredes de 54cm T+L da
+  evidência de domínio); `COMPENSATOR_CONSECUTIVE` 1443→1275,
+  `COMPENSATOR_EXCESS_IN_RUN` 1067→928, `COVERAGE_GAP_IN_ROW` 327→309;
+  cobertura/colisão/prisma (nível 1) com delta zero fora das paredes
+  reparadas; `CONFIRMED_BY_HUMAN` na fiada par (`W013`/`W088` e
+  equivalentes). TGD: 0 candidatos elegíveis (limite de escopo
+  documentado — nenhuma parede da reconstrução atual tem a assinatura
+  geométrica exata). `JUNCTION_HALF_BLOCK_ADJACENT` TP1 0→34: convergência
+  ESPERADA para o padrão humano (259 ocorrências no gabarito aprovado),
+  não uma regressão — ver relatório. `baseline.json` do TP1
+  intencionalmente NÃO regravado. Relatório: `docs/BLOCK_B19_RESIDUAL_
+  FILL_IMPLEMENTATION.md`; regras: seção 35 de `nuvem/REGRAS_MODULACAO_
+  BLOCOS.md`. Aguarda autorização de merge; sem monitoramento automático.
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
@@ -113,10 +129,13 @@ não é append-only).
 - **Pareamento `(474, 2306)`** — eixo espúrio de ~43,9 m continua no
   resultado; sem CR atribuído.
 - **Regra do meio-bloco (B19) perto de amarração** — evidência de domínio
-  coletada (`docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`): a regra atual
-  estrita diverge do corpus humano em 259 ocorrências (TP1); proposta de
-  flexibilização mínima aguarda `REQUIRES_HUMAN_DOMAIN_APPROVAL`. Regra
-  **não alterada**.
+  coletada (`docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`) e decisão
+  aprovada IMPLEMENTADA em branch separada, não mesclada
+  (`CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION`, ver "Trabalho ativo") —
+  B19 como fill residual de 15-20cm adjacente a peça de amarração real já
+  íntegra na mesma fiada, nunca substituindo B34/B54. TP1: 8/8 candidatos
+  aceitos; TGD: 0 candidatos elegíveis (limite de escopo). Regra na
+  `main` **ainda não alterada** (aguarda merge autorizado).
 - **Detector de espessuras da UI** amostra só as primeiras 900 linhas
   cruas do layer — não limita o solver real, mas pode ocultar espessuras
   raras na sugestão da tela. Dívida de UX, não corrigida por decisão
