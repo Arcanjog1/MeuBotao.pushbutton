@@ -3298,13 +3298,23 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     sem precisar mudar nenhum outro codigo.
 
     CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (2026-09-05): MESMO padrao,
-    encadeado APOS o SAFE REPAIR do ARM ROLE - `repair_b19_residual_fill`
-    (wall_stepper.py) roda sobre o resultado JA' corrigido pelo ARM SAFE
-    REPAIR (nunca antes: uma peca de amarracao que o ARM SAFE REPAIR
-    resgatou precisa estar presente ANTES do reparo B19 decidir se uma
-    parede vizinha tem trecho residual). `b19_residual_fill_repair` (None
-    usa o default do modulo, `B19_RESIDUAL_FILL_REPAIR_ENABLED`) permite
-    religar/desligar por chamada, independente do ARM SAFE REPAIR."""
+    encadeado APOS o SAFE REPAIR do ARM ROLE, DENTRO do MESMO bloco
+    `enabled` - `repair_b19_residual_fill` (wall_stepper.py) roda sobre o
+    resultado JA' corrigido pelo ARM SAFE REPAIR (nunca antes: uma peca de
+    amarracao que o ARM SAFE REPAIR resgatou precisa estar presente ANTES
+    do reparo B19 decidir se uma parede vizinha tem trecho residual).
+
+    REVISAO POS-PR#19 (item "flag existente" - contrato preservado):
+    `arm_role_safe_repair=False` continua desligando TODO o pos-
+    processamento (comportamento IDENTICO ao anterior a esta CR, quando
+    o ARM SAFE REPAIR era o UNICO reparo existente) - passar
+    `arm_role_safe_repair=False` NUNCA e' uma porta lateral para ligar o
+    B19 fora do pipeline normal. `b19_residual_fill_repair` (None usa o
+    default do modulo, `B19_RESIDUAL_FILL_REPAIR_ENABLED`) so' controla
+    se o passo B19 roda DENTRO do bloco `enabled` - permite desligar so'
+    o B19 (mantendo o ARM ligado), mas nunca o inverso. Separar os dois
+    flags de verdade (permitir B19 sozinho com ARM desligado) ficaria
+    para uma CR futura, se for desejavel - fora do escopo desta."""
     enabled = ARM_ROLE_SAFE_REPAIR_ENABLED if arm_role_safe_repair is None else arm_role_safe_repair
     b19_enabled = (B19_RESIDUAL_FILL_REPAIR_ENABLED if b19_residual_fill_repair is None
                   else b19_residual_fill_repair)
@@ -3314,7 +3324,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
         wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
     )
-    if result.get("error") is not None:
+    if not enabled or result.get("error") is not None:
         return result
 
     def _rebuild():
@@ -3324,19 +3334,18 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             opening_strategy=opening_strategy,
         )
 
-    if enabled:
-        repair_outcome = repair_arm_role_isolated_edges(
-            nodes, walls_to_create, catalog, num_courses,
-            baseline_result=result, rebuild_fn=_rebuild,
-        )
+    repair_outcome = repair_arm_role_isolated_edges(
+        nodes, walls_to_create, catalog, num_courses,
+        baseline_result=result, rebuild_fn=_rebuild,
+    )
+    result["arm_role_safe_repair"] = {
+        "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
+    }
+    if repair_outcome["changed"]:
+        result = repair_outcome["final_result"]
         result["arm_role_safe_repair"] = {
             "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
         }
-        if repair_outcome["changed"]:
-            result = repair_outcome["final_result"]
-            result["arm_role_safe_repair"] = {
-                "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
-            }
 
     if b19_enabled:
         arm_role_safe_repair_signal = result.get("arm_role_safe_repair")
@@ -3751,7 +3760,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         extents = []
         for c in items:
             t_start, t_end = _candidate_extent_on_wall_axis(c, p0, wall_dir)
-            extents.append((t_start, t_end, c["logical_code"], c.get("placement_reason")))
+            extents.append((t_start, t_end, c["logical_code"], c.get("placement_reason"), c.get("node_index")))
         extents.sort(key=lambda e: e[0])
         for i in range(len(extents) - 1):
             gap_cm = extents[i + 1][0] - extents[i][1]
@@ -3765,27 +3774,33 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                 # _joint_is_opening_aligned_exempt.
                 continue
             joint_points.append(((extents[i][1] + extents[i + 1][0]) / 2.0, course_index))
-        for t_start, t_end, code, placement_reason in extents:
+        for t_start, t_end, code, placement_reason, node_index in extents:
             if _is_special_block_code(code, catalog):
                 center = (t_start + t_end) / 2.0
                 if not _near_exempt_zone(center):
                     special_points.append((center, (course_index, code)))
-            # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: distingue
-            # B19_AS_VALID_RESIDUAL_FILL de B19_AS_NODE_TIE (secao 9 do
-            # pedido) SO' por prova geometrica construtiva, nunca por
-            # distancia generica - `placement_reason == "B19_RESIDUAL_
-            # FILL"` e' colocado SO' por `_corner_single_element_
-            # candidate` quando `repair_b19_residual_fill` (wall_stepper.py)
-            # ja' marcou o no' como fill validado PARA ESTA parede E ja'
-            # passou todos os hard gates (fechamento/colisao/prisma/
-            # compensador/cobertura) contra um rebuild completo - a mesma
-            # peca de amarracao (B34/B54) continua integra na MESMA
-            # fiada (e' precondicao do proprio reparo: o B19 so' e'
-            # aceito DEPOIS que a peca de no' real se formou na ponta
-            # oposta). Um B19 com QUALQUER outro placement_reason perto de
-            # uma amarracao continua bloqueado exatamente como antes -
+            # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-PR#19,
+            # item 4): distingue B19_AS_VALID_RESIDUAL_FILL de
+            # B19_AS_NODE_TIE por DUAS provas independentes, nunca por
+            # distancia generica e nunca so' pela etiqueta: (1)
+            # `placement_reason == "B19_RESIDUAL_FILL"` - so' colocado por
+            # `_corner_single_element_candidate` quando o no' foi marcado
+            # candidato PARA ESTA parede; (2) DEFESA EM PROFUNDIDADE -
+            # verificacao geometrica direta, aqui mesmo, de que uma peca de
+            # amarracao real (B34/B54) cobre o MESMO no' NA MESMA fiada,
+            # vinda de QUALQUER parede (`_b19_node_has_covering_tie`,
+            # contra `course_candidates[course_index]` SEM filtrar por
+            # wall_idx - nunca confia cegamente na etiqueta, mesmo que o
+            # hard gate `_b19_tie_integrity_ok` do reparo ja' garanta isso
+            # antes de aceitar qualquer candidato). So' isento quando as
+            # DUAS provas baterem. Um B19 com QUALQUER outro placement_
+            # reason, OU sem peca de amarracao real cobrindo o mesmo no'
+            # nesta fiada, continua bloqueado exatamente como antes -
             # nenhuma mudanca de comportamento para o resto do motor.
-            if code == HALF_BLOCK_CODE and placement_reason == "B19_RESIDUAL_FILL":
+            if (code == HALF_BLOCK_CODE and placement_reason == "B19_RESIDUAL_FILL"
+                    and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
+                    and _b19_node_has_covering_tie(
+                        course_candidates.get(course_index) or [], nodes[node_index])):
                 continue
             if code == HALF_BLOCK_CODE and tie_t_positions_cm:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):

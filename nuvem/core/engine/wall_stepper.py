@@ -143,8 +143,10 @@ __all__ = [
     "_no_wall_regression", "_no_new_forced_corner_prism_in_neighbors",
     "_evaluate_corner_role_candidate", "repair_arm_role_isolated_edges",
     # ---- CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION ----
-    "B19_RESIDUAL_FILL_MIN_CM", "B19_RESIDUAL_FILL_MAX_CM", "B19_RESIDUAL_RESERVE_FT",
+    "B19_RESIDUAL_FILL_MIN_CM", "B19_RESIDUAL_FILL_MAX_CM", "_b19_residual_span_cm",
     "_node_other_wall_idx", "_wall_two_end_node_indices", "_wall_all_junction_node_indices",
+    "_B19_TIE_PLACEMENT_PREFIXES", "_b19_is_tie_piece", "_b19_node_has_covering_tie",
+    "_b19_tie_integrity_ok", "_b19_candidate_dirty_scope",
     "_B19_REPAIR_DEGRADED_REASONS", "_wall_end_degraded_in_items",
     "_wall_both_ends_degraded_in_some_course",
     "_b19_residual_edge_candidates", "_evaluate_b19_residual_candidate",
@@ -611,18 +613,27 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
         reserve_cm, _joint_cm = _wall_end_default_start_cm(
             nodes, end_to_node, walls_to_create, wall_idx, end_index
         )
-        # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: reserva reduzida (a
-        # faixa de fill residual, nunca o pior-caso de B34 inteiro) SO'
+        # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: reserva DINAMICA (nunca
+        # um valor fixo do topo da faixa - ver `_b19_residual_span_cm`) SO'
         # quando `repair_b19_residual_fill` marcou explicitamente ESTE no',
-        # PARA ESTA parede (`_b19_residual_fill_for_wall == wall_idx`) -
-        # nunca por proximidade/no' generico. Outra parede que compartilhe
-        # o MESMO no' (ex.: a perpendicular de um L_CORNER) continua vendo
-        # o pior-caso de sempre, porque a marca e' por (no', wall_idx), nao
-        # so' por no' - ver docstring do reparo. Comportamento default
-        # (sem marca) e' byte-a-byte identico ao anterior a esta CR.
+        # PARA ESTA parede (`wall_idx in _b19_residual_fill_for_walls` - um
+        # CONJUNTO por no', nunca um escalar unico: duas paredes podem
+        # compartilhar o mesmo no' e cada uma precisa da sua propria marca
+        # sem apagar a da outra) - nunca por proximidade/no' generico.
+        # Outra parede que compartilhe o MESMO no' (ex.: a perpendicular de
+        # um L_CORNER) continua vendo o pior-caso de sempre, porque o
+        # `wall_idx in ...` testa ESTA parede especificamente. A reserva
+        # dinamica usa `length_ft - CORNER_B34_ROOM_FT` (o comprimento REAL
+        # desta parede) - garante que a ponta OPOSTA veja EXATAMENTE
+        # CORNER_B34_ROOM_FT de room, qualquer que seja o residuo real
+        # (15-20cm) - um valor fixo (ex.: sempre 20cm) so' funcionaria por
+        # coincidencia numerica quando o residuo real fosse exatamente
+        # aquele valor (bug real medido na revisao pos-PR#19: paredes com
+        # residuo < 20cm nunca destravariam a ponta oposta). Comportamento
+        # default (sem marca) e' byte-a-byte identico ao anterior a esta CR.
         node = nodes[node_index] if node_index < len(nodes) else None
-        if node is not None and node.get("_b19_residual_fill_for_wall") == wall_idx:
-            reserve_ft = max(_cm_to_ft(reserve_cm), B19_RESIDUAL_RESERVE_FT)
+        if node is not None and wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
+            reserve_ft = max(_cm_to_ft(reserve_cm), length_ft - CORNER_B34_ROOM_FT)
         else:
             reserve_ft = max(_cm_to_ft(reserve_cm), CORNER_B34_ROOM_FT)
         if end_index == 0:
@@ -824,15 +835,13 @@ CORNER_B34_ROOM_FT = _cm_to_ft(34.0)
 # fora dela o humano usa outra coisa (B39 inteiro, compensador).
 B19_RESIDUAL_FILL_MIN_CM = 15.0
 B19_RESIDUAL_FILL_MAX_CM = 20.0
-# Reserva usada SO' pelo reparo `repair_b19_residual_fill` (nunca pelo
-# room-check generico - ver `_wall_reserved_range_ft`) quando um no'
-# especifico foi marcado (`_b19_residual_fill_for_wall`) como candidato
-# validado de fill residual PARA UMA PAREDE ESPECIFICA: usa o MAIOR valor
-# da faixa (20cm), nunca menos - continua conservador (nunca reserva de
-# menos), so' deixa de superestimar o pior-caso de B34 inteiro (34cm)
-# quando o proprio reparo ja' provou, via reconstrucao completa e os
-# MESMOS hard gates do SAFE REPAIR, que aquela ponta fecha com B19.
-B19_RESIDUAL_RESERVE_FT = _cm_to_ft(B19_RESIDUAL_FILL_MAX_CM)
+# NAO ha' uma "B19_RESIDUAL_RESERVE_FT" fixa (removida na revisao pos-
+# PR#19 - era um bug real): a reserva usada por `_wall_reserved_range_ft`
+# quando um no' e' marcado para fill e' calculada DINAMICAMENTE, por
+# parede (`length_ft - CORNER_B34_ROOM_FT`), nunca um valor fixo do topo
+# da faixa - ver a nota em `_wall_reserved_range_ft` e `_b19_residual_
+# span_cm` (a UNICA formula de trecho residual usada em todo o
+# mecanismo).
 
 
 def _t_of_point_on_wall(walls_to_create, wall_idx, point):
@@ -1035,19 +1044,21 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
     automatica, precisa de ajuste de geometria antes.
 
     CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (`nodes` opcional, `None`
-    preserva o comportamento historico byte-a-byte): quando este `node_index`
-    foi marcado por `repair_b19_residual_fill` como fill residual validado
-    PARA ESTA `wall_idx` (`_b19_residual_fill_for_wall == wall_idx` - nunca
-    por proximidade) E `room_ft` cai na faixa aprovada
+    preserva o comportamento historico byte-a-byte): quando este
+    `node_index` foi marcado por `repair_b19_residual_fill` como fill
+    residual candidato PARA ESTA `wall_idx` (`wall_idx in
+    _b19_residual_fill_for_walls` - um CONJUNTO por no', nunca um escalar
+    unico, nunca por proximidade) E `room_ft` cai na faixa aprovada
     (B19_RESIDUAL_FILL_MIN_CM..MAX_CM), usa B19 em vez de C09/C04 - B19
-    aqui e' SEMPRE fill (nunca a peca de amarracao do no', que continua
-    sendo B34/B54 na OUTRA ponta desta mesma parede, ja' resolvida antes
-    de este reparo marcar este no' - ver `_evaluate_b19_residual_candidate`).
-    Fora da faixa, ou sem a marca, cai no C09/C04 de sempre - nunca
-    generaliza B19 para nenhum outro caso."""
+    aqui e' SEMPRE fill. Este B19, sozinho, NAO prova que a peca de
+    amarracao real existe no mesmo no'/mesma fiada - essa prova
+    geometrica e' feita DEPOIS, contra o rebuild completo, por
+    `_b19_tie_integrity_ok` (o hard gate que de fato aceita ou rejeita o
+    candidato). Fora da faixa, ou sem a marca, cai no C09/C04 de sempre -
+    nunca generaliza B19 para nenhum outro caso."""
     if nodes is not None and node_index is not None and 0 <= node_index < len(nodes):
         node = nodes[node_index]
-        if node.get("_b19_residual_fill_for_wall") == wall_idx:
+        if wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
             b19_entry = catalog.get("B19") if catalog else None
             if b19_entry is not None and b19_entry.get("length_cm"):
                 room_cm = _ft_to_cm(room_ft)
@@ -6704,6 +6715,18 @@ def repair_arm_role_isolated_edges(nodes, walls_to_create, catalog, num_courses,
 # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION - reparo pos-hoc, mesmo padrao
 # seguro de `repair_arm_role_isolated_edges` acima (candidato -> pin ->
 # reconstrucao REAL multi-banda -> hard gates -> aceita ou reverte).
+#
+# REVISAO POS-PR#19 (revisao final de integracao encontrou candidatos
+# aceitos sem nenhuma peca de amarracao cobrindo o MESMO no' na MESMA
+# fiada - a decisao de dominio abaixo e' a resposta formal a isso):
+#   B19 e' FILL, NUNCA TIE. Para toda fiada fisica onde existir um B19
+#   marcado como fill residual, tem que existir, no MESMO no' e na MESMA
+#   fiada, uma peca de amarracao real (B34/B54) que cubra geometricamente
+#   o ponto fisico do no' - vinda de QUALQUER parede participante do no'
+#   (a propria `wall_idx` ou a perpendicular). Nunca aceito so' por
+#   `placement_reason`/topologia abstrata - `_b19_tie_integrity_ok` prova
+#   isso GEOMETRICAMENTE, contra o REBUILD REAL, e rejeita o candidato
+#   inteiro se faltar em qualquer fiada.
 # ==========================================================================
 
 def _node_other_wall_idx(node, wall_idx):
@@ -6752,11 +6775,13 @@ def _wall_all_junction_node_indices(nodes, wall_idx):
 
 def _wall_two_end_node_indices(nodes, end_to_node, wall_idx):
     """(node0_index, node1_index) - os nos das DUAS PONTAS FISICAS de
-    `wall_idx` (end_index 0 e 1), SO' quando: as duas pontas existem no
-    grafo, sao nos DISTINTOS, dos tipos L_CORNER/T_INTERSECTION (nunca
-    FREE_END/STRAIGHT_CONTINUATION/AMBIGUOUS/X_INTERSECTION - fora do
-    escopo desta CR) E a parede NAO tem nenhum no' de MEIO (main wall de
-    um T/X que a atravessa) alem dessas duas pontas.
+    `wall_idx` (end_index 0 e 1, na ORDEM BRUTA do grafo - nunca usada
+    como criterio de prioridade, ver `_canonical_node_sort_key` para
+    isso), SO' quando: as duas pontas existem no grafo, sao nos
+    DISTINTOS, dos tipos L_CORNER/T_INTERSECTION (nunca FREE_END/
+    STRAIGHT_CONTINUATION/AMBIGUOUS/X_INTERSECTION - fora do escopo desta
+    CR) E a parede NAO tem nenhum no' de MEIO (main wall de um T/X que a
+    atravessa) alem dessas duas pontas.
 
     Devolve `(None, None)` quando qualquer condicao falha - candidato fora
     de escopo para `repair_b19_residual_fill`, nunca reparado (secao 4 do
@@ -6776,10 +6801,151 @@ def _wall_two_end_node_indices(nodes, end_to_node, wall_idx):
     return node0, node1
 
 
+def _b19_residual_span_cm(length_cm):
+    """UNICA formula de trecho residual (cm) - usada para elegibilidade
+    E para a reserva dinamica em `_wall_reserved_range_ft` (nunca duas
+    formulas separadas - achado da revisao pos-PR#19: a elegibilidade
+    antiga subtraia mais 1cm de junta que a reserva/colocacao real
+    subtraiam, e so' nao divergiam nos 54cm do TP1 por coincidencia
+    aritmetica - 19 vs 20, os dois dentro da faixa [15,20] por sorte).
+    Comprimento fisico da parede menos UMA peca de amarracao inteira
+    (B34, a MESMA fronteira que `_wall_reserved_range_ft` usa como pior-
+    caso na ponta oposta - que nao soma nenhuma junta extra, o
+    `joint_cm` de `_wall_end_default_start_cm` e' descartado ali por
+    construcao)."""
+    return length_cm - _ft_to_cm(CORNER_B34_ROOM_FT)
+
+
+# CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: mesma lista de prefixos que
+# `TIE_PLACEMENT_PREFIXES`/`_is_tie_candidate` (wall_modeling.py) usam
+# para classificar "peca de amarracao real" - duplicada aqui de proposito
+# (NUNCA importada de wall_modeling.py: aquele modulo e' quem importa
+# DESTE arquivo via `from core.engine.wall_stepper import *` - importar
+# de volta criaria import circular). Um B34/B54 colocado como
+# preenchimento comum (`STANDARD_FILL`) NUNCA conta como amarracao, mesmo
+# que o corpo dele coincida geometricamente com o ponto do no' - a MESMA
+# peca fisica so' "amarra" quando foi POSICIONADA para isso.
+_B19_TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+
+
+def _b19_is_tie_piece(candidate):
+    """True quando `candidate` e' uma peca de amarracao REAL (B34/B54,
+    posicionada como amarracao - nunca um B34/B54 que caiu ali por
+    coincidencia do preenchimento comum)."""
+    reason = str(candidate.get("placement_reason") or "")
+    return (candidate.get("logical_code") in ("B34", "B54")
+            and any(reason.startswith(p) for p in _B19_TIE_PLACEMENT_PREFIXES))
+
+
+# Folga (ft) para considerar que o CORPO de uma peca de amarracao alcanca
+# o ponto do no' - uma junta de assentamento, mesmo espirito de
+# `JUNCTION_REACH_TOLERANCE_CM` do validador do benchmark (nunca
+# importado de la' - este arquivo nao depende do pacote `benchmark`).
+_B19_NODE_REACH_TOLERANCE_FT = _cm_to_ft(BLOCK_JOINT_CM)
+
+
+def _b19_node_has_covering_tie(items, node, tolerance_ft=_B19_NODE_REACH_TOLERANCE_FT):
+    """True quando ALGUM candidato de `items` (candidatos de UMA fiada
+    fisica, DE QUALQUER parede - a decisao de dominio explicitamente
+    permite a peca vir da parede perpendicular participante do MESMO no')
+    e' uma peca de amarracao real (`_b19_is_tie_piece`) cujo CORPO
+    (retangulo real: comprimento x largura, na rotacao real - nunca so' o
+    centro) alcanca o ponto FISICO de `node` - a MESMA checagem
+    geometrica que `block_covers_point` faz no benchmark
+    (validate_junctions.py), agora do lado do motor, contra o REBUILD
+    REAL. Prova geometrica construtiva exigida pela decisao de dominio
+    (nunca por node_index/wall_idx/proximidade)."""
+    point = node.get("point") if isinstance(node, dict) else None
+    if point is None:
+        return False
+    for c in items:
+        if not _b19_is_tie_piece(c):
+            continue
+        origin = c.get("origin_world")
+        x_dir = c.get("x_dir")
+        if origin is None or x_dir is None:
+            continue
+        y_dir = c.get("y_dir") or _perp_dir(x_dir)
+        dx, dy = point.X - origin.X, point.Y - origin.Y
+        along = dx * x_dir.X + dy * x_dir.Y
+        across = dx * y_dir.X + dy * y_dir.Y
+        half_len_ft = _cm_to_ft(c["length_cm"]) / 2.0
+        half_wid_ft = _cm_to_ft(c.get("width_cm") or 14.0) / 2.0
+        if abs(along) <= half_len_ft + tolerance_ft and abs(across) <= half_wid_ft + tolerance_ft:
+            return True
+    return False
+
+
+def _b19_tie_integrity_ok(wall_idx, fill_node_index, nodes, num_courses, course_candidates):
+    """HARD GATE (decisao de dominio, revisao pos-PR#19): para TODA fiada
+    fisica onde `wall_idx` tem um `B19_RESIDUAL_FILL` ancorado em
+    `fill_node_index`, tem que existir, na MESMA fiada, uma peca de
+    amarracao real cobrindo geometricamente o MESMO no' (qualquer
+    parede - ver `_b19_node_has_covering_tie`). B19 nunca e' a UNICA peca
+    responsavel pelo no': se faltar em QUALQUER fiada onde o B19 exista,
+    o candidato inteiro e' rejeitado (nunca aceito parcialmente - este
+    reparo decide por PAREDE, nao por fiada)."""
+    node = nodes[fill_node_index] if 0 <= fill_node_index < len(nodes) else None
+    if node is None:
+        return False
+    saw_any_fill = False
+    for course_index in range(num_courses):
+        items = course_candidates.get(course_index) or []
+        has_fill = any(
+            c.get("wall_idx") == wall_idx and c.get("node_index") == fill_node_index
+            and c.get("placement_reason") == "B19_RESIDUAL_FILL"
+            for c in items
+        )
+        if not has_fill:
+            continue
+        saw_any_fill = True
+        if not _b19_node_has_covering_tie(items, node):
+            return False
+    return saw_any_fill
+
+
+def _b19_residual_edge_candidates(nodes, walls_to_create, end_to_node, catalog, num_courses,
+                                  baseline_result):
+    """Paredes candidatas ao reparo `repair_b19_residual_fill`: exatamente
+    DOIS nos genuinos, um em CADA ponta fisica (`_wall_two_end_node_
+    indices`), com as DUAS pontas degradadas JUNTAS em alguma fiada no
+    ORIGINAL (`_wall_both_ends_degraded_in_some_course` - triagem BARATA,
+    nunca autoritativa: quem decide de verdade e' `_b19_tie_integrity_ok`
+    contra o rebuild real) E aritmetica de trecho residual compativel
+    (`_b19_residual_span_cm`, a UNICA formula - ver docstring dela) na
+    faixa aprovada (B19_RESIDUAL_FILL_MIN_CM..MAX_CM).
+
+    Devolve uma lista de `{"wall_idx", "node_a", "node_b"}`, ordenada por
+    `wall_idx` (determinístico, nunca por dict/set) - `node_a`/`node_b`
+    em ORDEM CANONICA GEOMETRICA (`_canonical_node_sort_key`, nunca por
+    `end_index`/GetEndPoint(0)/(1) - invariante a' orientacao de desenho
+    da parede) - a ordem em que `repair_b19_residual_fill` tenta cada
+    atribuicao (fill primeiro num, depois no outro - ver la')."""
+    candidates = []
+    for wall_idx in range(len(walls_to_create)):
+        node_a, node_b = _wall_two_end_node_indices(nodes, end_to_node, wall_idx)
+        if node_a is None:
+            continue
+        _p0, _p1, _dir, length_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+        length_cm = _ft_to_cm(length_ft)
+        residual_cm = _b19_residual_span_cm(length_cm)
+        if not ((B19_RESIDUAL_FILL_MIN_CM - 1e-6) <= residual_cm <= (B19_RESIDUAL_FILL_MAX_CM + 1e-6)):
+            continue
+        course_candidates = (baseline_result or {}).get("course_candidates") or {}
+        if not _wall_both_ends_degraded_in_some_course(
+                wall_idx, walls_to_create, course_candidates, num_courses, length_cm):
+            continue
+        node_a, node_b = sorted((node_a, node_b),
+                                key=lambda idx: _canonical_node_sort_key(nodes[idx]))
+        candidates.append({"wall_idx": wall_idx, "node_a": node_a, "node_b": node_b})
+    candidates.sort(key=lambda c: c["wall_idx"])
+    return candidates
+
+
 # Razoes de PLACEMENT_REASON que marcam "esta ponta degradou para um
 # unico compensador" (C09/C04 - nunca B34/B54 real) - ver solve_l_corner/
-# solve_t_intersection. Usada SO' pela triagem de candidatos abaixo (nunca
-# pelo proprio degrade: aquele continua decidido por `_corner_wall_room_ft`,
+# solve_t_intersection. Usada SO' pela triagem de candidatos (nunca pelo
+# proprio degrade: aquele continua decidido por `_corner_wall_room_ft`,
 # como sempre).
 _B19_REPAIR_DEGRADED_REASONS = frozenset((
     "L_CORNER_DEGRADED", "T_INTERSECTION_DEGRADED_L", "T_INTERSECTION_INCOMING_DEGRADED",
@@ -6812,7 +6978,8 @@ def _wall_both_ends_degraded_in_some_course(wall_idx, walls_to_create, course_ca
     nos dois `end_index`) - a assinatura medida em docs/BLOCK_B19_
     JUNCTION_DOMAIN_EVIDENCE.md (reserva pior-caso simetrica faz as duas
     pontas degradarem juntas, nunca uma peca de amarracao real se forma em
-    nenhuma). Triagem BARATA (sem rebuild) antes de tentar o reparo."""
+    nenhuma). Triagem BARATA (sem rebuild) antes de tentar o reparo -
+    NUNCA autoritativa (ver `_b19_tie_integrity_ok`)."""
     for course_index in range(num_courses):
         items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
         if not items:
@@ -6823,60 +6990,19 @@ def _wall_both_ends_degraded_in_some_course(wall_idx, walls_to_create, course_ca
     return False
 
 
-def _b19_residual_edge_candidates(nodes, walls_to_create, end_to_node, catalog, num_courses,
-                                  baseline_result):
-    """Paredes candidatas ao reparo `repair_b19_residual_fill`: exatamente
-    DOIS nos genuinos, um em CADA ponta fisica (`_wall_two_end_node_
-    indices`), com as DUAS pontas degradadas JUNTAS em alguma fiada no
-    ORIGINAL (`_wall_both_ends_degraded_in_some_course` - so' tenta
-    reparar parede que MEDIU o problema real: nenhuma peca de amarracao
-    real se forma em nenhuma ponta) E aritmetica de trecho residual
-    compativel: comprimento fisico menos UMA peca de amarracao inteira
-    (B34, `_wall_end_default_start_cm`/`CORNER_B34_ROOM_FT` sempre usa
-    este valor como pior-caso) menos UMA junta cai na faixa aprovada
-    (B19_RESIDUAL_FILL_MIN_CM..MAX_CM).
-
-    Devolve uma lista de `{"wall_idx", "node_a", "node_b"}`, ordenada por
-    `wall_idx` (determinístico, nunca por dict/set) - `node_a`/`node_b` na
-    ORDEM em que `repair_b19_residual_fill` tenta cada atribuicao (fill
-    primeiro num, depois no outro - ver la')."""
-    b34_entry = catalog.get("B34") if catalog else None
-    if b34_entry is None or not b34_entry.get("length_cm"):
-        return []
-    tie_len_cm = b34_entry["length_cm"]
-    course_candidates = (baseline_result or {}).get("course_candidates") or {}
-    candidates = []
-    for wall_idx in range(len(walls_to_create)):
-        node_a, node_b = _wall_two_end_node_indices(nodes, end_to_node, wall_idx)
-        if node_a is None:
-            continue
-        _p0, _p1, _dir, length_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
-        length_cm = _ft_to_cm(length_ft)
-        residual_cm = length_cm - tie_len_cm - BLOCK_JOINT_CM
-        if not ((B19_RESIDUAL_FILL_MIN_CM - 1e-6) <= residual_cm <= (B19_RESIDUAL_FILL_MAX_CM + 1e-6)):
-            continue
-        if not _wall_both_ends_degraded_in_some_course(
-                wall_idx, walls_to_create, course_candidates, num_courses, length_cm):
-            continue
-        candidates.append({"wall_idx": wall_idx, "node_a": node_a, "node_b": node_b})
-    candidates.sort(key=lambda c: c["wall_idx"])
-    return candidates
-
-
-def _evaluate_b19_residual_candidate(wall_idx, neighbor_wall_idxs, walls_to_create, catalog,
-                                     num_courses, baseline_result, trial_result):
-    """HARD GATES do reparo B19 residual - MESMO conjunto/ORDEM de
-    `_evaluate_corner_role_candidate` (fechamento -> colisao -> prisma
-    forcado -> compensadores consecutivos -> regressao de cobertura),
-    reusando os MESMOS gates ja' provados pelo SAFE REPAIR (nenhuma
-    logica de validacao nova duplicada).
-
-    Diferenca da versao ARM: aqui o PROPRIO `wall_idx` tambem e' checado
-    contra prisma forcado NOVO (nao so' as vizinhas) - o candidato ARM
-    corrige um prisma que JA' existia no alvo (correcao esperada); o
-    candidato B19 residual poderia, em tese, introduzir um prisma NOVO na
-    propria parede (a mesma posicao de junta repetida em toda fiada, sem
-    alternar) - gate extra, nunca assumido seguro so' por construcao.
+def _evaluate_b19_residual_candidate(wall_idx, fill_node_index, nodes, dirty_wall_idxs,
+                                     neighbor_wall_idxs, walls_to_create, catalog, num_courses,
+                                     baseline_result, trial_result, wall_credit_node_indices=None):
+    """HARD GATES do reparo B19 residual - fechamento -> colisao ->
+    INTEGRIDADE DO NO' (decisao de dominio, revisao pos-PR#19:
+    `_b19_tie_integrity_ok`, PRIMEIRO gate de dominio - sem ele nao
+    interessa nem checar prisma/compensador) -> prisma forcado NO ALVO
+    (acrescimo desta CR - a versao ARM so' precisa checar vizinha, porque
+    o alvo dela ja' tinha o prisma que esta' sendo corrigido) -> prisma
+    forcado em VIZINHA -> compensadores consecutivos (para CADA parede
+    `dirty` - alvo E vizinhas, MESMO escopo do SAFE REPAIR) -> regressao
+    de cobertura por fiada (idem, com `wall_credit_node_indices` quando
+    informado - MESMO mecanismo de credito fisico de no' do PR #18).
 
     Devolve `(aceito: bool, motivo: str ou None)` - motivo nunca escondido
     (auditoria dos candidatos negativos)."""
@@ -6884,6 +7010,9 @@ def _evaluate_b19_residual_candidate(wall_idx, neighbor_wall_idxs, walls_to_crea
         return False, "closure_regression"
     if not _no_new_collisions(baseline_result, trial_result):
         return False, "new_collision"
+    if not _b19_tie_integrity_ok(wall_idx, fill_node_index, nodes, num_courses,
+                                 trial_result.get("course_candidates") or {}):
+        return False, "no_tie_covering_node"
     before_audits = baseline_result.get("wall_bond_audits") or {}
     after_audits = trial_result.get("wall_bond_audits") or {}
     if _wall_forced_corner_prism_signature(wall_idx, after_audits) - \
@@ -6892,15 +7021,38 @@ def _evaluate_b19_residual_candidate(wall_idx, neighbor_wall_idxs, walls_to_crea
     if not _no_new_forced_corner_prism_in_neighbors(
             wall_idx, neighbor_wall_idxs, baseline_result, trial_result):
         return False, "new_forced_prism_in_neighbor"
-    if not _no_new_consecutive_compensators(
-            wall_idx, walls_to_create, catalog, num_courses,
-            baseline_result["course_candidates"], trial_result["course_candidates"]):
-        return False, "new_consecutive_compensators"
-    if not _no_new_row_coverage_regression(
-            wall_idx, walls_to_create, num_courses,
-            baseline_result["course_candidates"], trial_result["course_candidates"]):
-        return False, "row_coverage_regression"
+    for dirty_wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_consecutive_compensators(
+                dirty_wall_idx, walls_to_create, catalog, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"]):
+            return False, "new_consecutive_compensators:{}".format(dirty_wall_idx)
+    for dirty_wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_row_coverage_regression(
+                dirty_wall_idx, walls_to_create, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"],
+                node_indices=(wall_credit_node_indices or {}).get(dirty_wall_idx)):
+            return False, "row_coverage_regression:{}".format(dirty_wall_idx)
     return True, None
+
+
+def _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node):
+    """`(dirty_wall_idxs, neighbor_wall_idxs, wall_credit_node_indices)`
+    para um candidato - MESMO padrao do SAFE REPAIR (`repair_arm_role_
+    isolated_edges`): `dirty` = alvo + as paredes perpendiculares dos dois
+    nos envolvidos (quem realmente pode mudar fisicamente); credito de no'
+    flui nos dois sentidos (alvo credita dos dois nos; cada vizinha
+    credita so' do no' que a liga ao alvo) - nunca inferido por
+    proximidade."""
+    neighbor_fill = _node_other_wall_idx(nodes[fill_node], wall_idx)
+    neighbor_tie = _node_other_wall_idx(nodes[tie_node], wall_idx)
+    neighbor_wall_idxs = set(w for w in (neighbor_fill, neighbor_tie) if w is not None)
+    dirty_wall_idxs = {wall_idx} | neighbor_wall_idxs
+    wall_credit_node_indices = {wall_idx: [fill_node, tie_node]}
+    if neighbor_fill is not None:
+        wall_credit_node_indices.setdefault(neighbor_fill, []).append(fill_node)
+    if neighbor_tie is not None:
+        wall_credit_node_indices.setdefault(neighbor_tie, []).append(tie_node)
+    return dirty_wall_idxs, neighbor_wall_idxs, wall_credit_node_indices
 
 
 def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_courses,
@@ -6913,42 +7065,39 @@ def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_c
     reconstrucao REAL multi-banda via `rebuild_fn` -> hard gates -> aceita
     ou reverte - nunca aplica sem validar).
 
-    Problema que resolve: uma parede curta com um no' real (L_CORNER/
-    T_INTERSECTION) em CADA ponta fisica reserva, para CADA ponta, o
-    pior-caso da OUTRA (`CORNER_B34_ROOM_FT`, 34cm - ver `_wall_reserved_
-    range_ft`) - para paredes de ~54cm isso deixa so' ~20cm de espaco em
-    CADA ponta, sempre abaixo dos 34cm exigidos: as DUAS pontas degradam
-    (`_corner_single_element_candidate`, C09/C04) e NENHUMA amarracao real
-    (B34/B54) chega a se formar em nenhuma ponta - a condicao aprovada da
-    regra de B19 ("fill adjacente a peca de no' ja' integra NA MESMA
-    FIADA") nunca fica satisfeita, entao a regra de B19 sozinha (sem isto)
-    nao muda nada nestes casos.
+    B19 e' FILL, NUNCA TIE (decisao de dominio, revisao pos-PR#19): o
+    hard gate `_b19_tie_integrity_ok` exige, para TODA fiada onde o B19
+    exista, uma peca de amarracao real cobrindo geometricamente o MESMO
+    no' (de qualquer parede participante) - nunca aceito so' porque a
+    OUTRA ponta desta mesma parede fechou com peca real.
 
     Mecanismo: para cada parede candidata (`_b19_residual_edge_
-    candidates`), marca UM dos dois nos como `_b19_residual_fill_for_wall
-    = wall_idx` (NUNCA os dois - dois fills na mesma parede deixariam o
-    no' sem NENHUMA amarracao real) e reconstroi. A marca SO' afeta a
-    reserva/candidato desta `wall_idx` especifica (nunca de outra parede
-    que compartilhe o mesmo no' - ver docstring de `_wall_reserved_range_
-    ft`/`_corner_single_element_candidate`): a ponta NAO marcada passa a
-    ver reserva menor na ponta marcada, `room_ft` cresce o suficiente para
-    a peca de amarracao real caber; a ponta MARCADA, cujo proprio
-    `room_ft` nao muda, passa a preferir B19 em vez do compensador quando
-    `room_ft` cai na faixa aprovada.
+    candidates`), marca UM dos dois nos como fill (`_b19_residual_fill_
+    for_walls`, um CONJUNTO por no' - NUNCA um escalar unico, para nao
+    sobrescrever a marca aceita de outra parede que compartilhe o mesmo
+    no') e reconstroi. A marca SO' afeta a reserva desta `wall_idx`
+    especifica no' pinado (ver `_wall_reserved_range_ft`) - a reserva
+    dinamica (`_b19_residual_span_cm`, nunca um valor fixo) garante que a
+    ponta OPOSTA veja EXATAMENTE `CORNER_B34_ROOM_FT` de room, qualquer
+    que seja o residuo real desta parede (15-20cm) - nao so' o caso de
+    20cm que uma reserva fixa cobriria por coincidencia.
 
-    Tenta as DUAS atribuicoes possiveis (`node_a`=fill primeiro, depois o
-    inverso) - o corpus humano mostra as duas ocorrendo (TP1 W013: fill na
-    ponta T; TP1 W088: fill na ponta L) e nao ha' formula geometrica
-    simples para prever qual lado - os MESMOS hard gates do SAFE REPAIR
-    decidem, nunca uma heuristica nova por wall_idx/projeto. Aceita a
-    PRIMEIRA atribuicao que passa; nenhuma passando -> candidato
-    rejeitado, parede permanece EXATAMENTE como no ORIGINAL (reversivel,
-    sem side-effect - `nodes` volta ao estado sem marca).
+    Tenta as DUAS atribuicoes possiveis, em ORDEM CANONICA GEOMETRICA
+    (`_canonical_node_sort_key` - nunca por `end_index`/orientacao de
+    desenho da parede): aceita a PRIMEIRA que passa TODOS os hard gates,
+    incluindo `_b19_tie_integrity_ok`. Nenhuma atribuicao passando ->
+    candidato rejeitado, parede permanece EXATAMENTE como no ORIGINAL.
+
+    Apos processar todos os candidatos, faz um REBUILD FINAL com o
+    conjunto acumulado de marcas aceitas e REVALIDA cada candidato aceito
+    contra esse resultado final (accepted[] so' pode existir se o efeito
+    realmente sobrevive na combinacao final - qualquer aceito cujo efeito
+    nao sobreviva e' removido de `accepted`, sua marca e' revertida, e um
+    rebuild final e' refeito).
 
     Devolve {"changed": bool, "final_result": dict ou None, "accepted":
     [{"wall_idx", "fill_node", "tie_node"}], "rejected": [{"wall_idx",
-    "fill_node", "reason"}]} - motivos de rejeicao NUNCA escondidos, mesmo
-    contrato do SAFE REPAIR."""
+    "fill_node", "reason"}]} - motivos de rejeicao NUNCA escondidos."""
     candidates = _b19_residual_edge_candidates(
         nodes, walls_to_create, end_to_node, catalog, num_courses, baseline_result)
     if not candidates:
@@ -6958,34 +7107,58 @@ def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_c
     for cand in candidates:
         wall_idx = cand["wall_idx"]
         node_a, node_b = cand["node_a"], cand["node_b"]
-        neighbor_a = _node_other_wall_idx(nodes[node_a], wall_idx)
-        neighbor_b = _node_other_wall_idx(nodes[node_b], wall_idx)
-        neighbor_wall_idxs = set(w for w in (neighbor_a, neighbor_b) if w is not None)
 
         picked = None
         for fill_node, tie_node in ((node_a, node_b), (node_b, node_a)):
+            dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
             node = nodes[fill_node]
-            node["_b19_residual_fill_for_wall"] = wall_idx
+            marks = node.setdefault("_b19_residual_fill_for_walls", set())
+            marks.add(wall_idx)
             trial_result = rebuild_fn()
             ok, reason = _evaluate_b19_residual_candidate(
-                wall_idx, neighbor_wall_idxs, walls_to_create, catalog, num_courses,
-                baseline_result, trial_result)
+                wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
+                num_courses, baseline_result, trial_result, wall_credit_node_indices=credit)
             if ok:
                 picked = (fill_node, tie_node)
                 break
-            node.pop("_b19_residual_fill_for_wall", None)
+            marks.discard(wall_idx)
             rejected.append({"wall_idx": wall_idx, "fill_node": fill_node, "reason": reason})
 
         if picked is not None:
             accepted.append({"wall_idx": wall_idx, "fill_node": picked[0], "tie_node": picked[1]})
         # senao: `nodes` ja' esta' de volta ao estado ORIGINAL (ultimo
-        # pop acima, das duas tentativas) - fallback, mesmo padrao do
-        # SAFE REPAIR.
+        # `discard` acima, das duas tentativas) - fallback, mesmo padrao
+        # do SAFE REPAIR.
 
     if not accepted:
         return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
 
+    # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-PR#19, item
+    # "accepted implica efeito final"): revalida cada aceito contra a
+    # COMBINACAO final de todas as marcas - uma interacao entre dois
+    # candidatos aceitos (ex.: dirty_wall_idxs sobrepostos) poderia, em
+    # tese, invalidar um deles mesmo que cada um tenha passado sozinho.
     final_result = rebuild_fn()
+    still_valid = []
+    for entry in accepted:
+        wall_idx, fill_node, tie_node = entry["wall_idx"], entry["fill_node"], entry["tie_node"]
+        dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
+        ok, reason = _evaluate_b19_residual_candidate(
+            wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
+            num_courses, baseline_result, final_result, wall_credit_node_indices=credit)
+        if ok:
+            still_valid.append(entry)
+        else:
+            nodes[fill_node].get("_b19_residual_fill_for_walls", set()).discard(wall_idx)
+            rejected.append({"wall_idx": wall_idx, "fill_node": fill_node,
+                             "reason": "no_effect_after_final_combination:{}".format(reason)})
+
+    if len(still_valid) != len(accepted):
+        accepted = still_valid
+        if not accepted:
+            return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
+        final_result = rebuild_fn()
+
     return {"changed": True, "final_result": final_result, "accepted": accepted, "rejected": rejected}
 
 

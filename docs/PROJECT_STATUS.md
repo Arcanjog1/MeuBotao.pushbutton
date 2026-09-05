@@ -61,27 +61,27 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 ## Trabalho ativo
 
 - **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (branch
-  `claude/cr-block-b19-residual-fill-uythsk`, **não mergeado**) —
-  decisão humana aprovada sobre B19: pode fechar um trecho residual de
-  15-20cm ADJACENTE a uma peça de amarração de nó (B34/B54) já presente e
-  ÍNTEGRA na mesma fiada, nunca sendo ele mesmo a peça de amarração.
-  Implementado como reparo pós-hoc isolado (`repair_b19_residual_fill`,
-  mesmo padrão seguro do SAFE REPAIR do ARM — candidato → pin →
-  reconstrução completa → hard gates → aceita ou reverte).
-  TP1: 8 candidatos elegíveis, **8 aceitos, 0 rejeitados**
-  (`wall_idx` 12,13,14,15,87,88,89,90 — as paredes de 54cm T+L da
-  evidência de domínio); `COMPENSATOR_CONSECUTIVE` 1443→1275,
-  `COMPENSATOR_EXCESS_IN_RUN` 1067→928, `COVERAGE_GAP_IN_ROW` 327→309;
-  cobertura/colisão/prisma (nível 1) com delta zero fora das paredes
-  reparadas; `CONFIRMED_BY_HUMAN` na fiada par (`W013`/`W088` e
-  equivalentes). TGD: 0 candidatos elegíveis (limite de escopo
-  documentado — nenhuma parede da reconstrução atual tem a assinatura
-  geométrica exata). `JUNCTION_HALF_BLOCK_ADJACENT` TP1 0→34: convergência
-  ESPERADA para o padrão humano (259 ocorrências no gabarito aprovado),
-  não uma regressão — ver relatório. `baseline.json` do TP1
-  intencionalmente NÃO regravado. Relatório: `docs/BLOCK_B19_RESIDUAL_
-  FILL_IMPLEMENTATION.md`; regras: seção 35 de `nuvem/REGRAS_MODULACAO_
-  BLOCOS.md`. Aguarda autorização de merge; sem monitoramento automático.
+  `claude/cr-block-b19-residual-fill-uythsk`, PR #19, **não mergeado**,
+  **corrigido em revisão pós-review**) — decisão humana aprovada sobre
+  B19: pode fechar um trecho residual de 15-20cm quando existir, no
+  MESMO NÓ e na MESMA FIADA, uma peça de amarração real e íntegra
+  (B34/B54) cobrindo geometricamente o ponto físico do nó, nunca sendo
+  ele mesmo a peça de amarração. Implementado como reparo pós-hoc
+  isolado (`repair_b19_residual_fill`, mesmo padrão seguro do SAFE
+  REPAIR do ARM — candidato → pin → reconstrução completa → hard gates
+  (incl. NOVO gate de integridade geométrica do nó) → aceita ou
+  reverte). Uma primeira versão (aceitava com base só em o OUTRO lado da
+  parede fechar) foi revisada e corrigida: medição real provou 0/102
+  fiadas com amarração no MESMO nó/MESMA fiada. Com o gate corrigido,
+  **TP1: 8 candidatos elegíveis, 0 aceitos** (todos rejeitados por
+  `no_tie_covering_node` — o padrão de alternância par/ímpar do canto L
+  nunca amarra o nó de fill na mesma fiada do B19); TGD/Piloto: 0
+  candidatos elegíveis. Fingerprint idêntico com/sem o reparo nos três
+  projetos — **zero risco de regressão, zero efeito prático hoje**.
+  `baseline.json`/`reference.json` intocados (não há diferença nenhuma a
+  refletir). Relatório: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`;
+  regras: seção 35 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda
+  autorização de merge; sem monitoramento automático.
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
@@ -130,12 +130,16 @@ não é append-only).
   resultado; sem CR atribuído.
 - **Regra do meio-bloco (B19) perto de amarração** — evidência de domínio
   coletada (`docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`) e decisão
-  aprovada IMPLEMENTADA em branch separada, não mesclada
-  (`CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION`, ver "Trabalho ativo") —
-  B19 como fill residual de 15-20cm adjacente a peça de amarração real já
-  íntegra na mesma fiada, nunca substituindo B34/B54. TP1: 8/8 candidatos
-  aceitos; TGD: 0 candidatos elegíveis (limite de escopo). Regra na
-  `main` **ainda não alterada** (aguarda merge autorizado).
+  aprovada IMPLEMENTADA (e corrigida em revisão pós-review) em branch
+  separada, não mesclada (`CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION`,
+  PR #19, ver "Trabalho ativo") — B19 como fill residual de 15-20cm só
+  quando o MESMO nó/MESMA fiada tem amarração real íntegra cobrindo o
+  ponto físico, nunca substituindo B34/B54. Resultado medido no corpus
+  atual: **0 candidatos aceitos em TP1/TGD/Piloto** (o padrão de
+  alternância par/ímpar do canto L nunca satisfaz a condição de mesma
+  fiada) — mecanismo correto e testado, mas sem efeito físico hoje; zero
+  risco de regressão. Regra na `main` **ainda não alterada** (aguarda
+  merge autorizado).
 - **Detector de espessuras da UI** amostra só as primeiras 900 linhas
   cruas do layer — não limita o solver real, mas pode ocultar espessuras
   raras na sugestão da tela. Dívida de UX, não corrigida por decisão
