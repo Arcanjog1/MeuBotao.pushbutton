@@ -11,16 +11,14 @@
 
 ```
 branch: main
-SHA:    209695d5559b53fe4cc8a92300779a8ae73b7c1d
+SHA:    3ebcd9b63875f9114a3d6223aa648e5075e2d35b
 ```
 
-Último marco de PRODUÇÃO: `PR #18` / `CR-BLOCK-ARM-SAFE-REPAIR-GATE-
-FIDELITY` — **mesclado** (a `main` avançou de `4344c76` para `209695d`;
-ver "Estado oficial do solver" abaixo). Antes dele, `PR #17` /
-`CR-BLOCK-NODE-FILL-REVALIDATION` (metade simétrica da junta NÓ|FILL) —
-`docs/BLOCK_NODE_FILL_REVALIDATION.md`. Entre os dois, só merges
-**docs-only** (diff de produção declarado ZERO). Histórico anterior
-completo: `docs/PROJECT_STATUS_LOG.md`.
+Último marco de PRODUÇÃO: `PR #19` / `CR-BLOCK-B19-RESIDUAL-FILL-
+IMPLEMENTATION` — **mesclado** (a `main` avançou de `209695d` para
+`3ebcd9b`; ver "Estado oficial do solver" abaixo). Antes dele, `PR #18` /
+`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY`. Histórico anterior completo:
+`docs/PROJECT_STATUS_LOG.md`.
 
 ## Estado oficial do solver
 
@@ -55,33 +53,46 @@ Só o que está realmente mesclado na `main`, na ordem em que foi integrado:
   zero. Relatório: `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
   IMPLEMENTATION.md`; regras: seção 34 de
   `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
+- **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (`PR #19`, **mesclado**)
+  — decisão humana aprovada sobre B19: pode fechar um trecho residual de
+  15-20cm quando existir, no MESMO NO e na MESMA FIADA, uma peca de
+  amarracao real e integra (B34/B54) cobrindo geometricamente o ponto
+  fisico do no, nunca sendo ele mesmo a peca de amarracao. Implementado
+  como reparo pos-hoc isolado (`repair_b19_residual_fill`, mesmo padrao
+  seguro do SAFE REPAIR do ARM). Medido no corpus: **TP1 8 candidatos
+  elegiveis, 0 aceitos** (rejeitados por `no_tie_covering_node`);
+  TGD/Piloto 0 candidatos elegiveis - mecanismo correto, zero efeito
+  pratico hoje, zero risco de regressao. Relatorio:
+  `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`; regras: secao 35 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
 
 Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
-- **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (branch
-  `claude/cr-block-b19-residual-fill-uythsk`, PR #19, **não mergeado**,
-  **corrigido em revisão pós-review**) — decisão humana aprovada sobre
-  B19: pode fechar um trecho residual de 15-20cm quando existir, no
-  MESMO NÓ e na MESMA FIADA, uma peça de amarração real e íntegra
-  (B34/B54) cobrindo geometricamente o ponto físico do nó, nunca sendo
-  ele mesmo a peça de amarração. Implementado como reparo pós-hoc
-  isolado (`repair_b19_residual_fill`, mesmo padrão seguro do SAFE
-  REPAIR do ARM — candidato → pin → reconstrução completa → hard gates
-  (incl. NOVO gate de integridade geométrica do nó) → aceita ou
-  reverte). Uma primeira versão (aceitava com base só em o OUTRO lado da
-  parede fechar) foi revisada e corrigida: medição real provou 0/102
-  fiadas com amarração no MESMO nó/MESMA fiada. Com o gate corrigido,
-  **TP1: 8 candidatos elegíveis, 0 aceitos** (todos rejeitados por
-  `no_tie_covering_node` — o padrão de alternância par/ímpar do canto L
-  nunca amarra o nó de fill na mesma fiada do B19); TGD/Piloto: 0
-  candidatos elegíveis. Fingerprint idêntico com/sem o reparo nos três
-  projetos — **zero risco de regressão, zero efeito prático hoje**.
-  `baseline.json`/`reference.json` intocados (não há diferença nenhuma a
-  refletir). Relatório: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`;
-  regras: seção 35 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda
-  autorização de merge; sem monitoramento automático.
+- **CR-BLOCK-FIT-TOLERANCE-C04** (branch
+  `claude/cr-block-fit-tolerance-c04-n5qsc4`, **nao mergeado**,
+  **veredito NEEDS_FIX**) - tolerancia dedicada `PIER_FIT_TOLERANCE_CM`
+  (0,30cm, separada de `PIER_LAYOUT_TOLERANCE_CM`/
+  `MODULATION_WHOLE_CM_TOLERANCE_CM`, que continuam em 0,05cm) para o
+  mecanismo que decide se a sobra de um trecho e' modular/snapavel
+  (`_pier_remaining_snapped_cm` em `wall_stepper.py`;
+  `pier_closes_with_blocks_cm`/`wall_length_closes_with_blocks_cm` em
+  `modulation_math.py`). Destrava cobertura real: `COVERAGE_GAP_IN_ROW`
+  TGD 1959->1644/TP1 327->214, `blocks` TGD +1056/TP1 +1155 - bate a'
+  unidade com a ablacao independente que aprovou o valor. MAS introduz
+  um hard blocker medido: `OPENING_BLOCK_CROSSES_JAMB` TGD 108->144 (+36
+  genuinos)/TP1 168->173 (+5 genuinos) - pecas recem-destravadas
+  invadindo 0,12-0,267cm o vao livre de portas, acima do piso de ruido
+  do proprio validador (0,1cm). Confirmado independentemente pelo
+  guard-rail de regressao do benchmark
+  (`tests/regression/test_benchmark_baselines.py`: TP1 falha como
+  `REGRESSAO CRITICA` contra `baseline.json`, intocado por decisao da
+  CR; suite completa 736 passed / 2 failed, ambas conhecidas). Relatorio
+  completo:
+  `docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md`. **Aguarda decisao
+  humana sobre o hard blocker antes de qualquer autorizacao de merge;
+  sem monitoramento automatico.**
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`

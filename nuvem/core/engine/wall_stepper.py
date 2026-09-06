@@ -2986,12 +2986,21 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     5cm que `_pier_ordered_layout` sempre usou - extraida daqui para ser
     reusada tambem por `_pier_forced_bypass_layouts`, sem duplicar a
     logica). Devolve None quando o trecho NAO fecha (negativo, ou nao e'
-    multiplo de 5cm dentro de PIER_LAYOUT_TOLERANCE_CM); 0.0 (nunca None)
-    para um trecho de comprimento praticamente zero."""
+    multiplo de 5cm dentro de PIER_FIT_TOLERANCE_CM); 0.0 (nunca None)
+    para um trecho de comprimento praticamente zero.
+
+    CR-BLOCK-FIT-TOLERANCE-C04 (2026-09-06): as 3 comparacoes abaixo usam
+    PIER_FIT_TOLERANCE_CM (0,30cm), NAO PIER_LAYOUT_TOLERANCE_CM (0,05cm) -
+    esta funcao E' o mecanismo "resto do trecho considerado modular/
+    snapavel" que a CR mira. As OUTRAS ocorrencias de
+    PIER_LAYOUT_TOLERANCE_CM neste arquivo (checagem de SEM_ESPACO/colisao,
+    consistencia do DP de stagger, adjacencia de compensador consecutivo)
+    ficam DE PROPOSITO em 0,05cm - sao contratos diferentes que a CR
+    proibe alargar (ver PIER_FIT_TOLERANCE_CM em modulation_math.py)."""
     remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
-    if remaining < -PIER_LAYOUT_TOLERANCE_CM:
+    if remaining < -PIER_FIT_TOLERANCE_CM:
         return None
-    if remaining <= PIER_LAYOUT_TOLERANCE_CM:
+    if remaining <= PIER_FIT_TOLERANCE_CM:
         return 0.0
     # TOLERANCIA REAL, NAO 1e-6 (corrigido 2026-08-21). `pier_cm` vem de
     # coordenadas do CAD que passaram por conversoes pes<->cm e por
@@ -2999,9 +3008,13 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     # borda de encontro sai em 829,99791cm em vez de 830cm - 0,002cm de
     # ruido. Com o teste antigo (1e-6) isso REPROVAVA o trecho como
     # "modulacao nao fecha": 116 dos 344 trechos nao-modulares medidos
-    # tinham o comprimento certo e falhavam so' por isso.
+    # tinham o comprimento certo e falhavam so' por isso. Ampliada de
+    # 0,05cm para PIER_FIT_TOLERANCE_CM (0,30cm) em CR-BLOCK-FIT-
+    # TOLERANCE-C04: ruido acumulado de VARIAS operacoes encadeadas
+    # (encontro + extend_wall_ends_to_junctions) passa de 0,05cm em
+    # trechos reais do corpus - medido, nao suposto (ver constante).
     snapped = PIER_MODULE_CM * round(remaining / PIER_MODULE_CM)
-    if abs(remaining - snapped) > PIER_LAYOUT_TOLERANCE_CM:
+    if abs(remaining - snapped) > PIER_FIT_TOLERANCE_CM:
         return None
     # Devolve o valor EXATO (arredondado ao modulo): assim o ruido nao se
     # acumula bloco a bloco no laco guloso do chamador (a peca final
