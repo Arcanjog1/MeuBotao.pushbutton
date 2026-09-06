@@ -355,50 +355,44 @@ Confirma preservados sem regressão: `NODE_FILL_OPPOSITE_COURSE_ENABLED`,
 convergência de ponto fixo do B19, Gate Fidelity, contrato
 `arm_role_safe_repair=False`.
 
-## Suíte completa (seção 19)
+## Suíte completa (seção 19 / FASE 14)
 
 ```
 python3 -m pytest tests -q
-======================== 2 failed, 736 passed in 2147.59s (0:35:47) ========================
+STATE_B_BLOCKED (1ª volta): 736 passed, 2 failed  (35:47)
+STATE_C          (2ª volta): 797 passed, 2 failed  (44:03)
 ```
 
-Falhas — **ambas esperadas/conhecidas**, ambas em
-`tests/regression/test_benchmark_baselines.py::
-test_projeto_nao_regrediu_contra_o_baseline` (o guard-rail de regressão
-do benchmark, item 12 do processo do projeto, comparando contra o
-`baseline.json` **congelado** de cada projeto — que a CR proíbe
-atualizar, seção 20):
+O salto de 736→797 é a suíte nova da guarda (`test_block_fit_tolerance_
+c04_jamb_guard.py`). As 2 falhas são as MESMAS duas de sempre —
+`tests/regression/test_benchmark_baselines.py`, o guard-rail que compara
+contra o `baseline.json` **congelado por decisão da CR** (seção 20) — mas o
+conteúdo delas mudou, e é isso que importa:
 
-- **TGD**: não dispara o veredito `REGRESSAO CRITICA` (o
-  `baseline.json` do TGD já registrava `OPENING_BLOCK_CROSSES_JAMB=147`,
-  mais alto que o STATE_B medido de 144 — ou seja, contra ESSE baseline
-  específico, mesmo com o efeito colateral desta CR, o TGD ainda
-  MELHOROU nesse código; o baseline é mais antigo que a medição STATE_A
-  desta CR). Falha, em vez disso, no assert de categoria:
-  `{'category': 'compensators', 'before': 52, 'after': 61, 'delta': 9,
-  'status': 'REGRESSAO'}` — mais paredes com pelo menos um achado de
-  compensador, consequência direta do `EXPECTED_EXPOSURE` já registrado
-  na tabela de delta acima (`COMPENSATOR_CONSECUTIVE`/
-  `COMPENSATOR_EXCESS_IN_RUN`/etc.).
-- **TP1**: dispara `REGRESSAO CRITICA` de fato:
-  `{'code': 'OPENING_BLOCK_CROSSES_JAMB', 'before': 168, 'after': 173,
-  'delta': 5, 'status': 'REGRESSAO CRITICA'}` — a MESMA regressão
-  documentada na seção acima, confirmada por um caminho totalmente
-  independente da análise manual. Também aparece
-  `{'code': 'JUNCTION_MISSING_BINDING', 'before': 8, 'after': 9, ...}`
-  — **não é desta CR**: o `baseline.json` do TP1 tem `8` gravado, mas o
-  valor real já era `9` em STATE_A (main pristina, antes de qualquer
-  mudança desta CR — ver seção 13/STATE_A acima, e
-  `docs/CURRENT_REFERENCE_SNAPSHOT.md`, que documenta esta mesma
-  divergência preexistente como `P3 — BENCHMARK_ARTIFACT`); STATE_B
-  preserva o valor real (9) sem alteração.
+| projeto | STATE_B_BLOCKED | STATE_C |
+|---|---|---|
+| TGD | `REGRESSAO` categoria `compensators` 52→61 paredes | **igual** (`compensators` 52→61) |
+| TP1 | `REGRESSAO CRITICA`: **`OPENING_BLOCK_CROSSES_JAMB` 168→173** + `JUNCTION_MISSING_BINDING` 8→9 | `REGRESSAO CRITICA`: **só** `JUNCTION_MISSING_BINDING` 8→9 |
 
-Isto é o comportamento CORRETO e ESPERADO: a CR proíbe explicitamente
-atualizar `baseline.json`/`reference.json`/`reference_score.json`
-(seção 20) até decisão humana — então estes 2 testes PRECISAM continuar
-vermelhos enquanto o `NEEDS_FIX` acima não for resolvido (ou o baseline
-regravado deliberadamente, decisão fora do escopo desta CR). Os outros
-736 testes da suíte completa passam.
+Ou seja: o guard-rail independente do benchmark **confirma, por um caminho
+totalmente separado da análise manual, que a regressão crítica de jamba
+desapareceu**. O que resta é:
+
+- `JUNCTION_MISSING_BINDING` 8→9 no TP1: **pré-existente**, não desta CR — o
+  `baseline.json` gravou `8`, mas o valor real já era `9` em STATE_A
+  (`REAL_SOLVER_DEFECT`, seção 13 da CR, explicitamente fora de escopo);
+- categoria `compensators` no TGD: o `EXPECTED_EXPOSURE` documentado (mais
+  paredes com achado de compensador nos trechos recém-preenchidos), que
+  esta CR não deve corrigir (seção 8).
+
+Nenhuma das duas é código crítico novo atribuível a esta CR, e nenhuma pode
+ser "resolvida" aqui sem tocar em `baseline.json` — o que a CR proíbe.
+
+Nota de rigor: a suíte completa rodou sobre o código de produção final; a
+única alteração posterior ao disparo foi um bloco de docstring (pré-condição
+de `_layout_fitted_to_physical_span`), sem efeito de comportamento. Os 12
+testes do ramo `prefer_avoiding` foram adicionados depois e rodados à parte
+(73 passed no arquivo da guarda).
 
 ## Validação humana
 
@@ -689,7 +683,7 @@ dentro do vão.
 
 ## Testes adicionados
 
-`tests/test_block_fit_tolerance_c04_jamb_guard.py` — **61 testes**, sobre
+`tests/test_block_fit_tolerance_c04_jamb_guard.py` — **73 testes**, sobre
 as funções de PRODUÇÃO e sobre o solver COMPLETO (nunca helper inventado):
 
 - aritmética de `pier_cm_floored_to_module`, incluindo a prova de que a
@@ -914,11 +908,13 @@ testes permanentes. **`NEW_AFTER_C04`: nenhum.**
 ## Testes (2ª volta)
 
 ```
-tests/test_block_fit_tolerance_c04_jamb_guard.py    61 passed
+tests/test_block_fit_tolerance_c04_jamb_guard.py    73 passed
 tests/test_block_fit_tolerance_c04.py + nuvem/tests/test_modulation_broken_length.py
                                                     61 passed
 suíte focada (B19 + ARM contract + Gate Fidelity + NODE-FILL + prism stagger)
                                                    140 passed  (19:21)
+suíte completa  python3 -m pytest tests -q        797 passed, 2 failed (44:03)
+                (as 2 = guard-rail do baseline congelado; ver "Suíte completa")
 ```
 
 ## Veredito
