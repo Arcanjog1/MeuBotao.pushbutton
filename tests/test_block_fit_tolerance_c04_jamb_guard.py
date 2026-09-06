@@ -96,12 +96,12 @@ def sub(lo_cm, hi_cm, leading_open=True, trailing_open=True,
             "left_opening": left_opening, "right_opening": right_opening}
 
 
-def solve_repair(sub_entry):
+def solve_repair(sub_entry, prefer_avoiding=False, avoid_joints_cm=None):
     """Chama a FUNCAO DE PRODUCAO `_solve_repair_subsegments` com um plano
     de uma unica sobra solida."""
     plan = {"segments": [sub_entry], "undersized": []}
     solved, failures = m._solve_repair_subsegments(
-        plan, CATALOG, True, [], [], False)
+        plan, CATALOG, True, avoid_joints_cm or [], [], prefer_avoiding)
     return solved, failures
 
 
@@ -260,6 +260,21 @@ class TestGuardaFisicaNoReparo(object):
         layout = m._layout_fitted_to_physical_span(
             [("B19", 0.0, 19.0)], 3.0, sub(0.0, 3.0), lambda _span: None)
         assert layout is None
+
+    # ---- os DOIS ramos de layout do reparo passam pela guarda ----
+    @pytest.mark.parametrize("nome", sorted(CORPUS_SPANS))
+    @pytest.mark.parametrize("prefer_avoiding", [False, True])
+    def test_ambos_os_ramos_de_layout_respeitam_a_fronteira(self, nome, prefer_avoiding):
+        """`_solve_repair_subsegments` tem dois caminhos - o normal
+        (`_pier_ordered_layout`) e o de desencontro de junta
+        (`_pier_layout_avoiding_joints`, `prefer_avoiding=True`). A guarda
+        cobre os dois."""
+        span, _invasao = CORPUS_SPANS[nome]
+        solved, _f = solve_repair(sub(0.0, span), prefer_avoiding=prefer_avoiding,
+                                  avoid_joints_cm=[10.0, 20.0])
+        assert len(solved) == 1
+        _s, layout = solved[0]
+        assert layout_end_cm(layout) <= span + PHYS_TOL
 
     # ---- a guarda nao inventa peca: usa composicao que o solver ja' monta --
     def test_composicao_reduzida_e_a_do_proprio_solver(self):
