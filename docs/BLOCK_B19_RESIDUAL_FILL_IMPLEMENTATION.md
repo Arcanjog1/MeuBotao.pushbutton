@@ -108,8 +108,9 @@ Detalhamento completo das 9 correções: seção 35.3 das regras. Resumo:
    ARM); pega uma regressão real que a versão original deixaria passar
    em `wall_idx=93` do TP1 (18 sequências novas de compensador
    consecutivo).
-7. Revalidação final pós-combinação — garante `accepted[] ⟹ efeito
-   físico presente no resultado final entregue`.
+7. Revalidação final CONVERGE ATÉ PONTO FIXO (corrigida numa segunda
+   revisão — ver seção "Segunda revisão" abaixo) — garante `accepted[]
+   ⟹ efeito físico presente no resultado final ESTABILIZADO`.
 8. `audit_wall_bond_quality` (`wall_modeling.py`): isenção do
    `HALF_BLOCK_NEAR_TIE` agora verifica a condição geométrica
    diretamente (defesa em profundidade), nunca confia só na etiqueta
@@ -151,6 +152,46 @@ complementares às que o B19 ocuparia. Consequências:
   aqui) que trate a alternância par/ímpar como amarração válida "ao
   longo da altura".
 
+## Segunda revisão — convergência de ponto fixo (achado H/I)
+
+Uma segunda revisão independente, reproduzindo o cenário com a própria
+função `repair_b19_residual_fill`, encontrou uma lacuna na revalidação
+final descrita acima (item 7): "uma única revalidação + no máximo um
+rebuild corretivo" não cobre uma cascata de invalidação de SEGUNDA
+ordem. Contraexemplo reproduzido: com três candidatos A, B, C, cada um
+passa individualmente; a combinação `{A,B,C}` invalida A; removido A, o
+NOVO mundo `{B,C}` também invalida B (só visível DEPOIS que A já saiu);
+só C permanece válido. O código anterior entregava `accepted=[B,C]` com
+B já inválido — violando `accepted[] ⟹ efeito físico válido no
+resultado final`.
+
+**Correção**: a revalidação final agora converge até ponto fixo — cada
+iteração reconstrói com o conjunto atual de marcas aceitas, revalida
+cada aceito restante (reutilizando `_evaluate_b19_residual_candidate`,
+nenhuma lógica duplicada/simplificada), remove os inválidos em ordem
+canônica geométrica (`_canonical_node_sort_key` — nunca por ordem de
+inserção de set/dict) e repete até que nenhum candidato adicional seja
+removido. `accepted` só pode DIMINUIR nessa fase — nunca readiciona um
+candidato removido — garantindo terminação finita (no máximo
+`len(accepted)` remoções + 1 iteração de confirmação; um guard
+defensivo levanta erro explícito se essa cota teórica for excedida, o
+que nunca deveria acontecer). Único arquivo de produção tocado nesta
+segunda correção: `wall_stepper.py` — nenhuma mudança de domínio (regra
+B19, faixa residual, tie integrity, canonical ordering, dirty scope,
+audit, `arm_role_safe_repair=False`, NODE-FILL, Gate Fidelity, rotated
+corners e `W039`/`W041` permanecem intocados).
+
+Testes novos (T54-T58): o contraexemplo A→B→C literal (T54); uma cadeia
+mais profunda de 4 níveis provando que não há suposição de "no máximo
+duas passadas" (T55); o caminho sem cascata, onde todos permanecem
+aceitos (T56); o caso em que a combinação completa invalida TODOS os
+candidatos inicialmente aceitos, sem estado residual (T57); e
+determinismo da convergência em execuções separadas (T58). Resultado no
+corpus real (TGD/TP1/Piloto) inalterado por esta correção — continua
+ZERO candidatos aceitos nos três projetos (a correção fecha uma lacuna
+que o corpus atual não chegava a exercitar, já que nunca há mais de um
+candidato aceito simultaneamente hoje).
+
 ## Achado adicional não bloqueante
 
 `B19_RESIDUAL_FILL_MIN_CM = 15.0` permite elegibilidade de parede para
@@ -181,7 +222,7 @@ inofensivo). Ver seção 35.5 das regras.
 ## Tests
 
 `tests/test_block_b19_residual_fill_implementation.py` — reescrita
-completa na revisão (T1-T53): **65 rápidos + 5 `slow`, todos passing**.
+completa nas duas revisões (T1-T58): **70 rápidos + 6 `slow`, todos passing** (T54-T58 acrescentados na segunda revisão — convergência de ponto fixo, ver 35.8).
 Cobre topologia; fórmula única de resíduo na matriz completa
 (14,9/15/18/19/20/20,1cm); reserva dinâmica (prova 34cm de room para
 qualquer resíduo na faixa); isolamento do estado por `(nó, parede)` via

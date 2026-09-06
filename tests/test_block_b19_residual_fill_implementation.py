@@ -35,9 +35,13 @@ Tambem corrigidos nesta revisao (achados da auditoria de integracao):
   ARM) - antes os gates de compensador/cobertura so' olhavam a propria
   parede alvo, deixando passar uma regressao real numa vizinha (medida:
   wall_idx=93 do TP1, 18 sequencias novas de compensador).
-  - `repair_b19_residual_fill` revalida cada candidato aceito contra a
+  - `repair_b19_residual_fill` CONVERGE ATE PONTO FIXO contra a
   COMBINACAO final de todas as marcas (accepted[] so' existe se o efeito
-  sobrevive no `final_result`).
+  sobrevive no `final_result` ESTABILIZADO - revisao pos-review #2: uma
+  unica revalidacao + no maximo um rebuild corretivo nao bastava para uma
+  cascata de invalidacao de SEGUNDA ordem, reproduzida literalmente em
+  `test_t54_cascata_adversarial_a_remove_b_remove_c_final_e_so_c` -
+  ver T54-T58).
 - `audit_wall_bond_quality` (wall_modeling.py): a isencao de
   HALF_BLOCK_NEAR_TIE agora verifica a condicao geometrica DIRETAMENTE
   (defesa em profundidade), nunca confia so' na etiqueta `placement_
@@ -1142,3 +1146,227 @@ def test_t53_arm_role_safe_repair_false_desliga_tudo_contrato_preservado():
     )
     assert "arm_role_safe_repair" not in result
     assert "b19_residual_fill_repair" not in result
+
+
+# =====================================================================
+# T54-T59 - CONVERGENCIA ATE PONTO FIXO (revisao pos-review #2 do PR #19)
+# =====================================================================
+#
+# A revisao independente reproduziu, com a funcao REAL
+# `repair_b19_residual_fill`, um contraexemplo de cascata de invalidacao
+# de SEGUNDA ordem: com tres candidatos A, B, C, cada um passa sozinho;
+# a COMBINACAO {A,B,C} invalida A; removido A, o NOVO mundo {B,C} TAMBEM
+# invalida B (so' visivel DEPOIS que A ja' saiu); C permanece valido. O
+# codigo antigo (uma unica revalidacao + no maximo um rebuild corretivo)
+# entregava `accepted=[B,C]` com B ja' invalido - violando `accepted[] =>
+# efeito fisico valido no resultado final`. Estes testes fixam esse
+# contraexemplo permanentemente (nunca dependem de um arquivo temporario
+# de revisao fora do repositorio).
+
+
+def _n_independent_setups(n):
+    """`n` sistemas parede-alvo FISICAMENTE INDEPENDENTES (mesmo padrao
+    de `_two_end_setup(54.0)`, lado a lado sem sobreposicao - cada
+    sistema `i` ocupa `wall_idx` [4i, 4i+3] (alvo, braco T, braco L,
+    parede SINTETICA de amarracao) e `node_index` [2i, 2i+1] (no' T, no'
+    L)) - usado pelos testes de convergencia com MULTIPLOS candidatos
+    interagindo so' atraves do `rebuild_fn` fake (nunca por geometria
+    compartilhada - cada sistema fica a 1000cm de distancia dos outros).
+    Devolve `(walls, nodes, end_to_node, systems)`, `systems[i]` =
+    `{"target_idx", "node_t", "node_l", "tie_idx", "original"}`."""
+    walls, nodes, end_to_node, systems = [], [], {}, []
+    for i in range(n):
+        base_x = i * 1000.0
+        walls.extend([
+            _wall(base_x, 0, base_x + 54.0, 0),
+            _wall(base_x, -100, base_x + 100, -100),
+            _wall(base_x + 54.0, 0, base_x + 154.0, 0),
+            _wall(base_x, 100, base_x + 100, 100),  # parede sintetica de amarracao (tie_idx)
+        ])
+        target_idx, arm_t_idx, arm_l_idx, tie_idx = 4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3
+        node_t, node_l = 2 * i, 2 * i + 1
+        t_point = XYZ(ft(base_x), 0.0, 0.0)
+        l_point = XYZ(ft(base_x + 54.0), 0.0, 0.0)
+        nodes.append(_t_node(t_point, main_idx=arm_t_idx, incoming_idx=target_idx))
+        nodes.append(_l_node(l_point, target_idx, 1, arm_l_idx, 0))
+        end_to_node[(target_idx, 0)] = node_t
+        end_to_node[(target_idx, 1)] = node_l
+        original = [
+            _end_piece(walls, target_idx, "C09", 9.0, 0, node_t, "T_INTERSECTION_INCOMING_DEGRADED"),
+            _end_piece(walls, target_idx, "C09", 9.0, 1, node_l, "L_CORNER_DEGRADED"),
+        ]
+        systems.append({"target_idx": target_idx, "node_t": node_t, "node_l": node_l,
+                        "tie_idx": tie_idx, "original": original})
+    return walls, nodes, end_to_node, systems
+
+
+def _cascading_rebuild_fn(walls, nodes, systems, cascade_rule):
+    """`rebuild_fn` fake para N sistemas independentes: a peca de FILL
+    (B19) e' colocada assim que o no' respectivo e' marcado; a peca de
+    TIE (real, da parede sintetica `tie_idx`) so' e' fornecida na PRIMEIRA
+    chamada em que o no' de FILL de cada sistema aparece marcado (garante
+    que o LOOP PRINCIPAL por candidato aceite CADA UM individualmente,
+    nunca dependendo da ordem em que os outros ja' foram aceitos) - a
+    partir da SEGUNDA chamada com aquele no' marcado (ou seja, so' nas
+    revalidacoes: a combinacao final e o loop de ponto fixo),
+    `cascade_rule(active_frozenset)` decide quais indices `i` (dentre os
+    ATIVOS) tem a peca de tie RETIRADA nesta chamada especifica - e' aqui
+    que a interacao entre candidatos (a cascata) e' simulada, de forma
+    100% deterministica e sem geometria real compartilhada."""
+    seen_first_l_call = [False] * len(systems)
+
+    def rebuild_fn():
+        active = frozenset(
+            i for i, s in enumerate(systems)
+            if s["target_idx"] in (nodes[s["node_l"]].get("_b19_residual_fill_for_walls") or ()))
+        withheld = cascade_rule(active)
+        cc = []
+        for i, s in enumerate(systems):
+            pinned_t = s["target_idx"] in (nodes[s["node_t"]].get("_b19_residual_fill_for_walls") or ())
+            pinned_l = i in active
+            if pinned_t:
+                cc.append(_b19_fill_at(walls, nodes, fill_node=s["node_t"], tie_node=s["node_l"],
+                                       wall_idx=s["target_idx"]))
+            elif pinned_l:
+                cc.append(_b19_fill_at(walls, nodes, fill_node=s["node_l"], tie_node=s["node_t"],
+                                       wall_idx=s["target_idx"]))
+                first_call = not seen_first_l_call[i]
+                seen_first_l_call[i] = True
+                if first_call or i not in withheld:
+                    cc.append(_real_tie_at(walls, nodes, fill_node=s["node_l"], wall_idx=s["tie_idx"],
+                                           dir_away=XYZ(0.0, 1.0, 0.0)))
+            else:
+                cc.extend(s["original"])
+        return _base_gate_result({0: cc})
+
+    return rebuild_fn
+
+
+def test_t54_cascata_adversarial_a_remove_b_remove_c_final_e_so_c():
+    """O contraexemplo LITERAL da revisao independente: A, B e C passam
+    individualmente; a combinacao {A,B,C} invalida A; removido A, {B,C}
+    invalida B; C permanece valido. `accepted` final tem que ser SO' C -
+    A e B tem que aparecer em `rejected`, e o `final_result` fisico so'
+    pode conter a peca de C."""
+    walls, nodes, end_to_node, systems = _n_independent_setups(3)
+    baseline_result = _base_gate_result({0: sum((s["original"] for s in systems), [])})
+
+    def cascade_rule(active):
+        # enquanto mais de um sistema estiver ativo, o de MENOR indice
+        # perde a amarracao nesta chamada - A(0) cai primeiro, depois B(1);
+        # C(2) sozinho nunca cai.
+        return {min(active)} if len(active) > 1 else set()
+
+    rebuild_fn = _cascading_rebuild_fn(walls, nodes, systems, cascade_rule)
+    outcome = m.repair_b19_residual_fill(nodes, walls, end_to_node, CATALOG, 1, baseline_result, rebuild_fn)
+
+    assert outcome["changed"] is True
+    assert outcome["accepted"] == [{"wall_idx": systems[2]["target_idx"],
+                                    "fill_node": systems[2]["node_l"],
+                                    "tie_node": systems[2]["node_t"]}]
+
+    rejected_final_combo = [r for r in outcome["rejected"]
+                            if r["reason"].startswith("no_effect_after_final_combination")]
+    assert {r["wall_idx"] for r in rejected_final_combo} == {systems[0]["target_idx"], systems[1]["target_idx"]}
+
+    # shared-node state: SO' as marcas de A e B foram revertidas - a de C
+    # continua intacta (nenhum candidato removido afeta outro no').
+    assert systems[0]["target_idx"] not in (nodes[systems[0]["node_l"]].get("_b19_residual_fill_for_walls") or set())
+    assert systems[1]["target_idx"] not in (nodes[systems[1]["node_l"]].get("_b19_residual_fill_for_walls") or set())
+    assert systems[2]["target_idx"] in (nodes[systems[2]["node_l"]].get("_b19_residual_fill_for_walls") or set())
+
+    # accepted -> final_result estabilizado: SO' a peca de C existe fisicamente.
+    final_codes = [(c["logical_code"], c.get("placement_reason"), c.get("wall_idx"))
+                  for c in outcome["final_result"]["course_candidates"][0]]
+    assert ("B19", "B19_RESIDUAL_FILL", systems[2]["target_idx"]) in final_codes
+    assert ("B19", "B19_RESIDUAL_FILL", systems[0]["target_idx"]) not in final_codes
+    assert ("B19", "B19_RESIDUAL_FILL", systems[1]["target_idx"]) not in final_codes
+
+
+def test_t55_cascata_mais_profunda_quatro_niveis_nunca_assume_duas_passadas():
+    """Cadeia de 4 (A remove B remove C remove D, so' D sobrevive) - prova
+    que a convergencia nao assume um maximo de duas passadas (o bug da
+    versao anterior so' fazia UMA revalidacao + UM rebuild corretivo, o
+    que bastaria para o caso de 2 niveis mas nao para este)."""
+    walls, nodes, end_to_node, systems = _n_independent_setups(4)
+    baseline_result = _base_gate_result({0: sum((s["original"] for s in systems), [])})
+
+    def cascade_rule(active):
+        return {min(active)} if len(active) > 1 else set()
+
+    rebuild_fn = _cascading_rebuild_fn(walls, nodes, systems, cascade_rule)
+    outcome = m.repair_b19_residual_fill(nodes, walls, end_to_node, CATALOG, 1, baseline_result, rebuild_fn)
+
+    assert outcome["changed"] is True
+    assert outcome["accepted"] == [{"wall_idx": systems[3]["target_idx"],
+                                    "fill_node": systems[3]["node_l"],
+                                    "tie_node": systems[3]["node_t"]}]
+    assert len([r for r in outcome["rejected"]
+               if r["reason"].startswith("no_effect_after_final_combination")]) == 3
+
+
+def test_t56_sem_cascata_todos_permanecem_aceitos():
+    """Caminho normal: se A+B+C continuam validos juntos (nenhuma
+    interacao adversa), a convergencia acontece na PRIMEIRA iteracao -
+    todos os 3 permanecem `accepted`, `final_result` identico ao primeiro
+    rebuild convergente, nenhum candidato removido indevidamente."""
+    walls, nodes, end_to_node, systems = _n_independent_setups(3)
+    baseline_result = _base_gate_result({0: sum((s["original"] for s in systems), [])})
+
+    def cascade_rule(active):
+        return set()  # nunca retira amarracao de ninguem
+
+    rebuild_fn = _cascading_rebuild_fn(walls, nodes, systems, cascade_rule)
+    outcome = m.repair_b19_residual_fill(nodes, walls, end_to_node, CATALOG, 1, baseline_result, rebuild_fn)
+
+    assert outcome["changed"] is True
+    assert {(a["wall_idx"], a["fill_node"]) for a in outcome["accepted"]} == \
+        {(s["target_idx"], s["node_l"]) for s in systems}
+    assert not any(r["reason"].startswith("no_effect_after_final_combination") for r in outcome["rejected"])
+
+
+def test_t57_todos_caem_juntos_na_combinacao_final():
+    """`accepted` inicial nao vazio (3) -> a convergencia remove TODOS
+    (a combinacao COMPLETA dos tres e' quem invalida todo mundo, nunca so'
+    um subconjunto) -> `accepted=[]`, `final_result=None`, nenhum estado
+    residual (nenhuma marca sobrevive em nenhum no')."""
+    walls, nodes, end_to_node, systems = _n_independent_setups(3)
+    baseline_result = _base_gate_result({0: sum((s["original"] for s in systems), [])})
+    n = len(systems)
+
+    def cascade_rule(active):
+        return active if len(active) == n else set()
+
+    rebuild_fn = _cascading_rebuild_fn(walls, nodes, systems, cascade_rule)
+    outcome = m.repair_b19_residual_fill(nodes, walls, end_to_node, CATALOG, 1, baseline_result, rebuild_fn)
+
+    assert outcome["changed"] is False
+    assert outcome["final_result"] is None
+    assert outcome["accepted"] == []
+    assert len([r for r in outcome["rejected"]
+               if r["reason"].startswith("no_effect_after_final_combination")]) == n
+    for s in systems:
+        assert s["target_idx"] not in (nodes[s["node_l"]].get("_b19_residual_fill_for_walls") or set())
+        assert s["target_idx"] not in (nodes[s["node_t"]].get("_b19_residual_fill_for_walls") or set())
+
+
+def test_t58_convergencia_e_deterministica_em_execucoes_separadas():
+    """O contraexemplo adversarial (T54) produz EXATAMENTE o mesmo
+    resultado (accepted/rejected, mesma ordem) em duas execucoes
+    independentes com estado fresco - a remocao durante a convergencia
+    usa ordenacao CANONICA GEOMETRICA, nunca ordem de set/dict."""
+    def run_once():
+        walls, nodes, end_to_node, systems = _n_independent_setups(3)
+        baseline_result = _base_gate_result({0: sum((s["original"] for s in systems), [])})
+
+        def cascade_rule(active):
+            return {min(active)} if len(active) > 1 else set()
+
+        rebuild_fn = _cascading_rebuild_fn(walls, nodes, systems, cascade_rule)
+        outcome = m.repair_b19_residual_fill(nodes, walls, end_to_node, CATALOG, 1, baseline_result, rebuild_fn)
+        return (outcome["accepted"],
+               [(r["wall_idx"], r["fill_node"], r["reason"]) for r in outcome["rejected"]])
+
+    result_1 = run_once()
+    result_2 = run_once()
+    assert result_1 == result_2

@@ -4953,9 +4953,12 @@ Relatório completo: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`.
 crítico foi confirmado: os 8 candidatos que ela aceitava no TP1 não
 tinham NENHUMA peça de amarração cobrindo o MESMO nó na MESMA fiada
 (0/102 fiadas) — a peça de amarração real formava-se sempre na OUTRA
-ponta da parede, nunca no nó onde o B19 estava. Esta seção documenta a
-versão CORRIGIDA, com a decisão de domínio explícita que fecha essa
-lacuna.
+ponta da parede, nunca no nó onde o B19 estava. Uma segunda revisão
+independente, já sobre a versão corrigida, encontrou um segundo achado
+(convergência da revalidação final incompleta sob cascata de segunda
+ordem — ver 35.8) e a correção foi aplicada NO MESMO PR/branch. Esta
+seção documenta a versão final, com a decisão de domínio explícita e a
+convergência de ponto fixo que fecham as duas lacunas.
 
 ### 35.1 Regra aprovada (versão final)
 
@@ -5053,13 +5056,15 @@ aceita ou reverte.
    (`new_consecutive_compensators:93`, coberto por teste sintético).
    `wall_credit_node_indices` é repassado ao gate de cobertura, mesmo
    mecanismo de crédito físico de nó do PR #18.
-7. **Revalidação final** (`repair_b19_residual_fill`): depois de aceitar
-   candidatos individualmente, um REBUILD FINAL com a combinação completa
-   de marcas é feito, e cada candidato aceito é revalidado contra esse
-   resultado final — um candidato cujo efeito não sobreviva na combinação
-   é removido de `accepted`, sua marca é revertida, e um rebuild final é
-   refeito. Garante `accepted[] ⟹ efeito físico presente no resultado
-   final entregue`.
+7. **Revalidação final CONVERGE ATÉ PONTO FIXO** (`repair_b19_residual_
+   fill` — corrigida de novo na revisão #2, ver 35.8): depois de aceitar
+   candidatos individualmente, cada iteração reconstrói com o conjunto
+   ATUAL de marcas aceitas e revalida CADA aceito restante contra ESSE
+   resultado; os inválidos são removidos (ordem canônica geométrica) e o
+   processo repete até que nenhum candidato adicional seja removido. Só
+   então `accepted[]`/`final_result` são devolvidos. Garante `accepted[]
+   ⟹ efeito físico presente no resultado final ESTABILIZADO` — mesmo sob
+   cascatas de invalidação de segunda ordem (ver 35.8).
 8. **`audit_wall_bond_quality`** (`wall_modeling.py`, rede de segurança
    `HALF_BLOCK_NEAR_TIE`): a isenção por `placement_reason ==
    "B19_RESIDUAL_FILL"` agora verifica a condição geométrica DIRETAMENTE
@@ -5127,7 +5132,7 @@ fracasso) ou manter como está (documentado, inofensivo).
 ### 35.6 Testes
 
 `tests/test_block_b19_residual_fill_implementation.py` — reescrita
-completa na revisão (T1-T53): **65 rápidos + 5 `slow`, todos passing**.
+completa nas duas revisões (T1-T58): **70 rápidos + 6 `slow`, todos passing** (T54-T58 acrescentados na segunda revisão — convergência de ponto fixo, ver 35.8).
 Cobre: topologia; fórmula única de resíduo na matriz completa
 (14,9/15/18/19/20/20,1cm); reserva dinâmica (prova que dá 34cm de room
 para QUALQUER resíduo na faixa, não só 20cm); isolamento do estado por
@@ -5157,14 +5162,56 @@ fidelity.py`, `tests/test_block_arm_role_candidate_safety_contract.py`
 passam integralmente). Suíte completa sem falha nova além da já
 conhecida (`JUNCTION_MISSING_BINDING` TP1 8→9, seção 32).
 
-### 35.8 Veredito
+### 35.8 Segunda revisão — convergência de ponto fixo (achado H/I)
+
+Uma segunda revisão independente, reproduzindo o cenário com a própria
+função `repair_b19_residual_fill`, encontrou uma lacuna na revalidação
+final da 35.3/item 7 (versão anterior desta seção): "uma única
+revalidação + no máximo um rebuild corretivo" não cobre uma cascata de
+invalidação de SEGUNDA ordem. Contraexemplo reproduzido: com três
+candidatos A, B, C, cada um passa individualmente; a combinação
+`{A,B,C}` invalida A; removido A, o NOVO mundo `{B,C}` também invalida
+B (só visível DEPOIS que A já saiu); só C permanece válido. O código
+antigo entregava `accepted=[B,C]` com B já inválido — violando
+`accepted[] ⟹ efeito físico válido no resultado final`.
+
+**Correção**: a revalidação final agora CONVERGE ATÉ PONTO FIXO — cada
+iteração reconstrói com o conjunto atual, revalida cada aceito restante
+(reutilizando `_evaluate_b19_residual_candidate`, nenhuma lógica
+duplicada/simplificada), remove os inválidos em ordem canônica
+geométrica (nunca por ordem de inserção de set/dict) e repete até que
+nenhum candidato adicional seja removido. `accepted` só pode DIMINUIR
+nessa fase — nunca readiciona um candidato removido — o que garante
+terminação finita (no máximo `len(accepted)` remoções + 1 iteração de
+confirmação; um guard defensivo levanta erro explícito se essa cota
+teórica for excedida, o que nunca deveria acontecer). Único arquivo de
+produção tocado nesta segunda correção: `wall_stepper.py` (nenhuma
+mudança de domínio — regra B19, faixa residual, tie integrity,
+canonical ordering, dirty scope, audit, `arm_role_safe_repair=False`,
+NODE-FILL, Gate Fidelity, rotated corners e `W039`/`W041` permanecem
+intocados).
+
+Testes novos (`tests/test_block_b19_residual_fill_implementation.py`,
+T54-T58): o contraexemplo A→B→C literal (T54); uma cadeia mais profunda
+de 4 níveis provando que não há suposição de "no máximo duas passadas"
+(T55); o caminho sem cascata, onde todos permanecem aceitos (T56); o
+caso em que a combinação completa invalida TODOS os candidatos
+inicialmente aceitos, sem estado residual (T57); e determinismo da
+convergência em execuções separadas (T58). Resultado no corpus real
+(TGD/TP1/Piloto) inalterado por esta correção — continua ZERO candidatos
+aceitos nos três projetos (a correção não muda o RESULTADO medido, só
+fecha uma lacuna de correção que o corpus atual não chegava a exercitar
+com mais de um candidato aceito simultaneamente).
+
+### 35.9 Veredito
 
 **APROVADO PARA INTEGRAÇÃO — SEM EFEITO PRÁTICO HOJE.** O mecanismo
 implementa exatamente a decisão de domínio aprovada (B19 nunca é
 amarração; exige peça real cobrindo o MESMO nó na MESMA fiada, prova
 geométrica contra o rebuild real, nunca só a etiqueta), com todos os
 hard gates do SAFE REPAIR mais os acréscimos desta CR (integridade do
-nó, escopo de vizinhas, revalidação final), determinismo provado,
+nó, escopo de vizinhas, revalidação final CONVERGENTE ATÉ PONTO FIXO —
+ver 35.8), determinismo provado,
 NODE-FILL/Gate Fidelity/rotated corners/`W039`-`W041` preservados
 intactos, `baseline.json`/`reference.json` intocados (diff zero — nunca
 houve necessidade de decidir sobre atualização de baseline, já que o

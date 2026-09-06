@@ -7088,12 +7088,22 @@ def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_c
     incluindo `_b19_tie_integrity_ok`. Nenhuma atribuicao passando ->
     candidato rejeitado, parede permanece EXATAMENTE como no ORIGINAL.
 
-    Apos processar todos os candidatos, faz um REBUILD FINAL com o
-    conjunto acumulado de marcas aceitas e REVALIDA cada candidato aceito
-    contra esse resultado final (accepted[] so' pode existir se o efeito
-    realmente sobrevive na combinacao final - qualquer aceito cujo efeito
-    nao sobreviva e' removido de `accepted`, sua marca e' revertida, e um
-    rebuild final e' refeito).
+    Apos processar todos os candidatos, CONVERGE ATE PONTO FIXO (revisao
+    pos-review #2 do PR #19: uma unica revalidacao + no maximo um rebuild
+    corretivo nao bastava - a revisao independente reproduziu, com esta
+    mesma funcao, uma cascata de invalidacao de SEGUNDA ordem: {A,B,C}
+    invalida A; removido A, o NOVO mundo {B,C} tambem invalida B; so' C
+    sobrevive - e o codigo antigo entregava `accepted=[B,C]` com B ja'
+    invalido, violando `accepted[] => efeito fisico valido no resultado
+    final`). Agora cada iteracao reconstroi com o conjunto ATUAL de marcas
+    aceitas, revalida CADA aceito restante contra ESSE resultado (MESMOS
+    hard gates de sempre, via `_evaluate_b19_residual_candidate` - nenhuma
+    logica duplicada/simplificada), remove os invalidos (ordem CANONICA
+    GEOMETRICA, `_canonical_node_sort_key` - nunca por ordem de insercao
+    de set/dict) e repete. `accepted` SO' PODE DIMINUIR nessa fase -
+    nenhum candidato removido volta - o que garante terminacao finita: no
+    maximo `len(accepted)` remocoes + 1 iteracao final de confirmacao
+    (guard defensivo abaixo, nunca deveria disparar).
 
     Devolve {"changed": bool, "final_result": dict ou None, "accepted":
     [{"wall_idx", "fill_node", "tie_node"}], "rejected": [{"wall_idx",
@@ -7133,31 +7143,46 @@ def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_c
     if not accepted:
         return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
 
-    # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-PR#19, item
-    # "accepted implica efeito final"): revalida cada aceito contra a
-    # COMBINACAO final de todas as marcas - uma interacao entre dois
-    # candidatos aceitos (ex.: dirty_wall_idxs sobrepostos) poderia, em
-    # tese, invalidar um deles mesmo que cada um tenha passado sozinho.
-    final_result = rebuild_fn()
-    still_valid = []
-    for entry in accepted:
-        wall_idx, fill_node, tie_node = entry["wall_idx"], entry["fill_node"], entry["tie_node"]
-        dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
-        ok, reason = _evaluate_b19_residual_candidate(
-            wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
-            num_courses, baseline_result, final_result, wall_credit_node_indices=credit)
-        if ok:
-            still_valid.append(entry)
-        else:
+    # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-review #2,
+    # item "convergencia ate ponto fixo" - ver docstring da funcao):
+    # `accepted` so' pode DIMINUIR daqui em diante, nunca crescer de volta
+    # - garante terminacao em no maximo `max_iterations` voltas.
+    max_iterations = len(accepted) + 1
+    final_result = None
+    for _iteration in range(max_iterations):
+        final_result = rebuild_fn()
+        invalid = []
+        for entry in accepted:
+            wall_idx, fill_node, tie_node = entry["wall_idx"], entry["fill_node"], entry["tie_node"]
+            dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
+            ok, reason = _evaluate_b19_residual_candidate(
+                wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
+                num_courses, baseline_result, final_result, wall_credit_node_indices=credit)
+            if not ok:
+                invalid.append((entry, reason))
+        if not invalid:
+            break  # ponto fixo: TODO accepted validado contra ESTE final_result
+        # ordem CANONICA GEOMETRICA (nunca por ordem de insercao de
+        # set/dict, nunca por wall_idx como criterio fisico) - deterministica
+        # mesmo quando mais de um candidato cai na MESMA iteracao.
+        invalid.sort(key=lambda pair: (_canonical_node_sort_key(nodes[pair[0]["fill_node"]]),
+                                       pair[0]["wall_idx"]))
+        removed_keys = set()
+        for entry, reason in invalid:
+            wall_idx, fill_node = entry["wall_idx"], entry["fill_node"]
             nodes[fill_node].get("_b19_residual_fill_for_walls", set()).discard(wall_idx)
             rejected.append({"wall_idx": wall_idx, "fill_node": fill_node,
                              "reason": "no_effect_after_final_combination:{}".format(reason)})
-
-    if len(still_valid) != len(accepted):
-        accepted = still_valid
+            removed_keys.add((wall_idx, fill_node))
+        accepted = [e for e in accepted if (e["wall_idx"], e["fill_node"]) not in removed_keys]
         if not accepted:
             return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
-        final_result = rebuild_fn()
+    else:
+        raise RuntimeError(
+            "repair_b19_residual_fill: convergencia de ponto fixo nao terminou em {} "
+            "iteracoes - invariante de conjunto monotonicamente decrescente violado "
+            "(nunca deveria acontecer; 'accepted' so' pode diminuir a cada iteracao)."
+            .format(max_iterations))
 
     return {"changed": True, "final_result": final_result, "accepted": accepted, "rejected": rejected}
 
