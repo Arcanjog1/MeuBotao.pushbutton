@@ -71,28 +71,28 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 ## Trabalho ativo
 
 - **CR-BLOCK-FIT-TOLERANCE-C04** (branch
-  `claude/cr-block-fit-tolerance-c04-n5qsc4`, **nao mergeado**,
-  **veredito NEEDS_FIX**) - tolerancia dedicada `PIER_FIT_TOLERANCE_CM`
-  (0,30cm, separada de `PIER_LAYOUT_TOLERANCE_CM`/
-  `MODULATION_WHOLE_CM_TOLERANCE_CM`, que continuam em 0,05cm) para o
-  mecanismo que decide se a sobra de um trecho e' modular/snapavel
-  (`_pier_remaining_snapped_cm` em `wall_stepper.py`;
-  `pier_closes_with_blocks_cm`/`wall_length_closes_with_blocks_cm` em
-  `modulation_math.py`). Destrava cobertura real: `COVERAGE_GAP_IN_ROW`
-  TGD 1959->1644/TP1 327->214, `blocks` TGD +1056/TP1 +1155 - bate a'
-  unidade com a ablacao independente que aprovou o valor. MAS introduz
-  um hard blocker medido: `OPENING_BLOCK_CROSSES_JAMB` TGD 108->144 (+36
-  genuinos)/TP1 168->173 (+5 genuinos) - pecas recem-destravadas
-  invadindo 0,12-0,267cm o vao livre de portas, acima do piso de ruido
-  do proprio validador (0,1cm). Confirmado independentemente pelo
-  guard-rail de regressao do benchmark
-  (`tests/regression/test_benchmark_baselines.py`: TP1 falha como
-  `REGRESSAO CRITICA` contra `baseline.json`, intocado por decisao da
-  CR; suite completa 736 passed / 2 failed, ambas conhecidas). Relatorio
-  completo:
-  `docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md`. **Aguarda decisao
-  humana sobre o hard blocker antes de qualquer autorizacao de merge;
-  sem monitoramento automatico.**
+  `claude/cr-block-fit-tolerance-c04-n5qsc4`, PR #20 **DRAFT, nao
+  mergeado**, veredito **READY_FOR_INDEPENDENT_REVIEW**) - duas
+  tolerancias SEPARADAS, uma para cada pergunta:
+  `PIER_FIT_TOLERANCE_CM` (0,30cm) decide se a sobra de um trecho PODE ser
+  considerada modular (`_pier_remaining_snapped_cm`;
+  `pier_closes_with_blocks_cm`), e `PIER_PHYSICAL_FIT_TOLERANCE_CM`
+  (0,05cm, = o piso de ruido que ja' existia) decide ONDE a peca pode
+  existir de fato - uma GUARDA FISICA impede que o valor snapado
+  materialize peca alem de uma fronteira sem junta de argamassa (jamba de
+  abertura, ponta livre, reserva de no'), remontando o trecho com o maior
+  conteudo modular que cabe (`pier_cm_floored_to_module`).
+  `PIER_LAYOUT_TOLERANCE_CM` continua 0,05cm e intocada.
+  Resultado medido: `COVERAGE_GAP_IN_ROW` TGD 1959->1649 / TP1 327->214,
+  `blocks` TGD +1052 / TP1 +1155 (98,4-100% do ganho da ablacao
+  independente), `OPENING_BLOCK_CROSSES_JAMB` com delta **ZERO** nos 3
+  projetos (verificado por instancia), `POSITION_OVERLAP`/`JUNCTION_*`/
+  demais `OPENING_*` com delta zero, TGD `critical_errors` 884->872.
+  Trade-off exposto e nao corrigido (fora de escopo): `COMPENSATOR_*` e
+  `PRISM_*` sobem nos trechos recem-destravados. Determinismo (4 seeds) e
+  invariancia identicos ao pre-existente. `baseline.json`/`reference.json`
+  intocados. Relatorio: `docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md`.
+  **Aguarda revisao independente; sem monitoramento automatico.**
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`

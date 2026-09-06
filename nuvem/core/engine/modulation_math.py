@@ -37,7 +37,9 @@ __all__ = [
     "OPENING_SOLVER_MAX_AXIS_DELTA_CM", "BLOCK_LENGTHS_CM", "BLOCK_WIDTH_CM",
     "BLOCK_JOINT_CM", "BLOCK_OPENING_JOINT_CM", "PIER_MODULE_CM",
     "BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT", "MODULATION_WHOLE_CM_TOLERANCE_CM",
-    "PIER_LAYOUT_TOLERANCE_CM", "PIER_FIT_TOLERANCE_CM", "pack_pier_with_blocks",
+    "PIER_LAYOUT_TOLERANCE_CM", "PIER_FIT_TOLERANCE_CM",
+    "PIER_PHYSICAL_FIT_TOLERANCE_CM", "pier_cm_floored_to_module",
+    "pack_pier_with_blocks",
     "_is_valid_opening_width_cm", "solve_opening_modulation",
     "PIER_BOUNDARY_JOINTS_CM", "PIER_BOUNDARY_JOINT_COMBINATIONS_CM",
     "_pier_remaining_cm", "pier_closes_with_blocks_cm",
@@ -153,6 +155,33 @@ PIER_LAYOUT_TOLERANCE_CM = MODULATION_WHOLE_CM_TOLERANCE_CM
 # ("nao transformar 0,30cm em tolerancia global do sistema"). Ver
 # docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md.
 PIER_FIT_TOLERANCE_CM = 0.30
+
+# CR-BLOCK-FIT-TOLERANCE-C04 (resolucao do hard blocker de jamba): o quanto
+# uma peca JA' MATERIALIZADA pode ultrapassar o limite FISICO real do trecho
+# em que ela foi colocada. NAO e' a mesma pergunta que PIER_FIT_TOLERANCE_CM
+# responde, e por isso NAO e' o mesmo numero:
+#
+#   FIT/FEASIBILIDADE  (PIER_FIT_TOLERANCE_CM = 0,30cm)
+#       "este trecho PODE ser considerado modular?" - absorve o ruido
+#       geometrico acumulado do CAD/encontros para decidir a COMPOSICAO.
+#
+#   COLOCACAO FISICA   (PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05cm)
+#       "onde as pecas PODEM existir de fato?" - o valor SNAPADO nunca
+#       apaga a fronteira fisica real (jamba de abertura, ponta de parede,
+#       reserva de no'). Quem nao tem junta de argamassa para absorver a
+#       diferenca nao pode ceder espaco nenhum alem do proprio ruido de
+#       calculo.
+#
+# Vale exatamente PIER_LAYOUT_TOLERANCE_CM (0,05cm) de proposito: e' o piso
+# de ruido geometrico que o projeto ja' usava ANTES desta CR para todo o
+# resto (adjacencia, colisao, consistencia de composicao). Amarrando a
+# guarda fisica nele, o C04 fica IMPOSSIBILITADO de materializar uma
+# invasao maior do que o solver ja' podia produzir antes dele - a
+# tolerancia de FIT mais larga muda o que fecha, nunca o que atravessa.
+# Deliberadamente MAIS APERTADO que o piso de ruido do proprio validador de
+# aberturas (`OVERLAP_TOLERANCE_CM = 0,1cm`, nuvem/benchmark/model.py): a
+# guarda e' fisica, nao um ajuste para caber na regua do validador.
+PIER_PHYSICAL_FIT_TOLERANCE_CM = PIER_LAYOUT_TOLERANCE_CM
 
 # Tolerancia SEPARADA e bem mais apertada, usada SO' para decidir o realce
 # VERMELHO ("comprimento quebrado" - ver evaluate_wall_block_length/
@@ -331,6 +360,36 @@ def _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     numa funcao unica de proposito para que a pre-checagem e o solver real
     nunca possam divergir."""
     return pier_cm - leading_joint_cm - trailing_joint_cm + BLOCK_JOINT_CM
+
+
+def pier_cm_floored_to_module(pier_cm, leading_joint_cm, trailing_joint_cm):
+    """O MAIOR `pier_cm` que (a) NAO passa do `pier_cm` real informado e (b)
+    fecha EXATAMENTE em blocos com estas juntas de contorno - ou seja, o
+    conteudo modular imediatamente ABAIXO, em vez do mais proximo.
+
+    Existe para a GUARDA FISICA da CR-BLOCK-FIT-TOLERANCE-C04 (ver
+    PIER_PHYSICAL_FIT_TOLERANCE_CM): quando o arredondamento do fit levaria
+    a peca a ultrapassar uma fronteira fisica que NAO tem junta de
+    argamassa para ceder (jamba de abertura, ponta livre de parede, reserva
+    de no'), o trecho e' remontado com este comprimento - que cabe por
+    construcao. NAO e' uma composicao nova: e' exatamente a composicao que
+    o proprio solver ja' montaria para um trecho um modulo menor.
+
+    Como o modulo vale PIER_MODULE_CM (5cm) e o fit so' aceita ruido de ate'
+    PIER_FIT_TOLERANCE_CM (0,30cm), a sobra deixada contra a fronteira fica
+    sempre em [PIER_MODULE_CM - PIER_FIT_TOLERANCE_CM, PIER_MODULE_CM), isto
+    e', menos de 5cm - abaixo do menor vazio que a auditoria de cobertura
+    considera reportavel.
+
+    Devolve None quando nem o modulo mais baixo cabe (nao ha' o que montar
+    ali - o chamador trata como trecho sem solucao, o MESMO caminho que
+    existia antes desta CR)."""
+    remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
+    units = int(math.floor(remaining / float(PIER_MODULE_CM) + 1e-9))
+    if units <= 0:
+        return None
+    floored_remaining = units * PIER_MODULE_CM
+    return floored_remaining + leading_joint_cm + trailing_joint_cm - BLOCK_JOINT_CM
 
 
 def pier_closes_with_blocks_cm(pier_cm, leading_joint_cm=BLOCK_JOINT_CM,
