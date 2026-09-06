@@ -1,0 +1,227 @@
+{
+ "main_sha": "3ebcd9b63875f9114a3d6223aa648e5075e2d35b",
+ "main_previous_sha": "209695d5559b53fe4cc8a92300779a8ae73b7c1d",
+ "pr19_head_sha": "9fcd01292eb4bff52af882968320610404d30bba",
+ "timestamp": "2026-09-06T13:18:57-03:00",
+ "merges_included": {
+  "pr17_node_fill": {
+   "number": 17,
+   "merged": true
+  },
+  "pr18_arm_safe_repair_gate_fidelity": {
+   "number": 18,
+   "merged": true
+  },
+  "pr19_b19_residual_fill": {
+   "number": 19,
+   "merged": true
+  }
+ },
+ "projects": {
+  "torre_easy_lo_r00_tgd": {
+   "walls": 167,
+   "blocks": 10679,
+   "courses": 17,
+   "runtime_sec": 60.93,
+   "findings_total": 4917,
+   "critical_total": 884,
+   "noncritical_total": 4033,
+   "counts_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 320,
+    "PRISM_JOINT_STACK": 19,
+    "PRISM_STAGGER_BELOW_TARGET": 774,
+    "COMPENSATOR_VERTICAL_STRIP": 58,
+    "COMPENSATOR_EXCESS_IN_RUN": 341,
+    "COMPENSATOR_CONSECUTIVE": 379,
+    "JUNCTION_NOT_ALTERNATING": 303,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_MISSING_LINTEL": 82,
+    "OPENING_MISSING_COUNTER_LINTEL": 25,
+    "OPENING_BLOCK_CROSSES_JAMB": 108,
+    "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+    "OPENING_BLOCK_INSIDE_DOOR": 5,
+    "COVERAGE_PARTIAL_WALL": 61,
+    "COVERAGE_GAP_IN_ROW": 1959,
+    "COVERAGE_MISSING_ROW": 258,
+    "COVERAGE_WALL_NOT_MODULATED": 29,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+    "POSITION_OVERLAP": 29
+   },
+   "fingerprint_walls_blocks": "3f699aabbb09a827754fae688ddea7b986ab22b3d366cd82d38256a4cfe0e630"
+  },
+  "torre_easy_lo_r00_tp1": {
+   "walls": 96,
+   "blocks": 18417,
+   "courses": 17,
+   "runtime_sec": 100.2,
+   "findings_total": 4905,
+   "critical_total": 469,
+   "noncritical_total": 4436,
+   "counts_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 256,
+    "PRISM_STAGGER_BELOW_TARGET": 1370,
+    "PRISM_JOINT_STACK": 16,
+    "COMPENSATOR_EXCESS_IN_RUN": 1067,
+    "COMPENSATOR_CONSECUTIVE": 1443,
+    "COMPENSATOR_VERTICAL_STRIP": 186,
+    "JUNCTION_MISSING_BINDING": 9,
+    "OPENING_MISSING_COUNTER_LINTEL": 21,
+    "OPENING_BLOCK_CROSSES_JAMB": 168,
+    "COVERAGE_GAP_IN_ROW": 327,
+    "COVERAGE_PARTIAL_WALL": 6,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+    "POSITION_OVERLAP": 18
+   },
+   "fingerprint_walls_blocks": "da02eeb3f3502d72ccbb315415e3b6df2e0f3d5f343e69423b08fed0d7584c00"
+  },
+  "piloto_sintetico_2x2": {
+   "walls": 12,
+   "blocks": 772,
+   "courses": 8,
+   "runtime_sec": 0.08,
+   "findings_total": 124,
+   "critical_total": 8,
+   "noncritical_total": 116,
+   "counts_by_code": {
+    "PRISM_STAGGER_BELOW_TARGET": 14,
+    "COMPENSATOR_CONSECUTIVE": 36,
+    "COMPENSATOR_EXCESS_IN_RUN": 28,
+    "COMPENSATOR_VERTICAL_STRIP": 18,
+    "OPENING_MISSING_COUNTER_LINTEL": 4,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 8,
+    "COVERAGE_GAP_IN_ROW": 16
+   },
+   "fingerprint_walls_blocks": "c012bb211914f325c12af11bf063a90d7cd2205842e410566f816fc3c23d59da"
+  }
+ },
+ "arm": {
+  "torre_easy_lo_r00_tgd": {
+   "accepted_count": 2,
+   "rejected_count": 19,
+   "accepted": [
+    {
+     "wall_idx": 23,
+     "bits": "SAME_A"
+    },
+    {
+     "wall_idx": 91,
+     "bits": "SAME_B"
+    }
+   ],
+   "rejected_reasons": {
+    "does_not_resolve_target": 14,
+    "row_coverage_regression:133": 1,
+    "new_forced_prism_in_neighbor": 1,
+    "new_consecutive_compensators:88": 1,
+    "row_coverage_regression:37": 1,
+    "row_coverage_regression:132": 1
+   }
+  },
+  "torre_easy_lo_r00_tp1": {
+   "accepted_count": 1,
+   "rejected_count": 6,
+   "accepted": [
+    {
+     "wall_idx": 75,
+     "bits": "SAME_A"
+    }
+   ],
+   "rejected_reasons": {
+    "does_not_resolve_target": 4,
+    "new_consecutive_compensators:13": 1,
+    "new_consecutive_compensators:88": 1
+   }
+  },
+  "piloto_sintetico_2x2": {
+   "accepted_count": 0,
+   "rejected_count": 0,
+   "accepted": [],
+   "rejected_reasons": {}
+  }
+ },
+ "b19": {
+  "b19_on_off_identical": {
+   "torre_easy_lo_r00_tgd": true,
+   "torre_easy_lo_r00_tp1": true,
+   "piloto_sintetico_2x2": true
+  },
+  "torre_easy_lo_r00_tgd": {
+   "eligible_walls": 0,
+   "attempted_assignments": 0,
+   "accepted_count": 0,
+   "rejected_count": 0,
+   "rejected_reasons": {}
+  },
+  "torre_easy_lo_r00_tp1": {
+   "eligible_walls": 8,
+   "attempted_assignments": 16,
+   "accepted_count": 0,
+   "rejected_count": 16,
+   "rejected_reasons": {
+    "no_tie_covering_node": 16
+   }
+  },
+  "piloto_sintetico_2x2": {
+   "eligible_walls": 0,
+   "attempted_assignments": 0,
+   "accepted_count": 0,
+   "rejected_count": 0,
+   "rejected_reasons": {}
+  }
+ },
+ "node_fill": {
+  "flag": "NODE_FILL_OPPOSITE_COURSE_ENABLED",
+  "value": true,
+  "location": "nuvem/core/engine/wall_stepper.py"
+ },
+ "gate_fidelity": {
+  "flag": "ARM_ROLE_SAFE_REPAIR_ENABLED",
+  "value": true,
+  "location": "nuvem/core/wall_modeling.py"
+ },
+ "determinism": {
+  "method": "2x fresh process, different PYTHONHASHSEED",
+  "fingerprint_and_counts_identical": true
+ },
+ "tests": {
+  "focused": {
+   "files": [
+    "tests/test_block_b19_residual_fill_implementation.py",
+    "tests/test_block_arm_role_candidate_safety_contract.py",
+    "tests/test_block_arm_safe_repair_gate_fidelity.py",
+    "tests/test_block_node_fill_revalidation.py",
+    "tests/test_block_arm_role_prism_stagger.py"
+   ],
+   "passed": 140,
+   "failed": 0,
+   "duration_sec": 1544.74
+  },
+  "full_suite": {
+   "passed": 682,
+   "failed": 1,
+   "duration_sec": 2170.12,
+   "known_failure": {
+    "test": "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]",
+    "code": "JUNCTION_MISSING_BINDING",
+    "before": 8,
+    "after": 9,
+    "delta": 1,
+    "classification": "PRE_EXISTING / P3 / BENCHMARK_ARTIFACT"
+   }
+  }
+ },
+ "baseline_reference_status": {
+  "baseline_json_modified_by_pr19": false,
+  "reference_json_modified_by_pr19": false,
+  "reference_score_json_modified_by_pr19": false
+ },
+ "known_failures": [
+  {
+   "test": "test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]",
+   "code": "JUNCTION_MISSING_BINDING",
+   "before": 8,
+   "after": 9,
+   "classification": "PRE_EXISTING / P3 / BENCHMARK_ARTIFACT"
+  }
+ ]
+}
