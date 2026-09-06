@@ -1,0 +1,294 @@
+{
+ "PILOTO": {
+  "COVERAGE_GAP_IN_ROW": {
+   "by_causes": [
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+NON_MODULAR_FIT",
+     16
+    ]
+   ],
+   "by_primary": [
+    [
+     "NODE_RESERVE_DEGRADED_SHORT",
+     16
+    ]
+   ],
+   "in_scope": 16,
+   "total": 16,
+   "with_human": 0
+  },
+  "COVERAGE_ROW_MOSTLY_EMPTY": {
+   "by_causes": [
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     8
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     8
+    ]
+   ],
+   "in_scope": 8,
+   "total": 8,
+   "with_human": 0
+  }
+ },
+ "TGD": {
+  "COVERAGE_GAP_IN_ROW": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     1330
+    ],
+    [
+     "NODE_UNBOUND_RESERVE(intersection_failure)+NON_MODULAR_FIT",
+     108
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     96
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+NON_MODULAR_FIT",
+     88
+    ],
+    [
+     "NODE_UNBOUND_RESERVE(no_piece_this_course)+NON_MODULAR_FIT",
+     62
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+NODE_UNBOUND_RESERVE(no_piece_this_course)+NON_MODULAR_FIT",
+     51
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+NODE_UNBOUND_RESERVE(intersection_failure)+NON_MODULAR_FIT+NON_MODULAR_SEM_ESPACO",
+     37
+    ],
+    [
+     "DROPPED_FILL_COLLISION",
+     35
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     1330
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT",
+     240
+    ],
+    [
+     "NODE_UNBOUND_RESERVE(intersection_failure)",
+     175
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     96
+    ],
+    [
+     "NODE_UNBOUND_RESERVE(no_piece_this_course)",
+     62
+    ],
+    [
+     "DROPPED_FILL_COLLISION",
+     51
+    ],
+    [
+     "FOREIGN_PIECE_COVERS",
+     5
+    ]
+   ],
+   "in_scope": 1945,
+   "total": 1959,
+   "with_human": 1292
+  },
+  "COVERAGE_MISSING_ROW": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     249
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     9
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     249
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     9
+    ]
+   ],
+   "in_scope": 258,
+   "total": 258,
+   "with_human": 135
+  },
+  "COVERAGE_PARTIAL_WALL": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     58
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     3
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     58
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     3
+    ]
+   ],
+   "in_scope": 61,
+   "total": 61,
+   "with_human": 39
+  },
+  "COVERAGE_ROW_MOSTLY_EMPTY": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     106
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     6
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     106
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     6
+    ]
+   ],
+   "in_scope": 98,
+   "total": 112,
+   "with_human": 44
+  },
+  "COVERAGE_WALL_NOT_MODULATED": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT+TINY_WALL_FRAGMENT(<40cm)",
+     14
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO+TINY_WALL_FRAGMENT(<40cm)",
+     12
+    ],
+    [
+     "NON_MODULAR_FIT",
+     3
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     17
+    ],
+    [
+     "NON_MODULAR_SEM_ESPACO",
+     12
+    ]
+   ],
+   "in_scope": 20,
+   "total": 29,
+   "with_human": 3
+  }
+ },
+ "TP1": {
+  "COVERAGE_GAP_IN_ROW": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     184
+    ],
+    [
+     "FOREIGN_PIECE_COVERS",
+     76
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+NON_MODULAR_FIT",
+     37
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     25
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT+OPENING_REPAIR_FAILED",
+     5
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     184
+    ],
+    [
+     "FOREIGN_PIECE_COVERS",
+     76
+    ],
+    [
+     "NODE_RESERVE_DEGRADED_SHORT",
+     42
+    ],
+    [
+     "OPENING_REPAIR_FAILED",
+     25
+    ]
+   ],
+   "in_scope": 327,
+   "total": 327,
+   "with_human": 327
+  },
+  "COVERAGE_PARTIAL_WALL": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     6
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     6
+    ]
+   ],
+   "in_scope": 6,
+   "total": 6,
+   "with_human": 6
+  },
+  "COVERAGE_ROW_MOSTLY_EMPTY": {
+   "by_causes": [
+    [
+     "NON_MODULAR_FIT",
+     18
+    ]
+   ],
+   "by_primary": [
+    [
+     "NON_MODULAR_FIT",
+     18
+    ]
+   ],
+   "in_scope": 18,
+   "total": 18,
+   "with_human": 18
+  }
+ }
+}

@@ -1,0 +1,135 @@
+{
+ "git_head": "209695d5559b53fe4cc8a92300779a8ae73b7c1d",
+ "measured_at": "2026-09-06T01:56:02",
+ "projects": {
+  "PILOTO": {
+   "arm_role_safe_repair": {
+    "accepted": 0,
+    "rejected": 0
+   },
+   "blocks": 772,
+   "counts_by_code": {
+    "COMPENSATOR_CONSECUTIVE": 36,
+    "COMPENSATOR_EXCESS_IN_RUN": 28,
+    "COMPENSATOR_VERTICAL_STRIP": 18,
+    "COVERAGE_GAP_IN_ROW": 16,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 8,
+    "OPENING_MISSING_COUNTER_LINTEL": 4,
+    "PRISM_STAGGER_BELOW_TARGET": 14
+   },
+   "evaluate_seconds": 0.02,
+   "human_walls": 0,
+   "matched_pairs": 0,
+   "n_bands": 2,
+   "n_nodes": 9,
+   "num_courses": 8,
+   "physical_fingerprint": "e66bcd806d57627652ee7dc38ca7a89fc55568e80b66eea1e9ab063cbdf5e3df",
+   "physical_pieces": 772,
+   "project_id": "piloto_sintetico_2x2",
+   "solver_seconds": 0.06,
+   "solver_signals": {
+    "bond_audits_failing": 9,
+    "collisions": 0,
+    "door_void_violations": 0,
+    "error": null,
+    "intersection_failures": 0,
+    "non_modular": 32
+   },
+   "total_seconds": 0.14,
+   "walls": 12
+  },
+  "TGD": {
+   "arm_role_safe_repair": {
+    "accepted": 2,
+    "rejected": 19
+   },
+   "blocks": 10679,
+   "counts_by_code": {
+    "COMPENSATOR_AVOIDABLE": 37,
+    "COMPENSATOR_CONSECUTIVE": 379,
+    "COMPENSATOR_EXCESS_IN_RUN": 341,
+    "COMPENSATOR_VERTICAL_STRIP": 58,
+    "COVERAGE_GAP_IN_ROW": 1959,
+    "COVERAGE_MISSING_ROW": 258,
+    "COVERAGE_PARTIAL_WALL": 61,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+    "COVERAGE_WALL_NOT_MODULATED": 29,
+    "JUNCTION_MISSING_BINDING": 23,
+    "JUNCTION_NOT_ALTERNATING": 303,
+    "OPENING_BLOCK_CROSSES_JAMB": 108,
+    "OPENING_BLOCK_INSIDE_DOOR": 5,
+    "OPENING_MISSING_COUNTER_LINTEL": 25,
+    "OPENING_MISSING_LINTEL": 82,
+    "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+    "POSITION_OVERLAP": 29,
+    "PRISM_CONTINUOUS_JOINT": 320,
+    "PRISM_JOINT_STACK": 19,
+    "PRISM_STAGGER_BELOW_TARGET": 774
+   },
+   "evaluate_seconds": 0.85,
+   "human_walls": 97,
+   "matched_pairs": 84,
+   "n_bands": 8,
+   "n_nodes": 273,
+   "num_courses": 17,
+   "physical_fingerprint": "09bc1b0c3cd966d473673f9b7136a163e4c3d2414c6bcc7c727fec2c936d37a1",
+   "physical_pieces": 10679,
+   "project_id": "torre_easy_lo_r00_tgd",
+   "solver_seconds": 45.56,
+   "solver_signals": {
+    "bond_audits_failing": 34,
+    "collisions": 1043,
+    "door_void_violations": 290,
+    "error": null,
+    "intersection_failures": 200,
+    "non_modular": 3047
+   },
+   "total_seconds": 48.75,
+   "walls": 167
+  },
+  "TP1": {
+   "arm_role_safe_repair": {
+    "accepted": 1,
+    "rejected": 6
+   },
+   "blocks": 18417,
+   "counts_by_code": {
+    "COMPENSATOR_AVOIDABLE": 86,
+    "COMPENSATOR_CONSECUTIVE": 1443,
+    "COMPENSATOR_EXCESS_IN_RUN": 1067,
+    "COMPENSATOR_VERTICAL_STRIP": 186,
+    "COVERAGE_GAP_IN_ROW": 327,
+    "COVERAGE_PARTIAL_WALL": 6,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+    "JUNCTION_MISSING_BINDING": 9,
+    "OPENING_BLOCK_CROSSES_JAMB": 168,
+    "OPENING_MISSING_COUNTER_LINTEL": 21,
+    "POSITION_OVERLAP": 18,
+    "PRISM_CONTINUOUS_JOINT": 256,
+    "PRISM_JOINT_STACK": 16,
+    "PRISM_STAGGER_BELOW_TARGET": 1370
+   },
+   "evaluate_seconds": 1.17,
+   "human_walls": 96,
+   "matched_pairs": 96,
+   "n_bands": 7,
+   "n_nodes": 180,
+   "num_courses": 17,
+   "physical_fingerprint": "8d08d59134cd7ed71b99c484f7a5f2cf5be63374dd5fa62bf55f9f8aa4af52a8",
+   "physical_pieces": 18417,
+   "project_id": "torre_easy_lo_r00_tp1",
+   "solver_seconds": 25.18,
+   "solver_signals": {
+    "bond_audits_failing": 38,
+    "collisions": 14,
+    "door_void_violations": 348,
+    "error": null,
+    "intersection_failures": 0,
+    "non_modular": 281
+   },
+   "total_seconds": 28.87,
+   "walls": 96
+  }
+ },
+ "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]"
+}

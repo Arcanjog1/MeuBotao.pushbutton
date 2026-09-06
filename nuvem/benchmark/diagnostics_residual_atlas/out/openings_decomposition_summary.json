@@ -1,0 +1,188 @@
+{
+ "PILOTO": {
+  "OPENING_MISSING_COUNTER_LINTEL": {
+   "by_cause": [
+    [
+     "CATALOG_SCOPE(no lintel/channel pieces in solver catalog)",
+     4
+    ]
+   ],
+   "by_reason": [
+    [
+     null,
+     4
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     4
+    ]
+   ],
+   "total": 4
+  }
+ },
+ "TGD": {
+  "OPENING_BLOCK_CROSSES_JAMB": {
+   "by_cause": [
+    [
+     "NODE_PIECE_AT_NODE_INSIDE_OPENING_SPAN",
+     84
+    ],
+    [
+     "NODE_PIECE_ROOM_CHECK_MISS",
+     24
+    ]
+   ],
+   "by_reason": [
+    [
+     "T_INTERSECTION_DEGRADED_L",
+     108
+    ]
+   ],
+   "human_conf": [
+    [
+     "reconstructed",
+     60
+    ],
+    [
+     null,
+     48
+    ]
+   ],
+   "total": 108
+  },
+  "OPENING_BLOCK_INSIDE_DOOR": {
+   "by_cause": [
+    [
+     "NODE_PIECE_ROOM_CHECK_MISS",
+     5
+    ]
+   ],
+   "by_reason": [
+    [
+     "L_CORNER",
+     5
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     5
+    ]
+   ],
+   "total": 5
+  },
+  "OPENING_MISSING_COUNTER_LINTEL": {
+   "by_cause": [
+    [
+     "CATALOG_SCOPE(no lintel/channel pieces in solver catalog)",
+     25
+    ]
+   ],
+   "by_reason": [
+    [
+     null,
+     25
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     25
+    ]
+   ],
+   "total": 25
+  },
+  "OPENING_MISSING_LINTEL": {
+   "by_cause": [
+    [
+     "CATALOG_SCOPE(no lintel/channel pieces in solver catalog)",
+     82
+    ]
+   ],
+   "by_reason": [
+    [
+     null,
+     82
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     82
+    ]
+   ],
+   "total": 82
+  },
+  "OPENING_SOLID_BELOW_SILL_MISSING": {
+   "by_cause": [
+    [
+     "NON_MODULAR_TRECHO(fit)",
+     32
+    ]
+   ],
+   "by_reason": [
+    [
+     null,
+     32
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     32
+    ]
+   ],
+   "total": 32
+  }
+ },
+ "TP1": {
+  "OPENING_BLOCK_CROSSES_JAMB": {
+   "by_cause": [
+    [
+     "NODE_PIECE_AT_NODE_INSIDE_OPENING_SPAN",
+     168
+    ]
+   ],
+   "by_reason": [
+    [
+     "X_INTERSECTION",
+     90
+    ],
+    [
+     "T_INTERSECTION_MAIN",
+     78
+    ]
+   ],
+   "human_conf": [
+    [
+     "reconstructed",
+     168
+    ]
+   ],
+   "total": 168
+  },
+  "OPENING_MISSING_COUNTER_LINTEL": {
+   "by_cause": [
+    [
+     "CATALOG_SCOPE(no lintel/channel pieces in solver catalog)",
+     21
+    ]
+   ],
+   "by_reason": [
+    [
+     null,
+     21
+    ]
+   ],
+   "human_conf": [
+    [
+     null,
+     21
+    ]
+   ],
+   "total": 21
+  }
+ }
+}

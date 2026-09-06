@@ -4902,3 +4902,103 @@ descartado, `_set_l_corner_role_bits(..., pinned=False)`). Delta de
 projetos do Reference Corpus; toda mudança de finding vem exclusivamente
 das arestas que passaram a ser ACEITAS (TGD 91, TP1 75). Determinismo
 provado (fingerprint idêntico em processos novos separados, TGD e TP1).
+
+## 35. `CR-BLOCK-SOLVER-RESIDUAL-ROOT-CAUSE-ATLAS` — conhecimento de amarração
+OBSERVADO no corpus humano durante a investigação forense (2026-09-06)
+
+Investigação sem alteração de produção sobre a `main` `209695d`. Relatório
+completo: `docs/BLOCK_SOLVER_RESIDUAL_ROOT_CAUSE_ATLAS.md`; dados:
+`nuvem/benchmark/diagnostics_residual_atlas/`. Tudo abaixo foi MEDIDO
+lendo `reference.json` de TP1 (e TGD onde há par) contra os nós do grafo
+do solver, com `block_covers_point` do validador oficial. **Nenhuma regra
+foi alterada nem implementada** — cada item é registro com rótulo de
+confiança e `DOCUMENTADO — pendência de código/decisão aberta`. Limite:
+TGD e TP1 são a MESMA planta (N=1 projetista) — generalização = HYPOTHESIS.
+
+### 35.1 CONFLITO REGISTRADO — o humano usa B19 encostado em amarração
+(regra #2 diz o oposto)
+
+- Piso de ruído do gabarito: `JUNCTION_HALF_BLOCK_ADJACENT` 264 (TGD) /
+  259 (TP1); no solver: 0.
+- L: em 8 de 38 nós L comparáveis de TP1 o humano cobre o quadrado do
+  canto com um **B19** numa família (ex.: nó W002×W028: `W028 [380-399
+  B19]` na fiada 0, `W002 [235-269 B34]` na fiada 1) — quando um dos lados
+  só tem 5 cm de folga (porta a 5 cm do canto). O solver degrada para
+  `C09` (`_corner_single_element_candidate` nunca B19) e ainda produz
+  `C09+C09` ao lado (reprodutor R5).
+- T: em 12+ nós T o humano fecha a boneca com **B19 no ponto do nó**
+  (`INC:B19`, 17 fiadas com `B19` exatamente onde o solver tem `C09
+  T_INTERSECTION_INCOMING_DEGRADED`), tipicamente quando há porta a 20 cm
+  do T (reprodutor R6).
+- Vigente: regra #2 (seção 2/11.6) continua OBRIGATÓRIA. Decisão humana
+  necessária antes de qualquer código (`REQUIRES_HUMAN_DOMAIN_APPROVAL`).
+
+### 35.2 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — parede curta entre dois
+nós: o humano CONCENTRA os dois cantos na mesma família
+
+TP1 W021 (124 cm, L–X–L): fiada 1 `[0-34 B34][35-54 B19][70-89 B19]
+[90-124 B34]` (os DOIS B34 de canto na parede curta), fiada 0 `[15-54
+B39][70-109 B39]` (os cantos nos vizinhos). Mesmo padrão em W092 e nas
+paredes de 54–69 cm (W013–W016, W088–W091: `[0-19 B19][20-54 B34]` /
+`[0-39 B39]`). O solver força papéis DIFERENTES nas duas pontas
+(`_coordinate_arm_role_nodes`); o candidato `SAME_B` do SAFE REPAIR, que
+reproduz o humano, é rejeitado por `new_consecutive_compensators:13/88`
+(espelho de paridade: a vizinha W013 já tem `C09×4` na outra família).
+Paridade solver×humano em nós comparáveis (TP1): L 18 iguais / 19
+invertidas; X 10 / 12. `DOCUMENTADO — decisão de regra aberta`.
+
+### 35.3 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — boneca ≤ 70 cm e X de
+parede curta NÃO recebem peça de amarração
+
+- T com boneca ≤ 70 cm (8 de 8 em TP1): parede principal contínua
+  `B39|B39` nas duas famílias, boneca preenchida `B19+B34` / `B39`, sem
+  B54 nem B34 de nó. Solver: `C09` degradado nas duas famílias na boneca.
+- X de parede curta (124 cm) cruzando parede longa (4 nós em TP1, 2 em
+  TGD): parede longa contínua (`B39|B39`), a curta encosta nos dois lados
+  com B19/B39; **nenhum B54**. Solver: B54 (ou B34 degradado por 0,01 cm de
+  room — ver atlas C02) nas duas paredes.
+- T com boneca > 200 cm: o padrão do solver (`B54` principal / `B34`
+  boneca) aparece em 25 + 11 (paridade invertida) de ~70 nós; em 23 o
+  humano usa **B34 na principal (sem B54)** e em 12 `B19` na boneca.
+`DOCUMENTADO — decisão de regra aberta` (a seção 5 "B54 centrado" é a
+regra vigente).
+
+### 35.4 CONFLITO REGISTRADO — B34 como enchimento comum em fileira
+
+Seção 23.6 registra "B34/B54 como enchimento 2 460 → 0" como GANHO e
+`MAX_SPECIAL_BOND_PER_TRECHO = 1` aplica isso na geração. Medido no
+gabarito: **899 pares B34|B34 adjacentes em TP1 (866 em TGD)**, fileiras
+de 2 a 8 B34 (TP1: 434 trechos com 2, 101 com 3, 112 com 4, 124 com 5);
+compensadores: 1 137 no humano × 4 164 no solver (TP1); a primeira
+divergência mais frequente nas fiadas 0/1 é solver `B39` × humano `B34`
+como PRIMEIRA peça do trecho (38 fiadas) — o humano desloca o módulo 5 cm
+com B34 para fechar sem compensador. A orientação mais recente do usuário
+(23.6, 2026-08-28) continua valendo até decisão contrária explícita.
+
+### 35.5 MEDIDO — junta NÓ|FILL recriada pelo reparo (33.5) e vão
+reconstruído inflado
+
+- 33.5 confirmado por traço (`probe_opening_repair.py`, TP1 W036, família
+  A, banda com janela): `[15-34 B19][35-74 B39]` → recorte derruba
+  `[35-74]` → reparo ancorado na peça mantida → `B34 [35-69]` → junta 34,5
+  renasce sobre a junta `B34 T_INCOMING|fill` da família B. Humano: 34,5 /
+  49,5 (uma junta por família) — CONFIRMED_BY_HUMAN. Correção futura:
+  contar a junta de âncora (peça mantida | peça derrubada) como
+  "sobrevivente" no filtro 33.3, e/ou reparo consciente da junta de nó
+  oposta.
+- As aberturas reconstruídas de TP1 (`extract/reconstruct.py`) incluem os
+  corpos das peças de amarração dos T adjacentes: porta "309–440" (131 cm)
+  onde o vão real é 325–424 (100 cm) — o humano tem `B34 [290-324]` até a
+  jamba; o solver recebe o nó a 8 cm dentro do vão e coloca B54 (168
+  `OPENING_BLOCK_CROSSES_JAMB`). Com o vão real o solver produz o B34 do
+  humano (reprodutor R4b). Benchmark, não solver.
+
+### 35.6 MEDIDO — JUNCTION_MISSING_BINDING de TP1 W039/W041 é buraco físico
+
+O eixo de W041 começa 8 cm DEPOIS do ponto do nó (também no gabarito
+reconstruído); o B34 de canto da família A, em W041, nasce em t=0 e não
+entra no quadrado do canto; W039 termina em 269 antes da porta → fiadas
+pares sem peça no canto. Humano: `W039 [365-384 B19]` nas DUAS famílias.
+Reclassificado: **REAL_SOLVER_DEFECT com precondição de entrada** (braço
+curto), não artefato P3. Mesma família no TGD (W050/W117: braço para na
+face próxima; W133: `C04` degradado de 4 cm não alcança o eixo a 7 cm).

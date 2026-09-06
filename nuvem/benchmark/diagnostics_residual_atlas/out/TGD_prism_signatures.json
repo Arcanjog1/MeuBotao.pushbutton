@@ -1,0 +1,2260 @@
+[
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B19|B54",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_HAS_SAME_CONTINUOUS_JOINT": 2,
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 12,
+   "HUMAN_ROW_EMPTY": 2
+  },
+  "human_wall": "W003",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B19",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 559.5,
+  "wall_id": "W002",
+  "wall_idx": 16,
+  "wall_len": 594.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B19|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 13,
+   "HUMAN_ROW_EMPTY": 3
+  },
+  "human_wall": "W014",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B19",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W003",
+  "wall_idx": 130,
+  "wall_len": 69.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B19|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 14,
+   "HUMAN_ROW_EMPTY": 2
+  },
+  "human_wall": "W021",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B54|B19",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 89.5,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W012",
+  "wall_idx": 92,
+  "wall_len": 124.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B39",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|C04",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 234.51,
+  "wall_id": "W038",
+  "wall_idx": 50,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 234.5,
+  "t_from_end_cm": 34.51,
+  "wall_id": "W038",
+  "wall_idx": 50,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B39",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.49,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|C04",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 234.51,
+  "wall_id": "W039",
+  "wall_idx": 54,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.51,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 234.5,
+  "t_from_end_cm": 34.51,
+  "wall_id": "W039",
+  "wall_idx": 54,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 349.5,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W040",
+  "wall_idx": 36,
+  "wall_len": 384.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B39",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|C04",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 335.51,
+  "wall_id": "W041",
+  "wall_idx": 33,
+  "wall_len": 370.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B19|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 607.5,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W085",
+  "wall_idx": 13,
+  "wall_len": 642.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B39",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|C04",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 234.51,
+  "wall_id": "W121",
+  "wall_idx": 53,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 234.5,
+  "t_from_end_cm": 34.51,
+  "wall_id": "W121",
+  "wall_idx": 53,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B39",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.49,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|C04",
+  "odd_row_kinds": "TIE|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 234.51,
+  "wall_id": "W122",
+  "wall_idx": 48,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "(sem humano)": 16
+  },
+  "human_wall": null,
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.51,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 234.5,
+  "t_from_end_cm": 34.51,
+  "wall_id": "W122",
+  "wall_idx": 48,
+  "wall_len": 269.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B19",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_NO_JOINT_HERE": 13,
+   "HUMAN_ROW_EMPTY": 3
+  },
+  "human_wall": "W077",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B19|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W137",
+  "wall_idx": 120,
+  "wall_len": 69.0
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B19",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 14,
+   "HUMAN_ROW_EMPTY": 2
+  },
+  "human_wall": "W093",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B19|B54",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 89.51,
+  "wall_id": "W157",
+  "wall_idx": 90,
+  "wall_len": 124.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "B34|B19",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 14,
+   "HUMAN_ROW_EMPTY": 2
+  },
+  "human_wall": "W094",
+  "multiplicity": 16,
+  "nearest_dist_cm": 27.49,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B19|B54",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ],
+   [
+    10,
+    11
+   ],
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 34.5,
+  "t_from_end_cm": 89.51,
+  "wall_id": "W158",
+  "wall_idx": 89,
+  "wall_len": 124.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 9,
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": null,
+  "multiplicity": 10,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "C09|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ]
+  ],
+  "t_cm": 1139.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W070",
+  "wall_idx": 4,
+  "wall_len": 1174.01
+ },
+ {
+  "bands": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 9,
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": "W055",
+  "multiplicity": 10,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "C09|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ]
+  ],
+  "t_cm": 904.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W089",
+  "wall_idx": 6,
+  "wall_len": 939.01
+ },
+ {
+  "bands": [
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "C04|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 3,
+   "HUMAN_NO_JOINT_HERE": 1,
+   "HUMAN_ROW_EMPTY": 1
+  },
+  "human_wall": null,
+  "multiplicity": 5,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 1139.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W070",
+  "wall_idx": 4,
+  "wall_len": 1174.01
+ },
+ {
+  "bands": [
+   5,
+   6,
+   7
+  ],
+  "even_row_joint": "C04|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 3,
+   "HUMAN_NO_JOINT_HERE": 1,
+   "HUMAN_ROW_EMPTY": 1
+  },
+  "human_wall": "W055",
+  "multiplicity": 5,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    11,
+    12
+   ],
+   [
+    12,
+    13
+   ],
+   [
+    13,
+    14
+   ],
+   [
+    14,
+    15
+   ],
+   [
+    15,
+    16
+   ]
+  ],
+  "t_cm": 904.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W089",
+  "wall_idx": 6,
+  "wall_len": 939.01
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "B19|B39",
+  "even_row_kinds": "FILL|FILL",
+  "human_verdicts": {
+   "HUMAN_NO_JOINT_HERE": 2
+  },
+  "human_wall": "W052",
+  "multiplicity": 2,
+  "nearest_dist_cm": 47.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "FILL|FILL",
+  "odd_row_joint": "B39|B34",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 454.51,
+  "t_from_end_cm": 514.5,
+  "wall_id": "W069",
+  "wall_idx": 5,
+  "wall_len": 969.01
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "B34|B54",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 2
+  },
+  "human_wall": "W052",
+  "multiplicity": 2,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B39|B19",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 649.51,
+  "t_from_end_cm": 319.5,
+  "wall_id": "W069",
+  "wall_idx": 5,
+  "wall_len": 969.01
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "B54|B19",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 2
+  },
+  "human_wall": null,
+  "multiplicity": 2,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B19|B39",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 524.5,
+  "t_from_end_cm": 649.51,
+  "wall_id": "W070",
+  "wall_idx": 4,
+  "wall_len": 1174.01
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "B54|C09",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1,
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": null,
+  "multiplicity": 2,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "C09|C04",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 129.5,
+  "t_from_end_cm": 39.5,
+  "wall_id": "W072",
+  "wall_idx": 80,
+  "wall_len": 169.0
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "B54|C09",
+  "even_row_kinds": "TIE|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1,
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": null,
+  "multiplicity": 2,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "C09|C04",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 129.5,
+  "t_from_end_cm": 39.5,
+  "wall_id": "W087",
+  "wall_idx": 81,
+  "wall_len": 169.0
+ },
+ {
+  "bands": [
+   2,
+   5
+  ],
+  "even_row_joint": "C09|B54",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1,
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": null,
+  "multiplicity": 2,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_MID_T_INTERSECTION",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "C04|C09",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    6,
+    7
+   ],
+   [
+    11,
+    12
+   ]
+  ],
+  "t_cm": 39.5,
+  "t_from_end_cm": 129.5,
+  "wall_id": "W113",
+  "wall_idx": 82,
+  "wall_len": 169.0
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B39",
+  "even_row_kinds": "FILL|FILL",
+  "human_verdicts": {
+   "HUMAN_NO_JOINT_HERE": 1
+  },
+  "human_wall": "W040",
+  "multiplicity": 1,
+  "nearest_dist_cm": 86.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "FILL|FILL",
+  "odd_row_joint": "B39|B39",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 94.5,
+  "t_from_end_cm": 289.51,
+  "wall_id": "W046",
+  "wall_idx": 30,
+  "wall_len": 384.01
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B39",
+  "even_row_kinds": "FILL|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1
+  },
+  "human_wall": "W040",
+  "multiplicity": 1,
+  "nearest_dist_cm": 126.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "FILL|FILL",
+  "odd_row_joint": "B39|B39",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 134.5,
+  "t_from_end_cm": 249.51,
+  "wall_id": "W046",
+  "wall_idx": 30,
+  "wall_len": 384.01
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B39",
+  "even_row_kinds": "FILL|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1
+  },
+  "human_wall": "W040",
+  "multiplicity": 1,
+  "nearest_dist_cm": 99.52,
+  "nearest_feature": "OPENING_DOOR_lo",
+  "node_side": "FILL|FILL",
+  "odd_row_joint": "B39|B39",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 174.5,
+  "t_from_end_cm": 209.51,
+  "wall_id": "W046",
+  "wall_idx": 30,
+  "wall_len": 384.01
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B39",
+  "even_row_kinds": "FILL|FILL",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1
+  },
+  "human_wall": "W040",
+  "multiplicity": 1,
+  "nearest_dist_cm": 59.52,
+  "nearest_feature": "OPENING_DOOR_lo",
+  "node_side": "FILL|FILL",
+  "odd_row_joint": "B39|B39",
+  "odd_row_kinds": "FILL|FILL",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 214.5,
+  "t_from_end_cm": 169.51,
+  "wall_id": "W046",
+  "wall_idx": 30,
+  "wall_len": 384.01
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1
+  },
+  "human_wall": null,
+  "multiplicity": 1,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 1139.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W070",
+  "wall_idx": 4,
+  "wall_len": 1174.01
+ },
+ {
+  "bands": [
+   4
+  ],
+  "even_row_joint": "B39|B34",
+  "even_row_kinds": "FILL|TIE",
+  "human_verdicts": {
+   "HUMAN_JOINT_IN_ONE_ROW_ONLY": 1
+  },
+  "human_wall": "W055",
+  "multiplicity": 1,
+  "nearest_dist_cm": 27.5,
+  "nearest_feature": "NODE_END_L_CORNER",
+  "node_side": "NODE|FILL",
+  "odd_row_joint": "B34|B34",
+  "odd_row_kinds": "FILL|TIE",
+  "project": "TGD",
+  "row_pairs": [
+   [
+    10,
+    11
+   ]
+  ],
+  "t_cm": 904.51,
+  "t_from_end_cm": 34.5,
+  "wall_id": "W089",
+  "wall_idx": 6,
+  "wall_len": 939.01
+ }
+]

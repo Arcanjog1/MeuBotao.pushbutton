@@ -1,0 +1,4423 @@
+[
+ {
+  "human_row0": [
+   [
+    "W011",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W001",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 0,
+  "solver_A": [
+   "W001"
+  ],
+  "solver_B": [
+   "W011"
+  ],
+  "walls": [
+   "W001",
+   "W011"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W039",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W001",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 1,
+  "solver_A": [
+   "W039"
+  ],
+  "solver_B": [
+   "W001"
+  ],
+  "walls": [
+   "W001",
+   "W039"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W002",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W011",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 2,
+  "solver_A": [
+   "W011"
+  ],
+  "solver_B": [
+   "W002"
+  ],
+  "walls": [
+   "W002",
+   "W011"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W028",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W002",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 3,
+  "solver_A": [
+   "W002"
+  ],
+  "solver_B": [
+   "W028"
+  ],
+  "walls": [
+   "W002",
+   "W028"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W011",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 4,
+  "solver_A": [
+   "W011"
+  ],
+  "solver_B": [
+   "W003"
+  ],
+  "walls": [
+   "W003",
+   "W011"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W094",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 5,
+  "solver_A": [
+   "W094"
+  ],
+  "solver_B": [
+   "W003"
+  ],
+  "walls": [
+   "W003",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W011",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 6,
+  "solver_A": [
+   "W011"
+  ],
+  "solver_B": [
+   "W004"
+  ],
+  "walls": [
+   "W004",
+   "W011"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W094",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 7,
+  "solver_A": [
+   "W094"
+  ],
+  "solver_B": [
+   "W004"
+  ],
+  "walls": [
+   "W004",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W011",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 8,
+  "solver_A": [
+   "W011"
+  ],
+  "solver_B": [
+   "W005"
+  ],
+  "walls": [
+   "W005",
+   "W011"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W094",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 9,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W094"
+  ],
+  "walls": [
+   "W005",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W012",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 10,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W012"
+  ],
+  "walls": [
+   "W006",
+   "W012"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W095",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 11,
+  "solver_A": [
+   "W095"
+  ],
+  "solver_B": [
+   "W006"
+  ],
+  "walls": [
+   "W006",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W012",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 12,
+  "solver_A": [
+   "W012"
+  ],
+  "solver_B": [
+   "W007"
+  ],
+  "walls": [
+   "W007",
+   "W012"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W095",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 13,
+  "solver_A": [
+   "W095"
+  ],
+  "solver_B": [
+   "W007"
+  ],
+  "walls": [
+   "W007",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W012",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 14,
+  "solver_A": [
+   "W012"
+  ],
+  "solver_B": [
+   "W008"
+  ],
+  "walls": [
+   "W008",
+   "W012"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W095",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 15,
+  "solver_A": [
+   "W095"
+  ],
+  "solver_B": [
+   "W008"
+  ],
+  "walls": [
+   "W008",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W009",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W012",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 16,
+  "solver_A": [
+   "W012"
+  ],
+  "solver_B": [
+   "W009"
+  ],
+  "walls": [
+   "W009",
+   "W012"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W029",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W009",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 17,
+  "solver_A": [
+   "W009"
+  ],
+  "solver_B": [
+   "W029"
+  ],
+  "walls": [
+   "W009",
+   "W029"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W012",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W010",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 18,
+  "solver_A": [
+   "W012"
+  ],
+  "solver_B": [
+   "W010"
+  ],
+  "walls": [
+   "W010",
+   "W012"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W040",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W010",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 19,
+  "solver_A": [
+   "W010"
+  ],
+  "solver_B": [
+   "W040"
+  ],
+  "walls": [
+   "W010",
+   "W040"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W011",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W011",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 20,
+  "solver_A": [
+   "W013"
+  ],
+  "solver_B": [
+   "W013"
+  ],
+  "walls": [
+   "W011",
+   "W013"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W013",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W021",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 21,
+  "solver_A": [
+   "W013"
+  ],
+  "solver_B": [
+   "W021"
+  ],
+  "walls": [
+   "W013",
+   "W021"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W011",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W011",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 22,
+  "solver_A": [
+   "W014"
+  ],
+  "solver_B": [
+   "W014"
+  ],
+  "walls": [
+   "W011",
+   "W014"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W014",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W021",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 23,
+  "solver_A": [
+   "W021"
+  ],
+  "solver_B": [
+   "W014"
+  ],
+  "walls": [
+   "W014",
+   "W021"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W012",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W012",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 24,
+  "solver_A": [
+   "W015"
+  ],
+  "solver_B": [
+   "W015"
+  ],
+  "walls": [
+   "W012",
+   "W015"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W015",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W022",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 25,
+  "solver_A": [
+   "W015"
+  ],
+  "solver_B": [
+   "W022"
+  ],
+  "walls": [
+   "W015",
+   "W022"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W012",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W012",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 26,
+  "solver_A": [
+   "W016"
+  ],
+  "solver_B": [
+   "W016"
+  ],
+  "walls": [
+   "W012",
+   "W016"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W016",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W022",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 27,
+  "solver_A": [
+   "W022"
+  ],
+  "solver_B": [
+   "W016"
+  ],
+  "walls": [
+   "W016",
+   "W022"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W020",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W017",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 28,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W020"
+  ],
+  "walls": [
+   "W017",
+   "W020"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W017",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W096",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 29,
+  "solver_A": [
+   "W096"
+  ],
+  "solver_B": [
+   "W017"
+  ],
+  "walls": [
+   "W017",
+   "W096"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W020",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W018",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 30,
+  "solver_A": [
+   "W020"
+  ],
+  "solver_B": [
+   "W018"
+  ],
+  "walls": [
+   "W018",
+   "W020"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W018",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 31,
+  "solver_A": [
+   "W052"
+  ],
+  "solver_B": [
+   "W018"
+  ],
+  "walls": [
+   "W018",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W020",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W019",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 32,
+  "solver_A": [
+   "W020"
+  ],
+  "solver_B": [
+   "W019"
+  ],
+  "walls": [
+   "W019",
+   "W020"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W019",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W096",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 33,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W096"
+  ],
+  "walls": [
+   "W019",
+   "W096"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W002",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W023",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 34,
+  "solver_A": [
+   "W002",
+   "W023"
+  ],
+  "solver_B": [
+   "W023"
+  ],
+  "walls": [
+   "W002",
+   "W023"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W023",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 35,
+  "solver_A": [
+   "W004"
+  ],
+  "solver_B": [
+   "W023"
+  ],
+  "walls": [
+   "W004",
+   "W023"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W024",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 36,
+  "solver_A": [
+   "W007"
+  ],
+  "solver_B": [
+   "W024"
+  ],
+  "walls": [
+   "W007",
+   "W024"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W009",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W024",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 37,
+  "solver_A": [
+   "W009",
+   "W024"
+  ],
+  "solver_B": [
+   "W024"
+  ],
+  "walls": [
+   "W009",
+   "W024"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W025",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 38,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W025"
+  ],
+  "walls": [
+   "W005",
+   "W025"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W017",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W025",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 39,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W025"
+  ],
+  "walls": [
+   "W017",
+   "W025"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W026",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 40,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W026"
+  ],
+  "walls": [
+   "W019",
+   "W026"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W026",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 41,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W026"
+  ],
+  "walls": [
+   "W006",
+   "W026"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W029",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W027",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 42,
+  "solver_A": [
+   "W029"
+  ],
+  "solver_B": [
+   "W027"
+  ],
+  "walls": [
+   "W027",
+   "W029"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W027",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W040",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 43,
+  "solver_A": [
+   "W027",
+   "W040"
+  ],
+  "solver_B": [
+   "W027"
+  ],
+  "walls": [
+   "W027",
+   "W040"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W001",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W028",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 44,
+  "solver_A": [
+   "W001"
+  ],
+  "solver_B": [
+   "W028"
+  ],
+  "walls": [
+   "W001",
+   "W028"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W010",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W029",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 45,
+  "solver_A": [
+   "W010"
+  ],
+  "solver_B": [
+   "W029"
+  ],
+  "walls": [
+   "W010",
+   "W029"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W028",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W028",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 46,
+  "solver_A": [
+   "W028"
+  ],
+  "solver_B": [
+   "W030"
+  ],
+  "walls": [
+   "W028",
+   "W030"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W039",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W030",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 47,
+  "solver_A": [
+   "W030",
+   "W039"
+  ],
+  "solver_B": [
+   "W030"
+  ],
+  "walls": [
+   "W030",
+   "W039"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W031",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W018",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 48,
+  "solver_A": [
+   "W018"
+  ],
+  "solver_B": [
+   "W031"
+  ],
+  "walls": [
+   "W018",
+   "W031"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W031",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 49,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W031"
+  ],
+  "walls": [
+   "W019",
+   "W031"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W032",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W034",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 50,
+  "solver_A": [
+   "W032",
+   "W034"
+  ],
+  "solver_B": [
+   "W032"
+  ],
+  "walls": [
+   "W032",
+   "W034"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W032",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W044",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 51,
+  "solver_A": [
+   "W032",
+   "W044"
+  ],
+  "solver_B": [
+   "W032"
+  ],
+  "walls": [
+   "W032",
+   "W044"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W033",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W035",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 52,
+  "solver_A": [
+   "W033",
+   "W035"
+  ],
+  "solver_B": [
+   "W033"
+  ],
+  "walls": [
+   "W033",
+   "W035"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W033",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W045",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 53,
+  "solver_A": [
+   "W033",
+   "W045"
+  ],
+  "solver_B": [
+   "W033"
+  ],
+  "walls": [
+   "W033",
+   "W045"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W034",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 54,
+  "solver_A": [
+   "W004",
+   "W034"
+  ],
+  "solver_B": [
+   "W034"
+  ],
+  "walls": [
+   "W004",
+   "W034"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W034",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 55,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W034"
+  ],
+  "walls": [
+   "W005",
+   "W034"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W035",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 56,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W035"
+  ],
+  "walls": [
+   "W006",
+   "W035"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W035",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 57,
+  "solver_A": [
+   "W007",
+   "W035"
+  ],
+  "solver_B": [
+   "W035"
+  ],
+  "walls": [
+   "W007",
+   "W035"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W039",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W036",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 58,
+  "solver_A": [
+   "W039"
+  ],
+  "solver_B": [
+   "W036"
+  ],
+  "walls": [
+   "W036",
+   "W039"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W071",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W036",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 59,
+  "solver_A": [
+   "W071"
+  ],
+  "solver_B": [
+   "W036"
+  ],
+  "walls": [
+   "W036",
+   "W071"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W040",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W037",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 60,
+  "solver_A": [
+   "W040"
+  ],
+  "solver_B": [
+   "W037"
+  ],
+  "walls": [
+   "W037",
+   "W040"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W072",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W037",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 61,
+  "solver_A": [
+   "W037"
+  ],
+  "solver_B": [
+   "W072"
+  ],
+  "walls": [
+   "W037",
+   "W072"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W040",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W038",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 62,
+  "solver_A": [
+   "W040"
+  ],
+  "solver_B": [
+   "W038"
+  ],
+  "walls": [
+   "W038",
+   "W040"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W072",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W038",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 63,
+  "solver_A": [
+   "W072"
+  ],
+  "solver_B": [
+   "W038"
+  ],
+  "walls": [
+   "W038",
+   "W072"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W039",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W039",
+    "B19"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 64,
+  "solver_A": [
+   "W041"
+  ],
+  "solver_B": [
+   "W039"
+  ],
+  "walls": [
+   "W039",
+   "W041"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W071",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W041",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 65,
+  "solver_A": [
+   "W071"
+  ],
+  "solver_B": [
+   "W041"
+  ],
+  "walls": [
+   "W041",
+   "W071"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W044",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 70,
+  "solver_A": [
+   "W004",
+   "W044"
+  ],
+  "solver_B": [
+   "W044"
+  ],
+  "walls": [
+   "W004",
+   "W044"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W044",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 71,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W044"
+  ],
+  "walls": [
+   "W005",
+   "W044"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W045",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 72,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W045"
+  ],
+  "walls": [
+   "W006",
+   "W045"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W045",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 73,
+  "solver_A": [
+   "W007",
+   "W045"
+  ],
+  "solver_B": [
+   "W045"
+  ],
+  "walls": [
+   "W007",
+   "W045"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W046",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W048",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 74,
+  "solver_A": [
+   "W046"
+  ],
+  "solver_B": [
+   "W048"
+  ],
+  "walls": [
+   "W046",
+   "W048"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W046",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W061",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 75,
+  "solver_A": [
+   "W061"
+  ],
+  "solver_B": [
+   "W046"
+  ],
+  "walls": [
+   "W046",
+   "W061"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W047",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W049",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 76,
+  "solver_A": [
+   "W047"
+  ],
+  "solver_B": [
+   "W049"
+  ],
+  "walls": [
+   "W047",
+   "W049"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W047",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W062",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 77,
+  "solver_A": [
+   "W062"
+  ],
+  "solver_B": [
+   "W047"
+  ],
+  "walls": [
+   "W047",
+   "W062"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W048",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 78,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W048"
+  ],
+  "walls": [
+   "W005",
+   "W048"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W049",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 79,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W049"
+  ],
+  "walls": [
+   "W006",
+   "W049"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W042",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W050",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 80,
+  "solver_A": [
+   "W042"
+  ],
+  "solver_B": [
+   "W050"
+  ],
+  "walls": [
+   "W042",
+   "W050"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W003",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W050",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 81,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W050"
+  ],
+  "walls": [
+   "W003",
+   "W050"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W008",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W051",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 82,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W051"
+  ],
+  "walls": [
+   "W008",
+   "W051"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W043",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W051",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 83,
+  "solver_A": [
+   "W043"
+  ],
+  "solver_B": [
+   "W051"
+  ],
+  "walls": [
+   "W043",
+   "W051"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 84,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W003",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 85,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W008",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W053",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W042",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 87,
+  "solver_A": [
+   "W042",
+   "W053"
+  ],
+  "solver_B": [
+   "W053"
+  ],
+  "walls": [
+   "W042",
+   "W053"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W054",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W043",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 88,
+  "solver_A": [
+   "W043",
+   "W054"
+  ],
+  "solver_B": [
+   "W054"
+  ],
+  "walls": [
+   "W043",
+   "W054"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W055",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 90,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W055"
+  ],
+  "walls": [
+   "W003",
+   "W055"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W055",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W017",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 91,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W055"
+  ],
+  "walls": [
+   "W017",
+   "W055"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W056",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W019",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 92,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W056"
+  ],
+  "walls": [
+   "W019",
+   "W056"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W056",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 93,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W056"
+  ],
+  "walls": [
+   "W008",
+   "W056"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W057",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 95,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W057"
+  ],
+  "walls": [
+   "W019",
+   "W057"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W042",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W058",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 96,
+  "solver_A": [
+   "W042"
+  ],
+  "solver_B": [
+   "W058"
+  ],
+  "walls": [
+   "W042",
+   "W058"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W003",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W058",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 97,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W058"
+  ],
+  "walls": [
+   "W003",
+   "W058"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W059",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W017",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 98,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W059"
+  ],
+  "walls": [
+   "W017",
+   "W059"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W008",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W060",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 100,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W060"
+  ],
+  "walls": [
+   "W008",
+   "W060"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W043",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W060",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 101,
+  "solver_A": [
+   "W043"
+  ],
+  "solver_B": [
+   "W060"
+  ],
+  "walls": [
+   "W043",
+   "W060"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W061",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 102,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W061"
+  ],
+  "walls": [
+   "W005",
+   "W061"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W062",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 103,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W062"
+  ],
+  "walls": [
+   "W006",
+   "W062"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W063",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W065",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 104,
+  "solver_A": [
+   "W063",
+   "W065"
+  ],
+  "solver_B": [
+   "W063"
+  ],
+  "walls": [
+   "W063",
+   "W065"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W063",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W074",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 105,
+  "solver_A": [
+   "W063",
+   "W074"
+  ],
+  "solver_B": [
+   "W063"
+  ],
+  "walls": [
+   "W063",
+   "W074"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W064",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W066",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 106,
+  "solver_A": [
+   "W064",
+   "W066"
+  ],
+  "solver_B": [
+   "W064"
+  ],
+  "walls": [
+   "W064",
+   "W066"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W064",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W075",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 107,
+  "solver_A": [
+   "W064",
+   "W075"
+  ],
+  "solver_B": [
+   "W064"
+  ],
+  "walls": [
+   "W064",
+   "W075"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W065",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 108,
+  "solver_A": [
+   "W004",
+   "W065"
+  ],
+  "solver_B": [
+   "W065"
+  ],
+  "walls": [
+   "W004",
+   "W065"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W065",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 109,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W065"
+  ],
+  "walls": [
+   "W005",
+   "W065"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W066",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 110,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W066"
+  ],
+  "walls": [
+   "W006",
+   "W066"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W066",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 111,
+  "solver_A": [
+   "W007",
+   "W066"
+  ],
+  "solver_B": [
+   "W066"
+  ],
+  "walls": [
+   "W007",
+   "W066"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W071",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W067",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 112,
+  "solver_A": [
+   "W067"
+  ],
+  "solver_B": [
+   "W071"
+  ],
+  "walls": [
+   "W067",
+   "W071"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W094",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W067",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 113,
+  "solver_A": [
+   "W094"
+  ],
+  "solver_B": [
+   "W067"
+  ],
+  "walls": [
+   "W067",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W068",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W071",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 114,
+  "solver_A": [
+   "W068",
+   "W071"
+  ],
+  "solver_B": [
+   "W068"
+  ],
+  "walls": [
+   "W068",
+   "W071"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W080",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W068",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 115,
+  "solver_A": [
+   "W080"
+  ],
+  "solver_B": [
+   "W068"
+  ],
+  "walls": [
+   "W068",
+   "W080"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W069",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W072",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 116,
+  "solver_A": [
+   "W069",
+   "W072"
+  ],
+  "solver_B": [
+   "W069"
+  ],
+  "walls": [
+   "W069",
+   "W072"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W081",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W069",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 117,
+  "solver_A": [
+   "W081"
+  ],
+  "solver_B": [
+   "W069"
+  ],
+  "walls": [
+   "W069",
+   "W081"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W072",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W070",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 118,
+  "solver_A": [
+   "W072"
+  ],
+  "solver_B": [
+   "W070"
+  ],
+  "walls": [
+   "W070",
+   "W072"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W095",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W070",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 119,
+  "solver_A": [
+   "W070"
+  ],
+  "solver_B": [
+   "W095"
+  ],
+  "walls": [
+   "W070",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W073",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 121,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W073"
+  ],
+  "walls": [
+   "W019",
+   "W073"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W074",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 122,
+  "solver_A": [
+   "W004",
+   "W074"
+  ],
+  "solver_B": [
+   "W074"
+  ],
+  "walls": [
+   "W004",
+   "W074"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W074",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 123,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W074"
+  ],
+  "walls": [
+   "W005",
+   "W074"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W075",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 124,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W075"
+  ],
+  "walls": [
+   "W006",
+   "W075"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W075",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 125,
+  "solver_A": [
+   "W007",
+   "W075"
+  ],
+  "solver_B": [
+   "W075"
+  ],
+  "walls": [
+   "W007",
+   "W075"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W076",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W077",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 126,
+  "solver_A": [
+   "W076"
+  ],
+  "solver_B": [
+   "W077"
+  ],
+  "walls": [
+   "W076",
+   "W077"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W076",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W082",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 127,
+  "solver_A": [
+   "W076"
+  ],
+  "solver_B": [
+   "W082"
+  ],
+  "walls": [
+   "W076",
+   "W082"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W017",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W077",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 128,
+  "solver_A": [
+   "W017",
+   "W077"
+  ],
+  "solver_B": [
+   "W077"
+  ],
+  "walls": [
+   "W017",
+   "W077"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W080",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W078",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 129,
+  "solver_A": [
+   "W078"
+  ],
+  "solver_B": [
+   "W080"
+  ],
+  "walls": [
+   "W078",
+   "W080"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W078",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W094",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 130,
+  "solver_A": [
+   "W094"
+  ],
+  "solver_B": [
+   "W078"
+  ],
+  "walls": [
+   "W078",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W081",
+    "B19"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W079",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 131,
+  "solver_A": [
+   "W079"
+  ],
+  "solver_B": [
+   "W081"
+  ],
+  "walls": [
+   "W079",
+   "W081"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W079",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W095",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 132,
+  "solver_A": [
+   "W095"
+  ],
+  "solver_B": [
+   "W079"
+  ],
+  "walls": [
+   "W079",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W067",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W080",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 133,
+  "solver_A": [
+   "W067"
+  ],
+  "solver_B": [
+   "W080"
+  ],
+  "walls": [
+   "W067",
+   "W080"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W070",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W081",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 134,
+  "solver_A": [
+   "W070"
+  ],
+  "solver_B": [
+   "W081"
+  ],
+  "walls": [
+   "W070",
+   "W081"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W082",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 135,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W082"
+  ],
+  "walls": [
+   "W019",
+   "W082"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W083",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 136,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W083"
+  ],
+  "walls": [
+   "W005",
+   "W083"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W017",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W083",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 137,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W083"
+  ],
+  "walls": [
+   "W017",
+   "W083"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W019",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W084",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 138,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W084"
+  ],
+  "walls": [
+   "W019",
+   "W084"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W084",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 139,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W084"
+  ],
+  "walls": [
+   "W006",
+   "W084"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W078",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W085",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 140,
+  "solver_A": [
+   "W078",
+   "W085"
+  ],
+  "solver_B": [
+   "W085"
+  ],
+  "walls": [
+   "W078",
+   "W085"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W004",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W085",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 141,
+  "solver_A": [
+   "W004"
+  ],
+  "solver_B": [
+   "W085"
+  ],
+  "walls": [
+   "W004",
+   "W085"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W007",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W086",
+    "B34"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 142,
+  "solver_A": [
+   "W007"
+  ],
+  "solver_B": [
+   "W086"
+  ],
+  "walls": [
+   "W007",
+   "W086"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W079",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W086",
+    "B19"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 143,
+  "solver_A": [
+   "W079",
+   "W086"
+  ],
+  "solver_B": [
+   "W086"
+  ],
+  "walls": [
+   "W079",
+   "W086"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W088",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W092",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 146,
+  "solver_A": [
+   "W088"
+  ],
+  "solver_B": [
+   "W092"
+  ],
+  "walls": [
+   "W088",
+   "W092"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W094",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W094",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 147,
+  "solver_A": [
+   "W088"
+  ],
+  "solver_B": [
+   "W088"
+  ],
+  "walls": [
+   "W088",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W089",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W092",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 148,
+  "solver_A": [
+   "W092"
+  ],
+  "solver_B": [
+   "W089"
+  ],
+  "walls": [
+   "W089",
+   "W092"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W094",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W094",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 149,
+  "solver_A": [
+   "W089"
+  ],
+  "solver_B": [
+   "W089"
+  ],
+  "walls": [
+   "W089",
+   "W094"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W090",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W093",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 150,
+  "solver_A": [
+   "W090"
+  ],
+  "solver_B": [
+   "W093"
+  ],
+  "walls": [
+   "W090",
+   "W093"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W095",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W095",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 151,
+  "solver_A": [
+   "W090"
+  ],
+  "solver_B": [
+   "W090"
+  ],
+  "walls": [
+   "W090",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W091",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W093",
+    "B34"
+   ]
+  ],
+  "kind": "L_CORNER",
+  "node_index": 152,
+  "solver_A": [
+   "W093"
+  ],
+  "solver_B": [
+   "W091"
+  ],
+  "walls": [
+   "W091",
+   "W093"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W095",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W095",
+    "B39"
+   ]
+  ],
+  "kind": "T_INTERSECTION",
+  "node_index": 153,
+  "solver_A": [
+   "W091"
+  ],
+  "solver_B": [
+   "W091"
+  ],
+  "walls": [
+   "W091",
+   "W095"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W003",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B39"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 154,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W021"
+  ],
+  "walls": [
+   "W003",
+   "W021"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W023",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 155,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W023"
+  ],
+  "walls": [
+   "W003",
+   "W023"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W085",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 156,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W085"
+  ],
+  "walls": [
+   "W003",
+   "W085"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W003",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W003",
+    "B39"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 157,
+  "solver_A": [
+   "W003"
+  ],
+  "solver_B": [
+   "W092"
+  ],
+  "walls": [
+   "W003",
+   "W092"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 158,
+  "solver_A": [
+   "W004"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W004",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W055",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W004",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 159,
+  "solver_A": [
+   "W004"
+  ],
+  "solver_B": [
+   "W055"
+  ],
+  "walls": [
+   "W004",
+   "W055"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W052",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 160,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W005",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W005",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W055",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 161,
+  "solver_A": [
+   "W005"
+  ],
+  "solver_B": [
+   "W055"
+  ],
+  "walls": [
+   "W005",
+   "W055"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W052",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 162,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W006",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W006",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W056",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 163,
+  "solver_A": [
+   "W006"
+  ],
+  "solver_B": [
+   "W056"
+  ],
+  "walls": [
+   "W006",
+   "W056"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 164,
+  "solver_A": [
+   "W007"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W007",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W056",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W007",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 165,
+  "solver_A": [
+   "W007"
+  ],
+  "solver_B": [
+   "W056"
+  ],
+  "walls": [
+   "W007",
+   "W056"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W008",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B39"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 166,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W022"
+  ],
+  "walls": [
+   "W008",
+   "W022"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W024",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 167,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W024"
+  ],
+  "walls": [
+   "W008",
+   "W024"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W086",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 168,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W086"
+  ],
+  "walls": [
+   "W008",
+   "W086"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W008",
+    "B39"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W008",
+    "B39"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 169,
+  "solver_A": [
+   "W008"
+  ],
+  "solver_B": [
+   "W093"
+  ],
+  "walls": [
+   "W008",
+   "W093"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W017",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 170,
+  "solver_A": [
+   "W017"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W017",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W052",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W019",
+    "B34"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 171,
+  "solver_A": [
+   "W019"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W019",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W036",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W053",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 172,
+  "solver_A": [
+   "W036"
+  ],
+  "solver_B": [
+   "W053"
+  ],
+  "walls": [
+   "W036",
+   "W053"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W054",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W037",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 173,
+  "solver_A": [
+   "W037"
+  ],
+  "solver_B": [
+   "W054"
+  ],
+  "walls": [
+   "W037",
+   "W054"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W038",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W054",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 174,
+  "solver_A": [
+   "W038"
+  ],
+  "solver_B": [
+   "W054"
+  ],
+  "walls": [
+   "W038",
+   "W054"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W053",
+    "B54"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W041",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 175,
+  "solver_A": [
+   "W041"
+  ],
+  "solver_B": [
+   "W053"
+  ],
+  "walls": [
+   "W041",
+   "W053"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W046",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W052",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 176,
+  "solver_A": [
+   "W046"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W046",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W046",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W055",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 177,
+  "solver_A": [
+   "W046"
+  ],
+  "solver_B": [
+   "W055"
+  ],
+  "walls": [
+   "W046",
+   "W055"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W047",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W052",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 178,
+  "solver_A": [
+   "W047"
+  ],
+  "solver_B": [
+   "W052"
+  ],
+  "walls": [
+   "W047",
+   "W052"
+  ]
+ },
+ {
+  "human_row0": [
+   [
+    "W047",
+    "B34"
+   ]
+  ],
+  "human_row1": [
+   [
+    "W056",
+    "B54"
+   ]
+  ],
+  "kind": "X_INTERSECTION",
+  "node_index": 179,
+  "solver_A": [
+   "W047"
+  ],
+  "solver_B": [
+   "W056"
+  ],
+  "walls": [
+   "W047",
+   "W056"
+  ]
+ }
+]

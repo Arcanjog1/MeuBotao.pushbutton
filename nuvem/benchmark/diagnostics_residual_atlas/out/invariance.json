@@ -1,0 +1,377 @@
+{
+ "R1_boneca_79": {
+  "endpoint_reversal_all": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 128
+  },
+  "endpoint_reversal_half": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "mirror_x": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 98
+  },
+  "permutation": {
+   "diffs": [
+    [
+     [
+      4,
+      0,
+      3,
+      1,
+      2
+     ],
+     "DIFFERENT_LAYOUT",
+     90
+    ],
+    [
+     [
+      2,
+      3,
+      1,
+      4,
+      0
+     ],
+     "DIFFERENT_LAYOUT",
+     136
+    ],
+    [
+     [
+      3,
+      2,
+      0,
+      1,
+      4
+     ],
+     "DIFFERENT_LAYOUT",
+     136
+    ],
+    [
+     [
+      1,
+      2,
+      4,
+      3,
+      0
+     ],
+     "DIFFERENT_LAYOUT",
+     98
+    ],
+    [
+     [
+      3,
+      4,
+      2,
+      0,
+      1
+     ],
+     "DIFFERENT_LAYOUT",
+     214
+    ]
+   ],
+   "of": 6,
+   "ok": 1
+  },
+  "pieces": 140,
+  "rotate_90": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "translation": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "walls": 5
+ },
+ "R2b_x_borderline": {
+  "endpoint_reversal_all": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 254
+  },
+  "endpoint_reversal_half": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "mirror_x": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "permutation": {
+   "diffs": [
+    [
+     [
+      4,
+      0,
+      5,
+      3,
+      1,
+      2
+     ],
+     "DIFFERENT_LAYOUT",
+     28
+    ],
+    [
+     [
+      2,
+      3,
+      1,
+      5,
+      4,
+      0
+     ],
+     "DIFFERENT_LAYOUT",
+     286
+    ],
+    [
+     [
+      2,
+      5,
+      3,
+      0,
+      1,
+      4
+     ],
+     "DIFFERENT_LAYOUT",
+     286
+    ],
+    [
+     [
+      2,
+      5,
+      4,
+      1,
+      0,
+      3
+     ],
+     "DIFFERENT_LAYOUT",
+     28
+    ],
+    [
+     [
+      1,
+      2,
+      3,
+      5,
+      4,
+      0
+     ],
+     "DIFFERENT_LAYOUT",
+     286
+    ]
+   ],
+   "of": 6,
+   "ok": 1
+  },
+  "pieces": 162,
+  "rotate_90": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 28
+  },
+  "translation": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 126
+  },
+  "walls": 6
+ },
+ "R5_L_porta_5cm": {
+  "endpoint_reversal_all": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "endpoint_reversal_half": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "mirror_x": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "permutation": {
+   "diffs": [
+    [
+     [
+      1,
+      0
+     ],
+     "PARITY_FLIP_ONLY",
+     8
+    ],
+    [
+     [
+      1,
+      0
+     ],
+     "PARITY_FLIP_ONLY",
+     8
+    ],
+    [
+     [
+      1,
+      0
+     ],
+     "PARITY_FLIP_ONLY",
+     8
+    ],
+    [
+     [
+      1,
+      0
+     ],
+     "PARITY_FLIP_ONLY",
+     8
+    ]
+   ],
+   "of": 6,
+   "ok": 2
+  },
+  "pieces": 4,
+  "rotate_90": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "translation": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "walls": 2
+ },
+ "grade_2x2_piloto": {
+  "endpoint_reversal_all": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 644
+  },
+  "endpoint_reversal_half": {
+   "class": "DIFFERENT_LAYOUT",
+   "diff_pieces": 288
+  },
+  "mirror_x": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "permutation": {
+   "diffs": [
+    [
+     [
+      7,
+      11,
+      3,
+      10,
+      8,
+      4,
+      9,
+      1,
+      0,
+      6,
+      2,
+      5
+     ],
+     "DIFFERENT_LAYOUT",
+     632
+    ],
+    [
+     [
+      7,
+      4,
+      2,
+      5,
+      11,
+      9,
+      10,
+      6,
+      1,
+      0,
+      3,
+      8
+     ],
+     "DIFFERENT_LAYOUT",
+     694
+    ],
+    [
+     [
+      10,
+      2,
+      5,
+      7,
+      8,
+      6,
+      4,
+      11,
+      3,
+      1,
+      9,
+      0
+     ],
+     "DIFFERENT_LAYOUT",
+     590
+    ],
+    [
+     [
+      1,
+      5,
+      3,
+      7,
+      11,
+      0,
+      9,
+      10,
+      6,
+      4,
+      2,
+      8
+     ],
+     "DIFFERENT_LAYOUT",
+     662
+    ],
+    [
+     [
+      11,
+      8,
+      2,
+      7,
+      6,
+      4,
+      0,
+      5,
+      3,
+      10,
+      9,
+      1
+     ],
+     "DIFFERENT_LAYOUT",
+     380
+    ],
+    [
+     [
+      11,
+      0,
+      1,
+      2,
+      9,
+      4,
+      3,
+      5,
+      6,
+      8,
+      10,
+      7
+     ],
+     "DIFFERENT_LAYOUT",
+     218
+    ]
+   ],
+   "of": 6,
+   "ok": 0
+  },
+  "pieces": 370,
+  "rotate_90": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "translation": {
+   "class": "INVARIANT",
+   "diff_pieces": 0
+  },
+  "walls": 12
+ }
+}

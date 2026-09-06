@@ -1,0 +1,7243 @@
+[
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [],
+  "human_wall": "W002",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   40.0
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 234.0,
+  "t_lo": 210.0,
+  "wall_id": "W002",
+  "wall_idx": 1,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 44.0,
+  "t_lo": 15.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 474.0,
+  "t_lo": 450.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B54",
+   "B39",
+   "C09"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 559.0,
+  "t_lo": 530.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C09",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 814.0,
+  "t_lo": 785.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "C04",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 1174.0,
+  "t_lo": 1150.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C04",
+   "B39",
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 1254.0,
+  "t_lo": 1230.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B34",
+   "B39",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   false
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   15.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 83.98,
+  "t_lo": 69.98,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "C04",
+   "B54",
+   "B39"
+  ],
+  "human_same_span": [
+   "B54"
+  ],
+  "human_wall": "W003",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B54",
+   "X_INTERSECTION",
+   false
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   15.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 1224.0,
+  "t_lo": 1210.0,
+  "wall_id": "W003",
+  "wall_idx": 2,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [],
+  "human_same_span": [],
+  "human_wall": "W005",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   42.5
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 1309.0,
+  "t_lo": 1280.0,
+  "wall_id": "W005",
+  "wall_idx": 4,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [],
+  "human_same_span": [],
+  "human_wall": "W006",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   42.51
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 184.0,
+  "t_lo": 155.0,
+  "wall_id": "W006",
+  "wall_idx": 5,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 44.0,
+  "t_lo": 15.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 474.0,
+  "t_lo": 450.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B54",
+   "B39",
+   "C09"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 559.0,
+  "t_lo": 530.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C09",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 814.0,
+  "t_lo": 785.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "C04",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 1174.0,
+  "t_lo": 1150.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C04",
+   "B39",
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 1254.0,
+  "t_lo": 1230.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B34",
+   "B39",
+   "B39",
+   "B54"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   false
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   15.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 83.98,
+  "t_lo": 69.98,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "C04",
+   "B54",
+   "B39"
+  ],
+  "human_same_span": [
+   "B54"
+  ],
+  "human_wall": "W008",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B54",
+   "X_INTERSECTION",
+   false
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   15.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 1224.0,
+  "t_lo": 1210.0,
+  "wall_id": "W008",
+  "wall_idx": 7,
+  "wall_len": 1344.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [],
+  "human_wall": "W009",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   40.0
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 234.0,
+  "t_lo": 210.0,
+  "wall_id": "W009",
+  "wall_idx": 8,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B34",
+   "B34",
+   "B34"
+  ],
+  "human_same_span": [
+   "B34",
+   "B34"
+  ],
+  "human_wall": "W011",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   42.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 364.0,
+  "t_lo": 335.0,
+  "wall_id": "W011",
+  "wall_idx": 10,
+  "wall_len": 1484.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "B19_C"
+  ],
+  "human_same_span": [],
+  "human_wall": "W011",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 124.0,
+  "t_lo": 110.0,
+  "wall_id": "W011",
+  "wall_idx": 10,
+  "wall_len": 1484.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B19_C",
+   "B34"
+  ],
+  "human_same_span": [],
+  "human_wall": "W011",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 269.0,
+  "t_lo": 255.0,
+  "wall_id": "W011",
+  "wall_idx": 10,
+  "wall_len": 1484.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W013",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   27.48
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 39.0,
+  "t_lo": 0.0,
+  "wall_id": "W013",
+  "wall_idx": 12,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B19",
+   "B34"
+  ],
+  "human_same_span": [
+   "B19",
+   "B34"
+  ],
+  "human_wall": "W014",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   27.48
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 39.0,
+  "t_lo": 0.0,
+  "wall_id": "W014",
+  "wall_idx": 13,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W015",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   27.48
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 39.0,
+  "t_lo": 0.0,
+  "wall_id": "W015",
+  "wall_idx": 14,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B19",
+   "B34"
+  ],
+  "human_same_span": [
+   "B19",
+   "B34"
+  ],
+  "human_wall": "W016",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   27.48
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 39.0,
+  "t_lo": 0.0,
+  "wall_id": "W016",
+  "wall_idx": 15,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B34"
+  ],
+  "human_same_span": [
+   "B39",
+   "B34"
+  ],
+  "human_wall": "W017",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 799.0,
+  "t_lo": 770.0,
+  "wall_id": "W017",
+  "wall_idx": 16,
+  "wall_len": 1379.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "CAN39",
+   "CAN39",
+   "CM19",
+   "CAN39"
+  ],
+  "human_same_span": [
+   "CAN39"
+  ],
+  "human_wall": "W017",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 999.0,
+  "t_lo": 975.0,
+  "wall_id": "W017",
+  "wall_idx": 16,
+  "wall_len": 1379.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W018",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   9.5
+  ],
+  "openings_active": [
+   "door",
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "span_cm": 19.0,
+  "t_hi": 564.0,
+  "t_lo": 545.0,
+  "wall_id": "W018",
+  "wall_idx": 17,
+  "wall_len": 579.0
+ },
+ {
+  "codes": "C09+C04+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B54"
+  ],
+  "human_same_span": [
+   "B54"
+  ],
+  "human_wall": "W018",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   9.5
+  ],
+  "openings_active": [
+   "door",
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   false
+  ],
+  "span_cm": 19.0,
+  "t_hi": 279.0,
+  "t_lo": 260.0,
+  "wall_id": "W018",
+  "wall_idx": 17,
+  "wall_len": 579.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W019",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   34.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 544.0,
+  "t_lo": 515.0,
+  "wall_id": "W019",
+  "wall_idx": 18,
+  "wall_len": 1379.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19_C"
+  ],
+  "human_same_span": [],
+  "human_wall": "W020",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   11.99
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 94.01,
+  "t_lo": 70.01,
+  "wall_id": "W020",
+  "wall_idx": 19,
+  "wall_len": 499.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B19",
+   "B19",
+   "B34"
+  ],
+  "human_same_span": [
+   "B19",
+   "B34"
+  ],
+  "human_wall": "W021",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   true
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.51
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "L_CORNER_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 108.99,
+  "t_lo": 79.99,
+  "wall_id": "W021",
+  "wall_idx": 20,
+  "wall_len": 123.98
+ },
+ {
+  "codes": "C09+C04+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W023",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W023",
+  "wall_idx": 22,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04",
+   "B19",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W023",
+  "in_scope": true,
+  "left": "FILL_REPAIR",
+  "left_piece": [
+   "B39",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   12.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 249.0,
+  "t_lo": 225.0,
+  "wall_id": "W023",
+  "wall_idx": 22,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W023",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W023",
+  "wall_idx": 22,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B39",
+   "B34"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W023",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 354.0,
+  "t_lo": 340.0,
+  "wall_id": "W023",
+  "wall_idx": 22,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B34",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W023",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 504.0,
+  "t_lo": 490.0,
+  "wall_id": "W023",
+  "wall_idx": 22,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B19",
+   "C04"
+  ],
+  "human_same_span": [
+   "B19",
+   "C04"
+  ],
+  "human_wall": "W024",
+  "in_scope": true,
+  "left": "FILL_REPAIR",
+  "left_piece": [
+   "B39",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   12.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 658.99,
+  "t_lo": 634.99,
+  "wall_id": "W024",
+  "wall_idx": 23,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C04+C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W024",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 843.99,
+  "t_lo": 824.99,
+  "wall_id": "W024",
+  "wall_idx": 23,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B34",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W024",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 503.99,
+  "t_lo": 489.99,
+  "wall_id": "W024",
+  "wall_idx": 23,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W024",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 843.99,
+  "t_lo": 824.99,
+  "wall_id": "W024",
+  "wall_idx": 23,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W025",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.0,
+  "t_lo": 55.0,
+  "wall_id": "W025",
+  "wall_idx": 24,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W025",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 214.0,
+  "t_lo": 200.0,
+  "wall_id": "W025",
+  "wall_idx": 24,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W026",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   6.98
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.01,
+  "t_lo": 55.01,
+  "wall_id": "W026",
+  "wall_idx": 25,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W026",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 213.99,
+  "t_lo": 199.99,
+  "wall_id": "W026",
+  "wall_idx": 25,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "C04",
+   "C09_C"
+  ],
+  "human_same_span": [
+   "C04",
+   "C09_C"
+  ],
+  "human_wall": "W026",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   26.99
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_REPAIR",
+  "right_piece": [
+   "B19",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 49.0,
+  "t_lo": 35.0,
+  "wall_id": "W026",
+  "wall_idx": 25,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04",
+   "B19"
+  ],
+  "human_same_span": [
+   "C04",
+   "B19"
+  ],
+  "human_wall": "W027",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 169.0,
+  "t_lo": 145.0,
+  "wall_id": "W027",
+  "wall_idx": 26,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W027",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   9.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 54.0,
+  "t_lo": 35.0,
+  "wall_id": "W027",
+  "wall_idx": 26,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C04+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C09"
+  ],
+  "human_same_span": [
+   "C09"
+  ],
+  "human_wall": "W027",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 169.0,
+  "t_lo": 145.0,
+  "wall_id": "W027",
+  "wall_idx": 26,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W028",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "WALL_END_L_CORNER",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 399.0,
+  "t_lo": 380.0,
+  "wall_id": "W028",
+  "wall_idx": 27,
+  "wall_len": 399.0
+ },
+ {
+  "codes": "C09+C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C09"
+  ],
+  "human_same_span": [
+   "C09"
+  ],
+  "human_wall": "W030",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 154.0,
+  "t_lo": 130.0,
+  "wall_id": "W030",
+  "wall_idx": 29,
+  "wall_len": 154.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W032",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W032",
+  "wall_idx": 31,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W032",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W032",
+  "wall_idx": 31,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W032",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W032",
+  "wall_idx": 31,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W032",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W032",
+  "wall_idx": 31,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W033",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W033",
+  "wall_idx": 32,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W033",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W033",
+  "wall_idx": 32,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W033",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W033",
+  "wall_idx": 32,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W033",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W033",
+  "wall_idx": 32,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W034",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W034",
+  "wall_idx": 33,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W034",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W034",
+  "wall_idx": 33,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W035",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.51
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "T_INTERSECTION_INCOMING_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 124.0,
+  "t_lo": 95.0,
+  "wall_id": "W035",
+  "wall_idx": 34,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W035",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W035",
+  "wall_idx": 34,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W035",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W035",
+  "wall_idx": 34,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19_C"
+  ],
+  "human_same_span": [
+   "B19_C"
+  ],
+  "human_wall": "W036",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 324.0,
+  "t_lo": 310.0,
+  "wall_id": "W036",
+  "wall_idx": 35,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W036",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 469.0,
+  "t_lo": 455.0,
+  "wall_id": "W036",
+  "wall_idx": 35,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "C09_C",
+   "C04"
+  ],
+  "human_same_span": [],
+  "human_wall": "W036",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.0,
+  "t_lo": 55.0,
+  "wall_id": "W036",
+  "wall_idx": 35,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34"
+  ],
+  "human_same_span": [],
+  "human_wall": "W036",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 214.0,
+  "t_lo": 200.0,
+  "wall_id": "W036",
+  "wall_idx": 35,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19_C"
+  ],
+  "human_same_span": [
+   "B19_C"
+  ],
+  "human_wall": "W038",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 324.0,
+  "t_lo": 310.0,
+  "wall_id": "W038",
+  "wall_idx": 37,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W038",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 469.0,
+  "t_lo": 455.0,
+  "wall_id": "W038",
+  "wall_idx": 37,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "C09_C",
+   "C04"
+  ],
+  "human_same_span": [],
+  "human_wall": "W038",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.0,
+  "t_lo": 55.0,
+  "wall_id": "W038",
+  "wall_idx": 37,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34"
+  ],
+  "human_same_span": [],
+  "human_wall": "W038",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 214.0,
+  "t_lo": 200.0,
+  "wall_id": "W038",
+  "wall_idx": 37,
+  "wall_len": 524.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W039",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "STANDARD_FILL"
+  ],
+  "right": "WALL_END_L_CORNER",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 384.0,
+  "t_lo": 365.0,
+  "wall_id": "W039",
+  "wall_idx": 38,
+  "wall_len": 384.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W040",
+  "in_scope": true,
+  "left": "WALL_END_L_CORNER",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   2.38
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W040",
+  "wall_idx": 39,
+  "wall_len": 384.11
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B54",
+   "C09",
+   "B34"
+  ],
+  "human_same_span": [
+   "C09",
+   "B34"
+  ],
+  "human_wall": "W040",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 369.12,
+  "t_lo": 340.12,
+  "wall_id": "W040",
+  "wall_idx": 39,
+  "wall_len": 384.11
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B34",
+   "C09",
+   "B39"
+  ],
+  "human_same_span": [
+   "C09",
+   "B39"
+  ],
+  "human_wall": "W040",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   false
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 349.12,
+  "t_lo": 320.12,
+  "wall_id": "W040",
+  "wall_idx": 39,
+  "wall_len": 384.11
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "B39",
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39",
+   "B39"
+  ],
+  "human_wall": "W041",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 219.0,
+  "t_lo": 195.0,
+  "wall_id": "W041",
+  "wall_idx": 40,
+  "wall_len": 509.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B54",
+   "B34"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W042",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 134.0,
+  "t_lo": 120.0,
+  "wall_id": "W042",
+  "wall_idx": 41,
+  "wall_len": 484.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B54",
+   "B34"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W043",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B19",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 134.0,
+  "t_lo": 120.0,
+  "wall_id": "W043",
+  "wall_idx": 42,
+  "wall_len": 484.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W044",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W044",
+  "wall_idx": 43,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W044",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W044",
+  "wall_idx": 43,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W045",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.51
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "T_INTERSECTION_INCOMING_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 124.0,
+  "t_lo": 95.0,
+  "wall_id": "W045",
+  "wall_idx": 44,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W045",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W045",
+  "wall_idx": 44,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W045",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W045",
+  "wall_idx": 44,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B19",
+   "B39",
+   "C04",
+   "B34"
+  ],
+  "human_same_span": [
+   "B39",
+   "C04"
+  ],
+  "human_wall": "W053",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_X_INTERSECTION",
+   20.01
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B54",
+   "X_INTERSECTION",
+   false
+  ],
+  "span_cm": 24.0,
+  "t_hi": 64.0,
+  "t_lo": 40.0,
+  "wall_id": "W053",
+  "wall_idx": 52,
+  "wall_len": 639.01
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B34"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W053",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   0.0
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 639.01,
+  "t_lo": 625.01,
+  "wall_id": "W053",
+  "wall_idx": 52,
+  "wall_len": 639.01
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W053",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 639.01,
+  "t_lo": 620.01,
+  "wall_id": "W053",
+  "wall_idx": 52,
+  "wall_len": 639.01
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C04",
+   "B39",
+   "B19"
+  ],
+  "human_same_span": [
+   "B39",
+   "B19"
+  ],
+  "human_wall": "W054",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "FREE_END",
+   12.01
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "FREE_END",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 639.0,
+  "t_lo": 615.0,
+  "wall_id": "W054",
+  "wall_idx": 53,
+  "wall_len": 639.01
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B39",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W054",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W054",
+  "wall_idx": 53,
+  "wall_len": 639.01
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "C09",
+   "B39"
+  ],
+  "human_same_span": [
+   "C09",
+   "B39"
+  ],
+  "human_wall": "W061",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   22.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 44.0,
+  "t_lo": 15.0,
+  "wall_id": "W061",
+  "wall_idx": 60,
+  "wall_len": 79.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B34",
+   "C09",
+   "B34"
+  ],
+  "human_same_span": [
+   "C09",
+   "B34"
+  ],
+  "human_wall": "W061",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   true
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 64.0,
+  "t_lo": 35.0,
+  "wall_id": "W061",
+  "wall_idx": 60,
+  "wall_len": 79.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B39",
+   "C09"
+  ],
+  "human_same_span": [
+   "B39",
+   "C09"
+  ],
+  "human_wall": "W062",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   22.51
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 64.0,
+  "t_lo": 35.0,
+  "wall_id": "W062",
+  "wall_idx": 61,
+  "wall_len": 79.01
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B34",
+   "C09",
+   "B34"
+  ],
+  "human_same_span": [
+   "B34",
+   "C09"
+  ],
+  "human_wall": "W062",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.5
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 44.01,
+  "t_lo": 15.01,
+  "wall_id": "W062",
+  "wall_idx": 61,
+  "wall_len": 79.01
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W063",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W063",
+  "wall_idx": 62,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W063",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W063",
+  "wall_idx": 62,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W063",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W063",
+  "wall_idx": 62,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W063",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W063",
+  "wall_idx": 62,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W064",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W064",
+  "wall_idx": 63,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W064",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W064",
+  "wall_idx": 63,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W064",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W064",
+  "wall_idx": 63,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W064",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 129.0,
+  "t_lo": 110.0,
+  "wall_id": "W064",
+  "wall_idx": 63,
+  "wall_len": 129.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W065",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W065",
+  "wall_idx": 64,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W065",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W065",
+  "wall_idx": 64,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W066",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.51
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "T_INTERSECTION_INCOMING_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 124.0,
+  "t_lo": 95.0,
+  "wall_id": "W066",
+  "wall_idx": 65,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W066",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W066",
+  "wall_idx": 65,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W066",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W066",
+  "wall_idx": 65,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19",
+   "C04"
+  ],
+  "human_same_span": [
+   "B19",
+   "C04"
+  ],
+  "human_wall": "W068",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 24.0,
+  "t_lo": 0.0,
+  "wall_id": "W068",
+  "wall_idx": 67,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C04+C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W068",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 5,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   19.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 154.0,
+  "t_lo": 115.0,
+  "wall_id": "W068",
+  "wall_idx": 67,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C09"
+  ],
+  "human_same_span": [
+   "C09"
+  ],
+  "human_wall": "W068",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 24.0,
+  "t_lo": 0.0,
+  "wall_id": "W068",
+  "wall_idx": 67,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B19",
+   "C04"
+  ],
+  "human_same_span": [
+   "B19",
+   "C04"
+  ],
+  "human_wall": "W069",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 24.0,
+  "t_lo": 0.0,
+  "wall_id": "W069",
+  "wall_idx": 68,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C04+C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W069",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 5,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   19.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   false
+  ],
+  "span_cm": 39.0,
+  "t_hi": 154.0,
+  "t_lo": 115.0,
+  "wall_id": "W069",
+  "wall_idx": 68,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C09"
+  ],
+  "human_same_span": [
+   "C09"
+  ],
+  "human_wall": "W069",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   5.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 24.0,
+  "t_lo": 0.0,
+  "wall_id": "W069",
+  "wall_idx": 68,
+  "wall_len": 169.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B34",
+   "C09",
+   "B54"
+  ],
+  "human_same_span": [
+   "B34",
+   "C09"
+  ],
+  "human_wall": "W071",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 29.0,
+  "t_hi": 44.0,
+  "t_lo": 15.0,
+  "wall_id": "W071",
+  "wall_idx": 70,
+  "wall_len": 384.0
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W071",
+  "in_scope": true,
+  "left": "GAP",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   0.0
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "STANDARD_FILL"
+  ],
+  "right": "WALL_END_L_CORNER",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 384.0,
+  "t_lo": 370.0,
+  "wall_id": "W071",
+  "wall_idx": 70,
+  "wall_len": 384.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B39",
+   "C09",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39",
+   "C09"
+  ],
+  "human_wall": "W071",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   true
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 64.0,
+  "t_lo": 35.0,
+  "wall_id": "W071",
+  "wall_idx": 70,
+  "wall_len": 384.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [],
+  "human_wall": "W072",
+  "in_scope": true,
+  "left": "WALL_END_L_CORNER",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   0.12
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "STANDARD_FILL"
+  ],
+  "right": "GAP",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 14.0,
+  "t_lo": 0.0,
+  "wall_id": "W072",
+  "wall_idx": 71,
+  "wall_len": 384.11
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W074",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W074",
+  "wall_idx": 73,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W074",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W074",
+  "wall_idx": 73,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W075",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   22.51
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "T_INTERSECTION_INCOMING_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 124.0,
+  "t_lo": 95.0,
+  "wall_id": "W075",
+  "wall_idx": 74,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W075",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W075",
+  "wall_idx": 74,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W075",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 269.0,
+  "t_lo": 250.0,
+  "wall_id": "W075",
+  "wall_idx": 74,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W077",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.48
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W077",
+  "wall_idx": 76,
+  "wall_len": 159.02
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W077",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.48
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": -0.0,
+  "wall_id": "W077",
+  "wall_idx": 76,
+  "wall_len": 159.02
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [],
+  "human_same_span": [],
+  "human_wall": "W078",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 99.0,
+  "t_lo": 75.0,
+  "wall_id": "W078",
+  "wall_idx": 77,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [],
+  "human_same_span": [],
+  "human_wall": "W079",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   40.0
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_OWN",
+  "right_piece": [
+   "B54",
+   "T_INTERSECTION_MAIN",
+   true
+  ],
+  "span_cm": 24.0,
+  "t_hi": 99.0,
+  "t_lo": 75.0,
+  "wall_id": "W079",
+  "wall_idx": 78,
+  "wall_len": 269.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W080",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   2.5
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "WALL_END_L_CORNER",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 399.0,
+  "t_lo": 380.0,
+  "wall_id": "W080",
+  "wall_idx": 79,
+  "wall_len": 399.0
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W081",
+  "in_scope": true,
+  "left": "WALL_END_L_CORNER",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   2.38
+  ],
+  "openings_active": [
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "L_CORNER_DEGRADED",
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W081",
+  "wall_idx": 80,
+  "wall_len": 399.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W083",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.0,
+  "t_lo": 55.0,
+  "wall_id": "W083",
+  "wall_idx": 82,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W083",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 214.0,
+  "t_lo": 200.0,
+  "wall_id": "W083",
+  "wall_idx": 82,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W084",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   6.98
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 69.01,
+  "t_lo": 55.01,
+  "wall_id": "W084",
+  "wall_idx": 83,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B34_C"
+  ],
+  "human_same_span": [
+   "B34_C"
+  ],
+  "human_wall": "W084",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 213.99,
+  "t_lo": 199.99,
+  "wall_id": "W084",
+  "wall_idx": 83,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "C04",
+   "C09_C"
+  ],
+  "human_same_span": [
+   "C04",
+   "C09_C"
+  ],
+  "human_wall": "W084",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   26.99
+  ],
+  "openings_active": [
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "FILL_REPAIR",
+  "right_piece": [
+   "B19",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 49.0,
+  "t_lo": 35.0,
+  "wall_id": "W084",
+  "wall_idx": 83,
+  "wall_len": 268.99
+ },
+ {
+  "codes": "C09+C04+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W085",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W085",
+  "wall_idx": 84,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04",
+   "B19",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W085",
+  "in_scope": true,
+  "left": "FILL_REPAIR",
+  "left_piece": [
+   "B39",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   12.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 249.0,
+  "t_lo": 225.0,
+  "wall_id": "W085",
+  "wall_idx": 84,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W085",
+  "in_scope": true,
+  "left": "WALL_END_T_INTERSECTION",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 19.0,
+  "t_lo": 0.0,
+  "wall_id": "W085",
+  "wall_idx": 84,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B39",
+   "B34"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W085",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_hi",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 354.0,
+  "t_lo": 340.0,
+  "wall_id": "W085",
+  "wall_idx": 84,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B34",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W085",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 504.0,
+  "t_lo": 490.0,
+  "wall_id": "W085",
+  "wall_idx": 84,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09+C04",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "B39",
+   "B19",
+   "C04"
+  ],
+  "human_same_span": [
+   "B19",
+   "C04"
+  ],
+  "human_wall": "W086",
+  "in_scope": true,
+  "left": "FILL_REPAIR",
+  "left_piece": [
+   "B39",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   12.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 24.0,
+  "t_hi": 658.99,
+  "t_lo": 634.99,
+  "wall_id": "W086",
+  "wall_idx": 85,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C04+C04+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10
+  ],
+  "human_context_span": [
+   "C04"
+  ],
+  "human_same_span": [
+   "C04"
+  ],
+  "human_wall": "W086",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "A",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 843.99,
+  "t_lo": 824.99,
+  "wall_id": "W086",
+  "wall_idx": 85,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C04+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B34",
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W086",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_DOOR_lo",
+   7.0
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 503.99,
+  "t_lo": 489.99,
+  "wall_id": "W086",
+  "wall_idx": 85,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9
+  ],
+  "human_context_span": [
+   "B19"
+  ],
+  "human_same_span": [
+   "B19"
+  ],
+  "human_wall": "W086",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_END_T_INTERSECTION",
+   2.5
+  ],
+  "openings_active": [
+   "door",
+   "door",
+   "door",
+   "door"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 19.0,
+  "t_hi": 843.99,
+  "t_lo": 824.99,
+  "wall_id": "W086",
+  "wall_idx": 85,
+  "wall_len": 843.99
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W088",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "B",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   27.5
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 39.0,
+  "t_hi": 54.0,
+  "t_lo": 15.0,
+  "wall_id": "W088",
+  "wall_idx": 87,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34",
+   "B19"
+  ],
+  "human_wall": "W089",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "A",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   27.5
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 39.0,
+  "t_hi": 54.0,
+  "t_lo": 15.0,
+  "wall_id": "W089",
+  "wall_idx": 88,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B39"
+  ],
+  "human_same_span": [
+   "B39"
+  ],
+  "human_wall": "W090",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "B",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   27.5
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 39.0,
+  "t_hi": 54.0,
+  "t_lo": 15.0,
+  "wall_id": "W090",
+  "wall_idx": 89,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09+C09",
+  "courses": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16
+  ],
+  "human_context_span": [
+   "B34",
+   "B19"
+  ],
+  "human_same_span": [
+   "B34",
+   "B19"
+  ],
+  "human_wall": "W091",
+  "in_scope": true,
+  "left": "TIE_FOREIGN",
+  "left_piece": [
+   "B34",
+   "L_CORNER",
+   false
+  ],
+  "letter": "A",
+  "n": 4,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   27.5
+  ],
+  "openings_active": [],
+  "orientation": "V",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL",
+   "T_INTERSECTION_INCOMING_DEGRADED"
+  ],
+  "right": "WALL_END_T_INTERSECTION",
+  "right_piece": null,
+  "span_cm": 39.0,
+  "t_hi": 54.0,
+  "t_lo": 15.0,
+  "wall_id": "W091",
+  "wall_idx": 90,
+  "wall_len": 54.0
+ },
+ {
+  "codes": "C09+C09+C09",
+  "courses": [
+   1,
+   3,
+   5,
+   7,
+   9,
+   11,
+   13,
+   15
+  ],
+  "human_context_span": [
+   "B19",
+   "B19",
+   "B34"
+  ],
+  "human_same_span": [
+   "B19",
+   "B34"
+  ],
+  "human_wall": "W092",
+  "in_scope": true,
+  "left": "TIE_OWN",
+  "left_piece": [
+   "B34",
+   "X_INTERSECTION_DEGRADED",
+   true
+  ],
+  "letter": "B",
+  "n": 3,
+  "nearest_feature": [
+   "NODE_END_L_CORNER",
+   22.51
+  ],
+  "openings_active": [],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "C09",
+   "L_CORNER_DEGRADED",
+   false
+  ],
+  "span_cm": 29.0,
+  "t_hi": 108.99,
+  "t_lo": 79.99,
+  "wall_id": "W092",
+  "wall_idx": 91,
+  "wall_len": 123.98
+ },
+ {
+  "codes": "C04+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34"
+  ],
+  "human_same_span": [
+   "B34"
+  ],
+  "human_wall": "W095",
+  "in_scope": true,
+  "left": "FILL_REPAIR",
+  "left_piece": [
+   "B39",
+   "OPENING_REPAIR_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "NODE_MID_T_INTERSECTION",
+   12.5
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL",
+   "STANDARD_FILL"
+  ],
+  "right": "TIE_FOREIGN",
+  "right_piece": [
+   "B34",
+   "T_INTERSECTION_INCOMING",
+   false
+  ],
+  "span_cm": 9.0,
+  "t_hi": 254.0,
+  "t_lo": 245.0,
+  "wall_id": "W095",
+  "wall_idx": 94,
+  "wall_len": 1484.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B34",
+   "B19_C"
+  ],
+  "human_same_span": [],
+  "human_wall": "W095",
+  "in_scope": true,
+  "left": "FILL_STD",
+  "left_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_lo",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "OPENING",
+  "right_piece": null,
+  "span_cm": 14.0,
+  "t_hi": 1229.0,
+  "t_lo": 1215.0,
+  "wall_id": "W095",
+  "wall_idx": 94,
+  "wall_len": 1484.0
+ },
+ {
+  "codes": "C09+C04",
+  "courses": [
+   5,
+   7,
+   9,
+   11
+  ],
+  "human_context_span": [
+   "B19_C",
+   "B34"
+  ],
+  "human_same_span": [],
+  "human_wall": "W095",
+  "in_scope": true,
+  "left": "OPENING",
+  "left_piece": null,
+  "letter": "B",
+  "n": 2,
+  "nearest_feature": [
+   "OPENING_WINDOW_hi",
+   7.0
+  ],
+  "openings_active": [
+   "window",
+   "window"
+  ],
+  "orientation": "H",
+  "project": "TP1",
+  "reasons": [
+   "OPENING_REPAIR_FILL"
+  ],
+  "right": "FILL_STD",
+  "right_piece": [
+   "B39",
+   "STANDARD_FILL",
+   true
+  ],
+  "span_cm": 14.0,
+  "t_hi": 1374.0,
+  "t_lo": 1360.0,
+  "wall_id": "W095",
+  "wall_idx": 94,
+  "wall_len": 1484.0
+ }
+]

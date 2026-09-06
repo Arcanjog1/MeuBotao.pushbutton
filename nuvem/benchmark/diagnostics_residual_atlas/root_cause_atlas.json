@@ -1,0 +1,2493 @@
+{
+ "schema_version": 1,
+ "cr": "CR-BLOCK-SOLVER-RESIDUAL-ROOT-CAUSE-ATLAS",
+ "base_commit": "209695d5559b53fe4cc8a92300779a8ae73b7c1d",
+ "measured_at": "2026-09-06",
+ "state_current": {
+  "PILOTO": {
+   "arm_role_safe_repair": {
+    "accepted": 0,
+    "rejected": 0
+   },
+   "blocks": 772,
+   "counts_by_code": {
+    "COMPENSATOR_CONSECUTIVE": 36,
+    "COMPENSATOR_EXCESS_IN_RUN": 28,
+    "COMPENSATOR_VERTICAL_STRIP": 18,
+    "COVERAGE_GAP_IN_ROW": 16,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 8,
+    "OPENING_MISSING_COUNTER_LINTEL": 4,
+    "PRISM_STAGGER_BELOW_TARGET": 14
+   },
+   "evaluate_seconds": 0.02,
+   "human_walls": 0,
+   "matched_pairs": 0,
+   "n_bands": 2,
+   "n_nodes": 9,
+   "num_courses": 8,
+   "physical_fingerprint": "e66bcd806d57627652ee7dc38ca7a89fc55568e80b66eea1e9ab063cbdf5e3df",
+   "physical_pieces": 772,
+   "project_id": "piloto_sintetico_2x2",
+   "solver_seconds": 0.06,
+   "solver_signals": {
+    "bond_audits_failing": 9,
+    "collisions": 0,
+    "door_void_violations": 0,
+    "error": null,
+    "intersection_failures": 0,
+    "non_modular": 32
+   },
+   "total_seconds": 0.14,
+   "walls": 12
+  },
+  "TGD": {
+   "arm_role_safe_repair": {
+    "accepted": 2,
+    "rejected": 19
+   },
+   "blocks": 10679,
+   "counts_by_code": {
+    "COMPENSATOR_AVOIDABLE": 37,
+    "COMPENSATOR_CONSECUTIVE": 379,
+    "COMPENSATOR_EXCESS_IN_RUN": 341,
+    "COMPENSATOR_VERTICAL_STRIP": 58,
+    "COVERAGE_GAP_IN_ROW": 1959,
+    "COVERAGE_MISSING_ROW": 258,
+    "COVERAGE_PARTIAL_WALL": 61,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+    "COVERAGE_WALL_NOT_MODULATED": 29,
+    "JUNCTION_MISSING_BINDING": 23,
+    "JUNCTION_NOT_ALTERNATING": 303,
+    "OPENING_BLOCK_CROSSES_JAMB": 108,
+    "OPENING_BLOCK_INSIDE_DOOR": 5,
+    "OPENING_MISSING_COUNTER_LINTEL": 25,
+    "OPENING_MISSING_LINTEL": 82,
+    "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+    "POSITION_OVERLAP": 29,
+    "PRISM_CONTINUOUS_JOINT": 320,
+    "PRISM_JOINT_STACK": 19,
+    "PRISM_STAGGER_BELOW_TARGET": 774
+   },
+   "evaluate_seconds": 0.85,
+   "human_walls": 97,
+   "matched_pairs": 84,
+   "n_bands": 8,
+   "n_nodes": 273,
+   "num_courses": 17,
+   "physical_fingerprint": "09bc1b0c3cd966d473673f9b7136a163e4c3d2414c6bcc7c727fec2c936d37a1",
+   "physical_pieces": 10679,
+   "project_id": "torre_easy_lo_r00_tgd",
+   "solver_seconds": 45.56,
+   "solver_signals": {
+    "bond_audits_failing": 34,
+    "collisions": 1043,
+    "door_void_violations": 290,
+    "error": null,
+    "intersection_failures": 200,
+    "non_modular": 3047
+   },
+   "total_seconds": 48.75,
+   "walls": 167
+  },
+  "TP1": {
+   "arm_role_safe_repair": {
+    "accepted": 1,
+    "rejected": 6
+   },
+   "blocks": 18417,
+   "counts_by_code": {
+    "COMPENSATOR_AVOIDABLE": 86,
+    "COMPENSATOR_CONSECUTIVE": 1443,
+    "COMPENSATOR_EXCESS_IN_RUN": 1067,
+    "COMPENSATOR_VERTICAL_STRIP": 186,
+    "COVERAGE_GAP_IN_ROW": 327,
+    "COVERAGE_PARTIAL_WALL": 6,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+    "JUNCTION_MISSING_BINDING": 9,
+    "OPENING_BLOCK_CROSSES_JAMB": 168,
+    "OPENING_MISSING_COUNTER_LINTEL": 21,
+    "POSITION_OVERLAP": 18,
+    "PRISM_CONTINUOUS_JOINT": 256,
+    "PRISM_JOINT_STACK": 16,
+    "PRISM_STAGGER_BELOW_TARGET": 1370
+   },
+   "evaluate_seconds": 1.17,
+   "human_walls": 96,
+   "matched_pairs": 96,
+   "n_bands": 7,
+   "n_nodes": 180,
+   "num_courses": 17,
+   "physical_fingerprint": "8d08d59134cd7ed71b99c484f7a5f2cf5be63374dd5fa62bf55f9f8aa4af52a8",
+   "physical_pieces": 18417,
+   "project_id": "torre_easy_lo_r00_tp1",
+   "solver_seconds": 25.18,
+   "solver_signals": {
+    "bond_audits_failing": 38,
+    "collisions": 14,
+    "door_void_violations": 348,
+    "error": null,
+    "intersection_failures": 0,
+    "non_modular": 281
+   },
+   "total_seconds": 28.87,
+   "walls": 96
+  }
+ },
+ "determinism": {
+  "deterministic_across_hash_seeds": true,
+  "seeds": [
+   "0",
+   "1",
+   "12345",
+   "random"
+  ]
+ },
+ "invariance": {
+  "R1_boneca_79": {
+   "endpoint_reversal_all": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 128
+   },
+   "endpoint_reversal_half": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "mirror_x": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 98
+   },
+   "permutation": {
+    "diffs": [
+     [
+      [
+       4,
+       0,
+       3,
+       1,
+       2
+      ],
+      "DIFFERENT_LAYOUT",
+      90
+     ],
+     [
+      [
+       2,
+       3,
+       1,
+       4,
+       0
+      ],
+      "DIFFERENT_LAYOUT",
+      136
+     ],
+     [
+      [
+       3,
+       2,
+       0,
+       1,
+       4
+      ],
+      "DIFFERENT_LAYOUT",
+      136
+     ],
+     [
+      [
+       1,
+       2,
+       4,
+       3,
+       0
+      ],
+      "DIFFERENT_LAYOUT",
+      98
+     ],
+     [
+      [
+       3,
+       4,
+       2,
+       0,
+       1
+      ],
+      "DIFFERENT_LAYOUT",
+      214
+     ]
+    ],
+    "of": 6,
+    "ok": 1
+   },
+   "pieces": 140,
+   "rotate_90": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "translation": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "walls": 5
+  },
+  "R2b_x_borderline": {
+   "endpoint_reversal_all": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 254
+   },
+   "endpoint_reversal_half": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "mirror_x": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "permutation": {
+    "diffs": [
+     [
+      [
+       4,
+       0,
+       5,
+       3,
+       1,
+       2
+      ],
+      "DIFFERENT_LAYOUT",
+      28
+     ],
+     [
+      [
+       2,
+       3,
+       1,
+       5,
+       4,
+       0
+      ],
+      "DIFFERENT_LAYOUT",
+      286
+     ],
+     [
+      [
+       2,
+       5,
+       3,
+       0,
+       1,
+       4
+      ],
+      "DIFFERENT_LAYOUT",
+      286
+     ],
+     [
+      [
+       2,
+       5,
+       4,
+       1,
+       0,
+       3
+      ],
+      "DIFFERENT_LAYOUT",
+      28
+     ],
+     [
+      [
+       1,
+       2,
+       3,
+       5,
+       4,
+       0
+      ],
+      "DIFFERENT_LAYOUT",
+      286
+     ]
+    ],
+    "of": 6,
+    "ok": 1
+   },
+   "pieces": 162,
+   "rotate_90": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 28
+   },
+   "translation": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 126
+   },
+   "walls": 6
+  },
+  "R5_L_porta_5cm": {
+   "endpoint_reversal_all": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "endpoint_reversal_half": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "mirror_x": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "permutation": {
+    "diffs": [
+     [
+      [
+       1,
+       0
+      ],
+      "PARITY_FLIP_ONLY",
+      8
+     ],
+     [
+      [
+       1,
+       0
+      ],
+      "PARITY_FLIP_ONLY",
+      8
+     ],
+     [
+      [
+       1,
+       0
+      ],
+      "PARITY_FLIP_ONLY",
+      8
+     ],
+     [
+      [
+       1,
+       0
+      ],
+      "PARITY_FLIP_ONLY",
+      8
+     ]
+    ],
+    "of": 6,
+    "ok": 2
+   },
+   "pieces": 4,
+   "rotate_90": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "translation": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "walls": 2
+  },
+  "grade_2x2_piloto": {
+   "endpoint_reversal_all": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 644
+   },
+   "endpoint_reversal_half": {
+    "class": "DIFFERENT_LAYOUT",
+    "diff_pieces": 288
+   },
+   "mirror_x": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "permutation": {
+    "diffs": [
+     [
+      [
+       7,
+       11,
+       3,
+       10,
+       8,
+       4,
+       9,
+       1,
+       0,
+       6,
+       2,
+       5
+      ],
+      "DIFFERENT_LAYOUT",
+      632
+     ],
+     [
+      [
+       7,
+       4,
+       2,
+       5,
+       11,
+       9,
+       10,
+       6,
+       1,
+       0,
+       3,
+       8
+      ],
+      "DIFFERENT_LAYOUT",
+      694
+     ],
+     [
+      [
+       10,
+       2,
+       5,
+       7,
+       8,
+       6,
+       4,
+       11,
+       3,
+       1,
+       9,
+       0
+      ],
+      "DIFFERENT_LAYOUT",
+      590
+     ],
+     [
+      [
+       1,
+       5,
+       3,
+       7,
+       11,
+       0,
+       9,
+       10,
+       6,
+       4,
+       2,
+       8
+      ],
+      "DIFFERENT_LAYOUT",
+      662
+     ],
+     [
+      [
+       11,
+       8,
+       2,
+       7,
+       6,
+       4,
+       0,
+       5,
+       3,
+       10,
+       9,
+       1
+      ],
+      "DIFFERENT_LAYOUT",
+      380
+     ],
+     [
+      [
+       11,
+       0,
+       1,
+       2,
+       9,
+       4,
+       3,
+       5,
+       6,
+       8,
+       10,
+       7
+      ],
+      "DIFFERENT_LAYOUT",
+      218
+     ]
+    ],
+    "of": 6,
+    "ok": 0
+   },
+   "pieces": 370,
+   "rotate_90": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "translation": {
+    "class": "INVARIANT",
+    "diff_pieces": 0
+   },
+   "walls": 12
+  }
+ },
+ "performance": {
+  "PILOTO": {
+   "total_seconds": 0.08,
+   "arm_rebuilds": 1
+  },
+  "TGD": {
+   "total_seconds": 46.85,
+   "arm_rebuilds": 23
+  },
+  "TP1": {
+   "total_seconds": 25.8,
+   "arm_rebuilds": 9
+  }
+ },
+ "ablations": {
+  "fit_tol_0_3": {
+   "TGD": {
+    "ablated": {
+     "COMPENSATOR_AVOIDABLE": 39,
+     "COMPENSATOR_CONSECUTIVE": 522,
+     "COMPENSATOR_EXCESS_IN_RUN": 439,
+     "COMPENSATOR_VERTICAL_STRIP": 81,
+     "COVERAGE_GAP_IN_ROW": 1644,
+     "COVERAGE_MISSING_ROW": 192,
+     "COVERAGE_PARTIAL_WALL": 48,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 150,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "JUNCTION_MISSING_BINDING": 23,
+     "JUNCTION_NOT_ALTERNATING": 303,
+     "OPENING_BLOCK_CROSSES_JAMB": 144,
+     "OPENING_BLOCK_INSIDE_DOOR": 5,
+     "OPENING_MISSING_COUNTER_LINTEL": 25,
+     "OPENING_MISSING_LINTEL": 82,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+     "POSITION_OVERLAP": 29,
+     "PRISM_CONTINUOUS_JOINT": 336,
+     "PRISM_JOINT_STACK": 20,
+     "PRISM_STAGGER_BELOW_TARGET": 830
+    },
+    "baseline": {
+     "COMPENSATOR_AVOIDABLE": 37,
+     "COMPENSATOR_CONSECUTIVE": 379,
+     "COMPENSATOR_EXCESS_IN_RUN": 341,
+     "COMPENSATOR_VERTICAL_STRIP": 58,
+     "COVERAGE_GAP_IN_ROW": 1959,
+     "COVERAGE_MISSING_ROW": 258,
+     "COVERAGE_PARTIAL_WALL": 61,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "JUNCTION_MISSING_BINDING": 23,
+     "JUNCTION_NOT_ALTERNATING": 303,
+     "OPENING_BLOCK_CROSSES_JAMB": 108,
+     "OPENING_BLOCK_INSIDE_DOOR": 5,
+     "OPENING_MISSING_COUNTER_LINTEL": 25,
+     "OPENING_MISSING_LINTEL": 82,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+     "POSITION_OVERLAP": 29,
+     "PRISM_CONTINUOUS_JOINT": 320,
+     "PRISM_JOINT_STACK": 19,
+     "PRISM_STAGGER_BELOW_TARGET": 774
+    },
+    "delta(base,ablated,diff)": {
+     "COMPENSATOR_AVOIDABLE": [
+      37,
+      39,
+      2
+     ],
+     "COMPENSATOR_CONSECUTIVE": [
+      379,
+      522,
+      143
+     ],
+     "COMPENSATOR_EXCESS_IN_RUN": [
+      341,
+      439,
+      98
+     ],
+     "COMPENSATOR_VERTICAL_STRIP": [
+      58,
+      81,
+      23
+     ],
+     "COVERAGE_GAP_IN_ROW": [
+      1959,
+      1644,
+      -315
+     ],
+     "COVERAGE_MISSING_ROW": [
+      258,
+      192,
+      -66
+     ],
+     "COVERAGE_PARTIAL_WALL": [
+      61,
+      48,
+      -13
+     ],
+     "COVERAGE_ROW_MOSTLY_EMPTY": [
+      112,
+      150,
+      38
+     ],
+     "OPENING_BLOCK_CROSSES_JAMB": [
+      108,
+      144,
+      36
+     ],
+     "PRISM_CONTINUOUS_JOINT": [
+      320,
+      336,
+      16
+     ],
+     "PRISM_JOINT_STACK": [
+      19,
+      20,
+      1
+     ],
+     "PRISM_STAGGER_BELOW_TARGET": [
+      774,
+      830,
+      56
+     ]
+    },
+    "pieces": 11735,
+    "pieces_baseline": 10679,
+    "solver_seconds": 52.0
+   },
+   "TP1": {
+    "ablated": {
+     "COMPENSATOR_AVOIDABLE": 87,
+     "COMPENSATOR_CONSECUTIVE": 1480,
+     "COMPENSATOR_EXCESS_IN_RUN": 1135,
+     "COMPENSATOR_VERTICAL_STRIP": 190,
+     "COVERAGE_GAP_IN_ROW": 214,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 173,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 290,
+     "PRISM_JOINT_STACK": 18,
+     "PRISM_STAGGER_BELOW_TARGET": 1506
+    },
+    "baseline": {
+     "COMPENSATOR_AVOIDABLE": 86,
+     "COMPENSATOR_CONSECUTIVE": 1443,
+     "COMPENSATOR_EXCESS_IN_RUN": 1067,
+     "COMPENSATOR_VERTICAL_STRIP": 186,
+     "COVERAGE_GAP_IN_ROW": 327,
+     "COVERAGE_PARTIAL_WALL": 6,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 256,
+     "PRISM_JOINT_STACK": 16,
+     "PRISM_STAGGER_BELOW_TARGET": 1370
+    },
+    "delta(base,ablated,diff)": {
+     "COMPENSATOR_AVOIDABLE": [
+      86,
+      87,
+      1
+     ],
+     "COMPENSATOR_CONSECUTIVE": [
+      1443,
+      1480,
+      37
+     ],
+     "COMPENSATOR_EXCESS_IN_RUN": [
+      1067,
+      1135,
+      68
+     ],
+     "COMPENSATOR_VERTICAL_STRIP": [
+      186,
+      190,
+      4
+     ],
+     "COVERAGE_GAP_IN_ROW": [
+      327,
+      214,
+      -113
+     ],
+     "COVERAGE_PARTIAL_WALL": [
+      6,
+      0,
+      -6
+     ],
+     "COVERAGE_ROW_MOSTLY_EMPTY": [
+      18,
+      0,
+      -18
+     ],
+     "OPENING_BLOCK_CROSSES_JAMB": [
+      168,
+      173,
+      5
+     ],
+     "PRISM_CONTINUOUS_JOINT": [
+      256,
+      290,
+      34
+     ],
+     "PRISM_JOINT_STACK": [
+      16,
+      18,
+      2
+     ],
+     "PRISM_STAGGER_BELOW_TARGET": [
+      1370,
+      1506,
+      136
+     ]
+    },
+    "pieces": 19572,
+    "pieces_baseline": 18417,
+    "solver_seconds": 46.9
+   }
+  },
+  "x_room_slack": {
+   "TP1": {
+    "ablated": {
+     "COMPENSATOR_AVOIDABLE": 83,
+     "COMPENSATOR_CONSECUTIVE": 1411,
+     "COMPENSATOR_EXCESS_IN_RUN": 1051,
+     "COMPENSATOR_VERTICAL_STRIP": 186,
+     "COVERAGE_GAP_IN_ROW": 327,
+     "COVERAGE_PARTIAL_WALL": 6,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 256,
+     "PRISM_JOINT_STACK": 16,
+     "PRISM_STAGGER_BELOW_TARGET": 1322
+    },
+    "baseline": {
+     "COMPENSATOR_AVOIDABLE": 86,
+     "COMPENSATOR_CONSECUTIVE": 1443,
+     "COMPENSATOR_EXCESS_IN_RUN": 1067,
+     "COMPENSATOR_VERTICAL_STRIP": 186,
+     "COVERAGE_GAP_IN_ROW": 327,
+     "COVERAGE_PARTIAL_WALL": 6,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 256,
+     "PRISM_JOINT_STACK": 16,
+     "PRISM_STAGGER_BELOW_TARGET": 1370
+    },
+    "delta(base,ablated,diff)": {
+     "COMPENSATOR_AVOIDABLE": [
+      86,
+      83,
+      -3
+     ],
+     "COMPENSATOR_CONSECUTIVE": [
+      1443,
+      1411,
+      -32
+     ],
+     "COMPENSATOR_EXCESS_IN_RUN": [
+      1067,
+      1051,
+      -16
+     ],
+     "PRISM_STAGGER_BELOW_TARGET": [
+      1370,
+      1322,
+      -48
+     ]
+    },
+    "pieces": 18361,
+    "pieces_baseline": 18417,
+    "solver_seconds": 25.5
+   }
+  },
+  "no_arm": {
+   "TGD": {
+    "ablated": {
+     "COMPENSATOR_AVOIDABLE": 37,
+     "COMPENSATOR_CONSECUTIVE": 379,
+     "COMPENSATOR_EXCESS_IN_RUN": 340,
+     "COMPENSATOR_VERTICAL_STRIP": 56,
+     "COVERAGE_GAP_IN_ROW": 1959,
+     "COVERAGE_MISSING_ROW": 258,
+     "COVERAGE_PARTIAL_WALL": 61,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "JUNCTION_MISSING_BINDING": 23,
+     "JUNCTION_NOT_ALTERNATING": 303,
+     "OPENING_BLOCK_CROSSES_JAMB": 108,
+     "OPENING_BLOCK_INSIDE_DOOR": 5,
+     "OPENING_MISSING_COUNTER_LINTEL": 25,
+     "OPENING_MISSING_LINTEL": 82,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+     "POSITION_OVERLAP": 29,
+     "PRISM_CONTINUOUS_JOINT": 347,
+     "PRISM_JOINT_STACK": 21,
+     "PRISM_STAGGER_BELOW_TARGET": 790
+    },
+    "baseline": {
+     "COMPENSATOR_AVOIDABLE": 37,
+     "COMPENSATOR_CONSECUTIVE": 379,
+     "COMPENSATOR_EXCESS_IN_RUN": 341,
+     "COMPENSATOR_VERTICAL_STRIP": 58,
+     "COVERAGE_GAP_IN_ROW": 1959,
+     "COVERAGE_MISSING_ROW": 258,
+     "COVERAGE_PARTIAL_WALL": 61,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "JUNCTION_MISSING_BINDING": 23,
+     "JUNCTION_NOT_ALTERNATING": 303,
+     "OPENING_BLOCK_CROSSES_JAMB": 108,
+     "OPENING_BLOCK_INSIDE_DOOR": 5,
+     "OPENING_MISSING_COUNTER_LINTEL": 25,
+     "OPENING_MISSING_LINTEL": 82,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+     "POSITION_OVERLAP": 29,
+     "PRISM_CONTINUOUS_JOINT": 320,
+     "PRISM_JOINT_STACK": 19,
+     "PRISM_STAGGER_BELOW_TARGET": 774
+    },
+    "delta(base,ablated,diff)": {
+     "COMPENSATOR_EXCESS_IN_RUN": [
+      341,
+      340,
+      -1
+     ],
+     "COMPENSATOR_VERTICAL_STRIP": [
+      58,
+      56,
+      -2
+     ],
+     "PRISM_CONTINUOUS_JOINT": [
+      320,
+      347,
+      27
+     ],
+     "PRISM_JOINT_STACK": [
+      19,
+      21,
+      2
+     ],
+     "PRISM_STAGGER_BELOW_TARGET": [
+      774,
+      790,
+      16
+     ]
+    },
+    "pieces": 10703,
+    "pieces_baseline": 10679,
+    "solver_seconds": 2.7
+   },
+   "TP1": {
+    "ablated": {
+     "COMPENSATOR_AVOIDABLE": 86,
+     "COMPENSATOR_CONSECUTIVE": 1461,
+     "COMPENSATOR_EXCESS_IN_RUN": 1084,
+     "COMPENSATOR_VERTICAL_STRIP": 188,
+     "COVERAGE_GAP_IN_ROW": 327,
+     "COVERAGE_PARTIAL_WALL": 6,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 272,
+     "PRISM_JOINT_STACK": 17,
+     "PRISM_STAGGER_BELOW_TARGET": 1418
+    },
+    "baseline": {
+     "COMPENSATOR_AVOIDABLE": 86,
+     "COMPENSATOR_CONSECUTIVE": 1443,
+     "COMPENSATOR_EXCESS_IN_RUN": 1067,
+     "COMPENSATOR_VERTICAL_STRIP": 186,
+     "COVERAGE_GAP_IN_ROW": 327,
+     "COVERAGE_PARTIAL_WALL": 6,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "POSITION_OVERLAP": 18,
+     "PRISM_CONTINUOUS_JOINT": 256,
+     "PRISM_JOINT_STACK": 16,
+     "PRISM_STAGGER_BELOW_TARGET": 1370
+    },
+    "delta(base,ablated,diff)": {
+     "COMPENSATOR_CONSECUTIVE": [
+      1443,
+      1461,
+      18
+     ],
+     "COMPENSATOR_EXCESS_IN_RUN": [
+      1067,
+      1084,
+      17
+     ],
+     "COMPENSATOR_VERTICAL_STRIP": [
+      186,
+      188,
+      2
+     ],
+     "PRISM_CONTINUOUS_JOINT": [
+      256,
+      272,
+      16
+     ],
+     "PRISM_JOINT_STACK": [
+      16,
+      17,
+      1
+     ],
+     "PRISM_STAGGER_BELOW_TARGET": [
+      1370,
+      1418,
+      48
+     ]
+    },
+    "pieces": 18451,
+    "pieces_baseline": 18417,
+    "solver_seconds": 2.9
+   }
+  }
+ },
+ "clusters": [
+  {
+   "cluster_id": "C01_SHORT_WALL_NODE_ROLE",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "MEDIUM",
+   "root_cause": "Parede curta (54-130cm) entre dois nos: alternancia de papel forcada (_coordinate_arm_role_nodes), reserva pior-caso 34cm (_wall_reserved_range_ft) e degradacao para C09/C04 (nunca B19) produzem C09x3 nas duas familias; humano concentra os dois B34 numa familia e fecha com B19/B39",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "JUNCTION_ROLE_ERROR",
+    "DOMAIN_RULE_BLOCKED",
+    "RESERVATION_TOO_CONSERVATIVE"
+   ],
+   "human_verdict": "SOLVER_WRONG",
+   "future_cr": "CR-BLOCK-SHORT-WALL-NODE-POLICY",
+   "dependencies": [
+    "C04_FIT_TOLERANCE_NOISE",
+    "HUMAN_DOMAIN_APPROVAL"
+   ],
+   "minimal_reproducer": "R1",
+   "files": [
+    "nuvem/core/engine/wall_stepper.py: solve_l_corner, solve_t_intersection, _corner_single_element_candidate, _wall_reserved_range_ft, _coordinate_arm_role_nodes, SAFE REPAIR gates"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 151,
+    "TP1": 652,
+    "PILOTO": 0,
+    "total": 803
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 394,
+    "COMPENSATOR_EXCESS_IN_RUN": 224,
+    "COMPENSATOR_VERTICAL_STRIP": 41,
+    "PRISM_CONTINUOUS_JOINT": 144
+   },
+   "walls": {
+    "TGD": [
+     "W003",
+     "W012",
+     "W079",
+     "W095",
+     "W137",
+     "W157",
+     "W158"
+    ],
+    "TP1": [
+     "W013",
+     "W014",
+     "W015",
+     "W016",
+     "W032",
+     "W033",
+     "W061",
+     "W062",
+     "W063",
+     "W064",
+     "W088",
+     "W089",
+     "W090",
+     "W091"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C02_X_ROOM_BORDERLINE_DEGRADED",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "MEDIUM",
+   "root_cause": "X a 55cm de um T: room_minus=27.99 < 28.00 (ruido 0.01cm) degrada B54->B34 nas duas paredes; a junta 34.5 e' coincidencia NO|NO (borda do X em 35 x borda do T em 34); humano nao amarra o X (parede longa continua)",
+   "first_divergence_stage": "node_reservation",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT(float)",
+    "DOMAIN_RULE"
+   ],
+   "human_verdict": "DIFFERENT_VALID/SOLVER_WRONG",
+   "future_cr": "CR-BLOCK-ROOM-CHECK-ROBUSTNESS",
+   "dependencies": [],
+   "minimal_reproducer": "R2b",
+   "ablation": {
+    "x_room_slack_0.05cm": {
+     "COMPENSATOR_CONSECUTIVE": -32,
+     "COMPENSATOR_EXCESS_IN_RUN": -16,
+     "PRISM_CONTINUOUS_JOINT": 0
+    }
+   },
+   "files": [
+    "wall_stepper.py: _x_intersection_wall_room_ft, solve_x_intersection, _t_intersection_room_ok, _corner_wall_room_ft"
+   ],
+   "projects": [
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 0,
+    "TP1": 236,
+    "PILOTO": 0,
+    "total": 236
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 84,
+    "COMPENSATOR_EXCESS_IN_RUN": 50,
+    "COMPENSATOR_VERTICAL_STRIP": 6,
+    "PRISM_CONTINUOUS_JOINT": 96
+   },
+   "walls": {
+    "TP1": [
+     "W003",
+     "W008",
+     "W021",
+     "W092"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C03_NODE_INSIDE_OPENING_SPAN",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "STRONG",
+   "root_cause": "Abertura reconstruida inflada (+15cm por lado adjacente a T) contem o no' a 8cm da borda; _room_at_t_on_wall so' ve aberturas a frente de t -> B54 centrado invade 35cm; entre dois B54 dentro do vao sobram 30cm -> C09x3. TGD: vaos medidos de 166cm contendo dois T (Fase A)",
+   "first_divergence_stage": "input(openings)/node_pieces",
+   "classification": [
+    "REFERENCE_LIMITATION",
+    "BENCHMARK_ARTIFACT",
+    "SEARCH_PRUNED(room check)"
+   ],
+   "human_verdict": "CONSISTENT_WITH_HUMAN when opening is real (R4b)",
+   "future_cr": "CR-BENCH-OPENING-RECONSTRUCTION + CR-BLOCK-ROOM-CHECK-ROBUSTNESS",
+   "dependencies": [],
+   "minimal_reproducer": "R4/R4b",
+   "files": [
+    "nuvem/benchmark/extract/reconstruct.py",
+    "wall_stepper.py: _room_at_t_on_wall"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 84,
+    "TP1": 338,
+    "PILOTO": 0,
+    "total": 422
+   },
+   "finding_codes": {
+    "OPENING_BLOCK_CROSSES_JAMB": 252,
+    "COMPENSATOR_CONSECUTIVE": 126,
+    "COMPENSATOR_EXCESS_IN_RUN": 23,
+    "COMPENSATOR_VERTICAL_STRIP": 21
+   },
+   "walls": {
+    "TGD": [
+     "W019",
+     "W020",
+     "W028",
+     "W029",
+     "W053",
+     "W110",
+     "W111",
+     "W134",
+     "W145",
+     "W146"
+    ],
+    "TP1": [
+     "W003",
+     "W004",
+     "W005",
+     "W006",
+     "W007",
+     "W008",
+     "W017",
+     "W019",
+     "W046",
+     "W047",
+     "W052"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C04_FIT_TOLERANCE_NOISE",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "STRONG",
+   "root_cause": "PIER_LAYOUT_TOLERANCE_CM=0.05 abaixo do ruido de entrada (0.08cm em TP1; fragmentos no TGD): _pier_remaining_snapped_cm devolve None e a familia inteira do trecho fica vazia",
+   "first_divergence_stage": "continuous_layout(arithmetic)",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT(tolerance)"
+   ],
+   "human_verdict": "SOLVER_WRONG",
+   "future_cr": "CR-BLOCK-FIT-TOLERANCE",
+   "dependencies": [],
+   "minimal_reproducer": "R3",
+   "ablation": {
+    "fit_tol_0.30cm": {
+     "TP1": {
+      "pieces": 1155,
+      "COVERAGE_GAP_IN_ROW": -113,
+      "COVERAGE_ROW_MOSTLY_EMPTY": -18,
+      "COVERAGE_PARTIAL_WALL": -6,
+      "COMPENSATOR_CONSECUTIVE": 37,
+      "COMPENSATOR_EXCESS_IN_RUN": 68,
+      "PRISM_CONTINUOUS_JOINT": 34
+     },
+     "TGD": {
+      "pieces": 1056,
+      "COVERAGE_GAP_IN_ROW": -315,
+      "COVERAGE_MISSING_ROW": -66,
+      "COVERAGE_PARTIAL_WALL": -13,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 38,
+      "COMPENSATOR_CONSECUTIVE": 143
+     }
+    }
+   },
+   "files": [
+    "nuvem/core/engine/modulation_math.py: MODULATION_WHOLE_CM_TOLERANCE_CM, _pier_remaining_cm",
+    "wall_stepper.py: _pier_remaining_snapped_cm"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 215,
+    "TP1": 176,
+    "PILOTO": 0,
+    "total": 391
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 361,
+    "COVERAGE_PARTIAL_WALL": 12,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 18
+   },
+   "walls": {
+    "TGD": [
+     "W019",
+     "W020",
+     "W090",
+     "W136",
+     "W145",
+     "W146"
+    ],
+    "TP1": [
+     "W012",
+     "W022",
+     "W029",
+     "W040",
+     "W072",
+     "W081",
+     "W093",
+     "W095"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C04b_NONMODULAR_TRECHO_GEOMETRY",
+   "severity": "MEDIUM",
+   "confidence": 4,
+   "human_support": "WEAK",
+   "root_cause": "Trecho a 0.5-2.5cm de um comprimento valido (geometria, nao ruido): sem ajuste geometrico (plan_hook=None no benchmark) fica vazio",
+   "first_divergence_stage": "continuous_layout",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "(ajuste geometrico ja existe na producao; fora do benchmark)",
+   "dependencies": [
+    "C04_FIT_TOLERANCE_NOISE"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 275,
+    "TP1": 32,
+    "PILOTO": 0,
+    "total": 307
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 288,
+    "COVERAGE_MISSING_ROW": 11,
+    "COVERAGE_PARTIAL_WALL": 8
+   },
+   "walls": {
+    "TGD": [
+     "W027",
+     "W028",
+     "W051",
+     "W053",
+     "W110",
+     "W111",
+     "W112",
+     "W115",
+     "W135"
+    ],
+    "TP1": [
+     "W052",
+     "W055",
+     "W056"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C05_DEGRADED_NODE_PIECE_RESIDUE",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "MEDIUM",
+   "root_cause": "No' degradado para C09/C04 (room<34) + residuo de 10-20cm fechado com outro compensador -> C09+C09 por construcao (regra #2 violada); humano usa B19 cobrindo o no'/canto ou nenhum elemento (boneca <=70cm: principal continua)",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "DOMAIN_RULE_BLOCKED",
+    "COMPENSATOR_FALLBACK"
+   ],
+   "human_verdict": "SOLVER_WRONG",
+   "future_cr": "CR-BLOCK-SHORT-WALL-NODE-POLICY",
+   "dependencies": [
+    "HUMAN_DOMAIN_APPROVAL"
+   ],
+   "minimal_reproducer": "R5/R6",
+   "files": [
+    "wall_stepper.py: _corner_single_element_candidate, solve_t_intersection, _recut_openings_and_repair"
+   ],
+   "projects": [
+    "TGD",
+    "TP1",
+    "PILOTO"
+   ],
+   "estimated_impact": {
+    "TGD": 374,
+    "TP1": 738,
+    "PILOTO": 16,
+    "total": 1128
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 421,
+    "COMPENSATOR_EXCESS_IN_RUN": 303,
+    "COMPENSATOR_VERTICAL_STRIP": 40,
+    "COVERAGE_GAP_IN_ROW": 298,
+    "PRISM_CONTINUOUS_JOINT": 66
+   },
+   "walls": {
+    "TGD": [
+     "W015",
+     "W018",
+     "W022",
+     "W031",
+     "W034",
+     "W043",
+     "W048",
+     "W050",
+     "W052",
+     "W066",
+     "W069",
+     "W070",
+     "W072",
+     "W075",
+     "W078",
+     "W082",
+     "W083",
+     "W087",
+     "W093",
+     "W104",
+     "W109",
+     "W113",
+     "W115",
+     "W117",
+     "W126",
+     "W129",
+     "W131",
+     "W133",
+     "W135",
+     "W142",
+     "W147",
+     "W150",
+     "W151",
+     "W159"
+    ],
+    "TP1": [
+     "W022",
+     "W023",
+     "W024",
+     "W027",
+     "W028",
+     "W029",
+     "W030",
+     "W034",
+     "W035",
+     "W039",
+     "W040",
+     "W044",
+     "W045",
+     "W053",
+     "W054",
+     "W065",
+     "W066",
+     "W068",
+     "W069",
+     "W071",
+     "W072",
+     "W074",
+     "W075",
+     "W077",
+     "W080",
+     "W081",
+     "W085",
+     "W086",
+     "W093"
+    ],
+    "PILOTO": [
+     "W002",
+     "W007",
+     "W009",
+     "W010"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C06_REPAIR_RESIDUE_NEAR_OPENING",
+   "severity": "MEDIUM",
+   "confidence": 4,
+   "human_support": "MEDIUM",
+   "root_cause": "Regiao de reparo fixada pelas pecas mantidas deixa residuos de 14/19/24/29cm -> C09+C04/C09+C09; humano corta bloco (B34_C/B19_C) ou refaz o trecho",
+   "first_divergence_stage": "local_repair",
+   "classification": [
+    "OPENING_REPAIR_INTERACTION",
+    "COMPENSATOR_FALLBACK"
+   ],
+   "human_verdict": "SOLVER_WRONG (parcialmente catalogo)",
+   "future_cr": "parte de CR-BLOCK-FILL-B34-MODULE / reparo com custo de compensador",
+   "dependencies": [
+    "C10_REPAIR_ANCHOR_RECREATES_NODE_JOINT (mesmas funcoes)"
+   ],
+   "files": [
+    "wall_stepper.py: _recut_openings_and_repair, _solve_repair_subsegments",
+    "continuous_modulation.py: region_solid_subsegments"
+   ],
+   "projects": [
+    "TGD",
+    "TP1",
+    "PILOTO"
+   ],
+   "estimated_impact": {
+    "TGD": 101,
+    "TP1": 410,
+    "PILOTO": 75,
+    "total": 586
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 335,
+    "COMPENSATOR_EXCESS_IN_RUN": 238,
+    "COMPENSATOR_VERTICAL_STRIP": 13
+   },
+   "walls": {
+    "TGD": [
+     "W007",
+     "W011",
+     "W069",
+     "W131",
+     "W159",
+     "W160"
+    ],
+    "TP1": [
+     "W011",
+     "W018",
+     "W020",
+     "W023",
+     "W024",
+     "W025",
+     "W026",
+     "W027",
+     "W036",
+     "W038",
+     "W042",
+     "W043",
+     "W068",
+     "W069",
+     "W083",
+     "W084",
+     "W085",
+     "W086",
+     "W095"
+    ],
+    "PILOTO": [
+     "W001",
+     "W003",
+     "W004",
+     "W005",
+     "W006",
+     "W007",
+     "W011"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C07_FILL_RESIDUE_BETWEEN_TIES",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "STRONG(conflicts with rule 23.6)",
+   "root_cause": "MAX_SPECIAL_BOND_PER_TRECHO=1 + B19 so' em ponta aberta + MAX_COMPENSATORS=1 -> fallback irrestrito C09+C09+C04; a busca DP herda os tetos e nunca gera B34+B34; humano usa fileiras de B34 (899 pares adjacentes em TP1) e 4x menos compensadores",
+   "first_divergence_stage": "composition_choice",
+   "classification": [
+    "DOMAIN_RULE_BLOCKED",
+    "SEARCH_PRUNED"
+   ],
+   "human_verdict": "SOLVER_WRONG / CONFLICT WITH RULE",
+   "future_cr": "CR-BLOCK-FILL-B34-MODULE",
+   "dependencies": [
+    "HUMAN_DOMAIN_APPROVAL",
+    "C04_FIT_TOLERANCE_NOISE"
+   ],
+   "files": [
+    "wall_stepper.py: _pier_ordered_layout, _pier_full_search_layout, _layout_piece_profile",
+    "wall_modeling.py: audit REPEATED_VERTICAL_COMPENSATOR_STRIP"
+   ],
+   "projects": [
+    "TGD",
+    "TP1",
+    "PILOTO"
+   ],
+   "estimated_impact": {
+    "TGD": 214,
+    "TP1": 756,
+    "PILOTO": 7,
+    "total": 977
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 380,
+    "COMPENSATOR_EXCESS_IN_RUN": 491,
+    "COMPENSATOR_VERTICAL_STRIP": 104,
+    "PRISM_CONTINUOUS_JOINT": 2
+   },
+   "walls": {
+    "TGD": [
+     "W007",
+     "W009",
+     "W010",
+     "W020",
+     "W031",
+     "W032",
+     "W033",
+     "W053",
+     "W058",
+     "W075",
+     "W087",
+     "W089",
+     "W090",
+     "W110",
+     "W111",
+     "W115",
+     "W127",
+     "W128",
+     "W135",
+     "W146",
+     "W159",
+     "W166"
+    ],
+    "TP1": [
+     "W002",
+     "W003",
+     "W005",
+     "W006",
+     "W008",
+     "W009",
+     "W011",
+     "W012",
+     "W013",
+     "W014",
+     "W015",
+     "W016",
+     "W017",
+     "W018",
+     "W019",
+     "W028",
+     "W036",
+     "W038",
+     "W039",
+     "W040",
+     "W041",
+     "W042",
+     "W043",
+     "W048",
+     "W049",
+     "W052",
+     "W053",
+     "W054",
+     "W055",
+     "W056",
+     "W071",
+     "W072",
+     "W077",
+     "W078",
+     "W079",
+     "W080",
+     "W082",
+     "W087",
+     "W088",
+     "W089"
+    ],
+    "PILOTO": [
+     "W001",
+     "W002",
+     "W004",
+     "W007",
+     "W009",
+     "W010"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C08_PHASEA_FRAGMENT_NONMODULAR",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "WEAK(TGD only)",
+   "root_cause": "Wall Modeling (Fase A) fragmenta paredes humanas longas em eixos nao modulares, cria eixos duplicados a 12.7cm e tocos de 4-40cm, e nao estende 17 bracos de L a face oposta -> 73 paredes sem nenhum preenchimento",
+   "first_divergence_stage": "graph_LTX(input)",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT",
+    "INPUT_TOPOLOGY",
+    "REFERENCE_LIMITATION"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE (fragmentos sem par 1:1)",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS (linha propria, wall_pairing/geometry)",
+   "dependencies": [],
+   "files": [
+    "nuvem/core/engine/wall_pairing.py",
+    "nuvem/core/engine/geometry.py"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 1564,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 1564
+   },
+   "finding_codes": {
+    "COMPENSATOR_CONSECUTIVE": 118,
+    "COMPENSATOR_EXCESS_IN_RUN": 107,
+    "COMPENSATOR_VERTICAL_STRIP": 37,
+    "COVERAGE_GAP_IN_ROW": 865,
+    "COVERAGE_MISSING_ROW": 238,
+    "COVERAGE_PARTIAL_WALL": 44,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 106,
+    "COVERAGE_WALL_NOT_MODULATED": 17,
+    "OPENING_SOLID_BELOW_SILL_MISSING": 32
+   },
+   "walls": {
+    "TGD": [
+     "W002",
+     "W004",
+     "W005",
+     "W006",
+     "W008",
+     "W011",
+     "W014",
+     "W015",
+     "W016",
+     "W017",
+     "W018",
+     "W022",
+     "W024",
+     "W025",
+     "W026",
+     "W029",
+     "W030",
+     "W034",
+     "W035",
+     "W036",
+     "W037",
+     "W041",
+     "W042",
+     "W043",
+     "W044",
+     "W047",
+     "W048",
+     "W050",
+     "W052",
+     "W054",
+     "W055",
+     "W061",
+     "W062",
+     "W063",
+     "W066",
+     "W067",
+     "W068",
+     "W069",
+     "W070",
+     "W072"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C09_ROTATED_CORNER_SAME_WALL",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "WEAK(no human wall)",
+   "root_cause": "_corner_bond_blocked_by_other_node ve outro no' L a 7cm (eixo duplicado) ou T de toco a 14-41cm e gira as duas pecas para a mesma parede; a parede real fica sem peca de canto em nenhuma familia; 17 nos, JUNCTION_NOT_ALTERNATING em todas as fiadas",
+   "first_divergence_stage": "graph_LTX(input)+node_pieces",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT(input)",
+    "JUNCTION_GEOMETRY_ERROR"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-BLOCK-CORNER-ROTATION-GUARD (apos CR-WALLMODEL-FRAGMENTS)",
+   "dependencies": [
+    "C08_PHASEA_FRAGMENT_NONMODULAR"
+   ],
+   "files": [
+    "wall_stepper.py: solve_l_corner, _corner_bond_blocked_by_other_node"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 480,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 480
+   },
+   "finding_codes": {
+    "JUNCTION_NOT_ALTERNATING": 272,
+    "PRISM_CONTINUOUS_JOINT": 208
+   },
+   "walls": {
+    "TGD": [
+     "W004",
+     "W005",
+     "W006",
+     "W019",
+     "W035",
+     "W036",
+     "W038",
+     "W039",
+     "W040",
+     "W041",
+     "W044",
+     "W070",
+     "W084",
+     "W085",
+     "W089",
+     "W090",
+     "W121",
+     "W122",
+     "W145"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C10_REPAIR_ANCHOR_RECREATES_NODE_JOINT",
+   "severity": "MEDIUM",
+   "confidence": 5,
+   "human_support": "STRONG(CONFIRMED_BY_HUMAN)",
+   "root_cause": "Filtro 33.3 ignora a junta 34.5 porque a peca seguinte cruza a jamba; o recorte derruba a peca e o reparo usa a peca mantida como ancora -> a junta 34.5 renasce sobre a junta NO|FILL da outra familia (traco real W036)",
+   "first_divergence_stage": "continuous_layout(joint filter)->local_repair",
+   "classification": [
+    "OPENING_REPAIR_INTERACTION",
+    "PRISM_REPAIR_INTERACTION"
+   ],
+   "human_verdict": "CONFIRMED_BY_HUMAN (34.5/49.5)",
+   "future_cr": "CR-BLOCK-REPAIR-ANCHOR-JOINT",
+   "dependencies": [
+    "C06 (mesmas funcoes)"
+   ],
+   "files": [
+    "wall_stepper.py: _layout_joints_surviving_openings_cm, solve_wall_free_fill, _recut_openings_and_repair"
+   ],
+   "projects": [
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 0,
+    "TP1": 20,
+    "PILOTO": 0,
+    "total": 20
+   },
+   "finding_codes": {
+    "PRISM_CONTINUOUS_JOINT": 20
+   },
+   "walls": {
+    "TP1": [
+     "W023",
+     "W036",
+     "W038",
+     "W042",
+     "W043",
+     "W085"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C11_NODE_FILL_JOINT_RESIDUAL",
+   "severity": "LOW",
+   "confidence": 4,
+   "human_support": "MEDIUM",
+   "root_cause": "Junta NO|FILL sem composicao alternativa no trecho (19-20cm)",
+   "first_divergence_stage": "composition_choice",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "(depende de C01/C07)",
+   "dependencies": [
+    "C01",
+    "C07"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 22,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 22
+   },
+   "finding_codes": {
+    "PRISM_CONTINUOUS_JOINT": 22
+   },
+   "walls": {
+    "TGD": [
+     "W002",
+     "W069",
+     "W070",
+     "W113"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C12_FILL_FILL_PRISM_OTHER",
+   "severity": "LOW",
+   "confidence": 2,
+   "human_support": "WEAK",
+   "root_cause": "Cross-band (27.7): mesma junta em bandas diferentes junto a vao",
+   "first_divergence_stage": "course_parity/bands",
+   "classification": [
+    "UNKNOWN"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "(nao priorizar)",
+   "dependencies": [],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 6,
+    "TP1": 12,
+    "PILOTO": 0,
+    "total": 18
+   },
+   "finding_codes": {
+    "PRISM_CONTINUOUS_JOINT": 18
+   },
+   "walls": {
+    "TGD": [
+     "W046",
+     "W069"
+    ],
+    "TP1": [
+     "W002",
+     "W004",
+     "W007",
+     "W009"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C13_NODE_RESERVE_EXCEEDS_WALL",
+   "severity": "LOW",
+   "confidence": 4,
+   "human_support": "WEAK",
+   "root_cause": "Reserva de no' maior que a parede (tocos de 5-25cm da entrada TGD; piloto 8 fiadas nao investigadas)",
+   "first_divergence_stage": "node_reservation",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT",
+    "INPUT_TOPOLOGY"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS",
+   "dependencies": [
+    "C08"
+   ],
+   "projects": [],
+   "estimated_impact": {
+    "TGD": 0,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 0
+   },
+   "finding_codes": {},
+   "walls": {},
+   "courses": "n/a"
+  },
+  {
+   "cluster_id": "C14_INTERSECTION_FAILURE_NO_PIECE",
+   "severity": "MEDIUM",
+   "confidence": 4,
+   "human_support": "WEAK",
+   "root_cause": "200 nos TGD sem solucao (T 120, X 72, L 8): densidade de nos da entrada; a reserva vira vazio",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT",
+    "INPUT_TOPOLOGY"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS",
+   "dependencies": [
+    "C08"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 175,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 175
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 175
+   },
+   "walls": {
+    "TGD": [
+     "W019",
+     "W020",
+     "W027",
+     "W040",
+     "W051",
+     "W112",
+     "W116",
+     "W117",
+     "W123",
+     "W138",
+     "W145",
+     "W146"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C15_NODE_RESERVE_WITHOUT_PIECE_THIS_COURSE",
+   "severity": "LOW",
+   "confidence": 3,
+   "human_support": "WEAK",
+   "root_cause": "Reserva de no' numa familia sem peca (T degradado so' numa familia / L com peca na vizinha)",
+   "first_divergence_stage": "node_reservation",
+   "classification": [
+    "RESERVATION_TOO_CONSERVATIVE"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-BLOCK-SHORT-WALL-NODE-POLICY",
+   "dependencies": [
+    "C01"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 62,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 62
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 62
+   },
+   "walls": {
+    "TGD": [
+     "W014",
+     "W019",
+     "W020",
+     "W132",
+     "W145",
+     "W146"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C16_OPENING_REPAIR_FAILED",
+   "severity": "MEDIUM",
+   "confidence": 4,
+   "human_support": "WEAK",
+   "root_cause": "ABERTURA_NAO_COMPATIVEL: pilarete entre vaos sem composicao; so' ajuste geometrico (fora do benchmark)",
+   "first_divergence_stage": "local_repair",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT",
+    "OPENING_REPAIR_INTERACTION"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "(ajuste geometrico existente)",
+   "dependencies": [
+    "C03"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 102,
+    "TP1": 25,
+    "PILOTO": 0,
+    "total": 127
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 121,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 6
+   },
+   "walls": {
+    "TGD": [
+     "W032",
+     "W043",
+     "W051",
+     "W072",
+     "W075",
+     "W087",
+     "W112",
+     "W113",
+     "W127",
+     "W160"
+    ],
+    "TP1": [
+     "W030",
+     "W039",
+     "W071",
+     "W072"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C17_FILL_DROPPED_BY_TIE_COLLISION",
+   "severity": "LOW",
+   "confidence": 5,
+   "human_support": "WEAK",
+   "root_cause": "219 pecas de fill derrubadas por colidir com peca de no' do eixo duplicado",
+   "first_divergence_stage": "node_fill_collision",
+   "classification": [
+    "NODE_FILL_INTERACTION",
+    "INPUT_TOPOLOGY"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS",
+   "dependencies": [
+    "C08",
+    "C09"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 51,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 51
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 51
+   },
+   "walls": {
+    "TGD": [
+     "W016",
+     "W038",
+     "W046",
+     "W121",
+     "W148"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C18_JUNCTION_NOT_ALTERNATING_OTHER",
+   "severity": "LOW",
+   "confidence": 3,
+   "human_support": "WEAK",
+   "root_cause": "Tocos de 14-15cm entre T (W092/W130)",
+   "first_divergence_stage": "graph_LTX(input)",
+   "classification": [
+    "INPUT_TOPOLOGY"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS",
+   "dependencies": [
+    "C08"
+   ],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 31,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 31
+   },
+   "finding_codes": {
+    "JUNCTION_NOT_ALTERNATING": 31
+   },
+   "walls": {
+    "TGD": [
+     "W092",
+     "W130"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C19_L_ARM_NOT_EXTENDED_OR_C04_TOO_SHORT",
+   "severity": "HIGH",
+   "confidence": 5,
+   "human_support": "STRONG(TP1 W039)",
+   "root_cause": "Braco do L que para na face proxima (W041 TP1: eixo comeca 8cm apos o no'; TGD W050/W117) ou elemento degradado C04 (4cm) que nao alcanca o eixo (W133): quadrado do canto fisicamente VAZIO numa paridade; humano preenche com B19 nas duas familias",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "JUNCTION_GEOMETRY_ERROR",
+    "REAL_SOLVER_DEFECT"
+   ],
+   "human_verdict": "SOLVER_WRONG (NOT a benchmark artifact)",
+   "future_cr": "parte de CR-BLOCK-SHORT-WALL-NODE-POLICY (canto: peca deve cobrir o quadrado; braco curto detectado)",
+   "dependencies": [],
+   "files": [
+    "wall_stepper.py: solve_l_corner, _corner_single_element_candidate, _node_involved_wall_ends"
+   ],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 23,
+    "TP1": 9,
+    "PILOTO": 0,
+    "total": 32
+   },
+   "finding_codes": {
+    "JUNCTION_MISSING_BINDING": 32
+   },
+   "walls": {
+    "TGD": [
+     "W050",
+     "W117",
+     "W133"
+    ],
+    "TP1": [
+     "W039"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C20_NODE_PIECE_ROOM_CHECK_MISS",
+   "severity": "MEDIUM",
+   "confidence": 4,
+   "human_support": "WEAK",
+   "root_cause": "Peca de no' cruza jamba sem no' dentro do vao (L a 6cm de porta na parede que recebe a largura; T degradado L)",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "SEARCH_PRUNED(room check incompleto)"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-BLOCK-ROOM-CHECK-ROBUSTNESS",
+   "dependencies": [],
+   "projects": [
+    "TGD"
+   ],
+   "estimated_impact": {
+    "TGD": 29,
+    "TP1": 0,
+    "PILOTO": 0,
+    "total": 29
+   },
+   "finding_codes": {
+    "OPENING_BLOCK_CROSSES_JAMB": 24,
+    "OPENING_BLOCK_INSIDE_DOOR": 5
+   },
+   "walls": {
+    "TGD": [
+     "W069",
+     "W070",
+     "W089",
+     "W090",
+     "W131"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "C21_NODE_PIECES_COLLIDE",
+   "severity": "MEDIUM",
+   "confidence": 3,
+   "human_support": "WEAK",
+   "root_cause": "B54 de T principal contra peca de no' vizinho a <54cm (TGD: dois T a 5-20cm = entrada; TP1 W019 nao aprofundado)",
+   "first_divergence_stage": "node_pieces",
+   "classification": [
+    "PHYSICAL_GEOMETRY_LIMIT",
+    "UNKNOWN(W019)"
+   ],
+   "human_verdict": "INSUFFICIENT_EVIDENCE",
+   "future_cr": "CR-WALLMODEL-FRAGMENTS / investigar W019",
+   "dependencies": [],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 29,
+    "TP1": 18,
+    "PILOTO": 0,
+    "total": 47
+   },
+   "finding_codes": {
+    "POSITION_OVERLAP": 47
+   },
+   "walls": {
+    "TGD": [
+     "W061",
+     "W112",
+     "W116",
+     "W131",
+     "W138",
+     "W162"
+    ],
+    "TP1": [
+     "W019"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  },
+  {
+   "cluster_id": "V01_VALIDATOR_FOREIGN_PIECE_NOT_CREDITED",
+   "severity": "LOW",
+   "confidence": 4,
+   "human_support": "n/a",
+   "root_cause": "Vazio fisicamente ocupado pela peca perpendicular da vizinha; OccupancyIndex.foreign_coverage_on_axis nao credita",
+   "first_divergence_stage": "final_validation(benchmark)",
+   "classification": [
+    "VALIDATOR_ARTIFACT"
+   ],
+   "human_verdict": "n/a",
+   "future_cr": "CR-BENCH-COVERAGE-FOREIGN-CREDIT",
+   "dependencies": [],
+   "projects": [
+    "TGD",
+    "TP1"
+   ],
+   "estimated_impact": {
+    "TGD": 5,
+    "TP1": 76,
+    "PILOTO": 0,
+    "total": 81
+   },
+   "finding_codes": {
+    "COVERAGE_GAP_IN_ROW": 81
+   },
+   "walls": {
+    "TGD": [
+     "W116"
+    ],
+    "TP1": [
+     "W011",
+     "W028",
+     "W094"
+    ]
+   },
+   "courses": "all physical courses of the wall (K=1 repeats the A/B pair per band)"
+  }
+ ],
+ "super_root_causes": [
+  {
+   "id": "S1_NODE_PIECE_POLICY_TIGHT_NODES",
+   "clusters": [
+    "C01",
+    "C02",
+    "C05",
+    "C06(part)"
+   ],
+   "impact": {
+    "TP1": 1626,
+    "TGD": 525
+   }
+  },
+  {
+   "id": "S2_FILL_COMPOSITION_RULES",
+   "clusters": [
+    "C07",
+    "C06"
+   ],
+   "impact": {
+    "TP1": 1166,
+    "TGD": 315
+   }
+  },
+  {
+   "id": "S3_INPUT_REFERENCE_GEOMETRY",
+   "clusters": [
+    "C08",
+    "C09",
+    "C13",
+    "C14",
+    "C15",
+    "C17",
+    "C21",
+    "C03(reference)"
+   ],
+   "impact": {
+    "TGD": 2385,
+    "TP1": 338
+   }
+  },
+  {
+   "id": "S4_NUMERIC_TOLERANCES",
+   "clusters": [
+    "C04",
+    "C02(slack part)"
+   ],
+   "impact": {
+    "TP1": 224,
+    "TGD": 215
+   }
+  }
+ ],
+ "ranked_next_crs": [
+  {
+   "rank": 1,
+   "cr": "CR-BLOCK-FIT-TOLERANCE",
+   "clusters": [
+    "C04"
+   ],
+   "impact": 4,
+   "confidence": 5,
+   "implementation_risk": 2,
+   "blast_radius": 2,
+   "estimated_complexity": "LOW",
+   "corpus_support": "BOTH",
+   "human_support": "STRONG",
+   "parallel_with": [
+    "CR-BENCH-OPENING-RECONSTRUCTION"
+   ],
+   "dependency": null
+  },
+  {
+   "rank": 2,
+   "cr": "CR-BENCH-OPENING-RECONSTRUCTION",
+   "clusters": [
+    "C03"
+   ],
+   "impact": 4,
+   "confidence": 4,
+   "implementation_risk": 3,
+   "blast_radius": 3,
+   "estimated_complexity": "MEDIUM",
+   "corpus_support": "TP1",
+   "human_support": "STRONG",
+   "parallel_with": [
+    "CR-BLOCK-FIT-TOLERANCE"
+   ],
+   "dependency": "autorizacao para regravar reference/input de TP1"
+  },
+  {
+   "rank": 3,
+   "cr": "CR-BLOCK-ROOM-CHECK-ROBUSTNESS",
+   "clusters": [
+    "C02",
+    "C03(solver)",
+    "C20"
+   ],
+   "impact": 3,
+   "confidence": 4,
+   "implementation_risk": 2,
+   "blast_radius": 3,
+   "estimated_complexity": "LOW-MEDIUM",
+   "corpus_support": "BOTH",
+   "human_support": "MEDIUM",
+   "parallel_with": [
+    "CR-BLOCK-ARM-SAFE-REPAIR-PERF"
+   ],
+   "dependency": "CR-BENCH-OPENING-RECONSTRUCTION (para medir CROSSES_JAMB real)"
+  },
+  {
+   "rank": 4,
+   "cr": "CR-BLOCK-REPAIR-ANCHOR-JOINT",
+   "clusters": [
+    "C10"
+   ],
+   "impact": 2,
+   "confidence": 5,
+   "implementation_risk": 2,
+   "blast_radius": 2,
+   "estimated_complexity": "LOW",
+   "corpus_support": "TP1",
+   "human_support": "STRONG",
+   "parallel_with": [
+    "CR-BLOCK-ARM-SAFE-REPAIR-PERF"
+   ],
+   "dependency": null,
+   "not_parallel_with": [
+    "CR-BLOCK-FILL-B34-MODULE",
+    "CR-BLOCK-ROOM-CHECK-ROBUSTNESS"
+   ]
+  },
+  {
+   "rank": 5,
+   "cr": "CR-BLOCK-SHORT-WALL-NODE-POLICY",
+   "clusters": [
+    "C01",
+    "C05",
+    "C19",
+    "C15"
+   ],
+   "impact": 5,
+   "confidence": 4,
+   "implementation_risk": 4,
+   "blast_radius": 4,
+   "estimated_complexity": "HIGH",
+   "corpus_support": "BOTH",
+   "human_support": "MEDIUM (requires domain approval)",
+   "parallel_with": [],
+   "dependency": "decisao de dominio (REGRAS 35) + CR-BLOCK-FIT-TOLERANCE medido"
+  },
+  {
+   "rank": 6,
+   "cr": "CR-BLOCK-FILL-B34-MODULE",
+   "clusters": [
+    "C07",
+    "C06"
+   ],
+   "impact": 5,
+   "confidence": 3,
+   "implementation_risk": 4,
+   "blast_radius": 3,
+   "estimated_complexity": "MEDIUM-HIGH",
+   "corpus_support": "BOTH",
+   "human_support": "STRONG (conflicts with rule 23.6)",
+   "parallel_with": [],
+   "dependency": "decisao de dominio; apos CR-BLOCK-SHORT-WALL-NODE-POLICY"
+  },
+  {
+   "rank": 7,
+   "cr": "CR-BLOCK-ARM-SAFE-REPAIR-PERF",
+   "clusters": [
+    "performance"
+   ],
+   "impact": 2,
+   "confidence": 5,
+   "implementation_risk": 3,
+   "blast_radius": 2,
+   "estimated_complexity": "MEDIUM",
+   "corpus_support": "BOTH",
+   "human_support": "n/a",
+   "parallel_with": [
+    "CR-BLOCK-ROOM-CHECK-ROBUSTNESS",
+    "CR-BLOCK-REPAIR-ANCHOR-JOINT"
+   ],
+   "dependency": null
+  },
+  {
+   "rank": 8,
+   "cr": "CR-WALLMODEL-FRAGMENTS",
+   "clusters": [
+    "C08",
+    "C09",
+    "C13",
+    "C14",
+    "C17",
+    "C18",
+    "C21"
+   ],
+   "impact": 5,
+   "confidence": 4,
+   "implementation_risk": 5,
+   "blast_radius": 5,
+   "estimated_complexity": "VERY_HIGH",
+   "corpus_support": "TGD",
+   "human_support": "WEAK",
+   "parallel_with": [],
+   "dependency": "linha propria (wall_pairing/geometry); nao medir TGD em paralelo"
+  },
+  {
+   "rank": 9,
+   "cr": "CR-BLOCK-CORNER-ROTATION-GUARD",
+   "clusters": [
+    "C09"
+   ],
+   "impact": 3,
+   "confidence": 4,
+   "implementation_risk": 3,
+   "blast_radius": 3,
+   "estimated_complexity": "MEDIUM",
+   "corpus_support": "TGD",
+   "human_support": "WEAK",
+   "parallel_with": [],
+   "dependency": "CR-WALLMODEL-FRAGMENTS"
+  },
+  {
+   "rank": 10,
+   "cr": "CR-BENCH-COVERAGE-FOREIGN-CREDIT",
+   "clusters": [
+    "V01"
+   ],
+   "impact": 1,
+   "confidence": 5,
+   "implementation_risk": 1,
+   "blast_radius": 1,
+   "estimated_complexity": "LOW",
+   "corpus_support": "TP1",
+   "human_support": "n/a",
+   "parallel_with": [
+    "any"
+   ],
+   "dependency": null
+  }
+ ],
+ "recommended_next_cr": "CR-BLOCK-FIT-TOLERANCE",
+ "do_not_work_on_yet": [
+  "B19 rule / B34 runs / X-T short wall binding without human approval",
+  "CR-BLOCK-DETERMINISM as a block-solver CR before parity policy",
+  "JUNCTION_MISSING_BINDING TP1 as P3 artifact (it is physical)",
+  "BENCH-Z-ORIGIN",
+  "level-2 findings / MISSING_LINTEL (catalog)"
+ ],
+ "unknowns": [
+  "B34 runs / B19 at ties: office rule or single designer habit (N=1 plan)",
+  "structural acceptability of unbound X/T of short walls",
+  "TP1 W019 POSITION_OVERLAP 18",
+  "Piloto SEM_ESPACO 8 rows",
+  "TGD 166cm doors containing two T nodes",
+  "door_void_violations 348 vs CROSSES_JAMB 168",
+  "C12 cross-band prism (18)"
+ ]
+}

@@ -1,0 +1,1032 @@
+{
+ "TGD": {
+  "by_feature(rows)": [
+   [
+    "NODE_END_L_CORNER",
+    267
+   ],
+   [
+    "NODE_END_T_INTERSECTION",
+    126
+   ],
+   [
+    "FREE_END",
+    75
+   ],
+   [
+    "OPENING_DOOR_lo",
+    42
+   ],
+   [
+    "NODE_MID_T_INTERSECTION",
+    38
+   ],
+   [
+    "NODE_END_AMBIGUOUS",
+    32
+   ],
+   [
+    "NODE_MID_X_INTERSECTION",
+    22
+   ],
+   [
+    "OPENING_WINDOW_lo",
+    18
+   ],
+   [
+    "OPENING_DOOR_hi",
+    5
+   ],
+   [
+    "OPENING_WINDOW_hi",
+    4
+   ]
+  ],
+  "by_kind(rows)": [
+   [
+    "LAYOUT",
+    503
+   ],
+   [
+    "SOLVER_EXTRA",
+    111
+   ],
+   [
+    "HUMAN_EXTRA",
+    15
+   ]
+  ],
+  "by_stage(rows)": [
+   [
+    "SOLVER_EMPTY",
+    230
+   ],
+   [
+    "CONTINUOUS_FILL",
+    188
+   ],
+   [
+    "NODE_PIECE",
+    147
+   ],
+   [
+    "NODE_PIECE_DEGRADED",
+    58
+   ],
+   [
+    "OPENING_REPAIR",
+    6
+   ]
+  ],
+  "examples": [
+   [
+    "W007",
+    1,
+    {
+     "human": [
+      "B39",
+      35.01,
+      74.01
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B34",
+      35.0,
+      69.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 35.0
+    }
+   ],
+   [
+    "W009",
+    0,
+    {
+     "human": [
+      "B19",
+      0.98,
+      19.98
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      1.0,
+      10.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 1.0
+    }
+   ],
+   [
+    "W010",
+    0,
+    {
+     "human": [
+      "B19",
+      0.98,
+      19.98
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      1.0,
+      10.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 1.0
+    }
+   ],
+   [
+    "W012",
+    1,
+    {
+     "human": [
+      "B19",
+      35.0,
+      54.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B54",
+      35.0,
+      89.0,
+      "X_INTERSECTION",
+      true
+     ],
+     "stage": "NODE_PIECE",
+     "t": 35.0
+    }
+   ],
+   [
+    "W013",
+    1,
+    {
+     "human": [
+      "B19",
+      35.02,
+      54.02
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B54",
+      35.0,
+      89.0,
+      "X_INTERSECTION",
+      true
+     ],
+     "stage": "NODE_PIECE",
+     "t": 35.0
+    }
+   ],
+   [
+    "W019",
+    1,
+    {
+     "human": [
+      "B34",
+      0.01,
+      34.01
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      205.01,
+      214.01,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W020",
+    1,
+    {
+     "human": [
+      "B19",
+      0.01,
+      19.01
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      340.01,
+      379.01,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W027",
+    0,
+    {
+     "human": [
+      "B39",
+      15.0,
+      54.0
+     ],
+     "kind": "HUMAN_EXTRA",
+     "solver": null,
+     "stage": "SOLVER_EMPTY",
+     "t": 15.0
+    }
+   ],
+   [
+    "W028",
+    0,
+    {
+     "human": [
+      "B34",
+      15.0,
+      49.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 15.0
+    }
+   ],
+   [
+    "W031",
+    1,
+    {
+     "human": [
+      "B39",
+      34.99,
+      73.99
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      35.0,
+      44.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 35.0
+    }
+   ],
+   [
+    "W032",
+    0,
+    {
+     "human": [
+      "C04",
+      15.01,
+      19.01
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      -0.0,
+      9.0,
+      "L_CORNER_DEGRADED",
+      true
+     ],
+     "stage": "NODE_PIECE_DEGRADED",
+     "t": -0.0
+    }
+   ],
+   [
+    "W033",
+    0,
+    {
+     "human": [
+      "B34",
+      14.99,
+      48.99
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B34",
+      0.0,
+      34.0,
+      "L_CORNER",
+      true
+     ],
+     "stage": "NODE_PIECE",
+     "t": 0.0
+    }
+   ]
+  ],
+  "identical_rows": 68,
+  "per_wall_feature": [
+   [
+    "NODE_END_L_CORNER",
+    16
+   ],
+   [
+    "NODE_END_T_INTERSECTION",
+    9
+   ],
+   [
+    "FREE_END",
+    7
+   ],
+   [
+    "NODE_END_AMBIGUOUS",
+    3
+   ],
+   [
+    "NODE_MID_X_INTERSECTION",
+    2
+   ],
+   [
+    "OPENING_WINDOW_lo",
+    2
+   ]
+  ],
+  "per_wall_solver_vs_human": [
+   [
+    [
+     "B34(STANDARD_FILL)",
+     "B39"
+    ],
+    5
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B34"
+    ],
+    4
+   ],
+   [
+    [
+     "B34(L_CORNER)",
+     "B34"
+    ],
+    4
+   ],
+   [
+    [
+     "B39(STANDARD_FILL)",
+     "B34"
+    ],
+    3
+   ],
+   [
+    [
+     "B34(L_CORNER)",
+     "B39"
+    ],
+    3
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B19"
+    ],
+    2
+   ],
+   [
+    [
+     "B54(X_INTERSECTION)",
+     "B19"
+    ],
+    2
+   ],
+   [
+    [
+     "B39(STANDARD_FILL)",
+     "B19"
+    ],
+    2
+   ],
+   [
+    [
+     "C09(L_CORNER_DEGRADED)",
+     "C04"
+    ],
+    2
+   ],
+   [
+    [
+     "B54(T_INTERSECTION_MAIN)",
+     "B34"
+    ],
+    2
+   ],
+   [
+    [
+     "B34(STANDARD_FILL)",
+     "B19"
+    ],
+    2
+   ],
+   [
+    [
+     "B39(STANDARD_FILL)",
+     "C09"
+    ],
+    2
+   ],
+   [
+    [
+     "NONE",
+     "B39"
+    ],
+    1
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B39"
+    ],
+    1
+   ],
+   [
+    [
+     "C09(L_CORNER_DEGRADED)",
+     "B19"
+    ],
+    1
+   ],
+   [
+    [
+     "C09(T_INTERSECTION_INCOMING_DEGRADED)",
+     "B19"
+    ],
+    1
+   ],
+   [
+    [
+     "C09(T_INTERSECTION_INCOMING_DEGRADED)",
+     "B39"
+    ],
+    1
+   ],
+   [
+    [
+     "B54(T_INTERSECTION_MAIN)",
+     "C09"
+    ],
+    1
+   ]
+  ],
+  "per_wall_stage": [
+   [
+    "SOLVER_EMPTY",
+    16
+   ],
+   [
+    "CONTINUOUS_FILL",
+    12
+   ],
+   [
+    "NODE_PIECE",
+    8
+   ],
+   [
+    "NODE_PIECE_DEGRADED",
+    3
+   ]
+  ],
+  "rows_compared(endpoint-matched walls)": 697,
+  "walls_all_rows_identical": 0,
+  "walls_diverging_in_band0": 39,
+  "walls_endpoint_matched": 41
+ },
+ "TP1": {
+  "by_feature(rows)": [
+   [
+    "NODE_END_T_INTERSECTION",
+    737
+   ],
+   [
+    "NODE_END_L_CORNER",
+    499
+   ],
+   [
+    "FREE_END",
+    102
+   ],
+   [
+    "OPENING_DOOR_lo",
+    65
+   ],
+   [
+    "NODE_MID_X_INTERSECTION",
+    59
+   ],
+   [
+    "OPENING_DOOR_hi",
+    58
+   ],
+   [
+    "NODE_MID_T_INTERSECTION",
+    30
+   ],
+   [
+    "OPENING_WINDOW_lo",
+    12
+   ],
+   [
+    "OPENING_WINDOW_hi",
+    5
+   ]
+  ],
+  "by_kind(rows)": [
+   [
+    "LAYOUT",
+    1291
+   ],
+   [
+    "SOLVER_EXTRA",
+    276
+   ]
+  ],
+  "by_stage(rows)": [
+   [
+    "CONTINUOUS_FILL",
+    654
+   ],
+   [
+    "NODE_PIECE",
+    380
+   ],
+   [
+    "NODE_PIECE_DEGRADED",
+    274
+   ],
+   [
+    "SOLVER_EMPTY",
+    224
+   ],
+   [
+    "OPENING_REPAIR",
+    35
+   ]
+  ],
+  "examples": [
+   [
+    "W001",
+    0,
+    {
+     "human": [
+      "B34",
+      15.0,
+      49.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B34",
+      0.0,
+      34.0,
+      "L_CORNER",
+      true
+     ],
+     "stage": "NODE_PIECE",
+     "t": 0.0
+    }
+   ],
+   [
+    "W002",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W003",
+    0,
+    {
+     "human": [
+      "B39",
+      15.0,
+      54.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      15.0,
+      24.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 15.0
+    }
+   ],
+   [
+    "W004",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W005",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      15.0,
+      24.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W006",
+    0,
+    {
+     "human": [
+      "C09",
+      240.01,
+      249.01
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      240.01,
+      279.01,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 240.0
+    }
+   ],
+   [
+    "W007",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W008",
+    0,
+    {
+     "human": [
+      "B39",
+      15.0,
+      54.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "C09",
+      15.0,
+      24.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 15.0
+    }
+   ],
+   [
+    "W009",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W010",
+    0,
+    {
+     "human": [
+      "B34",
+      15.0,
+      49.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 15.0
+    }
+   ],
+   [
+    "W011",
+    0,
+    {
+     "human": [
+      "B34",
+      0.0,
+      34.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B39",
+      15.0,
+      54.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "SOLVER_EMPTY",
+     "t": 0.0
+    }
+   ],
+   [
+    "W012",
+    1,
+    {
+     "human": [
+      "B39",
+      35.0,
+      74.0
+     ],
+     "kind": "LAYOUT",
+     "solver": [
+      "B34",
+      35.0,
+      69.0,
+      "STANDARD_FILL",
+      true
+     ],
+     "stage": "CONTINUOUS_FILL",
+     "t": 35.0
+    }
+   ]
+  ],
+  "identical_rows": 65,
+  "per_wall_feature": [
+   [
+    "NODE_END_T_INTERSECTION",
+    44
+   ],
+   [
+    "NODE_END_L_CORNER",
+    29
+   ],
+   [
+    "FREE_END",
+    6
+   ],
+   [
+    "NODE_MID_T_INTERSECTION",
+    3
+   ],
+   [
+    "OPENING_DOOR_hi",
+    3
+   ],
+   [
+    "OPENING_DOOR_lo",
+    3
+   ],
+   [
+    "NODE_MID_X_INTERSECTION",
+    2
+   ]
+  ],
+  "per_wall_solver_vs_human": [
+   [
+    [
+     "B39(STANDARD_FILL)",
+     "B34"
+    ],
+    25
+   ],
+   [
+    [
+     "C09(T_INTERSECTION_INCOMING_DEGRADED)",
+     "B19"
+    ],
+    10
+   ],
+   [
+    [
+     "C09(T_INTERSECTION_INCOMING_DEGRADED)",
+     "C04"
+    ],
+    7
+   ],
+   [
+    [
+     "B34(L_CORNER)",
+     "B39"
+    ],
+    5
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B34"
+    ],
+    4
+   ],
+   [
+    [
+     "B34(L_CORNER)",
+     "B34"
+    ],
+    3
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B39"
+    ],
+    3
+   ],
+   [
+    [
+     "B39(STANDARD_FILL)",
+     "C09"
+    ],
+    3
+   ],
+   [
+    [
+     "B54(T_INTERSECTION_MAIN)",
+     "B19"
+    ],
+    3
+   ],
+   [
+    [
+     "C09(STANDARD_FILL)",
+     "B19"
+    ],
+    3
+   ],
+   [
+    [
+     "C04(STANDARD_FILL)",
+     "B34"
+    ],
+    3
+   ],
+   [
+    [
+     "B34(STANDARD_FILL)",
+     "B34"
+    ],
+    2
+   ],
+   [
+    [
+     "B19(STANDARD_FILL)",
+     "B39"
+    ],
+    2
+   ],
+   [
+    [
+     "B39(OPENING_REPAIR_FILL)",
+     "C09"
+    ],
+    2
+   ],
+   [
+    [
+     "B54(X_INTERSECTION)",
+     "B34"
+    ],
+    2
+   ],
+   [
+    [
+     "B34(L_CORNER)",
+     "C04"
+    ],
+    2
+   ],
+   [
+    [
+     "C09(L_CORNER_DEGRADED)",
+     "B34"
+    ],
+    2
+   ],
+   [
+    [
+     "B34(STANDARD_FILL)",
+     "B39"
+    ],
+    1
+   ],
+   [
+    [
+     "B34(T_INTERSECTION_INCOMING)",
+     "B19"
+    ],
+    1
+   ],
+   [
+    [
+     "C04(STANDARD_FILL)",
+     "B39"
+    ],
+    1
+   ]
+  ],
+  "per_wall_stage": [
+   [
+    "CONTINUOUS_FILL",
+    33
+   ],
+   [
+    "NODE_PIECE_DEGRADED",
+    21
+   ],
+   [
+    "SOLVER_EMPTY",
+    20
+   ],
+   [
+    "NODE_PIECE",
+    14
+   ],
+   [
+    "OPENING_REPAIR",
+    2
+   ]
+  ],
+  "rows_compared(endpoint-matched walls)": 1632,
+  "walls_all_rows_identical": 0,
+  "walls_diverging_in_band0": 90,
+  "walls_endpoint_matched": 96
+ }
+}

@@ -127,6 +127,18 @@ não é append-only).
 
 Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 
+- **Atlas de causa-raiz residual** (`CR-BLOCK-SOLVER-RESIDUAL-ROOT-CAUSE-
+  ATLAS`, 2026-09-06, investigação sem produção, branch
+  `claude/block-solver-residual-root-cause-gwcmqa`):
+  `docs/BLOCK_SOLVER_RESIDUAL_ROOT_CAUSE_ATLAS.md` +
+  `nuvem/benchmark/diagnostics_residual_atlas/root_cause_atlas.json`.
+  Fila recomendada: `CR-BLOCK-FIT-TOLERANCE` → `CR-BENCH-OPENING-
+  RECONSTRUCTION` → `CR-BLOCK-ROOM-CHECK-ROBUSTNESS` → `CR-BLOCK-REPAIR-
+  ANCHOR-JOINT` → (decisão de domínio, REGRAS 35) `CR-BLOCK-SHORT-WALL-
+  NODE-POLICY` → `CR-BLOCK-FILL-B34-MODULE`; linha própria de Wall
+  Modeling para o TGD (`CR-WALLMODEL-FRAGMENTS`). Conhecimento de
+  amarração observado: `nuvem/REGRAS_MODULACAO_BLOCOS.md` seção 35.
+
 ## Próximos passos
 
 1. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — branch em aberto (ver

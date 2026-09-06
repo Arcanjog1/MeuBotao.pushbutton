@@ -1,0 +1,1861 @@
+{
+ "PILOTO": {
+  "ambiguous_wall_maps": [],
+  "by_code": {
+   "COMPENSATOR_CONSECUTIVE": 36,
+   "COMPENSATOR_EXCESS_IN_RUN": 28,
+   "COMPENSATOR_VERTICAL_STRIP": 18,
+   "COVERAGE_GAP_IN_ROW": 16,
+   "COVERAGE_ROW_MOSTLY_EMPTY": 8,
+   "OPENING_MISSING_COUNTER_LINTEL": 4,
+   "PRISM_STAGGER_BELOW_TARGET": 14
+  },
+  "by_code_block_reasons": {
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL": 36,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL": 28,
+   "COMPENSATOR_VERTICAL_STRIP|": 18,
+   "COVERAGE_GAP_IN_ROW|": 16,
+   "COVERAGE_ROW_MOSTLY_EMPTY|": 8,
+   "OPENING_MISSING_COUNTER_LINTEL|": 4,
+   "PRISM_STAGGER_BELOW_TARGET|": 14
+  },
+  "by_code_human_verdict": {},
+  "by_code_in_scope": {
+   "COMPENSATOR_CONSECUTIVE|True": 36,
+   "COMPENSATOR_EXCESS_IN_RUN|True": 28,
+   "COMPENSATOR_VERTICAL_STRIP|True": 18,
+   "COVERAGE_GAP_IN_ROW|True": 16,
+   "COVERAGE_ROW_MOSTLY_EMPTY|True": 8,
+   "OPENING_MISSING_COUNTER_LINTEL|True": 4,
+   "PRISM_STAGGER_BELOW_TARGET|True": 14
+  },
+  "by_code_nearest_feature": {
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_hi": 12,
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_lo": 16,
+   "COMPENSATOR_CONSECUTIVE|OPENING_WINDOW_hi": 8,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_X_INTERSECTION": 2,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_hi": 9,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_lo": 7,
+   "COVERAGE_GAP_IN_ROW|NODE_END_T_INTERSECTION": 4,
+   "COVERAGE_GAP_IN_ROW|NODE_END_X_INTERSECTION": 4,
+   "COVERAGE_GAP_IN_ROW|OPENING_DOOR_lo": 8,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_END_L_CORNER": 7,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_DOOR_lo": 7
+  },
+  "top_walls_by_code": {
+   "COMPENSATOR_CONSECUTIVE": [
+    [
+     "W001",
+     12
+    ],
+    [
+     "W004",
+     12
+    ],
+    [
+     "W007",
+     4
+    ],
+    [
+     "W003",
+     2
+    ],
+    [
+     "W005",
+     2
+    ],
+    [
+     "W006",
+     2
+    ],
+    [
+     "W011",
+     2
+    ]
+   ],
+   "COMPENSATOR_EXCESS_IN_RUN": [
+    [
+     "W001",
+     8
+    ],
+    [
+     "W004",
+     8
+    ],
+    [
+     "W007",
+     4
+    ],
+    [
+     "W003",
+     2
+    ],
+    [
+     "W005",
+     2
+    ],
+    [
+     "W006",
+     2
+    ],
+    [
+     "W011",
+     2
+    ]
+   ],
+   "COMPENSATOR_VERTICAL_STRIP": [
+    [
+     "W004",
+     6
+    ],
+    [
+     "W001",
+     5
+    ],
+    [
+     "W007",
+     3
+    ],
+    [
+     "W010",
+     2
+    ],
+    [
+     "W002",
+     1
+    ],
+    [
+     "W009",
+     1
+    ]
+   ],
+   "COVERAGE_GAP_IN_ROW": [
+    [
+     "W002",
+     4
+    ],
+    [
+     "W007",
+     4
+    ],
+    [
+     "W009",
+     4
+    ],
+    [
+     "W010",
+     4
+    ]
+   ],
+   "COVERAGE_ROW_MOSTLY_EMPTY": [
+    [
+     "W002",
+     4
+    ],
+    [
+     "W009",
+     4
+    ]
+   ],
+   "OPENING_MISSING_COUNTER_LINTEL": [
+    [
+     "W003",
+     1
+    ],
+    [
+     "W005",
+     1
+    ],
+    [
+     "W006",
+     1
+    ],
+    [
+     "W011",
+     1
+    ]
+   ],
+   "PRISM_STAGGER_BELOW_TARGET": [
+    [
+     "W004",
+     14
+    ]
+   ]
+  }
+ },
+ "TGD": {
+  "ambiguous_wall_maps": [],
+  "by_code": {
+   "COMPENSATOR_AVOIDABLE": 37,
+   "COMPENSATOR_CONSECUTIVE": 379,
+   "COMPENSATOR_EXCESS_IN_RUN": 341,
+   "COMPENSATOR_VERTICAL_STRIP": 58,
+   "COVERAGE_GAP_IN_ROW": 1959,
+   "COVERAGE_MISSING_ROW": 258,
+   "COVERAGE_PARTIAL_WALL": 61,
+   "COVERAGE_ROW_MOSTLY_EMPTY": 112,
+   "COVERAGE_WALL_NOT_MODULATED": 29,
+   "JUNCTION_MISSING_BINDING": 23,
+   "JUNCTION_NOT_ALTERNATING": 303,
+   "OPENING_BLOCK_CROSSES_JAMB": 108,
+   "OPENING_BLOCK_INSIDE_DOOR": 5,
+   "OPENING_MISSING_COUNTER_LINTEL": 25,
+   "OPENING_MISSING_LINTEL": 82,
+   "OPENING_SOLID_BELOW_SILL_MISSING": 32,
+   "POSITION_OVERLAP": 29,
+   "PRISM_CONTINUOUS_JOINT": 320,
+   "PRISM_JOINT_STACK": 19,
+   "PRISM_STAGGER_BELOW_TARGET": 774
+  },
+  "by_code_block_reasons": {
+   "COMPENSATOR_AVOIDABLE|": 37,
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL": 51,
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL+STANDARD_FILL": 9,
+   "COMPENSATOR_CONSECUTIVE|STANDARD_FILL": 281,
+   "COMPENSATOR_CONSECUTIVE|STANDARD_FILL+T_INTERSECTION_INCOMING_DEGRADED": 38,
+   "COMPENSATOR_EXCESS_IN_RUN|L_CORNER_DEGRADED+STANDARD_FILL": 18,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL": 32,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL+STANDARD_FILL": 42,
+   "COMPENSATOR_EXCESS_IN_RUN|STANDARD_FILL": 192,
+   "COMPENSATOR_EXCESS_IN_RUN|STANDARD_FILL+T_INTERSECTION_INCOMING_DEGRADED": 57,
+   "COMPENSATOR_VERTICAL_STRIP|": 58,
+   "COVERAGE_GAP_IN_ROW|": 1959,
+   "COVERAGE_MISSING_ROW|": 258,
+   "COVERAGE_PARTIAL_WALL|": 61,
+   "COVERAGE_ROW_MOSTLY_EMPTY|": 112,
+   "COVERAGE_WALL_NOT_MODULATED|": 29,
+   "JUNCTION_MISSING_BINDING|": 23,
+   "JUNCTION_NOT_ALTERNATING|": 303,
+   "OPENING_BLOCK_CROSSES_JAMB|T_INTERSECTION_DEGRADED_L": 108,
+   "OPENING_BLOCK_INSIDE_DOOR|L_CORNER": 5,
+   "OPENING_MISSING_COUNTER_LINTEL|": 25,
+   "OPENING_MISSING_LINTEL|": 82,
+   "OPENING_SOLID_BELOW_SILL_MISSING|": 32,
+   "POSITION_OVERLAP|L_CORNER+T_INTERSECTION_DEGRADED_L": 8,
+   "POSITION_OVERLAP|L_CORNER+T_INTERSECTION_INCOMING_DEGRADED": 3,
+   "POSITION_OVERLAP|T_INTERSECTION_DEGRADED_L+T_INTERSECTION_MAIN": 5,
+   "POSITION_OVERLAP|T_INTERSECTION_MAIN": 13,
+   "PRISM_CONTINUOUS_JOINT|L_CORNER+STANDARD_FILL": 224,
+   "PRISM_CONTINUOUS_JOINT|L_CORNER+STANDARD_FILL+T_INTERSECTION_INCOMING": 16,
+   "PRISM_CONTINUOUS_JOINT|L_CORNER+STANDARD_FILL+X_INTERSECTION": 48,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL": 6,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL+T_INTERSECTION_INCOMING+X_INTERSECTION": 16,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL+T_INTERSECTION_MAIN": 10,
+   "PRISM_JOINT_STACK|": 19,
+   "PRISM_STAGGER_BELOW_TARGET|": 774
+  },
+  "by_code_human_verdict": {
+   "PRISM_CONTINUOUS_JOINT|HUMAN_HAS_SAME_CONTINUOUS_JOINT": 2,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_JOINT_IN_ONE_ROW_ONLY": 103,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_NO_JOINT_HERE": 23,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_ROW_EMPTY": 16
+  },
+  "by_code_in_scope": {
+   "COMPENSATOR_AVOIDABLE|True": 37,
+   "COMPENSATOR_CONSECUTIVE|False": 35,
+   "COMPENSATOR_CONSECUTIVE|True": 344,
+   "COMPENSATOR_EXCESS_IN_RUN|False": 26,
+   "COMPENSATOR_EXCESS_IN_RUN|True": 315,
+   "COMPENSATOR_VERTICAL_STRIP|False": 7,
+   "COMPENSATOR_VERTICAL_STRIP|True": 51,
+   "COVERAGE_GAP_IN_ROW|False": 14,
+   "COVERAGE_GAP_IN_ROW|True": 1945,
+   "COVERAGE_MISSING_ROW|True": 258,
+   "COVERAGE_PARTIAL_WALL|True": 61,
+   "COVERAGE_ROW_MOSTLY_EMPTY|False": 14,
+   "COVERAGE_ROW_MOSTLY_EMPTY|True": 98,
+   "COVERAGE_WALL_NOT_MODULATED|False": 9,
+   "COVERAGE_WALL_NOT_MODULATED|True": 20,
+   "JUNCTION_MISSING_BINDING|True": 23,
+   "JUNCTION_NOT_ALTERNATING|False": 16,
+   "JUNCTION_NOT_ALTERNATING|True": 287,
+   "OPENING_BLOCK_CROSSES_JAMB|True": 108,
+   "OPENING_BLOCK_INSIDE_DOOR|True": 5,
+   "OPENING_MISSING_COUNTER_LINTEL|True": 25,
+   "OPENING_MISSING_LINTEL|True": 82,
+   "OPENING_SOLID_BELOW_SILL_MISSING|True": 32,
+   "POSITION_OVERLAP|True": 29,
+   "PRISM_CONTINUOUS_JOINT|True": 320,
+   "PRISM_JOINT_STACK|True": 19,
+   "PRISM_STAGGER_BELOW_TARGET|False": 24,
+   "PRISM_STAGGER_BELOW_TARGET|True": 750
+  },
+  "by_code_nearest_feature": {
+   "COMPENSATOR_CONSECUTIVE|NODE_END_L_CORNER": 96,
+   "COMPENSATOR_CONSECUTIVE|NODE_END_STRAIGHT_CONTINUATION": 17,
+   "COMPENSATOR_CONSECUTIVE|NODE_END_T_INTERSECTION": 74,
+   "COMPENSATOR_CONSECUTIVE|NODE_MID_T_INTERSECTION": 96,
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_hi": 56,
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_lo": 24,
+   "COMPENSATOR_CONSECUTIVE|OPENING_WINDOW_hi": 8,
+   "COMPENSATOR_CONSECUTIVE|OPENING_WINDOW_lo": 8,
+   "COMPENSATOR_VERTICAL_STRIP|FREE_END": 3,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_L_CORNER": 8,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_STRAIGHT_CONTINUATION": 1,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_T_INTERSECTION": 21,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_MID_T_INTERSECTION": 12,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_MID_X_INTERSECTION": 3,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_hi": 6,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_lo": 4,
+   "COVERAGE_GAP_IN_ROW|FREE_END": 291,
+   "COVERAGE_GAP_IN_ROW|NODE_END_AMBIGUOUS": 65,
+   "COVERAGE_GAP_IN_ROW|NODE_END_L_CORNER": 236,
+   "COVERAGE_GAP_IN_ROW|NODE_END_STRAIGHT_CONTINUATION": 9,
+   "COVERAGE_GAP_IN_ROW|NODE_END_T_INTERSECTION": 175,
+   "COVERAGE_GAP_IN_ROW|NODE_MID_T_INTERSECTION": 483,
+   "COVERAGE_GAP_IN_ROW|NODE_MID_X_INTERSECTION": 166,
+   "COVERAGE_GAP_IN_ROW|OPENING_DOOR_hi": 241,
+   "COVERAGE_GAP_IN_ROW|OPENING_DOOR_lo": 210,
+   "COVERAGE_GAP_IN_ROW|OPENING_WINDOW_hi": 46,
+   "COVERAGE_GAP_IN_ROW|OPENING_WINDOW_lo": 37,
+   "JUNCTION_MISSING_BINDING|NODE_END_L_CORNER": 23,
+   "JUNCTION_NOT_ALTERNATING|NODE_END_L_CORNER": 272,
+   "JUNCTION_NOT_ALTERNATING|NODE_END_T_INTERSECTION": 31,
+   "OPENING_BLOCK_CROSSES_JAMB|NODE_MID_T_INTERSECTION": 108,
+   "OPENING_BLOCK_INSIDE_DOOR|OPENING_DOOR_lo": 5,
+   "POSITION_OVERLAP|NODE_END_T_INTERSECTION": 8,
+   "POSITION_OVERLAP|NODE_MID_T_INTERSECTION": 18,
+   "POSITION_OVERLAP|OPENING_DOOR_lo": 3,
+   "PRISM_CONTINUOUS_JOINT|NODE_END_L_CORNER": 274,
+   "PRISM_CONTINUOUS_JOINT|NODE_END_T_INTERSECTION": 32,
+   "PRISM_CONTINUOUS_JOINT|NODE_MID_T_INTERSECTION": 12,
+   "PRISM_CONTINUOUS_JOINT|OPENING_DOOR_lo": 2,
+   "PRISM_JOINT_STACK|NODE_END_L_CORNER": 17,
+   "PRISM_JOINT_STACK|NODE_END_T_INTERSECTION": 2,
+   "PRISM_STAGGER_BELOW_TARGET|FREE_END": 27,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_END_L_CORNER": 304,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_END_T_INTERSECTION": 36,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_MID_T_INTERSECTION": 215,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_MID_X_INTERSECTION": 32,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_DOOR_hi": 75,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_DOOR_lo": 39,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_WINDOW_hi": 8,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_WINDOW_lo": 38
+  },
+  "top_walls_by_code": {
+   "COMPENSATOR_AVOIDABLE": [
+    [
+     "W007",
+     1
+    ],
+    [
+     "W009",
+     1
+    ],
+    [
+     "W010",
+     1
+    ],
+    [
+     "W011",
+     1
+    ],
+    [
+     "W028",
+     1
+    ],
+    [
+     "W031",
+     1
+    ],
+    [
+     "W032",
+     1
+    ],
+    [
+     "W033",
+     1
+    ],
+    [
+     "W034",
+     1
+    ],
+    [
+     "W050",
+     1
+    ],
+    [
+     "W052",
+     1
+    ],
+    [
+     "W053",
+     1
+    ]
+   ],
+   "COMPENSATOR_CONSECUTIVE": [
+    [
+     "W159",
+     34
+    ],
+    [
+     "W072",
+     33
+    ],
+    [
+     "W087",
+     30
+    ],
+    [
+     "W113",
+     30
+    ],
+    [
+     "W031",
+     18
+    ],
+    [
+     "W118",
+     18
+    ],
+    [
+     "W166",
+     18
+    ],
+    [
+     "W079",
+     17
+    ],
+    [
+     "W095",
+     17
+    ],
+    [
+     "W069",
+     15
+    ],
+    [
+     "W007",
+     12
+    ],
+    [
+     "W075",
+     12
+    ]
+   ],
+   "COMPENSATOR_EXCESS_IN_RUN": [
+    [
+     "W159",
+     23
+    ],
+    [
+     "W007",
+     19
+    ],
+    [
+     "W072",
+     18
+    ],
+    [
+     "W069",
+     17
+    ],
+    [
+     "W079",
+     17
+    ],
+    [
+     "W095",
+     17
+    ],
+    [
+     "W118",
+     17
+    ],
+    [
+     "W075",
+     15
+    ],
+    [
+     "W087",
+     15
+    ],
+    [
+     "W113",
+     15
+    ],
+    [
+     "W089",
+     14
+    ],
+    [
+     "W160",
+     14
+    ]
+   ],
+   "COMPENSATOR_VERTICAL_STRIP": [
+    [
+     "W095",
+     3
+    ],
+    [
+     "W118",
+     3
+    ],
+    [
+     "W166",
+     3
+    ],
+    [
+     "W007",
+     2
+    ],
+    [
+     "W009",
+     2
+    ],
+    [
+     "W010",
+     2
+    ],
+    [
+     "W034",
+     2
+    ],
+    [
+     "W069",
+     2
+    ],
+    [
+     "W072",
+     2
+    ],
+    [
+     "W076",
+     2
+    ],
+    [
+     "W087",
+     2
+    ],
+    [
+     "W109",
+     2
+    ]
+   ],
+   "COVERAGE_GAP_IN_ROW": [
+    [
+     "W162",
+     110
+    ],
+    [
+     "W084",
+     77
+    ],
+    [
+     "W112",
+     76
+    ],
+    [
+     "W051",
+     73
+    ],
+    [
+     "W019",
+     69
+    ],
+    [
+     "W145",
+     69
+    ],
+    [
+     "W006",
+     68
+    ],
+    [
+     "W138",
+     65
+    ],
+    [
+     "W088",
+     60
+    ],
+    [
+     "W020",
+     55
+    ],
+    [
+     "W146",
+     55
+    ],
+    [
+     "W002",
+     51
+    ]
+   ],
+   "COVERAGE_MISSING_ROW": [
+    [
+     "W047",
+     9
+    ],
+    [
+     "W129",
+     9
+    ],
+    [
+     "W165",
+     9
+    ],
+    [
+     "W004",
+     8
+    ],
+    [
+     "W005",
+     8
+    ],
+    [
+     "W014",
+     8
+    ],
+    [
+     "W016",
+     8
+    ],
+    [
+     "W017",
+     8
+    ],
+    [
+     "W027",
+     8
+    ],
+    [
+     "W035",
+     8
+    ],
+    [
+     "W042",
+     8
+    ],
+    [
+     "W044",
+     8
+    ]
+   ],
+   "COVERAGE_PARTIAL_WALL": [
+    [
+     "W002",
+     1
+    ],
+    [
+     "W004",
+     1
+    ],
+    [
+     "W005",
+     1
+    ],
+    [
+     "W006",
+     1
+    ],
+    [
+     "W014",
+     1
+    ],
+    [
+     "W016",
+     1
+    ],
+    [
+     "W019",
+     1
+    ],
+    [
+     "W020",
+     1
+    ],
+    [
+     "W027",
+     1
+    ],
+    [
+     "W028",
+     1
+    ],
+    [
+     "W030",
+     1
+    ],
+    [
+     "W034",
+     1
+    ]
+   ],
+   "COVERAGE_ROW_MOSTLY_EMPTY": [
+    [
+     "W083",
+     14
+    ],
+    [
+     "W052",
+     11
+    ],
+    [
+     "W015",
+     9
+    ],
+    [
+     "W017",
+     9
+    ],
+    [
+     "W018",
+     9
+    ],
+    [
+     "W147",
+     9
+    ],
+    [
+     "W149",
+     9
+    ],
+    [
+     "W150",
+     9
+    ],
+    [
+     "W153",
+     9
+    ],
+    [
+     "W155",
+     9
+    ],
+    [
+     "W011",
+     6
+    ],
+    [
+     "W075",
+     6
+    ]
+   ],
+   "COVERAGE_WALL_NOT_MODULATED": [
+    [
+     "W008",
+     1
+    ],
+    [
+     "W021",
+     1
+    ],
+    [
+     "W023",
+     1
+    ],
+    [
+     "W024",
+     1
+    ],
+    [
+     "W025",
+     1
+    ],
+    [
+     "W026",
+     1
+    ],
+    [
+     "W037",
+     1
+    ],
+    [
+     "W054",
+     1
+    ],
+    [
+     "W055",
+     1
+    ],
+    [
+     "W062",
+     1
+    ],
+    [
+     "W063",
+     1
+    ],
+    [
+     "W064",
+     1
+    ]
+   ],
+   "JUNCTION_MISSING_BINDING": [
+    [
+     "W050",
+     9
+    ],
+    [
+     "W117",
+     8
+    ],
+    [
+     "W133",
+     6
+    ]
+   ],
+   "JUNCTION_NOT_ALTERNATING": [
+    [
+     "W121",
+     32
+    ],
+    [
+     "W122",
+     32
+    ],
+    [
+     "W004",
+     16
+    ],
+    [
+     "W005",
+     16
+    ],
+    [
+     "W006",
+     16
+    ],
+    [
+     "W019",
+     16
+    ],
+    [
+     "W035",
+     16
+    ],
+    [
+     "W036",
+     16
+    ],
+    [
+     "W040",
+     16
+    ],
+    [
+     "W041",
+     16
+    ],
+    [
+     "W044",
+     16
+    ],
+    [
+     "W084",
+     16
+    ]
+   ],
+   "OPENING_BLOCK_CROSSES_JAMB": [
+    [
+     "W019",
+     12
+    ],
+    [
+     "W020",
+     12
+    ],
+    [
+     "W145",
+     12
+    ],
+    [
+     "W146",
+     12
+    ],
+    [
+     "W028",
+     6
+    ],
+    [
+     "W029",
+     6
+    ],
+    [
+     "W053",
+     6
+    ],
+    [
+     "W069",
+     6
+    ],
+    [
+     "W070",
+     6
+    ],
+    [
+     "W089",
+     6
+    ],
+    [
+     "W090",
+     6
+    ],
+    [
+     "W110",
+     6
+    ]
+   ],
+   "OPENING_BLOCK_INSIDE_DOOR": [
+    [
+     "W131",
+     5
+    ]
+   ],
+   "OPENING_MISSING_COUNTER_LINTEL": [
+    [
+     "W007",
+     2
+    ],
+    [
+     "W159",
+     2
+    ],
+    [
+     "W160",
+     2
+    ],
+    [
+     "W162",
+     2
+    ],
+    [
+     "W008",
+     1
+    ],
+    [
+     "W025",
+     1
+    ],
+    [
+     "W026",
+     1
+    ],
+    [
+     "W043",
+     1
+    ],
+    [
+     "W044",
+     1
+    ],
+    [
+     "W054",
+     1
+    ],
+    [
+     "W055",
+     1
+    ],
+    [
+     "W059",
+     1
+    ]
+   ],
+   "OPENING_MISSING_LINTEL": [
+    [
+     "W007",
+     4
+    ],
+    [
+     "W019",
+     4
+    ],
+    [
+     "W020",
+     4
+    ],
+    [
+     "W145",
+     4
+    ],
+    [
+     "W146",
+     4
+    ],
+    [
+     "W159",
+     4
+    ],
+    [
+     "W160",
+     4
+    ],
+    [
+     "W051",
+     2
+    ],
+    [
+     "W075",
+     2
+    ],
+    [
+     "W112",
+     2
+    ],
+    [
+     "W162",
+     2
+    ],
+    [
+     "W008",
+     1
+    ]
+   ],
+   "OPENING_SOLID_BELOW_SILL_MISSING": [
+    [
+     "W162",
+     16
+    ],
+    [
+     "W044",
+     8
+    ],
+    [
+     "W129",
+     8
+    ]
+   ],
+   "POSITION_OVERLAP": [
+    [
+     "W162",
+     9
+    ],
+    [
+     "W061",
+     8
+    ],
+    [
+     "W112",
+     3
+    ],
+    [
+     "W116",
+     3
+    ],
+    [
+     "W131",
+     3
+    ],
+    [
+     "W138",
+     3
+    ]
+   ],
+   "PRISM_CONTINUOUS_JOINT": [
+    [
+     "W038",
+     32
+    ],
+    [
+     "W039",
+     32
+    ],
+    [
+     "W121",
+     32
+    ],
+    [
+     "W122",
+     32
+    ],
+    [
+     "W070",
+     18
+    ],
+    [
+     "W002",
+     16
+    ],
+    [
+     "W003",
+     16
+    ],
+    [
+     "W012",
+     16
+    ],
+    [
+     "W040",
+     16
+    ],
+    [
+     "W041",
+     16
+    ],
+    [
+     "W085",
+     16
+    ],
+    [
+     "W089",
+     16
+    ]
+   ],
+   "PRISM_JOINT_STACK": [
+    [
+     "W038",
+     2
+    ],
+    [
+     "W039",
+     2
+    ],
+    [
+     "W121",
+     2
+    ],
+    [
+     "W122",
+     2
+    ],
+    [
+     "W002",
+     1
+    ],
+    [
+     "W003",
+     1
+    ],
+    [
+     "W012",
+     1
+    ],
+    [
+     "W040",
+     1
+    ],
+    [
+     "W041",
+     1
+    ],
+    [
+     "W070",
+     1
+    ],
+    [
+     "W085",
+     1
+    ],
+    [
+     "W089",
+     1
+    ]
+   ],
+   "PRISM_STAGGER_BELOW_TARGET": [
+    [
+     "W069",
+     55
+    ],
+    [
+     "W089",
+     54
+    ],
+    [
+     "W070",
+     50
+    ],
+    [
+     "W113",
+     36
+    ],
+    [
+     "W072",
+     32
+    ],
+    [
+     "W087",
+     32
+    ],
+    [
+     "W159",
+     31
+    ],
+    [
+     "W038",
+     30
+    ],
+    [
+     "W039",
+     30
+    ],
+    [
+     "W121",
+     30
+    ],
+    [
+     "W122",
+     30
+    ],
+    [
+     "W160",
+     25
+    ]
+   ]
+  }
+ },
+ "TP1": {
+  "ambiguous_wall_maps": [],
+  "by_code": {
+   "COMPENSATOR_AVOIDABLE": 86,
+   "COMPENSATOR_CONSECUTIVE": 1443,
+   "COMPENSATOR_EXCESS_IN_RUN": 1067,
+   "COMPENSATOR_VERTICAL_STRIP": 186,
+   "COVERAGE_GAP_IN_ROW": 327,
+   "COVERAGE_PARTIAL_WALL": 6,
+   "COVERAGE_ROW_MOSTLY_EMPTY": 18,
+   "JUNCTION_MISSING_BINDING": 9,
+   "OPENING_BLOCK_CROSSES_JAMB": 168,
+   "OPENING_MISSING_COUNTER_LINTEL": 21,
+   "POSITION_OVERLAP": 18,
+   "PRISM_CONTINUOUS_JOINT": 256,
+   "PRISM_JOINT_STACK": 16,
+   "PRISM_STAGGER_BELOW_TARGET": 1370
+  },
+  "by_code_block_reasons": {
+   "COMPENSATOR_AVOIDABLE|": 86,
+   "COMPENSATOR_CONSECUTIVE|L_CORNER_DEGRADED+OPENING_REPAIR_FILL": 19,
+   "COMPENSATOR_CONSECUTIVE|L_CORNER_DEGRADED+STANDARD_FILL": 12,
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL": 186,
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL+STANDARD_FILL": 84,
+   "COMPENSATOR_CONSECUTIVE|OPENING_REPAIR_FILL+T_INTERSECTION_INCOMING_DEGRADED": 200,
+   "COMPENSATOR_CONSECUTIVE|STANDARD_FILL": 788,
+   "COMPENSATOR_CONSECUTIVE|STANDARD_FILL+T_INTERSECTION_INCOMING_DEGRADED": 154,
+   "COMPENSATOR_EXCESS_IN_RUN|L_CORNER_DEGRADED+OPENING_REPAIR_FILL": 19,
+   "COMPENSATOR_EXCESS_IN_RUN|L_CORNER_DEGRADED+STANDARD_FILL": 12,
+   "COMPENSATOR_EXCESS_IN_RUN|L_CORNER_DEGRADED+T_INTERSECTION_INCOMING_DEGRADED": 68,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL": 104,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL+STANDARD_FILL": 100,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL+STANDARD_FILL+T_INTERSECTION_INCOMING_DEGRADED": 34,
+   "COMPENSATOR_EXCESS_IN_RUN|OPENING_REPAIR_FILL+T_INTERSECTION_INCOMING_DEGRADED": 200,
+   "COMPENSATOR_EXCESS_IN_RUN|STANDARD_FILL": 404,
+   "COMPENSATOR_EXCESS_IN_RUN|STANDARD_FILL+T_INTERSECTION_INCOMING_DEGRADED": 126,
+   "COMPENSATOR_VERTICAL_STRIP|": 186,
+   "COVERAGE_GAP_IN_ROW|": 327,
+   "COVERAGE_PARTIAL_WALL|": 6,
+   "COVERAGE_ROW_MOSTLY_EMPTY|": 18,
+   "JUNCTION_MISSING_BINDING|": 9,
+   "OPENING_BLOCK_CROSSES_JAMB|T_INTERSECTION_MAIN": 78,
+   "OPENING_BLOCK_CROSSES_JAMB|X_INTERSECTION": 90,
+   "OPENING_MISSING_COUNTER_LINTEL|": 21,
+   "POSITION_OVERLAP|T_INTERSECTION_MAIN": 18,
+   "PRISM_CONTINUOUS_JOINT|L_CORNER+STANDARD_FILL": 96,
+   "PRISM_CONTINUOUS_JOINT|OPENING_REPAIR_FILL+STANDARD_FILL": 8,
+   "PRISM_CONTINUOUS_JOINT|OPENING_REPAIR_FILL+STANDARD_FILL+T_INTERSECTION_INCOMING": 12,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL": 12,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL+T_INTERSECTION_INCOMING": 64,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL+T_INTERSECTION_INCOMING+X_INTERSECTION": 32,
+   "PRISM_CONTINUOUS_JOINT|STANDARD_FILL+T_INTERSECTION_MAIN": 32,
+   "PRISM_JOINT_STACK|": 16,
+   "PRISM_STAGGER_BELOW_TARGET|": 1370
+  },
+  "by_code_human_verdict": {
+   "PRISM_CONTINUOUS_JOINT|HUMAN_HAS_SAME_CONTINUOUS_JOINT": 10,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_JOINT_IN_ONE_ROW_ONLY": 194,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_NO_JOINT_HERE": 24,
+   "PRISM_CONTINUOUS_JOINT|HUMAN_ROW_EMPTY": 28
+  },
+  "by_code_in_scope": {
+   "COMPENSATOR_AVOIDABLE|True": 86,
+   "COMPENSATOR_CONSECUTIVE|True": 1443,
+   "COMPENSATOR_EXCESS_IN_RUN|True": 1067,
+   "COMPENSATOR_VERTICAL_STRIP|True": 186,
+   "COVERAGE_GAP_IN_ROW|True": 327,
+   "COVERAGE_PARTIAL_WALL|True": 6,
+   "COVERAGE_ROW_MOSTLY_EMPTY|True": 18,
+   "JUNCTION_MISSING_BINDING|True": 9,
+   "OPENING_BLOCK_CROSSES_JAMB|True": 168,
+   "OPENING_MISSING_COUNTER_LINTEL|True": 21,
+   "POSITION_OVERLAP|True": 18,
+   "PRISM_CONTINUOUS_JOINT|True": 256,
+   "PRISM_JOINT_STACK|True": 16,
+   "PRISM_STAGGER_BELOW_TARGET|True": 1370
+  },
+  "by_code_nearest_feature": {
+   "COMPENSATOR_CONSECUTIVE|FREE_END": 18,
+   "COMPENSATOR_CONSECUTIVE|NODE_END_L_CORNER": 239,
+   "COMPENSATOR_CONSECUTIVE|NODE_END_T_INTERSECTION": 506,
+   "COMPENSATOR_CONSECUTIVE|NODE_MID_T_INTERSECTION": 210,
+   "COMPENSATOR_CONSECUTIVE|NODE_MID_X_INTERSECTION": 156,
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_hi": 89,
+   "COMPENSATOR_CONSECUTIVE|OPENING_DOOR_lo": 145,
+   "COMPENSATOR_CONSECUTIVE|OPENING_WINDOW_hi": 34,
+   "COMPENSATOR_CONSECUTIVE|OPENING_WINDOW_lo": 46,
+   "COMPENSATOR_VERTICAL_STRIP|FREE_END": 6,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_L_CORNER": 28,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_END_T_INTERSECTION": 52,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_MID_T_INTERSECTION": 25,
+   "COMPENSATOR_VERTICAL_STRIP|NODE_MID_X_INTERSECTION": 26,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_hi": 23,
+   "COMPENSATOR_VERTICAL_STRIP|OPENING_DOOR_lo": 26,
+   "COVERAGE_GAP_IN_ROW|NODE_END_L_CORNER": 16,
+   "COVERAGE_GAP_IN_ROW|NODE_END_T_INTERSECTION": 18,
+   "COVERAGE_GAP_IN_ROW|NODE_MID_T_INTERSECTION": 178,
+   "COVERAGE_GAP_IN_ROW|NODE_MID_X_INTERSECTION": 51,
+   "COVERAGE_GAP_IN_ROW|OPENING_DOOR_hi": 26,
+   "COVERAGE_GAP_IN_ROW|OPENING_DOOR_lo": 38,
+   "JUNCTION_MISSING_BINDING|NODE_END_L_CORNER": 9,
+   "OPENING_BLOCK_CROSSES_JAMB|NODE_MID_T_INTERSECTION": 78,
+   "OPENING_BLOCK_CROSSES_JAMB|NODE_MID_X_INTERSECTION": 90,
+   "POSITION_OVERLAP|NODE_MID_T_INTERSECTION": 9,
+   "POSITION_OVERLAP|OPENING_DOOR_hi": 9,
+   "PRISM_CONTINUOUS_JOINT|NODE_END_L_CORNER": 64,
+   "PRISM_CONTINUOUS_JOINT|NODE_END_T_INTERSECTION": 76,
+   "PRISM_CONTINUOUS_JOINT|NODE_MID_T_INTERSECTION": 36,
+   "PRISM_CONTINUOUS_JOINT|NODE_MID_X_INTERSECTION": 64,
+   "PRISM_CONTINUOUS_JOINT|OPENING_DOOR_hi": 2,
+   "PRISM_CONTINUOUS_JOINT|OPENING_DOOR_lo": 10,
+   "PRISM_CONTINUOUS_JOINT|OPENING_WINDOW_lo": 4,
+   "PRISM_JOINT_STACK|NODE_END_L_CORNER": 4,
+   "PRISM_JOINT_STACK|NODE_END_T_INTERSECTION": 6,
+   "PRISM_JOINT_STACK|NODE_MID_T_INTERSECTION": 2,
+   "PRISM_JOINT_STACK|NODE_MID_X_INTERSECTION": 4,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_END_L_CORNER": 151,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_END_T_INTERSECTION": 142,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_MID_T_INTERSECTION": 450,
+   "PRISM_STAGGER_BELOW_TARGET|NODE_MID_X_INTERSECTION": 328,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_DOOR_hi": 112,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_DOOR_lo": 128,
+   "PRISM_STAGGER_BELOW_TARGET|OPENING_WINDOW_lo": 59
+  },
+  "top_walls_by_code": {
+   "COMPENSATOR_AVOIDABLE": [
+    [
+     "W001",
+     1
+    ],
+    [
+     "W002",
+     1
+    ],
+    [
+     "W003",
+     1
+    ],
+    [
+     "W004",
+     1
+    ],
+    [
+     "W005",
+     1
+    ],
+    [
+     "W006",
+     1
+    ],
+    [
+     "W007",
+     1
+    ],
+    [
+     "W008",
+     1
+    ],
+    [
+     "W009",
+     1
+    ],
+    [
+     "W010",
+     1
+    ],
+    [
+     "W011",
+     1
+    ],
+    [
+     "W012",
+     1
+    ]
+   ],
+   "COMPENSATOR_CONSECUTIVE": [
+    [
+     "W003",
+     124
+    ],
+    [
+     "W008",
+     124
+    ],
+    [
+     "W068",
+     46
+    ],
+    [
+     "W069",
+     46
+    ],
+    [
+     "W023",
+     39
+    ],
+    [
+     "W085",
+     39
+    ],
+    [
+     "W040",
+     38
+    ],
+    [
+     "W071",
+     38
+    ],
+    [
+     "W024",
+     34
+    ],
+    [
+     "W061",
+     34
+    ],
+    [
+     "W062",
+     34
+    ],
+    [
+     "W086",
+     34
+    ]
+   ],
+   "COMPENSATOR_EXCESS_IN_RUN": [
+    [
+     "W003",
+     48
+    ],
+    [
+     "W008",
+     48
+    ],
+    [
+     "W094",
+     44
+    ],
+    [
+     "W011",
+     37
+    ],
+    [
+     "W019",
+     24
+    ],
+    [
+     "W053",
+     23
+    ],
+    [
+     "W054",
+     23
+    ],
+    [
+     "W023",
+     22
+    ],
+    [
+     "W024",
+     22
+    ],
+    [
+     "W032",
+     22
+    ],
+    [
+     "W033",
+     22
+    ],
+    [
+     "W063",
+     22
+    ]
+   ],
+   "COMPENSATOR_VERTICAL_STRIP": [
+    [
+     "W003",
+     18
+    ],
+    [
+     "W008",
+     18
+    ],
+    [
+     "W053",
+     6
+    ],
+    [
+     "W019",
+     5
+    ],
+    [
+     "W054",
+     5
+    ],
+    [
+     "W006",
+     4
+    ],
+    [
+     "W014",
+     4
+    ],
+    [
+     "W016",
+     4
+    ],
+    [
+     "W017",
+     4
+    ],
+    [
+     "W032",
+     4
+    ],
+    [
+     "W033",
+     4
+    ],
+    [
+     "W063",
+     4
+    ]
+   ],
+   "COVERAGE_GAP_IN_ROW": [
+    [
+     "W011",
+     34
+    ],
+    [
+     "W012",
+     34
+    ],
+    [
+     "W093",
+     34
+    ],
+    [
+     "W094",
+     34
+    ],
+    [
+     "W095",
+     34
+    ],
+    [
+     "W072",
+     26
+    ],
+    [
+     "W040",
+     21
+    ],
+    [
+     "W022",
+     17
+    ],
+    [
+     "W052",
+     16
+    ],
+    [
+     "W029",
+     15
+    ],
+    [
+     "W081",
+     12
+    ],
+    [
+     "W030",
+     10
+    ]
+   ],
+   "COVERAGE_PARTIAL_WALL": [
+    [
+     "W012",
+     1
+    ],
+    [
+     "W022",
+     1
+    ],
+    [
+     "W040",
+     1
+    ],
+    [
+     "W072",
+     1
+    ],
+    [
+     "W093",
+     1
+    ],
+    [
+     "W095",
+     1
+    ]
+   ],
+   "COVERAGE_ROW_MOSTLY_EMPTY": [
+    [
+     "W029",
+     9
+    ],
+    [
+     "W081",
+     9
+    ]
+   ],
+   "JUNCTION_MISSING_BINDING": [
+    [
+     "W039",
+     9
+    ]
+   ],
+   "OPENING_BLOCK_CROSSES_JAMB": [
+    [
+     "W005",
+     24
+    ],
+    [
+     "W006",
+     24
+    ],
+    [
+     "W003",
+     14
+    ],
+    [
+     "W004",
+     14
+    ],
+    [
+     "W007",
+     14
+    ],
+    [
+     "W008",
+     14
+    ],
+    [
+     "W017",
+     14
+    ],
+    [
+     "W019",
+     14
+    ],
+    [
+     "W046",
+     14
+    ],
+    [
+     "W047",
+     14
+    ],
+    [
+     "W052",
+     8
+    ]
+   ],
+   "OPENING_MISSING_COUNTER_LINTEL": [
+    [
+     "W011",
+     2
+    ],
+    [
+     "W012",
+     2
+    ],
+    [
+     "W036",
+     2
+    ],
+    [
+     "W038",
+     2
+    ],
+    [
+     "W094",
+     2
+    ],
+    [
+     "W095",
+     2
+    ],
+    [
+     "W001",
+     1
+    ],
+    [
+     "W010",
+     1
+    ],
+    [
+     "W020",
+     1
+    ],
+    [
+     "W025",
+     1
+    ],
+    [
+     "W026",
+     1
+    ],
+    [
+     "W067",
+     1
+    ]
+   ],
+   "POSITION_OVERLAP": [
+    [
+     "W019",
+     18
+    ]
+   ],
+   "PRISM_CONTINUOUS_JOINT": [
+    [
+     "W003",
+     32
+    ],
+    [
+     "W008",
+     32
+    ],
+    [
+     "W040",
+     32
+    ],
+    [
+     "W061",
+     32
+    ],
+    [
+     "W062",
+     32
+    ],
+    [
+     "W071",
+     32
+    ],
+    [
+     "W021",
+     16
+    ],
+    [
+     "W092",
+     16
+    ],
+    [
+     "W036",
+     8
+    ],
+    [
+     "W038",
+     8
+    ],
+    [
+     "W004",
+     5
+    ],
+    [
+     "W007",
+     5
+    ]
+   ],
+   "PRISM_JOINT_STACK": [
+    [
+     "W003",
+     2
+    ],
+    [
+     "W008",
+     2
+    ],
+    [
+     "W040",
+     2
+    ],
+    [
+     "W061",
+     2
+    ],
+    [
+     "W062",
+     2
+    ],
+    [
+     "W071",
+     2
+    ],
+    [
+     "W021",
+     1
+    ],
+    [
+     "W036",
+     1
+    ],
+    [
+     "W038",
+     1
+    ],
+    [
+     "W092",
+     1
+    ]
+   ],
+   "PRISM_STAGGER_BELOW_TARGET": [
+    [
+     "W003",
+     144
+    ],
+    [
+     "W008",
+     144
+    ],
+    [
+     "W041",
+     104
+    ],
+    [
+     "W017",
+     88
+    ],
+    [
+     "W004",
+     80
+    ],
+    [
+     "W007",
+     80
+    ],
+    [
+     "W011",
+     51
+    ],
+    [
+     "W053",
+     44
+    ],
+    [
+     "W094",
+     44
+    ],
+    [
+     "W052",
+     40
+    ],
+    [
+     "W078",
+     33
+    ],
+    [
+     "W079",
+     33
+    ]
+   ]
+  }
+ }
+}
