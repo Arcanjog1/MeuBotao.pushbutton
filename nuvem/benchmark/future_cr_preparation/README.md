@@ -36,3 +36,4 @@ assert ws._solve_repair_subsegments.__globals__ is ws.__dict__
 Relatórios que usam estes scripts:
 `docs/C04_INDEPENDENT_FINAL_REVIEW.md`,
 `docs/FUTURE_BLOCK_CR_PREPARATION.md`.
+| `perm_probe.py` | invariancia a PERMUTACAO da ordem das paredes; separa dependencia pre-existente (aparece em STATE_A) de dependencia nova. Uso: `python3 perm_probe.py <project_id> <n_permutacoes>` |

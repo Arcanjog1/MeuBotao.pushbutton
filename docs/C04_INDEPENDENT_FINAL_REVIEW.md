@@ -585,9 +585,50 @@ deslocado para 0 / 100 / −250,5 / 100000 produz layout **idêntico**
 estruturalmente invariante a translação, rotação e espelhamento — não há
 caminho pelo qual coordenada absoluta entre na decisão.
 
-**Dependências pré-existentes:** o não-determinismo global do wall graph
-já registrado em `PROJECT_STATUS.md` é anterior a esta CR e não foi
-reintroduzido nem agravado — as fiadas/peças saíram idênticas.
+### 11.1 Permutação da ordem das paredes — pré-existente vs nova
+
+Permutei a ordem das paredes no `input.json` e comparei A contra C,
+permutação a permutação:
+
+**Piloto (4 permutações) — resultado decisivo:**
+
+| permutação | STATE_A | STATE_C |
+|---|---|---|
+| 0 (original) | `844900ccc1def6b2` (772) | `844900ccc1def6b2` (772) |
+| 1 | `82ba277604a55523` (750) | `82ba277604a55523` (750) |
+| 2 | `094ac769978776ea` (784) | `094ac769978776ea` (784) |
+| 3 | `c734aabc1064f45a` (768) | `c734aabc1064f45a` (768) |
+
+**Os quatro fingerprints são IDÊNTICOS entre A e C, permutação a
+permutação.** Ou seja:
+
+- a dependência de ordem é **PRÉ-EXISTENTE** (já está em STATE_A) — é o
+  não-determinismo global do wall graph já registrado em
+  `PROJECT_STATUS.md`;
+- **o C04 não introduz nenhuma dependência de ordem nova**, e nem sequer
+  altera a resposta do solver à permutação.
+
+**TP1 (2 permutações) — confirmação em escala:**
+
+| | perm 0 | perm 1 | sensibilidade |
+|---|---|---|---|
+| STATE_A | 18417 blocos | 18357 | −60 (−0,33%) |
+| STATE_C | 19572 blocos | 19504 | −68 (−0,35%) |
+
+A magnitude da sensibilidade à ordem é praticamente a mesma —
+**o C04 não amplifica o problema pré-existente.**
+
+### 11.2 Transformações não cobertas
+
+Declaro explicitamente o que **não** testei em rodada completa:
+`rotation`, `mirror` e `endpoint reversal` sobre o modelo inteiro. Para a
+**guarda em si** o argumento é estrutural e verificado (§4.3): ela opera
+em coordenadas locais ao trecho (`lo`/`hi` relativos), e a sonda de
+translação confirma saída idêntica — não há caminho pelo qual coordenada
+absoluta, orientação ou sentido entrem na decisão da guarda. As
+transformações de modelo inteiro ficam recomendadas para a CR do C02, que
+**mexe em medição geométrica** e por isso as exige de fato
+(`docs/FUTURE_BLOCK_CR_PREPARATION.md` §18.7).
 
 ---
 
@@ -614,15 +655,18 @@ Verificado em `git status --porcelain` nos três worktrees, restrito a
 
 ### 13.2 Suíte completa executada nos DOIS estados
 
-Executei a suíte inteira em STATE_C **e** o teste de baseline em STATE_A:
+Executei a suíte **inteira** nos **dois** estados:
 
-| estado | resultado |
-|---|---|
-| **STATE_C** (`dde0261`) | **809 passed, 2 failed** em 43min24s |
-| **STATE_A** (`3ebcd9b`, `tests/regression/test_benchmark_baselines.py`) | **8 passed, 1 failed** em 8min17s |
+| estado | resultado | tempo |
+|---|---|---|
+| **STATE_A** (`3ebcd9b`) | **682 passed, 1 failed** | 35min14s |
+| **STATE_C** (`dde0261`) | **809 passed, 2 failed** | 43min24s |
 
 > Meço `809 passed`, não os `797` relatados pelo implementador. A
 > diferença não altera nenhuma conclusão, mas reporto o meu número.
+
+Balanço do PR sobre a suíte: **+127 testes que passam** (os dois arquivos
+novos do C04) e **exatamente 1 falha nova**.
 
 **O PR leva a suíte de 1 falha para 2 falhas.** As duas falhas são o
 mesmo teste (`test_projeto_nao_regrediu_contra_o_baseline`), em projetos
@@ -655,15 +699,14 @@ correção antes do merge.
 
 **NÃO É CAUSADA PELO C04 — provado por execução direta do teste.**
 
-Rodei `tests/regression/test_benchmark_baselines.py` na **STATE_A**
-(`main` pós-PR19, sem C04). Resultado:
+A suíte completa da **STATE_A** (`main` pós-PR19, sem C04) termina com
+`682 passed, 1 failed`, e a única falha é exatamente esta:
 
 ```
 FAILED test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
 AssertionError: REGRESSAO CRITICA em torre_easy_lo_r00_tp1:
   [{'code': 'JUNCTION_MISSING_BINDING', 'before': 8, 'after': 9,
     'delta': 1, 'status': 'REGRESSAO CRITICA'}]
-1 failed, 8 passed
 ```
 
 **Mensagem literalmente idêntica à do STATE_C.** E o TGD **passa** em
