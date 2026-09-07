@@ -77,7 +77,7 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 - **CR-V1 — VALIDADOR DE ENCONTROS POR ELEVAÇÃO FÍSICA** (branch
   `claude/validador-encontros-elevacao-3u21lw`, base `origin/main` =
-  `e381992` — PR draft a abrir, **NÃO mesclado**) — fidelidade do
+  `e381992`, `PR #24` **DRAFT, NÃO mesclado**) — fidelidade do
   **validador de benchmark** (`nuvem/benchmark/validators/
   validate_junctions.py`); não toca solver, gabarito oficial nem regra
   normativa. Causa-raiz (achada na reconciliação independente do
