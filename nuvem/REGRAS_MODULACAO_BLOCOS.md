@@ -280,6 +280,74 @@ Dois B54 a 90°, ambos centrados no ponto do nó, células centrais
 alinhadas (`validate_x_intersection`). Cobre tanto o cruzamento no meio
 de duas paredes contínuas quanto o caso raro de 4 pontas coincidindo.
 
+### REGRA OBRIGATÓRIA: identidade de fiada usada para VALIDAR o encontro
+(não é regra de construção do solver — CR-V1, 2026-09-07)
+
+Isto **não muda** nenhuma regra de L/T/X acima nem nenhum critério de
+B54/B34 do solver. É sobre como o **benchmark** (`nuvem/benchmark/
+validators/validate_junctions.py`) decide, DEPOIS que as peças já
+existem, se duas paredes de um mesmo nó estão amarradas na mesma fiada.
+
+**O bug corrigido.** O validador agrupava as fiadas de um nó pelo
+**índice ordinal** `row["row"]` — a posição da fiada na pilha daquela
+parede, não a cota. Duas paredes que chegam ao mesmo nó com pilhas de
+tamanhos diferentes (meia-fiada de peça CORTADA, `base_z_cm` diferente)
+têm o **mesmo índice apontando para cotas diferentes**: o validador
+comparava fiadas fisicamente distintas só porque tinham o mesmo número
+de ordem, e acusava `JUNCTION_MISSING_BINDING` numa alvenaria
+perfeitamente amarrada.
+
+**A regra corrigida:**
+
+1. A identidade de fiada, para fins de comparação **entre paredes
+   diferentes** do mesmo nó, é `row["elevation_cm"]` (a cota física),
+   agrupada com a mesma tolerância que o motor já usa para juntar peças
+   em fiada por cota Z (`model.COURSE_Z_TOLERANCE_CM = 2,0cm`,
+   `extract/reconstruct.py:group_by_course`) — nenhuma tolerância nova
+   foi criada.
+2. "Faltou amarração" só é afirmável quando **pelo menos duas paredes**
+   do nó têm fiada registrada (com peça ou não) naquela cota — uma
+   banda presente numa única parede é dado incompleto **daquela parede**
+   (ela pode não ter curso nenhum naquela altura), não uma acusação
+   comparável de amarração faltando na vizinha.
+3. O índice ordinal continua existindo como metadado de apresentação
+   (`row`, `rows_by_wall` no achado), nunca mais como chave de
+   comparação entre paredes.
+
+**Como foi descoberto.** Medido no corpus real durante a reconciliação
+independente do contrato de avaliação (CR-B,
+`docs/BENCH_OPENING_RECONSTRUCTION_B_INDEPENDENT_RECONCILIATION.md`,
+§3): 236 de 373 achados de `JUNCTION_MISSING_BINDING` do gabarito de
+hoje (SEM nenhum corte) já nasciam de um índice ordinal apontando para
+mais de uma cota (63%). Reprodutor mínimo determinístico:
+`nuvem/benchmark/future_cr_preparation/
+cr_v1_junction_validator_fidelity/repro_junction_row_unit.py`.
+
+**Efeito medido, STATE_R → STATE_C (candidato CR-B, sem tocar gabarito
+oficial nem solver):** `JUNCTION_MISSING_BINDING` por índice ordinal
+(defeito) ia de +49 para +10 (identidade estrita — cota em ≥2 paredes),
+igual à classificação independente: 39 dos 49 eram defeito do validador
+(some com o fix), 10 são mudança legítima de unidade de avaliação (nós
+recém-registrados pela fragmentação T→L do candidato, 0 defeito
+físico novo). Nenhum outro código de achado (`COVERAGE_*`, `PRISM_*`,
+`COMPENSATOR_*`, `OPENING_*`, `JUNCTION_NOT_ALTERNATING`,
+`JUNCTION_HALF_BLOCK_ADJACENT`) mudou de valor com este fix — conferido
+por `reconcile_by_physical_identity.py` nos dois projetos do corpus
+(TGD e TP1). **STATUS: CORRIGIDO** (CR-V1, `validate_junctions.py`).
+
+**Pendência relacionada, ainda NÃO corrigida (fora do escopo desta
+CR — pertence à CR-S1):** o mesmo nó em que uma parede passa a
+**terminar** (nó `L`) em vez de **atravessar** (nó `T`) faz o **solver**
+de produção parar de alternar a amarração entre fiadas — a pessoa
+alterna corretamente nas duas topologias, o solver alternava na
+topologia antiga e para de alternar na nova (medido rodando o solver de
+produção sobre `input_roundtrip.json`/`input_candidate.json` do
+candidato CR-B, ocupação ponto a ponto, sem depender do agrupamento do
+validador — reprodutor `repro_solver_l_node_alternation.py`, mesma
+pasta). É defeito real do **solver**, não do validador, e não foi
+tocado por esta CR. **PADRÃO MEDIDO — DOCUMENTADO, pendência de código
+aberta (CR-S1).**
+
 ## 6. Limitações conhecidas (não são bugs, são escopo pendente)
 
 - **B34 de meio-de-parede** (seção 2, nível 3) **não** alinha ainda o vão

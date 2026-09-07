@@ -75,6 +75,39 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
+- **CR-V1 — VALIDADOR DE ENCONTROS POR ELEVAÇÃO FÍSICA** (branch
+  `claude/validador-encontros-elevacao-3u21lw`, base `origin/main` =
+  `e381992`, `PR #24` **DRAFT, NÃO mesclado**) — fidelidade do
+  **validador de benchmark** (`nuvem/benchmark/validators/
+  validate_junctions.py`); não toca solver, gabarito oficial nem regra
+  normativa. Causa-raiz (achada na reconciliação independente do
+  contrato CR-B, `docs/BENCH_OPENING_RECONSTRUCTION_B_INDEPENDENT_
+  RECONCILIATION.md`): o validador agrupava fiadas do nó pelo ÍNDICE
+  ORDINAL `row["row"]` (posição na pilha da parede), não pela COTA —
+  duas paredes com pilhas de tamanho diferente (meia-fiada cortada,
+  `base_z_cm` diferente) tinham o mesmo índice apontando para cotas
+  diferentes, gerando `JUNCTION_MISSING_BINDING` falso numa alvenaria
+  amarrada corretamente (medido: 63% dos 373 achados do gabarito de hoje
+  já nasciam disso). Corrigido para agrupar por `row["elevation_cm"]`
+  (mesma tolerância do motor, `model.COURSE_Z_TOLERANCE_CM`, nenhuma
+  tolerância nova) e exigir ≥2 paredes do nó com fiada registrada
+  naquela cota para afirmar "faltou amarração" — regra explicada em
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md` seção 5. Medido em STATE_R→STATE_C
+  (candidato CR-B, cópias isoladas, gabarito oficial intocado):
+  `JUNCTION_MISSING_BINDING` +49 (defeito, índice ordinal) → **+10**
+  (identidade física correta), TGD e TP1 — bate exatamente com a
+  classificação independente (39 defeito do validador eliminados, 10
+  mudança legítima de unidade em nós recém-registrados pela CR-B, 0
+  defeito físico novo). Nenhum outro código de achado mudou de valor
+  (`COVERAGE_*`, `PRISM_*`, `COMPENSATOR_*`, `OPENING_*`,
+  `JUNCTION_NOT_ALTERNATING`, `JUNCTION_HALF_BLOCK_ADJACENT` — delta
+  zero nos dois projetos). Testes novos:
+  `tests/regression/test_junction_elevation_identity_cr_v1.py` (13
+  casos A-G do pedido, 5 falham comprovadamente contra o código
+  pré-fix). Não inicia nem mistura CR-S1 (o solver genuinamente para de
+  alternar amarração no nó que muda de T para L — permanece defeito real
+  do solver, não tocado), CR-C1 (`expected_rows` global) nem a
+  integração oficial da CR-B.
 - **CR-BLOCK-FIT-TOLERANCE-C04** (branch
   `claude/cr-block-fit-tolerance-c04-n5qsc4`, PR #20 **DRAFT, nao
   mergeado**, veredito **READY_FOR_INDEPENDENT_REVIEW**) - duas
