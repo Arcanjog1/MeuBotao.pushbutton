@@ -8,7 +8,9 @@ apenas registra — nenhuma reimplementação do solver, nenhum arquivo de
 Base: `origin/main` @ `3ebcd9b63875f9114a3d6223aa648e5075e2d35b` (pós-PR #19).
 O C04 (PR #20) **não** estava mergeado quando isto foi medido.
 
-Relatório completo: [`docs/BLOCK_ROOM_CHECK_C02_PREPARATION.md`](../../../docs/BLOCK_ROOM_CHECK_C02_PREPARATION.md).
+Relatórios:
+- [`docs/BLOCK_ROOM_CHECK_C02_PREPARATION.md`](../../../docs/BLOCK_ROOM_CHECK_C02_PREPARATION.md) — a preparação (MODO A).
+- [`docs/BLOCK_ROOM_CHECK_C02_DOMAIN_RECONCILIATION.md`](../../../docs/BLOCK_ROOM_CHECK_C02_DOMAIN_RECONCILIATION.md) — a reconciliação de domínio, que **substitui a conclusão** sobre o que a CR deve fazer.
 
 ## Como reproduzir
 
@@ -20,6 +22,11 @@ python3 nuvem/benchmark/diagnostics_c02/tools_c02_instrument.py   # X + T: toda 
 python3 nuvem/benchmark/diagnostics_c02/tools_c02_lcorner.py      # L_CORNER (teto de 34cm)
 python3 nuvem/benchmark/diagnostics_c02/tools_c02_origin.py       # de ONDE vem o déficit
 python3 nuvem/benchmark/diagnostics_c02/minimal_reproducers.py    # sintéticos + invariância
+
+# reconciliação de domínio:
+python3 nuvem/benchmark/diagnostics_c02/tools_c02_reconcile.py    # geometria dos nós afetados
+python3 nuvem/benchmark/diagnostics_c02/tools_c02_x_pattern.py    # padrão humano em cada nó X
+python3 nuvem/benchmark/diagnostics_c02/tools_c02_ownership.py    # ownership por fiada + colisão
 
 # comparação de estratégias — UMA variante por processo:
 for v in baseline x005 x030 xt005; do
@@ -39,6 +46,9 @@ versionados aqui são a versão **consolidada e enxuta** (sem dumps grandes).
 | `candidate_strategy_comparison.json` | `baseline` × `x005` × `x030` × `xt005`, medido em peças finais por identidade geométrica. |
 | `minimal_reproducers.py` / `minimal_reproducers_output.json` | Escada de folgas (28,10 → 0,00cm) e as cinco transformações de invariância, em planta sintética independente do corpus. |
 | `human_reference_check.json` | O humano usa B54 nos nós que a tolerância recuperaria? |
+| `node_reconciliation.json` | Geometria completa dos 5 nós afetados: input cru, pós-`extend_wall_ends_to_junctions`, nó do solver, paredes e peças do gabarito, aberturas. |
+| `x_node_human_pattern.json` | Os 43 nós X do corpus classificados pelo padrão humano (`AMARRACAO` / `PASSAGEM` / `OUTRO`), com os vãos por fiada. |
+| `x_ownership_evidence.json` | Quem ocupa o ponto do cruzamento **em cada fiada**, no solver e no gabarito, e o teste de colisão. |
 
 ## As duas armadilhas de contagem
 

@@ -1,0 +1,2121 @@
+{
+ "nota": "READ-ONLY. `input` = geometria crua do input.json; `posicionada` = depois de extend_wall_ends_to_junctions.",
+ "nos": [
+  {
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    -507.951
+   ],
+   "input_paredes_no_ponto": [
+    {
+     "idx": 17,
+     "p0": [
+      1263.518,
+      -569.948
+     ],
+     "p1": [
+      1263.518,
+      24.049
+     ],
+     "length_cm": 593.997,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.997,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.997
+    },
+    {
+     "idx": 91,
+     "p0": [
+      1325.52,
+      -507.951
+     ],
+     "p1": [
+      1201.515,
+      -507.951
+     ],
+     "length_cm": 124.005,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 62.002,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.002
+    }
+   ],
+   "posicionada_paredes_no_ponto": [
+    {
+     "idx": 17,
+     "p0": [
+      1263.518,
+      -569.948
+     ],
+     "p1": [
+      1263.518,
+      24.049
+     ],
+     "length_cm": 593.997,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.997,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.997
+    },
+    {
+     "idx": 91,
+     "p0": [
+      1325.52,
+      -507.951
+     ],
+     "p1": [
+      1201.515,
+      -507.951
+     ],
+     "length_cm": 124.005,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 62.002,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.002
+    }
+   ],
+   "no_do_solver": [
+    {
+     "node_index": 263,
+     "kind": "X_INTERSECTION",
+     "point_cm": [
+      1263.518,
+      -507.951
+     ],
+     "crossing_walls": [
+      17,
+      91
+     ],
+     "arms": [],
+     "main_wall_idx": null,
+     "incoming_wall_idx": null
+    }
+   ],
+   "gabarito_paredes_no_ponto": [
+    {
+     "id": "W008",
+     "p0": [
+      1263.503,
+      -569.952
+     ],
+     "p1": [
+      1263.503,
+      774.048
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 62.001,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "T",
+       "t_cm": 0.0,
+       "point_cm": [
+        1263.5,
+        -569.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 502.0,
+       "point_cm": [
+        1256.5,
+        -67.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 587.0,
+       "point_cm": [
+        1270.5,
+        17.05
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 757.0,
+       "point_cm": [
+        1270.5,
+        187.05
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 842.0,
+       "point_cm": [
+        1256.5,
+        272.05
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 1344.0,
+       "point_cm": [
+        1263.5,
+        774.05
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 276,
+      "C04": 24,
+      "B54": 24,
+      "C09": 36,
+      "B34": 22,
+      "B19": 2,
+      "CAN39": 14,
+      "CAN34": 4,
+      "CJ19": 8,
+      "B34_C": 2,
+      "B39_C": 4,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       15.0,
+       54.0
+      ],
+      [
+       "B39",
+       55.0,
+       94.0
+      ],
+      [
+       "B39",
+       95.0,
+       134.0
+      ],
+      [
+       "C04",
+       150.0,
+       154.0
+      ],
+      [
+       "B39",
+       155.0,
+       194.0
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B39",
+       35.0,
+       74.0
+      ],
+      [
+       "B39",
+       75.0,
+       114.0
+      ],
+      [
+       "B54",
+       115.0,
+       169.0
+      ],
+      [
+       "C04",
+       170.0,
+       174.0
+      ],
+      [
+       "B39",
+       175.0,
+       214.0
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    },
+    {
+     "id": "W022",
+     "p0": [
+      1201.513,
+      -507.972
+     ],
+     "p1": [
+      1325.483,
+      -507.972
+     ],
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 62.005,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "L",
+       "t_cm": 0.0,
+       "point_cm": [
+        1201.51,
+        -507.97
+       ]
+      },
+      {
+       "type": "L",
+       "t_cm": 123.97,
+       "point_cm": [
+        1325.48,
+        -507.97
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 12,
+      "B34": 12,
+      "B19": 12,
+      "B39_C": 2,
+      "B34_C": 2,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       14.99,
+       53.99
+      ],
+      [
+       "B39",
+       69.99,
+       108.99
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B19",
+       34.99,
+       53.99
+      ],
+      [
+       "B19",
+       69.99,
+       88.99
+      ],
+      [
+       "B34",
+       89.97,
+       123.97
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    }
+   ],
+   "gabarito_junctions_no_ponto": [],
+   "solver_pecas_perto": {
+    "0": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       1263.52,
+       -507.95
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C04",
+      "length_cm": 4.0,
+      "center_cm": [
+       1263.52,
+       -527.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 19.997
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       1291.02,
+       -507.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 27.497
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       1236.02,
+       -507.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 27.5
+     }
+    ],
+    "1": [
+     {
+      "code": "B54",
+      "length_cm": 54.0,
+      "center_cm": [
+       1263.52,
+       -507.95
+      ],
+      "reason": "X_INTERSECTION",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       1263.52,
+       -532.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 24.997
+     }
+    ]
+   },
+   "aberturas_a_60cm": []
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    594.93
+   ],
+   "input_paredes_no_ponto": [
+    {
+     "idx": 2,
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    },
+    {
+     "idx": 20,
+     "p0": [
+      6545.26,
+      594.93
+     ],
+     "p1": [
+      6669.24,
+      594.93
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.99
+    }
+   ],
+   "posicionada_paredes_no_ponto": [
+    {
+     "idx": 2,
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    },
+    {
+     "idx": 20,
+     "p0": [
+      6545.26,
+      594.93
+     ],
+     "p1": [
+      6669.24,
+      594.93
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.99
+    }
+   ],
+   "no_do_solver": [
+    {
+     "node_index": 154,
+     "kind": "X_INTERSECTION",
+     "point_cm": [
+      6607.25,
+      594.93
+     ],
+     "crossing_walls": [
+      2,
+      20
+     ],
+     "arms": [],
+     "main_wall_idx": null,
+     "incoming_wall_idx": null
+    }
+   ],
+   "gabarito_paredes_no_ponto": [
+    {
+     "id": "W003",
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "T",
+       "t_cm": 0.0,
+       "point_cm": [
+        6607.25,
+        532.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 502.0,
+       "point_cm": [
+        6614.25,
+        1034.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 587.0,
+       "point_cm": [
+        6600.25,
+        1119.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 757.0,
+       "point_cm": [
+        6600.25,
+        1289.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 842.0,
+       "point_cm": [
+        6614.25,
+        1374.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 1344.0,
+       "point_cm": [
+        6607.25,
+        1876.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 276,
+      "C04": 24,
+      "B54": 24,
+      "C09": 36,
+      "B34": 22,
+      "B19": 2,
+      "CAN39": 14,
+      "CAN34": 4,
+      "CJ19": 8,
+      "B34_C": 2,
+      "B39_C": 4,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       15.0,
+       54.0
+      ],
+      [
+       "B39",
+       55.0,
+       94.0
+      ],
+      [
+       "B39",
+       95.0,
+       134.0
+      ],
+      [
+       "C04",
+       150.0,
+       154.0
+      ],
+      [
+       "B39",
+       155.0,
+       194.0
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B39",
+       35.0,
+       74.0
+      ],
+      [
+       "B39",
+       75.0,
+       114.0
+      ],
+      [
+       "B54",
+       115.0,
+       169.0
+      ],
+      [
+       "C04",
+       170.0,
+       174.0
+      ],
+      [
+       "B39",
+       175.0,
+       214.0
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    },
+    {
+     "id": "W021",
+     "p0": [
+      6545.26,
+      594.93
+     ],
+     "p1": [
+      6669.24,
+      594.93
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "L",
+       "t_cm": 0.0,
+       "point_cm": [
+        6545.26,
+        594.93
+       ]
+      },
+      {
+       "type": "L",
+       "t_cm": 123.98,
+       "point_cm": [
+        6669.24,
+        594.93
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 12,
+      "B34": 12,
+      "B19": 12,
+      "B39_C": 2,
+      "B34_C": 2,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       14.99,
+       53.99
+      ],
+      [
+       "B39",
+       69.99,
+       108.99
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B19",
+       34.99,
+       53.99
+      ],
+      [
+       "B19",
+       69.99,
+       88.99
+      ],
+      [
+       "B34",
+       89.98,
+       123.98
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    }
+   ],
+   "gabarito_junctions_no_ponto": [],
+   "solver_pecas_perto": {
+    "0": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       6607.25,
+       594.93
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       6624.75,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6607.25,
+       572.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.48
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       6579.76,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 27.49
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6607.25,
+       562.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 32.48
+     },
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       6607.25,
+       629.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 35.0
+     }
+    ],
+    "1": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       6607.25,
+       594.93
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C04",
+      "length_cm": 4.0,
+      "center_cm": [
+       6607.25,
+       604.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 10.0
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       6607.25,
+       577.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.48
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6607.25,
+       612.43
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6584.76,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.49
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6629.75,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6639.75,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 32.5
+     }
+    ]
+   },
+   "aberturas_a_60cm": []
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    594.93
+   ],
+   "input_paredes_no_ponto": [
+    {
+     "idx": 7,
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    },
+    {
+     "idx": 21,
+     "p0": [
+      8880.25,
+      594.93
+     ],
+     "p1": [
+      9004.22,
+      594.93
+     ],
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    }
+   ],
+   "posicionada_paredes_no_ponto": [
+    {
+     "idx": 7,
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    },
+    {
+     "idx": 21,
+     "p0": [
+      8880.25,
+      594.93
+     ],
+     "p1": [
+      9004.22,
+      594.93
+     ],
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.98
+    }
+   ],
+   "no_do_solver": [
+    {
+     "node_index": 166,
+     "kind": "X_INTERSECTION",
+     "point_cm": [
+      8942.24,
+      594.93
+     ],
+     "crossing_walls": [
+      7,
+      21
+     ],
+     "arms": [],
+     "main_wall_idx": null,
+     "incoming_wall_idx": null
+    }
+   ],
+   "gabarito_paredes_no_ponto": [
+    {
+     "id": "W008",
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.98,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "T",
+       "t_cm": 0.0,
+       "point_cm": [
+        8942.24,
+        532.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 502.0,
+       "point_cm": [
+        8935.24,
+        1034.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 587.0,
+       "point_cm": [
+        8949.24,
+        1119.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 757.0,
+       "point_cm": [
+        8949.24,
+        1289.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 842.0,
+       "point_cm": [
+        8935.24,
+        1374.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 1344.0,
+       "point_cm": [
+        8942.24,
+        1876.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 276,
+      "C04": 24,
+      "B54": 24,
+      "C09": 36,
+      "B34": 22,
+      "B19": 2,
+      "CAN39": 14,
+      "CAN34": 4,
+      "CJ19": 8,
+      "B34_C": 2,
+      "B39_C": 4,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       15.0,
+       54.0
+      ],
+      [
+       "B39",
+       55.0,
+       94.0
+      ],
+      [
+       "B39",
+       95.0,
+       134.0
+      ],
+      [
+       "C04",
+       150.0,
+       154.0
+      ],
+      [
+       "B39",
+       155.0,
+       194.0
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B39",
+       35.0,
+       74.0
+      ],
+      [
+       "B39",
+       75.0,
+       114.0
+      ],
+      [
+       "B54",
+       115.0,
+       169.0
+      ],
+      [
+       "C04",
+       170.0,
+       174.0
+      ],
+      [
+       "B39",
+       175.0,
+       214.0
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    },
+    {
+     "id": "W022",
+     "p0": [
+      8880.25,
+      594.93
+     ],
+     "p1": [
+      9004.22,
+      594.93
+     ],
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "L",
+       "t_cm": 0.0,
+       "point_cm": [
+        8880.25,
+        594.93
+       ]
+      },
+      {
+       "type": "L",
+       "t_cm": 123.97,
+       "point_cm": [
+        9004.22,
+        594.93
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 12,
+      "B34": 12,
+      "B19": 12,
+      "B39_C": 2,
+      "B34_C": 2,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       14.99,
+       53.99
+      ],
+      [
+       "B39",
+       69.99,
+       108.99
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B19",
+       34.99,
+       53.99
+      ],
+      [
+       "B19",
+       69.99,
+       88.99
+      ],
+      [
+       "B34",
+       89.97,
+       123.97
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    }
+   ],
+   "gabarito_junctions_no_ponto": [],
+   "solver_pecas_perto": {
+    "0": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       8942.24,
+       594.93
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       8959.74,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8942.24,
+       572.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.48
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8942.24,
+       562.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 32.48
+     },
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       8942.24,
+       629.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 35.0
+     }
+    ],
+    "1": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       8942.24,
+       594.93
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C04",
+      "length_cm": 4.0,
+      "center_cm": [
+       8942.24,
+       604.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 10.0
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       8942.24,
+       577.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.48
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8942.24,
+       612.43
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8919.75,
+       594.93
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.49
+     }
+    ]
+   },
+   "aberturas_a_60cm": []
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    1814.95
+   ],
+   "input_paredes_no_ponto": [
+    {
+     "idx": 2,
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.0
+    },
+    {
+     "idx": 91,
+     "p0": [
+      6545.26,
+      1814.95
+     ],
+     "p1": [
+      6669.24,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.99
+    }
+   ],
+   "posicionada_paredes_no_ponto": [
+    {
+     "idx": 2,
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.0
+    },
+    {
+     "idx": 91,
+     "p0": [
+      6545.26,
+      1814.95
+     ],
+     "p1": [
+      6669.24,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.99
+    }
+   ],
+   "no_do_solver": [
+    {
+     "node_index": 157,
+     "kind": "X_INTERSECTION",
+     "point_cm": [
+      6607.25,
+      1814.95
+     ],
+     "crossing_walls": [
+      2,
+      91
+     ],
+     "arms": [],
+     "main_wall_idx": null,
+     "incoming_wall_idx": null
+    }
+   ],
+   "gabarito_paredes_no_ponto": [
+    {
+     "id": "W003",
+     "p0": [
+      6607.25,
+      532.95
+     ],
+     "p1": [
+      6607.25,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "T",
+       "t_cm": 0.0,
+       "point_cm": [
+        6607.25,
+        532.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 502.0,
+       "point_cm": [
+        6614.25,
+        1034.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 587.0,
+       "point_cm": [
+        6600.25,
+        1119.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 757.0,
+       "point_cm": [
+        6600.25,
+        1289.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 842.0,
+       "point_cm": [
+        6614.25,
+        1374.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 1344.0,
+       "point_cm": [
+        6607.25,
+        1876.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 276,
+      "C04": 24,
+      "B54": 24,
+      "C09": 36,
+      "B34": 22,
+      "B19": 2,
+      "CAN39": 14,
+      "CAN34": 4,
+      "CJ19": 8,
+      "B34_C": 2,
+      "B39_C": 4,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       1150.0,
+       1189.0
+      ],
+      [
+       "C04",
+       1190.0,
+       1194.0
+      ],
+      [
+       "B39",
+       1210.0,
+       1249.0
+      ],
+      [
+       "B39",
+       1250.0,
+       1289.0
+      ],
+      [
+       "B39",
+       1290.0,
+       1329.0
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B39",
+       1130.0,
+       1169.0
+      ],
+      [
+       "C04",
+       1170.0,
+       1174.0
+      ],
+      [
+       "B54",
+       1175.0,
+       1229.0
+      ],
+      [
+       "B39",
+       1230.0,
+       1269.0
+      ],
+      [
+       "B39",
+       1270.0,
+       1309.0
+      ],
+      [
+       "B34",
+       1310.0,
+       1344.0
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    },
+    {
+     "id": "W092",
+     "p0": [
+      6545.26,
+      1814.95
+     ],
+     "p1": [
+      6669.24,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.99,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "L",
+       "t_cm": 0.0,
+       "point_cm": [
+        6545.26,
+        1814.95
+       ]
+      },
+      {
+       "type": "L",
+       "t_cm": 123.98,
+       "point_cm": [
+        6669.24,
+        1814.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 12,
+      "B34": 12,
+      "B19": 12,
+      "B39_C": 2,
+      "B34_C": 2,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       14.99,
+       53.99
+      ],
+      [
+       "B39",
+       69.99,
+       108.99
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B19",
+       34.99,
+       53.99
+      ],
+      [
+       "B19",
+       69.99,
+       88.99
+      ],
+      [
+       "B34",
+       89.98,
+       123.98
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    }
+   ],
+   "gabarito_junctions_no_ponto": [],
+   "solver_pecas_perto": {
+    "0": [
+     {
+      "code": "B54",
+      "length_cm": 54.0,
+      "center_cm": [
+       6607.25,
+       1814.95
+      ],
+      "reason": "X_INTERSECTION",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       6624.75,
+       1814.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       6579.76,
+       1814.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 27.49
+     },
+     {
+      "code": "C04",
+      "length_cm": 4.0,
+      "center_cm": [
+       6607.25,
+       1784.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 30.0
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6607.25,
+       1777.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       6607.25,
+       1852.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     }
+    ],
+    "1": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       6607.25,
+       1814.95
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6607.25,
+       1802.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 12.5
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       6607.25,
+       1832.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6584.76,
+       1814.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.49
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6629.75,
+       1814.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 22.5
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       6639.75,
+       1814.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 32.5
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       6607.25,
+       1777.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     }
+    ]
+   },
+   "aberturas_a_60cm": []
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    1814.95
+   ],
+   "input_paredes_no_ponto": [
+    {
+     "idx": 7,
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.0
+    },
+    {
+     "idx": 92,
+     "p0": [
+      8880.34,
+      1814.95
+     ],
+     "p1": [
+      9004.32,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.9,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.9
+    }
+   ],
+   "posicionada_paredes_no_ponto": [
+    {
+     "idx": 7,
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 62.0
+    },
+    {
+     "idx": 92,
+     "p0": [
+      8880.34,
+      1814.95
+     ],
+     "p1": [
+      9004.32,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "dist_eixo_ao_ponto_cm": 0.0,
+     "t_do_ponto_cm": 61.9,
+     "relacao": "ATRAVESSA o ponto",
+     "sobra_apos_o_ponto_cm": 61.9
+    }
+   ],
+   "no_do_solver": [
+    {
+     "node_index": 169,
+     "kind": "X_INTERSECTION",
+     "point_cm": [
+      8942.24,
+      1814.95
+     ],
+     "crossing_walls": [
+      7,
+      92
+     ],
+     "arms": [],
+     "main_wall_idx": null,
+     "incoming_wall_idx": null
+    }
+   ],
+   "gabarito_paredes_no_ponto": [
+    {
+     "id": "W008",
+     "p0": [
+      8942.24,
+      532.95
+     ],
+     "p1": [
+      8942.24,
+      1876.95
+     ],
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 1282.0,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "T",
+       "t_cm": 0.0,
+       "point_cm": [
+        8942.24,
+        532.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 502.0,
+       "point_cm": [
+        8935.24,
+        1034.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 587.0,
+       "point_cm": [
+        8949.24,
+        1119.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 757.0,
+       "point_cm": [
+        8949.24,
+        1289.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 842.0,
+       "point_cm": [
+        8935.24,
+        1374.95
+       ]
+      },
+      {
+       "type": "T",
+       "t_cm": 1344.0,
+       "point_cm": [
+        8942.24,
+        1876.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 276,
+      "C04": 24,
+      "B54": 24,
+      "C09": 36,
+      "B34": 22,
+      "B19": 2,
+      "CAN39": 14,
+      "CAN34": 4,
+      "CJ19": 8,
+      "B34_C": 2,
+      "B39_C": 4,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       1150.0,
+       1189.0
+      ],
+      [
+       "C04",
+       1190.0,
+       1194.0
+      ],
+      [
+       "B39",
+       1210.0,
+       1249.0
+      ],
+      [
+       "B39",
+       1250.0,
+       1289.0
+      ],
+      [
+       "B39",
+       1290.0,
+       1329.0
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B39",
+       1130.0,
+       1169.0
+      ],
+      [
+       "C04",
+       1170.0,
+       1174.0
+      ],
+      [
+       "B54",
+       1175.0,
+       1229.0
+      ],
+      [
+       "B39",
+       1230.0,
+       1269.0
+      ],
+      [
+       "B39",
+       1270.0,
+       1309.0
+      ],
+      [
+       "B34",
+       1310.0,
+       1344.0
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    },
+    {
+     "id": "W093",
+     "p0": [
+      8880.34,
+      1814.95
+     ],
+     "p1": [
+      9004.32,
+      1814.95
+     ],
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_ponto_cm": 61.9,
+     "relacao": "ATRAVESSA o ponto",
+     "junctions": [
+      {
+       "type": "L",
+       "t_cm": 0.0,
+       "point_cm": [
+        8880.34,
+        1814.95
+       ]
+      },
+      {
+       "type": "L",
+       "t_cm": 123.98,
+       "point_cm": [
+        9004.32,
+        1814.95
+       ]
+      }
+     ],
+     "junction_no_ponto": [],
+     "codigos": {
+      "B39": 12,
+      "B34": 12,
+      "B19": 12,
+      "B39_C": 2,
+      "B34_C": 2,
+      "B19_C": 2
+     },
+     "fiada_0": [
+      [
+       "B39",
+       14.99,
+       53.99
+      ],
+      [
+       "B39",
+       69.99,
+       108.99
+      ]
+     ],
+     "fiada_1": [
+      [
+       "B34",
+       0.0,
+       34.0
+      ],
+      [
+       "B19",
+       34.99,
+       53.99
+      ],
+      [
+       "B19",
+       69.99,
+       88.99
+      ],
+      [
+       "B34",
+       89.98,
+       123.98
+      ]
+     ],
+     "nota_fiadas": "pecas a +-120cm do ponto do cruzamento (lista truncada)"
+    }
+   ],
+   "gabarito_junctions_no_ponto": [],
+   "solver_pecas_perto": {
+    "0": [
+     {
+      "code": "B54",
+      "length_cm": 54.0,
+      "center_cm": [
+       8942.24,
+       1814.95
+      ],
+      "reason": "X_INTERSECTION",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C04",
+      "length_cm": 4.0,
+      "center_cm": [
+       8942.24,
+       1784.95
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 30.0
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8942.24,
+       1777.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       8942.24,
+       1852.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     }
+    ],
+    "1": [
+     {
+      "code": "B34",
+      "length_cm": 34.0,
+      "center_cm": [
+       8942.24,
+       1814.95
+      ],
+      "reason": "X_INTERSECTION_DEGRADED",
+      "dist_ao_no_cm": 0.0
+     },
+     {
+      "code": "C09",
+      "length_cm": 9.0,
+      "center_cm": [
+       8942.24,
+       1802.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 12.5
+     },
+     {
+      "code": "B19",
+      "length_cm": 19.0,
+      "center_cm": [
+       8942.24,
+       1832.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 17.5
+     },
+     {
+      "code": "B39",
+      "length_cm": 39.0,
+      "center_cm": [
+       8942.24,
+       1777.45
+      ],
+      "reason": "STANDARD_FILL",
+      "dist_ao_no_cm": 37.5
+     }
+    ]
+   },
+   "aberturas_a_60cm": []
+  }
+ ],
+ "nota_truncagem": "fiadas truncadas a +-120cm do no para nao virar dump"
+}

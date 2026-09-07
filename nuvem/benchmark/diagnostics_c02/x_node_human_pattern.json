@@ -1,0 +1,3310 @@
+{
+ "nota": "`vao_cm` e' o espaco livre da fiada que contem o ponto do cruzamento; comparar com a espessura da parede que passa (vao = espessura + 2 juntas e' passagem exata).",
+ "nos": [
+  {
+   "paredes": [
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W087",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.005,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 394.99,
+        "t_end_cm": 448.99,
+        "offset_do_no_cm": -0.015
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        413.99,
+        429.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1202.251,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1194.0,
+        1210.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1175.0,
+        "t_end_cm": 1229.0,
+        "offset_do_no_cm": -0.251
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W087",
+    "W008"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W087",
+    "W008"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    632.299
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W086",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 395.0,
+        "t_end_cm": 449.0,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1202.251,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1194.0,
+        1210.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1175.0,
+        "t_end_cm": 1229.0,
+        "offset_do_no_cm": -0.251
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W086",
+    "W003"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W086",
+    "W003"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    632.299
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "id": "W024",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.005,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 394.99,
+        "t_end_cm": 448.99,
+        "offset_do_no_cm": -0.015
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        413.99,
+        429.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 141.751,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        134.0,
+        150.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 115.0,
+        "t_end_cm": 169.0,
+        "offset_do_no_cm": 0.249
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W024",
+    "W008"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W024",
+    "W008"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    -428.201
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "id": "W023",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 395.0,
+        "t_end_cm": 449.0,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 141.751,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        134.0,
+        150.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 115.0,
+        "t_end_cm": 169.0,
+        "offset_do_no_cm": 0.249
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W023",
+    "W003"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W023",
+    "W003"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    -428.201
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1282.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W093",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W003"
+   ],
+   "parede_que_abre_vao": [
+    "W093"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    712.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1282.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W094",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.915,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W008"
+   ],
+   "parede_que_abre_vao": [
+    "W094"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    712.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 62.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "id": "W021",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W003"
+   ],
+   "parede_que_abre_vao": [
+    "W021"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    -507.951
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 62.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "id": "W022",
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 62.005,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W008"
+   ],
+   "parede_que_abre_vao": [
+    "W022"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    -507.951
+   ],
+   "afetado_por_tol_005": true
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W027",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 149.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 1.0,
+       "vao_intervalo": [
+        149.0,
+        150.0
+       ],
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 145.0,
+        "t_end_cm": 149.0,
+        "offset_do_no_cm": -2.001
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 145.0,
+        "t_end_cm": 154.0,
+        "offset_do_no_cm": 0.499
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    -165.951
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      -0.06459868372632144,
+      0.9979113237461668
+     ],
+     "id": "W027",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 149.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 1.0,
+       "vao_intervalo": [
+        149.0,
+        150.0
+       ],
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 145.0,
+        "t_end_cm": 149.0,
+        "offset_do_no_cm": -2.001
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 145.0,
+        "t_end_cm": 154.0,
+        "offset_do_no_cm": 0.499
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1808.533,
+    -165.951
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W070",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 20.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 20.0,
+        "t_end_cm": 24.0,
+        "offset_do_no_cm": 1.999
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 15.0,
+        "t_end_cm": 24.0,
+        "offset_do_no_cm": -0.501
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [
+    "W070"
+   ],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    370.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      0.0,
+      -1.0
+     ],
+     "id": "W069",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 20.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 20.0,
+        "t_end_cm": 24.0,
+        "offset_do_no_cm": 1.999
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 15.0,
+        "t_end_cm": 24.0,
+        "offset_do_no_cm": -0.501
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [
+    "W069"
+   ],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1616.486,
+    370.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      0.02308521615569807,
+      -0.9997335008866336
+     ],
+     "status": "SEM_PAREDE"
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1609.617,
+    370.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      0.0,
+      -1.0
+     ],
+     "id": "W030",
+     "length_cm": 154.01,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 134.001,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 130.0,
+        "t_end_cm": 139.0,
+        "offset_do_no_cm": 0.499
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 1.0,
+       "vao_intervalo": [
+        134.0,
+        135.0
+       ],
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 130.0,
+        "t_end_cm": 134.0,
+        "offset_do_no_cm": -2.001
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1616.486,
+    -165.951
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.024006905182810366,
+      0.9997117927200537
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      -1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    -1254.434,
+    115.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.024011954228451395,
+      -0.999711671460392
+     ],
+     "status": "SEM_PAREDE"
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "status": "SEM_PAREDE"
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1449.46,
+    89.049
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W027",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 149.303,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 1.0,
+       "vao_intervalo": [
+        149.0,
+        150.0
+       ],
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 145.0,
+        "t_end_cm": 149.0,
+        "offset_do_no_cm": -2.303
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 145.0,
+        "t_end_cm": 154.0,
+        "offset_do_no_cm": 0.197
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      -0.06459868372632144,
+      0.9979113237461668
+     ],
+     "id": "W027",
+     "length_cm": 169.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 149.303,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 1.0,
+       "vao_intervalo": [
+        149.0,
+        150.0
+       ],
+       "peca_centrada_no_no": {
+        "code": "C04",
+        "t_start_cm": 145.0,
+        "t_end_cm": 149.0,
+        "offset_do_no_cm": -2.303
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "C09",
+        "t_start_cm": 145.0,
+        "t_end_cm": 154.0,
+        "offset_do_no_cm": 0.197
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    -165.649
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.98,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W021",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W003"
+   ],
+   "parede_que_abre_vao": [
+    "W021"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    594.93
+   ],
+   "afetado_por_tol_005": true
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 142.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        134.0,
+        150.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 115.0,
+        "t_end_cm": 169.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W023",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 395.0,
+        "t_end_cm": 449.0,
+        "offset_do_no_cm": -0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W003",
+    "W023"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W003",
+    "W023"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    674.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1202.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1194.0,
+        1210.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1175.0,
+        "t_end_cm": 1229.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W085",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 395.0,
+        "t_end_cm": 449.0,
+        "offset_do_no_cm": -0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W003",
+    "W085"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W003",
+    "W085"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    1734.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W003",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1282.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W092",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W003"
+   ],
+   "parede_que_abre_vao": [
+    "W092"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    1814.95
+   ],
+   "afetado_por_tol_005": true
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W004",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 587.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W004",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7022.25,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W004",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 757.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W055",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 422.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        414.0,
+        430.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W004",
+    "W055"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7022.25,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W005",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 587.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 677.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        669.0,
+        685.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 650.0,
+        "t_end_cm": 704.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W005",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W052"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7277.25,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W005",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 757.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W055",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 677.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        669.0,
+        685.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 650.0,
+        "t_end_cm": 704.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W005",
+    "W055"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W055"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7277.25,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W006",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 587.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1671.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 15.99,
+       "vao_intervalo": [
+        1663.99,
+        1679.98
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1644.99,
+        "t_end_cm": 1698.99,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W006",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W052"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8272.24,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W006",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 757.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W056",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 262.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 15.99,
+       "vao_intervalo": [
+        254.0,
+        269.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 235.0,
+        "t_end_cm": 289.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W006",
+    "W056"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W056"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8272.24,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W007",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 587.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1926.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1918.99,
+        1934.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W007",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8527.24,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W007",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 757.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        579.0,
+        765.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W056",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 517.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        509.0,
+        525.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W007",
+    "W056"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8527.24,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.98,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W022",
+     "length_cm": 123.97,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W008"
+   ],
+   "parede_que_abre_vao": [
+    "W022"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    594.93
+   ],
+   "afetado_por_tol_005": true
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 142.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        134.0,
+        150.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 115.0,
+        "t_end_cm": 169.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W024",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 421.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 394.99,
+        "t_end_cm": 448.99,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        413.99,
+        429.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W008",
+    "W024"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W008",
+    "W024"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    674.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1202.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1194.0,
+        1210.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1175.0,
+        "t_end_cm": 1229.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W086",
+     "length_cm": 843.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 421.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 394.99,
+        "t_end_cm": 448.99,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        413.99,
+        429.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W008",
+    "W086"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W008",
+    "W086"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    1734.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W008",
+     "length_cm": 1344.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1282.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W093",
+     "length_cm": 123.98,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 61.9,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        53.99,
+        69.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "PASSAGEM",
+   "parede_que_passa": [
+    "W008"
+   ],
+   "parede_que_abre_vao": [
+    "W093"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    1814.95
+   ],
+   "afetado_por_tol_005": true
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W017",
+     "length_cm": 1379.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 572.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        564.0,
+        750.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 932.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 251.0,
+       "vao_intervalo": [
+        924.0,
+        1175.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "OUTRO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W017",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7532.25,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W019",
+     "length_cm": 1379.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 572.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        564.0,
+        750.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1417.01,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1390.0,
+        "t_end_cm": 1444.0,
+        "offset_do_no_cm": -0.01
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 15.99,
+       "vao_intervalo": [
+        1409.0,
+        1424.99
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W019",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W052"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8017.26,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W036",
+     "length_cm": 524.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 262.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 235.0,
+        "t_end_cm": 289.0,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        254.0,
+        270.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W053",
+     "length_cm": 639.01,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 72.01,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 15.98,
+       "vao_intervalo": [
+        64.03,
+        80.01
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 45.01,
+        "t_end_cm": 99.01,
+        "offset_do_no_cm": -0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W036",
+    "W053"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W036",
+    "W053"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    5872.25,
+    1204.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W037",
+     "length_cm": 524.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 262.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        254.0,
+        270.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 235.0,
+        "t_end_cm": 289.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W054",
+     "length_cm": 639.01,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 262.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 235.0,
+        "t_end_cm": 289.0,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        254.0,
+        270.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W037",
+    "W054"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W037",
+    "W054"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    9372.24,
+    1204.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W038",
+     "length_cm": 524.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 262.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 235.0,
+        "t_end_cm": 289.0,
+        "offset_do_no_cm": 0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        254.0,
+        270.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W054",
+     "length_cm": 639.01,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 567.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 15.97,
+       "vao_intervalo": [
+        559.0,
+        574.97
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 540.0,
+        "t_end_cm": 594.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W038",
+    "W054"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W038",
+    "W054"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    9677.24,
+    1204.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W041",
+     "length_cm": 509.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 247.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        239.0,
+        255.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 220.0,
+        "t_end_cm": 274.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W053",
+     "length_cm": 639.01,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 377.01,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 350.01,
+        "t_end_cm": 404.01,
+        "offset_do_no_cm": -0.0
+       }
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        369.01,
+        385.01
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W041",
+    "W053"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W041",
+    "W053"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    6177.25,
+    1204.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W046",
+     "length_cm": 374.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 102.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        94.0,
+        280.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 742.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        734.0,
+        750.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 715.0,
+        "t_end_cm": 769.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W046",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W052"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7342.25,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W046",
+     "length_cm": 374.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 272.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        94.0,
+        280.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W055",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 742.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        734.0,
+        750.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 715.0,
+        "t_end_cm": 769.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W046",
+    "W055"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W055"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    7342.25,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W047",
+     "length_cm": 374.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 102.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        94.0,
+        280.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W052",
+     "length_cm": 2348.99,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 1606.99,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        1598.99,
+        1614.99
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 1579.99,
+        "t_end_cm": 1633.99,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W047",
+    "W052"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W052"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8207.24,
+    1119.95
+   ],
+   "afetado_por_tol_005": false
+  },
+  {
+   "paredes": [
+    {
+     "axis": [
+      0.0,
+      1.0
+     ],
+     "id": "W047",
+     "length_cm": 374.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 272.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": false,
+       "vao_cm": 186.0,
+       "vao_intervalo": [
+        94.0,
+        280.0
+       ],
+       "peca_centrada_no_no": null
+      }
+     ]
+    },
+    {
+     "axis": [
+      1.0,
+      0.0
+     ],
+     "id": "W056",
+     "length_cm": 939.0,
+     "thickness_cm": 14.0,
+     "t_do_no_cm": 197.0,
+     "fiadas": [
+      {
+       "row": 0,
+       "coberto_por_peca": false,
+       "vao_cm": 16.0,
+       "vao_intervalo": [
+        189.0,
+        205.0
+       ],
+       "peca_centrada_no_no": null
+      },
+      {
+       "row": 1,
+       "coberto_por_peca": true,
+       "vao_cm": null,
+       "vao_intervalo": null,
+       "peca_centrada_no_no": {
+        "code": "B54",
+        "t_start_cm": 170.0,
+        "t_end_cm": 224.0,
+        "offset_do_no_cm": 0.0
+       }
+      }
+     ]
+    }
+   ],
+   "padrao_humano": "AMARRACAO",
+   "parede_que_passa": [],
+   "parede_que_abre_vao": [
+    "W047",
+    "W056"
+   ],
+   "parede_com_amarracao_centrada": [
+    "W056"
+   ],
+   "espessura_cm": 14.0,
+   "project": "TP1",
+   "no_cm": [
+    8207.24,
+    1289.95
+   ],
+   "afetado_por_tol_005": false
+  }
+ ],
+ "resumo": {
+  "TGD / AMARRACAO": 4,
+  "TGD / OUTRO": 9,
+  "TGD / PASSAGEM": 4,
+  "TP1 / AMARRACAO": 17,
+  "TP1 / OUTRO": 5,
+  "TP1 / PASSAGEM": 4
+ },
+ "resumo_afetados": {
+  "PASSAGEM": 5
+ }
+}

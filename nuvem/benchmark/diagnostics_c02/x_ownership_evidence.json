@@ -1,0 +1,3772 @@
+{
+ "nota": "`ocupa` = existe peca daquela parede cobrindo o ponto do cruzamento naquela fiada. ALTERNA = amarracao em X; PASSAGEM = uma parede e' dona do cruzamento nas duas fiadas.",
+ "fiadas_checadas": [
+  0,
+  1,
+  2,
+  3
+ ],
+ "nos": [
+  {
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    632.299
+   ],
+   "comprimentos_cm": [
+    844.0,
+    594.0
+   ],
+   "menor_parede_cm": 594.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.01,
+      "t_end_cm": 449.01,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 425.25,
+      "t_end_cm": 479.25,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.01,
+      "t_end_cm": 449.01,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 425.25,
+      "t_end_cm": 479.25,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    632.299
+   ],
+   "comprimentos_cm": [
+    844.0,
+    594.0
+   ],
+   "menor_parede_cm": 594.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 425.25,
+      "t_end_cm": 479.25,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 425.25,
+      "t_end_cm": 479.25,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    -428.201
+   ],
+   "comprimentos_cm": [
+    844.0,
+    594.0
+   ],
+   "menor_parede_cm": 594.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 114.75,
+      "t_end_cm": 168.75,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 114.75,
+      "t_end_cm": 168.75,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    -428.201
+   ],
+   "comprimentos_cm": [
+    844.0,
+    594.0
+   ],
+   "menor_parede_cm": 594.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 114.75,
+      "t_end_cm": 168.75,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 114.75,
+      "t_end_cm": 168.75,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    712.049
+   ],
+   "comprimentos_cm": [
+    594.0,
+    124.01
+   ],
+   "menor_parede_cm": 124.01,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 505.0,
+      "t_end_cm": 559.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 505.0,
+      "t_end_cm": 559.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    712.049
+   ],
+   "comprimentos_cm": [
+    594.0,
+    124.01
+   ],
+   "menor_parede_cm": 124.01,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 505.0,
+      "t_end_cm": 559.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.01,
+      "t_end_cm": 89.01,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 505.0,
+      "t_end_cm": 559.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.01,
+      "t_end_cm": 89.01,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1071.487,
+    -507.951
+   ],
+   "comprimentos_cm": [
+    594.0,
+    124.0
+   ],
+   "menor_parede_cm": 124.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1263.518,
+    -507.951
+   ],
+   "comprimentos_cm": [
+    594.0,
+    124.0
+   ],
+   "menor_parede_cm": 124.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 45.0,
+      "t_end_cm": 79.0,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 45.0,
+      "t_end_cm": 79.0,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 35.0,
+      "t_end_cm": 89.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    -165.951
+   ],
+   "comprimentos_cm": [
+    370.01,
+    169.0
+   ],
+   "menor_parede_cm": 169.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 145.0,
+      "t_end_cm": 154.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 145.0,
+      "t_end_cm": 154.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1808.533,
+    -165.951
+   ],
+   "comprimentos_cm": [
+    370.01,
+    99.75
+   ],
+   "menor_parede_cm": 99.75,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    370.049
+   ],
+   "comprimentos_cm": [
+    370.01,
+    166.72
+   ],
+   "menor_parede_cm": 166.72,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C04",
+      "t_start_cm": 20.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 15.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C04",
+      "t_start_cm": 20.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 15.0,
+      "t_end_cm": 24.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1616.486,
+    370.049
+   ],
+   "comprimentos_cm": [
+    384.0,
+    166.47
+   ],
+   "menor_parede_cm": 166.47,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "PASSAGEM",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 88.14,
+      "t_end_cm": 142.14,
+      "reason": "T_INTERSECTION_MAIN"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 88.14,
+      "t_end_cm": 142.14,
+      "reason": "T_INTERSECTION_MAIN"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C04",
+      "t_start_cm": 20.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 15.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C04",
+      "t_start_cm": 20.0,
+      "t_end_cm": 24.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 15.0,
+      "t_end_cm": 24.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1609.617,
+    370.049
+   ],
+   "comprimentos_cm": [
+    384.0,
+    97.46
+   ],
+   "menor_parede_cm": 97.46,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 88.14,
+      "t_end_cm": 142.14,
+      "reason": "T_INTERSECTION_MAIN"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 63.46,
+      "t_end_cm": 97.46,
+      "reason": "T_INTERSECTION_INCOMING"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 88.14,
+      "t_end_cm": 142.14,
+      "reason": "T_INTERSECTION_MAIN"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 63.46,
+      "t_end_cm": 97.46,
+      "reason": "T_INTERSECTION_INCOMING"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1616.486,
+    -165.951
+   ],
+   "comprimentos_cm": [
+    384.0,
+    168.74
+   ],
+   "menor_parede_cm": 168.74,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    -1254.434,
+    115.049
+   ],
+   "comprimentos_cm": [
+    197.94,
+    94.0
+   ],
+   "menor_parede_cm": 94.0,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1449.46,
+    89.049
+   ],
+   "comprimentos_cm": [
+    197.94,
+    94.01
+   ],
+   "menor_parede_cm": 94.01,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TGD",
+   "no_cm": [
+    1808.513,
+    -165.649
+   ],
+   "comprimentos_cm": [
+    169.0,
+    99.75
+   ],
+   "menor_parede_cm": 99.75,
+   "gabarito_tem_as_duas_paredes": false,
+   "solver_padrao": "VAZIO",
+   "gabarito_padrao": "SEM_PAREDE",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": null
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "C09",
+      "t_start_cm": 145.0,
+      "t_end_cm": 154.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "C09",
+      "t_start_cm": 145.0,
+      "t_end_cm": 154.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    594.93
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    123.98
+   ],
+   "menor_parede_cm": 123.98,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "PASSAGEM",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 44.98,
+      "t_end_cm": 78.98,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 44.98,
+      "t_end_cm": 78.98,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 55.0,
+      "t_end_cm": 94.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 35.0,
+      "t_end_cm": 74.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 55.0,
+      "t_end_cm": 94.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 35.0,
+      "t_end_cm": 74.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    674.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    843.99
+   ],
+   "menor_parede_cm": 843.99,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    1734.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    843.99
+   ],
+   "menor_parede_cm": 843.99,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 395.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6607.25,
+    1814.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    123.98
+   ],
+   "menor_parede_cm": 123.98,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "PASSAGEM",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1255.0,
+      "t_end_cm": 1309.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1255.0,
+      "t_end_cm": 1309.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1250.0,
+      "t_end_cm": 1289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1270.0,
+      "t_end_cm": 1309.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1250.0,
+      "t_end_cm": 1289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1270.0,
+      "t_end_cm": 1309.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7022.25,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1344.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 417.5,
+      "t_end_cm": 426.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 417.5,
+      "t_end_cm": 426.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 415.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 415.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7022.25,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    939.0
+   ],
+   "menor_parede_cm": 939.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 417.5,
+      "t_end_cm": 426.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 417.5,
+      "t_end_cm": 426.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 415.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 415.0,
+      "t_end_cm": 449.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7277.25,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1344.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7277.25,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    939.0
+   ],
+   "menor_parede_cm": 939.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 650.0,
+      "t_end_cm": 704.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8272.24,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1344.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1644.99,
+      "t_end_cm": 1698.99,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1644.99,
+      "t_end_cm": 1698.99,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1644.99,
+      "t_end_cm": 1698.99
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1644.99,
+      "t_end_cm": 1698.99
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8272.24,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    939.0
+   ],
+   "menor_parede_cm": 939.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8527.24,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1344.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 1922.49,
+      "t_end_cm": 1931.49,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 560.0,
+      "t_end_cm": 614.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 1922.49,
+      "t_end_cm": 1931.49,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 1899.99,
+      "t_end_cm": 1933.99
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 1899.99,
+      "t_end_cm": 1933.99
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 560.0,
+      "t_end_cm": 594.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8527.24,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    939.0
+   ],
+   "menor_parede_cm": 939.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 512.5,
+      "t_end_cm": 521.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 730.0,
+      "t_end_cm": 784.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "C09",
+      "t_start_cm": 512.5,
+      "t_end_cm": 521.5,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 490.0,
+      "t_end_cm": 524.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 490.0,
+      "t_end_cm": 524.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 750.0,
+      "t_end_cm": 784.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    594.93
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    123.97
+   ],
+   "menor_parede_cm": 123.97,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "PASSAGEM",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 44.98,
+      "t_end_cm": 78.98,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 44.98,
+      "t_end_cm": 78.98,
+      "reason": "X_INTERSECTION_DEGRADED"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.99,
+      "t_end_cm": 78.99,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 55.0,
+      "t_end_cm": 94.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 35.0,
+      "t_end_cm": 74.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 55.0,
+      "t_end_cm": 94.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 35.0,
+      "t_end_cm": 74.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    674.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    843.99
+   ],
+   "menor_parede_cm": 843.99,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 115.0,
+      "t_end_cm": 169.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    1734.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    843.99
+   ],
+   "menor_parede_cm": 843.99,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 394.99,
+      "t_end_cm": 448.99
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1175.0,
+      "t_end_cm": 1229.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8942.24,
+    1814.95
+   ],
+   "comprimentos_cm": [
+    1344.0,
+    123.98
+   ],
+   "menor_parede_cm": 123.98,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "PASSAGEM",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1255.0,
+      "t_end_cm": 1309.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.9,
+      "t_end_cm": 78.9,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 1255.0,
+      "t_end_cm": 1309.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 44.9,
+      "t_end_cm": 78.9,
+      "reason": "X_INTERSECTION_DEGRADED"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1250.0,
+      "t_end_cm": 1289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1270.0,
+      "t_end_cm": 1309.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1250.0,
+      "t_end_cm": 1289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B39",
+      "t_start_cm": 1270.0,
+      "t_end_cm": 1309.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7532.25,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1379.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1379.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 545.0,
+      "t_end_cm": 599.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 905.0,
+      "t_end_cm": 959.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 545.0,
+      "t_end_cm": 599.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 905.0,
+      "t_end_cm": 959.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 905.0,
+      "t_end_cm": 939.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 545.0,
+      "t_end_cm": 579.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B34",
+      "t_start_cm": 905.0,
+      "t_end_cm": 939.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 545.0,
+      "t_end_cm": 579.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8017.26,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    1379.0,
+    2348.99
+   ],
+   "menor_parede_cm": 1379.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 545.0,
+      "t_end_cm": 599.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1390.01,
+      "t_end_cm": 1444.01,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 545.0,
+      "t_end_cm": 599.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1390.01,
+      "t_end_cm": 1444.01,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1390.0,
+      "t_end_cm": 1444.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 545.0,
+      "t_end_cm": 579.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1390.0,
+      "t_end_cm": 1444.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 545.0,
+      "t_end_cm": 579.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    5872.25,
+    1204.95
+   ],
+   "comprimentos_cm": [
+    524.0,
+    639.01
+   ],
+   "menor_parede_cm": 524.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 45.01,
+      "t_end_cm": 99.01,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 45.01,
+      "t_end_cm": 99.01,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 45.01,
+      "t_end_cm": 99.01
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 45.01,
+      "t_end_cm": 99.01
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    9372.24,
+    1204.95
+   ],
+   "comprimentos_cm": [
+    524.0,
+    639.01
+   ],
+   "menor_parede_cm": 524.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    9677.24,
+    1204.95
+   ],
+   "comprimentos_cm": [
+    524.0,
+    639.01
+   ],
+   "menor_parede_cm": 524.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 540.0,
+      "t_end_cm": 594.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 540.0,
+      "t_end_cm": 594.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 540.0,
+      "t_end_cm": 594.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 235.0,
+      "t_end_cm": 289.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 540.0,
+      "t_end_cm": 594.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    6177.25,
+    1204.95
+   ],
+   "comprimentos_cm": [
+    509.0,
+    639.01
+   ],
+   "menor_parede_cm": 509.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 220.0,
+      "t_end_cm": 274.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 350.01,
+      "t_end_cm": 404.01,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 220.0,
+      "t_end_cm": 274.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 350.01,
+      "t_end_cm": 404.01,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 350.01,
+      "t_end_cm": 404.01
+     }
+    },
+    {
+     "fiada": 1,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 220.0,
+      "t_end_cm": 274.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 2,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 350.01,
+      "t_end_cm": 404.01
+     }
+    },
+    {
+     "fiada": 3,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 220.0,
+      "t_end_cm": 274.0
+     },
+     "parede_1": null
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7342.25,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    374.0,
+    2348.99
+   ],
+   "menor_parede_cm": 374.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 75.0,
+      "t_end_cm": 129.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 75.0,
+      "t_end_cm": 129.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 75.0,
+      "t_end_cm": 109.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 75.0,
+      "t_end_cm": 109.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    7342.25,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    374.0,
+    939.0
+   ],
+   "menor_parede_cm": 374.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 245.0,
+      "t_end_cm": 299.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 245.0,
+      "t_end_cm": 299.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 265.0,
+      "t_end_cm": 299.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 265.0,
+      "t_end_cm": 299.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 715.0,
+      "t_end_cm": 769.0
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8207.24,
+    1119.95
+   ],
+   "comprimentos_cm": [
+    374.0,
+    2348.99
+   ],
+   "menor_parede_cm": 374.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 75.0,
+      "t_end_cm": 129.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1579.99,
+      "t_end_cm": 1633.99,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 75.0,
+      "t_end_cm": 129.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1579.99,
+      "t_end_cm": 1633.99,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 75.0,
+      "t_end_cm": 109.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1579.99,
+      "t_end_cm": 1633.99
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 75.0,
+      "t_end_cm": 109.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 1579.99,
+      "t_end_cm": 1633.99
+     }
+    }
+   ]
+  },
+  {
+   "project": "TP1",
+   "no_cm": [
+    8207.24,
+    1289.95
+   ],
+   "comprimentos_cm": [
+    374.0,
+    939.0
+   ],
+   "menor_parede_cm": 374.0,
+   "gabarito_tem_as_duas_paredes": true,
+   "solver_padrao": "ALTERNA",
+   "gabarito_padrao": "ALTERNA",
+   "solver_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 245.0,
+      "t_end_cm": 299.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 170.0,
+      "t_end_cm": 224.0,
+      "reason": "X_INTERSECTION"
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B54",
+      "t_start_cm": 245.0,
+      "t_end_cm": 299.0,
+      "reason": "X_INTERSECTION"
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 170.0,
+      "t_end_cm": 224.0,
+      "reason": "X_INTERSECTION"
+     }
+    }
+   ],
+   "gabarito_por_fiada": [
+    {
+     "fiada": 0,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 265.0,
+      "t_end_cm": 299.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 1,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 170.0,
+      "t_end_cm": 224.0
+     }
+    },
+    {
+     "fiada": 2,
+     "parede_0": {
+      "code": "B34",
+      "t_start_cm": 265.0,
+      "t_end_cm": 299.0
+     },
+     "parede_1": null
+    },
+    {
+     "fiada": 3,
+     "parede_0": null,
+     "parede_1": {
+      "code": "B54",
+      "t_start_cm": 170.0,
+      "t_end_cm": 224.0
+     }
+    }
+   ]
+  }
+ ],
+ "resumo_solver_x_gabarito": {
+  "solver=ALTERNA / gabarito=ALTERNA": 22,
+  "solver=ALTERNA / gabarito=PASSAGEM": 4,
+  "solver=ALTERNA / gabarito=SEM_PAREDE": 9,
+  "solver=PASSAGEM / gabarito=SEM_PAREDE": 1,
+  "solver=VAZIO / gabarito=SEM_PAREDE": 7
+ },
+ "gabarito_por_comprimento_da_transversal": {
+  "transversal_longa_>=200cm": {
+   "SEM_PAREDE": 4,
+   "ALTERNA": 22
+  },
+  "transversal_curta_~124cm": {
+   "SEM_PAREDE": 13,
+   "PASSAGEM": 4
+  }
+ },
+ "colisoes_no_solver": 0
+}
