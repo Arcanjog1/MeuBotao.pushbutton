@@ -1,0 +1,4462 @@
+{
+ "torre_easy_lo_r00_tgd": [
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -2341.99,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -932.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    -1071.487,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    -1071.487,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W003"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 180.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W034"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W044"
+    }
+   ],
+   "envelope_cm": [
+    309.0,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    -656.487,
+    -144.952
+   ],
+   "jamba_lo_xy_cm": [
+    -656.487,
+    -245.952
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1926.99,
+      422.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -517.0,
+      422.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    -656.487,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    -656.487,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 180.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W066"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W075"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    -656.487,
+    450.048
+   ],
+   "jamba_lo_xy_cm": [
+    -656.487,
+    349.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W034"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W044"
+    }
+   ],
+   "envelope_cm": [
+    309.01,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    -401.487,
+    -144.952
+   ],
+   "jamba_lo_xy_cm": [
+    -401.487,
+    -245.952
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 150.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 220.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 150.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 220.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1671.99,
+      677.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      677.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    -401.487,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    -401.487,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W066"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W075"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    -401.487,
+    450.048
+   ],
+   "jamba_lo_xy_cm": [
+    -401.487,
+    349.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 220.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 220.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    109.0,
+    265.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1606.99,
+      742.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      95.0,
+      109.0
+     ],
+     "t_do_cruzamento_cm": 102.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -197.0,
+      742.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      265.0,
+      279.0
+     ],
+     "t_do_cruzamento_cm": 272.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    94.0,
+    280.0
+   ],
+   "jamba_hi_xy_cm": [
+    -336.487,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    -336.487,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W046"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    579.0,
+    735.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1416.99,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      565.0,
+      579.0
+     ],
+     "t_do_cruzamento_cm": 572.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      735.0,
+      749.0
+     ],
+     "t_do_cruzamento_cm": 742.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    564.0,
+    750.0
+   ],
+   "jamba_hi_xy_cm": [
+    -146.487,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    -146.487,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W015"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    939.0,
+    1175.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 1379.0,
+     "distancia_perp_do_host_cm": [
+      -572.0,
+      807.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      925.0,
+      939.0
+     ],
+     "t_do_cruzamento_cm": 932.0,
+     "wall": "W015"
+    },
+    {
+     "comprimento_cm": 579.0,
+     "distancia_perp_do_host_cm": [
+      -572.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1175.01,
+      1189.01
+     ],
+     "t_do_cruzamento_cm": 1182.01,
+     "wall": "W016"
+    }
+   ],
+   "envelope_cm": [
+    924.0,
+    1190.0
+   ],
+   "jamba_hi_xy_cm": [
+    96.513,
+    17.048
+   ],
+   "jamba_lo_xy_cm": [
+    -139.487,
+    17.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W052"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 220.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "CANALETA J - 14x19-29x19",
+     "role": "channel_block",
+     "rotation_deg": 90.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W017",
+     "z_cm": 240.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 0.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 40.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 80.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 120.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 160.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 200.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    579.0,
+    735.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -931.98,
+      1417.01
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      565.0,
+      579.0
+     ],
+     "t_do_cruzamento_cm": 572.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -931.98,
+      7.02
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      735.0,
+      749.0
+     ],
+     "t_do_cruzamento_cm": 742.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    564.0,
+    750.0
+   ],
+   "jamba_hi_xy_cm": [
+    338.523,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    338.523,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 13,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W017"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 220.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 220.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    109.0,
+    265.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -742.0,
+      1606.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      95.0,
+      109.0
+     ],
+     "t_do_cruzamento_cm": 102.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -742.0,
+      197.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      265.0,
+      279.0
+     ],
+     "t_do_cruzamento_cm": 272.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    94.0,
+    280.0
+   ],
+   "jamba_hi_xy_cm": [
+    528.503,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    528.503,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W047"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W035"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W045"
+    }
+   ],
+   "envelope_cm": [
+    309.01,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    593.503,
+    -144.952
+   ],
+   "jamba_lo_xy_cm": [
+    593.503,
+    -245.952
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 150.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 220.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 150.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 220.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -677.0,
+      1671.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -677.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    593.503,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    593.503,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W067"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W076"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    593.503,
+    450.048
+   ],
+   "jamba_lo_xy_cm": [
+    593.503,
+    349.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 180.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W035"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W045"
+    }
+   ],
+   "envelope_cm": [
+    309.0,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    848.503,
+    -144.952
+   ],
+   "jamba_lo_xy_cm": [
+    848.503,
+    -245.952
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -422.0,
+      1926.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -422.0,
+      517.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    848.503,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    848.503,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W067",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W067",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W067",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W067",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W067",
+     "z_cm": 180.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W076",
+     "z_cm": 20.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W076",
+     "z_cm": 60.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W076",
+     "z_cm": 100.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W076",
+     "z_cm": 140.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W076",
+     "z_cm": 180.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W067"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W076"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    848.503,
+    450.048
+   ],
+   "jamba_lo_xy_cm": [
+    848.503,
+    349.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      2341.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    1263.503,
+    180.048
+   ],
+   "jamba_lo_xy_cm": [
+    1263.503,
+    24.048
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W008"
+  }
+ ],
+ "torre_easy_lo_r00_tp1": [
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -2341.99,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -932.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    6607.25,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    6607.25,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W003"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W034",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W044",
+     "z_cm": 792.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W034"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W044"
+    }
+   ],
+   "envelope_cm": [
+    309.0,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    7022.25,
+    957.95
+   ],
+   "jamba_lo_xy_cm": [
+    7022.25,
+    856.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1926.99,
+      422.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -517.0,
+      422.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    7022.25,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    7022.25,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W065",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W065",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W065",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W065",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W065",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W074",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W074",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W074",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W074",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": -2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 19.0,
+     "t_start_cm": 0.0,
+     "wall_do_bloco": "W074",
+     "z_cm": 792.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W065"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W074"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    7022.25,
+    1552.95
+   ],
+   "jamba_lo_xy_cm": [
+    7022.25,
+    1451.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W004"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W034"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W044"
+    }
+   ],
+   "envelope_cm": [
+    309.01,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    7277.25,
+    957.95
+   ],
+   "jamba_lo_xy_cm": [
+    7277.25,
+    856.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 762.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 832.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 762.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 704.0,
+     "t_start_cm": 650.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 832.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1671.99,
+      677.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      677.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    7277.25,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    7277.25,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W065"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W074"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    7277.25,
+    1552.95
+   ],
+   "jamba_lo_xy_cm": [
+    7277.25,
+    1451.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W005"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 832.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 769.0,
+     "t_start_cm": 715.0,
+     "wall_do_bloco": "W055",
+     "z_cm": 832.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    109.0,
+    265.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1606.99,
+      742.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      95.0,
+      109.0
+     ],
+     "t_do_cruzamento_cm": 102.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -197.0,
+      742.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      265.0,
+      279.0
+     ],
+     "t_do_cruzamento_cm": 272.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    94.0,
+    280.0
+   ],
+   "jamba_hi_xy_cm": [
+    7342.25,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    7342.25,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W046"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    579.0,
+    735.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -1416.99,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      565.0,
+      579.0
+     ],
+     "t_do_cruzamento_cm": 572.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      735.0,
+      749.0
+     ],
+     "t_do_cruzamento_cm": 742.0,
+     "wall": "W055"
+    }
+   ],
+   "envelope_cm": [
+    564.0,
+    750.0
+   ],
+   "jamba_hi_xy_cm": [
+    7532.25,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    7532.25,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W017"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    939.0,
+    1175.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 1379.0,
+     "distancia_perp_do_host_cm": [
+      -572.0,
+      807.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      925.0,
+      939.0
+     ],
+     "t_do_cruzamento_cm": 932.0,
+     "wall": "W017"
+    },
+    {
+     "comprimento_cm": 579.0,
+     "distancia_perp_do_host_cm": [
+      -572.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1175.01,
+      1189.01
+     ],
+     "t_do_cruzamento_cm": 1182.01,
+     "wall": "W018"
+    }
+   ],
+   "envelope_cm": [
+    924.0,
+    1190.0
+   ],
+   "jamba_hi_xy_cm": [
+    7775.25,
+    1119.95
+   ],
+   "jamba_lo_xy_cm": [
+    7539.25,
+    1119.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W052"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 270.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 832.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "CANALETA J - 14x19-29x19",
+     "role": "channel_block",
+     "rotation_deg": 90.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 744.5,
+     "t_end_cm": 754.0,
+     "t_start_cm": 735.0,
+     "wall_do_bloco": "W019",
+     "z_cm": 852.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 612.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 652.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 692.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 732.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 772.0
+    },
+    {
+     "offset_perp_cm": 0.01,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 0.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 572.0,
+     "t_end_cm": 1444.0,
+     "t_start_cm": 1390.0,
+     "wall_do_bloco": "W052",
+     "z_cm": 812.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    579.0,
+    735.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -931.98,
+      1417.01
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      565.0,
+      579.0
+     ],
+     "t_do_cruzamento_cm": 572.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -931.98,
+      7.02
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      735.0,
+      749.0
+     ],
+     "t_do_cruzamento_cm": 742.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    564.0,
+    750.0
+   ],
+   "jamba_hi_xy_cm": [
+    8017.26,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    8017.26,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 13,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W019"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 102.0,
+     "t_end_cm": 1633.99,
+     "t_start_cm": 1579.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 832.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 272.0,
+     "t_end_cm": 224.0,
+     "t_start_cm": 170.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 832.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    109.0,
+    265.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -742.0,
+      1606.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      95.0,
+      109.0
+     ],
+     "t_do_cruzamento_cm": 102.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -742.0,
+      197.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      265.0,
+      279.0
+     ],
+     "t_do_cruzamento_cm": 272.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    94.0,
+    280.0
+   ],
+   "jamba_hi_xy_cm": [
+    8207.24,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    8207.24,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W047"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W035"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W045"
+    }
+   ],
+   "envelope_cm": [
+    309.01,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    8272.24,
+    957.95
+   ],
+   "jamba_lo_xy_cm": [
+    8272.24,
+    856.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 762.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 587.0,
+     "t_end_cm": 1698.99,
+     "t_start_cm": 1644.99,
+     "wall_do_bloco": "W052",
+     "z_cm": 832.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 762.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 - 14x19x54",
+     "role": "standard",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 0.0,
+     "peca": "BLOCO 54 CORTADO - 14x9x54",
+     "role": "cut_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 757.0,
+     "t_end_cm": 289.0,
+     "t_start_cm": 235.0,
+     "wall_do_bloco": "W056",
+     "z_cm": 832.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -677.0,
+      1671.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -677.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    8272.24,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    8272.24,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 12,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W066"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -262.0,
+      7.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W075"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    8272.24,
+    1552.95
+   ],
+   "jamba_lo_xy_cm": [
+    8272.24,
+    1451.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W006"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 317.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W035",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 432.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W045",
+     "z_cm": 792.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    324.0,
+    425.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      310.0,
+      324.0
+     ],
+     "t_do_cruzamento_cm": 317.0,
+     "wall": "W035"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      425.0,
+      439.0
+     ],
+     "t_do_cruzamento_cm": 432.0,
+     "wall": "W045"
+    }
+   ],
+   "envelope_cm": [
+    309.0,
+    440.0
+   ],
+   "jamba_hi_xy_cm": [
+    8527.24,
+    957.95
+   ],
+   "jamba_lo_xy_cm": [
+    8527.24,
+    856.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -422.0,
+      1926.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -422.0,
+      517.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    8527.24,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    8527.24,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 912.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W066",
+     "z_cm": 792.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 632.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 672.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 712.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 752.0
+    },
+    {
+     "offset_perp_cm": 2.5,
+     "peca": "MEIO BLOCO - 14x19x19",
+     "role": "half_block",
+     "rotation_deg": 180.0,
+     "secondary_wall_id": null,
+     "t_centro_cm": 1027.0,
+     "t_end_cm": 269.0,
+     "t_start_cm": 250.0,
+     "wall_do_bloco": "W075",
+     "z_cm": 792.0
+    }
+   ],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    919.0,
+    1020.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      905.0,
+      919.0
+     ],
+     "t_do_cruzamento_cm": 912.0,
+     "wall": "W066"
+    },
+    {
+     "comprimento_cm": 269.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      262.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      1020.0,
+      1034.0
+     ],
+     "t_do_cruzamento_cm": 1027.0,
+     "wall": "W075"
+    }
+   ],
+   "envelope_cm": [
+    904.0,
+    1035.0
+   ],
+   "jamba_hi_xy_cm": [
+    8527.24,
+    1552.95
+   ],
+   "jamba_lo_xy_cm": [
+    8527.24,
+    1451.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 10,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W007"
+  },
+  {
+   "blocos_nas_tiras_de_15cm": [],
+   "blocos_no_consenso": [],
+   "consenso_cm": [
+    594.0,
+    750.0
+   ],
+   "eixos_perpendiculares_cruzando": [
+    {
+     "comprimento_cm": 2348.99,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      2341.99
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      580.0,
+      594.0
+     ],
+     "t_do_cruzamento_cm": 587.0,
+     "wall": "W052"
+    },
+    {
+     "comprimento_cm": 939.0,
+     "distancia_perp_do_host_cm": [
+      -7.0,
+      932.0
+     ],
+     "espessura_cm": 14.0,
+     "faixa_ocupada_cm": [
+      750.0,
+      764.0
+     ],
+     "t_do_cruzamento_cm": 757.0,
+     "wall": "W056"
+    }
+   ],
+   "envelope_cm": [
+    579.0,
+    765.0
+   ],
+   "jamba_hi_xy_cm": [
+    8942.24,
+    1282.95
+   ],
+   "jamba_lo_xy_cm": [
+    8942.24,
+    1126.95
+   ],
+   "n_blocos_nas_tiras_de_15cm": 0,
+   "n_blocos_no_consenso": 0,
+   "wall_id_reference": "W008"
+  }
+ ]
+}

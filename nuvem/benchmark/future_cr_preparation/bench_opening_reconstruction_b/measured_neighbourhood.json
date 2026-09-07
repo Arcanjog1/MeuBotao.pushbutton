@@ -1,0 +1,361 @@
+[
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "envelope_cm": [
+   309.0,
+   440.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   -245.952
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W112",
+    "offset_lateral_cm": -13.0,
+    "t": [
+     425.0,
+     519.0
+    ]
+   },
+   {
+    "comprimento_cm": 324.258,
+    "espessura_cm": 14.0,
+    "id": "W047",
+    "offset_lateral_cm": 0.0,
+    "t": [
+     0.0,
+     324.26
+    ]
+   }
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "envelope_cm": [
+   579.0,
+   765.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   24.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W119",
+    "offset_lateral_cm": 15.0,
+    "t": [
+     500.0,
+     594.0
+    ]
+   },
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W117",
+    "offset_lateral_cm": 15.0,
+    "t": [
+     750.0,
+     844.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "envelope_cm": [
+   904.0,
+   1035.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   349.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W108",
+    "offset_lateral_cm": -13.0,
+    "t": [
+     825.0,
+     919.0
+    ]
+   },
+   {
+    "comprimento_cm": 324.258,
+    "espessura_cm": 14.0,
+    "id": "W044",
+    "offset_lateral_cm": 0.0,
+    "t": [
+     1019.74,
+     1344.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   579.0,
+   735.0
+  ],
+  "envelope_cm": [
+   564.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   -146.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -146.487,
+   24.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 584.001,
+    "espessura_cm": 14.0,
+    "id": "W019",
+    "offset_lateral_cm": 0.0,
+    "t": [
+     -5.0,
+     579.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W015"
+ },
+ {
+  "consenso_cm": [
+   939.0,
+   1175.0
+  ],
+  "envelope_cm": [
+   924.0,
+   1190.0
+  ],
+  "jamba_hi_xy_cm": [
+   96.513,
+   17.048
+  ],
+  "jamba_lo_xy_cm": [
+   -139.487,
+   17.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 969.013,
+    "espessura_cm": 14.0,
+    "id": "W006",
+    "offset_lateral_cm": 0.0,
+    "t": [
+     -0.01,
+     969.01
+    ]
+   },
+   {
+    "comprimento_cm": 1174.011,
+    "espessura_cm": 14.0,
+    "id": "W005",
+    "offset_lateral_cm": 0.0,
+    "t": [
+     1175.0,
+     2349.01
+    ]
+   }
+  ],
+  "wall_id_reference": "W052"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "envelope_cm": [
+   309.01,
+   440.0
+  ],
+  "jamba_hi_xy_cm": [
+   593.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   -245.952
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 324.258,
+    "espessura_cm": 14.0,
+    "id": "W043",
+    "offset_lateral_cm": -0.01,
+    "t": [
+     0.0,
+     324.26
+    ]
+   },
+   {
+    "comprimento_cm": 183.2,
+    "espessura_cm": 14.0,
+    "id": "W084",
+    "offset_lateral_cm": -0.01,
+    "t": [
+     410.8,
+     594.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "envelope_cm": [
+   309.0,
+   440.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   -245.952
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 324.258,
+    "espessura_cm": 14.0,
+    "id": "W045",
+    "offset_lateral_cm": -0.01,
+    "t": [
+     0.0,
+     324.26
+    ]
+   },
+   {
+    "comprimento_cm": 94.25,
+    "espessura_cm": 14.0,
+    "id": "W110",
+    "offset_lateral_cm": 12.98,
+    "t": [
+     424.75,
+     519.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "envelope_cm": [
+   579.0,
+   765.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   24.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W120",
+    "offset_lateral_cm": -15.02,
+    "t": [
+     500.0,
+     594.0
+    ]
+   },
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W118",
+    "offset_lateral_cm": -15.02,
+    "t": [
+     750.0,
+     844.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "envelope_cm": [
+   904.0,
+   1035.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   349.048
+  ],
+  "paredes_medidas_paralelas_a_45cm": [
+   {
+    "comprimento_cm": 324.258,
+    "espessura_cm": 14.0,
+    "id": "W046",
+    "offset_lateral_cm": -0.01,
+    "t": [
+     1019.74,
+     1344.0
+    ]
+   },
+   {
+    "comprimento_cm": 94.0,
+    "espessura_cm": 14.0,
+    "id": "W109",
+    "offset_lateral_cm": 12.98,
+    "t": [
+     825.0,
+     919.0
+    ]
+   }
+  ],
+  "wall_id_reference": "W007"
+ }
+]

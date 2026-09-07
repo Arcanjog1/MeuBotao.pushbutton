@@ -1,0 +1,515 @@
+[
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W007",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W006",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   -1071.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -1071.487,
+   24.048
+  ],
+  "wall_id_reference": "W003"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W052",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W047",
+   0.259,
+   0.0
+  ],
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   -245.952
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W007",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W006",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   24.048
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W044",
+   -0.257,
+   0.0
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W056",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "jamba_hi_xy_cm": [
+   -656.487,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   349.048
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W052",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W042",
+   0.259,
+   -0.0
+  ],
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "jamba_hi_xy_cm": [
+   -401.487,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   -245.952
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W007",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W006",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   -401.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   24.048
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W041",
+   -0.257,
+   -0.0
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W056",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "jamba_hi_xy_cm": [
+   -401.487,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   349.048
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W007",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W006",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   109.0,
+   265.0
+  ],
+  "jamba_hi_xy_cm": [
+   -336.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -336.487,
+   24.048
+  ],
+  "wall_id_reference": "W046"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W007",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W006",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   579.0,
+   735.0
+  ],
+  "jamba_hi_xy_cm": [
+   -146.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -146.487,
+   24.048
+  ],
+  "wall_id_reference": "W015"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W005",
+   0.0,
+   0.0
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W019",
+   -0.003,
+   null
+  ],
+  "consenso_cm": [
+   939.0,
+   1175.0
+  ],
+  "jamba_hi_xy_cm": [
+   96.513,
+   17.048
+  ],
+  "jamba_lo_xy_cm": [
+   -139.487,
+   17.048
+  ],
+  "wall_id_reference": "W052"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W008",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W005",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   579.0,
+   735.0
+  ],
+  "jamba_hi_xy_cm": [
+   338.523,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   338.523,
+   24.048
+  ],
+  "wall_id_reference": "W017"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W008",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W005",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   109.0,
+   265.0
+  ],
+  "jamba_hi_xy_cm": [
+   528.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   528.503,
+   24.048
+  ],
+  "wall_id_reference": "W047"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W053",
+   -0.199,
+   "FACE_OPOSTA"
+  ],
+  "confirmacao_jamba_lo": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W043",
+   0.259,
+   -0.01
+  ],
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "jamba_hi_xy_cm": [
+   593.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   -245.952
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W008",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W005",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   593.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   24.048
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W040",
+   -0.257,
+   -0.01
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W050",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "jamba_hi_xy_cm": [
+   593.503,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   349.048
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W053",
+   -0.199,
+   "FACE_OPOSTA"
+  ],
+  "confirmacao_jamba_lo": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W045",
+   0.259,
+   -0.01
+  ],
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   -245.952
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W008",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W005",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   24.048
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FIM_DE_PAREDE_COLINEAR",
+   "W046",
+   -0.257,
+   -0.01
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W050",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "jamba_hi_xy_cm": [
+   848.503,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   349.048
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "confirmacao_jamba_hi": [
+   "FACE_DE_PERPENDICULAR",
+   "W008",
+   0.001,
+   null
+  ],
+  "confirmacao_jamba_lo": [
+   "FACE_DE_PERPENDICULAR",
+   "W005",
+   0.001,
+   null
+  ],
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "jamba_hi_xy_cm": [
+   1263.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   1263.503,
+   24.048
+  ],
+  "wall_id_reference": "W008"
+ }
+]

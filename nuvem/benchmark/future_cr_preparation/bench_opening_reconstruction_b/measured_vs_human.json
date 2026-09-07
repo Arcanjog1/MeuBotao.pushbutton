@@ -1,0 +1,515 @@
+[
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -1071.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -1071.487,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W017",
+   0.0
+  ],
+  "medido_depois": [
+   750.001,
+   "W015",
+   0.0
+  ],
+  "wall_id_reference": "W003"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.26,
+  "jamba_hi_xy_cm": [
+   -656.487,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   -245.952
+  ],
+  "medido_antes": [
+   324.259,
+   "W047",
+   0.0
+  ],
+  "medido_depois": [
+   425.001,
+   "W112",
+   -13.0
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -656.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W119",
+   15.0
+  ],
+  "medido_depois": [
+   750.001,
+   "W117",
+   15.0
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "divergencia_jamba_hi_cm": -0.26,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -656.487,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   -656.487,
+   349.048
+  ],
+  "medido_antes": [
+   919.001,
+   "W108",
+   -13.0
+  ],
+  "medido_depois": [
+   1019.7429999999999,
+   "W044",
+   0.0
+  ],
+  "wall_id_reference": "W004"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.26,
+  "jamba_hi_xy_cm": [
+   -401.487,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   -245.952
+  ],
+  "medido_antes": [
+   324.259,
+   "W042",
+   -0.0
+  ],
+  "medido_depois": [
+   425.001,
+   "W081",
+   -0.0
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -401.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W081",
+   -0.0
+  ],
+  "medido_depois": [
+   750.001,
+   "W083",
+   -0.0
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "divergencia_jamba_hi_cm": -0.26,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -401.487,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   -401.487,
+   349.048
+  ],
+  "medido_antes": [
+   919.001,
+   "W083",
+   -0.0
+  ],
+  "medido_depois": [
+   1019.7429999999999,
+   "W041",
+   -0.0
+  ],
+  "wall_id_reference": "W005"
+ },
+ {
+  "consenso_cm": [
+   109.0,
+   265.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -336.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -336.487,
+   24.048
+  ],
+  "medido_antes": [
+   109.001,
+   "W104",
+   0.0
+  ],
+  "medido_depois": [
+   265.001,
+   "W102",
+   0.0
+  ],
+  "wall_id_reference": "W046"
+ },
+ {
+  "consenso_cm": [
+   579.0,
+   735.0
+  ],
+  "divergencia_jamba_hi_cm": 193.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   -146.487,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   -146.487,
+   24.048
+  ],
+  "medido_antes": [
+   579.001,
+   "W019",
+   0.0
+  ],
+  "medido_depois": [
+   927.998,
+   "W113",
+   -13.0
+  ],
+  "wall_id_reference": "W015"
+ },
+ {
+  "consenso_cm": [
+   939.0,
+   1175.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 30.01,
+  "jamba_hi_xy_cm": [
+   96.513,
+   17.048
+  ],
+  "jamba_lo_xy_cm": [
+   -139.487,
+   17.048
+  ],
+  "medido_antes": [
+   969.0070000000001,
+   "W006",
+   0.0
+  ],
+  "medido_depois": [
+   1175.0,
+   "W005",
+   0.0
+  ],
+  "wall_id_reference": "W052"
+ },
+ {
+  "consenso_cm": [
+   579.0,
+   735.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   338.523,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   338.523,
+   24.048
+  ],
+  "medido_antes": [
+   579.001,
+   "W020",
+   0.01
+  ],
+  "medido_depois": [
+   735.001,
+   "W013",
+   -1.24
+  ],
+  "wall_id_reference": "W017"
+ },
+ {
+  "consenso_cm": [
+   109.0,
+   265.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   528.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   528.503,
+   24.048
+  ],
+  "medido_antes": [
+   109.001,
+   "W103",
+   -0.01
+  ],
+  "medido_depois": [
+   265.001,
+   "W101",
+   -0.01
+  ],
+  "wall_id_reference": "W047"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "divergencia_jamba_hi_cm": -14.2,
+  "divergencia_jamba_lo_cm": 0.26,
+  "jamba_hi_xy_cm": [
+   593.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   -245.952
+  ],
+  "medido_antes": [
+   324.259,
+   "W043",
+   -0.01
+  ],
+  "medido_depois": [
+   410.801,
+   "W084",
+   -0.01
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   593.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W084",
+   -0.01
+  ],
+  "medido_depois": [
+   750.001,
+   "W082",
+   -0.01
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "divergencia_jamba_hi_cm": -0.26,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   593.503,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   593.503,
+   349.048
+  ],
+  "medido_antes": [
+   919.001,
+   "W082",
+   -0.01
+  ],
+  "medido_depois": [
+   1019.7429999999999,
+   "W040",
+   -0.01
+  ],
+  "wall_id_reference": "W006"
+ },
+ {
+  "consenso_cm": [
+   324.0,
+   425.0
+  ],
+  "divergencia_jamba_hi_cm": -0.25,
+  "divergencia_jamba_lo_cm": 0.26,
+  "jamba_hi_xy_cm": [
+   848.503,
+   -144.952
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   -245.952
+  ],
+  "medido_antes": [
+   324.259,
+   "W045",
+   -0.01
+  ],
+  "medido_depois": [
+   424.751,
+   "W110",
+   12.98
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   848.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W120",
+   -15.02
+  ],
+  "medido_depois": [
+   750.001,
+   "W118",
+   -15.02
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "consenso_cm": [
+   919.0,
+   1020.0
+  ],
+  "divergencia_jamba_hi_cm": -0.26,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   848.503,
+   450.048
+  ],
+  "jamba_lo_xy_cm": [
+   848.503,
+   349.048
+  ],
+  "medido_antes": [
+   919.001,
+   "W109",
+   12.98
+  ],
+  "medido_depois": [
+   1019.7429999999999,
+   "W046",
+   -0.01
+  ],
+  "wall_id_reference": "W007"
+ },
+ {
+  "consenso_cm": [
+   594.0,
+   750.0
+  ],
+  "divergencia_jamba_hi_cm": 0.0,
+  "divergencia_jamba_lo_cm": 0.0,
+  "jamba_hi_xy_cm": [
+   1263.503,
+   180.048
+  ],
+  "jamba_lo_xy_cm": [
+   1263.503,
+   24.048
+  ],
+  "medido_antes": [
+   594.001,
+   "W018",
+   -0.02
+  ],
+  "medido_depois": [
+   750.001,
+   "W016",
+   -0.02
+  ],
+  "wall_id_reference": "W008"
+ }
+]

@@ -1,0 +1,2548 @@
+{
+ "torre_easy_lo_r00_tgd": [
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    309.0,
+    380.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [
+    "6558425"
+   ],
+   "wall": "W001"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W003"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W008"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    309.0,
+    380.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [
+    "6558457"
+   ],
+   "wall": "W010"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    124.0,
+    255.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558430"
+   ],
+   "wall": "W011"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    1279.0,
+    1410.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558431"
+   ],
+   "wall": "W011"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    74.0,
+    205.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558432"
+   ],
+   "wall": "W012"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1229.0,
+    1360.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W012"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    579.0,
+    735.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W015"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    260.0
+   ],
+   "largura_cm": 226.0,
+   "measured_ids": [
+    "6558473"
+   ],
+   "wall": "W016"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    545.0
+   ],
+   "largura_cm": 231.0,
+   "measured_ids": [
+    "6558472"
+   ],
+   "wall": "W016"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    579.0,
+    735.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W017"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    190.0
+   ],
+   "largura_cm": 121.0,
+   "measured_ids": [],
+   "wall": "W020"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    185.0
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [
+    "6558416"
+   ],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    249.0,
+    340.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558418"
+   ],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    504.0,
+    595.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558419"
+   ],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    644.0,
+    809.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [
+    "6558417"
+   ],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    199.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [
+    "6558452"
+   ],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    248.99,
+    339.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558454"
+   ],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    503.99,
+    594.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558455"
+   ],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    658.99,
+    824.99
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [
+    "6558453"
+   ],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W025"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W026"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    54.0,
+    145.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558485"
+   ],
+   "wall": "W027"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    289.0,
+    380.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558420"
+   ],
+   "wall": "W028"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    109.88
+   ],
+   "largura_cm": 90.88,
+   "measured_ids": [
+    "6558460"
+   ],
+   "wall": "W029"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    39.0,
+    130.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558484"
+   ],
+   "wall": "W030"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558441"
+   ],
+   "wall": "W032"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558467"
+   ],
+   "wall": "W033"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558440"
+   ],
+   "wall": "W034"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558471"
+   ],
+   "wall": "W035"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    200.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558427"
+   ],
+   "wall": "W036"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    324.0,
+    455.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W036"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    200.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558459"
+   ],
+   "wall": "W038"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    324.0,
+    455.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W038"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    274.0,
+    365.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558421"
+   ],
+   "wall": "W039"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558486"
+   ],
+   "wall": "W040"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    134.0,
+    225.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558423"
+   ],
+   "wall": "W042"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    259.0,
+    350.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558422"
+   ],
+   "wall": "W042"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    134.0,
+    225.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558463"
+   ],
+   "wall": "W043"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    259.0,
+    350.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558462"
+   ],
+   "wall": "W043"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558439"
+   ],
+   "wall": "W044"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558470"
+   ],
+   "wall": "W045"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    109.0,
+    265.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W046"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    109.0,
+    265.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W047"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    405.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558435"
+   ],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    939.0,
+    1175.0
+   ],
+   "largura_cm": 236.0,
+   "measured_ids": [],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    1943.99,
+    2034.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558465"
+   ],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    405.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558434"
+   ],
+   "wall": "W055"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    534.0,
+    625.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558464"
+   ],
+   "wall": "W056"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    179.0,
+    260.0
+   ],
+   "largura_cm": 81.0,
+   "measured_ids": [],
+   "wall": "W057"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    59.0,
+    140.0
+   ],
+   "largura_cm": 81.0,
+   "measured_ids": [],
+   "wall": "W057"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    204.0,
+    305.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W060"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558438"
+   ],
+   "wall": "W064"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558466"
+   ],
+   "wall": "W065"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558437"
+   ],
+   "wall": "W066"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558469"
+   ],
+   "wall": "W067"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    44.0,
+    115.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [
+    "6558424"
+   ],
+   "wall": "W068"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    24.0,
+    115.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558483"
+   ],
+   "wall": "W069"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    24.0,
+    115.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558487"
+   ],
+   "wall": "W070"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    44.0,
+    115.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [
+    "6558456"
+   ],
+   "wall": "W071"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    274.0,
+    365.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W072"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W073"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558436"
+   ],
+   "wall": "W075"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558468"
+   ],
+   "wall": "W076"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.02,
+    120.02
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [
+    "6558442"
+   ],
+   "wall": "W078"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    289.0,
+    380.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558410"
+   ],
+   "wall": "W081"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.12,
+    110.0
+   ],
+   "largura_cm": 90.88,
+   "measured_ids": [
+    "6558492"
+   ],
+   "wall": "W082"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W084"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W085"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    185.0
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [
+    "6558412"
+   ],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    249.0,
+    340.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558414"
+   ],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    504.0,
+    595.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558415"
+   ],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    644.0,
+    809.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [
+    "6558413"
+   ],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    199.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [
+    "6558448"
+   ],
+   "wall": "W087"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    248.99,
+    339.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558450"
+   ],
+   "wall": "W087"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    503.99,
+    594.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [
+    "6558451"
+   ],
+   "wall": "W087"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    658.99,
+    824.99
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [
+    "6558449"
+   ],
+   "wall": "W087"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    124.0,
+    255.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558428"
+   ],
+   "wall": "W095"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    1279.0,
+    1410.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558429"
+   ],
+   "wall": "W095"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    74.0,
+    205.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558446"
+   ],
+   "wall": "W096"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": false,
+   "assinatura_15cm": false,
+   "consenso": [
+    1229.0,
+    1360.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [
+    "6558447"
+   ],
+   "wall": "W096"
+  }
+ ],
+ "torre_easy_lo_r00_tp1": [
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    309.0,
+    380.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [],
+   "wall": "W001"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W003"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W004"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W005"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W006"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    324.0,
+    425.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    919.0,
+    1020.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W007"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    594.0,
+    750.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W008"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    309.0,
+    380.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [],
+   "wall": "W010"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    124.0,
+    255.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W011"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1279.0,
+    1410.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W011"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    74.0,
+    205.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W012"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1229.0,
+    1360.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W012"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    579.0,
+    735.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W017"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    260.0
+   ],
+   "largura_cm": 226.0,
+   "measured_ids": [],
+   "wall": "W018"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    545.0
+   ],
+   "largura_cm": 231.0,
+   "measured_ids": [],
+   "wall": "W018"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    579.0,
+    735.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W019"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    94.0,
+    165.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [],
+   "wall": "W020"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    185.0
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    249.0,
+    340.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    504.0,
+    595.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    644.0,
+    809.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [],
+   "wall": "W023"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    199.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    248.99,
+    339.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    503.99,
+    594.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    658.99,
+    824.99
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [],
+   "wall": "W024"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W025"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W026"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    54.0,
+    145.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W027"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    289.0,
+    380.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W028"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    109.88
+   ],
+   "largura_cm": 90.88,
+   "measured_ids": [],
+   "wall": "W029"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    39.0,
+    130.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W030"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W032"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W033"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W034"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W035"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    200.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W036"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    324.0,
+    455.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W036"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    200.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W038"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    324.0,
+    455.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W038"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    274.0,
+    365.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W039"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.12,
+    110.0
+   ],
+   "largura_cm": 90.88,
+   "measured_ids": [],
+   "wall": "W040"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    134.0,
+    225.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W042"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    259.0,
+    350.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W042"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    134.0,
+    225.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W043"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    259.0,
+    350.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W043"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W044"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W045"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    109.0,
+    265.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W046"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    109.0,
+    265.0
+   ],
+   "largura_cm": 156.0,
+   "measured_ids": [],
+   "wall": "W047"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    405.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": true,
+   "C2_sem_verga": true,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": true,
+   "consenso": [
+    939.0,
+    1175.0
+   ],
+   "largura_cm": 236.0,
+   "measured_ids": [],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1943.99,
+    2034.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W052"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    314.0,
+    405.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W055"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    534.0,
+    625.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W056"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    204.0,
+    305.0
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W059"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W063"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W064"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W065"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W066"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    44.0,
+    115.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [],
+   "wall": "W067"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    24.0,
+    115.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W068"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    24.0,
+    115.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W069"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    44.0,
+    115.0
+   ],
+   "largura_cm": 71.0,
+   "measured_ids": [],
+   "wall": "W070"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    274.0,
+    365.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W071"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.12,
+    110.0
+   ],
+   "largura_cm": 90.88,
+   "measured_ids": [],
+   "wall": "W072"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W074"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    159.0,
+    250.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W075"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.02,
+    120.02
+   ],
+   "largura_cm": 101.0,
+   "measured_ids": [],
+   "wall": "W077"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    289.0,
+    380.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W080"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    110.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W081"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W083"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    69.0,
+    199.99
+   ],
+   "largura_cm": 130.99,
+   "measured_ids": [],
+   "wall": "W084"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    19.0,
+    185.0
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [],
+   "wall": "W085"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    249.0,
+    340.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W085"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    504.0,
+    595.0
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W085"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    644.0,
+    809.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [],
+   "wall": "W085"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    34.0,
+    199.99
+   ],
+   "largura_cm": 165.99,
+   "measured_ids": [],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    248.99,
+    339.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    503.99,
+    594.99
+   ],
+   "largura_cm": 91.0,
+   "measured_ids": [],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    658.99,
+    824.99
+   ],
+   "largura_cm": 166.0,
+   "measured_ids": [],
+   "wall": "W086"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    124.0,
+    255.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W094"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1279.0,
+    1410.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W094"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    74.0,
+    205.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W095"
+  },
+  {
+   "C1_reserva_de_no_nas_duas_jambas": false,
+   "C2_sem_verga": false,
+   "C3_sem_proveniencia_medida": true,
+   "assinatura_15cm": false,
+   "consenso": [
+    1229.0,
+    1360.0
+   ],
+   "largura_cm": 131.0,
+   "measured_ids": [],
+   "wall": "W095"
+  }
+ ]
+}

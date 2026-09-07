@@ -1,0 +1,6246 @@
+{
+ "torre_easy_lo_r00_tgd": {
+  "casos": [
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W003-O01",
+     "key": "W|-1071.5,-570.0|-1071.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W017",
+     "depois": "W015",
+     "hi": 750.001,
+     "largura_cm": 156.0,
+     "lo": 594.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W017",
+      "depois": "W015",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 594.001,
+      "id": "W017",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W015",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -1071.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -1071.487,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      -1071.487,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      -1071.487,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      -1071.487,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       22
+      ],
+      "point_cm": [
+       -1078.487,
+       17.048
+      ],
+      "t_cm": 587.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       25
+      ],
+      "point_cm": [
+       -1078.487,
+       187.048
+      ],
+      "t_cm": 757.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 774.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 579.0,
+      "t_start_cm": 570.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W003",
+    "wall_key_reference": "W|-1071.5,-570.0|-1071.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W004-O01",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|309.0-440.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W047",
+      "depois": "W044",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W047",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W044",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.0,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -656.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -656.487,
+      -129.952
+     ],
+     "envelope_lo_xy_cm": [
+      -656.487,
+      -260.952
+     ],
+     "jamba_hi_xy_cm": [
+      -656.487,
+      -144.952
+     ],
+     "jamba_lo_xy_cm": [
+      -656.487,
+      -245.952
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       12
+      ],
+      "point_cm": [
+       -663.487,
+       -252.952
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       16
+      ],
+      "point_cm": [
+       -663.487,
+       -137.952
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.0,
+      "t_start_cm": 270.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|-656.5,-570.0|-656.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W004-O02",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W047",
+      "depois": "W044",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W047",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W044",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -656.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -656.487,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      -656.487,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      -656.487,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      -656.487,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 14,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|-656.5,-570.0|-656.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W004-O03",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|904.0-1035.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W047",
+      "depois": "W044",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W047",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W044",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -656.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -656.487,
+      465.048
+     ],
+     "envelope_lo_xy_cm": [
+      -656.487,
+      334.048
+     ],
+     "jamba_hi_xy_cm": [
+      -656.487,
+      450.048
+     ],
+     "jamba_lo_xy_cm": [
+      -656.487,
+      349.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       33
+      ],
+      "point_cm": [
+       -663.487,
+       342.048
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       38
+      ],
+      "point_cm": [
+       -663.487,
+       457.048
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|-656.5,-570.0|-656.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W005-O01",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|309.0-440.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.01,
+     "width_cm": 130.99
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W042",
+     "depois": "W081",
+     "hi": 425.001,
+     "largura_cm": 100.742,
+     "lo": 324.259,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W042",
+      "depois": "W081",
+      "hi": 425.001,
+      "largura_cm": 100.742,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W081",
+      "depois": "W083",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W083",
+      "depois": "W041",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W042",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W081",
+      "lo": 425.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W083",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W041",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.01,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -401.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -401.487,
+      -129.952
+     ],
+     "envelope_lo_xy_cm": [
+      -401.487,
+      -260.942
+     ],
+     "jamba_hi_xy_cm": [
+      -401.487,
+      -144.952
+     ],
+     "jamba_lo_xy_cm": [
+      -401.487,
+      -245.952
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       12
+      ],
+      "point_cm": [
+       -394.487,
+       -252.952
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       16
+      ],
+      "point_cm": [
+       -394.487,
+       -137.952
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 130.99,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.01,
+      "t_start_cm": 270.01
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 14.99,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|-401.5,-570.0|-401.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 140.0,
+     "height_cm": 140.0,
+     "id": "W005-O02",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "measured",
+      "head_cm": 231.0,
+      "host_wall_input": "W081",
+      "kind": "window",
+      "sill_cm": 150.0,
+      "source_element_id": "6558480",
+      "t_range_no_eixo_do_host": [
+       509.24,
+       560.24
+      ],
+      "width_cm": 51.006
+     },
+     {
+      "confidence": "measured",
+      "head_cm": 231.0,
+      "host_wall_input": "W083",
+      "kind": "window",
+      "sill_cm": 150.0,
+      "source_element_id": "6558479",
+      "t_range_no_eixo_do_host": [
+       784.24,
+       835.27
+      ],
+      "width_cm": 51.025
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W081",
+     "depois": "W083",
+     "hi": 750.001,
+     "largura_cm": 156.0,
+     "lo": 594.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W042",
+      "depois": "W081",
+      "hi": 425.001,
+      "largura_cm": 100.742,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W081",
+      "depois": "W083",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W083",
+      "depois": "W041",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W042",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W081",
+      "lo": 425.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W083",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W041",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -401.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -401.487,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      -401.487,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      -401.487,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      -401.487,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 7,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|-401.5,-570.0|-401.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W005-O03",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|904.0-1035.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W083",
+     "depois": "W041",
+     "hi": 1019.743,
+     "largura_cm": 100.742,
+     "lo": 919.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W042",
+      "depois": "W081",
+      "hi": 425.001,
+      "largura_cm": 100.742,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W081",
+      "depois": "W083",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W083",
+      "depois": "W041",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W042",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W081",
+      "lo": 425.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W083",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W041",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -401.487,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      -401.487,
+      465.048
+     ],
+     "envelope_lo_xy_cm": [
+      -401.487,
+      334.048
+     ],
+     "jamba_hi_xy_cm": [
+      -401.487,
+      450.048
+     ],
+     "jamba_lo_xy_cm": [
+      -401.487,
+      349.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       33
+      ],
+      "point_cm": [
+       -394.487,
+       342.048
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       38
+      ],
+      "point_cm": [
+       -394.487,
+       457.048
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|-401.5,-570.0|-401.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W046-O01",
+     "key": "W|-336.5,-85.0|-336.5,289.0|t14.0|O|94.0-280.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 280.0,
+     "t_start_cm": 94.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     109.0,
+     265.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W104",
+     "depois": "W102",
+     "hi": 265.001,
+     "largura_cm": 156.0,
+     "lo": 109.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W104",
+      "depois": "W102",
+      "hi": 265.001,
+      "largura_cm": 156.0,
+      "lo": 109.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 109.001,
+      "id": "W104",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 374.001,
+      "id": "W102",
+      "lo": 265.001,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     94.0,
+     280.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -336.487,
+      -84.952
+     ],
+     "envelope_hi_xy_cm": [
+      -336.487,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      -336.487,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      -336.487,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      -336.487,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 319.0,
+      "t_start_cm": 280.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 94.0,
+      "t_start_cm": 55.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W046",
+    "wall_key_reference": "W|-336.5,-85.0|-336.5,289.0|t14.0",
+    "wall_length_cm": 374.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W015-O01",
+     "key": "W|-146.5,-555.0|-146.5,824.0|t14.0|O|564.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 564.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     579.0,
+     735.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 579.001,
+      "id": "W019",
+      "lo": -5.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     564.0,
+     750.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      -146.487,
+      -554.952
+     ],
+     "envelope_hi_xy_cm": [
+      -146.487,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      -146.487,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      -146.487,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      -146.487,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       25
+      ],
+      "point_cm": [
+       -139.487,
+       187.048
+      ],
+      "t_cm": 742.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 769.0,
+      "t_start_cm": 735.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 789.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 789.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 579.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 564.0,
+      "t_start_cm": 530.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 564.0,
+      "t_start_cm": 545.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 564.0,
+      "t_start_cm": 530.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W015",
+    "wall_key_reference": "W|-146.5,-555.0|-146.5,824.0|t14.0",
+    "wall_length_cm": 1379.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W052-O02",
+     "key": "W|-1078.5,17.0|1270.5,17.0|t14.0|O|924.0-1190.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1190.0,
+     "t_start_cm": 924.0,
+     "width_cm": 266.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     939.0,
+     1175.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W006",
+      "depois": "W005",
+      "hi": 1175.0,
+      "largura_cm": 205.993,
+      "lo": 969.007,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 969.007,
+      "id": "W006",
+      "lo": -0.006,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 2349.011,
+      "id": "W005",
+      "lo": 1175.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     924.0,
+     1190.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 0.0,
+     "direcao": [
+      1.0,
+      0.0
+     ],
+     "eixo_inicio_cm": [
+      -1078.487,
+      17.048
+     ],
+     "envelope_hi_xy_cm": [
+      111.513,
+      17.048
+     ],
+     "envelope_lo_xy_cm": [
+      -154.487,
+      17.048
+     ],
+     "jamba_hi_xy_cm": [
+      96.513,
+      17.048
+     ],
+     "jamba_lo_xy_cm": [
+      -139.487,
+      17.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       75
+      ],
+      "point_cm": [
+       103.523,
+       24.048
+      ],
+      "t_cm": 1182.01,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 236.0,
+    "largura_envelope_cm": 266.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1175.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1229.0,
+      "t_start_cm": 1190.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1190.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1190.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 939.0,
+      "t_start_cm": 905.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 924.0,
+      "t_start_cm": 890.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIA CANALETA - 14x19x19",
+      "t_end_cm": 924.0,
+      "t_start_cm": 905.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W052",
+    "wall_key_reference": "W|-1078.5,17.0|1270.5,17.0|t14.0",
+    "wall_length_cm": 2348.99,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W017-O01",
+     "key": "W|338.5,-555.0|338.5,824.0|t14.0|O|564.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 564.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     579.0,
+     735.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W020",
+     "depois": "W013",
+     "hi": 735.001,
+     "largura_cm": 156.0,
+     "lo": 579.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W020",
+      "depois": "W013",
+      "hi": 735.001,
+      "largura_cm": 156.0,
+      "lo": 579.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 579.001,
+      "id": "W020",
+      "lo": -5.0,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1377.001,
+      "id": "W013",
+      "lo": 735.001,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     564.0,
+     750.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      338.523,
+      -554.952
+     ],
+     "envelope_hi_xy_cm": [
+      338.523,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      338.523,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      338.523,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      338.523,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       26
+      ],
+      "point_cm": [
+       331.503,
+       187.048
+      ],
+      "t_cm": 742.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 754.0,
+      "t_start_cm": 735.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 754.0,
+      "t_start_cm": 735.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 579.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 564.0,
+      "t_start_cm": 525.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 564.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W017",
+    "wall_key_reference": "W|338.5,-555.0|338.5,824.0|t14.0",
+    "wall_length_cm": 1379.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W047-O01",
+     "key": "W|528.5,-85.0|528.5,289.0|t14.0|O|94.0-280.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 280.0,
+     "t_start_cm": 94.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     109.0,
+     265.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W103",
+     "depois": "W101",
+     "hi": 265.001,
+     "largura_cm": 156.0,
+     "lo": 109.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W103",
+      "depois": "W101",
+      "hi": 265.001,
+      "largura_cm": 156.0,
+      "lo": 109.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 109.001,
+      "id": "W103",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 374.001,
+      "id": "W101",
+      "lo": 265.001,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     94.0,
+     280.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      528.503,
+      -84.952
+     ],
+     "envelope_hi_xy_cm": [
+      528.503,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      528.503,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      528.503,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      528.503,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 319.0,
+      "t_start_cm": 280.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 94.0,
+      "t_start_cm": 55.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W047",
+    "wall_key_reference": "W|528.5,-85.0|528.5,289.0|t14.0",
+    "wall_length_cm": 374.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W006-O01",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|309.0-440.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.01,
+     "width_cm": 130.99
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W043",
+      "depois": "W084",
+      "hi": 410.801,
+      "largura_cm": 86.542,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W084",
+      "depois": "W082",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W082",
+      "depois": "W040",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W043",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W084",
+      "lo": 410.801,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W082",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W040",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.01,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      593.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      593.503,
+      -129.952
+     ],
+     "envelope_lo_xy_cm": [
+      593.503,
+      -260.942
+     ],
+     "jamba_hi_xy_cm": [
+      593.503,
+      -144.952
+     ],
+     "jamba_lo_xy_cm": [
+      593.503,
+      -245.952
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       13
+      ],
+      "point_cm": [
+       586.503,
+       -252.952
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       17
+      ],
+      "point_cm": [
+       586.503,
+       -137.952
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 130.99,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.01,
+      "t_start_cm": 270.01
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 14.99,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|593.5,-570.0|593.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 140.0,
+     "height_cm": 140.0,
+     "id": "W006-O02",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "measured",
+      "head_cm": 231.0,
+      "host_wall_input": "W084",
+      "kind": "window",
+      "sill_cm": 150.0,
+      "source_element_id": "6558482",
+      "t_range_no_eixo_do_host": [
+       509.24,
+       560.24
+      ],
+      "width_cm": 51.0
+     },
+     {
+      "confidence": "measured",
+      "head_cm": 231.0,
+      "host_wall_input": "W082",
+      "kind": "window",
+      "sill_cm": 150.0,
+      "source_element_id": "6558481",
+      "t_range_no_eixo_do_host": [
+       784.24,
+       835.24
+      ],
+      "width_cm": 51.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W084",
+     "depois": "W082",
+     "hi": 750.001,
+     "largura_cm": 156.0,
+     "lo": 594.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W043",
+      "depois": "W084",
+      "hi": 410.801,
+      "largura_cm": 86.542,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W084",
+      "depois": "W082",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W082",
+      "depois": "W040",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W043",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W084",
+      "lo": 410.801,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W082",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W040",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      593.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      593.503,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      593.503,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      593.503,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      593.503,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 7,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|593.5,-570.0|593.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W006-O03",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|904.0-1035.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W082",
+     "depois": "W040",
+     "hi": 1019.743,
+     "largura_cm": 100.742,
+     "lo": 919.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W043",
+      "depois": "W084",
+      "hi": 410.801,
+      "largura_cm": 86.542,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W084",
+      "depois": "W082",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     },
+     {
+      "antes": "W082",
+      "depois": "W040",
+      "hi": 1019.743,
+      "largura_cm": 100.742,
+      "lo": 919.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W043",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 594.001,
+      "id": "W084",
+      "lo": 410.801,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 919.001,
+      "id": "W082",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.003,
+      "id": "W040",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      593.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      593.503,
+      465.048
+     ],
+     "envelope_lo_xy_cm": [
+      593.503,
+      334.048
+     ],
+     "jamba_hi_xy_cm": [
+      593.503,
+      450.048
+     ],
+     "jamba_lo_xy_cm": [
+      593.503,
+      349.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       34
+      ],
+      "point_cm": [
+       586.503,
+       342.048
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       39
+      ],
+      "point_cm": [
+       586.503,
+       457.048
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|593.5,-570.0|593.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W007-O01",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|309.0-440.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W045",
+      "depois": "W046",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W045",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W046",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.0,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      848.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      848.503,
+      -129.952
+     ],
+     "envelope_lo_xy_cm": [
+      848.503,
+      -260.952
+     ],
+     "jamba_hi_xy_cm": [
+      848.503,
+      -144.952
+     ],
+     "jamba_lo_xy_cm": [
+      848.503,
+      -245.952
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       13
+      ],
+      "point_cm": [
+       855.503,
+       -252.952
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       17
+      ],
+      "point_cm": [
+       855.503,
+       -137.952
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.0,
+      "t_start_cm": 270.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|848.5,-570.0|848.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W007-O02",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W045",
+      "depois": "W046",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W045",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W046",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      848.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      848.503,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      848.503,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      848.503,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      848.503,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 14,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|848.5,-570.0|848.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W007-O03",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|904.0-1035.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W045",
+      "depois": "W046",
+      "hi": 1019.743,
+      "largura_cm": 695.484,
+      "lo": 324.259,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 324.259,
+      "id": "W045",
+      "lo": 0.001,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W046",
+      "lo": 1019.743,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      848.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      848.503,
+      465.048
+     ],
+     "envelope_lo_xy_cm": [
+      848.503,
+      334.048
+     ],
+     "jamba_hi_xy_cm": [
+      848.503,
+      450.048
+     ],
+     "jamba_lo_xy_cm": [
+      848.503,
+      349.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       34
+      ],
+      "point_cm": [
+       855.503,
+       342.048
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       39
+      ],
+      "point_cm": [
+       855.503,
+       457.048
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|848.5,-570.0|848.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W008-O01",
+     "key": "W|1263.5,-570.0|1263.5,774.0|t14.0|O|579.0-765.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": {
+     "antes": "W018",
+     "depois": "W016",
+     "hi": 750.001,
+     "largura_cm": 156.0,
+     "lo": 594.001,
+     "src_antes": [],
+     "src_depois": []
+    },
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [
+     {
+      "antes": "W018",
+      "depois": "W016",
+      "hi": 750.001,
+      "largura_cm": 156.0,
+      "lo": 594.001,
+      "src_antes": [],
+      "src_depois": []
+     }
+    ],
+    "eixo_medido__trechos": [
+     {
+      "hi": 594.001,
+      "id": "W018",
+      "lo": 0.004,
+      "src": [],
+      "thickness_cm": 14.0
+     },
+     {
+      "hi": 1344.001,
+      "id": "W016",
+      "lo": 750.001,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      1263.503,
+      -569.952
+     ],
+     "envelope_hi_xy_cm": [
+      1263.503,
+      195.048
+     ],
+     "envelope_lo_xy_cm": [
+      1263.503,
+      9.048
+     ],
+     "jamba_hi_xy_cm": [
+      1263.503,
+      180.048
+     ],
+     "jamba_lo_xy_cm": [
+      1263.503,
+      24.048
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       22
+      ],
+      "point_cm": [
+       1270.503,
+       17.048
+      ],
+      "t_cm": 587.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       26
+      ],
+      "point_cm": [
+       1270.503,
+       187.048
+      ],
+      "t_cm": 757.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 774.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 579.0,
+      "t_start_cm": 570.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W008",
+    "wall_key_reference": "W|1263.5,-570.0|1263.5,774.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   }
+  ],
+  "input_e_medido": true,
+  "n_aberturas_measured_no_input": 82,
+  "n_casos": 19,
+  "n_walls_input": 167,
+  "n_walls_reference": 97,
+  "projeto": "torre_easy_lo_r00_tgd"
+ },
+ "torre_easy_lo_r00_tp1": {
+  "casos": [
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W003-O01",
+     "key": "W|6607.0,533.0|6607.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W003",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W003",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      6607.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      6607.25,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      6607.25,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      6607.25,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      6607.25,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       22
+      ],
+      "point_cm": [
+       6600.25,
+       1119.95
+      ],
+      "t_cm": 587.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       25
+      ],
+      "point_cm": [
+       6600.25,
+       1289.95
+      ],
+      "t_cm": 757.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 774.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 579.0,
+      "t_start_cm": 570.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W003",
+    "wall_key_reference": "W|6607.0,533.0|6607.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 852.0,
+     "height_cm": 240.0,
+     "id": "W004-O01",
+     "key": "W|7022.0,533.0|7022.0,1877.0|t14.0|O|309.0-440.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 852.0,
+      "host_wall_input": "W004",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       309.0,
+       440.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W004",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.0,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7022.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7022.25,
+      972.95
+     ],
+     "envelope_lo_xy_cm": [
+      7022.25,
+      841.95
+     ],
+     "jamba_hi_xy_cm": [
+      7022.25,
+      957.95
+     ],
+     "jamba_lo_xy_cm": [
+      7022.25,
+      856.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       12
+      ],
+      "point_cm": [
+       7015.25,
+       849.95
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       16
+      ],
+      "point_cm": [
+       7015.25,
+       964.95
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.0,
+      "t_start_cm": 270.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|7022.0,533.0|7022.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W004-O02",
+     "key": "W|7022.0,533.0|7022.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W004",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W004",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7022.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7022.25,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      7022.25,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      7022.25,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      7022.25,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 14,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|7022.0,533.0|7022.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 852.0,
+     "height_cm": 240.0,
+     "id": "W004-O03",
+     "key": "W|7022.0,533.0|7022.0,1877.0|t14.0|O|904.0-1035.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 852.0,
+      "host_wall_input": "W004",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       904.0,
+       1035.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W004",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7022.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7022.25,
+      1567.95
+     ],
+     "envelope_lo_xy_cm": [
+      7022.25,
+      1436.95
+     ],
+     "jamba_hi_xy_cm": [
+      7022.25,
+      1552.95
+     ],
+     "jamba_lo_xy_cm": [
+      7022.25,
+      1451.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       33
+      ],
+      "point_cm": [
+       7015.25,
+       1444.95
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       38
+      ],
+      "point_cm": [
+       7015.25,
+       1559.95
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W004",
+    "wall_key_reference": "W|7022.0,533.0|7022.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 772.0,
+     "height_cm": 160.0,
+     "id": "W005-O01",
+     "key": "W|7277.0,533.0|7277.0,1877.0|t14.0|O|309.0-440.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.01,
+     "width_cm": 130.99
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 772.0,
+      "host_wall_input": "W005",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       309.01,
+       440.0
+      ],
+      "width_cm": 130.99
+     }
+    ],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W005",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.01,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7277.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7277.25,
+      972.95
+     ],
+     "envelope_lo_xy_cm": [
+      7277.25,
+      841.96
+     ],
+     "jamba_hi_xy_cm": [
+      7277.25,
+      957.95
+     ],
+     "jamba_lo_xy_cm": [
+      7277.25,
+      856.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       12
+      ],
+      "point_cm": [
+       7284.25,
+       849.95
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       16
+      ],
+      "point_cm": [
+       7284.25,
+       964.95
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 130.99,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.01,
+      "t_start_cm": 270.01
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 14.99,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|7277.0,533.0|7277.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 752.0,
+     "height_cm": 140.0,
+     "id": "W005-O02",
+     "key": "W|7277.0,533.0|7277.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 752.0,
+      "host_wall_input": "W005",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W005",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7277.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7277.25,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      7277.25,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      7277.25,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      7277.25,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 7,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|7277.0,533.0|7277.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 772.0,
+     "height_cm": 160.0,
+     "id": "W005-O03",
+     "key": "W|7277.0,533.0|7277.0,1877.0|t14.0|O|904.0-1035.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 772.0,
+      "host_wall_input": "W005",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       904.0,
+       1035.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W005",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7277.25,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      7277.25,
+      1567.95
+     ],
+     "envelope_lo_xy_cm": [
+      7277.25,
+      1436.95
+     ],
+     "jamba_hi_xy_cm": [
+      7277.25,
+      1552.95
+     ],
+     "jamba_lo_xy_cm": [
+      7277.25,
+      1451.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       33
+      ],
+      "point_cm": [
+       7284.25,
+       1444.95
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       38
+      ],
+      "point_cm": [
+       7284.25,
+       1559.95
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W005",
+    "wall_key_reference": "W|7277.0,533.0|7277.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W046-O01",
+     "key": "W|7342.0,1018.0|7342.0,1392.0|t14.0|O|94.0-280.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 280.0,
+     "t_start_cm": 94.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W046",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       94.0,
+       280.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     109.0,
+     265.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 374.0,
+      "id": "W046",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     94.0,
+     280.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7342.25,
+      1017.95
+     ],
+     "envelope_hi_xy_cm": [
+      7342.25,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      7342.25,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      7342.25,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      7342.25,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 319.0,
+      "t_start_cm": 280.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 94.0,
+      "t_start_cm": 55.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W046",
+    "wall_key_reference": "W|7342.0,1018.0|7342.0,1392.0|t14.0",
+    "wall_length_cm": 374.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W017-O01",
+     "key": "W|7532.0,548.0|7532.0,1927.0|t14.0|O|564.0-750.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 564.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W017",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       564.0,
+       750.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     579.0,
+     735.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1379.0,
+      "id": "W017",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     564.0,
+     750.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      7532.25,
+      547.95
+     ],
+     "envelope_hi_xy_cm": [
+      7532.25,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      7532.25,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      7532.25,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      7532.25,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       25
+      ],
+      "point_cm": [
+       7539.25,
+       1289.95
+      ],
+      "t_cm": 742.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 769.0,
+      "t_start_cm": 735.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 789.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 789.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 579.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 564.0,
+      "t_start_cm": 530.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 564.0,
+      "t_start_cm": 545.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 564.0,
+      "t_start_cm": 530.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W017",
+    "wall_key_reference": "W|7532.0,548.0|7532.0,1927.0|t14.0",
+    "wall_length_cm": 1379.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 772.0,
+     "height_cm": 160.0,
+     "id": "W052-O02",
+     "key": "W|6600.0,1120.0|8949.0,1120.0|t14.0|O|924.0-1190.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 1190.0,
+     "t_start_cm": 924.0,
+     "width_cm": 266.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 772.0,
+      "host_wall_input": "W052",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       924.0,
+       1190.0
+      ],
+      "width_cm": 266.0
+     }
+    ],
+    "consenso_cm": [
+     939.0,
+     1175.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 2348.99,
+      "id": "W052",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     924.0,
+     1190.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 0.0,
+     "direcao": [
+      1.0,
+      0.0
+     ],
+     "eixo_inicio_cm": [
+      6600.25,
+      1119.95
+     ],
+     "envelope_hi_xy_cm": [
+      7790.25,
+      1119.95
+     ],
+     "envelope_lo_xy_cm": [
+      7524.25,
+      1119.95
+     ],
+     "jamba_hi_xy_cm": [
+      7775.25,
+      1119.95
+     ],
+     "jamba_lo_xy_cm": [
+      7539.25,
+      1119.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       74
+      ],
+      "point_cm": [
+       7782.26,
+       1126.95
+      ],
+      "t_cm": 1182.01,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 236.0,
+    "largura_envelope_cm": 266.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1175.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1229.0,
+      "t_start_cm": 1190.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1190.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 1209.0,
+      "t_start_cm": 1190.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 939.0,
+      "t_start_cm": 905.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 924.0,
+      "t_start_cm": 890.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIA CANALETA - 14x19x19",
+      "t_end_cm": 924.0,
+      "t_start_cm": 905.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W052",
+    "wall_key_reference": "W|6600.0,1120.0|8949.0,1120.0|t14.0",
+    "wall_length_cm": 2348.99,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W019-O01",
+     "key": "W|8017.5,548.0|8017.5,1927.0|t14.0|O|564.0-750.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 564.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W019",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       564.0,
+       750.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     579.0,
+     735.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1379.0,
+      "id": "W019",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     564.0,
+     750.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8017.26,
+      547.95
+     ],
+     "envelope_hi_xy_cm": [
+      8017.26,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      8017.26,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      8017.26,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      8017.26,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       26
+      ],
+      "point_cm": [
+       8010.24,
+       1289.95
+      ],
+      "t_cm": 742.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 754.0,
+      "t_start_cm": 735.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 754.0,
+      "t_start_cm": 735.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 579.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 564.0,
+      "t_start_cm": 525.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x19-29x19",
+      "t_end_cm": 564.0,
+      "t_start_cm": 545.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W019",
+    "wall_key_reference": "W|8017.5,548.0|8017.5,1927.0|t14.0",
+    "wall_length_cm": 1379.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W047-O01",
+     "key": "W|8207.0,1018.0|8207.0,1392.0|t14.0|O|94.0-280.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 280.0,
+     "t_start_cm": 94.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W047",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       94.0,
+       280.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     109.0,
+     265.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 374.0,
+      "id": "W047",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     94.0,
+     280.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8207.24,
+      1017.95
+     ],
+     "envelope_hi_xy_cm": [
+      8207.24,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      8207.24,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      8207.24,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      8207.24,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 299.0,
+      "t_start_cm": 265.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 319.0,
+      "t_start_cm": 280.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 109.0,
+      "t_start_cm": 75.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 94.0,
+      "t_start_cm": 55.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W047",
+    "wall_key_reference": "W|8207.0,1018.0|8207.0,1392.0|t14.0",
+    "wall_length_cm": 374.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 772.0,
+     "height_cm": 160.0,
+     "id": "W006-O01",
+     "key": "W|8272.0,533.0|8272.0,1877.0|t14.0|O|309.0-440.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.01,
+     "width_cm": 130.99
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 772.0,
+      "host_wall_input": "W006",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       309.01,
+       440.0
+      ],
+      "width_cm": 130.99
+     }
+    ],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W006",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.01,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8272.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8272.24,
+      972.95
+     ],
+     "envelope_lo_xy_cm": [
+      8272.24,
+      841.96
+     ],
+     "jamba_hi_xy_cm": [
+      8272.24,
+      957.95
+     ],
+     "jamba_lo_xy_cm": [
+      8272.24,
+      856.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       13
+      ],
+      "point_cm": [
+       8265.24,
+       849.95
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       17
+      ],
+      "point_cm": [
+       8265.24,
+       964.95
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 130.99,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.01,
+      "t_start_cm": 270.01
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 14.99,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|8272.0,533.0|8272.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 752.0,
+     "height_cm": 140.0,
+     "id": "W006-O02",
+     "key": "W|8272.0,533.0|8272.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 752.0,
+      "host_wall_input": "W006",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W006",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8272.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8272.24,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      8272.24,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      8272.24,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      8272.24,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 7,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 3,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 2,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|8272.0,533.0|8272.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 772.0,
+     "height_cm": 160.0,
+     "id": "W006-O03",
+     "key": "W|8272.0,533.0|8272.0,1877.0|t14.0|O|904.0-1035.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 772.0,
+      "host_wall_input": "W006",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       904.0,
+       1035.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W006",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8272.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8272.24,
+      1567.95
+     ],
+     "envelope_lo_xy_cm": [
+      8272.24,
+      1436.95
+     ],
+     "jamba_hi_xy_cm": [
+      8272.24,
+      1552.95
+     ],
+     "jamba_lo_xy_cm": [
+      8272.24,
+      1451.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       34
+      ],
+      "point_cm": [
+       8265.24,
+       1444.95
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       39
+      ],
+      "point_cm": [
+       8265.24,
+       1559.95
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 8,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W006",
+    "wall_key_reference": "W|8272.0,533.0|8272.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 852.0,
+     "height_cm": 240.0,
+     "id": "W007-O01",
+     "key": "W|8527.0,533.0|8527.0,1877.0|t14.0|O|309.0-440.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 440.0,
+     "t_start_cm": 309.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 852.0,
+      "host_wall_input": "W007",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       309.0,
+       440.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     324.0,
+     425.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W007",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     309.0,
+     440.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8527.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8527.24,
+      972.95
+     ],
+     "envelope_lo_xy_cm": [
+      8527.24,
+      841.95
+     ],
+     "jamba_hi_xy_cm": [
+      8527.24,
+      957.95
+     ],
+     "jamba_lo_xy_cm": [
+      8527.24,
+      856.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       13
+      ],
+      "point_cm": [
+       8534.24,
+       849.95
+      ],
+      "t_cm": 317.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       17
+      ],
+      "point_cm": [
+       8534.24,
+       964.95
+      ],
+      "t_cm": 432.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 459.0,
+      "t_start_cm": 425.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 479.0,
+      "t_start_cm": 440.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 324.0,
+      "t_start_cm": 290.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 309.0,
+      "t_start_cm": 270.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|8527.0,533.0|8527.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W007-O02",
+     "key": "W|8527.0,533.0|8527.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W007",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W007",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8527.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8527.24,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      8527.24,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      8527.24,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      8527.24,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 14,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 804.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "BLOCO 34 CORTADO - 14x9x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO CORTADO - 14x9x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA INTEIRA - 14x19x39",
+      "t_end_cm": 579.0,
+      "t_start_cm": 540.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|8527.0,533.0|8527.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 852.0,
+     "height_cm": 240.0,
+     "id": "W007-O03",
+     "key": "W|8527.0,533.0|8527.0,1877.0|t14.0|O|904.0-1035.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 1035.0,
+     "t_start_cm": 904.0,
+     "width_cm": 131.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 852.0,
+      "host_wall_input": "W007",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       904.0,
+       1035.0
+      ],
+      "width_cm": 131.0
+     }
+    ],
+    "consenso_cm": [
+     919.0,
+     1020.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W007",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     904.0,
+     1035.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8527.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8527.24,
+      1567.95
+     ],
+     "envelope_lo_xy_cm": [
+      8527.24,
+      1436.95
+     ],
+     "jamba_hi_xy_cm": [
+      8527.24,
+      1552.95
+     ],
+     "jamba_lo_xy_cm": [
+      8527.24,
+      1451.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       34
+      ],
+      "point_cm": [
+       8534.24,
+       1444.95
+      ],
+      "t_cm": 912.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       39
+      ],
+      "point_cm": [
+       8534.24,
+       1559.95
+      ],
+      "t_cm": 1027.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 101.0,
+    "largura_envelope_cm": 131.0,
+    "n_fiadas_do_trecho": 12,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 1054.0,
+      "t_start_cm": 1020.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 1074.0,
+      "t_start_cm": 1035.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA 34 - 14x19x34",
+      "t_end_cm": 919.0,
+      "t_start_cm": 885.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "BLOCO INTEIRO - 14x19x39",
+      "t_end_cm": 904.0,
+      "t_start_cm": 865.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W007",
+    "wall_key_reference": "W|8527.0,533.0|8527.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   },
+   {
+    "abertura_gravada_no_gabarito": {
+     "confidence": "reconstructed",
+     "head_cm": 872.0,
+     "height_cm": 260.0,
+     "id": "W008-O01",
+     "key": "W|8942.0,533.0|8942.0,1877.0|t14.0|O|579.0-765.0|s612.0",
+     "kind": "door",
+     "sill_cm": 612.0,
+     "source_element_id": null,
+     "t_end_cm": 765.0,
+     "t_start_cm": 579.0,
+     "width_cm": 186.0
+    },
+    "aberturas_com_proveniencia_no_eixo": [
+     {
+      "confidence": "reconstructed",
+      "head_cm": 872.0,
+      "host_wall_input": "W008",
+      "kind": "door",
+      "sill_cm": 612.0,
+      "source_element_id": null,
+      "t_range_no_eixo_do_host": [
+       579.0,
+       765.0
+      ],
+      "width_cm": 186.0
+     }
+    ],
+    "consenso_cm": [
+     594.0,
+     750.0
+    ],
+    "eixo_medido__buraco_bate_consenso": null,
+    "eixo_medido__buraco_bate_envelope": null,
+    "eixo_medido__buracos": [],
+    "eixo_medido__trechos": [
+     {
+      "hi": 1344.0,
+      "id": "W008",
+      "lo": 0.0,
+      "src": [],
+      "thickness_cm": 14.0
+     }
+    ],
+    "envelope_cm": [
+     579.0,
+     765.0
+    ],
+    "identidade_fisica": {
+     "angulo_deg": 90.0,
+     "direcao": [
+      0.0,
+      1.0
+     ],
+     "eixo_inicio_cm": [
+      8942.24,
+      532.95
+     ],
+     "envelope_hi_xy_cm": [
+      8942.24,
+      1297.95
+     ],
+     "envelope_lo_xy_cm": [
+      8942.24,
+      1111.95
+     ],
+     "jamba_hi_xy_cm": [
+      8942.24,
+      1282.95
+     ],
+     "jamba_lo_xy_cm": [
+      8942.24,
+      1126.95
+     ]
+    },
+    "juncoes_no_intervalo": [
+     {
+      "at_end": false,
+      "neighbors": [
+       22
+      ],
+      "point_cm": [
+       8949.24,
+       1119.95
+      ],
+      "t_cm": 587.0,
+      "type": "T"
+     },
+     {
+      "at_end": false,
+      "neighbors": [
+       26
+      ],
+      "point_cm": [
+       8949.24,
+       1289.95
+      ],
+      "t_cm": 757.0,
+      "type": "T"
+     }
+    ],
+    "largura_consenso_cm": 156.0,
+    "largura_envelope_cm": 186.0,
+    "n_fiadas_do_trecho": 13,
+    "pecas_humanas_jamba_hi": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 784.0,
+      "t_start_cm": 750.0
+     }
+    ],
+    "pecas_humanas_jamba_hi_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 774.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 784.0,
+      "t_start_cm": 765.0
+     }
+    ],
+    "pecas_humanas_jamba_lo": [
+     {
+      "n_fiadas": 5,
+      "peca": "BLOCO 34 - 14x19x34",
+      "t_end_cm": 594.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "pecas_humanas_jamba_lo_envelope": [
+     {
+      "n_fiadas": 6,
+      "peca": "COMPENSADOR 14x19x9",
+      "t_end_cm": 579.0,
+      "t_start_cm": 570.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "MEIO BLOCO - 14x19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     },
+     {
+      "n_fiadas": 1,
+      "peca": "CANALETA J - 14x9-19x19",
+      "t_end_cm": 579.0,
+      "t_start_cm": 560.0
+     }
+    ],
+    "spread_fim_cm": 15.0,
+    "spread_inicio_cm": 15.0,
+    "wall_id_reference": "W008",
+    "wall_key_reference": "W|8942.0,533.0|8942.0,1877.0|t14.0",
+    "wall_length_cm": 1344.0,
+    "wall_source_element_ids": [],
+    "wall_thickness_cm": 14.0
+   }
+  ],
+  "input_e_medido": false,
+  "n_aberturas_measured_no_input": 0,
+  "n_casos": 19,
+  "n_walls_input": 96,
+  "n_walls_reference": 96,
+  "projeto": "torre_easy_lo_r00_tp1"
+ }
+}
