@@ -48,6 +48,15 @@ NODE_MERGE_TOLERANCE_CM = 3.0
 
 BINDING_JUNCTION_TYPES = (model.JUNCTION_L, model.JUNCTION_T, model.JUNCTION_X)
 
+# CR-V1. Tolerancia para juntar, no MESMO no', fiadas de paredes
+# DIFERENTES que estao na mesma banda fisica de cota. E' a MESMA
+# tolerancia que o motor ja usa para agrupar pecas em fiada por cota Z
+# (`model.COURSE_Z_TOLERANCE_CM`, empregada em
+# `extract/reconstruct.py:group_by_course` e em
+# `analysis.OccupancyIndex`) - nao e' uma tolerancia nova inventada para
+# este validador.
+ELEVATION_GROUP_TOLERANCE_CM = model.COURSE_Z_TOLERANCE_CM
+
 
 def block_covers_point(block, point_cm, tolerance_cm=JUNCTION_REACH_TOLERANCE_CM):
     """A peca alcanca `point_cm`? Testa o retangulo real da peca
@@ -99,25 +108,90 @@ def _row_signature(covering):
     return tuple(sorted((b.get("wall_id"), b.get("code")) for b in covering))
 
 
-def _covering_blocks(group, row_index):
-    covering = []
-    for wall, _junction in group["walls"]:
-        for row in wall.get("rows") or []:
-            if row["row"] != row_index:
-                continue
-            for block in row.get("blocks") or []:
-                if block_covers_point(block, group["point_cm"]):
-                    covering.append(block)
-    return covering
+def _elevation_groups_of_group(group):
+    """As fiadas FISICAS do no', identificadas pela ELEVACAO real de cada
+    fiada (`row["elevation_cm"]`) - nao pelo indice ordinal `row["row"]`.
 
+    CAUSA-RAIZ (CR-V1). O indice ordinal e' a posicao da fiada NA PILHA
+    DAQUELA PAREDE, nao a cota: e' construido fiada a fiada dentro de
+    cada parede (`extract/reconstruct.py:group_by_course`,
+    `extract/from_solver.py`) e nunca foi pensado como identidade
+    COMPARAVEL entre paredes diferentes. Duas paredes que chegam ao
+    mesmo no' com pilhas de tamanhos diferentes (meia-fiada de peca
+    CORTADA, `base_z_cm` diferente) tem o MESMO indice apontando para
+    COTAS DIFERENTES. Comparar por esse indice fazia o validador
+    perguntar "a fiada z=X de uma parede tem peca no no' da fiada z=Y da
+    outra?" - e concluir MISSING_BINDING numa alvenaria perfeitamente
+    amarrada. Medido no corpus real (reconciliacao CR-B): 39 dos +49
+    achados de `JUNCTION_MISSING_BINDING` nasciam so' disso; 63% dos 373
+    achados do gabarito de hoje (SEM nenhum corte) ja' nascem de um
+    indice ordinal que aponta para mais de uma cota. Reproduzido em
+    `nuvem/benchmark/future_cr_preparation/
+    bench_opening_reconstruction_b_reconciliation/repro_junction_row_unit.py`.
 
-def _rows_of_group(group):
-    indices = set()
+    Agrupa por proximidade de cota (`ELEVATION_GROUP_TOLERANCE_CM`, a
+    MESMA tolerancia que o motor usa para juntar pecas em fiada) -
+    reaproveita o contrato geometrico existente, nao inventa tolerancia
+    nova. Devolve uma lista ORDENADA por elevacao - cada item e' uma
+    fiada FISICA do no', com as (parede, fiada) de toda parede do grupo
+    que tem peca naquela banda de cota.
+
+    O indice ordinal de cada fiada continua disponivel em `row["row"]`
+    (metadado de apresentacao, nunca mais usado aqui como chave de
+    comparacao entre paredes diferentes)."""
+    entries = []
     for wall, _junction in group["walls"]:
         for row in wall.get("rows") or []:
             if row.get("blocks"):
-                indices.add(row["row"])
-    return sorted(indices)
+                entries.append((wall, row))
+    entries.sort(key=lambda item: item[1]["elevation_cm"])
+    clusters = []
+    for wall, row in entries:
+        if (clusters and row["elevation_cm"] - clusters[-1]["elevation_cm"]
+                <= ELEVATION_GROUP_TOLERANCE_CM):
+            clusters[-1]["rows"].append((wall, row))
+        else:
+            clusters.append({
+                "elevation_cm": row["elevation_cm"],
+                "rows": [(wall, row)],
+            })
+    return clusters
+
+
+def _covering_blocks(cluster, point_cm):
+    covering = []
+    for _wall, row in cluster["rows"]:
+        for block in row.get("blocks") or []:
+            if block_covers_point(block, point_cm):
+                covering.append(block)
+    return covering
+
+
+def _cluster_rows_by_wall(cluster):
+    """Indices ordinais originais, um por parede - so' para apresentacao
+    (`detail`, campo `rows_by_wall`); nunca usado para comparar fiadas."""
+    return dict((wall.get("id"), row["row"]) for wall, row in cluster["rows"])
+
+
+def _cluster_participant_wall_ids(group, cluster):
+    """Paredes do NO' que tem QUALQUER fiada estrutural (com peca ou nao)
+    dentro da banda de cota deste cluster - nao so' as que entraram no
+    cluster por terem peca (`_elevation_groups_of_group` so' enumera
+    fiadas COM peca, igual ao contrato antigo de `_rows_of_group`).
+
+    Preserva o caso legitimo de MISSING_BINDING (parede sem NENHUMA peca
+    naquela fiada em lugar nenhum - fiada realmente vazia, nao so' fora
+    do alcance do no'): essa parede conta como participante mesmo com a
+    fiada vazia, porque ela estruturalmente TEM curso naquela cota - o
+    mesmo que o indice ordinal garantia implicitamente ao consultar toda
+    parede do no' na mesma posicao, tenha peca ou nao."""
+    ids = set()
+    for wall, _junction in group["walls"]:
+        for row in wall.get("rows") or []:
+            if abs(row["elevation_cm"] - cluster["elevation_cm"]) <= ELEVATION_GROUP_TOLERANCE_CM:
+                ids.add(wall.get("id"))
+                break
+    return ids
 
 
 def validate_node(group):
@@ -133,26 +207,55 @@ def validate_node(group):
         return findings
 
     primary_wall = group["walls"][0][0]
+    # CR-V1: a fiada FISICA do no' e' a banda de elevacao, nao o indice
+    # ordinal por parede (ver `_elevation_groups_of_group`). `cluster`
+    # aqui e' o que "fiada" significava antes, so' que medido certo.
+    clusters = _elevation_groups_of_group(group)
     signatures = {}
-    for row_index in _rows_of_group(group):
-        covering = _covering_blocks(group, row_index)
+    for cluster_index, cluster in enumerate(clusters):
+        covering = _covering_blocks(cluster, group["point_cm"])
+        elevation_cm = round(cluster["elevation_cm"], 2)
+        rows_by_wall = _cluster_rows_by_wall(cluster)
         if not covering:
+            # "Faltou amarracao" so' e' afirmavel quando PELO MENOS DUAS
+            # paredes do no' tem fiada registrada nesta banda de cota -
+            # a mesma exigencia de participantes de `validate_node` (>=2
+            # paredes), aplicada por FIADA em vez de por no' inteiro.
+            # Uma banda com fiada em uma unica parede e' dado incompleto
+            # daquela parede especifica (ela pode nao ter curso nenhum
+            # naquela altura - meia-fiada de compensacao, parede mais
+            # baixa) - nao e' comparavel com "a vizinha nao amarrou".
+            # Medido no reprodutor da CR-V1
+            # (`repro_junction_row_unit.py`, caso 2): sem este filtro, a
+            # meia-fiada CORTADA que so' existe numa das paredes virava
+            # um segundo falso positivo, mesmo depois de trocar indice
+            # ordinal por elevacao. Participante = parede com QUALQUER
+            # fiada (com peca ou nao) naquela cota - uma fiada realmente
+            # vazia (parede sem peca alguma ali) ainda conta, entao o
+            # achado legitimo de "ninguem amarrou" continua sendo
+            # emitido.
+            if len(_cluster_participant_wall_ids(group, cluster)) < 2:
+                continue
             findings.append(base.finding(
                 "JUNCTION_MISSING_BINDING",
                 wall=primary_wall.get("id"),
                 detail=(
                     "encontro {0} em ({1:.1f}, {2:.1f}) sem nenhuma peca na "
-                    "fiada {3} - paredes {4}".format(
+                    "fiada fisica {3} (elevacao {4:.1f} cm) - paredes "
+                    "{5}".format(
                         group.get("type"), group["point_cm"][0],
-                        group["point_cm"][1], row_index, ", ".join(wall_ids))
+                        group["point_cm"][1], cluster_index, elevation_cm,
+                        ", ".join(wall_ids))
                 ),
-                row=row_index,
+                row=cluster_index,
+                elevation_cm=elevation_cm,
+                rows_by_wall=rows_by_wall,
                 junction_type=group.get("type"),
                 point_cm=[round(v, 2) for v in group["point_cm"]],
                 neighbors=wall_ids,
             ))
             continue
-        signatures[row_index] = _row_signature(covering)
+        signatures[cluster_index] = _row_signature(covering)
 
         for block in covering:
             if block.get("code") != analysis.HALF_BLOCK_CODE:
@@ -162,35 +265,50 @@ def validate_node(group):
                 wall=block.get("wall_id"),
                 detail=(
                     "meio-bloco {0} ocupando o encontro {1} em ({2:.1f}, "
-                    "{3:.1f}), fiada {4}".format(
+                    "{3:.1f}), fiada fisica {4} (elevacao {5:.1f} "
+                    "cm)".format(
                         block.get("id"), group.get("type"),
-                        group["point_cm"][0], group["point_cm"][1], row_index)
+                        group["point_cm"][0], group["point_cm"][1],
+                        cluster_index, elevation_cm)
                 ),
-                row=row_index,
+                row=cluster_index,
+                elevation_cm=elevation_cm,
+                rows_by_wall=rows_by_wall,
                 blocks=[block.get("id")],
                 junction_type=group.get("type"),
                 point_cm=[round(v, 2) for v in group["point_cm"]],
                 distance_cm=0.0,
             ))
 
+    # Duas fiadas fisicas so' contam como CONSECUTIVAS para a regra de
+    # alternancia se nao houver NENHUMA outra fiada fisica do no' entre
+    # elas - exatamente a mesma exigencia que o indice ordinal garantia
+    # dentro de uma unica parede (`row_b == row_a + 1`), so' que agora
+    # aplicada a' sequencia fisica correta do no' inteiro
+    # (`cluster_index` ja' esta' em ordem de elevacao).
     ordered = sorted(signatures)
     for index in range(len(ordered) - 1):
         row_a, row_b = ordered[index], ordered[index + 1]
         if row_b != row_a + 1:
             continue
         if signatures[row_a] == signatures[row_b]:
+            elevation_a = round(clusters[row_a]["elevation_cm"], 2)
+            elevation_b = round(clusters[row_b]["elevation_cm"], 2)
             findings.append(base.finding(
                 "JUNCTION_NOT_ALTERNATING",
                 wall=primary_wall.get("id"),
                 detail=(
                     "encontro {0} em ({1:.1f}, {2:.1f}) resolvido igual nas "
-                    "fiadas {3} e {4}: {5}".format(
+                    "fiadas fisicas {3} e {4} (elevacoes {5:.1f}/{6:.1f} "
+                    "cm): {7}".format(
                         group.get("type"), group["point_cm"][0],
                         group["point_cm"][1], row_a, row_b,
+                        elevation_a, elevation_b,
                         " + ".join("{0}:{1}".format(w, c)
                                    for w, c in signatures[row_a]))
                 ),
                 row_a=row_a, row_b=row_b,
+                elevation_a=elevation_a, elevation_b=elevation_b,
                 junction_type=group.get("type"),
                 point_cm=[round(v, 2) for v in group["point_cm"]],
                 codes=[list(item) for item in signatures[row_a]],
@@ -199,13 +317,15 @@ def validate_node(group):
 
 
 def _node_pieces(group):
-    """Assinatura do no' por fiada, so' com os CODIGOS - e' o que da' para
-    comparar entre dois projetos diferentes (o id da parede nao)."""
+    """Assinatura do no' por fiada FISICA (elevacao), so' com os CODIGOS -
+    e' o que da' para comparar entre dois projetos diferentes (o id da
+    parede nao, e o indice ordinal tambem nao - ver
+    `_elevation_groups_of_group`)."""
     result = {}
-    for row_index in _rows_of_group(group):
-        covering = _covering_blocks(group, row_index)
+    for cluster_index, cluster in enumerate(_elevation_groups_of_group(group)):
+        covering = _covering_blocks(cluster, group["point_cm"])
         if covering:
-            result[row_index] = tuple(sorted(b.get("code") for b in covering))
+            result[cluster_index] = tuple(sorted(b.get("code") for b in covering))
     return result
 
 
