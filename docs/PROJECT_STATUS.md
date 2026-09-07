@@ -147,6 +147,34 @@ não é append-only).
 - **Teste visual INTEGRADO completo no Revit** (extração → paredes
   criadas → inspeção visual) — adiado por decisão do usuário; retomar
   quando priorizado.
+- **[C3/PR#20] Guarda física overconservative em fronteiras de fim de
+  região (W087)** — a guarda de `_solve_repair_subsegments` (CR-BLOCK-
+  FIT-TOLERANCE-C04) usa o predicado amplo `trailing_open` (ausência de
+  junta de argamassa), que cobre tanto jamba de abertura real quanto
+  ponta livre/reserva de nó sem gabarito. Na família `W087` (TGD,
+  subsegmento `[85,242 ; 94,0]`) isso produz **5 vazios reportados**
+  cujo espaço tem folga física real (a peça removida caberia). Fix
+  correto especificado, **não implementado**: expor `trailing_slack_cm`
+  em `region_solid_subsegments` (folga física real até a próxima
+  ocupação) pelo contrato de `continuous_modulation.py`, e a guarda usar
+  `max(PIER_PHYSICAL_FIT_TOLERANCE_CM, trailing_slack_cm)` em vez do
+  limite fixo — em jamba real `trailing_slack_cm = 0`
+  (`BLOCK_OPENING_JOINT_CM = 0`), então as 952 fronteiras físicas
+  críticas ficam idênticas. Fora do escopo autorizado do C04 (toca
+  `continuous_modulation.py`, terceiro arquivo). Detalhe completo:
+  `docs/PROJECT_STATUS_LOG.md` (entrada PR #20).
+- **[C4/PR#20] Assimetria de escopo `PIER_FIT_TOLERANCE_CM` × guarda
+  física** — a tolerância de fit foi alargada para 0,30cm em
+  `_pier_remaining_snapped_cm`, que é **global** (todo chamador de
+  `_pier_ordered_layout`), mas a guarda física de fronteira só foi
+  aplicada no ponto de chamada de `_solve_repair_subsegments`.
+  `_pier_ordered_layout` segue sendo chamado sem a guarda em outros
+  pontos de `wall_stepper.py`. O corpus atual não mostrou escape
+  estrutural novo (`OPENING_BLOCK_CROSSES_JAMB`/`POSITION_OVERLAP`
+  restaurados por identidade), mas falta teste de contrato entre os dois
+  módulos e eventual generalização da guarda para os demais call sites.
+  Produção **não alterada** nesta integração. Detalhe completo:
+  `docs/PROJECT_STATUS_LOG.md` (entrada PR #20).
 
 Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 
