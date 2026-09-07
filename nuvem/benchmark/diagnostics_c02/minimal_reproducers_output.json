@@ -1,0 +1,663 @@
+{
+ "contract": {
+  "x_required_cm": 28.0,
+  "tolerance_candidate_cm": 0.05
+ },
+ "room_ladder": [
+  {
+   "room_cm": 28.1,
+   "required_cm": 28.0,
+   "deficit_cm": -0.1,
+   "b54_hoje": true,
+   "b54_com_tol_005": true,
+   "classe": "cabe",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 28.1,
+     "ok": true,
+     "codes": [
+      "B54",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 28.0,
+   "required_cm": 28.0,
+   "deficit_cm": 0.0,
+   "b54_hoje": true,
+   "b54_com_tol_005": true,
+   "classe": "cabe",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 28.0,
+     "ok": true,
+     "codes": [
+      "B54",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.997,
+   "required_cm": 28.0,
+   "deficit_cm": 0.003,
+   "b54_hoje": false,
+   "b54_com_tol_005": true,
+   "classe": "ruido<=0.05",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.997,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.99,
+   "required_cm": 28.0,
+   "deficit_cm": 0.01,
+   "b54_hoje": false,
+   "b54_com_tol_005": true,
+   "classe": "ruido<=0.05",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.99,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.98,
+   "required_cm": 28.0,
+   "deficit_cm": 0.02,
+   "b54_hoje": false,
+   "b54_com_tol_005": true,
+   "classe": "ruido<=0.05",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.98,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.96,
+   "required_cm": 28.0,
+   "deficit_cm": 0.04,
+   "b54_hoje": false,
+   "b54_com_tol_005": true,
+   "classe": "ruido<=0.05",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.96,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.95,
+   "required_cm": 28.0,
+   "deficit_cm": 0.05,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "borderline<=0.30",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.95,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.94,
+   "required_cm": 28.0,
+   "deficit_cm": 0.06,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "borderline<=0.30",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.94,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.9,
+   "required_cm": 28.0,
+   "deficit_cm": 0.1,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "borderline<=0.30",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.9,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 27.0,
+   "required_cm": 28.0,
+   "deficit_cm": 1.0,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "geometria insuficiente",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 27.0,
+     "ok": true,
+     "codes": [
+      "B34",
+      "B54"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 17.0,
+   "required_cm": 28.0,
+   "deficit_cm": 11.0,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "geometria insuficiente",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 17.0,
+     "ok": true,
+     "codes": [
+      "B54",
+      "C09"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 7.0,
+   "required_cm": 28.0,
+   "deficit_cm": 21.0,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "geometria insuficiente",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 7.0,
+     "ok": true,
+     "codes": [
+      "B54",
+      "C09"
+     ]
+    }
+   ]
+  },
+  {
+   "room_cm": 0.0,
+   "required_cm": 28.0,
+   "deficit_cm": 28.0,
+   "b54_hoje": false,
+   "b54_com_tol_005": false,
+   "classe": "geometria insuficiente",
+   "x_nodes": [
+    {
+     "node_cm": [
+      0.0,
+      0.0
+     ],
+     "room_cm": 0.0,
+     "ok": false,
+     "codes": []
+    }
+   ]
+  }
+ ],
+ "invariance": {
+  "28.0": {
+   "variants": {
+    "identidade": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "translacao_+1234.567_-987.654": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_90": {
+     "room_cm": 21.0,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_37": {
+     "room_cm": 21.0,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_x": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_y": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "reversao_pontas": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "permutacao_paredes": {
+     "room_cm": 28.0,
+     "codes": [
+      "B54",
+      "B54"
+     ],
+     "x_nodes": 1
+    }
+   },
+   "room_invariante": false,
+   "peca_invariante": false,
+   "rooms_distintos": [
+    21.0,
+    28.0
+   ]
+  },
+  "27.997": {
+   "variants": {
+    "identidade": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "translacao_+1234.567_-987.654": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_90": {
+     "room_cm": 20.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_37": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_x": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_y": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "reversao_pontas": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "permutacao_paredes": {
+     "room_cm": 27.997,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    }
+   },
+   "room_invariante": false,
+   "peca_invariante": true,
+   "rooms_distintos": [
+    20.997,
+    27.997
+   ]
+  },
+  "27.98": {
+   "variants": {
+    "identidade": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "translacao_+1234.567_-987.654": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_90": {
+     "room_cm": 20.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_37": {
+     "room_cm": 20.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_x": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_y": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "reversao_pontas": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "permutacao_paredes": {
+     "room_cm": 27.98,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    }
+   },
+   "room_invariante": false,
+   "peca_invariante": true,
+   "rooms_distintos": [
+    20.98,
+    27.98
+   ]
+  },
+  "27.9": {
+   "variants": {
+    "identidade": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "translacao_+1234.567_-987.654": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_90": {
+     "room_cm": 20.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_37": {
+     "room_cm": 20.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_x": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_y": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "reversao_pontas": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    },
+    "permutacao_paredes": {
+     "room_cm": 27.9,
+     "codes": [
+      "B34",
+      "B54"
+     ],
+     "x_nodes": 1
+    }
+   },
+   "room_invariante": false,
+   "peca_invariante": true,
+   "rooms_distintos": [
+    20.9,
+    27.9
+   ]
+  },
+  "17.0": {
+   "variants": {
+    "identidade": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "translacao_+1234.567_-987.654": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_90": {
+     "room_cm": 10.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "rotacao_37": {
+     "room_cm": 10.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_x": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "espelho_y": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "reversao_pontas": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    },
+    "permutacao_paredes": {
+     "room_cm": 17.0,
+     "codes": [
+      "B54",
+      "C09"
+     ],
+     "x_nodes": 1
+    }
+   },
+   "room_invariante": false,
+   "peca_invariante": true,
+   "rooms_distintos": [
+    10.0,
+    17.0
+   ]
+  }
+ }
+}

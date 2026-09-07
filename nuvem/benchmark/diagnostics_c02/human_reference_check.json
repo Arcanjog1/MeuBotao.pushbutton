@@ -1,0 +1,295 @@
+{
+ "metodo": "para cada identidade que a tolerancia de 0,05cm recuperaria, localizar A MESMA parede no reference.json (por geometria) e ler o que o humano colocou nela e nas junctions registradas",
+ "resultados": [
+  {
+   "project": "TGD",
+   "node_cm": [
+    1263.518,
+    -507.951
+   ],
+   "deficit_cm": 0.003,
+   "parede_no_gabarito": null,
+   "classificacao": "INCONCLUSIVE",
+   "motivo": "parede com esta geometria nao existe no reference.json (fragmentacao diferente - ver BENCH-WALLMODEL-FRAGMENTS)"
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    6607.25,
+    594.93
+   ],
+   "deficit_cm": 0.01,
+   "parede_no_gabarito": "W021",
+   "length_cm": 123.98,
+   "codigos_usados_pelo_humano": {
+    "B39": 12,
+    "B34": 12,
+    "B19": 12,
+    "B39_C": 2,
+    "B34_C": 2,
+    "B19_C": 2
+   },
+   "b54_usado_pelo_humano": false,
+   "junctions_registradas": [
+    {
+     "type": "L",
+     "t_cm": 0.0
+    },
+    {
+     "type": "L",
+     "t_cm": 123.98
+    }
+   ],
+   "ha_junction_no_ponto_do_X": false,
+   "fiada_0": [
+    [
+     "B39",
+     14.99,
+     53.99
+    ],
+    [
+     "B39",
+     69.99,
+     108.99
+    ]
+   ],
+   "fiada_1": [
+    [
+     "B34",
+     0.0,
+     34.0
+    ],
+    [
+     "B19",
+     34.99,
+     53.99
+    ],
+    [
+     "B19",
+     69.99,
+     88.99
+    ],
+    [
+     "B34",
+     89.98,
+     123.98
+    ]
+   ],
+   "classificacao": "QUALITY_REGRESSION_RISK",
+   "motivo": "o humano NAO usa B54 nesta parede e nao registra junction no meio dela: deixa um vao livre no eixo do cruzamento e amarra so' nas duas pontas (L). Recuperar B54 centrado AFASTA do gabarito em vez de aproximar."
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    6607.25,
+    1814.95
+   ],
+   "deficit_cm": 0.01,
+   "parede_no_gabarito": "W092",
+   "length_cm": 123.98,
+   "codigos_usados_pelo_humano": {
+    "B39": 12,
+    "B34": 12,
+    "B19": 12,
+    "B39_C": 2,
+    "B34_C": 2,
+    "B19_C": 2
+   },
+   "b54_usado_pelo_humano": false,
+   "junctions_registradas": [
+    {
+     "type": "L",
+     "t_cm": 0.0
+    },
+    {
+     "type": "L",
+     "t_cm": 123.98
+    }
+   ],
+   "ha_junction_no_ponto_do_X": false,
+   "fiada_0": [
+    [
+     "B39",
+     14.99,
+     53.99
+    ],
+    [
+     "B39",
+     69.99,
+     108.99
+    ]
+   ],
+   "fiada_1": [
+    [
+     "B34",
+     0.0,
+     34.0
+    ],
+    [
+     "B19",
+     34.99,
+     53.99
+    ],
+    [
+     "B19",
+     69.99,
+     88.99
+    ],
+    [
+     "B34",
+     89.98,
+     123.98
+    ]
+   ],
+   "classificacao": "QUALITY_REGRESSION_RISK",
+   "motivo": "o humano NAO usa B54 nesta parede e nao registra junction no meio dela: deixa um vao livre no eixo do cruzamento e amarra so' nas duas pontas (L). Recuperar B54 centrado AFASTA do gabarito em vez de aproximar."
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    8942.24,
+    594.93
+   ],
+   "deficit_cm": 0.02,
+   "parede_no_gabarito": "W022",
+   "length_cm": 123.97,
+   "codigos_usados_pelo_humano": {
+    "B39": 12,
+    "B34": 12,
+    "B19": 12,
+    "B39_C": 2,
+    "B34_C": 2,
+    "B19_C": 2
+   },
+   "b54_usado_pelo_humano": false,
+   "junctions_registradas": [
+    {
+     "type": "L",
+     "t_cm": 0.0
+    },
+    {
+     "type": "L",
+     "t_cm": 123.97
+    }
+   ],
+   "ha_junction_no_ponto_do_X": false,
+   "fiada_0": [
+    [
+     "B39",
+     14.99,
+     53.99
+    ],
+    [
+     "B39",
+     69.99,
+     108.99
+    ]
+   ],
+   "fiada_1": [
+    [
+     "B34",
+     0.0,
+     34.0
+    ],
+    [
+     "B19",
+     34.99,
+     53.99
+    ],
+    [
+     "B19",
+     69.99,
+     88.99
+    ],
+    [
+     "B34",
+     89.97,
+     123.97
+    ]
+   ],
+   "classificacao": "QUALITY_REGRESSION_RISK",
+   "motivo": "o humano NAO usa B54 nesta parede e nao registra junction no meio dela: deixa um vao livre no eixo do cruzamento e amarra so' nas duas pontas (L). Recuperar B54 centrado AFASTA do gabarito em vez de aproximar."
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    8942.24,
+    1814.95
+   ],
+   "deficit_cm": 0.1,
+   "parede_no_gabarito": "W093",
+   "length_cm": 123.98,
+   "codigos_usados_pelo_humano": {
+    "B39": 12,
+    "B34": 12,
+    "B19": 12,
+    "B39_C": 2,
+    "B34_C": 2,
+    "B19_C": 2
+   },
+   "b54_usado_pelo_humano": false,
+   "junctions_registradas": [
+    {
+     "type": "L",
+     "t_cm": 0.0
+    },
+    {
+     "type": "L",
+     "t_cm": 123.98
+    }
+   ],
+   "ha_junction_no_ponto_do_X": false,
+   "fiada_0": [
+    [
+     "B39",
+     14.99,
+     53.99
+    ],
+    [
+     "B39",
+     69.99,
+     108.99
+    ]
+   ],
+   "fiada_1": [
+    [
+     "B34",
+     0.0,
+     34.0
+    ],
+    [
+     "B19",
+     34.99,
+     53.99
+    ],
+    [
+     "B19",
+     69.99,
+     88.99
+    ],
+    [
+     "B34",
+     89.98,
+     123.98
+    ]
+   ],
+   "classificacao": "QUALITY_REGRESSION_RISK",
+   "motivo": "o humano NAO usa B54 nesta parede e nao registra junction no meio dela: deixa um vao livre no eixo do cruzamento e amarra so' nas duas pontas (L). Recuperar B54 centrado AFASTA do gabarito em vez de aproximar."
+  }
+ ],
+ "calibracao_global": {
+  "TGD": {
+   "b54_humanos": 516,
+   "nos_X_que_hoje_aceitam_B54": 16,
+   "destes_com_B54_humano_a_5cm": 0,
+   "nos_X_que_hoje_degradam": 10
+  },
+  "TP1": {
+   "b54_humanos": 519,
+   "nos_X_que_hoje_aceitam_B54": 24,
+   "destes_com_B54_humano_a_5cm": 0,
+   "nos_X_que_hoje_degradam": 8
+  }
+ },
+ "calibracao_nota": "mesmo onde o solver ja' aceita B54 o gabarito TGD so' concorda em 4/16 nos - a correspondencia de nos X entre solver e gabarito e' FRACA no TGD, entao a comparacao humana e' confiavel so' no TP1."
+}

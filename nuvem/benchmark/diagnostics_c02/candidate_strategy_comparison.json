@@ -1,0 +1,213 @@
+{
+ "nota": "Cada variante rodou num PROCESSO proprio, por monkey-patch em memoria - NENHUMA alteracao de producao. Metrica = PECA FINAL (`course_candidates`), nunca contagem de avaliacoes.",
+ "variantes": {
+  "baseline": "codigo atual (3ebcd9b), sem tolerancia",
+  "x005": "X: room + 0.05cm",
+  "x030": "X: room + 0.30cm (so' para medir o que 0.30 recuperaria a mais)",
+  "xt005": "X + T: room + 0.05cm"
+ },
+ "por_projeto": {
+  "TGD": {
+   "baseline": {
+    "total_pieces": 10679,
+    "by_code": {
+     "B34": 2679,
+     "B54": 636,
+     "C09": 1142,
+     "C04": 643,
+     "B19": 804,
+     "B39": 4775
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   },
+   "x005": {
+    "total_pieces": 10670,
+    "by_code": {
+     "B34": 2679,
+     "B54": 645,
+     "C09": 1142,
+     "C04": 634,
+     "B19": 804,
+     "B39": 4766
+    },
+    "delta_vs_baseline": {
+     "B39": -9,
+     "B54": 9,
+     "C04": -9
+    },
+    "pecas_novas_por_identidade": 18,
+    "failures": 0
+   },
+   "x030": {
+    "total_pieces": 10670,
+    "by_code": {
+     "B34": 2679,
+     "B54": 645,
+     "C09": 1142,
+     "C04": 634,
+     "B19": 804,
+     "B39": 4766
+    },
+    "delta_vs_baseline": {
+     "B39": -9,
+     "B54": 9,
+     "C04": -9
+    },
+    "pecas_novas_por_identidade": 18,
+    "failures": 0
+   },
+   "xt005": {
+    "total_pieces": 10664,
+    "by_code": {
+     "B34": 2667,
+     "B54": 657,
+     "C09": 1142,
+     "C04": 634,
+     "B19": 798,
+     "B39": 4766
+    },
+    "delta_vs_baseline": {
+     "B19": -6,
+     "B34": -12,
+     "B39": -9,
+     "B54": 21,
+     "C04": -9
+    },
+    "pecas_novas_por_identidade": 50,
+    "failures": 0
+   }
+  },
+  "TP1": {
+   "baseline": {
+    "total_pieces": 18417,
+    "by_code": {
+     "B34": 2386,
+     "B54": 1087,
+     "C09": 3027,
+     "B39": 9436,
+     "C04": 1137,
+     "B19": 1344
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   },
+   "x005": {
+    "total_pieces": 18361,
+    "by_code": {
+     "B34": 2326,
+     "B54": 1129,
+     "C09": 2937,
+     "B39": 9436,
+     "C04": 1155,
+     "B19": 1378
+    },
+    "delta_vs_baseline": {
+     "B19": 34,
+     "B34": -60,
+     "B54": 42,
+     "C04": 18,
+     "C09": -90
+    },
+    "pecas_novas_por_identidade": 130,
+    "failures": 0
+   },
+   "x030": {
+    "total_pieces": 18361,
+    "by_code": {
+     "B34": 2318,
+     "B54": 1137,
+     "C09": 2937,
+     "B39": 9436,
+     "C04": 1155,
+     "B19": 1378
+    },
+    "delta_vs_baseline": {
+     "B19": 34,
+     "B34": -68,
+     "B54": 50,
+     "C04": 18,
+     "C09": -90
+    },
+    "pecas_novas_por_identidade": 138,
+    "failures": 0
+   },
+   "xt005": {
+    "total_pieces": 18361,
+    "by_code": {
+     "B34": 2326,
+     "B54": 1129,
+     "C09": 2937,
+     "B39": 9436,
+     "C04": 1155,
+     "B19": 1378
+    },
+    "delta_vs_baseline": {
+     "B19": 34,
+     "B34": -60,
+     "B54": 42,
+     "C04": 18,
+     "C09": -90
+    },
+    "pecas_novas_por_identidade": 130,
+    "failures": 0
+   }
+  },
+  "PILOTO": {
+   "baseline": {
+    "total_pieces": 772,
+    "by_code": {
+     "B34": 164,
+     "C09": 64,
+     "B39": 440,
+     "B19": 52,
+     "C04": 52
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   },
+   "x005": {
+    "total_pieces": 772,
+    "by_code": {
+     "B34": 164,
+     "C09": 64,
+     "B39": 440,
+     "B19": 52,
+     "C04": 52
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   },
+   "x030": {
+    "total_pieces": 772,
+    "by_code": {
+     "B34": 164,
+     "C09": 64,
+     "B39": 440,
+     "B19": 52,
+     "C04": 52
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   },
+   "xt005": {
+    "total_pieces": 772,
+    "by_code": {
+     "B34": 164,
+     "C09": 64,
+     "B39": 440,
+     "B19": 52,
+     "C04": 52
+    },
+    "delta_vs_baseline": {},
+    "pecas_novas_por_identidade": 0,
+    "failures": 0
+   }
+  }
+ }
+}

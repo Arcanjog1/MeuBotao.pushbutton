@@ -1,0 +1,179 @@
+{
+ "gate_auditado": "_x_intersection_centered_candidate / solve_x_intersection",
+ "condicao": "half_len_ft + BLOCK_JOINT_CM(ft) <= room_ft + 1e-6",
+ "primeira_divergencia_por_identidade": [
+  {
+   "project": "TGD",
+   "node_cm": [
+    1263.518,
+    -507.951
+   ],
+   "wall_id": "1263.518,-569.948->1263.518,24.049",
+   "room_cm": 27.997,
+   "room_plus_cm": 498.0,
+   "room_minus_cm": 27.997,
+   "required_cm": 28.0,
+   "deficit_cm": 0.003,
+   "evaluations": 184,
+   "peca_escolhida": {
+    "B34": 184
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    6607.25,
+    594.93
+   ],
+   "wall_id": "6607.250,532.950->6607.250,1876.950",
+   "room_cm": 27.98,
+   "room_plus_cm": 517.02,
+   "room_minus_cm": 27.98,
+   "required_cm": 28.0,
+   "deficit_cm": 0.02,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    6607.25,
+    594.93
+   ],
+   "wall_id": "6545.260,594.930->6669.240,594.930",
+   "room_cm": 27.99,
+   "room_plus_cm": 27.99,
+   "room_minus_cm": 27.99,
+   "required_cm": 28.0,
+   "deficit_cm": 0.01,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    6607.25,
+    1814.95
+   ],
+   "wall_id": "6545.260,1814.950->6669.240,1814.950",
+   "room_cm": 27.99,
+   "room_plus_cm": 27.99,
+   "room_minus_cm": 27.99,
+   "required_cm": 28.0,
+   "deficit_cm": 0.01,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    8942.24,
+    594.93
+   ],
+   "wall_id": "8942.240,532.950->8942.240,1876.950",
+   "room_cm": 27.98,
+   "room_plus_cm": 517.02,
+   "room_minus_cm": 27.98,
+   "required_cm": 28.0,
+   "deficit_cm": 0.02,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    8942.24,
+    594.93
+   ],
+   "wall_id": "8880.250,594.930->9004.220,594.930",
+   "room_cm": 27.98,
+   "room_plus_cm": 27.98,
+   "room_minus_cm": 27.99,
+   "required_cm": 28.0,
+   "deficit_cm": 0.02,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  },
+  {
+   "project": "TP1",
+   "node_cm": [
+    8942.24,
+    1814.95
+   ],
+   "wall_id": "8880.340,1814.950->9004.320,1814.950",
+   "room_cm": 27.9,
+   "room_plus_cm": 28.08,
+   "room_minus_cm": 27.9,
+   "required_cm": 28.0,
+   "deficit_cm": 0.1,
+   "evaluations": 175,
+   "peca_escolhida": {
+    "B34": 175
+   }
+  }
+ ],
+ "b54_recuperados_como_PECA_FINAL_com_tol_005": {
+  "TGD": {
+   "b54_novos": 9,
+   "nos_unicos": 1,
+   "por_no": {
+    "(1263.52, -507.95)": 9
+   },
+   "fiadas": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16
+   ]
+  },
+  "TP1": {
+   "b54_novos": 42,
+   "nos_unicos": 3,
+   "por_no": {
+    "(6607.25, 594.93)": 17,
+    "(8942.24, 594.93)": 17,
+    "(6607.25, 1814.95)": 8
+   },
+   "fiadas": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ]
+  },
+  "PILOTO": {
+   "b54_novos": 0,
+   "nos_unicos": 0,
+   "por_no": {},
+   "fiadas": []
+  }
+ }
+}

@@ -1,0 +1,291 @@
+{
+ "contrato_medido_cm": {
+  "x_required_cm": 28.0,
+  "t_required_cm": 27.0,
+  "l_required_cm": 34.0,
+  "joint_cm": 1
+ },
+ "nota": "`evaluations` conta CHAMADAS do room check (o solver refaz a resolucao a cada rebuild/banda); `unique_*` conta IDENTIDADE FISICA (no' + parede, por coordenada). So' o segundo vira peca.",
+ "X_INTERSECTION": {
+  "TGD": {
+   "evaluations": 6256,
+   "unique_nodes": 17,
+   "buckets": {
+    "cabe": 4232,
+    "0<d<=0.05 (ruido)": 184,
+    "d>0.30 (geometria insuficiente)": 1840
+   },
+   "unique_node_wall_rejected": 11,
+   "unique_node_wall_noise_le_005": 1,
+   "unique_node_wall_borderline_005_030": 0,
+   "selected_codes": {
+    "B54": 2760,
+    "B34": 184
+   }
+  },
+  "TP1": {
+   "evaluations": 9100,
+   "unique_nodes": 26,
+   "buckets": {
+    "0<d<=0.05 (ruido)": 875,
+    "cabe": 7750,
+    "d>0.30 (geometria insuficiente)": 300,
+    "0.05<d<=0.30 (borderline)": 175
+   },
+   "unique_node_wall_rejected": 10,
+   "unique_node_wall_noise_le_005": 5,
+   "unique_node_wall_borderline_005_030": 1,
+   "selected_codes": {
+    "B34": 1050,
+    "B54": 7750,
+    "C09": 300
+   }
+  },
+  "PILOTO": {
+   "evaluations": 4,
+   "unique_nodes": 1,
+   "buckets": {
+    "d>0.30 (geometria insuficiente)": 4
+   },
+   "unique_node_wall_rejected": 2,
+   "unique_node_wall_noise_le_005": 0,
+   "unique_node_wall_borderline_005_030": 0,
+   "selected_codes": {
+    "C09": 4
+   }
+  }
+ },
+ "T_INTERSECTION": {
+  "TGD": {
+   "evaluations": 21712,
+   "unique_nodes": 118,
+   "buckets": {
+    "cabe": 13363,
+    "INC:cabe": 16330,
+    "d>0.30 (geometria insuficiente)": 7521,
+    "INC:d>0.30 (geometria insuficiente)": 5244,
+    "0.05<d<=0.30 (borderline)": 138,
+    "0<d<=0.05 (ruido)": 690,
+    "INC:0.05<d<=0.30 (borderline)": 138
+   },
+   "unique_node_wall_rejected": 59,
+   "unique_node_wall_noise_le_005": 6,
+   "unique_node_wall_borderline_005_030": 1,
+   "selected_codes": {}
+  },
+  "TP1": {
+   "evaluations": 18375,
+   "unique_nodes": 105,
+   "buckets": {
+    "cabe": 17475,
+    "INC:cabe": 14531,
+    "INC:d>0.30 (geometria insuficiente)": 3844,
+    "d>0.30 (geometria insuficiente)": 500,
+    "0<d<=0.05 (ruido)": 400
+   },
+   "unique_node_wall_rejected": 10,
+   "unique_node_wall_noise_le_005": 4,
+   "unique_node_wall_borderline_005_030": 0,
+   "selected_codes": {}
+  },
+  "PILOTO": {
+   "evaluations": 8,
+   "unique_nodes": 4,
+   "buckets": {
+    "d>0.30 (geometria insuficiente)": 8,
+    "INC:cabe": 8
+   },
+   "unique_node_wall_rejected": 4,
+   "unique_node_wall_noise_le_005": 0,
+   "unique_node_wall_borderline_005_030": 0,
+   "selected_codes": {}
+  }
+ },
+ "L_CORNER": {
+  "TGD": {
+   "evaluations": 23184,
+   "buckets": {
+    "cabe": 21068,
+    "borderline<=0.30": 138,
+    "insuficiente>0.30": 1863,
+    "ruido<=0.05": 115
+   },
+   "unique_identities": {
+    "cabe": 105,
+    "borderline<=0.30": 1,
+    "insuficiente>0.30": 15,
+    "ruido<=0.05": 1
+   },
+   "borderline_examples": [
+    [
+     33.757,
+     "103.517,-559.952->103.517,24.049",
+     [
+      103.517,
+      24.049
+     ]
+    ],
+    [
+     33.98,
+     "711.515,-138.201->842.520,-138.201",
+     [
+      711.515,
+      -138.201
+     ]
+    ]
+   ]
+  },
+  "TP1": {
+   "evaluations": 13300,
+   "buckets": {
+    "cabe": 11256,
+    "insuficiente>0.30": 2044
+   },
+   "unique_identities": {
+    "cabe": 76,
+    "insuficiente>0.30": 16
+   },
+   "borderline_examples": []
+  },
+  "PILOTO": {
+   "evaluations": 16,
+   "buckets": {
+    "cabe": 16
+   },
+   "unique_identities": {
+    "cabe": 8
+   },
+   "borderline_examples": []
+  }
+ },
+ "X_DEGRADED_reproducao_historica": {
+  "TGD": {
+   "evaluations": 2024,
+   "unique_nodes": 10,
+   "rooms": {
+    "0.0": 1840,
+    "27.997": 184
+   },
+   "selected": {
+    "B34": 184,
+    "NENHUMA": 1840
+   },
+   "b54_deficit_cm": {
+    "0.003": 184,
+    "28.0": 1840
+   }
+  },
+  "TP1": {
+   "evaluations": 1350,
+   "unique_nodes": 8,
+   "rooms": {
+    "17.0": 300,
+    "27.9": 175,
+    "27.98": 525,
+    "27.99": 350
+   },
+   "selected": {
+    "B34": 1050,
+    "C09": 300
+   },
+   "b54_deficit_cm": {
+    "0.01": 350,
+    "0.02": 525,
+    "0.1": 175,
+    "11.0": 300
+   }
+  },
+  "PILOTO": {
+   "evaluations": 4,
+   "unique_nodes": 1,
+   "rooms": {
+    "7.0": 4
+   },
+   "selected": {
+    "C09": 4
+   },
+   "b54_deficit_cm": {
+    "21.0": 4
+   }
+  }
+ },
+ "origem_do_deficit": [
+  {
+   "project": "TGD",
+   "room_cm": 27.997,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.997,
+   "boundary_cm": 34.0,
+   "wall_len_cm": 593.997,
+   "lo_cm": 34.0,
+   "hi_cm": 559.997,
+   "evaluations": 184
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.9,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.9,
+   "boundary_cm": 34.0,
+   "wall_len_cm": 123.98,
+   "lo_cm": 34.0,
+   "hi_cm": 89.98,
+   "evaluations": 175
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.98,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.98,
+   "boundary_cm": 34.0,
+   "wall_len_cm": 1344.0,
+   "lo_cm": 34.0,
+   "hi_cm": 1310.0,
+   "evaluations": 350
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.98,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.99,
+   "boundary_cm": 89.97,
+   "wall_len_cm": 123.97,
+   "lo_cm": 34.0,
+   "hi_cm": 89.97,
+   "evaluations": 175
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.99,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.99,
+   "boundary_cm": 34.0,
+   "wall_len_cm": 123.97,
+   "lo_cm": 34.0,
+   "hi_cm": 89.97,
+   "evaluations": 175
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.99,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.99,
+   "boundary_cm": 34.0,
+   "wall_len_cm": 123.98,
+   "lo_cm": 34.0,
+   "hi_cm": 89.98,
+   "evaluations": 350
+  },
+  {
+   "project": "TP1",
+   "room_cm": 27.99,
+   "boundary_source": "RESERVA_OU_PONTA",
+   "t_cm": 61.99,
+   "boundary_cm": 89.98,
+   "wall_len_cm": 123.98,
+   "lo_cm": 34.0,
+   "hi_cm": 89.98,
+   "evaluations": 350
+  }
+ ]
+}
