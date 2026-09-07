@@ -117,6 +117,7 @@ __all__ = [
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
     "_region_bounds_for_run", "_solve_repair_subsegments",
+    "_layout_physical_end_cm", "_layout_fitted_to_physical_span",
     "classify_extent_against_openings",
     "split_extents_by_openings", "opening_repair_regions",
     "region_solid_subsegments", "block_edges_cm", "joint_positions_from_extents",
@@ -2986,12 +2987,21 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     5cm que `_pier_ordered_layout` sempre usou - extraida daqui para ser
     reusada tambem por `_pier_forced_bypass_layouts`, sem duplicar a
     logica). Devolve None quando o trecho NAO fecha (negativo, ou nao e'
-    multiplo de 5cm dentro de PIER_LAYOUT_TOLERANCE_CM); 0.0 (nunca None)
-    para um trecho de comprimento praticamente zero."""
+    multiplo de 5cm dentro de PIER_FIT_TOLERANCE_CM); 0.0 (nunca None)
+    para um trecho de comprimento praticamente zero.
+
+    CR-BLOCK-FIT-TOLERANCE-C04 (2026-09-06): as 3 comparacoes abaixo usam
+    PIER_FIT_TOLERANCE_CM (0,30cm), NAO PIER_LAYOUT_TOLERANCE_CM (0,05cm) -
+    esta funcao E' o mecanismo "resto do trecho considerado modular/
+    snapavel" que a CR mira. As OUTRAS ocorrencias de
+    PIER_LAYOUT_TOLERANCE_CM neste arquivo (checagem de SEM_ESPACO/colisao,
+    consistencia do DP de stagger, adjacencia de compensador consecutivo)
+    ficam DE PROPOSITO em 0,05cm - sao contratos diferentes que a CR
+    proibe alargar (ver PIER_FIT_TOLERANCE_CM em modulation_math.py)."""
     remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
-    if remaining < -PIER_LAYOUT_TOLERANCE_CM:
+    if remaining < -PIER_FIT_TOLERANCE_CM:
         return None
-    if remaining <= PIER_LAYOUT_TOLERANCE_CM:
+    if remaining <= PIER_FIT_TOLERANCE_CM:
         return 0.0
     # TOLERANCIA REAL, NAO 1e-6 (corrigido 2026-08-21). `pier_cm` vem de
     # coordenadas do CAD que passaram por conversoes pes<->cm e por
@@ -2999,9 +3009,13 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     # borda de encontro sai em 829,99791cm em vez de 830cm - 0,002cm de
     # ruido. Com o teste antigo (1e-6) isso REPROVAVA o trecho como
     # "modulacao nao fecha": 116 dos 344 trechos nao-modulares medidos
-    # tinham o comprimento certo e falhavam so' por isso.
+    # tinham o comprimento certo e falhavam so' por isso. Ampliada de
+    # 0,05cm para PIER_FIT_TOLERANCE_CM (0,30cm) em CR-BLOCK-FIT-
+    # TOLERANCE-C04: ruido acumulado de VARIAS operacoes encadeadas
+    # (encontro + extend_wall_ends_to_junctions) passa de 0,05cm em
+    # trechos reais do corpus - medido, nao suposto (ver constante).
     snapped = PIER_MODULE_CM * round(remaining / PIER_MODULE_CM)
-    if abs(remaining - snapped) > PIER_LAYOUT_TOLERANCE_CM:
+    if abs(remaining - snapped) > PIER_FIT_TOLERANCE_CM:
         return None
     # Devolve o valor EXATO (arredondado ao modulo): assim o ruido nao se
     # acumula bloco a bloco no laco guloso do chamador (a peca final
@@ -4750,6 +4764,69 @@ def _region_bounds_for_run(first, last, extents, seg_lo_cm, seg_hi_cm,
     }
 
 
+def _layout_physical_end_cm(layout):
+    """Onde a ULTIMA peca de um layout termina fisicamente (cm, relativo ao
+    inicio do trecho). None para layout vazio - trecho sem peca nenhuma nao
+    ultrapassa fronteira nenhuma."""
+    if not layout:
+        return None
+    return max(end_cm for _code, _start_cm, end_cm in layout)
+
+
+def _layout_fitted_to_physical_span(layout, pier_cm, sub, layout_for_span):
+    """GUARDA FISICA DE FRONTEIRA (CR-BLOCK-FIT-TOLERANCE-C04 - resolucao do
+    hard blocker `OPENING_BLOCK_CROSSES_JAMB`).
+
+    O fit modular (PIER_FIT_TOLERANCE_CM = 0,30cm) decide se um trecho PODE
+    ser considerado modular, absorvendo o ruido geometrico acumulado. Mas o
+    comprimento SNAPADO tambem e' usado para POSICIONAR as pecas: quando o
+    trecho real e' um pouco MENOR que o multiplo aceito, a ultima peca
+    termina depois do fim fisico do trecho. Contra uma junta de argamassa
+    (o lado que encosta em outro bloco/ancora) isso e' inofensivo - a junta
+    de 1cm cede a fracao de milimetro. Contra uma fronteira SEM junta -
+    jamba de abertura, ponta livre de parede, reserva de no' - nao ha' o que
+    ceder: a peca invade o vao livre. Medido no corpus: 41 invasoes novas de
+    0,12 a 0,267cm, todas nascidas exatamente assim.
+
+    A guarda so' age quando a ponta de saida do trecho NAO tem junta de
+    argamassa (`trailing_open`) - e' o predicado FISICO, nao o nome/tipo da
+    abertura nem a parede/projeto. Ate' PIER_PHYSICAL_FIT_TOLERANCE_CM
+    (0,05cm - o mesmo piso de ruido geometrico que o projeto ja' usava
+    antes desta CR) o excesso continua sendo tratado como ruido de calculo;
+    acima disso o trecho e' REMONTADO com o maior conteudo modular que cabe
+    de verdade (`pier_cm_floored_to_module`) - a mesma composicao que o
+    solver montaria para um trecho um modulo menor, nenhuma regra de dominio
+    nova. Se nem o conteudo reduzido couber, devolve None: melhor o trecho
+    vazio (exatamente o que acontecia ANTES do C04) do que uma peca dentro
+    do vao.
+
+    PRE-CONDICAO: vale para trechos cujas juntas de contorno JA' foram
+    descontadas do proprio `lo`/`hi` - isto e', com junta de contorno ZERO
+    dos dois lados, que e' exatamente como `region_solid_subsegments`
+    entrega os subsegmentos e como `_solve_repair_subsegments` chama o
+    solver de pilarete (0.0, 0.0). E' por isso que
+    `pier_cm_floored_to_module` e' chamada com juntas zero aqui."""
+    if layout is None:
+        return None
+    if not sub.get("trailing_open"):
+        return layout  # a junta de argamassa da ancora absorve o excesso
+    end_cm = _layout_physical_end_cm(layout)
+    if end_cm is None or end_cm - pier_cm <= PIER_PHYSICAL_FIT_TOLERANCE_CM:
+        return layout
+    floored_cm = pier_cm_floored_to_module(pier_cm, 0.0, 0.0)
+    if floored_cm is None or floored_cm <= 0:
+        return None
+    fitted = layout_for_span(floored_cm)
+    if fitted is None:
+        return None
+    fitted_end_cm = _layout_physical_end_cm(fitted)
+    if fitted_end_cm is None:
+        return fitted
+    if fitted_end_cm - pier_cm > PIER_PHYSICAL_FIT_TOLERANCE_CM:
+        return None
+    return fitted
+
+
 def _solve_repair_subsegments(plan, catalog, allow_compensators,
                               avoid_joint_positions_cm, target_void_positions_cm,
                               prefer_avoiding):
@@ -4759,29 +4836,38 @@ def _solve_repair_subsegments(plan, catalog, allow_compensators,
       - `resolvidos`: [(subsegmento, layout), ...] na ordem do eixo;
       - `falhas`: os subsegmentos que nenhum layout fechou, MAIS os
         `undersized` (sobra pequena demais para qualquer peca) - os dois
-        casos pedem a mesma reacao do chamador (expandir a regiao)."""
+        casos pedem a mesma reacao do chamador (expandir a regiao).
+
+    Todo layout passa pela GUARDA FISICA DE FRONTEIRA antes de ser aceito
+    (ver `_layout_fitted_to_physical_span`): o valor snapado do fit nunca
+    materializa uma peca alem do fim fisico real do trecho."""
     solved = []
     failures = list(plan.get("undersized") or [])
     for sub in plan.get("segments") or []:
         pier_cm = sub["hi"] - sub["lo"]
         if pier_cm <= OPENING_FIT_TOLERANCE_CM:
             continue
-        if prefer_avoiding:
-            layout = _pier_layout_avoiding_joints(
-                pier_cm, catalog, 0.0, 0.0, sub["lo"],
-                avoid_joint_positions_cm or [],
+
+        def _layout_for_span(span_cm, _sub=sub):
+            if prefer_avoiding:
+                return _pier_layout_avoiding_joints(
+                    span_cm, catalog, 0.0, 0.0, _sub["lo"],
+                    avoid_joint_positions_cm or [],
+                    allow_compensators=allow_compensators,
+                    target_void_positions_cm=target_void_positions_cm,
+                    leading_is_open=_sub["leading_open"],
+                    trailing_is_open=_sub["trailing_open"],
+                )
+            return _pier_ordered_layout(
+                span_cm, catalog, 0.0, 0.0,
                 allow_compensators=allow_compensators,
-                target_void_positions_cm=target_void_positions_cm,
-                leading_is_open=sub["leading_open"],
-                trailing_is_open=sub["trailing_open"],
+                leading_open_override=_sub["leading_open"],
+                trailing_open_override=_sub["trailing_open"],
             )
-        else:
-            layout = _pier_ordered_layout(
-                pier_cm, catalog, 0.0, 0.0,
-                allow_compensators=allow_compensators,
-                leading_open_override=sub["leading_open"],
-                trailing_open_override=sub["trailing_open"],
-            )
+
+        layout = _layout_fitted_to_physical_span(
+            _layout_for_span(pier_cm), pier_cm, sub, _layout_for_span
+        )
         if layout is None:
             failures.append(sub)
         else:

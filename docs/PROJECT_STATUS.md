@@ -11,16 +11,14 @@
 
 ```
 branch: main
-SHA:    209695d5559b53fe4cc8a92300779a8ae73b7c1d
+SHA:    3ebcd9b63875f9114a3d6223aa648e5075e2d35b
 ```
 
-Último marco de PRODUÇÃO: `PR #18` / `CR-BLOCK-ARM-SAFE-REPAIR-GATE-
-FIDELITY` — **mesclado** (a `main` avançou de `4344c76` para `209695d`;
-ver "Estado oficial do solver" abaixo). Antes dele, `PR #17` /
-`CR-BLOCK-NODE-FILL-REVALIDATION` (metade simétrica da junta NÓ|FILL) —
-`docs/BLOCK_NODE_FILL_REVALIDATION.md`. Entre os dois, só merges
-**docs-only** (diff de produção declarado ZERO). Histórico anterior
-completo: `docs/PROJECT_STATUS_LOG.md`.
+Último marco de PRODUÇÃO: `PR #19` / `CR-BLOCK-B19-RESIDUAL-FILL-
+IMPLEMENTATION` — **mesclado** (a `main` avançou de `209695d` para
+`3ebcd9b`; ver "Estado oficial do solver" abaixo). Antes dele, `PR #18` /
+`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY`. Histórico anterior completo:
+`docs/PROJECT_STATUS_LOG.md`.
 
 ## Estado oficial do solver
 
@@ -55,33 +53,119 @@ Só o que está realmente mesclado na `main`, na ordem em que foi integrado:
   zero. Relatório: `docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_
   IMPLEMENTATION.md`; regras: seção 34 de
   `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
+- **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (`PR #19`, **mesclado**)
+  — decisão humana aprovada sobre B19: pode fechar um trecho residual de
+  15-20cm quando existir, no MESMO NO e na MESMA FIADA, uma peca de
+  amarracao real e integra (B34/B54) cobrindo geometricamente o ponto
+  fisico do no, nunca sendo ele mesmo a peca de amarracao. Implementado
+  como reparo pos-hoc isolado (`repair_b19_residual_fill`, mesmo padrao
+  seguro do SAFE REPAIR do ARM). Medido no corpus: **TP1 8 candidatos
+  elegiveis, 0 aceitos** (rejeitados por `no_tie_covering_node`);
+  TGD/Piloto 0 candidatos elegiveis - mecanismo correto, zero efeito
+  pratico hoje, zero risco de regressao. Relatorio:
+  `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`; regras: secao 35 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
 
 Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Trabalho ativo
 
-- **CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION** (branch
-  `claude/cr-block-b19-residual-fill-uythsk`, PR #19, **não mergeado**,
-  **corrigido em revisão pós-review**) — decisão humana aprovada sobre
-  B19: pode fechar um trecho residual de 15-20cm quando existir, no
-  MESMO NÓ e na MESMA FIADA, uma peça de amarração real e íntegra
-  (B34/B54) cobrindo geometricamente o ponto físico do nó, nunca sendo
-  ele mesmo a peça de amarração. Implementado como reparo pós-hoc
-  isolado (`repair_b19_residual_fill`, mesmo padrão seguro do SAFE
-  REPAIR do ARM — candidato → pin → reconstrução completa → hard gates
-  (incl. NOVO gate de integridade geométrica do nó) → aceita ou
-  reverte). Uma primeira versão (aceitava com base só em o OUTRO lado da
-  parede fechar) foi revisada e corrigida: medição real provou 0/102
-  fiadas com amarração no MESMO nó/MESMA fiada. Com o gate corrigido,
-  **TP1: 8 candidatos elegíveis, 0 aceitos** (todos rejeitados por
-  `no_tie_covering_node` — o padrão de alternância par/ímpar do canto L
-  nunca amarra o nó de fill na mesma fiada do B19); TGD/Piloto: 0
-  candidatos elegíveis. Fingerprint idêntico com/sem o reparo nos três
-  projetos — **zero risco de regressão, zero efeito prático hoje**.
-  `baseline.json`/`reference.json` intocados (não há diferença nenhuma a
-  refletir). Relatório: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`;
-  regras: seção 35 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Aguarda
-  autorização de merge; sem monitoramento automático.
+- **CR-BLOCK-FIT-TOLERANCE-C04** (branch
+  `claude/cr-block-fit-tolerance-c04-n5qsc4`, PR #20 **DRAFT, nao
+  mergeado**, veredito **READY_FOR_INDEPENDENT_REVIEW**) - duas
+  tolerancias SEPARADAS, uma para cada pergunta:
+  `PIER_FIT_TOLERANCE_CM` (0,30cm) decide se a sobra de um trecho PODE ser
+  considerada modular (`_pier_remaining_snapped_cm`;
+  `pier_closes_with_blocks_cm`), e `PIER_PHYSICAL_FIT_TOLERANCE_CM`
+  (0,05cm, = o piso de ruido que ja' existia) decide ONDE a peca pode
+  existir de fato - uma GUARDA FISICA impede que o valor snapado
+  materialize peca alem de uma fronteira sem junta de argamassa (jamba de
+  abertura, ponta livre, reserva de no'), remontando o trecho com o maior
+  conteudo modular que cabe (`pier_cm_floored_to_module`).
+  `PIER_LAYOUT_TOLERANCE_CM` continua 0,05cm e intocada.
+  Resultado medido: `COVERAGE_GAP_IN_ROW` TGD 1959->1649 / TP1 327->214,
+  `blocks` TGD +1052 / TP1 +1155 (98,4-100% do ganho da ablacao
+  independente), `OPENING_BLOCK_CROSSES_JAMB` com delta **ZERO** nos 3
+  projetos (verificado por instancia), `POSITION_OVERLAP`/`JUNCTION_*`/
+  demais `OPENING_*` com delta zero, TGD `critical_errors` 884->872.
+  Trade-off exposto e nao corrigido (fora de escopo): `COMPENSATOR_*` e
+  `PRISM_*` sobem nos trechos recem-destravados. Determinismo (4 seeds) e
+  invariancia identicos ao pre-existente. `baseline.json`/`reference.json`
+  intocados. Relatorio: `docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md`.
+  **Revisao independente concluida** (`docs/C04_INDEPENDENT_FINAL_REVIEW.md`,
+  branch `claude/c04-review-next-cr-prep-wc77d7`): veredito
+  **APPROVE_WITH_EXPLICIT_CONDITIONS** - NAO e' `APPROVE_FOR_MERGE`. Faltam
+  DUAS decisoes explicitas do usuario (C1 e C2 abaixo) e ficam registradas
+  DUAS dividas tecnicas (C3 e C4 abaixo). **Aguarda decisao do usuario; sem
+  monitoramento automatico.**
+
+  - **C1 - PENDENTE DE DECISAO DO USUARIO.** Regressao real de composicao
+    no TGD: a categoria `compensators` sai de **815 achados na `main` de
+    hoje** para **1083** com o C04, ultrapassando o baseline congelado
+    (950). O teste `tests/regression/test_benchmark_baselines.py`
+    **passa** em STATE_A e **falha** em STATE_C - portanto NAO e' artefato
+    nem falha pre-existente. Causa medida: o C04 preenche trechos que a
+    `main` deixava vazios, e em parte deles o solver monta uma composicao
+    PIOR que a humana (medido: humano `W016` f0 usa **um B19** em 15-34;
+    o solver usa **C09+C04** e para 5cm antes). Nao regravar `baseline.json`
+    para esconder isso.
+  - **C2 - PENDENTE DE DECISAO DO USUARIO.** Saldo critico do TP1 piora:
+    **469 -> 485** (`+16`), motor `PRISM_CONTINUOUS_JOINT` **256 -> 290**
+    (`+34`). Verificado por instancia que **50 de 50** dos prismas novos
+    aparecem onde pelo menos uma das duas fiadas nao tinha material nenhum
+    em STATE_A (`EXPECTED_EXPOSURE` testado, nao assumido) - mas
+    `EXPECTED_EXPOSURE` **nao** e' sinonimo de `ACCEPTABLE` nem de
+    `RESOLVED`: sao 34 juntas continuas fisicas reais no resultado final.
+  - **C3 - DIVIDA REGISTRADA: ramo overconservative da guarda fisica
+    (W087).** A guarda disparou **1205** vezes no corpus, estratificadas
+    pelo tipo real de fronteira: **952 em jamba de abertura real**
+    (`PHYSICALLY_REQUIRED_GUARD`, junta ZERO por contrato), **138 na
+    familia `W087` `[85.242, 94.0]`** (`OVERCONSERVATIVE_GUARD`
+    demonstrado) e **115 em outras fronteiras de fim de regiao**
+    (`INCONCLUSIVE` - a folga fisica nao foi verificada). Nao classificar
+    os 1205 como "todos fisicamente necessarios". No caso `W087` a guarda
+    troca um `C09` por um `C04`; o `C09` removido teria **0,758cm de folga
+    fisica** ate' a peca de amarracao de `W106` (`T_binding`, mesma fiada)
+    - a reserva de no' e' real e ocupada, mas a guarda e' conservadora
+    demais ali, porque trata `hi` como fronteira sem folga quando existe
+    1,00cm de junta ate' a perpendicular. Custo: **5 vazios** reportados
+    (`W087` fiadas 7-11). **NAO resolvido.** Fix minimo ja' especificado e
+    **nao implementado**: expor em `region_solid_subsegments` a folga
+    fisica real alem de `hi` (ex. `trailing_slack_cm`, derivada da proxima
+    ocupacao fisica real e do contrato de junta) e a guarda usar
+    `max(PIER_PHYSICAL_FIT_TOLERANCE_CM, trailing_slack_cm)`; em jamba de
+    abertura `trailing_slack_cm = 0`, entao as 952 fronteiras criticas
+    ficam identicas. Toca `nuvem/core/engine/continuous_modulation.py`,
+    **fora** do escopo autorizado do C04: exige CR propria, STATE_A/B
+    proprios, revalidacao das 41 e um teste de contrato entre os dois
+    modulos. Proibido nesta CR: aumentar tolerancia global, usar folga
+    presumida ou criar excecao por `W087`/`wall_id`.
+  - **C4 - DIVIDA REGISTRADA: escopo GLOBAL da tolerancia x escopo LOCAL
+    da guarda.** `PIER_FIT_TOLERANCE_CM` (0,30cm) foi aplicada em
+    `_pier_remaining_snapped_cm`, que e' um mecanismo de composicao
+    **global**; a guarda fisica foi aplicada em **um unico ponto de
+    chamada**, `_solve_repair_subsegments`. `_pier_ordered_layout` e'
+    chamado sem a guarda em outros pontos (l. 4160, 4263, 4290, 4693,
+    4713). A revisao independente **nao encontrou escape estrutural novo
+    no corpus atual** (`OPENING_BLOCK_CROSSES_JAMB` e `POSITION_OVERLAP`
+    restaurados por identidade geometrica, 0 novas), e por isso **nao e'
+    bug comprovado**; mas ausencia de regressao no corpus **nao e' prova
+    universal**. Verificacao futura exigida: todos os call sites, tipo de
+    fronteira, juntas de contorno, contrato de `region_solid_subsegments`,
+    colocacao fisica, reversao de orientacao, protecao de abertura e
+    protecao de reserva de no'. **Nao generalizar a guarda nesta
+    integracao.**
+  - **C5 - PRESERVADO.** `baseline.json`, `reference.json`,
+    `reference_score.json` e `input.json` **intocados** pelo PR; nenhum
+    threshold de regressao alterado; nenhum teste excluido, marcado
+    `xfail` ou `skip`. As **2 falhas** da suite completa em STATE_C sao o
+    guard-rail `tests/regression/test_benchmark_baselines.py` e ficam
+    visiveis de proposito: (a) TGD `compensators` - **regressao real
+    causada pelo C04** (C1); (b) TP1 `JUNCTION_MISSING_BINDING` 8->9 -
+    **`REAL_SOLVER_DEFECT` pre-existente**, ja' presente em STATE_A (a
+    suite da `main` sem C04 falha com a mensagem literalmente identica);
+    o C04 nao o introduz nem o agrava. As duas nao podem ser somadas na
+    mesma frase: a primeira e' custo deste PR, a segunda nao.
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
@@ -147,6 +231,31 @@ não é append-only).
 - **Teste visual INTEGRADO completo no Revit** (extração → paredes
   criadas → inspeção visual) — adiado por decisão do usuário; retomar
   quando priorizado.
+
+- **Guarda fisica do C04 - ramo overconservative em fim de regiao**
+  (C3 acima, `docs/C04_INDEPENDENT_FINAL_REVIEW.md` 8.3/8.5) - 138
+  disparos da familia `W087` sao conservadores demais; 115 disparos em
+  outras fronteiras de fim de regiao seguem **inconclusivos**. Fix minimo
+  especificado (`trailing_slack_cm` em `region_solid_subsegments`),
+  **nao implementado**, fora do escopo do C04.
+- **Assimetria escopo global/local da tolerancia de fit** (C4 acima) -
+  `PIER_FIT_TOLERANCE_CM` e' global, a guarda e' local a
+  `_solve_repair_subsegments`; outros call sites de
+  `_pier_ordered_layout` nao passam pela guarda. Sem contraexemplo no
+  corpus atual; divida arquitetural aberta, nao bug comprovado.
+- **Metrica `OPENING_BLOCK_CROSSES_JAMB` em valor ABSOLUTO nao e'
+  confiavel** - rodando os validadores sobre o PROPRIO gabarito humano:
+  TGD **208**, TP1 **209**, com **195 ocorrencias de exatamente 15,0cm**
+  nos dois projetos. Assinatura de artefato de reconstrucao do
+  benchmark. So' o **delta por identidade geometrica** (o solver contra
+  ele mesmo) e' valido hoje - foi assim que a revisao do C04 usou o
+  gate. CR de benchmark proposta: `BENCH-OPENING-RECONSTRUCTION`.
+
+**Nenhuma divida registrada aqui equivale a autorizacao para pioras
+futuras.** Registrar C1-C4 documenta o custo conhecido de UMA integracao
+especifica; nao cria licenca para novas regressoes de composicao, de
+amarracao ou de cobertura em CRs seguintes, nem dispensa os hard gates
+por identidade geometrica.
 
 Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 
