@@ -1,0 +1,49 @@
+{
+ "verificado_em": "reconciliacao independente CR-B",
+ "commits_em_todas_as_refs": 198,
+ "documentos": {
+  "docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md": {
+   "commit_que_adicionou": "d8933cde710ddfd72d62b918c69be8719fb7075d",
+   "data": "Mon Sep 7 06:15:35 2026 +0000",
+   "assunto": "docs(revisao): revisao independente do PR #22 (CR-BENCH-OPENING-RECONSTRUCTION-A)",
+   "branches_que_contem": [
+    "remotes/origin/claude/opening-detector-review-cr-a-q8bhuk"
+   ],
+   "ancestral_de_origin_main": false,
+   "existe_em_origin_main": false,
+   "linhas": 335,
+   "veredito_registrado": "APPROVE_WITH_EXPLICIT_CONDITIONS",
+   "arquivos_no_commit": [
+    "..._OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md | 335 +++++++++++++++++++++",
+    " 1 file changed, 335 insertions(+)"
+   ]
+  },
+  "docs/C04_INDEPENDENT_FINAL_REVIEW.md": {
+   "commit_que_adicionou": "418fba1e8a756555ecec5bdeab1e84db1551cf06",
+   "data": "Mon Sep 7 02:16:36 2026 +0000",
+   "assunto": "docs(blocos): revisao independente do C04 (PR #20) + preparacao das proximas CRs",
+   "branches_que_contem": [
+    "remotes/origin/claude/c04-review-next-cr-prep-wc77d7"
+   ],
+   "ancestral_de_origin_main": false,
+   "existe_em_origin_main": false,
+   "linhas": 785,
+   "veredito_registrado": "APPROVE_WITH_EXPLICIT_CONDITIONS",
+   "arquivos_no_commit": [
+    "docs/C04_INDEPENDENT_FINAL_REVIEW.md               | 785 +++++++++++++++++++++",
+    " docs/FUTURE_BLOCK_CR_PREPARATION.md                | 581 +++++++++++++++",
+    " docs/FUTURE_BLOCK_CR_PROMPTS.md                    | 575 +++++++++++++++",
+    " nuvem/benchmark/future_cr_preparation/README.md    |  38 +",
+    " .../future_cr_preparation/classify_exposure.py     |  44 ++",
+    " .../future_cr_preparation/compare_states.py        |  49 ++",
+    " .../future_cr_preparation/probe_c04_guard_fn.py    |  79 +++",
+    " .../benchmark/future_cr_preparation/probe_state.py | 102 +++",
+    " .../benchmark/future_cr_preparation/profile_arm.py |  11 +",
+    " .../future_cr_preparation/trace_c04_guard.py       |  49 ++",
+    " .../future_cr_preparation/trace_x_room_check.py    |  25 +",
+    " 11 files changed, 2338 insertions(+)"
+   ]
+  }
+ },
+ "conclusao": "Os dois documentos EXISTEM, cada um commitado na sua propria branch, e NUNCA foram mesclados na main. A afirmacao do candidato (secao 1.2: 'nunca commitados em nenhuma ref') e' um FALSO NEGATIVO produzido por conjunto de refs locais incompleto na sessao dele (153 commits varridos contra 198 disponiveis apos `git fetch origin`)."
+}

@@ -1,0 +1,92 @@
+================================================================================================
+torre_easy_lo_r00_tgd
+-- GABARITO  STATE_R -> STATE_C   (identidade fisica)
+   codigo                             sever.         R      C   delta   novas sumidas
+   COMPENSATOR_CONSECUTIVE            major         52     52      +0       0       0 
+   COMPENSATOR_EXCESS_IN_RUN          major         57     57      +0       0       0 
+   COMPENSATOR_VERTICAL_STRIP         major         26     26      +0       0       0 
+   COVERAGE_GAP_IN_ROW                major        648    601     -47      54     101 
+   COVERAGE_MISSING_ROW               critical      95    112     +17      26       9 <- chave fraca
+   COVERAGE_PARTIAL_WALL              major          4      4      +0       0       0 <- chave fraca
+   COVERAGE_ROW_MOSTLY_EMPTY          critical      85    108     +23      38      15 <- chave fraca
+   JUNCTION_HALF_BLOCK_ADJACENT       major        264    264      +0       0       0 
+   JUNCTION_MISSING_BINDING           critical     373    422     +49      82      33 
+   JUNCTION_NOT_ALTERNATING           major          9      9      +0       0       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         21     21      +0       0       0 <- chave fraca
+   OPENING_MISSING_LINTEL             major         60     48     -12       2      14 <- chave fraca
+   PRISM_CONTINUOUS_JOINT             critical     129    129      +0       0       0 
+   PRISM_JOINT_STACK                  major          8      8      +0       0       0 
+   PRISM_STAGGER_BELOW_TARGET         minor        101    101      +0       0       0 
+-- JUNCTION_MISSING_BINDING nas TRES unidades de avaliacao
+   por INDICE ORDINAL de fiada (validador de hoje): R=373 C=422  (+49)
+   por ELEVACAO FISICA:                             R=348 C=343  (-5)
+   ESTRITA (cota em >=2 paredes do no'):            R=86 C=96  (+10)
+      identidades estritas NOVAS: 10   SUMIDAS: 0
+      dessas NOVAS, em no' que NAO existia em STATE_R: 10
+-- FALHA VERTICAL DE AMARRACAO no eixo do no' (todas as pecas do no')
+   nos avaliaveis: R=147 C=161 | nos NOVOS=15 SUMIDOS=1
+   nos presentes NOS DOIS que PIORARAM:   0   <- so' isto seria defeito novo
+   nos presentes NOS DOIS que MELHORARAM: 8
+-- SOLVER  IN_R x STATE_R -> IN_C x STATE_C   (identidade fisica)
+   COMPENSATOR_AVOIDABLE              minor         88    105     +17      28      11 <- chave fraca
+   COMPENSATOR_CONSECUTIVE            major       1470   1414     -56     132     188 
+   COMPENSATOR_EXCESS_IN_RUN          major       1140   1151     +11     161     150 
+   COMPENSATOR_VERTICAL_STRIP         major        194    184     -10      24      34 
+   COVERAGE_GAP_IN_ROW                major        283    182    -101      21     122 
+   COVERAGE_ROW_MOSTLY_EMPTY          critical      14      0     -14       0      14 <- chave fraca
+   JUNCTION_MISSING_BINDING           critical       9      9      +0       0       0 
+   JUNCTION_NOT_ALTERNATING           major         16     32     +16      16       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         22     22      +0       0       0 <- chave fraca
+   POSITION_OVERLAP                   critical      18      9      -9       0       9 
+   PRISM_CONTINUOUS_JOINT             critical     314    272     -42      28      70 
+   PRISM_JOINT_STACK                  major         20     17      -3       1       4 
+   PRISM_STAGGER_BELOW_TARGET         minor       1486   1591    +105     451     346 
+   COVERAGE_GAP_IN_ROW em CENTIMETROS: {'cm_so_antes': 15586.9, 'cm_so_depois_NOVO': 419.8, 'cm_nos_dois': 2395.8}
+   POSITION_OVERLAP pela coordenada dos blocos: R=18 C=9 novas=0 sumidas=9 preservadas=9
+================================================================================================
+torre_easy_lo_r00_tp1
+-- GABARITO  STATE_R -> STATE_C   (identidade fisica)
+   codigo                             sever.         R      C   delta   novas sumidas
+   COMPENSATOR_CONSECUTIVE            major         52     52      +0       0       0 
+   COMPENSATOR_EXCESS_IN_RUN          major         54     54      +0       0       0 
+   COMPENSATOR_VERTICAL_STRIP         major         26     26      +0       0       0 
+   COVERAGE_GAP_IN_ROW                major        637    590     -47      54     101 
+   COVERAGE_MISSING_ROW               critical      94    111     +17      26       9 <- chave fraca
+   COVERAGE_ROW_MOSTLY_EMPTY          critical     120    143     +23      38      15 <- chave fraca
+   JUNCTION_HALF_BLOCK_ADJACENT       major        259    259      +0       0       0 
+   JUNCTION_MISSING_BINDING           critical     365    414     +49      82      33 
+   JUNCTION_NOT_ALTERNATING           major          9      9      +0       0       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         21     21      +0       0       0 <- chave fraca
+   OPENING_MISSING_LINTEL             major         57     45     -12       2      14 <- chave fraca
+   POSITION_OVERLAP                   critical       1      1      +0       0       0 
+   PRISM_CONTINUOUS_JOINT             critical     125    125      +0       0       0 
+   PRISM_JOINT_STACK                  major          8      8      +0       0       0 
+   PRISM_STAGGER_BELOW_TARGET         minor        101    101      +0       0       0 
+-- JUNCTION_MISSING_BINDING nas TRES unidades de avaliacao
+   por INDICE ORDINAL de fiada (validador de hoje): R=365 C=414  (+49)
+   por ELEVACAO FISICA:                             R=337 C=332  (-5)
+   ESTRITA (cota em >=2 paredes do no'):            R=82 C=92  (+10)
+      identidades estritas NOVAS: 10   SUMIDAS: 0
+      dessas NOVAS, em no' que NAO existia em STATE_R: 10
+-- FALHA VERTICAL DE AMARRACAO no eixo do no' (todas as pecas do no')
+   nos avaliaveis: R=143 C=157 | nos NOVOS=15 SUMIDOS=1
+   nos presentes NOS DOIS que PIORARAM:   0   <- so' isto seria defeito novo
+   nos presentes NOS DOIS que MELHORARAM: 8
+-- SOLVER  IN_R x STATE_R -> IN_C x STATE_C   (identidade fisica)
+   COMPENSATOR_AVOIDABLE              minor         87    104     +17      28      11 <- chave fraca
+   COMPENSATOR_CONSECUTIVE            major       1466   1410     -56     148     204 
+   COMPENSATOR_EXCESS_IN_RUN          major       1128   1134      +6     153     147 
+   COMPENSATOR_VERTICAL_STRIP         major        187    182      -5      31      36 
+   COVERAGE_GAP_IN_ROW                major        304    182    -122       0     122 
+   COVERAGE_ROW_MOSTLY_EMPTY          critical      14      0     -14       0      14 <- chave fraca
+   JUNCTION_MISSING_BINDING           critical       9      9      +0       0       0 
+   JUNCTION_NOT_ALTERNATING           major          0     16     +16      16       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         21     21      +0       0       0 <- chave fraca
+   POSITION_OVERLAP                   critical      18      9      -9       0       9 
+   PRISM_CONTINUOUS_JOINT             critical     286    244     -42      28      70 
+   PRISM_JOINT_STACK                  major         18     15      -3       1       4 
+   PRISM_STAGGER_BELOW_TARGET         minor       1444   1545    +101     486     385 
+   COVERAGE_GAP_IN_ROW em CENTIMETROS: {'cm_so_antes': 15586.9, 'cm_so_depois_NOVO': 0.0, 'cm_nos_dois': 2520.8}
+   POSITION_OVERLAP pela coordenada dos blocos: R=18 C=9 novas=0 sumidas=9 preservadas=9
+
+escrito: /home/user/MeuBotao.pushbutton/nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_b_reconciliation/evidence/reconciliation_physical_identity.json
