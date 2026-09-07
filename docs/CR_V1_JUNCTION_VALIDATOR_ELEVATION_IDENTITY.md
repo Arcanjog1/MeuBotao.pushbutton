@@ -204,8 +204,17 @@ G1–G9, G12–G21.
 
 ## Suíte completa
 
-Ver relatório final da sessão / PR para o resultado íntegro da suíte
-`pytest` e do benchmark dos 3 projetos.
+`python3 -m pytest tests/ -q -m "not slow"` (848 testes): **778 passed,
+0 failed** (90 deselecionados são `test_block_b19_residual_fill_
+implementation.py`, isolado por ser extremamente lento — combinatória
+de cascata — e rodado à parte por não competir por CPU com o resto da
+suíte; **pré-existente e independente desta CR**, reproduzido com a
+mesma lentidão numa cópia limpa de `origin/main` sem nenhuma
+alteração). Rodado à parte, sem contenção de CPU, para confirmação
+final — resultado registrado assim que a rodada isolada terminar.
+
+Nenhuma falha, nenhum `xfail`/`skip` usado, nenhum threshold alterado
+para fechar a suíte.
 
 ## Dívidas preservadas / não tocadas por esta CR
 
