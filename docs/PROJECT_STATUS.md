@@ -92,7 +92,80 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   `PRISM_*` sobem nos trechos recem-destravados. Determinismo (4 seeds) e
   invariancia identicos ao pre-existente. `baseline.json`/`reference.json`
   intocados. Relatorio: `docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md`.
-  **Aguarda revisao independente; sem monitoramento automatico.**
+  **Revisao independente concluida** (`docs/C04_INDEPENDENT_FINAL_REVIEW.md`,
+  branch `claude/c04-review-next-cr-prep-wc77d7`): veredito
+  **APPROVE_WITH_EXPLICIT_CONDITIONS** - NAO e' `APPROVE_FOR_MERGE`. Faltam
+  DUAS decisoes explicitas do usuario (C1 e C2 abaixo) e ficam registradas
+  DUAS dividas tecnicas (C3 e C4 abaixo). **Aguarda decisao do usuario; sem
+  monitoramento automatico.**
+
+  - **C1 - PENDENTE DE DECISAO DO USUARIO.** Regressao real de composicao
+    no TGD: a categoria `compensators` sai de **815 achados na `main` de
+    hoje** para **1083** com o C04, ultrapassando o baseline congelado
+    (950). O teste `tests/regression/test_benchmark_baselines.py`
+    **passa** em STATE_A e **falha** em STATE_C - portanto NAO e' artefato
+    nem falha pre-existente. Causa medida: o C04 preenche trechos que a
+    `main` deixava vazios, e em parte deles o solver monta uma composicao
+    PIOR que a humana (medido: humano `W016` f0 usa **um B19** em 15-34;
+    o solver usa **C09+C04** e para 5cm antes). Nao regravar `baseline.json`
+    para esconder isso.
+  - **C2 - PENDENTE DE DECISAO DO USUARIO.** Saldo critico do TP1 piora:
+    **469 -> 485** (`+16`), motor `PRISM_CONTINUOUS_JOINT` **256 -> 290**
+    (`+34`). Verificado por instancia que **50 de 50** dos prismas novos
+    aparecem onde pelo menos uma das duas fiadas nao tinha material nenhum
+    em STATE_A (`EXPECTED_EXPOSURE` testado, nao assumido) - mas
+    `EXPECTED_EXPOSURE` **nao** e' sinonimo de `ACCEPTABLE` nem de
+    `RESOLVED`: sao 34 juntas continuas fisicas reais no resultado final.
+  - **C3 - DIVIDA REGISTRADA: ramo overconservative da guarda fisica
+    (W087).** A guarda disparou **1205** vezes no corpus, estratificadas
+    pelo tipo real de fronteira: **952 em jamba de abertura real**
+    (`PHYSICALLY_REQUIRED_GUARD`, junta ZERO por contrato), **138 na
+    familia `W087` `[85.242, 94.0]`** (`OVERCONSERVATIVE_GUARD`
+    demonstrado) e **115 em outras fronteiras de fim de regiao**
+    (`INCONCLUSIVE` - a folga fisica nao foi verificada). Nao classificar
+    os 1205 como "todos fisicamente necessarios". No caso `W087` a guarda
+    troca um `C09` por um `C04`; o `C09` removido teria **0,758cm de folga
+    fisica** ate' a peca de amarracao de `W106` (`T_binding`, mesma fiada)
+    - a reserva de no' e' real e ocupada, mas a guarda e' conservadora
+    demais ali, porque trata `hi` como fronteira sem folga quando existe
+    1,00cm de junta ate' a perpendicular. Custo: **5 vazios** reportados
+    (`W087` fiadas 7-11). **NAO resolvido.** Fix minimo ja' especificado e
+    **nao implementado**: expor em `region_solid_subsegments` a folga
+    fisica real alem de `hi` (ex. `trailing_slack_cm`, derivada da proxima
+    ocupacao fisica real e do contrato de junta) e a guarda usar
+    `max(PIER_PHYSICAL_FIT_TOLERANCE_CM, trailing_slack_cm)`; em jamba de
+    abertura `trailing_slack_cm = 0`, entao as 952 fronteiras criticas
+    ficam identicas. Toca `nuvem/core/engine/continuous_modulation.py`,
+    **fora** do escopo autorizado do C04: exige CR propria, STATE_A/B
+    proprios, revalidacao das 41 e um teste de contrato entre os dois
+    modulos. Proibido nesta CR: aumentar tolerancia global, usar folga
+    presumida ou criar excecao por `W087`/`wall_id`.
+  - **C4 - DIVIDA REGISTRADA: escopo GLOBAL da tolerancia x escopo LOCAL
+    da guarda.** `PIER_FIT_TOLERANCE_CM` (0,30cm) foi aplicada em
+    `_pier_remaining_snapped_cm`, que e' um mecanismo de composicao
+    **global**; a guarda fisica foi aplicada em **um unico ponto de
+    chamada**, `_solve_repair_subsegments`. `_pier_ordered_layout` e'
+    chamado sem a guarda em outros pontos (l. 4160, 4263, 4290, 4693,
+    4713). A revisao independente **nao encontrou escape estrutural novo
+    no corpus atual** (`OPENING_BLOCK_CROSSES_JAMB` e `POSITION_OVERLAP`
+    restaurados por identidade geometrica, 0 novas), e por isso **nao e'
+    bug comprovado**; mas ausencia de regressao no corpus **nao e' prova
+    universal**. Verificacao futura exigida: todos os call sites, tipo de
+    fronteira, juntas de contorno, contrato de `region_solid_subsegments`,
+    colocacao fisica, reversao de orientacao, protecao de abertura e
+    protecao de reserva de no'. **Nao generalizar a guarda nesta
+    integracao.**
+  - **C5 - PRESERVADO.** `baseline.json`, `reference.json`,
+    `reference_score.json` e `input.json` **intocados** pelo PR; nenhum
+    threshold de regressao alterado; nenhum teste excluido, marcado
+    `xfail` ou `skip`. As **2 falhas** da suite completa em STATE_C sao o
+    guard-rail `tests/regression/test_benchmark_baselines.py` e ficam
+    visiveis de proposito: (a) TGD `compensators` - **regressao real
+    causada pelo C04** (C1); (b) TP1 `JUNCTION_MISSING_BINDING` 8->9 -
+    **`REAL_SOLVER_DEFECT` pre-existente**, ja' presente em STATE_A (a
+    suite da `main` sem C04 falha com a mensagem literalmente identica);
+    o C04 nao o introduz nem o agrava. As duas nao podem ser somadas na
+    mesma frase: a primeira e' custo deste PR, a segunda nao.
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
@@ -158,6 +231,31 @@ não é append-only).
 - **Teste visual INTEGRADO completo no Revit** (extração → paredes
   criadas → inspeção visual) — adiado por decisão do usuário; retomar
   quando priorizado.
+
+- **Guarda fisica do C04 - ramo overconservative em fim de regiao**
+  (C3 acima, `docs/C04_INDEPENDENT_FINAL_REVIEW.md` 8.3/8.5) - 138
+  disparos da familia `W087` sao conservadores demais; 115 disparos em
+  outras fronteiras de fim de regiao seguem **inconclusivos**. Fix minimo
+  especificado (`trailing_slack_cm` em `region_solid_subsegments`),
+  **nao implementado**, fora do escopo do C04.
+- **Assimetria escopo global/local da tolerancia de fit** (C4 acima) -
+  `PIER_FIT_TOLERANCE_CM` e' global, a guarda e' local a
+  `_solve_repair_subsegments`; outros call sites de
+  `_pier_ordered_layout` nao passam pela guarda. Sem contraexemplo no
+  corpus atual; divida arquitetural aberta, nao bug comprovado.
+- **Metrica `OPENING_BLOCK_CROSSES_JAMB` em valor ABSOLUTO nao e'
+  confiavel** - rodando os validadores sobre o PROPRIO gabarito humano:
+  TGD **208**, TP1 **209**, com **195 ocorrencias de exatamente 15,0cm**
+  nos dois projetos. Assinatura de artefato de reconstrucao do
+  benchmark. So' o **delta por identidade geometrica** (o solver contra
+  ele mesmo) e' valido hoje - foi assim que a revisao do C04 usou o
+  gate. CR de benchmark proposta: `BENCH-OPENING-RECONSTRUCTION`.
+
+**Nenhuma divida registrada aqui equivale a autorizacao para pioras
+futuras.** Registrar C1-C4 documenta o custo conhecido de UMA integracao
+especifica; nao cria licenca para novas regressoes de composicao, de
+amarracao ou de cobertura em CRs seguintes, nem dispensa os hard gates
+por identidade geometrica.
 
 Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 
