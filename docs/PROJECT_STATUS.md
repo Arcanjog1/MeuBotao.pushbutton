@@ -11,13 +11,18 @@
 
 ```
 branch: main
-SHA:    3ebcd9b63875f9114a3d6223aa648e5075e2d35b
+SHA:    62ea7f26b9fb8af72c960b04d08f7b58cd115114
 ```
 
-Último marco de PRODUÇÃO: `PR #19` / `CR-BLOCK-B19-RESIDUAL-FILL-
-IMPLEMENTATION` — **mesclado** (a `main` avançou de `209695d` para
-`3ebcd9b`; ver "Estado oficial do solver" abaixo). Antes dele, `PR #18` /
-`CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY`. Histórico anterior completo:
+Último marco de PRODUÇÃO: `PR #22` / `CR-BENCH-OPENING-RECONSTRUCTION-A` —
+**mesclado** (merge commit `62ea7f26b9fb8af72c960b04d08f7b58cd115114`, pais
+`3f293d1433e8c16eb186959e33a345b60ac944f9` + HEAD aprovado
+`2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff`; ver "Estado oficial do solver"
+abaixo). A entrada de `PR #19` logo abaixo (`3ebcd9b`) está desatualizada
+quanto ao SHA de `main` — `main` já continha `PR #20` /
+`CR-BLOCK-FIT-TOLERANCE-C04` (`3f293d1`) antes deste merge; corrigir a
+cadeia completa fica fora do escopo desta atualização (só registra o
+merge do `PR #22`). Histórico anterior completo:
 `docs/PROJECT_STATUS_LOG.md`.
 
 ## Estado oficial do solver
@@ -168,8 +173,11 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
     mesma frase: a primeira e' custo deste PR, a segunda nao.
 
 - **CR-BENCH-OPENING-RECONSTRUCTION-A** (branch
-  `claude/opening-detector-root-fix-m21hfm`, `PR #22` **DRAFT, não
-  mergeado**) — `nuvem/core/engine/opening_audit.py::detect_wall_
+  `claude/opening-detector-root-fix-m21hfm`, `PR #22` **MESCLADO** — merge
+  commit `62ea7f26b9fb8af72c960b04d08f7b58cd115114`, autorizado
+  explicitamente pelo usuário após a revisão independente e a aplicação de
+  todas as condições, aceitando SÓ NESTA CR os quatro deslocamentos de
+  0,06cm abaixo) — `nuvem/core/engine/opening_audit.py::detect_wall_
   openings_from_courses` respondia duas perguntas diferentes com o mesmo
   número: a tolerância de identidade (`OPENING_RUN_EDGE_MATCH_TOLERANCE_CM`,
   ~15cm) decide se o vazio de duas fiadas é a MESMA abertura, mas a
@@ -184,9 +192,9 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   real (revisão independente corrigiu overclaim de vocabulário no código e
   na doc). Diff de produção: 1 arquivo, só docstring/comentário desde a
   revisão (nenhuma linha executável mudou — AST idêntica antes/depois,
-  ignorando docstrings). HEAD de produção `f885081a0587a4d3f1cdd2092b557f
-  930c14003d` corresponde ao HEAD revisado pela revisão independente
-  (mesmo commit). 44 testes focados
+  ignorando docstrings, reconfirmado pós-merge contra a nova `main`). HEAD
+  de produção mesclado `2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff`
+  corresponde ao HEAD revisado pela revisão independente. 44 testes focados
   (`tests/test_opening_reconstruction_cr_a.py`) passando; última suíte
   completa (medida antes da revisão, sem efeito no diff documental
   posterior): **871 passed / 2 failed** — as 2 falhas são as mesmas
@@ -202,17 +210,25 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   seção 10.9 (só adição). Relatórios:
   `docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md` e
   `docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md` (veredito
-  **APPROVE_WITH_EXPLICIT_CONDITIONS**, condições já aplicadas). **NÃO
-  integrada à `main`** até merge autorizado. Pendências declaradas, **não
-  resolvidas nesta CR**: `CR-BENCH-OPENING-RECONSTRUCTION-B` (decisão
-  humana entre "abertura estreita" e "duas paredes separadas" para os 19
-  casos por projeto com assinatura de 15cm) **não iniciada**; família de
-  0,11–0,12cm de coordenada fracionária (causa é a extração, não o
-  detector) **não resolvida**; guard defensivo de `INCONCLUSIVE` em
+  **APPROVE_WITH_EXPLICIT_CONDITIONS**, condições já aplicadas).
+  **Mesclada à `main` com autorização explícita do usuário** (merge normal,
+  sem squash/rebase; commit `62ea7f26b9fb8af72c960b04d08f7b58cd115114`).
+  Autorização cobriu, só para esta CR, os 4 deslocamentos de 0,06cm acima —
+  **não** cria tolerância geral de 0,06cm, **não** altera abertura medida
+  do Revit, **não** trata geometria reconstruída como jamba física
+  confirmada. Pendências declaradas, **não resolvidas por este merge**:
+  `CR-BENCH-OPENING-RECONSTRUCTION-B` (decisão humana entre "abertura
+  estreita" e "duas paredes separadas" para os 19 casos por projeto com
+  assinatura de 15cm) **não iniciada**; família de 0,11–0,12cm de
+  coordenada fracionária (causa é a extração, não o detector) **não
+  resolvida**; guard defensivo de `INCONCLUSIVE` em
   `audit_existing_masonry_openings` **registrado, não implementado**
   (mudaria comportamento de produção). `baseline.json`/`reference.json`/
   `reference_score.json`/`input.json` intocados; nenhum threshold, `skip`
-  ou `xfail` alterado.
+  ou `xfail` alterado. **Ganho de métrica projetado pela CR-B (`CROSS_JAMB`
+  168→0, críticos 485→327) NÃO é ganho integrado** — o solver com gabarito
+  congelado permanece com delta ZERO nesta CR-A; só se materializa se/quando
+  a CR-B regravar o gabarito.
 
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
