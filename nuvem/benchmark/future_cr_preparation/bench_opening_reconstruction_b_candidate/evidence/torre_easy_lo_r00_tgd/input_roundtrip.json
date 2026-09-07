@@ -1,0 +1,7254 @@
+{
+ "catalog": {
+  "B19": {
+   "code": "B19",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 19.0,
+   "type_names": [
+    "MEIO BLOCO - 14x19x19",
+    "MEIO BLOCO - 14x19x19  - VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "B19_C": {
+   "code": "B19_C",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 19.0,
+   "type_names": [
+    "MEIO BLOCO CORTADO - 14x9x19",
+    "MEIO BLOCO CORTADO - 14x9x19 - VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "B34": {
+   "code": "B34",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": true,
+   "length_cm": 34.0,
+   "type_names": [
+    "BLOCO 34 - 14x19x34",
+    "VEDA??O - 14x19x34 - BLOCO 34"
+   ],
+   "width_cm": 14.0
+  },
+  "B34_C": {
+   "code": "B34_C",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 34.0,
+   "type_names": [
+    "BLOCO 34 CORTADO - 14x9x34",
+    "BLOCO 34 CORTADO - 14x9x34 - VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "B39": {
+   "code": "B39",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 39.0,
+   "type_names": [
+    "BLOCO INTEIRO - 14x19x39",
+    "VEDA??O 14x19x39 - BLOCO INTEIRO"
+   ],
+   "width_cm": 14.0
+  },
+  "B39_C": {
+   "code": "B39_C",
+   "count": 0,
+   "height_cm": 9.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 39.0,
+   "type_names": [
+    "BLOCO INTEIRO CORTADO - 14x9x39",
+    "BLOCO INTEIRO CORTADO - 14x9x39 - VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "B54": {
+   "code": "B54",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": true,
+   "length_cm": 54.0,
+   "type_names": [
+    "BLOCO 54 - 14x19x54"
+   ],
+   "width_cm": 14.0
+  },
+  "B54_C": {
+   "code": "B54_C",
+   "count": 0,
+   "height_cm": 9.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 54.0,
+   "type_names": [
+    "BLOCO 54 CORTADO - 14x9x54",
+    "BLOCO 54 CORTADO - 14x9x54 VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "C04": {
+   "code": "C04",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": true,
+   "is_special_bond": false,
+   "length_cm": 4.0,
+   "type_names": [
+    "PASTILHA - 14x19X4",
+    "PASTILHA CORTADA- 14x9X4",
+    "PASTILHA - 14x19X4 - VEDA??O",
+    "PASTILHA CORTADA VEDA??O- 14x9X4"
+   ],
+   "width_cm": 14.0
+  },
+  "C09": {
+   "code": "C09",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": true,
+   "is_special_bond": false,
+   "length_cm": 9.0,
+   "type_names": [
+    "COMPENSADOR 14x19x9",
+    "COMPENSADOR 14x19x9 (deitado)",
+    "COMPENSADOR 14x19x9 - VEDA??O"
+   ],
+   "width_cm": 14.0
+  },
+  "C09_C": {
+   "code": "C09_C",
+   "count": 0,
+   "height_cm": null,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 9.0,
+   "type_names": [
+    "COMPENSADOR CORTADO - 14xVARx9"
+   ],
+   "width_cm": 14.0
+  },
+  "CAN34": {
+   "code": "CAN34",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 34.0,
+   "type_names": [
+    "CANALETA 34 - 14x19x34"
+   ],
+   "width_cm": 14.0
+  },
+  "CAN39": {
+   "code": "CAN39",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 39.0,
+   "type_names": [
+    "CANALETA INTEIRA - 14x19x39"
+   ],
+   "width_cm": 14.0
+  },
+  "CJ19": {
+   "code": "CJ19",
+   "count": 0,
+   "height_cm": 29.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 19.0,
+   "type_names": [
+    "CANALETA J - 14x19-29x19",
+    "CANALETA J - 14x9-19x19"
+   ],
+   "width_cm": 14.0
+  },
+  "CM19": {
+   "code": "CM19",
+   "count": 0,
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 19.0,
+   "type_names": [
+    "MEIA CANALETA - 14x19x19"
+   ],
+   "width_cm": 14.0
+  }
+ },
+ "metadata": {
+  "blocks_placed": 12508,
+  "candidate_state": "STATE_R",
+  "derived_from": "reference.json",
+  "document": null,
+  "document_filename": "TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt",
+  "document_path": null,
+  "dump_warnings": [],
+  "extracted_instances": 12508,
+  "frame": "INPUT",
+  "level": "04. TGD",
+  "level_filter": null,
+  "off_grid_blocks": 362,
+  "openings_source": "reconstructed_from_blocks",
+  "orphan_blocks": 0,
+  "source_kind": "projeto entregue e aprovado, modulado por pessoa",
+  "walls_source": "reconstructed_from_blocks"
+ },
+ "orphan_blocks": [],
+ "project_id": "torre_easy_lo_r00_tgd",
+ "schema_version": 2,
+ "settings": {
+  "base_z_cm": 0.0,
+  "course_step_cm": 20.0,
+  "expected_rows": 17,
+  "num_courses": 17,
+  "walls_already_extended": true
+ },
+ "source": "input",
+ "walls": [
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1871.487,
+    -145.952
+   ],
+   "height_cm": 260.0,
+   "id": "W001",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -1878.487,
+      -562.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      9
+     ],
+     "point_cm": [
+      -1878.487,
+      -307.952
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      14
+     ],
+     "point_cm": [
+      -1878.487,
+      -152.952
+     ],
+     "t_cm": 417.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1871.5,-570.0|-1871.5,-146.0|t14.0",
+   "length_cm": 424.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 80.0,
+     "id": "W001-O01",
+     "key": "W|-1871.5,-570.0|-1871.5,-146.0|t14.0|O|309.0-380.0|s160.0",
+     "kind": "window",
+     "sill_cm": 160.0,
+     "source_element_id": null,
+     "t_end_cm": 380.0,
+     "t_start_cm": 309.0,
+     "width_cm": 71.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1871.487,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1486.487,
+    -300.952
+   ],
+   "height_cm": 260.0,
+   "id": "W002",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -1486.487,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      5
+     ],
+     "point_cm": [
+      -1493.487,
+      -427.952
+     ],
+     "t_cm": 142.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      9
+     ],
+     "point_cm": [
+      -1479.487,
+      -307.952
+     ],
+     "t_cm": 262.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1486.5,-570.0|-1486.5,-301.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1486.487,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1071.487,
+    774.048
+   ],
+   "height_cm": 281.0,
+   "id": "W003",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -1071.487,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      20
+     ],
+     "point_cm": [
+      -1064.487,
+      -67.952
+     ],
+     "t_cm": 502.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      22
+     ],
+     "point_cm": [
+      -1078.487,
+      17.048
+     ],
+     "t_cm": 587.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      25
+     ],
+     "point_cm": [
+      -1078.487,
+      187.048
+     ],
+     "t_cm": 757.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      28
+     ],
+     "point_cm": [
+      -1064.487,
+      272.048
+     ],
+     "t_cm": 842.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -1071.487,
+      774.048
+     ],
+     "t_cm": 1344.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1071.5,-570.0|-1071.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W003-O01",
+     "key": "W|-1071.5,-570.0|-1071.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1071.487,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -656.487,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W004",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -656.487,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      5
+     ],
+     "point_cm": [
+      -649.497,
+      -427.952
+     ],
+     "t_cm": 142.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      12
+     ],
+     "point_cm": [
+      -663.487,
+      -252.952
+     ],
+     "t_cm": 317.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      16
+     ],
+     "point_cm": [
+      -663.487,
+      -137.952
+     ],
+     "t_cm": 432.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      33
+     ],
+     "point_cm": [
+      -663.487,
+      342.048
+     ],
+     "t_cm": 912.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      38
+     ],
+     "point_cm": [
+      -663.487,
+      457.048
+     ],
+     "t_cm": 1027.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      46
+     ],
+     "point_cm": [
+      -649.497,
+      632.048
+     ],
+     "t_cm": 1202.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -656.487,
+      774.048
+     ],
+     "t_cm": 1344.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-656.5,-570.0|-656.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W004-O01",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|324.0-425.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 425.0,
+     "t_start_cm": 324.0,
+     "width_cm": 101.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W004-O02",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W004-O03",
+     "key": "W|-656.5,-570.0|-656.5,774.0|t14.0|O|919.0-1020.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1020.0,
+     "t_start_cm": 919.0,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -656.487,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -401.487,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W005",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -394.487,
+      -562.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      7
+     ],
+     "point_cm": [
+      -408.487,
+      -357.942
+     ],
+     "t_cm": 212.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      12
+     ],
+     "point_cm": [
+      -394.487,
+      -252.952
+     ],
+     "t_cm": 317.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      16
+     ],
+     "point_cm": [
+      -394.487,
+      -137.952
+     ],
+     "t_cm": 432.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      18
+     ],
+     "point_cm": [
+      -408.487,
+      -77.952
+     ],
+     "t_cm": 492.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      31
+     ],
+     "point_cm": [
+      -408.487,
+      282.048
+     ],
+     "t_cm": 852.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      33
+     ],
+     "point_cm": [
+      -394.487,
+      342.048
+     ],
+     "t_cm": 912.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      38
+     ],
+     "point_cm": [
+      -394.487,
+      457.048
+     ],
+     "t_cm": 1027.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      44
+     ],
+     "point_cm": [
+      -408.487,
+      562.048
+     ],
+     "t_cm": 1132.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -394.487,
+      767.048
+     ],
+     "t_cm": 1337.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-401.5,-570.0|-401.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W005-O01",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|324.0-425.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 425.0,
+     "t_start_cm": 324.0,
+     "width_cm": 101.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 140.0,
+     "height_cm": 140.0,
+     "id": "W005-O02",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W005-O03",
+     "key": "W|-401.5,-570.0|-401.5,774.0|t14.0|O|919.0-1020.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1020.0,
+     "t_start_cm": 919.0,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -401.487,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    593.503,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W006",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      586.503,
+      -562.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      8
+     ],
+     "point_cm": [
+      600.503,
+      -357.942
+     ],
+     "t_cm": 212.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      13
+     ],
+     "point_cm": [
+      586.503,
+      -252.952
+     ],
+     "t_cm": 317.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      17
+     ],
+     "point_cm": [
+      586.503,
+      -137.952
+     ],
+     "t_cm": 432.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      19
+     ],
+     "point_cm": [
+      600.503,
+      -77.952
+     ],
+     "t_cm": 492.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      32
+     ],
+     "point_cm": [
+      600.503,
+      282.048
+     ],
+     "t_cm": 852.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      34
+     ],
+     "point_cm": [
+      586.503,
+      342.048
+     ],
+     "t_cm": 912.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      39
+     ],
+     "point_cm": [
+      586.503,
+      457.048
+     ],
+     "t_cm": 1027.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      45
+     ],
+     "point_cm": [
+      600.503,
+      562.048
+     ],
+     "t_cm": 1132.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      586.503,
+      767.048
+     ],
+     "t_cm": 1337.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|593.5,-570.0|593.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W006-O01",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|324.0-425.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 425.0,
+     "t_start_cm": 324.0,
+     "width_cm": 101.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 140.0,
+     "height_cm": 140.0,
+     "id": "W006-O02",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W006-O03",
+     "key": "W|593.5,-570.0|593.5,774.0|t14.0|O|919.0-1020.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1020.0,
+     "t_start_cm": 919.0,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    593.503,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    848.503,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W007",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      848.503,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      6
+     ],
+     "point_cm": [
+      841.513,
+      -427.952
+     ],
+     "t_cm": 142.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      13
+     ],
+     "point_cm": [
+      855.503,
+      -252.952
+     ],
+     "t_cm": 317.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      17
+     ],
+     "point_cm": [
+      855.503,
+      -137.952
+     ],
+     "t_cm": 432.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      34
+     ],
+     "point_cm": [
+      855.503,
+      342.048
+     ],
+     "t_cm": 912.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      39
+     ],
+     "point_cm": [
+      855.503,
+      457.048
+     ],
+     "t_cm": 1027.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      47
+     ],
+     "point_cm": [
+      841.513,
+      632.048
+     ],
+     "t_cm": 1202.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      848.503,
+      774.048
+     ],
+     "t_cm": 1344.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|848.5,-570.0|848.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W007-O01",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|324.0-425.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 425.0,
+     "t_start_cm": 324.0,
+     "width_cm": 101.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W007-O02",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 240.0,
+     "id": "W007-O03",
+     "key": "W|848.5,-570.0|848.5,774.0|t14.0|O|919.0-1020.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1020.0,
+     "t_start_cm": 919.0,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    848.503,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1263.503,
+    774.048
+   ],
+   "height_cm": 281.0,
+   "id": "W008",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      1263.503,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      21
+     ],
+     "point_cm": [
+      1256.503,
+      -67.952
+     ],
+     "t_cm": 502.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      22
+     ],
+     "point_cm": [
+      1270.503,
+      17.048
+     ],
+     "t_cm": 587.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      26
+     ],
+     "point_cm": [
+      1270.503,
+      187.048
+     ],
+     "t_cm": 757.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      30
+     ],
+     "point_cm": [
+      1256.503,
+      272.048
+     ],
+     "t_cm": 842.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      1263.503,
+      774.048
+     ],
+     "t_cm": 1344.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1263.5,-570.0|1263.5,774.0|t14.0",
+   "length_cm": 1344.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W008-O01",
+     "key": "W|1263.5,-570.0|1263.5,774.0|t14.0|O|594.0-750.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 750.0,
+     "t_start_cm": 594.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1263.503,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1678.503,
+    -300.952
+   ],
+   "height_cm": 260.0,
+   "id": "W009",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      1678.503,
+      -569.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      6
+     ],
+     "point_cm": [
+      1685.503,
+      -427.952
+     ],
+     "t_cm": 142.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      10
+     ],
+     "point_cm": [
+      1671.503,
+      -307.952
+     ],
+     "t_cm": 262.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1678.5,-570.0|1678.5,-301.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1678.503,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2063.503,
+    -145.952
+   ],
+   "height_cm": 260.0,
+   "id": "W010",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      2070.503,
+      -562.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      10
+     ],
+     "point_cm": [
+      2070.383,
+      -307.952
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      15
+     ],
+     "point_cm": [
+      2070.493,
+      -152.952
+     ],
+     "t_cm": 417.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|2063.5,-570.0|2063.5,-146.0|t14.0",
+   "length_cm": 424.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 80.0,
+     "id": "W010-O01",
+     "key": "W|2063.5,-570.0|2063.5,-146.0|t14.0|O|309.0-380.0|s160.0",
+     "kind": "window",
+     "sill_cm": 160.0,
+     "source_element_id": null,
+     "t_end_cm": 380.0,
+     "t_start_cm": 309.0,
+     "width_cm": 71.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    2063.503,
+    -569.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    -562.952
+   ],
+   "height_cm": 281.0,
+   "id": "W011",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      95
+     ],
+     "point_cm": [
+      -1878.487,
+      -562.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      89
+     ],
+     "point_cm": [
+      -1486.487,
+      -569.952
+     ],
+     "t_cm": 392.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      86
+     ],
+     "point_cm": [
+      -1126.477,
+      -554.972
+     ],
+     "t_cm": 752.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1071.487,
+      -569.952
+     ],
+     "t_cm": 807.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      83
+     ],
+     "point_cm": [
+      -1016.477,
+      -554.972
+     ],
+     "t_cm": 862.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -656.487,
+      -569.952
+     ],
+     "t_cm": 1222.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      -562.952
+     ],
+     "t_cm": 1484.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0",
+   "length_cm": 1484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W011-O01",
+     "key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0|O|124.0-255.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 255.0,
+     "t_start_cm": 124.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W011-O02",
+     "key": "W|-1878.5,-563.0|-394.5,-563.0|t14.0|O|1279.0-1410.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 1410.0,
+     "t_start_cm": 1279.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    -562.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.503,
+    -562.952
+   ],
+   "height_cm": 281.0,
+   "id": "W012",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      -562.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      848.503,
+      -569.952
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      66
+     ],
+     "point_cm": [
+      1208.603,
+      -554.972
+     ],
+     "t_cm": 622.1,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1263.503,
+      -569.952
+     ],
+     "t_cm": 677.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      63
+     ],
+     "point_cm": [
+      1318.583,
+      -554.972
+     ],
+     "t_cm": 732.08,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      60
+     ],
+     "point_cm": [
+      1678.503,
+      -569.952
+     ],
+     "t_cm": 1092.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      54
+     ],
+     "point_cm": [
+      2070.503,
+      -562.952
+     ],
+     "t_cm": 1484.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|586.5,-563.0|2070.5,-563.0|t14.0",
+   "length_cm": 1484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W012-O01",
+     "key": "W|586.5,-563.0|2070.5,-563.0|t14.0|O|74.0-205.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 205.0,
+     "t_start_cm": 74.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W012-O02",
+     "key": "W|586.5,-563.0|2070.5,-563.0|t14.0|O|1229.0-1360.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 1360.0,
+     "t_start_cm": 1229.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    -562.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1126.477,
+    -500.972
+   ],
+   "height_cm": 281.0,
+   "id": "W013",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -1126.477,
+      -554.972
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      3
+     ],
+     "point_cm": [
+      -1133.477,
+      -507.972
+     ],
+     "t_cm": 47.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1126.5,-555.0|-1126.5,-501.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1126.477,
+    -554.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1016.477,
+    -500.972
+   ],
+   "height_cm": 281.0,
+   "id": "W014",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      0
+     ],
+     "point_cm": [
+      -1016.477,
+      -554.972
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      3
+     ],
+     "point_cm": [
+      -1009.497,
+      -507.972
+     ],
+     "t_cm": 47.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1016.5,-555.0|-1016.5,-501.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1016.477,
+    -554.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -146.487,
+    824.048
+   ],
+   "height_cm": 260.0,
+   "id": "W015",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      2
+     ],
+     "point_cm": [
+      -153.497,
+      -547.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      7
+     ],
+     "point_cm": [
+      -139.497,
+      -357.942
+     ],
+     "t_cm": 197.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      25
+     ],
+     "point_cm": [
+      -139.487,
+      187.048
+     ],
+     "t_cm": 742.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      29
+     ],
+     "point_cm": [
+      -153.487,
+      272.048
+     ],
+     "t_cm": 827.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      40
+     ],
+     "point_cm": [
+      -153.507,
+      472.048
+     ],
+     "t_cm": 1027.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      44
+     ],
+     "point_cm": [
+      -139.497,
+      562.048
+     ],
+     "t_cm": 1117.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      53
+     ],
+     "point_cm": [
+      -153.497,
+      817.048
+     ],
+     "t_cm": 1372.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-146.5,-555.0|-146.5,824.0|t14.0",
+   "length_cm": 1379.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W015-O01",
+     "key": "W|-146.5,-555.0|-146.5,824.0|t14.0|O|579.0-735.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 735.0,
+     "t_start_cm": 579.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -146.487,
+    -554.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    103.523,
+    24.048
+   ],
+   "height_cm": 220.0,
+   "id": "W016",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      2
+     ],
+     "point_cm": [
+      103.523,
+      -554.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      11
+     ],
+     "point_cm": [
+      96.513,
+      -267.952
+     ],
+     "t_cm": 287.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      22
+     ],
+     "point_cm": [
+      103.523,
+      24.048
+     ],
+     "t_cm": 579.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|103.5,-555.0|103.5,24.0|t14.0",
+   "length_cm": 579.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W016-O01",
+     "key": "W|103.5,-555.0|103.5,24.0|t14.0|O|34.0-260.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 260.0,
+     "t_start_cm": 34.0,
+     "width_cm": 226.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W016-O02",
+     "key": "W|103.5,-555.0|103.5,24.0|t14.0|O|314.0-545.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 545.0,
+     "t_start_cm": 314.0,
+     "width_cm": 231.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    103.523,
+    -554.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    338.523,
+    824.048
+   ],
+   "height_cm": 280.0,
+   "id": "W017",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      2
+     ],
+     "point_cm": [
+      345.503,
+      -547.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      8
+     ],
+     "point_cm": [
+      331.513,
+      -357.942
+     ],
+     "t_cm": 197.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      11
+     ],
+     "point_cm": [
+      345.513,
+      -267.952
+     ],
+     "t_cm": 287.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      26
+     ],
+     "point_cm": [
+      331.503,
+      187.048
+     ],
+     "t_cm": 742.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      27
+     ],
+     "point_cm": [
+      345.523,
+      237.048
+     ],
+     "t_cm": 792.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      37
+     ],
+     "point_cm": [
+      345.513,
+      382.048
+     ],
+     "t_cm": 937.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      43
+     ],
+     "point_cm": [
+      345.523,
+      527.048
+     ],
+     "t_cm": 1082.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      45
+     ],
+     "point_cm": [
+      331.513,
+      562.048
+     ],
+     "t_cm": 1117.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      53
+     ],
+     "point_cm": [
+      345.503,
+      817.048
+     ],
+     "t_cm": 1372.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|338.5,-555.0|338.5,824.0|t14.0",
+   "length_cm": 1379.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W017-O01",
+     "key": "W|338.5,-555.0|338.5,824.0|t14.0|O|579.0-735.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 735.0,
+     "t_start_cm": 579.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    338.523,
+    -554.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1208.603,
+    -500.972
+   ],
+   "height_cm": 281.0,
+   "id": "W018",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      1208.603,
+      -554.972
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      4
+     ],
+     "point_cm": [
+      1201.513,
+      -507.972
+     ],
+     "t_cm": 47.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1208.5,-555.0|1208.5,-501.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1208.603,
+    -554.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1318.583,
+    -500.972
+   ],
+   "height_cm": 281.0,
+   "id": "W019",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      1
+     ],
+     "point_cm": [
+      1318.583,
+      -554.972
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      4
+     ],
+     "point_cm": [
+      1325.483,
+      -507.972
+     ],
+     "t_cm": 47.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1318.5,-555.0|1318.5,-501.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1318.583,
+    -554.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.503,
+    -547.952
+   ],
+   "height_cm": 280.0,
+   "id": "W020",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -153.497,
+      -547.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      75
+     ],
+     "point_cm": [
+      103.523,
+      -554.952
+     ],
+     "t_cm": 257.02,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.503,
+      -547.952
+     ],
+     "t_cm": 499.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-153.5,-548.0|345.5,-548.0|t14.0",
+   "length_cm": 499.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W020-O01",
+     "key": "W|-153.5,-548.0|345.5,-548.0|t14.0|O|69.0-190.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 190.0,
+     "t_start_cm": 69.0,
+     "width_cm": 121.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -153.497,
+    -547.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1009.497,
+    -507.972
+   ],
+   "height_cm": 281.0,
+   "id": "W021",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      86
+     ],
+     "point_cm": [
+      -1133.477,
+      -507.972
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      83
+     ],
+     "point_cm": [
+      -1009.497,
+      -507.972
+     ],
+     "t_cm": 123.98,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1133.5,-508.0|-1009.5,-508.0|t14.0",
+   "length_cm": 123.98,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1133.477,
+    -507.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1325.483,
+    -507.972
+   ],
+   "height_cm": 281.0,
+   "id": "W022",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      66
+     ],
+     "point_cm": [
+      1201.513,
+      -507.972
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      63
+     ],
+     "point_cm": [
+      1325.483,
+      -507.972
+     ],
+     "t_cm": 123.97,
+     "type": "L"
+    }
+   ],
+   "key": "W|1201.5,-508.0|1325.5,-508.0|t14.0",
+   "length_cm": 123.97,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1201.513,
+    -507.972
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -649.497,
+    -427.952
+   ],
+   "height_cm": 260.0,
+   "id": "W023",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      89
+     ],
+     "point_cm": [
+      -1493.487,
+      -427.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -649.497,
+      -427.952
+     ],
+     "t_cm": 843.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1493.5,-428.0|-649.5,-428.0|t14.0",
+   "length_cm": 843.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W023-O01",
+     "key": "W|-1493.5,-428.0|-649.5,-428.0|t14.0|O|19.0-185.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 185.0,
+     "t_start_cm": 19.0,
+     "width_cm": 166.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W023-O02",
+     "key": "W|-1493.5,-428.0|-649.5,-428.0|t14.0|O|249.0-340.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 340.0,
+     "t_start_cm": 249.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W023-O03",
+     "key": "W|-1493.5,-428.0|-649.5,-428.0|t14.0|O|504.0-595.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 595.0,
+     "t_start_cm": 504.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W023-O04",
+     "key": "W|-1493.5,-428.0|-649.5,-428.0|t14.0|O|644.0-810.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 809.99,
+     "t_start_cm": 644.0,
+     "width_cm": 165.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1493.487,
+    -427.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1685.503,
+    -427.952
+   ],
+   "height_cm": 260.0,
+   "id": "W024",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      841.513,
+      -427.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      60
+     ],
+     "point_cm": [
+      1685.503,
+      -427.952
+     ],
+     "t_cm": 843.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|841.5,-428.0|1685.5,-428.0|t14.0",
+   "length_cm": 843.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W024-O01",
+     "key": "W|841.5,-428.0|1685.5,-428.0|t14.0|O|34.0-200.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 34.0,
+     "width_cm": 165.99
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W024-O02",
+     "key": "W|841.5,-428.0|1685.5,-428.0|t14.0|O|249.0-340.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 339.99,
+     "t_start_cm": 248.99,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W024-O03",
+     "key": "W|841.5,-428.0|1685.5,-428.0|t14.0|O|504.0-595.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 594.99,
+     "t_start_cm": 503.99,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W024-O04",
+     "key": "W|841.5,-428.0|1685.5,-428.0|t14.0|O|659.0-825.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 824.99,
+     "t_start_cm": 658.99,
+     "width_cm": 166.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    841.513,
+    -427.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -139.497,
+    -357.942
+   ],
+   "height_cm": 260.0,
+   "id": "W025",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -408.487,
+      -357.942
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -139.497,
+      -357.942
+     ],
+     "t_cm": 268.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|-408.5,-358.0|-139.5,-358.0|t14.0",
+   "length_cm": 268.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W025-O01",
+     "key": "W|-408.5,-358.0|-139.5,-358.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 69.0,
+     "width_cm": 130.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -408.487,
+    -357.942
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    600.503,
+    -357.942
+   ],
+   "height_cm": 260.0,
+   "id": "W026",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      331.513,
+      -357.942
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      600.503,
+      -357.942
+     ],
+     "t_cm": 268.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|331.5,-358.0|600.5,-358.0|t14.0",
+   "length_cm": 268.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W026-O01",
+     "key": "W|331.5,-358.0|600.5,-358.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 69.0,
+     "width_cm": 130.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    331.513,
+    -357.942
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1808.493,
+    -145.952
+   ],
+   "height_cm": 260.0,
+   "id": "W027",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      10
+     ],
+     "point_cm": [
+      1808.493,
+      -314.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      15
+     ],
+     "point_cm": [
+      1808.493,
+      -145.952
+     ],
+     "t_cm": 169.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1808.5,-315.0|1808.5,-146.0|t14.0",
+   "length_cm": 169.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W027-O01",
+     "key": "W|1808.5,-315.0|1808.5,-146.0|t14.0|O|54.0-145.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 145.0,
+     "t_start_cm": 54.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1808.493,
+    -314.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1479.487,
+    -307.952
+   ],
+   "height_cm": 260.0,
+   "id": "W028",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      95
+     ],
+     "point_cm": [
+      -1878.487,
+      -307.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      92
+     ],
+     "point_cm": [
+      -1616.487,
+      -299.952
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      89
+     ],
+     "point_cm": [
+      -1479.487,
+      -307.952
+     ],
+     "t_cm": 399.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,-308.0|-1479.5,-308.0|t14.0",
+   "length_cm": 399.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W028-O01",
+     "key": "W|-1878.5,-308.0|-1479.5,-308.0|t14.0|O|289.0-380.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 380.0,
+     "t_start_cm": 289.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    -307.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.383,
+    -307.952
+   ],
+   "height_cm": 260.0,
+   "id": "W029",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      60
+     ],
+     "point_cm": [
+      1671.503,
+      -307.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      57
+     ],
+     "point_cm": [
+      1808.493,
+      -314.952
+     ],
+     "t_cm": 136.99,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      54
+     ],
+     "point_cm": [
+      2070.383,
+      -307.952
+     ],
+     "t_cm": 398.88,
+     "type": "T"
+    }
+   ],
+   "key": "W|1671.5,-308.0|2070.5,-308.0|t14.0",
+   "length_cm": 398.88,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W029-O01",
+     "key": "W|1671.5,-308.0|2070.5,-308.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 109.88,
+     "t_start_cm": 19.0,
+     "width_cm": 90.88
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1671.503,
+    -307.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1616.487,
+    -145.942
+   ],
+   "height_cm": 260.0,
+   "id": "W030",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      9
+     ],
+     "point_cm": [
+      -1616.487,
+      -299.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      14
+     ],
+     "point_cm": [
+      -1616.487,
+      -145.942
+     ],
+     "t_cm": 154.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1616.5,-300.0|-1616.5,-146.0|t14.0",
+   "length_cm": 154.01,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W030-O01",
+     "key": "W|-1616.5,-300.0|-1616.5,-146.0|t14.0|O|39.0-130.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 130.0,
+     "t_start_cm": 39.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1616.487,
+    -299.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.513,
+    -267.952
+   ],
+   "height_cm": 280.0,
+   "id": "W031",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      75
+     ],
+     "point_cm": [
+      96.513,
+      -267.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.513,
+      -267.952
+     ],
+     "t_cm": 249.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|96.5,-268.0|345.5,-268.0|t14.0",
+   "length_cm": 249.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    96.513,
+    -267.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -526.487,
+    -130.952
+   ],
+   "height_cm": 260.0,
+   "id": "W032",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      12
+     ],
+     "point_cm": [
+      -526.487,
+      -259.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      16
+     ],
+     "point_cm": [
+      -526.487,
+      -130.952
+     ],
+     "t_cm": 129.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-526.5,-260.0|-526.5,-131.0|t14.0",
+   "length_cm": 129.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W032-O01",
+     "key": "W|-526.5,-260.0|-526.5,-131.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -526.487,
+    -259.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    718.513,
+    -130.952
+   ],
+   "height_cm": 260.0,
+   "id": "W033",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      13
+     ],
+     "point_cm": [
+      718.513,
+      -259.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      17
+     ],
+     "point_cm": [
+      718.513,
+      -130.952
+     ],
+     "t_cm": 129.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|718.5,-260.0|718.5,-131.0|t14.0",
+   "length_cm": 129.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W033-O01",
+     "key": "W|718.5,-260.0|718.5,-131.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    718.513,
+    -259.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    -252.952
+   ],
+   "height_cm": 260.0,
+   "id": "W034",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -663.487,
+      -252.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      80
+     ],
+     "point_cm": [
+      -526.487,
+      -259.952
+     ],
+     "t_cm": 137.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      -252.952
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-663.5,-253.0|-394.5,-253.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W034-O01",
+     "key": "W|-663.5,-253.0|-394.5,-253.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -663.487,
+    -252.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    855.503,
+    -252.952
+   ],
+   "height_cm": 260.0,
+   "id": "W035",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      -252.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      69
+     ],
+     "point_cm": [
+      718.513,
+      -259.952
+     ],
+     "t_cm": 132.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      855.503,
+      -252.952
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|586.5,-253.0|855.5,-253.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W035-O01",
+     "key": "W|586.5,-253.0|855.5,-253.0|t14.0|O|159.0-250.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 250.0,
+     "t_start_cm": 159.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    -252.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1806.487,
+    364.048
+   ],
+   "height_cm": 260.0,
+   "id": "W036",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      14
+     ],
+     "point_cm": [
+      -1806.487,
+      -159.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      35
+     ],
+     "point_cm": [
+      -1806.487,
+      364.048
+     ],
+     "t_cm": 524.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1806.5,-160.0|-1806.5,364.0|t14.0",
+   "length_cm": 524.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W036-O01",
+     "key": "W|-1806.5,-160.0|-1806.5,364.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 200.0,
+     "t_start_cm": 69.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W036-O02",
+     "key": "W|-1806.5,-160.0|-1806.5,364.0|t14.0|O|324.0-455.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 455.0,
+     "t_start_cm": 324.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1806.487,
+    -159.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1693.503,
+    364.048
+   ],
+   "height_cm": 260.0,
+   "id": "W037",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      15
+     ],
+     "point_cm": [
+      1686.493,
+      -152.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      36
+     ],
+     "point_cm": [
+      1686.493,
+      357.048
+     ],
+     "t_cm": 517.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1693.5,-160.0|1693.5,364.0|t14.0",
+   "length_cm": 524.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1693.503,
+    -159.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1998.503,
+    364.048
+   ],
+   "height_cm": 260.0,
+   "id": "W038",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      15
+     ],
+     "point_cm": [
+      1998.503,
+      -159.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      36
+     ],
+     "point_cm": [
+      1998.503,
+      364.048
+     ],
+     "t_cm": 524.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1998.5,-160.0|1998.5,364.0|t14.0",
+   "length_cm": 524.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W038-O01",
+     "key": "W|1998.5,-160.0|1998.5,364.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 200.0,
+     "t_start_cm": 69.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W038-O02",
+     "key": "W|1998.5,-160.0|1998.5,364.0|t14.0|O|324.0-455.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 455.0,
+     "t_start_cm": 324.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1998.503,
+    -159.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1494.487,
+    -152.952
+   ],
+   "height_cm": 260.0,
+   "id": "W039",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      95
+     ],
+     "point_cm": [
+      -1878.487,
+      -152.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      94
+     ],
+     "point_cm": [
+      -1806.487,
+      -159.952
+     ],
+     "t_cm": 72.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      92
+     ],
+     "point_cm": [
+      -1616.487,
+      -145.942
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      91
+     ],
+     "point_cm": [
+      -1494.487,
+      -152.952
+     ],
+     "t_cm": 384.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,-153.0|-1494.5,-153.0|t14.0",
+   "length_cm": 384.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W039-O01",
+     "key": "W|-1878.5,-153.0|-1494.5,-153.0|t14.0|O|274.0-365.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 365.0,
+     "t_start_cm": 274.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    -152.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.493,
+    -152.952
+   ],
+   "height_cm": 260.0,
+   "id": "W040",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      59
+     ],
+     "point_cm": [
+      1686.493,
+      -152.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      57
+     ],
+     "point_cm": [
+      1808.493,
+      -145.952
+     ],
+     "t_cm": 122.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      56
+     ],
+     "point_cm": [
+      1998.503,
+      -159.952
+     ],
+     "t_cm": 312.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      54
+     ],
+     "point_cm": [
+      2070.493,
+      -152.952
+     ],
+     "t_cm": 384.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1686.5,-153.0|2070.5,-153.0|t14.0",
+   "length_cm": 384.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W040-O01",
+     "key": "W|1686.5,-153.0|2070.5,-153.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1686.493,
+    -152.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1501.487,
+    364.048
+   ],
+   "height_cm": 260.0,
+   "id": "W041",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      14
+     ],
+     "point_cm": [
+      -1494.487,
+      -152.952
+     ],
+     "t_cm": -8.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      35
+     ],
+     "point_cm": [
+      -1494.487,
+      357.048
+     ],
+     "t_cm": 502.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1501.5,-145.0|-1501.5,364.0|t14.0",
+   "length_cm": 509.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1501.487,
+    -144.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1246.487,
+    344.048
+   ],
+   "height_cm": 260.0,
+   "id": "W042",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      -1246.487,
+      -139.952
+     ],
+     "t_cm": 0.0,
+     "type": "FREE_END"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      20
+     ],
+     "point_cm": [
+      -1253.487,
+      -67.952
+     ],
+     "t_cm": 72.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      23
+     ],
+     "point_cm": [
+      -1239.487,
+      102.048
+     ],
+     "t_cm": 242.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      28
+     ],
+     "point_cm": [
+      -1253.487,
+      272.048
+     ],
+     "t_cm": 412.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      -1246.487,
+      344.048
+     ],
+     "t_cm": 484.0,
+     "type": "FREE_END"
+    }
+   ],
+   "key": "W|-1246.5,-140.0|-1246.5,344.0|t14.0",
+   "length_cm": 484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W042-O01",
+     "key": "W|-1246.5,-140.0|-1246.5,344.0|t14.0|O|134.0-225.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 225.0,
+     "t_start_cm": 134.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W042-O02",
+     "key": "W|-1246.5,-140.0|-1246.5,344.0|t14.0|O|259.0-350.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 350.0,
+     "t_start_cm": 259.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1246.487,
+    -139.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1438.503,
+    344.048
+   ],
+   "height_cm": 260.0,
+   "id": "W043",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      1438.503,
+      -139.952
+     ],
+     "t_cm": 0.0,
+     "type": "FREE_END"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      21
+     ],
+     "point_cm": [
+      1445.503,
+      -67.952
+     ],
+     "t_cm": 72.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      24
+     ],
+     "point_cm": [
+      1431.503,
+      102.048
+     ],
+     "t_cm": 242.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      30
+     ],
+     "point_cm": [
+      1445.503,
+      272.048
+     ],
+     "t_cm": 412.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      1438.503,
+      344.048
+     ],
+     "t_cm": 484.0,
+     "type": "FREE_END"
+    }
+   ],
+   "key": "W|1438.5,-140.0|1438.5,344.0|t14.0",
+   "length_cm": 484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W043-O01",
+     "key": "W|1438.5,-140.0|1438.5,344.0|t14.0|O|134.0-225.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 225.0,
+     "t_start_cm": 134.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W043-O02",
+     "key": "W|1438.5,-140.0|1438.5,344.0|t14.0|O|259.0-350.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 350.0,
+     "t_start_cm": 259.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1438.503,
+    -139.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    -137.952
+   ],
+   "height_cm": 260.0,
+   "id": "W044",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -663.487,
+      -137.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      80
+     ],
+     "point_cm": [
+      -526.487,
+      -130.952
+     ],
+     "t_cm": 137.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      -137.952
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-663.5,-138.0|-394.5,-138.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W044-O01",
+     "key": "W|-663.5,-138.0|-394.5,-138.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -663.487,
+    -137.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    855.503,
+    -137.952
+   ],
+   "height_cm": 260.0,
+   "id": "W045",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      -137.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      69
+     ],
+     "point_cm": [
+      718.513,
+      -130.952
+     ],
+     "t_cm": 132.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      855.503,
+      -137.952
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|586.5,-138.0|855.5,-138.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W045-O01",
+     "key": "W|586.5,-138.0|855.5,-138.0|t14.0|O|159.0-250.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 250.0,
+     "t_start_cm": 159.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    -137.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -336.487,
+    289.048
+   ],
+   "height_cm": 260.0,
+   "id": "W046",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      18
+     ],
+     "point_cm": [
+      -329.487,
+      -77.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      31
+     ],
+     "point_cm": [
+      -329.487,
+      282.048
+     ],
+     "t_cm": 367.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-336.5,-85.0|-336.5,289.0|t14.0",
+   "length_cm": 374.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W046-O01",
+     "key": "W|-336.5,-85.0|-336.5,289.0|t14.0|O|109.0-265.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 265.0,
+     "t_start_cm": 109.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -336.487,
+    -84.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    528.503,
+    289.048
+   ],
+   "height_cm": 260.0,
+   "id": "W047",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      19
+     ],
+     "point_cm": [
+      521.493,
+      -77.952
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      32
+     ],
+     "point_cm": [
+      521.493,
+      282.048
+     ],
+     "t_cm": 367.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|528.5,-85.0|528.5,289.0|t14.0",
+   "length_cm": 374.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 260.0,
+     "id": "W047-O01",
+     "key": "W|528.5,-85.0|528.5,289.0|t14.0|O|109.0-265.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 265.0,
+     "t_start_cm": 109.0,
+     "width_cm": 156.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    528.503,
+    -84.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -329.487,
+    -77.952
+   ],
+   "height_cm": 260.0,
+   "id": "W048",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -408.487,
+      -77.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      78
+     ],
+     "point_cm": [
+      -329.487,
+      -77.952
+     ],
+     "t_cm": 79.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-408.5,-78.0|-329.5,-78.0|t14.0",
+   "length_cm": 79.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -408.487,
+    -77.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    600.503,
+    -77.952
+   ],
+   "height_cm": 260.0,
+   "id": "W049",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      72
+     ],
+     "point_cm": [
+      521.493,
+      -77.952
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      600.503,
+      -77.952
+     ],
+     "t_cm": 79.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|521.5,-78.0|600.5,-78.0|t14.0",
+   "length_cm": 79.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    521.493,
+    -77.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1064.487,
+    -67.952
+   ],
+   "height_cm": 260.0,
+   "id": "W050",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      88
+     ],
+     "point_cm": [
+      -1253.487,
+      -67.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1064.487,
+      -67.952
+     ],
+     "t_cm": 189.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1253.5,-68.0|-1064.5,-68.0|t14.0",
+   "length_cm": 189.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1253.487,
+    -67.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1445.503,
+    -67.952
+   ],
+   "height_cm": 260.0,
+   "id": "W051",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1256.503,
+      -67.952
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      62
+     ],
+     "point_cm": [
+      1445.503,
+      -67.952
+     ],
+     "t_cm": 189.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1256.5,-68.0|1445.5,-68.0|t14.0",
+   "length_cm": 189.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1256.503,
+    -67.952
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1270.503,
+    17.048
+   ],
+   "height_cm": 260.0,
+   "id": "W052",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1078.487,
+      17.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      75
+     ],
+     "point_cm": [
+      103.523,
+      24.048
+     ],
+     "t_cm": 1182.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1270.503,
+      17.048
+     ],
+     "t_cm": 2348.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1078.5,17.0|1270.5,17.0|t14.0",
+   "length_cm": 2348.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W052-O01",
+     "key": "W|-1078.5,17.0|1270.5,17.0|t14.0|O|314.0-405.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 405.0,
+     "t_start_cm": 314.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W052-O02",
+     "key": "W|-1078.5,17.0|1270.5,17.0|t14.0|O|939.0-1175.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 1175.0,
+     "t_start_cm": 939.0,
+     "width_cm": 236.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W052-O03",
+     "key": "W|-1078.5,17.0|1270.5,17.0|t14.0|O|1944.0-2035.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 2034.99,
+     "t_start_cm": 1943.99,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1078.487,
+    17.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1239.487,
+    102.048
+   ],
+   "height_cm": 260.0,
+   "id": "W053",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      -1878.497,
+      102.048
+     ],
+     "t_cm": 0.0,
+     "type": "FREE_END"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      88
+     ],
+     "point_cm": [
+      -1239.487,
+      102.048
+     ],
+     "t_cm": 639.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1878.5,102.0|-1239.5,102.0|t14.0",
+   "length_cm": 639.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.497,
+    102.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.513,
+    102.048
+   ],
+   "height_cm": 260.0,
+   "id": "W054",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      62
+     ],
+     "point_cm": [
+      1431.503,
+      102.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      2070.513,
+      102.048
+     ],
+     "t_cm": 639.01,
+     "type": "FREE_END"
+    }
+   ],
+   "key": "W|1431.5,102.0|2070.5,102.0|t14.0",
+   "length_cm": 639.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1431.503,
+    102.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -139.487,
+    187.048
+   ],
+   "height_cm": 260.0,
+   "id": "W055",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1078.487,
+      187.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -139.487,
+      187.048
+     ],
+     "t_cm": 939.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1078.5,187.0|-139.5,187.0|t14.0",
+   "length_cm": 939.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W055-O01",
+     "key": "W|-1078.5,187.0|-139.5,187.0|t14.0|O|314.0-405.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 405.0,
+     "t_start_cm": 314.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1078.487,
+    187.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1270.503,
+    187.048
+   ],
+   "height_cm": 260.0,
+   "id": "W056",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      331.503,
+      187.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1270.503,
+      187.048
+     ],
+     "t_cm": 939.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|331.5,187.0|1270.5,187.0|t14.0",
+   "length_cm": 939.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W056-O01",
+     "key": "W|331.5,187.0|1270.5,187.0|t14.0|O|534.0-625.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 625.0,
+     "t_start_cm": 534.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    331.503,
+    187.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    163.513,
+    534.048
+   ],
+   "height_cm": 270.0,
+   "id": "W057",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      27
+     ],
+     "point_cm": [
+      156.513,
+      237.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      29
+     ],
+     "point_cm": [
+      170.513,
+      272.048
+     ],
+     "t_cm": 42.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      37
+     ],
+     "point_cm": [
+      156.513,
+      382.048
+     ],
+     "t_cm": 152.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      43
+     ],
+     "point_cm": [
+      163.513,
+      534.048
+     ],
+     "t_cm": 304.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|163.5,230.0|163.5,534.0|t14.0",
+   "length_cm": 304.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 260.0,
+     "height_cm": 120.0,
+     "id": "W057-O01",
+     "key": "W|163.5,230.0|163.5,534.0|t14.0|O|59.0-140.0|s140.0",
+     "kind": "window",
+     "sill_cm": 140.0,
+     "source_element_id": null,
+     "t_end_cm": 140.0,
+     "t_start_cm": 59.0,
+     "width_cm": 81.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 140.0,
+     "height_cm": 120.0,
+     "id": "W057-O02",
+     "key": "W|163.5,230.0|163.5,534.0|t14.0|O|179.0-260.0|s20.0",
+     "kind": "door",
+     "sill_cm": 20.0,
+     "source_element_id": null,
+     "t_end_cm": 260.0,
+     "t_start_cm": 179.0,
+     "width_cm": 81.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    163.513,
+    230.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.523,
+    237.048
+   ],
+   "height_cm": 280.0,
+   "id": "W058",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      74
+     ],
+     "point_cm": [
+      156.513,
+      237.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.523,
+      237.048
+     ],
+     "t_cm": 189.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|156.5,237.0|345.5,237.0|t14.0",
+   "length_cm": 189.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    156.513,
+    237.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1064.487,
+    272.048
+   ],
+   "height_cm": 260.0,
+   "id": "W059",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      88
+     ],
+     "point_cm": [
+      -1253.487,
+      272.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1064.487,
+      272.048
+     ],
+     "t_cm": 189.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1253.5,272.0|-1064.5,272.0|t14.0",
+   "length_cm": 189.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1253.487,
+    272.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    170.513,
+    272.048
+   ],
+   "height_cm": 260.0,
+   "id": "W060",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -153.487,
+      272.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      74
+     ],
+     "point_cm": [
+      170.513,
+      272.048
+     ],
+     "t_cm": 324.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-153.5,272.0|170.5,272.0|t14.0",
+   "length_cm": 324.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W060-O01",
+     "key": "W|-153.5,272.0|170.5,272.0|t14.0|O|204.0-305.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 305.0,
+     "t_start_cm": 204.0,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -153.487,
+    272.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1445.503,
+    272.048
+   ],
+   "height_cm": 260.0,
+   "id": "W061",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1256.503,
+      272.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      62
+     ],
+     "point_cm": [
+      1445.503,
+      272.048
+     ],
+     "t_cm": 189.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1256.5,272.0|1445.5,272.0|t14.0",
+   "length_cm": 189.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1256.503,
+    272.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -329.487,
+    282.048
+   ],
+   "height_cm": 260.0,
+   "id": "W062",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -408.487,
+      282.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      78
+     ],
+     "point_cm": [
+      -329.487,
+      282.048
+     ],
+     "t_cm": 79.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-408.5,282.0|-329.5,282.0|t14.0",
+   "length_cm": 79.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -408.487,
+    282.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    600.503,
+    282.048
+   ],
+   "height_cm": 260.0,
+   "id": "W063",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      72
+     ],
+     "point_cm": [
+      521.493,
+      282.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      600.503,
+      282.048
+     ],
+     "t_cm": 79.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|521.5,282.0|600.5,282.0|t14.0",
+   "length_cm": 79.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    521.493,
+    282.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -526.487,
+    464.048
+   ],
+   "height_cm": 260.0,
+   "id": "W064",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      33
+     ],
+     "point_cm": [
+      -526.487,
+      335.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      38
+     ],
+     "point_cm": [
+      -526.487,
+      464.048
+     ],
+     "t_cm": 129.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-526.5,335.0|-526.5,464.0|t14.0",
+   "length_cm": 129.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W064-O01",
+     "key": "W|-526.5,335.0|-526.5,464.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -526.487,
+    335.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    718.513,
+    464.048
+   ],
+   "height_cm": 260.0,
+   "id": "W065",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      34
+     ],
+     "point_cm": [
+      718.513,
+      335.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      39
+     ],
+     "point_cm": [
+      718.513,
+      464.048
+     ],
+     "t_cm": 129.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|718.5,335.0|718.5,464.0|t14.0",
+   "length_cm": 129.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W065-O01",
+     "key": "W|718.5,335.0|718.5,464.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    718.513,
+    335.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    342.048
+   ],
+   "height_cm": 260.0,
+   "id": "W066",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -663.487,
+      342.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      81
+     ],
+     "point_cm": [
+      -526.487,
+      335.048
+     ],
+     "t_cm": 137.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      342.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-663.5,342.0|-394.5,342.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W066-O01",
+     "key": "W|-663.5,342.0|-394.5,342.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -663.487,
+    342.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    855.503,
+    342.048
+   ],
+   "height_cm": 260.0,
+   "id": "W067",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      342.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      70
+     ],
+     "point_cm": [
+      718.513,
+      335.048
+     ],
+     "t_cm": 132.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      855.503,
+      342.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|586.5,342.0|855.5,342.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W067-O01",
+     "key": "W|586.5,342.0|855.5,342.0|t14.0|O|159.0-250.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 250.0,
+     "t_start_cm": 159.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    342.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1871.487,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W068",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      35
+     ],
+     "point_cm": [
+      -1878.487,
+      357.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      41
+     ],
+     "point_cm": [
+      -1878.487,
+      512.048
+     ],
+     "t_cm": 162.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -1878.487,
+      767.048
+     ],
+     "t_cm": 417.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1871.5,350.0|-1871.5,774.0|t14.0",
+   "length_cm": 424.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 80.0,
+     "id": "W068-O01",
+     "key": "W|-1871.5,350.0|-1871.5,774.0|t14.0|O|44.0-115.0|s160.0",
+     "kind": "window",
+     "sill_cm": 160.0,
+     "source_element_id": null,
+     "t_end_cm": 115.0,
+     "t_start_cm": 44.0,
+     "width_cm": 71.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1871.487,
+    350.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1616.487,
+    519.048
+   ],
+   "height_cm": 260.0,
+   "id": "W069",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      35
+     ],
+     "point_cm": [
+      -1616.487,
+      350.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      41
+     ],
+     "point_cm": [
+      -1616.487,
+      519.048
+     ],
+     "t_cm": 169.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1616.5,350.0|-1616.5,519.0|t14.0",
+   "length_cm": 169.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W069-O01",
+     "key": "W|-1616.5,350.0|-1616.5,519.0|t14.0|O|24.0-115.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 115.0,
+     "t_start_cm": 24.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1616.487,
+    350.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1808.493,
+    519.048
+   ],
+   "height_cm": 260.0,
+   "id": "W070",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      36
+     ],
+     "point_cm": [
+      1808.493,
+      350.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      42
+     ],
+     "point_cm": [
+      1808.493,
+      519.048
+     ],
+     "t_cm": 169.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1808.5,350.0|1808.5,519.0|t14.0",
+   "length_cm": 169.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W070-O01",
+     "key": "W|1808.5,350.0|1808.5,519.0|t14.0|O|24.0-115.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 115.0,
+     "t_start_cm": 24.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1808.493,
+    350.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2063.503,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W071",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      36
+     ],
+     "point_cm": [
+      2070.493,
+      357.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      42
+     ],
+     "point_cm": [
+      2070.383,
+      512.048
+     ],
+     "t_cm": 162.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      2070.503,
+      767.048
+     ],
+     "t_cm": 417.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|2063.5,350.0|2063.5,774.0|t14.0",
+   "length_cm": 424.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 80.0,
+     "id": "W071-O01",
+     "key": "W|2063.5,350.0|2063.5,774.0|t14.0|O|44.0-115.0|s160.0",
+     "kind": "window",
+     "sill_cm": 160.0,
+     "source_element_id": null,
+     "t_end_cm": 115.0,
+     "t_start_cm": 44.0,
+     "width_cm": 71.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    2063.503,
+    350.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1494.487,
+    357.048
+   ],
+   "height_cm": 260.0,
+   "id": "W072",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      96
+     ],
+     "point_cm": [
+      -1878.487,
+      357.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      94
+     ],
+     "point_cm": [
+      -1806.487,
+      364.048
+     ],
+     "t_cm": 72.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      93
+     ],
+     "point_cm": [
+      -1616.487,
+      350.048
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      91
+     ],
+     "point_cm": [
+      -1494.487,
+      357.048
+     ],
+     "t_cm": 384.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,357.0|-1494.5,357.0|t14.0",
+   "length_cm": 384.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W072-O01",
+     "key": "W|-1878.5,357.0|-1494.5,357.0|t14.0|O|274.0-365.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 365.0,
+     "t_start_cm": 274.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    357.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.493,
+    357.048
+   ],
+   "height_cm": 260.0,
+   "id": "W073",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      59
+     ],
+     "point_cm": [
+      1686.493,
+      357.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      58
+     ],
+     "point_cm": [
+      1808.493,
+      350.048
+     ],
+     "t_cm": 122.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      56
+     ],
+     "point_cm": [
+      1998.503,
+      364.048
+     ],
+     "t_cm": 312.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      55
+     ],
+     "point_cm": [
+      2070.493,
+      357.048
+     ],
+     "t_cm": 384.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|1686.5,357.0|2070.5,357.0|t14.0",
+   "length_cm": 384.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 160.0,
+     "height_cm": 160.0,
+     "id": "W073-O01",
+     "key": "W|1686.5,357.0|2070.5,357.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1686.493,
+    357.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.513,
+    382.048
+   ],
+   "height_cm": 280.0,
+   "id": "W074",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      74
+     ],
+     "point_cm": [
+      156.513,
+      382.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.513,
+      382.048
+     ],
+     "t_cm": 189.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|156.5,382.0|345.5,382.0|t14.0",
+   "length_cm": 189.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    156.513,
+    382.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    457.048
+   ],
+   "height_cm": 260.0,
+   "id": "W075",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -663.487,
+      457.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      81
+     ],
+     "point_cm": [
+      -526.487,
+      464.048
+     ],
+     "t_cm": 137.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      457.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-663.5,457.0|-394.5,457.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W075-O01",
+     "key": "W|-663.5,457.0|-394.5,457.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -663.487,
+    457.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    855.503,
+    457.048
+   ],
+   "height_cm": 260.0,
+   "id": "W076",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      457.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      70
+     ],
+     "point_cm": [
+      718.513,
+      464.048
+     ],
+     "t_cm": 132.01,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      855.503,
+      457.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|586.5,457.0|855.5,457.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W076-O01",
+     "key": "W|586.5,457.0|855.5,457.0|t14.0|O|159.0-250.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 250.0,
+     "t_start_cm": 159.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    457.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1.487,
+    534.048
+   ],
+   "height_cm": 260.0,
+   "id": "W077",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      40
+     ],
+     "point_cm": [
+      5.513,
+      472.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      43
+     ],
+     "point_cm": [
+      -8.487,
+      527.048
+     ],
+     "t_cm": 62.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1.5,465.0|-1.5,534.0|t14.0",
+   "length_cm": 69.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1.487,
+    465.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    5.513,
+    472.048
+   ],
+   "height_cm": 260.0,
+   "id": "W078",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -153.507,
+      472.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      76
+     ],
+     "point_cm": [
+      5.513,
+      472.048
+     ],
+     "t_cm": 159.02,
+     "type": "L"
+    }
+   ],
+   "key": "W|-153.5,472.0|5.5,472.0|t14.0",
+   "length_cm": 159.02,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W078-O01",
+     "key": "W|-153.5,472.0|5.5,472.0|t14.0|O|19.0-120.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 120.02,
+     "t_start_cm": 19.02,
+     "width_cm": 101.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -153.507,
+    472.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1486.487,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W079",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      41
+     ],
+     "point_cm": [
+      -1479.487,
+      512.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      46
+     ],
+     "point_cm": [
+      -1493.487,
+      632.048
+     ],
+     "t_cm": 127.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -1486.487,
+      774.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1486.5,505.0|-1486.5,774.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1486.487,
+    505.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1678.503,
+    774.048
+   ],
+   "height_cm": 260.0,
+   "id": "W080",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      42
+     ],
+     "point_cm": [
+      1671.383,
+      512.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      47
+     ],
+     "point_cm": [
+      1685.503,
+      632.048
+     ],
+     "t_cm": 127.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      1678.503,
+      774.048
+     ],
+     "t_cm": 269.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1678.5,505.0|1678.5,774.0|t14.0",
+   "length_cm": 269.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1678.503,
+    505.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1479.487,
+    512.048
+   ],
+   "height_cm": 260.0,
+   "id": "W081",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      96
+     ],
+     "point_cm": [
+      -1878.487,
+      512.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      93
+     ],
+     "point_cm": [
+      -1616.487,
+      519.048
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      90
+     ],
+     "point_cm": [
+      -1479.487,
+      512.048
+     ],
+     "t_cm": 399.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,512.0|-1479.5,512.0|t14.0",
+   "length_cm": 399.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W081-O01",
+     "key": "W|-1878.5,512.0|-1479.5,512.0|t14.0|O|289.0-380.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 380.0,
+     "t_start_cm": 289.0,
+     "width_cm": 91.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    512.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.383,
+    512.048
+   ],
+   "height_cm": 260.0,
+   "id": "W082",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      61
+     ],
+     "point_cm": [
+      1671.383,
+      512.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      58
+     ],
+     "point_cm": [
+      1808.493,
+      519.048
+     ],
+     "t_cm": 137.11,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      55
+     ],
+     "point_cm": [
+      2070.383,
+      512.048
+     ],
+     "t_cm": 399.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1671.5,512.0|2070.5,512.0|t14.0",
+   "length_cm": 399.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W082-O01",
+     "key": "W|1671.5,512.0|2070.5,512.0|t14.0|O|19.0-110.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 110.0,
+     "t_start_cm": 19.12,
+     "width_cm": 90.88
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1671.383,
+    512.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.523,
+    527.048
+   ],
+   "height_cm": 280.0,
+   "id": "W083",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      76
+     ],
+     "point_cm": [
+      -8.487,
+      527.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      74
+     ],
+     "point_cm": [
+      163.513,
+      534.048
+     ],
+     "t_cm": 172.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.523,
+      527.048
+     ],
+     "t_cm": 354.01,
+     "type": "T"
+    }
+   ],
+   "key": "W|-8.5,527.0|345.5,527.0|t14.0",
+   "length_cm": 354.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -8.487,
+    527.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -139.497,
+    562.048
+   ],
+   "height_cm": 260.0,
+   "id": "W084",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -408.487,
+      562.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -139.497,
+      562.048
+     ],
+     "t_cm": 268.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|-408.5,562.0|-139.5,562.0|t14.0",
+   "length_cm": 268.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W084-O01",
+     "key": "W|-408.5,562.0|-139.5,562.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 69.0,
+     "width_cm": 130.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -408.487,
+    562.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    600.503,
+    562.048
+   ],
+   "height_cm": 260.0,
+   "id": "W085",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      331.513,
+      562.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      600.503,
+      562.048
+     ],
+     "t_cm": 268.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|331.5,562.0|600.5,562.0|t14.0",
+   "length_cm": 268.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W085-O01",
+     "key": "W|331.5,562.0|600.5,562.0|t14.0|O|69.0-200.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 69.0,
+     "width_cm": 130.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    331.513,
+    562.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -649.497,
+    632.048
+   ],
+   "height_cm": 260.0,
+   "id": "W086",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      90
+     ],
+     "point_cm": [
+      -1493.487,
+      632.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -649.497,
+      632.048
+     ],
+     "t_cm": 843.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1493.5,632.0|-649.5,632.0|t14.0",
+   "length_cm": 843.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W086-O01",
+     "key": "W|-1493.5,632.0|-649.5,632.0|t14.0|O|19.0-185.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 185.0,
+     "t_start_cm": 19.0,
+     "width_cm": 166.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W086-O02",
+     "key": "W|-1493.5,632.0|-649.5,632.0|t14.0|O|249.0-340.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 340.0,
+     "t_start_cm": 249.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W086-O03",
+     "key": "W|-1493.5,632.0|-649.5,632.0|t14.0|O|504.0-595.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 595.0,
+     "t_start_cm": 504.0,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W086-O04",
+     "key": "W|-1493.5,632.0|-649.5,632.0|t14.0|O|644.0-810.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 809.99,
+     "t_start_cm": 644.0,
+     "width_cm": 165.99
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1493.487,
+    632.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1685.503,
+    632.048
+   ],
+   "height_cm": 260.0,
+   "id": "W087",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      841.513,
+      632.048
+     ],
+     "t_cm": 0.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      61
+     ],
+     "point_cm": [
+      1685.503,
+      632.048
+     ],
+     "t_cm": 843.99,
+     "type": "T"
+    }
+   ],
+   "key": "W|841.5,632.0|1685.5,632.0|t14.0",
+   "length_cm": 843.99,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W087-O01",
+     "key": "W|841.5,632.0|1685.5,632.0|t14.0|O|34.0-200.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 199.99,
+     "t_start_cm": 34.0,
+     "width_cm": 165.99
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W087-O02",
+     "key": "W|841.5,632.0|1685.5,632.0|t14.0|O|249.0-340.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 339.99,
+     "t_start_cm": 248.99,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W087-O03",
+     "key": "W|841.5,632.0|1685.5,632.0|t14.0|O|504.0-595.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 594.99,
+     "t_start_cm": 503.99,
+     "width_cm": 91.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 220.0,
+     "height_cm": 220.0,
+     "id": "W087-O04",
+     "key": "W|841.5,632.0|1685.5,632.0|t14.0|O|659.0-825.0|s0.0",
+     "kind": "door",
+     "sill_cm": 0.0,
+     "source_element_id": null,
+     "t_end_cm": 824.99,
+     "t_start_cm": 658.99,
+     "width_cm": 166.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    841.513,
+    632.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    198.003,
+    672.048
+   ],
+   "height_cm": 279.98,
+   "id": "W088",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      -6.007,
+      672.048
+     ],
+     "t_cm": 0.0,
+     "type": "FREE_END"
+    },
+    {
+     "at_end": true,
+     "neighbors": [],
+     "point_cm": [
+      198.003,
+      672.048
+     ],
+     "t_cm": 204.01,
+     "type": "FREE_END"
+    }
+   ],
+   "key": "W|-6.0,672.0|198.0,672.0|t14.0",
+   "length_cm": 204.01,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -6.007,
+    672.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1126.477,
+    759.048
+   ],
+   "height_cm": 281.0,
+   "id": "W089",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      49
+     ],
+     "point_cm": [
+      -1133.477,
+      712.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -1126.477,
+      759.048
+     ],
+     "t_cm": 54.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1126.5,705.0|-1126.5,759.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1126.477,
+    705.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1016.477,
+    759.048
+   ],
+   "height_cm": 281.0,
+   "id": "W090",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      49
+     ],
+     "point_cm": [
+      -1009.497,
+      712.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      51
+     ],
+     "point_cm": [
+      -1016.477,
+      759.048
+     ],
+     "t_cm": 54.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|-1016.5,705.0|-1016.5,759.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1016.477,
+    705.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1208.603,
+    759.048
+   ],
+   "height_cm": 281.0,
+   "id": "W091",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      50
+     ],
+     "point_cm": [
+      1201.603,
+      712.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      1208.603,
+      759.048
+     ],
+     "t_cm": 54.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1208.5,705.0|1208.5,759.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1208.603,
+    705.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 90.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1318.583,
+    759.048
+   ],
+   "height_cm": 281.0,
+   "id": "W092",
+   "junctions": [
+    {
+     "at_end": false,
+     "neighbors": [
+      50
+     ],
+     "point_cm": [
+      1325.583,
+      712.048
+     ],
+     "t_cm": 7.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      52
+     ],
+     "point_cm": [
+      1318.583,
+      759.048
+     ],
+     "t_cm": 54.0,
+     "type": "T"
+    }
+   ],
+   "key": "W|1318.5,705.0|1318.5,759.0|t14.0",
+   "length_cm": 54.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1318.583,
+    705.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -1009.497,
+    712.048
+   ],
+   "height_cm": 281.0,
+   "id": "W093",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      87
+     ],
+     "point_cm": [
+      -1133.477,
+      712.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      84
+     ],
+     "point_cm": [
+      -1009.497,
+      712.048
+     ],
+     "t_cm": 123.98,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1133.5,712.0|-1009.5,712.0|t14.0",
+   "length_cm": 123.98,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1133.477,
+    712.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    1325.583,
+    712.048
+   ],
+   "height_cm": 281.0,
+   "id": "W094",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      67
+     ],
+     "point_cm": [
+      1201.603,
+      712.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      64
+     ],
+     "point_cm": [
+      1325.583,
+      712.048
+     ],
+     "t_cm": 123.98,
+     "type": "L"
+    }
+   ],
+   "key": "W|1201.5,712.0|1325.5,712.0|t14.0",
+   "length_cm": 123.98,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    1201.603,
+    712.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    -394.487,
+    767.048
+   ],
+   "height_cm": 281.0,
+   "id": "W095",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      96
+     ],
+     "point_cm": [
+      -1878.487,
+      767.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      90
+     ],
+     "point_cm": [
+      -1486.487,
+      774.048
+     ],
+     "t_cm": 392.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      87
+     ],
+     "point_cm": [
+      -1126.477,
+      759.048
+     ],
+     "t_cm": 752.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      85
+     ],
+     "point_cm": [
+      -1071.487,
+      774.048
+     ],
+     "t_cm": 807.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      84
+     ],
+     "point_cm": [
+      -1016.477,
+      759.048
+     ],
+     "t_cm": 862.01,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      82
+     ],
+     "point_cm": [
+      -656.487,
+      774.048
+     ],
+     "t_cm": 1222.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      79
+     ],
+     "point_cm": [
+      -394.487,
+      767.048
+     ],
+     "t_cm": 1484.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-1878.5,767.0|-394.5,767.0|t14.0",
+   "length_cm": 1484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W095-O01",
+     "key": "W|-1878.5,767.0|-394.5,767.0|t14.0|O|124.0-255.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 255.0,
+     "t_start_cm": 124.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W095-O02",
+     "key": "W|-1878.5,767.0|-394.5,767.0|t14.0|O|1279.0-1410.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 1410.0,
+     "t_start_cm": 1279.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -1878.487,
+    767.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    2070.503,
+    767.048
+   ],
+   "height_cm": 281.0,
+   "id": "W096",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      71
+     ],
+     "point_cm": [
+      586.503,
+      767.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      68
+     ],
+     "point_cm": [
+      848.503,
+      774.048
+     ],
+     "t_cm": 262.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      67
+     ],
+     "point_cm": [
+      1208.603,
+      759.048
+     ],
+     "t_cm": 622.1,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      65
+     ],
+     "point_cm": [
+      1263.503,
+      774.048
+     ],
+     "t_cm": 677.0,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      64
+     ],
+     "point_cm": [
+      1318.583,
+      759.048
+     ],
+     "t_cm": 732.08,
+     "type": "T"
+    },
+    {
+     "at_end": false,
+     "neighbors": [
+      61
+     ],
+     "point_cm": [
+      1678.503,
+      774.048
+     ],
+     "t_cm": 1092.0,
+     "type": "T"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      55
+     ],
+     "point_cm": [
+      2070.503,
+      767.048
+     ],
+     "t_cm": 1484.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|586.5,767.0|2070.5,767.0|t14.0",
+   "length_cm": 1484.0,
+   "openings": [
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W096-O01",
+     "key": "W|586.5,767.0|2070.5,767.0|t14.0|O|74.0-205.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 205.0,
+     "t_start_cm": 74.0,
+     "width_cm": 131.0
+    },
+    {
+     "confidence": "reconstructed",
+     "head_cm": 240.0,
+     "height_cm": 130.0,
+     "id": "W096-O02",
+     "key": "W|586.5,767.0|2070.5,767.0|t14.0|O|1229.0-1360.0|s110.0",
+     "kind": "window",
+     "sill_cm": 110.0,
+     "source_element_id": null,
+     "t_end_cm": 1360.0,
+     "t_start_cm": 1229.0,
+     "width_cm": 131.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    586.503,
+    767.048
+   ],
+   "thickness_cm": 14.0
+  },
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    345.503,
+    817.048
+   ],
+   "height_cm": 280.0,
+   "id": "W097",
+   "junctions": [
+    {
+     "at_end": true,
+     "neighbors": [
+      77
+     ],
+     "point_cm": [
+      -153.497,
+      817.048
+     ],
+     "t_cm": 0.0,
+     "type": "L"
+    },
+    {
+     "at_end": true,
+     "neighbors": [
+      73
+     ],
+     "point_cm": [
+      345.503,
+      817.048
+     ],
+     "t_cm": 499.0,
+     "type": "L"
+    }
+   ],
+   "key": "W|-153.5,817.0|345.5,817.0|t14.0",
+   "length_cm": 499.0,
+   "openings": [],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    -153.497,
+    817.048
+   ],
+   "thickness_cm": 14.0
+  }
+ ]
+}
