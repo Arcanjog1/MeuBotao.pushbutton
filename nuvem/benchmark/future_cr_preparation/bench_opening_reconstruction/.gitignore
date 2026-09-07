@@ -1,0 +1,4 @@
+# Gabaritos candidatos: ~8,5MB cada e 100% regeneraveis por
+#   python3 build_evidence.py && python3 build_candidate.py
+# A evidencia, a proveniencia e os relatorios ESSES sim sao versionados.
+candidate_reference_*.json
