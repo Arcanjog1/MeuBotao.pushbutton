@@ -210,8 +210,10 @@ implementation.py`, isolado por ser extremamente lento — combinatória
 de cascata — e rodado à parte por não competir por CPU com o resto da
 suíte; **pré-existente e independente desta CR**, reproduzido com a
 mesma lentidão numa cópia limpa de `origin/main` sem nenhuma
-alteração). Rodado à parte, sem contenção de CPU, para confirmação
-final — resultado registrado assim que a rodada isolada terminar.
+alteração). Rodado à parte, sem contenção de CPU (10min40s): **76
+passed, 0 failed**.
+
+**Suíte completa, nos dois lotes: 778 + 76 = 854 testes, 0 falhas.**
 
 Nenhuma falha, nenhum `xfail`/`skip` usado, nenhum threshold alterado
 para fechar a suíte.
