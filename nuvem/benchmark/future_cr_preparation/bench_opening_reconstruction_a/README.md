@@ -34,7 +34,6 @@ diretório corrente.
 | arquivo | o que é |
 |---|---|
 | `repro_envelope.py` | replica o agrupamento do `STATE_A` linha a linha e mede, por trecho, **envelope × consenso × desacordo** |
-| `repro_envelope.json` | saída do reproducer: os 94/92 trechos com envelope, consenso, desacordo e as bordas de **cada fiada** |
 | `repro_axis_gap.py` | confronta o consenso com os trechos de parede **medidos** no mesmo eixo (`input.json` do TGD) |
 | `state_detector.py` | roda o detector sobre a geometria real do gabarito humano dos 3 projetos |
 | `state_solver.py` | roda o solver inteiro nos 3 projetos; identidade dos achados = `(code, wall, detail)`, **nunca** `block_id` |
@@ -49,3 +48,21 @@ diretório corrente.
 completa de achados) **não** entram no repositório: `compare_states.py`
 regenera o delta a partir deles, e `solver_state_delta.json` guarda o
 resultado.
+
+`repro_envelope.json` (saída de `repro_envelope.py`, ~15 mil linhas com a
+lista completa dos 94/92 trechos e as bordas de cada fiada) recebeu o mesmo
+tratamento — removido do versionamento (revisão independente do PR #22,
+`docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md` §6) por ser
+regenerável determinística e trivialmente a partir de `repro_envelope.py` +
+`reference.json` dos dois projetos (ambos já versionados). Para reobter:
+
+```bash
+python3 repro_envelope.py
+```
+
+Os números agregados que a doc da CR cita (`n_runs`, `n_com_desacordo`,
+`n_assinatura_15cm`, `spread_max`, `n_consenso_abaixo_de_OPENING_GAP_MIN`,
+`n_consenso_invertido`) também são impressos no stdout do script; os deltas
+por abertura já ficam preservados, agregados, em `detector_state_a.json` /
+`detector_state_b.json` / `detector_state_delta.json`, que continuam
+versionados.

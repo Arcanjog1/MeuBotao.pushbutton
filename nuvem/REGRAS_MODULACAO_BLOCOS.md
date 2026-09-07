@@ -837,6 +837,67 @@ usuário pediu e que **ainda não foram medidos**:
 - Persistir os dumps fiada-a-fiada usados nesta análise em
   `diagnosticos/`, hoje só existem no histórico da conversa.
 
+### 10.9 — Detector de aberturas reconstruídas: tolerância de identidade não define geometria (CR-BENCH-OPENING-RECONSTRUCTION-A)
+
+- **Status**: IMPLEMENTADO — `nuvem/core/engine/opening_audit.py::detect_
+  wall_openings_from_courses` (PR #22). Registro de contrato já
+  implementado e testado, não regra de domínio nova.
+- **Regra**: a tolerância de desencontro de junta entre fiadas
+  (`OPENING_RUN_EDGE_MATCH_TOLERANCE_CM`, ~15cm — o mesmo valor medido na
+  seção 10.6, ainda **PADRÃO OBSERVADO AINDA NÃO CONFIRMADO** como
+  constante de domínio, e esta seção não muda esse status) decide **só
+  identidade** de abertura entre fiadas ("o vazio desta fiada é a mesma
+  abertura do vazio da fiada anterior?") e **nunca** a geometria gravada da
+  jamba. A geometria gravada (`x_range`) é o **consenso** — o intervalo
+  comum aos vazios OBSERVADOS em todas as fiadas do trecho
+  (`max(inícios), min(fins)`) — e o desacordo entre fiadas é registrado
+  (`jamb_spread_cm`, `x_range_envelope`), nunca absorvido em silêncio.
+- **Distinção obrigatória entre proveniências** — não confundir:
+  - `MEASURED`: abertura com `source_element_id`, proveniência
+    **independente** do Revit. Este detector **nunca** produz este valor.
+  - `RECONSTRUCTED_CONSENSUS`: o intervalo comum observado entre fiadas.
+    **NÃO EQUIVALE A `MEASURED`** — é geometria reconstruída a partir do
+    layout de blocos, não confirmação de que ali existe de fato uma
+    porta/janela nem de suas jambas reais. Um intervalo comum de vazio
+    observado **não prova, por si só**, que exista uma abertura física
+    naquela posição.
+  - `INCONCLUSIVE`: as fiadas do trecho não concordam sobre nenhum vão
+    válido. Casos sem evidência suficiente **não devem ser promovidos a
+    abertura `MEASURED`** nem tratados como abertura confirmada por quem
+    consome — a decisão fica explicitamente em aberto, não é resolvida por
+    suposição do detector.
+- **Motivo**: onde a jamba coincide com um nó T/L, as fiadas alternam
+  entre "reserva de nó vazia" e "peça de amarração atravessa o nó" —
+  diferença de exatamente `B34 − B19 = 34 − 19 = 15,0cm`. Gravar o
+  envelope (união dos vazios) em vez do consenso deixava a tolerância de
+  identidade vazar direto para a largura do vão gravado, produzindo vão
+  maior que qualquer peça de fiada permite (medido: 19 aberturas por
+  projeto, TGD e TP1, com essa assinatura de 15,0cm nas duas jambas).
+- **Onde se aplica**: os dois consumidores atuais de
+  `detect_wall_openings_from_courses` — auditoria de alvenaria já
+  construída (`audit_existing_masonry_openings`, ao vivo) e extração de
+  gabarito (`nuvem/benchmark/extract/reconstruct.py`, ainda não propaga
+  `opening_provenance`/`jamb_spread_cm` para o gabarito — isso é escopo da
+  CR-B).
+- **Exceções**: nenhuma — a regra vale para todo trecho detectado,
+  independente de altura ou tipo (porta/janela).
+- **Prioridade**: **REGRA OBRIGATÓRIA** — implementada e testada (44
+  testes, `tests/test_opening_reconstruction_cr_a.py`). Não promove o
+  valor de 15cm da seção 10.6 a constante de domínio, e não altera a regra
+  de amarração em L/T/X descrita nas seções 1-9 deste documento.
+- **Impacto na modulação**: hoje, delta zero no solver dos 3 projetos
+  (gabarito congelado não chama o detector) — o efeito só aparece se o
+  gabarito for regerado (CR-B, não iniciada, decisão pendente do usuário).
+- **Desvio conhecido, não resolvido por esta regra**: 4 aberturas
+  reconstruídas do corpus (TGD `W082`; TP1 `W029`, `W040`, `W072`) têm
+  deslocamento de centro de 0,06cm por causa de uma coordenada fracionária
+  de extração (`~0,12cm` de desencontro entre fiadas, abaixo da tolerância
+  de identidade mas acima do gate de centro de 0,01cm) — nenhuma das 4 tem
+  `source_element_id`/abertura `measured` correspondente no gabarito
+  congelado. Causa raiz é da **extração**, não deste detector, e continua
+  em aberto (ver `docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md`
+  §5 e `docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md` §3).
+
 ## 11. Regra #1 — alinhamento vertical obrigatório entre fiadas (2026-08-25)
 
 > **Status**: IMPLEMENTADO (sessão 2026-08-25). Substitui o antigo "best

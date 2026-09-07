@@ -77,16 +77,30 @@ CUT_BLOCK_JAMB_JUSTIFICATION_MAX_CM = 60.0
 # responde "de onde saiu ESTA geometria?" e nunca e' deduzido depois - quem
 # reconstroi grava o que de fato usou. Abertura sem proveniencia nao entra
 # em gabarito.
-#   MEASURED                - veio do Revit (tem `source_element_id`); este
-#                             modulo NUNCA produz este valor (ele reconstroi).
-#   RECONSTRUCTED_CONSENSUS - borda que TODAS as fiadas do trecho respeitam.
+#   MEASURED                - veio do Revit (tem `source_element_id`), isto
+#                             e', proveniencia INDEPENDENTE deste modulo -
+#                             uma porta/janela real, identificada por quem
+#                             leu o modelo. Este modulo NUNCA produz este
+#                             valor (ele reconstroi a partir de blocos, nao
+#                             confirma porta/janela nenhuma).
+#   RECONSTRUCTED_CONSENSUS - o intervalo comum aos vazios OBSERVADOS em
+#                             todas as fiadas do trecho (borda que TODAS
+#                             elas respeitam). NAO EQUIVALE A MEASURED: e'
+#                             geometria reconstruida a partir do layout de
+#                             pecas, nao confirmacao de que ali existe de
+#                             fato uma porta/janela nem de onde ficam suas
+#                             jambas reais - isso exigiria proveniencia
+#                             independente (Revit) que este modulo nao tem.
 #   RECONSTRUCTED_ENVELOPE  - LEGADO: uniao (min/max) dos vazios por fiada.
 #                             Mantido so' como vocabulario, pra' que dado
 #                             antigo possa ser rotulado; este modulo nao
 #                             emite mais aberturas assim.
 #   INCONCLUSIVE            - as fiadas do trecho nao concordam sobre nenhum
 #                             vao valido: nao ha' consenso pra' gravar e o
-#                             detector NAO decide por conta propria.
+#                             detector NAO decide por conta propria. Casos
+#                             sem evidencia suficiente NAO devem ser
+#                             promovidos a abertura MEASURED nem tratados
+#                             como abertura confirmada por quem consome.
 OPENING_PROVENANCE_MEASURED = "MEASURED"
 OPENING_PROVENANCE_CONSENSUS = "RECONSTRUCTED_CONSENSUS"
 OPENING_PROVENANCE_ENVELOPE = "RECONSTRUCTED_ENVELOPE"
@@ -169,10 +183,18 @@ def detect_wall_openings_from_courses(courses):
       1. "estas observacoes sao a MESMA abertura?" -> decidida pela
          tolerancia `OPENING_RUN_EDGE_MATCH_TOLERANCE_CM` contra o
          ENVELOPE corrente do trecho. Este passo NAO mudou.
-      2. "quais sao as JAMBAS FISICAS dessa abertura?" -> decidida pelo
-         CONSENSO: `x_range = (max(inicios), min(fins))` das fiadas do
-         trecho, isto e', a borda que TODAS elas respeitam. Nenhuma
-         tolerancia entra aqui.
+      2. "qual e' o INTERVALO COMUM aos vazios OBSERVADOS nessa
+         abertura?" -> decidida pelo CONSENSO: `x_range = (max(inicios),
+         min(fins))` das fiadas do trecho, isto e', a borda OBSERVADA que
+         TODAS elas respeitam. Nenhuma tolerancia entra aqui.
+
+    IMPORTANTE - o que o consenso NAO e': o detector NAO confirma, por si
+    so', que ali existe de fato uma porta/janela, nem que `x_range` sao as
+    jambas fisicas reais dessa abertura - isso exigiria proveniencia
+    independente do Revit (`source_element_id`), que este modulo nao tem
+    (ele so' le' o layout de blocos ja' colocados). `opening_provenance =
+    RECONSTRUCTED_CONSENSUS` NAO equivale a `MEASURED`: e' geometria
+    reconstruida por consenso entre fiadas, nao abertura confirmada.
 
     Consequencia: `x_range` esta' contido em TODOS os vazios de fiada do
     trecho - o detector nunca declara vazio um ponto onde ALGUMA fiada
@@ -184,7 +206,27 @@ def detect_wall_openings_from_courses(courses):
     de `OPENING_GAP_MIN_CM`), a funcao NAO volta ao envelope e NAO apaga a
     abertura: grava o consenso nao-invertido e marca
     `opening_provenance = INCONCLUSIVE`, deixando a decisao pra' quem
-    consome."""
+    consome.
+
+    PROVA (nao so' observacao empirica) de que o ramo INCONCLUSIVE e'
+    inalcancavel com as constantes de hoje, valida pra' trecho de QUALQUER
+    numero de fiadas - revisao independente do PR desta CR:
+      * `run_start` so' decresce (ou mantem) ao longo do trecho e nasce do
+        gap da fiada-ANCORA (a primeira do trecho); logo, pra toda fiada i
+        do trecho, gs_i <= run_start-no-momento-do-match + TOL
+                        <= gs_ancora + TOL.
+      * Por simetria, ge_i >= ge_ancora - TOL pra toda fiada i.
+      * Logo consenso = min(ge_i) - max(gs_i)
+                      >= (ge_ancora - TOL) - (gs_ancora + TOL)
+                       = largura_ancora - 2*TOL
+                      >= OPENING_GAP_MIN_CM - 2*OPENING_RUN_EDGE_MATCH_TOLERANCE_CM
+                       = 50,0 - 30,0 = 20,0cm > 0.
+    A ancora e' sempre a PRIMEIRA fiada do trecho (nao uma fiada "corrente"
+    que poderia andar indefinidamente), entao o piso vale pra' trechos de
+    qualquer tamanho - nao e' so' uma observacao sobre o corpus atual.
+    Teste `test_consenso_tem_piso_matematico_de_GAP_MIN_menos_duas_
+    tolerancias` confere a aritmetica (`GAP_MIN - 2*TOL > 0`); esta prova e'
+    o que garante que o ramo e' de fato morto."""
     ordered = sorted(courses, key=lambda c: c[0])
     if len(ordered) < OPENING_MIN_CONSEC_COURSES:
         return []

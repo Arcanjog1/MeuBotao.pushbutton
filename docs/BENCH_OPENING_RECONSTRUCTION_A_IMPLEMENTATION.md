@@ -111,7 +111,7 @@ e o desacordo passa a ser **dado gravado**, não arredondamento silencioso:
 
 | campo novo | o que é |
 |---|---|
-| `x_range` | **consenso** — a geometria física do vão (era o envelope) |
+| `x_range` | **consenso** — o intervalo comum aos vazios observados nas fiadas do trecho (era o envelope). Não confirma, por si só, jamba física real nem existência de porta/janela — isso exige proveniência independente do Revit (`MEASURED`) |
 | `x_range_envelope` | o envelope antigo, preservado para diagnóstico |
 | `jamb_spread_start_cm` / `jamb_spread_end_cm` | desacordo medido, por jamba |
 | `jamb_spread_cm` | o maior dos dois |
@@ -310,15 +310,43 @@ coordenada fracionária na extração (jamba em `18,88` contra peça em
 `19,00`), logo acima do `OVERLAP_TOLERANCE_CM = 0,1cm` do validador.
 
 A CR-A **estreita também essas**, porque o consenso não tem exceção por
-tamanho — e isso desloca o centro de 3 aberturas em **0,06cm** (0,6mm), e de
-outras 11 em ≤ 0,01cm.
+tamanho — e isso desloca o centro de **4 aberturas** (não 3 — corrigido pela
+revisão independente do PR, que refez a contagem a partir dos próprios
+artefatos commitados `detector_state_a.json`/`detector_state_b.json`) em
+**0,06cm** (0,6mm), e de outras 12 em ≤ 0,01cm:
 
-> **Desvio de hard gate declarado, não escondido.** O gate pedia centro
-> preservado com deslocamento < 0,01cm "salvo evidência medida em
-> contrário". Aqui há evidência medida: o deslocamento vem de coordenada de
-> peça realmente presente no corpus, e está gravado em `jamb_spread_cm`.
-> Nenhuma tolerância participa. Ainda assim, 0,06cm > 0,01cm: **é desvio, e
-> está sendo apresentado como desvio.**
+| projeto | parede em `reference.json` | envelope antigo | consenso novo |
+|---|---|---|---|
+| TGD | `W082` | `[19.0, 110.0]` | `[19.12, 110.0]` |
+| TP1 | `W029` | `[18.88, 109.88]` | `[19.0, 109.88]` |
+| TP1 | `W040` | `[19.0, 110.0]` | `[19.12, 110.0]` |
+| TP1 | `W072` | `[19.0, 110.0]` | `[19.12, 110.0]` |
+
+> **Desvio de hard gate declarado, não escondido — e a evidência precisa
+> ser descrita com precisão.** O gate pedia centro preservado com
+> deslocamento < 0,01cm "salvo evidência medida em contrário". Para estas 4
+> aberturas **não há abertura `measured` correspondente**: nas quatro,
+> `confidence == "reconstructed"`, `source_element_id is None` e a própria
+> parede tem `source_element_ids == []` em `reference.json`. O valor
+> **antigo** gravado para essas 4 (`19.0`/`18.88`) também não é medição
+> Revit independente — é, ele mesmo, byte-idêntico à saída do detector
+> ANTIGO (envelope) rodando sobre este mesmo corpus (conferido por
+> `state_detector.py STATE_A`), porque é exatamente isso que
+> `reconstruct.py:411` grava na extração.
+>
+> A evidência real que existe é mais estreita do que "medida": o
+> deslocamento de 0,12cm vem de uma coordenada de **peça de fato colocada**
+> no corpus (um `MEIO BLOCO - 14x19x19` com borda em `19,12` numa fiada e em
+> `19,00` na fiada alternada — verificável direto nas `rows` de
+> `reference.json`), e está gravado em `jamb_spread_cm`. Isso é mais forte
+> que arredondamento silencioso, mas **não é evidência medida do Revit** —
+> não há como arbitrar, com os dados disponíveis, se `19,00` ou `19,12` é o
+> valor "certo". Nenhuma tolerância participa do cálculo. Ainda assim,
+> 0,06cm > 0,01cm: **é desvio, e está sendo apresentado como desvio.**
+>
+> Este desvio de 0,06cm é aceito **somente para estes 4 casos
+> reconstruídos e para esta CR** — não é autorização geral para relaxar o
+> gate em mudanças futuras do detector.
 
 A alternativa seria um piso de ruído ("abaixo de X, mantenha o envelope") —
 que é literalmente o defeito outra vez, só que menor. Foi recusada.
@@ -496,6 +524,18 @@ constante de domínio — ela apenas impede que ele decida geometria.
    geometria agora é consenso, essa deriva não desloca mais o vão gravado —
    mas ela existe, e endurecê-la mudaria a composição dos trechos, o que
    estaria fora do escopo mínimo desta CR.
+7. **Melhoria futura registrada, não implementada nesta CR** (revisão
+   independente do PR, §7): `audit_existing_masonry_openings`
+   (`nuvem/core/wall_modeling.py:2259`) já roda em produção hoje e não
+   filtra por `opening_provenance` antes de usar a abertura no relatório
+   ao vivo — hoje inofensivo só porque `INCONCLUSIVE` é matematicamente
+   inalcançável com as constantes atuais (prova em `opening_audit.py`,
+   docstring de `detect_wall_openings_from_courses`). Recomenda-se, como
+   melhoria defensiva futura (não iniciada, não é CR própria ainda), pular
+   ou reportar separadamente aberturas `INCONCLUSIVE` nesse consumidor,
+   como cinto-e-suspensório para o dia em que `OPENING_GAP_MIN_CM`/
+   `OPENING_RUN_EDGE_MATCH_TOLERANCE_CM` mudarem. Mudaria comportamento de
+   produção, por isso não foi feita junto desta correção documental.
 
 ---
 
