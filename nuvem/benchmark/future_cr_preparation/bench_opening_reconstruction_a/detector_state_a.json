@@ -1,0 +1,2644 @@
+{
+ "label": "STATE_A",
+ "projects": {
+  "torre_easy_lo_r00_tgd": {
+   "n_openings": 94,
+   "openings": [
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W001",
+     "width_cm": 71.0,
+     "x_range": [
+      309.0,
+      380.0
+     ],
+     "z_range": [
+      160.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W003",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 131.0,
+     "x_range": [
+      309.0,
+      440.0
+     ],
+     "z_range": [
+      0.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 14,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      0.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 130.99,
+     "x_range": [
+      309.01,
+      440.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      120.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 130.99,
+     "x_range": [
+      309.01,
+      440.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      120.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 131.0,
+     "x_range": [
+      309.0,
+      440.0
+     ],
+     "z_range": [
+      0.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 14,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      0.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W008",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W010",
+     "width_cm": 71.0,
+     "x_range": [
+      309.0,
+      380.0
+     ],
+     "z_range": [
+      160.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W011",
+     "width_cm": 131.0,
+     "x_range": [
+      124.0,
+      255.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W011",
+     "width_cm": 131.0,
+     "x_range": [
+      1279.0,
+      1410.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W012",
+     "width_cm": 131.0,
+     "x_range": [
+      74.0,
+      205.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W012",
+     "width_cm": 131.0,
+     "x_range": [
+      1229.0,
+      1360.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W015",
+     "width_cm": 186.0,
+     "x_range": [
+      564.0,
+      750.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W016",
+     "width_cm": 226.0,
+     "x_range": [
+      34.0,
+      260.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W016",
+     "width_cm": 231.0,
+     "x_range": [
+      314.0,
+      545.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W017",
+     "width_cm": 186.0,
+     "x_range": [
+      564.0,
+      750.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W020",
+     "width_cm": 121.0,
+     "x_range": [
+      69.0,
+      190.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 166.0,
+     "x_range": [
+      19.0,
+      185.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 91.0,
+     "x_range": [
+      249.0,
+      340.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 91.0,
+     "x_range": [
+      504.0,
+      595.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 165.99,
+     "x_range": [
+      644.0,
+      809.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 165.99,
+     "x_range": [
+      34.0,
+      199.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 91.0,
+     "x_range": [
+      248.99,
+      339.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 91.0,
+     "x_range": [
+      503.99,
+      594.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 166.0,
+     "x_range": [
+      658.99,
+      824.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W025",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W026",
+     "width_cm": 131.0,
+     "x_range": [
+      68.99,
+      199.99
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W027",
+     "width_cm": 91.0,
+     "x_range": [
+      54.0,
+      145.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W028",
+     "width_cm": 91.0,
+     "x_range": [
+      289.0,
+      380.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W029",
+     "width_cm": 91.11,
+     "x_range": [
+      18.88,
+      109.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W030",
+     "width_cm": 91.01,
+     "x_range": [
+      39.0,
+      130.01
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W032",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W033",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W034",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W035",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W036",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W036",
+     "width_cm": 131.0,
+     "x_range": [
+      324.0,
+      455.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W038",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W038",
+     "width_cm": 131.0,
+     "x_range": [
+      324.0,
+      455.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W039",
+     "width_cm": 91.0,
+     "x_range": [
+      274.0,
+      365.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W040",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W042",
+     "width_cm": 91.0,
+     "x_range": [
+      134.0,
+      225.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W042",
+     "width_cm": 91.0,
+     "x_range": [
+      259.0,
+      350.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W043",
+     "width_cm": 91.0,
+     "x_range": [
+      134.0,
+      225.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W043",
+     "width_cm": 91.0,
+     "x_range": [
+      259.0,
+      350.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W044",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W045",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W046",
+     "width_cm": 186.0,
+     "x_range": [
+      94.0,
+      280.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W047",
+     "width_cm": 186.0,
+     "x_range": [
+      94.0,
+      280.0
+     ],
+     "z_range": [
+      0.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 91.0,
+     "x_range": [
+      314.0,
+      405.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 266.0,
+     "x_range": [
+      924.0,
+      1190.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 91.0,
+     "x_range": [
+      1943.99,
+      2034.99
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W055",
+     "width_cm": 91.0,
+     "x_range": [
+      314.0,
+      405.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W056",
+     "width_cm": 91.0,
+     "x_range": [
+      534.0,
+      625.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 6,
+     "tipo_provavel": "JANELA",
+     "wall": "W057",
+     "width_cm": 81.0,
+     "x_range": [
+      59.0,
+      140.0
+     ],
+     "z_range": [
+      140.0,
+      240.0
+     ]
+    },
+    {
+     "n_courses": 6,
+     "tipo_provavel": "PORTA",
+     "wall": "W057",
+     "width_cm": 81.0,
+     "x_range": [
+      179.0,
+      260.0
+     ],
+     "z_range": [
+      20.0,
+      120.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W060",
+     "width_cm": 101.0,
+     "x_range": [
+      204.0,
+      305.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W064",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W065",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W066",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W067",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W068",
+     "width_cm": 71.0,
+     "x_range": [
+      44.0,
+      115.0
+     ],
+     "z_range": [
+      160.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W069",
+     "width_cm": 91.0,
+     "x_range": [
+      24.0,
+      115.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W070",
+     "width_cm": 91.0,
+     "x_range": [
+      24.0,
+      115.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W071",
+     "width_cm": 71.0,
+     "x_range": [
+      44.0,
+      115.0
+     ],
+     "z_range": [
+      160.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W072",
+     "width_cm": 91.0,
+     "x_range": [
+      274.0,
+      365.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W073",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      140.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W075",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W076",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W078",
+     "width_cm": 101.02,
+     "x_range": [
+      19.0,
+      120.02
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W081",
+     "width_cm": 91.0,
+     "x_range": [
+      289.0,
+      380.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W082",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W084",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W085",
+     "width_cm": 131.0,
+     "x_range": [
+      68.99,
+      199.99
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 166.0,
+     "x_range": [
+      19.0,
+      185.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 91.0,
+     "x_range": [
+      249.0,
+      340.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 91.0,
+     "x_range": [
+      504.0,
+      595.0
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 165.99,
+     "x_range": [
+      644.0,
+      809.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W087",
+     "width_cm": 165.99,
+     "x_range": [
+      34.0,
+      199.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W087",
+     "width_cm": 91.0,
+     "x_range": [
+      248.99,
+      339.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W087",
+     "width_cm": 91.0,
+     "x_range": [
+      503.99,
+      594.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W087",
+     "width_cm": 166.0,
+     "x_range": [
+      658.99,
+      824.99
+     ],
+     "z_range": [
+      0.0,
+      200.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W095",
+     "width_cm": 131.0,
+     "x_range": [
+      124.0,
+      255.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W095",
+     "width_cm": 131.0,
+     "x_range": [
+      1279.0,
+      1410.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W096",
+     "width_cm": 131.0,
+     "x_range": [
+      74.0,
+      205.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W096",
+     "width_cm": 131.0,
+     "x_range": [
+      1229.0,
+      1360.0
+     ],
+     "z_range": [
+      110.0,
+      220.0
+     ]
+    }
+   ],
+   "widths": {
+    "71.0": 4,
+    "81.0": 2,
+    "91.0": 39,
+    "91.1": 1,
+    "101.0": 2,
+    "121.0": 1,
+    "131.0": 24,
+    "166.0": 8,
+    "186.0": 10,
+    "226.0": 1,
+    "231.0": 1,
+    "266.0": 1
+   }
+  },
+  "torre_easy_lo_r00_tp1": {
+   "n_openings": 92,
+   "openings": [
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W001",
+     "width_cm": 71.0,
+     "x_range": [
+      309.0,
+      380.0
+     ],
+     "z_range": [
+      772.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W003",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 131.0,
+     "x_range": [
+      309.0,
+      440.0
+     ],
+     "z_range": [
+      612.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 14,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W004",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      612.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 130.99,
+     "x_range": [
+      309.01,
+      440.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      732.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W005",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 130.99,
+     "x_range": [
+      309.01,
+      440.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      732.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W006",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 131.0,
+     "x_range": [
+      309.0,
+      440.0
+     ],
+     "z_range": [
+      612.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 14,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 12,
+     "tipo_provavel": "PORTA",
+     "wall": "W007",
+     "width_cm": 131.0,
+     "x_range": [
+      904.0,
+      1035.0
+     ],
+     "z_range": [
+      612.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W008",
+     "width_cm": 186.0,
+     "x_range": [
+      579.0,
+      765.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W010",
+     "width_cm": 71.0,
+     "x_range": [
+      309.0,
+      380.0
+     ],
+     "z_range": [
+      772.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W011",
+     "width_cm": 131.0,
+     "x_range": [
+      124.0,
+      255.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W011",
+     "width_cm": 131.0,
+     "x_range": [
+      1279.0,
+      1410.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W012",
+     "width_cm": 131.0,
+     "x_range": [
+      74.0,
+      205.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W012",
+     "width_cm": 131.0,
+     "x_range": [
+      1229.0,
+      1360.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W017",
+     "width_cm": 186.0,
+     "x_range": [
+      564.0,
+      750.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W018",
+     "width_cm": 226.0,
+     "x_range": [
+      34.0,
+      260.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W018",
+     "width_cm": 231.0,
+     "x_range": [
+      314.0,
+      545.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W019",
+     "width_cm": 186.0,
+     "x_range": [
+      564.0,
+      750.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W020",
+     "width_cm": 71.0,
+     "x_range": [
+      94.0,
+      165.0
+     ],
+     "z_range": [
+      772.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 166.0,
+     "x_range": [
+      19.0,
+      185.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 91.0,
+     "x_range": [
+      249.0,
+      340.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 91.0,
+     "x_range": [
+      504.0,
+      595.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W023",
+     "width_cm": 165.99,
+     "x_range": [
+      644.0,
+      809.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 165.99,
+     "x_range": [
+      34.0,
+      199.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 91.0,
+     "x_range": [
+      248.99,
+      339.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 91.0,
+     "x_range": [
+      503.99,
+      594.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W024",
+     "width_cm": 166.0,
+     "x_range": [
+      658.99,
+      824.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W025",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W026",
+     "width_cm": 131.0,
+     "x_range": [
+      68.99,
+      199.99
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W027",
+     "width_cm": 91.0,
+     "x_range": [
+      54.0,
+      145.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W028",
+     "width_cm": 91.0,
+     "x_range": [
+      289.0,
+      380.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W029",
+     "width_cm": 91.0,
+     "x_range": [
+      18.88,
+      109.88
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W030",
+     "width_cm": 91.0,
+     "x_range": [
+      39.0,
+      130.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W032",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W033",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W034",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W035",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W036",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W036",
+     "width_cm": 131.0,
+     "x_range": [
+      324.0,
+      455.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W038",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W038",
+     "width_cm": 131.0,
+     "x_range": [
+      324.0,
+      455.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W039",
+     "width_cm": 91.0,
+     "x_range": [
+      274.0,
+      365.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W040",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W042",
+     "width_cm": 91.0,
+     "x_range": [
+      134.0,
+      225.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W042",
+     "width_cm": 91.0,
+     "x_range": [
+      259.0,
+      350.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W043",
+     "width_cm": 91.0,
+     "x_range": [
+      134.0,
+      225.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W043",
+     "width_cm": 91.0,
+     "x_range": [
+      259.0,
+      350.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W044",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W045",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W046",
+     "width_cm": 186.0,
+     "x_range": [
+      94.0,
+      280.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 13,
+     "tipo_provavel": "PORTA",
+     "wall": "W047",
+     "width_cm": 186.0,
+     "x_range": [
+      94.0,
+      280.0
+     ],
+     "z_range": [
+      612.0,
+      852.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 91.0,
+     "x_range": [
+      314.0,
+      405.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 266.0,
+     "x_range": [
+      924.0,
+      1190.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W052",
+     "width_cm": 91.0,
+     "x_range": [
+      1943.99,
+      2034.99
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W055",
+     "width_cm": 91.0,
+     "x_range": [
+      314.0,
+      405.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W056",
+     "width_cm": 91.0,
+     "x_range": [
+      534.0,
+      625.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W059",
+     "width_cm": 101.0,
+     "x_range": [
+      204.0,
+      305.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W063",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W064",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W065",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W066",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W067",
+     "width_cm": 71.0,
+     "x_range": [
+      44.0,
+      115.0
+     ],
+     "z_range": [
+      772.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W068",
+     "width_cm": 91.0,
+     "x_range": [
+      24.0,
+      115.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W069",
+     "width_cm": 91.0,
+     "x_range": [
+      24.0,
+      115.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 4,
+     "tipo_provavel": "JANELA",
+     "wall": "W070",
+     "width_cm": 71.0,
+     "x_range": [
+      44.0,
+      115.0
+     ],
+     "z_range": [
+      772.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W071",
+     "width_cm": 91.0,
+     "x_range": [
+      274.0,
+      365.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 8,
+     "tipo_provavel": "PORTA",
+     "wall": "W072",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      752.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W074",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W075",
+     "width_cm": 91.01,
+     "x_range": [
+      158.99,
+      250.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W077",
+     "width_cm": 101.02,
+     "x_range": [
+      19.0,
+      120.02
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W080",
+     "width_cm": 91.0,
+     "x_range": [
+      289.0,
+      380.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W081",
+     "width_cm": 91.0,
+     "x_range": [
+      19.0,
+      110.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W083",
+     "width_cm": 131.0,
+     "x_range": [
+      69.0,
+      200.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W084",
+     "width_cm": 131.0,
+     "x_range": [
+      68.99,
+      199.99
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W085",
+     "width_cm": 166.0,
+     "x_range": [
+      19.0,
+      185.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W085",
+     "width_cm": 91.0,
+     "x_range": [
+      249.0,
+      340.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W085",
+     "width_cm": 91.0,
+     "x_range": [
+      504.0,
+      595.0
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W085",
+     "width_cm": 165.99,
+     "x_range": [
+      644.0,
+      809.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 165.99,
+     "x_range": [
+      34.0,
+      199.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 91.0,
+     "x_range": [
+      248.99,
+      339.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 91.0,
+     "x_range": [
+      503.99,
+      594.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 11,
+     "tipo_provavel": "PORTA",
+     "wall": "W086",
+     "width_cm": 166.0,
+     "x_range": [
+      658.99,
+      824.99
+     ],
+     "z_range": [
+      612.0,
+      812.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W094",
+     "width_cm": 131.0,
+     "x_range": [
+      124.0,
+      255.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W094",
+     "width_cm": 131.0,
+     "x_range": [
+      1279.0,
+      1410.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W095",
+     "width_cm": 131.0,
+     "x_range": [
+      74.0,
+      205.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    },
+    {
+     "n_courses": 7,
+     "tipo_provavel": "JANELA",
+     "wall": "W095",
+     "width_cm": 131.0,
+     "x_range": [
+      1229.0,
+      1360.0
+     ],
+     "z_range": [
+      722.0,
+      832.0
+     ]
+    }
+   ],
+   "widths": {
+    "71.0": 5,
+    "91.0": 40,
+    "101.0": 2,
+    "131.0": 24,
+    "166.0": 8,
+    "186.0": 10,
+    "226.0": 1,
+    "231.0": 1,
+    "266.0": 1
+   }
+  }
+ }
+}

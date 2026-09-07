@@ -25,6 +25,8 @@ __all__ = [
     "OPENING_SYSTEM_UNKNOWN", "OPENING_GAP_MIN_CM", "OPENING_GAP_MAX_CM",
     "OPENING_MIN_CONSEC_COURSES", "OPENING_RUN_EDGE_MATCH_TOLERANCE_CM",
     "OPENING_DOOR_TOUCHES_BASE_TOLERANCE_CM", "CUT_BLOCK_JAMB_JUSTIFICATION_MAX_CM",
+    "OPENING_PROVENANCE_MEASURED", "OPENING_PROVENANCE_CONSENSUS",
+    "OPENING_PROVENANCE_ENVELOPE", "OPENING_PROVENANCE_INCONCLUSIVE",
     "_family_name_matches_keyword", "is_canaleta_family_name",
     "is_cortado_family_name", "is_verga_or_contraverga_family_name",
     "merge_axis_intervals", "gaps_between_intervals",
@@ -50,6 +52,16 @@ OPENING_MIN_CONSEC_COURSES = 4
 # Tolerancia de casamento de borda (cm) entre gaps de fiadas consecutivas
 # ao formar um "trecho" vertical de vazio - absorve o pequeno deslocamento
 # horizontal natural do desencontro de junta entre fiadas (secao 10.6).
+#
+# ESCOPO (CR-BENCH-OPENING-RECONSTRUCTION-A): esta tolerancia responde SO'
+# a pergunta de IDENTIDADE - "o vazio desta fiada e' a MESMA abertura do
+# vazio da fiada anterior?". Ela NAO pode entrar na GEOMETRIA gravada do
+# vao: quem define a borda e' o CONSENSO entre as fiadas do trecho (ver
+# `detect_wall_openings_from_courses`). Antes desta CR o vao gravado era o
+# ENVELOPE (uniao min/max) dos vazios, e por isso a tolerancia de 15,0cm
+# vazava direto pra' largura do vao - onde a jamba cai num no' T/L as
+# fiadas alternam entre "reserva de no' vazia" e "peca de amarracao
+# atravessa o no'", diferenca de exatamente B34 - B19 = 34 - 19 = 15,0cm.
 OPENING_RUN_EDGE_MATCH_TOLERANCE_CM = 15.0
 # Um vao cuja base fica a ate' esta distancia da fiada mais baixa da
 # PROPRIA linha de parede reconstruida conta como "toca o chao" (porta,
@@ -60,6 +72,25 @@ OPENING_DOOR_TOUCHES_BASE_TOLERANCE_CM = 25.0
 # (secao 10.5) - medido: 65% dos cortados reais de TORRE EASY-LO-R00
 # ficaram dentro dessa distancia de alguma jamba.
 CUT_BLOCK_JAMB_JUSTIFICATION_MAX_CM = 60.0
+
+# Vocabulario de PROVENIENCIA de abertura (CR-BENCH-OPENING-RECONSTRUCTION-A):
+# responde "de onde saiu ESTA geometria?" e nunca e' deduzido depois - quem
+# reconstroi grava o que de fato usou. Abertura sem proveniencia nao entra
+# em gabarito.
+#   MEASURED                - veio do Revit (tem `source_element_id`); este
+#                             modulo NUNCA produz este valor (ele reconstroi).
+#   RECONSTRUCTED_CONSENSUS - borda que TODAS as fiadas do trecho respeitam.
+#   RECONSTRUCTED_ENVELOPE  - LEGADO: uniao (min/max) dos vazios por fiada.
+#                             Mantido so' como vocabulario, pra' que dado
+#                             antigo possa ser rotulado; este modulo nao
+#                             emite mais aberturas assim.
+#   INCONCLUSIVE            - as fiadas do trecho nao concordam sobre nenhum
+#                             vao valido: nao ha' consenso pra' gravar e o
+#                             detector NAO decide por conta propria.
+OPENING_PROVENANCE_MEASURED = "MEASURED"
+OPENING_PROVENANCE_CONSENSUS = "RECONSTRUCTED_CONSENSUS"
+OPENING_PROVENANCE_ENVELOPE = "RECONSTRUCTED_ENVELOPE"
+OPENING_PROVENANCE_INCONCLUSIVE = "INCONCLUSIVE"
 
 
 def _family_name_matches_keyword(family_name, keyword):
@@ -123,11 +154,37 @@ def detect_wall_openings_from_courses(courses):
 
     Devolve lista de dicts:
         {"x_range": (ini_cm, fim_cm), "width_cm": float,
+         "x_range_envelope": (ini_cm, fim_cm),
+         "jamb_spread_start_cm": float, "jamb_spread_end_cm": float,
+         "jamb_spread_cm": float, "opening_provenance": str,
          "z_range": (z_lo, z_hi), "n_courses": int,
          "tipo_provavel": "PORTA" | "JANELA"}
     "PORTA" quando o vao toca a fiada mais baixa da PROPRIA linha
     (`OPENING_DOOR_TOUCHES_BASE_TOLERANCE_CM`) - nunca espera contraverga
-    nesse caso (secao 10.4). "JANELA" caso contrario."""
+    nesse caso (secao 10.4). "JANELA" caso contrario.
+
+    IDENTIDADE x GEOMETRIA (CR-BENCH-OPENING-RECONSTRUCTION-A) - as duas
+    perguntas sao SEPARADAS e nao podem se contaminar:
+
+      1. "estas observacoes sao a MESMA abertura?" -> decidida pela
+         tolerancia `OPENING_RUN_EDGE_MATCH_TOLERANCE_CM` contra o
+         ENVELOPE corrente do trecho. Este passo NAO mudou.
+      2. "quais sao as JAMBAS FISICAS dessa abertura?" -> decidida pelo
+         CONSENSO: `x_range = (max(inicios), min(fins))` das fiadas do
+         trecho, isto e', a borda que TODAS elas respeitam. Nenhuma
+         tolerancia entra aqui.
+
+    Consequencia: `x_range` esta' contido em TODOS os vazios de fiada do
+    trecho - o detector nunca declara vazio um ponto onde ALGUMA fiada
+    tem peca. O desacordo entre fiadas nao e' apagado, e sim gravado em
+    `jamb_spread_*` (e o envelope antigo continua legivel em
+    `x_range_envelope`, pra' diagnostico).
+
+    Quando nem existe consenso valido (`min(fins) - max(inicios)` abaixo
+    de `OPENING_GAP_MIN_CM`), a funcao NAO volta ao envelope e NAO apaga a
+    abertura: grava o consenso nao-invertido e marca
+    `opening_provenance = INCONCLUSIVE`, deixando a decisao pra' quem
+    consome."""
     ordered = sorted(courses, key=lambda c: c[0])
     if len(ordered) < OPENING_MIN_CONSEC_COURSES:
         return []
@@ -150,6 +207,12 @@ def detect_wall_openings_from_courses(courses):
                 continue
             used.add(signature)
             run_courses = [z_cm]
+            # As bordas OBSERVADAS, fiada a fiada. Sao a materia-prima das
+            # DUAS respostas: o envelope (identidade) e o consenso
+            # (geometria). Guardar as duas listas e' o que permite gravar o
+            # desacordo em vez de arredonda-lo em silencio.
+            gap_starts, gap_ends = [gap_start], [gap_end]
+            # ENVELOPE - usado SO' como referencia de IDENTIDADE do trecho.
             run_start, run_end = gap_start, gap_end
             for z2, _iv2 in ordered[i + 1:]:
                 match = None
@@ -165,14 +228,33 @@ def detect_wall_openings_from_courses(courses):
                 gj, gs2, ge2 = match
                 used.add((z2, gj))
                 run_courses.append(z2)
+                gap_starts.append(gs2)
+                gap_ends.append(ge2)
                 run_start = min(run_start, gs2)
                 run_end = max(run_end, ge2)
             if len(run_courses) >= OPENING_MIN_CONSEC_COURSES:
                 z_lo, z_hi = min(run_courses), max(run_courses)
                 is_door_like = (z_lo <= body_bottom + OPENING_DOOR_TOUCHES_BASE_TOLERANCE_CM)
+                # CONSENSO: a borda que TODA fiada do trecho respeita.
+                consensus_start = max(gap_starts)
+                consensus_end = min(gap_ends)
+                spread_start = max(gap_starts) - min(gap_starts)
+                spread_end = max(gap_ends) - min(gap_ends)
+                if consensus_end - consensus_start >= OPENING_GAP_MIN_CM:
+                    provenance = OPENING_PROVENANCE_CONSENSUS
+                else:
+                    # Sem consenso valido: nao voltar ao envelope (era
+                    # exatamente o defeito) e nao apagar a abertura.
+                    provenance = OPENING_PROVENANCE_INCONCLUSIVE
+                    consensus_end = max(consensus_end, consensus_start)
                 openings.append({
-                    "x_range": (run_start, run_end),
-                    "width_cm": run_end - run_start,
+                    "x_range": (consensus_start, consensus_end),
+                    "width_cm": consensus_end - consensus_start,
+                    "x_range_envelope": (run_start, run_end),
+                    "jamb_spread_start_cm": spread_start,
+                    "jamb_spread_end_cm": spread_end,
+                    "jamb_spread_cm": max(spread_start, spread_end),
+                    "opening_provenance": provenance,
                     "z_range": (z_lo, z_hi),
                     "n_courses": len(run_courses),
                     "tipo_provavel": "PORTA" if is_door_like else "JANELA",

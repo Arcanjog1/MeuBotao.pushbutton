@@ -1,0 +1,112 @@
+{
+ "torre_easy_lo_r00_tgd": {
+  "ALARGADAS": 0,
+  "aberturas_A": 94,
+  "aberturas_B": 94,
+  "centro_deslocado_max_cm": 0.06,
+  "centro_deslocado_n": 14,
+  "contida_no_envelope_antigo": true,
+  "estreitadas": 31,
+  "geometria_alterada": 31,
+  "jamb_spread_cm_B": {
+   "0.0": 63,
+   "0.01": 9,
+   "0.02": 1,
+   "0.12": 2,
+   "15.0": 19
+  },
+  "larguras_A": {
+   "101.0": 2,
+   "121.0": 1,
+   "131.0": 24,
+   "166.0": 8,
+   "186.0": 10,
+   "226.0": 1,
+   "231.0": 1,
+   "266.0": 1,
+   "71.0": 4,
+   "81.0": 2,
+   "91.0": 39,
+   "91.1": 1
+  },
+  "larguras_B": {
+   "101.0": 10,
+   "121.0": 1,
+   "131.0": 16,
+   "156.0": 10,
+   "166.0": 8,
+   "226.0": 1,
+   "231.0": 1,
+   "236.0": 1,
+   "71.0": 4,
+   "81.0": 2,
+   "90.9": 2,
+   "91.0": 38
+  },
+  "proveniencia_B": {
+   "RECONSTRUCTED_CONSENSUS": 94
+  },
+  "reducao_de_largura_cm": {
+   "0.01": 9,
+   "0.02": 1,
+   "0.12": 1,
+   "0.23": 1,
+   "29.99": 2,
+   "30.0": 17
+  },
+  "so_em_A": 0,
+  "so_em_B": 0
+ },
+ "torre_easy_lo_r00_tp1": {
+  "ALARGADAS": 0,
+  "aberturas_A": 92,
+  "aberturas_B": 92,
+  "centro_deslocado_max_cm": 0.06,
+  "centro_deslocado_n": 14,
+  "contida_no_envelope_antigo": true,
+  "estreitadas": 31,
+  "geometria_alterada": 31,
+  "jamb_spread_cm_B": {
+   "0.0": 61,
+   "0.01": 8,
+   "0.02": 1,
+   "0.12": 3,
+   "15.0": 19
+  },
+  "larguras_A": {
+   "101.0": 2,
+   "131.0": 24,
+   "166.0": 8,
+   "186.0": 10,
+   "226.0": 1,
+   "231.0": 1,
+   "266.0": 1,
+   "71.0": 5,
+   "91.0": 40
+  },
+  "larguras_B": {
+   "101.0": 10,
+   "131.0": 16,
+   "156.0": 10,
+   "166.0": 8,
+   "226.0": 1,
+   "231.0": 1,
+   "236.0": 1,
+   "71.0": 5,
+   "90.9": 3,
+   "91.0": 37
+  },
+  "proveniencia_B": {
+   "RECONSTRUCTED_CONSENSUS": 92
+  },
+  "reducao_de_largura_cm": {
+   "0.01": 8,
+   "0.02": 1,
+   "0.12": 3,
+   "29.99": 2,
+   "30.0": 17
+  },
+  "so_em_A": 0,
+  "so_em_B": 0
+ }
+}
