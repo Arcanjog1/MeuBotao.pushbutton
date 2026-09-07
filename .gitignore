@@ -36,3 +36,11 @@ nuvem/benchmark/projects/*/scoped_comparison.json
 nuvem/benchmark/projects/*/provisional_2b/result.json
 nuvem/benchmark/projects/*/provisional_2b/findings.json
 nuvem/benchmark/projects/*/provisional_2b/comparison.json
+
+# CR-BENCH-OPENING-RECONSTRUCTION-A (PR #22) - saidas deterministicas dos
+# reproducers, regeneraveis a partir de reference.json (ja versionado) +
+# repro_envelope.py/state_solver.py; so' os resumos agregados
+# (detector_state_delta.json, solver_state_delta.json) ficam versionados.
+nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/repro_envelope.json
+nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/solver_state_a.json
+nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/solver_state_b.json

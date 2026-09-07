@@ -167,6 +167,53 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
     o C04 nao o introduz nem o agrava. As duas nao podem ser somadas na
     mesma frase: a primeira e' custo deste PR, a segunda nao.
 
+- **CR-BENCH-OPENING-RECONSTRUCTION-A** (branch
+  `claude/opening-detector-root-fix-m21hfm`, `PR #22` **DRAFT, não
+  mergeado**) — `nuvem/core/engine/opening_audit.py::detect_wall_
+  openings_from_courses` respondia duas perguntas diferentes com o mesmo
+  número: a tolerância de identidade (`OPENING_RUN_EDGE_MATCH_TOLERANCE_CM`,
+  ~15cm) decide se o vazio de duas fiadas é a MESMA abertura, mas a
+  geometria gravada virava o ENVELOPE (união) dos vazios, deixando a
+  tolerância de identidade vazar para a largura do vão. Corrigido para
+  gravar o **consenso** (interseção dos vazios OBSERVADOS em todas as
+  fiadas do trecho) em vez do envelope — **separação entre IDENTIDADE
+  (tolerância) e GEOMETRIA OBSERVADA (consenso) mantida explicitamente**.
+  `opening_provenance` novo (`RECONSTRUCTED_CONSENSUS`/`INCONCLUSIVE`);
+  **`RECONSTRUCTED_CONSENSUS` NÃO equivale a `MEASURED`** — o consenso é o
+  intervalo comum aos vazios observados, não confirmação de jamba física
+  real (revisão independente corrigiu overclaim de vocabulário no código e
+  na doc). Diff de produção: 1 arquivo, só docstring/comentário desde a
+  revisão (nenhuma linha executável mudou — AST idêntica antes/depois,
+  ignorando docstrings). HEAD de produção `f885081a0587a4d3f1cdd2092b557f
+  930c14003d` corresponde ao HEAD revisado pela revisão independente
+  (mesmo commit). 44 testes focados
+  (`tests/test_opening_reconstruction_cr_a.py`) passando; última suíte
+  completa (medida antes da revisão, sem efeito no diff documental
+  posterior): **871 passed / 2 failed** — as 2 falhas são as mesmas
+  dívidas já conhecidas do `PR #20` (`C1`: `compensators` do TGD; `TP1`
+  `JUNCTION_MISSING_BINDING` 8→9), não novas, não agravadas (score do
+  solver byte-idêntico entre STATE_A/STATE_B). Solver dos 3 projetos com
+  delta ZERO (gabarito congelado não chama o detector). Desvio de hard
+  gate declarado: **4 aberturas reconstruídas** do corpus (TGD `W082`; TP1
+  `W029`/`W040`/`W072`) têm deslocamento de centro de 0,06cm por
+  coordenada fracionária de extração — nenhuma tem `source_element_id`
+  correspondente, aceito só para estes 4 casos e para esta CR, não como
+  regra geral. Registro técnico em `nuvem/REGRAS_MODULACAO_BLOCOS.md`
+  seção 10.9 (só adição). Relatórios:
+  `docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md` e
+  `docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md` (veredito
+  **APPROVE_WITH_EXPLICIT_CONDITIONS**, condições já aplicadas). **NÃO
+  integrada à `main`** até merge autorizado. Pendências declaradas, **não
+  resolvidas nesta CR**: `CR-BENCH-OPENING-RECONSTRUCTION-B` (decisão
+  humana entre "abertura estreita" e "duas paredes separadas" para os 19
+  casos por projeto com assinatura de 15cm) **não iniciada**; família de
+  0,11–0,12cm de coordenada fracionária (causa é a extração, não o
+  detector) **não resolvida**; guard defensivo de `INCONCLUSIVE` em
+  `audit_existing_masonry_openings` **registrado, não implementado**
+  (mudaria comportamento de produção). `baseline.json`/`reference.json`/
+  `reference_score.json`/`input.json` intocados; nenhum threshold, `skip`
+  ou `xfail` alterado.
+
 `PR #9` (`CR-BLOCK-ARM-ROLE-INVARIANCE`, **CLOSED, não mesclado** —
 NECESSITA AJUSTE, branch histórica preservada) e `PR #11`
 (`CR-BLOCK-ARM-ROLE-HUMAN-POLICY`, **CLOSED, mesclado** — docs-only,
