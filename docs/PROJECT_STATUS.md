@@ -11,17 +11,25 @@
 
 ```
 branch: main
-SHA:    91258dd627af97fe437a56c0506eb096ca5aa267
+SHA:    c88a031404459ee4cee0f7c36904b8e7b971a471
 ```
 
-`main` real conferida por `git fetch` em 2026-09-08. Último merge:
-`PR #24` / **CR-V1** — valida encontros por elevação física, não por
-índice ordinal. O SHA `62ea7f2` que constava aqui era o do `PR #22` e
-estava **desatualizado**; a cadeia intermediária (`PR #23`, `PR #24`)
-está em `docs/PROJECT_STATUS_LOG.md`.
+Últimos marcos de PRODUÇÃO, na ordem em que entraram (todos **mesclados**),
+conferidos por `git fetch` em 2026-09-08:
 
-Último marco de PRODUÇÃO: `PR #24` / `CR-V1` — **mesclado** (merge commit
-`91258dd627af97fe437a56c0506eb096ca5aa267`). Antes dele, `PR #23` (registro
+| PR | CR | merge commit |
+|---|---|---|
+| `PR #24` | CR-V1 — validador de encontros por elevação física | `91258dd` |
+| `PR #27` | CR-D1 — recuperação documental | `7cc935d` |
+| `PR #25` | CR-S1 — alternância de amarração no nó L | `32e1c0e` |
+| `PR #26` | CR-C1 — `expected_rows` física por elevação | `0c6e8f7` |
+| `PR #29` | CR-G12 — regra #1 na fronteira entre bandas de abertura | `c88a031` |
+
+O SHA `62ea7f2` que constava aqui era o do `PR #22` e estava
+**desatualizado**; a cadeia intermediária está em
+`docs/PROJECT_STATUS_LOG.md`.
+
+Antes deles, `PR #23` (registro
 pós-merge, `e381992`) e `PR #22` / `CR-BENCH-OPENING-RECONSTRUCTION-A`
 (merge commit `62ea7f26b9fb8af72c960b04d08f7b58cd115114`, pais
 `3f293d1433e8c16eb186959e33a345b60ac944f9` + HEAD aprovado
@@ -95,110 +103,11 @@ Só o que está realmente mesclado na `main`, na ordem em que foi integrado:
   Regras: seção 5 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`; relatório:
   `docs/CR_V1_JUNCTION_VALIDATOR_ELEVATION_IDENTITY.md`.
 
-Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
-
-## Trabalho ativo
-
-- **CR-C1 — `expected_rows` GLOBAL acusava parede correta** (branch
-  `claude/cr-c1-expected-rows-fisico`, base `origin/main` = `91258dd`,
-  **PR DRAFT, NÃO mesclado**) — correção do **contrato de validação**
-  (`nuvem/benchmark/validators/validate_wall_coverage.py`, 1 arquivo de
-  produção). Não toca o solver, o gabarito oficial, `baseline.json`,
-  `reference_score.json` nem regra normativa de domínio. **NÃO inclui a
-  CR-S1.**
-  **Causa-raiz provada:** `validate_wall_coverage` lia
-  `settings.expected_rows` (= `num_courses`, o TETO de fiadas do PROJETO) e
-  comparava com a CONTAGEM de fiadas de CADA parede. As paredes do corpus
-  têm alturas diferentes (220/260/270/280/281cm com passo de 20cm) — uma
-  parede de 260cm nunca terá 17 fiadas. **Prova independente:** rodando os
-  validadores sobre o PRÓPRIO gabarito HUMANO, `COVERAGE_MISSING_ROW` dá
-  **95** (TGD) e **94** (TP1) — os mesmos números do `reference_score.json`
-  oficial — e **100% deles** vêm desse ramo, ZERO do ramo do meio da pilha.
-  **Correção mínima:** a pergunta passa a ser física e por ELEVAÇÃO —
-  *ainda cabe uma fiada INTEIRA (próximo passo + corpo da peça) abaixo do
-  pé-direito DESTA parede?* Não se calcula onde cada fiada cai: no gabarito
-  a fiada do topo NÃO segue o grid (270cm fecha em z=250, 281cm em z=261,
-  com canaleta `CJ19` de 29cm e peças `_C` de 9cm), e reproduzir isso no
-  validador seria reimplementar a política de empilhamento do solver dentro
-  dele. Regra registrada em `nuvem/REGRAS_MODULACAO_BLOCOS.md` **seção 37**
-  (a 36 fica RESERVADA para a CR-S1, ainda não mesclada).
-  **Medido (todos os validadores, duas árvores, por identidade física):**
-  gabarito TGD 95→**0** e TP1 94→**0**; solver TGD 192→**190**; solver TP1
-  e piloto sem mudança. **Delta ZERO em TODOS os demais códigos** nas cinco
-  unidades — incluindo `COVERAGE_ROW_MOSTLY_EMPTY`, `COVERAGE_GAP_IN_ROW`,
-  `POSITION_OVERLAP`, `PRISM_*`, `JUNCTION_*`, `COMPENSATOR_*` e
-  `OPENING_*`. **Não é silenciador:** no solver do TGD o ramo do topo cai só
-  **30→28** — as 28 preservadas são paredes de `h=340` que param em `z=301`
-  (ainda cabe fiada em z=321), defeito REAL; as 2 removidas fecham em
-  `z=321` (321+19=340 = topo exato), parede completa. Discriminação de
-  **19cm**. O ramo do meio da pilha fica intocado (162→162).
-  Testes: `tests/regression/test_validator_coverage_expected_rows_cr_c1.py`
-  (**19 casos; 16 falham contra `origin/main` `91258dd`**) — alturas
-  diferentes, base Z deslocada (612, o caso do TP1), fiada de topo fora do
-  grid, faixas intercaladas de abertura, ausência REAL de fiada
-  (anti-tautologia), fiada faltando no meio, parede sem altura declarada,
-  invariância à ordem de entrada por identidade física e determinismo.
-  Controles `tests/regression/test_validators.py` **23/23**. Suíte completa
-  nesta branch: **2 failed, 885 passed** — as 2 falhas são
-  `tests/regression/test_benchmark_baselines.py` (TGD `compensators` 52→61;
-  TP1 `JUNCTION_MISSING_BINDING` 8→9) e são **PRÉ-EXISTENTES**, com as
-  mesmas asserções e os mesmos valores medidos num *worktree* limpo de
-  `91258dd` sem o patch. **Zero falhas novas.** A contagem fecha: base 868 +
-  19 testes desta CR = 887.
-  **Dívidas registradas, não escondidas:** `baseline.json` (TGD 265 / TP1
-  16) e `reference_score.json` (95 / 94) ficam desalinhados de propósito —
-  recalibração é escrita em arquivo oficial e exige autorização específica;
-  os **162** achados do ramo do meio no solver do TGD seguem sem
-  diagnóstico próprio (CR separada); as **28** paredes de `h=340` são
-  defeito real do solver que esta CR ENTREGA, não corrige.
-  **Medido também sobre o CANDIDATO da CR-B** (o estado onde o gate `G16`
-  falha, reproduzido do gerador determinístico `5640933`): `STATE_R →
-  STATE_C` dá `+17 MISSING_ROW` e `+23 ROW_MOSTLY_EMPTY` — exatamente os
-  números do G16 — e com a C1 fica **`+0` / `+23`**. **O `G16` é COMPOSTO e
-  esta CR resolve METADE dele:** `COVERAGE_ROW_MOSTLY_EMPTY` não lê
-  `expected_rows` (compara as fiadas de uma parede entre si) e o resíduo é
-  consequência da **divisão de paredes** da própria CR-B (+19 paredes, 184
-  blocos mudaram de fiada). **`G16` continua NÃO aprovado**; a outra metade
-  exige CR própria — proposta **CR-C2 (cobertura por segmento após divisão
-  de parede)**, não implementada.
-  Relatório: `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`.
-
-- **CR-V1 — VALIDADOR DE ENCONTROS POR ELEVAÇÃO FÍSICA** (branch
-  `claude/validador-encontros-elevacao-3u21lw`, base `origin/main` =
-  `e381992`, `PR #24` **DRAFT, NÃO mesclado**) — fidelidade do
-  **validador de benchmark** (`nuvem/benchmark/validators/
-  validate_junctions.py`); não toca solver, gabarito oficial nem regra
-  normativa. Causa-raiz (achada na reconciliação independente do
-  contrato CR-B, `docs/BENCH_OPENING_RECONSTRUCTION_B_INDEPENDENT_
-  RECONCILIATION.md`): o validador agrupava fiadas do nó pelo ÍNDICE
-  ORDINAL `row["row"]` (posição na pilha da parede), não pela COTA —
-  duas paredes com pilhas de tamanho diferente (meia-fiada cortada,
-  `base_z_cm` diferente) tinham o mesmo índice apontando para cotas
-  diferentes, gerando `JUNCTION_MISSING_BINDING` falso numa alvenaria
-  amarrada corretamente (medido: 63% dos 373 achados do gabarito de hoje
-  já nasciam disso). Corrigido para agrupar por `row["elevation_cm"]`
-  (mesma tolerância do motor, `model.COURSE_Z_TOLERANCE_CM`, nenhuma
-  tolerância nova) e exigir ≥2 paredes do nó com fiada registrada
-  naquela cota para afirmar "faltou amarração" — regra explicada em
-  `nuvem/REGRAS_MODULACAO_BLOCOS.md` seção 5. Medido em STATE_R→STATE_C
-  (candidato CR-B, cópias isoladas, gabarito oficial intocado):
-  `JUNCTION_MISSING_BINDING` +49 (defeito, índice ordinal) → **+10**
-  (identidade física correta), TGD e TP1 — bate exatamente com a
-  classificação independente (39 defeito do validador eliminados, 10
-  mudança legítima de unidade em nós recém-registrados pela CR-B, 0
-  defeito físico novo). Nenhum outro código de achado mudou de valor
-  (`COVERAGE_*`, `PRISM_*`, `COMPENSATOR_*`, `OPENING_*`,
-  `JUNCTION_NOT_ALTERNATING`, `JUNCTION_HALF_BLOCK_ADJACENT` — delta
-  zero nos dois projetos). Testes novos:
-  `tests/regression/test_junction_elevation_identity_cr_v1.py` (13
-  casos A-G do pedido, 5 falham comprovadamente contra o código
-  pré-fix). Não inicia nem mistura CR-S1 (o solver genuinamente para de
-  alternar amarração no nó que muda de T para L — permanece defeito real
-  do solver, não tocado), CR-C1 (`expected_rows` global) nem a
-  integração oficial da CR-B.
-- **CR-S1 — PERDA REAL DE ALTERNÂNCIA EM NÓ L** (branch
-  `claude/corrigir-alternancia-no-l-76nnb3`, base `origin/main` =
-  `91258dd`, **PR DRAFT, NÃO mesclado**) — correção **do solver**
+- **CR-S1 — PERDA REAL DE ALTERNÂNCIA EM NÓ L** (`PR #25`, **mesclado**,
+  merge commit `32e1c0e`, HEAD aprovado `33d035f`, base `91258dd`;
+  alternativa **A** aceita explicitamente pelo usuário — o custo de
+  compensadores da §9.7 abaixo foi aceito, não corrigido) — correção
+  **do solver**
   (`nuvem/core/engine/wall_stepper.py`, 1 arquivo de produção). Não toca
   gabarito oficial, validador, baseline nem regra normativa de domínio.
   **Causa-raiz provada:** `solve_l_corner` gira a peça do canto (as DUAS
@@ -274,9 +183,84 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   regravado, nenhum `--save-baseline`, nenhum `skip`/`xfail`, nenhum
   threshold alterado. Determinismo: `sha256` idêntico em 3 processos
   novos por projeto.
-  Relatório: `docs/CR_S1_L_NODE_ALTERNATION.md`. **Não inicia CR-C1,
-  CR-B oficial, C02, C10 nem Junction/S1/S2 antigos. Sem monitoramento
-  automático.**
+  Relatório: `docs/CR_S1_L_NODE_ALTERNATION.md`; regras: seção 36 de
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Pós-merge: suíte `not slow` **864
+  passed** no HEAD aprovado e **883 passed** na `main` mesclada
+  (`0c6e8f7`), 0 falhas nas duas.
+
+Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
+
+## Trabalho ativo
+
+> Entradas marcadas **mesclado** ainda listadas aqui (CR-C1 `PR #26`,
+> CR-BENCH-OPENING-RECONSTRUCTION-A `PR #22`) aguardam reorganização por
+> quem as escreveu — o estado de merge delas já está correto; só a
+> posição na página é que está pendente.
+
+- **CR-C1 — `expected_rows` GLOBAL acusava parede correta** (`PR #26`,
+  **mesclado**, merge commit `0c6e8f7`; entrada mantida aqui como estava,
+  só o estado de merge foi corrigido) — correção do **contrato de validação**
+  (`nuvem/benchmark/validators/validate_wall_coverage.py`, 1 arquivo de
+  produção). Não toca o solver, o gabarito oficial, `baseline.json`,
+  `reference_score.json` nem regra normativa de domínio. **NÃO inclui a
+  CR-S1.**
+  **Causa-raiz provada:** `validate_wall_coverage` lia
+  `settings.expected_rows` (= `num_courses`, o TETO de fiadas do PROJETO) e
+  comparava com a CONTAGEM de fiadas de CADA parede. As paredes do corpus
+  têm alturas diferentes (220/260/270/280/281cm com passo de 20cm) — uma
+  parede de 260cm nunca terá 17 fiadas. **Prova independente:** rodando os
+  validadores sobre o PRÓPRIO gabarito HUMANO, `COVERAGE_MISSING_ROW` dá
+  **95** (TGD) e **94** (TP1) — os mesmos números do `reference_score.json`
+  oficial — e **100% deles** vêm desse ramo, ZERO do ramo do meio da pilha.
+  **Correção mínima:** a pergunta passa a ser física e por ELEVAÇÃO —
+  *ainda cabe uma fiada INTEIRA (próximo passo + corpo da peça) abaixo do
+  pé-direito DESTA parede?* Não se calcula onde cada fiada cai: no gabarito
+  a fiada do topo NÃO segue o grid (270cm fecha em z=250, 281cm em z=261,
+  com canaleta `CJ19` de 29cm e peças `_C` de 9cm), e reproduzir isso no
+  validador seria reimplementar a política de empilhamento do solver dentro
+  dele. Regra registrada em `nuvem/REGRAS_MODULACAO_BLOCOS.md` **seção 37**
+  (a 36 é da CR-S1, mesclada pelo `PR #25` — merge commit `32e1c0e`).
+  **Medido (todos os validadores, duas árvores, por identidade física):**
+  gabarito TGD 95→**0** e TP1 94→**0**; solver TGD 192→**190**; solver TP1
+  e piloto sem mudança. **Delta ZERO em TODOS os demais códigos** nas cinco
+  unidades — incluindo `COVERAGE_ROW_MOSTLY_EMPTY`, `COVERAGE_GAP_IN_ROW`,
+  `POSITION_OVERLAP`, `PRISM_*`, `JUNCTION_*`, `COMPENSATOR_*` e
+  `OPENING_*`. **Não é silenciador:** no solver do TGD o ramo do topo cai só
+  **30→28** — as 28 preservadas são paredes de `h=340` que param em `z=301`
+  (ainda cabe fiada em z=321), defeito REAL; as 2 removidas fecham em
+  `z=321` (321+19=340 = topo exato), parede completa. Discriminação de
+  **19cm**. O ramo do meio da pilha fica intocado (162→162).
+  Testes: `tests/regression/test_validator_coverage_expected_rows_cr_c1.py`
+  (**19 casos; 16 falham contra `origin/main` `91258dd`**) — alturas
+  diferentes, base Z deslocada (612, o caso do TP1), fiada de topo fora do
+  grid, faixas intercaladas de abertura, ausência REAL de fiada
+  (anti-tautologia), fiada faltando no meio, parede sem altura declarada,
+  invariância à ordem de entrada por identidade física e determinismo.
+  Controles `tests/regression/test_validators.py` **23/23**. Suíte completa
+  nesta branch: **2 failed, 885 passed** — as 2 falhas são
+  `tests/regression/test_benchmark_baselines.py` (TGD `compensators` 52→61;
+  TP1 `JUNCTION_MISSING_BINDING` 8→9) e são **PRÉ-EXISTENTES**, com as
+  mesmas asserções e os mesmos valores medidos num *worktree* limpo de
+  `91258dd` sem o patch. **Zero falhas novas.** A contagem fecha: base 868 +
+  19 testes desta CR = 887.
+  **Dívidas registradas, não escondidas:** `baseline.json` (TGD 265 / TP1
+  16) e `reference_score.json` (95 / 94) ficam desalinhados de propósito —
+  recalibração é escrita em arquivo oficial e exige autorização específica;
+  os **162** achados do ramo do meio no solver do TGD seguem sem
+  diagnóstico próprio (CR separada); as **28** paredes de `h=340` são
+  defeito real do solver que esta CR ENTREGA, não corrige.
+  **Medido também sobre o CANDIDATO da CR-B** (o estado onde o gate `G16`
+  falha, reproduzido do gerador determinístico `5640933`): `STATE_R →
+  STATE_C` dá `+17 MISSING_ROW` e `+23 ROW_MOSTLY_EMPTY` — exatamente os
+  números do G16 — e com a C1 fica **`+0` / `+23`**. **O `G16` é COMPOSTO e
+  esta CR resolve METADE dele:** `COVERAGE_ROW_MOSTLY_EMPTY` não lê
+  `expected_rows` (compara as fiadas de uma parede entre si) e o resíduo é
+  consequência da **divisão de paredes** da própria CR-B (+19 paredes, 184
+  blocos mudaram de fiada). **`G16` continua NÃO aprovado**; a outra metade
+  exige CR própria — proposta **CR-C2 (cobertura por segmento após divisão
+  de parede)**, não implementada.
+  Relatório: `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`.
+
 - **CR-BLOCK-FIT-TOLERANCE-C04** (branch
   `claude/cr-block-fit-tolerance-c04-n5qsc4`, PR #20 **DRAFT, nao
   mergeado**, veredito **READY_FOR_INDEPENDENT_REVIEW**) - duas
