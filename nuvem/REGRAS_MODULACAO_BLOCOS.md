@@ -5351,3 +5351,123 @@ imediato também é zero até que o corpus tenha um caso fisicamente
 compatível com a condição de domínio aprovada. **NÃO MESCLADO. Aguarda
 autorização explícita do usuário para merge. Nenhum monitoramento
 automático ativado.**
+
+---
+
+## 38. `CR-C2` — a UNIDADE de avaliação de cobertura de uma fiada, quando a parede é dividida
+
+> **ESTADO: DOCUMENTADO — pendência de DECISÃO NORMATIVA do usuário e
+> pendência de código aberta.** Nada nesta seção está implementado.
+> Nenhuma regra aqui foi aprovada pelo usuário. Registrado agora, antes da
+> implementação, porque é conhecimento medido que não pode se perder.
+
+**Como foi descoberto:** medição própria (nenhuma no Revit ao vivo) sobre
+o candidato determinístico da CR-B (`5640933`) e sobre o gabarito humano
+dos dois projetos, comparando **sempre por coordenada global** `(x, y, z)`
+— nunca por `W0xx`. Diagnósticos reprodutíveis em
+`nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/`.
+Relatório: `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md`.
+
+### 38.1 PADRÃO OBSERVADO, MEDIDO — dividir uma parede não muda a alvenaria, mas muda quantas vezes o mesmo vazio é acusado
+
+Quando um eixo é partido em segmentos, **nenhum bloco sai do lugar**
+(medido: 0 blocos humanos perdidos, 0 novos, 0 duplicados; 184 blocos
+mudam de *associação* de fiada, não de posição). Ainda assim
+`COVERAGE_ROW_MOSTLY_EMPTY` sobe `+23` por projeto, porque o achado é
+emitido **por par (parede, fiada)**: uma parede-mãe com uma fiada
+deficiente vira 2–3 segmentos, cada um com a sua fiada deficiente, e o
+guard `best_ratio ≥ 0.9` — calculado **por parede** — passa a ser
+satisfeito em segmentos onde a mãe não o satisfazia.
+
+Prova de que não é defeito físico (as três medições convergem):
+
+| medição | resultado |
+|---|---|
+| vazio físico total (coordenada global) | **−14.409,0cm** nos dois projetos — o candidato tem MENOS vazio |
+| vazios que aparecem só no candidato | **58 de 58 contidos** num vazio que já existia; **geometria nova = 0** |
+| mesmos blocos, reavaliados na **unidade de parede original** | **−3**, contra `+23` na unidade dividida |
+
+> **Consequência para qualquer CR futura:** um delta de
+> `COVERAGE_ROW_MOSTLY_EMPTY` entre dois estados com **particionamento de
+> parede diferente NÃO é comparável** sem antes reconciliar a unidade.
+> Comparar contagem de achados entre esses dois estados mede o
+> particionamento, não a alvenaria.
+
+### 38.2 CONFLITO REGISTRADO — a faixa de verga/peitoril está sendo contada como fiada de parede
+
+O código declara que `COVERAGE_ROW_MOSTLY_EMPTY` existe para detectar *"o
+solver ter perdido UMA das duas famílias de fiada (A ou B)"*. Medido:
+
+| projeto | achados no gabarito **humano** | em fiada do passo do grid | **em faixa FORA do passo** |
+|---|---|---|---|
+| TGD | 85 | 24 | **61 (72%)** |
+| TP1 | 120 | 52 | **68 (57%)** |
+
+As faixas fora do passo do grid são **vergas, contravergas e peitoris** —
+elementos locais de uma abertura, que existem só sobre o vão e que **nunca
+deveriam** cobrir o comprimento da parede. Uma verga não é família A nem
+família B. Cobrar dela 50% do trecho modulável contradiz o contrato
+declarado do próprio validador.
+
+**Este é um defeito PRÉ-EXISTENTE**, presente no gabarito humano e em
+`STATE_A` na mesma proporção — **não** foi introduzido pela CR-B. Dos
+`+23` do candidato, **16 estão em faixas de verga e 7 em fiadas de grid**.
+
+**Não corrigido.** Corrigir muda `baseline.json` e `reference_score.json`
+oficiais (escrita vedada sem autorização) e exige definir normativamente
+**o que é uma fiada de parede para efeito de cobertura** — decisão do
+usuário.
+
+### 38.3 DECISÃO FÍSICA PENDENTE — nenhuma opção adotada
+
+Números medidos, não estimados:
+
+| opção | definição normativa que ela cria | ruído no gabarito humano | delta G16 |
+|---|---|---|---|
+| manter como está | — | 85 / 120 | `+23` |
+| **A** — só fiada no passo do grid conta | *faixa de verga não é fiada de parede* | **24 / 52** | `+7` — **não basta** |
+| **B** — avaliar na parede física agregada | *segmentos colineares divididos são uma unidade de cobertura* | inalterado | **−3** |
+| **C** — G16 medido por vazio físico global | *o gate mede geometria, não contagem de achados* | inalterado | **−14.409cm** |
+
+**A orientação mais recente do usuário tem prioridade sobre esta seção.**
+Enquanto não houver decisão, vale o comportamento de hoje.
+
+### 38.4 REQUISITO OBRIGATÓRIO para qualquer correção futura
+
+Uma correção que apenas **reduza** `COVERAGE_ROW_MOSTLY_EMPTY` é
+inaceitável. Ela tem de **preservar a detecção de trecho realmente
+vazio**: um trecho de parede genuinamente não modulado tem as **fiadas do
+passo do grid** vazias, não apenas as faixas de verga. Qualquer patch
+precisa demonstrar, com teste que falha antes e passa depois, que esse
+caso continua acusado — junto com paredes divididas com cobertura real,
+paredes divididas com vazio real, bases Z distintas, aberturas,
+encontros, inversão de orientação, ordem de entrada e determinismo.
+
+### 38.5 CONHECIMENTO DE AMARRAÇÃO — dividir uma parede converte nós `T` em nós `L`
+
+Medido no candidato (TP1: **12 pontos** com troca de tipo; TGD: efeito
+análogo): quando o eixo é partido no ponto onde a perpendicular chega, o
+nó que era **`T`** (parede passante, perpendicular encostando no meio)
+passa a ser **`L`** (duas paredes terminando no mesmo ponto). O ponto, a
+cota e a geometria das peças são **os mesmos** — muda a classificação do
+encontro.
+
+Consequências práticas, ambas medidas:
+
+1. **Identidade de achado de encontro nunca deve incluir o tipo do nó.**
+   Com a chave `(ponto, elevação, tipo)`, `JUNCTION_MISSING_BINDING`
+   reporta **26 identidades novas** no TP1, das quais 16 pareceriam
+   piora em nó pré-existente. Com a chave física correta
+   `(ponto, elevação)`: **10 identidades novas, 0 sumiram, todas em nós
+   que só existem no candidato — nenhum nó pré-existente piorou.**
+2. **Pelo mesmo motivo, o eixo da parede não serve de identidade para
+   juntas de prisma.** `PRISM_CONTINUOUS_JOINT` no gabarito reporta **49
+   identidades novas** pela chave "eixo da parede" e **0** por coordenada
+   global — a divisão muda o eixo sem mover a junta.
+
+> **REGRA OBRIGATÓRIA (esta subseção, ao contrário das anteriores, não
+> depende de decisão normativa — é método de medição):** toda comparação
+> de amarração entre dois estados com particionamento de parede diferente
+> usa **coordenada global do ponto do nó + elevação física**. Nunca o
+> rótulo `W0xx`, nunca o eixo da parede, nunca o índice ordinal da fiada,
+> nunca o tipo do nó.

@@ -11,8 +11,14 @@
 
 ```
 branch: main
-SHA:    62ea7f26b9fb8af72c960b04d08f7b58cd115114
+SHA:    91258dd627af97fe437a56c0506eb096ca5aa267
 ```
+
+`main` real conferida por `git fetch` em 2026-09-08. Último merge:
+`PR #24` / **CR-V1** — valida encontros por elevação física, não por
+índice ordinal. O SHA `62ea7f2` que constava aqui era o do `PR #22` e
+estava **desatualizado**; a cadeia intermediária (`PR #23`, `PR #24`)
+está em `docs/PROJECT_STATUS_LOG.md`.
 
 Último marco de PRODUÇÃO: `PR #22` / `CR-BENCH-OPENING-RECONSTRUCTION-A` —
 **mesclado** (merge commit `62ea7f26b9fb8af72c960b04d08f7b58cd115114`, pais
@@ -391,6 +397,82 @@ anteriores. Há um lembrete automático
 (`.github/workflows/check-project-status.yml`) que sinaliza quando
 `nuvem/core/engine/**` muda sem que `docs/PROJECT_STATUS.md` seja tocado
 no mesmo diff — não bloqueia push/merge, só avisa.
+
+## Sessão multifase CR-C2 / revisão C1 / reavaliação CR-B (2026-09-08)
+
+> Tudo abaixo é **trabalho em PR draft ou diagnóstico**. **Nenhum merge
+> foi feito, nenhum PR foi marcado `ready`, nenhum arquivo oficial foi
+> regravado e nenhum monitoramento automático foi criado.**
+
+### PRs abertos — estado real
+
+| PR | CR | branch / HEAD | estado |
+|---|---|---|---|
+| #25 | **CR-S1** — alternância em nó `L` de ponta | `claude/corrigir-alternancia-no-l-76nnb3` `33d035f` | **draft**, não mesclado |
+| #26 | **CR-C1** — `expected_rows` físico | `claude/cr-c1-expected-rows-fisico` `34bf696` | **draft**, não mesclado |
+| #27 | **CR-D1** — recuperação documental | `claude/cr-d1-recuperacao-documental` `b852695` | **draft**, não mesclado |
+| #28 | **CR-B preparação** — identidade/G18 | `claude/cr-b-preparacao-identidade` `0596e78` | **draft**, não mesclado |
+| — | **CR-C2** — diagnóstico (sem patch) | `claude/multifase-cr-c2-c1-b-ikr8jc` | esta branch |
+
+Um PR **draft não é um gate aprovado**. A revisão da CR-C1 registrada em
+`docs/CR_C1_INDEPENDENT_REVIEW.md` é uma **revisão por medição própria em
+worktree isolado — não é um review formal do GitHub** e não substitui um.
+As execuções de `pytest` citadas são **locais nesta sessão — não são
+checks de CI**.
+
+### Entregas desta sessão
+
+- `docs/CR_C1_INDEPENDENT_REVIEW.md` — revisão independente do PR #26.
+  Veredito **APPROVE**, sem patch proposto. Merge continua **pendente de
+  autorização explícita**.
+- `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md` — causa-raiz dos `+23`
+  `COVERAGE_ROW_MOSTLY_EMPTY`. **Diagnóstico concluído, SEM PATCH**: a
+  correção exige decisão normativa do usuário.
+- `docs/CR_B_G12_G16_REEVALUATION.md` — G12 e G16 reavaliados sobre a
+  projeção `S1 + C1`, e contrato de integração da CR-B conferido por
+  medição própria.
+- `nuvem/REGRAS_MODULACAO_BLOCOS.md` §38 — registro obrigatório do
+  conhecimento, rotulado como **pendência de decisão**, não como regra
+  aprovada.
+- `nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/` —
+  diagnósticos reprodutíveis.
+
+### Gates — estado real após esta sessão
+
+| gate | estado | nota |
+|---|---|---|
+| **G12** (`PRISM_CONTINUOUS_JOINT`) | ✘ **não aprovado** | reavaliado: **28 → 12** identidades novas com a S1. A S1 melhora 57% mas **não zera** |
+| **G13** (`JUNCTION_NOT_ALTERNATING`) | resolvido pela **S1** (`+16 → 0`) | aprovação depende do **merge autorizado** da S1 |
+| **G16** (`COVERAGE_*`) | ✘ **não aprovado** | `MISSING_ROW` `+17 → +0` pela C1; `ROW_MOSTLY_EMPTY` `+23` continua |
+| **G18** (identidade) | artefato ✔, oficial ✘ | 0 chaves ambíguas nos 3 estados; gravar no oficial depende do usuário |
+
+**Nenhum gate foi promovido a aprovado nesta sessão.**
+
+### Dívidas e decisões pendentes do usuário
+
+- **Decisão normativa da CR-C2** — 3 opções medidas em
+  `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md` §5. Sem ela a CR-C2 não pode
+  ser implementada.
+- **G12** — decidir se 12 identidades críticas novas são aceitáveis, ou
+  abrir CR própria.
+- **Merge da CR-S1 (#25)** e **da CR-C1 (#26)** — pendentes.
+- **`reference_score.json`** — recalibração pendente (escrita oficial).
+- **`baseline.json`** — refresh pendente (CR própria, autorizada).
+  Há **2 falhas de baseline PRÉ-EXISTENTES na `main`**, reproduzidas nas
+  duas árvores com os mesmos valores (TP1: `JUNCTION_MISSING_BINDING`
+  8 → 9). Não são regressão de nenhuma CR desta sessão.
+- **D1–D5** — não decididas; nenhuma foi tomada, influenciada ou presumida.
+
+### Ordem de integração recomendada (não executada)
+
+1. **CR-S1** (#25) — resolve G13, melhora G12.
+2. **CR-C1** (#26) — resolve metade do G16. *(S1 e C1 tocam a mesma
+   posição de `REGRAS_MODULACAO_BLOCOS.md` — conflito de merge previsível
+   e trivial: §36 e §37.)*
+3. **Decisão normativa da CR-C2** → só então implementação.
+4. **Decisão sobre o G12 residual.**
+5. **D1/D2/D3** pelo usuário → só então a CR-B oficial.
+6. **CR-D1** (#27) — documental, independente, não bloqueia.
 
 ## Entradas de contexto
 
