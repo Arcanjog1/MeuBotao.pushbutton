@@ -25,6 +25,24 @@ conferidos por `git fetch` em 2026-09-08:
 | `PR #26` | CR-C1 — `expected_rows` física por elevação | `0c6e8f7` |
 | `PR #29` | CR-G12 — regra #1 na fronteira entre bandas de abertura | `c88a031` |
 
+Os quatro últimos (`#27`, `#25`, `#26`, `#29`) entraram numa
+**INTEGRAÇÃO CONSOLIDADA** autorizada explicitamente pelo usuário em
+2026-09-08, nessa ordem, com `origin/main` reconferida entre um merge e o
+seguinte. Dois deles precisaram de um **HEAD de compatibilidade** — o
+merge de `origin/main` para dentro da própria branch do PR, feito só para
+resolver conflito **documental**: `#26` `34bf696` → **`b2daca8`** e `#29`
+`73243e9` → **`9531cf0`**. Nenhum arquivo de produção foi alterado nessas
+resoluções, e `nuvem/core/engine/wall_stepper.py` fundiu **sem conflito**
+entre CR-S1 e CR-G12. Registro completo (SHAs, conflitos, testes, gates,
+limites e pendências):
+`docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md`. O `PR #28`
+**permanece `draft` e não foi integrado**.
+
+> **Commit posterior na `main`:** `4015564` (só documentação, sessão
+> paralela) reconciliou esta página depois do merge do `PR #29` e removeu
+> uma entrada duplicada e obsoleta da CR-V1 que o merge tinha
+> ressuscitado. A `main` real está **à frente** do SHA da caixa acima.
+
 O SHA `62ea7f2` que constava aqui era o do `PR #22` e estava
 **desatualizado**; a cadeia intermediária está em
 `docs/PROJECT_STATUS_LOG.md`.
@@ -187,6 +205,53 @@ Só o que está realmente mesclado na `main`, na ordem em que foi integrado:
   `nuvem/REGRAS_MODULACAO_BLOCOS.md`. Pós-merge: suíte `not slow` **864
   passed** no HEAD aprovado e **883 passed** na `main` mesclada
   (`0c6e8f7`), 0 falhas nas duas.
+
+- **CR-D1 — RECUPERAÇÃO DOCUMENTAL** (`PR #27`, **mesclado**, merge commit
+  `7cc935d`, HEAD aprovado `b852695`) — só documentação: recupera as duas
+  revisões independentes que a `main` citava e não continha
+  (`docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md`,
+  `docs/C04_INDEPENDENT_FINAL_REVIEW.md`) e registra a recuperação em
+  `docs/CR_D1_DOCUMENTAL_RECOVERY.md`. Nenhum arquivo de produção tocado.
+- **CR-C1 — EXPECTATIVA DE FIADA FÍSICA E POR ELEVAÇÃO** (`PR #26`,
+  **mesclado**, merge commit `0c6e8f7`, HEAD aprovado `34bf696` + HEAD de
+  compatibilidade `b2daca8`) — correção do **contrato de validação**
+  (`nuvem/benchmark/validators/validate_wall_coverage.py`); não toca o
+  solver, o gabarito oficial, `baseline.json` nem `reference_score.json`.
+  `settings.expected_rows` (teto de fiadas do PROJETO) deixa de ser a
+  expectativa de CADA parede; a expectativa passa a ser física, por
+  elevação e altura da parede. **A detecção de ausências reais de fiada é
+  preservada** — a CR entrega as 28 paredes de `h=340` que param em
+  `z=301` como defeito real do solver; `expected_rows` **não** vira
+  silenciador de cobertura. Testes:
+  `tests/regression/test_validator_coverage_expected_rows_cr_c1.py` (19).
+  Regras: seção 37 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`; relatório:
+  `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`. (A entrada longa em
+  "Trabalho ativo" é a mesma CR, aguardando só reorganização de página.)
+- **CR-G12 — A REGRA #1 VALE NA FRONTEIRA ENTRE BANDAS** (`PR #29`,
+  **mesclado**, merge commit `c88a031`, HEAD aprovado `73243e9` + HEAD de
+  compatibilidade `9531cf0`) — correção **do solver**
+  (`nuvem/core/wall_modeling.py`, `nuvem/core/engine/wall_stepper.py`): a
+  proibição de junta vertical coincidente passa a ser avaliada TAMBÉM
+  entre fiadas de bandas de abertura diferentes, por um segundo passe que
+  só substitui o resultado quando a coincidência cross-band cai
+  **estritamente**. Gate **G12 fechado: 12 identidades novas → 0 nos dois
+  projetos**, com **zero junta contínua nova por identidade física** e
+  delta zero em `COVERAGE_*`/`OPENING_*`/`JUNCTION_*`/`POSITION_*`.
+  Trade-offs declarados, não escondidos: `PRISM_STAGGER_BELOW_TARGET`
+  +31 no TGD (17 são a troca crítico → nível 2; as outras 16, todas em
+  `W074`, são colaterais da mudança de aceitação do ARM SAFE REPAIR),
+  `COMPENSATOR_EXCESS_IN_RUN` +2 no TGD no candidato CR-B, e **custo de
+  tempo ~2,1×** (95,6% dele nos 22 rebuilds do ARM SAFE REPAIR, que são
+  pré-existentes). Residual honesto: 2 identidades cross-band puras no
+  TGD (`W069`, `t=649,5`). Testes:
+  `tests/test_cross_band_joint_propagation_cr_g12.py` (20, dos quais 9
+  `slow`), mais os contratos ajustados de
+  `tests/test_block_arm_role_candidate_safety_contract.py` (t1/t9) e
+  `tests/test_block_node_fill_revalidation.py` (t20) — **sem `skip`, sem
+  `xfail`, sem asserção removida e sem threshold afrouxado**. Regras:
+  seção 39 de `nuvem/REGRAS_MODULACAO_BLOCOS.md`; relatórios:
+  `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` e
+  `docs/CR_G12_REVISAO_INDEPENDENTE.md`.
 
 Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
 
@@ -438,10 +503,14 @@ não é append-only).
 
 ## Problemas abertos
 
-- **Alinhamento cross-band** (entre bandas de abertura) — 33 casos
-  residuais, fora do escopo do `CR-BLOCK-01`; exige mudança em
-  `wall_modeling.py`. Ver `nuvem/REGRAS_MODULACAO_BLOCOS.md` 27.7.
-  Próximo CR recomendado: `CR-BLOCK-DETERMINISM`.
+- **Alinhamento cross-band** (entre bandas de abertura) — **ATACADO pela
+  CR-G12** (`PR #29`, merge `c88a031`): a regra #1 passou a ser avaliada
+  na fronteira entre bandas e o gate G12 fechou em **12 → 0 nos dois
+  projetos**. **Residual honesto que continua aberto:** 2 identidades
+  cross-band puras no TGD (`W069`, `t=649,5`, fronteiras `(6,7)` e
+  `(11,12)`) — o guard recusa corretamente qualquer alternativa que
+  pioraria a regra #1 dentro da banda. Ver
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md` 27.7 e 39.
 - **Determinismo global do wall graph** — não determinístico antes e
   depois do `CR-BLOCK-01` (8 execuções, 8 fingerprints distintos); causa
   é anterior ao preenchimento de blocos.
@@ -510,6 +579,17 @@ Detalhe/causa-raiz de cada item: `docs/PROJECT_STATUS_LOG.md`.
 
 ## Próximos passos
 
+0. **Varredura ampla do benchmark em dois blocos** — próxima etapa
+   definida pelo usuário depois da integração consolidada de 2026-09-08,
+   a ser feita em **sessão nova** e **sem exigir perfeição**. Pendências
+   que a integração deixou explicitamente em aberto: **G16 continua
+   pendente da CR-C2**; a **CR-B NÃO está oficialmente aprovada**; o
+   `PR #28` continua `draft` e não integrado; as **duas falhas históricas
+   de `tests/regression/test_benchmark_baselines.py`** continuam
+   registradas como pré-existentes (o refresh de `baseline.json` é CR
+   própria, não foi feito); a dívida de desempenho **~2,1×** da CR-G12
+   segue declarada, com a alavanca real nos 22 rebuilds do ARM SAFE
+   REPAIR.
 1. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — branch em aberto (ver
    "Trabalho ativo"); merge só com autorização explícita do usuário.
 2. Aguardar autorização/priorização do usuário para o próximo CR de
