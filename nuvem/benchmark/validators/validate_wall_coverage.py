@@ -47,6 +47,68 @@ MIN_REPORTABLE_GAP_CM = 5.0
 ROW_MOSTLY_EMPTY_RATIO = 0.5
 
 
+def wall_top_z_cm(wall):
+    """Cota FISICA do topo da parede (`base_z + height`), ou `None` quando a
+    parede nao declara altura.
+
+    Sem altura declarada nao existe pe-direito para comparar - e' o unico
+    caso em que a falta de fiada no topo fica sem veredito (CR-C1). NAO
+    chutar a altura a partir das fiadas existentes: isso tornaria o
+    criterio tautologico ("espera-se o que ja' esta' la'").
+    """
+    height_cm = wall.get("height_cm")
+    if not height_cm:
+        return None
+    return float(wall.get("base_z_cm") or 0.0) + float(height_cm)
+
+
+def missing_course_above_cm(wall, block_height_cm, course_step_cm):
+    """`(cota_da_fiada_que_falta, topo_coberto_cm, topo_da_parede_cm)` quando
+    ainda CABE uma fiada INTEIRA acima da fiada mais alta desta parede -
+    senao `None`.
+
+    Este e' o criterio fisico que substituiu, na CR-C1, a comparacao
+    `len(fiadas) < expected_rows` (um numero GLOBAL de projeto aplicado
+    igualmente a toda parede). Ver secao 37 de
+    `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
+
+    Por que a contagem global estava errada: `expected_rows` sai de
+    `settings.num_courses`, que e' o TETO de fiadas do projeto inteiro. As
+    paredes tem alturas diferentes (220/260/270/280/281cm no corpus real),
+    e uma parede baixa NUNCA tera' aquele numero de fiadas - ela estava
+    correta e era acusada assim mesmo. Medido: rodando os validadores
+    sobre o PROPRIO gabarito humano, 95 (TGD) e 94 (TP1)
+    `COVERAGE_MISSING_ROW`, 100% deles neste ramo e ZERO no ramo do meio
+    da pilha.
+
+    Por que a expectativa NAO e' calculada como "quantas fiadas cabem":
+    a fiada do topo nao segue o passo do grid - ela e' encostada no
+    pe-direito (medido no gabarito: parede de 270cm fecha em z=250, de
+    281cm em z=261, com canaleta `CJ19` de 29cm e pecas `_C` de 9cm).
+    Reproduzir aqui ONDE cada fiada cai seria reimplementar a politica de
+    empilhamento do solver DENTRO do validador - e um validador que
+    duplica a regra que ele fiscaliza para de fiscalizar.
+
+    O criterio usado nao precisa saber onde as fiadas caem: pergunta so'
+    se sobra espaco para MAIS UMA fiada inteira (proximo passo + corpo da
+    peca) abaixo do pe-direito. Conservador de proposito - a maior folga
+    LEGITIMA medida no gabarito humano e' 11cm contra um passo de 20cm.
+    """
+    top_z = wall_top_z_cm(wall)
+    if top_z is None:
+        return None
+    elevations = [float(block.get("z_cm") or 0.0)
+                  for row in (wall.get("rows") or [])
+                  for block in (row.get("blocks") or [])]
+    if not elevations:
+        return None
+    highest_cm = max(elevations)
+    next_course_cm = highest_cm + float(course_step_cm)
+    if next_course_cm + float(block_height_cm) <= top_z + 1e-6:
+        return (next_course_cm, highest_cm, top_z)
+    return None
+
+
 def junction_reserved_intervals(wall):
     """Pedacos do eixo que pertencem a' PAREDE VIZINHA num encontro.
 
@@ -90,7 +152,8 @@ def _covered_intervals(row):
     )
 
 
-def validate_wall(wall, block_height_cm, expected_rows=None, occupancy=None):
+def validate_wall(wall, block_height_cm, expected_rows=None, occupancy=None,
+                  course_step_cm=None):
     findings = []
     rows = model.rows_sorted(wall)
     total_blocks = sum(len(row.get("blocks") or []) for row in rows)
@@ -126,20 +189,35 @@ def validate_wall(wall, block_height_cm, expected_rows=None, occupancy=None):
                 first_row=indices[0],
                 last_row=indices[-1],
             ))
-    # Fiadas faltando NO TOPO (a parede deveria ter `expected_rows`) sao
-    # reportadas a parte, porque a causa e' outra: o solver parou antes de
-    # chegar ao pe-direito, nao pulou uma fiada no meio.
-    if expected_rows and indices and len(indices) < expected_rows:
+    # Fiadas faltando NO TOPO sao reportadas a parte, porque a causa e'
+    # outra: o solver parou antes de chegar ao pe-direito, nao pulou uma
+    # fiada no meio.
+    #
+    # CR-C1: a pergunta e' FISICA e por ELEVACAO ("ainda cabe uma fiada
+    # inteira abaixo do pe-direito DESTA parede?"), nunca mais
+    # `len(fiadas) < expected_rows` - um numero GLOBAL do projeto
+    # comparado com a contagem ordinal de cada parede. Ver
+    # `missing_course_above_cm` e a secao 37 das regras. O parametro
+    # `expected_rows` continua na assinatura so' para nao quebrar
+    # chamadores antigos: ele NAO decide mais este achado.
+    if course_step_cm is None:
+        course_step_cm = float(block_height_cm) + analysis.BLOCK_JOINT_CM
+    above = missing_course_above_cm(wall, block_height_cm, course_step_cm)
+    if above is not None:
+        next_course_cm, highest_cm, top_z_cm = above
         findings.append(base.finding(
             "COVERAGE_MISSING_ROW",
             wall=wall["id"],
             detail=(
-                "{0} fiadas moduladas de {1} esperadas para o pe-direito".format(
-                    len(indices), expected_rows)
+                "fiada mais alta em z={0:.1f}cm, mas ainda cabe fiada em "
+                "z={1:.1f}cm abaixo do topo da parede (z={2:.1f}cm)".format(
+                    highest_cm, next_course_cm, top_z_cm)
             ),
             row=None,
             rows_found=len(indices),
-            rows_expected=expected_rows,
+            highest_course_z_cm=round(highest_cm, 2),
+            missing_course_z_cm=round(next_course_cm, 2),
+            wall_top_z_cm=round(top_z_cm, 2),
         ))
 
     # ---- comprimento coberto -------------------------------------------
@@ -256,11 +334,16 @@ def validate_wall(wall, block_height_cm, expected_rows=None, occupancy=None):
 
 def validate(project, context=None):
     block_height = analysis.block_height_of(project)
-    expected_rows = (project.get("settings") or {}).get("expected_rows")
+    # `settings.expected_rows` NAO e' mais lido aqui (CR-C1): era o teto de
+    # fiadas do PROJETO aplicado igualmente a toda parede, independente da
+    # altura fisica dela. A expectativa de fiada no topo agora sai da
+    # geometria de cada parede - ver `missing_course_above_cm`.
+    course_step = analysis.course_step_cm(project)
     findings = []
     occupancy = analysis.OccupancyIndex(project)
     for wall in project.get("walls") or []:
-        findings.extend(validate_wall(wall, block_height, expected_rows, occupancy))
+        findings.extend(validate_wall(wall, block_height, None, occupancy,
+                                      course_step_cm=course_step))
 
     orphans = project.get("orphan_blocks") or []
     if orphans:

@@ -5358,6 +5358,345 @@ automático ativado.**
 
 ---
 
+## 36. `CR-S1` — o giro do canto em L é a ÚLTIMA saída, não a primeira:
+alternância só pode ser sacrificada quando nenhuma fiada resolve
+(2026-09-07)
+
+> Conhecimento de **AMARRAÇÃO** (encontro em L, alternância entre fiadas,
+> continuidade entre fiadas). Registro obrigatório por `CLAUDE.md`.
+> Implementado em `nuvem/core/engine/wall_stepper.py` (`solve_l_corner`,
+> `_corner_bond_blocking_courses`, `_node_bond_courses_on_wall`).
+> Relatório completo e medições: `docs/CR_S1_L_NODE_ALTERNATION.md`.
+
+### 36.1 O que já existia e nunca tinha sido registrado aqui — o GIRO
+
+**PADRÃO OBSERVADO, agora documentado** (existe no código desde
+2026-08-25; a seção 5 acima descrevia o L_CORNER como se ele sempre
+alternasse). Quando a peça de amarração de um dos lados de um `L_CORNER`
+esbarraria na peça de um encontro **vizinho da mesma parede**,
+`solve_l_corner` **gira** a peça do canto: manda as **duas** fiadas para a
+parede não bloqueada. O canto fica sem colisão — e **sem alternância**,
+com a peça do mesmo lado nas duas fiadas.
+
+Origem medida: um `T` a 20cm de um canto em L na mesma parede fazia as
+duas peças de 34cm ficarem uma sobre a outra (14cm de sobreposição); o
+solver detectava a colisão, desfazia **as duas**, e a parede terminava sem
+bloco nenhum — 42 dos 57 eixos de uma revisão manual da planta real.
+
+**REGRA OBRIGATÓRIA:** o giro é uma **degradação**, com custo de
+amarração. Ele é legítimo, mas nunca pode ser a primeira coisa tentada, e
+nunca pode ser aplicado sem que uma alternativa alternante tenha sido
+descartada por prova geométrica.
+
+### 36.2 REGRA OBRIGATÓRIA — a colisão de amarração é POR FIADA; um gate
+que só responde "bloqueado sim/não" não pode decidir girar
+
+**Causa-raiz provada** (nó físico presente nos dois níveis do corpus real:
+TGD `(338,52 ; 187,05)` = TP1 `(8017,26 ; 1289,95)`). O gate
+`_corner_bond_blocked_by_other_node` devolvia um **booleano**. Ele sabia
+que o vizinho estava perto demais e **descartava a informação de em qual
+fiada** aquele vizinho realmente ocupa a parede. Sem a fiada, girar as
+duas era a única saída segura.
+
+Neste nó o vizinho é um `T_INTERSECTION` a 50cm cuja parede **principal**
+é a mesma parede bloqueada. E `solve_t_intersection` deita peça na parede
+principal **só na Fiada A** — nos três caminhos dele (B54 no T verdadeiro,
+B34 na degradação para L, nada na degradação de compensador). **A Fiada B
+daquela parede estava livre o tempo todo.** O canto podia manter peça nas
+duas paredes; bastava a peça daquela parede ir para a Fiada B.
+
+Medição de referência (o humano é a referência, não a cópia): a alvenaria
+humana **alterna** neste nó nas **duas** topologias (T e L). O solver
+alternava com a topologia antiga (T) e parava de alternar quando a parede
+N-S passava a **terminar** ali (L) — 17 fiadas com um dono só.
+
+**A regra:** a decisão de girar tem de ser tomada **por fiada**. Sempre
+que existir uma fiada em que a parede bloqueada esteja provadamente livre,
+a amarração alternada é obrigatória e o giro é proibido.
+
+### 36.3 REGRA OBRIGATÓRIA — ordem de precedência num `L_CORNER` com um
+lado bloqueado
+
+Com `busy` = o conjunto de fiadas em que o vizinho ocupa a parede
+bloqueada:
+
+1. **A fiada que a parede bloqueada JÁ tem está livre** → não mexer.
+   Alternância natural preservada.
+2. **A OUTRA fiada está livre** → **trocar** `course_a`↔`course_b`. As
+   duas paredes continuam com peça; só troca quem leva qual fiada.
+   Alternância preservada.
+3. **O vizinho ocupa as DUAS fiadas** → **girar** (36.1). Só aqui a
+   alternância é sacrificada, e só porque nenhuma fiada resolve.
+
+**A ordem 1 → 2 → 3 é obrigatória**, e não é cosmética: qual fiada a
+parede bloqueada "já tem" depende de ela ser `arms[0]` ou `arms[1]`, que
+vem da ordem de entrada das paredes (seção 30). Uma versão desta correção
+com apenas (2) e (3) fazia o **mesmo nó físico** alternar numa ordem de
+entrada e girar na outra. Invariância à ordem de entrada é requisito, não
+detalhe.
+
+### 36.4 REGRA OBRIGATÓRIA — dois alcances, nunca "alcance zero" na fiada
+de fora
+
+Ao medir se o vizinho esbarra na peça deste canto, o alcance-para-trás
+dele **depende da fiada**:
+
+- **fiada em que o vizinho DEITA peça sobre esta parede**:
+  `T_INTERSECTION_B54_HALF_ROOM_FT` = 27cm — o mesmo teto superestimado
+  que o gate já usava, mantido sem alteração;
+- **a outra fiada**: a peça dele está na parede **perpendicular**, mas o
+  **corpo** dela é tão largo quanto a espessura da parede e **atravessa
+  fisicamente esta** — alcance = `_node_default_reservation_cm` (metade da
+  maior espessura do nó), o mesmo achado empírico que o preenchimento
+  comum já reserva. **NUNCA zero.**
+
+**Isto é o que separa os dois casos reais:** o `T` a **50cm** bloqueia só
+a Fiada A (50 < 34+27, mas 50 > 34+7) — a troca resolve. O `T` a **20cm**
+bloqueia as **duas** (20 < 34+27 e 20 < 34+7) — a troca só migraria a
+colisão de fiada, e o giro continua sendo a única saída sem sobreposição.
+Tratar a fiada de fora como "alcance zero" faria a troca ser aceita no
+caso de 20cm e traria de volta a sobreposição de 14cm.
+
+Consequência de projeto: "bloqueado em ALGUMA fiada" continua **idêntico**
+ao predicado booleano anterior, porque a fiada deitada mantém os 27cm, que
+é o maior dos dois alcances.
+
+### 36.5 Em quais fiadas cada tipo de nó deita peça sobre uma parede
+(leitura de convenção, NÃO regra nova)
+
+`_node_bond_courses_on_wall` só pode afirmar **uma** fiada quando a
+convenção do solver daquele tipo de nó a fixa em **todos** os caminhos
+dele — inclusive os degradados e o `ok=False`:
+
+| nó | parede | fiadas | por quê |
+|---|---|---|---|
+| `T_INTERSECTION` | `main_wall_idx` | **A** | B54/A no T verdadeiro, B34/A na degradação-L, nada na degradação de compensador |
+| `T_INTERSECTION` | `incoming_wall_idx` | A **e** B | a degradação de compensador põe o MESMO elemento único nas duas fiadas da boneca |
+| `X_INTERSECTION` | `crossing_walls[0]` | **A** | a degradação troca a PEÇA, nunca a fiada nem a parede |
+| `X_INTERSECTION` | `crossing_walls[1]` | **B** | idem |
+| `L_CORNER` | qualquer braço | A **e** B | o próprio giro (36.1) pode mandar as duas fiadas para a mesma parede |
+
+Na dúvida, **as duas** — o pior caso, que reproduz o comportamento
+anterior. Nenhuma linha desta tabela inventa comportamento: todas são
+lidas dos solvers em `wall_stepper.py`.
+
+### 36.6 O que esta CR NÃO decidiu
+
+- **B19 como peça de amarração continua PROIBIDO** (seção 35). No nó
+  medido, o humano fecha a fiada ímpar com **B19**; o solver corrigido
+  fecha com **B34**. A alternância física é a mesma. **A escolha do humano
+  NÃO foi copiada** — fazê-la exigiria decisão normativa nova, que não foi
+  tomada nem pedida.
+- Nenhuma regra de X, T ou L foi alterada. Nenhum B54 foi forçado em L.
+  Nenhuma regra geral de "parede curta" foi criada (as duas paredes do nó
+  medido têm 644cm e 939cm). Nenhuma tolerância, hard gate ou critério de
+  prisma foi relaxado. Nenhum compensador foi usado para esconder falha de
+  amarração.
+
+### 36.7 PADRÃO OBSERVADO — restaurar a amarração num canto pode custar
+dois compensadores, e isso é ARITMÉTICA do catálogo, não defeito
+
+Restaurar a alternância devolve peça de amarração à parede N-S em 8 das 17
+fiadas — e o trecho que sobra naquela fiada passa a fechar com dois
+compensadores: **`COMPENSATOR_CONSECUTIVE` +8** e
+**`COMPENSATOR_EXCESS_IN_RUN` +8** por projeto, na parede N-S do próprio
+nó (eixo `[338,523;180,048]→[338,523;824,048]` no TGD;
+`[8017,26;1282,95]→[8017,26;1926,95]` no TP1 — o rótulo `W0xx` é derivado
+de índice e **não** é identidade física).
+
+**São 8 eventos físicos, não 16** — provado comparando os `id` dos blocos
+citados: o MESMO par `C04`+`C09` dispara os dois códigos (encostados ⇒
+`CONSECUTIVE`; dois num trecho de teto 1 ⇒ `EXCESS_IN_RUN`).
+
+**A causa é aritmética e forçada.** O trecho da fiada ímpar é delimitado
+pelo nó (`t = 0`, onde a peça de amarração de um L obrigatoriamente
+encosta) e pela reserva do `T` vizinho (`t ≈ 50`, o corpo da peça dele
+atravessando esta parede): **49cm úteis**. Com o `B34` de amarração,
+`49 − 34 − 1 = 14cm` de sobra, e a enumeração exaustiva do catálogo
+(`B39` 39, `B34` 34, `B19` 19, `C09` 9, `C04` 4, junta 1cm) dá **apenas**
+`C04+C09` (2 compensadores) ou `C04+C04+C04` (3). **Nenhuma peça fecha
+14cm sozinha** — o solver já escolhe o mínimo. Sem peça de amarração no
+nó (o que o giro fazia) o trecho útil era de 34cm a partir de `t = 15` e
+fechava com **um `B34`, zero compensadores**: era esse o "lucro" contábil
+do giro — composição limpa **ao preço da amarração**.
+
+**REGRA OBRIGATÓRIA:** dois compensadores num trecho de nó **não**
+autorizam desfazer a amarração para "limpar" a composição. A composição é
+consequência; a amarração é a estrutura. Quem quiser eliminar esses
+compensadores tem de mudar a **peça**, não o **papel** do nó.
+
+**As duas saídas conhecidas exigem DECISÃO NORMATIVA e NÃO foram
+tomadas:**
+
+1. **`B19` como peça de amarração do canto** — é o que o humano faz aqui
+   (`B19[0–19] + C09[20–29] + B54[30–84]`, 1 compensador). **Proibido
+   pela seção 35.** Não copiado.
+2. **`B54` do `T` na fiada ÍMPAR** — o humano centra o `B54` do `T` na
+   mesma fiada do `B19` do canto; `solve_t_intersection` fixa a peça
+   principal na Fiada A. Mudaria a convenção de **todo** `T` do corpus.
+
+O `repair_b19_residual_fill` (seção 35) **não se aplica**:
+`_b19_residual_span_cm` mede o residual da PAREDE inteira
+(644 − 34 = 610cm), não um trecho interno — e um `B19` de 19cm não caberia
+nos 14cm de qualquer forma.
+
+**Margem declarada:** os compensadores novos ficam em `t ≈ 37,0` e
+`t ≈ 44,5`, em **8 de 17** fiadas. `COMPENSATOR_VERTICAL_STRIP` exige
+razão `≥ 0,50`; `8/17 = 0,47`, então **não** dispara (medido: 2 → 2). A
+margem é de **uma fiada** — numa parede com outra contagem de fiadas o
+mesmo padrão passaria do limiar.
+
+### 36.8 O saldo, no mesmo par de estados
+
+`JUNCTION_NOT_ALTERNATING`
+**32 → 0** (TGD) e **16 → 0** (TP1), e as juntas verticais que eram
+**coincidentes** (`PRISM_CONTINUOUS_JOINT`, critical) passam a
+**desencontradas abaixo do alvo** (`PRISM_STAGGER_BELOW_TARGET`, minor)
+nas MESMAS paredes — TGD `W071`/`W073`, TP1 `W071`. Cobertura, colisões,
+aberturas e todos os demais códigos de amarração ficam com **delta zero
+por identidade física**.
+
+---
+
+## 37. `CR-C1` — a expectativa de fiada de uma parede é FÍSICA e por
+ELEVAÇÃO, nunca um número global do projeto (2026-09-08)
+
+> Conhecimento de **COBERTURA/MODULAÇÃO EM ALTURA** (quantas fiadas uma
+> parede deve ter, e como isso é medido). Implementado em
+> `nuvem/benchmark/validators/validate_wall_coverage.py`
+> (`missing_course_above_cm`, `wall_top_z_cm`). Relatório e medições:
+> `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`.
+>
+> **Numeração:** a seção **36** está RESERVADA para a `CR-S1` (PR #25,
+> branch `claude/corrigir-alternancia-no-l-76nnb3`), que ainda **não foi
+> mesclada** na `main`. Esta CR nasceu da `main` `91258dd`, onde a 36
+> ainda não existe. Não renumerar nenhuma das duas no merge.
+
+### 37.1 REGRA OBRIGATÓRIA — `settings.expected_rows` NÃO é expectativa de parede
+
+`settings.expected_rows` (= `settings.num_courses`) é o **teto de fiadas do
+PROJETO**. Ele **nunca** pode ser comparado com a contagem de fiadas de uma
+parede individual.
+
+**Causa-raiz provada.** O validador de cobertura fazia
+`len(fiadas_da_parede) < expected_rows` → acusa `COVERAGE_MISSING_ROW`. As
+paredes do corpus real têm alturas **diferentes** — 220 / 260 / 270 / 280 /
+281cm — e uma parede de 260cm com passo de 20cm **nunca** terá 17 fiadas.
+
+**PADRÃO OBSERVADO, medido, não deduzido:** rodando os validadores sobre o
+**gabarito HUMANO** (`reference.json`), `COVERAGE_MISSING_ROW` dá **95**
+(TGD) e **94** (TP1) — os mesmos números que o `reference_score.json`
+oficial registra — e **100% deles** vêm desse ramo, **zero** do ramo do meio
+da pilha. Um validador que acusa a própria referência de correção está
+medindo a coisa errada.
+
+### 37.2 REGRA OBRIGATÓRIA — a fiada do topo NÃO segue o passo do grid
+
+Medido no gabarito humano, a última fiada é **encostada no pé-direito**, e
+não no próximo múltiplo do passo:
+
+| altura da parede | última cota | segue o grid? |
+|---|---|---|
+| 220cm | z=200 | sim |
+| 260cm | z=240 | sim |
+| 270cm | z=**250** | **não** |
+| 280cm | z=260 | sim |
+| 281cm | z=**261** | **não** |
+
+Nas paredes de 281cm a fiada abaixo do topo é **canaleta** (`CJ19`, 29cm de
+altura; `CAN34`/`CAN39`) e a do topo usa peças `_C` de 9cm.
+
+**Consequência de projeto:** é **PROIBIDO** um validador calcular "quantas
+fiadas esta parede deveria ter" reproduzindo onde cada fiada cai — isso
+reimplementa a política de empilhamento do solver **dentro** do validador, e
+um validador que duplica a regra que fiscaliza deixa de fiscalizar.
+
+### 37.3 REGRA OBRIGATÓRIA — o critério é "cabe mais uma fiada inteira?"
+
+Falta fiada no topo **se e somente se** ainda cabe uma fiada **inteira**
+abaixo do pé-direito daquela parede:
+
+```
+proxima_cota = cota_da_fiada_mais_alta + passo_de_fiada
+FALTA  <=>  proxima_cota + altura_da_peca <= base_z + altura_da_parede
+```
+
+Não precisa saber onde as fiadas caem — só se **sobra espaço físico** para
+outra. É por **elevação absoluta**, nunca por índice ordinal (mesma
+disciplina da seção da `CR-V1`).
+
+**Margem medida** (folga real no topo, gabarito humano): −9cm (24 paredes, a
+canaleta ultrapassa o topo declarado), +1cm (63/62), +11cm (10). O limiar é
+o **passo inteiro (20cm)** — margem de **9cm** contra a maior folga
+legítima observada.
+
+### 37.4 EXCEÇÃO PERMITIDA — parede sem altura declarada fica sem veredito
+
+Sem `height_cm` não existe pé-direito para comparar. Nesse caso **não se
+reporta** — e é **PROIBIDO** inferir a altura a partir das fiadas que
+existem: isso tornaria o critério **tautológico** ("espera-se o que já está
+lá") e um solver que truncasse toda parede passaria limpo.
+
+### 37.5 PADRÃO OBSERVADO — corrigir o falso positivo NÃO pode zerar o achado
+
+Prova de que o critério físico continua fiscalizando, medida sobre a saída
+do **solver** do TGD: o ramo do topo cai apenas **30 → 28**. As **28**
+preservadas são paredes de `h=340` cuja última fiada está em `z=301`
+(ainda cabe fiada em `z=321`, pois `321+19 = 340 ≤ 340`) — **defeito real
+do solver**. As **2** que deixaram de ser acusadas têm a última fiada em
+`z=321` (`321+19 = 340` = topo exato) — **parede fechada**. A discriminação
+entre elas é de **19cm**.
+
+O ramo do **meio da pilha** (fiada ausente entre a primeira e a última) não
+foi tocado: 162 → 162 no solver do TGD.
+
+**REGRA OBRIGATÓRIA:** ao corrigir um falso positivo de validador, medir
+sempre os dois lados — quanto sumiu **contra a referência correta** e
+quanto **permaneceu contra a saída defeituosa**. Uma queda a zero nos dois
+é sinal de que o validador foi silenciado, não corrigido.
+
+### 37.6 PADRÃO OBSERVADO — o gate `G16` da CR-B é COMPOSTO e esta CR
+resolve METADE dele
+
+Medido sobre o candidato da CR-B (estado onde o gate falha), nos dois
+projetos: `STATE_R → STATE_C` dá **`+17 COVERAGE_MISSING_ROW`** e
+**`+23 COVERAGE_ROW_MOSTLY_EMPTY`** — exatamente os números do G16.
+
+| componente | com a CR-C1 | causa |
+|---|---|---|
+| `+17 COVERAGE_MISSING_ROW` | **+0** — resolvido | `expected_rows` global |
+| `+23 COVERAGE_ROW_MOSTLY_EMPTY` | **+23** — inalterado | **outra causa** |
+
+`COVERAGE_ROW_MOSTLY_EMPTY` **não lê** `expected_rows`: compara as fiadas
+de uma parede entre si. O resíduo (38 novos − 15 que sumiram) são fiadas
+cobrindo 6-30% do trecho modulável numa parede cuja melhor fiada cobre
+100%; **34 dos 38 em paredes sem abertura nenhuma**, concentrados em
+paredes de 169cm. Classe **D/E**: consequência da **divisão de paredes** da
+própria CR-B (`+19` paredes, **184 blocos mudaram de fiada** pelo manifesto
+do candidato) — os blocos humanos são redistribuídos entre os segmentos.
+
+**REGRA OBRIGATÓRIA:** o `G16` **continua NÃO aprovado**. Resolver metade
+de um gate composto NÃO o aprova, e o saldo do outro componente não pode
+ser compensado pelo componente resolvido. A outra metade exige CR própria
+(**CR-C2 — cobertura por segmento após divisão de parede**), não
+implementada.
+
+### 37.7 O que esta CR NÃO decidiu
+
+- **`baseline.json` e `reference_score.json` NÃO foram regravados.** O
+  `reference_score.json` oficial continua registrando 95/94; recalibrá-lo
+  é escrita em arquivo oficial e exige **autorização específica do
+  usuário**.
+- Os **162** achados do ramo do meio da pilha no solver do TGD continuam
+  **sem diagnóstico próprio** — CR separada.
+- As **28** paredes de `h=340` que param em `z=301` são **defeito real do
+  solver**, agora corretamente acusado. Esta CR **entrega** esse achado;
+  corrigi-lo é outro trabalho.
+- Nenhuma regra de amarração, de X/T/L, de B54/B34/B19 ou de compensador
+  foi tocada. O solver não foi tocado.
+
+---
+
 ## 38. `CR-C2` — a UNIDADE de avaliação de cobertura de uma fiada, quando a parede é dividida
 
 > **ESTADO: DOCUMENTADO — pendência de DECISÃO NORMATIVA do usuário e

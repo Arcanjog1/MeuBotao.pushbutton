@@ -310,9 +310,28 @@ ZERO** nos dois projetos. Nenhuma identidade que não existisse antes.
 
 1. **`PRISM_STAGGER_BELOW_TARGET` sobe** (+13 a +31). É **nível 2**: não
    reprova nada, registra que o desencontro ficou abaixo do alvo de 10cm.
-   É a troca **crítico → menor** esperada: onde antes havia junta
-   empilhada (0,00cm) agora há desencontro pequeno mas real. Declarado
-   como o critério de aceite da §8 de `docs/CR_G12_CROSS_BAND.md` exige.
+   Declarado como o critério de aceite da §8 de
+   `docs/CR_G12_CROSS_BAND.md` exige.
+
+   > **CORREÇÃO (2026-09-08, condição C2 da revisão independente —
+   > `docs/CR_G12_REVISAO_INDEPENDENTE.md` §7.2 e §13).** A redação
+   > original atribuía as **+31** ocorrências líquidas novas do TGD
+   > inteiras à troca **crítico → nível 2**. Isso vale para **17** delas
+   > (6 paredes que perderam junta contínua: `W046 W069 W070 W072 W087
+   > W113` — onde havia junta empilhada de 0,00cm agora há desencontro
+   > real de 5,0cm, 24 das 33 novas em par de fiadas de **fronteira de
+   > banda**). As outras **16**, todas em `W074`, **não** vêm da troca
+   > cross-band: são **colaterais da mudança de aceitação do ARM SAFE
+   > REPAIR**. Medição decisiva: na **geração pura** (sem ARM nem B19) as
+   > paredes com blocos diferentes são 11 e `W074` **não** está entre
+   > elas; ela só aparece no pipeline completo. Com o mecanismo desligado
+   > o candidato `23/SAME_A` é aceito e o *pin* que ele instala melhorava
+   > de tabela a amarração de `W074`; com o mecanismo ligado a parede 23
+   > já nasce correta, o candidato não é proposto e o benefício colateral
+   > se perde. `W074` passa de desencontro ≥10cm para **5,0cm** em
+   > `t=49,5`/`t=54,5` ao longo de toda a altura — **nível 2, nunca
+   > crítico**, sem junta contínua e sem tocar cobertura, abertura,
+   > encontro ou posição.
 2. **`COMPENSATOR_EXCESS_IN_RUN` +2 no TGD** (nos dois estados do
    candidato). Pequena piora real, não compensada com as melhoras: fica
    registrada. No corpus oficial da `main` esse mesmo código **melhora**
