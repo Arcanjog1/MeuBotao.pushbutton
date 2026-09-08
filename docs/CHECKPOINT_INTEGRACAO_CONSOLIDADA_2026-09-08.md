@@ -7,7 +7,8 @@
 | item | valor |
 |---|---|
 | `main` inicial | `91258dd627af97fe437a56c0506eb096ca5aa267` (`PR #24` / CR-V1) |
-| `main` final | `c88a031404459ee4cee0f7c36904b8e7b971a471` (`PR #29` / CR-G12) |
+| `main` final desta integração | `c88a031404459ee4cee0f7c36904b8e7b971a471` (`PR #29` / CR-G12) |
+| `main` real ao fechar o checkpoint | `40155643d1fd79664cc262c7b74f4a137db9dec7` — ver §9 |
 | PRs integrados | `#27`, `#25`, `#26`, `#29` — nesta ordem |
 | PR **não** integrado | `#28` (permanece `draft`, por instrução explícita) |
 | autorização | merge dos quatro PRs autorizado explicitamente pelo usuário |
@@ -258,3 +259,72 @@ baseline para obter verde**.
    com 2 passes, vira inconsistência latente se alguém subir para 3+.
 8. **Erro no passe 2 descarta um passe 1 válido** — alcançável só se o
    passe 2 falhar e o 1 não; teórico.
+
+---
+
+## 9. Commit posterior na `main` por sessão paralela — `4015564`
+
+Ao reconferir o estado depois da integração, `origin/main` **não** estava
+mais em `c88a031`: havia um commit posterior, **`4015564`**
+(`docs(status): reconcilia PROJECT_STATUS com a main real apos os merges
+#25/#26/#27`), autorado por outra sessão às 18:43 UTC, com **pai
+`c88a031`** — ou seja, empilhado corretamente **em cima** desta
+integração, sem reescrever nada dela.
+
+| item | verificação |
+|---|---|
+| escopo | **só `docs/PROJECT_STATUS.md`** (99 inserções, 115 remoções) |
+| código / gabarito / `baseline.json` / `reference_score.json` / validador / regra normativa | **nada tocado** |
+| relação com esta integração | **aditiva** — os quatro merges e seus SHAs continuam intactos |
+
+**O que ele conserta, e que esta sessão não tinha visto:** o merge da
+CR-C1 (cuja branch partia de `91258dd`) **ressuscitou sem conflito** uma
+entrada obsoleta da CR-V1 dizendo `PR #24 DRAFT, NAO mesclado`, ao lado
+da entrada correta. A página ficou com **duas** CR-V1 contraditórias.
+`4015564` removeu a duplicata — é um artefato real de merge, e a correção
+está certa.
+
+**O que ele ainda não cobria:** o texto do commit foi escrito contra
+`0c6e8f7` (antes do `PR #29`); o conteúdo final já lista os cinco marcos,
+mas o "Estado oficial do solver" não tinha entrada para **CR-D1**,
+**CR-C1** nem **CR-G12**, não apontava para este checkpoint, não
+registrava os HEADs de compatibilidade (`b2daca8`, `9531cf0`) e mantinha
+"Alinhamento cross-band" como problema aberto de 33 casos, sem a CR-G12.
+
+**Resolução adotada:** `origin/main` foi mesclada nesta branch e o
+conflito em `docs/PROJECT_STATUS.md` foi resolvido **adotando a versão da
+`main` como base** (preservando a remoção da CR-V1 duplicata) e
+**reaplicando por cima** apenas o que era exclusivo desta sessão. Nenhuma
+das duas correções foi perdida e a CR-V1 duplicada **não** voltou
+(conferido: uma única ocorrência do título na página).
+
+---
+
+## 10. Estado dos processos de segundo plano ao fechar
+
+Diagnóstico feito às 20:08 UTC, a pedido do usuário.
+
+**Nenhum processo de teste estava ativo** — as quatro suítes já haviam
+terminado e seus resultados já estavam colhidos (§4). O que sobrava eram
+**5 monitores de espera travados**, todos a **0,0% de CPU**, entre 1 h 31
+e 1 h 58 de idade, nenhum avançando log:
+
+| tarefa | idade | padrão do `until ! pgrep -f` |
+|---|---|---|
+| `bxgisz3w5` | 1 h 58 | `pytest tests/ -q --no-header` |
+| `b64akwybr` | 1 h 58 | `cross_band_joint_propagation_cr_g12.py tests` |
+| `b2xdci4z8` | 1 h 34 | idem — **duplicata** de `b64akwybr` |
+| `br3wvq36l` | 1 h 31 | `test_benchmark_baselines.py -q` |
+| `b31ab5jwa` | 1 h 31 | `pytest tests/ -q --no-header` — **duplicata** de `bxgisz3w5` |
+
+**Causa-raiz:** o `pgrep -f` de cada monitor casava com a **própria linha
+de comando do monitor**, então a condição de saída nunca podia ser
+satisfeita — laço infinito por auto-referência, não teste travado. Os
+cinco foram encerrados com `SIGTERM` (processo e `sleep` filho). **Nenhum
+log foi perdido** e **nenhum teste foi reexecutado**: os quatro
+resultados da §4 vieram dos logs já gravados.
+
+*Lição registrada: um monitor `until ! pgrep -f "<padrão>"` precisa
+excluir a si mesmo (por exemplo casando o binário real, `pgrep -f
+"python3 -m pytest"`, ou filtrando o próprio PID).*
+
