@@ -516,3 +516,44 @@ refresh de `baseline.json` continua sendo CR própria.
 **Não é `DO_NOT_MERGE` nem `NEEDS_FIX`:** não encontrei regressão física,
 nem defeito de mecanismo, nem teste afrouxado. As condições são de
 **registro e decisão humana**, não de código.
+
+---
+
+## 14. Adendo (2026-09-08, pós-integração) — condições C2 e C4
+
+Depois da entrega desta revisão, a branch recebeu de outra sessão o merge
+`9531cf0` (`origin/main` com **CR-D1 #27 + CR-S1 #25 + CR-C1 #26**), que
+também **aplicou a condição C2**. Conferido:
+
+| condição | estado agora |
+|---|---|
+| **C2** — corrigir a §6.3 item 1 | **APLICADA.** `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` §6.3 agora atribui **17** ocorrências à troca crítico → nível 2 e as outras **16 (`W074`)** ao colateral do ARM, com a mesma evidência da §7.2 (11 paredes na geração pura, `W074` fora; 12 no pipeline completo). |
+| **C4** — G12 pressupõe o merge da CR-S1 e da CR-C1 | **PREMISSA SATISFEITA.** `33d035f` (CR-S1) e `34bf696` (CR-C1) são ancestrais de `origin/main`. A projeção sobre a qual o gate G12 foi medido é agora a `main` real. **G16 continua não aprovado e a CR-C2 continua pendente** — essa metade da C4 permanece. |
+
+**Meus dois commits sobreviveram intactos** ao merge (`a7c7f98` e
+`73243e9`: os dois ajustes de teste, este relatório e a §39.6 das regras,
+sem diferença).
+
+**Revalidação dos dois testes ajustados na árvore MESCLADA**
+(`91258dd` + CR-D1 + CR-S1 + CR-C1 + CR-G12), que é o que importa porque
+a CR-S1 mexe no mesmo `wall_stepper.py`:
+
+| teste | resultado |
+|---|---|
+| `test_t1_t9...` + `test_t10_fallback...` | **2 passed** (249 s) |
+| `test_t20...` | **1 passed** (492 s) |
+
+As travas absolutas que a §4 introduziu (`sig_on <= 4`, `v_on <= 14`,
+parede 23 sem prisma forçado) **continuam válidas com a CR-S1 e a CR-C1
+na árvore** — não eram um retrato da projeção isolada.
+
+> **Veredito inalterado: APPROVE_WITH_EXPLICIT_CONDITIONS**, agora com
+> **C2 aplicada** e a premissa de merge da **C4 satisfeita**. Restam
+> **C1** (aceitar os ajustes de contrato), **C3** (o custo ~2,1× como
+> dívida declarada, ou a CR que estreita os rebuilds do ARM), a metade
+> **G16/CR-C2** da C4, e **C5** (refresh de `baseline.json`).
+
+**Nota de estado, não condição:** `origin/main` já avançou para `08495d9`,
+além do `0c6e8f7` que o `9531cf0` trouxe — a branch está de novo atrás da
+`main`. Registro o fato; **não** mesclei nada (nenhum merge foi autorizado
+a esta revisão).
