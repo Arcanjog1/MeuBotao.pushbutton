@@ -68,7 +68,9 @@ __all__ = [
     "_canonical_node_sort_key", "_two_arm_l_corner_role_bit",
     "_arm_role_coordination_graph", "_coordinate_arm_role_nodes",
     "solve_l_corner", "T_INTERSECTION_B54_HALF_ROOM_FT", "CORNER_B34_ROOM_FT",
-    "_t_of_point_on_wall", "_wall_junction_ts_ft", "_corner_bond_blocked_by_other_node",
+    "_t_of_point_on_wall", "_wall_junction_ts_ft", "_wall_junction_nodes_and_ts_ft",
+    "_corner_bond_blocked_by_other_node", "BOND_COURSES_BOTH",
+    "_node_bond_courses_on_wall", "_corner_bond_blocking_courses",
     "_room_at_t_on_wall", "_t_intersection_room_assessment", "_t_intersection_room_ok",
     "CORNER_SINGLE_ELEMENT_CODES", "_corner_single_element_candidate",
     "solve_t_intersection", "X_INTERSECTION_B54_HALF_ROOM_FT",
@@ -726,16 +728,21 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     # respondia por 42 dos 57 eixos em revisao manual da planta real.
     #
     # A saida e' GIRAR a peca do canto para a outra parede - nas DUAS
-    # fiadas. Apenas trocar quem leva qual fiada nao resolve: o T tambem
-    # alterna, entao a colisao so' migra de fiada (medido: sobreposicao
-    # de 14cm nos dois casos). Girando nas duas, a sobreposicao vai a
-    # zero e ainda sobra um pilarete de 4cm entre o canto e o T - que
-    # fecha exato com um compensador C04.
+    # fiadas. Girando nas duas, a sobreposicao vai a zero e ainda sobra um
+    # pilarete de 4cm entre o canto e o T - que fecha exato com um
+    # compensador C04.
     #
     # CUSTO: neste canto especifico as duas fiadas passam a ter a peca do
-    # mesmo lado, ou seja, o canto perde a alternancia entre fiadas. E' a
-    # unica configuracao sem colisao quando as duas junçoes estao a menos
-    # de 34cm; so' e' aplicada nesse caso.
+    # mesmo lado, ou seja, o canto perde a alternancia entre fiadas.
+    #
+    # POR ISSO o giro deixou de ser a PRIMEIRA saida (CR-S1, 2026-09-07):
+    # antes dele, tenta-se a TROCA de papeis (`course_a`<->`course_b`), que
+    # mantem peca nas DUAS paredes. A troca so' vale quando a fiada que a
+    # parede bloqueada assumiria esta' provadamente livre do vizinho - se o
+    # vizinho ocupa a parede nas DUAS fiadas, a troca de fato so' migra a
+    # colisao (foi o caso medido em 2026-08-25: sobreposicao de 14cm nos
+    # dois casos) e o giro continua sendo a unica saida. A decisao esta'
+    # logo abaixo, com as provas em `_node_bond_courses_on_wall`.
     #
     # Gate em `nodes is not None AND end_to_node is not None` (nao so'
     # `nodes`) de proposito: e' o MESMO padrao que _wall_reserved_range_ft/
@@ -744,28 +751,75 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     # reproduzir o comportamento historico de proposito
     # (test_solve_l_corner_considera_reserva_do_encontro_na_outra_ponta_da_mesma_parede).
     if nodes is not None and end_to_node is not None:
-        blocked_a = _corner_bond_blocked_by_other_node(
+        busy_a = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_a_idx, point_a, dir_a,
             CORNER_B34_ROOM_FT, node_index)
-        blocked_b = _corner_bond_blocked_by_other_node(
+        busy_b = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_b_idx, point_b, dir_b,
             CORNER_B34_ROOM_FT, node_index)
+        blocked_a, blocked_b = bool(busy_a), bool(busy_b)
         if blocked_a != blocked_b:
-            # As DUAS fiadas vao para a parede NAO bloqueada - de proposito,
-            # NAO e' uma troca (course_a<->course_b): uma troca simples so'
-            # move a colisao de fiada para fiada (medido a mao antes desta
-            # mudanca - ver o commit que introduziu esta funcao: "trocar a
-            # alternancia" ainda colide 14cm, so' que na OUTRA fiada, porque
-            # o encontro vizinho tambem alterna). Com as duas fiadas na
-            # mesma parede livre, a sobreposicao vai a ZERO e ainda sobra um
-            # pilarete que fecha com um compensador simples. O CUSTO,
-            # documentado no cabecalho desta funcao: este canto especifico
-            # perde a alternancia normal entre fiadas.
-            unblocked_idx, unblocked_point, unblocked_dir = (
-                (wall_b_idx, point_b, dir_b) if blocked_a else (wall_a_idx, point_a, dir_a)
-            )
-            wall_a_idx, point_a, dir_a = unblocked_idx, unblocked_point, unblocked_dir
-            wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
+            # CR-S1 (2026-09-07): ANTES de girar, TENTAR A TROCA de papeis.
+            #
+            # O texto original desta secao dizia que "trocar quem leva qual
+            # fiada nao resolve, porque o encontro vizinho tambem alterna".
+            # Isso e' verdade quando o vizinho ocupa a parede bloqueada NAS
+            # DUAS FIADAS - e era a UNICA coisa que o gate antigo conseguia
+            # afirmar, porque ele so' devolvia um booleano: sabia que havia
+            # conflito e jogava fora em QUAL fiada. Com a fiada preservada
+            # (`_corner_bond_blocking_courses`), o caso comum aparece: um T
+            # vizinho ocupa a parede principal dele SO' NA FIADA A. Se a
+            # peca deste canto naquela parede for para a fiada B, a
+            # sobreposicao vai a ZERO **sem** perder a alternancia - que e'
+            # amarracao de verdade, nao um detalhe de paginacao.
+            #
+            # Medido (CR-B, no' TGD (338,52;187,05) = TP1 (8017,26;1289,95),
+            # o mesmo ponto fisico dos dois niveis): a parede N-S passa a
+            # TERMINAR no no' (T -> L) e tem um T a 57cm; o gate girava as
+            # duas fiadas para a parede E-O e o no' ficava com 17 fiadas de
+            # um dono so'. O humano alterna nas duas topologias.
+            #
+            # TRES saidas, nesta ordem - e a ordem importa para a
+            # INVARIANCIA a' ordem de entrada das paredes: a fiada que a
+            # parede bloqueada ja' tem depende de ela ser `arms[0]` ou
+            # `arms[1]`, entao "nao mexer" e "trocar" precisam ser as duas
+            # possiveis. Sem isso o mesmo no' fisico alternava numa ordem
+            # de entrada e girava na outra (medido ao escrever o teste de
+            # inversao de ordem desta CR).
+            #
+            # A parede NAO bloqueada nao tem fiada ocupada nenhuma
+            # (`busy` vazio), entao qualquer fiada serve para ela - so' a
+            # bloqueada decide.
+            blocked_course = "A" if blocked_a else "B"
+            other_course = "B" if blocked_a else "A"
+            busy_blocked = busy_a if blocked_a else busy_b
+            if blocked_course not in busy_blocked:
+                # 1) A fiada que a parede bloqueada JA' tem esta' livre -
+                # nao ha' nada a fazer: o gate booleano antigo girava aqui
+                # sem necessidade nenhuma.
+                pass
+            elif other_course not in busy_blocked:
+                # 2) TROCA de papeis: alternancia PRESERVADA, as duas
+                # paredes continuam com peca, so' trocam de fiada entre si.
+                wall_a_idx, point_a, dir_a, wall_b_idx, point_b, dir_b = (
+                    wall_b_idx, point_b, dir_b, wall_a_idx, point_a, dir_a)
+            else:
+                # 3) As DUAS fiadas vao para a parede NAO bloqueada - de proposito,
+                # NAO e' uma troca (course_a<->course_b): aqui a troca de fato
+                # so' moveria a colisao de fiada para fiada (medido a mao antes
+                # desta mudanca - ver o commit que introduziu esta funcao:
+                # "trocar a alternancia" ainda colide 14cm, so' que na OUTRA
+                # fiada, porque o encontro vizinho ocupa a parede nas duas).
+                # Com as duas fiadas na mesma parede livre, a sobreposicao vai
+                # a ZERO e ainda sobra um pilarete que fecha com um
+                # compensador simples. O CUSTO, documentado no cabecalho desta
+                # funcao: este canto especifico perde a alternancia normal
+                # entre fiadas.
+                unblocked_idx, unblocked_point, unblocked_dir = (
+                    (wall_b_idx, point_b, dir_b) if blocked_a else (wall_a_idx, point_a, dir_a)
+                )
+                wall_a_idx, point_a, dir_a = unblocked_idx, unblocked_point, unblocked_dir
+                wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
 
     room_a = _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_a_idx, point_a, dir_a,
                                   nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index)
@@ -863,7 +917,21 @@ def _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=No
     a 20cm um do outro, na MESMA parede, cada um prometendo os 34cm que a
     sua peca de amarracao precisa, sem saber do outro. Mesma classe de bug
     que o cabecalho de `_wall_reserved_range_ft` ja' descreve para as duas
-    PONTAS de uma parede curta - so' que pelo meio dela."""
+    PONTAS de uma parede curta - so' que pelo meio dela.
+
+    Delega a `_wall_junction_nodes_and_ts_ft` (CR-S1) para que a versao que
+    tambem precisa do PROPRIO no' (`_corner_bond_blocking_courses`) nunca
+    seja uma copia paralela desta varredura, que ficaria desatualizada -
+    mesmo motivo de `_arm_role_coordination_graph`."""
+    return [t_ft for _node, t_ft in _wall_junction_nodes_and_ts_ft(
+        walls_to_create, nodes, wall_idx, exclude_node_index)]
+
+
+def _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=None):
+    """`(no', t_ft)` de cada no' de encontro REAL que toca `wall_idx` - a
+    varredura UNICA que `_wall_junction_ts_ft` (so' o `t`) e
+    `_corner_bond_blocking_courses` (precisa do no' para saber em QUE
+    FIADA ele ocupa a parede) compartilham."""
     found = []
     if not nodes:
         return found
@@ -887,7 +955,7 @@ def _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=No
         point = node.get("point")
         if point is None:
             continue
-        found.append(_t_of_point_on_wall(walls_to_create, wall_idx, point))
+        found.append((node, _t_of_point_on_wall(walls_to_create, wall_idx, point)))
     return found
 
 
@@ -910,16 +978,130 @@ def _corner_bond_blocked_by_other_node(walls_to_create, nodes, wall_idx, contact
     Por isso a margem usada aqui e' `span_ft + T_INTERSECTION_B54_HALF_ROOM_FT`
     - o maior alcance-para-tras que qualquer peca de amarracao (B34 do
     outro lado de um L, B54 de um T ou de um X) pode ter, superestimando
-    de proposito (mais seguro rotacionar a mais do que colidir)."""
+    de proposito (mais seguro rotacionar a mais do que colidir).
+
+    CR-S1: hoje e' um atalho de `_corner_bond_blocking_courses` (mesma
+    geometria, mesma margem) - "bloqueado" e' exatamente "alguma fiada
+    ocupada". A funcao continua porque e' o predicado que os testes de
+    geometria pura deste gate leem; quem PRECISA saber em qual fiada usa
+    a outra."""
+    return bool(_corner_bond_blocking_courses(
+        walls_to_create, nodes, wall_idx, contact_point, dir_away, span_ft,
+        exclude_node_index))
+
+
+# CR-S1 - as duas fiadas, quando nao da' para provar UMA.
+BOND_COURSES_BOTH = ("A", "B")
+
+
+def _node_bond_courses_on_wall(node, wall_idx):
+    """As FIADAS ("A"/"B") em que `node` PODE colocar peca de amarracao
+    deitada sobre `wall_idx`.
+
+    So' afirma UMA fiada quando a convencao do proprio solver daquele tipo
+    de no' a fixa em TODOS os caminhos dele - inclusive os DEGRADADOS e o
+    `ok=False` (que nao coloca peca nenhuma, e portanto tambem cabe em
+    qualquer subconjunto). Em qualquer outra situacao devolve as DUAS, o
+    pior caso, que reproduz exatamente o comportamento anterior a' CR-S1.
+
+    Provas (ler os solvers, nao a memoria):
+
+    - `T_INTERSECTION`, parede = `main_wall_idx`: `solve_t_intersection`
+      poe B54 na principal na fiada **A** (caminho cheio), B34 na
+      principal na fiada **A** (degradacao 1, "degrada para L") e NADA na
+      principal (degradacao 2, so' compensador na boneca). Nunca a fiada
+      B. -> ("A",)
+    - `T_INTERSECTION`, parede = `incoming_wall_idx`: fiada B nos dois
+      primeiros caminhos, mas a degradacao 2 poe o MESMO elemento unico
+      nas DUAS fiadas da boneca. -> pior caso.
+    - `X_INTERSECTION`: `solve_x_intersection` poe a peca de
+      `crossing_walls[0]` na fiada **A** e a de `crossing_walls[1]` na
+      fiada **B**, e a degradacao troca so' a PECA, nunca a fiada nem a
+      parede. -> ("A",) / ("B",)
+    - `L_CORNER`: `arms[0]`->A e `arms[1]`->B no caminho normal, mas o
+      proprio giro deste arquivo pode mandar as DUAS fiadas para a mesma
+      parede. -> pior caso.
+
+    ATENCAO - o que esta funcao NAO diz: "a fiada X nao deita peca sobre
+    esta parede" NAO quer dizer "a fiada X nao ocupa nada aqui". Na fiada
+    em que a peca do vizinho esta' na parede PERPENDICULAR, o CORPO dela
+    (tao largo quanto a espessura da parede) ainda atravessa esta - o
+    mesmo achado empirico que `_node_default_reservation_cm` ja'
+    documenta. E' por isso que `_corner_bond_blocking_courses` usa DUAS
+    distancias de alcance, nunca "alcance zero" para a fiada de fora.
+
+    Nao existe fiada "certa" aqui: e' so' a leitura de uma convencao que
+    ja' esta' escrita nos solvers. Nenhuma regra de amarracao nova."""
+    kind = node.get("kind")
+    if kind == "T_INTERSECTION":
+        if (node.get("main_wall_idx") == wall_idx
+                and node.get("incoming_wall_idx") != wall_idx):
+            return ("A",)
+        return BOND_COURSES_BOTH
+    if kind == "X_INTERSECTION":
+        pair = node.get("crossing_walls") or []
+        if len(pair) == 2 and pair[0] is not None and pair[0] != pair[1]:
+            if pair[0] == wall_idx:
+                return ("A",)
+            if pair[1] == wall_idx:
+                return ("B",)
+        return BOND_COURSES_BOTH
+    return BOND_COURSES_BOTH
+
+
+def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_point,
+                                  dir_away, span_ft, exclude_node_index=None):
+    """As FIADAS em que a peca de amarracao deste canto (`span_ft`,
+    deitada sobre `wall_idx` a partir de `contact_point` no sentido
+    `dir_away`) esbarraria na peca de OUTRO encontro da MESMA parede.
+    Conjunto vazio = nada esbarra.
+
+    Geometria e margem IDENTICAS a's de `_corner_bond_blocked_by_other_node`
+    (que hoje e' so' `bool()` disto) - a unica coisa que a CR-S1 acrescenta
+    e' PARAR DE JOGAR FORA a fiada: o gate antigo sabia que havia conflito
+    e nao sabia em qual das duas fiadas, entao a unica saida segura era
+    mandar as duas fiadas para a outra parede, matando a alternancia do
+    no'. Ver a decisao em `solve_l_corner`.
+
+    DOIS ALCANCES, um por fiada - e e' o ponto todo da correcao:
+
+    - na fiada em que o vizinho DEITA peca sobre esta parede
+      (`_node_bond_courses_on_wall`), o alcance-para-tras dele e' o teto
+      historico `T_INTERSECTION_B54_HALF_ROOM_FT` (27cm), superestimado de
+      proposito - o mesmo valor, com a mesma justificativa, que este gate
+      ja' usava para as DUAS fiadas;
+    - na OUTRA fiada a peca dele esta' na parede perpendicular, mas o
+      CORPO dela ainda atravessa esta parede: o alcance e' a reserva
+      generica de no' (`_node_default_reservation_cm`, metade da maior
+      espessura do no') - a mesma medida que o preenchimento comum ja'
+      reserva exatamente para esse corpo. NUNCA zero.
+
+    Por isso "bloqueado em ALGUMA fiada" (o que
+    `_corner_bond_blocked_by_other_node` devolve) continua identico ao
+    comportamento anterior a' CR-S1: a fiada "deitada" mantem os 27cm, que
+    e' o maior dos dois alcances, entao o predicado booleano nao muda para
+    nenhuma geometria."""
     _p0, _p1, wall_dir, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     sign = 1.0 if dir_away.DotProduct(wall_dir) >= 0 else -1.0
     t0_ft = _t_of_point_on_wall(walls_to_create, wall_idx, contact_point)
-    danger_ft = span_ft + T_INTERSECTION_B54_HALF_ROOM_FT
-    for t_other_ft in _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index):
+    busy = set()
+    for other, t_other_ft in _wall_junction_nodes_and_ts_ft(
+            walls_to_create, nodes, wall_idx, exclude_node_index):
         along_ft = (t_other_ft - t0_ft) * sign
-        if 1e-6 < along_ft < danger_ft - 1e-6:
-            return True
-    return False
+        if along_ft <= 1e-6:
+            continue
+        lying_courses = _node_bond_courses_on_wall(other, wall_idx)
+        cross_reach_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
+        for course in BOND_COURSES_BOTH:
+            if course in busy:
+                continue
+            reach_ft = (T_INTERSECTION_B54_HALF_ROOM_FT if course in lying_courses
+                        else cross_reach_ft)
+            if along_ft < span_ft + reach_ft - 1e-6:
+                busy.add(course)
+        if len(busy) == len(BOND_COURSES_BOTH):
+            break
+    return busy
 
 
 def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign, safe_range_ft=None):
