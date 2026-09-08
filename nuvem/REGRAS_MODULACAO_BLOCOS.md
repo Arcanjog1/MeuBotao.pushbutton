@@ -6290,3 +6290,57 @@ específico, **3 compensadores é o mínimo aritmético existente**.
 
 Nenhuma das três foi aplicada. **A orientação mais recente do usuário tem
 prioridade quando ela vier.**
+---
+
+## 42. PENDÊNCIA NORMATIVA — parede cujo comprimento não é múltiplo de 5cm
+fica **INTEIRAMENTE VAZIA** (2026-09-08, **DECISÃO PENDENTE DO USUÁRIO —
+NADA IMPLEMENTADO**)
+
+> **Status**: `DOCUMENTADO — pendência normativa aberta`. Medido e
+> reproduzido; nenhuma linha de código alterada.
+
+### 42.1 O que foi medido
+
+`_pier_remaining_snapped_cm` devolve `None` quando o resto do trecho não
+cai a menos de `PIER_FIT_TOLERANCE_CM` (0,30cm) de um múltiplo de
+`PIER_MODULE_CM` (5cm). O chamador trata `None` como `NON_MODULAR` e o
+trecho fica **sem nenhuma peça** — em **todas as fiadas**.
+
+Reprodutor mínimo (parede LIVRE, sem abertura, sem encontro):
+
+| comprimento | resultado |
+|---|---|
+| 99,8cm | 6 peças (B19+B39) ✔ |
+| **197,9cm** | **0 peças** — `non_modular` nas duas fiadas ✘ |
+| 200,0cm | 11 peças (B34+B39+C04) ✔ |
+| 269,0cm | 16 peças (B19+B39+C09) ✔ |
+
+No TGD isso aparece como `COVERAGE_WALL_NOT_MODULATED` em **29 paredes**
+(0 no gabarito, "só o solver erra"). Das 29, duas são paredes reais e
+idênticas de **197,9cm** com as duas pontas livres (`W068`, `W091`) —
+1,98m de alvenaria que o modelo entrega **vazia**. As demais são de
+4,4 a 36,6cm, abaixo ou perto do menor módulo, e são artefato de
+pareamento de parede (fatias do CAD), não defeito do solver.
+
+### 42.2 Por que é normativo e não bug
+
+O contrato é **explícito e deliberado**: o achado carrega
+`lower_valid_cm`/`upper_valid_cm` e `delta_to_lower_cm`/`delta_to_upper_cm`
+— ou seja, o sistema está dizendo ao usuário "**ajuste o comprimento da
+parede em X cm**", não "não consegui". Isso conflita com a intenção
+declarada do tier 8 de `_pier_ordered_layout` ("preferir uma solução
+*feia* a reportar `NON_MODULAR_WALL` quando ela existe"), porque uma
+solução com 2,1cm de folga **existe** — a folga seria absorvida pela
+argamassa, como em obra.
+
+### 42.3 O que o usuário precisa decidir
+
+1. **Manter**: parede fora do módulo continua vazia e o relatório pede o
+   ajuste de comprimento — o modelo nunca "mente" sobre a modulação.
+2. **Modular com folga**: preencher até onde fecha e deixar o resto
+   (< 1 módulo) como folga declarada, marcando a peça final para revisão
+   — evita parede inteiramente vazia no Revit.
+3. **Ampliar `PIER_FIT_TOLERANCE_CM`**: rejeitado a priori aqui — a folga
+   real medida (2,1cm) é 7× a tolerância atual, e alargar a tolerância
+   mexeria também no contrato de snap de todos os outros trechos.
+
