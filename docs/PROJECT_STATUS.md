@@ -14,6 +14,12 @@ branch: main
 SHA:    91258dd627af97fe437a56c0506eb096ca5aa267
 ```
 
+`main` real conferida por `git fetch` em 2026-09-08. Último merge:
+`PR #24` / **CR-V1** — valida encontros por elevação física, não por
+índice ordinal. O SHA `62ea7f2` que constava aqui era o do `PR #22` e
+estava **desatualizado**; a cadeia intermediária (`PR #23`, `PR #24`)
+está em `docs/PROJECT_STATUS_LOG.md`.
+
 Último marco de PRODUÇÃO: `PR #24` / `CR-V1` — **mesclado** (merge commit
 `91258dd627af97fe437a56c0506eb096ca5aa267`). Antes dele, `PR #23` (registro
 pós-merge, `e381992`) e `PR #22` / `CR-BENCH-OPENING-RECONSTRUCTION-A`
@@ -554,6 +560,185 @@ anteriores. Há um lembrete automático
 (`.github/workflows/check-project-status.yml`) que sinaliza quando
 `nuvem/core/engine/**` muda sem que `docs/PROJECT_STATUS.md` seja tocado
 no mesmo diff — não bloqueia push/merge, só avisa.
+
+## Sessão multifase CR-C2 / revisão C1 / reavaliação CR-B (2026-09-08)
+
+> Tudo abaixo é **trabalho em PR draft ou diagnóstico**. **Nenhum merge
+> foi feito, nenhum PR foi marcado `ready`, nenhum arquivo oficial foi
+> regravado e nenhum monitoramento automático foi criado.**
+
+### PRs abertos — estado real
+
+| PR | CR | branch / HEAD | estado |
+|---|---|---|---|
+| #25 | **CR-S1** — alternância em nó `L` de ponta | `claude/corrigir-alternancia-no-l-76nnb3` `33d035f` | **draft**, não mesclado |
+| #26 | **CR-C1** — `expected_rows` físico | `claude/cr-c1-expected-rows-fisico` `34bf696` | **draft**, não mesclado |
+| #27 | **CR-D1** — recuperação documental | `claude/cr-d1-recuperacao-documental` `b852695` | **draft**, não mesclado |
+| #28 | **CR-B preparação** — identidade/G18 | `claude/cr-b-preparacao-identidade` `0596e78` | **draft**, não mesclado |
+| — | **CR-C2** — diagnóstico (sem patch) | `claude/multifase-cr-c2-c1-b-ikr8jc` | esta branch |
+
+Um PR **draft não é um gate aprovado**. A revisão da CR-C1 registrada em
+`docs/CR_C1_INDEPENDENT_REVIEW.md` é uma **revisão por medição própria em
+worktree isolado — não é um review formal do GitHub** e não substitui um.
+As execuções de `pytest` citadas são **locais nesta sessão — não são
+checks de CI**.
+
+### Entregas desta sessão
+
+- `docs/CR_C1_INDEPENDENT_REVIEW.md` — revisão independente do PR #26.
+  Veredito **APPROVE**, sem patch proposto. Merge continua **pendente de
+  autorização explícita**.
+- `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md` — causa-raiz dos `+23`
+  `COVERAGE_ROW_MOSTLY_EMPTY`. **Diagnóstico concluído, SEM PATCH**: a
+  correção exige decisão normativa do usuário.
+- `docs/CR_B_G12_G16_REEVALUATION.md` — G12 e G16 reavaliados sobre a
+  projeção `S1 + C1`, e contrato de integração da CR-B conferido por
+  medição própria.
+- `nuvem/REGRAS_MODULACAO_BLOCOS.md` §38 — registro obrigatório do
+  conhecimento, rotulado como **pendência de decisão**, não como regra
+  aprovada.
+- `nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/` —
+  diagnósticos reprodutíveis.
+- `docs/CR_C2_DECISAO_FISICA.md` — as 3 opções da C2 com contrato
+  integral, busca do fundamento normativo de cada uma e **duas correções
+  da análise anterior**. **Nenhum patch**: nem A nem B implementam
+  contrato existente. Recomendação revista: **opção C isolada**.
+- `docs/CR_G12_CROSS_BAND.md` — tabela física das 12 identidades do G12,
+  causa-raiz e escopo da **CR-G12** (preparada, **não iniciada**).
+- `docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md` — checkpoint da sessão.
+  **Gravado em `docs/` de propósito:** `.gitignore` linha 8 ignora
+  `.claude/*`, então um checkpoint escrito em `.claude/checkpoints/`
+  **nunca é commitado** e se perde com o contêiner — foi o que
+  aconteceu com `sessao-multifase-s1-c1-b-d1.md`, que esta sessão
+  recebeu como insumo e não existe em nenhuma branch.
+
+### Gates — estado real após esta sessão
+
+| gate | estado | nota |
+|---|---|---|
+| **G12** (`PRISM_CONTINUOUS_JOINT`) | ✘ **não aprovado** | reavaliado: **28 → 12** identidades novas com a S1. A S1 melhora 57% mas **não zera**. **Causa-raiz localizada** (fronteira de banda de abertura, §27.7/§39): `docs/CR_G12_CROSS_BAND.md`. **12 de 12 são defeito físico real** — não compensados por melhora em outros códigos |
+| **G13** (`JUNCTION_NOT_ALTERNATING`) | resolvido pela **S1** (`+16 → 0`) | aprovação depende do **merge autorizado** da S1 |
+| **G16** (`COVERAGE_*`) | ✘ **não aprovado** | `MISSING_ROW` `+17 → +0` pela C1; `ROW_MOSTLY_EMPTY` `+23` continua |
+| **G18** (identidade) | artefato ✔, oficial ✘ | 0 chaves ambíguas nos 3 estados; gravar no oficial depende do usuário |
+
+**Nenhum gate foi promovido a aprovado nesta sessão.**
+
+### Dívidas e decisões pendentes do usuário
+
+- **Decisão normativa da CR-C2** — 3 opções em
+  `docs/CR_C2_DECISAO_FISICA.md`. **Recomendação: opção C isolada**
+  (A é normativa nova; **B foi retirada** — contradiz a tese física da
+  própria CR-B). Sem decisão, a CR-C2 não pode ser implementada.
+- **G12** — autorizar ou não a **CR-G12** (`docs/CR_G12_CROSS_BAND.md`).
+  As 12 identidades são **defeito físico real**, com causa-raiz conhecida
+  (§27.7/§39) e correção já proposta lá. Exige escrever
+  `nuvem/core/wall_modeling.py` e abre dívida de **refresh de
+  `baseline.json`**. **Não iniciada.**
+- **Merge da CR-S1 (#25)** e **da CR-C1 (#26)** — pendentes.
+- **`reference_score.json`** — recalibração pendente (escrita oficial).
+- **`baseline.json`** — refresh pendente (CR própria, autorizada).
+  Há **2 falhas de baseline PRÉ-EXISTENTES na `main`**, reproduzidas nas
+  duas árvores com os mesmos valores (TP1: `JUNCTION_MISSING_BINDING`
+  8 → 9). Não são regressão de nenhuma CR desta sessão.
+- **D1–D5** — não decididas; nenhuma foi tomada, influenciada ou presumida.
+
+### Ordem de integração recomendada (não executada)
+
+1. **CR-S1** (#25) — resolve G13, melhora G12.
+2. **CR-C1** (#26) — resolve metade do G16. *(S1 e C1 tocam a mesma
+   posição de `REGRAS_MODULACAO_BLOCOS.md` — conflito de merge previsível
+   e trivial: §36 e §37.)*
+3. **Decisão normativa da CR-C2** → só então implementação.
+4. **Decisão sobre o G12 residual.**
+5. **D1/D2/D3** pelo usuário → só então a CR-B oficial.
+6. **CR-D1** (#27) — documental, independente, não bloqueia.
+
+## Sessão CR-G12 — correção do mecanismo cross-band (2026-09-08)
+
+> **Desenvolvimento e testes em branch isolada. Nenhum merge, nenhum PR
+> marcado `ready`, nenhum arquivo oficial regravado
+> (`baseline.json`/`reference_score.json`/gabarito intocados) e nenhum
+> monitoramento automático criado.**
+
+| item | valor |
+|---|---|
+| branch | `claude/cross-band-mechanism-fix-ab76jv` |
+| base | `main` `91258dd` + o diagnóstico de `claude/multifase-cr-c2-c1-b-ikr8jc` (`a25f846`) |
+| arquivos de produção | `nuvem/core/wall_modeling.py`, `nuvem/core/engine/wall_stepper.py` |
+| relatório | `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` |
+| regras | `nuvem/REGRAS_MODULACAO_BLOCOS.md` §27.7 (status) e §39.3/§39.4 |
+
+### O que mudou
+
+A regra #1 (junta vertical nunca coincide entre fiadas vizinhas) passa a
+ser avaliada **também na fronteira entre bandas de abertura**. Cada banda
+publica as juntas **reais** de cada fiada física; a banda seguinte recebe
+essas juntas como semente e só troca de composição quando há **ganho
+estrito** e nenhuma piora nas regras que já valiam. Dois passes
+(Gauss-Seidel), com **aceitação global** — o segundo só substitui o
+primeiro se a coincidência cross-band total cair estritamente.
+Desligável por `CROSS_BAND_JOINT_PROPAGATION_ENABLED` (default `True`);
+desligado, é bit-a-bit o comportamento anterior.
+
+### Reproducer
+
+**3 paredes REAIS** do `input.json` oficial do TGD (índices 55/82/124),
+obtidas por *delta-debugging* — não por proximidade. Falha no código
+anterior pelo **mesmo mecanismo físico** (junta em `t=39,5` presa à borda
+de um `B54` de `T_INTERSECTION_MIDSPAN`, desencontro 0,00cm) e some com a
+correção. `nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/repro_g12d_minimo.py`.
+
+### Resultado físico
+
+| projeto | identidades NOVAS do G12 sem o patch | **com o patch** |
+|---|---|---|
+| TGD (candidato CR-B + S1+C1) | 12 | **0** |
+| TP1 (candidato CR-B + S1+C1) | 12 | **0** |
+
+`PRISM_CONTINUOUS_JOINT` **não sobe** — cai: corpus oficial TGD 336→322,
+TP1 290→260, piloto 0→0; candidato −42/−48/−26/−32. **Zero** juntas
+contínuas novas. `COVERAGE_*`, `OPENING_*`, `JUNCTION_*` e
+`POSITION_OVERLAP` com **delta 0**.
+
+**Trade-offs declarados:** `PRISM_STAGGER_BELOW_TARGET` sobe (+31 TGD,
++25 TP1 — nível 2, troca crítico→menor); `COMPENSATOR_EXCESS_IN_RUN` +2
+no TGD do candidato; solver **~2× mais lento** (48s → 94s por resolução
+completa do TGD); sobram **2** identidades cross-band residuais no TGD
+(nenhuma entre as 12 do G12).
+
+### Gates após esta sessão
+
+| gate | estado |
+|---|---|
+| **G12** | **12 → 0 nos dois projetos.** Pronto para revisão humana; **não** declarado aprovado por conta própria |
+| **G13** | inalterado (delta 0 em `JUNCTION_*`); continua dependendo do merge da S1 |
+| **G16** | ✘ **continua não aprovado** — a **CR-C2 continua pendente** de decisão normativa. Esta CR não o destrava |
+| **G18** | inalterado |
+
+### Suíte completa
+
+| árvore | resultado |
+|---|---|
+| `main` `91258dd` **sem patch** (cópia isolada) | **2 failed, 884 passed** |
+| `main` **+ CR-G12** | **4 failed, 882 passed** |
+| `tests/test_cross_band_joint_propagation_cr_g12.py` | **20 passed** |
+
+As **2 pré-existentes** são as de `test_benchmark_baselines` (TGD
+`compensators` 52→61, TP1 `JUNCTION_MISSING_BINDING` 8→9) — idênticas nas
+duas árvores, dívida de refresh de `baseline.json`. As **2 novas** são
+asserções de *magnitude de reparo* que falham **por melhoria**
+(`test_t1_t9_...` e `test_t20_...`): o resultado físico final é idêntico
+nos dois casos. **Nenhuma foi alterada, nenhum `skip`/`xfail` foi usado** —
+ver `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` §7.2.
+
+### Dívidas que continuam abertas
+
+- `baseline.json` e `reference_score.json` — **não** regravados.
+- §27.8 item 2 (`UNCLASSIFIED_RULE_CONFLICT`, junta de peça de
+  **amarração** repetida) — sem decisão normativa, **fora** desta CR.
+- Decisão normativa da **CR-C2**; merge da **CR-S1 (#25)** e da
+  **CR-C1 (#26)**; **D1–D5**.
+- Custo de tempo do segundo passe e as 2 identidades residuais do TGD.
 
 ## Entradas de contexto
 

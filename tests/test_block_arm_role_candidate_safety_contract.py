@@ -440,11 +440,45 @@ def _run_tgd(enabled):
 
 @pytest.mark.slow
 def test_t1_t9_candidato_seguro_e_aceito_no_tgd_real():
+    """T1/T9 - o gate ACEITA candidato seguro E a parede alvo termina SEM
+    prisma forcado.
+
+    CR-G12 (2026-09-08, revisao independente): a assercao original era
+    `any(a["wall_idx"] == 23 for a in accepted)` - ela travava o MECANISMO
+    ("este candidato foi aceito"), nao o RESULTADO FISICO ("a parede nao
+    tem prisma forcado"). Com a propagacao de juntas entre BANDAS de
+    abertura a parede 23 ja' nasce SEM prisma forcado no resultado
+    ORIGINAL, entao ela nem chega a ser candidata:
+    `repair_arm_role_isolated_edges` so' propoe aresta isolada cuja parede
+    TEM prisma forcado no baseline.
+
+    Medido nas duas arvores (base `91258dd` x base+CR-G12), TGD real:
+
+        repairable ORIGINAL  [4,23,54,89,90,91,92,120] -> [4,54,89,90,91,92,120]
+        accepted             [23/SAME_A, 91/SAME_B]    -> [91/SAME_B]
+        rejected             19                        -> 19
+        prisma forcado FINAL as MESMAS 29 paredes nas duas arvores
+
+    O SAFE REPAIR nao foi enfraquecido: o defeito que ele consertava
+    naquela parede deixou de existir na GERACAO. Mesmo precedente da
+    secao 27.9 (`test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada`,
+    cuja assercao registrava um artefato do bug).
+
+    O contrato T1/T9 continua inteiro, agora fisico e mais forte:
+      1. o gate nao e' vacuo - aceita pelo menos um candidato;
+      2. todo candidato ACEITO de fato resolve o prisma forcado do alvo;
+      3. a parede 23 - o caso T1/T9 medido - termina SEM prisma forcado,
+         pelas DUAS rotas (reparo aceito, ou geracao ja' correta)."""
     result, _nodes, _walls, _e2n, _op, _cat, _bz, _nc = _run_tgd(enabled=True)
     safe_repair = result.get("arm_role_safe_repair") or {}
     accepted = safe_repair.get("accepted") or []
-    assert accepted, "esperava pelo menos 1 candidato aceito no TGD (wall_idx=23/W011)"
-    assert any(a["wall_idx"] == 23 for a in accepted), accepted
+    audits = result.get("wall_bond_audits")
+    assert accepted, "esperava pelo menos 1 candidato aceito no TGD"
+    for candidato in accepted:
+        assert not m._wall_has_forced_corner_prism(candidato["wall_idx"], audits), candidato
+    assert not m._wall_has_forced_corner_prism(23, audits), (
+        "a parede 23 (o caso T1/T9) tem de terminar SEM prisma forcado - "
+        "aceita como candidato de reparo, ou ja' correta na geracao")
 
 
 @pytest.mark.slow

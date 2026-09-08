@@ -574,6 +574,27 @@ def test_t20_caso_real_tp1_junta_b19_b39_em_cima_da_peca_de_no():
     # UNICA composicao possivel, juntas fixas em 24,5/34,5/44,5 - o limite
     # genuino ja documentado (REGRAS 30.6 / 33.5), que nenhuma troca de
     # layout move. O teste tranca a reducao, nao a impossibilidade.
-    assert len(sig_on) * 2 <= len(sig_off), (sig_off, sig_on)
+    #
+    # CR-G12 (2026-09-08, revisao independente): a razao `len(sig_on) * 2 <=
+    # len(sig_off)` media EFICACIA RELATIVA contra um CONTRAFACTUAL - o
+    # estado "sem a metade simetrica" -, e e' o CONTRAFACTUAL que a CR-G12
+    # muda. Medido nas duas arvores (base `91258dd` x base+CR-G12), TP1
+    # real:
+    #
+    #     PRODUCAO (metade simetrica LIGADA)   v_on  = 14 -> 14   IDENTICO
+    #                                          sig_on =  4 ->  4  IDENTICO
+    #     CONTRAFACTUAL (metade simetrica OFF) v_off = 31 -> 16
+    #                                          sig_off= 16 ->  5
+    #
+    # O estado de PRODUCAO nao mudou em nada: a CR-G12 retira ANTES, na
+    # geracao, parte do MESMO defeito que a metade simetrica consertava
+    # depois. Exigir a razao seria exigir que o contrafactual continuasse
+    # ruim. O teste passa a trancar o ESTADO FISICO DE PRODUCAO - que a
+    # razao nunca trancou (uma reducao de 100 para 50 tambem a satisfaz) -
+    # mais a reducao estrita, que continua provando que a metade simetrica
+    # ainda tem efeito proprio sobre esta assinatura:
+    assert len(sig_on) < len(sig_off), (sig_off, sig_on)
+    assert len(sig_on) <= 4, sig_on
+    assert len(v_on) <= 14, (len(v_on), v_on)
     # e nenhuma violacao NOVA: todo residual ja' existia sem a metade simetrica
     assert set(sig_on) <= set(sig_off), sorted(set(sig_on) - set(sig_off))

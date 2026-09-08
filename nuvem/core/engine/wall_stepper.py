@@ -126,6 +126,8 @@ __all__ = [
     "minimum_opening_shift_cm", "minimum_opening_widening_cm",
     "plan_minimum_opening_adjustment", "_nearest_edge_delta",
     "_recut_openings_and_repair", "_candidate_extents_on_wall",
+    # ---- CR-G12 - regra #1 na fronteira entre BANDAS de abertura ----
+    "_cross_band_swapped_layout",
     # ---- ordem de processamento / validacao / pipeline principal ----
     "WALL_ORIENTATION_TOLERANCE", "WALL_ALIGNMENT_TOLERANCE_FT",
     "WALL_NO_GROWTH_TOLERANCE_CM", "WALL_COLLISION_REACH_CM",
@@ -4480,6 +4482,67 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
     return best
 
 
+def _cross_band_swapped_layout(layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                               cross_band_joints_cm, same_band_avoid_cm,
+                               allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                               leading_is_open=True, trailing_is_open=True):
+    """CR-G12 (secao 27.7): a regra #1 avaliada tambem na FRONTEIRA ENTRE
+    BANDAS de abertura.
+
+    `solve_building_blocks_all_courses` agrupa as fiadas fisicas em bandas
+    por conjunto de aberturas ativas e resolve cada banda DO ZERO - a
+    familia "B" de uma banda desencontra a familia "A" da MESMA banda, mas
+    nunca ve' a fiada fisica IMEDIATAMENTE ABAIXO quando ela pertence a
+    outra banda. `cross_band_joints_cm` sao justamente as juntas dessa
+    fiada vizinha ja' resolvida (medidas na geometria REAL das pecas
+    lancadas, ver `joint_positions_from_extents`).
+
+    TROCA CONSERVADORA, no MESMO padrao ja' usado pela METADE SIMETRICA da
+    junta NO'|FILL (CR-BLOCK-NODE-FILL-REVALIDATION): o layout que o
+    caminho normal escolheu continua sendo o primeiro e o normal; so' e'
+    trocado quando
+
+      1. ele de fato empilha junta sobre a fiada vizinha de outra banda; E
+      2. existe composicao do MESMO trecho com ESTRITAMENTE menos
+         coincidencia cross-band; E
+      3. essa composicao NAO piora a coincidencia com a familia oposta da
+         PROPRIA banda (`same_band_avoid_cm` - regra #1 intra-banda, que
+         ja' valia); E
+      4. ela NAO piora a regra #2 (compensadores em sequencia).
+
+    Nunca troca por empate: quem ja' estava correto nao se mexe. Com
+    `cross_band_joints_cm` vazio a funcao devolve `layout` sem tocar em
+    nada - e' exatamente o comportamento anterior a esta CR, e e' o que
+    todo chamador que nao passa semente recebe."""
+    if layout is None or not cross_band_joints_cm:
+        return layout
+    antes_cross = _count_joint_coincidences_cm(
+        _layout_internal_joint_positions_cm(layout, seg_start_cm), cross_band_joints_cm)
+    if not antes_cross:
+        return layout
+    antes_same = _count_joint_coincidences_cm(
+        _layout_internal_joint_positions_cm(layout, seg_start_cm), same_band_avoid_cm
+    ) if same_band_avoid_cm else 0
+    alternativa = _pier_layout_avoiding_joints(
+        pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+        list(same_band_avoid_cm or []) + list(cross_band_joints_cm),
+        allow_compensators=allow_compensators,
+        leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+    )
+    if alternativa is None:
+        return layout
+    alt_joints_cm = _layout_internal_joint_positions_cm(alternativa, seg_start_cm)
+    if _count_joint_coincidences_cm(alt_joints_cm, cross_band_joints_cm) >= antes_cross:
+        return layout
+    if same_band_avoid_cm and _count_joint_coincidences_cm(
+            alt_joints_cm, same_band_avoid_cm) > antes_same:
+        return layout
+    if _layout_compensator_run_excess(alternativa, catalog) > \
+            _layout_compensator_run_excess(layout, catalog):
+        return layout
+    return alternativa
+
+
 def _place_pier_layout(layout, catalog, origin_point, direction, course, wall_idx,
                        node_index=None, placement_reason="STANDARD_FILL"):
     """Converte um layout 1D (ver _pier_ordered_layout) em
@@ -5257,7 +5320,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
-                         variants_per_course=1, opening_strategy=None):
+                         variants_per_course=1, opening_strategy=None,
+                         cross_band_joint_seed=None):
     """Preenchimento comum (secao 13: 'no -> abertura, abertura ->
     abertura, abertura -> no') de UMA parede, nas duas FAMILIAS de fiada
     (par/impar - "A"/"B"). Para cada abertura, materializa tambem o bloco
@@ -5401,6 +5465,12 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         return jamb_cache[key]
 
     for course in ("A", "B"):
+        # CR-G12 (secao 27.7): juntas da fiada fisica VIZINHA que pertence a
+        # OUTRA banda de abertura e ja' foi resolvida - a fronteira de banda
+        # e' o unico lugar em que a regra #1 nao era avaliada. Vazio (o
+        # default de todo chamador que nao passa semente) reproduz
+        # exatamente o comportamento anterior a esta CR.
+        cross_band_joints_cm = list((cross_band_joint_seed or {}).get(course) or [])
         boundaries = list(base_boundaries)
         # Intervalos de meio-de-parede sao MESCLADOS antes de virar
         # fronteira: dois encontros muito proximos (ou o mesmo encontro
@@ -5695,6 +5765,21 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                 allow_compensators=allow_compensators,
                                 leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                             )
+                        # CR-G12: fronteira de banda de abertura. Roda DEPOIS
+                        # de tudo que ja' existia (layout padrao, metade
+                        # simetrica NO'|FILL, variantes da propria familia) e
+                        # so' troca quando ha' ganho estrito - ver
+                        # `_cross_band_swapped_layout`. A familia A nao tem
+                        # familia oposta ja' resolvida DENTRO da banda, entao
+                        # o unico criterio intra-banda a nao piorar e' o das
+                        # variantes anteriores da propria familia.
+                        layout = _cross_band_swapped_layout(
+                            layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                            cross_band_joints_cm,
+                            own_family_joint_positions_cm + own_family_boundary_joint_positions_cm,
+                            allow_compensators=allow_compensators,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        )
                         if layout:
                             # Juntas INTERNAS (sem isencao, pelo mesmo motivo do
                             # `_score` de _pier_layout_avoiding_joints: a Fiada B
@@ -5739,6 +5824,19 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             + own_family_boundary_joint_positions_cm,
                             allow_compensators=allow_compensators,
                             target_void_positions_cm=course_a_void_positions_cm,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        )
+                        # CR-G12: fronteira de banda de abertura (ver o
+                        # comentario igual na familia A). Aqui o criterio
+                        # intra-banda a NAO piorar e' a regra #1 contra a
+                        # familia A da propria banda, que ja' valia.
+                        layout = _cross_band_swapped_layout(
+                            layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                            cross_band_joints_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm,
+                            allow_compensators=allow_compensators,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
                         if layout:
@@ -7519,7 +7617,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                              wall_start_cb=None, wall_result_cb=None,
                              dirty_wall_idxs=None, baseline_per_wall=None,
                              baseline_candidates=None, stage_cb=None,
-                             opening_strategy=None):
+                             opening_strategy=None, cross_band_joint_seed=None):
     """PIPELINE PRINCIPAL (regras #3, #4, #5, #8, #9): processa UMA parede
     de cada vez, na ordem geometrica de `order_walls_for_processing`, e
     para cada uma faz o ciclo completo antes de tocar na proxima:
@@ -7704,6 +7802,10 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
+                # CR-G12: a semente de fronteira de banda e' por PAREDE (as
+                # juntas sao coordenadas t do eixo DELA) - `None` para toda
+                # parede sem vizinha de outra banda ja' resolvida.
+                cross_band_joint_seed=(cross_band_joint_seed or {}).get(wall_idx),
             )
 
         result = _solve(working_walls, working_openings, wall_by_end, wall_midspan)
@@ -7907,7 +8009,8 @@ def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall
                           allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                           base_z_abs=None, variants_per_course=1,
                           progress_cb=None, wall_start_cb=None, wall_result_cb=None,
-                          stage_cb=None, opening_strategy=None):
+                          stage_cb=None, opening_strategy=None,
+                          cross_band_joint_seed=None):
     """Ponto de entrada UNICO da Etapa 4 completa (X -> T -> L -> jambs ->
     trechos livres): roda solve_all_intersections (X/T/L) e depois entrega
     tudo a `process_walls_one_by_one`, que percorre as paredes UMA A UMA na
@@ -7938,7 +8041,7 @@ def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall
         variants_per_course=variants_per_course,
         opening_strategy=opening_strategy,
         progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-        stage_cb=stage_cb,
+        stage_cb=stage_cb, cross_band_joint_seed=cross_band_joint_seed,
     )
     if base_z_abs is not None:
         if stage_cb is not None:
