@@ -5551,3 +5551,142 @@ mesmo padrão passaria do limiar.
 nas MESMAS paredes — TGD `W071`/`W073`, TP1 `W071`. Cobertura, colisões,
 aberturas e todos os demais códigos de amarração ficam com **delta zero
 por identidade física**.
+
+---
+
+## 37. `CR-C1` — a expectativa de fiada de uma parede é FÍSICA e por
+ELEVAÇÃO, nunca um número global do projeto (2026-09-08)
+
+> Conhecimento de **COBERTURA/MODULAÇÃO EM ALTURA** (quantas fiadas uma
+> parede deve ter, e como isso é medido). Implementado em
+> `nuvem/benchmark/validators/validate_wall_coverage.py`
+> (`missing_course_above_cm`, `wall_top_z_cm`). Relatório e medições:
+> `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`.
+>
+> **Numeração:** a seção **36** está RESERVADA para a `CR-S1` (PR #25,
+> branch `claude/corrigir-alternancia-no-l-76nnb3`), que ainda **não foi
+> mesclada** na `main`. Esta CR nasceu da `main` `91258dd`, onde a 36
+> ainda não existe. Não renumerar nenhuma das duas no merge.
+
+### 37.1 REGRA OBRIGATÓRIA — `settings.expected_rows` NÃO é expectativa de parede
+
+`settings.expected_rows` (= `settings.num_courses`) é o **teto de fiadas do
+PROJETO**. Ele **nunca** pode ser comparado com a contagem de fiadas de uma
+parede individual.
+
+**Causa-raiz provada.** O validador de cobertura fazia
+`len(fiadas_da_parede) < expected_rows` → acusa `COVERAGE_MISSING_ROW`. As
+paredes do corpus real têm alturas **diferentes** — 220 / 260 / 270 / 280 /
+281cm — e uma parede de 260cm com passo de 20cm **nunca** terá 17 fiadas.
+
+**PADRÃO OBSERVADO, medido, não deduzido:** rodando os validadores sobre o
+**gabarito HUMANO** (`reference.json`), `COVERAGE_MISSING_ROW` dá **95**
+(TGD) e **94** (TP1) — os mesmos números que o `reference_score.json`
+oficial registra — e **100% deles** vêm desse ramo, **zero** do ramo do meio
+da pilha. Um validador que acusa a própria referência de correção está
+medindo a coisa errada.
+
+### 37.2 REGRA OBRIGATÓRIA — a fiada do topo NÃO segue o passo do grid
+
+Medido no gabarito humano, a última fiada é **encostada no pé-direito**, e
+não no próximo múltiplo do passo:
+
+| altura da parede | última cota | segue o grid? |
+|---|---|---|
+| 220cm | z=200 | sim |
+| 260cm | z=240 | sim |
+| 270cm | z=**250** | **não** |
+| 280cm | z=260 | sim |
+| 281cm | z=**261** | **não** |
+
+Nas paredes de 281cm a fiada abaixo do topo é **canaleta** (`CJ19`, 29cm de
+altura; `CAN34`/`CAN39`) e a do topo usa peças `_C` de 9cm.
+
+**Consequência de projeto:** é **PROIBIDO** um validador calcular "quantas
+fiadas esta parede deveria ter" reproduzindo onde cada fiada cai — isso
+reimplementa a política de empilhamento do solver **dentro** do validador, e
+um validador que duplica a regra que fiscaliza deixa de fiscalizar.
+
+### 37.3 REGRA OBRIGATÓRIA — o critério é "cabe mais uma fiada inteira?"
+
+Falta fiada no topo **se e somente se** ainda cabe uma fiada **inteira**
+abaixo do pé-direito daquela parede:
+
+```
+proxima_cota = cota_da_fiada_mais_alta + passo_de_fiada
+FALTA  <=>  proxima_cota + altura_da_peca <= base_z + altura_da_parede
+```
+
+Não precisa saber onde as fiadas caem — só se **sobra espaço físico** para
+outra. É por **elevação absoluta**, nunca por índice ordinal (mesma
+disciplina da seção da `CR-V1`).
+
+**Margem medida** (folga real no topo, gabarito humano): −9cm (24 paredes, a
+canaleta ultrapassa o topo declarado), +1cm (63/62), +11cm (10). O limiar é
+o **passo inteiro (20cm)** — margem de **9cm** contra a maior folga
+legítima observada.
+
+### 37.4 EXCEÇÃO PERMITIDA — parede sem altura declarada fica sem veredito
+
+Sem `height_cm` não existe pé-direito para comparar. Nesse caso **não se
+reporta** — e é **PROIBIDO** inferir a altura a partir das fiadas que
+existem: isso tornaria o critério **tautológico** ("espera-se o que já está
+lá") e um solver que truncasse toda parede passaria limpo.
+
+### 37.5 PADRÃO OBSERVADO — corrigir o falso positivo NÃO pode zerar o achado
+
+Prova de que o critério físico continua fiscalizando, medida sobre a saída
+do **solver** do TGD: o ramo do topo cai apenas **30 → 28**. As **28**
+preservadas são paredes de `h=340` cuja última fiada está em `z=301`
+(ainda cabe fiada em `z=321`, pois `321+19 = 340 ≤ 340`) — **defeito real
+do solver**. As **2** que deixaram de ser acusadas têm a última fiada em
+`z=321` (`321+19 = 340` = topo exato) — **parede fechada**. A discriminação
+entre elas é de **19cm**.
+
+O ramo do **meio da pilha** (fiada ausente entre a primeira e a última) não
+foi tocado: 162 → 162 no solver do TGD.
+
+**REGRA OBRIGATÓRIA:** ao corrigir um falso positivo de validador, medir
+sempre os dois lados — quanto sumiu **contra a referência correta** e
+quanto **permaneceu contra a saída defeituosa**. Uma queda a zero nos dois
+é sinal de que o validador foi silenciado, não corrigido.
+
+### 37.6 PADRÃO OBSERVADO — o gate `G16` da CR-B é COMPOSTO e esta CR
+resolve METADE dele
+
+Medido sobre o candidato da CR-B (estado onde o gate falha), nos dois
+projetos: `STATE_R → STATE_C` dá **`+17 COVERAGE_MISSING_ROW`** e
+**`+23 COVERAGE_ROW_MOSTLY_EMPTY`** — exatamente os números do G16.
+
+| componente | com a CR-C1 | causa |
+|---|---|---|
+| `+17 COVERAGE_MISSING_ROW` | **+0** — resolvido | `expected_rows` global |
+| `+23 COVERAGE_ROW_MOSTLY_EMPTY` | **+23** — inalterado | **outra causa** |
+
+`COVERAGE_ROW_MOSTLY_EMPTY` **não lê** `expected_rows`: compara as fiadas
+de uma parede entre si. O resíduo (38 novos − 15 que sumiram) são fiadas
+cobrindo 6-30% do trecho modulável numa parede cuja melhor fiada cobre
+100%; **34 dos 38 em paredes sem abertura nenhuma**, concentrados em
+paredes de 169cm. Classe **D/E**: consequência da **divisão de paredes** da
+própria CR-B (`+19` paredes, **184 blocos mudaram de fiada** pelo manifesto
+do candidato) — os blocos humanos são redistribuídos entre os segmentos.
+
+**REGRA OBRIGATÓRIA:** o `G16` **continua NÃO aprovado**. Resolver metade
+de um gate composto NÃO o aprova, e o saldo do outro componente não pode
+ser compensado pelo componente resolvido. A outra metade exige CR própria
+(**CR-C2 — cobertura por segmento após divisão de parede**), não
+implementada.
+
+### 37.7 O que esta CR NÃO decidiu
+
+- **`baseline.json` e `reference_score.json` NÃO foram regravados.** O
+  `reference_score.json` oficial continua registrando 95/94; recalibrá-lo
+  é escrita em arquivo oficial e exige **autorização específica do
+  usuário**.
+- Os **162** achados do ramo do meio da pilha no solver do TGD continuam
+  **sem diagnóstico próprio** — CR separada.
+- As **28** paredes de `h=340` que param em `z=301` são **defeito real do
+  solver**, agora corretamente acusado. Esta CR **entrega** esse achado;
+  corrigi-lo é outro trabalho.
+- Nenhuma regra de amarração, de X/T/L, de B54/B34/B19 ou de compensador
+  foi tocada. O solver não foi tocado.
