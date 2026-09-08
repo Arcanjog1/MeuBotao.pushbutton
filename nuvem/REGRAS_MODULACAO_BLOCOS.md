@@ -5351,3 +5351,158 @@ imediato também é zero até que o corpus tenha um caso fisicamente
 compatível com a condição de domínio aprovada. **NÃO MESCLADO. Aguarda
 autorização explícita do usuário para merge. Nenhum monitoramento
 automático ativado.**
+
+---
+
+## 36. `CR-S1` — o giro do canto em L é a ÚLTIMA saída, não a primeira:
+alternância só pode ser sacrificada quando nenhuma fiada resolve
+(2026-09-07)
+
+> Conhecimento de **AMARRAÇÃO** (encontro em L, alternância entre fiadas,
+> continuidade entre fiadas). Registro obrigatório por `CLAUDE.md`.
+> Implementado em `nuvem/core/engine/wall_stepper.py` (`solve_l_corner`,
+> `_corner_bond_blocking_courses`, `_node_bond_courses_on_wall`).
+> Relatório completo e medições: `docs/CR_S1_L_NODE_ALTERNATION.md`.
+
+### 36.1 O que já existia e nunca tinha sido registrado aqui — o GIRO
+
+**PADRÃO OBSERVADO, agora documentado** (existe no código desde
+2026-08-25; a seção 5 acima descrevia o L_CORNER como se ele sempre
+alternasse). Quando a peça de amarração de um dos lados de um `L_CORNER`
+esbarraria na peça de um encontro **vizinho da mesma parede**,
+`solve_l_corner` **gira** a peça do canto: manda as **duas** fiadas para a
+parede não bloqueada. O canto fica sem colisão — e **sem alternância**,
+com a peça do mesmo lado nas duas fiadas.
+
+Origem medida: um `T` a 20cm de um canto em L na mesma parede fazia as
+duas peças de 34cm ficarem uma sobre a outra (14cm de sobreposição); o
+solver detectava a colisão, desfazia **as duas**, e a parede terminava sem
+bloco nenhum — 42 dos 57 eixos de uma revisão manual da planta real.
+
+**REGRA OBRIGATÓRIA:** o giro é uma **degradação**, com custo de
+amarração. Ele é legítimo, mas nunca pode ser a primeira coisa tentada, e
+nunca pode ser aplicado sem que uma alternativa alternante tenha sido
+descartada por prova geométrica.
+
+### 36.2 REGRA OBRIGATÓRIA — a colisão de amarração é POR FIADA; um gate
+que só responde "bloqueado sim/não" não pode decidir girar
+
+**Causa-raiz provada** (nó físico presente nos dois níveis do corpus real:
+TGD `(338,52 ; 187,05)` = TP1 `(8017,26 ; 1289,95)`). O gate
+`_corner_bond_blocked_by_other_node` devolvia um **booleano**. Ele sabia
+que o vizinho estava perto demais e **descartava a informação de em qual
+fiada** aquele vizinho realmente ocupa a parede. Sem a fiada, girar as
+duas era a única saída segura.
+
+Neste nó o vizinho é um `T_INTERSECTION` a 50cm cuja parede **principal**
+é a mesma parede bloqueada. E `solve_t_intersection` deita peça na parede
+principal **só na Fiada A** — nos três caminhos dele (B54 no T verdadeiro,
+B34 na degradação para L, nada na degradação de compensador). **A Fiada B
+daquela parede estava livre o tempo todo.** O canto podia manter peça nas
+duas paredes; bastava a peça daquela parede ir para a Fiada B.
+
+Medição de referência (o humano é a referência, não a cópia): a alvenaria
+humana **alterna** neste nó nas **duas** topologias (T e L). O solver
+alternava com a topologia antiga (T) e parava de alternar quando a parede
+N-S passava a **terminar** ali (L) — 17 fiadas com um dono só.
+
+**A regra:** a decisão de girar tem de ser tomada **por fiada**. Sempre
+que existir uma fiada em que a parede bloqueada esteja provadamente livre,
+a amarração alternada é obrigatória e o giro é proibido.
+
+### 36.3 REGRA OBRIGATÓRIA — ordem de precedência num `L_CORNER` com um
+lado bloqueado
+
+Com `busy` = o conjunto de fiadas em que o vizinho ocupa a parede
+bloqueada:
+
+1. **A fiada que a parede bloqueada JÁ tem está livre** → não mexer.
+   Alternância natural preservada.
+2. **A OUTRA fiada está livre** → **trocar** `course_a`↔`course_b`. As
+   duas paredes continuam com peça; só troca quem leva qual fiada.
+   Alternância preservada.
+3. **O vizinho ocupa as DUAS fiadas** → **girar** (36.1). Só aqui a
+   alternância é sacrificada, e só porque nenhuma fiada resolve.
+
+**A ordem 1 → 2 → 3 é obrigatória**, e não é cosmética: qual fiada a
+parede bloqueada "já tem" depende de ela ser `arms[0]` ou `arms[1]`, que
+vem da ordem de entrada das paredes (seção 30). Uma versão desta correção
+com apenas (2) e (3) fazia o **mesmo nó físico** alternar numa ordem de
+entrada e girar na outra. Invariância à ordem de entrada é requisito, não
+detalhe.
+
+### 36.4 REGRA OBRIGATÓRIA — dois alcances, nunca "alcance zero" na fiada
+de fora
+
+Ao medir se o vizinho esbarra na peça deste canto, o alcance-para-trás
+dele **depende da fiada**:
+
+- **fiada em que o vizinho DEITA peça sobre esta parede**:
+  `T_INTERSECTION_B54_HALF_ROOM_FT` = 27cm — o mesmo teto superestimado
+  que o gate já usava, mantido sem alteração;
+- **a outra fiada**: a peça dele está na parede **perpendicular**, mas o
+  **corpo** dela é tão largo quanto a espessura da parede e **atravessa
+  fisicamente esta** — alcance = `_node_default_reservation_cm` (metade da
+  maior espessura do nó), o mesmo achado empírico que o preenchimento
+  comum já reserva. **NUNCA zero.**
+
+**Isto é o que separa os dois casos reais:** o `T` a **50cm** bloqueia só
+a Fiada A (50 < 34+27, mas 50 > 34+7) — a troca resolve. O `T` a **20cm**
+bloqueia as **duas** (20 < 34+27 e 20 < 34+7) — a troca só migraria a
+colisão de fiada, e o giro continua sendo a única saída sem sobreposição.
+Tratar a fiada de fora como "alcance zero" faria a troca ser aceita no
+caso de 20cm e traria de volta a sobreposição de 14cm.
+
+Consequência de projeto: "bloqueado em ALGUMA fiada" continua **idêntico**
+ao predicado booleano anterior, porque a fiada deitada mantém os 27cm, que
+é o maior dos dois alcances.
+
+### 36.5 Em quais fiadas cada tipo de nó deita peça sobre uma parede
+(leitura de convenção, NÃO regra nova)
+
+`_node_bond_courses_on_wall` só pode afirmar **uma** fiada quando a
+convenção do solver daquele tipo de nó a fixa em **todos** os caminhos
+dele — inclusive os degradados e o `ok=False`:
+
+| nó | parede | fiadas | por quê |
+|---|---|---|---|
+| `T_INTERSECTION` | `main_wall_idx` | **A** | B54/A no T verdadeiro, B34/A na degradação-L, nada na degradação de compensador |
+| `T_INTERSECTION` | `incoming_wall_idx` | A **e** B | a degradação de compensador põe o MESMO elemento único nas duas fiadas da boneca |
+| `X_INTERSECTION` | `crossing_walls[0]` | **A** | a degradação troca a PEÇA, nunca a fiada nem a parede |
+| `X_INTERSECTION` | `crossing_walls[1]` | **B** | idem |
+| `L_CORNER` | qualquer braço | A **e** B | o próprio giro (36.1) pode mandar as duas fiadas para a mesma parede |
+
+Na dúvida, **as duas** — o pior caso, que reproduz o comportamento
+anterior. Nenhuma linha desta tabela inventa comportamento: todas são
+lidas dos solvers em `wall_stepper.py`.
+
+### 36.6 O que esta CR NÃO decidiu
+
+- **B19 como peça de amarração continua PROIBIDO** (seção 35). No nó
+  medido, o humano fecha a fiada ímpar com **B19**; o solver corrigido
+  fecha com **B34**. A alternância física é a mesma. **A escolha do humano
+  NÃO foi copiada** — fazê-la exigiria decisão normativa nova, que não foi
+  tomada nem pedida.
+- Nenhuma regra de X, T ou L foi alterada. Nenhum B54 foi forçado em L.
+  Nenhuma regra geral de "parede curta" foi criada (as duas paredes do nó
+  medido têm 644cm e 939cm). Nenhuma tolerância, hard gate ou critério de
+  prisma foi relaxado. Nenhum compensador foi usado para esconder falha de
+  amarração.
+
+### 36.7 Custo medido, registrado como dívida
+
+Restaurar a alternância devolve peça de amarração à parede N-S em 8 das 17
+fiadas — e o trecho que sobra naquela fiada passa a fechar com
+compensadores: **`COMPENSATOR_CONSECUTIVE` +8** e
+**`COMPENSATOR_EXCESS_IN_RUN` +8** por projeto, **100% na parede `W065`**,
+a centímetros do próprio nó. É custo real de composição de pilarete, não
+de amarração — **não foi escondido nem compensado**, e resolver isso é CR
+separada.
+
+Em compensação, no mesmo par de estados: `JUNCTION_NOT_ALTERNATING`
+**32 → 0** (TGD) e **16 → 0** (TP1), e as juntas verticais que eram
+**coincidentes** (`PRISM_CONTINUOUS_JOINT`, critical) passam a
+**desencontradas abaixo do alvo** (`PRISM_STAGGER_BELOW_TARGET`, minor)
+nas MESMAS paredes — TGD `W071`/`W073`, TP1 `W071`. Cobertura, colisões,
+aberturas e todos os demais códigos de amarração ficam com **delta zero
+por identidade física**.
