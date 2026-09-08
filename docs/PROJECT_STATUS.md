@@ -436,6 +436,12 @@ checks de CI**.
   aprovada.
 - `nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/` —
   diagnósticos reprodutíveis.
+- `docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md` — checkpoint da sessão.
+  **Gravado em `docs/` de propósito:** `.gitignore` linha 8 ignora
+  `.claude/*`, então um checkpoint escrito em `.claude/checkpoints/`
+  **nunca é commitado** e se perde com o contêiner — foi o que
+  aconteceu com `sessao-multifase-s1-c1-b-d1.md`, que esta sessão
+  recebeu como insumo e não existe em nenhuma branch.
 
 ### Gates — estado real após esta sessão
 
