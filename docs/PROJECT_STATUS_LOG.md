@@ -1692,3 +1692,211 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+### 2026-09-07 — PR #20 (CR-BLOCK-FIT-TOLERANCE-C04): revisão independente concluída, PRE_MERGE_READY
+
+```
+data:           2026-09-07
+CR:             CR-BLOCK-FIT-TOLERANCE-C04
+PR:             #20 (open, draft, merged=false)
+branch:         claude/cr-block-fit-tolerance-c04-n5qsc4
+HEAD auditado:  dde0261ea87f5680155b9303fddedb95106fd447
+base histórica: 3ebcd9b63875f9114a3d6223aa648e5075e2d35b (= origin/main
+                atual no momento desta entrada — main não avançou)
+revisão independente: branch claude/c04-review-next-cr-prep-wc77d7,
+                HEAD 54caff7781e76be0fe1b8c9e77636d43038dc70b
+                (docs/C04_INDEPENDENT_FINAL_REVIEW.md)
+status:         PRE_MERGE_READY — aguardando (1) aceitação explícita do
+                usuário para C1/C2 e (2) autorização explícita do merge
+                deste PR especificamente. Nenhuma das duas foi dada
+                ainda nesta sessão.
+```
+
+**O que a CR faz:** separa a tolerância de FIT (`PIER_FIT_TOLERANCE_CM`
+= 0,30cm, nova constante dedicada, decide "este trecho é modular?") da
+tolerância de COLOCAÇÃO FÍSICA (`PIER_PHYSICAL_FIT_TOLERANCE_CM` =
+0,05cm, decide "onde a peça pode existir de fato?"), e adiciona uma
+guarda física (`_layout_fitted_to_physical_span`) que impede o
+comprimento *snapado* de materializar peça além de uma fronteira sem
+junta de argamassa (jamba de abertura, ponta livre, reserva de nó),
+remontando o trecho com o maior conteúdo modular que cabe em vez de
+invadir o vão. Produção: `nuvem/core/engine/modulation_math.py` +
+`nuvem/core/engine/wall_stepper.py` (os mesmos 2 arquivos já
+autorizados; nenhum terceiro).
+
+**Resultado medido A→C:** `OPENING_BLOCK_CROSSES_JAMB` TGD 108→108, TP1
+168→168 (as 41 regressões novas da 1ª volta foram a ZERO, verificado por
+instância). Ganho de cobertura do C04 retido 98,4%–100% (TGD
+`COVERAGE_GAP_IN_ROW` -310, `blocks` +1052; TP1 `COVERAGE_GAP_IN_ROW`
+-113, `blocks` +1155). `POSITION_OVERLAP` e todos os `JUNCTION_*`,
+`OPENING_BLOCK_INSIDE_DOOR/WINDOW`, `OPENING_SOLID_BELOW_SILL_MISSING`,
+`OPENING_MISSING_LINTEL/COUNTER_LINTEL`, `COVERAGE_WALL_NOT_MODULATED`
+com delta ZERO A→C. 4 seeds determinísticos idênticos; invariância a
+permutação idêntica à pré-existente (nenhuma dependência nova de
+ordem/sentido). `baseline.json`/`reference.json`/`reference_score.json`
+intocados.
+
+**Revisão independente (docs/C04_INDEPENDENT_FINAL_REVIEW.md):**
+reproduziu o hard blocker das 41 regressões, confirmou por identidade
+geométrica que ficaram em zero, auditou os 1205 disparos da guarda
+(classificação por tipo de fronteira), testou (não assumiu) a etiqueta
+`EXPECTED_EXPOSURE` dos achados de `PRISM_CONTINUOUS_JOINT`/
+`COMPENSATOR_*`/`PRISM_STAGGER_BELOW_TARGET`, e validou contra o
+`reference.json` humano (o humano mantém a jamba exata, nunca invade —
+premissa da guarda confirmada; ressalva: o gate em valor absoluto viola
+o próprio gabarito humano 208-209× por artefato de reconstrução do
+benchmark em 15,0cm exatos — o gate em delta por identidade, que é como
+foi usado, continua válido). Veredito da revisão: guarda física correta,
+é a solução certa para o problema certo, ganho de cobertura grande e
+real — **mas 5 condições (C1-C5) precisam ser satisfeitas antes do
+merge**, nenhuma delas é FIX REQUEST (nenhum defeito de implementação
+identificado; as duas primeiras são decisões de trade-off do usuário).
+
+### C1 — regressão de compensadores TGD (815 → 1083)
+**NÃO registrada como aceita nesta entrada** — requer aceitação
+explícita do usuário. Custo real de produção (não artefato), exposto
+pela guarda: onde a peça não cabe fisicamente, o solver monta 2
+compensadores em vez de 1 meio-bloco (comparação direta com humano em
+`W075`/`W016`: humano `B19 15–34` único; solver `C09 15–24 + C04 25–29`,
+qualidade pior mas sobre região que STATE_A deixava vazia — não é
+regressão contra a `main`, é dívida de composição nova exposta pelo
+preenchimento). Candidato natural de CR futura: S1/S2 (política de
+composição).
+
+### C2 — TP1 saldo crítico (469 → 485), PRISM_CONTINUOUS_JOINT +34
+**NÃO registrada como aceita nesta entrada** — requer aceitação
+explícita do usuário. Revisão independente verificou (não assumiu)
+`EXPECTED_EXPOSURE`: nos 50 casos novos (16 TGD + 34 TP1), 100% ocorrem
+onde pelo menos uma das duas fiadas não tinha material nenhum em
+STATE_A — zero casos de duas fiadas já preenchidas com alinhamento novo.
+A junta contínua não podia existir antes porque não havia parede ali.
+Mesmo assim, são +50 críticos reais no modelo final e o TP1 fica com
+saldo pior que a `main` — precisa ser decisão consciente do usuário, não
+efeito colateral silencioso.
+
+**Nem C1 nem C2 autorizam:** atualização de baseline, piora adicional
+além do medido, ou tratamento como regra de domínio nova. Ambas devem
+permanecer rastreadas para CR futura de composição (S1/S2).
+
+### C3 — guarda overconservative em fim de região (W087)
+Registrada em `docs/PROJECT_STATUS.md` ("Problemas abertos").
+
+- **causa:** a guarda usa o predicado amplo `trailing_open` (ausência de
+  junta de argamassa), sem distinguir jamba de abertura real de ponta
+  livre/reserva de nó.
+- **evidência:** classificação por tipo de fronteira sobre os 1205
+  disparos no corpus — 952/1205 (79%) são `PHYSICALLY_REQUIRED_GUARD`
+  (jamba real, junta ZERO por contrato); 138 (só TGD, família `W087`
+  `[85,242 ; 94,0]`) são `OVERCONSERVATIVE_GUARD`, provado por medição
+  direta de folga física; 115 restantes `INCONCLUSIVE` (folga física não
+  verificada). Medição na branch de revisão
+  `claude/c04-review-next-cr-prep-wc77d7`, `docs/C04_INDEPENDENT_FINAL_
+  REVIEW.md` §8.
+- **impacto:** 5 vazios reportados em produção (TGD, `W087`, fiadas
+  7–11), todos na mesma posição física — subsegmento `trailing_open=True`
+  e `right_opening=None` (não é jamba, é borda de reserva de nó). Sem a
+  guarda, o C09 invadiria 0,242cm a zona reservada do nó. Sem gabarito
+  humano correspondente nessa parede.
+- **arquivos prováveis do fix:** `nuvem/core/engine/continuous_modulation.py`
+  (expor `trailing_slack_cm` em `region_solid_subsegments` — folga física
+  real até a próxima ocupação) + `nuvem/core/engine/wall_stepper.py`
+  (guarda passaria a usar `max(PIER_PHYSICAL_FIT_TOLERANCE_CM,
+  trailing_slack_cm)` em vez do limite fixo).
+- **hard gates:** em jamba de abertura real `trailing_slack_cm = 0`
+  (contrato `BLOCK_OPENING_JOINT_CM = 0`), portanto o comportamento nas
+  952 fronteiras físicas críticas ficaria idêntico ao atual — o fix é
+  aditivo, não deveria reabrir `OPENING_BLOCK_CROSSES_JAMB`.
+- **dependência:** toca `continuous_modulation.py`, terceiro arquivo
+  fora do escopo autorizado do C04; exige STATE_A/B próprios e
+  revalidação das 41 regressões antes de qualquer merge. **DOCUMENTADO —
+  pendência de código aberta**, não implementado nesta CR nem nesta
+  sessão.
+
+### C4 — assimetria de escopo global/local
+Registrada em `docs/PROJECT_STATUS.md` ("Problemas abertos").
+
+- **causa:** `PIER_FIT_TOLERANCE_CM` (0,30cm) foi introduzida em
+  `_pier_remaining_snapped_cm`, consumida globalmente por todo chamador
+  de `_pier_ordered_layout`; a guarda física de fronteira
+  (`_layout_fitted_to_physical_span`) só foi aplicada localmente, no
+  call site de `_solve_repair_subsegments`.
+- **evidência:** `_pier_ordered_layout` é chamado sem a guarda em outros
+  pontos de `wall_stepper.py` (ver `docs/C04_INDEPENDENT_FINAL_REVIEW.md`
+  §4.5, linhas ~4160/4263/4290/4693/4713 na revisão).
+- **impacto:** nenhum escape estrutural novo no corpus atual —
+  `OPENING_BLOCK_CROSSES_JAMB` e `POSITION_OVERLAP` restaurados por
+  identidade nos 3 projetos de benchmark. Risco é estrutural/latente, não
+  medido como manifesto.
+- **arquivos prováveis do fix:** `nuvem/core/engine/wall_stepper.py`
+  (generalizar a guarda para os demais call sites de
+  `_pier_ordered_layout`, ou reavaliar se a tolerância de fit alargada
+  deveria ser escopada por call site em vez de global).
+- **hard gates:** qualquer generalização precisa repetir o gate de
+  identidade (`OPENING_BLOCK_CROSSES_JAMB`/`POSITION_OVERLAP` por
+  instância, não por contagem agregada) nos 3 projetos de benchmark.
+- **dependência:** falta teste de contrato entre os dois módulos
+  (tolerância de fit × guarda física) antes de qualquer generalização.
+  Produção **não alterada** nesta integração — registro de dívida, sem
+  fix nesta CR.
+
+### C5 — baseline/reference preservados
+`baseline.json` / `reference.json` / `reference_score.json` / `input.json`
+**intocados** nesta CR — confirmado no diff do PR #20 (6 arquivos
+alterados: 2 de produção + testes + docs, nenhum dos 4 arquivos de
+baseline/reference). Falhas conhecidas da suíte completa classificadas:
+
+- `TP1 JUNCTION_MISSING_BINDING 8→9`: **REAL_SOLVER_DEFECT pré-existente
+  ao C04** — já presente em STATE_A, não introduzido por esta CR (o
+  `baseline.json` gravou 8, o real já era 9 antes do C04; revisão
+  independente confirma em §13.2/§16.1 do
+  `C04_INDEPENDENT_FINAL_REVIEW.md`).
+- `TGD compensators` (categoria do guard-rail de baseline): regressão
+  real do C04, coberta por C1 — aceita **somente se o usuário aprovar
+  C1** explicitamente.
+
+Nenhuma atualização de baseline feita ou proposta nesta entrada.
+
+### Gate pré-merge — checklist
+
+```
+[ ] C1 aprovada explicitamente pelo usuário           — PENDENTE
+[ ] C2 aprovada explicitamente pelo usuário           — PENDENTE
+[x] C3 registrada (docs/PROJECT_STATUS.md + esta entrada)
+[x] C4 registrada (docs/PROJECT_STATUS.md + esta entrada)
+[x] C5 — baseline/reference intocados, falhas classificadas
+[x] HEAD do PR (dde0261e) corresponde ao HEAD auditado pela revisão
+[x] diff de produção limitado aos 2 arquivos autorizados
+    (modulation_math.py, wall_stepper.py) — 6 arquivos no PR no total,
+    os demais são testes/docs
+[x] nenhuma mudança de regra normativa (nuvem/REGRAS_MODULACAO_BLOCOS.md
+    não tocado por este PR)
+[x] nenhuma mudança de baseline/reference
+[x] 41 regressões novas CROSS_JAMB = ZERO (verificado por instância,
+    TGD e TP1, pela revisão independente)
+[x] demais hard gates preservados (POSITION_OVERLAP, JUNCTION_*,
+    OPENING_BLOCK_INSIDE_DOOR/WINDOW, OPENING_SOLID_BELOW_SILL_MISSING,
+    OPENING_MISSING_LINTEL/COUNTER_LINTEL, COVERAGE_WALL_NOT_MODULATED
+    — delta ZERO A→C)
+[x] testes focados preservados (140 passed: B19 residual fill, ARM
+    candidate safety, Gate Fidelity, NODE-FILL, prism stagger)
+[x] falhas da suíte completa classificadas (ver C5 acima; STATE_C:
+    809 passed / 2 failed, 43min24s, medido na branch de revisão sobre
+    o mesmo HEAD dde0261e)
+[x] nenhum novo blocker ou comentário de revisão pendente (get_reviews
+    do PR #20 retornou lista vazia nesta sessão; checks GitHub
+    "check-status-doc" completos com sucesso)
+[ ] autorização explícita do usuário para o MERGE específico do PR #20
+    — PENDENTE
+```
+
+**Status final desta entrada: PRE_MERGE_READY.** Merge NÃO executado —
+faltam C1/C2 e a autorização explícita do merge. Suíte completa não
+re-executada nesta sessão (produção não mudou desde o HEAD auditado
+`dde0261e`; evidência da revisão independente sobre esse mesmo HEAD
+continua válida, conforme `docs/PROJECT_STATUS.md` "Recuperação
+progressiva de contexto").
+
+próximo passo: aguardar mensagem explícita do usuário aceitando C1/C2 e
+               autorizando o merge específico do PR #20. Sem
+               monitoramento automático, sem CR seguinte iniciada.
+```
