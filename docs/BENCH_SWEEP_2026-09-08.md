@@ -267,6 +267,29 @@ completo.
 
 ---
 
+## 5.1 DETERMINISMO
+
+Duas execuções do mesmo `input.json` **no mesmo processo**, comparando
+peça a peça (`chave física da parede`, fiada, código, `t_start`, `t_end`):
+
+```
+TGD  execucao 1: 12143 blocos  fingerprint=fe1218de0cf9f69d
+     execucao 2: 12143 blocos  fingerprint=fe1218de0cf9f69d
+     DETERMINISTICO: SIM
+```
+
+Os testes de determinismo da suíte (`test_t16_execucao_repetida_e_
+deterministica`, `test_bench_z_origin`, a família
+`block-determinism-*`) **passam** na regressão consolidada.
+
+**Limite honesto desta medição**: ela cobre *mesma entrada, mesmo
+processo, posicionamento de blocos*. **Não refuta** a dívida já
+registrada em `PROJECT_STATUS.md` ("determinismo global do wall graph —
+8 execuções, 8 fingerprints distintos"), que é anterior ao preenchimento
+de blocos e não foi reaberta nesta sessão.
+
+---
+
 ## 6. Dívidas que continuam abertas
 
 - **C2 / G16**: preservados, **não tocados**. Nada de A/B/C sem decisão
