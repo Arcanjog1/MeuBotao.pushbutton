@@ -2,7 +2,7 @@
  "project_id": "piloto_sintetico_2x2",
  "source": "solver",
  "walls": 12,
- "blocks": 768,
+ "blocks": 772,
  "categories": [
   {
    "category": "block_positions",
@@ -17,8 +17,8 @@
    "category": "compensators",
    "pass": 2,
    "fail": 10,
-   "findings": 81,
-   "findings_level_1": 81,
+   "findings": 82,
+   "findings_level_1": 82,
    "findings_level_2": 0,
    "success_rate": 0.1667
   },
@@ -42,12 +42,12 @@
   },
   {
    "category": "prism",
-   "pass": 11,
-   "fail": 1,
-   "findings": 8,
-   "findings_level_1": 8,
-   "findings_level_2": 0,
-   "success_rate": 0.9167
+   "pass": 12,
+   "fail": 0,
+   "findings": 14,
+   "findings_level_1": 0,
+   "findings_level_2": 14,
+   "success_rate": 1.0
   },
   {
    "category": "wall_coverage",
@@ -59,20 +59,18 @@
    "success_rate": 0.6667
   }
  ],
- "findings_total": 117,
- "findings_level_1": 113,
- "findings_level_2": 4,
- "critical_errors": 15,
+ "findings_total": 124,
+ "findings_level_1": 106,
+ "findings_level_2": 18,
+ "critical_errors": 8,
  "critical_by_code": {
-  "PRISM_CONTINUOUS_JOINT": 7,
   "COVERAGE_ROW_MOSTLY_EMPTY": 8
  },
  "findings_by_code": {
-  "PRISM_CONTINUOUS_JOINT": 7,
-  "PRISM_JOINT_STACK": 1,
+  "PRISM_STAGGER_BELOW_TARGET": 14,
   "COMPENSATOR_CONSECUTIVE": 36,
   "COMPENSATOR_EXCESS_IN_RUN": 28,
-  "COMPENSATOR_VERTICAL_STRIP": 17,
+  "COMPENSATOR_VERTICAL_STRIP": 18,
   "OPENING_MISSING_COUNTER_LINTEL": 4,
   "COVERAGE_ROW_MOSTLY_EMPTY": 8,
   "COVERAGE_GAP_IN_ROW": 16
@@ -128,13 +126,13 @@
   {
    "wall": "W004",
    "status": "FAIL",
-   "prism": "FAIL",
+   "prism": "PASS",
    "compensators": "FAIL",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 33
+   "findings": 40
   },
   {
    "wall": "W005",

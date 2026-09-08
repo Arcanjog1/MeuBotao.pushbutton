@@ -1,23 +1,22 @@
 ========================================================================
 BENCHMARK: piloto_sintetico_2x2  (solver)
 ========================================================================
-paredes: 12 | blocos: 768
+paredes: 12 | blocos: 772
 
 CATEGORIA            PASS   FAIL     TAXA  ACHADOS (n1/n2)
 ------------------------------------------------------------------------
 block_positions        12      0   100.0%  0 (0/0)
-compensators            2     10    16.7%  81 (81/0)
+compensators            2     10    16.7%  82 (82/0)
 junctions              12      0   100.0%  0 (0/0)
 openings               12      0   100.0%  4 (0/4)
-prism                  11      1    91.7%  8 (8/0)
+prism                  12      0   100.0%  14 (0/14)
 wall_coverage           8      4    66.7%  24 (24/0)
 ------------------------------------------------------------------------
 TAXA DE SUCESSO (paredes sem erro obrigatorio): 16.7%  #####.......................
-achados: 117 total | 113 obrigatorios (nivel 1) | 4 preferencia (nivel 2)
+achados: 124 total | 106 obrigatorios (nivel 1) | 18 preferencia (nivel 2)
 
-!! ERROS CRITICOS: 15 - o benchmark REPROVA, independente da taxa acima
+!! ERROS CRITICOS: 8 - o benchmark REPROVA, independente da taxa acima
    COVERAGE_ROW_MOSTLY_EMPTY          8
-   PRISM_CONTINUOUS_JOINT             7
 
 ACHADOS DE NIVEL 1 (obrigatorios)
 
@@ -91,7 +90,7 @@ ACHADOS DE NIVEL 1 (obrigatorios)
     - W011: 2 compensadores no trecho t=220.0..349.0cm da fiada 5 (teto 1)
     - W011: 2 compensadores no trecho t=220.0..349.0cm da fiada 7 (teto 1)
 
-[COMPENSATOR_VERTICAL_STRIP] faixa vertical de compensadores empilhados entre fiadas  (17 ocorrencia(s), nivel 1, major)
+[COMPENSATOR_VERTICAL_STRIP] faixa vertical de compensadores empilhados entre fiadas  (18 ocorrencia(s), nivel 1, major)
     regra: REGRAS_MODULACAO_BLOCOS.md secao 11.5
     - W001: compensadores empilhados em t=99.5cm em 4 de 8 fiadas
     - W001: compensadores empilhados em t=113.7cm em 8 de 8 fiadas
@@ -99,11 +98,12 @@ ACHADOS DE NIVEL 1 (obrigatorios)
     - W001: compensadores empilhados em t=212.0cm em 4 de 8 fiadas
     - W001: compensadores empilhados em t=224.5cm em 4 de 8 fiadas
     - W002: compensadores empilhados em t=357.0cm em 4 de 8 fiadas
-    - W004: compensadores empilhados em t=99.5cm em 4 de 8 fiadas
+    - W004: compensadores empilhados em t=97.0cm em 8 de 8 fiadas
     - W004: compensadores empilhados em t=109.5cm em 4 de 8 fiadas
-    - W004: compensadores empilhados em t=117.0cm em 8 de 8 fiadas
+    - W004: compensadores empilhados em t=117.0cm em 4 de 8 fiadas
     - W004: compensadores empilhados em t=204.5cm em 4 de 8 fiadas
     - W004: compensadores empilhados em t=212.0cm em 4 de 8 fiadas
+    - W004: compensadores empilhados em t=224.5cm em 4 de 8 fiadas
     - W007: compensadores empilhados em t=97.0cm em 4 de 8 fiadas
     - W007: compensadores empilhados em t=204.5cm em 4 de 8 fiadas
     - W007: compensadores empilhados em t=212.0cm em 4 de 8 fiadas
@@ -141,21 +141,21 @@ ACHADOS DE NIVEL 1 (obrigatorios)
     - W009: fiada 5 cobre so' 6% do trecho modulavel (19.0cm de 334.0cm), enquanto a melhor fiada da mesma parede cobre 100%
     - W009: fiada 7 cobre so' 6% do trecho modulavel (19.0cm de 334.0cm), enquanto a melhor fiada da mesma parede cobre 100%
 
-[PRISM_CONTINUOUS_JOINT] junta vertical alinhada em fiadas consecutivas (prisma)  (7 ocorrencia(s), nivel 1, critical)
-    regra: REGRAS_MODULACAO_BLOCOS.md secao 11 (regra #1)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 0 e 1 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 1 e 2 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 2 e 3 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 3 e 4 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 4 e 5 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 5 e 6 (desencontro 0.00cm, limite 1.50cm)
-    - W004: junta em t=34.5cm alinhada entre as fiadas 6 e 7 (desencontro 0.00cm, limite 1.50cm)
-
-[PRISM_JOINT_STACK] junta vertical repetida em muitas fiadas da mesma paridade  (1 ocorrencia(s), nivel 1, major)
-    regra: REGRAS_MODULACAO_BLOCOS.md secao 11.7
-    - W004: junta em t=34.5cm se repete em 8 de 8 fiadas (100%)
-
 ACHADOS DE NIVEL 2 (preferencia - nao reprovam)
+
+[PRISM_STAGGER_BELOW_TARGET] desencontro menor que o alvo, sem chegar a alinhar  (14 ocorrencia(s), nivel 2, minor)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 10.6
+    - W004: desencontro de 5.0cm em t=54.5cm entre as fiadas 0 e 1 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=94.5cm entre as fiadas 0 e 1 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=49.5cm entre as fiadas 1 e 2 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=89.5cm entre as fiadas 1 e 2 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=54.5cm entre as fiadas 2 e 3 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=94.5cm entre as fiadas 2 e 3 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=49.5cm entre as fiadas 3 e 4 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=89.5cm entre as fiadas 3 e 4 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=54.5cm entre as fiadas 4 e 5 (alvo 10cm)
+    - W004: desencontro de 5.0cm em t=94.5cm entre as fiadas 4 e 5 (alvo 10cm)
+    ... e mais 4
 
 [OPENING_MISSING_COUNTER_LINTEL] janela sem contraverga abaixo do peitoril  (4 ocorrencia(s), nivel 2, minor)
     regra: REGRAS_MODULACAO_BLOCOS.md secao 10.4
@@ -170,7 +170,7 @@ PAREDE           prism  compensators     junctions      openings wall_coverage b
 W001              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
 W002              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
 W003              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
-W004              FAIL          FAIL          PASS          PASS          PASS          PASS     FAIL
+W004              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
 W005              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
 W006              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
 W007              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
@@ -187,9 +187,12 @@ block_positions             0        0       +0  INALTERADO
 compensators               10       10       +0  INALTERADO
 junctions                   0        0       +0  INALTERADO
 openings                    0        0       +0  INALTERADO
-prism                       1        1       +0  INALTERADO
+prism                       1        0       -1  MELHORIA
 wall_coverage               4        4       +0  INALTERADO
 ------------------------------------------------------------------------
 taxa de sucesso: 16.7%  ->  16.7%
 
-VEREDITO: INALTERADO
+ERROS CRITICOS:
+   PRISM_CONTINUOUS_JOINT             7 -> 0   MELHORIA
+
+VEREDITO: MELHORIA

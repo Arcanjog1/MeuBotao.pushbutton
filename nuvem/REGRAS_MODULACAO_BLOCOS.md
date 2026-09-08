@@ -6100,3 +6100,247 @@ muda ali é da mudança; o que só aparece no pipeline completo é
 é lido como regressão do mecanismo novo — e uma degradação colateral é
 lida como “troca crítico → menor”, que é exatamente o erro corrigido pela
 condição C2 da revisão da CR-G12.
+
+---
+
+## 40. `CR-N1` — dois nós de encontro VIZINHOS na MESMA parede não podem
+lançar peças de amarração sobrepostas (2026-09-08, varredura ampla do
+benchmark offline)
+
+### 40.1 Regra (REGRA OBRIGATÓRIA)
+
+Duas peças de amarração (B54/B34) lançadas por **nós de encontro
+diferentes** que caem na **mesma parede** e na **mesma fiada** **nunca
+podem ocupar o mesmo volume**. Sobreposição entre peças de nós distintos
+é **COLISÃO**, não amarração legítima — a amarração legítima é a
+penetração de uma peça na parede **perpendicular** do seu próprio nó,
+nunca a superposição de duas peças ao longo do **mesmo eixo**.
+
+Quando os dois nós estão perto demais para as duas peças cheias,
+**os dois degradam** pela ordem já existente (B54 → B34 do L degradado →
+elemento único na boneca). Nenhum dos dois "ganha" o espaço inteiro.
+
+### 40.2 Causa-raiz medida
+
+`_room_at_t_on_wall` (`nuvem/core/engine/wall_stepper.py`) media o espaço
+disponível parando **só** em: borda de abertura, reserva das **duas
+PONTAS** da parede (`_wall_reserved_range_ft`) e ponta física. **Nunca**
+parava num nó de encontro no **MEIO** da parede — que é exatamente onde
+mora o `T_INTERSECTION_MAIN` (a parede principal de um T **atravessa** o
+nó, então ela não termina ali e `end_to_node[(wall_idx, 0/1)]` não a
+enxerga).
+
+Resultado: dois T na mesma parede principal, a `d` cm um do outro, cada
+um media espaço até a próxima abertura, cada um se achava com folga, e
+cada um lançava o seu **B54 CENTRADO** no próprio ponto. As duas peças se
+sobrepunham em exatamente **`54 − d` cm**.
+
+**COMO FOI DESCOBERTO**: medição no benchmark offline (TGD + TP1,
+`result.json`), não dedução. As **8 identidades físicas** de
+`POSITION_OVERLAP` dos dois projetos eram **este mesmo caso**. Assinatura
+numérica confirmada peça a peça:
+
+| projeto | parede | nós (cm) | distância | sobreposição medida | `54 − d` |
+|---|---|---|---|---|---|
+| TP1 | `W019` | 742 / 792 | 50,0cm | **4,00cm** | 4 |
+| TP1 | `W019` | 1082 / 1117 | 35,0cm | **19,00cm** | 19 |
+| TGD | `W162` | 927,3 / 940,0 | 12,7cm | **41,26cm** | 41,3 |
+| TGD | `W112` | 227 / 255 | 28,0cm | **26,00cm** | 26 |
+| TGD | `W116` | 115,1 / 122,0 | 6,9cm | **47,13cm** | 47,1 |
+| TGD | `W138` | 254,8 / 287,0 | 32,2cm | **11,76cm** | (T + L degradado) |
+| TGD | `W061` | 70,2 / 77,2 | 7,0cm | **27,00cm** | (L + T degradado) |
+| TGD | `W131` | 4,5 / 24,0 | 19,5cm | **2,00cm** | (compensador + L) |
+
+### 40.3 Implementação
+
+`_neighbor_node_boundary_ft` + parâmetros `nodes`/`exclude_node_index` em
+`_room_at_t_on_wall`, ligados nos quatro medidores de espaço
+(`_corner_wall_room_ft`, as duas medições da parede principal e a da
+boneca em `_t_intersection_room_assessment`, e
+`_x_intersection_wall_room_ft`).
+
+A fronteira entre dois nós vizinhos é o **PONTO MÉDIO** entre eles, de
+propósito: os dois nós são resolvidos **independentemente**, um sem saber
+a escolha final do outro, então só um critério **simétrico** faz as duas
+medições concordarem sobre a mesma fronteira sem uma segunda passada de
+coordenação. Cada nó fica com a sua metade.
+
+A checagem só é aplicada abaixo de `NEIGHBOR_NODE_BOND_CLEARANCE_FT`
+(= `2 × CORNER_B34_ROOM_FT` = 68cm), a soma do pior caso de alcance de
+cada lado. Acima disso as duas peças cabem inteiras e a checagem não
+muda nada — o comportamento histórico de todo par de nós bem separado
+fica intacto.
+
+**Meia espessura de overshoot**: o B34 do L degradado **não** começa no
+ponto do nó — começa em `point − l_dir × (espessura_da_boneca / 2)` e só
+então se estende 34cm em `l_dir`. Ele **ultrapassa o nó** em meia
+espessura para o lado contrário. Esse pedaço continuava invadindo a peça
+do vizinho (residual medido de **1,26cm** no `W162`), então a escolha do
+lado (`l_dir`) passou a exigir também essa folga — **cobrada só contra o
+nó vizinho**, nunca contra `room_plus`/`room_minus` inteiros (que também
+param em abertura): cobrar ali degradava o nó em troca de nada, porque a
+invasão de vão que sobra naquele caso vem da peça da **boneca**, não
+desta. Escopo mínimo, medido.
+
+### 40.4 Efeito medido (por IDENTIDADE FÍSICA, não por contagem de código)
+
+| | TGD | TP1 |
+|---|---|---|
+| `POSITION_OVERLAP` (identidades) | **6 → 0** | **2 → 0** |
+| `POSITION_OVERLAP` (ocorrências) | **29 → 0** | **18 → 0** |
+| total de identidades | 959 → 933 (**−26**) | 898 → 896 (−2) |
+| `COVERAGE_MISSING_ROW` (ident.) | 30 → 18 | 0 → 0 |
+| `PRISM_STAGGER_BELOW_TARGET` (ident.) | 181 → 156 | 245 → 246 |
+| `PRISM_JOINT_STACK` (ident.) | 20 → 14 | 16 → 8 |
+| blocos colocados | 11749 → 12143 | 19572 → 19629 |
+| `collisions` (sinal do solver) | 1160 → **1180** | **14 → 0** |
+
+> **Leitura honesta do sinal `collisions` do TGD**: ele SOBE (1160 → 1180)
+> enquanto a sobreposição real medida nas peças finais vai a **zero**. Não
+> é contradição: `collisions` conta pares entre **candidatos** (inclusive
+> os que o próprio solver descarta depois), e degradar mais nós gera mais
+> pares candidatos avaliados. O que vai para o Revit é a geometria final —
+> e ela está limpa nos dois projetos. `non_modular` cai (2668 → 2543) e o
+> solver passa a colocar **394 blocos a mais** no TGD.
+
+**TRADE-OFF DECLARADO, não escondido**: degradar um T significa que a
+parede principal deixa de receber a peça cheia e o preenchimento comum
+passa a fechar um trecho maior — sobem `COMPENSATOR_VERTICAL_STRIP`
+(TGD +25 identidades) e `COMPENSATOR_EXCESS_IN_RUN` (TGD +13). É a mesma
+tensão normativa da seção 41 (teto de compensador × teto de peça
+especial), não um defeito novo desta CR.
+
+### 40.5 Reprodutor permanente
+
+`tests/test_neighbor_node_bond_collision.py` — geometria **sintética**
+(nenhuma coordenada de projeto real): parede principal longa com duas
+bonecas perpendiculares a `d` cm uma da outra. Falha em 6 distâncias
+(12/20/28/35/45/50cm) antes da correção, passa depois; e três testes de
+guarda no sentido oposto (70/90/140cm continuam recebendo os dois B54
+inteiros — a correção não pode degradar amarração que sempre coube).
+
+---
+
+## 41. TENSÃO NORMATIVA ABERTA — teto de compensador × teto de peça
+especial num trecho entre dois nós (2026-09-08, **DECISÃO PENDENTE DO
+USUÁRIO — NADA IMPLEMENTADO**)
+
+> **Status**: `DOCUMENTADO — pendência normativa aberta`. Nenhuma linha de
+> código foi alterada por causa desta seção. Ela existe porque a
+> varredura ampla do benchmark provou que **as duas regras de teto que já
+> estão escritas neste arquivo se contradizem** em casos reais, e a
+> escolha entre elas é do usuário, não do solver.
+
+### 41.1 As duas regras que colidem
+
+- **Regra dos compensadores** (início deste arquivo): "**Proibido usar 2
+  ou mais em sequência** no mesmo trecho"; `MAX_COMPENSATORS_PER_TRECHO = 1`.
+- **Teto de peça especial** (`MAX_SPECIAL_BOND_PER_TRECHO = 1`,
+  `wall_stepper.py`): "peça de amarração virando enchimento" — uma
+  FILEIRA de B34 no meio da parede é proibida.
+
+Quando um trecho **só** fecha violando uma das duas, a hierarquia de
+`_pier_ordered_layout` hoje resolve pelo **tier 7 antes do 7b**, ou seja:
+prefere **compensador acima do teto** a **fileira de B34 acima do teto**
+("uma peça de amarração no meio da parede engana quem lê o modelo; um
+compensador a mais só é feio").
+
+### 41.2 A medição que expôs a contradição
+
+`TP1`, `W003`, fiada 0, trecho `[170, 474]` (span 304cm, junta 1cm),
+entre um `X_INTERSECTION` e um `T_INTERSECTION_MAIN`:
+
+- o solver entrega **`B39×7 + C09×2 + C04×1`** — **3 compensadores em
+  sequência**, violação literal da regra dos compensadores;
+- existe **`B39×5 + B34×3`**, que fecha os **mesmos 304cm exatos** com
+  **ZERO compensadores** — mas usa 3 peças especiais e é recusado pelo
+  `MAX_SPECIAL_BOND_PER_TRECHO = 1`;
+- enumeração exaustiva do trecho: com peça especial ≤ 1, o **mínimo**
+  possível é **3 compensadores**. O solver está fazendo a aritmética
+  **certa** dentro dos tetos que recebeu. **Não é bug de código.**
+
+Assinaturas repetidas na mesma parede: sub-trechos de **25cm** viram
+`C09+C09+C04` e de **30cm** viram `3×C09`. No TP1 inteiro a família
+compensador responde por **629 das 985 identidades físicas** (64%);
+`COMPENSATOR_AVOIDABLE` marca **87 identidades no TP1 e 39 no TGD contra
+0 no gabarito** ("só o solver erra").
+
+### 41.3 O caso que NÃO tem saída sem decisão de domínio
+
+Sub-trecho de 25–30cm **entre dois nós de amarração** (as duas pontas
+fechadas): B34 não cabe; B19 fecharia com **1** compensador
+(`B19+C09` = 29cm; `B19+C04` = 24cm) mas está **proibido** ali pela regra
+do meio-bloco ("só pode encostar numa ponta ABERTA; boneca/pilar de
+encontro **não** conta como ponta aberta") e pela seção 35
+(`REQUIRES_HUMAN_DOMAIN_APPROVAL`). Sem liberar B19 nesse caso
+específico, **3 compensadores é o mínimo aritmético existente**.
+
+### 41.4 O que o usuário precisa decidir (uma das três)
+
+1. **Manter como está** — compensador acima do teto continua preferível a
+   fileira de B34; a regra "proibido 2+ em sequência" passa a ser lida
+   como preferência forte, não como proibição absoluta, e o validador
+   deveria refletir isso.
+2. **Inverter tier 7 / 7b** — preferir a fileira de B34 (zero
+   compensadores) quando ela existe. Fecha `W003` e a família toda dos
+   trechos longos, ao custo de B34 repetido no meio da parede.
+3. **Liberar B19 como fechamento residual entre dois nós fechados**,
+   sob condição estrita (só quando a alternativa for ≥ 2 compensadores) —
+   extensão da decisão da seção 35, que hoje só cobre FILL residual de nó.
+
+Nenhuma das três foi aplicada. **A orientação mais recente do usuário tem
+prioridade quando ela vier.**
+---
+
+## 42. PENDÊNCIA NORMATIVA — parede cujo comprimento não é múltiplo de 5cm
+fica **INTEIRAMENTE VAZIA** (2026-09-08, **DECISÃO PENDENTE DO USUÁRIO —
+NADA IMPLEMENTADO**)
+
+> **Status**: `DOCUMENTADO — pendência normativa aberta`. Medido e
+> reproduzido; nenhuma linha de código alterada.
+
+### 42.1 O que foi medido
+
+`_pier_remaining_snapped_cm` devolve `None` quando o resto do trecho não
+cai a menos de `PIER_FIT_TOLERANCE_CM` (0,30cm) de um múltiplo de
+`PIER_MODULE_CM` (5cm). O chamador trata `None` como `NON_MODULAR` e o
+trecho fica **sem nenhuma peça** — em **todas as fiadas**.
+
+Reprodutor mínimo (parede LIVRE, sem abertura, sem encontro):
+
+| comprimento | resultado |
+|---|---|
+| 99,8cm | 6 peças (B19+B39) ✔ |
+| **197,9cm** | **0 peças** — `non_modular` nas duas fiadas ✘ |
+| 200,0cm | 11 peças (B34+B39+C04) ✔ |
+| 269,0cm | 16 peças (B19+B39+C09) ✔ |
+
+No TGD isso aparece como `COVERAGE_WALL_NOT_MODULATED` em **29 paredes**
+(0 no gabarito, "só o solver erra"). Das 29, duas são paredes reais e
+idênticas de **197,9cm** com as duas pontas livres (`W068`, `W091`) —
+1,98m de alvenaria que o modelo entrega **vazia**. As demais são de
+4,4 a 36,6cm, abaixo ou perto do menor módulo, e são artefato de
+pareamento de parede (fatias do CAD), não defeito do solver.
+
+### 42.2 Por que é normativo e não bug
+
+O contrato é **explícito e deliberado**: o achado carrega
+`lower_valid_cm`/`upper_valid_cm` e `delta_to_lower_cm`/`delta_to_upper_cm`
+— ou seja, o sistema está dizendo ao usuário "**ajuste o comprimento da
+parede em X cm**", não "não consegui". Isso conflita com a intenção
+declarada do tier 8 de `_pier_ordered_layout` ("preferir uma solução
+*feia* a reportar `NON_MODULAR_WALL` quando ela existe"), porque uma
+solução com 2,1cm de folga **existe** — a folga seria absorvida pela
+argamassa, como em obra.
+
+### 42.3 O que o usuário precisa decidir
+
+1. **Manter**: parede fora do módulo continua vazia e o relatório pede o
+   ajuste de comprimento — o modelo nunca "mente" sobre a modulação.
+2. **Modular com folga**: preencher até onde fecha e deixar o resto
+   (< 1 módulo) como folga declarada, marcando a peça final para revisão
+   — evita parede inteiramente vazia no Revit.
+3. **Ampliar `PIER_FIT_TOLERANCE_CM`**: rejeitado a priori aqui — a folga
+   real medida (2,1cm) é 7× a tolerância atual, e alargar a tolerância
+   mexeria também no contrato de snap de todos os outros trechos.
+
