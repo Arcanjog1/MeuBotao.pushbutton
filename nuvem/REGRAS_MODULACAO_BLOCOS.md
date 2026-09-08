@@ -5716,3 +5716,48 @@ Geometria do caso `(-401,5, 24,1)`, `z=140`:
 > defeito de amarração novo** — é o vazio de sempre, já acusado por
 > `COVERAGE_GAP_IN_ROW`. Classificação medida: **10 de 10 são (C) unidade
 > nova legítima; nenhum nó pré-existente piorou.**
+
+### 39.6 CONHECIMENTO DE AMARRAÇÃO — o *pin* de papel de canto `L` do SAFE REPAIR muda a amarração de paredes DISTANTES
+
+> **PADRÃO OBSERVADO, MEDIDO** — revisão independente da CR-G12
+> (2026-09-08). Medido no `torre_easy_lo_r00_tgd` oficial comparando a
+> **geração pura** (`_solve_building_blocks_all_courses_core`) com o
+> **pipeline completo** (`solve_building_blocks_all_courses`, que inclui
+> `repair_arm_role_isolated_edges`), com a propagação cross-band
+> desligada × ligada. Registro em
+> `docs/CR_G12_REVISAO_INDEPENDENTE.md` §7.2.
+
+Quando `repair_arm_role_isolated_edges` aceita um candidato, ele grava um
+**pin** de papel `course_a`/`course_b` nos dois nós da aresta isolada
+(`_set_l_corner_role_bits(..., pinned=True)`) e reconstrói **o edifício
+inteiro**. O efeito **não fica restrito** à parede alvo nem às duas
+vizinhas do candidato: o pin muda a reserva de nó dessas paredes, o que
+muda a composição das bandas, o que muda o layout de paredes que **não
+têm relação topológica nenhuma** com a aresta reparada.
+
+Medição que separa as duas coisas (TGD, flag cross-band desligada × ligada):
+
+```
+GERACAO PURA (sem ARM/B19) - paredes com blocos diferentes: 11
+    W007 W011 W046 W069 W070 W072 W075 W087 W090 W113 W160
+PIPELINE COMPLETO          - paredes com blocos diferentes: 12
+    as 11 acima + W074
+```
+
+`W074` **não muda na geração**. Ela só muda porque, com a propagação
+ligada, a parede 23 já nasce sem prisma forçado e o candidato `23/SAME_A`
+**deixa de ser proposto** — e o pin que ele instalava também melhorava,
+**de tabela**, a amarração de `W074`. Perdido o pin, `W074` cai de
+desencontro ≥ 10 cm para **5,0 cm** em `t=49,5` e `t=54,5`, em **toda** a
+altura (16 ocorrências de `PRISM_STAGGER_BELOW_TARGET`, nível 2 — nunca
+junta contínua).
+
+**REGRA OBRIGATÓRIA para qualquer análise futura:** ao avaliar o efeito
+de uma mudança que altera o **conjunto de candidatos aceitos** pelo SAFE
+REPAIR, **nunca** atribuir todo o delta de amarração à mudança em si.
+Separar sempre as duas causas rodando também a **geração pura**: o que
+muda ali é da mudança; o que só aparece no pipeline completo é
+**colateral do pin**. Sem essa separação, um benefício colateral perdido
+é lido como regressão do mecanismo novo — e uma degradação colateral é
+lida como “troca crítico → menor”, que é exatamente o erro corrigido pela
+condição C2 da revisão da CR-G12.
