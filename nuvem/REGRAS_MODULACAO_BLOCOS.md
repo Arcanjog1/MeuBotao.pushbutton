@@ -5489,17 +5489,62 @@ lidas dos solvers em `wall_stepper.py`.
   prisma foi relaxado. Nenhum compensador foi usado para esconder falha de
   amarração.
 
-### 36.7 Custo medido, registrado como dívida
+### 36.7 PADRÃO OBSERVADO — restaurar a amarração num canto pode custar
+dois compensadores, e isso é ARITMÉTICA do catálogo, não defeito
 
 Restaurar a alternância devolve peça de amarração à parede N-S em 8 das 17
-fiadas — e o trecho que sobra naquela fiada passa a fechar com
+fiadas — e o trecho que sobra naquela fiada passa a fechar com dois
 compensadores: **`COMPENSATOR_CONSECUTIVE` +8** e
-**`COMPENSATOR_EXCESS_IN_RUN` +8** por projeto, **100% na parede `W065`**,
-a centímetros do próprio nó. É custo real de composição de pilarete, não
-de amarração — **não foi escondido nem compensado**, e resolver isso é CR
-separada.
+**`COMPENSATOR_EXCESS_IN_RUN` +8** por projeto, na parede N-S do próprio
+nó (eixo `[338,523;180,048]→[338,523;824,048]` no TGD;
+`[8017,26;1282,95]→[8017,26;1926,95]` no TP1 — o rótulo `W0xx` é derivado
+de índice e **não** é identidade física).
 
-Em compensação, no mesmo par de estados: `JUNCTION_NOT_ALTERNATING`
+**São 8 eventos físicos, não 16** — provado comparando os `id` dos blocos
+citados: o MESMO par `C04`+`C09` dispara os dois códigos (encostados ⇒
+`CONSECUTIVE`; dois num trecho de teto 1 ⇒ `EXCESS_IN_RUN`).
+
+**A causa é aritmética e forçada.** O trecho da fiada ímpar é delimitado
+pelo nó (`t = 0`, onde a peça de amarração de um L obrigatoriamente
+encosta) e pela reserva do `T` vizinho (`t ≈ 50`, o corpo da peça dele
+atravessando esta parede): **49cm úteis**. Com o `B34` de amarração,
+`49 − 34 − 1 = 14cm` de sobra, e a enumeração exaustiva do catálogo
+(`B39` 39, `B34` 34, `B19` 19, `C09` 9, `C04` 4, junta 1cm) dá **apenas**
+`C04+C09` (2 compensadores) ou `C04+C04+C04` (3). **Nenhuma peça fecha
+14cm sozinha** — o solver já escolhe o mínimo. Sem peça de amarração no
+nó (o que o giro fazia) o trecho útil era de 34cm a partir de `t = 15` e
+fechava com **um `B34`, zero compensadores**: era esse o "lucro" contábil
+do giro — composição limpa **ao preço da amarração**.
+
+**REGRA OBRIGATÓRIA:** dois compensadores num trecho de nó **não**
+autorizam desfazer a amarração para "limpar" a composição. A composição é
+consequência; a amarração é a estrutura. Quem quiser eliminar esses
+compensadores tem de mudar a **peça**, não o **papel** do nó.
+
+**As duas saídas conhecidas exigem DECISÃO NORMATIVA e NÃO foram
+tomadas:**
+
+1. **`B19` como peça de amarração do canto** — é o que o humano faz aqui
+   (`B19[0–19] + C09[20–29] + B54[30–84]`, 1 compensador). **Proibido
+   pela seção 35.** Não copiado.
+2. **`B54` do `T` na fiada ÍMPAR** — o humano centra o `B54` do `T` na
+   mesma fiada do `B19` do canto; `solve_t_intersection` fixa a peça
+   principal na Fiada A. Mudaria a convenção de **todo** `T` do corpus.
+
+O `repair_b19_residual_fill` (seção 35) **não se aplica**:
+`_b19_residual_span_cm` mede o residual da PAREDE inteira
+(644 − 34 = 610cm), não um trecho interno — e um `B19` de 19cm não caberia
+nos 14cm de qualquer forma.
+
+**Margem declarada:** os compensadores novos ficam em `t ≈ 37,0` e
+`t ≈ 44,5`, em **8 de 17** fiadas. `COMPENSATOR_VERTICAL_STRIP` exige
+razão `≥ 0,50`; `8/17 = 0,47`, então **não** dispara (medido: 2 → 2). A
+margem é de **uma fiada** — numa parede com outra contagem de fiadas o
+mesmo padrão passaria do limiar.
+
+### 36.8 O saldo, no mesmo par de estados
+
+`JUNCTION_NOT_ALTERNATING`
 **32 → 0** (TGD) e **16 → 0** (TP1), e as juntas verticais que eram
 **coincidentes** (`PRISM_CONTINUOUS_JOINT`, critical) passam a
 **desencontradas abaixo do alvo** (`PRISM_STAGGER_BELOW_TARGET`, minor)

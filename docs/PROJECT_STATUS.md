@@ -129,8 +129,28 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   BINDING`, `JUNCTION_HALF_BLOCK_ADJACENT` e todos os `OPENING_*` com
   **delta zero**. **Custo real registrado, não escondido:**
   `COMPENSATOR_CONSECUTIVE` **+8** e `COMPENSATOR_EXCESS_IN_RUN` **+8**
-  por projeto, 100% na parede `W065`, ao lado do nó corrigido — CR
-  separada. Bônus da mesma causa-raiz: o nó pré-existente do TGD
+  por projeto, na parede N-S do próprio nó (eixo
+  `[338,523;180,048]→[338,523;824,048]` no TGD;
+  `[8017,26;1282,95]→[8017,26;1926,95]` no TP1 — o rótulo `W0xx` é
+  derivado de índice e NÃO é identidade física). **Investigado até o fim
+  (relatório §9), sem alterar código:** são **8 eventos físicos, não
+  16** (o MESMO par `C04`+`C09` dispara os dois códigos — provado pelos
+  `id` dos blocos citados), e a causa é **aritmética**: o trecho da fiada
+  ímpar tem 49cm úteis entre o nó (`t=0`) e a reserva do `T` vizinho
+  (`t≈50`); com o `B34` de amarração sobram **14cm**, e a enumeração
+  exaustiva do catálogo dá **só** `C04+C09` (2) ou `C04+C04+C04` (3) —
+  **nenhuma peça fecha 14cm sozinha**, o solver já escolhe o mínimo. Sem
+  peça no nó (o giro da `main`) o trecho era de 34cm e fechava com um
+  `B34`, zero compensadores: o "lucro" do giro era composição limpa ao
+  preço da amarração. **Não existe correção dentro do contrato**; as duas
+  saídas conhecidas exigem **decisão normativa** e NÃO foram tomadas —
+  (1) `B19` como peça de amarração do canto (é o que o humano faz, 1
+  compensador; **proibido pela seção 35**), (2) `B54` do `T` na fiada
+  ímpar (mudaria a convenção de `solve_t_intersection` em todo o corpus).
+  O `repair_b19_residual_fill` da seção 35 **não se aplica** (mede o
+  residual da parede inteira, 610cm, e um `B19` não caberia em 14cm).
+  Margem declarada: `COMPENSATOR_VERTICAL_STRIP` fica 2→2, mas por **uma
+  fiada** (`8/17 = 0,47` contra limiar `0,50`). Bônus da mesma causa-raiz: o nó pré-existente do TGD
   `(163,51;237,05)` também volta a alternar (`IN_R`:
   `JUNCTION_NOT_ALTERNATING` 16→0). **`JUNCTION_NOT_ALTERNATING` é
   `major` e NÃO entra em `critical_errors`** — o ganho de amarração não
@@ -142,9 +162,12 @@ Detalhe técnico de cada um: `docs/PROJECT_STATUS_LOG.md`.
   inversão de orientação, determinismo e controles de L/T/X já corretos.
   Suíte completa nesta branch: **2 failed, 882 passed** — as 2 falhas são
   `tests/regression/test_benchmark_baselines.py` (TGD `compensators`
-  52→61; TP1 `JUNCTION_MISSING_BINDING` 8→9) e são **PRÉ-EXISTENTES**:
-  a mesma comparação contra o baseline, rodada em `origin/main` `91258dd`
-  sem o patch, dá resultado **linha por linha idêntico**. Nenhum baseline
+  52→61; TP1 `JUNCTION_MISSING_BINDING` 8→9) e são **PRÉ-EXISTENTES,
+  formalmente provado**: rodando SÓ esse arquivo num *worktree* limpo de
+  `91258dd`, **sem o patch**, falham os mesmos 2 testes com a mesma
+  asserção (`2 failed, 7 passed in 375.47s`). A comparação de benchmark
+  contra o baseline nas duas árvores também dá resultado **linha por
+  linha idêntico**. Nenhum baseline
   regravado, nenhum `--save-baseline`, nenhum `skip`/`xfail`, nenhum
   threshold alterado. Determinismo: `sha256` idêntico em 3 processos
   novos por projeto.
