@@ -531,10 +531,14 @@ não é append-only).
 
 ## Problemas abertos
 
-- **Alinhamento cross-band** (entre bandas de abertura) — 33 casos
-  residuais, fora do escopo do `CR-BLOCK-01`; exige mudança em
-  `wall_modeling.py`. Ver `nuvem/REGRAS_MODULACAO_BLOCOS.md` 27.7.
-  Próximo CR recomendado: `CR-BLOCK-DETERMINISM`.
+- **Alinhamento cross-band** (entre bandas de abertura) — **ATACADO pela
+  CR-G12** (`PR #29`, merge `c88a031`): a regra #1 passou a ser avaliada
+  na fronteira entre bandas e o gate G12 fechou em **12 → 0 nos dois
+  projetos**. **Residual honesto que continua aberto:** 2 identidades
+  cross-band puras no TGD (`W069`, `t=649,5`, fronteiras `(6,7)` e
+  `(11,12)`) — o guard recusa corretamente qualquer alternativa que
+  pioraria a regra #1 dentro da banda. Ver
+  `nuvem/REGRAS_MODULACAO_BLOCOS.md` 27.7 e 39.
 - **Determinismo global do wall graph** — não determinístico antes e
   depois do `CR-BLOCK-01` (8 execuções, 8 fingerprints distintos); causa
   é anterior ao preenchimento de blocos.
