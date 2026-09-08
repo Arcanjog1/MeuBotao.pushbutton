@@ -552,6 +552,22 @@ completa do TGD); sobram **2** identidades cross-band residuais no TGD
 | **G16** | ✘ **continua não aprovado** — a **CR-C2 continua pendente** de decisão normativa. Esta CR não o destrava |
 | **G18** | inalterado |
 
+### Suíte completa
+
+| árvore | resultado |
+|---|---|
+| `main` `91258dd` **sem patch** (cópia isolada) | **2 failed, 884 passed** |
+| `main` **+ CR-G12** | **4 failed, 882 passed** |
+| `tests/test_cross_band_joint_propagation_cr_g12.py` | **20 passed** |
+
+As **2 pré-existentes** são as de `test_benchmark_baselines` (TGD
+`compensators` 52→61, TP1 `JUNCTION_MISSING_BINDING` 8→9) — idênticas nas
+duas árvores, dívida de refresh de `baseline.json`. As **2 novas** são
+asserções de *magnitude de reparo* que falham **por melhoria**
+(`test_t1_t9_...` e `test_t20_...`): o resultado físico final é idêntico
+nos dois casos. **Nenhuma foi alterada, nenhum `skip`/`xfail` foi usado** —
+ver `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` §7.2.
+
 ### Dívidas que continuam abertas
 
 - `baseline.json` e `reference_score.json` — **não** regravados.

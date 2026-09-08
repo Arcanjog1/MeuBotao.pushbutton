@@ -93,17 +93,43 @@ python3 -m pytest tests/test_cross_band_joint_propagation_cr_g12.py -q          
 python3 -m pytest tests/test_cross_band_joint_propagation_cr_g12.py -q -m "not slow"
 ```
 
+## Suíte completa — estado real
+
+| árvore | resultado |
+|---|---|
+| `main` `91258dd` **sem patch** (cópia isolada) | **2 failed, 884 passed** |
+| `main` **+ CR-G12** | **4 failed, 882 passed** |
+| só `tests/test_cross_band_joint_propagation_cr_g12.py` | **20 passed** |
+
+- **2 pré-existentes**, idênticas nas duas árvores e com os **mesmos
+  valores**: `test_benchmark_baselines[tgd]` (`compensators` 52→61) e
+  `[tp1]` (`JUNCTION_MISSING_BINDING` 8→9). Dívida de refresh de
+  `baseline.json`, já registrada.
+- **2 novas, as duas por MELHORIA** (detalhe e medições em
+  `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` §7.2):
+  `test_t1_t9_candidato_seguro_e_aceito_no_tgd_real` (a parede 23 deixou
+  de ter prisma forçado **na geração**, então o reparo ARM não é mais
+  proposto — o conjunto de paredes com prisma forçado no resultado FINAL
+  é **idêntico**, as mesmas 29) e
+  `test_t20_caso_real_tp1_junta_b19_b39_em_cima_da_peca_de_no` (o estado
+  de produção é o mesmo, `v_on=14`/`sig_on=4`; o contrafactual "sem a
+  metade simétrica" melhorou de 31 para 16, e a asserção travava uma
+  redução de 2×). **Nenhuma das duas asserções foi alterada** — é decisão
+  do usuário.
+
 ## Decisões que ESPERAM o usuário
 
 1. **Revisão e merge da CR-G12** — trade-offs em
    `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md` §6.3 (nível 2 subindo,
    `COMPENSATOR_EXCESS_IN_RUN` +2 no TGD do candidato, solver ~2× mais
    lento).
-2. **Normativa da CR-C2** — continua pendente. **G16 continua reprovado.**
-3. **Merge da CR-S1 (#25) e da CR-C1 (#26)**.
-4. **`baseline.json` / `reference_score.json`** — escrita oficial, CR própria.
-5. **§27.8 item 2** (`UNCLASSIFIED_RULE_CONFLICT`) — sem decisão normativa.
-6. **D1–D5** — nenhuma tomada nem presumida.
+2. **As duas asserções do §7.2** — autorizar (ou não) trocar asserção de
+   *mecanismo* por *resultado físico*, no mesmo precedente da §27.9.
+3. **Normativa da CR-C2** — continua pendente. **G16 continua reprovado.**
+4. **Merge da CR-S1 (#25) e da CR-C1 (#26)**.
+5. **`baseline.json` / `reference_score.json`** — escrita oficial, CR própria.
+6. **§27.8 item 2** (`UNCLASSIFIED_RULE_CONFLICT`) — sem decisão normativa.
+7. **D1–D5** — nenhuma tomada nem presumida.
 
 ## Não fazer
 

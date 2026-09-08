@@ -229,7 +229,12 @@ primeiro como vizinhança de cima (Gauss-Seidel).
 
 **Aceitação global, nunca otimista:** o resultado de um passe só substitui
 o anterior se a coincidência cross-band **total**
-(`_cross_band_coincidence_total`) diminuir **estritamente**. Empate mantém
+(`_cross_band_coincidence_total`) diminuir **estritamente**. Essa métrica
+usa a tolerância **do próprio motor**
+(`VERTICAL_JOINT_STAGGER_TOLERANCE_CM = 1,0cm`), não a do benchmark
+(1,5cm): nenhum threshold foi criado nem alterado. Na prática é
+indiferente — das 156 coincidências cross-band medidas no TGD, **149 têm
+desencontro 0,00cm** e as outras 7, 0,01cm. Empate mantém
 o passe anterior — o mais conservador. Medido no TGD: um passe só resolvia
 10 identidades e **criava 5 novas**; com o segundo passe são **14
 resolvidas e 0 novas**.
@@ -278,9 +283,13 @@ branch alterada). O `wall_stepper.py` do estado "com G12" é a fusão
 | `PRISM_JOINT_STACK` | 20 | 20 | 0 | 18 | **16** | **−2** | 0 |
 | `COMPENSATOR_CONSECUTIVE` | 523 | **511** | **−12** | 1480 | **1474** | **−6** | 0 |
 | `COMPENSATOR_EXCESS_IN_RUN` | 440 | **439** | **−1** | 1135 | **1133** | **−2** | 0 |
-| `COMPENSATOR_VERTICAL_STRIP` | 81 | **79** | **−2** | — | — | 0 | 0 |
+| `COMPENSATOR_VERTICAL_STRIP` | 81 | **79** | **−2** | 190 | 190 | 0 | 18 → 18 |
 | `PRISM_STAGGER_BELOW_TARGET` (nível 2) | 841 | 872 | **+31** | 1506 | 1531 | **+25** | 0 |
 | `COVERAGE_*`, `OPENING_*`, `JUNCTION_*`, `POSITION_OVERLAP` | — | — | **0** | — | — | **0** | **0** |
+
+**Total de achados (todos os códigos):** TGD 4.916 → 4.918 (**+2**, e são
+`PRISM_STAGGER_BELOW_TARGET` de nível 2 trocando por críticos removidos);
+TP1 5.049 → **5.034** (**−15**); piloto 124 → 124.
 
 **Juntas contínuas NOVAS (por identidade física, em qualquer ponto):
 ZERO** nos dois projetos. Nenhuma identidade que não existisse antes.
@@ -339,6 +348,89 @@ rápidos** (0,3s) e **9 marcados `slow`** (corpus real).
 Todo asserto de "resolvido" **falha se o patch for revertido** (a flag
 deixa de existir, ou, forçada a `False`, o defeito volta).
 
+Resultado: **20 passed** (`python3 -m pytest
+tests/test_cross_band_joint_propagation_cr_g12.py -q`, 10min17s).
+
+### 7.1 Suíte completa — pré-existentes × novas
+
+Duas execuções da suíte inteira (`pytest tests nuvem/tests -q`), a de
+controle numa **cópia isolada da `main` `91258dd`** montada por
+`git archive`:
+
+| árvore | resultado | tempo |
+|---|---|---|
+| `main` `91258dd` **sem patch** | **2 failed, 884 passed** | 34min20s |
+| `main` **+ CR-G12** | **4 failed, 882 passed** | 1h04min46s |
+
+**2 falhas PRÉ-EXISTENTES**, idênticas nas duas árvores, com os **mesmos
+valores** (reconferidas rodando só esse arquivo com o patch):
+
+| teste | motivo | antes | depois |
+|---|---|---|---|
+| `test_benchmark_baselines[torre_easy_lo_r00_tgd]` | categoria `compensators` | 52 | 61 |
+| `test_benchmark_baselines[torre_easy_lo_r00_tp1]` | `JUNCTION_MISSING_BINDING` | 8 | 9 |
+
+São a dívida de **refresh de `baseline.json`** já registrada (o baseline é
+anterior às correções de prisma). **Não pioraram com o patch** — os
+números são exatamente os mesmos.
+
+### 7.2 Duas falhas NOVAS — as duas por MELHORIA, nenhuma por regressão física
+
+Ambas são asserções que travam a **magnitude de um reparo pós-hoc**. A
+CR-G12 remove o defeito **antes**, então o reparo tem menos o que
+consertar — e o **estado final de produção é idêntico**. Medido, não
+suposto:
+
+**(a) `test_block_arm_role_candidate_safety_contract.py::test_t1_t9_candidato_seguro_e_aceito_no_tgd_real`**
+
+Espera que o candidato ARM `wall_idx=23` seja **aceito** no TGD. Com o
+patch ele não é sequer **proposto**:
+
+| | sem CR-G12 | com CR-G12 |
+|---|---|---|
+| parede 23 tem **prisma forçado no resultado ORIGINAL** (o que torna a aresta "reparável") | **sim** | **não** |
+| candidatos ARM aceitos | `23/SAME_A`, `91/SAME_B` | `91/SAME_B` |
+| candidatos ARM rejeitados | 19 | 19 |
+| parede 23 com prisma forçado no resultado **FINAL** | **não** | **não** |
+| **conjunto de paredes com prisma forçado no FINAL** | 29 paredes | **as MESMAS 29 paredes** |
+
+> O SAFE REPAIR não foi enfraquecido: **o defeito que ele consertava
+> naquela parede deixou de existir na geração**. O resultado físico final
+> é **idêntico**, parede por parede. A asserção registra o *mecanismo*
+> ("este candidato foi aceito"), não o *resultado físico* ("a parede não
+> tem prisma forçado").
+
+**(b) `test_block_node_fill_revalidation.py::test_t20_caso_real_tp1_junta_b19_b39_em_cima_da_peca_de_no`**
+
+Trava uma redução de **pelo menos 2×** produzida pela metade simétrica
+NÓ|FILL (`assert len(sig_on) * 2 <= len(sig_off)`):
+
+| | `v_off` | `v_on` | `sig_off` | `sig_on` | asserção |
+|---|---|---|---|---|---|
+| sem CR-G12 | 31 | 14 | 16 | 4 | `4×2 ≤ 16` ✔ |
+| com CR-G12 | **16** | 14 | **5** | 4 | `4×2 ≤ 5` ✘ |
+
+> **O estado de produção (`v_on` = 14, `sig_on` = 4) é EXATAMENTE o mesmo.**
+> O que mudou foi o **contrafactual**: com a CR-G12 ligada, o estado "sem
+> a metade simétrica" já é muito melhor (31 → 16), então não sobra espaço
+> para uma redução de 2×. A asserção `len(v_on) < len(v_off)` — a que
+> prova que a metade simétrica ainda ajuda — **continua passando**.
+
+**O que NÃO fiz, de propósito:** não toquei em nenhuma das duas
+asserções. Ajustar teste de outra CR para obter verde está fora do que
+esta CR autoriza, e a mudança tem peso de contrato (o contrato do SAFE
+REPAIR e o da metade simétrica). **Decisão do usuário.** A correção que
+eu proporia, se autorizado, é trocar a asserção de *mecanismo* por
+*resultado físico* — o mesmo precedente já registrado na §27.9
+(`test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada`, cuja asserção
+"registrava um artefato do bug"):
+
+- em (a): exigir que a parede 23 **não tenha prisma forçado no resultado
+  final**, aceitando as duas rotas (reparo ARM, ou geração já correta);
+- em (b): manter `len(v_on) < len(v_off)` e trocar o fator 2× por
+  asserções nos números medidos, declarando que a CR-G12 já retira 15 das
+  31 violações antes de a metade simétrica agir.
+
 ---
 
 ## 8. Gates
@@ -386,8 +478,15 @@ deixa de existir, ou, forçada a `False`, o defeito volta).
 - geometria, aberturas, amarração L/T/X, cobertura, compensadores,
   determinismo e os demais nós/bandas preservados (delta 0 nos códigos de
   cobertura/abertura/encontro/posição);
-- **falta**: decisão humana sobre o trade-off do §6.3, o merge da CR-S1 e
-  da CR-C1, e a CR própria de refresh de `baseline.json`.
+- **falta**: decisão humana sobre (i) o trade-off do §6.3, (ii) as **duas
+  asserções do §7.2** — as duas falham por melhoria, com o resultado
+  físico final idêntico, e eu **não** as alterei —, (iii) o merge da CR-S1
+  e da CR-C1, e (iv) a CR própria de refresh de `baseline.json`.
+
+**Estado da suíte, sem maquiagem:** `4 failed, 882 passed`. Duas falhas
+são **pré-existentes na `main`** (mesmos valores, §7.1) e duas são as
+asserções de magnitude do §7.2. **Nenhuma delas é regressão física** — e
+nenhuma foi contornada com `skip`, `xfail` ou ajuste de threshold.
 
 **Não** marquei `ready`. **Não** mesclei. **Não** criei monitoramento.
 **Não** iniciei C2, C02, C10, Junction, ARM nem qualquer outra CR.
