@@ -436,6 +436,12 @@ checks de CI**.
   aprovada.
 - `nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/` —
   diagnósticos reprodutíveis.
+- `docs/CR_C2_DECISAO_FISICA.md` — as 3 opções da C2 com contrato
+  integral, busca do fundamento normativo de cada uma e **duas correções
+  da análise anterior**. **Nenhum patch**: nem A nem B implementam
+  contrato existente. Recomendação revista: **opção C isolada**.
+- `docs/CR_G12_CROSS_BAND.md` — tabela física das 12 identidades do G12,
+  causa-raiz e escopo da **CR-G12** (preparada, **não iniciada**).
 - `docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md` — checkpoint da sessão.
   **Gravado em `docs/` de propósito:** `.gitignore` linha 8 ignora
   `.claude/*`, então um checkpoint escrito em `.claude/checkpoints/`
@@ -447,7 +453,7 @@ checks de CI**.
 
 | gate | estado | nota |
 |---|---|---|
-| **G12** (`PRISM_CONTINUOUS_JOINT`) | ✘ **não aprovado** | reavaliado: **28 → 12** identidades novas com a S1. A S1 melhora 57% mas **não zera** |
+| **G12** (`PRISM_CONTINUOUS_JOINT`) | ✘ **não aprovado** | reavaliado: **28 → 12** identidades novas com a S1. A S1 melhora 57% mas **não zera**. **Causa-raiz localizada** (fronteira de banda de abertura, §27.7/§39): `docs/CR_G12_CROSS_BAND.md`. **12 de 12 são defeito físico real** — não compensados por melhora em outros códigos |
 | **G13** (`JUNCTION_NOT_ALTERNATING`) | resolvido pela **S1** (`+16 → 0`) | aprovação depende do **merge autorizado** da S1 |
 | **G16** (`COVERAGE_*`) | ✘ **não aprovado** | `MISSING_ROW` `+17 → +0` pela C1; `ROW_MOSTLY_EMPTY` `+23` continua |
 | **G18** (identidade) | artefato ✔, oficial ✘ | 0 chaves ambíguas nos 3 estados; gravar no oficial depende do usuário |
@@ -456,11 +462,15 @@ checks de CI**.
 
 ### Dívidas e decisões pendentes do usuário
 
-- **Decisão normativa da CR-C2** — 3 opções medidas em
-  `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md` §5. Sem ela a CR-C2 não pode
-  ser implementada.
-- **G12** — decidir se 12 identidades críticas novas são aceitáveis, ou
-  abrir CR própria.
+- **Decisão normativa da CR-C2** — 3 opções em
+  `docs/CR_C2_DECISAO_FISICA.md`. **Recomendação: opção C isolada**
+  (A é normativa nova; **B foi retirada** — contradiz a tese física da
+  própria CR-B). Sem decisão, a CR-C2 não pode ser implementada.
+- **G12** — autorizar ou não a **CR-G12** (`docs/CR_G12_CROSS_BAND.md`).
+  As 12 identidades são **defeito físico real**, com causa-raiz conhecida
+  (§27.7/§39) e correção já proposta lá. Exige escrever
+  `nuvem/core/wall_modeling.py` e abre dívida de **refresh de
+  `baseline.json`**. **Não iniciada.**
 - **Merge da CR-S1 (#25)** e **da CR-C1 (#26)** — pendentes.
 - **`reference_score.json`** — recalibração pendente (escrita oficial).
 - **`baseline.json`** — refresh pendente (CR própria, autorizada).

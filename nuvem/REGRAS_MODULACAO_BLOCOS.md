@@ -5387,13 +5387,47 @@ Prova de que não é defeito físico (as três medições convergem):
 | vazios que aparecem só no candidato | **58 de 58 contidos** num vazio que já existia; **geometria nova = 0** |
 | mesmos blocos, reavaliados na **unidade de parede original** | **−3**, contra `+23` na unidade dividida |
 
+> **LIMITE DA CONCLUSÃO, registrado de propósito:** estar CONTIDO num
+> vazio anterior prova apenas que a reconstrução **não criou geometria
+> nova**. **NÃO** prova que o vazio seja falso nem que a ausência não seja
+> real — os 58 são vazios **reais**, em `STATE_R` e em `STATE_C`.
+>
+> **REGRA OBRIGATÓRIA (medição, não domínio) — a detecção de vazio real
+> não depende do `ROW_MOSTLY_EMPTY`.** Medido nos quatro estados:
+> correspondência **1:1 perfeita** entre vazio físico ≥5cm e
+> `COVERAGE_GAP_IN_ROW` (648/648, 601/601, 637/637, 590/590), **zero
+> vazios sem achado**. O `ROW_MOSTLY_EMPTY` é um **agregador secundário**
+> do mesmo fato geométrico que o `GAP_IN_ROW` já reporta integralmente.
+> Nenhuma mudança no `ROW_MOSTLY_EMPTY` perde detecção de vazio real.
+>
 > **Consequência para qualquer CR futura:** um delta de
 > `COVERAGE_ROW_MOSTLY_EMPTY` entre dois estados com **particionamento de
 > parede diferente NÃO é comparável** sem antes reconciliar a unidade.
 > Comparar contagem de achados entre esses dois estados mede o
 > particionamento, não a alvenaria.
 
-### 38.2 CONFLITO REGISTRADO — a faixa de verga/peitoril está sendo contada como fiada de parede
+### 38.2 CONFLITO REGISTRADO — fiadas fora do passo do grid contadas como fiada de parede
+
+> **CORREÇÃO DESTA SUBSEÇÃO (2026-09-08, mesma sessão).** A versão
+> anterior chamava essas fiadas de *"faixas de verga/peitoril"*.
+> **MEDIDO e REFUTADO:** das 116 fiadas fora do passo do candidato (TGD),
+> apenas **34 (29%) têm abertura ativa** naquela cota; **82 (71%) não têm
+> abertura nenhuma**. As peças dominantes são **CORTADAS** — `B39_C`
+> (137), `B34_C` (94), `B19_C` (67), `B54_C` (18) — não vergas. A
+> caracterização correta é **fiada de peças cortadas fora do passo do
+> grid**; verga/peitoril é um subconjunto minoritário. O número e o
+> conflito abaixo continuam válidos; só a explicação física muda.
+>
+> Contrato relacionado que **existe** e foi localizado
+> (`solver_bridge.solver_supported_catalog`): as peças `B19_C`, `B34_C`,
+> `B39_C`, `B54_C`, `C09_C`, `CAN34`, `CAN39`, `CJ19`, `CM19` **o solver
+> não implementa**, e o contrato manda tratá-las como *"escopo pendente do
+> solver, não erro de modulação"* (diferença de nível 2). Esse contrato
+> governa a comparação **solver × gabarito** — **não** se aplica ao G16,
+> que compara `STATE_R × STATE_C`, ambos gabarito humano. Aplicado como
+> filtro, levaria o delta de `+23` para `+12`, não a zero: **10 dos 23
+> achados estão em fiadas 100% compostas de peças que o solver
+> implementa.**
 
 O código declara que `COVERAGE_ROW_MOSTLY_EMPTY` existe para detectar *"o
 solver ter perdido UMA das duas famílias de fiada (A ou B)"*. Medido:
@@ -5425,9 +5459,20 @@ Números medidos, não estimados:
 | opção | definição normativa que ela cria | ruído no gabarito humano | delta G16 |
 |---|---|---|---|
 | manter como está | — | 85 / 120 | `+23` |
-| **A** — só fiada no passo do grid conta | *faixa de verga não é fiada de parede* | **24 / 52** | `+7` — **não basta** |
+| **A** — só fiada no passo do grid conta | *fiada fora do passo do grid não é fiada de parede* | **24 / 52** | `+7` — **não basta** |
 | **B** — avaliar na parede física agregada | *segmentos colineares divididos são uma unidade de cobertura* | inalterado | **−3** |
 | **C** — G16 medido por vazio físico global | *o gate mede geometria, não contagem de achados* | inalterado | **−14.409cm** |
+
+> **CONFLITO REGISTRADO contra a opção B (2026-09-08).** A tese medida da
+> CR-B é que os 19 casos **não são aberturas**, e sim *o espaço entre DUAS
+> PAREDES QUE TERMINAM NO NÓ* (teste da verga: 60 de 62 aberturas reais do
+> TGD têm verga; dos 19, **zero**). Se isso vale, os segmentos **são
+> paredes fisicamente distintas** e a unidade correta em `STATE_C` **é o
+> segmento** — a opção B reagruparia exatamente o que a CR-B separou por
+> evidência física, afirmando na avaliação o contrário do que a CR-B
+> afirma na geometria. **B fica registrada como normativa nova E
+> provavelmente incorreta.** Recomendação revista: **opção C isolada**,
+> não "A+B" como constava na primeira redação desta seção.
 
 **A orientação mais recente do usuário tem prioridade sobre esta seção.**
 Enquanto não houver decisão, vale o comportamento de hoje.
@@ -5471,3 +5516,115 @@ Consequências práticas, ambas medidas:
 > usa **coordenada global do ponto do nó + elevação física**. Nunca o
 > rótulo `W0xx`, nunca o eixo da parede, nunca o índice ordinal da fiada,
 > nunca o tipo do nó.
+
+---
+
+## 39. `CR-G12` — a junta contínua CRÍTICA nasce na FRONTEIRA ENTRE BANDAS de abertura
+
+> **ESTADO: DOCUMENTADO — pendência de código aberta. CR preparada, NÃO
+> implementada.** Conhecimento de AMARRAÇÃO: registro obrigatório
+> (`CLAUDE.md`). Relatório: `docs/CR_G12_CROSS_BAND.md`; diagnósticos em
+> `nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/`.
+
+**Como foi descoberto:** medição própria sobre a saída do **solver de
+produção** (projeção isolada `91258dd` + CR-S1 + CR-C1), comparando
+`IN_R → IN_C` do candidato CR-B por **coordenada global da junta + cotas
+físicas das duas fiadas**. Nenhuma medição no Revit ao vivo.
+
+### 39.1 REGRA OBRIGATÓRIA — a fiada acima da verga não herda a amarração da fiada abaixo dela
+
+Medido: numa parede de **geometria idêntica** (939cm, mesma porta
+`t=314..405` com `head_cm=160`, mesmo eixo), mudando **apenas** o tipo do
+nó de ponta de `T` para `L`:
+
+- as fiadas de `z=1` até **`z=141` saem IDÊNTICAS**;
+- **a divergência começa em `z=161`** — a primeira fiada **acima da
+  verga**;
+- na fiada `z=161` o solver troca um `B39` (39cm) por um `B19` (19cm) na
+  segunda posição. O `B19` consome 20cm em vez de 40cm e **recoloca a
+  fiada em fase** com a fiada de baixo;
+- resultado: **6 juntas contínuas** com desencontro **0,00cm** (limite
+  1,50cm), espaçadas de 40cm.
+
+Assinatura reproduzida **nos dois projetos**, nas **mesmas cotas
+relativas**: TGD `141/161` (base 0) e TP1 `753/773` (base 612 →
+`141/161`). 2 paredes × 6 juntas = **12 identidades por projeto**.
+
+> **É a mesma causa já registrada na §27.7**: `solve_building_blocks_all_
+> courses` resolve **cada banda de abertura do zero**, e *"na fronteira
+> entre duas bandas a regra #1 simplesmente não é avaliada"*. A §27.7 já
+> media que **as 33 coincidências residuais eram todas cross-band**. As 12
+> do G12 são uma **nova instância do mesmo defeito**, não um defeito novo.
+
+**A divisão de paredes da CR-B não criou este defeito — ela expôs um caso
+dele.** O `STATE_R` só escapava porque o layout que a banda de cima
+escolhia *calhava* de desencontrar.
+
+### 39.2 REGRA OBRIGATÓRIA — nó `T` e nó `L` na mesma ponta produzem amarrações diferentes na banda seguinte
+
+O tipo do nó de ponta **propaga efeito para muito além do nó**: ele muda a
+peça de arranque da fiada, e o arranque decide a fase de **toda a banda
+acima da abertura**. Consequência prática: qualquer CR que converta `T` em
+`L` (como a divisão de paredes faz — §38.5) **precisa remedir
+`PRISM_CONTINUOUS_JOINT` por identidade física em todas as bandas da
+parede**, não apenas no nó.
+
+### 39.3 PADRÃO OBSERVADO — o defeito NÃO se reproduz isoladamente
+
+Três tentativas de reprodução reduzida, **todas negativas** e todas
+versionadas:
+
+| cenário | resultado |
+|---|---|
+| nó `T` × `L`, parede 939cm, **sem abertura** | 0 × 0 |
+| idem **com a banda de abertura real** | 0 × 0 |
+| **subprojeto real isolado** (parede + vizinhas do nó) | inválido — isolar muda o resultado |
+
+> **REGRA OBRIGATÓRIA de método:** o layout de uma parede depende do
+> **contexto global do projeto**. Extrair a parede e as vizinhas do nó para
+> um subprojeto **não reproduz o mesmo problema** — o solver dá outra
+> solução. Reproduções de defeito de composição têm de rodar sobre o
+> projeto inteiro.
+
+### 39.4 Correção — proposta, NÃO implementada
+
+A correção é a que a §27.7 já propõe: **propagar as juntas/vazios da
+última fiada física da banda anterior para a primeira busca da banda
+seguinte**, em `solve_building_blocks_all_courses`
+(`nuvem/core/wall_modeling.py`).
+
+**Não implementada nesta sessão**, por quatro razões registradas: (i) não
+há reproducer reduzido para provar que o patch ataca a causa; (ii) a
+própria §27.7 registra esse arquivo como fora do escopo autorizado sem CR
+própria; (iii) mudaria o layout de **toda parede com abertura** nos 3
+projetos, exigindo **refresh de `baseline.json`** (escrita oficial); (iv)
+alterar solver ou baseline para obter verde é proibido.
+
+**Critério de aceite da CR-G12, quando autorizada:** as 12 identidades →
+**0** nos dois projetos, `PRISM_CONTINUOUS_JOINT` **não sobe** no corpus
+oficial, `PRISM_STAGGER_BELOW_TARGET` declarado, determinismo provado,
+suíte completa.
+
+### 39.5 CONHECIMENTO DE AMARRAÇÃO — o nó novo caiu no centro de um vazio que sempre existiu
+
+Medido nas 10 identidades novas de `JUNCTION_MISSING_BINDING` (gabarito,
+delta `STATE_R → STATE_C`), assinatura uniforme nos **20** achados dos dois
+projetos: **a peça mais próxima está a ~8,0cm do ponto do nó** — nunca
+zero, nunca longe.
+
+Geometria do caso `(-401,5, 24,1)`, `z=140`:
+
+- a parede que **termina** ali tem o ponto a **0,05cm** da sua ponta;
+- a parede **passante** tem o ponto a **7,05cm do seu eixo** = **meia
+  espessura**. O ponto do nó é onde o eixo de uma encontra a **face** da
+  outra;
+- na fiada `z=140` da passante há um **vazio de 16,0cm em `t=669..685`**, e
+  o ponto do nó está em **`t=677` — o centro exato do vazio**;
+- **o mesmo vazio de 16,0cm, em `t=669..685`, existe em `STATE_R`.**
+
+> **REGRA OBRIGATÓRIA:** ao registrar um nó novo num ponto, verificar se
+> ali existe **alvenaria** naquela cota. Um nó cujo ponto cai no centro de
+> um vazio pré-existente gera `JUNCTION_MISSING_BINDING` que **não é
+> defeito de amarração novo** — é o vazio de sempre, já acusado por
+> `COVERAGE_GAP_IN_ROW`. Classificação medida: **10 de 10 são (C) unidade
+> nova legítima; nenhum nó pré-existente piorou.**
