@@ -758,6 +758,11 @@ escrevem de verdade no modelo (`create_building_blocks`,
 
 - **Status**: CONFLITO ABERTO — não implementar nenhum dos dois lados
   até resolver.
+- **MEDIÇÃO MAIS RECENTE: ver seção 30.7** (2026-09-09, 651 paredes
+  agrupadas pelo parâmetro `Parede` do próprio projeto). A taxa subiu de
+  39,4% para **71,4%** e apareceu um mecanismo alternativo identificado
+  (encunhamento com bloco cortado de 9 cm até a laje). **O conflito
+  continua aberto** — 30.7 não o resolve, só o mede melhor.
 - **Hipótese do usuário**: toda parede deve ter canaleta na última fiada
   do topo, independentemente de aberturas.
 - **Medição real**: testando a fiada mais alta de 221 linhas de parede
@@ -3992,3 +3997,195 @@ explicitamente pelo usuário cria uma transação no Revit.
    quantidade de elementos modificados, e exibir a justificativa técnica em
    linguagem de obra (por exemplo, "mover janela 2 cm para liberar B34 na
    jamba").
+
+---
+
+## 30. FATO MEDIDO — extração forense do projeto humano (Revit, 2026-09-09)
+
+> **Origem**: leitura somente-leitura via MCP do documento
+> `TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt` (Revit 2026), o
+> HUMAN_REFERENCE do benchmark. 67.712 peças de alvenaria, 484 aberturas,
+> 9 níveis com modulação. Evidência bruta e relatório completo em
+> `docs/revit_reference_extraction/`.
+>
+> **Status de código**: **DOCUMENTADO — nenhuma pendência de código foi
+> aberta nesta sessão e nada aqui foi implementado.** Esta seção registra
+> medição, não autoriza mudança de comportamento do solver. Onde uma
+> medição confirma uma regra já existente, isso está dito explicitamente;
+> onde ela contradiz ou fica indecisa, fica registrada como CONFLITO.
+
+### 30.1 CONFIRMADO E MEDIDO — a grade vertical da seção 8 está certa
+
+Fiadas medidas no gabarito (`04. TGD`) e repetidas identicamente no
+pavimento-tipo (`05. TP1`), em cota relativa à base do nível:
+
+`1, 21, 41, 61, 81, 101, 121, 141, 161, 181, 201, 221, 241`
+
+Primeira fiada em **base + 1 cm**, passo de **20 cm** (19 de bloco + 1 de
+junta), 13 fiadas num pé-direito de 271 cm. 62.621 de 63.033 peças de
+19 cm de altura (99,35%) assentam nessa grade.
+
+Isto **confirma** `FIRST_COURSE_Z_OFFSET_CM = 1` e o passo de 20 cm da
+seção 8 contra o projeto humano real, em dois níveis independentes. A
+advertência da seção 8 ("não alterar sem reconfirmar no Revit real")
+está agora satisfeita — a fórmula atual é a correta.
+
+### 30.2 REGRA OBSERVADA (confiança ALTA) — onde verga e contraverga nascem
+
+- **Base da verga = cota do topo do vão**, offset 0,00 cm em **392/392**
+  peças assentadas nessa posição.
+- **Topo da contraverga = cota do peitoril**, offset 0,00 cm em
+  **147/147**.
+- Verga e contraverga têm **9 cm de altura** e 14 cm de largura em
+  **539/539** peças.
+- **Apoio mínimo de 9 cm de cada lado da jamba** em **1.078/1.078** apoios
+  medidos; mediana 19 cm; máximo 44 cm (verga) / 52,5 cm (contraverga).
+
+**Não** há fórmula fechada para o comprimento: só 51,5% das vergas medem
+`vão + 19 + 19`, e só 54,3% são simétricas. O humano escolhe um tipo de
+verga pré-fabricado (`VERGA 109` … `VERGA 214`, de 5 em 5 cm) que cubra o
+vão com apoio ≥ 9 cm. **Política de escolha de comprimento: em aberto.**
+
+### 30.3 CONFIRMADO E MEDIDO — o critério porta × janela da seção 10.4
+
+O projeto humano rotula as aberturas por parâmetro compartilhado
+`Título_abertura`: **PORTA 248 · JANELA 134 · ABERTURA 102**. O rótulo é
+coerente com o peitoril: **248/248** portas têm peitoril 0 e nenhuma
+janela tem peitoril 0.
+
+E o comportamento bate com o que 10.4 já dizia:
+
+- **Toda PORTA tem verga: 248/248 (100%).**
+- **Nenhuma PORTA tem contraverga: 248/248 (100%).**
+- JANELA tem verga em 130/134 (97,0%) e contraverga em 129/134 (96,3%).
+
+Confirmação independente de 10.4 — a regra não muda.
+
+### 30.4 REGRA OBSERVADA — "CORTADO" é corte em ALTURA, não em comprimento
+
+Descoberta que **corrige o entendimento anterior** (a documentação tratava
+`CORTADO` como peça fina genérica, sem dizer em que eixo):
+
+- **3.636 de 3.887 peças cortadas (93,5%)** vêm de famílias dedicadas
+  `… CORTADO - 14x9x…` cujo sólido tem **9 cm de altura** e o
+  **comprimento nominal preservado** (39, 34, 19, 9, 4, 54 cm).
+- Só **251 peças (6,5%)** são cortadas no **comprimento**, e essas usam
+  famílias `…VAR` com `Comprimento_bloco` como parâmetro de **INSTÂNCIA**
+  (valores redondos 9/10/14/24 cm e também valores de obra como 8,7913 ou
+  3,0556 cm).
+
+**Mecânica geométrica medida**: `9 + 1 (junta) + 9 = 19` — duas peças de
+9 cm empilhadas reconstroem exatamente uma fiada normal. 4.134 de 4.679
+peças de 9 cm (88,4%) assentam na base da fiada (`z ≡ +1 mod 20`) ou na
+meia-fiada (`z ≡ +11 mod 20`). É assim que o humano faz ajuste vertical
+sem sair da grade de 20 cm.
+
+### 30.5 CONFIRMADO E MEDIDO — reforça a seção 10.5
+
+**2.440 de 3.026 blocos cortados que têm abertura na mesma parede (80,6%)
+estão a menos de 60 cm de uma jamba.** A medição anterior de 10.5 era 65%.
+A regra de não reportar bloco cortado como erro sem checar proximidade de
+abertura fica **reforçada**, não alterada.
+
+Distribuição de contexto das 3.887 peças cortadas: acima de vão 29,4%,
+a ≤25 cm de jamba 28,4%, a ≤25 cm de extremidade de parede 12,2%, última
+fiada da parede 11,0%, corte em comprimento 6,5%, abaixo de peitoril 1,9%,
+outros 10,6%.
+
+### 30.6 CONFIRMADO EM ESCALA — a sequência do "Sistema 2" acima do vão
+
+`OPENINGS.md` registrava a sequência canaleta como PADRÃO OBSERVADO com
+apenas 2 exemplos. Medida agora no nível gabarito, acima do topo de vão de
+porta (cota 221 cm):
+
+| cota (rel.) | peças | composição |
+|---|---:|---|
+| 221 | 835 | 668 bloco de 19 cm · **164 cortado de 9 cm** · 3 canaleta |
+| 231 | 306 | **306 cortado de 9 cm** (fiada fina cheia) |
+| 241 | 1.361 | **1.254 canaleta** · 88 cortado · 19 bloco |
+| 261/262 | 42/128 | cortado de 9 cm (encunhamento até a laje) |
+
+Repetido identicamente em 5 pavimentos. A sequência
+*banda de 9 cm parcial → banda de 9 cm cheia → fiada de canaleta* deixa de
+ser "2 exemplos" e passa a ser **PADRÃO OBSERVADO em centenas de peças por
+pavimento**. Continua **não implementada** — 10.2/10.3/10.6 seguem só
+documentados.
+
+### 30.7 CONFLITO 10.7 — nova medição, continua ABERTO
+
+Sobre **651 paredes** de todos os níveis (agrupadas pelo parâmetro
+`Parede` do próprio projeto, não por linha reconstruída — método diferente
+e melhor que o da medição de 39,4%):
+
+- última fiada **100% canaleta**: **465 paredes (71,4%)**
+- última fiada **sem nenhuma canaleta**: 160 paredes
+- última fiada **mista**: 26 paredes
+
+No gabarito: 85/117 (72,6%) com canaleta, 26 sem, 6 mistas.
+
+**Mecanismo alternativo identificado**: as paredes sem canaleta no topo
+terminam majoritariamente em cota relativa 271 cm (20 de 26 no gabarito) —
+encostam na laje — e sua última fiada é de **bloco cortado de 9 cm**
+(encunhamento), não de canaleta. As paredes com canaleta terminam em 260
+ou 270 cm.
+
+**O conflito continua ABERTO.** 71,4% é predominante mas não universal, e
+agora existe uma explicação estrutural para os 28,6% restantes. Continua
+valendo: **não implementar nenhum dos dois lados** sem decisão explícita
+do usuário.
+
+### 30.8 REGRA OBSERVADA — não classificar peça pelo nome da família
+
+**25 instâncias da família `VERGA JANELA` estão assentadas como
+contraverga** (topo exatamente na cota do peitoril, apoios de 19 a 44 cm),
+nas paredes `PAR69`, `PAR70`, `PAR78`, `PAR84` e `PAR85`, nos 5 pavimentos
+modelados.
+
+Classificar verga × contraverga **pelo nome da família erra 25 de 539
+casos (4,6%)**. A classificação correta é **geométrica**: peça de 9 cm com
+base na cota do topo do vão = verga; peça de 9 cm com topo na cota do
+peitoril = contraverga.
+
+### 30.9 FATO MEDIDO — o catálogo fixo cobre 80,19% do projeto humano
+
+`BLOCK_FAMILY_CATALOG_DEFINITIONS` casa por família **+** tipo exatos, e
+cobre **54.298 de 67.712 peças (80,19%)**, **6 de 57 tipos**.
+
+Fora do catálogo: 6.584 canaletas, 3.887 cortados, 417 vergas, 122
+contravergas, 504 compensadores deitados, 30 de uma família duplicada.
+
+**Armadilha registrada**: **2.121 peças** usam uma **família que o catálogo
+conhece** com um **tipo que ele não conhece** — os tipos `VEDAÇÃO` (ex.:
+família `BLOCO INTEIRO - 14x19x39`, tipo `VEDAÇÃO 14x19x39 - BLOCO
+INTEIRO`), geometricamente idênticos ao B39. A regra de identificar
+**sempre por família+tipo exatos** (seção 1) continua correta e não deve
+ser afrouxada por dedução de comprimento; o que fica registrado é que a
+alvenaria de **vedação** deste projeto está, hoje, **fora do escopo do
+catálogo**, e isso é uma decisão a tomar, não um bug.
+
+### 30.10 ARMADILHAS DE LEITURA DO REVIT (medidas nesta sessão)
+
+Registradas porque qualquer leitura futura deste modelo repete o erro:
+
+1. **`Level.Elevation` não é a cota interna.** Neste documento
+   `Level.Elevation` está **+1510 cm** deslocado. A cota correta é
+   `Level.ProjectElevation + Deslocamento do hospedeiro`.
+2. **A `BoundingBox` das famílias de bloco tem +1 cm de folga em cada
+   ponta do comprimento** (bloco de 39 → bbox de 41) e, no
+   `BLOCO 54 CORTADO`, **+10 cm em Z**. Medir sempre pelo **sólido**.
+3. **`LookupParameter` com nome acentuado retorna `None`** neste ambiente
+   (`Nível`, `RÔGGA_LOCAL`) — silenciosamente, sem erro. Usar **GUID de
+   parâmetro compartilhado**.
+4. **`Fiada`, `Lintel`, `Arranque` e `Principal` estão zerados em
+   67.712/67.712 peças.** O projeto humano não numera fiada nem marca
+   verga por parâmetro — não usar esses campos como fonte.
+5. **Vergas e contravergas não têm nível** (`FAMILY_LEVEL_PARAM = -1` em
+   539/539). Um filtro por nível **perde a categoria inteira**.
+6. **Não existe `Wall` nem Porta/Janela nativa** neste documento: a
+   alvenaria é Modelo Genérico e a abertura é Mobiliário. A parede existe
+   como parâmetro de texto `Parede`, e a espessura de 14 cm é **inferida**
+   da largura das peças.
+7. **A bbox da família de abertura vai do piso até a verga**: a altura da
+   bbox é `Peitoril + Altura_abertura` em **484/484** casos. O vão real é
+   `[base + Peitoril, base + Peitoril + Altura_abertura]`. Usar a bbox como
+   vão trata toda janela como se fosse porta.

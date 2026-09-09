@@ -609,6 +609,19 @@ As regras técnicas e funcionais de amarração e modulação (o "como", não o
 
 ## 11. Arquivos de referência
 
+- `docs/revit_reference_extraction/` — **extração forense do projeto
+  humano** (Revit `TORRE EASY-LO-R00`, 2026-09-09, somente leitura):
+  catálogo de 57 famílias/tipos, 484 aberturas, 392 vergas, 147
+  contravergas, 6.584 canaletas, 3.887 blocos cortados e 20 padrões
+  quantificados sobre 67.712 peças. Relatório em
+  `REPORT_HUMAN_REVIT_MODULATION.md`; checkpoint em
+  `docs/checkpoints/2026-09-09-revit-human-reference-extraction.md`;
+  registro nas regras em `REGRAS_MODULACAO_BLOCOS.md` seção 30.
+  **Estado: evidência coletada e validada; nada implementado.** Aguarda
+  decisão do usuário sobre 4 pontos de política (canaleta de topo,
+  comprimento de verga, simetria de apoio, vãos `ABERTURA`) e sobre o
+  escopo da alvenaria de vedação no catálogo. Os dados brutos ficam nos
+  JSON daquela pasta — **não copiar números para cá**.
 - `nuvem/REGRAS_MODULACAO_BLOCOS.md` — **regras técnicas e funcionais**
   da modulação de blocos e da amarração (o "como" do domínio). Este
   documento (`docs/PROJECT_STATUS.md`) **não substitui** aquele arquivo
