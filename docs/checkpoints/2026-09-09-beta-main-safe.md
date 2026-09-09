@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-09",
-  "scope": "current",
+  "scope": "historical",
   "branch": "codex/beta-main-safe-20260909",
   "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
   "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
@@ -38,6 +38,15 @@
   ]
 }
 ```
+
+RECLASSIFICADO PARA `historical` em 2026-09-09, na branch
+`claude/revit-solver-perf-diagnosis-6dfd89`: o HEAD avancou para
+`0ffa8e9` (instrumentacao [PERF] de diagnostico), entao este registro
+deixou de cobrir o codigo em HEAD e o checkpoint corrente passou a ser
+[o do diagnostico do beta](2026-09-09-beta-revit-preparing-solver-performance.md).
+Nenhuma afirmacao, teste, numero ou decisao deste checkpoint foi
+alterada, e o GO tecnico restrito que ele registra continua valendo
+para o SHA `8cdd33f` que ele descreve.
 
 O SHA acima ficou congelado durante a consolidada. Apenas documentacao
 e evidencias foram acrescentadas. O probe inicial foi executado antes

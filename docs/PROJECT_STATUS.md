@@ -211,6 +211,26 @@ casos. Logs devem registrar entrada, configuracao, versao carregada,
 geometria, chave fisica e resultado para gerar regressao offline.
 Procedimento especifico: [runbook main-safe](BETA_MAIN_SAFE_RUNBOOK.md).
 
+## Diagnostico do beta no Revit: "Preparando o solver..."
+
+Primeiro beta controlado (8cdd33f) trava minutos em "Preparando o
+solver..." numa bancada de 2 Walls, 1 encontro em L e 0 aberturas.
+Detalhe, numeros e limites:
+[checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md).
+
+Medido, nao suposto: a entrada real do Revit e congruente com
+[main-safe-engineering-input.json](checkpoints/evidence/main-safe-engineering-input.json)
+(sem erro de unidade, sem Z incorreto), o grafo tem 3 nos / 1 L / 2 pontas
+livres sem residuo da execucao anterior, e o caminho `analyze` do botao
+custa 0,37s no documento real. O benchmark offline de 0,1-1,1s exercita
+`_execute_solve`, e o botao dispara `analyze` - os dois numeros nao sao
+comparaveis.
+
+CAUSA-RAIZ AINDA ABERTA e sem correcao. A branch entrega instrumentacao
+[PERF] no caminho real (`core/engine/perf_trace.py`); falta um clique no
+pacote instrumentado para separar latencia do ExternalEvent de trabalho
+real. Estado candidato, nao oficial - nao mesclar.
+
 ## Governanca e recuperacao
 
 Seguir [DEVELOPMENT_PROCESS.md](DEVELOPMENT_PROCESS.md).
