@@ -3555,16 +3555,16 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
 
 
 def _record_unmodulated_walls(result, walls_to_create):
-    """Keep every empty input wall identifiable for manual review, without fill."""
-    populated = set(c.get("wall_idx")
-                    for pcs in (result.get("course_candidates") or {}).values()
-                    for c in pcs)
+    """Keep empty or partially non-modular walls identifiable, without changing fill."""
+    sources = result.get("course_candidates")
+    physical_sources = sources.values() if sources is not None else [result.get("candidates") or []]
+    populated = set(c.get("wall_idx") for pcs in physical_sources for c in pcs)
     spans_by_wall = {}
     for span in result.get("non_modular") or []:
         spans_by_wall.setdefault(span.get("wall_idx"), []).append(dict(span))
     retained = []
     for wi in range(len(walls_to_create)):
-        if wi in populated:
+        if wi in populated and not spans_by_wall.get(wi) and not result.get("error"):
             continue
         p0, p1, _direction, length, thickness = _wall_axis_and_length(walls_to_create, wi)
         spans = spans_by_wall.get(wi, [])
@@ -3582,6 +3582,7 @@ def _record_unmodulated_walls(result, walls_to_create):
             "end_cm": [_ft_to_cm(p1.X), _ft_to_cm(p1.Y)],
             "length_cm": _ft_to_cm(length), "thickness_cm": _ft_to_cm(thickness),
             "non_modular_spans": spans,
+            "has_physical_candidates": wi in populated,
         })
     result["unmodulated_walls"] = retained
     return result
@@ -3590,6 +3591,8 @@ def _record_unmodulated_walls(result, walls_to_create):
 def _record_incomplete_wall_creation(solve_result, create_result, walls_to_create):
     """A planned piece is not a replacement until its physical instance exists."""
     solve_result = solve_result or {}
+    if walls_to_create:
+        _record_unmodulated_walls(solve_result, walls_to_create)
     retained = dict((w["wall_idx"], dict(w))
                     for w in solve_result.get("unmodulated_walls") or [])
     created = set((item.get("course_index"), item.get("candidate_key"))
@@ -9584,7 +9587,7 @@ def _format_block_solve_report(result, catalog):
         for issue in beta["errors"] + beta["opening_violations"] + beta["collisions"]:
             lines.append("  BETA: {}".format(issue))
     retained = result.get("unmodulated_walls") or []
-    lines.append("Paredes SEM BLOCOS, retidas para revisao manual: {}".format(len(retained)))
+    lines.append("Paredes vazias ou parcialmente nao modulaveis, retidas para revisao manual: {}".format(len(retained)))
     for wall in retained:
         lines.append("  - parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
                      "{start_cm} -> {end_cm}; PRESERVAR referencia.".format(**wall))
@@ -10069,6 +10072,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 self._refresh_geometry_from_document(app_doc)
                 self._execute_create(app_doc)
             elif self.action == "delete":
+                if self.controlled_beta:
+                    self._refresh_geometry_from_document(app_doc)
                 self._execute_delete(app_doc)
             elif self.action == "debug_view":
                 self._execute_debug_view(app_doc)
@@ -10145,6 +10150,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 for element_id, _seg_origin in entries:
                     elem = app_doc.GetElement(element_id)
                     if elem is None or not isinstance(elem.Location, LocationCurve):
+                        if self.controlled_beta:
+                            raise ValueError("BETA BLOQUEADO: parede de referencia ausente ou ilegivel; recapture o modelo.")
                         seg_curves = None
                         break
                     seg_curves.append(elem.Location.Curve)
@@ -10155,6 +10162,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 for curve in seg_curves:
                     for k in (0, 1):
                         p = curve.GetEndPoint(k)
+                        if self.controlled_beta and (
+                                abs((p.X - origin_ref.X) * dir_xy.Y - (p.Y - origin_ref.Y) * dir_xy.X) > 1e-6
+                                or min(abs(p.Z - origin_ref.Z), abs(p.Z - self.base_z_abs)) > 1e-6):
+                            raise ValueError("BETA BLOQUEADO: eixo deslocado/rotacionado fora do refresh suportado; recapture o modelo.")
                         t = XYZ(p.X - origin_ref.X, p.Y - origin_ref.Y, 0.0).DotProduct(dir_xy)
                         all_ts.append((t, p))
                 min_t, min_p = min(all_ts, key=lambda tp: tp[0])
@@ -10179,6 +10190,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 self.wall_segment_geometry[wall_idx] = new_segments
                 any_updated = True
             except Exception:
+                if self.controlled_beta:
+                    raise
                 continue  # nunca derruba o refresh dos demais eixos
 
         if any_updated:
@@ -10419,9 +10432,24 @@ class _PostCreationEventHandler(IExternalEventHandler):
         if self.controlled_beta:
             self.solve_result["beta_preflight"] = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+            self.solve_result["beta_input_signature"] = self._beta_input_signature()
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
+
+    def _beta_input_signature(self):
+        def xyz(point):
+            return tuple(round(v, 9) for v in (point.X, point.Y, point.Z))
+        walls = tuple((xyz(line.GetEndPoint(0)), xyz(line.GetEndPoint(1)), thickness, tuple(locks))
+                      for line, thickness, locks in self.walls_to_create)
+        openings = tuple(tuple(tuple(op) for op in wall) for wall in self.openings_per_wall)
+        catalog = tuple((code, entry.get("length_cm"), entry.get("width_cm"), entry.get("height_cm"),
+                         id(entry.get("symbol"))) for code, entry in sorted(self.catalog.items()))
+        return walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level)
+
+    def _require_current_beta_solve(self):
+        if (self.solve_result or {}).get("beta_input_signature") != self._beta_input_signature():
+            raise ValueError("BETA BLOQUEADO: geometria/catalogo mudou ou calculo sem assinatura; calcule novamente.")
 
     def _execute_create(self, app_doc):
         if self.controlled_beta:
@@ -10436,6 +10464,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                  "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
                                      len(preflight["opening_violations"]), len(preflight["collisions"]),
                                      "; ".join(preflight["errors"])))
+            self._require_current_beta_solve()
             # One outer group restores even the committed cleanup transaction.
             previous_result = self.create_result
             replacement = self._TransactionGroup(app_doc, "Beta - substitui lote completo de blocos")
@@ -10722,6 +10751,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
         if self.controlled_beta:
             if self.create_result is None:
                 raise ValueError("BETA BLOQUEADO: lote ainda nao criado.")
+            self._require_current_beta_solve()
             # A new solve cannot authorize deleting references based on an old batch.
             _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
         # NUNCA excluir a parede de referencia de um eixo que ficou SEM

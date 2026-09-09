@@ -7252,3 +7252,21 @@ classificada como decisao normativa pendente na secao 36.7; nao implementar
 essa inversao por inferencia do comentario historico sobre solver global.
 Repetir A/B com K=1 tambem continua vigente (18.4); nao reativar rodizio de
 fiadas para esconder faixas de compensadores sem a decisao correspondente.
+
+### 48.5 Referencia parcial e validade do calculo beta
+
+Uma parede com algumas pecas NAO esta integralmente substituida se o
+resultado ainda registra trecho nao modulavel. Preservar e identificar
+tambem essa referencia, inclusive quando todas as pecas planejadas foram
+criadas. O registro distingue `has_physical_candidates`; nao zerar
+candidatos, comprimento ou achados para simular cobertura completa.
+
+O beta registra assinatura da geometria CAPTURADA, aberturas, dimensoes
+do catalogo, nivel/base e altura ao calcular. Criar/finalizar com assinatura
+ausente ou diferente deve exigir novo calculo, antes de qualquer mutacao.
+No refresh beta, referencia apagada/ilegivel ou eixo deslocado lateralmente,
+rotacionado ou em cota nao suportada deve exigir recaptura, nao usar o
+snapshot antigo silenciosamente. O comportamento historico fora do beta
+permanece separado. Isso nao promete rastrear edicoes nativas arbitrarias
+de portas/janelas: o primeiro beta exige copia estatica do RVT e recaptura
+apos qualquer edicao nativa fora do fluxo suportado.

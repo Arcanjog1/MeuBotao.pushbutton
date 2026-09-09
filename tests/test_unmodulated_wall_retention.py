@@ -34,6 +34,23 @@ def test_valid_wall_is_not_marked_empty():
     assert result["unmodulated_walls"] == []
 
 
+def test_partial_non_modular_wall_is_retained_even_when_every_planned_piece_exists():
+    walls = [(seg(0, 0, 199, 0), ft(14), (False, False))]
+    result = solve(199)
+    result["num_courses"] = 2
+    result["non_modular"] = [{"wall_idx": 0, "current_length_cm": 12.7, "course": "A"}]
+    creation = {"created_instances": [
+        {"course_index": ci, "candidate_key": id(c)}
+        for ci, pcs in result["course_candidates"].items() for c in pcs]}
+    m._record_incomplete_wall_creation(result, creation, walls)
+    record, = creation["retained_walls"]
+    assert record["reason"] == "NON_MODULAR_SPANS"
+    assert record["has_physical_candidates"] is True
+    assert creation["skipped_wall_idxs"] == [0]
+    report, _ok = m._format_block_solve_report(result, CATALOG)
+    assert "parcialmente nao modulaveis, retidas para revisao manual: 1" in report
+
+
 def test_negative_reservations_are_not_mislabeled_as_plain_off_module():
     walls = [(seg(0, 0, 99.754, 0), ft(14), (False, False))]
     result = {"course_candidates": {0: []}, "non_modular": [
@@ -105,6 +122,7 @@ def test_beta_new_solve_does_not_finalize_using_old_instances():
     wall_id = revit_stubs.ElementId(1)
     handler.created_walls_by_axis = {0: [(wall_id, "cad")]}
     handler.created_wall_ids_all = [wall_id]
+    handler.solve_result["beta_input_signature"] = handler._beta_input_signature()
 
     class Document:
         def GetElement(self, _eid):
