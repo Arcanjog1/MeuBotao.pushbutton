@@ -267,3 +267,186 @@ def test_node_index_of_usa_identidade_de_objeto():
     assert gemeo == outro
     assert m._node_index_of(nodes, outro) == 1
     assert m._node_index_of(nodes, {"kind": "L_CORNER"}) is None
+
+
+# ============================================================
+# CR-N1c - a fronteira nao pode DOAR espaco PARA O VAZIO
+#
+# O ponto medio da CR-N1 supunha que o no' vizinho SEMPRE alcanca ate'
+# ele. Nao alcanca: quando o vizinho ja' esta' bloqueado (a reserva da
+# outra ponta o impede de descer, uma abertura o corta), o meio-a-meio
+# tira de quem usaria para dar a quem NAO PODE USAR.
+#
+# Medido no TGD real (2026-09-09), parede
+# `W|-140.5,470.0|5.5,470.0|t14.0`: no' 142 (`T_INTERSECTION`, t=1,00cm)
+# e no' 185 (`L_CORNER`, t=7,00cm), a 6,0cm um do outro. O alcance do
+# no' 185 na direcao do 142 e' ZERO (o `safe_range` dele comeca em
+# 34,00cm). O ponto medio (t=4,00cm) tirava 2cm do 142 assim mesmo:
+# room 5,00 -> 3,00cm. Com 5,00cm cabia o `C04` que amarrava o encontro;
+# com 3,00cm nao cabe NADA - `JUNCTION_MISSING_BINDING` 23 -> 40
+# ocorrencias, e o encontro T ficava SEM NENHUMA PECA nas 17 fiadas.
+# ============================================================
+
+def _plan_no_bloqueado(main_len_cm=146.0, t_boneca_cm=13.0):
+    """Parede principal com L_CORNER nas DUAS pontas e uma boneca de MEIO
+    logo depois da primeira - o no' de meio cai DENTRO da reserva de
+    ponta, entao o alcance dele para tras e' ZERO."""
+    return [
+        seg(0.0, 0.0, main_len_cm, 0.0),                    # 0: principal
+        seg(0.0, 0.0, 0.0, 300.0),                          # 1: L esquerda
+        seg(main_len_cm, 0.0, main_len_cm, 300.0),          # 2: L direita
+        seg(t_boneca_cm, 0.0, t_boneca_cm, 300.0),          # 3: boneca de MEIO
+    ]
+
+
+def _graph_no_bloqueado(main_len_cm=146.0, t_boneca_cm=13.0):
+    walls = [(line, ft(14.0), (False, False))
+             for line in _plan_no_bloqueado(main_len_cm, t_boneca_cm)]
+    walls, junction_map = m.extend_wall_ends_to_junctions(
+        walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, junction_map)
+    openings = dict((i, []) for i in range(len(walls)))
+    return walls, nodes, end_to_node, openings
+
+
+def _rooms_do_no_de_ponta(main_len_cm=146.0, t_boneca_cm=13.0):
+    """(historico, CR-N1/N1b sem alcance, CR-N1c) em cm, para o no' da
+    PONTA da parede principal medindo na direcao da boneca."""
+    walls, nodes, end_to_node, openings = _graph_no_bloqueado(
+        main_len_cm, t_boneca_cm)
+    wall_idx = 0
+    node_index = end_to_node[(wall_idx, 0)]
+    t_ft = next(t for node_obj, t in m._wall_junction_nodes_and_ts_ft(
+        walls, nodes, wall_idx) if m._node_index_of(nodes, node_obj) == node_index)
+    safe = m._wall_reserved_range_ft(walls, nodes, end_to_node, wall_idx,
+                                     exclude_node_index=node_index)
+    to_cm = lambda v: v / m.FEET_PER_METER * 100.0  # noqa: E731
+    return (
+        to_cm(m._room_at_t_on_wall(walls, openings, wall_idx, t_ft, 1,
+                                   safe_range_ft=safe)),
+        to_cm(m._room_at_t_on_wall(walls, openings, wall_idx, t_ft, 1,
+                                   safe_range_ft=safe, nodes=nodes,
+                                   exclude_node_index=node_index)),
+        to_cm(m._room_at_t_on_wall(walls, openings, wall_idx, t_ft, 1,
+                                   safe_range_ft=safe, nodes=nodes,
+                                   exclude_node_index=node_index,
+                                   end_to_node=end_to_node)),
+    )
+
+
+def test_reach_do_vizinho_bloqueado_e_zero():
+    """A medição que sustenta tudo: o no' de MEIO que caiu dentro da
+    reserva de ponta NAO ALCANCA nada para tras."""
+    walls, nodes, end_to_node, openings = _graph_no_bloqueado()
+    wall_idx = 0
+    ponta = end_to_node[(wall_idx, 0)]
+    meio = [(m._node_index_of(nodes, n), t)
+            for n, t in m._wall_junction_nodes_and_ts_ft(walls, nodes, wall_idx)
+            if m._node_index_of(nodes, n) not in
+            (end_to_node.get((wall_idx, 0)), end_to_node.get((wall_idx, 1)))]
+    assert meio, "esperava um no' de MEIO DE PAREDE neste plano"
+    meio_index, meio_t = meio[0]
+    assert meio_index != ponta
+    reach = m._neighbor_node_reach_ft(walls, openings, nodes, end_to_node,
+                                      wall_idx, meio_index, meio_t, -1)
+    assert reach == pytest.approx(0.0, abs=1e-9), (
+        "o no' de meio esta' dentro da reserva de ponta - o alcance dele "
+        "para tras tem de ser ZERO, e' isso que torna o ponto medio uma "
+        "doacao para o vazio: %.4fft" % reach)
+
+
+@pytest.mark.parametrize("main_len_cm,t_boneca_cm",
+                         [(146.0, 13.0), (146.0, 20.0), (200.0, 13.0)])
+def test_reproducer_o_ponto_medio_doa_espaco_para_o_vazio(main_len_cm, t_boneca_cm):
+    """PRE-FIX: sem o alcance, o ponto medio corta o no' de ponta ao meio
+    do vao ate' um vizinho que nao pode usa-lo."""
+    historico, sem_alcance, _com_alcance = _rooms_do_no_de_ponta(
+        main_len_cm, t_boneca_cm)
+    assert sem_alcance < historico - 1e-9, (
+        "esperava o ponto medio encolhendo o no' de ponta: hist=%.2f "
+        "sem_alcance=%.2f" % (historico, sem_alcance))
+
+
+@pytest.mark.parametrize("main_len_cm,t_boneca_cm",
+                         [(146.0, 13.0), (146.0, 20.0), (200.0, 13.0)])
+def test_a_fronteira_para_no_ALCANCE_do_vizinho_nao_no_meio(main_len_cm, t_boneca_cm):
+    """POS-FIX: com o alcance, a fronteira vai ate' o PONTO do vizinho
+    (que alcanca zero) - o no' de ponta recupera o espaco, e continua sem
+    sobreposicao porque o vizinho nao ocupa nada daquele lado."""
+    _historico, sem_alcance, com_alcance = _rooms_do_no_de_ponta(
+        main_len_cm, t_boneca_cm)
+    assert com_alcance > sem_alcance + 1e-9, (
+        "o espaco doado para o vazio tem de voltar: sem=%.2f com=%.2f"
+        % (sem_alcance, com_alcance))
+    # a fronteira e' exatamente o ponto do vizinho (alcance zero), medida
+    # a partir do no' de ponta em t = meia espessura.
+    assert com_alcance == pytest.approx(t_boneca_cm + 7.0 - 7.0, abs=1e-6), (
+        "esperava a fronteira no PONTO do vizinho: %.2fcm" % com_alcance)
+
+
+def test_dois_nos_que_realmente_competem_continuam_no_ponto_medio():
+    """GUARDA do ganho da CR-N1: quando os DOIS nos alcancam alem do
+    meio - o caso dos `POSITION_OVERLAP` -, a fronteira continua sendo o
+    ponto medio, e as duas medicoes concordam."""
+    lines = _plan_two_ts(35.0)
+    walls = [(line, ft(14.0), (False, False)) for line in lines]
+    walls, junction_map = m.extend_wall_ends_to_junctions(
+        walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, end_to_node = m.build_wall_graph(walls, junction_map)
+    openings = dict((i, []) for i in range(len(walls)))
+    ts = sorted(m._wall_junction_ts_ft(walls, nodes, 0))
+    t_a, t_b = ts[0], ts[1]
+
+    forward = m._neighbor_node_boundary_ft(
+        walls, nodes, 0, t_a, 1, openings_per_wall=openings,
+        end_to_node=end_to_node)
+    backward = m._neighbor_node_boundary_ft(
+        walls, nodes, 0, t_b, -1, openings_per_wall=openings,
+        end_to_node=end_to_node)
+    assert forward is not None and backward is not None
+    assert forward == pytest.approx((t_a + t_b) / 2.0), (
+        "os dois T de meio de parede competem de verdade - a fronteira "
+        "tem de continuar no ponto medio")
+    assert forward == pytest.approx(backward), (
+        "as duas medicoes precisam concordar sobre a MESMA fronteira")
+
+
+def test_a_fronteira_nunca_passa_do_que_o_vizinho_ALCANCA():
+    """INVARIANTE de nao-sobreposicao: a fronteira que eu recebo nunca
+    entra no espaco que o vizinho pode ocupar - no maximo os dois se
+    ENCOSTAM em `t_vizinho - alcance(vizinho)`."""
+    walls, nodes, end_to_node, openings = _graph_no_bloqueado()
+    wall_idx = 0
+    ponta = end_to_node[(wall_idx, 0)]
+    t_ponta = next(t for n, t in m._wall_junction_nodes_and_ts_ft(walls, nodes, wall_idx)
+                   if m._node_index_of(nodes, n) == ponta)
+    fronteira = m._neighbor_node_boundary_ft(
+        walls, nodes, wall_idx, t_ponta, 1, exclude_node_index=ponta,
+        openings_per_wall=openings, end_to_node=end_to_node)
+    assert fronteira is not None
+    for node_obj, other_t in m._wall_junction_nodes_and_ts_ft(
+            walls, nodes, wall_idx, exclude_node_index=ponta):
+        other_index = m._node_index_of(nodes, node_obj)
+        if other_index in (end_to_node.get((wall_idx, 0)),
+                           end_to_node.get((wall_idx, 1))):
+            continue
+        reach = m._neighbor_node_reach_ft(walls, openings, nodes, end_to_node,
+                                          wall_idx, other_index, other_t, -1)
+        assert fronteira <= other_t - max(0.0, reach) + 1e-9, (
+            "a fronteira invadiu o alcance do vizinho: %.4f > %.4f"
+            % (fronteira, other_t - reach))
+
+
+def test_sem_openings_e_end_to_node_o_criterio_continua_o_ponto_medio():
+    """Chamador antigo (sem `openings_per_wall`/`end_to_node`) recebe
+    exatamente a fronteira da CR-N1 - a correcao e' aditiva."""
+    walls, nodes, end_to_node, _openings = _graph_no_bloqueado()
+    ponta = end_to_node[(0, 0)]
+    t_ponta = next(t for n, t in m._wall_junction_nodes_and_ts_ft(walls, nodes, 0)
+                   if m._node_index_of(nodes, n) == ponta)
+    ts = sorted(m._wall_junction_ts_ft(walls, nodes, 0))
+    vizinho = min((t for t in ts if t > t_ponta + 1e-6), default=None)
+    assert vizinho is not None
+    antigo = m._neighbor_node_boundary_ft(walls, nodes, 0, t_ponta, 1,
+                                          exclude_node_index=ponta)
+    assert antigo == pytest.approx((t_ponta + vizinho) / 2.0)

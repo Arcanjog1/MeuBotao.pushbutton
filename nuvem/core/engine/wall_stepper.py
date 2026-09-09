@@ -117,6 +117,7 @@ __all__ = [
     "BOND_STRIP_EDGE_EXEMPT_CM", "BOND_STRIP_OPENING_INFLUENCE_CM",
     "MAX_SPECIAL_BOND_PER_TRECHO", "_continuous_segment_layout",
     "NEIGHBOR_NODE_BOND_CLEARANCE_FT", "_neighbor_node_boundary_ft",
+    "_neighbor_node_reach_ft",
     "_node_index_of",
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
@@ -1131,8 +1132,35 @@ def _node_index_of(nodes, node):
     return None
 
 
+def _neighbor_node_reach_ft(walls_to_create, openings_per_wall, nodes, end_to_node,
+                            wall_idx, neighbor_node_index, t_neighbor_ft, toward_sign):
+    """Quanto o no' VIZINHO consegue, no MAXIMO, estender na MINHA direcao
+    (`toward_sign` = o sentido que sai do vizinho e vem para mim).
+
+    E' a MESMA medicao que o proprio vizinho fara' quando for resolvido -
+    `_room_at_t_on_wall` com o `safe_range` DELE - so' que sem a checagem
+    de vizinhos (`nodes=None`), o que corta qualquer recursao e mantem
+    esta funcao um limite SUPERIOR: aberturas, reserva das duas pontas e a
+    ponta fisica ja' entram, a fronteira de vizinho nao.
+
+    Existe porque o ponto medio de `_neighbor_node_boundary_ft` supunha
+    que o vizinho SEMPRE alcanca ate' ele - e nao alcanca. Quando o
+    vizinho ja' esta' bloqueado (a reserva da outra ponta o impede de
+    descer, uma abertura o corta), o meio-a-meio DOA espaco PARA O VAZIO:
+    tira de quem usaria para dar a quem nao pode usar."""
+    safe_range_ft = (
+        _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx,
+                                exclude_node_index=neighbor_node_index)
+        if (nodes is not None and end_to_node is not None) else None
+    )
+    return _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx,
+                              t_neighbor_ft, toward_sign,
+                              safe_range_ft=safe_range_ft)
+
+
 def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
-                               exclude_node_index=None, skip_node_indices=()):
+                               exclude_node_index=None, skip_node_indices=(),
+                               openings_per_wall=None, end_to_node=None):
     """Limite (t em ft) que o no' de encontro VIZINHO mais proximo impoe a
     quem mede espaco a partir de `t_ft` andando em `sign`, ao longo de
     `wall_idx` - ou None quando nenhum vizinho esta' perto o bastante para
@@ -1170,6 +1198,29 @@ def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
     a ninguem, e que bastava para degradar a peca de amarracao e jogar o
     preenchimento no tier dos compensadores.
 
+    `openings_per_wall`/`end_to_node` (CR-N1c, 2026-09-09): quando dados, a
+    fronteira contra cada vizinho para de ser o ponto medio CEGO e passa a
+    ser o mais LONGE entre o ponto medio e o ALCANCE REAL daquele vizinho
+    (`_neighbor_node_reach_ft`). O ponto medio continua valendo quando os
+    dois de fato competem pelo mesmo espaco - o caso dos
+    `POSITION_OVERLAP` da secao 40 -, mas deixa de tirar espaco de quem
+    usaria para dar a um vizinho que NAO PODE ALCANCAR ali.
+
+    Continua sem sobreposicao por construcao: `p` vai no maximo ate'
+    `t_q - alcance(q)`, e `q` ocupa no maximo `[t_q - alcance(q), t_q]` -
+    os dois no maximo se ENCOSTAM nessa divisa. E continua SIMETRICO: se
+    os dois alcancam alem do meio, os dois caem no ponto medio e
+    concordam sem segunda passada.
+
+    BUG REAL MEDIDO (2026-09-09, TGD): parede
+    `W|-140.5,470.0|5.5,470.0|t14.0`, no' 142 (`T_INTERSECTION`, t=1,00cm)
+    e no' 185 (`L_CORNER`, t=7,00cm) a 6,0cm um do outro. O alcance do
+    no' 185 na direcao do 142 e' ZERO (a reserva da outra ponta poe o
+    `safe_range` dele em lo=34,00cm), mas o ponto medio (t=4,00cm) tirava
+    2cm do no' 142 assim mesmo: room 5,00 -> 3,00cm. Com 5,00cm cabia o
+    `C04` que amarrava o encontro; com 3,00cm nao cabe NADA, e o T ficava
+    SEM NENHUMA PECA nas 17 fiadas (`JUNCTION_MISSING_BINDING` 23 -> 40).
+
     `nodes` ausente (chamador antigo) devolve None - sem essa checagem,
     comportamento historico."""
     if not nodes:
@@ -1179,16 +1230,26 @@ def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
     skip = set(i for i in (skip_node_indices or ()) if i is not None)
     for other_node, other_t in _wall_junction_nodes_and_ts_ft(
             walls_to_create, nodes, wall_idx, exclude_node_index=exclude_node_index):
-        if skip and _node_index_of(nodes, other_node) in skip:
+        other_index = _node_index_of(nodes, other_node)
+        if skip and other_index in skip:
             continue
         gap = (other_t - t_ft) * direction
         if gap <= 1e-6 or gap >= NEIGHBOR_NODE_BOND_CLEARANCE_FT:
             # Atras (ou em cima) do proprio ponto, ou longe o bastante para
             # os dois caberem inteiros - nada a limitar nos dois casos.
             continue
-        mid = t_ft + direction * (gap / 2.0)
-        if boundary is None or (mid - t_ft) * direction < (boundary - t_ft) * direction:
-            boundary = mid
+        limit = t_ft + direction * (gap / 2.0)
+        if openings_per_wall is not None and end_to_node is not None:
+            reach = _neighbor_node_reach_ft(
+                walls_to_create, openings_per_wall, nodes, end_to_node,
+                wall_idx, other_index, other_t, -sign)
+            reachable = other_t - direction * max(0.0, reach)
+            # O mais LONGE dos dois na minha direcao: o ponto medio so'
+            # vale enquanto o vizinho realmente alcanca alem dele.
+            if (reachable - t_ft) * direction > (limit - t_ft) * direction:
+                limit = reachable
+        if boundary is None or (limit - t_ft) * direction < (boundary - t_ft) * direction:
+            boundary = limit
     return boundary
 
 
@@ -1235,7 +1296,8 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     neighbor_boundary = _neighbor_node_boundary_ft(
         walls_to_create, nodes, wall_idx, t_ft, sign,
         exclude_node_index=exclude_node_index,
-        skip_node_indices=skip_node_indices)
+        skip_node_indices=skip_node_indices,
+        openings_per_wall=openings_per_wall, end_to_node=end_to_node)
     if sign >= 0:
         boundary = hi_ft
         for (t_lo, _t_hi, _s, _h) in openings_here:

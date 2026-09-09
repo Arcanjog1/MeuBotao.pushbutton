@@ -6610,3 +6610,101 @@ grosseiro — pior que a sobreposição que a CR-N1 consertou.
 números na mesa**, ao lado do ganho `POSITION_OVERLAP` 6→0 / 2→0. Ambos
 apontam para o mesmo lugar da 43.5: a fronteira entre nós vizinhos é
 simétrica demais, e no limite deixa os **dois** lados sem solução.
+
+---
+
+## 44. `CR-N1c` — a fronteira entre nós vizinhos para no ALCANCE do
+vizinho, não no ponto médio cego (2026-09-09, **REGRA OBRIGATÓRIA —
+implementada e medida**)
+
+> Fecha as duas regressões críticas registradas na seção 43.6 (a primeira
+> por correção real, a segunda por prova de que não era regressão nova).
+
+### 44.1 O defeito
+
+O ponto médio da seção 40 supõe que o nó vizinho **sempre alcança até
+ele**. Não alcança. Quando o vizinho já está bloqueado — a reserva da
+outra ponta o impede de descer, uma abertura o corta — o meio-a-meio
+**tira de quem usaria para dar a quem não pode usar**.
+
+Medido no TGD, parede `W|-140.5,470.0|5.5,470.0|t14.0`:
+
+| | |
+|---|---|
+| nó 142 `T_INTERSECTION` | t = 1,00cm (ponta) |
+| nó 185 `L_CORNER` | t = 7,00cm (**meio de parede**) |
+| alcance do nó 185 na direção do 142 | **0,00cm** (o `safe_range` dele começa em 34,00cm) |
+| fronteira do ponto médio | t = 4,00cm |
+| room do nó 142 | 5,00cm → **3,00cm** |
+
+Com 5,00cm cabia o `C04` que amarrava o encontro; com 3,00cm **não cabe
+nada**. O encontro T ficava **sem nenhuma peça** nas 17 fiadas, e a parede
+perdia 17 blocos (58 → 41). `JUNCTION_MISSING_BINDING` 23 → 40.
+
+**REGRA OBRIGATÓRIA**: nenhuma reserva pode ser cobrada em favor de um nó
+que comprovadamente não alcança aquele espaço. Reserva é para quem vai
+ocupar; espaço reservado para o vazio é espaço perdido.
+
+### 44.2 A correção
+
+`_neighbor_node_reach_ft` mede quanto o vizinho pode, no máximo, estender
+na minha direção — é a **mesma** `_room_at_t_on_wall` que ele próprio usará
+(com o `safe_range` dele), só que sem a checagem de vizinhos (`nodes=None`),
+o que corta a recursão e a torna um **limite superior**.
+
+A fronteira passa a ser **o mais longe entre o ponto médio e
+`t_vizinho − alcance(vizinho)`**.
+
+- **Sem sobreposição por construção**: `p` vai no máximo até
+  `t_q − alcance(q)`, e `q` ocupa no máximo `[t_q − alcance(q), t_q]` —
+  os dois no máximo se **encostam** nessa divisa.
+- **Continua simétrico**: quando os dois alcançam além do meio (o caso dos
+  `POSITION_OVERLAP`), os dois caem no ponto médio e concordam sem segunda
+  passada.
+- **Aditivo**: chamador sem `openings_per_wall`/`end_to_node` recebe
+  exatamente a fronteira da seção 40.
+
+### 44.3 Medido, por identidade física
+
+| | base | CR-N1 | CR-N1b | **CR-N1c** |
+|---|---|---|---|---|
+| **TGD total** | 798 | 783 | 801 | **780** |
+| TGD `JUNCTION_MISSING_BINDING` | 3 | 4 | 4 | **3** |
+| TGD `COMPENSATOR_EXCESS_IN_RUN` | 70 | 85 | 82 | **70** |
+| TGD `COMPENSATOR_CONSECUTIVE` | 101 | 101 | 108 | **97** |
+| TGD `COMPENSATOR_VERTICAL_STRIP` | 79 | 109 | 102 | **88** |
+| **TP1 total** | 862 | 862 | 867 | **861** |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | **0/0** | **0/0** | **0/0** |
+
+Contra a base, a CR-N1c tem **17 identidades novas no TGD e 1 no TP1** —
+e **nenhuma das 17 é crítica** (todas da família compensador/prisma, nas
+paredes da pendência 43.5). A única do TP1 é a reclassificação da 44.4.
+
+**Custo honesto**: `PRISM_CONTINUOUS_JOINT` e `PRISM_JOINT_STACK` voltam
+ao nível da base (21/20 no TGD, 18/16 no TP1). O ganho que a CR-N1 mostrava
+nesses dois códigos era efeito colateral da amarração degradada — peça
+pequena desencontra junta com facilidade. Amarração vem antes.
+
+### 44.4 A segunda "regressão" da 43.6 NÃO era regressão nova — provado
+
+`OPENING_BLOCK_INSIDE_DOOR` no TP1 (0 → 7) é a **mesma peça física**
+reclassificada, não um bloco novo no vão. Medido em W019
+(`W|8017.3,548.0|8017.3,1927.0|t14.0`), vão da porta `t = 564..750`:
+
+| | base | CR-N1 / N1c |
+|---|---|---|
+| peça do nó em t≈742, fiada 0 | `B54[715, 769]` `T_INTERSECTION_MAIN` | `B34[715, 749]` `T_INTERSECTION_DEGRADED_L` |
+| `OPENING_BLOCK_CROSSES_JAMB` em W019 | **14** | **7** |
+| `OPENING_BLOCK_INSIDE_DOOR` em W019 | 0 | **7** |
+| **soma OPENING_\* em W019** | **14** | **14** |
+| `OPENING_BLOCK_CROSSES_JAMB` no TP1 | 168 | 161 (**−7**) |
+
+Mesmo `t` inicial (715), mesma identidade física, mesma fiada. Ao degradar
+`B54`→`B34` a peça encolheu 20cm e **deixou de cruzar a jamba** (750),
+passando a ficar **inteiramente** dentro do vão — o validador trocou o
+código. A soma é constante: 7 saíram de um, 7 entraram no outro.
+
+**A causa-raiz é anterior a tudo isto**: existe um `T_INTERSECTION` cujo
+ponto cai **dentro do vão de uma porta** (t≈742 em `564..750`). Qualquer
+peça de amarração daquele nó cai no vão, seja `B54` ou `B34`.
+`DOCUMENTADO — pendência de código aberta` (seção 45).
