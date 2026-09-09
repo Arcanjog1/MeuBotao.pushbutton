@@ -1,8 +1,10 @@
 # Preparacao do beta Revit: relatorio tecnico
 
 Data: 2026-09-09. **NO-GO para lancamento desta cadeia e merge #31.**
-Consolidada concluida na secao 14. A missao continua com uma alternativa
-separada sobre a main, sem N1; ainda depende de sua propria consolidada.
+Consolidada concluida na secao 14. A missao chegou a GO RESTRITO em uma
+alternativa separada da main, SEM N1, no [PR #34](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34).
+Isso NAO libera a cadeia #31. O ensaio34 e bancada uniforme340cm75/81,
+nao as Walls nativas260/280cm nem TP1/TGD completos.
 
 ## 1. Estado inicial reconstruido
 
@@ -175,7 +177,9 @@ ZERO achados, inclusive com referencia oficial e auditorias brutas.
 Isso nao elimina as regressoes globais desta cadeia. Motivou uma candidata
 SEPARADA da main, sem N1, em `codex/beta-main-safe-20260909`, codigo
 `8cdd33f974f41a9bf41010a32f82762740b31ed3`, com as mesmas protecoes e motor
-geometrico oficial. Ela precisa de regressao propria; nao e merge do #31.
+geometrico oficial. Sua consolidada terminou:1027 passed/2 falhas antigas
+da main em3021.98s. GO restrito ao ensaio de criacao/recriacao de187 blocos,
+sem Finalizar referencias. Nao e merge do #31 nem aceite construtivo.
 
 ## 11. Amarracao e juntas
 
@@ -340,7 +344,7 @@ que dele decorrerem. As provas locais nao demonstram impossibilidade de
 todo solver global, mas nao fornecem autoridade para escolher outra
 geometria, fase normativa ou composicao proibida. O #31 permanece bloqueado.
 Essas decisoes NAO sao necessariamente bloqueadoras de um primeiro beta
-limitado sobre a main: a alternativa75/81 esta sendo verificada separadamente.
+limitado sobre a main: a alternativa75/81 foi verificada separadamente no34.
 
 ## 19. SHA exato da versao candidata
 
@@ -368,4 +372,6 @@ Gate6 foi executado com duas falhas classificadas; gate7 tem SHA fixado. Procedi
 esta no [runbook condicionado](BETA_REVIT_RUNBOOK.md), nao e ordem para iniciar.
 Nao trocar o veredito por score, maioria verde, ausencia de POSITION_OVERLAP
 ou permissao generica. A alternativa main-safe nao transporta N1: seu
-veredito sera registrado em sua propria branch/PR apos a consolidada.
+[veredito restrito e procedimento](https://github.com/Arcanjog1/MeuBotao.pushbutton/blob/8a93a27/docs/BETA_MAIN_SAFE_2026-09-09.md)
+estao no34. Codigo8cdd33f974f41a9bf41010a32f82762740b31ed3, bancada
+de engenharia75/81 com altura uniforme340cm. Nenhum Revit iniciado.

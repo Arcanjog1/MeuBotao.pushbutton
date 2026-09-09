@@ -102,12 +102,16 @@ escolher nova unidade fisica/geometria nao foi autorizado. Aritmetica a
 fronteiras fixas confirma conflitos entre tetos de compensadores/especiais.
 Ultimo CI publicado conferido:64532c4, dois checks documentais verdes.
 
-Alternativa separada em verificacao: `codex/beta-main-safe-20260909`,
+Alternativa separada com GO RESTRITO: [PR #34 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34),
+branch `codex/beta-main-safe-20260909`,
 codigo8cdd33f974f41a9bf41010a32f82762740b31ed3, baseaa58d70 e motor
 geometrico identico a main, SEM N1. Recorte TP1 fonte75/81:187 blocos,
 um L, duas pontas livres, nenhuma abertura, zero achados com referencia.
-Nao e aprovacao do #31 ou do projeto inteiro. Consolidada propria em
-andamento; GO ainda nao declarado. A missao continua nessa alternativa.
+Nao e aprovacao do #31 ou do projeto inteiro. Consolidada propria:
+1027 passed/2 falhas antigas da main em3021.98s. Ensaio de bancada
+uniforme340cm, NAO substituicao das Walls nativas260/280cm; somente
+criacao/recriacao, sem Finalizar referencias. Pacote fixo verificado e
+runbook no34. A missao alcancou essa fronteira de beta sem iniciar Revit.
 
 Os PRs #7/#8 tambem carregam diferencas de producao em
 `wall_pairing.py`/`wall_stepper.py` desde o merge-base, apesar do escopo
@@ -172,8 +176,9 @@ finais de identidades. O
 **Aberturas:** o T sem peca tem correcao candidata N1c e testes focados;
 a invasao de porta continua aberta. O #31 relata que B54 atravessando a
 jamba virou B34 dentro da porta, reclassificando a mesma situacao. Isso
-nao autoriza sua geometria. A equivalencia peca a peca entre arvores
-continua dependente dos artefatos ausentes, nao apenas da soma de codigos.
+nao autoriza sua geometria. Censos por fiada/Z e propriedade recuperados
+nas etapas beta:500 invasoes espaciais TP1 tanto na main quanto N1f,
+incluindo88 OPENING_REPAIR_FILL de outra parede. Provas no relatorio beta.
 
 **Paredes vazias:** 197,943cm continua sem blocos nos testes de
 caracterizacao. A parede real de 99,754cm envolve reservas de ponta e
@@ -185,9 +190,9 @@ candidato; nao alteram topologia ou comprimento para obter preenchimento.
 **Desempenho relatado**, no mesmo ambiente historico TGD: base 99,3s/22
 rebuilds; N1 47,8s/7; N1b 65,0s/10; N1c+e 176,4s/22; N1f 127,0s/22.
 127s melhora N1c+e, mas fica cerca de 28% acima da base. Nao sao tempos
-medidos no Revit. A prova bit-a-bit global do cache nao esta disponivel;
-os nove testes locais de contrato passaram. Ordem de `arms` e mutada
-no solver, embora o conjunto consultado pelo cache seja preservado.
+medidos no Revit. Censos TGD/TP1 posteriores sem acerto de cache
+reproduziram exatamente candidatos e resultados fisicos N1f; evidencias
+versionadas nesta branch. Isso nao prova invariancia global de permutacao.
 
 Continuam como dividas: juntas cross-band residuais, compensadores,
 limites de catalogo (canaletas/cortados/vergas), C04 C3/C4, arestas ARM,
@@ -213,17 +218,17 @@ estabilizados sem contraexemplo.
 ## Beta e proximo passo
 
 **Nao liberar a colocacao automatica do candidato inteiro no Revit agora.**
-Prioridade da missao iniciada apos a auditoria: explicar por identidade
-as colisoes TGD 1160 -> 1197; distinguir agregado de bandas/variantes de
-fiadas realmente criadas; verificar OBB nas cotas ativas das portas;
-implementar contencao explicita e revisar paredes vazias. Nao aplicar a
-candidata de zerar room dentro da abertura, rejeitada na secao 47 do #31.
-Ancoragem na jamba nao esta aprovada nem provada como correcao suficiente.
-Depois das correcoes tecnicas: regressao final e recorte pequeno verificado.
+As etapas1-4 concluiram censos, contencoes, hipoteses e consolidada09b6ea0,
+1112 passed/2 failed. +37 agregado=+132/-95 nos pares que aumentam/zeram;
++58 fisico=+156/-98, com322 pares-pecas-fiadas novos e264 removidos.
+Novas regioes reais permanecem:31 nao integrar. A alternativa34 nasce
+diretamente da main e NAO transporta N1; possui GO restrito de bancada,
+com evidencias e limites no seu relatorio, nao aprovacao desta cadeia.
 
 O checkpoint do #31 relata OBB TP1 2094/2094 e TGD 1074/1038, com 68%
-do TP1 em STANDARD_FILL. Sao relatos a conferir no escopo de fiadas e
-aberturas passado ao instrumento, nao certificacao de 2094 volumes 3D.
+do TP1 em STANDARD_FILL. Esses relatos foram reconciliados:2094 mistura
+bandas/fiadas/alturas;412 e restrito a propriedade;500 e espacial ativo.
+O percentual68% nao caracteriza essas invasoes fisicas ativas.
 O caso B34 em W019 permanece invasao real conhecida, nao eliminado pela
 reclassificacao de OPENING_BLOCK_*. Contencao nao autoriza mudar benchmark.
 Usuario autorizou #31 somente ao final e apos TODOS os gates tecnicos;
