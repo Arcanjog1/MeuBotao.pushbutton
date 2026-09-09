@@ -656,6 +656,71 @@ idêntica: o solver trabalha sobre os eixos e sobre `openings_per_wall`,
 nunca sobre os elementos `Wall` (fingerprint de `tests/solver_bench.py`
 inalterado).
 
+## 8d. REGRA OBRIGATÓRIA — faixa vertical exige fiadas ADJACENTES
+(2026-09-09)
+
+> **Origem**: falso positivo REAL do primeiro beta controlado no Revit,
+> confirmado visualmente pelo usuário e **medido ao vivo via MCP** nos
+> blocos efetivamente criados. Confiança: REGRA OBRIGATÓRIA.
+
+`REPEATED_VERTICAL_COMPENSATOR_STRIP` só é defeito quando as peças
+especiais (B34/B54/compensadores) estão empilhadas em fiadas
+**ADJACENTES** — uma diretamente sobre a outra. Repetição apenas em
+fiadas da **mesma paridade** (0,2,4,… ou 1,3,5,…) **não é faixa
+vertical**: a fiada intermediária, de paridade oposta, quebra a coluna, e
+isso é exatamente como a amarração alternada funciona.
+
+**Por que era falso positivo (a mesma causa-raiz do
+`ALTERNATING_JOINT_PATTERN`, seção equivalente em `wall_modeling.py`)**:
+`solve_building_blocks_all_courses` resolve **um** par de fiadas A/B e o
+repete em toda fiada par (A) e toda fiada ímpar (B). Logo, qualquer peça
+especial da fiada A aparece, **por construção**, em 100% das fiadas pares.
+Contar "9 fiadas de 17" como faixa mede o próprio padrão de amarração,
+não um defeito.
+
+**Medição que provou o caso** (parede curta de 69 cm, eixo `t` de 0 a 69,
+17 fiadas, blocos reais lidos do Revit):
+
+| Fiada | Composição medida |
+|---|---|
+| par (A) | `B19[t 0..19]` + `B34[t 20..54]` |
+| ímpar (B) | `B34[t 0..34]` + `B34[t 35..69]` |
+
+- juntas: par em `t≈19,5`; ímpar em `t≈34,5` → **defasagem de 15 cm**
+  entre fiadas adjacentes;
+- no `t≈37` do cluster existe peça especial nas **duas** paridades — mas o
+  **centro** do B34 ímpar cai em `t=52`, dentro de
+  `BOND_STRIP_EDGE_EXEMPT_CM = 25`, e por isso só as pares entravam no
+  cluster;
+- nenhuma junta corrida, nenhuma quebra de prisma, sobreposição
+  horizontal legítima.
+
+Na parede longa (354 cm), o mesmo padrão: `B34[1910,7..1944,7]` em toda
+fiada par, e na fiada ímpar um `B39[1925,7..1964,7]` **cobrindo** a junta
+do B34 — defasagem de 20 cm, sobreposição de 19,05 cm.
+
+**Encontro em L medido e confirmado correto**: fiadas pares a parede
+LONGA vira o canto com B34; fiadas ímpares a parede CURTA vira o canto com
+B34 (rot 4,7124). Alternância clássica de L, exatamente como a seção 10
+exige.
+
+### Implementação
+
+`_longest_adjacent_course_run(courses)` em `core/wall_modeling.py` e a
+constante `BOND_STRIP_MIN_ADJACENT_COURSES = 2`. O detector continua
+exigindo `BOND_STRIP_MIN_COURSES`/`BOND_STRIP_RATIO` como antes, e passa a
+exigir **também** uma corrida de fiadas consecutivas ≥ 2.
+
+**O auditor NÃO foi silenciado**: o padrão de mesma paridade continua
+sendo enxergado e reportado, agora em `alternating_strips` — dado de
+diagnóstico, sem penalidade, mesmo tratamento já dado a
+`alternating_joints`. Nenhum threshold foi afrouxado, nenhum detector
+removido.
+
+Testes: `tests/test_bond_strip_adjacent_courses.py` (controle negativo com
+a bancada real do beta; controles positivos com empilhamento adjacente de
+17 fiadas e de 2 fiadas).
+
 ## 9. Testes automatizados
 
 `tests/run_tests.py` (`py -3 tests/run_tests.py`, a partir da raiz do

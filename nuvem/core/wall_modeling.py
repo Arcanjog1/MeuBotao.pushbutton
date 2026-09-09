@@ -3859,6 +3859,31 @@ PIER_LAYOUT_VARIANTS_PER_COURSE = 1
 BOND_STRIP_CLUSTER_TOLERANCE_CM = 6.0
 BOND_STRIP_MIN_COURSES = 3
 BOND_STRIP_RATIO = 0.5
+# FALSO POSITIVO REAL corrigido (2026-09-09, primeiro beta no Revit, medido
+# ao vivo via MCP na bancada de 2 paredes / 1 encontro em L):
+# REPEATED_VERTICAL_COMPENSATOR_STRIP reprovava a parede curta (69cm) por
+# "B34 repetido nas fiadas 0,2,4,6,8,10,12,14,16" - TODAS pares, nenhuma
+# impar. Isso nao e' uma faixa vertical: e' exatamente o padrao A/B.
+#
+# Mesma causa-raiz ja' documentada logo acima para ALTERNATING_JOINT_PATTERN:
+# `solve_building_blocks_all_courses` resolve UM par de fiadas A/B e repete
+# esse par em TODA fiada par (A) e TODA fiada impar (B). Entao qualquer peca
+# especial da fiada A aparece, POR CONSTRUCAO, em 100% das fiadas pares.
+# Contar "9 fiadas de 17" como faixa vertical mede o proprio padrao de
+# amarracao alternada, nao um defeito.
+#
+# Medicao que provou o caso (blocos reais criados no Revit, parede curta,
+# eixo t de 0 a 69cm): fiada PAR = B19[t 0..19] + B34[t 20..54]; fiada IMPAR
+# = B34[t 0..34] + B34[t 35..69]. No X do cluster (t~37) existe peca especial
+# nas DUAS paridades - mas o CENTRO do B34 impar cai em t=52, dentro da zona
+# isenta de borda, e por isso so' as pares entravam no cluster. As juntas
+# ficam defasadas 15cm entre fiadas adjacentes e nao ha' junta corrida.
+#
+# Uma faixa vertical REAL exige pecas especiais empilhadas em fiadas
+# ADJACENTES (uma diretamente sobre a outra). Repeticao so' na mesma
+# paridade tem, por definicao, a fiada intermediaria quebrando a junta -
+# que e' o funcionamento correto da amarracao, nao a falha.
+BOND_STRIP_MIN_ADJACENT_COURSES = 2
 # Zona de excecao local (regra #15/#20): perto da ponta da parede ou de
 # uma abertura, peca especial repetida NAO e' um defeito - e' a funcao
 # normal dela. BOND_STRIP_EDGE_EXEMPT_CM/BOND_STRIP_OPENING_INFLUENCE_CM
@@ -4010,6 +4035,25 @@ def _wall_course_candidates(wall_idx, course_candidates, num_courses, index=None
     return by_course
 
 
+def _longest_adjacent_course_run(courses):
+    """Maior sequencia de fiadas CONSECUTIVAS dentro de `courses` (lista de
+    indices de fiada, ordenada e sem repeticao).
+
+    E' o discriminador entre uma faixa vertical de verdade e o padrao A/B:
+    pecas empilhadas em fiadas adjacentes dao uma corrida >= 2; repeticao
+    so' nas pares (0,2,4,...) ou so' nas impares da sempre 1, porque a
+    fiada intermediaria - de paridade oposta - quebra a coluna.
+    Ver BOND_STRIP_MIN_ADJACENT_COURSES."""
+    if not courses:
+        return 0
+    melhor = corrida = 1
+    for anterior, atual in zip(courses, courses[1:]):
+        corrida = corrida + 1 if atual == anterior + 1 else 1
+        if corrida > melhor:
+            melhor = corrida
+    return melhor
+
+
 def _is_special_block_code(code, catalog):
     """B34/B54/B19 (is_special_bond) e C09/C04 (is_compensator) - as pecas
     que NAO podem virar uma faixa vertical repetitiva (regra #3/#5/#6/#20).
@@ -4102,10 +4146,18 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
     """Validacao MULTI-FIADA de UMA parede - ver cabecalho da secao acima.
     Devolve {"ok": bool, "problems": [str,...], "penalty": float,
     "continuous_joints": [...], "alternating_joints": [...],
-    "compensator_strips": [...], "half_blocks_near_ties": [...]}."""
+    "compensator_strips": [...], "alternating_strips": [...],
+    "half_blocks_near_ties": [...]}.
+
+    `compensator_strips` so' contem faixas VERTICAIS de verdade (pecas
+    especiais empilhadas em fiadas ADJACENTES - ver
+    BOND_STRIP_MIN_ADJACENT_COURSES). Peca especial repetida apenas na
+    mesma paridade (o padrao A/B normal) sai em `alternating_strips`, como
+    dado de diagnostico: continua visivel, mas nao e' defeito e nao
+    penaliza."""
     empty = {"ok": True, "problems": [], "penalty": 0.0,
              "continuous_joints": [], "alternating_joints": [], "compensator_strips": [],
-             "half_blocks_near_ties": []}
+             "alternating_strips": [], "half_blocks_near_ties": []}
     if num_courses < BOND_ALTERNATING_JOINT_MIN_COURSES:
         return empty
 
@@ -4204,6 +4256,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                         break
 
     continuous_joints, alternating_joints, strips, half_blocks_near_ties = [], [], [], []
+    alternating_strips = []  # pecas especiais repetidas SO' na mesma paridade
 
     total_evens = sum(1 for ci in range(num_courses) if ci % 2 == 0) or 1
     total_odds = sum(1 for ci in range(num_courses) if ci % 2 == 1) or 1
@@ -4227,7 +4280,18 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         courses = sorted(set(e[0] for e in entries))
         if len(courses) >= BOND_STRIP_MIN_COURSES and len(courses) / float(num_courses) >= BOND_STRIP_RATIO:
             codes = sorted(set(e[1] for e in entries))
-            strips.append({"x_cm": cluster["center"], "courses": courses, "codes": codes})
+            corrida = _longest_adjacent_course_run(courses)
+            registro = {"x_cm": cluster["center"], "courses": courses, "codes": codes,
+                        "adjacent_run": corrida}
+            if corrida >= BOND_STRIP_MIN_ADJACENT_COURSES:
+                strips.append(registro)
+            else:
+                # NAO e' faixa vertical: a fiada intermediaria (paridade
+                # oposta) quebra a coluna. Guardado como DADO de diagnostico
+                # - o auditor continua enxergando o padrao e reportando-o,
+                # so' nao o trata mais como defeito nem penaliza. Mesmo
+                # tratamento ja' dado a `alternating_joints`.
+                alternating_strips.append(registro)
 
     # regra #2 (rede de seguranca): QUALQUER ocorrencia conta - nunca exige
     # repeticao em varias fiadas como as demais checagens acima (aquelas
@@ -4307,6 +4371,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         "continuous_joints": continuous_joints,
         "alternating_joints": alternating_joints,
         "compensator_strips": strips,
+        "alternating_strips": alternating_strips,
         "half_blocks_near_ties": half_blocks_near_ties,
     }
 
