@@ -1,0 +1,23 @@
+{
+  "started_utc": "2026-09-09T14:37:07.436077+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\auditoria-meubotao-20260909",
+  "head": "65ab605212da8d9aa98b25d6bd1b6c5c2c07a665",
+  "tree": "33d72cf3c01f47bf67e34f7e196b6868fe5d7044",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_script.py",
+    "-q"
+  ],
+  "timeout_seconds": 1200,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-09-pr32-premerge-tests.txt",
+  "pid": 18292,
+  "exit_code": 0,
+  "elapsed_seconds": 78.625,
+  "status_after": "?? docs/checkpoints/evidence/2026-09-09-pr32-premerge-tests.json\n?? docs/checkpoints/evidence/2026-09-09-pr32-premerge-tests.txt",
+  "log_sha256": "9b024804f4976e6e8238c141b46938ae59b83762fca4006d7c00c41f0c2c7b34"
+}
