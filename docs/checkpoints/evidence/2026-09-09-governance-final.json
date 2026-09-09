@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-09T13:36:52.268161+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\auditoria-meubotao-20260909",
+  "head": "78e8d5f39e966d1e7c2b597ad977652e6e35194e",
+  "tree": "c31fc12421d3fe76b2be4219bd870d2be6aab41f",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/documentation",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-09-governance-final.txt",
+  "pid": 13768,
+  "exit_code": 0,
+  "elapsed_seconds": 8.703,
+  "status_after": "?? docs/checkpoints/evidence/2026-09-09-governance-final.json\n?? docs/checkpoints/evidence/2026-09-09-governance-final.txt",
+  "log_sha256": "36b92580b86315bf8faff3c324855e7617be8f086d3210f1b25dbc21bc6ed501"
+}

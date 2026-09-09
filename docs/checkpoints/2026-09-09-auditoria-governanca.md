@@ -4,7 +4,7 @@
 {
   "date": "2026-09-09",
   "branch": "codex/auditoria-governanca-beta-20260909",
-  "head": "2929bf5d465fc2598302cf7fbd9f8107ae6b9b06",
+  "head": "78e8d5f39e966d1e7c2b597ad977652e6e35194e",
   "base": "08495d913e72b36a80b034d5f0a1435470d27557",
   "pr": "not-created",
   "objective": "Auditar main e candidatos, reconciliar fatos e implementar governanca documental de baixo risco para preparar beta controlado.",
@@ -18,6 +18,7 @@
     "Candidato 439fd49391227e128038fec704833c66c6ce3ffa: 185 passed nos sete arquivos focados; log e proveniencia em evidence/2026-09-09-candidate-focused.*.",
     "Mesmo candidato: 2 failed, 1 passed, 6 deselected na selecao de baseline; 354.47s. Log integral em evidence/2026-09-09-candidate-baselines.*.",
     "python -m unittest discover -s tools/documentation -p test_*.py -v: 11 casos validos/invalidos passaram em 2929bf5; log/proveniencia em evidence/2026-09-09-governance-tests.*.",
+    "Validacao final apos guarda de hash: 12 testes passaram em 78e8d5f, incluindo rejeicao de log alterado; evidence/2026-09-09-governance-final.*.",
     "Probe estatico: chaves fisicas unicas nos insumos e room positivo dentro do vao confirmado, sem gerar novo benchmark."
   ],
   "known_failures": [
@@ -56,6 +57,8 @@
     {"path": "docs/checkpoints/evidence/2026-09-09-github-final.json"},
     {"path": "docs/checkpoints/evidence/2026-09-09-governance-tests.json"},
     {"path": "docs/checkpoints/evidence/2026-09-09-governance-tests.txt"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-governance-final.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-governance-final.txt"},
     {"path": "docs/BENCH_N1C_N1E_2026-09-09.md", "commit": "420dbcc753bd310a5af999be609584bae40d0c54"},
     {"path": "docs/CR_B_INTEGRATION_PREPARATION.md", "commit": "0596e78eadcbebd9369dbd54272b44952b8211ed"}
   ]

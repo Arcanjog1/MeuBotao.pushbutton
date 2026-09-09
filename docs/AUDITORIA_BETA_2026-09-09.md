@@ -301,6 +301,14 @@ do usuario; nao houve merge, force-push ou alteracao de protecao.
 
 ## 9. Entrega e limites finais
 
+Infraestrutura final: **12 testes passaram** em `78e8d5f`, inclusive casos
+validos e rejeicao de checkpoint ignorado, campo ausente, SHA invalido,
+referencia/link quebrado, main desatualizada, candidato classificado como
+oficial e log adulterado. [Log final](checkpoints/evidence/2026-09-09-governance-final.txt)
+e [proveniencia](checkpoints/evidence/2026-09-09-governance-final.json).
+Validacao da propria entrega passou. Logs brutos tem `-text` em
+`.gitattributes` para preservar bytes/hashes entre Windows e Linux.
+
 Branch, PR, HEAD avaliado e testes da infraestrutura ficam no
 [checkpoint de entrega](checkpoints/2026-09-09-auditoria-governanca.md).
 Producao inalterada; regras/gabaritos/baselines intocados; alteracoes locais
