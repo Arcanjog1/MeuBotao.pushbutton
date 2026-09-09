@@ -1703,3 +1703,17 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+### 2026-09-09 - Candidato beta main-safe, sem N1
+
+#32 integrado emaa58d70 apos autorizacao/revisao. #31 ficou NO-GO apos
+1112 passed/2 failed e provas de novas colisoes TGD; seus logs/provas
+permanecem no commit73cbf08. Esta alternativa sai diretamente da main,
+codigo8cdd33f, transportando somente protecoes beta e testes relacionados.
+Recorte fonte75/81 passa offline com187 blocos e zero achados; bancada
+explicita340cm uniforme, nao substituicao das Walls nativas260/280cm.
+Consolidada propria concluida:1027 passed/2 falhas antigas,3021.98s.
+GO tecnico restrito ao ensaio descrito, sem Finalizar/excluir referencias.
+[Checkpoint](checkpoints/2026-09-09-beta-main-safe.md),
+[relatorio](BETA_MAIN_SAFE_2026-09-09.md) e [runbook](BETA_MAIN_SAFE_RUNBOOK.md).
+Nenhum Revit iniciado ou outro merge executado.

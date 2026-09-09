@@ -10,6 +10,11 @@ versionado em `docs/checkpoints/`. Regras de recuperacao, publicacao e
 validacao: [DEVELOPMENT_PROCESS.md](DEVELOPMENT_PROCESS.md).
 Um relatorio em outra branch nao e codigo integrado; ler a revisao indicada.
 
+Missao beta atual: [relatorio main-safe](BETA_MAIN_SAFE_2026-09-09.md),
+[checkpoint](checkpoints/2026-09-09-beta-main-safe.md) e
+[procedimento](BETA_MAIN_SAFE_RUNBOOK.md). Candidato separado da main,
+SEM N1; nao confundir com o #31 bloqueado. Revit nao iniciado.
+
 ---
 
 ## SOLVER DE BLOCOS (modulação / amarração)

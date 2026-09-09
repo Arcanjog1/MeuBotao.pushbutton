@@ -1,0 +1,3 @@
+{"courses": 13, "node_kinds": ["FREE_END", "L_CORNER", "FREE_END"], "physical_blocks": 143} {} True
+{"courses": 14, "node_kinds": ["FREE_END", "L_CORNER", "FREE_END"], "physical_blocks": 154} {} True
+{"courses": 17, "node_kinds": ["FREE_END", "L_CORNER", "FREE_END"], "physical_blocks": 187} {} True

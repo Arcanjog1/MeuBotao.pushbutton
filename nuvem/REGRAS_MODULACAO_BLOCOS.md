@@ -6141,3 +6141,19 @@ fallback para main variavel; verificacao offline nao certifica API/familias.
 audits de amarracao passam. Selecionar paredes muda a topologia de fronteira:
 isso NAO aprova o mesmo canto no grafo completo, outros recortes, T/X,
 aberturas ou o PR #31. Exige nova validacao se geometria/escopo mudar.
+
+**LIMITACAO MEDIDA DA ENTRADA VERTICAL:** as duas paredes fonte75/81
+trazem alturas260/280cm, enquanto settings do benchmark pede17 fiadas.
+O bridge resolve a altura global (340cm), nao respeita separadamente
+esses dois campos nativos. Nao certificar substituicao de paredes de
+alturas heterogeneas por esse resultado. O ensaio main-safe e bancada
+derivada com referencias de altura UNIFORME340cm, declarada no input de
+engenharia separado; nao e autorizacao para alterar alturas do projeto.
+Nao usar Finalizar/excluir referencias nesse primeiro ensaio. Retencao
+de trecho nao modular nao comprova cobertura vertical individual.
+
+**EVIDENCIA OFFLINE:** caminho de extensao das Walls existentes passou
+em13/14/17 fiadas (143/154/187 blocos). Execute_solve real do handler,
+com dubles e bancada uniforme340cm, reproduziu exatamente as paredes,
+blocos e catalogo do probe17, com assinatura atual valida. Nao demonstra
+comportamento de transacoes/familias reais, que depende do beta futuro.

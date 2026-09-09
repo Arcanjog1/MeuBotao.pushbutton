@@ -1,0 +1,99 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 41%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+........................................................................ [ 69%]
+........................................................................ [ 76%]
+........................................................................ [ 83%]
+........................................................................ [ 90%]
+.............................F.......................................... [ 97%]
+..F..................                                                    [100%]
+================================== FAILURES ===================================
+_____ test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tgd] ______
+[gw0] win32 -- Python 3.12.14 C:\Users\CIVIX\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+
+project_id = 'torre_easy_lo_r00_tgd'
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("project_id", PROJECTS)
+    def test_projeto_nao_regrediu_contra_o_baseline(project_id):
+        baseline = _baseline(project_id)
+        if baseline is None:
+            pytest.skip("{0} ainda nao tem baseline.json".format(project_id))
+    
+        outcome = runner.run_project(project_id, write_files=False)
+        delta = scoring.compare_runs(baseline, outcome["score"])
+    
+        assert delta["verdict"] != scoring.STATUS_CRITICAL_REGRESSION, (
+            "REGRESSAO CRITICA em {0}: {1}".format(
+                project_id,
+                [row for row in delta["critical"]
+                 if row["status"] == scoring.STATUS_CRITICAL_REGRESSION])
+        )
+        regressoes = [row for row in delta["categories"]
+                      if row["status"] == scoring.STATUS_REGRESSED]
+>       assert not regressoes, (
+            "REGRESSAO em {0}: {1}".format(project_id, regressoes))
+E       AssertionError: REGRESSAO em torre_easy_lo_r00_tgd: [{'category': 'compensators', 'before': 52, 'after': 61, 'delta': 9, 'status': 'REGRESSAO'}]
+E       assert not [{'category': 'compensators', 'before': 52, 'after': 61, 'delta': 9, ...}]
+
+tests\regression\test_benchmark_baselines.py:58: AssertionError
+_____ test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1] ______
+[gw0] win32 -- Python 3.12.14 C:\Users\CIVIX\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+
+project_id = 'torre_easy_lo_r00_tp1'
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("project_id", PROJECTS)
+    def test_projeto_nao_regrediu_contra_o_baseline(project_id):
+        baseline = _baseline(project_id)
+        if baseline is None:
+            pytest.skip("{0} ainda nao tem baseline.json".format(project_id))
+    
+        outcome = runner.run_project(project_id, write_files=False)
+        delta = scoring.compare_runs(baseline, outcome["score"])
+    
+>       assert delta["verdict"] != scoring.STATUS_CRITICAL_REGRESSION, (
+            "REGRESSAO CRITICA em {0}: {1}".format(
+                project_id,
+                [row for row in delta["critical"]
+                 if row["status"] == scoring.STATUS_CRITICAL_REGRESSION])
+        )
+E       AssertionError: REGRESSAO CRITICA em torre_easy_lo_r00_tp1: [{'code': 'JUNCTION_MISSING_BINDING', 'before': 8, 'after': 9, 'delta': 1, 'status': 'REGRESSAO CRITICA'}]
+E       assert 'REGRESSAO CRITICA' != 'REGRESSAO CRITICA'
+E        +  where 'REGRESSAO CRITICA' = scoring.STATUS_CRITICAL_REGRESSION
+
+tests\regression\test_benchmark_baselines.py:50: AssertionError
+============================ slowest 20 durations =============================
+1140.11s call     tests/test_block_node_fill_revalidation.py::test_t18_candidato_aceito_permanece_seguro_no_corpus
+617.30s call     tests/test_block_b19_residual_fill_implementation.py::test_t52_determinismo_duas_execucoes_separadas
+579.91s call     tests/test_block_arm_role_prism_stagger.py::test_determinismo_w076_w041_duas_rodadas_identicas
+552.81s call     tests/test_block_b19_residual_fill_implementation.py::test_t49_tp1_fingerprint_identico_com_e_sem_b19
+421.87s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_determinismo_da_correcao
+392.95s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_fronteira_de_banda_deixa_de_criar_junta_continua[torre_easy_lo_r00_tp1]
+391.87s call     tests/test_block_arm_role_prism_stagger.py::test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao
+390.94s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t16_execucao_repetida_e_deterministica
+359.99s call     tests/test_block_b19_residual_fill_implementation.py::test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade
+317.83s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+314.89s call     tests/test_block_arm_role_prism_stagger.py::test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado
+305.24s call     tests/test_block_arm_role_prism_stagger.py::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair
+299.46s call     tests/regression/test_benchmark_baselines.py::test_nenhum_validador_quebra_no_projeto[torre_easy_lo_r00_tp1]
+265.17s call     tests/test_block_arm_role_prism_stagger.py::test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada
+263.19s call     tests/regression/test_benchmark_baselines.py::test_o_solver_produz_alguma_coisa[torre_easy_lo_r00_tp1]
+242.05s call     tests/test_block_b19_residual_fill_implementation.py::test_t50_tgd_zero_candidatos_elegiveis_limite_de_escopo_conhecido
+240.68s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tgd]
+180.14s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t1_t9_candidato_seguro_e_aceito_no_tgd_real
+179.27s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_reproducer_pre_fix_tem_junta_continua_na_fronteira_de_banda[torre_easy_lo_r00_tp1]
+165.46s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_fronteira_de_banda_deixa_de_criar_junta_continua[torre_easy_lo_r00_tgd]
+=========================== short test summary info ===========================
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tgd]
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+2 failed, 1027 passed in 3021.98s (0:50:21)

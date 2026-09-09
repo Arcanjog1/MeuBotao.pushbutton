@@ -1,0 +1,266 @@
+{
+  "schema_version": 2,
+  "project_id": "torre_easy_lo_r00_tp1",
+  "source": "input",
+  "settings": {
+    "base_z_cm": 612.0,
+    "course_step_cm": 20.0,
+    "num_courses": 17,
+    "expected_rows": 17,
+    "walls_already_extended": false
+  },
+  "catalog": {
+    "B34": {
+      "code": "B34",
+      "length_cm": 34.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": true,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO 34 - 14x19x34",
+        "VEDA??O - 14x19x34 - BLOCO 34"
+      ],
+      "count": 3096
+    },
+    "B39": {
+      "code": "B39",
+      "length_cm": 39.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO INTEIRO - 14x19x39",
+        "VEDA??O 14x19x39 - BLOCO INTEIRO"
+      ],
+      "count": 5122
+    },
+    "C09": {
+      "code": "C09",
+      "length_cm": 9.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": true,
+      "type_names": [
+        "COMPENSADOR 14x19x9",
+        "COMPENSADOR 14x19x9 (deitado)",
+        "COMPENSADOR 14x19x9 - VEDA??O"
+      ],
+      "count": 628
+    },
+    "B54": {
+      "code": "B54",
+      "length_cm": 54.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": true,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO 54 - 14x19x54",
+        "BLOCO 54 - 14x19x54 - VEDA??O"
+      ],
+      "count": 492
+    },
+    "B19": {
+      "code": "B19",
+      "length_cm": 19.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "MEIO BLOCO - 14x19x19",
+        "MEIO BLOCO - 14x19x19  - VEDA??O"
+      ],
+      "count": 848
+    },
+    "C04": {
+      "code": "C04",
+      "length_cm": 4.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": true,
+      "type_names": [
+        "PASTILHA - 14x19X4",
+        "PASTILHA CORTADA- 14x9X4",
+        "PASTILHA - 14x19X4 - VEDA??O",
+        "PASTILHA CORTADA VEDA??O- 14x9X4"
+      ],
+      "count": 509
+    },
+    "CAN39": {
+      "code": "CAN39",
+      "length_cm": 39.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "CANALETA INTEIRA - 14x19x39"
+      ],
+      "count": 405
+    },
+    "B19_C": {
+      "code": "B19_C",
+      "length_cm": 19.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "MEIO BLOCO CORTADO - 14x9x19",
+        "MEIO BLOCO CORTADO - 14x9x19 - VEDA??O"
+      ],
+      "count": 180
+    },
+    "B39_C": {
+      "code": "B39_C",
+      "length_cm": 39.0,
+      "height_cm": 9.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO INTEIRO CORTADO - 14x9x39",
+        "BLOCO INTEIRO CORTADO - 14x9x39 - VEDA??O"
+      ],
+      "count": 276
+    },
+    "CJ19": {
+      "code": "CJ19",
+      "length_cm": 19.0,
+      "height_cm": 29.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "CANALETA J - 14x19-29x19",
+        "CANALETA J - 14x9-19x19"
+      ],
+      "count": 616
+    },
+    "C09_C": {
+      "code": "C09_C",
+      "length_cm": 9.0,
+      "height_cm": null,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "COMPENSADOR CORTADO - 14xVARx9"
+      ],
+      "count": 36
+    },
+    "CM19": {
+      "code": "CM19",
+      "length_cm": 19.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "MEIA CANALETA - 14x19x19"
+      ],
+      "count": 70
+    },
+    "CAN34": {
+      "code": "CAN34",
+      "length_cm": 34.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "CANALETA 34 - 14x19x34"
+      ],
+      "count": 220
+    },
+    "B34_C": {
+      "code": "B34_C",
+      "length_cm": 34.0,
+      "height_cm": 19.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO 34 CORTADO - 14x9x34",
+        "BLOCO 34 CORTADO - 14x9x34 - VEDA??O"
+      ],
+      "count": 178
+    },
+    "B54_C": {
+      "code": "B54_C",
+      "length_cm": 54.0,
+      "height_cm": 9.0,
+      "width_cm": 14.0,
+      "is_special_bond": false,
+      "is_compensator": false,
+      "type_names": [
+        "BLOCO 54 CORTADO - 14x9x54",
+        "BLOCO 54 CORTADO - 14x9x54 VEDA??O"
+      ],
+      "count": 27
+    }
+  },
+  "orphan_blocks": [],
+  "metadata": {
+    "scope": "ENGINEERING_BENCH_ONLY; two reference walls of uniform 340cm height, NOT substitution of native TP1 walls with 260/280cm heights",
+    "source_project": "torre_easy_lo_r00_tp1",
+    "source_indices": [
+      75,
+      81
+    ],
+    "native_wall_heights_cm": [
+      260.0,
+      280.0
+    ],
+    "source_artifact_sha256": "1e44feea5cabce80ea7d614975d3f475da89afc171c69549c4cb85947502522a"
+  },
+  "walls": [
+    {
+      "id": "W076",
+      "key": "W|7677.0,1568.0|7677.0,1637.0|t14.0",
+      "start_cm": [
+        7677.25,
+        1567.95
+      ],
+      "end_cm": [
+        7677.25,
+        1636.95
+      ],
+      "length_cm": 69.0,
+      "angle_deg": 90.0,
+      "thickness_cm": 14.0,
+      "base_z_cm": 612.0,
+      "height_cm": 340.0,
+      "openings": [],
+      "junctions": [],
+      "rows": [],
+      "source_element_ids": []
+    },
+    {
+      "id": "W082",
+      "key": "W|7670.0,1630.0|8024.5,1630.0|t14.0",
+      "start_cm": [
+        7670.25,
+        1629.95
+      ],
+      "end_cm": [
+        8024.26,
+        1629.95
+      ],
+      "length_cm": 354.01,
+      "angle_deg": 0.0,
+      "thickness_cm": 14.0,
+      "base_z_cm": 612.0,
+      "height_cm": 340.0,
+      "openings": [],
+      "junctions": [],
+      "rows": [],
+      "source_element_ids": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "handler_execute_solve": true,
+  "signature_verified": true,
+  "exact_walls_and_catalog_equal_final_probe": true,
+  "courses": 17,
+  "physical_blocks": 187,
+  "preflight": {
+    "ok": true,
+    "errors": [],
+    "opening_violations": [],
+    "collisions": []
+  }
+}

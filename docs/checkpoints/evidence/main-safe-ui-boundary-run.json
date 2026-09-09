@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T17:35:22.241599+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-main-safe-20260909",
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "tree": "d835bdbb5092ac7d472502525434126c730a17e6",
+  "status_before": "?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import json,sys,subprocess,time\nfrom pathlib import Path\nsys.path.insert(0,'nuvem')\nfrom benchmark import solver_bridge as b\nfrom benchmark.extract.from_solver import project_from_solver\nfrom benchmark.runner import evaluate_project\nroot=Path('.')\ndata=json.loads(Path('docs/checkpoints/evidence/main-safe-region-final.json').read_text())['input_selection']\nref=json.loads(Path('nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference.json').read_text())\nout=[]\nfor courses in (13,14,17):\n d=json.loads(json.dumps(data));d['settings']['walls_already_extended']=False;d['settings']['num_courses']=courses;d['settings']['expected_rows']=courses\n start=time.monotonic();r,w,n,o,c,z,k,notes=b.run_solver(d);r['num_courses']=k\n p=project_from_solver('main_safe_ui_'+str(k),r,w,n,o,c,z,k,metadata={'solver_notes':notes})\n f,s,comp=evaluate_project(p,ref)\n gate=b.engine().controlled_beta_preflight(r,w,o,c,z)\n item={'courses':k,'settings':d['settings'],'source_wall_heights_cm':[x['height_cm'] for x in d['walls']],'seconds':time.monotonic()-start,'result_project':p,'preflight':gate,'non_modular':r.get('non_modular'),'unmodulated_walls':r.get('unmodulated_walls'),'bond_audits':r.get('wall_bond_audits'),'findings':f,'score':s,'node_kinds':[x['kind'] for x in n],'physical_blocks':sum(map(len,r['course_candidates'].values()))}\n out.append(item);print(json.dumps({a:item[a] for a in ('courses','physical_blocks','node_kinds')},sort_keys=True),s['findings_by_code'],gate['ok'])\nwith Path('docs/checkpoints/evidence/main-safe-ui-boundary.json').open('x') as h:json.dump({'head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'scope':'Fresh engineering variants; native existing-wall default extension. Official inputs unchanged. Heights 13/14/17 are NOT equivalent.','runs':out},h,separators=(',',':'))"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "main-safe-ui-boundary-run.txt",
+  "pid": 23712,
+  "exit_code": 0,
+  "elapsed_seconds": 1.609,
+  "status_after": "?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "log_sha256": "861754160c302053e97cc3c8ea1a43694e91ff4d9deb934cb4e70aa7384f841c"
+}

@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-09T17:32:04.087853+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-main-safe-20260909",
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "tree": "d835bdbb5092ac7d472502525434126c730a17e6",
+  "status_before": "?? docs/checkpoints/evidence/main-safe-region-initial.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "-n",
+    "4",
+    "--dist",
+    "loadfile",
+    "-q",
+    "--durations=20"
+  ],
+  "timeout_seconds": 5400,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "main-safe-consolidated.txt",
+  "pid": 25596,
+  "exit_code": 1,
+  "elapsed_seconds": 3025.078,
+  "status_after": "A  docs/BETA_MAIN_SAFE_2026-09-09.md\nA  docs/BETA_MAIN_SAFE_RUNBOOK.md\nM  docs/PROJECT_STATUS.md\nM  docs/PROJECT_STATUS_LOG.md\nM  docs/START_HERE.md\nA  docs/checkpoints/2026-09-09-beta-main-safe.md\nM  nuvem/REGRAS_MODULACAO_BLOCOS.md\n?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-engineering-input.json\n?? docs/checkpoints/evidence/main-safe-governance-tests.json\n?? docs/checkpoints/evidence/main-safe-governance-tests.txt\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.json\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.txt\n?? docs/checkpoints/evidence/main-safe-handler-bench.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.txt\n?? docs/checkpoints/evidence/main-safe-native-z.json\n?? docs/checkpoints/evidence/main-safe-package-build.json\n?? docs/checkpoints/evidence/main-safe-package-build.txt\n?? docs/checkpoints/evidence/main-safe-package-verify.json\n?? docs/checkpoints/evidence/main-safe-package-verify.txt\n?? docs/checkpoints/evidence/main-safe-provenance-run.json\n?? docs/checkpoints/evidence/main-safe-provenance-run.txt\n?? docs/checkpoints/evidence/main-safe-provenance.json\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "log_sha256": "74680d92596df4e906dab26f9e0f97406abeda2f1b60b7b5c9529ddcfc9a0647"
+}
