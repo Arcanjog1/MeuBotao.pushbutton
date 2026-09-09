@@ -191,13 +191,32 @@ def test_troca_cross_band_e_desligavel_pela_flag_do_modulo():
 #
 # Preserva o que importa: bandas abaixo/dentro/acima da abertura (uma
 # delas de UMA FIADA SO'), o L_CORNER da ponta, o B54 de
-# T_INTERSECTION_MIDSPAN que FIXA a junta de t=39,5 na fiada z=121, o
-# recorte/reparo da janela e os parametros reais dela.
+# T_INTERSECTION_MIDSPAN que FIXA a junta da fiada z=121, o recorte/
+# reparo da janela e os parametros reais dela.
+#
+# SUBPLANO TROCADO em 2026-09-09 (CR-N1). O subplano anterior
+# (`(55, 82, 124)`, alvo `(-401,5; 309,5)`) DEIXOU DE REPRODUZIR: a CR-N1
+# (`nuvem/REGRAS_MODULACAO_BLOCOS.md` secao 40) mudou a peca do no' de
+# encontro vizinho naquelas tres paredes e, com a propagacao DESLIGADA, o
+# sub-plano passou a acusar ZERO identidade - os dois testes do par
+# viravam vacuos. O defeito NAO sumiu do corpus: com a flag desligada o
+# TGD inteiro continua com 10 identidades cross-band PURAS (os testes de
+# corpus abaixo continuam verdes, e sao eles a prova de que a CR-G12
+# ainda tem alvo). O que se perdeu foi a REDUCAO, e ela foi refeita pelo
+# MESMO metodo (vizinhanca geometrica do alvo + delta-debugging com o
+# predicado duplo "reproduz com a flag OFF" E "zera com a flag ON").
+# Nenhuma coordenada nova: `(4, 83, 119)` sao tres paredes do MESMO
+# `input.json` oficial - uma principal de 1174cm com abertura e duas
+# bonecas perpendiculares (183,2cm com abertura e 94cm), a mesma
+# topologia de bandas do subplano antigo. Medido em 2026-09-09:
+# flag OFF -> 21 identidades, entre elas o alvo, CROSS-BAND;
+# flag ON  -> ZERO identidade; pecas de amarracao/abertura IDENTICAS
+# nas duas rodadas (40 x 40).
 # ============================================================
 
 _SUBPLANO_PROJETO = "torre_easy_lo_r00_tgd"
-_SUBPLANO_INDICES = (55, 82, 124)
-_SUBPLANO_PONTO = (-401.5, 309.5)
+_SUBPLANO_INDICES = (4, 83, 119)
+_SUBPLANO_PONTO = (621.0, 17.0)
 _SUBPLANO_COTAS = (121.0, 141.0)
 
 
