@@ -1,0 +1,83 @@
+=== SESSAO 2026-09-09 17:46:08 ===
+[PERF] +    0.002s tid=1424  ui.click START axes=2 beta=True catalog=6 nodes=3 openings=0 walls=2
+[PERF] +    0.125s tid=1424  ui.console_pronto
+[PERF] +    0.126s tid=1424  ui.external_event.Raise CHAMADO
+[PERF] +    0.133s tid=1424  ui.external_event.Raise RETORNOU
+[PERF] +    0.173s tid=1424  Execute ENTROU action=analyze
+[PERF] +    0.174s tid=1424  Execute.globals_update START nomes=871
+[PERF] +    0.175s tid=1424  Execute.globals_update END dt=0.001s nomes=871
+[PERF] +    0.175s tid=1424  Execute.ActiveUIDocument START
+[PERF] +    0.176s tid=1424  Execute.ActiveUIDocument END dt=0.001s
+[PERF] +    0.176s tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +    0.239s tid=1424  refresh_geometry_from_document END axes=2 dt=0.062s
+[PERF] +    0.240s tid=1424  _execute_analyze (disparo) START
+[PERF] +    0.241s tid=1424  _execute_analyze: criando thread de fundo
+[PERF] +    0.259s tid=7888  worker.thread ENTROU
+[PERF] +    0.268s tid=7888  analyze_created_walls_for_errors START nodes=3 walls=2
+[PERF] +    0.269s tid=7888  process_walls_one_by_one START walls=2
+[PERF] +    0.269s tid=7888  solve_all_intersections START nodes=3
+[PERF] +    0.271s tid=7888  solve_all_intersections END dt=0.002s nodes=3
+[PERF] +    0.272s tid=7888  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +    0.273s tid=7888  index_node_candidates START nodes=3
+[PERF] +    0.274s tid=7888  index_node_candidates END dt=0.001s nodes=3
+[PERF] +    0.274s tid=7888  order_walls_for_processing START walls=2
+[PERF] +    0.275s tid=7888  order_walls_for_processing END dt=0.001s walls=2
+[PERF] +    0.285s tid=7888  parede START idx=0 pos=1 total=2
+[PERF] +    0.285s tid=1424  _execute_analyze: thread de fundo INICIADA
+[PERF] +    0.290s tid=1424  _execute_analyze (disparo) END dt=0.050s
+[PERF] +    0.293s tid=1424  Execute SAIU action=analyze
+[PERF] +    0.318s tid=7888  parede START idx=1 pos=2 total=2
+[PERF] +    0.328s tid=7888  process_walls_one_by_one END dt=0.059s walls=2
+[PERF] +    0.332s tid=7888  analyze_created_walls_for_errors END dt=0.065s nodes=3 walls=2
+[PERF] +    0.335s tid=1424  ui._finish (volta para a thread de UI)
+[PERF] +    0.336s tid=1424  ui._on_analyze_done kind=analyze
+[PERF] +    6.298s tid=1424  Execute ENTROU action=solve
+[PERF] +    6.298s tid=1424  Execute.globals_update START nomes=871
+[PERF] +    6.299s tid=1424  Execute.globals_update END dt=0.001s nomes=871
+[PERF] +    6.299s tid=1424  Execute.ActiveUIDocument START
+[PERF] +    6.300s tid=1424  Execute.ActiveUIDocument END dt=0.001s
+[PERF] +    6.301s tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +    6.304s tid=1424  refresh_geometry_from_document END axes=2 dt=0.003s
+[PERF] +    6.305s tid=1424  _execute_solve START
+[PERF] +    6.318s tid=1424  solve_all_intersections START nodes=3
+[PERF] +    6.320s tid=1424  solve_all_intersections END dt=0.002s nodes=3
+[PERF] +    6.320s tid=1424  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +    6.321s tid=1424  index_node_candidates START nodes=3
+[PERF] +    6.322s tid=1424  index_node_candidates END dt=0.000s nodes=3
+[PERF] +    6.322s tid=1424  order_walls_for_processing START walls=2
+[PERF] +    6.323s tid=1424  order_walls_for_processing END dt=0.001s walls=2
+[PERF] +    6.330s tid=1424  parede START idx=0 pos=1 total=2
+[PERF] +    6.355s tid=1424  parede START idx=1 pos=2 total=2
+[PERF] +    6.560s tid=1424  _execute_solve END dt=0.255s
+[PERF] +    6.561s tid=1424  Execute SAIU action=create
+[PERF] +    6.573s tid=1424  Execute ENTROU action=None
+[PERF] +    6.574s tid=1424  Execute.globals_update START nomes=871
+[PERF] +    6.574s tid=1424  Execute.globals_update END dt=0.000s nomes=871
+[PERF] +    6.575s tid=1424  Execute.ActiveUIDocument START
+[PERF] +    6.575s tid=1424  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +    6.575s tid=1424  Execute SAIU action=None
+[PERF] +  147.977s tid=1424  Execute ENTROU action=solve
+[PERF] +  147.983s tid=1424  Execute.globals_update START nomes=871
+[PERF] +  147.985s tid=1424  Execute.globals_update END dt=0.002s nomes=871
+[PERF] +  147.985s tid=1424  Execute.ActiveUIDocument START
+[PERF] +  147.987s tid=1424  Execute.ActiveUIDocument END dt=0.002s
+[PERF] +  147.987s tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +  147.993s tid=1424  refresh_geometry_from_document END axes=2 dt=0.006s
+[PERF] +  147.994s tid=1424  _execute_solve START
+[PERF] +  148.000s tid=1424  solve_all_intersections START nodes=3
+[PERF] +  148.002s tid=1424  solve_all_intersections END dt=0.002s nodes=3
+[PERF] +  148.003s tid=1424  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +  148.003s tid=1424  index_node_candidates START nodes=3
+[PERF] +  148.003s tid=1424  index_node_candidates END dt=0.000s nodes=3
+[PERF] +  148.004s tid=1424  order_walls_for_processing START walls=2
+[PERF] +  148.004s tid=1424  order_walls_for_processing END dt=0.000s walls=2
+[PERF] +  148.009s tid=1424  parede START idx=0 pos=1 total=2
+[PERF] +  148.033s tid=1424  parede START idx=1 pos=2 total=2
+[PERF] +  148.130s tid=1424  _execute_solve END dt=0.136s
+[PERF] +  148.130s tid=1424  Execute SAIU action=create
+[PERF] +  148.145s tid=1424  Execute ENTROU action=None
+[PERF] +  148.146s tid=1424  Execute.globals_update START nomes=871
+[PERF] +  148.146s tid=1424  Execute.globals_update END dt=0.000s nomes=871
+[PERF] +  148.146s tid=1424  Execute.ActiveUIDocument START
+[PERF] +  148.147s tid=1424  Execute.ActiveUIDocument END dt=0.001s
+[PERF] +  148.147s tid=1424  Execute SAIU action=None

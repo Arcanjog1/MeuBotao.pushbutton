@@ -211,25 +211,27 @@ casos. Logs devem registrar entrada, configuracao, versao carregada,
 geometria, chave fisica e resultado para gerar regressao offline.
 Procedimento especifico: [runbook main-safe](BETA_MAIN_SAFE_RUNBOOK.md).
 
-## Diagnostico do beta no Revit: "Preparando o solver..."
+## Diagnostico do beta no Revit: Etapa 5 travada
 
-Primeiro beta controlado (8cdd33f) trava minutos em "Preparando o
-solver..." numa bancada de 2 Walls, 1 encontro em L e 0 aberturas.
-Detalhe, numeros e limites:
-[checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md).
+Causa-raiz FECHADA e nao era lentidao: a acao "create" do ExternalEvent era
+PERDIDA. `_execute_solve` chama `on_done("solve")` de dentro de `Execute()`,
+o callback encadeia `_raise_action("create")`, e o `finally` de `Execute()`
+apagava a acao recem-agendada - o despacho seguinte entrava com
+`action=None` e voltava em silencio. Duas tentativas, zero bloco criado,
+nenhum erro na tela. Prova, mecanismo, tempos e correcao:
+[checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md)
+e [log da execucao](checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log).
 
-Medido, nao suposto: a entrada real do Revit e congruente com
-[main-safe-engineering-input.json](checkpoints/evidence/main-safe-engineering-input.json)
-(sem erro de unidade, sem Z incorreto), o grafo tem 3 nos / 1 L / 2 pontas
-livres sem residuo da execucao anterior, e o caminho `analyze` do botao
-custa 0,37s no documento real. O benchmark offline de 0,1-1,1s exercita
-`_execute_solve`, e o botao dispara `analyze` - os dois numeros nao sao
-comparaveis.
+Correcao minima: consumir a acao no inicio de `Execute()` e despachar por
+copia local. Dois testes de regressao falham antes e passam depois.
+Nenhuma regra fisica alterada; nenhum auditor silenciado.
 
-CAUSA-RAIZ AINDA ABERTA e sem correcao. A branch entrega instrumentacao
-[PERF] no caminho real (`core/engine/perf_trace.py`); falta um clique no
-pacote instrumentado para separar latencia do ExternalEvent de trabalho
-real. Estado candidato, nao oficial - nao mesclar.
+DUAS PENDENCIAS FISICAS EM ABERTO. A cota Z das pecas NAO esta aprovada:
+`run_modulation_on_existing_walls` ignora `WALL_BASE_OFFSET` e as pecas
+nascem 1718,164cm abaixo da base das paredes (CR proprio). E a reprovacao
+`REPEATED_VERTICAL_COMPENSATOR_STRIP` desta bancada continua aberta.
+
+Estado candidato, nao oficial - nao mesclar.
 
 ## Governanca e recuperacao
 
