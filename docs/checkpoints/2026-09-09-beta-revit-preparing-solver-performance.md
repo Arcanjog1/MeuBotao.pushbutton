@@ -22,12 +22,13 @@
     "tests/test_script.py + test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 312 passed (HEAD anterior, com a instrumentacao).",
     "tests/test_bond_strip_adjacent_courses.py + tests/test_block_bonding.py: 38 passed no HEAD atual.",
     "Regressao do encadeamento: test_acao_agendada_por_callback_durante_execute_sobrevive e test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar - falham antes, passam depois.",
-    "Solve end-to-end offline no HEAD atual: 17 fiadas, 22 candidatos, 187 instancias fisicas, 0 colisoes, 0 vaos, 0 nao modulares, preflight ok, 0 paredes reprovadas."
+    "Solve end-to-end offline no HEAD atual: 17 fiadas, 22 candidatos, 187 instancias fisicas, 0 colisoes, 0 vaos, 0 nao modulares, preflight ok, 0 paredes reprovadas.",
+    "REGRESSAO DE AMARRACAO no codigo corrigido: 420 passed em 2366.84s (39min26s), exit 0 - test_script.py + test_block_bonding.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py + test_block_arm_role_invariance.py + test_bond_strip_adjacent_courses.py. Que a versao CORRIGIDA estava carregada e comprovado pelos 6 testes novos terem passado dentro dessa mesma rodada (com a logica antiga, dois deles falham)."
   ],
   "known_failures": [
     "BUG REAL 3 - CAUSA-RAIZ NAO FECHADA, BLOQUEADOR DE MERGE: o interpretador CPython dentro do processo do Revit congela por 19,6s (execucao 3) e por 100,2s (execucao 2) na mesma fronteira - entre `plan_failures = {}` e o `def plan_hook`, um trecho sem calculo nenhum. Durante o congelamento NENHUMA linha [PERF] de NENHUMA thread aparece (nem o watchdog), enquanto o CPU do processo anda 1,67s fora do Python. Nao e o solver, nao e a instrumentacao (0,285ms/marco medido) e nao e callback perdido. Nao consegui provar que o congelamento e limitado.",
     "GATE 3 NAO VERIFICADO NO REVIT: o bench offline NAO reproduz o falso positivo do auditor (0 paredes reprovadas com a logica antiga E com a nova - o layout reconstruido difere do criado no Revit). A correcao esta provada por teste que codifica a geometria MEDIDA, mas 'vermelho falso eliminado' so fecha com nova execucao no Revit.",
-    "Regressao consolidada NAO concluida nesta sessao (as suites longas foram interrompidas de proposito, para nao contaminar o arquivo de rastreamento usado pela medicao no Revit).",
+    "Regressao CONSOLIDADA (todas as suites, incluindo golden benchmark) nao concluida: rodou a regressao de AMARRACAO (420 passed), que cobre a mudanca e a vizinhanca dela, mas nao a suite inteira - as rodadas longas foram interrompidas de proposito para nao contaminar o arquivo de rastreamento usado pela medicao no Revit.",
     "CI nao avaliado nesta sessao."
   ],
   "physical_deltas": [
