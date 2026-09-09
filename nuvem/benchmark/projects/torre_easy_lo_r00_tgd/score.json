@@ -2,7 +2,7 @@
  "project_id": "torre_easy_lo_r00_tgd",
  "source": "solver",
  "walls": 167,
- "blocks": 12143,
+ "blocks": 12038,
  "categories": [
   {
    "category": "block_positions",
@@ -15,12 +15,12 @@
   },
   {
    "category": "compensators",
-   "pass": 91,
-   "fail": 76,
-   "findings": 1407,
-   "findings_level_1": 1351,
-   "findings_level_2": 56,
-   "success_rate": 0.5449
+   "pass": 98,
+   "fail": 69,
+   "findings": 1372,
+   "findings_level_1": 1322,
+   "findings_level_2": 50,
+   "success_rate": 0.5868
   },
   {
    "category": "junctions",
@@ -42,44 +42,44 @@
   },
   {
    "category": "prism",
-   "pass": 156,
-   "fail": 11,
-   "findings": 1088,
-   "findings_level_1": 240,
-   "findings_level_2": 848,
-   "success_rate": 0.9341
+   "pass": 154,
+   "fail": 13,
+   "findings": 1086,
+   "findings_level_1": 274,
+   "findings_level_2": 812,
+   "success_rate": 0.9222
   },
   {
    "category": "wall_coverage",
-   "pass": 56,
-   "fail": 111,
-   "findings": 2051,
-   "findings_level_1": 2051,
+   "pass": 55,
+   "fail": 112,
+   "findings": 2060,
+   "findings_level_1": 2060,
    "findings_level_2": 0,
-   "success_rate": 0.3353
+   "success_rate": 0.3293
   }
  ],
- "findings_total": 5126,
- "findings_level_1": 4115,
- "findings_level_2": 1011,
- "critical_errors": 668,
+ "findings_total": 5098,
+ "findings_level_1": 4129,
+ "findings_level_2": 969,
+ "critical_errors": 734,
  "critical_by_code": {
-  "PRISM_CONTINUOUS_JOINT": 226,
+  "PRISM_CONTINUOUS_JOINT": 258,
   "JUNCTION_MISSING_BINDING": 40,
   "OPENING_BLOCK_CROSSES_JAMB": 108,
   "OPENING_BLOCK_INSIDE_DOOR": 5,
-  "COVERAGE_ROW_MOSTLY_EMPTY": 126,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 144,
   "COVERAGE_WALL_NOT_MODULATED": 29,
-  "COVERAGE_MISSING_ROW": 134
+  "COVERAGE_MISSING_ROW": 150
  },
  "findings_by_code": {
-  "PRISM_STAGGER_BELOW_TARGET": 848,
-  "PRISM_CONTINUOUS_JOINT": 226,
-  "PRISM_JOINT_STACK": 14,
-  "COMPENSATOR_EXCESS_IN_RUN": 621,
-  "COMPENSATOR_CONSECUTIVE": 621,
-  "COMPENSATOR_VERTICAL_STRIP": 109,
-  "COMPENSATOR_AVOIDABLE": 56,
+  "PRISM_CONTINUOUS_JOINT": 258,
+  "PRISM_JOINT_STACK": 16,
+  "PRISM_STAGGER_BELOW_TARGET": 812,
+  "COMPENSATOR_CONSECUTIVE": 642,
+  "COMPENSATOR_EXCESS_IN_RUN": 578,
+  "COMPENSATOR_VERTICAL_STRIP": 102,
+  "COMPENSATOR_AVOIDABLE": 50,
   "JUNCTION_NOT_ALTERNATING": 288,
   "JUNCTION_MISSING_BINDING": 40,
   "OPENING_MISSING_LINTEL": 82,
@@ -87,15 +87,14 @@
   "OPENING_BLOCK_CROSSES_JAMB": 108,
   "OPENING_SOLID_BELOW_SILL_MISSING": 32,
   "OPENING_BLOCK_INSIDE_DOOR": 5,
-  "COVERAGE_PARTIAL_WALL": 44,
-  "COVERAGE_GAP_IN_ROW": 1718,
-  "COVERAGE_ROW_MOSTLY_EMPTY": 126,
+  "COVERAGE_PARTIAL_WALL": 46,
+  "COVERAGE_GAP_IN_ROW": 1691,
+  "COVERAGE_ROW_MOSTLY_EMPTY": 144,
   "COVERAGE_WALL_NOT_MODULATED": 29,
-  "COVERAGE_MISSING_ROW": 134
+  "COVERAGE_MISSING_ROW": 150
  },
- "success_rate": 0.1198,
+ "success_rate": 0.1257,
  "walls_failing": [
-  "W001",
   "W002",
   "W003",
   "W004",
@@ -247,14 +246,14 @@
  "per_wall": [
   {
    "wall": "W001",
-   "status": "FAIL",
+   "status": "PASS",
    "prism": "PASS",
-   "compensators": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 28
+   "findings": 0
   },
   {
    "wall": "W002",
@@ -265,18 +264,18 @@
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 52
+   "findings": 85
   },
   {
    "wall": "W003",
    "status": "FAIL",
-   "prism": "PASS",
-   "compensators": "FAIL",
+   "prism": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 38
+   "findings": 17
   },
   {
    "wall": "W004",
@@ -320,7 +319,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 63
+   "findings": 49
   },
   {
    "wall": "W008",
@@ -375,7 +374,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 52
+   "findings": 44
   },
   {
    "wall": "W013",
@@ -386,7 +385,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 61
+   "findings": 44
   },
   {
    "wall": "W014",
@@ -1167,7 +1166,7 @@
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 85
+   "findings": 117
   },
   {
    "wall": "W085",
@@ -1211,7 +1210,7 @@
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 52
+   "findings": 84
   },
   {
    "wall": "W089",
@@ -1744,13 +1743,13 @@
   {
    "wall": "W137",
    "status": "FAIL",
-   "prism": "PASS",
-   "compensators": "FAIL",
+   "prism": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 20
+   "findings": 17
   },
   {
    "wall": "W138",
@@ -1921,45 +1920,45 @@
    "wall": "W153",
    "status": "FAIL",
    "prism": "PASS",
-   "compensators": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 19
+   "findings": 17
   },
   {
    "wall": "W154",
    "status": "FAIL",
    "prism": "PASS",
-   "compensators": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 20
+   "findings": 18
   },
   {
    "wall": "W155",
    "status": "FAIL",
    "prism": "PASS",
-   "compensators": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 19
+   "findings": 17
   },
   {
    "wall": "W156",
    "status": "FAIL",
    "prism": "PASS",
-   "compensators": "FAIL",
+   "compensators": "PASS",
    "junctions": "PASS",
    "openings": "PASS",
    "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 20
+   "findings": 18
   },
   {
    "wall": "W157",
@@ -1970,7 +1969,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 52
+   "findings": 44
   },
   {
    "wall": "W158",
@@ -1981,7 +1980,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 52
+   "findings": 44
   },
   {
    "wall": "W159",
@@ -1992,7 +1991,7 @@
    "openings": "PASS",
    "wall_coverage": "PASS",
    "block_positions": "PASS",
-   "findings": 87
+   "findings": 99
   },
   {
    "wall": "W160",
@@ -2001,9 +2000,9 @@
    "compensators": "FAIL",
    "junctions": "PASS",
    "openings": "PASS",
-   "wall_coverage": "PASS",
+   "wall_coverage": "FAIL",
    "block_positions": "PASS",
-   "findings": 86
+   "findings": 64
   },
   {
    "wall": "W161",
