@@ -226,10 +226,17 @@ Correcao minima: consumir a acao no inicio de `Execute()` e despachar por
 copia local. Dois testes de regressao falham antes e passam depois.
 Nenhuma regra fisica alterada; nenhum auditor silenciado.
 
-DUAS PENDENCIAS FISICAS EM ABERTO. A cota Z das pecas NAO esta aprovada:
-`run_modulation_on_existing_walls` ignora `WALL_BASE_OFFSET` e as pecas
-nascem 1718,164cm abaixo da base das paredes (CR proprio). E a reprovacao
-`REPEATED_VERTICAL_COMPENSATOR_STRIP` desta bancada continua aberta.
+ORIGEM VERTICAL - DECISAO DO USUARIO (2026-09-09): o que eu havia
+classificado como bug de `WALL_BASE_OFFSET` NAO e bug. Os blocos nascem a
+partir do NIVEL de referencia; o offset de base de uma Wall existente e
+arbitrario e nao redefine a cota inicial da modulacao - nesta bancada sao
+as Walls que estao deslocadas. A logica de Z foi preservada sem nenhuma
+alteracao e a regra ficou registrada em
+[REGRAS_MODULACAO_BLOCOS.md](../nuvem/REGRAS_MODULACAO_BLOCOS.md), secao 8a,
+com o conflito contra a secao 15.3 anotado la, nao apagado.
+
+UMA PENDENCIA FISICA EM ABERTO: a reprovacao
+`REPEATED_VERTICAL_COMPENSATOR_STRIP` desta bancada.
 
 Estado candidato, nao oficial - nao mesclar.
 

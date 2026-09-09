@@ -22,7 +22,6 @@
     "Pacote beta corrigido construido e verificado a partir da PASTA DO BOTAO: head 686320a70cf07fa079246b376751455b002ce908."
   ],
   "known_failures": [
-    "PENDENCIA FISICA ABERTA - WALL_BASE_OFFSET: no fluxo de paredes existentes, base_z_abs = selected_level.Elevation e ignora WALL_BASE_OFFSET. Na bancada, o nivel 'pb' esta em -1106.16cm e as Walls tem offset de base de 1718.164cm (base real 612cm). Como o caminho de criacao usa course_offset = course_z_abs - base_z_abs, base_z_abs se CANCELA e as pecas nascem em level.Elevation + 1cm + n*20cm - ou seja, 1718.164cm ABAIXO da base das paredes. A posicao Z das pecas NAO esta aprovada e nao pode ser aprovada por esta entrega.",
     "PENDENCIA FISICA ABERTA - REPEATED_VERTICAL_COMPENSATOR_STRIP: o solve desta bancada reprovou 1 parede na auditoria de amarracao entre fiadas. Por decisao de 2026-08-26 isso nao bloqueia a criacao (as pecas saem marcadas em vermelho), e NADA foi silenciado aqui. Continua sendo reprovacao fisica em aberto.",
     "A execucao pos-correcao ainda nao foi feita: tempo de criacao, quantidade criada e repetibilidade do beta seguem sem medicao.",
     "A suite consolidada nao foi concluida nesta sessao (interrompida duas vezes de proposito, para nao contaminar o arquivo de rastreamento que a medicao no Revit usa)."
@@ -30,7 +29,7 @@
   "physical_deltas": [
     "Nenhum. Nenhuma regra fisica, tolerancia ou geometria esperada foi alterada; a bancada continua 2 paredes, 0 aberturas, 17 fiadas e 187 blocos esperados.",
     "Estado do modelo apos a execucao instrumentada: 0 FamilyInstance de bloco criada (as 52 existentes sao carimbos/legendas). A Etapa 5 nunca chegou a rodar.",
-    "Entrada real x artefato offline: CONGRUENTES (69.0024/354.0007cm, espessura 14cm, altura 340cm, sobreposicao do L 6.9959cm, base absoluta 612cm). Sem erro de unidade e sem Z incorreto NA ENTRADA - o erro de Z esta na criacao, nao na captura.",
+    "Entrada real x artefato offline: CONGRUENTES (69.0024/354.0007cm, espessura 14cm, altura 340cm, sobreposicao do L 6.9959cm). Sem erro de unidade e sem Z incorreto: a cota de criacao segue o NIVEL por regra (secao 8a).",
     "Grafo: 3 nos, 1 L_CORNER, 2 FREE_END, 2 candidatos, 0 falhas, sem residuo das 126 paredes / 77 aberturas."
   ],
   "decisions_taken": [
@@ -39,10 +38,12 @@
     "Solver descartado por medicao: analyze 0.065s, solve 0.255s e 0.136s na execucao real dentro do Revit.",
     "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco (o symbol vem do catalogo pronto), Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
     "O benchmark offline de 0.1-1.1s exercita _execute_solve; o botao dispara analyze e depois encadeia create. Os numeros nunca foram comparaveis.",
+    "ORIGEM VERTICAL DA MODULACAO (decisao do usuario, 2026-09-09): o que eu havia classificado como bug de WALL_BASE_OFFSET NAO e bug - e o funcionamento desejado. Os blocos nascem a partir do NIVEL de referencia; o offset de base de uma Wall existente e arbitrario e nao pode redefinir a cota inicial da modulacao. Nesta bancada sao as Walls que estao deslocadas. A logica de Z foi PRESERVADA sem nenhuma alteracao, o achado foi retirado da lista de bugs/CRs e a regra ficou registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8a.",
+    "CONFLITO REGISTRADO, nao apagado: a secao 15.3 das regras (peitoril/verga, 2026-08-28) afirma o contrario para paredes com offset de base. A secao 8a prevalece (orientacao mais recente); o caso peitoril/verga ficou como pendencia de decisao do usuario, com aviso no proprio 15.3.",
     "docs/checkpoints/2026-09-09-beta-main-safe.md reclassificado para 'historical' porque o HEAD avancou; nenhuma afirmacao, numero ou decisao dele foi alterada."
   ],
   "decisions_pending": [
-    "Abrir CR proprio para WALL_BASE_OFFSET no fluxo de paredes existentes, com teste de regressao de cota, ANTES de qualquer aprovacao da posicao Z das pecas.",
+    "Decidir o caso peitoril/verga da secao 15.3 das regras: aplicar a 8a literalmente (pecas de verga nascem a partir do nivel) ou tratar esse cenario como excecao com agrupamento por (altura, offset_de_base). Nao implementar o agrupamento sem essa resposta.",
     "Decidir o destino da reprovacao REPEATED_VERTICAL_COMPENSATOR_STRIP desta bancada - decisao de dominio, nao de codigo.",
     "Decidir se a janela 'Preparando o solver...'/'Preparando a criacao dos blocos...' passa a ter ponto de cancelamento: hoje o botao Cancelar so tem efeito a partir do laco por parede.",
     "Avaliar se um Execute() que recebe uma acao desconhecida/None deve avisar em vez de voltar em silencio - foi o silencio que escondeu este defeito por duas execucoes inteiras.",
@@ -51,7 +52,7 @@
   "next_steps": [
     "Rodar o botao TESTE-PERF (head 686320a) uma vez, nas mesmas 2 Walls, e medir tempo de criacao e quantidade criada.",
     "Ler o perf_diag.log da nova execucao e anexar como evidencia versionada.",
-    "Nao mesclar na main: esta entrega cobre um defeito de integracao corrigido e duas pendencias fisicas em aberto."
+    "Nao mesclar na main: esta entrega cobre um defeito de integracao corrigido e UMA pendencia fisica em aberto (REPEATED_VERTICAL_COMPENSATOR_STRIP)."
   ],
   "references": [
     {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log"},
@@ -62,6 +63,7 @@
     {"path": "nuvem/core/wall_modeling.py"},
     {"path": "nuvem/core/engine/wall_stepper.py"},
     {"path": "tests/test_script.py"},
+    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
     {"path": "docs/checkpoints/2026-09-09-beta-main-safe.md"}
   ]
 }
@@ -145,30 +147,28 @@ Auditado item a item, conforme pedido:
 - **Excecao engolida:** nao havia excecao. Havia um despacho sem ramo
   correspondente, que e' pior: nem sucesso, nem erro, nem log.
 
-## Pendencias fisicas preservadas
+## Origem vertical e pendencia fisica
 
-### WALL_BASE_OFFSET - a cota Z das pecas NAO esta aprovada
+### Origem vertical: decisao registrada, nao e defeito
 
-`run_modulation_on_existing_walls` faz `base_z_abs = selected_level.Elevation`
-e ignora `WALL_BASE_OFFSET`. O padrao correto ja existe no proprio arquivo
-(`base_z_abs = level_elevation + base_offset`).
+Eu havia classificado como bug o fato de `base_z_abs` vir de
+`selected_level.Elevation` sem somar `WALL_BASE_OFFSET`. **Estava errado.**
+O usuario esclareceu em 2026-09-09 que esse e' o funcionamento desejado: os
+blocos devem nascer a partir do **nivel de referencia**, e o offset de base
+de uma Wall existente e' arbitrario - deixar a modulacao segui-lo
+propagaria o erro do modelo para dentro da regra.
 
-| Grandeza | Valor |
-| --- | --- |
-| Elevacao do nivel `pb` | -1106,16 cm |
-| `WALL_BASE_OFFSET` das Walls | +1718,164 cm |
-| Base real das paredes | 612 cm |
-| `base_z_abs` usado hoje | -1106,16 cm |
-| Z da 1a fiada como sera criada | -1105,16 cm |
-| Z esperado da 1a fiada | 613 cm |
-| **Erro** | **1718,164 cm** |
+Nesta bancada, o nivel `pb` esta em -1106,16cm e as Walls tem
+`WALL_BASE_OFFSET` de +1718,164cm: sao **as paredes** que estao "voando"
+em relacao a' planta. Os blocos nascem colados ao nivel, que e' a posicao
+**correta**. Os 1718,164cm ate' a base das Walls medem o desvio das
+paredes, nao um erro da modulacao.
 
-Como o caminho de criacao calcula `course_offset = course_z_abs -
-base_z_abs`, o valor se cancela e o erro aparece integralmente na posicao
-final. `controlled_beta_preflight` nao compara Z de peca com base de
-parede, entao **nao bloqueia**. Qualquer execucao de criacao feita antes
-do CR de Z serve para medir tempo e quantidade, **nunca para aprovar
-geometria vertical**.
+**Nenhuma linha da logica de Z foi alterada.** A regra ficou registrada em
+[REGRAS_MODULACAO_BLOCOS.md](../../nuvem/REGRAS_MODULACAO_BLOCOS.md),
+secao 8a, com o conflito contra a secao 15.3 (peitoril/verga, 2026-08-28)
+anotado no proprio 15.3 em vez de apagado - a 8a prevalece, e o caso
+peitoril/verga ficou como pendencia de decisao do usuario.
 
 ### REPEATED_VERTICAL_COMPENSATOR_STRIP
 
@@ -184,3 +184,7 @@ A correcao esta provada por teste de regressao offline (falha antes, passa
 depois) mas **ainda nao foi exercitada no Revit**. Tempo de criacao,
 quantidade criada e repetibilidade do beta continuam sem medicao ate a
 proxima execucao.
+
+A unica pendencia fisica em aberto desta bancada e a reprovacao
+`REPEATED_VERTICAL_COMPENSATOR_STRIP`. A cota Z **nao** e pendencia: e
+comportamento decidido (secao 8a das regras).

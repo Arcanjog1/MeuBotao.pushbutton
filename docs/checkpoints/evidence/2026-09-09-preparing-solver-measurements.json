@@ -200,18 +200,6 @@
   },
   "secondary_findings": [
     {
-      "id": "Z-ORIGEM",
-      "severity": "correcao (nao performance)",
-      "detail": "run_modulation_on_existing_walls usa base_z_abs = selected_level.Elevation (-36.2915ft = -1106cm), mas as paredes da bancada tem WALL_BASE_OFFSET de 1718.164cm; a base real e' 612cm. O offset de base nao entra no calculo.",
-      "location": "nuvem/core/wall_modeling.py, run_modulation_on_existing_walls"
-    },
-    {
-      "id": "BETA-Z-GUARD",
-      "severity": "bloqueio potencial do beta",
-      "detail": "_refresh_geometry_from_document, com controlled_beta=True, levanta 'BETA BLOQUEADO' quando min(|p.Z - origin_ref.Z|, |p.Z - base_z_abs|) > 1e-6. Com base_z_abs vindo de Level.Elevation e as curvas em Z do nivel, a guarda passa; com base_z_abs = 612cm, ela reprova.",
-      "location": "nuvem/core/wall_modeling.py, _refresh_geometry_from_document"
-    },
-    {
       "id": "PKG-CACHE",
       "severity": "RETIRADO - achado incorreto",
       "detail": "RETIRADO em 2026-09-09. A afirmacao original ('nenhuma pasta de botao contem o pacote beta, logo o clique nao rodou 8cdd33f') era FALSA: veio de uma busca com profundidade insuficiente. O pacote beta 8cdd33f esta instalado como um botao pyRevit proprio em MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton, com beta-package.json, beta_package.py e core/ na propria pasta - exatamente o layout que _pasta_do_loader() exige. A execucao lenta relatada veio de la, e rodou de fato o head 8cdd33f974f41a9bf41010a32f82762740b31ed3.",
@@ -253,5 +241,17 @@
     "diagnostic_button_installed": "MinhaAba.tab/MeuPainel.panel/TESTE-PERF.pushbutton (head 0ffa8e98bffb0efe3723f2b07f376a9a1e473a73)",
     "verification": "beta_package.verify_beta_package executado a partir da PASTA DO BOTAO: manifesto e hashes de todos os arquivos conferem; entry point resolve dentro da propria pasta.",
     "rollback": "TESTE.pushbutton e MeuBotao.pushbutton intactos; desinstalar o diagnostico e apagar a pasta TESTE-PERF.pushbutton."
+  },
+  "z_origin_decision": {
+    "status": "NAO E BUG - comportamento desejado, decidido pelo usuario em 2026-09-09",
+    "rule": "nuvem/REGRAS_MODULACAO_BLOCOS.md, secao 8a",
+    "decision": "A origem vertical da modulacao e' o NIVEL de referencia (selected_level.Elevation). O WALL_BASE_OFFSET de uma Wall existente e' arbitrario e NAO pode redefinir a cota inicial dos blocos.",
+    "bench_reading": "Nesta bancada as Walls e' que estao deslocadas: nivel 'pb' em -1106.16cm com WALL_BASE_OFFSET de +1718.164cm. Os blocos nascem colados ao nivel, que e' a posicao CORRETA pela regra; os 1718.164cm ate' a base das Walls medem o desvio DAS PAREDES, nao um erro da modulacao.",
+    "retracted_findings": [
+      "Z-ORIGEM",
+      "BETA-Z-GUARD"
+    ],
+    "code_change": "NENHUMA - a logica de Z foi preservada exatamente como estava.",
+    "conflict_registered": "secao 15.3 das regras (peitoril/verga, 2026-08-28) contradiz a 8a; a 8a prevalece, e o caso peitoril/verga ficou como pendencia de decisao do usuario, sem apagar a 15.3."
   }
 }

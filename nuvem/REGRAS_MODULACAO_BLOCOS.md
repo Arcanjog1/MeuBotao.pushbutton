@@ -413,6 +413,44 @@ nunca aplica um ajuste maior sem autorização explícita do usuário.
   "Offset da base" de `Wall.Create`). Passar a cota já absoluta duplicava
   a elevação (bug real corrigido 2026-08-21).
 
+## 8a. REGRA OBRIGATÓRIA — a origem vertical da modulação é o NÍVEL,
+nunca o `WALL_BASE_OFFSET` da Wall (2026-09-09)
+
+> **Origem**: decisão explícita do usuário, 2026-09-09, ao revisar o
+> diagnóstico do primeiro beta no Revit. Substitui a leitura anterior de
+> que isso seria um defeito. **Não é bug: é o funcionamento desejado.**
+
+`base_z_abs` da modulação vem do **nível de referência selecionado**
+(`selected_level.Elevation` em `run_modulation_on_existing_walls`). O
+`WALL_BASE_OFFSET` de uma Wall **existente** não entra nessa conta e
+**não pode** redefinir a origem vertical do lote de blocos.
+
+Razão, nas palavras do usuário: os blocos devem nascer a partir do nível
+de referência; o offset de uma Wall existente é **arbitrário**, e quando
+ele diverge da planta o que está deslocado é a **parede**, não a
+modulação. Deixar a modulação seguir esse offset seria propagar o erro do
+modelo para dentro da regra.
+
+**Consequência prática, medida na bancada de 2 paredes (2026-09-09)**: as
+Walls `5390468`/`5390548` estão no nível `pb` (elevação −1106,16cm) com
+`WALL_BASE_OFFSET` de +1718,164cm — ou seja, "voando" 17,18m acima do
+nível. Os blocos nascem em `Level.Elevation + 1cm + n·20cm`, colados ao
+nível, e **essa é a posição correta pela regra**. A distância de
+1718,164cm entre os blocos e a base das Walls é a medida do desvio **das
+Walls**, não um erro da modulação.
+
+Como o caminho de criação calcula `course_offset = course_z_abs −
+base_z_abs`, o valor de `base_z_abs` se cancela e o Revit soma a elevação
+do nível por conta própria (ver seção 8, `NewFamilyInstance`). O efeito
+líquido já é exatamente o desejado — **não "corrigir" isso.**
+
+**Proibido** (a menos que o usuário reabra o assunto explicitamente):
+somar `WALL_BASE_OFFSET` a `base_z_abs`, derivar a cota inicial da
+bounding box das Walls, ou qualquer outra forma de fazer a origem
+vertical da modulação seguir a geometria da parede existente.
+
+Conflito registrado com a seção 15.3 — ver o aviso lá.
+
 ## 8b. Modo de geração das paredes de referência (2026-08-28)
 
 A janela de configuração (`_SetupForm`, seção *"6. Como gerar as
@@ -1562,6 +1600,27 @@ Por isso `AMBIGUOUS` **continua reservando** espaço de amarração (seção
 11.9): ali existe peça de verdade, só que na outra faixa de altura.
 
 ### 15.3 — Pendência: `num_courses`/`base_z_abs` são globais
+
+> **CONFLITO REGISTRADO (2026-09-09)** — leia antes de implementar esta
+> pendência. A seção **8a** (decisão do usuário, 2026-09-09) determina que
+> a origem vertical da modulação é **sempre o nível de referência**, e que
+> o `WALL_BASE_OFFSET` de uma Wall existente **não** pode redefini-la.
+> Isso contradiz diretamente o segundo marcador da lista abaixo ("o lote
+> inteiro nasce 220cm abaixo do lugar certo"), escrito em 2026-08-28.
+>
+> **Vale hoje: a seção 8a** (orientação mais recente do usuário tem
+> prioridade). Nada aqui foi apagado, porque o caso que motivou esta
+> pendência — peitoril e verga como paredes SEPARADAS em faixas de altura
+> diferentes — é um cenário distinto do da bancada que gerou a 8a (uma
+> parede inteira deslocada em relação à planta), e o usuário ainda **não**
+> se pronunciou sobre ele.
+>
+> **Pendência de decisão do usuário**: peitoril/verga devem continuar
+> nascendo a partir do nível (regra 8a aplicada literalmente, e as peças de
+> verga ficam fora de lugar), ou esse caso específico é a exceção que
+> justifica agrupar por `(altura, offset_de_base)`? **Não implementar o
+> agrupamento por offset de base sem essa resposta** — hoje ele violaria a
+> 8a.
 
 `_select_existing_walls_for_modulation` devolve **um** `max_height_ft` (a
 MAIOR altura entre as paredes selecionadas) e
