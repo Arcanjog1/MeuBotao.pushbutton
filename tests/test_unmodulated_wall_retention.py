@@ -91,6 +91,30 @@ def test_empty_failed_solve_retains_all_references():
     assert creation["skipped_wall_idxs"] == [0]
 
 
+def test_beta_new_solve_does_not_finalize_using_old_instances():
+    import revit_stubs
+    handler = m._PostCreationEventHandler()
+    handler.controlled_beta = True
+    old = solve(199)
+    handler.create_result = {"created_instances": [
+        {"course_index": ci, "candidate_key": id(c)}
+        for ci, pcs in old["course_candidates"].items() for c in pcs]}
+    handler.solve_result = solve(199)
+    handler.solve_result.update(num_courses=2, beta_preflight={"ok": True})
+    handler.walls_to_create = [(seg(0, 0, 199, 0), ft(14), (False, False))]
+    wall_id = revit_stubs.ElementId(1)
+    handler.created_walls_by_axis = {0: [(wall_id, "cad")]}
+    handler.created_wall_ids_all = [wall_id]
+
+    class Document:
+        def GetElement(self, _eid):
+            pytest.fail("Old instances cannot authorize finalizing the new solve")
+
+    handler._execute_delete(Document())
+    assert handler.create_result["skipped_wall_idxs"] == [0]
+    assert handler.create_result["kept_wall_count_no_blocks"] == 1
+
+
 def test_real_99754_wall_preserves_overlapping_reservation_diagnosis():
     import json
     from pathlib import Path

@@ -14,6 +14,14 @@ import sys
 import time
 
 
+def source_fingerprint(repo):
+    digest = hashlib.sha256()
+    for path in sorted((repo / "nuvem/core").rglob("*.py")):
+        digest.update(path.relative_to(repo).as_posix().encode("utf-8") + b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", type=Path, required=True)
@@ -26,7 +34,12 @@ def main():
     sys.path.insert(0, str(repo / "nuvem"))
     from benchmark import solver_bridge, model
     source = repo / "nuvem/benchmark/projects" / args.project / "input.json"
-    data = json.loads(source.read_text(encoding="utf-8"))
+    source_bytes = source.read_bytes()
+    data = json.loads(source_bytes.decode("utf-8"))
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+    status_before = subprocess.check_output(["git", "status", "--porcelain"], cwd=repo, text=True)
+    code_hash = source_fingerprint(repo)
+    instrumentation_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     started = datetime.now(timezone.utc).isoformat()
     clock = time.monotonic()
     result, walls, nodes, openings, catalog, base, courses, notes = solver_bridge.run_solver(data)
@@ -88,10 +101,15 @@ def main():
         "empty_walls": [i for i in range(len(walls)) if not counts[i]],
         "intersection_failures": len(result["intersection_failures"]),
     }
+    if code_hash != source_fingerprint(repo) or source_bytes != source.read_bytes():
+        raise RuntimeError("Solver source or input changed during snapshot; result is not immutable evidence")
     payload = {
-        "head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip(),
+        "head": head,
+        "head_after": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip(),
+        "status_before": status_before, "solver_source_sha256": code_hash,
+        "instrumentation_sha256": instrumentation_hash,
         "status": subprocess.check_output(["git", "status", "--porcelain"], cwd=repo, text=True),
-        "input_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "input_sha256": hashlib.sha256(source_bytes).hexdigest(),
         "started_utc": started, "solver_seconds": elapsed, "project": args.project,
         "summary": summary, "wall_keys": keys, "notes": notes,
         "candidates": [piece(c) for c in candidates],

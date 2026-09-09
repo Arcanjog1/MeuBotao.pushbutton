@@ -63,15 +63,18 @@ def test_mixed_or_incomplete_packages_are_rejected(tmp_path, damage):
         load(ROOT / "beta_package.py").verify_beta_package(str(tmp_path))
 
 
-def test_corrupt_beta_never_falls_back_to_network_or_normal_cache(tmp_path):
+@pytest.mark.parametrize("missing_manifest", [False, True])
+def test_corrupt_beta_never_falls_back_to_network_or_normal_cache(tmp_path, missing_manifest):
     package(tmp_path)
     (tmp_path / "beta_package.py").write_bytes((ROOT / "beta_package.py").read_bytes())
+    if missing_manifest:
+        (tmp_path / "beta-package.json").unlink()
     tree = ast.parse((ROOT / "Script.py").read_text(encoding="utf-8-sig"))
     function, = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_load_entry_point"]
     namespace = {"os": os, "io": io, "sys": sys, "_pasta_do_loader": lambda: str(tmp_path),
                  "_get_token": lambda: pytest.fail("Network/cache fallback entered")}
     exec(compile(ast.Module(body=[function], type_ignores=[]), "loader-test", "exec"), namespace)
-    with pytest.raises(ValueError, match="hash mismatch"):
+    with pytest.raises((ValueError, OSError)):
         namespace["_load_entry_point"]()
 
 

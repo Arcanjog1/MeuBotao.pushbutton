@@ -1,0 +1,33 @@
+{
+  "started_utc": "2026-09-09T15:06:45.494969+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "8d75bb4ea1c6079f4b5dd1dee56a2060f14766e7",
+  "tree": "49602c7c801b51c364afd64f63c922f6736c1b92",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_controlled_beta_preflight.py",
+    "tests/test_unmodulated_wall_retention.py",
+    "tests/test_beta_package.py",
+    "tests/test_neighbor_node_bond_collision.py",
+    "tests/test_compensator_spread_cr_n1e.py",
+    "tests/test_non_modular_wall_coverage.py",
+    "tests/test_block_bonding.py",
+    "tests/test_block_fit_tolerance_c04.py",
+    "tests/test_solver_l_node_alternation_cr_s1.py",
+    "tests/test_wall_junction_scan_perf.py",
+    "tests/test_script.py",
+    "-q"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-etapa2-intermediate.txt",
+  "pid": 17936,
+  "exit_code": 0,
+  "elapsed_seconds": 92.438,
+  "status_after": "M Script.py\n M nuvem/core/wall_modeling.py\n M tests/test_beta_package.py\n M tests/test_unmodulated_wall_retention.py\n?? docs/checkpoints/evidence/beta-etapa2-intermediate.json\n?? docs/checkpoints/evidence/beta-etapa2-intermediate.txt\n?? docs/checkpoints/evidence/beta-preflight-main-tp1-v2.json\n?? docs/checkpoints/evidence/beta-preflight-tgd-v2.json\n?? docs/checkpoints/evidence/beta-preflight-tp1-v2.json",
+  "log_sha256": "1b0bf0d59e40ba26cf026012806128d4be9df54712477b19da18853cb4700ea9"
+}

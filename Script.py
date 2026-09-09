@@ -1102,7 +1102,9 @@ def _load_entry_point():
     nenhum token cifrado estiver configurado, `_get_token` devolve None e o
     download acontece anonimo, exatamente como antes."""
     beta_directory = _pasta_do_loader()
-    if os.path.isfile(os.path.join(beta_directory, "beta-package.json")):
+    if (os.path.isfile(os.path.join(beta_directory, "beta-package.json")) or
+            (os.path.isfile(os.path.join(beta_directory, "beta_package.py")) and
+             os.path.isdir(os.path.join(beta_directory, "core")))):
         # An invalid beta must fail here, outside the online/cache fallback.
         verifier_path = os.path.join(beta_directory, "beta_package.py")
         verifier = {"__file__": verifier_path, "__name__": "beta_package_verifier"}
@@ -1112,6 +1114,9 @@ def _load_entry_point():
         globals()["CONTROLLED_BETA"] = True
         globals()["CONTROLLED_BETA_HEAD"] = head
         sys.dont_write_bytecode = True
+        while beta_directory in sys.path:
+            sys.path.remove(beta_directory)
+        sys.path.insert(0, beta_directory)
         print("BETA CONTROLADO - pacote offline verificado: " + head)
         return entry
     globals()["CONTROLLED_BETA"] = False

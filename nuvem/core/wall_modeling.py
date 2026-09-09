@@ -10602,6 +10602,11 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def _execute_delete(self, app_doc):
         if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
             raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
+        if self.controlled_beta:
+            if self.create_result is None:
+                raise ValueError("BETA BLOQUEADO: lote ainda nao criado.")
+            # A new solve cannot authorize deleting references based on an old batch.
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
         # NUNCA excluir a parede de referencia de um eixo que ficou SEM
         # bloco (reprovado na auditoria de amarracao entre fiadas - regra
         # #1, 2026-08-25, ver _execute_create): apagar essa parede junto
