@@ -4,7 +4,7 @@
 {
   "date": "2026-09-09",
   "branch": "codex/auditoria-governanca-beta-20260909",
-  "head": "08495d913e72b36a80b034d5f0a1435470d27557",
+  "head": "2929bf5d465fc2598302cf7fbd9f8107ae6b9b06",
   "base": "08495d913e72b36a80b034d5f0a1435470d27557",
   "pr": "not-created",
   "objective": "Auditar main e candidatos, reconciliar fatos e implementar governanca documental de baixo risco para preparar beta controlado.",
@@ -17,13 +17,13 @@
   "tests": [
     "Candidato 439fd49391227e128038fec704833c66c6ce3ffa: 185 passed nos sete arquivos focados; log e proveniencia em evidence/2026-09-09-candidate-focused.*.",
     "Mesmo candidato: 2 failed, 1 passed, 6 deselected na selecao de baseline; 354.47s. Log integral em evidence/2026-09-09-candidate-baselines.*.",
-    "python -m unittest discover -s tools/documentation -p test_*.py -v: 11 casos validos/invalidos passaram na implementacao local.",
+    "python -m unittest discover -s tools/documentation -p test_*.py -v: 11 casos validos/invalidos passaram em 2929bf5; log/proveniencia em evidence/2026-09-09-governance-tests.*.",
     "Probe estatico: chaves fisicas unicas nos insumos e room positivo dentro do vao confirmado, sem gerar novo benchmark."
   ],
   "known_failures": [
     "TGD test_projeto_nao_regrediu_contra_o_baseline: compensators 52->66 paredes reprovadas.",
     "TP1 mesmo teste: JUNCTION_MISSING_BINDING 8->9 e OPENING_BLOCK_INSIDE_DOOR 0->7.",
-    "Suite completa N1c/e/f inconclusiva nos relatos; ausencia de outras falhas nao foi comprovada.",
+    "Suite N1c/e/f 1003/2 relatada em 420dbcc, sem log bruto acessivel; assercoes corroboradas. Codigo/testes identicos a 439fd49.",
     "Checks antigos de PR #30/#31 vermelhos por falta de atualizacao do status; push incremental verde nao supria o PR."
   ],
   "physical_deltas": [
@@ -53,7 +53,10 @@
     {"path": "docs/checkpoints/evidence/2026-09-09-candidate-baselines.json"},
     {"path": "docs/checkpoints/evidence/2026-09-09-candidate-baselines.txt"},
     {"path": "docs/checkpoints/evidence/2026-09-09-static.json"},
-    {"path": "docs/BENCH_N1C_N1E_2026-09-09.md", "commit": "439fd49391227e128038fec704833c66c6ce3ffa"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-github-final.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-governance-tests.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-governance-tests.txt"},
+    {"path": "docs/BENCH_N1C_N1E_2026-09-09.md", "commit": "420dbcc753bd310a5af999be609584bae40d0c54"},
     {"path": "docs/CR_B_INTEGRATION_PREPARATION.md", "commit": "0596e78eadcbebd9369dbd54272b44952b8211ed"}
   ]
 }

@@ -1,6 +1,8 @@
 # Auditoria independente e preparacao do beta Revit
 
 Data: 2026-09-09. Escopo: GitHub, documentacao, codigo e evidencias offline.
+Reconferencia final as 13:34 UTC: #31 avancou de `439fd49` para `420dbcc`
+durante a auditoria. [Snapshot complementar](checkpoints/evidence/2026-09-09-github-final.json).
 **Recomendacao: ainda nao liberar a colocacao automatica do candidato inteiro.**
 Faltam fechar a invasao de aberturas, a disposicao das paredes vazias e a
 regressao consolidada da versao escolhida. Nao e exigida perfeicao do benchmark.
@@ -33,7 +35,7 @@ main no snapshot. Protecao da branch: `protected=false`, sem checks obrigatorios
 |---|---|---|---|
 | #28 | OPEN, draft | `0596e78eadcbebd9369dbd54272b44952b8211ed` | `91258dd627af97fe437a56c0506eb096ca5aa267` / mesmo SHA |
 | #30 | OPEN, draft | `626087b845a23f83b7907c39c448bfa7e8d3e69e` | `08495d913e72b36a80b034d5f0a1435470d27557` / mesmo SHA |
-| #31 | OPEN, draft | `439fd49391227e128038fec704833c66c6ce3ffa` | `08495d913e72b36a80b034d5f0a1435470d27557` / mesmo SHA |
+| #31 | OPEN, draft | `420dbcc753bd310a5af999be609584bae40d0c54` | `08495d913e72b36a80b034d5f0a1435470d27557` / mesmo SHA |
 
 Todos tem `baseRefName=main`; o `baseRefOid` retornado para #28 e historico,
 NAO a ponta atual da branch. O merge-base confirma de onde seu diff parte.
@@ -56,6 +58,7 @@ Titulos de #17/#19 ainda dizem draft apesar de `mergedAt` preenchido.
 | 09/09 05:37 | N1c `cb70224`: fronteira considera alcance do vizinho |
 | 09/09 06:34 | N1e `190fd6e`: intercala compensadores sem mudar composicao |
 | 09/09 10:30-12:29 | N1f `03942b4`: cache; `439fd49`: relatorio atualizado, suite completa ainda inconclusiva |
+| 09/09 13:15 | `420dbcc`: suite 1003/2 relatada como concluida e scores regenerados; nenhum diff de codigo/testes |
 
 Producao nao integrada: #30/#31 mudam `nuvem/core/engine/wall_stepper.py`;
 #31 inclui #30 por ancestralidade. #7/#8 carregam `wall_pairing.py` e
@@ -94,7 +97,7 @@ do documento, nao aprovacao de todas as propostas nele contidas.
 | `docs/CR_B_INTEGRATION_PREPARATION.md` | `0596e78` | somente #28 | Status antigo S1/C1 e D6; nao copiado como oficial. Tabela de identidade existe nessa branch |
 | `BENCH_SWEEP_2026-09-08.md` | `626087b` | #30/#31 | Registros N1, nao ultima revisao do solver |
 | `BENCH_FECHAMENTO_N1_2026-09-09.md` | `5da9471` | #31 | Descreve N1b; T sem peca supersedido por N1c; abertura nao foi resolvida |
-| `BENCH_N1C_N1E_2026-09-09.md` | `439fd49` | #31 | Inclui N1f; execucao final dita em curso sem log conclusivo. Numeros agregados relatados |
+| `BENCH_N1C_N1E_2026-09-09.md` | `439fd49` -> `420dbcc` | #31 | Atualizacao durante auditoria: 1003/2 relatados, assercoes corroboradas; log bruto indisponivel |
 | `docs/REFERENCE_CORPUS.md` e READMEs de benchmark/testes | ver inventario | main | Diferenciam origem/confianca/capabilities; nao certificam beta Revit |
 | Relatorios ARM, B19, C04, CR-A e arquivos de arquivo morto | ver inventario | main | Evidencia datada por CR; riscos C3/C4 e limitacoes nao promovidos a bloqueio universal |
 
@@ -210,9 +213,12 @@ fisicos independentes nem foi remensurada integralmente aqui.
 798->746 (TGD) / 862->811 (TP1) sao totais relatados de identidades de
 achados, nao contagem de compensadores. Os relatos divergem em TP1
 POSITION_OVERLAP base 2 versus 1 identidade; sem lista/metodo final nao
-normalizar silenciosamente essa divergencia. Scores versionados sao N1b:
-`67083b0` nos reais, `300aef6` no piloto. Nao provariam N1f mesmo se verdes.
-`input/reference/baseline/reference_score` sao byte-identicos entre main e #31.
+normalizar silenciosamente essa divergencia. No primeiro snapshot os scores eram N1b
+(`67083b0` nos reais, `300aef6` no piloto). `420dbcc` atualizou scores e
+reports dos reais: 11837/19647 blocos; POSITION_OVERLAP ausente (zero);
+binding 23/9; CROSSES_JAMB 108/161 e INSIDE_DOOR 5/7. Agregados conferidos
+no JSON, nao reexecucao nem prova do conjunto de identidades. Input,
+reference, baseline e reference_score permanecem identicos a main.
 
 Desempenho TGD relatado: base 99,3s/22 rebuilds; N1 47,8s/7; N1b 65s/10;
 N1c+e 176,4s/22; N1f 127s/22. N1f melhora 28% contra N1c+e, mas custa
@@ -222,10 +228,15 @@ pode usar outro denominador, que nao esta documentado. Medicao final do
 tempo de geracao/reparo separada, perfil bruto e equivalencia bit-a-bit
 global permanecem **nao verificados**; nao repetimos a varredura para isso.
 
-Suite completa do #31 nao tem conclusao disponivel: relato termina com
-execucoes interrompidas/uma final em curso. 964/2 e N1b; 921/2 e relato de
-base anterior. A selecao de baselines nova NAO e suite completa nem prova
-ausencia de outras falhas. Comando precisou do Python empacotado (alias
+Suite completa do #31: o relato inicialmente terminava com execucoes
+interrompidas; `420dbcc` o substituiu por **1003 passed, 2 failed, 39min00s**,
+comando `python3 -m pytest tests/ -q -n 4 --dist loadfile`. Nao ha log bruto
+ou JUnit versionado: resultado RELATADO, com assercoes corroboradas pelos
+nossos baselines. Diff `439fd49..420dbcc` em `nuvem/core` e `tests` vazio;
+nao ha motivo para repetir testes longos so por esse fechamento.
+964/2 e N1b; 921/2 e relato de base anterior. Nossa selecao de baselines
+NAO e suite completa nem prova ausencia de outras falhas.
+Comando precisou do Python empacotado (alias
 `python` do Windows indisponivel) e instalacao de pytest 9.1.1; para os
 baselines, `PYTHONPATH=<checkout candidato>/nuvem`. Sem relancamento de
 teste por falha de monitor; PIDs 21440/10544 encerrados, resultados preservados.
@@ -241,7 +252,7 @@ vizinhos, nao apenas a um retangulo recortado que esconda interacoes.
 | Nenhum bloco dentro/cruzando vao | FAIL | Corrigir ancoragem na jamba preservando amarracao; testar porta e janela no nivel certo |
 | Parede vazia com tratamento explicito | PARCIAL | Motivo NON_MODULAR existe, mas faltam lista fisica completa do recorte e disposicao visivel: corrigir, excluir do lancamento com revisao ou aprovar contrato |
 | L/T/X criticos e amarracao verificados | PARCIAL | Controles passam; conferir nos da regiao, incluindo T restaurado e encontro proximo da abertura |
-| Focados + regressao consolidada | PARCIAL | Focados verdes; suite final incompleta e baseline vermelho. Classificar custos e defeitos, sem regravar baseline para ocultar |
+| Focados + regressao consolidada | PARCIAL | Focados verdes; suite 1003/2 relatada sem log bruto e baseline vermelho confirmado. Recuperar log existente e classificar custos/defeitos; nao regravar baseline para ocultar |
 | Versao exata efetivamente carregada | NAO FECHADO | Fixar SHA do pacote completo, registrar hash e caminho carregados; `Script.py` configura `GITHUB_BRANCH = main` na linha 556 |
 | Rollback | NAO ENSAIADO no Revit | Copia de RVT e pacote anterior preservados; ensaiar restauracao antes da primeira colocacao |
 | Evidencia reproduzivel | PARCIAL | Infra offline pronta; registrar entrada/configuracao/catalogo, cota/unidades/eixo, chave e IDs locais, blocos/achados, log, duracao e capturas antes/depois no beta |
@@ -297,8 +308,8 @@ dos dois repositorios originais preservadas. Trabalho feito em worktrees
 isoladas. Subagente ficou indisponivel por limite de uso antes de produzir
 resultado; nenhuma conclusao desta auditoria depende dele.
 
-Limites restantes: nao foi inspecionado Revit real, nao ha log completo
-concluido da suite N1f, nao foram recuperados artefatos ignorados remotos,
+Limites restantes: nao foi inspecionado Revit real, nao ha log bruto acessivel
+da suite N1f relatada como concluida, nao foram recuperados artefatos ignorados remotos,
 nao foi certificado determinismo global ou performance no Revit. A
 governanca melhora rastreabilidade e detecta inconsistencias estruturais;
 nao substitui a revisao tecnica nem a autorizacao normativa do usuario.

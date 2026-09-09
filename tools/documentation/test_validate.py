@@ -1,6 +1,7 @@
 """Exercise the validator against real temporary Git repositories."""
 
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -108,6 +109,17 @@ class DocumentationTests(unittest.TestCase):
         self.state['candidates'] = [{'head': self.base}]
         self.sync()
         self.assertTrue(any('candidate already integrated' in e for e in self.errors()))
+
+    def test_captured_log_hash(self):
+        log = 'docs/checkpoints/evidence/run.txt'
+        self.write(log, 'passed\n')
+        digest = hashlib.sha256((self.root / log).read_bytes()).hexdigest()
+        self.write('docs/checkpoints/evidence/run.json', json.dumps({
+            'head': self.base, 'state': 'completed', 'log': 'run.txt', 'log_sha256': digest}))
+        self.git('add', '.')
+        self.assertEqual([], self.errors())
+        self.write(log, 'modified\n')
+        self.assertTrue(any('log hash mismatch' in e for e in self.errors()))
 
 
 if __name__ == '__main__':

@@ -4,10 +4,11 @@ Estado operacional conferido em 2026-09-09 por fetch e API GitHub.
 Esta pagina distingue codigo integrado, candidatos e decisoes pendentes.
 Auditoria, limites e gates: [AUDITORIA_BETA_2026-09-09.md](AUDITORIA_BETA_2026-09-09.md).
 Evidencia Git/GitHub: [snapshot](checkpoints/evidence/2026-09-09-github.json).
+Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-github-final.json).
 
 ```json
 {
-  "observed_utc": "2026-09-09T12:51:56.996890+00:00",
+  "observed_utc": "2026-09-09T13:34:33+00:00",
   "main": "08495d913e72b36a80b034d5f0a1435470d27557",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -22,7 +23,7 @@ Evidencia Git/GitHub: [snapshot](checkpoints/evidence/2026-09-09-github.json).
     {"pr": 21, "head": "766e1ea6ee281cc29a3d6118d6013f3955193352"},
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
-    {"pr": 31, "head": "439fd49391227e128038fec704833c66c6ce3ffa"}
+    {"pr": 31, "head": "420dbcc753bd310a5af999be609584bae40d0c54"}
   ]
 }
 ```
@@ -42,7 +43,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-C1 | PR #26 integrado, `0c6e8f7` | Herdado pelo #31 | [cobertura](CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md) | Nao resolve C2/G16 inteiro |
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
-| CR-N1b/c/e/f | Ausente | PR #31 draft, `439fd49` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Regressao consolidada completa e aberturas |
+| CR-N1b/c/e/f | Ausente | PR #31 draft, `420dbcc` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Log bruto da suite consolidada e aberturas |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
 | Governanca desta auditoria | Ainda candidata a revisao | Branch `codex/auditoria-governanca-beta-20260909` | [checkpoint](checkpoints/2026-09-09-auditoria-governanca.md) | Revisao humana; nenhum merge autorizado |
 
@@ -61,7 +62,9 @@ integrados. Titulo com "draft" nao substitui `state`/`mergedAt`.
 
 N1c pertence a `claude/sleepy-turing-rf4s7o`, nao a uma terceira branch:
 `cb70224` (alcance do vizinho), depois `190fd6e` (N1e, intercala),
-`03942b4` (N1f, cache), `439fd49` (relato final).
+`03942b4` (N1f, cache), `439fd49` (relato) e `420dbcc` (13:15 UTC,
+fechamento relatado da suite e scores regenerados). Este ultimo commit nao
+muda codigo nem testes; equivalencia conferida por diff.
 N1b foi `417341c`; o snapshot `67083b0` e anterior a N1c/e/f.
 
 Os PRs #7/#8 tambem carregam diferencas de producao em
@@ -86,14 +89,19 @@ No candidato exato `439fd49`, Python 3.12.14 e pytest 9.1.1, sem Revit:
 - [Probe independente](checkpoints/evidence/2026-09-09-static.json):
   no em `t=742` dentro do vao `564..750` ainda recebe room positivo
   nos dois sentidos (742cm/58cm). Defeito de medicao confirmado no codigo.
-- Suite completa de N1c/e/f: **nao verificada/concluida**. O relato de
-  964 passed / 2 failed pertence a N1b, nao a este HEAD.
+- Suite completa de N1c/e/f: **1003 passed / 2 failed relatados** em
+  `420dbcc` (39min, `-n 4 --dist loadfile`), sem log bruto acessivel.
+  Nao repetida: codigo/testes identicos aos auditados. As duas assercoes
+  relatadas batem com nossa execucao independente. 964/2 era N1b.
 
 Relatos do #31 informam 798 -> 746 / 862 -> 811: sao **totais de identidades
 de achados**, NAO compensadores, nem necessariamente defeitos fisicos
 distintos entre codigos. Conjuntos brutos finais nao estavam versionados;
-nao foram reproduzidos nesta auditoria. Os `score.json` de TGD/TP1 sao de
-`67083b0`, inadequados como prova da N1f. O
+nao foram reproduzidos nesta auditoria. Os `score.json` de TGD/TP1 eram de
+`67083b0` na primeira consulta e foram atualizados em `420dbcc`: registram
+11837/19647 blocos, overlap zero, TGD binding 23 e TP1 binding 9, com 5/7
+ocorrencias INSIDE_DOOR abertas. Sao agregados, nao prova dos conjuntos
+finais de identidades. O
 [CURRENT_REFERENCE_SNAPSHOT](CURRENT_REFERENCE_SNAPSHOT.md) e historico de
 `68a6269`, nao medicao da main atual.
 

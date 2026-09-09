@@ -5,6 +5,7 @@ Read-only. Does not approve domain rules or infer truth from prose.
 
 import argparse
 import datetime
+import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -39,7 +40,7 @@ def git(root, *args):
 
 def documentation_only(path):
     return (path.endswith('.md') or path.startswith(('docs/', 'tools/documentation/', '.github/')) or
-            path in ('AGENTS.md', 'CLAUDE.md') or
+            path in ('AGENTS.md', 'CLAUDE.md', '.gitattributes') or
             path.startswith('.claude/skills/'))
 
 
@@ -133,6 +134,23 @@ def validate(root, base, main, require_current_main=False):
                     reference(ref, path)
             else:
                 errors.append(path + ': references must be a list')
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            errors.append(path + ': ' + str(exc))
+
+    for path in sorted(changed):
+        if not path.startswith('docs/checkpoints/evidence/') or not path.endswith('.json'):
+            continue
+        try:
+            data = json.loads(read(path))
+            if 'log_sha256' not in data:
+                continue
+            log = (root / path).parent / data['log']
+            relative = log.resolve().relative_to(root.resolve()).as_posix()
+            require(relative in tracked, path + ': log is not versioned')
+            require(hashlib.sha256(log.read_bytes()).hexdigest() == data['log_sha256'],
+                    path + ': log hash mismatch')
+            commit(data.get('head'), path + ': evidence head')
+            require(data.get('state') in ('completed', 'timeout'), path + ': validation still running')
         except (ValueError, KeyError, OSError, TypeError) as exc:
             errors.append(path + ': ' + str(exc))
 
