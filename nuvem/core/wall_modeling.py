@@ -7634,6 +7634,13 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
     A funcao continua existindo em wall_stepper.py (com seus proprios
     testes), so' nao e' mais chamada daqui.
     """
+    # SONDAS FINAS (diagnostico 2026-09-09, execucao 2): entre a entrada
+    # desta funcao e `process_walls_one_by_one` passaram 97,3s numa
+    # execucao real - num trecho que so tem um `if` falso, um dict vazio e
+    # um `def`. Um marco por instrucao mostra se o tempo passa em UMA
+    # fronteira (algo bloqueia ali) ou espalhado (a thread nao esta
+    # rodando). O campo `cpu` de cada marco decide entre as duas.
+    _perf.mark("analyze.trecho: entrou no corpo")
     if catalog_missing:
         return [{
             "wall_idx": None, "wall_ids": [],
@@ -7646,7 +7653,9 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             "auto_fixable": False, "fix_plan": None,
         }]
 
+    _perf.mark("analyze.trecho: passou do catalog_missing")
     plan_failures = {}
+    _perf.mark("analyze.trecho: plan_failures criado")
 
     def plan_hook(wall_idx, fill_result, verify):
         """Ajuste candidato para UMA parede. Recebe `verify` - o solver de
@@ -7670,6 +7679,7 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             plan_failures[wall_idx] = str(plan_ex)
             return None
 
+    _perf.mark("analyze.trecho: plan_hook definido")
     with _perf.span("process_walls_one_by_one", walls=len(walls_to_create)):
         run = process_walls_one_by_one(
             walls_to_create, wall_graph_nodes, wall_end_to_node, openings_per_wall, catalog,
@@ -8608,7 +8618,12 @@ class _ProgressConsole(object):
             self._log_box.SelectionStart = self._log_box.TextLength
             self._log_box.ScrollToCaret()
             self._touch(message)
-            Application.DoEvents()
+            # DoEvents() bombeia a fila de mensagens do Windows SEGURANDO
+            # o GIL - suspeito direto da starvation da thread de fundo
+            # medida em 2026-09-09. Cronometrado para confirmar ou
+            # descartar.
+            with _perf.span("console.log DoEvents"):
+                Application.DoEvents()
         except Exception:
             pass
 
@@ -8625,7 +8640,8 @@ class _ProgressConsole(object):
         try:
             self._status_label.Text = text
             self._status_label.ForeColor = color
-            Application.DoEvents()
+            with _perf.span("console.set_status DoEvents"):
+                Application.DoEvents()
         except Exception:
             pass
 
@@ -8648,7 +8664,8 @@ class _ProgressConsole(object):
             self._progress_bar.Value = pct
             self._detail_label.Text = detail or "{}/{} processado(s) - {}%".format(done, total, pct)
             self._touch(detail or "")
-            Application.DoEvents()
+            with _perf.span("console.set_progress DoEvents"):
+                Application.DoEvents()
         except Exception:
             pass
 
@@ -8660,11 +8677,16 @@ class _ProgressConsole(object):
             return
         try:
             self._progress_bar.Style = ProgressBarStyle.Marquee
+            # MarqueeAnimationSpeed liga uma ANIMACAO continua no controle:
+            # e a unica coisa desta janela que continua trabalhando sozinha
+            # enquanto "nada acontece". Marcado para poder ser descartado
+            # (ou incriminado) com timestamp.
             self._progress_bar.MarqueeAnimationSpeed = 30
             if detail:
                 self._detail_label.Text = detail
             self._touch(detail or "")
-            Application.DoEvents()
+            with _perf.span("console.set_indeterminate DoEvents"):
+                Application.DoEvents()
         except Exception:
             pass
 
@@ -8749,6 +8771,8 @@ class _ProgressConsole(object):
                 if not self._closed:
                     self.log(message)
 
+            _perf.mark("watchdog.tick", parado="{:.1f}s".format(elapsed),
+                       rotulo=(label or "")[:40])
             self._log_box.BeginInvoke(Action(_flush))
         except Exception:
             pass
@@ -10369,6 +10393,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 if self.on_done:
                     self.on_done("analyze", None)
 
+            _perf.mark("worker.thread TERMINOU o trabalho",
+                       marshaling=self.ui_invoke_cb is not None)
             if self.ui_invoke_cb is not None:
                 self.ui_invoke_cb(_finish)
             else:
@@ -12573,13 +12599,19 @@ class _WallReviewForm(Form):
         # entao self.on_done (_on_analyze_done, mais abaixo) precisa ser
         # chamado na thread de UI, nao na thread do solver.
         def _ui_invoke(fn):
+            # Marcado dos DOIS lados: um BeginInvoke que lanca (janela ja
+            # fechada/descartada, o caso real de 2026-09-09) era engolido
+            # aqui sem deixar rastro nenhum.
             try:
                 if self.InvokeRequired:
+                    _perf.mark("ui_invoke.BeginInvoke (da thread de fundo)")
                     self.BeginInvoke(Action(fn))
+                    _perf.mark("ui_invoke.BeginInvoke aceito")
                 else:
+                    _perf.mark("ui_invoke.direto (ja na thread de UI)")
                     fn()
-            except Exception:
-                pass
+            except Exception as _invoke_ex:
+                _perf.mark("ui_invoke.FALHOU", erro=str(_invoke_ex)[:120])
 
         self._handler.progress_cb = _progress_cb
         self._handler.wall_start_cb = _wall_start_cb

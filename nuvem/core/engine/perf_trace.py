@@ -27,6 +27,20 @@ import os
 import threading
 import time
 
+# CPU do PROCESSO (todas as threads somadas). E' o discriminador decisivo
+# entre "esta thread esta calculando devagar" e "esta thread nao esta
+# rodando": se o relogio de parede anda 97s e o CPU do processo anda ~0s,
+# ninguem no processo computou nada - a thread ficou PARADA (starvation/
+# bloqueio), nao lenta. Ausente no IronPython 2.7 (o engine do servidor
+# MCP); presente no CPython 3.x, que e' onde o botao roda.
+try:
+    _process_cpu = time.process_time
+except AttributeError:  # pragma: no cover - IronPython 2.7
+    try:
+        _process_cpu = time.clock
+    except AttributeError:
+        _process_cpu = None
+
 __all__ = [
     "enable", "disable", "is_enabled", "log_path", "mark", "span", "reset",
 ]
@@ -35,6 +49,7 @@ _ENABLED = False
 _PATH = None
 _LOCK = threading.Lock()
 _T0 = None
+_CPU0 = 0.0
 
 
 def _default_path():
@@ -44,13 +59,14 @@ def _default_path():
 
 def enable(path=None):
     """Liga o rastreamento e comeca uma sessao nova (cabecalho no arquivo)."""
-    global _ENABLED, _PATH, _T0
+    global _ENABLED, _PATH, _T0, _CPU0
     try:
         _PATH = path or _default_path()
         directory = os.path.dirname(_PATH)
         if directory and not os.path.isdir(directory):
             os.makedirs(directory)
         _T0 = time.time()
+        _CPU0 = _process_cpu() if _process_cpu is not None else 0.0
         _ENABLED = True
         _write("=== SESSAO {} ===".format(time.strftime("%Y-%m-%d %H:%M:%S")))
     except Exception:
@@ -73,8 +89,9 @@ def log_path():
 def reset():
     """Zera o relogio relativo sem trocar de arquivo - usado no clique, para
     que todos os marcos de UMA execucao sejam lidos a partir do zero."""
-    global _T0
+    global _T0, _CPU0
     _T0 = time.time()
+    _CPU0 = _process_cpu() if _process_cpu is not None else 0.0
 
 
 def _now():
@@ -95,13 +112,26 @@ def _write(line):
 
 
 def mark(tag, **fields):
-    """Um marco pontual: `[PERF] +12.345s tid=7 tag k=v k=v`."""
+    """Um marco pontual:
+    `[PERF] +12.345s cpu=3.210s thr=9 tid=7 tag k=v k=v`.
+
+    `cpu` e' o tempo de CPU do PROCESSO inteiro desde o inicio da sessao -
+    comparar a variacao dele com a variacao de `+Ns` entre dois marcos
+    responde, sozinho, se houve calculo ou espera. `thr` e' o numero de
+    threads Python vivas."""
     if not _ENABLED:
         return
     try:
         extra = " ".join("{}={}".format(k, fields[k]) for k in sorted(fields))
-        _write("[PERF] +{:9.3f}s tid={:<5} {} {}".format(
-            _now(), threading.current_thread().ident, tag, extra).rstrip())
+        cpu = ""
+        if _process_cpu is not None:
+            try:
+                cpu = "cpu={:8.3f}s ".format(_process_cpu() - _CPU0)
+            except Exception:
+                cpu = ""
+        _write("[PERF] +{:9.3f}s {}thr={:<3} tid={:<5} {} {}".format(
+            _now(), cpu, threading.active_count(),
+            threading.current_thread().ident, tag, extra).rstrip())
     except Exception:
         pass
 
