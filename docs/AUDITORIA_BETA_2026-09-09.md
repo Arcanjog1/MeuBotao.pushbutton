@@ -1,5 +1,12 @@
 # Auditoria independente e preparacao do beta Revit
 
+> Registro historico encerrado as 13:34 UTC. A revisao posterior do #31
+> (`05030d2`, secao 47) e a missao beta supersedem a recomendacao abaixo
+> de iniciar diretamente por ancoragem na jamba. Estado operacional e
+> prioridade reconciliados em [PROJECT_STATUS.md](PROJECT_STATUS.md).
+> Autorizacao posterior permite integrar #32 apos seus gates documentais
+> e #31 somente apos todos os gates tecnicos; nao e autorizacao geral.
+
 Data: 2026-09-09. Escopo: GitHub, documentacao, codigo e evidencias offline.
 Reconferencia final as 13:34 UTC: #31 avancou de `439fd49` para `420dbcc`
 durante a auditoria. [Snapshot complementar](checkpoints/evidence/2026-09-09-github-final.json).

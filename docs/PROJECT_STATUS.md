@@ -8,7 +8,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-09T13:34:33+00:00",
+  "observed_utc": "2026-09-09T14:35:00+00:00",
   "main": "08495d913e72b36a80b034d5f0a1435470d27557",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -23,7 +23,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
     {"pr": 21, "head": "766e1ea6ee281cc29a3d6118d6013f3955193352"},
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
-    {"pr": 31, "head": "420dbcc753bd310a5af999be609584bae40d0c54"}
+    {"pr": 31, "head": "05030d2cf3e18081b040ad048759099a1b215210"}
   ]
 }
 ```
@@ -43,9 +43,9 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-C1 | PR #26 integrado, `0c6e8f7` | Herdado pelo #31 | [cobertura](CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md) | Nao resolve C2/G16 inteiro |
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
-| CR-N1b/c/e/f | Ausente | PR #31 draft, `420dbcc` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Log bruto da suite consolidada e aberturas |
+| CR-N1b/c/e/f | Ausente | PR #31 draft, `05030d2` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Colisoes TGD +37, aberturas e regressao final |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
-| Governanca desta auditoria | Ainda candidata a revisao | [PR #32 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32), branch `codex/auditoria-governanca-beta-20260909` | [checkpoint](checkpoints/2026-09-09-auditoria-governanca.md) | Revisao humana; nenhum merge autorizado |
+| Governanca desta auditoria | Candidata, recomendada para integracao apos checks finais | [PR #32](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32), branch `codex/auditoria-governanca-beta-20260909` | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | Merge especificamente autorizado nesta missao; ainda nao executado neste registro |
 
 Tambem integrados: ARM SAFE REPAIR (#12), NÓ|FILL (#17), fidelidade dos
 gates ARM (#18), B19 residual condicionado (#19), fit C04 (#20),
@@ -67,6 +67,9 @@ N1c pertence a `claude/sleepy-turing-rf4s7o`, nao a uma terceira branch:
 fechamento relatado da suite e scores regenerados). Este ultimo commit nao
 muda codigo nem testes; equivalencia conferida por diff.
 N1b foi `417341c`; o snapshot `67083b0` e anterior a N1c/e/f.
+`05030d2` acrescentou somente checkpoint, status e secao 47 das regras.
+Codigo/testes permanecem identicos a `420dbcc`. CI atual do #31: dois
+checks de governanca verdes; isso nao executa nem aprova o solver.
 
 Os PRs #7/#8 tambem carregam diferencas de producao em
 `wall_pairing.py`/`wall_stepper.py` desde o merge-base, apesar do escopo
@@ -151,10 +154,22 @@ estabilizados sem contraexemplo.
 ## Beta e proximo passo
 
 **Nao liberar a colocacao automatica do candidato inteiro no Revit agora.**
-Prioridade limitada: corrigir ancoragem de pecas de no junto a jamba,
-com reprodutor que exija ausencia de invasao E amarracao preservada.
-Em seguida, consolidar regressao no SHA corrigido e selecionar uma
-pequena regiao que passe nos gates da auditoria.
+Prioridade da missao iniciada apos a auditoria: explicar por identidade
+as colisoes TGD 1160 -> 1197; distinguir agregado de bandas/variantes de
+fiadas realmente criadas; verificar OBB nas cotas ativas das portas;
+implementar contencao explicita e revisar paredes vazias. Nao aplicar a
+candidata de zerar room dentro da abertura, rejeitada na secao 47 do #31.
+Ancoragem na jamba nao esta aprovada nem provada como correcao suficiente.
+Depois das correcoes tecnicas: regressao final e recorte pequeno verificado.
+
+O checkpoint do #31 relata OBB TP1 2094/2094 e TGD 1074/1038, com 68%
+do TP1 em STANDARD_FILL. Sao relatos a conferir no escopo de fiadas e
+aberturas passado ao instrumento, nao certificacao de 2094 volumes 3D.
+O caso B34 em W019 permanece invasao real conhecida, nao eliminado pela
+reclassificacao de OPENING_BLOCK_*. Contencao nao autoriza mudar benchmark.
+Usuario autorizou #31 somente ao final e apos TODOS os gates tecnicos;
+#30 e ancestral integral de #31, nao integrar separadamente. Os demais
+PRs continuam sem autorizacao de merge. Revit nao deve ser iniciado.
 
 O beta pode comecar sem benchmark perfeito, em copia de projeto, com
 versao fixada e rollback ensaiado, quando essa regiao nao tiver blocos
