@@ -1,5 +1,10 @@
 # CURRENT REFERENCE SNAPSHOT
 
+> Auditoria 2026-09-09: esta medicao e HISTORICA, de `68a6269`, nao da
+> main `08495d9`. Numeros preservados sem regeneracao. O campo
+> `CURRENT_MAIN` abaixo descreve a data da medicao. Estado reconciliado:
+> [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 > **CURRENT STATE ONLY — REPLACEABLE SNAPSHOT.**
 > **THIS FILE IS NOT A BASELINE, NOT HISTORY, NOT APPEND-ONLY.**
 > Quando uma nova medição oficial for feita, o conteúdo abaixo deve ser

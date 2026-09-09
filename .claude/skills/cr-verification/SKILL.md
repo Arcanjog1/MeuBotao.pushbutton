@@ -111,7 +111,7 @@ Antes de finalizar qualquer entrega:
 
 ## 8. Integração com Outras Skills
 
-- **`cr-checkpoint`:** Ao concluir bateria de validação (`VALIDAÇÃO CONCLUÍDA`), registrar status dos gates e métricas no checkpoint (`.claude/checkpoints/<cr>.md`). Sem hooks automáticos.
+- **`cr-checkpoint`:** Ao concluir bateria de validação (`VALIDAÇÃO CONCLUÍDA`), registrar status dos gates e métricas no checkpoint versionado (`docs/checkpoints/<data>-<cr>.md`), conforme `docs/DEVELOPMENT_PROCESS.md`. Sem hooks automáticos.
 
 ---
 

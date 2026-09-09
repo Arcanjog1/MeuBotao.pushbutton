@@ -1,5 +1,10 @@
 # CR-G12 — revisão independente, contratos de teste e desempenho
 
+> Nota da auditoria de 2026-09-09: este e um registro historico da revisao
+> indicada, nao o estado atual de merges. PRs #25/#26/#27/#29 estao
+> integrados na main `08495d9`; #28 continua draft. C2/G16 e CR-B nao
+> foram aprovados por esses merges. Estado corrente: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 > **Nenhum merge. Nenhum arquivo oficial regravado. Nenhum monitoramento
 > criado. Nenhuma outra CR iniciada.**
 

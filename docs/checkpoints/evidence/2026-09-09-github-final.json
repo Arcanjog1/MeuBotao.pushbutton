@@ -1,0 +1,189 @@
+{
+  "observed_utc": "2026-09-09 13:34:33 UTC",
+  "main": "08495d913e72b36a80b034d5f0a1435470d27557",
+  "pr31": {
+    "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+    "headRefOid": "420dbcc753bd310a5af999be609584bae40d0c54",
+    "isDraft": true,
+    "number": 31,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-09T13:16:00Z",
+        "conclusion": "FAILURE",
+        "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34355957947/job/102480578234",
+        "name": "check-status-doc",
+        "startedAt": "2026-09-09T13:15:53Z",
+        "status": "COMPLETED",
+        "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-09T13:15:47Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34355953209/job/102480542707",
+        "name": "check-status-doc",
+        "startedAt": "2026-09-09T13:15:40Z",
+        "status": "COMPLETED",
+        "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+      }
+    ],
+    "updatedAt": "2026-09-09T13:16:16Z",
+    "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31"
+  },
+  "previous_head": "439fd49391227e128038fec704833c66c6ce3ffa",
+  "production_tests_diff": "",
+  "files_changed": "docs/BENCH_N1C_N1E_2026-09-09.md\nnuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json\nnuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json\nnuvem/benchmark/reports/torre_easy_lo_r00_tgd.txt\nnuvem/benchmark/reports/torre_easy_lo_r00_tp1.txt",
+  "suite": {
+    "status": "reported_completed_raw_log_unavailable",
+    "command": "python3 -m pytest tests/ -q -n 4 --dist loadfile",
+    "passed": 1003,
+    "failed": 2,
+    "duration_reported": "39min00s",
+    "source": "420dbcc753bd310a5af999be609584bae40d0c54:docs/BENCH_N1C_N1E_2026-09-09.md"
+  },
+  "scores": [
+    {
+      "project": "torre_easy_lo_r00_tgd",
+      "walls": 167,
+      "blocks": 11837,
+      "findings_total": 4873,
+      "critical_by_code": {
+        "PRISM_CONTINUOUS_JOINT": 322,
+        "JUNCTION_MISSING_BINDING": 23,
+        "OPENING_BLOCK_CROSSES_JAMB": 108,
+        "OPENING_BLOCK_INSIDE_DOOR": 5,
+        "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+        "COVERAGE_WALL_NOT_MODULATED": 29,
+        "COVERAGE_MISSING_ROW": 150
+      },
+      "categories": [
+        {
+          "category": "block_positions",
+          "pass": 167,
+          "fail": 0,
+          "findings": 0,
+          "findings_level_1": 0,
+          "findings_level_2": 0,
+          "success_rate": 1
+        },
+        {
+          "category": "compensators",
+          "pass": 101,
+          "fail": 66,
+          "findings": 1028,
+          "findings_level_1": 982,
+          "findings_level_2": 46,
+          "success_rate": 0.6048
+        },
+        {
+          "category": "junctions",
+          "pass": 147,
+          "fail": 20,
+          "findings": 327,
+          "findings_level_1": 327,
+          "findings_level_2": 0,
+          "success_rate": 0.8802
+        },
+        {
+          "category": "openings",
+          "pass": 149,
+          "fail": 18,
+          "findings": 252,
+          "findings_level_1": 145,
+          "findings_level_2": 107,
+          "success_rate": 0.8922
+        },
+        {
+          "category": "prism",
+          "pass": 150,
+          "fail": 17,
+          "findings": 1196,
+          "findings_level_1": 342,
+          "findings_level_2": 854,
+          "success_rate": 0.8982
+        },
+        {
+          "category": "wall_coverage",
+          "pass": 55,
+          "fail": 112,
+          "findings": 2070,
+          "findings_level_1": 2070,
+          "findings_level_2": 0,
+          "success_rate": 0.3293
+        }
+      ],
+      "validator_errors": []
+    },
+    {
+      "project": "torre_easy_lo_r00_tp1",
+      "walls": 96,
+      "blocks": 19647,
+      "findings_total": 4752,
+      "critical_by_code": {
+        "PRISM_CONTINUOUS_JOINT": 256,
+        "JUNCTION_MISSING_BINDING": 9,
+        "OPENING_BLOCK_CROSSES_JAMB": 161,
+        "OPENING_BLOCK_INSIDE_DOOR": 7
+      },
+      "categories": [
+        {
+          "category": "block_positions",
+          "pass": 96,
+          "fail": 0,
+          "findings": 0,
+          "findings_level_1": 0,
+          "findings_level_2": 0,
+          "success_rate": 1
+        },
+        {
+          "category": "compensators",
+          "pass": 18,
+          "fail": 78,
+          "findings": 2703,
+          "findings_level_1": 2616,
+          "findings_level_2": 87,
+          "success_rate": 0.1875
+        },
+        {
+          "category": "junctions",
+          "pass": 95,
+          "fail": 1,
+          "findings": 9,
+          "findings_level_1": 9,
+          "findings_level_2": 0,
+          "success_rate": 0.9896
+        },
+        {
+          "category": "openings",
+          "pass": 85,
+          "fail": 11,
+          "findings": 189,
+          "findings_level_1": 168,
+          "findings_level_2": 21,
+          "success_rate": 0.8854
+        },
+        {
+          "category": "prism",
+          "pass": 86,
+          "fail": 10,
+          "findings": 1637,
+          "findings_level_1": 272,
+          "findings_level_2": 1365,
+          "success_rate": 0.8958
+        },
+        {
+          "category": "wall_coverage",
+          "pass": 83,
+          "fail": 13,
+          "findings": 214,
+          "findings_level_1": 214,
+          "findings_level_2": 0,
+          "success_rate": 0.8646
+        }
+      ],
+      "validator_errors": []
+    }
+  ]
+}

@@ -4,6 +4,12 @@ Ponto de entrada para qualquer nova sessão neste repositório. Leitura
 progressiva: leia o mínimo do nível abaixo antes de subir para o
 próximo — nunca "ler o repositório inteiro para entender".
 
+Antes de retomar uma entrega, executar `git status --short`, buscar a main
+com `git fetch origin main` e conferir os SHAs do status e do checkpoint
+versionado em `docs/checkpoints/`. Regras de recuperacao, publicacao e
+validacao: [DEVELOPMENT_PROCESS.md](DEVELOPMENT_PROCESS.md).
+Um relatorio em outra branch nao e codigo integrado; ler a revisao indicada.
+
 ---
 
 ## SOLVER DE BLOCOS (modulação / amarração)

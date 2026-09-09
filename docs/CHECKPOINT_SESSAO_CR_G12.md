@@ -1,5 +1,10 @@
 # CHECKPOINT — sessão CR-G12 (correção do mecanismo cross-band)
 
+> Nota da auditoria de 2026-09-09: este e um registro historico da revisao
+> indicada, nao o estado atual de merges. PRs #25/#26/#27/#29 estao
+> integrados na main `08495d9`; #28 continua draft. C2/G16 e CR-B nao
+> foram aprovados por esses merges. Estado corrente: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 **Data:** 2026-09-08 · **Branch:** `claude/cross-band-mechanism-fix-ab76jv`
 
 > Gravado em `docs/` de propósito: `.gitignore` linha 8 ignora `.claude/*`

@@ -1,5 +1,16 @@
 # PROJECT STATUS LOG
 
+## Indice de retomada: 2026-09-09
+
+Auditoria da main `08495d9` e do candidato #31 `439fd49`, sem merge:
+[relatorio](AUDITORIA_BETA_2026-09-09.md) e
+[checkpoint](checkpoints/2026-09-09-auditoria-governanca.md).
+Reconciliados os estados #18/#19/#25/#26/#27/#29, N1/b/c/e/f e os limites
+dos logs. Teste atual confirma TGD 52->66 e TP1 8->9 mais porta 0->7;
+nao sao apenas os conteudos historicos das duas falhas. Infraestrutura
+documental passa a validar checkpoint versionado e provenance por SHA.
+As entradas abaixo permanecem historicas; nao representam a main atual.
+
 > Histórico completo do desenvolvimento do projeto (Modulação Automática
 > pyRevit): de onde o projeto veio, cada CR concluído ou não-mesclado, cada
 > dívida técnica levantada ao longo do tempo, e o log cronológico de

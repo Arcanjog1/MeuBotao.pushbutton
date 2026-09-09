@@ -1,5 +1,10 @@
 # CHECKPOINT — sessão multifase CR-C2 / revisão C1 / reavaliação CR-B
 
+> Nota da auditoria de 2026-09-09: este e um registro historico da revisao
+> indicada, nao o estado atual de merges. PRs #25/#26/#27/#29 estao
+> integrados na main `08495d9`; #28 continua draft. C2/G16 e CR-B nao
+> foram aprovados por esses merges. Estado corrente: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 **Data:** 2026-09-08 · **Branch:** `claude/multifase-cr-c2-c1-b-ikr8jc`
 
 > **Nota sobre o checkpoint anterior — e por que este arquivo está em
