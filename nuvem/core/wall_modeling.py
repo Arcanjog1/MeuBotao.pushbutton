@@ -4770,6 +4770,8 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         # uso normal). Regenerate() DENTRO da transacao (nao depois do
         # Commit) - mesmo motivo/teste via MCP de load_fixed_block_catalog.
         t_activate_start = clock()
+        _perf.mark("blocos.activate START", codigos=len(used_codes),
+                   planejados=perf["planned_total"], fiadas=num_courses)
         t_activate = Transaction(target_doc, "Ativa tipos de bloco")
         status = t_activate.Start()
         try:
@@ -4793,7 +4795,9 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 t_activate.RollBack()
             raise
         perf["activate_s"] = clock() - t_activate_start
+        _perf.mark("blocos.activate END", dt="{:.3f}s".format(perf["activate_s"]))
 
+        _perf.mark("blocos.Transaction.Start (criacao)")
         t_create = Transaction(target_doc, "Cria instancias de bloco")
         status = t_create.Start()
         try:
@@ -4908,12 +4912,23 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             )
                         )
                     done += 1
+                    # Marco GROSSO (mesmo passo da barra) - um marco por peca
+                    # inflaria o proprio tempo que se quer medir. Registra a
+                    # ULTIMA peca alcancada, que e' o que diz onde uma
+                    # paralisacao real parou.
+                    if done % CREATE_PROGRESS_STEP == 0:
+                        _perf.mark("blocos.progresso", feitos=done,
+                                   total=perf["planned_total"],
+                                   fiada=course_index + 1, ultimo=cand["logical_code"])
                     if progress_cb is not None and done % CREATE_PROGRESS_STEP == 0:
                         try:
                             progress_cb(done, perf["planned_total"], course_index + 1, num_courses)
                         except Exception:
                             pass  # feedback de tela NUNCA derruba a criacao
             perf["loop_s"] = clock() - t_loop_start
+            _perf.mark("blocos.laco END", dt="{:.3f}s".format(perf["loop_s"]),
+                       criados=created_count, falhas=len(failures),
+                       chamadas_new=perf["new_instance_calls"])
 
             # COMMIT ISOLADO: o Revit REGENERA o modelo no Commit, e essa
             # regeneracao e' feita de uma vez so' para tudo que a transacao
@@ -4926,11 +4941,15 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 except Exception:
                     pass
             t_commit_start = clock()
+            _perf.mark("blocos.Commit START (o Revit regenera o modelo)")
             status = t_create.Commit()
             if strict_transactions:
                 _require_beta_transaction_status(t_create, status, "Committed")
             perf["commit_s"] = clock() - t_commit_start
-        except Exception:
+            _perf.mark("blocos.Commit END", dt="{:.3f}s".format(perf["commit_s"]))
+        except Exception as _criacao_ex:
+            _perf.mark("blocos.ROLLBACK da transacao de criacao",
+                       erro=str(_criacao_ex)[:140])
             if strict_transactions:
                 _rollback_beta_transaction(t_create)
             else:
@@ -10073,11 +10092,38 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._g = dict(self._fix_all_wall_modulation_errors.__globals__)
 
     def Execute(self, uiapp):
-        # Marco 1 do diagnostico: a distancia entre "ui.external_event.Raise
-        # CHAMADO" e este marco e' a LATENCIA de despacho do ExternalEvent
-        # (Revit so' roda o handler quando fica ocioso) - se o tempo estiver
-        # aqui, o problema nao e' o solver.
-        _perf.mark("Execute ENTROU", action=self.action)
+        # A ACAO E' CONSUMIDA AQUI, NO COMECO - nunca mais zerada no
+        # `finally` (bug real medido no primeiro beta instrumentado,
+        # 2026-09-09, perf_diag.log: "Execute ENTROU action=solve" seguido
+        # de "Execute SAIU action=create" e, no despacho seguinte,
+        # "Execute ENTROU action=None").
+        #
+        # O que acontecia: `_execute_solve` termina chamando
+        # `self.on_done("solve", None)` DE DENTRO deste Execute(). Esse
+        # callback e' `_PostCreationForm._on_solve_done`, que - por pedido
+        # explicito do usuario (2026-08-27: "nao quero que o script apenas
+        # calcule... os blocos precisam ser fisicamente inseridos") - segue
+        # DIRETO para `_on_create_click` -> `_raise_action("create")`, que
+        # faz `self._handler.action = "create"` e `external_event.Raise()`.
+        # Ou seja: a acao "create" nasce AINDA DENTRO deste Execute(), ao
+        # contrario do que o docstring de `_raise_action` supoe ("Raise()
+        # ... rodam no thread da UI, FORA do Execute()"). O `finally` antigo
+        # (`self.action = None`) apagava justamente essa acao recem-criada, e
+        # o despacho seguinte entrava com `action=None`, nao casava com
+        # nenhum ramo, nao chamava `on_done` e voltava em silencio.
+        # Resultado na tela: a Etapa 5 anunciava "criando as instancias de
+        # bloco no Revit..." e ficava ali para sempre - nenhum bloco criado,
+        # nenhum erro, nenhuma conclusao. Nao era lentidao: era uma acao
+        # PERDIDA.
+        #
+        # Consumir no inicio e despachar por uma copia LOCAL corrige as duas
+        # metades do problema: a acao que um callback agendar durante este
+        # Execute() sobrevive ate' o proximo despacho, e o encadeamento de
+        # ramos abaixo passa a olhar um valor estavel, imune a qualquer
+        # mutacao que um callback faca no meio do caminho.
+        action = self.action
+        self.action = None
+        _perf.mark("Execute ENTROU", action=action)
         try:
             # Reinjeta o snapshot de globais capturado no __init__ (ver
             # comentario la') no dicionario REAL do modulo - conserta
@@ -10106,30 +10152,35 @@ class _PostCreationEventHandler(IExternalEventHandler):
             with _perf.span("Execute.ActiveUIDocument"):
                 app_uidoc = uiapp.ActiveUIDocument
                 app_doc = app_uidoc.Document
-            if self.action == "analyze":
+            if action == "analyze":
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
                 with _perf.span("_execute_analyze (disparo)"):
                     self._execute_analyze(app_doc)
-            elif self.action == "zoom":
+            elif action == "zoom":
                 self._execute_zoom(app_uidoc)
-            elif self.action == "fix_errors":
+            elif action == "fix_errors":
                 self._execute_fix_errors(app_doc)
-            elif self.action == "solve":
+            elif action == "solve":
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
                 with _perf.span("_execute_solve"):
                     self._execute_solve()
-            elif self.action == "create":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_create(app_doc)
-            elif self.action == "delete":
+            elif action == "create":
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_create", esperados=sum(
+                        len(v) for v in ((self.solve_result or {})
+                                         .get("course_candidates") or {}).values())):
+                    self._execute_create(app_doc)
+            elif action == "delete":
                 if self.controlled_beta:
                     self._refresh_geometry_from_document(app_doc)
                 self._execute_delete(app_doc)
-            elif self.action == "debug_view":
+            elif action == "debug_view":
                 self._execute_debug_view(app_doc)
         except Exception as ex:
             # Este except e' a UNICA rede de seguranca entre um bug do
@@ -10154,8 +10205,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
             except Exception:
                 pass
         finally:
-            _perf.mark("Execute SAIU", action=self.action)
-            self.action = None
+            # `pendente` mostra uma acao AGENDADA por um callback durante
+            # este Execute() (o caso "create" descrito no topo) - ela tem de
+            # sobreviver, e este marco existe para provar isso no log.
+            _perf.mark("Execute SAIU", action=action, pendente=self.action)
 
     def _refresh_geometry_from_document(self, app_doc):
         """GEOMETRIA ATUAL COMO FONTE DA VERDADE (pedido explicito do
@@ -10516,9 +10569,11 @@ class _PostCreationEventHandler(IExternalEventHandler):
             raise ValueError("BETA BLOQUEADO: geometria/catalogo mudou ou calculo sem assinatura; calcule novamente.")
 
     def _execute_create(self, app_doc):
+        _perf.mark("create.entrou", beta=self.controlled_beta)
         if self.controlled_beta:
             if self.beta_transaction_error:
                 raise RuntimeError(self.beta_transaction_error)
+            _perf.mark("create.preflight START")
             preflight = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             if self.solve_result is not None:
@@ -10529,13 +10584,16 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                      len(preflight["opening_violations"]), len(preflight["collisions"]),
                                      "; ".join(preflight["errors"])))
             self._require_current_beta_solve()
+            _perf.mark("create.preflight END", ok=preflight["ok"])
             # One outer group restores even the committed cleanup transaction.
             previous_result = self.create_result
             replacement = self._TransactionGroup(app_doc, "Beta - substitui lote completo de blocos")
             replacement.IsFailureHandlingForcedModal = True
             try:
-                _require_beta_transaction_status(replacement, replacement.Start(), "Started")
-                self._execute_create_batch(app_doc)
+                with _perf.span("create.TransactionGroup.Start"):
+                    _require_beta_transaction_status(replacement, replacement.Start(), "Started")
+                with _perf.span("create.batch (beta)"):
+                    self._execute_create_batch(app_doc)
                 result = self.create_result or {}
                 expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
                             for c in source]
@@ -10547,8 +10605,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                         or any(app_doc.GetElement(item["id"]) is None for item in instances)):
                     raise RuntimeError("BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas. {}".format(
                         "; ".join(str(f) for f in result.get("failures", []))))
-                _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
-            except Exception:
+                with _perf.span("create.TransactionGroup.Assimilate"):
+                    _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
+            except Exception as _grupo_ex:
+                _perf.mark("create.ROLLBACK do grupo do beta", erro=str(_grupo_ex)[:140])
                 self.create_result = previous_result
                 try:
                     _rollback_beta_transaction(replacement)
@@ -10559,8 +10619,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     raise RuntimeError(self.beta_transaction_error)
                 raise
         else:
-            self._execute_create_batch(app_doc)
-        self._save_modulation_state_cache()
+            with _perf.span("create.batch"):
+                self._execute_create_batch(app_doc)
+        with _perf.span("create.save_modulation_state_cache"):
+            self._save_modulation_state_cache()
+        _resultado = self.create_result or {}
+        _perf.mark("create.RESULTADO",
+                   criados=_resultado.get("created_count"),
+                   falhas=len(_resultado.get("failures") or []),
+                   perf=repr(_resultado.get("perf")).replace(" ", ""))
         if self.on_done:
             self.on_done("create", None)
 
