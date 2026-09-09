@@ -111,12 +111,17 @@ def validate(root, base, main, require_current_main=False):
     if changed:
         require(STATUS in changed, 'delivery must reconcile ' + STATUS)
         require(bool(checkpoints), 'delivery requires a versioned docs/checkpoints/*.md checkpoint')
+    current_checkpoints = 0
     for path in checkpoints:
         try:
             data = metadata(read(path))
             for field in REQUIRED:
                 require(field in data and data[field] not in ('', None, []), path + ': missing field ' + field)
             datetime.date.fromisoformat(data['date'])
+            scope = data.get('scope', 'current')
+            require(scope in ('current', 'historical'), path + ': invalid checkpoint scope')
+            if scope == 'current':
+                current_checkpoints += 1
             require(data.get('pr') == 'not-created' or
                     re.fullmatch(r'https://github\.com/Arcanjog1/MeuBotao\.pushbutton/pull/[1-9][0-9]*', str(data.get('pr'))),
                     path + ': invalid PR URL (not-created allowed before draft creation)')
@@ -127,7 +132,8 @@ def validate(root, base, main, require_current_main=False):
                 git(root, 'merge-base', '--is-ancestor', data['head'], 'HEAD')
                 uncovered = [p for p in git(root, 'diff', '--name-only', data['head']).splitlines()
                              if not documentation_only(p)]
-                require(not uncovered, path + ': non-documentation changes after reviewed HEAD: ' + ', '.join(uncovered))
+                if scope != 'historical':
+                    require(not uncovered, path + ': non-documentation changes after reviewed HEAD: ' + ', '.join(uncovered))
             refs = data.get('references')
             if isinstance(refs, list):
                 for ref in refs:
@@ -136,6 +142,9 @@ def validate(root, base, main, require_current_main=False):
                 errors.append(path + ': references must be a list')
         except (ValueError, KeyError, OSError, TypeError) as exc:
             errors.append(path + ': ' + str(exc))
+
+    if changed:
+        require(current_checkpoints > 0, 'delivery requires a current checkpoint covering the reviewed code; historical records are not approval')
 
     for path in sorted(changed):
         if not path.startswith('docs/checkpoints/evidence/') or not path.endswith('.json'):

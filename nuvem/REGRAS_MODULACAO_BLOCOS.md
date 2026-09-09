@@ -6100,3 +6100,44 @@ muda ali é da mudança; o que só aparece no pipeline completo é
 é lido como regressão do mecanismo novo — e uma degradação colateral é
 lida como “troca crítico → menor”, que é exatamente o erro corrigido pela
 condição C2 da revisão da CR-G12.
+
+## 48. Beta controlado sobre a main, sem N1 (2026-09-09)
+
+As secoes 40 a 47 existem na branch candidata do PR #31, nao integrada.
+Esta branch preserva a numeracao e NAO transporta a implementacao N1 nem
+aprova mudancas de teto, fase, tolerancia ou geometria. O historico medido
+da cadeia N1 permanece no PR #31. Esta secao registra a mesma autorizacao
+de contencao do usuario, agora aplicada ao motor oficial.
+
+**REGRA OBRIGATORIA, instrucao explicita do usuario:** nenhuma peca pode
+ocupar o volume real de uma porta sem peitoril no beta. Verificar candidatos
+por fiada fisica e abertura ativa em Z, inclusive de outra parede; OBB XY
+agregado sem filtro de altura nao conta instancias fisicas. O preflight
+tambem verifica colisoes, eixos, dimensoes e finitude. Usa a tolerancia
+existente de 0,1cm e bloqueia o lote INTEIRO antes de qualquer mutacao;
+nao filtra pecas de amarracao nem altera os resultados brutos do solver.
+
+Paredes totalmente vazias, parcialmente nao modulares ou incompletamente
+criadas conservam referencias, coordenadas e motivo para revisao no
+resultado/log/UI. Nao truncar 197,943cm para 194cm nem alargar tolerancia.
+Ter algumas pecas nao comprova substituicao integral da parede.
+
+Substituicao beta deve ser atomica: exclusao anterior, nova criacao e
+realce no mesmo grupo externo; verificar retorno/estado de transacoes,
+identidade por fiada/candidato e existencia das instancias. Falha restaura
+o lote anterior; rollback nao confirmado bloqueia criar/finalizar e exige
+revisao do documento. Cache/callback somente apos confirmacao.
+
+Criar/finalizar exige assinatura atual da geometria capturada, aberturas,
+catalogo, altura, nivel/base. Refresh rejeita referencia ausente e mudancas
+laterais/rotacionais/cotas nao suportadas. Edicoes nativas de aberturas nao
+sao rastreadas integralmente: primeiro beta em copia estatica, com recaptura
+apos qualquer edicao externa. Loader beta exige pacote por SHA/hashes sem
+fallback para main variavel; verificacao offline nao certifica API/familias.
+
+**PADRAO OBSERVADO OFFLINE, nao regra geral:** recorte TP1 de indices fonte
+75/81, sem aberturas, resolvido novamente, tem um L e duas pontas livres,
+187 blocos e zero achados nos validadores com referencia oficial. Ambos os
+audits de amarracao passam. Selecionar paredes muda a topologia de fronteira:
+isso NAO aprova o mesmo canto no grafo completo, outros recortes, T/X,
+aberturas ou o PR #31. Exige nova validacao se geometria/escopo mudar.
