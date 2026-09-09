@@ -117,6 +117,7 @@ __all__ = [
     "BOND_STRIP_EDGE_EXEMPT_CM", "BOND_STRIP_OPENING_INFLUENCE_CM",
     "MAX_SPECIAL_BOND_PER_TRECHO", "_continuous_segment_layout",
     "NEIGHBOR_NODE_BOND_CLEARANCE_FT", "_neighbor_node_boundary_ft",
+    "_node_index_of",
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
     "_region_bounds_for_run", "_solve_repair_subsegments",
@@ -672,7 +673,8 @@ def _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, contact_p
         if (nodes is not None and end_to_node is not None) else None
     return _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, sign,
                               safe_range_ft=safe_range_ft, nodes=nodes,
-                              exclude_node_index=exclude_node_index)
+                              exclude_node_index=exclude_node_index,
+                              end_to_node=end_to_node)
 
 
 def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
@@ -1118,8 +1120,19 @@ def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_poin
 NEIGHBOR_NODE_BOND_CLEARANCE_FT = 2.0 * CORNER_B34_ROOM_FT
 
 
+def _node_index_of(nodes, node):
+    """Indice de `node` em `nodes` por IDENTIDADE DE OBJETO (`is`), nunca
+    por igualdade: dois nos distintos podem ter dicts iguais campo a campo
+    (dois L_CORNER simetricos da planta), e `list.index` devolveria o
+    primeiro dos dois. Devolve None quando o no' nao esta' na lista."""
+    for idx, other in enumerate(nodes):
+        if other is node:
+            return idx
+    return None
+
+
 def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
-                               exclude_node_index=None):
+                               exclude_node_index=None, skip_node_indices=()):
     """Limite (t em ft) que o no' de encontro VIZINHO mais proximo impoe a
     quem mede espaco a partir de `t_ft` andando em `sign`, ao longo de
     `wall_idx` - ou None quando nenhum vizinho esta' perto o bastante para
@@ -1142,14 +1155,32 @@ def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
     centrados sobrepostos em `54 - d` cm (medido: nos a 50cm -> 4,00cm;
     a 35cm -> 19,00cm; a 12,7cm -> 41,26cm).
 
+    `skip_node_indices`: nos que NAO devem ser cobrados aqui porque JA'
+    estao descontados por outro mecanismo. Na pratica sao os nos das duas
+    PONTAS desta parede quando o chamador passou `safe_range_ft`:
+    `_wall_reserved_range_ft` ja' reservou para cada um deles o PIOR CASO
+    (`CORNER_B34_ROOM_FT`, 34cm) medido a partir da PONTA FISICA. Cobrar a
+    mesma reserva outra vez pelo ponto medio e' DUPLA CONTAGEM - e o
+    minimo das duas e' sempre mais apertado que qualquer uma sozinha.
+
+    BUG REAL MEDIDO (2026-09-09, fechamento da N1): numa parede de 69cm
+    entre dois L_CORNER (nos a t=7,0 e t=62,0), a reserva de ponta ja'
+    dava `safe_range = (0,0; 35,0)cm` -> room 28,00cm; o ponto medio
+    (34,5cm) cortava para 27,50cm. Meio centimetro que a parede nao devia
+    a ninguem, e que bastava para degradar a peca de amarracao e jogar o
+    preenchimento no tier dos compensadores.
+
     `nodes` ausente (chamador antigo) devolve None - sem essa checagem,
     comportamento historico."""
     if not nodes:
         return None
     direction = 1.0 if sign >= 0 else -1.0
     boundary = None
-    for other_t in _wall_junction_ts_ft(walls_to_create, nodes, wall_idx,
-                                        exclude_node_index=exclude_node_index):
+    skip = set(i for i in (skip_node_indices or ()) if i is not None)
+    for other_node, other_t in _wall_junction_nodes_and_ts_ft(
+            walls_to_create, nodes, wall_idx, exclude_node_index=exclude_node_index):
+        if skip and _node_index_of(nodes, other_node) in skip:
+            continue
         gap = (other_t - t_ft) * direction
         if gap <= 1e-6 or gap >= NEIGHBOR_NODE_BOND_CLEARANCE_FT:
             # Atras (ou em cima) do proprio ponto, ou longe o bastante para
@@ -1162,7 +1193,8 @@ def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
 
 
 def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
-                      safe_range_ft=None, nodes=None, exclude_node_index=None):
+                      safe_range_ft=None, nodes=None, exclude_node_index=None,
+                      end_to_node=None):
     """Distancia (ft, nunca negativa) de `t_ft` ate' o proximo obstaculo
     REAL (borda de abertura, a reserva de um encontro na OUTRA ponta da
     parede, ou a propria ponta fisica) andando no sentido `sign` (+1 = t
@@ -1181,15 +1213,29 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     proximo desta MESMA parede (ver `_neighbor_node_boundary_ft`) - a
     lacuna dos nos de MEIO DE PAREDE que `safe_range_ft` nao cobre, porque
     aquele so' varre as duas PONTAS. `None` (chamador antigo) mantem o
-    comportamento historico."""
+    comportamento historico.
+
+    `end_to_node` (opcional): so' faz sentido junto de `safe_range_ft` -
+    identifica os nos das duas PONTAS desta parede para que eles NAO sejam
+    cobrados duas vezes (uma na reserva de ponta, outra no ponto medio).
+    Ver `skip_node_indices` em `_neighbor_node_boundary_ft`."""
     if wall_idx is None or wall_idx >= len(walls_to_create):
         return 0.0
     _p0, _p1, _dir, total_len_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     lo_ft, hi_ft = (0.0, total_len_ft) if safe_range_ft is None else safe_range_ft
     openings_here = openings_per_wall[wall_idx] if (openings_per_wall and wall_idx < len(openings_per_wall)) else []
+    # Os nos das duas PONTAS ja' entram por `safe_range_ft`
+    # (`_wall_reserved_range_ft`, pior caso de 34cm): cobra-los tambem no
+    # ponto medio seria contar a MESMA reserva duas vezes. Sem
+    # `safe_range_ft` ninguem os cobriu, entao continuam valendo aqui.
+    skip_node_indices = ()
+    if safe_range_ft is not None and end_to_node is not None:
+        skip_node_indices = (end_to_node.get((wall_idx, 0)),
+                             end_to_node.get((wall_idx, 1)))
     neighbor_boundary = _neighbor_node_boundary_ft(
         walls_to_create, nodes, wall_idx, t_ft, sign,
-        exclude_node_index=exclude_node_index)
+        exclude_node_index=exclude_node_index,
+        skip_node_indices=skip_node_indices)
     if sign >= 0:
         boundary = hi_ft
         for (t_lo, _t_hi, _s, _h) in openings_here:
@@ -1234,9 +1280,11 @@ def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
     t_main = _t_of_point_on_wall(walls_to_create, main_idx, point)
     main_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, main_idx) if have_graph else None
     room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, 1,
-                                   main_range, nodes=nodes, exclude_node_index=node_index)
+                                   main_range, nodes=nodes, exclude_node_index=node_index,
+                                   end_to_node=end_to_node)
     room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, -1,
-                                    main_range, nodes=nodes, exclude_node_index=node_index)
+                                    main_range, nodes=nodes, exclude_node_index=node_index,
+                                    end_to_node=end_to_node)
 
     contact_i = _node_contact_point_for_wall(node, inc_idx)
     _end_i, dir_i, _len_i, _thick_i = _wall_end_and_dir_near_point(walls_to_create, inc_idx, contact_i)
@@ -1246,7 +1294,8 @@ def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
     inc_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, inc_idx,
                                         exclude_node_index=node_index) if have_graph else None
     room_i = _room_at_t_on_wall(walls_to_create, openings_per_wall, inc_idx, t_i, sign_i,
-                                inc_range, nodes=nodes, exclude_node_index=node_index)
+                                inc_range, nodes=nodes, exclude_node_index=node_index,
+                                end_to_node=end_to_node)
 
     return {
         "main_idx": main_idx, "inc_idx": inc_idx, "point": point, "contact_i": contact_i,
@@ -1572,9 +1621,11 @@ def _x_intersection_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, p
         if nodes is not None and end_to_node is not None else None
     )
     room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, 1,
-                                   wall_range, nodes=nodes, exclude_node_index=exclude_node_index)
+                                   wall_range, nodes=nodes, exclude_node_index=exclude_node_index,
+                                   end_to_node=end_to_node)
     room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, -1,
-                                    wall_range, nodes=nodes, exclude_node_index=exclude_node_index)
+                                    wall_range, nodes=nodes, exclude_node_index=exclude_node_index,
+                                    end_to_node=end_to_node)
     return room_plus, room_minus
 
 

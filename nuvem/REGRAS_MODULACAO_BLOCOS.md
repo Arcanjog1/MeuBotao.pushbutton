@@ -6344,3 +6344,123 @@ argamassa, como em obra.
    real medida (2,1cm) é 7× a tolerância atual, e alargar a tolerância
    mexeria também no contrato de snap de todos os outros trechos.
 
+---
+
+## 43. `CR-N1b` — a reserva das PONTAS não pode ser cobrada DUAS VEZES
+(2026-09-09, **REGRA OBRIGATÓRIA — implementada e medida**)
+
+> Como foi descoberto: varredura de `COMPENSATOR_VERTICAL_STRIP` por
+> identidade física entre `origin/main` (`08495d9`) e a CR-N1
+> (`626087b`), peça a peça, no TGD real.
+
+### 43.1 O defeito
+
+`_wall_reserved_range_ft` já reserva, para **cada ponta** de uma parede, o
+**pior caso** de amarração (`CORNER_B34_ROOM_FT` = 34cm), medido a partir
+da **ponta física**. A CR-N1 (seção 40) passou a cobrar **também** o
+**ponto médio** até o nó vizinho — e, para os nós que estão **nas
+pontas**, os dois mecanismos descontam a **mesma** reserva. Como
+`_room_at_t_on_wall` fica com o **mínimo** dos dois, a parede curta perdia
+espaço que não devia a ninguém.
+
+Medido, parede de 69cm entre dois `L_CORNER` (nós em t=7,0 e t=62,0):
+
+| | room a partir do nó |
+|---|---|
+| histórico (só reserva de ponta) | **28,00cm** |
+| CR-N1 (mínimo com o ponto médio 34,5cm) | **27,50cm** |
+
+Meio centímetro — e ele **cruza limiar**. Com eixo de 81cm o mesmo par dá
+40,00cm × 33,50cm, e `CORNER_B34_ROOM_FT` vale 34cm: o canto deixa de
+receber **B34** e cai para `L_CORNER_DEGRADED`.
+
+### 43.2 O custo físico medido (TGD real, por identidade física)
+
+Duas paredes reais de 69cm — `W|-1.5,463.0|-1.5,532.0|t14.0` e
+`W|-1016.5,-570.0|-1016.5,-501.0|t14.0` — passaram de **0 para ~50
+compensadores** cada, e a peça de amarração do canto virou um **C09 de
+9cm**:
+
+```
+fiada 0  BASE : B34[0,34] L_CORNER          + B19[35,54] STANDARD_FILL
+fiada 0  CR-N1: C09[0,9]  L_CORNER_DEGRADED + B39[10,49] + C04[50,54]
+```
+
+**REGRA OBRIGATÓRIA**: um compensador (C09/C04) no papel de peça de
+amarração de um nó é sempre sintoma, nunca solução — quando aparecer,
+verificar primeiro se a medição de espaço daquele nó não está descontando
+duas vezes a mesma reserva.
+
+### 43.3 A correção
+
+`_neighbor_node_boundary_ft` ganha `skip_node_indices`; `_room_at_t_on_wall`
+ganha `end_to_node` e, **quando `safe_range_ft` foi informado**, isenta os
+nós das duas **pontas** desta parede — eles já entraram pela reserva de
+ponta. Nós de **MEIO DE PAREDE** (T/X), que são os que produziam os
+`POSITION_OVERLAP` da seção 40, **continuam** impondo a fronteira do ponto
+médio. Sem `safe_range_ft` ninguém cobriu as pontas e o comportamento é o
+da CR-N1, inalterado.
+
+Verificação por identidade física: as duas paredes de 69cm voltam ao
+conjunto de achados **exatamente igual ao da base** (`N1b == base`), e
+`POSITION_OVERLAP` continua **0** no TGD e no TP1.
+
+### 43.4 Trade-off DECLARADO (não escondido)
+
+Devolver o espaço restaura o B34 no canto, mas com ele voltam os achados
+de junta que a peça degradada mascarava. Placar por identidade física:
+
+| | base | CR-N1 | CR-N1b |
+|---|---|---|---|
+| TGD total | 798 | **783** | 801 |
+| TGD `COMPENSATOR_VERTICAL_STRIP` | 79 | 109 | **102** |
+| TGD `COMPENSATOR_EXCESS_IN_RUN` | 70 | 85 | **82** |
+| TGD `PRISM_STAGGER_BELOW_TARGET` | 181 | **156** | 168 |
+| TP1 total | 862 | **862** | 867 |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | **0/0** | **0/0** |
+
+Das 77 identidades que a CR-N1b acrescenta sobre a CR-N1 no TGD, **48 são
+o RETORNO de identidades que a base já tinha** (a parede voltou ao estado
+correto) e **29 são genuinamente novas** — e as 29 estão **todas** nas
+paredes do defeito da seção 43.5, que continua aberto.
+
+**Leitura honesta**: o placar da CR-N1 estava melhor em parte porque a
+amarração degradada gera peças pequenas que desencontram junta com
+facilidade — ganho no validador de junta, perda na amarração. A hierarquia
+do projeto põe amarração acima de estética de junta, e a dupla contagem é
+**defeito**, não preferência; por isso a correção fica, em commit próprio
+e revertível isoladamente.
+
+### 43.5 PENDÊNCIA ABERTA — o nó de MEIO com peça CENTRADA
+(`DOCUMENTADO — pendência de código aberta`)
+
+As quatro paredes reais de **124cm** com um `X_INTERSECTION` de travessia
+no meio (`W|-1133.5,712.0|…`, `W|-1133.5,-508.0|…`,
+`W|1201.5,-508.0|…`, `W|1201.5,712.0|…`) **continuam** com ~50
+compensadores. Ali o limitador não é a ponta: é o nó X em t=62,0, e a
+fronteira do ponto médio (34,5cm) deixa o `L_CORNER` de t=7,0 com 27,50cm.
+
+Medição que expõe o excesso de conservadorismo:
+
+- na base, o L colocava **B34 em [0, 34]** e o X colocava **B54 em
+  [35, 89]** — folga de 1cm, **sem colisão**;
+- o B34 do L se estende só **27cm** para frente do ponto de contato
+  (t=7 → t=34), mas o teste de espaço exige `CORNER_B34_ROOM_FT` = **34cm**
+  *a partir do contato* — 7cm a mais do que a peça realmente usa naquele
+  sentido, porque ela também ocupa 7cm **para trás** do contato;
+- `NEIGHBOR_NODE_BOND_CLEARANCE_FT` = 68cm = 2 × 34cm supõe **dois** nós
+  ANCORADOS. Um nó de travessia (X, ou o T na parede principal) lança peça
+  **CENTRADA**: o alcance dele para um lado é no máximo **metade** da maior
+  peça de amarração (27cm para o B54), não 34cm.
+
+Duas correções candidatas, **nenhuma implementada** (mexem no núcleo da
+amarração e precisam de decisão + medição própria):
+
+1. fronteira contra nó de meio = `t_vizinho − alcance_do_tipo` (27cm para
+   nó de peça centrada) em vez do ponto médio cego;
+2. requisito de espaço do L medido a partir do **ponto de contato**
+   descontando o recuo que a peça ocupa **atrás** dele
+   (`CORNER_B34_ROOM_FT − recuo`), em vez do pior caso cheio.
+
+Enquanto não houver decisão, as quatro paredes de 124cm ficam com a
+amarração degradada — registrado aqui para não se perder.
