@@ -28,8 +28,16 @@
       "base_offset_cm": 1718.164,
       "level": "pb",
       "level_elevation_ft": -36.2915,
-      "p0_ft": [62.688560, -26.170486, -36.291484],
-      "p1_ft": [74.302758, -26.170486, -36.291484]
+      "p0_ft": [
+        62.68856,
+        -26.170486,
+        -36.291484
+      ],
+      "p1_ft": [
+        74.302758,
+        -26.170486,
+        -36.291484
+      ]
     },
     "wall_5390548": {
       "length_cm": 69.0024,
@@ -37,25 +45,61 @@
       "height_cm": 340.0,
       "base_offset_cm": 1718.164,
       "level": "pb",
-      "p0_ft": [62.918219, -28.204684, -36.291484],
-      "p1_ft": [62.918219, -25.940827, -36.291484]
+      "p0_ft": [
+        62.918219,
+        -28.204684,
+        -36.291484
+      ],
+      "p1_ft": [
+        62.918219,
+        -25.940827,
+        -36.291484
+      ]
     }
   },
   "input_comparison_vs_offline_artifact": {
     "artifact": "docs/checkpoints/evidence/main-safe-engineering-input.json",
     "verdict": "CONGRUENTE (mesma bancada num referencial transladado)",
-    "lengths_cm": {"offline": [69.0, 354.01], "revit": [69.0024, 354.0007]},
-    "thickness_cm": {"offline": 14.0, "revit": 14.0},
-    "height_cm": {"offline": 340.0, "revit": 340.0},
-    "l_corner_overlap_cm": {"offline": 7.0, "revit": 6.9959},
-    "base_z_cm": {"offline_settings": 612.0, "revit_level_elev_plus_base_offset": 612.0},
-    "openings": {"offline": 0, "revit": 0},
+    "lengths_cm": {
+      "offline": [
+        69.0,
+        354.01
+      ],
+      "revit": [
+        69.0024,
+        354.0007
+      ]
+    },
+    "thickness_cm": {
+      "offline": 14.0,
+      "revit": 14.0
+    },
+    "height_cm": {
+      "offline": 340.0,
+      "revit": 340.0
+    },
+    "l_corner_overlap_cm": {
+      "offline": 7.0,
+      "revit": 6.9959
+    },
+    "base_z_cm": {
+      "offline_settings": 612.0,
+      "revit_level_elev_plus_base_offset": 612.0
+    },
+    "openings": {
+      "offline": 0,
+      "revit": 0
+    },
     "units_error_found": false,
     "notes": "Nenhuma diferenca de unidade (feet/cm), de Z ou de topologia. A relacao do L (7cm = meia espessura em cada ponta) e' identica nos dois."
   },
   "junction_graph_measured": {
     "nodes_total": 3,
-    "kinds": ["L_CORNER", "FREE_END", "FREE_END"],
+    "kinds": [
+      "L_CORNER",
+      "FREE_END",
+      "FREE_END"
+    ],
     "junctions_L": 1,
     "junctions_T": 0,
     "junctions_X": 0,
@@ -73,27 +117,39 @@
   "timings_offline_cpython_stubs": {
     "interpreter": "CPython 3.14.6 com tests/revit_stubs.py",
     "import_engine_s": 0.448,
-    "plan_from_input_plus_catalog_s": 0.000,
-    "execute_solve_s": 0.010,
+    "plan_from_input_plus_catalog_s": 0.0,
+    "execute_solve_s": 0.01,
     "execute_analyze_s": 0.002
   },
   "timings_inside_revit_ironpython_real_xyz": {
     "note": "Motor carregado no processo do Revit, com Autodesk.Revit.DB.XYZ/Line REAIS",
-    "cold": {"import_s": 2.036, "build_graph_s": 1.202, "execute_solve_s": 6.669, "execute_analyze_s": 0.336},
-    "warm": {"build_graph_s": 0.000, "execute_solve_s": 0.026, "execute_analyze_s": 0.012},
+    "cold": {
+      "import_s": 2.036,
+      "build_graph_s": 1.202,
+      "execute_solve_s": 6.669,
+      "execute_analyze_s": 0.336
+    },
+    "warm": {
+      "build_graph_s": 0.0,
+      "execute_solve_s": 0.026,
+      "execute_analyze_s": 0.012
+    },
     "conclusion": "O custo alto e' de PRIMEIRA CHAMADA (JIT/aquecimento), nao do algoritmo."
   },
   "faithful_reproduction_real_document": {
     "note": "Mesma montagem de run_modulation_on_existing_walls, sobre o doc real",
     "axes": 2,
     "nodes": 3,
-    "openings_per_wall": [0, 0],
+    "openings_per_wall": [
+      0,
+      0
+    ],
     "collect_opening_instances_s": 0.162,
     "assign_openings_to_walls_s": 0.167,
     "extend_wall_ends_to_junctions_s": 0.005,
     "build_wall_graph_s": 0.005,
     "load_fixed_block_catalog_cold_s": 8.793,
-    "load_fixed_block_catalog_warm_s": 0.330,
+    "load_fixed_block_catalog_warm_s": 0.33,
     "evaluate_wall_modulation_s": 0.175,
     "refresh_geometry_from_document_s": 0.187,
     "execute_analyze_s": 0.181,
@@ -102,10 +158,24 @@
     "verdict": "O caminho 'analyze' do botao, com documento real e catalogo real, custa 0,37s. Nao e' a causa dos minutos."
   },
   "catalog_measured_in_revit": {
-    "codes": ["B19", "B34", "B39", "B54", "C04", "C09"],
+    "codes": [
+      "B19",
+      "B34",
+      "B39",
+      "B54",
+      "C04",
+      "C09"
+    ],
     "missing": [],
     "cells_total": 8,
-    "cells_per_code": {"B19": 1, "B34": 2, "B39": 2, "B54": 3, "C04": 0, "C09": 0},
+    "cells_per_code": {
+      "B19": 1,
+      "B34": 2,
+      "B39": 2,
+      "B54": 3,
+      "C04": 0,
+      "C09": 0
+    },
     "explosion_found": false
   },
   "geometry_type_microbench_ironpython": {
@@ -143,9 +213,9 @@
     },
     {
       "id": "PKG-CACHE",
-      "severity": "procedimental",
-      "detail": "O espelho local %LOCALAPPDATA%\\MeuBotaoPushbutton\\pkg_cache foi reescrito em 2026-09-09 16:36 (sincronizacao online), DEPOIS da criacao do pacote beta 8cdd33f (14:36). A pasta do botao registrada no pyRevit (userextensions) nao contem beta-package.json, entao um clique feito de la' NAO roda o pacote beta - roda o codigo sincronizado do GitHub.",
-      "location": "Script.py, _load_entry_point / _pasta_do_loader"
+      "severity": "RETIRADO - achado incorreto",
+      "detail": "RETIRADO em 2026-09-09. A afirmacao original ('nenhuma pasta de botao contem o pacote beta, logo o clique nao rodou 8cdd33f') era FALSA: veio de uma busca com profundidade insuficiente. O pacote beta 8cdd33f esta instalado como um botao pyRevit proprio em MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton, com beta-package.json, beta_package.py e core/ na propria pasta - exatamente o layout que _pasta_do_loader() exige. A execucao lenta relatada veio de la, e rodou de fato o head 8cdd33f974f41a9bf41010a32f82762740b31ed3.",
+      "location": "Scripts.extension/MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton"
     }
   ],
   "instrumentation_delivered": {
@@ -170,10 +240,18 @@
       "ui._finish / ui._on_analyze_done",
       "_execute_solve"
     ],
-    "behavior_change": "nenhuma - no-op enquanto perf_trace.enable() nao for chamado; toda sonda em try/except"
+    "behavior_change": "nenhuma - no-op enquanto perf_trace.enable() nao for chamado; toda sonda em try/except",
+    "known_side_effect": "As sondas sao ligadas por _on_start_click, que a suite de testes tambem exercita - uma rodada de pytest escreve sessoes [PERF] no MESMO arquivo padrao. Antes de medir no Revit, garantir que nenhuma suite esteja rodando e que o arquivo esteja ausente/rotacionado."
   },
   "gates": {
     "tests_test_script": "260 passed (py -m pytest tests/test_script.py -q)",
     "beta_package_verify": "OK - C:\\Users\\CIVIX\\.codex\\artifacts\\beta-perf-diag-0ffa8e9-20260909, head 0ffa8e98bffb0efe3723f2b07f376a9a1e473a73"
+  },
+  "button_provenance_resolved": {
+    "beta_button": "MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton (head 8cdd33f974f41a9bf41010a32f82762740b31ed3)",
+    "normal_button": "MinhaAba.tab/MeuPainel.panel/MeuBotao.pushbutton (loader online, sem pacote beta)",
+    "diagnostic_button_installed": "MinhaAba.tab/MeuPainel.panel/TESTE-PERF.pushbutton (head 0ffa8e98bffb0efe3723f2b07f376a9a1e473a73)",
+    "verification": "beta_package.verify_beta_package executado a partir da PASTA DO BOTAO: manifesto e hashes de todos os arquivos conferem; entry point resolve dentro da propria pasta.",
+    "rollback": "TESTE.pushbutton e MeuBotao.pushbutton intactos; desinstalar o diagnostico e apagar a pasta TESTE-PERF.pushbutton."
   }
 }

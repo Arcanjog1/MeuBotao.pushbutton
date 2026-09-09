@@ -23,7 +23,7 @@
   "known_failures": [
     "CAUSA-RAIZ AINDA NAO FECHADA. Todas as etapas sob suspeita foram medidas e nenhuma reproduz os minutos relatados; falta a medicao do caminho REAL do botao (ExternalEvent + engine CPython/pythonnet do pyRevit + WinForms), que so pode ser obtida com um clique do usuario no pacote instrumentado. Nao ha correcao implementada nem tempo antes/depois.",
     "A reproducao dentro do Revit rodou no engine IronPython do servidor MCP; o botao roda no engine CPython (cpyengine=3123, shebang '#! python3' em Script.py). A diferenca de interop pythonnet nao foi medida e continua sendo a variavel nao coberta.",
-    "A pasta do botao registrada no pyRevit (userextensions) nao contem beta-package.json nem core/, e o espelho pkg_cache foi reescrito por sincronizacao online em 2026-09-09 16:36, depois da criacao do pacote 8cdd33f (14:36). Nao foi possivel confirmar por arquivo qual arvore de codigo produziu a execucao lenta relatada."
+    "CORRIGIDO: a duvida sobre qual arvore produziu a execucao lenta foi RESOLVIDA. O pacote 8cdd33f esta instalado como botao proprio em MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton; a suspeita anterior sobre o pkg_cache vinha de uma busca rasa demais e foi retirada."
   ],
   "physical_deltas": [
     "Nenhum. Nenhuma regra fisica, tolerancia ou geometria esperada foi alterada; a bancada continua 2 paredes, 0 aberturas, 17 fiadas e 187 blocos esperados.",
@@ -127,6 +127,19 @@ O replay offline registrado em
 chama `h._execute_solve()`. O botao chama `analyze`. Os 0,1-1,1 s medidos
 pelo beta offline descrevem outra etapa do pipeline, com dubles de XYZ, em
 CPython, fora do Revit - nao a Tela 1.
+
+### 4b. De onde veio a execucao lenta (resolvido)
+
+O pacote beta `8cdd33f` esta instalado como **botao pyRevit proprio** em
+`MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton`, com `beta-package.json`,
+`beta_package.py` e `core/` na propria pasta - o layout que
+`_pasta_do_loader()` exige. A execucao lenta veio de la e rodou mesmo o
+head `8cdd33f`. Uma suspeita anterior sobre o espelho `pkg_cache` era
+**falsa** (busca com profundidade insuficiente) e foi retirada.
+
+O botao de diagnostico foi instalado ao lado, em
+`TESTE-PERF.pushbutton` (head `0ffa8e9`), sem tocar em
+`TESTE.pushbutton` nem em `MeuBotao.pushbutton`.
 
 ### 5. Cancelamento
 
