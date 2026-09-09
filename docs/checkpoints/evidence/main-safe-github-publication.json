@@ -1,0 +1,145 @@
+{
+  "observed_utc_host": "2026-09-09T18:25:30.512157+00:00",
+  "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+  "prs": [
+    {
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "headRefName": "claude/sleepy-turing-rf4s7o",
+      "headRefOid": "73cbf08b4584f2e952e17a444ed88a99f9df5498",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 31,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T17:37:12Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34383985595/job/102575515895",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T17:36:59Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T17:37:12Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34383978984/job/102575491318",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T17:36:55Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T17:37:12Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34383983344/job/102575508737",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T17:36:58Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "CR-N1b/c/e/f \u2014 regress\u00f5es cr\u00edticas da N1 fechadas, compensadores intercalados, e \u221252/\u221251 identidades contra a base",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31"
+    },
+    {
+      "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "headRefName": "codex/auditoria-governanca-beta-20260909",
+      "headRefOid": "7ed1a545146ac12072a15a5bdcdea92008170051",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "aa58d70d84c6134216f8f15a131edf060c4dce81"
+      },
+      "mergedAt": "2026-09-09T14:44:50Z",
+      "number": 32,
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T14:43:28Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34365482479/job/102512968773",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T14:43:22Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T14:43:23Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34365474308/job/102512942012",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T14:43:18Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs: auditoria do solver, governanca documental e gates do beta Revit",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32"
+    },
+    {
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "headRefName": "claude/revit-human-reference-extraction",
+      "headRefOid": "51ed8c20c8c7ab903b851cfaae1432663955200a",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 33,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T15:56:52Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34373559545/job/102540527396",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T15:56:43Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs(revit): extra\u00e7\u00e3o forense do projeto humano \u2014 vergas, contravergas, canaletas e blocos cortados",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/33"
+    },
+    {
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "headRefName": "codex/beta-main-safe-20260909",
+      "headRefOid": "ee2250a6284981d2f2f97fc8f09389ffff6d2315",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 34,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:27:31Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389092291/job/102592682319",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:27:19Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:27:19Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389067319/job/102592599010",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:27:05Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "Beta controlado sobre main: protecoes e bancada TP1 75/81, sem N1",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34"
+    }
+  ],
+  "scope": "GitHub API observation; CI timestamps belong to GitHub, command timestamps to host. PR33 is another unmerged documentary effort, not reviewed or imported here."
+}

@@ -150,8 +150,13 @@ Governanca:16 testes passaram em25,589s, wrapper26,094s;
 ## 15. CI
 
 #31/73cbf08: checks documentais verdes34383983344/34383985595, nao solver.
-Esta branch tera draft e checks proprios; URL/resultados serao registrados
-apos publicacao. Verde documental nao substitui consolidada nem fisica.
+Esta branch esta no [PR #34 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34).
+No HEAD documentalee2250a6284981d2f2f97fc8f09389ffff6d2315, os checks
+[push](https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389067319/job/102592599010)
+e [PR](https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389092291/job/102592682319)
+passaram. [Snapshot](checkpoints/evidence/main-safe-github-publication.json).
+O commit seguinte registra esses links, sem alterar codigo/testes8cdd33f.
+Verde documental nao substitui consolidada nem fisica. #34 nao foi mesclado.
 
 ## 16. Documentacao e governanca
 
@@ -192,7 +197,7 @@ as17 fiadas sobre as duas Walls nativas e declara-las substituidas.
 
 **8cdd33f974f41a9bf41010a32f82762740b31ed3**.
 Tree:`d835bdbb5092ac7d472502525434126c730a17e6`.
-Branch:`codex/beta-main-safe-20260909`, baseaa58d70.
+Branch:`codex/beta-main-safe-20260909`, baseaa58d70, PR#34 draft.
 Pacote:`C:/Users/CIVIX/.codex/artifacts/beta-main-safe-8cdd33f-20260909`.
 [Build](checkpoints/evidence/main-safe-package-build.json) e
 [verificacao](checkpoints/evidence/main-safe-package-verify.json) passaram.

@@ -10,7 +10,7 @@ GO tecnico restrito ao ensaio de bancada75/81; nao aprova31 ou projetos completo
 
 ```json
 {
-  "observed_utc": "2026-09-09T17:36:00+00:00",
+  "observed_utc": "quarta-feira, 9 de setembro de 2026 15:25:30",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -27,7 +27,8 @@ GO tecnico restrito ao ensaio de bancada75/81; nao aprova31 ou projetos completo
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
     {"pr": 31, "head": "73cbf08b4584f2e952e17a444ed88a99f9df5498"},
-    {"pr": "not-created", "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3"}
+    {"pr": 33, "head": "51ed8c20c8c7ab903b851cfaae1432663955200a"},
+    {"pr": 34, "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3"}
   ]
 }
 ```
@@ -50,7 +51,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
 | CR-N1b/c/e/f + beta | Ausente | PR #31 draft, codigo09b6ea0, documentos73cbf08 | [Relatorio completo](https://github.com/Arcanjog1/MeuBotao.pushbutton/blob/73cbf08b4584f2e952e17a444ed88a99f9df5498/docs/RELATORIO_BETA_2026-09-09.md) | NO-GO: TGD+37 agregado/+58 fisico, regressoes de amarracao;1112 passed/2 failed |
-| Beta main-safe | Ausente | codex/beta-main-safe-20260909, codigo8cdd33f; SEM N1 | [Relatorio e escopo](BETA_MAIN_SAFE_2026-09-09.md) | GO restrito a bancada75/81;1027 passed/2 falhas antigas na consolidada |
+| Beta main-safe | Ausente | [PR #34 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34), codigo8cdd33f; SEM N1 | [Relatorio e escopo](BETA_MAIN_SAFE_2026-09-09.md) | GO restrito a bancada75/81;1027 passed/2 falhas antigas na consolidada |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
 | Governanca | #32 integrado emaa58d70 | Melhorias de checkpoint historico e captura de timeout na branch beta | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | CI documental nao executa solver nem aprova regras |
 
@@ -64,7 +65,10 @@ sem alteracao nesta auditoria.
 ## Trabalho candidato
 
 PRs abertos no snapshot: **#7, #8, #21, #28, #30 e #31**, todos drafts.
-O **PR #32 foi integrado**. O novo main-safe sera um draft separado.
+O **PR #32 foi integrado**. Main-safe esta no **PR #34 draft**, separado.
+#33 tambem apareceu como draft de outra frente documental de extracao
+humana; nao foi integrado, revisado integralmente ou transportado aqui.
+[Snapshot de publicacao](checkpoints/evidence/main-safe-github-publication.json).
 #2 e #9 foram fechados sem merge; os outros 23 PRs de #1 a #31 foram
 integrados. Titulo com "draft" nao substitui `state`/`mergedAt`.
 
@@ -88,6 +92,8 @@ Codigo8cdd33f:331 controles iniciais verdes em112.95s e teste do recorte
 verde. Consolidada iniciou17:32:04 UTC, PID25596, timeout5400s; terminou
 com1027 passed/2 failed em3021.98s (50min21s), exit1. Falhas antigas:
 TGD compensators52->61 e TP1 JUNCTION_MISSING_BINDING8->9.
+CI noee2250a: dois checks documentais verdes34389067319/34389092291.
+Commits documentais posteriores nao mudam o codigo8cdd33f avaliado.
 Pacote fixo exportado/verificado, nao instalado. Escopo de bancada: dois
 eixos75/81, sem aberturas, altura uniforme definida no runbook. Nao aprova
 as alturas heterogeneas260/280cm das Walls nativas nem TP1/TGD completos.
