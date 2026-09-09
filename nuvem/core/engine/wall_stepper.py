@@ -97,6 +97,7 @@ __all__ = [
     "NODE_FILL_OPPOSITE_COURSE_ENABLED",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
+    "_spread_compensators_layout", "_relayout_codes_in_place",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
     "_half_block_leading_layout", "_pier_forced_bypass_layouts",
     "PIER_STAGGER_DP_MAX_UNITS", "_layout_piece_profile",
@@ -3692,8 +3693,11 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
 
     # 7) fica com o "com compensadores" (ja' fundido) mesmo acima do teto,
     #    se existir - sempre melhor que reportar NON_MODULAR sem precisar.
+    #    A composicao e' a mesma; so' a ORDEM e' escolhida para nao deixar
+    #    compensador encostado em compensador (regra escrita #2, secao
+    #    41.5) - nenhum teto muda aqui.
     if layout_with_comp is not None:
-        return merged_with_comp
+        return _spread_compensators_layout(merged_with_comp, catalog)
 
     # 7b) fileira de B34 acima do teto (tiers 3/4) - pior que compensador
     #     acima do teto (uma peca de amarracao no meio da parede engana quem
@@ -4149,6 +4153,98 @@ def _pier_forced_bypass_layouts(pier_cm, catalog, leading_joint_cm, trailing_joi
             alt = _forced_first(comp_code)
             if alt is not None:
                 out.append(alt)
+    return out
+
+
+def _spread_compensators_layout(layout, catalog):
+    """O MESMO conjunto de pecas de `layout`, REORDENADO para que nenhum
+    compensador encoste em outro sempre que isso for aritmeticamente
+    possivel. Devolve o proprio `layout` quando ja' esta' bom, quando nao
+    ha' o que intercalar, ou quando a reordenacao nao melhoraria
+    `_layout_compensator_run_excess`.
+
+    NAO e' uma preferencia normativa nova, e NAO mexe em teto nenhum
+    (secao 41.5, "a parte da opcao 4 que ja' esta' integralmente
+    permitida"): a composicao entregue e' EXATAMENTE a mesma - mesmos
+    codigos, mesma contagem, mesmo comprimento total. So' a ORDEM muda.
+
+    A regra ESCRITA do usuario e' "**proibido usar 2 ou mais EM
+    SEQUENCIA** no mesmo trecho"; `MAX_COMPENSATORS_PER_TRECHO` e' a
+    implementacao mais restritiva dela. Quando o tier 7 ja' decidiu
+    entregar N compensadores acima do teto (porque nao existe alternativa
+    - ver a enumeracao exaustiva da secao 41.5), entrega-los EM SEQUENCIA
+    viola a regra escrita sem necessidade nenhuma: intercalar respeita a
+    letra da regra e nao custa uma peca sequer.
+
+    O criterio ja' era usado como PRIMARIO em `_pier_layout_avoiding_
+    joints` (`_score`); aqui ele passa a valer tambem no caminho em que
+    aquela busca nao roda (sem junta a evitar).
+
+    Preserva a POSICAO INICIAL e o encadeamento (peca + BLOCK_JOINT_CM),
+    e nunca move um HALF_BLOCK_CODE de ponta: o B19 so' e' legitimo onde
+    esta' (regra do meio-bloco), entao ele fica ancorado no extremo em que
+    o layout o colocou."""
+    if not layout or len(layout) < 3:
+        return layout
+    is_comp = lambda code: bool((catalog or {}).get(code, {}).get("is_compensator"))  # noqa: E731
+    if _layout_compensator_run_excess(layout, catalog) <= 0:
+        return layout
+    codes = [item[0] for item in layout]
+    # O B19 fica onde esta' (so' pode encostar em ponta ABERTA) - reordena
+    # apenas o miolo entre os B19 de extremidade, se houver.
+    head = codes[:1] if codes[0] == HALF_BLOCK_CODE else []
+    tail = codes[-1:] if len(codes) > 1 and codes[-1] == HALF_BLOCK_CODE else []
+    miolo = codes[len(head):len(codes) - len(tail)]
+    comps = [c for c in miolo if is_comp(c)]
+    plains = [c for c in miolo if not is_comp(c)]
+    if not comps or not plains:
+        return layout
+    # Intercala: um compensador a cada `passo` pecas comuns, distribuido o
+    # mais uniformemente possivel. Com comps <= plains + 1 o resultado tem
+    # excesso ZERO; acima disso sobra o minimo aritmetico possivel.
+    novo_miolo = []
+    restantes = list(comps)
+    for i, peca in enumerate(plains):
+        novo_miolo.append(peca)
+        # quantos compensadores ainda cabem depois desta peca comum
+        faltam_plains = len(plains) - i - 1
+        while restantes and (len(restantes) > faltam_plains or
+                             len(restantes) * 1.0 / max(1, faltam_plains + 1) > 1.0):
+            novo_miolo.append(restantes.pop(0))
+            break
+    novo_miolo.extend(restantes)
+    nova_ordem = head + novo_miolo + tail
+    if sorted(nova_ordem) != sorted(codes):
+        return layout  # nunca devolve uma composicao diferente
+    candidato = _relayout_codes_in_place(nova_ordem, layout, catalog)
+    if candidato is None:
+        return layout
+    if _layout_compensator_run_excess(candidato, catalog) >= \
+            _layout_compensator_run_excess(layout, catalog):
+        return layout
+    return candidato
+
+
+def _relayout_codes_in_place(codes, layout, catalog):
+    """Reconstroi `[(codigo, start_cm, end_cm), ...]` para `codes` a partir
+    da MESMA posicao inicial de `layout`, encadeando peca + BLOCK_JOINT_CM.
+    Devolve None se o comprimento total nao bater com o original (guarda
+    contra qualquer reordenacao que mudasse o trecho)."""
+    if not layout:
+        return None
+    start = layout[0][1]
+    fim_original = layout[-1][2]
+    out = []
+    cursor = start
+    for code in codes:
+        entry = (catalog or {}).get(code) or {}
+        length = entry.get("length_cm")
+        if length is None:
+            return None
+        out.append((code, cursor, cursor + length))
+        cursor += length + BLOCK_JOINT_CM
+    if abs(out[-1][2] - fim_original) > PIER_LAYOUT_TOLERANCE_CM:
+        return None
     return out
 
 

@@ -6336,8 +6336,58 @@ compensadores **intercalada** não violaria.
    também teria de passar a medir *sequência*, senão o solver ficaria
    certo pela regra e errado pela régua.
 
-Continua valendo: **nenhuma das quatro foi aplicada**, e escolher é do
-usuário.
+### 41.6 A PARTE da opção 4 que já estava PERMITIDA — `CR-N1e`
+(2026-09-09, **IMPLEMENTADA e medida**)
+
+A opção 4 tem duas metades, e só uma delas é decisão normativa:
+
+1. **Rebaixar `MAX_COMPENSATORS_PER_TRECHO` a preferência** — muda um
+   teto e obrigaria `COMPENSATOR_EXCESS_IN_RUN` a mudar de régua junto.
+   **Continua pendente do usuário. NÃO foi feita.**
+2. **Ordenar os compensadores que o tier 7 já decidiu entregar** — não
+   muda teto nenhum. A composição é **exatamente a mesma** (mesmos
+   códigos, mesma contagem, mesmo comprimento); só a **ordem** muda. E
+   entregar em sequência o que pode sair intercalado **viola a regra
+   escrita** ("proibido usar 2 ou mais **em sequência**") **sem
+   necessidade nenhuma**. Esta metade já estava integralmente permitida —
+   e foi implementada.
+
+`_spread_compensators_layout`, aplicada no tier 7. O critério
+(`_layout_compensator_run_excess`) **já era o primário** em
+`_pier_layout_avoiding_joints`; agora vale também no caminho em que
+aquela busca não roda (sem junta a evitar). O `B19` de ponta nunca é
+movido (regra do meio-bloco), e `_relayout_codes_in_place` devolve `None`
+em vez de entregar um trecho de comprimento diferente.
+
+`TP1/W003 [170, 474]`, o caso da 41.2 — a aritmética **não** mudou,
+continuam 3 compensadores com `esp ≤ 1`:
+
+```
+antes   B39 B39 B39 B39 B39 B39 B39 C09 C09 C04     excesso = 2
+depois  B39 B39 B39 B39 B39 C09 B39 C09 B39 C04     excesso = 0
+```
+
+Medido, por identidade física:
+
+| | base | CR-N1c | **CR-N1e** |
+|---|---|---|---|
+| TGD `COMPENSATOR_CONSECUTIVE` | 101 | 97 | **75** |
+| TGD `PRISM_STAGGER_BELOW_TARGET` | 181 | 176 | **161** |
+| **TGD total** | 798 | 780 | **746** |
+| TP1 `COMPENSATOR_CONSECUTIVE` | 200 | 200 | **171** |
+| TP1 `PRISM_STAGGER_BELOW_TARGET` | 245 | 245 | **221** |
+| **TP1 total** | 862 | 861 | **811** |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | 0/0 | **0/0** |
+
+Custo declarado: `COMPENSATOR_EXCESS_IN_RUN` +2 (TGD) e +4 (TP1), e
+`COMPENSATOR_VERTICAL_STRIP` +1 em cada — a contagem por trecho não muda,
+mas os *runs* de blocos sólidos se reagrupam quando o compensador sai do
+meio do bloco. `PRISM_STAGGER` melhorou junto, e não por acaso:
+compensador espalhado desencontra junta melhor que compensador
+empilhado.
+
+Continua valendo: **a metade normativa das quatro opções não foi
+aplicada**, e escolher é do usuário.
 ---
 
 ## 42. PENDÊNCIA NORMATIVA — parede cujo comprimento não é múltiplo de 5cm
