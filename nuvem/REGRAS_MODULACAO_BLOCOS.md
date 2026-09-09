@@ -7112,3 +7112,57 @@ No TGD o candidato **melhora**: OBB **1074 → 1038** (−36).
 regra da seção 3. A prova é `find_door_void_violations` (OBB) contra
 porta com peitoril ≤ `DOOR_NO_SILL_MAX_SILL_CM`. Qualquer conclusão sobre
 "bloco no vão" tem de citar o número do OBB.
+
+## 48. Preparacao do beta controlado (2026-09-09)
+
+### 48.1 Instrucoes explicitas do usuario: contencao e limites
+
+**REGRA OBRIGATORIA para esta missao beta**, autorizada pelo usuario:
+parede nao modulavel deve ser detectada, conservada para revisao manual,
+ter motivo explicito no resultado/log/UI e nunca receber blocos incorretos.
+Parede retida visivelmente nao exige ampliar tolerancia ou alterar seu
+comprimento. Nenhum input/reference/reference_score/baseline oficial pode
+ser regravado. Secoes 41/42 continuam sem autorizacao de extensao normativa.
+
+Peca ocupando volume real de porta sem peitoril nao pode ser criada no
+beta; problemas de janela pertinentes ao recorte tambem exigem correcao ou
+contencao explicita. Nao ressuscitar a candidata rejeitada na secao 47.
+A permissao historica de criar diagnosticos em vermelho nao constitui
+permissao de lancamento fisico incorreto neste beta. A contencao deve ser
+explicita e testada, sem apagar defeitos do resultado bruto ou do benchmark.
+**DOCUMENTADO - implementacao de seguranca do beta em andamento.**
+
+### 48.2 Correcao de medicao da secao 47: OBB exige escopo fisico
+
+**PADRAO MEDIDO OFFLINE**, nao mudanca de regra ou threshold. A funcao
+`find_door_void_violations` mede OBB em XY e nao filtra altura sozinha.
+Aplicar TODAS as portas a `candidates` agregado inclui pecas acima da
+verga e variantes/bandas que nao coexistem na mesma fiada. Para provar
+invasao de volume criado, usar `course_candidates` por indice fisico e
+as aberturas ativas na faixa Z, pelos helpers de banda ja existentes.
+O benchmark 1D e o OBB permanecem instrumentos distintos, sem reescrita
+de contrato; nenhum total liquido pode aprovar uma nova invasao.
+
+Medido por `tools/beta/physical_snapshot.py`, mesmos insumos oficiais:
+
+| Instrumento | main 08495d9 TGD | N1f 05030d2 TGD | N1f 05030d2 TP1 |
+|---|---:|---:|---:|
+| Colisoes agregadas | 1160 | 1197 | 0 |
+| Pares de colisao por fiada fisica | 726 | 784 | 0 |
+| OBB agregado contra todas as aberturas | 1074 | 1038 | 2094 |
+| OBB agregado por banda (resultado do motor) | 290 | 290 | 348 |
+| OBB por fiada fisica e abertura ativa em Z | 318 | 318 | 412 |
+
+As **412** do TP1 sao exclusivamente T/X (13 degraded-L, 74 incoming,
+88 incoming-degraded, 71 main, 150 X, 16 X-degraded). A afirmacao de 68%
+STANDARD_FILL da secao 47.3 veio do escopo agregado sem filtragem vertical:
+**nao prova invasao de preenchimento nas fiadas criadas**. A invasao real
+de encontro continua aberta. Nao declarar corrigida por melhorar contagem.
+
+As novas colisoes TGD distribuem-se em cinco pares de paredes (lista e
+geometria no checkpoint/evidencias da missao). Ha regioes geometricamente
+novas apesar da reducao da area TOTAL de overlap. Gate de regressao
+continua reprovado; causalidade por etapa ainda esta sendo investigada.
+N1c cb70224 ja produz 1196 pares agregados e 782 por fiada; N1e/f chega
+a 1197/784. Nenhum conhecimento de amarracao desta medicao autoriza
+alterar geometria da entrada, remover amarracao ou compensar por score.

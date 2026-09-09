@@ -1,0 +1,14 @@
+{
+  "head": "05030d2cf3e18081b040ad048759099a1b215210",
+  "seconds": 243.01599999999962,
+  "summary": {
+    "blocks": 19647,
+    "aggregate_collisions": 0,
+    "physical_course_collisions": 0,
+    "band_door_void": 348,
+    "naive_all_openings_door_void": 2094,
+    "physical_active_door_void": 412,
+    "empty_walls": [],
+    "intersection_failures": 0
+  }
+}
