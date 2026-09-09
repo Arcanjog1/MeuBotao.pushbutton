@@ -6,7 +6,7 @@
   "branch": "codex/auditoria-governanca-beta-20260909",
   "head": "78e8d5f39e966d1e7c2b597ad977652e6e35194e",
   "base": "08495d913e72b36a80b034d5f0a1435470d27557",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32",
   "objective": "Auditar main e candidatos, reconciliar fatos e implementar governanca documental de baixo risco para preparar beta controlado.",
   "changes": [
     "Status central reconciliado; auditoria com inventario por branch, linha do tempo, gates e decisoes.",

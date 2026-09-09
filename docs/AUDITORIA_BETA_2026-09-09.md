@@ -301,6 +301,12 @@ do usuario; nao houve merge, force-push ou alteracao de protecao.
 
 ## 9. Entrega e limites finais
 
+Entrega publicada como [PR #32 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32),
+branch `codex/auditoria-governanca-beta-20260909`. O HEAD avaliado da
+infraestrutura e `78e8d5f39e966d1e7c2b597ad977652e6e35194e`; commits posteriores
+apenas registram logs, PR e reconciliacao documental. HEAD de publicacao
+e checks atuais sao consultaveis no proprio PR, sem SHA autorreferente.
+
 Infraestrutura final: **12 testes passaram** em `78e8d5f`, inclusive casos
 validos e rejeicao de checkpoint ignorado, campo ausente, SHA invalido,
 referencia/link quebrado, main desatualizada, candidato classificado como

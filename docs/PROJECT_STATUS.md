@@ -45,7 +45,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
 | CR-N1b/c/e/f | Ausente | PR #31 draft, `420dbcc` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Log bruto da suite consolidada e aberturas |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
-| Governanca desta auditoria | Ainda candidata a revisao | Branch `codex/auditoria-governanca-beta-20260909` | [checkpoint](checkpoints/2026-09-09-auditoria-governanca.md) | Revisao humana; nenhum merge autorizado |
+| Governanca desta auditoria | Ainda candidata a revisao | [PR #32 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32), branch `codex/auditoria-governanca-beta-20260909` | [checkpoint](checkpoints/2026-09-09-auditoria-governanca.md) | Revisao humana; nenhum merge autorizado |
 
 Tambem integrados: ARM SAFE REPAIR (#12), NÓ|FILL (#17), fidelidade dos
 gates ARM (#18), B19 residual condicionado (#19), fit C04 (#20),
@@ -57,6 +57,7 @@ sem alteracao nesta auditoria.
 ## Trabalho candidato
 
 PRs abertos no snapshot: **#7, #8, #21, #28, #30 e #31**, todos drafts.
+Esta entrega acrescentou o **PR #32 draft**, exclusivamente documental/infra.
 #2 e #9 foram fechados sem merge; os outros 23 PRs de #1 a #31 foram
 integrados. Titulo com "draft" nao substitui `state`/`mergedAt`.
 
