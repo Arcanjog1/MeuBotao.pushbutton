@@ -1,0 +1,90 @@
+{
+  "head": "439fd49391227e128038fec704833c66c6ce3ffa",
+  "files": [
+    {
+      "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/input.json",
+      "sha256": "4ab24fcb55a26a3a3d9f189851a11ae9ecf5f684e697bc2a2cf9a099de19bce9",
+      "last_commit": "f693dcf4f5225f02fb23f8a395164a92da6c31fa",
+      "walls": 12,
+      "unique_keys": 12,
+      "collisions": {},
+      "stored_key_mismatches": 0
+    },
+    {
+      "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/baseline.json",
+      "sha256": "e66b9a41eb4f779750821c619364a80e1ad3f1ac5116e45febec8c1200490d86",
+      "last_commit": "f693dcf4f5225f02fb23f8a395164a92da6c31fa"
+    },
+    {
+      "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/score.json",
+      "sha256": "a8173786b4fc49577f5bf5155a444cdae455f5964bd0d11c62965fef614ff7cc",
+      "last_commit": "300aef653fae75986a9956594a336251ffa41248"
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/input.json",
+      "sha256": "936ec34ee63b541554c43d8ac2509d99e2c641a5ec140fbfa3716837cda1e049",
+      "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+      "walls": 167,
+      "unique_keys": 167,
+      "collisions": {},
+      "stored_key_mismatches": 0
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/reference.json",
+      "sha256": "3598b03610768d14171798a454afed4041d36a3160f36d3c684b5da9fa83110c",
+      "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+      "walls": 97,
+      "unique_keys": 97,
+      "collisions": {},
+      "stored_key_mismatches": 0
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/baseline.json",
+      "sha256": "d09c77dfd414af8b70b5d5c4627f4345cdd6500f57b4bedd1731d132d740fc22",
+      "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f"
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json",
+      "sha256": "e3d3b52a9e529bc12ffd966b2dd538569a16ef6e3b99e4ed86adc1a4d025b09a",
+      "last_commit": "67083b03e2beeeef320e97ed554aabaa35499613"
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/input.json",
+      "sha256": "60fde2eb6e6d4f35cee26a395e7582a5963f651ee9c3e7cf6aac54711d6f2589",
+      "last_commit": "f693dcf4f5225f02fb23f8a395164a92da6c31fa",
+      "walls": 96,
+      "unique_keys": 96,
+      "collisions": {},
+      "stored_key_mismatches": 0
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference.json",
+      "sha256": "238bb2129e766c8e24951a06d669740cabcdad5363e9b6696883309f4b9e9b3f",
+      "last_commit": "f693dcf4f5225f02fb23f8a395164a92da6c31fa",
+      "walls": 96,
+      "unique_keys": 96,
+      "collisions": {},
+      "stored_key_mismatches": 0
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/baseline.json",
+      "sha256": "87a90d5bad42fa98fcf95d60e1d19012e32e50ec38acc9ac1c96a4df7bf70c6f",
+      "last_commit": "f693dcf4f5225f02fb23f8a395164a92da6c31fa"
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json",
+      "sha256": "5312739eb1e5f37a15185992faec1c665933ba7f8af6a6d6e69b940b99c84dae",
+      "last_commit": "67083b03e2beeeef320e97ed554aabaa35499613"
+    }
+  ],
+  "room_probe": {
+    "wall_length_cm": 800,
+    "opening_t_cm": [
+      564,
+      750
+    ],
+    "node_t_cm": 742,
+    "-1": 741.9999999999999,
+    "1": 58.00000000000002
+  }
+}

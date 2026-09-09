@@ -1,5 +1,10 @@
 # CR-G12 — as 12 identidades críticas de `PRISM_CONTINUOUS_JOINT`
 
+> Nota da auditoria de 2026-09-09: este e um registro historico da revisao
+> indicada, nao o estado atual de merges. PRs #25/#26/#27/#29 estao
+> integrados na main `08495d9`; #28 continua draft. C2/G16 e CR-B nao
+> foram aprovados por esses merges. Estado corrente: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 > **CR PREPARADA — DIAGNÓSTICO E ESCOPO. NENHUM PATCH APLICADO.**
 > Solver, validadores, gabarito, baseline e `reference_score` **intocados**.
 

@@ -1,5 +1,10 @@
 # CR-B — REAVALIAÇÃO DE G12 E G16 E CONTRATO DE INTEGRAÇÃO
 
+> Nota da auditoria de 2026-09-09: este e um registro historico da revisao
+> indicada, nao o estado atual de merges. PRs #25/#26/#27/#29 estao
+> integrados na main `08495d9`; #28 continua draft. C2/G16 e CR-B nao
+> foram aprovados por esses merges. Estado corrente: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 | item | valor |
 |---|---|
 | base | `main` real **`91258dd`** (conferida por `fetch`; **não** presumida do SHA histórico) |

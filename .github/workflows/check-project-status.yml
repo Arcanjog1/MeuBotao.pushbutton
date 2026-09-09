@@ -1,24 +1,10 @@
 name: Checa atualizacao do PROJECT_STATUS.md
 
-# Ver docs/PROJECT_STATUS.md secao "Regra permanente de atualizacao"
-# e CLAUDE.md ("Atualizacao obrigatoria das regras de modulacao").
-#
-# Este workflow NAO bloqueia merge automaticamente (o repositorio usa
-# merge direto na main autorizado pelo usuario, sem PR obrigatorio) - ele
-# so' falha o check e deixa um aviso claro no log/summary quando o motor
-# (nuvem/core/engine/**) muda numa branch/PR sem que
-# docs/PROJECT_STATUS.md tenha sido tocado no mesmo diff. E' um lembrete
-# tecnico, nao um veto: se o agente/usuario decidir que a mudanca nao
-# merece uma entrada no PROJECT_STATUS.md (ex.: typo, comentario), pode
-# seguir mesmo com o check vermelho.
-
 on:
   pull_request:
     branches: [main]
   push:
-    branches:
-      - main
-      - 'claude/**'
+    branches: [main, 'claude/**', 'codex/**']
 
 permissions:
   contents: read
@@ -26,81 +12,40 @@ permissions:
 jobs:
   check-status-doc:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Checkout com historico completo
+      - name: Checkout da revisao avaliada
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
 
-      - name: Determinar intervalo do diff
-        id: range
+      - name: Testar validacao (casos validos e invalidos)
+        run: python3 -m unittest discover -s tools/documentation -p 'test_*.py' -v
+
+      - name: Validar entrega completa e publicar evidencia no summary
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BRANCH_REF: ${{ github.ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-            HEAD="${{ github.event.pull_request.head.sha }}"
+          set -euo pipefail
+          HEAD_SHA="$(git rev-parse HEAD)"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          EXTRA=()
+          if [ "$EVENT_NAME" = "push" ] && [ "$BRANCH_REF" = "refs/heads/main" ]; then
+            BASE="$BEFORE_SHA"
           else
-            BASE="${{ github.event.before }}"
-            HEAD="${{ github.event.after }}"
+            BASE="$(git merge-base origin/main HEAD)"
+            EXTRA=(--require-current-main)
           fi
-
-          # Push de branch NOVA vem com before = 40 zeros - e' o caso mais
-          # comum aqui (cada CR nasce numa branch claude/... nova). Nesse
-          # caso nao da' para usar "before"; comparamos contra o ponto onde
-          # a branch saiu de origin/main (merge-base), senao o check nunca
-          # rodaria de verdade nas branches novas.
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            git fetch origin main --quiet
-            MB="$(git merge-base origin/main "$HEAD" 2>/dev/null || true)"
-            if [ -z "$MB" ]; then
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-              echo "Branch nova sem merge-base com origin/main - pulando o check." >&2
-              exit 0
-            fi
-            BASE="$MB"
-          fi
-
-          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Commit base $BASE nao encontrado no historico - pulando o check." >&2
-            exit 0
-          fi
-
-          echo "skip=false" >> "$GITHUB_OUTPUT"
-          echo "base=$BASE" >> "$GITHUB_OUTPUT"
-          echo "head=$HEAD" >> "$GITHUB_OUTPUT"
-
-      - name: Comparar motor x docs/PROJECT_STATUS.md
-        if: steps.range.outputs.skip == 'false'
-        run: |
-          BASE="${{ steps.range.outputs.base }}"
-          HEAD="${{ steps.range.outputs.head }}"
-
-          CHANGED="$(git diff --name-only "$BASE" "$HEAD")"
-          echo "Arquivos alterados:"
-          echo "$CHANGED"
-
-          ENGINE_TOUCHED="$(echo "$CHANGED" | grep -E '^nuvem/core/engine/' || true)"
-          STATUS_TOUCHED="$(echo "$CHANGED" | grep -E '^docs/PROJECT_STATUS\.md$' || true)"
-
-          if [ -n "$ENGINE_TOUCHED" ] && [ -z "$STATUS_TOUCHED" ]; then
-            {
-              echo "## :warning: PROJECT_STATUS.md pode estar desatualizado"
-              echo
-              echo "Este diff altera o motor (\`nuvem/core/engine/**\`) mas nao"
-              echo "toca \`docs/PROJECT_STATUS.md\`:"
-              echo
-              echo '```'
-              echo "$ENGINE_TOUCHED"
-              echo '```'
-              echo
-              echo "Se esta mudanca conclui, avanca ou reabre um CR, atualize"
-              echo "\`docs/PROJECT_STATUS.md\` (secao \"Regra permanente de"
-              echo "atualizacao\") antes de finalizar. Se for uma mudanca trivial"
-              echo "que nao muda o estado do projeto (typo, comentario, etc.),"
-              echo "pode ignorar este aviso."
-            } >> "$GITHUB_STEP_SUMMARY"
-            echo "::warning::nuvem/core/engine/** mudou sem atualizar docs/PROJECT_STATUS.md"
-            exit 1
-          fi
-
-          echo "OK: nenhuma mudanca no motor sem atualizacao do PROJECT_STATUS.md (ou PROJECT_STATUS.md foi atualizado)." >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo '## Evidencia de governanca documental'
+            echo "HEAD avaliado: $HEAD_SHA"
+            echo "Base do diff: $BASE"
+            echo "Main observada: $MAIN_SHA"
+            echo 'Validacao estrutural; nao aprova regras, benchmark ou solver.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/documentation/validate.py --base "$BASE" --main "$MAIN_SHA" "${EXTRA[@]}" 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
