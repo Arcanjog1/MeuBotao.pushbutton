@@ -622,6 +622,19 @@ As regras técnicas e funcionais de amarração e modulação (o "como", não o
   comprimento de verga, simetria de apoio, vãos `ABERTURA`) e sobre o
   escopo da alvenaria de vedação no catálogo. Os dados brutos ficam nos
   JSON daquela pasta — **não copiar números para cá**.
+- `docs/revit_reference_extraction/butanta-r08-lt/` — **segunda referência
+  humana** (Revit `BUTANTÃ - R08_LT`, 2026-09-09, somente leitura).
+  Projeto escolhido por resolver as aberturas com **canaletas** em vez de
+  verga/contraverga — hipótese **confirmada geometricamente**. Relatório em
+  `REPORT_HUMAN_REVIT_MODULATION.md` daquela pasta; checkpoint em
+  `docs/checkpoints/2026-09-09-revit-human-reference-butanta-r08-lt.md`;
+  registro nas regras em `REGRAS_MODULACAO_BLOCOS.md` seção 31.
+  Branch `claude/revit-human-reference-extraction-project-2` (PR draft).
+  **Estado: EVIDÊNCIA, NÃO NORMA — evidência coletada e validada; nada
+  implementado.** Aguarda o Astra comparar os dois projetos e definir a
+  arquitetura A/B (estratégia verga/contraverga × estratégia canaleta).
+  Os números ficam nos JSON e no relatório daquela pasta — **não copiar
+  para cá**.
 - `nuvem/REGRAS_MODULACAO_BLOCOS.md` — **regras técnicas e funcionais**
   da modulação de blocos e da amarração (o "como" do domínio). Este
   documento (`docs/PROJECT_STATUS.md`) **não substitui** aquele arquivo

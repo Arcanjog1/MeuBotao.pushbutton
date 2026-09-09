@@ -1,0 +1,244 @@
+{
+ "project": {
+  "project_id": "butanta-r08-lt",
+  "document_name": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO)",
+  "document_path": "T:\\EM ANDAMENTO\\CIV0495_BUTANTA\\PRANCHAS\\BIM\\REVIT\\BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO).rvt",
+  "revit_version": "2026 (build 26.3.0.37)",
+  "length_unit": "centimeters",
+  "extraction_date": "2026-09-09",
+  "method": "pyRevit Routes POST /revit_mcp/execute_code/ (porta 48885) - SOMENTE LEITURA, nenhuma Transaction aberta"
+ },
+ "families": [
+  {
+   "family_name": "COMPENSADOR 14x19x9",
+   "instances": 2129,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    9.0,
+    19.0
+   ],
+   "role_INFERIDO": "compensador vertical de 9 cm",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 1973,
+    "20.0": 156
+   },
+   "in_top_course": 0,
+   "levels": {
+    "1º PAVIMENTO": 242,
+    "2º PAVIMENTO": 220,
+    "BARRILETE": 101,
+    "9º PAVIMENTO": 214,
+    "PAV. TÉRREO": 32,
+    "3º PAVIMENTO": 220,
+    "4º PAVIMENTO": 220,
+    "5º PAVIMENTO": 220,
+    "6º PAVIMENTO": 220,
+    "7º PAVIMENTO": 220,
+    "8º PAVIMENTO": 220
+   }
+  },
+  {
+   "family_name": "COMPENSADOR 14x19x9 (deitado)",
+   "instances": 633,
+   "solid_dims_cm_MEDIDO": [
+    19.0,
+    14.0,
+    9.0
+   ],
+   "role_INFERIDO": "compensador deitado (9 cm de altura, meia fiada)",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 460,
+    "10.0": 99,
+    "20.0": 74
+   },
+   "in_top_course": 534,
+   "levels": {
+    "1º PAVIMENTO": 62,
+    "2º PAVIMENTO": 62,
+    "9º PAVIMENTO": 123,
+    "PAV. TÉRREO": 14,
+    "3º PAVIMENTO": 62,
+    "4º PAVIMENTO": 62,
+    "5º PAVIMENTO": 62,
+    "6º PAVIMENTO": 62,
+    "7º PAVIMENTO": 62,
+    "8º PAVIMENTO": 62
+   }
+  },
+  {
+   "family_name": "PASTILHA - 14x19X4",
+   "instances": 2329,
+   "solid_dims_cm_MEDIDO": [
+    4.0,
+    14.0,
+    19.0
+   ],
+   "role_INFERIDO": "pastilha de 4 cm (ajuste fino de comprimento)",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 2127,
+    "20.0": 202
+   },
+   "in_top_course": 10,
+   "levels": {
+    "1º PAVIMENTO": 245,
+    "2º PAVIMENTO": 240,
+    "BARRILETE": 117,
+    "9º PAVIMENTO": 223,
+    "PAV. TÉRREO": 64,
+    "3º PAVIMENTO": 240,
+    "4º PAVIMENTO": 240,
+    "5º PAVIMENTO": 240,
+    "6º PAVIMENTO": 240,
+    "7º PAVIMENTO": 240,
+    "8º PAVIMENTO": 240
+   }
+  },
+  {
+   "family_name": "MEIO BLOCO - 14x19x19",
+   "instances": 2700,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    19.0,
+    19.0
+   ],
+   "role_INFERIDO": "amarracao / ajuste modular",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 2485,
+    "20.0": 215
+   },
+   "in_top_course": 0,
+   "levels": {
+    "1º PAVIMENTO": 324,
+    "2º PAVIMENTO": 288,
+    "BARRILETE": 65,
+    "9º PAVIMENTO": 295,
+    "3º PAVIMENTO": 288,
+    "4º PAVIMENTO": 288,
+    "5º PAVIMENTO": 288,
+    "6º PAVIMENTO": 288,
+    "7º PAVIMENTO": 288,
+    "8º PAVIMENTO": 288
+   }
+  },
+  {
+   "family_name": "BLOCO 34 - 14x19x34",
+   "instances": 15651,
+   "solid_dims_cm_MEDIDO": [
+    34.0,
+    14.0,
+    19.0
+   ],
+   "role_INFERIDO": "amarracao / ajuste modular",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 14789,
+    "20.0": 834,
+    "0.2": 28
+   },
+   "in_top_course": 0,
+   "levels": {
+    "1º PAVIMENTO": 1615,
+    "2º PAVIMENTO": 1610,
+    "BARRILETE": 987,
+    "COBERTURA": 110,
+    "9º PAVIMENTO": 1605,
+    "PAV. TÉRREO": 64,
+    "3º PAVIMENTO": 1610,
+    "4º PAVIMENTO": 1610,
+    "5º PAVIMENTO": 1610,
+    "6º PAVIMENTO": 1610,
+    "7º PAVIMENTO": 1610,
+    "8º PAVIMENTO": 1610
+   }
+  },
+  {
+   "family_name": "BLOCO 54 - 14x19x54",
+   "instances": 1614,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    54.0,
+    19.0
+   ],
+   "role_INFERIDO": "amarracao / ajuste modular",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 1503,
+    "20.0": 111
+   },
+   "in_top_course": 0,
+   "levels": {
+    "1º PAVIMENTO": 170,
+    "2º PAVIMENTO": 170,
+    "BARRILETE": 84,
+    "9º PAVIMENTO": 170,
+    "3º PAVIMENTO": 170,
+    "4º PAVIMENTO": 170,
+    "5º PAVIMENTO": 170,
+    "6º PAVIMENTO": 170,
+    "7º PAVIMENTO": 170,
+    "8º PAVIMENTO": 170
+   }
+  },
+  {
+   "family_name": "MEIA CANALETA - 14x19x19",
+   "instances": 194,
+   "solid_dims_cm_MEDIDO": [
+    19.0,
+    14.0,
+    19.0
+   ],
+   "role_INFERIDO": "amarracao / ajuste modular",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 163,
+    "20.0": 31
+   },
+   "in_top_course": 107,
+   "levels": {
+    "1º PAVIMENTO": 19,
+    "2º PAVIMENTO": 20,
+    "BARRILETE": 15,
+    "9º PAVIMENTO": 18,
+    "PAV. TÉRREO": 2,
+    "3º PAVIMENTO": 20,
+    "4º PAVIMENTO": 20,
+    "5º PAVIMENTO": 20,
+    "6º PAVIMENTO": 20,
+    "7º PAVIMENTO": 20,
+    "8º PAVIMENTO": 20
+   }
+  },
+  {
+   "family_name": "CANALETA J - 14x9-19x19",
+   "instances": 190,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    19.0,
+    19.0
+   ],
+   "role_INFERIDO": "amarracao / ajuste modular",
+   "z_rel_mod20_counts_MEDIDO": {
+    "0.0": 181,
+    "20.0": 9
+   },
+   "in_top_course": 73,
+   "levels": {
+    "9º PAVIMENTO": 86,
+    "1º PAVIMENTO": 13,
+    "2º PAVIMENTO": 13,
+    "3º PAVIMENTO": 13,
+    "4º PAVIMENTO": 13,
+    "5º PAVIMENTO": 13,
+    "6º PAVIMENTO": 13,
+    "7º PAVIMENTO": 13,
+    "8º PAVIMENTO": 13
+   }
+  }
+ ],
+ "pieces_9cm_tall": {
+  "n": 852,
+  "z_rel_mod20_counts_MEDIDO": {
+   "0.0": 600,
+   "10.0": 162,
+   "20.0": 90
+  },
+  "nota": "9 + 1 de junta + 9 = 19: duas pecas de 9 cm reconstroem uma fiada"
+ }
+}
