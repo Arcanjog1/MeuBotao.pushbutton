@@ -1,0 +1,1 @@
+{"permutations": 105, "nonadjacent": 30, "nonadjacent_audit_ok": 0, "minimum_strips_without_adjacency": 2, "minimum_continuous_joints_without_adjacency": 0}

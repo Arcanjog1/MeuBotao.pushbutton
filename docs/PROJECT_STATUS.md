@@ -4,11 +4,13 @@ Estado operacional conferido em 2026-09-09 por fetch e API GitHub.
 Esta pagina distingue codigo integrado, candidatos e decisoes pendentes.
 Auditoria, limites e gates: [AUDITORIA_BETA_2026-09-09.md](AUDITORIA_BETA_2026-09-09.md).
 Evidencia Git/GitHub: [snapshot](checkpoints/evidence/2026-09-09-github.json).
-Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-github-final.json).
+Snapshot historico do #31: [reconferencia](checkpoints/evidence/2026-09-09-github-final.json).
+Missao posterior: [relatorio beta](RELATORIO_BETA_2026-09-09.md) e
+[runbook condicionado](BETA_REVIT_RUNBOOK.md). **NO-GO; #31 nao integrado.**
 
 ```json
 {
-  "observed_utc": "2026-09-09T15:34:00+00:00",
+  "observed_utc": "2026-09-09T16:00:00+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -24,7 +26,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
     {"pr": 21, "head": "766e1ea6ee281cc29a3d6118d6013f3955193352"},
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
-    {"pr": 31, "head": "edc9666545eef0f0e423ecd1ba28d2ceb798cd5e"}
+    {"pr": 31, "head": "09b6ea0ae221a43a3adc27f63bb05d336351584f"}
   ]
 }
 ```
@@ -47,7 +49,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-C1 | PR #26 integrado, `0c6e8f7` | Herdado pelo #31 | [cobertura](CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md) | Nao resolve C2/G16 inteiro |
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
-| CR-N1b/c/e/f + beta | Ausente | PR #31 draft, producao `f9e81cc`, diagnostico `edc9666` | [etapa 3](checkpoints/2026-09-09-beta-etapa3.md), 314 testes desta etapa | Colisoes TGD +37, amarracao TP1, recorte e regressao final; contencao nao e GO |
+| CR-N1b/c/e/f + beta | Ausente | PR #31 draft, codigo/testes `09b6ea0` | [relatorio beta](RELATORIO_BETA_2026-09-09.md), 61 focados finais verdes; consolidada1112 passed/2 failed | Colisoes reais TGD, amarracao TP1 e decisoes de dominio; contencao nao e GO |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
 | Governanca | PR #32 integrado, `aa58d70` | Checkpoints historicos explicitos e timeout de arvore de processos na branch beta | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | Base: 12 testes infra e 260 test_script; candidato: 16 testes infra verdes |
 
@@ -88,6 +90,25 @@ preservam exatamente a geometria TGD/TP1. Recortes L/T/X ainda possuem
 achados de amarracao/compensadores e NAO estao liberados. O SHA da tabela
 identifica a revisao avaliada; HEAD publicado inclui checkpoints posteriores.
 
+Etapa 4: `3229924`/`09b6ea0` validam entrada finita, retencao de referencia
+parcial e assinatura do calculo/refresh beta. Pacote09b6ea0 gerado e verificado,
+sem instalar/abrir Revit. 61 testes finais verdes,1.99s, e 14 controles legados
+verdes. Consolidada no09b6ea0, PID7828, concluida:1112 passed/2 failed em
+2611.63s (43min31s); exit1. TGD comp52->66; TP1 binding8->9 e door0->7.
+Giro L163 e troca isolada de fases T95/138 foram medidos no solve completo e
+rejeitados por novas invasoes/+39 PRISM_STAGGER. Nenhuma hipotese mudou a
+producao. Pares paralelos do input TGD se sobrepoem em faixas0.746/1.258cm;
+escolher nova unidade fisica/geometria nao foi autorizado. Aritmetica a
+fronteiras fixas confirma conflitos entre tetos de compensadores/especiais.
+Ultimo CI publicado conferido:64532c4, dois checks documentais verdes.
+
+Alternativa separada em verificacao: `codex/beta-main-safe-20260909`,
+codigo8cdd33f974f41a9bf41010a32f82762740b31ed3, baseaa58d70 e motor
+geometrico identico a main, SEM N1. Recorte TP1 fonte75/81:187 blocos,
+um L, duas pontas livres, nenhuma abertura, zero achados com referencia.
+Nao e aprovacao do #31 ou do projeto inteiro. Consolidada propria em
+andamento; GO ainda nao declarado. A missao continua nessa alternativa.
+
 Os PRs #7/#8 tambem carregam diferencas de producao em
 `wall_pairing.py`/`wall_stepper.py` desde o merge-base, apesar do escopo
 documental declarado por parte dos commits. Nao integrar pela descricao.
@@ -111,7 +132,9 @@ com motivo e identificacao fisica no resultado/log/UI. Loader offline por
 SHA e hashes implementado, sem instalar/abrir Revit e sem fallback online.
 479 testes intermediarios verdes no HEAD 656544e (219 focados + 260 de
 test_script); 16 testes infra e 4 diagnosticos verdes. Consolidada
-final ainda nao executada, pois as frentes de colisao/recorte seguem abertas.
+final dessa etapa nao foi executada. A consolidada posterior terminou
+no09b6ea0:1112 passed/2 failed, com log bruto e PID em
+[evidencia](checkpoints/evidence/beta-consolidated-final-v2.json).
 O preflight e contencao, NAO prova de correcao do solver nem GO.
 
 No candidato exato `439fd49`, Python 3.12.14 e pytest 9.1.1, sem Revit:

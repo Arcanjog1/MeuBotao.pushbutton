@@ -1,0 +1,1982 @@
+{
+  "head": "09b6ea0ae221a43a3adc27f63bb05d336351584f",
+  "scope": "Result IDs mapped back to original physical axes by exact rounded coordinates, not matched to source IDs by name. All unchanged validators with official reference.",
+  "added_result_ids": [
+    "W040",
+    "W045",
+    "W061",
+    "W085",
+    "W098",
+    "W123",
+    "W167"
+  ],
+  "removed_result_ids": [
+    "W020",
+    "W146"
+  ],
+  "results": [
+    {
+      "stage": "main",
+      "source_head": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "walls": [
+        {
+          "result_wall_id": "W020",
+          "source_wall_index": 10,
+          "wall_key": "W|841.5,-428.0|1685.5,-428.0|t14.0",
+          "start_cm": [
+            1685.511,
+            -428.201
+          ],
+          "end_cm": [
+            841.515,
+            -428.201
+          ],
+          "direction": "resolved_failure",
+          "codes": {
+            "COMPENSATOR_CONSECUTIVE": 6,
+            "COMPENSATOR_EXCESS_IN_RUN": 3
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 11 (t=129.5cm e 139.5cm)",
+              "row": 11,
+              "blocks": [
+                "W020-R11-B003",
+                "W020-R11-B004"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 138.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C04 encostados na fiada 11 (t=139.5cm e 149.5cm)",
+              "row": 11,
+              "blocks": [
+                "W020-R11-B004",
+                "W020-R11-B005"
+              ],
+              "codes": [
+                "C09",
+                "C04"
+              ],
+              "t_cm": 148.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=49.5..153.5cm da fiada 11 (teto 1)",
+              "row": 11,
+              "blocks": [
+                "W020-R11-B003",
+                "W020-R11-B004",
+                "W020-R11-B005"
+              ],
+              "run_t_cm": [
+                49.5,
+                153.5
+              ],
+              "count": 3
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 13 (t=129.5cm e 139.5cm)",
+              "row": 13,
+              "blocks": [
+                "W020-R13-B003",
+                "W020-R13-B004"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 138.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C04 encostados na fiada 13 (t=139.5cm e 149.5cm)",
+              "row": 13,
+              "blocks": [
+                "W020-R13-B004",
+                "W020-R13-B005"
+              ],
+              "codes": [
+                "C09",
+                "C04"
+              ],
+              "t_cm": 148.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=49.5..153.5cm da fiada 13 (teto 1)",
+              "row": 13,
+              "blocks": [
+                "W020-R13-B003",
+                "W020-R13-B004",
+                "W020-R13-B005"
+              ],
+              "run_t_cm": [
+                49.5,
+                153.5
+              ],
+              "count": 3
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 15 (t=129.5cm e 139.5cm)",
+              "row": 15,
+              "blocks": [
+                "W020-R15-B003",
+                "W020-R15-B004"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 138.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C04 encostados na fiada 15 (t=139.5cm e 149.5cm)",
+              "row": 15,
+              "blocks": [
+                "W020-R15-B004",
+                "W020-R15-B005"
+              ],
+              "codes": [
+                "C09",
+                "C04"
+              ],
+              "t_cm": 148.5
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W020",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=49.5..153.5cm da fiada 15 (teto 1)",
+              "row": 15,
+              "blocks": [
+                "W020-R15-B003",
+                "W020-R15-B004",
+                "W020-R15-B005"
+              ],
+              "run_t_cm": [
+                49.5,
+                153.5
+              ],
+              "count": 3
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W040",
+          "source_wall_index": 36,
+          "wall_key": "W|-1878.5,-166.0|-1494.5,-166.0|t14.0",
+          "start_cm": [
+            -1878.484,
+            -165.951
+          ],
+          "end_cm": [
+            -1494.48,
+            -165.951
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W045",
+          "source_wall_index": 31,
+          "wall_key": "W|-1878.5,-153.0|-1494.5,-153.0|t14.0",
+          "start_cm": [
+            -1494.484,
+            -153.209
+          ],
+          "end_cm": [
+            -1878.489,
+            -153.209
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W061",
+          "source_wall_index": 109,
+          "wall_key": "W|835.5,-145.0|835.5,-51.0|t14.0",
+          "start_cm": [
+            835.52,
+            -50.951
+          ],
+          "end_cm": [
+            835.52,
+            -145.201
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W085",
+          "source_wall_index": 13,
+          "wall_key": "W|353.0,180.0|353.0,822.0|t14.0",
+          "start_cm": [
+            353.018,
+            180.049
+          ],
+          "end_cm": [
+            353.018,
+            822.049
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W098",
+          "source_wall_index": 66,
+          "wall_key": "W|143.5,235.0|347.0,235.0|t14.0",
+          "start_cm": [
+            143.516,
+            235.049
+          ],
+          "end_cm": [
+            346.764,
+            235.049
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W123",
+          "source_wall_index": 98,
+          "wall_key": "W|-1611.5,449.0|-1609.0,351.5|t14.0",
+          "start_cm": [
+            -1611.441,
+            449.024
+          ],
+          "end_cm": [
+            -1609.191,
+            351.585
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W146",
+          "source_wall_index": 8,
+          "wall_key": "W|841.5,632.5|1685.5,632.5|t14.0",
+          "start_cm": [
+            841.511,
+            632.299
+          ],
+          "end_cm": [
+            1685.511,
+            632.299
+          ],
+          "direction": "resolved_failure",
+          "codes": {
+            "COMPENSATOR_EXCESS_IN_RUN": 3
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W146",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=690.5..794.5cm da fiada 11 (teto 1)",
+              "row": 11,
+              "blocks": [
+                "W146-R11-B007",
+                "W146-R11-B009",
+                "W146-R11-B011"
+              ],
+              "run_t_cm": [
+                690.5,
+                794.5
+              ],
+              "count": 3
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W146",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=690.5..794.5cm da fiada 13 (teto 1)",
+              "row": 13,
+              "blocks": [
+                "W146-R13-B007",
+                "W146-R13-B009",
+                "W146-R13-B011"
+              ],
+              "run_t_cm": [
+                690.5,
+                794.5
+              ],
+              "count": 3
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W146",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "3 compensadores no trecho t=690.5..794.5cm da fiada 15 (teto 1)",
+              "row": 15,
+              "blocks": [
+                "W146-R15-B007",
+                "W146-R15-B009",
+                "W146-R15-B011"
+              ],
+              "run_t_cm": [
+                690.5,
+                794.5
+              ],
+              "count": 3
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W167",
+          "source_wall_index": 12,
+          "wall_key": "W|340.0,180.0|340.0,822.0|t14.0",
+          "start_cm": [
+            339.764,
+            822.049
+          ],
+          "end_cm": [
+            339.764,
+            180.049
+          ],
+          "direction": "new_failure",
+          "codes": {},
+          "findings": []
+        }
+      ]
+    },
+    {
+      "stage": "n1f",
+      "source_head": "05030d2cf3e18081b040ad048759099a1b215210",
+      "walls": [
+        {
+          "result_wall_id": "W020",
+          "source_wall_index": 10,
+          "wall_key": "W|841.5,-428.0|1685.5,-428.0|t14.0",
+          "start_cm": [
+            1685.511,
+            -428.201
+          ],
+          "end_cm": [
+            841.515,
+            -428.201
+          ],
+          "direction": "resolved_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W040",
+          "source_wall_index": 36,
+          "wall_key": "W|-1878.5,-166.0|-1494.5,-166.0|t14.0",
+          "start_cm": [
+            -1878.484,
+            -165.951
+          ],
+          "end_cm": [
+            -1494.48,
+            -165.951
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_EXCESS_IN_RUN": 17,
+            "COMPENSATOR_CONSECUTIVE": 8,
+            "COMPENSATOR_VERTICAL_STRIP": 2
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 0 (teto 1)",
+              "row": 0,
+              "blocks": [
+                "W040-R00-B001",
+                "W040-R00-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 1 (t=0.0cm e 10.0cm)",
+              "row": 1,
+              "blocks": [
+                "W040-R01-B001",
+                "W040-R01-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 1 (teto 1)",
+              "row": 1,
+              "blocks": [
+                "W040-R01-B001",
+                "W040-R01-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 2 (teto 1)",
+              "row": 2,
+              "blocks": [
+                "W040-R02-B001",
+                "W040-R02-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 3 (t=0.0cm e 10.0cm)",
+              "row": 3,
+              "blocks": [
+                "W040-R03-B001",
+                "W040-R03-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 3 (teto 1)",
+              "row": 3,
+              "blocks": [
+                "W040-R03-B001",
+                "W040-R03-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 4 (teto 1)",
+              "row": 4,
+              "blocks": [
+                "W040-R04-B001",
+                "W040-R04-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 5 (t=0.0cm e 10.0cm)",
+              "row": 5,
+              "blocks": [
+                "W040-R05-B001",
+                "W040-R05-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 5 (teto 1)",
+              "row": 5,
+              "blocks": [
+                "W040-R05-B001",
+                "W040-R05-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 6 (teto 1)",
+              "row": 6,
+              "blocks": [
+                "W040-R06-B001",
+                "W040-R06-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 7 (t=0.0cm e 10.0cm)",
+              "row": 7,
+              "blocks": [
+                "W040-R07-B001",
+                "W040-R07-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 7 (teto 1)",
+              "row": 7,
+              "blocks": [
+                "W040-R07-B001",
+                "W040-R07-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 8 (teto 1)",
+              "row": 8,
+              "blocks": [
+                "W040-R08-B001",
+                "W040-R08-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 9 (t=0.0cm e 10.0cm)",
+              "row": 9,
+              "blocks": [
+                "W040-R09-B001",
+                "W040-R09-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 9 (teto 1)",
+              "row": 9,
+              "blocks": [
+                "W040-R09-B001",
+                "W040-R09-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 10 (teto 1)",
+              "row": 10,
+              "blocks": [
+                "W040-R10-B001",
+                "W040-R10-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 11 (t=0.0cm e 10.0cm)",
+              "row": 11,
+              "blocks": [
+                "W040-R11-B001",
+                "W040-R11-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 11 (teto 1)",
+              "row": 11,
+              "blocks": [
+                "W040-R11-B001",
+                "W040-R11-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 12 (teto 1)",
+              "row": 12,
+              "blocks": [
+                "W040-R12-B001",
+                "W040-R12-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 13 (t=0.0cm e 10.0cm)",
+              "row": 13,
+              "blocks": [
+                "W040-R13-B001",
+                "W040-R13-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 13 (teto 1)",
+              "row": 13,
+              "blocks": [
+                "W040-R13-B001",
+                "W040-R13-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 14 (teto 1)",
+              "row": 14,
+              "blocks": [
+                "W040-R14-B001",
+                "W040-R14-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C09 e C09 encostados na fiada 15 (t=0.0cm e 10.0cm)",
+              "row": 15,
+              "blocks": [
+                "W040-R15-B001",
+                "W040-R15-B002"
+              ],
+              "codes": [
+                "C09",
+                "C09"
+              ],
+              "t_cm": 9.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 15 (teto 1)",
+              "row": 15,
+              "blocks": [
+                "W040-R15-B001",
+                "W040-R15-B002"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=0.0..254.0cm da fiada 16 (teto 1)",
+              "row": 16,
+              "blocks": [
+                "W040-R16-B001",
+                "W040-R16-B008"
+              ],
+              "run_t_cm": [
+                0.0,
+                254.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=4.5cm em 17 de 17 fiadas",
+              "t_cm": 4.5,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W040",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=252.0cm em 9 de 17 fiadas",
+              "t_cm": 252.0,
+              "rows": [
+                0,
+                2,
+                4,
+                6,
+                8,
+                10,
+                12,
+                14,
+                16
+              ],
+              "ratio": 0.529
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W045",
+          "source_wall_index": 31,
+          "wall_key": "W|-1878.5,-153.0|-1494.5,-153.0|t14.0",
+          "start_cm": [
+            -1494.484,
+            -153.209
+          ],
+          "end_cm": [
+            -1878.489,
+            -153.209
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_CONSECUTIVE": 9,
+            "COMPENSATOR_EXCESS_IN_RUN": 17,
+            "COMPENSATOR_VERTICAL_STRIP": 2,
+            "COMPENSATOR_AVOIDABLE": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 0 (t=370.0cm e 375.0cm)",
+              "row": 0,
+              "blocks": [
+                "W045-R00-B009",
+                "W045-R00-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 0 (teto 1)",
+              "row": 0,
+              "blocks": [
+                "W045-R00-B009",
+                "W045-R00-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 1 (teto 1)",
+              "row": 1,
+              "blocks": [
+                "W045-R01-B001",
+                "W045-R01-B008"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 2 (t=370.0cm e 375.0cm)",
+              "row": 2,
+              "blocks": [
+                "W045-R02-B009",
+                "W045-R02-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 2 (teto 1)",
+              "row": 2,
+              "blocks": [
+                "W045-R02-B009",
+                "W045-R02-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 3 (teto 1)",
+              "row": 3,
+              "blocks": [
+                "W045-R03-B001",
+                "W045-R03-B008"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 4 (t=370.0cm e 375.0cm)",
+              "row": 4,
+              "blocks": [
+                "W045-R04-B009",
+                "W045-R04-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 4 (teto 1)",
+              "row": 4,
+              "blocks": [
+                "W045-R04-B009",
+                "W045-R04-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 5 (teto 1)",
+              "row": 5,
+              "blocks": [
+                "W045-R05-B001",
+                "W045-R05-B008"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 6 (t=370.0cm e 375.0cm)",
+              "row": 6,
+              "blocks": [
+                "W045-R06-B009",
+                "W045-R06-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 6 (teto 1)",
+              "row": 6,
+              "blocks": [
+                "W045-R06-B009",
+                "W045-R06-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 7 (teto 1)",
+              "row": 7,
+              "blocks": [
+                "W045-R07-B001",
+                "W045-R07-B008"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 8 (t=370.0cm e 375.0cm)",
+              "row": 8,
+              "blocks": [
+                "W045-R08-B009",
+                "W045-R08-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 8 (teto 1)",
+              "row": 8,
+              "blocks": [
+                "W045-R08-B009",
+                "W045-R08-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 9 (teto 1)",
+              "row": 9,
+              "blocks": [
+                "W045-R09-B001",
+                "W045-R09-B008"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 10 (t=370.0cm e 375.0cm)",
+              "row": 10,
+              "blocks": [
+                "W045-R10-B009",
+                "W045-R10-B010"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 10 (teto 1)",
+              "row": 10,
+              "blocks": [
+                "W045-R10-B009",
+                "W045-R10-B010"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 11 (teto 1)",
+              "row": 11,
+              "blocks": [
+                "W045-R11-B004",
+                "W045-R11-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 12 (t=370.0cm e 375.0cm)",
+              "row": 12,
+              "blocks": [
+                "W045-R12-B010",
+                "W045-R12-B011"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 12 (teto 1)",
+              "row": 12,
+              "blocks": [
+                "W045-R12-B010",
+                "W045-R12-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 13 (teto 1)",
+              "row": 13,
+              "blocks": [
+                "W045-R13-B004",
+                "W045-R13-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 14 (t=370.0cm e 375.0cm)",
+              "row": 14,
+              "blocks": [
+                "W045-R14-B010",
+                "W045-R14-B011"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 14 (teto 1)",
+              "row": 14,
+              "blocks": [
+                "W045-R14-B010",
+                "W045-R14-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 15 (teto 1)",
+              "row": 15,
+              "blocks": [
+                "W045-R15-B004",
+                "W045-R15-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_CONSECUTIVE",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "dois ou mais compensadores encostados na mesma fiada",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)",
+              "detail": "C04 e C09 encostados na fiada 16 (t=370.0cm e 375.0cm)",
+              "row": 16,
+              "blocks": [
+                "W045-R16-B010",
+                "W045-R16-B011"
+              ],
+              "codes": [
+                "C04",
+                "C09"
+              ],
+              "t_cm": 374.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_EXCESS_IN_RUN",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "compensadores acima do teto permitido no trecho",
+              "rule_ref": "MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)",
+              "detail": "2 compensadores no trecho t=130.0..384.0cm da fiada 16 (teto 1)",
+              "row": 16,
+              "blocks": [
+                "W045-R16-B010",
+                "W045-R16-B011"
+              ],
+              "run_t_cm": [
+                130.0,
+                384.0
+              ],
+              "count": 2
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=372.0cm em 9 de 17 fiadas",
+              "t_cm": 372.0,
+              "rows": [
+                0,
+                2,
+                4,
+                6,
+                8,
+                10,
+                12,
+                14,
+                16
+              ],
+              "ratio": 0.529
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W045",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=379.5cm em 17 de 17 fiadas",
+              "t_cm": 379.5,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_AVOIDABLE",
+              "status": "FAIL",
+              "level": 2,
+              "severity": "minor",
+              "wall": "W045",
+              "reason": "compensador usado onde o vao fecharia com peca inteira",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2",
+              "detail": "49 compensadores contra 23 na mesma parede do projeto humano (W039)",
+              "count": 49,
+              "reference_count": 23,
+              "reference_wall": "W039"
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W061",
+          "source_wall_index": 109,
+          "wall_key": "W|835.5,-145.0|835.5,-51.0|t14.0",
+          "start_cm": [
+            835.52,
+            -50.951
+          ],
+          "end_cm": [
+            835.52,
+            -145.201
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_VERTICAL_STRIP": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W061",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=92.2cm em 17 de 17 fiadas",
+              "t_cm": 92.25,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W085",
+          "source_wall_index": 13,
+          "wall_key": "W|353.0,180.0|353.0,822.0|t14.0",
+          "start_cm": [
+            353.018,
+            180.049
+          ],
+          "end_cm": [
+            353.018,
+            822.049
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_VERTICAL_STRIP": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W085",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=4.5cm em 17 de 17 fiadas",
+              "t_cm": 4.5,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W098",
+          "source_wall_index": 66,
+          "wall_key": "W|143.5,235.0|347.0,235.0|t14.0",
+          "start_cm": [
+            143.516,
+            235.049
+          ],
+          "end_cm": [
+            346.764,
+            235.049
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_VERTICAL_STRIP": 1,
+            "COMPENSATOR_AVOIDABLE": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W098",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=4.5cm em 17 de 17 fiadas",
+              "t_cm": 4.5,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            },
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_AVOIDABLE",
+              "status": "FAIL",
+              "level": 2,
+              "severity": "minor",
+              "wall": "W098",
+              "reason": "compensador usado onde o vao fecharia com peca inteira",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 2",
+              "detail": "17 compensadores contra 0 na mesma parede do projeto humano (W058)",
+              "count": 17,
+              "reference_count": 0,
+              "reference_wall": "W058"
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W123",
+          "source_wall_index": 98,
+          "wall_key": "W|-1611.5,449.0|-1609.0,351.5|t14.0",
+          "start_cm": [
+            -1611.441,
+            449.024
+          ],
+          "end_cm": [
+            -1609.191,
+            351.585
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_VERTICAL_STRIP": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W123",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=93.0cm em 17 de 17 fiadas",
+              "t_cm": 92.97,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "result_wall_id": "W146",
+          "source_wall_index": 8,
+          "wall_key": "W|841.5,632.5|1685.5,632.5|t14.0",
+          "start_cm": [
+            841.511,
+            632.299
+          ],
+          "end_cm": [
+            1685.511,
+            632.299
+          ],
+          "direction": "resolved_failure",
+          "codes": {},
+          "findings": []
+        },
+        {
+          "result_wall_id": "W167",
+          "source_wall_index": 12,
+          "wall_key": "W|340.0,180.0|340.0,822.0|t14.0",
+          "start_cm": [
+            339.764,
+            822.049
+          ],
+          "end_cm": [
+            339.764,
+            180.049
+          ],
+          "direction": "new_failure",
+          "codes": {
+            "COMPENSATOR_VERTICAL_STRIP": 1
+          },
+          "findings": [
+            {
+              "validator": "compensators",
+              "code": "COMPENSATOR_VERTICAL_STRIP",
+              "status": "FAIL",
+              "level": 1,
+              "severity": "major",
+              "wall": "W167",
+              "reason": "faixa vertical de compensadores empilhados entre fiadas",
+              "rule_ref": "REGRAS_MODULACAO_BLOCOS.md secao 11.5",
+              "detail": "compensadores empilhados em t=4.5cm em 17 de 17 fiadas",
+              "t_cm": 4.5,
+              "rows": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "ratio": 1.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

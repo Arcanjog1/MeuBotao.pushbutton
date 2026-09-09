@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:42:11.947995+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "3229924e3537878e4c1d40d25dcb387ab23fc46a",
+  "tree": "17bb62ca7b142fcf30df4e7611a48ec24eef7894",
+  "status_before": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import json,pathlib,math\nfrom shapely.geometry import LineString,Polygon\np=pathlib.Path('docs/checkpoints/evidence'); s=json.loads((p/'beta-cache-off-tgd.json').read_text())\npolys=[]; solids=[]\nfor i,w in enumerate(s['wall_geometry_cm']):\n a=w['start_cm']; b=w['end_cm']; t=w['thickness_cm']; poly=LineString([a,b]).buffer(t/2,cap_style=2); polys.append(poly); solid=poly; dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy);u=(dx/length,dy/length);v=(-u[1],u[0])\n for lo,hi,sill,head in s['openings_cm'][i]:\n  if sill<20 and head>1:\n   corners=[(a[0]+u[0]*x+v[0]*y,a[1]+u[1]*x+v[1]*y) for x,y in ((lo,-t/2),(hi,-t/2),(hi,t/2),(lo,t/2))];solid=solid.difference(Polygon(corners))\n solids.append(solid)\nfor a,b in ((31,36),(12,13),(86,98),(99,109),(88,112)):\n overlap=polys[a].intersection(polys[b]); solid=solids[a].intersection(solids[b])\n print(json.dumps({'walls':[a,b],'geometry':[s['wall_geometry_cm'][a],s['wall_geometry_cm'][b]],'wall_footprint_overlap_cm2':overlap.area,'both_solid_first_course_cm2':solid.area,'solid_overlap_wkt':solid.wkt}))\n"
+  ],
+  "timeout_seconds": 60,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-wall-geometry-conflicts.txt",
+  "pid": 1184,
+  "exit_code": 1,
+  "elapsed_seconds": 0.594,
+  "status_after": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "log_sha256": "0b4079ad14545a60238c14b27efbeb856867cc6d70a31a1205548a57854214eb"
+}

@@ -7270,3 +7270,26 @@ snapshot antigo silenciosamente. O comportamento historico fora do beta
 permanece separado. Isso nao promete rastrear edicoes nativas arbitrarias
 de portas/janelas: o primeiro beta exige copia estatica do RVT e recaptura
 apos qualquer edicao nativa fora do fluxo suportado.
+
+### 48.6 Fechamento das provas offline e alternativa sem N1
+
+**EVIDENCIA MEDIDA, sem mudar regra:** parede40 TP1, trecho fixo35..219cm:
+105 ordens distintas do mesmo multiset4B39+2C09+C04,30 sem adjacencia,
+zero dessas30 aprovadas pela auditoria; minimo de duas faixas repetidas.
+Isso nao prova impossibilidade global com outras fronteiras. No W019,
+troca isolada das fases dos T95/138 mantem as quatro juntas continuas e
+as500 invasoes e acrescenta39 PRISM_STAGGER: hipotese rejeitada, nao
+implementada. Tornar apenas o teto preferencial nao resolve essas provas.
+
+TGD+37 agregado se decompoe em+132 nos quatro pares que aumentam e-95
+nos dez que zeram. Fisico+58=+156/-98; identidades pecas/fiadas322 novas
+e264 removidas. Pares paralelos12/13 e31/36 de14cm ocupam faixas comuns
+0,746/1,258cm. Nao deduplicar, mover ou definir parede composta sem
+confirmar a unidade fisica do projeto fonte. A contencao nao aprova N1.
+
+Recorte TP1 fonte75/81 resolvido novamente:187 blocos, um L, duas pontas
+livres, nenhuma abertura; zero achados com referencia e auditorias brutas
+aprovadas. Nao e o mesmo grafo do projeto inteiro. Uma alternativa beta
+sobre a main, SEM N1, pode ser avaliada separadamente; nao autoriza o
+merge do #31, novos T/X ou aberturas. Detalhes/reprodutores no relatorio
+`docs/RELATORIO_BETA_2026-09-09.md` e checkpoint da etapa4.

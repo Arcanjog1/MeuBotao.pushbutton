@@ -10,6 +10,10 @@ versionado em `docs/checkpoints/`. Regras de recuperacao, publicacao e
 validacao: [DEVELOPMENT_PROCESS.md](DEVELOPMENT_PROCESS.md).
 Um relatorio em outra branch nao e codigo integrado; ler a revisao indicada.
 
+Missao beta2026-09-09: [relatorio](RELATORIO_BETA_2026-09-09.md),
+com provas fisicas, decisoes pendentes e NO-GO explicito. O
+[runbook](BETA_REVIT_RUNBOOK.md) e condicionado, nao autorizacao para abrir Revit.
+
 ---
 
 ## SOLVER DE BLOCOS (modulação / amarração)

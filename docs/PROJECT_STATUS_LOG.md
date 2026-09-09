@@ -1728,3 +1728,14 @@ Experimentos locais L163/L185: troca apenas transfere a colisao; giro
 para a parede livre zera colisao local mas perde alternancia. Ainda nao
 e correcao de producao nem aprovacao do recorte. Main aa58d70 inalterada,
 PR31 draft sem merge. [Checkpoint](checkpoints/2026-09-09-beta-etapa3.md).
+
+### 2026-09-09 - Beta controlado, etapa 4 (CANDIDATO, NO-GO #31)
+
+Codigo09b6ea0: preflight numerico, referencia parcial e assinatura atual
+do calculo. Consolidada1112 passed/2 failed em2611.63s, log bruto completo;
+61 focados finais verdes. Nenhuma regressao fisica N1 foi absolvida.
+TGD+37 decomposto, hipoteses L/T rejeitadas e decisoes documentadas no
+[checkpoint](checkpoints/2026-09-09-beta-etapa4.md) e
+[relatorio](RELATORIO_BETA_2026-09-09.md). Novo recorte75/81 passou offline;
+alternativa separada main-safe8cdd33f, SEM N1, esta em consolidada propria.
+A missao continua; #31 permanece draft e Revit nao foi iniciado.

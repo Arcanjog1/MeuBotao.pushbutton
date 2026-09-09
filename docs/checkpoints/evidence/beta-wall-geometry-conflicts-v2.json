@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:42:34.068101+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "3229924e3537878e4c1d40d25dcb387ab23fc46a",
+  "tree": "17bb62ca7b142fcf30df4e7611a48ec24eef7894",
+  "status_before": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import json,pathlib,math,hashlib\nfrom shapely.geometry import LineString,Polygon\nsource=pathlib.Path('nuvem/benchmark/projects/torre_easy_lo_r00_tgd/input.json'); s=json.loads(source.read_text());print('Official input SHA256',hashlib.sha256(source.read_bytes()).hexdigest())\npolys=[]; solids=[]\nfor w in s['walls']:\n a=w['start_cm']; b=w['end_cm']; t=w['thickness_cm']; poly=LineString([a,b]).buffer(t/2,cap_style=2); polys.append(poly); solid=poly; dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy);u=(dx/length,dy/length);v=(-u[1],u[0])\n for opening in w.get('openings',[]):\n  lo,hi,sill,head=(opening[k] for k in ('t_start_cm','t_end_cm','sill_cm','head_cm'))\n  if sill<20 and head>1:\n   corners=[(a[0]+u[0]*x+v[0]*y,a[1]+u[1]*x+v[1]*y) for x,y in ((lo,-t/2),(hi,-t/2),(hi,t/2),(lo,t/2))];solid=solid.difference(Polygon(corners))\n solids.append(solid)\nfor a,b in ((31,36),(12,13),(86,98),(99,109),(88,112)):\n overlap=polys[a].intersection(polys[b]); solid=solids[a].intersection(solids[b])\n print(json.dumps({'walls':[a,b],'geometry':[{k:s['walls'][i][k] for k in ('start_cm','end_cm','thickness_cm')} for i in (a,b)],'wall_footprint_overlap_cm2':overlap.area,'both_solid_first_course_cm2':solid.area,'solid_overlap_wkt':solid.wkt}))\n"
+  ],
+  "timeout_seconds": 60,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-wall-geometry-conflicts-v2.txt",
+  "pid": 23732,
+  "exit_code": 0,
+  "elapsed_seconds": 0.297,
+  "status_after": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.txt\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "log_sha256": "2f90d2b035444942054be56dd918e80051749f4951ff75811df268323e1d7bf8"
+}
