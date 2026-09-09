@@ -1,5 +1,11 @@
 # Arquitetura interativa — acompanhamento visual + pausar/continuar/cancelar
 
+> Nota factual da auditoria (2026-09-09, main `08495d9`): a interface
+> PySide abaixo continua historica, mas `nuvem/core/engine/wall_stepper.py`
+> EXISTE na main atual. A afirmacao de ausencia abaixo descreve a remocao
+> de 2026-08-26, nao o inventario atual. O plano local citado nao esta
+> versionado. Nao usar este documento como especificacao da UI vigente.
+
 > **OBSOLETO (2026-08-26):** a UI interativa em PySide6/Qt descrita neste
 > documento foi **removida** a pedido do usuário (era a maior causa de
 > demora/erros ao abrir o botão — instalação extra do PySide6 no Python

@@ -1,0 +1,2537 @@
+{
+  "observed_utc": "2026-09-09T12:51:56.996890+00:00",
+  "repository": "Arcanjog1/MeuBotao.pushbutton",
+  "main": "08495d913e72b36a80b034d5f0a1435470d27557",
+  "github_main": {
+    "name": "main",
+    "commit": {
+      "sha": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "node_id": "C_kwDOUGKYHNoAKDA4NDk1ZDkxM2U3MmIzNmE4MGIwMzRkNWYwYTE0MzU0NzBkMjc1NTc",
+      "commit": {
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "date": "2026-09-08T20:45:14Z"
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "date": "2026-09-08T20:45:14Z"
+        },
+        "message": "Merge branch 'claude/integracao-consolidada-prs-8scic9': reconciliacao documental da integracao consolidada\n\nPublicacao autorizada pelo usuario. Diff exclusivamente documental:\n- docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md (novo)\n- docs/PROJECT_STATUS.md (reconciliado)\n\nNenhum arquivo de producao ou de teste alterado.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013EDC2ja2b7iEh9mPXJZvef",
+        "tree": {
+          "sha": "f46e90b01143e9ab5c88126635acd900d8c8522f",
+          "url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/git/trees/f46e90b01143e9ab5c88126635acd900d8c8522f"
+        },
+        "url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/git/commits/08495d913e72b36a80b034d5f0a1435470d27557",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgrLzsfFISF4by8Q+FKz27YpkK1USsBB+m\namu1QkJnbDsAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAAQBmbhOgo\n+QL/PWBBhXEuDbqJD7jI86GawHZoWG2ujg48Pz66D6zCOjWynloHujeRwREnzlhDj1R9T/8/0YfH\nlw4=\n-----END SSH SIGNATURE-----",
+          "payload": "tree f46e90b01143e9ab5c88126635acd900d8c8522f\nparent 40155643d1fd79664cc262c7b74f4a137db9dec7\nparent 116fe10400c328fb49f9300ade1f61d33367335e\nauthor Claude <noreply@anthropic.com> 1788900314 +0000\ncommitter Claude <noreply@anthropic.com> 1788900314 +0000\n\nMerge branch 'claude/integracao-consolidada-prs-8scic9': reconciliacao documental da integracao consolidada\n\nPublicacao autorizada pelo usuario. Diff exclusivamente documental:\n- docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md (novo)\n- docs/PROJECT_STATUS.md (reconciliado)\n\nNenhum arquivo de producao ou de teste alterado.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013EDC2ja2b7iEh9mPXJZvef\n",
+          "verified_at": "2026-09-08T20:45:21Z"
+        }
+      },
+      "url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/commits/08495d913e72b36a80b034d5f0a1435470d27557",
+      "html_url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/commit/08495d913e72b36a80b034d5f0a1435470d27557",
+      "comments_url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/commits/08495d913e72b36a80b034d5f0a1435470d27557/comments",
+      "author": {
+        "login": "claude",
+        "id": 81847,
+        "node_id": "MDQ6VXNlcjgxODQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/claude",
+        "html_url": "https://github.com/claude",
+        "followers_url": "https://api.github.com/users/claude/followers",
+        "following_url": "https://api.github.com/users/claude/following{/other_user}",
+        "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+        "organizations_url": "https://api.github.com/users/claude/orgs",
+        "repos_url": "https://api.github.com/users/claude/repos",
+        "events_url": "https://api.github.com/users/claude/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/claude/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "claude",
+        "id": 81847,
+        "node_id": "MDQ6VXNlcjgxODQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/claude",
+        "html_url": "https://github.com/claude",
+        "followers_url": "https://api.github.com/users/claude/followers",
+        "following_url": "https://api.github.com/users/claude/following{/other_user}",
+        "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+        "organizations_url": "https://api.github.com/users/claude/orgs",
+        "repos_url": "https://api.github.com/users/claude/repos",
+        "events_url": "https://api.github.com/users/claude/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/claude/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "40155643d1fd79664cc262c7b74f4a137db9dec7",
+          "url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/commits/40155643d1fd79664cc262c7b74f4a137db9dec7",
+          "html_url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/commit/40155643d1fd79664cc262c7b74f4a137db9dec7"
+        },
+        {
+          "sha": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/commits/116fe10400c328fb49f9300ade1f61d33367335e",
+          "html_url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/commit/116fe10400c328fb49f9300ade1f61d33367335e"
+        }
+      ]
+    },
+    "_links": {
+      "self": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/branches/main",
+      "html": "https://github.com/Arcanjog1/MeuBotao.pushbutton/tree/main"
+    },
+    "protected": false,
+    "protection": {
+      "enabled": false,
+      "required_status_checks": {
+        "enforcement_level": "off",
+        "contexts": [],
+        "checks": []
+      }
+    },
+    "protection_url": "https://api.github.com/repos/Arcanjog1/MeuBotao.pushbutton/branches/main/protection"
+  },
+  "prs": [
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/sleepy-turing-rf4s7o",
+      "headRefOid": "439fd49391227e128038fec704833c66c6ce3ffa",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 31,
+      "state": "OPEN",
+      "title": "CR-N1b/c/e/f — regressões críticas da N1 fechadas, compensadores intercalados, e −52/−51 identidades contra a base",
+      "updatedAt": "2026-09-09T12:30:07Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/fervent-mccarthy-lhwoai",
+      "headRefOid": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 30,
+      "state": "OPEN",
+      "title": "CR-N1 — nós de encontro vizinhos não lançam mais peças de amarração sobrepostas (varredura ampla do benchmark)",
+      "updatedAt": "2026-09-08T22:37:48Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/30"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-08T18:34:44Z",
+      "headRefName": "claude/cr-g12-independent-review-w93jf8",
+      "headRefOid": "9531cf0c991c5d46771c0aa200691909fc712b68",
+      "isDraft": false,
+      "mergedAt": "2026-09-08T18:34:44Z",
+      "number": 29,
+      "state": "MERGED",
+      "title": "CR-G12 — revisão independente: contratos de teste, desempenho e veredito",
+      "updatedAt": "2026-09-08T18:34:45Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/29"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/cr-b-preparacao-identidade",
+      "headRefOid": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 28,
+      "state": "OPEN",
+      "title": "CR-B (preparação): tabela de migração de identidade (G18) e estado real dos gates",
+      "updatedAt": "2026-09-08T04:54:19Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/28"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-08T18:03:07Z",
+      "headRefName": "claude/cr-d1-recuperacao-documental",
+      "headRefOid": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+      "isDraft": false,
+      "mergedAt": "2026-09-08T18:03:07Z",
+      "number": 27,
+      "state": "MERGED",
+      "title": "CR-D1: recupera as duas revisões independentes que a main citava e não tinha",
+      "updatedAt": "2026-09-08T18:03:07Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/27"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-08T18:06:24Z",
+      "headRefName": "claude/cr-c1-expected-rows-fisico",
+      "headRefOid": "b2daca8fbc3ee6397697fd3a76f43e4fab724bf9",
+      "isDraft": false,
+      "mergedAt": "2026-09-08T18:06:24Z",
+      "number": 26,
+      "state": "MERGED",
+      "title": "CR-C1: a expectativa de fiada é FÍSICA e por elevação — o validador acusava a própria referência",
+      "updatedAt": "2026-09-08T18:06:25Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/26"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-08T18:04:02Z",
+      "headRefName": "claude/corrigir-alternancia-no-l-76nnb3",
+      "headRefOid": "33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+      "isDraft": false,
+      "mergedAt": "2026-09-08T18:04:02Z",
+      "number": 25,
+      "state": "MERGED",
+      "title": "CR-S1: o giro do canto em L vira a ÚLTIMA saída — alternância de amarração restaurada no nó T→L",
+      "updatedAt": "2026-09-08T18:04:02Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/25"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-07T23:16:16Z",
+      "headRefName": "claude/validador-encontros-elevacao-3u21lw",
+      "headRefOid": "684e99955281693de563a91138dd0becf1e6a6dd",
+      "isDraft": false,
+      "mergedAt": "2026-09-07T23:16:16Z",
+      "number": 24,
+      "state": "MERGED",
+      "title": "CR-V1: valida encontros por elevação física, não por índice ordinal",
+      "updatedAt": "2026-09-07T23:16:16Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/24"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-07T07:16:10Z",
+      "headRefName": "docs/status-post-merge-pr22",
+      "headRefOid": "05dddc80a97445f7f9f79d8dfb76b48a5a589d11",
+      "isDraft": false,
+      "mergedAt": "2026-09-07T07:16:10Z",
+      "number": 23,
+      "state": "MERGED",
+      "title": "docs(status): registra merge concluído do PR #22 (CR-BENCH-OPENING-RECONSTRUCTION-A)",
+      "updatedAt": "2026-09-07T07:16:10Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/23"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-07T06:48:01Z",
+      "headRefName": "claude/opening-detector-root-fix-m21hfm",
+      "headRefOid": "2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff",
+      "isDraft": false,
+      "mergedAt": "2026-09-07T06:48:01Z",
+      "number": 22,
+      "state": "MERGED",
+      "title": "CR-BENCH-OPENING-RECONSTRUCTION-A — detector separa identidade de geometria do vão",
+      "updatedAt": "2026-09-07T06:48:01Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/22"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/pr20-conditional-merge-validation-2wfkfr",
+      "headRefOid": "766e1ea6ee281cc29a3d6118d6013f3955193352",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 21,
+      "state": "OPEN",
+      "title": "docs(blocos): PR #20 conditional-merge — C3/C4 registradas, gate PRE_MERGE_READY",
+      "updatedAt": "2026-09-07T02:48:28Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/21"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-07T04:05:42Z",
+      "headRefName": "claude/cr-block-fit-tolerance-c04-n5qsc4",
+      "headRefOid": "0b09e97be51d1780c5d013a505eb111e455f0f8f",
+      "isDraft": false,
+      "mergedAt": "2026-09-07T04:05:42Z",
+      "number": 20,
+      "state": "MERGED",
+      "title": "CR-BLOCK-FIT-TOLERANCE-C04 — tolerância modular robusta de 0,30 cm",
+      "updatedAt": "2026-09-07T04:05:42Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/20"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-06T13:18:57Z",
+      "headRefName": "claude/cr-block-b19-residual-fill-uythsk",
+      "headRefOid": "9fcd01292eb4bff52af882968320610404d30bba",
+      "isDraft": false,
+      "mergedAt": "2026-09-06T13:18:57Z",
+      "number": 19,
+      "state": "MERGED",
+      "title": "CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION — B19 como fill residual de nó (DRAFT — não mergear)",
+      "updatedAt": "2026-09-06T13:18:57Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/19"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-05T17:29:11Z",
+      "headRefName": "claude/cr-block-arm-safe-repair-gate-fidelity-ne5cdz",
+      "headRefOid": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+      "isDraft": false,
+      "mergedAt": "2026-09-05T17:29:11Z",
+      "number": 18,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY — compensador por course_index, crédito físico de nó na cobertura",
+      "updatedAt": "2026-09-05T17:29:11Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/18"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T19:51:05Z",
+      "headRefName": "claude/cr-block-node-fill-revalidation-iahuyg",
+      "headRefOid": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T19:51:05Z",
+      "number": 17,
+      "state": "MERGED",
+      "title": "CR-BLOCK-NODE-FILL-REVALIDATION: metade simétrica da junta NÓ|FILL (DRAFT — não mergear)",
+      "updatedAt": "2026-09-04T19:51:05Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/17"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T19:05:47Z",
+      "headRefName": "claude/b19-junction-domain-investigation-1h4ow8",
+      "headRefOid": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T19:05:47Z",
+      "number": 16,
+      "state": "MERGED",
+      "title": "docs(blocos): B19 junction domain evidence (investigation only)",
+      "updatedAt": "2026-09-04T19:05:47Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/16"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T18:39:28Z",
+      "headRefName": "claude/cr-block-arm-safe-repair-spec-gjkvm3",
+      "headRefOid": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T18:39:28Z",
+      "number": 15,
+      "state": "MERGED",
+      "title": "docs(blocos): CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY-PREIMPLEMENTATION - spec + test plan",
+      "updatedAt": "2026-09-04T18:39:28Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/15"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T18:28:11Z",
+      "headRefName": "claude/cr-current-reference-snapshot-refresh-lneed3",
+      "headRefOid": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T18:28:11Z",
+      "number": 14,
+      "state": "MERGED",
+      "title": "docs(snapshot): refresh current solver reference metrics",
+      "updatedAt": "2026-09-04T18:28:12Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/14"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T17:57:01Z",
+      "headRefName": "claude/cr-repo-context-optimization-v2-c8bdp4",
+      "headRefOid": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T17:57:01Z",
+      "number": 13,
+      "state": "MERGED",
+      "title": "docs(context): minimize agent onboarding and separate project history",
+      "updatedAt": "2026-09-04T17:57:01Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/13"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T17:43:17Z",
+      "headRefName": "claude/arm-role-safety-contract-ljfwnj",
+      "headRefOid": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T17:43:17Z",
+      "number": 12,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT: contrato geral de segurança para candidatos de papel (SAFE REPAIR ativado)",
+      "updatedAt": "2026-09-04T17:43:17Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/12"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T17:43:18Z",
+      "headRefName": "claude/cr-block-arm-role-policy-q0qepg",
+      "headRefOid": "cce8cf949653c04263c7b63abdddf4629d40362e",
+      "isDraft": true,
+      "mergedAt": "2026-09-04T17:43:18Z",
+      "number": 11,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-ROLE-HUMAN-POLICY: causa provada, política formalizada (NECESSITA AJUSTE)",
+      "updatedAt": "2026-09-04T17:43:18Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/11"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T01:44:39Z",
+      "headRefName": "claude/cr-repo-hygiene-cleanup-litdj0",
+      "headRefOid": "16fa1c7f979c14370b5d19618dee216e974e154b",
+      "isDraft": false,
+      "mergedAt": "2026-09-04T01:44:39Z",
+      "number": 10,
+      "state": "MERGED",
+      "title": "docs(repo): organize active and historical project knowledge",
+      "updatedAt": "2026-09-04T01:44:39Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/10"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-04T18:10:41Z",
+      "headRefName": "claude/cr-block-arm-role-invariance-7tezx4",
+      "headRefOid": "997ce465db42eab2dbb0806a0d9721975d30ef67",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 9,
+      "state": "CLOSED",
+      "title": "fix(blocos): invariância de papel em L_CORNER/X_INTERSECTION (CR-BLOCK-ARM-ROLE-INVARIANCE)",
+      "updatedAt": "2026-09-04T18:10:41Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/9"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/cr-block-wall-graph-quality-711umk",
+      "headRefOid": "e789bf253d82eb7ec1a8f078b85c56cccc30cb3b",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 8,
+      "state": "OPEN",
+      "title": "audit(wall-graph-quality): causa-raiz da regressão de cobertura/PRISM após o wall graph",
+      "updatedAt": "2026-09-03T13:53:20Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/8"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": null,
+      "headRefName": "claude/cr-block-determinism-final-cross-audit",
+      "headRefOid": "2594f6ff376212e5f24614241a0e1dd4b142b838",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 7,
+      "state": "OPEN",
+      "title": "CROSS-AUDIT FINAL — CR-BLOCK-DETERMINISM (auditoria, produção ZERO)",
+      "updatedAt": "2026-09-02T18:16:30Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/7"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-02T15:01:54Z",
+      "headRefName": "claude/block-reference-corpus",
+      "headRefOid": "0b81f88b040f210c201b4d7575216e70d570a159",
+      "isDraft": false,
+      "mergedAt": "2026-09-02T15:01:54Z",
+      "number": 6,
+      "state": "MERGED",
+      "title": "feat(benchmark): Reference Corpus - evolui o Golden Benchmark (CR-BLOCK-REFERENCE-CORPUS)",
+      "updatedAt": "2026-09-02T15:01:54Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/6"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-02T15:01:10Z",
+      "headRefName": "claude/golden-benchmark-system-vacwec",
+      "headRefOid": "a3c374084ff0de34688de40b14083d3c3e09ee68",
+      "isDraft": false,
+      "mergedAt": "2026-09-02T15:01:10Z",
+      "number": 5,
+      "state": "MERGED",
+      "title": "feat(benchmark): infraestrutura do GOLDEN BENCHMARK (CR-BLOCK-GOLDEN-BENCHMARK)",
+      "updatedAt": "2026-09-02T15:01:10Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/5"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-01T12:00:48Z",
+      "headRefName": "claude/cr-2f-a-baseline-scope-7036f5",
+      "headRefOid": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+      "isDraft": false,
+      "mergedAt": "2026-09-01T12:00:48Z",
+      "number": 4,
+      "state": "MERGED",
+      "title": "CR-2F-A — MERGE_RELATION_ASYMMETRY (T2/MAX)",
+      "updatedAt": "2026-09-01T12:00:48Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/4"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-01T04:13:22Z",
+      "headRefName": "claude/cr-2f-e-centerline-asymmetry-t4mc20",
+      "headRefOid": "9bca56122dbb474e50d8fa10fa6843a665664656",
+      "isDraft": false,
+      "mergedAt": "2026-09-01T04:13:22Z",
+      "number": 3,
+      "state": "MERGED",
+      "title": "Etapa 2I — diagnóstico e plano do CR-2F-E (CENTERLINE_ARGUMENT_ASYMMETRY)",
+      "updatedAt": "2026-09-01T04:13:22Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/3"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-09-01T02:30:31Z",
+      "headRefName": "claude/diagnose-claude-codex-dual-t1yctp",
+      "headRefOid": "6bea3da1ffdef7a3d79d570916ad915951076a26",
+      "isDraft": true,
+      "mergedAt": null,
+      "number": 2,
+      "state": "CLOSED",
+      "title": "Diagnostico read-only Claude/Codex dual (Fase 1)",
+      "updatedAt": "2026-09-01T02:30:31Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/2"
+    },
+    {
+      "baseRefName": "main",
+      "closedAt": "2026-08-31T23:43:29Z",
+      "headRefName": "feat/ai-team-cloud",
+      "headRefOid": "0ad67499bcf27f9baeb5a6a7aca2aa9ce31c6a3d",
+      "isDraft": false,
+      "mergedAt": "2026-08-31T23:43:29Z",
+      "number": 1,
+      "state": "MERGED",
+      "title": "feat(ai-team): orquestrador cloud Claude ↔ Codex (infraestrutura)",
+      "updatedAt": "2026-08-31T23:43:29Z",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/1"
+    }
+  ],
+  "remote_refs": [
+    "origin 08495d913e72b36a80b034d5f0a1435470d27557",
+    "origin/antigravity/cr-claude-skills-v1 6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+    "origin/antigravity/cr-claude-skills-v2 9724766f8e687592b4ecc1d51c16295134eced0f",
+    "origin/claude/arm-role-safety-contract-ljfwnj 78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+    "origin/claude/b19-junction-domain-investigation-1h4ow8 154b6c519334520dd3cc7c56d6a4658184b408dd",
+    "origin/claude/block-01-cross-audit 6c91c93450fa5f3074d45c29cc447d461db75e55",
+    "origin/claude/block-01-finalize ca80a748b0bcbca9eeb1619a5f5c4ab2f97cc302",
+    "origin/claude/block-01-prisma-fiadas-rik42t 3e6d937116466198c79d51b85928788766657a41",
+    "origin/claude/block-audit-baseline-350nav 22132b3bb57678c99cc10e477518202231b13538",
+    "origin/claude/block-determinism-audit 82d8fa8fb8c55fae7c1f9f3283f289df0cecead0",
+    "origin/claude/block-determinism-cross-audit 9a0757bfb8f92e94ebafb2353119ffc24bfc11f4",
+    "origin/claude/block-pipeline-determinism-uj7cvq 45161900bce82c65749328f0702571b89bfef2ac",
+    "origin/claude/block-reference-corpus 0b81f88b040f210c201b4d7575216e70d570a159",
+    "origin/claude/block-room-check-robustness-c02-rlq8l2 acc28ab935836e4ab038eb60d74a12bbfcdf060c",
+    "origin/claude/block-solver-residual-root-cause-gwcmqa 9834b40d745b8209d39bbb3efa235ce64bcbb911",
+    "origin/claude/c04-review-next-cr-prep-wc77d7 54caff7781e76be0fe1b8c9e77636d43038dc70b",
+    "origin/claude/candidato-validacao-gabarito-q450yr 56409334a7b273d0e81a13d8cc916ffe0e214654",
+    "origin/claude/ci-check-test ee2b907dc0453543857cb339b4d282200ccf5d30",
+    "origin/claude/ci-check-test-2 636e135120ffc616097c1d138f1aed612c5a806d",
+    "origin/claude/ci-check-test-3 1e2013ed5f3ce7d3d2f5378f5d8f59d08070a1e0",
+    "origin/claude/cloud-automation-orchestrator-aw6x43 0ad67499bcf27f9baeb5a6a7aca2aa9ce31c6a3d",
+    "origin/claude/continuous-walls-openings-c8fjma e2de8aa8c66b93d24b9abc39de9e7321fcae3dfe",
+    "origin/claude/corrigir-alternancia-no-l-76nnb3 33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+    "origin/claude/cr-2f-a-baseline-scope-7036f5 33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+    "origin/claude/cr-2f-d-determinism-ewnru5 55f7f8c0be643455498827828aa615792efec8d5",
+    "origin/claude/cr-2f-e-centerline-asymmetry-t4mc20 9bca56122dbb474e50d8fa10fa6843a665664656",
+    "origin/claude/cr-b-preparacao-identidade 0596e78eadcbebd9369dbd54272b44952b8211ed",
+    "origin/claude/cr-b-reconciliacao-contrato-1byigr 14926fb8f8514828b3133ce5c129c80bd60c9890",
+    "origin/claude/cr-bench-z-origin-42vxcx 49750820d7c6f8b0b9694365d3a2ccd76d7435c2",
+    "origin/claude/cr-block-arm-rejected-edges-yqdred 744cb1fa01848bb9089bf41ca7be4e3659ed94bb",
+    "origin/claude/cr-block-arm-role-invariance-7tezx4 997ce465db42eab2dbb0806a0d9721975d30ef67",
+    "origin/claude/cr-block-arm-role-policy-q0qepg cce8cf949653c04263c7b63abdddf4629d40362e",
+    "origin/claude/cr-block-arm-safe-repair-gate-fidelity-ne5cdz 4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+    "origin/claude/cr-block-arm-safe-repair-spec-gjkvm3 ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+    "origin/claude/cr-block-b19-residual-fill-uythsk 9fcd01292eb4bff52af882968320610404d30bba",
+    "origin/claude/cr-block-determinism-cross-audit-nm1x6m 2594f6ff376212e5f24614241a0e1dd4b142b838",
+    "origin/claude/cr-block-determinism-final-cross-audit 2594f6ff376212e5f24614241a0e1dd4b142b838",
+    "origin/claude/cr-block-determinism-finalization-chkixk 14b42e6f57fc71230d559ab1aca49f7572a10bf1",
+    "origin/claude/cr-block-fit-tolerance-c04-n5qsc4 0b09e97be51d1780c5d013a505eb111e455f0f8f",
+    "origin/claude/cr-block-node-fill-joint-9tv0kd bf4054b68fdfc3354ae66a52ca98867e44e043f2",
+    "origin/claude/cr-block-node-fill-revalidation-iahuyg ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+    "origin/claude/cr-block-wall-graph-quality-711umk e789bf253d82eb7ec1a8f078b85c56cccc30cb3b",
+    "origin/claude/cr-c1-expected-rows-fisico b2daca8fbc3ee6397697fd3a76f43e4fab724bf9",
+    "origin/claude/cr-current-reference-snapshot-refresh-lneed3 4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+    "origin/claude/cr-d1-recuperacao-documental b8526954106a3d4ec12711e43a2f109ca3e7c130",
+    "origin/claude/cr-g12-independent-review-w93jf8 82879906c2079f4e4ed131ee601d64a26a2af93f",
+    "origin/claude/cr-repo-context-optimization-v2-c8bdp4 642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+    "origin/claude/cr-repo-hygiene-cleanup-litdj0 16fa1c7f979c14370b5d19618dee216e974e154b",
+    "origin/claude/cross-band-mechanism-fix-ab76jv 777960c8d14d58b7507c00d4130ce6ad3e3d7fee",
+    "origin/claude/diagnose-claude-codex-dual-t1yctp 6bea3da1ffdef7a3d79d570916ad915951076a26",
+    "origin/claude/fervent-mccarthy-lhwoai 626087b845a23f83b7907c39c448bfa7e8d3e69e",
+    "origin/claude/golden-benchmark-system-vacwec a3c374084ff0de34688de40b14083d3c3e09ee68",
+    "origin/claude/integracao-consolidada-prs-8scic9 116fe10400c328fb49f9300ade1f61d33367335e",
+    "origin/claude/integrate-bench-z-origin-hz7h4e dc8ee01bfeb74c1c728e49e755e23e8d7aa339ca",
+    "origin/claude/modulation-rules-blocks-z24v9p 1887b8c7653f51e7f4c856e1b49a416d683fa7f1",
+    "origin/claude/multifase-cr-c2-c1-b-ikr8jc a25f846eb8a8cd94a5a37961302cc7d87a5cc5ea",
+    "origin/claude/opening-detector-review-cr-a-q8bhuk d8933cde710ddfd72d62b918c69be8719fb7075d",
+    "origin/claude/opening-detector-root-fix-m21hfm 2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff",
+    "origin/claude/otimizar-contexto-tokens-galqnr 6b409eb784d911200a2eb56679f07e51fd6a407e",
+    "origin/claude/post-pr19-atlas-revalidation-7jsxxj d8961e246969fbf531371f5e0f0cd0e7d8c0d718",
+    "origin/claude/post-pr19-reference-snapshot-s01rhc 97a6e72d0635dea6911e25ed6865d801e6ce401a",
+    "origin/claude/pr20-conditional-merge-validation-2wfkfr 766e1ea6ee281cc29a3d6118d6013f3955193352",
+    "origin/claude/pr20-integration-readiness-ec5xk1 4654898df4a731489c4f35fa5ccef278493d6e03",
+    "origin/claude/project-status-tracking-qm3r56 03afd3b284ec27c76256608a8725a89ecbf46f56",
+    "origin/claude/pyrevit-mcp-prompt-cw43uj c41a6a895b08595f09b9a1a45f614e1fc600710a",
+    "origin/claude/reconciliacao-gabarito-aberturas-uynv0q aa5dd1a97d11b37bca401d85640c175e2cca62fd",
+    "origin/claude/remove-ai-team-infra-clugaj 80149b6527cdad27e3ecb2c5a4a9917e0a1280ac",
+    "origin/claude/review-pr-25-independent-4uryyl eee0aeb6398d8bc5c15ac797c99fd75d008d3eda",
+    "origin/claude/revit-block-modulation-skill-ohacsb 810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+    "origin/claude/revit-merge-walls-1mrmf7 ea6a2468dfaa7a09685ae3ccaae34ea9bfbfe57b",
+    "origin/claude/script-password-instead-token-ocnl6l cb0ef81de00daa4d69f321136582ac6f65a4947c",
+    "origin/claude/sleepy-turing-rf4s7o 439fd49391227e128038fec704833c66c6ce3ffa",
+    "origin/claude/validador-encontros-elevacao-3u21lw 684e99955281693de563a91138dd0becf1e6a6dd",
+    "origin/codex/b34-bond-rule 07f5f771eba2e29181d12e69ab796cca9a33dd5a",
+    "origin/docs/status-post-merge-pr22 05dddc80a97445f7f9f79d8dfb76b48a5a589d11",
+    "origin/feat/ai-team-cloud 0ad67499bcf27f9baeb5a6a7aca2aa9ce31c6a3d",
+    "origin/fix/ai-team-cloud-selftest 015d302a1e548543281d61afde3e34f1a7145fa2",
+    "origin/fix/cr1-wall-pair-ranking 0a2724b5ec6629b44dce6a0c3583022faa22f013",
+    "origin/fix/cr2fb-symmetric-pair-predicates c5447fe72ad1d2933b3eef74d63f1279c6a76cf6",
+    "origin/fix/revit-short-cad-curves e0172164a7259c09ce66d536b6bfb8aca871b5ed",
+    "origin/main 08495d913e72b36a80b034d5f0a1435470d27557"
+  ],
+  "main_history": [
+    "08495d913e72b36a80b034d5f0a1435470d27557 2026-09-08T20:45:14Z Merge branch 'claude/integracao-consolidada-prs-8scic9': reconciliacao documental da integracao consolidada",
+    "116fe10400c328fb49f9300ade1f61d33367335e 2026-09-08T20:12:02Z Merge origin/main (4015564) e reconcilia a integracao documental",
+    "68afc709b37a6a346a457cb29426ee29079be0d6 2026-09-08T19:50:29Z docs(integracao): checkpoint versionado da integracao consolidada",
+    "40155643d1fd79664cc262c7b74f4a137db9dec7 2026-09-08T18:43:27Z docs(status): reconcilia PROJECT_STATUS com a main real apos os merges #25/#26/#27",
+    "08345589c47628a7f24b914335a60cdf25ed3796 2026-09-08T18:37:21Z docs(status): registra a integracao consolidada dos PRs #27/#25/#26/#29",
+    "c88a031404459ee4cee0f7c36904b8e7b971a471 2026-09-08T15:34:44-03:00 Merge pull request #29: CR-G12 - a regra #1 passa a ser avaliada na fronteira entre bandas de abertura",
+    "9531cf0c991c5d46771c0aa200691909fc712b68 2026-09-08T18:08:31Z Merge origin/main (CR-D1 #27 + CR-S1 #25 + CR-C1 #26) into CR-G12",
+    "0c6e8f7fb66660b9472445d4067e293bcb193c44 2026-09-08T15:06:24-03:00 Merge pull request #26: CR-C1 - a expectativa de fiada e FISICA e por elevacao, nao um numero global",
+    "b2daca8fbc3ee6397697fd3a76f43e4fab724bf9 2026-09-08T18:05:39Z Merge origin/main (CR-D1 #27 + CR-S1 #25) into CR-C1",
+    "32e1c0ef09b2d67ae1edf76be38e2678340dacd3 2026-09-08T15:04:02-03:00 Merge pull request #25: CR-S1 - o giro do canto em L vira a ULTIMA saida, alternancia de amarracao restaurada no no T-L",
+    "7cc935d9bd7434ae07e9e70d5839cc07ebd5d483 2026-09-08T15:03:06-03:00 Merge pull request #27: CR-D1 - recupera as duas revisoes independentes que a main citava e nao tinha",
+    "73243e980bd93e44ea515e9d21f0a08e6e478942 2026-09-08T11:56:47Z docs(cr-g12): revisao independente - veredito, contratos, desempenho e §39.6",
+    "a7c7f9818ecdc14e7b6738d8ac4ccc62a602db9f 2026-09-08T10:42:05Z test(cr-g12): t1/t9 e t20 passam a travar o RESULTADO FISICO, nao o mecanismo",
+    "777960c8d14d58b7507c00d4130ce6ad3e3d7fee 2026-09-08T09:06:22Z docs(cr-g12): fecha a suite completa, as 2 falhas pre-existentes e as 2 novas",
+    "b3dcf0ac5c283884b3544471d065f2cc707b3b1f 2026-09-08T07:53:27Z CR-G12: a regra #1 passa a ser avaliada na fronteira entre bandas de abertura",
+    "34bf6962f25aac12a2844e7b6c3cc5336c6459d6 2026-09-08T04:52:59Z fix(benchmark): CR-C1 - expectativa de fiada e' FISICA e por elevacao, nao um numero global",
+    "b8526954106a3d4ec12711e43a2f109ca3e7c130 2026-09-08T03:59:19Z docs(cr-d1): recupera as duas revisoes independentes que a main citava e nao tinha",
+    "33d035f84e61dd8162e5f3aeebb0bdd6284e5159 2026-09-08T02:34:28Z docs(cr-s1): fecha a investigacao dos compensadores da parede do no' e a prova das 2 falhas",
+    "98ae935e8e73df07a98abe08ae8920e2f4763180 2026-09-08T01:30:22Z fix(solver): CR-S1 - o giro do canto em L vira a ULTIMA saida, nao a primeira",
+    "91258dd627af97fe437a56c0506eb096ca5aa267 2026-09-07T20:16:16-03:00 Merge pull request #24: CR-V1: valida encontros por elevação física, não por índice ordinal",
+    "684e99955281693de563a91138dd0becf1e6a6dd 2026-09-07T20:51:31Z docs(cr-v1): fecha resultado da suite completa - 854 testes, 0 falhas",
+    "8af28ea51451444f213121271e1b56b12a8028fa 2026-09-07T20:41:57Z docs(cr-v1): registra resultado da suite completa (778 passed, 0 failed)",
+    "f6cd2822a929fabffcaf22f7338984edb41b86e8 2026-09-07T20:19:18Z docs(status): registra PR #24 da CR-V1 em PROJECT_STATUS.md",
+    "f09b1537760205031adeb7e5e4da90b8ce3b398c 2026-09-07T20:17:46Z fix(benchmark): valida encontros por elevacao fisica, nao por indice ordinal (CR-V1)",
+    "e381992cdc9f5cfd59547de6d385f25bfe6b3050 2026-09-07T04:16:09-03:00 Merge pull request #23: registro pós-merge do PR #22 em PROJECT_STATUS.md",
+    "05dddc80a97445f7f9f79d8dfb76b48a5a589d11 2026-09-07T06:51:38Z docs(status): registra merge concluido do PR #22 (CR-BENCH-OPENING-RECONSTRUCTION-A)",
+    "62ea7f26b9fb8af72c960b04d08f7b58cd115114 2026-09-07T03:48:01-03:00 Merge pull request #22: CR-BENCH-OPENING-RECONSTRUCTION-A",
+    "2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff 2026-09-07T06:34:26Z docs(status): registra CR-BENCH-OPENING-RECONSTRUCTION-A em PROJECT_STATUS.md",
+    "f885081a0587a4d3f1cdd2092b557f930c14003d 2026-09-07T06:26:20Z docs+fix(aberturas): aplica condicoes da revisao independente do PR #22",
+    "b61474d5542f813b5675f70d5bf25387c769b23f 2026-09-07T05:05:23Z fix(aberturas): detector separa identidade de geometria do vao (CR-A)",
+    "3f293d1433e8c16eb186959e33a345b60ac944f9 2026-09-07T01:05:42-03:00 Merge pull request #20: CR-BLOCK-FIT-TOLERANCE-C04",
+    "0b09e97be51d1780c5d013a505eb111e455f0f8f 2026-09-07T03:23:43Z docs(blocos): registra C1-C5 do PR #20 (condicoes da revisao independente)",
+    "dde0261ea87f5680155b9303fddedb95106fd447 2026-09-06T23:22:06Z docs(blocos): resultado da suite completa em STATE_C (797 passed, 2 failed)",
+    "bb73e7c98ff0cbb484778002488dfda92bb60709 2026-09-06T22:54:06Z test(blocos): guarda de jamba tambem no ramo prefer_avoiding do reparo",
+    "f31461f2b0970ef0b729e8773defba8a31c68d2c 2026-09-06T22:43:05Z fix(blocos): guarda fisica de fronteira - jamba nunca e' invadida pelo snap do fit (C04, 2a volta)"
+  ],
+  "pr_details": {
+    "31": {
+      "head": "439fd49391227e128038fec704833c66c6ce3ffa",
+      "merge_base": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "diff_from_merge_base": [
+        "A\tdocs/BENCH_FECHAMENTO_N1_2026-09-09.md",
+        "A\tdocs/BENCH_N1C_N1E_2026-09-09.md",
+        "A\tdocs/BENCH_SWEEP_2026-09-08.md",
+        "M\tnuvem/REGRAS_MODULACAO_BLOCOS.md",
+        "M\tnuvem/benchmark/projects/piloto_sintetico_2x2/score.json",
+        "M\tnuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json",
+        "M\tnuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json",
+        "M\tnuvem/benchmark/reports/piloto_sintetico_2x2.txt",
+        "M\tnuvem/benchmark/reports/torre_easy_lo_r00_tgd.txt",
+        "M\tnuvem/benchmark/reports/torre_easy_lo_r00_tp1.txt",
+        "M\tnuvem/core/engine/wall_stepper.py",
+        "M\ttests/test_block_arm_role_candidate_safety_contract.py",
+        "M\ttests/test_block_arm_role_prism_stagger.py",
+        "A\ttests/test_compensator_spread_cr_n1e.py",
+        "M\ttests/test_cross_band_joint_propagation_cr_g12.py",
+        "A\ttests/test_neighbor_node_bond_collision.py",
+        "A\ttests/test_non_modular_wall_coverage.py",
+        "A\ttests/test_wall_junction_scan_perf.py"
+      ],
+      "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "body": "**DRAFT.** Inclui a CR-N1 (PR #30) e continua dela. Relatórios:\n`docs/BENCH_FECHAMENTO_N1_2026-09-09.md` e `docs/BENCH_N1C_N1E_2026-09-09.md`.\n\nSem Revit, sem monitoramento, sem merge na `main`. `input.json`,\n`reference.json`, `reference_score.json` e `baseline.json` **não** regravados.\nC2/G16 e CR-B intocados. Toda medição por **identidade física**\n(`W|x0,y0|x1,y1|tE`), nunca `W0xx` cruzado entre input e result.\n\n## Placar consolidado — identidades físicas\n\n| | base | CR-N1 | CR-N1b | CR-N1c | **CR-N1e/f** |\n|---|---|---|---|---|---|\n| **TGD total** | 798 | 783 | 801 | 780 | **746** |\n| **TP1 total** | 862 | 862 | 867 | 861 | **811** |\n| `POSITION_OVERLAP` TGD/TP1 | 6/1 | 0/0 | 0/0 | 0/0 | **0/0** |\n| TGD `JUNCTION_MISSING_BINDING` | 3 | **4** | **4** | 3 | **3** |\n| TGD `COMPENSATOR_CONSECUTIVE` | 101 | 101 | 108 | 97 | **75** |\n| TGD `COMPENSATOR_EXCESS_IN_RUN` | 70 | 85 | 82 | 70 | **72** |\n| TGD `PRISM_STAGGER_BELOW_TARGET` | 181 | 156 | 168 | 176 | **161** |\n| TP1 `COMPENSATOR_CONSECUTIVE` | 200 | 202 | 206 | 200 | **171** |\n| TP1 `PRISM_STAGGER_BELOW_TARGET` | 245 | 246 | 243 | 245 | **221** |\n\n**−52 no TGD e −51 no TP1 contra a base**, com `POSITION_OVERLAP` zerado e\nnenhuma regressão crítica nova.\n\n## 1. `CR-N1c` — a fronteira para no ALCANCE do vizinho\n\n**Regressão crítica (a) — encontro T sem nenhuma peça — CORRIGIDA.**\nReproduzida nas três árvores; a parede `W|-140.5,470.0|5.5,470.0|t14.0`\ntinha **58 blocos** na base (`C04[0,4]` amarrando o T + `B34[112,146]`) e\ncaiu para **41** na N1.\n\nPrimeira etapa que cria o defeito:\n\n```\nnó 142  T_INTERSECTION  t = 1,00cm   (ponta)\nnó 185  L_CORNER        t = 7,00cm   (MEIO DE PAREDE)\nalcance do nó 185 na direção do 142 .......... 0,00cm\nfronteira do ponto médio (CR-N1) ............. t = 4,00cm\nroom do nó 142 ....................... 5,00cm → 3,00cm\n```\n\nCom 5,00cm cabia o `C04`; com 3,00cm **não cabe nada**. O ponto médio\n**doava espaço para o vazio** — tirava de quem usaria para dar a quem\ncomprovadamente não alcança.\n\n`_neighbor_node_reach_ft` mede quanto o vizinho pode, no máximo, estender\nna minha direção (mesma `_room_at_t_on_wall`, sem checagem de vizinhos →\nsem recursão, limite superior). A fronteira passa a ser **o mais longe\nentre o ponto médio e `t_vizinho − alcance(vizinho)`** — sem sobreposição\npor construção, simétrica quando os dois competem de verdade, e aditiva.\n\nResultado: `JUNCTION_MISSING_BINDING` **40 → 23** (= base), o `C04` volta,\n`POSITION_OVERLAP` segue **0/0**.\n\n**Regressão crítica (b) NÃO era regressão nova — provado.** Em W019/TP1\n(vão `564..750`): base `B54[715,769]` → N1 `B34[715,749]`. Mesmo `t`\ninicial, mesma identidade, mesma fiada. Ao encolher 20cm a peça deixou de\ncruzar a jamba e passou a ficar inteiramente dentro do vão — o validador\ntrocou o código. `CROSSES_JAMB` em W019 14→7, `INSIDE_DOOR` 0→7, **soma\nconstante 14**. No TP1 inteiro `CROSSES_JAMB` 168→161.\n\n## 2. `CR-N1e` — a metade da opção 4 que já estava permitida\n\nA regra escrita proíbe **sequência**; `MAX_COMPENSATORS_PER_TRECHO` é a\nimplementação mais restritiva dela. Quando o tier 7 já decidiu entregar N\ncompensadores acima do teto, entregá-los **em sequência** viola a regra\nescrita sem necessidade. `_spread_compensators_layout` reordena mantendo a\ncomposição **exata** — mesmos códigos, mesma contagem, mesmo comprimento.\n\n```\nTP1/W003 [170,474]\nantes   B39 B39 B39 B39 B39 B39 B39 C09 C09 C04     excesso = 2\ndepois  B39 B39 B39 B39 B39 C09 B39 C09 B39 C04     excesso = 0\n```\n\n`COMPENSATOR_CONSECUTIVE` TGD 97→**75**, TP1 200→**171**; `PRISM_STAGGER`\nmelhorou junto. **A metade normativa (rebaixar o teto) NÃO foi feita.**\n\n## 3. `CR-N1f` — desempenho, com equivalência bit-a-bit\n\ncProfile no TGD: `_wall_junction_indices_nodes_and_ts_ft` era **41% do\ntempo** (184s de 631s; 205M de `set.add`). Três mudanças só de custo: eixo\ncalculado uma vez por chamada, pertinência por short-circuit, e cache por\n**identidade** das listas (seguro: nenhum campo lido é escrito em\n`wall_stepper.py`).\n\n| TGD | tempo | rebuilds | por rebuild |\n|---|---|---|---|\n| base | 99,3s | 22 | 4,51s |\n| CR-N1 | 47,8s | 7 | 6,71s |\n| CR-N1c+e | 176,4s | 22 | 7,90s |\n| **CR-N1f** | **127,0s** | 22 | **5,70s** |\n\nEquivalência verificada no **conjunto** de identidades, não só no total:\nTGD 746/11 837 e TP1 811/19 647 idênticos com e sem a otimização.\n\n## 4. Frentes medidas e NÃO aplicadas\n\n**Seção 45 — nó cujo eixo cai dentro do vão.** Causa única de **100%** das\nocorrências de `OPENING_BLOCK_CROSSES_JAMB` (161 TP1 / 108 TGD) e\n`INSIDE_DOOR` (7/5): quando a parede que chega encosta a **face** na jamba,\no **eixo** dela fica meia espessura para dentro — o nó cai a **8,0cm** da\nborda (**38 nós assim só no TP1**), e `_room_at_t_on_wall` não enxerga a\nabertura que **contém** o ponto. Candidata implementada, medida e\n**revertida**: elimina `CROSSES_JAMB` 11→0 e `INSIDE_DOOR` 1→0 no TP1, mas\ncusta +55 MANDATORY/MAJOR e +126 PREFERENCE/MINOR (TP1 861→1020). Trocar\n12 críticos por 55 obrigatórios **não é escolha técnica**. A correção certa\né **ancorar a peça na jamba**, não removê-la — CR própria, 281 ocorrências\ncríticas dependem dela.\n\n**Seção 42.5 — contrato conferido.** O docstring de\n`pier_cm_floored_to_module` **delimita** o uso ao caso em que o trecho\n**fecha** e só foi arredondado por até 0,30cm, garantindo sobra em\n`[4,70; 5,00)cm`. Nos 197,943cm o trecho **não fecha** e a sobra seria\n**3,94cm**. Ligar ali é **estender** o contrato — continua sendo a opção 2,\n**pendente do usuário**.\n\n**Seção 42.6 — a parede de 99,754cm.** Os dois X a **0,303cm** um do outro\n**são fundidos corretamente**. Restam: um trecho de 70,832cm que herda a\nfração não-modular, e um segmento de **−2,586cm** entre reserva de\n**midspan** e de **ponta** (essa combinação não passa por\n`_merge_intervals_cm`). Família dos negativos no TGD: base 51, N1 19,\n**N1c 37**. Correção candidata registrada; o ganho seria de **relatório**\n(o segmento negativo dá `continue` antes do layout e não dispara o retry —\nconferido).\n\n## 5. Testes\n\nNovos nesta entrega: `test_compensator_spread_cr_n1e.py` (20),\n`test_wall_junction_scan_perf.py` (9), mais 10 em\n`test_neighbor_node_bond_collision.py` (21 → 31). Nenhum `skip`, `xfail`,\nthreshold afrouxado ou baseline regravado.\n\nRegressão ampla consolidada rodando; as **2 falhas históricas** de\n`tests/regression/test_benchmark_baselines.py` são registradas\nseparadamente e continuam sendo o refresh de `baseline.json` (CR própria).\n\n## 6. Próximo grupo de maior impacto\n\n1. **Seção 45** — ancorar a peça de nó na jamba (281 ocorrências críticas).\n2. **Seção 43.5** — fronteira contra nó de meio com peça centrada.\n3. **Seção 42.6** — fundir reserva de ponta com reserva de midspan.\n4. Decisões normativas **41** (metade restante) e **42**.\n5. `CR-PERF-1` (re-solve por escopo — ataca os 22 rebuilds em si).\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01BKX1kMWUtjKa8ow51wHfhG",
+      "headRefOid": "439fd49391227e128038fec704833c66c6ce3ffa",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T12:30:22Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34351385322/job/102465252169",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T12:30:15Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T12:30:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34351378311/job/102465229427",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T12:30:11Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ]
+    },
+    "30": {
+      "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "merge_base": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "diff_from_merge_base": [
+        "A\tdocs/BENCH_SWEEP_2026-09-08.md",
+        "M\tnuvem/REGRAS_MODULACAO_BLOCOS.md",
+        "M\tnuvem/benchmark/projects/piloto_sintetico_2x2/score.json",
+        "M\tnuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json",
+        "M\tnuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json",
+        "M\tnuvem/benchmark/reports/piloto_sintetico_2x2.txt",
+        "M\tnuvem/benchmark/reports/torre_easy_lo_r00_tgd.txt",
+        "M\tnuvem/benchmark/reports/torre_easy_lo_r00_tp1.txt",
+        "M\tnuvem/core/engine/wall_stepper.py",
+        "A\ttests/test_neighbor_node_bond_collision.py"
+      ],
+      "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "body": "**DRAFT** — há 3 falhas novas de suíte declaradas abaixo. Não fazer merge sem decisão do usuário.\n\nRelatório completo: `docs/BENCH_SWEEP_2026-09-08.md`.\n\n## O que foi corrigido — CR-N1\n\n**Causa-raiz medida** (não deduzida): `_room_at_t_on_wall` parava só em abertura, na reserva das **duas pontas** da parede e na ponta física — nunca num nó de encontro no **meio** da parede, que é exatamente onde mora o `T_INTERSECTION_MAIN` (a parede principal de um T *atravessa* o nó, então `end_to_node[(wall_idx, 0/1)]` não a enxerga).\n\nDois T na mesma parede principal a `d` cm produziam dois B54 **centrados** sobrepostos em exatamente **`54 − d` cm**. As **8 identidades físicas de `POSITION_OVERLAP`** do TGD+TP1 eram este mesmo caso:\n\n| projeto | parede | nós | distância | sobreposição | `54 − d` |\n|---|---|---|---|---|---|\n| TP1 | W019 | 742 / 792 | 50,0cm | 4,00cm | 4 |\n| TP1 | W019 | 1082 / 1117 | 35,0cm | 19,00cm | 19 |\n| TGD | W162 | 927,3 / 940,0 | 12,7cm | 41,26cm | 41,3 |\n| TGD | W116 | 115,1 / 122,0 | 6,9cm | 47,13cm | 47,1 |\n\n**Correção**: fronteira no **ponto médio** entre os dois nós (critério simétrico — os dois nós são resolvidos independentemente, só assim as duas medições concordam sem uma segunda passada). Aplicada só abaixo de `NEIGHBOR_NODE_BOND_CLEARANCE_FT` (2 × 34cm = 68cm); acima disso as duas peças cabem inteiras e nada muda. Mais uma guarda de *overshoot* de meia espessura, cobrada **só** contra o nó vizinho.\n\n## Efeito medido, por identidade física\n\n| | TGD | TP1 |\n|---|---|---|\n| `POSITION_OVERLAP` (ident.) | **6 → 0** | **2 → 0** |\n| `POSITION_OVERLAP` (ocorr.) | 29 → 0 | 18 → 0 |\n| `COVERAGE_MISSING_ROW` | 30 → 18 | — |\n| `PRISM_STAGGER_BELOW_TARGET` | 181 → 156 | 245 → 246 |\n| `PRISM_JOINT_STACK` | 20 → 14 | 16 → 8 |\n| blocos colocados | 11 749 → **12 143** | 19 572 → 19 629 |\n| **total de identidades** | 959 → **933** | 898 → **896** |\n| paredes com prisma forçado | **29 → 27** | — |\n\n**Trade-off declarado**: `COMPENSATOR_VERTICAL_STRIP` +30 e `COMPENSATOR_EXCESS_IN_RUN` +15 no TGD — degradar um T deixa a parede principal sem peça cheia. É a tensão normativa da seção 41, não defeito novo.\n\n## Falhas novas de suíte — DECLARADAS, não escondidas\n\n`pytest tests/ -q`: **930 passed, 5 failed**. Duas são as históricas pré-existentes (`test_benchmark_baselines.py`). **Três são novas**, e as três são asserções de **mecanismo/premissa**, não piora física:\n\n1. `test_t1_t9_candidato_seguro_e_aceito_no_tgd_real` — falha só em `assert accepted`. As asserções **físicas** do mesmo teste continuam passando (parede 23 termina sem prisma forçado).\n2. `test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair` — a **primeira** asserção, a física (\"a coincidência está resolvida\"), **passa**; falha a segunda, de mecanismo.\n3. `test_reproducer_minimo_falha_no_codigo_anterior` (CR-G12) — o reprodutor pré-fix deixou de reproduzir; a CR-N1 mudou o layout das bandas naquele sub-plano.\n\n**Por quê**: as paredes 89/90/91/92/120/130 deixaram de ter prisma forçado no baseline **original**, então nem são propostas ao ARM SAFE REPAIR. O reparo não foi enfraquecido — **o defeito que ele consertava passou a não existir na geração**. É o mesmo precedente que a revisão da CR-G12 já documentou para a parede 23.\n\nNenhum `skip`/`xfail`, nenhum threshold afrouxado, **nenhuma expectativa de teste alterada** — converter uma asserção de mecanismo em asserção física é decisão do usuário.\n\n## Desempenho — investigado, medido, NÃO otimizado\n\nTGD, 57,8s totais: **ARM SAFE REPAIR = 6 rebuilds, 49,2s (85,1%), 0 candidatos aceitos**.\n\n- **cache / rebuilds repetidos → ganho ZERO, medido**: com impressão digital de todo campo serializável de `nodes`, os 7 rebuilds rodam sobre **7 estados distintos**.\n- **triagem barata → indisponível**: os 6 rejeitados dão `does_not_resolve_target`, gate que lê o resultado *do* rebuild.\n- **escopo incremental → a alavanca real**, mas exige re-solve parcial no core multi-banda (refatoração ampla, fora do escopo). Recomendada como `CR-PERF-1`.\n\n## Decisões normativas pendentes (documentadas, nada implementado)\n\n- **Seção 41** — teto de compensador × teto de peça especial. `TP1/W003 [170,474]`: o solver entrega `B39×7 + C09×2 + C04×1` (3 compensadores em sequência); existe `B39×5 + B34×3` com **zero** compensadores, recusado por `MAX_SPECIAL_BOND_PER_TRECHO = 1`. **64% das identidades do TP1** dependem desta decisão.\n- **Seção 42** — parede fora do módulo de 5cm fica **inteiramente vazia** (197,9cm → 0 peças; 200,0cm → 11 peças). Duas paredes reais de 197,9cm saem vazias no TGD.\n\n## Preservado\n\nC2/G16 intocados; CR-B não aprovada por inferência; `input.json`, `reference.json`, `reference_score.json` e `baseline.json` **não regravados**; Revit não iniciado; nenhum monitoramento automático criado.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_013EDC2ja2b7iEh9mPXJZvef\n\n---\n_Generated by [Claude Code](https://claude.ai/code/session_013EDC2ja2b7iEh9mPXJZvef)_",
+      "headRefOid": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T22:38:01Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34286873137/job/102264381905",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T22:37:54Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T22:37:56Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34286870448/job/102264372711",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T22:37:51Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ]
+    },
+    "28": {
+      "head": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "merge_base": "91258dd627af97fe437a56c0506eb096ca5aa267",
+      "diff_from_merge_base": [
+        "A\tdocs/CR_B_INTEGRATION_PREPARATION.md",
+        "A\tnuvem/benchmark/future_cr_preparation/cr_b_identity_migration/build_identity_migration.py",
+        "A\tnuvem/benchmark/future_cr_preparation/cr_b_identity_migration/identity_migration.json"
+      ],
+      "baseRefOid": "91258dd627af97fe437a56c0506eb096ca5aa267",
+      "body": "> **DRAFT. Não mesclar sem autorização explícita.** Preparação e diagnóstico. **Nenhum arquivo de produção tocado. Nenhum arquivo oficial escrito** (`nuvem/benchmark/projects/**` intocado). **Nenhuma decisão `D1`–`D6` tomada. Nenhum gate promovido a aprovado.**\n\n## G18 — tabela de migração de identidade (entregue)\n\nO G18 exigia `stable_key` gravado **e** a tabela de migração `W0xx`. Medição anterior: *\"53/86 e 52/85 mudam de id, **não implementado**\"*.\n\n**Já existia e foi confirmado:** o `stable_key` **já é gravado** (campo `key` em **97/97** paredes e nas aberturas, via `model.wall_stable_key` = eixo canônico + espessura, nunca `ElementId`); o arquivo já tem `schema_version: 2`. **O que faltava era a tabela, não a chave.**\n\n**Entregue:** `cr_b_identity_migration/build_identity_migration.py` (gerador determinístico) + `identity_migration.json`.\n\n| par de estados | PRESERVADA | MUDOU_DE_ROTULO | SUMIU | NOVA | paredes | ambíguas |\n|---|---|---|---|---|---|---|\n| TGD `STATE_A → STATE_R` | **97** | 0 | 0 | 0 | 97 → 97 | **0** |\n| TGD `STATE_A → STATE_C` | 33 | **53** | 11 | 30 | 97 → 116 | **0** |\n| TP1 `STATE_A → STATE_R` | **96** | 0 | 0 | 0 | 96 → 96 | **0** |\n| TP1 `STATE_A → STATE_C` | 33 | **52** | 11 | 30 | 96 → 115 | **0** |\n\nTrês leituras novas:\n\n1. **`53` / `52` reproduz exatamente** o número da reconciliação — confirmação independente do gerador do candidato.\n2. **O round-trip é perfeito** (97/97 e 96/96 preservadas, zero mudança de rótulo): toda diferença de identidade vem do **corte**, não da ida e volta pelo extrator.\n3. **A aritmética do corte fecha**: 11 eixos somem, 30 segmentos nascem, e **30 = 11 + 19** (as 19 aberturas removidas partem 11 paredes); `97 − 11 + 30 = 116`.\n\n**Ambiguidade de `stable_key`: ZERO** nos dois projetos, em todos os pares. O gerador já trata colisão (a chave mapeia para uma **lista**, nunca um escalar), mas não existe caso hoje.\n\n## G16 — resolvido pela metade pela CR-C1, e continua reprovado\n\nMedido sobre o candidato (`STATE_R → STATE_C`), com e sem a CR-C1:\n\n| componente | sem C1 | com C1 |\n|---|---|---|\n| `COVERAGE_MISSING_ROW` | **+17** | **+0** |\n| `COVERAGE_ROW_MOSTLY_EMPTY` | **+23** | **+23** |\n\nMetade de um gate composto **não** aprova o gate, e o componente resolvido **não compensa** o outro. Proposta **CR-C2**, não implementada.\n\n## Estado dos gates, reconciliado com V1 / S1 / C1\n\n`CR-V1` está **mesclada**. `CR-S1` (`PR #25`) e `CR-C1` (`PR #26`) são **draft** — e **um PR draft não é um gate aprovado**.\n\n- **G12** (`PRISM_CONTINUOUS_JOINT`, 28 identidades novas): ✘ — **não reavaliado com a S1 aplicada**, que age exatamente aí. Exige a matriz `candidato + S1`.\n- **G13** (`JUNCTION_NOT_ALTERNATING`, 1 nó novo): a S1 leva de `32→0` e `16→0`, mas só pode ser aprovado **depois** do merge autorizado.\n- **G14**: não medido — **nada foi gravado e o `input.json` do TGD não foi regenerado nem tocado**.\n- **G16, G18, G19, G20**: pendentes. **G21** bloqueado por G1–G16.\n\n## Fonte medida — preservada\n\n`input.json` do TGD é **fonte medida independente** (167 paredes, 82 aberturas `measured`): **não regenerado, não sobrescrito, não lido como derivado do gabarito**. Nenhuma abertura medida alterada; nenhum input reconstruído marcado `measured`; **`W0xx` nunca usado como identidade**.\n\n## Limitações declaradas\n\nSem Revit ao vivo; G6/G7/G10 não reexecutados (insumos byte-idênticos, gerador determinístico); **G12 não reavaliado com a S1**; migração de **aberturas** e de **nós** não gerada.\n\n**Nada aqui autoriza integração. Não marcar `ready` nem mesclar.**\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01Rry5Baod7av7mWRUCP9YSW\n\n---\n_Generated by [Claude Code](https://claude.ai/code/session_01Rry5Baod7av7mWRUCP9YSW)_",
+      "headRefOid": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T04:54:30Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34188646595/job/101941977580",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T04:54:25Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T04:02:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34185577359/job/101933135374",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T04:02:44Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ]
+    },
+    "21": {
+      "head": "766e1ea6ee281cc29a3d6118d6013f3955193352",
+      "merge_base": "3ebcd9b63875f9114a3d6223aa648e5075e2d35b",
+      "diff_from_merge_base": [
+        "M\tdocs/PROJECT_STATUS.md",
+        "M\tdocs/PROJECT_STATUS_LOG.md"
+      ]
+    },
+    "8": {
+      "head": "e789bf253d82eb7ec1a8f078b85c56cccc30cb3b",
+      "merge_base": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "diff_from_merge_base": [
+        "A\tdocs/BLOCK_DETERMINISM_AUDIT.md",
+        "A\tdocs/BLOCK_DETERMINISM_CROSS_AUDIT.md",
+        "A\tdocs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md",
+        "A\tdocs/BLOCK_WALL_GRAPH_QUALITY.md",
+        "M\tdocs/PROJECT_STATUS.md",
+        "M\tnuvem/REGRAS_MODULACAO_BLOCOS.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/README.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/lib_det.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_ablation.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_after.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_baseline.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_benchmark_atual.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_benchmark_legacy.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_convention_matrix.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_examples.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_performance.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_point_choice.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_roles.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_rootcause.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_second_cause.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_ablation.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_baseline.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_benchmark.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_convention_matrix.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_examples.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_performance.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_point_choice.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_roles.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_rootcause.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_second_cause.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/full_wall_first_opening_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/lib_cross.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/official_process_order_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_60_nodes.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_node_oracle_agreement.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_variants_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_60_nodes.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/lib_det.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/oracle.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_canonical_sort_experiment.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_divergent_nodes.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_variants_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/run_baseline_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/run_oracle_divergence.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/census_official_wall_order.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/census_wall_first_openings.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/lib_final.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_d6_compare_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_layout_trace_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_performance_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_raw_vs_physical_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_piloto_sintetico_2x2_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_piloto_sintetico_2x2_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_baseline_lottery.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_d6_compare.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_final_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_performance.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_raw_vs_physical.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_row_diff.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_variant_validity.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_wall_trace.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/README.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/lib_xa.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_nodefill_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_order.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_before_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_head_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_main_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_three_point_measurements.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_validity.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_nodefill.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_order.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_prism_diff.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_validity.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/variants_xa.py",
+        "M\tnuvem/core/engine/wall_pairing.py",
+        "M\tnuvem/core/engine/wall_stepper.py",
+        "A\ttests/test_block_graph_determinism.py",
+        "A\ttests/test_block_pipeline_determinism.py",
+        "M\ttests/test_script.py"
+      ]
+    },
+    "7": {
+      "head": "2594f6ff376212e5f24614241a0e1dd4b142b838",
+      "merge_base": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "diff_from_merge_base": [
+        "A\tdocs/BLOCK_DETERMINISM_AUDIT.md",
+        "A\tdocs/BLOCK_DETERMINISM_CROSS_AUDIT.md",
+        "A\tdocs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md",
+        "M\tdocs/PROJECT_STATUS.md",
+        "M\tnuvem/REGRAS_MODULACAO_BLOCOS.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/README.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/lib_det.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_ablation.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_after.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_baseline.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_benchmark_atual.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_benchmark_legacy.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_convention_matrix.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_examples.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_performance.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_point_choice.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_roles.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_rootcause.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/out_second_cause.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_ablation.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_baseline.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_benchmark.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_convention_matrix.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_examples.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_performance.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_point_choice.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_roles.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_rootcause.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism/run_second_cause.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/full_wall_first_opening_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/lib_cross.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/official_process_order_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_60_nodes.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_node_oracle_agreement.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_variants_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_60_nodes.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/lib_det.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/oracle.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_canonical_sort_experiment.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_divergent_nodes.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/out_variants_census.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/run_baseline_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/run_oracle_divergence.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_audit/variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/census_official_wall_order.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/census_wall_first_openings.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/lib_final.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_d6_compare_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_layout_trace_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_performance_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_raw_vs_physical_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_piloto_sintetico_2x2_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_piloto_sintetico_2x2_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_baseline_lottery.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_d6_compare.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_final_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_performance.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_raw_vs_physical.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_row_diff.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_variant_validity.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final/run_wall_trace.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/README.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/lib_xa.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_nodefill_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_order.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_before_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_head_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_main_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.md",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_three_point_measurements.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_validity.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_piloto_sintetico_2x2.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tgd.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tp1.json",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_nodefill.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_order.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_prism_diff.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_validity.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_variants.py",
+        "A\tnuvem/benchmark/diagnostics_block_determinism_final_cross_audit/variants_xa.py",
+        "M\tnuvem/core/engine/wall_pairing.py",
+        "M\tnuvem/core/engine/wall_stepper.py",
+        "A\ttests/test_block_graph_determinism.py",
+        "A\ttests/test_block_pipeline_determinism.py",
+        "M\ttests/test_script.py"
+      ]
+    }
+  },
+  "documents": {
+    "main": {
+      "head": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "files": [
+        {
+          "path": ".claude/skills/cr-checkpoint/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/cr-verification/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".claude/skills/repo-research/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BLOCKS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BONDING.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/ERROR_HISTORY.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/EXAMPLES.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/OPENINGS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/RULES.md",
+          "last_commit": "838e98cbd0960beb9664bb37253ab1889645eb4e",
+          "last_commit_date": "2026-08-28T16:05:17-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/SKILL.md",
+          "last_commit": "6b409eb784d911200a2eb56679f07e51fd6a407e",
+          "last_commit_date": "2026-09-03T13:58:08Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/VALIDATION.md",
+          "last_commit": "62cf5a78adaef1a5180b9c1a637de5dbf2b360a1",
+          "last_commit_date": "2026-08-28T16:39:45-03:00"
+        },
+        {
+          "path": ".claude/skills/systematic-debugging/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".github/workflows/check-project-status.yml",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "AGENTS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "CLAUDE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "DESTINO_GITHUB.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/BENCH_Z_ORIGIN.md",
+          "last_commit": "dc8ee01bfeb74c1c728e49e755e23e8d7aa339ca",
+          "last_commit_date": "2026-09-03T17:29:17Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md",
+          "last_commit": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+          "last_commit_date": "2026-09-04T17:34:07Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md",
+          "last_commit": "cce8cf949653c04263c7b63abdddf4629d40362e",
+          "last_commit_date": "2026-09-04T13:25:06Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_INVARIANCE.md",
+          "last_commit": "7e7c0ed2346ae191849c6fb23c1e68dd5fee1a76",
+          "last_commit_date": "2026-09-04T01:53:11Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md",
+          "last_commit": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+          "last_commit_date": "2026-09-04T19:02:31Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md",
+          "last_commit": "9fcd01292eb4bff52af882968320610404d30bba",
+          "last_commit_date": "2026-09-06T05:57:30Z"
+        },
+        {
+          "path": "docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md",
+          "last_commit": "dde0261ea87f5680155b9303fddedb95106fd447",
+          "last_commit_date": "2026-09-06T23:22:06Z"
+        },
+        {
+          "path": "docs/BLOCK_NODE_FILL_REVALIDATION.md",
+          "last_commit": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+          "last_commit_date": "2026-09-04T19:48:23Z"
+        },
+        {
+          "path": "docs/C04_INDEPENDENT_FINAL_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_CR_G12.md",
+          "last_commit": "777960c8d14d58b7507c00d4130ce6ad3e3d7fee",
+          "last_commit_date": "2026-09-08T09:06:22Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_B_G12_G16_REEVALUATION.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md",
+          "last_commit": "34bf6962f25aac12a2844e7b6c3cc5336c6459d6",
+          "last_commit_date": "2026-09-08T04:52:59Z"
+        },
+        {
+          "path": "docs/CR_C1_INDEPENDENT_REVIEW.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_DECISAO_FISICA.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_D1_DOCUMENTAL_RECOVERY.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md",
+          "last_commit": "9531cf0c991c5d46771c0aa200691909fc712b68",
+          "last_commit_date": "2026-09-08T18:08:31Z"
+        },
+        {
+          "path": "docs/CR_G12_REVISAO_INDEPENDENTE.md",
+          "last_commit": "73243e980bd93e44ea515e9d21f0a08e6e478942",
+          "last_commit_date": "2026-09-08T11:56:47Z"
+        },
+        {
+          "path": "docs/CR_S1_L_NODE_ALTERNATION.md",
+          "last_commit": "33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+          "last_commit_date": "2026-09-08T02:34:28Z"
+        },
+        {
+          "path": "docs/CR_V1_JUNCTION_VALIDATOR_ELEVATION_IDENTITY.md",
+          "last_commit": "684e99955281693de563a91138dd0becf1e6a6dd",
+          "last_commit_date": "2026-09-07T20:51:31Z"
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "last_commit": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+          "last_commit_date": "2026-09-04T18:25:28Z"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/REFERENCE_CORPUS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/GOLDEN_BENCHMARK.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/ARQUITETURA_INTERATIVA.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/LOADER_SETUP.md",
+          "last_commit": "cb0ef81de00daa4d69f321136582ac6f65a4947c",
+          "last_commit_date": "2026-08-28T15:42:13Z"
+        },
+        {
+          "path": "nuvem/PADRAO_MODULACAO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "last_commit": "9531cf0c991c5d46771c0aa200691909fc712b68",
+          "last_commit_date": "2026-09-08T18:08:31Z"
+        },
+        {
+          "path": "nuvem/benchmark/HANDOFF_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2D.md",
+          "last_commit": "d18fdc372f132ced7ca95a92fee3f97ce3055e47",
+          "last_commit_date": "2026-08-31T15:20:44-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2G.md",
+          "last_commit": "0ec7f2b001f700508dc198c9514535e5ede51ca3",
+          "last_commit_date": "2026-08-31T17:19:19-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/README.md",
+          "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+          "last_commit_date": "2026-08-31T11:56:27-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2F.md",
+          "last_commit": "c895272f0ef1a93445c7c129b84a801a874f4598",
+          "last_commit_date": "2026-08-31T16:14:24-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/archive/RELATORIO_BASELINE_BLOCOS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2i/README.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2j/README.md",
+          "last_commit": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+          "last_commit_date": "2026-09-01T05:04:22Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2k/README.md",
+          "last_commit": "d2e36047105c576df87c52f1d4f590c370412aa6",
+          "last_commit_date": "2026-09-01T17:22:25Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/cross_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_prisma/README.md",
+          "last_commit": "c71e06cdc7faaf82b218b73d676128aa05360f7c",
+          "last_commit_date": "2026-09-01T19:07:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/README.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_v1_junction_validator_fidelity/README.md",
+          "last_commit": "f09b1537760205031adeb7e5e4da90b8ce3b398c",
+          "last_commit_date": "2026-09-07T20:17:46Z"
+        },
+        {
+          "path": "nuvem/diagnosticos/CHACARA-TORRE-EASY-LO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/diagnosticos/TORRE_EASY-LO-R00.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        }
+      ]
+    },
+    "pr31": {
+      "head": "439fd49391227e128038fec704833c66c6ce3ffa",
+      "files": [
+        {
+          "path": ".claude/skills/cr-checkpoint/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/cr-verification/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".claude/skills/repo-research/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BLOCKS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BONDING.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/ERROR_HISTORY.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/EXAMPLES.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/OPENINGS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/RULES.md",
+          "last_commit": "838e98cbd0960beb9664bb37253ab1889645eb4e",
+          "last_commit_date": "2026-08-28T16:05:17-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/SKILL.md",
+          "last_commit": "6b409eb784d911200a2eb56679f07e51fd6a407e",
+          "last_commit_date": "2026-09-03T13:58:08Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/VALIDATION.md",
+          "last_commit": "62cf5a78adaef1a5180b9c1a637de5dbf2b360a1",
+          "last_commit_date": "2026-08-28T16:39:45-03:00"
+        },
+        {
+          "path": ".claude/skills/systematic-debugging/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".github/workflows/check-project-status.yml",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "AGENTS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "CLAUDE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "DESTINO_GITHUB.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/BENCH_FECHAMENTO_N1_2026-09-09.md",
+          "last_commit": "5da94715956a05eb9b5ea10c5f3b880961eb4254",
+          "last_commit_date": "2026-09-09T03:28:57Z"
+        },
+        {
+          "path": "docs/BENCH_N1C_N1E_2026-09-09.md",
+          "last_commit": "439fd49391227e128038fec704833c66c6ce3ffa",
+          "last_commit_date": "2026-09-09T12:29:52Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/BENCH_SWEEP_2026-09-08.md",
+          "last_commit": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+          "last_commit_date": "2026-09-08T22:37:44Z"
+        },
+        {
+          "path": "docs/BENCH_Z_ORIGIN.md",
+          "last_commit": "dc8ee01bfeb74c1c728e49e755e23e8d7aa339ca",
+          "last_commit_date": "2026-09-03T17:29:17Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md",
+          "last_commit": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+          "last_commit_date": "2026-09-04T17:34:07Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md",
+          "last_commit": "cce8cf949653c04263c7b63abdddf4629d40362e",
+          "last_commit_date": "2026-09-04T13:25:06Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_INVARIANCE.md",
+          "last_commit": "7e7c0ed2346ae191849c6fb23c1e68dd5fee1a76",
+          "last_commit_date": "2026-09-04T01:53:11Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md",
+          "last_commit": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+          "last_commit_date": "2026-09-04T19:02:31Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md",
+          "last_commit": "9fcd01292eb4bff52af882968320610404d30bba",
+          "last_commit_date": "2026-09-06T05:57:30Z"
+        },
+        {
+          "path": "docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md",
+          "last_commit": "dde0261ea87f5680155b9303fddedb95106fd447",
+          "last_commit_date": "2026-09-06T23:22:06Z"
+        },
+        {
+          "path": "docs/BLOCK_NODE_FILL_REVALIDATION.md",
+          "last_commit": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+          "last_commit_date": "2026-09-04T19:48:23Z"
+        },
+        {
+          "path": "docs/C04_INDEPENDENT_FINAL_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_CR_G12.md",
+          "last_commit": "777960c8d14d58b7507c00d4130ce6ad3e3d7fee",
+          "last_commit_date": "2026-09-08T09:06:22Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_B_G12_G16_REEVALUATION.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md",
+          "last_commit": "34bf6962f25aac12a2844e7b6c3cc5336c6459d6",
+          "last_commit_date": "2026-09-08T04:52:59Z"
+        },
+        {
+          "path": "docs/CR_C1_INDEPENDENT_REVIEW.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_DECISAO_FISICA.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_D1_DOCUMENTAL_RECOVERY.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md",
+          "last_commit": "9531cf0c991c5d46771c0aa200691909fc712b68",
+          "last_commit_date": "2026-09-08T18:08:31Z"
+        },
+        {
+          "path": "docs/CR_G12_REVISAO_INDEPENDENTE.md",
+          "last_commit": "73243e980bd93e44ea515e9d21f0a08e6e478942",
+          "last_commit_date": "2026-09-08T11:56:47Z"
+        },
+        {
+          "path": "docs/CR_S1_L_NODE_ALTERNATION.md",
+          "last_commit": "33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+          "last_commit_date": "2026-09-08T02:34:28Z"
+        },
+        {
+          "path": "docs/CR_V1_JUNCTION_VALIDATOR_ELEVATION_IDENTITY.md",
+          "last_commit": "684e99955281693de563a91138dd0becf1e6a6dd",
+          "last_commit_date": "2026-09-07T20:51:31Z"
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "last_commit": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+          "last_commit_date": "2026-09-04T18:25:28Z"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/REFERENCE_CORPUS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/GOLDEN_BENCHMARK.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/ARQUITETURA_INTERATIVA.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/LOADER_SETUP.md",
+          "last_commit": "cb0ef81de00daa4d69f321136582ac6f65a4947c",
+          "last_commit_date": "2026-08-28T15:42:13Z"
+        },
+        {
+          "path": "nuvem/PADRAO_MODULACAO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "last_commit": "03942b480fc583da0ff1627ed1065913470fad9f",
+          "last_commit_date": "2026-09-09T10:30:13Z"
+        },
+        {
+          "path": "nuvem/benchmark/HANDOFF_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2D.md",
+          "last_commit": "d18fdc372f132ced7ca95a92fee3f97ce3055e47",
+          "last_commit_date": "2026-08-31T15:20:44-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2G.md",
+          "last_commit": "0ec7f2b001f700508dc198c9514535e5ede51ca3",
+          "last_commit_date": "2026-08-31T17:19:19-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/README.md",
+          "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+          "last_commit_date": "2026-08-31T11:56:27-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2F.md",
+          "last_commit": "c895272f0ef1a93445c7c129b84a801a874f4598",
+          "last_commit_date": "2026-08-31T16:14:24-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/archive/RELATORIO_BASELINE_BLOCOS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2i/README.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2j/README.md",
+          "last_commit": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+          "last_commit_date": "2026-09-01T05:04:22Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2k/README.md",
+          "last_commit": "d2e36047105c576df87c52f1d4f590c370412aa6",
+          "last_commit_date": "2026-09-01T17:22:25Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/cross_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_prisma/README.md",
+          "last_commit": "c71e06cdc7faaf82b218b73d676128aa05360f7c",
+          "last_commit_date": "2026-09-01T19:07:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/README.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_v1_junction_validator_fidelity/README.md",
+          "last_commit": "f09b1537760205031adeb7e5e4da90b8ce3b398c",
+          "last_commit_date": "2026-09-07T20:17:46Z"
+        },
+        {
+          "path": "nuvem/diagnosticos/CHACARA-TORRE-EASY-LO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/diagnosticos/TORRE_EASY-LO-R00.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        }
+      ]
+    },
+    "pr30": {
+      "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "files": [
+        {
+          "path": ".claude/skills/cr-checkpoint/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/cr-verification/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".claude/skills/repo-research/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BLOCKS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BONDING.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/ERROR_HISTORY.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/EXAMPLES.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/OPENINGS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/RULES.md",
+          "last_commit": "838e98cbd0960beb9664bb37253ab1889645eb4e",
+          "last_commit_date": "2026-08-28T16:05:17-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/SKILL.md",
+          "last_commit": "6b409eb784d911200a2eb56679f07e51fd6a407e",
+          "last_commit_date": "2026-09-03T13:58:08Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/VALIDATION.md",
+          "last_commit": "62cf5a78adaef1a5180b9c1a637de5dbf2b360a1",
+          "last_commit_date": "2026-08-28T16:39:45-03:00"
+        },
+        {
+          "path": ".claude/skills/systematic-debugging/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".github/workflows/check-project-status.yml",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "AGENTS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "CLAUDE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "DESTINO_GITHUB.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/BENCH_SWEEP_2026-09-08.md",
+          "last_commit": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+          "last_commit_date": "2026-09-08T22:37:44Z"
+        },
+        {
+          "path": "docs/BENCH_Z_ORIGIN.md",
+          "last_commit": "dc8ee01bfeb74c1c728e49e755e23e8d7aa339ca",
+          "last_commit_date": "2026-09-03T17:29:17Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md",
+          "last_commit": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+          "last_commit_date": "2026-09-04T17:34:07Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md",
+          "last_commit": "cce8cf949653c04263c7b63abdddf4629d40362e",
+          "last_commit_date": "2026-09-04T13:25:06Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_INVARIANCE.md",
+          "last_commit": "7e7c0ed2346ae191849c6fb23c1e68dd5fee1a76",
+          "last_commit_date": "2026-09-04T01:53:11Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md",
+          "last_commit": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+          "last_commit_date": "2026-09-04T19:02:31Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md",
+          "last_commit": "9fcd01292eb4bff52af882968320610404d30bba",
+          "last_commit_date": "2026-09-06T05:57:30Z"
+        },
+        {
+          "path": "docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md",
+          "last_commit": "dde0261ea87f5680155b9303fddedb95106fd447",
+          "last_commit_date": "2026-09-06T23:22:06Z"
+        },
+        {
+          "path": "docs/BLOCK_NODE_FILL_REVALIDATION.md",
+          "last_commit": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+          "last_commit_date": "2026-09-04T19:48:23Z"
+        },
+        {
+          "path": "docs/C04_INDEPENDENT_FINAL_REVIEW.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_INTEGRACAO_CONSOLIDADA_2026-09-08.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_CR_G12.md",
+          "last_commit": "777960c8d14d58b7507c00d4130ce6ad3e3d7fee",
+          "last_commit_date": "2026-09-08T09:06:22Z"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_B_G12_G16_REEVALUATION.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md",
+          "last_commit": "34bf6962f25aac12a2844e7b6c3cc5336c6459d6",
+          "last_commit_date": "2026-09-08T04:52:59Z"
+        },
+        {
+          "path": "docs/CR_C1_INDEPENDENT_REVIEW.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_DECISAO_FISICA.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_D1_DOCUMENTAL_RECOVERY.md",
+          "last_commit": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+          "last_commit_date": "2026-09-08T03:59:19Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md",
+          "last_commit": "9531cf0c991c5d46771c0aa200691909fc712b68",
+          "last_commit_date": "2026-09-08T18:08:31Z"
+        },
+        {
+          "path": "docs/CR_G12_REVISAO_INDEPENDENTE.md",
+          "last_commit": "73243e980bd93e44ea515e9d21f0a08e6e478942",
+          "last_commit_date": "2026-09-08T11:56:47Z"
+        },
+        {
+          "path": "docs/CR_S1_L_NODE_ALTERNATION.md",
+          "last_commit": "33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+          "last_commit_date": "2026-09-08T02:34:28Z"
+        },
+        {
+          "path": "docs/CR_V1_JUNCTION_VALIDATOR_ELEVATION_IDENTITY.md",
+          "last_commit": "684e99955281693de563a91138dd0becf1e6a6dd",
+          "last_commit_date": "2026-09-07T20:51:31Z"
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "last_commit": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+          "last_commit_date": "2026-09-04T18:25:28Z"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "last_commit": "116fe10400c328fb49f9300ade1f61d33367335e",
+          "last_commit_date": "2026-09-08T20:12:02Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/REFERENCE_CORPUS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/GOLDEN_BENCHMARK.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/ARQUITETURA_INTERATIVA.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/LOADER_SETUP.md",
+          "last_commit": "cb0ef81de00daa4d69f321136582ac6f65a4947c",
+          "last_commit_date": "2026-08-28T15:42:13Z"
+        },
+        {
+          "path": "nuvem/PADRAO_MODULACAO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "last_commit": "3f7cb8da2ea086d09de91c2f5603061416af0dbd",
+          "last_commit_date": "2026-09-08T22:34:08Z"
+        },
+        {
+          "path": "nuvem/benchmark/HANDOFF_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2D.md",
+          "last_commit": "d18fdc372f132ced7ca95a92fee3f97ce3055e47",
+          "last_commit_date": "2026-08-31T15:20:44-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2G.md",
+          "last_commit": "0ec7f2b001f700508dc198c9514535e5ede51ca3",
+          "last_commit_date": "2026-08-31T17:19:19-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/README.md",
+          "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+          "last_commit_date": "2026-08-31T11:56:27-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2F.md",
+          "last_commit": "c895272f0ef1a93445c7c129b84a801a874f4598",
+          "last_commit_date": "2026-08-31T16:14:24-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/archive/RELATORIO_BASELINE_BLOCOS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2i/README.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2j/README.md",
+          "last_commit": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+          "last_commit_date": "2026-09-01T05:04:22Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2k/README.md",
+          "last_commit": "d2e36047105c576df87c52f1d4f590c370412aa6",
+          "last_commit_date": "2026-09-01T17:22:25Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/cross_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_prisma/README.md",
+          "last_commit": "c71e06cdc7faaf82b218b73d676128aa05360f7c",
+          "last_commit_date": "2026-09-01T19:07:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/README.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/README.md",
+          "last_commit": "b3dcf0ac5c283884b3544471d065f2cc707b3b1f",
+          "last_commit_date": "2026-09-08T07:53:27Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_v1_junction_validator_fidelity/README.md",
+          "last_commit": "f09b1537760205031adeb7e5e4da90b8ce3b398c",
+          "last_commit_date": "2026-09-07T20:17:46Z"
+        },
+        {
+          "path": "nuvem/diagnosticos/CHACARA-TORRE-EASY-LO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/diagnosticos/TORRE_EASY-LO-R00.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        }
+      ]
+    },
+    "pr28": {
+      "head": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "files": [
+        {
+          "path": ".claude/skills/cr-checkpoint/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/cr-verification/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".claude/skills/repo-research/SKILL.md",
+          "last_commit": "6fbabef4fc761fdd04b52b3c36093c3803dabd58",
+          "last_commit_date": "2026-09-03T12:04:36-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BLOCKS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/BONDING.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/ERROR_HISTORY.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/EXAMPLES.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/OPENINGS.md",
+          "last_commit": "810d80fb4e9d266c7f65c9904970e2632dcce3e9",
+          "last_commit_date": "2026-08-28T18:46:40Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/RULES.md",
+          "last_commit": "838e98cbd0960beb9664bb37253ab1889645eb4e",
+          "last_commit_date": "2026-08-28T16:05:17-03:00"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/SKILL.md",
+          "last_commit": "6b409eb784d911200a2eb56679f07e51fd6a407e",
+          "last_commit_date": "2026-09-03T13:58:08Z"
+        },
+        {
+          "path": ".claude/skills/revit-block-modulation/VALIDATION.md",
+          "last_commit": "62cf5a78adaef1a5180b9c1a637de5dbf2b360a1",
+          "last_commit_date": "2026-08-28T16:39:45-03:00"
+        },
+        {
+          "path": ".claude/skills/systematic-debugging/SKILL.md",
+          "last_commit": "9724766f8e687592b4ecc1d51c16295134eced0f",
+          "last_commit_date": "2026-09-03T12:29:49-03:00"
+        },
+        {
+          "path": ".github/workflows/check-project-status.yml",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "AGENTS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "CLAUDE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "DESTINO_GITHUB.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "docs/BENCH_Z_ORIGIN.md",
+          "last_commit": "dc8ee01bfeb74c1c728e49e755e23e8d7aa339ca",
+          "last_commit_date": "2026-09-03T17:29:17Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_CANDIDATE_SAFETY_CONTRACT.md",
+          "last_commit": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+          "last_commit_date": "2026-09-04T17:34:07Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md",
+          "last_commit": "cce8cf949653c04263c7b63abdddf4629d40362e",
+          "last_commit_date": "2026-09-04T13:25:06Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_ROLE_INVARIANCE.md",
+          "last_commit": "7e7c0ed2346ae191849c6fb23c1e68dd5fee1a76",
+          "last_commit_date": "2026-09-04T01:53:11Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md",
+          "last_commit": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+          "last_commit_date": "2026-09-04T18:36:39Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md",
+          "last_commit": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+          "last_commit_date": "2026-09-04T19:02:31Z"
+        },
+        {
+          "path": "docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md",
+          "last_commit": "9fcd01292eb4bff52af882968320610404d30bba",
+          "last_commit_date": "2026-09-06T05:57:30Z"
+        },
+        {
+          "path": "docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md",
+          "last_commit": "dde0261ea87f5680155b9303fddedb95106fd447",
+          "last_commit_date": "2026-09-06T23:22:06Z"
+        },
+        {
+          "path": "docs/BLOCK_NODE_FILL_REVALIDATION.md",
+          "last_commit": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+          "last_commit_date": "2026-09-04T19:48:23Z"
+        },
+        {
+          "path": "docs/CR_B_INTEGRATION_PREPARATION.md",
+          "last_commit": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+          "last_commit_date": "2026-09-08T04:02:28Z"
+        },
+        {
+          "path": "docs/CR_V1_JUNCTION_VALIDATOR_ELEVATION_IDENTITY.md",
+          "last_commit": "684e99955281693de563a91138dd0becf1e6a6dd",
+          "last_commit_date": "2026-09-07T20:51:31Z"
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "last_commit": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+          "last_commit_date": "2026-09-04T18:25:28Z"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "last_commit": "f6cd2822a929fabffcaf22f7338984edb41b86e8",
+          "last_commit_date": "2026-09-07T20:19:18Z"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "last_commit": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+          "last_commit_date": "2026-09-04T20:57:05Z"
+        },
+        {
+          "path": "docs/REFERENCE_CORPUS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "last_commit": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+          "last_commit_date": "2026-09-04T17:51:19Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/BLOCK_MODULATION_CROSS_AUDIT.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "docs/archive/GOLDEN_BENCHMARK.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/ARQUITETURA_INTERATIVA.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/LOADER_SETUP.md",
+          "last_commit": "cb0ef81de00daa4d69f321136582ac6f65a4947c",
+          "last_commit_date": "2026-08-28T15:42:13Z"
+        },
+        {
+          "path": "nuvem/PADRAO_MODULACAO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "last_commit": "f09b1537760205031adeb7e5e4da90b8ce3b398c",
+          "last_commit_date": "2026-09-07T20:17:46Z"
+        },
+        {
+          "path": "nuvem/benchmark/HANDOFF_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2D.md",
+          "last_commit": "d18fdc372f132ced7ca95a92fee3f97ce3055e47",
+          "last_commit_date": "2026-08-31T15:20:44-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2G.md",
+          "last_commit": "0ec7f2b001f700508dc198c9514535e5ede51ca3",
+          "last_commit_date": "2026-08-31T17:19:19-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/PLANO_ETAPA_2I_CR_2F_E.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/README.md",
+          "last_commit": "eb9dfc220be46a623ff22b318102d2877c75a57f",
+          "last_commit_date": "2026-08-31T11:56:27-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2C.md",
+          "last_commit": "41b526cbcd8ed5e36153c73665b3d00afac40bdc",
+          "last_commit_date": "2026-08-31T14:47:06-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/RELATORIO_ETAPA_2F.md",
+          "last_commit": "c895272f0ef1a93445c7c129b84a801a874f4598",
+          "last_commit_date": "2026-08-31T16:14:24-03:00"
+        },
+        {
+          "path": "nuvem/benchmark/archive/RELATORIO_BASELINE_BLOCOS.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2i/README.md",
+          "last_commit": "9bca56122dbb474e50d8fa10fa6843a665664656",
+          "last_commit_date": "2026-09-01T03:58:57Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2j/README.md",
+          "last_commit": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+          "last_commit_date": "2026-09-01T05:04:22Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_2k/README.md",
+          "last_commit": "d2e36047105c576df87c52f1d4f590c370412aa6",
+          "last_commit_date": "2026-09-01T17:22:25Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_audit/cross_audit/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_prisma/README.md",
+          "last_commit": "c71e06cdc7faaf82b218b73d676128aa05360f7c",
+          "last_commit_date": "2026-09-01T19:07:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/README.md",
+          "last_commit": "f885081a0587a4d3f1cdd2092b557f930c14003d",
+          "last_commit_date": "2026-09-07T06:26:20Z"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_v1_junction_validator_fidelity/README.md",
+          "last_commit": "f09b1537760205031adeb7e5e4da90b8ce3b398c",
+          "last_commit_date": "2026-09-07T20:17:46Z"
+        },
+        {
+          "path": "nuvem/diagnosticos/CHACARA-TORRE-EASY-LO.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/diagnosticos/TORRE_EASY-LO-R00.md",
+          "last_commit": "30f446683a18da2761c194f980693e3c95c6dc8e",
+          "last_commit_date": "2026-08-27T12:23:10-03:00"
+        },
+        {
+          "path": "nuvem/tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        },
+        {
+          "path": "tests/README.md",
+          "last_commit": "16fa1c7f979c14370b5d19618dee216e974e154b",
+          "last_commit_date": "2026-09-03T21:08:07Z"
+        }
+      ]
+    }
+  }
+}
