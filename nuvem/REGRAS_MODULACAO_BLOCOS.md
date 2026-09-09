@@ -6290,6 +6290,54 @@ específico, **3 compensadores é o mínimo aritmético existente**.
 
 Nenhuma das três foi aplicada. **A orientação mais recente do usuário tem
 prioridade quando ela vier.**
+
+### 41.5 ENUMERAÇÃO EXAUSTIVA do trecho — os custos de cada opção
+(2026-09-09, medido; **continua sem nada implementado**)
+
+`TP1/W003`, trecho `[170, 474]`, span 304cm, juntas de contorno 1/1 →
+`remaining` = 303cm = **61 módulos** de 5cm. Enumeração completa das
+composições `a·B39 + b·B34 + c·B19 + d·C09 + e·C04` que fecham exatamente:
+**2 457 composições distintas**.
+
+| opção | melhor composição | comp. | esp. | B19 | peças |
+|---|---|---|---|---|---|
+| tetos ATUAIS (comp≤1 **e** esp≤1, sem B19) | **NÃO EXISTE** | — | — | — | — |
+| 1 — manter (esp≤1, compensador acima do teto) | `B39×6 + B34×1 + C09×3` | 3 | 1 | 0 | 10 |
+| 2 — inverter 7/7b (zero compensador) | `B39×5 + B34×3` | 0 | 3 | 0 | 8 |
+| 3 — liberar 1 B19 (esp≤1) | `B39×6 + B34×1 + B19×1 + C09×1` | **1** | 1 | 1 | 9 |
+
+Confirma a contradição: **com os dois tetos juntos não existe solução** —
+o mínimo é 3 compensadores mantendo `esp≤1`, ou 3 peças especiais
+mantendo `comp≤1`.
+
+**Achado NOVO que a 41.4 não tinha — a opção 4**: a regra ESCRITA do
+usuário (início deste arquivo) é *"**Proibido usar 2 ou mais em
+sequência** no mesmo trecho — nunca uma solução recorrente, só pontual"*.
+Ela proíbe **SEQUÊNCIA**; `MAX_COMPENSATORS_PER_TRECHO = 1` é uma
+implementação **mais restritiva** que a regra, listada logo abaixo dela
+como consequência. E a enumeração mostra que a melhor composição da opção
+1 (`B39×6 + B34×1 + C09×3`) admite uma ordenação em que **nenhum
+compensador encosta em outro** (7 peças não-compensadoras para intercalar
+3 compensadores). O que o solver entrega hoje — `B39×7 + C09×2 + C04×1`,
+os **3 em sequência** — viola a regra escrita; a mesma contagem de
+compensadores **intercalada** não violaria.
+
+4. **Ler a regra pela letra**: manter a proibição de *sequência* (2+
+   adjacentes) como regra dura, e rebaixar `MAX_COMPENSATORS_PER_TRECHO`
+   de teto duro para **preferência forte** (critério de desempate, já
+   existe como `_layout_compensator_run_excess`). Custo: trechos longos
+   passam a poder ter 3 compensadores **separados**; ganho: nenhuma
+   violação da regra escrita, `esp≤1` preservado, e a família
+   `COMPENSATOR_CONSECUTIVE` (101 identidades no TGD, 200 no TP1) some
+   por construção.
+
+   **Atenção**: o validador `COMPENSATOR_EXCESS_IN_RUN` conta
+   compensadores por *run* contra `MAX_COMPENSATORS_PER_TRECHO` — ele
+   também teria de passar a medir *sequência*, senão o solver ficaria
+   certo pela regra e errado pela régua.
+
+Continua valendo: **nenhuma das quatro foi aplicada**, e escolher é do
+usuário.
 ---
 
 ## 42. PENDÊNCIA NORMATIVA — parede cujo comprimento não é múltiplo de 5cm
