@@ -422,6 +422,34 @@ def test_t15_endpoints_invertidos_nao_muda_identificacao():
 # por no').
 # ============================================================
 
+# As paredes que o ARM SAFE REPAIR ja' aceitou como candidato SEGURO em
+# alguma arvore medida - pela CHAVE FISICA (`W|x0,y0|x1,y1|tE`, pontas
+# ordenadas), nunca por `W0xx` nem pelo indice, que nao sao identidade
+# estavel (secao 38.5 das regras). `W|-153.5,-553.0|346.1,-553.0` e' a
+# parede 23 (CR-G12); `W|1201.5,-508.0|1325.5,-508.0` e' a 91 (CR-N1).
+_T1_T9_PAREDES_JA_ACEITAS = (
+    "W|-153.5,-553.0|346.1,-553.0|t14.0",
+    "W|1201.5,-508.0|1325.5,-508.0|t14.0",
+)
+
+
+def _physical_key(walls_to_create, wall_idx):
+    p0, p1, _d, _l, thickness = m._wall_axis_and_length(walls_to_create, wall_idx)
+    a = (round(p0.X / F * 100.0, 1), round(p0.Y / F * 100.0, 1))
+    b = (round(p1.X / F * 100.0, 1), round(p1.Y / F * 100.0, 1))
+    lo, hi = sorted([a, b])
+    return "W|%.1f,%.1f|%.1f,%.1f|t%.1f" % (lo[0], lo[1], hi[0], hi[1],
+                                            thickness / F * 100.0)
+
+
+def _wall_idx_by_physical_key(walls_to_create, key):
+    for idx in range(len(walls_to_create)):
+        if _physical_key(walls_to_create, idx) == key:
+            return idx
+    raise AssertionError(
+        "parede %s sumiu do plano - identidade fisica nao encontrada" % key)
+
+
 def _run_tgd(enabled):
     m.ARM_ROLE_SAFE_REPAIR_ENABLED = enabled
     paths = bench_runner.project_paths("torre_easy_lo_r00_tgd")
@@ -464,18 +492,45 @@ def test_t1_t9_candidato_seguro_e_aceito_no_tgd_real():
     secao 27.9 (`test_pipeline_lanca_blocos_e_ajusta_na_mesma_passada`,
     cuja assercao registrava um artefato do bug).
 
-    O contrato T1/T9 continua inteiro, agora fisico e mais forte:
-      1. o gate nao e' vacuo - aceita pelo menos um candidato;
+    CR-N1 (2026-09-09): a assercao 1 (`assert accepted`, "o gate nao e'
+    vacuo") caiu pelo MESMO precedente, agora tambem para a parede 91.
+    Medido nas DUAS arvores (`origin/main` 08495d9 x base+CR-N1), TGD
+    real, por IDENTIDADE FISICA da parede (nunca `W0xx`, nunca indice):
+
+        parede aceita na base   W|1201.5,-508.0|1325.5,-508.0|t14.0 (=91)
+          base  repairable=SIM  aceita=SIM  prisma forcado FINAL=NAO
+          CR-N1 repairable=NAO  aceita=NAO  prisma forcado FINAL=NAO
+        repairable  5 identidades SAIRAM, ZERO entraram
+        prisma forcado FINAL  29 -> 27 paredes
+
+    O resultado FISICO daquela parede e' IDENTICO nas duas arvores; o que
+    mudou foi a ROTA (reparo aceito -> geracao ja' correta). O SAFE REPAIR
+    nao foi enfraquecido nem desligado: `_evaluate_corner_role_candidate`
+    continua ACEITANDO candidato seguro, provado sem depender do corpus
+    por `test_wiring_neighbor_credita_do_alvo` e
+    `test_wiring_alvo_credita_da_vizinha`
+    (tests/test_block_arm_safe_repair_gate_fidelity.py, `assert
+    ok_with_map is True`), e continua REJEITANDO os inseguros aqui nos
+    T2-T7 e no T10 sobre o corpus real.
+
+    O contrato T1/T9 continua inteiro, agora inteiramente FISICO:
+      1. as paredes que o SAFE REPAIR ja' aceitou como candidato seguro
+         (23 na CR-G12, 91 na CR-N1 - aqui pela CHAVE FISICA, nao pelo
+         indice) terminam SEM prisma forcado, por qualquer das duas rotas;
       2. todo candidato ACEITO de fato resolve o prisma forcado do alvo;
-      3. a parede 23 - o caso T1/T9 medido - termina SEM prisma forcado,
-         pelas DUAS rotas (reparo aceito, ou geracao ja' correta)."""
-    result, _nodes, _walls, _e2n, _op, _cat, _bz, _nc = _run_tgd(enabled=True)
+      3. a parede 23 - o caso T1/T9 medido - termina SEM prisma forcado."""
+    result, _nodes, walls, _e2n, _op, _cat, _bz, _nc = _run_tgd(enabled=True)
     safe_repair = result.get("arm_role_safe_repair") or {}
     accepted = safe_repair.get("accepted") or []
     audits = result.get("wall_bond_audits")
-    assert accepted, "esperava pelo menos 1 candidato aceito no TGD"
     for candidato in accepted:
         assert not m._wall_has_forced_corner_prism(candidato["wall_idx"], audits), candidato
+    for chave in _T1_T9_PAREDES_JA_ACEITAS:
+        idx = _wall_idx_by_physical_key(walls, chave)
+        assert not m._wall_has_forced_corner_prism(idx, audits), (
+            "a parede %s (candidato seguro ja' aceito pelo SAFE REPAIR) tem "
+            "de terminar SEM prisma forcado - aceita como candidato de "
+            "reparo, ou ja' correta na geracao" % chave)
     assert not m._wall_has_forced_corner_prism(23, audits), (
         "a parede 23 (o caso T1/T9) tem de terminar SEM prisma forcado - "
         "aceita como candidato de reparo, ou ja' correta na geracao")
