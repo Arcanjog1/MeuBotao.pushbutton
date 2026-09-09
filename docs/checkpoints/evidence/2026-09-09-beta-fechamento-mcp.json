@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "subject": "Fechamento do primeiro beta Revit - criacao real, falso positivo do auditor e stall da Tela 1",
+  "captured_utc": "2026-09-09T22:10:00+00:00",
+  "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
+  "document": "TESTE MODULACAO",
+  "walls": [5390468, 5390548],
+
+  "criacao_real_medida": {
+    "run": "execucao 3, 2026-09-09 18:40:37, pacote 07f43f2",
+    "family_instances_de_bloco": 187,
+    "por_familia": {"BLOCO 34 - 14x19x34": 34, "BLOCO INTEIRO - 14x19x39": 136, "MEIO BLOCO - 14x19x19": 17},
+    "fiadas": 17,
+    "pecas_por_fiada": 11,
+    "cotas_z_cm": {"primeira": -1105.2, "ultima": -785.2, "passo": 20.0},
+    "rotacoes_rad": [0.0, 1.5708, 4.7124],
+    "por_parede": {"LONGA": {"B34": 9, "B39": 136, "B19": 8}, "CURTA": {"B34": 25, "B19": 9}},
+    "candidatos_do_par_AB": 22,
+    "nota": "22 candidatos do par A/B NAO sao instancias finais: 22 candidatos -> 11 pecas por fiada fisica -> 17 fiadas -> 187 instancias.",
+    "falhas_de_criacao": 0,
+    "colisoes": 0,
+    "violacoes_de_vao": 0,
+    "trechos_nao_modulares": 0
+  },
+
+  "tempos_da_criacao": {
+    "create.batch_primeira_vez_s": 1.667,
+    "activate_s": 0.0556,
+    "loop_s": 0.7382,
+    "commit_s": 0.5604,
+    "assimilate_s": 0.0008,
+    "new_instance_calls": 187,
+    "new_instance_s": 0.3037,
+    "rotate_calls": 34,
+    "rotate_s": 0.4269,
+    "mirror_calls": 0,
+    "auditoria_do_laco": "sem Regenerate por bloco; sem busca de familia/tipo por bloco; sem varredura global; Activate+Regenerate uma unica vez fora do laco"
+  },
+
+  "recriacao": {
+    "segunda_execucao_de_create_s": 0.634,
+    "criados": 187,
+    "falhas": 0,
+    "loop_s": 0.3229,
+    "commit_s": 0.0711,
+    "total_no_modelo_depois": 187,
+    "veredito": "SUBSTITUICAO correta - o lote anterior foi apagado e recriado; o total no documento permaneceu 187, sem duplicata."
+  },
+
+  "falso_positivo_do_auditor": {
+    "reclamacao_original": "REPEATED_VERTICAL_COMPENSATOR_STRIP: B34 repetido(s) em X~37.0cm, em 9 fiadas (0,2,4,6,8,10,12,14,16)",
+    "parede": "CURTA (69cm)",
+    "medicao_parede_curta": {
+      "eixo_t_cm": [0.0, 69.0],
+      "fiada_par_A": ["B19[t 0..19]", "B34[t 20..54]"],
+      "fiada_impar_B": ["B34[t 0..34]", "B34[t 35..69]"],
+      "junta_par_t_cm": 19.5,
+      "junta_impar_t_cm": 34.5,
+      "defasagem_cm": 15.0
+    },
+    "medicao_parede_longa": {
+      "eixo_x_cm": [1910.75, 2264.75],
+      "fiada_par_A": ["B34[1910.7..1944.7]", "B39[1945.7..1984.7]", "... 8x B39"],
+      "fiada_impar_B": ["B39[1925.7..1964.7]", "... 8x B39", "B19[2245.7..2264.7]"],
+      "junta_par_x_cm": 1945.2,
+      "junta_impar_x_cm": 1965.2,
+      "defasagem_cm": 20.0,
+      "sobreposicao_horizontal_cm": 19.05,
+      "b34_por_fiada_par": {"id_fiada_0": 5390898, "id_fiada_2": 5390920, "id_fiada_16": 5391074,
+                            "centro_x_cm": 1927.75, "extensao_cm": [1910.75, 1944.75]}
+    },
+    "encontro_L_medido": {
+      "fiadas_pares": "parede LONGA vira o canto com B34 (rot 0.0), CURTA tem B19+B34 sem alcancar o canto",
+      "fiadas_impares": "parede CURTA vira o canto com B34 (rot 4.7124), LONGA sem B34",
+      "veredito": "alternancia classica de encontro em L - CORRETA"
+    },
+    "checagens_pedidas": {
+      "1_junta_vertical_continua_proibida": "NAO - defasagem de 15cm (curta) e 20cm (longa) entre fiadas adjacentes",
+      "2_limites_dos_B34_coincidem_verticalmente": "NAO - a fiada adjacente tem peca atravessando a posicao",
+      "3_quebra_de_prisma": "NAO",
+      "4_sobreposicao_horizontal_suficiente": "SIM - 19.05cm medidos na parede longa",
+      "5_B34_exerce_amarracao_legitima_no_L": "SIM - alternancia de canto confirmada",
+      "6_repeticao_so_em_fiadas_de_mesma_paridade": "SIM - 0,2,4,...,16, nenhuma impar",
+      "7_fiada_intermediaria_quebra_a_junta": "SIM"
+    },
+    "causa_raiz": "O detector contava len(courses) sem exigir ADJACENCIA. solve_building_blocks_all_courses resolve UM par A/B e o repete em toda fiada par e toda impar, entao qualquer peca especial da fiada A aparece por CONSTRUCAO em 100% das pares (9/17 = 0.53 >= BOND_STRIP_RATIO). Mesma causa-raiz ja corrigida para ALTERNATING_JOINT_PATTERN. Agravante: o cluster e formado pelo CENTRO da peca, e o centro do B34 impar (t=52) cai dentro de BOND_STRIP_EDGE_EXEMPT_CM=25, entao a peca impar que de fato cobre t~37 nao entrava no cluster.",
+    "correcao": "_longest_adjacent_course_run + BOND_STRIP_MIN_ADJACENT_COURSES=2, somente no auditor. Padrao de mesma paridade sai em `alternating_strips` como dado, sem penalidade.",
+    "limitacao": "O bench OFFLINE nao reproduz o falso positivo (0 paredes reprovadas com a logica antiga E com a nova) - o layout reconstruido difere do criado no Revit. A prova esta no teste que codifica a geometria MEDIDA; o gate so fecha com nova execucao no Revit."
+  },
+
+  "stall_da_tela_1": {
+    "status": "CAUSA-RAIZ NAO FECHADA - BLOQUEADOR DE MERGE",
+    "run3": {"analyze_wall_clock_s": 19.606, "cpu_do_processo_s": 1.672,
+             "fronteira": "entre 'plan_failures criado' (+0.060s) e 'plan_hook definido' (+19.648s)",
+             "codigo_entre_as_sondas": "um `if` falso, um dict vazio e um `def`"},
+    "run2": {"analyze_wall_clock_s": 100.204, "fronteira": "mesma"},
+    "prova_de_que_nao_e_calculo": "Nenhuma linha [PERF] de NENHUMA thread do processo do Revit aparece durante os 19,59s - nem o watchdog (System.Threading.Timer, dispara a cada 3s apos 8s parado), nem a thread de UI, nem o worker. O interpretador CPython inteiro ficou congelado.",
+    "custo_da_instrumentacao_descartado_por_medicao": {"mediana_ms": 0.285, "p95_ms": 0.329, "pior_ms": 0.508, "amostras": 300},
+    "retorno_para_a_ui_esta_saudavel": {
+      "worker.thread TERMINOU": "+19.665s",
+      "ui_invoke.BeginInvoke aceito": "+19.665s",
+      "ui._finish": "+19.693s",
+      "ui._on_analyze_done": "+19.694s",
+      "latencia_do_marshaling_ms": 28,
+      "veredito": "NAO ha callback perdido, delegate coletado, handle invalido nem excecao engolida no retorno."
+    },
+    "run2_ui_finish_ausente_explicado": "O usuario fechou a janela travada; BeginInvoke num Form ja descartado lanca, e a excecao era engolida. Agora e marcada (ui_invoke.FALHOU). Nao e um segundo defeito.",
+    "hipotese_principal_nao_provada": "A GIL do pythonnet permanece retida pela thread principal do Revit ao retornar de IExternalEventHandler.Execute, enquanto o Revit executa trabalho .NET/nativo proprio (o CPU do processo anda 1,67s sem nenhuma execucao Python). O worker so volta a rodar quando a thread principal reentra em Python. NAO PROVADO - exigiria amostragem de sys._current_frames() durante o congelamento.",
+    "por_que_nenhuma_mitigacao_em_python_funciona_durante_o_congelamento": "watchdog, barra de progresso, log e checagem de Cancelar sao todos codigo Python; enquanto o interpretador esta congelado, nenhum deles roda."
+  },
+
+  "gates_do_merge": {
+    "1_modulacao_fisica_correta": "PASS - medida via MCP",
+    "2_encontro_L_correto": "PASS - alternancia de canto medida",
+    "3_vermelho_falso_eliminado": "NAO VERIFICADO NO REVIT - correcao provada por teste, mas o bench offline nao reproduz o caso",
+    "4_casos_ruins_ainda_detectados": "PASS - dois controles positivos",
+    "5_tela_1_finaliza_normalmente": "PARCIAL - finalizou em 19,6s na execucao 3, mas com o interpretador congelado e sem feedback",
+    "6_solve_create_corrigido": "PASS - 'Execute SAIU action=solve pendente=create' na execucao 3",
+    "7_criacao_real_funciona": "PASS - 187 instancias, 0 falhas",
+    "8_sem_regressao_critica_nova": "PENDENTE - regressao consolidada nao concluida",
+    "9_testes_focados_verdes": "PASS",
+    "10_regressao_consolidada": "PENDENTE",
+    "11_documentacao_corresponde_ao_HEAD": "PASS",
+    "12_ci": "NAO AVALIADO",
+    "veredito": "NAO MERGEAR - gates 3, 5, 8, 10 e 12 nao fechados; gate 15 (Tela 1 podendo ficar infinita) nao pode ser descartado."
+  }
+}

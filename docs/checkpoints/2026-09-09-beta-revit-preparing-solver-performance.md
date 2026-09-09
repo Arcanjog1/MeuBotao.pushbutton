@@ -1,223 +1,171 @@
-# Beta Revit: Etapa 5 travada - acao "create" perdida no ExternalEvent
+# Primeiro beta Revit: criacao real, falso positivo do auditor e o congelamento da Tela 1
 
 ```json
 {
   "date": "2026-09-09",
   "scope": "current",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-  "head": "07f43f2f8b7a6dc71b0b8af81a42d807db747591",
+  "head": "2d8d0b1d9eeb87800c6f73394eee83a0db1db1fb",
   "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "pr": "not-created",
-  "objective": "Descobrir onde o tempo e gasto entre o clique em 'Iniciar Modulacao das Paredes' e o primeiro resultado util, na bancada de 2 paredes / 1 encontro em L / 0 aberturas do primeiro beta controlado (8cdd33f), com causa medida e nao hipotetica; corrigir apenas o hotspot provado.",
+  "objective": "Fechar o primeiro beta controlado do Revit na bancada de 2 paredes / 1 encontro em L / 0 aberturas: achar por medicao onde o fluxo travava, corrigir somente hotspots provados, eliminar o vermelho falso da auditoria de amarracao sem silenciar o auditor, e decidir merge por gates.",
   "changes": [
-    "Nenhuma alteracao de algoritmo, formula, tolerancia, regra normativa, benchmark, baseline ou gabarito. Nenhum auditor foi silenciado. Todo acesso ao modelo via MCP foi leitura.",
-    "core/engine/perf_trace.py (modulo puro, sem Revit e sem UI) e sondas [PERF] no caminho real: clique, latencia do ExternalEvent, Execute, refresh de geometria, analyze, solve e todo o caminho de criacao (preflight, TransactionGroup, Activate+Regenerate, Transaction, progresso/ultima peca, laco, Commit, rollback, resultado).",
-    "CORRECAO MINIMA em _PostCreationEventHandler.Execute(): a acao passa a ser CONSUMIDA no inicio e despachada por copia local, em vez de zerada no `finally`. Isso preserva a acao que um callback agenda DURANTE o proprio Execute()."
+    "BUG REAL 1 - CORRIGIDO: acao 'create' perdida. _PostCreationEventHandler.Execute() passa a CONSUMIR a acao no inicio e despachar por copia local, em vez de zera-la no `finally`. Preserva a acao que um callback agenda durante o proprio Execute().",
+    "BUG REAL 2 - CORRIGIDO: falso positivo REPEATED_VERTICAL_COMPENSATOR_STRIP. `_longest_adjacent_course_run` + BOND_STRIP_MIN_ADJACENT_COURSES=2: faixa vertical passa a exigir fiadas ADJACENTES. Somente o auditor foi tocado.",
+    "ACHADO Z - RECLASSIFICADO como comportamento esperado, por decisao do usuario. NENHUMA alteracao de codigo. Regra registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8a.",
+    "Instrumentacao [PERF] (core/engine/perf_trace.py + sondas) do caminho real: clique, ExternalEvent, Execute, refresh, analyze, solve, criacao e retorno para a UI. Cada marco traz CPU do processo e contagem de threads.",
+    "Nenhuma regra fisica, tolerancia, baseline, reference, input oficial ou threshold foi alterado. Nenhum skip/xfail introduzido. Nenhum detector removido."
   ],
   "tests": [
-    "tests/test_script.py + test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 312 passed em 64.38s, ja com as sondas finas.",
-    "test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 50 passed.",
-    "Regressao verificada nos DOIS sentidos: revertendo somente a correcao (mantendo a instrumentacao), test_acao_agendada_por_callback_durante_execute_sobrevive e test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar FALHAM; com a correcao, passam.",
-    "Bancada offline com dubles: _execute_solve 0.010s, _execute_analyze 0.002s. Reproducao fiel dentro do Revit sobre o documento real: refresh 0.187s + analyze 0.181s = 0.37s.",
-    "Pacote beta construido e verificado a partir da PASTA DO BOTAO: head 07f43f2f8b7a6dc71b0b8af81a42d807db747591.",
-    "Custo da propria instrumentacao MEDIDO, para nao ser confundido com o sintoma: mark() custa 0.285ms na mediana, 0.329ms no p95 e 0.508ms no pior caso de 300 chamadas."
+    "tests/test_bond_strip_adjacent_courses.py: 6 passed - controles negativos (bancada real do beta) e positivos (empilhamento adjacente de 17 fiadas e de 2 fiadas), sem skip/xfail.",
+    "Regressao verificada nos DOIS sentidos: revertendo somente o `if` da adjacencia, os dois controles negativos FALHAM; com a correcao, passam. Os controles positivos passam nos dois casos (a deteccao real foi preservada).",
+    "tests/test_script.py + test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 312 passed (HEAD anterior, com a instrumentacao).",
+    "tests/test_bond_strip_adjacent_courses.py + tests/test_block_bonding.py: 38 passed no HEAD atual.",
+    "Regressao do encadeamento: test_acao_agendada_por_callback_durante_execute_sobrevive e test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar - falham antes, passam depois.",
+    "Solve end-to-end offline no HEAD atual: 17 fiadas, 22 candidatos, 187 instancias fisicas, 0 colisoes, 0 vaos, 0 nao modulares, preflight ok, 0 paredes reprovadas."
   ],
   "known_failures": [
-    "PENDENCIA FISICA ABERTA - REPEATED_VERTICAL_COMPENSATOR_STRIP: o solve desta bancada reprovou 1 parede na auditoria de amarracao entre fiadas. Por decisao de 2026-08-26 isso nao bloqueia a criacao (as pecas saem marcadas em vermelho), e NADA foi silenciado aqui. Continua sendo reprovacao fisica em aberto.",
-    "DEFEITO NOVO E ABERTO - stall da thread de fundo: na execucao 2 (18:18, ja com a correcao), o analyze levou 100.204s, com 97.3s parados entre a entrada de analyze_created_walls_for_errors e process_walls_one_by_one - trecho que so tem um `if` falso, um dict vazio e um `def`. Houve ainda um salto de 2.16s entre dois marcos adjacentes. Nao e custo de instrumentacao (0.285ms/marco, medido) nem calculo. A thread de fundo nao estava rodando.",
-    "CORRECAO DE UMA CONCLUSAO MINHA ANTERIOR: eu havia dado o analyze por descartado com base nas execucoes em que ele nao travou (0.065s na execucao 1, 0.181s na reproducao dentro do Revit). A execucao 2 mostra que ele TRAVA de forma intermitente. O solver continua computando rapido; o que trava e a thread, nao a conta.",
-    "Tempo de criacao, quantidade criada e repetibilidade do beta seguem SEM medicao: a execucao 2 nunca chegou a solve/create.",
-    "A suite consolidada nao foi concluida nesta sessao (interrompida duas vezes de proposito, para nao contaminar o arquivo de rastreamento que a medicao no Revit usa)."
+    "BUG REAL 3 - CAUSA-RAIZ NAO FECHADA, BLOQUEADOR DE MERGE: o interpretador CPython dentro do processo do Revit congela por 19,6s (execucao 3) e por 100,2s (execucao 2) na mesma fronteira - entre `plan_failures = {}` e o `def plan_hook`, um trecho sem calculo nenhum. Durante o congelamento NENHUMA linha [PERF] de NENHUMA thread aparece (nem o watchdog), enquanto o CPU do processo anda 1,67s fora do Python. Nao e o solver, nao e a instrumentacao (0,285ms/marco medido) e nao e callback perdido. Nao consegui provar que o congelamento e limitado.",
+    "GATE 3 NAO VERIFICADO NO REVIT: o bench offline NAO reproduz o falso positivo do auditor (0 paredes reprovadas com a logica antiga E com a nova - o layout reconstruido difere do criado no Revit). A correcao esta provada por teste que codifica a geometria MEDIDA, mas 'vermelho falso eliminado' so fecha com nova execucao no Revit.",
+    "Regressao consolidada NAO concluida nesta sessao (as suites longas foram interrompidas de proposito, para nao contaminar o arquivo de rastreamento usado pela medicao no Revit).",
+    "CI nao avaliado nesta sessao."
   ],
   "physical_deltas": [
-    "Nenhum. Nenhuma regra fisica, tolerancia ou geometria esperada foi alterada; a bancada continua 2 paredes, 0 aberturas, 17 fiadas e 187 blocos esperados.",
-    "Estado do modelo apos a execucao instrumentada: 0 FamilyInstance de bloco criada (as 52 existentes sao carimbos/legendas). A Etapa 5 nunca chegou a rodar.",
-    "Entrada real x artefato offline: CONGRUENTES (69.0024/354.0007cm, espessura 14cm, altura 340cm, sobreposicao do L 6.9959cm). Sem erro de unidade e sem Z incorreto: a cota de criacao segue o NIVEL por regra (secao 8a).",
-    "Grafo: 3 nos, 1 L_CORNER, 2 FREE_END, 2 candidatos, 0 falhas, sem residuo das 126 paredes / 77 aberturas."
+    "187 FamilyInstances de bloco criadas e medidas no Revit: 34 B34 + 136 B39 + 17 B19, em 17 fiadas de 11 pecas, Z de -1105,2cm a -785,2cm com passo 20cm, rotacoes 0 / 1,5708 / 4,7124 rad. 0 falhas, 0 colisoes, 0 violacoes de vao, 0 trechos nao modulares.",
+    "22 candidatos do par A/B NAO sao instancias finais: 22 candidatos -> 11 pecas por fiada fisica -> 17 fiadas -> 187 instancias.",
+    "Encontro em L medido e CORRETO: fiadas pares a parede LONGA vira o canto com B34; fiadas impares a CURTA vira (rot 4,7124).",
+    "Amarracao medida e CORRETA: parede longa com juntas defasadas 20cm entre fiadas adjacentes e 19,05cm de sobreposicao; parede curta com 15cm de defasagem. Nenhuma junta corrida, nenhuma quebra de prisma.",
+    "Recriacao: a segunda criacao substituiu o lote (187 criados, 0 falhas, 0,634s) e o total no documento permaneceu 187 - sem duplicata.",
+    "Nenhuma regra fisica alterada. A logica vertical continua intacta (regra 8a)."
   ],
   "decisions_taken": [
-    "CAUSA-RAIZ FECHADA e nao e lentidao: a acao 'create' era PERDIDA. _execute_solve chama on_done('solve') de dentro de Execute(); o callback _on_solve_done encadeia _on_create_click -> _raise_action('create'), que define handler.action='create' e Raise(); o `finally` de Execute() apagava essa acao; o despacho seguinte entrava com action=None, nao casava com nenhum ramo, nao chamava on_done e voltava em silencio.",
-    "Latencia do ExternalEvent MEDIDA e descartada: 47ms entre 'ui.external_event.Raise CHAMADO' (+0.126s) e 'Execute ENTROU action=analyze' (+0.173s). No encadeamento solve->create foram 12ms (+6.561s -> +6.573s).",
-    "Solver descartado como CAUSA DE CALCULO: analyze 0.065s, solve 0.255s e 0.136s na execucao 1, e 0.181s na reproducao dentro do Revit. Isso nao o isenta do relogio de parede - ver o stall da execucao 2 nas falhas conhecidas.",
-    "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco (o symbol vem do catalogo pronto), Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
-    "O benchmark offline de 0.1-1.1s exercita _execute_solve; o botao dispara analyze e depois encadeia create. Os numeros nunca foram comparaveis.",
-    "ORIGEM VERTICAL DA MODULACAO (decisao do usuario, 2026-09-09): o que eu havia classificado como bug de WALL_BASE_OFFSET NAO e bug - e o funcionamento desejado. Os blocos nascem a partir do NIVEL de referencia; o offset de base de uma Wall existente e arbitrario e nao pode redefinir a cota inicial da modulacao. Nesta bancada sao as Walls que estao deslocadas. A logica de Z foi PRESERVADA sem nenhuma alteracao, o achado foi retirado da lista de bugs/CRs e a regra ficou registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8a.",
-    "CONFLITO REGISTRADO, nao apagado: a secao 15.3 das regras (peitoril/verga, 2026-08-28) afirma o contrario para paredes com offset de base. A secao 8a prevalece (orientacao mais recente); o caso peitoril/verga ficou como pendencia de decisao do usuario, com aviso no proprio 15.3.",
-    "docs/checkpoints/2026-09-09-beta-main-safe.md reclassificado para 'historical' porque o HEAD avancou; nenhuma afirmacao, numero ou decisao dele foi alterada."
+    "BUG 1 provado por log e corrigido: 'Execute ENTROU action=solve' -> 'Execute SAIU action=create' -> 'Execute ENTROU action=None'. Nao era lentidao; era acao perdida. Depois da correcao o log mostra 'Execute SAIU action=solve pendente=create' e a criacao acontece.",
+    "BUG 2 provado por MCP ANTES de tocar no codigo, conforme exigido: a modulacao esta fisicamente correta e o auditor e que errava. Corrigido SOMENTE o auditor.",
+    "O auditor NAO foi silenciado: o padrao de mesma paridade continua enxergado e reportado em `alternating_strips` como dado, sem penalidade - mesmo tratamento ja dado a `alternating_joints`. Nenhum threshold afrouxado.",
+    "ACHADO Z reclassificado como comportamento esperado por decisao do usuario; nenhum CR de Z aberto e nenhuma linha de codigo vertical alterada.",
+    "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco, Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
+    "Retorno para a UI PROVADO SAUDAVEL: worker TERMINOU -> BeginInvoke aceito -> ui._finish -> ui._on_analyze_done em 28ms. O `ui._finish` ausente na execucao 2 foi consequencia de o usuario ter fechado a janela congelada (BeginInvoke em Form descartado lanca) - nao um segundo defeito.",
+    "NAO MERGEAR: gates 3, 5, 8, 10 e 12 nao fechados, e o gate 15 (Tela 1 podendo ficar infinita) nao pode ser descartado sem a causa-raiz do congelamento."
   ],
   "decisions_pending": [
-    "Decidir o caso peitoril/verga da secao 15.3 das regras: aplicar a 8a literalmente (pecas de verga nascem a partir do nivel) ou tratar esse cenario como excecao com agrupamento por (altura, offset_de_base). Nao implementar o agrupamento sem essa resposta.",
-    "Decidir o destino da reprovacao REPEATED_VERTICAL_COMPENSATOR_STRIP desta bancada - decisao de dominio, nao de codigo.",
-    "Decidir se a janela 'Preparando o solver...'/'Preparando a criacao dos blocos...' passa a ter ponto de cancelamento: hoje o botao Cancelar so tem efeito a partir do laco por parede.",
-    "Avaliar se um Execute() que recebe uma acao desconhecida/None deve avisar em vez de voltar em silencio - foi o silencio que escondeu este defeito por duas execucoes inteiras.",
-    "Concluir a suite consolidada depois da medicao no Revit."
+    "Fechar a causa-raiz do congelamento do interpretador. Proximo passo tecnico: amostrar sys._current_frames() de um thread dedicado durante o congelamento para identificar quem retem a GIL. Hipotese principal, NAO PROVADA: a GIL do pythonnet permanece retida pela thread principal do Revit ao retornar de IExternalEventHandler.Execute enquanto o Revit executa trabalho proprio.",
+    "Reexecutar no Revit com o pacote 2d8d0b1 para fechar o gate 3 (vermelho falso eliminado na pratica).",
+    "Concluir a regressao consolidada e avaliar o CI antes de qualquer merge.",
+    "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a)."
   ],
   "next_steps": [
-    "Rodar o botao TESTE-PERF (head 07f43f2) uma vez, nas mesmas 2 Walls. As sondas finas devem dizer, sozinhas, se o stall e espera (cpu parado) ou trabalho, e se DoEvents/watchdog participam.",
-    "Ler o perf_diag.log da nova execucao e anexar como evidencia versionada.",
-    "Nao mesclar na main: esta entrega cobre um defeito de integracao corrigido e UMA pendencia fisica em aberto (REPEATED_VERTICAL_COMPENSATOR_STRIP)."
+    "Uma execucao do botao TESTE-PERF (head 2d8d0b1) nas mesmas 2 Walls, confirmando que nenhuma peca recebe vermelho.",
+    "Amostragem de frames durante o congelamento para fechar o BUG 3.",
+    "Regressao consolidada no HEAD final e leitura do CI.",
+    "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem."
   ],
   "references": [
+    {"path": "docs/checkpoints/evidence/2026-09-09-beta-fechamento-mcp.json"},
     {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log"},
     {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run2-stall-analyze.log"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run3-fluxo-completo.log"},
     {"path": "docs/checkpoints/evidence/2026-09-09-preparing-solver-measurements.json"},
-    {"path": "docs/checkpoints/evidence/main-safe-engineering-input.json"},
-    {"path": "docs/checkpoints/evidence/main-safe-handler-bench-run.json"},
+    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
     {"path": "nuvem/core/engine/perf_trace.py"},
     {"path": "nuvem/core/wall_modeling.py"},
-    {"path": "nuvem/core/engine/wall_stepper.py"},
+    {"path": "tests/test_bond_strip_adjacent_courses.py"},
     {"path": "tests/test_script.py"},
-    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
     {"path": "docs/checkpoints/2026-09-09-beta-main-safe.md"}
   ]
 }
 ```
 
-## A prova
-
-[Log da execucao instrumentada](evidence/2026-09-09-perf-diag-run1-etapa5.log),
-sha256 `211e146c3c3b938c127ea0d1853cb37aab7acce2873961892eb1fe01940abf32`:
+## Bug real 1 - acao `create` perdida pelo `finally` (CORRIGIDO)
 
 ```
 +6.298s Execute ENTROU action=solve
-+6.560s _execute_solve END dt=0.255s
 +6.561s Execute SAIU   action=create    <- o callback agendou "create"
 +6.573s Execute ENTROU action=None      <- e o finally ja' tinha apagado
-+6.575s Execute SAIU   action=None
 ```
 
-A mesma sequencia se repete em `+147.977s`, quando o usuario tentou de
-novo. Duas tentativas, zero bloco criado, nenhum erro na tela.
+`_execute_solve` chama `on_done("solve")` de dentro de `Execute()`; o
+callback encadeia `_raise_action("create")`. O `finally` apagava a acao. O
+despacho seguinte nao casava com nenhum ramo, nao chamava `on_done` e
+voltava em silencio - a Etapa 5 ficava para sempre em "criando as
+instancias de bloco no Revit...", com zero bloco criado e zero erro.
 
-## O mecanismo
+Correcao: consumir a acao no inicio e despachar por copia local. Depois
+dela, o log da execucao 3 mostra `Execute SAIU action=solve pendente=create`
+e a criacao acontece.
 
-```
-Execute(action="solve")                       (thread principal do Revit)
-  _execute_solve()
-    on_done("solve", None)
-      -> _PostCreationForm._on_solve_done
-           -> _on_create_click            (log "Etapa 5: criando as instancias...")
-                -> _raise_action("create")
-                     handler.action = "create"    <-- DENTRO de Execute()
-                     external_event.Raise()       <-- fica na fila
-  finally: self.action = None                     <-- APAGA a acao agendada
-Execute(action=None)                              <-- nenhum ramo casa
-  (nao chama on_done; a UI espera para sempre)
-```
+## Achado Z - NAO E BUG
 
-O docstring de `_raise_action` afirma que `Raise()` "roda no thread da UI,
-FORA do `Execute()` do ExternalEvent". Isso deixou de ser verdade em
-2026-08-27, quando o encadeamento automatico solve -> create foi
-introduzido a pedido do usuario ("os blocos precisam ser fisicamente
-inseridos no modelo"). O defeito nasceu ali e ficou invisivel porque um
-`Execute()` sem ramo correspondente volta em silencio.
-
-## A correcao
-
-Consumir a acao no inicio de `Execute()` e despachar por copia local:
-
-```python
-action = self.action
-self.action = None      # a acao que um callback agendar agora sobrevive
-try:
-    if action == "analyze": ...
-```
-
-Uma linha de comportamento. Nenhuma regra fisica tocada.
-
-## Tempos medidos na execucao real (dentro do Revit)
-
-| Etapa | Tempo |
-| --- | --- |
-| Latencia do ExternalEvent (Raise -> Execute) | 0,047 s |
-| `refresh_geometry_from_document` | 0,062 s |
-| `analyze_created_walls_for_errors` | 0,065 s |
-| `_execute_solve` | 0,255 s / 0,136 s |
-| Latencia do Raise encadeado (solve -> create) | 0,012 s |
-| **Etapa 5 (criacao)** | **nunca executou** |
-
-## O laco de criacao esta limpo
-
-Auditado item a item, conforme pedido:
-
-- **`Regenerate()` por bloco:** nao existe. Ha um unico `Regenerate()`,
-  dentro da transacao de `Activate()`, fora do laco.
-- **Busca de familia/tipo ou varredura global por bloco:** nao existe. O
-  `FamilySymbol` vem de `catalog[cand["logical_code"]]["symbol"]`, montado
-  uma vez.
-- **`Activate()`:** uma vez por codigo usado, antes do laco.
-- **Espera/lock:** nenhuma. O unico ponto de espera do caminho e o proprio
-  ExternalEvent - que era exatamente onde a acao se perdia.
-- **Excecao engolida:** nao havia excecao. Havia um despacho sem ramo
-  correspondente, que e' pior: nem sucesso, nem erro, nem log.
-
-## Execucao 2 (18:18): a correcao funcionou, e um defeito NOVO apareceu
-
-[Log da execucao 2](evidence/2026-09-09-perf-diag-run2-stall-analyze.log).
-O pacote usado ja era o corrigido (o campo `pendente=` so existe nele), e
-`Execute SAIU action=analyze pendente=None` confirma que nenhuma acao se
-perdeu. Mas:
-
-```
-+  0.030s analyze_created_walls_for_errors START
-+ 97.368s process_walls_one_by_one START        <- 97,3s de nada
-+ 98.049s solve_all_intersections END dt=0.680s
-+100.212s solve_all_intersections RESULTADO     <- 2,16s entre marcos vizinhos
-+100.234s analyze_created_walls_for_errors END dt=100.204s
-```
-
-Entre os dois primeiros marcos existem exatamente tres instrucoes: um `if`
-falso, `plan_failures = {}` e um `def`. **Nao ha calculo possivel ali.** E
-nao e a instrumentacao: `mark()` custa 0,285ms na mediana e 0,508ms no pior
-caso de 300 chamadas medidas.
-
-O `ui._finish` nunca apareceu porque o usuario fechou a janela travada -
-`BeginInvoke` num Form ja descartado lanca, e a excecao era engolida sem
-deixar rastro. Isso agora e marcado (`ui_invoke.FALHOU`).
-
-**Isto corrige uma conclusao minha anterior.** Eu havia descartado o analyze
-com base nas execucoes em que ele nao travou. Ele trava, de forma
-intermitente, e e' o sintoma original ("Preparando o solver..." por
-minutos) finalmente capturado com timestamp.
-
-## Origem vertical e pendencia fisica
-
-### Origem vertical: decisao registrada, nao e defeito
-
-Eu havia classificado como bug o fato de `base_z_abs` vir de
-`selected_level.Elevation` sem somar `WALL_BASE_OFFSET`. **Estava errado.**
-O usuario esclareceu em 2026-09-09 que esse e' o funcionamento desejado: os
-blocos devem nascer a partir do **nivel de referencia**, e o offset de base
-de uma Wall existente e' arbitrario - deixar a modulacao segui-lo
-propagaria o erro do modelo para dentro da regra.
-
-Nesta bancada, o nivel `pb` esta em -1106,16cm e as Walls tem
-`WALL_BASE_OFFSET` de +1718,164cm: sao **as paredes** que estao "voando"
-em relacao a' planta. Os blocos nascem colados ao nivel, que e' a posicao
-**correta**. Os 1718,164cm ate' a base das Walls medem o desvio das
-paredes, nao um erro da modulacao.
-
-**Nenhuma linha da logica de Z foi alterada.** A regra ficou registrada em
+Decisao do usuario: os blocos nascem a partir do **nivel de referencia**;
+`WALL_BASE_OFFSET` de uma Wall existente e' arbitrario e nao redefine a
+origem vertical da modulacao. Nesta bancada sao as **Walls** que estao
+deslocadas. **Nenhuma linha de codigo alterada.** Regra em
 [REGRAS_MODULACAO_BLOCOS.md](../../nuvem/REGRAS_MODULACAO_BLOCOS.md),
-secao 8a, com o conflito contra a secao 15.3 (peitoril/verga, 2026-08-28)
-anotado no proprio 15.3 em vez de apagado - a 8a prevalece, e o caso
-peitoril/verga ficou como pendencia de decisao do usuario.
+secao 8a; conflito com a secao 15.3 registrado la', nao apagado.
 
-### REPEATED_VERTICAL_COMPENSATOR_STRIP
+## Bug real 2 - falso positivo do auditor (CORRIGIDO, provado por MCP)
 
-O solve desta bancada reprovou 1 parede na auditoria de amarracao entre
-fiadas. Por decisao registrada em 2026-08-26, isso nao bloqueia a criacao -
-as pecas saem marcadas em vermelho para revisao. **O auditor nao foi
-tocado, nem seu resultado suprimido.** Continua sendo reprovacao fisica em
-aberto, a ser decidida no dominio.
+Medicao dos 187 blocos REAIS criados:
 
-## Limitacoes
+| | parede CURTA (69cm) | parede LONGA (354cm) |
+| --- | --- | --- |
+| fiada par (A) | `B19[t 0..19]` `B34[t 20..54]` | `B34[1910,7..1944,7]` + 8x B39 |
+| fiada impar (B) | `B34[t 0..34]` `B34[t 35..69]` | `B39[1925,7..1964,7]` ... |
+| junta par | t~19,5 | x~1945,2 |
+| junta impar | t~34,5 | x~1965,2 |
+| **defasagem** | **15 cm** | **20 cm** |
 
-A correcao esta provada por teste de regressao offline (falha antes, passa
-depois) mas **ainda nao foi exercitada no Revit**. Tempo de criacao,
-quantidade criada e repetibilidade do beta continuam sem medicao ate a
-proxima execucao.
+Sobreposicao horizontal medida na parede longa: **19,05 cm**. Encontro em
+L: fiadas pares a LONGA vira o canto, impares a CURTA (rot 4,7124) -
+alternancia classica. Nenhuma junta corrida, nenhuma quebra de prisma.
 
-A unica pendencia fisica em aberto desta bancada e a reprovacao
-`REPEATED_VERTICAL_COMPENSATOR_STRIP`. A cota Z **nao** e pendencia: e
-comportamento decidido (secao 8a das regras).
+**Causa-raiz**: o detector contava `len(courses)` sem exigir ADJACENCIA.
+Como o solver resolve **um** par A/B e o repete em toda fiada par e toda
+impar, qualquer peca especial da fiada A aparece por construcao em 100%
+das pares (9/17 = 0,53 >= `BOND_STRIP_RATIO`). E' a mesma causa-raiz ja
+corrigida para `ALTERNATING_JOINT_PATTERN`. Agravante: o cluster e' formado
+pelo **centro** da peca, e o centro do B34 impar (t=52) cai dentro de
+`BOND_STRIP_EDGE_EXEMPT_CM = 25` - por isso a peca impar que de fato cobre
+t~37 nao entrava no cluster.
+
+**Correcao**: `_longest_adjacent_course_run` + `BOND_STRIP_MIN_ADJACENT_COURSES = 2`.
+Repeticao so' na mesma paridade da corrida 1 e sai em `alternating_strips`
+(dado, sem penalidade). Empilhamento adjacente continua reprovando.
+
+## Bug real 3 - congelamento da Tela 1 (NAO FECHADO - BLOQUEADOR)
+
+```
++ 0.060s cpu=0.062s  analyze.trecho: plan_failures criado
++19.648s cpu=1.734s  analyze.trecho: plan_hook definido
+```
+
+19,59 s para executar um `def`. Entre as duas sondas ha' exatamente tres
+instrucoes: um `if` falso, um dict vazio e um `def`.
+
+**Durante os 19,59 s nenhuma linha [PERF] de nenhuma thread do processo do
+Revit aparece** - nem o watchdog (`System.Threading.Timer`, dispara a cada
+3 s apos 8 s parado), nem a thread de UI, nem o worker. O interpretador
+CPython inteiro ficou congelado, enquanto o CPU do **processo** andou
+1,67 s fora do Python. Na execucao 2 a mesma fronteira congelou 100,2 s.
+
+Descartados por medicao: solver, instrumentacao (0,285 ms/marco), callback
+perdido. O retorno para a UI e' **saudavel**: `worker TERMINOU` ->
+`BeginInvoke aceito` -> `ui._finish` -> `ui._on_analyze_done` em 28 ms.
+
+Hipotese principal, **nao provada**: a GIL do pythonnet permanece retida
+pela thread principal do Revit ao retornar de
+`IExternalEventHandler.Execute`, enquanto o Revit executa trabalho proprio.
+Enquanto o interpretador esta congelado, **nenhuma mitigacao em Python
+funciona** - watchdog, barra, log e checagem de Cancelar sao todos Python.
+
+## Contagem, geometria e recriacao
+
+187 instancias (34 B34 + 136 B39 + 17 B19), 17 fiadas x 11 pecas, Z de
+-1105,2 a -785,2 cm com passo 20 cm. Criacao em 1,667 s (laco 0,738 s,
+commit 0,560 s, 187 `NewFamilyInstance`, 34 rotacoes, 0 espelhamentos).
+Recriacao em 0,634 s, 187 criados, total no documento permanece **187** -
+substituicao correta, sem duplicata.
+
+## Veredito
+
+**O primeiro beta NAO esta PASS.** Dois defeitos reais foram corrigidos e
+provados; o terceiro esta aberto e e' bloqueador. Merge nao executado.

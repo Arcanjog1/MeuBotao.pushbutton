@@ -211,34 +211,40 @@ casos. Logs devem registrar entrada, configuracao, versao carregada,
 geometria, chave fisica e resultado para gerar regressao offline.
 Procedimento especifico: [runbook main-safe](BETA_MAIN_SAFE_RUNBOOK.md).
 
-## Diagnostico do beta no Revit: Etapa 5 travada
+## Primeiro beta no Revit: 2 bugs corrigidos, 1 bloqueador aberto
 
-Causa-raiz FECHADA e nao era lentidao: a acao "create" do ExternalEvent era
-PERDIDA. `_execute_solve` chama `on_done("solve")` de dentro de `Execute()`,
-o callback encadeia `_raise_action("create")`, e o `finally` de `Execute()`
-apagava a acao recem-agendada - o despacho seguinte entrava com
-`action=None` e voltava em silencio. Duas tentativas, zero bloco criado,
-nenhum erro na tela. Prova, mecanismo, tempos e correcao:
-[checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md)
-e [log da execucao](checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log).
+Bancada de 2 Walls / 1 encontro em L / 0 aberturas. Detalhe, medicoes e
+gates: [checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md)
+e [evidencia MCP](checkpoints/evidence/2026-09-09-beta-fechamento-mcp.json).
 
-Correcao minima: consumir a acao no inicio de `Execute()` e despachar por
-copia local. Dois testes de regressao falham antes e passam depois.
-Nenhuma regra fisica alterada; nenhum auditor silenciado.
+**Bug real 1 - CORRIGIDO**: a acao `create` do ExternalEvent era apagada
+pelo `finally` de `Execute()` quando um callback a agendava de dentro do
+proprio `Execute()`. A Etapa 5 ficava para sempre em "criando as instancias
+de bloco", com zero bloco e zero erro. Corrigido consumindo a acao no
+inicio e despachando por copia local; dois testes de regressao.
 
-ORIGEM VERTICAL - DECISAO DO USUARIO (2026-09-09): o que eu havia
-classificado como bug de `WALL_BASE_OFFSET` NAO e bug. Os blocos nascem a
-partir do NIVEL de referencia; o offset de base de uma Wall existente e
-arbitrario e nao redefine a cota inicial da modulacao - nesta bancada sao
-as Walls que estao deslocadas. A logica de Z foi preservada sem nenhuma
-alteracao e a regra ficou registrada em
-[REGRAS_MODULACAO_BLOCOS.md](../nuvem/REGRAS_MODULACAO_BLOCOS.md), secao 8a,
-com o conflito contra a secao 15.3 anotado la, nao apagado.
+**Achado Z - NAO E BUG**: decisao do usuario, os blocos nascem a partir do
+nivel de referencia e `WALL_BASE_OFFSET` nao redefine a origem vertical.
+Nenhuma linha alterada; regra em
+[REGRAS_MODULACAO_BLOCOS.md](../nuvem/REGRAS_MODULACAO_BLOCOS.md) secao 8a.
 
-UMA PENDENCIA FISICA EM ABERTO: a reprovacao
-`REPEATED_VERTICAL_COMPENSATOR_STRIP` desta bancada.
+**Bug real 2 - CORRIGIDO**: `REPEATED_VERTICAL_COMPENSATOR_STRIP` era falso
+positivo. Provado por MCP nos 187 blocos reais (juntas defasadas 15cm e
+20cm entre fiadas adjacentes, 19,05cm de sobreposicao, encontro em L com
+alternancia correta). Faixa vertical passa a exigir fiadas ADJACENTES
+(regra 8d). O auditor nao foi silenciado: o padrao de mesma paridade
+continua reportado como dado em `alternating_strips`.
 
-Estado candidato, nao oficial - nao mesclar.
+**Bug real 3 - ABERTO, BLOQUEADOR**: o interpretador CPython dentro do
+Revit congela (19,6s e 100,2s medidos) numa fronteira sem calculo nenhum;
+nenhuma thread Python roda durante o congelamento. Causa-raiz nao fechada.
+
+Criacao real medida: **187 instancias** (34 B34 + 136 B39 + 17 B19), 17
+fiadas x 11, 0 falhas, 0 colisoes; recriacao substitui o lote sem
+duplicata.
+
+**MERGE NAO EXECUTADO** - gates 3, 5, 8, 10 e 12 nao fechados. Estado
+candidato, nao oficial.
 
 ## Governanca e recuperacao
 
