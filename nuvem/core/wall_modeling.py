@@ -4567,8 +4567,25 @@ def _new_create_perf():
     }
 
 
+def _require_beta_transaction_status(transaction, returned, expected):
+    from Autodesk.Revit.DB import TransactionStatus
+    wanted = getattr(TransactionStatus, expected)
+    if returned != wanted or transaction.GetStatus() != wanted:
+        raise RuntimeError("BETA BLOQUEADO: transacao nao confirmou {} (retorno {}, estado {}).".format(
+            expected, returned, transaction.GetStatus()))
+
+
+def _rollback_beta_transaction(transaction):
+    from Autodesk.Revit.DB import TransactionStatus
+    status = transaction.GetStatus()
+    if status == TransactionStatus.Started:
+        _require_beta_transaction_status(transaction, transaction.RollBack(), "RolledBack")
+    elif status not in (TransactionStatus.RolledBack, TransactionStatus.Uninitialized):
+        raise RuntimeError("BETA BLOQUEADO: rollback nao confirmado; estado {}.".format(status))
+
+
 def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected_level, num_courses,
-                           course_candidates=None, progress_cb=None, stage_cb=None):
+                           course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False):
     """Ponto de entrada da Etapa 5: cria no Revit, dentro de um unico
     TransactionGroup, as FamilyInstance correspondentes a `candidates` (ver
     solve_building_blocks), repetidas em `num_courses` FIADAS FISICAS
@@ -4683,8 +4700,10 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
             pass
 
     group = TransactionGroup(target_doc, "Etapa 5 - Cria blocos estruturais")
-    group.Start()
+    status = group.Start()
     try:
+        if strict_transactions:
+            _require_beta_transaction_status(group, status, "Started")
         # Ativacao dos FamilySymbol: precisa de transacao propria porque a
         # API exige um Regenerate() depois de Activate() e antes do
         # primeiro NewFamilyInstance daquele tipo - feito UMA VEZ aqui,
@@ -4696,8 +4715,10 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         # Commit) - mesmo motivo/teste via MCP de load_fixed_block_catalog.
         t_activate_start = clock()
         t_activate = Transaction(target_doc, "Ativa tipos de bloco")
-        t_activate.Start()
+        status = t_activate.Start()
         try:
+            if strict_transactions:
+                _require_beta_transaction_status(t_activate, status, "Started")
             for code in used_codes:
                 entry = catalog.get(code)
                 if entry is None:
@@ -4706,15 +4727,22 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 if not symbol.IsActive:
                     symbol.Activate()
             target_doc.Regenerate()
-            t_activate.Commit()
+            status = t_activate.Commit()
+            if strict_transactions:
+                _require_beta_transaction_status(t_activate, status, "Committed")
         except Exception:
-            t_activate.RollBack()
+            if strict_transactions:
+                _rollback_beta_transaction(t_activate)
+            else:
+                t_activate.RollBack()
             raise
         perf["activate_s"] = clock() - t_activate_start
 
         t_create = Transaction(target_doc, "Cria instancias de bloco")
-        t_create.Start()
+        status = t_create.Start()
         try:
+            if strict_transactions:
+                _require_beta_transaction_status(t_create, status, "Started")
             t_loop_start = clock()
             done = 0
             # BUG REAL #2 medido ao vivo (2026-08-21, mesmo teste que achou o
@@ -4842,16 +4870,26 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 except Exception:
                     pass
             t_commit_start = clock()
-            t_create.Commit()
+            status = t_create.Commit()
+            if strict_transactions:
+                _require_beta_transaction_status(t_create, status, "Committed")
             perf["commit_s"] = clock() - t_commit_start
         except Exception:
-            t_create.RollBack()
+            if strict_transactions:
+                _rollback_beta_transaction(t_create)
+            else:
+                t_create.RollBack()
             raise
         t_assimilate_start = clock()
-        group.Assimilate()
+        status = group.Assimilate()
+        if strict_transactions:
+            _require_beta_transaction_status(group, status, "Committed")
         perf["assimilate_s"] = clock() - t_assimilate_start
     except Exception:
-        group.RollBack()
+        if strict_transactions:
+            _rollback_beta_transaction(group)
+        else:
+            group.RollBack()
         raise
 
     perf["instances"] = created_count
@@ -9922,6 +9960,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # clique, e o dicionario de globais de uma execucao anterior nao
         # sobrevive.
         self._Transaction = Transaction
+        self._TransactionGroup = TransactionGroup
+        self.beta_transaction_error = None
         self._analyze_created_walls_for_errors = analyze_created_walls_for_errors
         self._fix_all_wall_modulation_errors = fix_all_wall_modulation_errors
         self._solve_building_blocks = solve_building_blocks
@@ -10372,6 +10412,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
     def _execute_create(self, app_doc):
         if self.controlled_beta:
+            if self.beta_transaction_error:
+                raise RuntimeError(self.beta_transaction_error)
             preflight = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             if self.solve_result is not None:
@@ -10381,6 +10423,42 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                  "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
                                      len(preflight["opening_violations"]), len(preflight["collisions"]),
                                      "; ".join(preflight["errors"])))
+            # One outer group restores even the committed cleanup transaction.
+            previous_result = self.create_result
+            replacement = self._TransactionGroup(app_doc, "Beta - substitui lote completo de blocos")
+            replacement.IsFailureHandlingForcedModal = True
+            try:
+                _require_beta_transaction_status(replacement, replacement.Start(), "Started")
+                self._execute_create_batch(app_doc)
+                result = self.create_result or {}
+                expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
+                            for c in source]
+                instances = result.get("created_instances") or []
+                actual = [(item.get("course_index"), item.get("candidate_key")) for item in instances]
+                if (result.get("failures") or sorted(actual) != sorted(expected)
+                        or result.get("created_count") != len(expected)
+                        or len(set(item["id"] for item in instances)) != len(expected)
+                        or any(app_doc.GetElement(item["id"]) is None for item in instances)):
+                    raise RuntimeError("BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas. {}".format(
+                        "; ".join(str(f) for f in result.get("failures", []))))
+                _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
+            except Exception:
+                self.create_result = previous_result
+                try:
+                    _rollback_beta_transaction(replacement)
+                except Exception as rollback_error:
+                    self.beta_transaction_error = (
+                        "BETA BLOQUEADO: restauracao do lote nao confirmada. Interrompa o beta e "
+                        "revise o documento antes de continuar: {}".format(rollback_error))
+                    raise RuntimeError(self.beta_transaction_error)
+                raise
+        else:
+            self._execute_create_batch(app_doc)
+        self._save_modulation_state_cache()
+        if self.on_done:
+            self.on_done("create", None)
+
+    def _execute_create_batch(self, app_doc):
         # IDEMPOTENCIA / INTEGRIDADE DO CONJUNTO (bug real corrigido
         # 2026-08-25, reportado pelo usuario com imagem: parte da parede
         # "andou" e parte ficou na posicao antiga apos recalcular).
@@ -10402,8 +10480,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # amarracoes formam um UNICO conjunto que tem que ser recalculado e
         # reposicionado JUNTO, sempre). Apagando o lote anterior por
         # completo ANTES de criar o novo, cada clique em "criar" passa a
-        # ser uma SUBSTITUICAO atomica (nunca uma soma) - o modelo nunca
-        # mistura pecas de dois calculos diferentes.
+        # ser uma SUBSTITUICAO (nunca uma soma). No beta, o grupo externo
+        # tambem restaura o lote anterior se a nova criacao falhar.
 
         # PERFIL DE TEMPO do "criar" INTEIRO (rotulo, segundos, detalhe) -
         # mesmo formato do `perf_stats` da Etapa 1. create_building_blocks
@@ -10427,8 +10505,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
             _stage("apagando o lote anterior de {} bloco(s)".format(len(previous_instances)))
             t_delete_start = _perf_clock()
             t_cleanup = self._Transaction(app_doc, "Remove lote anterior de blocos (recalculo)")
-            t_cleanup.Start()
+            status = t_cleanup.Start()
             try:
+                if self.controlled_beta:
+                    _require_beta_transaction_status(t_cleanup, status, "Started")
                 # EXCLUSAO EM LOTE - a UNICA otimizacao que a medicao desta
                 # etapa aprovou (feita ao vivo via MCP em 2026-08-28, com a
                 # instrumentacao que este mesmo arquivo passou a expor).
@@ -10454,11 +10534,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
                         if app_doc.GetElement(item["id"]) is not None:
                             stale_ids.Add(item["id"])
                     except Exception:
+                        if self.controlled_beta:
+                            raise
                         pass  # peca ja' apagada/invalida - nunca trava a recriacao
                 if len(stale_ids):
                     try:
                         app_doc.Delete(stale_ids)
                     except Exception:
+                        if self.controlled_beta:
+                            raise
                         # Rede de seguranca: se o Revit recusar a colecao
                         # inteira (uma peca que a sondagem aprovou mas o
                         # Delete rejeita), volta ao caminho antigo. Apagar
@@ -10471,9 +10555,20 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                 app_doc.Delete(stale_id)
                             except Exception:
                                 pass
-                t_cleanup.Commit()
+                status = t_cleanup.Commit()
+                if self.controlled_beta:
+                    _require_beta_transaction_status(t_cleanup, status, "Committed")
+                    if any(app_doc.GetElement(eid) is not None for eid in stale_ids):
+                        raise RuntimeError("BETA BLOQUEADO: lote anterior nao removido integralmente.")
             except Exception:
-                t_cleanup.RollBack()
+                if self.controlled_beta:
+                    # A committed cleanup is undone by the outer group.
+                    from Autodesk.Revit.DB import TransactionStatus
+                    if t_cleanup.GetStatus() != TransactionStatus.Committed:
+                        _rollback_beta_transaction(t_cleanup)
+                    raise
+                else:
+                    t_cleanup.RollBack()
             perf_steps.append((
                 "Exclusao do lote anterior (sondagem + Delete em lote)",
                 _perf_clock() - t_delete_start,
@@ -10509,10 +10604,12 @@ class _PostCreationEventHandler(IExternalEventHandler):
             reproved_wall_idxs = {wi for wi, audit in wall_bond_audits.items() if not audit["ok"]}
 
             t_create_start = _perf_clock()
+            create_options = {"strict_transactions": True} if self.controlled_beta else {}
             self.create_result = self._create_building_blocks(
                 app_doc, candidates, self.catalog, self.base_z_abs,
                 self.selected_level, num_courses, course_candidates=course_candidates,
                 progress_cb=cbs.get("progress_cb"), stage_cb=stage_cb,
+                **create_options
             )
             perf_steps.append((
                 "create_building_blocks (criacao das FamilyInstance)",
@@ -10553,8 +10650,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 _stage("marcando {} peca(s) em vermelho".format(len(highlight_ids)))
                 t_highlight_start = _perf_clock()
                 t_highlight = self._Transaction(app_doc, "Realce vermelho de colisoes/paredes sem modulacao aprovada")
-                t_highlight.Start()
+                status = t_highlight.Start()
                 try:
+                    if self.controlled_beta:
+                        _require_beta_transaction_status(t_highlight, status, "Started")
                     # Vermelho generico (ver _apply_solid_color_override) -
                     # significado DIFERENTE do vermelho de comprimento
                     # quebrado (ver _apply_broken_length_overrides, Tela 1):
@@ -10567,9 +10666,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     self._apply_solid_color_override(
                         app_doc.ActiveView, highlight_ids, self._REVIT_DB_COLOR(255, 0, 0), target_doc=app_doc
                     )
-                    t_highlight.Commit()
+                    status = t_highlight.Commit()
+                    if self.controlled_beta:
+                        _require_beta_transaction_status(t_highlight, status, "Committed")
                 except Exception:
-                    t_highlight.RollBack()
+                    if self.controlled_beta:
+                        _rollback_beta_transaction(t_highlight)
+                        raise
+                    else:
+                        t_highlight.RollBack()
                 perf_steps.append((
                     "Realce vermelho (SetElementOverrides) das pecas suspeitas",
                     _perf_clock() - t_highlight_start,
@@ -10578,9 +10683,6 @@ class _PostCreationEventHandler(IExternalEventHandler):
         if self.create_result is not None:
             _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
             self.create_result["perf_steps"] = perf_steps
-        self._save_modulation_state_cache()
-        if self.on_done:
-            self.on_done("create", None)
 
     def _save_modulation_state_cache(self):
         """Guarda solve_result/create_result em _LAST_MODULATION_STATE,
@@ -10600,6 +10702,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         }
 
     def _execute_delete(self, app_doc):
+        if self.controlled_beta and self.beta_transaction_error:
+            raise RuntimeError(self.beta_transaction_error)
         if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
             raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
         if self.controlled_beta:

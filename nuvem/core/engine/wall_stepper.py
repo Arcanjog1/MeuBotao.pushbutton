@@ -952,12 +952,11 @@ def _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx, exclude_nod
 # so' e' usada quando as DUAS listas sao literalmente as mesmas, o que
 # elimina o risco de `id` reciclado depois de um GC.
 #
-# SEGURO porque nenhum dos campos lidos aqui (`kind`, `arms`,
-# `main_wall_idx`, `incoming_wall_idx`, `neighbor_wall_idx`,
-# `crossing_walls`, `point`) e' escrito em `wall_stepper.py`: todos sao
-# definidos em `wall_pairing.py`, na construcao do grafo, ANTES do solver
-# rodar. O que o solver muta nos nos (`_arm_role_pinned`,
-# `_b19_residual_fill_for_walls`, papel A/B) nao entra nesta varredura.
+# A varredura depende da pertinencia das paredes e da projecao do ponto,
+# nao da ordem dos bracos. A coordenacao A/B pode reordenar `arms`, mas
+# conserva essa pertinencia. Mudancas de topologia/coordenadas devem usar
+# outro grafo ou invalidar o cache. Censos TGD/TP1 de 2026-09-09 com todo
+# lookup forcado a miss reproduziram exatamente a geometria N1f.
 _WALL_JUNCTION_SCAN_CACHE = {}
 _WALL_JUNCTION_SCAN_CACHE_MAX = 4096
 

@@ -7201,3 +7201,30 @@ sao saldos por etapa, nao contagem de identidades adicionadas isoladamente.
 N1c cb70224 ja produz 1196 pares agregados e 782 por fiada; N1e/f chega
 a 1197/784. Nenhum conhecimento de amarracao desta medicao autoriza
 alterar geometria da entrada, remover amarracao ou compensar por score.
+
+### 48.3 Integridade da substituicao e evidencias complementares
+
+**CONTENCAO DO CANDIDATO BETA:** excluir o lote anterior e criar o novo
+devem pertencer ao mesmo grupo transacional externo. Falha de exclusao,
+criacao parcial, instancia ausente, ID duplicado ou commit nao confirmado
+reverte o conjunto; cache e callback de sucesso so recebem o novo resultado
+depois da confirmacao. Conferir retorno E estado das transacoes, sem
+tratar ausencia de excecao como commit bem-sucedido. Falha no proprio
+rollback bloqueia criar/finalizar e exige revisao do documento; nao anunciar
+restauracao quando ela nao foi confirmada. O fluxo diagnostico historico
+fora do pacote beta permanece separado. Testes com dubles nao substituem
+a futura verificacao controlada das familias/transacoes reais no Revit.
+
+**EVIDENCIA OFFLINE, nao aprovacao:** censos completos TGD e TP1 sem
+acertos de cache reproduziram exatamente candidatos, fiadas fisicas,
+pares de colisao e invasoes dos censos N1f anteriores. Cache nao explica
+os deltas fisicos observados. A auditoria de amarracao reconstruida do TP1
+coincidiu integralmente com o resultado bruto: paredes 18 e 40 possuem,
+respectivamente, quatro juntas continuas e duas faixas C09 repetidas.
+Investigar a causalidade e o caso fisico; nao descartar pelo score global.
+
+Recortes explicitamente selecionados e resolvidos novamente podem passar
+no preflight de invasao/colisao e ainda falhar em amarracao/compensadores.
+Passar nessa contencao NAO certifica o recorte nem libera o merge do #31.
+O recorte muda a topologia de fronteira e deve ter validadores executados
+novamente; nao usar apenas o recorte visual de um solve maior como prova.
