@@ -6907,3 +6907,64 @@ dentro de uma abertura — mudança de **posicionamento**, com efeito em toda
 a família de encontros. `DOCUMENTADO — pendência de código aberta`, CR
 própria, com este número na mesa: **168 ocorrências críticas do TP1
 dependem dela**.
+
+---
+
+## 46. `CR-N1f` — DESEMPENHO: a varredura de nós por parede era 41% do
+tempo do solver (2026-09-09, **implementada, equivalência física
+bit-a-bit verificada**)
+
+> Registro de custo, não de regra de modulação. Nenhum valor muda.
+
+### 46.1 O que a CR-N1 e a CR-N1c custaram
+
+A fronteira entre nós vizinhos pôs
+`_wall_junction_indices_nodes_and_ts_ft` no **caminho quente** — ela roda
+a cada `_room_at_t_on_wall`. Medido com cProfile no TGD: **184s de
+`tottime` em 631s (41%)**, 334 224 chamadas, **205 milhões** de
+`set.add` (o `set` era montado por nó só para fazer um `in`).
+
+| TGD, mesmo processo | tempo total | rebuilds | por rebuild |
+|---|---|---|---|
+| base `08495d9` | 99,3s | 22 | 4,51s |
+| CR-N1 | 47,8s | 7 | 6,71s |
+| CR-N1b | 65,0s | 10 | 6,41s |
+| CR-N1c + N1e | 176,4s | 22 | 7,90s |
+| **CR-N1f** | **127,0s** | 22 | **5,70s** |
+
+Os **22 rebuilds** são consequência **física** da amarração restaurada
+(mais paredes com prisma forçado no baseline voltam a ser candidatas ao
+reparo) — é o mesmo número da base, não um custo novo de código.
+
+### 46.2 As três mudanças (todas de custo, nenhuma de valor)
+
+1. o eixo da parede é calculado **uma vez por chamada**, não uma vez por
+   nó;
+2. a pertinência usa **short-circuit** (`_node_touches_wall`) em vez de
+   montar um `set` por nó;
+3. **cache** por IDENTIDADE (`is`) da lista de nós **e** da de paredes —
+   a entrada só é usada quando as duas listas são literalmente as mesmas,
+   o que elimina o risco de `id` reciclado depois de um GC.
+
+**Por que o cache é seguro**: nenhum campo lido pela varredura (`kind`,
+`arms`, `main_wall_idx`, `incoming_wall_idx`, `neighbor_wall_idx`,
+`crossing_walls`, `point`) é escrito em `wall_stepper.py` — todos vêm de
+`wall_pairing.py`, na construção do grafo, **antes** de o solver rodar. O
+que o solver muta nos nós (`_arm_role_pinned`,
+`_b19_residual_fill_for_walls`, papel A/B) não entra nesta varredura.
+
+### 46.3 Equivalência física verificada
+
+| | sem otimização | com otimização |
+|---|---|---|
+| TGD identidades / blocos | 746 / 11 837 | **746 / 11 837** |
+| TP1 identidades / blocos | 811 / 19 647 | **811 / 19 647** |
+
+Conjunto de identidades **idêntico** nos dois projetos, não apenas o
+total. `tests/test_wall_junction_scan_perf.py` trava o contrato: cache
+frio × quente × varredura direta, guarda de identidade da lista,
+`exclude_node_index` aplicado depois do cache sem corrompê-lo, e a lista
+devolvida nunca sendo o objeto guardado.
+
+**Fora do escopo desta CR** (segue valendo a `CR-PERF-1`): re-solve por
+escopo com `dirty_wall_idxs`, que atacaria os 22 rebuilds em si.

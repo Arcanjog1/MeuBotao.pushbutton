@@ -118,7 +118,9 @@ __all__ = [
     "BOND_STRIP_EDGE_EXEMPT_CM", "BOND_STRIP_OPENING_INFLUENCE_CM",
     "MAX_SPECIAL_BOND_PER_TRECHO", "_continuous_segment_layout",
     "NEIGHBOR_NODE_BOND_CLEARANCE_FT", "_neighbor_node_boundary_ft",
-    "_neighbor_node_reach_ft",
+    "_neighbor_node_reach_ft", "_wall_junction_indices_nodes_and_ts_ft",
+    "_node_touches_wall", "_scan_wall_junction_nodes",
+    "_WALL_JUNCTION_SCAN_CACHE",
     "_node_index_of",
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
@@ -940,31 +942,99 @@ def _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx, exclude_nod
     varredura UNICA que `_wall_junction_ts_ft` (so' o `t`) e
     `_corner_bond_blocking_courses` (precisa do no' para saber em QUE
     FIADA ele ocupa a parede) compartilham."""
-    found = []
+    return [(node, t_ft) for _idx, node, t_ft in
+            _wall_junction_indices_nodes_and_ts_ft(
+                walls_to_create, nodes, wall_idx, exclude_node_index)]
+
+
+# Cache da varredura de nos por parede. Chave por IDENTIDADE (`is`) da
+# lista de nos e da lista de paredes - nunca por conteudo -, e a entrada
+# so' e' usada quando as DUAS listas sao literalmente as mesmas, o que
+# elimina o risco de `id` reciclado depois de um GC.
+#
+# SEGURO porque nenhum dos campos lidos aqui (`kind`, `arms`,
+# `main_wall_idx`, `incoming_wall_idx`, `neighbor_wall_idx`,
+# `crossing_walls`, `point`) e' escrito em `wall_stepper.py`: todos sao
+# definidos em `wall_pairing.py`, na construcao do grafo, ANTES do solver
+# rodar. O que o solver muta nos nos (`_arm_role_pinned`,
+# `_b19_residual_fill_for_walls`, papel A/B) nao entra nesta varredura.
+_WALL_JUNCTION_SCAN_CACHE = {}
+_WALL_JUNCTION_SCAN_CACHE_MAX = 4096
+
+
+def _wall_junction_indices_nodes_and_ts_ft(walls_to_create, nodes, wall_idx,
+                                           exclude_node_index=None):
+    """`(indice, no', t_ft)` - a MESMA varredura, devolvendo tambem o
+    indice que o `enumerate` ja' tem em maos.
+
+    Existe por CUSTO, nao por gosto (medido 2026-09-09): quem precisava do
+    indice chamava `_node_index_of`, que varre `nodes` OUTRA VEZ para cada
+    vizinho. Com a CR-N1c isso passou a rodar dentro de
+    `_neighbor_node_boundary_ft`, ou seja, a cada `_room_at_t_on_wall` -
+    o TGD saltou de 65s para 176s. Devolver o indice aqui elimina a
+    segunda varredura sem mudar UM VALOR sequer."""
     if not nodes:
-        return found
+        return []
+    cache_key = (id(nodes), len(nodes), id(walls_to_create), wall_idx)
+    cached = _WALL_JUNCTION_SCAN_CACHE.get(cache_key)
+    if cached is not None and cached[0] is nodes and cached[1] is walls_to_create:
+        todos = cached[2]
+    else:
+        todos = _scan_wall_junction_nodes(walls_to_create, nodes, wall_idx)
+        if len(_WALL_JUNCTION_SCAN_CACHE) >= _WALL_JUNCTION_SCAN_CACHE_MAX:
+            _WALL_JUNCTION_SCAN_CACHE.clear()
+        _WALL_JUNCTION_SCAN_CACHE[cache_key] = (nodes, walls_to_create, todos)
+    if exclude_node_index is None:
+        return list(todos)
+    return [entry for entry in todos if entry[0] != exclude_node_index]
+
+
+def _scan_wall_junction_nodes(walls_to_create, nodes, wall_idx):
+    """A varredura de verdade (sem cache, sem exclusao) - ver
+    `_wall_junction_indices_nodes_and_ts_ft`."""
+    found = []
+    # Eixo calculado UMA VEZ (era 1x por no'), e pertinencia testada com
+    # short-circuit em vez de montar um `set` por no'. Semantica IDENTICA -
+    # o `set` so' servia para o `in` - mas sem 205 milhoes de `set.add` no
+    # TGD: esta funcao respondia por 41% do tempo do solver depois que a
+    # CR-N1 a pos no caminho quente (`_room_at_t_on_wall`), medido com
+    # cProfile em 2026-09-09 (184s de 631s).
+    p0, _p1, direction, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+    dir_x, dir_y = direction.X, direction.Y
+    p0_x, p0_y = p0.X, p0.Y
     for idx, node in enumerate(nodes):
-        if idx == exclude_node_index or not isinstance(node, dict):
+        if not isinstance(node, dict):
             continue
         if node.get("kind") in (None, "FREE_END"):
             continue
-        involved = set()
-        for arm in (node.get("arms") or []):
-            if arm:
-                involved.add(arm[0])
-        for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
-            if node.get(key) is not None:
-                involved.add(node[key])
-        for w in (node.get("crossing_walls") or []):
-            if w is not None:
-                involved.add(w)
-        if wall_idx not in involved:
+        if not _node_touches_wall(node, wall_idx):
             continue
         point = node.get("point")
         if point is None:
             continue
-        found.append((node, _t_of_point_on_wall(walls_to_create, wall_idx, point)))
+        found.append((idx, node,
+                      (point.X - p0_x) * dir_x + (point.Y - p0_y) * dir_y))
     return found
+
+
+def _node_touches_wall(node, wall_idx):
+    """True se `wall_idx` aparece em qualquer papel deste no' (braco,
+    principal, incoming, vizinha ou travessia). Testa com short-circuit -
+    e' a MESMA pertinencia que o `set` de
+    `_wall_junction_indices_nodes_and_ts_ft` calculava, sem alocar nada."""
+    for arm in (node.get("arms") or ()):
+        if arm and arm[0] == wall_idx:
+            return True
+    if node.get("main_wall_idx") == wall_idx:
+        return True
+    if node.get("incoming_wall_idx") == wall_idx:
+        return True
+    if node.get("neighbor_wall_idx") == wall_idx:
+        return True
+    for w in (node.get("crossing_walls") or ()):
+        if w == wall_idx:
+            return True
+    return False
 
 
 def _corner_bond_blocked_by_other_node(walls_to_create, nodes, wall_idx, contact_point,
@@ -1229,9 +1299,8 @@ def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
     direction = 1.0 if sign >= 0 else -1.0
     boundary = None
     skip = set(i for i in (skip_node_indices or ()) if i is not None)
-    for other_node, other_t in _wall_junction_nodes_and_ts_ft(
+    for other_index, _other_node, other_t in _wall_junction_indices_nodes_and_ts_ft(
             walls_to_create, nodes, wall_idx, exclude_node_index=exclude_node_index):
-        other_index = _node_index_of(nodes, other_node)
         if skip and other_index in skip:
             continue
         gap = (other_t - t_ft) * direction
