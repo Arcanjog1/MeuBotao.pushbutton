@@ -10,7 +10,7 @@ GO tecnico restrito ao ensaio de bancada75/81; nao aprova31 ou projetos completo
 
 ```json
 {
-  "observed_utc": "quarta-feira, 9 de setembro de 2026 15:25:30",
+  "observed_utc": "2026-09-09T18:25:30.512157+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},

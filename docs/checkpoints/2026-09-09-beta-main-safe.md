@@ -53,3 +53,9 @@ Publicacao inicialee2250a no PR34 draft: checks push/PR verdes
 34389067319/34389092291. Este complemento apenas registra links e o
 snapshot; codigo/testes permanecem8cdd33f. CI e do GitHub; timestamps de
 comandos sao do host. Nao inferir ordenacao fina entre relogios distintos.
+
+O complemento documentalb cde2cb (SHA curto sem espaco:bcde2cb) registrou
+observed_utc como data localizada pelo PowerShell; a validacao rejeitou
+o formato. Corrigido lendo a string ISO diretamente do JSON de evidencia,
+sem conversao automatica para DateTime. Nenhum codigo/teste de dominio
+mudou e a consolidada nao foi repetida por esse erro documental.
