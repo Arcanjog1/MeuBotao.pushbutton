@@ -278,6 +278,46 @@ except Exception:
 MIN_WALL_THICKNESS_FT = MIN_WALL_THICKNESS_M * FEET_PER_METER
 MAX_WALL_THICKNESS_FT = MAX_WALL_THICKNESS_M * FEET_PER_METER
 
+# INSTRUMENTACAO TEMPORARIA DE TEMPO (diagnostico do beta 2026-09-09 -
+# "Preparando o solver..." levando minutos numa bancada de 2 paredes). Mesmo
+# padrao de fallback inline do `_dispatch_progress_event` logo abaixo: um
+# core/engine desatualizado nunca pode quebrar o botao. Todos os marcos sao
+# no-op enquanto `perf_trace.enable()` nao for chamado - ver _on_start_click.
+try:
+    from core.engine import perf_trace as _perf
+except Exception:
+    class _perf(object):  # noqa: N801 - stub com a MESMA superficie do modulo
+        @staticmethod
+        def enable(path=None):
+            pass
+
+        @staticmethod
+        def is_enabled():
+            return False
+
+        @staticmethod
+        def log_path():
+            return None
+
+        @staticmethod
+        def reset():
+            pass
+
+        @staticmethod
+        def mark(tag, **fields):
+            pass
+
+        class span(object):
+            def __init__(self, tag, **fields):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+
 # `_dispatch_progress_event` (usada por _WallReviewForm._on_start_click, ver
 # FASE 1 do plano em C:\Users\CIVIX\.claude\plans\quiet-painting-petal.md)
 # mora em core/engine/progress.py - modulo PURO, testavel sem Revit/WinForms
@@ -7611,11 +7651,12 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             plan_failures[wall_idx] = str(plan_ex)
             return None
 
-    run = process_walls_one_by_one(
-        walls_to_create, wall_graph_nodes, wall_end_to_node, openings_per_wall, catalog,
-        plan_hook=plan_hook, progress_cb=progress_cb,
-        wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-    )
+    with _perf.span("process_walls_one_by_one", walls=len(walls_to_create)):
+        run = process_walls_one_by_one(
+            walls_to_create, wall_graph_nodes, wall_end_to_node, openings_per_wall, catalog,
+            plan_hook=plan_hook, progress_cb=progress_cb,
+            wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+        )
 
     # ETAPA 3C (deslocamento automatico de uma parede CONECTADA, sem relacao
     # com abertura) foi REMOVIDA (2026-08-26, pedido explicito do usuario):
@@ -10032,6 +10073,11 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._g = dict(self._fix_all_wall_modulation_errors.__globals__)
 
     def Execute(self, uiapp):
+        # Marco 1 do diagnostico: a distancia entre "ui.external_event.Raise
+        # CHAMADO" e este marco e' a LATENCIA de despacho do ExternalEvent
+        # (Revit so' roda o handler quando fica ocioso) - se o tempo estiver
+        # aqui, o problema nao e' o solver.
+        _perf.mark("Execute ENTROU", action=self.action)
         try:
             # Reinjeta o snapshot de globais capturado no __init__ (ver
             # comentario la') no dicionario REAL do modulo - conserta
@@ -10055,19 +10101,27 @@ class _PostCreationEventHandler(IExternalEventHandler):
             # funcao JA' CAPTURADA como referencia direta (atributo comum,
             # sem ambiguidade de frame/escopo) - qualquer funcao definida
             # neste modulo aponta para o MESMO dicionario real.
-            self._fix_all_wall_modulation_errors.__globals__.update(self._g)
-            app_uidoc = uiapp.ActiveUIDocument
-            app_doc = app_uidoc.Document
+            with _perf.span("Execute.globals_update", nomes=len(self._g)):
+                self._fix_all_wall_modulation_errors.__globals__.update(self._g)
+            with _perf.span("Execute.ActiveUIDocument"):
+                app_uidoc = uiapp.ActiveUIDocument
+                app_doc = app_uidoc.Document
             if self.action == "analyze":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_analyze(app_doc)
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_analyze (disparo)"):
+                    self._execute_analyze(app_doc)
             elif self.action == "zoom":
                 self._execute_zoom(app_uidoc)
             elif self.action == "fix_errors":
                 self._execute_fix_errors(app_doc)
             elif self.action == "solve":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_solve()
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_solve"):
+                    self._execute_solve()
             elif self.action == "create":
                 self._refresh_geometry_from_document(app_doc)
                 self._execute_create(app_doc)
@@ -10100,6 +10154,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
             except Exception:
                 pass
         finally:
+            _perf.mark("Execute SAIU", action=self.action)
             self.action = None
 
     def _refresh_geometry_from_document(self, app_doc):
@@ -10230,7 +10285,11 @@ class _PostCreationEventHandler(IExternalEventHandler):
         def _worker():
             error_detail = None
             result = None
+            _perf.mark("worker.thread ENTROU")
             try:
+              with _perf.span("analyze_created_walls_for_errors",
+                              walls=len(self.walls_to_create or []),
+                              nodes=len(self.wall_graph_nodes or [])):
                 result = self._analyze_created_walls_for_errors(
                     app_doc, self.walls_to_create, self.openings_per_wall,
                     self.created_walls_by_axis, self.all_openings,
@@ -10245,8 +10304,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 )
             except Exception as worker_ex:
                 error_detail = str(worker_ex) or repr(worker_ex)
+                _perf.mark("worker.thread EXCECAO", detalhe=error_detail[:120])
 
             def _finish():
+                _perf.mark("ui._finish (volta para a thread de UI)")
                 if error_detail is not None:
                     if self.on_done:
                         self.on_done("error", error_detail)
@@ -10261,10 +10322,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 _finish()
 
         if self.ui_invoke_cb is not None:
+            _perf.mark("_execute_analyze: criando thread de fundo")
             thread = _DotNetThread(_DotNetThreadStart(_worker))
             thread.IsBackground = True
             thread.Start()
+            _perf.mark("_execute_analyze: thread de fundo INICIADA")
         else:
+            _perf.mark("_execute_analyze: rodando SINCRONO (sem ui_invoke_cb)")
             _worker()
 
     def _execute_zoom(self, app_uidoc):
@@ -12373,10 +12437,27 @@ class _WallReviewForm(Form):
             "perder nada, ou 'Cancelar' se quiser parar e manter so' o que ja "
             "foi corrigido ate' ali."
         )
+        # DIAGNOSTICO (temporario): tudo o que acontece entre este clique e a
+        # primeira linha "ANALISAR: eixo ..." e' exatamente a janela em que a
+        # tela fica parada em "Preparando o solver..." - ver core/engine/
+        # perf_trace.py.
+        try:
+            _perf.enable()
+            _perf.reset()
+            _perf.mark("ui.click START",
+                       walls=len(self._handler.walls_to_create or []),
+                       openings=sum(len(o or []) for o in (self._handler.openings_per_wall or [])),
+                       nodes=len(self._handler.wall_graph_nodes or []),
+                       axes=len(self._handler.created_walls_by_axis or {}),
+                       catalog=len(self._handler.catalog or {}),
+                       beta=self._handler.controlled_beta)
+        except Exception:
+            pass
         self._console.log("ANALISAR: iniciando modulacao das paredes...")
         self._console.set_status("Analisando paredes...")
         self._console.set_indeterminate("Preparando o solver...")
         self._console.start_watchdog()
+        _perf.mark("ui.console_pronto")
 
         # Callbacks AO VIVO (ver docstring de process_walls_one_by_one) -
         # capturados como closures locais (nao pelo nome do modulo), mesmo
@@ -12442,7 +12523,9 @@ class _WallReviewForm(Form):
         try:
             self._handler.action = "analyze"
             self._handler.on_done = self._on_analyze_done
+            _perf.mark("ui.external_event.Raise CHAMADO")
             self._external_event.Raise()
+            _perf.mark("ui.external_event.Raise RETORNOU")
         except Exception as ex:
             self._console.stop_watchdog()
             self._start_button.Enabled = True
@@ -12490,6 +12573,7 @@ class _WallReviewForm(Form):
             self._console.log("Retomado pelo usuario.")
 
     def _on_analyze_done(self, kind, error):
+        _perf.mark("ui._on_analyze_done", kind=kind)
         # `kind == "error"` (nunca `if error:`) - ver o mesmo cuidado
         # documentado em _PostCreationForm._on_zoom_done: uma excecao sem
         # mensagem nao pode virar sucesso silencioso. Sucesso chega como

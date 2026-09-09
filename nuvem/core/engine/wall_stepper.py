@@ -45,6 +45,25 @@ from Autodesk.Revit.DB import XYZ, Line
 from core.engine.tolerances import (  # noqa: F401
     FEET_PER_METER, MIN_SEGMENT_LENGTH_FT, JUNCTION_FACE_SEARCH_FT,
 )
+# Instrumentacao TEMPORARIA de tempo (ver core/engine/perf_trace.py) - no-op
+# enquanto ninguem chamar perf_trace.enable().
+try:
+    from core.engine import perf_trace as _perf
+except Exception:
+    class _perf(object):  # noqa: N801
+        @staticmethod
+        def mark(tag, **fields):
+            pass
+
+        class span(object):
+            def __init__(self, tag, **fields):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
 from core.engine.geometry import *  # noqa: F401,F403
 from core.engine.wall_pairing import *  # noqa: F401,F403
 from core.engine.modulation_math import *  # noqa: F401,F403
@@ -7701,9 +7720,16 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
     deste modo) enxergue a planta inteira normalmente.
     """
     if intersections is None:
-        intersections = solve_all_intersections(nodes, walls_to_create, catalog,
-                                                 openings_per_wall=openings_per_wall,
-                                                 end_to_node=end_to_node)
+        # DIAGNOSTICO: esta e' a UNICA etapa pesada de `process_walls_one_by_one`
+        # que roda ANTES do primeiro `wall_start_cb` - ou seja, tudo o que
+        # demorar aqui aparece na tela como "Preparando o solver..." parado.
+        with _perf.span("solve_all_intersections", nodes=len(nodes)):
+            intersections = solve_all_intersections(nodes, walls_to_create, catalog,
+                                                     openings_per_wall=openings_per_wall,
+                                                     end_to_node=end_to_node)
+        _perf.mark("solve_all_intersections RESULTADO",
+                   candidatos=len(intersections["candidates"]),
+                   falhas=len(intersections["failures"]))
 
     working_walls = list(walls_to_create)
     working_openings = _copy_openings_per_wall(openings_per_wall)
@@ -7712,14 +7738,16 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         for i in range(len(walls_to_create))
     ]
 
-    by_end = _index_node_candidates_by_wall_end(
-        nodes, intersections["candidates"], walls_to_create, end_to_node
-    )
-    midspan = _index_node_candidates_midspan(
-        nodes, intersections["candidates"], walls_to_create, end_to_node
-    )
+    with _perf.span("index_node_candidates", nodes=len(nodes)):
+        by_end = _index_node_candidates_by_wall_end(
+            nodes, intersections["candidates"], walls_to_create, end_to_node
+        )
+        midspan = _index_node_candidates_midspan(
+            nodes, intersections["candidates"], walls_to_create, end_to_node
+        )
 
-    order = order_walls_for_processing(walls_to_create)
+    with _perf.span("order_walls_for_processing", walls=len(walls_to_create)):
+        order = order_walls_for_processing(walls_to_create)
     all_candidates = list(intersections["candidates"])
     # Espelho espacial de `all_candidates` - alimentado nos MESMOS pontos em
     # que a lista cresce (ver _placed_index_near_wall).
@@ -7752,6 +7780,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
     for _pos, wall_idx in enumerate(order):
         if progress_cb is not None and (_pos % progress_stride == 0 or _pos == total_walls - 1):
             progress_cb(_pos + 1, total_walls)
+        _perf.mark("parede START", idx=wall_idx, pos=_pos + 1, total=total_walls)
         if wall_start_cb is not None:
             try:
                 wall_start_cb(wall_idx, total_walls, _pos + 1)
