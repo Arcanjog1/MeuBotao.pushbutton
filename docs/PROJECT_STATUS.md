@@ -8,7 +8,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-09T15:05:00+00:00",
+  "observed_utc": "2026-09-09T15:14:00+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -24,7 +24,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
     {"pr": 21, "head": "766e1ea6ee281cc29a3d6118d6013f3955193352"},
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
-    {"pr": 31, "head": "05030d2cf3e18081b040ad048759099a1b215210"}
+    {"pr": 31, "head": "656544e15165c9481af3f1eccf04840384e863ed"}
   ]
 }
 ```
@@ -47,7 +47,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-C1 | PR #26 integrado, `0c6e8f7` | Herdado pelo #31 | [cobertura](CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md) | Nao resolve C2/G16 inteiro |
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
-| CR-N1b/c/e/f | Ausente | PR #31 draft, `05030d2` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Colisoes TGD +37, aberturas e regressao final |
+| CR-N1b/c/e/f + beta | Ausente | PR #31 draft, codigo avaliado `656544e` | [etapa 2](checkpoints/2026-09-09-beta-etapa2.md), 479 testes | Colisoes TGD +37, recorte e regressao final; contencao nao e GO |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
 | Governanca | PR #32 integrado, `aa58d70` | Checkpoints historicos explicitos e timeout de arvore de processos na branch beta | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | Base: 12 testes infra e 260 test_script; candidato: 16 testes infra verdes |
 
@@ -75,6 +75,13 @@ N1b foi `417341c`; o snapshot `67083b0` e anterior a N1c/e/f.
 Codigo/testes permanecem identicos a `420dbcc`. CI atual do #31: dois
 checks de governanca verdes; isso nao executa nem aprova o solver.
 
+Etapa beta posterior: `8d75bb4` e `656544e` acrescentam contencao e
+retencao sem alterar `wall_stepper.py`. Preparados na branch
+`codex/beta-revit-20260909` e publicados tambem no #31 por fast-forward,
+mantendo draft e sem merge. O SHA de codigo avaliado e 656544e; o HEAD do
+PR inclui o commit documental seguinte. CI desses novos commits deve ser
+conferido separadamente dos checks antigos de 05030d2.
+
 Os PRs #7/#8 tambem carregam diferencas de producao em
 `wall_pairing.py`/`wall_stepper.py` desde o merge-base, apesar do escopo
 documental declarado por parte dos commits. Nao integrar pela descricao.
@@ -96,7 +103,8 @@ apagar instancias se houver invasao/colisao; solver bruto nao e filtrado.
 Paredes vazias/com criacao incompleta passam a manter suas referencias,
 com motivo e identificacao fisica no resultado/log/UI. Loader offline por
 SHA e hashes implementado, sem instalar/abrir Revit e sem fallback online.
-217 testes focados verdes nesta etapa (incluem 32 novos); consolidada
+479 testes intermediarios verdes no HEAD 656544e (219 focados + 260 de
+test_script); 16 testes infra e 4 diagnosticos verdes. Consolidada
 final ainda nao executada, pois as frentes de colisao/recorte seguem abertas.
 O preflight e contencao, NAO prova de correcao do solver nem GO.
 

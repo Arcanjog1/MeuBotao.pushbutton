@@ -1703,3 +1703,15 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+### 2026-09-09 - Beta controlado, etapa 2 (CANDIDATO)
+
+Main continua aa58d70 (PR32 documental integrado). Codigo candidato
+656544e15165c9481af3f1eccf04840384e863ed, preparado em
+codex/beta-revit-20260909 para atualizar o PR31 draft, sem merge.
+Retencao de paredes vazias/incompletas e preflight fisico antes de qualquer
+criacao/remocao do lote; pacote offline por SHA/hash sem fallback.
+479 testes intermediarios, 16 de governanca e 4 do diagnostico aprovados.
+TGD ainda tem regressao real de colisao e o recorte/final consolidada
+continuam pendentes: NAO e GO. Provas, limites e proximos passos no
+[checkpoint da etapa 2](checkpoints/2026-09-09-beta-etapa2.md).
