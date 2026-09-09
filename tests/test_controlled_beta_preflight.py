@@ -131,3 +131,32 @@ def test_invalid_piece_geometry_cannot_pass_safety_gate(damage):
     gate = check(result, walls, openings)
     assert not gate["ok"]
     assert gate["errors"]
+
+
+@pytest.mark.parametrize("damage", ["base_nan", "sill_nan", "head_inf", "reversed_height",
+                                   "reversed_width", "wall_nan", "wall_thickness", "vertical_axis"])
+def test_invalid_input_cannot_silently_remove_a_void_from_preflight(damage):
+    result, walls, openings = fixture([piece(140)])
+    base = 0.0
+    if damage == "base_nan":
+        base = float("nan")
+    elif damage in ("sill_nan", "head_inf", "reversed_height", "reversed_width"):
+        a, b, sill, head = openings[0][0]
+        if damage == "sill_nan":
+            sill = float("nan")
+        elif damage == "head_inf":
+            head = float("inf")
+        elif damage == "reversed_height":
+            sill, head = head, sill
+        else:
+            a, b = b, a
+        openings[0] = [(a, b, sill, head)]
+    elif damage == "wall_nan":
+        walls[0] = (seg(float("nan"), 0, 199, 0), ft(14), (False, False))
+    elif damage == "wall_thickness":
+        walls[0] = (walls[0][0], -1.0, (False, False))
+    else:
+        result["candidates"][0]["x_dir"] = m.XYZ(0, 0, 1)
+    gate = m.controlled_beta_preflight(result, walls, openings, CATALOG, base)
+    assert not gate["ok"]
+    assert gate["errors"]

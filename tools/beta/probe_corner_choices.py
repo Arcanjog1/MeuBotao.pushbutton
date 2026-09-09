@@ -58,6 +58,7 @@ def main():
 
     fixed = [p for p in baseline["candidates"] if p.get("node_index") != args.node]
     alternatives = {}
+    base_z = bridge._ft((data.get("settings") or {}).get("base_z_cm") or 0.0)
     for name, pair in choices(result).items():
         pieces = fixed + list(pair)
         collisions = []
@@ -67,13 +68,39 @@ def main():
                 continue
             collisions.append({"a": describe(a), "b": describe(b),
                                "overlap_cm": m._obb_min_overlap(m._candidate_obb(a), m._candidate_obb(b)) * 30.48})
+        gate = m.controlled_beta_preflight(
+            {"num_courses": 2, "candidates": list(pair), "course_candidates": {0: [pair[0]], 1: [pair[1]]}},
+            walls, openings, catalog, base_z)
         alternatives[name] = {"pieces": [describe(p) for p in pair], "collisions": collisions,
+                              "opening_violations_first_two_courses": gate["opening_violations"],
                               "alternating_owners": pair[0]["wall_idx"] != pair[1]["wall_idx"]}
+    minimum_footprints = []
+    for wi in m._l_corner_wall_pair(node):
+        point = m._node_contact_point_for_wall(node, wi)
+        _end, direction, _length, _t = m._wall_end_and_dir_near_point(walls, wi, point)
+        room = m._corner_wall_room_ft(walls, openings, wi, point, direction,
+                                     nodes=nodes, end_to_node=ends, exclude_node_index=args.node)
+        for code in ("B34", "C09", "C04"):
+            entry = catalog[code]
+            if room is not None and bridge._ft(entry["length_cm"]) > room + 1e-6:
+                continue
+            origin = point + direction * bridge._ft(entry["length_cm"] / 2.0)
+            for ci, course in enumerate(("A", "B")):
+                candidate = m._make_block_candidate(code, entry, course, origin, direction,
+                                                     "EXPERIMENT_MINIMUM_FOOTPRINT", node_index=args.node, wall_idx=wi)
+                gate = m.controlled_beta_preflight(
+                    {"num_courses": 2, "candidates": [candidate], "course_candidates": {0: [], 1: [], ci: [candidate]}},
+                    walls, openings, catalog, base_z)
+                overlaps = [describe(other) for other in fixed if other["course"] == course
+                            and m._obb_min_overlap(m._candidate_obb(candidate), m._candidate_obb(other)) > m.BOND_COLLISION_EPS_FT]
+                minimum_footprints.append({"piece": describe(candidate), "room_cm": room * 30.48 if room is not None else None,
+                                           "colliding_neighbors": overlaps, "opening_violations": gate["opening_violations"]})
     payload = {"status": "EXPERIMENT_NOT_PRODUCTION_FIX", "node_index": args.node,
                "project": args.project, "input_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
                "head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
                "instrumentation_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-               "alternatives": alternatives}
+               "alternatives": alternatives,
+               "relaxed_minimum_footprints_not_approved_layouts": minimum_footprints}
     if args.full_choice:
         calls = []
 
@@ -105,7 +132,11 @@ def main():
     with args.output.open("x", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=True, separators=(",", ":"))
     print(json.dumps({"node": args.node, "choices": {k: {"collisions": len(v["collisions"]),
-                     "alternating_owners": v["alternating_owners"]} for k, v in alternatives.items()}}))
+                     "opening_violations": len(v["opening_violations_first_two_courses"]),
+                     "alternating_owners": v["alternating_owners"]} for k, v in alternatives.items()},
+                     "minimum_footprints": [{"wall": p["piece"]["wall_idx"], "course": p["piece"]["course"],
+                                             "code": p["piece"]["code"], "collisions": len(p["colliding_neighbors"]),
+                                             "openings": len(p["opening_violations"])} for p in minimum_footprints]}))
     if args.full_choice:
         from collections import Counter
         full = payload["full"]

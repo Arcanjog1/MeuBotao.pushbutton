@@ -3642,6 +3642,18 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
         errors.append("Conjunto de fiadas fisicas incompleto")
     if len(openings_per_wall) != len(walls_to_create):
         errors.append("Aberturas e paredes sem correspondencia completa")
+    if not math.isfinite(base_z_abs):
+        errors.append("Cota base nao finita")
+    for wi, (line, thickness, _locks) in enumerate(walls_to_create):
+        p, q = line.GetEndPoint(0), line.GetEndPoint(1)
+        if (not all(math.isfinite(v) for v in (p.X, p.Y, p.Z, q.X, q.Y, q.Z, thickness))
+                or thickness <= 0 or p.DistanceTo(q) <= 0 or abs(p.Z - q.Z) > 1e-6):
+            errors.append("Geometria invalida da parede {}".format(wi))
+    for wi, openings in enumerate(openings_per_wall):
+        for oi, opening in enumerate(openings):
+            if (len(opening) != 4 or not all(math.isfinite(v) for v in opening)
+                    or opening[0] >= opening[1] or opening[2] >= opening[3]):
+                errors.append("Geometria invalida da abertura {} na parede {}".format(oi, wi))
     if errors:
         return {"ok": False, "errors": errors, "opening_violations": [], "collisions": []}
     violations, collisions = [], []
@@ -3657,7 +3669,8 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
             values.extend([c["length_cm"], c["width_cm"]])
             if (not all(math.isfinite(v) for v in values) or min(c["length_cm"], c["width_cm"]) <= 0 or
                     abs(c["x_dir"].GetLength() - 1) > 1e-6 or abs(c["y_dir"].GetLength() - 1) > 1e-6 or
-                    abs(c["x_dir"].DotProduct(c["y_dir"])) > 1e-6):
+                    abs(c["x_dir"].DotProduct(c["y_dir"])) > 1e-6 or
+                    abs(c["x_dir"].Z) > 1e-6 or abs(c["y_dir"].Z) > 1e-6):
                 errors.append("Geometria invalida: fiada {}, candidato {}".format(ci, i))
         if errors:
             return {"ok": False, "errors": errors, "opening_violations": violations, "collisions": collisions}

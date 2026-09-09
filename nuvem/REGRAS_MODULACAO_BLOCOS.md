@@ -7228,3 +7228,27 @@ no preflight de invasao/colisao e ainda falhar em amarracao/compensadores.
 Passar nessa contencao NAO certifica o recorte nem libera o merge do #31.
 O recorte muda a topologia de fronteira e deve ter validadores executados
 novamente; nao usar apenas o recorte visual de um solve maior como prova.
+
+### 48.4 Hipoteses rejeitadas e entrada invalida
+
+**CONTENCAO BETA:** validar finitude da cota base, eixos/espessuras de
+paredes e limites das aberturas ANTES do filtro vertical. NaN nao pode
+fazer um vazio sumir silenciosamente; abertura invertida/degenerada ou
+eixo de bloco fora do plano deve bloquear explicitamente o lote.
+
+**HIPOTESE OFFLINE REJEITADA, sem mudar o solver:** colocar as duas
+fiadas do L163 TGD na parede 109 reduz pares fisicos 784->775 e agregados
+1197->1189, mas aumenta invasoes espaciais 692->698. O B34 girado cruza a
+porta da parede 99, inclusive nas seis fiadas pares adicionais 0..10.
+Cobertura tambem piora: GAP_IN_ROW +6, MISSING_ROW +8, PARTIAL_WALL +2.
+Nao adotar o giro por saldo de colisoes. Escolhas locais de L163/L185,
+inclusive C04 minimo mantendo contatos e vizinhos, continuam com invasao
+ou colisao; nao equivalem a prova de impossibilidade de TODA coordenacao
+global ou de TODA mudanca geometrica.
+
+A convencao do T principal na fiada A continua vigente. A alternativa de
+inverter um T para coordenar encontros proximos esta expressamente
+classificada como decisao normativa pendente na secao 36.7; nao implementar
+essa inversao por inferencia do comentario historico sobre solver global.
+Repetir A/B com K=1 tambem continua vigente (18.4); nao reativar rodizio de
+fiadas para esconder faixas de compensadores sem a decisao correspondente.
