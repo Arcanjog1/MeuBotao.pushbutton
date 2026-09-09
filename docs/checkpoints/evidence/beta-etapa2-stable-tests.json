@@ -1,0 +1,33 @@
+{
+  "started_utc": "2026-09-09T15:10:07.044293+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "656544e15165c9481af3f1eccf04840384e863ed",
+  "tree": "1235d238ecf7225405334d9fa82de0618fe1288e",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_controlled_beta_preflight.py",
+    "tests/test_unmodulated_wall_retention.py",
+    "tests/test_beta_package.py",
+    "tests/test_neighbor_node_bond_collision.py",
+    "tests/test_compensator_spread_cr_n1e.py",
+    "tests/test_non_modular_wall_coverage.py",
+    "tests/test_block_bonding.py",
+    "tests/test_block_fit_tolerance_c04.py",
+    "tests/test_solver_l_node_alternation_cr_s1.py",
+    "tests/test_wall_junction_scan_perf.py",
+    "tests/test_script.py",
+    "-q"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-etapa2-stable-tests.txt",
+  "pid": 23968,
+  "exit_code": 0,
+  "elapsed_seconds": 125.453,
+  "status_after": "?? docs/checkpoints/evidence/beta-etapa2-diagnostics.json\n?? docs/checkpoints/evidence/beta-etapa2-diagnostics.txt\n?? docs/checkpoints/evidence/beta-etapa2-infra.json\n?? docs/checkpoints/evidence/beta-etapa2-infra.txt\n?? docs/checkpoints/evidence/beta-etapa2-package-verify.json\n?? docs/checkpoints/evidence/beta-etapa2-package-verify.txt\n?? docs/checkpoints/evidence/beta-etapa2-package.json\n?? docs/checkpoints/evidence/beta-etapa2-package.txt\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.txt\n?? docs/checkpoints/evidence/beta-preflight-main-tgd-v2.json",
+  "log_sha256": "6bdc2f17f4c1992b270dbcc57bd0efaa1770dca99fbfe1a4b947880ff18988ed"
+}

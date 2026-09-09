@@ -1,0 +1,96 @@
+{
+  "head": "09b6ea0ae221a43a3adc27f63bb05d336351584f",
+  "scope": "Provenance only; no fixture rewritten. Census hashes use exact Windows checkout bytes; Git stores LF. Input semantics and normalized bytes are identical. Package builder uses Git blobs directly, independent of checkout endings.",
+  "files": [
+    {
+      "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/baseline.json",
+      "working_sha256": "e66b9a41eb4f779750821c619364a80e1ad3f1ac5116e45febec8c1200490d86",
+      "git_blob_content_sha256": "23c7b7e4b5765f4e57b19a6bae59852277430af98639c62b376d2d590dad1781",
+      "working_crlf": 228,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/input.json",
+      "working_sha256": "4ab24fcb55a26a3a3d9f189851a11ae9ecf5f684e697bc2a2cf9a099de19bce9",
+      "git_blob_content_sha256": "3c056fd0ba898935ddd19b4ea98a14cb0982bcef26c9e47ff918ef4c8ea42780",
+      "working_crlf": 178,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/baseline.json",
+      "working_sha256": "d09c77dfd414af8b70b5d5c4627f4345cdd6500f57b4bedd1731d132d740fc22",
+      "git_blob_content_sha256": "1be8182786ba671948231c90575aa475f91eba517236b8b73d0de65cb8094ca6",
+      "working_crlf": 2097,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/input.json",
+      "working_sha256": "936ec34ee63b541554c43d8ac2509d99e2c641a5ec140fbfa3716837cda1e049",
+      "git_blob_content_sha256": "6b8d8f13aa969e1bd2633fca1a7b143e616e8400c4a1b0df0b493078d515b436",
+      "working_crlf": 384,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/reference.json",
+      "working_sha256": "3598b03610768d14171798a454afed4041d36a3160f36d3c684b5da9fa83110c",
+      "git_blob_content_sha256": "4aa4169372ffad5994f96909f9a4591034ab3873aec68a3930176624cd701751",
+      "working_crlf": 341,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/reference_score.json",
+      "working_sha256": "d352d0aa52d34b45fd4316cda4ae710f889b67c247b7f3483184caf80467e6bd",
+      "git_blob_content_sha256": "4416ed372d67e1949745901c045627c5abbe6020695c48ce5df44b7752892ec4",
+      "working_crlf": 1262,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/baseline.json",
+      "working_sha256": "87a90d5bad42fa98fcf95d60e1d19012e32e50ec38acc9ac1c96a4df7bf70c6f",
+      "git_blob_content_sha256": "e8942c154196aa53ea203d3b39c127310aea03e39f81ec9244bdcb6774f49129",
+      "working_crlf": 1238,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/input.json",
+      "working_sha256": "60fde2eb6e6d4f35cee26a395e7582a5963f651ee9c3e7cf6aac54711d6f2589",
+      "git_blob_content_sha256": "33d83947b31c8d48b902d042121d48ec40e46e1eeef4765e3eea1354c4707300",
+      "working_crlf": 322,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference.json",
+      "working_sha256": "238bb2129e766c8e24951a06d669740cabcdad5363e9b6696883309f4b9e9b3f",
+      "git_blob_content_sha256": "df97dead35e69cf64a9ae96688f42f2a86fb66c7e3a70baf3350fb2b11035226",
+      "working_crlf": 321,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    },
+    {
+      "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference_score.json",
+      "working_sha256": "1bb07e5c1fd095162b00677939d5cf36e831d88e435dd872d6b1d727f0955257",
+      "git_blob_content_sha256": "da47f855301c3398789ee342e28051196529c8170b519d2bca6be0709cc52428",
+      "working_crlf": 1251,
+      "git_crlf": 0,
+      "same_json": true,
+      "same_after_eol_normalization": true
+    }
+  ]
+}

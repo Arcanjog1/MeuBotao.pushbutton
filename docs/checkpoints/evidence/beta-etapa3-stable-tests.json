@@ -1,0 +1,28 @@
+{
+  "started_utc": "2026-09-09T15:32:04.886907+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "f9e81ccbc2d523090490d39a5633674ca1768054",
+  "tree": "83ad449322d9394e15446c80733c92d093b8c035",
+  "status_before": "?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tp1.json\n?? docs/checkpoints/evidence/beta-region-l-run.json\n?? docs/checkpoints/evidence/beta-region-l-run.txt\n?? docs/checkpoints/evidence/beta-region-l.json\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_beta_atomic_creation.py",
+    "tests/test_controlled_beta_preflight.py",
+    "tests/test_unmodulated_wall_retention.py",
+    "tests/test_beta_package.py",
+    "tests/test_script.py",
+    "tools/beta/test_diagnostics.py",
+    "-q"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-etapa3-stable-tests.txt",
+  "pid": 25392,
+  "exit_code": 0,
+  "elapsed_seconds": 99.672,
+  "status_after": "?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-equivalence.json\n?? docs/checkpoints/evidence/beta-cache-equivalence.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tp1.json\n?? docs/checkpoints/evidence/beta-corner163-choices.json\n?? docs/checkpoints/evidence/beta-corner185-choices.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.txt\n?? docs/checkpoints/evidence/beta-region-l-run.json\n?? docs/checkpoints/evidence/beta-region-l-run.txt\n?? docs/checkpoints/evidence/beta-region-l.json\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json\n?? tools/beta/probe_corner_choices.py",
+  "log_sha256": "af9614f028def8be7d654862424977281561f5d59f5f4c009078b31b967babf1"
+}

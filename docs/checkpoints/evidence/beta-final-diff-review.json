@@ -1,0 +1,592 @@
+{
+  "reviewed_head": "09b6ea0ae221a43a3adc27f63bb05d336351584f",
+  "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+  "tree": "c28422e31373694a70823095d6f77be258d9f2bc",
+  "review_scope": "All committed PR31 changes against fetched current main, separated by ownership. Later documentation/evidence are not solver edits.",
+  "pr30_fully_ancestral": true,
+  "pr31_merge_authorized_by_gates": false,
+  "production_review": [
+    "Neighbor boundary/reach/overshoot and cache inspected; longitudinal control does not solve transverse overlapping walls.",
+    "N1e preserves multiset but shifts joint/strip locations; new physical collision areas remain blocking.",
+    "Beta loader verifies pinned objects, no online fallback; hashes are not signatures.",
+    "Physical preflight rejects entire unsafe batch; cannot certify bonding or unsupported catalogs.",
+    "Atomic replacement checks transaction status and per-piece completeness; real Revit lifecycle untested.",
+    "Retention covers empty, non-modular partial and incomplete creation; freshness is captured-state only."
+  ],
+  "test_review": [
+    "Inherited mechanism assertions replaced by physical-key/all-course invariants; independent positive ARM gate tests retained.",
+    "G12 minimal reproducer changed after old reduction lost its predicate; full-corpus controls retained.",
+    "No skip/xfail/baseline rewrite for approval."
+  ],
+  "known_critical_blockers": [
+    "TGD new physical collision regions",
+    "TP1 W019 continuous boundary joints",
+    "No approved complete L/T/X recorte"
+  ],
+  "official_fixture_sha256": {
+    "nuvem/benchmark/projects/piloto_sintetico_2x2/baseline.json": "e66b9a41eb4f779750821c619364a80e1ad3f1ac5116e45febec8c1200490d86",
+    "nuvem/benchmark/projects/piloto_sintetico_2x2/input.json": "4ab24fcb55a26a3a3d9f189851a11ae9ecf5f684e697bc2a2cf9a099de19bce9",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/baseline.json": "d09c77dfd414af8b70b5d5c4627f4345cdd6500f57b4bedd1731d132d740fc22",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/input.json": "936ec34ee63b541554c43d8ac2509d99e2c641a5ec140fbfa3716837cda1e049",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/reference.json": "3598b03610768d14171798a454afed4041d36a3160f36d3c684b5da9fa83110c",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/reference_score.json": "d352d0aa52d34b45fd4316cda4ae710f889b67c247b7f3483184caf80467e6bd",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/baseline.json": "87a90d5bad42fa98fcf95d60e1d19012e32e50ec38acc9ac1c96a4df7bf70c6f",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/input.json": "60fde2eb6e6d4f35cee26a395e7582a5963f651ee9c3e7cf6aac54711d6f2589",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference.json": "238bb2129e766c8e24951a06d669740cabcdad5363e9b6696883309f4b9e9b3f",
+    "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/reference_score.json": "1bb07e5c1fd095162b00677939d5cf36e831d88e435dd872d6b1d727f0955257"
+  },
+  "buckets": {
+    "production": [
+      {
+        "path": "Script.py",
+        "added": "19",
+        "deleted": "0"
+      },
+      {
+        "path": "beta_package.py",
+        "added": "41",
+        "deleted": "0"
+      },
+      {
+        "path": "nuvem/core/engine/wall_stepper.py",
+        "added": "415",
+        "deleted": "26"
+      },
+      {
+        "path": "nuvem/core/wall_modeling.py",
+        "added": "355",
+        "deleted": "27"
+      }
+    ],
+    "documentation": [
+      {
+        "path": "docs/BENCH_FECHAMENTO_N1_2026-09-09.md",
+        "added": "356",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/BENCH_N1C_N1E_2026-09-09.md",
+        "added": "299",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/BENCH_SWEEP_2026-09-08.md",
+        "added": "328",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/CHECKPOINT_CR_N1_SERIE_2026-09-09.md",
+        "added": "114",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/DEVELOPMENT_PROCESS.md",
+        "added": "8",
+        "deleted": "1"
+      },
+      {
+        "path": "docs/PROJECT_STATUS.md",
+        "added": "46",
+        "deleted": "10"
+      },
+      {
+        "path": "docs/PROJECT_STATUS_LOG.md",
+        "added": "25",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/2026-09-09-beta-etapa1.md",
+        "added": "87",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/2026-09-09-beta-etapa2.md",
+        "added": "118",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/2026-09-09-beta-etapa3.md",
+        "added": "75",
+        "deleted": "0"
+      },
+      {
+        "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+        "added": "1170",
+        "deleted": "0"
+      },
+      {
+        "path": "nuvem/benchmark/reports/piloto_sintetico_2x2.txt",
+        "added": "29",
+        "deleted": "26"
+      },
+      {
+        "path": "nuvem/benchmark/reports/torre_easy_lo_r00_tgd.txt",
+        "added": "507",
+        "deleted": "586"
+      },
+      {
+        "path": "nuvem/benchmark/reports/torre_easy_lo_r00_tp1.txt",
+        "added": "225",
+        "deleted": "320"
+      }
+    ],
+    "generated_evidence": [
+      {
+        "path": "docs/checkpoints/evidence/beta-bond-audit-main-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-bond-audit-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-equivalence.json",
+        "added": "21",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-equivalence.txt",
+        "added": "5",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tgd-run.json",
+        "added": "27",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tgd-run.txt",
+        "added": "45",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tp1-run.json",
+        "added": "27",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tp1-run.txt",
+        "added": "15",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-cache-off-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-corner163-choices.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-corner185-choices.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-diagnostics.json",
+        "added": "27",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-diagnostics.txt",
+        "added": "9",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-infra.json",
+        "added": "27",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-infra.txt",
+        "added": "21",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-intermediate.json",
+        "added": "33",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-intermediate.txt",
+        "added": "8",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-package-verify.json",
+        "added": "21",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-package-verify.txt",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-package.json",
+        "added": "24",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-package.txt",
+        "added": "23",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-stable-tests.json",
+        "added": "33",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa2-stable-tests.txt",
+        "added": "8",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa3-stable-tests.json",
+        "added": "28",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-etapa3-stable-tests.txt",
+        "added": "6",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tgd-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tgd-run.txt",
+        "added": "44",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tp1-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tp1-run.txt",
+        "added": "14",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-main-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1-tgd-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1-tgd-run.txt",
+        "added": "44",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1b-tgd-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1b-tgd-run.txt",
+        "added": "44",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1b-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1c-tgd-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1c-tgd-run.txt",
+        "added": "44",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1c-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tgd-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tgd-run.txt",
+        "added": "44",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tp1-run.json",
+        "added": "26",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tp1-run.txt",
+        "added": "14",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-n1f-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-main-tgd-v2.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-main-tp1-v2.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-tgd-v2.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-tgd.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-tp1-v2.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-preflight-tp1.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-l-run.json",
+        "added": "28",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-l-run.txt",
+        "added": "23",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-l.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-tx-run.json",
+        "added": "30",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-tx-run.txt",
+        "added": "32",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-region-tx.json",
+        "added": "1",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-tgd-collision-delta.json",
+        "added": "47537",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-tgd-collision-regions.json",
+        "added": "47769",
+        "deleted": "0"
+      },
+      {
+        "path": "docs/checkpoints/evidence/beta-tgd-stages.json",
+        "added": "1276",
+        "deleted": "0"
+      },
+      {
+        "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/score.json",
+        "added": "17",
+        "deleted": "19"
+      },
+      {
+        "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json",
+        "added": "249",
+        "deleted": "262"
+      },
+      {
+        "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json",
+        "added": "193",
+        "deleted": "201"
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_beta_atomic_creation.py",
+        "added": "230",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_beta_package.py",
+        "added": "106",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_block_arm_role_candidate_safety_contract.py",
+        "added": "61",
+        "deleted": "6"
+      },
+      {
+        "path": "tests/test_block_arm_role_prism_stagger.py",
+        "added": "52",
+        "deleted": "14"
+      },
+      {
+        "path": "tests/test_compensator_spread_cr_n1e.py",
+        "added": "153",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_controlled_beta_preflight.py",
+        "added": "162",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_cross_band_joint_propagation_cr_g12.py",
+        "added": "23",
+        "deleted": "4"
+      },
+      {
+        "path": "tests/test_neighbor_node_bond_collision.py",
+        "added": "452",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_non_modular_wall_coverage.py",
+        "added": "131",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_unmodulated_wall_retention.py",
+        "added": "161",
+        "deleted": "0"
+      },
+      {
+        "path": "tests/test_wall_junction_scan_perf.py",
+        "added": "137",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/test_diagnostics.py",
+        "added": "49",
+        "deleted": "0"
+      }
+    ],
+    "diagnostics_and_packaging": [
+      {
+        "path": "tools/beta/build_package.py",
+        "added": "49",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/collision_stage_report.py",
+        "added": "41",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/compare_physical_snapshots.py",
+        "added": "97",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/evaluate_artifact.py",
+        "added": "39",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/physical_snapshot.py",
+        "added": "139",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/probe_corner_choices.py",
+        "added": "151",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/probe_region.py",
+        "added": "68",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/replay_preflight.py",
+        "added": "63",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/beta/requirements.txt",
+        "added": "1",
+        "deleted": "0"
+      }
+    ],
+    "governance_infrastructure": [
+      {
+        "path": "tools/documentation/capture_validation.py",
+        "added": "18",
+        "deleted": "3"
+      },
+      {
+        "path": "tools/documentation/test_capture_validation.py",
+        "added": "38",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/documentation/test_validate.py",
+        "added": "23",
+        "deleted": "0"
+      },
+      {
+        "path": "tools/documentation/validate.py",
+        "added": "10",
+        "deleted": "1"
+      }
+    ]
+  }
+}

@@ -1703,3 +1703,39 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+### 2026-09-09 - Beta controlado, etapa 2 (CANDIDATO)
+
+Main continua aa58d70 (PR32 documental integrado). Codigo candidato
+656544e15165c9481af3f1eccf04840384e863ed, preparado em
+codex/beta-revit-20260909 para atualizar o PR31 draft, sem merge.
+Retencao de paredes vazias/incompletas e preflight fisico antes de qualquer
+criacao/remocao do lote; pacote offline por SHA/hash sem fallback.
+479 testes intermediarios, 16 de governanca e 4 do diagnostico aprovados.
+TGD ainda tem regressao real de colisao e o recorte/final consolidada
+continuam pendentes: NAO e GO. Provas, limites e proximos passos no
+[checkpoint da etapa 2](checkpoints/2026-09-09-beta-etapa2.md).
+
+### 2026-09-09 - Beta controlado, etapa 3 (CANDIDATO)
+
+Producao f9e81cc, diagnostico edc9666: substituicao do lote beta em grupo
+transacional externo, verificacao de commits/instancias e bloqueio em
+rollback nao confirmado. 314 testes verdes, 98.80s. Cache desativado nos
+censos completos TGD/TP1 conserva exatamente todas as geometrias medidas.
+Auditorias brutas confirmam achados TP1 nas paredes 18/40; recortes novos
+passam no preflight espacial mas nao em todos os controles de amarracao.
+Experimentos locais L163/L185: troca apenas transfere a colisao; giro
+para a parede livre zera colisao local mas perde alternancia. Ainda nao
+e correcao de producao nem aprovacao do recorte. Main aa58d70 inalterada,
+PR31 draft sem merge. [Checkpoint](checkpoints/2026-09-09-beta-etapa3.md).
+
+### 2026-09-09 - Beta controlado, etapa 4 (CANDIDATO, NO-GO #31)
+
+Codigo09b6ea0: preflight numerico, referencia parcial e assinatura atual
+do calculo. Consolidada1112 passed/2 failed em2611.63s, log bruto completo;
+61 focados finais verdes. Nenhuma regressao fisica N1 foi absolvida.
+TGD+37 decomposto, hipoteses L/T rejeitadas e decisoes documentadas no
+[checkpoint](checkpoints/2026-09-09-beta-etapa4.md) e
+[relatorio](RELATORIO_BETA_2026-09-09.md). Novo recorte75/81 passou offline;
+alternativa separada main-safe8cdd33f, SEM N1, esta em consolidada propria.
+A missao continua; #31 permanece draft e Revit nao foi iniciado.

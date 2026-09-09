@@ -1,0 +1,28 @@
+{
+  "started_utc": "2026-09-09T15:20:26.520082+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "1522b3bd25af81a858a9fb550626450cf06c944f",
+  "tree": "a1b0c446d1c9435479238ab5fceb397afc4bebbd",
+  "status_before": "M tools/beta/physical_snapshot.py\n M tools/beta/replay_preflight.py\n?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json\n?? tools/beta/probe_region.py",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "tools/beta/probe_region.py",
+    "--project",
+    "torre_easy_lo_r00_tp1",
+    "--walls",
+    "75",
+    "76",
+    "81",
+    "--output",
+    "docs/checkpoints/evidence/beta-region-l.json"
+  ],
+  "timeout_seconds": 600,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-region-l-run.txt",
+  "pid": 23244,
+  "exit_code": 0,
+  "elapsed_seconds": 0.421,
+  "status_after": "M tools/beta/physical_snapshot.py\n M tools/beta/replay_preflight.py\n?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-region-l-run.json\n?? docs/checkpoints/evidence/beta-region-l-run.txt\n?? docs/checkpoints/evidence/beta-region-l.json\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json\n?? tools/beta/probe_region.py",
+  "log_sha256": "4892f3749e4603045a3a9616994b195f538a18889e7684758c966cbee243e78a"
+}

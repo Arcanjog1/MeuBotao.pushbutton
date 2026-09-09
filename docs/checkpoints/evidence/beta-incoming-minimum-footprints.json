@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:43:01.929847+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "3229924e3537878e4c1d40d25dcb387ab23fc46a",
+  "tree": "17bb62ca7b142fcf30df4e7611a48ec24eef7894",
+  "status_before": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.txt\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import sys,json,pathlib,itertools\nsys.path.insert(0,'nuvem');from benchmark import solver_bridge as b\nm=b.engine(); d=json.loads(pathlib.Path('nuvem/benchmark/projects/torre_easy_lo_r00_tgd/input.json').read_text());nodes,w,e,o=b.plan_from_input(d);catalog,*_=b.catalog_from_input(d);r=m.solve_all_intersections(nodes,w,catalog,o,e)\nfor ni in (139,162):\n n=nodes[ni];print('node',ni,n['kind'],n.get('main_wall_idx'),n.get('incoming_wall_idx')); print([(p['logical_code'],p['wall_idx'],p['course'],[p['origin_world'].X*30.48,p['origin_world'].Y*30.48]) for p in r['candidates'] if p['node_index']==ni]); ass=m._t_intersection_room_assessment(n,w,o,nodes=nodes,end_to_node=e,node_index=ni);print('room',ass['room_incoming_ft']*30.48)\nchoices={}\nfor ni in (139,162):\n n=nodes[ni];ass=m._t_intersection_room_assessment(n,w,o,nodes=nodes,end_to_node=e,node_index=ni); choices[ni]=[]\n for code in ('C09','C04'):\n  ent=catalog[code];origin=ass['contact_i']+ass['incoming_dir']*b._ft(ent['length_cm']/2);p=m._make_block_candidate(code,ent,'A',origin,ass['incoming_dir'],'EXPERIMENT_MINIMUM',node_index=ni,wall_idx=n['incoming_wall_idx']);choices[ni].append(p)\nfor a,c in itertools.product(choices[139],choices[162]): print(json.dumps({'codes':[a['logical_code'],c['logical_code']],'overlap_cm':m._obb_min_overlap(m._candidate_obb(a),m._candidate_obb(c))*30.48}))\n"
+  ],
+  "timeout_seconds": 60,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-incoming-minimum-footprints.txt",
+  "pid": 24628,
+  "exit_code": 0,
+  "elapsed_seconds": 1.579,
+  "status_after": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.json\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.txt\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.txt\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "log_sha256": "0b9eea8eee7f3b7718198e587777bc01a8355410416972609baf94dd78654391"
+}

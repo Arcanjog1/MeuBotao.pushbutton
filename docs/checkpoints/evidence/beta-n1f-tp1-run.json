@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-09-09T14:37:18.986671+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "05030d2cf3e18081b040ad048759099a1b215210",
+  "tree": "4d4feda8d314f8d9adaa5864879d9984e4acbe83",
+  "status_before": "?? docs/checkpoints/\n?? tools/",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909\\tools\\beta\\physical_snapshot.py",
+    "--repo",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+    "--project",
+    "torre_easy_lo_r00_tp1",
+    "--output",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909\\docs\\checkpoints\\evidence\\beta-n1f-tp1.json"
+  ],
+  "timeout_seconds": 1200,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-n1f-tp1-run.txt",
+  "pid": 18064,
+  "exit_code": 0,
+  "elapsed_seconds": 244.828,
+  "status_after": "?? docs/checkpoints/\n?? tools/",
+  "log_sha256": "51334f1095578d99cb6d8f17d11abd4a35394de119fb007dd36133e133e39343"
+}

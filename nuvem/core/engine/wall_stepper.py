@@ -97,6 +97,7 @@ __all__ = [
     "NODE_FILL_OPPOSITE_COURSE_ENABLED",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
+    "_spread_compensators_layout", "_relayout_codes_in_place",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
     "_half_block_leading_layout", "_pier_forced_bypass_layouts",
     "PIER_STAGGER_DP_MAX_UNITS", "_layout_piece_profile",
@@ -116,6 +117,11 @@ __all__ = [
     "MIN_REPAIR_SEGMENT_CM", "AXIS_OPENING_SHIFT_MAX_CM",
     "BOND_STRIP_EDGE_EXEMPT_CM", "BOND_STRIP_OPENING_INFLUENCE_CM",
     "MAX_SPECIAL_BOND_PER_TRECHO", "_continuous_segment_layout",
+    "NEIGHBOR_NODE_BOND_CLEARANCE_FT", "_neighbor_node_boundary_ft",
+    "_neighbor_node_reach_ft", "_wall_junction_indices_nodes_and_ts_ft",
+    "_node_touches_wall", "_scan_wall_junction_nodes",
+    "_WALL_JUNCTION_SCAN_CACHE",
+    "_node_index_of",
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
     "_region_bounds_for_run", "_solve_repair_subsegments",
@@ -670,7 +676,9 @@ def _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, contact_p
                                             exclude_node_index=exclude_node_index) \
         if (nodes is not None and end_to_node is not None) else None
     return _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, sign,
-                              safe_range_ft=safe_range_ft)
+                              safe_range_ft=safe_range_ft, nodes=nodes,
+                              exclude_node_index=exclude_node_index,
+                              end_to_node=end_to_node)
 
 
 def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
@@ -934,31 +942,98 @@ def _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx, exclude_nod
     varredura UNICA que `_wall_junction_ts_ft` (so' o `t`) e
     `_corner_bond_blocking_courses` (precisa do no' para saber em QUE
     FIADA ele ocupa a parede) compartilham."""
-    found = []
+    return [(node, t_ft) for _idx, node, t_ft in
+            _wall_junction_indices_nodes_and_ts_ft(
+                walls_to_create, nodes, wall_idx, exclude_node_index)]
+
+
+# Cache da varredura de nos por parede. Chave por IDENTIDADE (`is`) da
+# lista de nos e da lista de paredes - nunca por conteudo -, e a entrada
+# so' e' usada quando as DUAS listas sao literalmente as mesmas, o que
+# elimina o risco de `id` reciclado depois de um GC.
+#
+# A varredura depende da pertinencia das paredes e da projecao do ponto,
+# nao da ordem dos bracos. A coordenacao A/B pode reordenar `arms`, mas
+# conserva essa pertinencia. Mudancas de topologia/coordenadas devem usar
+# outro grafo ou invalidar o cache. Censos TGD/TP1 de 2026-09-09 com todo
+# lookup forcado a miss reproduziram exatamente a geometria N1f.
+_WALL_JUNCTION_SCAN_CACHE = {}
+_WALL_JUNCTION_SCAN_CACHE_MAX = 4096
+
+
+def _wall_junction_indices_nodes_and_ts_ft(walls_to_create, nodes, wall_idx,
+                                           exclude_node_index=None):
+    """`(indice, no', t_ft)` - a MESMA varredura, devolvendo tambem o
+    indice que o `enumerate` ja' tem em maos.
+
+    Existe por CUSTO, nao por gosto (medido 2026-09-09): quem precisava do
+    indice chamava `_node_index_of`, que varre `nodes` OUTRA VEZ para cada
+    vizinho. Com a CR-N1c isso passou a rodar dentro de
+    `_neighbor_node_boundary_ft`, ou seja, a cada `_room_at_t_on_wall` -
+    o TGD saltou de 65s para 176s. Devolver o indice aqui elimina a
+    segunda varredura sem mudar UM VALOR sequer."""
     if not nodes:
-        return found
+        return []
+    cache_key = (id(nodes), len(nodes), id(walls_to_create), wall_idx)
+    cached = _WALL_JUNCTION_SCAN_CACHE.get(cache_key)
+    if cached is not None and cached[0] is nodes and cached[1] is walls_to_create:
+        todos = cached[2]
+    else:
+        todos = _scan_wall_junction_nodes(walls_to_create, nodes, wall_idx)
+        if len(_WALL_JUNCTION_SCAN_CACHE) >= _WALL_JUNCTION_SCAN_CACHE_MAX:
+            _WALL_JUNCTION_SCAN_CACHE.clear()
+        _WALL_JUNCTION_SCAN_CACHE[cache_key] = (nodes, walls_to_create, todos)
+    if exclude_node_index is None:
+        return list(todos)
+    return [entry for entry in todos if entry[0] != exclude_node_index]
+
+
+def _scan_wall_junction_nodes(walls_to_create, nodes, wall_idx):
+    """A varredura de verdade (sem cache, sem exclusao) - ver
+    `_wall_junction_indices_nodes_and_ts_ft`."""
+    found = []
+    # Eixo calculado UMA VEZ (era 1x por no'), e pertinencia testada com
+    # short-circuit em vez de montar um `set` por no'. Semantica IDENTICA -
+    # o `set` so' servia para o `in` - mas sem 205 milhoes de `set.add` no
+    # TGD: esta funcao respondia por 41% do tempo do solver depois que a
+    # CR-N1 a pos no caminho quente (`_room_at_t_on_wall`), medido com
+    # cProfile em 2026-09-09 (184s de 631s).
+    p0, _p1, direction, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+    dir_x, dir_y = direction.X, direction.Y
+    p0_x, p0_y = p0.X, p0.Y
     for idx, node in enumerate(nodes):
-        if idx == exclude_node_index or not isinstance(node, dict):
+        if not isinstance(node, dict):
             continue
         if node.get("kind") in (None, "FREE_END"):
             continue
-        involved = set()
-        for arm in (node.get("arms") or []):
-            if arm:
-                involved.add(arm[0])
-        for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
-            if node.get(key) is not None:
-                involved.add(node[key])
-        for w in (node.get("crossing_walls") or []):
-            if w is not None:
-                involved.add(w)
-        if wall_idx not in involved:
+        if not _node_touches_wall(node, wall_idx):
             continue
         point = node.get("point")
         if point is None:
             continue
-        found.append((node, _t_of_point_on_wall(walls_to_create, wall_idx, point)))
+        found.append((idx, node,
+                      (point.X - p0_x) * dir_x + (point.Y - p0_y) * dir_y))
     return found
+
+
+def _node_touches_wall(node, wall_idx):
+    """True se `wall_idx` aparece em qualquer papel deste no' (braco,
+    principal, incoming, vizinha ou travessia). Testa com short-circuit -
+    e' a MESMA pertinencia que o `set` de
+    `_wall_junction_indices_nodes_and_ts_ft` calculava, sem alocar nada."""
+    for arm in (node.get("arms") or ()):
+        if arm and arm[0] == wall_idx:
+            return True
+    if node.get("main_wall_idx") == wall_idx:
+        return True
+    if node.get("incoming_wall_idx") == wall_idx:
+        return True
+    if node.get("neighbor_wall_idx") == wall_idx:
+        return True
+    for w in (node.get("crossing_walls") or ()):
+        if w == wall_idx:
+            return True
+    return False
 
 
 def _corner_bond_blocked_by_other_node(walls_to_create, nodes, wall_idx, contact_point,
@@ -1106,7 +1181,150 @@ def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_poin
     return busy
 
 
-def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign, safe_range_ft=None):
+# Distancia (ft) entre dois nos de encontro da MESMA parede abaixo da qual
+# as pecas de amarracao dos dois podem se sobrepor fisicamente. E' a soma
+# do PIOR CASO de alcance de cada lado: CORNER_B34_ROOM_FT (34cm, o B34
+# deitado de um L/T degradado, que se estende todo para UM lado do no').
+# Acima disso os dois nos cabem com folga total e a checagem nao muda nada
+# - por isso ela so' e' aplicada abaixo deste limite, deixando byte-a-byte
+# intacto o comportamento historico de todo par de nos bem separado.
+NEIGHBOR_NODE_BOND_CLEARANCE_FT = 2.0 * CORNER_B34_ROOM_FT
+
+
+def _node_index_of(nodes, node):
+    """Indice de `node` em `nodes` por IDENTIDADE DE OBJETO (`is`), nunca
+    por igualdade: dois nos distintos podem ter dicts iguais campo a campo
+    (dois L_CORNER simetricos da planta), e `list.index` devolveria o
+    primeiro dos dois. Devolve None quando o no' nao esta' na lista."""
+    for idx, other in enumerate(nodes):
+        if other is node:
+            return idx
+    return None
+
+
+def _neighbor_node_reach_ft(walls_to_create, openings_per_wall, nodes, end_to_node,
+                            wall_idx, neighbor_node_index, t_neighbor_ft, toward_sign):
+    """Quanto o no' VIZINHO consegue, no MAXIMO, estender na MINHA direcao
+    (`toward_sign` = o sentido que sai do vizinho e vem para mim).
+
+    E' a MESMA medicao que o proprio vizinho fara' quando for resolvido -
+    `_room_at_t_on_wall` com o `safe_range` DELE - so' que sem a checagem
+    de vizinhos (`nodes=None`), o que corta qualquer recursao e mantem
+    esta funcao um limite SUPERIOR: aberturas, reserva das duas pontas e a
+    ponta fisica ja' entram, a fronteira de vizinho nao.
+
+    Existe porque o ponto medio de `_neighbor_node_boundary_ft` supunha
+    que o vizinho SEMPRE alcanca ate' ele - e nao alcanca. Quando o
+    vizinho ja' esta' bloqueado (a reserva da outra ponta o impede de
+    descer, uma abertura o corta), o meio-a-meio DOA espaco PARA O VAZIO:
+    tira de quem usaria para dar a quem nao pode usar."""
+    safe_range_ft = (
+        _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx,
+                                exclude_node_index=neighbor_node_index)
+        if (nodes is not None and end_to_node is not None) else None
+    )
+    return _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx,
+                              t_neighbor_ft, toward_sign,
+                              safe_range_ft=safe_range_ft)
+
+
+def _neighbor_node_boundary_ft(walls_to_create, nodes, wall_idx, t_ft, sign,
+                               exclude_node_index=None, skip_node_indices=(),
+                               openings_per_wall=None, end_to_node=None):
+    """Limite (t em ft) que o no' de encontro VIZINHO mais proximo impoe a
+    quem mede espaco a partir de `t_ft` andando em `sign`, ao longo de
+    `wall_idx` - ou None quando nenhum vizinho esta' perto o bastante para
+    haver colisao possivel.
+
+    O limite e' o PONTO MEDIO entre os dois nos, de proposito: os dois sao
+    resolvidos de forma INDEPENDENTE, um sem saber a escolha final do
+    outro, entao so' um criterio SIMETRICO garante que as duas medicoes
+    concordem sobre a fronteira (cada um fica com a sua metade) sem
+    precisar de uma segunda passada de coordenacao. E' a mesma classe de
+    bug que `_wall_reserved_range_ft` ja' resolve para as DUAS PONTAS de
+    uma parede curta - so' que para os nos de MEIO DE PAREDE (T/X), que
+    aquele nunca enxerga porque so' varre `end_to_node[(wall_idx, 0/1)]`.
+
+    BUG REAL MEDIDO (2026-09-08, varredura ampla do benchmark offline):
+    todas as 8 identidades de `POSITION_OVERLAP` do TGD+TP1 eram este
+    caso - dois nos na mesma parede, cada um prometendo a si mesmo o
+    espaco inteiro ate' a proxima abertura/ponta. Assinatura exata: dois
+    `T_INTERSECTION_MAIN` a `d` cm um do outro produziam dois B54
+    centrados sobrepostos em `54 - d` cm (medido: nos a 50cm -> 4,00cm;
+    a 35cm -> 19,00cm; a 12,7cm -> 41,26cm).
+
+    `skip_node_indices`: nos que NAO devem ser cobrados aqui porque JA'
+    estao descontados por outro mecanismo. Na pratica sao os nos das duas
+    PONTAS desta parede quando o chamador passou `safe_range_ft`:
+    `_wall_reserved_range_ft` ja' reservou para cada um deles o PIOR CASO
+    (`CORNER_B34_ROOM_FT`, 34cm) medido a partir da PONTA FISICA. Cobrar a
+    mesma reserva outra vez pelo ponto medio e' DUPLA CONTAGEM - e o
+    minimo das duas e' sempre mais apertado que qualquer uma sozinha.
+
+    BUG REAL MEDIDO (2026-09-09, fechamento da N1): numa parede de 69cm
+    entre dois L_CORNER (nos a t=7,0 e t=62,0), a reserva de ponta ja'
+    dava `safe_range = (0,0; 35,0)cm` -> room 28,00cm; o ponto medio
+    (34,5cm) cortava para 27,50cm. Meio centimetro que a parede nao devia
+    a ninguem, e que bastava para degradar a peca de amarracao e jogar o
+    preenchimento no tier dos compensadores.
+
+    `openings_per_wall`/`end_to_node` (CR-N1c, 2026-09-09): quando dados, a
+    fronteira contra cada vizinho para de ser o ponto medio CEGO e passa a
+    ser o mais LONGE entre o ponto medio e o ALCANCE REAL daquele vizinho
+    (`_neighbor_node_reach_ft`). O ponto medio continua valendo quando os
+    dois de fato competem pelo mesmo espaco - o caso dos
+    `POSITION_OVERLAP` da secao 40 -, mas deixa de tirar espaco de quem
+    usaria para dar a um vizinho que NAO PODE ALCANCAR ali.
+
+    Continua sem sobreposicao por construcao: `p` vai no maximo ate'
+    `t_q - alcance(q)`, e `q` ocupa no maximo `[t_q - alcance(q), t_q]` -
+    os dois no maximo se ENCOSTAM nessa divisa. E continua SIMETRICO: se
+    os dois alcancam alem do meio, os dois caem no ponto medio e
+    concordam sem segunda passada.
+
+    BUG REAL MEDIDO (2026-09-09, TGD): parede
+    `W|-140.5,470.0|5.5,470.0|t14.0`, no' 142 (`T_INTERSECTION`, t=1,00cm)
+    e no' 185 (`L_CORNER`, t=7,00cm) a 6,0cm um do outro. O alcance do
+    no' 185 na direcao do 142 e' ZERO (a reserva da outra ponta poe o
+    `safe_range` dele em lo=34,00cm), mas o ponto medio (t=4,00cm) tirava
+    2cm do no' 142 assim mesmo: room 5,00 -> 3,00cm. Com 5,00cm cabia o
+    `C04` que amarrava o encontro; com 3,00cm nao cabe NADA, e o T ficava
+    SEM NENHUMA PECA nas 17 fiadas (`JUNCTION_MISSING_BINDING` 23 -> 40).
+
+    `nodes` ausente (chamador antigo) devolve None - sem essa checagem,
+    comportamento historico."""
+    if not nodes:
+        return None
+    direction = 1.0 if sign >= 0 else -1.0
+    boundary = None
+    skip = set(i for i in (skip_node_indices or ()) if i is not None)
+    for other_index, _other_node, other_t in _wall_junction_indices_nodes_and_ts_ft(
+            walls_to_create, nodes, wall_idx, exclude_node_index=exclude_node_index):
+        if skip and other_index in skip:
+            continue
+        gap = (other_t - t_ft) * direction
+        if gap <= 1e-6 or gap >= NEIGHBOR_NODE_BOND_CLEARANCE_FT:
+            # Atras (ou em cima) do proprio ponto, ou longe o bastante para
+            # os dois caberem inteiros - nada a limitar nos dois casos.
+            continue
+        limit = t_ft + direction * (gap / 2.0)
+        if openings_per_wall is not None and end_to_node is not None:
+            reach = _neighbor_node_reach_ft(
+                walls_to_create, openings_per_wall, nodes, end_to_node,
+                wall_idx, other_index, other_t, -sign)
+            reachable = other_t - direction * max(0.0, reach)
+            # O mais LONGE dos dois na minha direcao: o ponto medio so'
+            # vale enquanto o vizinho realmente alcanca alem dele.
+            if (reachable - t_ft) * direction > (limit - t_ft) * direction:
+                limit = reachable
+        if boundary is None or (limit - t_ft) * direction < (boundary - t_ft) * direction:
+            boundary = limit
+    return boundary
+
+
+def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
+                      safe_range_ft=None, nodes=None, exclude_node_index=None,
+                      end_to_node=None):
     """Distancia (ft, nunca negativa) de `t_ft` ate' o proximo obstaculo
     REAL (borda de abertura, a reserva de um encontro na OUTRA ponta da
     parede, ou a propria ponta fisica) andando no sentido `sign` (+1 = t
@@ -1118,22 +1336,51 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     - quando dado, o "fim fisico da parede" some' como limite e vira esse
     intervalo (ja' descontada a reserva de outro encontro na ponta
     oposta). `None` (chamador antigo) usa o comprimento fisico inteiro,
-    comportamento historico."""
+    comportamento historico.
+
+    `nodes`/`exclude_node_index` (opcionais): quando dados, o espaco
+    tambem para no PONTO MEDIO ate' o no' de encontro VIZINHO mais
+    proximo desta MESMA parede (ver `_neighbor_node_boundary_ft`) - a
+    lacuna dos nos de MEIO DE PAREDE que `safe_range_ft` nao cobre, porque
+    aquele so' varre as duas PONTAS. `None` (chamador antigo) mantem o
+    comportamento historico.
+
+    `end_to_node` (opcional): so' faz sentido junto de `safe_range_ft` -
+    identifica os nos das duas PONTAS desta parede para que eles NAO sejam
+    cobrados duas vezes (uma na reserva de ponta, outra no ponto medio).
+    Ver `skip_node_indices` em `_neighbor_node_boundary_ft`."""
     if wall_idx is None or wall_idx >= len(walls_to_create):
         return 0.0
     _p0, _p1, _dir, total_len_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     lo_ft, hi_ft = (0.0, total_len_ft) if safe_range_ft is None else safe_range_ft
     openings_here = openings_per_wall[wall_idx] if (openings_per_wall and wall_idx < len(openings_per_wall)) else []
+    # Os nos das duas PONTAS ja' entram por `safe_range_ft`
+    # (`_wall_reserved_range_ft`, pior caso de 34cm): cobra-los tambem no
+    # ponto medio seria contar a MESMA reserva duas vezes. Sem
+    # `safe_range_ft` ninguem os cobriu, entao continuam valendo aqui.
+    skip_node_indices = ()
+    if safe_range_ft is not None and end_to_node is not None:
+        skip_node_indices = (end_to_node.get((wall_idx, 0)),
+                             end_to_node.get((wall_idx, 1)))
+    neighbor_boundary = _neighbor_node_boundary_ft(
+        walls_to_create, nodes, wall_idx, t_ft, sign,
+        exclude_node_index=exclude_node_index,
+        skip_node_indices=skip_node_indices,
+        openings_per_wall=openings_per_wall, end_to_node=end_to_node)
     if sign >= 0:
         boundary = hi_ft
         for (t_lo, _t_hi, _s, _h) in openings_here:
             if t_lo >= t_ft - 1e-6 and t_lo < boundary:
                 boundary = t_lo
+        if neighbor_boundary is not None and neighbor_boundary < boundary:
+            boundary = neighbor_boundary
         return max(0.0, boundary - t_ft)
     boundary = lo_ft
     for (_t_lo, t_hi, _s, _h) in openings_here:
         if t_hi <= t_ft + 1e-6 and t_hi > boundary:
             boundary = t_hi
+    if neighbor_boundary is not None and neighbor_boundary > boundary:
+        boundary = neighbor_boundary
     return max(0.0, t_ft - boundary)
 
 
@@ -1163,8 +1410,12 @@ def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
     _p0, _p1, main_dir, _len, _thick = _wall_axis_and_length(walls_to_create, main_idx)
     t_main = _t_of_point_on_wall(walls_to_create, main_idx, point)
     main_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, main_idx) if have_graph else None
-    room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, 1, main_range)
-    room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, -1, main_range)
+    room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, 1,
+                                   main_range, nodes=nodes, exclude_node_index=node_index,
+                                   end_to_node=end_to_node)
+    room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, -1,
+                                    main_range, nodes=nodes, exclude_node_index=node_index,
+                                    end_to_node=end_to_node)
 
     contact_i = _node_contact_point_for_wall(node, inc_idx)
     _end_i, dir_i, _len_i, _thick_i = _wall_end_and_dir_near_point(walls_to_create, inc_idx, contact_i)
@@ -1173,7 +1424,9 @@ def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
     t_i = _t_of_point_on_wall(walls_to_create, inc_idx, contact_i)
     inc_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, inc_idx,
                                         exclude_node_index=node_index) if have_graph else None
-    room_i = _room_at_t_on_wall(walls_to_create, openings_per_wall, inc_idx, t_i, sign_i, inc_range)
+    room_i = _room_at_t_on_wall(walls_to_create, openings_per_wall, inc_idx, t_i, sign_i,
+                                inc_range, nodes=nodes, exclude_node_index=node_index,
+                                end_to_node=end_to_node)
 
     return {
         "main_idx": main_idx, "inc_idx": inc_idx, "point": point, "contact_i": contact_i,
@@ -1342,9 +1595,46 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
         # 1) DEGRADA PARA L: B34 nos dois lados, se couberem.
         if room_i_ft + 1e-6 >= CORNER_B34_ROOM_FT:
             l_dir = None
-            if assessment["room_plus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT:
+            # O B34 deste L degradado NAO comeca no ponto do no': ele
+            # comeca em `point - l_dir * (thick_i / 2)` (ver `contact_main`
+            # logo abaixo) e so' entao se estende 34cm em `l_dir`. Ou seja,
+            # ele ULTRAPASSA o no' em meia espessura da boneca PARA O LADO
+            # CONTRARIO de `l_dir` - e e' exatamente esse pedacinho que
+            # continuava invadindo a peca do no' VIZINHO depois que a
+            # medicao de espaco passou a parar no ponto medio entre os dois
+            # (o residual de 1,26cm da primeira versao desta correcao,
+            # reproduzido em `tests/test_neighbor_node_bond_collision.py`
+            # com dois nos a 12cm).
+            #
+            # A folga extra e' cobrada SO' CONTRA O NO' VIZINHO, nunca
+            # contra `room_plus_ft`/`room_minus_ft` inteiros: aqueles
+            # tambem param em ABERTURA, e cobrar a meia espessura ali
+            # mudaria um comportamento que nao e' o alvo desta correcao -
+            # medido, custava o B34 da parede principal (o no' caia para o
+            # elemento unico da boneca) em troca de nada, porque a invasao
+            # de vao que sobra naquele caso vem da peca da BONECA, nao
+            # desta. Escopo minimo: a colisao entre nos vizinhos.
+            _p0_i, _p1_i, _dir_i2, _len_i2, thick_i_ft = _wall_axis_and_length(
+                walls_to_create, inc_idx)
+            overshoot_ft = thick_i_ft / 2.0
+            t_main_ft = _t_of_point_on_wall(walls_to_create, main_idx, point)
+            neighbor_plus = _neighbor_node_boundary_ft(
+                walls_to_create, nodes, main_idx, t_main_ft, 1,
+                exclude_node_index=node_index)
+            neighbor_minus = _neighbor_node_boundary_ft(
+                walls_to_create, nodes, main_idx, t_main_ft, -1,
+                exclude_node_index=node_index)
+            # Sobra para TRAS do no' quando a peca se estende para frente
+            # (e vice-versa) - so' o no' vizinho limita.
+            back_ok_for_plus = (neighbor_minus is None
+                                or (t_main_ft - neighbor_minus) + 1e-6 >= overshoot_ft)
+            back_ok_for_minus = (neighbor_plus is None
+                                 or (neighbor_plus - t_main_ft) + 1e-6 >= overshoot_ft)
+            if (assessment["room_plus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT
+                    and back_ok_for_plus):
                 l_dir = main_dir
-            elif assessment["room_minus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT:
+            elif (assessment["room_minus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT
+                    and back_ok_for_minus):
                 l_dir = main_dir.Negate()
             if l_dir is not None:
                 # O "arm_point" de um L_CORNER de verdade fica do lado
@@ -1461,8 +1751,12 @@ def _x_intersection_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, p
                                 exclude_node_index=exclude_node_index)
         if nodes is not None and end_to_node is not None else None
     )
-    room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, 1, wall_range)
-    room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, -1, wall_range)
+    room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, 1,
+                                   wall_range, nodes=nodes, exclude_node_index=exclude_node_index,
+                                   end_to_node=end_to_node)
+    room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, -1,
+                                    wall_range, nodes=nodes, exclude_node_index=exclude_node_index,
+                                    end_to_node=end_to_node)
     return room_plus, room_minus
 
 
@@ -3467,8 +3761,11 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
 
     # 7) fica com o "com compensadores" (ja' fundido) mesmo acima do teto,
     #    se existir - sempre melhor que reportar NON_MODULAR sem precisar.
+    #    A composicao e' a mesma; so' a ORDEM e' escolhida para nao deixar
+    #    compensador encostado em compensador (regra escrita #2, secao
+    #    41.5) - nenhum teto muda aqui.
     if layout_with_comp is not None:
-        return merged_with_comp
+        return _spread_compensators_layout(merged_with_comp, catalog)
 
     # 7b) fileira de B34 acima do teto (tiers 3/4) - pior que compensador
     #     acima do teto (uma peca de amarracao no meio da parede engana quem
@@ -3924,6 +4221,98 @@ def _pier_forced_bypass_layouts(pier_cm, catalog, leading_joint_cm, trailing_joi
             alt = _forced_first(comp_code)
             if alt is not None:
                 out.append(alt)
+    return out
+
+
+def _spread_compensators_layout(layout, catalog):
+    """O MESMO conjunto de pecas de `layout`, REORDENADO para que nenhum
+    compensador encoste em outro sempre que isso for aritmeticamente
+    possivel. Devolve o proprio `layout` quando ja' esta' bom, quando nao
+    ha' o que intercalar, ou quando a reordenacao nao melhoraria
+    `_layout_compensator_run_excess`.
+
+    NAO e' uma preferencia normativa nova, e NAO mexe em teto nenhum
+    (secao 41.5, "a parte da opcao 4 que ja' esta' integralmente
+    permitida"): a composicao entregue e' EXATAMENTE a mesma - mesmos
+    codigos, mesma contagem, mesmo comprimento total. So' a ORDEM muda.
+
+    A regra ESCRITA do usuario e' "**proibido usar 2 ou mais EM
+    SEQUENCIA** no mesmo trecho"; `MAX_COMPENSATORS_PER_TRECHO` e' a
+    implementacao mais restritiva dela. Quando o tier 7 ja' decidiu
+    entregar N compensadores acima do teto (porque nao existe alternativa
+    - ver a enumeracao exaustiva da secao 41.5), entrega-los EM SEQUENCIA
+    viola a regra escrita sem necessidade nenhuma: intercalar respeita a
+    letra da regra e nao custa uma peca sequer.
+
+    O criterio ja' era usado como PRIMARIO em `_pier_layout_avoiding_
+    joints` (`_score`); aqui ele passa a valer tambem no caminho em que
+    aquela busca nao roda (sem junta a evitar).
+
+    Preserva a POSICAO INICIAL e o encadeamento (peca + BLOCK_JOINT_CM),
+    e nunca move um HALF_BLOCK_CODE de ponta: o B19 so' e' legitimo onde
+    esta' (regra do meio-bloco), entao ele fica ancorado no extremo em que
+    o layout o colocou."""
+    if not layout or len(layout) < 3:
+        return layout
+    is_comp = lambda code: bool((catalog or {}).get(code, {}).get("is_compensator"))  # noqa: E731
+    if _layout_compensator_run_excess(layout, catalog) <= 0:
+        return layout
+    codes = [item[0] for item in layout]
+    # O B19 fica onde esta' (so' pode encostar em ponta ABERTA) - reordena
+    # apenas o miolo entre os B19 de extremidade, se houver.
+    head = codes[:1] if codes[0] == HALF_BLOCK_CODE else []
+    tail = codes[-1:] if len(codes) > 1 and codes[-1] == HALF_BLOCK_CODE else []
+    miolo = codes[len(head):len(codes) - len(tail)]
+    comps = [c for c in miolo if is_comp(c)]
+    plains = [c for c in miolo if not is_comp(c)]
+    if not comps or not plains:
+        return layout
+    # Intercala: um compensador a cada `passo` pecas comuns, distribuido o
+    # mais uniformemente possivel. Com comps <= plains + 1 o resultado tem
+    # excesso ZERO; acima disso sobra o minimo aritmetico possivel.
+    novo_miolo = []
+    restantes = list(comps)
+    for i, peca in enumerate(plains):
+        novo_miolo.append(peca)
+        # quantos compensadores ainda cabem depois desta peca comum
+        faltam_plains = len(plains) - i - 1
+        while restantes and (len(restantes) > faltam_plains or
+                             len(restantes) * 1.0 / max(1, faltam_plains + 1) > 1.0):
+            novo_miolo.append(restantes.pop(0))
+            break
+    novo_miolo.extend(restantes)
+    nova_ordem = head + novo_miolo + tail
+    if sorted(nova_ordem) != sorted(codes):
+        return layout  # nunca devolve uma composicao diferente
+    candidato = _relayout_codes_in_place(nova_ordem, layout, catalog)
+    if candidato is None:
+        return layout
+    if _layout_compensator_run_excess(candidato, catalog) >= \
+            _layout_compensator_run_excess(layout, catalog):
+        return layout
+    return candidato
+
+
+def _relayout_codes_in_place(codes, layout, catalog):
+    """Reconstroi `[(codigo, start_cm, end_cm), ...]` para `codes` a partir
+    da MESMA posicao inicial de `layout`, encadeando peca + BLOCK_JOINT_CM.
+    Devolve None se o comprimento total nao bater com o original (guarda
+    contra qualquer reordenacao que mudasse o trecho)."""
+    if not layout:
+        return None
+    start = layout[0][1]
+    fim_original = layout[-1][2]
+    out = []
+    cursor = start
+    for code in codes:
+        entry = (catalog or {}).get(code) or {}
+        length = entry.get("length_cm")
+        if length is None:
+            return None
+        out.append((code, cursor, cursor + length))
+        cursor += length + BLOCK_JOINT_CM
+    if abs(out[-1][2] - fim_original) > PIER_LAYOUT_TOLERANCE_CM:
+        return None
     return out
 
 

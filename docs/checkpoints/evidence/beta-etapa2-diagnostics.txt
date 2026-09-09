@@ -1,0 +1,9 @@
+test_axis_reversal_changes_piece_identity_not_occupied_region (test_diagnostics.DiagnosticsTests.test_axis_reversal_changes_piece_identity_not_occupied_region) ... ok
+test_different_inputs_rejected (test_diagnostics.DiagnosticsTests.test_different_inputs_rejected) ... ok
+test_new_region_cannot_be_approved_by_lower_total_area (test_diagnostics.DiagnosticsTests.test_new_region_cannot_be_approved_by_lower_total_area) ... ok
+test_stage_report_keeps_multiplicity_distinct_from_physical_identity (test_diagnostics.DiagnosticsTests.test_stage_report_keeps_multiplicity_distinct_from_physical_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.654s
+
+OK

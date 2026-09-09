@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-09-09T14:47:03.704307+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-n1b-20260909",
+  "head": "67083b03e2beeeef320e97ed554aabaa35499613",
+  "tree": "c40404c06ece1a185c12b820cfb80185bd37af6b",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909\\tools\\beta\\physical_snapshot.py",
+    "--repo",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-n1b-20260909",
+    "--project",
+    "torre_easy_lo_r00_tgd",
+    "--output",
+    "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909\\docs\\checkpoints\\evidence\\beta-n1b-tgd.json"
+  ],
+  "timeout_seconds": 1200,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-n1b-tgd-run.txt",
+  "pid": 5616,
+  "exit_code": 0,
+  "elapsed_seconds": 82.718,
+  "status_after": "",
+  "log_sha256": "01a9aed9577606e11f1f8a712f974f3fb0c82e470dd568784592011d8c3e2373"
+}

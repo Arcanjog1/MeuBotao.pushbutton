@@ -1,0 +1,1594 @@
+{
+  "head": "09b6ea0ae221a43a3adc27f63bb05d336351584f",
+  "input_sha256": "60fde2eb6e6d4f35cee26a395e7582a5963f651ee9c3e7cf6aac54711d6f2589",
+  "wall_key": "W|6177.0,958.0|6177.0,1467.0|t14.0",
+  "span_cm": [
+    35,
+    219
+  ],
+  "scope": "All permutations of the existing seven-piece multiset on all even physical courses, fixed nodes/boundaries, odd rows untouched. No solver patch or normative relaxation. Not an exhaustive composition or global topology search.",
+  "summary": {
+    "permutations": 105,
+    "nonadjacent": 30,
+    "nonadjacent_audit_ok": 0,
+    "minimum_strips_without_adjacency": 2,
+    "minimum_continuous_joints_without_adjacency": 0
+  },
+  "alternatives": [
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "C09"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 1,
+      "compensator_strips": 0,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "C09"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 0,
+      "audit_ok": true
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "C04"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 0,
+      "audit_ok": true
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 2,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 3,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 4,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 3,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 3,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C04",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "B39",
+        "C09",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 5,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 4,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 4,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 3,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 3,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 3,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "B39",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 2,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C04",
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 1,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 1,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 0,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "B39",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C09"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "C09",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "C09",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C04",
+        "B39",
+        "C09",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C04",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "B39",
+        "C04"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 2,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "B39",
+        "C04",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C09",
+        "B39",
+        "B39",
+        "C04",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C09",
+        "B39",
+        "C04",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 1,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    },
+    {
+      "order": [
+        "C09",
+        "C09",
+        "C04",
+        "B39",
+        "B39",
+        "B39",
+        "B39"
+      ],
+      "adjacency_excess": 2,
+      "continuous_joints": 0,
+      "compensator_strips": 3,
+      "audit_ok": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-09T15:16:18.335345+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "1522b3bd25af81a858a9fb550626450cf06c944f",
+  "tree": "a1b0c446d1c9435479238ab5fceb397afc4bebbd",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import sys,runpy; sys.path.insert(0,'nuvem'); from benchmark.solver_bridge import engine; engine(); import core.engine.wall_stepper as w; w._WALL_JUNCTION_SCAN_CACHE=type('ColdCache',(dict,),{'get':lambda self,key,default=None:None})(); print('CONTROL: every junction-cache lookup misses',flush=True); runpy.run_path('tools/beta/physical_snapshot.py',run_name='__main__')",
+    "--repo",
+    ".",
+    "--project",
+    "torre_easy_lo_r00_tgd",
+    "--output",
+    "docs/checkpoints/evidence/beta-cache-off-tgd.json"
+  ],
+  "timeout_seconds": 1200,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-cache-off-tgd-run.txt",
+  "pid": 25252,
+  "exit_code": 0,
+  "elapsed_seconds": 226.312,
+  "status_after": "M tools/beta/physical_snapshot.py\n M tools/beta/replay_preflight.py\n?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt",
+  "log_sha256": "57140f530428615abae033a2b59333f55c27b095a1b58616798eee0b2fda9c0b"
+}

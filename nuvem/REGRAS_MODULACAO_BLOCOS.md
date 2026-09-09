@@ -6100,3 +6100,1196 @@ muda ali é da mudança; o que só aparece no pipeline completo é
 é lido como regressão do mecanismo novo — e uma degradação colateral é
 lida como “troca crítico → menor”, que é exatamente o erro corrigido pela
 condição C2 da revisão da CR-G12.
+
+---
+
+## 40. `CR-N1` — dois nós de encontro VIZINHOS na MESMA parede não podem
+lançar peças de amarração sobrepostas (2026-09-08, varredura ampla do
+benchmark offline)
+
+### 40.1 Regra (REGRA OBRIGATÓRIA)
+
+Duas peças de amarração (B54/B34) lançadas por **nós de encontro
+diferentes** que caem na **mesma parede** e na **mesma fiada** **nunca
+podem ocupar o mesmo volume**. Sobreposição entre peças de nós distintos
+é **COLISÃO**, não amarração legítima — a amarração legítima é a
+penetração de uma peça na parede **perpendicular** do seu próprio nó,
+nunca a superposição de duas peças ao longo do **mesmo eixo**.
+
+Quando os dois nós estão perto demais para as duas peças cheias,
+**os dois degradam** pela ordem já existente (B54 → B34 do L degradado →
+elemento único na boneca). Nenhum dos dois "ganha" o espaço inteiro.
+
+### 40.2 Causa-raiz medida
+
+`_room_at_t_on_wall` (`nuvem/core/engine/wall_stepper.py`) media o espaço
+disponível parando **só** em: borda de abertura, reserva das **duas
+PONTAS** da parede (`_wall_reserved_range_ft`) e ponta física. **Nunca**
+parava num nó de encontro no **MEIO** da parede — que é exatamente onde
+mora o `T_INTERSECTION_MAIN` (a parede principal de um T **atravessa** o
+nó, então ela não termina ali e `end_to_node[(wall_idx, 0/1)]` não a
+enxerga).
+
+Resultado: dois T na mesma parede principal, a `d` cm um do outro, cada
+um media espaço até a próxima abertura, cada um se achava com folga, e
+cada um lançava o seu **B54 CENTRADO** no próprio ponto. As duas peças se
+sobrepunham em exatamente **`54 − d` cm**.
+
+**COMO FOI DESCOBERTO**: medição no benchmark offline (TGD + TP1,
+`result.json`), não dedução. As **8 identidades físicas** de
+`POSITION_OVERLAP` dos dois projetos eram **este mesmo caso**. Assinatura
+numérica confirmada peça a peça:
+
+| projeto | parede | nós (cm) | distância | sobreposição medida | `54 − d` |
+|---|---|---|---|---|---|
+| TP1 | `W019` | 742 / 792 | 50,0cm | **4,00cm** | 4 |
+| TP1 | `W019` | 1082 / 1117 | 35,0cm | **19,00cm** | 19 |
+| TGD | `W162` | 927,3 / 940,0 | 12,7cm | **41,26cm** | 41,3 |
+| TGD | `W112` | 227 / 255 | 28,0cm | **26,00cm** | 26 |
+| TGD | `W116` | 115,1 / 122,0 | 6,9cm | **47,13cm** | 47,1 |
+| TGD | `W138` | 254,8 / 287,0 | 32,2cm | **11,76cm** | (T + L degradado) |
+| TGD | `W061` | 70,2 / 77,2 | 7,0cm | **27,00cm** | (L + T degradado) |
+| TGD | `W131` | 4,5 / 24,0 | 19,5cm | **2,00cm** | (compensador + L) |
+
+### 40.3 Implementação
+
+`_neighbor_node_boundary_ft` + parâmetros `nodes`/`exclude_node_index` em
+`_room_at_t_on_wall`, ligados nos quatro medidores de espaço
+(`_corner_wall_room_ft`, as duas medições da parede principal e a da
+boneca em `_t_intersection_room_assessment`, e
+`_x_intersection_wall_room_ft`).
+
+A fronteira entre dois nós vizinhos é o **PONTO MÉDIO** entre eles, de
+propósito: os dois nós são resolvidos **independentemente**, um sem saber
+a escolha final do outro, então só um critério **simétrico** faz as duas
+medições concordarem sobre a mesma fronteira sem uma segunda passada de
+coordenação. Cada nó fica com a sua metade.
+
+A checagem só é aplicada abaixo de `NEIGHBOR_NODE_BOND_CLEARANCE_FT`
+(= `2 × CORNER_B34_ROOM_FT` = 68cm), a soma do pior caso de alcance de
+cada lado. Acima disso as duas peças cabem inteiras e a checagem não
+muda nada — o comportamento histórico de todo par de nós bem separado
+fica intacto.
+
+**Meia espessura de overshoot**: o B34 do L degradado **não** começa no
+ponto do nó — começa em `point − l_dir × (espessura_da_boneca / 2)` e só
+então se estende 34cm em `l_dir`. Ele **ultrapassa o nó** em meia
+espessura para o lado contrário. Esse pedaço continuava invadindo a peça
+do vizinho (residual medido de **1,26cm** no `W162`), então a escolha do
+lado (`l_dir`) passou a exigir também essa folga — **cobrada só contra o
+nó vizinho**, nunca contra `room_plus`/`room_minus` inteiros (que também
+param em abertura): cobrar ali degradava o nó em troca de nada, porque a
+invasão de vão que sobra naquele caso vem da peça da **boneca**, não
+desta. Escopo mínimo, medido.
+
+### 40.4 Efeito medido (por IDENTIDADE FÍSICA, não por contagem de código)
+
+| | TGD | TP1 |
+|---|---|---|
+| `POSITION_OVERLAP` (identidades) | **6 → 0** | **2 → 0** |
+| `POSITION_OVERLAP` (ocorrências) | **29 → 0** | **18 → 0** |
+| total de identidades | 959 → 933 (**−26**) | 898 → 896 (−2) |
+| `COVERAGE_MISSING_ROW` (ident.) | 30 → 18 | 0 → 0 |
+| `PRISM_STAGGER_BELOW_TARGET` (ident.) | 181 → 156 | 245 → 246 |
+| `PRISM_JOINT_STACK` (ident.) | 20 → 14 | 16 → 8 |
+| blocos colocados | 11749 → 12143 | 19572 → 19629 |
+| `collisions` (sinal do solver) | 1160 → **1180** | **14 → 0** |
+
+> **Leitura honesta do sinal `collisions` do TGD**: ele SOBE (1160 → 1180)
+> enquanto a sobreposição real medida nas peças finais vai a **zero**. Não
+> é contradição: `collisions` conta pares entre **candidatos** (inclusive
+> os que o próprio solver descarta depois), e degradar mais nós gera mais
+> pares candidatos avaliados. O que vai para o Revit é a geometria final —
+> e ela está limpa nos dois projetos. `non_modular` cai (2668 → 2543) e o
+> solver passa a colocar **394 blocos a mais** no TGD.
+
+**TRADE-OFF DECLARADO, não escondido**: degradar um T significa que a
+parede principal deixa de receber a peça cheia e o preenchimento comum
+passa a fechar um trecho maior — sobem `COMPENSATOR_VERTICAL_STRIP`
+(TGD +25 identidades) e `COMPENSATOR_EXCESS_IN_RUN` (TGD +13). É a mesma
+tensão normativa da seção 41 (teto de compensador × teto de peça
+especial), não um defeito novo desta CR.
+
+### 40.5 Reprodutor permanente
+
+`tests/test_neighbor_node_bond_collision.py` — geometria **sintética**
+(nenhuma coordenada de projeto real): parede principal longa com duas
+bonecas perpendiculares a `d` cm uma da outra. Falha em 6 distâncias
+(12/20/28/35/45/50cm) antes da correção, passa depois; e três testes de
+guarda no sentido oposto (70/90/140cm continuam recebendo os dois B54
+inteiros — a correção não pode degradar amarração que sempre coube).
+
+---
+
+## 41. TENSÃO NORMATIVA ABERTA — teto de compensador × teto de peça
+especial num trecho entre dois nós (2026-09-08, **DECISÃO PENDENTE DO
+USUÁRIO — NADA IMPLEMENTADO**)
+
+> **Status**: `DOCUMENTADO — pendência normativa aberta`. Nenhuma linha de
+> código foi alterada por causa desta seção. Ela existe porque a
+> varredura ampla do benchmark provou que **as duas regras de teto que já
+> estão escritas neste arquivo se contradizem** em casos reais, e a
+> escolha entre elas é do usuário, não do solver.
+
+### 41.1 As duas regras que colidem
+
+- **Regra dos compensadores** (início deste arquivo): "**Proibido usar 2
+  ou mais em sequência** no mesmo trecho"; `MAX_COMPENSATORS_PER_TRECHO = 1`.
+- **Teto de peça especial** (`MAX_SPECIAL_BOND_PER_TRECHO = 1`,
+  `wall_stepper.py`): "peça de amarração virando enchimento" — uma
+  FILEIRA de B34 no meio da parede é proibida.
+
+Quando um trecho **só** fecha violando uma das duas, a hierarquia de
+`_pier_ordered_layout` hoje resolve pelo **tier 7 antes do 7b**, ou seja:
+prefere **compensador acima do teto** a **fileira de B34 acima do teto**
+("uma peça de amarração no meio da parede engana quem lê o modelo; um
+compensador a mais só é feio").
+
+### 41.2 A medição que expôs a contradição
+
+`TP1`, `W003`, fiada 0, trecho `[170, 474]` (span 304cm, junta 1cm),
+entre um `X_INTERSECTION` e um `T_INTERSECTION_MAIN`:
+
+- o solver entrega **`B39×7 + C09×2 + C04×1`** — **3 compensadores em
+  sequência**, violação literal da regra dos compensadores;
+- existe **`B39×5 + B34×3`**, que fecha os **mesmos 304cm exatos** com
+  **ZERO compensadores** — mas usa 3 peças especiais e é recusado pelo
+  `MAX_SPECIAL_BOND_PER_TRECHO = 1`;
+- enumeração exaustiva do trecho: com peça especial ≤ 1, o **mínimo**
+  possível é **3 compensadores**. O solver está fazendo a aritmética
+  **certa** dentro dos tetos que recebeu. **Não é bug de código.**
+
+Assinaturas repetidas na mesma parede: sub-trechos de **25cm** viram
+`C09+C09+C04` e de **30cm** viram `3×C09`. No TP1 inteiro a família
+compensador responde por **629 das 985 identidades físicas** (64%);
+`COMPENSATOR_AVOIDABLE` marca **87 identidades no TP1 e 39 no TGD contra
+0 no gabarito** ("só o solver erra").
+
+### 41.3 O caso que NÃO tem saída sem decisão de domínio
+
+Sub-trecho de 25–30cm **entre dois nós de amarração** (as duas pontas
+fechadas): B34 não cabe; B19 fecharia com **1** compensador
+(`B19+C09` = 29cm; `B19+C04` = 24cm) mas está **proibido** ali pela regra
+do meio-bloco ("só pode encostar numa ponta ABERTA; boneca/pilar de
+encontro **não** conta como ponta aberta") e pela seção 35
+(`REQUIRES_HUMAN_DOMAIN_APPROVAL`). Sem liberar B19 nesse caso
+específico, **3 compensadores é o mínimo aritmético existente**.
+
+### 41.4 O que o usuário precisa decidir (uma das três)
+
+1. **Manter como está** — compensador acima do teto continua preferível a
+   fileira de B34; a regra "proibido 2+ em sequência" passa a ser lida
+   como preferência forte, não como proibição absoluta, e o validador
+   deveria refletir isso.
+2. **Inverter tier 7 / 7b** — preferir a fileira de B34 (zero
+   compensadores) quando ela existe. Fecha `W003` e a família toda dos
+   trechos longos, ao custo de B34 repetido no meio da parede.
+3. **Liberar B19 como fechamento residual entre dois nós fechados**,
+   sob condição estrita (só quando a alternativa for ≥ 2 compensadores) —
+   extensão da decisão da seção 35, que hoje só cobre FILL residual de nó.
+
+Nenhuma das três foi aplicada. **A orientação mais recente do usuário tem
+prioridade quando ela vier.**
+
+### 41.5 ENUMERAÇÃO EXAUSTIVA do trecho — os custos de cada opção
+(2026-09-09, medido; **continua sem nada implementado**)
+
+`TP1/W003`, trecho `[170, 474]`, span 304cm, juntas de contorno 1/1 →
+`remaining` = 303cm = **61 módulos** de 5cm. Enumeração completa das
+composições `a·B39 + b·B34 + c·B19 + d·C09 + e·C04` que fecham exatamente:
+**2 457 composições distintas**.
+
+| opção | melhor composição | comp. | esp. | B19 | peças |
+|---|---|---|---|---|---|
+| tetos ATUAIS (comp≤1 **e** esp≤1, sem B19) | **NÃO EXISTE** | — | — | — | — |
+| 1 — manter (esp≤1, compensador acima do teto) | `B39×6 + B34×1 + C09×3` | 3 | 1 | 0 | 10 |
+| 2 — inverter 7/7b (zero compensador) | `B39×5 + B34×3` | 0 | 3 | 0 | 8 |
+| 3 — liberar 1 B19 (esp≤1) | `B39×6 + B34×1 + B19×1 + C09×1` | **1** | 1 | 1 | 9 |
+
+Confirma a contradição: **com os dois tetos juntos não existe solução** —
+o mínimo é 3 compensadores mantendo `esp≤1`, ou 3 peças especiais
+mantendo `comp≤1`.
+
+**Achado NOVO que a 41.4 não tinha — a opção 4**: a regra ESCRITA do
+usuário (início deste arquivo) é *"**Proibido usar 2 ou mais em
+sequência** no mesmo trecho — nunca uma solução recorrente, só pontual"*.
+Ela proíbe **SEQUÊNCIA**; `MAX_COMPENSATORS_PER_TRECHO = 1` é uma
+implementação **mais restritiva** que a regra, listada logo abaixo dela
+como consequência. E a enumeração mostra que a melhor composição da opção
+1 (`B39×6 + B34×1 + C09×3`) admite uma ordenação em que **nenhum
+compensador encosta em outro** (7 peças não-compensadoras para intercalar
+3 compensadores). O que o solver entrega hoje — `B39×7 + C09×2 + C04×1`,
+os **3 em sequência** — viola a regra escrita; a mesma contagem de
+compensadores **intercalada** não violaria.
+
+4. **Ler a regra pela letra**: manter a proibição de *sequência* (2+
+   adjacentes) como regra dura, e rebaixar `MAX_COMPENSATORS_PER_TRECHO`
+   de teto duro para **preferência forte** (critério de desempate, já
+   existe como `_layout_compensator_run_excess`). Custo: trechos longos
+   passam a poder ter 3 compensadores **separados**; ganho: nenhuma
+   violação da regra escrita, `esp≤1` preservado, e a família
+   `COMPENSATOR_CONSECUTIVE` (101 identidades no TGD, 200 no TP1) some
+   por construção.
+
+   **Atenção**: o validador `COMPENSATOR_EXCESS_IN_RUN` conta
+   compensadores por *run* contra `MAX_COMPENSATORS_PER_TRECHO` — ele
+   também teria de passar a medir *sequência*, senão o solver ficaria
+   certo pela regra e errado pela régua.
+
+### 41.6 A PARTE da opção 4 que já estava PERMITIDA — `CR-N1e`
+(2026-09-09, **IMPLEMENTADA e medida**)
+
+A opção 4 tem duas metades, e só uma delas é decisão normativa:
+
+1. **Rebaixar `MAX_COMPENSATORS_PER_TRECHO` a preferência** — muda um
+   teto e obrigaria `COMPENSATOR_EXCESS_IN_RUN` a mudar de régua junto.
+   **Continua pendente do usuário. NÃO foi feita.**
+2. **Ordenar os compensadores que o tier 7 já decidiu entregar** — não
+   muda teto nenhum. A composição é **exatamente a mesma** (mesmos
+   códigos, mesma contagem, mesmo comprimento); só a **ordem** muda. E
+   entregar em sequência o que pode sair intercalado **viola a regra
+   escrita** ("proibido usar 2 ou mais **em sequência**") **sem
+   necessidade nenhuma**. Esta metade já estava integralmente permitida —
+   e foi implementada.
+
+`_spread_compensators_layout`, aplicada no tier 7. O critério
+(`_layout_compensator_run_excess`) **já era o primário** em
+`_pier_layout_avoiding_joints`; agora vale também no caminho em que
+aquela busca não roda (sem junta a evitar). O `B19` de ponta nunca é
+movido (regra do meio-bloco), e `_relayout_codes_in_place` devolve `None`
+em vez de entregar um trecho de comprimento diferente.
+
+`TP1/W003 [170, 474]`, o caso da 41.2 — a aritmética **não** mudou,
+continuam 3 compensadores com `esp ≤ 1`:
+
+```
+antes   B39 B39 B39 B39 B39 B39 B39 C09 C09 C04     excesso = 2
+depois  B39 B39 B39 B39 B39 C09 B39 C09 B39 C04     excesso = 0
+```
+
+Medido, por identidade física:
+
+| | base | CR-N1c | **CR-N1e** |
+|---|---|---|---|
+| TGD `COMPENSATOR_CONSECUTIVE` | 101 | 97 | **75** |
+| TGD `PRISM_STAGGER_BELOW_TARGET` | 181 | 176 | **161** |
+| **TGD total** | 798 | 780 | **746** |
+| TP1 `COMPENSATOR_CONSECUTIVE` | 200 | 200 | **171** |
+| TP1 `PRISM_STAGGER_BELOW_TARGET` | 245 | 245 | **221** |
+| **TP1 total** | 862 | 861 | **811** |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | 0/0 | **0/0** |
+
+Custo declarado: `COMPENSATOR_EXCESS_IN_RUN` +2 (TGD) e +4 (TP1), e
+`COMPENSATOR_VERTICAL_STRIP` +1 em cada — a contagem por trecho não muda,
+mas os *runs* de blocos sólidos se reagrupam quando o compensador sai do
+meio do bloco. `PRISM_STAGGER` melhorou junto, e não por acaso:
+compensador espalhado desencontra junta melhor que compensador
+empilhado.
+
+Continua valendo: **a metade normativa das quatro opções não foi
+aplicada**, e escolher é do usuário.
+---
+
+## 42. PENDÊNCIA NORMATIVA — parede cujo comprimento não é múltiplo de 5cm
+fica **INTEIRAMENTE VAZIA** (2026-09-08, **DECISÃO PENDENTE DO USUÁRIO —
+NADA IMPLEMENTADO**)
+
+> **Status**: `DOCUMENTADO — pendência normativa aberta`. Medido e
+> reproduzido; nenhuma linha de código alterada.
+
+### 42.1 O que foi medido
+
+`_pier_remaining_snapped_cm` devolve `None` quando o resto do trecho não
+cai a menos de `PIER_FIT_TOLERANCE_CM` (0,30cm) de um múltiplo de
+`PIER_MODULE_CM` (5cm). O chamador trata `None` como `NON_MODULAR` e o
+trecho fica **sem nenhuma peça** — em **todas as fiadas**.
+
+Reprodutor mínimo (parede LIVRE, sem abertura, sem encontro):
+
+| comprimento | resultado |
+|---|---|
+| 99,8cm | 6 peças (B19+B39) ✔ |
+| **197,9cm** | **0 peças** — `non_modular` nas duas fiadas ✘ |
+| 200,0cm | 11 peças (B34+B39+C04) ✔ |
+| 269,0cm | 16 peças (B19+B39+C09) ✔ |
+
+No TGD isso aparece como `COVERAGE_WALL_NOT_MODULATED` em **29 paredes**
+(0 no gabarito, "só o solver erra"). Das 29, duas são paredes reais e
+idênticas de **197,9cm** com as duas pontas livres (`W068`, `W091`) —
+1,98m de alvenaria que o modelo entrega **vazia**. As demais são de
+4,4 a 36,6cm, abaixo ou perto do menor módulo, e são artefato de
+pareamento de parede (fatias do CAD), não defeito do solver.
+
+### 42.2 Por que é normativo e não bug
+
+O contrato é **explícito e deliberado**: o achado carrega
+`lower_valid_cm`/`upper_valid_cm` e `delta_to_lower_cm`/`delta_to_upper_cm`
+— ou seja, o sistema está dizendo ao usuário "**ajuste o comprimento da
+parede em X cm**", não "não consegui". Isso conflita com a intenção
+declarada do tier 8 de `_pier_ordered_layout` ("preferir uma solução
+*feia* a reportar `NON_MODULAR_WALL` quando ela existe"), porque uma
+solução com 2,1cm de folga **existe** — a folga seria absorvida pela
+argamassa, como em obra.
+
+### 42.3 O que o usuário precisa decidir
+
+1. **Manter**: parede fora do módulo continua vazia e o relatório pede o
+   ajuste de comprimento — o modelo nunca "mente" sobre a modulação.
+2. **Modular com folga**: preencher até onde fecha e deixar o resto
+   (< 1 módulo) como folga declarada, marcando a peça final para revisão
+   — evita parede inteiramente vazia no Revit.
+3. **Ampliar `PIER_FIT_TOLERANCE_CM`**: rejeitado a priori aqui — a folga
+   real medida (2,1cm) é 7× a tolerância atual, e alargar a tolerância
+   mexeria também no contrato de snap de todos os outros trechos.
+
+### 42.4 A ETAPA exata, a fronteira medida, e o que NÃO é desta seção
+(2026-09-09)
+
+**Etapa exata** (reproduzida com parede livre sintética, sem abertura e
+sem encontro):
+
+```
+_pier_remaining_snapped_cm(pier, lead, trail)     wall_stepper.py
+    remaining = pier - lead - trail + BLOCK_JOINT_CM
+    snapped   = 5 * round(remaining / 5)
+    |remaining - snapped| > PIER_FIT_TOLERANCE_CM (0,30cm)  ->  None
+_pier_ordered_layout  recebe None, tenta o fallback de junta de ABERTURA
+    (as 3 combinações de junta de contorno) e devolve None
+o chamador registra `non_modular` e NÃO lança peça nenhuma - em TODAS as
+    fiadas.
+```
+
+**Fronteira medida** numa parede livre: fecham `…, 194, 195, 196, 199,
+200, 201, …` — isto é, **múltiplo de 5cm ± 1cm** (as três combinações de
+junta de contorno deslocam o alvo em 1cm para cada lado), mais a
+tolerância de 0,30cm. `197,943cm` cai exatamente no buraco entre 196 e
+199. Reprodutor permanente com os controles das medidas vizinhas:
+`tests/test_non_modular_wall_coverage.py`.
+
+**Correção do que a 42.1 dizia**: das 29 paredes
+`COVERAGE_WALL_NOT_MODULATED` do TGD, **três** são paredes reais, não
+duas — além das duas de 197,943cm há uma de **99,754cm**
+(`W|1807.2,-145.1|1813.6,-244.6|t14.0`). E ela **não é desta seção**:
+99,754cm **fecha** em blocos (a combinação de junta 1/0 dá resto 99,75,
+a 0,25cm do múltiplo — dentro da tolerância), e uma parede livre com esse
+comprimento recebe 6 peças. Ela sai vazia por **outro** motivo: o plano
+real põe nela um nó `AMBIGUOUS` em t=91,55cm **e dois `X_INTERSECTION` a
+0,30cm um do outro** (t=78,83 e t=79,13) — duas travessias praticamente
+coincidentes. `DOCUMENTADO — pendência de código aberta`, investigação
+própria, sem relação com o módulo de 5cm.
+
+O mecanismo que a **opção 2** (modular com folga) precisaria **já existe
+e é testado**: `pier_cm_floored_to_module` devolve o conteúdo modular
+imediatamente abaixo (194cm para os 197,943cm, folga de 3,94cm < 1
+módulo). Ele só não está ligado neste caminho — hoje serve apenas à
+guarda física da `CR-BLOCK-FIT-TOLERANCE-C04`.
+
+### 42.5 O contrato exato — por que ligar o mecanismo AINDA é decisão
+normativa (2026-09-09, conferido)
+
+O contrato de `pier_cm_floored_to_module` está escrito no próprio
+docstring e **delimita o uso**: *"quando o arredondamento do fit levaria a
+peça a ultrapassar uma fronteira física que NÃO tem junta de argamassa
+para ceder … o trecho é remontado com este comprimento"*, e garante que
+*"a sobra deixada contra a fronteira fica sempre em
+`[PIER_MODULE_CM − PIER_FIT_TOLERANCE_CM, PIER_MODULE_CM)`"* — isto é,
+**entre 4,70 e 5,00cm**, porque ali o trecho **fecha** e só foi arredondado
+para cima por até 0,30cm.
+
+No caso da seção 42 o trecho **não fecha de jeito nenhum**, e a sobra
+seria **3,94cm** — fora da faixa que o contrato garante. Usar o mecanismo
+aqui não é "ligar o que já existe": é **estender o contrato dele a um
+caso que ele explicitamente não cobre**, e passar a entregar parede com
+folga declarada onde hoje o sistema pede ajuste de comprimento. Segue
+sendo a **opção 2**, e segue **pendente do usuário**.
+
+### 42.6 A parede de 99,754cm — diagnóstico completo (2026-09-09)
+
+Confirmado que **não é** o caso da seção 42 (99,754cm fecha em blocos), e
+medido o que realmente acontece. Parede `idx 97` do TGD,
+`W|1807.2,-145.1|1813.6,-244.6|t14.0`:
+
+```
+nó 135  AMBIGUOUS        t =  91,548cm   (ponta 1)
+nó 265  X_INTERSECTION   t =  78,832cm   crossing_walls = (33, 97)
+nó 272  X_INTERSECTION   t =  79,135cm   crossing_walls = (84, 97)
+                                          ^ 0,303cm um do outro
+```
+
+Os dois X **são fundidos corretamente** (`_merge_intervals_cm` já cobre
+midspan × midspan): a reserva mesclada sai `[70,832; 87,135]`. O que
+sobra são **dois** defeitos distintos:
+
+1. **Segmento 0 = `[0; 70,832]` = 70,832cm** — não fecha (`lower 69`,
+   `upper 74`). A fração vem do comprimento não-modular da parede
+   (99,754cm), herdada pela posição do X. É a seção 42 aplicada ao
+   **trecho**, não à parede.
+2. **Segmento 2 = `[87,135; 84,548]` = −2,586cm** — comprimento
+   **NEGATIVO**, `conflict: SEM_ESPACO`. A reserva de **midspan** e a
+   reserva da **ponta** se sobrepõem, e essa combinação **não** passa por
+   `_merge_intervals_cm` (que só funde midspan × midspan). É a mesma
+   classe de bug, entre mecanismos diferentes.
+
+**Tamanho da família dos segmentos negativos** (identidades físicas, TGD):
+
+| | base | CR-N1 | CR-N1c |
+|---|---|---|---|
+| segmentos de comprimento negativo | 51 | 19 | 37 |
+| ocorrências `SEM_ESPACO` | 500 | 296 | 472 |
+
+A CR-N1 mostrava menos porque a amarração degradada ocupava menos espaço;
+a CR-N1c fica entre as duas, e ainda **abaixo da base**. As paredes curtas
+que saem vazias estão nesta lista — `W|-139.5,462.5|-139.5,477.5|t14.0`
+(15cm) aparece com segmentos `14,5..−0,5`, e
+`W|-1159.7,215.0|-1159.7,229.0|t14.0` (14cm) com `15,0..−1,0`.
+
+**Correção candidata** (`DOCUMENTADO — pendência de código aberta`):
+levar as fronteiras de reserva de **ponta** para dentro da mesma fusão de
+intervalos que hoje só cobre midspan. Duas reservas que se sobrepõem
+devem produzir **um trecho vazio**, não um trecho negativo reportado como
+`SEM_ESPACO`. Não foi feita nesta execução para não misturar mecanismo
+novo com as CRs já medidas.
+
+---
+
+## 43. `CR-N1b` — a reserva das PONTAS não pode ser cobrada DUAS VEZES
+(2026-09-09, **REGRA OBRIGATÓRIA — implementada e medida**)
+
+> Como foi descoberto: varredura de `COMPENSATOR_VERTICAL_STRIP` por
+> identidade física entre `origin/main` (`08495d9`) e a CR-N1
+> (`626087b`), peça a peça, no TGD real.
+
+### 43.1 O defeito
+
+`_wall_reserved_range_ft` já reserva, para **cada ponta** de uma parede, o
+**pior caso** de amarração (`CORNER_B34_ROOM_FT` = 34cm), medido a partir
+da **ponta física**. A CR-N1 (seção 40) passou a cobrar **também** o
+**ponto médio** até o nó vizinho — e, para os nós que estão **nas
+pontas**, os dois mecanismos descontam a **mesma** reserva. Como
+`_room_at_t_on_wall` fica com o **mínimo** dos dois, a parede curta perdia
+espaço que não devia a ninguém.
+
+Medido, parede de 69cm entre dois `L_CORNER` (nós em t=7,0 e t=62,0):
+
+| | room a partir do nó |
+|---|---|
+| histórico (só reserva de ponta) | **28,00cm** |
+| CR-N1 (mínimo com o ponto médio 34,5cm) | **27,50cm** |
+
+Meio centímetro — e ele **cruza limiar**. Com eixo de 81cm o mesmo par dá
+40,00cm × 33,50cm, e `CORNER_B34_ROOM_FT` vale 34cm: o canto deixa de
+receber **B34** e cai para `L_CORNER_DEGRADED`.
+
+### 43.2 O custo físico medido (TGD real, por identidade física)
+
+Duas paredes reais de 69cm — `W|-1.5,463.0|-1.5,532.0|t14.0` e
+`W|-1016.5,-570.0|-1016.5,-501.0|t14.0` — passaram de **0 para ~50
+compensadores** cada, e a peça de amarração do canto virou um **C09 de
+9cm**:
+
+```
+fiada 0  BASE : B34[0,34] L_CORNER          + B19[35,54] STANDARD_FILL
+fiada 0  CR-N1: C09[0,9]  L_CORNER_DEGRADED + B39[10,49] + C04[50,54]
+```
+
+**REGRA OBRIGATÓRIA**: um compensador (C09/C04) no papel de peça de
+amarração de um nó é sempre sintoma, nunca solução — quando aparecer,
+verificar primeiro se a medição de espaço daquele nó não está descontando
+duas vezes a mesma reserva.
+
+### 43.3 A correção
+
+`_neighbor_node_boundary_ft` ganha `skip_node_indices`; `_room_at_t_on_wall`
+ganha `end_to_node` e, **quando `safe_range_ft` foi informado**, isenta os
+nós das duas **pontas** desta parede — eles já entraram pela reserva de
+ponta. Nós de **MEIO DE PAREDE** (T/X), que são os que produziam os
+`POSITION_OVERLAP` da seção 40, **continuam** impondo a fronteira do ponto
+médio. Sem `safe_range_ft` ninguém cobriu as pontas e o comportamento é o
+da CR-N1, inalterado.
+
+Verificação por identidade física: as duas paredes de 69cm voltam ao
+conjunto de achados **exatamente igual ao da base** (`N1b == base`), e
+`POSITION_OVERLAP` continua **0** no TGD e no TP1.
+
+### 43.4 Trade-off DECLARADO (não escondido)
+
+Devolver o espaço restaura o B34 no canto, mas com ele voltam os achados
+de junta que a peça degradada mascarava. Placar por identidade física:
+
+| | base | CR-N1 | CR-N1b |
+|---|---|---|---|
+| TGD total | 798 | **783** | 801 |
+| TGD `COMPENSATOR_VERTICAL_STRIP` | 79 | 109 | **102** |
+| TGD `COMPENSATOR_EXCESS_IN_RUN` | 70 | 85 | **82** |
+| TGD `PRISM_STAGGER_BELOW_TARGET` | 181 | **156** | 168 |
+| TP1 total | 862 | **862** | 867 |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | **0/0** | **0/0** |
+
+Das 77 identidades que a CR-N1b acrescenta sobre a CR-N1 no TGD, **48 são
+o RETORNO de identidades que a base já tinha** (a parede voltou ao estado
+correto) e **29 são genuinamente novas** — e as 29 estão **todas** nas
+paredes do defeito da seção 43.5, que continua aberto.
+
+**Leitura honesta**: o placar da CR-N1 estava melhor em parte porque a
+amarração degradada gera peças pequenas que desencontram junta com
+facilidade — ganho no validador de junta, perda na amarração. A hierarquia
+do projeto põe amarração acima de estética de junta, e a dupla contagem é
+**defeito**, não preferência; por isso a correção fica, em commit próprio
+e revertível isoladamente.
+
+### 43.5 PENDÊNCIA ABERTA — o nó de MEIO com peça CENTRADA
+(`DOCUMENTADO — pendência de código aberta`)
+
+As quatro paredes reais de **124cm** com um `X_INTERSECTION` de travessia
+no meio (`W|-1133.5,712.0|…`, `W|-1133.5,-508.0|…`,
+`W|1201.5,-508.0|…`, `W|1201.5,712.0|…`) **continuam** com ~50
+compensadores. Ali o limitador não é a ponta: é o nó X em t=62,0, e a
+fronteira do ponto médio (34,5cm) deixa o `L_CORNER` de t=7,0 com 27,50cm.
+
+Medição que expõe o excesso de conservadorismo:
+
+- na base, o L colocava **B34 em [0, 34]** e o X colocava **B54 em
+  [35, 89]** — folga de 1cm, **sem colisão**;
+- o B34 do L se estende só **27cm** para frente do ponto de contato
+  (t=7 → t=34), mas o teste de espaço exige `CORNER_B34_ROOM_FT` = **34cm**
+  *a partir do contato* — 7cm a mais do que a peça realmente usa naquele
+  sentido, porque ela também ocupa 7cm **para trás** do contato;
+- `NEIGHBOR_NODE_BOND_CLEARANCE_FT` = 68cm = 2 × 34cm supõe **dois** nós
+  ANCORADOS. Um nó de travessia (X, ou o T na parede principal) lança peça
+  **CENTRADA**: o alcance dele para um lado é no máximo **metade** da maior
+  peça de amarração (27cm para o B54), não 34cm.
+
+Duas correções candidatas, **nenhuma implementada** (mexem no núcleo da
+amarração e precisam de decisão + medição própria):
+
+1. fronteira contra nó de meio = `t_vizinho − alcance_do_tipo` (27cm para
+   nó de peça centrada) em vez do ponto médio cego;
+2. requisito de espaço do L medido a partir do **ponto de contato**
+   descontando o recuo que a peça ocupa **atrás** dele
+   (`CORNER_B34_ROOM_FT − recuo`), em vez do pior caso cheio.
+
+Enquanto não houver decisão, as quatro paredes de 124cm ficam com a
+amarração degradada — registrado aqui para não se perder.
+
+### 43.6 DUAS REGRESSÕES CRÍTICAS da CR-N1 que estavam ESCONDIDAS
+(2026-09-09, `PADRÃO MEDIDO — pendência de código aberta`)
+
+Encontradas ao conferir **o conteúdo** das duas falhas históricas de
+`tests/regression/test_benchmark_baselines.py`. Elas já falhavam antes
+(refresh de `baseline.json` é CR própria) — e por isso **a piora de dois
+códigos CRÍTICOS ficou atrás de uma falha pré-existente**, sem ninguém
+declarar. É exatamente o modo de falha que a regra "compare por identidade
+física, nunca por saldo global" existe para evitar.
+
+**Nenhuma das duas foi introduzida pela CR-N1b**: os dois números são
+idênticos em `626087b` e nesta branch.
+
+#### (a) `JUNCTION_MISSING_BINDING` no TGD — 23 → 40 ocorrências
+
+Por identidade física é **UM** defeito, não 17: o encontro T em
+`(−139,5; 470,0)`, repetido nas 17 fiadas.
+
+```
+parede principal  W|-140.5,470.0|5.5,470.0|t14.0   (146cm)
+   nó 142  T_INTERSECTION  t =   1,00cm   (ponta)
+   nó 185  L_CORNER        t =   7,00cm   (MEIO DE PAREDE)
+   nó 143  L_CORNER        t = 139,00cm   (ponta)
+   abertura                t = 6,0 .. 107,0cm
+boneca            W|-139.5,462.5|-139.5,477.5|t14.0 (15cm, vazia nas 3 árvores)
+```
+
+Os nós **142 e 185 estão a 6,0cm** um do outro. A fronteira do ponto médio
+da CR-N1 cai em t=4,0cm e deixa o T com **3,0cm** de espaço — **nenhuma
+peça de amarração cabe, e o encontro fica sem peça nenhuma**. O nó 185 é
+de **meio de parede**, então a isenção da CR-N1b (que cobre só os nós das
+pontas) **não o alcança**.
+
+**REGRA OBRIGATÓRIA**: um encontro que termina **sem nenhuma peça** é
+falha de amarração, nunca "degradação aceitável" — degradar é trocar B54
+por B34 ou por compensador, não é ficar vazio. Quando a fronteira entre
+dois nós não deixa espaço para a menor peça, o certo é **um dos dois** ficar
+com a peça inteira, não os dois ficarem sem.
+
+#### (b) `OPENING_BLOCK_INSIDE_DOOR` no TP1 — 0 → 7 ocorrências
+
+Também **UMA** identidade física repetida em 7 fiadas pares: um **B34
+dentro do vão da porta** `W019-O01`, em `t = 564..750cm` da parede
+`W|8017.3,548.0|8017.3,1927.0|t14.0` (W019).
+
+W019 é justamente a parede dos `POSITION_OVERLAP` que a CR-N1 corrigiu
+(nós a 742/792 e a 1082/1117). Ao degradar/reposicionar a peça daquele nó,
+ela passou a cair **dentro do vão**. Bloco dentro de vão de porta é erro
+grosseiro — pior que a sobreposição que a CR-N1 consertou.
+
+**A decisão de manter ou reverter a CR-N1 tem de ser tomada com estes dois
+números na mesa**, ao lado do ganho `POSITION_OVERLAP` 6→0 / 2→0. Ambos
+apontam para o mesmo lugar da 43.5: a fronteira entre nós vizinhos é
+simétrica demais, e no limite deixa os **dois** lados sem solução.
+
+---
+
+## 44. `CR-N1c` — a fronteira entre nós vizinhos para no ALCANCE do
+vizinho, não no ponto médio cego (2026-09-09, **REGRA OBRIGATÓRIA —
+implementada e medida**)
+
+> Fecha as duas regressões críticas registradas na seção 43.6 (a primeira
+> por correção real, a segunda por prova de que não era regressão nova).
+
+### 44.1 O defeito
+
+O ponto médio da seção 40 supõe que o nó vizinho **sempre alcança até
+ele**. Não alcança. Quando o vizinho já está bloqueado — a reserva da
+outra ponta o impede de descer, uma abertura o corta — o meio-a-meio
+**tira de quem usaria para dar a quem não pode usar**.
+
+Medido no TGD, parede `W|-140.5,470.0|5.5,470.0|t14.0`:
+
+| | |
+|---|---|
+| nó 142 `T_INTERSECTION` | t = 1,00cm (ponta) |
+| nó 185 `L_CORNER` | t = 7,00cm (**meio de parede**) |
+| alcance do nó 185 na direção do 142 | **0,00cm** (o `safe_range` dele começa em 34,00cm) |
+| fronteira do ponto médio | t = 4,00cm |
+| room do nó 142 | 5,00cm → **3,00cm** |
+
+Com 5,00cm cabia o `C04` que amarrava o encontro; com 3,00cm **não cabe
+nada**. O encontro T ficava **sem nenhuma peça** nas 17 fiadas, e a parede
+perdia 17 blocos (58 → 41). `JUNCTION_MISSING_BINDING` 23 → 40.
+
+**REGRA OBRIGATÓRIA**: nenhuma reserva pode ser cobrada em favor de um nó
+que comprovadamente não alcança aquele espaço. Reserva é para quem vai
+ocupar; espaço reservado para o vazio é espaço perdido.
+
+### 44.2 A correção
+
+`_neighbor_node_reach_ft` mede quanto o vizinho pode, no máximo, estender
+na minha direção — é a **mesma** `_room_at_t_on_wall` que ele próprio usará
+(com o `safe_range` dele), só que sem a checagem de vizinhos (`nodes=None`),
+o que corta a recursão e a torna um **limite superior**.
+
+A fronteira passa a ser **o mais longe entre o ponto médio e
+`t_vizinho − alcance(vizinho)`**.
+
+- **Sem sobreposição por construção**: `p` vai no máximo até
+  `t_q − alcance(q)`, e `q` ocupa no máximo `[t_q − alcance(q), t_q]` —
+  os dois no máximo se **encostam** nessa divisa.
+- **Continua simétrico**: quando os dois alcançam além do meio (o caso dos
+  `POSITION_OVERLAP`), os dois caem no ponto médio e concordam sem segunda
+  passada.
+- **Aditivo**: chamador sem `openings_per_wall`/`end_to_node` recebe
+  exatamente a fronteira da seção 40.
+
+### 44.3 Medido, por identidade física
+
+| | base | CR-N1 | CR-N1b | **CR-N1c** |
+|---|---|---|---|---|
+| **TGD total** | 798 | 783 | 801 | **780** |
+| TGD `JUNCTION_MISSING_BINDING` | 3 | 4 | 4 | **3** |
+| TGD `COMPENSATOR_EXCESS_IN_RUN` | 70 | 85 | 82 | **70** |
+| TGD `COMPENSATOR_CONSECUTIVE` | 101 | 101 | 108 | **97** |
+| TGD `COMPENSATOR_VERTICAL_STRIP` | 79 | 109 | 102 | **88** |
+| **TP1 total** | 862 | 862 | 867 | **861** |
+| `POSITION_OVERLAP` TGD/TP1 | 6/1 | **0/0** | **0/0** | **0/0** |
+
+Contra a base, a CR-N1c tem **17 identidades novas no TGD e 1 no TP1** —
+e **nenhuma das 17 é crítica** (todas da família compensador/prisma, nas
+paredes da pendência 43.5). A única do TP1 é a reclassificação da 44.4.
+
+**Custo honesto**: `PRISM_CONTINUOUS_JOINT` e `PRISM_JOINT_STACK` voltam
+ao nível da base (21/20 no TGD, 18/16 no TP1). O ganho que a CR-N1 mostrava
+nesses dois códigos era efeito colateral da amarração degradada — peça
+pequena desencontra junta com facilidade. Amarração vem antes.
+
+### 44.4 A segunda "regressão" da 43.6 NÃO era regressão nova — provado
+
+`OPENING_BLOCK_INSIDE_DOOR` no TP1 (0 → 7) é a **mesma peça física**
+reclassificada, não um bloco novo no vão. Medido em W019
+(`W|8017.3,548.0|8017.3,1927.0|t14.0`), vão da porta `t = 564..750`:
+
+| | base | CR-N1 / N1c |
+|---|---|---|
+| peça do nó em t≈742, fiada 0 | `B54[715, 769]` `T_INTERSECTION_MAIN` | `B34[715, 749]` `T_INTERSECTION_DEGRADED_L` |
+| `OPENING_BLOCK_CROSSES_JAMB` em W019 | **14** | **7** |
+| `OPENING_BLOCK_INSIDE_DOOR` em W019 | 0 | **7** |
+| **soma OPENING_\* em W019** | **14** | **14** |
+| `OPENING_BLOCK_CROSSES_JAMB` no TP1 | 168 | 161 (**−7**) |
+
+Mesmo `t` inicial (715), mesma identidade física, mesma fiada. Ao degradar
+`B54`→`B34` a peça encolheu 20cm e **deixou de cruzar a jamba** (750),
+passando a ficar **inteiramente** dentro do vão — o validador trocou o
+código. A soma é constante: 7 saíram de um, 7 entraram no outro.
+
+**A causa-raiz é anterior a tudo isto**: existe um `T_INTERSECTION` cujo
+ponto cai **dentro do vão de uma porta** (t≈742 em `564..750`). Qualquer
+peça de amarração daquele nó cai no vão, seja `B54` ou `B34`.
+`DOCUMENTADO — pendência de código aberta` (seção 45).
+
+---
+
+## 45. NÓ DE ENCONTRO cujo EIXO cai DENTRO do vão — a família inteira de
+invasão de abertura tem UMA causa (2026-09-09, **PADRÃO MEDIDO —
+correção candidata medida e NÃO aplicada; exige decisão de trade-off**)
+
+### 45.1 O padrão
+
+Quando a parede que chega encosta a **face** na jamba de uma abertura, o
+**eixo** dela fica meia espessura para dentro do vão. Medido: o nó cai a
+**8,0cm** da borda em todos os casos (7cm de meia espessura + 1cm de
+junta). Não é geometria errada — é a configuração normal de uma porta que
+vai de parede a parede.
+
+**38 nós do TP1** estão nessa situação (T e X), em 13 paredes.
+
+### 45.2 A lacuna de medição
+
+`_room_at_t_on_wall` só enxerga abertura que **começa à frente** (sign≥0)
+ou que **termina atrás** (sign<0). A abertura que **contém** o ponto é
+invisível aos dois laços. Resultado: o solver mede espaço atravessando o
+vão e lança a peça de nó centrada no ponto — **metade dela dentro da
+porta**.
+
+A regra já estava escrita: o cabeçalho de
+`T_INTERSECTION_B54_HALF_ROOM_FT` exige *"metade do próprio comprimento
+livre para os dois lados … **sem invadir abertura nenhuma**"*. É bug
+contra regra existente, não pendência normativa.
+
+### 45.3 O tamanho real da família (medido)
+
+**100% das ocorrências** de `OPENING_BLOCK_CROSSES_JAMB` e
+`OPENING_BLOCK_INSIDE_DOOR` do TP1 vêm de **peça de nó** — nenhuma de
+preenchimento:
+
+```
+TP1   OPENING_BLOCK_CROSSES_JAMB   161 ocorrencias   origem: NO'  (100%)
+TP1   OPENING_BLOCK_INSIDE_DOOR      7 ocorrencias   origem: NO'  (100%)
+```
+
+Os dois são `LEVEL_MANDATORY` / `SEVERITY_CRITICAL` na taxonomia do
+projeto ("zona de exclusão absoluta", seção 3).
+
+### 45.4 A correção candidata, medida e NÃO aplicada
+
+Devolver `0.0` em `_room_at_t_on_wall` quando o ponto cai dentro de uma
+abertura (tolerância de LAYOUT, 0,05cm, para não zerar um nó legitimamente
+**na** jamba). O nó então cai na degradação que a própria regra já previa
+("1 único compensador fecha a boneca sozinho, **sem peça nenhuma na parede
+principal**").
+
+| identidades físicas | CR-N1c | candidata |
+|---|---|---|
+| **TP1** `OPENING_BLOCK_CROSSES_JAMB` | 11 | **0** |
+| **TP1** `OPENING_BLOCK_INSIDE_DOOR` | 1 | **0** |
+| TP1 `COMPENSATOR_CONSECUTIVE` | 200 | 233 (**+33**) |
+| TP1 `COMPENSATOR_EXCESS_IN_RUN` | 152 | 174 (**+22**) |
+| TP1 `PRISM_STAGGER_BELOW_TARGET` | 245 | 369 (**+124**) |
+| **TP1 total** | **861** | 1020 |
+| **TGD** `OPENING_BLOCK_CROSSES_JAMB` | 14 | **8** |
+| **TGD** `OPENING_BLOCK_INSIDE_DOOR` | 1 | **0** |
+| **TGD total** | **780** | 791 |
+
+**Por nível**: troca **−12 CRITICAL** por **+55 MANDATORY/MAJOR**
+(compensadores) e **+126 PREFERENCE/MINOR** (prisma). A troca de 12
+críticos por 55 obrigatórios **não é uma escolha técnica** — é decisão de
+trade-off entre categorias, e por isso a candidata **foi revertida**.
+
+### 45.5 Por que zerar não é a correção FINAL (e qual seria)
+
+Zerar remove a peça de nó da parede principal; o preenchimento comum passa
+a atravessar o nó em trechos maiores, e daí vêm os compensadores e as
+juntas. A correção **certa** não é remover a peça: é **ancorá-la na
+jamba** em vez de no eixo do nó — a alvenaria da parede principal começa
+ali, e uma peça que começa em `t_jamba` amarra de verdade **e** não invade
+o vão.
+
+Isso exige deslocar o ponto de contato da parede principal em
+`solve_t_intersection` / `solve_x_intersection` quando o eixo do nó cai
+dentro de uma abertura — mudança de **posicionamento**, com efeito em toda
+a família de encontros. `DOCUMENTADO — pendência de código aberta`, CR
+própria, com este número na mesa: **168 ocorrências críticas do TP1
+dependem dela**.
+
+---
+
+## 46. `CR-N1f` — DESEMPENHO: a varredura de nós por parede era 41% do
+tempo do solver (2026-09-09, **implementada, equivalência física
+bit-a-bit verificada**)
+
+> Registro de custo, não de regra de modulação. Nenhum valor muda.
+
+### 46.1 O que a CR-N1 e a CR-N1c custaram
+
+A fronteira entre nós vizinhos pôs
+`_wall_junction_indices_nodes_and_ts_ft` no **caminho quente** — ela roda
+a cada `_room_at_t_on_wall`. Medido com cProfile no TGD: **184s de
+`tottime` em 631s (41%)**, 334 224 chamadas, **205 milhões** de
+`set.add` (o `set` era montado por nó só para fazer um `in`).
+
+| TGD, mesmo processo | tempo total | rebuilds | por rebuild |
+|---|---|---|---|
+| base `08495d9` | 99,3s | 22 | 4,51s |
+| CR-N1 | 47,8s | 7 | 6,71s |
+| CR-N1b | 65,0s | 10 | 6,41s |
+| CR-N1c + N1e | 176,4s | 22 | 7,90s |
+| **CR-N1f** | **127,0s** | 22 | **5,70s** |
+
+Os **22 rebuilds** são consequência **física** da amarração restaurada
+(mais paredes com prisma forçado no baseline voltam a ser candidatas ao
+reparo) — é o mesmo número da base, não um custo novo de código.
+
+### 46.2 As três mudanças (todas de custo, nenhuma de valor)
+
+1. o eixo da parede é calculado **uma vez por chamada**, não uma vez por
+   nó;
+2. a pertinência usa **short-circuit** (`_node_touches_wall`) em vez de
+   montar um `set` por nó;
+3. **cache** por IDENTIDADE (`is`) da lista de nós **e** da de paredes —
+   a entrada só é usada quando as duas listas são literalmente as mesmas,
+   o que elimina o risco de `id` reciclado depois de um GC.
+
+**Por que o cache é seguro**: nenhum campo lido pela varredura (`kind`,
+`arms`, `main_wall_idx`, `incoming_wall_idx`, `neighbor_wall_idx`,
+`crossing_walls`, `point`) é escrito em `wall_stepper.py` — todos vêm de
+`wall_pairing.py`, na construção do grafo, **antes** de o solver rodar. O
+que o solver muta nos nós (`_arm_role_pinned`,
+`_b19_residual_fill_for_walls`, papel A/B) não entra nesta varredura.
+
+### 46.3 Equivalência física verificada
+
+| | sem otimização | com otimização |
+|---|---|---|
+| TGD identidades / blocos | 746 / 11 837 | **746 / 11 837** |
+| TP1 identidades / blocos | 811 / 19 647 | **811 / 19 647** |
+
+Conjunto de identidades **idêntico** nos dois projetos, não apenas o
+total. `tests/test_wall_junction_scan_perf.py` trava o contrato: cache
+frio × quente × varredura direta, guarda de identidade da lista,
+`exclude_node_index` aplicado depois do cache sem corrompê-lo, e a lista
+devolvida nunca sendo o objeto guardado.
+
+**Fora do escopo desta CR** (segue valendo a `CR-PERF-1`): re-solve por
+escopo com `dirty_wall_idxs`, que atacaria os 22 rebuilds em si.
+
+---
+
+## 47. REVISÃO DA SEÇÃO 45 — o que as 281 ocorrências realmente são, e por
+que a candidata NÃO deve ser implementada (2026-09-09, medido em
+`420dbcc` × `origin/main 08495d9`)
+
+> Corrige e completa a seção 45 com o que a medição por identidade física
+> e por OBB mostrou. **Nenhuma linha de código alterada.**
+
+### 47.1 O texto normativo, lido de novo
+
+Seção 3 (regra **absoluta, sem exceção**): *"nenhum bloco, compensador ou
+pastilha pode invadir o vão real de uma **porta sem peitoril**"*, e o
+instrumento é `find_door_void_violations` — **OBB real**, que *"roda como
+rede de segurança explícita e geométrica, não confia apenas na lógica de
+fronteiras dos trechos"* e cuja violação *"bloqueia a criação dos
+blocos"*. **Janelas não entram nesta regra.**
+
+O validador do benchmark (`OPENING_BLOCK_*`) é **outro contrato**:
+interseção em **`t` por fiada** (1D), classificando por razão —
+`overlap ≥ INSIDE_RATIO × comprimento` vira `INSIDE_DOOR`, abaixo disso
+`CROSSES_JAMB` —, e decide "porta" pelo **tipo declarado**, sem olhar
+peitoril. Os dois nunca foram reconciliados (registrado desde a varredura
+de 2026-09-08).
+
+### 47.2 As 281 ocorrências são **49 identidades físicas**
+
+| projeto | ocorrências | **identidades** | origem |
+|---|---|---|---|
+| TGD | 108 `CROSSES_JAMB` | **18** | `T_INTERSECTION_DEGRADED_*` |
+| TGD | 5 `INSIDE_DOOR` | **1** | `L_CORNER` |
+| TP1 | 161 `CROSSES_JAMB` | **29** | 15 `X_INTERSECTION` + 14 `T_INTERSECTION_MAIN` |
+| TP1 | 7 `INSIDE_DOOR` | **1** | `T_INTERSECTION_DEGRADED_L` |
+| **total** | **281** | **49** | |
+
+Todas as 49 são em abertura do tipo **porta**. `CROSSES_JAMB` e
+`INSIDE_DOOR` **não são dois defeitos**: são a **mesma peça invadindo o
+mesmo vão**, classificada de um jeito ou de outro conforme a razão
+`overlap / comprimento` cruze `INSIDE_RATIO`. É por isso que encolher a
+peça (B54→B34) move a ocorrência de um código para o outro sem mudar nada
+fisicamente.
+
+### 47.3 CORREÇÃO da 45.3 — quem invade, pelo OBB, não é só a peça de nó
+
+A seção 45.3 dizia "100% vem de peça de nó". Isso vale para o **validador
+do benchmark**. Pelo **OBB** — o instrumento da regra absoluta — o quadro
+é outro:
+
+| origem | TP1 (2094 violações OBB) | TGD (1038) |
+|---|---|---|
+| `STANDARD_FILL` (preenchimento comum) | **1419 (68%)** | 513 (49%) |
+| `X_INTERSECTION` | 214 | — |
+| `T_INTERSECTION_*` | 407 | 464 |
+| `L_CORNER` | 28 | 61 |
+
+Overlap medido: mediana **14,00cm** = a própria espessura da parede (o
+eixo de menor sobreposição), com **0 violações acima de 20cm**.
+
+**Consequência**: uma correção que só mexe na peça de **nó** não pode
+resolver a regra absoluta — dois terços do problema estão no
+preenchimento comum.
+
+### 47.4 A candidata, medida no físico — **VEREDITO: NÃO IMPLEMENTAR**
+
+Candidata: `_room_at_t_on_wall` devolve `0.0` quando o ponto cai dentro de
+uma abertura.
+
+| | TP1 atual | TP1 candidata | TGD atual | TGD candidata |
+|---|---|---|---|---|
+| **`door_void` OBB (regra absoluta)** | **2094** | 1938 (**−7,4%**) | **1038** | 1028 (**−1%**) |
+| `CROSSES_JAMB` (identidades) | 29 | **0** | 18 | 12 |
+| `INSIDE_DOOR` (identidades) | 1 | **0** | 1 | 0 |
+| identidades totais | **900** | 1092 (**+192**) | **789** | 798 (+9) |
+| `PRISM_STAGGER` (ident. novas) | — | **+169** | — | +9 |
+| `COMPENSATOR_CONSECUTIVE` (novas) | — | **+35** | — | +5 |
+| **`intersection_failures`** | **0** | **68** | **200** | **205** |
+| paredes vazias | 0 | 0 | 29 | 29 |
+| colisões do solver | 0 | 0 | 1197 | 1192 |
+| blocos colocados | 19 647 | 19 872 | 11 837 | 11 845 |
+
+**Três motivos independentes para não implementar:**
+
+1. **Não resolve a regra que diz resolver.** Zera o *validador* mas deixa
+   **1938 violações de OBB** de pé no TP1 — 92,6% do problema real
+   continua, porque ele mora no `STANDARD_FILL` (47.3).
+2. **Cria defeito obrigatório novo SEM SOLUÇÃO.** `intersection_failures`
+   **0 → 68** no TP1: 68 encontros que o solver deixa de conseguir
+   resolver, e cujo próprio contrato diz que *"precisa de ajuste de
+   geometria (mover abertura/crescer a boneca) antes, não dá para inventar
+   peça"*. É exatamente a condição de veto.
+3. **O custo não é de contagem, é de amarração.** Zerar o espaço
+   **remove** a peça de nó; o preenchimento comum atravessa o nó em
+   trechos maiores, e daí vêm as +169 identidades de junta e +35 de
+   compensador consecutivo (este último `MANDATORY`/`MAJOR`).
+
+### 47.5 A correção que continua de pé (e por que exige CR própria)
+
+**Ancorar a peça na jamba** em vez de no eixo do nó — a alvenaria da
+parede principal começa ali. Isso amarra de verdade **e** não invade. Mas,
+pela 47.3, ela sozinha atinge no máximo ~⅓ das violações de OBB: o
+`STANDARD_FILL` precisa de tratamento próprio (a fronteira do trecho
+precisa conhecer a abertura que **contém** o ponto, sem que isso apague a
+peça de nó).
+
+`DOCUMENTADO — pendência de código aberta`. **A escolha entre reconciliar
+as duas réguas (OBB × validador) ou tratar cada uma como contrato
+separado é decisão do usuário** — hoje elas discordam por construção, e
+nenhuma métrica de uma serve para aprovar a outra.
+
+### 47.6 Os 7 `OPENING_BLOCK_INSIDE_DOOR` do TP1 — prova por coordenada
+
+Pedido explícito: confirmar por coordenadas e volumes.
+
+```
+parede   W|8017.3,548.0|8017.3,1927.0|t14.0   (W019)
+abertura W019-O01   kind = door   PEITORIL = 0,00cm  -> porta SEM peitoril
+                    vão t = 564,0 .. 750,0cm
+bloco    B34  t = 715,0 .. 749,0cm   placement_reason = T_INTERSECTION_DEGRADED_L
+         fiadas 0, 2, 4, 6, 8, 10, 12          -> 7 ocorrências, 1 IDENTIDADE
+```
+
+`715,0 .. 749,0` ⊂ `564,0 .. 750,0`: o bloco está **inteiramente dentro**
+do vão. A porta tem peitoril **0,00cm**, logo a **regra absoluta da seção
+3 se aplica** e está sendo violada.
+
+**Portanto**: não é "apenas classificação" no sentido de "não há
+problema". A leitura correta tem duas partes, e as duas foram medidas:
+
+- **entre `main` e este candidato é só classificação** — `find_door_void_
+  violations` dá **2094 nas duas** árvores do TP1, as **30 identidades
+  são as mesmas**, e o que mudou foi 7 ocorrências passarem de
+  `CROSSES_JAMB` para `INSIDE_DOOR` porque a peça encolheu de `B54[715,
+  769]` para `B34[715,749]`;
+- **mas a invasão é REAL e PRÉ-EXISTENTE** — nas duas árvores, e é a
+  dívida da seção 45/47.
+
+No TGD o candidato **melhora**: OBB **1074 → 1038** (−36).
+
+**REGRA OBRIGATÓRIA**: `OPENING_BLOCK_INSIDE_DOOR` e
+`OPENING_BLOCK_CROSSES_JAMB` do benchmark **não provam nem refutam** a
+regra da seção 3. A prova é `find_door_void_violations` (OBB) contra
+porta com peitoril ≤ `DOOR_NO_SILL_MAX_SILL_CM`. Qualquer conclusão sobre
+"bloco no vão" tem de citar o número do OBB.
+
+## 48. Preparacao do beta controlado (2026-09-09)
+
+### 48.1 Instrucoes explicitas do usuario: contencao e limites
+
+**REGRA OBRIGATORIA para esta missao beta**, autorizada pelo usuario:
+parede nao modulavel deve ser detectada, conservada para revisao manual,
+ter motivo explicito no resultado/log/UI e nunca receber blocos incorretos.
+Parede retida visivelmente nao exige ampliar tolerancia ou alterar seu
+comprimento. Nenhum input/reference/reference_score/baseline oficial pode
+ser regravado. Secoes 41/42 continuam sem autorizacao de extensao normativa.
+
+Peca ocupando volume real de porta sem peitoril nao pode ser criada no
+beta; problemas de janela pertinentes ao recorte tambem exigem correcao ou
+contencao explicita. Nao ressuscitar a candidata rejeitada na secao 47.
+A permissao historica de criar diagnosticos em vermelho nao constitui
+permissao de lancamento fisico incorreto neste beta. A contencao deve ser
+explicita e testada, sem apagar defeitos do resultado bruto ou do benchmark.
+**IMPLEMENTADO NO CANDIDATO, ainda nao integrado/liberado:** o solver
+registra paredes totalmente sem candidatos fisicos em `unmodulated_walls`,
+com coordenadas, comprimento, motivo e `MANUAL_REVIEW_KEEP_REFERENCE`.
+A criacao confere instancias por candidato e fiada; referencias de paredes
+vazias ou com criacao incompleta sao retidas, marcadas e relatadas na UI.
+197.943cm permanece sem truncamento; no caso real 99.7543545516cm, o
+preenchimento apos dois X termina em reserva negativa de -2.5864347014cm
+contra a ponta AMBIGUOUS. Classificar como `OVERLAPPING_RESERVATIONS`, nao
+como simples parede livre fora de modulo. Nenhuma geometria foi alterada.
+
+O pacote offline controlado ativa `controlled_beta_preflight`: verifica
+fiadas fisicas e todas as aberturas ativas em Z contra TODAS as pecas por
+proximidade espacial, inclusive as atribuidas a outra parede. Verifica
+tambem colisoes entre pecas, sem isencao por pertencerem ao mesmo no.
+Usa OBB/SAT e tolerancias existentes; e uma contencao conservadora separada,
+nao substitui nem altera o contrato dos validadores do benchmark.
+Qualquer invasao/colisao ou resultado incompleto bloqueia o LOTE INTEIRO
+antes de criar ou remover o lote anterior. Nao retira pecas de amarracao,
+nao reescreve candidatos nem melhora artificialmente indicadores.
+Sem manifesto de beta, o carregador normal permanece historico; ele nao
+deve ser usado para este beta. Pacote exige commit completo e hashes de
+todos os modulos; erro nao permite fallback para main/cache antigo.
+
+### 48.2 Correcao de medicao da secao 47: OBB exige escopo fisico
+
+**PADRAO MEDIDO OFFLINE**, nao mudanca de regra ou threshold. A funcao
+`find_door_void_violations` mede OBB em XY e nao filtra altura sozinha.
+Aplicar TODAS as portas a `candidates` agregado inclui pecas acima da
+verga e variantes/bandas que nao coexistem na mesma fiada. Para provar
+invasao de volume criado, usar `course_candidates` por indice fisico e
+as aberturas ativas na faixa Z, pelos helpers de banda ja existentes.
+O benchmark 1D e o OBB permanecem instrumentos distintos, sem reescrita
+de contrato; nenhum total liquido pode aprovar uma nova invasao.
+
+Medido por `tools/beta/physical_snapshot.py`, mesmos insumos oficiais:
+
+| Instrumento | main 08495d9 TGD | N1f 05030d2 TGD | N1f 05030d2 TP1 |
+|---|---:|---:|---:|
+| Colisoes agregadas | 1160 | 1197 | 0 |
+| Pares de colisao por fiada fisica | 726 | 784 | 0 |
+| OBB agregado contra todas as aberturas | 1074 | 1038 | 2094 |
+| OBB agregado por banda (resultado do motor) | 290 | 290 | 348 |
+| OBB por fiada fisica e abertura ativa em Z | 318 | 318 | 412 |
+
+As **412** do TP1 sao exclusivamente T/X (13 degraded-L, 74 incoming,
+88 incoming-degraded, 71 main, 150 X, 16 X-degraded). A afirmacao de 68%
+STANDARD_FILL da secao 47.3 veio do escopo agregado sem filtragem vertical:
+**nao prova invasao de preenchimento nas fiadas criadas**. A invasao real
+de encontro continua aberta. Nao declarar corrigida por melhorar contagem.
+
+**Complemento espacial medido na etapa 2:** 412 ainda e uma medicao com
+filtro de propriedade (`wall_idx`/`secondary_wall_idx`). A contencao beta
+encontra **500** invasoes em portas ativas do TP1: as 412 anteriores mais
+**88 OPENING_REPAIR_FILL** de OUTRA parede que tambem cruzam a porta.
+Portanto nem a correcao para fiada/Z resolve sozinha a lacuna do instrumento.
+No TGD, a varredura espacial encontra 692 invasoes de aberturas ativas,
+contra 318 na regua restrita a porta e propriedade. Categorias/identidades
+permanecem separadas nos artefatos; nenhum total desses e aprovacao.
+Main TP1 foi conferida independentemente: 412 na regua restrita, 18
+colisoes por fiada e 19572 blocos; candidato N1f: 412, zero e 19647.
+
+As novas colisoes TGD distribuem-se em cinco pares de paredes (lista e
+geometria no checkpoint/evidencias da missao). Ha regioes geometricamente
+novas apesar da reducao da area TOTAL de overlap. Gate de regressao
+continua reprovado; causalidade por etapa ainda esta sendo investigada.
+Os censos completos atribuem +20 pares agregados/+38 fisicos a N1,
+zero delta de colisao a N1b, +16/+18 a N1c e +1/+2 a N1e/f. Esses deltas
+sao saldos por etapa, nao contagem de identidades adicionadas isoladamente.
+N1c cb70224 ja produz 1196 pares agregados e 782 por fiada; N1e/f chega
+a 1197/784. Nenhum conhecimento de amarracao desta medicao autoriza
+alterar geometria da entrada, remover amarracao ou compensar por score.
+
+### 48.3 Integridade da substituicao e evidencias complementares
+
+**CONTENCAO DO CANDIDATO BETA:** excluir o lote anterior e criar o novo
+devem pertencer ao mesmo grupo transacional externo. Falha de exclusao,
+criacao parcial, instancia ausente, ID duplicado ou commit nao confirmado
+reverte o conjunto; cache e callback de sucesso so recebem o novo resultado
+depois da confirmacao. Conferir retorno E estado das transacoes, sem
+tratar ausencia de excecao como commit bem-sucedido. Falha no proprio
+rollback bloqueia criar/finalizar e exige revisao do documento; nao anunciar
+restauracao quando ela nao foi confirmada. O fluxo diagnostico historico
+fora do pacote beta permanece separado. Testes com dubles nao substituem
+a futura verificacao controlada das familias/transacoes reais no Revit.
+
+**EVIDENCIA OFFLINE, nao aprovacao:** censos completos TGD e TP1 sem
+acertos de cache reproduziram exatamente candidatos, fiadas fisicas,
+pares de colisao e invasoes dos censos N1f anteriores. Cache nao explica
+os deltas fisicos observados. A auditoria de amarracao reconstruida do TP1
+coincidiu integralmente com o resultado bruto: paredes 18 e 40 possuem,
+respectivamente, quatro juntas continuas e duas faixas C09 repetidas.
+Investigar a causalidade e o caso fisico; nao descartar pelo score global.
+
+Recortes explicitamente selecionados e resolvidos novamente podem passar
+no preflight de invasao/colisao e ainda falhar em amarracao/compensadores.
+Passar nessa contencao NAO certifica o recorte nem libera o merge do #31.
+O recorte muda a topologia de fronteira e deve ter validadores executados
+novamente; nao usar apenas o recorte visual de um solve maior como prova.
+
+### 48.4 Hipoteses rejeitadas e entrada invalida
+
+**CONTENCAO BETA:** validar finitude da cota base, eixos/espessuras de
+paredes e limites das aberturas ANTES do filtro vertical. NaN nao pode
+fazer um vazio sumir silenciosamente; abertura invertida/degenerada ou
+eixo de bloco fora do plano deve bloquear explicitamente o lote.
+
+**HIPOTESE OFFLINE REJEITADA, sem mudar o solver:** colocar as duas
+fiadas do L163 TGD na parede 109 reduz pares fisicos 784->775 e agregados
+1197->1189, mas aumenta invasoes espaciais 692->698. O B34 girado cruza a
+porta da parede 99, inclusive nas seis fiadas pares adicionais 0..10.
+Cobertura tambem piora: GAP_IN_ROW +6, MISSING_ROW +8, PARTIAL_WALL +2.
+Nao adotar o giro por saldo de colisoes. Escolhas locais de L163/L185,
+inclusive C04 minimo mantendo contatos e vizinhos, continuam com invasao
+ou colisao; nao equivalem a prova de impossibilidade de TODA coordenacao
+global ou de TODA mudanca geometrica.
+
+A convencao do T principal na fiada A continua vigente. A alternativa de
+inverter um T para coordenar encontros proximos esta expressamente
+classificada como decisao normativa pendente na secao 36.7; nao implementar
+essa inversao por inferencia do comentario historico sobre solver global.
+Repetir A/B com K=1 tambem continua vigente (18.4); nao reativar rodizio de
+fiadas para esconder faixas de compensadores sem a decisao correspondente.
+
+### 48.5 Referencia parcial e validade do calculo beta
+
+Uma parede com algumas pecas NAO esta integralmente substituida se o
+resultado ainda registra trecho nao modulavel. Preservar e identificar
+tambem essa referencia, inclusive quando todas as pecas planejadas foram
+criadas. O registro distingue `has_physical_candidates`; nao zerar
+candidatos, comprimento ou achados para simular cobertura completa.
+
+O beta registra assinatura da geometria CAPTURADA, aberturas, dimensoes
+do catalogo, nivel/base e altura ao calcular. Criar/finalizar com assinatura
+ausente ou diferente deve exigir novo calculo, antes de qualquer mutacao.
+No refresh beta, referencia apagada/ilegivel ou eixo deslocado lateralmente,
+rotacionado ou em cota nao suportada deve exigir recaptura, nao usar o
+snapshot antigo silenciosamente. O comportamento historico fora do beta
+permanece separado. Isso nao promete rastrear edicoes nativas arbitrarias
+de portas/janelas: o primeiro beta exige copia estatica do RVT e recaptura
+apos qualquer edicao nativa fora do fluxo suportado.
+
+### 48.6 Fechamento das provas offline e alternativa sem N1
+
+**EVIDENCIA MEDIDA, sem mudar regra:** parede40 TP1, trecho fixo35..219cm:
+105 ordens distintas do mesmo multiset4B39+2C09+C04,30 sem adjacencia,
+zero dessas30 aprovadas pela auditoria; minimo de duas faixas repetidas.
+Isso nao prova impossibilidade global com outras fronteiras. No W019,
+troca isolada das fases dos T95/138 mantem as quatro juntas continuas e
+as500 invasoes e acrescenta39 PRISM_STAGGER: hipotese rejeitada, nao
+implementada. Tornar apenas o teto preferencial nao resolve essas provas.
+
+TGD+37 agregado se decompoe em+132 nos quatro pares que aumentam e-95
+nos dez que zeram. Fisico+58=+156/-98; identidades pecas/fiadas322 novas
+e264 removidas. Pares paralelos12/13 e31/36 de14cm ocupam faixas comuns
+0,746/1,258cm. Nao deduplicar, mover ou definir parede composta sem
+confirmar a unidade fisica do projeto fonte. A contencao nao aprova N1.
+
+Recorte TP1 fonte75/81 resolvido novamente:187 blocos, um L, duas pontas
+livres, nenhuma abertura; zero achados com referencia e auditorias brutas
+aprovadas. Nao e o mesmo grafo do projeto inteiro. Uma alternativa beta
+sobre a main, SEM N1, pode ser avaliada separadamente; nao autoriza o
+merge do #31, novos T/X ou aberturas. Detalhes/reprodutores no relatorio
+`docs/RELATORIO_BETA_2026-09-09.md` e checkpoint da etapa4.

@@ -83,6 +83,17 @@ def _wall_row_joints(wall, row_index):
     return joints
 
 
+def _physical_key(wall):
+    """Identidade FISICA de uma parede (`W|x0,y0|x1,y1|tE`, pontas
+    ordenadas) - a UNICA chave comparavel entre `input.json` e o result,
+    porque `model.assign_ids` reordena e renumera as paredes."""
+    a = (round(wall["start_cm"][0], 1), round(wall["start_cm"][1], 1))
+    b = (round(wall["end_cm"][0], 1), round(wall["end_cm"][1], 1))
+    lo, hi = sorted([a, b])
+    return "W|%.1f,%.1f|%.1f,%.1f|t%.1f" % (lo[0], lo[1], hi[0], hi[1],
+                                            round(wall["thickness_cm"], 1))
+
+
 def _wall_by_id(result_project, wall_id):
     return next(w for w in result_project["walls"] if w["id"] == wall_id)
 
@@ -115,25 +126,52 @@ def test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair():
     a coincidencia - a "prova da causa-raiz" antiga (a coincidencia
     persistir) so' valia enquanto o papel do no' ficava fixo; a causa-raiz
     do PRISM-STAGGER (junta de contorno invisivel a busca) continua real e
-    provada por W041/`test_w041_...` abaixo, que nao depende de ARM."""
+    provada por W041/`test_w041_...` abaixo, que nao depende de ARM.
+
+    CR-N1 (2026-09-09): a SEGUNDA assercao ("um candidato ARM foi aceito
+    para W076") caiu pelo mesmo precedente da parede 23. Medido nas DUAS
+    arvores (`origin/main` 08495d9 x base+CR-N1), TP1 real, conferindo
+    antes que `W076` E' a MESMA parede fisica no input e no result
+    (`W|7677.2,1568.0|7677.2,1637.0|t14.0` nos dois - aqui `W0xx` casa,
+    mas a chave fisica e' quem manda):
+
+        base   W076 repairable=SIM  aceita=SIM  coincidencia=[]  prisma=NAO
+        CR-N1  W076 repairable=NAO  aceita=NAO  coincidencia=[]  prisma=NAO
+        paredes repairable no TP1 inteiro   5 -> 0
+        prisma forcado FINAL no TP1        29 -> 24
+
+    O RESULTADO FISICO de W076 e' identico nas duas arvores; o que mudou
+    foi a rota (reparo aceito -> geracao ja' correta). A assercao de
+    mecanismo virou uma assercao FISICA mais forte: a coincidencia de
+    contorno tem de estar resolvida em TODOS os pares de fiadas vizinhas
+    (o teste antigo so' olhava o par 0/1) e a parede tem de terminar SEM
+    prisma forcado."""
     input_project, solve_result, walls_to_create, result_project = _run(
         "torre_easy_lo_r00_tp1")
     wall_idx = next(i for i, w in enumerate(input_project["walls"]) if w["id"] == "W076")
 
     wall = _wall_by_id(result_project, "W076")
-    joints_a = _wall_row_joints(wall, 0)
-    joints_b = _wall_row_joints(wall, 1)
-    assert not (joints_a & joints_b), (
-        "esperava a coincidencia de contorno de W076 RESOLVIDA pelo ARM "
-        "SAFE REPAIR (wall_idx=75/SAME_A aceito) - se voltou a coincidir, "
-        "o candidato deixou de ser aceito (regressao no Gate Fidelity ou "
-        "no SAFE REPAIR, investigar antes de ajustar este teste): "
-        "%s / %s" % (joints_a, joints_b)
-    )
-    arm = solve_result.get("arm_role_safe_repair") or {}
-    accepted_here = [c for c in (arm.get("accepted") or []) if c["wall_idx"] == wall_idx]
-    assert accepted_here, (
-        "esperava um candidato ARM aceito para W076 (wall_idx={})".format(wall_idx))
+    entrada = input_project["walls"][wall_idx]
+    assert _physical_key(entrada) == _physical_key(wall), (
+        "W076 do input e W076 do result nao sao a MESMA parede fisica - "
+        "`model.assign_ids` reordena as paredes, entao cruzar os dois "
+        "arquivos por `W0xx` nao vale (secao 38.5 das regras): %s x %s"
+        % (_physical_key(entrada), _physical_key(wall)))
+
+    for row_index in range(len(wall["rows"]) - 1):
+        joints_a = _wall_row_joints(wall, row_index)
+        joints_b = _wall_row_joints(wall, row_index + 1)
+        assert not (joints_a & joints_b), (
+            "esperava a coincidencia de contorno de W076 RESOLVIDA entre as "
+            "fiadas %d e %d - se voltou a coincidir, ou o candidato ARM "
+            "deixou de ser aceito ou a GERACAO regrediu (investigar antes "
+            "de ajustar este teste): %s / %s"
+            % (row_index, row_index + 1, joints_a, joints_b)
+        )
+    audits = solve_result.get("wall_bond_audits")
+    assert not m._wall_has_forced_corner_prism(wall_idx, audits), (
+        "W076 tem de terminar SEM prisma forcado - por reparo ARM aceito "
+        "ou por ja' nascer correta na geracao")
 
 
 # ============================================================

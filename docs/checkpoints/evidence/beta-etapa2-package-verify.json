@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:10:53.153437+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "656544e15165c9481af3f1eccf04840384e863ed",
+  "tree": "1235d238ecf7225405334d9fa82de0618fe1288e",
+  "status_before": "?? docs/checkpoints/evidence/beta-etapa2-diagnostics.json\n?? docs/checkpoints/evidence/beta-etapa2-diagnostics.txt\n?? docs/checkpoints/evidence/beta-etapa2-infra.json\n?? docs/checkpoints/evidence/beta-etapa2-infra.txt\n?? docs/checkpoints/evidence/beta-etapa2-package.json\n?? docs/checkpoints/evidence/beta-etapa2-package.txt\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.txt",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import beta_package; print(beta_package.verify_beta_package(r'C:\\Users\\CIVIX\\.codex\\artifacts\\beta-revit-656544e-20260909'))"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-etapa2-package-verify.txt",
+  "pid": 3460,
+  "exit_code": 0,
+  "elapsed_seconds": 1.031,
+  "status_after": "?? docs/checkpoints/evidence/beta-etapa2-diagnostics.json\n?? docs/checkpoints/evidence/beta-etapa2-diagnostics.txt\n?? docs/checkpoints/evidence/beta-etapa2-infra.json\n?? docs/checkpoints/evidence/beta-etapa2-infra.txt\n?? docs/checkpoints/evidence/beta-etapa2-package-verify.json\n?? docs/checkpoints/evidence/beta-etapa2-package-verify.txt\n?? docs/checkpoints/evidence/beta-etapa2-package.json\n?? docs/checkpoints/evidence/beta-etapa2-package.txt\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa2-stable-tests.txt",
+  "log_sha256": "51b73ad4e43b755b88257eff72ced66ce4c610594465c3ede9a1f044cb1f7510"
+}

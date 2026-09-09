@@ -1,0 +1,32 @@
+{
+  "head": "1522b3bd25af81a858a9fb550626450cf06c944f",
+  "source_indices": [
+    35,
+    41,
+    49,
+    52,
+    57
+  ],
+  "seconds": 0.34399999999914144,
+  "physical_blocks": 922,
+  "preflight_ok": true,
+  "node_counts": {
+    "FREE_END": 7,
+    "T_INTERSECTION": 3,
+    "X_INTERSECTION": 1
+  },
+  "validator_errors": [],
+  "unmodulated_walls": [],
+  "findings": {
+    "PRISM_STAGGER_BELOW_TARGET": 25,
+    "COMPENSATOR_CONSECUTIVE": 38,
+    "COMPENSATOR_EXCESS_IN_RUN": 43,
+    "COMPENSATOR_VERTICAL_STRIP": 10,
+    "OPENING_MISSING_COUNTER_LINTEL": 2
+  },
+  "bond_audits_failing": [
+    2,
+    3,
+    4
+  ]
+}

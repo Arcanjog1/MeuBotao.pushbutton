@@ -90,6 +90,29 @@ class DocumentationTests(unittest.TestCase):
         self.write('engine.py', 'changed\n')
         self.assertTrue(any('after reviewed HEAD' in e for e in self.errors()))
 
+    def test_historical_checkpoint_alone_cannot_approve_delivery(self):
+        self.checkpoint['scope'] = 'historical'
+        self.sync()
+        self.assertTrue(any('requires a current checkpoint' in e for e in self.errors()))
+
+    def test_historical_stage_preserves_its_original_head_with_current_review(self):
+        self.checkpoint['scope'] = 'historical'
+        self.sync()
+        self.write('engine.py', 'changed\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'new stage')
+        current = dict(self.checkpoint, scope='current', head=self.git('rev-parse', 'HEAD'))
+        self.write('docs/checkpoints/current.md', '```json\n' + json.dumps(current) + '\n```\n')
+        self.git('add', '.')
+        self.assertEqual([], self.errors())
+        self.write('engine.py', 'unreviewed\n')
+        self.assertTrue(any('after reviewed HEAD' in e for e in self.errors()))
+
+    def test_historical_references_are_still_validated(self):
+        self.checkpoint.update(scope='historical', references=[{'path': 'missing.py'}])
+        self.sync()
+        self.assertTrue(any('missing tracked reference' in e for e in self.errors()))
+
     def test_old_status_rejected_after_main_moves(self):
         self.git('commit', '-m', 'main advances')
         errors = validator.validate(self.root, self.base, 'HEAD', True)

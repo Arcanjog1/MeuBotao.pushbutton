@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:32:25.381153+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "f9e81ccbc2d523090490d39a5633674ca1768054",
+  "tree": "83ad449322d9394e15446c80733c92d093b8c035",
+  "status_before": "?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tp1.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.txt\n?? docs/checkpoints/evidence/beta-region-l-run.json\n?? docs/checkpoints/evidence/beta-region-l-run.txt\n?? docs/checkpoints/evidence/beta-region-l.json\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import json,pathlib\np=pathlib.Path('docs/checkpoints/evidence')\nkeys=('candidates','physical','aggregate_collisions','band_door_void','naive_door_void','wall_keys','bands','summary')\nfor project in ('tgd','tp1'):\n a=json.loads((p/('beta-n1f-'+project+'.json')).read_text()); b=json.loads((p/('beta-cache-off-'+project+'.json')).read_text())\n assert a['input_sha256']==b['input_sha256']\n equal={k:a[k]==b[k] for k in keys}; assert all(equal.values()),equal\n print(json.dumps({'project':project,'original_head':a['head'],'cold_head':b['head'],'input_sha256':a['input_sha256'],'exact_geometry_equality':equal,'seconds_cold':b['solver_seconds']}))\na=json.loads((p/'beta-cache-off-tp1.json').read_text())['wall_bond_audits']; b=json.loads((p/'beta-bond-audit-tp1.json').read_text())['bond_audits']\nassert a==b\nprint('TP1 reconstructed bond audits equal every raw solver audit: '+str(len(a))+' walls')\nfor wi in ('18','40'): print(json.dumps({'wall':wi,'problems':a[wi]['problems']}))"
+  ],
+  "timeout_seconds": 60,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-cache-equivalence.txt",
+  "pid": 24332,
+  "exit_code": 0,
+  "elapsed_seconds": 1.219,
+  "status_after": "?? docs/checkpoints/evidence/beta-bond-audit-main-tp1.json\n?? docs/checkpoints/evidence/beta-bond-audit-tp1.json\n?? docs/checkpoints/evidence/beta-cache-equivalence.json\n?? docs/checkpoints/evidence/beta-cache-equivalence.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tgd-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tgd.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.json\n?? docs/checkpoints/evidence/beta-cache-off-tp1-run.txt\n?? docs/checkpoints/evidence/beta-cache-off-tp1.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.json\n?? docs/checkpoints/evidence/beta-etapa3-stable-tests.txt\n?? docs/checkpoints/evidence/beta-region-l-run.json\n?? docs/checkpoints/evidence/beta-region-l-run.txt\n?? docs/checkpoints/evidence/beta-region-l.json\n?? docs/checkpoints/evidence/beta-region-tx-run.json\n?? docs/checkpoints/evidence/beta-region-tx-run.txt\n?? docs/checkpoints/evidence/beta-region-tx.json",
+  "log_sha256": "3b6dad89fb42626b5f6e6c21b354092effe9c694206341f1cfb4cde487995321"
+}

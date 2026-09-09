@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-09T15:43:43.901909+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-revit-20260909",
+  "head": "3229924e3537878e4c1d40d25dcb387ab23fc46a",
+  "tree": "17bb62ca7b142fcf30df4e7611a48ec24eef7894",
+  "status_before": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-final-package.json\n?? docs/checkpoints/evidence/beta-final-package.txt\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.json\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.txt\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.txt\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-c",
+    "import beta_package; print(beta_package.verify_beta_package(r'C:\\Users\\CIVIX\\.codex\\artifacts\\beta-revit-3229924-20260909'))"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "beta-final-package-verify.txt",
+  "pid": 24200,
+  "exit_code": 0,
+  "elapsed_seconds": 0.375,
+  "status_after": "?? docs/checkpoints/evidence/beta-consolidated-final.json\n?? docs/checkpoints/evidence/beta-consolidated-final.txt\n?? docs/checkpoints/evidence/beta-corner163-full-run.json\n?? docs/checkpoints/evidence/beta-corner163-full-run.txt\n?? docs/checkpoints/evidence/beta-corner163-full-scored.json\n?? docs/checkpoints/evidence/beta-corner163-full.json\n?? docs/checkpoints/evidence/beta-corner163-volume-choices.json\n?? docs/checkpoints/evidence/beta-corner185-volume-choices.json\n?? docs/checkpoints/evidence/beta-final-package-verify.json\n?? docs/checkpoints/evidence/beta-final-package-verify.txt\n?? docs/checkpoints/evidence/beta-final-package.json\n?? docs/checkpoints/evidence/beta-final-package.txt\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.json\n?? docs/checkpoints/evidence/beta-incoming-minimum-footprints.txt\n?? docs/checkpoints/evidence/beta-region-l-scored.json\n?? docs/checkpoints/evidence/beta-region-tx-scored.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts-v2.txt\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.json\n?? docs/checkpoints/evidence/beta-wall-geometry-conflicts.txt",
+  "log_sha256": "476828a6be3f6c3ef1f398bbef154ced5184b7c10d2b39538805a6e5c52aca40"
+}
