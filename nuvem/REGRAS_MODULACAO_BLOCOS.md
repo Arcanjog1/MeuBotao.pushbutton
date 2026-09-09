@@ -6708,3 +6708,87 @@ código. A soma é constante: 7 saíram de um, 7 entraram no outro.
 ponto cai **dentro do vão de uma porta** (t≈742 em `564..750`). Qualquer
 peça de amarração daquele nó cai no vão, seja `B54` ou `B34`.
 `DOCUMENTADO — pendência de código aberta` (seção 45).
+
+---
+
+## 45. NÓ DE ENCONTRO cujo EIXO cai DENTRO do vão — a família inteira de
+invasão de abertura tem UMA causa (2026-09-09, **PADRÃO MEDIDO —
+correção candidata medida e NÃO aplicada; exige decisão de trade-off**)
+
+### 45.1 O padrão
+
+Quando a parede que chega encosta a **face** na jamba de uma abertura, o
+**eixo** dela fica meia espessura para dentro do vão. Medido: o nó cai a
+**8,0cm** da borda em todos os casos (7cm de meia espessura + 1cm de
+junta). Não é geometria errada — é a configuração normal de uma porta que
+vai de parede a parede.
+
+**38 nós do TP1** estão nessa situação (T e X), em 13 paredes.
+
+### 45.2 A lacuna de medição
+
+`_room_at_t_on_wall` só enxerga abertura que **começa à frente** (sign≥0)
+ou que **termina atrás** (sign<0). A abertura que **contém** o ponto é
+invisível aos dois laços. Resultado: o solver mede espaço atravessando o
+vão e lança a peça de nó centrada no ponto — **metade dela dentro da
+porta**.
+
+A regra já estava escrita: o cabeçalho de
+`T_INTERSECTION_B54_HALF_ROOM_FT` exige *"metade do próprio comprimento
+livre para os dois lados … **sem invadir abertura nenhuma**"*. É bug
+contra regra existente, não pendência normativa.
+
+### 45.3 O tamanho real da família (medido)
+
+**100% das ocorrências** de `OPENING_BLOCK_CROSSES_JAMB` e
+`OPENING_BLOCK_INSIDE_DOOR` do TP1 vêm de **peça de nó** — nenhuma de
+preenchimento:
+
+```
+TP1   OPENING_BLOCK_CROSSES_JAMB   161 ocorrencias   origem: NO'  (100%)
+TP1   OPENING_BLOCK_INSIDE_DOOR      7 ocorrencias   origem: NO'  (100%)
+```
+
+Os dois são `LEVEL_MANDATORY` / `SEVERITY_CRITICAL` na taxonomia do
+projeto ("zona de exclusão absoluta", seção 3).
+
+### 45.4 A correção candidata, medida e NÃO aplicada
+
+Devolver `0.0` em `_room_at_t_on_wall` quando o ponto cai dentro de uma
+abertura (tolerância de LAYOUT, 0,05cm, para não zerar um nó legitimamente
+**na** jamba). O nó então cai na degradação que a própria regra já previa
+("1 único compensador fecha a boneca sozinho, **sem peça nenhuma na parede
+principal**").
+
+| identidades físicas | CR-N1c | candidata |
+|---|---|---|
+| **TP1** `OPENING_BLOCK_CROSSES_JAMB` | 11 | **0** |
+| **TP1** `OPENING_BLOCK_INSIDE_DOOR` | 1 | **0** |
+| TP1 `COMPENSATOR_CONSECUTIVE` | 200 | 233 (**+33**) |
+| TP1 `COMPENSATOR_EXCESS_IN_RUN` | 152 | 174 (**+22**) |
+| TP1 `PRISM_STAGGER_BELOW_TARGET` | 245 | 369 (**+124**) |
+| **TP1 total** | **861** | 1020 |
+| **TGD** `OPENING_BLOCK_CROSSES_JAMB` | 14 | **8** |
+| **TGD** `OPENING_BLOCK_INSIDE_DOOR` | 1 | **0** |
+| **TGD total** | **780** | 791 |
+
+**Por nível**: troca **−12 CRITICAL** por **+55 MANDATORY/MAJOR**
+(compensadores) e **+126 PREFERENCE/MINOR** (prisma). A troca de 12
+críticos por 55 obrigatórios **não é uma escolha técnica** — é decisão de
+trade-off entre categorias, e por isso a candidata **foi revertida**.
+
+### 45.5 Por que zerar não é a correção FINAL (e qual seria)
+
+Zerar remove a peça de nó da parede principal; o preenchimento comum passa
+a atravessar o nó em trechos maiores, e daí vêm os compensadores e as
+juntas. A correção **certa** não é remover a peça: é **ancorá-la na
+jamba** em vez de no eixo do nó — a alvenaria da parede principal começa
+ali, e uma peça que começa em `t_jamba` amarra de verdade **e** não invade
+o vão.
+
+Isso exige deslocar o ponto de contato da parede principal em
+`solve_t_intersection` / `solve_x_intersection` quando o eixo do nó cai
+dentro de uma abertura — mudança de **posicionamento**, com efeito em toda
+a família de encontros. `DOCUMENTADO — pendência de código aberta`, CR
+própria, com este número na mesa: **168 ocorrências críticas do TP1
+dependem dela**.
