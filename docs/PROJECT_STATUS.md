@@ -8,7 +8,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-09T15:14:00+00:00",
+  "observed_utc": "2026-09-09T15:34:00+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -24,7 +24,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
     {"pr": 21, "head": "766e1ea6ee281cc29a3d6118d6013f3955193352"},
     {"pr": 28, "head": "0596e78eadcbebd9369dbd54272b44952b8211ed"},
     {"pr": 30, "head": "626087b845a23f83b7907c39c448bfa7e8d3e69e"},
-    {"pr": 31, "head": "656544e15165c9481af3f1eccf04840384e863ed"}
+    {"pr": 31, "head": "edc9666545eef0f0e423ecd1ba28d2ceb798cd5e"}
   ]
 }
 ```
@@ -47,7 +47,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-C1 | PR #26 integrado, `0c6e8f7` | Herdado pelo #31 | [cobertura](CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md) | Nao resolve C2/G16 inteiro |
 | CR-G12 | PR #29 integrado, `c88a031` | Herdado pelo #31 | [revisao](CR_G12_REVISAO_INDEPENDENTE.md) | Duas identidades cross-band residuais historicas; custo ARM |
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
-| CR-N1b/c/e/f + beta | Ausente | PR #31 draft, codigo avaliado `656544e` | [etapa 2](checkpoints/2026-09-09-beta-etapa2.md), 479 testes | Colisoes TGD +37, recorte e regressao final; contencao nao e GO |
+| CR-N1b/c/e/f + beta | Ausente | PR #31 draft, producao `f9e81cc`, diagnostico `edc9666` | [etapa 3](checkpoints/2026-09-09-beta-etapa3.md), 314 testes desta etapa | Colisoes TGD +37, amarracao TP1, recorte e regressao final; contencao nao e GO |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
 | Governanca | PR #32 integrado, `aa58d70` | Checkpoints historicos explicitos e timeout de arvore de processos na branch beta | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | Base: 12 testes infra e 260 test_script; candidato: 16 testes infra verdes |
 
@@ -79,8 +79,14 @@ Etapa beta posterior: `8d75bb4` e `656544e` acrescentam contencao e
 retencao sem alterar `wall_stepper.py`. Preparados na branch
 `codex/beta-revit-20260909` e publicados tambem no #31 por fast-forward,
 mantendo draft e sem merge. O SHA de codigo avaliado e 656544e; o HEAD do
-PR inclui o commit documental seguinte. CI desses novos commits deve ser
-conferido separadamente dos checks antigos de 05030d2.
+PR inclui o commit documental seguinte. CI do HEAD publicado 1522b3b foi
+conferido: dois checks de governanca verdes, sem executar o solver.
+Etapa 3: `f9e81cc` protege substituicao atomica do lote beta e valida
+transacoes/instancias; `edc9666` acrescenta experimento L separado.
+314 testes verdes em 98.80s no codigo f9e81cc; censos completos sem cache
+preservam exatamente a geometria TGD/TP1. Recortes L/T/X ainda possuem
+achados de amarracao/compensadores e NAO estao liberados. O SHA da tabela
+identifica a revisao avaliada; HEAD publicado inclui checkpoints posteriores.
 
 Os PRs #7/#8 tambem carregam diferencas de producao em
 `wall_pairing.py`/`wall_stepper.py` desde o merge-base, apesar do escopo

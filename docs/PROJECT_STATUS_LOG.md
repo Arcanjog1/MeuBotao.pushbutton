@@ -1715,3 +1715,16 @@ criacao/remocao do lote; pacote offline por SHA/hash sem fallback.
 TGD ainda tem regressao real de colisao e o recorte/final consolidada
 continuam pendentes: NAO e GO. Provas, limites e proximos passos no
 [checkpoint da etapa 2](checkpoints/2026-09-09-beta-etapa2.md).
+
+### 2026-09-09 - Beta controlado, etapa 3 (CANDIDATO)
+
+Producao f9e81cc, diagnostico edc9666: substituicao do lote beta em grupo
+transacional externo, verificacao de commits/instancias e bloqueio em
+rollback nao confirmado. 314 testes verdes, 98.80s. Cache desativado nos
+censos completos TGD/TP1 conserva exatamente todas as geometrias medidas.
+Auditorias brutas confirmam achados TP1 nas paredes 18/40; recortes novos
+passam no preflight espacial mas nao em todos os controles de amarracao.
+Experimentos locais L163/L185: troca apenas transfere a colisao; giro
+para a parede livre zera colisao local mas perde alternancia. Ainda nao
+e correcao de producao nem aprovacao do recorte. Main aa58d70 inalterada,
+PR31 draft sem merge. [Checkpoint](checkpoints/2026-09-09-beta-etapa3.md).

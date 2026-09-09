@@ -1,0 +1,23 @@
+{
+  "head": "1522b3bd25af81a858a9fb550626450cf06c944f",
+  "source_indices": [
+    75,
+    76,
+    81
+  ],
+  "seconds": 0.23500000000058208,
+  "physical_blocks": 245,
+  "preflight_ok": true,
+  "node_counts": {
+    "L_CORNER": 2,
+    "FREE_END": 2
+  },
+  "validator_errors": [],
+  "unmodulated_walls": [],
+  "findings": {
+    "PRISM_STAGGER_BELOW_TARGET": 5,
+    "COMPENSATOR_EXCESS_IN_RUN": 3,
+    "COMPENSATOR_VERTICAL_STRIP": 1
+  },
+  "bond_audits_failing": []
+}

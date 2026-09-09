@@ -1,0 +1,15 @@
+CONTROL: every junction-cache lookup misses
+{
+  "head": "1522b3bd25af81a858a9fb550626450cf06c944f",
+  "seconds": 374.2970000000005,
+  "summary": {
+    "blocks": 19647,
+    "aggregate_collisions": 0,
+    "physical_course_collisions": 0,
+    "band_door_void": 348,
+    "naive_all_openings_door_void": 2094,
+    "physical_active_door_void": 412,
+    "empty_walls": [],
+    "intersection_failures": 0
+  }
+}
