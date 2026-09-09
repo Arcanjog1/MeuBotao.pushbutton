@@ -7,6 +7,30 @@
 >
 > Novo numa sessão? Comece por `docs/START_HERE.md`.
 
+## Candidato em revisão — NÃO integrado (2026-09-09)
+
+> Esta seção descreve trabalho em **branch draft**. Nada dela está na
+> `main`. Não citar como estado de produção.
+
+| item | valor |
+|---|---|
+| branch | `claude/sleepy-turing-rf4s7o` |
+| HEAD | `420dbcc` (tag `checkpoint/cr-n1f-420dbcc`) |
+| PR | [#31](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31) — **draft** |
+| contém | CR-N1 (PR #30, também **draft**) + CR-N1b/c/e/f |
+| testes | **1003 passed / 2 failed** (as 2 de `test_benchmark_baselines.py`) |
+| `POSITION_OVERLAP` | **0/0** (era 6/1 na `main`) |
+| identidades físicas | TGD 852 → **789**; TP1 961 → **900** |
+| ⚠ colisões TGD | 1160 → **1197** (+37) — investigar antes do Revit |
+| ✔ colisões TP1 | 14 → **0** |
+
+Checkpoint completo: `docs/CHECKPOINT_CR_N1_SERIE_2026-09-09.md`.
+**Três decisões normativas pendentes do usuário** (seções 41, 42 e 45/47
+de `nuvem/REGRAS_MODULACAO_BLOCOS.md`) — enquanto elas não saírem, o
+candidato **não** deve ser mesclado.
+
+---
+
 ## Main atual
 
 ```

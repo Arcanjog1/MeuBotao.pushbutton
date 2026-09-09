@@ -6968,3 +6968,147 @@ devolvida nunca sendo o objeto guardado.
 
 **Fora do escopo desta CR** (segue valendo a `CR-PERF-1`): re-solve por
 escopo com `dirty_wall_idxs`, que atacaria os 22 rebuilds em si.
+
+---
+
+## 47. REVISÃO DA SEÇÃO 45 — o que as 281 ocorrências realmente são, e por
+que a candidata NÃO deve ser implementada (2026-09-09, medido em
+`420dbcc` × `origin/main 08495d9`)
+
+> Corrige e completa a seção 45 com o que a medição por identidade física
+> e por OBB mostrou. **Nenhuma linha de código alterada.**
+
+### 47.1 O texto normativo, lido de novo
+
+Seção 3 (regra **absoluta, sem exceção**): *"nenhum bloco, compensador ou
+pastilha pode invadir o vão real de uma **porta sem peitoril**"*, e o
+instrumento é `find_door_void_violations` — **OBB real**, que *"roda como
+rede de segurança explícita e geométrica, não confia apenas na lógica de
+fronteiras dos trechos"* e cuja violação *"bloqueia a criação dos
+blocos"*. **Janelas não entram nesta regra.**
+
+O validador do benchmark (`OPENING_BLOCK_*`) é **outro contrato**:
+interseção em **`t` por fiada** (1D), classificando por razão —
+`overlap ≥ INSIDE_RATIO × comprimento` vira `INSIDE_DOOR`, abaixo disso
+`CROSSES_JAMB` —, e decide "porta" pelo **tipo declarado**, sem olhar
+peitoril. Os dois nunca foram reconciliados (registrado desde a varredura
+de 2026-09-08).
+
+### 47.2 As 281 ocorrências são **49 identidades físicas**
+
+| projeto | ocorrências | **identidades** | origem |
+|---|---|---|---|
+| TGD | 108 `CROSSES_JAMB` | **18** | `T_INTERSECTION_DEGRADED_*` |
+| TGD | 5 `INSIDE_DOOR` | **1** | `L_CORNER` |
+| TP1 | 161 `CROSSES_JAMB` | **29** | 15 `X_INTERSECTION` + 14 `T_INTERSECTION_MAIN` |
+| TP1 | 7 `INSIDE_DOOR` | **1** | `T_INTERSECTION_DEGRADED_L` |
+| **total** | **281** | **49** | |
+
+Todas as 49 são em abertura do tipo **porta**. `CROSSES_JAMB` e
+`INSIDE_DOOR` **não são dois defeitos**: são a **mesma peça invadindo o
+mesmo vão**, classificada de um jeito ou de outro conforme a razão
+`overlap / comprimento` cruze `INSIDE_RATIO`. É por isso que encolher a
+peça (B54→B34) move a ocorrência de um código para o outro sem mudar nada
+fisicamente.
+
+### 47.3 CORREÇÃO da 45.3 — quem invade, pelo OBB, não é só a peça de nó
+
+A seção 45.3 dizia "100% vem de peça de nó". Isso vale para o **validador
+do benchmark**. Pelo **OBB** — o instrumento da regra absoluta — o quadro
+é outro:
+
+| origem | TP1 (2094 violações OBB) | TGD (1038) |
+|---|---|---|
+| `STANDARD_FILL` (preenchimento comum) | **1419 (68%)** | 513 (49%) |
+| `X_INTERSECTION` | 214 | — |
+| `T_INTERSECTION_*` | 407 | 464 |
+| `L_CORNER` | 28 | 61 |
+
+Overlap medido: mediana **14,00cm** = a própria espessura da parede (o
+eixo de menor sobreposição), com **0 violações acima de 20cm**.
+
+**Consequência**: uma correção que só mexe na peça de **nó** não pode
+resolver a regra absoluta — dois terços do problema estão no
+preenchimento comum.
+
+### 47.4 A candidata, medida no físico — **VEREDITO: NÃO IMPLEMENTAR**
+
+Candidata: `_room_at_t_on_wall` devolve `0.0` quando o ponto cai dentro de
+uma abertura.
+
+| | TP1 atual | TP1 candidata | TGD atual | TGD candidata |
+|---|---|---|---|---|
+| **`door_void` OBB (regra absoluta)** | **2094** | 1938 (**−7,4%**) | **1038** | 1028 (**−1%**) |
+| `CROSSES_JAMB` (identidades) | 29 | **0** | 18 | 12 |
+| `INSIDE_DOOR` (identidades) | 1 | **0** | 1 | 0 |
+| identidades totais | **900** | 1092 (**+192**) | **789** | 798 (+9) |
+| `PRISM_STAGGER` (ident. novas) | — | **+169** | — | +9 |
+| `COMPENSATOR_CONSECUTIVE` (novas) | — | **+35** | — | +5 |
+| **`intersection_failures`** | **0** | **68** | **200** | **205** |
+| paredes vazias | 0 | 0 | 29 | 29 |
+| colisões do solver | 0 | 0 | 1197 | 1192 |
+| blocos colocados | 19 647 | 19 872 | 11 837 | 11 845 |
+
+**Três motivos independentes para não implementar:**
+
+1. **Não resolve a regra que diz resolver.** Zera o *validador* mas deixa
+   **1938 violações de OBB** de pé no TP1 — 92,6% do problema real
+   continua, porque ele mora no `STANDARD_FILL` (47.3).
+2. **Cria defeito obrigatório novo SEM SOLUÇÃO.** `intersection_failures`
+   **0 → 68** no TP1: 68 encontros que o solver deixa de conseguir
+   resolver, e cujo próprio contrato diz que *"precisa de ajuste de
+   geometria (mover abertura/crescer a boneca) antes, não dá para inventar
+   peça"*. É exatamente a condição de veto.
+3. **O custo não é de contagem, é de amarração.** Zerar o espaço
+   **remove** a peça de nó; o preenchimento comum atravessa o nó em
+   trechos maiores, e daí vêm as +169 identidades de junta e +35 de
+   compensador consecutivo (este último `MANDATORY`/`MAJOR`).
+
+### 47.5 A correção que continua de pé (e por que exige CR própria)
+
+**Ancorar a peça na jamba** em vez de no eixo do nó — a alvenaria da
+parede principal começa ali. Isso amarra de verdade **e** não invade. Mas,
+pela 47.3, ela sozinha atinge no máximo ~⅓ das violações de OBB: o
+`STANDARD_FILL` precisa de tratamento próprio (a fronteira do trecho
+precisa conhecer a abertura que **contém** o ponto, sem que isso apague a
+peça de nó).
+
+`DOCUMENTADO — pendência de código aberta`. **A escolha entre reconciliar
+as duas réguas (OBB × validador) ou tratar cada uma como contrato
+separado é decisão do usuário** — hoje elas discordam por construção, e
+nenhuma métrica de uma serve para aprovar a outra.
+
+### 47.6 Os 7 `OPENING_BLOCK_INSIDE_DOOR` do TP1 — prova por coordenada
+
+Pedido explícito: confirmar por coordenadas e volumes.
+
+```
+parede   W|8017.3,548.0|8017.3,1927.0|t14.0   (W019)
+abertura W019-O01   kind = door   PEITORIL = 0,00cm  -> porta SEM peitoril
+                    vão t = 564,0 .. 750,0cm
+bloco    B34  t = 715,0 .. 749,0cm   placement_reason = T_INTERSECTION_DEGRADED_L
+         fiadas 0, 2, 4, 6, 8, 10, 12          -> 7 ocorrências, 1 IDENTIDADE
+```
+
+`715,0 .. 749,0` ⊂ `564,0 .. 750,0`: o bloco está **inteiramente dentro**
+do vão. A porta tem peitoril **0,00cm**, logo a **regra absoluta da seção
+3 se aplica** e está sendo violada.
+
+**Portanto**: não é "apenas classificação" no sentido de "não há
+problema". A leitura correta tem duas partes, e as duas foram medidas:
+
+- **entre `main` e este candidato é só classificação** — `find_door_void_
+  violations` dá **2094 nas duas** árvores do TP1, as **30 identidades
+  são as mesmas**, e o que mudou foi 7 ocorrências passarem de
+  `CROSSES_JAMB` para `INSIDE_DOOR` porque a peça encolheu de `B54[715,
+  769]` para `B34[715,749]`;
+- **mas a invasão é REAL e PRÉ-EXISTENTE** — nas duas árvores, e é a
+  dívida da seção 45/47.
+
+No TGD o candidato **melhora**: OBB **1074 → 1038** (−36).
+
+**REGRA OBRIGATÓRIA**: `OPENING_BLOCK_INSIDE_DOOR` e
+`OPENING_BLOCK_CROSSES_JAMB` do benchmark **não provam nem refutam** a
+regra da seção 3. A prova é `find_door_void_violations` (OBB) contra
+porta com peitoril ≤ `DOOR_NO_SILL_MAX_SILL_CM`. Qualquer conclusão sobre
+"bloco no vão" tem de citar o número do OBB.
