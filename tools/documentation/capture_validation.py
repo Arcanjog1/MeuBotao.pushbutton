@@ -7,7 +7,22 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import signal
 import time
+
+
+def stop_process_tree(process):
+    if os.name == 'nt':
+        killed = subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
+                                capture_output=True, text=True, timeout=20)
+        if killed.returncode and process.poll() is None:
+            raise RuntimeError('Unable to stop validation process tree: ' + killed.stderr)
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    process.wait(timeout=20)
 
 
 def main():
@@ -39,7 +54,7 @@ def main():
     start = time.monotonic()
     with log.open('w', encoding='utf-8') as handle:
         process = subprocess.Popen(command, cwd=args.cwd, stdout=handle,
-                                   stderr=subprocess.STDOUT)
+                                   stderr=subprocess.STDOUT, start_new_session=(os.name != 'nt'))
         metadata['pid'] = process.pid
         output.write_text(json.dumps(metadata, indent=2), encoding='utf-8')
         print(json.dumps(metadata), flush=True)
@@ -47,10 +62,10 @@ def main():
             metadata['exit_code'] = process.wait(timeout=args.timeout)
             metadata['state'] = 'completed'
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+            stop_process_tree(process)
             metadata['exit_code'] = 124
             metadata['state'] = 'timeout'
+            metadata['process_tree_stopped'] = True
     metadata['elapsed_seconds'] = round(time.monotonic() - start, 3)
     metadata['status_after'] = git('status', '--porcelain')
     metadata['log_sha256'] = hashlib.sha256(log.read_bytes()).hexdigest()

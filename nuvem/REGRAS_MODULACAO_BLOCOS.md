@@ -7130,7 +7130,28 @@ contencao explicita. Nao ressuscitar a candidata rejeitada na secao 47.
 A permissao historica de criar diagnosticos em vermelho nao constitui
 permissao de lancamento fisico incorreto neste beta. A contencao deve ser
 explicita e testada, sem apagar defeitos do resultado bruto ou do benchmark.
-**DOCUMENTADO - implementacao de seguranca do beta em andamento.**
+**IMPLEMENTADO NO CANDIDATO, ainda nao integrado/liberado:** o solver
+registra paredes totalmente sem candidatos fisicos em `unmodulated_walls`,
+com coordenadas, comprimento, motivo e `MANUAL_REVIEW_KEEP_REFERENCE`.
+A criacao confere instancias por candidato e fiada; referencias de paredes
+vazias ou com criacao incompleta sao retidas, marcadas e relatadas na UI.
+197.943cm permanece sem truncamento; no caso real 99.7543545516cm, o
+preenchimento apos dois X termina em reserva negativa de -2.5864347014cm
+contra a ponta AMBIGUOUS. Classificar como `OVERLAPPING_RESERVATIONS`, nao
+como simples parede livre fora de modulo. Nenhuma geometria foi alterada.
+
+O pacote offline controlado ativa `controlled_beta_preflight`: verifica
+fiadas fisicas e todas as aberturas ativas em Z contra TODAS as pecas por
+proximidade espacial, inclusive as atribuidas a outra parede. Verifica
+tambem colisoes entre pecas, sem isencao por pertencerem ao mesmo no.
+Usa OBB/SAT e tolerancias existentes; e uma contencao conservadora separada,
+nao substitui nem altera o contrato dos validadores do benchmark.
+Qualquer invasao/colisao ou resultado incompleto bloqueia o LOTE INTEIRO
+antes de criar ou remover o lote anterior. Nao retira pecas de amarracao,
+nao reescreve candidatos nem melhora artificialmente indicadores.
+Sem manifesto de beta, o carregador normal permanece historico; ele nao
+deve ser usado para este beta. Pacote exige commit completo e hashes de
+todos os modulos; erro nao permite fallback para main/cache antigo.
 
 ### 48.2 Correcao de medicao da secao 47: OBB exige escopo fisico
 
@@ -7159,10 +7180,24 @@ STANDARD_FILL da secao 47.3 veio do escopo agregado sem filtragem vertical:
 **nao prova invasao de preenchimento nas fiadas criadas**. A invasao real
 de encontro continua aberta. Nao declarar corrigida por melhorar contagem.
 
+**Complemento espacial medido na etapa 2:** 412 ainda e uma medicao com
+filtro de propriedade (`wall_idx`/`secondary_wall_idx`). A contencao beta
+encontra **500** invasoes em portas ativas do TP1: as 412 anteriores mais
+**88 OPENING_REPAIR_FILL** de OUTRA parede que tambem cruzam a porta.
+Portanto nem a correcao para fiada/Z resolve sozinha a lacuna do instrumento.
+No TGD, a varredura espacial encontra 692 invasoes de aberturas ativas,
+contra 318 na regua restrita a porta e propriedade. Categorias/identidades
+permanecem separadas nos artefatos; nenhum total desses e aprovacao.
+Main TP1 foi conferida independentemente: 412 na regua restrita, 18
+colisoes por fiada e 19572 blocos; candidato N1f: 412, zero e 19647.
+
 As novas colisoes TGD distribuem-se em cinco pares de paredes (lista e
 geometria no checkpoint/evidencias da missao). Ha regioes geometricamente
 novas apesar da reducao da area TOTAL de overlap. Gate de regressao
 continua reprovado; causalidade por etapa ainda esta sendo investigada.
+Os censos completos atribuem +20 pares agregados/+38 fisicos a N1,
+zero delta de colisao a N1b, +16/+18 a N1c e +1/+2 a N1e/f. Esses deltas
+sao saldos por etapa, nao contagem de identidades adicionadas isoladamente.
 N1c cb70224 ja produz 1196 pares agregados e 782 por fiada; N1e/f chega
 a 1197/784. Nenhum conhecimento de amarracao desta medicao autoriza
 alterar geometria da entrada, remover amarracao ou compensar por score.

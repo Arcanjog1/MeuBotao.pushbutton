@@ -100,6 +100,11 @@ Git detecta conflitos textuais, nao contradicoes de significado.
    registra: evita a impossibilidade de um commit gravar seu proprio SHA.
    Depois desse HEAD, somente documentacao/infra documental pode mudar;
    alteracao de producao/teste de dominio exige novo HEAD avaliado.
+   Em uma missao iterativa, marcar etapas anteriores com `scope: historical`,
+   conservando HEAD, testes e limitacoes originais. A entrega exige pelo
+   menos um checkpoint `current` (padrao), cobrindo o codigo atual; todos
+   os historicos continuam sujeitos a ancestralidade/referencias. Historico
+   sozinho jamais aprova uma entrega.
 4. Adicionar arquivos ao indice, conferir `git ls-files docs/checkpoints`
    e rodar `python tools/documentation/validate.py --base <merge-base>
    --main origin/main --require-current-main`.
@@ -139,7 +144,9 @@ branches sem copiar esses documentos para a main.
 `tools/documentation/capture_validation.py` captura uma validacao com PID,
 timeout, SHA/tree e hash SHA-256 do log, em destino explicito. Nunca
 sobrescreve resultado anterior. Usar para comandos de teste sem servicos
-persistentes; nao e gerenciador de arvores de subprocessos. O comando
+persistentes. No timeout encerra a arvore via taskkill /T no Windows ou
+grupo de processos isolado no POSIX; registra o encerramento e exit 124,
+nunca PASS. Teste proprio verifica que um filho nao sobrevive. O comando
 `audit_inventory.py` captura metadados Git/GitHub sob demanda (requer `gh`);
 nao publica nem altera regras. Resultados curtos ficam em
 `docs/checkpoints/evidence/`; dados grandes exigem artefato acessivel e hash.

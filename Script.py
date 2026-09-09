@@ -1101,6 +1101,20 @@ def _load_entry_point():
     DPAPI e nada mais e' perguntado. Se o repositorio estiver publico e
     nenhum token cifrado estiver configurado, `_get_token` devolve None e o
     download acontece anonimo, exatamente como antes."""
+    beta_directory = _pasta_do_loader()
+    if os.path.isfile(os.path.join(beta_directory, "beta-package.json")):
+        # An invalid beta must fail here, outside the online/cache fallback.
+        verifier_path = os.path.join(beta_directory, "beta_package.py")
+        verifier = {"__file__": verifier_path, "__name__": "beta_package_verifier"}
+        with io.open(verifier_path, "r", encoding="utf-8") as handle:
+            exec(compile(handle.read(), verifier_path, "exec"), verifier)
+        entry, head = verifier["verify_beta_package"](beta_directory)
+        globals()["CONTROLLED_BETA"] = True
+        globals()["CONTROLLED_BETA_HEAD"] = head
+        sys.dont_write_bytecode = True
+        print("BETA CONTROLADO - pacote offline verificado: " + head)
+        return entry
+    globals()["CONTROLLED_BETA"] = False
     token = _get_token()
     try:
         return _sync_core_package(token)

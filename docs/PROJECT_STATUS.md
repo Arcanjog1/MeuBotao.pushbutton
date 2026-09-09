@@ -8,7 +8,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-09T14:45:00+00:00",
+  "observed_utc": "2026-09-09T15:05:00+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
@@ -49,7 +49,7 @@ O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
 | CR-N1 | Ausente | PR #30 draft, `626087b`; incluido no #31 | Diff de `wall_stepper.py`, testes de vizinhos | Nao integrar #30 isoladamente: regressao do T corrigida so depois |
 | CR-N1b/c/e/f | Ausente | PR #31 draft, `05030d2` | [185 testes](checkpoints/evidence/2026-09-09-candidate-focused.txt) | Colisoes TGD +37, aberturas e regressao final |
 | CR-B / identidade | Preparacao oficial nao integrada | PR #28 draft, `0596e78` | Inventario e relatorio do PR; chaves estaveis ja existem | C2/G16, decisoes D1-D5, migracao e metricas versionadas |
-| Governanca | PR #32 integrado, `aa58d70` | Nenhum novo codigo documental nesta etapa | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | 12 testes infra e 260 de test_script verdes; merge confirmado |
+| Governanca | PR #32 integrado, `aa58d70` | Checkpoints historicos explicitos e timeout de arvore de processos na branch beta | [revisao de integracao](checkpoints/2026-09-09-revisao-pr32.md) | Base: 12 testes infra e 260 test_script; candidato: 16 testes infra verdes |
 
 Tambem integrados: ARM SAFE REPAIR (#12), NÓ|FILL (#17), fidelidade dos
 gates ARM (#18), B19 residual condicionado (#19), fit C04 (#20),
@@ -89,7 +89,16 @@ colisoes por fiada fisica 726 -> 784 (+58), com novas regioes de overlap
 real. OBB fisico com porta ativa na cota: TGD 318 -> 318; TP1 candidato
 412, e nao 2094 (este ultimo e medicao agregada contra todas as portas,
 incluindo bandas inativas). Nenhum desses resultados corrige invasoes.
-Nao liberar #31. Evidencias e proxima etapa ficam no checkpoint da missao.
+Varredura beta espacial, sem limitar dono/secundaria, encontra 500 invasoes
+no TP1 (88 adicionais OPENING_REPAIR_FILL de outra parede) e 692 no TGD.
+Nao liberar #31. Contencao candidata bloqueia o lote ANTES de criar ou
+apagar instancias se houver invasao/colisao; solver bruto nao e filtrado.
+Paredes vazias/com criacao incompleta passam a manter suas referencias,
+com motivo e identificacao fisica no resultado/log/UI. Loader offline por
+SHA e hashes implementado, sem instalar/abrir Revit e sem fallback online.
+217 testes focados verdes nesta etapa (incluem 32 novos); consolidada
+final ainda nao executada, pois as frentes de colisao/recorte seguem abertas.
+O preflight e contencao, NAO prova de correcao do solver nem GO.
 
 No candidato exato `439fd49`, Python 3.12.14 e pytest 9.1.1, sem Revit:
 
@@ -132,8 +141,9 @@ continua dependente dos artefatos ausentes, nao apenas da soma de codigos.
 **Paredes vazias:** 197,943cm continua sem blocos nos testes de
 caracterizacao. A parede real de 99,754cm envolve reservas de ponta e
 midspan, nao simplesmente dois X nao fundidos (diagnostico candidato).
-Cada parede omitida precisa ter motivo, selecao fisica e disposicao de
-revisao explicitos antes de qualquer criacao no beta.
+Reproducer com grafo real confirmou reserva negativa -2.5864347014cm
+na parede 99.7543545516cm. Registro e retencao estao implementados no
+candidato; nao alteram topologia ou comprimento para obter preenchimento.
 
 **Desempenho relatado**, no mesmo ambiente historico TGD: base 99,3s/22
 rebuilds; N1 47,8s/7; N1b 65,0s/10; N1c+e 176,4s/22; N1f 127,0s/22.

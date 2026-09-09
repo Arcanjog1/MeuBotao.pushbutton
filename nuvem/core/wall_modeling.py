@@ -3512,7 +3512,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
     )
     if not enabled or result.get("error") is not None:
-        return result
+        return _record_unmodulated_walls(result, walls_to_create)
 
     def _rebuild():
         return _solve_building_blocks_all_courses_core(
@@ -3551,7 +3551,146 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
+    return _record_unmodulated_walls(result, walls_to_create)
+
+
+def _record_unmodulated_walls(result, walls_to_create):
+    """Keep every empty input wall identifiable for manual review, without fill."""
+    populated = set(c.get("wall_idx")
+                    for pcs in (result.get("course_candidates") or {}).values()
+                    for c in pcs)
+    spans_by_wall = {}
+    for span in result.get("non_modular") or []:
+        spans_by_wall.setdefault(span.get("wall_idx"), []).append(dict(span))
+    retained = []
+    for wi in range(len(walls_to_create)):
+        if wi in populated:
+            continue
+        p0, p1, _direction, length, thickness = _wall_axis_and_length(walls_to_create, wi)
+        spans = spans_by_wall.get(wi, [])
+        if result.get("error"):
+            reason = "SOLVER_ERROR"
+        elif any((s.get("current_length_cm") or 0) < 0 for s in spans):
+            reason = "OVERLAPPING_RESERVATIONS"
+        elif spans:
+            reason = "NON_MODULAR_SPANS"
+        else:
+            reason = "NO_PHYSICAL_CANDIDATES"
+        retained.append({
+            "wall_idx": wi, "reason": reason, "action": "MANUAL_REVIEW_KEEP_REFERENCE",
+            "start_cm": [_ft_to_cm(p0.X), _ft_to_cm(p0.Y)],
+            "end_cm": [_ft_to_cm(p1.X), _ft_to_cm(p1.Y)],
+            "length_cm": _ft_to_cm(length), "thickness_cm": _ft_to_cm(thickness),
+            "non_modular_spans": spans,
+        })
+    result["unmodulated_walls"] = retained
     return result
+
+
+def _record_incomplete_wall_creation(solve_result, create_result, walls_to_create):
+    """A planned piece is not a replacement until its physical instance exists."""
+    solve_result = solve_result or {}
+    retained = dict((w["wall_idx"], dict(w))
+                    for w in solve_result.get("unmodulated_walls") or [])
+    created = set((item.get("course_index"), item.get("candidate_key"))
+                  for item in create_result.get("created_instances") or [])
+    expected = {}
+    for ci in range(solve_result.get("num_courses", 0)):
+        sources = solve_result.get("course_candidates")
+        pieces = (sources.get(ci) or []) if sources is not None else [
+            c for c in solve_result.get("candidates") or []
+            if c.get("course") == ("A" if ci % 2 == 0 else "B")]
+        for c in pieces:
+            expected.setdefault(c.get("wall_idx"), []).append((ci, id(c)))
+    for wi in range(len(walls_to_create)):
+        planned = expected.get(wi, [])
+        missing = sum(key not in created for key in planned)
+        if wi not in retained and (missing or not planned):
+            p0, p1, _dir, length, thickness = _wall_axis_and_length(walls_to_create, wi)
+            retained[wi] = {
+                "wall_idx": wi, "reason": "INCOMPLETE_CREATION" if planned else "NO_PHYSICAL_CANDIDATES",
+                "action": "MANUAL_REVIEW_KEEP_REFERENCE",
+                "start_cm": [_ft_to_cm(p0.X), _ft_to_cm(p0.Y)],
+                "end_cm": [_ft_to_cm(p1.X), _ft_to_cm(p1.Y)],
+                "length_cm": _ft_to_cm(length), "thickness_cm": _ft_to_cm(thickness),
+                "planned_count": len(planned), "missing_count": missing,
+            }
+    create_result["retained_walls"] = [retained[wi] for wi in sorted(retained)]
+    create_result["skipped_wall_idxs"] = sorted(retained)
+    create_result["skipped_wall_count"] = len(retained)
+
+
+def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
+    """Read-only physical gate. Reject the batch, never remove individual ties.
+
+    Unlike the benchmark, this includes all active openings and all pairs,
+    even when two pieces share a node. It does not change either validator.
+    """
+    import math
+    from core.engine.wall_stepper import _obb_aabb, _collision_candidate_pairs
+
+    result = result or {}
+    sources = result.get("course_candidates")
+    num_courses = result.get("num_courses", 0)
+    step, error = _course_height_ft(catalog, result.get("candidates") or [])
+    errors = []
+    if result.get("error"):
+        errors.append(str(result["error"]))
+    if step is None:
+        errors.append(error or "Altura de fiada indisponivel")
+    if not isinstance(sources, dict) or num_courses <= 0 or set(sources) != set(range(num_courses)):
+        errors.append("Conjunto de fiadas fisicas incompleto")
+    if len(openings_per_wall) != len(walls_to_create):
+        errors.append("Aberturas e paredes sem correspondencia completa")
+    if errors:
+        return {"ok": False, "errors": errors, "opening_violations": [], "collisions": []}
+    violations, collisions = [], []
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+    if not math.isfinite(step) or height <= 0:
+        return {"ok": False, "errors": ["Altura fisica invalida"], "opening_violations": [], "collisions": []}
+    for ci, pieces in sorted(sources.items()):
+        z0, z1 = _course_z_band(base_z_abs, ci, step, height)
+        active = _filter_openings_per_wall_for_band(openings_per_wall, z0, z1)
+        for i, c in enumerate(pieces):
+            vectors = [c[key] for key in ("origin_world", "x_dir", "y_dir")]
+            values = [v for vector in vectors for v in (vector.X, vector.Y, vector.Z)]
+            values.extend([c["length_cm"], c["width_cm"]])
+            if (not all(math.isfinite(v) for v in values) or min(c["length_cm"], c["width_cm"]) <= 0 or
+                    abs(c["x_dir"].GetLength() - 1) > 1e-6 or abs(c["y_dir"].GetLength() - 1) > 1e-6 or
+                    abs(c["x_dir"].DotProduct(c["y_dir"])) > 1e-6):
+                errors.append("Geometria invalida: fiada {}, candidato {}".format(ci, i))
+        if errors:
+            return {"ok": False, "errors": errors, "opening_violations": violations, "collisions": collisions}
+        boxes = [_candidate_obb(c) for c in pieces]
+        voids = []
+        for wi, openings in enumerate(active):
+            for opening in openings:
+                voids.append((wi, openings_per_wall[wi].index(opening),
+                              _door_void_obb(wi, walls_to_create, opening[0], opening[1])))
+        all_boxes = boxes + [v[2] for v in voids]
+        aabbs = [_obb_aabb(box) for box in all_boxes]
+        for i, j in sorted(_collision_candidate_pairs(range(len(all_boxes)), aabbs, 0.0)):
+            if i >= len(pieces):
+                continue
+            overlap = _obb_min_overlap(all_boxes[i], all_boxes[j])
+            if overlap <= BOND_COLLISION_EPS_FT:
+                continue
+            piece = pieces[i]
+            record = {"course_index": ci, "candidate_index": i,
+                      "wall_idx": piece.get("wall_idx"), "logical_code": piece.get("logical_code"),
+                      "placement_reason": piece.get("placement_reason"), "node_index": piece.get("node_index"),
+                      "origin_cm": [_ft_to_cm(piece["origin_world"].X), _ft_to_cm(piece["origin_world"].Y)],
+                      "z_cm": [_ft_to_cm(z0), _ft_to_cm(z1)], "overlap_cm": _ft_to_cm(overlap)}
+            if j < len(pieces):
+                record.update(other_candidate_index=j, other_wall_idx=pieces[j].get("wall_idx"))
+                collisions.append(record)
+            else:
+                wi, oi, _obb = voids[j - len(pieces)]
+                record.update(opening_wall_idx=wi, opening_index=oi,
+                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]])
+                violations.append(record)
+    return {"ok": not violations and not collisions and not errors, "errors": errors,
+            "opening_violations": violations, "collisions": collisions}
 
 
 # ==========================================
@@ -9386,6 +9525,18 @@ def _format_block_solve_report(result, catalog):
     lines = []
     lines.append("=== Solver de blocos ===")
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
+    beta = result.get("beta_preflight")
+    if beta is not None:
+        lines.append("BETA CONTROLADO: {}. {} invasoes de abertura, {} colisoes fisicas.".format(
+            "lote liberado pelo preflight" if beta["ok"] else "LOTE BLOQUEADO - nenhuma criacao permitida",
+            len(beta["opening_violations"]), len(beta["collisions"])))
+        for issue in beta["errors"] + beta["opening_violations"] + beta["collisions"]:
+            lines.append("  BETA: {}".format(issue))
+    retained = result.get("unmodulated_walls") or []
+    lines.append("Paredes SEM BLOCOS, retidas para revisao manual: {}".format(len(retained)))
+    for wall in retained:
+        lines.append("  - parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
+                     "{start_cm} -> {end_cm}; PRESERVAR referencia.".format(**wall))
 
     # Resumo do processamento PAREDE A PAREDE (ordem geometrica obrigatoria
     # + validacao final de cada uma antes de passar para a proxima).
@@ -9692,6 +9843,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def __init__(self):
         self.action = None
         self.on_done = None
+        self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
         # dados fixos desta execucao
         self.walls_to_create = []
         self.openings_per_wall = []
@@ -10211,11 +10363,24 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 stage_cb=cbs.get("stage_cb"),
             )
         self.solve_result["num_courses"] = num_courses
+        if self.controlled_beta:
+            self.solve_result["beta_preflight"] = controlled_beta_preflight(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
 
     def _execute_create(self, app_doc):
+        if self.controlled_beta:
+            preflight = controlled_beta_preflight(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+            if self.solve_result is not None:
+                self.solve_result["beta_preflight"] = preflight
+            if not preflight["ok"]:
+                raise ValueError("BETA BLOQUEADO: {} invasoes de abertura, {} colisoes; {}. "
+                                 "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
+                                     len(preflight["opening_violations"]), len(preflight["collisions"]),
+                                     "; ".join(preflight["errors"])))
         # IDEMPOTENCIA / INTEGRIDADE DO CONJUNTO (bug real corrigido
         # 2026-08-25, reportado pelo usuario com imagem: parte da parede
         # "andou" e parte ficou na posicao antiga apos recalcular).
@@ -10354,10 +10519,9 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 _perf_clock() - t_create_start,
                 "{} instancia(s) criada(s)".format(self.create_result.get("created_count", 0)),
             ))
-            # Nao ha' mais "parede sem bloco": skipped_* fica sempre vazio,
-            # mantido so' por compatibilidade com quem le' create_result.
-            self.create_result["skipped_wall_count"] = 0
-            self.create_result["skipped_wall_idxs"] = []
+            # A permissao de criar diagnosticos nao torna uma parede vazia
+            # substituida. Finalizar deve preservar sua referencia (secao 48).
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
             self.create_result["reproved_wall_count"] = len(reproved_wall_idxs)
             self.create_result["reproved_wall_idxs"] = sorted(reproved_wall_idxs)
             # Colisao entre pecas: pedido explicito do usuario (2026-08-24)
@@ -10376,6 +10540,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 candidates, wall_bond_audits, self.create_result.get("created_instances") or []
             )
             highlight_ids = list(set(colliding_ids) | set(bond_reproved_ids))
+            highlight_ids.extend(eid for wi in self.create_result["skipped_wall_idxs"]
+                                 for eid, _origin in self.created_walls_by_axis.get(wi, []))
             perf_steps.append((
                 "Cruzamento colisoes/amarracao x instancias criadas",
                 _perf_clock() - t_cross_start,
@@ -10410,6 +10576,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     "{} peca(s) marcada(s)".format(len(highlight_ids)),
                 ))
         if self.create_result is not None:
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
             self.create_result["perf_steps"] = perf_steps
         self._save_modulation_state_cache()
         if self.on_done:
@@ -10433,6 +10600,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         }
 
     def _execute_delete(self, app_doc):
+        if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
+            raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
         # NUNCA excluir a parede de referencia de um eixo que ficou SEM
         # bloco (reprovado na auditoria de amarracao entre fiadas - regra
         # #1, 2026-08-25, ver _execute_create): apagar essa parede junto
@@ -10442,6 +10611,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # continuar ali, marcada em vermelho (ja' aplicado em
         # _execute_create), ate' a revisao manual resolver o eixo.
         skipped_wall_idxs = set((self.create_result or {}).get("skipped_wall_idxs") or [])
+        skipped_wall_idxs.update(w["wall_idx"] for w in
+                                 (self.solve_result or {}).get("unmodulated_walls") or [])
         skipped_wall_ids = set()
         for wi in skipped_wall_idxs:
             skipped_wall_ids.update(eid for eid, _origin in self.created_walls_by_axis.get(wi, []))
@@ -11513,9 +11684,12 @@ class _PostCreationForm(Form):
         final_report = self._build_final_modulation_report(
             self._handler.walls_to_create, self._handler.error_rows,
             wall_bond_audits=(self._handler.solve_result or {}).get("wall_bond_audits"),
-            skipped_wall_idxs=result.get("reproved_wall_idxs"),
+            skipped_wall_idxs=set(result.get("reproved_wall_idxs") or []) | set(result.get("skipped_wall_idxs") or []),
         )
         self._append_log(self._format_final_modulation_report(final_report))
+        for wall in result.get("retained_walls") or []:
+            self._append_log("RETER parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
+                             "{start_cm} -> {end_cm}; revisao manual obrigatoria.".format(**wall))
 
         self._create_status.Text = "{} bloco(s) criado(s), {} falha(s).".format(
             result["created_count"], len(result["failures"])
@@ -11524,6 +11698,8 @@ class _PostCreationForm(Form):
             self._create_status.Text += " {} peca(s) em colisao marcada(s) em vermelho.".format(colliding_count)
         if reproved_wall_count:
             self._create_status.Text += " {} parede(s) com amarracao reprovada (criadas e marcadas em vermelho).".format(reproved_wall_count)
+        if result.get("skipped_wall_count"):
+            self._create_status.Text += " {} parede(s) RETIDA(S) para revisao manual.".format(result["skipped_wall_count"])
         if result["created_count"] == 0:
             self._create_status.Text = "ALERTA: nenhum bloco foi criado! " + self._create_status.Text
         self._create_status.ForeColor = self._UI_OK if result["created_count"] > 0 else self._UI_WARN
