@@ -5,7 +5,7 @@
   "date": "2026-09-09",
   "scope": "current",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-  "head": "686320a70cf07fa079246b376751455b002ce908",
+  "head": "07f43f2f8b7a6dc71b0b8af81a42d807db747591",
   "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "pr": "not-created",
   "objective": "Descobrir onde o tempo e gasto entre o clique em 'Iniciar Modulacao das Paredes' e o primeiro resultado util, na bancada de 2 paredes / 1 encontro em L / 0 aberturas do primeiro beta controlado (8cdd33f), com causa medida e nao hipotetica; corrigir apenas o hotspot provado.",
@@ -15,15 +15,18 @@
     "CORRECAO MINIMA em _PostCreationEventHandler.Execute(): a acao passa a ser CONSUMIDA no inicio e despachada por copia local, em vez de zerada no `finally`. Isso preserva a acao que um callback agenda DURANTE o proprio Execute()."
   ],
   "tests": [
-    "tests/test_script.py: 262 passed em 67.81s (260 anteriores + 2 novos de regressao).",
+    "tests/test_script.py + test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 312 passed em 64.38s, ja com as sondas finas.",
     "test_beta_atomic_creation.py + test_controlled_beta_preflight.py: 50 passed.",
     "Regressao verificada nos DOIS sentidos: revertendo somente a correcao (mantendo a instrumentacao), test_acao_agendada_por_callback_durante_execute_sobrevive e test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar FALHAM; com a correcao, passam.",
     "Bancada offline com dubles: _execute_solve 0.010s, _execute_analyze 0.002s. Reproducao fiel dentro do Revit sobre o documento real: refresh 0.187s + analyze 0.181s = 0.37s.",
-    "Pacote beta corrigido construido e verificado a partir da PASTA DO BOTAO: head 686320a70cf07fa079246b376751455b002ce908."
+    "Pacote beta construido e verificado a partir da PASTA DO BOTAO: head 07f43f2f8b7a6dc71b0b8af81a42d807db747591.",
+    "Custo da propria instrumentacao MEDIDO, para nao ser confundido com o sintoma: mark() custa 0.285ms na mediana, 0.329ms no p95 e 0.508ms no pior caso de 300 chamadas."
   ],
   "known_failures": [
     "PENDENCIA FISICA ABERTA - REPEATED_VERTICAL_COMPENSATOR_STRIP: o solve desta bancada reprovou 1 parede na auditoria de amarracao entre fiadas. Por decisao de 2026-08-26 isso nao bloqueia a criacao (as pecas saem marcadas em vermelho), e NADA foi silenciado aqui. Continua sendo reprovacao fisica em aberto.",
-    "A execucao pos-correcao ainda nao foi feita: tempo de criacao, quantidade criada e repetibilidade do beta seguem sem medicao.",
+    "DEFEITO NOVO E ABERTO - stall da thread de fundo: na execucao 2 (18:18, ja com a correcao), o analyze levou 100.204s, com 97.3s parados entre a entrada de analyze_created_walls_for_errors e process_walls_one_by_one - trecho que so tem um `if` falso, um dict vazio e um `def`. Houve ainda um salto de 2.16s entre dois marcos adjacentes. Nao e custo de instrumentacao (0.285ms/marco, medido) nem calculo. A thread de fundo nao estava rodando.",
+    "CORRECAO DE UMA CONCLUSAO MINHA ANTERIOR: eu havia dado o analyze por descartado com base nas execucoes em que ele nao travou (0.065s na execucao 1, 0.181s na reproducao dentro do Revit). A execucao 2 mostra que ele TRAVA de forma intermitente. O solver continua computando rapido; o que trava e a thread, nao a conta.",
+    "Tempo de criacao, quantidade criada e repetibilidade do beta seguem SEM medicao: a execucao 2 nunca chegou a solve/create.",
     "A suite consolidada nao foi concluida nesta sessao (interrompida duas vezes de proposito, para nao contaminar o arquivo de rastreamento que a medicao no Revit usa)."
   ],
   "physical_deltas": [
@@ -35,7 +38,7 @@
   "decisions_taken": [
     "CAUSA-RAIZ FECHADA e nao e lentidao: a acao 'create' era PERDIDA. _execute_solve chama on_done('solve') de dentro de Execute(); o callback _on_solve_done encadeia _on_create_click -> _raise_action('create'), que define handler.action='create' e Raise(); o `finally` de Execute() apagava essa acao; o despacho seguinte entrava com action=None, nao casava com nenhum ramo, nao chamava on_done e voltava em silencio.",
     "Latencia do ExternalEvent MEDIDA e descartada: 47ms entre 'ui.external_event.Raise CHAMADO' (+0.126s) e 'Execute ENTROU action=analyze' (+0.173s). No encadeamento solve->create foram 12ms (+6.561s -> +6.573s).",
-    "Solver descartado por medicao: analyze 0.065s, solve 0.255s e 0.136s na execucao real dentro do Revit.",
+    "Solver descartado como CAUSA DE CALCULO: analyze 0.065s, solve 0.255s e 0.136s na execucao 1, e 0.181s na reproducao dentro do Revit. Isso nao o isenta do relogio de parede - ver o stall da execucao 2 nas falhas conhecidas.",
     "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco (o symbol vem do catalogo pronto), Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
     "O benchmark offline de 0.1-1.1s exercita _execute_solve; o botao dispara analyze e depois encadeia create. Os numeros nunca foram comparaveis.",
     "ORIGEM VERTICAL DA MODULACAO (decisao do usuario, 2026-09-09): o que eu havia classificado como bug de WALL_BASE_OFFSET NAO e bug - e o funcionamento desejado. Os blocos nascem a partir do NIVEL de referencia; o offset de base de uma Wall existente e arbitrario e nao pode redefinir a cota inicial da modulacao. Nesta bancada sao as Walls que estao deslocadas. A logica de Z foi PRESERVADA sem nenhuma alteracao, o achado foi retirado da lista de bugs/CRs e a regra ficou registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8a.",
@@ -50,12 +53,13 @@
     "Concluir a suite consolidada depois da medicao no Revit."
   ],
   "next_steps": [
-    "Rodar o botao TESTE-PERF (head 686320a) uma vez, nas mesmas 2 Walls, e medir tempo de criacao e quantidade criada.",
+    "Rodar o botao TESTE-PERF (head 07f43f2) uma vez, nas mesmas 2 Walls. As sondas finas devem dizer, sozinhas, se o stall e espera (cpu parado) ou trabalho, e se DoEvents/watchdog participam.",
     "Ler o perf_diag.log da nova execucao e anexar como evidencia versionada.",
     "Nao mesclar na main: esta entrega cobre um defeito de integracao corrigido e UMA pendencia fisica em aberto (REPEATED_VERTICAL_COMPENSATOR_STRIP)."
   ],
   "references": [
     {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log"},
+    {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run2-stall-analyze.log"},
     {"path": "docs/checkpoints/evidence/2026-09-09-preparing-solver-measurements.json"},
     {"path": "docs/checkpoints/evidence/main-safe-engineering-input.json"},
     {"path": "docs/checkpoints/evidence/main-safe-handler-bench-run.json"},
@@ -146,6 +150,35 @@ Auditado item a item, conforme pedido:
   ExternalEvent - que era exatamente onde a acao se perdia.
 - **Excecao engolida:** nao havia excecao. Havia um despacho sem ramo
   correspondente, que e' pior: nem sucesso, nem erro, nem log.
+
+## Execucao 2 (18:18): a correcao funcionou, e um defeito NOVO apareceu
+
+[Log da execucao 2](evidence/2026-09-09-perf-diag-run2-stall-analyze.log).
+O pacote usado ja era o corrigido (o campo `pendente=` so existe nele), e
+`Execute SAIU action=analyze pendente=None` confirma que nenhuma acao se
+perdeu. Mas:
+
+```
++  0.030s analyze_created_walls_for_errors START
++ 97.368s process_walls_one_by_one START        <- 97,3s de nada
++ 98.049s solve_all_intersections END dt=0.680s
++100.212s solve_all_intersections RESULTADO     <- 2,16s entre marcos vizinhos
++100.234s analyze_created_walls_for_errors END dt=100.204s
+```
+
+Entre os dois primeiros marcos existem exatamente tres instrucoes: um `if`
+falso, `plan_failures = {}` e um `def`. **Nao ha calculo possivel ali.** E
+nao e a instrumentacao: `mark()` custa 0,285ms na mediana e 0,508ms no pior
+caso de 300 chamadas medidas.
+
+O `ui._finish` nunca apareceu porque o usuario fechou a janela travada -
+`BeginInvoke` num Form ja descartado lanca, e a excecao era engolida sem
+deixar rastro. Isso agora e marcado (`ui_invoke.FALHOU`).
+
+**Isto corrige uma conclusao minha anterior.** Eu havia descartado o analyze
+com base nas execucoes em que ele nao travou. Ele trava, de forma
+intermitente, e e' o sintoma original ("Preparando o solver..." por
+minutos) finalmente capturado com timestamp.
 
 ## Origem vertical e pendencia fisica
 
