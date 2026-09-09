@@ -164,6 +164,38 @@ implementada, as duas mexem no núcleo da amarração.
 
 ---
 
+## 2.4 DUAS REGRESSÕES CRÍTICAS da CR-N1 que estavam ESCONDIDAS
+
+Achadas ao conferir **o conteúdo** das duas falhas históricas de
+`tests/regression/test_benchmark_baselines.py`. Elas já falhavam antes, e
+por isso a piora de dois códigos **críticos** ficou atrás de uma falha
+pré-existente. **Nenhuma foi introduzida pela CR-N1b** — os números são
+idênticos em `626087b` e nesta branch.
+
+| código | base | CR-N1 | CR-N1b | identidades físicas |
+|---|---|---|---|---|
+| TGD `JUNCTION_MISSING_BINDING` | 23 | **40** | 40 | **1** (17 fiadas) |
+| TP1 `OPENING_BLOCK_INSIDE_DOOR` | 0 | **7** | 7 | **1** (7 fiadas) |
+
+**(a) TGD** — o encontro T em `(−139,5; 470,0)` fica **sem nenhuma peça**.
+Na parede principal `W|-140.5,470.0|5.5,470.0|t14.0` os nós 142
+(`T_INTERSECTION`, t=1,00cm) e 185 (`L_CORNER`, t=7,00cm) estão a **6,0cm**
+um do outro; a fronteira do ponto médio cai em t=4,0cm e deixa o T com
+**3,0cm** — nem a menor peça cabe. O nó 185 é de **meio de parede**, então
+a isenção da CR-N1b não o alcança.
+
+**(b) TP1** — um **B34 dentro do vão da porta** `W019-O01`
+(`t = 564..750cm`), na mesma parede W019 onde a CR-N1 corrigiu os
+`POSITION_OVERLAP`. Bloco dentro de vão de porta é erro grosseiro.
+
+Os dois apontam para a mesma causa da seção 43.5: a fronteira do ponto
+médio é simétrica demais e, no limite, deixa **os dois** lados sem solução
+em vez de dar a peça inteira a um deles. **A decisão de manter ou reverter
+a CR-N1 tem de ser tomada com estes dois números na mesa**, ao lado do
+ganho `POSITION_OVERLAP` 6→0 / 2→0.
+
+---
+
 ## 3. Paredes fora do módulo — reproduzido, etapa exata, decisão pendente
 
 ### 3.1 Etapa exata
@@ -263,6 +295,29 @@ mostra que o caminho barato é o mesmo caminho da correção física.
 
 ---
 
+## 5.1 Regressão consolidada
+
+`python3 -m pytest tests/ -q` na árvore desta branch:
+**964 passed, 2 failed (58min31s)**.
+
+| | passed | failed |
+|---|---|---|
+| base conhecida | 921 | 2 |
+| CR-N1 (`626087b`) | 930 | **5** |
+| **esta branch** | **964** | **2** |
+
+As 2 falhas são **as mesmas duas históricas** de
+`tests/regression/test_benchmark_baselines.py` (refresh de `baseline.json`
+é CR própria) — mas **o conteúdo delas mudou**, e é isso que a seção 2.4
+registra: não basta ver "continuam sendo 2".
+
+As 3 falhas novas da CR-N1 estão fechadas; nenhuma nova apareceu. O
+aumento de testes vem dos 31 testes novos desta sessão (9 em
+`test_neighbor_node_bond_collision.py`, 22 em
+`test_non_modular_wall_coverage.py`).
+
+---
+
 ## 6. Dívidas que continuam abertas
 
 - **Seção 41** (compensador × peça especial): 4 opções documentadas com
@@ -271,6 +326,10 @@ mostra que o caminho barato é o mesmo caminho da correção física.
   usuário**.
 - **Seção 43.5**: nó de meio com peça centrada — 4 paredes de 124cm com
   amarração degradada; 2 correções candidatas, nenhuma implementada.
+- **Seção 43.6 (CRÍTICO, herdado da CR-N1)**: um encontro T sem nenhuma
+  peça no TGD e um B34 dentro do vão de porta no TP1 — mesma causa da
+  43.5, e o motivo pelo qual a decisão sobre a CR-N1 não é só sobre o
+  ganho de `POSITION_OVERLAP`.
 - **Seção 42.4**: a parede de 99,754cm com nó `AMBIGUOUS` + dois X a
   0,30cm — investigação própria.
 - **2 falhas históricas** de `tests/regression/test_benchmark_baselines.py`
@@ -289,8 +348,9 @@ mostra que o caminho barato é o mesmo caminho da correção física.
 2. **Decidir a seção 41** — a **opção 4** é a única que não contraria
    nenhuma regra escrita; desbloqueia a família compensador inteira
    (64% das identidades do TP1).
-3. **Seção 43.5** — corrigir a fronteira contra nó de meio com peça
-   centrada; devolve as 4 paredes de 124cm e apaga as 29 identidades
-   genuinamente novas da CR-N1b.
+3. **Seções 43.5 + 43.6 (prioridade sobre as demais)** — corrigir a
+   fronteira contra nó de meio: devolve as 4 paredes de 124cm, apaga as 29
+   identidades genuinamente novas da CR-N1b e, principalmente, resolve o
+   encontro T sem peça e o bloco dentro do vão de porta.
 4. **Seção 42.4** — a parede de 99,754cm (dois X a 0,30cm um do outro).
 5. Só então `CR-PERF-1` (re-solve por escopo).

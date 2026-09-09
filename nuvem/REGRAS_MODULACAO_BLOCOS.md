@@ -6555,3 +6555,58 @@ amarração e precisam de decisão + medição própria):
 
 Enquanto não houver decisão, as quatro paredes de 124cm ficam com a
 amarração degradada — registrado aqui para não se perder.
+
+### 43.6 DUAS REGRESSÕES CRÍTICAS da CR-N1 que estavam ESCONDIDAS
+(2026-09-09, `PADRÃO MEDIDO — pendência de código aberta`)
+
+Encontradas ao conferir **o conteúdo** das duas falhas históricas de
+`tests/regression/test_benchmark_baselines.py`. Elas já falhavam antes
+(refresh de `baseline.json` é CR própria) — e por isso **a piora de dois
+códigos CRÍTICOS ficou atrás de uma falha pré-existente**, sem ninguém
+declarar. É exatamente o modo de falha que a regra "compare por identidade
+física, nunca por saldo global" existe para evitar.
+
+**Nenhuma das duas foi introduzida pela CR-N1b**: os dois números são
+idênticos em `626087b` e nesta branch.
+
+#### (a) `JUNCTION_MISSING_BINDING` no TGD — 23 → 40 ocorrências
+
+Por identidade física é **UM** defeito, não 17: o encontro T em
+`(−139,5; 470,0)`, repetido nas 17 fiadas.
+
+```
+parede principal  W|-140.5,470.0|5.5,470.0|t14.0   (146cm)
+   nó 142  T_INTERSECTION  t =   1,00cm   (ponta)
+   nó 185  L_CORNER        t =   7,00cm   (MEIO DE PAREDE)
+   nó 143  L_CORNER        t = 139,00cm   (ponta)
+   abertura                t = 6,0 .. 107,0cm
+boneca            W|-139.5,462.5|-139.5,477.5|t14.0 (15cm, vazia nas 3 árvores)
+```
+
+Os nós **142 e 185 estão a 6,0cm** um do outro. A fronteira do ponto médio
+da CR-N1 cai em t=4,0cm e deixa o T com **3,0cm** de espaço — **nenhuma
+peça de amarração cabe, e o encontro fica sem peça nenhuma**. O nó 185 é
+de **meio de parede**, então a isenção da CR-N1b (que cobre só os nós das
+pontas) **não o alcança**.
+
+**REGRA OBRIGATÓRIA**: um encontro que termina **sem nenhuma peça** é
+falha de amarração, nunca "degradação aceitável" — degradar é trocar B54
+por B34 ou por compensador, não é ficar vazio. Quando a fronteira entre
+dois nós não deixa espaço para a menor peça, o certo é **um dos dois** ficar
+com a peça inteira, não os dois ficarem sem.
+
+#### (b) `OPENING_BLOCK_INSIDE_DOOR` no TP1 — 0 → 7 ocorrências
+
+Também **UMA** identidade física repetida em 7 fiadas pares: um **B34
+dentro do vão da porta** `W019-O01`, em `t = 564..750cm` da parede
+`W|8017.3,548.0|8017.3,1927.0|t14.0` (W019).
+
+W019 é justamente a parede dos `POSITION_OVERLAP` que a CR-N1 corrigiu
+(nós a 742/792 e a 1082/1117). Ao degradar/reposicionar a peça daquele nó,
+ela passou a cair **dentro do vão**. Bloco dentro de vão de porta é erro
+grosseiro — pior que a sobreposição que a CR-N1 consertou.
+
+**A decisão de manter ou reverter a CR-N1 tem de ser tomada com estes dois
+números na mesa**, ao lado do ganho `POSITION_OVERLAP` 6→0 / 2→0. Ambos
+apontam para o mesmo lugar da 43.5: a fronteira entre nós vizinhos é
+simétrica demais, e no limite deixa os **dois** lados sem solução.
