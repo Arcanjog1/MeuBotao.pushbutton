@@ -6482,8 +6482,73 @@ O mecanismo que a **opção 2** (modular com folga) precisaria **já existe
 e é testado**: `pier_cm_floored_to_module` devolve o conteúdo modular
 imediatamente abaixo (194cm para os 197,943cm, folga de 3,94cm < 1
 módulo). Ele só não está ligado neste caminho — hoje serve apenas à
-guarda física da `CR-BLOCK-FIT-TOLERANCE-C04`. Ou seja, a opção 2 é uma
-**ligação de mecanismo existente**, não código novo: falta a decisão.
+guarda física da `CR-BLOCK-FIT-TOLERANCE-C04`.
+
+### 42.5 O contrato exato — por que ligar o mecanismo AINDA é decisão
+normativa (2026-09-09, conferido)
+
+O contrato de `pier_cm_floored_to_module` está escrito no próprio
+docstring e **delimita o uso**: *"quando o arredondamento do fit levaria a
+peça a ultrapassar uma fronteira física que NÃO tem junta de argamassa
+para ceder … o trecho é remontado com este comprimento"*, e garante que
+*"a sobra deixada contra a fronteira fica sempre em
+`[PIER_MODULE_CM − PIER_FIT_TOLERANCE_CM, PIER_MODULE_CM)`"* — isto é,
+**entre 4,70 e 5,00cm**, porque ali o trecho **fecha** e só foi arredondado
+para cima por até 0,30cm.
+
+No caso da seção 42 o trecho **não fecha de jeito nenhum**, e a sobra
+seria **3,94cm** — fora da faixa que o contrato garante. Usar o mecanismo
+aqui não é "ligar o que já existe": é **estender o contrato dele a um
+caso que ele explicitamente não cobre**, e passar a entregar parede com
+folga declarada onde hoje o sistema pede ajuste de comprimento. Segue
+sendo a **opção 2**, e segue **pendente do usuário**.
+
+### 42.6 A parede de 99,754cm — diagnóstico completo (2026-09-09)
+
+Confirmado que **não é** o caso da seção 42 (99,754cm fecha em blocos), e
+medido o que realmente acontece. Parede `idx 97` do TGD,
+`W|1807.2,-145.1|1813.6,-244.6|t14.0`:
+
+```
+nó 135  AMBIGUOUS        t =  91,548cm   (ponta 1)
+nó 265  X_INTERSECTION   t =  78,832cm   crossing_walls = (33, 97)
+nó 272  X_INTERSECTION   t =  79,135cm   crossing_walls = (84, 97)
+                                          ^ 0,303cm um do outro
+```
+
+Os dois X **são fundidos corretamente** (`_merge_intervals_cm` já cobre
+midspan × midspan): a reserva mesclada sai `[70,832; 87,135]`. O que
+sobra são **dois** defeitos distintos:
+
+1. **Segmento 0 = `[0; 70,832]` = 70,832cm** — não fecha (`lower 69`,
+   `upper 74`). A fração vem do comprimento não-modular da parede
+   (99,754cm), herdada pela posição do X. É a seção 42 aplicada ao
+   **trecho**, não à parede.
+2. **Segmento 2 = `[87,135; 84,548]` = −2,586cm** — comprimento
+   **NEGATIVO**, `conflict: SEM_ESPACO`. A reserva de **midspan** e a
+   reserva da **ponta** se sobrepõem, e essa combinação **não** passa por
+   `_merge_intervals_cm` (que só funde midspan × midspan). É a mesma
+   classe de bug, entre mecanismos diferentes.
+
+**Tamanho da família dos segmentos negativos** (identidades físicas, TGD):
+
+| | base | CR-N1 | CR-N1c |
+|---|---|---|---|
+| segmentos de comprimento negativo | 51 | 19 | 37 |
+| ocorrências `SEM_ESPACO` | 500 | 296 | 472 |
+
+A CR-N1 mostrava menos porque a amarração degradada ocupava menos espaço;
+a CR-N1c fica entre as duas, e ainda **abaixo da base**. As paredes curtas
+que saem vazias estão nesta lista — `W|-139.5,462.5|-139.5,477.5|t14.0`
+(15cm) aparece com segmentos `14,5..−0,5`, e
+`W|-1159.7,215.0|-1159.7,229.0|t14.0` (14cm) com `15,0..−1,0`.
+
+**Correção candidata** (`DOCUMENTADO — pendência de código aberta`):
+levar as fronteiras de reserva de **ponta** para dentro da mesma fusão de
+intervalos que hoje só cobre midspan. Duas reservas que se sobrepõem
+devem produzir **um trecho vazio**, não um trecho negativo reportado como
+`SEM_ESPACO`. Não foi feita nesta execução para não misturar mecanismo
+novo com as CRs já medidas.
 
 ---
 
