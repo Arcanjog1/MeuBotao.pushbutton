@@ -6344,6 +6344,49 @@ argamassa, como em obra.
    real medida (2,1cm) é 7× a tolerância atual, e alargar a tolerância
    mexeria também no contrato de snap de todos os outros trechos.
 
+### 42.4 A ETAPA exata, a fronteira medida, e o que NÃO é desta seção
+(2026-09-09)
+
+**Etapa exata** (reproduzida com parede livre sintética, sem abertura e
+sem encontro):
+
+```
+_pier_remaining_snapped_cm(pier, lead, trail)     wall_stepper.py
+    remaining = pier - lead - trail + BLOCK_JOINT_CM
+    snapped   = 5 * round(remaining / 5)
+    |remaining - snapped| > PIER_FIT_TOLERANCE_CM (0,30cm)  ->  None
+_pier_ordered_layout  recebe None, tenta o fallback de junta de ABERTURA
+    (as 3 combinações de junta de contorno) e devolve None
+o chamador registra `non_modular` e NÃO lança peça nenhuma - em TODAS as
+    fiadas.
+```
+
+**Fronteira medida** numa parede livre: fecham `…, 194, 195, 196, 199,
+200, 201, …` — isto é, **múltiplo de 5cm ± 1cm** (as três combinações de
+junta de contorno deslocam o alvo em 1cm para cada lado), mais a
+tolerância de 0,30cm. `197,943cm` cai exatamente no buraco entre 196 e
+199. Reprodutor permanente com os controles das medidas vizinhas:
+`tests/test_non_modular_wall_coverage.py`.
+
+**Correção do que a 42.1 dizia**: das 29 paredes
+`COVERAGE_WALL_NOT_MODULATED` do TGD, **três** são paredes reais, não
+duas — além das duas de 197,943cm há uma de **99,754cm**
+(`W|1807.2,-145.1|1813.6,-244.6|t14.0`). E ela **não é desta seção**:
+99,754cm **fecha** em blocos (a combinação de junta 1/0 dá resto 99,75,
+a 0,25cm do múltiplo — dentro da tolerância), e uma parede livre com esse
+comprimento recebe 6 peças. Ela sai vazia por **outro** motivo: o plano
+real põe nela um nó `AMBIGUOUS` em t=91,55cm **e dois `X_INTERSECTION` a
+0,30cm um do outro** (t=78,83 e t=79,13) — duas travessias praticamente
+coincidentes. `DOCUMENTADO — pendência de código aberta`, investigação
+própria, sem relação com o módulo de 5cm.
+
+O mecanismo que a **opção 2** (modular com folga) precisaria **já existe
+e é testado**: `pier_cm_floored_to_module` devolve o conteúdo modular
+imediatamente abaixo (194cm para os 197,943cm, folga de 3,94cm < 1
+módulo). Ele só não está ligado neste caminho — hoje serve apenas à
+guarda física da `CR-BLOCK-FIT-TOLERANCE-C04`. Ou seja, a opção 2 é uma
+**ligação de mecanismo existente**, não código novo: falta a decisão.
+
 ---
 
 ## 43. `CR-N1b` — a reserva das PONTAS não pode ser cobrada DUAS VEZES
