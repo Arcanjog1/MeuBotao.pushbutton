@@ -69,9 +69,9 @@ validação e erro explícito se faltar tipo.
 
 ## Validação proporcional
 
-260 testes passaram em #33 e em #35, logs por HEAD. Reorganização exige
-260 novamente antes de merge, testes da governança, validador de links/SHAs
-e verificador do acervo/árvore. Resultado final no
+260 testes passaram em cada entrega: #33, #35 e reorganização (104,92s).
+Na reorganização, 12 testes da governança passaram; validador de links/SHAs
+e verificador de 23 JSONs/árvore protegida passaram. Logs por HEAD no
 [checkpoint](checkpoints/2026-09-10-beta2-consolidation.md).
 Sem regressão de 50 minutos porque não houve mudança física.
 
