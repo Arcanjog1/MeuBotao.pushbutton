@@ -256,10 +256,17 @@ coordenadas, e o detector era sensivel a paridade (8/17 = 0,471 passava,
 defeito sobreviveu ao benchmark offline. A correcao torna o auditor
 invariante a paridade. Registrado na secao 8d das regras.
 
-**MERGE NAO EXECUTADO** - gates 3, 4, 8, 10, 11 e 12 fecharam. O unico
-bloqueador restante e o 5/15: o congelamento do interpretador CPython dentro
-do Revit, sem causa-raiz e sem limite provado. Estado candidato, nao
-oficial.
+CONGELAMENTO DA TELA 1 - CAUSA-RAIZ FECHADA (2026-09-10):
+`Application.DoEvents()` era chamado da THREAD DE FUNDO do solver e levou
+**2652,285s (44 minutos)** para retornar. O guarda antigo decidia por
+`Control.InvokeRequired`, que devolve False quando o controle nao tem handle
+vivo - nao apenas quando ja' se esta' na thread de UI. Provado por tres
+evidencias independentes, incluindo amostragem feita de FORA do processo.
+Corrigido com `_ProgressConsole._pump_ui`, que so' bombeia na thread que
+construiu o console.
+
+**MERGE NAO EXECUTADO** - a correcao ainda nao foi validada numa execucao
+real no Revit (pacote e2b2b06). Estado candidato, nao oficial.
 
 ## Governanca e recuperacao
 

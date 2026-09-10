@@ -1,0 +1,35 @@
+[PERF] +   94.983s cpu=   6.016s thr=3   tid=25324 console.set_progress DoEvents START
+[PERF] + 2747.171s cpu=  81.109s thr=3   tid=17076 CONGELAMENTO detectado pelo amostrador parado=2652.323s
+[PERF] + 2747.268s cpu=  81.172s thr=3   tid=25324 console.set_progress DoEvents END dt=2652.285s
+[PERF] + 2747.279s cpu=  81.203s thr=3   tid=25324 parede START idx=1 pos=2 total=2
+[PERF] + 2747.291s cpu=  81.203s thr=3   tid=25324 console.set_status DoEvents START
+[PERF] + 2747.299s cpu=  81.203s thr=3   tid=25324 console.set_status DoEvents END dt=0.008s
+[PERF] + 2747.303s cpu=  81.203s thr=3   tid=25324 console.set_progress DoEvents START
+[PERF] + 2747.304s cpu=  81.203s thr=3   tid=25324 console.set_progress DoEvents END dt=0.001s
+[PERF] + 2747.340s cpu=  81.219s thr=3   tid=25324 process_walls_one_by_one END dt=2652.805s walls=2
+[PERF] + 2747.341s cpu=  81.219s thr=3   tid=25324 analyze_created_walls_for_errors END dt=2747.163s nodes=3 walls=2
+[PERF] + 2747.342s cpu=  81.219s thr=3   tid=25324 worker.thread TERMINOU o trabalho marshaling=True
+[PERF] + 2747.343s cpu=  81.219s thr=3   tid=25324 ui_invoke.direto (ja na thread de UI)
+[PERF] + 2747.343s cpu=  81.219s thr=3   tid=25324 ui._finish (volta para a thread de UI)
+[PERF] + 2747.345s cpu=  81.219s thr=3   tid=25324 ui._on_analyze_done kind=analyze
+[PERF] + 2747.346s cpu=  81.219s thr=3   tid=25324 console.set_status DoEvents START
+[PERF] + 2747.347s cpu=  81.219s thr=3   tid=25324 console.set_status DoEvents END dt=0.001s
+    --- tid=25324 (Dummy-1) ---
+      wall_modeling.py:10443 _worker
+      wall_modeling.py:7757 analyze_created_walls_for_errors
+      wall_stepper.py:7782 process_walls_one_by_one
+      wall_modeling.py:12644 _progress_cb
+      progress.py:52 dispatch_progress_event
+      wall_modeling.py:8741 set_progress
+    --- tid=17076 (perf-stall-sampler) ---
+      threading.py:1030 _bootstrap
+      threading.py:1073 _bootstrap_inner
+      threading.py:1010 run
+      perf_trace.py:245 _laco
+      perf_trace.py:211 _formatar_pilhas
+    --- tid=5932 (MainThread) ---
+      <string>:1175 <module>
+      <string>:545 _patch_pyrevit_forms_for_cpython
+      <string>:157 _dump_winforms_diagnostics
+[PERF] + 2747.490s cpu=  81.281s thr=3   tid=25324 console.set_status DoEvents START
+[PERF] + 2747.492s cpu=  81.281s thr=2   tid=25324 console.set_status DoEvents END dt=0.002s
