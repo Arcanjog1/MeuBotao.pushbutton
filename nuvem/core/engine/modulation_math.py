@@ -37,7 +37,9 @@ __all__ = [
     "OPENING_SOLVER_MAX_AXIS_DELTA_CM", "BLOCK_LENGTHS_CM", "BLOCK_WIDTH_CM",
     "BLOCK_JOINT_CM", "BLOCK_OPENING_JOINT_CM", "PIER_MODULE_CM",
     "BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT", "MODULATION_WHOLE_CM_TOLERANCE_CM",
-    "PIER_LAYOUT_TOLERANCE_CM", "pack_pier_with_blocks",
+    "PIER_LAYOUT_TOLERANCE_CM", "PIER_FIT_TOLERANCE_CM",
+    "PIER_PHYSICAL_FIT_TOLERANCE_CM", "pier_cm_floored_to_module",
+    "pack_pier_with_blocks",
     "_is_valid_opening_width_cm", "solve_opening_modulation",
     "PIER_BOUNDARY_JOINTS_CM", "PIER_BOUNDARY_JOINT_COMBINATIONS_CM",
     "_pier_remaining_cm", "pier_closes_with_blocks_cm",
@@ -122,6 +124,64 @@ MODULATION_WHOLE_CM_TOLERANCE_CM = 0.05
 # nunca podem discordar sobre o que fecha. Antes disto o empacotador usava
 # 1e-6 e reprovava por ruido 116 dos 344 trechos "nao-modulares" medidos.
 PIER_LAYOUT_TOLERANCE_CM = MODULATION_WHOLE_CM_TOLERANCE_CM
+
+# CR-BLOCK-FIT-TOLERANCE-C04 (2026-09-06): tolerancia DEDICADA do "fit"
+# modular - o passo que decide se a SOBRA de um trecho, depois de
+# descontadas as juntas de contorno, e' um multiplo (dentro de ruido) de
+# PIER_MODULE_CM e portanto pode ser "snapada" para o modulo mais proximo
+# (`_pier_remaining_snapped_cm` em wall_stepper.py; pre-checagem
+# equivalente aqui em `pier_closes_with_blocks_cm`/
+# `wall_length_closes_with_blocks_cm`). Causa-raiz (FIT_TOLERANCE_NOISE/
+# C04): 0,05cm (PIER_LAYOUT_TOLERANCE_CM) e' suficiente para o ruido de
+# ARREDONDAMENTO pes<->cm de UMA unica conversao, mas trechos derivados de
+# `extend_wall_ends_to_junctions`/geometria de encontro acumulam ruido
+# maior (varias operacoes encadeadas) e ficavam poucos decimos de cm fora
+# do multiplo esperado - rejeitados como "nao fecha" mesmo sendo
+# geometricamente validos. Varredura independente (0.05/0.10/0.15/0.20/
+# 0.25/0.30cm) sobre o corpus de referencia: TP1 satura o efeito em
+# ~0,15cm, TGD so' satura em ~0,30cm - valor aprovado para esta CR.
+#
+# DELIBERADAMENTE SEPARADA de PIER_LAYOUT_TOLERANCE_CM (que continua em
+# 0,05cm): PIER_LAYOUT_TOLERANCE_CM tambem e' reusada em wall_stepper.py
+# para contratos que esta CR NAO deve alargar - a checagem de "SEM ESPACO
+# FISICO" entre limites de trecho (colisao), a consistencia de composicao
+# do DP de stagger (_layout_matches_prism_target_dp) e as tolerancias de
+# ADJACENCIA de compensador consecutivo (`BLOCK_JOINT_CM +
+# PIER_LAYOUT_TOLERANCE_CM`, tanto em wall_stepper.py quanto herdadas em
+# wall_modeling.py via HALF_BLOCK_TIE_ADJACENCY_CM/
+# COMPENSATOR_OPENING_ADJACENCY_TOLERANCE_CM). Alargar
+# PIER_LAYOUT_TOLERANCE_CM diretamente teria alargado todas essas
+# tolerancias nao-relacionadas junto - exatamente o que a CR proibe
+# ("nao transformar 0,30cm em tolerancia global do sistema"). Ver
+# docs/BLOCK_FIT_TOLERANCE_C04_IMPLEMENTATION.md.
+PIER_FIT_TOLERANCE_CM = 0.30
+
+# CR-BLOCK-FIT-TOLERANCE-C04 (resolucao do hard blocker de jamba): o quanto
+# uma peca JA' MATERIALIZADA pode ultrapassar o limite FISICO real do trecho
+# em que ela foi colocada. NAO e' a mesma pergunta que PIER_FIT_TOLERANCE_CM
+# responde, e por isso NAO e' o mesmo numero:
+#
+#   FIT/FEASIBILIDADE  (PIER_FIT_TOLERANCE_CM = 0,30cm)
+#       "este trecho PODE ser considerado modular?" - absorve o ruido
+#       geometrico acumulado do CAD/encontros para decidir a COMPOSICAO.
+#
+#   COLOCACAO FISICA   (PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05cm)
+#       "onde as pecas PODEM existir de fato?" - o valor SNAPADO nunca
+#       apaga a fronteira fisica real (jamba de abertura, ponta de parede,
+#       reserva de no'). Quem nao tem junta de argamassa para absorver a
+#       diferenca nao pode ceder espaco nenhum alem do proprio ruido de
+#       calculo.
+#
+# Vale exatamente PIER_LAYOUT_TOLERANCE_CM (0,05cm) de proposito: e' o piso
+# de ruido geometrico que o projeto ja' usava ANTES desta CR para todo o
+# resto (adjacencia, colisao, consistencia de composicao). Amarrando a
+# guarda fisica nele, o C04 fica IMPOSSIBILITADO de materializar uma
+# invasao maior do que o solver ja' podia produzir antes dele - a
+# tolerancia de FIT mais larga muda o que fecha, nunca o que atravessa.
+# Deliberadamente MAIS APERTADO que o piso de ruido do proprio validador de
+# aberturas (`OVERLAP_TOLERANCE_CM = 0,1cm`, nuvem/benchmark/model.py): a
+# guarda e' fisica, nao um ajuste para caber na regua do validador.
+PIER_PHYSICAL_FIT_TOLERANCE_CM = PIER_LAYOUT_TOLERANCE_CM
 
 # Tolerancia SEPARADA e bem mais apertada, usada SO' para decidir o realce
 # VERMELHO ("comprimento quebrado" - ver evaluate_wall_block_length/
@@ -302,9 +362,39 @@ def _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     return pier_cm - leading_joint_cm - trailing_joint_cm + BLOCK_JOINT_CM
 
 
+def pier_cm_floored_to_module(pier_cm, leading_joint_cm, trailing_joint_cm):
+    """O MAIOR `pier_cm` que (a) NAO passa do `pier_cm` real informado e (b)
+    fecha EXATAMENTE em blocos com estas juntas de contorno - ou seja, o
+    conteudo modular imediatamente ABAIXO, em vez do mais proximo.
+
+    Existe para a GUARDA FISICA da CR-BLOCK-FIT-TOLERANCE-C04 (ver
+    PIER_PHYSICAL_FIT_TOLERANCE_CM): quando o arredondamento do fit levaria
+    a peca a ultrapassar uma fronteira fisica que NAO tem junta de
+    argamassa para ceder (jamba de abertura, ponta livre de parede, reserva
+    de no'), o trecho e' remontado com este comprimento - que cabe por
+    construcao. NAO e' uma composicao nova: e' exatamente a composicao que
+    o proprio solver ja' montaria para um trecho um modulo menor.
+
+    Como o modulo vale PIER_MODULE_CM (5cm) e o fit so' aceita ruido de ate'
+    PIER_FIT_TOLERANCE_CM (0,30cm), a sobra deixada contra a fronteira fica
+    sempre em [PIER_MODULE_CM - PIER_FIT_TOLERANCE_CM, PIER_MODULE_CM), isto
+    e', menos de 5cm - abaixo do menor vazio que a auditoria de cobertura
+    considera reportavel.
+
+    Devolve None quando nem o modulo mais baixo cabe (nao ha' o que montar
+    ali - o chamador trata como trecho sem solucao, o MESMO caminho que
+    existia antes desta CR)."""
+    remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
+    units = int(math.floor(remaining / float(PIER_MODULE_CM) + 1e-9))
+    if units <= 0:
+        return None
+    floored_remaining = units * PIER_MODULE_CM
+    return floored_remaining + leading_joint_cm + trailing_joint_cm - BLOCK_JOINT_CM
+
+
 def pier_closes_with_blocks_cm(pier_cm, leading_joint_cm=BLOCK_JOINT_CM,
                                trailing_joint_cm=BLOCK_OPENING_JOINT_CM,
-                               tolerance_cm=MODULATION_WHOLE_CM_TOLERANCE_CM):
+                               tolerance_cm=PIER_FIT_TOLERANCE_CM):
     """True se um trecho de `pier_cm` fecha EXATAMENTE com blocos, dadas as
     juntas de contorno REAIS daquele trecho. Nao olha digito nenhum: o que
     vale e' `(trecho - juntas + BLOCK_JOINT_CM)` ser um multiplo nao
@@ -313,18 +403,38 @@ def pier_closes_with_blocks_cm(pier_cm, leading_joint_cm=BLOCK_JOINT_CM,
     E' um limite SUPERIOR (necessario, nao suficiente): assume o catalogo
     padrao completo, onde qualquer multiplo de 5 e' construivel. Com o
     catalogo reduzido (sem compensadores) o solver real pode ainda assim
-    nao fechar - por isso ninguem decide "parede errada" so' com isto."""
+    nao fechar - por isso ninguem decide "parede errada" so' com isto.
+
+    `tolerance_cm` default e' PIER_FIT_TOLERANCE_CM (CR-BLOCK-FIT-
+    TOLERANCE-C04) - a MESMA tolerancia que `_pier_remaining_snapped_cm`
+    (wall_stepper.py) usa para decidir se a sobra real de um trecho e'
+    snapavel, mantendo a invariante de que pre-checagem e solver real
+    nunca discordam sobre o que fecha (ver PIER_FIT_TOLERANCE_CM acima).
+
+    Comparacao feita em CM (snap-e-compara), NUNCA dividindo para "unidades"
+    de PIER_MODULE_CM antes de comparar (correcao desta CR, achada pelos
+    testes de borda de ponto flutuante da secao 7): as duas formas sao
+    matematicamente equivalentes, mas dividir primeiro introduz outro
+    arredondamento de ponto flutuante, que com PIER_FIT_TOLERANCE_CM
+    (0,30cm) fazia o valor EXATAMENTE no limite (`pier_cm == multiplo +-
+    tolerance_cm`) discordar entre esta pre-checagem e
+    `_pier_remaining_snapped_cm` (wall_stepper.py, que ja' comparava em cm)
+    - violando a invariante documentada acima. Com tolerancia 0,05cm
+    (o valor antigo) a mesma divergencia nao aparecia por coincidencia de
+    arredondamento, mas a formula em unidades sempre foi fragil; a forma em
+    cm e' a mesma que `_pier_remaining_snapped_cm` usa, entao as duas
+    funcoes agora SAO literalmente a mesma conta."""
     remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
     if remaining < -tolerance_cm:
         return False
     if abs(remaining) <= tolerance_cm:
         return True  # trecho vazio (so' as juntas) - nada a preencher
-    units = remaining / float(PIER_MODULE_CM)
-    return abs(units - round(units)) <= tolerance_cm / float(PIER_MODULE_CM)
+    snapped = PIER_MODULE_CM * round(remaining / float(PIER_MODULE_CM))
+    return abs(remaining - snapped) <= tolerance_cm
 
 
 def wall_length_closes_with_blocks_cm(length_cm,
-                                      tolerance_cm=MODULATION_WHOLE_CM_TOLERANCE_CM):
+                                      tolerance_cm=PIER_FIT_TOLERANCE_CM):
     """True se EXISTE alguma combinacao de juntas de contorno
     (parede/parede, parede/abertura, abertura/abertura) para a qual
     `length_cm` fecha em blocos. Usada onde so' se conhece o comprimento da

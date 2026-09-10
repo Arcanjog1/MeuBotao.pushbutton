@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-09T12:51:02.514897+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\auditoria-candidato-20260909",
+  "head": "439fd49391227e128038fec704833c66c6ce3ffa",
+  "tree": "7591d72e9bac4c4e3d244badd8eb633bbe908867",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_neighbor_node_bond_collision.py",
+    "tests/test_compensator_spread_cr_n1e.py",
+    "tests/test_non_modular_wall_coverage.py",
+    "tests/test_block_bonding.py",
+    "tests/test_block_fit_tolerance_c04.py",
+    "tests/test_solver_l_node_alternation_cr_s1.py",
+    "tests/test_wall_junction_scan_perf.py",
+    "-q"
+  ],
+  "timeout_seconds": 240,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-09-candidate-focused.txt",
+  "pid": 21440,
+  "exit_code": 0,
+  "elapsed_seconds": 2.297,
+  "status_after": "",
+  "log_sha256": "440c42f14ec028a0b45af4708dd7722f4eed4314b2d064d09bff27420060b486"
+}

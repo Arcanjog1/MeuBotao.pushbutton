@@ -36,8 +36,13 @@ Criar ou atualizar checkpoint exclusivamente nos seguintes marcos:
 
 ## 3. Local de Armazenamento
 
-- **Caminho:** `.claude/checkpoints/<nome-do-cr>.md` (ex.: `.claude/checkpoints/cr-t-intersection-fix.md`)
-- **Git:** Esta pasta é desversionada via `.gitignore` (`.claude/*`), garantindo que rascunhos operacionais locais não poluam o histórico do repositório.
+- **Caminho permanente:** `docs/checkpoints/<data>-<nome-do-cr>.md`.
+- **Git:** checkpoint de entrega deve ser versionado. Rascunhos em
+  `.claude/checkpoints/` sao ignorados e nunca substituem esse registro.
+- **Metadados obrigatorios:** usar o bloco JSON e o procedimento de
+  `docs/DEVELOPMENT_PROCESS.md` antes da estrutura narrativa abaixo.
+  HEAD significa a revisao avaliada, nao o commit que contem o proprio
+  checkpoint; registrar alteracoes documentais posteriores separadamente.
 
 ---
 
@@ -102,7 +107,7 @@ Todo checkpoint deve seguir rigorosamente a estrutura abaixo:
 
 Ao iniciar uma sessão com intenção de continuar um CR existente:
 
-1. **Localizar e ler o checkpoint:** Ler `.claude/checkpoints/<nome-do-cr>.md`.
+1. **Localizar e ler o checkpoint:** Ler `docs/checkpoints/<data>-<nome-do-cr>.md` e o estado atual em `docs/PROJECT_STATUS.md`.
 2. **Validar o ambiente Git:**
    - Executar `git status --short` e `git rev-parse HEAD`.
    - Confirmar branch atual e se o SHA da HEAD corresponde ao checkpoint.
@@ -114,4 +119,4 @@ Ao iniciar uma sessão com intenção de continuar um CR existente:
 4. **Executar o "Próximo Passo Exato":**
    - Continuar a execução imediatamente a partir da próxima ação indicada no checkpoint.
 5. **Atualizar o checkpoint:**
-   - Ao atingir o próximo marco, atualizar o arquivo em `.claude/checkpoints/`.
+   - Ao atingir o próximo marco, atualizar o checkpoint versionado em `docs/checkpoints/`.

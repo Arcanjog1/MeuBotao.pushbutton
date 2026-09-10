@@ -1,0 +1,62 @@
+================================================================================================
+torre_easy_lo_r00_tgd
+-- GABARITO  STATE_R -> STATE_C   (identidade fisica)
+   codigo                             sever.         R      C   delta   novas sumidas
+   COMPENSATOR_CONSECUTIVE            major         52     52      +0       0       0 
+   COMPENSATOR_EXCESS_IN_RUN          major         57     57      +0       0       0 
+   COMPENSATOR_VERTICAL_STRIP         major         26     26      +0       0       0 
+   COVERAGE_GAP_IN_ROW                major        648    601     -47      54     101 
+   COVERAGE_MISSING_ROW               critical      95    112     +17      26       9 <- chave fraca
+   COVERAGE_PARTIAL_WALL              major          4      4      +0       0       0 <- chave fraca
+   COVERAGE_ROW_MOSTLY_EMPTY          critical      85    108     +23      38      15 <- chave fraca
+   JUNCTION_HALF_BLOCK_ADJACENT       major        264    264      +0       0       0 
+   JUNCTION_MISSING_BINDING           critical      86     96     +10      10       0 
+   JUNCTION_NOT_ALTERNATING           major          9      9      +0       0       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         21     21      +0       0       0 <- chave fraca
+   OPENING_MISSING_LINTEL             major         60     48     -12       2      14 <- chave fraca
+   PRISM_CONTINUOUS_JOINT             critical     129    129      +0       0       0 
+   PRISM_JOINT_STACK                  major          8      8      +0       0       0 
+   PRISM_STAGGER_BELOW_TARGET         minor        101    101      +0       0       0 
+-- JUNCTION_MISSING_BINDING nas TRES unidades de avaliacao
+   por INDICE ORDINAL de fiada (validador de hoje): R=86 C=96  (+10)
+   por ELEVACAO FISICA:                             R=348 C=343  (-5)
+   ESTRITA (cota em >=2 paredes do no'):            R=86 C=96  (+10)
+      identidades estritas NOVAS: 10   SUMIDAS: 0
+      dessas NOVAS, em no' que NAO existia em STATE_R: 10
+-- FALHA VERTICAL DE AMARRACAO no eixo do no' (todas as pecas do no')
+   nos avaliaveis: R=147 C=161 | nos NOVOS=15 SUMIDOS=1
+   nos presentes NOS DOIS que PIORARAM:   0   <- so' isto seria defeito novo
+   nos presentes NOS DOIS que MELHORARAM: 8
+-- SOLVER: saidas ausentes (rode repro_solver_l_node_alternation.py ou project_solver.py). Secao do solver pulada.
+================================================================================================
+torre_easy_lo_r00_tp1
+-- GABARITO  STATE_R -> STATE_C   (identidade fisica)
+   codigo                             sever.         R      C   delta   novas sumidas
+   COMPENSATOR_CONSECUTIVE            major         52     52      +0       0       0 
+   COMPENSATOR_EXCESS_IN_RUN          major         54     54      +0       0       0 
+   COMPENSATOR_VERTICAL_STRIP         major         26     26      +0       0       0 
+   COVERAGE_GAP_IN_ROW                major        637    590     -47      54     101 
+   COVERAGE_MISSING_ROW               critical      94    111     +17      26       9 <- chave fraca
+   COVERAGE_ROW_MOSTLY_EMPTY          critical     120    143     +23      38      15 <- chave fraca
+   JUNCTION_HALF_BLOCK_ADJACENT       major        259    259      +0       0       0 
+   JUNCTION_MISSING_BINDING           critical      82     92     +10      10       0 
+   JUNCTION_NOT_ALTERNATING           major          9      9      +0       0       0 
+   OPENING_MISSING_COUNTER_LINTEL     minor         21     21      +0       0       0 <- chave fraca
+   OPENING_MISSING_LINTEL             major         57     45     -12       2      14 <- chave fraca
+   POSITION_OVERLAP                   critical       1      1      +0       0       0 
+   PRISM_CONTINUOUS_JOINT             critical     125    125      +0       0       0 
+   PRISM_JOINT_STACK                  major          8      8      +0       0       0 
+   PRISM_STAGGER_BELOW_TARGET         minor        101    101      +0       0       0 
+-- JUNCTION_MISSING_BINDING nas TRES unidades de avaliacao
+   por INDICE ORDINAL de fiada (validador de hoje): R=82 C=92  (+10)
+   por ELEVACAO FISICA:                             R=337 C=332  (-5)
+   ESTRITA (cota em >=2 paredes do no'):            R=82 C=92  (+10)
+      identidades estritas NOVAS: 10   SUMIDAS: 0
+      dessas NOVAS, em no' que NAO existia em STATE_R: 10
+-- FALHA VERTICAL DE AMARRACAO no eixo do no' (todas as pecas do no')
+   nos avaliaveis: R=143 C=157 | nos NOVOS=15 SUMIDOS=1
+   nos presentes NOS DOIS que PIORARAM:   0   <- so' isto seria defeito novo
+   nos presentes NOS DOIS que MELHORARAM: 8
+-- SOLVER: saidas ausentes (rode repro_solver_l_node_alternation.py ou project_solver.py). Secao do solver pulada.
+
+escrito: /home/user/MeuBotao.pushbutton/nuvem/benchmark/future_cr_preparation/cr_v1_junction_validator_fidelity/evidence/reconciliation_physical_identity.json

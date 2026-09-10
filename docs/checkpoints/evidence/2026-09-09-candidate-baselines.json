@@ -1,0 +1,25 @@
+{
+  "started_utc": "2026-09-09T12:51:14.680655+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\auditoria-candidato-20260909",
+  "head": "439fd49391227e128038fec704833c66c6ce3ffa",
+  "tree": "7591d72e9bac4c4e3d244badd8eb633bbe908867",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/regression/test_benchmark_baselines.py",
+    "-k",
+    "test_projeto_nao_regrediu_contra_o_baseline",
+    "-q"
+  ],
+  "timeout_seconds": 600,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-09-candidate-baselines.txt",
+  "pid": 10544,
+  "exit_code": 1,
+  "elapsed_seconds": 355.125,
+  "status_after": "",
+  "log_sha256": "7ac3d94d5d76ecc987ac613e3af9ba65ee6dd0895ddbd537b4edec191e29d50a"
+}

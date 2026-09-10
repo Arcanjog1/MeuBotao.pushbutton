@@ -126,7 +126,7 @@ pelo nome). Detalhe em [`03_lintels.json`](03_lintels.json).
 Distribuição do apoio (cm): `9:40 · 18,9:38 · 19:486 · 19,1:38 · 24:87 ·
 25:20 · 29:65 · 34:6 · 39:1 · 44:1`.
 
-**Leitura**: o que é regra dura é *onde a verga nasce* (exatamente no topo do
+**Leitura observacional, sem aprovação normativa**: o invariante nesta amostra é *onde a verga nasce* (exatamente no topo do
 vão) e *o apoio mínimo de 9 cm*. O comprimento exato **não** é uma fórmula
 fechada — o humano escolhe o tipo de verga já fabricado (`VERGA 109` …
 `VERGA 214`, de 5 em 5 cm) que cubra o vão com apoio ≥ 9 cm, e o excedente
@@ -413,7 +413,7 @@ Bandas finas de 9 cm intercaladas em `111, 131, 151, 171, 191, 211, 231,
    timeout do cliente embora continuem executando no Revit; e
    `json.dumps` do IronPython quebra com caracteres não-ASCII
    (`UnicodeDecodeError` em `°`, `Ç`). Ambas contornadas (escrita em disco +
-   serializador próprio) e registradas nos scripts em [`_scripts/`](_scripts/).
+   serializador próprio) e registradas nos scripts em [`_scripts/`](_scripts/README.md).
 8. **`LookupParameter` com nome acentuado falha** neste ambiente (retorna
    `None` para `Nível`, `RÔGGA_LOCAL`). Foi preciso usar **GUID de parâmetro
    compartilhado**. Uma leitura ingênua desses parâmetros produz silenciosamente
@@ -480,7 +480,7 @@ Bandas finas de 9 cm intercaladas em `111, 131, 151, 171, 191, 211, 231,
 | Regra `bbox_h == Peitoril + Altura_abertura` | **484/484** |
 | Vergas/contravergas pareadas a uma abertura | **539/539** após reclassificação por uso |
 | Geometria sólida × parâmetros de tipo | divergência em 3 tipos `CORTADO` — geometria prevalece |
-| Reprodutibilidade | scripts em [`_scripts/`](_scripts/); dados brutos NDJSON regeráveis |
+| Reprodutibilidade | scripts em [`_scripts/`](_scripts/README.md); dados brutos NDJSON regeráveis |
 
 Reconstrução manual conferida em 2 exemplos (parede → abertura →
 verga/contraverga → blocos adjacentes), incluindo a `JANELA 6125136`
@@ -515,3 +515,7 @@ Instâncias detalhadas de canaleta/cortado/especial ficam restritas ao nível
 gabarito **04. TGD** para manter os arquivos versionáveis; os **agregados de
 todos esses arquivos cobrem o modelo inteiro**, e os níveis `05/08/10/20. TP1`
 são repetições verificadas do mesmo pavimento-tipo.
+
+## Revisão de integração (2026-09-10)
+
+Os limites e correções de interpretação estão em [REVIEW_2026-09-10.md](REVIEW_2026-09-10.md). O JSON é preservado como extraído.
