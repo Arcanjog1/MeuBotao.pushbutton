@@ -40,8 +40,8 @@ com **canaletas** em vez de verga/contraverga — ao contrário do
 | [`08_piece_opening_wall_relations.json`](08_piece_opening_wall_relations.json) | relação peça ↔ abertura ↔ parede (3.625 registros) |
 | [`09_observed_patterns.json`](09_observed_patterns.json) | 18 padrões quantificados, apoios, largura×solução, exceções |
 | [`10_torre_easy_comparison.json`](10_torre_easy_comparison.json) | comparação fato a fato com o projeto A |
-| [`_scripts/`](_scripts) | scripts de extração (lado Revit) e de análise (lado local) |
-| [`evidence/`](evidence) | saídas brutas: sólidos, busca de vergas, cobertura, contagem por família |
+| [`_scripts/`](_scripts/README.md) | scripts de extração (lado Revit) e de análise (lado local) |
+| [`evidence/`](evidence/verga_search.json) | saídas brutas: sólidos, busca de vergas, cobertura, contagem por família |
 
 ## Convenções dos dados
 
@@ -75,3 +75,5 @@ arquivos.
 - amarração em encontros L/T/X (fora do escopo desta missão);
 - vínculo peça-a-peça entre canaleta e graute;
 - 760 canaletas (8,51%) ficaram sem contexto atribuído.
+
+[Revisão de integração e erratas](REVIEW_2026-09-10.md): limites de reprodução, classificação e apoios.

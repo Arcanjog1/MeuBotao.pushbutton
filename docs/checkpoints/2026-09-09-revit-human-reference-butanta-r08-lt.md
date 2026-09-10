@@ -1,3 +1,51 @@
+# Checkpoint reconciliado — integração #35
+
+```json
+{
+  "date": "2026-09-10",
+  "branch": "claude/revit-human-reference-extraction-project-2",
+  "head": "f0b59dcaf85b6653db42b72ad4bc3ceb1fafdc9a",
+  "base": "59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/35",
+  "objective": "Reconciliar diff próprio e integrar evidência BUTANTÃ após #33.",
+  "changes": [
+    "Merge de main sem force-push; seção evidencial 31→41; erratas e limites dos dados publicados."
+  ],
+  "tests": [
+    "python -m pytest tests/test_script.py -q: 260 passed em 75.22s, exit 0; evidence/2026-09-10-pr35-tests.json.",
+    "Auditoria offline: dez JSON e quatro evidências parseados, contagens e vínculos conferidos; evidence/2026-09-10-pr35-json-audit.json."
+  ],
+  "known_failures": [
+    "Raw/intermediários e etapa de redução de clones não publicados; erratas evidenciais explicitadas."
+  ],
+  "physical_deltas": [
+    "ZERO produção/benchmark; dados JSON originais preservados."
+  ],
+  "decisions_taken": [
+    "Usuário autorizou especificamente integrar #35 evidencial após limpar herança de #33 e passar gates. Nenhuma norma aprovada."
+  ],
+  "decisions_pending": [
+    "Políticas de estratégias, apoio independente de CHANNEL, catálogo e topo."
+  ],
+  "next_steps": [
+    "Passar gates, merge normal, iniciar PR isolado de organização/arquitetura."
+  ],
+  "references": [
+    {
+      "path": "docs/revit_reference_extraction/butanta-r08-lt/REVIEW_2026-09-10.md"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-pr35-tests.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-pr35-json-audit.json"
+    }
+  ]
+}
+```
+
+STATUS do relato abaixo: HISTORICAL. SUPERSEDED BY: revisão acima.
+
 # Checkpoint — 2026-09-09 — Extração forense do projeto humano nº 2 (BUTANTÃ R08_LT)
 
 ```
