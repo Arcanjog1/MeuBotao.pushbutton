@@ -243,8 +243,15 @@ Criacao real medida: **187 instancias** (34 B34 + 136 B39 + 17 B19), 17
 fiadas x 11, 0 falhas, 0 colisoes; recriacao substitui o lote sem
 duplicata.
 
-**MERGE NAO EXECUTADO** - gates 3, 5, 8, 10 e 12 nao fechados. Estado
-candidato, nao oficial.
+Regressao consolidada no escopo correto (raiz, 1037 testes): **1035
+passed / 2 failed**, e as duas falhas sao as HISTORICAS ja registradas para
+o beta 8cdd33f, com numeros identicos (TGD compensators 52->61; TP1
+JUNCTION_MISSING_BINDING 8->9). **Zero falha nova.** Nenhum baseline,
+reference ou threshold foi tocado.
+
+**MERGE NAO EXECUTADO** - gates 8 e 10 fecharam, mas 3 (vermelho falso nao
+verificado no Revit), 5/15 (congelamento do interpretador) e 12 (CI) seguem
+abertos. Estado candidato, nao oficial.
 
 ## Governanca e recuperacao
 

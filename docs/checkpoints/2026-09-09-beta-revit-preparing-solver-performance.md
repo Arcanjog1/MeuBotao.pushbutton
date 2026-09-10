@@ -24,13 +24,15 @@
     "Regressao do encadeamento: test_acao_agendada_por_callback_durante_execute_sobrevive e test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar - falham antes, passam depois.",
     "Solve end-to-end offline no HEAD atual: 17 fiadas, 22 candidatos, 187 instancias fisicas, 0 colisoes, 0 vaos, 0 nao modulares, preflight ok, 0 paredes reprovadas.",
     "REGRESSAO DE AMARRACAO no codigo corrigido: 420 passed em 2366.84s (39min26s), exit 0 - test_script.py + test_block_bonding.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py + test_block_arm_role_invariance.py + test_bond_strip_adjacent_courses.py. Que a versao CORRIGIDA estava carregada e comprovado pelos 6 testes novos terem passado dentro dessa mesma rodada (com a logica antiga, dois deles falham).",
-    "CONFIRMACAO no HEAD commitado: 366 passed em 2257.45s (37min37s), exit 0 - test_script.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py."
+    "CONFIRMACAO no HEAD commitado: 366 passed em 2257.45s (37min37s), exit 0 - test_script.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py.",
+    "REGRESSAO CONSOLIDADA no escopo CORRETO (raiz, 1037 testes coletados): 1035 passed / 2 failed em 5576.96s (1h32m56s), exit 1. As DUAS falhas sao as HISTORICAS ja registradas para o beta 8cdd33f, com numeros IDENTICOS: TGD compensators 52->61 (delta 9) e TP1 JUNCTION_MISSING_BINDING 8->9 (delta 1). ZERO falha nova.",
+    "ERRO DE ESCOPO CORRIGIDO: a primeira consolidada rodou `pytest tests/` (1003 testes) e deixou 34 de fora (nuvem/tests/ e tools/documentation/). Refeita a partir da raiz. Que a raiz e o escopo oficial esta confirmado pela contagem: 8cdd33f tinha 1029 coletados, a raiz de hoje tem 1037 - exatamente +8, os testes acrescentados nesta entrega."
   ],
   "known_failures": [
     "BUG REAL 3 - CAUSA-RAIZ NAO FECHADA, BLOQUEADOR DE MERGE: o interpretador CPython dentro do processo do Revit congela por 19,6s (execucao 3) e por 100,2s (execucao 2) na mesma fronteira - entre `plan_failures = {}` e o `def plan_hook`, um trecho sem calculo nenhum. Durante o congelamento NENHUMA linha [PERF] de NENHUMA thread aparece (nem o watchdog), enquanto o CPU do processo anda 1,67s fora do Python. Nao e o solver, nao e a instrumentacao (0,285ms/marco medido) e nao e callback perdido. Nao consegui provar que o congelamento e limitado.",
     "GATE 3 NAO VERIFICADO NO REVIT: o bench offline NAO reproduz o falso positivo do auditor (0 paredes reprovadas com a logica antiga E com a nova - o layout reconstruido difere do criado no Revit). A correcao esta provada por teste que codifica a geometria MEDIDA, mas 'vermelho falso eliminado' so fecha com nova execucao no Revit.",
-    "Regressao CONSOLIDADA (todas as suites, incluindo golden benchmark) nao concluida: rodou a regressao de AMARRACAO (420 passed), que cobre a mudanca e a vizinhanca dela, mas nao a suite inteira - as rodadas longas foram interrompidas de proposito para nao contaminar o arquivo de rastreamento usado pela medicao no Revit.",
-    "CI nao avaliado nesta sessao."
+    "CI nao avaliado nesta sessao.",
+    "FALHAS HISTORICAS PRESERVADAS (nao introduzidas por esta entrega, identicas as de 8cdd33f): tests/regression/test_benchmark_baselines.py falha para torre_easy_lo_r00_tgd (compensators 52->61) e torre_easy_lo_r00_tp1 (JUNCTION_MISSING_BINDING 8->9). Nenhum baseline, reference ou threshold foi tocado para escondê-las."
   ],
   "physical_deltas": [
     "187 FamilyInstances de bloco criadas e medidas no Revit: 34 B34 + 136 B39 + 17 B19, em 17 fiadas de 11 pecas, Z de -1105,2cm a -785,2cm com passo 20cm, rotacoes 0 / 1,5708 / 4,7124 rad. 0 falhas, 0 colisoes, 0 violacoes de vao, 0 trechos nao modulares.",
@@ -47,32 +49,55 @@
     "ACHADO Z reclassificado como comportamento esperado por decisao do usuario; nenhum CR de Z aberto e nenhuma linha de codigo vertical alterada.",
     "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco, Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
     "Retorno para a UI PROVADO SAUDAVEL: worker TERMINOU -> BeginInvoke aceito -> ui._finish -> ui._on_analyze_done em 28ms. O `ui._finish` ausente na execucao 2 foi consequencia de o usuario ter fechado a janela congelada (BeginInvoke em Form descartado lanca) - nao um segundo defeito.",
-    "NAO MERGEAR: gates 3, 5, 8, 10 e 12 nao fechados, e o gate 15 (Tela 1 podendo ficar infinita) nao pode ser descartado sem a causa-raiz do congelamento."
+    "GATES 8 e 10 FECHADOS: consolidada executada no escopo correto e sem nenhuma falha nova. GATES 3, 5 e 12 continuam ABERTOS.",
+    "NAO MERGEAR: gate 3 (vermelho falso nao verificado no Revit), gate 5/15 (congelamento do interpretador sem causa-raiz nem limite provado) e gate 12 (CI nao avaliado)."
   ],
   "decisions_pending": [
     "Fechar a causa-raiz do congelamento do interpretador. Proximo passo tecnico: amostrar sys._current_frames() de um thread dedicado durante o congelamento para identificar quem retem a GIL. Hipotese principal, NAO PROVADA: a GIL do pythonnet permanece retida pela thread principal do Revit ao retornar de IExternalEventHandler.Execute enquanto o Revit executa trabalho proprio.",
     "Reexecutar no Revit com o pacote 2d8d0b1 para fechar o gate 3 (vermelho falso eliminado na pratica).",
-    "Concluir a regressao consolidada e avaliar o CI antes de qualquer merge.",
-    "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a)."
+    "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a).",
+    "Avaliar o CI (gate 12) antes de qualquer merge."
   ],
   "next_steps": [
     "Uma execucao do botao TESTE-PERF (head 2d8d0b1) nas mesmas 2 Walls, confirmando que nenhuma peca recebe vermelho.",
     "Amostragem de frames durante o congelamento para fechar o BUG 3.",
-    "Regressao consolidada no HEAD final e leitura do CI.",
-    "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem."
+    "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem.",
+    "Ler o CI no HEAD final."
   ],
   "references": [
-    {"path": "docs/checkpoints/evidence/2026-09-09-beta-fechamento-mcp.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log"},
-    {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run2-stall-analyze.log"},
-    {"path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run3-fluxo-completo.log"},
-    {"path": "docs/checkpoints/evidence/2026-09-09-preparing-solver-measurements.json"},
-    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
-    {"path": "nuvem/core/engine/perf_trace.py"},
-    {"path": "nuvem/core/wall_modeling.py"},
-    {"path": "tests/test_bond_strip_adjacent_courses.py"},
-    {"path": "tests/test_script.py"},
-    {"path": "docs/checkpoints/2026-09-09-beta-main-safe.md"}
+    {
+      "path": "docs/checkpoints/evidence/2026-09-09-beta-fechamento-mcp.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run1-etapa5.log"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run2-stall-analyze.log"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-09-perf-diag-run3-fluxo-completo.log"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-09-preparing-solver-measurements.json"
+    },
+    {
+      "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"
+    },
+    {
+      "path": "nuvem/core/engine/perf_trace.py"
+    },
+    {
+      "path": "nuvem/core/wall_modeling.py"
+    },
+    {
+      "path": "tests/test_bond_strip_adjacent_courses.py"
+    },
+    {
+      "path": "tests/test_script.py"
+    },
+    {
+      "path": "docs/checkpoints/2026-09-09-beta-main-safe.md"
+    }
   ]
 }
 ```
