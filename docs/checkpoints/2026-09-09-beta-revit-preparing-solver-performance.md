@@ -32,13 +32,15 @@
     "GATE 3 FECHADO OFFLINE: rodando o SOLVER REAL e trocando as letras A/B, a logica antiga produz a mensagem IDENTICA a do relato ('B34 repetido(s) em X~37.0cm, em 9 fiadas (0, 2, 4, 6, 8, 10, 12, 14, 16)') e a nova nao reprova nenhuma parede. tests/test_bond_strip_adjacent_courses.py: 9 passed; 3 failed ao reverter BOND_STRIP_MIN_ADJACENT_COURSES para 0.",
     "CI (gate 12) simulado localmente, identico ao workflow check-project-status.yml: passo 1 (unittest discover em tools/documentation) 16 tests OK em 16.1s; passo 2 (validate.py --base merge-base --main origin/main --require-current-main) PASS.",
     "tests/test_perf_trace_stall_sampler.py: 4 passed em 2,59s - controle negativo (laco Python apertado NAO dispara, porque o CPython entrega a GIL a cada ~5ms) e positivo (ctypes.PyDLL, que nao libera a GIL, dispara com cpu=0.000s durante o salto - a MESMA assinatura vista no Revit) mais o despejo de pilhas identificando a thread do amostrador.",
-    "tests/test_console_pump_ui_thread_guard.py: 5 passed; 3 FALHAM ao remover o guarda. 285 passed no conjunto focado (test_script + guarda + amostrador + bond_strip + nuvem/tests/test_progress)."
+    "tests/test_console_pump_ui_thread_guard.py: 5 passed; 3 FALHAM ao remover o guarda. 285 passed no conjunto focado (test_script + guarda + amostrador + bond_strip + nuvem/tests/test_progress).",
+    "VALIDACAO REAL NO REVIT (execucao 6, 14:27:04, pacote e2b2b06) - PARCIAL: a correcao _pump_ui FUNCIONOU (todos os console.*DoEvents vieram de tid=26316 = MainThread; ZERO da thread de fundo; a fronteira que antes travava 94s passou em 1 ms). MAS a execucao NAO concluiu: travou em solve_all_intersections START (+0.074s) e nao avancou mais."
   ],
   "known_failures": [
     "FALHAS HISTORICAS PRESERVADAS (nao introduzidas por esta entrega, identicas as de 8cdd33f): tests/regression/test_benchmark_baselines.py falha para torre_easy_lo_r00_tgd (compensators 52->61) e torre_easy_lo_r00_tp1 (JUNCTION_MISSING_BINDING 8->9). Nenhum baseline, reference ou threshold foi tocado para escondê-las.",
     "GATE 3 - residuo: a eliminacao do vermelho falso esta provada por reproducao EXATA com o solver real (mensagem identica a do relato), mas nao foi reconfirmada com um clique no Revit, porque o usuario ficou sem acesso ao Revit. O risco residual e baixo: a reproducao usa o solver de producao, nao candidatos montados a mao.",
-    "GATE 5/15 - correcao NAO VALIDADA NO REVIT REAL: a causa-raiz esta fechada e corrigida, com teste que falha sem o guarda, mas ainda nao houve execucao no Revit com o pacote e2b2b06. Sem isso nao se pode afirmar que a Tela 1 sai do 'Preparando o solver' em tempo aceitavel.",
-    "DIVIDA REGISTRADA, fora do escopo desta correcao: fix_all_wall_modulation_errors tem um busy-wait `while should_pause_cb(): Application.DoEvents()`. Roda SINCRONO dentro de Execute() na thread principal (abre Transaction), entao e' uso CORRETO do DoEvents - mas continua sendo espera ativa."
+    "DIVIDA REGISTRADA, fora do escopo desta correcao: fix_all_wall_modulation_errors tem um busy-wait `while should_pause_cb(): Application.DoEvents()`. Roda SINCRONO dentro de Execute() na thread principal (abre Transaction), entao e' uso CORRETO do DoEvents - mas continua sendo espera ativa.",
+    "DEFEITO NOVO E DIFERENTE - DEADLOCK, gate 5/15 CONTINUA ABERTO: na execucao 6 o worker bloqueou dentro de solve_all_intersections e NAO executou mais nenhuma instrucao. Medido de fora do processo em tres snapshots a 15s de intervalo: threads Running=0, worker (ntid=19324) com CPU cravado em 31 ms nos tres, MainThread (ntid=26316) variando 94.281->95.531 ms (ocioso), processo Responding=True. NAO e' o congelamento ocupado de antes (que tinha a MainThread Running queimando 44s de CPU): e' bloqueio passivo, com a GIL retida por quem esta' bloqueado - o amostrador nunca chegou a reportar. Nao identifiquei a chamada exata: exigiria pilha NATIVA, que a amostragem externa nao da.",
+    "O Revit ANTERIOR (PID 11196) MORREU em 14:24:03.833, nao congelou: o amostrador registrou o desaparecimento, a contagem de threads caiu de 55 para 1 e ha' diretorios CER (crash report) criados depois das 14:00. A execucao 6 ja' rodou num Revit novo (PID 26012, iniciado 14:23:58)."
   ],
   "physical_deltas": [
     "187 FamilyInstances de bloco criadas e medidas no Revit: 34 B34 + 136 B39 + 17 B19, em 17 fiadas de 11 pecas, Z de -1105,2cm a -785,2cm com passo 20cm, rotacoes 0 / 1,5708 / 4,7124 rad. 0 falhas, 0 colisoes, 0 violacoes de vao, 0 trechos nao modulares.",
@@ -59,9 +61,12 @@
     "GATES 3, 4, 8, 10, 11 e 12 FECHADOS. Gate 5/15 continua ABERTO.",
     "NAO MERGEAR: o unico bloqueador restante e o gate 5/15 - o congelamento do interpretador CPython dentro do Revit, sem causa-raiz e sem limite provado. A instrucao do usuario e explicita: se a Tela 1 puder ficar infinita, nao mergear.",
     "CAUSA-RAIZ DO CONGELAMENTO, provada por tres evidencias independentes (nao por semelhanca temporal): (1) o span mede a chamada exata, dt=2652.285s em volta do DoEvents, tid=25324 (thread de fundo), com pilha _worker -> analyze -> process_walls_one_by_one -> _progress_cb -> dispatch_progress_event -> set_progress; (2) o amostrador, thread Python que so' dorme, acusou parado=2652,323s - ninguem em Python rodou; (3) a amostragem EXTERNA, que nao depende da GIL, mostrou a thread do SO 5932 (= MainThread) `Running` com 44,2s de CPU na janela, 6x a segunda colocada, todas as outras em `Wait`.",
-    "POR QUE o guarda antigo nao pegava: `Control.InvokeRequired` devolve False quando o controle nao tem HANDLE VIVO, nao apenas quando ja' se esta' na thread de UI. Com a janela fechada/descartada a thread de fundo caia no corpo do metodo. Confirmado no log: `ui_invoke.direto (ja na thread de UI)` registrado a partir de tid=25324."
+    "POR QUE o guarda antigo nao pegava: `Control.InvokeRequired` devolve False quando o controle nao tem HANDLE VIVO, nao apenas quando ja' se esta' na thread de UI. Com a janela fechada/descartada a thread de fundo caia no corpo do metodo. Confirmado no log: `ui_invoke.direto (ja na thread de UI)` registrado a partir de tid=25324.",
+    "A correcao _pump_ui esta CONFIRMADA no Revit real para o defeito que ela endereca, e deve ser preservada. Mas o gate 5/15 NAO fechou: apareceu um deadlock distinto, mais cedo no fluxo (antes de qualquer callback de progresso), que _pump_ui nao pode ter causado - o bloqueio e' na PRIMEIRA chamada de solve_all_intersections, antes de o console ser tocado pelo worker.",
+    "PRIMEIRO BETA: FAIL. Nao mesclar. A autorizacao de merge era condicionada a 'congelamento resolvido' e 'execucao real Revit validada' - a execucao real nao concluiu."
   ],
   "decisions_pending": [
+    "Avaliar a opcao arquitetural que o proprio usuario listou: NAO rodar analyze em thread paralela e sim SINCRONO dentro do ExternalEvent. Medicao que sustenta: analyze custa 0,181s no documento real, medido dentro do Revit - nao precisa de thread de fundo, e isso elimina a classe inteira de problemas (DoEvents fora da thread de UI, marshaling, e este deadlock).",
     "UMA execucao do TESTE-PERF (head e2b2b06) nas mesmas 2 Walls, para medir o antes/depois e fechar o gate 5/15. Gate de tempo desta bancada: <5s PASS, 5-15s aceitavel com divida, 15-60s FAIL operacional, >60s FAIL critico.",
     "Reexecutar no Revit com o pacote 2d8d0b1 para fechar o gate 3 (vermelho falso eliminado na pratica).",
     "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a)."
@@ -110,6 +115,12 @@
     },
     {
       "path": "docs/checkpoints/evidence/2026-09-10-perf-diag-run4-congelamento.log"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-perf-diag-run6-deadlock.log"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-threads-deadlock-pid26012.txt"
     }
   ]
 }

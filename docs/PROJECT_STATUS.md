@@ -265,8 +265,15 @@ evidencias independentes, incluindo amostragem feita de FORA do processo.
 Corrigido com `_ProgressConsole._pump_ui`, que so' bombeia na thread que
 construiu o console.
 
-**MERGE NAO EXECUTADO** - a correcao ainda nao foi validada numa execucao
-real no Revit (pacote e2b2b06). Estado candidato, nao oficial.
+A correcao foi VALIDADA em execucao real (14:27, pacote e2b2b06) para o que
+ela endereca: zero DoEvents da thread de fundo, e a fronteira que travava
+94s passou em 1 ms. Mas a execucao NAO concluiu - travou em
+`solve_all_intersections` num DEADLOCK distinto: threads Running=0, worker
+com CPU cravado em 31 ms por mais de 15 minutos, processo respondendo.
+
+**PRIMEIRO BETA: FAIL. MERGE NAO EXECUTADO.** O gate 5/15 continua aberto
+com um defeito novo, e a autorizacao de merge era condicionada a execucao
+real validada. Estado candidato, nao oficial.
 
 ## Governanca e recuperacao
 

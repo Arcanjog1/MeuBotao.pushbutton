@@ -1,0 +1,22 @@
+﻿# DURANTE o congelamento | 2026-09-10 14:43:13.252 | pid=26012
+# procCPU=157.484s threads=93 WS=747MB Responding=True
+# alvos conhecidos: MainThread=26316  worker=19324
+26316    cpu=    93.156ms estado=Wait       espera=UserRequest      prio=12  <<< MainThread
+23880    cpu=     3.234ms estado=Wait       espera=UserRequest      prio=11  
+23716    cpu=     1.672ms estado=Wait       espera=Unknown          prio=11  
+24408    cpu=       875ms estado=Wait       espera=UserRequest      prio=11  
+23924    cpu=       609ms estado=Wait       espera=UserRequest      prio=13  
+22556    cpu=       547ms estado=Wait       espera=UserRequest      prio=8   
+22160    cpu=       516ms estado=Wait       espera=ExecutionDelay   prio=10  
+24744    cpu=       484ms estado=Wait       espera=UserRequest      prio=8   
+23284    cpu=       484ms estado=Wait       espera=UserRequest      prio=8   
+23892    cpu=       453ms estado=Wait       espera=UserRequest      prio=8   
+4824     cpu=       422ms estado=Wait       espera=UserRequest      prio=8   
+21092    cpu=       406ms estado=Wait       espera=UserRequest      prio=8   
+# --- alvos especificos ---
+26316    cpu=    93.156ms estado=Wait       espera=UserRequest
+19324    cpu=        31ms estado=Wait       espera=UserRequest
+﻿# tres snapshots com ~15s de intervalo - deadlock estavel ou progresso lento?
+#1 14:44:05.924 procCPU=158,688s threads=91 rodando=0 main(26316)=94.281ms/Wait worker(19324)=31ms/Wait
+#2 14:44:21.099 procCPU=159,484s threads=93 rodando=0 main(26316)=94.969ms/Wait worker(19324)=31ms/Wait
+#3 14:44:36.350 procCPU=160,172s threads=93 rodando=0 main(26316)=95.531ms/Wait worker(19324)=31ms/Wait
