@@ -136,6 +136,31 @@ anterior não fechar o trecho:
   novo, a partir da posição REAL de cada B19 já lançado, se ele está perto
   de uma amarração (nó L/T/X, ponta ou meio de parede) — e bloqueia a
   criação da parede se estiver (`HALF_BLOCK_NEAR_TIE`).
+- **EXCEÇÃO APROVADA (2026-09-05, `CR-BLOCK-B19-RESIDUAL-FILL-
+  IMPLEMENTATION`, ver seção 35)** — decisão humana explícita do usuário,
+  registrada aqui por obrigação da seção "Atualização obrigatória das
+  regras de modulação" do `CLAUDE.md`: a proibição "B19 só encosta em
+  ponta aberta, nunca perto de amarração" descrita acima é a
+  **INTERPRETAÇÃO ESTRITA histórica** e CONTINUA valendo como regra geral
+  — mas o corpus humano aprovado (TGD/TP1, 259 ocorrências medidas em
+  `docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md`) mostra uma exceção
+  sistemática e legítima que a interpretação estrita não cobria: **B19
+  PODE fechar um trecho residual de 15-20cm ADJACENTE a uma peça de
+  amarração de nó (B34/B54) já presente e ÍNTEGRA NA MESMA FIADA** —
+  nunca sendo ele mesmo a peça de amarração, nunca ocupando o ponto físico
+  do nó da OUTRA ponta, nunca substituindo B34/B54. Fora dessa faixa
+  (15-20cm) e fora dessa condição (peça de nó real já formada na mesma
+  fiada), a proibição estrita de sempre continua valendo — **não foi
+  liberado B19 genericamente perto de nó, nem por comprimento total de
+  parede, nem por projeto/wall_idx**. Implementado como reparo pós-hoc
+  isolado (`repair_b19_residual_fill`, `nuvem/core/engine/wall_stepper.py`)
+  — nunca uma mudança na regra de geração em si (a proibição incondicional
+  "nunca no meio de um trecho" e a regra de ponta aberta acima **não foram
+  tocadas**). A rede de segurança `HALF_BLOCK_NEAR_TIE` foi refinada (não
+  desligada) para distinguir os dois casos só por prova geométrica
+  construtiva (`placement_reason == "B19_RESIDUAL_FILL"`, marcado só
+  depois de o candidato passar todos os hard gates) — ver seção 35 para o
+  relatório completo, os hard gates e a medição contra TGD/TP1/Piloto.
 
 ### Regra dos compensadores/pastilhas (C09/C04)
 
@@ -254,6 +279,74 @@ geometria (mover abertura / crescer a boneca) antes.
 Dois B54 a 90°, ambos centrados no ponto do nó, células centrais
 alinhadas (`validate_x_intersection`). Cobre tanto o cruzamento no meio
 de duas paredes contínuas quanto o caso raro de 4 pontas coincidindo.
+
+### REGRA OBRIGATÓRIA: identidade de fiada usada para VALIDAR o encontro
+(não é regra de construção do solver — CR-V1, 2026-09-07)
+
+Isto **não muda** nenhuma regra de L/T/X acima nem nenhum critério de
+B54/B34 do solver. É sobre como o **benchmark** (`nuvem/benchmark/
+validators/validate_junctions.py`) decide, DEPOIS que as peças já
+existem, se duas paredes de um mesmo nó estão amarradas na mesma fiada.
+
+**O bug corrigido.** O validador agrupava as fiadas de um nó pelo
+**índice ordinal** `row["row"]` — a posição da fiada na pilha daquela
+parede, não a cota. Duas paredes que chegam ao mesmo nó com pilhas de
+tamanhos diferentes (meia-fiada de peça CORTADA, `base_z_cm` diferente)
+têm o **mesmo índice apontando para cotas diferentes**: o validador
+comparava fiadas fisicamente distintas só porque tinham o mesmo número
+de ordem, e acusava `JUNCTION_MISSING_BINDING` numa alvenaria
+perfeitamente amarrada.
+
+**A regra corrigida:**
+
+1. A identidade de fiada, para fins de comparação **entre paredes
+   diferentes** do mesmo nó, é `row["elevation_cm"]` (a cota física),
+   agrupada com a mesma tolerância que o motor já usa para juntar peças
+   em fiada por cota Z (`model.COURSE_Z_TOLERANCE_CM = 2,0cm`,
+   `extract/reconstruct.py:group_by_course`) — nenhuma tolerância nova
+   foi criada.
+2. "Faltou amarração" só é afirmável quando **pelo menos duas paredes**
+   do nó têm fiada registrada (com peça ou não) naquela cota — uma
+   banda presente numa única parede é dado incompleto **daquela parede**
+   (ela pode não ter curso nenhum naquela altura), não uma acusação
+   comparável de amarração faltando na vizinha.
+3. O índice ordinal continua existindo como metadado de apresentação
+   (`row`, `rows_by_wall` no achado), nunca mais como chave de
+   comparação entre paredes.
+
+**Como foi descoberto.** Medido no corpus real durante a reconciliação
+independente do contrato de avaliação (CR-B,
+`docs/BENCH_OPENING_RECONSTRUCTION_B_INDEPENDENT_RECONCILIATION.md`,
+§3): 236 de 373 achados de `JUNCTION_MISSING_BINDING` do gabarito de
+hoje (SEM nenhum corte) já nasciam de um índice ordinal apontando para
+mais de uma cota (63%). Reprodutor mínimo determinístico:
+`nuvem/benchmark/future_cr_preparation/
+cr_v1_junction_validator_fidelity/repro_junction_row_unit.py`.
+
+**Efeito medido, STATE_R → STATE_C (candidato CR-B, sem tocar gabarito
+oficial nem solver):** `JUNCTION_MISSING_BINDING` por índice ordinal
+(defeito) ia de +49 para +10 (identidade estrita — cota em ≥2 paredes),
+igual à classificação independente: 39 dos 49 eram defeito do validador
+(some com o fix), 10 são mudança legítima de unidade de avaliação (nós
+recém-registrados pela fragmentação T→L do candidato, 0 defeito
+físico novo). Nenhum outro código de achado (`COVERAGE_*`, `PRISM_*`,
+`COMPENSATOR_*`, `OPENING_*`, `JUNCTION_NOT_ALTERNATING`,
+`JUNCTION_HALF_BLOCK_ADJACENT`) mudou de valor com este fix — conferido
+por `reconcile_by_physical_identity.py` nos dois projetos do corpus
+(TGD e TP1). **STATUS: CORRIGIDO** (CR-V1, `validate_junctions.py`).
+
+**Pendência relacionada, ainda NÃO corrigida (fora do escopo desta
+CR — pertence à CR-S1):** o mesmo nó em que uma parede passa a
+**terminar** (nó `L`) em vez de **atravessar** (nó `T`) faz o **solver**
+de produção parar de alternar a amarração entre fiadas — a pessoa
+alterna corretamente nas duas topologias, o solver alternava na
+topologia antiga e para de alternar na nova (medido rodando o solver de
+produção sobre `input_roundtrip.json`/`input_candidate.json` do
+candidato CR-B, ocupação ponto a ponto, sem depender do agrupamento do
+validador — reprodutor `repro_solver_l_node_alternation.py`, mesma
+pasta). É defeito real do **solver**, não do validador, e não foi
+tocado por esta CR. **PADRÃO MEDIDO — DOCUMENTADO, pendência de código
+aberta (CR-S1).**
 
 ## 6. Limitações conhecidas (não são bugs, são escopo pendente)
 
@@ -758,11 +851,6 @@ escrevem de verdade no modelo (`create_building_blocks`,
 
 - **Status**: CONFLITO ABERTO — não implementar nenhum dos dois lados
   até resolver.
-- **MEDIÇÃO MAIS RECENTE: ver seção 30.7** (2026-09-09, 651 paredes
-  agrupadas pelo parâmetro `Parede` do próprio projeto). A taxa subiu de
-  39,4% para **71,4%** e apareceu um mecanismo alternativo identificado
-  (encunhamento com bloco cortado de 9 cm até a laje). **O conflito
-  continua aberto** — 30.7 não o resolve, só o mede melhor.
 - **Hipótese do usuário**: toda parede deve ter canaleta na última fiada
   do topo, independentemente de aberturas.
 - **Medição real**: testando a fiada mais alta de 221 linhas de parede
@@ -816,6 +904,67 @@ usuário pediu e que **ainda não foram medidos**:
   1 projeto só, TORRE EASY-LO-R00 — ver preâmbulo desta seção).
 - Persistir os dumps fiada-a-fiada usados nesta análise em
   `diagnosticos/`, hoje só existem no histórico da conversa.
+
+### 10.9 — Detector de aberturas reconstruídas: tolerância de identidade não define geometria (CR-BENCH-OPENING-RECONSTRUCTION-A)
+
+- **Status**: IMPLEMENTADO — `nuvem/core/engine/opening_audit.py::detect_
+  wall_openings_from_courses` (PR #22). Registro de contrato já
+  implementado e testado, não regra de domínio nova.
+- **Regra**: a tolerância de desencontro de junta entre fiadas
+  (`OPENING_RUN_EDGE_MATCH_TOLERANCE_CM`, ~15cm — o mesmo valor medido na
+  seção 10.6, ainda **PADRÃO OBSERVADO AINDA NÃO CONFIRMADO** como
+  constante de domínio, e esta seção não muda esse status) decide **só
+  identidade** de abertura entre fiadas ("o vazio desta fiada é a mesma
+  abertura do vazio da fiada anterior?") e **nunca** a geometria gravada da
+  jamba. A geometria gravada (`x_range`) é o **consenso** — o intervalo
+  comum aos vazios OBSERVADOS em todas as fiadas do trecho
+  (`max(inícios), min(fins)`) — e o desacordo entre fiadas é registrado
+  (`jamb_spread_cm`, `x_range_envelope`), nunca absorvido em silêncio.
+- **Distinção obrigatória entre proveniências** — não confundir:
+  - `MEASURED`: abertura com `source_element_id`, proveniência
+    **independente** do Revit. Este detector **nunca** produz este valor.
+  - `RECONSTRUCTED_CONSENSUS`: o intervalo comum observado entre fiadas.
+    **NÃO EQUIVALE A `MEASURED`** — é geometria reconstruída a partir do
+    layout de blocos, não confirmação de que ali existe de fato uma
+    porta/janela nem de suas jambas reais. Um intervalo comum de vazio
+    observado **não prova, por si só**, que exista uma abertura física
+    naquela posição.
+  - `INCONCLUSIVE`: as fiadas do trecho não concordam sobre nenhum vão
+    válido. Casos sem evidência suficiente **não devem ser promovidos a
+    abertura `MEASURED`** nem tratados como abertura confirmada por quem
+    consome — a decisão fica explicitamente em aberto, não é resolvida por
+    suposição do detector.
+- **Motivo**: onde a jamba coincide com um nó T/L, as fiadas alternam
+  entre "reserva de nó vazia" e "peça de amarração atravessa o nó" —
+  diferença de exatamente `B34 − B19 = 34 − 19 = 15,0cm`. Gravar o
+  envelope (união dos vazios) em vez do consenso deixava a tolerância de
+  identidade vazar direto para a largura do vão gravado, produzindo vão
+  maior que qualquer peça de fiada permite (medido: 19 aberturas por
+  projeto, TGD e TP1, com essa assinatura de 15,0cm nas duas jambas).
+- **Onde se aplica**: os dois consumidores atuais de
+  `detect_wall_openings_from_courses` — auditoria de alvenaria já
+  construída (`audit_existing_masonry_openings`, ao vivo) e extração de
+  gabarito (`nuvem/benchmark/extract/reconstruct.py`, ainda não propaga
+  `opening_provenance`/`jamb_spread_cm` para o gabarito — isso é escopo da
+  CR-B).
+- **Exceções**: nenhuma — a regra vale para todo trecho detectado,
+  independente de altura ou tipo (porta/janela).
+- **Prioridade**: **REGRA OBRIGATÓRIA** — implementada e testada (44
+  testes, `tests/test_opening_reconstruction_cr_a.py`). Não promove o
+  valor de 15cm da seção 10.6 a constante de domínio, e não altera a regra
+  de amarração em L/T/X descrita nas seções 1-9 deste documento.
+- **Impacto na modulação**: hoje, delta zero no solver dos 3 projetos
+  (gabarito congelado não chama o detector) — o efeito só aparece se o
+  gabarito for regerado (CR-B, não iniciada, decisão pendente do usuário).
+- **Desvio conhecido, não resolvido por esta regra**: 4 aberturas
+  reconstruídas do corpus (TGD `W082`; TP1 `W029`, `W040`, `W072`) têm
+  deslocamento de centro de 0,06cm por causa de uma coordenada fracionária
+  de extração (`~0,12cm` de desencontro entre fiadas, abaixo da tolerância
+  de identidade mas acima do gate de centro de 0,01cm) — nenhuma das 4 tem
+  `source_element_id`/abertura `measured` correspondente no gabarito
+  congelado. Causa raiz é da **extração**, não deste detector, e continua
+  em aberto (ver `docs/BENCH_OPENING_RECONSTRUCTION_A_IMPLEMENTATION.md`
+  §5 e `docs/BENCH_OPENING_RECONSTRUCTION_A_INDEPENDENT_REVIEW.md` §3).
 
 ## 11. Regra #1 — alinhamento vertical obrigatório entre fiadas (2026-08-25)
 
@@ -954,6 +1103,17 @@ usuário pediu para "penalizar fortemente". Diferente das checagens de
 faixa repetitiva (que exigem um padrão em várias fiadas), esta dispara
 com uma ÚNICA ocorrência — a regra #2 é uma proibição incondicional por
 peça, não uma busca por padrão.
+
+**Refinamento aprovado (2026-09-05, `CR-BLOCK-B19-RESIDUAL-FILL-
+IMPLEMENTATION`, seção 35)**: esta rede de segurança continua bloqueando
+QUALQUER B19 perto de amarração, **exceto** quando o próprio candidato já
+foi construído e validado pelo reparo `repair_b19_residual_fill` como fill
+residual legítimo — identificado só pelo `placement_reason ==
+"B19_RESIDUAL_FILL"` (nunca por distância genérica; essa marca só existe
+depois que o candidato passou TODOS os hard gates do reparo contra um
+rebuild completo). Qualquer B19 com outro `placement_reason` perto de uma
+amarração continua bloqueado exatamente como antes — nenhuma mudança de
+comportamento para o resto do motor.
 
 ### 11.7 — Causa-raiz do bug real "118/128 paredes reprovadas": geração de
 apenas 2 layouts fixos ("A"/"B") repetidos para sempre, contra uma
@@ -3866,10 +4026,14 @@ Coberto por teste permanente (`tests/test_block_bonding.py`):
 
 ### 27.7 NECESSIDADE DE ESCOPO ADICIONAL — as BANDAS de abertura fragmentam a memória entre fiadas
 
-- **Status**: **DIAGNOSTICADO — pendência de código aberta, FORA do escopo
-  do `CR-BLOCK-01`** (exige alterar `solve_building_blocks_all_courses`
-  em `core/wall_modeling.py`, arquivo que o CR desta branch não autoriza
-  escrever).
+- **Status**: **IMPLEMENTADO pela `CR-G12` (2026-09-08)** — ver seção 39.4
+  e `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md`. Antes era *"DIAGNOSTICADO
+  — pendência de código aberta, FORA do escopo do `CR-BLOCK-01`"* (exigia
+  alterar `solve_building_blocks_all_courses` em `core/wall_modeling.py`,
+  arquivo que aquele CR não autorizava escrever); a `CR-G12` autorizou e
+  fez exatamente essa alteração. **A correção proposta abaixo deixou de
+  ser proposta e passou a ser o comportamento de produção**
+  (`CROSS_BAND_JOINT_PROPAGATION_ENABLED = True`).
 - **O achado**: `solve_building_blocks_all_courses` agrupa as fiadas
   físicas em **bandas** por conjunto de aberturas ativas
   (`_group_course_indices_by_opening_band`) e chama
@@ -3997,10 +4161,1950 @@ explicitamente pelo usuário cria uma transação no Revit.
    quantidade de elementos modificados, e exibir a justificativa técnica em
    linguagem de obra (por exemplo, "mover janela 2 cm para liberar B34 na
    jamba").
+## 30. `CR-BLOCK-ARM-ROLE-INVARIANCE` — o papel `course_a`/`course_b` num
+encontro L/T/X nunca pode fazer uma parede perder uma família inteira de
+fiadas (2026-09-03)
+
+NOTA (2026-09-04, `CR-BLOCK-ARM-ROLE-HUMAN-POLICY`): esta seção foi
+renumerada de "28" para "29" ao integrar `CR-BLOCK-ARM-ROLE-*` (PR #9,
+SHAs `963aa9b`/`d813f45`/`77bda14`) numa branch derivada de uma `main`
+que já tinha sua própria seção 28 (recálculo incremental do editor
+externo, acima). Nenhum conteúdo foi alterado, só a numeração do
+heading e das subseções (28.1→29.1 ... 28.7→29.7) para eliminar a
+colisão.
+
+### 30.1 REGRA OBRIGATÓRIA — o papel do braço num nó é bookkeeping, não
+geometria: uma parede não pode perder `course_a` OU `course_b` por causa
+dele
+
+Contexto: `_l_corner_wall_pair`/`solve_l_corner` (`wall_stepper.py`) lêem
+`node["arms"][0]`/`[1]` para decidir qual das duas paredes de um
+`L_CORNER` simétrico recebe a peça `course_a` (fiadas pares) e qual recebe
+`course_b` (fiadas ímpares). Essa ordem `arms[0]`/`[1]` vem de
+`wall_pairing.py` (hoje: ordem de enumeração das paredes de entrada —
+`build_wall_graph`/`_wall_node_arms` percorre `walls_to_create` em ordem;
+uma futura ordenação canônica por identidade geométrica, se/quando
+`wall_pairing.py` ganhar uma, teria exatamente o mesmo efeito aqui,
+confirmado neste CR sem tocar `wall_pairing.py`). **Trocar qual parede é
+`wall_a`/`wall_b` só pode, no máximo, ESPELHAR o padrão da amarração
+(seção 30.3 abaixo, custo já aceito) — nunca fazer uma parede ficar com
+ZERO peças numa das duas famílias.**
+
+**Causa-raiz medida, com um caso real totalmente instrumentado**
+(`W042`/TGD, `wall_idx` 41, torre_easy_lo_r00_tgd): esta parede tem um
+`L_CORNER` em CADA ponta — um nó com `wall1` (arms=[(1,0),(41,1)]), outro
+com `wall50` (arms=[(41,0),(50,0)]). Cada um desses DOIS nós decide,
+**de forma totalmente independente do outro**, qual das duas paredes ali
+recebe `course_a`/`course_b`. Não há NADA no código que force os dois nós
+da MESMA parede a alternar (`course_a` numa ponta, `course_b` na outra) —
+é perfeitamente possível (e medido, ao vivo, com a ordem de `arms` que
+`wall_pairing.py` devolve hoje) que os DOIS nós, cada um agindo sozinho,
+deem à `W042` o MESMO papel (`course_b`) nas duas pontas. Quando isso
+acontece, a família OPOSTA (`course_a`, as fiadas pares) fica sem NENHUM
+candidato de nó nesta parede — e o preenchimento comum (`solve_wall_free_
+fill`) também falhava em fechar sozinho o trecho todo (ver 29.2), levando
+a `COVERAGE_MISSING_ROW` em TODAS as fiadas pares da parede (medido: 8/17
+fiadas com bloco, as 9 pares 100% ausentes).
+
+Reproduzido de forma independente e determinística: trocar `arms[0]`/`[1]`
+de UM SÓ dos dois nós (sem tocar `wall_pairing.py`, só manipulando a lista
+`nodes` em memória depois de `build_wall_graph`) muda a cobertura de
+`W042` de 8/17 para 17/17 fiadas — mesma geometria física, só o papel do
+nó mudando. Generaliza para `W022`/`W093` (TP1) e para o mecanismo
+citado em `PRISM_CONTINUOUS_JOINT` do piloto (nó de `W011`), todos com o
+mesmo padrão: duas paredes com um nó de amarração em cada ponta, papel
+decidido nó a nó sem alternância forçada.
+
+- **Status**: DOCUMENTADO — fix parcial IMPLEMENTADO (ver 29.2). Testes
+  sintéticos permanentes em `tests/test_block_arm_role_invariance.py`
+  (não tocam `wall_pairing.py` — manipulam `node["arms"]`/
+  `node["crossing_walls"]` diretamente, provando o consumidor
+  `wall_stepper.py` robusto a QUALQUER ordem, hoje ou futura).
+
+### 30.2 REGRA OBRIGATÓRIA — a fronteira "emprestada" de uma peça de nó
+que pertence à parede VIZINHA precisa reservar um múltiplo de
+`PIER_MODULE_CM`, nunca a extensão exata da peça
+
+Causa mecânica de POR QUE a "família ausente" acima também fazia o
+preenchimento comum (não só a peça do nó) falhar: `_index_node_
+candidates_by_wall_end` (por bom motivo — ver seção 8/13, evitar colisão
+com o corpo físico da peça de amarração) reserva, em CADA ponta de
+parede, a extensão da peça de encontro que ocupa aquele espaço — mesmo
+quando essa peça pertence à parede VIZINHA (projetada no eixo desta
+parede). A peça PRÓPRIA de uma parede num nó (`_asymmetric_bond_origin_
+and_axis`, calibrada a partir do ponto/eixo desta mesma parede) fecha o
+módulo de 5cm (`PIER_MODULE_CM`) por construção; a projeção da peça da
+parede VIZINHA (um retângulo quase sempre fora de eixo, medido: ~0,26cm a
+~2,26cm de folga em relação ao módulo mais próximo, no caso real `W042`)
+**normalmente não fecha** — e como o preenchimento contínuo (`OPENING_
+STRATEGY_CONTINUOUS_FIRST`) resolve o trecho de nó a nó como "tudo ou
+nada" quando não há abertura para servir de ponto de quebra, essa
+fração de cm sobrando derrubava o trecho INTEIRO (não só a borda).
+
+- **Fix IMPLEMENTADO** (`wall_stepper.py`,
+  `_node_boundary_module_snap_cm`/`_index_node_candidates_borrowed_by_
+  wall_end`): quando o trecho falha em fechar SÓ por causa dessa fração
+  de módulo, e a fronteira em questão vem de uma peça EMPRESTADA (nunca
+  da peça própria — essa continua tratada como hoje, uma falha real de
+  comprimento, `NON_MODULAR_WALL` legítimo), a reserva é arredondada PARA
+  DENTRO (mais reserva, nunca menos — sem risco novo de colisão) até o
+  próximo múltiplo de `PIER_MODULE_CM`.
+- **Escopo do fix, restrito de propósito** (medido ao vivo contra
+  regressão real no benchmark, ver 29.4): só ativa quando (a) a parede
+  não tem NENHUMA abertura própria e a parede DOADORA da peça emprestada
+  também não; (b) o trecho é a parede INTEIRA (nó-a-nó, sem meio-de-
+  parede no caminho); (c) esta família não tem NENHUMA peça de nó
+  própria em NENHUMA ponta desta parede (a família estaria total e
+  legitimamente ausente sem o arredondamento); (d) a família OPOSTA desta
+  MESMA parede tem uma peça de nó própria de verdade (o padrão exato que
+  `COVERAGE_ROW_MOSTLY_EMPTY` descreve — "família ausente numa parede que
+  tem outras fiadas cheias" — nunca ativa numa parede em que as duas
+  famílias já eram emprestadas). Fora desse escopo, o trecho continua
+  `NON_MODULAR_WALL`, reportado normalmente (seção 15 do prompt do CR:
+  "se a fiada realmente não couber por geometria, isso continua
+  permitido").
+
+### 30.3 PADRÃO OBSERVADO, AINDA NÃO CORRIGIDO — troca de papel simétrica
+é aceita como espelhamento inofensivo (custo já conhecido)
+
+Confirma o que já estava registrado antes deste CR: quando um `L_CORNER`
+simétrico troca `arms[0]`/`[1]`, o efeito NORMAL (a maioria dos casos,
+inclusive medido em geometria sintética redonda — sem o ruído de CAD que
+o 29.1/29.2 exigem) é só espelhar qual parede desenha o padrão em qual
+fiada, sem perda nenhuma. `wall_pairing.py` não precisa (e não deve, por
+este CR) tentar "preservar" o papel antigo — ele nunca teve significado
+geométrico (saía da ordem da lista de entrada). O problema tratado nas
+seções 29.1/29.2 só aparece quando (a) a mesma parede tem DOIS nós desse
+tipo, cada um decidindo sozinho, e por coincidência escolhem o mesmo
+papel; e (b) a geometria real (coordenadas de CAD, não redondas) faz a
+fronteira emprestada cair fora do módulo de blocos.
+
+### 30.4 CONFLITO CONHECIDO, NÃO RESOLVIDO — o fix de 30.2 recupera
+`COVERAGE_MISSING_ROW` mas ainda troca parte dele por `COVERAGE_ROW_
+MOSTLY_EMPTY` no TGD real (regressão crítica medida, sem solução limpa
+dentro do escopo autorizado deste CR)
+
+Medido no benchmark real (`torre_easy_lo_r00_tgd`, contra o próprio
+`origin/main` sem nenhuma alteração, não contra baseline.json desatualizado):
+
+| métrica | main (limpo) | com o fix (29.2) | delta |
+|---|---|---|---|
+| `COVERAGE_MISSING_ROW` | 265 | 145 | **-120** |
+| `COVERAGE_ROW_MOSTLY_EMPTY` | 171 | 309 | **+138** |
+| `OPENING_BLOCK_CROSSES_JAMB`/`INSIDE_DOOR` | 147 / 43 | 147 / 43 | 0 |
+| total de achados (todos os códigos) | 5307 | 5430 | +123 |
+
+Mecanismo do resíduo (medido, não suposto): algumas paredes do TGD têm as
+DUAS famílias emprestadas em nós DIFERENTES, um com parede doadora SEM
+abertura (rescatável pela regra 29.2) e outro com doadora COM abertura
+(fora do escopo — ver 29.2, restrição (a)). O resultado: a família
+rescatável fecha 100%, a outra continua 0% (comportamento idêntico ao de
+antes deste CR — não piorou o que já era genuinamente `NON_MODULAR_WALL`/
+`COVERAGE_WALL_NOT_MODULATED` nessas paredes) — mas o validador
+`COVERAGE_ROW_MOSTLY_EMPTY` (ver `validators/validate_wall_coverage.py`,
+"fiada quase vazia numa parede que tem outras fiadas cheias") passa a
+enxergar exatamente esse padrão, onde antes a parede tinha as DUAS
+famílias ruins e caía noutro código (`COVERAGE_MISSING_ROW`/`COVERAGE_
+PARTIAL_WALL`/`COVERAGE_WALL_NOT_MODULATED`). Não é uma parede NOVA
+quebrada — é uma RECLASSIFICAÇÃO de um defeito que já existia (confirmado
+achado a achado, nenhuma parede nova aparece na lista de `COVERAGE_ROW_
+MOSTLY_EMPTY` que não tivesse ALGUM achado de cobertura antes) —, mas o
+TOTAL de achados sobe (+123), então não é um resultado limpo.
+
+- **Fix completo exigiria**: forçar ALTERNÂNCIA de papel entre os DOIS
+  nós de uma mesma parede (nunca os dois com o mesmo papel) — um
+  problema de 2-coloração num grafo onde cada `L_CORNER`/`X_INTERSECTION`
+  de 2 braços é uma aresta entre duas paredes-vértice; ciclos de
+  comprimento ímpar (topologicamente possíveis) tornam alternância
+  PERFEITA impossível em geral, exigindo um critério de desempate
+  determinístico e explicitamente documentado para esse caso residual.
+  Investigado, não implementado — mudança de escopo maior que o
+  autorizado para este CR (só `wall_stepper.py`, sem tocar
+  `wall_pairing.py`, sem "resolver todo o prisma"/toda a cobertura).
+- **Recomendação**: CR próprio, mesmo espírito do `CR-BLOCK-NODE-FILL-
+  JOINT` já aberto — ver o relatório final
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md`.
+
+### 30.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
+entre os dois nós de UMA MESMA parede é resolvida por coordenação
+determinística (2-coloring), não por reserva de fronteira
+(`CR-BLOCK-ARM-ROLE-CONSISTENCY`, superam 29.2/29.4, 2026-09-03)
+
+A previsão feita em 29.4 ("Fix completo exigiria... um problema de
+2-coloração num grafo onde cada `L_CORNER`/`X_INTERSECTION` de 2 braços é
+uma aresta entre duas paredes-vértice") **foi implementada e confirmada
+correta** — mas a formalização do contrato (feita ANTES de assumir
+2-coloring, por exigência explícita do usuário) mostrou que a hipótese de
+29.4 sobre ciclos ímpares estava **incompleta**: ciclos de comprimento
+ímpar NÃO tornam a alternância perfeita impossível. Prova (por
+telescopagem da paridade XOR ao redor de qualquer ciclo, ver
+`docs/BLOCK_ARM_ROLE_INVARIANCE.md`, seção "Ciclos e casos impossíveis"):
+como cada nó `L_CORNER` de 2 braços atribui, por construção, EXATAMENTE
+um papel 0 e um papel 1 às suas duas arestas, qualquer componente do
+grafo de coordenação tem grau ≤ 2 (caminho ou ciclo simples), e a soma
+XOR das paridades ao redor de QUALQUER ciclo — par OU ímpar — é sempre 0.
+**Não existe caso residual/conflito nesta topologia** — o critério de
+desempate determinístico previsto em 29.4 foi implementado mesmo assim
+(`_coordinate_arm_role_nodes`, `wall_stepper.py`), mas é código morto
+para a regra de elegibilidade atual (só dispara se a elegibilidade for
+estendida no futuro a nós com mais de 2 braços participando).
+
+- **Mecanismo**: `_coordinate_arm_role_nodes(nodes)` monta um grafo onde
+  vértice = nó `L_CORNER` de 2 braços, aresta = parede que toca
+  EXATAMENTE 2 desses nós, com peso de paridade calculado a partir de
+  como cada nó já referencia a parede em `arms[0]`/`[1]`. Resolve por
+  BFS/2-coloring, com raiz e ordem de visita SEMPRE por identidade
+  geométrica (`point.X, point.Y`, nunca índice de lista) para não
+  depender da ordem de `nodes`/`walls`/`arms` de entrada. Quando um nó
+  precisa trocar de papel, `node["arms"]` é invertido antes do restante
+  de `solve_all_intersections` rodar — todo consumidor downstream já vê
+  o papel coordenado.
+- **Fix de 29.2 (reserva de fronteira "emprestada" arredondada) foi
+  REMOVIDO do código de produção** — a coordenação de papéis resolve a
+  causa raiz diretamente (as duas pontas da parede nunca mais escolhem
+  papéis contraditórios), então a reserva-de-módulo deixou de ser
+  necessária. Comparação empírica no benchmark real confirmou que
+  coordenação sozinha supera qualquer combinação testada de
+  coordenação+reserva nos dois eixos (`COVERAGE_MISSING_ROW` e
+  `COVERAGE_ROW_MOSTLY_EMPTY` simultaneamente) — a regressão de
+  `COVERAGE_ROW_MOSTLY_EMPTY` (+138 no TGD) registrada em 29.4 **não
+  ocorre mais**: medido no mesmo projeto, `MOSTLY_EMPTY` cai de 171
+  (`origin/main` limpo) para 153 (coordenação, sem a reserva de 29.2).
+- **Status**: 29.2 e o número "+138 MOSTLY_EMPTY" de 29.4 estão
+  SUPERADOS — mantidos no texto acima por registro histórico (nunca
+  apagar regra anterior em silêncio), mas não representam mais o
+  comportamento do código. A regra vigente é esta (29.5). Detalhe
+  completo, gate a gate, com números reais de TGD/TP1/piloto:
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` (relatório
+  `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 29.6).
+
+### 30.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
+pode dessincronizar a alternância do vão menor (B34/B54) entre fiadas em
+paredes cujas duas pontas são `L_CORNER` (`DOCUMENTADO — pendência de
+código aberta`, 2026-09-03)
+
+Medido no benchmark real ao comparar `origin/main` limpo contra o estado
+com a coordenação de papéis (29.5) aplicada: `PRISM_CONTINUOUS_JOINT`
+(seção 11, regra #1 — junta vertical alinhada entre fiadas consecutivas,
+quebra a alternância do vão menor das peças B34/B54) aparece em paredes
+que ANTES não tinham nenhum achado desse código: 8 paredes no TP1
+(`W010, W021, W037, W041, W061, W062, W076, W092`, com TODAS as junções
+consecutivas de fiada, 0 a 16, alinhadas em 0.00cm de desencontro — perda
+TOTAL de stagger ao longo da altura da parede) e um padrão análogo em 2-3
+paredes do TGD (`W003`, `W137`, `W117` parcial). Diferente do achado
+"benigno" já documentado (mesma junção W039/W041 do TP1, que só espelha
+de paridade — linhas ímpares↔pares — sem ser um defeito novo), este
+padrão aparece em paredes que simplesmente não tinham NENHUM problema de
+prisma antes.
+
+- **Hipótese original, REFUTADA** (`CR-BLOCK-ARM-ROLE-PRISM-STAGGER`,
+  2026-09-03): "ao trocar `node['arms']` numa ponta `L_CORNER`, a
+  coordenação muda qual parede recebe a peça de canto assimétrica
+  (B34/B54) mas a regra fixa `letter = par/ímpar` não é ajustada em
+  conjunto, então o vão menor fica do lado errado" — **não é isto**.
+  Medido diretamente: a posição/orientação (`origin_world`, `x_dir`,
+  `rotation_deg`) da peça de canto em cada nó é IDÊNTICA antes e depois
+  da troca de papel (só o RÓTULO course_a/course_b muda) —
+  `_asymmetric_bond_origin_and_axis` nunca lê `course`/arms, só a
+  geometria do canto. O vão menor sempre aponta pro lado certo; nunca
+  foi a causa.
+- **Causa raiz real, PROVADA** (ver `docs/BLOCK_ARM_ROLE_INVARIANCE.md`
+  para a cadeia completa e a tabela de hipóteses H1-H7): a junta entre a
+  peça de canto de um nó (posicionada por `solve_l_corner`, fora do
+  preenchimento comum) e o primeiro/último bloco do preenchimento
+  adjacente NUNCA foi rastreada pelo mecanismo de desencontro de junta
+  vertical (`course_a_joint_positions_cm`/`_pier_layout_avoiding_joints`,
+  seção 6) — só juntas INTERNAS ao preenchimento eram contadas, por
+  design documentado na própria `_layout_internal_joint_positions_cm`
+  ("sem contar as juntas de CONTORNO"). Isso era inofensivo enquanto só
+  uma família tinha candidato de nó real num dado encontro; com a
+  coordenação de papel dando às duas famílias um candidato real no MESMO
+  encontro — e ambas escolhendo a MESMA peça (B34, decisão geométrica
+  correta e independente da coordenação) —, a junta de contorno de uma
+  família coincide com a da outra sem que a busca de desencontro jamais
+  soubesse.
+- **Fix IMPLEMENTADO** (`wall_stepper.py`, `_pier_boundary_joint_
+  positions_cm` + `course_a_boundary_joint_positions_cm`/`own_family_
+  boundary_joint_positions_cm`, listas SEPARADAS das internas para não
+  afetar o reparo de abertura `_recut_openings_and_repair`): resolve por
+  completo os casos com liberdade real de composição de preenchimento
+  (2 de 11 paredes regredidas: `W117`/TGD, `W041`/TP1) e reduz
+  substancialmente o total de `PRISM_CONTINUOUS_JOINT` nos dois projetos
+  reais (TGD 691→476, TP1 896→576 — abaixo até do estado anterior a
+  QUALQUER CR desta série), sem retroceder a cobertura ganha por
+  `CR-BLOCK-ARM-ROLE-CONSISTENCY`.
+- **Limite genuíno, não corrigido**: as outras 9 paredes têm o pier
+  cabendo EXATAMENTE 1 bloco (ou, em `W061`/`W062`, uma cadeia de
+  compensadores simétrica) entre a peça de canto e o próximo limite — a
+  posição da junta de contorno é matematicamente fixada pelo comprimento
+  da peça de canto nas duas pontas (`border + BLOCK_JOINT_CM/2`, igual
+  nas duas famílias quando a peça é a mesma), e NENHUMA composição de
+  preenchimento alternativa pode mover isso. A busca agora DETECTA e
+  REPORTA essas 9 coincidências (`alignment_conflicts`, antes escondido
+  pelo filtro `len(layout) > 1`), mas não as elimina — eliminá-las
+  exigiria mudar QUAL peça é escolhida num dos dois nós (ex. B54 em vez
+  de B34), uma mudança na lógica de SELEÇÃO de peça de
+  `solve_l_corner`, mais invasiva e não implementada.
+- **Regressão colateral `OPENING_BLOCK_INSIDE_DOOR` +3 no TGD —
+  CAUSA PROVADA (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03): não é uma
+  invasão física nova. As mesmas 3 paredes (`W045`, `W051`, `W112`), na
+  MESMA fiada 11, já tinham este achado no estado `origin/main` limpo
+  (SHA `7c9a681`), ANTES de qualquer CR desta série — é artefato
+  pré-existente de `opening_active_in_row` (binário: a fiada 11 tem
+  elevação 220–239cm contra uma porta com `head_cm=221` — só 1 dos
+  19cm, 5,3%, está de fato dentro do vão; os outros 94,7% são a verga,
+  onde bloco é fisicamente correto). O fix de prisma só mudou a
+  COMPOSIÇÃO de blocos nessa fiada de fronteira (efeito colateral de
+  segmentos anteriores da mesma parede), fatiando o MESMO intervalo já
+  "invasor" em mais blocos (1-2 achados → 2-3), sem nenhuma parede
+  nova. Não corrigido em produção (decisão explícita: é um problema de
+  medição do benchmark, não do motor) — corrigir de verdade exige
+  regravar `baseline.json` ou graduar `opening_active_in_row` por
+  fração de altura, fora do escopo de `wall_stepper.py`.
+- **Status das 9 paredes restantes**: `DOCUMENTADO — pendência de
+  código aberta`, com evidência humana forte (ver 29.7). Veredito de
+  `CR-BLOCK-ARM-ROLE-RESIDUALS`: BLOQUEADO POR ESCOPO — ver
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para o relatório completo (gates
+  G1-G16).
+
+### 30.7 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — o humano nem sempre
+alterna qual nó ancora qual família; às vezes concentra as duas peças
+de canto na MESMA fiada (`CR-BLOCK-ARM-ROLE-RESIDUALS`, 2026-09-03)
+
+Comparação sistemática das 9 paredes com `PRISM_CONTINUOUS_JOINT`
+residual (29.6) contra o Reference Corpus humano (casamento geométrico
+via `nuvem/benchmark/comparator/match.py`, nunca por `id` — confirmado
+que IDs não são estáveis entre `input.json`/resultado e
+`reference.json`): 8 de 9 têm correspondente humano; nas 8, a fiada par
+e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
+
+- **Paredes curtas** (`W003`, `W076`, `W021`, `W092`, `W061`, `W062`,
+  provavelmente `W137`): o humano dá as DUAS peças de canto (dos dois
+  nós) à MESMA fiada física — a fiada oposta fica sem NENHUMA amarração
+  de nó, só um preenchimento comum solto (caso extremo, `W076`↔`W077`:
+  `B39` de 39cm que nem toca nenhuma das duas pontas da parede). Sem
+  junta de contorno na fiada "vazia", não há nada para coincidir.
+- **Paredes longas** (`W010`, `W037`): o humano mantém as duas âncoras
+  em nós opostos (mesma direção da coordenação atual) mas usa `B34`
+  também como peça de preenchimento comum (não só de canto), numa
+  sequência que nunca sincroniza entre as duas fiadas.
+
+- **Confiança**: `PADRÃO OBSERVADO AINDA NÃO CONFIRMADO` — evidência
+  forte (8/8 concordância) mas estreita (1 topologia: 2 nós L_CORNER de
+  2 braços, mesma peça B34 nas duas pontas; 2 projetos). Não promovido
+  a regra obrigatória.
+- **Conflito com 29.5**: a coordenação determinística atual (29.5,
+  `REGRA OBRIGATÓRIA`) resolve corretamente o defeito ORIGINAL
+  (`COVERAGE_MISSING_ROW`), mas o critério de DESEMPATE que ela usa
+  hoje (geométrico, `_canonical_node_sort_key`) não necessariamente
+  reproduz a escolha humana nestes 9 casos — a hipótese, não verificada,
+  é que o processo humano decide fiada a fiada (evitar coincidência com
+  a fiada JÁ COLOCADA, seja par ou ímpar), não por uma partição global
+  "família A / família B" fixada por parede como a arquitetura atual do
+  solver.
+- **Não implementado**: mudar o desempate da coordenação para permitir/
+  preferir concentrar as duas âncoras na mesma fiada é, em espírito,
+  alterar a POLÍTICA da coordenação — precisa de autorização explícita
+  e verificação ampla (garantir que não reabre o `COVERAGE_MISSING_ROW`
+  original em outro caso) antes de qualquer tentativa. Ver
+  `docs/BLOCK_ARM_ROLE_INVARIANCE.md` para os 9 casos individuais e o
+  caso `W076` detalhado.
+- **ATUALIZAÇÃO (`CR-BLOCK-ARM-ROLE-HUMAN-POLICY`, 2026-09-04)**: a
+  autorização explícita chegou nesta CR seguinte — ver seção 31 abaixo
+  para a causa PROVADA (não mais hipótese), a política formalizada, e o
+  motivo pelo qual a implementação tentada foi revertida antes do commit.
+
+## 31. `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` — causa provada do prisma forçado
+em paredes curtas; política formalizada; implementação tentada e
+REVERTIDA por gap de segurança (2026-09-04)
+
+Continuação direta da seção 30.7 acima, com autorização explícita para
+formalizar/implementar a política. Relatório completo:
+`docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`.
+
+- **CAUSA PROVADA (não mais "padrão observado")**: quando as duas pontas
+  de uma parede usam a MESMA peça de canto (tipicamente `B34`) e o vão
+  restante é curto/constrangido o bastante para que a busca de
+  preenchimento (`_pier_full_search_layout`/`_layout_min_joint_stagger_
+  cm`, já instrumentada por `CR-BLOCK-ARM-ROLE-PRISM-STAGGER` para EVITAR
+  coincidência sempre que existir alternativa) não tenha NENHUMA
+  composição alternativa dentro do vão, a alternância "sempre-diferente"
+  de 29.5 é FORÇADA a produzir a MESMA junta relativa nas duas fiadas —
+  medido: `stagger_cm≈0` em TODAS as 17 fiadas da parede (prisma corrido
+  de altura total), não um caso de fronteira ocasional. Verificado
+  diretamente (não só herdado da seção 30.7) nas 9 paredes residuais via
+  `nuvem/benchmark/validators/validate_prism.py` rodado contra os
+  projetos reais.
+- **Variável causal generalizada** (respondendo à seção 30.7, que ainda
+  chamava a evidência "estreita — 1 topologia, mesma peça B34"): a causa
+  NÃO é "comprimento" nem "B34+B19" especificamente — é **ser uma ARESTA
+  ISOLADA do grafo de coordenação de `_coordinate_arm_role_nodes`**
+  (nenhuma outra parede coordenada toca qualquer um dos dois nós L_CORNER
+  da parede) **combinada com** ausência de composição alternativa no vão
+  livre. Confirma-se com o mesmo mecanismo aparecendo com compensador C09
+  no meio (`W061`/`W062`), não só B34+B19 puro.
+- **Achado novo**: 3 das 9 paredes residuais (`W003`, `W061`, `W062`) têm
+  um nó `T_INTERSECTION` numa das duas pontas, não dois `L_CORNER` — essas
+  paredes NUNCA estiveram sob o controle de `_coordinate_arm_role_nodes`
+  (que só enxerga nós `L_CORNER` de 2 braços); a coincidência nelas vem de
+  `solve_l_corner`/`solve_t_intersection` decidindo o papel de forma
+  totalmente independente, sem NENHUM mecanismo de alternância ou
+  concentração — fora do alcance desta política, registrado como escopo
+  futuro (seção "Próximo passo recomendado" de
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`).
+- **Paredes longas (`W010`/`W037`) são um mecanismo DIFERENTE**: o humano
+  mantém a alternância (não concentra as duas âncoras) e evita a
+  coincidência com uma composição de preenchimento mais rica no trecho
+  livre não ancorado (medido: humano usa `B34+B34` onde o solver usa
+  `B19+B39` no mesmo trecho, deslocando o primeiro joint de 34.5cm para
+  49.5cm) — a causa-raiz exata de por que a busca de preenchimento não
+  escolhe essa composição (poda, desempate, ou nunca gerada) **não foi
+  isolada** nesta sessão; mudar `_coordinate_arm_role_nodes` não ajudaria
+  aqui (a alternância nessas duas paredes já está correta).
+- **Política formal**: ver `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção
+  "Política candidata" — resumo: para uma parede que é aresta ISOLADA do
+  grafo de coordenação E cuja alternância padrão produz junta corrida,
+  é seguro TENTAR a alternativa "mesma família" (por construção, aresta
+  isolada nunca pode afetar a alternância de nenhuma OUTRA parede
+  coordenada), mas só ACEITAR se uma re-solução real (nunca estimativa)
+  confirmar que a junta corrida desaparece E nenhuma parede que fechava
+  antes passa a falhar E nenhuma colisão nova aparece.
+- **Implementação tentada e REVERTIDA**: escrita em
+  `nuvem/core/engine/wall_stepper.py` (`_arm_role_isolated_edges`,
+  `_wall_has_forced_corner_prism`, `try_same_family_corner_role_repair`,
+  `_repair_forced_corner_prism`) — o DETECTOR (arestas isoladas + prisma
+  forçado) foi provado correto contra os projetos reais (identificou
+  exatamente `W021`/`W092`/`W076` no TP1, nenhuma a mais, nenhuma a
+  menos), mas o REPARO (a troca em si) usava uma verificação LOCAL (1
+  salto de vizinhança de nó, machinery de `find_wall_group_shift_fixes`/
+  ETAPA 3C) que não checava colisão — medido ao vivo, isso introduzia
+  colisões reais (`POSITION_OVERLAP` 18→74270 no TP1 quando ativo).
+  Revertido integralmente ANTES de qualquer commit — nenhuma alteração de
+  produção no estado final entregue desta CR.
+- **Status**: `DOCUMENTADO — causa provada, política formalizada,
+  pendência de código aberta` (não `REGRA OBRIGATÓRIA` — nada foi
+  implementado com segurança confirmada). Veredito de
+  `CR-BLOCK-ARM-ROLE-HUMAN-POLICY`: NECESSITA AJUSTE — ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md` para o relatório completo (gates
+  G1-G18) e o próximo passo recomendado (reimplementar o reparo com
+  verificação de colisão real, no estilo mais caro-porém-seguro da ETAPA
+  3C, em vez do resolve parcial de 1 salto).
+- **ATUALIZAÇÃO — continuação SAFE REPAIR (mesma CR, 2026-09-04)**: o
+  gap de colisão acima foi encontrado e CORRIGIDO (causa raiz: duplicação
+  de candidatos de nó no RESOLVE PARCIAL, não a vizinhança de 1 salto em
+  si) — `result["collisions"]` (já calculada, completa, por
+  `process_walls_one_by_one`) foi reutilizada com sucesso como gate,
+  medido: `POSITION_OVERLAP` no TP1 ficou 18→18 (inalterado) com o reparo
+  ativo, 3 paredes (`W021`, `W092`, `W076`) tiveram o prisma forçado
+  eliminado com segurança completa (fechamento + colisão + prisma em
+  vizinhas, as três checadas). Um SEGUNDO gap, de categoria DIFERENTE, foi
+  então descoberto: reparar `W137`/TGD introduz `JUNCTION_NOT_ALTERNATING`
+  (nível 1, `nuvem/benchmark/validators/validate_junctions.py`) em duas
+  paredes vizinhas (`W011`, `W088`) que estavam limpas — mecanismo
+  envolve agrupamento de nó por proximidade física (`NODE_MERGE_
+  TOLERANCE_CM`) que inclui uma TERCEIRA parede (`W090`) e não tem
+  equivalente no grafo interno de `wall_stepper.py` (`node["arms"]`,
+  sempre 2 paredes). Implementação revertida de novo, por completo
+  (não só o candidato de `W137`) — sem um quinto gate que replique esse
+  agrupamento fielmente, não há prova de que os candidatos hoje "limpos"
+  (TP1) continuariam limpos em outro projeto. Ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção "CONTINUAÇÃO — SAFE
+  REPAIR", para o relatório completo desta segunda tentativa.
+- **CORREÇÃO (`CR-BLOCK-ARM-ROLE-JUNCTION-GATE`, 2026-09-04, terceira
+  continuação)**: a atribuição acima ("reparar `W137` introduz
+  `JUNCTION_NOT_ALTERNATING` em `W011`/`W088`") está **ERRADA** — foi
+  produto de uma comparação corrompida por conflito de `git stash` com
+  `score.json`/`reports/*.txt` regenerados. Reproduzido com mapeamento
+  id↔`wall_idx` geométrico e diff de assinatura exato: `W137`
+  (`wall_idx=120`) isolado produz **0** achados de junção novos. Os
+  candidatos que REALMENTE causam a regressão são `wall_idx=7`
+  (=`W090`, causa 1 novo em `W088`, a própria vizinha) e `wall_idx=23`
+  (=`W011`, causa 1 novo na PRÓPRIA `W011`) — nunca um cluster de 3+
+  paredes; sempre um par (parede reparada + vizinha imediata).
+- **CAUSA RAIZ REAL, PROVADA**: não é agrupamento de nó por proximidade
+  (`NODE_MERGE_TOLERANCE_CM`) nem grafo incompleto — é uma
+  **inconsistência de persistência do papel do nó ENTRE BANDAS** de
+  `solve_building_blocks_all_courses` (`wall_modeling.py`, resolve o
+  edifício em bandas de fiadas com o mesmo conjunto de aberturas
+  ativas). `_coordinate_arm_role_nodes` reconstrói o estado alternante
+  do ZERO em cada banda (nenhum estado de decisão manual sobrevive
+  entre bandas); um reparo de aresta isolada, acionado só quando a
+  banda ATUAL mostra prisma forçado, fica ativo nas bandas onde a
+  coincidência ocorre e INATIVO (revertendo para o padrão alternante
+  natural, que é a família OPOSTA) nas bandas onde não ocorre — a MESMA
+  parede acaba com duas convenções internas opostas em fiadas
+  diferentes, o que o validador de junção lê como "não alterna" na
+  fronteira entre as duas convenções. Medido e reproduzido com
+  instrumentação banda-a-banda (8 bandas no TGD, `W090`/`wall_idx=7`
+  como caso de prova).
+- **Correção estrutural provada (não commitada)**: marcador
+  `_arm_role_pinned` nos dois nós de uma aresta isolada ao aceitar um
+  candidato SAME/ALTERNATE, excluído do filtro `eligible` de
+  `_coordinate_arm_role_nodes` — como o reparo só age em arestas
+  ISOLADAS (grau 1, nenhuma outra parede coordenada os toca), excluí-las
+  do grafo de coordenação nunca afeta nenhuma OUTRA parede. Testado em
+  script: zera `JUNCTION_NOT_ALTERNATING` novo nos 5 candidatos
+  elegíveis do TGD (antes: +2; depois: 0) e até melhora
+  `PRISM_CONTINUOUS_JOINT` (79→80 resolvidos, 1→0 novo na própria
+  parede reparada). Fica inteiramente dentro de `wall_stepper.py`
+  (`_coordinate_arm_role_nodes`), sem tocar `wall_pairing.py` nem
+  `wall_modeling.py`.
+- **Achado adicional, fora do escopo desta CR**: verificando o conjunto
+  COMPLETO de validadores (não só junção/prisma/colisão) com o pin
+  ativo, 4 dos 5 candidatos do TGD introduzem `COMPENSATOR_CONSECUTIVE`/
+  `COVERAGE_GAP_IN_ROW`/`COVERAGE_PARTIAL_WALL`/
+  `COVERAGE_ROW_MOSTLY_EMPTY`/`PRISM_STAGGER_BELOW_TARGET` novos na
+  própria parede reparada ou numa vizinha — categorias que os gates
+  hoje autorizados (fechamento via `_wall_ok_map`, colisão global,
+  prisma forçado em vizinha, alternância de junção) não capturam,
+  porque não existe hoje uma função de produção equivalente aos
+  validadores de benchmark para essas categorias. Só `wall_idx=23`
+  (`W011`) passa limpo em TODAS as categorias. Documentado como
+  `DOCUMENTADO — pendência de código aberta` (sexto gate necessário
+  antes de reativar o SAFE REPAIR em produção) — ver
+  `docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md`, seção "CONTINUAÇÃO —
+  `CR-BLOCK-ARM-ROLE-JUNCTION-GATE`", para o relatório completo (gates
+  G1-G18, hipóteses H1-H5 com veredito, tabela de causa por
+  `wall_idx`). Veredito: **NECESSITA AJUSTE**. Nenhuma alteração de
+  produção commitada nesta continuação.
+
+## 32. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
+segurança para candidatos de papel; SAFE REPAIR ATIVADO em produção
+(2026-09-04)
+
+**REGRA OBRIGATÓRIA (nova).** Decisão formalizada nesta CR: um candidato
+de troca de papel `course_a`/`course_b` numa aresta ISOLADA do grafo de
+`_coordinate_arm_role_nodes` só pode ser aceito se uma RE-RESOLUÇÃO
+COMPLETA (nunca estimativa) confirmar, contra o ORIGINAL, por DELTA (nunca
+contagem bruta nem `candidato corrigiu o alvo` sozinho):
+
+1. nenhuma parede que fechava passa a falhar (`_no_wall_regression`);
+2. nenhum par de colisão novo, GLOBAL (`_no_new_collisions`, por
+   assinatura geométrica);
+3. nenhuma parede VIZINHA (nunca a própria alvo) ganha prisma forçado
+   novo (`_no_new_forced_corner_prism_in_neighbors`, reusa
+   `wall_bond_audits`/`continuous_joints` já calculado);
+4. nenhuma sequência nova de compensadores consecutivos em nenhuma
+   parede DIRTY (`_no_new_consecutive_compensators`, reusa
+   `_find_consecutive_compensators`, já produção);
+5. nenhuma fiada de nenhuma parede DIRTY perde comprimento coberto além
+   de uma folga RELATIVA de 10% (ou 5cm, o que for maior) —
+   `_no_new_row_coverage_regression`/`_wall_row_covered_length_cm`
+   (único mecanismo NOVO desta CR).
+
+"DIRTY" = a própria parede da aresta isolada + a parede vizinha em CADA
+um dos dois nós (nunca proximidade por tolerância numérica, nunca um
+cluster de 3+ paredes — medido, ver "Inventário" abaixo).
+
+**Tolerância RELATIVA (não absoluta), motivo medido**: qualquer troca de
+papel isolada realoca a peça de canto de um nó entre a família A e a
+família B da parede VIZINHA — efeito esperado e inofensivo de QUALQUER
+candidato, inclusive o aceitável. Medido ao vivo (TGD, `wall_idx=23`,
+ver "Candidato aceito" abaixo): a fiada que perde o nó cai de 555cm para
+541cm (~2.5%) enquanto a que ganha sobe para 570cm — redistribuição
+balanceada. Uma tolerância absoluta de poucos cm (a primeira versão desta
+função usava `BLOCK_JOINT_CM`) rejeitava esse candidato SEGURO por
+engano — corrigido para 10% relativo (ou 5cm, o que for maior) do
+comprimento ANTES, por fiada.
+
+### Inventário de validadores (G1/G2 desta CR)
+
+Todos os 15 identificadores de erro pedidos (`COVERAGE_*`,
+`PRISM_CONTINUOUS_JOINT`, `PRISM_STAGGER_BELOW_TARGET`,
+`FORBIDDEN_JOINT_ALIGNMENT`, `JUNCTION_*`, `OPENING_BLOCK_*`,
+`COMPENSATOR_CONSECUTIVE`, `POSITION_OVERLAP`) só existem como código
+literal em `nuvem/benchmark/validators/*` — **BENCHMARK-ONLY**. Produção
+já tinha equivalentes PUROS e reutilizáveis para `COMPENSATOR_CONSECUTIVE`
+(`_find_consecutive_compensators`), `POSITION_OVERLAP`/`collisions`
+(`validate_same_course_collision`/`collisions_between`) e prisma forçado
+de altura total (`wall_bond_audits[...]["continuous_joints"]`, já
+calculado por `audit_wall_bond_quality`/`solve_building_blocks_all_
+courses`) — reusados sem duplicação. `COVERAGE_GAP_IN_ROW`/
+`COVERAGE_PARTIAL_WALL`/`COVERAGE_ROW_MOSTLY_EMPTY` não tinham
+equivalente de produção — coberto por um helper NOVO, LOCAL e PURO
+(`_wall_row_covered_length_cm`, sem `OccupancyIndex`/cobertura emprestada
+de amarração — seguro porque usado só em DELTA, nunca como validação
+absoluta). `PRISM_STAGGER_BELOW_TARGET` é **SOFT PREFERENCE** na própria
+taxonomia do benchmark (`LEVEL_PREFERENCE`, nível 2) — não ganhou gate
+dedicado de propósito (candidatos que o pioram junto de um achado HARD
+seguem rejeitados pelo gate HARD correspondente). `JUNCTION_NOT_
+ALTERNATING` não precisou de um sexto gate: prevenido ESTRUTURALMENTE
+pelo marcador `_arm_role_pinned` (ver seção 31 acima) — a causa raiz
+(inconsistência de persistência de papel do nó ENTRE BANDAS) deixa de
+poder acontecer, por construção, em vez de ser detectada depois do fato.
+
+### Persistência entre bandas
+
+`_arm_role_pinned` (proposto na seção 31, agora IMPLEMENTADO): um nó com
+esse marcador fica fora do grafo de `_coordinate_arm_role_nodes`
+inteiramente (`_arm_role_coordination_graph(nodes, respect_pins=True)`).
+Identidade estável = o NÓ (índice em `nodes`, mas o papel em si é
+travado por `node["arms"]`, nunca por posição de lista externa) — como o
+SAFE REPAIR só atua em ARESTAS ISOLADAS (grau 1 nos dois nós), excluí-las
+nunca afeta a alternância de nenhuma OUTRA parede coordenada.
+
+### Arquitetura escolhida
+
+**D (candidato completo + validação final)**, com os gates como helpers
+PUROS compartilhados (arquitetura B) — tudo dentro de
+`nuvem/core/engine/wall_stepper.py`
+(`repair_arm_role_isolated_edges`/`_evaluate_corner_role_candidate`/
+`_arm_role_isolated_edges`/`_set_l_corner_role_bits`/gates). ÚNICA
+exceção, disclosed conscientemente (nunca escondida — seção 12 do pedido
+desta CR): `nuvem/core/wall_modeling.py::solve_building_blocks_all_
+courses` virou um wrapper fino (a função original renomeada para
+`_solve_building_blocks_all_courses_core`) que injeta `rebuild_fn`
+(callback, nunca importado por `wall_stepper.py` — evita import
+circular) — o rebuild multi-banda em si mora ali, não podia ser movido
+sem duplicar `_group_course_indices_by_opening_band`. Nenhum validador de
+benchmark importado em produção (G10).
+
+### Medido (TGD, TP1, Piloto — 3 chamadas `run_project` na mesma sessão
+Python, sem git stash, sem escrever `baseline.json`/`score.json`)
+
+- **TGD**: 8 arestas isoladas com prisma forçado detectadas
+  (`wall_idx` 4, 23, 54, 89, 90, 91, 92, 120 — numeração desta sessão,
+  não precisa coincidir com a numeração de sessões anteriores). **1
+  aceito** (`wall_idx=23`, `SAME_A`) — `PRISM_CONTINUOUS_JOINT` 476→444,
+  `PRISM_JOINT_STACK` 29→27, zero achados novos em qualquer outra
+  categoria (a única "diferença" — `COMPENSATOR_EXCESS_IN_RUN` reposicionado
+  em W011, 5 antigos por 5 novos na mesma parede — é a MESMA sequência
+  deslocada 15cm, contagem líquida inalterada). **7 rejeitados**, cada um
+  por um motivo HARD reproduzível: `does_not_resolve_target` (a troca não
+  removia o prisma alvo), `closure_regression`, `new_forced_prism_in_
+  neighbor`, `new_consecutive_compensators`, `row_coverage_regression`.
+- **TP1**: 3 arestas isoladas detectadas (`wall_idx` 20, 75, 91) —
+  **0 aceitos** (todas rejeitadas por `new_consecutive_compensators`
+  ou `does_not_resolve_target`). Score B==C IDÊNTICO em toda categoria —
+  zero regressão, zero melhoria (nenhum candidato seguro disponível
+  neste projeto).
+- **Piloto**: 0 arestas isoladas com prisma forçado — no-op, B==C
+  idêntico.
+
+Nenhuma regressão global em NENHUM projeto. `baseline.json`/
+`reference.json`/`score.json` de todos os projetos permanecem intactos
+(rodado só em memória, `write_files=False`).
+
+### Testes
+
+`tests/test_block_arm_role_candidate_safety_contract.py` (T1-T16 do
+pedido desta CR): unitários e diretos para os gates (compensador,
+cobertura por fiada, colisão, taxonomia soft/hard do stagger),
+sintéticos para persistência entre bandas/invariância de
+permutação/ordem, e contra o corpus real (TGD) para aceitação do
+candidato seguro, fallback ORIGINAL e determinismo de execução repetida.
+
+### Status
+
+`ARM_ROLE_SAFE_REPAIR_ENABLED = True` (default, `wall_modeling.py`) —
+SAFE REPAIR **ATIVO em produção** a partir desta CR, restrito por
+construção às arestas isoladas do grafo de coordenação (nunca paredes T/X
+numa ponta, nunca paredes com componente maior do grafo — `W010`/`W037`-
+like, ver seção 31). Pendências residuais explicitamente NÃO corrigidas
+nesta CR (fora de escopo — seção 13 do pedido): as 7 paredes rejeitadas
+no TGD e as 3 no TP1 continuam com o prisma forçado original, sem
+regressão nova introduzida por tentar corrigi-las.
+
+**Achado durante a suíte completa (`tests/`, 565 passaram/1 falhou),
+causa raiz provada em auditoria pré-integração posterior
+(2026-09-04)**: `test_projeto_nao_regrediu_contra_o_baseline
+[torre_easy_lo_r00_tp1]` falha (`JUNCTION_MISSING_BINDING` 8→9 contra
+`baseline.json`). Investigação completa (não só reproduzida com
+`ARM_ROLE_SAFE_REPAIR_ENABLED=False` — isolada por commit, um a um,
+sobre `963aa9b`/`d813f45`/`77bda14`):
+
+- **Primeiro commit que introduz o 8→9**: `d813f45` (`CR-BLOCK-ARM-ROLE-
+  CONSISTENCY`, o que introduz `_coordinate_arm_role_nodes`) —
+  `963aa9b` sozinho mantém 8; `d813f45` muda para 9; `77bda14` mantém 9.
+  Nenhum commit desta CR (`CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`)
+  participa — confirmado tanto por `ARM_ROLE_SAFE_REPAIR_ENABLED=False`
+  (idêntico) quanto pelo isolamento por commit acima.
+- **As 8/9 ocorrências são TODAS o MESMO nó físico**: encontro L em
+  `(6177.25, 949.95)`, paredes `W039`↔`W041` — nunca um nó novo, nunca
+  outro encontro.
+- **Prova geométrica direta** (`block_covers_point`, o mesmo calculo do
+  validador, chamado diretamente sobre `result_project`): `W041` NUNCA
+  cobre este ponto em NENHUMA fiada, em NENHUM dos dois estados (main ou
+  branch) — a peça mais próxima de `W041` (meio-bloco B19 ou B34) fica
+  sistematicamente ~8cm curta do ponto real do nó. A cobertura deste
+  encontro depende inteiramente de `W039`; qual fiada tem/não tem peça
+  de `W039` ali é decidido por `_coordinate_arm_role_nodes` (que família
+  ancora o canto no nó distante desta parede) — em `main` (sem
+  coordenação), as fiadas ÍMPARES ficam sem peça (8 ocorrências, já que
+  a parede tem 17 fiadas: 8 ímpares/9 pares); com a coordenação
+  (branch), as fiadas PARES é que ficam sem peça (9 ocorrências) — o
+  MESMO defeito pré-existente, só espelhado de paridade. A contagem
+  muda de 8 para 9 apenas porque o prédio tem uma fiada par a mais que
+  ímpar (17 fiadas, índices 0-16) — não porque um novo defeito físico
+  foi criado.
+- **Comparação com o Reference Corpus humano**: o mesmo nó físico (casado
+  geometricamente, `(6184.25, 949.95)`, offset de 7cm dentro da
+  tolerância) no projeto humano APROVADO também só recebe peça de
+  `W039` (nunca de `W041`, mesmo padrão), majoritariamente com um
+  meio-bloco repetido (não uma peça de amarração B34/B54 alternada -
+  dispara `JUNCTION_NOT_ALTERNATING` no PRÓPRIO gabarito humano) e TEM
+  `JUNCTION_MISSING_BINDING` real em 2 fiadas (8 e 12) mesmo na
+  modulação aprovada. Ou seja: este encontro específico já é um caso
+  atípico onde nem o humano fecha a amarração "de livro" em toda fiada.
+- **Classificação**: `P3 — BENCHMARK_ARTIFACT`. Não é `P1` (nada foi
+  perdido - o mesmo defeito já existia em `main`, só na paridade
+  oposta); não é `P2` (nenhum dos dois estados está "correto" nesse
+  encontro especificamente). O que é artefato é o DELTA 8→9 usado pelo
+  gate de regressão como "piorou" - na verdade é o mesmo defeito
+  relocado por um efeito colateral já conhecido de `d813f45`, amplificado
+  numericamente só pelo desbalanceamento par/ímpar de fiadas do prédio.
+- **Decisão**: `baseline.json` do TP1 NÃO regravado (nem nesta CR nem na
+  auditoria pré-integração) — decisão humana pendente, fora de escopo
+  de ambas. `test_projeto_nao_regrediu_contra_o_baseline[...tp1]`
+  continua falhando por este motivo já documentado e comprovadamente
+  não relacionado a `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT`.
+
+## 33. `CR-BLOCK-NODE-FILL-REVALIDATION` — a METADE SIMÉTRICA da junta
+NÓ|FILL: a Fiada A também tem de desencontrar da junta de nó da Fiada B
+(2026-09-04)
+
+Revalidação do fix histórico NODE-FILL (`claude/cr-block-node-fill-joint-
+9tv0kd`, `d1fc4abb`), medida sobre `origin/main @ 68a62693` (`PR #17`,
+`CR-BLOCK-NODE-FILL-REVALIDATION`) e reconfirmada equivalente à `main`
+pós PRs #14/#15/#16 (docs-only, produção idêntica). Comportamento
+técnico e evidência: seções 33.1-33.7 abaixo. Regra resultante:
+`NODE_FILL_OPPOSITE_COURSE_ENABLED` (`wall_stepper.py`). Relatório
+completo com gates G1-G26: `docs/BLOCK_NODE_FILL_REVALIDATION.md`.
+Estado do PR/merge: `docs/PROJECT_STATUS.md` (não repetido aqui — regra
+de domínio não deve ficar obsoleta quando o PR mudar de estado).
+
+### 33.1 REGRA OBRIGATÓRIA — a junta PEÇA DE NÓ | PREENCHIMENTO é uma junta
+vertical de verdade NOS DOIS SENTIDOS
+
+- A seção 30.6 (`CR-BLOCK-ARM-ROLE-PRISM-STAGGER`) já estabelece que a
+  junta de contorno entre a peça de amarração do nó (L/T/X, posicionada
+  fora do preenchimento comum) e o primeiro/último bloco do preenchimento
+  é tão física quanto uma junta interna, e a Fiada B tem de evitá-la
+  (`_pier_boundary_joint_positions_cm` → `course_a_boundary_joint_
+  positions_cm`).
+- **O que faltava (medido no corpus real):** a Fiada A roda PRIMEIRO e
+  nunca via a junta NÓ|FILL que a Fiada B vai ter. Assinatura em TGD e
+  TP1: junta interna `B19|B39` (ou `B19|B34`) da Fiada A em t = 34,5 cm
+  (comprimento do `B34` de nó + junta) exatamente em cima da junta
+  `B34(nó)|fill` da Fiada B, em toda fiada da mesma paridade da parede
+  (TP1: 16 findings por parede em `W004`, `W007`, `W010`, `W012`,
+  `W028`, `W036`, `W037`, `W038`, `W055`, `W056`, `W080`…; TGD: `W007`,
+  `W028`, `W073`, `W086`, `W166`…).
+- **Como foi descoberto:** rodando os testes comportamentais da suíte
+  histórica sobre a `main`: só o invariante de ORDEM DE ENTRADA falhava
+  (grade 2×2 sintética: 1 a 3 violações conforme a ordem das paredes,
+  todas "junta interna da A × junta de nó da B em 34,5"). Depois
+  confirmado no corpus (TGD 108, TP1 308 findings com essa assinatura).
+- **Regra:** a posição da peça de nó de uma fiada depende só da geometria
+  do encontro (`node_candidates_by_wall_end` / `node_midspan_by_wall_
+  course`, decididos ANTES do preenchimento e só por `course`, nunca por
+  layout ou `variant_index`) — logo a junta NÓ|FILL da fiada OPOSTA é
+  deduzível antes de resolver a própria fiada
+  (`_wall_node_boundary_joints_cm`: `border ± BLOCK_JOINT_CM/2`; meio de
+  parede `t_start − J/2` e `t_end + J/2`). A Fiada A (variante 0,
+  layout padrão) SÓ troca de layout quando empilha uma junta interna
+  sobre uma dessas juntas E existe composição do mesmo trecho
+  (`_pier_layout_avoiding_joints`, a mesma busca da B) com ESTRITAMENTE
+  menos coincidência — nunca por empate.
+- **Implementado** em `wall_stepper.py` (`NODE_FILL_OPPOSITE_COURSE_
+  ENABLED = True`; `False` reproduz a main bit a bit). Medido (todos os
+  demais validadores com delta zero — cobertura, aberturas, colisões,
+  junções; ARM accepted/rejected idênticos):
+
+  ```
+  PRISM_CONTINUOUS_JOINT   TGD 444 → 336   TP1 576 → 272   piloto 0 → 0
+  PRISM_JOINT_STACK        TGD  27 → 20    TP1  33 → 17
+  COMPENSATOR_CONSECUTIVE  TGD 410 → 379   TP1 1469 → 1461
+  ```
+
+- **Confirmação humana (Reference Corpus):** dos findings removidos
+  casados com o humano, 226 CONFIRMED (o humano tem a junta em 34,5 numa
+  fiada e desencontra na outra — tipicamente `B34+B19`, junta 49,5) e 47
+  CONSISTENT; **0 CONFLICTS** (nenhum caso em que o humano também tenha a
+  junta corrida).
+
+### 33.2 REGRA OBRIGATÓRIA — só junta de PEÇA DE NÓ; abertura e ponta livre
+continuam sem junta de nó (11.8 preservada)
+
+`_wall_node_boundary_joints_cm` só produz junta onde há `border` de peça
+de nó (ou faixa de meio de parede). Ponta livre e borda de vão não
+entram — a exceção 18.12/11.8 (C04/C09/B19 encostado no vão pode
+alinhar) segue intacta. Testado (T2): o layout de um L com ponta livre
+não muda com a regra ligada.
+
+### 33.3 REGRA OBRIGATÓRIA — a troca de layout é decidida só por juntas que
+SOBREVIVEM ao recorte das aberturas
+
+No pipeline contínuo o layout da Fase 1 atravessa os vãos. A junta de
+uma peça que `split_extents_by_openings` vai derrubar é FANTASMA e não
+pode decidir a troca (`_layout_joints_surviving_openings_cm`, o mesmo
+critério do recorte, sem tolerância nova). Medido no TGD `W075` (584 cm,
+duas aberturas, nó `B34` da B em `[550..584]`): sem esta regra, uma junta
+em 549,5 de uma peça `[510..549]` que cruza a jamba 544,8 forçava a troca
+do layout inteiro, o reparo local não fechava `[550..569]` e a fiada A
+perdia 2×`C09` (+6 `COVERAGE_ROW_MOSTLY_EMPTY`). Com a regra: cobertura
+idêntica à main.
+
+### 33.4 REGRA OBRIGATÓRIA — a lista deduzida NÃO entra na busca da Fiada B
+
+A Fiada B já recebe as juntas de contorno REAIS da Fiada A
+(`course_a_boundary_joint_positions_cm`). Somar a lista deduzida ali só
+acrescentava restrição onde o preenchimento da A não existe (fiada
+vazia, trecho que não fecha): medido no TGD, mais compensador contra o
+nó e colisões rearranjadas em paredes SOBREPOSTAS (`W011∥W075`,
+`W009∥W070`, eixos a 2,4 cm — artefato de extração pré-existente), sem
+nenhum ganho de prisma. O sentido "A evita nó da B" é o único que
+faltava.
+
+### 33.5 DOCUMENTADO — pendência de código aberta: o REPARO LOCAL recria a
+junta a partir da peça mantida
+
+Em bandas em que a peça adjacente à junta de nó cruza uma jamba (TP1
+`W036`/`W038`, fiadas 5–12, janela ativa): o layout da A é `[15..34 B19]
+[35..74 B39]…`, `[35..74]` cruza a jamba (≈70) → pela regra 33.3 a junta
+34,5 não decide a troca → o recorte derruba `[35..74]` e o reparo refaz
+`[35..69]` com `B34` a partir da peça mantida `B19 [15..34]` → a junta
+34,5 renasce (16 findings residuais no TP1). Passar a junta de nó da
+fiada oposta ao reparo (`_solve_repair_subsegments`) NÃO resolve: a
+junta é o CONTORNO da região de reparo, fixado pela peça mantida. Correção
+exige o reparo consciente da junta de nó da fiada oposta E da posição da
+peça mantida (expandir a região por cima dela) — fora do mínimo desta CR.
+
+Segundo residual, limite GENUÍNO (mesma natureza de 30.6): quando o
+espaço entre a largura do nó vizinho e uma peça de X/T degradado só
+fecha com uma cadeia de compensadores (TP1 `W003`/`W008`/`W061`: 30 cm =
+3×`C09`, juntas fixas 24,5/34,5/44,5), nenhuma composição alternativa
+existe e a junta 34,5 coincide com a junta de nó da fiada oposta. Só a
+seleção da peça de nó (ou a degradação do X/T) resolve — fora de
+`solve_wall_free_fill`.
+
+### 33.6 MEDIDO — o que NÃO foi integrado do fix histórico, e por quê
+
+| parte histórica | medição sobre a main | decisão |
+|---|---|---|
+| gate `node_boundary_conflicts` separado de `alignment_conflicts` | fingerprint idêntico (só representação); mostra que INTERNA×INTERNA residual = 0 nos 3 projetos; mas muda a semântica de `needs_fix` e do check `sem_alinhamento_vertical` usado pelo gate de fechamento do SAFE REPAIR | não integrado |
+| filtro pela geometria final (`_node_boundary_joints_backed_by_pieces_cm`) | nenhum efeito (fingerprint idêntico) | não integrado |
+| juntas de nó no reparo de abertura | sem ganho de prisma; rearranja compensadores (`W159`/`W095`); a seção 30.6 já registrou regressão de porta ao incluir contorno no reparo | não integrado |
+
+### 33.7 CONFLITO REGISTRADO — hipótese "junta NÓ|FILL contada a mais"
+
+O pedido desta CR formulava a hipótese de que uma junta NÓ|FILL estaria
+sendo contabilizada como junta estrutural "a mais". **Refutada**: nem no
+histórico nem na main há contagem a mais; o defeito é a contagem A MENOS
+(a junta invisível para a busca de desencontro da fiada oposta). Nenhum
+validador foi alterado e nenhuma redução vem de reclassificação (N3 = 0).
+
+## 34. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — os dois gates do SAFE
+REPAIR mediam PROXY, não o defeito real
+
+Continuação de `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` (seção 32) e
+de `docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md`/`docs/BLOCK_ARM_SAFE_
+REPAIR_GATE_FIDELITY_SPEC.md`. Implementação sobre a main pós-NODE-FILL
+(seção 33). Relatório completo:
+`docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_IMPLEMENTATION.md`.
+
+### 34.1 REGRA OBRIGATÓRIA — identidade de fiada física é `course_index`,
+nunca a letra de família
+
+`_no_new_consecutive_compensators` (gate 4 do SAFE REPAIR) media
+sequências de compensadores sobre `result["candidates"]` **agregado entre
+todas as bandas de abertura**, agrupando por `c["course"]` (a letra
+"A"/"B", que se repete em TODA banda). Uma banda cobre várias fiadas
+físicas; o MESMO compensador solitário, reaparecendo em N bandas na MESMA
+posição X, virava uma cadeia FANTASMA de N compensadores "consecutivos" —
+**PROVADO**: `TP1 wall_idx=75/SAME_A`, medido ao vivo, rejeitado por
+`new_consecutive_compensators:81` com o código antigo; medido de novo
+nesta CR sobre a main pós-fix: candidato ACEITO, delta de achados do
+projeto inteiro = **exatamente -102** (bate com o número medido no
+diagnóstico original, sem nenhum outro candidato ARM ter mudado).
+
+Fix: os dois gates de compensador (`_wall_compensator_run_signatures`/
+`_no_new_consecutive_compensators`) passaram a usar `course_candidates`
+(a mesma estrutura, por `course_index` físico, que o gate de cobertura já
+usava) em vez de `candidates` agregado — cada chamada já recebe UMA fiada
+física isolada, elimina a agregação cross-banda por construção. Nenhuma
+mudança na definição de compensador nem nas tolerâncias.
+
+### 34.2 REGRA OBRIGATÓRIA — crédito de cobertura de nó flui nos DOIS
+sentidos (alvo↔vizinha), restrito a 5 condições
+
+`_wall_row_covered_length_cm` (gate 5) media cobertura só das peças cujo
+`wall_idx` "dono" nos dados é a própria parede — uma peça de amarração de
+canto fica fisicamente sobre o VÉRTICE de um nó L/T/X e se estende sobre
+o eixo de AMBAS as paredes, mas é registrada com um único `wall_idx`
+dono; uma troca de papel ARM muda esse dono sem a peça sair fisicamente
+do nó, derrubando a cobertura LOCAL medida de 100% para perto de 0% —
+falso positivo de regressão.
+
+Fix: crédito físico restrito a 5 condições (nunca por proximidade/
+heurística de `wall_idx`): (1) mesmo `node_index` — `wall_credit_node_
+indices` é construído pelo chamador (`repair_arm_role_isolated_edges`),
+nunca deduzido por distância; o ALVO tem os DOIS nós isolados do
+candidato (`node_p`/`node_q` — o crédito flui NOS DOIS SENTIDOS, alvo
+credita da vizinha que hoje possui a peça E vizinha credita do alvo),
+cada VIZINHA tem só o nó que a liga ao alvo; (2) mesma região geométrica —
+o crédito é recortado contra o trecho que REALMENTE deixou de ser
+coberto (`_wall_row_own_extents_cm` ANTES menos DEPOIS), nunca "a peça
+existe em algum lugar da parede"; (3) mesma fiada física (`course_index`
+explícito); (4) peça realmente presente no `trial_result` (resultado REAL
+do rebuild); (5) o crédito nunca pode exceder o gap medido — se ainda
+sobrar gap real, a regressão continua bloqueada.
+
+**PROVADO** (corpus real, main pós-fix): `TGD wall_idx=91/SAME_B`
+(antes rejeitado por `new_consecutive_compensators:128`, resolvido pela
+seção 34.1) passou a ser ACEITO após o crédito de cobertura também
+aprovar seu vizinho — composição final idêntica ao gabarito humano
+(`os dois B34 de canto na MESMA família`, seção 30.7/`docs/BLOCK_ARM_
+REJECTED_EDGES_DIAGNOSIS.md` "Solver × Humano") →
+`CONFIRMED_BY_HUMAN`. `TGD wall_idx=89/90/92` e `TGD 120`/`TP1 20/91`
+continuam corretamente rejeitados (o crédito não fecha o gap real, ou o
+gate que rejeita é outro, não relacionado a esta CR) — o objetivo é
+FIDELIDADE do gate, não forçar aceitação (ver seção 16 do pedido da CR).
+
+### 34.3 PADRÃO CONFIRMADO — os dois fixes só mudam O QUE o contrato mede,
+nunca o solver
+
+Nenhum bloco físico do resultado final muda para as arestas que
+CONTINUAM rejeitadas (o rebuild de um candidato rejeitado é sempre
+descartado, `_set_l_corner_role_bits(..., pinned=False)`). Delta de
+`COVERAGE_*`/`JUNCTION_*`/`OPENING_*`/`POSITION_OVERLAP` = ZERO nos três
+projetos do Reference Corpus; toda mudança de finding vem exclusivamente
+das arestas que passaram a ser ACEITAS (TGD 91, TP1 75). Determinismo
+provado (fingerprint idêntico em processos novos separados, TGD e TP1).
+
+## 35. `CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION` — B19 como FILL
+residual de nó, decisão humana aprovada (2026-09-05, corrigida na
+revisão final de integração do PR #19)
+
+Implementa, sobre a `main` pós-Gate-Fidelity (`209695d5`), a decisão
+aprovada pelo usuário sobre B19 (`docs/BLOCK_B19_JUNCTION_DOMAIN_
+EVIDENCE.md`, investigação apenas, `REQUIRES_HUMAN_DOMAIN_APPROVAL`).
+Relatório completo: `docs/BLOCK_B19_RESIDUAL_FILL_IMPLEMENTATION.md`.
+
+**HISTÓRICO DESTA SEÇÃO**: a primeira versão implementada (PR #19,
+2026-09-05) foi revisada em revisão final de integração e um achado
+crítico foi confirmado: os 8 candidatos que ela aceitava no TP1 não
+tinham NENHUMA peça de amarração cobrindo o MESMO nó na MESMA fiada
+(0/102 fiadas) — a peça de amarração real formava-se sempre na OUTRA
+ponta da parede, nunca no nó onde o B19 estava. Uma segunda revisão
+independente, já sobre a versão corrigida, encontrou um segundo achado
+(convergência da revalidação final incompleta sob cascata de segunda
+ordem — ver 35.8) e a correção foi aplicada NO MESMO PR/branch. Esta
+seção documenta a versão final, com a decisão de domínio explícita e a
+convergência de ponto fixo que fecham as duas lacunas.
+
+### 35.1 Regra aprovada (versão final)
+
+B19 é FILL, **NUNCA TIE**. Para toda fiada física onde existir um B19
+marcado como fill residual, tem que existir, no **MESMO NÓ** e na
+**MESMA FIADA**, uma peça de amarração real e íntegra (B34/B54) que
+cubra geometricamente o ponto físico do nó — vinda de **qualquer**
+parede participante do nó (a própria parede do B19 ou a perpendicular).//
+B19 nunca é a peça de amarração, nunca ocupa fisicamente mais do que o
+seu próprio corpo, nunca substitui B34/B54. **Não é suficiente que a
+OUTRA ponta da mesma parede feche com peça real na mesma fiada** — essa
+era a condição da versão original do PR #19, e é exatamente o que a
+revisão provou insuficiente.
+
+Continua valendo, sem alteração: depende do TRECHO RESIDUAL medido,
+nunca do comprimento total da parede; a proibição estrita histórica (ver
+"Regra do meio-bloco (B19)", início deste arquivo, e 11.6) continua
+valendo fora dessa condição específica — não foi liberado B19
+genericamente perto de nó, nem por comprimento de parede/wall_idx/
+projeto.
+
+### 35.2 Causa-raiz medida (duas camadas)
+
+**Camada 1 (primeira divergência, ainda válida)**: `_wall_reserved_
+range_ft` reservava um valor **FIXO** (o topo da faixa, 20cm) na ponta
+oposta quando um nó era marcado como fill — isso só produzia o room
+exato exigido (`CORNER_B34_ROOM_FT`, 34cm) na ponta TIE quando o resíduo
+real da parede era EXATAMENTE 20cm (o caso do TP1, 54cm). Para qualquer
+parede com resíduo real entre 15-19cm, a reserva fixa de 20cm teria
+**subestimado** o que a ponta TIE precisa, deixando-a com menos de 34cm
+de room e portanto ainda degradada — o mecanismo nunca destravaria a
+ponta oposta fora do caso de 20cm exatos. Corrigido com reserva
+**dinâmica** (`length_ft - CORNER_B34_ROOM_FT`, calculada por parede) —
+ver 35.3.
+
+**Camada 2 (achado da revisão, o motivo real dos 0 aceitos)**: mesmo com
+a reserva corrigida, medir o TP1 real mostrou que a ponta TIE (a que
+recebe B34 real) e a ponta FILL (a que recebe B19) são nós **diferentes**
+da mesma parede — e o nó de FILL nunca é amarrado por NENHUMA peça em
+NENHUMA fiada onde o B19 esteja. Nas 8 paredes-alvo (TP1
+`wall_idx=12,13,14,15,87,88,89,90`), o nó de fill É amarrado — mas pela
+parede perpendicular, em fiadas de PARIDADE OPOSTA à do B19 (o padrão de
+alternância par/ímpar do canto L: o nó 146, por exemplo, recebe um B34
+real da parede 91 nas fiadas ÍMPARES, exatamente quando a parede 87 NÃO
+tem B19 lá; nas fiadas PARES, quando a parede 87 tem B19 no nó 146,
+NENHUMA peça de amarração cobre aquele ponto). Medido explicitamente:
+**0 de 102 fiadas** com `B19_RESIDUAL_FILL` (nos 8 candidatos que a
+versão original aceitava) tinham amarração real cobrindo o MESMO nó na
+MESMA fiada.
+
+### 35.3 Implementação corrigida
+
+Reparo pós-hoc isolado (`repair_b19_residual_fill`, `nuvem/core/engine/
+wall_stepper.py`), MESMO padrão seguro de `repair_arm_role_isolated_
+edges` — candidato → pin → reconstrução REAL multi-banda → hard gates →
+aceita ou reverte.
+
+**Correções desta revisão** (todas em `wall_stepper.py`, exceto a
+última):
+
+1. **Fórmula única de resíduo** (`_b19_residual_span_cm`): `comprimento -
+   CORNER_B34_ROOM_FT` — a MESMA fórmula usada para elegibilidade,
+   reserva e colocação (antes havia 3 fórmulas quase-iguais que só
+   coincidiam por acidente aritmético nos 54cm do TP1).
+2. **Reserva DINÂMICA** (não mais uma constante fixa
+   `B19_RESIDUAL_RESERVE_FT`, removida): `_wall_reserved_range_ft` calcula
+   `length_ft - CORNER_B34_ROOM_FT` por parede — garante room EXATO de
+   34cm na ponta TIE para qualquer resíduo na faixa aprovada, nunca só
+   para 20cm.
+3. **Gate de integridade do nó** (`_b19_tie_integrity_ok`, NOVO — o gate
+   central desta revisão): para toda fiada onde `wall_idx` tem um
+   `B19_RESIDUAL_FILL` ancorado num nó, exige uma peça de amarração real
+   (`_b19_is_tie_piece`: B34/B54, com `placement_reason` de amarração —
+   nunca um B34/B54 de preenchimento comum) cujo CORPO cubra
+   geometricamente o ponto físico DESTE MESMO nó (`_b19_node_has_
+   covering_tie`, mesma checagem geométrica de `block_covers_point` do
+   benchmark) — vinda de QUALQUER parede participante do nó. Falta em
+   QUALQUER fiada → candidato inteiro rejeitado.
+4. **Estado por nó é um CONJUNTO** (`_b19_residual_fill_for_walls`, nunca
+   mais um escalar único `_b19_residual_fill_for_wall`) — duas paredes
+   candidatas podem compartilhar o mesmo nó sem uma apagar a marca aceita
+   da outra.
+5. **Ordem de tentativa CANÔNICA GEOMÉTRICA** (`_canonical_node_sort_
+   key`, a mesma função já usada por `_coordinate_arm_role_nodes`) —
+   nunca por `end_index`/orientação de desenho da parede
+   (`GetEndPoint(0)`/`(1)`).
+6. **Escopo dos hard gates ampliado** (`_b19_candidate_dirty_scope`):
+   `dirty_wall_idxs` passa a incluir as paredes perpendiculares dos dois
+   nós envolvidos (MESMO padrão do SAFE REPAIR do ARM) — os gates de
+   compensador consecutivo e regressão de cobertura agora rodam em TODAS
+   elas, não só na parede alvo. Achado real que isto pega: a versão
+   original teria deixado passar uma regressão em `wall_idx=93` do TP1
+   (18 sequências novas de compensador consecutivo, medida na revisão) —
+   com o escopo corrigido, esse mesmo cenário é corretamente rejeitado
+   (`new_consecutive_compensators:93`, coberto por teste sintético).
+   `wall_credit_node_indices` é repassado ao gate de cobertura, mesmo
+   mecanismo de crédito físico de nó do PR #18.
+7. **Revalidação final CONVERGE ATÉ PONTO FIXO** (`repair_b19_residual_
+   fill` — corrigida de novo na revisão #2, ver 35.8): depois de aceitar
+   candidatos individualmente, cada iteração reconstrói com o conjunto
+   ATUAL de marcas aceitas e revalida CADA aceito restante contra ESSE
+   resultado; os inválidos são removidos (ordem canônica geométrica) e o
+   processo repete até que nenhum candidato adicional seja removido. Só
+   então `accepted[]`/`final_result` são devolvidos. Garante `accepted[]
+   ⟹ efeito físico presente no resultado final ESTABILIZADO` — mesmo sob
+   cascatas de invalidação de segunda ordem (ver 35.8).
+8. **`audit_wall_bond_quality`** (`wall_modeling.py`, rede de segurança
+   `HALF_BLOCK_NEAR_TIE`): a isenção por `placement_reason ==
+   "B19_RESIDUAL_FILL"` agora verifica a condição geométrica DIRETAMENTE
+   (defesa em profundidade, reusando `_b19_node_has_covering_tie`),
+   nunca confia só na etiqueta — mesmo que o hard gate do reparo já
+   garanta isso antes de aceitar qualquer candidato.
+9. **Contrato de `arm_role_safe_repair=False` preservado**: voltou a
+   desligar TODO o pós-processamento (ARM e B19), idêntico ao
+   comportamento anterior a esta CR — não é mais uma porta lateral para
+   ligar o B19 fora do pipeline normal.
+
+### 35.4 RESULTADO MEDIDO — zero efeito no corpus atual (achado central
+da revisão)
+
+Com o gate de integridade do nó corretamente implementado, **os 8
+candidatos que a versão original aceitava no TP1 passam a ser
+rejeitados** (`no_tie_covering_node`, nas 16 tentativas — 8 paredes × 2
+atribuições cada). TGD e Piloto continuam com 0 candidatos elegíveis
+(já era assim antes). Resultado:
+
+| projeto | candidatos elegíveis | aceitos | fingerprint com B19 vs sem B19 |
+|---|---|---|---|
+| TP1 | 8 | **0** | idêntico |
+| TGD | 0 | 0 | idêntico |
+| Piloto | 0 | 0 | idêntico |
+
+**O mecanismo, corretamente implementado e testado, não produz NENHUM
+efeito físico no corpus de referência atual** — nenhuma parede do TGD,
+TP1 ou Piloto tem hoje uma atribuição fill/tie onde o nó de fill fique
+coberto por amarração real na MESMA fiada (o padrão de alternância
+par/ímpar do canto L sistematicamente amarra o nó só nas fiadas
+complementares às que o B19 ocuparia). Isto significa:
+
+- **Zero risco de regressão** — o resultado é byte-a-byte idêntico ao
+  estado sem o reparo B19 (fingerprint `walls_blocks` idêntico nos três
+  projetos, com e sem `B19_RESIDUAL_FILL_REPAIR_ENABLED`).
+- **Zero ganho prático hoje** — os números de melhoria reportados na
+  versão original desta seção (`COMPENSATOR_CONSECUTIVE` −168 no TP1,
+  etc.) vinham exatamente dos 8 candidatos agora corretamente
+  rejeitados — não se sustentam sob a condição de domínio correta.
+- O mecanismo fica pronto, correto e testado para o dia em que o corpus
+  tiver um caso onde a condição de domínio seja fisicamente satisfeita
+  (ou para quando uma CR futura, decisão de domínio à parte, tratar a
+  alternância par/ímpar como uma forma válida de amarração "ao longo da
+  altura" em vez de "na mesma fiada" — mudança de regra que NÃO foi
+  autorizada aqui e não deve ser inferida).
+
+### 35.5 Achado adicional (não bloqueante): faixa aprovada mais larga do
+que a colocação física permite
+
+`B19_RESIDUAL_FILL_MIN_CM = 15.0` permite ELEGIBILIDADE de parede
+(`_b19_residual_edge_candidates`) para resíduos tão baixos quanto 15cm —
+mas B19 é um bloco de catálogo FIXO de 19cm: nunca cabe fisicamente em
+menos de 19cm de room. Na prática, nenhuma parede com resíduo entre 15 e
+18cm jamais produz um B19 na colocação real (`_corner_single_element_
+candidate` cai no C09/C04 mesmo com o nó marcado) — o candidato é
+tentado (custo de um rebuild extra) mas nunca pode ser aceito (`_b19_
+tie_integrity_ok` exige `saw_any_fill=True`, que nunca acontece). Não é
+um bug de comportamento incorreto (nunca gera um B19 mal colocado), só
+uma faixa de elegibilidade mais permissiva do que a física do bloco
+permite — decisão do usuário se vale a pena estreitar `B19_RESIDUAL_
+FILL_MIN_CM` para ~19cm (eliminaria tentativas de rebuild fadadas ao
+fracasso) ou manter como está (documentado, inofensivo).
+
+### 35.6 Testes
+
+`tests/test_block_b19_residual_fill_implementation.py` — reescrita
+completa nas duas revisões (T1-T58): **70 rápidos + 6 `slow`, todos passing** (T54-T58 acrescentados na segunda revisão — convergência de ponto fixo, ver 35.8).
+Cobre: topologia; fórmula única de resíduo na matriz completa
+(14,9/15/18/19/20/20,1cm); reserva dinâmica (prova que dá 34cm de room
+para QUALQUER resíduo na faixa, não só 20cm); isolamento do estado por
+`(nó, parede)` via conjunto; preferência B19 só quando marcado E com
+room fisicamente suficiente (19-20cm); **o gate de integridade do nó em
+11 variações** (próprio nó/parede perpendicular, fiada errada, nó
+errado, peça não-amarração, peça longe demais, B54 também conta, B19
+sozinho rejeita, uma fiada sem tie reprova a parede inteira, corpo
+inteiro da peça — não só o centro); os 7 hard gates; orquestração com
+`rebuild_fn` falso (reversibilidade, `accepted ⟹ efeito no resultado
+final`, revalidação pós-combinação, ordem canônica); invariância à
+reversão dos endpoints da parede; a rede de segurança `HALF_BLOCK_NEAR_
+TIE` com defesa em profundidade (isento só com prova geométrica direta,
+não só a etiqueta); corpus real (TP1/TGD/Piloto, resultado honesto de
+zero aceitos, determinismo, contrato de `arm_role_safe_repair=False`
+preservado).
+
+### 35.7 Determinismo e regressão
+
+Fingerprint `walls_blocks` idêntico em duas execuções separadas
+(processos novos) sobre o TP1 (accepted=[] nas duas). NODE-FILL
+(`NODE_FILL_OPPOSITE_COURSE_ENABLED=True`) e Gate Fidelity (ARM SAFE
+REPAIR) preservados e intactos — nenhuma mudança de comportamento
+(`tests/test_block_node_fill_revalidation.py`, `tests/test_block_arm_
+role_prism_stagger.py`, `tests/test_block_arm_safe_repair_gate_
+fidelity.py`, `tests/test_block_arm_role_candidate_safety_contract.py`
+passam integralmente). Suíte completa sem falha nova além da já
+conhecida (`JUNCTION_MISSING_BINDING` TP1 8→9, seção 32).
+
+### 35.8 Segunda revisão — convergência de ponto fixo (achado H/I)
+
+Uma segunda revisão independente, reproduzindo o cenário com a própria
+função `repair_b19_residual_fill`, encontrou uma lacuna na revalidação
+final da 35.3/item 7 (versão anterior desta seção): "uma única
+revalidação + no máximo um rebuild corretivo" não cobre uma cascata de
+invalidação de SEGUNDA ordem. Contraexemplo reproduzido: com três
+candidatos A, B, C, cada um passa individualmente; a combinação
+`{A,B,C}` invalida A; removido A, o NOVO mundo `{B,C}` também invalida
+B (só visível DEPOIS que A já saiu); só C permanece válido. O código
+antigo entregava `accepted=[B,C]` com B já inválido — violando
+`accepted[] ⟹ efeito físico válido no resultado final`.
+
+**Correção**: a revalidação final agora CONVERGE ATÉ PONTO FIXO — cada
+iteração reconstrói com o conjunto atual, revalida cada aceito restante
+(reutilizando `_evaluate_b19_residual_candidate`, nenhuma lógica
+duplicada/simplificada), remove os inválidos em ordem canônica
+geométrica (nunca por ordem de inserção de set/dict) e repete até que
+nenhum candidato adicional seja removido. `accepted` só pode DIMINUIR
+nessa fase — nunca readiciona um candidato removido — o que garante
+terminação finita (no máximo `len(accepted)` remoções + 1 iteração de
+confirmação; um guard defensivo levanta erro explícito se essa cota
+teórica for excedida, o que nunca deveria acontecer). Único arquivo de
+produção tocado nesta segunda correção: `wall_stepper.py` (nenhuma
+mudança de domínio — regra B19, faixa residual, tie integrity,
+canonical ordering, dirty scope, audit, `arm_role_safe_repair=False`,
+NODE-FILL, Gate Fidelity, rotated corners e `W039`/`W041` permanecem
+intocados).
+
+Testes novos (`tests/test_block_b19_residual_fill_implementation.py`,
+T54-T58): o contraexemplo A→B→C literal (T54); uma cadeia mais profunda
+de 4 níveis provando que não há suposição de "no máximo duas passadas"
+(T55); o caminho sem cascata, onde todos permanecem aceitos (T56); o
+caso em que a combinação completa invalida TODOS os candidatos
+inicialmente aceitos, sem estado residual (T57); e determinismo da
+convergência em execuções separadas (T58). Resultado no corpus real
+(TGD/TP1/Piloto) inalterado por esta correção — continua ZERO candidatos
+aceitos nos três projetos (a correção não muda o RESULTADO medido, só
+fecha uma lacuna de correção que o corpus atual não chegava a exercitar
+com mais de um candidato aceito simultaneamente).
+
+### 35.9 Veredito
+
+**APROVADO PARA INTEGRAÇÃO — SEM EFEITO PRÁTICO HOJE.** O mecanismo
+implementa exatamente a decisão de domínio aprovada (B19 nunca é
+amarração; exige peça real cobrindo o MESMO nó na MESMA fiada, prova
+geométrica contra o rebuild real, nunca só a etiqueta), com todos os
+hard gates do SAFE REPAIR mais os acréscimos desta CR (integridade do
+nó, escopo de vizinhas, revalidação final CONVERGENTE ATÉ PONTO FIXO —
+ver 35.8), determinismo provado,
+NODE-FILL/Gate Fidelity/rotated corners/`W039`-`W041` preservados
+intactos, `baseline.json`/`reference.json` intocados (diff zero — nunca
+houve necessidade de decidir sobre atualização de baseline, já que o
+resultado é idêntico ao estado sem o reparo). **Efeito medido no corpus
+de referência atual: ZERO** (0 candidatos aceitos em TGD/TP1/Piloto) —
+risco de integração é, por isso, também zero, mas o benefício prático
+imediato também é zero até que o corpus tenha um caso fisicamente
+compatível com a condição de domínio aprovada. **NÃO MESCLADO. Aguarda
+autorização explícita do usuário para merge. Nenhum monitoramento
+automático ativado.**
 
 ---
 
-## 30. FATO MEDIDO — extração forense do projeto humano (Revit, 2026-09-09)
+## 36. `CR-S1` — o giro do canto em L é a ÚLTIMA saída, não a primeira:
+alternância só pode ser sacrificada quando nenhuma fiada resolve
+(2026-09-07)
+
+> Conhecimento de **AMARRAÇÃO** (encontro em L, alternância entre fiadas,
+> continuidade entre fiadas). Registro obrigatório por `CLAUDE.md`.
+> Implementado em `nuvem/core/engine/wall_stepper.py` (`solve_l_corner`,
+> `_corner_bond_blocking_courses`, `_node_bond_courses_on_wall`).
+> Relatório completo e medições: `docs/CR_S1_L_NODE_ALTERNATION.md`.
+
+### 36.1 O que já existia e nunca tinha sido registrado aqui — o GIRO
+
+**PADRÃO OBSERVADO, agora documentado** (existe no código desde
+2026-08-25; a seção 5 acima descrevia o L_CORNER como se ele sempre
+alternasse). Quando a peça de amarração de um dos lados de um `L_CORNER`
+esbarraria na peça de um encontro **vizinho da mesma parede**,
+`solve_l_corner` **gira** a peça do canto: manda as **duas** fiadas para a
+parede não bloqueada. O canto fica sem colisão — e **sem alternância**,
+com a peça do mesmo lado nas duas fiadas.
+
+Origem medida: um `T` a 20cm de um canto em L na mesma parede fazia as
+duas peças de 34cm ficarem uma sobre a outra (14cm de sobreposição); o
+solver detectava a colisão, desfazia **as duas**, e a parede terminava sem
+bloco nenhum — 42 dos 57 eixos de uma revisão manual da planta real.
+
+**REGRA OBRIGATÓRIA:** o giro é uma **degradação**, com custo de
+amarração. Ele é legítimo, mas nunca pode ser a primeira coisa tentada, e
+nunca pode ser aplicado sem que uma alternativa alternante tenha sido
+descartada por prova geométrica.
+
+### 36.2 REGRA OBRIGATÓRIA — a colisão de amarração é POR FIADA; um gate
+que só responde "bloqueado sim/não" não pode decidir girar
+
+**Causa-raiz provada** (nó físico presente nos dois níveis do corpus real:
+TGD `(338,52 ; 187,05)` = TP1 `(8017,26 ; 1289,95)`). O gate
+`_corner_bond_blocked_by_other_node` devolvia um **booleano**. Ele sabia
+que o vizinho estava perto demais e **descartava a informação de em qual
+fiada** aquele vizinho realmente ocupa a parede. Sem a fiada, girar as
+duas era a única saída segura.
+
+Neste nó o vizinho é um `T_INTERSECTION` a 50cm cuja parede **principal**
+é a mesma parede bloqueada. E `solve_t_intersection` deita peça na parede
+principal **só na Fiada A** — nos três caminhos dele (B54 no T verdadeiro,
+B34 na degradação para L, nada na degradação de compensador). **A Fiada B
+daquela parede estava livre o tempo todo.** O canto podia manter peça nas
+duas paredes; bastava a peça daquela parede ir para a Fiada B.
+
+Medição de referência (o humano é a referência, não a cópia): a alvenaria
+humana **alterna** neste nó nas **duas** topologias (T e L). O solver
+alternava com a topologia antiga (T) e parava de alternar quando a parede
+N-S passava a **terminar** ali (L) — 17 fiadas com um dono só.
+
+**A regra:** a decisão de girar tem de ser tomada **por fiada**. Sempre
+que existir uma fiada em que a parede bloqueada esteja provadamente livre,
+a amarração alternada é obrigatória e o giro é proibido.
+
+### 36.3 REGRA OBRIGATÓRIA — ordem de precedência num `L_CORNER` com um
+lado bloqueado
+
+Com `busy` = o conjunto de fiadas em que o vizinho ocupa a parede
+bloqueada:
+
+1. **A fiada que a parede bloqueada JÁ tem está livre** → não mexer.
+   Alternância natural preservada.
+2. **A OUTRA fiada está livre** → **trocar** `course_a`↔`course_b`. As
+   duas paredes continuam com peça; só troca quem leva qual fiada.
+   Alternância preservada.
+3. **O vizinho ocupa as DUAS fiadas** → **girar** (36.1). Só aqui a
+   alternância é sacrificada, e só porque nenhuma fiada resolve.
+
+**A ordem 1 → 2 → 3 é obrigatória**, e não é cosmética: qual fiada a
+parede bloqueada "já tem" depende de ela ser `arms[0]` ou `arms[1]`, que
+vem da ordem de entrada das paredes (seção 30). Uma versão desta correção
+com apenas (2) e (3) fazia o **mesmo nó físico** alternar numa ordem de
+entrada e girar na outra. Invariância à ordem de entrada é requisito, não
+detalhe.
+
+### 36.4 REGRA OBRIGATÓRIA — dois alcances, nunca "alcance zero" na fiada
+de fora
+
+Ao medir se o vizinho esbarra na peça deste canto, o alcance-para-trás
+dele **depende da fiada**:
+
+- **fiada em que o vizinho DEITA peça sobre esta parede**:
+  `T_INTERSECTION_B54_HALF_ROOM_FT` = 27cm — o mesmo teto superestimado
+  que o gate já usava, mantido sem alteração;
+- **a outra fiada**: a peça dele está na parede **perpendicular**, mas o
+  **corpo** dela é tão largo quanto a espessura da parede e **atravessa
+  fisicamente esta** — alcance = `_node_default_reservation_cm` (metade da
+  maior espessura do nó), o mesmo achado empírico que o preenchimento
+  comum já reserva. **NUNCA zero.**
+
+**Isto é o que separa os dois casos reais:** o `T` a **50cm** bloqueia só
+a Fiada A (50 < 34+27, mas 50 > 34+7) — a troca resolve. O `T` a **20cm**
+bloqueia as **duas** (20 < 34+27 e 20 < 34+7) — a troca só migraria a
+colisão de fiada, e o giro continua sendo a única saída sem sobreposição.
+Tratar a fiada de fora como "alcance zero" faria a troca ser aceita no
+caso de 20cm e traria de volta a sobreposição de 14cm.
+
+Consequência de projeto: "bloqueado em ALGUMA fiada" continua **idêntico**
+ao predicado booleano anterior, porque a fiada deitada mantém os 27cm, que
+é o maior dos dois alcances.
+
+### 36.5 Em quais fiadas cada tipo de nó deita peça sobre uma parede
+(leitura de convenção, NÃO regra nova)
+
+`_node_bond_courses_on_wall` só pode afirmar **uma** fiada quando a
+convenção do solver daquele tipo de nó a fixa em **todos** os caminhos
+dele — inclusive os degradados e o `ok=False`:
+
+| nó | parede | fiadas | por quê |
+|---|---|---|---|
+| `T_INTERSECTION` | `main_wall_idx` | **A** | B54/A no T verdadeiro, B34/A na degradação-L, nada na degradação de compensador |
+| `T_INTERSECTION` | `incoming_wall_idx` | A **e** B | a degradação de compensador põe o MESMO elemento único nas duas fiadas da boneca |
+| `X_INTERSECTION` | `crossing_walls[0]` | **A** | a degradação troca a PEÇA, nunca a fiada nem a parede |
+| `X_INTERSECTION` | `crossing_walls[1]` | **B** | idem |
+| `L_CORNER` | qualquer braço | A **e** B | o próprio giro (36.1) pode mandar as duas fiadas para a mesma parede |
+
+Na dúvida, **as duas** — o pior caso, que reproduz o comportamento
+anterior. Nenhuma linha desta tabela inventa comportamento: todas são
+lidas dos solvers em `wall_stepper.py`.
+
+### 36.6 O que esta CR NÃO decidiu
+
+- **B19 como peça de amarração continua PROIBIDO** (seção 35). No nó
+  medido, o humano fecha a fiada ímpar com **B19**; o solver corrigido
+  fecha com **B34**. A alternância física é a mesma. **A escolha do humano
+  NÃO foi copiada** — fazê-la exigiria decisão normativa nova, que não foi
+  tomada nem pedida.
+- Nenhuma regra de X, T ou L foi alterada. Nenhum B54 foi forçado em L.
+  Nenhuma regra geral de "parede curta" foi criada (as duas paredes do nó
+  medido têm 644cm e 939cm). Nenhuma tolerância, hard gate ou critério de
+  prisma foi relaxado. Nenhum compensador foi usado para esconder falha de
+  amarração.
+
+### 36.7 PADRÃO OBSERVADO — restaurar a amarração num canto pode custar
+dois compensadores, e isso é ARITMÉTICA do catálogo, não defeito
+
+Restaurar a alternância devolve peça de amarração à parede N-S em 8 das 17
+fiadas — e o trecho que sobra naquela fiada passa a fechar com dois
+compensadores: **`COMPENSATOR_CONSECUTIVE` +8** e
+**`COMPENSATOR_EXCESS_IN_RUN` +8** por projeto, na parede N-S do próprio
+nó (eixo `[338,523;180,048]→[338,523;824,048]` no TGD;
+`[8017,26;1282,95]→[8017,26;1926,95]` no TP1 — o rótulo `W0xx` é derivado
+de índice e **não** é identidade física).
+
+**São 8 eventos físicos, não 16** — provado comparando os `id` dos blocos
+citados: o MESMO par `C04`+`C09` dispara os dois códigos (encostados ⇒
+`CONSECUTIVE`; dois num trecho de teto 1 ⇒ `EXCESS_IN_RUN`).
+
+**A causa é aritmética e forçada.** O trecho da fiada ímpar é delimitado
+pelo nó (`t = 0`, onde a peça de amarração de um L obrigatoriamente
+encosta) e pela reserva do `T` vizinho (`t ≈ 50`, o corpo da peça dele
+atravessando esta parede): **49cm úteis**. Com o `B34` de amarração,
+`49 − 34 − 1 = 14cm` de sobra, e a enumeração exaustiva do catálogo
+(`B39` 39, `B34` 34, `B19` 19, `C09` 9, `C04` 4, junta 1cm) dá **apenas**
+`C04+C09` (2 compensadores) ou `C04+C04+C04` (3). **Nenhuma peça fecha
+14cm sozinha** — o solver já escolhe o mínimo. Sem peça de amarração no
+nó (o que o giro fazia) o trecho útil era de 34cm a partir de `t = 15` e
+fechava com **um `B34`, zero compensadores**: era esse o "lucro" contábil
+do giro — composição limpa **ao preço da amarração**.
+
+**REGRA OBRIGATÓRIA:** dois compensadores num trecho de nó **não**
+autorizam desfazer a amarração para "limpar" a composição. A composição é
+consequência; a amarração é a estrutura. Quem quiser eliminar esses
+compensadores tem de mudar a **peça**, não o **papel** do nó.
+
+**As duas saídas conhecidas exigem DECISÃO NORMATIVA e NÃO foram
+tomadas:**
+
+1. **`B19` como peça de amarração do canto** — é o que o humano faz aqui
+   (`B19[0–19] + C09[20–29] + B54[30–84]`, 1 compensador). **Proibido
+   pela seção 35.** Não copiado.
+2. **`B54` do `T` na fiada ÍMPAR** — o humano centra o `B54` do `T` na
+   mesma fiada do `B19` do canto; `solve_t_intersection` fixa a peça
+   principal na Fiada A. Mudaria a convenção de **todo** `T` do corpus.
+
+O `repair_b19_residual_fill` (seção 35) **não se aplica**:
+`_b19_residual_span_cm` mede o residual da PAREDE inteira
+(644 − 34 = 610cm), não um trecho interno — e um `B19` de 19cm não caberia
+nos 14cm de qualquer forma.
+
+**Margem declarada:** os compensadores novos ficam em `t ≈ 37,0` e
+`t ≈ 44,5`, em **8 de 17** fiadas. `COMPENSATOR_VERTICAL_STRIP` exige
+razão `≥ 0,50`; `8/17 = 0,47`, então **não** dispara (medido: 2 → 2). A
+margem é de **uma fiada** — numa parede com outra contagem de fiadas o
+mesmo padrão passaria do limiar.
+
+### 36.8 O saldo, no mesmo par de estados
+
+`JUNCTION_NOT_ALTERNATING`
+**32 → 0** (TGD) e **16 → 0** (TP1), e as juntas verticais que eram
+**coincidentes** (`PRISM_CONTINUOUS_JOINT`, critical) passam a
+**desencontradas abaixo do alvo** (`PRISM_STAGGER_BELOW_TARGET`, minor)
+nas MESMAS paredes — TGD `W071`/`W073`, TP1 `W071`. Cobertura, colisões,
+aberturas e todos os demais códigos de amarração ficam com **delta zero
+por identidade física**.
+
+---
+
+## 37. `CR-C1` — a expectativa de fiada de uma parede é FÍSICA e por
+ELEVAÇÃO, nunca um número global do projeto (2026-09-08)
+
+> Conhecimento de **COBERTURA/MODULAÇÃO EM ALTURA** (quantas fiadas uma
+> parede deve ter, e como isso é medido). Implementado em
+> `nuvem/benchmark/validators/validate_wall_coverage.py`
+> (`missing_course_above_cm`, `wall_top_z_cm`). Relatório e medições:
+> `docs/CR_C1_COVERAGE_EXPECTED_ROWS_PHYSICAL.md`.
+>
+> **Numeração:** a seção **36** está RESERVADA para a `CR-S1` (PR #25,
+> branch `claude/corrigir-alternancia-no-l-76nnb3`), que ainda **não foi
+> mesclada** na `main`. Esta CR nasceu da `main` `91258dd`, onde a 36
+> ainda não existe. Não renumerar nenhuma das duas no merge.
+
+### 37.1 REGRA OBRIGATÓRIA — `settings.expected_rows` NÃO é expectativa de parede
+
+`settings.expected_rows` (= `settings.num_courses`) é o **teto de fiadas do
+PROJETO**. Ele **nunca** pode ser comparado com a contagem de fiadas de uma
+parede individual.
+
+**Causa-raiz provada.** O validador de cobertura fazia
+`len(fiadas_da_parede) < expected_rows` → acusa `COVERAGE_MISSING_ROW`. As
+paredes do corpus real têm alturas **diferentes** — 220 / 260 / 270 / 280 /
+281cm — e uma parede de 260cm com passo de 20cm **nunca** terá 17 fiadas.
+
+**PADRÃO OBSERVADO, medido, não deduzido:** rodando os validadores sobre o
+**gabarito HUMANO** (`reference.json`), `COVERAGE_MISSING_ROW` dá **95**
+(TGD) e **94** (TP1) — os mesmos números que o `reference_score.json`
+oficial registra — e **100% deles** vêm desse ramo, **zero** do ramo do meio
+da pilha. Um validador que acusa a própria referência de correção está
+medindo a coisa errada.
+
+### 37.2 REGRA OBRIGATÓRIA — a fiada do topo NÃO segue o passo do grid
+
+Medido no gabarito humano, a última fiada é **encostada no pé-direito**, e
+não no próximo múltiplo do passo:
+
+| altura da parede | última cota | segue o grid? |
+|---|---|---|
+| 220cm | z=200 | sim |
+| 260cm | z=240 | sim |
+| 270cm | z=**250** | **não** |
+| 280cm | z=260 | sim |
+| 281cm | z=**261** | **não** |
+
+Nas paredes de 281cm a fiada abaixo do topo é **canaleta** (`CJ19`, 29cm de
+altura; `CAN34`/`CAN39`) e a do topo usa peças `_C` de 9cm.
+
+**Consequência de projeto:** é **PROIBIDO** um validador calcular "quantas
+fiadas esta parede deveria ter" reproduzindo onde cada fiada cai — isso
+reimplementa a política de empilhamento do solver **dentro** do validador, e
+um validador que duplica a regra que fiscaliza deixa de fiscalizar.
+
+### 37.3 REGRA OBRIGATÓRIA — o critério é "cabe mais uma fiada inteira?"
+
+Falta fiada no topo **se e somente se** ainda cabe uma fiada **inteira**
+abaixo do pé-direito daquela parede:
+
+```
+proxima_cota = cota_da_fiada_mais_alta + passo_de_fiada
+FALTA  <=>  proxima_cota + altura_da_peca <= base_z + altura_da_parede
+```
+
+Não precisa saber onde as fiadas caem — só se **sobra espaço físico** para
+outra. É por **elevação absoluta**, nunca por índice ordinal (mesma
+disciplina da seção da `CR-V1`).
+
+**Margem medida** (folga real no topo, gabarito humano): −9cm (24 paredes, a
+canaleta ultrapassa o topo declarado), +1cm (63/62), +11cm (10). O limiar é
+o **passo inteiro (20cm)** — margem de **9cm** contra a maior folga
+legítima observada.
+
+### 37.4 EXCEÇÃO PERMITIDA — parede sem altura declarada fica sem veredito
+
+Sem `height_cm` não existe pé-direito para comparar. Nesse caso **não se
+reporta** — e é **PROIBIDO** inferir a altura a partir das fiadas que
+existem: isso tornaria o critério **tautológico** ("espera-se o que já está
+lá") e um solver que truncasse toda parede passaria limpo.
+
+### 37.5 PADRÃO OBSERVADO — corrigir o falso positivo NÃO pode zerar o achado
+
+Prova de que o critério físico continua fiscalizando, medida sobre a saída
+do **solver** do TGD: o ramo do topo cai apenas **30 → 28**. As **28**
+preservadas são paredes de `h=340` cuja última fiada está em `z=301`
+(ainda cabe fiada em `z=321`, pois `321+19 = 340 ≤ 340`) — **defeito real
+do solver**. As **2** que deixaram de ser acusadas têm a última fiada em
+`z=321` (`321+19 = 340` = topo exato) — **parede fechada**. A discriminação
+entre elas é de **19cm**.
+
+O ramo do **meio da pilha** (fiada ausente entre a primeira e a última) não
+foi tocado: 162 → 162 no solver do TGD.
+
+**REGRA OBRIGATÓRIA:** ao corrigir um falso positivo de validador, medir
+sempre os dois lados — quanto sumiu **contra a referência correta** e
+quanto **permaneceu contra a saída defeituosa**. Uma queda a zero nos dois
+é sinal de que o validador foi silenciado, não corrigido.
+
+### 37.6 PADRÃO OBSERVADO — o gate `G16` da CR-B é COMPOSTO e esta CR
+resolve METADE dele
+
+Medido sobre o candidato da CR-B (estado onde o gate falha), nos dois
+projetos: `STATE_R → STATE_C` dá **`+17 COVERAGE_MISSING_ROW`** e
+**`+23 COVERAGE_ROW_MOSTLY_EMPTY`** — exatamente os números do G16.
+
+| componente | com a CR-C1 | causa |
+|---|---|---|
+| `+17 COVERAGE_MISSING_ROW` | **+0** — resolvido | `expected_rows` global |
+| `+23 COVERAGE_ROW_MOSTLY_EMPTY` | **+23** — inalterado | **outra causa** |
+
+`COVERAGE_ROW_MOSTLY_EMPTY` **não lê** `expected_rows`: compara as fiadas
+de uma parede entre si. O resíduo (38 novos − 15 que sumiram) são fiadas
+cobrindo 6-30% do trecho modulável numa parede cuja melhor fiada cobre
+100%; **34 dos 38 em paredes sem abertura nenhuma**, concentrados em
+paredes de 169cm. Classe **D/E**: consequência da **divisão de paredes** da
+própria CR-B (`+19` paredes, **184 blocos mudaram de fiada** pelo manifesto
+do candidato) — os blocos humanos são redistribuídos entre os segmentos.
+
+**REGRA OBRIGATÓRIA:** o `G16` **continua NÃO aprovado**. Resolver metade
+de um gate composto NÃO o aprova, e o saldo do outro componente não pode
+ser compensado pelo componente resolvido. A outra metade exige CR própria
+(**CR-C2 — cobertura por segmento após divisão de parede**), não
+implementada.
+
+### 37.7 O que esta CR NÃO decidiu
+
+- **`baseline.json` e `reference_score.json` NÃO foram regravados.** O
+  `reference_score.json` oficial continua registrando 95/94; recalibrá-lo
+  é escrita em arquivo oficial e exige **autorização específica do
+  usuário**.
+- Os **162** achados do ramo do meio da pilha no solver do TGD continuam
+  **sem diagnóstico próprio** — CR separada.
+- As **28** paredes de `h=340` que param em `z=301` são **defeito real do
+  solver**, agora corretamente acusado. Esta CR **entrega** esse achado;
+  corrigi-lo é outro trabalho.
+- Nenhuma regra de amarração, de X/T/L, de B54/B34/B19 ou de compensador
+  foi tocada. O solver não foi tocado.
+
+---
+
+## 38. `CR-C2` — a UNIDADE de avaliação de cobertura de uma fiada, quando a parede é dividida
+
+> **ESTADO: DOCUMENTADO — pendência de DECISÃO NORMATIVA do usuário e
+> pendência de código aberta.** Nada nesta seção está implementado.
+> Nenhuma regra aqui foi aprovada pelo usuário. Registrado agora, antes da
+> implementação, porque é conhecimento medido que não pode se perder.
+
+**Como foi descoberto:** medição própria (nenhuma no Revit ao vivo) sobre
+o candidato determinístico da CR-B (`5640933`) e sobre o gabarito humano
+dos dois projetos, comparando **sempre por coordenada global** `(x, y, z)`
+— nunca por `W0xx`. Diagnósticos reprodutíveis em
+`nuvem/benchmark/future_cr_preparation/cr_c2_row_mostly_empty/`.
+Relatório: `docs/CR_C2_ROW_MOSTLY_EMPTY_WALL_SPLIT.md`.
+
+### 38.1 PADRÃO OBSERVADO, MEDIDO — dividir uma parede não muda a alvenaria, mas muda quantas vezes o mesmo vazio é acusado
+
+Quando um eixo é partido em segmentos, **nenhum bloco sai do lugar**
+(medido: 0 blocos humanos perdidos, 0 novos, 0 duplicados; 184 blocos
+mudam de *associação* de fiada, não de posição). Ainda assim
+`COVERAGE_ROW_MOSTLY_EMPTY` sobe `+23` por projeto, porque o achado é
+emitido **por par (parede, fiada)**: uma parede-mãe com uma fiada
+deficiente vira 2–3 segmentos, cada um com a sua fiada deficiente, e o
+guard `best_ratio ≥ 0.9` — calculado **por parede** — passa a ser
+satisfeito em segmentos onde a mãe não o satisfazia.
+
+Prova de que não é defeito físico (as três medições convergem):
+
+| medição | resultado |
+|---|---|
+| vazio físico total (coordenada global) | **−14.409,0cm** nos dois projetos — o candidato tem MENOS vazio |
+| vazios que aparecem só no candidato | **58 de 58 contidos** num vazio que já existia; **geometria nova = 0** |
+| mesmos blocos, reavaliados na **unidade de parede original** | **−3**, contra `+23` na unidade dividida |
+
+> **LIMITE DA CONCLUSÃO, registrado de propósito:** estar CONTIDO num
+> vazio anterior prova apenas que a reconstrução **não criou geometria
+> nova**. **NÃO** prova que o vazio seja falso nem que a ausência não seja
+> real — os 58 são vazios **reais**, em `STATE_R` e em `STATE_C`.
+>
+> **REGRA OBRIGATÓRIA (medição, não domínio) — a detecção de vazio real
+> não depende do `ROW_MOSTLY_EMPTY`.** Medido nos quatro estados:
+> correspondência **1:1 perfeita** entre vazio físico ≥5cm e
+> `COVERAGE_GAP_IN_ROW` (648/648, 601/601, 637/637, 590/590), **zero
+> vazios sem achado**. O `ROW_MOSTLY_EMPTY` é um **agregador secundário**
+> do mesmo fato geométrico que o `GAP_IN_ROW` já reporta integralmente.
+> Nenhuma mudança no `ROW_MOSTLY_EMPTY` perde detecção de vazio real.
+>
+> **Consequência para qualquer CR futura:** um delta de
+> `COVERAGE_ROW_MOSTLY_EMPTY` entre dois estados com **particionamento de
+> parede diferente NÃO é comparável** sem antes reconciliar a unidade.
+> Comparar contagem de achados entre esses dois estados mede o
+> particionamento, não a alvenaria.
+
+### 38.2 CONFLITO REGISTRADO — fiadas fora do passo do grid contadas como fiada de parede
+
+> **CORREÇÃO DESTA SUBSEÇÃO (2026-09-08, mesma sessão).** A versão
+> anterior chamava essas fiadas de *"faixas de verga/peitoril"*.
+> **MEDIDO e REFUTADO:** das 116 fiadas fora do passo do candidato (TGD),
+> apenas **34 (29%) têm abertura ativa** naquela cota; **82 (71%) não têm
+> abertura nenhuma**. As peças dominantes são **CORTADAS** — `B39_C`
+> (137), `B34_C` (94), `B19_C` (67), `B54_C` (18) — não vergas. A
+> caracterização correta é **fiada de peças cortadas fora do passo do
+> grid**; verga/peitoril é um subconjunto minoritário. O número e o
+> conflito abaixo continuam válidos; só a explicação física muda.
+>
+> Contrato relacionado que **existe** e foi localizado
+> (`solver_bridge.solver_supported_catalog`): as peças `B19_C`, `B34_C`,
+> `B39_C`, `B54_C`, `C09_C`, `CAN34`, `CAN39`, `CJ19`, `CM19` **o solver
+> não implementa**, e o contrato manda tratá-las como *"escopo pendente do
+> solver, não erro de modulação"* (diferença de nível 2). Esse contrato
+> governa a comparação **solver × gabarito** — **não** se aplica ao G16,
+> que compara `STATE_R × STATE_C`, ambos gabarito humano. Aplicado como
+> filtro, levaria o delta de `+23` para `+12`, não a zero: **10 dos 23
+> achados estão em fiadas 100% compostas de peças que o solver
+> implementa.**
+
+O código declara que `COVERAGE_ROW_MOSTLY_EMPTY` existe para detectar *"o
+solver ter perdido UMA das duas famílias de fiada (A ou B)"*. Medido:
+
+| projeto | achados no gabarito **humano** | em fiada do passo do grid | **em faixa FORA do passo** |
+|---|---|---|---|
+| TGD | 85 | 24 | **61 (72%)** |
+| TP1 | 120 | 52 | **68 (57%)** |
+
+As faixas fora do passo do grid são **vergas, contravergas e peitoris** —
+elementos locais de uma abertura, que existem só sobre o vão e que **nunca
+deveriam** cobrir o comprimento da parede. Uma verga não é família A nem
+família B. Cobrar dela 50% do trecho modulável contradiz o contrato
+declarado do próprio validador.
+
+**Este é um defeito PRÉ-EXISTENTE**, presente no gabarito humano e em
+`STATE_A` na mesma proporção — **não** foi introduzido pela CR-B. Dos
+`+23` do candidato, **16 estão em faixas de verga e 7 em fiadas de grid**.
+
+**Não corrigido.** Corrigir muda `baseline.json` e `reference_score.json`
+oficiais (escrita vedada sem autorização) e exige definir normativamente
+**o que é uma fiada de parede para efeito de cobertura** — decisão do
+usuário.
+
+### 38.3 DECISÃO FÍSICA PENDENTE — nenhuma opção adotada
+
+Números medidos, não estimados:
+
+| opção | definição normativa que ela cria | ruído no gabarito humano | delta G16 |
+|---|---|---|---|
+| manter como está | — | 85 / 120 | `+23` |
+| **A** — só fiada no passo do grid conta | *fiada fora do passo do grid não é fiada de parede* | **24 / 52** | `+7` — **não basta** |
+| **B** — avaliar na parede física agregada | *segmentos colineares divididos são uma unidade de cobertura* | inalterado | **−3** |
+| **C** — G16 medido por vazio físico global | *o gate mede geometria, não contagem de achados* | inalterado | **−14.409cm** |
+
+> **CONFLITO REGISTRADO contra a opção B (2026-09-08).** A tese medida da
+> CR-B é que os 19 casos **não são aberturas**, e sim *o espaço entre DUAS
+> PAREDES QUE TERMINAM NO NÓ* (teste da verga: 60 de 62 aberturas reais do
+> TGD têm verga; dos 19, **zero**). Se isso vale, os segmentos **são
+> paredes fisicamente distintas** e a unidade correta em `STATE_C` **é o
+> segmento** — a opção B reagruparia exatamente o que a CR-B separou por
+> evidência física, afirmando na avaliação o contrário do que a CR-B
+> afirma na geometria. **B fica registrada como normativa nova E
+> provavelmente incorreta.** Recomendação revista: **opção C isolada**,
+> não "A+B" como constava na primeira redação desta seção.
+
+**A orientação mais recente do usuário tem prioridade sobre esta seção.**
+Enquanto não houver decisão, vale o comportamento de hoje.
+
+### 38.4 REQUISITO OBRIGATÓRIO para qualquer correção futura
+
+Uma correção que apenas **reduza** `COVERAGE_ROW_MOSTLY_EMPTY` é
+inaceitável. Ela tem de **preservar a detecção de trecho realmente
+vazio**: um trecho de parede genuinamente não modulado tem as **fiadas do
+passo do grid** vazias, não apenas as faixas de verga. Qualquer patch
+precisa demonstrar, com teste que falha antes e passa depois, que esse
+caso continua acusado — junto com paredes divididas com cobertura real,
+paredes divididas com vazio real, bases Z distintas, aberturas,
+encontros, inversão de orientação, ordem de entrada e determinismo.
+
+### 38.5 CONHECIMENTO DE AMARRAÇÃO — dividir uma parede converte nós `T` em nós `L`
+
+Medido no candidato (TP1: **12 pontos** com troca de tipo; TGD: efeito
+análogo): quando o eixo é partido no ponto onde a perpendicular chega, o
+nó que era **`T`** (parede passante, perpendicular encostando no meio)
+passa a ser **`L`** (duas paredes terminando no mesmo ponto). O ponto, a
+cota e a geometria das peças são **os mesmos** — muda a classificação do
+encontro.
+
+Consequências práticas, ambas medidas:
+
+1. **Identidade de achado de encontro nunca deve incluir o tipo do nó.**
+   Com a chave `(ponto, elevação, tipo)`, `JUNCTION_MISSING_BINDING`
+   reporta **26 identidades novas** no TP1, das quais 16 pareceriam
+   piora em nó pré-existente. Com a chave física correta
+   `(ponto, elevação)`: **10 identidades novas, 0 sumiram, todas em nós
+   que só existem no candidato — nenhum nó pré-existente piorou.**
+2. **Pelo mesmo motivo, o eixo da parede não serve de identidade para
+   juntas de prisma.** `PRISM_CONTINUOUS_JOINT` no gabarito reporta **49
+   identidades novas** pela chave "eixo da parede" e **0** por coordenada
+   global — a divisão muda o eixo sem mover a junta.
+
+> **REGRA OBRIGATÓRIA (esta subseção, ao contrário das anteriores, não
+> depende de decisão normativa — é método de medição):** toda comparação
+> de amarração entre dois estados com particionamento de parede diferente
+> usa **coordenada global do ponto do nó + elevação física**. Nunca o
+> rótulo `W0xx`, nunca o eixo da parede, nunca o índice ordinal da fiada,
+> nunca o tipo do nó.
+
+---
+
+## 39. `CR-G12` — a junta contínua CRÍTICA nasce na FRONTEIRA ENTRE BANDAS de abertura
+
+> **ESTADO: IMPLEMENTADO (2026-09-08), aguardando revisão humana e
+> merge.** Conhecimento de AMARRAÇÃO: registro obrigatório (`CLAUDE.md`).
+> Diagnóstico: `docs/CR_G12_CROSS_BAND.md`; **implementação e medições:
+> `docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md`**; diagnósticos e
+> reproducers em `nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/`.
+>
+> O estado anterior deste bloco era *"DOCUMENTADO — pendência de código
+> aberta, CR preparada, NÃO implementada"*. Mantido o registro da mudança
+> de estado, como manda o `CLAUDE.md`: nada aqui foi apagado, a §39.3 foi
+> **corrigida** (ver lá) e a §39.4 passou de proposta a implementação.
+
+**Como foi descoberto:** medição própria sobre a saída do **solver de
+produção** (projeção isolada `91258dd` + CR-S1 + CR-C1), comparando
+`IN_R → IN_C` do candidato CR-B por **coordenada global da junta + cotas
+físicas das duas fiadas**. Nenhuma medição no Revit ao vivo.
+
+### 39.1 REGRA OBRIGATÓRIA — a fiada acima da verga não herda a amarração da fiada abaixo dela
+
+Medido: numa parede de **geometria idêntica** (939cm, mesma porta
+`t=314..405` com `head_cm=160`, mesmo eixo), mudando **apenas** o tipo do
+nó de ponta de `T` para `L`:
+
+- as fiadas de `z=1` até **`z=141` saem IDÊNTICAS**;
+- **a divergência começa em `z=161`** — a primeira fiada **acima da
+  verga**;
+- na fiada `z=161` o solver troca um `B39` (39cm) por um `B19` (19cm) na
+  segunda posição. O `B19` consome 20cm em vez de 40cm e **recoloca a
+  fiada em fase** com a fiada de baixo;
+- resultado: **6 juntas contínuas** com desencontro **0,00cm** (limite
+  1,50cm), espaçadas de 40cm.
+
+Assinatura reproduzida **nos dois projetos**, nas **mesmas cotas
+relativas**: TGD `141/161` (base 0) e TP1 `753/773` (base 612 →
+`141/161`). 2 paredes × 6 juntas = **12 identidades por projeto**.
+
+> **É a mesma causa já registrada na §27.7**: `solve_building_blocks_all_
+> courses` resolve **cada banda de abertura do zero**, e *"na fronteira
+> entre duas bandas a regra #1 simplesmente não é avaliada"*. A §27.7 já
+> media que **as 33 coincidências residuais eram todas cross-band**. As 12
+> do G12 são uma **nova instância do mesmo defeito**, não um defeito novo.
+
+**A divisão de paredes da CR-B não criou este defeito — ela expôs um caso
+dele.** O `STATE_R` só escapava porque o layout que a banda de cima
+escolhia *calhava* de desencontrar.
+
+### 39.2 REGRA OBRIGATÓRIA — nó `T` e nó `L` na mesma ponta produzem amarrações diferentes na banda seguinte
+
+O tipo do nó de ponta **propaga efeito para muito além do nó**: ele muda a
+peça de arranque da fiada, e o arranque decide a fase de **toda a banda
+acima da abertura**. Consequência prática: qualquer CR que converta `T` em
+`L` (como a divisão de paredes faz — §38.5) **precisa remedir
+`PRISM_CONTINUOUS_JOINT` por identidade física em todas as bandas da
+parede**, não apenas no nó.
+
+### 39.3 CORRIGIDA (2026-09-08) — o defeito não se reproduz numa planta SINTÉTICA, mas reproduz num SUBPLANO REAL de 3 paredes
+
+> **CONFLITO REGISTRADO, com a versão que vale agora.** A redação anterior
+> desta seção dizia *"o defeito NÃO se reproduz isoladamente"* e concluía,
+> como **regra obrigatória de método**, que *"reproduções de defeito de
+> composição têm de rodar sobre o projeto inteiro"*. **Essa generalização
+> estava errada** e está substituída pelo texto abaixo. O que continua
+> valendo da versão antiga é o fato medido: nenhuma planta **inventada**
+> reproduz.
+
+Cinco tentativas de redução, todas versionadas em
+`nuvem/benchmark/future_cr_preparation/cr_g12_cross_band/`:
+
+| cenário | natureza | resultado |
+|---|---|---|
+| nó `T` × `L`, parede 939cm, **sem abertura** (`repro_g12.py`) | sintético | 0 × 0 |
+| idem **com a banda de abertura real** (`repro_g12b.py`) | sintético | 0 × 0 |
+| **subprojeto real** escolhido por PROXIMIDADE (`repro_g12c.py`) | real, seleção errada | não reproduz |
+| 1.952 cenários porta + **janela** (`sweep2_janela.py`) | sintético | **0** juntas contínuas cross-band |
+| 430 cenários com **encontro T no meio do eixo** (`sweep3_no_de_meio.py`) | sintético | **0** juntas contínuas — nem cross-band nem intra-banda |
+| **subplano de 3 paredes REAIS** escolhido por MEDIÇÃO (`reduzir.py` → `repro_g12d_minimo.py`) | real, delta-debugging | **REPRODUZ** — identidade `(-401,5, 309,5)`, cotas `121/141`, desencontro **0,00cm** |
+
+> **REGRA OBRIGATÓRIA de método (versão que vale):** um defeito de
+> composição **não se reproduz numa planta sintética pequena** — numa
+> planta inventada o solver não produz junta contínua nenhuma (~4.900
+> combinações medidas). Mas ele **se reduz**: partindo do `input.json`
+> **oficial** e removendo parede enquanto a **identidade física** continuar
+> sendo acusada (*delta-debugging*), o TGD cai de **167 para 3 paredes**
+> sem perder o defeito. Selecionar as paredes por **proximidade** não
+> funciona (foi o erro do `repro_g12c.py`); selecionar por **medição**,
+> sim. Sempre reduzir assim antes de declarar "só reproduz no projeto
+> inteiro".
+
+**Os três ingredientes que o subplano mínimo prova serem necessários** (e
+que faltavam em todas as tentativas sintéticas):
+
+1. uma **banda de UMA FIADA SÓ**, criada quando o peitoril ou a verga
+   atravessa o meio de uma fiada — é ela que fica *espremida* entre duas
+   outras e não enxerga nenhum dos dois lados;
+2. uma **peça de amarração que FIXA a junta** de um dos lados (no caso
+   medido, um `B54` de `T_INTERSECTION_MIDSPAN` em `t=40..94`): a junta em
+   `t=39,5` da fiada de baixo **não depende de layout** e o preenchimento
+   não tem como movê-la — quem tinha de sair da frente era a fiada de
+   cima, que está em outra banda;
+3. o **recorte e o reparo da abertura** (`OPENING_REPAIR_FILL`) na fiada
+   de cima, que é o que dá a ela a composição em fase.
+
+### 39.4 REGRA OBRIGATÓRIA — a regra #1 vale TAMBÉM entre fiadas de bandas diferentes (IMPLEMENTADA)
+
+> Substitui a redação anterior desta seção (*"Correção — proposta, NÃO
+> implementada"*). As quatro razões que sustentavam o adiamento estão
+> respondidas: (i) existe reproducer reduzido — §39.3; (ii) a `CR-G12`
+> autorizou escrever `nuvem/core/wall_modeling.py`; (iii) medido, o
+> impacto **não** é "toda parede com abertura" (ver abaixo); (iv) nenhum
+> validador, threshold ou baseline foi tocado.
+
+**A regra.** Duas fiadas **fisicamente vizinhas** obedecem à regra #1
+(junta vertical nunca coincide) **independentemente de pertencerem à mesma
+banda de abertura ou não**. A banda é um agrupamento **interno do solver**,
+por conjunto de aberturas ativas; ela não existe na parede construída e
+**não pode ser fronteira de amarração**.
+
+**Como está implementado** (`docs/CR_G12_CROSS_BAND_IMPLEMENTATION.md`):
+
+1. cada fiada física, depois de montada, publica as juntas **reais** das
+   suas peças (`_course_joint_positions_by_wall`, medidas na geometria
+   lançada — nunca no "layout", que depois do recorte e do reparo já não
+   descreve o que ficou na parede);
+2. a banda seguinte recebe essas juntas como **semente**
+   (`_cross_band_seed_for_band` → `cross_band_joint_seed`), separadas por
+   família A/B: a vizinha física tem sempre paridade oposta, então a
+   semente de "A" vem sempre de fiadas "B" de outra banda;
+3. o preenchimento só **troca** de composição quando de fato empilha junta
+   sobre a vizinha, quando existe alternativa do **mesmo trecho** com
+   **estritamente** menos coincidência, e quando essa alternativa **não
+   piora** nem a regra #1 dentro da banda nem a regra #2 (compensadores) —
+   `_cross_band_swapped_layout`. **Nunca troca por empate.**
+
+**Por que DOIS passes.** As bandas são resolvidas de baixo para cima: no
+primeiro passe uma banda só enxerga a vizinha de **baixo**. Uma banda
+espremida entre duas outras (o caso comum da banda de uma fiada só) pode
+ter, em cima, uma junta **presa a uma peça de amarração**, que não se move
+— quem tinha de sair da frente era a de baixo, e ela ainda não sabia
+disso. O segundo passe roda com o resultado do primeiro como vizinhança de
+cima. **Medido no TGD:** um passe só resolvia 10 identidades e **criava
+5 novas**; com o segundo passe, **14 resolvidas e 0 novas**. O resultado de
+um passe só substitui o anterior se a coincidência cross-band **total**
+cair **estritamente** — empate mantém o mais conservador.
+
+**Critério de aceite — cumprido, medido nos dois projetos:**
+
+| critério | resultado |
+|---|---|
+| as **12 identidades → 0** | **0 no TGD e 0 no TP1** (candidato CR-B com S1+C1) |
+| `PRISM_CONTINUOUS_JOINT` **não sobe** no corpus oficial | **cai**: TGD 336→322, TP1 290→260; nos 4 estados do candidato, −42/−48/−26/−32 |
+| nenhuma junta contínua **nova** | **zero** identidades novas, em qualquer ponto |
+| `PRISM_STAGGER_BELOW_TARGET` **declarado** | sobe **+31 (TGD)** e **+25 (TP1)** — nível 2, é a troca crítico→menor esperada |
+| determinismo | provado (duas execuções, peças idênticas na mesma ordem) |
+| cobertura/aberturas/encontros/colisões | **delta 0** |
+
+**Impacto real medido — a estimativa antiga de "toda parede com abertura"
+estava errada:** no TGD só **21 paredes** tinham junta contínua cross-band
+e apenas **6** tinham a variante *pura* (a que só existe por causa da
+fronteira). `piloto_sintetico_2x2`: **delta zero em todos os códigos**.
+
+**Dívidas que continuam abertas:** `baseline.json` **não** foi regravado
+(escrita oficial, CR própria); a §27.8 item 2
+(`UNCLASSIFIED_RULE_CONFLICT` — junta de peça de **amarração** repetida)
+continua **sem decisão normativa** e **fora** desta correção: o
+preenchimento não pode mover a borda de uma peça de nó, e o guard recusa a
+troca; sobram **2** identidades cross-band residuais no TGD (nenhuma delas
+entre as 12 do G12), registradas e não escondidas; e o solver ficou
+**~2× mais lento** por causa do segundo passe.
+
+### 39.5 CONHECIMENTO DE AMARRAÇÃO — o nó novo caiu no centro de um vazio que sempre existiu
+
+Medido nas 10 identidades novas de `JUNCTION_MISSING_BINDING` (gabarito,
+delta `STATE_R → STATE_C`), assinatura uniforme nos **20** achados dos dois
+projetos: **a peça mais próxima está a ~8,0cm do ponto do nó** — nunca
+zero, nunca longe.
+
+Geometria do caso `(-401,5, 24,1)`, `z=140`:
+
+- a parede que **termina** ali tem o ponto a **0,05cm** da sua ponta;
+- a parede **passante** tem o ponto a **7,05cm do seu eixo** = **meia
+  espessura**. O ponto do nó é onde o eixo de uma encontra a **face** da
+  outra;
+- na fiada `z=140` da passante há um **vazio de 16,0cm em `t=669..685`**, e
+  o ponto do nó está em **`t=677` — o centro exato do vazio**;
+- **o mesmo vazio de 16,0cm, em `t=669..685`, existe em `STATE_R`.**
+
+> **REGRA OBRIGATÓRIA:** ao registrar um nó novo num ponto, verificar se
+> ali existe **alvenaria** naquela cota. Um nó cujo ponto cai no centro de
+> um vazio pré-existente gera `JUNCTION_MISSING_BINDING` que **não é
+> defeito de amarração novo** — é o vazio de sempre, já acusado por
+> `COVERAGE_GAP_IN_ROW`. Classificação medida: **10 de 10 são (C) unidade
+> nova legítima; nenhum nó pré-existente piorou.**
+
+### 39.6 CONHECIMENTO DE AMARRAÇÃO — o *pin* de papel de canto `L` do SAFE REPAIR muda a amarração de paredes DISTANTES
+
+> **PADRÃO OBSERVADO, MEDIDO** — revisão independente da CR-G12
+> (2026-09-08). Medido no `torre_easy_lo_r00_tgd` oficial comparando a
+> **geração pura** (`_solve_building_blocks_all_courses_core`) com o
+> **pipeline completo** (`solve_building_blocks_all_courses`, que inclui
+> `repair_arm_role_isolated_edges`), com a propagação cross-band
+> desligada × ligada. Registro em
+> `docs/CR_G12_REVISAO_INDEPENDENTE.md` §7.2.
+
+Quando `repair_arm_role_isolated_edges` aceita um candidato, ele grava um
+**pin** de papel `course_a`/`course_b` nos dois nós da aresta isolada
+(`_set_l_corner_role_bits(..., pinned=True)`) e reconstrói **o edifício
+inteiro**. O efeito **não fica restrito** à parede alvo nem às duas
+vizinhas do candidato: o pin muda a reserva de nó dessas paredes, o que
+muda a composição das bandas, o que muda o layout de paredes que **não
+têm relação topológica nenhuma** com a aresta reparada.
+
+Medição que separa as duas coisas (TGD, flag cross-band desligada × ligada):
+
+```
+GERACAO PURA (sem ARM/B19) - paredes com blocos diferentes: 11
+    W007 W011 W046 W069 W070 W072 W075 W087 W090 W113 W160
+PIPELINE COMPLETO          - paredes com blocos diferentes: 12
+    as 11 acima + W074
+```
+
+`W074` **não muda na geração**. Ela só muda porque, com a propagação
+ligada, a parede 23 já nasce sem prisma forçado e o candidato `23/SAME_A`
+**deixa de ser proposto** — e o pin que ele instalava também melhorava,
+**de tabela**, a amarração de `W074`. Perdido o pin, `W074` cai de
+desencontro ≥ 10 cm para **5,0 cm** em `t=49,5` e `t=54,5`, em **toda** a
+altura (16 ocorrências de `PRISM_STAGGER_BELOW_TARGET`, nível 2 — nunca
+junta contínua).
+
+**REGRA OBRIGATÓRIA para qualquer análise futura:** ao avaliar o efeito
+de uma mudança que altera o **conjunto de candidatos aceitos** pelo SAFE
+REPAIR, **nunca** atribuir todo o delta de amarração à mudança em si.
+Separar sempre as duas causas rodando também a **geração pura**: o que
+muda ali é da mudança; o que só aparece no pipeline completo é
+**colateral do pin**. Sem essa separação, um benefício colateral perdido
+é lido como regressão do mecanismo novo — e uma degradação colateral é
+lida como “troca crítico → menor”, que é exatamente o erro corrigido pela
+condição C2 da revisão da CR-G12.
+
+
+---
+
+## 40. FATO MEDIDO — extração forense do projeto humano (Revit, 2026-09-09)
 
 > **Origem**: leitura somente-leitura via MCP do documento
 > `TORRE EASY-LO-R00_desanexado_joaoC9CL7.rvt` (Revit 2026), o
@@ -4014,7 +6118,7 @@ explicitamente pelo usuário cria uma transação no Revit.
 > medição confirma uma regra já existente, isso está dito explicitamente;
 > onde ela contradiz ou fica indecisa, fica registrada como CONFLITO.
 
-### 30.1 CONFIRMADO E MEDIDO — a grade vertical da seção 8 está certa
+### 40.1 CONFIRMADO E MEDIDO — a grade vertical da seção 8 está certa
 
 Fiadas medidas no gabarito (`04. TGD`) e repetidas identicamente no
 pavimento-tipo (`05. TP1`), em cota relativa à base do nível:
@@ -4030,7 +6134,7 @@ seção 8 contra o projeto humano real, em dois níveis independentes. A
 advertência da seção 8 ("não alterar sem reconfirmar no Revit real")
 está agora satisfeita — a fórmula atual é a correta.
 
-### 30.2 REGRA OBSERVADA (confiança ALTA) — onde verga e contraverga nascem
+### 40.2 REGRA OBSERVADA (confiança ALTA) — onde verga e contraverga nascem
 
 - **Base da verga = cota do topo do vão**, offset 0,00 cm em **392/392**
   peças assentadas nessa posição.
@@ -4046,7 +6150,7 @@ está agora satisfeita — a fórmula atual é a correta.
 verga pré-fabricado (`VERGA 109` … `VERGA 214`, de 5 em 5 cm) que cubra o
 vão com apoio ≥ 9 cm. **Política de escolha de comprimento: em aberto.**
 
-### 30.3 CONFIRMADO E MEDIDO — o critério porta × janela da seção 10.4
+### 40.3 CONFIRMADO E MEDIDO — o critério porta × janela da seção 10.4
 
 O projeto humano rotula as aberturas por parâmetro compartilhado
 `Título_abertura`: **PORTA 248 · JANELA 134 · ABERTURA 102**. O rótulo é
@@ -4061,7 +6165,7 @@ E o comportamento bate com o que 10.4 já dizia:
 
 Confirmação independente de 10.4 — a regra não muda.
 
-### 30.4 REGRA OBSERVADA — "CORTADO" é corte em ALTURA, não em comprimento
+### 40.4 REGRA OBSERVADA — "CORTADO" é corte em ALTURA, não em comprimento
 
 Descoberta que **corrige o entendimento anterior** (a documentação tratava
 `CORTADO` como peça fina genérica, sem dizer em que eixo):
@@ -4080,7 +6184,7 @@ peças de 9 cm (88,4%) assentam na base da fiada (`z ≡ +1 mod 20`) ou na
 meia-fiada (`z ≡ +11 mod 20`). É assim que o humano faz ajuste vertical
 sem sair da grade de 20 cm.
 
-### 30.5 CONFIRMADO E MEDIDO — reforça a seção 10.5
+### 40.5 CONFIRMADO E MEDIDO — reforça a seção 10.5
 
 **2.440 de 3.026 blocos cortados que têm abertura na mesma parede (80,6%)
 estão a menos de 60 cm de uma jamba.** A medição anterior de 10.5 era 65%.
@@ -4092,7 +6196,7 @@ a ≤25 cm de jamba 28,4%, a ≤25 cm de extremidade de parede 12,2%, última
 fiada da parede 11,0%, corte em comprimento 6,5%, abaixo de peitoril 1,9%,
 outros 10,6%.
 
-### 30.6 CONFIRMADO EM ESCALA — a sequência do "Sistema 2" acima do vão
+### 40.6 CONFIRMADO EM ESCALA — a sequência do "Sistema 2" acima do vão
 
 `OPENINGS.md` registrava a sequência canaleta como PADRÃO OBSERVADO com
 apenas 2 exemplos. Medida agora no nível gabarito, acima do topo de vão de
@@ -4111,7 +6215,7 @@ ser "2 exemplos" e passa a ser **PADRÃO OBSERVADO em centenas de peças por
 pavimento**. Continua **não implementada** — 10.2/10.3/10.6 seguem só
 documentados.
 
-### 30.7 CONFLITO 10.7 — nova medição, continua ABERTO
+### 40.7 CONFLITO 10.7 — nova medição, continua ABERTO
 
 Sobre **651 paredes** de todos os níveis (agrupadas pelo parâmetro
 `Parede` do próprio projeto, não por linha reconstruída — método diferente
@@ -4134,7 +6238,7 @@ agora existe uma explicação estrutural para os 28,6% restantes. Continua
 valendo: **não implementar nenhum dos dois lados** sem decisão explícita
 do usuário.
 
-### 30.8 REGRA OBSERVADA — não classificar peça pelo nome da família
+### 40.8 REGRA OBSERVADA — não classificar peça pelo nome da família
 
 **25 instâncias da família `VERGA JANELA` estão assentadas como
 contraverga** (topo exatamente na cota do peitoril, apoios de 19 a 44 cm),
@@ -4146,7 +6250,7 @@ casos (4,6%)**. A classificação correta é **geométrica**: peça de 9 cm com
 base na cota do topo do vão = verga; peça de 9 cm com topo na cota do
 peitoril = contraverga.
 
-### 30.9 FATO MEDIDO — o catálogo fixo cobre 80,19% do projeto humano
+### 40.9 FATO MEDIDO — o catálogo fixo cobre 80,19% do projeto humano
 
 `BLOCK_FAMILY_CATALOG_DEFINITIONS` casa por família **+** tipo exatos, e
 cobre **54.298 de 67.712 peças (80,19%)**, **6 de 57 tipos**.
@@ -4163,7 +6267,7 @@ ser afrouxada por dedução de comprimento; o que fica registrado é que a
 alvenaria de **vedação** deste projeto está, hoje, **fora do escopo do
 catálogo**, e isso é uma decisão a tomar, não um bug.
 
-### 30.10 ARMADILHAS DE LEITURA DO REVIT (medidas nesta sessão)
+### 40.10 ARMADILHAS DE LEITURA DO REVIT (medidas nesta sessão)
 
 Registradas porque qualquer leitura futura deste modelo repete o erro:
 
@@ -4190,9 +6294,12 @@ Registradas porque qualquer leitura futura deste modelo repete o erro:
    `[base + Peitoril, base + Peitoril + Altura_abertura]`. Usar a bbox como
    vão trata toda janela como se fosse porta.
 
+> Nota da revisão 2026-09-10: EVIDÊNCIA / NÃO NORMA. A seção era 30 no PR original; renumerada para 40 para preservar as seções 30–39 já integradas. Confirmação observacional não aprova mudança de contrato. Limites de reprodutibilidade e identidade: docs/revit_reference_extraction/REVIEW_2026-09-10.md.
+
+
 ---
 
-## 31. MEDIÇÕES OBSERVADAS — projeto humano nº 2, BUTANTÃ R08_LT (Revit, 2026-09-09)
+## 41. MEDIÇÕES OBSERVADAS — projeto humano nº 2, BUTANTÃ R08_LT (Revit, 2026-09-09)
 
 > **STATUS: EVIDÊNCIA / NÃO NORMATIVO.**
 >
@@ -4216,9 +6323,9 @@ Registradas porque qualquer leitura futura deste modelo repete o erro:
 > explicitamente proibida de tocar solver, catálogo, benchmark, baseline,
 > gabarito, UI ou thresholds.
 
-### 31.1 Existe um segundo sistema de aberturas no domínio: CANALETA
+### 41.1 Existe um segundo sistema de aberturas no domínio: CANALETA
 
-O projeto nº 1 (`TORRE EASY-LO-R00`, seção 30) resolve aberturas com
+O projeto nº 1 (`TORRE EASY-LO-R00`, seção 40) resolve aberturas com
 **verga/contraverga**: peça dedicada de **9 cm** de altura, sobreposta.
 
 Este projeto resolve com **canaleta**: **fiada inteira de 19 cm**, integrada
@@ -4245,7 +6352,7 @@ isso reflete o projeto nº 1. Existe pelo menos um projeto humano real que
 não usa nenhum dos dois. **Isto não revoga nenhuma regra existente** — é
 registro de que o domínio tem mais de uma solução válida.
 
-### 31.2 O invariante entre os dois projetos
+### 41.2 O invariante entre os dois projetos
 
 Apesar de sistemas de abertura **opostos**, os dois projetos concordam em:
 
@@ -4260,7 +6367,7 @@ Apesar de sistemas de abertura **opostos**, os dois projetos concordam em:
 - bbox com +1 cm de folga por face no comprimento, e a bbox inflada em Z
   do `BLOCO 54 CORTADO` (19 cm na bbox, 9 cm no sólido).
 
-### 31.3 CONFLITO 10.7 (canaleta na última fiada) — segunda medição independente
+### 41.3 CONFLITO 10.7 (canaleta na última fiada) — segunda medição independente
 
 A seção 10.7 registra o conflito *"toda parede tem canaleta na última fiada"*.
 
@@ -4277,7 +6384,7 @@ sistemas de abertura diferentes, convergem em **~72–74%**.
 80 dos 340 grupos de parede (23,53%) terminam **sem nenhuma canaleta** no
 topo. Não implementar nenhum dos dois lados sem decisão explícita do usuário.
 
-### 31.4 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — apoio lateral da canaleta
+### 41.4 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — apoio lateral da canaleta
 
 Os dois projetos **discordam** sobre apoio lateral:
 
@@ -4295,26 +6402,26 @@ funde com a da vizinha** (comprimento máximo medido: 449 cm além da jamba).
 
 **Não promover a regra.** Registrado para a decisão de política do usuário.
 
-### 31.5 FATO MEDIDO — "cortado" tem duas estratégias, com proporção variável
+### 41.5 FATO MEDIDO — "cortado" tem duas estratégias, com proporção variável
 
 | Estratégia | Projeto nº 1 | Projeto nº 2 |
 |---|---|---|
 | Corte na **altura** (19 → 9 cm), família dedicada | 93,54% | **43,36%** (124/286) |
 | Corte no **comprimento**, parâmetro `VAR` de instância | 6,46% | **56,64%** (162/286) |
 
-A seção 30 registra o corte em altura como dominante. **Isso vale para o
+A seção 40 registra o corte em altura como dominante. **Isso vale para o
 projeto nº 1, não para o domínio**: aqui a maioria dos cortes é no
 comprimento, e 67 dos 162 são em peças de **canaleta**, para fechar o
 comprimento das fiadas canaletadas.
 
-### 31.6 FATO MEDIDO — topo do vão cai numa linha da grade
+### 41.6 FATO MEDIDO — topo do vão cai numa linha da grade
 
 **134/142 (94,37%)** dos vãos terminam na cota `z_rel = 221 cm`, que é
 `1 + 11 × 20` — uma linha exata da grade de 20 cm. O topo do vão não é uma
 cota livre: é uma fiada. Isso é o que permite a canaleta assentar com offset
 zero sem nenhuma peça de ajuste.
 
-### 31.7 EXCEÇÕES MEDIDAS — quando a canaleta não aparece
+### 41.7 EXCEÇÕES MEDIDAS — quando a canaleta não aparece
 
 12 de 142 aberturas (8,45%), com duas causas identificadas:
 
@@ -4335,7 +6442,7 @@ Relação medida entre largura do vão e solução:
 | **120–149 cm** | **57/57 (100%)** |
 | 150–179 cm | 18/24 (75%) |
 
-### 31.8 ARMADILHAS DE LEITURA deste modelo (registradas para não repetir)
+### 41.8 ARMADILHAS DE LEITURA deste modelo (registradas para não repetir)
 
 1. **Categoria *Vegetação* espelha a alvenaria 1:1** — 65.747 instâncias
    `Cor <peça>`, uma para cada peça de Modelos genéricos. São representação
@@ -4353,8 +6460,10 @@ Relação medida entre largura do vão e solução:
    `DB.Element.Name.GetValue(el)` ou `symbol.FamilyName`.
 6. **A bbox da família de abertura vai do datum do nível até o topo do vão**
    (`bbox.MaxZ == datum + Peitoril + Altura_abertura` em 142/142) — mesma
-   armadilha do item 7 da seção 30, confirmada num segundo projeto.
+   armadilha do item 7 da seção 40, confirmada num segundo projeto.
 7. Neste documento **`LookupParameter` com nome acentuado funcionou**
    (`Deslocamento do hospedeiro`, `Título_abertura`, `RÉGGA_LOCAL`) —
    diferente do projeto nº 1, onde retornava `None`. Não assumir nenhum dos
    dois comportamentos: verificar por documento.
+
+> Erratas evidenciais 2026-09-10 (sem alteração normativa): 7212991 PORTA tem peitoril 40 cm; 135/136 offsets superiores incluem COMMON_BLOCKS (CHANNEL: 129/130); desvio de 6616547 é 1 cm (220→221); corte de canaleta é 67/162 = 41,36%. Ver docs/revit_reference_extraction/butanta-r08-lt/REVIEW_2026-09-10.md.

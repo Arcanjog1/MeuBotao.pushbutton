@@ -1,0 +1,2 @@
+# Captured test output is evidence: preserve bytes and trailing spaces.
+docs/checkpoints/evidence/*.txt -text whitespace=-blank-at-eol

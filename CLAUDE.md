@@ -1,9 +1,26 @@
 # Modulacao Automatica (pyRevit) - instrucoes para o Claude Code
 
+## Entrega e recuperacao documental
+
+Ao concluir trabalho relevante, seguir `docs/DEVELOPMENT_PROCESS.md`:
+reconciliar `docs/PROJECT_STATUS.md` com a main buscada por fetch e criar
+checkpoint versionado em `docs/checkpoints/`, com HEAD avaliado, base,
+PR e evidencias. Nunca usar uma copia antiga do status para sobrescrever
+mudancas de outra sessao. Confirmar `git ls-files` e executar o validador
+documental antes do push. `.claude/checkpoints/` serve apenas como rascunho
+local, nunca como unica memoria de entrega. Estado candidato nao e oficial.
+Nova sessao: ler START_HERE, status e checkpoint antes de retomar.
+
 ## Idioma
 
 Sempre responder ao usuario em portugues do Brasil (pt-BR), em toda
 sessao futura deste projeto - independente do idioma usado na pergunta.
+
+## Onboarding
+
+Comece por `docs/START_HERE.md`. Use recuperacao progressiva de
+contexto (ver secao abaixo): nao leia recursivamente todo o repo sem
+necessidade.
 
 ## Merge na main
 

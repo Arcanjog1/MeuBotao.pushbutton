@@ -2992,6 +2992,83 @@ def _group_course_indices_by_opening_band(openings_per_wall, base_z_abs, course_
             for sig in signature_order]
 
 
+# CR-G12 (2026-09-08) - liga/desliga a propagacao de juntas entre BANDAS de
+# abertura, no mesmo padrao de ARM_ROLE_SAFE_REPAIR_ENABLED/
+# B19_RESIDUAL_FILL_REPAIR_ENABLED (permite medir com e sem a correcao sem
+# tocar em nenhum chamador). Desligado, `_solve_building_blocks_all_courses_
+# core` nao monta semente nenhuma e o solver reproduz EXATAMENTE o
+# comportamento anterior a esta CR.
+#
+# CAUSA que isto corrige (secao 27.7 do REGRAS_MODULACAO_BLOCOS.md): a
+# regra #1 (junta vertical nunca coincide entre fiadas vizinhas) e'
+# avaliada DENTRO de cada banda - a familia B desencontra a familia A da
+# mesma banda - mas nunca ATRAVESSA a fronteira entre duas bandas, porque
+# cada banda chama `solve_building_blocks` do zero. Duas fiadas fisicamente
+# vizinhas que caem em bandas diferentes nunca se viam.
+CROSS_BAND_JOINT_PROPAGATION_ENABLED = True
+
+
+def _course_joint_positions_by_wall(course_pieces, walls_to_create):
+    """{wall_idx: [t_cm das juntas]} de UMA fiada FISICA ja' montada.
+
+    Medido na geometria REAL das pecas lancadas (`joint_positions_from_
+    extents`), nunca no "layout" - depois do recorte de abertura e do
+    reparo local o layout original ja' nao descreve o que ficou na parede.
+    Duas pecas separadas por um VAO nao formam junta (a mesma protecao de
+    `BOND_MAX_ADJACENT_GAP_CM` da auditoria de amarracao)."""
+    by_wall = {}
+    for candidate in course_pieces or []:
+        wall_idx = candidate.get("wall_idx")
+        if wall_idx is None:
+            continue
+        by_wall.setdefault(wall_idx, []).append(candidate)
+    joints_by_wall = {}
+    for wall_idx in sorted(by_wall):
+        p0, _p1, wall_dir, _len_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+        extents = _candidate_extents_on_wall(by_wall[wall_idx], p0, wall_dir)
+        joints = joint_positions_from_extents(extents)
+        if joints:
+            joints_by_wall[wall_idx] = joints
+    return joints_by_wall
+
+
+def _cross_band_seed_for_band(course_indices, solved_course_joints,
+                              prior_course_joints=None, band_of_course=None):
+    """Semente da regra #1 na FRONTEIRA DE BANDA, no formato que
+    `solve_building_blocks` consome: {wall_idx: {"A": [...], "B": [...]}}.
+
+    Para cada fiada fisica desta banda, junta as juntas das fiadas
+    fisicamente vizinhas (indice +-1) que estao em OUTRA banda. A vizinha
+    sempre tem paridade OPOSTA, entao a semente da familia "A" desta banda
+    vem sempre de fiadas "B" de outra banda, e vice-versa - exatamente a
+    relacao que a regra #1 exige e que a fronteira de banda perdia.
+
+    Fiadas vizinhas da PROPRIA banda NUNCA entram: dentro da banda a regra
+    #1 ja' e' avaliada pelo mecanismo historico (familia B evita a familia
+    A), e repetir isso aqui so' acrescentaria restricao duplicada.
+
+    Duas fontes, nesta ordem de prioridade (Gauss-Seidel):
+
+    1. `solved_course_joints` - o que ESTE passe ja' resolveu (a vizinha de
+       BAIXO, sempre; e a de cima quando a banda dela ja' rodou);
+    2. `prior_course_joints` - o passe ANTERIOR, para a vizinha que ainda
+       nao rodou neste passe (a de CIMA, no caso comum). `None` no primeiro
+       passe: la' a banda so' pode conhecer quem veio antes dela."""
+    seed = {}
+    for course_index in sorted(course_indices):
+        letter = "A" if course_index % 2 == 0 else "B"
+        for neighbour in (course_index - 1, course_index + 1):
+            if band_of_course is not None and \
+                    band_of_course.get(neighbour) == band_of_course.get(course_index):
+                continue
+            source = solved_course_joints.get(neighbour)
+            if source is None:
+                source = (prior_course_joints or {}).get(neighbour)
+            for wall_idx, joints in sorted((source or {}).items()):
+                seed.setdefault(wall_idx, {"A": [], "B": []})[letter].extend(joints)
+    return seed
+
+
 TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
 
 
@@ -3050,13 +3127,36 @@ def _drop_fill_colliding_with_ties(course_pieces):
     return mantidas, descartadas
 
 
-def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
-                                      catalog, base_z_abs, num_courses,
-                                      allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
-                                      variants_per_course=1,
-                                      band_cb=None, progress_cb=None,
-                                      wall_start_cb=None, wall_result_cb=None,
-                                      stage_cb=None, opening_strategy=None):
+# CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT (2026-09-04): liga/desliga o
+# SAFE REPAIR (`repair_arm_role_isolated_edges`, wall_stepper.py) sem
+# precisar mudar nenhum chamador - default True porque o contrato de
+# seguranca (hard gates de fechamento/colisao/prisma-em-vizinha/
+# compensador/cobertura, TODOS avaliados contra um rebuild COMPLETO antes
+# de aceitar) ja' foi verificado contra TGD/TP1/Piloto (ver
+# docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md e REGRAS_MODULACAO_BLOCOS.md secao
+# 30 para o historico; relatorio desta CR para a verificacao final).
+ARM_ROLE_SAFE_REPAIR_ENABLED = True
+
+# CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (2026-09-05): liga/desliga o
+# reparo de fill residual B19 (`repair_b19_residual_fill`, wall_stepper.py)
+# sem precisar mudar nenhum chamador - mesmo padrao de
+# ARM_ROLE_SAFE_REPAIR_ENABLED acima (default True porque o candidato so'
+# e' aplicado depois de passar os MESMOS hard gates - fechamento/colisao/
+# prisma-forcado-no-alvo-e-em-vizinha/compensador/cobertura - avaliados
+# contra um rebuild COMPLETO; ver docs/BLOCK_B19_RESIDUAL_FILL_
+# IMPLEMENTATION.md e nuvem/REGRAS_MODULACAO_BLOCOS.md para o veredito e a
+# medicao contra TGD/TP1/Piloto).
+B19_RESIDUAL_FILL_REPAIR_ENABLED = True
+
+
+def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                           catalog, base_z_abs, num_courses,
+                                           allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                           variants_per_course=1,
+                                           band_cb=None, progress_cb=None,
+                                           wall_start_cb=None, wall_result_cb=None,
+                                           stage_cb=None, opening_strategy=None,
+                                           prior_course_joints=None):
     """Como `solve_building_blocks`, mas roda uma vez POR GRUPO de fiadas
     fisicas com o mesmo conjunto de aberturas ativas (ver
     _group_course_indices_by_opening_band), em vez de resolver so' UMA vez
@@ -3099,11 +3199,17 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             "jamb_exceptions": [], "non_modular": [], "alignment_conflicts": [],
             "per_wall": [], "validations": [],
             "door_void_violations": [],
+            "_cross_band_course_joints": {}, "_cross_band_band_of_course": {},
         }
     block_height_ft = course_height_ft - _cm_to_ft(COURSE_JOINT_CM)
 
     groups = _group_course_indices_by_opening_band(
         openings_per_wall, base_z_abs, course_height_ft, block_height_ft, num_courses
+    )
+    band_of_course = dict(
+        (course_index, band_pos)
+        for band_pos, (course_indices, _f) in enumerate(groups)
+        for course_index in course_indices
     )
 
     course_candidates = {}
@@ -3115,19 +3221,29 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     all_per_wall, all_validations = [], []
     all_door_void_violations = []
     total_bands = len(groups)
+    # CR-G12 (secao 27.7): juntas ja' resolvidas, por fiada FISICA
+    # ({course_index: {wall_idx: [t_cm]}}). E' o unico estado que atravessa
+    # a fronteira entre duas bandas - alimenta a regra #1 na primeira busca
+    # da banda seguinte, em vez de cada banda comecar com as listas vazias.
+    solved_course_joints = {}
     for _band_pos, (course_indices, filtered_openings) in enumerate(groups):
         if band_cb is not None:
             try:
                 band_cb(_band_pos + 1, total_bands, list(course_indices))
             except Exception:
                 pass
+        cross_band_seed = (
+            _cross_band_seed_for_band(course_indices, solved_course_joints,
+                                      prior_course_joints, band_of_course)
+            if CROSS_BAND_JOINT_PROPAGATION_ENABLED else None
+        )
         result = solve_building_blocks(
             nodes, walls_to_create, end_to_node, filtered_openings, catalog,
             allow_compensators=allow_compensators, base_z_abs=base_z_abs,
             variants_per_course=variants_per_course,
             opening_strategy=opening_strategy,
             progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-            stage_cb=stage_cb,
+            stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
         )
         bands.append({"course_indices": list(course_indices), "result": result})
         for course_index in course_indices:
@@ -3158,6 +3274,12 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             fiada, descartados = _drop_fill_colliding_with_ties(fiada)
             dropped_by_course[course_index] = descartados
             course_candidates[course_index] = fiada
+            # CR-G12: publica as juntas DESTA fiada fisica (geometria final,
+            # ja' sem o preenchimento que a regra 18.7 descartou) para as
+            # bandas ainda nao resolvidas que tenham vizinha aqui.
+            if CROSS_BAND_JOINT_PROPAGATION_ENABLED:
+                solved_course_joints[course_index] = _course_joint_positions_by_wall(
+                    fiada, walls_to_create)
         # AGREGADO para o relatorio (all_candidates/all_collisions): cada
         # banda entra UMA UNICA VEZ aqui, nao uma vez por course_index -
         # `result["collisions"]` sao pares de indice DENTRO da lista
@@ -3238,7 +3360,198 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         # Validacao MULTI-FIADA (ve' a parede inteira de uma vez, nao fiada
         # a fiada isolada) - ver secao "ETAPA 4C" logo acima desta funcao.
         "wall_bond_audits": wall_bond_audits,
+        # CR-G12 - estado INTERNO do laco de passes de
+        # `_solve_building_blocks_all_courses_core`, que o remove antes de
+        # devolver: {course_index: {wall_idx: [t_cm]}} e {course_index:
+        # band_pos}. Nenhum consumidor externo ve' estas chaves.
+        "_cross_band_course_joints": solved_course_joints,
+        "_cross_band_band_of_course": band_of_course,
     }
+
+
+CROSS_BAND_JOINT_PROPAGATION_PASSES = 2
+
+
+def _cross_band_coincidence_total(course_joints, band_of_course):
+    """Quantas juntas coincidem entre duas fiadas FISICAMENTE vizinhas que
+    caem em BANDAS diferentes - a grandeza que a CR-G12 existe para baixar,
+    medida por coordenada real ao longo do eixo de cada parede.
+
+    Pares dentro da MESMA banda ficam de fora de proposito: la' a regra #1
+    ja' e' avaliada pelo mecanismo historico, e o residuo que sobra
+    (junta de peca de AMARRACAO repetida - conflito §27.8 item 2, sem
+    decisao normativa) nao e' desta CR."""
+    total = 0
+    for course_index in sorted(course_joints):
+        neighbour = course_index + 1
+        if neighbour not in course_joints:
+            continue
+        if band_of_course.get(course_index) == band_of_course.get(neighbour):
+            continue
+        below = course_joints[course_index]
+        above = course_joints[neighbour]
+        for wall_idx in sorted(set(below) & set(above)):
+            total += _count_joint_coincidences_cm(below[wall_idx], above[wall_idx])
+    return total
+
+
+def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                            catalog, base_z_abs, num_courses,
+                                            allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                            variants_per_course=1,
+                                            band_cb=None, progress_cb=None,
+                                            wall_start_cb=None, wall_result_cb=None,
+                                            stage_cb=None, opening_strategy=None):
+    """CR-G12 - laco de PASSES sobre `_solve_building_blocks_all_courses_
+    pass` (a funcao original, inalterada no que faz).
+
+    Por que mais de um passe. As bandas sao resolvidas na ordem em que
+    aparecem, de baixo para cima, entao no primeiro passe uma banda so'
+    enxerga a fiada vizinha de BAIXO - a de CIMA ainda nao existe. Isso
+    basta para a maioria das fronteiras, mas nao para uma banda ESPREMIDA
+    entre duas outras (o caso comum de uma banda de UMA fiada so', onde o
+    peitoril/verga atravessa a fiada): a fiada de cima pode ter a junta
+    presa a uma peca de AMARRACAO, que nao se move - quem tinha de sair da
+    frente era a de baixo, e no primeiro passe ela ainda nao sabia disso.
+    O segundo passe roda com o resultado do primeiro como vizinhanca de
+    cima (Gauss-Seidel: a vizinha de baixo ja' e' a deste passe).
+
+    ACEITACAO GLOBAL, nunca otimista: o resultado de um passe so' substitui
+    o anterior se a coincidencia cross-band TOTAL
+    (`_cross_band_coincidence_total`) diminuir ESTRITAMENTE. Empate mantem
+    o passe anterior - o mais conservador, o que mexeu menos. Com
+    `CROSS_BAND_JOINT_PROPAGATION_ENABLED = False` roda UM passe sem
+    semente nenhuma, identico ao comportamento anterior a esta CR."""
+    passes = CROSS_BAND_JOINT_PROPAGATION_PASSES \
+        if CROSS_BAND_JOINT_PROPAGATION_ENABLED else 1
+    best = None
+    best_score = None
+    prior_course_joints = None
+    for _pass_index in range(max(1, passes)):
+        result = _solve_building_blocks_all_courses_pass(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+            base_z_abs, num_courses,
+            allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+            band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
+            wall_result_cb=wall_result_cb, stage_cb=stage_cb,
+            opening_strategy=opening_strategy,
+            prior_course_joints=prior_course_joints,
+        )
+        course_joints = result.pop("_cross_band_course_joints", {})
+        band_of_course = result.pop("_cross_band_band_of_course", {})
+        if result.get("error") is not None:
+            return result
+        score = _cross_band_coincidence_total(course_joints, band_of_course)
+        if best is None or score < best_score:
+            best, best_score = result, score
+        if best_score == 0:
+            break
+        prior_course_joints = course_joints
+    return best
+
+
+def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                      catalog, base_z_abs, num_courses,
+                                      allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                      variants_per_course=1,
+                                      band_cb=None, progress_cb=None,
+                                      wall_start_cb=None, wall_result_cb=None,
+                                      stage_cb=None, opening_strategy=None,
+                                      arm_role_safe_repair=None, b19_residual_fill_repair=None):
+    """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+    CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
+    courses_core` (a funcao original, inalterada - mesma docstring,
+    mesmos parametros): roda o rebuild ORIGINAL uma vez, e entao chama
+    `repair_arm_role_isolated_edges` (wall_stepper.py - TODA a logica de
+    candidatos/gates/delta mora la', ver o comentario no topo daquela
+    secao) passando `rebuild_fn` como um CALLBACK que roda a MESMA
+    resolucao de novo sobre o `nodes` mutado (nunca a si mesma - reentrar
+    aqui, no wrapper, dispararia o SAFE REPAIR de novo a cada tentativa
+    interna, que e' so' auditoria/tentativa, nao a resolucao "de verdade"
+    que o chamador externo pediu).
+
+    Este e' o UNICO lugar em `wall_modeling.py` tocado por esta CR - a
+    unica razao de nao caber inteiramente em `wall_stepper.py` (escopo
+    originalmente autorizado) e' que o REBUILD multi-banda em si (o loop
+    de bandas acima) mora aqui; `wall_stepper.py` nunca importa este
+    modulo (evita import circular - este modulo ja' faz `from
+    core.engine.wall_stepper import *`), entao a injecao de `rebuild_fn` e'
+    a unica ponte necessaria. Escopo consciente e minimo, nunca logica de
+    validacao duplicada aqui (ver CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+    CONTRACT secao 12).
+
+    `arm_role_safe_repair` (None usa o default do modulo,
+    `ARM_ROLE_SAFE_REPAIR_ENABLED`) permite religar/desligar por chamada,
+    sem precisar mudar nenhum outro codigo.
+
+    CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (2026-09-05): MESMO padrao,
+    encadeado APOS o SAFE REPAIR do ARM ROLE, DENTRO do MESMO bloco
+    `enabled` - `repair_b19_residual_fill` (wall_stepper.py) roda sobre o
+    resultado JA' corrigido pelo ARM SAFE REPAIR (nunca antes: uma peca de
+    amarracao que o ARM SAFE REPAIR resgatou precisa estar presente ANTES
+    do reparo B19 decidir se uma parede vizinha tem trecho residual).
+
+    REVISAO POS-PR#19 (item "flag existente" - contrato preservado):
+    `arm_role_safe_repair=False` continua desligando TODO o pos-
+    processamento (comportamento IDENTICO ao anterior a esta CR, quando
+    o ARM SAFE REPAIR era o UNICO reparo existente) - passar
+    `arm_role_safe_repair=False` NUNCA e' uma porta lateral para ligar o
+    B19 fora do pipeline normal. `b19_residual_fill_repair` (None usa o
+    default do modulo, `B19_RESIDUAL_FILL_REPAIR_ENABLED`) so' controla
+    se o passo B19 roda DENTRO do bloco `enabled` - permite desligar so'
+    o B19 (mantendo o ARM ligado), mas nunca o inverso. Separar os dois
+    flags de verdade (permitir B19 sozinho com ARM desligado) ficaria
+    para uma CR futura, se for desejavel - fora do escopo desta."""
+    enabled = ARM_ROLE_SAFE_REPAIR_ENABLED if arm_role_safe_repair is None else arm_role_safe_repair
+    b19_enabled = (B19_RESIDUAL_FILL_REPAIR_ENABLED if b19_residual_fill_repair is None
+                  else b19_residual_fill_repair)
+    result = _solve_building_blocks_all_courses_core(
+        nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
+        allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+        band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
+        wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
+    )
+    if not enabled or result.get("error") is not None:
+        return result
+
+    def _rebuild():
+        return _solve_building_blocks_all_courses_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
+            allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+            opening_strategy=opening_strategy,
+        )
+
+    repair_outcome = repair_arm_role_isolated_edges(
+        nodes, walls_to_create, catalog, num_courses,
+        baseline_result=result, rebuild_fn=_rebuild,
+    )
+    result["arm_role_safe_repair"] = {
+        "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
+    }
+    if repair_outcome["changed"]:
+        result = repair_outcome["final_result"]
+        result["arm_role_safe_repair"] = {
+            "accepted": repair_outcome["accepted"], "rejected": repair_outcome["rejected"],
+        }
+
+    if b19_enabled:
+        arm_role_safe_repair_signal = result.get("arm_role_safe_repair")
+        b19_outcome = repair_b19_residual_fill(
+            nodes, walls_to_create, end_to_node, catalog, num_courses,
+            baseline_result=result, rebuild_fn=_rebuild,
+        )
+        result["b19_residual_fill_repair"] = {
+            "accepted": b19_outcome["accepted"], "rejected": b19_outcome["rejected"],
+        }
+        if b19_outcome["changed"]:
+            result = b19_outcome["final_result"]
+            result["b19_residual_fill_repair"] = {
+                "accepted": b19_outcome["accepted"], "rejected": b19_outcome["rejected"],
+            }
+            if arm_role_safe_repair_signal is not None:
+                result["arm_role_safe_repair"] = arm_role_safe_repair_signal
+
+    return result
 
 
 # ==========================================
@@ -3634,7 +3947,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         extents = []
         for c in items:
             t_start, t_end = _candidate_extent_on_wall_axis(c, p0, wall_dir)
-            extents.append((t_start, t_end, c["logical_code"]))
+            extents.append((t_start, t_end, c["logical_code"], c.get("placement_reason"), c.get("node_index")))
         extents.sort(key=lambda e: e[0])
         for i in range(len(extents) - 1):
             gap_cm = extents[i + 1][0] - extents[i][1]
@@ -3642,17 +3955,40 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                 # Nao encostados de verdade - ha' uma abertura (ou outro
                 # vazio) entre eles, nao uma junta de assentamento.
                 continue
-            if _joint_is_opening_aligned_exempt(extents[i], extents[i + 1],
+            if _joint_is_opening_aligned_exempt(extents[i][:3], extents[i + 1][:3],
                                                 opening_edges_cm, length_cm):
                 # EXCECAO a' regra #1 (2026-08-28) - ver
                 # _joint_is_opening_aligned_exempt.
                 continue
             joint_points.append(((extents[i][1] + extents[i + 1][0]) / 2.0, course_index))
-        for t_start, t_end, code in extents:
+        for t_start, t_end, code, placement_reason, node_index in extents:
             if _is_special_block_code(code, catalog):
                 center = (t_start + t_end) / 2.0
                 if not _near_exempt_zone(center):
                     special_points.append((center, (course_index, code)))
+            # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-PR#19,
+            # item 4): distingue B19_AS_VALID_RESIDUAL_FILL de
+            # B19_AS_NODE_TIE por DUAS provas independentes, nunca por
+            # distancia generica e nunca so' pela etiqueta: (1)
+            # `placement_reason == "B19_RESIDUAL_FILL"` - so' colocado por
+            # `_corner_single_element_candidate` quando o no' foi marcado
+            # candidato PARA ESTA parede; (2) DEFESA EM PROFUNDIDADE -
+            # verificacao geometrica direta, aqui mesmo, de que uma peca de
+            # amarracao real (B34/B54) cobre o MESMO no' NA MESMA fiada,
+            # vinda de QUALQUER parede (`_b19_node_has_covering_tie`,
+            # contra `course_candidates[course_index]` SEM filtrar por
+            # wall_idx - nunca confia cegamente na etiqueta, mesmo que o
+            # hard gate `_b19_tie_integrity_ok` do reparo ja' garanta isso
+            # antes de aceitar qualquer candidato). So' isento quando as
+            # DUAS provas baterem. Um B19 com QUALQUER outro placement_
+            # reason, OU sem peca de amarracao real cobrindo o mesmo no'
+            # nesta fiada, continua bloqueado exatamente como antes -
+            # nenhuma mudanca de comportamento para o resto do motor.
+            if (code == HALF_BLOCK_CODE and placement_reason == "B19_RESIDUAL_FILL"
+                    and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
+                    and _b19_node_has_covering_tie(
+                        course_candidates.get(course_index) or [], nodes[node_index])):
+                continue
             if code == HALF_BLOCK_CODE and tie_t_positions_cm:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):
                 # distancia do CORPO do B19 (nao so' do centro) ate' a

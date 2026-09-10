@@ -1,0 +1,450 @@
+{
+ "OFICIAL": {
+  "counts": {
+   "COMPENSATOR_AVOIDABLE": 87,
+   "COMPENSATOR_CONSECUTIVE": 1480,
+   "COMPENSATOR_EXCESS_IN_RUN": 1135,
+   "COMPENSATOR_VERTICAL_STRIP": 190,
+   "COVERAGE_GAP_IN_ROW": 214,
+   "JUNCTION_MISSING_BINDING": 9,
+   "OPENING_BLOCK_CROSSES_JAMB": 168,
+   "OPENING_MISSING_COUNTER_LINTEL": 21,
+   "POSITION_OVERLAP": 18,
+   "PRISM_CONTINUOUS_JOINT": 290,
+   "PRISM_JOINT_STACK": 18,
+   "PRISM_STAGGER_BELOW_TARGET": 1506
+  },
+  "criticos": 485,
+  "fingerprint": "27d61b5c2e7b",
+  "pecas": 19572
+ },
+ "PROJETADO": {
+  "counts": {
+   "COMPENSATOR_AVOIDABLE": 87,
+   "COMPENSATOR_CONSECUTIVE": 1466,
+   "COMPENSATOR_EXCESS_IN_RUN": 1128,
+   "COMPENSATOR_VERTICAL_STRIP": 187,
+   "COVERAGE_GAP_IN_ROW": 304,
+   "COVERAGE_ROW_MOSTLY_EMPTY": 14,
+   "JUNCTION_MISSING_BINDING": 9,
+   "OPENING_MISSING_COUNTER_LINTEL": 21,
+   "POSITION_OVERLAP": 18,
+   "PRISM_CONTINUOUS_JOINT": 286,
+   "PRISM_JOINT_STACK": 18,
+   "PRISM_STAGGER_BELOW_TARGET": 1444
+  },
+  "criticos": 327,
+  "fingerprint": "081e5e4696eb",
+  "pecas": 19286
+ },
+ "resumo_da_projecao": {
+  "alteradas": [
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W003"
+   },
+   {
+    "de": [
+     309.0,
+     440.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     324.0,
+     425.0
+    ],
+    "wall": "W004"
+   },
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W004"
+   },
+   {
+    "de": [
+     904.0,
+     1035.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     919.0,
+     1020.0
+    ],
+    "wall": "W004"
+   },
+   {
+    "de": [
+     309.01,
+     440.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     324.0,
+     425.0
+    ],
+    "wall": "W005"
+   },
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W005"
+   },
+   {
+    "de": [
+     904.0,
+     1035.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     919.0,
+     1020.0
+    ],
+    "wall": "W005"
+   },
+   {
+    "de": [
+     309.01,
+     440.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     324.0,
+     425.0
+    ],
+    "wall": "W006"
+   },
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W006"
+   },
+   {
+    "de": [
+     904.0,
+     1035.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     919.0,
+     1020.0
+    ],
+    "wall": "W006"
+   },
+   {
+    "de": [
+     309.0,
+     440.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     324.0,
+     425.0
+    ],
+    "wall": "W007"
+   },
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W007"
+   },
+   {
+    "de": [
+     904.0,
+     1035.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     919.0,
+     1020.0
+    ],
+    "wall": "W007"
+   },
+   {
+    "de": [
+     579.0,
+     765.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     594.0,
+     750.0
+    ],
+    "wall": "W008"
+   },
+   {
+    "de": [
+     564.0,
+     750.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     579.0,
+     735.0
+    ],
+    "wall": "W017"
+   },
+   {
+    "de": [
+     564.0,
+     750.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     579.0,
+     735.0
+    ],
+    "wall": "W019"
+   },
+   {
+    "de": [
+     69.0,
+     200.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     69.0,
+     199.99
+    ],
+    "wall": "W025"
+   },
+   {
+    "de": [
+     68.99,
+     199.99
+    ],
+    "jamb_spread_cm": 0.010000000000005116,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     69.0,
+     199.99
+    ],
+    "wall": "W026"
+   },
+   {
+    "de": [
+     18.88,
+     109.88
+    ],
+    "jamb_spread_cm": 0.120000000000001,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     19.0,
+     109.88
+    ],
+    "wall": "W029"
+   },
+   {
+    "de": [
+     158.99,
+     250.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     159.0,
+     250.0
+    ],
+    "wall": "W035"
+   },
+   {
+    "de": [
+     19.0,
+     110.0
+    ],
+    "jamb_spread_cm": 0.120000000000001,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     19.12,
+     110.0
+    ],
+    "wall": "W040"
+   },
+   {
+    "de": [
+     158.99,
+     250.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     159.0,
+     250.0
+    ],
+    "wall": "W045"
+   },
+   {
+    "de": [
+     94.0,
+     280.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     109.0,
+     265.0
+    ],
+    "wall": "W046"
+   },
+   {
+    "de": [
+     94.0,
+     280.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     109.0,
+     265.0
+    ],
+    "wall": "W047"
+   },
+   {
+    "de": [
+     924.0,
+     1190.0
+    ],
+    "jamb_spread_cm": 15.0,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     939.0,
+     1175.0
+    ],
+    "wall": "W052"
+   },
+   {
+    "de": [
+     158.99,
+     250.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     159.0,
+     250.0
+    ],
+    "wall": "W066"
+   },
+   {
+    "de": [
+     19.0,
+     110.0
+    ],
+    "jamb_spread_cm": 0.120000000000001,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     19.12,
+     110.0
+    ],
+    "wall": "W072"
+   },
+   {
+    "de": [
+     158.99,
+     250.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     159.0,
+     250.0
+    ],
+    "wall": "W075"
+   },
+   {
+    "de": [
+     19.0,
+     120.02
+    ],
+    "jamb_spread_cm": 0.019999999999999574,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     19.02,
+     120.02
+    ],
+    "wall": "W077"
+   },
+   {
+    "de": [
+     69.0,
+     200.0
+    ],
+    "jamb_spread_cm": 0.009999999999990905,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     69.0,
+     199.99
+    ],
+    "wall": "W083"
+   },
+   {
+    "de": [
+     68.99,
+     199.99
+    ],
+    "jamb_spread_cm": 0.010000000000005116,
+    "opening_provenance": "RECONSTRUCTED_CONSENSUS",
+    "para": [
+     69.0,
+     199.99
+    ],
+    "wall": "W084"
+   }
+  ],
+  "inalteradas": 61,
+  "medidas_preservadas": 0,
+  "sem_par": []
+ }
+}

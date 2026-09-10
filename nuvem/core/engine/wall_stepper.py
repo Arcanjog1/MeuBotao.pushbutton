@@ -65,8 +65,12 @@ __all__ = [
     "_make_block_candidate", "_obb_2d", "_obb_corners", "_obb_min_overlap",
     "_obb_overlap", "_candidate_obb", "_cell_obb",
     "_l_corner_wall_pair", "_wall_reserved_range_ft", "_corner_wall_room_ft",
+    "_canonical_node_sort_key", "_two_arm_l_corner_role_bit",
+    "_arm_role_coordination_graph", "_coordinate_arm_role_nodes",
     "solve_l_corner", "T_INTERSECTION_B54_HALF_ROOM_FT", "CORNER_B34_ROOM_FT",
-    "_t_of_point_on_wall", "_wall_junction_ts_ft", "_corner_bond_blocked_by_other_node",
+    "_t_of_point_on_wall", "_wall_junction_ts_ft", "_wall_junction_nodes_and_ts_ft",
+    "_corner_bond_blocked_by_other_node", "BOND_COURSES_BOTH",
+    "_node_bond_courses_on_wall", "_corner_bond_blocking_courses",
     "_room_at_t_on_wall", "_t_intersection_room_assessment", "_t_intersection_room_ok",
     "CORNER_SINGLE_ELEMENT_CODES", "_corner_single_element_candidate",
     "solve_t_intersection", "X_INTERSECTION_B54_HALF_ROOM_FT",
@@ -87,7 +91,10 @@ __all__ = [
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
-    "_layout_internal_joint_positions_cm", "_count_joint_coincidences_cm",
+    "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
+    "_count_joint_coincidences_cm",
+    "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
+    "NODE_FILL_OPPOSITE_COURSE_ENABLED",
     "_layout_min_joint_stagger_cm", "MIN_JOINT_STAGGER_TARGET_CM",
     "OPENING_ALIGNED_EXEMPT_CODES", "_layout_compensator_run_excess",
     "_block_void_offsets_cm", "_layout_void_positions_cm", "_count_void_alignment_cm",
@@ -112,18 +119,43 @@ __all__ = [
     "_is_acerto_code", "_layout_acerto_penalty",
     "OPENING_WIDTH_INCREASE_MAX_CM", "OPENING_REPAIR_PLACEMENT_REASON",
     "_region_bounds_for_run", "_solve_repair_subsegments",
+    "_layout_physical_end_cm", "_layout_fitted_to_physical_span",
     "classify_extent_against_openings",
     "split_extents_by_openings", "opening_repair_regions",
     "region_solid_subsegments", "block_edges_cm", "joint_positions_from_extents",
     "minimum_opening_shift_cm", "minimum_opening_widening_cm",
     "plan_minimum_opening_adjustment", "_nearest_edge_delta",
     "_recut_openings_and_repair", "_candidate_extents_on_wall",
+    # ---- CR-G12 - regra #1 na fronteira entre BANDAS de abertura ----
+    "_cross_band_swapped_layout",
     # ---- ordem de processamento / validacao / pipeline principal ----
     "WALL_ORIENTATION_TOLERANCE", "WALL_ALIGNMENT_TOLERANCE_FT",
     "WALL_NO_GROWTH_TOLERANCE_CM", "WALL_COLLISION_REACH_CM",
     "classify_wall_orientation", "_cluster_values_ft", "order_walls_for_processing",
     "openings_for_wall", "_copy_openings_per_wall", "_wall_opening_intervals_cm",
     "_find_consecutive_compensators", "validate_wall_modulation",
+    # ---- CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT - SAFE REPAIR ----
+    "CORNER_ROLE_CANDIDATE_BITS", "_arm_role_isolated_edges",
+    "_set_l_corner_role_bits", "_wall_forced_corner_prism_signature",
+    "_wall_has_forced_corner_prism", "_wall_compensator_run_signatures",
+    "_no_new_consecutive_compensators", "_wall_row_covered_length_cm",
+    "_no_new_row_coverage_regression", "_candidate_identity_signature",
+    # ---- CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY ----
+    "_find_consecutive_compensators_in_course", "_wall_row_own_extents_cm",
+    "_subtract_intervals_cm", "_wall_row_node_credit_cm",
+    "_wall_row_covered_length_cm_with_node_credit",
+    "_collision_signatures", "_no_new_collisions", "_multi_band_wall_ok_map",
+    "_no_wall_regression", "_no_new_forced_corner_prism_in_neighbors",
+    "_evaluate_corner_role_candidate", "repair_arm_role_isolated_edges",
+    # ---- CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION ----
+    "B19_RESIDUAL_FILL_MIN_CM", "B19_RESIDUAL_FILL_MAX_CM", "_b19_residual_span_cm",
+    "_node_other_wall_idx", "_wall_two_end_node_indices", "_wall_all_junction_node_indices",
+    "_B19_TIE_PLACEMENT_PREFIXES", "_b19_is_tie_piece", "_b19_node_has_covering_tie",
+    "_b19_tie_integrity_ok", "_b19_candidate_dirty_scope",
+    "_B19_REPAIR_DEGRADED_REASONS", "_wall_end_degraded_in_items",
+    "_wall_both_ends_degraded_in_some_course",
+    "_b19_residual_edge_candidates", "_evaluate_b19_residual_candidate",
+    "repair_b19_residual_fill",
     "_apply_axis_plan_in_memory", "_rebase_node_indexes_for_wall",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
@@ -586,7 +618,29 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
         reserve_cm, _joint_cm = _wall_end_default_start_cm(
             nodes, end_to_node, walls_to_create, wall_idx, end_index
         )
-        reserve_ft = max(_cm_to_ft(reserve_cm), CORNER_B34_ROOM_FT)
+        # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: reserva DINAMICA (nunca
+        # um valor fixo do topo da faixa - ver `_b19_residual_span_cm`) SO'
+        # quando `repair_b19_residual_fill` marcou explicitamente ESTE no',
+        # PARA ESTA parede (`wall_idx in _b19_residual_fill_for_walls` - um
+        # CONJUNTO por no', nunca um escalar unico: duas paredes podem
+        # compartilhar o mesmo no' e cada uma precisa da sua propria marca
+        # sem apagar a da outra) - nunca por proximidade/no' generico.
+        # Outra parede que compartilhe o MESMO no' (ex.: a perpendicular de
+        # um L_CORNER) continua vendo o pior-caso de sempre, porque o
+        # `wall_idx in ...` testa ESTA parede especificamente. A reserva
+        # dinamica usa `length_ft - CORNER_B34_ROOM_FT` (o comprimento REAL
+        # desta parede) - garante que a ponta OPOSTA veja EXATAMENTE
+        # CORNER_B34_ROOM_FT de room, qualquer que seja o residuo real
+        # (15-20cm) - um valor fixo (ex.: sempre 20cm) so' funcionaria por
+        # coincidencia numerica quando o residuo real fosse exatamente
+        # aquele valor (bug real medido na revisao pos-PR#19: paredes com
+        # residuo < 20cm nunca destravariam a ponta oposta). Comportamento
+        # default (sem marca) e' byte-a-byte identico ao anterior a esta CR.
+        node = nodes[node_index] if node_index < len(nodes) else None
+        if node is not None and wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
+            reserve_ft = max(_cm_to_ft(reserve_cm), length_ft - CORNER_B34_ROOM_FT)
+        else:
+            reserve_ft = max(_cm_to_ft(reserve_cm), CORNER_B34_ROOM_FT)
         if end_index == 0:
             lo_ft = max(lo_ft, reserve_ft)
         else:
@@ -676,16 +730,21 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     # respondia por 42 dos 57 eixos em revisao manual da planta real.
     #
     # A saida e' GIRAR a peca do canto para a outra parede - nas DUAS
-    # fiadas. Apenas trocar quem leva qual fiada nao resolve: o T tambem
-    # alterna, entao a colisao so' migra de fiada (medido: sobreposicao
-    # de 14cm nos dois casos). Girando nas duas, a sobreposicao vai a
-    # zero e ainda sobra um pilarete de 4cm entre o canto e o T - que
-    # fecha exato com um compensador C04.
+    # fiadas. Girando nas duas, a sobreposicao vai a zero e ainda sobra um
+    # pilarete de 4cm entre o canto e o T - que fecha exato com um
+    # compensador C04.
     #
     # CUSTO: neste canto especifico as duas fiadas passam a ter a peca do
-    # mesmo lado, ou seja, o canto perde a alternancia entre fiadas. E' a
-    # unica configuracao sem colisao quando as duas junçoes estao a menos
-    # de 34cm; so' e' aplicada nesse caso.
+    # mesmo lado, ou seja, o canto perde a alternancia entre fiadas.
+    #
+    # POR ISSO o giro deixou de ser a PRIMEIRA saida (CR-S1, 2026-09-07):
+    # antes dele, tenta-se a TROCA de papeis (`course_a`<->`course_b`), que
+    # mantem peca nas DUAS paredes. A troca so' vale quando a fiada que a
+    # parede bloqueada assumiria esta' provadamente livre do vizinho - se o
+    # vizinho ocupa a parede nas DUAS fiadas, a troca de fato so' migra a
+    # colisao (foi o caso medido em 2026-08-25: sobreposicao de 14cm nos
+    # dois casos) e o giro continua sendo a unica saida. A decisao esta'
+    # logo abaixo, com as provas em `_node_bond_courses_on_wall`.
     #
     # Gate em `nodes is not None AND end_to_node is not None` (nao so'
     # `nodes`) de proposito: e' o MESMO padrao que _wall_reserved_range_ft/
@@ -694,28 +753,75 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     # reproduzir o comportamento historico de proposito
     # (test_solve_l_corner_considera_reserva_do_encontro_na_outra_ponta_da_mesma_parede).
     if nodes is not None and end_to_node is not None:
-        blocked_a = _corner_bond_blocked_by_other_node(
+        busy_a = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_a_idx, point_a, dir_a,
             CORNER_B34_ROOM_FT, node_index)
-        blocked_b = _corner_bond_blocked_by_other_node(
+        busy_b = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_b_idx, point_b, dir_b,
             CORNER_B34_ROOM_FT, node_index)
+        blocked_a, blocked_b = bool(busy_a), bool(busy_b)
         if blocked_a != blocked_b:
-            # As DUAS fiadas vao para a parede NAO bloqueada - de proposito,
-            # NAO e' uma troca (course_a<->course_b): uma troca simples so'
-            # move a colisao de fiada para fiada (medido a mao antes desta
-            # mudanca - ver o commit que introduziu esta funcao: "trocar a
-            # alternancia" ainda colide 14cm, so' que na OUTRA fiada, porque
-            # o encontro vizinho tambem alterna). Com as duas fiadas na
-            # mesma parede livre, a sobreposicao vai a ZERO e ainda sobra um
-            # pilarete que fecha com um compensador simples. O CUSTO,
-            # documentado no cabecalho desta funcao: este canto especifico
-            # perde a alternancia normal entre fiadas.
-            unblocked_idx, unblocked_point, unblocked_dir = (
-                (wall_b_idx, point_b, dir_b) if blocked_a else (wall_a_idx, point_a, dir_a)
-            )
-            wall_a_idx, point_a, dir_a = unblocked_idx, unblocked_point, unblocked_dir
-            wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
+            # CR-S1 (2026-09-07): ANTES de girar, TENTAR A TROCA de papeis.
+            #
+            # O texto original desta secao dizia que "trocar quem leva qual
+            # fiada nao resolve, porque o encontro vizinho tambem alterna".
+            # Isso e' verdade quando o vizinho ocupa a parede bloqueada NAS
+            # DUAS FIADAS - e era a UNICA coisa que o gate antigo conseguia
+            # afirmar, porque ele so' devolvia um booleano: sabia que havia
+            # conflito e jogava fora em QUAL fiada. Com a fiada preservada
+            # (`_corner_bond_blocking_courses`), o caso comum aparece: um T
+            # vizinho ocupa a parede principal dele SO' NA FIADA A. Se a
+            # peca deste canto naquela parede for para a fiada B, a
+            # sobreposicao vai a ZERO **sem** perder a alternancia - que e'
+            # amarracao de verdade, nao um detalhe de paginacao.
+            #
+            # Medido (CR-B, no' TGD (338,52;187,05) = TP1 (8017,26;1289,95),
+            # o mesmo ponto fisico dos dois niveis): a parede N-S passa a
+            # TERMINAR no no' (T -> L) e tem um T a 57cm; o gate girava as
+            # duas fiadas para a parede E-O e o no' ficava com 17 fiadas de
+            # um dono so'. O humano alterna nas duas topologias.
+            #
+            # TRES saidas, nesta ordem - e a ordem importa para a
+            # INVARIANCIA a' ordem de entrada das paredes: a fiada que a
+            # parede bloqueada ja' tem depende de ela ser `arms[0]` ou
+            # `arms[1]`, entao "nao mexer" e "trocar" precisam ser as duas
+            # possiveis. Sem isso o mesmo no' fisico alternava numa ordem
+            # de entrada e girava na outra (medido ao escrever o teste de
+            # inversao de ordem desta CR).
+            #
+            # A parede NAO bloqueada nao tem fiada ocupada nenhuma
+            # (`busy` vazio), entao qualquer fiada serve para ela - so' a
+            # bloqueada decide.
+            blocked_course = "A" if blocked_a else "B"
+            other_course = "B" if blocked_a else "A"
+            busy_blocked = busy_a if blocked_a else busy_b
+            if blocked_course not in busy_blocked:
+                # 1) A fiada que a parede bloqueada JA' tem esta' livre -
+                # nao ha' nada a fazer: o gate booleano antigo girava aqui
+                # sem necessidade nenhuma.
+                pass
+            elif other_course not in busy_blocked:
+                # 2) TROCA de papeis: alternancia PRESERVADA, as duas
+                # paredes continuam com peca, so' trocam de fiada entre si.
+                wall_a_idx, point_a, dir_a, wall_b_idx, point_b, dir_b = (
+                    wall_b_idx, point_b, dir_b, wall_a_idx, point_a, dir_a)
+            else:
+                # 3) As DUAS fiadas vao para a parede NAO bloqueada - de proposito,
+                # NAO e' uma troca (course_a<->course_b): aqui a troca de fato
+                # so' moveria a colisao de fiada para fiada (medido a mao antes
+                # desta mudanca - ver o commit que introduziu esta funcao:
+                # "trocar a alternancia" ainda colide 14cm, so' que na OUTRA
+                # fiada, porque o encontro vizinho ocupa a parede nas duas).
+                # Com as duas fiadas na mesma parede livre, a sobreposicao vai
+                # a ZERO e ainda sobra um pilarete que fecha com um
+                # compensador simples. O CUSTO, documentado no cabecalho desta
+                # funcao: este canto especifico perde a alternancia normal
+                # entre fiadas.
+                unblocked_idx, unblocked_point, unblocked_dir = (
+                    (wall_b_idx, point_b, dir_b) if blocked_a else (wall_a_idx, point_a, dir_a)
+                )
+                wall_a_idx, point_a, dir_a = unblocked_idx, unblocked_point, unblocked_dir
+                wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
 
     room_a = _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_a_idx, point_a, dir_a,
                                   nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index)
@@ -734,7 +840,7 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     else:
         course_a = _corner_single_element_candidate(
             catalog, point_a, dir_a, room_a, "A", wall_a_idx, wall_b_idx, node_index,
-            placement_reason="L_CORNER_DEGRADED"
+            placement_reason="L_CORNER_DEGRADED", nodes=nodes
         )
 
     if b34_ok_b:
@@ -745,7 +851,7 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     else:
         course_b = _corner_single_element_candidate(
             catalog, point_b, dir_b, room_b, "B", wall_b_idx, wall_a_idx, node_index,
-            placement_reason="L_CORNER_DEGRADED"
+            placement_reason="L_CORNER_DEGRADED", nodes=nodes
         )
 
     if course_a is None or course_b is None:
@@ -775,6 +881,25 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 T_INTERSECTION_B54_HALF_ROOM_FT = _cm_to_ft(54.0 / 2.0)
 CORNER_B34_ROOM_FT = _cm_to_ft(34.0)
 
+# CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (decisao humana aprovada, ver
+# docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md e docs/BLOCK_B19_RESIDUAL_
+# FILL_IMPLEMENTATION.md; regra registrada em nuvem/REGRAS_MODULACAO_
+# BLOCOS.md): B19 PODE fechar um trecho residual de 15-20cm adjacente a
+# uma peca de amarracao de no' (B34/B54) ja' presente e integra NA MESMA
+# FIADA - NUNCA a propria peca de amarracao, NUNCA um substituto de B34/
+# B54, NUNCA liberado por comprimento total de parede/wall_idx/projeto.
+# Faixa medida no corpus humano (TGD/TP1, TP1 W013/014/088/089 etc.) -
+# fora dela o humano usa outra coisa (B39 inteiro, compensador).
+B19_RESIDUAL_FILL_MIN_CM = 15.0
+B19_RESIDUAL_FILL_MAX_CM = 20.0
+# NAO ha' uma "B19_RESIDUAL_RESERVE_FT" fixa (removida na revisao pos-
+# PR#19 - era um bug real): a reserva usada por `_wall_reserved_range_ft`
+# quando um no' e' marcado para fill e' calculada DINAMICAMENTE, por
+# parede (`length_ft - CORNER_B34_ROOM_FT`), nunca um valor fixo do topo
+# da faixa - ver a nota em `_wall_reserved_range_ft` e `_b19_residual_
+# span_cm` (a UNICA formula de trecho residual usada em todo o
+# mecanismo).
+
 
 def _t_of_point_on_wall(walls_to_create, wall_idx, point):
     """Parametro `t` (ft, desde p0) da projecao de `point` no eixo de
@@ -794,7 +919,21 @@ def _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=No
     a 20cm um do outro, na MESMA parede, cada um prometendo os 34cm que a
     sua peca de amarracao precisa, sem saber do outro. Mesma classe de bug
     que o cabecalho de `_wall_reserved_range_ft` ja' descreve para as duas
-    PONTAS de uma parede curta - so' que pelo meio dela."""
+    PONTAS de uma parede curta - so' que pelo meio dela.
+
+    Delega a `_wall_junction_nodes_and_ts_ft` (CR-S1) para que a versao que
+    tambem precisa do PROPRIO no' (`_corner_bond_blocking_courses`) nunca
+    seja uma copia paralela desta varredura, que ficaria desatualizada -
+    mesmo motivo de `_arm_role_coordination_graph`."""
+    return [t_ft for _node, t_ft in _wall_junction_nodes_and_ts_ft(
+        walls_to_create, nodes, wall_idx, exclude_node_index)]
+
+
+def _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=None):
+    """`(no', t_ft)` de cada no' de encontro REAL que toca `wall_idx` - a
+    varredura UNICA que `_wall_junction_ts_ft` (so' o `t`) e
+    `_corner_bond_blocking_courses` (precisa do no' para saber em QUE
+    FIADA ele ocupa a parede) compartilham."""
     found = []
     if not nodes:
         return found
@@ -818,7 +957,7 @@ def _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index=No
         point = node.get("point")
         if point is None:
             continue
-        found.append(_t_of_point_on_wall(walls_to_create, wall_idx, point))
+        found.append((node, _t_of_point_on_wall(walls_to_create, wall_idx, point)))
     return found
 
 
@@ -841,16 +980,130 @@ def _corner_bond_blocked_by_other_node(walls_to_create, nodes, wall_idx, contact
     Por isso a margem usada aqui e' `span_ft + T_INTERSECTION_B54_HALF_ROOM_FT`
     - o maior alcance-para-tras que qualquer peca de amarracao (B34 do
     outro lado de um L, B54 de um T ou de um X) pode ter, superestimando
-    de proposito (mais seguro rotacionar a mais do que colidir)."""
+    de proposito (mais seguro rotacionar a mais do que colidir).
+
+    CR-S1: hoje e' um atalho de `_corner_bond_blocking_courses` (mesma
+    geometria, mesma margem) - "bloqueado" e' exatamente "alguma fiada
+    ocupada". A funcao continua porque e' o predicado que os testes de
+    geometria pura deste gate leem; quem PRECISA saber em qual fiada usa
+    a outra."""
+    return bool(_corner_bond_blocking_courses(
+        walls_to_create, nodes, wall_idx, contact_point, dir_away, span_ft,
+        exclude_node_index))
+
+
+# CR-S1 - as duas fiadas, quando nao da' para provar UMA.
+BOND_COURSES_BOTH = ("A", "B")
+
+
+def _node_bond_courses_on_wall(node, wall_idx):
+    """As FIADAS ("A"/"B") em que `node` PODE colocar peca de amarracao
+    deitada sobre `wall_idx`.
+
+    So' afirma UMA fiada quando a convencao do proprio solver daquele tipo
+    de no' a fixa em TODOS os caminhos dele - inclusive os DEGRADADOS e o
+    `ok=False` (que nao coloca peca nenhuma, e portanto tambem cabe em
+    qualquer subconjunto). Em qualquer outra situacao devolve as DUAS, o
+    pior caso, que reproduz exatamente o comportamento anterior a' CR-S1.
+
+    Provas (ler os solvers, nao a memoria):
+
+    - `T_INTERSECTION`, parede = `main_wall_idx`: `solve_t_intersection`
+      poe B54 na principal na fiada **A** (caminho cheio), B34 na
+      principal na fiada **A** (degradacao 1, "degrada para L") e NADA na
+      principal (degradacao 2, so' compensador na boneca). Nunca a fiada
+      B. -> ("A",)
+    - `T_INTERSECTION`, parede = `incoming_wall_idx`: fiada B nos dois
+      primeiros caminhos, mas a degradacao 2 poe o MESMO elemento unico
+      nas DUAS fiadas da boneca. -> pior caso.
+    - `X_INTERSECTION`: `solve_x_intersection` poe a peca de
+      `crossing_walls[0]` na fiada **A** e a de `crossing_walls[1]` na
+      fiada **B**, e a degradacao troca so' a PECA, nunca a fiada nem a
+      parede. -> ("A",) / ("B",)
+    - `L_CORNER`: `arms[0]`->A e `arms[1]`->B no caminho normal, mas o
+      proprio giro deste arquivo pode mandar as DUAS fiadas para a mesma
+      parede. -> pior caso.
+
+    ATENCAO - o que esta funcao NAO diz: "a fiada X nao deita peca sobre
+    esta parede" NAO quer dizer "a fiada X nao ocupa nada aqui". Na fiada
+    em que a peca do vizinho esta' na parede PERPENDICULAR, o CORPO dela
+    (tao largo quanto a espessura da parede) ainda atravessa esta - o
+    mesmo achado empirico que `_node_default_reservation_cm` ja'
+    documenta. E' por isso que `_corner_bond_blocking_courses` usa DUAS
+    distancias de alcance, nunca "alcance zero" para a fiada de fora.
+
+    Nao existe fiada "certa" aqui: e' so' a leitura de uma convencao que
+    ja' esta' escrita nos solvers. Nenhuma regra de amarracao nova."""
+    kind = node.get("kind")
+    if kind == "T_INTERSECTION":
+        if (node.get("main_wall_idx") == wall_idx
+                and node.get("incoming_wall_idx") != wall_idx):
+            return ("A",)
+        return BOND_COURSES_BOTH
+    if kind == "X_INTERSECTION":
+        pair = node.get("crossing_walls") or []
+        if len(pair) == 2 and pair[0] is not None and pair[0] != pair[1]:
+            if pair[0] == wall_idx:
+                return ("A",)
+            if pair[1] == wall_idx:
+                return ("B",)
+        return BOND_COURSES_BOTH
+    return BOND_COURSES_BOTH
+
+
+def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_point,
+                                  dir_away, span_ft, exclude_node_index=None):
+    """As FIADAS em que a peca de amarracao deste canto (`span_ft`,
+    deitada sobre `wall_idx` a partir de `contact_point` no sentido
+    `dir_away`) esbarraria na peca de OUTRO encontro da MESMA parede.
+    Conjunto vazio = nada esbarra.
+
+    Geometria e margem IDENTICAS a's de `_corner_bond_blocked_by_other_node`
+    (que hoje e' so' `bool()` disto) - a unica coisa que a CR-S1 acrescenta
+    e' PARAR DE JOGAR FORA a fiada: o gate antigo sabia que havia conflito
+    e nao sabia em qual das duas fiadas, entao a unica saida segura era
+    mandar as duas fiadas para a outra parede, matando a alternancia do
+    no'. Ver a decisao em `solve_l_corner`.
+
+    DOIS ALCANCES, um por fiada - e e' o ponto todo da correcao:
+
+    - na fiada em que o vizinho DEITA peca sobre esta parede
+      (`_node_bond_courses_on_wall`), o alcance-para-tras dele e' o teto
+      historico `T_INTERSECTION_B54_HALF_ROOM_FT` (27cm), superestimado de
+      proposito - o mesmo valor, com a mesma justificativa, que este gate
+      ja' usava para as DUAS fiadas;
+    - na OUTRA fiada a peca dele esta' na parede perpendicular, mas o
+      CORPO dela ainda atravessa esta parede: o alcance e' a reserva
+      generica de no' (`_node_default_reservation_cm`, metade da maior
+      espessura do no') - a mesma medida que o preenchimento comum ja'
+      reserva exatamente para esse corpo. NUNCA zero.
+
+    Por isso "bloqueado em ALGUMA fiada" (o que
+    `_corner_bond_blocked_by_other_node` devolve) continua identico ao
+    comportamento anterior a' CR-S1: a fiada "deitada" mantem os 27cm, que
+    e' o maior dos dois alcances, entao o predicado booleano nao muda para
+    nenhuma geometria."""
     _p0, _p1, wall_dir, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     sign = 1.0 if dir_away.DotProduct(wall_dir) >= 0 else -1.0
     t0_ft = _t_of_point_on_wall(walls_to_create, wall_idx, contact_point)
-    danger_ft = span_ft + T_INTERSECTION_B54_HALF_ROOM_FT
-    for t_other_ft in _wall_junction_ts_ft(walls_to_create, nodes, wall_idx, exclude_node_index):
+    busy = set()
+    for other, t_other_ft in _wall_junction_nodes_and_ts_ft(
+            walls_to_create, nodes, wall_idx, exclude_node_index):
         along_ft = (t_other_ft - t0_ft) * sign
-        if 1e-6 < along_ft < danger_ft - 1e-6:
-            return True
-    return False
+        if along_ft <= 1e-6:
+            continue
+        lying_courses = _node_bond_courses_on_wall(other, wall_idx)
+        cross_reach_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
+        for course in BOND_COURSES_BOTH:
+            if course in busy:
+                continue
+            reach_ft = (T_INTERSECTION_B54_HALF_ROOM_FT if course in lying_courses
+                        else cross_reach_ft)
+            if along_ft < span_ft + reach_ft - 1e-6:
+                busy.add(course)
+        if len(busy) == len(BOND_COURSES_BOTH):
+            break
+    return busy
 
 
 def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign, safe_range_ft=None):
@@ -963,17 +1216,45 @@ CORNER_SINGLE_ELEMENT_CODES = ("C09", "C04")
 
 def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, course,
                                      wall_idx, secondary_wall_idx, node_index,
-                                     placement_reason="CORNER_DEGRADED"):
+                                     placement_reason="CORNER_DEGRADED", nodes=None):
     """UM UNICO elemento (o maior entre C09/C04 que caiba no espaco real
-    disponivel - NUNCA B19, ver CORNER_SINGLE_ELEMENT_CODES) para fechar
-    uma parede curta demais para o B34 normal num encontro (L de verdade
-    OU T degradado para L - ver solve_l_corner/solve_t_intersection) -
-    substitui a amarracao especial quando ela nao cabe fisicamente.
-    Encosta em `contact_point` (o ponto do no'), estendendo-se por
-    `dir_away` (unitario, para dentro da parede - o mesmo sentido em que
-    o B34 normal se estenderia). Devolve None se nem o menor (C04, 4cm)
-    couber em `room_ft` - nesse caso nao ha' solucao automatica, precisa
-    de ajuste de geometria antes."""
+    disponivel - NUNCA B19 por padrao, ver CORNER_SINGLE_ELEMENT_CODES)
+    para fechar uma parede curta demais para o B34 normal num encontro (L
+    de verdade OU T degradado para L - ver solve_l_corner/
+    solve_t_intersection) - substitui a amarracao especial quando ela nao
+    cabe fisicamente. Encosta em `contact_point` (o ponto do no'),
+    estendendo-se por `dir_away` (unitario, para dentro da parede - o
+    mesmo sentido em que o B34 normal se estenderia). Devolve None se nem
+    o menor (C04, 4cm) couber em `room_ft` - nesse caso nao ha' solucao
+    automatica, precisa de ajuste de geometria antes.
+
+    CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (`nodes` opcional, `None`
+    preserva o comportamento historico byte-a-byte): quando este
+    `node_index` foi marcado por `repair_b19_residual_fill` como fill
+    residual candidato PARA ESTA `wall_idx` (`wall_idx in
+    _b19_residual_fill_for_walls` - um CONJUNTO por no', nunca um escalar
+    unico, nunca por proximidade) E `room_ft` cai na faixa aprovada
+    (B19_RESIDUAL_FILL_MIN_CM..MAX_CM), usa B19 em vez de C09/C04 - B19
+    aqui e' SEMPRE fill. Este B19, sozinho, NAO prova que a peca de
+    amarracao real existe no mesmo no'/mesma fiada - essa prova
+    geometrica e' feita DEPOIS, contra o rebuild completo, por
+    `_b19_tie_integrity_ok` (o hard gate que de fato aceita ou rejeita o
+    candidato). Fora da faixa, ou sem a marca, cai no C09/C04 de sempre -
+    nunca generaliza B19 para nenhum outro caso."""
+    if nodes is not None and node_index is not None and 0 <= node_index < len(nodes):
+        node = nodes[node_index]
+        if wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
+            b19_entry = catalog.get("B19") if catalog else None
+            if b19_entry is not None and b19_entry.get("length_cm"):
+                room_cm = _ft_to_cm(room_ft)
+                b19_len_cm = b19_entry["length_cm"]
+                if (B19_RESIDUAL_FILL_MIN_CM - 1e-6) <= room_cm <= (B19_RESIDUAL_FILL_MAX_CM + 1e-6) \
+                        and _cm_to_ft(b19_len_cm) <= room_ft + 1e-6:
+                    half_len_ft = _cm_to_ft(b19_len_cm) / 2.0
+                    origin = contact_point + dir_away * half_len_ft
+                    return _make_block_candidate(
+                        "B19", b19_entry, course, origin, dir_away, "B19_RESIDUAL_FILL",
+                        node_index=node_index, wall_idx=wall_idx, secondary_wall_idx=secondary_wall_idx)
     best_code = None
     for code in CORNER_SINGLE_ELEMENT_CODES:
         entry = catalog.get(code)
@@ -1101,11 +1382,11 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
         #    CORNER_SINGLE_ELEMENT_CODES), nada na parede principal.
         single_a = _corner_single_element_candidate(
             catalog, contact_i, dir_i, room_i_ft, "A", inc_idx, main_idx, node_index,
-            placement_reason="T_INTERSECTION_INCOMING_DEGRADED"
+            placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes
         )
         single_b = _corner_single_element_candidate(
             catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
-            placement_reason="T_INTERSECTION_INCOMING_DEGRADED"
+            placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes
         )
         if single_a is None or single_b is None:
             return {"ok": False,
@@ -1303,6 +1584,191 @@ def solve_x_intersection(node, walls_to_create, catalog, node_index=None,
     return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b}
 
 
+# ---- CR-BLOCK-ARM-ROLE-CONSISTENCY: coerencia de papel entre os dois -----
+# nos L_CORNER de uma mesma parede (ver docs/BLOCK_ARM_ROLE_INVARIANCE.md e
+# REGRAS_MODULACAO_BLOCOS.md 29.1/29.5).
+
+def _canonical_node_sort_key(node):
+    """Chave de ordenacao 100% GEOMETRICA (ponto do no', nunca indice de
+    lista/parede) - usada para escolher raiz de componente e ordem de
+    visita no BFS de `_coordinate_arm_role_nodes`, para o resultado nao
+    depender da ordem de entrada das paredes nem de qual arm veio
+    primeiro em `wall_pairing.py`."""
+    point = node.get("point")
+    if point is None:
+        return (float("inf"), float("inf"))
+    return (point.X, point.Y)
+
+
+def _two_arm_l_corner_role_bit(node, wall_idx):
+    """0 se `wall_idx` e' `arms[0]` deste no' (receberia `course_a` em
+    `_l_corner_wall_pair`), 1 se e' `arms[1]` (`course_b`). `None` se
+    `wall_idx` nao esta' neste no' ou o no' nao tem exatamente 2 arms
+    (fora do escopo deste mecanismo - ver docstring de
+    `_coordinate_arm_role_nodes`)."""
+    arms = node.get("arms") or []
+    if len(arms) != 2:
+        return None
+    if arms[0][0] == wall_idx:
+        return 0
+    if arms[1][0] == wall_idx:
+        return 1
+    return None
+
+
+def _arm_role_coordination_graph(nodes, respect_pins=True):
+    """Constroi a topologia (vertices/arestas) que
+    `_coordinate_arm_role_nodes` usa para a 2-coloracao - fatorado para
+    que `_arm_role_isolated_edges` (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+    CONTRACT) nunca possa divergir da definicao real do grafo com uma
+    copia paralela que fica desatualizada.
+
+    `respect_pins=True` (usado por `_coordinate_arm_role_nodes`) exclui de
+    `eligible` qualquer no' com `node["_arm_role_pinned"]` truthy - ver
+    docstring de `_coordinate_arm_role_nodes`. `respect_pins=False` (usado
+    por `_arm_role_isolated_edges`, chamado ANTES de qualquer pin nesta
+    resolucao) devolve a topologia completa.
+
+    Devolve `(eligible, adjacency, edges)`:
+    - `eligible`: indices de `nodes` que sao `L_CORNER` de 2 bracos (e nao
+      pinados, se `respect_pins`);
+    - `adjacency[node_index]`: lista de `(neighbor_index, parity, wall_idx)`;
+    - `edges`: lista de `(node_p, node_q, wall_idx)`, uma por parede que
+      toca exatamente 2 nos elegiveis (0 ou 1 no' elegivel = nada a
+      coordenar para aquela parede, fora da lista)."""
+    eligible = [
+        node_index for node_index, node in enumerate(nodes)
+        if node.get("kind") == "L_CORNER" and len(node.get("arms") or []) == 2
+        and not (respect_pins and node.get("_arm_role_pinned"))
+    ]
+
+    wall_touches = {}
+    for node_index in eligible:
+        for wall_idx, _end_index in nodes[node_index]["arms"]:
+            wall_touches.setdefault(wall_idx, []).append(node_index)
+
+    adjacency = dict((node_index, []) for node_index in eligible)
+    edges = []
+    for wall_idx, touches in wall_touches.items():
+        if len(touches) != 2:
+            continue  # 0 ou 1 no' elegivel para esta parede - nada a coordenar
+        node_p, node_q = touches
+        if node_p == node_q:
+            continue  # degenerado (as duas pontas no MESMO no') - fora de escopo
+        role_p = _two_arm_l_corner_role_bit(nodes[node_p], wall_idx)
+        role_q = _two_arm_l_corner_role_bit(nodes[node_q], wall_idx)
+        parity = 1 ^ role_p ^ role_q
+        adjacency[node_p].append((node_q, parity, wall_idx))
+        adjacency[node_q].append((node_p, parity, wall_idx))
+        edges.append((node_p, node_q, wall_idx))
+
+    return eligible, adjacency, edges
+
+
+def _coordinate_arm_role_nodes(nodes):
+    """CR-BLOCK-ARM-ROLE-CONSISTENCY: garante que os DOIS nos `L_CORNER`
+    de 2 bracos de uma MESMA parede - um em cada extremidade - NUNCA deem
+    `course_a`/`course_b` a essa parede da MESMA forma (o mesmo papel nas
+    duas pontas) - o mecanismo medido (`W042`/TGD, ver
+    docs/BLOCK_ARM_ROLE_INVARIANCE.md) que apaga uma familia inteira de
+    fiadas quando combinado com a fronteira "emprestada" nao caindo no
+    modulo de blocos (REGRAS_MODULACAO_BLOCOS.md 29.1/29.2).
+
+    Muta `nodes` IN PLACE: troca `arms[0]`/`arms[1]` (e
+    `neighbor_wall_idx`/`neighbor_end_index` junto, exatamente como
+    `_classify_wall_node` preencheria se a ordem de entrada ja' fosse
+    essa) nos nos que precisam inverter o papel. Seguro porque todo o
+    resto do arquivo le' `node["arms"]` como CONJUNTO (nunca por posicao,
+    exceto `_l_corner_wall_pair`/`solve_l_corner` - ver `git grep
+    'node.get("arms")'`), entao a troca e' invisivel para os demais
+    consumidores (`_node_involved_wall_ends`, `_wall_group_shift_targets`
+    etc., todos filtram "o outro arm" por diferenca, nunca por indice).
+
+    MODELO DO PROBLEMA (nunca hardcoded por parede/no/projeto): grafo cujos
+    VERTICES sao os proprios nos `L_CORNER` de 2 bracos, e cujas ARESTAS
+    sao as paredes que tocam EXATAMENTE 2 desses nos (uma em cada
+    extremidade) - uma parede com 0 ou 1 desses nos nao entra no grafo
+    (nada a coordenar sozinha). Cada aresta carrega a PARIDADE "os dois
+    nos precisam escolher o MESMO swap (0) ou o OPOSTO (1)" para que a
+    parede fique com papeis DIFERENTES nas duas pontas depois da correcao
+    - resolvido por 2-coloracao/BFS por componente conexo (cada vertice
+    tem grau <= 2 aqui, por construcao: um no' L_CORNER so' tem 2 arms,
+    entao a peca do grafo e' sempre uma uniao de CAMINHOS e CICLOS, nunca
+    uma arvore ramificada - cobre cadeia aberta, U, retangulo, ciclo
+    fechado como casos de teste).
+
+    DETERMINISMO: a raiz de cada componente (e a ordem de visita do BFS)
+    e' escolhida por `_canonical_node_sort_key` - IDENTIDADE GEOMETRICA
+    (ponto (x,y) do no'), nunca indice de `nodes`/`wall_idx`/qual arm veio
+    primeiro. Isso torna o resultado invariante a permutacao da ordem de
+    entrada das paredes e a qual convencao `wall_pairing.py` usa hoje ou
+    no futuro (a correcao sempre alcanca "alternancia completa" a partir
+    de QUALQUER papel inicial, porque ela mede e corrige o DESVIO, nao
+    impoe um papel absoluto).
+
+    CICLOS DE COMPRIMENTO IMPAR (topologicamente possiveis - ex.: 3
+    paredes formando um triangulo fechado de L_CORNERs) podem tornar
+    alternancia PERFEITA impossivel para alguma parede do ciclo (o mesmo
+    limite estrutural de qualquer 2-coloracao de grafo com ciclo impar).
+    Politica DETERMINISTICA (nunca escondida): preserva o `swap` do
+    PRIMEIRO no' visitado pelo BFS geometrico e deixa a parede que fechou
+    o ciclo com o conflito residual - devolvida em `conflicts` (lista de
+    `wall_idx`) para diagnostico/relatorio, nunca descartada em silencio
+    (mesmo espirito de `failures` em `solve_all_intersections`).
+
+    ATUALIZACAO (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT, 2026-09-04):
+    um no' com `node["_arm_role_pinned"]` truthy fica de FORA do grafo
+    inteiramente (ver `_arm_role_coordination_graph`), preservando
+    exatamente o papel (`arms`) que o SAFE REPAIR
+    (`repair_arm_role_isolated_edges`, mais abaixo) fixou explicitamente.
+    Resolve a inconsistencia de persistencia ENTRE BANDAS de
+    `solve_building_blocks_all_courses` (`nodes` e' o MESMO objeto em
+    todas as bandas, mas sem o pin cada banda reconstruiria - e poderia
+    inverter - a decisao manual do zero, produzindo duas convencoes
+    opostas na mesma parede entre bandas diferentes - causa raiz provada e
+    medida em `REGRAS_MODULACAO_BLOCOS.md` secao 30/
+    `CR-BLOCK-ARM-ROLE-JUNCTION-GATE`). So' afeta arestas ISOLADAS (grau 1
+    nos dois nos - ver `_arm_role_isolated_edges`), entao nunca muda a
+    alternancia de nenhuma OUTRA parede coordenada."""
+    eligible, adjacency, _edges = _arm_role_coordination_graph(nodes, respect_pins=True)
+    if not eligible:
+        return []
+
+    def _key(node_index):
+        return _canonical_node_sort_key(nodes[node_index]) + (node_index,)
+
+    swap_decision = {}
+    conflicts = []
+    for start in sorted(eligible, key=_key):
+        if start in swap_decision:
+            continue
+        swap_decision[start] = False
+        frontier = [start]
+        while frontier:
+            frontier.sort(key=_key)
+            current = frontier.pop(0)
+            for neighbor_index, parity, wall_idx in sorted(
+                    adjacency[current], key=lambda edge: _key(edge[0])):
+                wanted = swap_decision[current] ^ bool(parity)
+                if neighbor_index in swap_decision:
+                    if swap_decision[neighbor_index] != wanted:
+                        conflicts.append(wall_idx)
+                    continue
+                swap_decision[neighbor_index] = wanted
+                frontier.append(neighbor_index)
+
+    for node_index, needs_swap in swap_decision.items():
+        if not needs_swap:
+            continue
+        node = nodes[node_index]
+        a0, a1 = node["arms"]
+        node["arms"] = [a1, a0]
+        node["neighbor_wall_idx"] = a0[0]
+        node["neighbor_end_index"] = a0[1]
+
+    return sorted(set(conflicts))
+
+
 def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=None, end_to_node=None):
     """Roda o solver adequado (L/T/X) em TODOS os nos de `nodes` (ver
     build_wall_graph) - fluxo SolveXIntersections/SolveTIntersections/
@@ -1323,12 +1789,27 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     da outra, produziam trechos de preenchimento comum com comprimento
     NEGATIVO em cascata pela planta toda).
 
-    Devolve {"candidates": [...], "failures": [(node_index, motivo), ...]}:
-    `candidates` e' uma lista PLANA de BlockPlacementCandidate (2 por no'
-    resolvido, Fiada A e Fiada B) - pronta para a Etapa 7 (solver global)
-    consumir, ou para o modo de debug (Etapa 25) desenhar. Um no' que
-    deveria ser um encontro mas nao tem solucao (catalogo incompleto, por
-    exemplo) entra em `failures`, nunca e' descartado em silencio."""
+    ANTES de resolver qualquer no', roda `_coordinate_arm_role_nodes`
+    (CR-BLOCK-ARM-ROLE-CONSISTENCY) - muta `nodes` IN PLACE para garantir
+    que os dois nos L_CORNER de uma mesma parede nunca deem o MESMO papel
+    (course_a/course_b) nas duas pontas dela (ver a docstring daquela
+    funcao). Como a mutacao e' no MESMO objeto `nodes` que o chamador
+    passou, todo uso posterior dele (`_index_node_candidates_by_wall_end`,
+    `_wall_group_shift_targets` etc.) ja' enxerga os papeis coordenados
+    sem precisar de nenhum encanamento extra.
+
+    Devolve {"candidates": [...], "failures": [(node_index, motivo), ...],
+    "role_conflicts": [wall_idx, ...]}: `candidates` e' uma lista PLANA de
+    BlockPlacementCandidate (2 por no' resolvido, Fiada A e Fiada B) -
+    pronta para a Etapa 7 (solver global) consumir, ou para o modo de
+    debug (Etapa 25) desenhar. Um no' que deveria ser um encontro mas nao
+    tem solucao (catalogo incompleto, por exemplo) entra em `failures`,
+    nunca e' descartado em silencio. `role_conflicts` (novo): paredes em
+    que a coordenacao de papel acima nao conseguiu alternancia perfeita
+    (ciclo de comprimento impar no grafo de nos L_CORNER - ver a docstring
+    de `_coordinate_arm_role_nodes`) - quase sempre vazio; nao impede a
+    modulacao, so' relata a excecao estrutural."""
+    role_conflicts = _coordinate_arm_role_nodes(nodes)
     candidates = []
     failures = []
     for node_index, node in enumerate(nodes):
@@ -1352,7 +1833,7 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             continue
         candidates.append(result["course_a"])
         candidates.append(result["course_b"])
-    return {"candidates": candidates, "failures": failures}
+    return {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts}
 
 
 # ---- validacao geometrica dos encontros (secoes 10/11/12/19) ------------
@@ -2690,12 +3171,21 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     5cm que `_pier_ordered_layout` sempre usou - extraida daqui para ser
     reusada tambem por `_pier_forced_bypass_layouts`, sem duplicar a
     logica). Devolve None quando o trecho NAO fecha (negativo, ou nao e'
-    multiplo de 5cm dentro de PIER_LAYOUT_TOLERANCE_CM); 0.0 (nunca None)
-    para um trecho de comprimento praticamente zero."""
+    multiplo de 5cm dentro de PIER_FIT_TOLERANCE_CM); 0.0 (nunca None)
+    para um trecho de comprimento praticamente zero.
+
+    CR-BLOCK-FIT-TOLERANCE-C04 (2026-09-06): as 3 comparacoes abaixo usam
+    PIER_FIT_TOLERANCE_CM (0,30cm), NAO PIER_LAYOUT_TOLERANCE_CM (0,05cm) -
+    esta funcao E' o mecanismo "resto do trecho considerado modular/
+    snapavel" que a CR mira. As OUTRAS ocorrencias de
+    PIER_LAYOUT_TOLERANCE_CM neste arquivo (checagem de SEM_ESPACO/colisao,
+    consistencia do DP de stagger, adjacencia de compensador consecutivo)
+    ficam DE PROPOSITO em 0,05cm - sao contratos diferentes que a CR
+    proibe alargar (ver PIER_FIT_TOLERANCE_CM em modulation_math.py)."""
     remaining = _pier_remaining_cm(pier_cm, leading_joint_cm, trailing_joint_cm)
-    if remaining < -PIER_LAYOUT_TOLERANCE_CM:
+    if remaining < -PIER_FIT_TOLERANCE_CM:
         return None
-    if remaining <= PIER_LAYOUT_TOLERANCE_CM:
+    if remaining <= PIER_FIT_TOLERANCE_CM:
         return 0.0
     # TOLERANCIA REAL, NAO 1e-6 (corrigido 2026-08-21). `pier_cm` vem de
     # coordenadas do CAD que passaram por conversoes pes<->cm e por
@@ -2703,9 +3193,13 @@ def _pier_remaining_snapped_cm(pier_cm, leading_joint_cm, trailing_joint_cm):
     # borda de encontro sai em 829,99791cm em vez de 830cm - 0,002cm de
     # ruido. Com o teste antigo (1e-6) isso REPROVAVA o trecho como
     # "modulacao nao fecha": 116 dos 344 trechos nao-modulares medidos
-    # tinham o comprimento certo e falhavam so' por isso.
+    # tinham o comprimento certo e falhavam so' por isso. Ampliada de
+    # 0,05cm para PIER_FIT_TOLERANCE_CM (0,30cm) em CR-BLOCK-FIT-
+    # TOLERANCE-C04: ruido acumulado de VARIAS operacoes encadeadas
+    # (encontro + extend_wall_ends_to_junctions) passa de 0,05cm em
+    # trechos reais do corpus - medido, nao suposto (ver constante).
     snapped = PIER_MODULE_CM * round(remaining / PIER_MODULE_CM)
-    if abs(remaining - snapped) > PIER_LAYOUT_TOLERANCE_CM:
+    if abs(remaining - snapped) > PIER_FIT_TOLERANCE_CM:
         return None
     # Devolve o valor EXATO (arredondado ao modulo): assim o ruido nao se
     # acumula bloco a bloco no laco guloso do chamador (a peca final
@@ -3036,6 +3530,109 @@ def _layout_internal_joint_positions_cm(layout, seg_start_cm,
             continue
         gap_center_local = layout[i][2] + BLOCK_JOINT_CM / 2.0
         joints.append(seg_start_cm + gap_center_local)
+    return joints
+
+
+def _pier_boundary_joint_positions_cm(seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                      leading_is_open, trailing_is_open):
+    """Posicao (cm, absoluta na parede) da junta de CONTORNO de um trecho
+    contra um NO' de amarracao (L/T/X ou encontro de meio-de-parede) -
+    nunca contra abertura nem ponta livre de verdade (por isso o filtro
+    por `kind_*`/`*_is_open`, os mesmos que decidem a isencao em
+    `_layout_internal_joint_positions_cm`).
+
+    CR-BLOCK-ARM-ROLE-PRISM-STAGGER (causa-raiz provada, ver relatorio):
+    esta junta - entre a peca de amarracao do no' (ja' posicionada fora
+    de `layout`, por `solve_l_corner`/`solve_t_intersection`/
+    `solve_x_intersection`) e o PRIMEIRO/ULTIMO bloco do preenchimento
+    comum deste trecho - NUNCA foi rastreada por `course_a_joint_
+    positions_cm`/`_pier_layout_avoiding_joints` (que so' enxergam
+    juntas INTERNAS de `layout`, secao 6). Isso era inofensivo enquanto
+    normalmente so' uma das duas familias tinha candidato de no' de
+    verdade num dado encontro (o defeito que CR-BLOCK-ARM-ROLE-
+    CONSISTENCY corrigiu). Com as duas familias podendo ter candidato de
+    no' real no MESMO encontro, a junta de contorno de uma familia pode
+    coincidir com a da OUTRA sem a busca de desencontro nunca saber -
+    produzindo `PRISM_CONTINUOUS_JOINT` em paredes que antes nunca
+    tinham as duas familias com no' real ali. Devolve 0, 1 ou 2 posicoes
+    (uma por ponta do trecho que for, de fato, um no')."""
+    positions = []
+    if kind_left in ("WALL_START", "MIDSPAN_HI") and not leading_is_open:
+        positions.append(seg_start_cm - BLOCK_JOINT_CM / 2.0)
+    if kind_right in ("WALL_END", "MIDSPAN_LO") and not trailing_is_open:
+        positions.append(seg_end_cm + BLOCK_JOINT_CM / 2.0)
+    return positions
+
+
+# CR-BLOCK-NODE-FILL-REVALIDATION (2026-09-04): a METADE SIMETRICA da junta
+# NO'|FILL. `_pier_boundary_joint_positions_cm` (CR-BLOCK-ARM-ROLE-PRISM-
+# STAGGER) publica a junta de contorno da Fiada A contra a peca de no' e a
+# Fiada B a evita - mas a Fiada A roda PRIMEIRO e nunca via a junta NO'|FILL
+# que a Fiada B vai ter. Medido no corpus real (TGD/TP1): junta interna
+# `B19|B39` da Fiada A em t=34,5 cm exatamente em cima da junta `B34(no')|
+# fill` da Fiada B, em todas as fiadas da mesma paridade. Como a posicao da
+# peca de no' depende so' da geometria do encontro (`node_candidates_by_
+# wall_end` / `node_midspan_by_wall_course`, decididos ANTES do
+# preenchimento e dependentes so' de `course`, nunca de layout ou de
+# `variant_index`), ela e' deduzivel antes de resolver a propria fiada -
+# ver `_wall_node_boundary_joints_cm` e o uso em `solve_wall_free_fill`.
+# Constante (nao heuristica): True em producao; False reproduz exatamente a
+# main anterior - usado pelos testes para provar que o defeito existe e que
+# a reducao e' fisica (tests/test_block_node_fill_revalidation.py).
+NODE_FILL_OPPOSITE_COURSE_ENABLED = True
+
+
+def _wall_node_boundary_joints_cm(wall_idx, course, node_candidates_by_wall_end,
+                                  node_midspan_by_wall_course):
+    """Todas as juntas NO'|FILL de UMA fiada de UMA parede, deduzidas SO' da
+    geometria das pecas de amarracao (`node_candidates_by_wall_end` nas
+    pontas, `node_midspan_by_wall_course` nos encontros de meio de parede),
+    sem depender de layout nenhum. Mesma aritmetica do trecho em
+    `solve_wall_free_fill` / `_pier_boundary_joint_positions_cm`: o
+    preenchimento comeca em `border + BLOCK_JOINT_CM`, logo a junta esta'
+    em `border + BLOCK_JOINT_CM / 2` (espelhado na ponta final e nos dois
+    lados de um meio de parede). E' uma lista de POSICOES A EVITAR, nao um
+    censo: uma junta cujo trecho acabe sem peca (vao colado no no', trecho
+    que nao fecha) entra mesmo assim - conservador, custa liberdade de
+    busca, nunca inventa geometria. Ponta livre e abertura NAO produzem
+    junta de no' (nao ha' `border`), preservando a excecao da secao 11.8.
+    Funcao pura."""
+    joints = []
+    for end_index, sign in ((0, +1.0), (1, -1.0)):
+        border_cm = (node_candidates_by_wall_end or {}).get((wall_idx, end_index, course))
+        if border_cm is not None:
+            joints.append(border_cm + sign * BLOCK_JOINT_CM / 2.0)
+    for t_start_cm, t_end_cm in _merge_intervals_cm(
+        (node_midspan_by_wall_course or {}).get((wall_idx, course), [])
+    ):
+        joints.append(t_start_cm - BLOCK_JOINT_CM / 2.0)
+        joints.append(t_end_cm + BLOCK_JOINT_CM / 2.0)
+    return joints
+
+
+def _layout_joints_surviving_openings_cm(layout, seg_start_cm, opening_intervals_cm):
+    """Juntas INTERNAS de `layout` (cm, absolutas) que EXISTEM depois do
+    recorte das aberturas: so' as que separam duas pecas que
+    `split_extents_by_openings` MANTEM (o mesmo criterio de
+    `_recut_openings_and_repair`, sem tolerancia nova). No pipeline
+    continuo o layout da FASE 1 atravessa os vaos; a junta de uma peca que
+    o recorte vai derrubar e' fantasma e nao pode decidir uma troca de
+    layout (medido no TGD: uma troca por junta fantasma ao lado de uma
+    jamba deixava o reparo local sem fechamento naquela fiada). Sem
+    aberturas devolve exatamente `_layout_internal_joint_positions_cm`.
+    Funcao pura."""
+    if not layout:
+        return []
+    if not opening_intervals_cm:
+        return _layout_internal_joint_positions_cm(layout, seg_start_cm)
+    extents = [(seg_start_cm + start_cm, seg_start_cm + end_cm)
+               for _code, start_cm, end_cm in layout]
+    kept, _removed = split_extents_by_openings(extents, opening_intervals_cm)
+    kept = set(kept)
+    joints = []
+    for i in range(len(layout) - 1):
+        if i in kept and (i + 1) in kept:
+            joints.append(seg_start_cm + layout[i][2] + BLOCK_JOINT_CM / 2.0)
     return joints
 
 
@@ -3885,6 +4482,67 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
     return best
 
 
+def _cross_band_swapped_layout(layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                               cross_band_joints_cm, same_band_avoid_cm,
+                               allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                               leading_is_open=True, trailing_is_open=True):
+    """CR-G12 (secao 27.7): a regra #1 avaliada tambem na FRONTEIRA ENTRE
+    BANDAS de abertura.
+
+    `solve_building_blocks_all_courses` agrupa as fiadas fisicas em bandas
+    por conjunto de aberturas ativas e resolve cada banda DO ZERO - a
+    familia "B" de uma banda desencontra a familia "A" da MESMA banda, mas
+    nunca ve' a fiada fisica IMEDIATAMENTE ABAIXO quando ela pertence a
+    outra banda. `cross_band_joints_cm` sao justamente as juntas dessa
+    fiada vizinha ja' resolvida (medidas na geometria REAL das pecas
+    lancadas, ver `joint_positions_from_extents`).
+
+    TROCA CONSERVADORA, no MESMO padrao ja' usado pela METADE SIMETRICA da
+    junta NO'|FILL (CR-BLOCK-NODE-FILL-REVALIDATION): o layout que o
+    caminho normal escolheu continua sendo o primeiro e o normal; so' e'
+    trocado quando
+
+      1. ele de fato empilha junta sobre a fiada vizinha de outra banda; E
+      2. existe composicao do MESMO trecho com ESTRITAMENTE menos
+         coincidencia cross-band; E
+      3. essa composicao NAO piora a coincidencia com a familia oposta da
+         PROPRIA banda (`same_band_avoid_cm` - regra #1 intra-banda, que
+         ja' valia); E
+      4. ela NAO piora a regra #2 (compensadores em sequencia).
+
+    Nunca troca por empate: quem ja' estava correto nao se mexe. Com
+    `cross_band_joints_cm` vazio a funcao devolve `layout` sem tocar em
+    nada - e' exatamente o comportamento anterior a esta CR, e e' o que
+    todo chamador que nao passa semente recebe."""
+    if layout is None or not cross_band_joints_cm:
+        return layout
+    antes_cross = _count_joint_coincidences_cm(
+        _layout_internal_joint_positions_cm(layout, seg_start_cm), cross_band_joints_cm)
+    if not antes_cross:
+        return layout
+    antes_same = _count_joint_coincidences_cm(
+        _layout_internal_joint_positions_cm(layout, seg_start_cm), same_band_avoid_cm
+    ) if same_band_avoid_cm else 0
+    alternativa = _pier_layout_avoiding_joints(
+        pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+        list(same_band_avoid_cm or []) + list(cross_band_joints_cm),
+        allow_compensators=allow_compensators,
+        leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+    )
+    if alternativa is None:
+        return layout
+    alt_joints_cm = _layout_internal_joint_positions_cm(alternativa, seg_start_cm)
+    if _count_joint_coincidences_cm(alt_joints_cm, cross_band_joints_cm) >= antes_cross:
+        return layout
+    if same_band_avoid_cm and _count_joint_coincidences_cm(
+            alt_joints_cm, same_band_avoid_cm) > antes_same:
+        return layout
+    if _layout_compensator_run_excess(alternativa, catalog) > \
+            _layout_compensator_run_excess(layout, catalog):
+        return layout
+    return alternativa
+
+
 def _place_pier_layout(layout, catalog, origin_point, direction, course, wall_idx,
                        node_index=None, placement_reason="STANDARD_FILL"):
     """Converte um layout 1D (ver _pier_ordered_layout) em
@@ -4351,6 +5009,69 @@ def _region_bounds_for_run(first, last, extents, seg_lo_cm, seg_hi_cm,
     }
 
 
+def _layout_physical_end_cm(layout):
+    """Onde a ULTIMA peca de um layout termina fisicamente (cm, relativo ao
+    inicio do trecho). None para layout vazio - trecho sem peca nenhuma nao
+    ultrapassa fronteira nenhuma."""
+    if not layout:
+        return None
+    return max(end_cm for _code, _start_cm, end_cm in layout)
+
+
+def _layout_fitted_to_physical_span(layout, pier_cm, sub, layout_for_span):
+    """GUARDA FISICA DE FRONTEIRA (CR-BLOCK-FIT-TOLERANCE-C04 - resolucao do
+    hard blocker `OPENING_BLOCK_CROSSES_JAMB`).
+
+    O fit modular (PIER_FIT_TOLERANCE_CM = 0,30cm) decide se um trecho PODE
+    ser considerado modular, absorvendo o ruido geometrico acumulado. Mas o
+    comprimento SNAPADO tambem e' usado para POSICIONAR as pecas: quando o
+    trecho real e' um pouco MENOR que o multiplo aceito, a ultima peca
+    termina depois do fim fisico do trecho. Contra uma junta de argamassa
+    (o lado que encosta em outro bloco/ancora) isso e' inofensivo - a junta
+    de 1cm cede a fracao de milimetro. Contra uma fronteira SEM junta -
+    jamba de abertura, ponta livre de parede, reserva de no' - nao ha' o que
+    ceder: a peca invade o vao livre. Medido no corpus: 41 invasoes novas de
+    0,12 a 0,267cm, todas nascidas exatamente assim.
+
+    A guarda so' age quando a ponta de saida do trecho NAO tem junta de
+    argamassa (`trailing_open`) - e' o predicado FISICO, nao o nome/tipo da
+    abertura nem a parede/projeto. Ate' PIER_PHYSICAL_FIT_TOLERANCE_CM
+    (0,05cm - o mesmo piso de ruido geometrico que o projeto ja' usava
+    antes desta CR) o excesso continua sendo tratado como ruido de calculo;
+    acima disso o trecho e' REMONTADO com o maior conteudo modular que cabe
+    de verdade (`pier_cm_floored_to_module`) - a mesma composicao que o
+    solver montaria para um trecho um modulo menor, nenhuma regra de dominio
+    nova. Se nem o conteudo reduzido couber, devolve None: melhor o trecho
+    vazio (exatamente o que acontecia ANTES do C04) do que uma peca dentro
+    do vao.
+
+    PRE-CONDICAO: vale para trechos cujas juntas de contorno JA' foram
+    descontadas do proprio `lo`/`hi` - isto e', com junta de contorno ZERO
+    dos dois lados, que e' exatamente como `region_solid_subsegments`
+    entrega os subsegmentos e como `_solve_repair_subsegments` chama o
+    solver de pilarete (0.0, 0.0). E' por isso que
+    `pier_cm_floored_to_module` e' chamada com juntas zero aqui."""
+    if layout is None:
+        return None
+    if not sub.get("trailing_open"):
+        return layout  # a junta de argamassa da ancora absorve o excesso
+    end_cm = _layout_physical_end_cm(layout)
+    if end_cm is None or end_cm - pier_cm <= PIER_PHYSICAL_FIT_TOLERANCE_CM:
+        return layout
+    floored_cm = pier_cm_floored_to_module(pier_cm, 0.0, 0.0)
+    if floored_cm is None or floored_cm <= 0:
+        return None
+    fitted = layout_for_span(floored_cm)
+    if fitted is None:
+        return None
+    fitted_end_cm = _layout_physical_end_cm(fitted)
+    if fitted_end_cm is None:
+        return fitted
+    if fitted_end_cm - pier_cm > PIER_PHYSICAL_FIT_TOLERANCE_CM:
+        return None
+    return fitted
+
+
 def _solve_repair_subsegments(plan, catalog, allow_compensators,
                               avoid_joint_positions_cm, target_void_positions_cm,
                               prefer_avoiding):
@@ -4360,29 +5081,38 @@ def _solve_repair_subsegments(plan, catalog, allow_compensators,
       - `resolvidos`: [(subsegmento, layout), ...] na ordem do eixo;
       - `falhas`: os subsegmentos que nenhum layout fechou, MAIS os
         `undersized` (sobra pequena demais para qualquer peca) - os dois
-        casos pedem a mesma reacao do chamador (expandir a regiao)."""
+        casos pedem a mesma reacao do chamador (expandir a regiao).
+
+    Todo layout passa pela GUARDA FISICA DE FRONTEIRA antes de ser aceito
+    (ver `_layout_fitted_to_physical_span`): o valor snapado do fit nunca
+    materializa uma peca alem do fim fisico real do trecho."""
     solved = []
     failures = list(plan.get("undersized") or [])
     for sub in plan.get("segments") or []:
         pier_cm = sub["hi"] - sub["lo"]
         if pier_cm <= OPENING_FIT_TOLERANCE_CM:
             continue
-        if prefer_avoiding:
-            layout = _pier_layout_avoiding_joints(
-                pier_cm, catalog, 0.0, 0.0, sub["lo"],
-                avoid_joint_positions_cm or [],
+
+        def _layout_for_span(span_cm, _sub=sub):
+            if prefer_avoiding:
+                return _pier_layout_avoiding_joints(
+                    span_cm, catalog, 0.0, 0.0, _sub["lo"],
+                    avoid_joint_positions_cm or [],
+                    allow_compensators=allow_compensators,
+                    target_void_positions_cm=target_void_positions_cm,
+                    leading_is_open=_sub["leading_open"],
+                    trailing_is_open=_sub["trailing_open"],
+                )
+            return _pier_ordered_layout(
+                span_cm, catalog, 0.0, 0.0,
                 allow_compensators=allow_compensators,
-                target_void_positions_cm=target_void_positions_cm,
-                leading_is_open=sub["leading_open"],
-                trailing_is_open=sub["trailing_open"],
+                leading_open_override=_sub["leading_open"],
+                trailing_open_override=_sub["trailing_open"],
             )
-        else:
-            layout = _pier_ordered_layout(
-                pier_cm, catalog, 0.0, 0.0,
-                allow_compensators=allow_compensators,
-                leading_open_override=sub["leading_open"],
-                trailing_open_override=sub["trailing_open"],
-            )
+
+        layout = _layout_fitted_to_physical_span(
+            _layout_for_span(pier_cm), pier_cm, sub, _layout_for_span
+        )
         if layout is None:
             failures.append(sub)
         else:
@@ -4590,7 +5320,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
-                         variants_per_course=1, opening_strategy=None):
+                         variants_per_course=1, opening_strategy=None,
+                         cross_band_joint_seed=None):
     """Preenchimento comum (secao 13: 'no -> abertura, abertura ->
     abertura, abertura -> no') de UMA parede, nas duas FAMILIAS de fiada
     (par/impar - "A"/"B"). Para cada abertura, materializa tambem o bloco
@@ -4701,6 +5432,18 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     # "B")` abaixo) e consultado ao resolver "B", para o desencontro de
     # junta vertical entre fiadas da secao 6 (_pier_layout_avoiding_joints).
     course_a_joint_positions_cm = []
+    # Juntas de CONTORNO contra um no' (ver _pier_boundary_joint_positions_cm,
+    # CR-BLOCK-ARM-ROLE-PRISM-STAGGER) - SEPARADAS de course_a_joint_
+    # positions_cm de proposito: alimentam a BUSCA de desencontro
+    # (_pier_layout_avoiding_joints) e a checagem residual, mas NUNCA
+    # `avoid_joint_positions_cm` do reparo continuo (_recut_openings_and_
+    # repair, mais abaixo) - esse reparo so' espera juntas INTERNAS de
+    # verdade (testado ao vivo: incluir a de contorno ali criava jambs
+    # POSICIONADOS DIFERENTE perto de porta/janela em paredes sem nenhuma
+    # relacao com o defeito original, regressao real medida em
+    # OPENING_BLOCK_INSIDE_DOOR no TGD - revertida restringindo o escopo
+    # desta lista a busca/relatorio, nunca ao recorte de abertura).
+    course_a_boundary_joint_positions_cm = []
     # Centros dos vazios/celulas internas (cm, absolutos) ja' usados pela
     # Fiada A nos mesmos trechos - consultado ao resolver "B" para alinhar
     # os vazios entre fiadas (mesma secao 6, ver _pier_layout_avoiding_joints
@@ -4722,6 +5465,12 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
         return jamb_cache[key]
 
     for course in ("A", "B"):
+        # CR-G12 (secao 27.7): juntas da fiada fisica VIZINHA que pertence a
+        # OUTRA banda de abertura e ja' foi resolvida - a fronteira de banda
+        # e' o unico lugar em que a regra #1 nao era avaliada. Vazio (o
+        # default de todo chamador que nao passa semente) reproduz
+        # exatamente o comportamento anterior a esta CR.
+        cross_band_joints_cm = list((cross_band_joint_seed or {}).get(course) or [])
         boundaries = list(base_boundaries)
         # Intervalos de meio-de-parede sao MESCLADOS antes de virar
         # fronteira: dois encontros muito proximos (ou o mesmo encontro
@@ -4737,12 +5486,33 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
             boundaries.append((t_end_cm, "MIDSPAN_HI", None))
         boundaries.sort(key=lambda b: b[0])
 
+        # METADE SIMETRICA da junta NO'|FILL (CR-BLOCK-NODE-FILL-
+        # REVALIDATION): onde estarao as juntas NO'|FILL da fiada OPOSTA.
+        # A Fiada A roda primeiro e nunca veria as juntas de contorno que
+        # a B publica; mas a posicao da PECA DE NO' nao depende de layout,
+        # so' de `course`, entao da' para saber onde ela vai cair antes de
+        # resolver (ver `_wall_node_boundary_joints_cm`). So' a Fiada A
+        # consome esta lista (abaixo): a Fiada B ja' recebe as juntas de
+        # contorno REAIS da A por `course_a_boundary_joint_positions_cm`, e
+        # somar a lista deduzida la' so' acrescentava restricao fantasma
+        # onde o preenchimento da A nao existe (medido: mais compensador e
+        # colisao rearranjada em paredes sobrepostas do TGD, sem ganho de
+        # prisma).
+        opposite_course = "B" if course == "A" else "A"
+        opposite_node_joints_cm = (
+            _wall_node_boundary_joints_cm(
+                wall_idx, opposite_course, node_candidates_by_wall_end,
+                node_midspan_by_wall_course)
+            if NODE_FILL_OPPOSITE_COURSE_ENABLED else []
+        )
+
         # Juntas internas ja' usadas por VARIANTES ANTERIORES desta MESMA
         # familia (secao 11.7) - comeca vazia a cada familia nova; a
         # familia "B" comeca sua PROPRIA busca considerando tambem tudo
         # que "A" acumulou (course_a_joint_positions_cm, abaixo), exatamente
         # como antes (regra #1, preservada integralmente).
         own_family_joint_positions_cm = []
+        own_family_boundary_joint_positions_cm = []
 
         for variant_index in range(variants_per_course):
             # FASE 1 do pipeline continuo: onde esta variante comeca em
@@ -4950,6 +5720,37 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                                               allow_compensators=allow_compensators,
                                                               leading_open_override=leading_is_open,
                                                               trailing_open_override=trailing_is_open)
+                            # METADE SIMETRICA (CR-BLOCK-NODE-FILL-
+                            # REVALIDATION): o layout PADRAO continua sendo o
+                            # primeiro e o normal; so' e' trocado se empilhar
+                            # uma junta interna em cima de uma junta NO'|FILL
+                            # da fiada OPOSTA e existir composicao do MESMO
+                            # trecho (a mesma busca que a Fiada B sempre usou,
+                            # `_pier_layout_avoiding_joints`) com ESTRITAMENTE
+                            # menos coincidencia. Nunca troca por empate -
+                            # quem ja' estava correto nao se mexe. Conta so'
+                            # as juntas que SOBREVIVEM ao recorte das
+                            # aberturas (`_layout_joints_surviving_openings_
+                            # cm`): a junta de uma peca que o vao vai derrubar
+                            # e' fantasma e nao pode decidir a troca.
+                            if layout is not None and opposite_node_joints_cm:
+                                colide = _count_joint_coincidences_cm(
+                                    _layout_joints_surviving_openings_cm(
+                                        layout, seg_start_cm, opening_intervals_cm),
+                                    opposite_node_joints_cm)
+                                if colide:
+                                    alternativa = _pier_layout_avoiding_joints(
+                                        pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                                        opposite_node_joints_cm,
+                                        allow_compensators=allow_compensators,
+                                        leading_is_open=leading_is_open,
+                                        trailing_is_open=trailing_is_open,
+                                    )
+                                    if alternativa is not None and _count_joint_coincidences_cm(
+                                            _layout_joints_surviving_openings_cm(
+                                                alternativa, seg_start_cm, opening_intervals_cm),
+                                            opposite_node_joints_cm) < colide:
+                                        layout = alternativa
                         else:
                             # Variantes 1+ da PROPRIA familia A (secao 11.7):
                             # desencontram as juntas das variantes A anteriores
@@ -4959,16 +5760,43 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             # fixa aqui para alinhar).
                             layout = _pier_layout_avoiding_joints(
                                 pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
-                                own_family_joint_positions_cm, allow_compensators=allow_compensators,
+                                own_family_joint_positions_cm
+                                + own_family_boundary_joint_positions_cm,
+                                allow_compensators=allow_compensators,
                                 leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                             )
+                        # CR-G12: fronteira de banda de abertura. Roda DEPOIS
+                        # de tudo que ja' existia (layout padrao, metade
+                        # simetrica NO'|FILL, variantes da propria familia) e
+                        # so' troca quando ha' ganho estrito - ver
+                        # `_cross_band_swapped_layout`. A familia A nao tem
+                        # familia oposta ja' resolvida DENTRO da banda, entao
+                        # o unico criterio intra-banda a nao piorar e' o das
+                        # variantes anteriores da propria familia.
+                        layout = _cross_band_swapped_layout(
+                            layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                            cross_band_joints_cm,
+                            own_family_joint_positions_cm + own_family_boundary_joint_positions_cm,
+                            allow_compensators=allow_compensators,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        )
                         if layout:
-                            # Lista de juntas a EVITAR - sem isencao, pelo mesmo
-                            # motivo do `_score` de _pier_layout_avoiding_joints:
-                            # a Fiada B deve continuar tentando desencontrar
-                            # todas, inclusive as isentas (a isencao so' vale na
-                            # hora de validar o resultado final).
+                            # Juntas INTERNAS (sem isencao, pelo mesmo motivo do
+                            # `_score` de _pier_layout_avoiding_joints: a Fiada B
+                            # deve continuar tentando desencontrar todas,
+                            # inclusive as isentas - a isencao so' vale na hora
+                            # de validar o resultado final) e junta de CONTORNO
+                            # contra um no' (ver _pier_boundary_joint_positions_cm)
+                            # SEPARADAS de proposito - ver a declaracao de
+                            # `course_a_boundary_joint_positions_cm` acima: a de
+                            # contorno alimenta busca/checagem, nunca o reparo de
+                            # abertura (`avoid_joint_positions_cm` do recut, mais
+                            # abaixo).
                             seg_joints_cm = _layout_internal_joint_positions_cm(layout, seg_start_cm)
+                            seg_boundary_joints_cm = _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
+                            )
                             seg_voids_cm = _layout_void_positions_cm(layout, catalog, seg_start_cm)
                             if continuous_first:
                                 variant_joint_positions_cm.extend(seg_joints_cm)
@@ -4977,6 +5805,8 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                 own_family_joint_positions_cm.extend(seg_joints_cm)
                                 course_a_joint_positions_cm.extend(seg_joints_cm)
                                 course_a_void_positions_cm.extend(seg_voids_cm)
+                            own_family_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
+                            course_a_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
                     else:
                         # Fiada B (todas as variantes): tenta ALINHAR os vazios
                         # internos com os ja' usados por QUALQUER variante da
@@ -4985,22 +5815,43 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         # familia A e das variantes B ja' geradas (criterio de
                         # desempate) - secao 6/11.7. `course_a_joint_positions_cm`
                         # sozinho (sem own_family) e' EXATAMENTE o avoid-list
-                        # historico quando variants_per_course=1.
+                        # historico quando variants_per_course=1. Inclui tambem a
+                        # junta de CONTORNO de A/B ja' usada (ver acima).
                         layout = _pier_layout_avoiding_joints(
                             pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
-                            course_a_joint_positions_cm + own_family_joint_positions_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm,
                             allow_compensators=allow_compensators,
                             target_void_positions_cm=course_a_void_positions_cm,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        )
+                        # CR-G12: fronteira de banda de abertura (ver o
+                        # comentario igual na familia A). Aqui o criterio
+                        # intra-banda a NAO piorar e' a regra #1 contra a
+                        # familia A da propria banda, que ja' valia.
+                        layout = _cross_band_swapped_layout(
+                            layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                            cross_band_joints_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm,
+                            allow_compensators=allow_compensators,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
                         if layout:
                             # Sem isencao aqui tambem - esta lista alimenta a
                             # BUSCA das variantes seguintes (ver acima).
                             seg_joints_cm = _layout_internal_joint_positions_cm(layout, seg_start_cm)
+                            seg_boundary_joints_cm = _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
+                            )
                             if continuous_first:
                                 variant_joint_positions_cm.extend(seg_joints_cm)
                             else:
                                 own_family_joint_positions_cm.extend(seg_joints_cm)
+                            own_family_boundary_joint_positions_cm.extend(seg_boundary_joints_cm)
                     if layout is None:
                         if continuous_first:
                             variant_failed_spans.append((seg_start_cm, seg_end_cm))
@@ -5021,19 +5872,31 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                 "upper_valid_cm": upper, "delta_to_upper_cm": upper - length_rounded,
                             })
                         continue
-                    if course == "B" and len(layout) > 1 and course_a_joint_positions_cm:
+                    if course == "B" and layout and (
+                            course_a_joint_positions_cm or course_a_boundary_joint_positions_cm):
                         # Segunda checagem, INDEPENDENTE da busca de
                         # `_pier_layout_avoiding_joints` (regra #1, absoluta - ver
                         # docstring): mesmo com a busca melhorada, um trecho pode
                         # nao ter NENHUMA composicao sem coincidencia (ex.:
                         # compensadores desligados, ou um caso realmente sem
                         # solucao dentro do catalogo) - nunca aceitar isso calado.
+                        # Inclui a junta de CONTORNO contra um no' (ver
+                        # _pier_boundary_joint_positions_cm) e roda mesmo com
+                        # `layout` de 1 peca so' - um trecho de UM bloco entre um
+                        # no' e outro limite nao tem junta INTERNA nenhuma, mas
+                        # ainda assim pode coincidir na junta de contorno com a
+                        # da Fiada A (CR-BLOCK-ARM-ROLE-PRISM-STAGGER; antes
+                        # disto o `len(layout) > 1` escondia exatamente este
+                        # caso, o mais comum nas paredes curtas afetadas).
                         residual = _count_joint_coincidences_cm(
                             _layout_internal_joint_positions_cm(
                                 layout, seg_start_cm,
                                 leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                            ) + _pier_boundary_joint_positions_cm(
+                                seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                leading_is_open, trailing_is_open,
                             ),
-                            course_a_joint_positions_cm,
+                            course_a_joint_positions_cm + course_a_boundary_joint_positions_cm,
                         )
                         if residual:
                             alignment_conflicts.append({
@@ -5525,6 +6388,1171 @@ def validate_wall_modulation(wall_idx, walls_to_create, openings_per_wall, fill_
             "problems": problems, "warnings": warnings}
 
 
+# ==========================================
+# CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT (2026-09-04) - SAFE REPAIR
+#
+# Continuacao de CR-BLOCK-ARM-ROLE-HUMAN-POLICY/-JUNCTION-GATE (ver
+# REGRAS_MODULACAO_BLOCOS.md secao 30 e docs/BLOCK_ARM_ROLE_HUMAN_POLICY.md
+# para a investigacao completa). Formaliza um CONTRATO GERAL de seguranca
+# para aceitar/rejeitar um candidato de troca de papel `course_a`/
+# `course_b` numa aresta ISOLADA do grafo de `_coordinate_arm_role_nodes`
+# (ver `_arm_role_isolated_edges`) que hoje produz PRISMA FORCADO (junta
+# corrida de altura total - `continuous_joints` de `audit_wall_bond_
+# quality`, ja' calculado em `wall_bond_audits` por
+# `solve_building_blocks_all_courses`).
+#
+# MODELO DE DECISAO (nunca "corrigiu o defeito alvo, entao aceita"):
+#
+#     ORIGINAL -> gera candidatos -> resolve candidato (rebuild COMPLETO,
+#     nunca estimativa) -> calcula DELTA de qualidade contra o ORIGINAL ->
+#     rejeita qualquer HARD REGRESSION NOVA -> aceita o primeiro candidato
+#     seguro (ordem canonica) -> senao mantem ORIGINAL.
+#
+# HARD CONSTRAINTS (nesta ordem - cada um rejeita sozinho, ver
+# `_evaluate_corner_role_candidate`):
+#   1. fechamento (`_no_wall_regression`) - reusa o MESMO criterio (b) de
+#      `_group_shift_trial_improves`/ETAPA 3C.
+#   2. colisao nova, GLOBAL (`_no_new_collisions`) - reusa
+#      `validate_same_course_collision`, por ASSINATURA geometrica (nunca
+#      indice de lista, que muda entre resolucoes).
+#   3. prisma forcado novo empurrado para uma parede VIZINHA
+#      (`_no_new_forced_corner_prism_in_neighbors`) - reusa
+#      `wall_bond_audits`/`continuous_joints`, ja' calculado.
+#   4. sequencia nova de compensadores consecutivos, por parede DIRTY
+#      (`_no_new_consecutive_compensators`) - reusa `_find_consecutive_
+#      compensators` (regra #2/#8, ja' producao).
+#   5. regressao de cobertura por fiada, por parede DIRTY
+#      (`_no_new_row_coverage_regression`) - unico mecanismo NOVO desta
+#      CR (nao existe equivalente de producao para COVERAGE_GAP_IN_ROW/
+#      COVERAGE_PARTIAL_WALL/COVERAGE_ROW_MOSTLY_EMPTY hoje) - ver
+#      docstring de `_wall_row_covered_length_cm` para por que uma medida
+#      LOCAL simplificada (sem occupancy/cobertura emprestada de
+#      amarracao, ao contrario de nuvem/benchmark/validators/
+#      validate_wall_coverage.py) e' segura quando usada so' como DELTA.
+#
+# "DIRTY" (secao 9 do CR): a propria parede da aresta isolada + a parede
+# vizinha em CADA um dos dois nos (quem esta' do "outro lado" de
+# `node["arms"]`) - IDENTIDADE geometrica/topologica estavel (nunca
+# proximidade por tolerancia numerica, nunca wall_idx de outra resolucao),
+# suficiente por medicao direta (REGRAS_MODULACAO_BLOCOS.md secao 30: toda
+# regressao medida nos 5 candidatos do TGD apareceu na propria parede
+# reparada OU na vizinha imediata - nunca um cluster de 3+ paredes, H2/H3/
+# H4 refutadas).
+#
+# ESCOPO (secao 12 do CR): TODA a logica de decisao (geracao de
+# candidatos, gates, delta, orquestracao) vive AQUI, em wall_stepper.py -
+# nenhuma dependencia de nuvem/benchmark. A UNICA excecao e' `rebuild_fn`,
+# injetado pelo CHAMADOR (`solve_building_blocks_all_courses`,
+# wall_modeling.py) - este arquivo nunca importa wall_modeling.py
+# (evitaria import circular: wall_modeling.py ja' faz `from
+# core.engine.wall_stepper import *`). Ver a docstring de
+# `repair_arm_role_isolated_edges` para o motivo dessa injecao ser
+# necessaria (o rebuild multi-banda completo mora em wall_modeling.py).
+# ==========================================
+
+CORNER_ROLE_CANDIDATE_BITS = (
+    ("SAME_A", (0, 0)),
+    ("SAME_B", (1, 1)),
+    ("ALTERNATE_AB", (0, 1)),
+    ("ALTERNATE_BA", (1, 0)),
+)
+
+
+def _arm_role_isolated_edges(nodes):
+    """Arestas ISOLADAS do grafo de `_coordinate_arm_role_nodes`: paredes
+    cujos dois nos L_CORNER (`node_p`, `node_q`) tem GRAU 1 no grafo de
+    coordenacao - nenhuma OUTRA parede coordenada toca qualquer um dos
+    dois (REGRAS_MODULACAO_BLOCOS.md secao 30, "variavel causal
+    generalizada": e' esta propriedade - nunca comprimento nem par de
+    pecas especifico - que decide se a alternativa "mesma familia" e'
+    segura de TENTAR, porque uma aresta isolada nunca pode afetar a
+    alternancia de nenhuma OUTRA parede coordenada).
+
+    Chamada UMA VEZ por `repair_arm_role_isolated_edges`, ANTES de
+    qualquer pin desta resolucao - por isso usa `respect_pins=False`
+    (topologia completa; nenhum no' esta' pinado ainda neste ponto).
+
+    Devolve uma lista ordenada DETERMINISTICAMENTE (por
+    `_canonical_node_sort_key(nodes[node_p])`, nunca por wall_idx/ordem de
+    insercao) de dicts {"wall_idx":, "node_p":, "node_q":,
+    "original_bits": (bit_p, bit_q)}."""
+    _eligible, adjacency, edges = _arm_role_coordination_graph(nodes, respect_pins=False)
+    isolated = []
+    for node_p, node_q, wall_idx in edges:
+        if len(adjacency.get(node_p, [])) != 1 or len(adjacency.get(node_q, [])) != 1:
+            continue
+        bit_p = _two_arm_l_corner_role_bit(nodes[node_p], wall_idx)
+        bit_q = _two_arm_l_corner_role_bit(nodes[node_q], wall_idx)
+        isolated.append({
+            "wall_idx": wall_idx, "node_p": node_p, "node_q": node_q,
+            "original_bits": (bit_p, bit_q),
+        })
+    isolated.sort(key=lambda e: _canonical_node_sort_key(nodes[e["node_p"]]) + (e["wall_idx"],))
+    return isolated
+
+
+def _set_l_corner_role_bits(nodes, node_p, node_q, wall_idx, bit_p, bit_q, pinned):
+    """Fixa o papel de `wall_idx` em `bit_p`/`bit_q` (0 ou 1 - ver
+    `_two_arm_l_corner_role_bit`) nos nos `node_p`/`node_q`, e marca (ou
+    remove, se `pinned=False`) `_arm_role_pinned` nos dois - usado pelo
+    SAFE REPAIR para testar/aceitar/reverter um candidato de
+    `CORNER_ROLE_CANDIDATE_BITS`.
+
+    ABSOLUTO e IDEMPOTENTE: define o estado ALVO diretamente (nunca um
+    toggle relativo) - chamar de novo com os MESMOS bits, depois de
+    qualquer sequencia de tentativas anteriores, sempre produz o mesmo
+    resultado. A troca fisica (`node["arms"] = [a1, a0]`) e' EXATAMENTE a
+    mesma operacao que `_coordinate_arm_role_nodes` ja' usa - nenhuma
+    segunda convencao.
+
+    Devolve `changed_indices` (subconjunto de `[node_p, node_q]` cujo
+    `arms` de fato mudou de ordem) - lista vazia quando o estado pedido ja'
+    era o estado atual, para o chamador nunca contar uma tentativa "nula"
+    como candidato avaliado (mesma regra do relatorio: `ORIGINAL` nunca e'
+    testado como se fosse um candidato novo)."""
+    changed = []
+    for node_index, wanted_bit in ((node_p, bit_p), (node_q, bit_q)):
+        node = nodes[node_index]
+        current_bit = _two_arm_l_corner_role_bit(node, wall_idx)
+        if current_bit is None:
+            continue
+        if current_bit != wanted_bit:
+            a0, a1 = node["arms"]
+            node["arms"] = [a1, a0]
+            node["neighbor_wall_idx"] = a0[0]
+            node["neighbor_end_index"] = a0[1]
+            changed.append(node_index)
+        if pinned:
+            node["_arm_role_pinned"] = True
+        else:
+            node.pop("_arm_role_pinned", None)
+    return changed
+
+
+def _wall_forced_corner_prism_signature(wall_idx, wall_bond_audits):
+    """Assinatura ESTAVEL (conjunto de posicoes X arredondadas, cm) dos
+    achados `CONTINUOUS_VERTICAL_JOINT` de `audit_wall_bond_quality` para
+    `wall_idx` - reusa a auditoria MULTI-FIADA que
+    `solve_building_blocks_all_courses` ja' calcula (`wall_bond_audits`,
+    wall_modeling.py) em vez de duplicar deteccao de prisma corrido: um
+    "prisma forcado" (mesma junta em quase toda fiada) e' exatamente o que
+    aquele mecanismo ja' rastreia como `continuous_joints`. Nunca importa
+    nuvem/benchmark."""
+    audit = (wall_bond_audits or {}).get(wall_idx) or {}
+    return frozenset(round(j["x_cm"], 1) for j in (audit.get("continuous_joints") or []))
+
+
+def _wall_has_forced_corner_prism(wall_idx, wall_bond_audits):
+    return bool(_wall_forced_corner_prism_signature(wall_idx, wall_bond_audits))
+
+
+def _find_consecutive_compensators_in_course(wall_idx, walls_to_create, course_items, catalog,
+                                             tolerance_cm=None):
+    """Como `_find_consecutive_compensators`, mas para uma lista JA'
+    filtrada a UMA fiada FISICA isolada (`course_candidates[course_index]`,
+    filtrada por `wall_idx`) - nunca agrupa por `course` (letra "A"/"B"),
+    porque a lista de entrada e' inerentemente UMA fiada fisica so' (nenhuma
+    agregacao cross-banda e' possivel aqui - CR-BLOCK-ARM-SAFE-REPAIR-GATE-
+    FIDELITY, ver docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md, secao
+    "Compensator gate"). Usada SO' pelo gate `_no_new_consecutive_
+    compensators` (SAFE REPAIR) - `_find_consecutive_compensators` em si
+    continua servindo `validate_wall_modulation` (fora do escopo desta
+    CR)."""
+    if tolerance_cm is None:
+        tolerance_cm = BLOCK_JOINT_CM + PIER_LAYOUT_TOLERANCE_CM
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    items = []
+    for c in course_items:
+        entry = catalog.get(c.get("logical_code")) if catalog else None
+        if not entry or not entry.get("is_compensator"):
+            continue
+        t_lo_cm, t_hi_cm = _candidate_t_range_on_wall(c, p0, wall_dir)
+        items.append((t_lo_cm, t_hi_cm, c.get("logical_code")))
+    items.sort(key=lambda it: it[0])
+    runs = []
+    i = 0
+    while i < len(items) - 1:
+        run = [items[i]]
+        j = i
+        while j + 1 < len(items) and (items[j + 1][0] - items[j][1]) <= tolerance_cm:
+            run.append(items[j + 1])
+            j += 1
+        if len(run) >= 2:
+            runs.append({"codes": [r[2] for r in run], "start_cm": run[0][0], "end_cm": run[-1][1]})
+        i = j + 1
+    return runs
+
+
+def _wall_compensator_run_signatures(wall_idx, walls_to_create, num_courses,
+                                     course_candidates, catalog):
+    """Assinatura ESTAVEL (course_index FISICO + codigos + posicao, nunca
+    indice de lista NEM letra de familia "A"/"B") das sequencias de
+    compensadores consecutivos de `wall_idx`, usada para comparar ORIGINAL x
+    CANDIDATO por DELTA (uma troca de 1 sequencia por outra NA MESMA
+    posicao/fiada nao conta como nova).
+
+    CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY: identidade de fiada e'
+    `course_index` (0..num_courses-1), a partir de `course_candidates`
+    (mesma estrutura que o gate de cobertura ja' usa) - NUNCA `candidates`
+    agregado entre bandas de abertura (uma banda cobre varias fiadas
+    fisicas com a MESMA letra "A"/"B"; agrupar por letra faz o MESMO
+    compensador solitario, repetido em N bandas na mesma posicao X, virar
+    uma cadeia fantasma de N compensadores "consecutivos" - PROVADO,
+    docs/BLOCK_ARM_REJECTED_EDGES_DIAGNOSIS.md, TP1 wall_idx=75/SAME_A: 0
+    achados novos/102 resolvidos no validador real, mas o proxy antigo
+    rejeitava por uma cadeia de 7 copias do mesmo C04). Cada chamada de
+    `_find_consecutive_compensators_in_course` ja' recebe UMA fiada fisica
+    isolada - elimina a agregacao cross-banda por construcao, sem agrupar
+    por letra."""
+    signatures = set()
+    for course_index in range(num_courses):
+        items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+        runs = _find_consecutive_compensators_in_course(wall_idx, walls_to_create, items, catalog)
+        for run in runs:
+            signatures.add((course_index, tuple(run["codes"]), round(run["start_cm"], 1)))
+    return signatures
+
+
+def _no_new_consecutive_compensators(wall_idx, walls_to_create, catalog, num_courses,
+                                     baseline_course_candidates, trial_course_candidates):
+    """HARD GATE: nenhuma sequencia NOVA de compensadores REALMENTE
+    consecutivos NA MESMA FIADA FISICA (`COMPENSATOR_CONSECUTIVE` - ja'
+    producao, regra #2/#8) pode aparecer em `wall_idx` depois do candidato.
+    Identidade de fiada = `course_index` (ver `_wall_compensator_run_
+    signatures`) - nunca agrega compensadores entre `course_index`
+    diferentes."""
+    before = _wall_compensator_run_signatures(
+        wall_idx, walls_to_create, num_courses, baseline_course_candidates, catalog)
+    after = _wall_compensator_run_signatures(
+        wall_idx, walls_to_create, num_courses, trial_course_candidates, catalog)
+    return not (after - before)
+
+
+def _wall_row_covered_length_cm(wall_idx, course_index, course_candidates, walls_to_create):
+    """Comprimento coberto (uniao de intervalos, cm) das pecas de
+    `wall_idx` na fiada FISICA `course_index`, a partir de
+    `course_candidates` (ja' pos-drop de `_drop_fill_colliding_with_ties`
+    - ver `solve_building_blocks_all_courses`, wall_modeling.py).
+
+    FUNCAO PURA E LOCAL, deliberadamente mais simples que
+    `nuvem/benchmark/validators/validate_wall_coverage.py` (que precisa de
+    `OccupancyIndex`/cobertura emprestada de amarracao para medir
+    corretamente em termos ABSOLUTOS - COVERAGE_GAP_IN_ROW/
+    COVERAGE_PARTIAL_WALL/COVERAGE_ROW_MOSTLY_EMPTY): usada SO' para
+    DELTA, comparando o MESMO `wall_idx`/`course_index` entre ORIGINAL e
+    CANDIDATO (nunca como limiar absoluto) - qualquer vies sistematico do
+    metodo (ex.: zona de amarracao emprestada perto de um no') aparece
+    IGUAL nos dois lados e cancela no delta. Ver
+    `_no_new_row_coverage_regression`."""
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+    if not items:
+        return 0.0
+    extents = sorted(
+        (_candidate_extent_on_wall_axis(c, p0, wall_dir) for c in items),
+        key=lambda extent: extent[0]
+    )
+    total = 0.0
+    cur_lo, cur_hi = extents[0]
+    for lo, hi in extents[1:]:
+        if lo <= cur_hi + 1e-6:
+            cur_hi = max(cur_hi, hi)
+        else:
+            total += (cur_hi - cur_lo)
+            cur_lo, cur_hi = lo, hi
+    total += (cur_hi - cur_lo)
+    return total
+
+
+ROW_COVERAGE_RELATIVE_TOLERANCE = 0.10
+ROW_COVERAGE_ABSOLUTE_FLOOR_CM = 5.0 * BLOCK_JOINT_CM
+
+
+def _wall_row_own_extents_cm(wall_idx, course_index, course_candidates, walls_to_create):
+    """Intervalos (uniao, MESCLADOS - `_merge_intervals_cm`) que as pecas
+    'donas' de `wall_idx` ocupam na fiada FISICA `course_index`, projetados
+    no proprio eixo de `wall_idx`. Base tanto de `_wall_row_covered_
+    length_cm` (delta simples) quanto do credito de no' abaixo."""
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+    return _merge_intervals_cm([_candidate_extent_on_wall_axis(c, p0, wall_dir) for c in items])
+
+
+def _subtract_intervals_cm(base_intervals, remove_intervals, tolerance_cm=1e-6):
+    """`base_intervals` MENOS `remove_intervals` (ambos ja' mesclados,
+    disjuntos) - devolve os pedacos de `base` que sobram depois de remover
+    qualquer sobreposicao com `remove` - usado para achar o trecho que
+    REALMENTE deixou de ser coberto (ANTES menos DEPOIS), nunca um limiar
+    absoluto."""
+    result = []
+    for b_lo, b_hi in base_intervals:
+        pieces = [(b_lo, b_hi)]
+        for r_lo, r_hi in remove_intervals:
+            next_pieces = []
+            for p_lo, p_hi in pieces:
+                if r_hi <= p_lo + tolerance_cm or r_lo >= p_hi - tolerance_cm:
+                    next_pieces.append((p_lo, p_hi))
+                    continue
+                if r_lo > p_lo + tolerance_cm:
+                    next_pieces.append((p_lo, r_lo))
+                if r_hi < p_hi - tolerance_cm:
+                    next_pieces.append((r_hi, p_hi))
+            pieces = next_pieces
+        result.extend(pieces)
+    return result
+
+
+def _wall_row_node_credit_cm(wall_idx, course_index, node_indices, missing_intervals,
+                             course_candidates, walls_to_create):
+    """Credito FISICO (cm) que pecas ancoradas em QUALQUER no' de
+    `node_indices` mas 'donas', nos dados (`c.get("wall_idx")`), de OUTRA
+    parede podem dar a `wall_idx`/`course_index` -
+    CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY, contrato de credito de no'
+    (docs/BLOCK_ARM_SAFE_REPAIR_GATE_FIDELITY_SPEC.md, secao "Coverage
+    gate"):
+
+        1. MESMO no' - `node_indices` e' um parametro EXPLICITO (os nos'
+           ISOLADOS de `wall_idx` que participam do candidato ARM - o
+           ALVO tem DOIS, `node_p`/`node_q`; uma parede VIZINHA tem UM
+           so', o que a liga ao alvo), nunca deduzido por proximidade/
+           tolerancia numerica. O credito flui nos DOIS sentidos (alvo <-
+           vizinha E vizinha <- alvo): a peca de canto de QUALQUER um dos
+           dois nos ISOLADOS deste candidato pode ter trocado de dono, e
+           os DOIS lados do no' (a parede que perdeu E a parede que
+           ganhou) precisam poder creditar da OUTRA.
+        2. MESMA regiao geometrica - o credito e' recortado (`max`/`min`)
+           contra `missing_intervals` (o trecho que REALMENTE deixou de
+           ser coberto, nunca "a peca existe em algum lugar da parede").
+        3. MESMA fiada fisica - `course_index` explicito (nunca letra de
+           familia), so' olha `course_candidates[course_index]`.
+        4. PECA REALMENTE PRESENTE - `course_candidates` aqui e' sempre o
+           do `trial_result` (resultado REAL do rebuild), nunca hipotese.
+        5. AUSENCIA DE GAP FISICO - nao verificado aqui: o credito e'
+           limitado a `missing_intervals` por construcao (nunca pode
+           exceder o gap real); quem decide se ainda sobra gap e'
+           `_no_new_row_coverage_regression`, comparando o total (com
+           credito) contra a tolerancia."""
+    if not missing_intervals or not node_indices:
+        return 0.0
+    node_index_set = set(node_indices)
+    p0, _p1, wall_dir, _length_ft, _thickness = _wall_axis_and_length(walls_to_create, wall_idx)
+    credit_intervals = []
+    for c in (course_candidates.get(course_index) or []):
+        if c.get("wall_idx") == wall_idx:
+            continue  # ja' e' peca propria - nao e' credito "emprestado"
+        if c.get("node_index") not in node_index_set:
+            continue  # condicao 1 - nunca peca de outro no'
+        lo, hi = _candidate_extent_on_wall_axis(c, p0, wall_dir)
+        for gap_lo, gap_hi in missing_intervals:
+            ov_lo, ov_hi = max(lo, gap_lo), min(hi, gap_hi)
+            if ov_hi >= ov_lo:  # condicao 2 - so' o trecho que sobrepoe o gap
+                credit_intervals.append((ov_lo, ov_hi))
+    merged = _merge_intervals_cm(credit_intervals)
+    return sum(hi - lo for lo, hi in merged)
+
+
+def _wall_row_covered_length_cm_with_node_credit(wall_idx, course_index, node_indices,
+                                                  baseline_course_candidates,
+                                                  trial_course_candidates,
+                                                  walls_to_create):
+    """Como `_wall_row_covered_length_cm(wall_idx, course_index,
+    trial_course_candidates, walls_to_create)`, mas soma tambem o credito
+    FISICO de no' (`_wall_row_node_credit_cm`) quando `node_indices` nao e'
+    vazio/None - usado SO' pelo lado DEPOIS (`trial`) de `_no_new_row_
+    coverage_regression`; o lado ANTES continua a medida simples (nunca
+    precisa de credito - e' a base contra a qual o gap e' calculado)."""
+    after_own = _wall_row_own_extents_cm(wall_idx, course_index, trial_course_candidates, walls_to_create)
+    after_own_total = sum(hi - lo for lo, hi in after_own)
+    if not node_indices:
+        return after_own_total
+    before_own = _wall_row_own_extents_cm(wall_idx, course_index, baseline_course_candidates, walls_to_create)
+    missing = _subtract_intervals_cm(before_own, after_own)
+    if not missing:
+        return after_own_total
+    credit_cm = _wall_row_node_credit_cm(
+        wall_idx, course_index, node_indices, missing, trial_course_candidates, walls_to_create)
+    return after_own_total + credit_cm
+
+
+def _no_new_row_coverage_regression(wall_idx, walls_to_create, num_courses,
+                                    baseline_course_candidates, trial_course_candidates,
+                                    node_indices=None,
+                                    relative_tolerance=ROW_COVERAGE_RELATIVE_TOLERANCE,
+                                    absolute_floor_cm=ROW_COVERAGE_ABSOLUTE_FLOOR_CM):
+    """HARD GATE: nenhuma fiada FISICA de `wall_idx` pode perder
+    comprimento coberto alem de uma folga RELATIVA (`relative_tolerance`,
+    fracao do comprimento ANTES) OU `absolute_floor_cm`, o que for maior -
+    mecanismo real por tras de `COVERAGE_GAP_IN_ROW`/`COVERAGE_
+    PARTIAL_WALL`/`COVERAGE_ROW_MOSTLY_EMPTY` (REGRAS_MODULACAO_BLOCOS.md
+    secao 30, candidatos 89/90/120: um bloco de preenchimento que antes
+    cabia passa a colidir com a peca de canto na nova posicao/familia e e'
+    descartado por `_drop_fill_colliding_with_ties`, abrindo um buraco que
+    nao existia).
+
+    TOLERANCIA RELATIVA (nao absoluta em cm) por um motivo medido, nao
+    arbitrario: QUALQUER troca de papel isolada realoca a peca de canto
+    de um no' entre a familia A e a familia B da parede VIZINHA (efeito
+    esperado e inofensivo de qualquer candidato, inclusive o ACEITAVEL -
+    medido ao vivo, TGD, candidato `wall_idx=23`/W011: a fiada da familia
+    que PERDE o no' cai de 555cm para 541cm, ~2.5%, enquanto a familia que
+    GANHA sobe de 555 para 570cm - redistribuicao balanceada, comprimento
+    coberto continua fechando a parede quase inteira). Um limiar absoluto
+    de poucos cm (a primeira versao desta funcao usava `BLOCK_JOINT_CM`)
+    rejeitava esse candidato SEGURO por engano. Uma regressao REAL
+    (medida no mesmo TGD, candidato `wall_idx=89`, parede vizinha curta de
+    34cm): a fiada de uma familia INTEIRA cai de 34cm para 0cm - 100% de
+    perda, muito acima de QUALQUER folga relativa razoavel - continua
+    corretamente rejeitada.
+
+    DELTA por fiada (identidade = `wall_idx` + `course_index`, ambos
+    estaveis DENTRO da mesma resolucao - nunca ElementId/ordem de
+    processamento) - ver docstring de `_wall_row_covered_length_cm`.
+
+    `node_indices` (CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY, opcional -
+    None/vazio preserva o comportamento antigo, sem credito): quando
+    informado, o lado DEPOIS aceita o credito FISICO de `_wall_row_
+    covered_length_cm_with_node_credit` para uma peca de amarracao
+    ancorada em QUALQUER um desses nos que hoje 'pertence', nos dados, a
+    OUTRA parede (troca de posse pura, nao perda fisica - ver docstring de
+    `_wall_row_node_credit_cm`). So' o chamador (`_evaluate_corner_role_
+    candidate`) sabe quais nos ISOLADOS do candidato ARM tocam esta parede
+    `wall_idx` (o alvo tem DOIS - `node_p`/`node_q`; uma vizinha tem UM) -
+    nunca inferido aqui por proximidade."""
+    for course_index in range(num_courses):
+        before = _wall_row_covered_length_cm(
+            wall_idx, course_index, baseline_course_candidates, walls_to_create)
+        after = _wall_row_covered_length_cm_with_node_credit(
+            wall_idx, course_index, node_indices,
+            baseline_course_candidates, trial_course_candidates, walls_to_create)
+        if before <= absolute_floor_cm:
+            continue  # ja' era (quase) vazia antes - nada a regredir
+        allowed_drop = max(absolute_floor_cm, relative_tolerance * before)
+        if after + allowed_drop < before:
+            return False
+    return True
+
+
+def _candidate_identity_signature(candidate):
+    """Identidade GEOMETRICA estavel de um candidato (nunca o indice dele
+    em `candidates`, que muda entre resolucoes) - usada por
+    `_collision_signatures` para comparar pares de colisao por DELTA."""
+    origin = candidate.get("origin_world")
+    return (
+        candidate.get("wall_idx"), candidate.get("course"), candidate.get("logical_code"),
+        round(origin.X, 3) if origin is not None else None,
+        round(origin.Y, 3) if origin is not None else None,
+        round(origin.Z, 3) if origin is not None else None,
+        round(candidate.get("rotation_deg") or 0.0, 1),
+    )
+
+
+def _collision_signatures(candidates, collisions):
+    return set(
+        frozenset((_candidate_identity_signature(candidates[i]), _candidate_identity_signature(candidates[j])))
+        for i, j in collisions
+    )
+
+
+def _no_new_collisions(baseline_result, trial_result):
+    """HARD GATE: nenhum par de colisao (`POSITION_OVERLAP`) NOVO pode
+    aparecer, GLOBALMENTE (a planta inteira - colisao e' proximidade
+    FISICA, nunca limitada a `dirty_wall_idxs`: REGRAS_MODULACAO_BLOCOS.md
+    secao 30, "causa provavel do gap de seguranca" - vizinhanca de grafo
+    de 1 salto NAO e' suficiente para colisao). Reusa `result["collisions"]`
+    (ja' calculado por `solve_building_blocks_all_courses`/
+    `process_walls_one_by_one` - nenhuma segunda definicao de colisao),
+    comparado por ASSINATURA geometrica (par de identidades estaveis),
+    nunca indice de lista."""
+    before = _collision_signatures(baseline_result["candidates"], baseline_result["collisions"])
+    after = _collision_signatures(trial_result["candidates"], trial_result["collisions"])
+    return not (after - before)
+
+
+def _multi_band_wall_ok_map(result):
+    """Como `_wall_ok_map`, mas para o resultado AGREGADO multi-banda de
+    `solve_building_blocks_all_courses` (`per_wall` tem uma entrada POR
+    BANDA em que a parede aparece, nunca uma por parede - ver docstring
+    daquela funcao): uma parede so' conta como "ok" se fechou em TODAS as
+    bandas em que aparece - uma unica banda com problema e' uma regressao
+    real, nao pode ser mascarada pela ULTIMA entrada do dict (o que
+    `_wall_ok_map` simples faria)."""
+    ok = {}
+    for entry in result.get("per_wall") or []:
+        wall_idx = entry["wall_idx"]
+        this_ok = entry["validation"]["ok"] and not entry["non_modular"]
+        ok[wall_idx] = ok.get(wall_idx, True) and this_ok
+    return ok
+
+
+def _no_wall_regression(baseline_result, trial_result):
+    """HARD GATE: nenhuma parede que fechava a modulacao no ORIGINAL pode
+    passar a falhar no CANDIDATO - mesmo criterio (b) de
+    `_group_shift_trial_improves`/ETAPA 3C, SEM o criterio (a) daquela
+    funcao (que exige que a propria parede alterada passe a fechar: nao se
+    aplica aqui - o SAFE REPAIR nao conserta uma parede quebrada, so' troca
+    papel de amarracao de uma que ja' fecha). GLOBAL (todas as paredes,
+    nao so' as `dirty`) - o rebuild e' completo, sem custo extra em checar
+    todo mundo."""
+    before = _multi_band_wall_ok_map(baseline_result)
+    after = _multi_band_wall_ok_map(trial_result)
+    for wall_idx, was_ok in before.items():
+        if was_ok and not after.get(wall_idx, False):
+            return False
+    return True
+
+
+def _no_new_forced_corner_prism_in_neighbors(target_wall_idx, neighbor_wall_idxs,
+                                             baseline_result, trial_result):
+    """HARD GATE (achado desta CR - REGRAS_MODULACAO_BLOCOS.md secao 30,
+    "o prisma forcado nao pode ser empurrado para a parede VIZINHA"):
+    nenhuma parede vizinha (que compartilha `node_p`/`node_q` com a aresta
+    isolada - NUNCA `target_wall_idx`, que e' quem o candidato tenta
+    corrigir) pode ganhar uma posicao de prisma forcado que nao tinha
+    antes."""
+    before_audits = baseline_result.get("wall_bond_audits") or {}
+    after_audits = trial_result.get("wall_bond_audits") or {}
+    for wall_idx in neighbor_wall_idxs:
+        if wall_idx == target_wall_idx:
+            continue
+        before_sig = _wall_forced_corner_prism_signature(wall_idx, before_audits)
+        after_sig = _wall_forced_corner_prism_signature(wall_idx, after_audits)
+        if after_sig - before_sig:
+            return False
+    return True
+
+
+def _evaluate_corner_role_candidate(target_wall_idx, dirty_wall_idxs, neighbor_wall_idxs,
+                                    walls_to_create, catalog, num_courses,
+                                    baseline_result, trial_result,
+                                    wall_credit_node_indices=None):
+    """Roda os HARD GATES desta CR NESTA ORDEM (cada um pode rejeitar
+    sozinho, sem depender dos seguintes - CR-BLOCK-ARM-ROLE-CANDIDATE-
+    SAFETY-CONTRACT secoes 4/16/17): fechamento -> colisao -> prisma
+    forcado em vizinha -> compensadores consecutivos (por parede dirty) ->
+    regressao de cobertura por fiada (por parede dirty).
+
+    `wall_credit_node_indices` (CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY,
+    opcional): {wall_idx: [node_index, ...]} - os nos' ISOLADOS deste
+    candidato ARM que tocam cada parede `dirty` (o ALVO tem DOIS -
+    `node_p`/`node_q`; cada vizinha tem UM, o que a liga ao alvo). So' o
+    chamador (`repair_arm_role_isolated_edges`, que conhece essa topologia)
+    sabe essa relacao; repassado ao gate de cobertura para o credito
+    FISICO de no' fluir nos DOIS sentidos (alvo credita da vizinha E
+    vizinha credita do alvo - nunca inferido aqui por proximidade).
+
+    Devolve `(aceito: bool, motivo: str ou None)` - o motivo nunca e'
+    descartado (relatorio/auditoria dos 4 candidatos negativos)."""
+    if not _no_wall_regression(baseline_result, trial_result):
+        return False, "closure_regression"
+    if not _no_new_collisions(baseline_result, trial_result):
+        return False, "new_collision"
+    if not _no_new_forced_corner_prism_in_neighbors(
+            target_wall_idx, neighbor_wall_idxs, baseline_result, trial_result):
+        return False, "new_forced_prism_in_neighbor"
+    for wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_consecutive_compensators(
+                wall_idx, walls_to_create, catalog, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"]):
+            return False, "new_consecutive_compensators:{}".format(wall_idx)
+    for wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_row_coverage_regression(
+                wall_idx, walls_to_create, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"],
+                node_indices=(wall_credit_node_indices or {}).get(wall_idx)):
+            return False, "row_coverage_regression:{}".format(wall_idx)
+    return True, None
+
+
+def repair_arm_role_isolated_edges(nodes, walls_to_create, catalog, num_courses,
+                                   baseline_result, rebuild_fn):
+    """CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT - SAFE REPAIR.
+
+    Para cada aresta ISOLADA (`_arm_role_isolated_edges`) cuja parede tem
+    PRISMA FORCADO no ORIGINAL (`_wall_has_forced_corner_prism`, via
+    `baseline_result["wall_bond_audits"]`), tenta, NESTA ORDEM CANONICA
+    (nunca por ordem de dict/set - `CORNER_ROLE_CANDIDATE_BITS`):
+
+        SAME_A, SAME_B, ALTERNATE_AB, ALTERNATE_BA
+
+    (pulando o que ja' e' o estado ORIGINAL - `_set_l_corner_role_bits`
+    devolve `changed=[]` nesse caso, nunca contado como tentativa) -
+    mutando `nodes` (o MESMO objeto usado por TODAS as bandas, ver
+    `_coordinate_arm_role_nodes`) e chamando `rebuild_fn()` para obter o
+    resultado REAL do candidato - a re-resolucao MULTI-BANDA completa da
+    planta inteira, nunca aritmetica/estimativa ("caro por tentativa,
+    seguro" - mesmo espirito ja' estabelecido pela ETAPA 3C neste
+    arquivo).
+
+    Aceita o PRIMEIRO candidato que (a) resolve o prisma forcado da
+    parede alvo E (b) passa `_evaluate_corner_role_candidate` - e entao
+    FIXA o papel com `_arm_role_pinned=True` (estrutural: sobrevive a
+    todas as bandas seguintes sem precisar de nenhum gate extra por
+    banda - ver `_coordinate_arm_role_nodes`). Se nenhum candidato serve,
+    reverte para o estado ORIGINAL (sem pin) - fallback explicito, nunca
+    uma excecao.
+
+    `rebuild_fn`: callable SEM ARGUMENTOS que roda de novo a MESMA
+    resolucao multi-banda sobre o `nodes` (mutado) atual e devolve um dict
+    no mesmo formato de `baseline_result` (precisa de "candidates"/
+    "collisions"/"per_wall"/"course_candidates"/"wall_bond_audits") -
+    INJETADO pelo chamador (`solve_building_blocks_all_courses`,
+    wall_modeling.py) para este arquivo nunca precisar importar
+    wall_modeling.py (evita import circular - wall_modeling.py ja' faz
+    `from core.engine.wall_stepper import *`). Isolar assim mantem TODA a
+    logica de decisao (candidatos/gates/delta/orquestracao) neste
+    arquivo - a UNICA coisa que wall_modeling.py precisa fazer e' passar o
+    callback de rebuild (ver ali' o comentario "SAFE REPAIR - hook
+    minimo").
+
+    Devolve {"changed": bool, "final_result": dict ou None (None quando
+    `changed` e' False - o chamador deve continuar usando
+    `baseline_result` inalterado), "accepted": [{"wall_idx":,"bits":}],
+    "rejected": [{"wall_idx":,"bits":,"reason":}]} - motivos de rejeicao
+    NUNCA escondidos (auditoria dos candidatos negativos)."""
+    isolated_edges = _arm_role_isolated_edges(nodes)
+    repairable = [
+        edge for edge in isolated_edges
+        if _wall_has_forced_corner_prism(edge["wall_idx"], baseline_result.get("wall_bond_audits"))
+    ]
+    if not repairable:
+        return {"changed": False, "final_result": None, "accepted": [], "rejected": []}
+
+    accepted, rejected = [], []
+    for edge in repairable:
+        wall_idx, node_p, node_q = edge["wall_idx"], edge["node_p"], edge["node_q"]
+        original_bit_p, original_bit_q = edge["original_bits"]
+        other_wall_p = next((w for w, _e in nodes[node_p]["arms"] if w != wall_idx), None)
+        other_wall_q = next((w for w, _e in nodes[node_q]["arms"] if w != wall_idx), None)
+        neighbor_wall_idxs = set(w for w in (other_wall_p, other_wall_q) if w is not None)
+        dirty_wall_idxs = {wall_idx} | neighbor_wall_idxs
+        # CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY: quais nos ISOLADOS deste
+        # candidato tocam cada parede `dirty` - o gate de cobertura usa
+        # isto (nunca proximidade) para saber de qual no' uma peca de
+        # amarracao emprestada pode dar credito fisico (ver
+        # `_evaluate_corner_role_candidate`/`_wall_row_node_credit_cm`). O
+        # ALVO (`wall_idx`) tem os DOIS nos (a peca de canto de QUALQUER
+        # um dos dois pode ter trocado de dono, nos dois sentidos); cada
+        # VIZINHA tem so' o no' que a liga ao alvo.
+        wall_credit_node_indices = {wall_idx: [node_p, node_q]}
+        if other_wall_p is not None:
+            wall_credit_node_indices.setdefault(other_wall_p, []).append(node_p)
+        if other_wall_q is not None:
+            wall_credit_node_indices.setdefault(other_wall_q, []).append(node_q)
+
+        picked_bits = None
+        for bit_name, (bit_p, bit_q) in CORNER_ROLE_CANDIDATE_BITS:
+            if (bit_p, bit_q) == (original_bit_p, original_bit_q):
+                continue  # e' o proprio ORIGINAL - nunca testado como candidato
+            changed = _set_l_corner_role_bits(nodes, node_p, node_q, wall_idx, bit_p, bit_q, pinned=True)
+            if not changed:
+                continue
+
+            trial_result = rebuild_fn()
+            resolved = not _wall_has_forced_corner_prism(wall_idx, trial_result.get("wall_bond_audits"))
+            if resolved:
+                ok, reason = _evaluate_corner_role_candidate(
+                    wall_idx, dirty_wall_idxs, neighbor_wall_idxs,
+                    walls_to_create, catalog, num_courses, baseline_result, trial_result,
+                    wall_credit_node_indices=wall_credit_node_indices)
+            else:
+                ok, reason = False, "does_not_resolve_target"
+
+            if ok:
+                picked_bits = bit_name
+                break
+
+            rejected.append({"wall_idx": wall_idx, "bits": bit_name, "reason": reason})
+            _set_l_corner_role_bits(nodes, node_p, node_q, wall_idx,
+                                    original_bit_p, original_bit_q, pinned=False)
+
+        if picked_bits is not None:
+            accepted.append({"wall_idx": wall_idx, "bits": picked_bits})
+        # senao: `nodes` ja' esta' de volta ao estado ORIGINAL (ultimo
+        # _set_l_corner_role_bits do loop acima, sem pin) - fallback.
+
+    if not accepted:
+        return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
+
+    final_result = rebuild_fn()
+    return {"changed": True, "final_result": final_result, "accepted": accepted, "rejected": rejected}
+
+
+# ==========================================================================
+# CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION - reparo pos-hoc, mesmo padrao
+# seguro de `repair_arm_role_isolated_edges` acima (candidato -> pin ->
+# reconstrucao REAL multi-banda -> hard gates -> aceita ou reverte).
+#
+# REVISAO POS-PR#19 (revisao final de integracao encontrou candidatos
+# aceitos sem nenhuma peca de amarracao cobrindo o MESMO no' na MESMA
+# fiada - a decisao de dominio abaixo e' a resposta formal a isso):
+#   B19 e' FILL, NUNCA TIE. Para toda fiada fisica onde existir um B19
+#   marcado como fill residual, tem que existir, no MESMO no' e na MESMA
+#   fiada, uma peca de amarracao real (B34/B54) que cubra geometricamente
+#   o ponto fisico do no' - vinda de QUALQUER parede participante do no'
+#   (a propria `wall_idx` ou a perpendicular). Nunca aceito so' por
+#   `placement_reason`/topologia abstrata - `_b19_tie_integrity_ok` prova
+#   isso GEOMETRICAMENTE, contra o REBUILD REAL, e rejeita o candidato
+#   inteiro se faltar em qualquer fiada.
+# ==========================================================================
+
+def _node_other_wall_idx(node, wall_idx):
+    """A OUTRA parede deste no' (perpendicular, no MESMO ponto fisico) -
+    nunca `wall_idx`. Cobre os dois formatos de no' usados neste arquivo:
+    L_CORNER (`arms`, lista de (wall_idx, end_index)) e T_INTERSECTION
+    (`main_wall_idx`/`incoming_wall_idx`). `None` se nao identificavel."""
+    for arm in (node.get("arms") or []):
+        if arm and arm[0] is not None and arm[0] != wall_idx:
+            return arm[0]
+    main_idx = node.get("main_wall_idx")
+    inc_idx = node.get("incoming_wall_idx")
+    if main_idx is not None and inc_idx is not None:
+        if main_idx == wall_idx:
+            return inc_idx
+        if inc_idx == wall_idx:
+            return main_idx
+    return None
+
+
+def _wall_all_junction_node_indices(nodes, wall_idx):
+    """Todos os indices de no' (kind != None/FREE_END - MESMO filtro de
+    `_wall_junction_ts_ft`, incluindo STRAIGHT_CONTINUATION/AMBIGUOUS de
+    proposito) que envolvem `wall_idx` como qualquer um de seus bracos/
+    main/incoming/crossing - usado para detectar TAMBEM nos de MEIO (main
+    wall de um T/X que atravessa esta parede), que `end_to_node` (so' as
+    DUAS pontas) nunca enxerga."""
+    found = []
+    for idx, node in enumerate(nodes or []):
+        if not isinstance(node, dict) or node.get("kind") in (None, "FREE_END"):
+            continue
+        involved = set()
+        for arm in (node.get("arms") or []):
+            if arm:
+                involved.add(arm[0])
+        for key in ("main_wall_idx", "incoming_wall_idx"):
+            if node.get(key) is not None:
+                involved.add(node[key])
+        for w in (node.get("crossing_walls") or []):
+            if w is not None:
+                involved.add(w)
+        if wall_idx in involved:
+            found.append(idx)
+    return found
+
+
+def _wall_two_end_node_indices(nodes, end_to_node, wall_idx):
+    """(node0_index, node1_index) - os nos das DUAS PONTAS FISICAS de
+    `wall_idx` (end_index 0 e 1, na ORDEM BRUTA do grafo - nunca usada
+    como criterio de prioridade, ver `_canonical_node_sort_key` para
+    isso), SO' quando: as duas pontas existem no grafo, sao nos
+    DISTINTOS, dos tipos L_CORNER/T_INTERSECTION (nunca FREE_END/
+    STRAIGHT_CONTINUATION/AMBIGUOUS/X_INTERSECTION - fora do escopo desta
+    CR) E a parede NAO tem nenhum no' de MEIO (main wall de um T/X que a
+    atravessa) alem dessas duas pontas.
+
+    Devolve `(None, None)` quando qualquer condicao falha - candidato fora
+    de escopo para `repair_b19_residual_fill`, nunca reparado (secao 4 do
+    pedido: "nao generalizar" - so' a parede curta de 2 pontas simples,
+    exatamente o mecanismo medido em docs/BLOCK_B19_JUNCTION_DOMAIN_
+    EVIDENCE.md)."""
+    node0 = end_to_node.get((wall_idx, 0))
+    node1 = end_to_node.get((wall_idx, 1))
+    if node0 is None or node1 is None or node0 == node1:
+        return None, None
+    for idx in (node0, node1):
+        node = nodes[idx] if 0 <= idx < len(nodes) else None
+        if not isinstance(node, dict) or node.get("kind") not in ("L_CORNER", "T_INTERSECTION"):
+            return None, None
+    if sorted(_wall_all_junction_node_indices(nodes, wall_idx)) != sorted({node0, node1}):
+        return None, None
+    return node0, node1
+
+
+def _b19_residual_span_cm(length_cm):
+    """UNICA formula de trecho residual (cm) - usada para elegibilidade
+    E para a reserva dinamica em `_wall_reserved_range_ft` (nunca duas
+    formulas separadas - achado da revisao pos-PR#19: a elegibilidade
+    antiga subtraia mais 1cm de junta que a reserva/colocacao real
+    subtraiam, e so' nao divergiam nos 54cm do TP1 por coincidencia
+    aritmetica - 19 vs 20, os dois dentro da faixa [15,20] por sorte).
+    Comprimento fisico da parede menos UMA peca de amarracao inteira
+    (B34, a MESMA fronteira que `_wall_reserved_range_ft` usa como pior-
+    caso na ponta oposta - que nao soma nenhuma junta extra, o
+    `joint_cm` de `_wall_end_default_start_cm` e' descartado ali por
+    construcao)."""
+    return length_cm - _ft_to_cm(CORNER_B34_ROOM_FT)
+
+
+# CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION: mesma lista de prefixos que
+# `TIE_PLACEMENT_PREFIXES`/`_is_tie_candidate` (wall_modeling.py) usam
+# para classificar "peca de amarracao real" - duplicada aqui de proposito
+# (NUNCA importada de wall_modeling.py: aquele modulo e' quem importa
+# DESTE arquivo via `from core.engine.wall_stepper import *` - importar
+# de volta criaria import circular). Um B34/B54 colocado como
+# preenchimento comum (`STANDARD_FILL`) NUNCA conta como amarracao, mesmo
+# que o corpo dele coincida geometricamente com o ponto do no' - a MESMA
+# peca fisica so' "amarra" quando foi POSICIONADA para isso.
+_B19_TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+
+
+def _b19_is_tie_piece(candidate):
+    """True quando `candidate` e' uma peca de amarracao REAL (B34/B54,
+    posicionada como amarracao - nunca um B34/B54 que caiu ali por
+    coincidencia do preenchimento comum)."""
+    reason = str(candidate.get("placement_reason") or "")
+    return (candidate.get("logical_code") in ("B34", "B54")
+            and any(reason.startswith(p) for p in _B19_TIE_PLACEMENT_PREFIXES))
+
+
+# Folga (ft) para considerar que o CORPO de uma peca de amarracao alcanca
+# o ponto do no' - uma junta de assentamento, mesmo espirito de
+# `JUNCTION_REACH_TOLERANCE_CM` do validador do benchmark (nunca
+# importado de la' - este arquivo nao depende do pacote `benchmark`).
+_B19_NODE_REACH_TOLERANCE_FT = _cm_to_ft(BLOCK_JOINT_CM)
+
+
+def _b19_node_has_covering_tie(items, node, tolerance_ft=_B19_NODE_REACH_TOLERANCE_FT):
+    """True quando ALGUM candidato de `items` (candidatos de UMA fiada
+    fisica, DE QUALQUER parede - a decisao de dominio explicitamente
+    permite a peca vir da parede perpendicular participante do MESMO no')
+    e' uma peca de amarracao real (`_b19_is_tie_piece`) cujo CORPO
+    (retangulo real: comprimento x largura, na rotacao real - nunca so' o
+    centro) alcanca o ponto FISICO de `node` - a MESMA checagem
+    geometrica que `block_covers_point` faz no benchmark
+    (validate_junctions.py), agora do lado do motor, contra o REBUILD
+    REAL. Prova geometrica construtiva exigida pela decisao de dominio
+    (nunca por node_index/wall_idx/proximidade)."""
+    point = node.get("point") if isinstance(node, dict) else None
+    if point is None:
+        return False
+    for c in items:
+        if not _b19_is_tie_piece(c):
+            continue
+        origin = c.get("origin_world")
+        x_dir = c.get("x_dir")
+        if origin is None or x_dir is None:
+            continue
+        y_dir = c.get("y_dir") or _perp_dir(x_dir)
+        dx, dy = point.X - origin.X, point.Y - origin.Y
+        along = dx * x_dir.X + dy * x_dir.Y
+        across = dx * y_dir.X + dy * y_dir.Y
+        half_len_ft = _cm_to_ft(c["length_cm"]) / 2.0
+        half_wid_ft = _cm_to_ft(c.get("width_cm") or 14.0) / 2.0
+        if abs(along) <= half_len_ft + tolerance_ft and abs(across) <= half_wid_ft + tolerance_ft:
+            return True
+    return False
+
+
+def _b19_tie_integrity_ok(wall_idx, fill_node_index, nodes, num_courses, course_candidates):
+    """HARD GATE (decisao de dominio, revisao pos-PR#19): para TODA fiada
+    fisica onde `wall_idx` tem um `B19_RESIDUAL_FILL` ancorado em
+    `fill_node_index`, tem que existir, na MESMA fiada, uma peca de
+    amarracao real cobrindo geometricamente o MESMO no' (qualquer
+    parede - ver `_b19_node_has_covering_tie`). B19 nunca e' a UNICA peca
+    responsavel pelo no': se faltar em QUALQUER fiada onde o B19 exista,
+    o candidato inteiro e' rejeitado (nunca aceito parcialmente - este
+    reparo decide por PAREDE, nao por fiada)."""
+    node = nodes[fill_node_index] if 0 <= fill_node_index < len(nodes) else None
+    if node is None:
+        return False
+    saw_any_fill = False
+    for course_index in range(num_courses):
+        items = course_candidates.get(course_index) or []
+        has_fill = any(
+            c.get("wall_idx") == wall_idx and c.get("node_index") == fill_node_index
+            and c.get("placement_reason") == "B19_RESIDUAL_FILL"
+            for c in items
+        )
+        if not has_fill:
+            continue
+        saw_any_fill = True
+        if not _b19_node_has_covering_tie(items, node):
+            return False
+    return saw_any_fill
+
+
+def _b19_residual_edge_candidates(nodes, walls_to_create, end_to_node, catalog, num_courses,
+                                  baseline_result):
+    """Paredes candidatas ao reparo `repair_b19_residual_fill`: exatamente
+    DOIS nos genuinos, um em CADA ponta fisica (`_wall_two_end_node_
+    indices`), com as DUAS pontas degradadas JUNTAS em alguma fiada no
+    ORIGINAL (`_wall_both_ends_degraded_in_some_course` - triagem BARATA,
+    nunca autoritativa: quem decide de verdade e' `_b19_tie_integrity_ok`
+    contra o rebuild real) E aritmetica de trecho residual compativel
+    (`_b19_residual_span_cm`, a UNICA formula - ver docstring dela) na
+    faixa aprovada (B19_RESIDUAL_FILL_MIN_CM..MAX_CM).
+
+    Devolve uma lista de `{"wall_idx", "node_a", "node_b"}`, ordenada por
+    `wall_idx` (determinístico, nunca por dict/set) - `node_a`/`node_b`
+    em ORDEM CANONICA GEOMETRICA (`_canonical_node_sort_key`, nunca por
+    `end_index`/GetEndPoint(0)/(1) - invariante a' orientacao de desenho
+    da parede) - a ordem em que `repair_b19_residual_fill` tenta cada
+    atribuicao (fill primeiro num, depois no outro - ver la')."""
+    candidates = []
+    for wall_idx in range(len(walls_to_create)):
+        node_a, node_b = _wall_two_end_node_indices(nodes, end_to_node, wall_idx)
+        if node_a is None:
+            continue
+        _p0, _p1, _dir, length_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+        length_cm = _ft_to_cm(length_ft)
+        residual_cm = _b19_residual_span_cm(length_cm)
+        if not ((B19_RESIDUAL_FILL_MIN_CM - 1e-6) <= residual_cm <= (B19_RESIDUAL_FILL_MAX_CM + 1e-6)):
+            continue
+        course_candidates = (baseline_result or {}).get("course_candidates") or {}
+        if not _wall_both_ends_degraded_in_some_course(
+                wall_idx, walls_to_create, course_candidates, num_courses, length_cm):
+            continue
+        node_a, node_b = sorted((node_a, node_b),
+                                key=lambda idx: _canonical_node_sort_key(nodes[idx]))
+        candidates.append({"wall_idx": wall_idx, "node_a": node_a, "node_b": node_b})
+    candidates.sort(key=lambda c: c["wall_idx"])
+    return candidates
+
+
+# Razoes de PLACEMENT_REASON que marcam "esta ponta degradou para um
+# unico compensador" (C09/C04 - nunca B34/B54 real) - ver solve_l_corner/
+# solve_t_intersection. Usada SO' pela triagem de candidatos (nunca pelo
+# proprio degrade: aquele continua decidido por `_corner_wall_room_ft`,
+# como sempre).
+_B19_REPAIR_DEGRADED_REASONS = frozenset((
+    "L_CORNER_DEGRADED", "T_INTERSECTION_DEGRADED_L", "T_INTERSECTION_INCOMING_DEGRADED",
+))
+
+
+def _wall_end_degraded_in_items(wall_idx, walls_to_create, items, end_index, length_cm,
+                                tolerance_cm=2.0):
+    """True quando algum candidato de `items` (ja' filtrados por
+    `wall_idx`, UMA fiada fisica) e' uma degradacao de canto/T
+    (`_B19_REPAIR_DEGRADED_REASONS`) ENCOSTADA na ponta fisica
+    `end_index` (0 = t=0, 1 = t=comprimento) desta parede, dentro de
+    `tolerance_cm`."""
+    p0, _p1, wall_dir, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+    target_t = 0.0 if end_index == 0 else length_cm
+    for c in items:
+        if c.get("placement_reason") not in _B19_REPAIR_DEGRADED_REASONS:
+            continue
+        t_lo, t_hi = _candidate_t_range_on_wall(c, p0, wall_dir)
+        edge_t = t_lo if end_index == 0 else t_hi
+        if abs(edge_t - target_t) <= tolerance_cm:
+            return True
+    return False
+
+
+def _wall_both_ends_degraded_in_some_course(wall_idx, walls_to_create, course_candidates,
+                                            num_courses, length_cm):
+    """True quando existe ALGUMA fiada fisica onde as DUAS pontas de
+    `wall_idx` mostram degradacao simultanea (`_wall_end_degraded_in_items`
+    nos dois `end_index`) - a assinatura medida em docs/BLOCK_B19_
+    JUNCTION_DOMAIN_EVIDENCE.md (reserva pior-caso simetrica faz as duas
+    pontas degradarem juntas, nunca uma peca de amarracao real se forma em
+    nenhuma). Triagem BARATA (sem rebuild) antes de tentar o reparo -
+    NUNCA autoritativa (ver `_b19_tie_integrity_ok`)."""
+    for course_index in range(num_courses):
+        items = [c for c in (course_candidates.get(course_index) or []) if c.get("wall_idx") == wall_idx]
+        if not items:
+            continue
+        if (_wall_end_degraded_in_items(wall_idx, walls_to_create, items, 0, length_cm) and
+                _wall_end_degraded_in_items(wall_idx, walls_to_create, items, 1, length_cm)):
+            return True
+    return False
+
+
+def _evaluate_b19_residual_candidate(wall_idx, fill_node_index, nodes, dirty_wall_idxs,
+                                     neighbor_wall_idxs, walls_to_create, catalog, num_courses,
+                                     baseline_result, trial_result, wall_credit_node_indices=None):
+    """HARD GATES do reparo B19 residual - fechamento -> colisao ->
+    INTEGRIDADE DO NO' (decisao de dominio, revisao pos-PR#19:
+    `_b19_tie_integrity_ok`, PRIMEIRO gate de dominio - sem ele nao
+    interessa nem checar prisma/compensador) -> prisma forcado NO ALVO
+    (acrescimo desta CR - a versao ARM so' precisa checar vizinha, porque
+    o alvo dela ja' tinha o prisma que esta' sendo corrigido) -> prisma
+    forcado em VIZINHA -> compensadores consecutivos (para CADA parede
+    `dirty` - alvo E vizinhas, MESMO escopo do SAFE REPAIR) -> regressao
+    de cobertura por fiada (idem, com `wall_credit_node_indices` quando
+    informado - MESMO mecanismo de credito fisico de no' do PR #18).
+
+    Devolve `(aceito: bool, motivo: str ou None)` - motivo nunca escondido
+    (auditoria dos candidatos negativos)."""
+    if not _no_wall_regression(baseline_result, trial_result):
+        return False, "closure_regression"
+    if not _no_new_collisions(baseline_result, trial_result):
+        return False, "new_collision"
+    if not _b19_tie_integrity_ok(wall_idx, fill_node_index, nodes, num_courses,
+                                 trial_result.get("course_candidates") or {}):
+        return False, "no_tie_covering_node"
+    before_audits = baseline_result.get("wall_bond_audits") or {}
+    after_audits = trial_result.get("wall_bond_audits") or {}
+    if _wall_forced_corner_prism_signature(wall_idx, after_audits) - \
+            _wall_forced_corner_prism_signature(wall_idx, before_audits):
+        return False, "new_forced_prism_in_target"
+    if not _no_new_forced_corner_prism_in_neighbors(
+            wall_idx, neighbor_wall_idxs, baseline_result, trial_result):
+        return False, "new_forced_prism_in_neighbor"
+    for dirty_wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_consecutive_compensators(
+                dirty_wall_idx, walls_to_create, catalog, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"]):
+            return False, "new_consecutive_compensators:{}".format(dirty_wall_idx)
+    for dirty_wall_idx in sorted(dirty_wall_idxs):
+        if not _no_new_row_coverage_regression(
+                dirty_wall_idx, walls_to_create, num_courses,
+                baseline_result["course_candidates"], trial_result["course_candidates"],
+                node_indices=(wall_credit_node_indices or {}).get(dirty_wall_idx)):
+            return False, "row_coverage_regression:{}".format(dirty_wall_idx)
+    return True, None
+
+
+def _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node):
+    """`(dirty_wall_idxs, neighbor_wall_idxs, wall_credit_node_indices)`
+    para um candidato - MESMO padrao do SAFE REPAIR (`repair_arm_role_
+    isolated_edges`): `dirty` = alvo + as paredes perpendiculares dos dois
+    nos envolvidos (quem realmente pode mudar fisicamente); credito de no'
+    flui nos dois sentidos (alvo credita dos dois nos; cada vizinha
+    credita so' do no' que a liga ao alvo) - nunca inferido por
+    proximidade."""
+    neighbor_fill = _node_other_wall_idx(nodes[fill_node], wall_idx)
+    neighbor_tie = _node_other_wall_idx(nodes[tie_node], wall_idx)
+    neighbor_wall_idxs = set(w for w in (neighbor_fill, neighbor_tie) if w is not None)
+    dirty_wall_idxs = {wall_idx} | neighbor_wall_idxs
+    wall_credit_node_indices = {wall_idx: [fill_node, tie_node]}
+    if neighbor_fill is not None:
+        wall_credit_node_indices.setdefault(neighbor_fill, []).append(fill_node)
+    if neighbor_tie is not None:
+        wall_credit_node_indices.setdefault(neighbor_tie, []).append(tie_node)
+    return dirty_wall_idxs, neighbor_wall_idxs, wall_credit_node_indices
+
+
+def repair_b19_residual_fill(nodes, walls_to_create, end_to_node, catalog, num_courses,
+                             baseline_result, rebuild_fn):
+    """CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION - decisao humana aprovada
+    (ver docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md e docs/BLOCK_B19_
+    RESIDUAL_FILL_IMPLEMENTATION.md; regra registrada em nuvem/REGRAS_
+    MODULACAO_BLOCOS.md), implementada como reparo pos-hoc no MESMO padrao
+    seguro de `repair_arm_role_isolated_edges` (candidato -> pin ->
+    reconstrucao REAL multi-banda via `rebuild_fn` -> hard gates -> aceita
+    ou reverte - nunca aplica sem validar).
+
+    B19 e' FILL, NUNCA TIE (decisao de dominio, revisao pos-PR#19): o
+    hard gate `_b19_tie_integrity_ok` exige, para TODA fiada onde o B19
+    exista, uma peca de amarracao real cobrindo geometricamente o MESMO
+    no' (de qualquer parede participante) - nunca aceito so' porque a
+    OUTRA ponta desta mesma parede fechou com peca real.
+
+    Mecanismo: para cada parede candidata (`_b19_residual_edge_
+    candidates`), marca UM dos dois nos como fill (`_b19_residual_fill_
+    for_walls`, um CONJUNTO por no' - NUNCA um escalar unico, para nao
+    sobrescrever a marca aceita de outra parede que compartilhe o mesmo
+    no') e reconstroi. A marca SO' afeta a reserva desta `wall_idx`
+    especifica no' pinado (ver `_wall_reserved_range_ft`) - a reserva
+    dinamica (`_b19_residual_span_cm`, nunca um valor fixo) garante que a
+    ponta OPOSTA veja EXATAMENTE `CORNER_B34_ROOM_FT` de room, qualquer
+    que seja o residuo real desta parede (15-20cm) - nao so' o caso de
+    20cm que uma reserva fixa cobriria por coincidencia.
+
+    Tenta as DUAS atribuicoes possiveis, em ORDEM CANONICA GEOMETRICA
+    (`_canonical_node_sort_key` - nunca por `end_index`/orientacao de
+    desenho da parede): aceita a PRIMEIRA que passa TODOS os hard gates,
+    incluindo `_b19_tie_integrity_ok`. Nenhuma atribuicao passando ->
+    candidato rejeitado, parede permanece EXATAMENTE como no ORIGINAL.
+
+    Apos processar todos os candidatos, CONVERGE ATE PONTO FIXO (revisao
+    pos-review #2 do PR #19: uma unica revalidacao + no maximo um rebuild
+    corretivo nao bastava - a revisao independente reproduziu, com esta
+    mesma funcao, uma cascata de invalidacao de SEGUNDA ordem: {A,B,C}
+    invalida A; removido A, o NOVO mundo {B,C} tambem invalida B; so' C
+    sobrevive - e o codigo antigo entregava `accepted=[B,C]` com B ja'
+    invalido, violando `accepted[] => efeito fisico valido no resultado
+    final`). Agora cada iteracao reconstroi com o conjunto ATUAL de marcas
+    aceitas, revalida CADA aceito restante contra ESSE resultado (MESMOS
+    hard gates de sempre, via `_evaluate_b19_residual_candidate` - nenhuma
+    logica duplicada/simplificada), remove os invalidos (ordem CANONICA
+    GEOMETRICA, `_canonical_node_sort_key` - nunca por ordem de insercao
+    de set/dict) e repete. `accepted` SO' PODE DIMINUIR nessa fase -
+    nenhum candidato removido volta - o que garante terminacao finita: no
+    maximo `len(accepted)` remocoes + 1 iteracao final de confirmacao
+    (guard defensivo abaixo, nunca deveria disparar).
+
+    Devolve {"changed": bool, "final_result": dict ou None, "accepted":
+    [{"wall_idx", "fill_node", "tie_node"}], "rejected": [{"wall_idx",
+    "fill_node", "reason"}]} - motivos de rejeicao NUNCA escondidos."""
+    candidates = _b19_residual_edge_candidates(
+        nodes, walls_to_create, end_to_node, catalog, num_courses, baseline_result)
+    if not candidates:
+        return {"changed": False, "final_result": None, "accepted": [], "rejected": []}
+
+    accepted, rejected = [], []
+    for cand in candidates:
+        wall_idx = cand["wall_idx"]
+        node_a, node_b = cand["node_a"], cand["node_b"]
+
+        picked = None
+        for fill_node, tie_node in ((node_a, node_b), (node_b, node_a)):
+            dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
+            node = nodes[fill_node]
+            marks = node.setdefault("_b19_residual_fill_for_walls", set())
+            marks.add(wall_idx)
+            trial_result = rebuild_fn()
+            ok, reason = _evaluate_b19_residual_candidate(
+                wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
+                num_courses, baseline_result, trial_result, wall_credit_node_indices=credit)
+            if ok:
+                picked = (fill_node, tie_node)
+                break
+            marks.discard(wall_idx)
+            rejected.append({"wall_idx": wall_idx, "fill_node": fill_node, "reason": reason})
+
+        if picked is not None:
+            accepted.append({"wall_idx": wall_idx, "fill_node": picked[0], "tie_node": picked[1]})
+        # senao: `nodes` ja' esta' de volta ao estado ORIGINAL (ultimo
+        # `discard` acima, das duas tentativas) - fallback, mesmo padrao
+        # do SAFE REPAIR.
+
+    if not accepted:
+        return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
+
+    # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (revisao pos-review #2,
+    # item "convergencia ate ponto fixo" - ver docstring da funcao):
+    # `accepted` so' pode DIMINUIR daqui em diante, nunca crescer de volta
+    # - garante terminacao em no maximo `max_iterations` voltas.
+    max_iterations = len(accepted) + 1
+    final_result = None
+    for _iteration in range(max_iterations):
+        final_result = rebuild_fn()
+        invalid = []
+        for entry in accepted:
+            wall_idx, fill_node, tie_node = entry["wall_idx"], entry["fill_node"], entry["tie_node"]
+            dirty, neighbors, credit = _b19_candidate_dirty_scope(nodes, wall_idx, fill_node, tie_node)
+            ok, reason = _evaluate_b19_residual_candidate(
+                wall_idx, fill_node, nodes, dirty, neighbors, walls_to_create, catalog,
+                num_courses, baseline_result, final_result, wall_credit_node_indices=credit)
+            if not ok:
+                invalid.append((entry, reason))
+        if not invalid:
+            break  # ponto fixo: TODO accepted validado contra ESTE final_result
+        # ordem CANONICA GEOMETRICA (nunca por ordem de insercao de
+        # set/dict, nunca por wall_idx como criterio fisico) - deterministica
+        # mesmo quando mais de um candidato cai na MESMA iteracao.
+        invalid.sort(key=lambda pair: (_canonical_node_sort_key(nodes[pair[0]["fill_node"]]),
+                                       pair[0]["wall_idx"]))
+        removed_keys = set()
+        for entry, reason in invalid:
+            wall_idx, fill_node = entry["wall_idx"], entry["fill_node"]
+            nodes[fill_node].get("_b19_residual_fill_for_walls", set()).discard(wall_idx)
+            rejected.append({"wall_idx": wall_idx, "fill_node": fill_node,
+                             "reason": "no_effect_after_final_combination:{}".format(reason)})
+            removed_keys.add((wall_idx, fill_node))
+        accepted = [e for e in accepted if (e["wall_idx"], e["fill_node"]) not in removed_keys]
+        if not accepted:
+            return {"changed": False, "final_result": None, "accepted": [], "rejected": rejected}
+    else:
+        raise RuntimeError(
+            "repair_b19_residual_fill: convergencia de ponto fixo nao terminou em {} "
+            "iteracoes - invariante de conjunto monotonicamente decrescente violado "
+            "(nunca deveria acontecer; 'accepted' so' pode diminuir a cada iteracao)."
+            .format(max_iterations))
+
+    return {"changed": True, "final_result": final_result, "accepted": accepted, "rejected": rejected}
+
+
 def _apply_axis_plan_in_memory(working_walls, working_openings, plan):
     """Aplica SO' EM MEMORIA (nunca no modelo Revit) o efeito geometrico de
     um plano de `plan_axis_opening_fix`, para que o solver de blocos possa
@@ -5589,7 +7617,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                              wall_start_cb=None, wall_result_cb=None,
                              dirty_wall_idxs=None, baseline_per_wall=None,
                              baseline_candidates=None, stage_cb=None,
-                             opening_strategy=None):
+                             opening_strategy=None, cross_band_joint_seed=None):
     """PIPELINE PRINCIPAL (regras #3, #4, #5, #8, #9): processa UMA parede
     de cada vez, na ordem geometrica de `order_walls_for_processing`, e
     para cada uma faz o ciclo completo antes de tocar na proxima:
@@ -5774,6 +7802,10 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
+                # CR-G12: a semente de fronteira de banda e' por PAREDE (as
+                # juntas sao coordenadas t do eixo DELA) - `None` para toda
+                # parede sem vizinha de outra banda ja' resolvida.
+                cross_band_joint_seed=(cross_band_joint_seed or {}).get(wall_idx),
             )
 
         result = _solve(working_walls, working_openings, wall_by_end, wall_midspan)
@@ -5977,7 +8009,8 @@ def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall
                           allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                           base_z_abs=None, variants_per_course=1,
                           progress_cb=None, wall_start_cb=None, wall_result_cb=None,
-                          stage_cb=None, opening_strategy=None):
+                          stage_cb=None, opening_strategy=None,
+                          cross_band_joint_seed=None):
     """Ponto de entrada UNICO da Etapa 4 completa (X -> T -> L -> jambs ->
     trechos livres): roda solve_all_intersections (X/T/L) e depois entrega
     tudo a `process_walls_one_by_one`, que percorre as paredes UMA A UMA na
@@ -6008,7 +8041,7 @@ def solve_building_blocks(nodes, walls_to_create, end_to_node, openings_per_wall
         variants_per_course=variants_per_course,
         opening_strategy=opening_strategy,
         progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-        stage_cb=stage_cb,
+        stage_cb=stage_cb, cross_band_joint_seed=cross_band_joint_seed,
     )
     if base_z_abs is not None:
         if stage_cb is not None:

@@ -1,0 +1,362 @@
+{
+ "torre_easy_lo_r00_tgd": {
+  "falha_vertical": {
+   "nos_C": 161,
+   "nos_R": 147,
+   "nos_novos": 15,
+   "nos_que_melhoraram": 8,
+   "nos_que_pioraram": 0
+  },
+  "gabarito": {
+   "COMPENSATOR_CONSECUTIVE": {
+    "antes": 52,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 52,
+    "identidades_novas": 0,
+    "identidades_preservadas": 52,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COMPENSATOR_EXCESS_IN_RUN": {
+    "antes": 57,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 57,
+    "identidades_novas": 0,
+    "identidades_preservadas": 57,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COMPENSATOR_VERTICAL_STRIP": {
+    "antes": 26,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 26,
+    "identidades_novas": 0,
+    "identidades_preservadas": 26,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COVERAGE_GAP_IN_ROW": {
+    "antes": 648,
+    "chave": "fisica",
+    "delta": -47,
+    "depois": 601,
+    "identidades_novas": 54,
+    "identidades_preservadas": 547,
+    "identidades_sumidas": 101,
+    "severidade": "major"
+   },
+   "COVERAGE_MISSING_ROW": {
+    "antes": 95,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 17,
+    "depois": 112,
+    "identidades_novas": 26,
+    "identidades_preservadas": 86,
+    "identidades_sumidas": 9,
+    "severidade": "critical"
+   },
+   "COVERAGE_PARTIAL_WALL": {
+    "antes": 4,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 0,
+    "depois": 4,
+    "identidades_novas": 0,
+    "identidades_preservadas": 4,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COVERAGE_ROW_MOSTLY_EMPTY": {
+    "antes": 85,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 23,
+    "depois": 108,
+    "identidades_novas": 38,
+    "identidades_preservadas": 70,
+    "identidades_sumidas": 15,
+    "severidade": "critical"
+   },
+   "JUNCTION_HALF_BLOCK_ADJACENT": {
+    "antes": 264,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 264,
+    "identidades_novas": 0,
+    "identidades_preservadas": 264,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "JUNCTION_MISSING_BINDING": {
+    "antes": 373,
+    "chave": "fisica",
+    "delta": 49,
+    "depois": 422,
+    "identidades_novas": 82,
+    "identidades_preservadas": 340,
+    "identidades_sumidas": 33,
+    "severidade": "critical"
+   },
+   "JUNCTION_NOT_ALTERNATING": {
+    "antes": 9,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 9,
+    "identidades_novas": 0,
+    "identidades_preservadas": 9,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "OPENING_MISSING_COUNTER_LINTEL": {
+    "antes": 21,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 0,
+    "depois": 21,
+    "identidades_novas": 0,
+    "identidades_preservadas": 21,
+    "identidades_sumidas": 0,
+    "severidade": "minor"
+   },
+   "OPENING_MISSING_LINTEL": {
+    "antes": 60,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": -12,
+    "depois": 48,
+    "identidades_novas": 2,
+    "identidades_preservadas": 46,
+    "identidades_sumidas": 14,
+    "severidade": "major"
+   },
+   "PRISM_CONTINUOUS_JOINT": {
+    "antes": 129,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 129,
+    "identidades_novas": 0,
+    "identidades_preservadas": 129,
+    "identidades_sumidas": 0,
+    "severidade": "critical"
+   },
+   "PRISM_JOINT_STACK": {
+    "antes": 8,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 8,
+    "identidades_novas": 0,
+    "identidades_preservadas": 8,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "PRISM_STAGGER_BELOW_TARGET": {
+    "antes": 101,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 101,
+    "identidades_novas": 0,
+    "identidades_preservadas": 101,
+    "identidades_sumidas": 0,
+    "severidade": "minor"
+   }
+  },
+  "missing_binding_unidades": {
+   "elevacao": {
+    "C": 343,
+    "R": 348,
+    "delta": -5
+   },
+   "estrita": {
+    "C": 96,
+    "R": 86,
+    "delta": 10,
+    "novas_em_no_novo": 10,
+    "novas_total": 10
+   },
+   "ordinal": {
+    "C": 422,
+    "R": 373,
+    "delta": 49
+   }
+  }
+ },
+ "torre_easy_lo_r00_tp1": {
+  "falha_vertical": {
+   "nos_C": 157,
+   "nos_R": 143,
+   "nos_novos": 15,
+   "nos_que_melhoraram": 8,
+   "nos_que_pioraram": 0
+  },
+  "gabarito": {
+   "COMPENSATOR_CONSECUTIVE": {
+    "antes": 52,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 52,
+    "identidades_novas": 0,
+    "identidades_preservadas": 52,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COMPENSATOR_EXCESS_IN_RUN": {
+    "antes": 54,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 54,
+    "identidades_novas": 0,
+    "identidades_preservadas": 54,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COMPENSATOR_VERTICAL_STRIP": {
+    "antes": 26,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 26,
+    "identidades_novas": 0,
+    "identidades_preservadas": 26,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "COVERAGE_GAP_IN_ROW": {
+    "antes": 637,
+    "chave": "fisica",
+    "delta": -47,
+    "depois": 590,
+    "identidades_novas": 54,
+    "identidades_preservadas": 536,
+    "identidades_sumidas": 101,
+    "severidade": "major"
+   },
+   "COVERAGE_MISSING_ROW": {
+    "antes": 94,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 17,
+    "depois": 111,
+    "identidades_novas": 26,
+    "identidades_preservadas": 85,
+    "identidades_sumidas": 9,
+    "severidade": "critical"
+   },
+   "COVERAGE_ROW_MOSTLY_EMPTY": {
+    "antes": 120,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 23,
+    "depois": 143,
+    "identidades_novas": 38,
+    "identidades_preservadas": 105,
+    "identidades_sumidas": 15,
+    "severidade": "critical"
+   },
+   "JUNCTION_HALF_BLOCK_ADJACENT": {
+    "antes": 259,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 259,
+    "identidades_novas": 0,
+    "identidades_preservadas": 259,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "JUNCTION_MISSING_BINDING": {
+    "antes": 365,
+    "chave": "fisica",
+    "delta": 49,
+    "depois": 414,
+    "identidades_novas": 82,
+    "identidades_preservadas": 332,
+    "identidades_sumidas": 33,
+    "severidade": "critical"
+   },
+   "JUNCTION_NOT_ALTERNATING": {
+    "antes": 9,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 9,
+    "identidades_novas": 0,
+    "identidades_preservadas": 9,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "OPENING_MISSING_COUNTER_LINTEL": {
+    "antes": 21,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": 0,
+    "depois": 21,
+    "identidades_novas": 0,
+    "identidades_preservadas": 21,
+    "identidades_sumidas": 0,
+    "severidade": "minor"
+   },
+   "OPENING_MISSING_LINTEL": {
+    "antes": 57,
+    "chave": "FRACA (achado sem coordenada - nao reconciliavel)",
+    "delta": -12,
+    "depois": 45,
+    "identidades_novas": 2,
+    "identidades_preservadas": 43,
+    "identidades_sumidas": 14,
+    "severidade": "major"
+   },
+   "POSITION_OVERLAP": {
+    "antes": 1,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 1,
+    "identidades_novas": 0,
+    "identidades_preservadas": 1,
+    "identidades_sumidas": 0,
+    "severidade": "critical"
+   },
+   "PRISM_CONTINUOUS_JOINT": {
+    "antes": 125,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 125,
+    "identidades_novas": 0,
+    "identidades_preservadas": 125,
+    "identidades_sumidas": 0,
+    "severidade": "critical"
+   },
+   "PRISM_JOINT_STACK": {
+    "antes": 8,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 8,
+    "identidades_novas": 0,
+    "identidades_preservadas": 8,
+    "identidades_sumidas": 0,
+    "severidade": "major"
+   },
+   "PRISM_STAGGER_BELOW_TARGET": {
+    "antes": 101,
+    "chave": "fisica",
+    "delta": 0,
+    "depois": 101,
+    "identidades_novas": 0,
+    "identidades_preservadas": 101,
+    "identidades_sumidas": 0,
+    "severidade": "minor"
+   }
+  },
+  "missing_binding_unidades": {
+   "elevacao": {
+    "C": 332,
+    "R": 337,
+    "delta": -5
+   },
+   "estrita": {
+    "C": 92,
+    "R": 82,
+    "delta": 10,
+    "novas_em_no_novo": 10,
+    "novas_total": 10
+   },
+   "ordinal": {
+    "C": 414,
+    "R": 365,
+    "delta": 49
+   }
+  }
+ }
+}

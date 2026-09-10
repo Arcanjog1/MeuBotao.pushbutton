@@ -140,9 +140,7 @@ Uma única família de **Mobiliário** — `Abertura de janela para paredes de b
 | `Altura_peitoril` / `Peitoril` | peitoril |
 | `Parede` | chave de agrupamento |
 
-**O rótulo é coerente com a geometria em 134/142 (94,37%)**: todos os 47
-`PORTA` têm peitoril 0. As 8 divergências são vãos rotulados `ABERTURA` com
-peitoril 0 — que geometricamente são portas.
+**O rótulo é coerente com a geometria em 134/142 (94,37%)**: 46 dos 47 rótulos PORTA têm peitoril 0; 7212991 tem 40 cm. As oito divergências são esta PORTA e sete ABERTURA com peitoril zero.
 
 **A bbox da abertura dá o vão exato no eixo da parede** (não tem a folga de
 2 cm dos blocos), e vai de `datum do nível` até `peitoril + altura`. Ou seja:
@@ -253,7 +251,7 @@ Detalhe por abertura em [`03_above_openings.json`](03_above_openings.json).
 | Nº de peças sobre o vão | mediana 4 (vãos ≤ 119 cm) · 16 (vãos 120–149 cm) | — |
 
 A única exceção do offset (`id=6616547`, PORTA) é artefato: a parede `PAR23` tem
-a grade deslocada em +1 cm, e a canaleta está em 222 cm sobre um vão que termina
+a grade deslocada em +1 cm, e a canaleta está em 221 cm sobre um vão que termina
 em 220 cm — **é a mesma solução**, com 1 cm de deslocamento da grade.
 
 ### E.1 Composição da fiada acima do vão
@@ -388,7 +386,7 @@ canaleta no meio da parede sem abertura associada a menos de 60 cm.
 
 > **Diferença marcante para o TORRE EASY.** Lá o corte na altura respondia por
 > **93,54%** dos cortados. Aqui responde por **43,36%** — a maior parte dos
-> cortes é **no comprimento**, e mais da metade deles é em peças **de canaleta**
+> cortes é **no comprimento**, e 41,36% deles são em peças **de canaleta**
 > (67 de 162), justamente para fechar o comprimento das fiadas canaletadas.
 
 ### H.2 Onde os blocos cortados aparecem
@@ -739,3 +737,7 @@ Apesar de sistemas de abertura **opostos**, os dois projetos concordam em:
 - `docs/revit_reference_extraction/` do TORRE EASY — **intocado**.
 - Nenhuma regra normativa criada ou alterada; nenhuma estratégia `CHANNEL` ou
   `LINTEL` implementada.
+
+## Revisão de integração 2026-09-10
+
+[Erratas, limites e conferência dos JSON](REVIEW_2026-09-10.md) prevalecem sobre as simplificações do relato acima. As observações não foram promovidas a norma.

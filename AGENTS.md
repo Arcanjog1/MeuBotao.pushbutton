@@ -1,5 +1,22 @@
 # Modulacao Automatica (pyRevit) - instrucoes para o Codex
 
+## Entrega e recuperacao documental
+
+Ao concluir trabalho relevante, seguir `docs/DEVELOPMENT_PROCESS.md`:
+reconciliar `docs/PROJECT_STATUS.md` com a main buscada por fetch e criar
+checkpoint versionado em `docs/checkpoints/`, com HEAD avaliado, base,
+PR e evidencias. Nunca usar uma copia antiga do status para sobrescrever
+mudancas de outra sessao. Confirmar `git ls-files` e executar o validador
+documental antes do push. `.claude/checkpoints/` serve apenas como rascunho
+local, nunca como unica memoria de entrega. Estado candidato nao e oficial.
+Nova sessao: ler START_HERE, status e checkpoint antes de retomar.
+
+## Onboarding
+
+Comece por `docs/START_HERE.md`. Use recuperacao progressiva de
+contexto (ver secao abaixo): nao leia recursivamente todo o repo sem
+necessidade.
+
 ## Merge na main
 
 REVOGADO (2026-09-03) o "ok" permanente que existia aqui: NUNCA fazer
