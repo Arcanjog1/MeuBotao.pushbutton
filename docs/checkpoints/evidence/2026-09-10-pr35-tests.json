@@ -1,0 +1,23 @@
+{
+  "started_utc": "2026-09-10T18:33:27.871523+00:00",
+  "cwd": "C:\\Users\\CIVIX\\codex-workspaces\\solver-beta2-consolidation",
+  "head": "f0b59dcaf85b6653db42b72ad4bc3ceb1fafdc9a",
+  "tree": "cf205f6dad5ede702e939eba6370a0162c630d7a",
+  "status_before": "",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_script.py",
+    "-q"
+  ],
+  "timeout_seconds": 600,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-10-pr35-tests.txt",
+  "pid": 15212,
+  "exit_code": 0,
+  "elapsed_seconds": 75.641,
+  "status_after": "M  docs/checkpoints/2026-09-09-revit-human-reference-butanta-r08-lt.md\nA  docs/checkpoints/evidence/2026-09-10-pr35-tests.json\nAM docs/checkpoints/evidence/2026-09-10-pr35-tests.txt\nM  docs/revit_reference_extraction/butanta-r08-lt/README.md",
+  "log_sha256": "c019fde02e1855f5e5741ff4a35b6b12248085be93cc44631cf0e883603feccd"
+}

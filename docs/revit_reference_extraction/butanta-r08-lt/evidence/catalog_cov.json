@@ -1,0 +1,128 @@
+[
+ {
+  "fam": "BLOCO INTEIRO - 14x19x39",
+  "typ": "BLOCO INTEIRO - 14x19x39",
+  "qtd": 31540,
+  "cls": "SUPPORTED (B39)"
+ },
+ {
+  "fam": "BLOCO 34 - 14x19x34",
+  "typ": "BLOCO 34 - 14x19x34",
+  "qtd": 15651,
+  "cls": "SUPPORTED (B34)"
+ },
+ {
+  "fam": "CANALETA INTEIRA - 14x19x39",
+  "typ": "CANALETA INTEIRA - 14x19x39",
+  "qtd": 5865,
+  "cls": "NOT_SUPPORTED (canaleta)"
+ },
+ {
+  "fam": "MEIO BLOCO - 14x19x19",
+  "typ": "MEIO BLOCO - 14x19x19",
+  "qtd": 2700,
+  "cls": "SUPPORTED (B19)"
+ },
+ {
+  "fam": "CANALETA 34 - 14x19x34",
+  "typ": "CANALETA 34 - 14x19x34",
+  "qtd": 2615,
+  "cls": "NOT_SUPPORTED (canaleta)"
+ },
+ {
+  "fam": "PASTILHA - 14x19X4",
+  "typ": "PASTILHA - 14x19X4",
+  "qtd": 2329,
+  "cls": "SUPPORTED (C04)"
+ },
+ {
+  "fam": "COMPENSADOR 14x19x9",
+  "typ": "COMPENSADOR 14x19x9",
+  "qtd": 2129,
+  "cls": "SUPPORTED (C09)"
+ },
+ {
+  "fam": "BLOCO 54 - 14x19x54",
+  "typ": "BLOCO 54 - 14x19x54",
+  "qtd": 1614,
+  "cls": "SUPPORTED (B54)"
+ },
+ {
+  "fam": "COMPENSADOR 14x19x9 (deitado)",
+  "typ": "COMPENSADOR 14x19x9 (deitado)",
+  "qtd": 633,
+  "cls": "NOT_SUPPORTED (compensador deitado)"
+ },
+ {
+  "fam": "MEIA CANALETA - 14x19x19",
+  "typ": "MEIA CANALETA - 14x19x19",
+  "qtd": 194,
+  "cls": "NOT_SUPPORTED (canaleta)"
+ },
+ {
+  "fam": "CANALETA J - 14x9-19x19",
+  "typ": "CANALETA J - 14x9-19x19",
+  "qtd": 190,
+  "cls": "NOT_SUPPORTED (canaleta)"
+ },
+ {
+  "fam": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+  "typ": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+  "qtd": 95,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "BLOCO CANALETA CORTADO - 14x19xVAR",
+  "typ": "BLOCO CANALETA CORTADO - 14x19xVAR",
+  "qtd": 57,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "BLOCO 34 CORTADO - 14x9x34",
+  "typ": "BLOCO 34 CORTADO - 14x9x34",
+  "qtd": 44,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "MEIO BLOCO CORTADO - 14x9x19",
+  "typ": "MEIO BLOCO CORTADO - 14x9x19",
+  "qtd": 28,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "BLOCO 54 CORTADO - 14x9x54",
+  "typ": "BLOCO 54 CORTADO - 14x9x54",
+  "qtd": 18,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "PASTILHA CORTADA- 14x9X4",
+  "typ": "PASTILHA CORTADA- 14x9X4",
+  "qtd": 16,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "CANALETA J CORTADA - 14x9-19xVAR",
+  "typ": "CANALETA J CORTADA - 14x9-19xVAR",
+  "qtd": 10,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "BLOCO INTEIRO CORTADO - 14x9x39",
+  "typ": "BLOCO INTEIRO CORTADO - 14x9x39",
+  "qtd": 9,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "COMPENSADOR CORTADO - 14xVARx9",
+  "typ": "COMPENSADOR CORTADO - 14xVARx9",
+  "qtd": 9,
+  "cls": "NOT_SUPPORTED (cortado)"
+ },
+ {
+  "fam": "BLOCO INTEIRO - 14x19x39",
+  "typ": "BLOCO INTEIRO VEDAÇÃO - 14x19x39",
+  "qtd": 1,
+  "cls": "PARTIALLY_SUPPORTED (familia ok, tipo divergente)"
+ }
+]

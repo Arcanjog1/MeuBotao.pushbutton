@@ -6295,3 +6295,175 @@ Registradas porque qualquer leitura futura deste modelo repete o erro:
    vão trata toda janela como se fosse porta.
 
 > Nota da revisão 2026-09-10: EVIDÊNCIA / NÃO NORMA. A seção era 30 no PR original; renumerada para 40 para preservar as seções 30–39 já integradas. Confirmação observacional não aprova mudança de contrato. Limites de reprodutibilidade e identidade: docs/revit_reference_extraction/REVIEW_2026-09-10.md.
+
+
+---
+
+## 41. MEDIÇÕES OBSERVADAS — projeto humano nº 2, BUTANTÃ R08_LT (Revit, 2026-09-09)
+
+> **STATUS: EVIDÊNCIA / NÃO NORMATIVO.**
+>
+> Esta seção registra **medição**, não regra. Nada aqui usa a forma
+> "o solver deve". Nenhuma regra anterior foi alterada por esta seção.
+>
+> - **Projeto**: `BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO).rvt`
+>   (Revit 2026, build 26.3.0.37, unidades em cm).
+> - **Amostra**: 65.747 peças de alvenaria, 142 aberturas, 12 níveis com
+>   modulação, 340 grupos `(Parede, nível)`, 8.931 canaletas, 286 cortados.
+> - **Método**: leitura somente-leitura via pyRevit Routes
+>   (`POST /revit_mcp/execute_code/`, porta 48885). Nenhuma `Transaction`
+>   aberta; nada criado, movido, apagado ou salvo.
+> - **Relatório**:
+>   `docs/revit_reference_extraction/butanta-r08-lt/REPORT_HUMAN_REVIT_MODULATION.md`
+> - **Checkpoint**:
+>   `docs/checkpoints/2026-09-09-revit-human-reference-butanta-r08-lt.md`
+>
+> **Status de código**: **DOCUMENTADO — nada implementado, nenhuma
+> pendência de código aberta.** A missão que gerou esta seção era
+> explicitamente proibida de tocar solver, catálogo, benchmark, baseline,
+> gabarito, UI ou thresholds.
+
+### 41.1 Existe um segundo sistema de aberturas no domínio: CANALETA
+
+O projeto nº 1 (`TORRE EASY-LO-R00`, seção 40) resolve aberturas com
+**verga/contraverga**: peça dedicada de **9 cm** de altura, sobreposta.
+
+Este projeto resolve com **canaleta**: **fiada inteira de 19 cm**, integrada
+à grade modular. Medições:
+
+| Medição | Valor | Amostra |
+|---|---|---|
+| Canaleta apoiada no topo do vão, PORTA | **100,00%** | 47/47 |
+| Canaleta apoiada no topo do vão, JANELA | 95,08% | 58/61 |
+| Canaleta apoiada no topo do vão, qualquer abertura | 91,55% | 130/142 |
+| Canaleta imediatamente sob o peitoril | **100,00%** | 89/89 |
+| Base da canaleta acima = topo do vão (offset 0,00 cm) | 99,26% | 135/136 |
+| Topo da canaleta abaixo = peitoril (offset 0,00 cm) | 98,88% | 88/89 |
+| Segunda fiada de canaleta **abaixo** do peitoril | **0,00%** | 0/89 |
+
+Prova de que a escolha é deliberada: as famílias `VERGA PORTA`,
+`VERGA JANELA`, `VERGA JANELA 3 FUROS` e `CONTRAVERGA` estão **carregadas
+no documento (69 tipos) com ZERO instâncias**, e o parâmetro de instância
+`Lintel` está zerado em 65.747/65.747 peças.
+
+**Consequência para a leitura das seções anteriores**: onde as regras deste
+arquivo falam de "verga" e "contraverga" como se fossem o único mecanismo,
+isso reflete o projeto nº 1. Existe pelo menos um projeto humano real que
+não usa nenhum dos dois. **Isto não revoga nenhuma regra existente** — é
+registro de que o domínio tem mais de uma solução válida.
+
+### 41.2 O invariante entre os dois projetos
+
+Apesar de sistemas de abertura **opostos**, os dois projetos concordam em:
+
+- ausência total de `Wall` / `Door` / `Window` nativos;
+- parâmetro de texto `Parede` como chave de agrupamento (100% das peças);
+- `Título_abertura` como rótulo PORTA/JANELA/ABERTURA;
+- **offset 0,00 cm** entre a peça de reforço e a borda do vão, acima e abaixo;
+- grade de 20 cm (bloco de 19 + junta de 1), iniciando em +1 cm;
+- peça de 9 cm ocupando meia fiada (`9 + 1 + 9 = 19`) — aqui 762/852 = 89,44%;
+- espessura única de 14 cm (65.747/65.747);
+- ortogonalidade total (65.747/65.747 com rotação múltipla de 90°);
+- bbox com +1 cm de folga por face no comprimento, e a bbox inflada em Z
+  do `BLOCO 54 CORTADO` (19 cm na bbox, 9 cm no sólido).
+
+### 41.3 CONFLITO 10.7 (canaleta na última fiada) — segunda medição independente
+
+A seção 10.7 registra o conflito *"toda parede tem canaleta na última fiada"*.
+
+| Fonte | Última fiada 100% canaleta | Amostra |
+|---|---|---|
+| Medição antiga | 39,4% | 87/221 |
+| Projeto nº 1 (TORRE EASY) | 71,43% | 465/651 |
+| **Projeto nº 2 (BUTANTÃ)** | **73,82%** | **251/340** |
+
+Duas medições independentes, em projetos de escritórios diferentes e com
+sistemas de abertura diferentes, convergem em **~72–74%**.
+
+**O conflito CONTINUA ABERTO**: 73,82% é predominante, não universal —
+80 dos 340 grupos de parede (23,53%) terminam **sem nenhuma canaleta** no
+topo. Não implementar nenhum dos dois lados sem decisão explícita do usuário.
+
+### 41.4 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — apoio lateral da canaleta
+
+Os dois projetos **discordam** sobre apoio lateral:
+
+| Fonte | Apoio mínimo medido |
+|---|---|
+| Projeto nº 1 (verga) | **≥ 9 cm** em 784/784 apoios |
+| Projeto nº 2 (canaleta), acima do vão | **4 cm** (mínimo); mediana 39 cm |
+| Projeto nº 2 (canaleta), abaixo do peitoril | **−1 cm** (mínimo); mediana 24 cm |
+
+Leitura inferida (**não confirmada**): quando o reforço é uma **fiada** e não
+uma peça apoiada, o esforço é resolvido pela continuidade da fiada, não pelo
+comprimento de embutimento — por isso o apoio deixa de ser regra dura.
+Em fachadas com janelas seguidas a corrida de canaleta de uma janela **se
+funde com a da vizinha** (comprimento máximo medido: 449 cm além da jamba).
+
+**Não promover a regra.** Registrado para a decisão de política do usuário.
+
+### 41.5 FATO MEDIDO — "cortado" tem duas estratégias, com proporção variável
+
+| Estratégia | Projeto nº 1 | Projeto nº 2 |
+|---|---|---|
+| Corte na **altura** (19 → 9 cm), família dedicada | 93,54% | **43,36%** (124/286) |
+| Corte no **comprimento**, parâmetro `VAR` de instância | 6,46% | **56,64%** (162/286) |
+
+A seção 40 registra o corte em altura como dominante. **Isso vale para o
+projeto nº 1, não para o domínio**: aqui a maioria dos cortes é no
+comprimento, e 67 dos 162 são em peças de **canaleta**, para fechar o
+comprimento das fiadas canaletadas.
+
+### 41.6 FATO MEDIDO — topo do vão cai numa linha da grade
+
+**134/142 (94,37%)** dos vãos terminam na cota `z_rel = 221 cm`, que é
+`1 + 11 × 20` — uma linha exata da grade de 20 cm. O topo do vão não é uma
+cota livre: é uma fiada. Isso é o que permite a canaleta assentar com offset
+zero sem nenhuma peça de ajuste.
+
+### 41.7 EXCEÇÕES MEDIDAS — quando a canaleta não aparece
+
+12 de 142 aberturas (8,45%), com duas causas identificadas:
+
+1. **Vão livre até o topo da parede** — 6 casos (`PAR28`, 156 × 221 cm,
+   peitoril 0). A alvenaria termina nas jambas; não há fiada sobre o vão.
+   Confiança **ALTA**.
+2. **Vão pequeno resolvido com `COMPENSADOR 14x19x9 (deitado)`** — 6 casos,
+   vãos de 61–66 cm de largura. A fiada sobre o vão é de compensador de 9 cm
+   em vez de canaleta; **abaixo** do peitoril desses mesmos vãos há canaleta
+   normal. Confiança **MÉDIA** (amostra de 6).
+
+Relação medida entre largura do vão e solução:
+
+| Faixa | Com canaleta acima |
+|---|---|
+| 60–89 cm | 9/15 (60%) |
+| **90–119 cm** | **43/43 (100%)** |
+| **120–149 cm** | **57/57 (100%)** |
+| 150–179 cm | 18/24 (75%) |
+
+### 41.8 ARMADILHAS DE LEITURA deste modelo (registradas para não repetir)
+
+1. **Categoria *Vegetação* espelha a alvenaria 1:1** — 65.747 instâncias
+   `Cor <peça>`, uma para cada peça de Modelos genéricos. São representação
+   gráfica. Contar "Modelos genéricos + Vegetação" **dobra o modelo**.
+2. **A chave `Parede` embute a faixa de pavimento** neste projeto
+   (`PAR10 - 2º PAVIMENTO AO 8º PAVIMENTO (TIPO)`), diferente do projeto nº 1
+   (`PAR1`…`PAR117`). Agrupar só por `Parede` junta **7 pavimentos** num
+   grupo só. A chave utilizável é `(Parede, nível)` — 340 grupos, cada um
+   com um único eixo.
+3. **Pavimentos 3º a 8º são clones geométricos exatos do 2º** (6.727/6.727
+   peças idênticas, 0 diferenças). As aberturas só existem instanciadas em
+   4 níveis; nos clones elas precisam ser **inferidas**.
+4. **`ElementId.IntegerValue` não existe no Revit 2026** — usar `.Value`.
+5. **`Element.Name` falha no IronPython** para `FamilySymbol`; usar
+   `DB.Element.Name.GetValue(el)` ou `symbol.FamilyName`.
+6. **A bbox da família de abertura vai do datum do nível até o topo do vão**
+   (`bbox.MaxZ == datum + Peitoril + Altura_abertura` em 142/142) — mesma
+   armadilha do item 7 da seção 40, confirmada num segundo projeto.
+7. Neste documento **`LookupParameter` com nome acentuado funcionou**
+   (`Deslocamento do hospedeiro`, `Título_abertura`, `RÉGGA_LOCAL`) —
+   diferente do projeto nº 1, onde retornava `None`. Não assumir nenhum dos
+   dois comportamentos: verificar por documento.
+
+> Erratas evidenciais 2026-09-10 (sem alteração normativa): 7212991 PORTA tem peitoril 40 cm; 135/136 offsets superiores incluem COMMON_BLOCKS (CHANNEL: 129/130); desvio de 6616547 é 1 cm (220→221); corte de canaleta é 67/162 = 41,36%. Ver docs/revit_reference_extraction/butanta-r08-lt/REVIEW_2026-09-10.md.

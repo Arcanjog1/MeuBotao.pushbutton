@@ -1,0 +1,611 @@
+[
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "M_Identificador de vergalhão", 
+  "instances": 0, 
+  "typ": "Tipo e número", 
+  "type_id": 94047
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "M_Identificador de vergalhão", 
+  "instances": 0, 
+  "typ": "Espaçamento e número de tipo", 
+  "type_id": 94049
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "M_Identificador de vergalhão", 
+  "instances": 0, 
+  "typ": "Espaçamento e número de quantidade - 2 Linhas", 
+  "type_id": 94051
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "M_Identificador de vergalhão", 
+  "instances": 0, 
+  "typ": "Tipo e número de quantidade", 
+  "type_id": 94053
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "M_Identificador de vergalhão", 
+  "instances": 0, 
+  "typ": "Espaçamento e número de quantidade - 1 Linha", 
+  "type_id": 94055
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "Seção do Vergalhão Estrutural MRA", 
+  "instances": 0, 
+  "typ": "Seção do Vergalhão MRA", 
+  "type_id": 215762
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "Vergalhão Estrutural MRA", 
+  "instances": 0, 
+  "typ": "Vergalhão MRA", 
+  "type_id": 216039
+ }, 
+ {
+  "cat": "Identificadores do acoplador de vergalhão estrutural", 
+  "fam": "Identificador do acoplador do vergalhão estrutural", 
+  "instances": 0, 
+  "typ": "Tipo", 
+  "type_id": 434810
+ }, 
+ {
+  "cat": "Identificadores do acoplador de vergalhão estrutural", 
+  "fam": "Identificador do acoplador do vergalhão estrutural", 
+  "instances": 0, 
+  "typ": "Tipo e quantidade", 
+  "type_id": 434812
+ }, 
+ {
+  "cat": "Identificadores do acoplador de vergalhão estrutural", 
+  "fam": "Identificador do acoplador do vergalhão estrutural", 
+  "instances": 0, 
+  "typ": "Tipo e barras conectadas", 
+  "type_id": 434814
+ }, 
+ {
+  "cat": "Identificadores do acoplador de vergalhão estrutural", 
+  "fam": "Identificador do acoplador do vergalhão estrutural", 
+  "instances": 0, 
+  "typ": "Tipo de família, Engates da barra e Qte", 
+  "type_id": 434816
+ }, 
+ {
+  "cat": "Identificadores do acoplador de vergalhão estrutural", 
+  "fam": "Identificador do acoplador do vergalhão estrutural", 
+  "instances": 0, 
+  "typ": "Número, tipo e quantidade do acoplador", 
+  "type_id": 434818
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA", 
+  "type_id": 520218
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA 3 FUROS", 
+  "instances": 0, 
+  "typ": "VERGA JANELA", 
+  "type_id": 529589
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA 3 FUROS", 
+  "instances": 0, 
+  "typ": "V 14x19x124", 
+  "type_id": 529591
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "VERGA JANELA", 
+  "type_id": 530657
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x19x124", 
+  "type_id": 530659
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA", 
+  "type_id": 531593
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x19x279", 
+  "type_id": 740752
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x159", 
+  "type_id": 741110
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 159", 
+  "type_id": 741214
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 119", 
+  "type_id": 741850
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x119", 
+  "type_id": 741913
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x154", 
+  "type_id": 742190
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 199", 
+  "type_id": 744620
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 194", 
+  "type_id": 744818
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x194", 
+  "type_id": 745112
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 124", 
+  "type_id": 745552
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x120", 
+  "type_id": 745754
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X204", 
+  "type_id": 746812
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X119", 
+  "type_id": 747183
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X124", 
+  "type_id": 747582
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x279", 
+  "type_id": 747657
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 114", 
+  "type_id": 747761
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x134", 
+  "type_id": 748389
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x114", 
+  "type_id": 748511
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X189", 
+  "type_id": 748719
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X199", 
+  "type_id": 752820
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X224", 
+  "type_id": 753432
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x184", 
+  "type_id": 758502
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 174", 
+  "type_id": 758601
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 189", 
+  "type_id": 758657
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X114", 
+  "type_id": 759246
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X129", 
+  "type_id": 760257
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X144", 
+  "type_id": 761069
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X139", 
+  "type_id": 761606
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x189", 
+  "type_id": 763441
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X134", 
+  "type_id": 764546
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 109", 
+  "type_id": 764734
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x104", 
+  "type_id": 764872
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 94", 
+  "type_id": 764990
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X130", 
+  "type_id": 771449
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 179", 
+  "type_id": 773481
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x179", 
+  "type_id": 773705
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 134", 
+  "type_id": 782123
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x174", 
+  "type_id": 787228
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA 3 FUROS", 
+  "instances": 0, 
+  "typ": "VERGA JANELA 254", 
+  "type_id": 788712
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 104", 
+  "type_id": 788795
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X149", 
+  "type_id": 790306
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x204", 
+  "type_id": 792025
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x109", 
+  "type_id": 793348
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 219", 
+  "type_id": 802378
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x219", 
+  "type_id": 802393
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X159", 
+  "type_id": 803643
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x229", 
+  "type_id": 851134
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 154", 
+  "type_id": 1333381
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x139", 
+  "type_id": 1334689
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 139", 
+  "type_id": 1335086
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x99", 
+  "type_id": 1336214
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 99", 
+  "type_id": 1336329
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x124", 
+  "type_id": 1339726
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "TAG de vergalhão - completa - Texto 3mm - com repetições totais de um N", 
+  "instances": 0, 
+  "typ": "COMPLETA COM SOMATÓRIO DE N's", 
+  "type_id": 1599254
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "Identificador de vergalhão - QNBE", 
+  "instances": 0, 
+  "typ": "3 N1 Ø8 c/15", 
+  "type_id": 1599548
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "Identificador de vergalhão - QPBC", 
+  "instances": 0, 
+  "typ": "3 N1 Ø8 C=200", 
+  "type_id": 1751181
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "TAG de vergalhão - completa - Texto 3mm - COM REPETIÇÕES DO CONJUNTO", 
+  "instances": 0, 
+  "typ": "COMPLETA COM REPETIÇÕES DO CONJUNTO", 
+  "type_id": 2343266
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X154", 
+  "type_id": 2367149
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 204", 
+  "type_id": 3864953
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 144", 
+  "type_id": 3916763
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x144", 
+  "type_id": 3916897
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 149", 
+  "type_id": 3928579
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA", 
+  "instances": 0, 
+  "typ": "V 14x9x149", 
+  "type_id": 3935126
+ }, 
+ {
+  "cat": "Identificadores de vergalhão estrutural", 
+  "fam": "TAG de vergalhão - completa - Texto 3mm - SEM REPETIÇÕES DO CONJUNTO", 
+  "instances": 0, 
+  "typ": "COMPLETA COM REPETIÇÕES DO CONJUNTO", 
+  "type_id": 4486897
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "CONTRAVERGA", 
+  "instances": 0, 
+  "typ": "CONTRAVERGA 129", 
+  "type_id": 6180452
+ }, 
+ {
+  "cat": "Identificadores de modelo genérico", 
+  "fam": "TAGS PARA VERGAS", 
+  "instances": 0, 
+  "typ": "TAGS PARA VERGAS", 
+  "type_id": 6197527
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA JANELA 3 FUROS", 
+  "instances": 0, 
+  "typ": "VERGA JANELA 284", 
+  "type_id": 6288764
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X174", 
+  "type_id": 6437780
+ }, 
+ {
+  "cat": "Modelos genéricos", 
+  "fam": "VERGA PORTA", 
+  "instances": 0, 
+  "typ": "VERGA PORTA 9X109", 
+  "type_id": 6438295
+ }
+]

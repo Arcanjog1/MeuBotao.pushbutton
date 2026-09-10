@@ -1,0 +1,43 @@
+{
+  "observed_utc": "2026-09-10T18:33:27.442372+00:00",
+  "source_head": "5f1a0c4855cbc947702304aea693c9b4bfa08ada",
+  "result": "PASS structural/count/link checks with documented interpretation errata",
+  "pieces": 65747,
+  "openings": 142,
+  "channels": 8931,
+  "cuts": 286,
+  "relations": 3625,
+  "door_above_channel": 47,
+  "window_above_channel": 58,
+  "sill_below_channel": 89,
+  "channel_only_zero_offset_above": [
+    129,
+    130
+  ],
+  "all_reinforcement_zero_offset_above": [
+    135,
+    136
+  ],
+  "zero_offset_below": [
+    88,
+    89
+  ],
+  "lintel_types_loaded": 69,
+  "lintel_instances": 0,
+  "files": {
+    "01_family_catalog.json": "db3c88713ceb8bd6dffa012131137f664c5bdb4518ce192a3cf17c91394a8fc1",
+    "02_openings.json": "070c9b8e36184c432a74e0dbb37d91163cf05f1ce3acee9de41774c0f524e9e8",
+    "03_above_openings.json": "9b50a1a1207449cb2d6c34022ac43d5c30d4b0bb502de758f0a4991ca5435b3f",
+    "04_below_windows.json": "652384b1970503b924c26a3f3fad26ce3a4ab78cbd7a0272a8b6a71866c8b2d0",
+    "05_channels.json": "590feff19893eb8e6aab43f63355936acc41e61f1b0cc308c128bc3a3913a239",
+    "06_cut_blocks.json": "e44d5a108c0306ec8ca24308b61e24cae5ec659d778051981b5cdf398077ddeb",
+    "07_special_blocks.json": "fd316d2940697d8a7cd9cd7b38c722f0996af73ab8e9eebf5ee435e8cefe342f",
+    "08_piece_opening_wall_relations.json": "0459c4ea4ae85f3ab204111efeb42a14f96012f9f3bc77cb41616792dbd85517",
+    "09_observed_patterns.json": "8694d63884c3242ab6151b9ff53b45ecca73ff69fa9aa799ad24f7e6d000a7f5",
+    "10_torre_easy_comparison.json": "790ade8a55d78508b3efd90b0cc341acf7284d1f3dadc02e0879f76dbf066e5b",
+    "evidence/catalog_cov.json": "cd1e2676602d1fe036443a9061e543eb63afd79067335ea0802b7dd93297e9c1",
+    "evidence/famtype_counts_todas_categorias.json": "d8a7328b3370dd52e70e6677ece8c9b1d9fbf1452672374e09b09887857b4802",
+    "evidence/solid_check.json": "ddb17e7a6653b8c1800a50fc2143543372df8ffbe0d52c305375181ab48500f1",
+    "evidence/verga_search.json": "b5a381f2fed51d5afe1c44bc1ae9210c37e96f7248530b6cabf83ade17cc00db"
+  }
+}
