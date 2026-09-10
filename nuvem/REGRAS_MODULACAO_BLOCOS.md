@@ -721,6 +721,37 @@ Testes: `tests/test_bond_strip_adjacent_courses.py` (controle negativo com
 a bancada real do beta; controles positivos com empilhamento adjacente de
 17 fiadas e de 2 fiadas).
 
+### PADRAO OBSERVADO E CONFIRMADO — a atribuicao das letras A/B depende do
+referencial de coordenadas (2026-09-10)
+
+Medido ao comparar a execucao real no Revit com o mesmo caso resolvido
+offline: para a **mesma** bancada, o solver troca qual paridade recebe qual
+layout, porque a escolha passa pela ordenacao canonica geometrica dos nos
+(`_canonical_node_sort_key` / `_coordinate_arm_role_nodes`), que depende das
+coordenadas absolutas.
+
+| | fiada par (A) | fiada impar (B) |
+|---|---|---|
+| offline (eixo em 7677/1568) | `B34[0..34]` `B34[35..69]` | `B19[0..19]` `B34[20..54]` |
+| Revit (eixo em 1918/−860) | `B19[0..19]` `B34[20..54]` | `B34[0..34]` `B34[35..69]` |
+
+As duas solucoes sao **fisicamente equivalentes** — A/B e' simetrico, e a
+amarracao fecha igual nas duas. Nao e' defeito.
+
+**A consequencia e' uma REGRA para os auditores**: nenhuma checagem de
+amarracao pode ter veredito dependente de paridade, porque a paridade nao e'
+uma propriedade fisica da parede. Foi exatamente essa dependencia que
+produziu o falso positivo acima: o cluster de peca especial nao isenta cai
+em `t≈37` nas duas paridades, mas entram **8** fiadas numa (8/17 = 0,471,
+abaixo de `BOND_STRIP_RATIO = 0,5`) e **9** na outra (9/17 = 0,529, acima).
+O limiar ficava entre os dois valores, e o veredito virava cara-ou-coroa —
+o que tambem explica por que o defeito sobreviveu a todas as rodadas
+offline do benchmark.
+
+A regra de adjacencia acima torna o detector invariante a paridade
+(`adjacent_run = 1` nas duas). Coberto por
+`test_veredito_do_auditor_e_invariante_a_paridade_A_B`.
+
 ## 9. Testes automatizados
 
 `tests/run_tests.py` (`py -3 tests/run_tests.py`, a partir da raiz do

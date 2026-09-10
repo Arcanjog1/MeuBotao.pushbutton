@@ -249,9 +249,17 @@ o beta 8cdd33f, com numeros identicos (TGD compensators 52->61; TP1
 JUNCTION_MISSING_BINDING 8->9). **Zero falha nova.** Nenhum baseline,
 reference ou threshold foi tocado.
 
-**MERGE NAO EXECUTADO** - gates 8 e 10 fecharam, mas 3 (vermelho falso nao
-verificado no Revit), 5/15 (congelamento do interpretador) e 12 (CI) seguem
-abertos. Estado candidato, nao oficial.
+O falso positivo do auditor foi reproduzido EXATAMENTE com o solver real,
+sem Revit: a atribuicao das letras A/B depende do referencial de
+coordenadas, e o detector era sensivel a paridade (8/17 = 0,471 passava,
+9/17 = 0,529 reprovava, com o limiar entre os dois). Isso explica por que o
+defeito sobreviveu ao benchmark offline. A correcao torna o auditor
+invariante a paridade. Registrado na secao 8d das regras.
+
+**MERGE NAO EXECUTADO** - gates 3, 4, 8, 10, 11 e 12 fecharam. O unico
+bloqueador restante e o 5/15: o congelamento do interpretador CPython dentro
+do Revit, sem causa-raiz e sem limite provado. Estado candidato, nao
+oficial.
 
 ## Governanca e recuperacao
 

@@ -5,7 +5,7 @@
   "date": "2026-09-09",
   "scope": "current",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-  "head": "2d8d0b1d9eeb87800c6f73394eee83a0db1db1fb",
+  "head": "f2e218a3d9f00d2acb9aed643992ae249b987e4d",
   "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "pr": "not-created",
   "objective": "Fechar o primeiro beta controlado do Revit na bancada de 2 paredes / 1 encontro em L / 0 aberturas: achar por medicao onde o fluxo travava, corrigir somente hotspots provados, eliminar o vermelho falso da auditoria de amarracao sem silenciar o auditor, e decidir merge por gates.",
@@ -26,13 +26,14 @@
     "REGRESSAO DE AMARRACAO no codigo corrigido: 420 passed em 2366.84s (39min26s), exit 0 - test_script.py + test_block_bonding.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py + test_block_arm_role_invariance.py + test_bond_strip_adjacent_courses.py. Que a versao CORRIGIDA estava carregada e comprovado pelos 6 testes novos terem passado dentro dessa mesma rodada (com a logica antiga, dois deles falham).",
     "CONFIRMACAO no HEAD commitado: 366 passed em 2257.45s (37min37s), exit 0 - test_script.py + test_block_b19_residual_fill_implementation.py + test_block_node_fill_revalidation.py.",
     "REGRESSAO CONSOLIDADA no escopo CORRETO (raiz, 1037 testes coletados): 1035 passed / 2 failed em 5576.96s (1h32m56s), exit 1. As DUAS falhas sao as HISTORICAS ja registradas para o beta 8cdd33f, com numeros IDENTICOS: TGD compensators 52->61 (delta 9) e TP1 JUNCTION_MISSING_BINDING 8->9 (delta 1). ZERO falha nova.",
-    "ERRO DE ESCOPO CORRIGIDO: a primeira consolidada rodou `pytest tests/` (1003 testes) e deixou 34 de fora (nuvem/tests/ e tools/documentation/). Refeita a partir da raiz. Que a raiz e o escopo oficial esta confirmado pela contagem: 8cdd33f tinha 1029 coletados, a raiz de hoje tem 1037 - exatamente +8, os testes acrescentados nesta entrega."
+    "ERRO DE ESCOPO CORRIGIDO: a primeira consolidada rodou `pytest tests/` (1003 testes) e deixou 34 de fora (nuvem/tests/ e tools/documentation/). Refeita a partir da raiz. Que a raiz e o escopo oficial esta confirmado pela contagem: 8cdd33f tinha 1029 coletados, a raiz de hoje tem 1037 - exatamente +8, os testes acrescentados nesta entrega.",
+    "GATE 3 FECHADO OFFLINE: rodando o SOLVER REAL e trocando as letras A/B, a logica antiga produz a mensagem IDENTICA a do relato ('B34 repetido(s) em X~37.0cm, em 9 fiadas (0, 2, 4, 6, 8, 10, 12, 14, 16)') e a nova nao reprova nenhuma parede. tests/test_bond_strip_adjacent_courses.py: 9 passed; 3 failed ao reverter BOND_STRIP_MIN_ADJACENT_COURSES para 0.",
+    "CI (gate 12) simulado localmente, identico ao workflow check-project-status.yml: passo 1 (unittest discover em tools/documentation) 16 tests OK em 16.1s; passo 2 (validate.py --base merge-base --main origin/main --require-current-main) PASS."
   ],
   "known_failures": [
     "BUG REAL 3 - CAUSA-RAIZ NAO FECHADA, BLOQUEADOR DE MERGE: o interpretador CPython dentro do processo do Revit congela por 19,6s (execucao 3) e por 100,2s (execucao 2) na mesma fronteira - entre `plan_failures = {}` e o `def plan_hook`, um trecho sem calculo nenhum. Durante o congelamento NENHUMA linha [PERF] de NENHUMA thread aparece (nem o watchdog), enquanto o CPU do processo anda 1,67s fora do Python. Nao e o solver, nao e a instrumentacao (0,285ms/marco medido) e nao e callback perdido. Nao consegui provar que o congelamento e limitado.",
-    "GATE 3 NAO VERIFICADO NO REVIT: o bench offline NAO reproduz o falso positivo do auditor (0 paredes reprovadas com a logica antiga E com a nova - o layout reconstruido difere do criado no Revit). A correcao esta provada por teste que codifica a geometria MEDIDA, mas 'vermelho falso eliminado' so fecha com nova execucao no Revit.",
-    "CI nao avaliado nesta sessao.",
-    "FALHAS HISTORICAS PRESERVADAS (nao introduzidas por esta entrega, identicas as de 8cdd33f): tests/regression/test_benchmark_baselines.py falha para torre_easy_lo_r00_tgd (compensators 52->61) e torre_easy_lo_r00_tp1 (JUNCTION_MISSING_BINDING 8->9). Nenhum baseline, reference ou threshold foi tocado para escondê-las."
+    "FALHAS HISTORICAS PRESERVADAS (nao introduzidas por esta entrega, identicas as de 8cdd33f): tests/regression/test_benchmark_baselines.py falha para torre_easy_lo_r00_tgd (compensators 52->61) e torre_easy_lo_r00_tp1 (JUNCTION_MISSING_BINDING 8->9). Nenhum baseline, reference ou threshold foi tocado para escondê-las.",
+    "GATE 3 - residuo: a eliminacao do vermelho falso esta provada por reproducao EXATA com o solver real (mensagem identica a do relato), mas nao foi reconfirmada com um clique no Revit, porque o usuario ficou sem acesso ao Revit. O risco residual e baixo: a reproducao usa o solver de producao, nao candidatos montados a mao."
   ],
   "physical_deltas": [
     "187 FamilyInstances de bloco criadas e medidas no Revit: 34 B34 + 136 B39 + 17 B19, em 17 fiadas de 11 pecas, Z de -1105,2cm a -785,2cm com passo 20cm, rotacoes 0 / 1,5708 / 4,7124 rad. 0 falhas, 0 colisoes, 0 violacoes de vao, 0 trechos nao modulares.",
@@ -49,20 +50,19 @@
     "ACHADO Z reclassificado como comportamento esperado por decisao do usuario; nenhum CR de Z aberto e nenhuma linha de codigo vertical alterada.",
     "Laco de criacao auditado e LIMPO: nenhum Regenerate por bloco, nenhuma busca de familia/tipo nem varredura global por bloco, Activate+Regenerate uma unica vez fora do laco. Nao havia hotspot de criacao a otimizar.",
     "Retorno para a UI PROVADO SAUDAVEL: worker TERMINOU -> BeginInvoke aceito -> ui._finish -> ui._on_analyze_done em 28ms. O `ui._finish` ausente na execucao 2 foi consequencia de o usuario ter fechado a janela congelada (BeginInvoke em Form descartado lanca) - nao um segundo defeito.",
-    "GATES 8 e 10 FECHADOS: consolidada executada no escopo correto e sem nenhuma falha nova. GATES 3, 5 e 12 continuam ABERTOS.",
-    "NAO MERGEAR: gate 3 (vermelho falso nao verificado no Revit), gate 5/15 (congelamento do interpretador sem causa-raiz nem limite provado) e gate 12 (CI nao avaliado)."
+    "ACHADO NOVO (2026-09-10): a atribuicao das letras A/B depende do REFERENCIAL DE COORDENADAS - o mesmo caso resolvido offline e no Revit troca qual paridade recebe qual layout. As duas solucoes sao fisicamente equivalentes, mas o detector era SENSIVEL A PARIDADE: 8 fiadas de 17 = 0,471 (abaixo de BOND_STRIP_RATIO=0,5) contra 9 de 17 = 0,529 (acima). O limiar caia exatamente entre os dois e o veredito virava cara-ou-coroa - o que tambem explica por que o defeito sobreviveu a todas as rodadas offline. A correcao por adjacencia torna o auditor INVARIANTE a paridade, que e a propriedade correta. Registrado em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8d.",
+    "GATES 3, 4, 8, 10, 11 e 12 FECHADOS. Gate 5/15 continua ABERTO.",
+    "NAO MERGEAR: o unico bloqueador restante e o gate 5/15 - o congelamento do interpretador CPython dentro do Revit, sem causa-raiz e sem limite provado. A instrucao do usuario e explicita: se a Tela 1 puder ficar infinita, nao mergear."
   ],
   "decisions_pending": [
     "Fechar a causa-raiz do congelamento do interpretador. Proximo passo tecnico: amostrar sys._current_frames() de um thread dedicado durante o congelamento para identificar quem retem a GIL. Hipotese principal, NAO PROVADA: a GIL do pythonnet permanece retida pela thread principal do Revit ao retornar de IExternalEventHandler.Execute enquanto o Revit executa trabalho proprio.",
     "Reexecutar no Revit com o pacote 2d8d0b1 para fechar o gate 3 (vermelho falso eliminado na pratica).",
-    "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a).",
-    "Avaliar o CI (gate 12) antes de qualquer merge."
+    "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a)."
   ],
   "next_steps": [
     "Uma execucao do botao TESTE-PERF (head 2d8d0b1) nas mesmas 2 Walls, confirmando que nenhuma peca recebe vermelho.",
     "Amostragem de frames durante o congelamento para fechar o BUG 3.",
-    "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem.",
-    "Ler o CI no HEAD final."
+    "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem."
   ],
   "references": [
     {
