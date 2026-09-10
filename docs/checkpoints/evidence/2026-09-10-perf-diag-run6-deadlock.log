@@ -30,3 +30,10 @@
 [PERF] +    0.073s cpu=   0.062s thr=3   tid=19324 ntid=19324  process_walls_one_by_one START walls=2
 [PERF] +    0.074s cpu=   0.062s thr=3   tid=19324 ntid=19324  solve_all_intersections START nodes=3
 [PERF] +    0.073s cpu=   0.062s thr=3   tid=26316 ntid=26316  Execute SAIU action=analyze pendente=None
+[PERF] + 1654.757s cpu=  45.078s thr=3   tid=4704  ntid=4704   CONGELAMENTO detectado pelo amostrador parado=1654.490s
+[PERF] + 1654.848s cpu=  45.125s thr=3   tid=19324 ntid=19324  solve_all_intersections END dt=1654.774s nodes=3
+[PERF] + 1654.849s cpu=  45.125s thr=3   tid=19324 ntid=19324  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] + 1654.851s cpu=  45.125s thr=3   tid=19324 ntid=19324  index_node_candidates START nodes=3
+[PERF] + 1654.857s cpu=  45.141s thr=3   tid=19324 ntid=19324  index_node_candidates END dt=0.006s nodes=3
+[PERF] + 1654.859s cpu=  45.141s thr=3   tid=19324 ntid=19324  order_walls_for_processing START walls=2
+[PERF] + 1654.873s cpu=  45.172s thr=3   tid=19324 ntid=19324  order_walls_for_processing END dt=0.014s walls=2

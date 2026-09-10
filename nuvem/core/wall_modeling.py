@@ -10462,19 +10462,21 @@ class _PostCreationEventHandler(IExternalEventHandler):
         os mesmos dados que main() calculava antes desta separacao Etapa
         1/Etapa 2.
 
-        MUDANCA 2 do plano de arquitetura em memoria (2026-08-26): quando
-        `self.wall_segment_geometry` foi preenchido na Etapa 1 (ver main()),
-        analyze_created_walls_for_errors roda 100% livre de `target_doc` (ver
-        _classify_wall_axis_segments) - entao roda numa `System.Threading.
-        Thread` de VERDADE, fora da thread principal do Revit, em vez de
-        bloquear `Execute()` (que e' a propria thread de UI do Revit) pela
-        duracao inteira do solver, como acontecia antes. `self.on_done` so'
-        e' chamado quando a thread termina, marshalado de volta para a UI via
-        `self.ui_invoke_cb` (configurado pelo chamador com um Control real -
-        ver _WallReviewForm._on_start_click). Sem `ui_invoke_cb` (chamador
-        antigo/teste que nao configurou), roda SINCRONO exatamente como
-        antes desta mudanca - nunca quebra quem chama a acao "analyze" sem
-        passar por essa janela."""
+        THREAD DE FUNDO RETIRADA (2026-09-10) - ver o bloco de comentario em
+        _WallReviewForm._on_start_click para a evidencia completa. A
+        "Mudanca 2" de 2026-08-26 fazia isto rodar numa
+        `System.Threading.Thread` de verdade para nao bloquear `Execute()`.
+        Medido no Revit real, essa thread era a causa de congelamentos de
+        94s, 2652s e 1654s, com o worker sem consumir CPU e o interpretador
+        inteiro parado - contra 0,181s do proprio `analyze`. O caminho de
+        fundo continua implementado abaixo (`ui_invoke_cb` nao-nulo), mas
+        NENHUM chamador do produto o instala mais.
+
+        Com `ui_invoke_cb is None` - o caso normal agora, e o que os testes
+        sempre usaram - `_worker()` roda SINCRONO dentro de `Execute()`, na
+        thread principal do Revit, e `self.on_done` e' chamado direto, sem
+        `BeginInvoke`: ja' estamos na thread certa. `_finish` roda
+        exatamente UMA vez nos dois caminhos."""
         def _worker():
             error_detail = None
             result = None
@@ -12712,33 +12714,43 @@ class _WallReviewForm(Form):
         def _should_pause():
             return self._paused
 
-        # Marshala de volta para a UI (mesma tecnica de _ProgressConsole.
-        # _invoke_if_needed, aqui usando o proprio Form como Control) -
-        # ver Mudanca 2 do plano de arquitetura em memoria: "analyze" agora
-        # roda numa thread de fundo (_PostCreationEventHandler._execute_analyze),
-        # entao self.on_done (_on_analyze_done, mais abaixo) precisa ser
-        # chamado na thread de UI, nao na thread do solver.
-        def _ui_invoke(fn):
-            # Marcado dos DOIS lados: um BeginInvoke que lanca (janela ja
-            # fechada/descartada, o caso real de 2026-09-09) era engolido
-            # aqui sem deixar rastro nenhum.
-            try:
-                if self.InvokeRequired:
-                    _perf.mark("ui_invoke.BeginInvoke (da thread de fundo)")
-                    self.BeginInvoke(Action(fn))
-                    _perf.mark("ui_invoke.BeginInvoke aceito")
-                else:
-                    _perf.mark("ui_invoke.direto (ja na thread de UI)")
-                    fn()
-            except Exception as _invoke_ex:
-                _perf.mark("ui_invoke.FALHOU", erro=str(_invoke_ex)[:120])
-
+        # ANALYZE RODA SINCRONO, NA THREAD PRINCIPAL DO REVIT (2026-09-10).
+        #
+        # `ui_invoke_cb` NAO e' instalado de proposito: e' exatamente ele que
+        # fazia `_execute_analyze` abrir uma `System.Threading.Thread` (ver o
+        # `if self.ui_invoke_cb is not None` la'). Sem ele, o caminho
+        # SINCRONO - que sempre existiu e e' o mesmo que os testes usam -
+        # roda dentro do proprio `Execute()`, onde a API do Revit e' legal.
+        #
+        # POR QUE a thread de fundo foi retirada, medido no Revit real:
+        #   - execucao 4: 94,167s parados na fronteira de `analyze`;
+        #   - execucao 5: `Application.DoEvents()` chamado DA THREAD DE FUNDO
+        #     levou 2652,285s (corrigido a parte, ver `_pump_ui`);
+        #   - execucao 6: `solve_all_intersections` levou 1654,774s (27min35s)
+        #     com o worker consumindo ~47ms de CPU no periodo inteiro -
+        #     bloqueio passivo, threads `Running`=0, e o trabalho concluiu em
+        #     milissegundos assim que destravou.
+        # Dois processos do Revit morreram (14:24:03 e 14:55:09) depois
+        # desses episodios.
+        # Contra isso: `analyze` custa 0,181s medido dentro do Revit, no
+        # documento real. Nao havia beneficio medido em manter a thread.
+        #
+        # CONSEQUENCIA DE SEMANTICA, deliberada e documentada: durante
+        # `analyze` a janela fica bloqueada por esse tempo (fracao de
+        # segundo nesta bancada), e "Pausar"/"Cancelar" nao tem efeito
+        # pratico nele. Ja' era assim de fato - `should_cancel_cb` so' e'
+        # consultado a partir do laco POR PAREDE, nunca antes; a diferenca
+        # e' que agora a janela tambem nao repinta. Nenhum threading novo
+        # foi inventado para preservar um cancelamento que nao existia.
+        #
+        # `_finish` passa a ser chamado direto pelo proprio `_worker` (ver
+        # `_execute_analyze`), sem `BeginInvoke`: ja' estamos na thread certa.
         self._handler.progress_cb = _progress_cb
         self._handler.wall_start_cb = _wall_start_cb
         self._handler.wall_result_cb = _wall_result_cb
         self._handler.should_cancel_cb = _should_cancel
         self._handler.should_pause_cb = _should_pause
-        self._handler.ui_invoke_cb = _ui_invoke
+        self._handler.ui_invoke_cb = None
         try:
             self._handler.action = "analyze"
             self._handler.on_done = self._on_analyze_done
