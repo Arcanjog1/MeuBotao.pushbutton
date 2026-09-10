@@ -109,6 +109,13 @@ encontro L correto. Consolidada 1035 passed / 2 falhas HISTORICAS identicas
 as de `8cdd33f`. Detalhe e evidencias:
 [checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md).
 
+Fechamento OFFLINE concluido no HEAD reconciliado: testes focados 342
+passed; determinismo focal identico em tres processos separados
+(`229b46d2...`); consolidada 1054 passed / 2 falhas HISTORICAS com deltas
+identicos aos de `8cdd33f`, zero falha nova; CI PASS nos dois passos; diff
+revisado - `wall_stepper.py` so' instrumentacao, nenhum baseline, reference,
+threshold, skip ou xfail tocado, benchmark oficial intacto.
+
 **Gate obrigatorio em aberto**: UMA execucao real no Revit com o pacote
 `712f221`. Sem ela o Beta 1 NAO e' PASS e nao ha' merge.
 
