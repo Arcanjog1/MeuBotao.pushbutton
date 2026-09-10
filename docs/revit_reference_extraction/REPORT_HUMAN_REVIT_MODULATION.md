@@ -519,3 +519,5 @@ são repetições verificadas do mesmo pavimento-tipo.
 ## Revisão de integração (2026-09-10)
 
 Os limites e correções de interpretação estão em [REVIEW_2026-09-10.md](REVIEW_2026-09-10.md). O JSON é preservado como extraído.
+
+ERRATA: 07 contém 5.536 especiais, incluindo 3.526 B34/B54, sem hand/facing/mirrored. A descrição anterior de formato enxuto e suficiência para orientação é superada pela revisão acima.

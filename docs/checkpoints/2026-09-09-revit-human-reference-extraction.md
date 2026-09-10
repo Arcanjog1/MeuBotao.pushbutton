@@ -1,3 +1,51 @@
+# Checkpoint reconciliado — integração #33
+
+```json
+{
+  "date": "2026-09-10",
+  "branch": "claude/revit-human-reference-extraction",
+  "head": "11d571eb5f9cd2f736346e767da4724365042f6a",
+  "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/33",
+  "objective": "Integrar evidência Torre Easy após revisão e reconciliação com governança #32.",
+  "changes": [
+    "Reconciliado status; preservadas regras oficiais; seção evidencial 30 renumerada 40; explicitadas limitações e errata do JSON07."
+  ],
+  "tests": [
+    "python -m pytest tests/test_script.py -q: 260 passed; wrapper 68.641s; evidence/2026-09-10-pr33-tests.json",
+    "JSON audit: nove arquivos parseados; contagens, unicidade, vínculos, cotas e apoios conferidos; evidence/2026-09-10-pr33-json-audit.json"
+  ],
+  "known_failures": [
+    "Regeneração completa depende de raw/*.ndjson e pre.py ausentes; JSON07 sem vetores de orientação. Limites evidenciais documentados, nenhum teste executado falhou."
+  ],
+  "physical_deltas": [
+    "ZERO produção/benchmark; JSON original preservado."
+  ],
+  "decisions_taken": [
+    "Usuário autorizou especificamente merge #33 exclusivamente evidencial/documental após gates; nenhuma norma aprovada."
+  ],
+  "decisions_pending": [
+    "Política de apoio/comprimento/topo, catálogo e estratégias futuras."
+  ],
+  "next_steps": [
+    "Checks finais e merge normal #33; revisar #35."
+  ],
+  "references": [
+    {
+      "path": "docs/revit_reference_extraction/REVIEW_2026-09-10.md"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-pr33-json-audit.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-pr33-tests.json"
+    }
+  ]
+}
+```
+
+STATUS do relato abaixo: HISTORICAL. SUPERSEDED BY: revisão de integração acima.
+
 # Checkpoint — 2026-09-09 — Extração forense do projeto humano no Revit
 
 ```

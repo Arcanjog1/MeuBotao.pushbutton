@@ -8,7 +8,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-10T18:40:00+00:00",
+  "observed_utc": "2026-09-10T18:30:44.937352+00:00",
   "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
