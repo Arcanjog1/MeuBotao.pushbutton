@@ -307,6 +307,14 @@ except Exception:
         def mark(tag, **fields):
             pass
 
+        @staticmethod
+        def start_stall_sampler(interval_s=0.25, threshold_s=2.0):
+            pass
+
+        @staticmethod
+        def stop_stall_sampler():
+            pass
+
         class span(object):
             def __init__(self, tag, **fields):
                 pass
@@ -12602,6 +12610,10 @@ class _WallReviewForm(Form):
         try:
             _perf.enable()
             _perf.reset()
+            # Amostrador de congelamento (ver core/engine/perf_trace.py): thread
+            # PYTHON pura que so' anota a hora. Se ELA congelar junto, o
+            # congelamento e' da GIL/interpretador, nao da thread do solver.
+            _perf.start_stall_sampler()
             _perf.mark("ui.click START",
                        walls=len(self._handler.walls_to_create or []),
                        openings=sum(len(o or []) for o in (self._handler.openings_per_wall or [])),
@@ -12738,6 +12750,7 @@ class _WallReviewForm(Form):
 
     def _on_analyze_done(self, kind, error):
         _perf.mark("ui._on_analyze_done", kind=kind)
+        _perf.stop_stall_sampler()
         # `kind == "error"` (nunca `if error:`) - ver o mesmo cuidado
         # documentado em _PostCreationForm._on_zoom_done: uma excecao sem
         # mensagem nao pode virar sucesso silencioso. Sucesso chega como

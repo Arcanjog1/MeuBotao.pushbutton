@@ -43,6 +43,7 @@ except AttributeError:  # pragma: no cover - IronPython 2.7
 
 __all__ = [
     "enable", "disable", "is_enabled", "log_path", "mark", "span", "reset",
+    "start_stall_sampler", "stop_stall_sampler",
 ]
 
 _ENABLED = False
@@ -165,3 +166,103 @@ class span(object):
                 fields["exc"] = exc_type.__name__
             mark(self._tag + " END", **fields)
         return False  # nunca engole excecao
+
+
+# ---------------------------------------------------------------------
+# AMOSTRADOR DE CONGELAMENTO
+#
+# Instrumento decisivo para o congelamento medido no primeiro beta
+# (2026-09-09): o interpretador para por 19,6s / 100,2s entre duas
+# instrucoes que nao computam nada, e NENHUMA linha [PERF] de NENHUMA
+# thread aparece durante o periodo - nem o watchdog do _ProgressConsole,
+# que e' um System.Threading.Timer.
+#
+# Este amostrador e' uma thread PYTHON pura (nao um timer do .NET) que so'
+# acorda, anota a hora e volta a dormir. Ele responde a pergunta que
+# nenhuma sonda anterior conseguiu responder:
+#
+#   - se o amostrador TAMBEM congela, ninguem em Python rodou -> a GIL
+#     estava retida por um chamador .NET (hipotese principal: a thread
+#     principal do Revit, ainda dentro de um frame do pythonnet, enquanto
+#     o Revit faz trabalho proprio);
+#   - se o amostrador continua tiquetaqueando enquanto a thread do solver
+#     nao anda, o problema e' especifico daquela thread (starvation de
+#     escalonamento), nao da GIL.
+#
+# Ao detectar um salto, despeja o topo da pilha de TODAS as threads
+# (`sys._current_frames()`), que mostra onde cada uma estava.
+# ---------------------------------------------------------------------
+
+_SAMPLER = None
+_SAMPLER_STOP = None
+
+
+def _formatar_pilhas(limite_por_thread=6):
+    """Topo da pilha de cada thread Python viva, uma linha por frame."""
+    try:
+        import sys as _sys
+        import traceback as _tb
+        nomes = {}
+        for t in threading.enumerate():
+            nomes[t.ident] = t.name
+        linhas = []
+        for ident, frame in _sys._current_frames().items():
+            linhas.append("    --- tid={} ({}) ---".format(ident, nomes.get(ident, "?")))
+            pilha = _tb.extract_stack(frame)[-limite_por_thread:]
+            for entrada in pilha:
+                linhas.append("      {}:{} {}".format(
+                    os.path.basename(entrada.filename), entrada.lineno, entrada.name))
+        return "\n".join(linhas)
+    except Exception as exc:
+        return "    (falha ao ler as pilhas: {})".format(exc)
+
+
+def start_stall_sampler(interval_s=0.25, threshold_s=2.0):
+    """Liga o amostrador. Seguro chamar mais de uma vez (para/recria)."""
+    global _SAMPLER, _SAMPLER_STOP
+    stop_stall_sampler()
+    if not _ENABLED:
+        return
+    parar = threading.Event()
+
+    def _laco():
+        anterior = time.time()
+        while True:
+            parado = parar.wait(interval_s)
+            # MEDE ANTES de olhar a flag de parada. Endurecimento, nao
+            # correcao de defeito observado: a versao anterior checava a flag
+            # primeiro e, se `stop_stall_sampler()` fosse chamado no instante
+            # em que o congelamento terminasse, descartaria justamente a
+            # ultima medicao - a que interessa. Nao ha' registro desse caso
+            # ter acontecido; a ordem trocada e' de graca e fecha a corrida.
+            agora = time.time()
+            salto = agora - anterior - interval_s
+            if salto >= threshold_s:
+                # O PROPRIO amostrador ficou parado: prova de congelamento
+                # global do interpretador, nao de uma thread especifica.
+                mark("CONGELAMENTO detectado pelo amostrador",
+                     parado="{:.3f}s".format(salto))
+                _write(_formatar_pilhas())
+            anterior = agora
+            if parado or parar.is_set():
+                break
+
+    thread = threading.Thread(target=_laco, name="perf-stall-sampler")
+    thread.daemon = True
+    try:
+        thread.start()
+    except Exception:
+        return
+    _SAMPLER, _SAMPLER_STOP = thread, parar
+    mark("amostrador de congelamento LIGADO",
+         intervalo="{:.2f}s".format(interval_s), limiar="{:.1f}s".format(threshold_s))
+
+
+def stop_stall_sampler():
+    global _SAMPLER, _SAMPLER_STOP
+    if _SAMPLER_STOP is not None:
+        try:
+            _SAMPLER_STOP.set()
+        except Exception:
+            pass
+    _SAMPLER, _SAMPLER_STOP = None, None
