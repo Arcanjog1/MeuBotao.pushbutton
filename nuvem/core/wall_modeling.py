@@ -8608,6 +8608,9 @@ class _ProgressConsole(object):
         self._current_label = ""
         self._watchdog_timer = None
         self._closed = False
+        # THREAD DE UI, capturada na CONSTRUCAO (ver _pump_ui) - a unica em
+        # que `Application.DoEvents()` pode ser chamado.
+        self._ui_thread_id = _DotNetThread.CurrentThread.ManagedThreadId
 
         self.panel = Panel()
         self.panel.Dock = DockStyle.Fill
@@ -8651,6 +8654,46 @@ class _ProgressConsole(object):
 
         self.panel.Controls.Add(self._log_box)
         self.panel.Controls.Add(top)
+
+    def _pump_ui(self):
+        """Bombeia a fila de mensagens do Windows - SOMENTE na thread que
+        construiu este console.
+
+        CAUSA-RAIZ do congelamento da Tela 1, medida ao vivo no Revit
+        (2026-09-10, perf_diag.log): `Application.DoEvents()` chamado da
+        THREAD DE FUNDO do solver levou **2652,285s** (44 minutos) para
+        retornar - span "console.set_progress DoEvents" com dt=2652.285s,
+        tid=25324 (Dummy-1), com a pilha em process_walls_one_by_one ->
+        _progress_cb -> dispatch_progress_event -> set_progress. Enquanto
+        isso NENHUMA linha [PERF] de NENHUMA thread apareceu (o amostrador
+        acusou parado=2652,323s) e a thread 5932 (MainThread) ficou
+        `Running` com 44,2s de CPU, 6x a segunda colocada - medido de FORA
+        do processo, sem depender da GIL.
+
+        POR QUE o guarda antigo nao pegava: `_invoke_if_needed` decide por
+        `Control.InvokeRequired`, que devolve **False** quando o controle
+        NAO TEM HANDLE VIVO - nao apenas quando ja' se esta' na thread de
+        UI. Com a janela da Tela 1 fechada/descartada (ou antes do handle
+        existir), a thread de fundo caia no corpo do metodo e chamava
+        `DoEvents()` numa thread SEM bomba de mensagens. Confirmado no
+        mesmo log: `ui_invoke.direto (ja na thread de UI)` foi registrado
+        a partir de tid=25324, ou seja `Form.InvokeRequired` era False para
+        a thread de fundo.
+
+        `DoEvents()` continua exatamente como era na thread de UI - e' o que
+        permite a janela repintar durante trabalho longo (ver ETAPA 5). Fora
+        dela, virou no-op."""
+        if self._closed:
+            return
+        try:
+            if _DotNetThread.CurrentThread.ManagedThreadId != self._ui_thread_id:
+                return
+        except Exception:
+            return
+        try:
+            Application.DoEvents()
+        except Exception:
+            pass
 
     # ------------------------------------------------------------- log
     def _invoke_if_needed(self, fn):
@@ -8696,7 +8739,7 @@ class _ProgressConsole(object):
             # medida em 2026-09-09. Cronometrado para confirmar ou
             # descartar.
             with _perf.span("console.log DoEvents"):
-                Application.DoEvents()
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8714,7 +8757,7 @@ class _ProgressConsole(object):
             self._status_label.Text = text
             self._status_label.ForeColor = color
             with _perf.span("console.set_status DoEvents"):
-                Application.DoEvents()
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8738,7 +8781,7 @@ class _ProgressConsole(object):
             self._detail_label.Text = detail or "{}/{} processado(s) - {}%".format(done, total, pct)
             self._touch(detail or "")
             with _perf.span("console.set_progress DoEvents"):
-                Application.DoEvents()
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8759,7 +8802,7 @@ class _ProgressConsole(object):
                 self._detail_label.Text = detail
             self._touch(detail or "")
             with _perf.span("console.set_indeterminate DoEvents"):
-                Application.DoEvents()
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8772,7 +8815,7 @@ class _ProgressConsole(object):
             self._progress_bar.Value = 100
             self.set_status(text, "ok")
             self._detail_label.Text = "Concluido."
-            Application.DoEvents()
+            self._pump_ui()
         except Exception:
             pass
 
@@ -8781,7 +8824,7 @@ class _ProgressConsole(object):
             return
         try:
             self.set_status(text, "error")
-            Application.DoEvents()
+            self._pump_ui()
         except Exception:
             pass
 
