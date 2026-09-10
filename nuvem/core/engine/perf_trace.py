@@ -41,6 +41,26 @@ except AttributeError:  # pragma: no cover - IronPython 2.7
     except AttributeError:
         _process_cpu = None
 
+# ID NATIVO da thread (o mesmo que o Windows/.NET usa). E' a CHAVE DE JUNCAO
+# entre este log e uma amostragem feita de FORA do processo: `threading.
+# current_thread().ident` e' um handle do CPython e nao casa com nada que o
+# Gerenciador de Tarefas ou o PowerShell mostrem. Sem isso e' impossivel dizer
+# QUAL thread do SO era a que estava rodando durante um congelamento.
+try:
+    import ctypes as _ctypes
+    _GetCurrentThreadId = _ctypes.windll.kernel32.GetCurrentThreadId
+except Exception:  # pragma: no cover - fora do Windows
+    _GetCurrentThreadId = None
+
+
+def _native_tid():
+    if _GetCurrentThreadId is None:
+        return -1
+    try:
+        return _GetCurrentThreadId()
+    except Exception:
+        return -1
+
 __all__ = [
     "enable", "disable", "is_enabled", "log_path", "mark", "span", "reset",
     "start_stall_sampler", "stop_stall_sampler",
@@ -130,9 +150,9 @@ def mark(tag, **fields):
                 cpu = "cpu={:8.3f}s ".format(_process_cpu() - _CPU0)
             except Exception:
                 cpu = ""
-        _write("[PERF] +{:9.3f}s {}thr={:<3} tid={:<5} {} {}".format(
+        _write("[PERF] +{:9.3f}s {}thr={:<3} tid={:<5} ntid={:<6} {} {}".format(
             _now(), cpu, threading.active_count(),
-            threading.current_thread().ident, tag, extra).rstrip())
+            threading.current_thread().ident, _native_tid(), tag, extra).rstrip())
     except Exception:
         pass
 
@@ -205,7 +225,16 @@ def _formatar_pilhas(limite_por_thread=6):
         nomes = {}
         for t in threading.enumerate():
             nomes[t.ident] = t.name
+        vivos = sorted(nomes)
         linhas = []
+        com_frame = set(_sys._current_frames())
+        sem_frame = [i for i in vivos if i not in com_frame]
+        if sem_frame:
+            # SINAL PROPRIO: uma thread viva SEM frame Python esta' dentro de
+            # uma chamada nativa. E' exatamente a assinatura de um retentor
+            # nativo da GIL (confirmado no teste com ctypes.PyDLL).
+            linhas.append("    !! threads VIVAS sem frame Python (dentro de codigo nativo): {}".format(
+                ", ".join("{} ({})".format(i, nomes.get(i, "?")) for i in sem_frame)))
         for ident, frame in _sys._current_frames().items():
             linhas.append("    --- tid={} ({}) ---".format(ident, nomes.get(ident, "?")))
             pilha = _tb.extract_stack(frame)[-limite_por_thread:]
