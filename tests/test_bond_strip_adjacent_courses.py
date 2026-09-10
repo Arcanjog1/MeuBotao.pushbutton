@@ -232,3 +232,128 @@ def audit_sem_junta_corrida(walls, cc):
     audit = _auditar(walls, cc)
     assert audit["continuous_joints"] == [], audit["continuous_joints"]
     return True
+
+
+# =====================================================================
+# REPRODUCAO COM O SOLVER REAL (2026-09-10) - sem Revit, sem MCP
+#
+# Os testes acima codificam a geometria MEDIDA no Revit. Este roda o
+# SOLVER DE VERDADE sobre a bancada e reproduz o falso positivo com a
+# mensagem exata que o usuario viu, provando tambem POR QUE o bench
+# offline nunca o pegava: o solver, no referencial do input do benchmark,
+# atribui as letras A/B TROCADAS em relacao a execucao real no Revit.
+#
+#   offline: fiada par = B34[0..34] B34[35..69] | impar = B19[0..19] B34[20..54]
+#   Revit  : fiada par = B19[0..19] B34[20..54] | impar = B34[0..34] B34[35..69]
+#
+# O cluster de peca especial nao isenta fica em t~37 nas DUAS. A diferenca
+# e' so' quantas fiadas entram nele:
+#
+#   paridade offline -> 8 fiadas de 17 = 0,471  < BOND_STRIP_RATIO (0,5) -> nao dispara
+#   paridade Revit   -> 9 fiadas de 17 = 0,529 >= BOND_STRIP_RATIO       -> DISPARA
+#
+# Ou seja: o veredito do auditor dependia de QUAL paridade o solver
+# escolheu para uma solucao fisicamente equivalente - um cara-ou-coroa em
+# cima do limiar. A correcao por adjacencia torna o auditor INVARIANTE a
+# paridade, que e' a propriedade correta.
+# =====================================================================
+
+L_LONGA_CM = 354.01
+L_CURTA_CM = 69.0
+
+
+def _bancada_com_solver_real():
+    """(walls, nodes, ends, openings, catalog, course_candidates) da bancada
+    de 2 paredes / 1 L, resolvida pelo solver REAL."""
+    walls = [_wall(0.0, 0.0, 0.0, L_CURTA_CM),
+             _wall(-7.0, L_CURTA_CM - 7.0, L_LONGA_CM - 7.0, L_CURTA_CM - 7.0)]
+    walls, junction_map = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, ends = m.build_wall_graph(walls, junction_map)
+    openings = [[], []]
+    res = m.solve_building_blocks_all_courses(
+        nodes, walls, ends, openings, CATALOG, ft(612.0), NUM_COURSES,
+        variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
+    return walls, nodes, ends, openings, res["course_candidates"]
+
+
+def _reprovadas(walls, nodes, ends, openings, cc, minimo_adjacencia):
+    original = m.BOND_STRIP_MIN_ADJACENT_COURSES
+    m.BOND_STRIP_MIN_ADJACENT_COURSES = minimo_adjacencia
+    try:
+        todas = m.audit_all_walls_bond_quality(
+            walls, cc, CATALOG, NUM_COURSES,
+            openings_per_wall=openings, nodes=nodes, end_to_node=ends)
+        faixas = []
+        for wi, aud in sorted(todas.items()):
+            faixas += [(wi, p) for p in aud["problems"]
+                       if p.startswith("REPEATED_VERTICAL_COMPENSATOR_STRIP")]
+        return faixas, todas
+    finally:
+        m.BOND_STRIP_MIN_ADJACENT_COURSES = original
+
+
+def test_solver_real_reproduz_o_falso_positivo():
+    """O solver REAL reproduz o falso positivo com a mensagem EXATA do
+    relato - e a correcao o elimina. Fecha o caso sem Revit.
+
+    NAO fixa qual paridade dispara: qual das duas letras o solver chama de
+    "A" depende do referencial de coordenadas (foi exatamente isso que fez
+    o bench offline nunca pegar o defeito). O que o teste exige e' que, com
+    a logica ANTIGA, UMA das duas paridades reprove com a mensagem do
+    relato - e que com a NOVA nenhuma reprove."""
+    walls, nodes, ends, openings, cc = _bancada_com_solver_real()
+    assert sum(len(v) for v in cc.values()) == 187, sum(len(v) for v in cc.values())
+
+    cc_trocada = {ci: cc[1 if ci % 2 == 0 else 0] for ci in range(NUM_COURSES)}
+
+    antigas = []
+    for usado in (cc, cc_trocada):
+        faixas, _ = _reprovadas(walls, nodes, ends, openings, usado, 0)
+        antigas.append(faixas)
+    disparadas = [f for f in antigas if f]
+    assert disparadas, "a logica antiga nao reproduziu o falso positivo em nenhuma paridade"
+    _wi, msg = disparadas[0][0]
+    assert "B34" in msg and "9 fiadas" in msg, msg
+    assert "0, 2, 4, 6, 8, 10, 12, 14, 16" in msg, msg
+
+    for usado in (cc, cc_trocada):
+        novas, todas = _reprovadas(walls, nodes, ends, openings, usado, 2)
+        assert novas == [], "a correcao nao eliminou o falso positivo: %r" % (novas,)
+        assert all(aud["ok"] for aud in todas.values()), {
+            wi: aud["problems"] for wi, aud in todas.items() if not aud["ok"]}
+    # e continua VISIVEL como dado, nao silenciado
+    _novas, todas = _reprovadas(walls, nodes, ends, openings, cc, 2)
+    assert any(aud.get("alternating_strips") for aud in todas.values())
+
+
+def test_veredito_do_auditor_e_invariante_a_paridade_A_B():
+    """A propriedade que a correcao garante: duas solucoes FISICAMENTE
+    equivalentes (o mesmo par A/B, com as letras trocadas) recebem o MESMO
+    veredito.
+
+    Antes NAO recebiam: o cluster de peca especial nao isenta cai em t~37
+    nas duas, mas entram 8 fiadas numa paridade (8/17 = 0,471, abaixo de
+    BOND_STRIP_RATIO = 0,5) e 9 na outra (9/17 = 0,529, acima). O limiar
+    ficava exatamente entre os dois, e o veredito virava cara-ou-coroa."""
+    walls, nodes, ends, openings, cc = _bancada_com_solver_real()
+    cc_trocada = {ci: cc[1 if ci % 2 == 0 else 0] for ci in range(NUM_COURSES)}
+
+    nova_direta, _ = _reprovadas(walls, nodes, ends, openings, cc, 2)
+    nova_trocada, _ = _reprovadas(walls, nodes, ends, openings, cc_trocada, 2)
+    assert nova_direta == nova_trocada == [], (nova_direta, nova_trocada)
+
+    # prova de que a fragilidade EXISTIA: com a logica antiga os dois
+    # vereditos DIVERGEM para a mesma fisica.
+    antiga_direta, _ = _reprovadas(walls, nodes, ends, openings, cc, 0)
+    antiga_trocada, _ = _reprovadas(walls, nodes, ends, openings, cc_trocada, 0)
+    assert bool(antiga_direta) != bool(antiga_trocada), (
+        "a fragilidade de paridade nao ficou demonstrada: %r vs %r"
+        % (antiga_direta, antiga_trocada))
+
+
+def test_constante_de_adjacencia_esta_ativa_no_codigo_entregue():
+    """Os dois testes acima manipulam BOND_STRIP_MIN_ADJACENT_COURSES de
+    proposito, para comparar as duas logicas - por isso passariam mesmo se
+    o valor ENTREGUE fosse revertido para 0. Este teste guarda o valor de
+    producao: sem ele, um `= 0` de volta no codigo passaria batido."""
+    assert m.BOND_STRIP_MIN_ADJACENT_COURSES >= 2, m.BOND_STRIP_MIN_ADJACENT_COURSES
