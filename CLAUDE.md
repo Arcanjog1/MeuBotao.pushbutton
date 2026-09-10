@@ -165,3 +165,14 @@ Conta como conhecimento de amarracao:
 
 Um erro de amarracao que volta a acontecer porque a regra nao foi escrita
 e' considerado falha do processo, nao do solver.
+
+
+## Navegação consolidada (2026-09-10)
+
+START_HERE é a entrada. rules/ e benchmark/ são índices; reference_projects/
+separa evidência humana, com primários legados. docs/decisions registra
+contratos pendentes; merge documental não é aprovação normativa.
+Citar arquivo + SHA para seções de branches diferentes.
+Pedido de 2026-09-10 autoriza somente #33/#35 evidenciais e o PR consolidado
+sem mudança física/normativa, após gates; não permite mesclar Beta 1/#31/#34
+ou implementar estratégias novas.

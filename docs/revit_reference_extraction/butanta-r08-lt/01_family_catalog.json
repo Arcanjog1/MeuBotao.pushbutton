@@ -1,0 +1,1052 @@
+{
+ "project": {
+  "project_id": "butanta-r08-lt",
+  "document_name": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO)",
+  "document_path": "T:\\EM ANDAMENTO\\CIV0495_BUTANTA\\PRANCHAS\\BIM\\REVIT\\BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO).rvt",
+  "revit_version": "2026 (build 26.3.0.37)",
+  "length_unit": "centimeters",
+  "extraction_date": "2026-09-09",
+  "method": "pyRevit Routes POST /revit_mcp/execute_code/ (porta 48885) - SOMENTE LEITURA, nenhuma Transaction aberta"
+ },
+ "n_family_types": 21,
+ "n_pieces": 65747,
+ "families": [
+  {
+   "family_name": "BLOCO INTEIRO - 14x19x39",
+   "type_name": "BLOCO INTEIRO - 14x19x39",
+   "category": "Modelos genéricos",
+   "instances": 31540,
+   "solid_dims_cm_MEDIDO": [
+    39.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 5020.3,
+   "bbox_dims_cm_MEDIDO": [
+    41.0,
+    14.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    39.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    39.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "B39",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 3059,
+    "2º PAVIMENTO": 3186,
+    "BARRILETE": 2453,
+    "COBERTURA": 470,
+    "9º PAVIMENTO": 3192,
+    "PAV. TÉRREO": 64,
+    "3º PAVIMENTO": 3186,
+    "4º PAVIMENTO": 3186,
+    "5º PAVIMENTO": 3186,
+    "6º PAVIMENTO": 3186,
+    "7º PAVIMENTO": 3186,
+    "8º PAVIMENTO": 3186
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "BLOCO 34 - 14x19x34",
+   "type_name": "BLOCO 34 - 14x19x34",
+   "category": "Modelos genéricos",
+   "instances": 15651,
+   "solid_dims_cm_MEDIDO": [
+    34.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 4545.3,
+   "bbox_dims_cm_MEDIDO": [
+    36.0,
+    14.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    34.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    34.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "B34",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 1615,
+    "2º PAVIMENTO": 1610,
+    "BARRILETE": 987,
+    "COBERTURA": 110,
+    "9º PAVIMENTO": 1605,
+    "PAV. TÉRREO": 64,
+    "3º PAVIMENTO": 1610,
+    "4º PAVIMENTO": 1610,
+    "5º PAVIMENTO": 1610,
+    "6º PAVIMENTO": 1610,
+    "7º PAVIMENTO": 1610,
+    "8º PAVIMENTO": 1610
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "CANALETA INTEIRA - 14x19x39",
+   "type_name": "CANALETA INTEIRA - 14x19x39",
+   "category": "Modelos genéricos",
+   "instances": 5865,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    39.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 4582.5,
+   "bbox_dims_cm_MEDIDO": [
+    14.04,
+    41.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    39.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    39.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 587,
+    "2º PAVIMENTO": 614,
+    "BARRILETE": 333,
+    "COBERTURA": 94,
+    "9º PAVIMENTO": 549,
+    "PAV. TÉRREO": 4,
+    "3º PAVIMENTO": 614,
+    "4º PAVIMENTO": 614,
+    "5º PAVIMENTO": 614,
+    "6º PAVIMENTO": 614,
+    "7º PAVIMENTO": 614,
+    "8º PAVIMENTO": 614
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "MEIO BLOCO - 14x19x19",
+   "type_name": "MEIO BLOCO - 14x19x19",
+   "category": "Modelos genéricos",
+   "instances": 2700,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    19.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 2676.4,
+   "bbox_dims_cm_MEDIDO": [
+    14.0,
+    21.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    19.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    19.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "B19",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 324,
+    "2º PAVIMENTO": 288,
+    "BARRILETE": 65,
+    "9º PAVIMENTO": 295,
+    "3º PAVIMENTO": 288,
+    "4º PAVIMENTO": 288,
+    "5º PAVIMENTO": 288,
+    "6º PAVIMENTO": 288,
+    "7º PAVIMENTO": 288,
+    "8º PAVIMENTO": 288
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "CANALETA 34 - 14x19x34",
+   "type_name": "CANALETA 34 - 14x19x34",
+   "category": "Modelos genéricos",
+   "instances": 2615,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    34.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 3995.0,
+   "bbox_dims_cm_MEDIDO": [
+    14.06,
+    36.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    34.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    34.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 270,
+    "2º PAVIMENTO": 276,
+    "BARRILETE": 134,
+    "COBERTURA": 22,
+    "9º PAVIMENTO": 253,
+    "PAV. TÉRREO": 4,
+    "3º PAVIMENTO": 276,
+    "4º PAVIMENTO": 276,
+    "5º PAVIMENTO": 276,
+    "6º PAVIMENTO": 276,
+    "7º PAVIMENTO": 276,
+    "8º PAVIMENTO": 276
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "PASTILHA - 14x19X4",
+   "type_name": "PASTILHA - 14x19X4",
+   "category": "Modelos genéricos",
+   "instances": 2329,
+   "solid_dims_cm_MEDIDO": [
+    4.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1064.0,
+   "bbox_dims_cm_MEDIDO": [
+    6.0,
+    14.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    4.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    4.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "C04",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 245,
+    "2º PAVIMENTO": 240,
+    "BARRILETE": 117,
+    "9º PAVIMENTO": 223,
+    "PAV. TÉRREO": 64,
+    "3º PAVIMENTO": 240,
+    "4º PAVIMENTO": 240,
+    "5º PAVIMENTO": 240,
+    "6º PAVIMENTO": 240,
+    "7º PAVIMENTO": 240,
+    "8º PAVIMENTO": 240
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "COMPENSADOR 14x19x9",
+   "type_name": "COMPENSADOR 14x19x9",
+   "category": "Modelos genéricos",
+   "instances": 2129,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    9.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1282.5,
+   "bbox_dims_cm_MEDIDO": [
+    14.0,
+    11.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    9.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    9.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "C09",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 242,
+    "2º PAVIMENTO": 220,
+    "BARRILETE": 101,
+    "9º PAVIMENTO": 214,
+    "PAV. TÉRREO": 32,
+    "3º PAVIMENTO": 220,
+    "4º PAVIMENTO": 220,
+    "5º PAVIMENTO": 220,
+    "6º PAVIMENTO": 220,
+    "7º PAVIMENTO": 220,
+    "8º PAVIMENTO": 220
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "BLOCO 54 - 14x19x54",
+   "type_name": "BLOCO 54 - 14x19x54",
+   "category": "Modelos genéricos",
+   "instances": 1614,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    54.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 6889.2,
+   "bbox_dims_cm_MEDIDO": [
+    14.02,
+    56.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    54.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    54.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": "B54",
+   "solver_status": "SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 170,
+    "2º PAVIMENTO": 170,
+    "BARRILETE": 84,
+    "9º PAVIMENTO": 170,
+    "3º PAVIMENTO": 170,
+    "4º PAVIMENTO": 170,
+    "5º PAVIMENTO": 170,
+    "6º PAVIMENTO": 170,
+    "7º PAVIMENTO": 170,
+    "8º PAVIMENTO": 170
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "COMPENSADOR 14x19x9 (deitado)",
+   "type_name": "COMPENSADOR 14x19x9 (deitado)",
+   "category": "Modelos genéricos",
+   "instances": 633,
+   "solid_dims_cm_MEDIDO": [
+    19.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1282.5,
+   "bbox_dims_cm_MEDIDO": [
+    21.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    19.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    19.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 62,
+    "2º PAVIMENTO": 62,
+    "9º PAVIMENTO": 123,
+    "PAV. TÉRREO": 14,
+    "3º PAVIMENTO": 62,
+    "4º PAVIMENTO": 62,
+    "5º PAVIMENTO": 62,
+    "6º PAVIMENTO": 62,
+    "7º PAVIMENTO": 62,
+    "8º PAVIMENTO": 62
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180
+   ]
+  },
+  {
+   "family_name": "MEIA CANALETA - 14x19x19",
+   "type_name": "MEIA CANALETA - 14x19x19",
+   "category": "Modelos genéricos",
+   "instances": 194,
+   "solid_dims_cm_MEDIDO": [
+    19.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 2232.5,
+   "bbox_dims_cm_MEDIDO": [
+    21.0,
+    14.07,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    19.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    19.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 19,
+    "2º PAVIMENTO": 20,
+    "BARRILETE": 15,
+    "9º PAVIMENTO": 18,
+    "PAV. TÉRREO": 2,
+    "3º PAVIMENTO": 20,
+    "4º PAVIMENTO": 20,
+    "5º PAVIMENTO": 20,
+    "6º PAVIMENTO": 20,
+    "7º PAVIMENTO": 20,
+    "8º PAVIMENTO": 20
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "CANALETA J - 14x9-19x19",
+   "type_name": "CANALETA J - 14x9-19x19",
+   "category": "Modelos genéricos",
+   "instances": 190,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    19.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1757.5,
+   "bbox_dims_cm_MEDIDO": [
+    14.13,
+    21.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    19.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    19.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": false,
+   "levels": {
+    "9º PAVIMENTO": 86,
+    "1º PAVIMENTO": 13,
+    "2º PAVIMENTO": 13,
+    "3º PAVIMENTO": 13,
+    "4º PAVIMENTO": 13,
+    "5º PAVIMENTO": 13,
+    "6º PAVIMENTO": 13,
+    "7º PAVIMENTO": 13,
+    "8º PAVIMENTO": 13
+   },
+   "rotations_deg": [
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+   "type_name": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+   "category": "Modelos genéricos",
+   "instances": 95,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 945.0,
+   "bbox_dims_cm_MEDIDO": [
+    16.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    14.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    4.0,
+    9.0,
+    9.01,
+    12.73,
+    13.5,
+    13.97,
+    14.0,
+    14.1
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 8,
+    "2º PAVIMENTO": 7,
+    "9º PAVIMENTO": 34,
+    "PAV. TÉRREO": 4,
+    "3º PAVIMENTO": 7,
+    "4º PAVIMENTO": 7,
+    "5º PAVIMENTO": 7,
+    "6º PAVIMENTO": 7,
+    "7º PAVIMENTO": 7,
+    "8º PAVIMENTO": 7
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180
+   ]
+  },
+  {
+   "family_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+   "type_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+   "category": "Modelos genéricos",
+   "instances": 57,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    8.99,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1056.7,
+   "bbox_dims_cm_MEDIDO": [
+    14.07,
+    10.99,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    8.99,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    8.98,
+    8.99,
+    9.0,
+    9.01,
+    9.04,
+    14.0,
+    24.04,
+    29.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 6,
+    "2º PAVIMENTO": 6,
+    "BARRILETE": 3,
+    "9º PAVIMENTO": 6,
+    "3º PAVIMENTO": 6,
+    "4º PAVIMENTO": 6,
+    "5º PAVIMENTO": 6,
+    "6º PAVIMENTO": 6,
+    "7º PAVIMENTO": 6,
+    "8º PAVIMENTO": 6
+   },
+   "rotations_deg": [
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "BLOCO 34 CORTADO - 14x9x34",
+   "type_name": "BLOCO 34 CORTADO - 14x9x34",
+   "category": "Modelos genéricos",
+   "instances": 44,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    34.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 2153.0,
+   "bbox_dims_cm_MEDIDO": [
+    14.0,
+    36.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    34.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    34.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 4,
+    "2º PAVIMENTO": 5,
+    "9º PAVIMENTO": 5,
+    "3º PAVIMENTO": 5,
+    "4º PAVIMENTO": 5,
+    "5º PAVIMENTO": 5,
+    "6º PAVIMENTO": 5,
+    "7º PAVIMENTO": 5,
+    "8º PAVIMENTO": 5
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "MEIO BLOCO CORTADO - 14x9x19",
+   "type_name": "MEIO BLOCO CORTADO - 14x9x19",
+   "category": "Modelos genéricos",
+   "instances": 28,
+   "solid_dims_cm_MEDIDO": [
+    19.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1267.8,
+   "bbox_dims_cm_MEDIDO": [
+    21.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    19.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    19.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 4,
+    "9º PAVIMENTO": 3,
+    "2º PAVIMENTO": 3,
+    "3º PAVIMENTO": 3,
+    "4º PAVIMENTO": 3,
+    "5º PAVIMENTO": 3,
+    "6º PAVIMENTO": 3,
+    "7º PAVIMENTO": 3,
+    "8º PAVIMENTO": 3
+   },
+   "rotations_deg": [
+    0,
+    90,
+    180,
+    270
+   ]
+  },
+  {
+   "family_name": "BLOCO 54 CORTADO - 14x9x54",
+   "type_name": "BLOCO 54 CORTADO - 14x9x54",
+   "category": "Modelos genéricos",
+   "instances": 18,
+   "solid_dims_cm_MEDIDO": [
+    54.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 3263.3,
+   "bbox_dims_cm_MEDIDO": [
+    56.0,
+    14.02,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    54.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    54.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 2,
+    "2º PAVIMENTO": 2,
+    "9º PAVIMENTO": 2,
+    "3º PAVIMENTO": 2,
+    "4º PAVIMENTO": 2,
+    "5º PAVIMENTO": 2,
+    "6º PAVIMENTO": 2,
+    "7º PAVIMENTO": 2,
+    "8º PAVIMENTO": 2
+   },
+   "rotations_deg": [
+    0
+   ]
+  },
+  {
+   "family_name": "PASTILHA CORTADA- 14x9X4",
+   "type_name": "PASTILHA CORTADA- 14x9X4",
+   "category": "Modelos genéricos",
+   "instances": 16,
+   "solid_dims_cm_MEDIDO": [
+    4.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 504.0,
+   "bbox_dims_cm_MEDIDO": [
+    6.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    4.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    4.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "2º PAVIMENTO": 2,
+    "9º PAVIMENTO": 2,
+    "3º PAVIMENTO": 2,
+    "4º PAVIMENTO": 2,
+    "5º PAVIMENTO": 2,
+    "6º PAVIMENTO": 2,
+    "7º PAVIMENTO": 2,
+    "8º PAVIMENTO": 2
+   },
+   "rotations_deg": [
+    0
+   ]
+  },
+  {
+   "family_name": "CANALETA J CORTADA - 14x9-19xVAR",
+   "type_name": "CANALETA J CORTADA - 14x9-19xVAR",
+   "category": "Modelos genéricos",
+   "instances": 10,
+   "solid_dims_cm_MEDIDO": [
+    14.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 1295.0,
+   "bbox_dims_cm_MEDIDO": [
+    14.13,
+    16.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    14.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    9.0,
+    14.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": true,
+   "is_cut": true,
+   "levels": {
+    "9º PAVIMENTO": 2,
+    "1º PAVIMENTO": 1,
+    "2º PAVIMENTO": 1,
+    "3º PAVIMENTO": 1,
+    "4º PAVIMENTO": 1,
+    "5º PAVIMENTO": 1,
+    "6º PAVIMENTO": 1,
+    "7º PAVIMENTO": 1,
+    "8º PAVIMENTO": 1
+   },
+   "rotations_deg": [
+    90,
+    270
+   ]
+  },
+  {
+   "family_name": "BLOCO INTEIRO CORTADO - 14x9x39",
+   "type_name": "BLOCO INTEIRO CORTADO - 14x9x39",
+   "category": "Modelos genéricos",
+   "instances": 9,
+   "solid_dims_cm_MEDIDO": [
+    39.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 2378.0,
+   "bbox_dims_cm_MEDIDO": [
+    41.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    39.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    39.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "1º PAVIMENTO": 1,
+    "2º PAVIMENTO": 1,
+    "9º PAVIMENTO": 1,
+    "3º PAVIMENTO": 1,
+    "4º PAVIMENTO": 1,
+    "5º PAVIMENTO": 1,
+    "6º PAVIMENTO": 1,
+    "7º PAVIMENTO": 1,
+    "8º PAVIMENTO": 1
+   },
+   "rotations_deg": [
+    180
+   ]
+  },
+  {
+   "family_name": "COMPENSADOR CORTADO - 14xVARx9",
+   "type_name": "COMPENSADOR CORTADO - 14xVARx9",
+   "category": "Modelos genéricos",
+   "instances": 9,
+   "solid_dims_cm_MEDIDO": [
+    9.0,
+    14.0,
+    9.0
+   ],
+   "solid_volume_cm3_MEDIDO": 607.5,
+   "bbox_dims_cm_MEDIDO": [
+    11.0,
+    14.0,
+    9.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    9.0,
+    9.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    9.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    9.0
+   ],
+   "solver_code": null,
+   "solver_status": "NOT_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": true,
+   "levels": {
+    "2º PAVIMENTO": 1,
+    "1º PAVIMENTO": 1,
+    "9º PAVIMENTO": 1,
+    "3º PAVIMENTO": 1,
+    "4º PAVIMENTO": 1,
+    "5º PAVIMENTO": 1,
+    "6º PAVIMENTO": 1,
+    "7º PAVIMENTO": 1,
+    "8º PAVIMENTO": 1
+   },
+   "rotations_deg": [
+    0
+   ]
+  },
+  {
+   "family_name": "BLOCO INTEIRO - 14x19x39",
+   "type_name": "BLOCO INTEIRO VEDAÇÃO - 14x19x39",
+   "category": "Modelos genéricos",
+   "instances": 1,
+   "solid_dims_cm_MEDIDO": [
+    39.0,
+    14.0,
+    19.0
+   ],
+   "solid_volume_cm3_MEDIDO": 5020.3,
+   "bbox_dims_cm_MEDIDO": [
+    41.0,
+    14.0,
+    19.0
+   ],
+   "param_L_H_W_cm_MEDIDO": [
+    39.0,
+    19.0,
+    14.0
+   ],
+   "instance_L_values_cm_MEDIDO": [
+    39.0
+   ],
+   "instance_H_values_cm_MEDIDO": [
+    19.0
+   ],
+   "solver_code": null,
+   "solver_status": "PARTIALLY_SUPPORTED",
+   "is_canaleta": false,
+   "is_cut": false,
+   "levels": {
+    "1º PAVIMENTO": 1
+   },
+   "rotations_deg": [
+    0
+   ]
+  }
+ ]
+}

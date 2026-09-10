@@ -1,3 +1,5 @@
+> STATUS: HISTORICAL. SUPERSEDED BY para estado operacional: [PROJECT_STATUS.md](PROJECT_STATUS.md). Medições preservadas no SHA original.
+
 # CURRENT REFERENCE SNAPSHOT
 
 > Auditoria 2026-09-09: esta medicao e HISTORICA, de `68a6269`, nao da

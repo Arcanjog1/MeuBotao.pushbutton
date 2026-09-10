@@ -1,0 +1,130 @@
+{
+ "project": {
+  "project_id": "butanta-r08-lt",
+  "document_name": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO)",
+  "document_path": "T:\\EM ANDAMENTO\\CIV0495_BUTANTA\\PRANCHAS\\BIM\\REVIT\\BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO).rvt",
+  "revit_version": "2026 (build 26.3.0.37)",
+  "length_unit": "centimeters",
+  "extraction_date": "2026-09-09",
+  "method": "pyRevit Routes POST /revit_mcp/execute_code/ (porta 48885) - SOMENTE LEITURA, nenhuma Transaction aberta"
+ },
+ "aviso": "Comparacao de FATOS MEDIDOS. Os numeros do TORRE EASY vem da extracao ja versionada em docs/revit_reference_extraction/ - o RVT antigo NAO foi reaberto. Esta tabela NAO e' regra do solver.",
+ "projeto_A": {
+  "nome": "TORRE EASY-LO-R00",
+  "fonte": "docs/revit_reference_extraction/REPORT_HUMAN_REVIT_MODULATION.md"
+ },
+ "projeto_B": {
+  "nome": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO)",
+  "fonte": "esta pasta"
+ },
+ "linhas": [
+  {
+   "aspecto": "Sistema acima de PORTA",
+   "torre_easy": "verga (familia dedicada, 9 cm de altura)",
+   "butanta": "CANALETA (fiada inteira de 19 cm)",
+   "diferenca": "SISTEMA DIFERENTE"
+  },
+  {
+   "aspecto": "Sistema abaixo de PORTA",
+   "torre_easy": "nenhum",
+   "butanta": "nenhum (peitoril 0)",
+   "diferenca": "igual"
+  },
+  {
+   "aspecto": "Sistema acima de JANELA",
+   "torre_easy": "verga",
+   "butanta": "CANALETA",
+   "diferenca": "SISTEMA DIFERENTE"
+  },
+  {
+   "aspecto": "Sistema abaixo de JANELA",
+   "torre_easy": "contraverga",
+   "butanta": "CANALETA",
+   "diferenca": "SISTEMA DIFERENTE"
+  },
+  {
+   "aspecto": "Altura da peca especial",
+   "torre_easy": "9 cm",
+   "butanta": "19 cm (fiada inteira)",
+   "diferenca": "2x mais alta"
+  },
+  {
+   "aspecto": "Offset base da peca acima x topo do vao",
+   "torre_easy": "0,00 cm (392/392)",
+   "butanta": "0,00 cm (136/136 com peca)",
+   "diferenca": "IDENTICO"
+  },
+  {
+   "aspecto": "Offset topo da peca abaixo x peitoril",
+   "torre_easy": "0,00 cm (147/147)",
+   "butanta": "0,00 cm (89/89)",
+   "diferenca": "IDENTICO"
+  },
+  {
+   "aspecto": "Apoio minimo medido",
+   "torre_easy": ">= 9 cm (784/784)",
+   "butanta": ">= 4 cm (min 4 cm; mediana 24 cm acima, 24 cm abaixo)",
+   "diferenca": "apoio menor, mas a canaleta e' continua e frequentemente vai ate' a proxima abertura"
+  },
+  {
+   "aspecto": "Ultima fiada 100% canaleta",
+   "torre_easy": "465/651 = 71,43%",
+   "butanta": "251/340 = 73.82%",
+   "diferenca": "praticamente igual"
+  },
+  {
+   "aspecto": "CORTADO = corte na altura",
+   "torre_easy": "3.636/3.887 = 93,54%",
+   "butanta": "124/286 = 43.36%",
+   "diferenca": "BUTANTA usa muito mais corte no COMPRIMENTO"
+  },
+  {
+   "aspecto": "Cobertura do catalogo do solver (pecas)",
+   "torre_easy": "54.298/67.712 = 80,19%",
+   "butanta": "55.963/65.747 = 85,12%",
+   "diferenca": "+4,93 pontos"
+  },
+  {
+   "aspecto": "Cobertura do catalogo (tipos)",
+   "torre_easy": "6/57",
+   "butanta": "6/21",
+   "diferenca": "BUTANTA tem catalogo de pecas bem mais enxuto"
+  },
+  {
+   "aspecto": "Walls nativas",
+   "torre_easy": "0",
+   "butanta": "0",
+   "diferenca": "igual"
+  },
+  {
+   "aspecto": "Portas/Janelas nativas",
+   "torre_easy": "0",
+   "butanta": "0",
+   "diferenca": "igual"
+  },
+  {
+   "aspecto": "Chave de parede",
+   "torre_easy": "parametro de texto 'Parede' (PAR1..PAR117)",
+   "butanta": "parametro de texto 'Parede' ('PARn - <faixa de pavimento>')",
+   "diferenca": "mesmo mecanismo; BUTANTA embute a faixa de pavimento no valor"
+  },
+  {
+   "aspecto": "Rotulo de abertura",
+   "torre_easy": "Titulo_abertura (PORTA 248 / JANELA 134 / ABERTURA 102)",
+   "butanta": "Titulo_abertura (PORTA 47 / JANELA 61 / ABERTURA 34)",
+   "diferenca": "mesmo parametro"
+  },
+  {
+   "aspecto": "bbox +2 cm no comprimento",
+   "torre_easy": "sim",
+   "butanta": "sim (20/20 familias)",
+   "diferenca": "IDENTICO - mesma biblioteca de familias"
+  },
+  {
+   "aspecto": "Familias de verga carregadas",
+   "torre_easy": "usadas (417+122 instancias)",
+   "butanta": "carregadas com 0 instancias (69 tipos)",
+   "diferenca": "prova de escolha deliberada do sistema de canaleta"
+  }
+ ]
+}

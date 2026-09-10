@@ -1,0 +1,33 @@
+{
+  "observed_utc": "2026-09-10T18:30:44.937352+00:00",
+  "reviewed_head": "11d571eb5f9cd2f736346e767da4724365042f6a",
+  "result": "PASS published JSON integrity and stated numeric checks; see limitations",
+  "files": {
+    "01_family_catalog.json": "05a6b12f17a975ce04413572413b1ea14b3eaa7e1f8760e5f26c72e1cd16df7f",
+    "02_openings.json": "15c998671f2f87c3ed3fad57a06a003d0e28e5ec9a09293d921670e5692d39d4",
+    "03_lintels.json": "adf993aa308ca786ad44c960dda29dec91f98a056beff2fb5f7e503ef9046643",
+    "04_counter_lintels.json": "bd840127a82187c52c281b973a1ea2bb6941288c3fa800ae4b1897c8e3e3a29d",
+    "05_channels.json": "4be8161bb209135515747717ecca070defec60bf93905ac4183f55338284fc01",
+    "06_cut_blocks.json": "d3dfa53db76a2f6f648d7ee86eed5b4c9b52ffe5dce61cb3f4be23274f28e9d6",
+    "07_special_blocks.json": "6eb0759a1cc80daf187ccc5e27b0aea437a6d7f2a3f2cbbb3fa9597b0cbd64ac",
+    "08_piece_opening_wall_relations.json": "86fbb962dd1d28f2e6ddd333b5fd29b45f7c03a56cf2b1790d2cb6c91b253d53",
+    "09_observed_patterns.json": "a96891bb393036094da35eab63022e93f25f7d3d72639618b88dc56314989c18"
+  },
+  "pieces": 67712,
+  "openings": 484,
+  "pipe_holes": 200,
+  "lintels": 392,
+  "counterlintels": 147,
+  "relations": 539,
+  "channels_total": 6584,
+  "cuts_total": 3887,
+  "special_detail_actual": 5536,
+  "special_b34_b54_detail": 3526,
+  "orientation_vectors_present": 0,
+  "limitations": [
+    "raw/pre.py absent",
+    "not rerun Revit",
+    "07 is gen3 format, not gen5 lean format",
+    "keys are not universal wall identities"
+  ]
+}

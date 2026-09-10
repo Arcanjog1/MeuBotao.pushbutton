@@ -1717,3 +1717,25 @@ GO tecnico restrito ao ensaio descrito, sem Finalizar/excluir referencias.
 [Checkpoint](checkpoints/2026-09-09-beta-main-safe.md),
 [relatorio](BETA_MAIN_SAFE_2026-09-09.md) e [runbook](BETA_MAIN_SAFE_RUNBOOK.md).
 Nenhum Revit iniciado ou outro merge executado.
+
+## 2026-09-10 — referências e arquitetura Beta 2
+
+[Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md) e [auditoria](GITHUB_STATE_2026-09-10.md). #33/#35 integrados; índices sem mover produção/dados oficiais. Arquitetura PENDING; Beta 1 CANDIDATO — VALIDAÇÃO REVIT PENDENTE. Nenhum Revit iniciado.
+
+## 2026-09-10 - Beta 1: tres causas fechadas, validacao Revit pendente
+
+[Checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md).
+Tres defeitos de INTEGRACAO corrigidos, nenhum de modulacao: (1) acao
+'create' perdida pelo `finally` do Execute(); (2) falso positivo
+REPEATED_VERTICAL_COMPENSATOR_STRIP - faixa vertical passa a exigir fiadas
+ADJACENTES, com o padrao de mesma paridade preservado como dado em
+`alternating_strips`; (3) `Application.DoEvents()` chamado da thread de
+fundo levou 2652,285s, corrigido com `_pump_ui`. Em seguida a thread de
+fundo do analyze foi RETIRADA (analyze sincrono no ExternalEvent) apos um
+deadlock de 1654,774s com o worker sem CPU; analyze custa 0,181s na thread
+principal. Achado de Z RECLASSIFICADO como comportamento esperado por
+decisao do usuario - nenhuma linha vertical alterada (regra 8a).
+Consolidada 1035 passed/2 falhas HISTORICAS identicas as de 8cdd33f.
+187 blocos/17 fiadas criados e medidos no Revit; recriacao sem duplicata.
+Beta 1 CANDIDATO - VALIDACAO REVIT PENDENTE com o pacote 712f221.
+Nenhum merge na main executado.

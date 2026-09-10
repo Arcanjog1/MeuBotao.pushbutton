@@ -1,0 +1,17 @@
+test_broken_local_link (test_validate.DocumentationTests.test_broken_local_link) ... ok
+test_candidate_cannot_be_official (test_validate.DocumentationTests.test_candidate_cannot_be_official) ... ok
+test_captured_log_hash (test_validate.DocumentationTests.test_captured_log_hash) ... ok
+test_ignored_checkpoint_does_not_satisfy_delivery (test_validate.DocumentationTests.test_ignored_checkpoint_does_not_satisfy_delivery) ... ok
+test_integrated_candidate_is_stale (test_validate.DocumentationTests.test_integrated_candidate_is_stale) ... ok
+test_missing_reference (test_validate.DocumentationTests.test_missing_reference) ... ok
+test_missing_required_field (test_validate.DocumentationTests.test_missing_required_field) ... ok
+test_old_status_rejected_after_main_moves (test_validate.DocumentationTests.test_old_status_rejected_after_main_moves) ... ok
+test_production_after_reviewed_head (test_validate.DocumentationTests.test_production_after_reviewed_head) ... ok
+test_unavailable_commit (test_validate.DocumentationTests.test_unavailable_commit) ... ok
+test_untracked_existing_link (test_validate.DocumentationTests.test_untracked_existing_link) ... ok
+test_valid_delivery (test_validate.DocumentationTests.test_valid_delivery) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 13.421s
+
+OK

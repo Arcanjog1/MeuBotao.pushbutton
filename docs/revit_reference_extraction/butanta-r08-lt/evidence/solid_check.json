@@ -1,0 +1,422 @@
+[
+ {
+  "bbox_dims_cm": [
+   36.0, 
+   14.0, 
+   19.0
+  ], 
+  "fam": "BLOCO 34 - 14x19x34", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   34.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6550082, 
+  "solid_dims_cm": [
+   34.0, 
+   14.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 4545.3000000000002
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.0, 
+   36.0, 
+   9.0
+  ], 
+  "fam": "BLOCO 34 CORTADO - 14x9x34", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   34.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 6627592, 
+  "solid_dims_cm": [
+   14.0, 
+   34.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 2153.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.020000000000000, 
+   56.0, 
+   19.0
+  ], 
+  "fam": "BLOCO 54 - 14x19x54", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   54.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6550207, 
+  "solid_dims_cm": [
+   14.0, 
+   54.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 6889.1999999999998
+ }, 
+ {
+  "bbox_dims_cm": [
+   56.0, 
+   14.020000000000000, 
+   19.0
+  ], 
+  "fam": "BLOCO 54 CORTADO - 14x9x54", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   54.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 7657398, 
+  "solid_dims_cm": [
+   54.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 3263.3000000000002
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.070000000000000, 
+   10.990000000000000, 
+   19.0
+  ], 
+  "fam": "BLOCO CANALETA CORTADO - 14x19xVAR", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   8.9900000000000002, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6624022, 
+  "solid_dims_cm": [
+   14.0, 
+   8.9900000000000002, 
+   19.0
+  ], 
+  "solid_vol_cm3": 1056.7000000000000
+ }, 
+ {
+  "bbox_dims_cm": [
+   41.0, 
+   14.0, 
+   19.0
+  ], 
+  "fam": "BLOCO INTEIRO - 14x19x39", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   39.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6550223, 
+  "solid_dims_cm": [
+   39.0, 
+   14.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 5020.3000000000002
+ }, 
+ {
+  "bbox_dims_cm": [
+   41.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "BLOCO INTEIRO CORTADO - 14x9x39", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   39.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 6627594, 
+  "solid_dims_cm": [
+   39.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 2378.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.060000000000000, 
+   36.0, 
+   19.0
+  ], 
+  "fam": "CANALETA 34 - 14x19x34", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   34.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6582581, 
+  "solid_dims_cm": [
+   14.0, 
+   34.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 3995.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.039999999999999, 
+   41.0, 
+   19.0
+  ], 
+  "fam": "CANALETA INTEIRA - 14x19x39", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   39.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6588742, 
+  "solid_dims_cm": [
+   14.0, 
+   39.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 4582.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.130000000000001, 
+   21.0, 
+   19.0
+  ], 
+  "fam": "CANALETA J - 14x9-19x19", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   19.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6847537, 
+  "solid_dims_cm": [
+   14.0, 
+   19.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 1757.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.130000000000001, 
+   16.0, 
+   19.0
+  ], 
+  "fam": "CANALETA J CORTADA - 14x9-19xVAR", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   14.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 7418753, 
+  "solid_dims_cm": [
+   14.0, 
+   14.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 1295.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.0, 
+   11.0, 
+   19.0
+  ], 
+  "fam": "COMPENSADOR 14x19x9", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   9.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6550366, 
+  "solid_dims_cm": [
+   14.0, 
+   9.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 1282.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   21.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "COMPENSADOR 14x19x9 (deitado)", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   19.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 6677892, 
+  "solid_dims_cm": [
+   19.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 1282.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   11.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "COMPENSADOR CORTADO - 14xVARx9", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   9.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 7721123, 
+  "solid_dims_cm": [
+   9.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 607.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   16.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "COMPENSADOR CORTADO 14x19x9 (deitado)", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   14.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 6677939, 
+  "solid_dims_cm": [
+   14.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 945.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   21.0, 
+   14.070000000000000, 
+   19.0
+  ], 
+  "fam": "MEIA CANALETA - 14x19x19", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   19.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6616208, 
+  "solid_dims_cm": [
+   19.0, 
+   14.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 2232.5
+ }, 
+ {
+  "bbox_dims_cm": [
+   14.0, 
+   21.0, 
+   19.0
+  ], 
+  "fam": "MEIO BLOCO - 14x19x19", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   19.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6550363, 
+  "solid_dims_cm": [
+   14.0, 
+   19.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 2676.4000000000001
+ }, 
+ {
+  "bbox_dims_cm": [
+   21.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "MEIO BLOCO CORTADO - 14x9x19", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   19.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 6627596, 
+  "solid_dims_cm": [
+   19.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 1267.8000000000000
+ }, 
+ {
+  "bbox_dims_cm": [
+   6.0, 
+   14.0, 
+   19.0
+  ], 
+  "fam": "PASTILHA - 14x19X4", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   4.0, 
+   19.0, 
+   14.0
+  ], 
+  "sample_id": 6552535, 
+  "solid_dims_cm": [
+   4.0, 
+   14.0, 
+   19.0
+  ], 
+  "solid_vol_cm3": 1064.0
+ }, 
+ {
+  "bbox_dims_cm": [
+   6.0, 
+   14.0, 
+   9.0
+  ], 
+  "fam": "PASTILHA CORTADA- 14x9X4", 
+  "n_solids": 1, 
+  "param_LHW_cm": [
+   4.0, 
+   9.0, 
+   14.0
+  ], 
+  "sample_id": 7721124, 
+  "solid_dims_cm": [
+   4.0, 
+   14.0, 
+   9.0
+  ], 
+  "solid_vol_cm3": 504.0
+ }
+]

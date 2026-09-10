@@ -1,0 +1,497 @@
+{
+ "project": {
+  "project_id": "butanta-r08-lt",
+  "document_name": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO)",
+  "document_path": "T:\\EM ANDAMENTO\\CIV0495_BUTANTA\\PRANCHAS\\BIM\\REVIT\\BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO).rvt",
+  "revit_version": "2026 (build 26.3.0.37)",
+  "length_unit": "centimeters",
+  "extraction_date": "2026-09-09",
+  "method": "pyRevit Routes POST /revit_mcp/execute_code/ (porta 48885) - SOMENTE LEITURA, nenhuma Transaction aberta"
+ },
+ "aviso": "EVIDENCIA MEDIDA - NAO NORMATIVO. Nenhum destes padroes foi promovido a regra do solver.",
+ "amostra": {
+  "pecas": 65747,
+  "aberturas_instanciadas": 142,
+  "aberturas_analisadas_com_clones": 400,
+  "grupos_de_parede": 340,
+  "canaletas": 8931,
+  "blocos_cortados": 286
+ },
+ "padroes": [
+  {
+   "id": "BP01",
+   "descricao": "Toda PORTA tem canaleta apoiada no topo do vao",
+   "ocorrencias": 47,
+   "total": 47,
+   "percentual": 100.0,
+   "confianca": "ALTA",
+   "excecoes": []
+  },
+  {
+   "id": "BP02",
+   "descricao": "Toda abertura com peitoril tem canaleta imediatamente abaixo do peitoril",
+   "ocorrencias": 89,
+   "total": 89,
+   "percentual": 100.0,
+   "confianca": "ALTA",
+   "excecoes": []
+  },
+  {
+   "id": "BP03",
+   "descricao": "Base da canaleta acima = topo do vao (offset vertical 0,00 cm)",
+   "ocorrencias": 135,
+   "total": 136,
+   "percentual": 99.26,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP04",
+   "descricao": "Topo da canaleta abaixo = peitoril (offset vertical 0,00 cm)",
+   "ocorrencias": 88,
+   "total": 89,
+   "percentual": 98.88,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP05",
+   "descricao": "Qualquer abertura (porta/janela/abertura) tem canaleta acima",
+   "ocorrencias": 130,
+   "total": 142,
+   "percentual": 91.55,
+   "confianca": "ALTA",
+   "excecoes": [
+    6919219,
+    6919324,
+    6920791,
+    6920792,
+    6922742,
+    6922743,
+    7719511,
+    7720857,
+    7722851,
+    7739806,
+    7742173,
+    7743976
+   ]
+  },
+  {
+   "id": "BP06",
+   "descricao": "Toda JANELA tem canaleta acima",
+   "ocorrencias": 58,
+   "total": 61,
+   "percentual": 95.08,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP07",
+   "descricao": "Vao rotulado ABERTURA tem canaleta acima",
+   "ocorrencias": 25,
+   "total": 34,
+   "percentual": 73.53,
+   "confianca": "MEDIA"
+  },
+  {
+   "id": "BP08",
+   "descricao": "Topo do vao na cota z_rel = 221 cm",
+   "ocorrencias": 134,
+   "total": 142,
+   "percentual": 94.37,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP09",
+   "descricao": "Nenhuma instancia de VERGA/CONTRAVERGA no modelo (69 tipos carregados, 0 usados)",
+   "ocorrencias": 0,
+   "total": 65747,
+   "percentual": 0.0,
+   "confianca": "ALTA",
+   "tipos_carregados": 69,
+   "instancias": 0,
+   "familias": [
+    "VERGA JANELA",
+    "VERGA JANELA 3 FUROS",
+    "VERGA PORTA",
+    "CONTRAVERGA"
+   ]
+  },
+  {
+   "id": "BP10",
+   "descricao": "Parametro de instancia 'Lintel' zerado em todas as pecas",
+   "ocorrencias": 65747,
+   "total": 65747,
+   "percentual": 100.0,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP11",
+   "descricao": "Toda peca de alvenaria tem 14 cm de largura",
+   "ocorrencias": 65747,
+   "total": 65747,
+   "percentual": 100.0,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP12",
+   "descricao": "Rotacao multipla exata de 90 graus",
+   "ocorrencias": 65747,
+   "total": 65747,
+   "percentual": 100.0,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP13",
+   "descricao": "Ultima fiada da parede e 100% canaleta (cinta de topo)",
+   "ocorrencias": 251,
+   "total": 340,
+   "percentual": 73.82,
+   "confianca": "MEDIA"
+  },
+  {
+   "id": "BP14",
+   "descricao": "CORTADO = corte na ALTURA (19 -> 9 cm)",
+   "ocorrencias": 124,
+   "total": 286,
+   "percentual": 43.36,
+   "confianca": "MEDIA",
+   "corte_em_COMPRIMENTO": 162
+  },
+  {
+   "id": "BP15",
+   "descricao": "Peca de 9 cm ocupa base ou meia-fiada da grade de 20 cm (9+1+9=19)",
+   "ocorrencias": 762,
+   "total": 852,
+   "percentual": 89.44,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP16",
+   "descricao": "2a fiada acima do vao tambem e canaleta (verga + cinta de topo adjacentes)",
+   "ocorrencias": 114,
+   "total": 142,
+   "percentual": 80.28,
+   "confianca": "MEDIA"
+  },
+  {
+   "id": "BP17",
+   "descricao": "Canaleta do modelo esta na fiada de topo da parede",
+   "ocorrencias": 4949,
+   "total": 8931,
+   "percentual": 55.41,
+   "confianca": "ALTA"
+  },
+  {
+   "id": "BP18",
+   "descricao": "Rotulo Titulo_abertura coerente com a geometria (PORTA <-> peitoril 0)",
+   "ocorrencias": 134,
+   "total": 142,
+   "percentual": 94.37,
+   "confianca": "ALTA"
+  }
+ ],
+ "apoios_laterais": {
+  "nota": "Apoio medido da JAMBA ate' a extremidade da corrida continua de canaleta. '_bbox' usa a bounding box (inclui 1 cm de junta por face); '_solid' subtrai esse 1 cm e e' o apoio real de alvenaria. Quando a corrida encosta na extremidade da parede o valor nao e' uma decisao de apoio, e sim continuidade - ver campos run_reaches_wall_*.",
+  "acima_esquerdo_solid": {
+   "n": 130,
+   "min": 4.0,
+   "p25": 33.99,
+   "mediana": 49.0,
+   "p75": 259.01,
+   "max": 1028.98,
+   "media": 205.95
+  },
+  "acima_direito_solid": {
+   "n": 130,
+   "min": 4.0,
+   "p25": 29.0,
+   "mediana": 49.0,
+   "p75": 259.0,
+   "max": 1028.98,
+   "media": 206.08
+  },
+  "acima_minimo_por_abertura_solid": {
+   "n": 130,
+   "min": 4.0,
+   "p25": 19.0,
+   "mediana": 39.0,
+   "p75": 59.01,
+   "max": 448.98,
+   "media": 101.5
+  },
+  "abaixo_esquerdo_solid": {
+   "n": 89,
+   "min": -0.99,
+   "p25": 19.01,
+   "mediana": 39.0,
+   "p75": 94.0,
+   "max": 259.01,
+   "media": 80.07
+  },
+  "abaixo_direito_solid": {
+   "n": 89,
+   "min": -1.01,
+   "p25": 19.0,
+   "mediana": 34.0,
+   "p75": 94.0,
+   "max": 259.0,
+   "media": 78.21
+  },
+  "abaixo_minimo_por_abertura_solid": {
+   "n": 89,
+   "min": -1.01,
+   "p25": 19.0,
+   "mediana": 24.0,
+   "p75": 39.0,
+   "max": 74.01,
+   "media": 31.64
+  },
+  "acima_limiares": {
+   ">=4 cm": 130,
+   ">=9 cm": 125,
+   ">=14 cm": 125,
+   ">=19 cm": 112,
+   ">=24 cm": 94,
+   ">=34 cm": 73,
+   ">=39 cm": 70
+  },
+  "abaixo_limiares": {
+   ">=4 cm": 85,
+   ">=9 cm": 83,
+   ">=14 cm": 80,
+   ">=19 cm": 72,
+   ">=24 cm": 46,
+   ">=34 cm": 31,
+   ">=39 cm": 24
+  },
+  "acima_n": 130,
+  "abaixo_n": 89,
+  "corrida_atinge_extremidade_da_parede": {
+   "acima": 4,
+   "abaixo": 3
+  }
+ },
+ "largura_do_vao_x_solucao": {
+  "120-149 cm": {
+   "n": 57,
+   "com_canaleta": 57,
+   "n_pecas_stats": {
+    "n": 57,
+    "min": 4,
+    "p25": 7,
+    "mediana": 16,
+    "p75": 31,
+    "max": 32,
+    "media": 19.02
+   }
+  },
+  "150-179 cm": {
+   "n": 24,
+   "com_canaleta": 18,
+   "n_pecas_stats": {
+    "n": 18,
+    "min": 15,
+    "p25": 16,
+    "mediana": 31,
+    "p75": 32,
+    "max": 32,
+    "media": 26.17
+   }
+  },
+  "60-89 cm": {
+   "n": 15,
+   "com_canaleta": 9,
+   "n_pecas_stats": {
+    "n": 9,
+    "min": 3,
+    "p25": 3,
+    "mediana": 3,
+    "p75": 5,
+    "max": 11,
+    "media": 4.44
+   }
+  },
+  "90-119 cm": {
+   "n": 43,
+   "com_canaleta": 43,
+   "n_pecas_stats": {
+    "n": 43,
+    "min": 3,
+    "p25": 4,
+    "mediana": 4,
+    "p75": 5,
+    "max": 11,
+    "media": 4.49
+   }
+  },
+  "270-299 cm": {
+   "n": 3,
+   "com_canaleta": 3,
+   "n_pecas_stats": {
+    "n": 3,
+    "min": 9,
+    "p25": 9,
+    "mediana": 9,
+    "p75": 9,
+    "max": 9,
+    "media": 9.0
+   }
+  }
+ },
+ "excecoes_detalhadas": [
+  {
+   "opening_id": 6919219,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 1º PAVIMENTO",
+   "nivel": "1º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 6919324,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 1º PAVIMENTO",
+   "nivel": "1º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 6920791,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 2º PAVIMENTO AO 8º PAVIMENTO (TIPO)",
+   "nivel": "2º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 6920792,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 2º PAVIMENTO AO 8º PAVIMENTO (TIPO)",
+   "nivel": "2º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 6922742,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 9º PAVIMENTO",
+   "nivel": "9º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 6922743,
+   "tipo": "ABERTURA",
+   "parede": "PAR28 - 9º PAVIMENTO",
+   "nivel": "9º PAVIMENTO",
+   "largura_cm": 156.0,
+   "topo_vao_cm": 221.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {},
+   "motivo_INFERIDO": "vao livre ate' o topo da parede - nao ha' fiada sobre o vao",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7719511,
+   "tipo": "JANELA",
+   "parede": "PAR12 - 1º PAVIMENTO",
+   "nivel": "1º PAVIMENTO",
+   "largura_cm": 66.0,
+   "topo_vao_cm": 91.0,
+   "topo_parede_cm": 261.0,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7720857,
+   "tipo": "JANELA",
+   "parede": "PAR10 - 1º PAVIMENTO",
+   "nivel": "2º PAVIMENTO",
+   "largura_cm": 66.0,
+   "topo_vao_cm": 71.0,
+   "topo_parede_cm": null,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7722851,
+   "tipo": "JANELA",
+   "parede": "PAR10 - 1º PAVIMENTO",
+   "nivel": "9º PAVIMENTO",
+   "largura_cm": 66.0,
+   "topo_vao_cm": 71.0,
+   "topo_parede_cm": null,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7739806,
+   "tipo": "ABERTURA",
+   "parede": "PAR18 - 2º PAVIMENTO AO 8º PAVIMENTO (TIPO)",
+   "nivel": "2º PAVIMENTO",
+   "largura_cm": 61.0,
+   "topo_vao_cm": 171.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7742173,
+   "tipo": "ABERTURA",
+   "parede": "PAR18 - 1º PAVIMENTO",
+   "nivel": "1º PAVIMENTO",
+   "largura_cm": 61.0,
+   "topo_vao_cm": 171.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  },
+  {
+   "opening_id": 7743976,
+   "tipo": "ABERTURA",
+   "parede": "PAR20 - 9º PAVIMENTO",
+   "nivel": "9º PAVIMENTO",
+   "largura_cm": 61.01,
+   "topo_vao_cm": 171.0,
+   "topo_parede_cm": 241.0,
+   "familias_sobre_o_vao": {
+    "COMPENSADOR 14x19x9 (deitado)": 5
+   },
+   "motivo_INFERIDO": "vao pequeno resolvido com compensador deitado de 9 cm",
+   "confianca": "MEDIA"
+  }
+ ]
+}
