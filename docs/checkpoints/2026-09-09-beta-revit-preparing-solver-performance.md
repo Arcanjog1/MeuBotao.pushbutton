@@ -5,8 +5,8 @@
   "date": "2026-09-09",
   "scope": "current",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-  "head": "712f2217f455694e10b110b3cd46543d7c0fbdce",
-  "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+  "head": "25993550ef4fd3ce80b2dbec4809d1b2ce69ca09",
+  "base": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
   "pr": "not-created",
   "objective": "Fechar o primeiro beta controlado do Revit na bancada de 2 paredes / 1 encontro em L / 0 aberturas: achar por medicao onde o fluxo travava, corrigir somente hotspots provados, eliminar o vermelho falso da auditoria de amarracao sem silenciar o auditor, e decidir merge por gates.",
   "changes": [
@@ -17,7 +17,8 @@
     "Nenhuma regra fisica, tolerancia, baseline, reference, input oficial ou threshold foi alterado. Nenhum skip/xfail introduzido. Nenhum detector removido.",
     "INSTRUMENTO DO GATE 5: perf_trace.start_stall_sampler() - thread PYTHON pura, ligada no clique e desligada em _on_analyze_done, que ao detectar um salto registra 'CONGELAMENTO detectado pelo amostrador parado=Ns' e despeja o topo da pilha de TODAS as threads. Torna a leitura binaria: se o amostrador congela junto, a GIL estava retida por um chamador NATIVO; se continua tiquetaqueando, e starvation especifica da thread do solver.",
     "BUG REAL 3 - CAUSA-RAIZ FECHADA E CORRIGIDA: Application.DoEvents() era chamado da THREAD DE FUNDO do solver e levou 2652,285s (44 min) para retornar. _ProgressConsole._pump_ui captura o ManagedThreadId na construcao do console e so' bombeia naquela thread; falha fechado e nunca propaga excecao. Os 6 pontos do console passam por ele.",
-    "THREAD DE FUNDO DO ANALYZE RETIRADA (autorizada pelo usuario apos a execucao 6): _on_start_click deixa de instalar ui_invoke_cb, e analyze passa a rodar SINCRONO dentro do Execute(), na thread principal do Revit. O ramo sincrono ja existia; nenhuma linha de solver/geometria/regras/auditor/solve->create/catalogo/Z/thresholds/benchmark/baseline foi tocada, e _pump_ui fica preservado."
+    "THREAD DE FUNDO DO ANALYZE RETIRADA (autorizada pelo usuario apos a execucao 6): _on_start_click deixa de instalar ui_invoke_cb, e analyze passa a rodar SINCRONO dentro do Execute(), na thread principal do Revit. O ramo sincrono ja existia; nenhuma linha de solver/geometria/regras/auditor/solve->create/catalogo/Z/thresholds/benchmark/baseline foi tocada, e _pump_ui fica preservado.",
+    "RECONCILIACAO 2026-09-10: merge normal de origin/main (21576ee, PRs #33/#35/#36) nesta branch, sem rebase e sem reescrever os 24 commits da cadeia. Quatro conflitos resolvidos somando os dois lados (REGRAS, START_HERE, PROJECT_STATUS_LOG, PROJECT_STATUS) - nenhum ours/theirs."
   ],
   "tests": [
     "tests/test_bond_strip_adjacent_courses.py: 6 passed - controles negativos (bancada real do beta) e positivos (empilhamento adjacente de 17 fiadas e de 2 fiadas), sem skip/xfail.",
