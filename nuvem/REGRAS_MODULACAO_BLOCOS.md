@@ -6467,3 +6467,31 @@ Relação medida entre largura do vão e solução:
    dois comportamentos: verificar por documento.
 
 > Erratas evidenciais 2026-09-10 (sem alteração normativa): 7212991 PORTA tem peitoril 40 cm; 135/136 offsets superiores incluem COMMON_BLOCKS (CHANNEL: 129/130); desvio de 6616547 é 1 cm (220→221); corte de canaleta é 67/162 = 41,36%. Ver docs/revit_reference_extraction/butanta-r08-lt/REVIEW_2026-09-10.md.
+
+
+---
+
+## REF-BETA2-20260910 — evidência e proposta documental
+
+STATUS: EVIDÊNCIA / NÃO NORMA; arquitetura PENDING USER APPROVAL.
+Origem: pedido do usuário 2026-09-10 e revisão offline dos JSON #33/#35.
+Nenhuma regra normativa anterior alterada.
+
+Não transportar apoio ≥9 cm de TORRE EASY para CHANNEL como norma.
+Proposta a avaliar: um motor com estratégia configurável antes da modulação.
+HEIGHT_CUT (19→9 em Z) e LENGTH_CUT são observações distintas; tipo lógico e
+família/tipo são camadas separadas. DOCUMENTADO — pendência de código aberta,
+condicionada às decisões em docs/decisions; nada implementado nesta missão.
+
+Conhecimento de amarração: PADRÃO OBSERVADO AINDA NÃO CONFIRMADO para
+generalização. Grade comum não prova L/T/X/células/orientação entre fiadas.
+Revisão confirmou 5.536 especiais no JSON07 TORRE EASY, 3.526 B34/B54,
+sem hand/facing/mirrored. Vão menor não pode ser certificado por esse arquivo.
+Reservas/subfaixas 9/19 são proposta de dados, não exceção às juntas/amarração
+de §36/39. Conflito §10.7 preservado.
+
+Conflito interpretativo: §10.2 descrevia duas meias-fiadas antes de canaleta
+em poucos exemplos; BUTANTÃ apresenta canaleta diretamente na borda do vão.
+Não universalizar nenhuma sequência. Orientação atual do usuário: separar
+evidência, regra e decisão. Comparação/erratas em reference_projects/COMPARISON.md;
+contrato proposto em docs/architecture/opening-reinforcement-strategies.md.

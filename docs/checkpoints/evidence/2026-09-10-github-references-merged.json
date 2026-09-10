@@ -1,0 +1,3725 @@
+{
+  "observed_utc": "2026-09-10T18:43:17.572173+00:00",
+  "main": "6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9",
+  "repository": "Arcanjog1/MeuBotao.pushbutton",
+  "prs": [
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/revit-human-reference-extraction-project-2",
+      "headRefOid": "25ee78a927322e7b8e46a5b47e95d932c1caf84b",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9"
+      },
+      "mergedAt": "2026-09-10T18:38:31Z",
+      "number": 35,
+      "state": "MERGED",
+      "title": "docs(revit): extração forense do projeto humano nº 2 — BUTANTÃ R08_LT (sistema de canaletas)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/35"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "codex/beta-main-safe-20260909",
+      "headRefOid": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 34,
+      "state": "OPEN",
+      "title": "Beta controlado sobre main: protecoes e bancada TP1 75/81, sem N1",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/revit-human-reference-extraction",
+      "headRefOid": "f4cd6a8c0f50e980b4a8590e6eef3b0a57b6483a",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9"
+      },
+      "mergedAt": "2026-09-10T18:34:55Z",
+      "number": 33,
+      "state": "MERGED",
+      "title": "docs(revit): extração forense do projeto humano — vergas, contravergas, canaletas e blocos cortados",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/33"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "codex/auditoria-governanca-beta-20260909",
+      "headRefOid": "7ed1a545146ac12072a15a5bdcdea92008170051",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "aa58d70d84c6134216f8f15a131edf060c4dce81"
+      },
+      "mergedAt": "2026-09-09T14:44:50Z",
+      "number": 32,
+      "state": "MERGED",
+      "title": "docs: auditoria do solver, governanca documental e gates do beta Revit",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/sleepy-turing-rf4s7o",
+      "headRefOid": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 31,
+      "state": "OPEN",
+      "title": "CR-N1b/c/e/f — regressões críticas da N1 fechadas, compensadores intercalados, e −52/−51 identidades contra a base",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/fervent-mccarthy-lhwoai",
+      "headRefOid": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 30,
+      "state": "OPEN",
+      "title": "CR-N1 — nós de encontro vizinhos não lançam mais peças de amarração sobrepostas (varredura ampla do benchmark)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/30"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-g12-independent-review-w93jf8",
+      "headRefOid": "9531cf0c991c5d46771c0aa200691909fc712b68",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "c88a031404459ee4cee0f7c36904b8e7b971a471"
+      },
+      "mergedAt": "2026-09-08T18:34:44Z",
+      "number": 29,
+      "state": "MERGED",
+      "title": "CR-G12 — revisão independente: contratos de teste, desempenho e veredito",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/29"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-b-preparacao-identidade",
+      "headRefOid": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 28,
+      "state": "OPEN",
+      "title": "CR-B (preparação): tabela de migração de identidade (G18) e estado real dos gates",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/28"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-d1-recuperacao-documental",
+      "headRefOid": "b8526954106a3d4ec12711e43a2f109ca3e7c130",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "7cc935d9bd7434ae07e9e70d5839cc07ebd5d483"
+      },
+      "mergedAt": "2026-09-08T18:03:07Z",
+      "number": 27,
+      "state": "MERGED",
+      "title": "CR-D1: recupera as duas revisões independentes que a main citava e não tinha",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/27"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-c1-expected-rows-fisico",
+      "headRefOid": "b2daca8fbc3ee6397697fd3a76f43e4fab724bf9",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "0c6e8f7fb66660b9472445d4067e293bcb193c44"
+      },
+      "mergedAt": "2026-09-08T18:06:24Z",
+      "number": 26,
+      "state": "MERGED",
+      "title": "CR-C1: a expectativa de fiada é FÍSICA e por elevação — o validador acusava a própria referência",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/26"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/corrigir-alternancia-no-l-76nnb3",
+      "headRefOid": "33d035f84e61dd8162e5f3aeebb0bdd6284e5159",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "32e1c0ef09b2d67ae1edf76be38e2678340dacd3"
+      },
+      "mergedAt": "2026-09-08T18:04:02Z",
+      "number": 25,
+      "state": "MERGED",
+      "title": "CR-S1: o giro do canto em L vira a ÚLTIMA saída — alternância de amarração restaurada no nó T→L",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/25"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/validador-encontros-elevacao-3u21lw",
+      "headRefOid": "684e99955281693de563a91138dd0becf1e6a6dd",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "91258dd627af97fe437a56c0506eb096ca5aa267"
+      },
+      "mergedAt": "2026-09-07T23:16:16Z",
+      "number": 24,
+      "state": "MERGED",
+      "title": "CR-V1: valida encontros por elevação física, não por índice ordinal",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/24"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "docs/status-post-merge-pr22",
+      "headRefOid": "05dddc80a97445f7f9f79d8dfb76b48a5a589d11",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "e381992cdc9f5cfd59547de6d385f25bfe6b3050"
+      },
+      "mergedAt": "2026-09-07T07:16:10Z",
+      "number": 23,
+      "state": "MERGED",
+      "title": "docs(status): registra merge concluído do PR #22 (CR-BENCH-OPENING-RECONSTRUCTION-A)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/23"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/opening-detector-root-fix-m21hfm",
+      "headRefOid": "2ee526dc0a3eab9e059b5e22b6f205b39bfa76ff",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "62ea7f26b9fb8af72c960b04d08f7b58cd115114"
+      },
+      "mergedAt": "2026-09-07T06:48:01Z",
+      "number": 22,
+      "state": "MERGED",
+      "title": "CR-BENCH-OPENING-RECONSTRUCTION-A — detector separa identidade de geometria do vão",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/22"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/pr20-conditional-merge-validation-2wfkfr",
+      "headRefOid": "766e1ea6ee281cc29a3d6118d6013f3955193352",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 21,
+      "state": "OPEN",
+      "title": "docs(blocos): PR #20 conditional-merge — C3/C4 registradas, gate PRE_MERGE_READY",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/21"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-fit-tolerance-c04-n5qsc4",
+      "headRefOid": "0b09e97be51d1780c5d013a505eb111e455f0f8f",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "3f293d1433e8c16eb186959e33a345b60ac944f9"
+      },
+      "mergedAt": "2026-09-07T04:05:42Z",
+      "number": 20,
+      "state": "MERGED",
+      "title": "CR-BLOCK-FIT-TOLERANCE-C04 — tolerância modular robusta de 0,30 cm",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/20"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-b19-residual-fill-uythsk",
+      "headRefOid": "9fcd01292eb4bff52af882968320610404d30bba",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "3ebcd9b63875f9114a3d6223aa648e5075e2d35b"
+      },
+      "mergedAt": "2026-09-06T13:18:57Z",
+      "number": 19,
+      "state": "MERGED",
+      "title": "CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION — B19 como fill residual de nó (DRAFT — não mergear)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/19"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-arm-safe-repair-gate-fidelity-ne5cdz",
+      "headRefOid": "4dd7008ff2a697f5594fd6e4ae5490df5ac49d78",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "209695d5559b53fe4cc8a92300779a8ae73b7c1d"
+      },
+      "mergedAt": "2026-09-05T17:29:11Z",
+      "number": 18,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY — compensador por course_index, crédito físico de nó na cobertura",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/18"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-node-fill-revalidation-iahuyg",
+      "headRefOid": "ac7acee3ad0059f94f1a17e90f79fdaeb0627733",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "4344c76225f12569b3776b0121bbfc1b49f7256a"
+      },
+      "mergedAt": "2026-09-04T19:51:05Z",
+      "number": 17,
+      "state": "MERGED",
+      "title": "CR-BLOCK-NODE-FILL-REVALIDATION: metade simétrica da junta NÓ|FILL (DRAFT — não mergear)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/17"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/b19-junction-domain-investigation-1h4ow8",
+      "headRefOid": "154b6c519334520dd3cc7c56d6a4658184b408dd",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "789f44227145ecc681c714fb952e10dd1de507d9"
+      },
+      "mergedAt": "2026-09-04T19:05:47Z",
+      "number": 16,
+      "state": "MERGED",
+      "title": "docs(blocos): B19 junction domain evidence (investigation only)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/16"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-arm-safe-repair-spec-gjkvm3",
+      "headRefOid": "ca9dd2fee42ad7aa8f722c8fef2439d8e639f532",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "5f4f98e8a87352ad811666eb441d99bc7ad3cf92"
+      },
+      "mergedAt": "2026-09-04T18:39:28Z",
+      "number": 15,
+      "state": "MERGED",
+      "title": "docs(blocos): CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY-PREIMPLEMENTATION - spec + test plan",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/15"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-current-reference-snapshot-refresh-lneed3",
+      "headRefOid": "4b7cf9e941b07d97e34ef0da7c94cfc15045f11c",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "9818b8595ae6480b54d5a283b8ac010a05e15618"
+      },
+      "mergedAt": "2026-09-04T18:28:11Z",
+      "number": 14,
+      "state": "MERGED",
+      "title": "docs(snapshot): refresh current solver reference metrics",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/14"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-repo-context-optimization-v2-c8bdp4",
+      "headRefOid": "642aa0049cf5b2d79b97129398eb73c69e8ed5a9",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "68a62693ba4ac3a1def43be8b84d526372a4ee9a"
+      },
+      "mergedAt": "2026-09-04T17:57:01Z",
+      "number": 13,
+      "state": "MERGED",
+      "title": "docs(context): minimize agent onboarding and separate project history",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/13"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/arm-role-safety-contract-ljfwnj",
+      "headRefOid": "78c01aec72ce81e3e5a9d75f0e779e32ed6baa27",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "4c89e1216cc6b5708c590f495e1584497e2df583"
+      },
+      "mergedAt": "2026-09-04T17:43:17Z",
+      "number": 12,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT: contrato geral de segurança para candidatos de papel (SAFE REPAIR ativado)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/12"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-arm-role-policy-q0qepg",
+      "headRefOid": "cce8cf949653c04263c7b63abdddf4629d40362e",
+      "isDraft": true,
+      "mergeCommit": {
+        "oid": "cce8cf949653c04263c7b63abdddf4629d40362e"
+      },
+      "mergedAt": "2026-09-04T17:43:18Z",
+      "number": 11,
+      "state": "MERGED",
+      "title": "CR-BLOCK-ARM-ROLE-HUMAN-POLICY: causa provada, política formalizada (NECESSITA AJUSTE)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/11"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-repo-hygiene-cleanup-litdj0",
+      "headRefOid": "16fa1c7f979c14370b5d19618dee216e974e154b",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "a2577797f40048413207d11ea7e7b385e97c1813"
+      },
+      "mergedAt": "2026-09-04T01:44:39Z",
+      "number": 10,
+      "state": "MERGED",
+      "title": "docs(repo): organize active and historical project knowledge",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/10"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-arm-role-invariance-7tezx4",
+      "headRefOid": "997ce465db42eab2dbb0806a0d9721975d30ef67",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 9,
+      "state": "CLOSED",
+      "title": "fix(blocos): invariância de papel em L_CORNER/X_INTERSECTION (CR-BLOCK-ARM-ROLE-INVARIANCE)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/9"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-wall-graph-quality-711umk",
+      "headRefOid": "e789bf253d82eb7ec1a8f078b85c56cccc30cb3b",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 8,
+      "state": "OPEN",
+      "title": "audit(wall-graph-quality): causa-raiz da regressão de cobertura/PRISM após o wall graph",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/8"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-block-determinism-final-cross-audit",
+      "headRefOid": "2594f6ff376212e5f24614241a0e1dd4b142b838",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 7,
+      "state": "OPEN",
+      "title": "CROSS-AUDIT FINAL — CR-BLOCK-DETERMINISM (auditoria, produção ZERO)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/7"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/block-reference-corpus",
+      "headRefOid": "0b81f88b040f210c201b4d7575216e70d570a159",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b"
+      },
+      "mergedAt": "2026-09-02T15:01:54Z",
+      "number": 6,
+      "state": "MERGED",
+      "title": "feat(benchmark): Reference Corpus - evolui o Golden Benchmark (CR-BLOCK-REFERENCE-CORPUS)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/6"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/golden-benchmark-system-vacwec",
+      "headRefOid": "a3c374084ff0de34688de40b14083d3c3e09ee68",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "edf00b2f4f8e21e1586d50ea37597ca6d7ade3dc"
+      },
+      "mergedAt": "2026-09-02T15:01:10Z",
+      "number": 5,
+      "state": "MERGED",
+      "title": "feat(benchmark): infraestrutura do GOLDEN BENCHMARK (CR-BLOCK-GOLDEN-BENCHMARK)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/5"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-2f-a-baseline-scope-7036f5",
+      "headRefOid": "33bb5168a4d019d516f3a23556ea89c3bdc00ee0",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "c21a4297a6ff372358cbb81da5ca6a65f91a955b"
+      },
+      "mergedAt": "2026-09-01T12:00:48Z",
+      "number": 4,
+      "state": "MERGED",
+      "title": "CR-2F-A — MERGE_RELATION_ASYMMETRY (T2/MAX)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/4"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/cr-2f-e-centerline-asymmetry-t4mc20",
+      "headRefOid": "9bca56122dbb474e50d8fa10fa6843a665664656",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "902bc70e0dda1fb5a1fc38f5c3877e27adfe66bb"
+      },
+      "mergedAt": "2026-09-01T04:13:22Z",
+      "number": 3,
+      "state": "MERGED",
+      "title": "Etapa 2I — diagnóstico e plano do CR-2F-E (CENTERLINE_ARGUMENT_ASYMMETRY)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/3"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "claude/diagnose-claude-codex-dual-t1yctp",
+      "headRefOid": "6bea3da1ffdef7a3d79d570916ad915951076a26",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 2,
+      "state": "CLOSED",
+      "title": "Diagnostico read-only Claude/Codex dual (Fase 1)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/2"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "feat/ai-team-cloud",
+      "headRefOid": "0ad67499bcf27f9baeb5a6a7aca2aa9ce31c6a3d",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "0ad67499bcf27f9baeb5a6a7aca2aa9ce31c6a3d"
+      },
+      "mergedAt": "2026-08-31T23:43:29Z",
+      "number": 1,
+      "state": "MERGED",
+      "title": "feat(ai-team): orquestrador cloud Claude ↔ Codex (infraestrutura)",
+      "url": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/1"
+    }
+  ],
+  "details": {
+    "7": {
+      "baseRefName": "main",
+      "baseRefOid": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "files": [
+        {
+          "path": "docs/BLOCK_DETERMINISM_AUDIT.md",
+          "additions": 283,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BLOCK_DETERMINISM_CROSS_AUDIT.md",
+          "additions": 591,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md",
+          "additions": 628,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 301,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 586,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/README.md",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/lib_det.py",
+          "additions": 401,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_ablation.json",
+          "additions": 145,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_after.json",
+          "additions": 421,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_baseline.json",
+          "additions": 421,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_benchmark_atual.json",
+          "additions": 87,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_benchmark_legacy.json",
+          "additions": 87,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_convention_matrix.json",
+          "additions": 120,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_examples.json",
+          "additions": 266,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_performance.json",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_point_choice.json",
+          "additions": 93,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_roles.json",
+          "additions": 2525,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_rootcause.json",
+          "additions": 161,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_second_cause.json",
+          "additions": 1363,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_ablation.py",
+          "additions": 299,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_baseline.py",
+          "additions": 86,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_benchmark.py",
+          "additions": 101,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_convention_matrix.py",
+          "additions": 70,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_examples.py",
+          "additions": 119,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_performance.py",
+          "additions": 89,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_point_choice.py",
+          "additions": 131,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_roles.py",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_rootcause.py",
+          "additions": 159,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_second_cause.py",
+          "additions": 127,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/full_wall_first_opening_census.json",
+          "additions": 83,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/lib_cross.py",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/official_process_order_census.json",
+          "additions": 68,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_60_nodes.json",
+          "additions": 199,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_node_oracle_agreement.json",
+          "additions": 89,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_variants_census.json",
+          "additions": 1918,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_60_nodes.py",
+          "additions": 129,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_variants.py",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/lib_det.py",
+          "additions": 381,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/oracle.py",
+          "additions": 395,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_canonical_sort_experiment.json",
+          "additions": 380,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_divergent_nodes.json",
+          "additions": 4027,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_variants_census.json",
+          "additions": 2008,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/run_baseline_variants.py",
+          "additions": 118,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/run_oracle_divergence.py",
+          "additions": 258,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/variants.py",
+          "additions": 181,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/census_official_wall_order.json",
+          "additions": 95,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/census_wall_first_openings.json",
+          "additions": 93,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/lib_final.py",
+          "additions": 190,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_piloto_sintetico_2x2.json",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tgd.json",
+          "additions": 137,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tp1.json",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_piloto_sintetico_2x2.json",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tgd.json",
+          "additions": 137,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tp1.json",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_d6_compare_torre_easy_lo_r00_tgd.json",
+          "additions": 106,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_piloto_sintetico_2x2.json",
+          "additions": 2389,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tgd.json",
+          "additions": 2498,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tp1.json",
+          "additions": 2469,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_layout_trace_endpoint_reversal.json",
+          "additions": 9005,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_performance_torre_easy_lo_r00_tgd.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_raw_vs_physical_endpoint_reversal.json",
+          "additions": 96,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_piloto_sintetico_2x2_endpoint_reversal.json",
+          "additions": 211,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+          "additions": 218,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+          "additions": 186,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_piloto_sintetico_2x2.json",
+          "additions": 134,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_torre_easy_lo_r00_tgd.json",
+          "additions": 90,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_piloto_sintetico_2x2_endpoint_reversal.json",
+          "additions": 3662,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+          "additions": 10977,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+          "additions": 6732,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_baseline_lottery.py",
+          "additions": 112,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_d6_compare.py",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_final_variants.py",
+          "additions": 117,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py",
+          "additions": 147,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_performance.py",
+          "additions": 74,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_raw_vs_physical.py",
+          "additions": 71,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_row_diff.py",
+          "additions": 64,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_variant_validity.py",
+          "additions": 115,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_wall_trace.py",
+          "additions": 201,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/README.md",
+          "additions": 51,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/lib_xa.py",
+          "additions": 277,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_nodefill_piloto_sintetico_2x2.json",
+          "additions": 342,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_order.json",
+          "additions": 42,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_before_piloto_sintetico_2x2.json",
+          "additions": 287,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_head_piloto_sintetico_2x2.json",
+          "additions": 567,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_main_piloto_sintetico_2x2.json",
+          "additions": 6,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.json",
+          "additions": 3880,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.md",
+          "additions": 40,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_three_point_measurements.json",
+          "additions": 2030,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_validity.json",
+          "additions": 618,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_piloto_sintetico_2x2.json",
+          "additions": 1516,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_torre_easy_lo_r00_tgd.json",
+          "additions": 1426,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_piloto_sintetico_2x2.json",
+          "additions": 1716,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_torre_easy_lo_r00_tgd.json",
+          "additions": 1780,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_piloto_sintetico_2x2.json",
+          "additions": 1476,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tgd.json",
+          "additions": 1418,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tp1.json",
+          "additions": 1458,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_nodefill.py",
+          "additions": 91,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_order.py",
+          "additions": 126,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_prism_diff.py",
+          "additions": 121,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_validity.py",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "claude/cr-block-determinism-final-cross-audit",
+      "headRefOid": "2594f6ff376212e5f24614241a0e1dd4b142b838",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 7,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-02T18:16:46Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/33666211875/job/100368493534",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-02T18:16:41Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-02T18:15:45Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/33666105922/job/100368132380",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-02T18:15:37Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-02T18:15:45Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/33666108251/job/100368140112",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-02T18:15:38Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "CROSS-AUDIT FINAL — CR-BLOCK-DETERMINISM (auditoria, produção ZERO)",
+      "merge_base": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "commits_after_old_report": []
+    },
+    "8": {
+      "baseRefName": "main",
+      "baseRefOid": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "files": [
+        {
+          "path": "docs/BLOCK_DETERMINISM_AUDIT.md",
+          "additions": 283,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BLOCK_DETERMINISM_CROSS_AUDIT.md",
+          "additions": 591,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BLOCK_DETERMINISM_FINAL_CROSS_AUDIT.md",
+          "additions": 628,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BLOCK_WALL_GRAPH_QUALITY.md",
+          "additions": 414,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 301,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 613,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/README.md",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/lib_det.py",
+          "additions": 401,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_ablation.json",
+          "additions": 145,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_after.json",
+          "additions": 421,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_baseline.json",
+          "additions": 421,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_benchmark_atual.json",
+          "additions": 87,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_benchmark_legacy.json",
+          "additions": 87,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_convention_matrix.json",
+          "additions": 120,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_examples.json",
+          "additions": 266,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_performance.json",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_point_choice.json",
+          "additions": 93,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_roles.json",
+          "additions": 2525,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_rootcause.json",
+          "additions": 161,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/out_second_cause.json",
+          "additions": 1363,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_ablation.py",
+          "additions": 299,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_baseline.py",
+          "additions": 86,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_benchmark.py",
+          "additions": 101,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_convention_matrix.py",
+          "additions": 70,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_examples.py",
+          "additions": 119,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_performance.py",
+          "additions": 89,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_point_choice.py",
+          "additions": 131,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_roles.py",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_rootcause.py",
+          "additions": 159,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism/run_second_cause.py",
+          "additions": 127,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/full_wall_first_opening_census.json",
+          "additions": 83,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/lib_cross.py",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/official_process_order_census.json",
+          "additions": 68,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_60_nodes.json",
+          "additions": 199,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_node_oracle_agreement.json",
+          "additions": 89,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/out_cross_variants_census.json",
+          "additions": 1918,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_60_nodes.py",
+          "additions": 129,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/cross_audit/run_cross_variants.py",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/lib_det.py",
+          "additions": 381,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/oracle.py",
+          "additions": 395,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_canonical_sort_experiment.json",
+          "additions": 380,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_divergent_nodes.json",
+          "additions": 4027,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/out_variants_census.json",
+          "additions": 2008,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/run_baseline_variants.py",
+          "additions": 118,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/run_oracle_divergence.py",
+          "additions": 258,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_audit/variants.py",
+          "additions": 181,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/census_official_wall_order.json",
+          "additions": 95,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/census_wall_first_openings.json",
+          "additions": 93,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/lib_final.py",
+          "additions": 190,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_piloto_sintetico_2x2.json",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tgd.json",
+          "additions": 137,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_AFTER_torre_easy_lo_r00_tp1.json",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_piloto_sintetico_2x2.json",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tgd.json",
+          "additions": 137,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_baseline_lottery_BEFORE_torre_easy_lo_r00_tp1.json",
+          "additions": 105,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_d6_compare_torre_easy_lo_r00_tgd.json",
+          "additions": 106,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_piloto_sintetico_2x2.json",
+          "additions": 2389,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tgd.json",
+          "additions": 2498,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_final_variants_torre_easy_lo_r00_tp1.json",
+          "additions": 2469,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_layout_trace_endpoint_reversal.json",
+          "additions": 9005,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_performance_torre_easy_lo_r00_tgd.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_raw_vs_physical_endpoint_reversal.json",
+          "additions": 96,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_piloto_sintetico_2x2_endpoint_reversal.json",
+          "additions": 211,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+          "additions": 218,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_row_diff_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+          "additions": 186,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_piloto_sintetico_2x2.json",
+          "additions": 134,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_variant_validity_torre_easy_lo_r00_tgd.json",
+          "additions": 90,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_piloto_sintetico_2x2_endpoint_reversal.json",
+          "additions": 3662,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tgd_endpoint_reversal.json",
+          "additions": 10977,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/out_wall_trace_torre_easy_lo_r00_tp1_endpoint_reversal.json",
+          "additions": 6732,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_baseline_lottery.py",
+          "additions": 112,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_d6_compare.py",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_final_variants.py",
+          "additions": 117,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_layout_trace.py",
+          "additions": 147,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_performance.py",
+          "additions": 74,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_raw_vs_physical.py",
+          "additions": 71,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_row_diff.py",
+          "additions": 64,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_variant_validity.py",
+          "additions": 115,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final/run_wall_trace.py",
+          "additions": 201,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/README.md",
+          "additions": 51,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/lib_xa.py",
+          "additions": 277,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_nodefill_piloto_sintetico_2x2.json",
+          "additions": 342,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_order.json",
+          "additions": 42,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_before_piloto_sintetico_2x2.json",
+          "additions": 287,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_head_piloto_sintetico_2x2.json",
+          "additions": 567,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_prism_diff_main_piloto_sintetico_2x2.json",
+          "additions": 6,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.json",
+          "additions": 3880,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_reference_corpus.md",
+          "additions": 40,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_three_point_measurements.json",
+          "additions": 2030,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_validity.json",
+          "additions": 618,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_piloto_sintetico_2x2.json",
+          "additions": 1516,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_GRAFO_torre_easy_lo_r00_tgd.json",
+          "additions": 1426,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_piloto_sintetico_2x2.json",
+          "additions": 1716,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_CONTROLE_MAIN_torre_easy_lo_r00_tgd.json",
+          "additions": 1780,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_piloto_sintetico_2x2.json",
+          "additions": 1476,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tgd.json",
+          "additions": 1418,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/out_xa_variants_torre_easy_lo_r00_tp1.json",
+          "additions": 1458,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_nodefill.py",
+          "additions": 91,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_order.py",
+          "additions": 126,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/diagnostics_block_determinism_final_cross_audit/run_xa_prism_diff.py",
+          "additions": 121,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "claude/cr-block-wall-graph-quality-711umk",
+      "headRefOid": "e789bf253d82eb7ec1a8f078b85c56cccc30cb3b",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 8,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-03T13:53:31Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/33763661363/job/100675927709",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-03T13:53:27Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-03T13:53:08Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/33763621691/job/100675793967",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-03T13:53:01Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "audit(wall-graph-quality): causa-raiz da regressão de cobertura/PRISM após o wall graph",
+      "merge_base": "21add6ec1f6cad220bdf3ff8651adb90b63d6e1b",
+      "commits_after_old_report": []
+    },
+    "21": {
+      "baseRefName": "main",
+      "baseRefOid": "3ebcd9b63875f9114a3d6223aa648e5075e2d35b",
+      "files": [
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 28,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "additions": 208,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        }
+      ],
+      "headRefName": "claude/pr20-conditional-merge-validation-2wfkfr",
+      "headRefOid": "766e1ea6ee281cc29a3d6118d6013f3955193352",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 21,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-07T02:48:41Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34077510358/job/101606412679",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-07T02:48:33Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-07T02:48:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34077488735/job/101606352258",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-07T02:48:11Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs(blocos): PR #20 conditional-merge — C3/C4 registradas, gate PRE_MERGE_READY",
+      "merge_base": "3ebcd9b63875f9114a3d6223aa648e5075e2d35b",
+      "commits_after_old_report": []
+    },
+    "28": {
+      "baseRefName": "main",
+      "baseRefOid": "91258dd627af97fe437a56c0506eb096ca5aa267",
+      "files": [
+        {
+          "path": "docs/CR_B_INTEGRATION_PREPARATION.md",
+          "additions": 204,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_b_identity_migration/build_identity_migration.py",
+          "additions": 115,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/benchmark/future_cr_preparation/cr_b_identity_migration/identity_migration.json",
+          "additions": 6744,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "claude/cr-b-preparacao-identidade",
+      "headRefOid": "0596e78eadcbebd9369dbd54272b44952b8211ed",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 28,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T04:54:30Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34188646595/job/101941977580",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T04:54:25Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T04:02:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34185577359/job/101933135374",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T04:02:44Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "CR-B (preparação): tabela de migração de identidade (G18) e estado real dos gates",
+      "merge_base": "91258dd627af97fe437a56c0506eb096ca5aa267",
+      "commits_after_old_report": []
+    },
+    "30": {
+      "baseRefName": "main",
+      "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "files": [
+        {
+          "path": "docs/BENCH_SWEEP_2026-09-08.md",
+          "additions": 328,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 244,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/projects/piloto_sintetico_2x2/score.json",
+          "additions": 17,
+          "deletions": 19,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tgd/score.json",
+          "additions": 266,
+          "deletions": 277,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/projects/torre_easy_lo_r00_tp1/score.json",
+          "additions": 194,
+          "deletions": 201,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/reports/piloto_sintetico_2x2.txt",
+          "additions": 29,
+          "deletions": 26,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/reports/torre_easy_lo_r00_tgd.txt",
+          "additions": 555,
+          "deletions": 623,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/benchmark/reports/torre_easy_lo_r00_tp1.txt",
+          "additions": 254,
+          "deletions": 357,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/core/engine/wall_stepper.py",
+          "additions": 121,
+          "deletions": 9,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "tests/test_neighbor_node_bond_collision.py",
+          "additions": 131,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "claude/fervent-mccarthy-lhwoai",
+      "headRefOid": "626087b845a23f83b7907c39c448bfa7e8d3e69e",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 30,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T22:38:01Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34286873137/job/102264381905",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T22:37:54Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-08T22:37:56Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34286870448/job/102264372711",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-08T22:37:51Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "CR-N1 — nós de encontro vizinhos não lançam mais peças de amarração sobrepostas (varredura ampla do benchmark)",
+      "merge_base": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "commits_after_old_report": []
+    },
+    "31": {
+      "baseRefName": "main",
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "files": [
+        {
+          "path": "Script.py",
+          "additions": 19,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "beta_package.py",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BENCH_FECHAMENTO_N1_2026-09-09.md",
+          "additions": 356,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BENCH_N1C_N1E_2026-09-09.md",
+          "additions": 299,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BENCH_SWEEP_2026-09-08.md",
+          "additions": 328,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BETA_REVIT_RUNBOOK.md",
+          "additions": 85,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/CHECKPOINT_CR_N1_SERIE_2026-09-09.md",
+          "additions": 114,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "additions": 8,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 89,
+          "deletions": 25,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/RELATORIO_BETA_2026-09-09.md",
+          "additions": 377,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "additions": 4,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-beta-etapa1.md",
+          "additions": 87,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-beta-etapa2.md",
+          "additions": 118,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-beta-etapa3.md",
+          "additions": 75,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-beta-etapa4.md",
+          "additions": 56,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-baseline-replay-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-baseline-replay-run.txt",
+          "additions": 4,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-baseline-replay.json",
+          "additions": 7911,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-bond-audit-main-tp1.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-bond-audit-tp1.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-equivalence.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-equivalence.txt",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tgd-run.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tgd-run.txt",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tp1-run.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tp1-run.txt",
+          "additions": 15,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-cache-off-tp1.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-compensator-wall-delta-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-compensator-wall-delta-run.txt",
+          "additions": 2,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-compensator-wall-delta.json",
+          "additions": 1982,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-compensator-wall66-context.json",
+          "additions": 34,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-consolidated-final-v2.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-consolidated-final-v2.txt",
+          "additions": 100,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-consolidated-final.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-consolidated-final.txt",
+          "additions": 16,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-choices.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-full-run.json",
+          "additions": 28,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-full-run.txt",
+          "additions": 2,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-full-scored.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-full.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-volume-choices-v2.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner163-volume-choices.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner185-choices.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner185-volume-choices-v2.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-corner185-volume-choices.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-diagnostics.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-diagnostics.txt",
+          "additions": 9,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-infra.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-infra.txt",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-intermediate.json",
+          "additions": 33,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-intermediate.txt",
+          "additions": 8,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-package-verify.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-package-verify.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-package.json",
+          "additions": 24,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-package.txt",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-stable-tests.json",
+          "additions": 33,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa2-stable-tests.txt",
+          "additions": 8,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa3-stable-tests.json",
+          "additions": 28,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-etapa3-stable-tests.txt",
+          "additions": 6,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-diff-review.json",
+          "additions": 592,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-focused.json",
+          "additions": 25,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-focused.txt",
+          "additions": 2,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-package-verify.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-package-verify.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-package.json",
+          "additions": 24,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-final-package.txt",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-fixed-span-compositions-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-fixed-span-compositions-run.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-fixed-span-compositions.json",
+          "additions": 843,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-fixture-byte-provenance.json",
+          "additions": 96,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-incoming-minimum-footprints.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-incoming-minimum-footprints.txt",
+          "additions": 10,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tgd-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tgd-run.txt",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tp1-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tp1-run.txt",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-main-tp1.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1-tgd-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1-tgd-run.txt",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1b-tgd-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1b-tgd-run.txt",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1b-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1c-tgd-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1c-tgd-run.txt",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1c-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tgd-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tgd-run.txt",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tp1-run.json",
+          "additions": 26,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tp1-run.txt",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-n1f-tp1.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-package-09b6ea0-verify.json",
+          "additions": 22,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-package-09b6ea0-verify.txt",
+          "additions": 2,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-package-09b6ea0.json",
+          "additions": 24,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-package-09b6ea0.txt",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/beta-preflight-final-tgd.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "claude/sleepy-turing-rf4s7o",
+      "headRefOid": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergedAt": null,
+      "number": 31,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:31:16Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389472353/job/102593939294",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:31:01Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:31:10Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389467009/job/102593921162",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:30:57Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:31:14Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389468226/job/102593925662",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:30:58Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "CR-N1b/c/e/f — regressões críticas da N1 fechadas, compensadores intercalados, e −52/−51 identidades contra a base",
+      "merge_base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "commits_after_old_report": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f Route beta handoff to independent PR34 while preserving N1 NO-GO\n73cbf08b4584f2e952e17a444ed88a99f9df5498 Record final N1 beta regression and separate main-safe investigation\n09b6ea0ae221a43a3adc27f63bb05d336351584f fix(beta): retain partial walls and reject stale captured solves\n3229924e3537878e4c1d40d25dcb387ab23fc46a fix(beta): reject invalid geometry before filtering physical voids\n64532c434c85fca2b3dcacffd07ccaac8c5c95e9 docs(beta): checkpoint atomic creation and independent cache controls\nedc9666545eef0f0e423ecd1ba28d2ceb798cd5e test(beta): measure existing L role alternatives against physical neighbors\nf9e81ccbc2d523090490d39a5633674ca1768054 fix(beta): restore previous batch when replacement creation fails\nf8d384c2e10e18f9380355ce8f8cda0e1e7a65c6 test(beta): preserve physical audit state and probe explicit regions\n1522b3bd25af81a858a9fb550626450cf06c944f docs(beta): checkpoint containment evidence and unresolved collision gates\n656544e15165c9481af3f1eccf04840384e863ed fix(beta): reject stale finalization and incomplete offline packages\n8d75bb4ea1c6079f4b5dd1dee56a2060f14766e7 fix(beta): retain incomplete walls and gate pinned offline creation\n88cd41f0024883277bff324bd6d3305d06e20fbf docs(beta): checkpoint da primeira etapa e merge confirmado do PR32\n93d9b8ec0def44e2e2950dc3ee13d12fc1c9175d diagnostics(beta): mede colisoes e portas por fiada fisica sem alterar benchmark\n39215a8d5859a83ca6448a5159edca09c9f3c96e Merge origin/main: integra governanca PR32 na branch da missao beta\naa58d70d84c6134216f8f15a131edf060c4dce81 Merge pull request #32 from Arcanjog1/codex/auditoria-governanca-beta-20260909\n7ed1a545146ac12072a15a5bdcdea92008170051 docs: registra 260 testes verdes antes da integracao do PR32\n65ab605212da8d9aa98b25d6bd1b6c5c2c07a665 docs: reconcilia PR32 com revisao 05030d2 e autorizacao de integracao\n652a8884f199dc8214a3a0be093eb8f3c7de9c0f docs: link draft PR32 and finalize audit handoff\n729c656975110079acd047668dab59b06e698e40 docs: record final governance validation with negative controls\n78e8d5f39e966d1e7c2b597ad977652e6e35194e docs: reconcile PR31 completion and preserve validation log integrity\n2929bf5d465fc2598302cf7fbd9f8107ae6b9b06 docs: audit solver candidates and add verifiable documentation governance"
+    },
+    "32": {
+      "baseRefName": "main",
+      "baseRefOid": "08495d913e72b36a80b034d5f0a1435470d27557",
+      "files": [
+        {
+          "path": ".claude/skills/cr-checkpoint/SKILL.md",
+          "additions": 9,
+          "deletions": 4,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": ".claude/skills/cr-verification/SKILL.md",
+          "additions": 1,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": ".gitattributes",
+          "additions": 2,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": ".github/workflows/check-project-status.yml",
+          "additions": 31,
+          "deletions": 86,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "AGENTS.md",
+          "additions": 11,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "CLAUDE.md",
+          "additions": 11,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/AUDITORIA_BETA_2026-09-09.md",
+          "additions": 336,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_CR_G12.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CHECKPOINT_SESSAO_MULTIFASE_C2.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CR_B_G12_G16_REEVALUATION.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CR_C1_INDEPENDENT_REVIEW.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CR_G12_CROSS_BAND.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CR_G12_REVISAO_INDEPENDENTE.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/DEVELOPMENT_PROCESS.md",
+          "additions": 100,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 188,
+          "deletions": 812,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "additions": 11,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "additions": 6,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-auditoria-governanca.md",
+          "additions": 83,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-revisao-pr32.md",
+          "additions": 55,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-candidate-baselines.json",
+          "additions": 25,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-candidate-baselines.txt",
+          "additions": 59,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-candidate-focused.json",
+          "additions": 29,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-candidate-focused.txt",
+          "additions": 4,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-github-final.json",
+          "additions": 189,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-github.json",
+          "additions": 2537,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-governance-final.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-governance-final.txt",
+          "additions": 17,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-governance-tests.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-governance-tests.txt",
+          "additions": 16,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-pr32-premerge-tests.json",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-pr32-premerge-tests.txt",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-09-static.json",
+          "additions": 90,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/ARQUITETURA_INTERATIVA.md",
+          "additions": 6,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/LOADER_SETUP.md",
+          "additions": 3,
+          "deletions": 3,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "tools/documentation/audit_inventory.py",
+          "additions": 64,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/capture_validation.py",
+          "additions": 63,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/inspect_static_evidence.py",
+          "additions": 62,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/test_validate.py",
+          "additions": 126,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/validate.py",
+          "additions": 198,
+          "deletions": 0,
+          "changeType": "ADDED"
+        }
+      ],
+      "headRefName": "codex/auditoria-governanca-beta-20260909",
+      "headRefOid": "7ed1a545146ac12072a15a5bdcdea92008170051",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "aa58d70d84c6134216f8f15a131edf060c4dce81"
+      },
+      "mergeable": "UNKNOWN",
+      "mergedAt": "2026-09-09T14:44:50Z",
+      "number": 32,
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T14:43:28Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34365482479/job/102512968773",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T14:43:22Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T14:43:23Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34365474308/job/102512942012",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T14:43:18Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs: auditoria do solver, governanca documental e gates do beta Revit",
+      "merge_base": "7ed1a545146ac12072a15a5bdcdea92008170051",
+      "commits_after_old_report": []
+    },
+    "33": {
+      "baseRefName": "main",
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "files": [
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 7,
+          "deletions": 3,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-revit-human-reference-extraction.md",
+          "additions": 138,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr33-json-audit.json",
+          "additions": 33,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr33-tests.json",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr33-tests.txt",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/01_family_catalog.json",
+          "additions": 1551,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/02_openings.json",
+          "additions": 26694,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/03_lintels.json",
+          "additions": 20794,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/04_counter_lintels.json",
+          "additions": 7809,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/05_channels.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/06_cut_blocks.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/07_special_blocks.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/08_piece_opening_wall_relations.json",
+          "additions": 28585,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/09_observed_patterns.json",
+          "additions": 415,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/REPORT_HUMAN_REVIT_MODULATION.md",
+          "additions": 523,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/REVIEW_2026-09-10.md",
+          "additions": 36,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/README.md",
+          "additions": 13,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/gen.py",
+          "additions": 117,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/gen2.py",
+          "additions": 106,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/gen3.py",
+          "additions": 69,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/gen5.py",
+          "additions": 17,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/gen6.py",
+          "additions": 101,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/lib.py",
+          "additions": 31,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/_scripts/val.py",
+          "additions": 55,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 195,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        }
+      ],
+      "headRefName": "claude/revit-human-reference-extraction",
+      "headRefOid": "f4cd6a8c0f50e980b4a8590e6eef3b0a57b6483a",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9"
+      },
+      "mergeable": "UNKNOWN",
+      "mergedAt": "2026-09-10T18:34:55Z",
+      "number": 33,
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-10T18:34:37Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34515168515/job/102998652277",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-10T18:34:30Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-10T18:34:38Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34515165436/job/102998641440",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-10T18:34:30Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs(revit): extração forense do projeto humano — vergas, contravergas, canaletas e blocos cortados",
+      "merge_base": "f4cd6a8c0f50e980b4a8590e6eef3b0a57b6483a",
+      "commits_after_old_report": []
+    },
+    "34": {
+      "baseRefName": "main",
+      "baseRefOid": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "files": [
+        {
+          "path": "Script.py",
+          "additions": 19,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "beta_package.py",
+          "additions": 41,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BETA_MAIN_SAFE_2026-09-09.md",
+          "additions": 228,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/BETA_MAIN_SAFE_RUNBOOK.md",
+          "additions": 109,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 64,
+          "deletions": 31,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/PROJECT_STATUS_LOG.md",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/START_HERE.md",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-beta-main-safe.md",
+          "additions": 61,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-consolidated.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-consolidated.txt",
+          "additions": 99,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-documentation-validation.json",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-documentation-validation.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-engineering-input.json",
+          "additions": 266,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-github-publication.json",
+          "additions": 145,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-governance-tests.json",
+          "additions": 27,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-governance-tests.txt",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-handler-bench-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-handler-bench-run.txt",
+          "additions": 14,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-handler-bench.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-native-z-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-native-z-run.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-native-z.json",
+          "additions": 117,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-package-build.json",
+          "additions": 24,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-package-build.txt",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-package-verify.json",
+          "additions": 22,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-package-verify.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-provenance-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-provenance-run.txt",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-provenance.json",
+          "additions": 351,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-region-final-scored.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-region-final.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-region-initial.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-ui-boundary-run.json",
+          "additions": 21,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-ui-boundary-run.txt",
+          "additions": 3,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/main-safe-ui-boundary.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 57,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "nuvem/core/wall_modeling.py",
+          "additions": 355,
+          "deletions": 27,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "tests/test_beta_atomic_creation.py",
+          "additions": 230,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tests/test_beta_package.py",
+          "additions": 106,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tests/test_beta_tp1_region.py",
+          "additions": 34,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tests/test_controlled_beta_preflight.py",
+          "additions": 162,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tests/test_unmodulated_wall_retention.py",
+          "additions": 161,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/beta/build_package.py",
+          "additions": 49,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/beta/evaluate_artifact.py",
+          "additions": 39,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/beta/probe_region.py",
+          "additions": 68,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/capture_validation.py",
+          "additions": 18,
+          "deletions": 3,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "tools/documentation/test_capture_validation.py",
+          "additions": 38,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "tools/documentation/test_validate.py",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "tools/documentation/validate.py",
+          "additions": 10,
+          "deletions": 1,
+          "changeType": "MODIFIED"
+        }
+      ],
+      "headRefName": "codex/beta-main-safe-20260909",
+      "headRefOid": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe",
+      "isDraft": true,
+      "mergeCommit": null,
+      "mergeable": "CONFLICTING",
+      "mergedAt": null,
+      "number": 34,
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:30:21Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389382928/job/102593645581",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:30:10Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-09T18:30:18Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34389376299/job/102593624471",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-09T18:30:07Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "Beta controlado sobre main: protecoes e bancada TP1 75/81, sem N1",
+      "merge_base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
+      "commits_after_old_report": []
+    },
+    "35": {
+      "baseRefName": "main",
+      "baseRefOid": "59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9",
+      "files": [
+        {
+          "path": "docs/PROJECT_STATUS.md",
+          "additions": 5,
+          "deletions": 3,
+          "changeType": "MODIFIED"
+        },
+        {
+          "path": "docs/checkpoints/2026-09-09-revit-human-reference-butanta-r08-lt.md",
+          "additions": 221,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr35-json-audit.json",
+          "additions": 43,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr35-tests.json",
+          "additions": 23,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-10-pr35-tests.txt",
+          "additions": 5,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/01_family_catalog.json",
+          "additions": 1052,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/02_openings.json",
+          "additions": 3849,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/03_above_openings.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/04_below_windows.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/05_channels.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/06_cut_blocks.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/07_special_blocks.json",
+          "additions": 244,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/08_piece_opening_wall_relations.json",
+          "additions": 1,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/09_observed_patterns.json",
+          "additions": 497,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/10_torre_easy_comparison.json",
+          "additions": 130,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/README.md",
+          "additions": 79,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/REPORT_HUMAN_REVIT_MODULATION.md",
+          "additions": 743,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/REVIEW_2026-09-10.md",
+          "additions": 44,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/README.md",
+          "additions": 9,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an04_wall.py",
+          "additions": 54,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an09_valid.py",
+          "additions": 58,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an10_final.py",
+          "additions": 45,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an_core.py",
+          "additions": 53,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an_geo.py",
+          "additions": 48,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/an_lib.py",
+          "additions": 35,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/emit.py",
+          "additions": 198,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/emit2.py",
+          "additions": 210,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/emit3.py",
+          "additions": 222,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/rmcp.py",
+          "additions": 30,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/rv_lib.py",
+          "additions": 59,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s01_doc.py",
+          "additions": 28,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s03b_famcount.py",
+          "additions": 29,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s07_dump_pieces.py",
+          "additions": 85,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s08_dump_open.py",
+          "additions": 54,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s09_verga.py",
+          "additions": 37,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/_scripts/s10_solid.py",
+          "additions": 60,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/catalog_cov.json",
+          "additions": 128,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/famtype_counts_todas_categorias.json",
+          "additions": 90,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/solid_check.json",
+          "additions": 422,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/verga_search.json",
+          "additions": 611,
+          "deletions": 0,
+          "changeType": "ADDED"
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "additions": 172,
+          "deletions": 0,
+          "changeType": "MODIFIED"
+        }
+      ],
+      "headRefName": "claude/revit-human-reference-extraction-project-2",
+      "headRefOid": "25ee78a927322e7b8e46a5b47e95d932c1caf84b",
+      "isDraft": false,
+      "mergeCommit": {
+        "oid": "6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9"
+      },
+      "mergeable": "UNKNOWN",
+      "mergedAt": "2026-09-10T18:38:31Z",
+      "number": 35,
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-10T18:38:11Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34515529853/job/102999859879",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-10T18:38:04Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-10T18:38:07Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/Arcanjog1/MeuBotao.pushbutton/actions/runs/34515525407/job/102999844793",
+          "name": "check-status-doc",
+          "startedAt": "2026-09-10T18:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "Checa atualizacao do PROJECT_STATUS.md"
+        }
+      ],
+      "title": "docs(revit): extração forense do projeto humano nº 2 — BUTANTÃ R08_LT (sistema de canaletas)",
+      "merge_base": "25ee78a927322e7b8e46a5b47e95d932c1caf84b",
+      "commits_after_old_report": []
+    }
+  },
+  "beta1_unavailable": {
+    "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
+    "reported_sha": "a5081d85b3fcb79cbb2f8c99dadcd08b4c186f8b",
+    "ref_lookup": "absent from git ls-remote after fetch",
+    "commit_api": "HTTP 422 No commit found for SHA",
+    "classification": "CANDIDATO — VALIDAÇÃO REVIT PENDENTE",
+    "later_commits": "unknown; not inferred"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-09-10T18:51:11.493782+00:00",
+  "cwd": "C:\\Users\\CIVIX\\codex-workspaces\\solver-beta2-consolidation",
+  "head": "8a7f2037d68e3602629bb3ca2236c642bd389033",
+  "tree": "755f82368b3acd0ca55f66ad50aa79a93319c0f2",
+  "status_before": "?? docs/checkpoints/evidence/2026-09-10-consolidation-governance.json\n?? docs/checkpoints/evidence/2026-09-10-consolidation-governance.txt\n?? docs/checkpoints/evidence/2026-09-10-consolidation-tests.json\n?? docs/checkpoints/evidence/2026-09-10-consolidation-tests.txt",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "tools/documentation/verify_reference_inventory.py",
+    "--protected-base",
+    "aa58d70d84c6134216f8f15a131edf060c4dce81"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-10-consolidation-inventory.txt",
+  "pid": 25428,
+  "exit_code": 0,
+  "elapsed_seconds": 2.094,
+  "status_after": "?? docs/checkpoints/evidence/2026-09-10-consolidation-governance.json\n?? docs/checkpoints/evidence/2026-09-10-consolidation-governance.txt\n?? docs/checkpoints/evidence/2026-09-10-consolidation-inventory.json\n?? docs/checkpoints/evidence/2026-09-10-consolidation-inventory.txt\n?? docs/checkpoints/evidence/2026-09-10-consolidation-tests.json\n?? docs/checkpoints/evidence/2026-09-10-consolidation-tests.txt",
+  "log_sha256": "15409321f408e35a60a8e2e2634b9cabe2c80ebeac8bedfe60f44050688bccde"
+}

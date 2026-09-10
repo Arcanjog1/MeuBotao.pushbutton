@@ -1,3 +1,5 @@
+> STATUS: HISTORICAL. SUPERSEDED BY para estado operacional: [PROJECT_STATUS.md](PROJECT_STATUS.md). Medições preservadas no SHA original.
+
 # Auditoria independente e preparacao do beta Revit
 
 > Registro historico encerrado as 13:34 UTC. A revisao posterior do #31
