@@ -5,7 +5,7 @@
   "date": "2026-09-09",
   "scope": "current",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-  "head": "f2e218a3d9f00d2acb9aed643992ae249b987e4d",
+  "head": "96c89b570d05f736546cacdbd28c174e3295b2d5",
   "base": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "pr": "not-created",
   "objective": "Fechar o primeiro beta controlado do Revit na bancada de 2 paredes / 1 encontro em L / 0 aberturas: achar por medicao onde o fluxo travava, corrigir somente hotspots provados, eliminar o vermelho falso da auditoria de amarracao sem silenciar o auditor, e decidir merge por gates.",
@@ -14,7 +14,8 @@
     "BUG REAL 2 - CORRIGIDO: falso positivo REPEATED_VERTICAL_COMPENSATOR_STRIP. `_longest_adjacent_course_run` + BOND_STRIP_MIN_ADJACENT_COURSES=2: faixa vertical passa a exigir fiadas ADJACENTES. Somente o auditor foi tocado.",
     "ACHADO Z - RECLASSIFICADO como comportamento esperado, por decisao do usuario. NENHUMA alteracao de codigo. Regra registrada em nuvem/REGRAS_MODULACAO_BLOCOS.md secao 8a.",
     "Instrumentacao [PERF] (core/engine/perf_trace.py + sondas) do caminho real: clique, ExternalEvent, Execute, refresh, analyze, solve, criacao e retorno para a UI. Cada marco traz CPU do processo e contagem de threads.",
-    "Nenhuma regra fisica, tolerancia, baseline, reference, input oficial ou threshold foi alterado. Nenhum skip/xfail introduzido. Nenhum detector removido."
+    "Nenhuma regra fisica, tolerancia, baseline, reference, input oficial ou threshold foi alterado. Nenhum skip/xfail introduzido. Nenhum detector removido.",
+    "INSTRUMENTO DO GATE 5: perf_trace.start_stall_sampler() - thread PYTHON pura, ligada no clique e desligada em _on_analyze_done, que ao detectar um salto registra 'CONGELAMENTO detectado pelo amostrador parado=Ns' e despeja o topo da pilha de TODAS as threads. Torna a leitura binaria: se o amostrador congela junto, a GIL estava retida por um chamador NATIVO; se continua tiquetaqueando, e starvation especifica da thread do solver."
   ],
   "tests": [
     "tests/test_bond_strip_adjacent_courses.py: 6 passed - controles negativos (bancada real do beta) e positivos (empilhamento adjacente de 17 fiadas e de 2 fiadas), sem skip/xfail.",
@@ -28,7 +29,8 @@
     "REGRESSAO CONSOLIDADA no escopo CORRETO (raiz, 1037 testes coletados): 1035 passed / 2 failed em 5576.96s (1h32m56s), exit 1. As DUAS falhas sao as HISTORICAS ja registradas para o beta 8cdd33f, com numeros IDENTICOS: TGD compensators 52->61 (delta 9) e TP1 JUNCTION_MISSING_BINDING 8->9 (delta 1). ZERO falha nova.",
     "ERRO DE ESCOPO CORRIGIDO: a primeira consolidada rodou `pytest tests/` (1003 testes) e deixou 34 de fora (nuvem/tests/ e tools/documentation/). Refeita a partir da raiz. Que a raiz e o escopo oficial esta confirmado pela contagem: 8cdd33f tinha 1029 coletados, a raiz de hoje tem 1037 - exatamente +8, os testes acrescentados nesta entrega.",
     "GATE 3 FECHADO OFFLINE: rodando o SOLVER REAL e trocando as letras A/B, a logica antiga produz a mensagem IDENTICA a do relato ('B34 repetido(s) em X~37.0cm, em 9 fiadas (0, 2, 4, 6, 8, 10, 12, 14, 16)') e a nova nao reprova nenhuma parede. tests/test_bond_strip_adjacent_courses.py: 9 passed; 3 failed ao reverter BOND_STRIP_MIN_ADJACENT_COURSES para 0.",
-    "CI (gate 12) simulado localmente, identico ao workflow check-project-status.yml: passo 1 (unittest discover em tools/documentation) 16 tests OK em 16.1s; passo 2 (validate.py --base merge-base --main origin/main --require-current-main) PASS."
+    "CI (gate 12) simulado localmente, identico ao workflow check-project-status.yml: passo 1 (unittest discover em tools/documentation) 16 tests OK em 16.1s; passo 2 (validate.py --base merge-base --main origin/main --require-current-main) PASS.",
+    "tests/test_perf_trace_stall_sampler.py: 4 passed em 2,59s - controle negativo (laco Python apertado NAO dispara, porque o CPython entrega a GIL a cada ~5ms) e positivo (ctypes.PyDLL, que nao libera a GIL, dispara com cpu=0.000s durante o salto - a MESMA assinatura vista no Revit) mais o despejo de pilhas identificando a thread do amostrador."
   ],
   "known_failures": [
     "BUG REAL 3 - CAUSA-RAIZ NAO FECHADA, BLOQUEADOR DE MERGE: o interpretador CPython dentro do processo do Revit congela por 19,6s (execucao 3) e por 100,2s (execucao 2) na mesma fronteira - entre `plan_failures = {}` e o `def plan_hook`, um trecho sem calculo nenhum. Durante o congelamento NENHUMA linha [PERF] de NENHUMA thread aparece (nem o watchdog), enquanto o CPU do processo anda 1,67s fora do Python. Nao e o solver, nao e a instrumentacao (0,285ms/marco medido) e nao e callback perdido. Nao consegui provar que o congelamento e limitado.",
@@ -55,13 +57,13 @@
     "NAO MERGEAR: o unico bloqueador restante e o gate 5/15 - o congelamento do interpretador CPython dentro do Revit, sem causa-raiz e sem limite provado. A instrucao do usuario e explicita: se a Tela 1 puder ficar infinita, nao mergear."
   ],
   "decisions_pending": [
-    "Fechar a causa-raiz do congelamento do interpretador. Proximo passo tecnico: amostrar sys._current_frames() de um thread dedicado durante o congelamento para identificar quem retem a GIL. Hipotese principal, NAO PROVADA: a GIL do pythonnet permanece retida pela thread principal do Revit ao retornar de IExternalEventHandler.Execute enquanto o Revit executa trabalho proprio.",
+    "Fechar a causa-raiz do congelamento (gate 5/15) com UMA execucao do botao TESTE-PERF (head 96c89b5), que ja carrega o amostrador. Sinal extra a ler no despejo: uma thread bloqueada dentro de uma chamada nativa NAO aparece em sys._current_frames() - ausencia no despejo ja aponta retentor nativo.",
     "Reexecutar no Revit com o pacote 2d8d0b1 para fechar o gate 3 (vermelho falso eliminado na pratica).",
     "Decidir o caso peitoril/verga da secao 15.3 das regras (conflito registrado com a 8a)."
   ],
   "next_steps": [
+    "Uma execucao do TESTE-PERF (head 96c89b5) nas mesmas 2 Walls, com o amostrador ligado.",
     "Uma execucao do botao TESTE-PERF (head 2d8d0b1) nas mesmas 2 Walls, confirmando que nenhuma peca recebe vermelho.",
-    "Amostragem de frames durante o congelamento para fechar o BUG 3.",
     "Nao mesclar na main ate que os gates 3, 5, 8, 10 e 12 fechem."
   ],
   "references": [
