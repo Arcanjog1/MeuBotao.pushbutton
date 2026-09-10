@@ -173,3 +173,17 @@ relancar porque um monitor falhou. Checkpoint apenas local deve ser
 recuperado e versionado antes da entrega. Retomar o proximo passo exato;
 uma causa registrada e evidencia a conferir quando houver contradicao,
 nao autoridade superior ao codigo ou ao usuario.
+
+
+## Evidência e propostas (2026-09-10)
+
+reference_projects contém portais; primários em docs/revit_reference_extraction
+com inventário/hash/limites. rules/ e benchmark/ não são fontes concorrentes.
+docs/decisions mantém STATUS/autorização. Nenhuma promoção normativa automática.
+
+Ao alterar portais/acervo, executar também
+python tools/documentation/verify_reference_inventory.py --protected-base <SHA>
+e registrar resultado. Não executar coletores históricos para validar navegação.
+Workflow #32 e validador permanecem governança única.
+Snapshot guarda SHA observado anterior ao commit/merge que o publica; obter
+merge posterior por URL do PR e fetch, sem autorreferência.

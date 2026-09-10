@@ -1,97 +1,40 @@
-# START HERE
+# START HERE — recuperação em poucos minutos
 
-Ponto de entrada para qualquer nova sessão neste repositório. Leitura
-progressiva: leia o mínimo do nível abaixo antes de subir para o
-próximo — nunca "ler o repositório inteiro para entender".
+Projeto pyRevit de alvenaria estrutural. Main contém código oficial e
+propostas documentais; integração não transforma proposta em contrato aprovado.
 
-Antes de retomar uma entrega, executar `git status --short`, buscar a main
-com `git fetch origin main` e conferir os SHAs do status e do checkpoint
-versionado em `docs/checkpoints/`. Regras de recuperacao, publicacao e
-validacao: [DEVELOPMENT_PROCESS.md](DEVELOPMENT_PROCESS.md).
-Um relatorio em outra branch nao e codigo integrado; ler a revisao indicada.
+1. git status; git fetch origin main; comparar HEAD com
+   [status](PROJECT_STATUS.md) e [checkpoint](checkpoints/2026-09-10-beta2-consolidation.md).
+2. Ler [AGENTS](../AGENTS.md), [CLAUDE](../CLAUDE.md) e [processo](DEVELOPMENT_PROCESS.md).
+3. Buscar tema → sinônimo → entidade → heading/símbolo antes de ampliar leitura.
 
----
+| Pergunta | Fonte |
+|---|---|
+| Onde está o solver? | [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py); Script.py é entrada/loader |
+| Quais regras valem? | [Índice](../rules/README.md), autoridade em [REGRAS](../nuvem/REGRAS_MODULACAO_BLOCOS.md), status por seção |
+| Decisões do usuário? | [Registros PENDING](decisions/README.md) |
+| Benchmark oficial? | [Índice](../benchmark/README.md), [manifesto](../nuvem/benchmark/golden/manifest.json), caminhos preservados |
+| Referências humanas? | [TORRE EASY e BUTANTÃ](../reference_projects/README.md), evidência/não norma; [comparação](../reference_projects/COMPARISON.md) |
+| Candidato em teste? | Beta 1 síncrono pendente; #34 bancada e #31 N1 são distintos; [SHAs/limites](GITHUB_STATE_2026-09-10.md) |
+| Última entrega? | [Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md), [consolidação](CONSOLIDATION_2026-09-10.md) |
+| Próximo objetivo? | [Pacote Beta 2](architecture/beta2-implementation-package.md), [backlog A–E](BETA2_BACKLOG.md) |
 
-## SOLVER DE BLOCOS (modulação / amarração)
+## Não fazer
 
-Leia, nesta ordem:
+Não iniciar Revit nesta missão; não mesclar Beta 1/#31/#34/produção antiga;
+não declarar Beta 1 PASS; não implementar CHANNEL/LINTEL, catálogo/cortes/UI,
+N1/C2/CR-B por causa de documento integrado. Não regravar benchmark para
+ocultar falha, promover observação a regra ou transportar apoio TORRE EASY
+para CHANNEL. Nenhum monitoramento agendado.
 
-1. `CLAUDE.md` (raiz)
-2. `docs/PROJECT_STATUS.md`
-3. `nuvem/REGRAS_MODULACAO_BLOCOS.md` — localize a seção pelo
-   heading/ID/termo antes de ler o arquivo inteiro
-4. `docs/CURRENT_REFERENCE_SNAPSHOT.md`
+## Busca por domínio e histórico
 
-Depois: busque só o símbolo/erro específico (`git grep`/`rg`). NÃO leia
-todos os `docs/diagnostics_*` ou relatórios de CR antigos por padrão —
-só se uma busca específica apontar para eles.
+Pairing/geometria: core/engine/geometry.py, wall_pairing.py e tolerances.py.
+UI/Revit: wall_modeling.py; API 2027 ao usar a API.
+Benchmark: REFERENCE_CORPUS/README pertinente. Bug: reproduzir → primeira
+divergência → causa → fix mínimo → testes.
+[Log](PROJECT_STATUS_LOG.md), [arquivo](archive/README.md) e
+[status antigo](PROJECT_STATUS_2026-09-09_HISTORICAL.md) não substituem este estado.
 
----
-
-## WALL PAIRING / GEOMETRIA (paredes a partir do CAD)
-
-Leia, nesta ordem:
-
-1. `CLAUDE.md` (raiz)
-2. `docs/PROJECT_STATUS.md`
-3. `docs/DEVELOPMENT_PROCESS.md`
-4. o módulo específico (`nuvem/core/engine/geometry.py`,
-   `wall_pairing.py`, `tolerances.py`, conforme o caso)
-
-Não carregar o benchmark inteiro automaticamente.
-
----
-
-## BENCHMARK / REFERENCE CORPUS
-
-Leia, nesta ordem:
-
-1. `CLAUDE.md` (raiz)
-2. `docs/PROJECT_STATUS.md`
-3. `docs/REFERENCE_CORPUS.md`
-4. `docs/CURRENT_REFERENCE_SNAPSHOT.md`
-5. o README do benchmark relevante (`nuvem/benchmark/`)
-
----
-
-## UI / REVIT (integração pyRevit)
-
-Não leia o benchmark de blocos inteiro por padrão. Abra só a
-documentação da integração necessária (ex.: seção "REVIT — SHORT
-CURVES" em `docs/PROJECT_STATUS_LOG.md` para o histórico da extração do
-CAD).
-
----
-
-## BUG / DEBUG
-
-Fluxo:
-
-```
-reproduzir -> primeira divergência -> causa -> fix mínimo -> testes
-```
-
-Ver `docs/DEVELOPMENT_PROCESS.md` para o fluxo completo de CR. Para
-diagnóstico sistemático de causa-raiz, use a skill `systematic-debugging`
-quando disponível.
-
----
-
-## REGRA DE OURO
-
-NÃO: "ler o repositório inteiro para entender".
-
-SIM:
-
-```
-START_HERE (este arquivo)
-  -> PROJECT_STATUS.md
-  -> documento do domínio
-  -> busca exata (termo -> sinônimo -> heading -> símbolo de código)
-  -> arquivo de produção específico
-  -> expandir só se a busca em camadas ficou inconclusiva
-```
-
-Histórico completo de CRs: `docs/PROJECT_STATUS_LOG.md` — só abrir
-quando o assunto for uma continuação de CR anterior ou a busca em
-`PROJECT_STATUS.md` ficar inconclusiva.
+Seções numéricas podem colidir entre branches: citar arquivo + SHA.
+Ler erratas/escopo dos dumps humanos antes de reutilizar. Sem migração de imports.

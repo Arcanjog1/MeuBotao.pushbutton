@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "status": "EVIDENCE_NOT_NORM",
+  "source_date": "2026-09-09",
+  "review_date": "2026-09-10",
+  "projects": [
+    {
+      "id": "torre_easy_lo_r00",
+      "source_commit": "51ed8c20c8c7ab903b851cfaae1432663955200a",
+      "primary_path": "docs/revit_reference_extraction",
+      "portal": "reference_projects/torre_easy_lo_r00/README.md",
+      "files": [
+        {
+          "path": "docs/revit_reference_extraction/01_family_catalog.json",
+          "sha256": "7b96f2728ba38e4a49c23feef67a2b95c8dfacc516c5e15da010eaad26d248cb"
+        },
+        {
+          "path": "docs/revit_reference_extraction/02_openings.json",
+          "sha256": "6ea7ca0cab6a1aa29f11831034b248c2a772ef96048f27a17125f7412d7adfad"
+        },
+        {
+          "path": "docs/revit_reference_extraction/03_lintels.json",
+          "sha256": "27aa21f224ddd805f0b7df4b7427d560cfa9e324685a1b28c1bb1140cf320d3a"
+        },
+        {
+          "path": "docs/revit_reference_extraction/04_counter_lintels.json",
+          "sha256": "66855cc7d86cc38362fb3b8419803d6aafdf2b7aad60e3832846a09db012c1ad"
+        },
+        {
+          "path": "docs/revit_reference_extraction/05_channels.json",
+          "sha256": "4be8161bb209135515747717ecca070defec60bf93905ac4183f55338284fc01"
+        },
+        {
+          "path": "docs/revit_reference_extraction/06_cut_blocks.json",
+          "sha256": "d3dfa53db76a2f6f648d7ee86eed5b4c9b52ffe5dce61cb3f4be23274f28e9d6"
+        },
+        {
+          "path": "docs/revit_reference_extraction/07_special_blocks.json",
+          "sha256": "6eb0759a1cc80daf187ccc5e27b0aea437a6d7f2a3f2cbbb3fa9597b0cbd64ac"
+        },
+        {
+          "path": "docs/revit_reference_extraction/08_piece_opening_wall_relations.json",
+          "sha256": "68f6711c39b6f2ef0e93bd8831e306ebdcc47c89170c8f2cbb2710a9451e4d89"
+        },
+        {
+          "path": "docs/revit_reference_extraction/09_observed_patterns.json",
+          "sha256": "b35a9cda46f51171fc4b9dcb082c5ab7f815ec751e9aff2bf848ae6e844b7db0"
+        }
+      ],
+      "status": "EVIDENCE_NOT_NORM",
+      "reproduction": "PARTIAL_RAW_OR_INTERMEDIATE_INPUTS_ABSENT"
+    },
+    {
+      "id": "butanta_r08_lt",
+      "source_commit": "5f1a0c4855cbc947702304aea693c9b4bfa08ada",
+      "primary_path": "docs/revit_reference_extraction/butanta-r08-lt",
+      "portal": "reference_projects/butanta_r08_lt/README.md",
+      "files": [
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/01_family_catalog.json",
+          "sha256": "fc6967a38b547b8aaec210eafca4ad6f9c38ddc8cdd1e867be5db037eb3bb9ce"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/02_openings.json",
+          "sha256": "82b2d7fd52f74c9b960de1a73ab8b204e2350d6e75693812476053f68444a8b9"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/03_above_openings.json",
+          "sha256": "9b50a1a1207449cb2d6c34022ac43d5c30d4b0bb502de758f0a4991ca5435b3f"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/04_below_windows.json",
+          "sha256": "652384b1970503b924c26a3f3fad26ce3a4ab78cbd7a0272a8b6a71866c8b2d0"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/05_channels.json",
+          "sha256": "590feff19893eb8e6aab43f63355936acc41e61f1b0cc308c128bc3a3913a239"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/06_cut_blocks.json",
+          "sha256": "e44d5a108c0306ec8ca24308b61e24cae5ec659d778051981b5cdf398077ddeb"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/07_special_blocks.json",
+          "sha256": "0127e2bf9b280436ffc34f92b53332449459b7b9f209a502ed7aa3dcc3bf2796"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/08_piece_opening_wall_relations.json",
+          "sha256": "0459c4ea4ae85f3ab204111efeb42a14f96012f9f3bc77cb41616792dbd85517"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/09_observed_patterns.json",
+          "sha256": "75bf305f4a1314f7ba7b1767e6cf7190ea5253dd335005f74a6e3df049272ee6"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/10_torre_easy_comparison.json",
+          "sha256": "d37db08bcf196d8d237c010b2e368ee33f129f481e76cc1eb15ffb371bba0446"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/catalog_cov.json",
+          "sha256": "1ee5b44a0a4adaebd856ca6fcc67cee222f8faaa965950831a7f710668508737"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/famtype_counts_todas_categorias.json",
+          "sha256": "f4e71e10de20809b3a8445ab6b57a5ecc30dc186b46e0887224dbb781a093bf3"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/solid_check.json",
+          "sha256": "cd4d64710f50a73fbd6839ed187f150fb222bebb0ba93ee9be6dd82312a82b85"
+        },
+        {
+          "path": "docs/revit_reference_extraction/butanta-r08-lt/evidence/verga_search.json",
+          "sha256": "361c8c613c5dfdee1c198f905e49b6f12d4d465404d90c01cedbd07a3321a94c"
+        }
+      ],
+      "status": "EVIDENCE_NOT_NORM",
+      "reproduction": "PARTIAL_RAW_OR_INTERMEDIATE_INPUTS_ABSENT"
+    }
+  ],
+  "hash_format": "SHA-256 of UTF-8 text with LF line endings"
+}

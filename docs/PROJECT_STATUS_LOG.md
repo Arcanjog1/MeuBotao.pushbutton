@@ -1703,3 +1703,8 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                Teste visual integrado completo no Revit continua
                pendente, retomar quando o usuário priorizar.
 ```
+
+
+## 2026-09-10 — referências e arquitetura Beta 2
+
+[Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md) e [auditoria](GITHUB_STATE_2026-09-10.md). #33/#35 integrados; índices sem mover produção/dados oficiais. Arquitetura PENDING; Beta 1 CANDIDATO — VALIDAÇÃO REVIT PENDENTE. Nenhum Revit iniciado.
