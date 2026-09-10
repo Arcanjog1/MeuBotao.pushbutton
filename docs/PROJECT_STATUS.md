@@ -8,8 +8,8 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ```json
 {
-  "observed_utc": "2026-09-09T14:35:00+00:00",
-  "main": "08495d913e72b36a80b034d5f0a1435470d27557",
+  "observed_utc": "2026-09-10T18:30:44.937352+00:00",
+  "main": "aa58d70d84c6134216f8f15a131edf060c4dce81",
   "official": [
     {"pr": 24, "head": "91258dd627af97fe437a56c0506eb096ca5aa267"},
     {"pr": 27, "head": "7cc935d9bd7434ae07e9e70d5839cc07ebd5d483"},
@@ -30,7 +30,7 @@ Fechamento posterior do #31: [reconferencia](checkpoints/evidence/2026-09-09-git
 
 ## Estado oficial
 
-Main observada: **08495d913e72b36a80b034d5f0a1435470d27557**.
+Main observada por fetch: **aa58d70d84c6134216f8f15a131edf060c4dce81**. #32 integrado em 2026-09-09; checks verdes. O relato detalhado abaixo é o snapshot anterior e será compactado no PR de consolidação.
 Ultimo marco de solver desta cadeia: CR-G12, merge `c88a031`.
 Os commits seguintes ate `08495d9` reconciliam documentacao.
 O SHA e uma observacao datada, nao uma promessa de que a main nunca avancara.
@@ -190,3 +190,7 @@ estava desativada no snapshot; checks nao sao veto administrativo.
 Historico: [PROJECT_STATUS_LOG.md](PROJECT_STATUS_LOG.md) e Git.
 Relatos datados anteriores preservam o que se sabia naquela revisao; nao
 substituem este estado operacional reconciliado.
+
+## Reconciliação 2026-09-10 — referências humanas
+
+#33: EVIDÊNCIA / NÃO NORMA; revisão e limites em [revisão TORRE EASY](revit_reference_extraction/REVIEW_2026-09-10.md). #35 será revisado depois. #34 e #31 continuam candidatos. Beta 1: **CANDIDATO — VALIDAÇÃO REVIT PENDENTE**; branch de desempenho informada pelo usuário ainda não localizada no remoto. Nenhum desses candidatos foi integrado.
