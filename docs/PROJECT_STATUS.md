@@ -66,7 +66,7 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 | Último checkpoint | [Consolidação Beta 2](checkpoints/2026-09-10-beta2-consolidation.md) |
 | Próximo objetivo | [Pacote](architecture/beta2-implementation-package.md), após decisões e validação Beta 1 |
 
-PR da consolidação: not-created (preencher antes da entrega).
+PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
 Integração documental não aprova arquitetura/produção. D6 resolvida por #27.
 
 Branch Beta 1 informada: claude/revit-solver-perf-diagnosis-6dfd89;

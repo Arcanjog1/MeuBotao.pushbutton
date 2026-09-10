@@ -4,7 +4,7 @@ STATUS: entrega documental; arquitetura PENDING USER APPROVAL.
 Main inicial aa58d70d84c6134216f8f15a131edf060c4dce81.
 #33: 59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9. #35: 6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9.
 [Auditoria/PRs/checks](GITHUB_STATE_2026-09-10.md).
-PR de reorganização: not-created; merge posterior consultável no PR.
+PR de reorganização: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36); merge posterior consultável no PR.
 Checkpoint registra HEAD avaliado anterior ao commit documental; um commit
 não pode gravar seu próprio SHA.
 

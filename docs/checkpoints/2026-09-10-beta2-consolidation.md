@@ -6,7 +6,7 @@
   "branch": "codex/consolidate-beta2-architecture-20260910",
   "head": "8a7f2037d68e3602629bb3ca2236c642bd389033",
   "base": "6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36",
   "objective": "Consolidar GitHub, integrar referencias humanas autorizadas e definir arquitetura/backlog Beta 2 sem alterar producao.",
   "changes": [
     "Inventario Git/GitHub e classificacao dos 10 PRs relevantes; 35 PRs no snapshot inicial.",
@@ -90,7 +90,7 @@
   "branch": "codex/consolidate-beta2-architecture-20260910",
   "head": "8a7f2037d68e3602629bb3ca2236c642bd389033",
   "base": "6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36",
   "objective": "Consolidar GitHub, integrar referencias humanas autorizadas e definir arquitetura/backlog Beta 2 sem alterar producao.",
   "changes": [
     "Inventario Git/GitHub e classificacao dos 10 PRs relevantes; 35 PRs no snapshot inicial.",
