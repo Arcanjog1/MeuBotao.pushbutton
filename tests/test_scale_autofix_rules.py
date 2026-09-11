@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Regressao das duas regras que o usuario definiu em 2026-09-10.
 
-  - secao 11.10: amarracao que nao cabe fica SEM MODULAR;
+  - secao 11.10 (revisada pela evidencia humana): amarracao que nao cabe DEGRADA para B34|B34; so' fica SEM MODULAR se nem assim couber;
   - secao 11.11: boneca que atravessa parede e' ABSORVIDA por ela.
 
 Geometria SINTETICA de proposito (nada do RVT de teste entra aqui): a regra e'
@@ -89,25 +89,52 @@ def _two_close_tees(gap_cm):
     ]
 
 
-def test_11_10_amarracoes_que_nao_cabem_ficam_sem_modular():
-    """Dois encontros a 27cm com peca de amarracao de 54cm: nenhuma peca dos
-    dois nos e' lancada e os DOIS aparecem em intersection_failures."""
+def test_11_10_amarracoes_que_nao_cabem_degradam_para_B34_antes_de_ficar_sem_modular():
+    """Dois encontros a 27cm com peca de amarracao de 54cm.
+
+    EVIDENCIA HUMANA (BUTANTA R08_LT, 2026-09-10): nos 3 nos T reais sem
+    espaco o projeto pronto usa B34 na principal + B34 na que chega (a
+    degradacao para L que o solver ja' tinha), contra 30 nos com espaco em
+    B54|B34. Entao a ordem e': (1) o teste de espaco enxerga o vizinho de
+    meio de vao e o T degrada sozinho; (2) so' se AINDA assim interpenetrar,
+    o par fica sem modular (rede de seguranca _reject_overlapping_node_ties).
+    Nunca dois solidos no mesmo espaco."""
     walls, nodes, result, preflight = solve(_two_close_tees(27.0))
 
     assert preflight["collisions"] == [], (
-        "a regra 11.10 existe justamente para nao emitir dois solidos no mesmo "
-        "espaco: %r" % (preflight["collisions"][:2],))
-
-    failures = result["intersection_failures"]
-    nao_cabe = [f for f in failures if "nao cabe" in str(f[1])]
-    assert len(nao_cabe) == 2, (
-        "os DOIS nos tem de ser reportados, nunca um vencedor eleito: %r" % (failures,))
-
-    rejeitados = {f[0] for f in nao_cabe}
-    for course_index, pieces in result["course_candidates"].items():
+        "nunca dois solidos no mesmo espaco: %r" % (preflight["collisions"][:2],))
+    assert [f for f in result["intersection_failures"] if "nao cabe" in str(f[1])] == [], (
+        "com espaco para degradar, o par NAO pode ficar sem modular: %r"
+        % (result["intersection_failures"],))
+    # Os dois T foram resolvidos, e resolvidos DEGRADADOS (B34 na principal).
+    reasons = {}
+    for pieces in result["course_candidates"].values():
         for piece in pieces:
-            assert piece.get("node_index") not in rejeitados, (
-                "fiada %s ainda lancou peca de um no' rejeitado" % course_index)
+            if piece.get("placement_reason", "").startswith("T_INTERSECTION"):
+                reasons.setdefault(piece["node_index"], set()).add(
+                    (piece["logical_code"], piece["placement_reason"]))
+    t_nodes = [i for i, n in enumerate(nodes) if n["kind"] == "T_INTERSECTION"]
+    assert len(t_nodes) == 2
+    for ni in t_nodes:
+        assert ni in reasons, "no' T %d ficou sem peca de amarracao" % ni
+        assert all(code == "B34" for code, _r in reasons[ni]), reasons[ni]
+        assert any("DEGRADED" in r for _c, r in reasons[ni]), reasons[ni]
+
+
+def test_11_10_rede_de_seguranca_continua_ativa_quando_nem_degradar_cabe():
+    """Se mesmo degradadas as pecas interpenetrarem, o par fica SEM MODULAR e
+    reportado - nunca lancado. Forca o caso desligando a degradacao."""
+    import sys as _sys
+    ws = _sys.modules["core.engine.wall_stepper"]   # o modulo real, ja' carregado por load_script
+    original = ws._clip_range_by_midspan_neighbours
+    ws._clip_range_by_midspan_neighbours = lambda w, n, wi, t, rng, exclude_node_index=None: rng
+    try:
+        walls, nodes, result, preflight = solve(_two_close_tees(27.0))
+    finally:
+        ws._clip_range_by_midspan_neighbours = original
+    assert preflight["collisions"] == []
+    nao_cabe = [f for f in result["intersection_failures"] if "nao cabe" in str(f[1])]
+    assert len(nao_cabe) == 2, result["intersection_failures"]
 
 
 def test_11_10_nao_dispara_quando_os_encontros_cabem():

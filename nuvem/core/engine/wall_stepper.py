@@ -1156,6 +1156,41 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     return max(0.0, t_ft - boundary)
 
 
+
+def _clip_range_by_midspan_neighbours(walls_to_create, nodes, wall_idx, t_ft, safe_range_ft,
+                                      exclude_node_index=None):
+    """Encolhe `safe_range_ft` (lo, hi) de `wall_idx` para parar TAMBEM na reserva
+    de outro encontro de MEIO de vao (T/X) da MESMA parede, nao so' nas pontas.
+
+    `_wall_reserved_range_ft` so' conhece os nos das duas PONTAS da parede - e
+    um T e' sempre meio da principal. Dois T na mesma principal a menos do que
+    a peca de amarracao mede nunca se enxergavam: cada um media espaco ate' a
+    ponta oposta, forcava o B54 inteiro, e os dois B54 se interpenetravam
+    (medido na planta de teste: nos a 27cm, B54 de 54cm, [311,365] x [338,392]).
+
+    Parando aqui, `_t_intersection_room_ok` devolve False e
+    `solve_t_intersection` cai sozinho na degradacao ja' existente - B34 na
+    principal para o lado que TEM espaco + B34 na que chega. E' exatamente o
+    que o projeto humano BUTANTA R08_LT faz nos 3 nos T sem espaco medidos em
+    2026-09-10 (B34|B34 em todos), contra 30 nos com espaco em B54|B34.
+
+    A reserva do vizinho e' a generica de meio de vao
+    (`_node_default_reservation_cm`, metade da espessura da parede que
+    atravessa) - a mesma que o preenchimento comum ja' respeita."""
+    lo_ft, hi_ft = safe_range_ft
+    for other_index, other in enumerate(nodes or []):
+        if other_index == exclude_node_index:
+            continue
+        if wall_idx not in _midspan_node_wall_ids(other):
+            continue
+        t_other = _t_of_point_on_wall(walls_to_create, wall_idx, other["point"])
+        reserve_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
+        if t_other > t_ft + 1e-6:
+            hi_ft = min(hi_ft, t_other - reserve_ft)
+        elif t_other < t_ft - 1e-6:
+            lo_ft = max(lo_ft, t_other + reserve_ft)
+    return lo_ft, hi_ft
+
 def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
                                     nodes=None, end_to_node=None, node_index=None):
     """Mede o espaco fisico real neste no' T - so' MEDE, nunca decide nem
@@ -1182,6 +1217,9 @@ def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
     _p0, _p1, main_dir, _len, _thick = _wall_axis_and_length(walls_to_create, main_idx)
     t_main = _t_of_point_on_wall(walls_to_create, main_idx, point)
     main_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, main_idx) if have_graph else None
+    if have_graph:
+        main_range = _clip_range_by_midspan_neighbours(walls_to_create, nodes, main_idx, t_main, main_range,
+                                                       exclude_node_index=node_index)
     room_plus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, 1, main_range)
     room_minus = _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, -1, main_range)
 
