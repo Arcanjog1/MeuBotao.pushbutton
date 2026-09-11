@@ -3570,7 +3570,8 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       band_cb=None, progress_cb=None,
                                       wall_start_cb=None, wall_result_cb=None,
                                       stage_cb=None, opening_strategy=None,
-                                      arm_role_safe_repair=None, b19_residual_fill_repair=None):
+                                      arm_role_safe_repair=None, b19_residual_fill_repair=None,
+                                      tie_parity_search=None):
     """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
     CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
     courses_core` (a funcao original, inalterada - mesma docstring,
@@ -3624,15 +3625,32 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
         wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
     )
-    if not enabled or result.get("error") is not None:
-        return _record_unmodulated_walls(result, walls_to_create)
-
     def _rebuild():
         return _solve_building_blocks_all_courses_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
             allow_compensators=allow_compensators, variants_per_course=variants_per_course,
             opening_strategy=opening_strategy,
         )
+
+    # ETAPA 7 - paridade de amarracao por no' (ver search_tie_parity em
+    # wall_stepper.py). Roda ANTES dos reparos: eles reconstroem sobre os
+    # mesmos `nodes`, e a marca `_tie_parity_flip` vive no proprio no', entao
+    # enxergam a paridade escolhida. `tie_parity_search=None` usa o default do
+    # modulo (TIE_PARITY_LOCAL_SEARCH); True/False liga/desliga por chamada.
+    # Lida do MODULO wall_stepper em tempo de chamada (nao da copia que o
+    # `import *` fez ao carregar): e' la' que a flag vive e e' la' que os
+    # testes/bancadas a ligam, como REJECT_OVERLAPPING_NODE_TIES.
+    from core.engine import wall_stepper as _stepper_flags
+    parity_enabled = (tie_parity_search if tie_parity_search is not None
+                      else _stepper_flags.TIE_PARITY_LOCAL_SEARCH)
+    if parity_enabled and result.get("error") is None:
+        parity_outcome = search_tie_parity(nodes, walls_to_create, result, _rebuild, stage_cb=stage_cb)
+        if parity_outcome["changed"]:
+            result = parity_outcome["final_result"]
+        result["tie_parity_search"] = {"flips": parity_outcome["flips"], "tried": parity_outcome["tried"]}
+
+    if not enabled or result.get("error") is not None:
+        return _record_unmodulated_walls(result, walls_to_create)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,

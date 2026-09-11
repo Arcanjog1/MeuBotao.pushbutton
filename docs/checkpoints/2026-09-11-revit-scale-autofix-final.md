@@ -166,3 +166,24 @@ Maiores faltas: as paredes de 99/115 cm (`8079859`, `8079866`), cluster de pared
 - Paredes de 99 cm: amarração em todos os lados (canto, canto e T) sem espaço para peça inteira — reserva de canto por fiada (pendente).
 
 Regra candidata (evidência humana, não implementada): **a paridade de um canto em L deve ser escolhida junto com as amarrações em T da mesma parede, de modo que o trecho entre a amarração e o canto feche com peça inteira/B34, nunca com compensadores empilhados.**
+
+
+## Adendo 2026-09-11 — Etapa 7: paridade de amarração por nó (flag)
+
+Hipótese "paridade por parede (2-coloração)" testada contra o humano e
+DERRUBADA (13/33 paredes mistas; 13/37 T com paridades iguais). O humano escolhe
+nó a nó. Sonda (`_scripts/parity_probe.py`): inverter a paridade de UM nó T por
+parede elimina as 7 faixas de compensador de 494 cm com a regra #2 intacta.
+
+Implementado `TIE_PARITY_LOCAL_SEARCH` (default False) — marca `_tie_parity_flip`
+no nó + `search_tie_parity` gulosa/determinística, rodando no wrapper antes dos
+reparos. Medições (`_scripts/measure_parity.py`):
+
+| Planta | off | on | custo |
+|---|---|---|---|
+| BUTANTÃ 34, vãos reais | 12 reprovadas, 1.263 comp. | **4**, 1.043 comp., 13 flips/29 tent. | 2,9 s → 106 s |
+| Torre 179 | 22 reprovadas | **15** | 5,5 s → 28 s |
+
+Benchmarks TGD/TP1 (`_scripts/bench_parity.py`): em execução no fechamento
+deste adendo — resultado no commit seguinte. Regras: seção 11.12.
+Testes: `tests/test_tie_parity_local_search.py` (4).

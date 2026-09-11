@@ -176,6 +176,7 @@ __all__ = [
     "_b19_residual_edge_candidates", "_evaluate_b19_residual_candidate",
     "repair_b19_residual_fill",
     "_apply_axis_plan_in_memory", "_rebase_node_indexes_for_wall",
+    "search_tie_parity", "TIE_PARITY_LOCAL_SEARCH", "_tie_parity_score", "_tie_parity_candidates",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
     "WALL_GROUP_SHIFT_MAX_CM", "WALL_GROUP_SHIFT_VERIFY_BUDGET",
@@ -1904,9 +1905,117 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     for node_index, course_a, course_b in solved:
         if node_index in rejected:
             continue
+        # PARIDADE POR NO' (ver search_tie_parity): um no' marcado troca a
+        # fiada das suas DUAS pecas (A<->B). A relacao de amarracao entre
+        # elas nao muda - so' qual das duas cai na fiada par/impar.
+        if nodes[node_index].get("_tie_parity_flip"):
+            for candidate in (course_a, course_b):
+                candidate["course"] = "B" if candidate.get("course") == "A" else "A"
         candidates.append(course_a)
         candidates.append(course_b)
     return {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts}
+
+
+# ==========================================
+# ETAPA 7 (a "inversao A/B que a secao 11 permite para a paginacao global",
+# deixada em aberto desde o inicio) - BUSCA LOCAL DE PARIDADE POR NO'.
+#
+# Cada solver de encontro fixa uma convencao por PAPEL: no T, B54 da
+# principal -> Fiada A e B34 da que chega -> Fiada B; no L, arms[0] -> A.
+# Isso obriga uma parede que e' principal num T e "chega" noutro a hospedar
+# amarracoes nas duas paridades, e os trechos entre amarracoes ficam com
+# comprimentos que so' fecham com compensador empilhado ou junta corrida.
+#
+# EVIDENCIA (BUTANTA R08_LT, 1o PAV, 2026-09-11, docs/checkpoints/2026-09-11-
+# revit-scale-autofix-final.md): o projeto humano NAO segue nenhuma regra
+# global de paridade (13 de 33 paredes hospedam amarracoes ora na fiada 0,
+# ora na 1; principal e chega tem a mesma paridade em 13 de 37 T) - ele
+# escolhe no' a no' o que fecha melhor. Sonda sobre o solver: inverter a
+# paridade de UM no' T por parede elimina as 7 faixas de compensador das
+# paredes de 494cm (12 -> 4 paredes reprovadas, 1263 -> 1103 compensadores)
+# com a regra #2 intacta - sem ligar a fileira de B34.
+#
+# Mecanica: `node["_tie_parity_flip"]` (persistente no proprio no', como o
+# pin de papel do SAFE REPAIR - consistente entre bandas e reparos), lida por
+# `solve_all_intersections`. `search_tie_parity` e' gulosa e DETERMINISTICA
+# (candidatos em ordem geometrica), aceita um flip so' se a pontuacao
+# lexicografica (paredes reprovadas pela auditoria, compensadores, colisoes)
+# melhora estritamente, e tem orcamento porque cada tentativa e' uma
+# re-resolucao COMPLETA (34 paredes: ~3s em CPython, ~20s no IronPython do
+# Revit). DEFAULT False ate' a medicao dos benchmarks decidir.
+TIE_PARITY_LOCAL_SEARCH = False
+TIE_PARITY_SEARCH_MAX_CANDIDATES = 24
+TIE_PARITY_SEARCH_MAX_PASSES = 2
+
+
+def _tie_parity_score(result):
+    """(paredes reprovadas, compensadores lancados, colisoes) - menor e' melhor.
+    None se o resultado nao e' comparavel (erro)."""
+    if not result or result.get("error"):
+        return None
+    audits = result.get("wall_bond_audits") or {}
+    reproved = sum(1 for audit in audits.values() if not audit.get("ok", True))
+    compensators = 0
+    for pieces in (result.get("course_candidates") or {}).values():
+        for piece in pieces:
+            if piece.get("logical_code") in ("C09", "C04"):
+                compensators += 1
+    return (reproved, compensators, len(result.get("collisions") or []))
+
+
+def _tie_parity_candidates(nodes, result, walls_to_create):
+    """Nos T/X que tocam uma parede REPROVADA pela auditoria, em ordem
+    geometrica (nunca por indice de entrada)."""
+    audits = result.get("wall_bond_audits") or {}
+    reproved = {wi for wi, audit in audits.items() if not audit.get("ok", True)}
+    out = []
+    for node_index, node in enumerate(nodes):
+        if node.get("kind") not in ("T_INTERSECTION", "X_INTERSECTION"):
+            continue
+        involved = {node.get("main_wall_idx"), node.get("incoming_wall_idx")}
+        involved.update(node.get("crossing_walls") or [])
+        if involved & reproved:
+            out.append(node_index)
+    out.sort(key=lambda i: _canonical_node_sort_key(nodes[i]) + (i,))
+    return out[:TIE_PARITY_SEARCH_MAX_CANDIDATES]
+
+
+def search_tie_parity(nodes, walls_to_create, baseline_result, rebuild_fn, stage_cb=None):
+    """Busca gulosa de paridade por no'. Muta `nodes` IN PLACE (marca
+    `_tie_parity_flip`) e devolve {"changed", "flips", "tried", "final_result"}.
+    Nunca aceita um flip que piore a pontuacao ou que introduza erro."""
+    best_score = _tie_parity_score(baseline_result)
+    best = baseline_result
+    accepted = []
+    tried = 0
+    if best_score is None or best_score[0] == 0:
+        return {"changed": False, "flips": [], "tried": 0, "final_result": baseline_result}
+    for _pass in range(TIE_PARITY_SEARCH_MAX_PASSES):
+        improved = False
+        for node_index in _tie_parity_candidates(nodes, best, walls_to_create):
+            node = nodes[node_index]
+            node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+            tried += 1
+            if stage_cb is not None:
+                try:
+                    stage_cb("paridade: testando no' {} ({} tentativas)".format(node_index, tried))
+                except Exception:
+                    pass
+            trial = rebuild_fn()
+            score = _tie_parity_score(trial)
+            if score is not None and score < best_score:
+                best_score, best = score, trial
+                accepted.append(node_index)
+                improved = True
+            else:
+                node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+                if not node["_tie_parity_flip"]:
+                    node.pop("_tie_parity_flip", None)
+            if best_score[0] == 0:
+                break
+        if not improved or best_score[0] == 0:
+            break
+    return {"changed": bool(accepted), "flips": accepted, "tried": tried, "final_result": best}
 
 
 # REGRA DO USUARIO (2026-09-10, secao 11.10 de REGRAS_MODULACAO_BLOCOS.md):

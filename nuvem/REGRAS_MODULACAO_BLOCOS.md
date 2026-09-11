@@ -1598,6 +1598,53 @@ próprio vão. Medido: reservar por esse caminho reprovou a **própria bancada d
 planta (42 → 126, agora em compensadores). O critério correto é decidir
 **depois** da colisão, com a peça já posicionada.
 
+### 11.12 — ETAPA 7: paridade de amarração por NÓ (busca local, atrás de flag) — 2026-09-11
+
+> **Status**: IMPLEMENTADO atrás de `TIE_PARITY_LOCAL_SEARCH` (`wall_stepper.py`),
+> **default False** até a medição dos benchmarks; regra candidata, não norma.
+
+**O que a seção 11 sempre deixou em aberto:** cada solver de encontro fixa a
+fiada por PAPEL (T: B54 da principal → Fiada A, B34 da que chega → Fiada B;
+L: `arms[0]` → A) e "a inversão A/B que a seção 11 permite para a paginação
+global fica para a Etapa 7 decidir". A Etapa 7 nunca existiu. Consequência
+medida: uma parede que é principal num T e "chega" noutro hospeda amarrações
+nas DUAS paridades, e o trecho entre amarrações fica com comprimento que só
+fecha com compensador empilhado — nas sete paredes de 494 cm de BUTANTÃ,
+`11×B39 + C09 C09 C04` (três compensadores seguidos, que a seção 2 proíbe).
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV):** o projeto pronto **não** segue
+regra global de paridade — 13 de 33 paredes hospedam amarrações próprias ora
+na fiada 0, ora na 1; principal e parede que chega têm a MESMA paridade em 13
+de 37 nós T. Ele escolhe **nó a nó** o que fecha melhor (ex.: `8079838`, T +
+T: `B34[-1,35] … B54[399,455] C09 B34[464,500]` na fiada 0). Uma primeira
+hipótese "paridade por parede / 2-coloração" foi testada contra o humano e
+**derrubada** antes de virar código.
+
+**Mecânica:** `node["_tie_parity_flip"]` (marca persistente no próprio nó,
+como o pin de papel do SAFE REPAIR — consistente entre bandas e reparos) faz
+`solve_all_intersections` trocar a fiada das DUAS peças daquele nó (A↔B); a
+relação de amarração entre elas não muda. `search_tie_parity` é gulosa e
+determinística (candidatos = nós T/X que tocam parede reprovada, em ordem
+geométrica), aceita um flip só se a pontuação `(paredes reprovadas,
+compensadores, colisões)` melhora estritamente, com orçamento
+(`TIE_PARITY_SEARCH_MAX_CANDIDATES = 24`, `…MAX_PASSES = 2`). Roda no wrapper
+`solve_building_blocks_all_courses` ANTES dos reparos, que reconstroem sobre
+os mesmos nós. `tie_parity_search=True/False` liga/desliga por chamada.
+
+**Medido (regra #2 intacta, fileira de B34 desligada):**
+
+| Planta | off | on | custo |
+|---|---|---|---|
+| BUTANTÃ 34 paredes, vãos reais | 12 reprovadas (9 juntas + 7 faixas), 1.263 comp. | **4** reprovadas (7 juntas), 1.043 comp., 13 flips / 29 tentativas | 2,9 s → **106 s** (CPython) |
+| Torre 179 eixos | 22 reprovadas | **15** | 5,5 s → 28 s |
+
+As 4 que sobram em BUTANTÃ (`8079818` na ponta livre e as três de 99 cm) são
+outra família (reserva de canto por fiada). Custo é o motivo do default
+False: cada tentativa é uma re-resolução completa (~7× mais lenta no
+IronPython do Revit). Nenhuma regra física nova; nenhum limiar alterado.
+Testes: `tests/test_tie_parity_local_search.py` (mecânica, determinismo,
+reversão de flip inútil, e integração sobre a parede de 494 cm real).
+
 ## 12. Orientação dos compensadores (regra #3, 2026-08-25)
 
 > **Status**: IMPLEMENTADO (sessão 2026-08-25), com uma premissa física
