@@ -95,16 +95,19 @@ def test_butanta_494cm_entre_duas_principais_fecha_sem_faixa_de_compensador():
              for i in (8079818, 8079777, 8079833)]
     walls, nodes, e2n = _graph(lines)
     openings = [[] for _ in walls]
-    ws.PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = False
     base = m.solve_building_blocks_all_courses(nodes, walls, e2n, openings, CATALOG, 0.0, 14,
                                                variants_per_course=1, tie_parity_search=False)
     reproved_base = [wi for wi, a in base["wall_bond_audits"].items() if not a["ok"]]
-    assert 2 in reproved_base, "a parede de 494cm deveria sair reprovada no default: %r" % reproved_base
+    # 2026-09-11 (regra da fileira de B34, decisao do usuario): a parede de
+    # 494cm ja' fecha SEM faixa de compensador no default - B34 + 9xB39 +
+    # B34 B34, como o humano. A busca de paridade passa a ser um no-op aqui
+    # (nada reprovado para consertar) e nunca pode piorar o resultado.
+    assert 2 not in reproved_base, "a parede de 494cm deveria fechar sem faixa no default: %r" % reproved_base
     for n in nodes:
         n.pop("_tie_parity_flip", None)
     best = m.solve_building_blocks_all_courses(nodes, walls, e2n, openings, CATALOG, 0.0, 14,
                                                variants_per_course=1, tie_parity_search=True)
     reproved_best = [wi for wi, a in best["wall_bond_audits"].items() if not a["ok"]]
-    assert best["tie_parity_search"]["flips"], best["tie_parity_search"]
+    assert not best["tie_parity_search"]["flips"], best["tie_parity_search"]
     assert 2 not in reproved_best, reproved_best
-    assert len(reproved_best) < len(reproved_base)
+    assert len(reproved_best) <= len(reproved_base)

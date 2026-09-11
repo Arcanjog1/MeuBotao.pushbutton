@@ -96,38 +96,58 @@ anterior não fechar o trecho:
 8. Último recurso irrestrito (nunca reporta `NON_MODULAR_WALL` quando uma
    solução — mesmo "feia" — existe).
 
-### Correção de implementação (2026-09-10): fileira de B34 antes de compensadores empilhados
+### Regra da fileira de B34 (revisada em 2026-09-11 — decisão do usuário sobre a evidência humana)
 
-A ordem acima já dizia que, acima de `MAX_COMPENSATORS_PER_TRECHO = 1`, o
-solver prefere B34 a empilhar compensadores. O código não fazia isso quando a
-fileira de B34 passava de `MAX_SPECIAL_BOND_PER_TRECHO = 1` peça: esse layout
-era guardado como "7b" e só devolvido **depois** do fallback irrestrito de
-compensadores. **Medido no projeto humano BUTANTÃ R08_LT (1º PAV):** nas sete
-paredes de 494 cm sem abertura o solver punha `11×B39 + C09 C09 C04` (três
-compensadores em sequência, faixa vertical reprovada pelo próprio auditor);
-o humano põe `B34 + 9×B39 + B34 B34`. Corridas de 2 a 6 B34 são rotina no
-projeto pronto (1.615 B34 contra 242 C09).
+**O teto `MAX_SPECIAL_BOND_PER_TRECHO = 1` é de PREFERÊNCIA, não proibição.**
+A ordem de fechamento de um trecho de preenchimento passa a ser, em geral:
 
-**Implementação:** em `_pier_ordered_layout` a fileira de B34 acima do teto
-pode vir logo depois do tier 5 (≤ 1 compensador) e antes do meio-bloco
-forçado e de qualquer fallback com mais de um compensador — atrás da flag
-`PREFER_B34_ROW_OVER_STACKED_COMPENSATORS`. **DEFAULT `False` (2026-09-11):**
-esse comportamento é o do projeto humano e o benchmark TGD é indiferente a
-ele (números idênticos com True/False), mas ele **contraria a regra #2
-documentada** ("peça especial não vira enchimento", teto
-`MAX_SPECIAL_BOND_PER_TRECHO = 1` na geração desde 2026-08-28) e os testes que
-a codificam (`test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo`,
-controles de `test_block_node_fill_revalidation`). Trocar o default é
-**decisão normativa do usuário** — registrada como pendente. Com `False`,
-o trecho de 494 cm volta a fechar com `11×B39 + C09 C09 C04` (o que a seção
-2 proíbe e o auditor reprova como faixa) — as duas regras documentadas
-conflitam nesse comprimento; o humano resolve a favor da fileira de B34. Um
-único compensador dentro do teto continua preferido (246 cm = 6×B39 + C04).
-Efeito medido: Butantã, 34 paredes com aberturas reais, reprovações do solver
-12 → 5 (as 7 faixas de compensador desaparecem), B34 846 → 1.557 (humano
-1.615), C09 739 → 467; a bancada de 340 cm da Torre fecha com 11 peças por
-fiada — os mesmos 154 blocos medidos no Revit real. Teste:
-`tests/test_fill_prefers_b34_row_over_stacked_compensators.py`.
+1. só B39;
+2. 1 B19 numa ponta aberta;
+3. B39 + **até 1** B34 (acerto pontual — a função clássica do B34);
+4. 1 B19 em ponta aberta + B39/B34;
+5. **1 único** compensador/pastilha (`MAX_COMPENSATORS_PER_TRECHO = 1`);
+5b. **fileira de B34** (2 ou mais peças de 34, sem compensador);
+6. B19 forçado contra um nó;
+7. compensadores acima do teto (só se nada acima fechar);
+8. último recurso irrestrito.
+
+**Por que é geral e explicável:** B34 é peça **modular** da mesma família
+(39/34/54 — módulo de 5 cm com junta), não uma peça de acerto como o
+compensador (9 cm) ou a pastilha (4 cm). Uma fileira de B34 fecha o trecho
+sem quebrar o prisma (as juntas continuam desencontradas entre fiadas) e
+sem sequência de peças pequenas — exatamente o que a regra dos compensadores
+proíbe. O que a regra antiga chamava de "peça de amarração virando
+enchimento" só é um problema quando o B34 é **gratuito** (1 B34 ou 1
+compensador já fechavam); a fileira só entra quando nenhum dos dois fecha.
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, medido via MCP):** 1.615 B34
+contra 242 C09; corridas de 2 a 6 B34 como fechamento de rotina; as sete
+paredes de 494 cm sem abertura fecham com `B34 + 9×B39 + B34 B34` — onde o
+teto-como-proibição produzia `11×B39 + C09 C09 C04` (três compensadores em
+sequência, faixa vertical reprovada pelo próprio auditor). Um único
+compensador dentro do teto continua preferido a dois B34 (246 cm = 6×B39 +
+C04), como o humano também faz (245 C04 no pavimento).
+
+**Conflito resolvido:** como proibição, o teto de B34 contradizia
+`MAX_COMPENSATORS_PER_TRECHO` em todo comprimento em que nem 1 B34 nem 1
+compensador fecham (494 cm é o caso medido) — uma das duas tinha de ceder;
+o projeto humano cede sempre a favor da fileira de B34. Nada é hardcoded:
+nem o comprimento, nem a quantidade de B34, nem a parede — a regra é a
+ordem de tiers acima, varrida em teste de 40 a 900 cm
+(`test_regra_geral_fileira_de_b34_so_quando_nem_um_b34_nem_um_compensador_fecham`).
+
+**Implementação:** `_pier_ordered_layout`, bloco 5b (`wall_stepper.py`), sem
+flag (a flag `PREFER_B34_ROW_OVER_STACKED_COMPENSATORS`, que existiu entre
+2026-09-10 e 2026-09-11 com default `False`, foi removida). Histórico: até
+2026-09-10 a fileira era o "7b", depois do fallback irrestrito de
+compensadores. Efeito medido: Butantã, 34 paredes com aberturas reais,
+reprovações do solver 12 → 5 (as 7 faixas de compensador desaparecem), B34
+846 → 1.557 (humano 1.615), C09 739 → 467; a bancada de 340 cm da Torre
+fecha com 11 peças por fiada — os mesmos 154 blocos medidos no Revit real;
+benchmark TGD indiferente. Testes:
+`tests/test_fill_prefers_b34_row_over_stacked_compensators.py`,
+`test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo` (reescrito
+para a regra revisada).
 
 ### Regra do meio-bloco (B19)
 

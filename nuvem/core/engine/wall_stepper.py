@@ -3147,35 +3147,37 @@ COMMON_FILL_BLOCK_CODES = OPENING_JAMB_BLOCK_CODES + (MID_WALL_BLOCK_CODE,)
 MAX_COMPENSATORS_PER_TRECHO = 1
 
 # Quantas pecas ESPECIAIS DE AMARRACAO (B34/B54 - `is_special_bond` no
-# catalogo, nunca por codigo fixo) um UNICO trecho de preenchimento comum
-# pode usar antes de a solucao ser considerada "peca de amarracao virando
-# enchimento". Mesmo espirito e mesmo teto de MAX_COMPENSATORS_PER_TRECHO:
-# peca de acerto e' PONTUAL, nunca sequencia.
+# catalogo, nunca por codigo fixo) um trecho de preenchimento comum usa
+# ANTES de o solver considerar outras solucoes. E' um teto de PREFERENCIA,
+# nao uma proibicao (regra revisada em 2026-09-11 pela evidencia do projeto
+# humano BUTANTA R08_LT, decisao do usuario):
 #
-# NECESSARIO A PARTIR DE 2026-08-28, com o pipeline "parede completa
-# primeiro" (secao 23): o trecho de preenchimento passou a ir de no' a no',
-# atravessando os vaos, e num trecho longo o tier 3 (B39+B34, sem limite de
-# quantidade) fechava a sobra com uma FILEIRA de B34 no meio da parede -
-# medido: `4xB39 + 3xB34` seguidos em [475, 579] numa parede de 6m, que a
-# propria auditoria de amarracao reprovava logo em seguida
-# (REPEATED_VERTICAL_COMPENSATOR_STRIP, B34 repetido em 8 fiadas). Com
-# trechos curtos (a ordem antiga) isso quase nunca aparecia, entao o teto
-# nunca tinha feito falta. A regra em si nao e' nova - e' a regra #2 do
-# usuario ("nao utilizar peca especial como enchimento", "penalizar
-# fortemente") aplicada tambem na GERACAO, e nao so' na auditoria.
+#   - ate' MAX_SPECIAL_BOND_PER_TRECHO pecas de 34 o layout e' aceito de
+#     imediato (tiers 3/4): acerto PONTUAL, a funcao classica do B34;
+#   - acima disso a FILEIRA de B34 fica guardada e so' e' usada se nem
+#     B19 em ponta aberta nem 1 UNICO compensador fecharem o trecho
+#     (tier 5b) - mas SEMPRE antes de meio-bloco forcado contra um no' e de
+#     qualquer sequencia de 2+ compensadores (tiers 6/7/8).
+#
+# Por que nao e' proibicao: B34 e' peca MODULAR da mesma familia (39/34/54,
+# modulo 5cm), nao uma peca de acerto como o compensador (9) ou a pastilha
+# (4). Uma fileira de B34 fecha o trecho sem quebrar o prisma (juntas
+# continuam desencontradas entre fiadas) e e' o que o projeto humano faz
+# como rotina: no 1o pavimento de BUTANTA ha' 1.615 B34 contra 242 C09,
+# corridas de 2 a 6 B34, e as sete paredes de 494cm fecham com
+# B34 + 9xB39 + B34 B34 onde o teto-como-proibicao produzia
+# 11xB39 + C09 C09 C04 (tres compensadores em sequencia - exatamente o que
+# a regra dos compensadores proibe e o auditor reprova como faixa).
+#
+# Historico: o teto nasceu em 2026-08-28 como proibicao ("peca de
+# amarracao virando enchimento"), quando o trecho passou a ir de no' a no'
+# e o tier 3 fechava sobras com fileiras de B34 (`4xB39 + 3xB34` em
+# [475, 579] numa parede de 6m, reprovado na epoca como
+# REPEATED_VERTICAL_COMPENSATOR_STRIP). Como proibicao ela conflitava com
+# MAX_COMPENSATORS_PER_TRECHO em qualquer comprimento em que nem 1 B34 nem
+# 1 compensador fecham (ex.: 494cm): uma das duas regras tinha de ceder, e
+# o humano resolve sempre a favor da fileira de B34.
 MAX_SPECIAL_BOND_PER_TRECHO = 1
-# 2026-09-10: uma fileira de B34 acima do teto passa a ser preferida a
-# qualquer solucao com mais de MAX_COMPENSATORS_PER_TRECHO compensadores (ver
-# _pier_ordered_layout, bloco 5b, e a secao 2 de REGRAS_MODULACAO_BLOCOS.md).
-# DEFAULT False (2026-09-11): a fileira de B34 e' o que o projeto humano
-# BUTANTA faz (corridas de 2-6 B34; 7 paredes de 494cm sem compensador) e o
-# benchmark TGD e' INDIFERENTE (numeros identicos com True/False), mas True
-# contraria a regra #2 documentada ("peca especial nao vira enchimento",
-# teto MAX_SPECIAL_BOND_PER_TRECHO em vigor desde 2026-08-28) e os testes que
-# a codificam. Trocar o default e' decisao normativa do usuario - ver
-# docs/checkpoints/2026-09-11-revit-scale-autofix-final.md. True liga o
-# comportamento humano; a mecanica esta' testada nos dois modos.
-PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = False
 
 
 def _pier_codes_by_len_desc(catalog, allow_compensators, exclude=(), pool=OPENING_JAMB_BLOCK_CODES):
@@ -3516,6 +3518,10 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
          "extremamente proibido... duas pastilhas ou combinacoes
          consecutivas de compensadores... usados apenas de forma pontual,
          nunca em sequencia".
+      5b. FILEIRA de B34 (mais de MAX_SPECIAL_BOND_PER_TRECHO pecas de 34,
+         sem compensador) - peca modular da familia, preferida a qualquer
+         sequencia de 2+ compensadores e ao meio-bloco forcado (regra
+         revisada em 2026-09-11 pela evidencia do projeto humano).
       6. 1 UNICO B19 MESMO SEM ponta aberta - ULTIMISSIMO recurso "limpo"
          (0 ou 1 compensador), so' tentado se nem o tier 5 (compensador)
          fechou. TROCADO DE LUGAR com o tier de compensador em 2026-08-25
@@ -3721,25 +3727,15 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
         if _compensator_count(merged_with_comp) <= MAX_COMPENSATORS_PER_TRECHO:
             return merged_with_comp
 
-    # 5b) A fileira de B34 acima do teto (layout dos tiers 3/4 rejeitado so'
-    #     por ter mais de MAX_SPECIAL_BOND_PER_TRECHO pecas de 34) vem ANTES do
-    #     meio-bloco forcado e de qualquer fallback com mais de
-    #     MAX_COMPENSATORS_PER_TRECHO compensadores - e' o que a secao 2 de
-    #     REGRAS_MODULACAO_BLOCOS.md ja' dizia ("acima disso, o solver prefere
-    #     B34, se couber em qualquer posicao, a empilhar compensadores"). A
-    #     ordem antiga devolvia o fallback IRRESTRITO de compensadores antes
-    #     de chegar aqui (7b). Medido ao vivo no projeto humano BUTANTA R08_LT
-    #     (2026-09-10): nas sete paredes de 494cm sem abertura o solver punha
-    #     11xB39 + C09 C09 C04 (tres compensadores em sequencia, faixa
-    #     vertical reprovada pelo proprio auditor) onde o humano poe
-    #     B34 + 9xB39 + B34 B34; corridas de 2 a 6 B34 sao rotina no projeto
-    #     pronto (1.615 B34 contra 242 C09 no 1o pavimento).
-    #     (Ate' 2026-09-10 este bloco era o "7b", DEPOIS do fallback de
-    #     compensadores acima do teto, sob a premissa de que "uma peca de
-    #     amarracao no meio da parede engana quem le' o modelo; um compensador
-    #     a mais so' e' feio" - premissa contrariada pelo projeto humano e
-    #     pelo proprio auditor, que reprova a sequencia de compensadores.)
-    if layout_special_over is not None and PREFER_B34_ROW_OVER_STACKED_COMPENSATORS:
+    # 5b) A FILEIRA de B34 (layout dos tiers 3/4 guardado por passar de
+    #     MAX_SPECIAL_BOND_PER_TRECHO pecas de 34) vem DEPOIS de 1 unico
+    #     compensador e ANTES do meio-bloco forcado e de qualquer fallback com
+    #     2+ compensadores. O teto de B34 e' de PREFERENCIA, nao proibicao -
+    #     ver o comentario em MAX_SPECIAL_BOND_PER_TRECHO (regra revisada em
+    #     2026-09-11 pela evidencia humana; ate' 2026-09-10 este bloco era o
+    #     "7b", DEPOIS do fallback irrestrito de compensadores, e entre
+    #     2026-09-10 e 2026-09-11 ficou atras de uma flag).
+    if layout_special_over is not None:
         return layout_special_over
 
     # 6) 1 B19 mesmo SEM ponta aberta (ou seja, exatamente contra um no'

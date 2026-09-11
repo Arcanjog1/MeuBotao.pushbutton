@@ -7634,22 +7634,34 @@ def test_bloco_bom_engolido_pela_busca_volta_quando_o_reparo_falha():
 
 @case
 def test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo():
-    """Regra #2 do usuario aplicada na GERACAO, nao so' na auditoria: com o
-    trecho continuo indo de no' a no', o tier "B39+B34" fechava a sobra com
-    uma FILEIRA de B34 no meio da parede (medido: 3 seguidos em [475, 579]).
-    MAX_SPECIAL_BOND_PER_TRECHO limita isso."""
+    """Regra #2 do usuario na GERACAO, na forma REVISADA em 2026-09-11 pela
+    evidencia do projeto humano BUTANTA (decisao do usuario): o teto
+    MAX_SPECIAL_BOND_PER_TRECHO e' de PREFERENCIA, nao proibicao. B34 nunca
+    vira enchimento GRATUITO - so' aparece em fileira quando nem 1 B34 nem 1
+    compensador fecham o trecho - e, nesse caso, e' preferido a empilhar
+    compensadores (o que o auditor reprova como faixa). Antes (2026-08-28 a
+    2026-09-10) o teto era proibicao e produzia 11xB39 + C09 C09 C04 em
+    494cm; o humano poe B34 + 9xB39 + B34 B34."""
     assert m.MAX_SPECIAL_BOND_PER_TRECHO == 1
     usou_alguma = False
+    fileiras = 0
     for total_cm in range(40, 900):
         layout = m._pier_ordered_layout(float(total_cm), CATALOG, 1, 1)
         if layout is None:
             continue
-        especiais = [c for c, _a, _b in layout if CATALOG[c]["is_special_bond"]]
-        assert len(especiais) <= m.MAX_SPECIAL_BOND_PER_TRECHO, (total_cm, layout)
+        codes = [c for c, _a, _b in layout]
+        especiais = [c for c in codes if CATALOG[c]["is_special_bond"]]
+        compensadores = [c for c in codes if CATALOG[c].get("is_compensator")]
+        if len(especiais) > m.MAX_SPECIAL_BOND_PER_TRECHO:
+            # fileira: so' sem compensador nenhum, e so' onde 1 B34 nao fecha
+            fileiras += 1
+            assert not compensadores, (total_cm, layout)
         usou_alguma = usou_alguma or bool(especiais)
     # e o teto nao virou "proibido": a peca especial continua disponivel
     # como acerto PONTUAL, que e' a funcao legitima dela
     assert usou_alguma
+    # ... e a fileira existe (regra revisada), nunca acompanhada de compensador
+    assert fileiras > 0
 
 
 @case
