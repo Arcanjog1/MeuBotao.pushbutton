@@ -201,6 +201,29 @@ _ACTIVE_MODELESS_WINDOWS = []
 _LAST_MODULATION_STATE = {}
 
 
+
+def _level_internal_elevation_ft(level):
+    """Cota do NIVEL no referencial INTERNO do projeto (o mesmo de Wall.Location
+    e de FamilyInstance.Location), em pes.
+
+    `Level.Elevation` NAO e' isso: devolve a cota relativa a' "Base de
+    elevacao" do tipo do nivel - Ponto Base do Projeto OU Ponto de
+    Levantamento (survey). Num projeto com niveis referenciados ao survey
+    (medido ao vivo em BUTANTA R08_LT, 2026-09-10: `Elevation` = 72.665 cm,
+    `ProjectElevation` = 0,00 cm, Walls e blocos humanos em z = 0..261 cm)
+    usar `.Elevation` como origem vertical colocaria a modulacao inteira 726
+    m acima das paredes. `Level.ProjectElevation` e' "relativo a' origem do
+    projeto, independentemente do parametro Base de elevacao" (RevitAPIDocs,
+    Level.ProjectElevation). A regra 8a ("origem vertical = NIVEL de
+    referencia") continua identica; so' a propriedade da API muda.
+
+    `getattr` com fallback para `.Elevation` mantem os dubles de teste e
+    qualquer nivel antigo sem a propriedade funcionando como antes."""
+    project_elevation = getattr(level, "ProjectElevation", None)
+    if project_elevation is None:
+        return level.Elevation
+    return project_elevation
+
 def _eid_int(eid):
     """ElementId -> int, compativel com Revit < 2024 (.IntegerValue) e >= 2024 (.Value).
     O atributo IntegerValue foi removido no Revit 2024; Value e' o substituto."""
@@ -1347,7 +1370,7 @@ def _build_opening_dict(inst, allow_bbox_fallback):
         center_source = "geometria"
 
     level = doc.GetElement(inst.LevelId) if inst.LevelId != ElementId.InvalidElementId else None
-    level_elevation_ft = level.Elevation if isinstance(level, Level) else insertion_point.Z
+    level_elevation_ft = _level_internal_elevation_ft(level) if isinstance(level, Level) else insertion_point.Z
     level_offset_ft = _lookup_param_value(
         inst, [OPENING_LEVEL_OFFSET_PARAM, u"Elevação do nível", u"Elevacao"]
     ) or 0.0
@@ -2172,9 +2195,9 @@ def _wall_lines_from_generic_model_instances(target_doc, dim_param_names=("Compr
     resultado desta."""
     levels = sorted(
         FilteredElementCollector(target_doc).OfClass(Level),
-        key=lambda lv: lv.Elevation,
+        key=lambda lv: _level_internal_elevation_ft(lv),
     )
-    level_elev_cm = [lv.Elevation / FEET_PER_METER * 100.0 for lv in levels]
+    level_elev_cm = [_level_internal_elevation_ft(lv) / FEET_PER_METER * 100.0 for lv in levels]
 
     def _nearest_level_index(z_cm):
         best_i, best_d = 0, None
@@ -2233,12 +2256,12 @@ def detect_opening_system_for_level(target_doc, level_name, min_instances=1):
     100% leitura, nenhuma Transaction."""
     levels = sorted(
         FilteredElementCollector(target_doc).OfClass(Level),
-        key=lambda lv: lv.Elevation,
+        key=lambda lv: _level_internal_elevation_ft(lv),
     )
     target_level = next((lv for lv in levels if lv.Name == level_name), None)
     if target_level is None:
         return OPENING_SYSTEM_UNKNOWN
-    elevations = [lv.Elevation for lv in levels]
+    elevations = [_level_internal_elevation_ft(lv) for lv in levels]
     idx = levels.index(target_level)
     lo = elevations[idx]
     hi = elevations[idx + 1] if idx + 1 < len(elevations) else lo + (elevations[idx] - elevations[idx - 1] if idx > 0 else 1e9)
@@ -13410,7 +13433,7 @@ def run_modulation_on_existing_walls(preselected=None):
         )
         return
 
-    base_z_abs = selected_level.Elevation
+    base_z_abs = _level_internal_elevation_ft(selected_level)
 
     output.print_md("**Coletando aberturas (portas/janelas) do projeto...**")
     all_openings, openings_source_note = collect_opening_instances("auto", None)
@@ -13839,7 +13862,7 @@ def _wall_vertical_extent(wall, level, target_doc):
     level_elevation = None
     if level is not None:
         try:
-            level_elevation = level.Elevation
+            level_elevation = _level_internal_elevation_ft(level)
         except Exception:
             level_elevation = None
 
@@ -13856,7 +13879,7 @@ def _wall_vertical_extent(wall, level, target_doc):
         top_level = target_doc.GetElement(top_level_id) if top_level_id is not None else None
         if isinstance(top_level, Level):
             top_offset = _param_double(BuiltInParameter.WALL_TOP_OFFSET) or 0.0
-            top_z_abs = top_level.Elevation + top_offset
+            top_z_abs = _level_internal_elevation_ft(top_level) + top_offset
     except Exception:
         top_z_abs = None
     # 2) altura desconectada.
@@ -13966,7 +13989,7 @@ def read_existing_wall_for_merge(wall, target_doc=None):
         "wall_type_id": wall_type_id,
         "level": level,
         "level_id": _eid_int(level.Id),
-        "level_elevation_ft": level.Elevation,
+        "level_elevation_ft": _level_internal_elevation_ft(level),
         "base_z_abs": base_z_abs,
         "top_z_abs": top_z_abs,
         "height_ft": top_z_abs - base_z_abs,
@@ -15647,7 +15670,7 @@ def main():
     # comprimento quebrado (ver secao ETAPA 2/FASE 2 - evaluate_wall_
     # modulation/_apply_broken_length_overrides), nao mais este diagnostico.
 
-    base_z_abs = selected_level.Elevation
+    base_z_abs = _level_internal_elevation_ft(selected_level)
     top_z_abs = base_z_abs + wall_height_ft
     openings_used = 0
 

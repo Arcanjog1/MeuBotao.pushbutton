@@ -451,6 +451,32 @@ vertical da modulação seguir a geometria da parede existente.
 
 Conflito registrado com a seção 15.3 — ver o aviso lá.
 
+### 8a.1 — Implementação: a cota do nível é `ProjectElevation`, nunca `Elevation` (2026-09-10)
+
+A regra 8a não muda: a origem vertical continua sendo o **nível de
+referência**. O que estava errado era a **propriedade da API** usada para ler
+a cota dele. `Level.Elevation` devolve a cota relativa à *Base de elevação*
+do tipo do nível — Ponto Base do Projeto **ou** Ponto de Levantamento —
+enquanto `Wall.Location` e `FamilyInstance.Location` vivem sempre no
+referencial **interno** do projeto. `Level.ProjectElevation` é "relativo à
+origem do projeto, independentemente do parâmetro Base de elevação"
+(RevitAPIDocs, `Level.ProjectElevation`).
+
+**Medido ao vivo em BUTANTÃ R08_LT (2026-09-10):** níveis com base no
+levantamento — `1º PAVIMENTO`: `Elevation` = **72.665 cm**,
+`ProjectElevation` = **0,00 cm**; as 46 Walls do projeto de teste estão em
+z = 0 e os 6.634 blocos humanos do mesmo pavimento em z = 1..261 cm. Com
+`.Elevation` como `base_z_abs`, a modulação inteira nasceria **726 m acima**
+das paredes. No `TESTE MODULAÇÃO` as duas propriedades coincidiam, por isso o
+defeito nunca apareceu.
+
+**Implementação:** `_level_internal_elevation_ft(level)` em
+`nuvem/core/wall_modeling.py` — usa `ProjectElevation` quando existe, com
+fallback para `.Elevation` (dublês de teste, níveis antigos). Substituídos os
+9 usos que alimentam `base_z_abs`, comparações com Z de instâncias e a leitura
+de altura das paredes existentes. Teste: `tests/test_level_internal_elevation.py`,
+com guarda de fonte que falha se `base_z_abs` voltar a ler `.Elevation` direto.
+
 ## 8b. Modo de geração das paredes de referência (2026-08-28)
 
 A janela de configuração (`_SetupForm`, seção *"6. Como gerar as
