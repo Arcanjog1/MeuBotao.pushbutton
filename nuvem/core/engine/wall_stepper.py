@@ -589,7 +589,8 @@ def _l_corner_wall_pair(node):
     return None, None
 
 
-def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclude_node_index=None):
+def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclude_node_index=None,
+                            course=None, solved=None):
     """(t_lo_ft, t_hi_ft) - a faixa REALMENTE livre (ft, ao longo do eixo
     de `wall_idx`) depois de descontar a reserva de amarracao em CADA
     PONTA desta parede (mesma formula de `_wall_end_default_start_cm`, a
@@ -626,7 +627,13 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
 
     `nodes`/`end_to_node` ausentes (chamador antigo) devolve o intervalo
     fisico inteiro da parede - comportamento historico, sem essa
-    checagem cruzada."""
+    checagem cruzada.
+
+    `course` ("A"/"B") + `solved` ({node_index: (course_a, course_b)} dos
+    encontros ja' resolvidos): regra 11.14 (CORNER_RESERVE_PER_COURSE) -
+    a reserva da outra ponta passa a ser POR FIADA, pela ocupacao real do
+    encontro vizinho (ver `_node_lays_bond_on_wall_in_course`). Sem os
+    dois, pior caso de sempre."""
     _p0, _p1, _dir, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
     if nodes is None or end_to_node is None:
         return 0.0, length_ft
@@ -667,6 +674,12 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
             continue
         if node is not None and wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
             reserve_ft = max(_cm_to_ft(reserve_cm), length_ft - CORNER_B34_ROOM_FT)
+        elif (CORNER_RESERVE_PER_COURSE and course is not None and solved is not None
+              and node is not None
+              and not _node_lays_bond_on_wall_in_course(node, node_index, wall_idx, course, solved)):
+            # Regra 11.14: nesta fiada a peca do vizinho esta' na parede
+            # perpendicular - so' o corpo dela atravessa esta parede.
+            reserve_ft = _cm_to_ft(reserve_cm)
         else:
             reserve_ft = max(_cm_to_ft(reserve_cm), CORNER_B34_ROOM_FT)
         if end_index == 0:
@@ -676,8 +689,36 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
     return lo_ft, hi_ft
 
 
+def _node_lays_bond_on_wall_in_course(node, node_index, wall_idx, course, solved):
+    """Regra 11.14: o encontro `node` poe peca de amarracao DEITADA sobre
+    `wall_idx` na fiada `course`?
+
+    - encontro ja' resolvido (`node_index in solved`): le a peca REAL -
+      `wall_idx`/`course` do candidato, nunca uma convencao;
+    - L_CORNER ainda nao resolvido: False (otimista) - quem o resolver
+      depois ve a peca deste encontro via `_corner_bond_blocking_courses`
+      e troca de fiada ou degrada, entao o otimismo nunca vira colisao;
+    - T/X ainda nao resolvidos: a convencao fixa do solver deles
+      (`_node_bond_courses_on_wall`), que e' previsivel."""
+    pieces = solved.get(node_index) if node_index is not None else None
+    if pieces is not None:
+        return any(c is not None and c.get("wall_idx") == wall_idx and c.get("course") == course
+                   for c in pieces)
+    if node.get("kind") == "L_CORNER":
+        return False
+    if (node.get("kind") == "T_INTERSECTION" and node.get("incoming_wall_idx") == wall_idx
+            and node.get("main_wall_idx") != wall_idx):
+        # T ainda nao resolvido, esta parede e' a que CHEGA: a peca dela
+        # (B34 no caminho cheio e na degradacao para L) fica na fiada B; a
+        # degradacao 2 poe um unico compensador (<= 9cm) nas duas fiadas,
+        # curto demais para alcancar o canto da outra ponta.
+        return course == "B"
+    return course in _node_bond_courses_on_wall(node, wall_idx)
+
+
 def _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, contact_point, dir_away,
-                         nodes=None, end_to_node=None, exclude_node_index=None):
+                         nodes=None, end_to_node=None, exclude_node_index=None,
+                         course=None, solved=None):
     """Espaco real (ft) disponivel em `wall_idx` a partir de
     `contact_point`, andando em `dir_away` (para dentro do corpo da
     parede) - mesma medicao de `_room_at_t_on_wall`, so' que a partir de
@@ -695,14 +736,15 @@ def _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, contact_p
     sign = 1 if dir_away.DotProduct(wall_dir) >= 0 else -1
     t = _t_of_point_on_wall(walls_to_create, wall_idx, contact_point)
     safe_range_ft = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx,
-                                            exclude_node_index=exclude_node_index) \
+                                            exclude_node_index=exclude_node_index,
+                                            course=course, solved=solved) \
         if (nodes is not None and end_to_node is not None) else None
     return _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t, sign,
                               safe_range_ft=safe_range_ft)
 
 
 def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
-                   nodes=None, end_to_node=None):
+                   nodes=None, end_to_node=None, solved=None):
     """Resolve o encontro em L (secao 10 do prompt): dois B34, um por
     fiada, cada um com a ponta do VAO MENOR encostada no no' (ver
     _asymmetric_bond_origin_and_axis) - e' o que faz as duas celulas
@@ -783,10 +825,10 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     if nodes is not None and end_to_node is not None:
         busy_a = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_a_idx, point_a, dir_a,
-            CORNER_B34_ROOM_FT, node_index)
+            CORNER_B34_ROOM_FT, node_index, solved=solved)
         busy_b = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_b_idx, point_b, dir_b,
-            CORNER_B34_ROOM_FT, node_index)
+            CORNER_B34_ROOM_FT, node_index, solved=solved)
         blocked_a, blocked_b = bool(busy_a), bool(busy_b)
         if blocked_a != blocked_b:
             # CR-S1 (2026-09-07): ANTES de girar, TENTAR A TROCA de papeis.
@@ -852,9 +894,11 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
                 wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
 
     room_a = _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_a_idx, point_a, dir_a,
-                                  nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index)
+                                  nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index,
+                                  course="A", solved=solved)
     room_b = _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_b_idx, point_b, dir_b,
-                                  nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index)
+                                  nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index,
+                                  course="B", solved=solved)
     b34_ok_a = room_a is None or room_a + 1e-6 >= CORNER_B34_ROOM_FT
     b34_ok_b = room_b is None or room_b + 1e-6 >= CORNER_B34_ROOM_FT
 
@@ -908,6 +952,22 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 # sobreposicao, blocos fora do limite da parede ou modulacoes forcadas".
 T_INTERSECTION_B54_HALF_ROOM_FT = _cm_to_ft(54.0 / 2.0)
 CORNER_B34_ROOM_FT = _cm_to_ft(34.0)
+# Regra 11.14 (2026-09-11, decisao do usuario sobre a evidencia humana de
+# BUTANTA): RESERVA DE CANTO POR FIADA. Ao medir o espaco de uma parede para a
+# peca de um encontro, a reserva na OUTRA ponta da mesma parede deixa de ser o
+# pior caso fixo (34cm nas duas fiadas) e passa a ser, fiada a fiada, a
+# ocupacao REAL do encontro vizinho: 34cm so' na fiada em que a peca dele
+# esta' DEITADA sobre esta parede, e apenas o corpo da peca (meia espessura +
+# junta, `_node_default_reservation_cm`) na fiada em que ela esta' na parede
+# perpendicular. Um canto ainda nao resolvido e' tratado como "nao deita"
+# (otimista): quem o resolver depois enxerga a peca real deste
+# (`_corner_bond_blocking_courses` com `solved`) e troca de fiada ou degrada.
+# Medido: parede de 65cm entre dois cantos (as tres de BUTANTA que o CAD
+# alonga em 34cm) - o humano poe B34 num canto na fiada A e no outro na
+# fiada B; com o pior caso fixo a parede "nao tinha espaco" em nenhuma fiada
+# e os dois vizinhos recebiam B34 nas DUAS fiadas (faixa repetida + junta
+# corrida). False = comportamento anterior (medicao/bissecao).
+CORNER_RESERVE_PER_COURSE = True
 
 # CR-BLOCK-B19-RESIDUAL-FILL-IMPLEMENTATION (decisao humana aprovada, ver
 # docs/BLOCK_B19_JUNCTION_DOMAIN_EVIDENCE.md e docs/BLOCK_B19_RESIDUAL_
@@ -1080,7 +1140,7 @@ def _node_bond_courses_on_wall(node, wall_idx):
 
 
 def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_point,
-                                  dir_away, span_ft, exclude_node_index=None):
+                                  dir_away, span_ft, exclude_node_index=None, solved=None):
     """As FIADAS em que a peca de amarracao deste canto (`span_ft`,
     deitada sobre `wall_idx` a partir de `contact_point` no sentido
     `dir_away`) esbarraria na peca de OUTRO encontro da MESMA parede.
@@ -1115,12 +1175,39 @@ def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_poin
     sign = 1.0 if dir_away.DotProduct(wall_dir) >= 0 else -1.0
     t0_ft = _t_of_point_on_wall(walls_to_create, wall_idx, contact_point)
     busy = set()
+    index_of = {}
+    if solved:
+        for i, n in enumerate(nodes or ()):
+            index_of[id(n)] = i
     for other, t_other_ft in _wall_junction_nodes_and_ts_ft(
             walls_to_create, nodes, wall_idx, exclude_node_index):
         along_ft = (t_other_ft - t0_ft) * sign
         if along_ft <= 1e-6:
             continue
-        lying_courses = _node_bond_courses_on_wall(other, wall_idx)
+        pieces = solved.get(index_of.get(id(other))) if solved else None
+        if pieces is not None and CORNER_RESERVE_PER_COURSE:
+            # Regra 11.14: vizinho ja' resolvido - fiadas REAIS em que a peca
+            # dele esta' deitada sobre esta parede, nao a convencao.
+            lying_courses = tuple(c.get("course") for c in pieces
+                                  if c is not None and c.get("wall_idx") == wall_idx)
+        elif (solved is not None and CORNER_RESERVE_PER_COURSE
+              and other.get("kind") == "T_INTERSECTION"
+              and other.get("incoming_wall_idx") == wall_idx
+              and other.get("main_wall_idx") != wall_idx):
+            # Regra 11.14: T ainda nao resolvido em que esta parede CHEGA -
+            # a peca dele sobre esta parede fica na fiada B (ver
+            # _node_lays_bond_on_wall_in_course).
+            lying_courses = ("B",)
+        elif solved is not None and CORNER_RESERVE_PER_COURSE and other.get("kind") == "L_CORNER":
+            # Regra 11.14: canto vizinho AINDA NAO resolvido - otimista (nao
+            # deita): ele vai enxergar a peca deste canto quando for
+            # resolvido e trocar de fiada/degradar. So' o corpo (cross_reach)
+            # conta. Sem isto uma parede curta entre dois cantos era "ocupada
+            # nas duas fiadas" pelos dois vizinhos ao mesmo tempo, antes de
+            # qualquer um deles existir.
+            lying_courses = ()
+        else:
+            lying_courses = _node_bond_courses_on_wall(other, wall_idx)
         cross_reach_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
         for course in BOND_COURSES_BOTH:
             if course in busy:
@@ -1886,13 +1973,14 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     modulacao, so' relata a excecao estrutural."""
     role_conflicts = _coordinate_arm_role_nodes(nodes)
     solved = []          # (node_index, course_a, course_b)
+    solved_by_node = {}  # regra 11.14: o que ja' esta' resolvido, para os cantos seguintes
     failures = []
     for node_index, node in enumerate(nodes):
         kind = node.get("kind")
         if kind == "L_CORNER":
             result = solve_l_corner(node, walls_to_create, catalog, node_index=node_index,
                                     openings_per_wall=openings_per_wall,
-                                    nodes=nodes, end_to_node=end_to_node)
+                                    nodes=nodes, end_to_node=end_to_node, solved=solved_by_node)
         elif kind == "T_INTERSECTION":
             result = solve_t_intersection(node, walls_to_create, catalog, node_index=node_index,
                                           openings_per_wall=openings_per_wall,
@@ -1907,6 +1995,7 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             failures.append((node_index, result["reason"]))
             continue
         solved.append((node_index, result["course_a"], result["course_b"]))
+        solved_by_node[node_index] = (result["course_a"], result["course_b"])
 
     rejected = _reject_overlapping_node_ties(solved, failures) if REJECT_OVERLAPPING_NODE_TIES else set()
     candidates = []

@@ -1728,6 +1728,60 @@ esteja invertido".
   peça, passando pelo ponto de inserção) — o mesmo padrão já usado para
   `rotation_deg`/`RotateElement`.
 
+### 11.14 — RESERVA DE CANTO POR FIADA (2026-09-11, decisão do usuário sobre a evidência humana)
+
+**Evidência (BUTANTÃ R08_LT, 1º PAV, via MCP):** as três paredes curtas que
+o CAD `Paredes` desenha com 99 cm (x 1135→1234, y 737/1437/1937) são, no
+projeto pronto, paredes de **64 cm** entre dois cantos — a vertical x=1142 de
+um lado e a vertical x=1192 (que termina nela) do outro; o toco de 34 cm
+além da segunda vizinha não recebe bloco nenhum (o layer estrutural
+`ARQ-STR-BLOCO` cobre 62 % da linha, exatamente os 64 cm). Nesses 64 cm o
+humano põe **um B34 de canto por fiada, em cantos opostos**:
+
+    fiada par : [corpo da vizinha 0..14] C04 C09 B34[30,64]
+    fiada ímpar: B34[0,34] C04 C09 [corpo da vizinha 50..64]
+
+Não é uma reserva de canto diferente da do solver: é a mesma alternância
+L de sempre. A diferença estava em **como o solver mede o espaço** para o
+B34 de um canto: a reserva na OUTRA ponta da mesma parede era o pior caso
+fixo (34 cm) **nas duas fiadas**, então a parede de 64 cm "não tinha
+espaço" em fiada nenhuma (64 − 34 = 30 < 34), os dois vizinhos recebiam o
+B34 nas DUAS fiadas (giro do canto) e o resultado era faixa repetida na
+curta + junta corrida nos dois vizinhos (3 paredes reprovadas).
+
+**Regra:** a reserva da outra ponta é **por fiada**, pela ocupação real do
+encontro vizinho — 34 cm só na fiada em que a peça dele está **deitada
+sobre esta parede**; na fiada em que ela está na parede perpendicular,
+apenas o corpo da peça (meia espessura + junta, a reserva genérica que o
+preenchimento já usa). Um canto ainda não resolvido conta como "não deita"
+(otimista): quem o resolver depois enxerga a peça real deste canto
+(`_corner_bond_blocking_courses` lê os candidatos já resolvidos, não a
+convenção) e troca de fiada ou degrada — o otimismo nunca vira colisão.
+T/X ainda não resolvidos continuam previsíveis pela convenção deles.
+
+**Implementação:** `CORNER_RESERVE_PER_COURSE = True` (`wall_stepper.py`);
+`_wall_reserved_range_ft(course=, solved=)`, `_node_lays_bond_on_wall_in_course`,
+`_corner_bond_blocking_courses(solved=)`, `solve_l_corner(solved=)` e
+`solve_all_intersections` passando o que já foi resolvido. Nada hardcoded:
+nem 64/99 cm, nem parede, nem paridade — vale para qualquer parede curta
+entre dois encontros.
+
+**Medido:** caso sintético com a geometria real (64 cm): 3 → **0**
+reprovadas, padrão idêntico ao humano (paridade espelhada), invariante a 3
+ordens de entrada; Torre 179 eixos: reprovadas pelo auditor 18 → **12**,
+`intersection_failures` 0; Butantã 34 paredes (vãos reais): com o CAD como
+está (tocos), 4 reprovadas — as mesmas de antes (a regra é neutra ali, o toco
+manda); com as três curtas aparadas ao layer estrutural (64 cm), 4 → 2
+(8079818 — que também tem um toco de 39 cm no CAD — e 8079838); com os
+quatro tocos aparados, **1** (8079838, junta corrida de preenchimento —
+defeito 1). Um T ainda não resolvido em que a parede CHEGA conta como
+"deita na fiada B" (caminho cheio e degradação para L), o que destravou o
+canto da parede 8079863. Com o toco do CAD a parede curta continua
+reprovada — **geometria de entrada** (ver o filtro por layer de referência
+estrutural, seção 49), não regra. Combinada com a busca de paridade da Etapa 7 (`TIE_PARITY_LOCAL_SEARCH=True`), a tentativa anterior de reserva por fiada dava 7 colisões de preflight (previsão do papel do canto por convenção); esta versão lê as peças **já resolvidas** e a combinação mede 0 colisões em Butantã (3 reprovadas, 1 flip). Testes:
+`tests/test_corner_reserve_per_course.py` (antes/depois, invariância,
+toco do CAD, controle de parede longa).
+
 ### 12.1 — Bug real corrigido: o espelhamento duplicava a peça (2026-09-10)
 
 A orientação do compensador (regra #3 acima) era aplicada com
