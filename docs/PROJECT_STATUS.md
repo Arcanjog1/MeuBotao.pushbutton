@@ -129,7 +129,8 @@ reprovadas (só tocos do CAD + defeito 1), Torre 21→12, TGD sem regressão,
 TP1 só a histórica. Teste real no botão CPython (HEAD `198a639`): 16/16 gates, 8.399 blocos
 criados e recriados idempotentes (~6,5 min; 33–39 ms por instância); o
 travamento 1 (lote anterior não substituído entre sessões) virou a seção 50
-(lote persistente por carimbo). Pendentes: regressão consolidada final, PR. Ver `docs/checkpoints/2026-09-11-fechamento-decisoes-aprovadas.md`.
+(lote persistente por carimbo). Regressão consolidada final: 1066 passed / 2 explicadas (histórica TP1 +
+contagem de corpus t48 adaptada). PR aberto para revisão, sem merge. Ver `docs/checkpoints/2026-09-11-fechamento-decisoes-aprovadas.md`.
 Regressão consolidada 3 no HEAD final `cf325f2`: 2 failed / 1043 passed (só as
 falhas históricas do benchmark: TGD compensators 52→55, TP1 JUNCTION 8→9).
 Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055

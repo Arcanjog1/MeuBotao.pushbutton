@@ -9,7 +9,7 @@
   "base": "41086e43b6b56102ce736b816debad04749fa4bf",
   "main_observada": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
   "pr": "not-created",
-  "veredito": "TESTE REAL PASS (16/16 gates, duas criações de 8.399 blocos, idempotente) — decisões A/B/C implementadas; regressão consolidada final e PR: ver seções abaixo.",
+  "veredito": "READY FOR PR REVIEW — decisões A/B/C/D implementadas, teste real CPython 16/16 gates (8.399 blocos, idempotente), regressão consolidada 1066 passed / 2 explicadas (histórica TP1 + contagem de corpus adaptada), CI verde.",
   "objective": "Fechar a base do solver antes de verga/contraverga/canaletas: implementar as quatro decisões aprovadas pelo usuário (regra geral da fileira de B34; reserva de canto por fiada; filtro de paredes não estruturais por layer de referência; salvar a bancada) e provar o fluxo real completo BOTÃO → Tela 1 → análise → solver → Tela 2 → criação → UI, no CPython do pyRevit, com as 34 paredes de Butantã.",
   "changes": [
     "A — wall_stepper.py: MAX_SPECIAL_BOND_PER_TRECHO passa a teto de PREFERÊNCIA (regra geral: B39 → B19 em ponta aberta → até 1 B34 → 1 compensador → FILEIRA de B34 → B19 forçado → 2+ compensadores); flag PREFER_B34_ROW_OVER_STACKED_COMPENSATORS removida; bloco 5b incondicional. Regras seção 2 reescrita; testes reescritos para a regra revisada (test_fill_prefers_b34_row..., test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo, test_tie_parity_local_search).",
@@ -25,7 +25,7 @@
     "11.14 × TIE_PARITY_LOCAL_SEARCH=True em Butantã: 0 colisões, 3 reprovadas (só os tocos), 1 flip — a combinação que na tentativa da sessão fork dava 7 colisões.",
     "Sessão fork (ee34c2a): regressão consolidada no HEAD 2405969 = 3 failed / 1076 passed (2 históricas + guarda de fonte por edição concorrente, verde isolada).",
     "test_block_lot_persistence (5) + test_beta_atomic_creation: 33 passed.",
-    "Regressão consolidada final no HEAD desta etapa: ver seção 'Regressão consolidada'."
+    "Regressão consolidada final (HEAD 198a639): 2 failed / 1066 passed em 1h02 — histórica TP1 + t48 (contagem de corpus 16→12, contrato intacto, adaptado e verde). Ver seção 'Regressão consolidada'."
   ],
   "known_failures": [
     "Butantã 34 paredes (CAD como está): 4 reprovadas pelo auditor — 8079861/62/63 (toco de 34 cm do CAD através da vizinha; com o filtro da seção 49 seriam aparadas e passam) e 8079838 (junta corrida de preenchimento, defeito 1). Com os quatro tocos aparados: 1.",
@@ -50,7 +50,7 @@
     "Importar o desenho estrutural na bancada para exercitar o filtro da seção 49 no fluxo CAD→Walls real."
   ],
   "next_steps": [
-    "Regressão consolidada final; PR para a main (sem merge)."
+    "PR para a main aberto para revisão (sem merge); próxima missão: verga/contraverga/canaletas."
   ],
   "references": [
     {"path": "docs/checkpoints/2026-09-11-revit-scale-autofix-final.md"},
@@ -58,6 +58,7 @@
     {"path": "docs/checkpoints/evidence/2026-09-11-teste-real-travamento-1.json"},
     {"path": "docs/checkpoints/evidence/2026-09-11-bench-retro-stamp.json"},
     {"path": "docs/checkpoints/evidence/2026-09-11-teste-real-run2.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-11-regressao-consolidada-fechamento.txt"},
     {"path": "tests/test_block_lot_persistence.py"},
     {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
     {"path": "tests/test_corner_reserve_per_course.py"},
@@ -108,4 +109,4 @@ anterior por baixo. Causa-raiz: lote anterior só conhecido por memória → se�
 
 ## Regressão consolidada
 
-PENDING
+REGRESSÃO CONSOLIDADA no HEAD de código `198a639` (`py -3 -m pytest tests -q`, suíte inteira com benchmarks): **2 failed / 1066 passed em 1h02** (log `evidence/2026-09-11-regressao-consolidada-fechamento.txt`). (1) `torre_easy_lo_r00_tp1` — só a histórica `JUNCTION_MISSING_BINDING 8→9` (idêntica a 8cdd33f); o TGD, que falhava desde antes da missão, agora passa. (2) `test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade` — o número de tentativas de reparo B19 no corpus TP1 caiu de 16 para 12 (duas paredes elegíveis passaram a fechar sem resíduo com a regra da fileira de B34); o contrato do gate (ZERO aceitas, todas `no_tie_covering_node`, em pares) não mudou — teste adaptado ao estado medido e verde isolado (2min23). Nenhuma crítica nova; nenhum baseline/golden/threshold/skip/xfail alterado.
