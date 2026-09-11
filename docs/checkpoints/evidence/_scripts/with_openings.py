@@ -71,7 +71,19 @@ for o in ops:
     _lat, wi, t = best
     sill = o["opening_base_z_rel_cm"]
     head = o["opening_top_z_rel_cm"]
-    openings_per_wall[wi].append(((t - w / 2.0) * CM2F, (t + w / 2.0) * CM2F, sill * CM2F, head * CM2F))
+    # span_along_axis_cm = vao REAL medido na alvenaria (coordenada mundial ao
+    # longo do eixo); x_cm/y_cm e' so' o ponto de insercao da familia.
+    p0, d = frame(wi)
+    span = o.get("span_along_axis_cm")
+    if span and len(span) == 2:
+        if horiz:
+            ts = [((sv * CM2F - p0.X) * d.X + (oy * CM2F - p0.Y) * d.Y) * F2CM for sv in span]
+        else:
+            ts = [((ox * CM2F - p0.X) * d.X + (sv * CM2F - p0.Y) * d.Y) * F2CM for sv in span]
+        t_lo, t_hi = min(ts), max(ts)
+    else:
+        t_lo, t_hi = t - w / 2.0, t + w / 2.0
+    openings_per_wall[wi].append((t_lo * CM2F, t_hi * CM2F, sill * CM2F, head * CM2F))
 for lst in openings_per_wall:
     lst.sort()
 print("aberturas 1o PAV: %d | associadas a paredes de alvenaria: %d | sem parede: %d" % (
@@ -212,3 +224,58 @@ for n in nodes:
                     parts.append((round(tc - c["length_cm"] / 2), c["logical_code"]))
             seqs.append(" ".join("%s@%d" % (cd, t0) for t0, cd in sorted(parts)))
         print("   wall %d ponta%d->T em %.0fcm | aberturas ate' ai: %s | c0: %s | c1: %s" % (ids[mi], end, tt, ops_here, seqs[0], seqs[1]))
+
+print("\n=== (E) as reprovacoes do SOLVER (mesma geometria, mesmo auditor, mesmas aberturas) ===")
+from collections import Counter as _C
+kinds_s = _C(); touch_s = _C()
+for wi, a in sorted(aud.items()):
+    if a["ok"]:
+        continue
+    p0, d = frame(wi)
+    for p in a["problems"]:
+        kinds_s[str(p).split(":")[0]] += 1
+    for cj in a["continuous_joints"]:
+        x = cj["x_cm"]; t = _C()
+        for ci in cj["courses"]:
+            for c in cc.get(ci, []):
+                if c["wall_idx"] != wi:
+                    continue
+                lo, hi = m._candidate_extent_on_wall_axis(c, p0, d)
+                if abs(hi - x) < 2 or abs(lo - x) < 2:
+                    t["TIE" if c["logical_code"] in ("B34", "B54") else "FILL"] += 1
+        touch_s["encosta em TIE" if t["TIE"] else "so FILL x FILL"] += 1
+    print("   wall %d (len %.0f, ab=%d): %s" % (ids[wi], walls[wi][0].Length * F2CM, len(openings_per_wall[wi]), [str(p)[:80] for p in a["problems"]][:2]))
+print("-- tipos: %s | juntas corridas do solver: %s" % (dict(kinds_s), dict(touch_s)))
+
+print("\n=== (F) parede 8079834 (494cm): layout REAL do solver e o que _pier_ordered_layout devolve para o trecho ===")
+wi = ids.index(8079834)
+p0, d = frame(wi)
+for ci in (0, 1):
+    pcs = [c for c in cc.get(ci, []) if c.get("wall_idx") == wi]
+    ext = sorted((m._candidate_extent_on_wall_axis(c, p0, d), c["logical_code"], c.get("placement_reason")) for c in pcs)
+    print("  c%d: %s" % (ci, " ".join("%s[%.0f,%.0f]" % (cd, lo, hi) for (lo, hi), cd, pr in ext)))
+    print("      razoes: %s" % sorted(set(pr for _e, _c, pr in ext)))
+    fills = [(lo, hi) for (lo, hi), cd, pr in ext if pr and "FILL" in pr or pr in (None, "STANDARD_FILL")]
+    if fills:
+        span_lo, span_hi = min(l for l, h in fills), max(h for l, h in fills)
+        print("      trecho de preenchimento: [%.0f, %.0f] = %.0f cm" % (span_lo, span_hi, span_hi - span_lo))
+        for lead, trail in ((1.0, 1.0), (0.0, 1.0), (1.0, 0.0)):
+            lay = m._pier_ordered_layout(span_hi - span_lo + lead + trail, CATALOG, lead, trail)
+            print("      _pier_ordered_layout(pier=%.0f, lead=%s, trail=%s) -> %s" % (span_hi - span_lo + lead + trail, lead, trail, [c for c, a, b in lay] if lay else lay))
+# forca bruta: composicoes sem compensador para o comprimento (modulo com junta: B39=40, B34=35, B54=55, B19=20)
+def compositions(total, mods=((40, "B39"), (35, "B34"), (55, "B54"))):
+    out = []
+    def rec(rem, counts, idx):
+        if rem == 0:
+            out.append(dict(counts)); return
+        if idx >= len(mods) or rem < 0: return
+        mod, name = mods[idx]
+        for k in range(0, rem // mod + 1):
+            counts[name] = k
+            rec(rem - k * mod, counts, idx + 1)
+        counts.pop(name, None)
+    rec(total, {}, 0)
+    return out
+for total in (465, 466, 470, 478, 480):
+    comps = compositions(total)
+    print("  comprimento %d (com juntas): %d composicoes sem compensador, ex.: %s" % (total, len(comps), comps[:3]))

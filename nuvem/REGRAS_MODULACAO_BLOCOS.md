@@ -1481,6 +1481,38 @@ Este caso já estava descrito como pendência na docstring de
 vencedor sem quebrar a outra amarração"); a decisão do usuário é justamente o
 critério que faltava — **não modular**.
 
+**REVISÃO (2026-09-10, mais tarde no mesmo dia, pela EVIDÊNCIA HUMANA — o
+usuário pediu que o projeto pronto BUTANTÃ R08_LT prevalecesse sobre as
+respostas rápidas dele):** nos 3 nós T reais sem espaço medidos no 1º PAV
+(vizinho a 50 cm), o projeto humano **não** deixa sem modular — lança **B34
+na principal cobrindo o nó + B34 na parede que chega**, exatamente a
+degradação para L que `solve_t_intersection` já tinha
+(`T_INTERSECTION_DEGRADED_L`). Nos 30 nós com espaço, B54|B34 como o solver.
+
+Portanto a ordem passa a ser:
+
+1. o teste de espaço do T enxerga também o **nó vizinho de meio de vão** na
+   mesma parede principal (`_clip_range_by_midspan_neighbours`,
+   `wall_stepper.py`) — antes só parava nos nós das pontas, e um T é sempre
+   meio da principal, então dois T próximos nunca se viam;
+2. com isso `_t_intersection_room_ok` devolve False e o T **degrada sozinho**
+   para B34|B34, para o lado que tem espaço;
+3. **só se nem degradado couber**, `_reject_overlapping_node_ties` (rede de
+   segurança) deixa o par sem modular e reportado. Nunca dois sólidos no
+   mesmo espaço.
+
+Caso mínimo da Torre [21,19,44]: antes 2 nós "não cabe"; agora PASS com os
+dois T degradados. Testes: `test_11_10_amarracoes_que_nao_cabem_degradam_
+para_B34_antes_de_ficar_sem_modular` e `test_11_10_rede_de_seguranca_
+continua_ativa_quando_nem_degradar_cabe`.
+
+**Pendente, evidência registrada:** os 3 nós humanos ficam numa parede de
+99 cm com canto nas duas pontas; o solver ainda produz C09|C09 ali porque
+`_wall_reserved_range_ft` reserva 34 cm em cada ponta nas DUAS fiadas (pior
+caso), e o humano usa a fiada em que o B34 do canto pertence à OUTRA parede
+(reserva real: 14 cm). Reserva de canto por fiada é regra candidata — ver
+`docs/checkpoints/2026-09-10-butanta-human-comparison.md`.
+
 ### 11.11 — REGRA DO USUÁRIO: boneca que atravessa parede é ABSORVIDA (2026-09-10)
 
 **Decisão do usuário, 2026-09-10.** Uma **boneca** que cruza o corpo de outra
