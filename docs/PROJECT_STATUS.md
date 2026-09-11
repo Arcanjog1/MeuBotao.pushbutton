@@ -119,6 +119,15 @@ fronteira preenchimento|amarração — o projeto humano não produz nenhuma);
 reserva de canto por fiada; filtro de paredes não estruturais no CAD; um
 clique real no botão (CPython) com o pacote do HEAD final `cf325f2` já
 instalado em `teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
+Fechamento das decisões aprovadas (2026-09-11, HEAD `c44c7d9`): regra da
+fileira de B34 como regra geral (teto de preferência, flag removida);
+regra 11.14 (reserva de canto por fiada, lendo as peças já resolvidas);
+filtro por layer de referência estrutural (seção 49, opcional na Tela de
+Configuração); seleção corrente de Walls no fluxo "paredes existentes";
+bancada salva como `BUTANTA_BENCH_SCALE_AUTOFIX.rvt`. Butantã 12→4
+reprovadas (só tocos do CAD + defeito 1), Torre 21→12, TGD sem regressão,
+TP1 só a histórica. Pendentes: teste real no botão CPython, regressão
+consolidada final, PR. Ver `docs/checkpoints/2026-09-11-fechamento-decisoes-aprovadas.md`.
 Regressão consolidada 3 no HEAD final `cf325f2`: 2 failed / 1043 passed (só as
 falhas históricas do benchmark: TGD compensators 52→55, TP1 JUNCTION 8→9).
 Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055

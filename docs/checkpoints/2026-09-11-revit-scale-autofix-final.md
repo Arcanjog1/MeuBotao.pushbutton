@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-11",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/revit-scale-autofix",
   "head": "cf325f2e78130d8aa54b464e0ac0599b897ff750",
   "base": "41086e43b6b56102ce736b816debad04749fa4bf",
