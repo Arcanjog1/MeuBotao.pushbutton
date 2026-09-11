@@ -131,3 +131,38 @@ históricas pré-missão de `tests/regression/test_benchmark_baselines.py`:
 crítica nova: a `OPENING_BLOCK_INSIDE_DOOR 0→7` que a regressão 2 (árvore com reserva de
 meio B54, descartada) carregava foi eliminada pela reversão. Nenhum baseline regravado.
 
+
+
+## Adendo 2026-09-11 (sessão seguinte) — comparação FÍSICA Revit × Revit por cobertura
+
+Os 7.257 blocos criados em `butanta testes` foram comparados com os 6.634 blocos
+humanos do 1º PAV projetando ambos nos eixos das 34 paredes de alvenaria (união
+de intervalos por fiada; fiadas 0..11; canaletas humanas contam como ocupado;
+documentos resolvidos por **título**, nunca pelo ativo — o ativo trocou sozinho
+para a referência durante a sessão). Script:
+`docs/checkpoints/evidence/_scripts/coverage.py`; dados:
+`evidence/2026-09-11-butanta-created-blocks.json`, `evidence/2026-09-11-butanta-coverage.json`.
+
+| Métrica | Valor |
+|---|---|
+| Cobertura do volume humano pelo solver | **96,8 %** (205.486 / 212.223 cm·fiada) |
+| Preenchimento do solver fora do humano | **3,0 %** |
+| Faltas > 10 cm | 317 trechos (6.673 cm) |
+| Sobras > 10 cm | 330 trechos (6.287 cm) |
+| Paredes ≥ 92,7 % de cobertura | 27 de 34 (todas as longas) |
+| Paredes com falha grossa | as 7 curtas: 99/86/115 cm (24–86 % de cobertura, 21–45 % de sobra) |
+
+Casamento peça a peça (mesma fiada, centro a ≤ 2,5 cm, mesmo tipo): 1.253 de 7.257
+(17 %) — métrica inadequada como veredito porque uma modulação válida com 20 cm de
+defasagem zera os pares; fica registrada só como diagnóstico (trocas B34↔B39: 432).
+
+Maiores sobras: fiada 11 sobre portas de `8079790` (o humano tem canaleta/verga ali — CHANNEL, fora de escopo).
+Maiores faltas: as paredes de 99/115 cm (`8079859`, `8079866`), cluster de paredes curtas com canto nas duas pontas.
+
+### Defeito 1 visto nas peças CRIADAS (mecanismo identificado)
+
+- `8079838` (499 cm, T + canto): solver c0 `B34 B54[399,455] C09 C09 C09` e c1 `B34[384,420] C09 C09 C09 B34[464,500]` — **três compensadores seguidos** nas duas paridades (a própria seção 2 proíbe). Humano c0 `B54[399,455] C09[454,465] B34[464,500]`, c1 `B34[384,420] · C09[434,445] B39[444,485]`. Diferença: o humano faz esta parede **atravessar o canto na mesma fiada em que ela recebe o B54** do T; o solver escolheu a paridade do canto ao contrário, e o resto entre o B54 e o canto (30 cm) só fecha com 3×C09. Causa: a paridade dos cantos (`_coordinate_arm_role_nodes`) não é coordenada com as amarrações em T da mesma parede.
+- `8079818` (1039 cm): solver termina com `B39[999,1040]` nas DUAS paridades no nó da ponta; humano termina em `B34[964,1000]` (c0) e preenchimento até 985 (c1), deixando 38–53 cm para a parede perpendicular — a junta em 999,5 existe em todas as 14 fiadas só no solver.
+- Paredes de 99 cm: amarração em todos os lados (canto, canto e T) sem espaço para peça inteira — reserva de canto por fiada (pendente).
+
+Regra candidata (evidência humana, não implementada): **a paridade de um canto em L deve ser escolhida junto com as amarrações em T da mesma parede, de modo que o trecho entre a amarração e o canto feche com peça inteira/B34, nunca com compensadores empilhados.**
