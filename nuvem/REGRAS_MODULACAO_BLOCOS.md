@@ -96,6 +96,28 @@ anterior não fechar o trecho:
 8. Último recurso irrestrito (nunca reporta `NON_MODULAR_WALL` quando uma
    solução — mesmo "feia" — existe).
 
+### Correção de implementação (2026-09-10): fileira de B34 antes de compensadores empilhados
+
+A ordem acima já dizia que, acima de `MAX_COMPENSATORS_PER_TRECHO = 1`, o
+solver prefere B34 a empilhar compensadores. O código não fazia isso quando a
+fileira de B34 passava de `MAX_SPECIAL_BOND_PER_TRECHO = 1` peça: esse layout
+era guardado como "7b" e só devolvido **depois** do fallback irrestrito de
+compensadores. **Medido no projeto humano BUTANTÃ R08_LT (1º PAV):** nas sete
+paredes de 494 cm sem abertura o solver punha `11×B39 + C09 C09 C04` (três
+compensadores em sequência, faixa vertical reprovada pelo próprio auditor);
+o humano põe `B34 + 9×B39 + B34 B34`. Corridas de 2 a 6 B34 são rotina no
+projeto pronto (1.615 B34 contra 242 C09).
+
+**Implementação:** em `_pier_ordered_layout` a fileira de B34 acima do teto
+passa a vir logo depois do tier 5 (≤ 1 compensador) e antes do meio-bloco
+forçado e de qualquer fallback com mais de um compensador. Um único
+compensador dentro do teto continua preferido (246 cm = 6×B39 + C04).
+Efeito medido: Butantã, 34 paredes com aberturas reais, reprovações do solver
+12 → 5 (as 7 faixas de compensador desaparecem), B34 846 → 1.557 (humano
+1.615), C09 739 → 467; a bancada de 340 cm da Torre fecha com 11 peças por
+fiada — os mesmos 154 blocos medidos no Revit real. Teste:
+`tests/test_fill_prefers_b34_row_over_stacked_compensators.py`.
+
 ### Regra do meio-bloco (B19)
 
 - **Nunca no meio de um trecho** — quebra o ritmo/prisma da alvenaria

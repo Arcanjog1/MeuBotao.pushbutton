@@ -3573,6 +3573,27 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
         if _compensator_count(merged_with_comp) <= MAX_COMPENSATORS_PER_TRECHO:
             return merged_with_comp
 
+    # 5b) A fileira de B34 acima do teto (layout dos tiers 3/4 rejeitado so'
+    #     por ter mais de MAX_SPECIAL_BOND_PER_TRECHO pecas de 34) vem ANTES do
+    #     meio-bloco forcado e de qualquer fallback com mais de
+    #     MAX_COMPENSATORS_PER_TRECHO compensadores - e' o que a secao 2 de
+    #     REGRAS_MODULACAO_BLOCOS.md ja' dizia ("acima disso, o solver prefere
+    #     B34, se couber em qualquer posicao, a empilhar compensadores"). A
+    #     ordem antiga devolvia o fallback IRRESTRITO de compensadores antes
+    #     de chegar aqui (7b). Medido ao vivo no projeto humano BUTANTA R08_LT
+    #     (2026-09-10): nas sete paredes de 494cm sem abertura o solver punha
+    #     11xB39 + C09 C09 C04 (tres compensadores em sequencia, faixa
+    #     vertical reprovada pelo proprio auditor) onde o humano poe
+    #     B34 + 9xB39 + B34 B34; corridas de 2 a 6 B34 sao rotina no projeto
+    #     pronto (1.615 B34 contra 242 C09 no 1o pavimento).
+    #     (Ate' 2026-09-10 este bloco era o "7b", DEPOIS do fallback de
+    #     compensadores acima do teto, sob a premissa de que "uma peca de
+    #     amarracao no meio da parede engana quem le' o modelo; um compensador
+    #     a mais so' e' feio" - premissa contrariada pelo projeto humano e
+    #     pelo proprio auditor, que reprova a sequencia de compensadores.)
+    if layout_special_over is not None:
+        return layout_special_over
+
     # 6) 1 B19 mesmo SEM ponta aberta (ou seja, exatamente contra um no'
     #    L/T/X) - ULTIMISSIMO recurso "limpo", so' tentado se nem o
     #    compensador (tier 5) fechou dentro do teto. Tenta a ponta de
@@ -3587,12 +3608,6 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
     if layout_with_comp is not None:
         return merged_with_comp
 
-    # 7b) fileira de B34 acima do teto (tiers 3/4) - pior que compensador
-    #     acima do teto (uma peca de amarracao no meio da parede engana quem
-    #     le' o modelo; um compensador a mais so' e' feio), melhor que o
-    #     irrestrito do tier 8.
-    if layout_special_over is not None:
-        return layout_special_over
 
     # 8) ultimo recurso irrestrito (B19 em qualquer posicao, qualquer
     #    contagem de compensadores).
