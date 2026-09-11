@@ -5,10 +5,10 @@
   "date": "2026-09-11",
   "scope": "current",
   "branch": "claude/revit-scale-autofix",
-  "head": "198a639ec3c4d351a51491b45cd5f88c37f85905",
+  "head": "c3eb0a1bf867f12b2aa2ee0cd38fdbe6b60bdc2d",
   "base": "41086e43b6b56102ce736b816debad04749fa4bf",
   "main_observada": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/37",
   "veredito": "READY FOR PR REVIEW — decisões A/B/C/D implementadas, teste real CPython 16/16 gates (8.399 blocos, idempotente), regressão consolidada 1066 passed / 2 explicadas (histórica TP1 + contagem de corpus adaptada), CI verde.",
   "objective": "Fechar a base do solver antes de verga/contraverga/canaletas: implementar as quatro decisões aprovadas pelo usuário (regra geral da fileira de B34; reserva de canto por fiada; filtro de paredes não estruturais por layer de referência; salvar a bancada) e provar o fluxo real completo BOTÃO → Tela 1 → análise → solver → Tela 2 → criação → UI, no CPython do pyRevit, com as 34 paredes de Butantã.",
   "changes": [
