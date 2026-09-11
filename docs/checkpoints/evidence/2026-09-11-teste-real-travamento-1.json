@@ -1,0 +1,23 @@
+{
+ "quando": "2026-09-11 10:45-11:12",
+ "fluxo": "BOTAO teste-perf (CPython, pacote c44c7d9) -> Modulacao Automatica (Utilizar paredes existentes) -> alerta 'Ha 34 parede(s) ja selecionada(s)' Sim -> Tela 1 (44 s) -> Iniciar -> Tela 2 (2 s) -> Lancar Blocos - calcular (16 s) -> Lancar Blocos - criar",
+ "travamento": {
+  "ultimo_estagio": "Criando blocos: Transaction.Commit() - o Revit esta' regenerando o modelo (status da Tela 2 congelado de 10:57:09 ate 11:12)",
+  "causa_direta": "caixa modal do Revit '#32770 Autodesk Revit 2026': Aviso - 0 Erros, 13940 Avisos: 'Ha instancias identicas no mesmo local. Isto ira resultar na contagem dupla nas tabelas.' (1 de 13940) - bloqueia o Idling, o MCP (timeout) e a UI do plugin",
+  "causa_raiz": "o lote anterior (7.257 blocos, criado em OUTRA sessao via _execute_create sob MCP) nao foi apagado: _execute_create_batch so' conhece o lote anterior por memoria (self.create_result['created_instances']); numa sessao nova a lista esta vazia e o novo lote (8.399) foi criado por cima -> crescimento N -> ~2N (gate 15) + avisos de instancias identicas",
+  "thread": "UI do Revit parada na caixa modal (CPU 0,2 s / 10 s, Responding=True)",
+  "external_event": "_PostCreationEventHandler (acao create) dentro da Transaction de criacao, em Commit()",
+  "planejado": 8399,
+  "criado_ate_o_instante": "8399 instancias no documento antes do Commit (nao confirmadas)",
+  "acao": "Cancelar na caixa de aviso -> Transaction desfeita; modelo volta a 7.257 blocos, IsModified=False (verificado via MCP em 0,1 s)"
+ },
+ "tempos": {
+  "tela1_s": 44,
+  "tela1_para_tela2_s": 2,
+  "solve_s": 16,
+  "criacao_loop_s": 487,
+  "criacao_por_instancia_ms": 58.0,
+  "commit_s": "nao concluido (modal)"
+ },
+ "fiadas": "16 (altura das Walls 3,20 m) - o lote anterior via MCP usou 14 (7.257); planejado agora 8.399"
+}

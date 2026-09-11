@@ -4796,8 +4796,84 @@ def _rollback_beta_transaction(transaction):
         raise RuntimeError("BETA BLOQUEADO: rollback nao confirmado; estado {}.".format(status))
 
 
+# =====================================================================
+# PROPRIEDADE DO LOTE DE BLOCOS (2026-09-11, teste real do botao - secao 50
+# de REGRAS_MODULACAO_BLOCOS.md). Cada FamilyInstance criada pelo plugin
+# recebe, no parametro de instancia "Comentarios"
+# (ALL_MODEL_INSTANCE_COMMENTS), um carimbo com o UniqueId da Wall a que
+# pertence e a etiqueta do lote. E' assim que uma execucao NOVA do botao
+# (outra sessao, outro dia) reconhece o lote anterior daquelas paredes e o
+# SUBSTITUI em vez de somar um segundo lote por cima - medido no teste real:
+# 8.399 blocos criados sobre os 7.257 de uma sessao anterior, 13.940 avisos
+# "instancias identicas no mesmo local" e a caixa modal do Revit travando a
+# UI. A memoria do handler (create_result["created_instances"]) continua
+# valendo dentro da mesma sessao; o carimbo cobre as demais. Nunca se apaga
+# nada sem carimbo: um bloco desenhado a mao (ou de outro plugin) nao tem o
+# marcador e fica intocado.
+# =====================================================================
+BLOCK_LOT_MARKER = "MODULACAO_AUTOMATICA"
+
+
+def _block_lot_stamp(wall_uid, lot_tag):
+    return "{}|parede={}|lote={}".format(BLOCK_LOT_MARKER, wall_uid or "", lot_tag or "")
+
+
+def _parse_block_lot_stamp(text):
+    """(wall_uid, lot_tag) ou None se o texto nao for um carimbo do plugin."""
+    if not text or not text.startswith(BLOCK_LOT_MARKER + "|"):
+        return None
+    wall_uid, lot_tag = None, None
+    for part in text.split("|")[1:]:
+        if part.startswith("parede="):
+            wall_uid = part[len("parede="):]
+        elif part.startswith("lote="):
+            lot_tag = part[len("lote="):]
+    return wall_uid, lot_tag
+
+
+def _stamp_block_instance(instance, wall_uid, lot_tag):
+    """Grava o carimbo de propriedade na instancia. Devolve True se gravou.
+    Nunca levanta: sem o parametro (familia sem Comentarios) a instancia
+    fica sem carimbo e o relatorio conta."""
+    try:
+        param = instance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+        if param is None or param.IsReadOnly:
+            return False
+        return bool(param.Set(_block_lot_stamp(wall_uid, lot_tag)))
+    except Exception:
+        return False
+
+
+def _discover_previous_lot(target_doc, owner_wall_uids):
+    """Instancias de bloco JA' existentes no documento carimbadas pelo plugin
+    para alguma das Walls em `owner_wall_uids` - o lote anterior dessas
+    paredes, criado numa sessao anterior. Lista de {"id", "wall_uid",
+    "lot_tag"}; vazia sem carimbos. So' le o parametro de Comentarios:
+    nenhuma inferencia geometrica, nenhum nome de familia."""
+    found = []
+    if not owner_wall_uids:
+        return found
+    owners = set(owner_wall_uids)
+    try:
+        collector = FilteredElementCollector(target_doc).OfClass(FamilyInstance).WhereElementIsNotElementType()
+        elements = collector.ToElements()
+    except Exception:
+        return found
+    for element in elements:
+        try:
+            param = element.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+            parsed = _parse_block_lot_stamp(param.AsString() if param is not None else None)
+        except Exception:
+            parsed = None
+        if parsed is None or parsed[0] not in owners:
+            continue
+        found.append({"id": element.Id, "wall_uid": parsed[0], "lot_tag": parsed[1]})
+    return found
+
+
 def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected_level, num_courses,
-                           course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False):
+                           course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False,
+                           owner_uid_by_wall_idx=None, lot_tag=None):
     """Ponto de entrada da Etapa 5: cria no Revit, dentro de um unico
     TransactionGroup, as FamilyInstance correspondentes a `candidates` (ver
     solve_building_blocks), repetidas em `num_courses` FIADAS FISICAS
@@ -4929,6 +5005,7 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         _perf.mark("blocos.activate START", codigos=len(used_codes),
                    planejados=perf["planned_total"], fiadas=num_courses)
         t_activate = Transaction(target_doc, "Ativa tipos de bloco")
+        _suppress_transaction_warnings(t_activate)
         status = t_activate.Start()
         try:
             if strict_transactions:
@@ -4955,6 +5032,12 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
 
         _perf.mark("blocos.Transaction.Start (criacao)")
         t_create = Transaction(target_doc, "Cria instancias de bloco")
+        # Avisos (nunca erros) sao apagados antes de virarem caixa modal: no
+        # teste real de 2026-09-11 o Commit() parou numa caixa com 13.940
+        # avisos e a UI do plugin ficou em "regenerando o modelo" para
+        # sempre. A propria causa (lote anterior nao substituido) foi
+        # corrigida com o carimbo de propriedade; isto e' a rede.
+        _suppress_transaction_warnings(t_create)
         status = t_create.Start()
         try:
             if strict_transactions:
@@ -5057,10 +5140,20 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             t_mark = clock()
                             perf["mirror_s"] += t_mark - t_geometry
                             perf["mirror_calls"] += 1
+                        stamped = False
+                        if owner_uid_by_wall_idx is not None:
+                            t_stamp = clock()
+                            stamped = _stamp_block_instance(
+                                instance, owner_uid_by_wall_idx.get(cand.get("wall_idx")), lot_tag)
+                            perf["stamp_s"] = perf.get("stamp_s", 0.0) + (clock() - t_stamp)
+                            perf["stamp_calls"] = perf.get("stamp_calls", 0) + 1
+                            if not stamped:
+                                perf["stamp_failures"] = perf.get("stamp_failures", 0) + 1
                         created_count += 1
                         created_instances.append({
                             "id": instance.Id, "logical_code": cand["logical_code"],
                             "course": cand["course"], "course_index": course_index,
+                            "stamped": stamped,
                             # identidade do dict-candidato de origem (o MESMO
                             # objeto Python, por referencia, entre
                             # result["candidates"]/course_candidates e este
@@ -10310,6 +10403,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._solve_building_blocks = solve_building_blocks
         self._solve_building_blocks_all_courses = solve_building_blocks_all_courses
         self._create_building_blocks = create_building_blocks
+        self._discover_previous_lot = _discover_previous_lot
         self._num_courses_for_wall_height = num_courses_for_wall_height
         self._OverrideGraphicSettings = OverrideGraphicSettings
         self._REVIT_DB_COLOR = _REVIT_DB_COLOR
@@ -10902,6 +10996,24 @@ class _PostCreationEventHandler(IExternalEventHandler):
         if self.on_done:
             self.on_done("create", None)
 
+    def _owner_wall_uids(self, app_doc):
+        """{wall_idx: UniqueId da Wall} para as paredes desta execucao (le
+        `created_walls_by_axis`, que tanto o fluxo CAD quanto o de paredes
+        existentes preenchem). Vazio quando nao ha' Wall legivel - e entao
+        nem carimbo nem descoberta acontecem."""
+        out = {}
+        for wall_idx, entries in (self.created_walls_by_axis or {}).items():
+            for entry in entries or ():
+                try:
+                    element = app_doc.GetElement(entry[0])
+                    uid = getattr(element, "UniqueId", None)
+                except Exception:
+                    uid = None
+                if uid:
+                    out[wall_idx] = uid
+                    break
+        return out
+
     def _execute_create_batch(self, app_doc):
         # IDEMPOTENCIA / INTEGRIDADE DO CONJUNTO (bug real corrigido
         # 2026-08-25, reportado pelo usuario com imagem: parte da parede
@@ -10945,6 +11057,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     pass
 
         previous_instances = (self.create_result or {}).get("created_instances") or []
+        owner_uid_by_wall_idx = self._owner_wall_uids(app_doc)
+        if not previous_instances and owner_uid_by_wall_idx:
+            # Sessao nova: o lote anterior destas paredes so' existe no
+            # documento, carimbado (ver BLOCK_LOT_MARKER). Sem carimbo, nada
+            # e' apagado - nunca no escuro.
+            _stage("procurando lote anterior carimbado destas paredes")
+            previous_instances = self._discover_previous_lot(app_doc, set(owner_uid_by_wall_idx.values()))
         if previous_instances:
             _stage("apagando o lote anterior de {} bloco(s)".format(len(previous_instances)))
             t_delete_start = _perf_clock()
@@ -11049,6 +11168,9 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
             t_create_start = _perf_clock()
             create_options = {"strict_transactions": True} if self.controlled_beta else {}
+            if owner_uid_by_wall_idx:
+                create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
+                create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
             self.create_result = self._create_building_blocks(
                 app_doc, candidates, self.catalog, self.base_z_abs,
                 self.selected_level, num_courses, course_candidates=course_candidates,

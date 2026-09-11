@@ -7098,3 +7098,43 @@ a seleção é do usuário.
 `tests/test_reference_layer_filter.py` (46 paredes reais × faces reais do
 projeto pronto: exatamente 34/12, margem ≥ 0,10 dos dois lados do limiar,
 tocos aparados 99→64 e 1039→~1000).
+
+## 50. Lote PERSISTENTE de blocos — propriedade gravada na instância (2026-09-11, teste real do botão)
+
+**Travamento medido no teste real** (botão `teste-perf`, CPython, pacote
+`c44c7d9`, 34 paredes de Butantã): Tela 1 44 s, solver 16 s, criação de
+8.399 instâncias em 487 s (58 ms cada) e então `Transaction.Commit()`
+parou numa caixa modal do Revit — **0 erros, 13.940 avisos: "Há instâncias
+idênticas no mesmo local"** — com a UI do plugin congelada em "regenerando
+o modelo" e o Idling/MCP bloqueados. Causa-raiz: o lote anterior (7.257
+blocos, criado numa sessão anterior) **não foi apagado** — o handler só
+conhecia o lote anterior por memória (`create_result["created_instances"]`),
+que numa sessão nova está vazia — e o lote novo foi criado por cima
+(crescimento N → ~2N). Cancelar a caixa desfez a transação (modelo voltou
+a 7.257, `IsModified=False`).
+
+**Regra:** toda instância criada pelo plugin recebe, no parâmetro de
+instância **Comentários** (`ALL_MODEL_INSTANCE_COMMENTS`), o carimbo
+`MODULACAO_AUTOMATICA|parede=<UniqueId da Wall>|lote=<etiqueta>`. Ao
+"criar", se o handler não tem lote anterior em memória, ele **descobre** no
+documento as instâncias carimbadas para as Walls desta execução e as apaga
+antes de criar (mesma transação de limpeza de sempre, dentro do grupo que
+restaura tudo se a criação falhar). Nunca se apaga nada sem carimbo — bloco
+a mão, de outro plugin ou de outra parede fica intocado. Nada é inferido
+por família, geometria ou contagem. Além disso, as transações de criação
+apagam **avisos** (nunca erros) antes de virarem caixa modal
+(`_suppress_transaction_warnings`, a mesma rede da união de paredes).
+
+**Implementação:** `BLOCK_LOT_MARKER`, `_block_lot_stamp`,
+`_parse_block_lot_stamp`, `_stamp_block_instance`, `_discover_previous_lot`,
+`create_building_blocks(owner_uid_by_wall_idx=, lot_tag=)`,
+`_PostCreationEventHandler._owner_wall_uids` (lê `created_walls_by_axis`,
+preenchido pelos dois fluxos). Testes: `tests/test_block_lot_persistence.py`
+(carimbo, criação carimbada, sessão nova substitui N→N, sem carimbo/outra
+parede intocado).
+
+**Bancada:** o lote de 7.257 de `BUTANTA_BENCH_SCALE_AUTOFIX.rvt` foi criado
+antes do carimbo existir; foi carimbado retroativamente via MCP (atribuição
+bloco→parede pela geometria, só nesta bancada e documentada em
+`evidence/2026-09-11-bench-retro-stamp.json`) para que o teste real exercite
+a substituição.

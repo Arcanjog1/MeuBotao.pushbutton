@@ -290,6 +290,9 @@ class _FakeWritableParam(object):
         self._owner.params[self._name] = value
         return True
 
+    def AsString(self):
+        return self._owner.params.get(self._name)
+
 
 class _FakeFamilyInstance(object):
     """Devolvido por _StubCreate.NewFamilyInstance - so' o suficiente
@@ -314,6 +317,11 @@ class _FakeFamilyInstance(object):
 
     def LookupParameter(self, name):
         return _FakeWritableParam(self, name)
+
+    def get_Parameter(self, built_in_parameter):
+        # carimbo de propriedade do lote (create_building_blocks) - a chave e'
+        # o nome do BuiltInParameter, como o _Enum do stub o representa
+        return _FakeWritableParam(self, str(built_in_parameter))
 
     def flipFacing(self):
         self.FacingFlipped = not self.FacingFlipped

@@ -1,0 +1,16 @@
+{
+ "quando": "2026-09-11 ~11:30",
+ "doc": "BUTANTA_BENCH_SCALE_AUTOFIX (bancada, salvo em seguida)",
+ "o_que": "carimbo retroativo MODULACAO_AUTOMATICA|parede=<UniqueId>|lote=retro-20260911 no parametro Comentarios dos 7.257 blocos do lote criado antes do carimbo existir (secao 50)",
+ "atribuicao": "bloco -> parede pela geometria (ponto de insercao a <= 8 cm lateral do eixo, t em [-30, L+30] cm; empate = menor distancia lateral) - SO nesta bancada, nunca em producao",
+ "resultado": {
+  "a_carimbar": 7257,
+  "ja_carimbados": 0,
+  "sem_parede": 0,
+  "carimbados": 7257,
+  "falhas": 0,
+  "commit": "Committed",
+  "tempo_s": 12.1
+ },
+ "porque": "o teste real do botao (sessao nova) precisa encontrar e substituir este lote; antes do carimbo o handler so' conhecia o lote por memoria e criou 8.399 blocos por cima (travamento 1)"
+}
