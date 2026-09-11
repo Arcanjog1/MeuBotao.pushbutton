@@ -1184,7 +1184,12 @@ def _clip_range_by_midspan_neighbours(walls_to_create, nodes, wall_idx, t_ft, sa
         if wall_idx not in _midspan_node_wall_ids(other):
             continue
         t_other = _t_of_point_on_wall(walls_to_create, wall_idx, other["point"])
-        reserve_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
+        # O vizinho tambem vai centrar a SUA peca de amarracao no proprio no':
+        # a reserva dele e' no minimo meio B54 (T_INTERSECTION_B54_HALF_ROOM_FT),
+        # nunca so' a meia espessura generica - senao dois T a 40cm ainda
+        # "cabiam" (40 - 7 = 33 >= 27) e os dois B54 se interpenetravam.
+        reserve_ft = max(_cm_to_ft(_node_default_reservation_cm(walls_to_create, other)),
+                         T_INTERSECTION_B54_HALF_ROOM_FT)
         if t_other > t_ft + 1e-6:
             hi_ft = min(hi_ft, t_other - reserve_ft)
         elif t_other < t_ft - 1e-6:
@@ -1890,7 +1895,7 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             continue
         solved.append((node_index, result["course_a"], result["course_b"]))
 
-    rejected = _reject_overlapping_node_ties(solved, failures)
+    rejected = _reject_overlapping_node_ties(solved, failures) if REJECT_OVERLAPPING_NODE_TIES else set()
     candidates = []
     for node_index, course_a, course_b in solved:
         if node_index in rejected:
@@ -1921,6 +1926,16 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
 # qualquer par de codigos do catalogo e para L/T/X, e nao precisa mudar se o
 # catalogo mudar. So' compara candidatos da MESMA fiada logica (A com A,
 # B com B) - A e B nunca coexistem na mesma fiada fisica.
+# DESLIGADA POR PADRAO desde 2026-09-11: medida no benchmark TORRE EASY TGD,
+# a rejeicao em par derrubava 229 amarracoes legitimas (JUNCTION_MISSING_BINDING
+# 24 -> 253, REGRESSAO CRITICA); so' desligando esta rede o TGD vira MELHORIA
+# (23). O caso que a motivou (dois T proximos) passou a ser resolvido ANTES,
+# pela degradacao para B34|B34 (_clip_range_by_midspan_neighbours), e o que
+# ainda interpenetrar continua barrado pelo gate duro de colisao do preflight.
+# True so' para bissecao/teste da propria rede.
+REJECT_OVERLAPPING_NODE_TIES = False
+
+
 def _reject_overlapping_node_ties(solved, failures):
     """Indices dos nos cujas pecas de amarracao se interpenetram. Acrescenta
     o motivo em `failures` (in place) e devolve o conjunto rejeitado."""
@@ -3028,6 +3043,18 @@ MAX_COMPENSATORS_PER_TRECHO = 1
 # usuario ("nao utilizar peca especial como enchimento", "penalizar
 # fortemente") aplicada tambem na GERACAO, e nao so' na auditoria.
 MAX_SPECIAL_BOND_PER_TRECHO = 1
+# 2026-09-10: uma fileira de B34 acima do teto passa a ser preferida a
+# qualquer solucao com mais de MAX_COMPENSATORS_PER_TRECHO compensadores (ver
+# _pier_ordered_layout, bloco 5b, e a secao 2 de REGRAS_MODULACAO_BLOCOS.md).
+# DEFAULT False (2026-09-11): a fileira de B34 e' o que o projeto humano
+# BUTANTA faz (corridas de 2-6 B34; 7 paredes de 494cm sem compensador) e o
+# benchmark TGD e' INDIFERENTE (numeros identicos com True/False), mas True
+# contraria a regra #2 documentada ("peca especial nao vira enchimento",
+# teto MAX_SPECIAL_BOND_PER_TRECHO em vigor desde 2026-08-28) e os testes que
+# a codificam. Trocar o default e' decisao normativa do usuario - ver
+# docs/checkpoints/2026-09-11-revit-scale-autofix-final.md. True liga o
+# comportamento humano; a mecanica esta' testada nos dois modos.
+PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = False
 
 
 def _pier_codes_by_len_desc(catalog, allow_compensators, exclude=(), pool=OPENING_JAMB_BLOCK_CODES):
@@ -3591,7 +3618,7 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
     #     amarracao no meio da parede engana quem le' o modelo; um compensador
     #     a mais so' e' feio" - premissa contrariada pelo projeto humano e
     #     pelo proprio auditor, que reprova a sequencia de compensadores.)
-    if layout_special_over is not None:
+    if layout_special_over is not None and PREFER_B34_ROW_OVER_STACKED_COMPENSATORS:
         return layout_special_over
 
     # 6) 1 B19 mesmo SEM ponta aberta (ou seja, exatamente contra um no'

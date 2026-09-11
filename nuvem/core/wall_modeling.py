@@ -220,9 +220,13 @@ def _level_internal_elevation_ft(level):
     `getattr` com fallback para `.Elevation` mantem os dubles de teste e
     qualquer nivel antigo sem a propriedade funcionando como antes."""
     project_elevation = getattr(level, "ProjectElevation", None)
-    if project_elevation is None:
-        return level.Elevation
-    return project_elevation
+    # So' um NUMERO vale: dubles de teste (e objetos .NET inertes) respondem a
+    # qualquer atributo com um objeto que nao e' cota - medido na suite
+    # (2026-09-11): 13 testes da uniao de paredes quebraram com
+    # `_Inert + float` porque o fallback so' testava `is None`.
+    if isinstance(project_elevation, (int, float)) and not isinstance(project_elevation, bool):
+        return project_elevation
+    return level.Elevation
 
 def _eid_int(eid):
     """ElementId -> int, compativel com Revit < 2024 (.IntegerValue) e >= 2024 (.Value).

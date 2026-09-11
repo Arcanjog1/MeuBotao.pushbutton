@@ -15,10 +15,33 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
+import pytest
 import solver_bench as sb  # noqa: E402
 
 m = sb.m
 CATALOG = sb.CATALOG
+ws = sys.modules["core.engine.wall_stepper"]
+
+
+@pytest.fixture(autouse=True)
+def _fileira_de_b34_ligada():
+    """Estes testes exercitam o MECANISMO com a flag LIGADA (comportamento do
+    projeto humano). O default da flag e' False - regra #2 documentada - ate'
+    decisao do usuario; ver test_default_da_flag_segue_a_regra_2_documentada."""
+    before = ws.PREFER_B34_ROW_OVER_STACKED_COMPENSATORS
+    ws.PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = True
+    yield
+    ws.PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = before
+
+
+def test_default_da_flag_segue_a_regra_2_documentada():
+    """Com o default (False) o teto MAX_SPECIAL_BOND_PER_TRECHO continua valendo
+    na geracao: 466cm volta a fechar com compensadores, como
+    test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo exige."""
+    ws.PREFER_B34_ROW_OVER_STACKED_COMPENSATORS = False
+    codes = _codes(466.0)
+    especiais = [c for c in codes if CATALOG[c].get("is_special_bond")]
+    assert len(especiais) <= m.MAX_SPECIAL_BOND_PER_TRECHO, codes
 
 
 def _codes(pier_cm):

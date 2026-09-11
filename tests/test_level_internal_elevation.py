@@ -30,6 +30,19 @@ def test_usa_project_elevation_quando_existe():
     assert m._level_internal_elevation_ft(_SurveyLevel()) == 0.0
 
 
+class _InertLevel(object):
+    """Duble que responde a QUALQUER atributo com um objeto inerte (como
+    revit_stubs._Inert): ProjectElevation existe, mas nao e' numero."""
+    Elevation = 2.5
+
+    def __getattr__(self, name):
+        return object()
+
+
+def test_project_elevation_nao_numerico_cai_para_elevation():
+    assert m._level_internal_elevation_ft(_InertLevel()) == 2.5
+
+
 def test_fallback_para_elevation_em_nivel_sem_a_propriedade():
     assert m._level_internal_elevation_ft(_LegacyLevel()) == -1.706
 

@@ -127,11 +127,14 @@ def test_11_10_rede_de_seguranca_continua_ativa_quando_nem_degradar_cabe():
     import sys as _sys
     ws = _sys.modules["core.engine.wall_stepper"]   # o modulo real, ja' carregado por load_script
     original = ws._clip_range_by_midspan_neighbours
+    flag = ws.REJECT_OVERLAPPING_NODE_TIES
     ws._clip_range_by_midspan_neighbours = lambda w, n, wi, t, rng, exclude_node_index=None: rng
+    ws.REJECT_OVERLAPPING_NODE_TIES = True    # a rede fica desligada por padrao (regressao no TGD)
     try:
         walls, nodes, result, preflight = solve(_two_close_tees(27.0))
     finally:
         ws._clip_range_by_midspan_neighbours = original
+        ws.REJECT_OVERLAPPING_NODE_TIES = flag
     assert preflight["collisions"] == []
     nao_cabe = [f for f in result["intersection_failures"] if "nao cabe" in str(f[1])]
     assert len(nao_cabe) == 2, result["intersection_failures"]
