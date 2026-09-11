@@ -141,3 +141,57 @@ Decidir os itens 1-4 de `decisoes_pendentes_do_usuario`. Com o item 1 liberado,
 a bancada de escala ja' esta' pronta para: recriar as paredes pelo pipeline
 real, refazer a matriz dentro do Revit e validar fisicamente a Tela 2 no maior
 K que passar (hoje K=6).
+
+## ADENDO - limpeza autorizada e bloqueio do harness MCP
+
+O usuario AUTORIZOU a limpeza. Executada: 156 elementos apagados (as 2 Walls
+'Parede CAD - 14.0cm' e os 154 blocos das 3 familias do catalogo), com prova de
+propriedade impressa antes do Delete e recusa automatica caso algum elemento
+nao tivesse prova. PRESERVADOS e conferidos depois: o CAD, o unico nivel e os
+638 itens de detalhe. Estado anterior ja' estava salvo em
+`evidence/2026-09-10-scale-autofix-prestate.json`. O modelo ficou com 0 Walls.
+
+A recriacao pelo pipeline real foi tentada com `main()` dirigida headless,
+neutralizando SOMENTE `revit.pick_element`, `ask_setup` e
+`_show_wall_review_window` (nenhuma linha de deteccao/pareamento/criacao
+tocada). A Etapa 1 rodou CORRETAMENTE e reproduziu, dentro do Revit, os mesmos
+numeros do banco offline - validacao cruzada forte:
+
+```
+1196 linhas / 10 layers -> A-WALL 937 -> 630 apos religar
+630 linhas -> 179 paredes formadas, 272 sem par
+0 duplicatas removidas | 179 paredes apos fechar T/L | 251 nos
+```
+
+E entao parou em `wall_modeling.py:15570`
+(`out_of_bounds_count = sum(...)`, calculo usado SO' para o relatorio) com
+`SystemError: Sequence contains no elements`, ANTES da Transaction - por isso
+nenhuma Wall foi criada e nenhum estado parcial ficou no modelo.
+
+NAO E' POSSIVEL ATRIBUIR ISSO A PRODUCAO, e por isso nao esta' listado como
+defeito do motor. Evidencia:
+
+- a MESMA instrucao, com os MESMOS objetos vivos capturados daquela execucao
+  (`lines_to_process` de 630 e `walls_to_create` de 179), executada fora de
+  `main()`, devolve `out_of_bounds_count = 0` sem erro;
+- as 179 centerlines sao todas `Line`, todas as tuplas tem 3 elementos e
+  `GetEndPoint` funciona em todas;
+- `build_plan_bounds` foi sondada e retornou limites validos;
+- descartado: mutacao in-place de `deduplicate_walls` (lista continua com 179),
+  colisao do alvo `_` do gerador com o `_` local da linha 15553 (4 variantes
+  testadas, todas OK), registro dos updaters (neutralizado, mesma falha) e
+  sombreamento de builtins por star-import (nenhum builtin sombreado).
+
+O botao roda em CPython 3 (shebang `#! python3`); o MCP so' oferece
+IronPython 2.7. A hipotese que resta e' artefato do IronPython nessa linha, e
+a forma AUTORITATIVA de decidir e' uma execucao real do botao. Registrado como
+LIMITE DO HARNESS, nao como defeito.
+
+### O que falta para fechar a validacao fisica
+
+Uma unica execucao do botao TESTE-PERF com: Layer `A-WALL`, espessura `14`,
+Nivel `pb`, altura `2,80 m`, aberturas `automatico`. Isso cria as 179 paredes
+pelo caminho de producao. A partir dai' o restante (Tela 1, solve, preflight,
+Tela 2) volta a ser dirigivel por MCP, porque usa
+`_PostCreationEventHandler`/`run_modulation_on_existing_walls`, que nao passam
+pela linha 15570.
