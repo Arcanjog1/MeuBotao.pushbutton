@@ -26,7 +26,7 @@
     "BISSECÇÃO TP1 (runner.run_project, 7 configurações, evidence/2026-09-11-bisect-tp1.txt): HEAD 09ce2a7, rede ligada, fileira B34 e sem boneca = crítica OPENING_BLOCK_INSIDE_DOOR 0→7; com a reserva antiga (meia espessura), sem clip e tudo desligado = sem INSIDE_DOOR (só a histórica JUNCTION 8→9 e compensators 74→78 de categoria). Culpado: reserva de meio B54 em _clip_range_by_midspan_neighbours — revertida (as melhorias CROSSES_JAMB 168→161 e POSITION_OVERLAP 18→0 vinham junto com ela e são abandonadas); o clip com a reserva genérica fica, porque é ele que degrada o par de T da Torre em vez de deixá-lo sem modular.",
     "Prova causal na Torre (179 eixos): com as regras 0 colisões de preflight; sem 11.10 = 7; sem 11.11 = 42; sem as duas = 49.",
     "Paridade Revit × offline: motor da branch no Revit (IronPython) resolve as 34 paredes de Butantã com 7.257 peças, preflight ok, ifail 0, nmod 78, bond 5 — idêntico ao CPython offline.",
-    "Baseline TGD/TP1 e REGRESSÃO CONSOLIDADA 2 com a configuração final: ver seção 'Regressão consolidada' abaixo."
+    "REGRESSÃO CONSOLIDADA 3 (HEAD cf325f2, suíte inteira): 2 failed / 1043 passed em 1h05 — só as 2 falhas históricas do benchmark (TGD compensators 52→55, TP1 JUNCTION 8→9). Regressão 2 (árvore com reserva de meio B54) foi abortada a 20% ao ser descartada pela bissecção TP1."
   ],
   "known_failures": [
     "Butantã, 34 paredes, mesmo auditor e mesmas aberturas: com PREFER_B34_ROW_OVER_STACKED_COMPENSATORS=True (comportamento humano) o solver reprova 5 paredes (9 juntas corridas na fronteira preenchimento|amarração); com o DEFAULT False (regra #2 documentada) reprova 12 (as mesmas 5 + 7 faixas de compensador nas paredes de 494 cm, que o humano fecha com 3×B34). Humano: 2 (3× B19 residual, exceção prevista).",
@@ -91,6 +91,9 @@
     },
     {
       "path": "docs/checkpoints/evidence/2026-09-11-bisect-tp1.txt"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-11-regressao-consolidada-3.txt"
     }
   ]
 }
@@ -119,4 +122,12 @@
 
 ## Regressão consolidada
 
-Preenchido ao término da execução (ver commit seguinte a este checkpoint).
+REGRESSÃO CONSOLIDADA 3, árvore do HEAD final `cf325f2` (`py -3 -m pytest tests -q`, suíte
+inteira incluindo os benchmarks lentos): **2 failed / 1043 passed em 1h05** (log em
+`evidence/2026-09-11-regressao-consolidada-3.txt`). As 2 falhas são exatamente as
+históricas pré-missão de `tests/regression/test_benchmark_baselines.py`:
+`torre_easy_lo_r00_tgd` compensators 52→55 (categoria; histórico 52→61) e
+`torre_easy_lo_r00_tp1` JUNCTION_MISSING_BINDING 8→9 (idêntica a 8cdd33f). Nenhuma
+crítica nova: a `OPENING_BLOCK_INSIDE_DOOR 0→7` que a regressão 2 (árvore com reserva de
+meio B54, descartada) carregava foi eliminada pela reversão. Nenhum baseline regravado.
+

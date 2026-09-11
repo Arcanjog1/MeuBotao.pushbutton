@@ -119,6 +119,8 @@ fronteira preenchimento|amarração — o projeto humano não produz nenhuma);
 reserva de canto por fiada; filtro de paredes não estruturais no CAD; um
 clique real no botão (CPython) com o pacote do HEAD final `cf325f2` já
 instalado em `teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
+Regressão consolidada 3 no HEAD final `cf325f2`: 2 failed / 1043 passed (só as
+falhas históricas do benchmark: TGD compensators 52→55, TP1 JUNCTION 8→9).
 Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055
 falhas — bissecção no TGD provou que a rede de rejeição em par causava
 `JUNCTION_MISSING_BINDING` 24→253 (desligada por padrão; sem ela o TGD vira
