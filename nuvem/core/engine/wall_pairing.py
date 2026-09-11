@@ -47,6 +47,8 @@ __all__ = [
     "_closest_target_thickness_ft", "_cap_falls_inside_opening",
     "_cap_touches_wall_face", "find_cap_positions", "clip_centerline_to_caps",
     "find_wall_pairs", "scan_possible_missed_bonecas", "_fmt_line_cm",
+    "clip_axes_to_reference_lines", "REFERENCE_LAYER_MIN_COVERAGE",
+    "REFERENCE_LAYER_LATERAL_SLACK_FT",
     "classify_unused_line_reason", "_line_2d_intersection",
     "extend_wall_ends_to_junctions", "_wall_node_arms",
     "_wall_end_geometric_anchor", "_wall_end_junction_anchor",
@@ -1785,3 +1787,117 @@ def build_wall_segments(centerline, base_z_abs, wall_height_ft, openings_on_line
         segments.append(seg)
 
     return segments
+
+
+# =====================================================================
+# FILTRO POR LAYER DE REFERENCIA ESTRUTURAL (secao 24 de
+# REGRAS_MODULACAO_BLOCOS.md, decisao do usuario 2026-09-11)
+# =====================================================================
+# Fracao MINIMA do eixo que precisa estar coberta por linhas do layer de
+# referencia (faces da alvenaria estrutural) para a parede entrar na
+# modulacao. Medido em BUTANTA (46 paredes do layer arquitetonico 'Paredes'
+# contra o layer estrutural 'ARQ-STR-BLOCO' do projeto pronto): as 34 de
+# alvenaria cobrem 0,42..0,99 (as lacunas sao os vaos), as 12 que nao sao
+# alvenaria cobrem 0,03..0,08. O limiar fica no meio da separacao medida -
+# e' um parametro documentado, nao um golden: qualquer valor em 0,15..0,35
+# separa o mesmo conjunto.
+REFERENCE_LAYER_MIN_COVERAGE = 0.30
+# Folga lateral, alem da meia espessura, para aceitar uma linha de referencia
+# como "face desta parede" (as faces do layer estrutural ficam a meia
+# espessura do eixo; 2cm cobrem o desvio de tracado entre os dois desenhos).
+REFERENCE_LAYER_LATERAL_SLACK_FT = 2.0 / 100.0 * FEET_PER_METER
+
+
+def _covered_intervals_along_axis(p0, p1, half_thickness_ft, reference_lines, lateral_slack_ft):
+    """[(t_lo, t_hi), ...] em pes ao longo do eixo p0->p1, uniao dos trechos
+    cobertos por linhas de `reference_lines` paralelas ao eixo e a uma
+    distancia lateral de ate' meia espessura + folga (as duas faces)."""
+    dx, dy = p1.X - p0.X, p1.Y - p0.Y
+    length = (dx * dx + dy * dy) ** 0.5
+    if length <= 1e-9:
+        return [], 0.0
+    ux, uy = dx / length, dy / length
+    lateral_max = half_thickness_ft + lateral_slack_ft
+    raw = []
+    for line in reference_lines:
+        try:
+            a, b = line.GetEndPoint(0), line.GetEndPoint(1)
+        except Exception:
+            continue
+        ta = (a.X - p0.X) * ux + (a.Y - p0.Y) * uy
+        tb = (b.X - p0.X) * ux + (b.Y - p0.Y) * uy
+        da = -(a.X - p0.X) * uy + (a.Y - p0.Y) * ux
+        db = -(b.X - p0.X) * uy + (b.Y - p0.Y) * ux
+        if abs(da - db) > lateral_slack_ft:      # nao e' paralela ao eixo
+            continue
+        if abs(da) > lateral_max or abs(db) > lateral_max:
+            continue
+        lo, hi = max(min(ta, tb), 0.0), min(max(ta, tb), length)
+        if hi > lo + 1e-9:
+            raw.append((lo, hi))
+    raw.sort()
+    merged = []
+    for lo, hi in raw:
+        if merged and lo <= merged[-1][1] + 1e-9:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], hi))
+        else:
+            merged.append((lo, hi))
+    return merged, length
+
+
+def clip_axes_to_reference_lines(walls_to_create, reference_lines,
+                                 min_coverage=REFERENCE_LAYER_MIN_COVERAGE,
+                                 lateral_slack_ft=REFERENCE_LAYER_LATERAL_SLACK_FT):
+    """Mantem, apara ou descarta cada eixo de `walls_to_create` pela cobertura
+    das linhas de um layer de REFERENCIA (as faces da alvenaria estrutural,
+    de outro desenho ou de outro layer do mesmo DWG).
+
+    - cobertura < `min_coverage` -> eixo DESCARTADO (parede do layer
+      arquitetonico que nao e' alvenaria estrutural: drywall, mureta, viga
+      projetada...);
+    - senao, o eixo e' APARADO ao envelope coberto [primeira, ultima linha
+      de referencia] - os buracos internos (vaos de porta/janela) ficam;
+      um toco alem da ultima face (parede que o CAD arquitetonico alonga
+      atraves da vizinha) e' removido.
+
+    Nada e' inferido por nome, ID, posicao ou contagem: so' geometria entre
+    os dois conjuntos de linhas. `reference_lines` vazio devolve a entrada
+    intacta (sem referencia nao ha' criterio - nunca se descarta no escuro).
+
+    Devolve (kept_axes, report) com report = {"kept": n, "dropped": [...],
+    "trimmed": [...], "coverage": [(idx, fracao), ...]} onde cada item de
+    dropped/trimmed e' um dict com o indice original, comprimento em cm e a
+    cobertura (e, no trimmed, o novo comprimento em cm)."""
+    report = {"kept": 0, "dropped": [], "trimmed": [], "coverage": []}
+    if not reference_lines:
+        report["kept"] = len(walls_to_create)
+        return list(walls_to_create), report
+    kept = []
+    for idx, entry in enumerate(walls_to_create):
+        line, thickness_ft = entry[0], entry[1]
+        rest = tuple(entry[2:])
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        intervals, length = _covered_intervals_along_axis(
+            p0, p1, thickness_ft / 2.0, reference_lines, lateral_slack_ft)
+        covered = sum(hi - lo for lo, hi in intervals)
+        ratio = (covered / length) if length > 1e-9 else 0.0
+        report["coverage"].append((idx, ratio))
+        length_cm = length / FEET_PER_METER * 100.0
+        if ratio + 1e-9 < min_coverage:
+            report["dropped"].append({"index": idx, "length_cm": length_cm, "coverage": ratio})
+            continue
+        t_lo, t_hi = intervals[0][0], intervals[-1][1]
+        if t_lo > 1e-6 or t_hi < length - 1e-6:
+            dx, dy = p1.X - p0.X, p1.Y - p0.Y
+            ux, uy = dx / length, dy / length
+            q0 = XYZ(p0.X + ux * t_lo, p0.Y + uy * t_lo, p0.Z)
+            q1 = XYZ(p0.X + ux * t_hi, p0.Y + uy * t_hi, p1.Z)
+            new_line = Line.CreateBound(q0, q1)
+            report["trimmed"].append({"index": idx, "length_cm": length_cm,
+                                      "new_length_cm": (t_hi - t_lo) / FEET_PER_METER * 100.0,
+                                      "coverage": ratio})
+            kept.append((new_line, thickness_ft) + rest)
+        else:
+            kept.append(entry)
+        report["kept"] += 1
+    return kept, report

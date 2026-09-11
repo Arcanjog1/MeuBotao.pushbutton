@@ -9022,6 +9022,9 @@ class _ProgressConsole(object):
 SETUP_THICKNESS_SCAN_MAX_LINES = 900
 
 
+REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
+
+
 class _SetupForm(Form):
     """Configuracao completa da execucao: Layer, espessuras, Nivel, altura
     e como identificar portas/janelas. MODAL de proposito - nada existe no
@@ -9216,7 +9219,31 @@ class _SetupForm(Form):
             self._layer_grid.Items.Add(row)
         self._layer_grid.SelectedIndexChanged += self._on_layer_changed
 
+        # Secao 49: layer de REFERENCIA estrutural (opcional) - as faces da
+        # alvenaria estrutural, quando existem num layer separado; eixos do
+        # layer de paredes sem cobertura nele sao descartados/aparados.
+        self._reference_combo = ComboBox()
+        self._reference_combo.Dock = DockStyle.Bottom
+        self._reference_combo.Height = 26
+        self._reference_combo.Font = _ui_font(10.0)
+        self._reference_combo.DropDownStyle = ComboBoxStyle.DropDownList
+        self._reference_combo.Items.Add(REFERENCE_LAYER_NONE_LABEL)
+        for name in ordered_layers:
+            self._reference_combo.Items.Add(name)
+        remembered_reference = defaults.get("reference_layer")
+        if remembered_reference in ordered_layers:
+            self._reference_combo.SelectedIndex = ordered_layers.index(remembered_reference) + 1
+        else:
+            self._reference_combo.SelectedIndex = 0
+        reference_label = _build_section_label(
+            "Layer de referencia estrutural (opcional)",
+            "Faces da alvenaria estrutural: paredes do layer acima sem cobertura aqui ficam fora."
+        )
+        reference_label.Dock = DockStyle.Bottom
+
         left.Controls.Add(self._layer_grid)
+        left.Controls.Add(reference_label)      # docado por ultimo entre os dois...
+        left.Controls.Add(self._reference_combo)  # ...o combo fica no fundo, o rotulo acima dele
         left.Controls.Add(_build_section_label(
             "1. Layer das paredes",
             "Ordenado por quantidade de linhas - o Layer de parede costuma ser o maior."
@@ -9431,6 +9458,8 @@ class _SetupForm(Form):
             "openings_mode": "pick" if self._openings_pick.Checked else "auto",
             "wall_mode": (WALL_BUILD_MODE_CONTINUOUS if self._wall_mode_continuous.Checked
                           else WALL_BUILD_MODE_SEGMENTED),
+            "reference_layer": (None if self._reference_combo.SelectedIndex <= 0
+                                else str(self._reference_combo.SelectedItem)),
         }
         self.Close()
 
@@ -9472,6 +9501,7 @@ def _remember_setup_defaults(setup):
                 "height_m": setup.get("height_m"),
                 "openings_mode": setup.get("openings_mode"),
                 "wall_mode": setup.get("wall_mode"),
+                "reference_layer": setup.get("reference_layer"),
             }, handle)
     except Exception:
         pass
@@ -15524,6 +15554,36 @@ def main():
             len(lines_to_process), len(walls_to_create), len(lines_to_process) - 2 * len(walls_to_create)
         )
     )
+
+    # Secao 49 (2026-09-11): LAYER DE REFERENCIA ESTRUTURAL (opcional). O
+    # layer arquitetonico de paredes traz tambem o que NAO e' alvenaria
+    # estrutural (drywall, muretas, vigas projetadas) e alonga paredes
+    # atraves da vizinha; quando o DWG (ou outro import) tem um layer com as
+    # faces da alvenaria estrutural, cada eixo e' mantido/aparado/descartado
+    # pela cobertura geometrica dessas linhas - nunca por nome, ID ou
+    # posicao. Sem layer escolhido (ou sem linhas nele) nada muda.
+    reference_layer = setup.get("reference_layer")
+    reference_report = None
+    if reference_layer and cad_lines_by_layer.get(reference_layer):
+        before_ref = len(walls_to_create)
+        walls_to_create, reference_report = clip_axes_to_reference_lines(
+            walls_to_create, cad_lines_by_layer[reference_layer]
+        )
+        output.print_md(
+            "**Layer de referencia estrutural '{}'**: {} eixo(s) analisados, "
+            "{} mantido(s), {} aparado(s), {} descartado(s) por cobertura "
+            "< {:.0f}% (nao sao alvenaria estrutural).".format(
+                reference_layer, before_ref, reference_report["kept"],
+                len(reference_report["trimmed"]), len(reference_report["dropped"]),
+                REFERENCE_LAYER_MIN_COVERAGE * 100.0
+            )
+        )
+        for item in reference_report["dropped"]:
+            output.print_md("- descartado: eixo #{} de {:.0f} cm, cobertura {:.0f}%".format(
+                item["index"], item["length_cm"], item["coverage"] * 100.0))
+        for item in reference_report["trimmed"]:
+            output.print_md("- aparado: eixo #{} de {:.0f} cm -> {:.0f} cm".format(
+                item["index"], item["length_cm"], item["new_length_cm"]))
 
     # Paredes DETECTADAS no AutoCAD = pares validos (paralelismo + espessura
     # + sobreposicao + linhas de fechamento) encontrados por find_wall_pairs

@@ -7052,3 +7052,49 @@ em13/14/17 fiadas (143/154/187 blocos). Execute_solve real do handler,
 com dubles e bancada uniforme340cm, reproduziu exatamente as paredes,
 blocos e catalogo do probe17, com assinatura atual valida. Nao demonstra
 comportamento de transacoes/familias reais, que depende do beta futuro.
+
+## 49. Filtro por LAYER DE REFERÊNCIA ESTRUTURAL (2026-09-11, decisão do usuário)
+
+**Problema medido (BUTANTÃ, via MCP):** o DWG `1 PAV` do doc de teste é uma
+exportação arquitetônica do Revit — os layers são `Paredes`, `Estrutura _1_`,
+`Substrato _2_`, `Acabamento`… (nomes de camadas de parede do Revit) e o
+layer estrutural `ARQ-STR-BLOCO` existe mas está **vazio**. Foi esse o "erro
+de layer" do projeto: das 46 paredes que o layer `Paredes` forma, **12 não
+são alvenaria estrutural** no projeto pronto (não há bloco nenhum ao longo
+delas em nenhum pavimento; em cinco há uma viga `TQS` projetada) e quatro são
+desenhadas **atravessando a vizinha** (99 cm onde a alvenaria tem 64; 1039
+onde tem ~1000). Nenhuma propriedade da parede no doc de teste separa os
+dois grupos (mesmo tipo `Parede 14cm`, mesma espessura, mesma altura; ponta
+livre em ambos: 5 alvenarias também têm ponta livre; 224 cm com T+livre
+aparece nos dois grupos).
+
+**Critério geral e confiável:** a **cobertura geométrica pelo layer
+estrutural**. O desenho estrutural do projeto pronto (import 7097743, layer
+`ARQ-STR-BLOCO`, 11.415 linhas = faces dos blocos) cobre as 34 de alvenaria
+em **0,42–0,99** (as lacunas são os vãos) e as 12 restantes em **0,03–0,08**;
+e o envelope coberto termina exatamente onde a alvenaria termina (0,62 nas
+três curtas = 64/99 cm). Separação limpa, sem nome, ID, posição ou contagem.
+
+**Regra:** com um layer de referência escolhido (opcional, na Tela de
+Configuração — "Layer de referência estrutural"), cada eixo do layer de
+paredes é (a) **descartado** se a cobertura for menor que
+`REFERENCE_LAYER_MIN_COVERAGE = 0,30` (meio da separação medida; qualquer
+valor em 0,15–0,35 separa o mesmo conjunto — parâmetro documentado, não
+golden), (b) **aparado** ao envelope coberto [primeira, última face] — os
+buracos internos (vãos) ficam; o toco além da última face sai — ou (c)
+mantido. Faces são linhas paralelas ao eixo a meia espessura ± 2 cm
+(`REFERENCE_LAYER_LATERAL_SLACK_FT`). Sem layer escolhido, ou sem linhas
+nele, **nada muda** — nunca se descarta no escuro.
+
+**Implementação:** `clip_axes_to_reference_lines` (`core/engine/wall_pairing.py`),
+chamada em `main()` logo depois de `find_wall_pairs`; relatório no output
+(mantidos / aparados / descartados) e escolha lembrada com as demais da
+Tela de Configuração. Só no fluxo CAD→Walls: no fluxo "paredes existentes"
+a seleção é do usuário.
+
+**Limite registrado:** o DWG deste projeto não tem as faces estruturais
+(layer vazio) — para usá-lo aqui é preciso importar o desenho estrutural
+(o mesmo que o projeto pronto usa). A evidência do filtro está em
+`tests/test_reference_layer_filter.py` (46 paredes reais × faces reais do
+projeto pronto: exatamente 34/12, margem ≥ 0,10 dos dois lados do limiar,
+tocos aparados 99→64 e 1039→~1000).
