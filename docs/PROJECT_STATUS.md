@@ -66,12 +66,12 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 | MAIN / HEAD observado | 21576ee3d0826f362bce1038131603bd2ccf5dc1 (merge do #36); antes 6c00f7e; main inicial aa58d70 |
 | Solver oficial | Produção igual à main inicial; S1/C1/G12 e ARM integrados, N1 ausente |
 | Solver candidato | #31 5658e9c: NO-GO; #34 8a93a27: bancada offline restrita |
-| Beta Revit | **CANDIDATO — VALIDAÇÃO REVIT PENDENTE**; analyze síncrono da branch informada a5081d8 não verificado |
+| Beta Revit | **CANDIDATO — ESCALA E CRIAÇÃO REAL MEDIDAS** na branch `claude/revit-scale-autofix` (HEAD 91cc738): planta de 179 eixos passa o gate de criação; 7.257 blocos criados e recriados no Revit sem duplicata (Butantã, 34 paredes, 44 aberturas); 5 paredes ainda reprovadas pelo auditor (humano: 2). Sem merge. |
 | PRs importantes | #32 governança, #33/#35 referências integrados; [inventário/checks](GITHUB_STATE_2026-09-10.md) |
 | Bloqueadores | Invasões/colisões/amarração no recorte, omissões, validação síncrona/rollback real; [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
-| Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA, reprodução parcial |
-| Último checkpoint | [Consolidação Beta 2](checkpoints/2026-09-10-beta2-consolidation.md) |
+| Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA; BUTANTÃ 1º PAV comparado ao vivo com o solver em 2026-09-10 — [comparação](checkpoints/2026-09-10-butanta-human-comparison.md) |
+| Último checkpoint | [Fechamento scale-autofix](checkpoints/2026-09-11-revit-scale-autofix-final.md); antes [Consolidação Beta 2](checkpoints/2026-09-10-beta2-consolidation.md) |
 | Próximo objetivo | [Pacote](architecture/beta2-implementation-package.md), após decisões e validação Beta 1 |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
@@ -87,6 +87,39 @@ integrado antes do gate do Revit.
 #34: código 8cdd33f, 1027/2; bancada uniforme 75/81, 187 blocos sem aberturas.
 Históricos candidatos, não medição desta main/PASS Revit.
 [Fontes fixadas](GITHUB_STATE_2026-09-10.md).
+
+## Missão claude/revit-scale-autofix (2026-09-10/11) — escala e comparação humana
+
+Branch `claude/revit-scale-autofix`, derivada de `41086e43` (Beta 1
+reconciliado), HEAD de código `91cc73833c188ca618c86e59cade4f62e6b0a125`,
+publicada; main observada por fetch `21576ee3` (inalterada). Sem PR, sem merge.
+
+Pergunta central respondida: o que quebra ao sair das 2 paredes é o
+**encontro em T** (e bonecas), não a quantidade — o primeiro FAIL reproduz com
+2–3 eixos; a planta inteira da Torre (179 eixos) resolve em 2–8 s.
+
+Cinco correções gerais, todas com teste que falha antes e passa depois:
+8a.1 `ProjectElevation` (a modulação nasceria 726 m acima em projetos com
+nível no survey point); 11.10 revisada pela evidência humana (T sem espaço
+degrada para B34|B34); 11.11 boneca absorvida; fileira de B34 antes de
+compensadores empilhados (bug contra a seção 2); 12.1 espelhamento no lugar
+(`MirrorElement` duplicava compensadores). Detalhe e evidências:
+[fechamento](checkpoints/2026-09-11-revit-scale-autofix-final.md),
+[escala](checkpoints/2026-09-10-revit-scale-autofix.md),
+[comparação humana](checkpoints/2026-09-10-butanta-human-comparison.md).
+
+Medido no Revit (doc de teste `butanta testes`, 1º PAV, 34 paredes de
+alvenaria, 44 aberturas detectadas pelo próprio plugin): 7.257 blocos criados
+pelo caminho real (`_execute_create`, modo beta), 0 falhas, 0 colisões, 14
+fiadas z=1..261; recriação substitui o lote por exatamente 7.257, 0 órfãs.
+Criação custa 36,9 ms por instância (295 s) — gargalo real da Tela 2 em escala.
+
+Gates em aberto: 5 paredes reprovadas pelo auditor (junta corrida na
+fronteira preenchimento|amarração — o projeto humano não produz nenhuma);
+reserva de canto por fiada; filtro de paredes não estruturais no CAD; um
+clique real no botão (CPython) com o pacote `91cc738` já instalado em
+`teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
+Regressão consolidada: ver seção "Regressão consolidada" do checkpoint final.
 
 ## Beta 1 - CANDIDATO, validacao Revit PENDENTE
 

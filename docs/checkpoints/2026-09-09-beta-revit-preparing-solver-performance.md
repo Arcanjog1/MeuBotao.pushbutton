@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-09",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
   "head": "25993550ef4fd3ce80b2dbec4809d1b2ce69ca09",
   "base": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
