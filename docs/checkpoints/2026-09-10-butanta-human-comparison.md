@@ -52,7 +52,7 @@
     "11.11 (boneca absorvida): o humano não tem boneca atravessando parede neste pavimento; regra não testada por esta evidência."
   ],
   "limites": [
-    "Comparação em memória (CPython 3 com dublês): nenhuma criação de bloco no Revit nesta rodada; a Tela 2 não foi exercitada.",
+    "PARIDADE Revit x offline: o motor da branch carregado DENTRO do Revit (IronPython 2.7, shim de math.isfinite) com as 44 aberturas detectadas pelo PRÓPRIO plugin (collect_opening_instances('auto') sobre as famílias de Mobiliário do doc de teste) resolve as mesmas 34 paredes em 21,5 s com 7.257 peças, preflight ok, 0 colisões, 0 invasões, ifail 0, nmod 78, bond 5 - idêntico ao offline CPython (7.257; histograma difere em poucas peças por spans do acervo x detecção automática). A divisão inteira do IronPython não alterou o resultado neste corpus.",
     "Só o 1º PAVIMENTO; 3º-8º são clones do 2º segundo o README do acervo.",
     "Canaletas (979 peças do 1º PAV) fora do escopo por instrução - o solver as substitui por bloco comum, o que infla B39.",
     "A extração humana usa bbox com 1 cm de junta por face (as erratas do acervo avisam); juntas medidas no ponto médio entre faces."
