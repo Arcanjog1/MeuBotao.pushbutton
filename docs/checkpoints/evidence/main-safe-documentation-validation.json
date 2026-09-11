@@ -1,0 +1,23 @@
+{
+  "started_utc": "2026-09-09T18:24:00.799049+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-main-safe-20260909",
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "tree": "d835bdbb5092ac7d472502525434126c730a17e6",
+  "status_before": "A  docs/BETA_MAIN_SAFE_2026-09-09.md\nA  docs/BETA_MAIN_SAFE_RUNBOOK.md\nM  docs/PROJECT_STATUS.md\nM  docs/PROJECT_STATUS_LOG.md\nM  docs/START_HERE.md\nA  docs/checkpoints/2026-09-09-beta-main-safe.md\nA  docs/checkpoints/evidence/main-safe-consolidated.json\nA  docs/checkpoints/evidence/main-safe-consolidated.txt\nA  docs/checkpoints/evidence/main-safe-engineering-input.json\nA  docs/checkpoints/evidence/main-safe-governance-tests.json\nA  docs/checkpoints/evidence/main-safe-governance-tests.txt\nA  docs/checkpoints/evidence/main-safe-handler-bench-run.json\nA  docs/checkpoints/evidence/main-safe-handler-bench-run.txt\nA  docs/checkpoints/evidence/main-safe-handler-bench.json\nA  docs/checkpoints/evidence/main-safe-native-z-run.json\nA  docs/checkpoints/evidence/main-safe-native-z-run.txt\nA  docs/checkpoints/evidence/main-safe-native-z.json\nA  docs/checkpoints/evidence/main-safe-package-build.json\nA  docs/checkpoints/evidence/main-safe-package-build.txt\nA  docs/checkpoints/evidence/main-safe-package-verify.json\nA  docs/checkpoints/evidence/main-safe-package-verify.txt\nA  docs/checkpoints/evidence/main-safe-provenance-run.json\nA  docs/checkpoints/evidence/main-safe-provenance-run.txt\nA  docs/checkpoints/evidence/main-safe-provenance.json\nA  docs/checkpoints/evidence/main-safe-region-final-scored.json\nA  docs/checkpoints/evidence/main-safe-region-final.json\nA  docs/checkpoints/evidence/main-safe-region-initial.json\nA  docs/checkpoints/evidence/main-safe-ui-boundary-run.json\nA  docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\nA  docs/checkpoints/evidence/main-safe-ui-boundary.json\nM  nuvem/REGRAS_MODULACAO_BLOCOS.md",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "tools/documentation/validate.py",
+    "--base",
+    "aa58d70d84c6134216f8f15a131edf060c4dce81",
+    "--require-current-main"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "main-safe-documentation-validation.txt",
+  "pid": 17200,
+  "exit_code": 0,
+  "elapsed_seconds": 1.75,
+  "status_after": "A  docs/BETA_MAIN_SAFE_2026-09-09.md\nA  docs/BETA_MAIN_SAFE_RUNBOOK.md\nM  docs/PROJECT_STATUS.md\nM  docs/PROJECT_STATUS_LOG.md\nM  docs/START_HERE.md\nA  docs/checkpoints/2026-09-09-beta-main-safe.md\nA  docs/checkpoints/evidence/main-safe-consolidated.json\nA  docs/checkpoints/evidence/main-safe-consolidated.txt\nA  docs/checkpoints/evidence/main-safe-engineering-input.json\nA  docs/checkpoints/evidence/main-safe-governance-tests.json\nA  docs/checkpoints/evidence/main-safe-governance-tests.txt\nA  docs/checkpoints/evidence/main-safe-handler-bench-run.json\nA  docs/checkpoints/evidence/main-safe-handler-bench-run.txt\nA  docs/checkpoints/evidence/main-safe-handler-bench.json\nA  docs/checkpoints/evidence/main-safe-native-z-run.json\nA  docs/checkpoints/evidence/main-safe-native-z-run.txt\nA  docs/checkpoints/evidence/main-safe-native-z.json\nA  docs/checkpoints/evidence/main-safe-package-build.json\nA  docs/checkpoints/evidence/main-safe-package-build.txt\nA  docs/checkpoints/evidence/main-safe-package-verify.json\nA  docs/checkpoints/evidence/main-safe-package-verify.txt\nA  docs/checkpoints/evidence/main-safe-provenance-run.json\nA  docs/checkpoints/evidence/main-safe-provenance-run.txt\nA  docs/checkpoints/evidence/main-safe-provenance.json\nA  docs/checkpoints/evidence/main-safe-region-final-scored.json\nA  docs/checkpoints/evidence/main-safe-region-final.json\nA  docs/checkpoints/evidence/main-safe-region-initial.json\nA  docs/checkpoints/evidence/main-safe-ui-boundary-run.json\nA  docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\nA  docs/checkpoints/evidence/main-safe-ui-boundary.json\nM  nuvem/REGRAS_MODULACAO_BLOCOS.md\n?? docs/checkpoints/evidence/main-safe-documentation-validation.json\n?? docs/checkpoints/evidence/main-safe-documentation-validation.txt",
+  "log_sha256": "09051bf1575da4ee41e385c09e9e2f9f8c71dcb4e9af5908e488b8d4b346fd5e"
+}

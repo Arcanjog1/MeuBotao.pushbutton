@@ -3752,6 +3752,102 @@ def test_execute_analyze_erro_sem_mensagem_nunca_fica_vazio():
 
 
 @case
+def test_acao_agendada_por_callback_durante_execute_sobrevive():
+    """REGRESSAO do travamento medido no primeiro beta instrumentado
+    (2026-09-09): a Etapa 5 anunciava "criando as instancias de bloco no
+    Revit..." e ficava ali para sempre - zero bloco criado, zero erro, zero
+    conclusao.
+
+    Causa: `_execute_solve` chama `self.on_done("solve", None)` DE DENTRO de
+    `Execute()`, e esse callback (`_PostCreationForm._on_solve_done`) segue
+    direto para `_on_create_click` -> `_raise_action("create")`, que faz
+    `handler.action = "create"` e `Raise()`. O `finally` de `Execute()`
+    zerava `self.action` DEPOIS disso, apagando a acao recem-agendada; o
+    despacho seguinte entrava com `action=None`, nao casava com nenhum ramo
+    e voltava em silencio, sem nunca chamar `on_done`.
+
+    Evidencia no log da execucao real (perf_diag.log):
+        Execute ENTROU action=solve
+        Execute SAIU   action=create      <- callback agendou "create"
+        Execute ENTROU action=None        <- e o finally ja' tinha apagado
+
+    O contrato exigido aqui: uma acao agendada por um callback DURANTE
+    Execute() precisa sobreviver ate' o proximo despacho."""
+    handler = m._PostCreationEventHandler()
+
+    fake_uidoc = revit_stubs._Inert()
+    fake_uidoc.Document = revit_stubs._Inert()
+    fake_uiapp = revit_stubs._Inert()
+    fake_uiapp.ActiveUIDocument = fake_uidoc
+
+    # Simula _execute_solve: no fim dele, o callback encadeia "create" -
+    # exatamente como _on_solve_done -> _on_create_click -> _raise_action.
+    despachadas = []
+
+    def _fake_execute_solve():
+        despachadas.append("solve")
+        handler.action = "create"          # <- _raise_action, ainda DENTRO de Execute()
+        handler.on_done = _fake_on_create_done
+
+    def _fake_on_create_done(kind, error):
+        despachadas.append(("done", kind))
+
+    def _fake_execute_create(app_doc):
+        despachadas.append("create")
+
+    handler._execute_solve = _fake_execute_solve
+    handler._execute_create = _fake_execute_create
+    handler._refresh_geometry_from_document = lambda app_doc: None
+    handler.action = "solve"
+
+    handler.Execute(fake_uiapp)
+
+    # A acao agendada pelo callback NAO pode ter sido apagada pelo finally.
+    assert handler.action == "create", (
+        "a acao agendada durante Execute() foi perdida (action=%r) - "
+        "e' o travamento da Etapa 5" % (handler.action,))
+
+    # E o despacho seguinte (o Raise() que o callback fez) precisa mesmo criar.
+    handler.Execute(fake_uiapp)
+    assert despachadas == ["solve", "create"], despachadas
+
+    # Consumida: um terceiro despacho nao repete nada.
+    assert handler.action is None, handler.action
+    handler.Execute(fake_uiapp)
+    assert despachadas == ["solve", "create"], despachadas
+
+
+@case
+def test_execute_despacha_pela_acao_do_inicio_mesmo_se_callback_trocar():
+    """Complemento do teste acima: o encadeamento de ramos de `Execute()`
+    olha a acao capturada NO INICIO, nunca `self.action` vivo. Sem isso, um
+    callback que troca a acao no meio do caminho poderia fazer o MESMO
+    despacho executar dois ramos diferentes."""
+    handler = m._PostCreationEventHandler()
+    fake_uidoc = revit_stubs._Inert()
+    fake_uidoc.Document = revit_stubs._Inert()
+    fake_uiapp = revit_stubs._Inert()
+    fake_uiapp.ActiveUIDocument = fake_uidoc
+
+    executados = []
+    handler._refresh_geometry_from_document = lambda app_doc: None
+    handler._execute_create = lambda app_doc: executados.append("create")
+    handler._execute_delete = lambda app_doc: executados.append("delete")
+
+    def _solve_que_troca_a_acao():
+        executados.append("solve")
+        handler.action = "delete"
+
+    handler._execute_solve = _solve_que_troca_a_acao
+    handler.action = "solve"
+
+    handler.Execute(fake_uiapp)
+
+    assert executados == ["solve"], executados
+    assert handler.action == "delete", handler.action
+
+
+@case
 def test_wall_review_form_so_dispara_modulacao_apos_clique_no_botao():
     """REGRA PRINCIPAL do usuario: so' construir _WallReviewForm (o que
     acontece assim que a Etapa 1 - criacao das Walls - termina) NUNCA pode
@@ -7538,22 +7634,34 @@ def test_bloco_bom_engolido_pela_busca_volta_quando_o_reparo_falha():
 
 @case
 def test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo():
-    """Regra #2 do usuario aplicada na GERACAO, nao so' na auditoria: com o
-    trecho continuo indo de no' a no', o tier "B39+B34" fechava a sobra com
-    uma FILEIRA de B34 no meio da parede (medido: 3 seguidos em [475, 579]).
-    MAX_SPECIAL_BOND_PER_TRECHO limita isso."""
+    """Regra #2 do usuario na GERACAO, na forma REVISADA em 2026-09-11 pela
+    evidencia do projeto humano BUTANTA (decisao do usuario): o teto
+    MAX_SPECIAL_BOND_PER_TRECHO e' de PREFERENCIA, nao proibicao. B34 nunca
+    vira enchimento GRATUITO - so' aparece em fileira quando nem 1 B34 nem 1
+    compensador fecham o trecho - e, nesse caso, e' preferido a empilhar
+    compensadores (o que o auditor reprova como faixa). Antes (2026-08-28 a
+    2026-09-10) o teto era proibicao e produzia 11xB39 + C09 C09 C04 em
+    494cm; o humano poe B34 + 9xB39 + B34 B34."""
     assert m.MAX_SPECIAL_BOND_PER_TRECHO == 1
     usou_alguma = False
+    fileiras = 0
     for total_cm in range(40, 900):
         layout = m._pier_ordered_layout(float(total_cm), CATALOG, 1, 1)
         if layout is None:
             continue
-        especiais = [c for c, _a, _b in layout if CATALOG[c]["is_special_bond"]]
-        assert len(especiais) <= m.MAX_SPECIAL_BOND_PER_TRECHO, (total_cm, layout)
+        codes = [c for c, _a, _b in layout]
+        especiais = [c for c in codes if CATALOG[c]["is_special_bond"]]
+        compensadores = [c for c in codes if CATALOG[c].get("is_compensator")]
+        if len(especiais) > m.MAX_SPECIAL_BOND_PER_TRECHO:
+            # fileira: so' sem compensador nenhum, e so' onde 1 B34 nao fecha
+            fileiras += 1
+            assert not compensadores, (total_cm, layout)
         usou_alguma = usou_alguma or bool(especiais)
     # e o teto nao virou "proibido": a peca especial continua disponivel
     # como acerto PONTUAL, que e' a funcao legitima dela
     assert usou_alguma
+    # ... e a fileira existe (regra revisada), nunca acompanhada de compensador
+    assert fileiras > 0
 
 
 @case

@@ -1,0 +1,39 @@
+=== SESSAO 2026-09-10 14:27:04 ===
+[PERF] +    0.006s cpu=   0.000s thr=2   tid=26316 ntid=26316  amostrador de congelamento LIGADO intervalo=0.25s limiar=2.0s
+[PERF] +    0.007s cpu=   0.000s thr=2   tid=26316 ntid=26316  ui.click START axes=2 beta=True catalog=6 nodes=3 openings=0 walls=2
+[PERF] +    0.009s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.log DoEvents START
+[PERF] +    0.015s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.log DoEvents END dt=0.006s
+[PERF] +    0.016s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.set_status DoEvents START
+[PERF] +    0.017s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.set_status DoEvents END dt=0.001s
+[PERF] +    0.021s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.set_indeterminate DoEvents START
+[PERF] +    0.023s cpu=   0.016s thr=2   tid=26316 ntid=26316  console.set_indeterminate DoEvents END dt=0.002s
+[PERF] +    0.039s cpu=   0.047s thr=2   tid=26316 ntid=26316  ui.console_pronto
+[PERF] +    0.040s cpu=   0.047s thr=2   tid=26316 ntid=26316  ui.external_event.Raise CHAMADO
+[PERF] +    0.041s cpu=   0.047s thr=2   tid=26316 ntid=26316  ui.external_event.Raise RETORNOU
+[PERF] +    0.051s cpu=   0.047s thr=2   tid=26316 ntid=26316  Execute ENTROU action=analyze
+[PERF] +    0.051s cpu=   0.047s thr=2   tid=26316 ntid=26316  Execute.globals_update START nomes=873
+[PERF] +    0.052s cpu=   0.047s thr=2   tid=26316 ntid=26316  Execute.globals_update END dt=0.001s nomes=873
+[PERF] +    0.052s cpu=   0.047s thr=2   tid=26316 ntid=26316  Execute.ActiveUIDocument START
+[PERF] +    0.052s cpu=   0.047s thr=2   tid=26316 ntid=26316  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +    0.052s cpu=   0.047s thr=2   tid=26316 ntid=26316  refresh_geometry_from_document START axes=2
+[PERF] +    0.065s cpu=   0.047s thr=2   tid=26316 ntid=26316  refresh_geometry_from_document END axes=2 dt=0.013s
+[PERF] +    0.066s cpu=   0.047s thr=2   tid=26316 ntid=26316  _execute_analyze (disparo) START
+[PERF] +    0.066s cpu=   0.047s thr=2   tid=26316 ntid=26316  _execute_analyze: criando thread de fundo
+[PERF] +    0.070s cpu=   0.062s thr=2   tid=26316 ntid=26316  _execute_analyze: thread de fundo INICIADA
+[PERF] +    0.070s cpu=   0.062s thr=2   tid=19324 ntid=19324  worker.thread ENTROU
+[PERF] +    0.072s cpu=   0.062s thr=3   tid=19324 ntid=19324  analyze_created_walls_for_errors START nodes=3 walls=2
+[PERF] +    0.072s cpu=   0.062s thr=3   tid=19324 ntid=19324  analyze.trecho: entrou no corpo
+[PERF] +    0.071s cpu=   0.062s thr=3   tid=26316 ntid=26316  _execute_analyze (disparo) END dt=0.005s
+[PERF] +    0.072s cpu=   0.062s thr=3   tid=19324 ntid=19324  analyze.trecho: passou do catalog_missing
+[PERF] +    0.073s cpu=   0.062s thr=3   tid=19324 ntid=19324  analyze.trecho: plan_failures criado
+[PERF] +    0.073s cpu=   0.062s thr=3   tid=19324 ntid=19324  analyze.trecho: plan_hook definido
+[PERF] +    0.073s cpu=   0.062s thr=3   tid=19324 ntid=19324  process_walls_one_by_one START walls=2
+[PERF] +    0.074s cpu=   0.062s thr=3   tid=19324 ntid=19324  solve_all_intersections START nodes=3
+[PERF] +    0.073s cpu=   0.062s thr=3   tid=26316 ntid=26316  Execute SAIU action=analyze pendente=None
+[PERF] + 1654.757s cpu=  45.078s thr=3   tid=4704  ntid=4704   CONGELAMENTO detectado pelo amostrador parado=1654.490s
+[PERF] + 1654.848s cpu=  45.125s thr=3   tid=19324 ntid=19324  solve_all_intersections END dt=1654.774s nodes=3
+[PERF] + 1654.849s cpu=  45.125s thr=3   tid=19324 ntid=19324  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] + 1654.851s cpu=  45.125s thr=3   tid=19324 ntid=19324  index_node_candidates START nodes=3
+[PERF] + 1654.857s cpu=  45.141s thr=3   tid=19324 ntid=19324  index_node_candidates END dt=0.006s nodes=3
+[PERF] + 1654.859s cpu=  45.141s thr=3   tid=19324 ntid=19324  order_walls_for_processing START walls=2
+[PERF] + 1654.873s cpu=  45.172s thr=3   tid=19324 ntid=19324  order_walls_for_processing END dt=0.014s walls=2

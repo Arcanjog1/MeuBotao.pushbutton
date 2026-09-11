@@ -1,0 +1,73 @@
+{
+ "quando": "2026-09-11 13:32-13:47",
+ "pacote": "198a639 (verify_beta_package OK; BETA CONTROLADO na janela do botao)",
+ "fluxo": "PostCommand do botao teste-perf (CPython, engine do pyRevit) -> 'Modulacao Automatica' (Utilizar paredes existentes) -> alerta 'Ha 34 parede(s) ja selecionada(s)' Sim -> Tela 1 -> Iniciar -> Tela 2 -> Lancar Blocos - calcular -> criacao AUTOMATICA apos o solver (pedido do usuario de 2026-08-27, _on_solve_done) -> Resumo final (modal) -> clique manual extra em 'criar' = recriacao (idempotencia) -> Resumo final -> Fechar",
+ "pre_estado": {
+  "blocos": 7257,
+  "carimbados": 7257,
+  "lote": "retro-20260911",
+  "IsModified": false
+ },
+ "tempos_s": {
+  "dialogo_modo": 1,
+  "selecao_para_tela1": 5.1,
+  "tela1_para_tela2": 1.6,
+  "solve": 15,
+  "criacao_1": {
+   "procura_lote": 1,
+   "exclusao_lote_7257": 1.9,
+   "create_building_blocks": 317.8,
+   "laco_api": 309.1,
+   "NewFamilyInstance_ms": 32.841,
+   "RotateElement_ms": 6.471,
+   "commit": 8.65,
+   "realce_vermelho": 0.1,
+   "soma_clique": 319.8
+  },
+  "criacao_2_idempotencia": {
+   "exclusao_lote_8399": 2.1,
+   "create_building_blocks": 328.6,
+   "NewFamilyInstance_ms": 34.085,
+   "commit": 10.11,
+   "soma_clique": 330.8
+  },
+  "total_fluxo_ate_fim_da_criacao_1": 386
+ },
+ "gates": {
+  "1_tela1_abre_sem_congelar": true,
+  "2_analyze_termina": true,
+  "3_solver_termina": true,
+  "4_tela2_abre": true,
+  "5_criacao_comeca": true,
+  "6_criacao_termina": true,
+  "7_ui_sem_loading": true,
+  "8_planejado_igual_criado": "8399 = 8399 (0 falhas), duas vezes",
+  "9_sem_duplicacao": "0 posicoes duplicadas (x,y,z,familia) em 8399",
+  "10_sem_orfao_do_mirror": "54 espelhados no lugar; 8399 carimbados = 8399 no doc",
+  "11_sem_colisao_critica": "0 colisoes (preflight/solver)",
+  "12_sem_invasao_nova": "0 violacoes de vao de porta",
+  "13_34_paredes_tratadas": "34 paredes donas nos carimbos; 34/34 processadas",
+  "14_reexecucao_idempotente": "run 2: apagou 8399 e criou 8399; lote unico 20260911-134117",
+  "15_sem_crescimento_2N": "7257 -> 8399 -> 8399 (o salto 7257->8399 e' 14 -> 16 fiadas: altura 3,20 m)",
+  "16_coerente_com_humano": "paridade Revit x offline (16 fiadas): 8399 = 8399, mesmas 4 reprovadas (8079838 + 3 tocos do CAD); nos L/T como o humano (checkpoint anterior)"
+ },
+ "pos_estado": {
+  "blocos": 8399,
+  "sem_carimbo": 0,
+  "duplicatas": 0,
+  "espelhados": 54,
+  "paredes_donas": 34,
+  "lote": "20260911-134117",
+  "hist": {
+   "B39": 4917,
+   "B34": 2121,
+   "B54": 236,
+   "B19": 289,
+   "C09": 508,
+   "C04": 328
+  },
+  "salvo": true
+ },
+ "auditoria": "4 paredes reprovadas (8079838 + 8079861/62/63), 425 pecas marcadas em vermelho; 21 eixos 'com erro' no resumo final = material da Etapa 3B (relatorio de modulacao), nao bloqueia",
+ "travamento_1": "ver 2026-09-11-teste-real-travamento-1.json (lote anterior nao substituido -> corrigido pela secao 50)"
+}

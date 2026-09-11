@@ -1704,7 +1704,38 @@ próximo passo: PRÓXIMA FASE AUTORIZADA — MODULAÇÃO DOS BLOCOS (seção 10)
                pendente, retomar quando o usuário priorizar.
 ```
 
+### 2026-09-09 - Candidato beta main-safe, sem N1
+
+#32 integrado emaa58d70 apos autorizacao/revisao. #31 ficou NO-GO apos
+1112 passed/2 failed e provas de novas colisoes TGD; seus logs/provas
+permanecem no commit73cbf08. Esta alternativa sai diretamente da main,
+codigo8cdd33f, transportando somente protecoes beta e testes relacionados.
+Recorte fonte75/81 passa offline com187 blocos e zero achados; bancada
+explicita340cm uniforme, nao substituicao das Walls nativas260/280cm.
+Consolidada propria concluida:1027 passed/2 falhas antigas,3021.98s.
+GO tecnico restrito ao ensaio descrito, sem Finalizar/excluir referencias.
+[Checkpoint](checkpoints/2026-09-09-beta-main-safe.md),
+[relatorio](BETA_MAIN_SAFE_2026-09-09.md) e [runbook](BETA_MAIN_SAFE_RUNBOOK.md).
+Nenhum Revit iniciado ou outro merge executado.
 
 ## 2026-09-10 — referências e arquitetura Beta 2
 
 [Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md) e [auditoria](GITHUB_STATE_2026-09-10.md). #33/#35 integrados; índices sem mover produção/dados oficiais. Arquitetura PENDING; Beta 1 CANDIDATO — VALIDAÇÃO REVIT PENDENTE. Nenhum Revit iniciado.
+
+## 2026-09-10 - Beta 1: tres causas fechadas, validacao Revit pendente
+
+[Checkpoint](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md).
+Tres defeitos de INTEGRACAO corrigidos, nenhum de modulacao: (1) acao
+'create' perdida pelo `finally` do Execute(); (2) falso positivo
+REPEATED_VERTICAL_COMPENSATOR_STRIP - faixa vertical passa a exigir fiadas
+ADJACENTES, com o padrao de mesma paridade preservado como dado em
+`alternating_strips`; (3) `Application.DoEvents()` chamado da thread de
+fundo levou 2652,285s, corrigido com `_pump_ui`. Em seguida a thread de
+fundo do analyze foi RETIRADA (analyze sincrono no ExternalEvent) apos um
+deadlock de 1654,774s com o worker sem CPU; analyze custa 0,181s na thread
+principal. Achado de Z RECLASSIFICADO como comportamento esperado por
+decisao do usuario - nenhuma linha vertical alterada (regra 8a).
+Consolidada 1035 passed/2 falhas HISTORICAS identicas as de 8cdd33f.
+187 blocos/17 fiadas criados e medidos no Revit; recriacao sem duplicata.
+Beta 1 CANDIDATO - VALIDACAO REVIT PENDENTE com o pacote 712f221.
+Nenhum merge na main executado.

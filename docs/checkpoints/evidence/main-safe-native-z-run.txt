@@ -1,0 +1,1 @@
+{"same_physical_walls_as_zero_z_axes": true, "preflight": {"ok": true, "errors": [], "opening_violations": [], "collisions": []}, "wall_endpoints_z_cm": [[612.0000000000001, 612.0000000000001], [612.0000000000001, 612.0000000000001]]}

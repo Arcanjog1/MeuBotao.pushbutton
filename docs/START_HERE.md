@@ -18,6 +18,7 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 | Candidato em teste? | Beta 1 síncrono pendente; #34 bancada e #31 N1 são distintos; [SHAs/limites](GITHUB_STATE_2026-09-10.md) |
 | Última entrega? | [Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md), [consolidação](CONSOLIDATION_2026-09-10.md) |
 | Próximo objetivo? | [Pacote Beta 2](architecture/beta2-implementation-package.md), [backlog A–E](BETA2_BACKLOG.md) |
+| Beta 1: causas e correcoes? | [checkpoint do fechamento](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md) - solve->create, falso positivo do auditor, `_pump_ui`, analyze sincrono |
 
 ## Não fazer
 

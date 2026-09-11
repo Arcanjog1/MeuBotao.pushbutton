@@ -1,0 +1,61 @@
+=== SESSAO 2026-09-10 11:37:44 ===
+[PERF] +    0.101s cpu=   0.000s thr=2   tid=5932  amostrador de congelamento LIGADO intervalo=0.25s limiar=2.0s
+[PERF] +    0.102s cpu=   0.000s thr=2   tid=5932  ui.click START axes=2 beta=True catalog=6 nodes=3 openings=0 walls=2
+[PERF] +    0.104s cpu=   0.000s thr=2   tid=5932  console.log DoEvents START
+[PERF] +    0.113s cpu=   0.000s thr=2   tid=5932  console.log DoEvents END dt=0.009s
+[PERF] +    0.115s cpu=   0.000s thr=2   tid=5932  console.set_status DoEvents START
+[PERF] +    0.116s cpu=   0.000s thr=2   tid=5932  console.set_status DoEvents END dt=0.001s
+[PERF] +    0.121s cpu=   0.000s thr=2   tid=5932  console.set_indeterminate DoEvents START
+[PERF] +    0.130s cpu=   0.000s thr=2   tid=5932  console.set_indeterminate DoEvents END dt=0.009s
+[PERF] +    0.145s cpu=   0.016s thr=2   tid=5932  ui.console_pronto
+[PERF] +    0.146s cpu=   0.016s thr=2   tid=5932  ui.external_event.Raise CHAMADO
+[PERF] +    0.147s cpu=   0.016s thr=2   tid=5932  ui.external_event.Raise RETORNOU
+[PERF] +    0.159s cpu=   0.031s thr=2   tid=5932  Execute ENTROU action=analyze
+[PERF] +    0.160s cpu=   0.031s thr=2   tid=5932  Execute.globals_update START nomes=873
+[PERF] +    0.160s cpu=   0.031s thr=2   tid=5932  Execute.globals_update END dt=0.000s nomes=873
+[PERF] +    0.160s cpu=   0.031s thr=2   tid=5932  Execute.ActiveUIDocument START
+[PERF] +    0.161s cpu=   0.031s thr=2   tid=5932  Execute.ActiveUIDocument END dt=0.001s
+[PERF] +    0.161s cpu=   0.031s thr=2   tid=5932  refresh_geometry_from_document START axes=2
+[PERF] +    0.174s cpu=   0.047s thr=2   tid=5932  refresh_geometry_from_document END axes=2 dt=0.013s
+[PERF] +    0.174s cpu=   0.047s thr=2   tid=5932  _execute_analyze (disparo) START
+[PERF] +    0.174s cpu=   0.047s thr=2   tid=5932  _execute_analyze: criando thread de fundo
+[PERF] +    0.177s cpu=   0.047s thr=2   tid=5932  _execute_analyze: thread de fundo INICIADA
+[PERF] +    0.177s cpu=   0.047s thr=2   tid=5932  _execute_analyze (disparo) END dt=0.003s
+[PERF] +    0.177s cpu=   0.047s thr=2   tid=25324 worker.thread ENTROU
+[PERF] +    0.178s cpu=   0.047s thr=3   tid=5932  Execute SAIU action=analyze pendente=None
+[PERF] +    0.178s cpu=   0.047s thr=3   tid=25324 analyze_created_walls_for_errors START nodes=3 walls=2
+[PERF] +   94.517s cpu=   5.906s thr=3   tid=17076 CONGELAMENTO detectado pelo amostrador parado=94.167s
+[PERF] +   94.518s cpu=   5.906s thr=3   tid=5932  console.set_status DoEvents START
+[PERF] +   94.519s cpu=   5.906s thr=3   tid=25324 analyze.trecho: entrou no corpo
+[PERF] +   94.534s cpu=   5.906s thr=3   tid=25324 analyze.trecho: passou do catalog_missing
+[PERF] +   94.534s cpu=   5.906s thr=3   tid=5932  console.set_status DoEvents END dt=0.016s
+[PERF] +   94.534s cpu=   5.906s thr=3   tid=25324 analyze.trecho: plan_failures criado
+[PERF] +   94.535s cpu=   5.906s thr=3   tid=25324 analyze.trecho: plan_hook definido
+[PERF] +   94.535s cpu=   5.906s thr=3   tid=25324 process_walls_one_by_one START walls=2
+[PERF] +   94.535s cpu=   5.906s thr=3   tid=25324 solve_all_intersections START nodes=3
+[PERF] +   94.536s cpu=   5.906s thr=3   tid=5932  console.log DoEvents START
+[PERF] +   94.539s cpu=   5.906s thr=3   tid=5932  console.log DoEvents END dt=0.003s
+[PERF] +   94.951s cpu=   5.969s thr=3   tid=25324 solve_all_intersections END dt=0.415s nodes=3
+[PERF] +   94.952s cpu=   5.969s thr=3   tid=25324 solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +   94.954s cpu=   5.969s thr=3   tid=25324 index_node_candidates START nodes=3
+[PERF] +   94.955s cpu=   5.969s thr=3   tid=25324 index_node_candidates END dt=0.001s nodes=3
+[PERF] +   94.956s cpu=   5.969s thr=3   tid=25324 order_walls_for_processing START walls=2
+[PERF] +   94.959s cpu=   5.969s thr=3   tid=25324 order_walls_for_processing END dt=0.003s walls=2
+    --- tid=25324 (Dummy-1) ---
+      wall_modeling.py:10443 _worker
+      wall_modeling.py:7716 analyze_created_walls_for_errors
+      perf_trace.py:133 mark
+      perf_trace.py:104 _write
+    --- tid=17076 (perf-stall-sampler) ---
+      threading.py:1030 _bootstrap
+      threading.py:1073 _bootstrap_inner
+      threading.py:1010 run
+      perf_trace.py:245 _laco
+      perf_trace.py:211 _formatar_pilhas
+    --- tid=5932 (MainThread) ---
+      wall_modeling.py:12746 _on_pause_click
+      wall_modeling.py:8716 set_status
+      perf_trace.py:158 __enter__
+      perf_trace.py:133 mark
+      perf_trace.py:104 _write
+[PERF] +   94.968s cpu=   6.000s thr=3   tid=25324 parede START idx=0 pos=1 total=2

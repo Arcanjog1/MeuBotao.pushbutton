@@ -96,6 +96,59 @@ anterior não fechar o trecho:
 8. Último recurso irrestrito (nunca reporta `NON_MODULAR_WALL` quando uma
    solução — mesmo "feia" — existe).
 
+### Regra da fileira de B34 (revisada em 2026-09-11 — decisão do usuário sobre a evidência humana)
+
+**O teto `MAX_SPECIAL_BOND_PER_TRECHO = 1` é de PREFERÊNCIA, não proibição.**
+A ordem de fechamento de um trecho de preenchimento passa a ser, em geral:
+
+1. só B39;
+2. 1 B19 numa ponta aberta;
+3. B39 + **até 1** B34 (acerto pontual — a função clássica do B34);
+4. 1 B19 em ponta aberta + B39/B34;
+5. **1 único** compensador/pastilha (`MAX_COMPENSATORS_PER_TRECHO = 1`);
+5b. **fileira de B34** (2 ou mais peças de 34, sem compensador);
+6. B19 forçado contra um nó;
+7. compensadores acima do teto (só se nada acima fechar);
+8. último recurso irrestrito.
+
+**Por que é geral e explicável:** B34 é peça **modular** da mesma família
+(39/34/54 — módulo de 5 cm com junta), não uma peça de acerto como o
+compensador (9 cm) ou a pastilha (4 cm). Uma fileira de B34 fecha o trecho
+sem quebrar o prisma (as juntas continuam desencontradas entre fiadas) e
+sem sequência de peças pequenas — exatamente o que a regra dos compensadores
+proíbe. O que a regra antiga chamava de "peça de amarração virando
+enchimento" só é um problema quando o B34 é **gratuito** (1 B34 ou 1
+compensador já fechavam); a fileira só entra quando nenhum dos dois fecha.
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, medido via MCP):** 1.615 B34
+contra 242 C09; corridas de 2 a 6 B34 como fechamento de rotina; as sete
+paredes de 494 cm sem abertura fecham com `B34 + 9×B39 + B34 B34` — onde o
+teto-como-proibição produzia `11×B39 + C09 C09 C04` (três compensadores em
+sequência, faixa vertical reprovada pelo próprio auditor). Um único
+compensador dentro do teto continua preferido a dois B34 (246 cm = 6×B39 +
+C04), como o humano também faz (245 C04 no pavimento).
+
+**Conflito resolvido:** como proibição, o teto de B34 contradizia
+`MAX_COMPENSATORS_PER_TRECHO` em todo comprimento em que nem 1 B34 nem 1
+compensador fecham (494 cm é o caso medido) — uma das duas tinha de ceder;
+o projeto humano cede sempre a favor da fileira de B34. Nada é hardcoded:
+nem o comprimento, nem a quantidade de B34, nem a parede — a regra é a
+ordem de tiers acima, varrida em teste de 40 a 900 cm
+(`test_regra_geral_fileira_de_b34_so_quando_nem_um_b34_nem_um_compensador_fecham`).
+
+**Implementação:** `_pier_ordered_layout`, bloco 5b (`wall_stepper.py`), sem
+flag (a flag `PREFER_B34_ROW_OVER_STACKED_COMPENSATORS`, que existiu entre
+2026-09-10 e 2026-09-11 com default `False`, foi removida). Histórico: até
+2026-09-10 a fileira era o "7b", depois do fallback irrestrito de
+compensadores. Efeito medido: Butantã, 34 paredes com aberturas reais,
+reprovações do solver 12 → 5 (as 7 faixas de compensador desaparecem), B34
+846 → 1.557 (humano 1.615), C09 739 → 467; a bancada de 340 cm da Torre
+fecha com 11 peças por fiada — os mesmos 154 blocos medidos no Revit real;
+benchmark TGD indiferente. Testes:
+`tests/test_fill_prefers_b34_row_over_stacked_compensators.py`,
+`test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo` (reescrito
+para a regra revisada).
+
 ### Regra do meio-bloco (B19)
 
 - **Nunca no meio de um trecho** — quebra o ritmo/prisma da alvenaria
@@ -413,6 +466,70 @@ nunca aplica um ajuste maior sem autorização explícita do usuário.
   "Offset da base" de `Wall.Create`). Passar a cota já absoluta duplicava
   a elevação (bug real corrigido 2026-08-21).
 
+## 8a. REGRA OBRIGATÓRIA — a origem vertical da modulação é o NÍVEL,
+nunca o `WALL_BASE_OFFSET` da Wall (2026-09-09)
+
+> **Origem**: decisão explícita do usuário, 2026-09-09, ao revisar o
+> diagnóstico do primeiro beta no Revit. Substitui a leitura anterior de
+> que isso seria um defeito. **Não é bug: é o funcionamento desejado.**
+
+`base_z_abs` da modulação vem do **nível de referência selecionado**
+(`selected_level.Elevation` em `run_modulation_on_existing_walls`). O
+`WALL_BASE_OFFSET` de uma Wall **existente** não entra nessa conta e
+**não pode** redefinir a origem vertical do lote de blocos.
+
+Razão, nas palavras do usuário: os blocos devem nascer a partir do nível
+de referência; o offset de uma Wall existente é **arbitrário**, e quando
+ele diverge da planta o que está deslocado é a **parede**, não a
+modulação. Deixar a modulação seguir esse offset seria propagar o erro do
+modelo para dentro da regra.
+
+**Consequência prática, medida na bancada de 2 paredes (2026-09-09)**: as
+Walls `5390468`/`5390548` estão no nível `pb` (elevação −1106,16cm) com
+`WALL_BASE_OFFSET` de +1718,164cm — ou seja, "voando" 17,18m acima do
+nível. Os blocos nascem em `Level.Elevation + 1cm + n·20cm`, colados ao
+nível, e **essa é a posição correta pela regra**. A distância de
+1718,164cm entre os blocos e a base das Walls é a medida do desvio **das
+Walls**, não um erro da modulação.
+
+Como o caminho de criação calcula `course_offset = course_z_abs −
+base_z_abs`, o valor de `base_z_abs` se cancela e o Revit soma a elevação
+do nível por conta própria (ver seção 8, `NewFamilyInstance`). O efeito
+líquido já é exatamente o desejado — **não "corrigir" isso.**
+
+**Proibido** (a menos que o usuário reabra o assunto explicitamente):
+somar `WALL_BASE_OFFSET` a `base_z_abs`, derivar a cota inicial da
+bounding box das Walls, ou qualquer outra forma de fazer a origem
+vertical da modulação seguir a geometria da parede existente.
+
+Conflito registrado com a seção 15.3 — ver o aviso lá.
+
+### 8a.1 — Implementação: a cota do nível é `ProjectElevation`, nunca `Elevation` (2026-09-10)
+
+A regra 8a não muda: a origem vertical continua sendo o **nível de
+referência**. O que estava errado era a **propriedade da API** usada para ler
+a cota dele. `Level.Elevation` devolve a cota relativa à *Base de elevação*
+do tipo do nível — Ponto Base do Projeto **ou** Ponto de Levantamento —
+enquanto `Wall.Location` e `FamilyInstance.Location` vivem sempre no
+referencial **interno** do projeto. `Level.ProjectElevation` é "relativo à
+origem do projeto, independentemente do parâmetro Base de elevação"
+(RevitAPIDocs, `Level.ProjectElevation`).
+
+**Medido ao vivo em BUTANTÃ R08_LT (2026-09-10):** níveis com base no
+levantamento — `1º PAVIMENTO`: `Elevation` = **72.665 cm**,
+`ProjectElevation` = **0,00 cm**; as 46 Walls do projeto de teste estão em
+z = 0 e os 6.634 blocos humanos do mesmo pavimento em z = 1..261 cm. Com
+`.Elevation` como `base_z_abs`, a modulação inteira nasceria **726 m acima**
+das paredes. No `TESTE MODULAÇÃO` as duas propriedades coincidiam, por isso o
+defeito nunca apareceu.
+
+**Implementação:** `_level_internal_elevation_ft(level)` em
+`nuvem/core/wall_modeling.py` — usa `ProjectElevation` quando existe, com
+fallback para `.Elevation` (dublês de teste, níveis antigos). Substituídos os
+9 usos que alimentam `base_z_abs`, comparações com Z de instâncias e a leitura
+de altura das paredes existentes. Teste: `tests/test_level_internal_elevation.py`,
+com guarda de fonte que falha se `base_z_abs` voltar a ler `.Elevation` direto.
+
 ## 8b. Modo de geração das paredes de referência (2026-08-28)
 
 A janela de configuração (`_SetupForm`, seção *"6. Como gerar as
@@ -617,6 +734,102 @@ contínuo do fluxo do CAD (8b) no mesmo projeto. A modulação em si continua
 idêntica: o solver trabalha sobre os eixos e sobre `openings_per_wall`,
 nunca sobre os elementos `Wall` (fingerprint de `tests/solver_bench.py`
 inalterado).
+
+## 8d. REGRA OBRIGATÓRIA — faixa vertical exige fiadas ADJACENTES
+(2026-09-09)
+
+> **Origem**: falso positivo REAL do primeiro beta controlado no Revit,
+> confirmado visualmente pelo usuário e **medido ao vivo via MCP** nos
+> blocos efetivamente criados. Confiança: REGRA OBRIGATÓRIA.
+
+`REPEATED_VERTICAL_COMPENSATOR_STRIP` só é defeito quando as peças
+especiais (B34/B54/compensadores) estão empilhadas em fiadas
+**ADJACENTES** — uma diretamente sobre a outra. Repetição apenas em
+fiadas da **mesma paridade** (0,2,4,… ou 1,3,5,…) **não é faixa
+vertical**: a fiada intermediária, de paridade oposta, quebra a coluna, e
+isso é exatamente como a amarração alternada funciona.
+
+**Por que era falso positivo (a mesma causa-raiz do
+`ALTERNATING_JOINT_PATTERN`, seção equivalente em `wall_modeling.py`)**:
+`solve_building_blocks_all_courses` resolve **um** par de fiadas A/B e o
+repete em toda fiada par (A) e toda fiada ímpar (B). Logo, qualquer peça
+especial da fiada A aparece, **por construção**, em 100% das fiadas pares.
+Contar "9 fiadas de 17" como faixa mede o próprio padrão de amarração,
+não um defeito.
+
+**Medição que provou o caso** (parede curta de 69 cm, eixo `t` de 0 a 69,
+17 fiadas, blocos reais lidos do Revit):
+
+| Fiada | Composição medida |
+|---|---|
+| par (A) | `B19[t 0..19]` + `B34[t 20..54]` |
+| ímpar (B) | `B34[t 0..34]` + `B34[t 35..69]` |
+
+- juntas: par em `t≈19,5`; ímpar em `t≈34,5` → **defasagem de 15 cm**
+  entre fiadas adjacentes;
+- no `t≈37` do cluster existe peça especial nas **duas** paridades — mas o
+  **centro** do B34 ímpar cai em `t=52`, dentro de
+  `BOND_STRIP_EDGE_EXEMPT_CM = 25`, e por isso só as pares entravam no
+  cluster;
+- nenhuma junta corrida, nenhuma quebra de prisma, sobreposição
+  horizontal legítima.
+
+Na parede longa (354 cm), o mesmo padrão: `B34[1910,7..1944,7]` em toda
+fiada par, e na fiada ímpar um `B39[1925,7..1964,7]` **cobrindo** a junta
+do B34 — defasagem de 20 cm, sobreposição de 19,05 cm.
+
+**Encontro em L medido e confirmado correto**: fiadas pares a parede
+LONGA vira o canto com B34; fiadas ímpares a parede CURTA vira o canto com
+B34 (rot 4,7124). Alternância clássica de L, exatamente como a seção 10
+exige.
+
+### Implementação
+
+`_longest_adjacent_course_run(courses)` em `core/wall_modeling.py` e a
+constante `BOND_STRIP_MIN_ADJACENT_COURSES = 2`. O detector continua
+exigindo `BOND_STRIP_MIN_COURSES`/`BOND_STRIP_RATIO` como antes, e passa a
+exigir **também** uma corrida de fiadas consecutivas ≥ 2.
+
+**O auditor NÃO foi silenciado**: o padrão de mesma paridade continua
+sendo enxergado e reportado, agora em `alternating_strips` — dado de
+diagnóstico, sem penalidade, mesmo tratamento já dado a
+`alternating_joints`. Nenhum threshold foi afrouxado, nenhum detector
+removido.
+
+Testes: `tests/test_bond_strip_adjacent_courses.py` (controle negativo com
+a bancada real do beta; controles positivos com empilhamento adjacente de
+17 fiadas e de 2 fiadas).
+
+### PADRAO OBSERVADO E CONFIRMADO — a atribuicao das letras A/B depende do
+referencial de coordenadas (2026-09-10)
+
+Medido ao comparar a execucao real no Revit com o mesmo caso resolvido
+offline: para a **mesma** bancada, o solver troca qual paridade recebe qual
+layout, porque a escolha passa pela ordenacao canonica geometrica dos nos
+(`_canonical_node_sort_key` / `_coordinate_arm_role_nodes`), que depende das
+coordenadas absolutas.
+
+| | fiada par (A) | fiada impar (B) |
+|---|---|---|
+| offline (eixo em 7677/1568) | `B34[0..34]` `B34[35..69]` | `B19[0..19]` `B34[20..54]` |
+| Revit (eixo em 1918/−860) | `B19[0..19]` `B34[20..54]` | `B34[0..34]` `B34[35..69]` |
+
+As duas solucoes sao **fisicamente equivalentes** — A/B e' simetrico, e a
+amarracao fecha igual nas duas. Nao e' defeito.
+
+**A consequencia e' uma REGRA para os auditores**: nenhuma checagem de
+amarracao pode ter veredito dependente de paridade, porque a paridade nao e'
+uma propriedade fisica da parede. Foi exatamente essa dependencia que
+produziu o falso positivo acima: o cluster de peca especial nao isenta cai
+em `t≈37` nas duas paridades, mas entram **8** fiadas numa (8/17 = 0,471,
+abaixo de `BOND_STRIP_RATIO = 0,5`) e **9** na outra (9/17 = 0,529, acima).
+O limiar ficava entre os dois valores, e o veredito virava cara-ou-coroa —
+o que tambem explica por que o defeito sobreviveu a todas as rodadas
+offline do benchmark.
+
+A regra de adjacencia acima torna o detector invariante a paridade
+(`adjacent_run = 1` nas duas). Coberto por
+`test_veredito_do_auditor_e_invariante_a_paridade_A_B`.
 
 ## 9. Testes automatizados
 
@@ -1286,6 +1499,197 @@ regra #1 exige.
   na medição ao vivo (44 mil → 73 mil) e quase dobrou as paredes reprovadas
   na auditoria de amarração (62 → 116).
 
+### 11.10 — REGRA DO USUÁRIO: amarração que não cabe fica SEM MODULAR (2026-09-10)
+
+**Decisão do usuário, 2026-09-10.** Quando as peças de amarração de dois
+encontros vizinhos **não cabem lado a lado**, o trecho fica **sem modular**.
+Não se inventa amarração alternativa, não se troca por peça menor e não se
+elege um "nó vencedor": os **dois** nós vão para `intersection_failures` e
+**nenhuma peça deles é lançada**.
+
+Caso medido que originou a regra (planta de teste, 2026-09-10): dois
+`T_INTERSECTION` sobre a **mesma** parede a **27 cm** um do outro, cada um
+lançando o seu `B54` (que mede **54 cm**) — as peças ocupavam `[311, 365]` e
+`[338, 392]` do mesmo eixo, dois sólidos no mesmo espaço, em cada uma das 7
+fiadas de mesma paridade.
+
+**Implementação:** `_reject_overlapping_node_ties`, chamada por
+`solve_all_intersections` (`nuvem/core/engine/wall_stepper.py`). O teste é
+**geométrico** — OBB real das peças emitidas, a mesma função que a detecção de
+colisão usa (`_obb_min_overlap` contra `BOND_COLLISION_EPS_FT`) — nunca uma
+distância fixa em centímetros. Assim vale para qualquer par de códigos do
+catálogo e para L/T/X, e não precisa mudar se o catálogo mudar. Só compara
+candidatos da **mesma fiada lógica** (A com A, B com B), porque A e B nunca
+coexistem na mesma fiada física.
+
+**Por que rejeitar no nó e não deixar para o preflight:**
+`controlled_beta_preflight` é um gate de **lote** — uma única colisão levanta
+`BETA BLOQUEADO` e a planta **inteira** deixa de ser criada. Rejeitando nó a
+nó, o resto da planta continua modulando e o caso aparece em
+`intersection_failures`, o canal que a Tela 2 já reporta parede a parede.
+Isto **não** silencia nada: um nó rejeitado nunca é descartado em silêncio.
+
+Este caso já estava descrito como pendência na docstring de
+`_drop_fill_colliding_with_ties` ("os dois tie: não há critério para eleger um
+vencedor sem quebrar a outra amarração"); a decisão do usuário é justamente o
+critério que faltava — **não modular**.
+
+**REVISÃO (2026-09-10, mais tarde no mesmo dia, pela EVIDÊNCIA HUMANA — o
+usuário pediu que o projeto pronto BUTANTÃ R08_LT prevalecesse sobre as
+respostas rápidas dele):** nos 3 nós T reais sem espaço medidos no 1º PAV
+(vizinho a 50 cm), o projeto humano **não** deixa sem modular — lança **B34
+na principal cobrindo o nó + B34 na parede que chega**, exatamente a
+degradação para L que `solve_t_intersection` já tinha
+(`T_INTERSECTION_DEGRADED_L`). Nos 30 nós com espaço, B54|B34 como o solver.
+
+Portanto a ordem passa a ser:
+
+1. o teste de espaço do T enxerga também o **nó vizinho de meio de vão** na
+   mesma parede principal (`_clip_range_by_midspan_neighbours`,
+   `wall_stepper.py`) — antes só parava nos nós das pontas, e um T é sempre
+   meio da principal, então dois T próximos nunca se viam;
+2. com isso `_t_intersection_room_ok` devolve False e o T **degrada sozinho**
+   para B34|B34, para o lado que tem espaço;
+3. o que ainda interpenetrar é barrado pelo **gate duro de colisão do
+   preflight** (`BETA BLOQUEADO`). A rede `_reject_overlapping_node_ties`
+   (deixar o par sem modular) existe, mas fica **DESLIGADA por padrão**
+   (`REJECT_OVERLAPPING_NODE_TIES = False`) desde 2026-09-11: no benchmark
+   TORRE EASY TGD ela derrubava 229 amarrações legítimas
+   (`JUNCTION_MISSING_BINDING` 24 → 253, regressão crítica); só desligando-a o
+   TGD vira MELHORIA (23). A reserva no nó vizinho é a **genérica de meio
+   de vão** (meia espessura da parede que atravessa,
+   `_node_default_reservation_cm`). Reservar meio B54 ali foi tentado e
+   **revertido em 2026-09-11** pela bissecção no benchmark TORRE EASY TP1:
+   a reserva maior degradava mais T para L e, perto de porta, a degradação
+   punha **7 blocos dentro do vão** (`OPENING_BLOCK_INSIDE_DOOR` 0 → 7,
+   regressão crítica). **Limite conhecido, registrado em teste**
+   (`test_11_10_limite_conhecido_dois_T_entre_34_e_54cm_ficam_no_gate_do_
+   preflight`): dois T entre 34 e 54 cm ainda "cabem" para o teste de espaço
+   e os B54 se interpenetram — o par é barrado pelo gate de colisão do
+   preflight, nunca passa em silêncio. Resolver exige que a degradação para
+   L respeite o vão de porta antes de aumentar a reserva.
+
+Caso mínimo da Torre [21,19,44]: antes 2 nós "não cabe"; agora PASS com os
+dois T degradados. Testes: `test_11_10_amarracoes_que_nao_cabem_degradam_
+para_B34_antes_de_ficar_sem_modular` e `test_11_10_rede_de_seguranca_
+continua_ativa_quando_nem_degradar_cabe`.
+
+**Pendente, evidência registrada:** os 3 nós humanos ficam numa parede de
+99 cm com canto nas duas pontas; o solver ainda produz C09|C09 ali porque
+`_wall_reserved_range_ft` reserva 34 cm em cada ponta nas DUAS fiadas (pior
+caso), e o humano usa a fiada em que o B34 do canto pertence à OUTRA parede
+(reserva real: 14 cm). Reserva de canto por fiada é regra candidata — ver
+`docs/checkpoints/2026-09-10-butanta-human-comparison.md`.
+
+### 11.11 — REGRA DO USUÁRIO: boneca que atravessa parede é ABSORVIDA (2026-09-10)
+
+**Decisão do usuário, 2026-09-10.** Uma **boneca** que cruza o corpo de outra
+parede **não recebe bloco nenhum dentro da faixa física da parede
+atravessada**. Quem manda na faixa é a parede **mais longa**; a mais curta só é
+modulada no que sobra de cada lado — e, **se o que sobra não comportar nem o
+menor bloco, aquele lado simplesmente fica sem peça**.
+
+Caso medido que originou a regra (planta de teste, 2026-09-10): uma boneca de
+**21 cm** cruzando uma parede de **642 cm** colocava um `B19` dentro do corpo
+dela (invasão de **13,0 cm**); outra de **24 cm** invadia **9,0 cm** com `B19`
+e **4,0 cm** com `C04`. Eram **42 das 49** colisões do preflight da planta
+inteira. Esses cruzamentos nem viravam encontro: o grafo os classificava como
+`STRAIGHT_CONTINUATION` sem `main_wall_idx`/`incoming_wall_idx`, então nenhum
+indexador de nó reservava a faixa para ninguém.
+
+**Implementação:** o critério entra em `_drop_fill_colliding_with_ties`
+(`nuvem/core/wall_modeling.py`), que já era o lugar onde a regra 18.7 decide
+quem sobrevive a uma colisão dentro de uma fiada física. Preenchimento ×
+preenchimento de **paredes diferentes** passa a ter vencedor: descarta-se a
+peça da parede **mais curta**. Empate de comprimento (ou comprimento
+ilegível) continua **sem** vencedor e segue sendo **reportado**, nunca
+descartado no escuro. Preenchimento × preenchimento da **mesma** parede também
+continua reportado — ali a sobreposição é sintoma de outro defeito e escondê-la
+mascararia o problema.
+
+**Tentativa descartada, registrada para não ser repetida:** reservar a faixa
+antecipadamente em `_index_node_candidates_midspan` (como se fosse um encontro
+de meio de parede) **não funciona**. Geometricamente, "boneca atravessando" e
+"encontro legítimo" são iguais, porque `extend_wall_ends_to_junctions` estica a
+ponta da parede que chega até a face **oposta** da outra — num canto em L o
+eixo da parede curta também cruza a faixa da longa, e também no interior do
+próprio vão. Medido: reservar por esse caminho reprovou a **própria bancada de
+2 paredes** (o L virou 2 trechos não modulares) e **triplicou** as colisões da
+planta (42 → 126, agora em compensadores). O critério correto é decidir
+**depois** da colisão, com a peça já posicionada.
+
+### 11.12 — ETAPA 7: paridade de amarração por NÓ (busca local, atrás de flag) — 2026-09-11
+
+> **Status**: IMPLEMENTADO atrás de `TIE_PARITY_LOCAL_SEARCH` (`wall_stepper.py`),
+> **default False** até a medição dos benchmarks; regra candidata, não norma.
+
+**O que a seção 11 sempre deixou em aberto:** cada solver de encontro fixa a
+fiada por PAPEL (T: B54 da principal → Fiada A, B34 da que chega → Fiada B;
+L: `arms[0]` → A) e "a inversão A/B que a seção 11 permite para a paginação
+global fica para a Etapa 7 decidir". A Etapa 7 nunca existiu. Consequência
+medida: uma parede que é principal num T e "chega" noutro hospeda amarrações
+nas DUAS paridades, e o trecho entre amarrações fica com comprimento que só
+fecha com compensador empilhado — nas sete paredes de 494 cm de BUTANTÃ,
+`11×B39 + C09 C09 C04` (três compensadores seguidos, que a seção 2 proíbe).
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV):** o projeto pronto **não** segue
+regra global de paridade — 13 de 33 paredes hospedam amarrações próprias ora
+na fiada 0, ora na 1; principal e parede que chega têm a MESMA paridade em 13
+de 37 nós T. Ele escolhe **nó a nó** o que fecha melhor (ex.: `8079838`, T +
+T: `B34[-1,35] … B54[399,455] C09 B34[464,500]` na fiada 0). Uma primeira
+hipótese "paridade por parede / 2-coloração" foi testada contra o humano e
+**derrubada** antes de virar código.
+
+**Mecânica:** `node["_tie_parity_flip"]` (marca persistente no próprio nó,
+como o pin de papel do SAFE REPAIR — consistente entre bandas e reparos) faz
+`solve_all_intersections` trocar a fiada das DUAS peças daquele nó (A↔B); a
+relação de amarração entre elas não muda. `search_tie_parity` é gulosa e
+determinística (candidatos = nós T/X que tocam parede reprovada, em ordem
+geométrica), aceita um flip só se a pontuação `(paredes reprovadas,
+compensadores, colisões)` melhora estritamente, com orçamento
+(`TIE_PARITY_SEARCH_MAX_CANDIDATES = 24`, `…MAX_PASSES = 2`). Roda no wrapper
+`solve_building_blocks_all_courses` ANTES dos reparos, que reconstroem sobre
+os mesmos nós. `tie_parity_search=True/False` liga/desliga por chamada.
+
+**Medido (regra #2 intacta, fileira de B34 desligada):**
+
+| Planta | off | on | custo |
+|---|---|---|---|
+| BUTANTÃ 34 paredes, vãos reais | 12 reprovadas (9 juntas + 7 faixas), 1.263 comp. | **4** reprovadas (7 juntas), 1.043 comp., 13 flips / 29 tentativas | 2,9 s → **106 s** (CPython) |
+| Torre 179 eixos | 22 reprovadas | **15** | 5,5 s → 28 s |
+
+**Benchmarks oficiais** (`_scripts/bench_parity.py`, TGD e TP1 contra os
+baselines salvos): resultado **idêntico** com a flag ligada e desligada —
+neutra. As 4 que sobram em BUTANTÃ (`8079818` na ponta livre e as três de
+99 cm) são outra família (ver 11.13). Custo é o motivo do default False: cada tentativa é uma re-resolução completa (~7× mais lenta no
+IronPython do Revit). Nenhuma regra física nova; nenhum limiar alterado.
+Testes: `tests/test_tie_parity_local_search.py` (mecânica, determinismo,
+reversão de flip inútil, e integração sobre a parede de 494 cm real).
+
+### 11.13 — BUG REAL corrigido: ponta livre reservava 34 cm de amarração (2026-09-11)
+
+`_wall_reserved_range_ft` (`wall_stepper.py`) aplicava `max(reserva,
+CORNER_B34_ROOM_FT)` a TODA ponta com nó — inclusive `FREE_END` e
+`STRAIGHT_CONTINUATION`, para as quais `_wall_end_default_start_cm` já
+devolve 0 ("nada para encostar"). Efeito medido nas três paredes de 99 cm de
+BUTANTÃ (canto em t=0, T em t=57, ponta livre em t=99): o teste de espaço do
+T via `room_plus = 8 cm` em vez de 42, não cabia nem a degradação para L, e o
+nó caía em **um C09 nas duas fiadas** — junta corrida em 14 fiadas. O humano
+põe B34 na principal.
+
+**Fix:** ponta livre / continuação reta não reserva nada (mesma regra que o
+preenchimento comum já usa). Nenhuma tolerância nova; nenhuma regra física.
+Teste: `tests/test_free_end_reserve.py`.
+
+**Medido (regra #2 intacta):**
+
+| Planta | antes | depois | depois + Etapa 7 (11.12) |
+|---|---|---|---|
+| BUTANTÃ 34 paredes, vãos reais | 12 reprovadas | **11** | **3** (só as de 99 cm, que atravessam pilar — geometria de entrada) |
+| Torre 179 eixos | 22 reprovadas, 4 `intersection_failures` | **21**, **0** | **8**, 0 |
+| TGD (benchmark) | críticos ≤ baseline; `compensators` 52→55 | idem, 52→54, `COVERAGE_WALL_NOT_MODULATED` 29→28 | **MELHORIA**: `POSITION_OVERLAP` 29→23, `PRISM_CONTINUOUS_JOINT` 961→262, sem regressão de categoria |
+| TP1 (benchmark) | históricas (JUNCTION 8→9, comp. 74→78) | idem, sem crítica nova | ver checkpoint |
+
 ## 12. Orientação dos compensadores (regra #3, 2026-08-25)
 
 > **Status**: IMPLEMENTADO (sessão 2026-08-25), com uma premissa física
@@ -1323,6 +1727,78 @@ esteja invertido".
   `ElementTransformUtils.MirrorElement` (plano com normal = `x_dir` da
   peça, passando pelo ponto de inserção) — o mesmo padrão já usado para
   `rotation_deg`/`RotateElement`.
+
+### 11.14 — RESERVA DE CANTO POR FIADA (2026-09-11, decisão do usuário sobre a evidência humana)
+
+**Evidência (BUTANTÃ R08_LT, 1º PAV, via MCP):** as três paredes curtas que
+o CAD `Paredes` desenha com 99 cm (x 1135→1234, y 737/1437/1937) são, no
+projeto pronto, paredes de **64 cm** entre dois cantos — a vertical x=1142 de
+um lado e a vertical x=1192 (que termina nela) do outro; o toco de 34 cm
+além da segunda vizinha não recebe bloco nenhum (o layer estrutural
+`ARQ-STR-BLOCO` cobre 62 % da linha, exatamente os 64 cm). Nesses 64 cm o
+humano põe **um B34 de canto por fiada, em cantos opostos**:
+
+    fiada par : [corpo da vizinha 0..14] C04 C09 B34[30,64]
+    fiada ímpar: B34[0,34] C04 C09 [corpo da vizinha 50..64]
+
+Não é uma reserva de canto diferente da do solver: é a mesma alternância
+L de sempre. A diferença estava em **como o solver mede o espaço** para o
+B34 de um canto: a reserva na OUTRA ponta da mesma parede era o pior caso
+fixo (34 cm) **nas duas fiadas**, então a parede de 64 cm "não tinha
+espaço" em fiada nenhuma (64 − 34 = 30 < 34), os dois vizinhos recebiam o
+B34 nas DUAS fiadas (giro do canto) e o resultado era faixa repetida na
+curta + junta corrida nos dois vizinhos (3 paredes reprovadas).
+
+**Regra:** a reserva da outra ponta é **por fiada**, pela ocupação real do
+encontro vizinho — 34 cm só na fiada em que a peça dele está **deitada
+sobre esta parede**; na fiada em que ela está na parede perpendicular,
+apenas o corpo da peça (meia espessura + junta, a reserva genérica que o
+preenchimento já usa). Um canto ainda não resolvido conta como "não deita"
+(otimista): quem o resolver depois enxerga a peça real deste canto
+(`_corner_bond_blocking_courses` lê os candidatos já resolvidos, não a
+convenção) e troca de fiada ou degrada — o otimismo nunca vira colisão.
+T/X ainda não resolvidos continuam previsíveis pela convenção deles.
+
+**Implementação:** `CORNER_RESERVE_PER_COURSE = True` (`wall_stepper.py`);
+`_wall_reserved_range_ft(course=, solved=)`, `_node_lays_bond_on_wall_in_course`,
+`_corner_bond_blocking_courses(solved=)`, `solve_l_corner(solved=)` e
+`solve_all_intersections` passando o que já foi resolvido. Nada hardcoded:
+nem 64/99 cm, nem parede, nem paridade — vale para qualquer parede curta
+entre dois encontros.
+
+**Medido:** caso sintético com a geometria real (64 cm): 3 → **0**
+reprovadas, padrão idêntico ao humano (paridade espelhada), invariante a 3
+ordens de entrada; Torre 179 eixos: reprovadas pelo auditor 18 → **12**,
+`intersection_failures` 0; Butantã 34 paredes (vãos reais): com o CAD como
+está (tocos), 4 reprovadas — as mesmas de antes (a regra é neutra ali, o toco
+manda); com as três curtas aparadas ao layer estrutural (64 cm), 4 → 2
+(8079818 — que também tem um toco de 39 cm no CAD — e 8079838); com os
+quatro tocos aparados, **1** (8079838, junta corrida de preenchimento —
+defeito 1). Um T ainda não resolvido em que a parede CHEGA conta como
+"deita na fiada B" (caminho cheio e degradação para L), o que destravou o
+canto da parede 8079863. Com o toco do CAD a parede curta continua
+reprovada — **geometria de entrada** (ver o filtro por layer de referência
+estrutural, seção 49), não regra. Combinada com a busca de paridade da Etapa 7 (`TIE_PARITY_LOCAL_SEARCH=True`), a tentativa anterior de reserva por fiada dava 7 colisões de preflight (previsão do papel do canto por convenção); esta versão lê as peças **já resolvidas** e a combinação mede 0 colisões em Butantã (3 reprovadas, 1 flip). Testes:
+`tests/test_corner_reserve_per_course.py` (antes/depois, invariância,
+toco do CAD, controle de parede longa).
+
+### 12.1 — Bug real corrigido: o espelhamento duplicava a peça (2026-09-10)
+
+A orientação do compensador (regra #3 acima) era aplicada com
+`ElementTransformUtils.MirrorElement(doc, id, plane)`, que **cria uma cópia
+espelhada e deixa o original no lugar** (RevitAPIDocs, `MirrorElement`).
+Resultado, medido ao vivo em BUTANTÃ R08_LT (1º PAV, 44 aberturas): 54
+compensadores/pastilhas orientados ficaram **duplicados** — o original, com a
+orientação errada, rastreado em `created_instances`; a cópia, com a orientação
+certa, órfã. A órfã sobrevivia à substituição do lote na recriação
+(quebra da idempotência da seção 13.4) e formava dois sólidos no mesmo ponto.
+Nunca apareceu nas bancadas anteriores porque só há espelhamento quando há
+abertura para orientar o compensador.
+
+**Fix:** `ElementTransformUtils.MirrorElements(doc, [id], plane, mirrorCopies=False)`
+espelha a própria instância no lugar (RevitAPIDocs, `MirrorElements`). O
+dublê de testes ganhou `MirrorElements` com a mesma semântica; teste em
+`tests/test_beta_atomic_creation.py` (uma instância por candidato espelhado).
 
 ## 13. Pipeline integrado e relatório final (itens 4–7 do pedido do usuário, 2026-08-25)
 
@@ -1562,6 +2038,27 @@ Por isso `AMBIGUOUS` **continua reservando** espaço de amarração (seção
 11.9): ali existe peça de verdade, só que na outra faixa de altura.
 
 ### 15.3 — Pendência: `num_courses`/`base_z_abs` são globais
+
+> **CONFLITO REGISTRADO (2026-09-09)** — leia antes de implementar esta
+> pendência. A seção **8a** (decisão do usuário, 2026-09-09) determina que
+> a origem vertical da modulação é **sempre o nível de referência**, e que
+> o `WALL_BASE_OFFSET` de uma Wall existente **não** pode redefini-la.
+> Isso contradiz diretamente o segundo marcador da lista abaixo ("o lote
+> inteiro nasce 220cm abaixo do lugar certo"), escrito em 2026-08-28.
+>
+> **Vale hoje: a seção 8a** (orientação mais recente do usuário tem
+> prioridade). Nada aqui foi apagado, porque o caso que motivou esta
+> pendência — peitoril e verga como paredes SEPARADAS em faixas de altura
+> diferentes — é um cenário distinto do da bancada que gerou a 8a (uma
+> parede inteira deslocada em relação à planta), e o usuário ainda **não**
+> se pronunciou sobre ele.
+>
+> **Pendência de decisão do usuário**: peitoril/verga devem continuar
+> nascendo a partir do nível (regra 8a aplicada literalmente, e as peças de
+> verga ficam fora de lugar), ou esse caso específico é a exceção que
+> justifica agrupar por `(altura, offset_de_base)`? **Não implementar o
+> agrupamento por offset de base sem essa resposta** — hoje ele violaria a
+> 8a.
 
 `_select_existing_walls_for_modulation` devolve **um** `max_height_ft` (a
 MAIOR altura entre as paredes selecionadas) e
@@ -6495,3 +6992,149 @@ em poucos exemplos; BUTANTÃ apresenta canaleta diretamente na borda do vão.
 Não universalizar nenhuma sequência. Orientação atual do usuário: separar
 evidência, regra e decisão. Comparação/erratas em reference_projects/COMPARISON.md;
 contrato proposto em docs/architecture/opening-reinforcement-strategies.md.
+
+## 48. Beta controlado sobre a main, sem N1 (2026-09-09)
+
+RECONCILIADO 2026-09-10: as secoes 40 e 41 desta numeracao passaram a existir
+na main com OUTRO conteudo - a extracao forense dos projetos humanos TORRE
+EASY e BUTANTA (PRs #33 e #35), acima. As secoes 42 a 47 da cadeia N1
+continuam existindo apenas na branch candidata do PR #31, NAO integrada.
+Esta secao NAO transporta a implementacao N1 nem aprova mudancas de teto,
+fase, tolerancia ou geometria; o historico medido da cadeia N1 permanece no
+PR #31. Registra a autorizacao de contencao do usuario aplicada ao motor
+oficial.
+
+**REGRA OBRIGATORIA, instrucao explicita do usuario:** nenhuma peca pode
+ocupar o volume real de uma porta sem peitoril no beta. Verificar candidatos
+por fiada fisica e abertura ativa em Z, inclusive de outra parede; OBB XY
+agregado sem filtro de altura nao conta instancias fisicas. O preflight
+tambem verifica colisoes, eixos, dimensoes e finitude. Usa a tolerancia
+existente de 0,1cm e bloqueia o lote INTEIRO antes de qualquer mutacao;
+nao filtra pecas de amarracao nem altera os resultados brutos do solver.
+
+Paredes totalmente vazias, parcialmente nao modulares ou incompletamente
+criadas conservam referencias, coordenadas e motivo para revisao no
+resultado/log/UI. Nao truncar 197,943cm para 194cm nem alargar tolerancia.
+Ter algumas pecas nao comprova substituicao integral da parede.
+
+Substituicao beta deve ser atomica: exclusao anterior, nova criacao e
+realce no mesmo grupo externo; verificar retorno/estado de transacoes,
+identidade por fiada/candidato e existencia das instancias. Falha restaura
+o lote anterior; rollback nao confirmado bloqueia criar/finalizar e exige
+revisao do documento. Cache/callback somente apos confirmacao.
+
+Criar/finalizar exige assinatura atual da geometria capturada, aberturas,
+catalogo, altura, nivel/base. Refresh rejeita referencia ausente e mudancas
+laterais/rotacionais/cotas nao suportadas. Edicoes nativas de aberturas nao
+sao rastreadas integralmente: primeiro beta em copia estatica, com recaptura
+apos qualquer edicao externa. Loader beta exige pacote por SHA/hashes sem
+fallback para main variavel; verificacao offline nao certifica API/familias.
+
+**PADRAO OBSERVADO OFFLINE, nao regra geral:** recorte TP1 de indices fonte
+75/81, sem aberturas, resolvido novamente, tem um L e duas pontas livres,
+187 blocos e zero achados nos validadores com referencia oficial. Ambos os
+audits de amarracao passam. Selecionar paredes muda a topologia de fronteira:
+isso NAO aprova o mesmo canto no grafo completo, outros recortes, T/X,
+aberturas ou o PR #31. Exige nova validacao se geometria/escopo mudar.
+
+**LIMITACAO MEDIDA DA ENTRADA VERTICAL:** as duas paredes fonte75/81
+trazem alturas260/280cm, enquanto settings do benchmark pede17 fiadas.
+O bridge resolve a altura global (340cm), nao respeita separadamente
+esses dois campos nativos. Nao certificar substituicao de paredes de
+alturas heterogeneas por esse resultado. O ensaio main-safe e bancada
+derivada com referencias de altura UNIFORME340cm, declarada no input de
+engenharia separado; nao e autorizacao para alterar alturas do projeto.
+Nao usar Finalizar/excluir referencias nesse primeiro ensaio. Retencao
+de trecho nao modular nao comprova cobertura vertical individual.
+
+**EVIDENCIA OFFLINE:** caminho de extensao das Walls existentes passou
+em13/14/17 fiadas (143/154/187 blocos). Execute_solve real do handler,
+com dubles e bancada uniforme340cm, reproduziu exatamente as paredes,
+blocos e catalogo do probe17, com assinatura atual valida. Nao demonstra
+comportamento de transacoes/familias reais, que depende do beta futuro.
+
+## 49. Filtro por LAYER DE REFERÊNCIA ESTRUTURAL (2026-09-11, decisão do usuário)
+
+**Problema medido (BUTANTÃ, via MCP):** o DWG `1 PAV` do doc de teste é uma
+exportação arquitetônica do Revit — os layers são `Paredes`, `Estrutura _1_`,
+`Substrato _2_`, `Acabamento`… (nomes de camadas de parede do Revit) e o
+layer estrutural `ARQ-STR-BLOCO` existe mas está **vazio**. Foi esse o "erro
+de layer" do projeto: das 46 paredes que o layer `Paredes` forma, **12 não
+são alvenaria estrutural** no projeto pronto (não há bloco nenhum ao longo
+delas em nenhum pavimento; em cinco há uma viga `TQS` projetada) e quatro são
+desenhadas **atravessando a vizinha** (99 cm onde a alvenaria tem 64; 1039
+onde tem ~1000). Nenhuma propriedade da parede no doc de teste separa os
+dois grupos (mesmo tipo `Parede 14cm`, mesma espessura, mesma altura; ponta
+livre em ambos: 5 alvenarias também têm ponta livre; 224 cm com T+livre
+aparece nos dois grupos).
+
+**Critério geral e confiável:** a **cobertura geométrica pelo layer
+estrutural**. O desenho estrutural do projeto pronto (import 7097743, layer
+`ARQ-STR-BLOCO`, 11.415 linhas = faces dos blocos) cobre as 34 de alvenaria
+em **0,42–0,99** (as lacunas são os vãos) e as 12 restantes em **0,03–0,08**;
+e o envelope coberto termina exatamente onde a alvenaria termina (0,62 nas
+três curtas = 64/99 cm). Separação limpa, sem nome, ID, posição ou contagem.
+
+**Regra:** com um layer de referência escolhido (opcional, na Tela de
+Configuração — "Layer de referência estrutural"), cada eixo do layer de
+paredes é (a) **descartado** se a cobertura for menor que
+`REFERENCE_LAYER_MIN_COVERAGE = 0,30` (meio da separação medida; qualquer
+valor em 0,15–0,35 separa o mesmo conjunto — parâmetro documentado, não
+golden), (b) **aparado** ao envelope coberto [primeira, última face] — os
+buracos internos (vãos) ficam; o toco além da última face sai — ou (c)
+mantido. Faces são linhas paralelas ao eixo a meia espessura ± 2 cm
+(`REFERENCE_LAYER_LATERAL_SLACK_FT`). Sem layer escolhido, ou sem linhas
+nele, **nada muda** — nunca se descarta no escuro.
+
+**Implementação:** `clip_axes_to_reference_lines` (`core/engine/wall_pairing.py`),
+chamada em `main()` logo depois de `find_wall_pairs`; relatório no output
+(mantidos / aparados / descartados) e escolha lembrada com as demais da
+Tela de Configuração. Só no fluxo CAD→Walls: no fluxo "paredes existentes"
+a seleção é do usuário.
+
+**Limite registrado:** o DWG deste projeto não tem as faces estruturais
+(layer vazio) — para usá-lo aqui é preciso importar o desenho estrutural
+(o mesmo que o projeto pronto usa). A evidência do filtro está em
+`tests/test_reference_layer_filter.py` (46 paredes reais × faces reais do
+projeto pronto: exatamente 34/12, margem ≥ 0,10 dos dois lados do limiar,
+tocos aparados 99→64 e 1039→~1000).
+
+## 50. Lote PERSISTENTE de blocos — propriedade gravada na instância (2026-09-11, teste real do botão)
+
+**Travamento medido no teste real** (botão `teste-perf`, CPython, pacote
+`c44c7d9`, 34 paredes de Butantã): Tela 1 44 s, solver 16 s, criação de
+8.399 instâncias em 487 s (58 ms cada) e então `Transaction.Commit()`
+parou numa caixa modal do Revit — **0 erros, 13.940 avisos: "Há instâncias
+idênticas no mesmo local"** — com a UI do plugin congelada em "regenerando
+o modelo" e o Idling/MCP bloqueados. Causa-raiz: o lote anterior (7.257
+blocos, criado numa sessão anterior) **não foi apagado** — o handler só
+conhecia o lote anterior por memória (`create_result["created_instances"]`),
+que numa sessão nova está vazia — e o lote novo foi criado por cima
+(crescimento N → ~2N). Cancelar a caixa desfez a transação (modelo voltou
+a 7.257, `IsModified=False`).
+
+**Regra:** toda instância criada pelo plugin recebe, no parâmetro de
+instância **Comentários** (`ALL_MODEL_INSTANCE_COMMENTS`), o carimbo
+`MODULACAO_AUTOMATICA|parede=<UniqueId da Wall>|lote=<etiqueta>`. Ao
+"criar", se o handler não tem lote anterior em memória, ele **descobre** no
+documento as instâncias carimbadas para as Walls desta execução e as apaga
+antes de criar (mesma transação de limpeza de sempre, dentro do grupo que
+restaura tudo se a criação falhar). Nunca se apaga nada sem carimbo — bloco
+a mão, de outro plugin ou de outra parede fica intocado. Nada é inferido
+por família, geometria ou contagem. Além disso, as transações de criação
+apagam **avisos** (nunca erros) antes de virarem caixa modal
+(`_suppress_transaction_warnings`, a mesma rede da união de paredes).
+
+**Implementação:** `BLOCK_LOT_MARKER`, `_block_lot_stamp`,
+`_parse_block_lot_stamp`, `_stamp_block_instance`, `_discover_previous_lot`,
+`create_building_blocks(owner_uid_by_wall_idx=, lot_tag=)`,
+`_PostCreationEventHandler._owner_wall_uids` (lê `created_walls_by_axis`,
+preenchido pelos dois fluxos). Testes: `tests/test_block_lot_persistence.py`
+(carimbo, criação carimbada, sessão nova substitui N→N, sem carimbo/outra
+parede intocado).
+
+**Bancada:** o lote de 7.257 de `BUTANTA_BENCH_SCALE_AUTOFIX.rvt` foi criado
+antes do carimbo existir; foi carimbado retroativamente via MCP (atribuição
+bloco→parede pela geometria, só nesta bancada e documentada em
+`evidence/2026-09-11-bench-retro-stamp.json`) para que o teste real exercite
+a substituição.

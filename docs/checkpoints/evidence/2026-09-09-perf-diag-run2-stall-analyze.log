@@ -1,0 +1,31 @@
+=== SESSAO 2026-09-09 18:18:00 ===
+[PERF] +    0.000s tid=1424  ui.click START axes=2 beta=True catalog=6 nodes=3 openings=0 walls=2
+[PERF] +    0.015s tid=1424  ui.console_pronto
+[PERF] +    0.016s tid=1424  ui.external_event.Raise CHAMADO
+[PERF] +    0.016s tid=1424  ui.external_event.Raise RETORNOU
+[PERF] +    0.019s tid=1424  Execute ENTROU action=analyze
+[PERF] +    0.019s tid=1424  Execute.globals_update START nomes=871
+[PERF] +    0.020s tid=1424  Execute.globals_update END dt=0.001s nomes=871
+[PERF] +    0.020s tid=1424  Execute.ActiveUIDocument START
+[PERF] +    0.020s tid=1424  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +    0.021s tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +    0.024s tid=1424  refresh_geometry_from_document END axes=2 dt=0.003s
+[PERF] +    0.024s tid=1424  _execute_analyze (disparo) START
+[PERF] +    0.024s tid=1424  _execute_analyze: criando thread de fundo
+[PERF] +    0.027s tid=1424  _execute_analyze: thread de fundo INICIADA
+[PERF] +    0.027s tid=1424  _execute_analyze (disparo) END dt=0.003s
+[PERF] +    0.027s tid=9456  worker.thread ENTROU
+[PERF] +    0.030s tid=1424  Execute SAIU action=analyze pendente=None
+[PERF] +    0.030s tid=9456  analyze_created_walls_for_errors START nodes=3 walls=2
+[PERF] +   97.368s tid=9456  process_walls_one_by_one START walls=2
+[PERF] +   97.369s tid=9456  solve_all_intersections START nodes=3
+[PERF] +   98.049s tid=9456  solve_all_intersections END dt=0.680s nodes=3
+[PERF] +  100.212s tid=9456  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +  100.213s tid=9456  index_node_candidates START nodes=3
+[PERF] +  100.213s tid=9456  index_node_candidates END dt=0.000s nodes=3
+[PERF] +  100.214s tid=9456  order_walls_for_processing START walls=2
+[PERF] +  100.214s tid=9456  order_walls_for_processing END dt=0.000s walls=2
+[PERF] +  100.218s tid=9456  parede START idx=0 pos=1 total=2
+[PERF] +  100.226s tid=9456  parede START idx=1 pos=2 total=2
+[PERF] +  100.233s tid=9456  process_walls_one_by_one END dt=2.866s walls=2
+[PERF] +  100.234s tid=9456  analyze_created_walls_for_errors END dt=100.204s nodes=3 walls=2

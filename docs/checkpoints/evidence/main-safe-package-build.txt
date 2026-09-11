@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "controlled_beta": true,
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "created_utc": "2026-09-09T17:36:20.722871+00:00",
+  "sha256": {
+    "Script.py": "2e5756084743c97fcff670e94277433f00ec963152ed265d3803b8c4509420ca",
+    "beta_package.py": "fbf69bf325a67860bc2c7ed7668a7b9a6a6759063116017eeddd0428df3dffb0",
+    "core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "core/capture_export.py": "12b866fb06ccc47ef810440486c7d98dde9f5911dc19b3fcff9941a0c940fa41",
+    "core/engine/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "core/engine/continuous_modulation.py": "350068c28a4e4fef271804022664d174d6e6a1a37ecc8e46c33d18de6aea2773",
+    "core/engine/geometry.py": "b6370642ce20c1d5e489cf8d16a97ea8916a719a26aa4b53b53b33e6b5be4815",
+    "core/engine/modulation_math.py": "8f4cec7be5b626b2f7360a38513e58c1ef6ad81463fbd13d0d667ce84b551747",
+    "core/engine/opening_audit.py": "b96d03dc4b1dd692fba25456e204fbd347df1abcfb90941d6faa6e7058b486b3",
+    "core/engine/progress.py": "a10faf237dd1471d6276955e7b676766ed039f126249f250e84913ba0778d500",
+    "core/engine/tolerances.py": "9d54f4c79dbf55c10976d68729e125bda9bbe527686a275a705aadae4ad8ab4c",
+    "core/engine/wall_pairing.py": "218129f20a963bc1012c35f3068391d3b916bee7863ca4669fda250e49963086",
+    "core/engine/wall_stepper.py": "1645bba1ec2f8540c420af64ce8645df5071e8a4e5bbaadb16842b5c48cd45d5",
+    "core/wall_modeling.py": "36117820d0ba9890e43fa6c019361e38be42b032893cb279a7c58f04ebf109e5"
+  },
+  "status": "ENGINEERING_CANDIDATE_NOT_BETA_APPROVAL"
+}

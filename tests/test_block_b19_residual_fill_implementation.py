@@ -1044,7 +1044,8 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     topologia/aritmetica elegiveis, mas NENHUMA tem amarracao real
     cobrindo o MESMO no' na MESMA fiada (o padrao de alternancia par/
     impar do canto L amarra o no' so' nas fiadas ONDE O B19 NAO ESTA') -
-    as 16 tentativas (8 paredes x 2 atribuicoes) sao rejeitadas por
+    todas as tentativas (2 por parede elegivel: 16 ate' 2026-09-10, 12
+    depois da regra da fileira de B34) sao rejeitadas por
     `no_tie_covering_node`."""
     solver_bridge = _solver_bridge()
     input_project = json.load(open(_project_paths("torre_easy_lo_r00_tp1"), encoding="utf-8"))
@@ -1052,8 +1053,16 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
      _base_z_ft, _num_courses, _notes) = solver_bridge.run_solver(input_project)
     repair = solve_result.get("b19_residual_fill_repair") or {}
     assert repair.get("accepted") == []
-    assert len(repair.get("rejected") or []) == 16
-    assert all(r["reason"] == "no_tie_covering_node" for r in repair["rejected"])
+    rejected = repair.get("rejected") or []
+    # 2026-09-11 (regra da fileira de B34 + 11.14, decisoes do usuario): o
+    # numero de paredes ELEGIVEIS caiu de 8 para 6 (duas delas passaram a
+    # fechar sem residuo de B19), entao as tentativas sao 12 (6 x 2
+    # atribuicoes), nao mais 16. O contrato do gate nao mudou: ZERO aceitas,
+    # todas rejeitadas por `no_tie_covering_node`, sempre em pares (uma
+    # tentativa por atribuicao de fiada).
+    assert rejected, "o corpus deixou de ter paredes elegiveis - o teste perdeu o objeto"
+    assert len(rejected) % 2 == 0 and len(rejected) <= 16, len(rejected)
+    assert all(r["reason"] == "no_tie_covering_node" for r in rejected)
 
 
 @pytest.mark.slow

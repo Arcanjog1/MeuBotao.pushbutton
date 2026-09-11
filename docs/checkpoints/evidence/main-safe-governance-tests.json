@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-09T17:44:15.809988+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-main-safe-20260909",
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "tree": "d835bdbb5092ac7d472502525434126c730a17e6",
+  "status_before": "M docs/PROJECT_STATUS.md\n M docs/PROJECT_STATUS_LOG.md\n M docs/START_HERE.md\n M nuvem/REGRAS_MODULACAO_BLOCOS.md\n?? docs/BETA_MAIN_SAFE_2026-09-09.md\n?? docs/BETA_MAIN_SAFE_RUNBOOK.md\n?? docs/checkpoints/2026-09-09-beta-main-safe.md\n?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-engineering-input.json\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.json\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.txt\n?? docs/checkpoints/evidence/main-safe-handler-bench.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.txt\n?? docs/checkpoints/evidence/main-safe-native-z.json\n?? docs/checkpoints/evidence/main-safe-package-build.json\n?? docs/checkpoints/evidence/main-safe-package-build.txt\n?? docs/checkpoints/evidence/main-safe-package-verify.json\n?? docs/checkpoints/evidence/main-safe-package-verify.txt\n?? docs/checkpoints/evidence/main-safe-provenance-run.json\n?? docs/checkpoints/evidence/main-safe-provenance-run.txt\n?? docs/checkpoints/evidence/main-safe-provenance.json\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/documentation",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "timeout_seconds": 120,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "main-safe-governance-tests.txt",
+  "pid": 24884,
+  "exit_code": 0,
+  "elapsed_seconds": 26.094,
+  "status_after": "M docs/PROJECT_STATUS.md\n M docs/PROJECT_STATUS_LOG.md\n M docs/START_HERE.md\n M nuvem/REGRAS_MODULACAO_BLOCOS.md\n?? docs/BETA_MAIN_SAFE_2026-09-09.md\n?? docs/BETA_MAIN_SAFE_RUNBOOK.md\n?? docs/checkpoints/2026-09-09-beta-main-safe.md\n?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-engineering-input.json\n?? docs/checkpoints/evidence/main-safe-governance-tests.json\n?? docs/checkpoints/evidence/main-safe-governance-tests.txt\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.json\n?? docs/checkpoints/evidence/main-safe-handler-bench-run.txt\n?? docs/checkpoints/evidence/main-safe-handler-bench.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.json\n?? docs/checkpoints/evidence/main-safe-native-z-run.txt\n?? docs/checkpoints/evidence/main-safe-native-z.json\n?? docs/checkpoints/evidence/main-safe-package-build.json\n?? docs/checkpoints/evidence/main-safe-package-build.txt\n?? docs/checkpoints/evidence/main-safe-package-verify.json\n?? docs/checkpoints/evidence/main-safe-package-verify.txt\n?? docs/checkpoints/evidence/main-safe-provenance-run.json\n?? docs/checkpoints/evidence/main-safe-provenance-run.txt\n?? docs/checkpoints/evidence/main-safe-provenance.json\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "log_sha256": "923bcb79d8b62e67dd6faba39fc793f8a8e81b9282adc6d130d1bf43754112b6"
+}

@@ -290,6 +290,9 @@ class _FakeWritableParam(object):
         self._owner.params[self._name] = value
         return True
 
+    def AsString(self):
+        return self._owner.params.get(self._name)
+
 
 class _FakeFamilyInstance(object):
     """Devolvido por _StubCreate.NewFamilyInstance - so' o suficiente
@@ -314,6 +317,11 @@ class _FakeFamilyInstance(object):
 
     def LookupParameter(self, name):
         return _FakeWritableParam(self, name)
+
+    def get_Parameter(self, built_in_parameter):
+        # carimbo de propriedade do lote (create_building_blocks) - a chave e'
+        # o nome do BuiltInParameter, como o _Enum do stub o representa
+        return _FakeWritableParam(self, str(built_in_parameter))
 
     def flipFacing(self):
         self.FacingFlipped = not self.FacingFlipped
@@ -480,7 +488,14 @@ class _StubElementTransformUtils(object):
         self.calls.append(("rotate", element_id, axis, angle_radians))
 
     def MirrorElement(self, document, element_id, plane):
-        self.calls.append(("mirror", element_id, plane))
+        # API real: CRIA UMA COPIA espelhada e deixa o original (ver regra 12.1).
+        self.calls.append(("mirror_copy", element_id, plane))
+
+    def MirrorElements(self, document, element_ids, plane, mirror_copies):
+        # API real: mirror_copies=False espelha NO LUGAR e devolve lista vazia.
+        ids = list(element_ids)
+        self.calls.append(("mirror", ids[0] if len(ids) == 1 else ids, plane, mirror_copies))
+        return []
 
     def MoveElement(self, document, element_id, translation):
         self.calls.append(("move", element_id, translation))

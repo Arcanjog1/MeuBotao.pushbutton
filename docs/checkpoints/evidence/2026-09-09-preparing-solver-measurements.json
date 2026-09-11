@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "subject": "Beta Revit preso em 'Preparando o solver...' - bancada de 2 paredes",
+  "captured_utc": "2026-09-09T20:30:00+00:00",
+  "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
+  "head_measured": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe",
+  "head_instrumented": "0ffa8e98bffb0efe3723f2b07f376a9a1e473a73",
+  "beta_package_measured": "C:\\Users\\CIVIX\\.codex\\artifacts\\beta-main-safe-8cdd33f-20260909 (head 8cdd33f974f41a9bf41010a32f82762740b31ed3)",
+  "revit": {
+    "document": "TESTE MODULACAO",
+    "api": "Revit 2027 (ElementId.IntegerValue removido; usar .Value)",
+    "mcp_engine": "IronPython 2.7.12 / .NET 10.0.11",
+    "button_engine": "pyRevit CPython (cpyengine=3123), shebang '#! python3' em Script.py",
+    "total_elements_in_document": 33044
+  },
+  "bench_state_confirmed_in_revit": {
+    "walls": 2,
+    "doors": 0,
+    "windows": 0,
+    "generic_models": 0,
+    "structural_columns": 0,
+    "db_opening": 0,
+    "wall_5390468": {
+      "unique_id": "2db50489-54d4-4e6c-86e5-59dd4a7e11b3-00524084",
+      "length_cm": 354.0007,
+      "thickness_cm": 14.0,
+      "height_cm": 340.0,
+      "base_offset_cm": 1718.164,
+      "level": "pb",
+      "level_elevation_ft": -36.2915,
+      "p0_ft": [
+        62.68856,
+        -26.170486,
+        -36.291484
+      ],
+      "p1_ft": [
+        74.302758,
+        -26.170486,
+        -36.291484
+      ]
+    },
+    "wall_5390548": {
+      "length_cm": 69.0024,
+      "thickness_cm": 14.0,
+      "height_cm": 340.0,
+      "base_offset_cm": 1718.164,
+      "level": "pb",
+      "p0_ft": [
+        62.918219,
+        -28.204684,
+        -36.291484
+      ],
+      "p1_ft": [
+        62.918219,
+        -25.940827,
+        -36.291484
+      ]
+    }
+  },
+  "input_comparison_vs_offline_artifact": {
+    "artifact": "docs/checkpoints/evidence/main-safe-engineering-input.json",
+    "verdict": "CONGRUENTE (mesma bancada num referencial transladado)",
+    "lengths_cm": {
+      "offline": [
+        69.0,
+        354.01
+      ],
+      "revit": [
+        69.0024,
+        354.0007
+      ]
+    },
+    "thickness_cm": {
+      "offline": 14.0,
+      "revit": 14.0
+    },
+    "height_cm": {
+      "offline": 340.0,
+      "revit": 340.0
+    },
+    "l_corner_overlap_cm": {
+      "offline": 7.0,
+      "revit": 6.9959
+    },
+    "base_z_cm": {
+      "offline_settings": 612.0,
+      "revit_level_elev_plus_base_offset": 612.0
+    },
+    "openings": {
+      "offline": 0,
+      "revit": 0
+    },
+    "units_error_found": false,
+    "notes": "Nenhuma diferenca de unidade (feet/cm), de Z ou de topologia. A relacao do L (7cm = meia espessura em cada ponta) e' identica nos dois."
+  },
+  "junction_graph_measured": {
+    "nodes_total": 3,
+    "kinds": [
+      "L_CORNER",
+      "FREE_END",
+      "FREE_END"
+    ],
+    "junctions_L": 1,
+    "junctions_T": 0,
+    "junctions_X": 0,
+    "intersection_candidates": 2,
+    "intersection_failures": 0,
+    "stale_state_found": false,
+    "notes": "Nenhuma referencia as 126 paredes / 77 aberturas da execucao anterior. Grafo exatamente o esperado."
+  },
+  "path_divergence_finding": {
+    "offline_benchmark_exercised": "_PostCreationEventHandler._execute_solve (acao 'solve')",
+    "button_actually_triggers": "_PostCreationEventHandler._execute_analyze (acao 'analyze')",
+    "evidence": "docs/checkpoints/evidence/main-safe-handler-bench-run.json usa h._execute_solve(); core/wall_modeling.py:_WallReviewForm._on_start_click define handler.action = 'analyze'",
+    "consequence": "O numero de 0,1-1,1s do beta offline NAO media o caminho que o botao dispara."
+  },
+  "timings_offline_cpython_stubs": {
+    "interpreter": "CPython 3.14.6 com tests/revit_stubs.py",
+    "import_engine_s": 0.448,
+    "plan_from_input_plus_catalog_s": 0.0,
+    "execute_solve_s": 0.01,
+    "execute_analyze_s": 0.002
+  },
+  "timings_inside_revit_ironpython_real_xyz": {
+    "note": "Motor carregado no processo do Revit, com Autodesk.Revit.DB.XYZ/Line REAIS",
+    "cold": {
+      "import_s": 2.036,
+      "build_graph_s": 1.202,
+      "execute_solve_s": 6.669,
+      "execute_analyze_s": 0.336
+    },
+    "warm": {
+      "build_graph_s": 0.0,
+      "execute_solve_s": 0.026,
+      "execute_analyze_s": 0.012
+    },
+    "conclusion": "O custo alto e' de PRIMEIRA CHAMADA (JIT/aquecimento), nao do algoritmo."
+  },
+  "faithful_reproduction_real_document": {
+    "note": "Mesma montagem de run_modulation_on_existing_walls, sobre o doc real",
+    "axes": 2,
+    "nodes": 3,
+    "openings_per_wall": [
+      0,
+      0
+    ],
+    "collect_opening_instances_s": 0.162,
+    "assign_openings_to_walls_s": 0.167,
+    "extend_wall_ends_to_junctions_s": 0.005,
+    "build_wall_graph_s": 0.005,
+    "load_fixed_block_catalog_cold_s": 8.793,
+    "load_fixed_block_catalog_warm_s": 0.33,
+    "evaluate_wall_modulation_s": 0.175,
+    "refresh_geometry_from_document_s": 0.187,
+    "execute_analyze_s": 0.181,
+    "gap_until_first_wall_s": 0.144,
+    "error_rows": 0,
+    "verdict": "O caminho 'analyze' do botao, com documento real e catalogo real, custa 0,37s. Nao e' a causa dos minutos."
+  },
+  "catalog_measured_in_revit": {
+    "codes": [
+      "B19",
+      "B34",
+      "B39",
+      "B54",
+      "C04",
+      "C09"
+    ],
+    "missing": [],
+    "cells_total": 8,
+    "cells_per_code": {
+      "B19": 1,
+      "B34": 2,
+      "B39": 2,
+      "B54": 3,
+      "C04": 0,
+      "C09": 0
+    },
+    "explosion_found": false
+  },
+  "geometry_type_microbench_ironpython": {
+    "note": "Hipotese 'XYZ real e' lento' REFUTADA por medicao",
+    "XYZ_ctor_us": 0.877,
+    "DotProduct_us": 0.659,
+    "subtract_plus_GetLength_us": 0.829,
+    "Normalize_us": 0.642,
+    "pure_python_class_ctor_us": 2.111
+  },
+  "cancellation_review": {
+    "flag": "_WallReviewForm._cancel_requested, lida via handler.should_cancel_cb",
+    "checked_in": "process_walls_one_by_one / find_wall_group_shift_fixes (ETAPA 3C, hoje fora do pipeline)",
+    "preparing_solver_window_has_cancel_point": false,
+    "notes": "solve_all_intersections, _index_node_candidates_* e order_walls_for_processing nao consultam should_cancel_cb; refresh_geometry_from_document e a latencia do ExternalEvent tambem nao. O botao Cancelar so' passa a ter efeito a partir do laco por parede."
+  },
+  "watchdog": {
+    "interval_ms": 3000,
+    "slow_warning_seconds": 8.0,
+    "message": "Ainda processando ({}s sem atualizacao) - elemento atual: {}",
+    "notes": "Uma parada real acima de 8s DEVE produzir essas linhas no log da Tela 1, com o rotulo 'Preparando o solver...'. Sao a evidencia direta de quanto tempo a janela ficou parada."
+  },
+  "secondary_findings": [
+    {
+      "id": "PKG-CACHE",
+      "severity": "RETIRADO - achado incorreto",
+      "detail": "RETIRADO em 2026-09-09. A afirmacao original ('nenhuma pasta de botao contem o pacote beta, logo o clique nao rodou 8cdd33f') era FALSA: veio de uma busca com profundidade insuficiente. O pacote beta 8cdd33f esta instalado como um botao pyRevit proprio em MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton, com beta-package.json, beta_package.py e core/ na propria pasta - exatamente o layout que _pasta_do_loader() exige. A execucao lenta relatada veio de la, e rodou de fato o head 8cdd33f974f41a9bf41010a32f82762740b31ed3.",
+      "location": "Scripts.extension/MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton"
+    }
+  ],
+  "instrumentation_delivered": {
+    "module": "nuvem/core/engine/perf_trace.py",
+    "output_file": "%LOCALAPPDATA%\\MeuBotaoPushbutton\\perf_diag.log",
+    "probes": [
+      "ui.click START (walls/openings/nodes/axes/catalog/beta)",
+      "ui.console_pronto",
+      "ui.external_event.Raise CHAMADO / RETORNOU",
+      "Execute ENTROU (action) / SAIU",
+      "Execute.globals_update",
+      "Execute.ActiveUIDocument",
+      "refresh_geometry_from_document",
+      "_execute_analyze (disparo) / thread de fundo INICIADA",
+      "worker.thread ENTROU",
+      "analyze_created_walls_for_errors",
+      "process_walls_one_by_one",
+      "solve_all_intersections (+ RESULTADO)",
+      "index_node_candidates",
+      "order_walls_for_processing",
+      "parede START (idx/pos/total)",
+      "ui._finish / ui._on_analyze_done",
+      "_execute_solve"
+    ],
+    "behavior_change": "nenhuma - no-op enquanto perf_trace.enable() nao for chamado; toda sonda em try/except",
+    "known_side_effect": "As sondas sao ligadas por _on_start_click, que a suite de testes tambem exercita - uma rodada de pytest escreve sessoes [PERF] no MESMO arquivo padrao. Antes de medir no Revit, garantir que nenhuma suite esteja rodando e que o arquivo esteja ausente/rotacionado."
+  },
+  "gates": {
+    "tests_test_script": "260 passed (py -m pytest tests/test_script.py -q)",
+    "beta_package_verify": "OK - C:\\Users\\CIVIX\\.codex\\artifacts\\beta-perf-diag-0ffa8e9-20260909, head 0ffa8e98bffb0efe3723f2b07f376a9a1e473a73"
+  },
+  "button_provenance_resolved": {
+    "beta_button": "MinhaAba.tab/MeuPainel.panel/TESTE.pushbutton (head 8cdd33f974f41a9bf41010a32f82762740b31ed3)",
+    "normal_button": "MinhaAba.tab/MeuPainel.panel/MeuBotao.pushbutton (loader online, sem pacote beta)",
+    "diagnostic_button_installed": "MinhaAba.tab/MeuPainel.panel/TESTE-PERF.pushbutton (head 0ffa8e98bffb0efe3723f2b07f376a9a1e473a73)",
+    "verification": "beta_package.verify_beta_package executado a partir da PASTA DO BOTAO: manifesto e hashes de todos os arquivos conferem; entry point resolve dentro da propria pasta.",
+    "rollback": "TESTE.pushbutton e MeuBotao.pushbutton intactos; desinstalar o diagnostico e apagar a pasta TESTE-PERF.pushbutton."
+  },
+  "z_origin_decision": {
+    "status": "NAO E BUG - comportamento desejado, decidido pelo usuario em 2026-09-09",
+    "rule": "nuvem/REGRAS_MODULACAO_BLOCOS.md, secao 8a",
+    "decision": "A origem vertical da modulacao e' o NIVEL de referencia (selected_level.Elevation). O WALL_BASE_OFFSET de uma Wall existente e' arbitrario e NAO pode redefinir a cota inicial dos blocos.",
+    "bench_reading": "Nesta bancada as Walls e' que estao deslocadas: nivel 'pb' em -1106.16cm com WALL_BASE_OFFSET de +1718.164cm. Os blocos nascem colados ao nivel, que e' a posicao CORRETA pela regra; os 1718.164cm ate' a base das Walls medem o desvio DAS PAREDES, nao um erro da modulacao.",
+    "retracted_findings": [
+      "Z-ORIGEM",
+      "BETA-Z-GUARD"
+    ],
+    "code_change": "NENHUMA - a logica de Z foi preservada exatamente como estava.",
+    "conflict_registered": "secao 15.3 das regras (peitoril/verga, 2026-08-28) contradiz a 8a; a 8a prevalece, e o caso peitoril/verga ficou como pendencia de decisao do usuario, sem apagar a 15.3."
+  }
+}

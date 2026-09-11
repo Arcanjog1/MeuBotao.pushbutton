@@ -201,6 +201,33 @@ _ACTIVE_MODELESS_WINDOWS = []
 _LAST_MODULATION_STATE = {}
 
 
+
+def _level_internal_elevation_ft(level):
+    """Cota do NIVEL no referencial INTERNO do projeto (o mesmo de Wall.Location
+    e de FamilyInstance.Location), em pes.
+
+    `Level.Elevation` NAO e' isso: devolve a cota relativa a' "Base de
+    elevacao" do tipo do nivel - Ponto Base do Projeto OU Ponto de
+    Levantamento (survey). Num projeto com niveis referenciados ao survey
+    (medido ao vivo em BUTANTA R08_LT, 2026-09-10: `Elevation` = 72.665 cm,
+    `ProjectElevation` = 0,00 cm, Walls e blocos humanos em z = 0..261 cm)
+    usar `.Elevation` como origem vertical colocaria a modulacao inteira 726
+    m acima das paredes. `Level.ProjectElevation` e' "relativo a' origem do
+    projeto, independentemente do parametro Base de elevacao" (RevitAPIDocs,
+    Level.ProjectElevation). A regra 8a ("origem vertical = NIVEL de
+    referencia") continua identica; so' a propriedade da API muda.
+
+    `getattr` com fallback para `.Elevation` mantem os dubles de teste e
+    qualquer nivel antigo sem a propriedade funcionando como antes."""
+    project_elevation = getattr(level, "ProjectElevation", None)
+    # So' um NUMERO vale: dubles de teste (e objetos .NET inertes) respondem a
+    # qualquer atributo com um objeto que nao e' cota - medido na suite
+    # (2026-09-11): 13 testes da uniao de paredes quebraram com
+    # `_Inert + float` porque o fallback so' testava `is None`.
+    if isinstance(project_elevation, (int, float)) and not isinstance(project_elevation, bool):
+        return project_elevation
+    return level.Elevation
+
 def _eid_int(eid):
     """ElementId -> int, compativel com Revit < 2024 (.IntegerValue) e >= 2024 (.Value).
     O atributo IntegerValue foi removido no Revit 2024; Value e' o substituto."""
@@ -277,6 +304,54 @@ except Exception:
 
 MIN_WALL_THICKNESS_FT = MIN_WALL_THICKNESS_M * FEET_PER_METER
 MAX_WALL_THICKNESS_FT = MAX_WALL_THICKNESS_M * FEET_PER_METER
+
+# INSTRUMENTACAO TEMPORARIA DE TEMPO (diagnostico do beta 2026-09-09 -
+# "Preparando o solver..." levando minutos numa bancada de 2 paredes). Mesmo
+# padrao de fallback inline do `_dispatch_progress_event` logo abaixo: um
+# core/engine desatualizado nunca pode quebrar o botao. Todos os marcos sao
+# no-op enquanto `perf_trace.enable()` nao for chamado - ver _on_start_click.
+try:
+    from core.engine import perf_trace as _perf
+except Exception:
+    class _perf(object):  # noqa: N801 - stub com a MESMA superficie do modulo
+        @staticmethod
+        def enable(path=None):
+            pass
+
+        @staticmethod
+        def is_enabled():
+            return False
+
+        @staticmethod
+        def log_path():
+            return None
+
+        @staticmethod
+        def reset():
+            pass
+
+        @staticmethod
+        def mark(tag, **fields):
+            pass
+
+        @staticmethod
+        def start_stall_sampler(interval_s=0.25, threshold_s=2.0):
+            pass
+
+        @staticmethod
+        def stop_stall_sampler():
+            pass
+
+        class span(object):
+            def __init__(self, tag, **fields):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
 
 # `_dispatch_progress_event` (usada por _WallReviewForm._on_start_click, ver
 # FASE 1 do plano em C:\Users\CIVIX\.claude\plans\quiet-painting-petal.md)
@@ -1299,7 +1374,7 @@ def _build_opening_dict(inst, allow_bbox_fallback):
         center_source = "geometria"
 
     level = doc.GetElement(inst.LevelId) if inst.LevelId != ElementId.InvalidElementId else None
-    level_elevation_ft = level.Elevation if isinstance(level, Level) else insertion_point.Z
+    level_elevation_ft = _level_internal_elevation_ft(level) if isinstance(level, Level) else insertion_point.Z
     level_offset_ft = _lookup_param_value(
         inst, [OPENING_LEVEL_OFFSET_PARAM, u"Elevação do nível", u"Elevacao"]
     ) or 0.0
@@ -2124,9 +2199,9 @@ def _wall_lines_from_generic_model_instances(target_doc, dim_param_names=("Compr
     resultado desta."""
     levels = sorted(
         FilteredElementCollector(target_doc).OfClass(Level),
-        key=lambda lv: lv.Elevation,
+        key=lambda lv: _level_internal_elevation_ft(lv),
     )
-    level_elev_cm = [lv.Elevation / FEET_PER_METER * 100.0 for lv in levels]
+    level_elev_cm = [_level_internal_elevation_ft(lv) / FEET_PER_METER * 100.0 for lv in levels]
 
     def _nearest_level_index(z_cm):
         best_i, best_d = 0, None
@@ -2185,12 +2260,12 @@ def detect_opening_system_for_level(target_doc, level_name, min_instances=1):
     100% leitura, nenhuma Transaction."""
     levels = sorted(
         FilteredElementCollector(target_doc).OfClass(Level),
-        key=lambda lv: lv.Elevation,
+        key=lambda lv: _level_internal_elevation_ft(lv),
     )
     target_level = next((lv for lv in levels if lv.Name == level_name), None)
     if target_level is None:
         return OPENING_SYSTEM_UNKNOWN
-    elevations = [lv.Elevation for lv in levels]
+    elevations = [_level_internal_elevation_ft(lv) for lv in levels]
     idx = levels.index(target_level)
     lo = elevations[idx]
     hi = elevations[idx + 1] if idx + 1 < len(elevations) else lo + (elevations[idx] - elevations[idx - 1] if idx > 0 else 1e9)
@@ -3080,7 +3155,22 @@ def _is_tie_candidate(candidate):
     return any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
 
 
-def _drop_fill_colliding_with_ties(course_pieces):
+def _wall_length_cm_for_absorption(walls_to_create, wall_idx):
+    """Comprimento (cm) do eixo de `wall_idx`, ou None se nao der para ler.
+
+    Usado so' pelo criterio de absorcao de boneca - nunca decide fisica por
+    si, so' diz QUAL das duas paredes e' a mais curta."""
+    try:
+        line = walls_to_create[wall_idx][0]
+    except Exception:
+        return None
+    try:
+        return line.Length / FEET_PER_METER * 100.0
+    except Exception:
+        return None
+
+
+def _drop_fill_colliding_with_ties(course_pieces, walls_to_create=None):
     """REGRA 18.7 + prioridade #1 do usuario (2026-08-28): "nunca sacrificar
     uma amarracao correta apenas para preencher um espaco". Recebe as pecas
     de UMA FIADA FISICA (o conjunto que vira FamilyInstance) e devolve
@@ -3099,9 +3189,23 @@ def _drop_fill_colliding_with_ties(course_pieces):
       criterio para eleger um vencedor sem quebrar a outra amarracao - o
       par continua sendo reportado como colisao para revisao manual, e a
       causa e' geometrica (dois nos a menos de 54cm um do outro);
-    - preenchimento x preenchimento: nao deveria existir (sao trechos
-      disjuntos) e, se existir, e' sintoma de outro bug - some-lo
-      silenciosamente esconderia o problema.
+    - preenchimento x preenchimento DA MESMA PAREDE: nao deveria existir
+      (sao trechos disjuntos) e, se existir, e' sintoma de outro bug -
+      some-lo silenciosamente esconderia o problema.
+
+    BONECA ABSORVIDA (regra do usuario, 2026-09-10, secao 11.11 de
+    REGRAS_MODULACAO_BLOCOS.md): preenchimento x preenchimento de PAREDES
+    DIFERENTES passa a ter vencedor - a parede MAIS LONGA manda na faixa, e a
+    peca da mais curta (a boneca que atravessa o corpo dela) e' descartada.
+    Ate' esta regra existir nao havia criterio para eleger um vencedor e o par
+    ficava so' reportado; e' o que produzia, na planta de teste, 42 das 49
+    colisoes do preflight - uma boneca de 21cm pondo um B19 dentro de uma
+    parede de 642cm (invasao de 13,0cm) e uma de 24cm invadindo 9,0cm.
+    Empate de comprimento (ou comprimento ilegivel) continua SEM vencedor e
+    segue sendo reportado, nunca descartado no escuro.
+
+    `walls_to_create` ausente (chamador antigo/teste) desliga so' esse
+    criterio novo - todo o resto do comportamento fica identico.
 
     Usa `validate_same_course_collision` (OBB/SAT), nunca bounding box -
     ver o cuidado de metodo registrado na secao 18.7."""
@@ -3119,7 +3223,16 @@ def _drop_fill_colliding_with_ties(course_pieces):
             remover.add(j)
         elif b_tie and not a_tie:
             remover.add(i)
-        # os dois tie, ou os dois fill: mantidos (ver docstring)
+        elif not a_tie and not b_tie and walls_to_create is not None:
+            wall_a, wall_b = a.get("wall_idx"), b.get("wall_idx")
+            if wall_a is None or wall_b is None or wall_a == wall_b:
+                continue  # mesma parede: sintoma de outro bug, continua visivel
+            len_a = _wall_length_cm_for_absorption(walls_to_create, wall_a)
+            len_b = _wall_length_cm_for_absorption(walls_to_create, wall_b)
+            if len_a is None or len_b is None or abs(len_a - len_b) <= 1e-6:
+                continue  # sem criterio: continua reportado
+            remover.add(i if len_a < len_b else j)
+        # os dois tie: mantidos (ver docstring)
     if not remover:
         return course_pieces, []
     mantidas = [c for k, c in enumerate(course_pieces) if k not in remover]
@@ -3271,7 +3384,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
             # create_building_blocks transforma em FamilyInstance - e nao
             # sobre `candidates` agregado (que mistura variantes que nunca
             # coexistem, ver secao 17.1).
-            fiada, descartados = _drop_fill_colliding_with_ties(fiada)
+            fiada, descartados = _drop_fill_colliding_with_ties(fiada, walls_to_create)
             dropped_by_course[course_index] = descartados
             course_candidates[course_index] = fiada
             # CR-G12: publica as juntas DESTA fiada fisica (geometria final,
@@ -3457,7 +3570,8 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       band_cb=None, progress_cb=None,
                                       wall_start_cb=None, wall_result_cb=None,
                                       stage_cb=None, opening_strategy=None,
-                                      arm_role_safe_repair=None, b19_residual_fill_repair=None):
+                                      arm_role_safe_repair=None, b19_residual_fill_repair=None,
+                                      tie_parity_search=None):
     """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
     CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
     courses_core` (a funcao original, inalterada - mesma docstring,
@@ -3511,15 +3625,32 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         band_cb=band_cb, progress_cb=progress_cb, wall_start_cb=wall_start_cb,
         wall_result_cb=wall_result_cb, stage_cb=stage_cb, opening_strategy=opening_strategy,
     )
-    if not enabled or result.get("error") is not None:
-        return result
-
     def _rebuild():
         return _solve_building_blocks_all_courses_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
             allow_compensators=allow_compensators, variants_per_course=variants_per_course,
             opening_strategy=opening_strategy,
         )
+
+    # ETAPA 7 - paridade de amarracao por no' (ver search_tie_parity em
+    # wall_stepper.py). Roda ANTES dos reparos: eles reconstroem sobre os
+    # mesmos `nodes`, e a marca `_tie_parity_flip` vive no proprio no', entao
+    # enxergam a paridade escolhida. `tie_parity_search=None` usa o default do
+    # modulo (TIE_PARITY_LOCAL_SEARCH); True/False liga/desliga por chamada.
+    # Lida do MODULO wall_stepper em tempo de chamada (nao da copia que o
+    # `import *` fez ao carregar): e' la' que a flag vive e e' la' que os
+    # testes/bancadas a ligam, como REJECT_OVERLAPPING_NODE_TIES.
+    from core.engine import wall_stepper as _stepper_flags
+    parity_enabled = (tie_parity_search if tie_parity_search is not None
+                      else _stepper_flags.TIE_PARITY_LOCAL_SEARCH)
+    if parity_enabled and result.get("error") is None:
+        parity_outcome = search_tie_parity(nodes, walls_to_create, result, _rebuild, stage_cb=stage_cb)
+        if parity_outcome["changed"]:
+            result = parity_outcome["final_result"]
+        result["tie_parity_search"] = {"flips": parity_outcome["flips"], "tried": parity_outcome["tried"]}
+
+    if not enabled or result.get("error") is not None:
+        return _record_unmodulated_walls(result, walls_to_create)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3551,7 +3682,162 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
+    return _record_unmodulated_walls(result, walls_to_create)
+
+
+def _record_unmodulated_walls(result, walls_to_create):
+    """Keep empty or partially non-modular walls identifiable, without changing fill."""
+    sources = result.get("course_candidates")
+    physical_sources = sources.values() if sources is not None else [result.get("candidates") or []]
+    populated = set(c.get("wall_idx") for pcs in physical_sources for c in pcs)
+    spans_by_wall = {}
+    for span in result.get("non_modular") or []:
+        spans_by_wall.setdefault(span.get("wall_idx"), []).append(dict(span))
+    retained = []
+    for wi in range(len(walls_to_create)):
+        if wi in populated and not spans_by_wall.get(wi) and not result.get("error"):
+            continue
+        p0, p1, _direction, length, thickness = _wall_axis_and_length(walls_to_create, wi)
+        spans = spans_by_wall.get(wi, [])
+        if result.get("error"):
+            reason = "SOLVER_ERROR"
+        elif any((s.get("current_length_cm") or 0) < 0 for s in spans):
+            reason = "OVERLAPPING_RESERVATIONS"
+        elif spans:
+            reason = "NON_MODULAR_SPANS"
+        else:
+            reason = "NO_PHYSICAL_CANDIDATES"
+        retained.append({
+            "wall_idx": wi, "reason": reason, "action": "MANUAL_REVIEW_KEEP_REFERENCE",
+            "start_cm": [_ft_to_cm(p0.X), _ft_to_cm(p0.Y)],
+            "end_cm": [_ft_to_cm(p1.X), _ft_to_cm(p1.Y)],
+            "length_cm": _ft_to_cm(length), "thickness_cm": _ft_to_cm(thickness),
+            "non_modular_spans": spans,
+            "has_physical_candidates": wi in populated,
+        })
+    result["unmodulated_walls"] = retained
     return result
+
+
+def _record_incomplete_wall_creation(solve_result, create_result, walls_to_create):
+    """A planned piece is not a replacement until its physical instance exists."""
+    solve_result = solve_result or {}
+    if walls_to_create:
+        _record_unmodulated_walls(solve_result, walls_to_create)
+    retained = dict((w["wall_idx"], dict(w))
+                    for w in solve_result.get("unmodulated_walls") or [])
+    created = set((item.get("course_index"), item.get("candidate_key"))
+                  for item in create_result.get("created_instances") or [])
+    expected = {}
+    for ci in range(solve_result.get("num_courses", 0)):
+        sources = solve_result.get("course_candidates")
+        pieces = (sources.get(ci) or []) if sources is not None else [
+            c for c in solve_result.get("candidates") or []
+            if c.get("course") == ("A" if ci % 2 == 0 else "B")]
+        for c in pieces:
+            expected.setdefault(c.get("wall_idx"), []).append((ci, id(c)))
+    for wi in range(len(walls_to_create)):
+        planned = expected.get(wi, [])
+        missing = sum(key not in created for key in planned)
+        if wi not in retained and (missing or not planned):
+            p0, p1, _dir, length, thickness = _wall_axis_and_length(walls_to_create, wi)
+            retained[wi] = {
+                "wall_idx": wi, "reason": "INCOMPLETE_CREATION" if planned else "NO_PHYSICAL_CANDIDATES",
+                "action": "MANUAL_REVIEW_KEEP_REFERENCE",
+                "start_cm": [_ft_to_cm(p0.X), _ft_to_cm(p0.Y)],
+                "end_cm": [_ft_to_cm(p1.X), _ft_to_cm(p1.Y)],
+                "length_cm": _ft_to_cm(length), "thickness_cm": _ft_to_cm(thickness),
+                "planned_count": len(planned), "missing_count": missing,
+            }
+    create_result["retained_walls"] = [retained[wi] for wi in sorted(retained)]
+    create_result["skipped_wall_idxs"] = sorted(retained)
+    create_result["skipped_wall_count"] = len(retained)
+
+
+def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
+    """Read-only physical gate. Reject the batch, never remove individual ties.
+
+    Unlike the benchmark, this includes all active openings and all pairs,
+    even when two pieces share a node. It does not change either validator.
+    """
+    import math
+    from core.engine.wall_stepper import _obb_aabb, _collision_candidate_pairs
+
+    result = result or {}
+    sources = result.get("course_candidates")
+    num_courses = result.get("num_courses", 0)
+    step, error = _course_height_ft(catalog, result.get("candidates") or [])
+    errors = []
+    if result.get("error"):
+        errors.append(str(result["error"]))
+    if step is None:
+        errors.append(error or "Altura de fiada indisponivel")
+    if not isinstance(sources, dict) or num_courses <= 0 or set(sources) != set(range(num_courses)):
+        errors.append("Conjunto de fiadas fisicas incompleto")
+    if len(openings_per_wall) != len(walls_to_create):
+        errors.append("Aberturas e paredes sem correspondencia completa")
+    if not math.isfinite(base_z_abs):
+        errors.append("Cota base nao finita")
+    for wi, (line, thickness, _locks) in enumerate(walls_to_create):
+        p, q = line.GetEndPoint(0), line.GetEndPoint(1)
+        if (not all(math.isfinite(v) for v in (p.X, p.Y, p.Z, q.X, q.Y, q.Z, thickness))
+                or thickness <= 0 or p.DistanceTo(q) <= 0 or abs(p.Z - q.Z) > 1e-6):
+            errors.append("Geometria invalida da parede {}".format(wi))
+    for wi, openings in enumerate(openings_per_wall):
+        for oi, opening in enumerate(openings):
+            if (len(opening) != 4 or not all(math.isfinite(v) for v in opening)
+                    or opening[0] >= opening[1] or opening[2] >= opening[3]):
+                errors.append("Geometria invalida da abertura {} na parede {}".format(oi, wi))
+    if errors:
+        return {"ok": False, "errors": errors, "opening_violations": [], "collisions": []}
+    violations, collisions = [], []
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+    if not math.isfinite(step) or height <= 0:
+        return {"ok": False, "errors": ["Altura fisica invalida"], "opening_violations": [], "collisions": []}
+    for ci, pieces in sorted(sources.items()):
+        z0, z1 = _course_z_band(base_z_abs, ci, step, height)
+        active = _filter_openings_per_wall_for_band(openings_per_wall, z0, z1)
+        for i, c in enumerate(pieces):
+            vectors = [c[key] for key in ("origin_world", "x_dir", "y_dir")]
+            values = [v for vector in vectors for v in (vector.X, vector.Y, vector.Z)]
+            values.extend([c["length_cm"], c["width_cm"]])
+            if (not all(math.isfinite(v) for v in values) or min(c["length_cm"], c["width_cm"]) <= 0 or
+                    abs(c["x_dir"].GetLength() - 1) > 1e-6 or abs(c["y_dir"].GetLength() - 1) > 1e-6 or
+                    abs(c["x_dir"].DotProduct(c["y_dir"])) > 1e-6 or
+                    abs(c["x_dir"].Z) > 1e-6 or abs(c["y_dir"].Z) > 1e-6):
+                errors.append("Geometria invalida: fiada {}, candidato {}".format(ci, i))
+        if errors:
+            return {"ok": False, "errors": errors, "opening_violations": violations, "collisions": collisions}
+        boxes = [_candidate_obb(c) for c in pieces]
+        voids = []
+        for wi, openings in enumerate(active):
+            for opening in openings:
+                voids.append((wi, openings_per_wall[wi].index(opening),
+                              _door_void_obb(wi, walls_to_create, opening[0], opening[1])))
+        all_boxes = boxes + [v[2] for v in voids]
+        aabbs = [_obb_aabb(box) for box in all_boxes]
+        for i, j in sorted(_collision_candidate_pairs(range(len(all_boxes)), aabbs, 0.0)):
+            if i >= len(pieces):
+                continue
+            overlap = _obb_min_overlap(all_boxes[i], all_boxes[j])
+            if overlap <= BOND_COLLISION_EPS_FT:
+                continue
+            piece = pieces[i]
+            record = {"course_index": ci, "candidate_index": i,
+                      "wall_idx": piece.get("wall_idx"), "logical_code": piece.get("logical_code"),
+                      "placement_reason": piece.get("placement_reason"), "node_index": piece.get("node_index"),
+                      "origin_cm": [_ft_to_cm(piece["origin_world"].X), _ft_to_cm(piece["origin_world"].Y)],
+                      "z_cm": [_ft_to_cm(z0), _ft_to_cm(z1)], "overlap_cm": _ft_to_cm(overlap)}
+            if j < len(pieces):
+                record.update(other_candidate_index=j, other_wall_idx=pieces[j].get("wall_idx"))
+                collisions.append(record)
+            else:
+                wi, oi, _obb = voids[j - len(pieces)]
+                record.update(opening_wall_idx=wi, opening_index=oi,
+                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]])
+                violations.append(record)
+    return {"ok": not violations and not collisions and not errors, "errors": errors,
+            "opening_violations": violations, "collisions": collisions}
 
 
 # ==========================================
@@ -3664,6 +3950,31 @@ PIER_LAYOUT_VARIANTS_PER_COURSE = 1
 BOND_STRIP_CLUSTER_TOLERANCE_CM = 6.0
 BOND_STRIP_MIN_COURSES = 3
 BOND_STRIP_RATIO = 0.5
+# FALSO POSITIVO REAL corrigido (2026-09-09, primeiro beta no Revit, medido
+# ao vivo via MCP na bancada de 2 paredes / 1 encontro em L):
+# REPEATED_VERTICAL_COMPENSATOR_STRIP reprovava a parede curta (69cm) por
+# "B34 repetido nas fiadas 0,2,4,6,8,10,12,14,16" - TODAS pares, nenhuma
+# impar. Isso nao e' uma faixa vertical: e' exatamente o padrao A/B.
+#
+# Mesma causa-raiz ja' documentada logo acima para ALTERNATING_JOINT_PATTERN:
+# `solve_building_blocks_all_courses` resolve UM par de fiadas A/B e repete
+# esse par em TODA fiada par (A) e TODA fiada impar (B). Entao qualquer peca
+# especial da fiada A aparece, POR CONSTRUCAO, em 100% das fiadas pares.
+# Contar "9 fiadas de 17" como faixa vertical mede o proprio padrao de
+# amarracao alternada, nao um defeito.
+#
+# Medicao que provou o caso (blocos reais criados no Revit, parede curta,
+# eixo t de 0 a 69cm): fiada PAR = B19[t 0..19] + B34[t 20..54]; fiada IMPAR
+# = B34[t 0..34] + B34[t 35..69]. No X do cluster (t~37) existe peca especial
+# nas DUAS paridades - mas o CENTRO do B34 impar cai em t=52, dentro da zona
+# isenta de borda, e por isso so' as pares entravam no cluster. As juntas
+# ficam defasadas 15cm entre fiadas adjacentes e nao ha' junta corrida.
+#
+# Uma faixa vertical REAL exige pecas especiais empilhadas em fiadas
+# ADJACENTES (uma diretamente sobre a outra). Repeticao so' na mesma
+# paridade tem, por definicao, a fiada intermediaria quebrando a junta -
+# que e' o funcionamento correto da amarracao, nao a falha.
+BOND_STRIP_MIN_ADJACENT_COURSES = 2
 # Zona de excecao local (regra #15/#20): perto da ponta da parede ou de
 # uma abertura, peca especial repetida NAO e' um defeito - e' a funcao
 # normal dela. BOND_STRIP_EDGE_EXEMPT_CM/BOND_STRIP_OPENING_INFLUENCE_CM
@@ -3815,6 +4126,25 @@ def _wall_course_candidates(wall_idx, course_candidates, num_courses, index=None
     return by_course
 
 
+def _longest_adjacent_course_run(courses):
+    """Maior sequencia de fiadas CONSECUTIVAS dentro de `courses` (lista de
+    indices de fiada, ordenada e sem repeticao).
+
+    E' o discriminador entre uma faixa vertical de verdade e o padrao A/B:
+    pecas empilhadas em fiadas adjacentes dao uma corrida >= 2; repeticao
+    so' nas pares (0,2,4,...) ou so' nas impares da sempre 1, porque a
+    fiada intermediaria - de paridade oposta - quebra a coluna.
+    Ver BOND_STRIP_MIN_ADJACENT_COURSES."""
+    if not courses:
+        return 0
+    melhor = corrida = 1
+    for anterior, atual in zip(courses, courses[1:]):
+        corrida = corrida + 1 if atual == anterior + 1 else 1
+        if corrida > melhor:
+            melhor = corrida
+    return melhor
+
+
 def _is_special_block_code(code, catalog):
     """B34/B54/B19 (is_special_bond) e C09/C04 (is_compensator) - as pecas
     que NAO podem virar uma faixa vertical repetitiva (regra #3/#5/#6/#20).
@@ -3907,10 +4237,18 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
     """Validacao MULTI-FIADA de UMA parede - ver cabecalho da secao acima.
     Devolve {"ok": bool, "problems": [str,...], "penalty": float,
     "continuous_joints": [...], "alternating_joints": [...],
-    "compensator_strips": [...], "half_blocks_near_ties": [...]}."""
+    "compensator_strips": [...], "alternating_strips": [...],
+    "half_blocks_near_ties": [...]}.
+
+    `compensator_strips` so' contem faixas VERTICAIS de verdade (pecas
+    especiais empilhadas em fiadas ADJACENTES - ver
+    BOND_STRIP_MIN_ADJACENT_COURSES). Peca especial repetida apenas na
+    mesma paridade (o padrao A/B normal) sai em `alternating_strips`, como
+    dado de diagnostico: continua visivel, mas nao e' defeito e nao
+    penaliza."""
     empty = {"ok": True, "problems": [], "penalty": 0.0,
              "continuous_joints": [], "alternating_joints": [], "compensator_strips": [],
-             "half_blocks_near_ties": []}
+             "alternating_strips": [], "half_blocks_near_ties": []}
     if num_courses < BOND_ALTERNATING_JOINT_MIN_COURSES:
         return empty
 
@@ -4009,6 +4347,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                         break
 
     continuous_joints, alternating_joints, strips, half_blocks_near_ties = [], [], [], []
+    alternating_strips = []  # pecas especiais repetidas SO' na mesma paridade
 
     total_evens = sum(1 for ci in range(num_courses) if ci % 2 == 0) or 1
     total_odds = sum(1 for ci in range(num_courses) if ci % 2 == 1) or 1
@@ -4032,7 +4371,18 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         courses = sorted(set(e[0] for e in entries))
         if len(courses) >= BOND_STRIP_MIN_COURSES and len(courses) / float(num_courses) >= BOND_STRIP_RATIO:
             codes = sorted(set(e[1] for e in entries))
-            strips.append({"x_cm": cluster["center"], "courses": courses, "codes": codes})
+            corrida = _longest_adjacent_course_run(courses)
+            registro = {"x_cm": cluster["center"], "courses": courses, "codes": codes,
+                        "adjacent_run": corrida}
+            if corrida >= BOND_STRIP_MIN_ADJACENT_COURSES:
+                strips.append(registro)
+            else:
+                # NAO e' faixa vertical: a fiada intermediaria (paridade
+                # oposta) quebra a coluna. Guardado como DADO de diagnostico
+                # - o auditor continua enxergando o padrao e reportando-o,
+                # so' nao o trata mais como defeito nem penaliza. Mesmo
+                # tratamento ja' dado a `alternating_joints`.
+                alternating_strips.append(registro)
 
     # regra #2 (rede de seguranca): QUALQUER ocorrencia conta - nunca exige
     # repeticao em varias fiadas como as demais checagens acima (aquelas
@@ -4112,6 +4462,7 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         "continuous_joints": continuous_joints,
         "alternating_joints": alternating_joints,
         "compensator_strips": strips,
+        "alternating_strips": alternating_strips,
         "half_blocks_near_ties": half_blocks_near_ties,
     }
 
@@ -4428,8 +4779,101 @@ def _new_create_perf():
     }
 
 
+def _require_beta_transaction_status(transaction, returned, expected):
+    from Autodesk.Revit.DB import TransactionStatus
+    wanted = getattr(TransactionStatus, expected)
+    if returned != wanted or transaction.GetStatus() != wanted:
+        raise RuntimeError("BETA BLOQUEADO: transacao nao confirmou {} (retorno {}, estado {}).".format(
+            expected, returned, transaction.GetStatus()))
+
+
+def _rollback_beta_transaction(transaction):
+    from Autodesk.Revit.DB import TransactionStatus
+    status = transaction.GetStatus()
+    if status == TransactionStatus.Started:
+        _require_beta_transaction_status(transaction, transaction.RollBack(), "RolledBack")
+    elif status not in (TransactionStatus.RolledBack, TransactionStatus.Uninitialized):
+        raise RuntimeError("BETA BLOQUEADO: rollback nao confirmado; estado {}.".format(status))
+
+
+# =====================================================================
+# PROPRIEDADE DO LOTE DE BLOCOS (2026-09-11, teste real do botao - secao 50
+# de REGRAS_MODULACAO_BLOCOS.md). Cada FamilyInstance criada pelo plugin
+# recebe, no parametro de instancia "Comentarios"
+# (ALL_MODEL_INSTANCE_COMMENTS), um carimbo com o UniqueId da Wall a que
+# pertence e a etiqueta do lote. E' assim que uma execucao NOVA do botao
+# (outra sessao, outro dia) reconhece o lote anterior daquelas paredes e o
+# SUBSTITUI em vez de somar um segundo lote por cima - medido no teste real:
+# 8.399 blocos criados sobre os 7.257 de uma sessao anterior, 13.940 avisos
+# "instancias identicas no mesmo local" e a caixa modal do Revit travando a
+# UI. A memoria do handler (create_result["created_instances"]) continua
+# valendo dentro da mesma sessao; o carimbo cobre as demais. Nunca se apaga
+# nada sem carimbo: um bloco desenhado a mao (ou de outro plugin) nao tem o
+# marcador e fica intocado.
+# =====================================================================
+BLOCK_LOT_MARKER = "MODULACAO_AUTOMATICA"
+
+
+def _block_lot_stamp(wall_uid, lot_tag):
+    return "{}|parede={}|lote={}".format(BLOCK_LOT_MARKER, wall_uid or "", lot_tag or "")
+
+
+def _parse_block_lot_stamp(text):
+    """(wall_uid, lot_tag) ou None se o texto nao for um carimbo do plugin."""
+    if not text or not text.startswith(BLOCK_LOT_MARKER + "|"):
+        return None
+    wall_uid, lot_tag = None, None
+    for part in text.split("|")[1:]:
+        if part.startswith("parede="):
+            wall_uid = part[len("parede="):]
+        elif part.startswith("lote="):
+            lot_tag = part[len("lote="):]
+    return wall_uid, lot_tag
+
+
+def _stamp_block_instance(instance, wall_uid, lot_tag):
+    """Grava o carimbo de propriedade na instancia. Devolve True se gravou.
+    Nunca levanta: sem o parametro (familia sem Comentarios) a instancia
+    fica sem carimbo e o relatorio conta."""
+    try:
+        param = instance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+        if param is None or param.IsReadOnly:
+            return False
+        return bool(param.Set(_block_lot_stamp(wall_uid, lot_tag)))
+    except Exception:
+        return False
+
+
+def _discover_previous_lot(target_doc, owner_wall_uids):
+    """Instancias de bloco JA' existentes no documento carimbadas pelo plugin
+    para alguma das Walls em `owner_wall_uids` - o lote anterior dessas
+    paredes, criado numa sessao anterior. Lista de {"id", "wall_uid",
+    "lot_tag"}; vazia sem carimbos. So' le o parametro de Comentarios:
+    nenhuma inferencia geometrica, nenhum nome de familia."""
+    found = []
+    if not owner_wall_uids:
+        return found
+    owners = set(owner_wall_uids)
+    try:
+        collector = FilteredElementCollector(target_doc).OfClass(FamilyInstance).WhereElementIsNotElementType()
+        elements = collector.ToElements()
+    except Exception:
+        return found
+    for element in elements:
+        try:
+            param = element.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+            parsed = _parse_block_lot_stamp(param.AsString() if param is not None else None)
+        except Exception:
+            parsed = None
+        if parsed is None or parsed[0] not in owners:
+            continue
+        found.append({"id": element.Id, "wall_uid": parsed[0], "lot_tag": parsed[1]})
+    return found
+
+
 def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected_level, num_courses,
-                           course_candidates=None, progress_cb=None, stage_cb=None):
+                           course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False,
+                           owner_uid_by_wall_idx=None, lot_tag=None):
     """Ponto de entrada da Etapa 5: cria no Revit, dentro de um unico
     TransactionGroup, as FamilyInstance correspondentes a `candidates` (ver
     solve_building_blocks), repetidas em `num_courses` FIADAS FISICAS
@@ -4544,8 +4988,10 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
             pass
 
     group = TransactionGroup(target_doc, "Etapa 5 - Cria blocos estruturais")
-    group.Start()
+    status = group.Start()
     try:
+        if strict_transactions:
+            _require_beta_transaction_status(group, status, "Started")
         # Ativacao dos FamilySymbol: precisa de transacao propria porque a
         # API exige um Regenerate() depois de Activate() e antes do
         # primeiro NewFamilyInstance daquele tipo - feito UMA VEZ aqui,
@@ -4556,9 +5002,14 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         # uso normal). Regenerate() DENTRO da transacao (nao depois do
         # Commit) - mesmo motivo/teste via MCP de load_fixed_block_catalog.
         t_activate_start = clock()
+        _perf.mark("blocos.activate START", codigos=len(used_codes),
+                   planejados=perf["planned_total"], fiadas=num_courses)
         t_activate = Transaction(target_doc, "Ativa tipos de bloco")
-        t_activate.Start()
+        _suppress_transaction_warnings(t_activate)
+        status = t_activate.Start()
         try:
+            if strict_transactions:
+                _require_beta_transaction_status(t_activate, status, "Started")
             for code in used_codes:
                 entry = catalog.get(code)
                 if entry is None:
@@ -4567,15 +5018,30 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 if not symbol.IsActive:
                     symbol.Activate()
             target_doc.Regenerate()
-            t_activate.Commit()
+            status = t_activate.Commit()
+            if strict_transactions:
+                _require_beta_transaction_status(t_activate, status, "Committed")
         except Exception:
-            t_activate.RollBack()
+            if strict_transactions:
+                _rollback_beta_transaction(t_activate)
+            else:
+                t_activate.RollBack()
             raise
         perf["activate_s"] = clock() - t_activate_start
+        _perf.mark("blocos.activate END", dt="{:.3f}s".format(perf["activate_s"]))
 
+        _perf.mark("blocos.Transaction.Start (criacao)")
         t_create = Transaction(target_doc, "Cria instancias de bloco")
-        t_create.Start()
+        # Avisos (nunca erros) sao apagados antes de virarem caixa modal: no
+        # teste real de 2026-09-11 o Commit() parou numa caixa com 13.940
+        # avisos e a UI do plugin ficou em "regenerando o modelo" para
+        # sempre. A propria causa (lote anterior nao substituido) foi
+        # corrigida com o carimbo de propriedade; isto e' a rede.
+        _suppress_transaction_warnings(t_create)
+        status = t_create.Start()
         try:
+            if strict_transactions:
+                _require_beta_transaction_status(t_create, status, "Started")
             t_loop_start = clock()
             done = 0
             # BUG REAL #2 medido ao vivo (2026-08-21, mesmo teste que achou o
@@ -4656,14 +5122,38 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             mirror_plane = Plane.CreateByNormalAndOrigin(cand["x_dir"], point)
                             t_geometry = clock()
                             perf["aux_geometry_s"] += t_geometry - t_mark
-                            ElementTransformUtils.MirrorElement(target_doc, instance.Id, mirror_plane)
+                            # MirrorElements(..., mirrorCopies=False) espelha a
+                            # propria instancia NO LUGAR. MirrorElement(doc, id,
+                            # plane) - usado ate' 2026-09-10 - CRIA UMA COPIA
+                            # espelhada e deixa o original intacto (RevitAPIDocs,
+                            # ElementTransformUtils.MirrorElement): medido em
+                            # BUTANTA R08_LT, 54 compensadores/pastilhas
+                            # orientados pela regra #3 ficaram DUPLICADOS - o
+                            # original (orientacao errada) rastreado em
+                            # created_instances e a copia (certa) orfa, que
+                            # sobrevivia a' troca de lote e quebrava a
+                            # idempotencia. Nunca apareceu nas bancadas sem
+                            # abertura porque so' ha' espelhamento com abertura.
+                            _mirror_ids = List[ElementId]()
+                            _mirror_ids.Add(instance.Id)
+                            ElementTransformUtils.MirrorElements(target_doc, _mirror_ids, mirror_plane, False)
                             t_mark = clock()
                             perf["mirror_s"] += t_mark - t_geometry
                             perf["mirror_calls"] += 1
+                        stamped = False
+                        if owner_uid_by_wall_idx is not None:
+                            t_stamp = clock()
+                            stamped = _stamp_block_instance(
+                                instance, owner_uid_by_wall_idx.get(cand.get("wall_idx")), lot_tag)
+                            perf["stamp_s"] = perf.get("stamp_s", 0.0) + (clock() - t_stamp)
+                            perf["stamp_calls"] = perf.get("stamp_calls", 0) + 1
+                            if not stamped:
+                                perf["stamp_failures"] = perf.get("stamp_failures", 0) + 1
                         created_count += 1
                         created_instances.append({
                             "id": instance.Id, "logical_code": cand["logical_code"],
                             "course": cand["course"], "course_index": course_index,
+                            "stamped": stamped,
                             # identidade do dict-candidato de origem (o MESMO
                             # objeto Python, por referencia, entre
                             # result["candidates"]/course_candidates e este
@@ -4685,12 +5175,23 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             )
                         )
                     done += 1
+                    # Marco GROSSO (mesmo passo da barra) - um marco por peca
+                    # inflaria o proprio tempo que se quer medir. Registra a
+                    # ULTIMA peca alcancada, que e' o que diz onde uma
+                    # paralisacao real parou.
+                    if done % CREATE_PROGRESS_STEP == 0:
+                        _perf.mark("blocos.progresso", feitos=done,
+                                   total=perf["planned_total"],
+                                   fiada=course_index + 1, ultimo=cand["logical_code"])
                     if progress_cb is not None and done % CREATE_PROGRESS_STEP == 0:
                         try:
                             progress_cb(done, perf["planned_total"], course_index + 1, num_courses)
                         except Exception:
                             pass  # feedback de tela NUNCA derruba a criacao
             perf["loop_s"] = clock() - t_loop_start
+            _perf.mark("blocos.laco END", dt="{:.3f}s".format(perf["loop_s"]),
+                       criados=created_count, falhas=len(failures),
+                       chamadas_new=perf["new_instance_calls"])
 
             # COMMIT ISOLADO: o Revit REGENERA o modelo no Commit, e essa
             # regeneracao e' feita de uma vez so' para tudo que a transacao
@@ -4703,16 +5204,30 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                 except Exception:
                     pass
             t_commit_start = clock()
-            t_create.Commit()
+            _perf.mark("blocos.Commit START (o Revit regenera o modelo)")
+            status = t_create.Commit()
+            if strict_transactions:
+                _require_beta_transaction_status(t_create, status, "Committed")
             perf["commit_s"] = clock() - t_commit_start
-        except Exception:
-            t_create.RollBack()
+            _perf.mark("blocos.Commit END", dt="{:.3f}s".format(perf["commit_s"]))
+        except Exception as _criacao_ex:
+            _perf.mark("blocos.ROLLBACK da transacao de criacao",
+                       erro=str(_criacao_ex)[:140])
+            if strict_transactions:
+                _rollback_beta_transaction(t_create)
+            else:
+                t_create.RollBack()
             raise
         t_assimilate_start = clock()
-        group.Assimilate()
+        status = group.Assimilate()
+        if strict_transactions:
+            _require_beta_transaction_status(group, status, "Committed")
         perf["assimilate_s"] = clock() - t_assimilate_start
     except Exception:
-        group.RollBack()
+        if strict_transactions:
+            _rollback_beta_transaction(group)
+        else:
+            group.RollBack()
         raise
 
     perf["instances"] = created_count
@@ -7382,6 +7897,13 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
     A funcao continua existindo em wall_stepper.py (com seus proprios
     testes), so' nao e' mais chamada daqui.
     """
+    # SONDAS FINAS (diagnostico 2026-09-09, execucao 2): entre a entrada
+    # desta funcao e `process_walls_one_by_one` passaram 97,3s numa
+    # execucao real - num trecho que so tem um `if` falso, um dict vazio e
+    # um `def`. Um marco por instrucao mostra se o tempo passa em UMA
+    # fronteira (algo bloqueia ali) ou espalhado (a thread nao esta
+    # rodando). O campo `cpu` de cada marco decide entre as duas.
+    _perf.mark("analyze.trecho: entrou no corpo")
     if catalog_missing:
         return [{
             "wall_idx": None, "wall_ids": [],
@@ -7394,7 +7916,9 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             "auto_fixable": False, "fix_plan": None,
         }]
 
+    _perf.mark("analyze.trecho: passou do catalog_missing")
     plan_failures = {}
+    _perf.mark("analyze.trecho: plan_failures criado")
 
     def plan_hook(wall_idx, fill_result, verify):
         """Ajuste candidato para UMA parede. Recebe `verify` - o solver de
@@ -7418,11 +7942,13 @@ def analyze_created_walls_for_errors(target_doc, walls_to_create, openings_per_w
             plan_failures[wall_idx] = str(plan_ex)
             return None
 
-    run = process_walls_one_by_one(
-        walls_to_create, wall_graph_nodes, wall_end_to_node, openings_per_wall, catalog,
-        plan_hook=plan_hook, progress_cb=progress_cb,
-        wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-    )
+    _perf.mark("analyze.trecho: plan_hook definido")
+    with _perf.span("process_walls_one_by_one", walls=len(walls_to_create)):
+        run = process_walls_one_by_one(
+            walls_to_create, wall_graph_nodes, wall_end_to_node, openings_per_wall, catalog,
+            plan_hook=plan_hook, progress_cb=progress_cb,
+            wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+        )
 
     # ETAPA 3C (deslocamento automatico de uma parede CONECTADA, sem relacao
     # com abertura) foi REMOVIDA (2026-08-26, pedido explicito do usuario):
@@ -8272,6 +8798,9 @@ class _ProgressConsole(object):
         self._current_label = ""
         self._watchdog_timer = None
         self._closed = False
+        # THREAD DE UI, capturada na CONSTRUCAO (ver _pump_ui) - a unica em
+        # que `Application.DoEvents()` pode ser chamado.
+        self._ui_thread_id = _DotNetThread.CurrentThread.ManagedThreadId
 
         self.panel = Panel()
         self.panel.Dock = DockStyle.Fill
@@ -8316,6 +8845,46 @@ class _ProgressConsole(object):
         self.panel.Controls.Add(self._log_box)
         self.panel.Controls.Add(top)
 
+    def _pump_ui(self):
+        """Bombeia a fila de mensagens do Windows - SOMENTE na thread que
+        construiu este console.
+
+        CAUSA-RAIZ do congelamento da Tela 1, medida ao vivo no Revit
+        (2026-09-10, perf_diag.log): `Application.DoEvents()` chamado da
+        THREAD DE FUNDO do solver levou **2652,285s** (44 minutos) para
+        retornar - span "console.set_progress DoEvents" com dt=2652.285s,
+        tid=25324 (Dummy-1), com a pilha em process_walls_one_by_one ->
+        _progress_cb -> dispatch_progress_event -> set_progress. Enquanto
+        isso NENHUMA linha [PERF] de NENHUMA thread apareceu (o amostrador
+        acusou parado=2652,323s) e a thread 5932 (MainThread) ficou
+        `Running` com 44,2s de CPU, 6x a segunda colocada - medido de FORA
+        do processo, sem depender da GIL.
+
+        POR QUE o guarda antigo nao pegava: `_invoke_if_needed` decide por
+        `Control.InvokeRequired`, que devolve **False** quando o controle
+        NAO TEM HANDLE VIVO - nao apenas quando ja' se esta' na thread de
+        UI. Com a janela da Tela 1 fechada/descartada (ou antes do handle
+        existir), a thread de fundo caia no corpo do metodo e chamava
+        `DoEvents()` numa thread SEM bomba de mensagens. Confirmado no
+        mesmo log: `ui_invoke.direto (ja na thread de UI)` foi registrado
+        a partir de tid=25324, ou seja `Form.InvokeRequired` era False para
+        a thread de fundo.
+
+        `DoEvents()` continua exatamente como era na thread de UI - e' o que
+        permite a janela repintar durante trabalho longo (ver ETAPA 5). Fora
+        dela, virou no-op."""
+        if self._closed:
+            return
+        try:
+            if _DotNetThread.CurrentThread.ManagedThreadId != self._ui_thread_id:
+                return
+        except Exception:
+            return
+        try:
+            Application.DoEvents()
+        except Exception:
+            pass
+
     # ------------------------------------------------------------- log
     def _invoke_if_needed(self, fn):
         """Marshala `fn` (sem argumentos) para a thread de UI quando este
@@ -8355,7 +8924,12 @@ class _ProgressConsole(object):
             self._log_box.SelectionStart = self._log_box.TextLength
             self._log_box.ScrollToCaret()
             self._touch(message)
-            Application.DoEvents()
+            # DoEvents() bombeia a fila de mensagens do Windows SEGURANDO
+            # o GIL - suspeito direto da starvation da thread de fundo
+            # medida em 2026-09-09. Cronometrado para confirmar ou
+            # descartar.
+            with _perf.span("console.log DoEvents"):
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8372,7 +8946,8 @@ class _ProgressConsole(object):
         try:
             self._status_label.Text = text
             self._status_label.ForeColor = color
-            Application.DoEvents()
+            with _perf.span("console.set_status DoEvents"):
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8395,7 +8970,8 @@ class _ProgressConsole(object):
             self._progress_bar.Value = pct
             self._detail_label.Text = detail or "{}/{} processado(s) - {}%".format(done, total, pct)
             self._touch(detail or "")
-            Application.DoEvents()
+            with _perf.span("console.set_progress DoEvents"):
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8407,11 +8983,16 @@ class _ProgressConsole(object):
             return
         try:
             self._progress_bar.Style = ProgressBarStyle.Marquee
+            # MarqueeAnimationSpeed liga uma ANIMACAO continua no controle:
+            # e a unica coisa desta janela que continua trabalhando sozinha
+            # enquanto "nada acontece". Marcado para poder ser descartado
+            # (ou incriminado) com timestamp.
             self._progress_bar.MarqueeAnimationSpeed = 30
             if detail:
                 self._detail_label.Text = detail
             self._touch(detail or "")
-            Application.DoEvents()
+            with _perf.span("console.set_indeterminate DoEvents"):
+                self._pump_ui()
         except Exception:
             pass
 
@@ -8424,7 +9005,7 @@ class _ProgressConsole(object):
             self._progress_bar.Value = 100
             self.set_status(text, "ok")
             self._detail_label.Text = "Concluido."
-            Application.DoEvents()
+            self._pump_ui()
         except Exception:
             pass
 
@@ -8433,7 +9014,7 @@ class _ProgressConsole(object):
             return
         try:
             self.set_status(text, "error")
-            Application.DoEvents()
+            self._pump_ui()
         except Exception:
             pass
 
@@ -8496,6 +9077,8 @@ class _ProgressConsole(object):
                 if not self._closed:
                     self.log(message)
 
+            _perf.mark("watchdog.tick", parado="{:.1f}s".format(elapsed),
+                       rotulo=(label or "")[:40])
             self._log_box.BeginInvoke(Action(_flush))
         except Exception:
             pass
@@ -8530,6 +9113,9 @@ class _ProgressConsole(object):
 # usando todas). A varredura e' O(n^2) e roda a cada troca de Layer; sem
 # teto, um Layer com milhares de linhas congelaria a janela por segundos.
 SETUP_THICKNESS_SCAN_MAX_LINES = 900
+
+
+REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 
 
 class _SetupForm(Form):
@@ -8726,7 +9312,31 @@ class _SetupForm(Form):
             self._layer_grid.Items.Add(row)
         self._layer_grid.SelectedIndexChanged += self._on_layer_changed
 
+        # Secao 49: layer de REFERENCIA estrutural (opcional) - as faces da
+        # alvenaria estrutural, quando existem num layer separado; eixos do
+        # layer de paredes sem cobertura nele sao descartados/aparados.
+        self._reference_combo = ComboBox()
+        self._reference_combo.Dock = DockStyle.Bottom
+        self._reference_combo.Height = 26
+        self._reference_combo.Font = _ui_font(10.0)
+        self._reference_combo.DropDownStyle = ComboBoxStyle.DropDownList
+        self._reference_combo.Items.Add(REFERENCE_LAYER_NONE_LABEL)
+        for name in ordered_layers:
+            self._reference_combo.Items.Add(name)
+        remembered_reference = defaults.get("reference_layer")
+        if remembered_reference in ordered_layers:
+            self._reference_combo.SelectedIndex = ordered_layers.index(remembered_reference) + 1
+        else:
+            self._reference_combo.SelectedIndex = 0
+        reference_label = _build_section_label(
+            "Layer de referencia estrutural (opcional)",
+            "Faces da alvenaria estrutural: paredes do layer acima sem cobertura aqui ficam fora."
+        )
+        reference_label.Dock = DockStyle.Bottom
+
         left.Controls.Add(self._layer_grid)
+        left.Controls.Add(reference_label)      # docado por ultimo entre os dois...
+        left.Controls.Add(self._reference_combo)  # ...o combo fica no fundo, o rotulo acima dele
         left.Controls.Add(_build_section_label(
             "1. Layer das paredes",
             "Ordenado por quantidade de linhas - o Layer de parede costuma ser o maior."
@@ -8941,6 +9551,8 @@ class _SetupForm(Form):
             "openings_mode": "pick" if self._openings_pick.Checked else "auto",
             "wall_mode": (WALL_BUILD_MODE_CONTINUOUS if self._wall_mode_continuous.Checked
                           else WALL_BUILD_MODE_SEGMENTED),
+            "reference_layer": (None if self._reference_combo.SelectedIndex <= 0
+                                else str(self._reference_combo.SelectedItem)),
         }
         self.Close()
 
@@ -8982,6 +9594,7 @@ def _remember_setup_defaults(setup):
                 "height_m": setup.get("height_m"),
                 "openings_mode": setup.get("openings_mode"),
                 "wall_mode": setup.get("wall_mode"),
+                "reference_layer": setup.get("reference_layer"),
             }, handle)
     except Exception:
         pass
@@ -9386,6 +9999,18 @@ def _format_block_solve_report(result, catalog):
     lines = []
     lines.append("=== Solver de blocos ===")
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
+    beta = result.get("beta_preflight")
+    if beta is not None:
+        lines.append("BETA CONTROLADO: {}. {} invasoes de abertura, {} colisoes fisicas.".format(
+            "lote liberado pelo preflight" if beta["ok"] else "LOTE BLOQUEADO - nenhuma criacao permitida",
+            len(beta["opening_violations"]), len(beta["collisions"])))
+        for issue in beta["errors"] + beta["opening_violations"] + beta["collisions"]:
+            lines.append("  BETA: {}".format(issue))
+    retained = result.get("unmodulated_walls") or []
+    lines.append("Paredes vazias ou parcialmente nao modulaveis, retidas para revisao manual: {}".format(len(retained)))
+    for wall in retained:
+        lines.append("  - parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
+                     "{start_cm} -> {end_cm}; PRESERVAR referencia.".format(**wall))
 
     # Resumo do processamento PAREDE A PAREDE (ordem geometrica obrigatoria
     # + validacao final de cada uma antes de passar para a proxima).
@@ -9692,6 +10317,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def __init__(self):
         self.action = None
         self.on_done = None
+        self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
         # dados fixos desta execucao
         self.walls_to_create = []
         self.openings_per_wall = []
@@ -9770,11 +10396,14 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # clique, e o dicionario de globais de uma execucao anterior nao
         # sobrevive.
         self._Transaction = Transaction
+        self._TransactionGroup = TransactionGroup
+        self.beta_transaction_error = None
         self._analyze_created_walls_for_errors = analyze_created_walls_for_errors
         self._fix_all_wall_modulation_errors = fix_all_wall_modulation_errors
         self._solve_building_blocks = solve_building_blocks
         self._solve_building_blocks_all_courses = solve_building_blocks_all_courses
         self._create_building_blocks = create_building_blocks
+        self._discover_previous_lot = _discover_previous_lot
         self._num_courses_for_wall_height = num_courses_for_wall_height
         self._OverrideGraphicSettings = OverrideGraphicSettings
         self._REVIT_DB_COLOR = _REVIT_DB_COLOR
@@ -9824,6 +10453,38 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._g = dict(self._fix_all_wall_modulation_errors.__globals__)
 
     def Execute(self, uiapp):
+        # A ACAO E' CONSUMIDA AQUI, NO COMECO - nunca mais zerada no
+        # `finally` (bug real medido no primeiro beta instrumentado,
+        # 2026-09-09, perf_diag.log: "Execute ENTROU action=solve" seguido
+        # de "Execute SAIU action=create" e, no despacho seguinte,
+        # "Execute ENTROU action=None").
+        #
+        # O que acontecia: `_execute_solve` termina chamando
+        # `self.on_done("solve", None)` DE DENTRO deste Execute(). Esse
+        # callback e' `_PostCreationForm._on_solve_done`, que - por pedido
+        # explicito do usuario (2026-08-27: "nao quero que o script apenas
+        # calcule... os blocos precisam ser fisicamente inseridos") - segue
+        # DIRETO para `_on_create_click` -> `_raise_action("create")`, que
+        # faz `self._handler.action = "create"` e `external_event.Raise()`.
+        # Ou seja: a acao "create" nasce AINDA DENTRO deste Execute(), ao
+        # contrario do que o docstring de `_raise_action` supoe ("Raise()
+        # ... rodam no thread da UI, FORA do Execute()"). O `finally` antigo
+        # (`self.action = None`) apagava justamente essa acao recem-criada, e
+        # o despacho seguinte entrava com `action=None`, nao casava com
+        # nenhum ramo, nao chamava `on_done` e voltava em silencio.
+        # Resultado na tela: a Etapa 5 anunciava "criando as instancias de
+        # bloco no Revit..." e ficava ali para sempre - nenhum bloco criado,
+        # nenhum erro, nenhuma conclusao. Nao era lentidao: era uma acao
+        # PERDIDA.
+        #
+        # Consumir no inicio e despachar por uma copia LOCAL corrige as duas
+        # metades do problema: a acao que um callback agendar durante este
+        # Execute() sobrevive ate' o proximo despacho, e o encadeamento de
+        # ramos abaixo passa a olhar um valor estavel, imune a qualquer
+        # mutacao que um callback faca no meio do caminho.
+        action = self.action
+        self.action = None
+        _perf.mark("Execute ENTROU", action=action)
         try:
             # Reinjeta o snapshot de globais capturado no __init__ (ver
             # comentario la') no dicionario REAL do modulo - conserta
@@ -9847,25 +10508,40 @@ class _PostCreationEventHandler(IExternalEventHandler):
             # funcao JA' CAPTURADA como referencia direta (atributo comum,
             # sem ambiguidade de frame/escopo) - qualquer funcao definida
             # neste modulo aponta para o MESMO dicionario real.
-            self._fix_all_wall_modulation_errors.__globals__.update(self._g)
-            app_uidoc = uiapp.ActiveUIDocument
-            app_doc = app_uidoc.Document
-            if self.action == "analyze":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_analyze(app_doc)
-            elif self.action == "zoom":
+            with _perf.span("Execute.globals_update", nomes=len(self._g)):
+                self._fix_all_wall_modulation_errors.__globals__.update(self._g)
+            with _perf.span("Execute.ActiveUIDocument"):
+                app_uidoc = uiapp.ActiveUIDocument
+                app_doc = app_uidoc.Document
+            if action == "analyze":
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_analyze (disparo)"):
+                    self._execute_analyze(app_doc)
+            elif action == "zoom":
                 self._execute_zoom(app_uidoc)
-            elif self.action == "fix_errors":
+            elif action == "fix_errors":
                 self._execute_fix_errors(app_doc)
-            elif self.action == "solve":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_solve()
-            elif self.action == "create":
-                self._refresh_geometry_from_document(app_doc)
-                self._execute_create(app_doc)
-            elif self.action == "delete":
+            elif action == "solve":
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_solve"):
+                    self._execute_solve()
+            elif action == "create":
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                with _perf.span("_execute_create", esperados=sum(
+                        len(v) for v in ((self.solve_result or {})
+                                         .get("course_candidates") or {}).values())):
+                    self._execute_create(app_doc)
+            elif action == "delete":
+                if self.controlled_beta:
+                    self._refresh_geometry_from_document(app_doc)
                 self._execute_delete(app_doc)
-            elif self.action == "debug_view":
+            elif action == "debug_view":
                 self._execute_debug_view(app_doc)
         except Exception as ex:
             # Este except e' a UNICA rede de seguranca entre um bug do
@@ -9890,7 +10566,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
             except Exception:
                 pass
         finally:
-            self.action = None
+            # `pendente` mostra uma acao AGENDADA por um callback durante
+            # este Execute() (o caso "create" descrito no topo) - ela tem de
+            # sobreviver, e este marco existe para provar isso no log.
+            _perf.mark("Execute SAIU", action=action, pendente=self.action)
 
     def _refresh_geometry_from_document(self, app_doc):
         """GEOMETRIA ATUAL COMO FONTE DA VERDADE (pedido explicito do
@@ -9940,6 +10619,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 for element_id, _seg_origin in entries:
                     elem = app_doc.GetElement(element_id)
                     if elem is None or not isinstance(elem.Location, LocationCurve):
+                        if self.controlled_beta:
+                            raise ValueError("BETA BLOQUEADO: parede de referencia ausente ou ilegivel; recapture o modelo.")
                         seg_curves = None
                         break
                     seg_curves.append(elem.Location.Curve)
@@ -9950,6 +10631,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 for curve in seg_curves:
                     for k in (0, 1):
                         p = curve.GetEndPoint(k)
+                        if self.controlled_beta and (
+                                abs((p.X - origin_ref.X) * dir_xy.Y - (p.Y - origin_ref.Y) * dir_xy.X) > 1e-6
+                                or min(abs(p.Z - origin_ref.Z), abs(p.Z - self.base_z_abs)) > 1e-6):
+                            raise ValueError("BETA BLOQUEADO: eixo deslocado/rotacionado fora do refresh suportado; recapture o modelo.")
                         t = XYZ(p.X - origin_ref.X, p.Y - origin_ref.Y, 0.0).DotProduct(dir_xy)
                         all_ts.append((t, p))
                 min_t, min_p = min(all_ts, key=lambda tp: tp[0])
@@ -9974,6 +10659,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 self.wall_segment_geometry[wall_idx] = new_segments
                 any_updated = True
             except Exception:
+                if self.controlled_beta:
+                    raise
                 continue  # nunca derruba o refresh dos demais eixos
 
         if any_updated:
@@ -9996,23 +10683,29 @@ class _PostCreationEventHandler(IExternalEventHandler):
         os mesmos dados que main() calculava antes desta separacao Etapa
         1/Etapa 2.
 
-        MUDANCA 2 do plano de arquitetura em memoria (2026-08-26): quando
-        `self.wall_segment_geometry` foi preenchido na Etapa 1 (ver main()),
-        analyze_created_walls_for_errors roda 100% livre de `target_doc` (ver
-        _classify_wall_axis_segments) - entao roda numa `System.Threading.
-        Thread` de VERDADE, fora da thread principal do Revit, em vez de
-        bloquear `Execute()` (que e' a propria thread de UI do Revit) pela
-        duracao inteira do solver, como acontecia antes. `self.on_done` so'
-        e' chamado quando a thread termina, marshalado de volta para a UI via
-        `self.ui_invoke_cb` (configurado pelo chamador com um Control real -
-        ver _WallReviewForm._on_start_click). Sem `ui_invoke_cb` (chamador
-        antigo/teste que nao configurou), roda SINCRONO exatamente como
-        antes desta mudanca - nunca quebra quem chama a acao "analyze" sem
-        passar por essa janela."""
+        THREAD DE FUNDO RETIRADA (2026-09-10) - ver o bloco de comentario em
+        _WallReviewForm._on_start_click para a evidencia completa. A
+        "Mudanca 2" de 2026-08-26 fazia isto rodar numa
+        `System.Threading.Thread` de verdade para nao bloquear `Execute()`.
+        Medido no Revit real, essa thread era a causa de congelamentos de
+        94s, 2652s e 1654s, com o worker sem consumir CPU e o interpretador
+        inteiro parado - contra 0,181s do proprio `analyze`. O caminho de
+        fundo continua implementado abaixo (`ui_invoke_cb` nao-nulo), mas
+        NENHUM chamador do produto o instala mais.
+
+        Com `ui_invoke_cb is None` - o caso normal agora, e o que os testes
+        sempre usaram - `_worker()` roda SINCRONO dentro de `Execute()`, na
+        thread principal do Revit, e `self.on_done` e' chamado direto, sem
+        `BeginInvoke`: ja' estamos na thread certa. `_finish` roda
+        exatamente UMA vez nos dois caminhos."""
         def _worker():
             error_detail = None
             result = None
+            _perf.mark("worker.thread ENTROU")
             try:
+              with _perf.span("analyze_created_walls_for_errors",
+                              walls=len(self.walls_to_create or []),
+                              nodes=len(self.wall_graph_nodes or [])):
                 result = self._analyze_created_walls_for_errors(
                     app_doc, self.walls_to_create, self.openings_per_wall,
                     self.created_walls_by_axis, self.all_openings,
@@ -10027,8 +10720,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 )
             except Exception as worker_ex:
                 error_detail = str(worker_ex) or repr(worker_ex)
+                _perf.mark("worker.thread EXCECAO", detalhe=error_detail[:120])
 
             def _finish():
+                _perf.mark("ui._finish (volta para a thread de UI)")
                 if error_detail is not None:
                     if self.on_done:
                         self.on_done("error", error_detail)
@@ -10037,16 +10732,21 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 if self.on_done:
                     self.on_done("analyze", None)
 
+            _perf.mark("worker.thread TERMINOU o trabalho",
+                       marshaling=self.ui_invoke_cb is not None)
             if self.ui_invoke_cb is not None:
                 self.ui_invoke_cb(_finish)
             else:
                 _finish()
 
         if self.ui_invoke_cb is not None:
+            _perf.mark("_execute_analyze: criando thread de fundo")
             thread = _DotNetThread(_DotNetThreadStart(_worker))
             thread.IsBackground = True
             thread.Start()
+            _perf.mark("_execute_analyze: thread de fundo INICIADA")
         else:
+            _perf.mark("_execute_analyze: rodando SINCRONO (sem ui_invoke_cb)")
             _worker()
 
     def _execute_zoom(self, app_uidoc):
@@ -10211,11 +10911,110 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 stage_cb=cbs.get("stage_cb"),
             )
         self.solve_result["num_courses"] = num_courses
+        if self.controlled_beta:
+            self.solve_result["beta_preflight"] = controlled_beta_preflight(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+            self.solve_result["beta_input_signature"] = self._beta_input_signature()
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
 
+    def _beta_input_signature(self):
+        def xyz(point):
+            return tuple(round(v, 9) for v in (point.X, point.Y, point.Z))
+        walls = tuple((xyz(line.GetEndPoint(0)), xyz(line.GetEndPoint(1)), thickness, tuple(locks))
+                      for line, thickness, locks in self.walls_to_create)
+        openings = tuple(tuple(tuple(op) for op in wall) for wall in self.openings_per_wall)
+        catalog = tuple((code, entry.get("length_cm"), entry.get("width_cm"), entry.get("height_cm"),
+                         id(entry.get("symbol"))) for code, entry in sorted(self.catalog.items()))
+        return walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level)
+
+    def _require_current_beta_solve(self):
+        if (self.solve_result or {}).get("beta_input_signature") != self._beta_input_signature():
+            raise ValueError("BETA BLOQUEADO: geometria/catalogo mudou ou calculo sem assinatura; calcule novamente.")
+
     def _execute_create(self, app_doc):
+        _perf.mark("create.entrou", beta=self.controlled_beta)
+        if self.controlled_beta:
+            if self.beta_transaction_error:
+                raise RuntimeError(self.beta_transaction_error)
+            _perf.mark("create.preflight START")
+            preflight = controlled_beta_preflight(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+            if self.solve_result is not None:
+                self.solve_result["beta_preflight"] = preflight
+            if not preflight["ok"]:
+                raise ValueError("BETA BLOQUEADO: {} invasoes de abertura, {} colisoes; {}. "
+                                 "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
+                                     len(preflight["opening_violations"]), len(preflight["collisions"]),
+                                     "; ".join(preflight["errors"])))
+            self._require_current_beta_solve()
+            _perf.mark("create.preflight END", ok=preflight["ok"])
+            # One outer group restores even the committed cleanup transaction.
+            previous_result = self.create_result
+            replacement = self._TransactionGroup(app_doc, "Beta - substitui lote completo de blocos")
+            replacement.IsFailureHandlingForcedModal = True
+            try:
+                with _perf.span("create.TransactionGroup.Start"):
+                    _require_beta_transaction_status(replacement, replacement.Start(), "Started")
+                with _perf.span("create.batch (beta)"):
+                    self._execute_create_batch(app_doc)
+                result = self.create_result or {}
+                expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
+                            for c in source]
+                instances = result.get("created_instances") or []
+                actual = [(item.get("course_index"), item.get("candidate_key")) for item in instances]
+                if (result.get("failures") or sorted(actual) != sorted(expected)
+                        or result.get("created_count") != len(expected)
+                        or len(set(item["id"] for item in instances)) != len(expected)
+                        or any(app_doc.GetElement(item["id"]) is None for item in instances)):
+                    raise RuntimeError("BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas. {}".format(
+                        "; ".join(str(f) for f in result.get("failures", []))))
+                with _perf.span("create.TransactionGroup.Assimilate"):
+                    _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
+            except Exception as _grupo_ex:
+                _perf.mark("create.ROLLBACK do grupo do beta", erro=str(_grupo_ex)[:140])
+                self.create_result = previous_result
+                try:
+                    _rollback_beta_transaction(replacement)
+                except Exception as rollback_error:
+                    self.beta_transaction_error = (
+                        "BETA BLOQUEADO: restauracao do lote nao confirmada. Interrompa o beta e "
+                        "revise o documento antes de continuar: {}".format(rollback_error))
+                    raise RuntimeError(self.beta_transaction_error)
+                raise
+        else:
+            with _perf.span("create.batch"):
+                self._execute_create_batch(app_doc)
+        with _perf.span("create.save_modulation_state_cache"):
+            self._save_modulation_state_cache()
+        _resultado = self.create_result or {}
+        _perf.mark("create.RESULTADO",
+                   criados=_resultado.get("created_count"),
+                   falhas=len(_resultado.get("failures") or []),
+                   perf=repr(_resultado.get("perf")).replace(" ", ""))
+        if self.on_done:
+            self.on_done("create", None)
+
+    def _owner_wall_uids(self, app_doc):
+        """{wall_idx: UniqueId da Wall} para as paredes desta execucao (le
+        `created_walls_by_axis`, que tanto o fluxo CAD quanto o de paredes
+        existentes preenchem). Vazio quando nao ha' Wall legivel - e entao
+        nem carimbo nem descoberta acontecem."""
+        out = {}
+        for wall_idx, entries in (self.created_walls_by_axis or {}).items():
+            for entry in entries or ():
+                try:
+                    element = app_doc.GetElement(entry[0])
+                    uid = getattr(element, "UniqueId", None)
+                except Exception:
+                    uid = None
+                if uid:
+                    out[wall_idx] = uid
+                    break
+        return out
+
+    def _execute_create_batch(self, app_doc):
         # IDEMPOTENCIA / INTEGRIDADE DO CONJUNTO (bug real corrigido
         # 2026-08-25, reportado pelo usuario com imagem: parte da parede
         # "andou" e parte ficou na posicao antiga apos recalcular).
@@ -10237,8 +11036,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # amarracoes formam um UNICO conjunto que tem que ser recalculado e
         # reposicionado JUNTO, sempre). Apagando o lote anterior por
         # completo ANTES de criar o novo, cada clique em "criar" passa a
-        # ser uma SUBSTITUICAO atomica (nunca uma soma) - o modelo nunca
-        # mistura pecas de dois calculos diferentes.
+        # ser uma SUBSTITUICAO (nunca uma soma). No beta, o grupo externo
+        # tambem restaura o lote anterior se a nova criacao falhar.
 
         # PERFIL DE TEMPO do "criar" INTEIRO (rotulo, segundos, detalhe) -
         # mesmo formato do `perf_stats` da Etapa 1. create_building_blocks
@@ -10258,12 +11057,21 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     pass
 
         previous_instances = (self.create_result or {}).get("created_instances") or []
+        owner_uid_by_wall_idx = self._owner_wall_uids(app_doc)
+        if not previous_instances and owner_uid_by_wall_idx:
+            # Sessao nova: o lote anterior destas paredes so' existe no
+            # documento, carimbado (ver BLOCK_LOT_MARKER). Sem carimbo, nada
+            # e' apagado - nunca no escuro.
+            _stage("procurando lote anterior carimbado destas paredes")
+            previous_instances = self._discover_previous_lot(app_doc, set(owner_uid_by_wall_idx.values()))
         if previous_instances:
             _stage("apagando o lote anterior de {} bloco(s)".format(len(previous_instances)))
             t_delete_start = _perf_clock()
             t_cleanup = self._Transaction(app_doc, "Remove lote anterior de blocos (recalculo)")
-            t_cleanup.Start()
+            status = t_cleanup.Start()
             try:
+                if self.controlled_beta:
+                    _require_beta_transaction_status(t_cleanup, status, "Started")
                 # EXCLUSAO EM LOTE - a UNICA otimizacao que a medicao desta
                 # etapa aprovou (feita ao vivo via MCP em 2026-08-28, com a
                 # instrumentacao que este mesmo arquivo passou a expor).
@@ -10289,11 +11097,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
                         if app_doc.GetElement(item["id"]) is not None:
                             stale_ids.Add(item["id"])
                     except Exception:
+                        if self.controlled_beta:
+                            raise
                         pass  # peca ja' apagada/invalida - nunca trava a recriacao
                 if len(stale_ids):
                     try:
                         app_doc.Delete(stale_ids)
                     except Exception:
+                        if self.controlled_beta:
+                            raise
                         # Rede de seguranca: se o Revit recusar a colecao
                         # inteira (uma peca que a sondagem aprovou mas o
                         # Delete rejeita), volta ao caminho antigo. Apagar
@@ -10306,9 +11118,20 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                 app_doc.Delete(stale_id)
                             except Exception:
                                 pass
-                t_cleanup.Commit()
+                status = t_cleanup.Commit()
+                if self.controlled_beta:
+                    _require_beta_transaction_status(t_cleanup, status, "Committed")
+                    if any(app_doc.GetElement(eid) is not None for eid in stale_ids):
+                        raise RuntimeError("BETA BLOQUEADO: lote anterior nao removido integralmente.")
             except Exception:
-                t_cleanup.RollBack()
+                if self.controlled_beta:
+                    # A committed cleanup is undone by the outer group.
+                    from Autodesk.Revit.DB import TransactionStatus
+                    if t_cleanup.GetStatus() != TransactionStatus.Committed:
+                        _rollback_beta_transaction(t_cleanup)
+                    raise
+                else:
+                    t_cleanup.RollBack()
             perf_steps.append((
                 "Exclusao do lote anterior (sondagem + Delete em lote)",
                 _perf_clock() - t_delete_start,
@@ -10344,20 +11167,24 @@ class _PostCreationEventHandler(IExternalEventHandler):
             reproved_wall_idxs = {wi for wi, audit in wall_bond_audits.items() if not audit["ok"]}
 
             t_create_start = _perf_clock()
+            create_options = {"strict_transactions": True} if self.controlled_beta else {}
+            if owner_uid_by_wall_idx:
+                create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
+                create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
             self.create_result = self._create_building_blocks(
                 app_doc, candidates, self.catalog, self.base_z_abs,
                 self.selected_level, num_courses, course_candidates=course_candidates,
                 progress_cb=cbs.get("progress_cb"), stage_cb=stage_cb,
+                **create_options
             )
             perf_steps.append((
                 "create_building_blocks (criacao das FamilyInstance)",
                 _perf_clock() - t_create_start,
                 "{} instancia(s) criada(s)".format(self.create_result.get("created_count", 0)),
             ))
-            # Nao ha' mais "parede sem bloco": skipped_* fica sempre vazio,
-            # mantido so' por compatibilidade com quem le' create_result.
-            self.create_result["skipped_wall_count"] = 0
-            self.create_result["skipped_wall_idxs"] = []
+            # A permissao de criar diagnosticos nao torna uma parede vazia
+            # substituida. Finalizar deve preservar sua referencia (secao 48).
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
             self.create_result["reproved_wall_count"] = len(reproved_wall_idxs)
             self.create_result["reproved_wall_idxs"] = sorted(reproved_wall_idxs)
             # Colisao entre pecas: pedido explicito do usuario (2026-08-24)
@@ -10376,6 +11203,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 candidates, wall_bond_audits, self.create_result.get("created_instances") or []
             )
             highlight_ids = list(set(colliding_ids) | set(bond_reproved_ids))
+            highlight_ids.extend(eid for wi in self.create_result["skipped_wall_idxs"]
+                                 for eid, _origin in self.created_walls_by_axis.get(wi, []))
             perf_steps.append((
                 "Cruzamento colisoes/amarracao x instancias criadas",
                 _perf_clock() - t_cross_start,
@@ -10387,8 +11216,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 _stage("marcando {} peca(s) em vermelho".format(len(highlight_ids)))
                 t_highlight_start = _perf_clock()
                 t_highlight = self._Transaction(app_doc, "Realce vermelho de colisoes/paredes sem modulacao aprovada")
-                t_highlight.Start()
+                status = t_highlight.Start()
                 try:
+                    if self.controlled_beta:
+                        _require_beta_transaction_status(t_highlight, status, "Started")
                     # Vermelho generico (ver _apply_solid_color_override) -
                     # significado DIFERENTE do vermelho de comprimento
                     # quebrado (ver _apply_broken_length_overrides, Tela 1):
@@ -10401,19 +11232,23 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     self._apply_solid_color_override(
                         app_doc.ActiveView, highlight_ids, self._REVIT_DB_COLOR(255, 0, 0), target_doc=app_doc
                     )
-                    t_highlight.Commit()
+                    status = t_highlight.Commit()
+                    if self.controlled_beta:
+                        _require_beta_transaction_status(t_highlight, status, "Committed")
                 except Exception:
-                    t_highlight.RollBack()
+                    if self.controlled_beta:
+                        _rollback_beta_transaction(t_highlight)
+                        raise
+                    else:
+                        t_highlight.RollBack()
                 perf_steps.append((
                     "Realce vermelho (SetElementOverrides) das pecas suspeitas",
                     _perf_clock() - t_highlight_start,
                     "{} peca(s) marcada(s)".format(len(highlight_ids)),
                 ))
         if self.create_result is not None:
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
             self.create_result["perf_steps"] = perf_steps
-        self._save_modulation_state_cache()
-        if self.on_done:
-            self.on_done("create", None)
 
     def _save_modulation_state_cache(self):
         """Guarda solve_result/create_result em _LAST_MODULATION_STATE,
@@ -10433,6 +11268,16 @@ class _PostCreationEventHandler(IExternalEventHandler):
         }
 
     def _execute_delete(self, app_doc):
+        if self.controlled_beta and self.beta_transaction_error:
+            raise RuntimeError(self.beta_transaction_error)
+        if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
+            raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
+        if self.controlled_beta:
+            if self.create_result is None:
+                raise ValueError("BETA BLOQUEADO: lote ainda nao criado.")
+            self._require_current_beta_solve()
+            # A new solve cannot authorize deleting references based on an old batch.
+            _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
         # NUNCA excluir a parede de referencia de um eixo que ficou SEM
         # bloco (reprovado na auditoria de amarracao entre fiadas - regra
         # #1, 2026-08-25, ver _execute_create): apagar essa parede junto
@@ -10442,6 +11287,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         # continuar ali, marcada em vermelho (ja' aplicado em
         # _execute_create), ate' a revisao manual resolver o eixo.
         skipped_wall_idxs = set((self.create_result or {}).get("skipped_wall_idxs") or [])
+        skipped_wall_idxs.update(w["wall_idx"] for w in
+                                 (self.solve_result or {}).get("unmodulated_walls") or [])
         skipped_wall_ids = set()
         for wi in skipped_wall_idxs:
             skipped_wall_ids.update(eid for eid, _origin in self.created_walls_by_axis.get(wi, []))
@@ -11513,9 +12360,12 @@ class _PostCreationForm(Form):
         final_report = self._build_final_modulation_report(
             self._handler.walls_to_create, self._handler.error_rows,
             wall_bond_audits=(self._handler.solve_result or {}).get("wall_bond_audits"),
-            skipped_wall_idxs=result.get("reproved_wall_idxs"),
+            skipped_wall_idxs=set(result.get("reproved_wall_idxs") or []) | set(result.get("skipped_wall_idxs") or []),
         )
         self._append_log(self._format_final_modulation_report(final_report))
+        for wall in result.get("retained_walls") or []:
+            self._append_log("RETER parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
+                             "{start_cm} -> {end_cm}; revisao manual obrigatoria.".format(**wall))
 
         self._create_status.Text = "{} bloco(s) criado(s), {} falha(s).".format(
             result["created_count"], len(result["failures"])
@@ -11524,6 +12374,8 @@ class _PostCreationForm(Form):
             self._create_status.Text += " {} peca(s) em colisao marcada(s) em vermelho.".format(colliding_count)
         if reproved_wall_count:
             self._create_status.Text += " {} parede(s) com amarracao reprovada (criadas e marcadas em vermelho).".format(reproved_wall_count)
+        if result.get("skipped_wall_count"):
+            self._create_status.Text += " {} parede(s) RETIDA(S) para revisao manual.".format(result["skipped_wall_count"])
         if result["created_count"] == 0:
             self._create_status.Text = "ALERTA: nenhum bloco foi criado! " + self._create_status.Text
         self._create_status.ForeColor = self._UI_OK if result["created_count"] > 0 else self._UI_WARN
@@ -12045,10 +12897,31 @@ class _WallReviewForm(Form):
             "perder nada, ou 'Cancelar' se quiser parar e manter so' o que ja "
             "foi corrigido ate' ali."
         )
+        # DIAGNOSTICO (temporario): tudo o que acontece entre este clique e a
+        # primeira linha "ANALISAR: eixo ..." e' exatamente a janela em que a
+        # tela fica parada em "Preparando o solver..." - ver core/engine/
+        # perf_trace.py.
+        try:
+            _perf.enable()
+            _perf.reset()
+            # Amostrador de congelamento (ver core/engine/perf_trace.py): thread
+            # PYTHON pura que so' anota a hora. Se ELA congelar junto, o
+            # congelamento e' da GIL/interpretador, nao da thread do solver.
+            _perf.start_stall_sampler()
+            _perf.mark("ui.click START",
+                       walls=len(self._handler.walls_to_create or []),
+                       openings=sum(len(o or []) for o in (self._handler.openings_per_wall or [])),
+                       nodes=len(self._handler.wall_graph_nodes or []),
+                       axes=len(self._handler.created_walls_by_axis or {}),
+                       catalog=len(self._handler.catalog or {}),
+                       beta=self._handler.controlled_beta)
+        except Exception:
+            pass
         self._console.log("ANALISAR: iniciando modulacao das paredes...")
         self._console.set_status("Analisando paredes...")
         self._console.set_indeterminate("Preparando o solver...")
         self._console.start_watchdog()
+        _perf.mark("ui.console_pronto")
 
         # Callbacks AO VIVO (ver docstring de process_walls_one_by_one) -
         # capturados como closures locais (nao pelo nome do modulo), mesmo
@@ -12090,31 +12963,49 @@ class _WallReviewForm(Form):
         def _should_pause():
             return self._paused
 
-        # Marshala de volta para a UI (mesma tecnica de _ProgressConsole.
-        # _invoke_if_needed, aqui usando o proprio Form como Control) -
-        # ver Mudanca 2 do plano de arquitetura em memoria: "analyze" agora
-        # roda numa thread de fundo (_PostCreationEventHandler._execute_analyze),
-        # entao self.on_done (_on_analyze_done, mais abaixo) precisa ser
-        # chamado na thread de UI, nao na thread do solver.
-        def _ui_invoke(fn):
-            try:
-                if self.InvokeRequired:
-                    self.BeginInvoke(Action(fn))
-                else:
-                    fn()
-            except Exception:
-                pass
-
+        # ANALYZE RODA SINCRONO, NA THREAD PRINCIPAL DO REVIT (2026-09-10).
+        #
+        # `ui_invoke_cb` NAO e' instalado de proposito: e' exatamente ele que
+        # fazia `_execute_analyze` abrir uma `System.Threading.Thread` (ver o
+        # `if self.ui_invoke_cb is not None` la'). Sem ele, o caminho
+        # SINCRONO - que sempre existiu e e' o mesmo que os testes usam -
+        # roda dentro do proprio `Execute()`, onde a API do Revit e' legal.
+        #
+        # POR QUE a thread de fundo foi retirada, medido no Revit real:
+        #   - execucao 4: 94,167s parados na fronteira de `analyze`;
+        #   - execucao 5: `Application.DoEvents()` chamado DA THREAD DE FUNDO
+        #     levou 2652,285s (corrigido a parte, ver `_pump_ui`);
+        #   - execucao 6: `solve_all_intersections` levou 1654,774s (27min35s)
+        #     com o worker consumindo ~47ms de CPU no periodo inteiro -
+        #     bloqueio passivo, threads `Running`=0, e o trabalho concluiu em
+        #     milissegundos assim que destravou.
+        # Dois processos do Revit morreram (14:24:03 e 14:55:09) depois
+        # desses episodios.
+        # Contra isso: `analyze` custa 0,181s medido dentro do Revit, no
+        # documento real. Nao havia beneficio medido em manter a thread.
+        #
+        # CONSEQUENCIA DE SEMANTICA, deliberada e documentada: durante
+        # `analyze` a janela fica bloqueada por esse tempo (fracao de
+        # segundo nesta bancada), e "Pausar"/"Cancelar" nao tem efeito
+        # pratico nele. Ja' era assim de fato - `should_cancel_cb` so' e'
+        # consultado a partir do laco POR PAREDE, nunca antes; a diferenca
+        # e' que agora a janela tambem nao repinta. Nenhum threading novo
+        # foi inventado para preservar um cancelamento que nao existia.
+        #
+        # `_finish` passa a ser chamado direto pelo proprio `_worker` (ver
+        # `_execute_analyze`), sem `BeginInvoke`: ja' estamos na thread certa.
         self._handler.progress_cb = _progress_cb
         self._handler.wall_start_cb = _wall_start_cb
         self._handler.wall_result_cb = _wall_result_cb
         self._handler.should_cancel_cb = _should_cancel
         self._handler.should_pause_cb = _should_pause
-        self._handler.ui_invoke_cb = _ui_invoke
+        self._handler.ui_invoke_cb = None
         try:
             self._handler.action = "analyze"
             self._handler.on_done = self._on_analyze_done
+            _perf.mark("ui.external_event.Raise CHAMADO")
             self._external_event.Raise()
+            _perf.mark("ui.external_event.Raise RETORNOU")
         except Exception as ex:
             self._console.stop_watchdog()
             self._start_button.Enabled = True
@@ -12162,6 +13053,8 @@ class _WallReviewForm(Form):
             self._console.log("Retomado pelo usuario.")
 
     def _on_analyze_done(self, kind, error):
+        _perf.mark("ui._on_analyze_done", kind=kind)
+        _perf.stop_stall_sampler()
         # `kind == "error"` (nunca `if error:`) - ver o mesmo cuidado
         # documentado em _PostCreationForm._on_zoom_done: uma excecao sem
         # mensagem nao pode virar sucesso silencioso. Sucesso chega como
@@ -12595,6 +13488,30 @@ def _select_existing_walls_for_modulation():
     # status do PickObjects abaixo tambem existe, mas e' pequena e facil de
     # nao notar; este alerta modal garante que ninguem comeca a selecao sem
     # saber o que fazer.
+    # 2026-09-11 (infraestrutura, teste real do botao): se o usuario JA' tem
+    # Walls selecionadas ao clicar no botao, oferece usa-las direto - o mesmo
+    # que qualquer ferramenta do Revit faz com a selecao corrente. Quem
+    # responde "Nao" cai no PickObjects de sempre. Nada e' assumido: sem
+    # Wall na selecao o fluxo e' identico ao anterior.
+    preselected_walls = []
+    try:
+        for element_id in uidoc.Selection.GetElementIds():
+            element = doc.GetElement(element_id)
+            if isinstance(element, Wall):
+                preselected_walls.append(element)
+    except Exception:
+        preselected_walls = []
+    if preselected_walls:
+        use_selection = forms.alert(
+            "Ha' {} parede(s) ja' selecionada(s) no modelo.\n\nUsar essas "
+            "paredes na modulacao? (Nao = selecionar de novo no modelo)".format(
+                len(preselected_walls)),
+            title="Modulacao Automatica - Etapa 1: Selecao das paredes",
+            yes=True, no=True
+        )
+        if use_selection:
+            return _build_existing_walls_selection(preselected_walls)
+
     forms.alert(
         "Selecione no modelo as paredes existentes que deseja modular e "
         "clique em 'Concluir' na barra de opcoes do Revit (ou Esc para "
@@ -12728,7 +13645,7 @@ def run_modulation_on_existing_walls(preselected=None):
         )
         return
 
-    base_z_abs = selected_level.Elevation
+    base_z_abs = _level_internal_elevation_ft(selected_level)
 
     output.print_md("**Coletando aberturas (portas/janelas) do projeto...**")
     all_openings, openings_source_note = collect_opening_instances("auto", None)
@@ -13157,7 +14074,7 @@ def _wall_vertical_extent(wall, level, target_doc):
     level_elevation = None
     if level is not None:
         try:
-            level_elevation = level.Elevation
+            level_elevation = _level_internal_elevation_ft(level)
         except Exception:
             level_elevation = None
 
@@ -13174,7 +14091,7 @@ def _wall_vertical_extent(wall, level, target_doc):
         top_level = target_doc.GetElement(top_level_id) if top_level_id is not None else None
         if isinstance(top_level, Level):
             top_offset = _param_double(BuiltInParameter.WALL_TOP_OFFSET) or 0.0
-            top_z_abs = top_level.Elevation + top_offset
+            top_z_abs = _level_internal_elevation_ft(top_level) + top_offset
     except Exception:
         top_z_abs = None
     # 2) altura desconectada.
@@ -13284,7 +14201,7 @@ def read_existing_wall_for_merge(wall, target_doc=None):
         "wall_type_id": wall_type_id,
         "level": level,
         "level_id": _eid_int(level.Id),
-        "level_elevation_ft": level.Elevation,
+        "level_elevation_ft": _level_internal_elevation_ft(level),
         "base_z_abs": base_z_abs,
         "top_z_abs": top_z_abs,
         "height_ft": top_z_abs - base_z_abs,
@@ -14784,6 +15701,36 @@ def main():
         )
     )
 
+    # Secao 49 (2026-09-11): LAYER DE REFERENCIA ESTRUTURAL (opcional). O
+    # layer arquitetonico de paredes traz tambem o que NAO e' alvenaria
+    # estrutural (drywall, muretas, vigas projetadas) e alonga paredes
+    # atraves da vizinha; quando o DWG (ou outro import) tem um layer com as
+    # faces da alvenaria estrutural, cada eixo e' mantido/aparado/descartado
+    # pela cobertura geometrica dessas linhas - nunca por nome, ID ou
+    # posicao. Sem layer escolhido (ou sem linhas nele) nada muda.
+    reference_layer = setup.get("reference_layer")
+    reference_report = None
+    if reference_layer and cad_lines_by_layer.get(reference_layer):
+        before_ref = len(walls_to_create)
+        walls_to_create, reference_report = clip_axes_to_reference_lines(
+            walls_to_create, cad_lines_by_layer[reference_layer]
+        )
+        output.print_md(
+            "**Layer de referencia estrutural '{}'**: {} eixo(s) analisados, "
+            "{} mantido(s), {} aparado(s), {} descartado(s) por cobertura "
+            "< {:.0f}% (nao sao alvenaria estrutural).".format(
+                reference_layer, before_ref, reference_report["kept"],
+                len(reference_report["trimmed"]), len(reference_report["dropped"]),
+                REFERENCE_LAYER_MIN_COVERAGE * 100.0
+            )
+        )
+        for item in reference_report["dropped"]:
+            output.print_md("- descartado: eixo #{} de {:.0f} cm, cobertura {:.0f}%".format(
+                item["index"], item["length_cm"], item["coverage"] * 100.0))
+        for item in reference_report["trimmed"]:
+            output.print_md("- aparado: eixo #{} de {:.0f} cm -> {:.0f} cm".format(
+                item["index"], item["length_cm"], item["new_length_cm"]))
+
     # Paredes DETECTADAS no AutoCAD = pares validos (paralelismo + espessura
     # + sobreposicao + linhas de fechamento) encontrados por find_wall_pairs
     # ANTES de qualquer deduplicacao/extensao - usado no log final ("paredes
@@ -14965,7 +15912,7 @@ def main():
     # comprimento quebrado (ver secao ETAPA 2/FASE 2 - evaluate_wall_
     # modulation/_apply_broken_length_overrides), nao mais este diagnostico.
 
-    base_z_abs = selected_level.Elevation
+    base_z_abs = _level_internal_elevation_ft(selected_level)
     top_z_abs = base_z_abs + wall_height_ft
     openings_used = 0
 

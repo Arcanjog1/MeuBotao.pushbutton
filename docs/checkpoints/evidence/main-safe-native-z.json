@@ -1,0 +1,117 @@
+{
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "scope": "Existing-wall axes at actual base Z612cm, default extension and real handler solve; Revit geometry stubs only.",
+  "same_physical_walls_as_zero_z_axes": true,
+  "preflight": {
+    "ok": true,
+    "errors": [],
+    "opening_violations": [],
+    "collisions": []
+  },
+  "score": {
+    "project_id": "native_z_bench",
+    "source": "solver",
+    "walls": 2,
+    "blocks": 187,
+    "categories": [
+      {
+        "category": "block_positions",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      },
+      {
+        "category": "compensators",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      },
+      {
+        "category": "junctions",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      },
+      {
+        "category": "openings",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      },
+      {
+        "category": "prism",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      },
+      {
+        "category": "wall_coverage",
+        "pass": 2,
+        "fail": 0,
+        "findings": 0,
+        "findings_level_1": 0,
+        "findings_level_2": 0,
+        "success_rate": 1.0
+      }
+    ],
+    "findings_total": 0,
+    "findings_level_1": 0,
+    "findings_level_2": 0,
+    "critical_errors": 0,
+    "critical_by_code": {},
+    "findings_by_code": {},
+    "success_rate": 1.0,
+    "walls_failing": [],
+    "blocking": false,
+    "per_wall": [
+      {
+        "wall": "W001",
+        "status": "PASS",
+        "prism": "PASS",
+        "compensators": "PASS",
+        "junctions": "PASS",
+        "openings": "PASS",
+        "wall_coverage": "PASS",
+        "block_positions": "PASS",
+        "findings": 0
+      },
+      {
+        "wall": "W002",
+        "status": "PASS",
+        "prism": "PASS",
+        "compensators": "PASS",
+        "junctions": "PASS",
+        "openings": "PASS",
+        "wall_coverage": "PASS",
+        "block_positions": "PASS",
+        "findings": 0
+      }
+    ],
+    "validator_errors": []
+  },
+  "wall_endpoints_z_cm": [
+    [
+      612.0000000000001,
+      612.0000000000001
+    ],
+    [
+      612.0000000000001,
+      612.0000000000001
+    ]
+  ]
+}

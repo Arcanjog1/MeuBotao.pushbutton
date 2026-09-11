@@ -1,0 +1,281 @@
+=== SESSAO 2026-09-09 18:40:37 ===
+[PERF] +    0.001s cpu=   0.000s thr=3   tid=1424  ui.click START axes=2 beta=True catalog=6 nodes=3 openings=0 walls=2
+[PERF] +    0.004s cpu=   0.000s thr=3   tid=1424  console.log DoEvents START
+[PERF] +    0.012s cpu=   0.000s thr=3   tid=1424  console.log DoEvents END dt=0.008s
+[PERF] +    0.014s cpu=   0.016s thr=3   tid=1424  console.set_status DoEvents START
+[PERF] +    0.014s cpu=   0.016s thr=3   tid=1424  console.set_status DoEvents END dt=0.000s
+[PERF] +    0.018s cpu=   0.016s thr=3   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +    0.019s cpu=   0.016s thr=3   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +    0.025s cpu=   0.016s thr=3   tid=1424  ui.console_pronto
+[PERF] +    0.025s cpu=   0.016s thr=3   tid=1424  ui.external_event.Raise CHAMADO
+[PERF] +    0.026s cpu=   0.016s thr=3   tid=1424  ui.external_event.Raise RETORNOU
+[PERF] +    0.030s cpu=   0.031s thr=3   tid=1424  Execute ENTROU action=analyze
+[PERF] +    0.030s cpu=   0.031s thr=3   tid=1424  Execute.globals_update START nomes=871
+[PERF] +    0.031s cpu=   0.031s thr=3   tid=1424  Execute.globals_update END dt=0.001s nomes=871
+[PERF] +    0.031s cpu=   0.031s thr=3   tid=1424  Execute.ActiveUIDocument START
+[PERF] +    0.031s cpu=   0.031s thr=3   tid=1424  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +    0.031s cpu=   0.031s thr=3   tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +    0.043s cpu=   0.031s thr=3   tid=1424  refresh_geometry_from_document END axes=2 dt=0.012s
+[PERF] +    0.043s cpu=   0.031s thr=3   tid=1424  _execute_analyze (disparo) START
+[PERF] +    0.044s cpu=   0.047s thr=3   tid=1424  _execute_analyze: criando thread de fundo
+[PERF] +    0.057s cpu=   0.047s thr=3   tid=21876 worker.thread ENTROU
+[PERF] +    0.058s cpu=   0.047s thr=4   tid=21876 analyze_created_walls_for_errors START nodes=3 walls=2
+[PERF] +    0.059s cpu=   0.047s thr=4   tid=1424  _execute_analyze: thread de fundo INICIADA
+[PERF] +    0.059s cpu=   0.047s thr=4   tid=21876 analyze.trecho: entrou no corpo
+[PERF] +    0.059s cpu=   0.047s thr=4   tid=1424  _execute_analyze (disparo) END dt=0.016s
+[PERF] +    0.059s cpu=   0.047s thr=4   tid=21876 analyze.trecho: passou do catalog_missing
+[PERF] +    0.059s cpu=   0.047s thr=4   tid=1424  Execute SAIU action=analyze pendente=None
+[PERF] +    0.060s cpu=   0.062s thr=4   tid=21876 analyze.trecho: plan_failures criado
+[PERF] +   19.648s cpu=   1.734s thr=4   tid=21876 analyze.trecho: plan_hook definido
+[PERF] +   19.648s cpu=   1.734s thr=4   tid=21876 process_walls_one_by_one START walls=2
+[PERF] +   19.649s cpu=   1.734s thr=4   tid=21876 solve_all_intersections START nodes=3
+[PERF] +   19.651s cpu=   1.734s thr=4   tid=21876 solve_all_intersections END dt=0.002s nodes=3
+[PERF] +   19.652s cpu=   1.734s thr=4   tid=21876 solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +   19.652s cpu=   1.734s thr=4   tid=21876 index_node_candidates START nodes=3
+[PERF] +   19.652s cpu=   1.734s thr=4   tid=21876 index_node_candidates END dt=0.000s nodes=3
+[PERF] +   19.653s cpu=   1.734s thr=4   tid=21876 order_walls_for_processing START walls=2
+[PERF] +   19.653s cpu=   1.734s thr=4   tid=21876 order_walls_for_processing END dt=0.000s walls=2
+[PERF] +   19.655s cpu=   1.750s thr=4   tid=21876 parede START idx=0 pos=1 total=2
+[PERF] +   19.660s cpu=   1.750s thr=4   tid=21876 parede START idx=1 pos=2 total=2
+[PERF] +   19.664s cpu=   1.750s thr=4   tid=21876 process_walls_one_by_one END dt=0.016s walls=2
+[PERF] +   19.664s cpu=   1.750s thr=4   tid=21876 analyze_created_walls_for_errors END dt=19.606s nodes=3 walls=2
+[PERF] +   19.665s cpu=   1.750s thr=4   tid=21876 worker.thread TERMINOU o trabalho marshaling=True
+[PERF] +   19.665s cpu=   1.750s thr=4   tid=21876 ui_invoke.BeginInvoke (da thread de fundo)
+[PERF] +   19.665s cpu=   1.750s thr=4   tid=21876 ui_invoke.BeginInvoke aceito
+[PERF] +   19.680s cpu=   1.750s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   19.682s cpu=   1.750s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   19.684s cpu=   1.750s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   19.685s cpu=   1.766s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   19.687s cpu=   1.766s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   19.688s cpu=   1.766s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   19.689s cpu=   1.766s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   19.690s cpu=   1.766s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   19.691s cpu=   1.766s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   19.693s cpu=   1.766s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   19.693s cpu=   1.766s thr=4   tid=1424  ui._finish (volta para a thread de UI)
+[PERF] +   19.694s cpu=   1.766s thr=4   tid=1424  ui._on_analyze_done kind=analyze
+[PERF] +   19.699s cpu=   1.766s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   19.711s cpu=   1.766s thr=4   tid=1424  console.log DoEvents END dt=0.012s
+[PERF] +   19.712s cpu=   1.766s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   19.713s cpu=   1.766s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   19.754s cpu=   1.812s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   19.758s cpu=   1.812s thr=4   tid=1424  console.set_status DoEvents END dt=0.004s
+[PERF] +   19.839s cpu=   1.875s thr=4   tid=1424  console.log DoEvents END dt=0.147s
+[PERF] +   19.840s cpu=   1.875s thr=4   tid=1424  console.set_progress DoEvents END dt=0.149s
+[PERF] +   19.840s cpu=   1.875s thr=4   tid=1424  console.set_status DoEvents END dt=0.151s
+[PERF] +   19.840s cpu=   1.875s thr=4   tid=1424  console.log DoEvents END dt=0.152s
+[PERF] +   19.840s cpu=   1.875s thr=4   tid=1424  console.set_progress DoEvents END dt=0.153s
+[PERF] +   19.841s cpu=   1.891s thr=4   tid=1424  console.log DoEvents END dt=0.155s
+[PERF] +   19.841s cpu=   1.891s thr=4   tid=1424  console.set_progress DoEvents END dt=0.157s
+[PERF] +   19.841s cpu=   1.891s thr=4   tid=1424  console.set_status DoEvents END dt=0.158s
+[PERF] +   19.841s cpu=   1.891s thr=4   tid=1424  console.log DoEvents END dt=0.159s
+[PERF] +   19.842s cpu=   1.891s thr=4   tid=1424  console.set_progress DoEvents END dt=0.162s
+[PERF] +   20.937s cpu=   2.203s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.938s cpu=   2.203s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   20.940s cpu=   2.203s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   20.941s cpu=   2.203s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   20.944s cpu=   2.203s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   20.945s cpu=   2.203s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   20.947s cpu=   2.203s thr=4   tid=1424  Execute ENTROU action=solve
+[PERF] +   20.948s cpu=   2.203s thr=4   tid=1424  Execute.globals_update START nomes=871
+[PERF] +   20.948s cpu=   2.203s thr=4   tid=1424  Execute.globals_update END dt=0.000s nomes=871
+[PERF] +   20.948s cpu=   2.203s thr=4   tid=1424  Execute.ActiveUIDocument START
+[PERF] +   20.948s cpu=   2.203s thr=4   tid=1424  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +   20.949s cpu=   2.203s thr=4   tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +   20.950s cpu=   2.203s thr=4   tid=1424  refresh_geometry_from_document END axes=2 dt=0.001s
+[PERF] +   20.950s cpu=   2.203s thr=4   tid=1424  _execute_solve START
+[PERF] +   20.952s cpu=   2.234s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.953s cpu=   2.234s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   20.954s cpu=   2.234s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   20.955s cpu=   2.234s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   20.955s cpu=   2.234s thr=4   tid=1424  solve_all_intersections START nodes=3
+[PERF] +   20.956s cpu=   2.234s thr=4   tid=1424  solve_all_intersections END dt=0.001s nodes=3
+[PERF] +   20.957s cpu=   2.234s thr=4   tid=1424  solve_all_intersections RESULTADO candidatos=2 falhas=0
+[PERF] +   20.957s cpu=   2.234s thr=4   tid=1424  index_node_candidates START nodes=3
+[PERF] +   20.957s cpu=   2.234s thr=4   tid=1424  index_node_candidates END dt=0.000s nodes=3
+[PERF] +   20.958s cpu=   2.234s thr=4   tid=1424  order_walls_for_processing START walls=2
+[PERF] +   20.958s cpu=   2.234s thr=4   tid=1424  order_walls_for_processing END dt=0.000s walls=2
+[PERF] +   20.961s cpu=   2.234s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.962s cpu=   2.234s thr=4   tid=1424  console.set_progress DoEvents END dt=0.001s
+[PERF] +   20.962s cpu=   2.234s thr=4   tid=1424  parede START idx=0 pos=1 total=2
+[PERF] +   20.963s cpu=   2.234s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.964s cpu=   2.234s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   20.966s cpu=   2.250s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   20.967s cpu=   2.250s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   20.969s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.969s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents END dt=0.000s
+[PERF] +   20.974s cpu=   2.250s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.974s cpu=   2.250s thr=4   tid=1424  console.log DoEvents END dt=0.000s
+[PERF] +   20.975s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.976s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents END dt=0.001s
+[PERF] +   20.977s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.978s cpu=   2.250s thr=4   tid=1424  console.set_progress DoEvents END dt=0.001s
+[PERF] +   20.978s cpu=   2.250s thr=4   tid=1424  parede START idx=1 pos=2 total=2
+[PERF] +   20.979s cpu=   2.250s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.979s cpu=   2.250s thr=4   tid=1424  console.log DoEvents END dt=0.000s
+[PERF] +   20.980s cpu=   2.250s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   20.981s cpu=   2.250s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   20.983s cpu=   2.266s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.984s cpu=   2.266s thr=4   tid=1424  console.set_progress DoEvents END dt=0.001s
+[PERF] +   20.987s cpu=   2.266s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.987s cpu=   2.266s thr=4   tid=1424  console.log DoEvents END dt=0.000s
+[PERF] +   20.988s cpu=   2.266s thr=4   tid=1424  console.set_progress DoEvents START
+[PERF] +   20.989s cpu=   2.266s thr=4   tid=1424  console.set_progress DoEvents END dt=0.001s
+[PERF] +   20.992s cpu=   2.266s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   20.992s cpu=   2.266s thr=4   tid=1424  console.log DoEvents END dt=0.000s
+[PERF] +   20.993s cpu=   2.266s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   20.994s cpu=   2.266s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   20.999s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.001s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.002s
+[PERF] +   21.004s cpu=   2.281s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.004s cpu=   2.281s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   21.005s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.006s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.007s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.008s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   21.030s cpu=   2.281s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.032s cpu=   2.281s thr=4   tid=1424  console.log DoEvents END dt=0.002s
+[PERF] +   21.033s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.034s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.035s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.036s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   21.037s cpu=   2.281s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.038s cpu=   2.281s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   21.039s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.040s cpu=   2.281s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.041s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.042s cpu=   2.281s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   21.063s cpu=   2.312s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.064s cpu=   2.312s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.073s cpu=   2.312s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.075s cpu=   2.328s thr=4   tid=1424  console.log DoEvents END dt=0.002s
+[PERF] +   21.077s cpu=   2.328s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.079s cpu=   2.328s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.081s cpu=   2.328s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.083s cpu=   2.328s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.002s
+[PERF] +   21.083s cpu=   2.328s thr=4   tid=1424  _execute_solve END dt=0.134s
+[PERF] +   21.084s cpu=   2.328s thr=4   tid=1424  Execute SAIU action=solve pendente=create
+[PERF] +   21.089s cpu=   2.328s thr=4   tid=1424  Execute ENTROU action=create
+[PERF] +   21.089s cpu=   2.328s thr=4   tid=1424  Execute.globals_update START nomes=871
+[PERF] +   21.089s cpu=   2.328s thr=4   tid=1424  Execute.globals_update END dt=0.000s nomes=871
+[PERF] +   21.090s cpu=   2.328s thr=4   tid=1424  Execute.ActiveUIDocument START
+[PERF] +   21.090s cpu=   2.328s thr=4   tid=1424  Execute.ActiveUIDocument END dt=0.000s
+[PERF] +   21.090s cpu=   2.328s thr=4   tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +   21.091s cpu=   2.344s thr=4   tid=1424  refresh_geometry_from_document END axes=2 dt=0.001s
+[PERF] +   21.092s cpu=   2.344s thr=4   tid=1424  _execute_create START esperados=187
+[PERF] +   21.092s cpu=   2.344s thr=4   tid=1424  create.entrou beta=True
+[PERF] +   21.092s cpu=   2.344s thr=4   tid=1424  create.preflight START
+[PERF] +   21.108s cpu=   2.359s thr=4   tid=1424  create.preflight END ok=True
+[PERF] +   21.128s cpu=   2.375s thr=4   tid=1424  create.TransactionGroup.Start START
+[PERF] +   21.152s cpu=   2.375s thr=4   tid=1424  create.TransactionGroup.Start END dt=0.025s
+[PERF] +   21.152s cpu=   2.375s thr=4   tid=1424  create.batch (beta) START
+[PERF] +   21.155s cpu=   2.391s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.157s cpu=   2.391s thr=4   tid=1424  console.log DoEvents END dt=0.003s
+[PERF] +   21.158s cpu=   2.391s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.159s cpu=   2.391s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.160s cpu=   2.391s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.161s cpu=   2.391s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   21.162s cpu=   2.391s thr=4   tid=1424  blocos.activate START codigos=3 fiadas=17 planejados=187
+[PERF] +   21.218s cpu=   2.391s thr=4   tid=1424  blocos.activate END dt=0.056s
+[PERF] +   21.218s cpu=   2.391s thr=4   tid=1424  blocos.Transaction.Start (criacao)
+[PERF] +   21.958s cpu=   2.812s thr=4   tid=1424  blocos.laco END chamadas_new=187 criados=187 dt=0.738s falhas=0
+[PERF] +   21.960s cpu=   2.812s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   21.962s cpu=   2.812s thr=4   tid=1424  console.log DoEvents END dt=0.002s
+[PERF] +   21.964s cpu=   2.812s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   21.965s cpu=   2.812s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   21.967s cpu=   2.828s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   21.968s cpu=   2.828s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   21.969s cpu=   2.828s thr=4   tid=1424  blocos.Commit START (o Revit regenera o modelo)
+[PERF] +   22.528s cpu=   3.125s thr=4   tid=1424  blocos.Commit END dt=0.560s
+[PERF] +   22.539s cpu=   3.125s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   22.703s cpu=   3.188s thr=4   tid=1424  console.log DoEvents END dt=0.164s
+[PERF] +   22.704s cpu=   3.188s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   22.707s cpu=   3.188s thr=4   tid=1424  console.set_status DoEvents END dt=0.003s
+[PERF] +   22.708s cpu=   3.188s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   22.709s cpu=   3.188s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   22.711s cpu=   3.188s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   22.711s cpu=   3.188s thr=4   tid=1424  console.log DoEvents END dt=0.000s
+[PERF] +   22.712s cpu=   3.188s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   22.713s cpu=   3.188s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   22.714s cpu=   3.188s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   22.715s cpu=   3.188s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   22.819s cpu=   3.219s thr=4   tid=1424  create.batch (beta) END dt=1.667s
+[PERF] +   22.823s cpu=   3.219s thr=4   tid=1424  create.TransactionGroup.Assimilate START
+[PERF] +   22.824s cpu=   3.219s thr=4   tid=1424  create.TransactionGroup.Assimilate END dt=0.001s
+[PERF] +   22.824s cpu=   3.219s thr=4   tid=1424  create.save_modulation_state_cache START
+[PERF] +   22.824s cpu=   3.219s thr=4   tid=1424  create.save_modulation_state_cache END dt=0.000s
+[PERF] +   22.825s cpu=   3.234s thr=4   tid=1424  create.RESULTADO criados=187 falhas=0 perf={'instances':187,'planned_total':187,'failed_count':0,'total_s':1.3767004999972414,'activate_s':0.055622200001380406,'loop_s':0.7382476999991923,'commit_s':0.560449199998402,'assimilate_s':0.0008163000020431355,'new_instance_s':0.30370290005521383,'new_instance_calls':187,'rotate_s':0.4269281000160845,'rotate_calls':34,'mirror_s':0.0,'mirror_calls':0,'aux_geometry_s':0.002236199965409469,'failed_s':0.0}
+[PERF] +   22.832s cpu=   3.234s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   22.867s cpu=   3.250s thr=4   tid=1424  console.log DoEvents END dt=0.035s
+[PERF] +   22.874s cpu=   3.266s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   22.876s cpu=   3.266s thr=4   tid=1424  console.set_status DoEvents END dt=0.002s
+[PERF] +   24.006s cpu=   3.312s thr=4   tid=1424  _execute_create END dt=2.914s esperados=187
+[PERF] +   24.006s cpu=   3.312s thr=4   tid=1424  Execute SAIU action=create pendente=None
+[PERF] +   25.637s cpu=   3.547s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   25.640s cpu=   3.594s thr=4   tid=1424  console.log DoEvents END dt=0.003s
+[PERF] +   25.641s cpu=   3.594s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   25.642s cpu=   3.594s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   25.644s cpu=   3.594s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   25.645s cpu=   3.594s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   25.648s cpu=   3.594s thr=4   tid=1424  Execute ENTROU action=create
+[PERF] +   25.648s cpu=   3.594s thr=4   tid=1424  Execute.globals_update START nomes=871
+[PERF] +   25.648s cpu=   3.594s thr=4   tid=1424  Execute.globals_update END dt=0.000s nomes=871
+[PERF] +   25.648s cpu=   3.594s thr=4   tid=1424  Execute.ActiveUIDocument START
+[PERF] +   25.649s cpu=   3.594s thr=4   tid=1424  Execute.ActiveUIDocument END dt=0.001s
+[PERF] +   25.649s cpu=   3.594s thr=4   tid=1424  refresh_geometry_from_document START axes=2
+[PERF] +   25.650s cpu=   3.594s thr=4   tid=1424  refresh_geometry_from_document END axes=2 dt=0.001s
+[PERF] +   25.651s cpu=   3.594s thr=4   tid=1424  _execute_create START esperados=187
+[PERF] +   25.651s cpu=   3.594s thr=4   tid=1424  create.entrou beta=True
+[PERF] +   25.651s cpu=   3.594s thr=4   tid=1424  create.preflight START
+[PERF] +   25.666s cpu=   3.609s thr=4   tid=1424  create.preflight END ok=True
+[PERF] +   25.667s cpu=   3.609s thr=4   tid=1424  create.TransactionGroup.Start START
+[PERF] +   25.667s cpu=   3.609s thr=4   tid=1424  create.TransactionGroup.Start END dt=0.000s
+[PERF] +   25.667s cpu=   3.609s thr=4   tid=1424  create.batch (beta) START
+[PERF] +   25.671s cpu=   3.625s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   25.672s cpu=   3.625s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   25.673s cpu=   3.625s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   25.674s cpu=   3.625s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   25.675s cpu=   3.625s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   25.676s cpu=   3.625s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   25.784s cpu=   3.688s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   25.800s cpu=   3.703s thr=4   tid=1424  console.log DoEvents END dt=0.015s
+[PERF] +   25.801s cpu=   3.703s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   25.802s cpu=   3.703s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   25.803s cpu=   3.703s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   25.805s cpu=   3.703s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.002s
+[PERF] +   25.806s cpu=   3.703s thr=4   tid=1424  blocos.activate START codigos=3 fiadas=17 planejados=187
+[PERF] +   25.807s cpu=   3.703s thr=4   tid=1424  blocos.activate END dt=0.002s
+[PERF] +   25.808s cpu=   3.703s thr=4   tid=1424  blocos.Transaction.Start (criacao)
+[PERF] +   26.131s cpu=   4.047s thr=4   tid=1424  blocos.laco END chamadas_new=187 criados=187 dt=0.323s falhas=0
+[PERF] +   26.136s cpu=   4.047s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   26.137s cpu=   4.047s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   26.139s cpu=   4.047s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   26.140s cpu=   4.047s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   26.141s cpu=   4.047s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   26.141s cpu=   4.047s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.000s
+[PERF] +   26.142s cpu=   4.047s thr=4   tid=1424  blocos.Commit START (o Revit regenera o modelo)
+[PERF] +   26.213s cpu=   4.094s thr=4   tid=1424  blocos.Commit END dt=0.071s
+[PERF] +   26.217s cpu=   4.109s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   26.269s cpu=   4.156s thr=4   tid=1424  console.log DoEvents END dt=0.053s
+[PERF] +   26.272s cpu=   4.156s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   26.273s cpu=   4.156s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   26.274s cpu=   4.156s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   26.275s cpu=   4.156s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   26.278s cpu=   4.172s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   26.278s cpu=   4.172s thr=4   tid=1424  console.log DoEvents END dt=0.001s
+[PERF] +   26.280s cpu=   4.172s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   26.281s cpu=   4.172s thr=4   tid=1424  console.set_status DoEvents END dt=0.001s
+[PERF] +   26.283s cpu=   4.172s thr=4   tid=1424  console.set_indeterminate DoEvents START
+[PERF] +   26.283s cpu=   4.172s thr=4   tid=1424  console.set_indeterminate DoEvents END dt=0.001s
+[PERF] +   26.301s cpu=   4.188s thr=4   tid=1424  create.batch (beta) END dt=0.634s
+[PERF] +   26.312s cpu=   4.250s thr=4   tid=1424  create.TransactionGroup.Assimilate START
+[PERF] +   26.314s cpu=   4.250s thr=4   tid=1424  create.TransactionGroup.Assimilate END dt=0.002s
+[PERF] +   26.314s cpu=   4.250s thr=4   tid=1424  create.save_modulation_state_cache START
+[PERF] +   26.314s cpu=   4.250s thr=4   tid=1424  create.save_modulation_state_cache END dt=0.000s
+[PERF] +   26.314s cpu=   4.250s thr=4   tid=1424  create.RESULTADO criados=187 falhas=0 perf={'instances':187,'planned_total':187,'failed_count':0,'total_s':0.43291100000351435,'activate_s':0.0017052999974112026,'loop_s':0.32286439999734284,'commit_s':0.07113030000618892,'assimilate_s':5.96999961999245e-05,'new_instance_s':0.08678220005094772,'new_instance_calls':187,'rotate_s':0.2292058999883011,'rotate_calls':34,'mirror_s':0.0,'mirror_calls':0,'aux_geometry_s':0.0011712999912560917,'failed_s':0.0}
+[PERF] +   26.322s cpu=   4.250s thr=4   tid=1424  console.log DoEvents START
+[PERF] +   26.355s cpu=   4.281s thr=4   tid=1424  console.log DoEvents END dt=0.033s
+[PERF] +   26.362s cpu=   4.297s thr=4   tid=1424  console.set_status DoEvents START
+[PERF] +   26.365s cpu=   4.297s thr=4   tid=1424  console.set_status DoEvents END dt=0.003s
+[PERF] +   28.222s cpu=   4.375s thr=4   tid=1424  _execute_create END dt=2.571s esperados=187
+[PERF] +   28.223s cpu=   4.375s thr=4   tid=1424  Execute SAIU action=create pendente=None

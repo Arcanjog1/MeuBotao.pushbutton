@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-09-09T17:36:21.299252+00:00",
+  "cwd": "C:\\Users\\CIVIX\\.codex\\worktrees\\beta-main-safe-20260909",
+  "head": "8cdd33f974f41a9bf41010a32f82762740b31ed3",
+  "tree": "d835bdbb5092ac7d472502525434126c730a17e6",
+  "status_before": "?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-package-build.json\n?? docs/checkpoints/evidence/main-safe-package-build.txt\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "command": [
+    "C:\\Users\\CIVIX\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-B",
+    "-c",
+    "from beta_package import verify_beta_package; print(verify_beta_package('C:/Users/CIVIX/.codex/artifacts/beta-main-safe-8cdd33f-20260909'))"
+  ],
+  "timeout_seconds": 30,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "main-safe-package-verify.txt",
+  "pid": 24036,
+  "exit_code": 0,
+  "elapsed_seconds": 0.312,
+  "status_after": "?? docs/checkpoints/evidence/main-safe-consolidated.json\n?? docs/checkpoints/evidence/main-safe-consolidated.txt\n?? docs/checkpoints/evidence/main-safe-package-build.json\n?? docs/checkpoints/evidence/main-safe-package-build.txt\n?? docs/checkpoints/evidence/main-safe-package-verify.json\n?? docs/checkpoints/evidence/main-safe-package-verify.txt\n?? docs/checkpoints/evidence/main-safe-region-final-scored.json\n?? docs/checkpoints/evidence/main-safe-region-final.json\n?? docs/checkpoints/evidence/main-safe-region-initial.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.json\n?? docs/checkpoints/evidence/main-safe-ui-boundary-run.txt\n?? docs/checkpoints/evidence/main-safe-ui-boundary.json",
+  "log_sha256": "ce65fd024864b3c1f7a7a1f475f42cde469bcbc4c3e37c3476c482a510ae50b7"
+}

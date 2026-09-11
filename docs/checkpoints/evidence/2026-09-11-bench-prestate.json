@@ -1,0 +1,17 @@
+{
+ "doc": "BUTANTA_BENCH_SCALE_AUTOFIX",
+ "path": "C:/Users/twitc/Desktop/CIVIX/BUTANTA_BENCH_SCALE_AUTOFIX.rvt",
+ "saved_from": "butanta testes (nunca salvo) - SaveAs em 2026-09-11",
+ "walls": 46,
+ "masonry34_present": 34,
+ "blocks_before_real_test": {
+  "total": 7257,
+  "B34": 1716,
+  "B54": 195,
+  "B39": 4269,
+  "C09": 492,
+  "B19": 288,
+  "C04": 297
+ },
+ "note": "lote anterior criado via _execute_create sob MCP (IronPython), pacote cf325f2; o teste real do botao (CPython) deve substitui-lo de forma idempotente"
+}
