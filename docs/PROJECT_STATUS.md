@@ -117,8 +117,8 @@ Criação custa 36,9 ms por instância (295 s) — gargalo real da Tela 2 em esc
 Gates em aberto: 5 paredes reprovadas pelo auditor (junta corrida na
 fronteira preenchimento|amarração — o projeto humano não produz nenhuma);
 reserva de canto por fiada; filtro de paredes não estruturais no CAD; um
-clique real no botão (CPython) com o pacote `91cc738` já instalado em
-`teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
+clique real no botão (CPython) com o pacote do HEAD final `cf325f2` já
+instalado em `teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
 Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055
 falhas — bissecção no TGD provou que a rede de rejeição em par causava
 `JUNCTION_MISSING_BINDING` 24→253 (desligada por padrão; sem ela o TGD vira
