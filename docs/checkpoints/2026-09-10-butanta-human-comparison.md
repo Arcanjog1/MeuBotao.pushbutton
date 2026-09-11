@@ -64,14 +64,60 @@
     "py -3 docs/checkpoints/evidence/_scripts/tnodes.py          (contexto dos nos T, 46 paredes)"
   ],
   "references": [
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-ref-1pav-blocks.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-test-walls.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-human-sequences.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-solver-vs-human.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-cad-fix.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-awall-axes.json"},
-    {"path": "docs/revit_reference_extraction/butanta-r08-lt/02_openings.json"},
-    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"}
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-ref-1pav-blocks.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-test-walls.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-human-sequences.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-solver-vs-human.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-cad-fix.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-awall-axes.json"
+    },
+    {
+      "path": "docs/revit_reference_extraction/butanta-r08-lt/02_openings.json"
+    },
+    {
+      "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"
+    }
+  ],
+  "head": "308554d06c90dfdef992be5705ae9b32076ce714",
+  "changes": [
+    "wall_modeling.py: _level_internal_elevation_ft (regra 8a.1, ProjectElevation) em 9 usos.",
+    "wall_stepper.py: _clip_range_by_midspan_neighbours (11.10 revisada: T sem espaco degrada para B34|B34); fileira de B34 antes de compensadores empilhados em _pier_ordered_layout (secao 2).",
+    "Doc de teste 'butanta testes': import '1 PAV' corrigido (fator de escala do tipo x10 + reposicao).",
+    "REGRAS: 8a.1, 11.10 revisada, correcao de implementacao na secao 2.",
+    "Evidencia e scripts em docs/checkpoints/evidence/."
+  ],
+  "tests": [
+    "tests/test_level_internal_elevation.py (3), tests/test_scale_autofix_rules.py (12, reescrito para a semantica com evidencia), tests/test_fill_prefers_b34_row_over_stacked_compensators.py (4): todos passando; focados 130 passed.",
+    "Paridade Revit x offline no solve das 34 paredes: 7.257 pecas nos dois, preflight ok, ifail 0, nmod 78, bond 5."
+  ],
+  "known_failures": [
+    "Solver ainda reprova 5 paredes de Butanta (9 juntas corridas na fronteira preenchimento|amarracao); humano 0.",
+    "3 nos T em parede de 99cm com canto nas duas pontas ainda saem C09|C09 (humano B34|B34) - reserva de canto por fiada pendente.",
+    "Criacao fisica dos 7.257 blocos disparada via _execute_create: MCP estourou timeout; estado registrado no checkpoint final."
+  ],
+  "physical_deltas": [
+    "Doc de teste: import 1 PAV reescalado/reposicionado; criacao de blocos em andamento no momento deste checkpoint (ver checkpoint final)."
+  ],
+  "decisions_taken": [
+    "Projeto humano prevalece sobre as respostas rapidas do usuario (instrucao explicita dele).",
+    "Nao mudar o auditor: ele concorda com o humano; corrigir o gerador."
+  ],
+  "decisions_pending": [
+    "Reserva de canto por fiada; filtro de paredes nao estruturais no fluxo CAD->Walls; B19 no trecho curto (inconclusivo); 11.11 nao testada pelo humano."
+  ],
+  "next_steps": [
+    "Checkpoint final com a regressao consolidada e o resultado fisico da criacao."
   ]
 }
 ```

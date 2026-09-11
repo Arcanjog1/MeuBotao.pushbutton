@@ -480,7 +480,14 @@ class _StubElementTransformUtils(object):
         self.calls.append(("rotate", element_id, axis, angle_radians))
 
     def MirrorElement(self, document, element_id, plane):
-        self.calls.append(("mirror", element_id, plane))
+        # API real: CRIA UMA COPIA espelhada e deixa o original (ver regra 12.1).
+        self.calls.append(("mirror_copy", element_id, plane))
+
+    def MirrorElements(self, document, element_ids, plane, mirror_copies):
+        # API real: mirror_copies=False espelha NO LUGAR e devolve lista vazia.
+        ids = list(element_ids)
+        self.calls.append(("mirror", ids[0] if len(ids) == 1 else ids, plane, mirror_copies))
+        return []
 
     def MoveElement(self, document, element_id, translation):
         self.calls.append(("move", element_id, translation))

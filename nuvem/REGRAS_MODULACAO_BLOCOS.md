@@ -1610,6 +1610,24 @@ esteja invertido".
   peça, passando pelo ponto de inserção) — o mesmo padrão já usado para
   `rotation_deg`/`RotateElement`.
 
+### 12.1 — Bug real corrigido: o espelhamento duplicava a peça (2026-09-10)
+
+A orientação do compensador (regra #3 acima) era aplicada com
+`ElementTransformUtils.MirrorElement(doc, id, plane)`, que **cria uma cópia
+espelhada e deixa o original no lugar** (RevitAPIDocs, `MirrorElement`).
+Resultado, medido ao vivo em BUTANTÃ R08_LT (1º PAV, 44 aberturas): 54
+compensadores/pastilhas orientados ficaram **duplicados** — o original, com a
+orientação errada, rastreado em `created_instances`; a cópia, com a orientação
+certa, órfã. A órfã sobrevivia à substituição do lote na recriação
+(quebra da idempotência da seção 13.4) e formava dois sólidos no mesmo ponto.
+Nunca apareceu nas bancadas anteriores porque só há espelhamento quando há
+abertura para orientar o compensador.
+
+**Fix:** `ElementTransformUtils.MirrorElements(doc, [id], plane, mirrorCopies=False)`
+espelha a própria instância no lugar (RevitAPIDocs, `MirrorElements`). O
+dublê de testes ganhou `MirrorElements` com a mesma semântica; teste em
+`tests/test_beta_atomic_creation.py` (uma instância por candidato espelhado).
+
 ## 13. Pipeline integrado e relatório final (itens 4–7 do pedido do usuário, 2026-08-25)
 
 > Pedido explícito: "análise, correção, modulação e validação funcionem

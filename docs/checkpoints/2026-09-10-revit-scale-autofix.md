@@ -98,11 +98,52 @@
     "py -3 tests/scale_bench.py --axes docs/checkpoints/evidence/2026-09-10-scale-autofix-axes.json --seed-key \"1910.7,-797.7->2250.7,-797.7@14.0cm\" --ladder 2,5,10,20,30,50,75,100,150,0 --no-stop   # matriz completa"
   ],
   "references": [
-    {"path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-prestate.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-axes.json"},
-    {"path": "tests/scale_bench.py"},
-    {"path": "docs/checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md"},
-    {"path": "nuvem/core/wall_modeling.py"}
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-prestate.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-axes.json"
+    },
+    {
+      "path": "tests/scale_bench.py"
+    },
+    {
+      "path": "docs/checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md"
+    },
+    {
+      "path": "nuvem/core/wall_modeling.py"
+    }
+  ],
+  "head": "090822cb9b89414f144ee7a5396b322f12e73594",
+  "changes": [
+    "tests/scale_bench.py: escada de escala offline (CPython 3, dubles) sobre eixos REAIS exportados do Revit; subsets por conexidade e chave fisica.",
+    "wall_stepper.py: _reject_overlapping_node_ties (regra 11.10 original: amarracao que nao cabe fica sem modular); depois REVISADA - ver checkpoint 2026-09-10-butanta-human-comparison.",
+    "wall_modeling.py: criterio de boneca absorvida em _drop_fill_colliding_with_ties (regra 11.11).",
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secoes 11.10 e 11.11.",
+    "Evidencia: prestate.json, axes.json (179 eixos), ladder/diff em _scripts."
+  ],
+  "tests": [
+    "tests/test_scale_autofix_rules.py: 11 passed (controle da bancada em L, 11.10, 11.11, permutacao, translacao).",
+    "Focados: preflight + bond_strip + atomic_creation + C04: 114 passed.",
+    "Prova causal na planta inteira da Torre: com as duas regras 0 colisoes; sem 11.10 = 7; sem 11.11 = 42; sem as duas = 49."
+  ],
+  "known_failures": [
+    "Regressao consolidada iniciada nesta rodada foi ENCERRADA por mim antes do fim (testava o motor carregado antes dos fixes seguintes); a consolidada valida e' a do checkpoint final.",
+    "Defeito 1 (junta corrida na fronteira preenchimento|amarracao): 22 paredes da Torre reprovadas; decisao do usuario 'manter reprovando'; sem fix nesta rodada.",
+    "main() sob IronPython (harness MCP) para em wall_modeling.py:15570 - limite do harness, nao atribuido a producao."
+  ],
+  "physical_deltas": [
+    "Nenhum bloco criado no Revit nesta rodada. Limpeza autorizada: 2 Walls + 154 blocos do lote anterior apagados do TESTE MODULACAO (pre-estado em evidence/prestate.json)."
+  ],
+  "decisions_taken": [
+    "Ladder offline em CPython (semantica de `/`) em vez de IronPython no MCP.",
+    "Escada por conexidade a partir da bancada; parar no primeiro FAIL e minimizar (delta debugging)."
+  ],
+  "decisions_pending": [
+    "Ver checkpoint 2026-09-10-butanta-human-comparison (regras candidatas)."
+  ],
+  "next_steps": [
+    "Comparacao com projeto humano BUTANTA - feita no checkpoint seguinte."
   ]
 }
 ```

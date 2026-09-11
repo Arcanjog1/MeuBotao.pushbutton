@@ -5017,7 +5017,21 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             mirror_plane = Plane.CreateByNormalAndOrigin(cand["x_dir"], point)
                             t_geometry = clock()
                             perf["aux_geometry_s"] += t_geometry - t_mark
-                            ElementTransformUtils.MirrorElement(target_doc, instance.Id, mirror_plane)
+                            # MirrorElements(..., mirrorCopies=False) espelha a
+                            # propria instancia NO LUGAR. MirrorElement(doc, id,
+                            # plane) - usado ate' 2026-09-10 - CRIA UMA COPIA
+                            # espelhada e deixa o original intacto (RevitAPIDocs,
+                            # ElementTransformUtils.MirrorElement): medido em
+                            # BUTANTA R08_LT, 54 compensadores/pastilhas
+                            # orientados pela regra #3 ficaram DUPLICADOS - o
+                            # original (orientacao errada) rastreado em
+                            # created_instances e a copia (certa) orfa, que
+                            # sobrevivia a' troca de lote e quebrava a
+                            # idempotencia. Nunca apareceu nas bancadas sem
+                            # abertura porque so' ha' espelhamento com abertura.
+                            _mirror_ids = List[ElementId]()
+                            _mirror_ids.Add(instance.Id)
+                            ElementTransformUtils.MirrorElements(target_doc, _mirror_ids, mirror_plane, False)
                             t_mark = clock()
                             perf["mirror_s"] += t_mark - t_geometry
                             perf["mirror_calls"] += 1
