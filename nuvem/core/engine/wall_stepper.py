@@ -657,6 +657,14 @@ def _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, wall_idx, exclu
         # residuo < 20cm nunca destravariam a ponta oposta). Comportamento
         # default (sem marca) e' byte-a-byte identico ao anterior a esta CR.
         node = nodes[node_index] if node_index < len(nodes) else None
+        if node is not None and node.get("kind") in ("FREE_END", "STRAIGHT_CONTINUATION"):
+            # PONTA LIVRE / CONTINUACAO RETA: nada para encostar - mesma regra
+            # que _wall_end_default_start_cm ja' aplica (reserva 0). Antes o
+            # `max(..., CORNER_B34_ROOM_FT)` abaixo reservava 34cm aqui tambem:
+            # um T a 42cm de uma ponta livre media 8cm de espaco em vez de 42 e
+            # degradava para compensador nas duas fiadas (medido em BUTANTA,
+            # paredes de 99cm, 2026-09-11 - o humano poe B34 na principal).
+            continue
         if node is not None and wall_idx in (node.get("_b19_residual_fill_for_walls") or ()):
             reserve_ft = max(_cm_to_ft(reserve_cm), length_ft - CORNER_B34_ROOM_FT)
         else:

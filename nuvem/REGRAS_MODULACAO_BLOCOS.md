@@ -1638,12 +1638,37 @@ os mesmos nós. `tie_parity_search=True/False` liga/desliga por chamada.
 | BUTANTÃ 34 paredes, vãos reais | 12 reprovadas (9 juntas + 7 faixas), 1.263 comp. | **4** reprovadas (7 juntas), 1.043 comp., 13 flips / 29 tentativas | 2,9 s → **106 s** (CPython) |
 | Torre 179 eixos | 22 reprovadas | **15** | 5,5 s → 28 s |
 
-As 4 que sobram em BUTANTÃ (`8079818` na ponta livre e as três de 99 cm) são
-outra família (reserva de canto por fiada). Custo é o motivo do default
-False: cada tentativa é uma re-resolução completa (~7× mais lenta no
+**Benchmarks oficiais** (`_scripts/bench_parity.py`, TGD e TP1 contra os
+baselines salvos): resultado **idêntico** com a flag ligada e desligada —
+neutra. As 4 que sobram em BUTANTÃ (`8079818` na ponta livre e as três de
+99 cm) são outra família (ver 11.13). Custo é o motivo do default False: cada tentativa é uma re-resolução completa (~7× mais lenta no
 IronPython do Revit). Nenhuma regra física nova; nenhum limiar alterado.
 Testes: `tests/test_tie_parity_local_search.py` (mecânica, determinismo,
 reversão de flip inútil, e integração sobre a parede de 494 cm real).
+
+### 11.13 — BUG REAL corrigido: ponta livre reservava 34 cm de amarração (2026-09-11)
+
+`_wall_reserved_range_ft` (`wall_stepper.py`) aplicava `max(reserva,
+CORNER_B34_ROOM_FT)` a TODA ponta com nó — inclusive `FREE_END` e
+`STRAIGHT_CONTINUATION`, para as quais `_wall_end_default_start_cm` já
+devolve 0 ("nada para encostar"). Efeito medido nas três paredes de 99 cm de
+BUTANTÃ (canto em t=0, T em t=57, ponta livre em t=99): o teste de espaço do
+T via `room_plus = 8 cm` em vez de 42, não cabia nem a degradação para L, e o
+nó caía em **um C09 nas duas fiadas** — junta corrida em 14 fiadas. O humano
+põe B34 na principal.
+
+**Fix:** ponta livre / continuação reta não reserva nada (mesma regra que o
+preenchimento comum já usa). Nenhuma tolerância nova; nenhuma regra física.
+Teste: `tests/test_free_end_reserve.py`.
+
+**Medido (regra #2 intacta):**
+
+| Planta | antes | depois | depois + Etapa 7 (11.12) |
+|---|---|---|---|
+| BUTANTÃ 34 paredes, vãos reais | 12 reprovadas | **11** | **3** (só as de 99 cm, que atravessam pilar — geometria de entrada) |
+| Torre 179 eixos | 22 reprovadas, 4 `intersection_failures` | **21**, **0** | **8**, 0 |
+| TGD (benchmark) | críticos ≤ baseline; `compensators` 52→55 | idem, 52→54, `COVERAGE_WALL_NOT_MODULATED` 29→28 | **MELHORIA**: `POSITION_OVERLAP` 29→23, `PRISM_CONTINUOUS_JOINT` 961→262, sem regressão de categoria |
+| TP1 (benchmark) | históricas (JUNCTION 8→9, comp. 74→78) | idem, sem crítica nova | ver checkpoint |
 
 ## 12. Orientação dos compensadores (regra #3, 2026-08-25)
 

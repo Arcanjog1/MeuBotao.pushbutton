@@ -163,7 +163,7 @@ Maiores faltas: as paredes de 99/115 cm (`8079859`, `8079866`), cluster de pared
 
 - `8079838` (499 cm, T + canto): solver c0 `B34 B54[399,455] C09 C09 C09` e c1 `B34[384,420] C09 C09 C09 B34[464,500]` — **três compensadores seguidos** nas duas paridades (a própria seção 2 proíbe). Humano c0 `B54[399,455] C09[454,465] B34[464,500]`, c1 `B34[384,420] · C09[434,445] B39[444,485]`. Diferença: o humano faz esta parede **atravessar o canto na mesma fiada em que ela recebe o B54** do T; o solver escolheu a paridade do canto ao contrário, e o resto entre o B54 e o canto (30 cm) só fecha com 3×C09. Causa: a paridade dos cantos (`_coordinate_arm_role_nodes`) não é coordenada com as amarrações em T da mesma parede.
 - `8079818` (1039 cm): solver termina com `B39[999,1040]` nas DUAS paridades no nó da ponta; humano termina em `B34[964,1000]` (c0) e preenchimento até 985 (c1), deixando 38–53 cm para a parede perpendicular — a junta em 999,5 existe em todas as 14 fiadas só no solver.
-- Paredes de 99 cm: amarração em todos os lados (canto, canto e T) sem espaço para peça inteira — reserva de canto por fiada (pendente).
+- Paredes de 99 cm (`8079861/62/63`, peças humanas cruas por fiada): a alvenaria humana ocupa só t∈[0,65]; em t∈[65,99] **não há bloco em nenhuma fiada** — é pilar de concreto (layer `Estrutura`); a parede arquitetônica do layer `Paredes` atravessa o pilar. Logo as "falhas grossas" de cobertura das 7 paredes curtas (e a sobra `B39[999,1040]` em `8079818`) são **geometria de entrada**, não solver: o fluxo CAD→Walls precisa parar as paredes nos pilares. No T (t≈57) o humano degrada para L: fiada 0 `C04 C09 B34[30,64]` na principal, fiada 1 `B34[0,34] C04 C09` + B34 da que chega. **Reserva de canto por fiada** foi TENTADA e REVERTIDA (2026-09-11): sozinha não muda Butantã (12 → 12 reprovadas) e, combinada com a busca de paridade, produz 7 colisões de preflight — a previsão de qual parede hospeda o B34 do canto em cada fiada não bate com `solve_l_corner`, que troca papéis dinamicamente quando falta espaço. Sem fonte segura para essa previsão, não entra.
 
 Regra candidata (evidência humana, não implementada): **a paridade de um canto em L deve ser escolhida junto com as amarrações em T da mesma parede, de modo que o trecho entre a amarração e o canto feche com peça inteira/B34, nunca com compensadores empilhados.**
 
@@ -187,3 +187,27 @@ reparos. Medições (`_scripts/measure_parity.py`):
 Benchmarks TGD/TP1 (`_scripts/bench_parity.py`): em execução no fechamento
 deste adendo — resultado no commit seguinte. Regras: seção 11.12.
 Testes: `tests/test_tie_parity_local_search.py` (4).
+
+
+## Adendo 2026-09-11 (final) — 11.13 ponta livre + números finais
+
+BUG REAL: `_wall_reserved_range_ft` reservava 34 cm numa ponta LIVRE (o `max` com
+`CORNER_B34_ROOM_FT` ignorava o 0 de `_wall_end_default_start_cm`). Era a causa
+de os T das paredes de 99 cm caírem em C09|C09 e de 4 `intersection_failures`
+da Torre. Fix mínimo (ponta livre/continuação reta não reserva), regra 11.13,
+`tests/test_free_end_reserve.py`. Reserva de canto por FIADA foi tentada e
+revertida (7 colisões com a busca de paridade; previsão de papel do canto não
+bate com `solve_l_corner`).
+
+| Medição | HEAD anterior | + 11.13 | + 11.13 + Etapa 7 |
+|---|---|---|---|
+| BUTANTÃ 34 (vãos reais) reprovadas | 12 | 11 | **3** |
+| BUTANTÃ compensadores | 1.263 | 1.256 | 1.036 |
+| Torre 179 reprovadas / ifail | 22 / 4 | 21 / **0** | **8** / 0 |
+| TGD | REGRESSAO (comp. 52→55) | REGRESSAO (52→54) | **MELHORIA** (sem regressão) |
+| TP1 | históricas | históricas, sem crítica nova | `_scripts/bench_parity.py`, log `bench_freeend` |
+
+Custo da Etapa 7: 93 s (Butantã) / 15 s (Torre) em CPython. Default continua
+False (decisão de custo, não de regra): ligar é recomendado para plantas grandes.
+Testes focados após tudo: 69 passed. Regressão consolidada relançada no HEAD
+`2405969` nesta sessão: só as 2 históricas até 20%.
