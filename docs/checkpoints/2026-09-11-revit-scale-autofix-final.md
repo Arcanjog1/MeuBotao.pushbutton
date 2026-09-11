@@ -5,14 +5,14 @@
   "date": "2026-09-11",
   "scope": "current",
   "branch": "claude/revit-scale-autofix",
-  "head": "91cc73833c188ca618c86e59cade4f62e6b0a125",
+  "head": "09ce2a7672ecc892bd0110d226502e4aae9f7a91",
   "base": "41086e43b6b56102ce736b816debad04749fa4bf",
   "main_observada": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
   "pr": "not-created",
-  "veredito": "PARTIAL SCALE PASS — LIMITE CONHECIDO E EXPLICADO. Planta inteira passa o gate de criação; 7.257 blocos criados e recriados no Revit sem duplicata; restam 5 paredes reprovadas pelo auditor (junta corrida na fronteira preenchimento|amarração), que o projeto humano não produz.",
+  "veredito": "PARTIAL SCALE PASS — LIMITE CONHECIDO E EXPLICADO. Planta inteira passa o gate de criação; 7.257 blocos criados e recriados no Revit sem duplicata; benchmark TGD melhora com a configuração final; restam 5 (flag humana) / 12 (default da regra #2) paredes reprovadas pelo auditor em Butantã e uma decisão normativa pendente (fileira de B34).",
   "objective": "Recriar o cenário de escala a partir da bancada de 2 paredes, achar a primeira diferença que faz o fluxo falhar, corrigir com prova, e — a pedido do usuário — validar/derrubar cada regra contra o projeto humano pronto BUTANTÃ R08_LT e extrair regras novas.",
   "changes": [
-    "wall_stepper.py: _reject_overlapping_node_ties (rede de segurança: nunca dois sólidos no mesmo espaço); _clip_range_by_midspan_neighbours (T sem espaço degrada para B34|B34 — regra 11.10 revisada pela evidência humana); fileira de B34 antes de compensadores empilhados em _pier_ordered_layout (bug contra a seção 2 das regras).",
+    "wall_stepper.py: _clip_range_by_midspan_neighbours (T sem espaço degrada para B34|B34 — 11.10 revisada; reserva no vizinho = meio B54); _reject_overlapping_node_ties mantida mas DESLIGADA por padrão (REJECT_OVERLAPPING_NODE_TIES=False — regressão crítica no TGD); fileira de B34 antes de compensadores empilhados atrás de PREFER_B34_ROW_OVER_STACKED_COMPENSATORS, DEFAULT False (regra #2 documentada; decisão do usuário pendente).",
     "wall_modeling.py: boneca absorvida em _drop_fill_colliding_with_ties (11.11); _level_internal_elevation_ft = ProjectElevation em 9 usos (8a.1); MirrorElements(..., mirrorCopies=False) no lugar de MirrorElement (12.1).",
     "tests/revit_stubs.py: MirrorElements com a semântica real. Testes novos: test_scale_autofix_rules (12), test_level_internal_elevation (3), test_fill_prefers_b34_row_over_stacked_compensators (4), test_mirror_in_place (2); tests/scale_bench.py (escada de escala offline sobre eixos reais).",
     "REGRAS_MODULACAO_BLOCOS.md: 8a.1, 11.10 (+revisão), 11.11, 12.1, correção de implementação na seção 2.",
@@ -20,19 +20,22 @@
     "Evidência em docs/checkpoints/evidence/ (Torre: prestate/axes; Butantã: blocos humanos, walls, sequências, diff, CAD, eixos A-WALL) e _scripts/ reprodutíveis."
   ],
   "tests": [
-    "Focados no HEAD: test_scale_autofix_rules + test_level_internal_elevation + test_fill_prefers_b34_row_over_stacked_compensators + test_mirror_in_place + test_beta_atomic_creation + test_controlled_beta_preflight + test_bond_strip_adjacent_courses + test_block_fit_tolerance_c04 + test_block_bonding: todos passando (52 + 130 nas duas últimas rodadas).",
-    "Prova causal na planta inteira da Torre (179 eixos): com as regras 0 colisões de preflight; sem 11.10 = 7; sem 11.11 = 42; sem as duas = 49.",
-    "Paridade Revit × offline: motor da branch carregado no Revit (IronPython) resolve as 34 paredes de Butantã com 7.257 peças, preflight ok, ifail 0, nmod 78, bond 5 — idêntico ao CPython offline.",
-    "Regressão consolidada (raiz, pytest -q) sobre a árvore final: EM EXECUÇÃO no momento deste checkpoint; resultado registrado na seção 'Regressão consolidada' abaixo quando terminar. As 2 falhas históricas de test_benchmark_baselines (TGD compensators 52→61, TP1 binding 8→9) já apareceram nas mesmas posições."
+    "Focados no HEAD final: test_scale_autofix_rules (12) + test_fill_prefers_b34_row_over_stacked_compensators (5, flag explícita) + test_mirror_in_place (2) + test_level_internal_elevation (4) + test_beta_atomic_creation + test_controlled_beta_preflight + test_block_node_fill_revalidation + test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo + união de paredes (29): todos passando.",
+    "REGRESSÃO CONSOLIDADA 1 (árvore com rede ligada e fileira de B34 ligada): 20 failed / 1055 passed em 2h21. Diagnóstico por grupo: 13 união de paredes (ProjectElevation aceitava objeto inerte do dublê — corrigido, só número vale); 2 guardas de fonte (artefato: editei wall_modeling.py durante a suíte; passam em processo limpo); 4 (regra #2 + controles node_fill) causados pela fileira de B34 — flag desligada por padrão; 1 TGD crítica (JUNCTION_MISSING_BINDING 24→253) causada pela rede de rejeição — desligada.",
+    "BISSECÇÃO TGD (runner.run_project, 6 configurações): HEAD crítica 253; sem clip 253; SEM REDE → MELHORIA (23, PRISM_CONTINUOUS_JOINT 961→324, POSITION_OVERLAP 29→24, OPENING_BLOCK_INSIDE_DOOR 45→5); sem fileira B34 253 (indiferente); sem boneca 253; tudo desligado = falha histórica (compensators 52→61).",
+    "Prova causal na Torre (179 eixos): com as regras 0 colisões de preflight; sem 11.10 = 7; sem 11.11 = 42; sem as duas = 49.",
+    "Paridade Revit × offline: motor da branch no Revit (IronPython) resolve as 34 paredes de Butantã com 7.257 peças, preflight ok, ifail 0, nmod 78, bond 5 — idêntico ao CPython offline.",
+    "Baseline TGD/TP1 e REGRESSÃO CONSOLIDADA 2 com a configuração final: ver seção 'Regressão consolidada' abaixo."
   ],
   "known_failures": [
-    "Butantã, 34 paredes, mesmo auditor e mesmas aberturas: solver reprova 5 paredes (9 juntas corridas, todas na fronteira preenchimento|amarração); humano reprova 2 (3× B19 residual, exceção já prevista). O usuário decidiu manter reprovando; o trabalho restante é no layout do gerador perto dos nós.",
+    "Butantã, 34 paredes, mesmo auditor e mesmas aberturas: com PREFER_B34_ROW_OVER_STACKED_COMPENSATORS=True (comportamento humano) o solver reprova 5 paredes (9 juntas corridas na fronteira preenchimento|amarração); com o DEFAULT False (regra #2 documentada) reprova 12 (as mesmas 5 + 7 faixas de compensador nas paredes de 494 cm, que o humano fecha com 3×B34). Humano: 2 (3× B19 residual, exceção prevista).",
     "3 nós T em parede de 99 cm com canto nas duas pontas saem C09|C09 (humano B34|B34): reserva de canto por fiada pendente.",
     "Torre, planta inteira: 21 paredes reprovadas (defeito 1) e 260 trechos não modulares (material da Etapa 3B, não exercitada).",
     "Performance de CRIAÇÃO: 36,9 ms por NewFamilyInstance no doc de Butantã (146 mil elementos) — 7.257 peças = 295 s; estoura o timeout HTTP do MCP, e no botão real aparecerá como Tela 2 longa. Solve: 18–21 s.",
     "main() sob IronPython (harness MCP) parava em wall_modeling.py:15570 no TESTE MODULAÇÃO — limite do harness, não atribuído a produção; não reproduzido em Butantã porque a Etapa 1 lá foi 'paredes existentes'.",
     "Trecho curto ponta-livre→T (defeito 1 pela evidência humana): inconclusivo — as pontas medidas são pilares de concreto, não alvenaria.",
-    "11.11 (boneca absorvida) não é testada pelo humano (caso não ocorre no pavimento)."
+    "11.11 (boneca absorvida) não é testada pelo humano (caso não ocorre no pavimento).",
+    "Falhas históricas do benchmark preservadas: torre_easy_lo_r00_tgd compensators 52→61 e torre_easy_lo_r00_tp1 JUNCTION_MISSING_BINDING 8→9 (idênticas às de 8cdd33f); nenhum baseline regravado."
   ],
   "physical_deltas": [
     "TESTE MODULAÇÃO (Torre): 2 Walls + 154 blocos do lote anterior apagados com autorização (pré-estado em evidence/prestate.json). Nenhuma parede recriada lá (harness).",
@@ -40,18 +43,18 @@
     "Documento de teste NÃO salvo (IsModified=True) — decisão do usuário."
   ],
   "decisions_taken": [
-    "Projeto humano prevalece sobre respostas rápidas (instrução do usuário): 11.10 revisada (degradar antes de deixar sem modular).",
+    "Projeto humano prevalece sobre as respostas rápidas (instrução do usuário): 11.10 revisada (degradar antes de deixar sem modular).",
+    "Rede de rejeição em par DESLIGADA por padrão: benchmark TGD prova que ela destrói amarrações legítimas; o gate duro de colisão do preflight permanece.",
+    "Fileira de B34 (evidência humana) mantida atrás de flag com DEFAULT na regra #2 documentada: trocar regra documentada do usuário sem o usuário presente não é decisão do agente — registrada como pendente com as duas medições.",
     "Auditor não foi tocado: ele concorda com o humano (0 juntas corridas humanas com vãos reais).",
-    "Escada de escala em CPython (semântica de '/') e criação física pelo caminho real dentro do Revit.",
-    "Bug de API (MirrorElement) corrigido como implementação, não como regra.",
     "Nenhum baseline/reference/threshold alterado; nenhum skip/xfail; nenhum merge na main."
   ],
   "decisions_pending": [
-    "Reserva de canto por fiada (parede curta com canto nas duas pontas).",
+    "PREFER_B34_ROW_OVER_STACKED_COMPENSATORS: ligar (projeto humano; 494 cm = 9×B39 + 3×B34; TGD indiferente) ou manter a regra #2 (teto de 1 peça especial por trecho; 494 cm = 11×B39 + C09 C09 C04, que a própria seção 2 proíbe). As duas regras documentadas conflitam nesse comprimento.",
+    "Reserva de canto por fiada (parede curta com canto nas duas pontas — 3 nós T de 99 cm em Butantã saem C09|C09; humano B34|B34).",
     "Filtro de paredes não estruturais no fluxo CAD→Walls (12/46 do layer 'Paredes' não são alvenaria).",
-    "Salvar ou descartar o doc 'butanta testes' com os 7.257 blocos e o CAD corrigido.",
-    "Deploy do pacote beta com o HEAD desta branch no botão teste-perf (hoje em 712f221).",
-    "PR e merge: decisão do usuário."
+    "Salvar ou descartar o doc 'butanta testes' (7.257 blocos + CAD corrigido, não salvo).",
+    "Pacote beta com o HEAD final instalado em teste-perf.pushbutton: um clique real (CPython) nas 34 paredes; PR e merge."
   ],
   "next_steps": [
     "Defeito 1 no gerador: escalonar o preenchimento contra a amarração (o humano usa corridas de B34 para mudar a fase).",
@@ -60,13 +63,27 @@
     "Estender a comparação humana aos demais pavimentos (2º é matriz dos clones) e ao TORRE EASY."
   ],
   "references": [
-    {"path": "docs/checkpoints/2026-09-10-revit-scale-autofix.md"},
-    {"path": "docs/checkpoints/2026-09-10-butanta-human-comparison.md"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-ref-1pav-blocks.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-butanta-solver-vs-human.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-axes.json"},
-    {"path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"},
-    {"path": "tests/scale_bench.py"}
+    {
+      "path": "docs/checkpoints/2026-09-10-revit-scale-autofix.md"
+    },
+    {
+      "path": "docs/checkpoints/2026-09-10-butanta-human-comparison.md"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-ref-1pav-blocks.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-butanta-solver-vs-human.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-10-scale-autofix-axes.json"
+    },
+    {
+      "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"
+    },
+    {
+      "path": "tests/scale_bench.py"
+    }
   ]
 }
 ```
@@ -85,10 +102,10 @@
 
 | Métrica | Humano | Solver antes | Solver depois |
 |---|---|---|---|
-| Paredes reprovadas pelo auditor do repo | 2 | 12 | **5** |
-| Faixas de compensador | 0 | 7 | **0** |
-| B34 / C09 (fiadas 0..12) | 1615 / 242 | 846 / 739 | **1557 / 467** |
-| Parede de 494 cm | B34 + 9×B39 + B34 B34 | 11×B39 + C09 C09 C04 | 9×B39 + 3×B34 |
+| Paredes reprovadas pelo auditor do repo | 2 | 12 | **5** com a fileira de B34 ligada / 12 no default (regra #2) |
+| Faixas de compensador | 0 | 7 | **0** (flag ligada) / 7 (default) |
+| B34 / C09 (fiadas 0..12) | 1615 / 242 | 846 / 739 | **1557 / 467** (flag ligada) / 846 / 739 (default) |
+| Parede de 494 cm | B34 + 9×B39 + B34 B34 | 11×B39 + C09 C09 C04 | 9×B39 + 3×B34 (flag ligada) / igual ao antes (default) |
 | Nós T com espaço | B54\|B34 (30/34) | igual | igual |
 | Nós L | B34\|B34 (13/13) | igual | igual |
 

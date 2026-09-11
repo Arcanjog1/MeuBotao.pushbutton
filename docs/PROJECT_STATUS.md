@@ -119,7 +119,12 @@ fronteira preenchimento|amarração — o projeto humano não produz nenhuma);
 reserva de canto por fiada; filtro de paredes não estruturais no CAD; um
 clique real no botão (CPython) com o pacote `91cc738` já instalado em
 `teste-perf.pushbutton` (backup do `712f221` em `C:/BetaRevit`).
-Regressão consolidada: ver seção "Regressão consolidada" do checkpoint final.
+Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055
+falhas — bissecção no TGD provou que a rede de rejeição em par causava
+`JUNCTION_MISSING_BINDING` 24→253 (desligada por padrão; sem ela o TGD vira
+MELHORIA) e que a fileira de B34 contraria a regra #2 documentada (atrás de
+flag, default na regra; decisão pendente). Resultado da regressão 2 e dos
+baselines com a configuração final: checkpoint final.
 
 ## Beta 1 - CANDIDATO, validacao Revit PENDENTE
 

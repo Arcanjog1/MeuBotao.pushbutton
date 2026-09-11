@@ -109,9 +109,20 @@ o humano põe `B34 + 9×B39 + B34 B34`. Corridas de 2 a 6 B34 são rotina no
 projeto pronto (1.615 B34 contra 242 C09).
 
 **Implementação:** em `_pier_ordered_layout` a fileira de B34 acima do teto
-passa a vir logo depois do tier 5 (≤ 1 compensador) e antes do meio-bloco
-forçado e de qualquer fallback com mais de um compensador. Um único
-compensador dentro do teto continua preferido (246 cm = 6×B39 + C04).
+pode vir logo depois do tier 5 (≤ 1 compensador) e antes do meio-bloco
+forçado e de qualquer fallback com mais de um compensador — atrás da flag
+`PREFER_B34_ROW_OVER_STACKED_COMPENSATORS`. **DEFAULT `False` (2026-09-11):**
+esse comportamento é o do projeto humano e o benchmark TGD é indiferente a
+ele (números idênticos com True/False), mas ele **contraria a regra #2
+documentada** ("peça especial não vira enchimento", teto
+`MAX_SPECIAL_BOND_PER_TRECHO = 1` na geração desde 2026-08-28) e os testes que
+a codificam (`test_peca_de_amarracao_nao_vira_enchimento_em_trecho_longo`,
+controles de `test_block_node_fill_revalidation`). Trocar o default é
+**decisão normativa do usuário** — registrada como pendente. Com `False`,
+o trecho de 494 cm volta a fechar com `11×B39 + C09 C09 C04` (o que a seção
+2 proíbe e o auditor reprova como faixa) — as duas regras documentadas
+conflitam nesse comprimento; o humano resolve a favor da fileira de B34. Um
+único compensador dentro do teto continua preferido (246 cm = 6×B39 + C04).
 Efeito medido: Butantã, 34 paredes com aberturas reais, reprovações do solver
 12 → 5 (as 7 faixas de compensador desaparecem), B34 846 → 1.557 (humano
 1.615), C09 739 → 467; a bancada de 340 cm da Torre fecha com 11 peças por
@@ -1519,9 +1530,15 @@ Portanto a ordem passa a ser:
    meio da principal, então dois T próximos nunca se viam;
 2. com isso `_t_intersection_room_ok` devolve False e o T **degrada sozinho**
    para B34|B34, para o lado que tem espaço;
-3. **só se nem degradado couber**, `_reject_overlapping_node_ties` (rede de
-   segurança) deixa o par sem modular e reportado. Nunca dois sólidos no
-   mesmo espaço.
+3. o que ainda interpenetrar é barrado pelo **gate duro de colisão do
+   preflight** (`BETA BLOQUEADO`). A rede `_reject_overlapping_node_ties`
+   (deixar o par sem modular) existe, mas fica **DESLIGADA por padrão**
+   (`REJECT_OVERLAPPING_NODE_TIES = False`) desde 2026-09-11: no benchmark
+   TORRE EASY TGD ela derrubava 229 amarrações legítimas
+   (`JUNCTION_MISSING_BINDING` 24 → 253, regressão crítica); só desligando-a o
+   TGD vira MELHORIA (23). A reserva no nó vizinho é de **meio B54**
+   (`T_INTERSECTION_B54_HALF_ROOM_FT`), não só a meia espessura genérica —
+   senão dois T a 40 cm ainda "cabiam" e os B54 se interpenetravam.
 
 Caso mínimo da Torre [21,19,44]: antes 2 nós "não cabe"; agora PASS com os
 dois T degradados. Testes: `test_11_10_amarracoes_que_nao_cabem_degradam_
