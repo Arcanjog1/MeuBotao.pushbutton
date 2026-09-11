@@ -3128,7 +3128,22 @@ def _is_tie_candidate(candidate):
     return any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
 
 
-def _drop_fill_colliding_with_ties(course_pieces):
+def _wall_length_cm_for_absorption(walls_to_create, wall_idx):
+    """Comprimento (cm) do eixo de `wall_idx`, ou None se nao der para ler.
+
+    Usado so' pelo criterio de absorcao de boneca - nunca decide fisica por
+    si, so' diz QUAL das duas paredes e' a mais curta."""
+    try:
+        line = walls_to_create[wall_idx][0]
+    except Exception:
+        return None
+    try:
+        return line.Length / FEET_PER_METER * 100.0
+    except Exception:
+        return None
+
+
+def _drop_fill_colliding_with_ties(course_pieces, walls_to_create=None):
     """REGRA 18.7 + prioridade #1 do usuario (2026-08-28): "nunca sacrificar
     uma amarracao correta apenas para preencher um espaco". Recebe as pecas
     de UMA FIADA FISICA (o conjunto que vira FamilyInstance) e devolve
@@ -3147,9 +3162,23 @@ def _drop_fill_colliding_with_ties(course_pieces):
       criterio para eleger um vencedor sem quebrar a outra amarracao - o
       par continua sendo reportado como colisao para revisao manual, e a
       causa e' geometrica (dois nos a menos de 54cm um do outro);
-    - preenchimento x preenchimento: nao deveria existir (sao trechos
-      disjuntos) e, se existir, e' sintoma de outro bug - some-lo
-      silenciosamente esconderia o problema.
+    - preenchimento x preenchimento DA MESMA PAREDE: nao deveria existir
+      (sao trechos disjuntos) e, se existir, e' sintoma de outro bug -
+      some-lo silenciosamente esconderia o problema.
+
+    BONECA ABSORVIDA (regra do usuario, 2026-09-10, secao 11.11 de
+    REGRAS_MODULACAO_BLOCOS.md): preenchimento x preenchimento de PAREDES
+    DIFERENTES passa a ter vencedor - a parede MAIS LONGA manda na faixa, e a
+    peca da mais curta (a boneca que atravessa o corpo dela) e' descartada.
+    Ate' esta regra existir nao havia criterio para eleger um vencedor e o par
+    ficava so' reportado; e' o que produzia, na planta de teste, 42 das 49
+    colisoes do preflight - uma boneca de 21cm pondo um B19 dentro de uma
+    parede de 642cm (invasao de 13,0cm) e uma de 24cm invadindo 9,0cm.
+    Empate de comprimento (ou comprimento ilegivel) continua SEM vencedor e
+    segue sendo reportado, nunca descartado no escuro.
+
+    `walls_to_create` ausente (chamador antigo/teste) desliga so' esse
+    criterio novo - todo o resto do comportamento fica identico.
 
     Usa `validate_same_course_collision` (OBB/SAT), nunca bounding box -
     ver o cuidado de metodo registrado na secao 18.7."""
@@ -3167,7 +3196,16 @@ def _drop_fill_colliding_with_ties(course_pieces):
             remover.add(j)
         elif b_tie and not a_tie:
             remover.add(i)
-        # os dois tie, ou os dois fill: mantidos (ver docstring)
+        elif not a_tie and not b_tie and walls_to_create is not None:
+            wall_a, wall_b = a.get("wall_idx"), b.get("wall_idx")
+            if wall_a is None or wall_b is None or wall_a == wall_b:
+                continue  # mesma parede: sintoma de outro bug, continua visivel
+            len_a = _wall_length_cm_for_absorption(walls_to_create, wall_a)
+            len_b = _wall_length_cm_for_absorption(walls_to_create, wall_b)
+            if len_a is None or len_b is None or abs(len_a - len_b) <= 1e-6:
+                continue  # sem criterio: continua reportado
+            remover.add(i if len_a < len_b else j)
+        # os dois tie: mantidos (ver docstring)
     if not remover:
         return course_pieces, []
     mantidas = [c for k, c in enumerate(course_pieces) if k not in remover]
@@ -3319,7 +3357,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
             # create_building_blocks transforma em FamilyInstance - e nao
             # sobre `candidates` agregado (que mistura variantes que nunca
             # coexistem, ver secao 17.1).
-            fiada, descartados = _drop_fill_colliding_with_ties(fiada)
+            fiada, descartados = _drop_fill_colliding_with_ties(fiada, walls_to_create)
             dropped_by_course[course_index] = descartados
             course_candidates[course_index] = fiada
             # CR-G12: publica as juntas DESTA fiada fisica (geometria final,

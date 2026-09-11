@@ -1420,6 +1420,78 @@ regra #1 exige.
   na medição ao vivo (44 mil → 73 mil) e quase dobrou as paredes reprovadas
   na auditoria de amarração (62 → 116).
 
+### 11.10 — REGRA DO USUÁRIO: amarração que não cabe fica SEM MODULAR (2026-09-10)
+
+**Decisão do usuário, 2026-09-10.** Quando as peças de amarração de dois
+encontros vizinhos **não cabem lado a lado**, o trecho fica **sem modular**.
+Não se inventa amarração alternativa, não se troca por peça menor e não se
+elege um "nó vencedor": os **dois** nós vão para `intersection_failures` e
+**nenhuma peça deles é lançada**.
+
+Caso medido que originou a regra (planta de teste, 2026-09-10): dois
+`T_INTERSECTION` sobre a **mesma** parede a **27 cm** um do outro, cada um
+lançando o seu `B54` (que mede **54 cm**) — as peças ocupavam `[311, 365]` e
+`[338, 392]` do mesmo eixo, dois sólidos no mesmo espaço, em cada uma das 7
+fiadas de mesma paridade.
+
+**Implementação:** `_reject_overlapping_node_ties`, chamada por
+`solve_all_intersections` (`nuvem/core/engine/wall_stepper.py`). O teste é
+**geométrico** — OBB real das peças emitidas, a mesma função que a detecção de
+colisão usa (`_obb_min_overlap` contra `BOND_COLLISION_EPS_FT`) — nunca uma
+distância fixa em centímetros. Assim vale para qualquer par de códigos do
+catálogo e para L/T/X, e não precisa mudar se o catálogo mudar. Só compara
+candidatos da **mesma fiada lógica** (A com A, B com B), porque A e B nunca
+coexistem na mesma fiada física.
+
+**Por que rejeitar no nó e não deixar para o preflight:**
+`controlled_beta_preflight` é um gate de **lote** — uma única colisão levanta
+`BETA BLOQUEADO` e a planta **inteira** deixa de ser criada. Rejeitando nó a
+nó, o resto da planta continua modulando e o caso aparece em
+`intersection_failures`, o canal que a Tela 2 já reporta parede a parede.
+Isto **não** silencia nada: um nó rejeitado nunca é descartado em silêncio.
+
+Este caso já estava descrito como pendência na docstring de
+`_drop_fill_colliding_with_ties` ("os dois tie: não há critério para eleger um
+vencedor sem quebrar a outra amarração"); a decisão do usuário é justamente o
+critério que faltava — **não modular**.
+
+### 11.11 — REGRA DO USUÁRIO: boneca que atravessa parede é ABSORVIDA (2026-09-10)
+
+**Decisão do usuário, 2026-09-10.** Uma **boneca** que cruza o corpo de outra
+parede **não recebe bloco nenhum dentro da faixa física da parede
+atravessada**. Quem manda na faixa é a parede **mais longa**; a mais curta só é
+modulada no que sobra de cada lado — e, **se o que sobra não comportar nem o
+menor bloco, aquele lado simplesmente fica sem peça**.
+
+Caso medido que originou a regra (planta de teste, 2026-09-10): uma boneca de
+**21 cm** cruzando uma parede de **642 cm** colocava um `B19` dentro do corpo
+dela (invasão de **13,0 cm**); outra de **24 cm** invadia **9,0 cm** com `B19`
+e **4,0 cm** com `C04`. Eram **42 das 49** colisões do preflight da planta
+inteira. Esses cruzamentos nem viravam encontro: o grafo os classificava como
+`STRAIGHT_CONTINUATION` sem `main_wall_idx`/`incoming_wall_idx`, então nenhum
+indexador de nó reservava a faixa para ninguém.
+
+**Implementação:** o critério entra em `_drop_fill_colliding_with_ties`
+(`nuvem/core/wall_modeling.py`), que já era o lugar onde a regra 18.7 decide
+quem sobrevive a uma colisão dentro de uma fiada física. Preenchimento ×
+preenchimento de **paredes diferentes** passa a ter vencedor: descarta-se a
+peça da parede **mais curta**. Empate de comprimento (ou comprimento
+ilegível) continua **sem** vencedor e segue sendo **reportado**, nunca
+descartado no escuro. Preenchimento × preenchimento da **mesma** parede também
+continua reportado — ali a sobreposição é sintoma de outro defeito e escondê-la
+mascararia o problema.
+
+**Tentativa descartada, registrada para não ser repetida:** reservar a faixa
+antecipadamente em `_index_node_candidates_midspan` (como se fosse um encontro
+de meio de parede) **não funciona**. Geometricamente, "boneca atravessando" e
+"encontro legítimo" são iguais, porque `extend_wall_ends_to_junctions` estica a
+ponta da parede que chega até a face **oposta** da outra — num canto em L o
+eixo da parede curta também cruza a faixa da longa, e também no interior do
+próprio vão. Medido: reservar por esse caminho reprovou a **própria bancada de
+2 paredes** (o L virou 2 trechos não modulares) e **triplicou** as colisões da
+planta (42 → 126, agora em compensadores). O critério correto é decidir
+**depois** da colisão, com a peça já posicionada.
+
 ## 12. Orientação dos compensadores (regra #3, 2026-08-25)
 
 > **Status**: IMPLEMENTADO (sessão 2026-08-25), com uma premissa física

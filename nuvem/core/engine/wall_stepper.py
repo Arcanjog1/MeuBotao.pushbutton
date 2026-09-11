@@ -1829,7 +1829,7 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     de `_coordinate_arm_role_nodes`) - quase sempre vazio; nao impede a
     modulacao, so' relata a excecao estrutural."""
     role_conflicts = _coordinate_arm_role_nodes(nodes)
-    candidates = []
+    solved = []          # (node_index, course_a, course_b)
     failures = []
     for node_index, node in enumerate(nodes):
         kind = node.get("kind")
@@ -1850,9 +1850,69 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
         if not result["ok"]:
             failures.append((node_index, result["reason"]))
             continue
-        candidates.append(result["course_a"])
-        candidates.append(result["course_b"])
+        solved.append((node_index, result["course_a"], result["course_b"]))
+
+    rejected = _reject_overlapping_node_ties(solved, failures)
+    candidates = []
+    for node_index, course_a, course_b in solved:
+        if node_index in rejected:
+            continue
+        candidates.append(course_a)
+        candidates.append(course_b)
     return {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts}
+
+
+# REGRA DO USUARIO (2026-09-10, secao 11.10 de REGRAS_MODULACAO_BLOCOS.md):
+# quando as pecas de amarracao de DOIS nos vizinhos nao cabem lado a lado -
+# tipicamente dois encontros na MESMA parede mais proximos que o comprimento
+# da peca de amarracao (medido ao vivo: dois T a 27cm com B54 de 54cm, cada
+# no' lancando o seu, ocupando [311,365] e [338,392] do mesmo eixo) - o caso
+# fica SEM MODULAR. Nao se inventa amarracao alternativa nem se escolhe um
+# "no' vencedor": os dois nos vao para `failures` e nenhuma peca deles e'
+# lancada.
+#
+# Por que aqui e nao no preflight: `controlled_beta_preflight` e' um gate de
+# LOTE - uma unica colisao levanta "BETA BLOQUEADO" e a planta INTEIRA deixa
+# de ser criada. Rejeitando no' a no', o resto da planta continua modulando e
+# o caso aparece em `intersection_failures`, o canal que a Tela 2 ja' reporta
+# parede a parede (nunca descartado em silencio - ver a docstring de
+# solve_all_intersections).
+#
+# O teste e' GEOMETRICO (OBB real das pecas emitidas, mesma funcao que a
+# deteccao de colisao usa), nunca uma distancia fixa em cm: assim vale para
+# qualquer par de codigos do catalogo e para L/T/X, e nao precisa mudar se o
+# catalogo mudar. So' compara candidatos da MESMA fiada logica (A com A,
+# B com B) - A e B nunca coexistem na mesma fiada fisica.
+def _reject_overlapping_node_ties(solved, failures):
+    """Indices dos nos cujas pecas de amarracao se interpenetram. Acrescenta
+    o motivo em `failures` (in place) e devolve o conjunto rejeitado."""
+    rejected = set()
+    by_course = {}
+    for node_index, course_a, course_b in solved:
+        for candidate in (course_a, course_b):
+            if candidate is None:
+                continue
+            by_course.setdefault(candidate.get("course"), []).append((node_index, candidate))
+    for _course, entries in sorted(by_course.items()):
+        for i in range(len(entries)):
+            node_i, cand_i = entries[i]
+            for j in range(i + 1, len(entries)):
+                node_j, cand_j = entries[j]
+                if node_i == node_j:
+                    continue
+                if _obb_min_overlap(_candidate_obb(cand_i),
+                                    _candidate_obb(cand_j)) <= BOND_COLLISION_EPS_FT:
+                    continue
+                for node_index, other in ((node_i, node_j), (node_j, node_i)):
+                    if node_index in rejected:
+                        continue
+                    rejected.add(node_index)
+                    failures.append((
+                        node_index,
+                        "Amarracao nao cabe: a peca deste encontro interpenetra a do "
+                        "encontro vizinho (no' {}). Trecho deixado SEM MODULAR.".format(other),
+                    ))
+    return rejected
 
 
 # ---- validacao geometrica dos encontros (secoes 10/11/12/19) ------------
@@ -4853,6 +4913,7 @@ def _index_node_candidates_midspan(nodes, intersection_candidates, walls_to_crea
                 by_wall_course.setdefault((wall_idx, course), []).append(
                     (node_t_cm - reservation_cm, node_t_cm + reservation_cm)
                 )
+
     return by_wall_course
 
 
