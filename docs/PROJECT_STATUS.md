@@ -126,8 +126,10 @@ filtro por layer de referência estrutural (seção 49, opcional na Tela de
 Configuração); seleção corrente de Walls no fluxo "paredes existentes";
 bancada salva como `BUTANTA_BENCH_SCALE_AUTOFIX.rvt`. Butantã 12→4
 reprovadas (só tocos do CAD + defeito 1), Torre 21→12, TGD sem regressão,
-TP1 só a histórica. Pendentes: teste real no botão CPython, regressão
-consolidada final, PR. Ver `docs/checkpoints/2026-09-11-fechamento-decisoes-aprovadas.md`.
+TP1 só a histórica. Teste real no botão CPython (HEAD `198a639`): 16/16 gates, 8.399 blocos
+criados e recriados idempotentes (~6,5 min; 33–39 ms por instância); o
+travamento 1 (lote anterior não substituído entre sessões) virou a seção 50
+(lote persistente por carimbo). Pendentes: regressão consolidada final, PR. Ver `docs/checkpoints/2026-09-11-fechamento-decisoes-aprovadas.md`.
 Regressão consolidada 3 no HEAD final `cf325f2`: 2 failed / 1043 passed (só as
 falhas históricas do benchmark: TGD compensators 52→55, TP1 JUNCTION 8→9).
 Regressão consolidada 1 (rede de rejeição e fileira de B34 ligadas): 20/1055
