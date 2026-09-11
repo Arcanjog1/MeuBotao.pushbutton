@@ -13366,6 +13366,30 @@ def _select_existing_walls_for_modulation():
     # status do PickObjects abaixo tambem existe, mas e' pequena e facil de
     # nao notar; este alerta modal garante que ninguem comeca a selecao sem
     # saber o que fazer.
+    # 2026-09-11 (infraestrutura, teste real do botao): se o usuario JA' tem
+    # Walls selecionadas ao clicar no botao, oferece usa-las direto - o mesmo
+    # que qualquer ferramenta do Revit faz com a selecao corrente. Quem
+    # responde "Nao" cai no PickObjects de sempre. Nada e' assumido: sem
+    # Wall na selecao o fluxo e' identico ao anterior.
+    preselected_walls = []
+    try:
+        for element_id in uidoc.Selection.GetElementIds():
+            element = doc.GetElement(element_id)
+            if isinstance(element, Wall):
+                preselected_walls.append(element)
+    except Exception:
+        preselected_walls = []
+    if preselected_walls:
+        use_selection = forms.alert(
+            "Ha' {} parede(s) ja' selecionada(s) no modelo.\n\nUsar essas "
+            "paredes na modulacao? (Nao = selecionar de novo no modelo)".format(
+                len(preselected_walls)),
+            title="Modulacao Automatica - Etapa 1: Selecao das paredes",
+            yes=True, no=True
+        )
+        if use_selection:
+            return _build_existing_walls_selection(preselected_walls)
+
     forms.alert(
         "Selecione no modelo as paredes existentes que deseja modular e "
         "clique em 'Concluir' na barra de opcoes do Revit (ou Esc para "
