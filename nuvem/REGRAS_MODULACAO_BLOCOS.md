@@ -1536,9 +1536,18 @@ Portanto a ordem passa a ser:
    (`REJECT_OVERLAPPING_NODE_TIES = False`) desde 2026-09-11: no benchmark
    TORRE EASY TGD ela derrubava 229 amarrações legítimas
    (`JUNCTION_MISSING_BINDING` 24 → 253, regressão crítica); só desligando-a o
-   TGD vira MELHORIA (23). A reserva no nó vizinho é de **meio B54**
-   (`T_INTERSECTION_B54_HALF_ROOM_FT`), não só a meia espessura genérica —
-   senão dois T a 40 cm ainda "cabiam" e os B54 se interpenetravam.
+   TGD vira MELHORIA (23). A reserva no nó vizinho é a **genérica de meio
+   de vão** (meia espessura da parede que atravessa,
+   `_node_default_reservation_cm`). Reservar meio B54 ali foi tentado e
+   **revertido em 2026-09-11** pela bissecção no benchmark TORRE EASY TP1:
+   a reserva maior degradava mais T para L e, perto de porta, a degradação
+   punha **7 blocos dentro do vão** (`OPENING_BLOCK_INSIDE_DOOR` 0 → 7,
+   regressão crítica). **Limite conhecido, registrado em teste**
+   (`test_11_10_limite_conhecido_dois_T_entre_34_e_54cm_ficam_no_gate_do_
+   preflight`): dois T entre 34 e 54 cm ainda "cabem" para o teste de espaço
+   e os B54 se interpenetram — o par é barrado pelo gate de colisão do
+   preflight, nunca passa em silêncio. Resolver exige que a degradação para
+   L respeite o vão de porta antes de aumentar a reserva.
 
 Caso mínimo da Torre [21,19,44]: antes 2 nós "não cabe"; agora PASS com os
 dois T degradados. Testes: `test_11_10_amarracoes_que_nao_cabem_degradam_

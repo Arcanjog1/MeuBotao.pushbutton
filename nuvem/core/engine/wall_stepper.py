@@ -1184,12 +1184,16 @@ def _clip_range_by_midspan_neighbours(walls_to_create, nodes, wall_idx, t_ft, sa
         if wall_idx not in _midspan_node_wall_ids(other):
             continue
         t_other = _t_of_point_on_wall(walls_to_create, wall_idx, other["point"])
-        # O vizinho tambem vai centrar a SUA peca de amarracao no proprio no':
-        # a reserva dele e' no minimo meio B54 (T_INTERSECTION_B54_HALF_ROOM_FT),
-        # nunca so' a meia espessura generica - senao dois T a 40cm ainda
-        # "cabiam" (40 - 7 = 33 >= 27) e os dois B54 se interpenetravam.
-        reserve_ft = max(_cm_to_ft(_node_default_reservation_cm(walls_to_create, other)),
-                         T_INTERSECTION_B54_HALF_ROOM_FT)
+        # Reserva GENERICA de meio de vao (meia espessura da parede que
+        # atravessa). Reservar meio B54 aqui seria o correto para dois T a
+        # 34-54cm (com meia espessura eles ainda "cabem" e os B54 se
+        # interpenetram - o preflight barra), mas foi medido no benchmark
+        # TORRE EASY TP1 (bissecao 2026-09-11): a reserva maior faz mais T
+        # degradarem para L e a degradacao perto de porta poe 7 blocos
+        # DENTRO do vao (OPENING_BLOCK_INSIDE_DOOR 0 -> 7, regressao critica).
+        # Ate' a degradacao respeitar o vao, fica a reserva generica; o par
+        # a 34-54cm continua barrado pelo gate de colisao do preflight.
+        reserve_ft = _cm_to_ft(_node_default_reservation_cm(walls_to_create, other))
         if t_other > t_ft + 1e-6:
             hi_ft = min(hi_ft, t_other - reserve_ft)
         elif t_other < t_ft - 1e-6:
