@@ -1,0 +1,709 @@
+========================================================================
+BENCHMARK: torre_easy_lo_r00_tgd  (solver)
+========================================================================
+paredes: 145 | blocos: 16463
+
+CATEGORIA            PASS   FAIL     TAXA  ACHADOS (n1/n2)
+------------------------------------------------------------------------
+block_positions       131     14    90.3%  140 (140/0)
+compensators           84     61    57.9%  1355 (1298/57)
+junctions             144      1    99.3%  16 (16/0)
+openings              137      8    94.5%  236 (115/121)
+prism                 122     23    84.1%  1133 (466/667)
+wall_coverage          75     70    51.7%  1545 (1545/0)
+------------------------------------------------------------------------
+TAXA DE SUCESSO (paredes sem erro obrigatorio): 23.4%  #######.....................
+achados: 4425 total | 3580 obrigatorios (nivel 1) | 845 preferencia (nivel 2)
+
+!! ERROS CRITICOS: 911 - o benchmark REPROVA, independente da taxa acima
+   PRISM_CONTINUOUS_JOINT             437
+   COVERAGE_MISSING_ROW               142
+   POSITION_OVERLAP                   140
+   OPENING_BLOCK_CROSSES_JAMB         96
+   COVERAGE_ROW_MOSTLY_EMPTY          86
+   COVERAGE_WALL_NOT_MODULATED        10
+
+ACHADOS DE NIVEL 1 (obrigatorios)
+
+[COVERAGE_GAP_IN_ROW] trecho sem blocos numa fiada, fora de qualquer abertura  (1275 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.8
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 0, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 0, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 0, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 1, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 1, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 2, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 2, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 2, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 3, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 3, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 4, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 4, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 4, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 5, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 5, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 6, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 6, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 6, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 7, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 7, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 8, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=553.4..559.1cm na fiada 8, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 8, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=1218.4..1224.1cm na fiada 8, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 8, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 9, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=573.4..579.1cm na fiada 9, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 9, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=1238.4..1244.1cm na fiada 9, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 10, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=553.4..559.1cm na fiada 10, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 10, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=1218.4..1224.1cm na fiada 10, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 14.4cm em t=1513.1..1527.5cm na fiada 10, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 169.1cm em t=0.0..169.1cm na fiada 11, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=573.4..579.1cm na fiada 11, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 234.0cm em t=593.1..827.1cm na fiada 11, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 5.8cm em t=1238.4..1244.1cm na fiada 11, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 149.1cm em t=0.0..149.1cm na fiada 12, fora de abertura e fora de zona de amarracao
+    - W001: vazio de 194.0cm em t=613.1..807.1cm na fiada 12, fora de abertura e fora de zona de amarracao
+    ... e mais 1235
+
+[COMPENSATOR_CONSECUTIVE] dois ou mais compensadores encostados na mesma fiada  (676 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 2 (regra dos compensadores)
+    - W001: C09 e C04 encostados na fiada 8 (t=1204.4cm e 1214.4cm)
+    - W001: C09 e C04 encostados na fiada 10 (t=1204.4cm e 1214.4cm)
+    - W002: C09 e C04 encostados na fiada 8 (t=1204.4cm e 1214.4cm)
+    - W002: C09 e C04 encostados na fiada 10 (t=1204.4cm e 1214.4cm)
+    - W015: C09 e C09 encostados na fiada 0 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 0 (t=345.0cm e 355.0cm)
+    - W015: C09 e C09 encostados na fiada 2 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 2 (t=345.0cm e 355.0cm)
+    - W015: C09 e C09 encostados na fiada 4 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 4 (t=345.0cm e 355.0cm)
+    - W015: C09 e C04 encostados na fiada 5 (t=110.0cm e 120.0cm)
+    - W015: C09 e C04 encostados na fiada 5 (t=255.0cm e 265.0cm)
+    - W015: C09 e C09 encostados na fiada 6 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 6 (t=345.0cm e 355.0cm)
+    - W015: C09 e C04 encostados na fiada 7 (t=110.0cm e 120.0cm)
+    - W015: C09 e C04 encostados na fiada 7 (t=255.0cm e 265.0cm)
+    - W015: C09 e C09 encostados na fiada 8 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 8 (t=345.0cm e 355.0cm)
+    - W015: C09 e C04 encostados na fiada 9 (t=110.0cm e 120.0cm)
+    - W015: C09 e C04 encostados na fiada 9 (t=255.0cm e 265.0cm)
+    - W015: C09 e C09 encostados na fiada 10 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 10 (t=345.0cm e 355.0cm)
+    - W015: C09 e C04 encostados na fiada 11 (t=110.0cm e 120.0cm)
+    - W015: C09 e C04 encostados na fiada 11 (t=255.0cm e 265.0cm)
+    - W015: C09 e C09 encostados na fiada 12 (t=335.0cm e 345.0cm)
+    - W015: C09 e C09 encostados na fiada 12 (t=345.0cm e 355.0cm)
+    - W018: C09 e C04 encostados na fiada 0 (t=265.2cm e 275.2cm)
+    - W018: C09 e C04 encostados na fiada 0 (t=550.2cm e 560.2cm)
+    - W018: C04 e C09 encostados na fiada 1 (t=265.2cm e 270.2cm)
+    - W018: C09 e C04 encostados na fiada 2 (t=265.2cm e 275.2cm)
+    - W018: C09 e C04 encostados na fiada 2 (t=550.2cm e 560.2cm)
+    - W018: C04 e C09 encostados na fiada 3 (t=265.2cm e 270.2cm)
+    - W018: C09 e C04 encostados na fiada 4 (t=265.2cm e 275.2cm)
+    - W018: C09 e C04 encostados na fiada 4 (t=550.2cm e 560.2cm)
+    - W018: C04 e C09 encostados na fiada 5 (t=265.2cm e 270.2cm)
+    - W018: C09 e C04 encostados na fiada 6 (t=265.2cm e 275.2cm)
+    - W018: C09 e C04 encostados na fiada 6 (t=550.2cm e 560.2cm)
+    - W018: C04 e C09 encostados na fiada 7 (t=265.2cm e 270.2cm)
+    - W018: C09 e C04 encostados na fiada 8 (t=265.2cm e 275.2cm)
+    - W018: C09 e C04 encostados na fiada 8 (t=550.2cm e 560.2cm)
+    ... e mais 636
+
+[COMPENSATOR_EXCESS_IN_RUN] compensadores acima do teto permitido no trecho  (528 ocorrencia(s), nivel 1, major)
+    regra: MAX_COMPENSATORS_PER_TRECHO (core/engine/wall_stepper.py)
+    - W001: 2 compensadores no trecho t=1204.4..1218.4cm da fiada 8 (teto 1)
+    - W001: 2 compensadores no trecho t=1204.4..1218.4cm da fiada 10 (teto 1)
+    - W002: 2 compensadores no trecho t=1204.4..1218.4cm da fiada 8 (teto 1)
+    - W002: 2 compensadores no trecho t=1204.4..1218.4cm da fiada 10 (teto 1)
+    - W015: 3 compensadores no trecho t=15.0..399.0cm da fiada 0 (teto 1)
+    - W015: 3 compensadores no trecho t=15.0..399.0cm da fiada 2 (teto 1)
+    - W015: 3 compensadores no trecho t=15.0..399.0cm da fiada 4 (teto 1)
+    - W015: 2 compensadores no trecho t=0.0..124.0cm da fiada 5 (teto 1)
+    - W015: 2 compensadores no trecho t=255.0..384.0cm da fiada 5 (teto 1)
+    - W015: 3 compensadores no trecho t=255.0..399.0cm da fiada 6 (teto 1)
+    - W015: 2 compensadores no trecho t=0.0..124.0cm da fiada 7 (teto 1)
+    - W015: 2 compensadores no trecho t=255.0..384.0cm da fiada 7 (teto 1)
+    - W015: 3 compensadores no trecho t=255.0..399.0cm da fiada 8 (teto 1)
+    - W015: 2 compensadores no trecho t=0.0..124.0cm da fiada 9 (teto 1)
+    - W015: 2 compensadores no trecho t=255.0..384.0cm da fiada 9 (teto 1)
+    - W015: 3 compensadores no trecho t=255.0..399.0cm da fiada 10 (teto 1)
+    - W015: 2 compensadores no trecho t=0.0..124.0cm da fiada 11 (teto 1)
+    - W015: 2 compensadores no trecho t=255.0..384.0cm da fiada 11 (teto 1)
+    - W015: 3 compensadores no trecho t=15.0..399.0cm da fiada 12 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 0 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 0 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 1 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 2 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 2 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 3 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 4 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 4 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 5 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 6 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 6 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 7 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 8 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 8 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 9 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 10 (teto 1)
+    - W018: 2 compensadores no trecho t=550.2..564.2cm da fiada 10 (teto 1)
+    - W018: 2 compensadores no trecho t=265.2..279.2cm da fiada 11 (teto 1)
+    - W018: 2 compensadores no trecho t=15.0..569.0cm da fiada 12 (teto 1)
+    - W018: 2 compensadores no trecho t=0.0..284.0cm da fiada 13 (teto 1)
+    - W018: 2 compensadores no trecho t=15.0..569.0cm da fiada 14 (teto 1)
+    ... e mais 488
+
+[PRISM_CONTINUOUS_JOINT] junta vertical alinhada em fiadas consecutivas (prisma)  (437 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 11 (regra #1)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 0 e 1 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 1 e 2 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 2 e 3 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 3 e 4 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 4 e 5 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 5 e 6 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 6 e 7 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 7 e 8 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 8 e 9 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 9 e 10 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 10 e 11 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 11 e 12 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 12 e 13 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 13 e 14 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 14 e 15 (desencontro 0.00cm, limite 1.50cm)
+    - W005: junta em t=34.5cm alinhada entre as fiadas 15 e 16 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 0 e 1 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 1 e 2 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 2 e 3 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 3 e 4 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 4 e 5 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 5 e 6 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 6 e 7 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 7 e 8 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 8 e 9 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 9 e 10 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 10 e 11 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 11 e 12 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 12 e 13 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 13 e 14 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 14 e 15 (desencontro 0.00cm, limite 1.50cm)
+    - W006: junta em t=34.5cm alinhada entre as fiadas 15 e 16 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 0 e 1 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 1 e 2 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 2 e 3 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 3 e 4 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 4 e 5 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 5 e 6 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 6 e 7 (desencontro 0.00cm, limite 1.50cm)
+    - W012: junta em t=34.5cm alinhada entre as fiadas 7 e 8 (desencontro 0.00cm, limite 1.50cm)
+    ... e mais 397
+
+[COVERAGE_MISSING_ROW] fiada faltando no meio da parede  (142 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.8
+    - W023: fiada 2 ausente entre a 1 e a 15
+    - W023: fiada 4 ausente entre a 1 e a 15
+    - W023: fiada 6 ausente entre a 1 e a 15
+    - W023: fiada 8 ausente entre a 1 e a 15
+    - W023: fiada 10 ausente entre a 1 e a 15
+    - W023: fiada 12 ausente entre a 1 e a 15
+    - W023: fiada 14 ausente entre a 1 e a 15
+    - W023: fiada mais alta em z=301.0cm, mas ainda cabe fiada em z=321.0cm abaixo do topo da parede (z=340.0cm)
+    - W024: fiada 2 ausente entre a 1 e a 15
+    - W024: fiada 4 ausente entre a 1 e a 15
+    - W024: fiada 6 ausente entre a 1 e a 15
+    - W024: fiada 8 ausente entre a 1 e a 15
+    - W024: fiada 10 ausente entre a 1 e a 15
+    - W024: fiada 12 ausente entre a 1 e a 15
+    - W024: fiada 14 ausente entre a 1 e a 15
+    - W024: fiada mais alta em z=301.0cm, mas ainda cabe fiada em z=321.0cm abaixo do topo da parede (z=340.0cm)
+    - W025: fiada 2 ausente entre a 1 e a 15
+    - W025: fiada 4 ausente entre a 1 e a 15
+    - W025: fiada 6 ausente entre a 1 e a 15
+    - W025: fiada 8 ausente entre a 1 e a 15
+    - W025: fiada 10 ausente entre a 1 e a 15
+    - W025: fiada 12 ausente entre a 1 e a 15
+    - W025: fiada 14 ausente entre a 1 e a 15
+    - W025: fiada mais alta em z=301.0cm, mas ainda cabe fiada em z=321.0cm abaixo do topo da parede (z=340.0cm)
+    - W026: fiada 2 ausente entre a 1 e a 15
+    - W026: fiada 4 ausente entre a 1 e a 15
+    - W026: fiada 6 ausente entre a 1 e a 15
+    - W026: fiada 8 ausente entre a 1 e a 15
+    - W026: fiada 10 ausente entre a 1 e a 15
+    - W026: fiada 12 ausente entre a 1 e a 15
+    - W026: fiada 14 ausente entre a 1 e a 15
+    - W026: fiada mais alta em z=301.0cm, mas ainda cabe fiada em z=321.0cm abaixo do topo da parede (z=340.0cm)
+    - W029: fiada 2 ausente entre a 1 e a 15
+    - W029: fiada 4 ausente entre a 1 e a 15
+    - W029: fiada 6 ausente entre a 1 e a 15
+    - W029: fiada 8 ausente entre a 1 e a 15
+    - W029: fiada 10 ausente entre a 1 e a 15
+    - W029: fiada 12 ausente entre a 1 e a 15
+    - W029: fiada 14 ausente entre a 1 e a 15
+    - W029: fiada mais alta em z=301.0cm, mas ainda cabe fiada em z=321.0cm abaixo do topo da parede (z=340.0cm)
+    ... e mais 102
+
+[POSITION_OVERLAP] dois blocos ocupando o mesmo volume na mesma fiada  (140 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.7
+    - W001: W001-R00-B012 (B34) e W001-R00-B013 (B34) se sobrepoem 7.00cm na fiada 0
+    - W001: W001-R02-B012 (B34) e W001-R02-B013 (B34) se sobrepoem 7.00cm na fiada 2
+    - W001: W001-R04-B012 (B34) e W001-R04-B013 (B34) se sobrepoem 7.00cm na fiada 4
+    - W001: W001-R06-B012 (B34) e W001-R06-B013 (B34) se sobrepoem 7.00cm na fiada 6
+    - W001: W001-R08-B011 (B34) e W001-R08-B012 (B34) se sobrepoem 7.00cm na fiada 8
+    - W001: W001-R10-B011 (B34) e W001-R10-B012 (B34) se sobrepoem 7.00cm na fiada 10
+    - W001: W001-R12-B012 (B34) e W001-R12-B013 (B34) se sobrepoem 7.00cm na fiada 12
+    - W001: W001-R14-B012 (B34) e W001-R14-B013 (B34) se sobrepoem 7.00cm na fiada 14
+    - W001: W001-R16-B012 (B34) e W001-R16-B013 (B34) se sobrepoem 7.00cm na fiada 16
+    - W002: W002-R00-B012 (B34) e W002-R00-B013 (B34) se sobrepoem 7.00cm na fiada 0
+    - W002: W002-R02-B012 (B34) e W002-R02-B013 (B34) se sobrepoem 7.00cm na fiada 2
+    - W002: W002-R04-B012 (B34) e W002-R04-B013 (B34) se sobrepoem 7.00cm na fiada 4
+    - W002: W002-R06-B012 (B34) e W002-R06-B013 (B34) se sobrepoem 7.00cm na fiada 6
+    - W002: W002-R08-B011 (B34) e W002-R08-B012 (B34) se sobrepoem 7.00cm na fiada 8
+    - W002: W002-R10-B011 (B34) e W002-R10-B012 (B34) se sobrepoem 7.00cm na fiada 10
+    - W002: W002-R12-B012 (B34) e W002-R12-B013 (B34) se sobrepoem 7.00cm na fiada 12
+    - W002: W002-R14-B012 (B34) e W002-R14-B013 (B34) se sobrepoem 7.00cm na fiada 14
+    - W002: W002-R16-B012 (B34) e W002-R16-B013 (B34) se sobrepoem 7.00cm na fiada 16
+    - W027: W027-R00-B001 (B34) e W027-R00-B002 (B34) se sobrepoem 34.00cm na fiada 0
+    - W027: W027-R00-B008 (B34) e W027-R00-B009 (B34) se sobrepoem 34.00cm na fiada 0
+    - W027: W027-R02-B001 (B34) e W027-R02-B002 (B34) se sobrepoem 34.00cm na fiada 2
+    - W027: W027-R02-B008 (B34) e W027-R02-B009 (B34) se sobrepoem 34.00cm na fiada 2
+    - W027: W027-R04-B001 (B34) e W027-R04-B002 (B34) se sobrepoem 34.00cm na fiada 4
+    - W027: W027-R04-B008 (B34) e W027-R04-B009 (B34) se sobrepoem 34.00cm na fiada 4
+    - W027: W027-R06-B001 (B34) e W027-R06-B002 (B34) se sobrepoem 34.00cm na fiada 6
+    - W027: W027-R06-B008 (B34) e W027-R06-B009 (B34) se sobrepoem 34.00cm na fiada 6
+    - W027: W027-R08-B001 (B34) e W027-R08-B002 (B34) se sobrepoem 34.00cm na fiada 8
+    - W027: W027-R08-B008 (B34) e W027-R08-B009 (B34) se sobrepoem 34.00cm na fiada 8
+    - W027: W027-R10-B001 (B34) e W027-R10-B002 (B34) se sobrepoem 34.00cm na fiada 10
+    - W027: W027-R10-B008 (B34) e W027-R10-B009 (B34) se sobrepoem 34.00cm na fiada 10
+    - W027: W027-R12-B001 (B54) e W027-R12-B002 (B54) se sobrepoem 54.00cm na fiada 12
+    - W027: W027-R12-B004 (B54) e W027-R12-B005 (B54) se sobrepoem 54.00cm na fiada 12
+    - W027: W027-R14-B001 (B54) e W027-R14-B002 (B54) se sobrepoem 54.00cm na fiada 14
+    - W027: W027-R14-B004 (B54) e W027-R14-B005 (B54) se sobrepoem 54.00cm na fiada 14
+    - W027: W027-R16-B001 (B54) e W027-R16-B002 (B54) se sobrepoem 54.00cm na fiada 16
+    - W027: W027-R16-B004 (B54) e W027-R16-B005 (B54) se sobrepoem 54.00cm na fiada 16
+    - W028: W028-R00-B001 (B34) e W028-R00-B002 (B34) se sobrepoem 34.00cm na fiada 0
+    - W028: W028-R00-B008 (B34) e W028-R00-B009 (B34) se sobrepoem 34.00cm na fiada 0
+    - W028: W028-R02-B001 (B34) e W028-R02-B002 (B34) se sobrepoem 34.00cm na fiada 2
+    - W028: W028-R02-B008 (B34) e W028-R02-B009 (B34) se sobrepoem 34.00cm na fiada 2
+    ... e mais 100
+
+[OPENING_BLOCK_CROSSES_JAMB] bloco atravessa a jamba, entrando parcialmente no vao  (96 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 3
+    - W027: bloco W027-R00-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 0)
+    - W027: bloco W027-R00-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 0)
+    - W027: bloco W027-R00-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 0)
+    - W027: bloco W027-R00-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 0)
+    - W027: bloco W027-R02-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 2)
+    - W027: bloco W027-R02-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 2)
+    - W027: bloco W027-R02-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 2)
+    - W027: bloco W027-R02-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 2)
+    - W027: bloco W027-R04-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 4)
+    - W027: bloco W027-R04-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 4)
+    - W027: bloco W027-R04-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 4)
+    - W027: bloco W027-R04-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 4)
+    - W027: bloco W027-R06-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 6)
+    - W027: bloco W027-R06-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 6)
+    - W027: bloco W027-R06-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 6)
+    - W027: bloco W027-R06-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 6)
+    - W027: bloco W027-R08-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 8)
+    - W027: bloco W027-R08-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 8)
+    - W027: bloco W027-R08-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 8)
+    - W027: bloco W027-R08-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 8)
+    - W027: bloco W027-R10-B001 (B34) invade 3.5cm do vao de W027-O01 (fiada 10)
+    - W027: bloco W027-R10-B002 (B34) invade 3.5cm do vao de W027-O01 (fiada 10)
+    - W027: bloco W027-R10-B008 (B34) invade 3.0cm do vao de W027-O04 (fiada 10)
+    - W027: bloco W027-R10-B009 (B34) invade 3.0cm do vao de W027-O04 (fiada 10)
+    - W028: bloco W028-R00-B001 (B34) invade 3.0cm do vao de W028-O01 (fiada 0)
+    - W028: bloco W028-R00-B002 (B34) invade 3.0cm do vao de W028-O01 (fiada 0)
+    - W028: bloco W028-R00-B008 (B34) invade 3.5cm do vao de W028-O04 (fiada 0)
+    - W028: bloco W028-R00-B009 (B34) invade 3.5cm do vao de W028-O04 (fiada 0)
+    - W028: bloco W028-R02-B001 (B34) invade 3.0cm do vao de W028-O01 (fiada 2)
+    - W028: bloco W028-R02-B002 (B34) invade 3.0cm do vao de W028-O01 (fiada 2)
+    - W028: bloco W028-R02-B008 (B34) invade 3.5cm do vao de W028-O04 (fiada 2)
+    - W028: bloco W028-R02-B009 (B34) invade 3.5cm do vao de W028-O04 (fiada 2)
+    - W028: bloco W028-R04-B001 (B34) invade 3.0cm do vao de W028-O01 (fiada 4)
+    - W028: bloco W028-R04-B002 (B34) invade 3.0cm do vao de W028-O01 (fiada 4)
+    - W028: bloco W028-R04-B008 (B34) invade 3.5cm do vao de W028-O04 (fiada 4)
+    - W028: bloco W028-R04-B009 (B34) invade 3.5cm do vao de W028-O04 (fiada 4)
+    - W028: bloco W028-R06-B001 (B34) invade 3.0cm do vao de W028-O01 (fiada 6)
+    - W028: bloco W028-R06-B002 (B34) invade 3.0cm do vao de W028-O01 (fiada 6)
+    - W028: bloco W028-R06-B008 (B34) invade 3.5cm do vao de W028-O04 (fiada 6)
+    - W028: bloco W028-R06-B009 (B34) invade 3.5cm do vao de W028-O04 (fiada 6)
+    ... e mais 56
+
+[COMPENSATOR_VERTICAL_STRIP] faixa vertical de compensadores empilhados entre fiadas  (94 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 11.5
+    - W005: compensadores empilhados em t=132.0cm em 9 de 17 fiadas
+    - W012: compensadores empilhados em t=132.0cm em 9 de 17 fiadas
+    - W017: compensadores empilhados em t=564.5cm em 9 de 17 fiadas
+    - W018: compensadores empilhados em t=37.0cm em 14 de 17 fiadas
+    - W018: compensadores empilhados em t=273.0cm em 14 de 17 fiadas
+    - W018: compensadores empilhados em t=563.0cm em 9 de 17 fiadas
+    - W019: compensadores empilhados em t=179.5cm em 9 de 17 fiadas
+    - W019: compensadores empilhados em t=244.5cm em 9 de 17 fiadas
+    - W019: compensadores empilhados em t=254.5cm em 9 de 17 fiadas
+    - W019: compensadores empilhados em t=262.0cm em 9 de 17 fiadas
+    - W019: compensadores empilhados em t=564.5cm em 9 de 17 fiadas
+    - W035: compensadores empilhados em t=149.7cm em 11 de 17 fiadas
+    - W035: compensadores empilhados em t=164.5cm em 11 de 17 fiadas
+    - W036: compensadores empilhados em t=149.7cm em 11 de 17 fiadas
+    - W036: compensadores empilhados em t=164.5cm em 11 de 17 fiadas
+    - W037: compensadores empilhados em t=383.5cm em 11 de 17 fiadas
+    - W039: compensadores empilhados em t=4.5cm em 12 de 17 fiadas
+    - W040: compensadores empilhados em t=4.5cm em 11 de 17 fiadas
+    - W040: compensadores empilhados em t=14.5cm em 11 de 17 fiadas
+    - W040: compensadores empilhados em t=112.2cm em 11 de 17 fiadas
+    - W040: compensadores empilhados em t=124.5cm em 11 de 17 fiadas
+    - W041: compensadores empilhados em t=4.5cm em 11 de 17 fiadas
+    - W041: compensadores empilhados em t=14.5cm em 11 de 17 fiadas
+    - W041: compensadores empilhados em t=112.2cm em 11 de 17 fiadas
+    - W041: compensadores empilhados em t=124.5cm em 11 de 17 fiadas
+    - W043: compensadores empilhados em t=99.5cm em 9 de 17 fiadas
+    - W043: compensadores empilhados em t=253.5cm em 11 de 17 fiadas
+    - W048: compensadores empilhados em t=19.5cm em 9 de 17 fiadas
+    - W048: compensadores empilhados em t=29.5cm em 9 de 17 fiadas
+    - W048: compensadores empilhados em t=39.5cm em 17 de 17 fiadas
+    - W049: compensadores empilhados em t=344.5cm em 17 de 17 fiadas
+    - W049: compensadores empilhados em t=354.5cm em 9 de 17 fiadas
+    - W049: compensadores empilhados em t=364.5cm em 9 de 17 fiadas
+    - W051: compensadores empilhados em t=37.6cm em 9 de 17 fiadas
+    - W051: compensadores empilhados em t=78.2cm em 10 de 17 fiadas
+    - W052: compensadores empilhados em t=45.6cm em 17 de 17 fiadas
+    - W052: compensadores empilhados em t=78.2cm em 10 de 17 fiadas
+    - W054: compensadores empilhados em t=254.5cm em 11 de 17 fiadas
+    - W055: compensadores empilhados em t=254.5cm em 11 de 17 fiadas
+    - W057: compensadores empilhados em t=253.1cm em 11 de 17 fiadas
+    ... e mais 54
+
+[COVERAGE_ROW_MOSTLY_EMPTY] fiada praticamente vazia numa parede que tem outras fiadas cheias  (86 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.8
+    - W020: fiada 0 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W020: fiada 2 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W020: fiada 4 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W020: fiada 6 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W020: fiada 8 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W020: fiada 10 cobre so' 48% do trecho modulavel (166.4cm de 348.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 0 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 2 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 4 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 6 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 8 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 10 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 12 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 14 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W024: fiada 16 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 0 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 2 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 4 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 6 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 8 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 10 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 12 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 14 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W025: fiada 16 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 0 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 2 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 4 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 6 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 8 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 10 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 12 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 14 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W030: fiada 16 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 0 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 2 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 4 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 6 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 8 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 10 cobre so' 0% do trecho modulavel (0.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    - W031: fiada 12 cobre so' 10% do trecho modulavel (19.0cm de 181.0cm), enquanto a melhor fiada da mesma parede cobre 100%
+    ... e mais 46
+
+[COVERAGE_PARTIAL_WALL] parede modulada so' em parte do comprimento  (32 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.8
+    - W001: melhor fiada cobre 77% do trecho modulavel (1527.5cm de 1542.5cm de parede)
+    - W002: melhor fiada cobre 77% do trecho modulavel (1498.1cm de 1513.2cm de parede)
+    - W005: melhor fiada cobre 33% do trecho modulavel (564.0cm de 594.0cm de parede)
+    - W012: melhor fiada cobre 37% do trecho modulavel (564.0cm de 594.0cm de parede)
+    - W023: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W026: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W027: melhor fiada cobre 78% do trecho modulavel (300.0cm de 844.0cm de parede)
+    - W028: melhor fiada cobre 78% do trecho modulavel (300.0cm de 844.0cm de parede)
+    - W029: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W032: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W044: melhor fiada cobre 85% do trecho modulavel (232.0cm de 524.0cm de parede)
+    - W045: melhor fiada cobre 57% do trecho modulavel (494.0cm de 524.0cm de parede)
+    - W046: melhor fiada cobre 57% do trecho modulavel (494.0cm de 524.0cm de parede)
+    - W047: melhor fiada cobre 85% do trecho modulavel (232.0cm de 524.0cm de parede)
+    - W054: melhor fiada cobre 46% do trecho modulavel (302.0cm de 484.0cm de parede)
+    - W055: melhor fiada cobre 46% do trecho modulavel (302.0cm de 484.0cm de parede)
+    - W075: melhor fiada cobre 33% do trecho modulavel (564.0cm de 594.0cm de parede)
+    - W079: melhor fiada cobre 58% do trecho modulavel (612.0cm de 642.0cm de parede)
+    - W081: melhor fiada cobre 85% do trecho modulavel (241.0cm de 352.0cm de parede)
+    - W086: melhor fiada cobre 37% do trecho modulavel (564.0cm de 594.0cm de parede)
+    - W097: melhor fiada cobre 86% do trecho modulavel (294.0cm de 317.0cm de parede)
+    - W116: melhor fiada cobre 89% do trecho modulavel (28.0cm de 152.0cm de parede)
+    - W122: melhor fiada cobre 70% do trecho modulavel (324.0cm de 354.0cm de parede)
+    - W125: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W128: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W129: melhor fiada cobre 78% do trecho modulavel (300.0cm de 844.0cm de parede)
+    - W130: melhor fiada cobre 78% do trecho modulavel (300.0cm de 844.0cm de parede)
+    - W131: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W134: melhor fiada cobre 16% do trecho modulavel (165.5cm de 188.5cm de parede)
+    - W135: melhor fiada cobre 9% do trecho modulavel (201.5cm de 216.5cm de parede)
+    - W144: melhor fiada cobre 46% do trecho modulavel (4394.2cm de 4394.2cm de parede)
+    - W145: melhor fiada cobre 73% do trecho modulavel (691.0cm de 707.0cm de parede)
+
+[PRISM_JOINT_STACK] junta vertical repetida em muitas fiadas da mesma paridade  (29 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 11.7
+    - W005: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W006: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W012: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W013: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W021: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W022: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W027: junta em t=629.7cm se repete em 14 de 17 fiadas (82%)
+    - W028: junta em t=214.2cm se repete em 11 de 17 fiadas (65%)
+    - W048: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W048: junta em t=44.5cm se repete em 17 de 17 fiadas (100%)
+    - W049: junta em t=339.5cm se repete em 17 de 17 fiadas (100%)
+    - W049: junta em t=349.5cm se repete em 17 de 17 fiadas (100%)
+    - W071: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W071: junta em t=44.5cm se repete em 17 de 17 fiadas (100%)
+    - W072: junta em t=595.0cm se repete em 17 de 17 fiadas (100%)
+    - W072: junta em t=605.0cm se repete em 17 de 17 fiadas (100%)
+    - W075: junta em t=559.5cm se repete em 17 de 17 fiadas (100%)
+    - W080: junta em t=344.5cm se repete em 14 de 17 fiadas (82%)
+    - W086: junta em t=559.5cm se repete em 17 de 17 fiadas (100%)
+    - W106: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W106: junta em t=44.5cm se repete em 17 de 17 fiadas (100%)
+    - W107: junta em t=339.5cm se repete em 17 de 17 fiadas (100%)
+    - W107: junta em t=349.5cm se repete em 17 de 17 fiadas (100%)
+    - W129: junta em t=629.7cm se repete em 14 de 17 fiadas (82%)
+    - W130: junta em t=214.2cm se repete em 11 de 17 fiadas (65%)
+    - W137: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W139: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W140: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+    - W141: junta em t=34.5cm se repete em 17 de 17 fiadas (100%)
+
+[OPENING_SOLID_BELOW_SILL_MISSING] fiada abaixo do peitoril da janela ficou vazia (deveria ser solida)  (19 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 4
+    - W016: fiada 1 (elev 21cm) esta' abaixo do peitoril de W016-O04 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W016: fiada 3 (elev 61cm) esta' abaixo do peitoril de W016-O04 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W044: fiada 0 (elev 1cm) esta' abaixo do peitoril de W044-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W044: fiada 1 (elev 21cm) esta' abaixo do peitoril de W044-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W044: fiada 2 (elev 41cm) esta' abaixo do peitoril de W044-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W044: fiada 3 (elev 61cm) esta' abaixo do peitoril de W044-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W044: fiada 4 (elev 81cm) esta' abaixo do peitoril de W044-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W047: fiada 0 (elev 1cm) esta' abaixo do peitoril de W047-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W047: fiada 1 (elev 21cm) esta' abaixo do peitoril de W047-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W047: fiada 2 (elev 41cm) esta' abaixo do peitoril de W047-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W047: fiada 3 (elev 61cm) esta' abaixo do peitoril de W047-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W047: fiada 4 (elev 81cm) esta' abaixo do peitoril de W047-O01 (peitoril 110cm) e ficou 131.0cm sem bloco
+    - W081: fiada 0 (elev 1cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 63.8cm sem bloco
+    - W081: fiada 1 (elev 21cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 81.0cm sem bloco
+    - W081: fiada 2 (elev 41cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 63.8cm sem bloco
+    - W081: fiada 3 (elev 61cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 81.0cm sem bloco
+    - W081: fiada 4 (elev 81cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 63.8cm sem bloco
+    - W081: fiada 5 (elev 101cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 81.0cm sem bloco
+    - W081: fiada 6 (elev 121cm) esta' abaixo do peitoril de W081-O01 (peitoril 140cm) e ficou 63.8cm sem bloco
+
+[JUNCTION_NOT_ALTERNATING] amarracao do encontro nao alterna entre fiadas  (16 ocorrencia(s), nivel 1, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 5 / 18.4
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 0 e 1 (elevacoes 1.0/21.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 1 e 2 (elevacoes 21.0/41.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 2 e 3 (elevacoes 41.0/61.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 3 e 4 (elevacoes 61.0/81.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 4 e 5 (elevacoes 81.0/101.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 5 e 6 (elevacoes 101.0/121.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 6 e 7 (elevacoes 121.0/141.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 7 e 8 (elevacoes 141.0/161.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 8 e 9 (elevacoes 161.0/181.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 9 e 10 (elevacoes 181.0/201.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 10 e 11 (elevacoes 201.0/221.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 11 e 12 (elevacoes 221.0/241.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 12 e 13 (elevacoes 241.0/261.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 13 e 14 (elevacoes 261.0/281.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 14 e 15 (elevacoes 281.0/301.0 cm): W080:B34
+    - W080: encontro L em (-139.5, 552.0) resolvido igual nas fiadas fisicas 15 e 16 (elevacoes 301.0/321.0 cm): W080:B34
+
+[COVERAGE_WALL_NOT_MODULATED] parede sem nenhum bloco  (10 ocorrencia(s), nivel 1, critical)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 18.8
+    - W064: parede de 8.0cm x 340.0cm sem nenhum bloco
+    - W065: parede de 8.0cm x 340.0cm sem nenhum bloco
+    - W066: parede de 39.6cm x 340.0cm sem nenhum bloco
+    - W067: parede de 39.5cm x 340.0cm sem nenhum bloco
+    - W068: parede de 39.6cm x 340.0cm sem nenhum bloco
+    - W089: parede de 8.0cm x 340.0cm sem nenhum bloco
+    - W090: parede de 8.0cm x 340.0cm sem nenhum bloco
+    - W091: parede de 39.5cm x 340.0cm sem nenhum bloco
+    - W092: parede de 39.6cm x 340.0cm sem nenhum bloco
+    - W093: parede de 39.6cm x 340.0cm sem nenhum bloco
+
+ACHADOS DE NIVEL 2 (preferencia - nao reprovam)
+
+[PRISM_STAGGER_BELOW_TARGET] desencontro menor que o alvo, sem chegar a alinhar  (667 ocorrencia(s), nivel 2, minor)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 10.6
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 0 e 1 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1138.6cm entre as fiadas 1 e 2 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 2 e 3 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1138.6cm entre as fiadas 3 e 4 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 4 e 5 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1138.6cm entre as fiadas 5 e 6 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 6 e 7 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 12 e 13 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1138.6cm entre as fiadas 13 e 14 (alvo 10cm)
+    - W001: desencontro de 5.0cm em t=1143.6cm entre as fiadas 14 e 15 (alvo 10cm)
+    ... e mais 657
+
+[OPENING_MISSING_LINTEL] vao sem verga/canaleta na fiada imediatamente acima  (91 ocorrencia(s), nivel 2, major)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 10.2/10.3
+    - W001: sem verga/canaleta sobre W001-O01 (verga em 231cm, fiada 11)
+    - W001: sem verga/canaleta sobre W001-O02 (verga em 231cm, fiada 11)
+    - W002: sem verga/canaleta sobre W002-O01 (verga em 231cm, fiada 11)
+    - W002: sem verga/canaleta sobre W002-O02 (verga em 231cm, fiada 11)
+    - W015: sem verga/canaleta sobre W015-O01 (verga em 231cm, fiada 11)
+    - W015: sem verga/canaleta sobre W015-O02 (verga em 251cm, fiada 12)
+    - W015: sem verga/canaleta sobre W015-O03 (verga em 251cm, fiada 12)
+    - W015: sem verga/canaleta sobre W015-O04 (verga em 231cm, fiada 11)
+    - W016: sem verga/canaleta sobre W016-O01 (verga em 231cm, fiada 11)
+    - W016: sem verga/canaleta sobre W016-O02 (verga em 251cm, fiada 12)
+    ... e mais 81
+
+[COMPENSATOR_AVOIDABLE] compensador usado onde o vao fecharia com peca inteira  (57 ocorrencia(s), nivel 2, minor)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 2
+    - W001: 14 compensadores contra 3 na mesma parede do projeto humano (W001)
+    - W002: 14 compensadores contra 3 na mesma parede do projeto humano (W010)
+    - W015: 71 compensadores contra 18 na mesma parede do projeto humano (W011)
+    - W016: 30 compensadores contra 18 na mesma parede do projeto humano (W012)
+    - W018: 66 compensadores contra 0 na mesma parede do projeto humano (W016)
+    - W020: 23 compensadores contra 0 na mesma parede do projeto humano (W020)
+    - W035: 24 compensadores contra 12 na mesma parede do projeto humano (W030)
+    - W036: 24 compensadores contra 11 na mesma parede do projeto humano (W027)
+    - W037: 19 compensadores contra 5 na mesma parede do projeto humano (W028)
+    - W038: 17 compensadores contra 5 na mesma parede do projeto humano (W029)
+    ... e mais 47
+
+[OPENING_MISSING_COUNTER_LINTEL] janela sem contraverga abaixo do peitoril  (30 ocorrencia(s), nivel 2, minor)
+    regra: REGRAS_MODULACAO_BLOCOS.md secao 10.4
+    - W001: janela W001-O01 sem contraverga na fiada 7
+    - W001: janela W001-O02 sem contraverga na fiada 7
+    - W002: janela W002-O01 sem contraverga na fiada 7
+    - W002: janela W002-O02 sem contraverga na fiada 7
+    - W015: janela W015-O01 sem contraverga na fiada 4
+    - W015: janela W015-O04 sem contraverga na fiada 4
+    - W016: janela W016-O01 sem contraverga na fiada 4
+    - W016: janela W016-O04 sem contraverga na fiada 4
+    - W033: janela W033-O01 sem contraverga na fiada 4
+    - W034: janela W034-O01 sem contraverga na fiada 4
+    ... e mais 20
+
+RELATORIO POR PAREDE (so' as que falham)
+PAREDE           prism  compensators     junctions      openings wall_coverage block_positio   STATUS
+-----------------------------------------------------------------------------------------------------
+W001              PASS          FAIL          PASS          PASS          FAIL          FAIL     FAIL
+W002              PASS          FAIL          PASS          PASS          FAIL          FAIL     FAIL
+W005              FAIL          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W006              FAIL          PASS          PASS          PASS          PASS          PASS     FAIL
+W012              FAIL          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W013              FAIL          PASS          PASS          PASS          PASS          PASS     FAIL
+W015              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W016              PASS          PASS          PASS          FAIL          FAIL          PASS     FAIL
+W017              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W018              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W019              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W020              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W021              FAIL          PASS          PASS          PASS          PASS          PASS     FAIL
+W022              FAIL          PASS          PASS          PASS          PASS          PASS     FAIL
+W023              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W024              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W025              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W026              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W027              FAIL          PASS          PASS          FAIL          FAIL          FAIL     FAIL
+W028              FAIL          PASS          PASS          FAIL          FAIL          FAIL     FAIL
+W029              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W030              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W031              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W032              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W033              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W034              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W035              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W036              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W037              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W038              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W039              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W040              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W041              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W042              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W043              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W044              PASS          FAIL          PASS          FAIL          FAIL          FAIL     FAIL
+W045              PASS          PASS          PASS          PASS          FAIL          FAIL     FAIL
+W046              PASS          PASS          PASS          PASS          FAIL          FAIL     FAIL
+W047              PASS          FAIL          PASS          FAIL          FAIL          FAIL     FAIL
+W048              FAIL          FAIL          PASS          PASS          PASS          PASS     FAIL
+W049              FAIL          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W051              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W052              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W054              PASS          FAIL          PASS          PASS          FAIL          FAIL     FAIL
+W055              PASS          FAIL          PASS          PASS          FAIL          FAIL     FAIL
+W056              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W057              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W064              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W065              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W066              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W067              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W068              PASS          PASS          PASS          PASS          FAIL          PASS     FAIL
+W069              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W070              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W071              FAIL          FAIL          PASS          PASS          PASS          PASS     FAIL
+W072              FAIL          FAIL          PASS          PASS          PASS          PASS     FAIL
+W073              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W074              PASS          FAIL          PASS          PASS          PASS          PASS     FAIL
+W075              FAIL          FAIL          PASS          PASS          FAIL          PASS     FAIL
+W077              PASS          FAIL          PASS          PASS          FAIL          PASS     FAIL
+
+------------------------------------------------------------------------
+RESULTADO  x  PROJETO HUMANO (mesmo validador nos dois)
+------------------------------------------------------------------------
+CLASSE DE ERRO                            SOLVER    HUMANO  LEITURA
+COVERAGE_GAP_IN_ROW                         1275       626  solver 2.0x o humano
+PRISM_STAGGER_BELOW_TARGET                   667       101  solver 6.6x o humano
+COMPENSATOR_CONSECUTIVE                      676        52  solver 13.0x o humano
+COMPENSATOR_EXCESS_IN_RUN                    528        57  solver 9.3x o humano
+PRISM_CONTINUOUS_JOINT                       437       126  solver 3.5x o humano
+JUNCTION_MISSING_BINDING                       0       373  ruido do validador (humano erra mais)
+OPENING_BLOCK_CROSSES_JAMB                    96       208  ruido do validador (humano erra mais)
+JUNCTION_HALF_BLOCK_ADJACENT                   0       264  ruido do validador (humano erra mais)
+COVERAGE_MISSING_ROW                         142        95  comparavel
+COVERAGE_ROW_MOSTLY_EMPTY                     86        85  comparavel
+OPENING_MISSING_LINTEL                        91        56  comparavel
+POSITION_OVERLAP                             140         0  so' o solver erra
+COMPENSATOR_VERTICAL_STRIP                    94        26  solver 3.6x o humano
+COMPENSATOR_AVOIDABLE                         57         0  so' o solver erra
+OPENING_MISSING_COUNTER_LINTEL                30        21  comparavel
+PRISM_JOINT_STACK                             29         8  solver 3.6x o humano
+COVERAGE_PARTIAL_WALL                         32         4  solver 8.0x o humano
+JUNCTION_NOT_ALTERNATING                      16         9  comparavel
+OPENING_SOLID_BELOW_SILL_MISSING              19         0  so' o solver erra
+COVERAGE_WALL_NOT_MODULATED                   10         0  so' o solver erra
+
+O projeto humano NAO tem zero achado - ver README do benchmark,
+secao 'piso de ruido'. Numero do solver so' significa alguma
+coisa comparado com a coluna HUMANO.
+
+------------------------------------------------------------------------
+COMPARACAO COM O GABARITO (torre_easy_lo_r00_tgd)
+------------------------------------------------------------------------
+paredes casadas: 91 | so' no resultado: 54 | so' no gabarito: 6
+   DIFFERENT_LAYOUT           1124
+   EQUIVALENT_SUBSTITUTION    166
+   EXTRA_IN_RESULT            9516
+   IDENTICAL                  1554
+   MISSING_IN_RESULT          9056
+similaridade exata      : 7.3%
+similaridade estrutural : 8.0%  (conta substituicao equivalente)
+
+LEMBRETE: diferenca do projeto humano NAO e' erro por si so'.
+O que reprova sao os achados de nivel 1 acima.

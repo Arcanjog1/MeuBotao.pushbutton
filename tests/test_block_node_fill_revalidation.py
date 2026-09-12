@@ -251,20 +251,38 @@ def _hand_piece(walls, wall_idx, course, code, t_lo_cm, node_index=None):
             "node_index": node_index}
 
 
-def test_t3_junta_fisica_real_continua_detectada():
-    """CONTROLE do medidor, com a assinatura do defeito construida A MAO: na
-    fiada B um B34 de no' [0,34] seguido de preenchimento (junta NO'|FILL em
-    34,5); na fiada A `B19|B39` com junta interna em 19,5+15 = 34,5. O medidor
-    acusa exatamente (parede, 34.5, "B"); deslocar a junta da A em 5cm faz a
-    acusacao sumir.
+def parede_curta_entre_canto_e_T(short_cm):
+    """Geometria REAL de W088/W090 do TP1 (2026-09-12): parede curta entre um
+    canto L (t=0) e um T em que ela CHEGA (t=short_cm). Com a regra 11.14 o
+    canto deita B34 na fiada A e o preenchimento da fiada B, entre o corpo do
+    canto e a peca do T, e' curto - a assinatura B34(no')|fill em 34,5."""
+    return [seg(0, 0, 300, 0), seg(0, 0, 0, short_cm), seg(-300, short_cm, 300, short_cm)]
 
-    HISTORICO (2026-09-11): ate' a regra da fileira de B34 + 11.14 este
-    controle usava a saida REAL do solver na grade 2x2 (ordens permutadas,
-    metade simetrica desligada). Com as duas regras a geracao deixou de
-    produzir essa junta em QUALQUER ordem/lado da grade (varrido 300..700cm)
-    e nos corpora TGD/TP1 (v_off == v_on) - o defeito e' removido antes, na
-    geracao, como a CR-G12 ja' tinha feito com parte dele. O medidor continua
-    sendo o mesmo; so' a fonte do controle mudou."""
+
+# Comprimentos em que a GERACAO (sem a metade simetrica) ainda produz a junta
+# no'|fill em 34,5 e a metade simetrica a remove (varredura 40..155cm de 5 em
+# 5, 2026-09-12). 70cm e' o residual conhecido: nem a metade simetrica fecha
+# (registrado abaixo, nunca escondido).
+LT_COM_JUNTA = (75.0, 110.0, 115.0, 150.0)
+LT_RESIDUAL = (70.0,)
+
+
+def test_t3_junta_fisica_real_continua_detectada():
+    """CONTROLE do medidor em DUAS fontes.
+
+    (a) Assinatura construida A MAO: na fiada B um B34 de no' [0,34] seguido
+    de preenchimento (junta NO'|FILL em 34,5); na fiada A `B19|B39` com
+    junta interna em 19,5+15 = 34,5. O medidor acusa exatamente (parede,
+    34.5, "B"); deslocar a junta da A em 5cm faz a acusacao sumir.
+
+    (b) Saida REAL do solver, metade simetrica DESLIGADA: a parede curta
+    entre canto L e T (geometria de W088/W090 do TP1) produz a MESMA
+    assinatura. HISTORICO: ate' 2026-09-11 o controle real era a grade 2x2
+    (ordens permutadas); a fileira de B34 + 11.14 removeram a junta da grade
+    em qualquer ordem/lado (varrido 300..700cm), e o PR #37 deixou so' o
+    controle a mao. Restaurado em 2026-09-12 com a geometria que a bisseccao
+    do TP1 encontrou - o controle real prova que o medidor ve' o solver, nao
+    so' pecas sinteticas."""
     walls = [(seg(0, 0, 400, 0), ft(14.0), (False, False))]
     cands = [
         _hand_piece(walls, 0, "B", "B34", 0.0, node_index=0),
@@ -277,6 +295,14 @@ def test_t3_junta_fisica_real_continua_detectada():
     assert all(abs(v[1] - 34.5) < 1e-6 and v[2] == "B" for v in achados), achados
     deslocado = [cands[0], cands[1], _hand_piece(walls, 0, "A", "B19", 20.0), _hand_piece(walls, 0, "A", "B39", 40.0)]
     assert node_fill_prism_violations(walls, deslocado) == []
+
+    reais = []
+    with node_fill(False):
+        for short_cm in LT_COM_JUNTA:
+            result, walls_lt = solve_plan(parede_curta_entre_canto_e_T(short_cm))
+            reais.extend(node_fill_prism_violations(walls_lt, result["candidates"]))
+    assert reais, "a geracao sem a metade simetrica deixou de produzir a junta real - conferir LT_COM_JUNTA"
+    assert all(abs(v[1] - 34.5) < 1e-6 and v[2] == "B" and v[0] == 1 for v in reais), reais
 
 
 def test_t3b_o_gate_do_motor_nao_e_silenciado():
@@ -295,24 +321,46 @@ def test_t3b_o_gate_do_motor_nao_e_silenciado():
 # T4 - nao mascara prisma real: a reducao e' na GEOMETRIA, mesmo medidor
 # =====================================================================
 def test_t4_reducao_e_fisica_nao_mascaramento():
-    """A metade simetrica age na GEOMETRIA (mesmo medidor), nunca mascara.
-    Desde a regra da fileira de B34 + 11.14 (2026-09-11) a geracao ja' nao
-    produz a junta no' B x interna A na grade 2x2 em nenhuma ordem (`antes`
-    vazio - medido tambem em TGD/TP1: v_off == v_on, T_MEIO/X_MEIO/L_LIVRE
-    0/0), entao a metade simetrica fica DORMENTE aqui. O que este teste
-    tranca agora: com ela ligada o resultado nunca e' pior do que sem ela, e
-    o estado de producao continua sem a violacao."""
-    linhas = grade_2x2()
+    """A metade simetrica age na GEOMETRIA (mesmo medidor), nunca mascara,
+    e MELHORA de verdade: nas paredes curtas canto-T de `LT_COM_JUNTA` a
+    geracao sem ela produz a junta no' B x interna A e com ela a junta some
+    (`antes` nao vazio, `depois` vazio - o asserto `any(antes)` que o PR #37
+    tinha retirado volta aqui, com fixture real). Na grade 2x2 (todas as
+    ordens) a geracao ja' nao produz a junta desde a fileira de B34 + 11.14;
+    ali o teste tranca que ligar a metade simetrica nunca piora.
+
+    RESIDUAL registrado, nao escondido: em `LT_RESIDUAL` (70cm) nem a metade
+    simetrica fecha - a unica composicao do preenchimento da fiada B com a
+    licenca de 1 B19 ainda empilha; fica documentado como limite (secao
+    33 de REGRAS_MODULACAO_BLOCOS.md)."""
     antes, depois = [], []
+    for short_cm in LT_COM_JUNTA:
+        linhas = parede_curta_entre_canto_e_T(short_cm)
+        with node_fill(False):
+            r, w = solve_plan(linhas)
+            antes.append(node_fill_prism_violations(w, r["candidates"]))
+        with node_fill(True):
+            r, w = solve_plan(linhas)
+            depois.append(node_fill_prism_violations(w, r["candidates"]))
+    assert all(antes), antes
+    assert all(v == [] for v in depois), depois
+
+    linhas = grade_2x2()
     for ordem in ORDENS:
         with node_fill(False):
             r, w = solve_plan([linhas[i] for i in ordem])
-            antes.append(node_fill_prism_violations(w, r["candidates"]))
+            a = node_fill_prism_violations(w, r["candidates"])
         with node_fill(True):
             r, w = solve_plan([linhas[i] for i in ordem])
-            depois.append(node_fill_prism_violations(w, r["candidates"]))
-    assert all(v == [] for v in depois), depois
-    assert all(len(d) <= len(a) for a, d in zip(antes, depois)), (antes, depois)
+            d = node_fill_prism_violations(w, r["candidates"])
+        assert d == [], d
+        assert len(d) <= len(a), (a, d)
+
+    for short_cm in LT_RESIDUAL:
+        with node_fill(True):
+            r, w = solve_plan(parede_curta_entre_canto_e_T(short_cm))
+        residual = node_fill_prism_violations(w, r["candidates"])
+        assert residual, "o residual de %scm foi resolvido: mover o comprimento para LT_COM_JUNTA" % short_cm
 
 
 # =====================================================================
