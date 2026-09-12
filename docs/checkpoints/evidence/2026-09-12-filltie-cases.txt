@@ -1,0 +1,84 @@
+# Defeito 1 — casos PRISM_CONTINUOUS_JOINT por parede (chave física), antes e depois
+
+HEAD avaliado `fb618b21e7c0d5542b649f18f0043527fec3ff56`, base `ad46c61`. Gerado por `_scripts/2026-09-12-filltie-cases.py` a partir de `runner.run_project(..., version='v2')`. Categoria: A_fill|tie = junta NÓ|FILL da fiada A em cima da junta NÓ|FILL da fiada B; B_fill|fill; C_tie|tie; D_abertura (peça de ajuste de abertura/peça de nó duplicada).
+
+## before torre_easy_lo_r00_tgd (v2) — PRISM_CONTINUOUS_JOINT por parede/junta
+| W0xx | idx solver | chave física | comp. cm | t junta | categoria | pares de fiadas | junta A (ex.) | junta B (ex.) | aberturas | placement das peças |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W005 | 24 | `W|-1071.5,-570.0|-1071.5,24.0|t14.0` | 594.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B19|B54 | B34|B19 | - | B34@T_INTERSECTION_INCOMING[0,34]; B54@X_INTERSECTION[35,89] |
+| W006 | 129 | `W|-1016.5,-570.0|-1016.5,-501.0|t14.0` | 69.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B19|B34 | B34|B19 | - | B34@L_CORNER[35,69]; B34@T_INTERSECTION_INCOMING[0,34] |
+| W012 | 25 | `W|1263.5,-570.0|1263.5,24.0|t14.0` | 594.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B19|B54 | B34|B19 | - | B34@T_INTERSECTION_INCOMING[0,34]; B54@X_INTERSECTION[35,89] |
+| W013 | 131 | `W|1318.5,-570.0|1318.5,-501.0|t14.0` | 69.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B19|B34 | B34|B19 | - | B34@L_CORNER[35,69]; B34@T_INTERSECTION_INCOMING[0,34] |
+| W021 | 112 | `W|-1133.5,-508.0|-1009.5,-508.0|t14.0` | 124.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B54 | - | B34@L_CORNER[0,34]; B54@X_INTERSECTION[35,89] |
+| W022 | 113 | `W|1201.5,-508.0|1325.5,-508.0|t14.0` | 124.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B54 | - | B34@L_CORNER[0,34]; B54@X_INTERSECTION[35,89] |
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 630.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | B34|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 629.5 | D_abertura | 5 (1-2,3-4,5-6…) | B34|C09 | B34|B34 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 630.0 | C_tie|tie | 1 (10-11…) | B34|B34 | B39|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W028 | 13 | `W|841.5,-428.0|1685.5,-428.0|t14.0` | 844.0 | 214.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | C09|B34 | door[33.994,199.994];door[248.983,339.983];door[503.983,594.983];door[658.983,824.983] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W028 | 13 | `W|841.5,-428.0|1685.5,-428.0|t14.0` | 844.0 | 214.5 | D_abertura | 5 (1-2,3-4,5-6…) | C09|B34 | B34|B34 | door[33.994,199.994];door[248.983,339.983];door[503.983,594.983];door[658.983,824.983] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W075 | 22 | `W|-1071.5,180.0|-1071.5,774.0|t14.0` | 594.0 | 559.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B54|B19 | B19|B34 | - | B34@T_INTERSECTION_INCOMING[560,594]; B54@X_INTERSECTION[505,559] |
+| W080 | 44 | `W|-139.5,180.0|-139.5,559.0|t14.0` | 379.0 | 344.5 | A_fill|tie | 11 (0-1,1-2,2-3…) | B34|B34 | B39|B34 | - | B34@L_CORNER[345,379] |
+| W086 | 23 | `W|1263.5,180.0|1263.5,774.0|t14.0` | 594.0 | 559.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B54|B19 | B19|B34 | - | B34@T_INTERSECTION_INCOMING[560,594]; B54@X_INTERSECTION[505,559] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 630.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | B34|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 629.5 | D_abertura | 5 (1-2,3-4,5-6…) | B34|C09 | B34|B34 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 630.0 | C_tie|tie | 1 (10-11…) | B34|B34 | B39|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W130 | 11 | `W|841.5,632.0|1685.5,632.0|t14.0` | 844.0 | 214.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | C09|B34 | door[33.998,199.998];door[248.987,339.987];door[503.987,594.987];door[658.987,824.987] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W130 | 11 | `W|841.5,632.0|1685.5,632.0|t14.0` | 844.0 | 214.5 | D_abertura | 5 (1-2,3-4,5-6…) | C09|B34 | B34|B34 | door[33.998,199.998];door[248.987,339.987];door[503.987,594.987];door[658.987,824.987] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W137 | 133 | `W|-1016.5,705.0|-1016.5,774.0|t14.0` | 69.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B34 | - | B34@L_CORNER[0,34]; B34@T_INTERSECTION_INCOMING[35,69] |
+| W139 | 134 | `W|1318.5,705.0|1318.5,774.0|t14.0` | 69.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B34 | - | B34@L_CORNER[0,34]; B34@T_INTERSECTION_INCOMING[35,69] |
+| W140 | 111 | `W|-1133.5,712.0|-1009.5,712.0|t14.0` | 124.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B54 | - | B34@L_CORNER[0,34]; B54@X_INTERSECTION[35,89] |
+| W141 | 110 | `W|1201.5,712.0|1325.5,712.0|t14.0` | 124.0 | 34.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B34|B19 | B19|B54 | - | B34@L_CORNER[0,34]; B54@X_INTERSECTION[35.01,89.01] |
+
+Totais: {'A_fill|tie': 203, 'D_abertura': 40, 'C_tie|tie': 2} PRISM_CONTINUOUS_JOINT = 245
+
+
+## after torre_easy_lo_r00_tgd (v2) — PRISM_CONTINUOUS_JOINT por parede/junta
+| W0xx | idx solver | chave física | comp. cm | t junta | categoria | pares de fiadas | junta A (ex.) | junta B (ex.) | aberturas | placement das peças |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 630.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | B34|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 629.5 | D_abertura | 5 (1-2,3-4,5-6…) | B34|C09 | B34|B34 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W027 | 14 | `W|-1493.5,-428.0|-649.5,-428.0|t14.0` | 844.0 | 630.0 | C_tie|tie | 1 (10-11…) | B34|B34 | B39|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W028 | 13 | `W|841.5,-428.0|1685.5,-428.0|t14.0` | 844.0 | 214.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | C09|B34 | door[33.994,199.994];door[248.983,339.983];door[503.983,594.983];door[658.983,824.983] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W028 | 13 | `W|841.5,-428.0|1685.5,-428.0|t14.0` | 844.0 | 214.5 | D_abertura | 5 (1-2,3-4,5-6…) | C09|B34 | B34|B34 | door[33.994,199.994];door[248.983,339.983];door[503.983,594.983];door[658.983,824.983] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W080 | 44 | `W|-139.5,180.0|-139.5,559.0|t14.0` | 379.0 | 344.5 | A_fill|tie | 11 (0-1,1-2,2-3…) | B34|B34 | B39|B34 | - | B34@L_CORNER[345,379] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 630.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | B34|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 629.5 | D_abertura | 5 (1-2,3-4,5-6…) | B34|C09 | B34|B34 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W129 | 12 | `W|-1493.5,632.0|-649.5,632.0|t14.0` | 844.0 | 630.0 | C_tie|tie | 1 (10-11…) | B34|B34 | B39|C09 | door[19,185];door[248.999,339.999];door[503.999,594.999];door[644,809.989] | B34@OPENING_REPAIR_FILL[595,629]; B34@T_INTERSECTION_DEGRADED_L[613,647]; B54@T_INTERSECTION_MAIN[613,667] |
+| W130 | 11 | `W|841.5,632.0|1685.5,632.0|t14.0` | 844.0 | 214.0 | D_abertura | 5 (0-1,2-3,4-5…) | B34|B34 | C09|B34 | door[33.998,199.998];door[248.987,339.987];door[503.987,594.987];door[658.987,824.987] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+| W130 | 11 | `W|841.5,632.0|1685.5,632.0|t14.0` | 844.0 | 214.5 | D_abertura | 5 (1-2,3-4,5-6…) | C09|B34 | B34|B34 | door[33.998,199.998];door[248.987,339.987];door[503.987,594.987];door[658.987,824.987] | B34@OPENING_REPAIR_FILL[215,249]; B34@T_INTERSECTION_DEGRADED_L[197,231]; B54@T_INTERSECTION_MAIN[177,231] |
+
+Totais: {'D_abertura': 40, 'C_tie|tie': 2, 'A_fill|tie': 11} PRISM_CONTINUOUS_JOINT = 53
+
+
+## before torre_easy_lo_r00_tp1 (v2) — PRISM_CONTINUOUS_JOINT por parede/junta
+| W0xx | idx solver | chave física | comp. cm | t junta | categoria | pares de fiadas | junta A (ex.) | junta B (ex.) | aberturas | placement das peças |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W002 | 1 | `W|6192.0,533.0|6192.0,802.0|t14.0` | 269.0 | 219.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W003 | 2 | `W|6607.0,533.0|6607.0,1877.0|t14.0` | 1344.0 | 1309.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B54|B19 | B19|B34 | door[579,765] | B34@T_INTERSECTION_INCOMING[1310,1344]; B54@X_INTERSECTION[1255,1309] |
+| W008 | 7 | `W|8942.0,533.0|8942.0,1877.0|t14.0` | 1344.0 | 1309.5 | A_fill|tie | 16 (0-1,1-2,2-3…) | B54|B19 | B19|B34 | door[579,765] | B34@T_INTERSECTION_INCOMING[1310,1344]; B54@X_INTERSECTION[1255,1309] |
+| W009 | 8 | `W|9357.0,533.0|9357.0,802.0|t14.0` | 269.0 | 219.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W034 | 33 | `W|7015.0,850.0|7284.0,850.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W044 | 43 | `W|7015.0,965.0|7284.0,965.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W065 | 64 | `W|7015.0,1445.0|7284.0,1445.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W074 | 73 | `W|7015.0,1560.0|7284.0,1560.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W078 | 77 | `W|6192.0,1608.0|6192.0,1877.0|t14.0` | 269.0 | 84.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W079 | 78 | `W|9357.0,1608.0|9357.0,1877.0|t14.0` | 269.0 | 84.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+
+Totais: {'B_fill|fill': 16, 'A_fill|tie': 32} PRISM_CONTINUOUS_JOINT = 48
+
+
+## after torre_easy_lo_r00_tp1 (v2) — PRISM_CONTINUOUS_JOINT por parede/junta
+| W0xx | idx solver | chave física | comp. cm | t junta | categoria | pares de fiadas | junta A (ex.) | junta B (ex.) | aberturas | placement das peças |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W002 | 1 | `W|6192.0,533.0|6192.0,802.0|t14.0` | 269.0 | 219.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W009 | 8 | `W|9357.0,533.0|9357.0,802.0|t14.0` | 269.0 | 219.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W034 | 33 | `W|7015.0,850.0|7284.0,850.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W044 | 43 | `W|7015.0,965.0|7284.0,965.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W065 | 64 | `W|7015.0,1445.0|7284.0,1445.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W074 | 73 | `W|7015.0,1560.0|7284.0,1560.0|t14.0` | 269.0 | 49.5 | B_fill|fill | 1 (11-12…) | B39|B39 | B34|B19 | door[19,110] |  |
+| W078 | 77 | `W|6192.0,1608.0|6192.0,1877.0|t14.0` | 269.0 | 84.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+| W079 | 78 | `W|9357.0,1608.0|9357.0,1877.0|t14.0` | 269.0 | 84.5 | B_fill|fill | 3 (13-14,14-15,15-16…) | B34|B34 | C09|C09 | - |  |
+
+Totais: {'B_fill|fill': 16} PRISM_CONTINUOUS_JOINT = 16
+
+

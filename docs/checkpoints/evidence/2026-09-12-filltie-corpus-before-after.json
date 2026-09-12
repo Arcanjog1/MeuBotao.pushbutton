@@ -1,0 +1,279 @@
+{
+ "head": "fb618b21e7c0d5542b649f18f0043527fec3ff56",
+ "base_main": "ad46c61372ba0292d117e14ba605375af7acd807",
+ "method": "runner.run_project(project, version='v2', write_files=False); classificacao de cada PRISM_CONTINUOUS_JOINT pelo papel das pecas das duas juntas (NF = junta peca de no'|preenchimento; FF = preenchimento|preenchimento; TT = no'|no'; OF = peca de ajuste de abertura). A_fill|tie = NFxNF (a junta NO'|FILL de uma fiada em cima da junta NO'|FILL da outra). Scripts: docs/checkpoints/evidence/_scripts/2026-09-12-filltie-{dump,classify,cases,predict}.py",
+ "projects": {
+  "torre_easy_lo_r00_tp1": {
+   "before": {
+    "seconds_run_project": 90.0,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 48,
+     "JUNCTION_MISSING_BINDING": 9,
+     "POSITION_OVERLAP": 11
+    },
+    "findings_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 48,
+     "PRISM_STAGGER_BELOW_TARGET": 1571,
+     "PRISM_JOINT_STACK": 2,
+     "COMPENSATOR_CONSECUTIVE": 988,
+     "COMPENSATOR_EXCESS_IN_RUN": 947,
+     "COMPENSATOR_VERTICAL_STRIP": 151,
+     "COMPENSATOR_AVOIDABLE": 81,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "COVERAGE_GAP_IN_ROW": 336,
+     "POSITION_OVERLAP": 11
+    },
+    "blocks": 19039,
+    "walls": 96,
+    "success_rate": 0.1979,
+    "findings_total": 4165,
+    "prism_continuous_joint_by_category": {
+     "B_fill|fill": 16,
+     "A_fill|tie": 32
+    },
+    "prism_continuous_joint_by_wall": {
+     "W002": {
+      "B_fill|fill": 3
+     },
+     "W003": {
+      "A_fill|tie": 16
+     },
+     "W008": {
+      "A_fill|tie": 16
+     },
+     "W009": {
+      "B_fill|fill": 3
+     },
+     "W034": {
+      "B_fill|fill": 1
+     },
+     "W044": {
+      "B_fill|fill": 1
+     },
+     "W065": {
+      "B_fill|fill": 1
+     },
+     "W074": {
+      "B_fill|fill": 1
+     },
+     "W078": {
+      "B_fill|fill": 3
+     },
+     "W079": {
+      "B_fill|fill": 3
+     }
+    }
+   },
+   "after": {
+    "seconds_run_project": 81.2,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 16,
+     "JUNCTION_MISSING_BINDING": 9,
+     "POSITION_OVERLAP": 11
+    },
+    "findings_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 16,
+     "PRISM_STAGGER_BELOW_TARGET": 1539,
+     "COMPENSATOR_CONSECUTIVE": 936,
+     "COMPENSATOR_EXCESS_IN_RUN": 933,
+     "COMPENSATOR_VERTICAL_STRIP": 149,
+     "COMPENSATOR_AVOIDABLE": 80,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_MISSING_COUNTER_LINTEL": 21,
+     "COVERAGE_GAP_IN_ROW": 336,
+     "POSITION_OVERLAP": 11
+    },
+    "blocks": 18963,
+    "walls": 96,
+    "success_rate": 0.2083,
+    "findings_total": 4030,
+    "prism_continuous_joint_by_category": {
+     "B_fill|fill": 16
+    },
+    "prism_continuous_joint_by_wall": {
+     "W002": {
+      "B_fill|fill": 3
+     },
+     "W009": {
+      "B_fill|fill": 3
+     },
+     "W034": {
+      "B_fill|fill": 1
+     },
+     "W044": {
+      "B_fill|fill": 1
+     },
+     "W065": {
+      "B_fill|fill": 1
+     },
+     "W074": {
+      "B_fill|fill": 1
+     },
+     "W078": {
+      "B_fill|fill": 3
+     },
+     "W079": {
+      "B_fill|fill": 3
+     }
+    }
+   }
+  },
+  "torre_easy_lo_r00_tgd": {
+   "before": {
+    "seconds_run_project": 273.2,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 245,
+     "OPENING_BLOCK_CROSSES_JAMB": 96,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+     "COVERAGE_MISSING_ROW": 142,
+     "COVERAGE_WALL_NOT_MODULATED": 10,
+     "POSITION_OVERLAP": 140
+    },
+    "findings_by_code": {
+     "PRISM_STAGGER_BELOW_TARGET": 739,
+     "PRISM_CONTINUOUS_JOINT": 245,
+     "PRISM_JOINT_STACK": 17,
+     "COMPENSATOR_CONSECUTIVE": 472,
+     "COMPENSATOR_EXCESS_IN_RUN": 444,
+     "COMPENSATOR_VERTICAL_STRIP": 82,
+     "COMPENSATOR_AVOIDABLE": 55,
+     "JUNCTION_NOT_ALTERNATING": 16,
+     "OPENING_MISSING_LINTEL": 91,
+     "OPENING_MISSING_COUNTER_LINTEL": 30,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 19,
+     "OPENING_BLOCK_CROSSES_JAMB": 96,
+     "COVERAGE_PARTIAL_WALL": 32,
+     "COVERAGE_GAP_IN_ROW": 1275,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+     "COVERAGE_MISSING_ROW": 142,
+     "COVERAGE_WALL_NOT_MODULATED": 10,
+     "POSITION_OVERLAP": 140
+    },
+    "blocks": 16361,
+    "walls": 145,
+    "success_rate": 0.2345,
+    "findings_total": 3991,
+    "prism_continuous_joint_by_category": {
+     "A_fill|tie": 203,
+     "D_abertura": 40,
+     "C_tie|tie": 2
+    },
+    "prism_continuous_joint_by_wall": {
+     "W005": {
+      "A_fill|tie": 16
+     },
+     "W006": {
+      "A_fill|tie": 16
+     },
+     "W012": {
+      "A_fill|tie": 16
+     },
+     "W013": {
+      "A_fill|tie": 16
+     },
+     "W021": {
+      "A_fill|tie": 16
+     },
+     "W022": {
+      "A_fill|tie": 16
+     },
+     "W027": {
+      "D_abertura": 10,
+      "C_tie|tie": 1
+     },
+     "W028": {
+      "D_abertura": 10
+     },
+     "W075": {
+      "A_fill|tie": 16
+     },
+     "W080": {
+      "A_fill|tie": 11
+     },
+     "W086": {
+      "A_fill|tie": 16
+     },
+     "W129": {
+      "D_abertura": 10,
+      "C_tie|tie": 1
+     },
+     "W130": {
+      "D_abertura": 10
+     },
+     "W137": {
+      "A_fill|tie": 16
+     },
+     "W139": {
+      "A_fill|tie": 16
+     },
+     "W140": {
+      "A_fill|tie": 16
+     },
+     "W141": {
+      "A_fill|tie": 16
+     }
+    }
+   },
+   "after": {
+    "seconds_run_project": 216.1,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 53,
+     "OPENING_BLOCK_CROSSES_JAMB": 96,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+     "COVERAGE_MISSING_ROW": 142,
+     "COVERAGE_WALL_NOT_MODULATED": 10,
+     "POSITION_OVERLAP": 140
+    },
+    "findings_by_code": {
+     "PRISM_STAGGER_BELOW_TARGET": 739,
+     "PRISM_CONTINUOUS_JOINT": 53,
+     "PRISM_JOINT_STACK": 5,
+     "COMPENSATOR_CONSECUTIVE": 472,
+     "COMPENSATOR_EXCESS_IN_RUN": 454,
+     "COMPENSATOR_VERTICAL_STRIP": 86,
+     "COMPENSATOR_AVOIDABLE": 55,
+     "JUNCTION_NOT_ALTERNATING": 16,
+     "OPENING_MISSING_LINTEL": 91,
+     "OPENING_MISSING_COUNTER_LINTEL": 30,
+     "OPENING_SOLID_BELOW_SILL_MISSING": 19,
+     "OPENING_BLOCK_CROSSES_JAMB": 96,
+     "COVERAGE_PARTIAL_WALL": 32,
+     "COVERAGE_GAP_IN_ROW": 1275,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+     "COVERAGE_MISSING_ROW": 142,
+     "COVERAGE_WALL_NOT_MODULATED": 10,
+     "POSITION_OVERLAP": 140
+    },
+    "blocks": 16289,
+    "walls": 145,
+    "success_rate": 0.2897,
+    "findings_total": 3801,
+    "prism_continuous_joint_by_category": {
+     "D_abertura": 40,
+     "C_tie|tie": 2,
+     "A_fill|tie": 11
+    },
+    "prism_continuous_joint_by_wall": {
+     "W027": {
+      "D_abertura": 10,
+      "C_tie|tie": 1
+     },
+     "W028": {
+      "D_abertura": 10
+     },
+     "W080": {
+      "A_fill|tie": 11
+     },
+     "W129": {
+      "D_abertura": 10,
+      "C_tie|tie": 1
+     },
+     "W130": {
+      "D_abertura": 10
+     }
+    }
+   }
+  }
+ }
+}

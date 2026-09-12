@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-12T15:19:49.631830+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "fb618b21e7c0d5542b649f18f0043527fec3ff56",
+  "tree": "39bde403ef7f71d041c25b483a508aead1fbe229",
+  "status_before": "M docs/PROJECT_STATUS.md",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 7000,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "running",
+  "log": "2026-09-12-filltie-regressao-consolidada.txt",
+  "pid": 3138
+}
