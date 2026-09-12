@@ -86,10 +86,23 @@ def test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas(tmp_path):
     retencao nativa dispara."""
     alvo = _preparar(tmp_path, limiar=0.3)
     try:
-        kernel32 = ctypes.PyDLL("kernel32", use_last_error=True)
+        # PORTABILIDADE (2026-09-12): a retencao nativa e' a mesma ideia em
+        # qualquer SO - uma chamada estrangeira via `PyDLL` (GIL retida) que
+        # dorme 900ms. No Windows e' `kernel32.Sleep(ms)`; fora dele
+        # `libc.usleep(us)`. Ate' entao o teste so' abria `kernel32` e
+        # quebrava em Linux com OSError - falha de portabilidade do teste,
+        # nunca do amostrador nem do solver.
+        if sys.platform == "win32":
+            nativo = ctypes.PyDLL("kernel32", use_last_error=True)
 
-        def reter():
-            kernel32.Sleep(900)
+            def reter():
+                nativo.Sleep(900)
+        else:
+            import ctypes.util
+            nativo = ctypes.PyDLL(ctypes.util.find_library("c") or "libc.so.6")
+
+            def reter():
+                nativo.usleep(900 * 1000)
 
         thread = threading.Thread(target=reter, name="retentor-nativo")
         thread.start()
