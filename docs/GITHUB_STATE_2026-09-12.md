@@ -16,8 +16,8 @@ aquele arquivo fica como histórico.
 
 Consequência para os documentos anteriores: as frases "Beta 1 não
 mesclado", "não mesclar Beta 1/#31/#34/produção antiga" e "solver oficial =
-produção igual à main inicial" **deixaram de valer para o Beta 1 e para a
-scale-autofix** — ambos estão na main desde o #37. O gate "uma execução real
+produção igual à main inicial" **deixaram de valer para o Beta 1, para o #34 e para a
+scale-autofix** — os três estão na main desde o #37 (o #34 pela cadeia do Beta 1; ver a correção na tabela abaixo). O gate "uma execução real
 no Revit com o pacote" foi cumprido na própria missão scale-autofix (teste
 real do botão CPython, 8.399 blocos, `7bb176b`), mas o **PASS Revit do
 Beta** continua sendo decisão do usuário, não deste registro.
@@ -27,7 +27,7 @@ Beta** continua sendo decisão do usuário, não deste registro.
 | PR | Estado GitHub | HEAD | Na main? | Observação |
 |---|---|---|---|---|
 | [#37](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/37) | merged 2026-09-11T18:09:04Z | `24a443e` | **sim** (`6439669`) | scale-autofix + decisões A/B/C + teste real do botão |
-| [#34](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34) | **merged: true** segundo a API (2026-09-11T18:09:05Z, `merged_by` Arcanjog1) | `8a93a27` (código `8cdd33f`) | **NÃO** — nem `8a93a27` nem `8cdd33f` são ancestrais de `6439669`; `8a93a27` só existe em `origin/codex/beta-main-safe-20260909` | **INCONSISTÊNCIA a esclarecer pelo usuário**: a API marca o PR como mesclado um segundo depois do #37, mas o Git da main não contém os commits. Este registro segue o Git: o conteúdo do #34 **não está na main**. |
+| [#34](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/34) | merged 2026-09-11T18:09:05Z (`merged_by` Arcanjog1) | `8a93a27` (código `8cdd33f`) | **sim** — via cadeia do Beta 1 (`8a93a27` → `0ffa8e9` … `41086e4` → `2599355` → #37 `6439669`) | API e Git coerentes: o GitHub marcou o #34 como mesclado um segundo depois do #37 porque o #37 trouxe os commits do #34 para a main. **Correção (revisão do #38, 2026-09-12):** a leitura original desta linha dizia "NÃO ancestral / inconsistência a esclarecer"; ela foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, só 252 commits alcançáveis a partir da main) e `git merge-base --is-ancestor` respondia errado. Após `git fetch --unshallow` (262 commits), `8a93a27` e `8cdd33f` são ancestrais de `6439669`. O CI do #38 (`validate.py`: "candidate already integrated") acusou exatamente isso. |
 | [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36) | merged | `b5ea0eb` | sim (`21576ee`) | consolidação documental |
 | [#35](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/35) / [#33](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/33) / [#32](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32) | merged | — | sim | referências humanas / governança |
 | [#31](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/31) | open, draft | `5658e9c` | não | NO-GO físico (inalterado desde 2026-09-09) |

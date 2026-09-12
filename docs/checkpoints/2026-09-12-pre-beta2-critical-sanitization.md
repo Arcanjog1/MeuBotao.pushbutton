@@ -34,7 +34,7 @@
     "TP1 PRISM_CONTINUOUS_JOINT 300 (main) → 304 (sonda) → 48 (final): os 48 restantes são W003/W008 (16 cada), W002/W009/W078/W079 (3 cada) e W034/W044/W065/W074 (1 cada — junta 49,5 entre as fiadas 11 e 12, consequência da degradação correta do T a 7 cm de uma porta: o B54 que antes atravessava a jamba vira C09 e o preenchimento 3×B39 alinha com a fiada de cima). Defeito 1 estrutural, não regressão desta missão.",
     "TGD (régua V1) inalterado entre a sonda e o final: 831 críticos (PRISM 324, JUNCTION 23, CROSSES_JAMB 72, COVERAGE 216/144/28, POSITION_OVERLAP 24). CROSSES_JAMB 108 → 72 e INSIDE_DOOR 5 → 0 vêm da sonda.",
     "TGD régua V2 (topologia atual, 145 paredes): 911 críticos no HEAD de geração ac5e447 — PRISM 437, POSITION_OVERLAP 140, CROSSES_JAMB 96, COVERAGE 142/86/10; JUNCTION_MISSING_BINDING 0 e INSIDE_DOOR 0. Registrado como está (o baseline mede o solver, não o protege).",
-    "PR #34: a API do GitHub marca merged (2026-09-11T18:09:05Z) mas 8a93a27/8cdd33f não são ancestrais da main 6439669 — inconsistência a esclarecer pelo usuário; os documentos seguem o Git."
+    "PR #34: registrado inicialmente como 'merged na API mas 8a93a27/8cdd33f não ancestrais da main 6439669'. CORRIGIDO na revisão do #38 (2026-09-12): a leitura foi feita num clone raso (is-shallow-repository = true); com o clone completo (git fetch --unshallow) 8a93a27 e 8cdd33f SÃO ancestrais de 6439669 pela cadeia do Beta 1 (8a93a27 → 0ffa8e9 … 41086e4 → 2599355 → #37). Não há inconsistência API × Git; o CI do #38 (validate.py: candidate already integrated) acusava exatamente isso e o status foi reconciliado (#34 passa a official)."
   ],
   "physical_deltas": [
     "TP1 (V1): críticos 495 → 68; OPENING_BLOCK_CROSSES_JAMB 168 → 0 (todos eram B54 de T_INTERSECTION_MAIN/X_INTERSECTION atravessando jamba — a sonda media espaço através do vão); POSITION_OVERLAP 18 → 11; PRISM 300 → 48; JUNCTION_MISSING_BINDING 9 → 9; blocos 18.955 → 19.039.",
@@ -55,7 +55,7 @@
     "Tier 6 padrão (B19 + 1 compensador): exige decidir a prioridade regra #1 × regra #2 na busca de desencontro (hoje regra #2 primeiro) ou lookahead da família A sobre a B.",
     "Migração completa de identidade (#28): validadores/scoring por chave física em vez de W0xx — débito registrado no manifest V2.",
     "CI: adotar pytest -m 'not slow' em PR e runner --check (V1 e V2) agendado (CI_RECOMMENDATION_2026-09-12.md).",
-    "Esclarecer o estado do PR #34 (API merged × Git)."
+    "Estado do PR #34 (API merged × Git): RESOLVIDO na revisão do #38 — #34 está na main; nada a esclarecer."
   ],
   "next_steps": [
     "Revisão humana do PR; sem merge sem autorização específica.",

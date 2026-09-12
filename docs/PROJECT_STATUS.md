@@ -4,7 +4,7 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 
 ```json
 {
-  "observed_utc": "2026-09-12T02:50:00+00:00",
+  "observed_utc": "2026-09-12T10:57:28+00:00",
   "main": "643966994a2552df31e43451b3cb4137a1d3dc59",
   "official": [
     {
@@ -14,6 +14,10 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
     {
       "pr": 33,
       "head": "59c0352e4a3f66349a08b1d3f1ac5b079ce72bf9"
+    },
+    {
+      "pr": 34,
+      "head": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe"
     },
     {
       "pr": 35,
@@ -54,10 +58,6 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
     },
     {
-      "pr": 34,
-      "head": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe"
-    },
-    {
       "branch": "claude/nifty-lovelace-d3ewpi",
       "head": "4d6eecff394b0147a4e59b942162d3aa653755de"
     }
@@ -70,7 +70,7 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 | MAIN / HEAD observado | `643966994a2552df31e43451b3cb4137a1d3dc59` (merge do **#37**, 2026-09-11); antes 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | Beta 1 + missão scale-autofix **integrados** pelo #37: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50). Falhas históricas do benchmark V1: TGD compensators, TP1 JUNCTION 8→9 |
 | Candidato desta sessão | `claude/nifty-lovelace-d3ewpi` HEAD `4d6eecf` (base `6439669`): sonda de vão corrigida (regra 3.1), regressão nó|fill W088/W090 corrigida (regra 33.8), régua V2, testes estritos restaurados, teste do amostrador portável. **Sem merge**; PR [#38](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/38) para revisão — [checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
-| Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27: API marca merged mas **não é ancestral da main** — inconsistência a esclarecer ([estado](GITHUB_STATE_2026-09-12.md)) |
+| Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. Nenhum Revit iniciado em 2026-09-12 |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
 | Bloqueadores | Defeito 1 (preenchimento|amarração) reduzido mas não fechado (TP1 PRISM 48, TGD 324); COVERAGE do TGD; decisões pendentes (reserva de meio B54 na 11.10; tier 6 padrão; prioridade regra #1 × #2) — [backlog](BETA2_BACKLOG.md) |
