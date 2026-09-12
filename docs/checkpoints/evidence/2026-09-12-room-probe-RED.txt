@@ -1,0 +1,15 @@
+E         comparison failed
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[1-210.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[1-250.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[1-290.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[-1-210.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[-1-250.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_nao_tem_espaco_em_nenhum_sentido[-1-290.0]
+FAILED tests/test_room_probe_inside_opening.py::test_C_ponto_dentro_da_abertura_continua_sem_espaco_com_safe_range
+FAILED tests/test_room_probe_inside_opening.py::test_D_ponto_logo_apos_a_jamba_ja_esta_no_vazio[0.05]
+FAILED tests/test_room_probe_inside_opening.py::test_D_ponto_logo_apos_a_jamba_ja_esta_no_vazio[0.5]
+FAILED tests/test_room_probe_inside_opening.py::test_D_ponto_logo_apos_a_jamba_ja_esta_no_vazio[2.0]
+FAILED tests/test_room_probe_inside_opening.py::test_E_endpoints_da_abertura_invertidos_dao_o_mesmo_resultado
+FAILED tests/test_room_probe_inside_opening.py::test_F_duas_aberturas_na_mesma_parede
+12 failed, 4 passed in 0.23s
+HEAD 643966994a2552df31e43451b3cb4137a1d3dc59

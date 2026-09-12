@@ -1739,3 +1739,9 @@ Consolidada 1035 passed/2 falhas HISTORICAS identicas as de 8cdd33f.
 187 blocos/17 fiadas criados e medidos no Revit; recriacao sem duplicata.
 Beta 1 CANDIDATO - VALIDACAO REVIT PENDENTE com o pacote 712f221.
 Nenhum merge na main executado.
+
+## 2026-09-12 — saneamento crítico pré-Beta 2 (sonda de vão, régua V2, regressão nó|fill)
+
+[Checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) e
+[estado GitHub](GITHUB_STATE_2026-09-12.md). Main observada `6439669` (#37 mesclado,
+Beta 1 e scale-autofix já na main). Sem MCP, sem Revit, sem merge.

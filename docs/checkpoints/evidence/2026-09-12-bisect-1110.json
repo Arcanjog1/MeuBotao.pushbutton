@@ -1,0 +1,390 @@
+{
+ "date": "2026-09-12",
+ "what": "Bisseccao 11.10 repetida: reserva de meio B54 em _clip_range_by_midspan_neighbours reaplicada (patch em runtime, bisect_1110.py) antes (main 6439669) e depois (ac5e447) da correcao da sonda _room_at_t_on_wall; runner.run_project write_files=False",
+ "head": "ac5e4470987a3fca188ac12dcac56b9a5f197aa2",
+ "results": {
+  "base_B54:torre_easy_lo_r00_tp1": {
+   "root": "wt-6439669",
+   "variant": "reserva_meio_B54",
+   "blocks": 18965,
+   "critical_errors": 477,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 300,
+    "JUNCTION_MISSING_BINDING": 9,
+    "OPENING_BLOCK_CROSSES_JAMB": 161,
+    "OPENING_BLOCK_INSIDE_DOOR": 7
+   },
+   "inside_openings": [
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 0,
+     "blocks": [
+      "W019-R00-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 2,
+     "blocks": [
+      "W019-R02-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 4,
+     "blocks": [
+      "W019-R04-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 6,
+     "blocks": [
+      "W019-R06-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 8,
+     "blocks": [
+      "W019-R08-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 10,
+     "blocks": [
+      "W019-R10-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W019",
+     "row": 12,
+     "blocks": [
+      "W019-R12-B017"
+     ],
+     "block_t_cm": [
+      715.0,
+      749.0
+     ],
+     "opening_t_cm": [
+      564.0,
+      750.0
+     ]
+    }
+   ]
+  },
+  "fix_B54:torre_easy_lo_r00_tp1": {
+   "root": "MeuBotao.pushbutton",
+   "variant": "reserva_meio_B54",
+   "blocks": 19177,
+   "critical_errors": 313,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 304,
+    "JUNCTION_MISSING_BINDING": 9
+   },
+   "inside_openings": []
+  },
+  "base_B54_tgd:torre_easy_lo_r00_tgd": {
+   "root": "wt-6439669",
+   "variant": "reserva_meio_B54",
+   "blocks": 11045,
+   "critical_errors": 866,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_BLOCK_CROSSES_JAMB": 108,
+    "OPENING_BLOCK_INSIDE_DOOR": 5,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+    "COVERAGE_WALL_NOT_MODULATED": 28,
+    "COVERAGE_MISSING_ROW": 213,
+    "POSITION_OVERLAP": 21
+   },
+   "inside_openings": [
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 1,
+     "blocks": [
+      "W131-R01-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 3,
+     "blocks": [
+      "W131-R03-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 5,
+     "blocks": [
+      "W131-R05-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 7,
+     "blocks": [
+      "W131-R07-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 9,
+     "blocks": [
+      "W131-R09-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    }
+   ]
+  },
+  "fix_B54_tgd:torre_easy_lo_r00_tgd": {
+   "root": "MeuBotao.pushbutton",
+   "variant": "reserva_meio_B54",
+   "blocks": 11087,
+   "critical_errors": 825,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_BLOCK_CROSSES_JAMB": 72,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+    "COVERAGE_WALL_NOT_MODULATED": 28,
+    "COVERAGE_MISSING_ROW": 213,
+    "POSITION_OVERLAP": 21
+   },
+   "inside_openings": []
+  },
+  "main_6439669_reserva_generica:torre_easy_lo_r00_tp1": {
+   "blocks": 18955,
+   "critical_errors": 495,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 300,
+    "JUNCTION_MISSING_BINDING": 9,
+    "OPENING_BLOCK_CROSSES_JAMB": 168,
+    "POSITION_OVERLAP": 18
+   },
+   "inside_openings": []
+  },
+  "main_6439669_reserva_generica:torre_easy_lo_r00_tgd": {
+   "blocks": 11045,
+   "critical_errors": 872,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_BLOCK_CROSSES_JAMB": 108,
+    "OPENING_BLOCK_INSIDE_DOOR": 5,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+    "COVERAGE_WALL_NOT_MODULATED": 28,
+    "COVERAGE_MISSING_ROW": 216,
+    "POSITION_OVERLAP": 24
+   },
+   "inside_openings": [
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 1,
+     "blocks": [
+      "W131-R01-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 3,
+     "blocks": [
+      "W131-R03-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 5,
+     "blocks": [
+      "W131-R05-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 7,
+     "blocks": [
+      "W131-R07-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    },
+    {
+     "code": "OPENING_BLOCK_INSIDE_DOOR",
+     "wall": "W131",
+     "row": 9,
+     "blocks": [
+      "W131-R09-B002"
+     ],
+     "block_t_cm": [
+      7.0,
+      41.0
+     ],
+     "opening_t_cm": [
+      6.0,
+      107.0
+     ]
+    }
+   ]
+  },
+  "fix_ac5e447_reserva_generica:torre_easy_lo_r00_tp1": {
+   "blocks": 19181,
+   "critical_errors": 324,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 304,
+    "JUNCTION_MISSING_BINDING": 9,
+    "POSITION_OVERLAP": 11
+   },
+   "inside_openings": []
+  },
+  "fix_ac5e447_reserva_generica:torre_easy_lo_r00_tgd": {
+   "blocks": 11087,
+   "critical_errors": 831,
+   "critical_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_BLOCK_CROSSES_JAMB": 72,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+    "COVERAGE_WALL_NOT_MODULATED": 28,
+    "COVERAGE_MISSING_ROW": 216,
+    "POSITION_OVERLAP": 24
+   },
+   "inside_openings": []
+  }
+ },
+ "scripts": "docs/checkpoints/evidence/_scripts/2026-09-12-bisect_1110.py (+ corpus_openings.py, nodefill.py, findings_dump.py)"
+}

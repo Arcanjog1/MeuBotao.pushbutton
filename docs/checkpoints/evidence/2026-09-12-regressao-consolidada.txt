@@ -1,0 +1,45 @@
+..F..................................................................... [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 19%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 39%]
+........................................................................ [ 46%]
+........................................................................ [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+........................................................................ [ 72%]
+........................................................................ [ 79%]
+........................................................................ [ 85%]
+........................................................................ [ 92%]
+........................................................................ [ 98%]
+...........                                                              [100%]
+=================================== FAILURES ===================================
+______ test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1] ______
+
+project_id = 'torre_easy_lo_r00_tp1'
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("project_id", PROJECTS)
+    def test_projeto_nao_regrediu_contra_o_baseline(project_id):
+        baseline = _baseline(project_id)
+        if baseline is None:
+            pytest.skip("{0} ainda nao tem baseline.json".format(project_id))
+    
+        outcome = runner.run_project(project_id, write_files=False)
+        delta = scoring.compare_runs(baseline, outcome["score"])
+    
+>       assert delta["verdict"] != scoring.STATUS_CRITICAL_REGRESSION, (
+            "REGRESSAO CRITICA em {0}: {1}".format(
+                project_id,
+                [row for row in delta["critical"]
+                 if row["status"] == scoring.STATUS_CRITICAL_REGRESSION])
+        )
+E       AssertionError: REGRESSAO CRITICA em torre_easy_lo_r00_tp1: [{'code': 'JUNCTION_MISSING_BINDING', 'before': 8, 'after': 9, 'delta': 1, 'status': 'REGRESSAO CRITICA'}]
+E       assert 'REGRESSAO CRITICA' != 'REGRESSAO CRITICA'
+E        +  where 'REGRESSAO CRITICA' = scoring.STATUS_CRITICAL_REGRESSION
+
+tests/regression/test_benchmark_baselines.py:68: AssertionError
+=========================== short test summary info ============================
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+1 failed, 1090 passed in 4236.67s (1:10:36)

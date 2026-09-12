@@ -1,0 +1,208 @@
+{
+ "date": "2026-09-12",
+ "what": "Estado final medido CONTRA a regua V2 (baseline gerado em ac5e447): runner.run_project(version='v2', write_files=False) + scoring.compare_runs",
+ "head": "4d6eecff394b0147a4e59b942162d3aa653755de",
+ "projects": {
+  "torre_easy_lo_r00_tgd": {
+   "seconds": 339.7,
+   "verdict": "MELHORIA",
+   "baseline_critical": {
+    "PRISM_CONTINUOUS_JOINT": 437,
+    "OPENING_BLOCK_CROSSES_JAMB": 96,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+    "COVERAGE_MISSING_ROW": 142,
+    "COVERAGE_WALL_NOT_MODULATED": 10,
+    "POSITION_OVERLAP": 140
+   },
+   "now_critical": {
+    "PRISM_CONTINUOUS_JOINT": 245,
+    "OPENING_BLOCK_CROSSES_JAMB": 96,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+    "COVERAGE_MISSING_ROW": 142,
+    "COVERAGE_WALL_NOT_MODULATED": 10,
+    "POSITION_OVERLAP": 140
+   },
+   "baseline_success": 0.2345,
+   "now_success": 0.2345,
+   "blocks": [
+    16463,
+    16361
+   ],
+   "critical_rows": [
+    {
+     "code": "COVERAGE_MISSING_ROW",
+     "before": 142,
+     "after": 142,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "COVERAGE_ROW_MOSTLY_EMPTY",
+     "before": 86,
+     "after": 86,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "COVERAGE_WALL_NOT_MODULATED",
+     "before": 10,
+     "after": 10,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "OPENING_BLOCK_CROSSES_JAMB",
+     "before": 96,
+     "after": 96,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "POSITION_OVERLAP",
+     "before": 140,
+     "after": 140,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "PRISM_CONTINUOUS_JOINT",
+     "before": 437,
+     "after": 245,
+     "delta": -192,
+     "status": "MELHORIA"
+    }
+   ],
+   "category_rows": [
+    {
+     "category": "block_positions",
+     "before": 14,
+     "after": 14,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "compensators",
+     "before": 61,
+     "after": 61,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "junctions",
+     "before": 1,
+     "after": 1,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "openings",
+     "before": 8,
+     "after": 8,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "prism",
+     "before": 23,
+     "after": 17,
+     "delta": -6,
+     "status": "MELHORIA"
+    },
+    {
+     "category": "wall_coverage",
+     "before": 70,
+     "after": 70,
+     "delta": 0,
+     "status": "INALTERADO"
+    }
+   ]
+  },
+  "torre_easy_lo_r00_tp1": {
+   "seconds": 118.2,
+   "verdict": "MELHORIA",
+   "baseline_critical": {
+    "PRISM_CONTINUOUS_JOINT": 304,
+    "JUNCTION_MISSING_BINDING": 9,
+    "POSITION_OVERLAP": 11
+   },
+   "now_critical": {
+    "PRISM_CONTINUOUS_JOINT": 48,
+    "JUNCTION_MISSING_BINDING": 9,
+    "POSITION_OVERLAP": 11
+   },
+   "baseline_success": 0.1979,
+   "now_success": 0.1979,
+   "blocks": [
+    19181,
+    19039
+   ],
+   "critical_rows": [
+    {
+     "code": "JUNCTION_MISSING_BINDING",
+     "before": 9,
+     "after": 9,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "POSITION_OVERLAP",
+     "before": 11,
+     "after": 11,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "code": "PRISM_CONTINUOUS_JOINT",
+     "before": 304,
+     "after": 48,
+     "delta": -256,
+     "status": "MELHORIA"
+    }
+   ],
+   "category_rows": [
+    {
+     "category": "block_positions",
+     "before": 1,
+     "after": 1,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "compensators",
+     "before": 77,
+     "after": 77,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "junctions",
+     "before": 1,
+     "after": 1,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "openings",
+     "before": 0,
+     "after": 0,
+     "delta": 0,
+     "status": "INALTERADO"
+    },
+    {
+     "category": "prism",
+     "before": 20,
+     "after": 10,
+     "delta": -10,
+     "status": "MELHORIA"
+    },
+    {
+     "category": "wall_coverage",
+     "before": 13,
+     "after": 13,
+     "delta": 0,
+     "status": "INALTERADO"
+    }
+   ]
+  }
+ }
+}

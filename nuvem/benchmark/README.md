@@ -62,6 +62,41 @@ abaixo).
 py -3 -m pytest tests/regression -q
 ```
 
+## Réguas versionadas — V1 (histórica) × V2 (topologia do motor atual)
+
+Desde 2026-09-12 um projeto pode ter mais de uma **régua** (baseline +
+input + snapshot medidos juntos):
+
+| Régua | Onde | O que é |
+|---|---|---|
+| **V1** | raiz de `projects/<id>/` (`input.json`, `wall_modeling_snapshot.json`, `baseline.json`, `score.json`) | **HISTORICAL / TOPOLOGIA ANTIGA** — FASE A de 2026-08-31 (TGD: 167 paredes / 272 nós / 82 aberturas atribuídas). Preservada como está; nunca regravada. |
+| **V2** | `projects/<id>/v2/` (`wall_modeling_snapshot.json`, `input.json`, `baseline.json`, `score.json`, `manifest.json`) | **CURRENT ENGINE TOPOLOGY** — FASE A regenerada pelo motor atual através do pipeline real (`runner.run_wall_modeling_only` → `wall_modeling_bridge` → snapshot → `input_from_snapshot`); TGD: 145 paredes / 234 nós / 91 aberturas atribuídas. |
+
+Insumos compartilhados (nunca duplicados): `input_real.json`, `reference.json`,
+`metadata.json`, `reference_score.json`, `evaluation_scope.json`. Projeto sem
+`input_real.json` (TP1, reconstruído do gabarito) não tem FASE A para
+regenerar: a V2 reutiliza o `input.json` da raiz e o `manifest.json` grava
+isso (`input_source`).
+
+```bash
+py -3 nuvem/benchmark/runner.py --run torre_easy_lo_r00_tgd --version v2
+py -3 nuvem/benchmark/runner.py --all --check --version v2
+py -3 nuvem/benchmark/tools/build_version_manifest.py --version v2 --project torre_easy_lo_r00_tgd --base-main-sha <sha> --head-sha <sha>
+```
+
+`manifest.json` da versão registra: SHA da main/base e do HEAD, sha256 dos
+módulos do motor, data, contagens da FASE A (linhas, paredes, nós por tipo,
+interseções, aberturas atribuídas/não atribuídas), fingerprint canônico do
+input e do resultado, resumo do baseline e a **identidade física** de cada
+parede (`key` = endpoints canônicos + espessura, aberturas por `element_id`
+de origem) e de cada nó (ponto + chaves das paredes) — `W0xx` é só alias de
+índice daquela rodada. Débito registrado no próprio manifest: validadores e
+`scoring.per_wall` ainda reportam por `W0xx` (#28 não migrado).
+
+O baseline V2 **mede** o solver no estado em que foi gerado; não é ajustado
+para o solver passar. `tests/regression/test_benchmark_baselines.py` descobre
+as versões em disco e as compara com a mesma regra da V1.
+
 ## Wall Modeling (Etapa 2A) - FASE A
 
 Premissa arquitetural (confirmada antes da Etapa 2A, vale para toda sessao

@@ -1229,6 +1229,10 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     so' para MEDIR espaco disponivel antes de forcar uma peca de
     amarracao (B54/B34) num encontro em T/L - nunca altera nada.
 
+    Ponto DENTRO de um vao (t_lo < t_ft < t_hi): devolve 0.0 em qualquer
+    sentido - o vazio da abertura e' obstaculo, nunca se mede espaco
+    atraves dele (correcao de 2026-09-12, ver o comentario no corpo).
+
     `safe_range_ft` (opcional): `(lo_ft, hi_ft)` de `_wall_reserved_range_ft`
     - quando dado, o "fim fisico da parede" some' como limite e vira esse
     intervalo (ja' descontada a reserva de outro encontro na ponta
@@ -1239,14 +1243,32 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     _p0, _p1, _dir, total_len_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     lo_ft, hi_ft = (0.0, total_len_ft) if safe_range_ft is None else safe_range_ft
     openings_here = openings_per_wall[wall_idx] if (openings_per_wall and wall_idx < len(openings_per_wall)) else []
+    # Intervalos [t_lo, t_hi] NORMALIZADOS: a tupla e' (t_lo, t_hi, sill,
+    # head), mas a sonda nao pode depender do sentido em que o vao foi
+    # gravado - invertido, o mesmo vao fisico deixaria de ser obstaculo.
+    spans = []
+    for (t_a, t_b, _s, _h) in openings_here:
+        spans.append((t_a, t_b) if t_a <= t_b else (t_b, t_a))
+    # Ponto DENTRO de um vao (t_lo < t_ft < t_hi, fora do ruido das jambas):
+    # nao existe alvenaria onde apoiar a peca - a disponibilidade e' ZERO em
+    # qualquer sentido. Antes (ate' 2026-09-12) este caso era ignorado: o
+    # filtro so' enxergava vaos inteiramente a frente (t_lo >= t_ft) ou
+    # inteiramente atras (t_hi <= t_ft), e a sonda media "espaco" ATRAVES
+    # do vazio ate' o proximo obstaculo - o solver concluia que cabia uma
+    # peca de amarracao e a punha dentro da porta (OPENING_BLOCK_INSIDE_DOOR,
+    # caso W019 do TP1; auditoria 2026-09-09; regressao 0->7 na bisseccao
+    # 11.10 de 2026-09-11). Ver tests/test_room_probe_inside_opening.py.
+    for (t_lo, t_hi) in spans:
+        if t_lo + 1e-6 < t_ft < t_hi - 1e-6:
+            return 0.0
     if sign >= 0:
         boundary = hi_ft
-        for (t_lo, _t_hi, _s, _h) in openings_here:
+        for (t_lo, _t_hi) in spans:
             if t_lo >= t_ft - 1e-6 and t_lo < boundary:
                 boundary = t_lo
         return max(0.0, boundary - t_ft)
     boundary = lo_ft
-    for (_t_lo, t_hi, _s, _h) in openings_here:
+    for (_t_lo, t_hi) in spans:
         if t_hi <= t_ft + 1e-6 and t_hi > boundary:
             boundary = t_hi
     return max(0.0, t_ft - boundary)
@@ -3613,7 +3635,13 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
          revisada em 2026-09-11 pela evidencia do projeto humano).
       6. 1 UNICO B19 MESMO SEM ponta aberta - ULTIMISSIMO recurso "limpo"
          (0 ou 1 compensador), so' tentado se nem o tier 5 (compensador)
-         fechou. TROCADO DE LUGAR com o tier de compensador em 2026-08-25
+         fechou. NOTA (2026-09-12): a implementacao deste tier so' tenta
+         "0 compensador" (pool sem C09/C04); o caso "1 compensador" cai no
+         tier 7 como sequencia de compensadores. Trocar isso no PADRAO foi
+         medido na missao pre-Beta 2 (TP1 PRISM 300->36, mas +2 juntas
+         cross-band no TGD/W113 e o reproducer da CR-G12 volta a acusar) e
+         ficou como DECISAO PENDENTE; o que entrou foi a licenca restrita
+         de `_pier_full_search_layout` (ver `allow_forced_half`). TROCADO DE LUGAR com o tier de compensador em 2026-08-25
          (pedido explicito do usuario): "o meio bloco deve ser priorizado
          EXCLUSIVAMENTE em situacoes relacionadas as aberturas... nao
          utilizar meio bloco para simplesmente corrigir uma modulacao ruim
@@ -4442,7 +4470,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
                              target_void_positions_cm=None,
                              allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                              leading_open=True, trailing_open=True,
-                             extra_profile=None):
+                             extra_profile=None, allow_forced_half=False):
     """A MELHOR composicao do MESMO trecho de `baseline` sob os criterios
     de amarracao ja' documentados, procurada por programacao dinamica sobre
     TODAS as composicoes possiveis - nao so' as que variam o primeiro
@@ -4482,7 +4510,21 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
     por causa da regra #1 - e o de MEIO BLOCO so' sobe quando existe ponta
     ABERTA de verdade (regra #2: B19 nunca encosta num no' de amarracao).
     Nenhum meio-bloco fora de ponta aberta e' criado que o baseline ja'
-    nao tivesse."""
+    nao tivesse - EXCETO sob `allow_forced_half` (2026-09-12): quando o
+    baseline e' uma SEQUENCIA de compensadores acima de
+    MAX_COMPENSATORS_PER_TRECHO (regra #2 ja' violada, tier 7 de
+    `_pier_ordered_layout`) E ela empilha junta em cima da fiada oposta
+    (regra #1 tambem violada), a busca pode usar 1 UNICO B19 forcado numa
+    ponta fechada - o "ultimissimo recurso limpo" do tier 6, cujo docstring
+    ja' previa "0 ou 1 compensador". CAUSA MEDIDA (bisseccao TP1,
+    2026-09-12): a cadeia `C09 C09 C09` de um resto de 29cm tem juntas
+    FIXAS em 24,5/34,5/44,5; na parede de 54cm entre um canto L e um T
+    (W088/W090) a junta 34,5 ficou embaixo da junta B34(canto)|fill que a
+    regra 11.14 passou a produzir na fiada oposta - junta corrida no'|fill
+    (regressao 14 -> 16 do PR #37). `C09 + B19` (junta 24,5) desencontra e
+    tem 1 compensador. A licenca e' restrita de proposito: fora de conflito
+    de junta a cadeia continua sendo o layout (trocar o PADRAO do tier 6
+    foi medido e fica como decisao pendente - ver o docstring do tier 6)."""
     if not baseline or len(baseline) <= 1:
         return None
 
@@ -4528,6 +4570,11 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
     max_half = perfil[1] + (1 if (leading_open or trailing_open) else 0)
     max_special = max(perfil[2], MAX_SPECIAL_BOND_PER_TRECHO)
     max_misplaced = perfil[3]
+    if allow_forced_half and base_profile[0] > MAX_COMPENSATORS_PER_TRECHO:
+        # Licenca restrita (ver docstring): 1 B19 forcado no lugar de uma
+        # sequencia de compensadores que empilha junta.
+        max_half = max(max_half, 1)
+        max_misplaced = max(max_misplaced, 1)
 
     avoid = sorted(avoid_positions_cm or [])
     alvo_vazio = sorted(target_void_positions_cm or [])
@@ -4844,6 +4891,27 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
             completa_score = _score(completa)
             if completa_score < best_score:
                 best, best_score = completa, completa_score
+        # Licenca do B19 forcado (2026-09-12, ver _pier_full_search_layout):
+        # SO' quando o melhor candidato ate' aqui viola as DUAS regras
+        # (sequencia de compensadores E junta empilhada), e SO' se o layout
+        # licenciado ZERA a coincidencia de junta - um B19 forcado que ainda
+        # empilha junta nao e' melhor que a cadeia, e esconderia da troca
+        # cross-band (`_cross_band_swapped_layout`, que exige coincidencia
+        # ESTRITAMENTE menor) a reordenacao da propria cadeia que resolve.
+        if best_score[0] > 0 and best_score[1] > 0:
+            forcada = _pier_full_search_layout(
+                baseline, catalog, seg_start_cm, avoid_positions_cm,
+                target_void_positions_cm=target_void_positions_cm,
+                allow_compensators=allow_compensators,
+                leading_open=leading_is_open, trailing_open=trailing_is_open,
+                extra_profile=_layout_piece_profile(best, catalog, leading_is_open,
+                                                    trailing_is_open),
+                allow_forced_half=True,
+            )
+            if forcada is not None:
+                forcada_score = _score(forcada)
+                if forcada_score[1] == 0 and forcada_score < best_score:
+                    best, best_score = forcada, forcada_score
     return best
 
 

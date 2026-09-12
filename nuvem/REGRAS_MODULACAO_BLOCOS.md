@@ -247,6 +247,40 @@ pode invadir o vão real de uma porta sem peitoril (peitoril ≈ 0,
 - Janelas (peitoril > 0 de verdade) **não** entram nesta regra — o vão
   delas só é excluído na faixa vertical real (ver seção 4).
 
+### 3.1 — REGRA OBRIGATÓRIA: a sonda de vão não atravessa abertura (2026-09-12)
+
+**Como foi descoberto:** auditoria de 2026-09-09 (secção 5, "Portas/janelas")
+e bissecção 11.10 de 2026-09-11 (`OPENING_BLOCK_INSIDE_DOOR` 0 → 7 no TP1,
+caso W019). Corrigido em 2026-09-12 (missão pré-Beta 2), teste RED → GREEN em
+`tests/test_room_probe_inside_opening.py`.
+
+`_room_at_t_on_wall` (`wall_stepper.py`) mede a alvenaria disponível a partir
+de um ponto `t` de uma parede, num sentido, até o próximo obstáculo real
+(jamba de abertura, reserva de outro encontro, ponta física). É a medição que
+decide se um encontro T/L/X recebe B54, degrada para B34 ou fica sem amarração.
+
+- **Ponto dentro de uma abertura** (`t_lo < t < t_hi`, na faixa vertical em
+  que ela está ativa): a disponibilidade é **ZERO em qualquer sentido**. Não
+  existe alvenaria onde apoiar a peça; a sonda **nunca mede espaço através do
+  vazio** até a jamba oposta ou além dela. Antes da correcção o filtro só
+  enxergava aberturas inteiramente à frente ou inteiramente atrás do ponto, e
+  a abertura que continha o ponto era ignorada — foi assim que blocos de
+  amarração entraram em portas.
+- **Ponto exactamente na jamba:** andando para dentro do vão, zero; andando
+  para fora, mede normalmente até o próximo obstáculo.
+- **Intervalo gravado invertido** (`t_lo > t_hi`) é o **mesmo vão físico**: a
+  sonda normaliza antes de medir; nunca trata como "sem abertura".
+- **Várias aberturas na mesma parede:** cada uma é obstáculo independente; a
+  ordem da lista não altera a medição.
+- A regra é **geométrica e geral** — não há porta, coordenada, largura ou peça
+  específica no código nem no teste.
+
+**Efeito medido no corpus (main `6439669` → correcção, mesmo input V1):** TP1
+`OPENING_BLOCK_CROSSES_JAMB` 168 → 0, `POSITION_OVERLAP` 18 → 11,
+`PRISM_CONTINUOUS_JOINT` 300 → 304 (explicado no checkpoint de 2026-09-12);
+TGD `OPENING_BLOCK_INSIDE_DOOR` 5 → 0, `CROSSES_JAMB` 108 → 72. Ver
+`docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md`.
+
 ## 4. Janela não interrompe a fiada abaixo do peitoril
 
 Uma janela só é vazia **na faixa vertical real do seu vão**
@@ -1569,6 +1603,25 @@ Portanto a ordem passa a ser:
    preflight, nunca passa em silêncio. Resolver exige que a degradação para
    L respeite o vão de porta antes de aumentar a reserva.
 
+   **BISSECÇÃO REPETIDA (2026-09-12, missão pré-Beta 2, após a regra 3.1 —
+   sonda de vão não atravessa abertura):** a mesma reserva de meio B54 em
+   `_clip_range_by_midspan_neighbours` foi reaplicada nas duas árvores
+   (`runner.run_project`, evidência em
+   `docs/checkpoints/evidence/2026-09-12-bisect-1110.json`):
+
+   | Árvore | TP1 `OPENING_BLOCK_INSIDE_DOOR` | TP1 outros críticos | TGD `INSIDE_DOOR` |
+   |---|---|---|---|
+   | main `6439669` + reserva de meio B54 (ANTES do fix) | **7** (W019, bloco [715,749] no vão [564,750], fiadas 0–12 pares — idêntico à bissecção de 2026-09-11) | CROSSES_JAMB 161, PRISM 300, JUNCTION 9 | 5 |
+   | fix da sonda `ac5e447` + reserva de meio B54 (DEPOIS do fix) | **0** | CROSSES_JAMB 0, POSITION_OVERLAP 0, PRISM 304, JUNCTION 9 | 0 |
+   | fix da sonda, reserva genérica (estado entregue) | 0 | CROSSES_JAMB 0, POSITION_OVERLAP 11, PRISM 304, JUNCTION 9 | 0 |
+
+   Ou seja: a causa dos 7 blocos dentro da porta era a **sonda** (regra 3.1),
+   não a reserva. Com a sonda corrigida a reserva de meio B54 deixa de pôr
+   bloco em porta e ainda zera `POSITION_OVERLAP` no TP1 (11 → 0). **Não foi
+   religada nesta missão** (instrução do usuário: apresentar a evidência
+   primeiro) — fica como DECISÃO PENDENTE: reativar a reserva de meio B54
+   resolve o limite conhecido dos dois T entre 34 e 54 cm.
+
 Caso mínimo da Torre [21,19,44]: antes 2 nós "não cabe"; agora PASS com os
 dois T degradados. Testes: `test_11_10_amarracoes_que_nao_cabem_degradam_
 para_B34_antes_de_ficar_sem_modular` e `test_11_10_rede_de_seguranca_
@@ -1781,6 +1834,12 @@ reprovada — **geometria de entrada** (ver o filtro por layer de referência
 estrutural, seção 49), não regra. Combinada com a busca de paridade da Etapa 7 (`TIE_PARITY_LOCAL_SEARCH=True`), a tentativa anterior de reserva por fiada dava 7 colisões de preflight (previsão do papel do canto por convenção); esta versão lê as peças **já resolvidas** e a combinação mede 0 colisões em Butantã (3 reprovadas, 1 flip). Testes:
 `tests/test_corner_reserve_per_course.py` (antes/depois, invariância,
 toco do CAD, controle de parede longa).
+
+**Efeito colateral medido e corrigido (2026-09-12):** nas paredes curtas
+canto–T do TP1 (W088/W090, 54 cm) o B34 de canto que esta regra passa a
+deitar na fiada A criou a junta 34,5 exatamente em cima da junta fixa da
+cadeia `C09 C09 C09` da fiada B — regressão nó|fill 14 → 16 do PR #37. A
+regra fica; o preenchimento é que foi corrigido (seção 33.8).
 
 ### 12.1 — Bug real corrigido: o espelhamento duplicava a peça (2026-09-10)
 
@@ -5490,6 +5549,74 @@ sendo contabilizada como junta estrutural "a mais". **Refutada**: nem no
 histórico nem na main há contagem a mais; o defeito é a contagem A MENOS
 (a junta invisível para a busca de desencontro da fiada oposta). Nenhum
 validador foi alterado e nenhuma redução vem de reclassificação (N3 = 0).
+
+### 33.8 REGRA OBRIGATÓRIA — cadeia de compensadores com junta fixa embaixo da peça de canto (regressão W088/W090, 2026-09-12)
+
+**Como foi descoberto:** bissecção do medidor nó|fill do TP1 na missão
+pré-Beta 2 (estados `21576ee` → `e34f710` → `ee34c2a` → `7239946` → `cd4a261`
+→ `6439669`, `docs/checkpoints/evidence/2026-09-12-nodefill-bisect.json`). O
+PR #37 subiu o estado de produção de 14 para 16 violações nó|fill; as duas
+novas são W088 e W090 (índices 87/89), paredes de **54 cm entre um canto L
+(t=0) e um T em que elas chegam (t=54)**, ambas com a assinatura
+`(34,5, "A")`. Commit culpado: **`cd4a261` (regra 11.14, reserva de canto por
+fiada)**; `7239946` (fileira de B34) e `ee34c2a` (11.13) não as criam.
+
+**Mecanismo físico (peça a peça, medido):**
+
+| Fiada | Antes de 11.14 (`7239946`) | Depois de 11.14 (`cd4a261`) |
+|---|---|---|
+| A | `C09 [0,9] (canto L degradado)` + `B34 [10,44] (fill)` + `C09 [45,54] (T degradado)` — juntas 9,5 / 44,5 | `B34 [0,34] (canto L, 11.14)` + `C09 [35,44] (fill)` + `C09 [45,54] (T)` — juntas **34,5** / 44,5 |
+| B | `C09 [15,24] C09 [25,34] C09 [35,44]` (fill) + `C09 [45,54] (T)` — juntas 24,5 / **34,5** / 44,5 | idêntica |
+
+A 11.14 está **certa** (é o que o humano faz: B34 de canto na fiada A, só o
+corpo da peça reservado na outra fiada). O que estava errado era o
+preenchimento da fiada B: os 30 cm entre o corpo do canto e a peça do T
+fechavam pelo **tier 7** de `_pier_ordered_layout` como `C09 C09 C09` — três
+compensadores em sequência ("extremamente proibido", regra #2) com juntas
+**fixas** em 24,5/34,5/44,5. Antes de 11.14 a junta 34,5 dessa cadeia não
+tinha par na fiada A; depois, ficou exatamente embaixo da junta
+B34(canto)|fill. A metade simétrica (33.1) não conseguia consertar porque a
+busca de desencontro **nunca gerava B19 fora de ponta aberta** — a
+composição `C09 + B19` (uma junta só, em 24,5) não existia como candidato,
+embora o docstring do tier 6 ("1 único B19 mesmo sem ponta aberta, 0 ou 1
+compensador") já a previsse.
+
+**Regra (implementada, `_pier_full_search_layout(allow_forced_half=True)` via
+`_pier_layout_avoiding_joints`):** quando o melhor preenchimento de um trecho
+viola **as duas** regras ao mesmo tempo — sequência de compensadores acima de
+`MAX_COMPENSATORS_PER_TRECHO` **e** junta empilhada na fiada oposta — a busca
+pode usar **1 único B19 forçado numa ponta fechada**, e só aceita esse layout
+se ele **zerar** a coincidência de junta. Fora de conflito, a cadeia continua
+sendo o layout (nada muda no padrão); um B19 forçado que ainda empilhasse
+junta é recusado, porque esconderia da troca cross-band (39.x) a reordenação
+da própria cadeia que resolve (caso W113 do TGD / reproducer mínimo da
+CR-G12, mantido verde). Testes: `tests/test_forced_half_licence.py`,
+`test_block_node_fill_revalidation.py` t3/t4 (fixture real canto–T) e t20.
+
+**Medido (HEAD `bf836bb`, evidência
+`docs/checkpoints/evidence/2026-09-12-corpus-states.json`):** medidor nó|fill
+do TP1 **16 → 0** (metade simétrica ligada) e **16 → 0** no contrafactual
+desligado (a fiada B já enxerga a junta de contorno da A pela licença); TGD
+0 → 0. No benchmark, TP1 `PRISM_CONTINUOUS_JOINT` **304 → 48** exatamente nas
+12 paredes que o medidor acusava (W003/W008 32→16, W021/W022/W088/W090/
+W092/W093 16→0, W040/W061/W062/W071 32→0), `PRISM_JOINT_STACK` 18 → 2,
+`COMPENSATOR_CONSECUTIVE` 1284 → 988; TGD **inalterado** (PRISM 324,
+CROSSES_JAMB 72, criticos 831). Críticos do TP1: main 495 → 68.
+
+**Residual registrado:** parede curta canto–T de **70 cm**: nem a metade
+simétrica nem a licença fecham sem junta empilhada (fixture `LT_RESIDUAL`
+em t4) — limite conhecido, não escondido.
+
+**DECISÃO PENDENTE (medida, não aplicada):** tornar o tier 6 **padrão** com
+1 compensador (B19 + C09 no lugar de qualquer `C09 C09 C09`, sem esperar
+conflito). Medido em 2026-09-12: TP1 `PRISM_CONTINUOUS_JOINT` 304 → **36**,
+`COMPENSATOR_CONSECUTIVE` 1300 → 607, nó|fill 16 → 6; TGD
+`COMPENSATOR_CONSECUTIVE` 294 → 173 mas `PRISM` 324 → 326 (W113: as duas
+ordens com B19 empilham numa vizinha — 39,5 abaixo ou 54,5 na própria
+banda — e o reproducer mínimo da CR-G12 volta a acusar 2 identidades). Exige
+decidir a prioridade regra #1 × regra #2 na busca (hoje regra #2 primeiro,
+seção 16.1) ou dar à família A um lookahead da família B — decisão do
+usuário, não do agente.
 
 ## 34. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — os dois gates do SAFE
 REPAIR mediam PROXY, não o defeito real
