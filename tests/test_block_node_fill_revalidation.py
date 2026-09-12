@@ -639,55 +639,45 @@ def test_t19_candidato_rejeitado_nao_e_liberado_indevidamente():
 
 
 def test_t20_caso_real_tp1_junta_b19_b39_em_cima_da_peca_de_no():
-    """Assinatura real do defeito no TP1 (t = 34,5 cm, fiada A `B19|B39` ou
-    `B19|B34` sobre a junta `B34(no')|fill` da fiada B): existe SEM a metade
-    simetrica e desaparece COM ela - medido na geometria do solver, sem
-    validador do benchmark."""
+    """Estado de PRODUCAO do TP1 no medidor no'|fill desta CR - trancado no
+    valor medido, nunca afrouxado.
+
+    HISTORICO MEDIDO (metade simetrica OFF -> ON, `_corpus` real):
+        2026-09-04 (CR original)            31 -> 14   (sig 16 -> 4)
+        2026-09-08 (CR-G12)                 16 -> 14   (sig  5 -> 4)
+        2026-09-11 (PR #37, main 6439669)   16 -> 16   (sig  4 -> 4)  REGRESSAO
+                                            +W088/+W090 (idx 87/89), t=34,5 A
+        2026-09-12 (missao pre-Beta 2)       0 ->  0   (sig  0 -> 0)
+    A regressao de 2026-09-11 foi bisseccionada ate' o commit cd4a261 (regra
+    11.14): o B34 de canto que ela deita na fiada A das paredes de 54cm
+    canto-T ficou em cima da junta fixa 34,5 da cadeia C09 C09 C09 da fiada
+    B. Correcao GERAL (secao 33.8 de REGRAS_MODULACAO_BLOCOS.md): licenca
+    restrita do B19 forcado em `_pier_full_search_layout` - so' quando a
+    cadeia de compensadores empilha junta, e so' se zerar a coincidencia.
+    Efeito no corpus (benchmark, validador de prisma): TP1
+    PRISM_CONTINUOUS_JOINT 304 -> 48, exatamente nas 12 paredes que o medidor
+    acusava; TGD inalterado (324). Evidencia:
+    docs/checkpoints/evidence/2026-09-12-nodefill-bisect.json e
+    docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md.
+
+    O que este teste tranca AGORA (mais estrito do que os `<= 14`/`<= 16`
+    anteriores): ZERO violacoes no'|fill no estado de producao (metade
+    simetrica ligada) e ZERO na assinatura de 34,5; ligar a metade simetrica
+    nunca piora e nunca cria violacao nova. O contrafactual OFF tambem mede
+    0 desde 2026-09-12 (a fiada B ja' enxerga a junta de contorno da A pela
+    licenca) - por isso a exigencia `sig_off` nao-vazio, que provava o efeito
+    proprio da metade simetrica, mudou de lugar: t4 prova esse efeito com a
+    fixture REAL canto-T (LT_COM_JUNTA), onde OFF produz a junta e ON a
+    remove."""
     off, walls = _corpus("torre_easy_lo_r00_tp1", False)
     on, walls_on = _corpus("torre_easy_lo_r00_tp1", True)
     v_off = node_fill_prism_violations(walls, off["candidates"])
     v_on = node_fill_prism_violations(walls_on, on["candidates"])
     sig_off = [v for v in v_off if abs(v[1] - 34.5) < 1e-6 and v[2] == "B"]
     sig_on = [v for v in v_on if abs(v[1] - 34.5) < 1e-6 and v[2] == "B"]
-    assert sig_off, v_off[:10]
     assert len(v_on) <= len(v_off), (len(v_off), len(v_on))
-    # Medido (2026-09-04): 16 -> 4. O residual sao cadeias de 3 compensadores
-    # (3 x C09 em 30cm entre a largura do no vizinho e um X/T degradado) - a
-    # UNICA composicao possivel, juntas fixas em 24,5/34,5/44,5 - o limite
-    # genuino ja documentado (REGRAS 30.6 / 33.5), que nenhuma troca de
-    # layout move. O teste tranca a reducao, nao a impossibilidade.
-    #
-    # CR-G12 (2026-09-08, revisao independente): a razao `len(sig_on) * 2 <=
-    # len(sig_off)` media EFICACIA RELATIVA contra um CONTRAFACTUAL - o
-    # estado "sem a metade simetrica" -, e e' o CONTRAFACTUAL que a CR-G12
-    # muda. Medido nas duas arvores (base `91258dd` x base+CR-G12), TP1
-    # real:
-    #
-    #     PRODUCAO (metade simetrica LIGADA)   v_on  = 14 -> 14   IDENTICO
-    #                                          sig_on =  4 ->  4  IDENTICO
-    #     CONTRAFACTUAL (metade simetrica OFF) v_off = 31 -> 16
-    #                                          sig_off= 16 ->  5
-    #
-    # O estado de PRODUCAO nao mudou em nada: a CR-G12 retira ANTES, na
-    # geracao, parte do MESMO defeito que a metade simetrica consertava
-    # depois. Exigir a razao seria exigir que o contrafactual continuasse
-    # ruim. O teste passa a trancar o ESTADO FISICO DE PRODUCAO - que a
-    # razao nunca trancou (uma reducao de 100 para 50 tambem a satisfaz) -
-    # mais a reducao estrita, que continua provando que a metade simetrica
-    # ainda tem efeito proprio sobre esta assinatura:
-    #
-    # 2026-09-11 (regra da fileira de B34 + 11.14, decisoes do usuario): o
-    # MESMO fenomeno de novo, agora completo - a geracao remove ANTES toda a
-    # parcela que a metade simetrica consertava depois. Medido no TP1 real:
-    # v_off = v_on = 16, sig_off = sig_on = 4 (TGD: 0/0; T_MEIO/X_MEIO/
-    # L_LIVRE: 0/0). A metade simetrica fica DORMENTE neste corpus; exigir a
-    # reducao estrita seria exigir que o contrafactual continuasse ruim. O
-    # estado de producao (16 violacoes node|fill no medidor desta CR, 4 na
-    # assinatura de 34,5) e' o novo valor medido - o gate do benchmark TP1
-    # (criticos) nao regride com as duas regras (so' a historica
-    # JUNCTION_MISSING_BINDING 8->9), e a assinatura continua em 4.
     assert len(sig_on) <= len(sig_off), (sig_off, sig_on)
-    assert len(sig_on) <= 4, sig_on
-    assert len(v_on) <= 16, (len(v_on), v_on)
+    assert v_on == [], v_on
+    assert sig_on == [], sig_on
     # e nenhuma violacao NOVA: todo residual ja' existia sem a metade simetrica
-    assert set(sig_on) <= set(sig_off), sorted(set(sig_on) - set(sig_off))
+    assert set(v_on) <= set(v_off), sorted(set(v_on) - set(v_off))

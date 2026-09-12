@@ -1045,8 +1045,8 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     cobrindo o MESMO no' na MESMA fiada (o padrao de alternancia par/
     impar do canto L amarra o no' so' nas fiadas ONDE O B19 NAO ESTA') -
     todas as tentativas (2 por parede elegivel: 16 ate' 2026-09-10, 12
-    depois da regra da fileira de B34) sao rejeitadas por
-    `no_tie_covering_node`."""
+    depois da regra da fileira de B34 - expectativa EXATA restaurada em
+    2026-09-12) sao rejeitadas por `no_tie_covering_node`."""
     solver_bridge = _solver_bridge()
     input_project = json.load(open(_project_paths("torre_easy_lo_r00_tp1"), encoding="utf-8"))
     (solve_result, _walls, _nodes, _openings, _catalog,
@@ -1057,11 +1057,15 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     # 2026-09-11 (regra da fileira de B34 + 11.14, decisoes do usuario): o
     # numero de paredes ELEGIVEIS caiu de 8 para 6 (duas delas passaram a
     # fechar sem residuo de B19), entao as tentativas sao 12 (6 x 2
-    # atribuicoes), nao mais 16. O contrato do gate nao mudou: ZERO aceitas,
-    # todas rejeitadas por `no_tie_covering_node`, sempre em pares (uma
-    # tentativa por atribuicao de fiada).
-    assert rejected, "o corpus deixou de ter paredes elegiveis - o teste perdeu o objeto"
-    assert len(rejected) % 2 == 0 and len(rejected) <= 16, len(rejected)
+    # atribuicoes), nao mais 16. O PR #37 tinha afrouxado isto para
+    # `% 2 == 0 and <= 16`; restaurado em 2026-09-12 para a expectativa
+    # EXATA medida no estado corrigido (wall_idx 12, 13, 14, 15, 88, 90 - as
+    # mesmas 6 paredes com e sem a licenca da secao 33.8): 12 tentativas.
+    # O contrato do gate nao mudou: ZERO aceitas, todas rejeitadas por
+    # `no_tie_covering_node`, sempre em pares (uma tentativa por atribuicao
+    # de fiada). Mudar este numero exige explicar QUAL parede entrou ou saiu.
+    assert len(rejected) == 12, (len(rejected), sorted(set(r["wall_idx"] for r in rejected)))
+    assert sorted(set(r["wall_idx"] for r in rejected)) == [12, 13, 14, 15, 88, 90]
     assert all(r["reason"] == "no_tie_covering_node" for r in rejected)
 
 
