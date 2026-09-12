@@ -1,0 +1,337 @@
+{
+ "date": "2026-09-12",
+ "what": "Corpus (runner.run_project, write_files=False) e medidor no'|fill por estado: main 6439669; ac5e447 (sonda de vao); tier 6 padrao (medido, NAO aplicado); final bf836bb (licenca restrita 33.8)",
+ "states": {
+  "main_6439669": {
+   "torre_easy_lo_r00_tp1": {
+    "seconds": 216.0,
+    "walls": 96,
+    "blocks": 18955,
+    "success_rate": 0.1562,
+    "critical_errors": 495,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 300,
+     "JUNCTION_MISSING_BINDING": 9,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "POSITION_OVERLAP": 18
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 968,
+     "JUNCTION_MISSING_BINDING": 8,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "COVERAGE_MISSING_ROW": 16,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 27,
+     "POSITION_OVERLAP": 18
+    },
+    "delta_verdict": "REGRESSAO CRITICA",
+    "inside_openings": []
+   },
+   "torre_easy_lo_r00_tgd": {
+    "seconds": 132.9,
+    "walls": 167,
+    "blocks": 11045,
+    "success_rate": 0.1677,
+    "critical_errors": 872,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 324,
+     "JUNCTION_MISSING_BINDING": 23,
+     "OPENING_BLOCK_CROSSES_JAMB": 108,
+     "OPENING_BLOCK_INSIDE_DOOR": 5,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+     "COVERAGE_WALL_NOT_MODULATED": 28,
+     "COVERAGE_MISSING_ROW": 216,
+     "POSITION_OVERLAP": 24
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 961,
+     "JUNCTION_MISSING_BINDING": 24,
+     "OPENING_BLOCK_CROSSES_JAMB": 147,
+     "OPENING_BLOCK_INSIDE_DOOR": 45,
+     "COVERAGE_MISSING_ROW": 265,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 171,
+     "POSITION_OVERLAP": 29
+    },
+    "delta_verdict": "MELHORIA",
+    "inside_openings": [
+     {
+      "code": "OPENING_BLOCK_INSIDE_DOOR",
+      "wall": "W131",
+      "row": 1,
+      "blocks": [
+       "W131-R01-B002"
+      ],
+      "block_t_cm": [
+       7.0,
+       41.0
+      ],
+      "opening_t_cm": [
+       6.0,
+       107.0
+      ]
+     },
+     {
+      "code": "OPENING_BLOCK_INSIDE_DOOR",
+      "wall": "W131",
+      "row": 3,
+      "blocks": [
+       "W131-R03-B002"
+      ],
+      "block_t_cm": [
+       7.0,
+       41.0
+      ],
+      "opening_t_cm": [
+       6.0,
+       107.0
+      ]
+     },
+     {
+      "code": "OPENING_BLOCK_INSIDE_DOOR",
+      "wall": "W131",
+      "row": 5,
+      "blocks": [
+       "W131-R05-B002"
+      ],
+      "block_t_cm": [
+       7.0,
+       41.0
+      ],
+      "opening_t_cm": [
+       6.0,
+       107.0
+      ]
+     },
+     {
+      "code": "OPENING_BLOCK_INSIDE_DOOR",
+      "wall": "W131",
+      "row": 7,
+      "blocks": [
+       "W131-R07-B002"
+      ],
+      "block_t_cm": [
+       7.0,
+       41.0
+      ],
+      "opening_t_cm": [
+       6.0,
+       107.0
+      ]
+     },
+     {
+      "code": "OPENING_BLOCK_INSIDE_DOOR",
+      "wall": "W131",
+      "row": 9,
+      "blocks": [
+       "W131-R09-B002"
+      ],
+      "block_t_cm": [
+       7.0,
+       41.0
+      ],
+      "opening_t_cm": [
+       6.0,
+       107.0
+      ]
+     }
+    ]
+   }
+  },
+  "probe_fix_ac5e447": {
+   "torre_easy_lo_r00_tp1": {
+    "seconds": 217.9,
+    "walls": 96,
+    "blocks": 19181,
+    "success_rate": 0.1979,
+    "critical_errors": 324,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 304,
+     "JUNCTION_MISSING_BINDING": 9,
+     "POSITION_OVERLAP": 11
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 968,
+     "JUNCTION_MISSING_BINDING": 8,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "COVERAGE_MISSING_ROW": 16,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 27,
+     "POSITION_OVERLAP": 18
+    },
+    "delta_verdict": "REGRESSAO CRITICA",
+    "inside_openings": []
+   },
+   "torre_easy_lo_r00_tgd": {
+    "seconds": 131.7,
+    "walls": 167,
+    "blocks": 11087,
+    "success_rate": 0.1377,
+    "critical_errors": 831,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 324,
+     "JUNCTION_MISSING_BINDING": 23,
+     "OPENING_BLOCK_CROSSES_JAMB": 72,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+     "COVERAGE_WALL_NOT_MODULATED": 28,
+     "COVERAGE_MISSING_ROW": 216,
+     "POSITION_OVERLAP": 24
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 961,
+     "JUNCTION_MISSING_BINDING": 24,
+     "OPENING_BLOCK_CROSSES_JAMB": 147,
+     "OPENING_BLOCK_INSIDE_DOOR": 45,
+     "COVERAGE_MISSING_ROW": 265,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 171,
+     "POSITION_OVERLAP": 29
+    },
+    "delta_verdict": "MELHORIA",
+    "inside_openings": []
+   }
+  },
+  "tier6_default_NOT_APPLIED": {
+   "torre_easy_lo_r00_tp1": {
+    "seconds": 115.7,
+    "walls": 96,
+    "blocks": 19005,
+    "success_rate": 0.2188,
+    "critical_errors": 56,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 36,
+     "JUNCTION_MISSING_BINDING": 9,
+     "POSITION_OVERLAP": 11
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 968,
+     "JUNCTION_MISSING_BINDING": 8,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "COVERAGE_MISSING_ROW": 16,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 27,
+     "POSITION_OVERLAP": 18
+    },
+    "delta_verdict": "REGRESSAO CRITICA",
+    "inside_openings": []
+   },
+   "torre_easy_lo_r00_tgd": {
+    "seconds": 128.5,
+    "walls": 167,
+    "blocks": 11025,
+    "success_rate": 0.1377,
+    "critical_errors": 833,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 326,
+     "JUNCTION_MISSING_BINDING": 23,
+     "OPENING_BLOCK_CROSSES_JAMB": 72,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+     "COVERAGE_WALL_NOT_MODULATED": 28,
+     "COVERAGE_MISSING_ROW": 216,
+     "POSITION_OVERLAP": 24
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 961,
+     "JUNCTION_MISSING_BINDING": 24,
+     "OPENING_BLOCK_CROSSES_JAMB": 147,
+     "OPENING_BLOCK_INSIDE_DOOR": 45,
+     "COVERAGE_MISSING_ROW": 265,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 171,
+     "POSITION_OVERLAP": 29
+    },
+    "delta_verdict": "MELHORIA",
+    "inside_openings": []
+   }
+  },
+  "final_bf836bb": {
+   "torre_easy_lo_r00_tp1": {
+    "seconds": 197.2,
+    "walls": 96,
+    "blocks": 19039,
+    "success_rate": 0.1979,
+    "critical_errors": 68,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 48,
+     "JUNCTION_MISSING_BINDING": 9,
+     "POSITION_OVERLAP": 11
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 968,
+     "JUNCTION_MISSING_BINDING": 8,
+     "OPENING_BLOCK_CROSSES_JAMB": 168,
+     "COVERAGE_MISSING_ROW": 16,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 27,
+     "POSITION_OVERLAP": 18
+    },
+    "delta_verdict": "REGRESSAO CRITICA",
+    "inside_openings": []
+   },
+   "torre_easy_lo_r00_tgd": {
+    "seconds": 128.0,
+    "walls": 167,
+    "blocks": 11084,
+    "success_rate": 0.1377,
+    "critical_errors": 831,
+    "critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 324,
+     "JUNCTION_MISSING_BINDING": 23,
+     "OPENING_BLOCK_CROSSES_JAMB": 72,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+     "COVERAGE_WALL_NOT_MODULATED": 28,
+     "COVERAGE_MISSING_ROW": 216,
+     "POSITION_OVERLAP": 24
+    },
+    "baseline_critical_by_code": {
+     "PRISM_CONTINUOUS_JOINT": 961,
+     "JUNCTION_MISSING_BINDING": 24,
+     "OPENING_BLOCK_CROSSES_JAMB": 147,
+     "OPENING_BLOCK_INSIDE_DOOR": 45,
+     "COVERAGE_MISSING_ROW": 265,
+     "COVERAGE_WALL_NOT_MODULATED": 29,
+     "COVERAGE_ROW_MOSTLY_EMPTY": 171,
+     "POSITION_OVERLAP": 29
+    },
+    "delta_verdict": "MELHORIA",
+    "inside_openings": []
+   }
+  }
+ },
+ "nodefill_final_bf836bb": {
+  "torre_easy_lo_r00_tp1": {
+   "off": {
+    "count": 0,
+    "sig": 0,
+    "violations": []
+   },
+   "on": {
+    "count": 0,
+    "sig": 0,
+    "violations": []
+   }
+  },
+  "torre_easy_lo_r00_tgd": {
+   "off": {
+    "count": 0,
+    "sig": 0,
+    "violations": []
+   },
+   "on": {
+    "count": 0,
+    "sig": 0,
+    "violations": []
+   }
+  }
+ },
+ "t48_final": {
+  "accepted": 0,
+  "rejected": 12,
+  "walls": [
+   12,
+   13,
+   14,
+   15,
+   88,
+   90
+  ],
+  "reason": "no_tie_covering_node"
+ },
+ "head": "bf836bb7aee487957fa6e4980af3241e7bdca186"
+}

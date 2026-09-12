@@ -5593,9 +5593,15 @@ da própria cadeia que resolve (caso W113 do TGD / reproducer mínimo da
 CR-G12, mantido verde). Testes: `tests/test_forced_half_licence.py`,
 `test_block_node_fill_revalidation.py` t3/t4 (fixture real canto–T) e t20.
 
-**Medido no TP1 (produção, metade simétrica ligada):** 16 → ver checkpoint
-`docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md` (W088/W090
-fora; contagem final e contrafactual sem a metade simétrica registrados lá).
+**Medido (HEAD `bf836bb`, evidência
+`docs/checkpoints/evidence/2026-09-12-corpus-states.json`):** medidor nó|fill
+do TP1 **16 → 0** (metade simétrica ligada) e **16 → 0** no contrafactual
+desligado (a fiada B já enxerga a junta de contorno da A pela licença); TGD
+0 → 0. No benchmark, TP1 `PRISM_CONTINUOUS_JOINT` **304 → 48** exatamente nas
+12 paredes que o medidor acusava (W003/W008 32→16, W021/W022/W088/W090/
+W092/W093 16→0, W040/W061/W062/W071 32→0), `PRISM_JOINT_STACK` 18 → 2,
+`COMPENSATOR_CONSECUTIVE` 1284 → 988; TGD **inalterado** (PRISM 324,
+CROSSES_JAMB 72, criticos 831). Críticos do TP1: main 495 → 68.
 
 **Residual registrado:** parede curta canto–T de **70 cm**: nem a metade
 simétrica nem a licença fecham sem junta empilhada (fixture `LT_RESIDUAL`

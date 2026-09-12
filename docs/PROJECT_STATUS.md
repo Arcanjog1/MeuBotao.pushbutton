@@ -4,8 +4,8 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 
 ```json
 {
-  "observed_utc": "2026-09-10T18:57:19.155668+00:00",
-  "main": "21576ee3d0826f362bce1038131603bd2ccf5dc1",
+  "observed_utc": "2026-09-12T02:50:00+00:00",
+  "main": "643966994a2552df31e43451b3cb4137a1d3dc59",
   "official": [
     {
       "pr": 32,
@@ -22,6 +22,10 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
     {
       "pr": 36,
       "head": "21576ee3d0826f362bce1038131603bd2ccf5dc1"
+    },
+    {
+      "pr": 37,
+      "head": "643966994a2552df31e43451b3cb4137a1d3dc59"
     }
   ],
   "candidates": [
@@ -54,8 +58,8 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
       "head": "8a93a27a660f59e7b532ea6f9db1a6a3561caffe"
     },
     {
-      "branch": "claude/revit-solver-perf-diagnosis-6dfd89",
-      "head": "a5081d85b3fcb79cbb2f8c99dadcd08b4c186f8b"
+      "branch": "claude/nifty-lovelace-d3ewpi",
+      "head": "4d6eecff394b0147a4e59b942162d3aa653755de"
     }
   ]
 }
@@ -63,16 +67,18 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | 21576ee3d0826f362bce1038131603bd2ccf5dc1 (merge do #36); antes 6c00f7e; main inicial aa58d70 |
-| Solver oficial | Produção igual à main inicial; S1/C1/G12 e ARM integrados, N1 ausente |
-| Solver candidato | #31 5658e9c: NO-GO; #34 8a93a27: bancada offline restrita |
-| Beta Revit | **CANDIDATO — ESCALA E CRIAÇÃO REAL MEDIDAS** na branch `claude/revit-scale-autofix` (HEAD 91cc738): planta de 179 eixos passa o gate de criação; 7.257 blocos criados e recriados no Revit sem duplicata (Butantã, 34 paredes, 44 aberturas); 5 paredes ainda reprovadas pelo auditor (humano: 2). Sem merge. |
-| PRs importantes | #32 governança, #33/#35 referências integrados; [inventário/checks](GITHUB_STATE_2026-09-10.md) |
-| Bloqueadores | Invasões/colisões/amarração no recorte, omissões, validação síncrona/rollback real; [backlog](BETA2_BACKLOG.md) |
+| MAIN / HEAD observado | `643966994a2552df31e43451b3cb4137a1d3dc59` (merge do **#37**, 2026-09-11); antes 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| Solver oficial (main) | Beta 1 + missão scale-autofix **integrados** pelo #37: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50). Falhas históricas do benchmark V1: TGD compensators, TP1 JUNCTION 8→9 |
+| Candidato desta sessão | `claude/nifty-lovelace-d3ewpi` HEAD `4d6eecf` (base `6439669`): sonda de vão corrigida (regra 3.1), regressão nó|fill W088/W090 corrigida (regra 33.8), régua V2, testes estritos restaurados, teste do amostrador portável. **Sem merge**; PR para revisão — [checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
+| Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27: API marca merged mas **não é ancestral da main** — inconsistência a esclarecer ([estado](GITHUB_STATE_2026-09-12.md)) |
+| Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. Nenhum Revit iniciado em 2026-09-12 |
+| Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
+| Bloqueadores | Defeito 1 (preenchimento|amarração) reduzido mas não fechado (TP1 PRISM 48, TGD 324); COVERAGE do TGD; decisões pendentes (reserva de meio B54 na 11.10; tier 6 padrão; prioridade regra #1 × #2) — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
-| Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA; BUTANTÃ 1º PAV comparado ao vivo com o solver em 2026-09-10 — [comparação](checkpoints/2026-09-10-butanta-human-comparison.md) |
-| Último checkpoint | [Fechamento scale-autofix](checkpoints/2026-09-11-revit-scale-autofix-final.md); antes [Consolidação Beta 2](checkpoints/2026-09-10-beta2-consolidation.md) |
-| Próximo objetivo | [Pacote](architecture/beta2-implementation-package.md), após decisões e validação Beta 1 |
+| Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
+| Último checkpoint | [Saneamento pré-Beta 2](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md); antes [fechamento scale-autofix](checkpoints/2026-09-11-revit-scale-autofix-final.md) |
+| CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
+| Próximo objetivo | Decidir as três pendências acima; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
 Integração documental não aprova arquitetura/produção. D6 resolvida por #27.
@@ -87,6 +93,13 @@ integrado antes do gate do Revit.
 #34: código 8cdd33f, 1027/2; bancada uniforme 75/81, 187 blocos sem aberturas.
 Históricos candidatos, não medição desta main/PASS Revit.
 [Fontes fixadas](GITHUB_STATE_2026-09-10.md).
+
+## HISTÓRICO — as seções abaixo descrevem estados ANTERIORES ao #37 (mantidas como registro; o painel acima é o estado corrente)
+
+As frases "sem merge", "Beta 1 CANDIDATO", "#34 bancada" e "pacote 712f221
+pendente" abaixo eram verdadeiras nas datas em que foram escritas; desde
+2026-09-11 (#37, `6439669`) Beta 1 e a missão scale-autofix estão na main.
+Reconciliado em 2026-09-12 — ver [GITHUB_STATE_2026-09-12.md](GITHUB_STATE_2026-09-12.md).
 
 ## Missão claude/revit-scale-autofix (2026-09-10/11) — escala e comparação humana
 

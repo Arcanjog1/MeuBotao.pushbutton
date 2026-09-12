@@ -15,14 +15,16 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 | Decisões do usuário? | [Registros PENDING](decisions/README.md) |
 | Benchmark oficial? | [Índice](../benchmark/README.md), [manifesto](../nuvem/benchmark/golden/manifest.json), caminhos preservados |
 | Referências humanas? | [TORRE EASY e BUTANTÃ](../reference_projects/README.md), evidência/não norma; [comparação](../reference_projects/COMPARISON.md) |
-| Candidato em teste? | Beta 1 síncrono pendente; #34 bancada e #31 N1 são distintos; [SHAs/limites](GITHUB_STATE_2026-09-10.md) |
-| Última entrega? | [Checkpoint](checkpoints/2026-09-10-beta2-consolidation.md), [consolidação](CONSOLIDATION_2026-09-10.md) |
+| Candidato em teste? | Beta 1 e scale-autofix **já estão na main** (#37, `6439669`); #31 N1 continua NO-GO e #34 **não** está na main apesar de a API marcá-lo merged; [estado 2026-09-12](GITHUB_STATE_2026-09-12.md) |
+| Última entrega? | [Saneamento pré-Beta 2 (2026-09-12)](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md): sonda de vão, régua V2, regressão nó|fill; antes [checkpoint](checkpoints/2026-09-10-beta2-consolidation.md) |
+| Benchmark V2? | [Réguas versionadas](../nuvem/benchmark/README.md): V1 raiz = HISTORICAL, `v2/` = topologia do motor atual (`runner.py --version v2`) |
 | Próximo objetivo? | [Pacote Beta 2](architecture/beta2-implementation-package.md), [backlog A–E](BETA2_BACKLOG.md) |
 | Beta 1: causas e correcoes? | [checkpoint do fechamento](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md) - solve->create, falso positivo do auditor, `_pump_ui`, analyze sincrono |
 
 ## Não fazer
 
-Não iniciar Revit nesta missão; não mesclar Beta 1/#31/#34/produção antiga;
+Não iniciar Revit nesta missão; não mesclar #31/#34 (Beta 1 e scale-autofix
+já foram mesclados pelo usuário no #37 — não reverter nem "re-mesclar");
 não declarar Beta 1 PASS; não implementar CHANNEL/LINTEL, catálogo/cortes/UI,
 N1/C2/CR-B por causa de documento integrado. Não regravar benchmark para
 ocultar falha, promover observação a regra ou transportar apoio TORRE EASY
