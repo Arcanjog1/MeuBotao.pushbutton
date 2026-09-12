@@ -1745,3 +1745,9 @@ Nenhum merge na main executado.
 [Checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) e
 [estado GitHub](GITHUB_STATE_2026-09-12.md). Main observada `6439669` (#37 mesclado,
 Beta 1 e scale-autofix já na main). Sem MCP, sem Revit, sem merge.
+
+## 2026-09-12 — revisão independente e merge do PR #38 (PRÉ-BETA 2 SANITIZED)
+
+[Checkpoint](checkpoints/2026-09-12-pr38-review-merge.md). 15/15 gates; merge normal
+`ad46c61` (pais `6439669` + `609a8b3`). Correção factual: #34 **está** na main
+(leitura anterior veio de clone raso). Sem MCP, sem Revit, nenhuma implementação nova.

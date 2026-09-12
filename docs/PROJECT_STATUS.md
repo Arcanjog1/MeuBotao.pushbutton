@@ -4,8 +4,8 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 
 ```json
 {
-  "observed_utc": "2026-09-12T10:57:28+00:00",
-  "main": "643966994a2552df31e43451b3cb4137a1d3dc59",
+  "observed_utc": "2026-09-12T11:55:22+00:00",
+  "main": "ad46c61372ba0292d117e14ba605375af7acd807",
   "official": [
     {
       "pr": 32,
@@ -30,6 +30,10 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
     {
       "pr": 37,
       "head": "643966994a2552df31e43451b3cb4137a1d3dc59"
+    },
+    {
+      "pr": 38,
+      "head": "ad46c61372ba0292d117e14ba605375af7acd807"
     }
   ],
   "candidates": [
@@ -56,10 +60,6 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
     {
       "pr": 31,
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
-    },
-    {
-      "branch": "claude/nifty-lovelace-d3ewpi",
-      "head": "4d6eecff394b0147a4e59b942162d3aa653755de"
     }
   ]
 }
@@ -67,18 +67,18 @@ Painel reconciliado por fetch/API em 2026-09-10; SHAs são observações datadas
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | `643966994a2552df31e43451b3cb4137a1d3dc59` (merge do **#37**, 2026-09-11); antes 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
-| Solver oficial (main) | Beta 1 + missão scale-autofix **integrados** pelo #37: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50). Falhas históricas do benchmark V1: TGD compensators, TP1 JUNCTION 8→9 |
-| Candidato desta sessão | `claude/nifty-lovelace-d3ewpi` HEAD `4d6eecf` (base `6439669`): sonda de vão corrigida (regra 3.1), regressão nó|fill W088/W090 corrigida (regra 33.8), régua V2, testes estritos restaurados, teste do amostrador portável. **Sem merge**; PR [#38](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/38) para revisão — [checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
+| MAIN / HEAD observado | `ad46c61372ba0292d117e14ba605375af7acd807` (merge do **#38**, 2026-09-12); antes 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| Solver oficial (main) | **PRÉ-BETA 2 SANITIZED** — #38 mesclado em 2026-09-12 após revisão independente (15/15 gates): sonda de vão (3.1), licença restrita do B19 (33.8), régua V2. Antes: Beta 1 + scale-autofix pelo #37 (8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)). Falha histórica do benchmark V1 que resta: TP1 JUNCTION 8→9 (TGD passa) |
+| Última integração | PR [#38](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/38) (`claude/nifty-lovelace-d3ewpi`, head `609a8b3`, código avaliado `4d6eecf`) **MERGED** em `ad46c61` — [revisão e gates](checkpoints/2026-09-12-pr38-review-merge.md); [checkpoint da missão](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. Nenhum Revit iniciado em 2026-09-12 |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
 | Bloqueadores | Defeito 1 (preenchimento|amarração) reduzido mas não fechado (TP1 PRISM 48, TGD 324); COVERAGE do TGD; decisões pendentes (reserva de meio B54 na 11.10; tier 6 padrão; prioridade regra #1 × #2) — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Saneamento pré-Beta 2](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md); antes [fechamento scale-autofix](checkpoints/2026-09-11-revit-scale-autofix-final.md) |
+| Último checkpoint | [Revisão e merge do #38](checkpoints/2026-09-12-pr38-review-merge.md); antes [saneamento pré-Beta 2](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
 | CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
-| Próximo objetivo | Decidir as três pendências acima; [pacote Beta 2](architecture/beta2-implementation-package.md) |
+| Próximo objetivo | Missão separada: **DEFEITO 1 — junta corrida preenchimento|amarração** (TP1 PRISM 48, TGD 324 na V1 / 245 na V2), sobre a régua V2; decidir as três pendências acima; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
 Integração documental não aprova arquitetura/produção. D6 resolvida por #27.

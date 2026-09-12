@@ -4,7 +4,7 @@ Projeto pyRevit de alvenaria estrutural. Main contém código oficial e
 propostas documentais; integração não transforma proposta em contrato aprovado.
 
 1. git status; git fetch origin main; comparar HEAD com
-   [status](PROJECT_STATUS.md) e [checkpoint](checkpoints/2026-09-10-beta2-consolidation.md).
+   [status](PROJECT_STATUS.md) e [checkpoint](checkpoints/2026-09-12-pr38-review-merge.md).
 2. Ler [AGENTS](../AGENTS.md), [CLAUDE](../CLAUDE.md) e [processo](DEVELOPMENT_PROCESS.md).
 3. Buscar tema → sinônimo → entidade → heading/símbolo antes de ampliar leitura.
 
@@ -16,7 +16,7 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 | Benchmark oficial? | [Índice](../benchmark/README.md), [manifesto](../nuvem/benchmark/golden/manifest.json), caminhos preservados |
 | Referências humanas? | [TORRE EASY e BUTANTÃ](../reference_projects/README.md), evidência/não norma; [comparação](../reference_projects/COMPARISON.md) |
 | Candidato em teste? | Beta 1 e scale-autofix **já estão na main** (#37, `6439669`); #31 N1 continua NO-GO; #34 **está** na main pela cadeia do Beta 1 (corrigido na revisão do #38 — a leitura "não ancestral" veio de um clone raso); [estado 2026-09-12](GITHUB_STATE_2026-09-12.md) |
-| Última entrega? | [Saneamento pré-Beta 2 (2026-09-12)](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md): sonda de vão, régua V2, regressão nó|fill; antes [checkpoint](checkpoints/2026-09-10-beta2-consolidation.md) |
+| Última entrega? | [Revisão e merge do #38 (2026-09-12)](checkpoints/2026-09-12-pr38-review-merge.md) — main `ad46c61` = PRÉ-BETA 2 SANITIZED; missão em [saneamento pré-Beta 2](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
 | Benchmark V2? | [Réguas versionadas](../nuvem/benchmark/README.md): V1 raiz = HISTORICAL, `v2/` = topologia do motor atual (`runner.py --version v2`) |
 | Próximo objetivo? | [Pacote Beta 2](architecture/beta2-implementation-package.md), [backlog A–E](BETA2_BACKLOG.md) |
 | Beta 1: causas e correcoes? | [checkpoint do fechamento](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md) - solve->create, falso positivo do auditor, `_pump_ui`, analyze sincrono |

@@ -1,0 +1,1488 @@
+{
+ "date": "2026-09-12",
+ "what": "Revisao independente do PR #38 (head de codigo d7dbb94/609a8b3, arvores nuvem a740c76 / tests c26f5d5 identicas). Medicoes reproduzidas nesta sessao, Linux, Python 3.11.15, pytest 9.1.1.",
+ "pr38_head_reviewed": "609a8b381e364605a3ac87c749a62ea6b4b2c909",
+ "base_main": "643966994a2552df31e43451b3cb4137a1d3dc59",
+ "corpus_pr38": {
+  "torre_easy_lo_r00_tp1/v1": {
+   "walls": 96,
+   "blocks": 19039,
+   "critical": 68,
+   "by_code": {
+    "OPENING_BLOCK_INSIDE_DOOR": 0,
+    "OPENING_BLOCK_INSIDE_WINDOW": 0,
+    "OPENING_BLOCK_CROSSES_JAMB": 0,
+    "POSITION_OVERLAP": 11,
+    "PRISM_CONTINUOUS_JOINT": 48,
+    "JUNCTION_MISSING_BINDING": 9
+   },
+   "all_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 48,
+    "JUNCTION_MISSING_BINDING": 9,
+    "POSITION_OVERLAP": 11
+   },
+   "verdict": "REGRESSAO CRITICA",
+   "seconds": 93.8,
+   "from_input": "torre_easy_lo_r00_tp1/input.json",
+   "inside_openings": []
+  },
+  "torre_easy_lo_r00_tgd/v1": {
+   "walls": 167,
+   "blocks": 11084,
+   "critical": 831,
+   "by_code": {
+    "OPENING_BLOCK_INSIDE_DOOR": 0,
+    "OPENING_BLOCK_INSIDE_WINDOW": 0,
+    "OPENING_BLOCK_CROSSES_JAMB": 72,
+    "POSITION_OVERLAP": 24,
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23
+   },
+   "all_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 324,
+    "JUNCTION_MISSING_BINDING": 23,
+    "OPENING_BLOCK_CROSSES_JAMB": 72,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 144,
+    "COVERAGE_WALL_NOT_MODULATED": 28,
+    "COVERAGE_MISSING_ROW": 216,
+    "POSITION_OVERLAP": 24
+   },
+   "verdict": "MELHORIA",
+   "seconds": 103.7,
+   "from_input": "torre_easy_lo_r00_tgd/input.json",
+   "inside_openings": []
+  },
+  "torre_easy_lo_r00_tp1/v2": {
+   "walls": 96,
+   "blocks": 19039,
+   "critical": 68,
+   "by_code": {
+    "OPENING_BLOCK_INSIDE_DOOR": 0,
+    "OPENING_BLOCK_INSIDE_WINDOW": 0,
+    "OPENING_BLOCK_CROSSES_JAMB": 0,
+    "POSITION_OVERLAP": 11,
+    "PRISM_CONTINUOUS_JOINT": 48,
+    "JUNCTION_MISSING_BINDING": 9
+   },
+   "all_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 48,
+    "JUNCTION_MISSING_BINDING": 9,
+    "POSITION_OVERLAP": 11
+   },
+   "verdict": "MELHORIA",
+   "seconds": 98.9,
+   "from_input": "torre_easy_lo_r00_tp1/input.json",
+   "inside_openings": []
+  },
+  "torre_easy_lo_r00_tgd/v2": {
+   "walls": 145,
+   "blocks": 16361,
+   "critical": 719,
+   "by_code": {
+    "OPENING_BLOCK_INSIDE_DOOR": 0,
+    "OPENING_BLOCK_INSIDE_WINDOW": 0,
+    "OPENING_BLOCK_CROSSES_JAMB": 96,
+    "POSITION_OVERLAP": 140,
+    "PRISM_CONTINUOUS_JOINT": 245,
+    "JUNCTION_MISSING_BINDING": 0
+   },
+   "all_by_code": {
+    "PRISM_CONTINUOUS_JOINT": 245,
+    "OPENING_BLOCK_CROSSES_JAMB": 96,
+    "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+    "COVERAGE_MISSING_ROW": 142,
+    "COVERAGE_WALL_NOT_MODULATED": 10,
+    "POSITION_OVERLAP": 140
+   },
+   "verdict": "MELHORIA",
+   "seconds": 288.0,
+   "from_input": "torre_easy_lo_r00_tgd/v2/input.json",
+   "inside_openings": []
+  }
+ },
+ "nodefill_pr38": "pr38 torre_easy_lo_r00_tp1 off 0 sig 0 []\npr38 torre_easy_lo_r00_tp1 on 0 sig 0 []\npr38 torre_easy_lo_r00_tgd off 0 sig 0 []\npr38 torre_easy_lo_r00_tgd on 0 sig 0 []\n",
+ "nodefill_bisect_tp1": {
+  "bis_7239946": {
+   "off": {
+    "count": 14,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        9.0,
+        "C09",
+        "L_CORNER_DEGRADED"
+       ],
+       [
+        10.0,
+        44.0,
+        "B34",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        9.0,
+        "C09",
+        "L_CORNER_DEGRADED"
+       ],
+       [
+        10.0,
+        44.0,
+        "B34",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   },
+   "on": {
+    "count": 14,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        9.0,
+        "C09",
+        "L_CORNER_DEGRADED"
+       ],
+       [
+        10.0,
+        44.0,
+        "B34",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        9.0,
+        "C09",
+        "L_CORNER_DEGRADED"
+       ],
+       [
+        10.0,
+        44.0,
+        "B34",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   }
+  },
+  "bis_cd4a261": {
+   "off": {
+    "count": 16,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W088",
+      87,
+      34.5,
+      "A"
+     ],
+     [
+      "W090",
+      89,
+      34.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   },
+   "on": {
+    "count": 16,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W088",
+      87,
+      34.5,
+      "A"
+     ],
+     [
+      "W090",
+      89,
+      34.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   }
+  },
+  "bis_main": {
+   "off": {
+    "count": 16,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W088",
+      87,
+      34.5,
+      "A"
+     ],
+     [
+      "W090",
+      89,
+      34.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   },
+   "on": {
+    "count": 16,
+    "sig": 4,
+    "violations": [
+     [
+      "W003",
+      2,
+      34.5,
+      "B"
+     ],
+     [
+      "W008",
+      7,
+      34.5,
+      "B"
+     ],
+     [
+      "W021",
+      20,
+      89.48,
+      "A"
+     ],
+     [
+      "W022",
+      21,
+      89.48,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      339.62,
+      "A"
+     ],
+     [
+      "W040",
+      39,
+      349.61,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      34.5,
+      "B"
+     ],
+     [
+      "W061",
+      60,
+      44.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      34.5,
+      "A"
+     ],
+     [
+      "W062",
+      61,
+      44.51,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      34.5,
+      "B"
+     ],
+     [
+      "W071",
+      70,
+      44.5,
+      "A"
+     ],
+     [
+      "W088",
+      87,
+      34.5,
+      "A"
+     ],
+     [
+      "W090",
+      89,
+      34.5,
+      "A"
+     ],
+     [
+      "W092",
+      91,
+      89.48,
+      "A"
+     ],
+     [
+      "W093",
+      92,
+      89.44,
+      "A"
+     ]
+    ],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        34.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   }
+  },
+  "bis_pr38": {
+   "off": {
+    "count": 0,
+    "sig": 0,
+    "violations": [],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        44.0,
+        "B19",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        44.0,
+        "B19",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   },
+   "on": {
+    "count": 0,
+    "sig": 0,
+    "violations": [],
+    "W088_W090_pieces": {
+     "W088": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        44.0,
+        "B19",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     },
+     "W090": {
+      "A": [
+       [
+        0.0,
+        34.0,
+        "B34",
+        "L_CORNER"
+       ],
+       [
+        35.0,
+        44.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ],
+      "B": [
+       [
+        15.0,
+        24.0,
+        "C09",
+        "STANDARD_FILL"
+       ],
+       [
+        25.0,
+        44.0,
+        "B19",
+        "STANDARD_FILL"
+       ],
+       [
+        45.0,
+        54.0,
+        "C09",
+        "T_INTERSECTION_INCOMING_DEGRADED"
+       ]
+      ]
+     }
+    }
+   }
+  }
+ },
+ "room_probe": {
+  "main_6439669": "13 failed / 3 passed (evidencia da sessao anterior: 12/4 - o teste T_dentro_da_porta tambem falha na main nesta rodada: B54 em [223,277] dentro do vao [200,300])",
+  "pr38": "16 passed"
+ },
+ "focused_tests_pr38": {
+  "room_probe+forced_half_licence+perf_trace_stall_sampler": "25 passed",
+  "t3/t4/t20/t48": "4 passed em 283s"
+ },
+ "v2_reproduction_tgd": {
+  "regenerated_vs_stored": "walls 145/145, nodes 234/234 (AMB 12, FREE 20, L 50, T 134, X 18), openings 91/91 (0 nao atribuidas); chaves de parede, conjunto de nos e aberturas IDENTICOS; engine sha 8efd1f4b; input fingerprint == manifest (af44db2a)",
+  "v1_stored": "167 paredes / 272 nos / 82 aberturas (9 nao atribuidas)"
+ },
+ "pr34_ancestry": {
+  "shallow_clone_before": "is-shallow-repository true, 252 commits, merge-base --is-ancestor 8a93a27 main = NO",
+  "after_unshallow": "262 commits; 8a93a27 e 8cdd33f SAO ancestrais de 6439669; cadeia 8a93a27 -> 0ffa8e9 -> ... 41086e4 (Beta 1) -> 2599355 -> 6439669 (#37)"
+ }
+}

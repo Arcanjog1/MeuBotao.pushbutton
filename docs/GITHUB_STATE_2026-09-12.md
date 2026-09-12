@@ -47,3 +47,11 @@ de `6439669`. Sem merge; PR [#38](https://github.com/Arcanjog1/MeuBotao.pushbutt
 Único workflow: `check-project-status.yml` (validação documental). Nenhum
 `pytest`/`runner --check` no CI — recomendação em
 [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md).
+
+## Atualização após a revisão do #38 (2026-09-12, mesma data)
+
+| Item | Valor |
+|---|---|
+| `origin/main` | `ad46c61372ba0292d117e14ba605375af7acd807` — merge normal do **#38** (`claude/nifty-lovelace-d3ewpi`, head `609a8b3`), pais `6439669` + `609a8b3`; sem rebase, sem force-push |
+| #38 | merged; CI `check-status-doc` verde no head `609a8b3` (o head anterior `d7dbb94` falhava por "candidate already integrated: 8a93a27" — ver a correção do #34 acima) |
+| Revisão | [checkpoint](checkpoints/2026-09-12-pr38-review-merge.md) |
