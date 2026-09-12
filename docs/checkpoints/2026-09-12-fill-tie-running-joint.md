@@ -8,7 +8,7 @@
   "head": "fb618b21e7c0d5542b649f18f0043527fec3ff56",
   "base": "ad46c61372ba0292d117e14ba605375af7acd807",
   "main_observada": "ad46c61372ba0292d117e14ba605375af7acd807",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/39",
   "veredito": "PARTIAL — FILL|TIE FIXED, OTHER PRISM REMAINS (ver seção Veredito: fill|tie entre nós distintos 0/0; resta fill|fill no TP1 e abertura/peça duplicada/mesma peça de canto no TGD)",
   "objective": "Sem MCP/Revit, sobre origin/main ad46c61 (PR #38 integrado) e a régua V2: classificar os PRISM_CONTINUOUS_JOINT residuais (TP1 48, TGD 245), reproduzir a classe fill|tie em fixtures mínimas, provar a causa e corrigi-la de forma física e geral (sem tocar auditor/tolerância/baseline), com fill|tie = 0 nas duas plantas, nó|fill = 0, INSIDE_DOOR/WINDOW = 0, CROSSES_JAMB/POSITION_OVERLAP sem regressão, determinismo e custo local.",
   "changes": [
@@ -22,7 +22,7 @@
     "RED→GREEN: `python3 -m pytest tests/test_tie_parity_abutting_ties.py -q` — com ABUTTING_TIE_PARITY_ENABLED=False as 5 fixtures produzem a junta NÓ|FILL × NÓ|FILL (test_defeito_reproduzido_sem_a_paridade); com True 0 juntas fill|tie, 0 nó|fill, 0 falhas de nó, 0 colisões (22 passed em 1,2 s no HEAD fb618b2).",
     "Focados (HEAD fb618b2, Linux, Python 3.11.15, pytest 9.1.1): test_block_node_fill_revalidation (t1–t17), test_forced_half_licence, test_tie_parity_local_search, test_corner_reserve_per_course, test_script, test_tie_parity_abutting_ties -k 'not t18 and not t19 and not t20': 325 passed / 3 deselected em 56,5 s (evidence/2026-09-12-filltie-focados.txt).",
     "Corpus V2 antes/depois (`runner.run_project(version='v2', write_files=False)`, evidence/2026-09-12-filltie-corpus-before-after.json e tabela por chave física em evidence/2026-09-12-filltie-cases.txt): ver seção 'Métrica antes/depois'.",
-    "Determinismo (evidence/2026-09-12-filltie-determinism.json): fingerprint canônico do resultado (golden.fingerprint.canonical_fingerprint) em 3 processos separados por planta — TP1 f72853f9…69a00 idêntico ×3; TGD ver arquivo.",
+    "Determinismo (evidence/2026-09-12-filltie-determinism.json): fingerprint canônico do resultado (golden.fingerprint.canonical_fingerprint) em 3 processos separados por planta — TP1 f72853f9…69a00 idêntico ×3; TGD 1403b49d…5a648 idêntico ×3.",
     "REGRESSÃO CONSOLIDADA (`python3 -m pytest tests -q -p no:cacheprovider`, HEAD fb618b2, capturada por tools/documentation/capture_validation.py em evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}): ver seção 'Regressão consolidada'.",
     "Validador documental: `python3 tools/documentation/validate.py --base ad46c61 --main origin/main --require-current-main` — ver seção 'Validação documental'."
   ],
@@ -63,6 +63,8 @@
     {"path": "tests/test_tie_parity_abutting_ties.py"},
     {"path": "docs/checkpoints/evidence/2026-09-12-filltie-corpus-before-after.json"},
     {"path": "docs/checkpoints/evidence/2026-09-12-filltie-cases.txt"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-determinism.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-focados.txt"},
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-dump.py"},
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-classify.py"},
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-cases.py"},
@@ -155,7 +157,7 @@ a composição do preenchimento já variava com a ordem antes desta CR (medido
 com a paridade desligada: 4 assinaturas distintas em 4 ordens — convenção
 `arms[0]`→A). Mesmo input em três processos separados: fingerprint canônico
 idêntico — TP1 `f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00`
-×3; TGD em `evidence/2026-09-12-filltie-determinism.json`.
+×3; TGD `1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648` ×3 (`evidence/2026-09-12-filltie-determinism.json`).
 
 ## 8. Regressão consolidada
 
