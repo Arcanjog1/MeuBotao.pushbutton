@@ -177,6 +177,11 @@ __all__ = [
     "repair_b19_residual_fill",
     "_apply_axis_plan_in_memory", "_rebase_node_indexes_for_wall",
     "search_tie_parity", "TIE_PARITY_LOCAL_SEARCH", "_tie_parity_score", "_tie_parity_candidates",
+    "ABUTTING_TIE_PARITY_ENABLED", "OPENING_ALIGNED_TOUCH_TOLERANCE_CM", "_flip_course", "_wall_openings_cm", "_smallest_fill_piece_cm",
+    "_node_fill_boundary_joint_census", "_census_coincidences", "_plan_abutting_tie_parity",
+    "_abutting_same_course_tie_pairs", "_tie_parity_node_movable", "_tie_parity_apply",
+    "_node_walls", "_wall_course_free_segments_cm", "_tie_parity_fill_proxy", "_tie_parity_component_options",
+    "_apply_abutting_tie_parity",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
     "WALL_GROUP_SHIFT_MAX_CM", "WALL_GROUP_SHIFT_VERIFY_BUDGET",
@@ -711,8 +716,9 @@ def _node_lays_bond_on_wall_in_course(node, node_index, wall_idx, course, solved
         # T ainda nao resolvido, esta parede e' a que CHEGA: a peca dela
         # (B34 no caminho cheio e na degradacao para L) fica na fiada B; a
         # degradacao 2 poe um unico compensador (<= 9cm) nas duas fiadas,
-        # curto demais para alcancar o canto da outra ponta.
-        return course == "B"
+        # curto demais para alcancar o canto da outra ponta. Um no' com
+        # paridade invertida (`_tie_parity_flip`) hospeda a B34 na fiada A.
+        return course == _flip_course("B", node)
     return course in _node_bond_courses_on_wall(node, wall_idx)
 
 
@@ -1126,17 +1132,27 @@ def _node_bond_courses_on_wall(node, wall_idx):
     if kind == "T_INTERSECTION":
         if (node.get("main_wall_idx") == wall_idx
                 and node.get("incoming_wall_idx") != wall_idx):
-            return ("A",)
+            return (_flip_course("A", node),)
         return BOND_COURSES_BOTH
     if kind == "X_INTERSECTION":
         pair = node.get("crossing_walls") or []
         if len(pair) == 2 and pair[0] is not None and pair[0] != pair[1]:
             if pair[0] == wall_idx:
-                return ("A",)
+                return (_flip_course("A", node),)
             if pair[1] == wall_idx:
-                return ("B",)
+                return (_flip_course("B", node),)
         return BOND_COURSES_BOTH
     return BOND_COURSES_BOTH
+
+
+def _flip_course(course, node):
+    """A fiada em que a convencao do solver de `node` poe uma peca, ja'
+    considerando a paridade invertida do no' (`_tie_parity_flip`, ver
+    solve_all_intersections): a convencao "T principal -> A" vira B num no'
+    invertido. Funcao pura."""
+    if node is not None and node.get("_tie_parity_flip"):
+        return "B" if course == "A" else "A"
+    return course
 
 
 def _corner_bond_blocking_courses(walls_to_create, nodes, wall_idx, contact_point,
@@ -1953,7 +1969,8 @@ def _coordinate_arm_role_nodes(nodes):
     return sorted(set(conflicts))
 
 
-def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=None, end_to_node=None):
+def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=None, end_to_node=None,
+                            _parity_pass=True):
     """Roda o solver adequado (L/T/X) em TODOS os nos de `nodes` (ver
     build_wall_graph) - fluxo SolveXIntersections/SolveTIntersections/
     SolveLCorners da secao 17/32 do prompt. Nos FREE_END/
@@ -1982,8 +1999,23 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     `_wall_group_shift_targets` etc.) ja' enxerga os papeis coordenados
     sem precisar de nenhum encanamento extra.
 
+    PARIDADE DAS PECAS ENCOSTADAS (2026-09-12, ver o cabecalho de
+    `ABUTTING_TIE_PARITY_ENABLED`): depois de resolver todos os nos, o
+    censo `_node_fill_boundary_joint_census` deduz as juntas NO'|FILL de
+    cada fiada; onde uma junta da A coincide com uma da B (pecas de nos
+    diferentes encostadas em fiadas opostas - junta corrida certa, que
+    nenhum preenchimento desfaz), `_apply_abutting_tie_parity` inverte a
+    paridade dos nos necessarios (T/X pela marca `_tie_parity_flip`, canto
+    L livre/de aresta isolada pela troca de `arms` + pino) e re-resolve os
+    nos UMA vez; fica so' se a contagem de coincidencias cair. As chaves
+    `tie_parity_flips` (nos invertidos nesta chamada) e
+    `tie_parity_conflicts` (coincidencias que a paridade nao resolve,
+    com motivo) saem sempre no resultado. `end_to_node=None` (chamador
+    antigo) ou `ABUTTING_TIE_PARITY_ENABLED=False` pulam a etapa.
+
     Devolve {"candidates": [...], "failures": [(node_index, motivo), ...],
-    "role_conflicts": [wall_idx, ...]}: `candidates` e' uma lista PLANA de
+    "role_conflicts": [wall_idx, ...], "tie_parity_flips": [...],
+    "tie_parity_conflicts": [...]}: `candidates` e' uma lista PLANA de
     BlockPlacementCandidate (2 por no' resolvido, Fiada A e Fiada B) -
     pronta para a Etapa 7 (solver global) consumir, ou para o modo de
     debug (Etapa 25) desenhar. Um no' que deveria ser um encontro mas nao
@@ -2016,6 +2048,19 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
         if not result["ok"]:
             failures.append((node_index, result["reason"]))
             continue
+        # PARIDADE POR NO' (ver search_tie_parity e a paridade das pecas
+        # ENCOSTADAS, abaixo): um no' marcado troca a fiada das suas DUAS
+        # pecas (A<->B). A relacao de amarracao entre elas nao muda - so'
+        # qual das duas cai na fiada par/impar. Aplicada AQUI, antes de o
+        # no' entrar em `solved_by_node`: a regra 11.14 (reserva de canto
+        # por fiada) le' a fiada REAL das pecas ja' resolvidas, e um flip
+        # aplicado so' no fim deixaria os cantos seguintes lendo a
+        # convencao errada (inconsistencia latente da 11.12, nunca
+        # exercida com a flag desligada).
+        if node.get("_tie_parity_flip"):
+            for candidate in (result["course_a"], result["course_b"]):
+                if candidate is not None:
+                    candidate["course"] = "B" if candidate.get("course") == "A" else "A"
         solved.append((node_index, result["course_a"], result["course_b"]))
         solved_by_node[node_index] = (result["course_a"], result["course_b"])
 
@@ -2024,15 +2069,15 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     for node_index, course_a, course_b in solved:
         if node_index in rejected:
             continue
-        # PARIDADE POR NO' (ver search_tie_parity): um no' marcado troca a
-        # fiada das suas DUAS pecas (A<->B). A relacao de amarracao entre
-        # elas nao muda - so' qual das duas cai na fiada par/impar.
-        if nodes[node_index].get("_tie_parity_flip"):
-            for candidate in (course_a, course_b):
-                candidate["course"] = "B" if candidate.get("course") == "A" else "A"
         candidates.append(course_a)
         candidates.append(course_b)
-    return {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts}
+    outcome = {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts,
+               "tie_parity_flips": [], "tie_parity_conflicts": []}
+    if (_parity_pass and ABUTTING_TIE_PARITY_ENABLED and end_to_node is not None
+            and walls_to_create):
+        outcome = _apply_abutting_tie_parity(
+            outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    return outcome
 
 
 # ==========================================
@@ -2065,6 +2110,547 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
 TIE_PARITY_LOCAL_SEARCH = False
 TIE_PARITY_SEARCH_MAX_CANDIDATES = 24
 TIE_PARITY_SEARCH_MAX_PASSES = 2
+
+
+# ==========================================
+# PARIDADE DAS PECAS DE AMARRACAO ENCOSTADAS (DEFEITO 1 - junta corrida
+# fill|tie, 2026-09-12; REGRAS_MODULACAO_BLOCOS.md secao 33.9).
+#
+# MEDIDO no corpus (TGD V2 245 PRISM_CONTINUOUS_JOINT, TP1 48): toda junta
+# corrida residual da classe fill|tie e' uma junta NO'|FILL da Fiada A
+# exatamente em cima de uma junta NO'|FILL da Fiada B na MESMA parede - e
+# nesses casos as duas pecas de no' sao de NOS DIFERENTES e se ENCOSTAM
+# junta a junta ao longo da parede, cada uma numa fiada:
+#
+#     Fiada A:  [corpo da principal 0..14] B19[15,34] B54(X)[35,89] ...
+#     Fiada B:  B34(T que chega)[0,34]     B19[35,54] ...
+#                                        ^ 34,5 nas duas fiadas
+#
+# (T em que a parede chega + X a 55cm - W005/W012/W075/W086 do TGD V2,
+# W003/W008 do TP1; T + canto L na parede de 69cm - W006/W013/W137/W139).
+# O preenchimento NAO tem liberdade nenhuma aqui: nas duas fiadas a junta
+# e' o CONTORNO da propria peca de no', e existe enquanto houver qualquer
+# peca de preenchimento encostada nela. A busca de desencontro
+# (`_pier_layout_avoiding_joints`, secoes 30.6/33) ja' recebe essas juntas
+# e nao tem o que trocar. A unica variavel fisica e' a PARIDADE: em qual
+# fiada cada no' hospeda a sua peca - a "inversao A/B que a secao 11
+# permite" e a regra 11.12 implementou como `_tie_parity_flip`
+# (`search_tie_parity`, DESLIGADA por custo: cada tentativa era uma
+# re-solucao COMPLETA da planta).
+#
+# O que esta parte faz (e so' isso): deduz, SO' da geometria das pecas de
+# no' (antes de qualquer preenchimento, `_node_fill_boundary_joint_census`),
+# as juntas NO'|FILL de cada fiada de cada parede; onde uma junta da A
+# coincide com uma da B e as duas pecas sao de nos diferentes, as duas
+# pecas precisam ficar na MESMA fiada (a junta de contorno entre duas
+# pecas de no' encostadas e' uma junta AMARRACAO|AMARRACAO, e a fiada
+# oposta atravessa livre e desencontra pelo preenchimento normal). Isso e'
+# uma restricao XOR entre os dois nos ("exatamente um dos dois inverte");
+# T/X podem inverter, canto L e' fixo (papel coordenado por
+# `_coordinate_arm_role_nodes`/30.5, fora do escopo), no' ja' invertido
+# tambem e' fixo (monotonia: uma decisao tomada numa banda vale para as
+# seguintes e para os rebuilds dos reparos - a marca vive no proprio no').
+# A propagacao e' 2-coloracao por componente, em ordem geometrica
+# (`_canonical_node_sort_key`), e o resultado so' e' aceito se a contagem
+# de coincidencias NO'|FILL x NO'|FILL cair ESTRITAMENTE numa re-solucao
+# dos nos - nunca piora, nunca inventa peca, nunca muda a peca nem a
+# posicao de nenhuma amarracao. Conflitos (L-X-L de 124cm em que os dois
+# cantos alternam e o X so' iguala um; duas pecas do MESMO no' nas duas
+# fiadas) ficam em `tie_parity_conflicts`, nunca escondidos.
+#
+# Custo: 2x solve_all_intersections + 2 censos (dezenas de ms numa planta
+# de 145 paredes), sem nenhuma re-solucao de preenchimento por tentativa -
+# a parte MINIMA e barata da 11.12. Nenhum validador/tolerancia/baseline
+# alterado; a regra #1 (junta corrida proibida) e' a que se aplica.
+# ==========================================
+ABUTTING_TIE_PARITY_ENABLED = True
+# Rodadas de plano -> re-solucao -> censo por chamada (cada rodada so' e'
+# aceita com reducao estrita; 1 rodada resolve todo o corpus medido, as
+# demais so' entram se as inversoes revelarem coincidencia nova).
+ABUTTING_TIE_PARITY_MAX_ROUNDS = 3
+
+
+def _wall_openings_cm(openings_per_wall, wall_idx):
+    """[(t_lo_cm, t_hi_cm), ...] das aberturas de `wall_idx` (ou [] sem
+    lista) - mesma conversao de solve_wall_free_fill."""
+    if not openings_per_wall:
+        return []
+    try:
+        entries = openings_per_wall[wall_idx] or []
+    except (IndexError, KeyError, TypeError):
+        return []
+    out = []
+    for op in entries:
+        a_cm = op[0] / FEET_PER_METER * 100.0
+        b_cm = op[1] / FEET_PER_METER * 100.0
+        out.append((min(a_cm, b_cm), max(a_cm, b_cm)))
+    return out
+
+
+def _smallest_fill_piece_cm(catalog):
+    """Menor peca que o preenchimento comum pode lancar (lida do catalogo,
+    nunca por codigo fixo): abaixo disso um trecho livre nao recebe peca
+    nenhuma - e portanto nao tem junta de contorno."""
+    lengths = [
+        (catalog.get(code) or {}).get("length_cm")
+        for code in COMMON_FILL_BLOCK_CODES
+    ]
+    lengths = [length for length in lengths if length]
+    return min(lengths) if lengths else PIER_MODULE_CM
+
+
+def _node_fill_boundary_joint_census(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                     candidates, catalog):
+    """{(wall_idx, course): [(t_junta_cm, candidato_de_no'), ...]} - as juntas
+    NO'|FILL que cada fiada de cada parede VAI ter, deduzidas so' das pecas
+    de no' (`candidates` de solve_all_intersections) e das reservas que o
+    preenchimento respeita - o mesmo contorno que `solve_wall_free_fill`
+    monta (`_index_node_candidates_by_wall_end`/`_index_node_candidates_
+    midspan`/`_wall_end_default_start_cm`), sem resolver preenchimento
+    nenhum.
+
+    Diferente de `_wall_node_boundary_joints_cm` (lista conservadora de
+    posicoes a EVITAR, que inclui contornos sem peca e reservas de pecas da
+    parede vizinha), este censo e' PRECISO: so' conta a junta de uma peca
+    que PERTENCE a esta parede (`wall_idx` do candidato) e so' do lado em
+    que existe trecho livre para receber preenchimento (>= menor peca do
+    catalogo, fora de abertura). Uma peca pequena de fechamento encostada
+    numa abertura ou na ponta do eixo fica isenta (11.8/18.12) - mesma
+    regra do validador de prisma. Funcao pura."""
+    by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
+    midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    min_fill_cm = _smallest_fill_piece_cm(catalog)
+    own = {}
+    for cand in candidates:
+        wall_idx = cand.get("wall_idx")
+        if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+            continue
+        p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+        t_a, t_b = _candidate_extent_on_wall_axis(cand, p0, wall_dir)
+        own.setdefault((wall_idx, cand.get("course")), []).append((min(t_a, t_b), max(t_a, t_b), cand))
+
+    census = {}
+    far = 1e9
+    for wall_idx in range(len(walls_to_create)):
+        length_cm = _wall_axis_and_length(walls_to_create, wall_idx)[3] / FEET_PER_METER * 100.0
+        openings_cm = _wall_openings_cm(openings_per_wall, wall_idx)
+        edges_cm = [edge for interval in openings_cm for edge in interval] + [0.0, length_cm]
+        for course in ("A", "B"):
+            pieces = own.get((wall_idx, course))
+            if not pieces:
+                continue
+            border_0 = by_end.get((wall_idx, 0, course))
+            if border_0 is None:
+                reservation_cm, _joint = _wall_end_default_start_cm(
+                    nodes, end_to_node, walls_to_create, wall_idx, 0)
+                border_0 = reservation_cm - BLOCK_JOINT_CM
+            border_1 = by_end.get((wall_idx, 1, course))
+            if border_1 is None:
+                reservation_cm, _joint = _wall_end_default_start_cm(
+                    nodes, end_to_node, walls_to_create, wall_idx, 1)
+                border_1 = length_cm - reservation_cm + BLOCK_JOINT_CM
+            obstacles = [(-far, border_0), (border_1, far)]
+            obstacles.extend(_merge_intervals_cm(midspan.get((wall_idx, course), [])))
+            obstacles.extend(openings_cm)
+            joints = []
+            for t_start_cm, t_end_cm, cand in sorted(pieces, key=lambda item: (item[0], item[1])):
+                code = cand.get("logical_code")
+                if code in OPENING_ALIGNED_EXEMPT_CODES and any(
+                        abs(t_start_cm - edge) <= OPENING_ALIGNED_TOUCH_TOLERANCE_CM
+                        or abs(t_end_cm - edge) <= OPENING_ALIGNED_TOUCH_TOLERANCE_CM
+                        for edge in edges_cm):
+                    continue
+                prev_end = max([b for _a, b in obstacles if b < t_start_cm - 1e-6] + [-far])
+                if prev_end > -far and (t_start_cm - BLOCK_JOINT_CM) - (prev_end + BLOCK_JOINT_CM) \
+                        >= min_fill_cm - 1e-6:
+                    joints.append((t_start_cm - BLOCK_JOINT_CM / 2.0, cand))
+                next_start = min([a for a, _b in obstacles if a > t_end_cm + 1e-6] + [far])
+                if next_start < far and (next_start - BLOCK_JOINT_CM) - (t_end_cm + BLOCK_JOINT_CM) \
+                        >= min_fill_cm - 1e-6:
+                    joints.append((t_end_cm + BLOCK_JOINT_CM / 2.0, cand))
+            if joints:
+                census[(wall_idx, course)] = joints
+    return census
+
+
+def _census_coincidences(census, num_walls, tolerance_cm=None):
+    """[(wall_idx, t_cm, candidato_A, candidato_B), ...] - juntas NO'|FILL da
+    Fiada A em cima de juntas NO'|FILL da Fiada B na mesma parede.
+    `tolerance_cm=None` usa VERTICAL_JOINT_STAGGER_TOLERANCE_CM (definida
+    mais abaixo no modulo)."""
+    if tolerance_cm is None:
+        tolerance_cm = VERTICAL_JOINT_STAGGER_TOLERANCE_CM
+    out = []
+    for wall_idx in range(num_walls):
+        joints_a = census.get((wall_idx, "A")) or []
+        joints_b = census.get((wall_idx, "B")) or []
+        for t_a, cand_a in joints_a:
+            for t_b, cand_b in joints_b:
+                if abs(t_a - t_b) <= tolerance_cm:
+                    out.append((wall_idx, t_a, cand_a, cand_b))
+    return out
+
+
+def _abutting_same_course_tie_pairs(nodes, walls_to_create, candidates,
+                                    tolerance_cm=None):
+    """[(wall_idx, t_cm, candidato, candidato), ...] - pares de pecas de no'
+    (de nos DIFERENTES) que se ENCOSTAM junta a junta na mesma parede e na
+    MESMA fiada. Sao a outra metade da restricao de paridade: duas pecas
+    encostadas que hoje ja' estao juntas precisam CONTINUAR juntas quando
+    uma delas inverte (senao a inversao so' muda a junta corrida de lugar -
+    medido na cadeia de tres T a 55cm: inverter um so' T da cadeia cria a
+    coincidencia na principal). Funcao pura."""
+    if tolerance_cm is None:
+        tolerance_cm = VERTICAL_JOINT_STAGGER_TOLERANCE_CM
+    own = {}
+    for cand in candidates:
+        wall_idx = cand.get("wall_idx")
+        if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+            continue
+        p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+        t_a, t_b = _candidate_extent_on_wall_axis(cand, p0, wall_dir)
+        own.setdefault((wall_idx, cand.get("course")), []).append((min(t_a, t_b), max(t_a, t_b), cand))
+    pairs = []
+    for (wall_idx, _course), pieces in sorted(own.items(), key=lambda item: (item[0][0], item[0][1] or "")):
+        pieces.sort(key=lambda item: (item[0], item[1]))
+        for left, right in zip(pieces, pieces[1:]):
+            if left[2].get("node_index") is None or right[2].get("node_index") is None:
+                continue
+            if left[2]["node_index"] == right[2]["node_index"]:
+                continue
+            if abs(right[0] - (left[1] + BLOCK_JOINT_CM)) <= tolerance_cm:
+                pairs.append((wall_idx, left[1] + BLOCK_JOINT_CM / 2.0, left[2], right[2]))
+    return pairs
+
+
+def _tie_parity_node_movable(nodes, node_index, eligible, coordination):
+    """O no' pode inverter a paridade nesta rodada? T/X: sim, se ainda nao
+    invertido. Canto L: so' com 2 bracos, sem pino, e LIVRE (grau 0 no grafo
+    de coordenacao) ou de ARESTA ISOLADA (grau 1, vizinho de grau 1 - a
+    unica situacao em que a secao 31/32 licencia "mesma familia"). Cantos
+    de cadeia coordenada (30.5) nunca."""
+    node = nodes[node_index]
+    if node.get("_tie_parity_flip") or node.get("_arm_role_pinned"):
+        return False
+    kind = node.get("kind")
+    if kind in ("T_INTERSECTION", "X_INTERSECTION"):
+        return True
+    if kind != "L_CORNER" or len(node.get("arms") or []) != 2 or node_index not in eligible:
+        return False
+    neighbors = coordination.get(node_index) or []
+    if not neighbors:
+        return True
+    if len(neighbors) != 1:
+        return False
+    other = neighbors[0][0]
+    return len(coordination.get(other) or []) == 1
+
+
+def _tie_parity_apply(node, on):
+    """Aplica (`on=True`) ou desfaz a inversao de paridade de UM no'. T/X:
+    a marca `_tie_parity_flip` (lida por solve_all_intersections e pelas
+    convencoes de fiada). Canto L: a MESMA troca fisica de `arms` que
+    `_coordinate_arm_role_nodes`/`_set_l_corner_role_bits` usam (nenhuma
+    segunda convencao), mais o pino `_arm_role_pinned` para a coordenacao
+    das bandas/rebuilds seguintes respeitar a decisao - o mesmo mecanismo
+    de persistencia do SAFE REPAIR."""
+    if node.get("kind") == "L_CORNER":
+        a0, a1 = node["arms"]
+        node["arms"] = [a1, a0]
+        node["neighbor_wall_idx"] = a0[0]
+        node["neighbor_end_index"] = a0[1]
+        if on:
+            node["_arm_role_pinned"] = True
+        else:
+            node.pop("_arm_role_pinned", None)
+        return
+    if on:
+        node["_tie_parity_flip"] = True
+    else:
+        node.pop("_tie_parity_flip", None)
+
+
+def _plan_abutting_tie_parity(coincidences, same_course_pairs, nodes):
+    """(flips, conflicts, components). Restricoes de paridade entre nos:
+
+      - cada coincidencia NO'|FILL x NO'|FILL entre pecas de nos DIFERENTES
+        (`coincidences`) pede "exatamente um dos dois inverte" (XOR 1);
+      - cada par de pecas de no' encostadas na MESMA fiada
+        (`same_course_pairs`) pede "os dois invertem juntos ou nenhum"
+        (XOR 0) - e' o que propaga a decisao ao longo de uma cadeia de
+        pecas encostadas em vez de so' mudar a junta corrida de lugar.
+
+    Variaveis (delta 1 = inverter agora): nos T/X ainda nao invertidos e
+    cantos L que a coordenacao de papel NAO prende (ver
+    `_tie_parity_node_movable`): canto LIVRE (nenhuma aresta no grafo de
+    `_coordinate_arm_role_nodes` - o papel e' convencao de ordem de
+    entrada) ou canto de ARESTA ISOLADA (a parede entre dois cantos de grau
+    1 - exatamente a licenca "mesma familia" das secoes 31/32, que por
+    construcao nunca afeta a alternancia de nenhuma outra parede). Fixos
+    (delta 0): canto de cadeia coordenada (alternancia obrigatoria, 30.5),
+    canto pinado, no' ja' invertido (monotonia), qualquer outro tipo. 2-coloracao por
+    componente, raizes fixas primeiro, visita em ordem geometrica
+    (`_canonical_node_sort_key`). Conflitos (aresta que a coloracao nao
+    satisfaz; coincidencia entre pecas do MESMO no') sao devolvidos, nunca
+    resolvidos por adivinhacao. Funcao pura sobre `nodes` (nao muta)."""
+    _eligible, coordination, _edges = _arm_role_coordination_graph(nodes, respect_pins=True)
+
+    def _movable(node_index):
+        return _tie_parity_node_movable(nodes, node_index, _eligible, coordination)
+
+    def _key(node_index):
+        return _canonical_node_sort_key(nodes[node_index]) + (node_index,)
+
+    edges = []
+    conflicts = []
+    for wall_idx, t_cm, cand_a, cand_b in coincidences:
+        n_a, n_b = cand_a.get("node_index"), cand_b.get("node_index")
+        if n_a is None or n_b is None or n_a == n_b:
+            conflicts.append({"wall_idx": wall_idx, "t_cm": round(t_cm, 2),
+                              "nodes": sorted(set(n for n in (n_a, n_b) if n is not None)),
+                              "reason": "SAME_NODE" if n_a == n_b else "NO_NODE"})
+            continue
+        edges.append((wall_idx, t_cm, n_a, n_b, 1))
+    for wall_idx, t_cm, cand_a, cand_b in same_course_pairs:
+        edges.append((wall_idx, t_cm, cand_a["node_index"], cand_b["node_index"], 0))
+
+    adjacency = {}
+    for _wall_idx, _t_cm, n_a, n_b, xor in edges:
+        adjacency.setdefault(n_a, []).append((n_b, xor))
+        adjacency.setdefault(n_b, []).append((n_a, xor))
+
+    delta = {}
+    component = {}
+    for start in sorted(adjacency, key=lambda n: (_movable(n), _key(n))):
+        # nos FIXOS primeiro (chave (False, ...) < (True, ...)): a raiz de
+        # um componente com no' fixo e' sempre um no' fixo, com delta 0.
+        if start in delta:
+            continue
+        delta[start] = 0
+        component[start] = start
+        frontier = [start]
+        while frontier:
+            frontier.sort(key=_key)
+            current = frontier.pop(0)
+            for neighbor, xor in sorted(adjacency[current], key=lambda edge: _key(edge[0])):
+                if neighbor in delta:
+                    continue
+                delta[neighbor] = (delta[current] ^ xor) if _movable(neighbor) else 0
+                component[neighbor] = start
+                frontier.append(neighbor)
+
+    # Componente com QUALQUER aresta violada (XOR 0 ou 1) e' insatisfativel
+    # com os nos fixos que tem: nenhum no' dele inverte (inverter so' mudaria
+    # a junta corrida de lugar), e as coincidencias dele sao reportadas.
+    violated_components = set()
+    for _wall_idx, _t_cm, n_a, n_b, xor in edges:
+        if (delta.get(n_a, 0) ^ delta.get(n_b, 0)) != xor:
+            violated_components.add(component[n_a])
+    flips = sorted((n for n, d in delta.items()
+                    if d == 1 and component[n] not in violated_components), key=_key)
+    for wall_idx, t_cm, n_a, n_b, xor in edges:
+        if xor == 1 and component[n_a] in violated_components:
+            conflicts.append({"wall_idx": wall_idx, "t_cm": round(t_cm, 2),
+                              "nodes": sorted((n_a, n_b)), "reason": "UNSATISFIABLE"})
+    conflicts.sort(key=lambda c: (c["wall_idx"], c["t_cm"], tuple(c["nodes"])))
+    # Componentes satisfeitos, em ordem geometrica da raiz: um componente SEM
+    # no' fixo admite as duas coloracoes (delta e complemento) - o chamador
+    # escolhe entre elas pelo proxy de compensadores (ver
+    # `_tie_parity_component_options`); com no' fixo so' ha' uma.
+    components = []
+    for root in sorted(set(component.values()), key=_key):
+        if root in violated_components:
+            continue
+        members = sorted((n for n, r in component.items() if r == root), key=_key)
+        has_fixed = any(not _movable(n) for n in members)
+        components.append({"root": root, "nodes": members, "has_fixed": has_fixed,
+                           "delta": dict((n, delta[n]) for n in members)})
+    return flips, conflicts, components
+
+
+def _node_walls(node):
+    """Todas as paredes que `node` toca (bracos, principal/que chega, cruzadas)."""
+    walls = set(w for w, _e in (node.get("arms") or []))
+    for key in ("main_wall_idx", "incoming_wall_idx"):
+        if node.get(key) is not None:
+            walls.add(node[key])
+    walls.update(w for w in (node.get("crossing_walls") or []) if w is not None)
+    return walls
+
+
+def _wall_course_free_segments_cm(wall_idx, course, nodes, walls_to_create, end_to_node,
+                                  by_end, midspan):
+    """[(pier_cm, lead_cm, trail_cm, leading_open, trailing_open), ...] - os
+    trechos livres de UMA fiada de `wall_idx`, com o MESMO contorno que
+    `solve_wall_free_fill` monta (bordas de no' pelas pontas, reservas
+    padrao, intervalos de meio de parede), no modo continuo (aberturas nao
+    sao fronteira). So' aritmetica de contorno, nenhum preenchimento."""
+    length_cm = _wall_axis_and_length(walls_to_create, wall_idx)[3] / FEET_PER_METER * 100.0
+    border_0 = by_end.get((wall_idx, 0, course))
+    if border_0 is not None:
+        seg_start_cm, lead_cm, leading_open = border_0 + BLOCK_JOINT_CM, 0.0, False
+    else:
+        seg_start_cm, lead_cm = _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, 0)
+        leading_open = True
+    border_1 = by_end.get((wall_idx, 1, course))
+    if border_1 is not None:
+        seg_end_cm, trail_cm, trailing_open = border_1 - BLOCK_JOINT_CM, 0.0, False
+    else:
+        reservation_cm, trail_cm = _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, 1)
+        seg_end_cm, trailing_open = length_cm - reservation_cm, True
+    cursor_cm, cursor_lead, cursor_open = seg_start_cm, lead_cm, leading_open
+    segments = []
+    for t_start_cm, t_end_cm in _merge_intervals_cm(midspan.get((wall_idx, course), [])):
+        segments.append((t_start_cm - BLOCK_JOINT_CM - cursor_cm, cursor_lead, 0.0, cursor_open, False))
+        cursor_cm, cursor_lead, cursor_open = t_end_cm + BLOCK_JOINT_CM, 0.0, False
+    segments.append((seg_end_cm - cursor_cm, cursor_lead, trail_cm, cursor_open, trailing_open))
+    return segments
+
+
+def _tie_parity_fill_proxy(wall_idxs, nodes, walls_to_create, end_to_node, candidates, catalog,
+                           allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
+    """Custo-proxy do preenchimento das paredes `wall_idxs` para UMA
+    paridade dos nos: (excesso de compensadores em sequencia [regra #2],
+    compensadores, meios-blocos fora de ponta aberta, trechos que nao
+    fecham) somados sobre os trechos livres das duas fiadas, cada trecho
+    resolvido pelo layout PADRAO (`_pier_ordered_layout`, mesmos tiers de
+    sempre). Nao e' o preenchimento real (sem desencontro de junta, sem
+    aberturas): so' desempata entre duas paridades que resolvem a MESMA
+    junta corrida, preferindo a que deixa sobras que fecham sem cadeia de
+    compensadores - medido no TGD V2: inverter o X em vez do T nas paredes
+    de 594cm zerava a junta mas criava `C09 C09 C04` nas duas fiadas
+    (+136 COMPENSATOR_CONSECUTIVE), inverter o T resolve com 1
+    compensador por fiada, como antes. Funcao pura."""
+    by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
+    midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    excess = comps = misplaced = failed = 0
+    for wall_idx in sorted(wall_idxs):
+        for course in ("A", "B"):
+            for pier_cm, lead_cm, trail_cm, leading_open, trailing_open in _wall_course_free_segments_cm(
+                    wall_idx, course, nodes, walls_to_create, end_to_node, by_end, midspan):
+                if pier_cm < -PIER_LAYOUT_TOLERANCE_CM:
+                    failed += 1
+                    continue
+                layout = _pier_ordered_layout(max(0.0, pier_cm), catalog, lead_cm, trail_cm,
+                                              allow_compensators=allow_compensators,
+                                              leading_open_override=leading_open,
+                                              trailing_open_override=trailing_open)
+                if layout is None:
+                    failed += 1
+                    continue
+                excess += _layout_compensator_run_excess(layout, catalog)
+                for index, (code, _a, _b) in enumerate(layout):
+                    if (catalog.get(code) or {}).get("is_compensator"):
+                        comps += 1
+                    elif code == HALF_BLOCK_CODE and not (
+                            (index == 0 and leading_open) or (index == len(layout) - 1 and trailing_open)):
+                        misplaced += 1
+    return (excess, comps, misplaced, failed)
+
+
+def _tie_parity_component_options(component, nodes):
+    """As coloracoes admissiveis de um componente: a do plano e, se o
+    componente nao tem no' fixo, tambem o complemento (inverter os outros
+    nos em vez destes). Cada opcao e' a lista ordenada de nos a inverter."""
+    delta = component["delta"]
+    def _key(node_index):
+        return _canonical_node_sort_key(nodes[node_index]) + (node_index,)
+    primary = sorted((n for n, d in delta.items() if d == 1), key=_key)
+    if component["has_fixed"]:
+        return [primary]
+    complement = sorted((n for n, d in delta.items() if d == 0), key=_key)
+    return [primary, complement]
+
+
+def _apply_abutting_tie_parity(outcome, nodes, walls_to_create, catalog, openings_per_wall,
+                               end_to_node):
+    """Segunda metade de solve_all_intersections quando ABUTTING_TIE_PARITY_
+    ENABLED: censo -> plano -> marca `_tie_parity_flip` nos nos escolhidos ->
+    re-solucao dos nos -> censo de novo; fica so' se a contagem de
+    coincidencias NO'|FILL x NO'|FILL cair estritamente (senao desfaz as
+    marcas desta chamada e devolve o resultado original). Sempre devolve
+    `tie_parity_flips` (nos invertidos NESTA chamada) e
+    `tie_parity_conflicts` (coincidencias que a paridade T/X nao resolve)."""
+    num_walls = len(walls_to_create)
+
+    def _count(result):
+        census = _node_fill_boundary_joint_census(
+            nodes, walls_to_create, end_to_node, openings_per_wall, result["candidates"], catalog)
+        return _census_coincidences(census, num_walls)
+
+    def _residual(coincidences, planned_conflicts):
+        # Toda coincidencia que sobrou e' reportada - a razao vem do plano
+        # (MESMO no', sem no', insatisfativel) quando ele a explicou, senao
+        # "NO_IMPROVEMENT" (a inversao existia mas nao reduziu a contagem).
+        explained = dict(((c["wall_idx"], c["t_cm"]), c) for c in planned_conflicts)
+        out = []
+        for wall_idx, t_cm, cand_a, cand_b in coincidences:
+            key = (wall_idx, round(t_cm, 2))
+            if key in explained:
+                out.append(explained[key])
+                continue
+            out.append({"wall_idx": wall_idx, "t_cm": key[1],
+                        "nodes": sorted(set(n for n in (cand_a.get("node_index"), cand_b.get("node_index"))
+                                            if n is not None)),
+                        "reason": "NO_IMPROVEMENT"})
+        out.sort(key=lambda c: (c["wall_idx"], c["t_cm"], tuple(c["nodes"])))
+        return out
+
+    current = outcome
+    coincidences = _count(current)
+    accepted = []
+    conflicts = []
+    for _round in range(ABUTTING_TIE_PARITY_MAX_ROUNDS):
+        if not coincidences:
+            conflicts = []
+            break
+        same_course_pairs = _abutting_same_course_tie_pairs(nodes, walls_to_create, current["candidates"])
+        _planned, conflicts, components = _plan_abutting_tie_parity(coincidences, same_course_pairs, nodes)
+        flips = []
+        for component in components:
+            options = _tie_parity_component_options(component, nodes)
+            if len(options) == 1:
+                chosen = options[0]
+            else:
+                # Duas coloracoes resolvem a mesma junta corrida: fica a que
+                # deixa as sobras de preenchimento mais limpas (proxy), e em
+                # empate a que inverte menos nos, depois a do plano.
+                walls_touched = set()
+                for node_index in component["nodes"]:
+                    walls_touched |= _node_walls(nodes[node_index])
+                walls_touched = set(w for w in walls_touched if 0 <= w < len(walls_to_create))
+                scored = []
+                for option_index, option in enumerate(options):
+                    for node_index in option:
+                        _tie_parity_apply(nodes[node_index], True)
+                    trial = solve_all_intersections(nodes, walls_to_create, catalog,
+                                                    openings_per_wall=openings_per_wall,
+                                                    end_to_node=end_to_node, _parity_pass=False)
+                    proxy = _tie_parity_fill_proxy(walls_touched, nodes, walls_to_create, end_to_node,
+                                                   trial["candidates"], catalog)
+                    for node_index in option:
+                        _tie_parity_apply(nodes[node_index], False)
+                    scored.append((proxy, len(option), option_index, option))
+                chosen = min(scored)[3]
+            for node_index in chosen:
+                _tie_parity_apply(nodes[node_index], True)
+            flips.extend(chosen)
+        if not flips:
+            break
+        retry = solve_all_intersections(nodes, walls_to_create, catalog,
+                                        openings_per_wall=openings_per_wall,
+                                        end_to_node=end_to_node, _parity_pass=False)
+        coincidences_after = _count(retry)
+        if len(coincidences_after) < len(coincidences):
+            current, coincidences = retry, coincidences_after
+            accepted.extend(flips)
+            continue
+        for node_index in flips:
+            _tie_parity_apply(nodes[node_index], False)
+        break
+    current["tie_parity_flips"] = list(accepted)
+    current["tie_parity_conflicts"] = _residual(coincidences, conflicts)
+    return current
 
 
 def _tie_parity_score(result):
@@ -3888,6 +4474,12 @@ VERTICAL_JOINT_STAGGER_TOLERANCE_CM = 1.0  # secao 6: juntas mais proximas que
 # principalmente o b4 e o b9"). Ver EXCECAO na secao 11 de
 # REGRAS_MODULACAO_BLOCOS.md.
 OPENING_ALIGNED_EXEMPT_CODES = ("C04", "C09", "B19")
+# Tolerancia (cm) para "peca encostada na borda do vao / ponta do eixo"
+# (isencao 11.8/18.12). Definida aqui (e nao so' em wall_modeling.py) porque
+# o censo de juntas NO'|FILL de `_node_fill_boundary_joint_census` aplica a
+# MESMA isencao do validador de prisma antes de qualquer preenchimento;
+# wall_modeling.py a recebe pelo `import *`.
+OPENING_ALIGNED_TOUCH_TOLERANCE_CM = 2.0
 
 
 def _layout_internal_joint_positions_cm(layout, seg_start_cm,
@@ -6910,7 +7502,12 @@ def _arm_role_isolated_edges(nodes):
     `_canonical_node_sort_key(nodes[node_p])`, nunca por wall_idx/ordem de
     insercao) de dicts {"wall_idx":, "node_p":, "node_q":,
     "original_bits": (bit_p, bit_q)}."""
-    _eligible, adjacency, edges = _arm_role_coordination_graph(nodes, respect_pins=False)
+    # `respect_pins=True` desde a paridade das pecas encostadas (2026-09-12):
+    # um canto que ela ja' fixou (pino) fica fora da topologia, e a parede
+    # dele deixa de ser "aresta isolada" candidata - a decisao anterior nao
+    # e' refeita nem revertida aqui. Sem pinos anteriores (o caso de sempre)
+    # a topologia e' a completa, identica ao comportamento historico.
+    _eligible, adjacency, edges = _arm_role_coordination_graph(nodes, respect_pins=True)
     isolated = []
     for node_p, node_q, wall_idx in edges:
         if len(adjacency.get(node_p, [])) != 1 or len(adjacency.get(node_q, [])) != 1:
@@ -8396,6 +8993,8 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         "order": order,
         "candidates": all_candidates,
         "intersection_failures": intersections["failures"],
+        "tie_parity_flips": list(intersections.get("tie_parity_flips") or []),
+        "tie_parity_conflicts": list(intersections.get("tie_parity_conflicts") or []),
         "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular,
         "alignment_conflicts": alignment_conflicts,
