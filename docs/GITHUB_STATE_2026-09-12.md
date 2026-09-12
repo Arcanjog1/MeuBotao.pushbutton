@@ -39,7 +39,7 @@ Beta** continua sendo decisão do usuário, não deste registro.
 
 `claude/nifty-lovelace-d3ewpi` (nome designado pela sessão; o usuário
 sugeriu `claude/pre-beta2-critical-sanitization` — mesmo conteúdo), derivada
-de `6439669`. Sem merge; PR aberto para revisão (ver checkpoint
+de `6439669`. Sem merge; PR [#38](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/38) aberto para revisão (ver checkpoint
 [2026-09-12](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md)).
 
 ## CI

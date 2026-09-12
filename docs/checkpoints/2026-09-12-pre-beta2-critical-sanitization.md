@@ -8,7 +8,7 @@
   "head": "4d6eecff394b0147a4e59b942162d3aa653755de",
   "base": "643966994a2552df31e43451b3cb4137a1d3dc59",
   "main_observada": "643966994a2552df31e43451b3cb4137a1d3dc59",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/38",
   "veredito": "READY FOR REVIEW — PRÉ-BETA 2 SANITIZED (ver a seção Veredito; regressão consolidada registrada em evidence/2026-09-12-regressao-consolidada.json)",
   "objective": "Sem MCP/Revit: (1) corrigir a sonda de vão `_room_at_t_on_wall` (ponto dentro de abertura); (2) criar a régua V2 do benchmark com a topologia do motor atual sem apagar a V1; (3) localizar e corrigir a regressão nó|fill (+2, W088/W090) escondida pelo PR #37 e restaurar os testes afrouxados.",
   "changes": [
