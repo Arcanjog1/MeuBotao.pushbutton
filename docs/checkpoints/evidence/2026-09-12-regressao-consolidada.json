@@ -1,0 +1,25 @@
+{
+  "started_utc": "2026-09-12T02:50:34.425554+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "4d6eecff394b0147a4e59b942162d3aa653755de",
+  "tree": "fef15919f3b63a867a4cdd9a53c1e7a6577ac759",
+  "status_before": "",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 7000,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-12-regressao-consolidada.txt",
+  "pid": 3942,
+  "exit_code": 1,
+  "elapsed_seconds": 4239.121,
+  "status_after": "?? docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md\n?? docs/checkpoints/evidence/2026-09-12-regressao-consolidada.json\n?? docs/checkpoints/evidence/2026-09-12-regressao-consolidada.txt",
+  "log_sha256": "a8319d03b7b1bd5db9a7c0f7d62e993a55811f8d6cb22021dd3044faa9834804"
+}
