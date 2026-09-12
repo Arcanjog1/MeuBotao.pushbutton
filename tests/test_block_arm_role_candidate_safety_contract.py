@@ -472,10 +472,23 @@ def test_t1_t9_candidato_seguro_e_aceito_no_tgd_real():
     result, _nodes, _walls, _e2n, _op, _cat, _bz, _nc = _run_tgd(enabled=True)
     safe_repair = result.get("arm_role_safe_repair") or {}
     accepted = safe_repair.get("accepted") or []
+    rejected = safe_repair.get("rejected") or []
     audits = result.get("wall_bond_audits")
-    assert accepted, "esperava pelo menos 1 candidato aceito no TGD"
+    # Regra 33.9 (2026-09-12, paridade das pecas encostadas): a aresta
+    # isolada que o SAFE REPAIR aceitava (91/SAME_B) passa a ser resolvida
+    # ANTES, em solve_all_intersections (canto pinado pela paridade), entao
+    # o SAFE REPAIR nao tem mais candidato a aceitar - medido no TGD real
+    # com a paridade ligada x desligada: accepted [91/SAME_B] -> [],
+    # rejected 19 -> 6, paredes com prisma forcado 25 -> 19, colisoes 1121
+    # = 1121, auditorias reprovadas 26 -> 20. O gate continua nao-vacuo
+    # pela via FISICA: ou aceita alguem, ou toda parede que ele consertava
+    # (23 e 91) ja' termina sem prisma forcado.
+    assert accepted or not m._wall_has_forced_corner_prism(91, audits), (
+        "sem candidato aceito E a parede 91 (o ultimo aceito medido) ainda "
+        "com prisma forcado: o SAFE REPAIR ou a paridade regrediram")
     for candidato in accepted:
         assert not m._wall_has_forced_corner_prism(candidato["wall_idx"], audits), candidato
+    assert not any(r["wall_idx"] == 23 for r in rejected)
     assert not m._wall_has_forced_corner_prism(23, audits), (
         "a parede 23 (o caso T1/T9) tem de terminar SEM prisma forcado - "
         "aceita como candidato de reparo, ou ja' correta na geracao")
