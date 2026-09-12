@@ -23,7 +23,7 @@
     "Focados (HEAD fb618b2, Linux, Python 3.11.15, pytest 9.1.1): test_block_node_fill_revalidation (t1–t17), test_forced_half_licence, test_tie_parity_local_search, test_corner_reserve_per_course, test_script, test_tie_parity_abutting_ties -k 'not t18 and not t19 and not t20': 325 passed / 3 deselected em 56,5 s (evidence/2026-09-12-filltie-focados.txt).",
     "Corpus V2 antes/depois (`runner.run_project(version='v2', write_files=False)`, evidence/2026-09-12-filltie-corpus-before-after.json e tabela por chave física em evidence/2026-09-12-filltie-cases.txt): ver seção 'Métrica antes/depois'.",
     "Determinismo (evidence/2026-09-12-filltie-determinism.json): fingerprint canônico do resultado (golden.fingerprint.canonical_fingerprint) em 3 processos separados por planta — TP1 f72853f9…69a00 idêntico ×3; TGD 1403b49d…5a648 idêntico ×3.",
-    "REGRESSÃO CONSOLIDADA (`python3 -m pytest tests -q -p no:cacheprovider`, HEAD de produção fb618b2, capturada por tools/documentation/capture_validation.py em evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}): 4 failed / 1109 passed em 2.395,56 s, exit 1 — 1 histórica (TP1 JUNCTION 8→9 vs V1), 1 categoria nível 2 (TGD V2 compensators 61→62), 2 asserções de mecanismo ARM substituídas pela prova física (ver seção 8). O HEAD avaliado deste checkpoint difere de fb618b2 SOMENTE nos dois testes ajustados (git diff fb618b2..HEAD -- nuvem/ vazio); os dois testes foram re-executados isolados no HEAD avaliado (evidence/2026-09-12-filltie-arm-tests-rerun.txt).",
+    "REGRESSÃO CONSOLIDADA (`python3 -m pytest tests -q -p no:cacheprovider`, HEAD de produção fb618b2, capturada por tools/documentation/capture_validation.py em evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}): 4 failed / 1109 passed em 2.395,56 s, exit 1 — 1 histórica (TP1 JUNCTION 8→9 vs V1), 1 categoria nível 2 (TGD V2 compensators 61→62), 2 asserções de mecanismo ARM substituídas pela prova física (ver seção 8). O HEAD avaliado deste checkpoint difere de fb618b2 SOMENTE nos dois testes ajustados (git diff fb618b2..HEAD -- nuvem/core/ vazio; só documentação em nuvem/REGRAS_MODULACAO_BLOCOS.md); os dois testes foram re-executados isolados no HEAD avaliado (evidence/2026-09-12-filltie-arm-tests-rerun.txt).",
     "Validador documental: `python3 tools/documentation/validate.py --base ad46c61 --main origin/main --require-current-main` — ver seção 'Validação documental'."
   ],
   "known_failures": [
@@ -91,7 +91,7 @@ confirmado por `git fetch` + `git rev-parse origin/main`. Branch
 `claude/fix-fill-tie-running-joint` derivada dela, sem rebase, sem
 force-push. Commit de produção `fb618b2` (engine + testes novos + scripts); HEAD avaliado
 `6b78a9aa70ff0cac239dcdd9ed1deaab730eb9a1` = fb618b2 + ajuste dos dois testes ARM ao contrato físico
-(`git diff fb618b2..HEAD -- nuvem/` vazio); depois só documentação.
+(`git diff fb618b2..HEAD -- nuvem/core/ tests/test_tie_parity_abutting_ties.py` vazio; em `nuvem/` só o REGRAS_MODULACAO_BLOCOS.md documental); depois só documentação.
 
 ## 2. Classificação dos PRISM (antes, régua V2)
 
