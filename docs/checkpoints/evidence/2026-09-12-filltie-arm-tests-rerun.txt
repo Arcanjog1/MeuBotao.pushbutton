@@ -1,0 +1,3 @@
+# HEAD de producao fb618b2 (testes ajustados no commit seguinte) | python3 -m pytest tests/test_block_arm_role_candidate_safety_contract.py::test_t1_t9_candidato_seguro_e_aceito_no_tgd_real tests/test_block_arm_role_prism_stagger.py::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair -q -p no:cacheprovider | Linux, Python 3.11.15, pytest 9.1.1
+..                                                                       [100%]
+2 passed in 127.44s (0:02:07)

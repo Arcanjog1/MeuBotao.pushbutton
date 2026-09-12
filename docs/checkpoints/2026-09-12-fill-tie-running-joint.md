@@ -5,7 +5,7 @@
   "date": "2026-09-12",
   "scope": "current",
   "branch": "claude/fix-fill-tie-running-joint",
-  "head": "fb618b21e7c0d5542b649f18f0043527fec3ff56",
+  "head": "6b78a9aa70ff0cac239dcdd9ed1deaab730eb9a1",
   "base": "ad46c61372ba0292d117e14ba605375af7acd807",
   "main_observada": "ad46c61372ba0292d117e14ba605375af7acd807",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/39",
@@ -23,11 +23,12 @@
     "Focados (HEAD fb618b2, Linux, Python 3.11.15, pytest 9.1.1): test_block_node_fill_revalidation (t1–t17), test_forced_half_licence, test_tie_parity_local_search, test_corner_reserve_per_course, test_script, test_tie_parity_abutting_ties -k 'not t18 and not t19 and not t20': 325 passed / 3 deselected em 56,5 s (evidence/2026-09-12-filltie-focados.txt).",
     "Corpus V2 antes/depois (`runner.run_project(version='v2', write_files=False)`, evidence/2026-09-12-filltie-corpus-before-after.json e tabela por chave física em evidence/2026-09-12-filltie-cases.txt): ver seção 'Métrica antes/depois'.",
     "Determinismo (evidence/2026-09-12-filltie-determinism.json): fingerprint canônico do resultado (golden.fingerprint.canonical_fingerprint) em 3 processos separados por planta — TP1 f72853f9…69a00 idêntico ×3; TGD 1403b49d…5a648 idêntico ×3.",
-    "REGRESSÃO CONSOLIDADA (`python3 -m pytest tests -q -p no:cacheprovider`, HEAD fb618b2, capturada por tools/documentation/capture_validation.py em evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}): ver seção 'Regressão consolidada'.",
+    "REGRESSÃO CONSOLIDADA (`python3 -m pytest tests -q -p no:cacheprovider`, HEAD de produção fb618b2, capturada por tools/documentation/capture_validation.py em evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}): 4 failed / 1109 passed em 2.395,56 s, exit 1 — 1 histórica (TP1 JUNCTION 8→9 vs V1), 1 categoria nível 2 (TGD V2 compensators 61→62), 2 asserções de mecanismo ARM substituídas pela prova física (ver seção 8). O HEAD avaliado deste checkpoint difere de fb618b2 SOMENTE nos dois testes ajustados (git diff fb618b2..HEAD -- nuvem/ vazio); os dois testes foram re-executados isolados no HEAD avaliado (evidence/2026-09-12-filltie-arm-tests-rerun.txt).",
     "Validador documental: `python3 tools/documentation/validate.py --base ad46c61 --main origin/main --require-current-main` — ver seção 'Validação documental'."
   ],
   "known_failures": [
-    "Regressão consolidada: ver seção 'Regressão consolidada' (esperada a falha HISTÓRICA test_benchmark_baselines::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1] — JUNCTION_MISSING_BINDING 8→9 contra o baseline V1, presente em 8cdd33f/cf325f2/c3eb0a1/4d6eecf; JUNCTION continua 9 neste HEAD).",
+    "Regressão consolidada (fb618b2): 4 failed / 1109 passed — (1) test_benchmark_baselines[tp1] JUNCTION_MISSING_BINDING 8→9 vs V1, HISTÓRICA; (2) test_benchmark_baselines_versionado[tgd-v2] categoria compensators 61→62 (nível 2, W016; baseline V2 não regravado — decisão do usuário); (3) e (4) asserções de MECANISMO do SAFE REPAIR (candidato aceito 91/SAME_B no TGD, 75/SAME_A em W076 do TP1) que a paridade passa a resolver antes — ajustadas ao contrato físico e re-executadas isoladas (seção 8).",
+    "non_modular do solver: +14 (TP1 V1) / +63 (TGD V1) entradas SEM_ESPACO de −1 cm entre duas peças de nó encostadas na mesma fiada — bookkeeping pré-existente do laço de trechos, sem peça faltando; pendência pequena registrada.",
     "TP1 V2 residual 16 PRISM_CONTINUOUS_JOINT, todos fill|fill: W002/W009/W078/W079 (3 cada, rows 13–16: cadeia `C09 C09 C04` do trecho de 65 cm entre T e canto contra `B34 B34 B34` da fiada oposta) e W034/W044/W065/W074 (1 cada, rows 11–12: fronteira de banda acima da porta). Defeito próprio (tier 7 / cross-band), fora do escopo desta missão (item 17: tier 6 padrão é decisão pendente).",
     "TGD V2 residual 53: 40 em W027/W028/W129/W130 (844 cm, 4 portas): peça B34 `T_INTERSECTION_DEGRADED_L` DUPLICADA no mesmo lugar ([613,647]×2 / [181.5,215.5]×2 — POSITION_OVERLAP) forma junta artificial contra o C09 de reparo de abertura da fiada vizinha; 2 tie|tie nas mesmas paredes; 11 em W080 (379 cm): os dois cantos L põem B34 nas DUAS fiadas na mesma posição (SAME_NODE) — giro do canto, não paridade. Nenhum é fill|tie entre nós distintos.",
     "TGD: COMPENSATOR_EXCESS_IN_RUN 444 → 454 e COMPENSATOR_VERTICAL_STRIP 82 → 86 nas quatro principais das cadeias de T (W015/W016/W142/W143, 1484–1936 cm), nível 2; COMPENSATOR_CONSECUTIVE 472 = 472. Registrado como delta, não escondido.",
@@ -50,7 +51,8 @@
   "decisions_pending": [
     "fill|fill residual do TP1 (cadeias `C09 C09 C04` de 65 cm entre T e canto; fronteira de banda acima de porta): tier 6 padrão / prioridade regra #1 × #2 (33.8, decisão do usuário).",
     "Peça de nó duplicada em T_INTERSECTION_DEGRADED_L (W027/W028/W129/W130 do TGD, POSITION_OVERLAP) e canto com B34 nas duas fiadas (W080): defeitos próprios do solver de L/T degradado, fora desta missão.",
-    "Regravar a régua V2 num artefato/versão próprio quando a governança permitir (o delta está registrado aqui; V2 não foi alterada)."
+    "Regravar a régua V2 num artefato/versão próprio quando a governança permitir (o delta está registrado aqui; V2 não foi alterada) — inclusive a categoria compensators 61→62 que faz o gate versionado falhar.",
+    "Trecho de −1 cm entre duas peças de nó encostadas na mesma fiada reportado como SEM_ESPACO em solve_wall_free_fill (non_modular): ignorar quando os dois contornos são de nó (correção pequena, não feita depois do HEAD avaliado)."
   ],
   "next_steps": [
     "Revisão humana do PR draft; sem merge sem autorização específica.",
@@ -70,6 +72,13 @@
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-cases.py"},
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-predict.py"},
     {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-census-prototype.py"},
+    {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-fp.py"},
+    {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-arm-check.py"},
+    {"path": "docs/checkpoints/evidence/_scripts/2026-09-12-filltie-nonmod.py"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-regressao-consolidada.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-regressao-consolidada.txt"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-arm-check.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-arm-tests-rerun.txt"},
     {"path": "docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md"}
   ]
 }
@@ -80,8 +89,9 @@
 `origin/main` = `ad46c61372ba0292d117e14ba605375af7acd807` (merge do #38),
 confirmado por `git fetch` + `git rev-parse origin/main`. Branch
 `claude/fix-fill-tie-running-joint` derivada dela, sem rebase, sem
-force-push. Commit de código `fb618b2` = HEAD avaliado (engine + testes +
-scripts de evidência); depois só documentação.
+force-push. Commit de produção `fb618b2` (engine + testes novos + scripts); HEAD avaliado
+`6b78a9aa70ff0cac239dcdd9ed1deaab730eb9a1` = fb618b2 + ajuste dos dois testes ARM ao contrato físico
+(`git diff fb618b2..HEAD -- nuvem/` vazio); depois só documentação.
 
 ## 2. Classificação dos PRISM (antes, régua V2)
 
@@ -161,14 +171,42 @@ idêntico — TP1 `f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569
 
 ## 8. Regressão consolidada
 
-Em execução no HEAD `fb618b2` (`capture_validation.py`, timeout 7000 s) —
-resultado gravado em `evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}`
-e transcrito aqui no commit documental final.
+`python3 -m pytest tests -q -p no:cacheprovider` no HEAD de produção `fb618b2`
+(tree `39bde403…`), Linux, Python 3.11.15, pytest 9.1.1, capturada por
+`tools/documentation/capture_validation.py` (PID 3138, timeout 7000 s) em
+`evidence/2026-09-12-filltie-regressao-consolidada.{json,txt}`:
+
+**4 failed / 1109 passed em 2.395,56 s (39m55s), exit code 1**, terminada às
+15:59:47 UTC (os dois watchers bash desta sessão ficaram presos por `pgrep -f`
+casar a própria linha de comando; encerrados sem relançar nada).
+
+| Falha | Assercão | Natureza |
+|---|---|---|
+| `tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]` | `REGRESSAO CRITICA … JUNCTION_MISSING_BINDING 8 → 9` contra o baseline V1 | HISTÓRICA (8cdd33f/cf325f2/c3eb0a1/4d6eecf); JUNCTION continua 9 |
+| `…::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]` | `REGRESSAO em torre_easy_lo_r00_tgd/v2: [{'category': 'compensators', 'before': 61, 'after': 62}]` | NOVA, nível 2: W016 (1483 cm, principal de uma cadeia de T invertida) passa a contar 2 `COMPENSATOR_EXCESS_IN_RUN` (trecho 270..1084 das fiadas 13/15) + 1 `VERTICAL_STRIP` (C04 de jamb em t=612, 9 de 17 fiadas) — as MESMAS peças (`B19 C04` de jamb das portas) trocaram de fiada com o B54 do T e a contagem por faixa/banda é assimétrica entre fiadas pares e ímpares. Categoria de paredes reprovadas 61 → 62; críticos do TGD 719 → 527. Baseline V2 NÃO regravado (governança) — decisão do usuário |
+| `tests/test_block_arm_role_candidate_safety_contract.py::test_t1_t9_candidato_seguro_e_aceito_no_tgd_real` | `esperava pelo menos 1 candidato aceito no TGD` | asserção de MECANISMO: a aresta isolada 91/SAME_B que o SAFE REPAIR aceitava passa a ser resolvida antes, pela paridade (canto pinado). Reproduzido isolado (`_scripts/2026-09-12-filltie-arm-check.py`, TGD V1, paridade ON × OFF): accepted [91/SAME_B] → [], rejected 19 → 6, paredes com prisma forçado 25 → 19, colisões 1121 = 1121, auditorias reprovadas 26 → 20, parede 23 sem prisma forçado nas duas. Teste ajustado ao contrato físico (aceita alguém OU 91 sem prisma forçado; 23 nunca rejeitada e sem prisma) |
+| `tests/test_block_arm_role_prism_stagger.py::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair` | `esperava um candidato ARM aceito para W076 (wall_idx=75)` — o primeiro assert (juntas de W076 não coincidem) PASSOU | idem: W076 (69 cm L-L, aresta isolada) resolvido pela paridade; reproduzido isolado (TP1 V1): accepted [75/SAME_A] → [], prisma forçado 23 → 21 paredes, colisões 8 = 8, auditorias 25 → 23. Teste ajustado (aceito OU não rejeitado; prova física mantida) |
+
+Efeito colateral medido na reprodução (`_scripts/2026-09-12-filltie-nonmod.py`):
+`non_modular` do solver TP1 V1 43 → 57 e TGD V1 2676 → 2739 — todos
+`SEM_ESPACO` de **−1 cm** entre duas peças de nó ENCOSTADAS na mesma fiada
+(ex.: TP1 walls 2/7 fiada B `[1310,1309]`, 7 bandas/variantes cada): o laço de
+trechos de `solve_wall_free_fill` reporta como conflito o trecho vazio entre
+duas amarrações que compartilham uma junta — bookkeeping pré-existente (wall
+75 fiada A tinha o mesmo antes), sem peça faltando (COVERAGE idêntica no
+benchmark). Correção pequena (ignorar trecho de −J entre dois contornos de nó)
+registrada como pendência, não feita aqui para não mudar produção depois do
+HEAD avaliado.
+
+Zero skip/xfail; nenhum baseline/reference/threshold tocado.
 
 ## 9. Validação documental
 
 `python3 tools/documentation/validate.py --base ad46c61 --main origin/main --require-current-main`
-— resultado transcrito no commit documental final.
+→ `PASS: versioned documentation, commit provenance and explicit local links`
+(clone completo após `git fetch --unshallow`; sem isso o validador acusava
+`official revision is not integrated: 8a93a27`, o mesmo artefato de clone raso
+registrado na revisão do #38).
 
 ## Veredito
 
@@ -181,5 +219,5 @@ da paridade, reportado); (7) nó|fill 0; (8) INSIDE_DOOR 0; (9) INSIDE_WINDOW
 0; (10) nenhuma regressão crítica (CROSSES_JAMB/OVERLAP/COVERAGE/JUNCTION
 iguais; delta nível 2 de +10 EXCESS_IN_RUN/+4 STRIP no TGD registrado);
 (11) determinismo; (12) custo local (<1 s por planta); (13) focados verdes;
-(14) consolidada — seção 8; (15) 33.9 + checkpoint + status. Sem MCP, sem
+(14) consolidada compreendida: 4 falhas nomeadas, 1 histórica, 1 categoria nível 2 (compensators 61→62 no TGD V2) e 2 asserções de mecanismo ajustadas (seção 8); (15) 33.9 + checkpoint + status. Sem MCP, sem
 Revit, sem merge.
