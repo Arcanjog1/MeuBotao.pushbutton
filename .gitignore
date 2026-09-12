@@ -44,3 +44,12 @@ nuvem/benchmark/projects/*/provisional_2b/comparison.json
 nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/repro_envelope.json
 nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/solver_state_a.json
 nuvem/benchmark/future_cr_preparation/bench_opening_reconstruction_a/solver_state_b.json
+
+# Reguas versionadas do benchmark (2026-09-12, `runner.py --version v2`):
+# mesma regra de cima para o subdiretorio `<projeto>/<versao>/` - so' o que
+# se regenera identico fica de fora; input/snapshot/baseline/score/manifest
+# da versao ficam versionados.
+nuvem/benchmark/projects/*/*/result.json
+nuvem/benchmark/projects/*/*/findings.json
+nuvem/benchmark/projects/*/*/comparison.json
+nuvem/benchmark/projects/*/*/scoped_comparison.json

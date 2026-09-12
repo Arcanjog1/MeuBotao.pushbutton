@@ -1229,6 +1229,10 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     so' para MEDIR espaco disponivel antes de forcar uma peca de
     amarracao (B54/B34) num encontro em T/L - nunca altera nada.
 
+    Ponto DENTRO de um vao (t_lo < t_ft < t_hi): devolve 0.0 em qualquer
+    sentido - o vazio da abertura e' obstaculo, nunca se mede espaco
+    atraves dele (correcao de 2026-09-12, ver o comentario no corpo).
+
     `safe_range_ft` (opcional): `(lo_ft, hi_ft)` de `_wall_reserved_range_ft`
     - quando dado, o "fim fisico da parede" some' como limite e vira esse
     intervalo (ja' descontada a reserva de outro encontro na ponta
@@ -1239,14 +1243,32 @@ def _room_at_t_on_wall(walls_to_create, openings_per_wall, wall_idx, t_ft, sign,
     _p0, _p1, _dir, total_len_ft, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
     lo_ft, hi_ft = (0.0, total_len_ft) if safe_range_ft is None else safe_range_ft
     openings_here = openings_per_wall[wall_idx] if (openings_per_wall and wall_idx < len(openings_per_wall)) else []
+    # Intervalos [t_lo, t_hi] NORMALIZADOS: a tupla e' (t_lo, t_hi, sill,
+    # head), mas a sonda nao pode depender do sentido em que o vao foi
+    # gravado - invertido, o mesmo vao fisico deixaria de ser obstaculo.
+    spans = []
+    for (t_a, t_b, _s, _h) in openings_here:
+        spans.append((t_a, t_b) if t_a <= t_b else (t_b, t_a))
+    # Ponto DENTRO de um vao (t_lo < t_ft < t_hi, fora do ruido das jambas):
+    # nao existe alvenaria onde apoiar a peca - a disponibilidade e' ZERO em
+    # qualquer sentido. Antes (ate' 2026-09-12) este caso era ignorado: o
+    # filtro so' enxergava vaos inteiramente a frente (t_lo >= t_ft) ou
+    # inteiramente atras (t_hi <= t_ft), e a sonda media "espaco" ATRAVES
+    # do vazio ate' o proximo obstaculo - o solver concluia que cabia uma
+    # peca de amarracao e a punha dentro da porta (OPENING_BLOCK_INSIDE_DOOR,
+    # caso W019 do TP1; auditoria 2026-09-09; regressao 0->7 na bisseccao
+    # 11.10 de 2026-09-11). Ver tests/test_room_probe_inside_opening.py.
+    for (t_lo, t_hi) in spans:
+        if t_lo + 1e-6 < t_ft < t_hi - 1e-6:
+            return 0.0
     if sign >= 0:
         boundary = hi_ft
-        for (t_lo, _t_hi, _s, _h) in openings_here:
+        for (t_lo, _t_hi) in spans:
             if t_lo >= t_ft - 1e-6 and t_lo < boundary:
                 boundary = t_lo
         return max(0.0, boundary - t_ft)
     boundary = lo_ft
-    for (_t_lo, t_hi, _s, _h) in openings_here:
+    for (_t_lo, t_hi) in spans:
         if t_hi <= t_ft + 1e-6 and t_hi > boundary:
             boundary = t_hi
     return max(0.0, t_ft - boundary)
