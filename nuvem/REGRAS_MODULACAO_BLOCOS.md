@@ -247,6 +247,40 @@ pode invadir o vão real de uma porta sem peitoril (peitoril ≈ 0,
 - Janelas (peitoril > 0 de verdade) **não** entram nesta regra — o vão
   delas só é excluído na faixa vertical real (ver seção 4).
 
+### 3.1 — REGRA OBRIGATÓRIA: a sonda de vão não atravessa abertura (2026-09-12)
+
+**Como foi descoberto:** auditoria de 2026-09-09 (secção 5, "Portas/janelas")
+e bissecção 11.10 de 2026-09-11 (`OPENING_BLOCK_INSIDE_DOOR` 0 → 7 no TP1,
+caso W019). Corrigido em 2026-09-12 (missão pré-Beta 2), teste RED → GREEN em
+`tests/test_room_probe_inside_opening.py`.
+
+`_room_at_t_on_wall` (`wall_stepper.py`) mede a alvenaria disponível a partir
+de um ponto `t` de uma parede, num sentido, até o próximo obstáculo real
+(jamba de abertura, reserva de outro encontro, ponta física). É a medição que
+decide se um encontro T/L/X recebe B54, degrada para B34 ou fica sem amarração.
+
+- **Ponto dentro de uma abertura** (`t_lo < t < t_hi`, na faixa vertical em
+  que ela está ativa): a disponibilidade é **ZERO em qualquer sentido**. Não
+  existe alvenaria onde apoiar a peça; a sonda **nunca mede espaço através do
+  vazio** até a jamba oposta ou além dela. Antes da correcção o filtro só
+  enxergava aberturas inteiramente à frente ou inteiramente atrás do ponto, e
+  a abertura que continha o ponto era ignorada — foi assim que blocos de
+  amarração entraram em portas.
+- **Ponto exactamente na jamba:** andando para dentro do vão, zero; andando
+  para fora, mede normalmente até o próximo obstáculo.
+- **Intervalo gravado invertido** (`t_lo > t_hi`) é o **mesmo vão físico**: a
+  sonda normaliza antes de medir; nunca trata como "sem abertura".
+- **Várias aberturas na mesma parede:** cada uma é obstáculo independente; a
+  ordem da lista não altera a medição.
+- A regra é **geométrica e geral** — não há porta, coordenada, largura ou peça
+  específica no código nem no teste.
+
+**Efeito medido no corpus (main `6439669` → correcção, mesmo input V1):** TP1
+`OPENING_BLOCK_CROSSES_JAMB` 168 → 0, `POSITION_OVERLAP` 18 → 11,
+`PRISM_CONTINUOUS_JOINT` 300 → 304 (explicado no checkpoint de 2026-09-12);
+TGD `OPENING_BLOCK_INSIDE_DOOR` 5 → 0, `CROSSES_JAMB` 108 → 72. Ver
+`docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md`.
+
 ## 4. Janela não interrompe a fiada abaixo do peitoril
 
 Uma janela só é vazia **na faixa vertical real do seu vão**
