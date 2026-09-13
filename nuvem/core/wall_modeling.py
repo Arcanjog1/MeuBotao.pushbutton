@@ -3330,6 +3330,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
     bands = []
     all_candidates, all_collisions = [], []
     all_intersection_failures, all_jamb_exceptions, all_non_modular = [], [], []
+    all_tie_parity_flips, all_tie_parity_conflicts = [], []
     all_alignment_conflicts = []
     all_per_wall, all_validations = [], []
     all_door_void_violations = []
@@ -3413,6 +3414,8 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         all_candidates.extend(result["candidates"])
         all_collisions.extend((i + offset, j + offset) for i, j in result["collisions"])
         all_intersection_failures.extend(result["intersection_failures"])
+        all_tie_parity_flips.extend(result.get("tie_parity_flips") or [])
+        all_tie_parity_conflicts.extend(result.get("tie_parity_conflicts") or [])
         all_jamb_exceptions.extend(result["jamb_exceptions"])
         all_per_wall.extend(result.get("per_wall") or [])
         all_validations.extend(result.get("validations") or [])
@@ -3455,6 +3458,8 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         "candidates": all_candidates,
         "collisions": all_collisions,
         "intersection_failures": all_intersection_failures,
+        "tie_parity_flips": all_tie_parity_flips,
+        "tie_parity_conflicts": all_tie_parity_conflicts,
         "jamb_exceptions": all_jamb_exceptions,
         "non_modular": all_non_modular,
         "alignment_conflicts": all_alignment_conflicts,
@@ -4198,7 +4203,9 @@ def _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node):
 # Folga (cm) para considerar a borda de uma peca "encostada" na borda de um
 # vao (ou na ponta do eixo, onde o vao da parede vizinha comeca) - uma junta
 # de assentamento (1cm) mais uma margem de arredondamento.
-OPENING_ALIGNED_TOUCH_TOLERANCE_CM = 2.0
+# OPENING_ALIGNED_TOUCH_TOLERANCE_CM (2,0 cm) vem de core/engine/wall_stepper.py
+# pelo `import *` acima - definicao unica, compartilhada com o censo de
+# juntas NO'|FILL (`_node_fill_boundary_joint_census`).
 
 
 def _joint_is_opening_aligned_exempt(extent_a, extent_b, opening_edges_cm, length_cm):

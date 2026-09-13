@@ -5618,6 +5618,148 @@ decidir a prioridade regra #1 × regra #2 na busca (hoje regra #2 primeiro,
 seção 16.1) ou dar à família A um lookahead da família B — decisão do
 usuário, não do agente.
 
+### 33.9 REGRA OBRIGATÓRIA — peças de amarração de nós DIFERENTES que se encostam na mesma parede ficam na MESMA fiada (Defeito 1, junta corrida fill|tie, 2026-09-12)
+
+**Como foi descoberto:** missão "Defeito 1 — junta corrida entre
+preenchimento e amarração" sobre a régua V2 (main `ad46c61`, PR #38
+integrado). Cada `PRISM_CONTINUOUS_JOINT` do corpus foi classificado pelo
+papel das peças das duas juntas (evidência
+`docs/checkpoints/evidence/2026-09-12-filltie-corpus-before-after.json`,
+tabela por chave física em `…/2026-09-12-filltie-cases.txt`):
+
+| Régua V2 | PRISM total | A fill\|tie (NÓ\|FILL × NÓ\|FILL) | B fill\|fill | C tie\|tie | D abertura/peça duplicada |
+|---|---|---|---|---|---|
+| TP1 antes | 48 | **32** (W003/W008, 1344 cm: X a 1282 + T em que chega a 1337) | 16 (W002/W009/W078/W079 cadeia `C09 C09 C04`; W034/W044/W065/W074 fronteira de banda) | 0 | 0 |
+| TGD antes | 245 | **203** (13 paredes: 594 cm T-que-chega + X a 55 cm ×4; 69 cm T + canto L ×4; 124 cm L-X-L ×4; 379 cm W080) | 0 | 2 | 40 (W027/W028/W129/W130: B34 `T_INTERSECTION_DEGRADED_L` duplicada no mesmo lugar contra C09 de abertura) |
+
+**Definição física do defeito (a única assinatura encontrada):** toda junta
+corrida fill|tie residual é uma junta NÓ|FILL da fiada A exatamente em cima
+de uma junta NÓ|FILL da fiada B na mesma parede — e as duas peças de nó são
+de NÓS DIFERENTES, encostadas junta a junta ao longo da parede, cada uma numa
+fiada:
+
+```
+Fiada A:  [corpo da principal 0..14] B19[15,34] | B54(X)[35,89] …
+Fiada B:  B34(T que chega)[0,34]     | B19[35,54] …
+                                    ^ 34,5 nas duas fiadas
+```
+
+O preenchimento NÃO tem liberdade nenhuma ali: em cada fiada a junta é o
+CONTORNO da própria peça de nó, e existe enquanto houver qualquer peça
+encostada nela (B19, `C09 C09`, tanto faz). A busca de desencontro
+(30.6/33.1) já recebe essas juntas e não tem o que trocar; a hipótese de
+que "o fill desconhece a junta da tie" foi **refutada** pela medição — o
+fill conhece, mas o trecho é de uma peça só entre dois contornos fixos.
+A única variável física é a PARIDADE: em qual fiada cada nó hospeda a sua
+peça — a "inversão A/B que a seção 11 permite" e a 11.12 implementou atrás
+de flag (`_tie_parity_flip`). Com as duas peças na mesma fiada a junta entre
+elas é AMARRAÇÃO|AMARRAÇÃO e a fiada oposta atravessa livre, desencontrando
+pelo preenchimento normal (`B39[15,54]`, junta 54,5).
+
+**Regra:** duas peças de amarração de nós diferentes que se encostam (junta
+a junta) na mesma parede ficam na MESMA fiada. É a regra #1 (junta corrida
+proibida) aplicada à junta de contorno das peças de nó — não é regra nova;
+o que muda é que a paridade dos nós passa a ser decidida por ela, e não só
+pela convenção do solver de cada tipo (T: B54→A/B34→B; X: `crossing_walls`;
+L: `arms[0]`→A).
+
+**Implementação (`solve_all_intersections`, `wall_stepper.py`,
+`ABUTTING_TIE_PARITY_ENABLED = True`; `False` reproduz a main bit a bit):**
+
+1. `_node_fill_boundary_joint_census` deduz, SÓ das peças de nó já
+   resolvidas e das reservas que o preenchimento respeita (`_index_node_
+   candidates_by_wall_end`/`_index_node_candidates_midspan`/`_wall_end_
+   default_start_cm`), as juntas NÓ|FILL que cada fiada de cada parede VAI
+   ter — só de peça que pertence à parede (`wall_idx` do candidato), só do
+   lado em que há trecho livre para receber peça (≥ menor peça do catálogo,
+   fora de abertura), com a mesma isenção 11.8/18.12 do validador de prisma
+   (peça pequena encostada no vão ou na ponta do eixo). Diferente de
+   `_wall_node_boundary_joints_cm` (lista conservadora de posições a
+   evitar), este censo é preciso: no corpus ele acusa exatamente as 13
+   paredes do TGD e as 2 do TP1, mais uma parede de 69 cm L-L sem junta
+   material.
+2. Cada coincidência NÓ|FILL(A) × NÓ|FILL(B) entre nós diferentes vira uma
+   restrição de paridade "exatamente um dos dois inverte" (XOR 1); cada par
+   de peças de nó encostadas na MESMA fiada vira "invertem juntos ou nenhum"
+   (XOR 0) — é o que propaga a decisão ao longo de uma cadeia (três T a
+   55 cm na mesma principal, W005/W006/W015/W016 do TGD: inverter um só T
+   apenas muda a junta corrida de lugar).
+3. 2-coloração por componente, raízes fixas primeiro, visita em ordem
+   geométrica (`_canonical_node_sort_key`, nunca índice). Variáveis: T/X
+   ainda não invertidos; canto L LIVRE (grau 0 no grafo de
+   `_coordinate_arm_role_nodes`) ou de ARESTA ISOLADA (grau 1 com vizinho
+   de grau 1 — exatamente a licença "mesma família" das seções 31/32).
+   Fixos: canto de cadeia coordenada (alternância 30.5), canto pinado, nó
+   já invertido (monotonia: uma decisão vale para as bandas seguintes e
+   para os rebuilds dos reparos — a marca vive no nó). Componente com
+   aresta violada não mexe em nada e é reportado.
+4. Componente sem nó fixo admite duas colorações; escolhe-se pelo proxy de
+   compensadores dos trechos livres (`_tie_parity_fill_proxy`: layout
+   padrão de cada trecho, sem desencontro) — medido: inverter o X em vez do
+   T nas paredes de 594 cm zerava a junta mas criava `C09 C09 C04` nas duas
+   fiadas (+136 `COMPENSATOR_CONSECUTIVE`); inverter o T resolve com 1
+   compensador por fiada, como antes.
+5. Inversão: T/X pela marca `_tie_parity_flip` (aplicada AGORA antes de
+   `solved_by_node`, para a 11.14 ler a fiada real; as convenções
+   `_node_bond_courses_on_wall`/`_node_lays_bond_on_wall_in_course` a
+   respeitam); canto L pela MESMA troca de `arms` de
+   `_coordinate_arm_role_nodes`/`_set_l_corner_role_bits`, mais o pino
+   `_arm_role_pinned` (o SAFE REPAIR passa a listar arestas isoladas com
+   `respect_pins=True`, então não refaz nem reverte a decisão).
+6. Aceitação: os nós são re-resolvidos UMA vez e o resultado fica só se a
+   contagem de coincidências NÓ|FILL × NÓ|FILL cair estritamente; senão
+   tudo é desfeito. Residual sempre em `tie_parity_conflicts`
+   (`SAME_NODE`, `UNSATISFIABLE`, `NO_IMPROVEMENT`), nunca escondido.
+
+**Por que não é "corrigir o auditor":** nenhum validador, tolerância,
+baseline, threshold, skip ou xfail foi tocado; a geometria muda (quais
+fiadas hospedam as peças de nó), e o mesmo validador mede a queda. Não é a
+11.12 ligada: `search_tie_parity` (busca gulosa com re-solução COMPLETA da
+planta por tentativa, 3 s → 106 s em Butantã) continua desligada; daqui
+saiu só a parte mínima e barata — a restrição local deduzível da geometria
+dos nós, sem nenhum preenchimento por tentativa (custo: censo + poucas
+re-soluções de nós, 0,8 s na primeira chamada do TGD, 0,05 s nas seguintes).
+
+**Medido (HEAD `fb618b2`, `runner.run_project(version="v2")`,
+`…/2026-09-12-filltie-corpus-before-after.json`):**
+
+| | TP1 V2 | TGD V2 |
+|---|---|---|
+| PRISM_CONTINUOUS_JOINT | 48 → **16** | 245 → **53** |
+| A fill\|tie entre nós distintos | 32 → **0** | 203 → **0** |
+| residual | 16 fill\|fill (cadeias `C09 C09 C04`/fronteira de banda — fora do escopo, defeito próprio) | 40 abertura/peça de nó duplicada (W027/W028/W129/W130), 2 tie\|tie, **11 em W080** (379 cm: os dois cantos põem B34 nas DUAS fiadas na mesma posição — `SAME_NODE`, giro do canto, não é paridade) |
+| PRISM_JOINT_STACK | 2 → 0 | 17 → 5 |
+| nó\|fill (33.1) / INSIDE_DOOR / INSIDE_WINDOW | 0 / 0 / 0 | 0 / 0 / 0 |
+| CROSSES_JAMB / POSITION_OVERLAP / JUNCTION | 0 / 11 / 9 (iguais) | 96 / 140 / 0 (iguais) |
+| COVERAGE (todas) | iguais | iguais |
+| compensadores | CONSECUTIVE 988 → 936, EXCESS 947 → 933, STRIP 151 → 149 | CONSECUTIVE 472 = 472; EXCESS_IN_RUN 444 → 454 e VERTICAL_STRIP 82 → 86 nas principais das cadeias de T (W015/W016/W142/W143); categoria `compensators` do benchmark 61 → 62 paredes (W016 entra: com a cadeia `B54 B54 B54` na fiada ímpar as sobras acima das portas passam de 305 cm — 5×B39 + 3×B34 — para 325 cm — 8×B39 + C04 pelo tier 5 —, 1 pastilha por trecho do solver, 2 no run contíguo que o validador conta; a outra coloração do mesmo componente é pior, +136 CONSECUTIVE) — consequência válida da correção, baseline V2 não regravado; ver checkpoint 2026-09-12-fill-tie-running-joint seção 10 |
+| blocos / paredes / nós | 19.039 → 18.963 / 96 / iguais | 16.361 → 16.289 / 145 / 234 |
+| inversões | 2 X + 1 canto | 12 T + 5 cantos (4 X ficaram) |
+
+**Limites registrados:**
+
+- L-X-L com os dois cantos presos numa cadeia coordenada (alternância
+  30.5 obrigatória): o X só iguala um dos dois — `UNSATISFIABLE`,
+  reportado (fixture `l_x_l_124_coordenado`). No corpus os quatro L-X-L de
+  124 cm são arestas isoladas e resolvem pela licença 31/32.
+- Peça do MESMO nó nas duas fiadas na mesma posição (W080 do TGD, canto
+  que põe B34 nas duas fiadas): não é paridade — `SAME_NODE`, fica para a
+  regra do canto.
+- Cantos de cadeia coordenada nunca são movidos por esta regra; a
+  inversão de um componente inteiro de cantos (preservando a alternância)
+  não foi implementada — não houve caso no corpus que a exigisse.
+- A composição do preenchimento já variava com a ordem de entrada ANTES
+  desta regra (papel `arms[0]`→A é convenção de entrada); o invariante
+  garantido em qualquer ordem é o físico (nenhuma junta fill|tie, nenhuma
+  nó|fill, nenhuma colisão, mesmo número de amarrações), e o fingerprint do
+  MESMO input é idêntico em três processos separados.
+
+**Testes:** `tests/test_tie_parity_abutting_ties.py` (22): fixtures mínimas
+T–L 69 cm, T–X com fill à esquerda, X–T com fill à direita (594 cm),
+cadeia de três T na principal, L-X-L isolado e coordenado; RED sem a
+paridade / GREEN com ela; ordem normal, reversa, permutada e endpoints
+invertidos; três processos; porta perto do nó (0 blocos no vão); colisões.
+
 ## 34. `CR-BLOCK-ARM-SAFE-REPAIR-GATE-FIDELITY` — os dois gates do SAFE
 REPAIR mediam PROXY, não o defeito real
 

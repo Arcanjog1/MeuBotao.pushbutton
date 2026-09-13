@@ -132,8 +132,18 @@ def test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair():
     )
     arm = solve_result.get("arm_role_safe_repair") or {}
     accepted_here = [c for c in (arm.get("accepted") or []) if c["wall_idx"] == wall_idx]
-    assert accepted_here, (
-        "esperava um candidato ARM aceito para W076 (wall_idx={})".format(wall_idx))
+    rejected_here = [c for c in (arm.get("rejected") or []) if c["wall_idx"] == wall_idx]
+    # Regra 33.9 (2026-09-12): a mesma licenca "mesma familia" da aresta
+    # isolada passa a ser aplicada ANTES do preenchimento, pela paridade
+    # das pecas encostadas (canto pinado em solve_all_intersections), e a
+    # coincidencia de W076 ja' nasce resolvida - o SAFE REPAIR nao tem o
+    # que aceitar (medido: accepted [75/SAME_A] -> [], forced prism 23 ->
+    # 21 paredes, colisoes 8 = 8). A prova continua fisica (assercao
+    # acima); aqui so' se exige que nenhuma das duas rotas tenha REJEITADO
+    # o conserto.
+    assert accepted_here or not rejected_here, (
+        "W076 (wall_idx={}) sem candidato aceito e com candidato rejeitado: "
+        "nem o SAFE REPAIR nem a paridade resolveram - {}".format(wall_idx, rejected_here))
 
 
 # ============================================================

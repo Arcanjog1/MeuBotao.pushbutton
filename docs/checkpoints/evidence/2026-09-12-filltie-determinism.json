@@ -1,0 +1,109 @@
+{
+ "head": "fb618b21e7c0d5542b649f18f0043527fec3ff56",
+ "method": "3 processos separados por planta (python3 docs/checkpoints/evidence/_scripts/2026-09-12-filltie-fp.py . <projeto> v2): runner.run_project(version='v2', write_files=False) + nuvem.benchmark.golden.fingerprint.canonical_fingerprint(result)",
+ "runs": {
+  "torre_easy_lo_r00_tp1": {
+   "processes": [
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 3101,
+     "seconds": 102.8,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    },
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 3102,
+     "seconds": 102.9,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    },
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 3103,
+     "seconds": 103.4,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    }
+   ],
+   "distinct_fingerprints": [
+    "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00"
+   ],
+   "identical": true
+  },
+  "torre_easy_lo_r00_tgd": {
+   "processes": [
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 3130,
+     "seconds": 244.2,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    },
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 3131,
+     "seconds": 240.7,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    },
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 3132,
+     "seconds": 243.8,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    }
+   ],
+   "distinct_fingerprints": [
+    "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648"
+   ],
+   "identical": true
+  }
+ }
+}

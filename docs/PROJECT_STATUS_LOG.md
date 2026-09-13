@@ -1745,3 +1745,12 @@ Nenhum merge na main executado.
 [Checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) e
 [estado GitHub](GITHUB_STATE_2026-09-12.md). Main observada `6439669` (#37 mesclado,
 Beta 1 e scale-autofix já na main). Sem MCP, sem Revit, sem merge.
+
+## 2026-09-12 — Defeito 1: junta corrida fill|tie (paridade das peças de amarração encostadas)
+
+[Checkpoint](checkpoints/2026-09-12-fill-tie-running-joint.md). Main observada
+`ad46c61` (#38 mesclado). Classificação dos PRISM da régua V2: toda junta
+fill|tie residual é NÓ|FILL(A) × NÓ|FILL(B) de nós diferentes encostados;
+regra 33.9 (paridade por restrição XOR, T/X pela marca 11.12, canto L livre/
+aresta isolada pela troca de arms + pino). TP1 48 → 16, TGD 245 → 53;
+fill|tie entre nós distintos 0/0. Sem MCP, sem Revit, sem merge.
