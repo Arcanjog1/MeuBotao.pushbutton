@@ -5732,7 +5732,7 @@ re-soluções de nós, 0,8 s na primeira chamada do TGD, 0,05 s nas seguintes).
 | nó\|fill (33.1) / INSIDE_DOOR / INSIDE_WINDOW | 0 / 0 / 0 | 0 / 0 / 0 |
 | CROSSES_JAMB / POSITION_OVERLAP / JUNCTION | 0 / 11 / 9 (iguais) | 96 / 140 / 0 (iguais) |
 | COVERAGE (todas) | iguais | iguais |
-| compensadores | CONSECUTIVE 988 → 936, EXCESS 947 → 933, STRIP 151 → 149 | CONSECUTIVE 472 = 472; EXCESS_IN_RUN 444 → 454 e VERTICAL_STRIP 82 → 86 nas principais das cadeias de T (W015/W016/W142/W143) |
+| compensadores | CONSECUTIVE 988 → 936, EXCESS 947 → 933, STRIP 151 → 149 | CONSECUTIVE 472 = 472; EXCESS_IN_RUN 444 → 454 e VERTICAL_STRIP 82 → 86 nas principais das cadeias de T (W015/W016/W142/W143); categoria `compensators` do benchmark 61 → 62 paredes (W016 entra: com a cadeia `B54 B54 B54` na fiada ímpar as sobras acima das portas passam de 305 cm — 5×B39 + 3×B34 — para 325 cm — 8×B39 + C04 pelo tier 5 —, 1 pastilha por trecho do solver, 2 no run contíguo que o validador conta; a outra coloração do mesmo componente é pior, +136 CONSECUTIVE) — consequência válida da correção, baseline V2 não regravado; ver checkpoint 2026-09-12-fill-tie-running-joint seção 10 |
 | blocos / paredes / nós | 19.039 → 18.963 / 96 / iguais | 16.361 → 16.289 / 145 / 234 |
 | inversões | 2 X + 1 canto | 12 T + 5 cantos (4 X ficaram) |
 

@@ -79,6 +79,11 @@
     {"path": "docs/checkpoints/evidence/2026-09-12-filltie-regressao-consolidada.txt"},
     {"path": "docs/checkpoints/evidence/2026-09-12-filltie-arm-check.json"},
     {"path": "docs/checkpoints/evidence/2026-09-12-filltie-arm-tests-rerun.txt"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-review-corpus.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-12-filltie-review-focados.txt"},
+    {"path": "docs/checkpoints/evidence/2026-09-13-filltie-review-determinism.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-13-filltie-review-regressao-consolidada.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-13-filltie-review-regressao-consolidada.txt"},
     {"path": "docs/checkpoints/2026-09-12-pre-beta2-critical-sanitization.md"}
   ]
 }
@@ -207,6 +212,126 @@ Zero skip/xfail; nenhum baseline/reference/threshold tocado.
 (clone completo após `git fetch --unshallow`; sem isso o validador acusava
 `official revision is not integrated: 8a93a27`, o mesmo artefato de clone raso
 registrado na revisão do #38).
+
+## 10. Revisão final independente antes do merge (2026-09-13, HEAD `7fb0b52`)
+
+Refs confirmados por `git fetch`: base = `origin/main` `ad46c61`, head do PR
+`7fb0b52` (6 commits), `git diff fb618b2..7fb0b52 -- nuvem/core` vazio (produção
+= `fb618b2`; só os dois testes ARM e documentação depois).
+
+**Auditoria do algoritmo** (`_apply_abutting_tie_parity` → `_node_fill_boundary_
+joint_census` → `_census_coincidences` / `_abutting_same_course_tie_pairs` →
+`_plan_abutting_tie_parity` → `_tie_parity_component_options` /
+`_tie_parity_fill_proxy` → `_tie_parity_apply`):
+- resolve paridade só entre pecas de nós DIFERENTES realmente encostadas
+  (coincidência NÓ|FILL×NÓ|FILL, aresta XOR 1; par encostado na mesma fiada,
+  XOR 0 — `|s2 − (e1 + J)| ≤ 1 cm`); mesma peça/mesmo nó → `SAME_NODE`, nunca
+  invertido;
+- não move nenhuma peça de nó nem cria peça: medido no corpus, o conjunto
+  (parede, código, t0, t1) das peças de amarração é IDÊNTICO antes/depois
+  (TGD 458 peças, 32 trocaram de fiada; TP1 380, 8 trocaram) —
+  `evidence/2026-09-12-filltie-review-corpus.json`;
+- nenhuma dependência de W0xx (só índices de `nodes`/`walls_to_create` e
+  geometria); ordem de visita e raízes por `_canonical_node_sort_key`
+  (ponto do nó), candidatos e componentes ordenados geometricamente;
+- cantos de cadeia coordenada (grau ≥ 2 ou vizinho de grau ≠ 1) e pinados
+  nunca são variáveis (`_tie_parity_node_movable`);
+- aceite só com `len(coincidências) < len(anteriores)` numa re-solução dos
+  nós; caso contrário todas as marcas/pinos da rodada são desfeitos;
+- nenhum fallback silencioso: toda coincidência que sobra sai em
+  `tie_parity_conflicts` com motivo; nenhum validador/tolerância/baseline
+  tocado; `TIE_PARITY_LOCAL_SEARCH` continua `False`.
+
+**fill|tie no HEAD** (`_scripts/2026-09-12-filltie-dump.py` + `classify.py`,
+`evidence/2026-09-12-filltie-review-corpus.json`): TP1 PRISM 16 = 16 fill|fill,
+fill|tie **0**; TGD PRISM 53 = 40 abertura/peça duplicada + 2 tie|tie + 11 em
+W080 — os 11 de W080 são a MESMA peça `B34[345,379] L_CORNER` presente nas
+duas fiadas (SAME_NODE), 11 antes e 11 depois, não é junta entre amarração e
+preenchimento de nós distintos; fill|tie entre nós distintos **0**.
+
+**Garantias do #38 no HEAD**: nó|fill 0/0; INSIDE_DOOR/WINDOW 0/0;
+CROSSES_JAMB 0/96 iguais; POSITION_OVERLAP 11/140 iguais; COVERAGE (5 códigos)
+iguais; JUNCTION 9/0 iguais; paredes reprovadas por categoria: `prism` 17 → 5,
+`compensators` 61 → 62, demais iguais.
+
+**O +1 de `compensators` (TGD V2)** — `W016`, chave física
+`W|586.5,-563.0|2070.0,-563.0|t14.0` (1483,5 cm, solver idx 6; L em t=7, T em
+262/622/677/732/1092/1477; portas [269,590] e [764,1085] de 251 cm, janelas
+[74,205] e [1229,1360]). Os três T a 55 cm (622/677/732, nós 196/47/200) foram
+invertidos: a cadeia `B54 B54 B54 [595,759]` passa da fiada A (fiadas pares)
+para a B (ímpares). Nas fiadas 13–16 (acima das portas):
+
+| | antes | depois |
+|---|---|---|
+| fiada A (14/16) | `B54(T262)[235,289] 5×B39 B34 B34 B34[490,594] B54 B54 B54 5×B39 B34 B34 B34[960,1064] B54(T1092)` — 0 compensadores | `B54(T262) 8×B39 C04[610,614] │ 8×B39 C04[1060,1064] B54(T1092)` — 1 C04 por trecho |
+| fiada B (13/15) | `12×B39 B34 B34 B34[510,614] │ … │ B34 B34 B34[980,1084]` (atravessa os T, sem B54) — 0 | `B39…B39[550,589] C04[590,594] B54 B54 B54 B39…B39[1040,1079] C04[1080,1084]` — 2 C04 no mesmo run contíguo |
+
+Causa: com a cadeia na A, as sobras entre o B54 do T262 e a cadeia (e entre a
+cadeia e o B54 do T1092) medem **305 cm** (= 5×B39 + 3×B34, fileira de B34 do
+tier 5b, sem compensador); com a cadeia na B, as sobras na B começam depois da
+PENETRAÇÃO da B34 do T262 (t=270) e medem **325 cm** — 325 = 8×B39 + 5 fecha com
+1 pastilha (tier 5) e o tier 5 vem antes da fileira de B34 (2×B39 + 7×B34), então
+o solver põe 1 C04 por trecho, respeitando `MAX_COMPENSATORS_PER_TRECHO = 1`
+por trecho de preenchimento. O validador do benchmark conta o RUN contíguo da
+fiada (270..1084, que inclui a cadeia de B54) e vê 2 pastilhas (teto 1) →
+`COMPENSATOR_EXCESS_IN_RUN` ×2 (fiadas 13 e 15); e o C04 da fiada A em
+[610,614] cai na mesma coluna do C04 de jamb da porta (`[609.98,613.98]`, que
+trocou para as fiadas pares) → `COMPENSATOR_VERTICAL_STRIP` em t=612 (9 de 17
+fiadas). `COMPENSATOR_CONSECUTIVE` continua 0 na parede; PRISM de W016 0 → 0;
+COVERAGE de W016 igual; 344 → 350 blocos.
+
+Alternativa: o componente tinha exatamente duas colorações — inverter os T
+(escolhida) ou inverter os X das paredes de 594 cm + cantos das arestas
+isoladas; a segunda foi medida e é pior (`C09 C09 C04` nas duas fiadas das
+quatro paredes de 594 cm, +136 `COMPENSATOR_CONSECUTIVE`). Não existe terceira
+paridade; uma sobra de 325 cm sem pastilha exigiria preferir a fileira de B34
+ao compensador único (inverter a ordem dos tiers 5/5b), decisão de regra fora
+desta missão. **Classificação: B — consequência válida e necessária da
+correção** (a junta corrida crítica das 4 paredes de 594 cm e das bonecas de 69
+cm some; sobra 1 pastilha por trecho, dentro do teto do solver, contada pelo
+benchmark no run que atravessa a cadeia). Baseline V2 NÃO alterado; o delta
+fica registrado aqui e em `evidence/2026-09-12-filltie-review-corpus.json`.
+
+**Os dois testes ARM** (commit `6b78a9a`):
+
+| | `test_t1_t9_candidato_seguro_e_aceito_no_tgd_real` | `test_w076_tp1_…_arm_safe_repair` |
+|---|---|---|
+| asserção antiga | `assert accepted` (≥ 1 candidato ARM aceito no TGD) | `assert accepted_here` (candidato 75/SAME_A aceito para W076) |
+| motivo da falha | a aresta isolada 91 (a única aceita, SAME_B) já nasce sem prisma forçado: o canto foi pinado pela paridade em `solve_all_intersections`, antes do SAFE REPAIR; `repair_arm_role_isolated_edges` (agora `respect_pins=True`) não a lista → `accepted = []`, `rejected` 19 → 6 | idem para W076 (69 cm L-L, aresta isolada): resolvida pela paridade; `accepted = []`, `rejected = []` |
+| comportamento físico novo | TGD V1: paredes com prisma forçado 25 → 19; parede 23 sem prisma forçado nas duas rotas; colisões 1121 = 1121; auditorias reprovadas 26 → 20 | TP1 V1: juntas de W076 fiada 0 `[]` × fiada 1 `[34.5]` (sem coincidência); prisma forçado 23 → 21 paredes; colisões 8 = 8 |
+| asserção nova | `accepted or not forced(91)`; todo aceito resolve o alvo; 23 nunca rejeitada e sem prisma forçado | assert físico original mantido (juntas não coincidem) + `accepted_here or not rejected_here` |
+| por que protege | se a paridade deixar de resolver 91 E o SAFE REPAIR deixar de aceitá-la, `forced(91)` volta a True e o teste falha; se 23 regredir, falha; se algum aceito não resolver o alvo, falha | se W076 voltar a coincidir, o primeiro assert falha; se alguma rota REJEITAR o conserto sem que a outra aceite, falha. Não é afrouxamento: a condição física (sem coincidência) é a que sempre importou e continua obrigatória |
+
+**Determinismo no HEAD**: 22 testes de ordem/permutação/endpoints/3 processos
+verdes; fingerprint canônico em 3 processos separados idêntico e igual ao de
+`fb618b2` (TP1 `f72853f9…`, TGD `1403b49d…`) —
+`evidence/2026-09-13-filltie-review-determinism.json`.
+
+**Performance no HEAD**: `solve_all_intersections` com paridade TGD 0,75 s
+(primeira chamada, 17 inversões) / 0,14 s (seguintes); TP1 0,29 s / 0,03 s;
+`run_project` V2 TP1 83,8 s, TGD 225,1 s (com testes rodando em paralelo) —
+sem explosão.
+
+**Focados no HEAD**: 9 arquivos (paridade, nó|fill, licença B19, 11.12,
+reserva de canto, test_script, os dois ARM, CR-G12), `-k "not t18 and not t19
+and not t20"`: **368 passed** em 17m11s
+(`evidence/2026-09-12-filltie-review-focados.txt`).
+
+**Regressão consolidada no HEAD `7fb0b52`** (`python3 -m pytest tests -q -p
+no:cacheprovider`, `capture_validation.py` PID 1127, sozinha, watcher por PID;
+`evidence/2026-09-13-filltie-review-regressao-consolidada.{json,txt}`):
+**2 failed / 1111 passed em 2.362,44 s (39m22s), exit 1** —
+(1) `test_benchmark_baselines[torre_easy_lo_r00_tp1]`: JUNCTION_MISSING_BINDING
+8 → 9 contra V1, HISTÓRICA; (2) `test_benchmark_baselines_versionado[tgd-v2]`:
+categoria `compensators` 61 → 62 — o +1 de W016 classificado acima como B
+(válido e necessário), baseline V2 não regravado. Os dois testes ARM ajustados
+passam na suíte completa. Nenhuma falha crítica nova, nenhum skip/xfail.
+
+**Veredito da revisão**: todas as 12 condições do merge condicional atendidas
+(fill|tie 0/0 entre nós distintos; nó|fill 0; INSIDE 0/0; sem regressão
+crítica; +1 = B com evidência; ARM no contrato físico; determinismo;
+performance; focados; consolidada compreendida; CI/documentação). Merge normal
+(sem squash/rebase/force) autorizado pelo usuário em 2026-09-13.
 
 ## Veredito
 

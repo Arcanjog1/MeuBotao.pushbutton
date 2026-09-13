@@ -1,0 +1,25 @@
+{
+  "started_utc": "2026-09-13T00:00:49.910115+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "7fb0b5284a41bed012a3e14ab203be5c535fdc36",
+  "tree": "d91a9011cc2f44c630e6a3f134fc7885eae8b676",
+  "status_before": "?? docs/checkpoints/evidence/2026-09-12-filltie-review-corpus.json\n?? docs/checkpoints/evidence/2026-09-12-filltie-review-focados.txt",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 7000,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-13-filltie-review-regressao-consolidada.txt",
+  "pid": 1127,
+  "exit_code": 1,
+  "elapsed_seconds": 2364.447,
+  "status_after": "M docs/checkpoints/2026-09-12-fill-tie-running-joint.md\n M nuvem/REGRAS_MODULACAO_BLOCOS.md\n?? docs/checkpoints/evidence/2026-09-12-filltie-review-corpus.json\n?? docs/checkpoints/evidence/2026-09-12-filltie-review-focados.txt\n?? docs/checkpoints/evidence/2026-09-13-filltie-review-determinism.json\n?? docs/checkpoints/evidence/2026-09-13-filltie-review-regressao-consolidada.json\n?? docs/checkpoints/evidence/2026-09-13-filltie-review-regressao-consolidada.txt",
+  "log_sha256": "906ecb10d4b8d9825534ca78f74aa25ba0697440a0721ddf31bf543f21bef144"
+}

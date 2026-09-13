@@ -1,0 +1,110 @@
+{
+ "head": "7fb0b5284a41bed012a3e14ab203be5c535fdc36",
+ "runs": {
+  "torre_easy_lo_r00_tp1": {
+   "processes": [
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 1050,
+     "seconds": 80.8,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    },
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 1051,
+     "seconds": 79.9,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    },
+    {
+     "project": "torre_easy_lo_r00_tp1",
+     "version": "v2",
+     "pid_os": 1052,
+     "seconds": 79.9,
+     "result_fingerprint": "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 16,
+      "JUNCTION_MISSING_BINDING": 9,
+      "POSITION_OVERLAP": 11
+     },
+     "blocks": 18963
+    }
+   ],
+   "distinct_fingerprints": [
+    "f72853f978eac9807725295577250f71e0426e52acb4b9876afb6705f0569a00"
+   ],
+   "identical": true,
+   "same_as_fb618b2": true
+  },
+  "torre_easy_lo_r00_tgd": {
+   "processes": [
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 1068,
+     "seconds": 212.6,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    },
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 1069,
+     "seconds": 216.7,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    },
+    {
+     "project": "torre_easy_lo_r00_tgd",
+     "version": "v2",
+     "pid_os": 1070,
+     "seconds": 218.9,
+     "result_fingerprint": "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648",
+     "critical_by_code": {
+      "PRISM_CONTINUOUS_JOINT": 53,
+      "OPENING_BLOCK_CROSSES_JAMB": 96,
+      "COVERAGE_ROW_MOSTLY_EMPTY": 86,
+      "COVERAGE_MISSING_ROW": 142,
+      "COVERAGE_WALL_NOT_MODULATED": 10,
+      "POSITION_OVERLAP": 140
+     },
+     "blocks": 16289
+    }
+   ],
+   "distinct_fingerprints": [
+    "1403b49da5d2e2bdf4e14c3dab0a0dfc142976693e6b5598547e4f9a9395a648"
+   ],
+   "identical": true,
+   "same_as_fb618b2": true
+  }
+ }
+}

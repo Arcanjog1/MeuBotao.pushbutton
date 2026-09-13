@@ -1,0 +1,8 @@
+# HEAD 7fb0b5284a41bed012a3e14ab203be5c535fdc36 | python3 -m pytest tests/test_tie_parity_abutting_ties.py tests/test_block_node_fill_revalidation.py tests/test_forced_half_licence.py tests/test_tie_parity_local_search.py tests/test_corner_reserve_per_course.py tests/test_script.py tests/test_block_arm_role_candidate_safety_contract.py tests/test_block_arm_role_prism_stagger.py tests/test_cross_band_joint_propagation_cr_g12.py -q -p no:cacheprovider -k "not t18 and not t19 and not t20" | Linux, Python 3.11.15, pytest 9.1.1
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 58%]
+........................................................................ [ 78%]
+........................................................................ [ 97%]
+........                                                                 [100%]
+368 passed, 3 deselected in 1031.69s (0:17:11)
