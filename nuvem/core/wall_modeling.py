@@ -2601,6 +2601,113 @@ def load_fixed_block_catalog(target_doc):
     return catalog, missing
 
 
+# ==========================================
+# ETAPA 1B - CATALOGO DE CANALETAS (estrategia de reforco CHANNEL, 2026-09-14)
+#
+# SEPARADO de BLOCK_FAMILY_CATALOG_DEFINITIONS de proposito: o catalogo fixo
+# alimenta o PREENCHIMENTO do solver (ele escolhe pecas por comprimento) - se
+# as canaletas entrassem la', o solver passaria a usa-las como bloco comum.
+# As canaletas so' entram no pos-passe de reforco
+# (core/engine/opening_reinforcement.py) e na criacao.
+#
+# Familia + tipo EXATOS medidos no BUTANTA R08_LT (humano) e presentes no
+# documento de teste (2026-09-14, leitura via MCP): origem no CENTRO
+# geometrico, eixo X ao longo do comprimento (mesma convencao dos blocos). A
+# canaleta cortada tem o comprimento no parametro de INSTANCIA
+# `Comprimento_bloco` (8,993 cm medido numa KV de 9). Falta de familia vira
+# MISSING_FAMILY_MAPPING - nunca troca por peca parecida.
+# ==========================================
+CHANNEL_FAMILY_CATALOG_DEFINITIONS = {
+    "CHANNEL_U_39": {"family_name": "CANALETA INTEIRA - 14x19x39",
+                     "type_name": "CANALETA INTEIRA - 14x19x39", "length_parameter": None},
+    "CHANNEL_U_34": {"family_name": "CANALETA 34 - 14x19x34",
+                     "type_name": "CANALETA 34 - 14x19x34", "length_parameter": None},
+    "CHANNEL_U_19": {"family_name": "MEIA CANALETA - 14x19x19",
+                     "type_name": "MEIA CANALETA - 14x19x19", "length_parameter": None},
+    "CHANNEL_U_CUT": {"family_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+                      "type_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+                      "length_parameter": "Comprimento_bloco"},
+}
+
+
+def load_channel_family_catalog(target_doc):
+    """(catalog, missing) das canaletas, no MESMO formato de
+    load_fixed_block_catalog. `missing` usa reason com prefixo
+    MISSING_FAMILY_MAPPING. Ativa os simbolos numa transacao propria."""
+    from core.engine.opening_reinforcement import CHANNEL_LOGICAL_TYPES
+    catalog = {}
+    missing = []
+    found = []
+    for logical_code in sorted(CHANNEL_FAMILY_CATALOG_DEFINITIONS):
+        definition = CHANNEL_FAMILY_CATALOG_DEFINITIONS[logical_code]
+        symbol = _find_family_symbol_by_exact_name(
+            target_doc, definition["family_name"], definition["type_name"])
+        if symbol is None:
+            missing.append({
+                "logical_code": logical_code, "family_name": definition["family_name"],
+                "type_name": definition["type_name"],
+                "reason": "MISSING_FAMILY_MAPPING: familia/tipo de canaleta nao carregado no projeto.",
+            })
+            continue
+        found.append((logical_code, definition, symbol))
+    if found:
+        t_activate = Transaction(target_doc, "Ativa tipos de canaleta")
+        t_activate.Start()
+        try:
+            for _code, _definition, symbol in found:
+                if not symbol.IsActive:
+                    symbol.Activate()
+            target_doc.Regenerate()
+            t_activate.Commit()
+        except Exception:
+            t_activate.RollBack()
+            raise
+    for logical_code, definition, symbol in found:
+        logical = CHANNEL_LOGICAL_TYPES[logical_code]
+        length_cm = _type_param_cm(symbol, ["Comprimento_bloco"])
+        height_cm = _type_param_cm(symbol, ["Altura_bloco"])
+        width_cm = _type_param_cm(symbol, ["Largura_bloco"])
+        problems = []
+        if definition["length_parameter"] is None:
+            if length_cm is None or abs(length_cm - logical["nominal_length_cm"]) > 0.1:
+                problems.append("comprimento de tipo {} != {}".format(length_cm, logical["nominal_length_cm"]))
+        if height_cm is not None and abs(height_cm - logical["height_cm"]) > 0.1:
+            problems.append("altura {} != {}".format(height_cm, logical["height_cm"]))
+        if width_cm is not None and abs(width_cm - logical["width_cm"]) > 0.1:
+            problems.append("largura {} != {}".format(width_cm, logical["width_cm"]))
+        if problems:
+            missing.append({
+                "logical_code": logical_code, "family_name": definition["family_name"],
+                "type_name": definition["type_name"],
+                "reason": "MISSING_FAMILY_MAPPING: dimensoes divergentes ({}).".format("; ".join(problems)),
+            })
+            continue
+        catalog[logical_code] = {
+            "symbol": symbol,
+            "logical_code": logical_code,
+            "length_cm": length_cm if length_cm is not None else logical["nominal_length_cm"],
+            "height_cm": height_cm if height_cm is not None else logical["height_cm"],
+            "width_cm": width_cm if width_cm is not None else logical["width_cm"],
+            "cells_local": [],
+            "is_special_bond": False,
+            "is_compensator": False,
+            "is_channel": True,
+            "length_parameter": definition["length_parameter"],
+            "source_instance_id": symbol.Id,
+        }
+    return catalog, missing
+
+
+def channel_logical_catalog():
+    """Entradas SEM Revit das canaletas (dimensao/flags) - para auditorias e
+    benchmark que so' precisam de comprimento/altura por codigo."""
+    from core.engine.opening_reinforcement import CHANNEL_LOGICAL_TYPES
+    return dict((code, {"logical_code": code, "length_cm": spec["nominal_length_cm"],
+                        "height_cm": spec["height_cm"], "width_cm": spec["width_cm"], "cells_local": [],
+                        "is_special_bond": False, "is_compensator": False, "is_channel": True})
+                for code, spec in CHANNEL_LOGICAL_TYPES.items())
+
+
 # pack_pier_with_blocks, _is_valid_opening_width_cm e
 # solve_opening_modulation moraram para core/engine/modulation_math.py
 # (import * feito mais acima, junto do resto da aritmetica de blocos) -
@@ -3576,8 +3683,16 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       wall_start_cb=None, wall_result_cb=None,
                                       stage_cb=None, opening_strategy=None,
                                       arm_role_safe_repair=None, b19_residual_fill_repair=None,
-                                      tie_parity_search=None):
-    """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+                                      tie_parity_search=None, opening_reinforcement_strategy=None,
+                                      opening_reinforcement_policy=None):
+    """ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14): `opening_reinforcement_
+    strategy=None` (default) mantem o comportamento anterior, byte a byte.
+    "CHANNEL" roda, DEPOIS de todo o solve/reparos, o pos-passe de
+    core/engine/opening_reinforcement.py sobre as fiadas fisicas e grava o
+    plano/validacao em result["opening_reinforcement"]. Nao ha' default A/B:
+    campo ausente nao significa CHANNEL.
+
+    SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
     CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
     courses_core` (a funcao original, inalterada - mesma docstring,
     mesmos parametros): roda o rebuild ORIGINAL uma vez, e entao chama
@@ -3655,7 +3770,10 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         result["tie_parity_search"] = {"flips": parity_outcome["flips"], "tried": parity_outcome["tried"]}
 
     if not enabled or result.get("error") is not None:
-        return _record_unmodulated_walls(result, walls_to_create)
+        return _apply_opening_reinforcement(
+            _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
+            openings_per_wall, catalog, base_z_abs, num_courses,
+            opening_reinforcement_strategy, opening_reinforcement_policy)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3687,7 +3805,48 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
-    return _record_unmodulated_walls(result, walls_to_create)
+    return _apply_opening_reinforcement(
+        _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
+        openings_per_wall, catalog, base_z_abs, num_courses,
+        opening_reinforcement_strategy, opening_reinforcement_policy)
+
+
+def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                 base_z_abs, num_courses, strategy, policy=None):
+    """Pos-passe da estrategia de reforco. None devolve `result` intacto."""
+    if strategy is None:
+        return result
+    from core.engine import opening_reinforcement as _reinforcement
+    if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+        raise ValueError("estrategia de reforco de aberturas nao suportada: {!r}".format(strategy))
+    if result.get("error") is not None:
+        result["opening_reinforcement"] = {"strategy": strategy, "error": result.get("error")}
+        return result
+    step, height_error = _course_height_ft(catalog, result.get("candidates") or [])
+    if step is None:
+        result["opening_reinforcement"] = {"strategy": strategy, "error": height_error}
+        return result
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    plan = _reinforcement.plan_channel_reinforcement(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
+        base_z_abs, policy=policy, nodes=nodes, catalog=catalog)
+    result["course_candidates_before_reinforcement"] = result.get("course_candidates")
+    result["course_candidates"] = plan.pop("course_candidates")
+    plan["validation"] = _reinforcement.validate_channel_reinforcement(
+        result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+        free_to_top=plan["free_to_top"], policy=plan["policy"])
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    result["wall_bond_audits_before_reinforcement"] = result.get("wall_bond_audits")
+    result["wall_bond_audits"] = audit_all_walls_bond_quality(
+        walls_to_create, result["course_candidates"], audit_catalog, num_courses,
+        openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    result["opening_reinforcement"] = plan
+    return result
 
 
 def _record_unmodulated_walls(result, walls_to_create):
@@ -4334,6 +4493,17 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                     and _b19_node_has_covering_tie(
                         course_candidates.get(course_index) or [], nodes[node_index])):
                 continue
+            # EXCECAO CHANNEL (regra 51.6, 2026-09-14): na fiada em que a
+            # canaleta ATRAVESSA o T, a parede que chega termina com B19
+            # encostado na face da principal - medido no BUTANTA humano
+            # (8079833 e 8079837, fiadas 61 e 221: `B19 [460,479]` + canaleta
+            # transversal sobre o no'). Duas provas, como a de cima: a
+            # etiqueta da travessia E uma canaleta cobrindo fisicamente o
+            # MESMO no' na MESMA fiada.
+            if (code == HALF_BLOCK_CODE and placement_reason == "T_INTERSECTION_INCOMING_CHANNEL_ABUTMENT"
+                    and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
+                    and _channel_covers_node(course_candidates.get(course_index) or [], nodes[node_index])):
+                continue
             if code == HALF_BLOCK_CODE and tie_t_positions_cm:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):
                 # distancia do CORPO do B19 (nao so' do centro) ate' a
@@ -4472,6 +4642,29 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         "alternating_strips": alternating_strips,
         "half_blocks_near_ties": half_blocks_near_ties,
     }
+
+
+def _channel_covers_node(items, node, tolerance_ft=None):
+    """True se alguma CANALETA de `items` (uma fiada fisica) cobre com o
+    corpo real o ponto do no' - prova geometrica da travessia de T."""
+    point = node.get("point") if isinstance(node, dict) else None
+    if point is None:
+        return False
+    tol = _cm_to_ft(0.5) if tolerance_ft is None else tolerance_ft
+    for c in items:
+        if not str(c.get("logical_code") or "").startswith("CHANNEL_"):
+            continue
+        origin, x_dir = c.get("origin_world"), c.get("x_dir")
+        if origin is None or x_dir is None:
+            continue
+        y_dir = c.get("y_dir") or _perp_dir(x_dir)
+        dx, dy = point.X - origin.X, point.Y - origin.Y
+        along = abs(dx * x_dir.X + dy * x_dir.Y)
+        across = abs(dx * y_dir.X + dy * y_dir.Y)
+        if (along <= _cm_to_ft(c["length_cm"]) / 2.0 + tol and
+                across <= _cm_to_ft(c.get("width_cm") or 14.0) / 2.0 + tol):
+            return True
+    return False
 
 
 def audit_all_walls_bond_quality(walls_to_create, course_candidates, catalog, num_courses,
@@ -5147,6 +5340,18 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             t_mark = clock()
                             perf["mirror_s"] += t_mark - t_geometry
                             perf["mirror_calls"] += 1
+                        # Canaleta cortada (LENGTH_CUT): comprimento por
+                        # parametro de INSTANCIA. Se nao gravar, a peca criada
+                        # teria o comprimento errado - apaga e reporta falha.
+                        length_parameter = entry.get("length_parameter")
+                        instance_length_cm = cand.get("instance_length_cm")
+                        if length_parameter and instance_length_cm:
+                            param = instance.LookupParameter(length_parameter)
+                            if param is None or param.IsReadOnly or not param.Set(_cm_to_ft(instance_length_cm)):
+                                target_doc.Delete(instance.Id)
+                                raise ValueError("parametro de instancia '{}' nao gravado ({} cm)".format(
+                                    length_parameter, instance_length_cm))
+                            perf["length_param_calls"] = perf.get("length_param_calls", 0) + 1
                         stamped = False
                         if owner_uid_by_wall_idx is not None:
                             t_stamp = clock()
@@ -10349,6 +10554,12 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.wall_height_ft = 0.0
         self.catalog = {}
         self.catalog_missing = []
+        # Estrategia de reforco de aberturas (2026-09-14): None = legado
+        # (sem reforco); "CHANNEL" exige `channel_catalog` carregado por
+        # load_channel_family_catalog. Nunca inferida por familia presente.
+        self.opening_reinforcement_strategy = None
+        self.opening_reinforcement_policy = None
+        self.channel_catalog = {}
         # estado mutavel, atualizado a cada passo concluido
         self.error_rows = []
         self.pending_zoom_ids = []
@@ -10916,6 +11127,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 band_cb=cbs.get("band_cb"), progress_cb=cbs.get("progress_cb"),
                 wall_start_cb=cbs.get("wall_start_cb"), wall_result_cb=cbs.get("wall_result_cb"),
                 stage_cb=cbs.get("stage_cb"),
+                opening_reinforcement_strategy=self.opening_reinforcement_strategy,
+                opening_reinforcement_policy=self.opening_reinforcement_policy,
             )
         self.solve_result["num_courses"] = num_courses
         if self.controlled_beta:
@@ -10933,8 +11146,18 @@ class _PostCreationEventHandler(IExternalEventHandler):
                       for line, thickness, locks in self.walls_to_create)
         openings = tuple(tuple(tuple(op) for op in wall) for wall in self.openings_per_wall)
         catalog = tuple((code, entry.get("length_cm"), entry.get("width_cm"), entry.get("height_cm"),
-                         id(entry.get("symbol"))) for code, entry in sorted(self.catalog.items()))
-        return walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level)
+                         id(entry.get("symbol"))) for code, entry in sorted(self._creation_catalog().items()))
+        return (walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level),
+                self.opening_reinforcement_strategy)
+
+    def _creation_catalog(self):
+        """Catalogo usado na CRIACAO: o fixo + canaletas quando a estrategia
+        CHANNEL esta' ativa (o solver de preenchimento nunca ve canaletas)."""
+        if not self.opening_reinforcement_strategy:
+            return self.catalog
+        merged = dict(self.catalog)
+        merged.update(self.channel_catalog or {})
+        return merged
 
     def _require_current_beta_solve(self):
         if (self.solve_result or {}).get("beta_input_signature") != self._beta_input_signature():
@@ -11179,7 +11402,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
                 create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
             self.create_result = self._create_building_blocks(
-                app_doc, candidates, self.catalog, self.base_z_abs,
+                app_doc, candidates, self._creation_catalog(), self.base_z_abs,
                 self.selected_level, num_courses, course_candidates=course_candidates,
                 progress_cb=cbs.get("progress_cb"), stage_cb=stage_cb,
                 **create_options

@@ -34,6 +34,9 @@ PLACEMENT_REASON_TO_ROLE = {
     "T_INTERSECTION_INCOMING": model.ROLE_T_BINDING,
     "T_INTERSECTION_INCOMING_DEGRADED": model.ROLE_T_BINDING,
     "T_INTERSECTION_DEGRADED_L": model.ROLE_T_BINDING,
+    # Estrategia CHANNEL: amarracao da parede que chega recuada ate' a face
+    # quando a canaleta atravessa o T (core/engine/opening_reinforcement.py).
+    "T_INTERSECTION_INCOMING_CHANNEL_ABUTMENT": model.ROLE_T_BINDING,
     "X_INTERSECTION": model.ROLE_CROSS_BINDING,
     "X_INTERSECTION_DEGRADED": model.ROLE_CROSS_BINDING,
     "STANDARD_FILL": model.ROLE_STANDARD,
