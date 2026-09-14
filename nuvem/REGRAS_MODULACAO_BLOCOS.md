@@ -7647,14 +7647,35 @@ sem a decisão). A versão anterior removia peça inteira que tocava o vão acim
 topo e abria além das jambas (sonda BUTANTÃ: jambas 1414–1570 abertas 1394–1590;
 fixture 227–473 aberta 208–488).
 
-**CONFLITO REGISTRADO (evidência humana × regra do usuário)**: medido nas
-sequências humanas (`2026-09-10-butanta-human-sequences.json`, parede 8079790,
-fiadas 221/241), o humano **não** termina a alvenaria nas jambas acima do topo:
-deixa aberto de face de nó a face de nó (≈1395–1799), sem o pilar entre os dois
-vãos. A regra acima (pedido explícito do usuário) prevalece; a comparação
-humano × solver classifica essas duas passagens como `NORMATIVE_DECISION`, nunca
-como equivalência. **Decisão do usuário pendente** se a passagem deve seguir o
-humano.
+**CONHECIMENTO DE AMARRAÇÃO — REGRA APROVADA PELO USUÁRIO (2026-09-14, implementada) —
+passagem livre CONTÍNUA abre de face de nó a face de nó**. O conflito anterior
+(humano × "só o vão") foi decidido pelo usuário a favor do humano, **somente**
+para a geometria equivalente ao padrão comprovado:
+
+- **Detecção geométrica** (`continuous_free_passages`, nunca id/coordenada/nome):
+  duas ou mais passagens livres (51.9) da MESMA parede, com a mesma fiada de topo,
+  encadeadas por um pilar que contém **um único nó T** do qual esta parede é a
+  **principal**, com as duas jambas do pilar a ≤ 28,5 cm desse nó. Nós externos =
+  os nós que já tornam as jambas extremas passagem livre.
+- **Comportamento**: nas fiadas acima do topo fica livre da **face do nó externo
+  esquerdo à face do nó externo direito** (eixo ± meia espessura da parede
+  transversal), sem reconstruir o pilar intermediário; a parede que chega no nó
+  do pilar termina na **face** da principal. Implementado como vão sintético no
+  solve (principal: de face a face; parede que chega: da face até a ponta),
+  acima do topo das portas — o recorte é o do próprio motor.
+- **Não é regra geral**: passagem livre isolada continua abrindo só o vão; pilar
+  com X, com dois nós, jamba a mais de 28,5 cm do nó do pilar ou topos diferentes
+  não formam passagem contínua.
+- **Validação**: nenhuma peça de nenhuma parede na região (geometria real,
+  `CHANNEL_FREE_TO_TOP_NOT_OPEN`), bordas junto às faces sem vazio
+  (`CHANNEL_OPENING_OVERCUT`), peça órfã, preflight de vão/colisão, prisma e
+  auditoria de amarração.
+- **Evidência (medida)**: BUTANTÃ 1º PAV, parede 8079790, vãos 6919324/6919219
+  (jambas 1414–1570 e 1624–1780, nós 1387/1597/1807): fiadas 221/241 do humano
+  vazias de 1394 a 1800; parede que chega no nó 1597 (8079855) termina em t=194,
+  B39[155,194] na fiada 221 e B39[135,174]+B19[175,194] na 241 — o solver
+  reproduz as mesmas peças. Comparação humano × solver: **EXACT_MATCH** nas duas.
+- **Confiança**: `REGRA APROVADA` para a geometria detectada; 1 ocorrência medida.
 
 ### 51.10 SEPARAÇÃO OBRIGATÓRIA — cinta de topo não é reforço de abertura (cinta de topo mantida PENDENTE pelo usuário 2026-09-14, item F)
 
@@ -7829,4 +7850,37 @@ como fonte única; regressão e Revit real refeitos.
   9 BETTER, 38 VALID_ALTERNATIVE, 2 KNOWN_LIMITATION, 2 NORMATIVE_DECISION,
   2 NOT_COMPARABLE, 0 ACTUAL_ERROR, 0 SOLVER_WORSE. Solve 44,6 s no Revit (a
   tentativa de paridade reconstrói o motor por candidato; offline 2,3 s legado ×
-  12,4 s CHANNEL), criação 237 s.
+  12,4 s CHANNEL), criação 237 s. **Superado por 51.15.**
+
+### 51.15 Fechamento final e desempenho (2026-09-14)
+
+**Decisões do usuário**: passagem livre contínua de face de nó a face de nó
+(51.9, aprovada); 30.8 continua DESLIGADA e 7719511 `KNOWN_LIMITATION` (sem
+regravar baseline nem mexer em COVERAGE); topo/peitoril fora da grade continua
+PENDENTE (`NOT_COMPARABLE`, 51.8); cinta de topo continua fora do escopo
+(`TOP_BOND_BEAM` ≠ `OPENING_CHANNEL`, 51.10).
+
+**Desempenho sem mudar o resultado** (prova: assinatura completa — peças, plano,
+validação, decisões da tentativa, auditorias — idêntica com e sem otimização no
+BUTANTÃ 34 paredes e em 6 fixtures, `tests/test_channel_audit_fixes.py`):
+
+| Medida (Revit real, 34 paredes, solve) | Antes | Depois |
+|---|---|---|
+| Solve CHANNEL | 44,6 s | 24,2 s |
+| Reconstruções da tentativa de paridade | 2 | 2 |
+| Tempo por reconstrução | 13,6 s | 2,7 s |
+| Métricas (plano+validação+qualidade) | 7,3 s | ≈ 3,4 s |
+| Legado (referência) | 19,2 s | 19,2 s |
+
+1. **Memo de preenchimento por parede** (`wall_stepper.WALL_FILL_MEMO`): chave =
+   `repr` exato das entradas de `solve_wall_free_fill` (geometria, vãos da banda,
+   bordas dos candidatos de nó nas pontas e no meio, estado dos nós das pontas,
+   semente cross-band, parâmetros); resultado clonado; vive só durante a
+   chamada CHANNEL (BUTANTÃ: 1.137 acertos, 291 cálculos).
+2. **Memo de OBB** (`wall_stepper.OBB_MEMO`) pela tupla exata de valores da peça.
+3. **Baldes por (fiada, parede)** e cache de linhas por avaliação.
+4. **Reaproveitamento** do plano/validação da tentativa aceita quando os reparos
+   não trocam o resultado.
+5. **Gates baratos antes do planejamento** na tentativa (a decisão aceita/rejeita
+   não muda; só a ordem em que o motivo é encontrado).
+Instrumentação permanente: `result["channel_tie_parity_trials"]["timing"]`.

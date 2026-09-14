@@ -37,7 +37,12 @@ Implementação: PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/
 ## Auditoria independente (2026-09-14)
 - 30.8 desligada por default (opção B escolhida pelo usuário); 7719511 = limitação temporária do CHANNEL.
 - CHANNEL nunca é default da tela; só por escolha explícita.
-- Passagem livre abre só o vão (pedido do usuário). **Pendente**: o humano (PAR28) abre até as faces dos nós. LINTEL_COUNTERLINTEL, catálogo de verga e demais escolhas A continuam pendentes.
+- Passagem livre isolada abre só o vão (pedido do usuário).
+
+## Fechamento final (2026-09-14)
+- APROVADO: passagem livre contínua (padrão PAR28 detectado pela geometria) abre de face de nó a face de nó, sem o pilar intermediário (regra 51.9).
+- 30.8 continua desligada; 7719511 KNOWN_LIMITATION. Topo/peitoril fora da grade e cinta de topo continuam pendentes/fora do escopo.
+- Merge normal do PR #40 autorizado pelo usuário condicionado aos gates (regra 51.15). LINTEL_COUNTERLINTEL, catálogo de verga e demais escolhas A continuam pendentes.
 
 ## SHA/PR relacionado
 Base de consolidação: 6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9. [#32](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32),

@@ -1,9 +1,11 @@
 # CHANNEL — correções da auditoria independente do PR #40 (2026-09-14)
 
+> **HISTÓRICO** — superado pelo [fechamento final](2026-09-14-channel-final-merge.md).
+
 ```json
 {
   "date": "2026-09-14",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/butanta-channel-reference-implementation",
   "head": "612f9f3b2f950e34ddc6b817f6e4c5d620dfe2a2",
   "base": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",

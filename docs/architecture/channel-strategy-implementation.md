@@ -8,7 +8,10 @@ regras: seção 51 de [REGRAS](../../nuvem/REGRAS_MODULACAO_BLOCOS.md).
 
 ```
 solve_building_blocks_all_courses(..., opening_reinforcement_strategy=None|"CHANNEL")
-  -> free_to_top_openings + openings_extended_to_top           (so' CHANNEL: passagem livre ANTES do solve)
+  -> free_to_top_openings + continuous_free_passages
+     + openings_extended_to_top                                  (so' CHANNEL: passagem livre ANTES do solve;
+                                                                  continua = vao sintetico de face a face)
+  -> WALL_FILL_MEMO / OBB_MEMO                                    (so' CHANNEL: memo exato durante a chamada)
   -> solve por bandas + paridade                                (inalterado)
   -> _channel_tie_parity_trials                                 (so' CHANNEL: paridade do T com gates, 51.14)
   -> SAFE REPAIR + B19 residual                                 (inalterado)
@@ -97,10 +100,10 @@ Validador independente (recalcula a demanda a partir das aberturas):
 - Folga residual entre nós (30.8) e tolerância de ruído da pastilha (51.13)
   existem mas estão DESLIGADAS (auditoria 2026-09-14): 7719511 é limitação
   conhecida.
-- Passagem livre abre só o vão (regra do usuário); o humano abre até as faces dos
-  nós — conflito registrado em 51.9.
-- A tentativa de paridade reconstrói o motor por nó candidato (Revit BUTANTÃ:
-  solve 44,6 s × 17 s sem ela).
+- Passagem livre isolada abre só o vão; passagem CONTÍNUA (51.9) abre de face de
+  nó a face de nó, só para a geometria detectada.
+- A tentativa de paridade reconstrói o motor por nó candidato; com os memos exatos
+  (51.15) o solve CHANNEL no Revit BUTANTÃ é 24,2 s (legado 19,2 s).
 - Validador: `CHANNEL_OPENING_OVERCUT`, `CHANNEL_FREE_TO_TOP_NOT_OPEN`,
   `CHANNEL_ORPHAN_PIECE`; chaves físicas canônicas (sem `id()`).
 - Canaleta J não usada.

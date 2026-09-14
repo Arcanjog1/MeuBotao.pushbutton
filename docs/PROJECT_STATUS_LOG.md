@@ -1781,3 +1781,12 @@ no Revit), FREE_TO_TOP resolvido antes do solve, paridade do nó T para 6627438,
 UI default NONE, chaves canônicas, `candidates` unificado, comparador endurecido
 (0 ACTUAL_ERROR, 0 WORSE), Revit 34 paredes 7.238→7.238, regressão 3/1191 =
 main. Sem merge; verga/contraverga não iniciada.
+
+## 2026-09-14 — CHANNEL: fechamento final e merge do PR #40
+
+[Checkpoint](checkpoints/2026-09-14-channel-final-merge.md). Main observada `0e41c8e`.
+Passagem livre contínua de face de nó a face de nó (decisão do usuário, detecção
+geométrica), 30.8 desligada (7719511 limitação), off-grid e cinta de topo
+pendentes. Solve CHANNEL no Revit 44,6 s → 24,2 s com resultado idêntico.
+0 ACTUAL_ERROR / 0 WORSE / 0 NORMATIVE_DECISION; Revit 7.222→7.222; legado =
+main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.
