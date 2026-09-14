@@ -1,12 +1,12 @@
 {
  "CHANNEL": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 21,
-   "COMPENSATOR_EXCESS_IN_RUN": 23,
+   "COMPENSATOR_CONSECUTIVE": 33,
+   "COMPENSATOR_EXCESS_IN_RUN": 29,
    "COMPENSATOR_VERTICAL_STRIP": 2,
    "OPENING_MISSING_COUNTER_LINTEL": 7,
    "OPENING_MISSING_LINTEL": 7,
-   "PRISM_STAGGER_BELOW_TARGET": 5
+   "PRISM_STAGGER_BELOW_TARGET": 15
   },
   "bond_reproved_walls": 0,
   "channel_findings": {},
@@ -25,10 +25,10 @@
    "channel_top_matched": 7
   },
   "codes": {
-   "B19": 51,
-   "B34": 13,
-   "B39": 292,
-   "C04": 39,
+   "B19": 39,
+   "B34": 25,
+   "B39": 286,
+   "C04": 51,
    "C09": 53,
    "CHANNEL_U_39": 72
   },
@@ -36,41 +36,41 @@
   "free_to_top": 0,
   "node_crossings": 0,
   "non_modular": 0,
-  "pieces": 520,
+  "pieces": 526,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "runs": 8,
-  "signature": "9d259282055fde22951856612acff2b8d42f7ed05342904560a19d799a5b38e4",
+  "signature": "e903aff35780ecba6ff475f1bac815c3148ccbd8a51b53b0086e922efc323d63",
   "solve_s": 0.08
  },
  "LEGACY": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 21,
-   "COMPENSATOR_EXCESS_IN_RUN": 23,
+   "COMPENSATOR_CONSECUTIVE": 33,
+   "COMPENSATOR_EXCESS_IN_RUN": 29,
    "COMPENSATOR_VERTICAL_STRIP": 2,
    "OPENING_MISSING_COUNTER_LINTEL": 7,
    "OPENING_MISSING_LINTEL": 7,
-   "PRISM_STAGGER_BELOW_TARGET": 5
+   "PRISM_STAGGER_BELOW_TARGET": 15
   },
   "bond_reproved_walls": 0,
   "codes": {
-   "B19": 51,
-   "B34": 13,
-   "B39": 364,
-   "C04": 39,
+   "B19": 39,
+   "B34": 25,
+   "B39": 358,
+   "C04": 51,
    "C09": 53
   },
   "door_void_violations": 0,
   "non_modular": 0,
-  "pieces": 520,
+  "pieces": 526,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "signature": "cd0107ffa77e70d7c22db905bcea01edec70e3079451f66278bc4ab44868d5e0",
-  "solve_s": 0.07
+  "signature": "d05b0fff22824a938605013c934461081106ba434fa6e01575e6b268db4459da",
+  "solve_s": 0.09
  },
  "bench_delta": {},
  "openings": 7,

@@ -93,6 +93,9 @@ SEVERITY_ERROR = "ERROR"
 SEVERITY_WARNING = "WARNING"
 SEVERITY_INFO = "INFO"
 
+# Ruido de ponto flutuante na comparacao de folga entre pecas contiguas.
+CONTIGUOUS_GAP_EPSILON_CM = 1e-6
+
 DEFAULT_CHANNEL_POLICY = {
     "policy_version": "CHANNEL-2026-09-14-BUTANTA-EVIDENCE",
     # Apoio preferencial de cada lado (jamba -> ponta da corrida), em cm.
@@ -106,8 +109,12 @@ DEFAULT_CHANNEL_POLICY = {
     # (ou entre o topo da fiada e o peitoril) e' a MESMA solucao - BUTANTA
     # 6616547: vao ate' 220, canaleta em 221 (errata do acervo).
     "grid_joint_allowance_cm": 1.0,
-    # Folga maxima entre duas pecas CONTIGUAS da mesma corrida (junta 1 cm).
-    "contiguous_gap_cm": 1.5,
+    # Folga maxima entre duas pecas CONTIGUAS da mesma corrida: junta de 1 cm
+    # + ate' 1 cm da folga residual que a regra 30.8 distribui numa junta de
+    # contorno de trecho entre nos (2026-09-14; antes 1,5 - a junta de 1,5 cm
+    # do anel do vao 7719511 caia fora por ruido de ponto flutuante e a de
+    # 2,0 cm das paredes de 86 cm quebrava a corrida).
+    "contiguous_gap_cm": 2.0,
     "merge_compensators": True,
     "max_channel_length_cm": 39.0,
     # Menor canaleta cortada observada no humano (9 cm): abaixo disso vira
@@ -266,7 +273,7 @@ def _extend_run(rows, i0, i1, t_lo, t_hi, policy, cross=None):
     """Estende [i0, i1] (indices em `rows`) peca a peca ate' o apoio
     preferencial. `cross(j, support_cm)` pode transformar a amarracao `rows[j]`
     em trecho atravessavel (devolve True). Devolve (i0, i1, lim_esq, lim_dir)."""
-    gap = policy["contiguous_gap_cm"]
+    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     need = policy["min_support_cm"]
     limits = [None, None]
     while t_lo - rows[i0]["lo"] < need - 1e-6:
@@ -328,7 +335,7 @@ def _group_run_members(members, policy):
     fusao que da' canaleta de comprimento padrao (39/34/19), depois a da
     esquerda. Sem fusao possivel, vira canaleta cortada sozinho."""
     max_len = policy["max_channel_length_cm"]
-    gap = policy["contiguous_gap_cm"]
+    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     groups = []
     k = 0
     n = len(members)
@@ -866,7 +873,7 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
     policy = channel_policy(policy)
     tol_ft = _cm_to_ft(policy["grid_tolerance_cm"])
     joint_ft = _cm_to_ft(policy["grid_joint_allowance_cm"])
-    gap = policy["contiguous_gap_cm"]
+    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     exempt = set((f["wall_idx"], f["opening_index"]) for f in (free_to_top or []))
     counts = {"MISSING_REQUIRED_CHANNEL": 0, "EXTRA_CHANNEL": 0, "CHANNEL_WRONG_COURSE": 0,
               "CHANNEL_INVADES_OPENING": 0, "CHANNEL_COLLISION": 0, "CHANNEL_SUPPORT_BELOW_POLICY": 0,

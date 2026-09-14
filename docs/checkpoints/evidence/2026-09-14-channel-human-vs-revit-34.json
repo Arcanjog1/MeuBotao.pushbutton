@@ -1,22 +1,20 @@
 {
- "source": "r_ladder_34.json",
+ "source": "r_final34b_run2.json",
  "summary": {
   "PHYSICALLY_EQUIVALENT": 55,
   "EXACT_MATCH": 4,
-  "SOLVER_BETTER": 4,
-  "SOLVER_WORSE": 1,
-  "NOT_COMPARABLE": 2,
-  "ACTUAL_ERROR": 1
+  "SOLVER_BETTER": 5,
+  "VALID_ALTERNATIVE": 1,
+  "NOT_COMPARABLE": 2
  },
  "by_role": {
   "above:PHYSICALLY_EQUIVALENT": 36,
   "below:PHYSICALLY_EQUIVALENT": 19,
   "below:EXACT_MATCH": 1,
   "above:SOLVER_BETTER": 2,
-  "below:SOLVER_BETTER": 2,
-  "above:SOLVER_WORSE": 1,
+  "below:SOLVER_BETTER": 3,
+  "above:VALID_ALTERNATIVE": 1,
   "above:NOT_COMPARABLE": 2,
-  "below:ACTUAL_ERROR": 1,
   "above:EXACT_MATCH": 3
  },
  "openings_matched": 44,
@@ -36,6 +34,10 @@
     29.0,
     24.0
    ],
+   "solver_bearing": [
+    28.0,
+    23.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -53,6 +55,10 @@
    "solver_support": [
     49.0,
     49.0
+   ],
+   "solver_bearing": [
+    48.0,
+    48.0
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -72,6 +78,10 @@
     44.024,
     33.988
    ],
+   "solver_bearing": [
+    43.0,
+    33.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -89,6 +99,10 @@
    "solver_support": [
     19.024,
     58.988
+   ],
+   "solver_bearing": [
+    18.024,
+    57.988
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -108,6 +122,10 @@
     34.012,
     18.988
    ],
+   "solver_bearing": [
+    33.0,
+    18.988
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -124,6 +142,10 @@
    ],
    "solver_support": [
     34.012,
+    18.988
+   ],
+   "solver_bearing": [
+    33.012,
     18.988
    ],
    "human_z": 61.0,
@@ -144,6 +166,10 @@
     54.012,
     43.988
    ],
+   "solver_bearing": [
+    53.0,
+    42.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -161,6 +187,10 @@
    "solver_support": [
     34.012,
     23.988
+   ],
+   "solver_bearing": [
+    33.012,
+    22.988
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -180,6 +210,10 @@
     19.012,
     28.988
    ],
+   "solver_bearing": [
+    19.0,
+    28.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -197,6 +231,10 @@
    "solver_support": [
     19.012,
     28.988
+   ],
+   "solver_bearing": [
+    19.0,
+    27.988
    ],
    "human_z": 61.0,
    "solver_course": 3,
@@ -216,6 +254,10 @@
     39.012,
     38.988
    ],
+   "solver_bearing": [
+    38.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -233,6 +275,10 @@
    "solver_support": [
     19.012,
     58.988
+   ],
+   "solver_bearing": [
+    19.0,
+    57.988
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -252,6 +298,10 @@
     29.012,
     48.988
    ],
+   "solver_bearing": [
+    28.0,
+    46.998
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -269,6 +319,10 @@
    "solver_support": [
     49.012,
     28.988
+   ],
+   "solver_bearing": [
+    48.012,
+    27.988
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -288,6 +342,10 @@
     54.001,
     38.999
    ],
+   "solver_bearing": [
+    53.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -305,6 +363,10 @@
    "solver_support": [
     24.012,
     43.988
+   ],
+   "solver_bearing": [
+    24.0,
+    43.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -324,6 +386,10 @@
     39.002,
     23.998
    ],
+   "solver_bearing": [
+    38.0,
+    23.001
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -341,6 +407,10 @@
    "solver_support": [
     49.001,
     33.999
+   ],
+   "solver_bearing": [
+    47.0,
+    32.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -360,6 +430,10 @@
     49.001,
     33.999
    ],
+   "solver_bearing": [
+    48.001,
+    32.999
+   ],
    "human_z": 141.0,
    "solver_course": 7,
    "classification": "SOLVER_BETTER"
@@ -377,6 +451,10 @@
    "solver_support": [
     34.009,
     43.991
+   ],
+   "solver_bearing": [
+    32.0,
+    42.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -396,6 +474,10 @@
     39.0,
     39.0
    ],
+   "solver_bearing": [
+    38.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -412,6 +494,10 @@
    ],
    "solver_support": [
     59.0,
+    19.0
+   ],
+   "solver_bearing": [
+    58.0,
     19.0
    ],
    "human_z": 221.0,
@@ -432,9 +518,13 @@
     34.022,
     3.989
    ],
+   "solver_bearing": [
+    32.0,
+    3.989
+   ],
    "human_z": 221.0,
    "solver_course": 11,
-   "classification": "SOLVER_WORSE"
+   "classification": "VALID_ALTERNATIVE"
   },
   {
    "opening_id": 7742173,
@@ -458,6 +548,10 @@
     19.014,
     23.988
    ],
+   "solver_bearing": [
+    19.0,
+    23.988
+   ],
    "human_z": 61.0,
    "solver_course": 3,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -475,6 +569,10 @@
    "solver_support": [
     4.003,
     23.997
+   ],
+   "solver_bearing": [
+    4.0,
+    23.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -494,6 +592,10 @@
     39.003,
     58.997
    ],
+   "solver_bearing": [
+    38.0,
+    57.997
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -511,6 +613,10 @@
    "solver_support": [
     19.003,
     38.997
+   ],
+   "solver_bearing": [
+    19.0,
+    37.997
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -530,6 +636,10 @@
     54.002,
     43.998
    ],
+   "solver_bearing": [
+    53.0,
+    42.0
+   ],
    "human_z": 220.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -547,6 +657,10 @@
    "solver_support": [
     54.007,
     43.993
+   ],
+   "solver_bearing": [
+    53.0,
+    42.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -566,6 +680,10 @@
     19.0,
     39.0
    ],
+   "solver_bearing": [
+    19.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -582,9 +700,23 @@
    "opening_id": 7719511,
    "wall": 8079859,
    "role": "below",
-   "solver_status": "MISSING",
+   "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
-   "classification": "ACTUAL_ERROR"
+   "human_support": [
+    4.0,
+    9.0
+   ],
+   "solver_support": [
+    19.512,
+    13.989
+   ],
+   "solver_bearing": [
+    18.013,
+    13.989
+   ],
+   "human_z": 21.0,
+   "solver_course": 1,
+   "classification": "SOLVER_BETTER"
   },
   {
    "opening_id": 6621639,
@@ -599,6 +731,10 @@
    "solver_support": [
     44.002,
     58.997
+   ],
+   "solver_bearing": [
+    42.0,
+    57.997
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -618,6 +754,10 @@
     54.003,
     53.998
    ],
+   "solver_bearing": [
+    53.0,
+    52.004
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -636,6 +776,10 @@
     54.007,
     53.993
    ],
+   "solver_bearing": [
+    53.0,
+    52.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -653,6 +797,10 @@
    "solver_support": [
     24.007,
     44.003
+   ],
+   "solver_bearing": [
+    23.0,
+    42.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -688,6 +836,10 @@
     49.003,
     38.997
    ],
+   "solver_bearing": [
+    48.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -705,6 +857,10 @@
    "solver_support": [
     39.003,
     48.997
+   ],
+   "solver_bearing": [
+    38.0,
+    48.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -724,6 +880,10 @@
     48.995,
     34.005
    ],
+   "solver_bearing": [
+    46.995,
+    33.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -741,6 +901,10 @@
    "solver_support": [
     39.003,
     53.997
+   ],
+   "solver_bearing": [
+    38.0,
+    53.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -760,6 +924,10 @@
     48.993,
     38.989
    ],
+   "solver_bearing": [
+    46.993,
+    37.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -777,6 +945,10 @@
    "solver_support": [
     28.993,
     28.989
+   ],
+   "solver_bearing": [
+    27.993,
+    27.989
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -796,6 +968,10 @@
     29.005,
     43.995
    ],
+   "solver_bearing": [
+    28.0,
+    42.995
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -813,6 +989,10 @@
    "solver_support": [
     39.005,
     38.995
+   ],
+   "solver_bearing": [
+    38.005,
+    37.995
    ],
    "human_z": 81.0,
    "solver_course": 4,
@@ -832,6 +1012,10 @@
     23.993,
     18.988
    ],
+   "solver_bearing": [
+    22.993,
+    17.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -848,6 +1032,10 @@
    ],
    "solver_support": [
     48.993,
+    18.988
+   ],
+   "solver_bearing": [
+    47.993,
     18.988
    ],
    "human_z": 61.0,
@@ -868,6 +1056,10 @@
     54.003,
     38.997
    ],
+   "solver_bearing": [
+    31.0,
+    38.0
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -886,6 +1078,10 @@
     49.003,
     38.997
    ],
+   "solver_bearing": [
+    48.003,
+    37.997
+   ],
    "human_z": 61.0,
    "solver_course": 3,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -902,6 +1098,10 @@
    ],
    "solver_support": [
     53.995,
+    24.005
+   ],
+   "solver_bearing": [
+    51.995,
     24.005
    ],
    "human_z": 221.0,
@@ -922,6 +1122,10 @@
     38.995,
     39.005
    ],
+   "solver_bearing": [
+    37.995,
+    38.005
+   ],
    "human_z": 81.0,
    "solver_course": 4,
    "classification": "SOLVER_BETTER"
@@ -939,6 +1143,10 @@
    "solver_support": [
     43.996,
     49.004
+   ],
+   "solver_bearing": [
+    41.995,
+    46.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -958,6 +1166,10 @@
     28.996,
     29.004
    ],
+   "solver_bearing": [
+    27.996,
+    28.004
+   ],
    "human_z": 81.0,
    "solver_course": 4,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -975,6 +1187,10 @@
    "solver_support": [
     48.996,
     34.004
+   ],
+   "solver_bearing": [
+    46.996,
+    32.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -994,6 +1210,10 @@
     28.996,
     29.004
    ],
+   "solver_bearing": [
+    27.996,
+    28.004
+   ],
    "human_z": 81.0,
    "solver_course": 4,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1011,6 +1231,10 @@
    "solver_support": [
     33.996,
     44.004
+   ],
+   "solver_bearing": [
+    33.996,
+    43.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -1030,6 +1254,10 @@
     38.996,
     39.004
    ],
+   "solver_bearing": [
+    37.996,
+    38.004
+   ],
    "human_z": 81.0,
    "solver_course": 4,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1047,6 +1275,10 @@
    "solver_support": [
     48.987,
     49.013
+   ],
+   "solver_bearing": [
+    46.987,
+    14.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -1066,6 +1298,10 @@
     33.987,
     49.013
    ],
+   "solver_bearing": [
+    32.987,
+    48.013
+   ],
    "human_z": 61.0,
    "solver_course": 3,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1083,6 +1319,10 @@
    "solver_support": [
     53.995,
     39.005
+   ],
+   "solver_bearing": [
+    13.995,
+    38.0
    ],
    "human_z": 221.0,
    "solver_course": 11,
@@ -1102,6 +1342,10 @@
     48.995,
     39.005
    ],
+   "solver_bearing": [
+    47.995,
+    38.005
+   ],
    "human_z": 61.0,
    "solver_course": 3,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1118,6 +1362,10 @@
    ],
    "solver_support": [
     53.997,
+    24.003
+   ],
+   "solver_bearing": [
+    51.992,
     24.003
    ],
    "human_z": 221.0,
@@ -1138,6 +1386,10 @@
     38.997,
     39.003
    ],
+   "solver_bearing": [
+    37.997,
+    38.003
+   ],
    "human_z": 81.0,
    "solver_course": 4,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1156,6 +1408,10 @@
     44.003,
     48.997
    ],
+   "solver_bearing": [
+    41.997,
+    45.996
+   ],
    "human_z": 221.0,
    "solver_course": 11,
    "classification": "PHYSICALLY_EQUIVALENT"
@@ -1173,6 +1429,10 @@
    "solver_support": [
     29.003,
     28.997
+   ],
+   "solver_bearing": [
+    28.003,
+    27.997
    ],
    "human_z": 81.0,
    "solver_course": 4,

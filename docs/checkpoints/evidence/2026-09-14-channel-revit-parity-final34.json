@@ -1,0 +1,35 @@
+{
+ "equal": true,
+ "offline_pieces": 7416,
+ "offline_signature": "844b04c3d767d56e599a8aa46ffb8bff1171169d1f72cefba056982b84384905",
+ "offline_validation": {
+  "CHANNEL_COLLISION": 0,
+  "CHANNEL_INVADES_OPENING": 0,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 5,
+  "CHANNEL_WRONG_COURSE": 0,
+  "EXTRA_CHANNEL": 0,
+  "MISSING_REQUIRED_CHANNEL": 0,
+  "channel_bottom_expected": 23,
+  "channel_bottom_matched": 23,
+  "channel_cut_pieces": 8,
+  "channel_pieces": 323,
+  "channel_top_expected": 40,
+  "channel_top_matched": 40
+ },
+ "revit_pieces": 7416,
+ "revit_signature": "844b04c3d767d56e599a8aa46ffb8bff1171169d1f72cefba056982b84384905",
+ "revit_validation": {
+  "CHANNEL_COLLISION": 0,
+  "CHANNEL_INVADES_OPENING": 0,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 5,
+  "CHANNEL_WRONG_COURSE": 0,
+  "EXTRA_CHANNEL": 0,
+  "MISSING_REQUIRED_CHANNEL": 0,
+  "channel_bottom_expected": 23,
+  "channel_bottom_matched": 23,
+  "channel_cut_pieces": 8,
+  "channel_pieces": 323,
+  "channel_top_expected": 40,
+  "channel_top_matched": 40
+ }
+}

@@ -1,22 +1,20 @@
 {
  "summary": {
-  "PHYSICALLY_EQUIVALENT": 44,
+  "PHYSICALLY_EQUIVALENT": 45,
   "SOLVER_BETTER": 4,
   "EXACT_MATCH": 15,
-  "SOLVER_WORSE": 1,
-  "NOT_COMPARABLE": 2,
-  "ACTUAL_ERROR": 1
+  "VALID_ALTERNATIVE": 1,
+  "NOT_COMPARABLE": 2
  },
  "by_role": {
   "above:PHYSICALLY_EQUIVALENT": 27,
-  "below:PHYSICALLY_EQUIVALENT": 17,
+  "below:PHYSICALLY_EQUIVALENT": 18,
   "below:SOLVER_BETTER": 2,
   "above:EXACT_MATCH": 12,
   "above:SOLVER_BETTER": 2,
   "below:EXACT_MATCH": 3,
-  "above:SOLVER_WORSE": 1,
-  "above:NOT_COMPARABLE": 2,
-  "below:ACTUAL_ERROR": 1
+  "above:VALID_ALTERNATIVE": 1,
+  "above:NOT_COMPARABLE": 2
  },
  "rows": [
   {
@@ -51,6 +49,10 @@
    "solver_support": [
     28.993,
     28.987
+   ],
+   "solver_bearing": [
+    27.993,
+    28.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 27,
@@ -92,6 +94,10 @@
     48.993,
     48.987
    ],
+   "solver_bearing": [
+    47.993,
+    47.987
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 11
    },
@@ -129,6 +135,10 @@
    "solver_support": [
     39.003,
     38.997
+   ],
+   "solver_bearing": [
+    38.0,
+    38.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 27,
@@ -170,6 +180,10 @@
     19.003,
     58.997
    ],
+   "solver_bearing": [
+    19.0,
+    57.997
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 11
    },
@@ -206,6 +220,10 @@
    ],
    "solver_support": [
     28.993,
+    18.987
+   ],
+   "solver_bearing": [
+    27.993,
     18.987
    ],
    "solver_codes": {
@@ -248,6 +266,10 @@
     28.993,
     18.987
    ],
+   "solver_bearing": [
+    27.993,
+    18.987
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 8,
     "CHANNEL_U_CUT": 1,
@@ -287,6 +309,10 @@
    "solver_support": [
     54.003,
     38.997
+   ],
+   "solver_bearing": [
+    33.0,
+    38.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 27,
@@ -328,6 +354,10 @@
     54.003,
     38.997
    ],
+   "solver_bearing": [
+    53.003,
+    37.997
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 8,
     "CHANNEL_U_CUT": 1,
@@ -366,6 +396,10 @@
    ],
    "solver_support": [
     53.993,
+    24.007
+   ],
+   "solver_bearing": [
+    51.993,
     24.007
    ],
    "solver_codes": {
@@ -408,6 +442,10 @@
     38.993,
     39.007
    ],
+   "solver_bearing": [
+    37.993,
+    38.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -445,6 +483,10 @@
    "solver_support": [
     43.993,
     49.007
+   ],
+   "solver_bearing": [
+    41.993,
+    46.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 27,
@@ -486,6 +528,10 @@
     28.993,
     29.007
    ],
+   "solver_bearing": [
+    27.993,
+    28.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -523,6 +569,10 @@
    "solver_support": [
     48.993,
     34.007
+   ],
+   "solver_bearing": [
+    46.993,
+    32.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 6,
@@ -564,6 +614,10 @@
     28.993,
     29.007
    ],
+   "solver_bearing": [
+    27.993,
+    28.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -601,6 +655,10 @@
    "solver_support": [
     33.993,
     44.007
+   ],
+   "solver_bearing": [
+    33.993,
+    43.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 6,
@@ -642,6 +700,10 @@
     38.993,
     39.007
    ],
+   "solver_bearing": [
+    37.993,
+    38.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -679,6 +741,10 @@
    "solver_support": [
     48.983,
     49.017
+   ],
+   "solver_bearing": [
+    46.983,
+    14.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 6,
@@ -720,6 +786,10 @@
     33.983,
     49.017
    ],
+   "solver_bearing": [
+    32.983,
+    48.017
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 5,
     "CHANNEL_U_34": 5,
@@ -759,6 +829,10 @@
    "solver_support": [
     53.993,
     39.007
+   ],
+   "solver_bearing": [
+    13.993,
+    38.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 6,
@@ -800,6 +874,10 @@
     48.993,
     39.007
    ],
+   "solver_bearing": [
+    47.993,
+    38.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 5,
     "CHANNEL_U_34": 5,
@@ -838,6 +916,10 @@
    ],
    "solver_support": [
     53.993,
+    24.007
+   ],
+   "solver_bearing": [
+    51.987,
     24.007
    ],
    "solver_codes": {
@@ -880,6 +962,10 @@
     38.993,
     39.007
    ],
+   "solver_bearing": [
+    37.993,
+    38.007
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -917,6 +1003,10 @@
    "solver_support": [
     44.003,
     48.997
+   ],
+   "solver_bearing": [
+    41.993,
+    45.996
    ],
    "solver_codes": {
     "CHANNEL_U_34": 6,
@@ -958,6 +1048,10 @@
     29.003,
     28.997
    ],
+   "solver_bearing": [
+    28.003,
+    27.997
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -995,6 +1089,10 @@
    "solver_support": [
     44.005,
     58.995
+   ],
+   "solver_bearing": [
+    42.0,
+    57.995
    ],
    "solver_codes": {
     "CHANNEL_U_34": 1,
@@ -1035,6 +1133,10 @@
     54.006,
     53.994
    ],
+   "solver_bearing": [
+    53.0,
+    52.004
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 5
    },
@@ -1073,6 +1175,10 @@
     54.01,
     53.99
    ],
+   "solver_bearing": [
+    53.0,
+    52.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 5
    },
@@ -1110,6 +1216,10 @@
    "solver_support": [
     24.01,
     44.0
+   ],
+   "solver_bearing": [
+    23.0,
+    42.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 4
@@ -1172,6 +1282,10 @@
     54.002,
     38.998
    ],
+   "solver_bearing": [
+    53.0,
+    38.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 2,
     "CHANNEL_U_34": 3
@@ -1210,6 +1324,10 @@
    "solver_support": [
     24.012,
     43.988
+   ],
+   "solver_bearing": [
+    24.0,
+    43.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 4
@@ -1250,6 +1368,10 @@
     39.002,
     23.998
    ],
+   "solver_bearing": [
+    38.0,
+    23.001
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 3,
     "CHANNEL_U_34": 1
@@ -1287,6 +1409,10 @@
    "solver_support": [
     49.002,
     33.998
+   ],
+   "solver_bearing": [
+    47.0,
+    32.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 4,
@@ -1326,6 +1452,10 @@
     29.002,
     28.998
    ],
+   "solver_bearing": [
+    28.002,
+    27.998
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -1362,6 +1492,10 @@
    "solver_support": [
     34.022,
     43.988
+   ],
+   "solver_bearing": [
+    33.0,
+    42.988
    ],
    "solver_codes": {
     "CHANNEL_U_34": 4,
@@ -1401,6 +1535,10 @@
     39.022,
     38.988
    ],
+   "solver_bearing": [
+    38.022,
+    37.988
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 10
    },
@@ -1438,6 +1576,10 @@
     24.012,
     18.988
    ],
+   "solver_bearing": [
+    23.012,
+    17.0
+   ],
    "solver_codes": {
     "CHANNEL_U_34": 4,
     "CHANNEL_U_39": 12
@@ -1474,6 +1616,10 @@
    ],
    "solver_support": [
     49.012,
+    18.988
+   ],
+   "solver_bearing": [
+    48.012,
     18.988
    ],
    "solver_codes": {
@@ -1515,6 +1661,10 @@
     54.012,
     43.988
    ],
+   "solver_bearing": [
+    53.0,
+    42.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 6
    },
@@ -1552,6 +1702,10 @@
    "solver_support": [
     34.012,
     23.988
+   ],
+   "solver_bearing": [
+    33.012,
+    22.988
    ],
    "solver_codes": {
     "CHANNEL_U_39": 5
@@ -1592,6 +1746,10 @@
     19.012,
     28.988
    ],
+   "solver_bearing": [
+    19.0,
+    28.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 15
    },
@@ -1628,6 +1786,10 @@
    "solver_support": [
     19.012,
     28.988
+   ],
+   "solver_bearing": [
+    19.0,
+    27.988
    ],
    "solver_codes": {
     "CHANNEL_U_39": 5
@@ -1668,6 +1830,10 @@
     39.012,
     38.988
    ],
+   "solver_bearing": [
+    38.0,
+    38.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 15
    },
@@ -1704,6 +1870,10 @@
    "solver_support": [
     19.012,
     58.988
+   ],
+   "solver_bearing": [
+    19.0,
+    57.988
    ],
    "solver_codes": {
     "CHANNEL_U_39": 10
@@ -1744,6 +1914,10 @@
     29.012,
     28.988
    ],
+   "solver_bearing": [
+    28.0,
+    28.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 15
    },
@@ -1780,6 +1954,10 @@
    "solver_support": [
     49.012,
     48.988
+   ],
+   "solver_bearing": [
+    48.012,
+    47.986
    ],
    "solver_codes": {
     "CHANNEL_U_39": 10
@@ -1819,6 +1997,10 @@
     54.005,
     43.995
    ],
+   "solver_bearing": [
+    53.0,
+    42.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 6
    },
@@ -1856,6 +2038,10 @@
    "solver_support": [
     34.006,
     23.994
+   ],
+   "solver_bearing": [
+    33.006,
+    22.994
    ],
    "solver_codes": {
     "CHANNEL_U_39": 5
@@ -1895,6 +2081,10 @@
     54.006,
     43.994
    ],
+   "solver_bearing": [
+    53.0,
+    42.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 6
    },
@@ -1932,6 +2122,10 @@
    "solver_support": [
     54.01,
     43.99
+   ],
+   "solver_bearing": [
+    53.0,
+    42.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 6
@@ -1971,6 +2165,10 @@
     19.0,
     39.0
    ],
+   "solver_bearing": [
+    19.0,
+    38.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 5
    },
@@ -2007,6 +2205,10 @@
    "solver_support": [
     54.01,
     23.99
+   ],
+   "solver_bearing": [
+    53.0,
+    23.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 5
@@ -2045,6 +2247,10 @@
     19.0,
     39.0
    ],
+   "solver_bearing": [
+    19.0,
+    38.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 8,
     "CHANNEL_U_34": 1
@@ -2081,6 +2287,10 @@
    ],
    "solver_support": [
     59.0,
+    19.0
+   ],
+   "solver_bearing": [
+    58.0,
     19.0
    ],
    "solver_codes": {
@@ -2121,6 +2331,10 @@
     48.995,
     34.005
    ],
+   "solver_bearing": [
+    46.995,
+    33.0
+   ],
    "solver_codes": {
     "CHANNEL_U_34": 5
    },
@@ -2158,6 +2372,10 @@
    "solver_support": [
     39.003,
     53.997
+   ],
+   "solver_bearing": [
+    38.0,
+    53.0
    ],
    "solver_codes": {
     "CHANNEL_U_34": 3,
@@ -2198,6 +2416,10 @@
     29.002,
     28.998
    ],
+   "solver_bearing": [
+    28.0,
+    27.0
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 3
    },
@@ -2236,6 +2458,10 @@
     29.002,
     28.998
    ],
+   "solver_bearing": [
+    28.002,
+    26.998
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 3
    },
@@ -2273,6 +2499,10 @@
    "solver_support": [
     49.003,
     38.997
+   ],
+   "solver_bearing": [
+    48.0,
+    38.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 1,
@@ -2313,6 +2543,10 @@
     39.003,
     48.997
    ],
+   "solver_bearing": [
+    38.0,
+    48.0
+   ],
    "solver_codes": {
     "CHANNEL_U_34": 4,
     "CHANNEL_U_39": 1
@@ -2351,6 +2585,10 @@
    "solver_support": [
     4.003,
     23.997
+   ],
+   "solver_bearing": [
+    4.0,
+    23.0
    ],
    "solver_codes": {
     "CHANNEL_U_39": 3
@@ -2391,10 +2629,14 @@
     34.022,
     3.988
    ],
+   "solver_bearing": [
+    32.0,
+    3.988
+   ],
    "solver_codes": {
     "CHANNEL_U_34": 4
    },
-   "classification": "SOLVER_WORSE"
+   "classification": "VALID_ALTERNATIVE"
   },
   {
    "opening_id": 7742173,
@@ -2441,6 +2683,10 @@
     19.013,
     38.987
    ],
+   "solver_bearing": [
+    19.0,
+    37.987
+   ],
    "solver_codes": {
     "CHANNEL_U_39": 3
    },
@@ -2466,7 +2712,7 @@
    "width_cm": 66.0,
    "sill": 40.0,
    "head": 91.0,
-   "solver_status": "MISSING",
+   "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
    "human_z": 21.0,
    "human_support": [
@@ -2480,27 +2726,45 @@
    "human_codes": {
     "K39": 2
    },
-   "classification": "ACTUAL_ERROR"
+   "solver_course": 1,
+   "solver_z": 21,
+   "solver_run_human_axis": [
+    15.5,
+    115.0
+   ],
+   "solver_support": [
+    4.013,
+    29.487
+   ],
+   "solver_bearing": [
+    4.013,
+    26.987
+   ],
+   "solver_codes": {
+    "CHANNEL_U_CUT": 2,
+    "CHANNEL_U_39": 1,
+    "CHANNEL_U_34": 1
+   },
+   "classification": "PHYSICALLY_EQUIVALENT"
   }
  ],
  "findings": {
-  "CHANNEL_NODE_CROSSING": 4,
-  "CHANNEL_SUPPORT_LIMITED": 6,
-  "CHANNEL_HEAD_OFF_GRID": 2,
-  "MISSING_REQUIRED_CHANNEL": 1
+  "CHANNEL_THROUGH_T_SUPPORTED_PATTERN": 4,
+  "CHANNEL_SUPPORT_LIMITED": 7,
+  "CHANNEL_HEAD_OFF_GRID": 2
  },
  "validation": {
-  "MISSING_REQUIRED_CHANNEL": 1,
+  "MISSING_REQUIRED_CHANNEL": 0,
   "EXTRA_CHANNEL": 0,
   "CHANNEL_WRONG_COURSE": 0,
   "CHANNEL_INVADES_OPENING": 0,
   "CHANNEL_COLLISION": 0,
-  "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 5,
   "channel_top_expected": 40,
   "channel_top_matched": 40,
   "channel_bottom_expected": 23,
-  "channel_bottom_matched": 22,
-  "channel_pieces": 313,
-  "channel_cut_pieces": 4
+  "channel_bottom_matched": 23,
+  "channel_pieces": 317,
+  "channel_cut_pieces": 6
  }
 }

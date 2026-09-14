@@ -79,12 +79,14 @@ for rec in rein["openings"]:
             row["solver_z"] = 1 + 20 * s["course_index"]
             row["solver_run_human_axis"] = [round(lo, 2), round(hi, 2)]
             row["solver_support"] = [s["support_l_cm"], s["support_r_cm"]]
+            row["solver_bearing"] = [s.get("bearing_l_cm", s["support_l_cm"]), s.get("bearing_r_cm", s["support_r_cm"])]
             row["solver_codes"] = dict(Counter(c for c, _l in solver_run_pieces(run)))
         # ---- classificacao
         st = row["solver_status"]
         if row["human_status"] == "CHANNEL" and st == "CHANNEL":
             same_z = abs(row["human_z"] - row["solver_z"]) <= 1.5
             hs, ss = row["human_support"], row["solver_support"]
+            bearing = row["solver_bearing"]
             hr, sr = row["human_run"], row["solver_run_human_axis"]
             if not same_z:
                 cls = "ACTUAL_ERROR"
@@ -94,7 +96,9 @@ for rec in rein["openings"]:
                 cls = "PHYSICALLY_EQUIVALENT"
             elif min(ss) >= min(hs) - 0.05:
                 cls = "SOLVER_BETTER" if min(ss) > min(hs) + 0.05 else "PHYSICALLY_EQUIVALENT"
-            elif min(ss) > 0 and min(hs) < MIN_SUPPORT - 0.05:
+            elif min(ss) > 0 and min(bearing) > 0.5:
+                # 19 cm e' PREFERENCIAL (decisao 2026-09-14): apoio menor
+                # sobre alvenaria real da fiada de baixo e' alternativa valida.
                 cls = "VALID_ALTERNATIVE"
             else:
                 cls = "SOLVER_WORSE"

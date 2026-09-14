@@ -162,7 +162,9 @@ out["solve"] = {"t_s": round(t_solve, 3), "error": res.get("error"), "pieces": s
                 "channel_validation": (rein.get("validation") or {}).get("counts"),
                 "channel_findings": [dict((k, v) for k, v in f.items()) for f in rein.get("findings") or []],
                 "openings": rein.get("openings"), "node_crossings": rein.get("node_crossings"),
-                "tie_conversions": rein.get("tie_conversions"), "free_to_top": rein.get("free_to_top")}
+                "tie_conversions": rein.get("tie_conversions"), "free_to_top": rein.get("free_to_top"),
+                "channel_timing_s": rein.get("timing_s"),
+                "residual_absorptions": len(res.get("residual_absorptions") or [])}
 step("SOLVED", pieces=out["solve"]["pieces"], preflight=pf.get("ok"), t_solve=round(t_solve, 2))
 
 if cfg.get("create"):

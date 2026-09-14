@@ -2,15 +2,14 @@
  "CHANNEL": {
   "bench_codes": {
    "COMPENSATOR_CONSECUTIVE": 34,
-   "COMPENSATOR_EXCESS_IN_RUN": 51,
-   "COMPENSATOR_VERTICAL_STRIP": 9,
+   "COMPENSATOR_EXCESS_IN_RUN": 52,
+   "COMPENSATOR_VERTICAL_STRIP": 8,
    "OPENING_MISSING_COUNTER_LINTEL": 9,
    "OPENING_MISSING_LINTEL": 17,
-   "PRISM_STAGGER_BELOW_TARGET": 2
+   "PRISM_STAGGER_BELOW_TARGET": 6
   },
   "bond_reproved_walls": 0,
   "channel_findings": {
-   "CHANNEL_CUT_BELOW_OBSERVED_MIN": 1,
    "CHANNEL_HEAD_OFF_GRID": 1,
    "CHANNEL_SUPPORT_LIMITED": 1
   },
@@ -23,21 +22,20 @@
    "MISSING_REQUIRED_CHANNEL": 0,
    "channel_bottom_expected": 9,
    "channel_bottom_matched": 9,
-   "channel_cut_pieces": 1,
+   "channel_cut_pieces": 0,
    "channel_pieces": 127,
    "channel_top_expected": 16,
    "channel_top_matched": 16
   },
   "codes": {
    "B19": 172,
-   "B34": 296,
+   "B34": 295,
    "B39": 1891,
    "B54": 29,
-   "C04": 99,
+   "C04": 100,
    "C09": 143,
-   "CHANNEL_U_34": 12,
-   "CHANNEL_U_39": 114,
-   "CHANNEL_U_CUT": 1
+   "CHANNEL_U_34": 13,
+   "CHANNEL_U_39": 114
   },
   "door_void_violations": 0,
   "free_to_top": 0,
@@ -49,17 +47,17 @@
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "runs": 18,
-  "signature": "bbb5b8b9a02230499c588bd1fb793123aedf86080fd9483147cef9b5b332f504",
-  "solve_s": 0.36
+  "signature": "9ba229da8133045523c4d8ff023afc2a0feedc377f010d52cc9aaf5b01146c44",
+  "solve_s": 0.38
  },
  "LEGACY": {
   "bench_codes": {
    "COMPENSATOR_CONSECUTIVE": 34,
    "COMPENSATOR_EXCESS_IN_RUN": 52,
-   "COMPENSATOR_VERTICAL_STRIP": 9,
+   "COMPENSATOR_VERTICAL_STRIP": 8,
    "OPENING_MISSING_COUNTER_LINTEL": 9,
    "OPENING_MISSING_LINTEL": 17,
-   "PRISM_STAGGER_BELOW_TARGET": 2
+   "PRISM_STAGGER_BELOW_TARGET": 6
   },
   "bond_reproved_walls": 0,
   "codes": {
@@ -77,12 +75,10 @@
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "signature": "0246646fe023f69a994ab100376f6b63f883e48d09680e66bea6db5e0862ecd4",
+  "signature": "bae2acd22eafacd2cc7dee3fe4ffe86824ee0ff8f382ca3b7802e85644bb529a",
   "solve_s": 0.34
  },
- "bench_delta": {
-  "COMPENSATOR_EXCESS_IN_RUN": -1
- },
+ "bench_delta": {},
  "openings": 17,
  "walls": 10
 }

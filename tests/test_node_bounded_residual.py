@@ -106,6 +106,58 @@ def test_ring_absorption_creates_no_running_joint():
         assert not [p for p in audit["problems"] if "CONTINUOUS_VERTICAL_JOINT" in str(p)], (wi, audit["problems"])
 
 
+def _ring_orders():
+    lines = ring_lines()
+    return {"shaft_first": lines, "short_first": [lines[2], lines[1], lines[3], lines[0]]}
+
+
+def _strips(res):
+    return dict((wi, [p for p in audit["problems"] if "REPEATED_VERTICAL_COMPENSATOR_STRIP" in str(p)])
+                for wi, audit in res["wall_bond_audits"].items())
+
+
+def test_ring_red_greedy_course_a_stacks_compensator_strip(monkeypatch):
+    """RED: com a Fiada A gulosa (B39 + C09 + C09 + C04, tres acertos em
+    sequencia contra o no') a Fiada B nao tem composicao sem junta coincidente
+    que nao termine com compensador sobre o da A: faixa vertical em 14 fiadas."""
+    monkeypatch.setattr(ws, "_absorbed_segment_rule2_layout", lambda layout, *a, **k: layout)
+    with absorption(True):
+        res, _walls = solve(_ring_orders()["shaft_first"], [[], [], [], []])
+    assert any(_strips(res).values())
+
+
+@pytest.mark.parametrize("order", ["shaft_first", "short_first"])
+def test_ring_absorbed_segments_respect_rule_2_and_leave_no_strip(order):
+    with absorption(True):
+        res, walls = solve(_ring_orders()[order], [[], [], [], []])
+    assert not any(_strips(res).values()), _strips(res)
+    assert all(audit["ok"] for audit in res["wall_bond_audits"].values())
+    for ci, pieces in res["course_candidates"].items():
+        for wi in range(4):
+            codes = [r["cand"]["logical_code"] for r in orf._wall_strip_pieces(pieces, walls, wi) if r["along"]]
+            run = longest = 0
+            for code in codes:
+                run = run + 1 if code.startswith("C") else 0
+                longest = max(longest, run)
+            assert longest <= 2, (ci, wi, codes)
+
+
+@pytest.mark.parametrize("order", ["shaft_first", "short_first"])
+def test_channel_run_is_contiguous_across_rule_30_8_boundary_joint(order):
+    """A junta de contorno do trecho absorvido mede 1 cm + metade da folga
+    (1,5 cm na parede de 115): a corrida de canaletas continua contigua."""
+    lines = _ring_orders()[order]
+    window_wall = {"shaft_first": 0, "short_first": 3}[order]  # parede de 115 cm em y=1000
+    openings = [[] for _ in lines]
+    openings[window_wall] = ring_window()[0]
+    with absorption(True):
+        res, _walls = solve(lines, openings, strategy=orf.OPENING_REINFORCEMENT_CHANNEL)
+    counts = res["opening_reinforcement"]["validation"]["counts"]
+    assert counts["MISSING_REQUIRED_CHANNEL"] == 0
+    assert counts["channel_top_matched"] == counts["channel_top_expected"] == 1
+    assert counts["channel_bottom_matched"] == counts["channel_bottom_expected"] == 1
+
+
 def test_residual_above_limit_is_not_absorbed():
     """Anel com parede de 118 cm: folga de 4 cm (> 2 cm) continua nao modular."""
     lines = [seg(537, 1000, 655, 1000), seg(537, 928, 655, 928), seg(544, 921, 544, 1007), seg(648, 921, 648, 1007)]

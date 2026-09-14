@@ -109,7 +109,7 @@ __all__ = [
     "describe_opening_jamb_exception", "_pier_codes_by_len_desc",
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
-    "_pier_remaining_snapped_cm", "_pier_ordered_layout",
+    "_pier_remaining_snapped_cm", "_pier_ordered_layout", "_absorbed_segment_rule2_layout",
     "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
@@ -5992,6 +5992,67 @@ def _continuous_segment_layout(pier_cm, catalog, leading_joint_cm, trailing_join
     return best
 
 
+def _absorbed_segment_rule2_layout(layout, pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
+                                   seg_start_cm, opening_intervals_cm, opposite_joints_cm,
+                                   allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                   leading_is_open=False, trailing_is_open=False):
+    """Regra 30.8, complemento (2026-09-14): a Fiada A (variante 0) de um
+    trecho que SO' fecha por causa da absorcao de folga entre nos nao aceita
+    o guloso com compensadores em sequencia (regra #2) quando existe outra
+    composicao VALIDA do MESMO trecho com menos excesso.
+
+    Por que so' aqui: o guloso da Fiada A nunca olha a regra #2 (a Fiada B
+    sim, ver `_pier_layout_avoiding_joints`). Num trecho entre dois nos em
+    que o miolo pede tres acertos (BUTANTA 1o PAV, anel 115 x 86 cm: miolo de
+    64 cm = B39 + C09 + C09 + C04) o guloso empilha os tres contra o no', a
+    Fiada B - deslocada de 20 cm pelo papel alternado dos cantos - so' tem
+    composicoes sem junta coincidente que tambem terminam com compensador
+    contra o no' oposto, e os dois acertos ficam um sobre o outro em TODAS as
+    fiadas (REPEATED_VERTICAL_COMPENSATOR_STRIP). Com C09 + B39 + C09 + C04 na
+    Fiada A a Fiada B fecha sem junta coincidente e sem faixa. Trechos que ja'
+    fechavam sem absorcao ficam exatamente como eram.
+
+    Candidatos: o proprio `_pier_ordered_layout` com cada codigo como
+    primeiro bloco (mesmas regras de tier/B19) e os bypass de tier. Criterio
+    (menor e' melhor): excesso da regra #2, juntas coincidentes com os nos da
+    fiada oposta (so' as que sobrevivem ao recorte dos vaos), numero de pecas
+    de acerto. So' troca com ganho ESTRITO no excesso sem piorar a
+    coincidencia."""
+    if layout is None:
+        return None
+
+    def _score(candidate):
+        coincide = _count_joint_coincidences_cm(
+            _layout_joints_surviving_openings_cm(candidate, seg_start_cm, opening_intervals_cm),
+            opposite_joints_cm) if opposite_joints_cm else 0
+        return (_layout_compensator_run_excess(candidate, catalog), coincide,
+                sum(1 for code, _a, _b in candidate if _is_acerto_code(code, catalog)))
+
+    best, best_score = layout, _score(layout)
+    if best_score[0] == 0:
+        return layout
+    alternatives = list(_pier_forced_bypass_layouts(
+        pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
+        allow_compensators=allow_compensators,
+        leading_is_open=leading_is_open, trailing_is_open=trailing_is_open))
+    codes = _pier_codes_by_len_desc(catalog, allow_compensators, pool=OPENING_JAMB_BLOCK_CODES)
+    if not leading_is_open:
+        codes = [code for code in codes if code != HALF_BLOCK_CODE]
+    for code in codes:
+        alternatives.append(_pier_ordered_layout(
+            pier_cm, catalog, leading_joint_cm, trailing_joint_cm, first_code=code,
+            allow_compensators=allow_compensators,
+            leading_open_override=leading_is_open, trailing_open_override=trailing_is_open))
+    for alternative in alternatives:
+        if alternative is None:
+            continue
+        score = _score(alternative)
+        if score[0] < best_score[0] and score[1] <= best_score[1] or (
+                score[0] == best_score[0] and score < best_score and best is not layout):
+            best, best_score = alternative, score
+    return best
+
+
 def _candidate_extents_on_wall(candidates, wall_p0, wall_dir):
     """[(t_start_cm, t_end_cm), ...] de `candidates` ao longo do eixo da
     parede, na MESMA ordem da lista de entrada e sempre com start <= end."""
@@ -6740,6 +6801,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     # (anel 115 x 86 cm): pecas a 0,5 cm das duas pontas na
                     # parede de 115 (folga 1,0) e a 1,0 cm nas de 86 (folga 2,0);
                     # sem isto o solver deixava o anel inteiro sem preenchimento.
+                    absorbed_segment = False
                     if (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open
                             and not trailing_is_open and pier_cm > 0
                             and kind_left in ("WALL_START", "MIDSPAN_HI")
@@ -6752,6 +6814,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             seg_start_cm += residual_cm / 2.0
                             seg_end_cm -= residual_cm / 2.0
                             pier_cm = lower_cm
+                            absorbed_segment = True
                             residual_absorptions.append({
                                 "wall_idx": wall_idx, "course": course, "variant_index": variant_index,
                                 "segment_index": seg_i, "residual_cm": round(residual_cm, 4),
@@ -6814,6 +6877,12 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                                 alternativa, seg_start_cm, opening_intervals_cm),
                                             opposite_node_joints_cm) < colide:
                                         layout = alternativa
+                            if absorbed_segment:
+                                layout = _absorbed_segment_rule2_layout(
+                                    layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                                    opening_intervals_cm, opposite_node_joints_cm,
+                                    allow_compensators=allow_compensators,
+                                    leading_is_open=leading_is_open, trailing_is_open=trailing_is_open)
                         else:
                             # Variantes 1+ da PROPRIA familia A (secao 11.7):
                             # desencontram as juntas das variantes A anteriores

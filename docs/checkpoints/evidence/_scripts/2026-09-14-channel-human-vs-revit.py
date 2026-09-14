@@ -60,11 +60,13 @@ for rec in d["solve"]["openings"]:
         st = row["solver_status"]
         if h_has and st == "CHANNEL":
             ss = [s["support_l_cm"], s["support_r_cm"]]
+            bearing = [s.get("bearing_l_cm", ss[0]), s.get("bearing_r_cm", ss[1])]
             if flipped:
                 ss = ss[::-1]
+                bearing = bearing[::-1]
             hs = [hh["support_l"], hh["support_r"]]
             same_z = abs(hh["z_lo"] - (1 + 20 * s["course_index"])) <= 1.5
-            row.update(human_support=hs, solver_support=ss, human_z=hh["z_lo"], solver_course=s["course_index"])
+            row.update(human_support=hs, solver_support=ss, solver_bearing=bearing, human_z=hh["z_lo"], solver_course=s["course_index"])
             if not same_z:
                 cls = "ACTUAL_ERROR"
             elif abs(hs[0] - ss[0]) <= TOL and abs(hs[1] - ss[1]) <= TOL:
@@ -73,7 +75,9 @@ for rec in d["solve"]["openings"]:
                 cls = "PHYSICALLY_EQUIVALENT"
             elif min(ss) >= min(hs) - 0.05:
                 cls = "SOLVER_BETTER" if min(ss) > min(hs) + 0.05 else "PHYSICALLY_EQUIVALENT"
-            elif min(ss) > 0 and min(hs) < MIN_SUPPORT - 0.05:
+            elif min(ss) > 0 and min(bearing) > 0.5:
+                # 19 cm e' PREFERENCIAL (decisao 2026-09-14): apoio menor
+                # sobre alvenaria real da fiada de baixo e' alternativa valida.
                 cls = "VALID_ALTERNATIVE"
             else:
                 cls = "SOLVER_WORSE"

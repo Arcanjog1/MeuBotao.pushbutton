@@ -3835,20 +3835,25 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     def _band(course_index):
         return _course_z_band(base_z_abs, course_index, step, height)
 
+    t_plan = time.time()
     plan = _reinforcement.plan_channel_reinforcement(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
         base_z_abs, policy=policy, nodes=nodes, catalog=catalog)
+    t_validate = time.time()
     result["course_candidates_before_reinforcement"] = result.get("course_candidates")
     result["course_candidates"] = plan.pop("course_candidates")
     plan["validation"] = _reinforcement.validate_channel_reinforcement(
         result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
         free_to_top=plan["free_to_top"], policy=plan["policy"])
+    t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
     result["wall_bond_audits_before_reinforcement"] = result.get("wall_bond_audits")
     result["wall_bond_audits"] = audit_all_walls_bond_quality(
         walls_to_create, result["course_candidates"], audit_catalog, num_courses,
         openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
+                        "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
     return result
 
