@@ -96,7 +96,14 @@ Validador independente (recalcula a demanda a partir das aberturas):
 - Travessia de T produz junta na face da parede que chega em 3 fiadas (51.6),
   como no humano; aceita (decisão D) sem relaxar a auditoria global.
 - Apoio limitado é classificado pelo **assentamento real** na fiada de baixo
-  (`bearing_*_cm`, 51.4): 6627438 apoia 4 cm sobre a pastilha C04 — VALID_ALTERNATIVE.
+  (`bearing_*_cm`, 51.4): sem assentamento = `ACTUAL_ERROR`; abaixo de 9 cm =
+  `KNOWN_LIMITATION`; entre 9 cm e o preferencial de 19 cm = `VALID_ALTERNATIVE`.
+  Caso remanescente: **6672349** apoia ~4 cm de um lado e o humano apoia os
+  mesmos ~4 cm no mesmo lado — `KNOWN_LIMITATION`, nunca equivalência.
+  **6627438 deixou de ser esse caso** (tentativa de paridade do nó): apoio
+  efetivo 19/33 cm, mesma extensão física e mesma paridade do humano, 0
+  coincidências de junta e 0 problema local de amarração —
+  `PHYSICALLY_EQUIVALENT`.
 - Folga residual entre nós (30.8) e tolerância de ruído da pastilha (51.13)
   existem mas estão DESLIGADAS (auditoria 2026-09-14): 7719511 é limitação
   conhecida.
