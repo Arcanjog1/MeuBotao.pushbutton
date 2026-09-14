@@ -6416,6 +6416,30 @@ RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False
 RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
 
 
+def _residual_node_bounded_absorption(pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open,
+                                      kind_left, kind_right, seg_start_cm, seg_end_cm):
+    """Regra 30.8 (ver solve_wall_free_fill): (seg_start, seg_end, pier, folga)
+    quando o trecho entre dois nos absorve a folga; None caso contrario."""
+    if not (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open and not trailing_is_open
+            and pier_cm > 0 and kind_left in ("WALL_START", "MIDSPAN_HI")
+            and kind_right in ("WALL_END", "MIDSPAN_LO")
+            and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
+        return None
+    lower_cm, _upper_cm = nearest_block_lengths_cm(pier_cm, lead_cm, trail_cm)
+    residual_cm = pier_cm - (lower_cm or 0.0)
+    if not (lower_cm and 0.0 < residual_cm <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM + 1e-6
+            and _pier_remaining_snapped_cm(lower_cm, lead_cm, trail_cm) is not None):
+        return None
+    return (seg_start_cm + residual_cm / 2.0, seg_end_cm - residual_cm / 2.0, lower_cm, residual_cm)
+
+
+def _interval_inside_any_span(a_cm, b_cm, spans):
+    for span_lo, span_hi in spans:
+        if a_cm >= span_lo - OPENING_OVERLAP_TOLERANCE_CM and b_cm <= span_hi + OPENING_OVERLAP_TOLERANCE_CM:
+            return True
+    return False
+
+
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -6805,25 +6829,21 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     # (anel 115 x 86 cm): pecas a 0,5 cm das duas pontas na
                     # parede de 115 (folga 1,0) e a 1,0 cm nas de 86 (folga 2,0);
                     # sem isto o solver deixava o anel inteiro sem preenchimento.
-                    absorbed_segment = False
-                    if (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open
-                            and not trailing_is_open and pier_cm > 0
-                            and kind_left in ("WALL_START", "MIDSPAN_HI")
-                            and kind_right in ("WALL_END", "MIDSPAN_LO")
-                            and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
-                        lower_cm, _upper_cm = nearest_block_lengths_cm(pier_cm, lead_cm, trail_cm)
-                        residual_cm = pier_cm - (lower_cm or 0.0)
-                        if (lower_cm and 0.0 < residual_cm <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM + 1e-6
-                                and _pier_remaining_snapped_cm(lower_cm, lead_cm, trail_cm) is not None):
-                            seg_start_cm += residual_cm / 2.0
-                            seg_end_cm -= residual_cm / 2.0
-                            pier_cm = lower_cm
-                            absorbed_segment = True
-                            residual_absorptions.append({
-                                "wall_idx": wall_idx, "course": course, "variant_index": variant_index,
-                                "segment_index": seg_i, "residual_cm": round(residual_cm, 4),
-                                "seg_start_cm": round(seg_start_cm, 4), "seg_end_cm": round(seg_end_cm, 4),
-                            })
+                    # IronPython (Revit): a logica fica numa funcao auxiliar - locais
+                    # novos nesta funcao gigante quebravam o `any(...)` com closure
+                    # do laco de degradacao ("Sequence contains no elements",
+                    # medido no Revit real 2026-09-14).
+                    absorption = _residual_node_bounded_absorption(
+                        pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open, kind_left, kind_right,
+                        seg_start_cm, seg_end_cm)
+                    absorbed_segment = absorption is not None
+                    if absorbed_segment:
+                        seg_start_cm, seg_end_cm, pier_cm = absorption[0], absorption[1], absorption[2]
+                        residual_absorptions.append({
+                            "wall_idx": wall_idx, "course": course, "variant_index": variant_index,
+                            "segment_index": seg_i, "residual_cm": round(absorption[3], 4),
+                            "seg_start_cm": round(seg_start_cm, 4), "seg_end_cm": round(seg_end_cm, 4),
+                        })
                     origin = p0 + wall_dir * _cm_to_ft(seg_start_cm)
 
                     if course == "A":
@@ -7061,12 +7081,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                 for oi, interval in enumerate(opening_intervals_cm):
                     a_cm = min(interval[0], interval[1])
                     b_cm = max(interval[0], interval[1])
-                    inside = any(
-                        a_cm >= span_lo - OPENING_OVERLAP_TOLERANCE_CM
-                        and b_cm <= span_hi + OPENING_OVERLAP_TOLERANCE_CM
-                        for span_lo, span_hi in variant_failed_spans
-                    )
-                    if inside:
+                    if _interval_inside_any_span(a_cm, b_cm, variant_failed_spans):
                         extra_boundaries.append((a_cm, "OPENING_LO", oi))
                         extra_boundaries.append((b_cm, "OPENING_HI", oi))
                 if not extra_boundaries:
