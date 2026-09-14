@@ -1,0 +1,99 @@
+{
+ "CHANNEL": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 78,
+   "COVERAGE_PARTIAL_WALL": 4,
+   "OPENING_MISSING_COUNTER_LINTEL": 23,
+   "OPENING_MISSING_LINTEL": 43,
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 78
+  },
+  "bond_reproved_walls": 3,
+  "channel_findings": {
+   "CHANNEL_HEAD_OFF_GRID": 2,
+   "CHANNEL_SUPPORT_LIMITED": 5,
+   "CHANNEL_THROUGH_T_SUPPORTED_PATTERN": 4,
+   "MISSING_REQUIRED_CHANNEL": 1
+  },
+  "channel_validation": {
+   "CHANNEL_COLLISION": 0,
+   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+   "CHANNEL_INVADES_OPENING": 0,
+   "CHANNEL_OPENING_OVERCUT": 0,
+   "CHANNEL_ORPHAN_PIECE": 0,
+   "CHANNEL_SUPPORT_BELOW_POLICY": 3,
+   "CHANNEL_WRONG_COURSE": 0,
+   "EXTRA_CHANNEL": 0,
+   "MISSING_REQUIRED_CHANNEL": 1,
+   "channel_bottom_expected": 23,
+   "channel_bottom_matched": 22,
+   "channel_cut_pieces": 5,
+   "channel_pieces": 319,
+   "channel_top_expected": 40,
+   "channel_top_matched": 40
+  },
+  "codes": {
+   "B19": 296,
+   "B34": 1839,
+   "B39": 3819,
+   "B54": 205,
+   "C04": 291,
+   "C09": 441,
+   "CHANNEL_U_34": 65,
+   "CHANNEL_U_39": 249,
+   "CHANNEL_U_CUT": 5
+  },
+  "door_void_violations": 0,
+  "free_to_top": 2,
+  "node_crossings": 4,
+  "non_modular": 78,
+  "pieces": 7210,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "runs": 39,
+  "signature": "7082e71e87522498272ed80e5517b4afe644f7e6c8662fa043ef3b0f85787384",
+  "solve_s": 4.34
+ },
+ "LEGACY": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 75,
+   "COVERAGE_PARTIAL_WALL": 4,
+   "OPENING_MISSING_COUNTER_LINTEL": 23,
+   "OPENING_MISSING_LINTEL": 43,
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 76
+  },
+  "bond_reproved_walls": 3,
+  "codes": {
+   "B19": 306,
+   "B34": 1957,
+   "B39": 4044,
+   "B54": 208,
+   "C04": 291,
+   "C09": 444
+  },
+  "door_void_violations": 0,
+  "non_modular": 78,
+  "pieces": 7250,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "signature": "94541746ba71190b3595096394f5fcc42c85ab63ad41ecdae441ac5afc148f0e",
+  "solve_s": 2.53
+ },
+ "bench_delta": {
+  "COVERAGE_GAP_IN_ROW": 3,
+  "PRISM_STAGGER_BELOW_TARGET": 2
+ },
+ "openings": 44,
+ "walls": 34
+}

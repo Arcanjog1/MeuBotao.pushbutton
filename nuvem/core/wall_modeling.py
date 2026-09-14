@@ -2601,6 +2601,113 @@ def load_fixed_block_catalog(target_doc):
     return catalog, missing
 
 
+# ==========================================
+# ETAPA 1B - CATALOGO DE CANALETAS (estrategia de reforco CHANNEL, 2026-09-14)
+#
+# SEPARADO de BLOCK_FAMILY_CATALOG_DEFINITIONS de proposito: o catalogo fixo
+# alimenta o PREENCHIMENTO do solver (ele escolhe pecas por comprimento) - se
+# as canaletas entrassem la', o solver passaria a usa-las como bloco comum.
+# As canaletas so' entram no pos-passe de reforco
+# (core/engine/opening_reinforcement.py) e na criacao.
+#
+# Familia + tipo EXATOS medidos no BUTANTA R08_LT (humano) e presentes no
+# documento de teste (2026-09-14, leitura via MCP): origem no CENTRO
+# geometrico, eixo X ao longo do comprimento (mesma convencao dos blocos). A
+# canaleta cortada tem o comprimento no parametro de INSTANCIA
+# `Comprimento_bloco` (8,993 cm medido numa KV de 9). Falta de familia vira
+# MISSING_FAMILY_MAPPING - nunca troca por peca parecida.
+# ==========================================
+CHANNEL_FAMILY_CATALOG_DEFINITIONS = {
+    "CHANNEL_U_39": {"family_name": "CANALETA INTEIRA - 14x19x39",
+                     "type_name": "CANALETA INTEIRA - 14x19x39", "length_parameter": None},
+    "CHANNEL_U_34": {"family_name": "CANALETA 34 - 14x19x34",
+                     "type_name": "CANALETA 34 - 14x19x34", "length_parameter": None},
+    "CHANNEL_U_19": {"family_name": "MEIA CANALETA - 14x19x19",
+                     "type_name": "MEIA CANALETA - 14x19x19", "length_parameter": None},
+    "CHANNEL_U_CUT": {"family_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+                      "type_name": "BLOCO CANALETA CORTADO - 14x19xVAR",
+                      "length_parameter": "Comprimento_bloco"},
+}
+
+
+def load_channel_family_catalog(target_doc):
+    """(catalog, missing) das canaletas, no MESMO formato de
+    load_fixed_block_catalog. `missing` usa reason com prefixo
+    MISSING_FAMILY_MAPPING. Ativa os simbolos numa transacao propria."""
+    from core.engine.opening_reinforcement import CHANNEL_LOGICAL_TYPES
+    catalog = {}
+    missing = []
+    found = []
+    for logical_code in sorted(CHANNEL_FAMILY_CATALOG_DEFINITIONS):
+        definition = CHANNEL_FAMILY_CATALOG_DEFINITIONS[logical_code]
+        symbol = _find_family_symbol_by_exact_name(
+            target_doc, definition["family_name"], definition["type_name"])
+        if symbol is None:
+            missing.append({
+                "logical_code": logical_code, "family_name": definition["family_name"],
+                "type_name": definition["type_name"],
+                "reason": "MISSING_FAMILY_MAPPING: familia/tipo de canaleta nao carregado no projeto.",
+            })
+            continue
+        found.append((logical_code, definition, symbol))
+    if found:
+        t_activate = Transaction(target_doc, "Ativa tipos de canaleta")
+        t_activate.Start()
+        try:
+            for _code, _definition, symbol in found:
+                if not symbol.IsActive:
+                    symbol.Activate()
+            target_doc.Regenerate()
+            t_activate.Commit()
+        except Exception:
+            t_activate.RollBack()
+            raise
+    for logical_code, definition, symbol in found:
+        logical = CHANNEL_LOGICAL_TYPES[logical_code]
+        length_cm = _type_param_cm(symbol, ["Comprimento_bloco"])
+        height_cm = _type_param_cm(symbol, ["Altura_bloco"])
+        width_cm = _type_param_cm(symbol, ["Largura_bloco"])
+        problems = []
+        if definition["length_parameter"] is None:
+            if length_cm is None or abs(length_cm - logical["nominal_length_cm"]) > 0.1:
+                problems.append("comprimento de tipo {} != {}".format(length_cm, logical["nominal_length_cm"]))
+        if height_cm is not None and abs(height_cm - logical["height_cm"]) > 0.1:
+            problems.append("altura {} != {}".format(height_cm, logical["height_cm"]))
+        if width_cm is not None and abs(width_cm - logical["width_cm"]) > 0.1:
+            problems.append("largura {} != {}".format(width_cm, logical["width_cm"]))
+        if problems:
+            missing.append({
+                "logical_code": logical_code, "family_name": definition["family_name"],
+                "type_name": definition["type_name"],
+                "reason": "MISSING_FAMILY_MAPPING: dimensoes divergentes ({}).".format("; ".join(problems)),
+            })
+            continue
+        catalog[logical_code] = {
+            "symbol": symbol,
+            "logical_code": logical_code,
+            "length_cm": length_cm if length_cm is not None else logical["nominal_length_cm"],
+            "height_cm": height_cm if height_cm is not None else logical["height_cm"],
+            "width_cm": width_cm if width_cm is not None else logical["width_cm"],
+            "cells_local": [],
+            "is_special_bond": False,
+            "is_compensator": False,
+            "is_channel": True,
+            "length_parameter": definition["length_parameter"],
+            "source_instance_id": symbol.Id,
+        }
+    return catalog, missing
+
+
+def channel_logical_catalog():
+    """Entradas SEM Revit das canaletas (dimensao/flags) - para auditorias e
+    benchmark que so' precisam de comprimento/altura por codigo."""
+    from core.engine.opening_reinforcement import CHANNEL_LOGICAL_TYPES
+    return dict((code, {"logical_code": code, "length_cm": spec["nominal_length_cm"],
+                        "height_cm": spec["height_cm"], "width_cm": spec["width_cm"], "cells_local": [],
+                        "is_special_bond": False, "is_compensator": False, "is_channel": True})
+                for code, spec in CHANNEL_LOGICAL_TYPES.items())
+
+
 # pack_pier_with_blocks, _is_valid_opening_width_cm e
 # solve_opening_modulation moraram para core/engine/modulation_math.py
 # (import * feito mais acima, junto do resto da aritmetica de blocos) -
@@ -3332,6 +3439,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
     all_intersection_failures, all_jamb_exceptions, all_non_modular = [], [], []
     all_tie_parity_flips, all_tie_parity_conflicts = [], []
     all_alignment_conflicts = []
+    all_residual_absorptions = []
     all_per_wall, all_validations = [], []
     all_door_void_violations = []
     total_bands = len(groups)
@@ -3421,6 +3529,8 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         all_validations.extend(result.get("validations") or [])
         all_non_modular.extend(result["non_modular"])
         all_alignment_conflicts.extend(result.get("alignment_conflicts") or [])
+        for absorption in result.get("residual_absorptions") or []:
+            all_residual_absorptions.append(dict(absorption, course_indices=list(course_indices)))
         all_door_void_violations.extend(result.get("door_void_violations") or [])
 
     # ETAPA 4D (regra #3, 2026-08-25): orientacao dos compensadores - roda
@@ -3463,6 +3573,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         "jamb_exceptions": all_jamb_exceptions,
         "non_modular": all_non_modular,
         "alignment_conflicts": all_alignment_conflicts,
+        "residual_absorptions": all_residual_absorptions,
         "door_void_violations": all_door_void_violations,
         # ATENCAO ao ler estas duas no relatorio: uma parede que aparece em
         # varias bandas (ex.: uma com janela - abaixo do peitoril, dentro
@@ -3569,6 +3680,31 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
 
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                      catalog, base_z_abs, num_courses, **kwargs):
+    """Wrapper de desempenho: com estrategia de reforco ativa, liga o memo de
+    preenchimento por parede (`wall_stepper.WALL_FILL_MEMO`, chave canonica das
+    entradas, resultado identico) so' durante esta chamada. Legado (None) nao
+    muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
+    from core.engine import wall_stepper as _stepper_memo
+    if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
+        return _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                       catalog, base_z_abs, num_courses, **kwargs)
+    _stepper_memo.WALL_FILL_MEMO = {}
+    _stepper_memo.OBB_MEMO = {}
+    _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
+    _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
+    try:
+        result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                         catalog, base_z_abs, num_courses, **kwargs)
+    finally:
+        _stepper_memo.WALL_FILL_MEMO = None
+        _stepper_memo.OBB_MEMO = None
+    if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
+        result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
+    return result
+
+
+def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                       variants_per_course=1,
@@ -3576,8 +3712,16 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                                       wall_start_cb=None, wall_result_cb=None,
                                       stage_cb=None, opening_strategy=None,
                                       arm_role_safe_repair=None, b19_residual_fill_repair=None,
-                                      tie_parity_search=None):
-    """SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
+                                      tie_parity_search=None, opening_reinforcement_strategy=None,
+                                      opening_reinforcement_policy=None):
+    """ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14): `opening_reinforcement_
+    strategy=None` (default) mantem o comportamento anterior, byte a byte.
+    "CHANNEL" roda, DEPOIS de todo o solve/reparos, o pos-passe de
+    core/engine/opening_reinforcement.py sobre as fiadas fisicas e grava o
+    plano/validacao em result["opening_reinforcement"]. Nao ha' default A/B:
+    campo ausente nao significa CHANNEL.
+
+    SAFE REPAIR - hook minimo (CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-
     CONTRACT, 2026-09-04). Wrapper fino sobre `_solve_building_blocks_all_
     courses_core` (a funcao original, inalterada - mesma docstring,
     mesmos parametros): roda o rebuild ORIGINAL uma vez, e entao chama
@@ -3624,6 +3768,20 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     enabled = ARM_ROLE_SAFE_REPAIR_ENABLED if arm_role_safe_repair is None else arm_role_safe_repair
     b19_enabled = (B19_RESIDUAL_FILL_REPAIR_ENABLED if b19_residual_fill_repair is None
                   else b19_residual_fill_repair)
+    # PASSAGEM LIVRE ATE' O TOPO (51.9, correcao P0 2026-09-14): decidida pela
+    # geometria ANTES do solve; o motor resolve com o vao estendido ate' o
+    # topo, entao as jambas sao recortadas pelo mesmo mecanismo do resto da
+    # altura da porta. O pos-passe recebe as aberturas ORIGINAIS.
+    original_openings_per_wall = openings_per_wall
+    free_to_top = _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                        num_courses, opening_reinforcement_strategy,
+                                        opening_reinforcement_policy)
+    if free_to_top:
+        from core.engine import opening_reinforcement as _reinforcement
+        openings_per_wall = _reinforcement.openings_extended_to_top(
+            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
+            passages=_reinforcement.continuous_free_passages(
+                walls_to_create, openings_per_wall, nodes, free_to_top, opening_reinforcement_policy))
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,
@@ -3654,8 +3812,21 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             result = parity_outcome["final_result"]
         result["tie_parity_search"] = {"flips": parity_outcome["flips"], "tried": parity_outcome["tried"]}
 
+    if opening_reinforcement_strategy is not None and result.get("error") is None:
+        channel_parity = _channel_tie_parity_trials(
+            nodes, walls_to_create, original_openings_per_wall, catalog, base_z_abs, num_courses, result,
+            _rebuild, opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top)
+        if channel_parity["changed"]:
+            result = channel_parity["final_result"]
+        result["channel_tie_parity_trials"] = {"accepted": channel_parity["accepted"],
+                                               "rejected": channel_parity["rejected"],
+                                               "timing": channel_parity.get("timing")}
+
     if not enabled or result.get("error") is not None:
-        return _record_unmodulated_walls(result, walls_to_create)
+        return _apply_opening_reinforcement(
+            _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
+            original_openings_per_wall, catalog, base_z_abs, num_courses,
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3687,7 +3858,347 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
-    return _record_unmodulated_walls(result, walls_to_create)
+    return _apply_opening_reinforcement(
+        _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
+        original_openings_per_wall, catalog, base_z_abs, num_courses,
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+
+
+CHANNEL_TRIAL_CHEAP_GATES = ("bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
+                             "compensator_consecutive", "stagger_below_target")
+
+
+def _channel_cheap_metrics(result, walls_to_create, catalog, num_courses):
+    """Gates que saem do resultado do motor sem planejar o CHANNEL."""
+    audits = result.get("wall_bond_audits") or {}
+    compensator_pairs, stagger_below = _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses)
+    return {
+        "bond_reproved": sum(1 for a in audits.values() if not a.get("ok")),
+        "continuous_joints": sum(1 for a in audits.values() for p in a.get("problems") or []
+                                 if "CONTINUOUS_VERTICAL_JOINT" in str(p)),
+        "non_modular": len(result.get("non_modular") or []),
+        "collisions": len(result.get("collisions") or []),
+        "door_void": len(result.get("door_void_violations") or []),
+        "compensator_consecutive": compensator_pairs,
+        "stagger_below_target": stagger_below,
+    }
+
+
+def _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                          policy, free_to_top, cheap=None):
+    """Plano + validacao CHANNEL provisorios (sem mutar `result`) e as
+    grandezas que a tentativa de paridade nao pode piorar."""
+    from core.engine import opening_reinforcement as _reinforcement
+    band = _free_to_top_band(catalog, base_z_abs)
+    plan = _reinforcement.plan_channel_reinforcement(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, band, num_courses,
+        base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
+    strip_cache = {}
+    validation = _reinforcement.validate_channel_reinforcement(
+        plan["course_candidates"], walls_to_create, openings_per_wall, band, num_courses, base_z_abs,
+        free_to_top=plan["free_to_top"], policy=plan["policy"],
+        reference_course_candidates=result.get("course_candidates"), nodes=nodes, strip_cache=strip_cache)
+    counts = validation["counts"]
+    error_codes = ("MISSING_REQUIRED_CHANNEL", "EXTRA_CHANNEL", "CHANNEL_WRONG_COURSE", "CHANNEL_INVADES_OPENING",
+                   "CHANNEL_COLLISION", "CHANNEL_OPENING_OVERCUT", "CHANNEL_FREE_TO_TOP_NOT_OPEN",
+                   "CHANNEL_ORPHAN_PIECE")
+    supports = {}
+    for rec in plan["openings"]:
+        for role in ("above", "below"):
+            side = rec.get(role) or {}
+            if side.get("status") == "CHANNEL":
+                for key in ("l", "r"):
+                    supports[(rec["wall_idx"], rec["opening_index"], role, key)] = min(
+                        side["support_%s_cm" % key], side["bearing_%s_cm" % key])
+    metrics = dict(cheap) if cheap is not None else _channel_cheap_metrics(result, walls_to_create, catalog,
+                                                                             num_courses)
+    metrics.update({"plan": plan, "validation": validation,
+                    "errors": sum(counts.get(code, 0) for code in error_codes), "supports": supports})
+    return metrics
+
+
+def _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses, strip_cache=None):
+    """Grandezas de qualidade de junta que a tentativa de paridade nao pode
+    piorar, com as MESMAS definicoes da regua de benchmark (validate_
+    compensators / validate_prism): pares de compensadores encostados (folga
+    <= 5 cm) e juntas cujo vizinho mais proximo na fiada seguinte fica entre
+    1 e 10 cm (MIN_JOINT_STAGGER_TARGET_CM)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    courses = result.get("course_candidates") or {}
+    buckets = _reinforcement.course_wall_buckets(courses)
+    pairs = stagger = 0
+    for wall_idx in range(len(walls_to_create)):
+        joints_by_course = {}
+        for ci in range(num_courses):
+            rows = [r for r in _reinforcement.cached_strip_rows(strip_cache, "reference", buckets, ci, wall_idx,
+                                                                walls_to_create)
+                    if r["along"] and r["cand"].get("wall_idx") == wall_idx]
+            joints = []
+            for a, b in zip(rows, rows[1:]):
+                gap = b["lo"] - a["hi"]
+                entry_a = catalog.get(a["cand"].get("logical_code")) or {}
+                entry_b = catalog.get(b["cand"].get("logical_code")) or {}
+                if gap <= 5.0 and entry_a.get("is_compensator") and entry_b.get("is_compensator"):
+                    pairs += 1
+                if 0.0 <= gap <= 5.0:
+                    joints.append((a["hi"] + b["lo"]) / 2.0)
+            joints_by_course[ci] = joints
+        for ci in range(num_courses - 1):
+            upper = joints_by_course.get(ci + 1) or []
+            for joint in joints_by_course.get(ci) or []:
+                if upper:
+                    nearest = min(abs(joint - other) for other in upper)
+                    if 1.0 < nearest < MIN_JOINT_STAGGER_TARGET_CM:
+                        stagger += 1
+    return pairs, stagger
+
+
+def _channel_tie_parity_candidates(metrics, policy):
+    """Nos T cuja paridade deixou a canaleta com apoio GEOMETRICO entre 0,5 cm
+    e o limiar de conversao (9 cm) diante da amarracao TRANSVERSAL da parede
+    que chega - parando ali ou atravessando o T so' por falta de assentamento.
+    A travessia com a jamba na face (apoio geometrico <= 0,5, regra 51.6) nao
+    e' candidata. Ordem canonica."""
+    from core.engine import opening_reinforcement as _reinforcement
+    policy = _reinforcement.channel_policy(policy)
+    limit = policy["convert_along_tie_when_support_below_cm"]
+    found = {}
+    for rec in metrics["plan"]["openings"]:
+        for role in ("above", "below"):
+            side = rec.get(role) or {}
+            if side.get("status") != "CHANNEL":
+                continue
+            for key in ("l", "r"):
+                blocker = side.get("blocker_%s" % key)
+                support = side["support_%s_cm" % key]
+                if blocker and not blocker["along"] and blocker.get("node_index") is not None \
+                        and 0.5 < support < limit - 1e-6:
+                    found.setdefault(blocker["node_index"], (rec["wall_idx"], rec["opening_index"], role, key))
+    for crossing in metrics["plan"].get("node_crossings") or []:
+        if crossing.get("node_index") is not None and 0.5 < crossing.get("geometric_support_cm", 0.0) < limit:
+            found.setdefault(crossing["node_index"], (crossing["main_wall_idx"], crossing["opening_index"],
+                                                      "above" if crossing["role"] == "ABOVE_OPENING" else "below",
+                                                      None))
+    return [(node_index, found[node_index]) for node_index in sorted(found)]
+
+
+def _channel_tie_parity_trials(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                               result, rebuild_fn, strategy, policy, free_to_top):
+    """TENTATIVA DE PARIDADE DO CHANNEL (auditoria 2026-09-14, vao 6627438).
+
+    O humano, diante da amarracao transversal de um T a poucos cm da jamba,
+    usou a paridade OPOSTA do no' naquela fiada (a principal passa com a K34
+    ao longo sobre o no', apoio 39 cm). A conversao de amarracao ao longo
+    (51.7) so' existe quando a amarracao ao longo esta' la'; com a paridade do
+    motor a peca do no' e' transversal e a corrida parava com 4 cm. Aqui o
+    no' candidato tem a marca `_tie_parity_flip` invertida, o motor e'
+    RECONSTRUIDO (mesmo mecanismo de search_tie_parity) e o plano CHANNEL e'
+    refeito. Aceita so' se: o apoio daquele lado chega a >= 9 cm; nenhum outro
+    apoio de canaleta cai abaixo do preferencial (19 cm); erros do validador CHANNEL, paredes
+    reprovadas, juntas corridas, trechos nao modulares, colisoes, invasoes de
+    vao, compensadores encostados e desencontros abaixo do alvo nao aumentam
+    (BUTANTA: a inversao do no' de W018 foi rejeitada por +12 compensadores
+    encostados). Senao reverte. Evidencia conflitante registrada (6672349:
+    o humano parou com 4 cm) - por isso e' tentativa com gates, nunca regra."""
+    t_start = time.time()
+    timing = {"candidates": 0, "rebuilds": 0, "base_metrics_s": 0.0, "per_candidate": [], "total_s": 0.0}
+    empty = {"changed": False, "accepted": [], "rejected": [], "final_result": result, "timing": timing}
+    if strategy is None:
+        return empty
+    base = _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                 num_courses, policy, free_to_top)
+    timing["base_metrics_s"] = round(time.time() - t_start, 4)
+    result["_channel_metrics_cache"] = base
+    candidates = _channel_tie_parity_candidates(base, policy)
+    timing["candidates"] = len(candidates)
+    if not candidates:
+        timing["total_s"] = round(time.time() - t_start, 4)
+        return empty
+    from core.engine import opening_reinforcement as _reinforcement
+    min_support_cm = _reinforcement.channel_policy(policy)["min_support_cm"]
+    accepted, rejected = [], []
+    current, current_metrics = result, base
+    for node_index, target in candidates:
+        node = nodes[node_index]
+        node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+        t_rebuild = time.time()
+        trial = rebuild_fn()
+        timing["rebuilds"] += 1
+        t_metrics = time.time()
+        reason = None
+        metrics = None
+        if trial.get("error") is not None:
+            reason = "trial_error"
+        else:
+            # gates baratos primeiro (sem planejar): qualquer gate reprovado
+            # rejeita, entao a ordem so' muda QUAL motivo e' registrado.
+            cheap = _channel_cheap_metrics(trial, walls_to_create, catalog, num_courses)
+            for gate in CHANNEL_TRIAL_CHEAP_GATES:
+                if cheap[gate] > current_metrics[gate]:
+                    reason = "gate_{}:{}->{}".format(gate, current_metrics[gate], cheap[gate])
+                    break
+        if reason is None:
+            metrics = _channel_plan_metrics(trial, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                            num_courses, policy, free_to_top, cheap=cheap)
+            wall_idx, opening_index, role, key = target
+            keys = [(wall_idx, opening_index, role, k) for k in (("l", "r") if key is None else (key,))]
+            after = [metrics["supports"].get(k) for k in keys]
+            if any(v is None or v < 9.0 - 1e-6 for v in after):
+                reason = "target_support_not_reached:{}".format(after)
+            else:
+                if metrics["errors"] > current_metrics["errors"]:
+                    reason = "gate_errors:{}->{}".format(current_metrics["errors"], metrics["errors"])
+                if reason is None:
+                    for k, before in sorted(current_metrics["supports"].items()):
+                        now = metrics["supports"].get(k)
+                        if k in keys:
+                            continue
+                        # 19 cm e' preferencial: cair acima dele nao piora o reforco.
+                        if now is None or (now < before - 0.5 and now < min_support_cm - 1e-6):
+                            reason = "support_drop:{}:{}->{}".format(k, before, now)
+                            break
+        record = {"node_index": node_index, "wall_idx": target[0], "opening_index": target[1],
+                  "role": target[2], "side": target[3]}
+        timing["per_candidate"].append({"node_index": node_index, "rebuild_s": round(t_metrics - t_rebuild, 4),
+                                        "metrics_s": round(time.time() - t_metrics, 4)})
+        if reason is None:
+            current, current_metrics = trial, metrics
+            accepted.append(record)
+            trial["_channel_metrics_cache"] = metrics
+        else:
+            node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+            if not node["_tie_parity_flip"]:
+                node.pop("_tie_parity_flip", None)
+            rejected.append(dict(record, reason=reason))
+    timing["total_s"] = round(time.time() - t_start, 4)
+    return {"changed": bool(accepted), "accepted": accepted, "rejected": rejected, "final_result": current,
+            "timing": timing}
+
+
+def _free_to_top_band(catalog, base_z_abs):
+    step, _error = _course_height_ft(catalog, None)
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+    return _band
+
+
+def _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                          strategy, policy):
+    """Decisoes de passagem livre (so' CHANNEL). None/estrategia desconhecida
+    -> [] (a estrategia desconhecida continua sendo rejeitada no pos-passe)."""
+    if strategy is None:
+        return []
+    from core.engine import opening_reinforcement as _reinforcement
+    if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+        return []
+    step, _error = _course_height_ft(catalog, None)
+    if step is None:
+        return []
+    return _reinforcement.free_to_top_openings(
+        walls_to_create, openings_per_wall, nodes, _free_to_top_band(catalog, base_z_abs), num_courses,
+        base_z_abs, policy)
+
+
+def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                 base_z_abs, num_courses, strategy, policy=None, free_to_top=None):
+    """Pos-passe da estrategia de reforco. None devolve `result` intacto."""
+    if strategy is None:
+        return result
+    from core.engine import opening_reinforcement as _reinforcement
+    if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+        raise ValueError("estrategia de reforco de aberturas nao suportada: {!r}".format(strategy))
+    if result.get("error") is not None:
+        result["opening_reinforcement"] = {"strategy": strategy, "error": result.get("error")}
+        return result
+    step, height_error = _course_height_ft(catalog, result.get("candidates") or [])
+    if step is None:
+        result["opening_reinforcement"] = {"strategy": strategy, "error": height_error}
+        return result
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    t_plan = time.time()
+    # A tentativa de paridade ja' planejou e validou ESTE resultado (mesmo
+    # objeto: os reparos nao o substituiram) com as mesmas entradas - reaproveita.
+    cached = result.pop("_channel_metrics_cache", None)
+    if cached is not None and cached["plan"]["policy"] == _reinforcement.channel_policy(policy):
+        plan = dict(cached["plan"])
+    else:
+        cached = None
+        plan = _reinforcement.plan_channel_reinforcement(
+            result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
+            base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
+    t_validate = time.time()
+    result["course_candidates_before_reinforcement"] = result.get("course_candidates")
+    result["course_candidates"] = plan.pop("course_candidates")
+    if cached is not None:
+        plan["validation"] = cached["validation"]
+    else:
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+            free_to_top=plan["free_to_top"], policy=plan["policy"],
+            reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    t_audit = time.time()
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    result["wall_bond_audits_before_reinforcement"] = result.get("wall_bond_audits")
+    result["wall_bond_audits"] = audit_all_walls_bond_quality(
+        walls_to_create, result["course_candidates"], audit_catalog, num_courses,
+        openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    _unify_candidates_with_courses(result, _reinforcement)
+    plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
+                        "reaudit": round(time.time() - t_audit, 4)}
+    result["opening_reinforcement"] = plan
+    return result
+
+
+def _unify_candidates_with_courses(result, reinforcement_module):
+    """FONTE UNICA DE VERDADE depois do pos-passe (auditoria 2026-09-14):
+    `result["candidates"]` passa a ser o conjunto de pecas FISICAS distintas de
+    `course_candidates` (chave canonica, ordem por fiada/chave), e
+    `result["collisions"]` aponta para essa lista (pares herdados do solve cujas
+    duas pecas continuam existindo + pares que envolvem canaleta, medidos por
+    fiada). O estado anterior fica em `*_before_reinforcement`. So' roda com
+    estrategia de reforco: o legado continua byte a byte."""
+    key_of = reinforcement_module._physical_key
+    before = result.get("candidates") or []
+    result["candidates_before_reinforcement"] = before
+    result["collisions_before_reinforcement"] = result.get("collisions") or []
+    flat, index = [], {}
+    course_indices = {}
+    for ci in sorted(result.get("course_candidates") or {}):
+        for cand in result["course_candidates"][ci]:
+            key = key_of(cand)
+            if key not in index:
+                index[key] = len(flat)
+                flat.append(cand)
+            course_indices.setdefault(key, []).append(ci)
+    pairs = set()
+    for i, j in result["collisions_before_reinforcement"]:
+        if i < len(before) and j < len(before):
+            a, b = index.get(key_of(before[i])), index.get(key_of(before[j]))
+            if a is not None and b is not None and a != b:
+                pairs.add((min(a, b), max(a, b)))
+    for ci in sorted(result.get("course_candidates") or {}):
+        pieces = result["course_candidates"][ci]
+        channel = set(k for k, c in enumerate(pieces) if reinforcement_module.is_channel_code(c.get("logical_code")))
+        if not channel:
+            continue
+        rm = reinforcement_module
+        boxes = [rm._candidate_obb(c) for c in pieces]
+        aabbs = [rm._obb_aabb(b) for b in boxes]
+        for i, j in sorted(rm._collision_candidate_pairs(range(len(pieces)), aabbs, 0.0)):
+            if (i in channel or j in channel) and rm._obb_min_overlap(boxes[i], boxes[j]) > rm.BOND_COLLISION_EPS_FT:
+                a, b = index[key_of(pieces[i])], index[key_of(pieces[j])]
+                if a != b:
+                    pairs.add((min(a, b), max(a, b)))
+    result["candidates"] = flat
+    result["collisions"] = sorted(pairs)
+    return result
 
 
 def _record_unmodulated_walls(result, walls_to_create):
@@ -4334,6 +4845,17 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                     and _b19_node_has_covering_tie(
                         course_candidates.get(course_index) or [], nodes[node_index])):
                 continue
+            # EXCECAO CHANNEL (regra 51.6, 2026-09-14): na fiada em que a
+            # canaleta ATRAVESSA o T, a parede que chega termina com B19
+            # encostado na face da principal - medido no BUTANTA humano
+            # (8079833 e 8079837, fiadas 61 e 221: `B19 [460,479]` + canaleta
+            # transversal sobre o no'). Duas provas, como a de cima: a
+            # etiqueta da travessia E uma canaleta cobrindo fisicamente o
+            # MESMO no' na MESMA fiada.
+            if (code == HALF_BLOCK_CODE and placement_reason == "T_INTERSECTION_INCOMING_CHANNEL_ABUTMENT"
+                    and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
+                    and _channel_covers_node(course_candidates.get(course_index) or [], nodes[node_index])):
+                continue
             if code == HALF_BLOCK_CODE and tie_t_positions_cm:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):
                 # distancia do CORPO do B19 (nao so' do centro) ate' a
@@ -4472,6 +4994,29 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
         "alternating_strips": alternating_strips,
         "half_blocks_near_ties": half_blocks_near_ties,
     }
+
+
+def _channel_covers_node(items, node, tolerance_ft=None):
+    """True se alguma CANALETA de `items` (uma fiada fisica) cobre com o
+    corpo real o ponto do no' - prova geometrica da travessia de T."""
+    point = node.get("point") if isinstance(node, dict) else None
+    if point is None:
+        return False
+    tol = _cm_to_ft(0.5) if tolerance_ft is None else tolerance_ft
+    for c in items:
+        if not str(c.get("logical_code") or "").startswith("CHANNEL_"):
+            continue
+        origin, x_dir = c.get("origin_world"), c.get("x_dir")
+        if origin is None or x_dir is None:
+            continue
+        y_dir = c.get("y_dir") or _perp_dir(x_dir)
+        dx, dy = point.X - origin.X, point.Y - origin.Y
+        along = abs(dx * x_dir.X + dy * x_dir.Y)
+        across = abs(dx * y_dir.X + dy * y_dir.Y)
+        if (along <= _cm_to_ft(c["length_cm"]) / 2.0 + tol and
+                across <= _cm_to_ft(c.get("width_cm") or 14.0) / 2.0 + tol):
+            return True
+    return False
 
 
 def audit_all_walls_bond_quality(walls_to_create, course_candidates, catalog, num_courses,
@@ -5147,6 +5692,18 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                             t_mark = clock()
                             perf["mirror_s"] += t_mark - t_geometry
                             perf["mirror_calls"] += 1
+                        # Canaleta cortada (LENGTH_CUT): comprimento por
+                        # parametro de INSTANCIA. Se nao gravar, a peca criada
+                        # teria o comprimento errado - apaga e reporta falha.
+                        length_parameter = entry.get("length_parameter")
+                        instance_length_cm = cand.get("instance_length_cm")
+                        if length_parameter and instance_length_cm:
+                            param = instance.LookupParameter(length_parameter)
+                            if param is None or param.IsReadOnly or not param.Set(_cm_to_ft(instance_length_cm)):
+                                target_doc.Delete(instance.Id)
+                                raise ValueError("parametro de instancia '{}' nao gravado ({} cm)".format(
+                                    length_parameter, instance_length_cm))
+                            perf["length_param_calls"] = perf.get("length_param_calls", 0) + 1
                         stamped = False
                         if owner_uid_by_wall_idx is not None:
                             t_stamp = clock()
@@ -9124,6 +9681,32 @@ SETUP_THICKNESS_SCAN_MAX_LINES = 900
 
 REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 
+# ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14). (valor salvo, rotulo,
+# implementada). "NONE" = modulacao legada sem reforco e e' o DEFAULT
+# (auditoria independente 2026-09-14): CHANNEL so' com escolha EXPLICITA do
+# usuario - instalacao antiga, preferencia ausente/corrompida ou valor
+# desconhecido continuam no fluxo legado, sem exigir familia de canaleta. Uma
+# estrategia nao implementada aparece para deixar a expansao visivel, mas
+# bloqueia o botao executar.
+OPENING_REINFORCEMENT_UI_OPTIONS = (
+    ("NONE", "Sem reforco de aberturas (modulacao legada)", True),
+    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
+    ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
+)
+DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "NONE"
+
+
+def _opening_reinforcement_strategy_from_ui_value(value):
+    """Valor escolhido na tela -> `opening_reinforcement_strategy` do motor.
+    Ausente/desconhecido -> None (legado); nao implementado -> ValueError
+    (nunca vira estrategia silenciosamente)."""
+    for key, _label, implemented in OPENING_REINFORCEMENT_UI_OPTIONS:
+        if key == value:
+            if not implemented:
+                raise ValueError("estrategia de reforco de aberturas '{}' ainda nao implementada".format(value))
+            return None if key == "NONE" else key
+    return None
+
 
 class _SetupForm(Form):
     """Configuracao completa da execucao: Layer, espessuras, Nivel, altura
@@ -9156,8 +9739,8 @@ class _SetupForm(Form):
         # +80px em relacao aos 680 originais: a secao "6. Como gerar as
         # paredes" (rotulo + 2 opcoes) acrescentou 90px a' pilha da coluna
         # direita, que sem isso passaria a estourar a altura util.
-        self.Height = 760
-        self.MinimumSize = Size(880, 680)
+        self.Height = 830
+        self.MinimumSize = Size(880, 750)
         self.StartPosition = FORM_START_POSITION_CENTER_SCREEN
         self.BackColor = UI_BG
 
@@ -9270,8 +9853,28 @@ class _SetupForm(Form):
         self._thickness_list.BackColor = UI_SOFT
         self._thickness_list.ItemCheck += self._on_item_check
 
+        self._reinforcement_combo = ComboBox()
+        self._reinforcement_combo.Dock = DockStyle.Top
+        self._reinforcement_combo.Height = 26
+        self._reinforcement_combo.Font = _ui_font(10.0)
+        self._reinforcement_combo.DropDownStyle = ComboBoxStyle.DropDownList
+        remembered_reinforcement = defaults.get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+        selected_reinforcement = 0
+        for index, (key, label, _implemented) in enumerate(OPENING_REINFORCEMENT_UI_OPTIONS):
+            self._reinforcement_combo.Items.Add(label)
+            if key == remembered_reinforcement:
+                selected_reinforcement = index
+        self._reinforcement_combo.SelectedIndex = selected_reinforcement
+        self._reinforcement_combo.SelectedIndexChanged += self._on_changed
+
         # ordem de insercao = de baixo para cima (Dock.Top empilha ao
         # contrario da ordem em que os controles entram na colecao)
+        right.Controls.Add(self._reinforcement_combo)
+        right.Controls.Add(_build_section_label(
+            "7. Reforco de aberturas",
+            "CHANNEL: canaleta na fiada do topo do vao e sob o peitoril. Familias de canaleta "
+            "sao conferidas antes de calcular."
+        ))
         right.Controls.Add(self._wall_mode_panel)
         right.Controls.Add(_build_section_label(
             "6. Como gerar as paredes",
@@ -9502,6 +10105,10 @@ class _SetupForm(Form):
             problems.append("escolha o Nivel")
         if self._parsed_height_m() is None:
             problems.append("informe uma altura valida em metros (ex.: 2.80)")
+        reinforcement_option = self._selected_reinforcement_option()
+        if reinforcement_option is not None and not reinforcement_option[2]:
+            problems.append("reforco de aberturas '{}' ainda nao implementado - escolha CHANNEL".format(
+                reinforcement_option[0]))
 
         if problems:
             self._status.ForeColor = UI_WARN
@@ -9523,6 +10130,12 @@ class _SetupForm(Form):
         )
         _set_button_enabled(self._run_button, True)
         return True
+
+    def _selected_reinforcement_option(self):
+        combo = getattr(self, "_reinforcement_combo", None)
+        if combo is None or combo.SelectedIndex < 0:
+            return None
+        return OPENING_REINFORCEMENT_UI_OPTIONS[combo.SelectedIndex]
 
     # ------------------------------------------------------------ eventos
     def _on_layer_changed(self, sender, args):
@@ -9560,6 +10173,8 @@ class _SetupForm(Form):
                           else WALL_BUILD_MODE_SEGMENTED),
             "reference_layer": (None if self._reference_combo.SelectedIndex <= 0
                                 else str(self._reference_combo.SelectedItem)),
+            "opening_reinforcement": (self._selected_reinforcement_option() or
+                                      (DEFAULT_OPENING_REINFORCEMENT_UI_VALUE,))[0],
         }
         self.Close()
 
@@ -9602,6 +10217,7 @@ def _remember_setup_defaults(setup):
                 "openings_mode": setup.get("openings_mode"),
                 "wall_mode": setup.get("wall_mode"),
                 "reference_layer": setup.get("reference_layer"),
+                "opening_reinforcement": setup.get("opening_reinforcement"),
             }, handle)
     except Exception:
         pass
@@ -10349,6 +10965,12 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.wall_height_ft = 0.0
         self.catalog = {}
         self.catalog_missing = []
+        # Estrategia de reforco de aberturas (2026-09-14): None = legado
+        # (sem reforco); "CHANNEL" exige `channel_catalog` carregado por
+        # load_channel_family_catalog. Nunca inferida por familia presente.
+        self.opening_reinforcement_strategy = None
+        self.opening_reinforcement_policy = None
+        self.channel_catalog = {}
         # estado mutavel, atualizado a cada passo concluido
         self.error_rows = []
         self.pending_zoom_ids = []
@@ -10410,6 +11032,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._solve_building_blocks = solve_building_blocks
         self._solve_building_blocks_all_courses = solve_building_blocks_all_courses
         self._create_building_blocks = create_building_blocks
+        self._load_channel_family_catalog = load_channel_family_catalog
+        self.channel_catalog_missing = []
         self._discover_previous_lot = _discover_previous_lot
         self._num_courses_for_wall_height = num_courses_for_wall_height
         self._OverrideGraphicSettings = OverrideGraphicSettings
@@ -10534,12 +11158,14 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
+                self._ensure_opening_reinforcement_catalog(app_doc)
                 with _perf.span("_execute_solve"):
                     self._execute_solve()
             elif action == "create":
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
+                self._ensure_opening_reinforcement_catalog(app_doc)
                 with _perf.span("_execute_create", esperados=sum(
                         len(v) for v in ((self.solve_result or {})
                                          .get("course_candidates") or {}).values())):
@@ -10916,6 +11542,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 band_cb=cbs.get("band_cb"), progress_cb=cbs.get("progress_cb"),
                 wall_start_cb=cbs.get("wall_start_cb"), wall_result_cb=cbs.get("wall_result_cb"),
                 stage_cb=cbs.get("stage_cb"),
+                opening_reinforcement_strategy=self.opening_reinforcement_strategy,
+                opening_reinforcement_policy=self.opening_reinforcement_policy,
             )
         self.solve_result["num_courses"] = num_courses
         if self.controlled_beta:
@@ -10933,8 +11561,39 @@ class _PostCreationEventHandler(IExternalEventHandler):
                       for line, thickness, locks in self.walls_to_create)
         openings = tuple(tuple(tuple(op) for op in wall) for wall in self.openings_per_wall)
         catalog = tuple((code, entry.get("length_cm"), entry.get("width_cm"), entry.get("height_cm"),
-                         id(entry.get("symbol"))) for code, entry in sorted(self.catalog.items()))
-        return walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level)
+                         id(entry.get("symbol"))) for code, entry in sorted(self._creation_catalog().items()))
+        return (walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level),
+                self.opening_reinforcement_strategy)
+
+    def _ensure_opening_reinforcement_catalog(self, app_doc):
+        """VALIDACAO DE FAMILIAS antes de calcular/criar (CHANNEL): carrega o
+        catalogo de canaletas uma vez e BLOQUEIA com a lista exata do que
+        falta - nenhuma peca e' criada e nada e' substituido por familia
+        parecida. Roda dentro do Execute (contexto de API valido)."""
+        strategy = self.opening_reinforcement_strategy
+        if not strategy:
+            return
+        from core.engine import opening_reinforcement as _reinforcement
+        if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+            raise ValueError("Estrategia de reforco de aberturas '{}' nao implementada.".format(strategy))
+        if not self.channel_catalog or self.channel_catalog_missing:
+            self.channel_catalog, self.channel_catalog_missing = self._load_channel_family_catalog(app_doc)
+        if self.channel_catalog_missing:
+            raise ValueError(
+                "CHANNEL BLOQUEADO antes de calcular/criar - familia(s)/tipo(s) de canaleta faltando no "
+                "projeto: {}. Carregue as familias e rode de novo.".format("; ".join(
+                    "{} = '{}' / '{}' ({})".format(item["logical_code"], item["family_name"],
+                                                   item["type_name"], item["reason"])
+                    for item in self.channel_catalog_missing)))
+
+    def _creation_catalog(self):
+        """Catalogo usado na CRIACAO: o fixo + canaletas quando a estrategia
+        CHANNEL esta' ativa (o solver de preenchimento nunca ve canaletas)."""
+        if not self.opening_reinforcement_strategy:
+            return self.catalog
+        merged = dict(self.catalog)
+        merged.update(self.channel_catalog or {})
+        return merged
 
     def _require_current_beta_solve(self):
         if (self.solve_result or {}).get("beta_input_signature") != self._beta_input_signature():
@@ -11179,7 +11838,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
                 create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
             self.create_result = self._create_building_blocks(
-                app_doc, candidates, self.catalog, self.base_z_abs,
+                app_doc, candidates, self._creation_catalog(), self.base_z_abs,
                 self.selected_level, num_courses, course_candidates=course_candidates,
                 progress_cb=cbs.get("progress_cb"), stage_cb=stage_cb,
                 **create_options
@@ -12572,7 +13231,8 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
                                wall_error_rows, catalog=None, catalog_missing=None,
                                wall_segment_geometry=None, initial_solve_result=None,
                                initial_create_result=None, precreated_event=None,
-                               precreated_handler=None, created_cuts_by_axis=None):
+                               precreated_handler=None, created_cuts_by_axis=None,
+                               opening_reinforcement_strategy=None):
     """Cria o ExternalEvent + handler (_PostCreationEventHandler) e mostra a
     janela unica de modulacao (_PostCreationForm) - guarda a referencia em
     _ACTIVE_MODELESS_WINDOWS pelo mesmo motivo/cuidado documentado no topo
@@ -12641,6 +13301,11 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     handler.wall_height_ft = wall_height_ft
     handler.catalog = catalog
     handler.catalog_missing = catalog_missing
+    # Estrategia escolhida na Tela de Configuracao DESTA execucao, recebida
+    # do chamador - nunca relida do disco (a preferencia salva so' pre-seleciona
+    # o combo). Sem escolha explicita (fluxo de paredes existentes, tela
+    # antiga) = None = legado.
+    handler.opening_reinforcement_strategy = opening_reinforcement_strategy
     handler.error_rows = wall_error_rows
     handler.solve_result = initial_solve_result
     handler.create_result = initial_create_result
@@ -17000,7 +17665,9 @@ def main():
                     selected_level, base_z_abs, wall_height_ft, wall_error_rows,
                     catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
                     precreated_event=stage2_external_event, precreated_handler=stage2_handler,
-                    created_cuts_by_axis=created_cuts_by_axis
+                    created_cuts_by_axis=created_cuts_by_axis,
+                    opening_reinforcement_strategy=_opening_reinforcement_strategy_from_ui_value(
+                        setup.get("opening_reinforcement"))
                 )
             except Exception as ex:
                 # NUNCA mostrar `summary` (o resumo da Etapa 1, "tudo certo")

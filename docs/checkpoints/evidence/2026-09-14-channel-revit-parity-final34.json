@@ -1,0 +1,41 @@
+{
+ "equal": true,
+ "offline_pieces": 7222,
+ "offline_signature": "112ccde5e2543401e059f5db129cf97e67590c2ba97e986bee44039bd35e5b4b",
+ "offline_validation": {
+  "CHANNEL_COLLISION": 0,
+  "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+  "CHANNEL_INVADES_OPENING": 0,
+  "CHANNEL_OPENING_OVERCUT": 0,
+  "CHANNEL_ORPHAN_PIECE": 0,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 3,
+  "CHANNEL_WRONG_COURSE": 0,
+  "EXTRA_CHANNEL": 0,
+  "MISSING_REQUIRED_CHANNEL": 1,
+  "channel_bottom_expected": 23,
+  "channel_bottom_matched": 22,
+  "channel_cut_pieces": 6,
+  "channel_pieces": 321,
+  "channel_top_expected": 40,
+  "channel_top_matched": 40
+ },
+ "revit_pieces": 7222,
+ "revit_signature": "112ccde5e2543401e059f5db129cf97e67590c2ba97e986bee44039bd35e5b4b",
+ "revit_validation": {
+  "CHANNEL_COLLISION": 0,
+  "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+  "CHANNEL_INVADES_OPENING": 0,
+  "CHANNEL_OPENING_OVERCUT": 0,
+  "CHANNEL_ORPHAN_PIECE": 0,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 3,
+  "CHANNEL_WRONG_COURSE": 0,
+  "EXTRA_CHANNEL": 0,
+  "MISSING_REQUIRED_CHANNEL": 1,
+  "channel_bottom_expected": 23,
+  "channel_bottom_matched": 22,
+  "channel_cut_pieces": 6,
+  "channel_pieces": 321,
+  "channel_top_expected": 40,
+  "channel_top_matched": 40
+ }
+}

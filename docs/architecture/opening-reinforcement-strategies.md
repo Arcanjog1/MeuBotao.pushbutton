@@ -4,6 +4,8 @@ Base: 6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9.
 [Decisão](../decisions/DECISION-OPENING-REINFORCEMENT.md) ·
 [Evidências](../../reference_projects/COMPARISON.md).
 
+> 2026-09-14: a estratégia B foi implementada como candidato opt-in — ver [channel-strategy-implementation.md](channel-strategy-implementation.md). Este documento continua a proposta de contrato.
+
 ## Arquitetura atual e fronteiras
 
 wall_modeling.py orquestra solve_building_blocks_all_courses,

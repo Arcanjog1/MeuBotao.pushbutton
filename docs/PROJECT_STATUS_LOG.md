@@ -1754,3 +1754,39 @@ fill|tie residual é NÓ|FILL(A) × NÓ|FILL(B) de nós diferentes encostados;
 regra 33.9 (paridade por restrição XOR, T/X pela marca 11.12, canto L livre/
 aresta isolada pela troca de arms + pino). TP1 48 → 16, TGD 245 → 53;
 fill|tie entre nós distintos 0/0. Sem MCP, sem Revit, sem merge.
+
+## 2026-09-14 — estratégia CHANNEL (canaletas), BUTANTÃ humano × cru no Revit real
+
+[Checkpoint](checkpoints/2026-09-14-butanta-channel-implementation.md). Main observada
+`0e41c8e` (#39 mesclado). Branch `claude/butanta-channel-reference-implementation`:
+pós-passe CHANNEL opt-in (regra 51), validado offline (34 paredes) e no Revit real
+(escada 1→34, 7.229 peças, idempotência, paridade exata). HUMANO somente leitura.
+Sem merge; LINTEL não iniciado.
+
+## 2026-09-14 — fechamento CHANNEL, PR #40 ready for review
+
+[Checkpoint](checkpoints/2026-09-14-channel-ready-closure.md). Main observada
+`0e41c8e`. HEAD avaliado `f918c1c`: decisões A–F, regra 30.8 (folga residual
+entre nós + regra #2 nos trechos absorvidos), pastilha de jamba por ruído,
+apoio efetivo, travessia de T como SUPPORTED_PATTERN, UI e bloqueio por família.
+MISSING 0, ACTUAL_ERROR 0, Revit 34 paredes 7.416→7.416. Regressão 4 failed /
+1161 passed classificadas. Sem merge; verga/contraverga não iniciada.
+
+## 2026-09-14 — CHANNEL: correções da auditoria independente (PR #40)
+
+[Checkpoint](checkpoints/2026-09-14-channel-audit-fixes.md). Main observada `0e41c8e`.
+O veredito READY anterior foi revogado pela auditoria. HEAD `612f9f3` (código
+`8019ce2`): 30.8 e tolerância da pastilha desligadas (legado = main no corpus e
+no Revit), FREE_TO_TOP resolvido antes do solve, paridade do nó T para 6627438,
+UI default NONE, chaves canônicas, `candidates` unificado, comparador endurecido
+(0 ACTUAL_ERROR, 0 WORSE), Revit 34 paredes 7.238→7.238, regressão 3/1191 =
+main. Sem merge; verga/contraverga não iniciada.
+
+## 2026-09-14 — CHANNEL: fechamento final e merge do PR #40
+
+[Checkpoint](checkpoints/2026-09-14-channel-final-merge.md). Main observada `0e41c8e`.
+Passagem livre contínua de face de nó a face de nó (decisão do usuário, detecção
+geométrica), 30.8 desligada (7719511 limitação), off-grid e cinta de topo
+pendentes. Solve CHANNEL no Revit 44,6 s → 24,2 s com resultado idêntico.
+0 ACTUAL_ERROR / 0 WORSE / 0 NORMATIVE_DECISION; Revit 7.222→7.222; legado =
+main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.

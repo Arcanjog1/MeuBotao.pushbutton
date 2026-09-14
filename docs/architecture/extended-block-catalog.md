@@ -2,6 +2,8 @@
 STATUS: PROPOSED / PENDING USER APPROVAL. Produção intacta.
 [Estratégias](opening-reinforcement-strategies.md) · [Mapping](revit-family-mapping.md).
 
+> 2026-09-14: `CHANNEL_U_39/_34/_19/_CUT` implementados (candidato) com `LENGTH_CUT` por parâmetro de instância — [implementação](channel-strategy-implementation.md). Demais grupos continuam propostos.
+
 ## Catálogo lógico ↔ realização no documento
 
 Tipo lógico define geometria/capacidades/restrições; FamilyMapping resolve

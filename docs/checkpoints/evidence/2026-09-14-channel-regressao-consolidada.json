@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-09-14T04:38:06.448732+00:00",
+  "cwd": "C:\\Users\\twitc\\Documents\\butanta-channel\\MeuBotao.pushbutton",
+  "head": "26cf5d2e1419cdaa988cefa6a78c919afad902da",
+  "tree": "0a7fbca4931f796d9f20fbff8bed6739768ccd39",
+  "status_before": "?? docs/checkpoints/evidence/2026-09-14-channel-bench-1.json\n?? docs/checkpoints/evidence/2026-09-14-channel-bench-10.json\n?? docs/checkpoints/evidence/2026-09-14-channel-bench-20.json\n?? docs/checkpoints/evidence/2026-09-14-channel-bench-3.json\n?? docs/checkpoints/evidence/2026-09-14-channel-bench-34.json\n?? docs/checkpoints/evidence/2026-09-14-channel-bench-5.json\n?? docs/checkpoints/evidence/2026-09-14-channel-human-runs.json\n?? docs/checkpoints/evidence/2026-09-14-channel-human-vs-solver.json",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 7200,
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "regressao-consolidada-26cf5d2.txt",
+  "pid": 21096,
+  "exit_code": 1,
+  "elapsed_seconds": 2225.942,
+  "status_after": "",
+  "log_sha256": "424669bdc78919297d8e305feb96e5dfbe4fecf960c364d3375935dee57b09c2"
+}

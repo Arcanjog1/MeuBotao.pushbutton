@@ -1,0 +1,113 @@
+..F......F.............................................................. [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 17%]
+........................................................................ [ 23%]
+........................................................................ [ 29%]
+........................................................................ [ 35%]
+........................................................................ [ 41%]
+........................................................................ [ 47%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+...................................................................F.... [ 71%]
+........................................................................ [ 77%]
+........................................................................ [ 83%]
+........................................................................ [ 89%]
+........................................................................ [ 95%]
+.........................................................                [100%]
+================================== FAILURES ===================================
+_____ test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1] ______
+
+project_id = 'torre_easy_lo_r00_tp1'
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("project_id", PROJECTS)
+    def test_projeto_nao_regrediu_contra_o_baseline(project_id):
+        baseline = _baseline(project_id)
+        if baseline is None:
+            pytest.skip("{0} ainda nao tem baseline.json".format(project_id))
+    
+        outcome = runner.run_project(project_id, write_files=False)
+        delta = scoring.compare_runs(baseline, outcome["score"])
+    
+>       assert delta["verdict"] != scoring.STATUS_CRITICAL_REGRESSION, (
+            "REGRESSAO CRITICA em {0}: {1}".format(
+                project_id,
+                [row for row in delta["critical"]
+                 if row["status"] == scoring.STATUS_CRITICAL_REGRESSION])
+        )
+E       AssertionError: REGRESSAO CRITICA em torre_easy_lo_r00_tp1: [{'code': 'JUNCTION_MISSING_BINDING', 'before': 8, 'after': 9, 'delta': 1, 'status': 'REGRESSAO CRITICA'}]
+E       assert 'REGRESSAO CRITICA' != 'REGRESSAO CRITICA'
+E        +  where 'REGRESSAO CRITICA' = scoring.STATUS_CRITICAL_REGRESSION
+
+tests\regression\test_benchmark_baselines.py:68: AssertionError
+_ test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2] _
+
+project_id = 'torre_easy_lo_r00_tgd', version = 'v2'
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("project_id,version", VERSIONED)
+    def test_projeto_nao_regrediu_contra_o_baseline_versionado(project_id, version):
+        """Mesma regra do teste V1, contra a regua VERSIONADA (ex.: `v2` =
+        topologia do motor ATUAL, FASE A regenerada em 2026-09-12). A V1 (raiz)
+        continua sendo medida pelo teste acima - HISTORICAL, nunca regravada."""
+        baseline = _baseline(project_id, version)
+        assert baseline is not None, (project_id, version)
+    
+        outcome = runner.run_project(project_id, write_files=False, version=version)
+        delta = scoring.compare_runs(baseline, outcome["score"])
+    
+        assert delta["verdict"] != scoring.STATUS_CRITICAL_REGRESSION, (
+            "REGRESSAO CRITICA em {0}/{1}: {2}".format(
+                project_id, version,
+                [row for row in delta["critical"]
+                 if row["status"] == scoring.STATUS_CRITICAL_REGRESSION])
+        )
+        regressoes = [row for row in delta["categories"]
+                      if row["status"] == scoring.STATUS_REGRESSED]
+>       assert not regressoes, (
+            "REGRESSAO em {0}/{1}: {2}".format(project_id, version, regressoes))
+E       AssertionError: REGRESSAO em torre_easy_lo_r00_tgd/v2: [{'category': 'compensators', 'before': 61, 'after': 62, 'delta': 1, 'status': 'REGRESSAO'}]
+E       assert not [{'category': 'compensators', 'before': 61, 'after': 62, 'delta': 1, ...}]
+
+tests\regression\test_benchmark_baselines.py:124: AssertionError
+___________ test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas ___________
+
+tmp_path = WindowsPath('C:/Users/twitc/AppData/Local/Temp/pytest-of-twitc/pytest-18/test_retencao_nativa_de_gil_di0')
+
+    def test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas(tmp_path):
+        """CONTROLE POSITIVO: `ctypes.PyDLL` (ao contrario de `WinDLL`) NAO
+        libera a GIL na chamada estrangeira - e' o analogo exato da hipotese
+        sobre o congelamento no Revit. O amostrador tem de acordar, medir o
+        salto e despejar as pilhas.
+    
+        NAO distingue as duas versoes do laco (a antiga tambem passa aqui - o
+        endurecimento da ordem medir/checar fecha uma corrida de encerramento
+        que este teste nao exercita). O que ele distingue, junto com o controle
+        negativo acima, e' o que importa: trabalho Python pesado nao dispara,
+        retencao nativa dispara."""
+        alvo = _preparar(tmp_path, limiar=0.3)
+        try:
+            # PORTABILIDADE (2026-09-12): a retencao nativa e' a mesma ideia em
+            # qualquer SO - uma chamada estrangeira via `PyDLL` (GIL retida) que
+            # dorme 900ms. No Windows e' `kernel32.Sleep(ms)`; fora dele
+            # `libc.usleep(us)`. Ate' entao o teste so' abria `kernel32` e
+            # quebrava em Linux com OSError - falha de portabilidade do teste,
+            # nunca do amostrador nem do solver.
+            if sys.platform == "win32":
+>               nativo = ctypes.PyDLL("kernel32", use_last_error=True)
+                         ^^^^^^
+E               UnboundLocalError: cannot access local variable 'ctypes' where it is not associated with a value
+
+tests\test_perf_trace_stall_sampler.py:96: UnboundLocalError
+============================== warnings summary ===============================
+tests/test_script.py::test_log_salva_com_acento_sem_quebrar
+  C:\Users\twitc\Documents\butanta-channel\MeuBotao.pushbutton\nuvem\core\wall_modeling.py:8968: DeprecationWarning: codecs.open() is deprecated. Use open() instead.
+    with codecs.open(path, "w", "utf-8") as log_file:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+FAILED tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas
+3 failed, 1206 passed, 1 warning in 2123.49s (0:35:23)

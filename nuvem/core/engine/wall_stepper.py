@@ -109,7 +109,9 @@ __all__ = [
     "describe_opening_jamb_exception", "_pier_codes_by_len_desc",
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
-    "_pier_remaining_snapped_cm", "_pier_ordered_layout",
+    "_pier_remaining_snapped_cm", "_pier_ordered_layout", "_absorbed_segment_rule2_layout",
+    "WALL_FILL_MEMO", "WALL_FILL_MEMO_STATS", "OBB_MEMO",
+    "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
     "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
@@ -564,13 +566,34 @@ def _obb_overlap(obb_a, obb_b, tolerance_ft=0.0):
     return _obb_min_overlap(obb_a, obb_b) > tolerance_ft
 
 
+# MEMO DE OBB (2026-09-14, desempenho do CHANNEL): o mesmo retangulo de uma
+# peca e' recalculado em cada validacao de parede. Com o memo ativo (mesma vida
+# de WALL_FILL_MEMO), OBBs sao reaproveitados pela tupla EXATA dos valores que
+# os definem (origem, comprimento, largura, eixos) - geometria identica, sem id()
+# e sem gravar nada no dict da peca. None = desligado.
+OBB_MEMO = None
+
+
 def _candidate_obb(candidate):
-    return _obb_2d(
-        candidate["origin_world"],
-        _cm_to_ft(candidate["length_cm"]) / 2.0,
-        _cm_to_ft(candidate["width_cm"]) / 2.0,
-        candidate["x_dir"], candidate["y_dir"],
-    )
+    memo = OBB_MEMO
+    if memo is None:
+        return _obb_2d(
+            candidate["origin_world"],
+            _cm_to_ft(candidate["length_cm"]) / 2.0,
+            _cm_to_ft(candidate["width_cm"]) / 2.0,
+            candidate["x_dir"], candidate["y_dir"],
+        )
+    origin = candidate["origin_world"]
+    x_dir = candidate["x_dir"]
+    y_dir = candidate["y_dir"]
+    key = (origin.X, origin.Y, origin.Z, candidate["length_cm"], candidate["width_cm"],
+           x_dir.X, x_dir.Y, x_dir.Z, y_dir.X, y_dir.Y, y_dir.Z)
+    obb = memo.get(key)
+    if obb is None:
+        obb = _obb_2d(origin, _cm_to_ft(candidate["length_cm"]) / 2.0, _cm_to_ft(candidate["width_cm"]) / 2.0,
+                      x_dir, y_dir)
+        memo[key] = obb
+    return obb
 
 
 def _cell_obb(cell_world, x_dir, y_dir):
@@ -5991,6 +6014,67 @@ def _continuous_segment_layout(pier_cm, catalog, leading_joint_cm, trailing_join
     return best
 
 
+def _absorbed_segment_rule2_layout(layout, pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
+                                   seg_start_cm, opening_intervals_cm, opposite_joints_cm,
+                                   allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                   leading_is_open=False, trailing_is_open=False):
+    """Regra 30.8, complemento (2026-09-14): a Fiada A (variante 0) de um
+    trecho que SO' fecha por causa da absorcao de folga entre nos nao aceita
+    o guloso com compensadores em sequencia (regra #2) quando existe outra
+    composicao VALIDA do MESMO trecho com menos excesso.
+
+    Por que so' aqui: o guloso da Fiada A nunca olha a regra #2 (a Fiada B
+    sim, ver `_pier_layout_avoiding_joints`). Num trecho entre dois nos em
+    que o miolo pede tres acertos (BUTANTA 1o PAV, anel 115 x 86 cm: miolo de
+    64 cm = B39 + C09 + C09 + C04) o guloso empilha os tres contra o no', a
+    Fiada B - deslocada de 20 cm pelo papel alternado dos cantos - so' tem
+    composicoes sem junta coincidente que tambem terminam com compensador
+    contra o no' oposto, e os dois acertos ficam um sobre o outro em TODAS as
+    fiadas (REPEATED_VERTICAL_COMPENSATOR_STRIP). Com C09 + B39 + C09 + C04 na
+    Fiada A a Fiada B fecha sem junta coincidente e sem faixa. Trechos que ja'
+    fechavam sem absorcao ficam exatamente como eram.
+
+    Candidatos: o proprio `_pier_ordered_layout` com cada codigo como
+    primeiro bloco (mesmas regras de tier/B19) e os bypass de tier. Criterio
+    (menor e' melhor): excesso da regra #2, juntas coincidentes com os nos da
+    fiada oposta (so' as que sobrevivem ao recorte dos vaos), numero de pecas
+    de acerto. So' troca com ganho ESTRITO no excesso sem piorar a
+    coincidencia."""
+    if layout is None:
+        return None
+
+    def _score(candidate):
+        coincide = _count_joint_coincidences_cm(
+            _layout_joints_surviving_openings_cm(candidate, seg_start_cm, opening_intervals_cm),
+            opposite_joints_cm) if opposite_joints_cm else 0
+        return (_layout_compensator_run_excess(candidate, catalog), coincide,
+                sum(1 for code, _a, _b in candidate if _is_acerto_code(code, catalog)))
+
+    best, best_score = layout, _score(layout)
+    if best_score[0] == 0:
+        return layout
+    alternatives = list(_pier_forced_bypass_layouts(
+        pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
+        allow_compensators=allow_compensators,
+        leading_is_open=leading_is_open, trailing_is_open=trailing_is_open))
+    codes = _pier_codes_by_len_desc(catalog, allow_compensators, pool=OPENING_JAMB_BLOCK_CODES)
+    if not leading_is_open:
+        codes = [code for code in codes if code != HALF_BLOCK_CODE]
+    for code in codes:
+        alternatives.append(_pier_ordered_layout(
+            pier_cm, catalog, leading_joint_cm, trailing_joint_cm, first_code=code,
+            allow_compensators=allow_compensators,
+            leading_open_override=leading_is_open, trailing_open_override=trailing_is_open))
+    for alternative in alternatives:
+        if alternative is None:
+            continue
+        score = _score(alternative)
+        if score[0] < best_score[0] and score[1] <= best_score[1] or (
+                score[0] == best_score[0] and score < best_score and best is not layout):
+            best, best_score = alternative, score
+    return best
+
+
 def _candidate_extents_on_wall(candidates, wall_p0, wall_dir):
     """[(t_start_cm, t_end_cm), ...] de `candidates` ao longo do eixo da
     parede, na MESMA ordem da lista de entrada e sempre com start <= end."""
@@ -6343,6 +6427,41 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
     }
 
 
+# Regra 30.8 (2026-09-14) - folga residual em trecho fechado por dois nos
+# (ver o uso em solve_wall_free_fill). 2,0 cm = maior folga medida no humano
+# (anel de shaft do BUTANTA: 1,0 cm na parede de 115, 2,0 cm nas de 86).
+# DESLIGADA por default desde a auditoria independente de 2026-09-14: ligada,
+# fecha paredes antes vazias do TGD mas a regua de benchmark acusa regressao
+# critica de COVERAGE_ROW_MOSTLY_EMPTY (V1 171 -> 232, V2 86 -> 92). O vao
+# 7719511 fica como limitacao conhecida da estrategia CHANNEL.
+RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False
+RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
+
+
+def _residual_node_bounded_absorption(pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open,
+                                      kind_left, kind_right, seg_start_cm, seg_end_cm):
+    """Regra 30.8 (ver solve_wall_free_fill): (seg_start, seg_end, pier, folga)
+    quando o trecho entre dois nos absorve a folga; None caso contrario."""
+    if not (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open and not trailing_is_open
+            and pier_cm > 0 and kind_left in ("WALL_START", "MIDSPAN_HI")
+            and kind_right in ("WALL_END", "MIDSPAN_LO")
+            and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
+        return None
+    lower_cm, _upper_cm = nearest_block_lengths_cm(pier_cm, lead_cm, trail_cm)
+    residual_cm = pier_cm - (lower_cm or 0.0)
+    if not (lower_cm and 0.0 < residual_cm <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM + 1e-6
+            and _pier_remaining_snapped_cm(lower_cm, lead_cm, trail_cm) is not None):
+        return None
+    return (seg_start_cm + residual_cm / 2.0, seg_end_cm - residual_cm / 2.0, lower_cm, residual_cm)
+
+
+def _interval_inside_any_span(a_cm, b_cm, spans):
+    for span_lo, span_hi in spans:
+        if a_cm >= span_lo - OPENING_OVERLAP_TOLERANCE_CM and b_cm <= span_hi + OPENING_OVERLAP_TOLERANCE_CM:
+            return True
+    return False
+
+
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -6446,6 +6565,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     jamb_exceptions = []
     non_modular = []
     alignment_conflicts = []
+    residual_absorptions = []
     # Diagnostico do pipeline "parede completa primeiro" - so' preenchidos
     # quando `continuous_first` (ver a docstring de `opening_strategy`).
     opening_cut_removals = []
@@ -6571,12 +6691,14 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
             # (L_CORNER_DEGRADED e familia): melhor uma solucao pior e
             # rotulada do que nenhuma solucao.
             non_modular_mark = len(non_modular)
+            residual_mark = len(residual_absorptions)
             alignment_mark = len(alignment_conflicts)
             active_boundaries = boundaries
             degraded_retry_done = False
             while True:
                 del candidates[variant_candidates_start:]
                 del non_modular[non_modular_mark:]
+                del residual_absorptions[residual_mark:]
                 del alignment_conflicts[alignment_mark:]
                 variant_seg_records = []
                 variant_joint_positions_cm = []
@@ -6720,6 +6842,30 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         })
                         continue
                     pier_cm = max(0.0, raw_pier_cm)
+                    # FOLGA RESIDUAL ENTRE DOIS NOS (regra 30.8, 2026-09-14):
+                    # trecho fechado dos DOIS lados por amarracao de no' (nunca
+                    # jamba de abertura, nunca ponta livre) que fica fora do
+                    # modulo por <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM usa
+                    # o comprimento modular INFERIOR e divide a folga igualmente
+                    # nas duas juntas de contorno. Medido no BUTANTA humano
+                    # (anel 115 x 86 cm): pecas a 0,5 cm das duas pontas na
+                    # parede de 115 (folga 1,0) e a 1,0 cm nas de 86 (folga 2,0);
+                    # sem isto o solver deixava o anel inteiro sem preenchimento.
+                    # IronPython (Revit): a logica fica numa funcao auxiliar - locais
+                    # novos nesta funcao gigante quebravam o `any(...)` com closure
+                    # do laco de degradacao ("Sequence contains no elements",
+                    # medido no Revit real 2026-09-14).
+                    absorption = _residual_node_bounded_absorption(
+                        pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open, kind_left, kind_right,
+                        seg_start_cm, seg_end_cm)
+                    absorbed_segment = absorption is not None
+                    if absorbed_segment:
+                        seg_start_cm, seg_end_cm, pier_cm = absorption[0], absorption[1], absorption[2]
+                        residual_absorptions.append({
+                            "wall_idx": wall_idx, "course": course, "variant_index": variant_index,
+                            "segment_index": seg_i, "residual_cm": round(absorption[3], 4),
+                            "seg_start_cm": round(seg_start_cm, 4), "seg_end_cm": round(seg_end_cm, 4),
+                        })
                     origin = p0 + wall_dir * _cm_to_ft(seg_start_cm)
 
                     if course == "A":
@@ -6777,6 +6923,12 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                                 alternativa, seg_start_cm, opening_intervals_cm),
                                             opposite_node_joints_cm) < colide:
                                         layout = alternativa
+                            if absorbed_segment:
+                                layout = _absorbed_segment_rule2_layout(
+                                    layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                                    opening_intervals_cm, opposite_node_joints_cm,
+                                    allow_compensators=allow_compensators,
+                                    leading_is_open=leading_is_open, trailing_is_open=trailing_is_open)
                         else:
                             # Variantes 1+ da PROPRIA familia A (secao 11.7):
                             # desencontram as juntas das variantes A anteriores
@@ -6951,12 +7103,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                 for oi, interval in enumerate(opening_intervals_cm):
                     a_cm = min(interval[0], interval[1])
                     b_cm = max(interval[0], interval[1])
-                    inside = any(
-                        a_cm >= span_lo - OPENING_OVERLAP_TOLERANCE_CM
-                        and b_cm <= span_hi + OPENING_OVERLAP_TOLERANCE_CM
-                        for span_lo, span_hi in variant_failed_spans
-                    )
-                    if inside:
+                    if _interval_inside_any_span(a_cm, b_cm, variant_failed_spans):
                         extra_boundaries.append((a_cm, "OPENING_LO", oi))
                         extra_boundaries.append((b_cm, "OPENING_HI", oi))
                 if not extra_boundaries:
@@ -7021,6 +7168,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     return {
         "candidates": candidates, "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular, "alignment_conflicts": alignment_conflicts,
+        "residual_absorptions": residual_absorptions,
         # Diagnostico do pipeline "parede completa primeiro" (vazio no modo
         # historico): quais pecas o recorte derrubou e quais regioes
         # precisaram ser recalculadas por causa disso.
@@ -8640,6 +8788,57 @@ def _rebase_node_indexes_for_wall(node_candidates_by_wall_end, node_midspan_by_w
     return by_end, midspan
 
 
+# MEMO DE PREENCHIMENTO POR PAREDE (2026-09-14, desempenho do CHANNEL). Ativado
+# so' pelo chamador (wall_modeling, estrategia CHANNEL) durante UMA chamada de
+# solve: as reconstrucoes da tentativa de paridade repetem o solve inteiro e so'
+# as paredes dos nos invertidos mudam de entrada. `solve_wall_free_fill` e' uma
+# funcao das entradas explicitas abaixo; a chave e' o `repr` EXATO delas (sem
+# arredondamento, sem id(), sem ordem de dict), e o resultado volta CLONADO -
+# um acerto devolve exatamente o que a funcao calcularia. None = desligado.
+WALL_FILL_MEMO = None
+WALL_FILL_MEMO_STATS = {"hits": 0, "misses": 0}
+
+
+def _plain_clone(value):
+    """Copia do resultado de `solve_wall_free_fill` em TRES niveis: o dict, cada
+    lista dele e cada dict dessas listas (candidatos, trechos, excecoes). Os
+    consumidores so' estendem essas listas e trocam chaves desses dicts; campos
+    aninhados de candidato (cells_world, XYZ, tuplas) nunca sao mutados in
+    place no motor (conferido por busca), entao ficam compartilhados."""
+    out = {}
+    for key, item in value.items():
+        if isinstance(item, list):
+            out[key] = [dict(x) if isinstance(x, dict) else x for x in item]
+        elif isinstance(item, dict):
+            out[key] = dict(item)
+        else:
+            out[key] = item
+    return out
+
+
+def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg, midspan_arg,
+                        allow_compensators, variants_per_course, opening_strategy, seed):
+    parts = [repr(wall_idx), repr(len(walls_arg)), repr(allow_compensators), repr(variants_per_course),
+             repr(opening_strategy)]
+    line = walls_arg[wall_idx][0]
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    parts.append("|".join(repr(v) for v in (p0.X, p0.Y, p0.Z, p1.X, p1.Y, p1.Z, walls_arg[wall_idx][1])))
+    parts.append(repr(sorted(tuple(o) for o in (openings_arg[wall_idx] or []))))
+    for end_index in (0, 1):
+        node_index = end_to_node.get((wall_idx, end_index))
+        node = nodes[node_index] if node_index is not None else None
+        state = None
+        if node is not None:
+            state = sorted((k, repr(v)) for k, v in node.items() if k not in ("point", "arm_points"))
+        parts.append(repr((end_index, node_index, state)))
+        for course in ("A", "B"):
+            parts.append(repr((end_index, course, (by_end_arg or {}).get((wall_idx, end_index, course)))))
+    for course in ("A", "B"):
+        parts.append(repr((course, sorted(tuple(x) for x in (midspan_arg or {}).get((wall_idx, course), [])))))
+        parts.append(repr((course, list((seed or {}).get(course) or []))))
+    return "\n".join(parts)
+
+
 def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_wall,
                              catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                              plan_hook=None,
@@ -8765,6 +8964,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
     # que a lista cresce (ver _placed_index_near_wall).
     placed_index = _placed_index_add(_placed_index_new(), all_candidates)
     jamb_exceptions = []
+    residual_absorptions = []
     non_modular = []
     alignment_conflicts = []
     per_wall = []
@@ -8838,16 +9038,27 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         )
 
         def _solve(walls_arg, openings_arg, by_end_arg, midspan_arg):
-            return solve_wall_free_fill(
+            seed = (cross_band_joint_seed or {}).get(wall_idx)
+            memo = WALL_FILL_MEMO
+            key = None
+            if memo is not None:
+                key = _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg,
+                                          midspan_arg, allow_compensators, variants_per_course,
+                                          opening_strategy, seed)
+                if key in memo:
+                    WALL_FILL_MEMO_STATS["hits"] += 1
+                    return _plain_clone(memo[key])
+            computed = solve_wall_free_fill(
                 wall_idx, walls_arg, nodes, end_to_node, openings_arg,
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
-                # CR-G12: a semente de fronteira de banda e' por PAREDE (as
-                # juntas sao coordenadas t do eixo DELA) - `None` para toda
-                # parede sem vizinha de outra banda ja' resolvida.
-                cross_band_joint_seed=(cross_band_joint_seed or {}).get(wall_idx),
+                cross_band_joint_seed=seed,
             )
+            if memo is not None:
+                WALL_FILL_MEMO_STATS["misses"] += 1
+                memo[key] = _plain_clone(computed)
+            return computed
 
         result = _solve(working_walls, working_openings, wall_by_end, wall_midspan)
         first_validation = validate_wall_modulation(
@@ -8946,6 +9157,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         jamb_exceptions.extend(result["jamb_exceptions"])
         non_modular.extend(result["non_modular"])
         alignment_conflicts.extend(result.get("alignment_conflicts") or [])
+        residual_absorptions.extend(result.get("residual_absorptions") or [])
         validations.append(validation)
         per_wall.append({
             "wall_idx": wall_idx,
@@ -8998,6 +9210,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular,
         "alignment_conflicts": alignment_conflicts,
+        "residual_absorptions": residual_absorptions,
         "collisions": collisions,
         "per_wall": per_wall,
         "validations": validations,

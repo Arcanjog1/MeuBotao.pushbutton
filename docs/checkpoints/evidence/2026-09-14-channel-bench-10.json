@@ -1,0 +1,91 @@
+{
+ "CHANNEL": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 34,
+   "COMPENSATOR_EXCESS_IN_RUN": 51,
+   "COMPENSATOR_VERTICAL_STRIP": 9,
+   "OPENING_MISSING_COUNTER_LINTEL": 9,
+   "OPENING_MISSING_LINTEL": 17,
+   "PRISM_STAGGER_BELOW_TARGET": 2
+  },
+  "bond_reproved_walls": 0,
+  "channel_findings": {
+   "CHANNEL_CUT_BELOW_OBSERVED_MIN": 1,
+   "CHANNEL_HEAD_OFF_GRID": 1,
+   "CHANNEL_SUPPORT_LIMITED": 1
+  },
+  "channel_validation": {
+   "CHANNEL_COLLISION": 0,
+   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+   "CHANNEL_INVADES_OPENING": 0,
+   "CHANNEL_OPENING_OVERCUT": 0,
+   "CHANNEL_ORPHAN_PIECE": 0,
+   "CHANNEL_SUPPORT_BELOW_POLICY": 1,
+   "CHANNEL_WRONG_COURSE": 0,
+   "EXTRA_CHANNEL": 0,
+   "MISSING_REQUIRED_CHANNEL": 0,
+   "channel_bottom_expected": 9,
+   "channel_bottom_matched": 9,
+   "channel_cut_pieces": 1,
+   "channel_pieces": 127,
+   "channel_top_expected": 16,
+   "channel_top_matched": 16
+  },
+  "codes": {
+   "B19": 172,
+   "B34": 296,
+   "B39": 1891,
+   "B54": 29,
+   "C04": 99,
+   "C09": 143,
+   "CHANNEL_U_34": 12,
+   "CHANNEL_U_39": 114,
+   "CHANNEL_U_CUT": 1
+  },
+  "door_void_violations": 0,
+  "free_to_top": 0,
+  "node_crossings": 0,
+  "non_modular": 0,
+  "pieces": 2757,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "runs": 18,
+  "signature": "bbb5b8b9a02230499c588bd1fb793123aedf86080fd9483147cef9b5b332f504",
+  "solve_s": 0.44
+ },
+ "LEGACY": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 34,
+   "COMPENSATOR_EXCESS_IN_RUN": 52,
+   "COMPENSATOR_VERTICAL_STRIP": 9,
+   "OPENING_MISSING_COUNTER_LINTEL": 9,
+   "OPENING_MISSING_LINTEL": 17,
+   "PRISM_STAGGER_BELOW_TARGET": 2
+  },
+  "bond_reproved_walls": 0,
+  "codes": {
+   "B19": 172,
+   "B34": 308,
+   "B39": 2005,
+   "B54": 29,
+   "C04": 100,
+   "C09": 143
+  },
+  "door_void_violations": 0,
+  "non_modular": 0,
+  "pieces": 2757,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "signature": "0246646fe023f69a994ab100376f6b63f883e48d09680e66bea6db5e0862ecd4",
+  "solve_s": 0.39
+ },
+ "bench_delta": {
+  "COMPENSATOR_EXCESS_IN_RUN": -1
+ },
+ "openings": 17,
+ "walls": 10
+}

@@ -1,0 +1,12 @@
+FREE_TO_TOP P0 - sonda no BUTANTA 34 paredes (parede 8079790, vao 6919324 jambas 1414-1570; vao 6919219 jambas 1624-1780)
+Fiada 11 (primeira acima do topo 221), pecas da faixa da parede [lo,hi] cm, * = transversal, T = amarracao.
+
+HEAD 4695925 (pos-passe removia peca inteira que tocava o vao):
+  antes   c11 B39[1330,1369] C09[1370,1379] B34*T[1380,1394] B39[1395,1434] B39[1435,1474] B39[1475,1514] B39[1515,1554] B34[1555,1589] B34*T[1590,1604] B39[1605,1644]
+  depois  c11 B39[1330,1369] C09[1370,1379] B34*T[1380,1394] B34*T[1590,1604]
+  -> aberto 1394-1590 (jambas 1414-1570) e 1604-1800 (jambas 1624-1780)
+
+Correcao (vao estendido ate' o topo no solve):
+  c11 B39[1330,1369] C09[1370,1379] B34*T[1380,1394] B19[1395,1414] B19[1570,1589] B34*T[1590,1604] B19[1605,1624]
+  c11 ... B19[1780,1799] B34*T[1800,1814] C09[1815,1824] B19[1825,1844]
+  -> alvenaria termina nas jambas; validador: CHANNEL_OPENING_OVERCUT 0, CHANNEL_FREE_TO_TOP_NOT_OPEN 0, CHANNEL_ORPHAN_PIECE 0.
