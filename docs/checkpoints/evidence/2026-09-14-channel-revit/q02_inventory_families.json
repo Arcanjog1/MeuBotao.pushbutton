@@ -1,0 +1,1574 @@
+{
+"HUMAN": {
+"title": "BUTANTÃ - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO) (1)",
+"imports": [
+{
+"id": "7097743",
+"owner_view": "-1",
+"level": "6664354",
+"name": "1 PAV",
+"linked": false
+},
+{
+"id": "7101201",
+"owner_view": "-1",
+"level": "6265066",
+"name": "",
+"linked": true
+},
+{
+"id": "7207307",
+"owner_view": "-1",
+"level": "6548745",
+"name": "",
+"linked": true
+},
+{
+"id": "7514688",
+"owner_view": "-1",
+"level": "6265066",
+"name": "151-06-ARQ-EX-0001-IMP-R01",
+"linked": false
+},
+{
+"id": "8079488",
+"owner_view": "-1",
+"level": "6265066",
+"name": "151.06-ARQ-EX-0103-TIP-R02",
+"linked": false
+}
+],
+"symbols": [
+{
+"fam": "COMPENSADOR 14x19x9",
+"typ": "COMPENSADOR 14x19x9",
+"category_id": "-2000151",
+"instances": 2129
+},
+{
+"fam": "BLOCO 34 - 14x19x34",
+"typ": "BLOCO 34 - 14x19x34",
+"category_id": "-2000151",
+"instances": 15651
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x9x34",
+"typ": "BLOCO 34 CORTADO - 14x9x34",
+"category_id": "-2000151",
+"instances": 44
+},
+{
+"fam": "BLOCO 54 - 14x19x54",
+"typ": "BLOCO 54 - 14x19x54",
+"category_id": "-2000151",
+"instances": 1614
+},
+{
+"fam": "BLOCO 54 CORTADO - 14x9x54",
+"typ": "BLOCO 54 CORTADO - 14x9x54",
+"category_id": "-2000151",
+"instances": 18
+},
+{
+"fam": "BLOCO CORTADO - 19x9x39",
+"typ": "BLOCO CORTADO - 19x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO - 14x19x39",
+"typ": "BLOCO INTEIRO - 14x19x39",
+"category_id": "-2000151",
+"instances": 31540
+},
+{
+"fam": "BLOCO INTEIRO - 19x19x39",
+"typ": "BLOCO INTEIRO - 19x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x9x39",
+"typ": "BLOCO INTEIRO CORTADO - 14x9x39",
+"category_id": "-2000151",
+"instances": 9
+},
+{
+"fam": "BLOCO INTEIRO CORTADO- 19x9x39",
+"typ": "BLOCO INTEIRO CORTADO- 19x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BOLACHA",
+"typ": "BOLACHA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA INTEIRA - 14x19x39",
+"typ": "CANALETA INTEIRA - 14x19x39",
+"category_id": "-2000151",
+"instances": 5865
+},
+{
+"fam": "CANALETA INTEIRA - 19x19x39",
+"typ": "CANALETA INTEIRA - 19x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - 14x9-19x19",
+"typ": "CANALETA J - 14x9-19x19",
+"category_id": "-2000151",
+"instances": 190
+},
+{
+"fam": "CANALETA J - 14x19-29x19",
+"typ": "CANALETA J - 14x19-29x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - 14x19-31x19",
+"typ": "CANALETA J - 14x19-31x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIA CANALETA - 14x19x19",
+"typ": "MEIA CANALETA - 14x19x19",
+"category_id": "-2000151",
+"instances": 194
+},
+{
+"fam": "MEIA CANALETA - 19x19x19",
+"typ": "MEIA CANALETA - 19x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO  - 19x19x19",
+"typ": "MEIO BLOCO  - 19x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO - 14x19x19",
+"typ": "MEIO BLOCO - 14x19x19",
+"category_id": "-2000151",
+"instances": 2700
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x9x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19",
+"category_id": "-2000151",
+"instances": 28
+},
+{
+"fam": "MEIO BLOCO CORTADO - 19x9x19",
+"typ": "MEIO BLOCO CORTADO - 19x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "PASTILHA - 14x19X4",
+"typ": "PASTILHA - 14x19X4",
+"category_id": "-2000151",
+"instances": 2329
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "V 14x19x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "VERGA JANELA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x19x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "COMPENSADOR 14x19x9 (deitado)",
+"typ": "COMPENSADOR 14x19x9 (deitado)",
+"category_id": "-2000151",
+"instances": 633
+},
+{
+"fam": "CANALETA 34 - 14x19x34",
+"typ": "CANALETA 34 - 14x19x34",
+"category_id": "-2000151",
+"instances": 2615
+},
+{
+"fam": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+"typ": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+"category_id": "-2000151",
+"instances": 95
+},
+{
+"fam": "CANALETA J - CORTADO - 14x19-29xVAR",
+"typ": "CANALETA J - CORTADO - 14x19-29xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - CORTADO - 14x19-31xVAR",
+"typ": "CANALETA J - CORTADO - 14x19-31xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x19x279",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 199",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 194",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x194",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x120",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x279",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X199",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X224",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x184",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X129",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x104",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 94",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X130",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 179",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x179",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Abertura de janela para paredes de blocos",
+"typ": "Abertura de janela para paredes de blocos",
+"category_id": "-2000080",
+"instances": 142
+},
+{
+"fam": "COMPENSADOR CORTADO - 14xVARx9",
+"typ": "COMPENSADOR CORTADO - 14xVARx9",
+"category_id": "-2000151",
+"instances": 9
+},
+{
+"fam": "PASTILHA CORTADA- 14x9X4",
+"typ": "PASTILHA CORTADA- 14x9X4",
+"category_id": "-2000151",
+"instances": 16
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA 254",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 104",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 219",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x219",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO - 14x19x39",
+"typ": "BLOCO INTEIRO VEDAÇÃO - 14x19x39",
+"category_id": "-2000151",
+"instances": 1
+},
+{
+"fam": "MEIO BLOCO - 14x19x19",
+"typ": "MEIO BLOCO VEDAÇÃO - 14x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 - 14x19x34",
+"typ": "BLOCO 34 VEDAÇÃO - 14x19x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x229",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x9x19",
+"typ": "MEIO BLOCO CORTADO VEDAÇÃO - 14x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x9x34",
+"typ": "BLOCO 34 CORTADO VEDAÇÃO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x9x39",
+"typ": "BLOCO INTEIRO CORTADO VEDAÇÃO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x99",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 99",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Furo Retangular Concreto",
+"typ": "Furo Retangular Concreto",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Furo Circular Laje",
+"typ": "Furo Circular Laje",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "GANCHO DE IÇAMENTO",
+"typ": "GANCHO DE IÇAMENTO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "FURO CIRCULAR - DISCO DE INFILTRAÇÃO",
+"typ": "FURO CIRCULAR - DISCO DE INFILTRAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONJUNTO DE GANCHOS DE IÇAMENTO",
+"typ": "CONJUNTO DE GANCHOS DE IÇAMENTO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO CANALETA CORTADO - 14x19xVAR",
+"typ": "BLOCO CANALETA CORTADO - 14x19xVAR",
+"category_id": "-2000151",
+"instances": 57
+},
+{
+"fam": "CANALETA J CORTADA - 14x9-19xVAR",
+"typ": "CANALETA J CORTADA - 14x9-19xVAR",
+"category_id": "-2000151",
+"instances": 10
+},
+{
+"fam": "SGraute - H",
+"typ": "SGraute - H",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "COMPENSADOR 14x19x9",
+"typ": "COMPENSADOR 14x19x9 - VEDAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 129",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "PASTILHA - 14x19X4",
+"typ": "PASTILHA VEDAÇÃO - 14x19X4",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA 284",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x14x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x14x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19 - VEDAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x14x34",
+"typ": "BLOCO 34 CORTADO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x14x34",
+"typ": "BLOCO 34 CORTADO VEDAÇÃO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x14x39",
+"typ": "BLOCO INTEIRO CORTADO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x14x39",
+"typ": "BLOCO INTEIRO CORTADO VEDAÇÃO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "FUROS EM PAREDES DE BLOCO-V2",
+"typ": "FUROS EM PAREDES DE BLOCO-V2",
+"category_id": "-2000080",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "SGraute - B1",
+"typ": "SGraute - B",
+"category_id": "-2000151",
+"instances": 0
+}
+]
+},
+"TARGET": {
+"title": "butanta testes",
+"imports": [
+{
+"id": "7097743",
+"owner_view": "-1",
+"level": "6664354",
+"name": "1 PAV",
+"linked": false
+},
+{
+"id": "7101201",
+"owner_view": "-1",
+"level": "6265066",
+"name": "",
+"linked": true
+},
+{
+"id": "7207307",
+"owner_view": "-1",
+"level": "6548745",
+"name": "",
+"linked": true
+},
+{
+"id": "7514688",
+"owner_view": "-1",
+"level": "6265066",
+"name": "151-06-ARQ-EX-0001-IMP-R01",
+"linked": false
+},
+{
+"id": "8079028",
+"owner_view": "-1",
+"level": "6548745",
+"name": "151.06-ARQ-EX-0103-TIP-R02",
+"linked": false
+}
+],
+"symbols": [
+{
+"fam": "COMPENSADOR 14x19x9",
+"typ": "COMPENSADOR 14x19x9",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 - 14x19x34",
+"typ": "BLOCO 34 - 14x19x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x9x34",
+"typ": "BLOCO 34 CORTADO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 54 - 14x19x54",
+"typ": "BLOCO 54 - 14x19x54",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 54 CORTADO - 14x9x54",
+"typ": "BLOCO 54 CORTADO - 14x9x54",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO CORTADO - 19x9x39",
+"typ": "BLOCO CORTADO - 19x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO - 14x19x39",
+"typ": "BLOCO INTEIRO - 14x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO - 19x19x39",
+"typ": "BLOCO INTEIRO - 19x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x9x39",
+"typ": "BLOCO INTEIRO CORTADO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO- 19x9x39",
+"typ": "BLOCO INTEIRO CORTADO- 19x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BOLACHA",
+"typ": "BOLACHA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA INTEIRA - 14x19x39",
+"typ": "CANALETA INTEIRA - 14x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA INTEIRA - 19x19x39",
+"typ": "CANALETA INTEIRA - 19x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - 14x9-19x19",
+"typ": "CANALETA J - 14x9-19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - 14x19-29x19",
+"typ": "CANALETA J - 14x19-29x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - 14x19-31x19",
+"typ": "CANALETA J - 14x19-31x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIA CANALETA - 14x19x19",
+"typ": "MEIA CANALETA - 14x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIA CANALETA - 19x19x19",
+"typ": "MEIA CANALETA - 19x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO  - 19x19x19",
+"typ": "MEIO BLOCO  - 19x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO - 14x19x19",
+"typ": "MEIO BLOCO - 14x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x9x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 19x9x19",
+"typ": "MEIO BLOCO CORTADO - 19x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "PASTILHA - 14x19X4",
+"typ": "PASTILHA - 14x19X4",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "V 14x19x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "VERGA JANELA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x19x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "COMPENSADOR 14x19x9 (deitado)",
+"typ": "COMPENSADOR 14x19x9 (deitado)",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA 34 - 14x19x34",
+"typ": "CANALETA 34 - 14x19x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+"typ": "COMPENSADOR CORTADO 14x19x9 (deitado)",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - CORTADO - 14x19-29xVAR",
+"typ": "CANALETA J - CORTADO - 14x19-29xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J - CORTADO - 14x19-31xVAR",
+"typ": "CANALETA J - CORTADO - 14x19-31xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x19x279",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 199",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 194",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x194",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x120",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X119",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x279",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X199",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X224",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x184",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X114",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X129",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x189",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x104",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 94",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X130",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 179",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x179",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Abertura de janela para paredes de blocos",
+"typ": "Abertura de janela para paredes de blocos",
+"category_id": "-2000080",
+"instances": 44
+},
+{
+"fam": "COMPENSADOR CORTADO - 14xVARx9",
+"typ": "COMPENSADOR CORTADO - 14xVARx9",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "PASTILHA CORTADA- 14x9X4",
+"typ": "PASTILHA CORTADA- 14x9X4",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 134",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA 254",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 104",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 219",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x219",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X159",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO - 14x19x39",
+"typ": "BLOCO INTEIRO VEDAÇÃO - 14x19x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO - 14x19x19",
+"typ": "MEIO BLOCO VEDAÇÃO - 14x19x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 - 14x19x34",
+"typ": "BLOCO 34 VEDAÇÃO - 14x19x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x229",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x9x19",
+"typ": "MEIO BLOCO CORTADO VEDAÇÃO - 14x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x9x34",
+"typ": "BLOCO 34 CORTADO VEDAÇÃO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x9x39",
+"typ": "BLOCO INTEIRO CORTADO VEDAÇÃO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 139",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x99",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 99",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x124",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Furo Retangular Concreto",
+"typ": "Furo Retangular Concreto",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "Furo Circular Laje",
+"typ": "Furo Circular Laje",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "GANCHO DE IÇAMENTO",
+"typ": "GANCHO DE IÇAMENTO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "FURO CIRCULAR - DISCO DE INFILTRAÇÃO",
+"typ": "FURO CIRCULAR - DISCO DE INFILTRAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONJUNTO DE GANCHOS DE IÇAMENTO",
+"typ": "CONJUNTO DE GANCHOS DE IÇAMENTO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO CANALETA CORTADO - 14x19xVAR",
+"typ": "BLOCO CANALETA CORTADO - 14x19xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CANALETA J CORTADA - 14x9-19xVAR",
+"typ": "CANALETA J CORTADA - 14x9-19xVAR",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "SGraute - H",
+"typ": "SGraute - H",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X154",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "COMPENSADOR 14x19x9",
+"typ": "COMPENSADOR 14x19x9 - VEDAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 204",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x144",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA",
+"typ": "V 14x9x149",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "CONTRAVERGA",
+"typ": "CONTRAVERGA 129",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "PASTILHA - 14x19X4",
+"typ": "PASTILHA VEDAÇÃO - 14x19X4",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA JANELA 3 FUROS",
+"typ": "VERGA JANELA 284",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x14x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "MEIO BLOCO CORTADO - 14x14x19",
+"typ": "MEIO BLOCO CORTADO - 14x9x19 - VEDAÇÃO",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x14x34",
+"typ": "BLOCO 34 CORTADO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO 34 CORTADO - 14x14x34",
+"typ": "BLOCO 34 CORTADO VEDAÇÃO - 14x9x34",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x14x39",
+"typ": "BLOCO INTEIRO CORTADO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "BLOCO INTEIRO CORTADO - 14x14x39",
+"typ": "BLOCO INTEIRO CORTADO VEDAÇÃO - 14x9x39",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "FUROS EM PAREDES DE BLOCO-V2",
+"typ": "FUROS EM PAREDES DE BLOCO-V2",
+"category_id": "-2000080",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X174",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "VERGA PORTA",
+"typ": "VERGA PORTA 9X109",
+"category_id": "-2000151",
+"instances": 0
+},
+{
+"fam": "SGraute - B1",
+"typ": "SGraute - B",
+"category_id": "-2000151",
+"instances": 0
+}
+]
+}
+}

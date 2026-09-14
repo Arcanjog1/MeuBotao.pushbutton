@@ -22,6 +22,9 @@ Opção 1. Propor escolha explícita por recorte/nível; preservar política con
 PENDENTE — nenhuma aprovação presumida pelo pedido de arquitetura ou merge documental.
 Aprovar ou revisar arquitetura; definir catálogo discreto e apoio mínimo de A, simetria/preferência de excedente, apoio/continuidade de B e tratamento de ABERTURA/peitoril divergente. Valores ainda não aprovados.
 
+## Implementação candidata (2026-09-14)
+Estratégia B (CHANNEL) implementada como opt-in na branch `claude/butanta-channel-reference-implementation` ([arquitetura](../architecture/channel-strategy-implementation.md), regra 51). **Não é aprovação**: a decisão continua PENDENTE; A (LINTEL) não implementada.
+
 ## SHA/PR relacionado
 Base de consolidação: 6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9. [#32](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32),
 [#33](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/33), [#35](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/35).

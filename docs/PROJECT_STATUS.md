@@ -1,11 +1,11 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-12 (main `ad46c61`, merge do #38); SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-14 (main `0e41c8e`, merge do #39); SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-12T15:07:27+00:00",
-  "main": "ad46c61372ba0292d117e14ba605375af7acd807",
+  "observed_utc": "2026-09-14T04:38:50+00:00",
+  "main": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",
   "official": [
     {
       "pr": 32,
@@ -34,6 +34,10 @@ Painel reconciliado por fetch em 2026-09-12 (main `ad46c61`, merge do #38); SHAs
     {
       "pr": 38,
       "head": "4d6eecff394b0147a4e59b942162d3aa653755de"
+    },
+    {
+      "pr": 39,
+      "head": "cf4e4fb1d825743a75462a660a0965259db035e5"
     }
   ],
   "candidates": [
@@ -62,8 +66,8 @@ Painel reconciliado por fetch em 2026-09-12 (main `ad46c61`, merge do #38); SHAs
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
     },
     {
-      "branch": "claude/fix-fill-tie-running-joint",
-      "head": "6b78a9aa70ff0cac239dcdd9ed1deaab730eb9a1"
+      "branch": "claude/butanta-channel-reference-implementation",
+      "head": "26cf5d2e1419cdaa988cefa6a78c919afad902da"
     }
   ]
 }
@@ -71,18 +75,18 @@ Painel reconciliado por fetch em 2026-09-12 (main `ad46c61`, merge do #38); SHAs
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | `ad46c61372ba0292d117e14ba605375af7acd807` (merge do **#38**, 2026-09-12); antes 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
-| Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + **#38** (sonda de vão 3.1, licença 33.8, régua V2, testes estritos). Falha histórica do benchmark V1: TP1 JUNCTION 8→9 |
-| Candidato desta sessão | `claude/fix-fill-tie-running-joint` HEAD `6b78a9a` (base `ad46c61`): **Defeito 1 — junta corrida fill|tie** — paridade das peças de amarração encostadas (regra 33.9): TP1 PRISM 48 → 16 (fill|tie 32 → 0), TGD V2 245 → 53 (fill|tie entre nós distintos 203 → 0); nó|fill 0, INSIDE_DOOR/WINDOW 0, CROSSES_JAMB/OVERLAP iguais. Revisão final 2026-09-13: 12 condições atendidas (consolidada no HEAD 2 failed / 1111 passed — histórica TP1/V1 e categoria compensators 61→62 classificada B); merge normal do PR [#39](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/39) autorizado pelo usuário — após o merge a main passa a ser o SHA de merge (reconciliar este painel no próximo checkpoint) — [checkpoint](checkpoints/2026-09-12-fill-tie-running-joint.md). Anterior: #38 (integrado) — [checkpoint](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
+| MAIN / HEAD observado | `0e41c8efe2b141b836bb4873f5219e4da0b1d03c` (merge do **#39**, Defeito 1 fill|tie); antes ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9). Sem reforço de aberturas (verga/canaleta) na main. Falha histórica do benchmark V1: TP1 JUNCTION 8→9 |
+| Candidato desta sessão | `claude/butanta-channel-reference-implementation` HEAD `26cf5d2` (base `0e41c8e`): **estratégia CHANNEL (canaletas)** opt-in (`opening_reinforcement_strategy="CHANNEL"`; `None` = legado idêntico) — regra 51. Offline 34 paredes/44 vãos: top 40/40, bottom 22/23, 0 invasão/colisão/extra, PRISM 0 = legado. Revit real (bancada `butanta testes`, HUMANO somente leitura): escada 1→34 paredes, 7.229 peças criadas, releitura 0 divergências, idempotência 7.229→7.229, paridade exata Revit×offline. Humano×solver 67 papéis: 15 exatos, 44 equivalentes, 4 melhores, 1 pior, 1 erro (7719511). PR draft, sem merge — [checkpoint](checkpoints/2026-09-14-butanta-channel-implementation.md). Anterior: #39 (integrado) — [checkpoint](checkpoints/2026-09-12-fill-tie-running-joint.md) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
-| Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. Nenhum Revit iniciado em 2026-09-12 |
+| Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; UI sem seleção de estratégia |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
-| Bloqueadores | Defeito 1: classe fill|tie fechada no candidato (resta fill|fill — cadeias `C09 C09 C04`/fronteira de banda, TP1 16 — e W080/peça duplicada no TGD, 53); COVERAGE do TGD; decisões pendentes (reserva de meio B54 na 11.10; tier 6 padrão; prioridade regra #1 × #2) — [backlog](BETA2_BACKLOG.md) |
+| Bloqueadores | CHANNEL: aprovação A/B e UI; face-junta da travessia de T (51.6); topo/peitoril fora da grade (51.8); cinta de topo (10.7). Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Defeito 1 — junta corrida fill|tie](checkpoints/2026-09-12-fill-tie-running-joint.md); antes [saneamento pré-Beta 2](checkpoints/2026-09-12-pre-beta2-critical-sanitization.md) |
+| Último checkpoint | [Estratégia CHANNEL — BUTANTÃ humano × cru](checkpoints/2026-09-14-butanta-channel-implementation.md); antes [Defeito 1 — junta corrida fill|tie](checkpoints/2026-09-12-fill-tie-running-joint.md) |
 | CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
-| Próximo objetivo | Decidir as três pendências acima; [pacote Beta 2](architecture/beta2-implementation-package.md) |
+| Próximo objetivo | Revisão do PR CHANNEL e decisões da seção 51; LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
 Integração documental não aprova arquitetura/produção. D6 resolvida por #27.

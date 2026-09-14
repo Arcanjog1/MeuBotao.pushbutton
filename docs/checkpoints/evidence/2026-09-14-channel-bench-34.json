@@ -1,0 +1,96 @@
+{
+ "CHANNEL": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 81,
+   "COVERAGE_PARTIAL_WALL": 4,
+   "OPENING_MISSING_COUNTER_LINTEL": 23,
+   "OPENING_MISSING_LINTEL": 43,
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 77
+  },
+  "bond_reproved_walls": 3,
+  "channel_findings": {
+   "CHANNEL_HEAD_OFF_GRID": 2,
+   "CHANNEL_NODE_CROSSING": 4,
+   "CHANNEL_SUPPORT_LIMITED": 6,
+   "MISSING_REQUIRED_CHANNEL": 1
+  },
+  "channel_validation": {
+   "CHANNEL_COLLISION": 0,
+   "CHANNEL_INVADES_OPENING": 0,
+   "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+   "CHANNEL_WRONG_COURSE": 0,
+   "EXTRA_CHANNEL": 0,
+   "MISSING_REQUIRED_CHANNEL": 1,
+   "channel_bottom_expected": 23,
+   "channel_bottom_matched": 22,
+   "channel_cut_pieces": 5,
+   "channel_pieces": 318,
+   "channel_top_expected": 40,
+   "channel_top_matched": 40
+  },
+  "codes": {
+   "B19": 309,
+   "B34": 1877,
+   "B39": 3779,
+   "B54": 208,
+   "C04": 291,
+   "C09": 443,
+   "CHANNEL_U_34": 70,
+   "CHANNEL_U_39": 243,
+   "CHANNEL_U_CUT": 5
+  },
+  "door_void_violations": 0,
+  "free_to_top": 2,
+  "node_crossings": 4,
+  "non_modular": 78,
+  "pieces": 7225,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "runs": 39,
+  "signature": "ec8d525868ca2c99dfeb29d9f0a75cd0dd0377964430557bc24a6585bf8fc304",
+  "solve_s": 3.42
+ },
+ "LEGACY": {
+  "bench_codes": {
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 75,
+   "COVERAGE_PARTIAL_WALL": 4,
+   "OPENING_MISSING_COUNTER_LINTEL": 23,
+   "OPENING_MISSING_LINTEL": 43,
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 76
+  },
+  "bond_reproved_walls": 3,
+  "codes": {
+   "B19": 306,
+   "B34": 1957,
+   "B39": 4044,
+   "B54": 208,
+   "C04": 291,
+   "C09": 444
+  },
+  "door_void_violations": 0,
+  "non_modular": 78,
+  "pieces": 7250,
+  "preflight_collisions": 0,
+  "preflight_ok": true,
+  "preflight_opening_violations": 0,
+  "prism_classes": {},
+  "signature": "94541746ba71190b3595096394f5fcc42c85ab63ad41ecdae441ac5afc148f0e",
+  "solve_s": 2.26
+ },
+ "bench_delta": {
+  "COVERAGE_GAP_IN_ROW": 6,
+  "PRISM_STAGGER_BELOW_TARGET": 1
+ },
+ "openings": 44,
+ "walls": 34
+}

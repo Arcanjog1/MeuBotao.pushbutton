@@ -1,0 +1,1182 @@
+{
+ "source": "r_ladder_34.json",
+ "summary": {
+  "PHYSICALLY_EQUIVALENT": 55,
+  "EXACT_MATCH": 4,
+  "SOLVER_BETTER": 4,
+  "SOLVER_WORSE": 1,
+  "NOT_COMPARABLE": 2,
+  "ACTUAL_ERROR": 1
+ },
+ "by_role": {
+  "above:PHYSICALLY_EQUIVALENT": 36,
+  "below:PHYSICALLY_EQUIVALENT": 19,
+  "below:EXACT_MATCH": 1,
+  "above:SOLVER_BETTER": 2,
+  "below:SOLVER_BETTER": 2,
+  "above:SOLVER_WORSE": 1,
+  "above:NOT_COMPARABLE": 2,
+  "below:ACTUAL_ERROR": 1,
+  "above:EXACT_MATCH": 3
+ },
+ "openings_matched": 44,
+ "unmatched": [],
+ "rows": [
+  {
+   "opening_id": 6609615,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    28.99,
+    429.01
+   ],
+   "solver_support": [
+    29.0,
+    24.0
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609615,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    48.99,
+    209.01
+   ],
+   "solver_support": [
+    49.0,
+    49.0
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609655,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    239.01,
+    239.0
+   ],
+   "solver_support": [
+    44.024,
+    33.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609655,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    259.01,
+    19.0
+   ],
+   "solver_support": [
+    19.024,
+    58.988
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7061924,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    429.0,
+    19.0
+   ],
+   "solver_support": [
+    34.012,
+    18.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7061924,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    29.0,
+    19.0
+   ],
+   "solver_support": [
+    34.012,
+    18.988
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609813,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    59.0,
+    74.0
+   ],
+   "solver_support": [
+    54.012,
+    43.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609813,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    74.0,
+    94.0
+   ],
+   "solver_support": [
+    34.012,
+    23.988
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7061378,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.0,
+    429.0
+   ],
+   "solver_support": [
+    19.012,
+    28.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7061378,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.0,
+    29.0
+   ],
+   "solver_support": [
+    19.012,
+    28.988
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "EXACT_MATCH"
+  },
+  {
+   "opening_id": 6609874,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    239.0,
+    239.0
+   ],
+   "solver_support": [
+    39.012,
+    38.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609874,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.0,
+    259.0
+   ],
+   "solver_support": [
+    19.012,
+    58.988
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609915,
+   "wall": 8079801,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    429.0,
+    29.0
+   ],
+   "solver_support": [
+    29.012,
+    48.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6609915,
+   "wall": 8079801,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    209.0,
+    49.0
+   ],
+   "solver_support": [
+    49.012,
+    28.988
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6628433,
+   "wall": 8079797,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    33.99,
+    34.01
+   ],
+   "solver_support": [
+    54.001,
+    38.999
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6628479,
+   "wall": 8079797,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    24.0,
+    34.0
+   ],
+   "solver_support": [
+    24.012,
+    43.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6628508,
+   "wall": 8079797,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    18.99,
+    24.01
+   ],
+   "solver_support": [
+    39.002,
+    23.998
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6620076,
+   "wall": 8079821,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    39.0,
+    14.0
+   ],
+   "solver_support": [
+    49.001,
+    33.999
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "SOLVER_BETTER"
+  },
+  {
+   "opening_id": 6620076,
+   "wall": 8079821,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    39.0,
+    14.0
+   ],
+   "solver_support": [
+    49.001,
+    33.999
+   ],
+   "human_z": 141.0,
+   "solver_course": 7,
+   "classification": "SOLVER_BETTER"
+  },
+  {
+   "opening_id": 6618304,
+   "wall": 8079814,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.01,
+    18.99
+   ],
+   "solver_support": [
+    34.009,
+    43.991
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7508776,
+   "wall": 8079814,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    24.0,
+    39.0
+   ],
+   "solver_support": [
+    39.0,
+    39.0
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7062498,
+   "wall": 8079814,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    29.0,
+    49.0
+   ],
+   "solver_support": [
+    59.0,
+    19.0
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6627438,
+   "wall": 8079829,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    34.0,
+    39.0
+   ],
+   "solver_support": [
+    34.022,
+    3.989
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "SOLVER_WORSE"
+  },
+  {
+   "opening_id": 7742173,
+   "wall": 8079829,
+   "role": "above",
+   "solver_status": "HEAD_OFF_GRID",
+   "human_status": "NO_CHANNEL",
+   "classification": "NOT_COMPARABLE"
+  },
+  {
+   "opening_id": 7742173,
+   "wall": 8079829,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    34.0,
+    19.0
+   ],
+   "solver_support": [
+    19.014,
+    23.988
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6672349,
+   "wall": 8079827,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    4.0,
+    19.0
+   ],
+   "solver_support": [
+    4.003,
+    23.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6616555,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    59.0,
+    74.0
+   ],
+   "solver_support": [
+    39.003,
+    58.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6616555,
+   "wall": 8079809,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    74.0,
+    94.0
+   ],
+   "solver_support": [
+    19.003,
+    38.997
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6616547,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    74.0,
+    59.0
+   ],
+   "solver_support": [
+    54.002,
+    43.998
+   ],
+   "human_z": 220.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6616539,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    59.0,
+    74.0
+   ],
+   "solver_support": [
+    54.007,
+    43.993
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6617398,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    73.99,
+    59.01
+   ],
+   "solver_support": [
+    19.0,
+    39.0
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 7719511,
+   "wall": 8079859,
+   "role": "above",
+   "solver_status": "HEAD_OFF_GRID",
+   "human_status": "NO_CHANNEL",
+   "classification": "NOT_COMPARABLE"
+  },
+  {
+   "opening_id": 7719511,
+   "wall": 8079859,
+   "role": "below",
+   "solver_status": "MISSING",
+   "human_status": "CHANNEL",
+   "classification": "ACTUAL_ERROR"
+  },
+  {
+   "opening_id": 6621639,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    24.0,
+    34.0
+   ],
+   "solver_support": [
+    44.002,
+    58.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6621689,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    34.0,
+    24.0
+   ],
+   "solver_support": [
+    54.003,
+    53.998
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6621699,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.0,
+    44.0
+   ],
+   "solver_support": [
+    54.007,
+    53.993
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6621711,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    44.0,
+    14.0
+   ],
+   "solver_support": [
+    24.007,
+    44.003
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "SOLVER_BETTER"
+  },
+  {
+   "opening_id": 6919324,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "FREE_TO_TOP",
+   "human_status": "NO_CHANNEL",
+   "classification": "EXACT_MATCH"
+  },
+  {
+   "opening_id": 6919219,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "FREE_TO_TOP",
+   "human_status": "NO_CHANNEL",
+   "classification": "EXACT_MATCH"
+  },
+  {
+   "opening_id": 6661879,
+   "wall": 8079823,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    19.0,
+    39.0
+   ],
+   "solver_support": [
+    49.003,
+    38.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6632347,
+   "wall": 8079823,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    39.0,
+    19.0
+   ],
+   "solver_support": [
+    39.003,
+    48.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6621475,
+   "wall": 8079818,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    49.0,
+    39.0
+   ],
+   "solver_support": [
+    48.995,
+    34.005
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6621603,
+   "wall": 8079818,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    39.0,
+    54.0
+   ],
+   "solver_support": [
+    39.003,
+    53.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "EXACT_MATCH"
+  },
+  {
+   "opening_id": 6588577,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    48.98,
+    1028.98
+   ],
+   "solver_support": [
+    48.993,
+    38.989
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6588577,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    28.98,
+    209.0
+   ],
+   "solver_support": [
+    28.993,
+    28.989
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6589819,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    258.99,
+    838.99
+   ],
+   "solver_support": [
+    29.005,
+    43.995
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6589819,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    238.99,
+    19.01
+   ],
+   "solver_support": [
+    39.005,
+    38.995
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6646280,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    448.98,
+    618.98
+   ],
+   "solver_support": [
+    23.993,
+    18.988
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6646280,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    28.98,
+    203.99
+   ],
+   "solver_support": [
+    48.993,
+    18.988
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6599856,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    633.99,
+    433.99
+   ],
+   "solver_support": [
+    54.003,
+    38.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6599856,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    213.99,
+    19.0
+   ],
+   "solver_support": [
+    49.003,
+    38.997
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6608319,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    838.98,
+    259.0
+   ],
+   "solver_support": [
+    53.995,
+    24.005
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6608319,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    13.99,
+    239.0
+   ],
+   "solver_support": [
+    38.995,
+    39.005
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "SOLVER_BETTER"
+  },
+  {
+   "opening_id": 6607561,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    1028.98,
+    49.0
+   ],
+   "solver_support": [
+    43.996,
+    49.004
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6607561,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    203.99,
+    29.0
+   ],
+   "solver_support": [
+    28.996,
+    29.004
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6597131,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    49.0,
+    994.01
+   ],
+   "solver_support": [
+    48.996,
+    34.004
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6597131,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    29.0,
+    244.0
+   ],
+   "solver_support": [
+    28.996,
+    29.004
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6640648,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    259.0,
+    804.01
+   ],
+   "solver_support": [
+    33.996,
+    44.004
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6640648,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    239.0,
+    54.0
+   ],
+   "solver_support": [
+    38.996,
+    39.004
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6599933,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    433.99,
+    599.02
+   ],
+   "solver_support": [
+    48.987,
+    49.013
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6599933,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    18.99,
+    199.02
+   ],
+   "solver_support": [
+    33.987,
+    49.013
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6644707,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    599.0,
+    434.01
+   ],
+   "solver_support": [
+    53.995,
+    39.005
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6644707,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    184.0,
+    34.01
+   ],
+   "solver_support": [
+    48.995,
+    39.005
+   ],
+   "human_z": 61.0,
+   "solver_course": 3,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6636362,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    804.0,
+    259.01
+   ],
+   "solver_support": [
+    53.997,
+    24.003
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6636362,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    34.0,
+    239.01
+   ],
+   "solver_support": [
+    38.997,
+    39.003
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6636306,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    994.01,
+    49.0
+   ],
+   "solver_support": [
+    44.003,
+    48.997
+   ],
+   "human_z": 221.0,
+   "solver_course": 11,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  },
+  {
+   "opening_id": 6636306,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "human_support": [
+    224.01,
+    29.0
+   ],
+   "solver_support": [
+    29.003,
+    28.997
+   ],
+   "human_z": 81.0,
+   "solver_course": 4,
+   "classification": "PHYSICALLY_EQUIVALENT"
+  }
+ ]
+}

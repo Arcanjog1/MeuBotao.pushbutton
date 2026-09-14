@@ -1754,3 +1754,11 @@ fill|tie residual é NÓ|FILL(A) × NÓ|FILL(B) de nós diferentes encostados;
 regra 33.9 (paridade por restrição XOR, T/X pela marca 11.12, canto L livre/
 aresta isolada pela troca de arms + pino). TP1 48 → 16, TGD 245 → 53;
 fill|tie entre nós distintos 0/0. Sem MCP, sem Revit, sem merge.
+
+## 2026-09-14 — estratégia CHANNEL (canaletas), BUTANTÃ humano × cru no Revit real
+
+[Checkpoint](checkpoints/2026-09-14-butanta-channel-implementation.md). Main observada
+`0e41c8e` (#39 mesclado). Branch `claude/butanta-channel-reference-implementation`:
+pós-passe CHANNEL opt-in (regra 51), validado offline (34 paredes) e no Revit real
+(escada 1→34, 7.229 peças, idempotência, paridade exata). HUMANO somente leitura.
+Sem merge; LINTEL não iniciado.
