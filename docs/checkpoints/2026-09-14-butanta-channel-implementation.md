@@ -8,7 +8,7 @@
   "head": "26cf5d2e1419cdaa988cefa6a78c919afad902da",
   "base": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",
   "main_observada": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40",
   "veredito": "__VEREDITO__",
   "objective": "Implementar e validar a estratégia de reforço de aberturas CHANNEL (canaletas) no motor comum, seguindo de forma geral o sistema físico do projeto humano BUTANTÃ R08_LT, sem verga/contraverga; validar offline e no Revit real (bancada 'butanta testes', HUMANO somente leitura), com comparação humano × solver, escada de escala, idempotência e regressão.",
   "changes": [
@@ -68,7 +68,7 @@
     {"path": "docs/checkpoints/evidence/2026-09-14-channel-human-vs-solver.json"},
     {"path": "docs/checkpoints/evidence/2026-09-14-channel-human-vs-revit-34.json"},
     {"path": "docs/checkpoints/evidence/2026-09-14-channel-bench-34.json"},
-    {"path": "docs/checkpoints/evidence/2026-09-14-channel-revit/README.md"},
+    {"path": "docs/checkpoints/evidence/2026-09-14-channel-revit/LEIAME.txt"},
     {"path": "docs/PROJECT_STATUS.md"}
   ]
 }
