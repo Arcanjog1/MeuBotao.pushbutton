@@ -129,6 +129,11 @@ DEFAULT_CHANNEL_POLICY = {
     # MESMA geometria; B54 dividido em duas canaletas com a junta nova o mais
     # longe possivel das juntas das fiadas vizinhas (minimo abaixo).
     "convert_blocking_along_ties": True,
+    # Limite de apoio para converter a amarracao AO LONGO que bloqueia a
+    # corrida (topologia do no' preservada). BUTANTA 1o PAV: humano passa por
+    # cima do no' com apoio que seria 4 cm (6627438, K34 sobre o no') e para
+    # na amarracao com 14 cm (6620076, 6621711). PADRAO OBSERVADO (3 casos).
+    "convert_along_tie_when_support_below_cm": 9.0,
     "tie_split_lengths_cm": (39.0, 34.0, 29.0, 24.0, 19.0, 14.0, 9.0),
     "tie_split_min_stagger_cm": 1.5,
 }
@@ -673,10 +678,12 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                 def _cross(j, support_cm, rows=rows, ci=ci):
                     row = rows[j]
                     tie = row["cand"]
+                    if row["along"]:
+                        if support_cm >= policy["convert_along_tie_when_support_below_cm"] - 1e-6:
+                            return 0
+                        return _convert_along_tie(j)
                     if support_cm > policy["cross_tee_when_support_at_most_cm"] + 1e-6:
                         return 0
-                    if row["along"]:
-                        return _convert_along_tie(j)
                     if not str(tie.get("placement_reason") or "").startswith(
                             "T_INTERSECTION_INCOMING"):
                         return False
@@ -690,6 +697,13 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                          "detail": "sem peca de catalogo para recuar a amarracao da parede que chega"})
                         return 0
                     rows[j] = _crossing_row(row, walls_to_create, wall_idx)
+                    findings.append({"code": "CHANNEL_NODE_CROSSING", "severity": SEVERITY_INFO,
+                                     "classification": "EXCEPTION_HUMAN_EVIDENCE", "wall_idx": wall_idx,
+                                     "course_index": ci, "incoming_wall_idx": tie.get("wall_idx"),
+                                     "node_index": tie.get("node_index"),
+                                     "detail": "canaleta atravessa o T; a parede que chega encosta na face "
+                                               "nesta fiada (junta na face repete nas fiadas vizinhas, "
+                                               "como no BUTANTA humano)"})
                     crossings.append({"course_index": ci, "main_wall_idx": wall_idx,
                                       "incoming_wall_idx": tie.get("wall_idx"), "node_index": tie.get("node_index"),
                                       "removed": tie, "added": abut,

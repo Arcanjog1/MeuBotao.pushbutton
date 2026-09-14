@@ -7168,6 +7168,10 @@ funde com a da vizinha** (comprimento máximo medido: 449 cm além da jamba).
 
 **Não promover a regra.** Registrado para a decisão de política do usuário.
 
+> **Atualização 2026-09-14 (seção 51.4)**: a estratégia CHANNEL implementada usa
+> apoio **preferencial** de 19 cm (119/126 lados humanos), sem apoio negativo;
+> a fusão com a corrida vizinha só ocorre quando as corridas se tocam (51.5).
+
 ### 41.5 FATO MEDIDO — "cortado" tem duas estratégias, com proporção variável
 
 | Estratégia | Projeto nº 1 | Projeto nº 2 |
@@ -7407,3 +7411,170 @@ antes do carimbo existir; foi carimbado retroativamente via MCP (atribuição
 bloco→parede pela geometria, só nesta bancada e documentada em
 `evidence/2026-09-11-bench-retro-stamp.json`) para que o teste real exercite
 a substituição.
+
+---
+
+## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
+
+> **STATUS: IMPLEMENTADO como estratégia OPT-IN** (`opening_reinforcement_strategy="CHANNEL"`,
+> branch `claude/butanta-channel-reference-implementation`, PR draft).
+> `None` (default) mantém o motor legado byte a byte. **A escolha A/B continua
+> decisão do usuário** (`docs/decisions/DECISION-OPENING-REINFORCEMENT.md`,
+> PENDING); esta seção registra o comportamento implementado, a evidência que o
+> sustenta e o rótulo de confiança de cada parte. Nada daqui vale para a
+> estratégia de verga/contraverga (não implementada).
+>
+> **Evidência**: BUTANTÃ R08_LT (seção 41), medida de novo por abertura em
+> `docs/checkpoints/evidence/2026-09-14-channel-human-runs.json` (44 vãos do
+> 1º PAV, 126 lados de corrida) e confrontada com o solver em
+> `2026-09-14-channel-human-vs-solver.json`.
+> **Código**: `nuvem/core/engine/opening_reinforcement.py`;
+> integração em `solve_building_blocks_all_courses` (pós-passe) e na criação.
+> **Testes**: `tests/test_channel_reinforcement.py`.
+
+### 51.1 REGRA OBRIGATÓRIA (implementada) — canaleta acima: fiada cuja base é o topo do vão
+
+A fiada de canaleta é a **primeira fiada física cuja base coincide com o topo
+do vão** — ou fica **uma junta (1 cm) acima** dele, que é a mesma solução
+(humano 6616547: vão até 220, canaleta em 221). Humano: base = topo em 129/130
+corridas de canaleta. Topo do vão fora da grade (mais de 1 junta) **não** recebe
+canaleta: vira achado `CHANNEL_HEAD_OFF_GRID` (ver 51.8). Vão que chega ao topo
+da parede não tem fiada acima (`REACHES_WALL_TOP`).
+
+### 51.2 REGRA OBRIGATÓRIA (implementada) — canaleta abaixo: UMA fiada cujo topo é o peitoril
+
+Só quando o peitoril está acima da base (classificação **geométrica**, nunca
+pelo rótulo PORTA/JANELA — humano 7212991 é "PORTA" com peitoril 40). A fiada é
+a última cujo topo coincide com o peitoril (ou uma junta abaixo). **Uma fiada
+só** (humano: 0/89 com segunda fiada inteira). Peitoril fora da grade →
+`CHANNEL_SILL_OFF_GRID` (51.8).
+
+### 51.3 REGRA OBRIGATÓRIA (implementada) — a corrida é feita com as peças da própria fiada, sem junta nova
+
+A canaleta **ocupa a fiada** (19 cm), não é peça sobreposta. O planejador troca o
+**tipo lógico** das peças da fiada já resolvida pelo motor (juntas, amarrações e
+paridade intactas): `B39→CHANNEL_U_39`, `B34→CHANNEL_U_34`, `B19→CHANNEL_U_19`.
+Compensadores não têm canaleta do mesmo comprimento: são **fundidos** a uma
+vizinha contígua numa **canaleta cortada no comprimento** (`CHANNEL_U_CUT`,
+`LENGTH_CUT`, altura preservada) se o total ≤ 39 cm, preferindo o comprimento
+padrão (B34+C04 = 39) e depois a esquerda; sem fusão possível a peça vira canaleta
+cortada sozinha. Fundir **só remove juntas** — a regra #1 não pode piorar por causa
+do reforço. Os comprimentos resultantes reproduzem os cortes humanos medidos
+(`BLOCO CANALETA CORTADO` de **9, 14, 24, 29 cm** = C09, C09+C04, B19+C04,
+B19+C09). Canaleta cortada abaixo de 9 cm (menor observada) é criada, mas vira
+achado `CHANNEL_CUT_BELOW_OBSERVED_MIN` (NEEDS_RULE).
+
+### 51.4 PREFERENCIAL (implementada, parâmetro `min_support_cm = 19`) — apoio lateral
+
+A corrida cobre o vão inteiro e se estende **peça inteira a peça inteira** até o
+apoio (jamba → ponta da corrida) ≥ 19 cm de cada lado. Para em amarração de nó,
+fim de parede ou vazio; apoio menor vira `CHANNEL_SUPPORT_LIMITED` (nunca some).
+Evidência: 119/126 lados humanos ≥ 19 cm; os 7 menores estão encostados em nó
+ou fim de parede (um único caso livre com 14 cm). **Não é o ≥ 9 cm da verga
+(TORRE EASY)** e não autoriza apoio negativo.
+
+### 51.5 PADRÃO OBSERVADO (implementado) — corridas vizinhas NÃO são fundidas por cima de bloco comum
+
+Duas corridas só viram uma quando se tocam. Humano 8079814: corridas
+`[90,249]` e `[290,649]` separadas por **um único B39** não foram fundidas.
+Fachadas inteiras de canaleta (8079777, 84% da fiada 221) acontecem porque as
+corridas se tocam — não há regra de "cinta intermediária" implementada.
+
+### 51.6 CONHECIMENTO DE AMARRAÇÃO — EXCEÇÃO PERMITIDA (implementada) — a canaleta atravessa o T quando o apoio seria ≤ 0
+
+**Quando**: a corrida precisa passar da jamba e o próximo elemento é a peça
+**transversal** da parede que chega a um T (`T_INTERSECTION_INCOMING`) e, sem
+atravessar, o apoio daquele lado seria **≤ 0 cm** (jamba na face da parede que
+chega).
+
+**O que o solver faz**: nessa fiada a principal fica contínua — o trecho de 14 cm
+do nó vira canaleta (cortada/fundida) — e a amarração da parede que chega é
+**recuada até a face** da principal + 1 junta: `B34` → `B19` (placement
+`T_INTERSECTION_INCOMING_CHANNEL_ABUTMENT`, papel T_binding). Sem peça de catálogo
+do comprimento recuado → não atravessa (`CHANNEL_CROSSING_NO_ABUTMENT_PIECE`).
+Cada travessia gera o achado informativo `CHANNEL_NODE_CROSSING`.
+
+**Evidência (medida)**: BUTANTÃ 1º PAV, vãos 6599856, 6599933 e 6644707 (jamba a
+7 cm do eixo do T), acima **e** abaixo: o humano atravessa nos 4 cruzamentos
+(`K39 [595,634] + KV [635,659]` sobre o nó 642 na fiada 61) e a parede que chega
+termina com `B19 [460,479]` encostado na face (8079833 e 8079837, fiadas 61 e
+221). Com apoio > 0 o humano **não** atravessa (6672349: para com 4 cm diante da
+transversal).
+
+**Consequência registrada, não escondida**: na parede que chega, a junta da face
+do T passa a se repetir nas fiadas vizinhas (face-junta nas fiadas c−1, c, c+1) —
+é o que o humano também tem (8079833, fiadas 41/61/81). A auditoria de junta
+corrida **não foi relaxada**: num recorte isolado de 3 paredes ela reprova as
+duas paredes que chegam (`CONTINUOUS_VERTICAL_JOINT` a 479,5 cm em 9 fiadas); no
+plano completo de 34 paredes não reprova. A exceção de auditoria criada é só a do
+**B19 encostado** (`HALF_BLOCK_NEAR_TIE`), com prova dupla (etiqueta da travessia
+**e** canaleta cobrindo fisicamente o nó na mesma fiada), no mesmo padrão da
+`B19_RESIDUAL_FILL`. **Decisão do usuário pendente** sobre aceitar essa face-junta.
+
+### 51.7 CONHECIMENTO DE AMARRAÇÃO — PADRÃO OBSERVADO (implementado) — amarração AO LONGO sobre o vão ou com apoio < 9 cm vira canaleta sem mudar a topologia
+
+Se a amarração que bloqueia a corrida está **ao longo desta parede** (B34 de canto
+ou de T, C09 degradado, B54 da principal) e cai **sobre o vão** na fiada da
+canaleta, ou deixaria apoio **< 9 cm**, ela vira canaleta **com a mesma
+ocupação**: B34/C09 com a mesma geometria (placement preservado); o **B54 é
+dividido em duas canaletas** (comprimentos 39/34/29/24/19/14/9) escolhendo a junta
+nova **o mais longe possível das juntas das fiadas vizinhas** (mínimo 1,5 cm;
+desempate pelo maior menor pedaço). O nó continua "principal passa" nessa fiada.
+Sem divisão válida → `CHANNEL_TIE_SPLIT_NO_STAGGER`. Evidência: humano 6627438
+passa `K34 [375,409]` sobre o nó quando o apoio seria 4 cm; 6620076 e 6621711 param
+na amarração com 14 cm. Amostra pequena (3 casos) — **não confirmado**.
+
+### 51.8 NEEDS_RULE (documentado — pendência de código aberta) — topo/peitoril fora da grade
+
+Humano K.2 (vãos 61–66 cm, topo em 91/171): a meia fiada sobre o vão é
+**compensador deitado de 9 cm**, sem canaleta; embaixo há canaleta normal. A
+seção 10.2 (COSTA BEACH CLUB) registra, para o mesmo desencontro, **duas fiadas
+de 9 cm cortadas** antes da canaleta. **CONFLITO**: duas soluções humanas
+diferentes. O solver não inventa nenhuma: `CHANNEL_HEAD_OFF_GRID` /
+`CHANNEL_SILL_OFF_GRID` sem canaleta, e a meia fiada sobre o vão continua
+sendo a do motor legado.
+
+### 51.9 PADRÃO OBSERVADO (implementado, parâmetro) — passagem livre até o topo
+
+Vão **sem peitoril** cujas **duas** jambas ficam a ≤ 28,5 cm (meio B54 + folga)
+do eixo de um nó L/T/X real da parede: não recebe canaleta e as peças sobre o vão
+(fiadas acima do topo) são removidas — a alvenaria termina nas jambas. Evidência:
+PAR28 (6919219, 6919324; 6/6 em todos os níveis) — as únicas duas do 1º PAV com
+as duas jambas a 27 cm de nós; a outra com as duas jambas perto de nós (7719511)
+tem peitoril e mantém alvenaria acima. Janela com peitoril nunca é passagem livre.
+`free_to_top_tie_bounded_passages=False` desliga. **Não confirmado** pelo usuário.
+
+### 51.10 SEPARAÇÃO OBRIGATÓRIA — cinta de topo não é reforço de abertura
+
+A estratégia CHANNEL **não gera** `TOP_BOND_BEAM`: o conflito 10.7/41.3 continua
+aberto (`DECISION-TOP-BOND-BEAM`). Canaleta humana na última fiada é classificada
+como cinta de topo na comparação, não como canaleta de abertura faltante. Uma
+abertura cuja fiada de canaleta coincide com a última fiada tem **uma** ocupação
+com o papel `ABOVE_OPENING` (nunca duas peças).
+
+### 51.11 Catálogo lógico × família Revit
+
+Catálogo **separado** do de preenchimento (o solver nunca usa canaleta como bloco
+comum): `CHANNEL_U_39` = `CANALETA INTEIRA - 14x19x39`; `CHANNEL_U_34` =
+`CANALETA 34 - 14x19x34`; `CHANNEL_U_19` = `MEIA CANALETA - 14x19x19`;
+`CHANNEL_U_CUT` = `BLOCO CANALETA CORTADO - 14x19xVAR` com o comprimento no
+parâmetro de **instância** `Comprimento_bloco` (medido: 8,993 cm numa KV de 9).
+Todas com origem no centro e eixo X no comprimento (medido no humano). Canaleta J
+**não** é usada (perfil próprio; humano 0 ocorrências sob peitoril). Família
+ausente ou com dimensão divergente → `MISSING_FAMILY_MAPPING`; parâmetro de
+comprimento não gravado → a instância é apagada e a falha reportada.
+
+### 51.12 Medições de validação (2026-09-14)
+
+- **Offline, 34 paredes / 44 vãos do 1º PAV**: 40/40 canaletas superiores e 22/23
+  inferiores planejadas; 0 invasão, 0 colisão, 0 canaleta extra/fiada errada;
+  `PRISM_CONTINUOUS_JOINT` 0 (igual ao legado); paredes reprovadas 3 = legado;
+  delta de achados do benchmark: `COVERAGE_GAP_IN_ROW +6` (passagens livres),
+  `PRISM_STAGGER_BELOW_TARGET +1` (nível 2).
+- **Humano × solver (67 papéis)**: 15 EXACT_MATCH, 44 PHYSICALLY_EQUIVALENT,
+  4 SOLVER_BETTER, 1 SOLVER_WORSE (6627438, apoio 4 cm por paridade do nó),
+  2 NOT_COMPARABLE (51.8), 1 ACTUAL_ERROR (7719511 abaixo: parede de 115 cm em que
+  o preenchimento legado já deixa trecho não modular).
+- **Revit real** (bancada `butanta testes`, 2º PAVIMENTO, aberturas detectadas pelo
+  plugin): criação + releitura + idempotência — ver checkpoint
+  `docs/checkpoints/2026-09-14-butanta-channel-implementation.md`.
