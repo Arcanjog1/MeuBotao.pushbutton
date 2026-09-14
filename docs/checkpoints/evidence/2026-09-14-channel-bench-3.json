@@ -1,18 +1,21 @@
 {
  "CHANNEL": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 37,
-   "COMPENSATOR_EXCESS_IN_RUN": 31,
+   "COMPENSATOR_CONSECUTIVE": 25,
+   "COMPENSATOR_EXCESS_IN_RUN": 25,
    "COMPENSATOR_VERTICAL_STRIP": 4,
    "OPENING_MISSING_COUNTER_LINTEL": 8,
    "OPENING_MISSING_LINTEL": 11,
-   "PRISM_STAGGER_BELOW_TARGET": 713
+   "PRISM_STAGGER_BELOW_TARGET": 703
   },
   "bond_reproved_walls": 0,
   "channel_findings": {},
   "channel_validation": {
    "CHANNEL_COLLISION": 0,
+   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
    "CHANNEL_INVADES_OPENING": 0,
+   "CHANNEL_OPENING_OVERCUT": 0,
+   "CHANNEL_ORPHAN_PIECE": 0,
    "CHANNEL_SUPPORT_BELOW_POLICY": 0,
    "CHANNEL_WRONG_COURSE": 0,
    "EXTRA_CHANNEL": 0,
@@ -25,10 +28,10 @@
    "channel_top_matched": 11
   },
   "codes": {
-   "B19": 71,
-   "B34": 94,
-   "B39": 1020,
-   "C04": 60,
+   "B19": 83,
+   "B34": 82,
+   "B39": 1026,
+   "C04": 48,
    "C09": 81,
    "CHANNEL_U_39": 90
   },
@@ -36,41 +39,41 @@
   "free_to_top": 0,
   "node_crossings": 0,
   "non_modular": 0,
-  "pieces": 1416,
+  "pieces": 1410,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "runs": 13,
-  "signature": "f58392791072c34b2bacefb1bba9fb66f349687264af73bb4c6645c452a62737",
-  "solve_s": 0.34
+  "signature": "8d394cdbb3262684333bab9e14e04606db7bb7c00b1e9cc24624a24dd54e7374",
+  "solve_s": 0.58
  },
  "LEGACY": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 37,
-   "COMPENSATOR_EXCESS_IN_RUN": 31,
+   "COMPENSATOR_CONSECUTIVE": 25,
+   "COMPENSATOR_EXCESS_IN_RUN": 25,
    "COMPENSATOR_VERTICAL_STRIP": 4,
    "OPENING_MISSING_COUNTER_LINTEL": 8,
    "OPENING_MISSING_LINTEL": 11,
-   "PRISM_STAGGER_BELOW_TARGET": 713
+   "PRISM_STAGGER_BELOW_TARGET": 703
   },
   "bond_reproved_walls": 0,
   "codes": {
-   "B19": 71,
-   "B34": 94,
-   "B39": 1110,
-   "C04": 60,
+   "B19": 83,
+   "B34": 82,
+   "B39": 1116,
+   "C04": 48,
    "C09": 81
   },
   "door_void_violations": 0,
   "non_modular": 0,
-  "pieces": 1416,
+  "pieces": 1410,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "signature": "22dffbdc6e8519177b26e9494e41edd386e61b06fdc75c19c654ef44c660456b",
-  "solve_s": 0.31
+  "signature": "55627cc80c7f25d598a29d8b4c0e32a6244c6834d6539172bb2494a715f891db",
+  "solve_s": 0.46
  },
  "bench_delta": {},
  "openings": 11,

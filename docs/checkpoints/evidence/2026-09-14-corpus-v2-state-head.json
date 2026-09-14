@@ -121,16 +121,16 @@
  },
  "root": "C:\\Users\\twitc\\Documents\\butanta-channel\\MeuBotao.pushbutton",
  "torre_easy_lo_r00_tgd|v2": {
-  "blocks": 17452,
+  "blocks": 16289,
   "codes": {
-   "COMPENSATOR_AVOIDABLE": 57,
-   "COMPENSATOR_CONSECUTIVE": 507,
-   "COMPENSATOR_EXCESS_IN_RUN": 537,
-   "COMPENSATOR_VERTICAL_STRIP": 108,
-   "COVERAGE_GAP_IN_ROW": 1090,
-   "COVERAGE_MISSING_ROW": 136,
-   "COVERAGE_PARTIAL_WALL": 24,
-   "COVERAGE_ROW_MOSTLY_EMPTY": 92,
+   "COMPENSATOR_AVOIDABLE": 55,
+   "COMPENSATOR_CONSECUTIVE": 472,
+   "COMPENSATOR_EXCESS_IN_RUN": 454,
+   "COMPENSATOR_VERTICAL_STRIP": 86,
+   "COVERAGE_GAP_IN_ROW": 1275,
+   "COVERAGE_MISSING_ROW": 142,
+   "COVERAGE_PARTIAL_WALL": 32,
+   "COVERAGE_ROW_MOSTLY_EMPTY": 86,
    "COVERAGE_WALL_NOT_MODULATED": 10,
    "JUNCTION_NOT_ALTERNATING": 16,
    "OPENING_BLOCK_CROSSES_JAMB": 96,
@@ -140,7 +140,7 @@
    "POSITION_OVERLAP": 140,
    "PRISM_CONTINUOUS_JOINT": 53,
    "PRISM_JOINT_STACK": 5,
-   "PRISM_STAGGER_BELOW_TARGET": 776
+   "PRISM_STAGGER_BELOW_TARGET": 739
   },
   "delta_vs_baseline": {
    "categories": [
@@ -152,10 +152,10 @@
      "status": "INALTERADO"
     },
     {
-     "after": 65,
+     "after": 62,
      "before": 61,
      "category": "compensators",
-     "delta": 4,
+     "delta": 1,
      "status": "REGRESSAO"
     },
     {
@@ -180,27 +180,27 @@
      "status": "MELHORIA"
     },
     {
-     "after": 61,
+     "after": 70,
      "before": 70,
      "category": "wall_coverage",
-     "delta": -9,
-     "status": "MELHORIA"
+     "delta": 0,
+     "status": "INALTERADO"
     }
    ],
    "critical": [
     {
-     "after": 136,
+     "after": 142,
      "before": 142,
      "code": "COVERAGE_MISSING_ROW",
-     "delta": -6,
-     "status": "MELHORIA"
+     "delta": 0,
+     "status": "INALTERADO"
     },
     {
-     "after": 92,
+     "after": 86,
      "before": 86,
      "code": "COVERAGE_ROW_MOSTLY_EMPTY",
-     "delta": 6,
-     "status": "REGRESSAO CRITICA"
+     "delta": 0,
+     "status": "INALTERADO"
     },
     {
      "after": 10,
@@ -233,24 +233,24 @@
    ],
    "fixed_codes": [
     {
-     "after": 507,
+     "after": 55,
+     "before": 57,
+     "code": "COMPENSATOR_AVOIDABLE"
+    },
+    {
+     "after": 472,
      "before": 676,
      "code": "COMPENSATOR_CONSECUTIVE"
     },
     {
-     "after": 1090,
-     "before": 1275,
-     "code": "COVERAGE_GAP_IN_ROW"
+     "after": 454,
+     "before": 528,
+     "code": "COMPENSATOR_EXCESS_IN_RUN"
     },
     {
-     "after": 136,
-     "before": 142,
-     "code": "COVERAGE_MISSING_ROW"
-    },
-    {
-     "after": 24,
-     "before": 32,
-     "code": "COVERAGE_PARTIAL_WALL"
+     "after": 86,
+     "before": 94,
+     "code": "COMPENSATOR_VERTICAL_STRIP"
     },
     {
      "after": 53,
@@ -265,37 +265,21 @@
    ],
    "new_codes": [
     {
-     "after": 537,
-     "before": 528,
-     "code": "COMPENSATOR_EXCESS_IN_RUN"
-    },
-    {
-     "after": 108,
-     "before": 94,
-     "code": "COMPENSATOR_VERTICAL_STRIP"
-    },
-    {
-     "after": 92,
-     "before": 86,
-     "code": "COVERAGE_ROW_MOSTLY_EMPTY"
-    },
-    {
-     "after": 776,
+     "after": 739,
      "before": 667,
      "code": "PRISM_STAGGER_BELOW_TARGET"
     }
    ],
    "project_id": "torre_easy_lo_r00_tgd",
-   "success_rate_after": 0.2966,
+   "success_rate_after": 0.2897,
    "success_rate_before": 0.2345,
-   "verdict": "REGRESSAO CRITICA",
+   "verdict": "REGRESSAO",
    "walls_broken": [],
    "walls_fixed": [
     "W006",
     "W013",
     "W021",
     "W022",
-    "W121",
     "W137",
     "W139",
     "W140",
@@ -386,6 +370,7 @@
     "W116",
     "W119",
     "W120",
+    "W121",
     "W122",
     "W123",
     "W124",
@@ -406,16 +391,16 @@
     "W145"
    ]
   },
-  "seconds": 263.6
+  "seconds": 206.2
  },
  "torre_easy_lo_r00_tp1|v2": {
-  "blocks": 19047,
+  "blocks": 18963,
   "codes": {
-   "COMPENSATOR_AVOIDABLE": 84,
-   "COMPENSATOR_CONSECUTIVE": 971,
-   "COMPENSATOR_EXCESS_IN_RUN": 966,
-   "COMPENSATOR_VERTICAL_STRIP": 151,
-   "COVERAGE_GAP_IN_ROW": 302,
+   "COMPENSATOR_AVOIDABLE": 80,
+   "COMPENSATOR_CONSECUTIVE": 936,
+   "COMPENSATOR_EXCESS_IN_RUN": 933,
+   "COMPENSATOR_VERTICAL_STRIP": 149,
+   "COVERAGE_GAP_IN_ROW": 336,
    "JUNCTION_MISSING_BINDING": 9,
    "OPENING_MISSING_COUNTER_LINTEL": 21,
    "POSITION_OVERLAP": 11,
@@ -460,11 +445,11 @@
      "status": "MELHORIA"
     },
     {
-     "after": 10,
+     "after": 13,
      "before": 13,
      "category": "wall_coverage",
-     "delta": -3,
-     "status": "MELHORIA"
+     "delta": 0,
+     "status": "INALTERADO"
     }
    ],
    "critical": [
@@ -492,24 +477,24 @@
    ],
    "fixed_codes": [
     {
-     "after": 971,
+     "after": 80,
+     "before": 83,
+     "code": "COMPENSATOR_AVOIDABLE"
+    },
+    {
+     "after": 936,
      "before": 1284,
      "code": "COMPENSATOR_CONSECUTIVE"
     },
     {
-     "after": 966,
+     "after": 933,
      "before": 1023,
      "code": "COMPENSATOR_EXCESS_IN_RUN"
     },
     {
-     "after": 151,
+     "after": 149,
      "before": 163,
      "code": "COMPENSATOR_VERTICAL_STRIP"
-    },
-    {
-     "after": 302,
-     "before": 336,
-     "code": "COVERAGE_GAP_IN_ROW"
     },
     {
      "after": 16,
@@ -523,11 +508,6 @@
     }
    ],
    "new_codes": [
-    {
-     "after": 84,
-     "before": 83,
-     "code": "COMPENSATOR_AVOIDABLE"
-    },
     {
      "after": 1539,
      "before": 1495,
@@ -621,6 +601,6 @@
     "W096"
    ]
   },
-  "seconds": 96.0
+  "seconds": 73.3
  }
 }

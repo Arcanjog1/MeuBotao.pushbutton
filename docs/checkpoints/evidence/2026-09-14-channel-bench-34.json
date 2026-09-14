@@ -1,90 +1,96 @@
 {
  "CHANNEL": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 178,
-   "COMPENSATOR_EXCESS_IN_RUN": 254,
-   "COMPENSATOR_VERTICAL_STRIP": 52,
-   "COVERAGE_GAP_IN_ROW": 13,
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 81,
+   "COVERAGE_PARTIAL_WALL": 4,
    "OPENING_MISSING_COUNTER_LINTEL": 23,
    "OPENING_MISSING_LINTEL": 43,
-   "PRISM_STAGGER_BELOW_TARGET": 108
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 77
   },
   "bond_reproved_walls": 3,
   "channel_findings": {
    "CHANNEL_HEAD_OFF_GRID": 2,
-   "CHANNEL_SUPPORT_LIMITED": 7,
-   "CHANNEL_THROUGH_T_SUPPORTED_PATTERN": 4
+   "CHANNEL_SUPPORT_LIMITED": 5,
+   "CHANNEL_THROUGH_T_SUPPORTED_PATTERN": 4,
+   "MISSING_REQUIRED_CHANNEL": 1
   },
   "channel_validation": {
    "CHANNEL_COLLISION": 0,
+   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
    "CHANNEL_INVADES_OPENING": 0,
-   "CHANNEL_SUPPORT_BELOW_POLICY": 5,
+   "CHANNEL_OPENING_OVERCUT": 0,
+   "CHANNEL_ORPHAN_PIECE": 0,
+   "CHANNEL_SUPPORT_BELOW_POLICY": 3,
    "CHANNEL_WRONG_COURSE": 0,
    "EXTRA_CHANNEL": 0,
-   "MISSING_REQUIRED_CHANNEL": 0,
+   "MISSING_REQUIRED_CHANNEL": 1,
    "channel_bottom_expected": 23,
-   "channel_bottom_matched": 23,
-   "channel_cut_pieces": 7,
-   "channel_pieces": 322,
+   "channel_bottom_matched": 22,
+   "channel_cut_pieces": 5,
+   "channel_pieces": 319,
    "channel_top_expected": 40,
    "channel_top_matched": 40
   },
   "codes": {
-   "B19": 318,
-   "B34": 1908,
-   "B39": 3796,
-   "B54": 208,
-   "C04": 359,
-   "C09": 502,
-   "CHANNEL_U_34": 71,
-   "CHANNEL_U_39": 244,
-   "CHANNEL_U_CUT": 7
+   "B19": 304,
+   "B34": 1852,
+   "B39": 3808,
+   "B54": 207,
+   "C04": 291,
+   "C09": 441,
+   "CHANNEL_U_34": 65,
+   "CHANNEL_U_39": 249,
+   "CHANNEL_U_CUT": 5
   },
   "door_void_violations": 0,
   "free_to_top": 2,
   "node_crossings": 4,
-  "non_modular": 0,
-  "pieces": 7413,
+  "non_modular": 78,
+  "pieces": 7222,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "runs": 40,
-  "signature": "7a2f516a19e932e2a01a0ccc54f81c320d11bbbf06ce084149d97c4b2406f9eb",
-  "solve_s": 2.85
+  "runs": 39,
+  "signature": "b509a4256bb80a5f5d151f0b9b2317add4d0f1812dbb1e16abf419898773b47d",
+  "solve_s": 12.36
  },
  "LEGACY": {
   "bench_codes": {
-   "COMPENSATOR_CONSECUTIVE": 179,
-   "COMPENSATOR_EXCESS_IN_RUN": 255,
-   "COMPENSATOR_VERTICAL_STRIP": 52,
-   "COVERAGE_GAP_IN_ROW": 7,
+   "COMPENSATOR_CONSECUTIVE": 142,
+   "COMPENSATOR_EXCESS_IN_RUN": 216,
+   "COMPENSATOR_VERTICAL_STRIP": 42,
+   "COVERAGE_GAP_IN_ROW": 75,
+   "COVERAGE_PARTIAL_WALL": 4,
    "OPENING_MISSING_COUNTER_LINTEL": 23,
    "OPENING_MISSING_LINTEL": 43,
-   "PRISM_STAGGER_BELOW_TARGET": 107
+   "OPENING_SOLID_BELOW_SILL_MISSING": 2,
+   "PRISM_STAGGER_BELOW_TARGET": 76
   },
   "bond_reproved_walls": 3,
   "codes": {
-   "B19": 315,
-   "B34": 1989,
-   "B39": 4062,
+   "B19": 306,
+   "B34": 1957,
+   "B39": 4044,
    "B54": 208,
-   "C04": 360,
-   "C09": 505
+   "C04": 291,
+   "C09": 444
   },
   "door_void_violations": 0,
-  "non_modular": 0,
-  "pieces": 7439,
+  "non_modular": 78,
+  "pieces": 7250,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "signature": "9b3f0501be8eab4ba6d54e04fa7627aa9f065c0fa440001a0cc0b79852d1b8b5",
-  "solve_s": 2.73
+  "signature": "94541746ba71190b3595096394f5fcc42c85ab63ad41ecdae441ac5afc148f0e",
+  "solve_s": 2.27
  },
  "bench_delta": {
-  "COMPENSATOR_CONSECUTIVE": -1,
-  "COMPENSATOR_EXCESS_IN_RUN": -1,
   "COVERAGE_GAP_IN_ROW": 6,
   "PRISM_STAGGER_BELOW_TARGET": 1
  },

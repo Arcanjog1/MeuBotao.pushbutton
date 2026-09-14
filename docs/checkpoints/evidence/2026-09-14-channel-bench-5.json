@@ -14,7 +14,10 @@
   },
   "channel_validation": {
    "CHANNEL_COLLISION": 0,
+   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
    "CHANNEL_INVADES_OPENING": 0,
+   "CHANNEL_OPENING_OVERCUT": 0,
+   "CHANNEL_ORPHAN_PIECE": 0,
    "CHANNEL_SUPPORT_BELOW_POLICY": 0,
    "CHANNEL_WRONG_COURSE": 0,
    "EXTRA_CHANNEL": 0,
@@ -46,8 +49,8 @@
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "runs": 17,
-  "signature": "d4b8b8f7e5f44e00511268551e6bc5850d435b1095f8482d4186fb6992e57da5",
-  "solve_s": 0.62
+  "signature": "c2b8584df2065fbeeab296ea1a890fdffd7bb8e9649f6a083c43bdcfdc9e3964",
+  "solve_s": 0.97
  },
  "LEGACY": {
   "bench_codes": {
@@ -74,8 +77,8 @@
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
-  "signature": "26cb825d4e8a8961ba016950618b02fedfd81b14103ae0d66cba71e9bccb8ceb",
-  "solve_s": 0.55
+  "signature": "f1da30ac50f3469f02f244956caaf05173dc6c2aee17b3c8a8e014ec5feb2618",
+  "solve_s": 0.75
  },
  "bench_delta": {},
  "openings": 16,
