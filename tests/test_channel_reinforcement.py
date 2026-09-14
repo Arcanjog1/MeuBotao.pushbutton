@@ -450,3 +450,44 @@ def test_module_is_ironpython27_compatible():
     assert not re.search(r"\bf\"|\bf'", source)
     assert "math.isfinite(" not in source
     assert "nonlocal" not in source
+
+
+# ------------------------------------------ travessia de T: nao vaza (51.6)
+def test_through_t_pattern_is_classified_specifically():
+    lines, ops = tee(sill_cm=80.0)
+    res, _w, _n, _o = solve(lines, ops)
+    codes = [f["code"] for f in res["opening_reinforcement"]["findings"]]
+    assert codes.count(orf.CHANNEL_THROUGH_T_PATTERN) == len(res["opening_reinforcement"]["node_crossings"]) == 2
+    assert all(f["classification"] == "SUPPORTED_PATTERN" for f in res["opening_reinforcement"]["findings"]
+               if f["code"] == orf.CHANNEL_THROUGH_T_PATTERN)
+
+
+def test_same_geometry_without_channel_keeps_the_normal_t():
+    lines, ops = tee(sill_cm=80.0)
+    res, walls, _n, _o = solve(lines, ops, strategy=None)
+    reasons = [c["placement_reason"] for v in res["course_candidates"].values() for c in v]
+    assert orf.CROSSING_ABUTMENT_REASON not in reasons
+    incoming = [r for ci in (3, 11) for r in strip(res, walls, 0, ci) if not r["along"]]
+    assert incoming and all(r["cand"]["logical_code"] == "B34" for r in incoming)
+
+
+def test_normal_t_away_from_opening_is_never_crossed():
+    lines, ops = tee(sill_cm=80.0, jamb_t_cm=380.0)  # jamba a 78 cm do eixo do T
+    res, _w, _n, _o = solve(lines, ops)
+    assert res["opening_reinforcement"]["node_crossings"] == []
+    assert orf.CHANNEL_THROUGH_T_PATTERN not in [f["code"] for f in res["opening_reinforcement"]["findings"]]
+
+
+def test_abutment_label_without_channel_covering_node_is_still_audited():
+    """A isencao HALF_BLOCK_NEAR_TIE exige a canaleta cobrindo o no': a
+    etiqueta sozinha nao isenta (auditor global intacto)."""
+    lines, ops = tee(sill_cm=80.0)
+    res, walls, nodes, openings = solve(lines, ops)
+    cc = dict((ci, list(v)) for ci, v in res["course_candidates"].items())
+    for ci in (3, 11):
+        cc[ci] = [dict(c, logical_code="B39") if orf.is_channel_code(c["logical_code"]) else c for c in cc[ci]]
+    catalog = dict(sb.CATALOG)
+    catalog.update(m.channel_logical_catalog())
+    audits = m.audit_all_walls_bond_quality(walls, cc, catalog, NUM_COURSES, openings_per_wall=openings, nodes=nodes)
+    problems = [str(p) for a in audits.values() for p in a["problems"]]
+    assert any("HALF_BLOCK_NEAR_TIE" in p for p in problems)

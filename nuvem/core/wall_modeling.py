@@ -3439,6 +3439,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
     all_intersection_failures, all_jamb_exceptions, all_non_modular = [], [], []
     all_tie_parity_flips, all_tie_parity_conflicts = [], []
     all_alignment_conflicts = []
+    all_residual_absorptions = []
     all_per_wall, all_validations = [], []
     all_door_void_violations = []
     total_bands = len(groups)
@@ -3528,6 +3529,8 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         all_validations.extend(result.get("validations") or [])
         all_non_modular.extend(result["non_modular"])
         all_alignment_conflicts.extend(result.get("alignment_conflicts") or [])
+        for absorption in result.get("residual_absorptions") or []:
+            all_residual_absorptions.append(dict(absorption, course_indices=list(course_indices)))
         all_door_void_violations.extend(result.get("door_void_violations") or [])
 
     # ETAPA 4D (regra #3, 2026-08-25): orientacao dos compensadores - roda
@@ -3570,6 +3573,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         "jamb_exceptions": all_jamb_exceptions,
         "non_modular": all_non_modular,
         "alignment_conflicts": all_alignment_conflicts,
+        "residual_absorptions": all_residual_absorptions,
         "door_void_violations": all_door_void_violations,
         # ATENCAO ao ler estas duas no relatorio: uma parede que aparece em
         # varias bandas (ex.: uma com janela - abaixo do peitoril, dentro
@@ -9329,6 +9333,37 @@ SETUP_THICKNESS_SCAN_MAX_LINES = 900
 
 REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 
+# ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14, decisao do usuario: CHANNEL
+# e' estrategia oficial; LINTEL_COUNTERLINTEL faz parte da arquitetura mas
+# ainda nao existe). (valor salvo, rotulo, implementada). "NONE" = modulacao
+# legada sem reforco. Uma estrategia nao implementada aparece para deixar a
+# expansao visivel, mas bloqueia o botao executar.
+OPENING_REINFORCEMENT_UI_OPTIONS = (
+    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
+    ("NONE", "Sem reforco de aberturas (modulacao legada)", True),
+    ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
+)
+DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "CHANNEL"
+
+
+def _opening_reinforcement_strategy_from_ui_value(value):
+    """Valor salvo na tela -> `opening_reinforcement_strategy` do motor.
+    Desconhecido/nao implementado nunca vira estrategia silenciosamente."""
+    for key, _label, implemented in OPENING_REINFORCEMENT_UI_OPTIONS:
+        if key == value:
+            if not implemented:
+                raise ValueError("estrategia de reforco de aberturas '{}' ainda nao implementada".format(value))
+            return None if key == "NONE" else key
+    return _opening_reinforcement_strategy_from_ui_value(DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+
+
+def _remembered_opening_reinforcement_strategy():
+    value = _recall_setup_defaults().get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+    try:
+        return _opening_reinforcement_strategy_from_ui_value(value)
+    except ValueError:
+        return _opening_reinforcement_strategy_from_ui_value(DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+
 
 class _SetupForm(Form):
     """Configuracao completa da execucao: Layer, espessuras, Nivel, altura
@@ -9361,8 +9396,8 @@ class _SetupForm(Form):
         # +80px em relacao aos 680 originais: a secao "6. Como gerar as
         # paredes" (rotulo + 2 opcoes) acrescentou 90px a' pilha da coluna
         # direita, que sem isso passaria a estourar a altura util.
-        self.Height = 760
-        self.MinimumSize = Size(880, 680)
+        self.Height = 830
+        self.MinimumSize = Size(880, 750)
         self.StartPosition = FORM_START_POSITION_CENTER_SCREEN
         self.BackColor = UI_BG
 
@@ -9475,8 +9510,28 @@ class _SetupForm(Form):
         self._thickness_list.BackColor = UI_SOFT
         self._thickness_list.ItemCheck += self._on_item_check
 
+        self._reinforcement_combo = ComboBox()
+        self._reinforcement_combo.Dock = DockStyle.Top
+        self._reinforcement_combo.Height = 26
+        self._reinforcement_combo.Font = _ui_font(10.0)
+        self._reinforcement_combo.DropDownStyle = ComboBoxStyle.DropDownList
+        remembered_reinforcement = defaults.get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+        selected_reinforcement = 0
+        for index, (key, label, _implemented) in enumerate(OPENING_REINFORCEMENT_UI_OPTIONS):
+            self._reinforcement_combo.Items.Add(label)
+            if key == remembered_reinforcement:
+                selected_reinforcement = index
+        self._reinforcement_combo.SelectedIndex = selected_reinforcement
+        self._reinforcement_combo.SelectedIndexChanged += self._on_changed
+
         # ordem de insercao = de baixo para cima (Dock.Top empilha ao
         # contrario da ordem em que os controles entram na colecao)
+        right.Controls.Add(self._reinforcement_combo)
+        right.Controls.Add(_build_section_label(
+            "7. Reforco de aberturas",
+            "CHANNEL: canaleta na fiada do topo do vao e sob o peitoril. Familias de canaleta "
+            "sao conferidas antes de calcular."
+        ))
         right.Controls.Add(self._wall_mode_panel)
         right.Controls.Add(_build_section_label(
             "6. Como gerar as paredes",
@@ -9707,6 +9762,10 @@ class _SetupForm(Form):
             problems.append("escolha o Nivel")
         if self._parsed_height_m() is None:
             problems.append("informe uma altura valida em metros (ex.: 2.80)")
+        reinforcement_option = self._selected_reinforcement_option()
+        if reinforcement_option is not None and not reinforcement_option[2]:
+            problems.append("reforco de aberturas '{}' ainda nao implementado - escolha CHANNEL".format(
+                reinforcement_option[0]))
 
         if problems:
             self._status.ForeColor = UI_WARN
@@ -9728,6 +9787,12 @@ class _SetupForm(Form):
         )
         _set_button_enabled(self._run_button, True)
         return True
+
+    def _selected_reinforcement_option(self):
+        combo = getattr(self, "_reinforcement_combo", None)
+        if combo is None or combo.SelectedIndex < 0:
+            return None
+        return OPENING_REINFORCEMENT_UI_OPTIONS[combo.SelectedIndex]
 
     # ------------------------------------------------------------ eventos
     def _on_layer_changed(self, sender, args):
@@ -9765,6 +9830,8 @@ class _SetupForm(Form):
                           else WALL_BUILD_MODE_SEGMENTED),
             "reference_layer": (None if self._reference_combo.SelectedIndex <= 0
                                 else str(self._reference_combo.SelectedItem)),
+            "opening_reinforcement": (self._selected_reinforcement_option() or
+                                      (DEFAULT_OPENING_REINFORCEMENT_UI_VALUE,))[0],
         }
         self.Close()
 
@@ -9807,6 +9874,7 @@ def _remember_setup_defaults(setup):
                 "openings_mode": setup.get("openings_mode"),
                 "wall_mode": setup.get("wall_mode"),
                 "reference_layer": setup.get("reference_layer"),
+                "opening_reinforcement": setup.get("opening_reinforcement"),
             }, handle)
     except Exception:
         pass
@@ -10621,6 +10689,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._solve_building_blocks = solve_building_blocks
         self._solve_building_blocks_all_courses = solve_building_blocks_all_courses
         self._create_building_blocks = create_building_blocks
+        self._load_channel_family_catalog = load_channel_family_catalog
+        self.channel_catalog_missing = []
         self._discover_previous_lot = _discover_previous_lot
         self._num_courses_for_wall_height = num_courses_for_wall_height
         self._OverrideGraphicSettings = OverrideGraphicSettings
@@ -10745,12 +10815,14 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
+                self._ensure_opening_reinforcement_catalog(app_doc)
                 with _perf.span("_execute_solve"):
                     self._execute_solve()
             elif action == "create":
                 with _perf.span("refresh_geometry_from_document",
                                 axes=len(self.created_walls_by_axis or {})):
                     self._refresh_geometry_from_document(app_doc)
+                self._ensure_opening_reinforcement_catalog(app_doc)
                 with _perf.span("_execute_create", esperados=sum(
                         len(v) for v in ((self.solve_result or {})
                                          .get("course_candidates") or {}).values())):
@@ -11149,6 +11221,27 @@ class _PostCreationEventHandler(IExternalEventHandler):
                          id(entry.get("symbol"))) for code, entry in sorted(self._creation_catalog().items()))
         return (walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level),
                 self.opening_reinforcement_strategy)
+
+    def _ensure_opening_reinforcement_catalog(self, app_doc):
+        """VALIDACAO DE FAMILIAS antes de calcular/criar (CHANNEL): carrega o
+        catalogo de canaletas uma vez e BLOQUEIA com a lista exata do que
+        falta - nenhuma peca e' criada e nada e' substituido por familia
+        parecida. Roda dentro do Execute (contexto de API valido)."""
+        strategy = self.opening_reinforcement_strategy
+        if not strategy:
+            return
+        from core.engine import opening_reinforcement as _reinforcement
+        if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+            raise ValueError("Estrategia de reforco de aberturas '{}' nao implementada.".format(strategy))
+        if not self.channel_catalog or self.channel_catalog_missing:
+            self.channel_catalog, self.channel_catalog_missing = self._load_channel_family_catalog(app_doc)
+        if self.channel_catalog_missing:
+            raise ValueError(
+                "CHANNEL BLOQUEADO antes de calcular/criar - familia(s)/tipo(s) de canaleta faltando no "
+                "projeto: {}. Carregue as familias e rode de novo.".format("; ".join(
+                    "{} = '{}' / '{}' ({})".format(item["logical_code"], item["family_name"],
+                                                   item["type_name"], item["reason"])
+                    for item in self.channel_catalog_missing)))
 
     def _creation_catalog(self):
         """Catalogo usado na CRIACAO: o fixo + canaletas quando a estrategia
@@ -12864,6 +12957,9 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     handler.wall_height_ft = wall_height_ft
     handler.catalog = catalog
     handler.catalog_missing = catalog_missing
+    # Estrategia escolhida na Tela de Configuracao (lembrada entre execucoes;
+    # o fluxo "paredes existentes" usa a ultima escolha).
+    handler.opening_reinforcement_strategy = _remembered_opening_reinforcement_strategy()
     handler.error_rows = wall_error_rows
     handler.solve_result = initial_solve_result
     handler.create_result = initial_create_result

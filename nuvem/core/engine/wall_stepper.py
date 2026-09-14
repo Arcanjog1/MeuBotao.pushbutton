@@ -110,6 +110,7 @@ __all__ = [
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout",
+    "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
     "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
@@ -6343,6 +6344,13 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
     }
 
 
+# Regra 30.8 (2026-09-14) - folga residual em trecho fechado por dois nos
+# (ver o uso em solve_wall_free_fill). 2,0 cm = maior folga medida no humano
+# (anel de shaft do BUTANTA: 1,0 cm na parede de 115, 2,0 cm nas de 86).
+RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
+RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
+
+
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -6446,6 +6454,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     jamb_exceptions = []
     non_modular = []
     alignment_conflicts = []
+    residual_absorptions = []
     # Diagnostico do pipeline "parede completa primeiro" - so' preenchidos
     # quando `continuous_first` (ver a docstring de `opening_strategy`).
     opening_cut_removals = []
@@ -6571,12 +6580,14 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
             # (L_CORNER_DEGRADED e familia): melhor uma solucao pior e
             # rotulada do que nenhuma solucao.
             non_modular_mark = len(non_modular)
+            residual_mark = len(residual_absorptions)
             alignment_mark = len(alignment_conflicts)
             active_boundaries = boundaries
             degraded_retry_done = False
             while True:
                 del candidates[variant_candidates_start:]
                 del non_modular[non_modular_mark:]
+                del residual_absorptions[residual_mark:]
                 del alignment_conflicts[alignment_mark:]
                 variant_seg_records = []
                 variant_joint_positions_cm = []
@@ -6720,6 +6731,32 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                         })
                         continue
                     pier_cm = max(0.0, raw_pier_cm)
+                    # FOLGA RESIDUAL ENTRE DOIS NOS (regra 30.8, 2026-09-14):
+                    # trecho fechado dos DOIS lados por amarracao de no' (nunca
+                    # jamba de abertura, nunca ponta livre) que fica fora do
+                    # modulo por <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM usa
+                    # o comprimento modular INFERIOR e divide a folga igualmente
+                    # nas duas juntas de contorno. Medido no BUTANTA humano
+                    # (anel 115 x 86 cm): pecas a 0,5 cm das duas pontas na
+                    # parede de 115 (folga 1,0) e a 1,0 cm nas de 86 (folga 2,0);
+                    # sem isto o solver deixava o anel inteiro sem preenchimento.
+                    if (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open
+                            and not trailing_is_open and pier_cm > 0
+                            and kind_left in ("WALL_START", "MIDSPAN_HI")
+                            and kind_right in ("WALL_END", "MIDSPAN_LO")
+                            and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
+                        lower_cm, _upper_cm = nearest_block_lengths_cm(pier_cm, lead_cm, trail_cm)
+                        residual_cm = pier_cm - (lower_cm or 0.0)
+                        if (lower_cm and 0.0 < residual_cm <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM + 1e-6
+                                and _pier_remaining_snapped_cm(lower_cm, lead_cm, trail_cm) is not None):
+                            seg_start_cm += residual_cm / 2.0
+                            seg_end_cm -= residual_cm / 2.0
+                            pier_cm = lower_cm
+                            residual_absorptions.append({
+                                "wall_idx": wall_idx, "course": course, "variant_index": variant_index,
+                                "segment_index": seg_i, "residual_cm": round(residual_cm, 4),
+                                "seg_start_cm": round(seg_start_cm, 4), "seg_end_cm": round(seg_end_cm, 4),
+                            })
                     origin = p0 + wall_dir * _cm_to_ft(seg_start_cm)
 
                     if course == "A":
@@ -7021,6 +7058,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
     return {
         "candidates": candidates, "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular, "alignment_conflicts": alignment_conflicts,
+        "residual_absorptions": residual_absorptions,
         # Diagnostico do pipeline "parede completa primeiro" (vazio no modo
         # historico): quais pecas o recorte derrubou e quais regioes
         # precisaram ser recalculadas por causa disso.
@@ -8765,6 +8803,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
     # que a lista cresce (ver _placed_index_near_wall).
     placed_index = _placed_index_add(_placed_index_new(), all_candidates)
     jamb_exceptions = []
+    residual_absorptions = []
     non_modular = []
     alignment_conflicts = []
     per_wall = []
@@ -8946,6 +8985,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         jamb_exceptions.extend(result["jamb_exceptions"])
         non_modular.extend(result["non_modular"])
         alignment_conflicts.extend(result.get("alignment_conflicts") or [])
+        residual_absorptions.extend(result.get("residual_absorptions") or [])
         validations.append(validation)
         per_wall.append({
             "wall_idx": wall_idx,
@@ -8998,6 +9038,7 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular,
         "alignment_conflicts": alignment_conflicts,
+        "residual_absorptions": residual_absorptions,
         "collisions": collisions,
         "per_wall": per_wall,
         "validations": validations,

@@ -27,7 +27,7 @@ isoladamente e reutilizavel pelo modelador externo. Ver
 """
 
 from core.engine.modulation_math import (  # noqa: F401
-    BLOCK_JOINT_CM, BLOCK_OPENING_JOINT_CM, PIER_MODULE_CM,
+    BLOCK_JOINT_CM, BLOCK_OPENING_JOINT_CM, PIER_MODULE_CM, PIER_PHYSICAL_FIT_TOLERANCE_CM,
 )
 
 __all__ = [
@@ -293,7 +293,10 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
             "trailing_open": True,
             "left_opening": left_opening, "right_opening": oi,
         }
-        if seg_hi - cursor_cm >= min_length_cm:
+        # Ruido de geometria (ex.: 3,9989 cm entre jamba e amarracao de no',
+        # BUTANTA 6627438) nao pode descartar a pastilha: mesma tolerancia
+        # FISICA de colocacao ja' aprovada (PIER_PHYSICAL_FIT_TOLERANCE_CM).
+        if seg_hi - cursor_cm >= min_length_cm - PIER_PHYSICAL_FIT_TOLERANCE_CM:
             segments.append(entry)
         elif seg_hi - cursor_cm > OPENING_FIT_TOLERANCE_CM:
             undersized.append(entry)
@@ -306,7 +309,7 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
         "trailing_open": not region.get("right_anchor_is_block"),
         "left_opening": left_opening, "right_opening": None,
     }
-    if hi_cm - cursor_cm >= min_length_cm:
+    if hi_cm - cursor_cm >= min_length_cm - PIER_PHYSICAL_FIT_TOLERANCE_CM:
         segments.append(entry)
     elif hi_cm - cursor_cm > OPENING_FIT_TOLERANCE_CM:
         undersized.append(entry)

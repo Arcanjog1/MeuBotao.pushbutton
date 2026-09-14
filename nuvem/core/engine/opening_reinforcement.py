@@ -79,6 +79,10 @@ COMPENSATOR_CODES = ("C09", "C04")
 CROSSING_CODE = "NODE_CROSSING"
 MERGEABLE_CODES = COMPENSATOR_CODES + (CROSSING_CODE,)
 CROSSING_ABUTMENT_REASON = "T_INTERSECTION_INCOMING_CHANNEL_ABUTMENT"
+# Mecanismo aprovado pelo usuario (2026-09-14, regra 51.6): corrida de canaleta
+# que atravessa o T quando o apoio efetivo seria <= 0. Classificacao PROPRIA -
+# nao e' excecao generica do auditor de junta.
+CHANNEL_THROUGH_T_PATTERN = "CHANNEL_THROUGH_T_SUPPORTED_PATTERN"
 # Parte de um B54 de no' dividido em duas canaletas (ver _tie_split_rows).
 TIE_SPLIT_CODE = "TIE_SPLIT"
 STANDARD_CHANNEL_BY_LENGTH = ((39.0, CHANNEL_U_39), (34.0, CHANNEL_U_34), (19.0, CHANNEL_U_19))
@@ -455,6 +459,23 @@ def _incoming_abutment_piece(tie, walls_to_create, main_wall_idx, catalog, polic
                                  wall_idx=incoming_idx, secondary_wall_idx=main_wall_idx)
 
 
+def _bearing_cm(rows, lo_cm, hi_cm):
+    """Comprimento de [lo_cm, hi_cm] efetivamente apoiado sobre pecas
+    (uniao das extensoes de `rows`, fiada imediatamente abaixo)."""
+    if hi_cm <= lo_cm:
+        return 0.0
+    spans = sorted((max(lo_cm, r["lo"]), min(hi_cm, r["hi"])) for r in rows
+                   if r["hi"] > lo_cm and r["lo"] < hi_cm)
+    total = 0.0
+    cursor = lo_cm
+    for a, b in spans:
+        a = max(a, cursor)
+        if b > a:
+            total += b - a
+            cursor = b
+    return total
+
+
 def _row_joints_cm(rows, gap_cm):
     joints = []
     for a, b in zip(rows, rows[1:]):
@@ -675,9 +696,17 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                      "wall_idx": wall_idx, "opening_index": oi,
                                      "course_index": ci, "role": role, "detail": problem})
                     continue
-                def _cross(j, support_cm, rows=rows, ci=ci):
+                def _cross(j, support_cm, rows=rows, ci=ci, t_lo=t_lo, t_hi=t_hi):
                     row = rows[j]
                     tie = row["cand"]
+                    # Apoio EFETIVO: o que fica sobre alvenaria da fiada de baixo
+                    # (um vazio junto a' jamba nao apoia nada).
+                    if ci > 0:
+                        below = _wall_strip_pieces(out_cc[ci - 1], walls_to_create, wall_idx)
+                        if row["hi"] <= t_lo + 0.5 and j + 1 < len(rows):
+                            support_cm = min(support_cm, _bearing_cm(below, rows[j + 1]["lo"], t_lo))
+                        elif j - 1 >= 0:
+                            support_cm = min(support_cm, _bearing_cm(below, t_hi, rows[j - 1]["hi"]))
                     if row["along"]:
                         if support_cm >= policy["convert_along_tie_when_support_below_cm"] - 1e-6:
                             return 0
@@ -697,8 +726,8 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                          "detail": "sem peca de catalogo para recuar a amarracao da parede que chega"})
                         return 0
                     rows[j] = _crossing_row(row, walls_to_create, wall_idx)
-                    findings.append({"code": "CHANNEL_NODE_CROSSING", "severity": SEVERITY_INFO,
-                                     "classification": "EXCEPTION_HUMAN_EVIDENCE", "wall_idx": wall_idx,
+                    findings.append({"code": CHANNEL_THROUGH_T_PATTERN, "severity": SEVERITY_INFO,
+                                     "classification": "SUPPORTED_PATTERN", "wall_idx": wall_idx,
                                      "course_index": ci, "incoming_wall_idx": tie.get("wall_idx"),
                                      "node_index": tie.get("node_index"),
                                      "detail": "canaleta atravessa o T; a parede que chega encosta na face "
@@ -765,17 +794,29 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                     t_hi = _ft_to_cm(opening[1])
                     support_l = round(t_lo - rows[sp[0]]["lo"], 3)
                     support_r = round(rows[sp[1]]["hi"] - t_hi, 3)
+                    if ci > 0:
+                        below_rows = _wall_strip_pieces(out_cc[ci - 1], walls_to_create, wall_idx)
+                        bearing_l = round(_bearing_cm(below_rows, rows[sp[0]]["lo"], t_lo), 3)
+                        bearing_r = round(_bearing_cm(below_rows, t_hi, rows[sp[1]]["hi"]), 3)
+                    else:
+                        bearing_l, bearing_r = support_l, support_r
                     side_key = "above" if role == ROLE_ABOVE_OPENING else "below"
                     rec = [r for r in openings_report if r["wall_idx"] == wall_idx and r["opening_index"] == oi][0]
                     rec[side_key] = {"status": "CHANNEL", "course_index": ci, "run_id": run_id,
                                      "support_l_cm": support_l, "support_r_cm": support_r,
+                                     "bearing_l_cm": bearing_l, "bearing_r_cm": bearing_r,
                                      "limited_l": lim_l, "limited_r": lim_r}
-                    for side, sup, lim in (("L", support_l, lim_l), ("R", support_r, lim_r)):
+                    for side, sup, bearing, lim in (("L", support_l, bearing_l, lim_l),
+                                                    ("R", support_r, bearing_r, lim_r)):
                         if sup < policy["min_support_cm"] - 1e-6:
+                            # 19 cm e' PREFERENCIAL (decisao do usuario 2026-09-14):
+                            # apoio menor, mas sobre alvenaria real, e' valido.
                             findings.append({"code": "CHANNEL_SUPPORT_LIMITED", "severity": SEVERITY_WARNING,
-                                             "classification": "VALID_ALTERNATIVE" if sup > 0 else "ACTUAL_ERROR",
+                                             "classification": ("VALID_ALTERNATIVE" if bearing > 0.5
+                                                                else "ACTUAL_ERROR"),
                                              "wall_idx": wall_idx, "opening_index": oi, "course_index": ci,
-                                             "role": role, "side": side, "support_cm": sup, "limited_by": lim})
+                                             "role": role, "side": side, "support_cm": sup,
+                                             "bearing_cm": bearing, "limited_by": lim})
                 runs.append(record)
             crossed = dict((id(x["removed"]), x) for x in crossings
                            if x["course_index"] == ci and x["main_wall_idx"] == wall_idx)
