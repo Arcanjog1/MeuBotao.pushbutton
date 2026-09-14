@@ -32,7 +32,12 @@ Estratégia B (CHANNEL) implementada como opt-in na branch `claude/butanta-chann
 - D: o cruzamento de T do humano é válido — classificação `CHANNEL_THROUGH_T_SUPPORTED_PATTERN`, sem relaxar o auditor global.
 - E: topo/peitoril fora da grade continua PENDENTE.
 - F: cinta de topo continua PENDENTE (TOP_BOND_BEAM ≠ OPENING_CHANNEL).
-Implementação: PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40), regra 51.13. LINTEL_COUNTERLINTEL, catálogo de verga e demais escolhas A continuam pendentes.
+Implementação: PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40), regras 51.13 e 51.14.
+
+## Auditoria independente (2026-09-14)
+- 30.8 desligada por default (opção B escolhida pelo usuário); 7719511 = limitação temporária do CHANNEL.
+- CHANNEL nunca é default da tela; só por escolha explícita.
+- Passagem livre abre só o vão (pedido do usuário). **Pendente**: o humano (PAR28) abre até as faces dos nós. LINTEL_COUNTERLINTEL, catálogo de verga e demais escolhas A continuam pendentes.
 
 ## SHA/PR relacionado
 Base de consolidação: 6c00f7e8198c9e6abea1880ee8a3a4cae473c8d9. [#32](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/32),

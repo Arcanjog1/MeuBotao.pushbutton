@@ -5224,7 +5224,16 @@ formalizar/implementar a política. Relatório completo:
   `wall_idx`). Veredito: **NECESSITA AJUSTE**. Nenhuma alteração de
   produção commitada nesta continuação.
 
-### 30.8 CONHECIMENTO DE AMARRAÇÃO — PADRÃO OBSERVADO (implementado) — folga residual de até 2 cm num trecho fechado por DOIS nós é distribuída nas duas juntas de contorno (2026-09-14)
+### 30.8 CONHECIMENTO DE AMARRAÇÃO — PADRÃO OBSERVADO (implementado, DESLIGADO por default desde a auditoria independente de 2026-09-14) — folga residual de até 2 cm num trecho fechado por DOIS nós é distribuída nas duas juntas de contorno (2026-09-14)
+
+> **STATUS (auditoria independente 2026-09-14, decisão do usuário "opção B")**:
+> `RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False`. Ligada, a régua de
+> benchmark acusa regressão crítica de `COVERAGE_ROW_MOSTLY_EMPTY` no TGD
+> (V1 171 → 232, V2 86 → 92) — o usuário não aceita regressão crítica no legado
+> e não autorizou regravar baseline. O vão 7719511 volta a ser **limitação
+> conhecida** da estratégia CHANNEL (canaleta inferior ausente sobre trecho não
+> modular). O conhecimento abaixo continua registrado; religar exige nova
+> decisão.
 
 **Quando**: um trecho de preenchimento limitado por nó dos DOIS lados (início/fim
 de parede em L/T/X ou nó de meio de parede — nunca jamba nem ponta livre) não
@@ -7483,11 +7492,13 @@ a substituição.
 
 > **STATUS: IMPLEMENTADO — estratégia OFICIAL** (decisão do usuário 2026-09-14,
 > item A: CHANNEL é estratégia oficial; a arquitetura terá também
-> LINTEL_COUNTERLINTEL, ainda não implementada). Escolhida na Tela de
-> Configuração ("7. Reforço de aberturas", padrão CHANNEL; "Sem reforço" = motor
-> legado byte a byte; VERGA/CONTRAVERGA aparece como não implementada e bloqueia
-> a execução). Branch `claude/butanta-channel-reference-implementation`, PR #40.
-> Decisões A–F de 2026-09-14 em 51.13. Nada daqui vale para verga/contraverga.
+> LINTEL_COUNTERLINTEL, ainda não implementada). **Nunca é default**
+> (auditoria independente 2026-09-14): a Tela de Configuração ("7. Reforço de
+> aberturas") abre em "Sem reforço" (motor legado byte a byte); CHANNEL só por
+> escolha explícita; VERGA/CONTRAVERGA aparece como não implementada e bloqueia a
+> execução. Branch `claude/butanta-channel-reference-implementation`, PR #40.
+> Decisões A–F em 51.13; correções da auditoria em 51.14. Nada daqui vale para
+> verga/contraverga.
 >
 > **Evidência**: BUTANTÃ R08_LT (seção 41), medida de novo por abertura em
 > `docs/checkpoints/evidence/2026-09-14-channel-human-runs.json` (44 vãos do
@@ -7618,13 +7629,32 @@ sendo a do motor legado.
 ### 51.9 PADRÃO OBSERVADO (implementado, parâmetro; aceito pelo usuário 2026-09-14, item C) — passagem livre até o topo
 
 Vão **sem peitoril** cujas **duas** jambas ficam a ≤ 28,5 cm (meio B54 + folga)
-do eixo de um nó L/T/X real da parede: não recebe canaleta e as peças sobre o vão
-(fiadas acima do topo) são removidas — a alvenaria termina nas jambas. Evidência:
-PAR28 (6919219, 6919324; 6/6 em todos os níveis) — as únicas duas do 1º PAV com
-as duas jambas a 27 cm de nós; a outra com as duas jambas perto de nós (7719511)
-tem peitoril e mantém alvenaria acima. Janela com peitoril nunca é passagem livre.
-`free_to_top_tie_bounded_passages=False` desliga. Usuário (item C): vão livre até o
-topo é válido — nenhuma canaleta superior artificial.
+do eixo de um nó L/T/X real da parede: não recebe canaleta e fica aberto até o
+topo. Evidência: PAR28 (6919219, 6919324; 6/6 em todos os níveis) — as únicas duas
+do 1º PAV com as duas jambas a 27 cm de nós; a outra com as duas jambas perto de
+nós (7719511) tem peitoril e mantém alvenaria acima. Janela com peitoril nunca é
+passagem livre. `free_to_top_tie_bounded_passages=False` desliga. Usuário (item
+C): vão livre até o topo é válido — nenhuma canaleta superior artificial.
+
+**REGRA OBRIGATÓRIA (auditoria independente 2026-09-14, correção P0)**: fica
+aberto **somente o intervalo físico do vão**; a alvenaria dos dois lados da jamba
+permanece, peça que cruza a jamba é recortada pelo motor e não sobra peça órfã.
+Implementação: a decisão é geométrica e tomada ANTES do solve
+(`free_to_top_openings`); o motor resolve com o vão estendido até o topo da
+última fiada (`openings_extended_to_top`), com o mesmo recorte de jamba da altura
+da porta. O pós-passe nunca remove peça (`FREE_TO_TOP_NOT_PRESOLVED` se chamado
+sem a decisão). A versão anterior removia peça inteira que tocava o vão acima do
+topo e abria além das jambas (sonda BUTANTÃ: jambas 1414–1570 abertas 1394–1590;
+fixture 227–473 aberta 208–488).
+
+**CONFLITO REGISTRADO (evidência humana × regra do usuário)**: medido nas
+sequências humanas (`2026-09-10-butanta-human-sequences.json`, parede 8079790,
+fiadas 221/241), o humano **não** termina a alvenaria nas jambas acima do topo:
+deixa aberto de face de nó a face de nó (≈1395–1799), sem o pilar entre os dois
+vãos. A regra acima (pedido explícito do usuário) prevalece; a comparação
+humano × solver classifica essas duas passagens como `NORMATIVE_DECISION`, nunca
+como equivalência. **Decisão do usuário pendente** se a passagem deve seguir o
+humano.
 
 ### 51.10 SEPARAÇÃO OBRIGATÓRIA — cinta de topo não é reforço de abertura (cinta de topo mantida PENDENTE pelo usuário 2026-09-14, item F)
 
@@ -7670,14 +7700,14 @@ superior artificial). D — o cruzamento de T do humano é válido, com classifi
 própria e sem relaxar o auditor global. E — topo/peitoril fora da grade continua
 PENDENTE. F — cinta de topo continua PENDENTE (TOP_BOND_BEAM ≠ OPENING_CHANNEL).
 
-**7719511 (MISSING_REQUIRED_CHANNEL = 1 → 0)**: causa na modulação legada — o anel
+**7719511 (MISSING_REQUIRED_CHANNEL = 1 → 0; REVERTIDO em 51.14: limitação conhecida)**: causa na modulação legada — o anel
 de 4 cantos L tinha miolos 1–2 cm fora do módulo e ficava vazio (categoria
 "preenchimento legado incapaz de fechar folga pequena entre nós"). Correção
 geral: 30.8. A canaleta sob o peitoril passa a existir com apoio 19,5/14 cm
 (humano 4/9 cm → SOLVER_BETTER); a de cima tem topo em 91 cm, fora da grade
 (51.8, NOT_COMPARABLE).
 
-**REGRA OBRIGATÓRIA (implementada) — ruído geométrico não descarta a pastilha de
+**PADRÃO (implementado, DESLIGADO por default desde 51.14 — `JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED`) — ruído geométrico não descarta a pastilha de
 jamba**: um trecho sólido entre jamba e peça de nó com comprimento
 ≥ `mínimo − PIER_PHYSICAL_FIT_TOLERANCE_CM` (0,05 cm) é trecho, não sobra
 (`region_solid_subsegments`). Medido: 6627438 tinha 3,9989 cm entre a jamba e a
@@ -7702,7 +7732,8 @@ antes de calcular/criar …") — nenhuma peça criada, nenhuma família parecid
 usada. "Sem reforço" nunca carrega famílias de canaleta. Testes:
 `tests/test_channel_ui_and_family_gate.py`.
 
-**Medições finais (HEAD `f918c1c`)**:
+**Medições do fechamento anterior (HEAD `f918c1c`, SUPERADAS por 51.14 — a 30.8 e a
+tolerância da pastilha foram desligadas e o comparador foi endurecido)**:
 - Offline 34 paredes/44 vãos: legado 7.439 peças × CHANNEL 7.413; `non_modular`
   0 (antes 78); top 40/40, bottom 23/23; MISSING/EXTRA/WRONG_COURSE/INVADES/
   COLLISION 0; PRISM 0 (nó|fill 0, fill|tie 0); paredes reprovadas 3 = 3
@@ -7716,3 +7747,86 @@ usada. "Sem reforço" nunca carrega famílias de canaleta. Testes:
   releitura 0 divergências, sessão nova 7.416 → 7.416, assinatura idêntica à
   bancada offline; solve 16,8 s (plano CHANNEL 0,51 s, validação 0,42 s,
   re-auditoria 0,18 s), criação 266 s.
+
+### 51.14 Correções da auditoria independente (2026-09-14)
+
+**Pedido do usuário (resumido)**: não aceitar regressão crítica no legado (30.8
+corrigida ou desligada, preferência pela opção B); provar o P0 do FREE_TO_TOP
+corrigido; endurecer o comparador humano × solver; tratar 6627438 (causa → RED →
+correção) sem mascarar 4 cm; CHANNEL nunca default e escolha passada do formulário
+para a execução; determinismo sem `id()`/ordem de dict; `result["candidates"]`
+como fonte única; regressão e Revit real refeitos.
+
+1. **30.8 e tolerância da pastilha DESLIGADAS** (opção B). Prova: assinatura do
+   legado BUTANTÃ 34 paredes idêntica à main (`94541746…`); corpus por parede em
+   coordenada de mundo, main × HEAD: TGD V1, TGD V2, TP1 V1, TP1 V2 com **0 paredes
+   alteradas**; no Revit real o legado do HEAD reproduz a assinatura da main
+   (7.253 peças). 7719511: limitação conhecida.
+2. **FREE_TO_TOP** (51.9): pré-solve + validador `CHANNEL_OPENING_OVERCUT` (vazio
+   junto à jamba maior que na referência — a fiada antes do reforço ou, acima de
+   passagem livre, a fiada de mesma paridade da altura do vão),
+   `CHANNEL_FREE_TO_TOP_NOT_OPEN` e `CHANNEL_ORPHAN_PIECE`. Testes com jambas em
+   5 posições, jamba atravessando peça nos dois lados, controle RED do planejador
+   e do validador (`tests/test_channel_audit_fixes.py`).
+3. **CONHECIMENTO DE AMARRAÇÃO — TENTATIVA COM GATES (implementada) — paridade do
+   nó T diante da canaleta (6627438)**. Causa medida: com a paridade do motor, na
+   fiada da canaleta a peça do nó é a amarração **transversal** da parede que
+   chega; a conversão ao longo (51.7, < 9 cm) só existe para amarração ao longo, e a
+   travessia (51.6) só com apoio ≤ 0 — com a pastilha C04 na jamba (4 cm reais, ou
+   3,9989 cm com a tolerância ligada) a corrida parava com 4 cm. O humano usou a
+   paridade oposta (K34 ao longo sobre o nó, apoio 39). Implementação
+   (`_channel_tie_parity_trials`): nó candidato quando o apoio geométrico diante da
+   transversal fica entre 0,5 e 9 cm (parando ou atravessando só por falta de
+   assentamento — a travessia com jamba na face da 51.6 não é candidata); inverte
+   `_tie_parity_flip`, reconstrói o motor e refaz o plano; aceita só se o apoio
+   chega a ≥ 9 cm e nada piora: erros do validador CHANNEL, paredes reprovadas,
+   juntas corridas, trechos não modulares, colisões, invasões de vão,
+   compensadores encostados, desencontros abaixo do alvo, e nenhum apoio de
+   canaleta cai abaixo do preferencial. BUTANTÃ: 6627438 aceito (offline 19/39,
+   Revit 24/33 efetivo, humano 34/39, mesma paridade no nó); W018/6672349
+   rejeitado (+12 compensadores encostados) — ali o solver fica com 4 cm, igual ao
+   humano (evidência conflitante: o humano também parou com 4 cm), classificado
+   `KNOWN_LIMITATION`. Confiança: `PADRÃO OBSERVADO` (2 casos, 1 a favor e 1
+   contra) — tentativa, nunca regra obrigatória.
+4. **Classificação do apoio limitado**: sem assentamento = `ACTUAL_ERROR`;
+   efetivo < 9 cm = `KNOWN_LIMITATION`; entre 9 e 19 cm assentado =
+   `VALID_ALTERNATIVE`.
+5. **UI**: default "Sem reforço" (NONE); instalação antiga, preferência ausente ou
+   valor desconhecido = legado sem exigir família de canaleta; a estratégia da
+   execução é a do formulário (a preferência salva só pré-seleciona); falha ao
+   salvar não troca a escolha; CHANNEL explícito sem família = erro com a lista.
+6. **Determinismo**: chave física canônica (`_physical_key`) em substituições,
+   travessias e divisões; ordem de linhas desempatada pela chave; plano idêntico
+   com as peças de entrada em ordem direta, invertida e rotacionada.
+7. **Fonte única**: após o pós-passe `result["candidates"]` = peças físicas
+   distintas de `course_candidates` e `result["collisions"]` aponta para essa
+   lista (a criação ativava símbolos a partir da lista antiga, sem as canaletas).
+8. **IronPython**: a lógica da 30.8 e o teste "vão dentro do trecho degradado"
+   viraram funções auxiliares — locais novos na função gigante quebravam o
+   `any(...)` com closure no Revit ("Sequence contains no elements"), medido no
+   Revit real com trecho não modular.
+9. **Comparador endurecido** (`_scripts/channel_strict_compare.py`): fiada;
+   apoio efetivo (apoio ∩ assentamento); juntas da própria parede (definição e
+   isenção da régua) contra as fiadas vizinhas — coincidências e desencontro abaixo
+   do alvo; paridade em cada nó da janela; problema de amarração local;
+   passagem livre pelas bordas abertas por fiada. EXACT exige corrida e apoio
+   efetivo iguais; VALID_ALTERNATIVE exige apoio efetivo ≥ 9 cm e nada crítico
+   pior, com motivo explícito.
+
+**Medições (HEAD de código `8019ce2`)**:
+- Offline 34 paredes/44 vãos: legado 7.250 (= main), CHANNEL 7.222; top 40/40,
+  bottom 22/23 (7719511); EXTRA/WRONG_COURSE/INVADES/COLLISION/OVERCUT/NOT_OPEN/
+  ORPHAN 0; PRISM 0; reprovadas 3 = 3; delta de benchmark CHANNEL × legado
+  `COVERAGE_GAP_IN_ROW +6` (passagens livres) e `PRISM_STAGGER_BELOW_TARGET +1`;
+  determinismo em 3 processos (legado `94541746…`, CHANNEL `b509a425…`).
+- Humano × solver endurecido (67 papéis): 1 EXACT, 14 EQUIVALENT, 9 BETTER,
+  37 VALID_ALTERNATIVE (20 paridade de canto, 17 desencontro abaixo do alvo),
+  2 KNOWN_LIMITATION (7719511 inferior, 6672349), 2 NORMATIVE_DECISION (passagens
+  livres), 2 NOT_COMPARABLE (topo fora da grade), **0 ACTUAL_ERROR, 0 SOLVER_WORSE**.
+- Revit real 34 paredes: 7.238 peças (321 canaletas, 6 cortadas), 0 falhas,
+  releitura 0 divergências, sessão nova 7.238 → 7.238, assinatura idêntica à
+  offline (`42e61f52…`); humano × Revit endurecido 44/44 vãos: 14 EQUIVALENT,
+  9 BETTER, 38 VALID_ALTERNATIVE, 2 KNOWN_LIMITATION, 2 NORMATIVE_DECISION,
+  2 NOT_COMPARABLE, 0 ACTUAL_ERROR, 0 SOLVER_WORSE. Solve 44,6 s no Revit (a
+  tentativa de paridade reconstrói o motor por candidato; offline 2,3 s legado ×
+  12,4 s CHANNEL), criação 237 s.

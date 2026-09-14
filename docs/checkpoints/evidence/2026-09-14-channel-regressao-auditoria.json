@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-09-14T16:01:14.819722+00:00",
+  "cwd": "C:\\Users\\twitc\\Documents\\butanta-channel\\MeuBotao.pushbutton",
+  "head": "612f9f3b2f950e34ddc6b817f6e4c5d620dfe2a2",
+  "tree": "1ee0aed56758f3a485dc046447660ecb630ffd87",
+  "status_before": "",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 7200,
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "regressao-consolidada-audit.txt",
+  "pid": 38188,
+  "exit_code": 1,
+  "elapsed_seconds": 2093.627,
+  "status_after": "",
+  "log_sha256": "a74a05b74ad66c72c6fcf27eac420b2bdc6047e05967ef15469588267fb38425"
+}

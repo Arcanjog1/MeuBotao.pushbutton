@@ -8,7 +8,10 @@ regras: seção 51 de [REGRAS](../../nuvem/REGRAS_MODULACAO_BLOCOS.md).
 
 ```
 solve_building_blocks_all_courses(..., opening_reinforcement_strategy=None|"CHANNEL")
-  -> solve por bandas + paridade + SAFE REPAIR + B19 residual   (inalterado)
+  -> free_to_top_openings + openings_extended_to_top           (so' CHANNEL: passagem livre ANTES do solve)
+  -> solve por bandas + paridade                                (inalterado)
+  -> _channel_tie_parity_trials                                 (so' CHANNEL: paridade do T com gates, 51.14)
+  -> SAFE REPAIR + B19 residual                                 (inalterado)
   -> _record_unmodulated_walls                                  (inalterado)
   -> _apply_opening_reinforcement                               (só se CHANNEL; timing_s plan/validate/reaudit)
        plan_channel_reinforcement(course_candidates, walls, openings, course_band, ...)
@@ -29,7 +32,8 @@ nós, fiadas nem preenchimento; recebe as fiadas físicas já resolvidas.
 | Mapeamento Revit | `CHANNEL_FAMILY_CATALOG_DEFINITIONS`, `load_channel_family_catalog` (`wall_modeling.py`) | família/tipo exatos, `Comprimento_bloco` de instância, `MISSING_FAMILY_MAPPING` |
 | Criação | `create_building_blocks` | grava o comprimento de instância; se não gravar, apaga a instância e reporta |
 | Handler | `_PostCreationEventHandler.opening_reinforcement_strategy`, `channel_catalog`, `_creation_catalog()`, `_ensure_opening_reinforcement_catalog()` | solve com a estratégia; **bloqueio antes de calcular/criar** com a lista de famílias/tipos de canaleta faltantes; criação com catálogo fixo + canaletas; assinatura beta inclui a estratégia |
-| Tela de Configuração | `OPENING_REINFORCEMENT_UI_OPTIONS`, `_SetupForm._reinforcement_combo` | seção "7. Reforço de aberturas": CHANNEL (padrão), Sem reforço (legado), VERGA/CONTRAVERGA visível e não executável; escolha lembrada |
+| Tela de Configuração | `OPENING_REINFORCEMENT_UI_OPTIONS`, `_SetupForm._reinforcement_combo`, `_show_post_creation_window(opening_reinforcement_strategy=...)` | seção "7. Reforço de aberturas": Sem reforço (**padrão**), CHANNEL só explícito, VERGA/CONTRAVERGA visível e não executável; a estratégia da execução vem do formulário (preferência salva só pré-seleciona) |
+| Fonte única | `_unify_candidates_with_courses` | após o pós-passe `candidates`/`collisions` = peças físicas de `course_candidates` |
 
 O catálogo de canaletas **nunca** entra no catálogo de preenchimento (o solver
 escolheria canaleta como bloco comum). Nomes de família não aparecem no módulo
@@ -90,7 +94,13 @@ Validador independente (recalcula a demanda a partir das aberturas):
   como no humano; aceita (decisão D) sem relaxar a auditoria global.
 - Apoio limitado é classificado pelo **assentamento real** na fiada de baixo
   (`bearing_*_cm`, 51.4): 6627438 apoia 4 cm sobre a pastilha C04 — VALID_ALTERNATIVE.
-- Dependências no motor comum fechadas nesta entrega: folga residual entre nós
-  (30.8, com regra #2 nos trechos absorvidos) e tolerância de ruído da pastilha de
-  jamba (51.13).
+- Folga residual entre nós (30.8) e tolerância de ruído da pastilha (51.13)
+  existem mas estão DESLIGADAS (auditoria 2026-09-14): 7719511 é limitação
+  conhecida.
+- Passagem livre abre só o vão (regra do usuário); o humano abre até as faces dos
+  nós — conflito registrado em 51.9.
+- A tentativa de paridade reconstrói o motor por nó candidato (Revit BUTANTÃ:
+  solve 44,6 s × 17 s sem ela).
+- Validador: `CHANNEL_OPENING_OVERCUT`, `CHANNEL_FREE_TO_TOP_NOT_OPEN`,
+  `CHANNEL_ORPHAN_PIECE`; chaves físicas canônicas (sem `id()`).
 - Canaleta J não usada.

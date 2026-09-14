@@ -1,9 +1,11 @@
 # Fechamento CHANNEL — PR #40 pronto para revisão (2026-09-14)
 
+> **HISTÓRICO** — veredito revogado pela auditoria independente; ver [correções da auditoria](2026-09-14-channel-audit-fixes.md).
+
 ```json
 {
   "date": "2026-09-14",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/butanta-channel-reference-implementation",
   "head": "f918c1c0ee44269fb533238a82320bfbe4ff601f",
   "base": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",

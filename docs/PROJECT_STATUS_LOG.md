@@ -1771,3 +1771,13 @@ entre nós + regra #2 nos trechos absorvidos), pastilha de jamba por ruído,
 apoio efetivo, travessia de T como SUPPORTED_PATTERN, UI e bloqueio por família.
 MISSING 0, ACTUAL_ERROR 0, Revit 34 paredes 7.416→7.416. Regressão 4 failed /
 1161 passed classificadas. Sem merge; verga/contraverga não iniciada.
+
+## 2026-09-14 — CHANNEL: correções da auditoria independente (PR #40)
+
+[Checkpoint](checkpoints/2026-09-14-channel-audit-fixes.md). Main observada `0e41c8e`.
+O veredito READY anterior foi revogado pela auditoria. HEAD `612f9f3` (código
+`8019ce2`): 30.8 e tolerância da pastilha desligadas (legado = main no corpus e
+no Revit), FREE_TO_TOP resolvido antes do solve, paridade do nó T para 6627438,
+UI default NONE, chaves canônicas, `candidates` unificado, comparador endurecido
+(0 ACTUAL_ERROR, 0 WORSE), Revit 34 paredes 7.238→7.238, regressão 3/1191 =
+main. Sem merge; verga/contraverga não iniciada.

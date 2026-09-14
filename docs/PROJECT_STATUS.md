@@ -4,7 +4,7 @@ Painel reconciliado por fetch em 2026-09-14 (main `0e41c8e`, merge do #39; refei
 
 ```json
 {
-  "observed_utc": "2026-09-14T13:56:39+00:00",
+  "observed_utc": "2026-09-14T16:38:30+00:00",
   "main": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",
   "official": [
     {
@@ -68,7 +68,7 @@ Painel reconciliado por fetch em 2026-09-14 (main `0e41c8e`, merge do #39; refei
     {
       "pr": 40,
       "branch": "claude/butanta-channel-reference-implementation",
-      "head": "f918c1c0ee44269fb533238a82320bfbe4ff601f"
+      "head": "612f9f3b2f950e34ddc6b817f6e4c5d620dfe2a2"
     }
   ]
 }
@@ -78,14 +78,14 @@ Painel reconciliado por fetch em 2026-09-14 (main `0e41c8e`, merge do #39; refei
 |---|---|
 | MAIN / HEAD observado | `0e41c8efe2b141b836bb4873f5219e4da0b1d03c` (merge do **#39**, Defeito 1 fill|tie); antes ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9). Sem reforço de aberturas (verga/canaleta) na main. Falha histórica do benchmark V1: TP1 JUNCTION 8→9 |
-| Candidato desta sessão | PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40) `claude/butanta-channel-reference-implementation` HEAD `f918c1c` (base `0e41c8e`): **estratégia CHANNEL (canaletas) — READY FOR REVIEW**, estratégia oficial pela decisão A de 2026-09-14 (regras 30.8, 51, 51.13). 7719511 corrigido (folga residual entre nós, 30.8); 6627438 VALID_ALTERNATIVE (pastilha de jamba por ruído). Offline 34 paredes/44 vãos: top 40/40, bottom 23/23, MISSING/EXTRA/INVADES/COLLISION 0, PRISM 0, reprovadas 3 = 3. Humano×solver 67 papéis: 0 ACTUAL_ERROR, 0 WORSE. Revit real: 7.416 peças, releitura 0, 7.416→7.416, paridade exata. UI "7. Reforço de aberturas" + bloqueio por família. Regressão 4 failed/1161 passed (TP1 V1 JUNCTION e GIL win32 = main; TGD V1/V2 COVERAGE_ROW_MOSTLY_EMPTY por reclassificação da 30.8). Sem merge — [checkpoint](checkpoints/2026-09-14-channel-ready-closure.md). Anterior: #39 (integrado) |
+| Candidato desta sessão | PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40) `claude/butanta-channel-reference-implementation` HEAD `612f9f3` (código `8019ce2`, base `0e41c8e`): **CHANNEL após a auditoria independente** — 30.8 e tolerância da pastilha desligadas (legado = main no BUTANTÃ, TGD V1/V2, TP1 V1/V2 e no Revit); FREE_TO_TOP pré-solve (abre só o vão); 6627438 por tentativa de paridade do T (19/39; humano 34/39); UI default NONE; chaves canônicas; `candidates` unificado; comparador endurecido: 0 ACTUAL_ERROR, 0 WORSE (offline e Revit). Revit 34 paredes 7.238→7.238. Regressão 3 failed/1191 passed = falhas da main. Sem merge — [checkpoint](checkpoints/2026-09-14-channel-audit-fixes.md) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
-| Bloqueadores | CHANNEL: topo/peitoril fora da grade (51.8, decisão E pendente); cinta de topo (10.7, F pendente); cascata C04+C04 no TP1 e 3 paredes V1 do TGD com perda de cobertura (51.13). Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
+| Bloqueadores | CHANNEL: decisão da passagem livre (humano abre até as faces dos nós), 7719511 (30.8 desligada), 6672349 (4 cm = humano), topo/peitoril fora da grade (E), cinta de topo (F), custo do solve CHANNEL (44,6 s no Revit). Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Fechamento CHANNEL — READY FOR REVIEW](checkpoints/2026-09-14-channel-ready-closure.md); antes [Estratégia CHANNEL — BUTANTÃ humano × cru](checkpoints/2026-09-14-butanta-channel-implementation.md) e [Defeito 1 — junta corrida fill|tie](checkpoints/2026-09-12-fill-tie-running-joint.md) |
+| Último checkpoint | [CHANNEL — correções da auditoria independente](checkpoints/2026-09-14-channel-audit-fixes.md); antes [fechamento revogado](checkpoints/2026-09-14-channel-ready-closure.md) e [implementação](checkpoints/2026-09-14-butanta-channel-implementation.md) |
 | CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
 | Próximo objetivo | Revisão do PR #40 (CHANNEL) e decisões E/F; LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
