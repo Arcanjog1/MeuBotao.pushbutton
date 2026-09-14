@@ -269,3 +269,157 @@ def test_legacy_candidates_are_untouched():
     explicit, _w, _n, _o = solve(lines, ops, strategy=None)
     assert [orf._physical_key(c) for c in plain["candidates"]] == [orf._physical_key(c) for c in explicit["candidates"]]
     assert "candidates_before_reinforcement" not in explicit
+
+
+# ------------------------------------------ passagem livre CONTINUA (face a face)
+def _double_passage(left_node=200.0, pier_node=450.0, right_node=700.0, gap=27.0, head2=221.0, pier_cross=False):
+    """Parede principal com tres T (paredes que chegam de um lado so') e duas
+    portas sem peitoril encadeadas pelo pilar do T do meio - padrao PAR28."""
+    lines = [seg(0, 0, 900, 0), seg(left_node, 0, left_node, 273), seg(right_node, 0, right_node, 273)]
+    if pier_cross:
+        lines.append(seg(pier_node, -273, pier_node, 273))
+    else:
+        lines.append(seg(pier_node, 0, pier_node, 273))
+    ops = [[(ft(left_node + gap), ft(pier_node - gap), ft(0), ft(221)),
+            (ft(pier_node + gap), ft(right_node - gap), ft(0), ft(head2))], [], [], []]
+    return lines, ops
+
+
+@pytest.mark.parametrize("gap,pier", [(27.0, 450.0), (25.0, 450.0), (27.0, 430.0)])
+def test_continuous_passage_opens_from_node_face_to_node_face(gap, pier):
+    lines, ops = _double_passage(pier_node=pier, gap=gap)
+    res, walls, nodes, openings = solve(lines, ops)
+    rein = res["opening_reinforcement"]
+    assert len(rein["continuous_passages"]) == 1
+    passage = rein["continuous_passages"][0]
+    lo, hi = passage["region_cm"]
+    assert abs(lo - 207.0) < 0.6 and abs(hi - 693.0) < 0.6
+    assert [r["above"]["status"] for r in rein["openings"]] == ["FREE_TO_TOP", "FREE_TO_TOP"]
+    incoming = passage["inner"][0]["incoming_wall_idx"]
+    for ci in range(passage["from_course"], NUM_COURSES):
+        pieces = res["course_candidates"][ci]
+        # (1) regiao interna vazia (qualquer parede, pela geometria real)
+        assert orf._pieces_in_wall_region(pieces, walls, 0, lo, hi) == [], ci
+        # (2) nos externos continuam amarrados ate' a face
+        rows = strip(res, walls, 0, ci)
+        assert orf._jamb_outside_gap_cm(rows, lo, -1) <= 1.5 and orf._jamb_outside_gap_cm(rows, hi, 1) <= 1.5, ci
+        # (3) a parede que chega no no' do pilar termina na face da principal
+        a, b = passage["inner"][0]["incoming_region_cm"]
+        assert strip(res, walls, incoming, ci), ci
+        assert orf._pieces_in_wall_region(pieces, walls, incoming, a, b) == [], ci
+        assert orf._jamb_outside_gap_cm(strip(res, walls, incoming, ci), b if a <= 0.5 else a,
+                                        1 if a <= 0.5 else -1) <= 1.5, ci
+    # abaixo do topo: as duas portas e o pilar existem como antes
+    below = strip(res, walls, 0, passage["from_course"] - 1)
+    assert [r for r in below if pier - 20 < (r["lo"] + r["hi"]) / 2.0 < pier + 20]
+    counts = rein["validation"]["counts"]
+    for key in ("CHANNEL_FREE_TO_TOP_NOT_OPEN", "CHANNEL_OPENING_OVERCUT", "CHANNEL_ORPHAN_PIECE",
+                "CHANNEL_INVADES_OPENING", "CHANNEL_COLLISION", "MISSING_REQUIRED_CHANNEL"):
+        assert counts[key] == 0, key
+    pf = m.controlled_beta_preflight(res, walls, openings, tcr.sb.CATALOG, 0.0)
+    assert pf["ok"] and not pf["opening_violations"] and not pf["collisions"]
+    assert not [p for a in res["wall_bond_audits"].values() for p in a["problems"]
+                if "CONTINUOUS_VERTICAL_JOINT" in str(p)]
+
+
+def test_single_free_passage_is_not_continuous_and_opens_only_the_opening():
+    lines, ops = _passage(227.0, 473.0)
+    res, walls, _n, _o = solve(lines, ops)
+    assert res["opening_reinforcement"]["continuous_passages"] == []
+    from_ci = res["opening_reinforcement"]["free_to_top"][0]["from_course"]
+    assert codes_over_any(res, walls, from_ci, 200.0, 227.0)
+
+
+def codes_over_any(res, walls, ci, lo, hi):
+    return [r["cand"]["logical_code"] for r in strip(res, walls, 0, ci) if r["hi"] > lo + 0.5 and r["lo"] < hi - 0.5]
+
+
+@pytest.mark.parametrize("variant", ["pier_is_cross", "different_head", "pier_too_wide"])
+def test_non_equivalent_geometry_is_not_a_continuous_passage(variant):
+    if variant == "pier_is_cross":
+        lines, ops = _double_passage(pier_cross=True)
+    elif variant == "different_head":
+        lines, ops = _double_passage(head2=201.0)
+    else:
+        lines, ops = _double_passage(gap=27.0)
+        ops = [[ops[0][0], (ft(450.0 + 40.0), ft(673.0), ft(0), ft(221))], [], [], []]
+    res, _w, _n, _o = solve(lines, ops)
+    assert res["opening_reinforcement"]["continuous_passages"] == []
+
+
+def test_validator_red_leftover_in_passage_and_incoming_wall_intrusion():
+    lines, ops = _double_passage()
+    res, walls, nodes, openings = solve(lines, ops)
+    rein = res["opening_reinforcement"]
+    passage = rein["continuous_passages"][0]
+    ci = passage["from_course"]
+    band = _band(res)
+    cc = dict((k, list(v)) for k, v in res["course_candidates"].items())
+    template = strip(res, walls, 0, ci - 1)[0]["cand"]
+    leftover = dict(template, logical_code="B39", length_cm=39.0,
+                    origin_world=m.XYZ(ft(450.0), template["origin_world"].Y, template["origin_world"].Z))
+    cc[ci] = cc[ci] + [leftover]
+    val = orf.validate_channel_reinforcement(cc, walls, openings, band, NUM_COURSES, 0.0,
+                                             free_to_top=rein["free_to_top"], nodes=nodes)
+    assert val["counts"]["CHANNEL_FREE_TO_TOP_NOT_OPEN"] >= 1
+    inc = passage["inner"][0]["incoming_wall_idx"]
+    inc_template = [r for r in strip(res, walls, inc, ci) if r["along"]][0]["cand"]
+    p0, _p1, d, _l, _t = m._wall_axis_and_length(walls, inc)
+    a, b = passage["inner"][0]["incoming_region_cm"]
+    intrusion = dict(inc_template, logical_code="C09", length_cm=9.0,
+                     origin_world=m.XYZ((p0 + d * ft((a + b) / 2.0)).X, (p0 + d * ft((a + b) / 2.0)).Y,
+                                        inc_template["origin_world"].Z))
+    cc2 = dict((k, list(v)) for k, v in res["course_candidates"].items())
+    cc2[ci] = cc2[ci] + [intrusion]
+    val = orf.validate_channel_reinforcement(cc2, walls, openings, band, NUM_COURSES, 0.0,
+                                             free_to_top=rein["free_to_top"], nodes=nodes)
+    assert val["counts"]["CHANNEL_FREE_TO_TOP_NOT_OPEN"] >= 1
+
+
+# ------------------------------------------ desempenho: memo/cache sem mudar nada
+def _full_signature(res):
+    import json
+    rows = sorted("%d|%s" % (ci, orf._physical_key(c)) for ci, v in res["course_candidates"].items() for c in v)
+    rein = res["opening_reinforcement"]
+    extra = json.dumps({"val": rein["validation"], "openings": rein["openings"], "runs": rein["runs"],
+                        "findings": rein["findings"], "passages": rein.get("continuous_passages"),
+                        "trials": [(res.get("channel_tie_parity_trials") or {}).get("accepted"),
+                                   (res.get("channel_tie_parity_trials") or {}).get("rejected")],
+                        "nonmod": res["non_modular"], "collisions": res["collisions"],
+                        "candidates": [orf._physical_key(c) for c in res["candidates"]],
+                        "bond": sorted((k, a["ok"], a["problems"]) for k, a in res["wall_bond_audits"].items())},
+                       sort_keys=True, default=str)
+    return hashlib.sha256(("\n".join(rows) + extra).encode("utf-8")).hexdigest()
+
+
+@pytest.mark.parametrize("fixture", ["tee80", "tee100", "free_wall", "passage", "double_passage", "door_next_to_tee"])
+def test_performance_memo_and_caches_give_identical_result(fixture):
+    if fixture == "tee80":
+        lines, ops = tcr.tee(sill_cm=80.0)
+    elif fixture == "tee100":
+        lines, ops = tcr.tee(sill_cm=100.0)
+    elif fixture == "free_wall":
+        lines, ops = tcr.free_wall()
+    elif fixture == "passage":
+        lines, ops = _passage(227.0, 473.0)
+    elif fixture == "double_passage":
+        lines, ops = _double_passage()
+    else:
+        lines, ops = _door_next_to_tee(269.0, 370.0)
+    sigs = []
+    for fn in (m.solve_building_blocks_all_courses, m._solve_building_blocks_all_courses_impl):
+        walls = [(line, ft(14.0), (False, False)) for line in lines]
+        walls, jm = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+        nodes, e2n = m.build_wall_graph(walls, jm)
+        res = fn(nodes, walls, e2n, ops, tcr.sb.CATALOG, 0.0, NUM_COURSES,
+                 variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE, opening_reinforcement_strategy=tcr.CHANNEL)
+        assert "_channel_metrics_cache" not in res
+        sigs.append(_full_signature(res))
+    assert sigs[0] == sigs[1]
+    assert ws.WALL_FILL_MEMO is None  # memo nunca vaza para fora da chamada
+
+
+def test_memo_key_has_no_identity_or_dict_order_dependency():
+    import inspect
+    src = inspect.getsource(ws._wall_fill_memo_key)
+    assert "id(" not in src and "sorted(" in src

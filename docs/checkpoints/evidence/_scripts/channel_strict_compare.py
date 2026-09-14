@@ -28,8 +28,9 @@ SOLVER_WORSE: apoio efetivo < 9 cm (abaixo do humano), mais coincidencias, ou
   do humano naquele lado, sem outra piora.
 Passagem livre (humano sem pecas sobre o vao): EXACT_MATCH so' se as bordas
 abertas do solver ficam a <= 1,6 cm das humanas em todas as fiadas comuns;
-mais aberto que o humano = SOLVER_WORSE; menos aberto (alvenaria ate' a jamba,
-regra pedida pelo usuario) = NORMATIVE_DECISION.
+bordas livres medidas pela ocupacao geometrica da faixa (inclui as pecas das
+paredes que encontram esta nos nos); mais aberto que o humano = SOLVER_WORSE;
+menos aberto = VALID_ALTERNATIVE.
 EXACT_MATCH de canaleta exige tambem apoio efetivo >= humano - 1,6 cm.
 Canaleta ausente: ACTUAL_ERROR, exceto KNOWN_LIMITATION quando o proprio solver
 registra trecho NAO MODULAR sobre o vao naquela fiada (limitacao declarada).
@@ -281,37 +282,79 @@ class StrictComparator(object):
             return ("SOLVER_BETTER", gain) if gain else ("PHYSICALLY_EQUIVALENT", [])
         return "VALID_ALTERNATIVE", reasons
 
+    def _occupancy(self, wi, wid, ci):
+        """Intervalos ocupados na FAIXA da parede `wi` (eixo humano), solver e
+        humano, pela geometria: pecas de qualquer parede cuja pegada entra na
+        faixa. No humano soma as pecas das paredes que encontram esta num no'
+        (a lista da propria parede nao traz a transversal da vizinha)."""
+        m, orf = self.m, self.orf
+        p0, _p1, wall_dir, _l, th = m._wall_axis_and_length(self.walls, wi)
+        half = m._ft_to_cm(th) / 2.0
+        solver = []
+        for cand in self.res["course_candidates"].get(ci) or []:
+            t_lo, t_hi, n_lo, n_hi = orf._footprint_on_wall(cand, p0, wall_dir)
+            if n_hi > -half + 0.5 and n_lo < half - 0.5:
+                a, b = sorted((self.to_human_t(wi, t_lo), self.to_human_t(wi, t_hi)))
+                solver.append((a, b))
+        human = [(a + 1.0, b - 1.0) for a, b in self.human_course(wid, ci)]
+        w = self.walls_json[wid]
+        (hx0, hy0), (hx1, hy1) = w["p0_cm"], w["p1_cm"]
+        L = ((hx1 - hx0) ** 2 + (hy1 - hy0) ** 2) ** 0.5
+        ux, uy = (hx1 - hx0) / L, (hy1 - hy0) / L
+        others = set()
+        for node, _t in m._wall_junction_nodes_and_ts_ft(self.walls, self.nodes, wi):
+            for arm in node.get("arms") or []:
+                if arm and arm[0] != wi:
+                    others.add(arm[0])
+            for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+                if node.get(key) is not None and node[key] != wi:
+                    others.add(node[key])
+        for other in sorted(others):
+            owid = self.wall_ids[other]
+            ow = self.walls_json[owid]
+            (ox0, oy0), (ox1, oy1) = ow["p0_cm"], ow["p1_cm"]
+            OL = ((ox1 - ox0) ** 2 + (oy1 - oy0) ** 2) ** 0.5
+            vx, vy = (ox1 - ox0) / OL, (oy1 - oy0) / OL
+            for lo, hi in self.human_course(owid, ci, along_only=True):
+                ts, ns = [], []
+                for t in (lo + 1.0, hi - 1.0):
+                    x, y = ox0 + vx * t, oy0 + vy * t
+                    ts.append((x - hx0) * ux + (y - hy0) * uy)
+                    ns.append(-(x - hx0) * uy + (y - hy0) * ux)
+                if max(ns) > -half + 0.5 and min(ns) < half - 0.5:
+                    across = abs(vx * uy - vy * ux) * 7.0 + abs(vx * ux + vy * uy) * 0.0
+                    human.append((min(ts) - across, max(ts) + across))
+        return sorted(solver), sorted(human)
+
     def _free_to_top(self, wi, wid, s, hh, span, row):
         from_ci = s.get("course_index")
-        diffs = []
-        worse = []
-        inside = []
+        mid = (span[0] + span[1]) / 2.0
+        reach = 400.0
+
+        def edges(intervals):
+            inside = [iv for iv in intervals if iv[1] > span[0] + 0.5 and iv[0] < span[1] - 0.5]
+            left = [iv[1] for iv in intervals if iv[1] <= span[0] + 0.5 and iv[1] >= span[0] - reach]
+            right = [iv[0] for iv in intervals if iv[0] >= span[1] - 0.5 and iv[0] <= span[1] + reach]
+            return (max(left) if left else span[0] - reach, min(right) if right else span[1] + reach, inside)
+
+        diffs, worse, less, inside_solver = [], [], [], []
         human_courses = sorted(int(c) for c in self.seq.get(str(wid), {}))
         for ci in [c for c in human_courses if c >= from_ci]:
-            sol = self.solver_course(wi, ci)
-            hum = [(a + 1.0, b - 1.0) for a, b in self.human_course(wid, ci)]  # sem a aba de 1 cm
-            for pieces, label in ((sol, "solver"), (hum, "human")):
-                if [p for p in pieces if p[1] > span[0] + 0.5 and p[0] < span[1] - 0.5]:
-                    inside.append((ci, label))
-            for side, t in ((-1, span[0]), (1, span[1])):
-                def gap(pieces):
-                    if side < 0:
-                        edges = [b for a, b in pieces if t - 80 <= b <= t + 0.5]
-                        return max(0.0, t - max(edges)) if edges else 80.0
-                    edges = [a for a, b in pieces if t - 0.5 <= a <= t + 80]
-                    return max(0.0, min(edges) - t) if edges else 80.0
-                g_s, g_h = gap(sol), gap(hum)
-                diffs.append((ci, side, round(g_s, 2), round(g_h, 2)))
-                if g_s > g_h + TOL:
-                    worse.append((ci, side, round(g_s, 2), round(g_h, 2)))
-        row.update(free_to_top_gaps=diffs, pieces_inside=inside)
-        if [x for x in inside if x[1] == "solver"]:
+            sol, hum = self._occupancy(wi, wid, ci)
+            ls, rs, ins = edges(sol)
+            lh, rh, _inh = edges(hum)
+            if ins:
+                inside_solver.append(ci)
+            diffs.append((ci, round(ls, 1), round(lh, 1), round(rs, 1), round(rh, 1)))
+            if ls < lh - TOL or rs > rh + TOL:
+                worse.append(ci)
+            if ls > lh + TOL or rs < rh - TOL:
+                less.append(ci)
+        row.update(free_edges_solver_human=diffs)
+        if inside_solver:
             return "SOLVER_WORSE", ["solver_piece_inside_open_span"]
         if worse:
             return "SOLVER_WORSE", ["solver_opens_wider_than_human"]
-        if all(abs(g_s - g_h) <= TOL for _c, _sd, g_s, g_h in diffs):
-            return "EXACT_MATCH", []
-        # O humano abre alem das jambas (ate' as faces dos nos); a regra pedida
-        # pelo usuario (auditoria 2026-09-14) abre SO' o vao. Diferenca real,
-        # nunca equivalencia: decisao normativa registrada.
-        return "NORMATIVE_DECISION", ["user_rule_opens_only_the_opening_human_opens_to_node_faces"]
+        if less:
+            return "VALID_ALTERNATIVE", ["solver_keeps_more_masonry_than_human"]
+        return "EXACT_MATCH", []

@@ -193,6 +193,42 @@ def _physical_key(candidate):
         o.X, o.Y, o.Z, candidate.get("length_cm") or 0.0, direction, candidate.get("placement_reason") or "")
 
 
+def course_wall_buckets(course_candidates):
+    """{course_index: {wall_idx: [pecas]}} com cada peca listada sob `wall_idx` e
+    `secondary_wall_idx`, na ORDEM original da fiada. `_wall_strip_pieces`
+    sobre o balde devolve exatamente o mesmo que sobre a fiada inteira (ela ja'
+    filtra por essas duas chaves e ordena) - so' evita varrer a fiada toda a
+    cada parede (desempenho, 2026-09-14)."""
+    out = {}
+    for ci in sorted(course_candidates or {}):
+        by_wall = {}
+        for cand in course_candidates.get(ci) or []:
+            for key in (cand.get("wall_idx"), cand.get("secondary_wall_idx")):
+                if key is None:
+                    continue
+                bucket = by_wall.setdefault(key, [])
+                if not bucket or bucket[-1] is not cand:
+                    bucket.append(cand)
+        out[ci] = by_wall
+    return out
+
+
+def _bucket(buckets, ci, wall_idx):
+    return (buckets.get(ci) or {}).get(wall_idx) or []
+
+
+def cached_strip_rows(cache, tag, buckets, ci, wall_idx, walls_to_create):
+    """Linhas de `_wall_strip_pieces` para (fiada, parede) calculadas UMA vez por
+    fonte (`tag`) dentro de uma avaliacao - chave deterministica (tag, fiada,
+    parede); o conjunto de pecas de uma fonte nao muda durante a avaliacao."""
+    if cache is None:
+        return _wall_strip_pieces(_bucket(buckets, ci, wall_idx), walls_to_create, wall_idx)
+    key = (tag, ci, wall_idx)
+    if key not in cache:
+        cache[key] = _wall_strip_pieces(_bucket(buckets, ci, wall_idx), walls_to_create, wall_idx)
+    return cache[key]
+
+
 def _wall_strip_pieces(course_pieces, walls_to_create, wall_idx):
     """Pecas de UMA fiada fisica que ocupam a faixa da parede, com extensao
     no eixo (cm). Transversais (amarracao da outra parede) entram como
@@ -297,22 +333,193 @@ def free_to_top_openings(walls_to_create, openings_per_wall, nodes, course_band,
     return out
 
 
-def openings_extended_to_top(openings_per_wall, free_to_top, course_band, num_courses):
-    """Copia de `openings_per_wall` com o topo das passagens livres levado ao
-    topo da ultima fiada (o motor passa a tratar o vao como porta ate' o topo)."""
+def _node_other_wall_thickness_cm(walls_to_create, node, wall_idx):
+    involved = set(arm[0] for arm in (node.get("arms") or []) if arm)
+    for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+        if node.get(key) is not None:
+            involved.add(node[key])
+    for other in (node.get("crossing_walls") or []):
+        if other is not None:
+            involved.add(other)
+    involved.discard(wall_idx)
+    widths = [_ft_to_cm(walls_to_create[w][1]) for w in involved if 0 <= w < len(walls_to_create)]
+    return max(widths) if widths else None
+
+
+def continuous_free_passages(walls_to_create, openings_per_wall, nodes, free_to_top, policy=None):
+    """PASSAGEM LIVRE CONTINUA (decisao do usuario 2026-09-14, padrao BUTANTA
+    PAR28): duas ou mais passagens livres da MESMA parede, com a mesma fiada de
+    topo, encadeadas por um pilar que contem UM unico no' T do qual esta parede
+    e' a PRINCIPAL, com as duas jambas do pilar a <= tie_bounded_max_jamb_to_
+    node_cm desse no'. Acima do topo o humano deixa aberto de FACE DE NO' A FACE
+    DE NO' (nos externos) e nao reconstroi o pilar: a parede que chega no no'
+    intermediario termina na face da principal.
+
+    Deteccao so' pela geometria (vaos, nos e espessuras) - nunca por id,
+    coordenada ou nome. Passagem livre isolada continua abrindo so' o vao.
+    Devolve [{"wall_idx", "opening_indices", "from_course", "region_cm",
+    "outer_node_t_cm", "inner": [{"node_t_cm", "incoming_wall_idx",
+    "incoming_region_cm"}]}] em ordem estavel."""
+    policy = channel_policy(policy)
+    max_cm = policy["tie_bounded_max_jamb_to_node_cm"]
+    by_wall = {}
+    for f in free_to_top or []:
+        by_wall.setdefault(f["wall_idx"], []).append(f)
+    passages = []
+    for wall_idx in sorted(by_wall):
+        decisions = sorted(by_wall[wall_idx], key=lambda f: openings_per_wall[wall_idx][f["opening_index"]][0])
+        if len(decisions) < 2:
+            continue
+        junctions = []
+        for node, t_ft in _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx):
+            junctions.append((_ft_to_cm(t_ft), node))
+        junctions.sort(key=lambda item: item[0])
+
+        def _span(f):
+            op = openings_per_wall[wall_idx][f["opening_index"]]
+            return _ft_to_cm(op[0]), _ft_to_cm(op[1])
+
+        chains = [[decisions[0]]]
+        inner_nodes = [[]]
+        for prev, nxt in zip(decisions, decisions[1:]):
+            _a, prev_hi = _span(prev)
+            next_lo, _b = _span(nxt)
+            pier = [(t, node) for t, node in junctions if prev_hi < t < next_lo]
+            ok = (prev["from_course"] == nxt["from_course"] and len(pier) == 1
+                  and pier[0][1].get("kind") == "T_INTERSECTION"
+                  and pier[0][1].get("main_wall_idx") == wall_idx
+                  and pier[0][1].get("incoming_wall_idx") is not None
+                  and pier[0][0] - prev_hi <= max_cm and next_lo - pier[0][0] <= max_cm)
+            if ok:
+                chains[-1].append(nxt)
+                inner_nodes[-1].append(pier[0])
+            else:
+                chains.append([nxt])
+                inner_nodes.append([])
+        main_half_cm = _ft_to_cm(walls_to_create[wall_idx][1]) / 2.0
+        p0, _p1, wall_dir, _len_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+        for chain, inner in zip(chains, inner_nodes):
+            if len(chain) < 2:
+                continue
+            first_lo, _x = _span(chain[0])
+            _y, last_hi = _span(chain[-1])
+            left = [(t, node) for t, node in junctions if t <= first_lo + 0.5 and first_lo - t <= max_cm]
+            right = [(t, node) for t, node in junctions if t >= last_hi - 0.5 and t - last_hi <= max_cm]
+            if not left or not right:
+                continue
+            left_t, left_node = max(left, key=lambda item: item[0])
+            right_t, right_node = min(right, key=lambda item: item[0])
+            left_half = (_node_other_wall_thickness_cm(walls_to_create, left_node, wall_idx) or 0.0) / 2.0
+            right_half = (_node_other_wall_thickness_cm(walls_to_create, right_node, wall_idx) or 0.0) / 2.0
+            inner_out = []
+            valid = True
+            for node_t, node in inner:
+                incoming = node["incoming_wall_idx"]
+                end_index = None
+                for arm in node.get("arms") or []:
+                    if arm and arm[0] == incoming:
+                        end_index = arm[1]
+                if end_index is None:
+                    valid = False
+                    break
+                ip0, _ip1, idir, ilen_ft, _ith = _wall_axis_and_length(walls_to_create, incoming)
+                point = p0 + wall_dir * _cm_to_ft(node_t)
+                t_axis = _ft_to_cm((point - ip0).DotProduct(idir))
+                ilen = _ft_to_cm(ilen_ft)
+                # dentro do eixo da parede que chega (vao alem da ponta deixava a
+                # parede inteira sem recorte valido no motor)
+                if end_index == 1:
+                    region = (t_axis - main_half_cm, ilen)
+                else:
+                    region = (0.0, t_axis + main_half_cm)
+                inner_out.append({"node_t_cm": round(node_t, 3), "incoming_wall_idx": incoming,
+                                  "incoming_region_cm": [round(region[0], 3), round(region[1], 3)]})
+            if not valid:
+                continue
+            passages.append({
+                "wall_idx": wall_idx,
+                "opening_indices": [f["opening_index"] for f in chain],
+                "from_course": chain[0]["from_course"],
+                "region_cm": [round(left_t + left_half, 3), round(right_t - right_half, 3)],
+                "outer_node_t_cm": [round(left_t, 3), round(right_t, 3)],
+                "inner": inner_out,
+            })
+    return passages
+
+
+def openings_extended_to_top(openings_per_wall, free_to_top, course_band, num_courses, passages=None):
+    """Copia de `openings_per_wall` para o SOLVE: o topo das passagens livres
+    isoladas vai ao topo da ultima fiada (o motor trata o vao como porta ate' o
+    topo). Passagem livre CONTINUA (`continuous_free_passages`): os vaos mantem o
+    topo e ganham, acima dele, um vao sintetico de face de no' a face de no' na
+    principal e um no trecho final de cada parede que chega no no' intermediario
+    (termina na face da principal). Os vaos sinteticos vao no FIM da lista de
+    cada parede - os indices dos vaos reais nao mudam."""
     if not free_to_top or num_courses <= 0:
         return openings_per_wall
     top_z = course_band(num_courses - 1)[1]
     marked = set((f["wall_idx"], f["opening_index"]) for f in free_to_top)
+    grouped = set()
+    extra = {}
+    for passage in passages or []:
+        wall_idx = passage["wall_idx"]
+        head_z = max(openings_per_wall[wall_idx][oi][3] for oi in passage["opening_indices"])
+        for oi in passage["opening_indices"]:
+            grouped.add((wall_idx, oi))
+        lo, hi = passage["region_cm"]
+        extra.setdefault(wall_idx, []).append((_cm_to_ft(lo), _cm_to_ft(hi), head_z, top_z))
+        for inner in passage["inner"]:
+            a, b = inner["incoming_region_cm"]
+            extra.setdefault(inner["incoming_wall_idx"], []).append((_cm_to_ft(a), _cm_to_ft(b), head_z, top_z))
     out = []
     for wall_idx, openings in enumerate(openings_per_wall):
         row = []
         for oi, opening in enumerate(openings):
-            if (wall_idx, oi) in marked:
+            if (wall_idx, oi) in marked and (wall_idx, oi) not in grouped:
                 row.append((opening[0], opening[1], opening[2], max(opening[3], top_z)))
             else:
                 row.append(opening)
+        row.extend(extra.get(wall_idx, []))
         out.append(row)
+    return out
+
+
+def _footprint_on_wall(candidate, p0, wall_dir):
+    """(t_lo, t_hi, n_lo, n_hi) em cm da peca projetada no eixo/normal de uma
+    parede - geometria real (comprimento no x_dir, largura no normal da peca)."""
+    x_dir = candidate.get("x_dir") or wall_dir
+    y_dir = XYZ(-x_dir.Y, x_dir.X, 0.0)
+    normal = XYZ(-wall_dir.Y, wall_dir.X, 0.0)
+    center = candidate["origin_world"] - p0
+    c_t = _ft_to_cm(center.DotProduct(wall_dir))
+    c_n = _ft_to_cm(center.DotProduct(normal))
+    half_l = (candidate.get("length_cm") or 0.0) / 2.0
+    half_w = (candidate.get("width_cm") or 14.0) / 2.0
+    ext_t = abs(x_dir.DotProduct(wall_dir)) * half_l + abs(y_dir.DotProduct(wall_dir)) * half_w
+    ext_n = abs(x_dir.DotProduct(normal)) * half_l + abs(y_dir.DotProduct(normal)) * half_w
+    return c_t - ext_t, c_t + ext_t, c_n - ext_n, c_n + ext_n
+
+
+def _pieces_in_wall_region(pieces, walls_to_create, wall_idx, lo_cm, hi_cm, margin_cm=0.5):
+    p0, _p1, wall_dir, _len_ft, thickness_ft = _wall_axis_and_length(walls_to_create, wall_idx)
+    half = _ft_to_cm(thickness_ft) / 2.0
+    found = []
+    for cand in pieces:
+        t_lo, t_hi, n_lo, n_hi = _footprint_on_wall(cand, p0, wall_dir)
+        if t_hi > lo_cm + margin_cm and t_lo < hi_cm - margin_cm and n_hi > -half + margin_cm \
+                and n_lo < half - margin_cm:
+            found.append((round(t_lo, 3), round(t_hi, 3), cand.get("logical_code"), cand.get("wall_idx")))
+    return sorted(found)
+
+
+def _unique_passages(passage_of):
+    seen, out = set(), []
+    for key in sorted(passage_of):
+        passage = passage_of[key]
+        ident = (passage["wall_idx"], tuple(passage["region_cm"]))
+        if ident not in seen:
+            seen.add(ident)
+            out.append(passage)
     return out
 
 
@@ -617,6 +824,11 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                free_to_top_openings(walls_to_create, openings_per_wall, nodes, course_band, num_courses,
                                     base_z_abs, policy))
     decided_keys = dict(((f["wall_idx"], f["opening_index"]), f) for f in decided)
+    passage_of = {}
+    for passage in (continuous_free_passages(walls_to_create, openings_per_wall, nodes, decided, policy)
+                    if presolved else []):
+        for oi in passage["opening_indices"]:
+            passage_of[(passage["wall_idx"], oi)] = passage
     free_to_top = [dict(f) for f in decided] if presolved else []
     top_z = course_band(num_courses - 1)[1] if num_courses > 0 else None
 
@@ -646,6 +858,9 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                 decision = decided_keys.get((wall_idx, oi))
                 if decision is not None and presolved:
                     rec["above"] = {"status": "FREE_TO_TOP", "course_index": above_ci}
+                    passage = passage_of.get((wall_idx, oi))
+                    if passage is not None:
+                        rec["above"]["continuous_passage_region_cm"] = list(passage["region_cm"])
                 elif decision is not None:
                     rec["above"] = {"status": "FREE_TO_TOP_NOT_PRESOLVED", "course_index": above_ci}
                     findings.append({"code": "FREE_TO_TOP_NOT_PRESOLVED", "severity": SEVERITY_ERROR,
@@ -928,12 +1143,13 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
         x.pop("removed")
     return {"strategy": OPENING_REINFORCEMENT_CHANNEL, "policy": policy, "course_candidates": out_cc,
             "runs": runs, "openings": openings_report, "findings": findings, "free_to_top": free_to_top,
+            "continuous_passages": _unique_passages(passage_of),
             "node_crossings": crossings, "tie_conversions": tie_conversions}
 
 
 def validate_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
                                    num_courses, base_z_abs, free_to_top=None, policy=None,
-                                   reference_course_candidates=None):
+                                   reference_course_candidates=None, nodes=None, strip_cache=None):
     """Validador INDEPENDENTE do planejador (recalcula a demanda a partir das
     aberturas e confere as pecas). Devolve {"counts": {...}, "items": [...]}.
 
@@ -954,6 +1170,9 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
     gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     exempt = set((f["wall_idx"], f["opening_index"]) for f in (free_to_top or []))
     ftt_from = dict(((f["wall_idx"], f["opening_index"]), f["from_course"]) for f in (free_to_top or []))
+    passages = continuous_free_passages(walls_to_create, openings_per_wall, nodes, free_to_top, policy) \
+        if (free_to_top and nodes) else []
+    in_passage = set((pa["wall_idx"], oi) for pa in passages for oi in pa["opening_indices"])
     counts = {"MISSING_REQUIRED_CHANNEL": 0, "EXTRA_CHANNEL": 0, "CHANNEL_WRONG_COURSE": 0,
               "CHANNEL_INVADES_OPENING": 0, "CHANNEL_COLLISION": 0, "CHANNEL_SUPPORT_BELOW_POLICY": 0,
               "CHANNEL_OPENING_OVERCUT": 0, "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0, "CHANNEL_ORPHAN_PIECE": 0,
@@ -976,6 +1195,10 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                 if ci is not None:
                     demand_courses.setdefault(wi, {}).setdefault(ci, []).append(span + (ROLE_BELOW_SILL, oi))
 
+    buckets = course_wall_buckets(course_candidates)
+    ref_buckets = course_wall_buckets(reference_course_candidates) if reference_course_candidates is not None else None
+    if strip_cache is None:
+        strip_cache = {}
     # ---- abertura real x jambas
     for wi in range(len(walls_to_create)):
         openings = openings_per_wall[wi] if wi < len(openings_per_wall) else []
@@ -988,14 +1211,16 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                 upper = from_ci is not None and ci >= from_ci
                 if not upper and not _opening_active(opening, z_lo, z_hi, tol_ft):
                     continue
-                rows = _wall_strip_pieces(course_candidates.get(ci) or [], walls_to_create, wi)
+                if upper and (wi, oi) in in_passage:
+                    continue  # validado pela regiao da passagem continua (abaixo)
+                rows = cached_strip_rows(strip_cache, "now", buckets, ci, wi, walls_to_create)
                 ref_rows = None
                 if upper:
                     ref_ci = next((cj for cj in range(from_ci - 1, -1, -1)
                                    if cj % 2 == ci % 2 and _opening_active(opening, *(course_band(cj) + (tol_ft,)))),
                                   None)
                     if ref_ci is not None:
-                        ref_rows = _wall_strip_pieces(course_candidates.get(ref_ci) or [], walls_to_create, wi)
+                        ref_rows = cached_strip_rows(strip_cache, "now", buckets, ref_ci, wi, walls_to_create)
                     inside = [r for r in rows if r["hi"] > t_lo + 0.5 and r["lo"] < t_hi - 0.5]
                     if inside:
                         counts["CHANNEL_FREE_TO_TOP_NOT_OPEN"] += len(inside)
@@ -1013,7 +1238,7 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                                           "opening_index": oi, "lo_cm": round(r["lo"], 3),
                                           "hi_cm": round(r["hi"], 3), "piece": r["cand"].get("logical_code")})
                 elif reference_course_candidates is not None:
-                    ref_rows = _wall_strip_pieces(reference_course_candidates.get(ci) or [], walls_to_create, wi)
+                    ref_rows = cached_strip_rows(strip_cache, "reference", ref_buckets, ci, wi, walls_to_create)
                 if ref_rows is None:
                     continue
                 for side, t_jamb in ((-1, t_lo), (1, t_hi)):
@@ -1025,6 +1250,46 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                                       "opening_index": oi, "side": "L" if side < 0 else "R",
                                       "gap_cm": round(now, 3), "reference_gap_cm": round(ref, 3)})
 
+    # ---- passagem livre continua: regiao de face de no' a face de no'
+    for passage in passages:
+        wi = passage["wall_idx"]
+        lo, hi = passage["region_cm"]
+        for ci in range(passage["from_course"], num_courses):
+            pieces = course_candidates.get(ci) or []
+            inside = _pieces_in_wall_region(pieces, walls_to_create, wi, lo, hi)
+            for inner in passage["inner"]:
+                a, b = inner["incoming_region_cm"]
+                inside += _pieces_in_wall_region(pieces, walls_to_create, inner["incoming_wall_idx"], a, b)
+            if inside:
+                counts["CHANNEL_FREE_TO_TOP_NOT_OPEN"] += len(inside)
+                items.append({"code": "CHANNEL_FREE_TO_TOP_NOT_OPEN", "wall_idx": wi, "course_index": ci,
+                              "continuous_passage": [lo, hi], "pieces": inside})
+            rows = cached_strip_rows(strip_cache, "now", buckets, ci, wi, walls_to_create)
+            checks = [(rows, lo, -1), (rows, hi, 1)]
+            for inner in passage["inner"]:
+                a, b = inner["incoming_region_cm"]
+                inc_rows = cached_strip_rows(strip_cache, "now", buckets, ci, inner["incoming_wall_idx"],
+                                             walls_to_create)
+                checks.append((inc_rows, a, -1) if a > 0 else (inc_rows, b, 1))
+            for rows_k, t_edge, side in checks:
+                edge_gap = _jamb_outside_gap_cm(rows_k, t_edge, side)
+                if edge_gap > gap:
+                    counts["CHANNEL_OPENING_OVERCUT"] += 1
+                    items.append({"code": "CHANNEL_OPENING_OVERCUT", "wall_idx": wi, "course_index": ci,
+                                  "continuous_passage": [lo, hi], "edge_cm": round(t_edge, 3),
+                                  "gap_cm": round(edge_gap, 3)})
+            for k, r in enumerate(rows):
+                if not r["along"] or r["tie"] or r["hi"] - r["lo"] >= 9.5:
+                    continue
+                if r["hi"] < lo - 60.0 or r["lo"] > hi + 60.0:
+                    continue
+                left_ok = k > 0 and 0.0 <= r["lo"] - rows[k - 1]["hi"] <= gap
+                right_ok = k + 1 < len(rows) and 0.0 <= rows[k + 1]["lo"] - r["hi"] <= gap
+                if not left_ok and not right_ok:
+                    counts["CHANNEL_ORPHAN_PIECE"] += 1
+                    items.append({"code": "CHANNEL_ORPHAN_PIECE", "wall_idx": wi, "course_index": ci,
+                                  "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3)})
+
     for ci in range(num_courses):
         pieces = course_candidates.get(ci) or []
         z_lo, z_hi = course_band(ci)
@@ -1032,7 +1297,7 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
         counts["channel_pieces"] += len(channel_idx)
         counts["channel_cut_pieces"] += sum(1 for c in pieces if c.get("logical_code") == CHANNEL_U_CUT)
         for wi in range(len(walls_to_create)):
-            rows = _wall_strip_pieces(pieces, walls_to_create, wi)
+            rows = cached_strip_rows(strip_cache, "now", buckets, ci, wi, walls_to_create)
             along_channel = [r for r in rows if r["along"] and is_channel_code(r["cand"].get("logical_code"))
                              and r["cand"].get("wall_idx") == wi]
             demands = demand_courses.get(wi, {}).get(ci, [])

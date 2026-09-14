@@ -110,6 +110,7 @@ __all__ = [
     "_greedy_fill_blocks", "_greedy_fill_blocks_any_first", "_exact_fill_blocks",
     "_merge_adjacent_compensator_pairs",
     "_pier_remaining_snapped_cm", "_pier_ordered_layout", "_absorbed_segment_rule2_layout",
+    "WALL_FILL_MEMO", "WALL_FILL_MEMO_STATS", "OBB_MEMO",
     "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
@@ -565,13 +566,34 @@ def _obb_overlap(obb_a, obb_b, tolerance_ft=0.0):
     return _obb_min_overlap(obb_a, obb_b) > tolerance_ft
 
 
+# MEMO DE OBB (2026-09-14, desempenho do CHANNEL): o mesmo retangulo de uma
+# peca e' recalculado em cada validacao de parede. Com o memo ativo (mesma vida
+# de WALL_FILL_MEMO), OBBs sao reaproveitados pela tupla EXATA dos valores que
+# os definem (origem, comprimento, largura, eixos) - geometria identica, sem id()
+# e sem gravar nada no dict da peca. None = desligado.
+OBB_MEMO = None
+
+
 def _candidate_obb(candidate):
-    return _obb_2d(
-        candidate["origin_world"],
-        _cm_to_ft(candidate["length_cm"]) / 2.0,
-        _cm_to_ft(candidate["width_cm"]) / 2.0,
-        candidate["x_dir"], candidate["y_dir"],
-    )
+    memo = OBB_MEMO
+    if memo is None:
+        return _obb_2d(
+            candidate["origin_world"],
+            _cm_to_ft(candidate["length_cm"]) / 2.0,
+            _cm_to_ft(candidate["width_cm"]) / 2.0,
+            candidate["x_dir"], candidate["y_dir"],
+        )
+    origin = candidate["origin_world"]
+    x_dir = candidate["x_dir"]
+    y_dir = candidate["y_dir"]
+    key = (origin.X, origin.Y, origin.Z, candidate["length_cm"], candidate["width_cm"],
+           x_dir.X, x_dir.Y, x_dir.Z, y_dir.X, y_dir.Y, y_dir.Z)
+    obb = memo.get(key)
+    if obb is None:
+        obb = _obb_2d(origin, _cm_to_ft(candidate["length_cm"]) / 2.0, _cm_to_ft(candidate["width_cm"]) / 2.0,
+                      x_dir, y_dir)
+        memo[key] = obb
+    return obb
 
 
 def _cell_obb(cell_world, x_dir, y_dir):
@@ -8766,6 +8788,57 @@ def _rebase_node_indexes_for_wall(node_candidates_by_wall_end, node_midspan_by_w
     return by_end, midspan
 
 
+# MEMO DE PREENCHIMENTO POR PAREDE (2026-09-14, desempenho do CHANNEL). Ativado
+# so' pelo chamador (wall_modeling, estrategia CHANNEL) durante UMA chamada de
+# solve: as reconstrucoes da tentativa de paridade repetem o solve inteiro e so'
+# as paredes dos nos invertidos mudam de entrada. `solve_wall_free_fill` e' uma
+# funcao das entradas explicitas abaixo; a chave e' o `repr` EXATO delas (sem
+# arredondamento, sem id(), sem ordem de dict), e o resultado volta CLONADO -
+# um acerto devolve exatamente o que a funcao calcularia. None = desligado.
+WALL_FILL_MEMO = None
+WALL_FILL_MEMO_STATS = {"hits": 0, "misses": 0}
+
+
+def _plain_clone(value):
+    """Copia do resultado de `solve_wall_free_fill` em TRES niveis: o dict, cada
+    lista dele e cada dict dessas listas (candidatos, trechos, excecoes). Os
+    consumidores so' estendem essas listas e trocam chaves desses dicts; campos
+    aninhados de candidato (cells_world, XYZ, tuplas) nunca sao mutados in
+    place no motor (conferido por busca), entao ficam compartilhados."""
+    out = {}
+    for key, item in value.items():
+        if isinstance(item, list):
+            out[key] = [dict(x) if isinstance(x, dict) else x for x in item]
+        elif isinstance(item, dict):
+            out[key] = dict(item)
+        else:
+            out[key] = item
+    return out
+
+
+def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg, midspan_arg,
+                        allow_compensators, variants_per_course, opening_strategy, seed):
+    parts = [repr(wall_idx), repr(len(walls_arg)), repr(allow_compensators), repr(variants_per_course),
+             repr(opening_strategy)]
+    line = walls_arg[wall_idx][0]
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    parts.append("|".join(repr(v) for v in (p0.X, p0.Y, p0.Z, p1.X, p1.Y, p1.Z, walls_arg[wall_idx][1])))
+    parts.append(repr(sorted(tuple(o) for o in (openings_arg[wall_idx] or []))))
+    for end_index in (0, 1):
+        node_index = end_to_node.get((wall_idx, end_index))
+        node = nodes[node_index] if node_index is not None else None
+        state = None
+        if node is not None:
+            state = sorted((k, repr(v)) for k, v in node.items() if k not in ("point", "arm_points"))
+        parts.append(repr((end_index, node_index, state)))
+        for course in ("A", "B"):
+            parts.append(repr((end_index, course, (by_end_arg or {}).get((wall_idx, end_index, course)))))
+    for course in ("A", "B"):
+        parts.append(repr((course, sorted(tuple(x) for x in (midspan_arg or {}).get((wall_idx, course), [])))))
+        parts.append(repr((course, list((seed or {}).get(course) or []))))
+    return "\n".join(parts)
+
+
 def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_wall,
                              catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                              plan_hook=None,
@@ -8965,16 +9038,27 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         )
 
         def _solve(walls_arg, openings_arg, by_end_arg, midspan_arg):
-            return solve_wall_free_fill(
+            seed = (cross_band_joint_seed or {}).get(wall_idx)
+            memo = WALL_FILL_MEMO
+            key = None
+            if memo is not None:
+                key = _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg,
+                                          midspan_arg, allow_compensators, variants_per_course,
+                                          opening_strategy, seed)
+                if key in memo:
+                    WALL_FILL_MEMO_STATS["hits"] += 1
+                    return _plain_clone(memo[key])
+            computed = solve_wall_free_fill(
                 wall_idx, walls_arg, nodes, end_to_node, openings_arg,
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
-                # CR-G12: a semente de fronteira de banda e' por PAREDE (as
-                # juntas sao coordenadas t do eixo DELA) - `None` para toda
-                # parede sem vizinha de outra banda ja' resolvida.
-                cross_band_joint_seed=(cross_band_joint_seed or {}).get(wall_idx),
+                cross_band_joint_seed=seed,
             )
+            if memo is not None:
+                WALL_FILL_MEMO_STATS["misses"] += 1
+                memo[key] = _plain_clone(computed)
+            return computed
 
         result = _solve(working_walls, working_openings, wall_by_end, wall_midspan)
         first_validation = validate_wall_modulation(

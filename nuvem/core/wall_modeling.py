@@ -3680,6 +3680,31 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
 
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                      catalog, base_z_abs, num_courses, **kwargs):
+    """Wrapper de desempenho: com estrategia de reforco ativa, liga o memo de
+    preenchimento por parede (`wall_stepper.WALL_FILL_MEMO`, chave canonica das
+    entradas, resultado identico) so' durante esta chamada. Legado (None) nao
+    muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
+    from core.engine import wall_stepper as _stepper_memo
+    if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
+        return _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                       catalog, base_z_abs, num_courses, **kwargs)
+    _stepper_memo.WALL_FILL_MEMO = {}
+    _stepper_memo.OBB_MEMO = {}
+    _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
+    _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
+    try:
+        result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                         catalog, base_z_abs, num_courses, **kwargs)
+    finally:
+        _stepper_memo.WALL_FILL_MEMO = None
+        _stepper_memo.OBB_MEMO = None
+    if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
+        result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
+    return result
+
+
+def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                       variants_per_course=1,
@@ -3754,7 +3779,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     if free_to_top:
         from core.engine import opening_reinforcement as _reinforcement
         openings_per_wall = _reinforcement.openings_extended_to_top(
-            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses)
+            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
+            passages=_reinforcement.continuous_free_passages(
+                walls_to_create, openings_per_wall, nodes, free_to_top, opening_reinforcement_policy))
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,
@@ -3792,7 +3819,8 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         if channel_parity["changed"]:
             result = channel_parity["final_result"]
         result["channel_tie_parity_trials"] = {"accepted": channel_parity["accepted"],
-                                               "rejected": channel_parity["rejected"]}
+                                               "rejected": channel_parity["rejected"],
+                                               "timing": channel_parity.get("timing")}
 
     if not enabled or result.get("error") is not None:
         return _apply_opening_reinforcement(
@@ -3836,8 +3864,28 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
 
 
+CHANNEL_TRIAL_CHEAP_GATES = ("bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
+                             "compensator_consecutive", "stagger_below_target")
+
+
+def _channel_cheap_metrics(result, walls_to_create, catalog, num_courses):
+    """Gates que saem do resultado do motor sem planejar o CHANNEL."""
+    audits = result.get("wall_bond_audits") or {}
+    compensator_pairs, stagger_below = _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses)
+    return {
+        "bond_reproved": sum(1 for a in audits.values() if not a.get("ok")),
+        "continuous_joints": sum(1 for a in audits.values() for p in a.get("problems") or []
+                                 if "CONTINUOUS_VERTICAL_JOINT" in str(p)),
+        "non_modular": len(result.get("non_modular") or []),
+        "collisions": len(result.get("collisions") or []),
+        "door_void": len(result.get("door_void_violations") or []),
+        "compensator_consecutive": compensator_pairs,
+        "stagger_below_target": stagger_below,
+    }
+
+
 def _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
-                          policy, free_to_top):
+                          policy, free_to_top, cheap=None):
     """Plano + validacao CHANNEL provisorios (sem mutar `result`) e as
     grandezas que a tentativa de paridade nao pode piorar."""
     from core.engine import opening_reinforcement as _reinforcement
@@ -3845,10 +3893,11 @@ def _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, cat
     plan = _reinforcement.plan_channel_reinforcement(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, band, num_courses,
         base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
+    strip_cache = {}
     validation = _reinforcement.validate_channel_reinforcement(
         plan["course_candidates"], walls_to_create, openings_per_wall, band, num_courses, base_z_abs,
         free_to_top=plan["free_to_top"], policy=plan["policy"],
-        reference_course_candidates=result.get("course_candidates"))
+        reference_course_candidates=result.get("course_candidates"), nodes=nodes, strip_cache=strip_cache)
     counts = validation["counts"]
     error_codes = ("MISSING_REQUIRED_CHANNEL", "EXTRA_CHANNEL", "CHANNEL_WRONG_COURSE", "CHANNEL_INVADES_OPENING",
                    "CHANNEL_COLLISION", "CHANNEL_OPENING_OVERCUT", "CHANNEL_FREE_TO_TOP_NOT_OPEN",
@@ -3861,24 +3910,14 @@ def _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, cat
                 for key in ("l", "r"):
                     supports[(rec["wall_idx"], rec["opening_index"], role, key)] = min(
                         side["support_%s_cm" % key], side["bearing_%s_cm" % key])
-    audits = result.get("wall_bond_audits") or {}
-    compensator_pairs, stagger_below = _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses)
-    return {
-        "plan": plan,
-        "compensator_consecutive": compensator_pairs,
-        "stagger_below_target": stagger_below,
-        "errors": sum(counts.get(code, 0) for code in error_codes),
-        "supports": supports,
-        "bond_reproved": sum(1 for a in audits.values() if not a.get("ok")),
-        "continuous_joints": sum(1 for a in audits.values() for p in a.get("problems") or []
-                                 if "CONTINUOUS_VERTICAL_JOINT" in str(p)),
-        "non_modular": len(result.get("non_modular") or []),
-        "collisions": len(result.get("collisions") or []),
-        "door_void": len(result.get("door_void_violations") or []),
-    }
+    metrics = dict(cheap) if cheap is not None else _channel_cheap_metrics(result, walls_to_create, catalog,
+                                                                             num_courses)
+    metrics.update({"plan": plan, "validation": validation,
+                    "errors": sum(counts.get(code, 0) for code in error_codes), "supports": supports})
+    return metrics
 
 
-def _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses):
+def _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses, strip_cache=None):
     """Grandezas de qualidade de junta que a tentativa de paridade nao pode
     piorar, com as MESMAS definicoes da regua de benchmark (validate_
     compensators / validate_prism): pares de compensadores encostados (folga
@@ -3886,11 +3925,13 @@ def _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses):
     1 e 10 cm (MIN_JOINT_STAGGER_TARGET_CM)."""
     from core.engine import opening_reinforcement as _reinforcement
     courses = result.get("course_candidates") or {}
+    buckets = _reinforcement.course_wall_buckets(courses)
     pairs = stagger = 0
     for wall_idx in range(len(walls_to_create)):
         joints_by_course = {}
         for ci in range(num_courses):
-            rows = [r for r in _reinforcement._wall_strip_pieces(courses.get(ci) or [], walls_to_create, wall_idx)
+            rows = [r for r in _reinforcement.cached_strip_rows(strip_cache, "reference", buckets, ci, wall_idx,
+                                                                walls_to_create)
                     if r["along"] and r["cand"].get("wall_idx") == wall_idx]
             joints = []
             for a, b in zip(rows, rows[1:]):
@@ -3959,13 +4000,19 @@ def _channel_tie_parity_trials(nodes, walls_to_create, openings_per_wall, catalo
     (BUTANTA: a inversao do no' de W018 foi rejeitada por +12 compensadores
     encostados). Senao reverte. Evidencia conflitante registrada (6672349:
     o humano parou com 4 cm) - por isso e' tentativa com gates, nunca regra."""
-    empty = {"changed": False, "accepted": [], "rejected": [], "final_result": result}
+    t_start = time.time()
+    timing = {"candidates": 0, "rebuilds": 0, "base_metrics_s": 0.0, "per_candidate": [], "total_s": 0.0}
+    empty = {"changed": False, "accepted": [], "rejected": [], "final_result": result, "timing": timing}
     if strategy is None:
         return empty
     base = _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
                                  num_courses, policy, free_to_top)
+    timing["base_metrics_s"] = round(time.time() - t_start, 4)
+    result["_channel_metrics_cache"] = base
     candidates = _channel_tie_parity_candidates(base, policy)
+    timing["candidates"] = len(candidates)
     if not candidates:
+        timing["total_s"] = round(time.time() - t_start, 4)
         return empty
     from core.engine import opening_reinforcement as _reinforcement
     min_support_cm = _reinforcement.channel_policy(policy)["min_support_cm"]
@@ -3974,24 +4021,33 @@ def _channel_tie_parity_trials(nodes, walls_to_create, openings_per_wall, catalo
     for node_index, target in candidates:
         node = nodes[node_index]
         node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+        t_rebuild = time.time()
         trial = rebuild_fn()
+        timing["rebuilds"] += 1
+        t_metrics = time.time()
         reason = None
+        metrics = None
         if trial.get("error") is not None:
             reason = "trial_error"
         else:
+            # gates baratos primeiro (sem planejar): qualquer gate reprovado
+            # rejeita, entao a ordem so' muda QUAL motivo e' registrado.
+            cheap = _channel_cheap_metrics(trial, walls_to_create, catalog, num_courses)
+            for gate in CHANNEL_TRIAL_CHEAP_GATES:
+                if cheap[gate] > current_metrics[gate]:
+                    reason = "gate_{}:{}->{}".format(gate, current_metrics[gate], cheap[gate])
+                    break
+        if reason is None:
             metrics = _channel_plan_metrics(trial, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
-                                            num_courses, policy, free_to_top)
+                                            num_courses, policy, free_to_top, cheap=cheap)
             wall_idx, opening_index, role, key = target
             keys = [(wall_idx, opening_index, role, k) for k in (("l", "r") if key is None else (key,))]
             after = [metrics["supports"].get(k) for k in keys]
             if any(v is None or v < 9.0 - 1e-6 for v in after):
                 reason = "target_support_not_reached:{}".format(after)
             else:
-                for gate in ("errors", "bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
-                             "compensator_consecutive", "stagger_below_target"):
-                    if metrics[gate] > current_metrics[gate]:
-                        reason = "gate_{}:{}->{}".format(gate, current_metrics[gate], metrics[gate])
-                        break
+                if metrics["errors"] > current_metrics["errors"]:
+                    reason = "gate_errors:{}->{}".format(current_metrics["errors"], metrics["errors"])
                 if reason is None:
                     for k, before in sorted(current_metrics["supports"].items()):
                         now = metrics["supports"].get(k)
@@ -4003,15 +4059,20 @@ def _channel_tie_parity_trials(nodes, walls_to_create, openings_per_wall, catalo
                             break
         record = {"node_index": node_index, "wall_idx": target[0], "opening_index": target[1],
                   "role": target[2], "side": target[3]}
+        timing["per_candidate"].append({"node_index": node_index, "rebuild_s": round(t_metrics - t_rebuild, 4),
+                                        "metrics_s": round(time.time() - t_metrics, 4)})
         if reason is None:
             current, current_metrics = trial, metrics
             accepted.append(record)
+            trial["_channel_metrics_cache"] = metrics
         else:
             node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
             if not node["_tie_parity_flip"]:
                 node.pop("_tie_parity_flip", None)
             rejected.append(dict(record, reason=reason))
-    return {"changed": bool(accepted), "accepted": accepted, "rejected": rejected, "final_result": current}
+    timing["total_s"] = round(time.time() - t_start, 4)
+    return {"changed": bool(accepted), "accepted": accepted, "rejected": rejected, "final_result": current,
+            "timing": timing}
 
 
 def _free_to_top_band(catalog, base_z_abs):
@@ -4061,16 +4122,26 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
         return _course_z_band(base_z_abs, course_index, step, height)
 
     t_plan = time.time()
-    plan = _reinforcement.plan_channel_reinforcement(
-        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
-        base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
+    # A tentativa de paridade ja' planejou e validou ESTE resultado (mesmo
+    # objeto: os reparos nao o substituiram) com as mesmas entradas - reaproveita.
+    cached = result.pop("_channel_metrics_cache", None)
+    if cached is not None and cached["plan"]["policy"] == _reinforcement.channel_policy(policy):
+        plan = dict(cached["plan"])
+    else:
+        cached = None
+        plan = _reinforcement.plan_channel_reinforcement(
+            result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
+            base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
     t_validate = time.time()
     result["course_candidates_before_reinforcement"] = result.get("course_candidates")
     result["course_candidates"] = plan.pop("course_candidates")
-    plan["validation"] = _reinforcement.validate_channel_reinforcement(
-        result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
-        free_to_top=plan["free_to_top"], policy=plan["policy"],
-        reference_course_candidates=result["course_candidates_before_reinforcement"])
+    if cached is not None:
+        plan["validation"] = cached["validation"]
+    else:
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+            free_to_top=plan["free_to_top"], policy=plan["policy"],
+            reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
