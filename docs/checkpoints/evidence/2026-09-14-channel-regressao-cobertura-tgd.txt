@@ -1,0 +1,23 @@
+Atribuicao das falhas de benchmark TGD na regressao final (HEAD f918c1c) - 2026-09-14
+Scripts: _scripts/2026-09-14-tgd-coverage-rows.py (achados COVERAGE por parede/fiada) e
+_scripts/2026-09-14-corpus-v2-changed-walls.py (blocos em coordenada de mundo), main 0e41c8e x HEAD.
+
+V2 (topologia atual, 145 paredes)  main -> HEAD
+  COVERAGE_GAP_IN_ROW 1275 -> 1090 | MISSING_ROW 142 -> 136 | PARTIAL_WALL 32 -> 24 | ROW_MOSTLY_EMPTY 86 -> 92 | WALL_NOT_MODULATED 10 -> 10
+  12 fiadas passam a ROW_MOSTLY_EMPTY (6 saem): as 12 eram GAP_IN_ROW na main, todas em paredes que eram
+  PARTIAL_WALL, e tem EXATAMENTE o mesmo comprimento preenchido (3240 cm = 3240 cm) - reclassificacao
+  (a parede deixou de ser PARTIAL_WALL e passou a ser contada por fiada), nao perda.
+  Preenchimento total 535626 -> 569749 cm (+34123). Fiadas com menos preenchimento: 42; somando o eixo
+  sobreposto (paredes duplicadas do TGD, y=95/102 e 815 x eixo inclinado) nenhuma piora; W|-153.5,-553 perde
+  ~1 cm em 5 fiadas (folga da 30.8 distribuida), liquido +1570 cm.
+
+V1 (HISTORICAL, 167 paredes)  main -> HEAD (baseline V1 171)
+  COVERAGE_GAP_IN_ROW 1855 -> 1601 | MISSING_ROW 232 -> 220 | PARTIAL_WALL 57 -> 38 | ROW_MOSTLY_EMPTY 158 -> 232
+  110 fiadas novas (36 saem): 105 em paredes PARTIAL_WALL na main; eram MISSING_ROW 19, GAP_IN_ROW 43,
+  sem achado de fiada 48 (mascaradas pelo PARTIAL_WALL). Preenchimento nessas 110: 5502 -> 5944 cm
+  (12 mais, 60 igual, 38 menos). Preenchimento total 353391 -> 389468 cm (+36077).
+  Perda liquida real (ja' somando eixos sobrepostos): W|-140.5,470 -95 cm; W|-1878.5,-166 -210 cm;
+  W|1686.5,-166 -75 cm. Paredes de 116 cm em x=-526.5/718.5: 11 fiadas -9 cm e outras +, liquido +30 cm.
+
+TP1 V1 JUNCTION_MISSING_BINDING 8 -> 9: historica, identica a main/#39.
+test_retencao_nativa_de_gil (UnboundLocalError ctypes, win32): falha tambem na origin/main.

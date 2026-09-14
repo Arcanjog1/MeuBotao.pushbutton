@@ -15,8 +15,8 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 | Decisões do usuário? | [Registros PENDING](decisions/README.md) |
 | Benchmark oficial? | [Índice](../benchmark/README.md), [manifesto](../nuvem/benchmark/golden/manifest.json), caminhos preservados |
 | Referências humanas? | [TORRE EASY e BUTANTÃ](../reference_projects/README.md), evidência/não norma; [comparação](../reference_projects/COMPARISON.md) |
-| Candidato em teste? | `claude/butanta-channel-reference-implementation` (estratégia CHANNEL, regra 51), PR draft sem merge. #39 (fill|tie), #38, #37 e Beta 1 **já estão na main**; #31 N1 continua NO-GO; [estado 2026-09-12](GITHUB_STATE_2026-09-12.md) |
-| Última entrega? | [Estratégia CHANNEL (2026-09-14)](checkpoints/2026-09-14-butanta-channel-implementation.md): canaletas acima/abaixo de vãos, validado offline e no Revit real; antes [Defeito 1 fill|tie](checkpoints/2026-09-12-fill-tie-running-joint.md) |
+| Candidato em teste? | PR #40 `claude/butanta-channel-reference-implementation` (estratégia CHANNEL, regras 30.8/51), ready for review, sem merge. #39 (fill|tie), #38, #37 e Beta 1 **já estão na main**; #31 N1 continua NO-GO; [estado 2026-09-12](GITHUB_STATE_2026-09-12.md) |
+| Última entrega? | [Fechamento CHANNEL (2026-09-14)](checkpoints/2026-09-14-channel-ready-closure.md): decisões A–F, 7719511 corrigido, UI e bloqueio por família, Revit real 34 paredes; antes [implementação CHANNEL](checkpoints/2026-09-14-butanta-channel-implementation.md); antes [Defeito 1 fill|tie](checkpoints/2026-09-12-fill-tie-running-joint.md) |
 | Benchmark V2? | [Réguas versionadas](../nuvem/benchmark/README.md): V1 raiz = HISTORICAL, `v2/` = topologia do motor atual (`runner.py --version v2`) |
 | Próximo objetivo? | [Pacote Beta 2](architecture/beta2-implementation-package.md), [backlog A–E](BETA2_BACKLOG.md) |
 | Beta 1: causas e correcoes? | [checkpoint do fechamento](checkpoints/2026-09-09-beta-revit-preparing-solver-performance.md) - solve->create, falso positivo do auditor, `_pump_ui`, analyze sincrono |
@@ -25,7 +25,7 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 
 Não iniciar Revit nesta missão; não mesclar #31 (Beta 1, #34 e scale-autofix
 já estão na main pelo #37 — não reverter nem "re-mesclar");
-não declarar Beta 1 PASS; não implementar LINTEL (CHANNEL existe só como candidato opt-in, regra 51), UI,
+não declarar Beta 1 PASS; não implementar LINTEL (CHANNEL é estratégia oficial candidata no PR #40, regra 51),
 N1/C2/CR-B por causa de documento integrado. Não regravar benchmark para
 ocultar falha, promover observação a regra ou transportar apoio TORRE EASY
 para CHANNEL. Nenhum monitoramento agendado.

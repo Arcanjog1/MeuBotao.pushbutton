@@ -1,7 +1,7 @@
 # Estratégia CHANNEL — implementação
-STATUS: IMPLEMENTADO COMO OPT-IN / ESCOLHA A/B PENDENTE DO USUÁRIO.
+STATUS: IMPLEMENTADO — ESTRATÉGIA OFICIAL (decisão do usuário 2026-09-14, item A); LINTEL_COUNTERLINTEL não implementada.
 Contrato de origem: [um motor e duas estratégias](opening-reinforcement-strategies.md) ·
-[decisão](../decisions/DECISION-OPENING-REINFORCEMENT.md) (continua PENDING) ·
+[decisão](../decisions/DECISION-OPENING-REINFORCEMENT.md) (A–F registradas em 2026-09-14) ·
 regras: seção 51 de [REGRAS](../../nuvem/REGRAS_MODULACAO_BLOCOS.md).
 
 ## Onde encaixa no motor comum
@@ -10,7 +10,7 @@ regras: seção 51 de [REGRAS](../../nuvem/REGRAS_MODULACAO_BLOCOS.md).
 solve_building_blocks_all_courses(..., opening_reinforcement_strategy=None|"CHANNEL")
   -> solve por bandas + paridade + SAFE REPAIR + B19 residual   (inalterado)
   -> _record_unmodulated_walls                                  (inalterado)
-  -> _apply_opening_reinforcement                               (novo, só se CHANNEL)
+  -> _apply_opening_reinforcement                               (só se CHANNEL; timing_s plan/validate/reaudit)
        plan_channel_reinforcement(course_candidates, walls, openings, course_band, ...)
        validate_channel_reinforcement(...)                      (validador independente)
        audit_all_walls_bond_quality(... catálogo + canaletas lógicas)
@@ -28,7 +28,8 @@ nós, fiadas nem preenchimento; recebe as fiadas físicas já resolvidas.
 | Catálogo lógico | `CHANNEL_LOGICAL_TYPES` (mesmo módulo) | `CHANNEL_U_39/_34/_19/_CUT`, dimensões nominais, realização |
 | Mapeamento Revit | `CHANNEL_FAMILY_CATALOG_DEFINITIONS`, `load_channel_family_catalog` (`wall_modeling.py`) | família/tipo exatos, `Comprimento_bloco` de instância, `MISSING_FAMILY_MAPPING` |
 | Criação | `create_building_blocks` | grava o comprimento de instância; se não gravar, apaga a instância e reporta |
-| Handler | `_PostCreationEventHandler.opening_reinforcement_strategy`, `channel_catalog`, `_creation_catalog()` | solve com a estratégia; criação com catálogo fixo + canaletas; assinatura beta inclui a estratégia |
+| Handler | `_PostCreationEventHandler.opening_reinforcement_strategy`, `channel_catalog`, `_creation_catalog()`, `_ensure_opening_reinforcement_catalog()` | solve com a estratégia; **bloqueio antes de calcular/criar** com a lista de famílias/tipos de canaleta faltantes; criação com catálogo fixo + canaletas; assinatura beta inclui a estratégia |
+| Tela de Configuração | `OPENING_REINFORCEMENT_UI_OPTIONS`, `_SetupForm._reinforcement_combo` | seção "7. Reforço de aberturas": CHANNEL (padrão), Sem reforço (legado), VERGA/CONTRAVERGA visível e não executável; escolha lembrada |
 
 O catálogo de canaletas **nunca** entra no catálogo de preenchimento (o solver
 escolheria canaleta como bloco comum). Nomes de família não aparecem no módulo
@@ -63,6 +64,7 @@ fiadas da banda) **não são mutados**: toda troca cria dict novo
 | `cross_tee_when_support_at_most_cm` | 0 | 3 vãos × 2 papéis cruzam; 6672349 (4 cm) não |
 | `convert_blocking_along_ties`, `convert_along_tie_when_support_below_cm` | sim / 9 | 6627438 (4 cm) cruza; 6620076/6621711 (14 cm) não |
 | `tie_split_lengths_cm`, `tie_split_min_stagger_cm` | 39…9 / 1,5 | comprimentos humanos; tolerância de junta |
+| `contiguous_gap_cm` | 2,0 (+ ε) | junta de 1 cm + até 1 cm da folga da regra 30.8 |
 
 Todos são parâmetros explícitos de política — nenhum é regra aprovada pelo
 usuário; o `policy_version` acompanha cada peça.
@@ -72,7 +74,7 @@ usuário; o `policy_version` acompanha cada peça.
 Planejador: `MISSING_REQUIRED_CHANNEL` (com motivo `NO_PIECES_OVER_SPAN`,
 `SPAN_NOT_COVERED`, `INELIGIBLE_PIECE_OVER_SPAN`, `TIE_OVER_SPAN`),
 `CHANNEL_SUPPORT_LIMITED`, `CHANNEL_HEAD_OFF_GRID`, `CHANNEL_SILL_OFF_GRID`,
-`CHANNEL_CUT_BELOW_OBSERVED_MIN`, `CHANNEL_NODE_CROSSING` (INFO),
+`CHANNEL_CUT_BELOW_OBSERVED_MIN`, `CHANNEL_THROUGH_T_SUPPORTED_PATTERN` (travessia de T, `SUPPORTED_PATTERN`, decisão D),
 `CHANNEL_CROSSING_NO_ABUTMENT_PIECE`, `CHANNEL_TIE_SPLIT_NO_STAGGER`.
 
 Validador independente (recalcula a demanda a partir das aberturas):
@@ -82,12 +84,13 @@ Validador independente (recalcula a demanda a partir das aberturas):
 
 ## Limites conhecidos
 
-- UI/Tela de configuração **não** oferece a escolha (decisão A/B pendente); a
-  estratégia é atribuída ao handler/harness.
-- Cinta de topo não gerada (conflito 10.7).
-- Topo/peitoril fora da grade sem solução (51.8).
+- Cinta de topo não gerada (conflito 10.7, decisão F pendente).
+- Topo/peitoril fora da grade sem solução (51.8, decisão E pendente).
 - Travessia de T produz junta na face da parede que chega em 3 fiadas (51.6),
-  como no humano; a auditoria de junta não foi relaxada.
-- Paridade do nó é a do motor: onde o humano usou a paridade oposta o apoio pode
-  ficar menor (6627438, 4 cm).
+  como no humano; aceita (decisão D) sem relaxar a auditoria global.
+- Apoio limitado é classificado pelo **assentamento real** na fiada de baixo
+  (`bearing_*_cm`, 51.4): 6627438 apoia 4 cm sobre a pastilha C04 — VALID_ALTERNATIVE.
+- Dependências no motor comum fechadas nesta entrega: folga residual entre nós
+  (30.8, com regra #2 nos trechos absorvidos) e tolerância de ruído da pastilha de
+  jamba (51.13).
 - Canaleta J não usada.

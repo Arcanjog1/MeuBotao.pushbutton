@@ -1,9 +1,11 @@
 # Estratégia CHANNEL (canaletas) — BUTANTÃ humano × cru, Revit real + MCP (2026-09-14)
 
+> **HISTÓRICO** — superado por [fechamento CHANNEL](2026-09-14-channel-ready-closure.md) (HEAD `f918c1c`).
+
 ```json
 {
   "date": "2026-09-14",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/butanta-channel-reference-implementation",
   "head": "26cf5d2e1419cdaa988cefa6a78c919afad902da",
   "base": "0e41c8efe2b141b836bb4873f5219e4da0b1d03c",

@@ -1762,3 +1762,12 @@ fill|tie entre nós distintos 0/0. Sem MCP, sem Revit, sem merge.
 pós-passe CHANNEL opt-in (regra 51), validado offline (34 paredes) e no Revit real
 (escada 1→34, 7.229 peças, idempotência, paridade exata). HUMANO somente leitura.
 Sem merge; LINTEL não iniciado.
+
+## 2026-09-14 — fechamento CHANNEL, PR #40 ready for review
+
+[Checkpoint](checkpoints/2026-09-14-channel-ready-closure.md). Main observada
+`0e41c8e`. HEAD avaliado `f918c1c`: decisões A–F, regra 30.8 (folga residual
+entre nós + regra #2 nos trechos absorvidos), pastilha de jamba por ruído,
+apoio efetivo, travessia de T como SUPPORTED_PATTERN, UI e bloqueio por família.
+MISSING 0, ACTUAL_ERROR 0, Revit 34 paredes 7.416→7.416. Regressão 4 failed /
+1161 passed classificadas. Sem merge; verga/contraverga não iniciada.
