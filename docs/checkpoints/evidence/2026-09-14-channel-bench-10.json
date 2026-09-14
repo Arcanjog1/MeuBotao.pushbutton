@@ -53,7 +53,7 @@
   "prism_classes": {},
   "runs": 18,
   "signature": "bbb5b8b9a02230499c588bd1fb793123aedf86080fd9483147cef9b5b332f504",
-  "solve_s": 1.2
+  "solve_s": 0.44
  },
  "LEGACY": {
   "bench_codes": {
@@ -81,7 +81,7 @@
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "signature": "0246646fe023f69a994ab100376f6b63f883e48d09680e66bea6db5e0862ecd4",
-  "solve_s": 0.44
+  "solve_s": 0.39
  },
  "bench_delta": {
   "COMPENSATOR_EXCESS_IN_RUN": -1

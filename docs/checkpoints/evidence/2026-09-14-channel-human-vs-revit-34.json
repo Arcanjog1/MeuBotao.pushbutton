@@ -5,7 +5,7 @@
   "SOLVER_BETTER": 9,
   "NOT_COMPARABLE": 2,
   "KNOWN_LIMITATION": 2,
-  "NORMATIVE_DECISION": 2
+  "EXACT_MATCH": 2
  },
  "by_role": {
   "above:PHYSICALLY_EQUIVALENT": 6,
@@ -17,7 +17,7 @@
   "below:SOLVER_BETTER": 5,
   "above:KNOWN_LIMITATION": 1,
   "below:KNOWN_LIMITATION": 1,
-  "above:NORMATIVE_DECISION": 2
+  "above:EXACT_MATCH": 2
  },
  "rows": [
   {
@@ -1655,37 +1655,24 @@
    "role": "above",
    "solver_status": "FREE_TO_TOP",
    "human_status": "NO_CHANNEL",
-   "free_to_top_gaps": [
+   "free_edges_solver_human": [
     [
      11,
-     -1,
-     0.0,
-     20.0
-    ],
-    [
-     11,
-     1,
-     0.0,
-     80.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ],
     [
      12,
-     -1,
-     0.0,
-     35.0
-    ],
-    [
-     12,
-     1,
-     0.0,
-     80.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ]
    ],
-   "pieces_inside": [],
-   "classification": "NORMATIVE_DECISION",
-   "reasons": [
-    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
-   ]
+   "classification": "EXACT_MATCH",
+   "reasons": []
   },
   {
    "opening_id": 6919219,
@@ -1693,37 +1680,24 @@
    "role": "above",
    "solver_status": "FREE_TO_TOP",
    "human_status": "NO_CHANNEL",
-   "free_to_top_gaps": [
+   "free_edges_solver_human": [
     [
      11,
-     -1,
-     0.0,
-     80.0
-    ],
-    [
-     11,
-     1,
-     0.0,
-     20.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ],
     [
      12,
-     -1,
-     0.0,
-     80.0
-    ],
-    [
-     12,
-     1,
-     0.0,
-     35.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ]
    ],
-   "pieces_inside": [],
-   "classification": "NORMATIVE_DECISION",
-   "reasons": [
-    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
-   ]
+   "classification": "EXACT_MATCH",
+   "reasons": []
   },
   {
    "opening_id": 6661879,
@@ -3102,7 +3076,7 @@
   }
  ],
  "source": "r_final34_run2.json",
- "parity_signature": "42e61f52e7a5438fde5cb086226034981522e9a1522eb1144e9fa8fdbc97d4f7",
+ "parity_signature": "112ccde5e2543401e059f5db129cf97e67590c2ba97e986bee44039bd35e5b4b",
  "openings_matched": 44,
  "unmatched": [],
  "validation": {

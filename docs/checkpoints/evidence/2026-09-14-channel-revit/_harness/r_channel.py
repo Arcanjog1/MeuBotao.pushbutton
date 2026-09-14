@@ -49,6 +49,24 @@ assert wm.doc.Equals(T), "modulo carregado contra outro documento"
 assert not wm.doc.Equals(H)
 out["module_file"] = wm.__file__
 step("MODULE_LOADED")
+PERF = {}
+def _perf_wrap(owner, name, label):
+    fn = getattr(owner, name)
+    def inner(*a, **k):
+        t0 = clock.Elapsed.TotalSeconds
+        try:
+            return fn(*a, **k)
+        finally:
+            rec = PERF.setdefault(label, [0, 0.0]); rec[0] += 1; rec[1] += clock.Elapsed.TotalSeconds - t0
+    setattr(owner, name, inner)
+for _name in (() if not cfg.get("perf_wrappers", True) else ("_solve_building_blocks_all_courses_core", "_channel_tie_parity_trials", "_channel_plan_metrics",
+              "_channel_trial_joint_quality", "_apply_opening_reinforcement", "_unify_candidates_with_courses",
+              "audit_all_walls_bond_quality", "repair_arm_role_isolated_edges", "repair_b19_residual_fill",
+              "controlled_beta_preflight")):
+    if hasattr(wm, _name):
+        _perf_wrap(wm, _name, _name)
+for _name in (() if not cfg.get("perf_wrappers", True) else ("plan_channel_reinforcement", "validate_channel_reinforcement", "_wall_strip_pieces")):
+    _perf_wrap(orf, _name, "orf." + _name)
 
 BENCH_PREFIX = "CHANNELBENCH-"
 
@@ -164,7 +182,10 @@ out["solve"] = {"t_s": round(t_solve, 3), "error": res.get("error"), "pieces": s
                 "openings": rein.get("openings"), "node_crossings": rein.get("node_crossings"),
                 "tie_conversions": rein.get("tie_conversions"), "free_to_top": rein.get("free_to_top"),
                 "channel_timing_s": rein.get("timing_s"),
-                "residual_absorptions": len(res.get("residual_absorptions") or [])}
+                "residual_absorptions": len(res.get("residual_absorptions") or []),
+                "parity_trials": res.get("channel_tie_parity_trials"),
+                "continuous_passages": (rein.get("continuous_passages") or []),
+                "perf_functions": dict((k, [v[0], round(v[1], 3)]) for k, v in PERF.items())}
 step("SOLVED", pieces=out["solve"]["pieces"], preflight=pf.get("ok"), t_solve=round(t_solve, 2))
 
 if cfg.get("create"):

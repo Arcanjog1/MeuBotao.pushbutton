@@ -1,7 +1,6 @@
 ok torre_easy_lo_r00_tgd 167 non_modular 2739 absorptions 0
 ok torre_easy_lo_r00_tp1 96 non_modular 57 absorptions 0
 ok torre_easy_lo_r00_tp1 96 non_modular 57 absorptions 0
-ok torre_easy_lo_r00_tp1 96 non_modular 57 absorptions 0
 ok torre_easy_lo_r00_tgd 145 non_modular 1958 absorptions 0
 == TGD V1
 changed 0 {}
@@ -11,6 +10,3 @@ changed 0 {}
 changed 0 {}
 == TP1 V1
 changed 0 {}
-torre_easy_lo_r00_tp1 v2 73.3
-torre_easy_lo_r00_tgd v2 206.2
-piloto_sintetico_2x2 None 0.1

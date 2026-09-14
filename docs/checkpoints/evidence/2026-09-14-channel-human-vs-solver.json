@@ -1,12 +1,11 @@
 {
  "summary": {
   "PHYSICALLY_EQUIVALENT": 14,
-  "EXACT_MATCH": 1,
+  "EXACT_MATCH": 3,
   "VALID_ALTERNATIVE": 37,
   "SOLVER_BETTER": 9,
   "NOT_COMPARABLE": 2,
-  "KNOWN_LIMITATION": 2,
-  "NORMATIVE_DECISION": 2
+  "KNOWN_LIMITATION": 2
  },
  "by_role": {
   "above:PHYSICALLY_EQUIVALENT": 6,
@@ -19,7 +18,7 @@
   "below:SOLVER_BETTER": 5,
   "above:KNOWN_LIMITATION": 1,
   "below:KNOWN_LIMITATION": 1,
-  "above:NORMATIVE_DECISION": 2
+  "above:EXACT_MATCH": 2
  },
  "rows": [
   {
@@ -1654,37 +1653,24 @@
    "role": "above",
    "solver_status": "FREE_TO_TOP",
    "human_status": "NO_CHANNEL",
-   "free_to_top_gaps": [
+   "free_edges_solver_human": [
     [
      11,
-     -1,
-     0.0,
-     20.0
-    ],
-    [
-     11,
-     1,
-     0.0,
-     80.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ],
     [
      12,
-     -1,
-     0.0,
-     35.0
-    ],
-    [
-     12,
-     1,
-     0.0,
-     80.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ]
    ],
-   "pieces_inside": [],
-   "classification": "NORMATIVE_DECISION",
-   "reasons": [
-    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
-   ]
+   "classification": "EXACT_MATCH",
+   "reasons": []
   },
   {
    "opening_id": 6919219,
@@ -1692,37 +1678,24 @@
    "role": "above",
    "solver_status": "FREE_TO_TOP",
    "human_status": "NO_CHANNEL",
-   "free_to_top_gaps": [
+   "free_edges_solver_human": [
     [
      11,
-     -1,
-     0.0,
-     80.0
-    ],
-    [
-     11,
-     1,
-     0.0,
-     20.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ],
     [
      12,
-     -1,
-     0.0,
-     80.0
-    ],
-    [
-     12,
-     1,
-     0.0,
-     35.0
+     1394.0,
+     1394.0,
+     1800.0,
+     1800.0
     ]
    ],
-   "pieces_inside": [],
-   "classification": "NORMATIVE_DECISION",
-   "reasons": [
-    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
-   ]
+   "classification": "EXACT_MATCH",
+   "reasons": []
   },
   {
    "opening_id": 6661879,
@@ -3143,6 +3116,28 @@
     "side": "l",
     "reason": "gate_compensator_consecutive:142->154"
    }
-  ]
+  ],
+  "timing": {
+   "candidates": 2,
+   "rebuilds": 2,
+   "base_metrics_s": 0.1862,
+   "per_candidate": [
+    {
+     "node_index": 6,
+     "rebuild_s": 0.5143,
+     "metrics_s": 0.0518
+    },
+    {
+     "node_index": 32,
+     "rebuild_s": 0.5069,
+     "metrics_s": 0.21
+    }
+   ],
+   "total_s": 1.4694
+  },
+  "wall_fill_memo": {
+   "hits": 1137,
+   "misses": 291
+  }
  }
 }

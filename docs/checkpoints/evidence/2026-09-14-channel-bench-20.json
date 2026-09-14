@@ -56,7 +56,7 @@
   "prism_classes": {},
   "runs": 23,
   "signature": "c292da69ec41749ff7e59222953cba1f79288ced89c75b97db6a5480530fbbf9",
-  "solve_s": 4.69
+  "solve_s": 1.59
  },
  "LEGACY": {
   "bench_codes": {
@@ -90,7 +90,7 @@
    "fill|fillxfill|fill": 2
   },
   "signature": "3fc2b64bef9e5181f25138e2678e6770044e4c2b5568253e6982464715a5945f",
-  "solve_s": 1.09
+  "solve_s": 1.07
  },
  "bench_delta": {
   "PRISM_CONTINUOUS_JOINT": -2,

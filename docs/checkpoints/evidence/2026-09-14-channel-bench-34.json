@@ -4,12 +4,12 @@
    "COMPENSATOR_CONSECUTIVE": 142,
    "COMPENSATOR_EXCESS_IN_RUN": 216,
    "COMPENSATOR_VERTICAL_STRIP": 42,
-   "COVERAGE_GAP_IN_ROW": 81,
+   "COVERAGE_GAP_IN_ROW": 78,
    "COVERAGE_PARTIAL_WALL": 4,
    "OPENING_MISSING_COUNTER_LINTEL": 23,
    "OPENING_MISSING_LINTEL": 43,
    "OPENING_SOLID_BELOW_SILL_MISSING": 2,
-   "PRISM_STAGGER_BELOW_TARGET": 77
+   "PRISM_STAGGER_BELOW_TARGET": 78
   },
   "bond_reproved_walls": 3,
   "channel_findings": {
@@ -36,10 +36,10 @@
    "channel_top_matched": 40
   },
   "codes": {
-   "B19": 304,
-   "B34": 1852,
-   "B39": 3808,
-   "B54": 207,
+   "B19": 296,
+   "B34": 1839,
+   "B39": 3819,
+   "B54": 205,
    "C04": 291,
    "C09": 441,
    "CHANNEL_U_34": 65,
@@ -50,14 +50,14 @@
   "free_to_top": 2,
   "node_crossings": 4,
   "non_modular": 78,
-  "pieces": 7222,
+  "pieces": 7210,
   "preflight_collisions": 0,
   "preflight_ok": true,
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "runs": 39,
-  "signature": "b509a4256bb80a5f5d151f0b9b2317add4d0f1812dbb1e16abf419898773b47d",
-  "solve_s": 12.36
+  "signature": "7082e71e87522498272ed80e5517b4afe644f7e6c8662fa043ef3b0f85787384",
+  "solve_s": 4.34
  },
  "LEGACY": {
   "bench_codes": {
@@ -88,11 +88,11 @@
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "signature": "94541746ba71190b3595096394f5fcc42c85ab63ad41ecdae441ac5afc148f0e",
-  "solve_s": 2.27
+  "solve_s": 2.53
  },
  "bench_delta": {
-  "COVERAGE_GAP_IN_ROW": 6,
-  "PRISM_STAGGER_BELOW_TARGET": 1
+  "COVERAGE_GAP_IN_ROW": 3,
+  "PRISM_STAGGER_BELOW_TARGET": 2
  },
  "openings": 44,
  "walls": 34

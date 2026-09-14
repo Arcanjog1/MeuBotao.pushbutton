@@ -46,7 +46,7 @@
   "prism_classes": {},
   "runs": 13,
   "signature": "8d394cdbb3262684333bab9e14e04606db7bb7c00b1e9cc24624a24dd54e7374",
-  "solve_s": 0.58
+  "solve_s": 0.34
  },
  "LEGACY": {
   "bench_codes": {
@@ -73,7 +73,7 @@
   "preflight_opening_violations": 0,
   "prism_classes": {},
   "signature": "55627cc80c7f25d598a29d8b4c0e32a6244c6834d6539172bb2494a715f891db",
-  "solve_s": 0.46
+  "solve_s": 0.4
  },
  "bench_delta": {},
  "openings": 11,

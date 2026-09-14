@@ -1,7 +1,7 @@
 {
  "equal": true,
- "offline_pieces": 7238,
- "offline_signature": "42e61f52e7a5438fde5cb086226034981522e9a1522eb1144e9fa8fdbc97d4f7",
+ "offline_pieces": 7222,
+ "offline_signature": "112ccde5e2543401e059f5db129cf97e67590c2ba97e986bee44039bd35e5b4b",
  "offline_validation": {
   "CHANNEL_COLLISION": 0,
   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
@@ -19,8 +19,8 @@
   "channel_top_expected": 40,
   "channel_top_matched": 40
  },
- "revit_pieces": 7238,
- "revit_signature": "42e61f52e7a5438fde5cb086226034981522e9a1522eb1144e9fa8fdbc97d4f7",
+ "revit_pieces": 7222,
+ "revit_signature": "112ccde5e2543401e059f5db129cf97e67590c2ba97e986bee44039bd35e5b4b",
  "revit_validation": {
   "CHANNEL_COLLISION": 0,
   "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
