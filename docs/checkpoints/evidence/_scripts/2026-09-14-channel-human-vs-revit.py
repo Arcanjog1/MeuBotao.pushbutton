@@ -1,104 +1,85 @@
 # -*- coding: utf-8 -*-
-"""HUMANO (1o PAV) x SOLVER CHANNEL executado NO REVIT (bancada, 2o PAV).
+"""HUMANO (1o PAV) x SOLVER CHANNEL executado NO REVIT (bancada, 2o PAV), com o
+comparador ENDURECIDO (channel_strict_compare.py, auditoria 2026-09-14).
 
-Usa o resultado do harness (aberturas detectadas pelo plugin, suportes e fiada
-por abertura) e as corridas humanas medidas. Casamento FISICO: mesma parede
-(eixo) e sobreposicao do vao em coordenada de mundo. Z comparado relativo ao
-nivel. Classificacao igual a 2026-09-14-channel-human-vs-solver.py (sem
-extensao exata da corrida: EXACT = mesmos apoios +-1,6 cm).
-Uso: py -3 2026-09-14-channel-human-vs-revit.py <r_ladder_34.json> <saida.json>
+As pecas por fiada vem do solve offline com as MESMAS entradas do harness
+(paredes por id, aberturas DETECTADAS pelo plugin, base do nivel, catalogo lido
+no Revit); a comparacao so' roda se a assinatura fisica offline for IDENTICA a'
+do Revit (paridade). Aberturas casadas ao humano por parede + sobreposicao do
+vao em coordenada de mundo (sem ElementId do TARGET).
+Uso: py -3 2026-09-14-channel-human-vs-revit.py <r_final34_run.json> <saida.json>
 """
+import hashlib
 import json
 import os
 import sys
-from collections import Counter
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-EV = os.path.join(HERE, "..")
-MIN_SUPPORT = 19.0
-TOL = 1.6
-F2CM = 30.48
+import channel_bench_common as cb
+from channel_strict_compare import StrictComparator
+from core.engine import opening_reinforcement as orf
+
+m = cb.m
+
+
+def signature(cc):
+    rows = []
+    for ci in sorted(cc):
+        for c in cc[ci]:
+            o = c["origin_world"]
+            rows.append("%d:%s|%s|%.4f|%.4f|%.3f|%s" % (ci, c["logical_code"], c.get("wall_idx"), o.X, o.Y,
+                                                        c["length_cm"], c.get("placement_reason")))
+    return hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
+
 
 d = json.load(open(sys.argv[1], encoding="utf-8"))
-human = json.load(open(os.path.join(EV, "2026-09-14-channel-human-runs.json"), encoding="utf-8"))["records"]
-walls_json = dict((w["id"], w) for w in json.load(open(os.path.join(EV, "2026-09-10-butanta-test-walls.json"),
+walls_json = dict((w["id"], w) for w in json.load(open(os.path.join(cb.EV, "2026-09-10-butanta-test-walls.json"),
                                                        encoding="utf-8"))["walls"])
+human = json.load(open(os.path.join(cb.EV, "2026-09-14-channel-human-runs.json"), encoding="utf-8"))["records"]
+seq = json.load(open(os.path.join(cb.EV, "2026-09-10-butanta-human-sequences.json"), encoding="utf-8"))
+ids = d["cfg"]["ids"]
+axes = []
+for wid in ids:
+    w = walls_json[wid]
+    axes.append((cb.Line.CreateBound(cb.XYZ(*[float(v) for v in w["p0"]]), cb.XYZ(*[float(v) for v in w["p1"]])),
+                 m._cm_to_ft(14.0), (False, False)))
+walls, jmap = m.extend_wall_ends_to_junctions(list(axes), m.JUNCTION_FACE_SEARCH_FT)
+nodes, e2n = m.build_wall_graph(walls, jmap)
+opw = [[tuple(o) for o in v] for v in d["openings_per_wall_ft"]]
+base_z = m._cm_to_ft(float(d["cfg"]["level_pe_cm"]))
+num = int(round(float(d["cfg"].get("wall_height_cm", 280.0)) / 20.0))
+catalog = cb.CATALOG
+if d.get("fill_catalog"):
+    catalog = {}
+    for code, e in d["fill_catalog"].items():
+        catalog[code] = dict(e, symbol=None, logical_code=code, source_instance_id=None,
+                             cells_local=[{"center_local": tuple(c["center_local"]),
+                                           "size_local": tuple(c["size_local"])} for c in e["cells_local"]])
+res = m.solve_building_blocks_all_courses(nodes, walls, e2n, opw, catalog, base_z, num,
+                                          variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE,
+                                          opening_reinforcement_strategy=d["cfg"].get("strategy"))
+sig = signature(res["course_candidates"])
+if sig != d["solve"]["signature"]:
+    raise SystemExit("PARIDADE QUEBRADA: offline %s x Revit %s" % (sig, d["solve"]["signature"]))
 
-
-def to_human_t(wi, t_cm):
-    x0, y0, x1, y1 = [v * F2CM for v in d["walls_ft"][wi]]
-    L = ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
-    x = x0 + (x1 - x0) / L * t_cm
-    y = y0 + (y1 - y0) / L * t_cm
-    w = walls_json[d["cfg"]["ids"][wi]]
-    hx0, hy0 = w["p0_cm"]
-    hx1, hy1 = w["p1_cm"]
-    H = ((hx1 - hx0) ** 2 + (hy1 - hy0) ** 2) ** 0.5
-    return (x - hx0) * (hx1 - hx0) / H + (y - hy0) * (hy1 - hy0) / H
-
-
-rows = []
+cmp_ = StrictComparator(m, orf, walls, nodes, res, ids, walls_json, human, seq)
+opening_ids = []
 unmatched = []
-for rec in d["solve"]["openings"]:
-    wi = rec["wall_idx"]
-    wid = d["cfg"]["ids"][wi]
-    a, b = sorted((to_human_t(wi, rec["t_lo_cm"]), to_human_t(wi, rec["t_hi_cm"])))
-    cands = [h for h in human if h.get("wall") == wid and min(b, h["t"][1]) - max(a, h["t"][0]) > 0.5 * (b - a)]
-    if len(cands) != 1:
-        unmatched.append((wid, round(a, 1), round(b, 1), len(cands)))
-        continue
-    h = cands[0]
-    flipped = to_human_t(wi, rec["t_lo_cm"]) > to_human_t(wi, rec["t_hi_cm"])
-    for role in ("above", "below"):
-        s = rec.get(role)
-        hh = h.get(role)
-        if s is None and hh is None:
-            continue
-        h_has = bool(hh and "run" in hh and hh.get("all_over_channel"))
-        row = {"opening_id": h["id"], "wall": wid, "role": role, "solver_status": (s or {}).get("status"),
-               "human_status": "CHANNEL" if h_has else "NO_CHANNEL"}
-        st = row["solver_status"]
-        if h_has and st == "CHANNEL":
-            ss = [s["support_l_cm"], s["support_r_cm"]]
-            bearing = [s.get("bearing_l_cm", ss[0]), s.get("bearing_r_cm", ss[1])]
-            if flipped:
-                ss = ss[::-1]
-                bearing = bearing[::-1]
-            hs = [hh["support_l"], hh["support_r"]]
-            same_z = abs(hh["z_lo"] - (1 + 20 * s["course_index"])) <= 1.5
-            row.update(human_support=hs, solver_support=ss, solver_bearing=bearing, human_z=hh["z_lo"], solver_course=s["course_index"])
-            if not same_z:
-                cls = "ACTUAL_ERROR"
-            elif abs(hs[0] - ss[0]) <= TOL and abs(hs[1] - ss[1]) <= TOL:
-                cls = "EXACT_MATCH"
-            elif min(ss) >= MIN_SUPPORT - 0.05 and min(hs) >= MIN_SUPPORT - 0.05:
-                cls = "PHYSICALLY_EQUIVALENT"
-            elif min(ss) >= min(hs) - 0.05:
-                cls = "SOLVER_BETTER" if min(ss) > min(hs) + 0.05 else "PHYSICALLY_EQUIVALENT"
-            elif min(ss) > 0 and min(bearing) > 0.5:
-                # 19 cm e' PREFERENCIAL (decisao 2026-09-14): apoio menor
-                # sobre alvenaria real da fiada de baixo e' alternativa valida.
-                cls = "VALID_ALTERNATIVE"
-            else:
-                cls = "SOLVER_WORSE"
-        elif not h_has and st == "FREE_TO_TOP":
-            cls = "EXACT_MATCH"
-        elif not h_has and st in ("HEAD_OFF_GRID", "SILL_OFF_GRID"):
-            cls = "NOT_COMPARABLE"
-        elif h_has and st in ("MISSING", "HEAD_OFF_GRID", "SILL_OFF_GRID", "FREE_TO_TOP", None):
-            cls = "ACTUAL_ERROR"
-        elif not h_has and st == "CHANNEL":
-            cls = "NORMATIVE_DECISION"
-        else:
-            cls = "NOT_COMPARABLE"
-        row["classification"] = cls
-        rows.append(row)
-
-out = {"source": os.path.basename(sys.argv[1]), "summary": dict(Counter(r["classification"] for r in rows)),
-       "by_role": dict(("%s:%s" % k, v) for k, v in Counter((r["role"], r["classification"]) for r in rows).items()),
-       "openings_matched": len(set(r["opening_id"] for r in rows)), "unmatched": unmatched, "rows": rows}
-json.dump(out, open(sys.argv[2], "w", encoding="utf-8"), indent=1)
-print(json.dumps(dict((k, out[k]) for k in ("summary", "by_role", "openings_matched", "unmatched")), indent=1))
-for r in rows:
-    if r["classification"] not in ("EXACT_MATCH", "PHYSICALLY_EQUIVALENT"):
-        print(r)
+for wi, ops in enumerate(opw):
+    row = []
+    for op in ops:
+        a, b = sorted((cmp_.to_human_t(wi, m._ft_to_cm(op[0])), cmp_.to_human_t(wi, m._ft_to_cm(op[1]))))
+        cands = [h["id"] for h in human if h.get("wall") == ids[wi]
+                 and min(b, h["t"][1]) - max(a, h["t"][0]) > 0.5 * (b - a)]
+        if len(cands) != 1:
+            unmatched.append((ids[wi], round(a, 1), round(b, 1), len(cands)))
+        row.append(cands[0] if len(cands) == 1 else None)
+    opening_ids.append(row)
+out = cmp_.compare(opening_ids)
+out["source"] = os.path.basename(sys.argv[1])
+out["parity_signature"] = sig
+out["openings_matched"] = len(set(r["opening_id"] for r in out["rows"] if r["opening_id"] is not None))
+out["unmatched"] = unmatched
+out["validation"] = res["opening_reinforcement"]["validation"]["counts"]
+json.dump(out, open(sys.argv[2], "w", encoding="utf-8"), indent=1, ensure_ascii=False, default=str)
+print(json.dumps(dict((k, out[k]) for k in ("summary", "by_role", "openings_matched", "unmatched", "parity_signature")),
+                 indent=1))

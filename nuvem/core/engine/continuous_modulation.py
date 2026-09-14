@@ -122,6 +122,16 @@ BOND_STRIP_OPENING_INFLUENCE_CM = 60.0
 # para o solver tentar preencher.
 MIN_REPAIR_SEGMENT_CM = PIER_MODULE_CM - 1.0
 
+# Tolerancia de ruido para trecho solido entre jamba e ancora (regra 51.13).
+# DESLIGADA por default desde a auditoria independente de 2026-09-14: ligada,
+# recompoe paredes do TP1 que ja' fechavam (estrategia None deixa de ser igual
+# a' main). Mantida como parametro explicito, nunca implicito.
+JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = False
+
+
+def _jamb_segment_noise_tolerance_cm():
+    return PIER_PHYSICAL_FIT_TOLERANCE_CM if JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED else 0.0
+
 
 def classify_extent_against_openings(t_start_cm, t_end_cm, opening_intervals_cm,
                                      tolerance_cm=OPENING_OVERLAP_TOLERANCE_CM):
@@ -294,9 +304,10 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
             "left_opening": left_opening, "right_opening": oi,
         }
         # Ruido de geometria (ex.: 3,9989 cm entre jamba e amarracao de no',
-        # BUTANTA 6627438) nao pode descartar a pastilha: mesma tolerancia
-        # FISICA de colocacao ja' aprovada (PIER_PHYSICAL_FIT_TOLERANCE_CM).
-        if seg_hi - cursor_cm >= min_length_cm - PIER_PHYSICAL_FIT_TOLERANCE_CM:
+        # BUTANTA 6627438): com JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED a
+        # pastilha nao e' descartada (tolerancia FISICA de colocacao).
+        # DESLIGADO por default (auditoria 2026-09-14): muda o legado do TP1.
+        if seg_hi - cursor_cm >= min_length_cm - _jamb_segment_noise_tolerance_cm():
             segments.append(entry)
         elif seg_hi - cursor_cm > OPENING_FIT_TOLERANCE_CM:
             undersized.append(entry)
@@ -309,7 +320,7 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
         "trailing_open": not region.get("right_anchor_is_block"),
         "left_opening": left_opening, "right_opening": None,
     }
-    if hi_cm - cursor_cm >= min_length_cm - PIER_PHYSICAL_FIT_TOLERANCE_CM:
+    if hi_cm - cursor_cm >= min_length_cm - _jamb_segment_noise_tolerance_cm():
         segments.append(entry)
     elif hi_cm - cursor_cm > OPENING_FIT_TOLERANCE_CM:
         undersized.append(entry)

@@ -1,2770 +1,3148 @@
 {
  "summary": {
-  "PHYSICALLY_EQUIVALENT": 45,
-  "SOLVER_BETTER": 4,
-  "EXACT_MATCH": 15,
-  "VALID_ALTERNATIVE": 1,
-  "NOT_COMPARABLE": 2
+  "PHYSICALLY_EQUIVALENT": 14,
+  "EXACT_MATCH": 1,
+  "VALID_ALTERNATIVE": 37,
+  "SOLVER_BETTER": 9,
+  "NOT_COMPARABLE": 2,
+  "KNOWN_LIMITATION": 2,
+  "NORMATIVE_DECISION": 2
  },
  "by_role": {
-  "above:PHYSICALLY_EQUIVALENT": 27,
-  "below:PHYSICALLY_EQUIVALENT": 18,
-  "below:SOLVER_BETTER": 2,
-  "above:EXACT_MATCH": 12,
-  "above:SOLVER_BETTER": 2,
-  "below:EXACT_MATCH": 3,
-  "above:VALID_ALTERNATIVE": 1,
-  "above:NOT_COMPARABLE": 2
+  "above:PHYSICALLY_EQUIVALENT": 6,
+  "below:PHYSICALLY_EQUIVALENT": 8,
+  "below:EXACT_MATCH": 1,
+  "above:VALID_ALTERNATIVE": 29,
+  "below:VALID_ALTERNATIVE": 8,
+  "above:SOLVER_BETTER": 4,
+  "above:NOT_COMPARABLE": 2,
+  "below:SOLVER_BETTER": 5,
+  "above:KNOWN_LIMITATION": 1,
+  "below:KNOWN_LIMITATION": 1,
+  "above:NORMATIVE_DECISION": 2
  },
  "rows": [
   {
-   "opening_id": 6588577,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    48.98,
-    1028.98
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    28.993,
-    28.987
-   ],
-   "solver_bearing": [
-    27.993,
-    28.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6588577,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    28.98,
-    209.0
-   ],
-   "human_run": [
-    35.01,
-    414.01
-   ],
-   "human_codes": {
-    "K34": 4,
-    "K39": 6
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    15.0,
-    454.0
-   ],
-   "solver_support": [
-    48.993,
-    48.987
-   ],
-   "solver_bearing": [
-    47.993,
-    47.987
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 11
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6589819,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    258.99,
-    838.99
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    39.003,
-    38.997
-   ],
-   "solver_bearing": [
-    38.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6589819,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    238.99,
-    19.01
-   ],
-   "human_run": [
-    35.01,
-    414.01
-   ],
-   "human_codes": {
-    "K34": 4,
-    "K39": 6
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    15.0,
-    454.0
-   ],
-   "solver_support": [
-    19.003,
-    58.997
-   ],
-   "solver_bearing": [
-    19.0,
-    57.997
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 11
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6646280,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    448.98,
-    618.98
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    28.993,
-    18.987
-   ],
-   "solver_bearing": [
-    27.993,
-    18.987
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6646280,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 61.0,
-   "human_support": [
-    28.98,
-    203.99
-   ],
-   "human_run": [
-    435.01,
-    819.0
-   ],
-   "human_codes": {
-    "K39": 9,
-    "KV": 1
-   },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    435.0,
-    839.0
-   ],
-   "solver_support": [
-    28.993,
-    18.987
-   ],
-   "solver_bearing": [
-    27.993,
-    18.987
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 8,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 2
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6599856,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    633.99,
-    433.99
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    54.003,
-    38.997
-   ],
-   "solver_bearing": [
-    33.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6599856,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 61.0,
-   "human_support": [
-    213.99,
-    19.0
-   ],
-   "human_run": [
-    435.01,
-    819.0
-   ],
-   "human_codes": {
-    "K39": 9,
-    "KV": 1
-   },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    435.0,
-    839.0
-   ],
-   "solver_support": [
-    54.003,
-    38.997
-   ],
-   "solver_bearing": [
-    53.003,
-    37.997
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 8,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 2
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6608319,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    838.98,
-    259.0
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    53.993,
-    24.007
-   ],
-   "solver_bearing": [
-    51.993,
-    24.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6608319,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    13.99,
-    239.0
-   ],
-   "human_run": [
-    840.0,
-    1213.99
-   ],
-   "human_codes": {
-    "K39": 5,
-    "K34": 5
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    815.0,
-    1214.0
-   ],
-   "solver_support": [
-    38.993,
-    39.007
-   ],
-   "solver_bearing": [
-    37.993,
-    38.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "SOLVER_BETTER"
-  },
-  {
-   "opening_id": 6607561,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    1028.98,
-    49.0
-   ],
-   "human_run": [
-    15.01,
-    1233.99
-   ],
-   "human_codes": {
-    "K34": 12,
-    "K39": 20
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    1234.0
-   ],
-   "solver_support": [
-    43.993,
-    49.007
-   ],
-   "solver_bearing": [
-    41.993,
-    46.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 27,
-    "CHANNEL_U_CUT": 1,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6607561,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    203.99,
-    29.0
-   ],
-   "human_run": [
-    840.0,
-    1213.99
-   ],
-   "human_codes": {
-    "K39": 5,
-    "K34": 5
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    815.0,
-    1214.0
-   ],
-   "solver_support": [
-    28.993,
-    29.007
-   ],
-   "solver_bearing": [
-    27.993,
-    28.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6597131,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    49.0,
-    994.01
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    48.993,
-    34.007
-   ],
-   "solver_bearing": [
-    46.993,
-    32.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6597131,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    29.0,
-    244.0
-   ],
-   "human_run": [
-    1269.99,
-    1683.99
-   ],
-   "human_codes": {
-    "K34": 5,
-    "K39": 6
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    1270.0,
-    1669.0
-   ],
-   "solver_support": [
-    28.993,
-    29.007
-   ],
-   "solver_bearing": [
-    27.993,
-    28.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6640648,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    259.0,
-    804.01
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    33.993,
-    44.007
-   ],
-   "solver_bearing": [
-    33.993,
-    43.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6640648,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    239.0,
-    54.0
-   ],
-   "human_run": [
-    1269.99,
-    1683.99
-   ],
-   "human_codes": {
-    "K34": 5,
-    "K39": 6
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    1270.0,
-    1669.0
-   ],
-   "solver_support": [
-    38.993,
-    39.007
-   ],
-   "solver_bearing": [
-    37.993,
-    38.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6599933,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    433.99,
-    599.02
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    48.983,
-    49.017
-   ],
-   "solver_bearing": [
-    46.983,
-    14.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6599933,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 61.0,
-   "human_support": [
-    18.99,
-    199.02
-   ],
-   "human_run": [
-    1664.99,
-    2034.0
-   ],
-   "human_codes": {
-    "K39": 4,
-    "K34": 6
-   },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    1650.0,
-    2039.0
-   ],
-   "solver_support": [
-    33.983,
-    49.017
-   ],
-   "solver_bearing": [
-    32.983,
-    48.017
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5,
-    "CHANNEL_U_34": 5,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6644707,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    599.0,
-    434.01
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    53.993,
-    39.007
-   ],
-   "solver_bearing": [
-    13.993,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6644707,
-   "type": "ABERTURA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 61.0,
-   "human_support": [
-    184.0,
-    34.01
-   ],
-   "human_run": [
-    1664.99,
-    2034.0
-   ],
-   "human_codes": {
-    "K39": 4,
-    "K34": 6
-   },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    1650.0,
-    2039.0
-   ],
-   "solver_support": [
-    48.993,
-    39.007
-   ],
-   "solver_bearing": [
-    47.993,
-    38.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5,
-    "CHANNEL_U_34": 5,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6636362,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    804.0,
-    259.01
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    53.993,
-    24.007
-   ],
-   "solver_bearing": [
-    51.987,
-    24.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6636362,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    34.0,
-    239.01
-   ],
-   "human_run": [
-    2019.99,
-    2414.0
-   ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 9
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    2015.0,
-    2414.0
-   ],
-   "solver_support": [
-    38.993,
-    39.007
-   ],
-   "solver_bearing": [
-    37.993,
-    38.007
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6636306,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    994.01,
-    49.0
-   ],
-   "human_run": [
-    1249.99,
-    2434.0
-   ],
-   "human_codes": {
-    "K39": 20,
-    "K34": 11
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1250.0,
-    2434.0
-   ],
-   "solver_support": [
-    44.003,
-    48.997
-   ],
-   "solver_bearing": [
-    41.993,
-    45.996
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 6,
-    "CHANNEL_U_39": 24,
-    "CHANNEL_U_CUT": 1
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6636306,
-   "type": "JANELA",
-   "wall": 8079777,
-   "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    224.01,
-    29.0
-   ],
-   "human_run": [
-    2019.99,
-    2414.0
-   ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 9
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    2015.0,
-    2414.0
-   ],
-   "solver_support": [
-    29.003,
-    28.997
-   ],
-   "solver_bearing": [
-    28.003,
-    27.997
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621639,
-   "type": "PORTA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    24.0,
-    34.0
-   ],
-   "human_run": [
-    55.01,
-    204.01
-   ],
-   "human_codes": {
-    "K34": 2,
-    "K39": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    35.0,
-    229.0
-   ],
-   "solver_support": [
-    44.005,
-    58.995
-   ],
-   "solver_bearing": [
-    42.0,
-    57.995
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 1,
-    "CHANNEL_U_39": 4
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621689,
-   "type": "PORTA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    34.0,
-    24.0
-   ],
-   "human_run": [
-    500.01,
-    649.01
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    480.0,
-    679.0
-   ],
-   "solver_support": [
-    54.006,
-    53.994
-   ],
-   "solver_bearing": [
-    53.0,
-    52.004
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621699,
-   "type": "PORTA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    19.0,
-    44.0
-   ],
-   "human_run": [
-    860.01,
-    1014.01
-   ],
-   "human_codes": {
-    "K39": 3,
-    "K34": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    825.0,
-    1024.0
-   ],
-   "solver_support": [
-    54.01,
-    53.99
-   ],
-   "solver_bearing": [
-    53.0,
-    52.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621711,
-   "type": "PORTA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    44.0,
-    14.0
-   ],
-   "human_run": [
-    1070.01,
-    1219.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1090.0,
-    1249.0
-   ],
-   "solver_support": [
-    24.01,
-    44.0
-   ],
-   "solver_bearing": [
-    23.0,
-    42.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 4
-   },
-   "classification": "SOLVER_BETTER"
-  },
-  {
-   "opening_id": 6919324,
-   "type": "ABERTURA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 156.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "FREE_TO_TOP",
-   "human_status": "NO_CHANNEL",
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6919219,
-   "type": "ABERTURA",
-   "wall": 8079790,
-   "role": "above",
-   "width_cm": 156.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "FREE_TO_TOP",
-   "human_status": "NO_CHANNEL",
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6628433,
-   "type": "PORTA",
-   "wall": 8079797,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    33.99,
-    34.01
-   ],
-   "human_run": [
-    435.01,
-    594.01
-   ],
-   "human_codes": {
-    "K39": 4
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    415.0,
-    599.0
-   ],
-   "solver_support": [
-    54.002,
-    38.998
-   ],
-   "solver_bearing": [
-    53.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 2,
-    "CHANNEL_U_34": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6628479,
-   "type": "PORTA",
-   "wall": 8079797,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    24.0,
-    34.0
-   ],
-   "human_run": [
-    690.01,
-    839.01
-   ],
-   "human_codes": {
-    "K34": 2,
-    "K39": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    690.0,
-    849.0
-   ],
-   "solver_support": [
-    24.012,
-    43.988
-   ],
-   "solver_bearing": [
-    24.0,
-    43.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 4
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6628508,
-   "type": "PORTA",
-   "wall": 8079797,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    18.99,
-    24.01
-   ],
-   "human_run": [
-    1050.01,
-    1184.01
-   ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 2,
-    "K19": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1030.0,
-    1184.0
-   ],
-   "solver_support": [
-    39.002,
-    23.998
-   ],
-   "solver_bearing": [
-    38.0,
-    23.001
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 3,
-    "CHANNEL_U_34": 1
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
    "opening_id": 6609615,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    28.0,
+    28.0
+   ],
    "human_support": [
     28.99,
     429.01
    ],
+   "solver_run": [
+    35.0,
+    634.0
+   ],
    "human_run": [
     35.01,
     634.01
    ],
-   "human_codes": {
-    "K39": 15
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    15.0,
-    634.0
-   ],
-   "solver_support": [
-    49.002,
-    33.998
-   ],
-   "solver_bearing": [
-    47.0,
-    32.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 4,
-    "CHANNEL_U_39": 12
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     7.0,
+     true,
+     true
+    ],
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 6609615,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 4,
    "human_z": 81.0,
+   "solver_support_effective": [
+    48.002,
+    47.998
+   ],
    "human_support": [
     48.99,
     209.01
    ],
+   "solver_run": [
+    15.0,
+    454.0
+   ],
    "human_run": [
     15.01,
     414.01
    ],
-   "human_codes": {
-    "K39": 10
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    35.0,
-    434.0
-   ],
-   "solver_support": [
-    29.002,
-    28.998
-   ],
-   "solver_bearing": [
-    28.002,
-    27.998
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     7.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 6609655,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    38.0
+   ],
    "human_support": [
     239.01,
     239.0
    ],
+   "solver_run": [
+    35.0,
+    634.0
+   ],
    "human_run": [
     35.01,
     634.01
    ],
-   "human_codes": {
-    "K39": 15
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    15.0,
-    634.0
-   ],
-   "solver_support": [
-    34.022,
-    43.988
-   ],
-   "solver_bearing": [
-    33.0,
-    42.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 4,
-    "CHANNEL_U_39": 12
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     7.0,
+     true,
+     true
+    ],
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 6609655,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 4,
    "human_z": 81.0,
+   "solver_support_effective": [
+    19.0,
+    57.988
+   ],
    "human_support": [
     259.01,
     19.0
+   ],
+   "solver_run": [
+    15.0,
+    454.0
    ],
    "human_run": [
     15.01,
     414.01
    ],
-   "human_codes": {
-    "K39": 10
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    35.0,
-    434.0
-   ],
-   "solver_support": [
-    39.022,
-    38.988
-   ],
-   "solver_bearing": [
-    38.022,
-    37.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     7.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 7061924,
-   "type": "ABERTURA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    28.0,
+    18.988
+   ],
    "human_support": [
     429.0,
     19.0
+   ],
+   "solver_run": [
+    35.0,
+    634.0
    ],
    "human_run": [
     35.01,
     634.01
    ],
-   "human_codes": {
-    "K39": 15
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    15.0,
-    634.0
-   ],
-   "solver_support": [
-    24.012,
-    18.988
-   ],
-   "solver_bearing": [
-    23.012,
-    17.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 4,
-    "CHANNEL_U_39": 12
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     7.0,
+     true,
+     true
+    ],
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 7061924,
-   "type": "ABERTURA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 3,
    "human_z": 61.0,
+   "solver_support_effective": [
+    28.012,
+    18.988
+   ],
    "human_support": [
     29.0,
     19.0
+   ],
+   "solver_run": [
+    435.0,
+    634.0
    ],
    "human_run": [
     435.01,
     634.01
    ],
-   "human_codes": {
-    "K39": 5
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    415.0,
-    634.0
-   ],
-   "solver_support": [
-    49.012,
-    18.988
-   ],
-   "solver_bearing": [
-    48.012,
-    18.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 2,
-    "CHANNEL_U_34": 4
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "EXACT_MATCH",
+   "reasons": []
   },
   {
    "opening_id": 6609813,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    53.0,
+    42.0
+   ],
    "human_support": [
     59.0,
     74.0
+   ],
+   "solver_run": [
+    690.0,
+    929.0
    ],
    "human_run": [
     685.01,
     959.01
    ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 6
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    690.0,
-    929.0
-   ],
-   "solver_support": [
-    54.012,
-    43.988
-   ],
-   "solver_bearing": [
-    53.0,
-    42.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 6
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     642.0,
+     false,
+     false
+    ],
+    [
+     987.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6609813,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 4,
    "human_z": 81.0,
+   "solver_support_effective": [
+    33.012,
+    22.988
+   ],
    "human_support": [
     74.0,
     94.0
+   ],
+   "solver_run": [
+    710.0,
+    909.0
    ],
    "human_run": [
     670.01,
     979.01
    ],
-   "human_codes": {
-    "K34": 2,
-    "K39": 6
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    710.0,
-    909.0
-   ],
-   "solver_support": [
-    34.012,
-    23.988
-   ],
-   "solver_bearing": [
-    33.012,
-    22.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     987.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 7061378,
-   "type": "ABERTURA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    19.0,
+    28.0
+   ],
    "human_support": [
     19.0,
     429.0
+   ],
+   "solver_run": [
+    995.0,
+    1614.0
    ],
    "human_run": [
     995.01,
     1594.01
    ],
-   "human_codes": {
-    "K34": 4,
-    "K19": 1,
-    "K39": 11
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 3
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    995.0,
-    1594.0
-   ],
-   "solver_support": [
-    19.012,
-    28.988
-   ],
-   "solver_bearing": [
-    19.0,
-    28.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 15
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     1622.0,
+     false,
+     true
+    ],
+    [
+     987.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 7061378,
-   "type": "ABERTURA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 151.0,
-   "sill": 80.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 3,
    "human_z": 61.0,
+   "solver_support_effective": [
+    19.0,
+    27.988
+   ],
    "human_support": [
     19.0,
     29.0
+   ],
+   "solver_run": [
+    995.0,
+    1194.0
    ],
    "human_run": [
     995.01,
     1194.01
    ],
-   "human_codes": {
-    "K39": 5
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 1
    },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    995.0,
-    1194.0
-   ],
-   "solver_support": [
-    19.012,
-    28.988
-   ],
-   "solver_bearing": [
-    19.0,
-    27.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     987.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6609874,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    38.0
+   ],
    "human_support": [
     239.0,
     239.0
    ],
+   "solver_run": [
+    995.0,
+    1614.0
+   ],
    "human_run": [
     995.01,
     1594.01
    ],
-   "human_codes": {
-    "K34": 4,
-    "K19": 1,
-    "K39": 11
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 3
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    995.0,
-    1594.0
-   ],
-   "solver_support": [
-    39.012,
-    38.988
-   ],
-   "solver_bearing": [
-    38.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 15
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     1622.0,
+     false,
+     true
+    ],
+    [
+     987.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6609874,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 121.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 4,
    "human_z": 81.0,
+   "solver_support_effective": [
+    19.0,
+    57.988
+   ],
    "human_support": [
     19.0,
     259.0
    ],
+   "solver_run": [
+    1215.0,
+    1594.0
+   ],
    "human_run": [
     1215.01,
     1614.01
    ],
-   "human_codes": {
-    "K39": 10
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    1215.0,
-    1614.0
-   ],
-   "solver_support": [
-    19.012,
-    58.988
-   ],
-   "solver_bearing": [
-    19.0,
-    57.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     1622.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6609915,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    28.0,
+    46.998
+   ],
    "human_support": [
     429.0,
     29.0
+   ],
+   "solver_run": [
+    995.0,
+    1614.0
    ],
    "human_run": [
     995.01,
     1594.01
    ],
-   "human_codes": {
-    "K34": 4,
-    "K19": 1,
-    "K39": 11
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 3
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    995.0,
-    1594.0
-   ],
-   "solver_support": [
-    29.012,
-    28.988
-   ],
-   "solver_bearing": [
-    28.0,
-    28.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 15
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     1622.0,
+     false,
+     true
+    ],
+    [
+     987.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6609915,
-   "type": "JANELA",
    "wall": 8079801,
    "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 4,
    "human_z": 81.0,
+   "solver_support_effective": [
+    48.012,
+    27.988
+   ],
    "human_support": [
     209.0,
     49.0
+   ],
+   "solver_run": [
+    1215.0,
+    1594.0
    ],
    "human_run": [
     1215.01,
     1614.01
    ],
-   "human_codes": {
-    "K39": 10
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    1215.0,
-    1614.0
-   ],
-   "solver_support": [
-    49.012,
-    48.988
-   ],
-   "solver_bearing": [
-    48.012,
-    47.986
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 10
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "EXACT_MATCH"
+   "node_parity": [
+    [
+     1622.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
-   "opening_id": 6616555,
-   "type": "JANELA",
-   "wall": 8079809,
+   "opening_id": 6628433,
+   "wall": 8079797,
    "role": "above",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
-   "human_support": [
-    59.0,
-    74.0
-   ],
-   "human_run": [
-    50.01,
-    324.01
-   ],
-   "human_codes": {
-    "K39": 6,
-    "K34": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    55.0,
-    294.0
-   ],
-   "solver_support": [
-    54.005,
-    43.995
-   ],
-   "solver_bearing": [
+   "solver_support_effective": [
     53.0,
-    42.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 6
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6616555,
-   "type": "JANELA",
-   "wall": 8079809,
-   "role": "below",
-   "width_cm": 141.0,
-   "sill": 100.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 81.0,
-   "human_support": [
-    74.0,
-    94.0
-   ],
-   "human_run": [
-    35.01,
-    344.01
-   ],
-   "human_codes": {
-    "K34": 2,
-    "K39": 6
-   },
-   "solver_course": 4,
-   "solver_z": 81,
-   "solver_run_human_axis": [
-    75.0,
-    274.0
-   ],
-   "solver_support": [
-    34.006,
-    23.994
-   ],
-   "solver_bearing": [
-    33.006,
-    22.994
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6616547,
-   "type": "PORTA",
-   "wall": 8079809,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": -1.0,
-   "head": 220.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 220.0,
-   "human_support": [
-    74.0,
-    59.0
-   ],
-   "human_run": [
-    380.01,
-    654.01
-   ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 6
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    400.0,
-    639.0
-   ],
-   "solver_support": [
-    54.006,
-    43.994
-   ],
-   "solver_bearing": [
-    53.0,
-    42.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 6
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6616539,
-   "type": "PORTA",
-   "wall": 8079809,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    59.0,
-    74.0
-   ],
-   "human_run": [
-    740.01,
-    1014.01
-   ],
-   "human_codes": {
-    "K39": 6,
-    "K34": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    745.0,
-    984.0
-   ],
-   "solver_support": [
-    54.01,
-    43.99
-   ],
-   "solver_bearing": [
-    53.0,
-    42.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 6
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6617398,
-   "type": "PORTA",
-   "wall": 8079809,
-   "role": "above",
-   "width_cm": 141.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    73.99,
-    59.01
-   ],
-   "human_run": [
-    1070.01,
-    1344.01
-   ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 6
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    1125.0,
-    1324.0
-   ],
-   "solver_support": [
-    19.0,
-    39.0
-   ],
-   "solver_bearing": [
-    19.0,
     38.0
    ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
+   "human_support": [
+    33.99,
+    34.01
+   ],
+   "solver_run": [
+    415.0,
+    599.0
+   ],
+   "human_run": [
+    435.01,
+    594.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     407.0,
+     false,
+     true
+    ],
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6628479,
+   "wall": 8079797,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    24.0,
+    43.0
+   ],
+   "human_support": [
+    24.0,
+    34.0
+   ],
+   "solver_run": [
+    690.0,
+    849.0
+   ],
+   "human_run": [
+    690.01,
+    839.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 1,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6628508,
+   "wall": 8079797,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    19.0,
+    19.001
+   ],
+   "human_support": [
+    18.99,
+    24.01
+   ],
+   "solver_run": [
+    1030.0,
+    1184.0
+   ],
+   "human_run": [
+    1050.01,
+    1184.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     987.0,
+     false,
+     true
+    ],
+    [
+     1192.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6620076,
+   "wall": 8079821,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    47.0,
+    32.0
+   ],
+   "human_support": [
+    39.0,
+    14.0
+   ],
+   "solver_run": [
+    255.0,
+    399.0
+   ],
+   "human_run": [
+    265.0,
+    379.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     407.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6620076,
+   "wall": 8079821,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 7,
+   "human_z": 141.0,
+   "solver_support_effective": [
+    48.002,
+    32.998
+   ],
+   "human_support": [
+    39.0,
+    14.0
+   ],
+   "solver_run": [
+    255.0,
+    399.0
+   ],
+   "human_run": [
+    265.0,
+    379.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     407.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
   },
   {
    "opening_id": 6618304,
-   "type": "PORTA",
    "wall": 8079814,
    "role": "above",
-   "width_cm": 121.0,
-   "sill": -0.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    32.0,
+    42.0
+   ],
    "human_support": [
     19.01,
     18.99
+   ],
+   "solver_run": [
+    75.0,
+    649.0
    ],
    "human_run": [
     90.0,
     249.0
    ],
-   "human_codes": {
-    "K39": 4
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    55.0,
-    254.0
-   ],
-   "solver_support": [
-    54.01,
-    23.99
-   ],
-   "solver_bearing": [
-    53.0,
-    23.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     657.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
   },
   {
    "opening_id": 7508776,
-   "type": "ABERTURA",
    "wall": 8079814,
    "role": "above",
-   "width_cm": 296.0,
-   "sill": -0.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    38.0
+   ],
    "human_support": [
     24.0,
     39.0
+   ],
+   "solver_run": [
+    75.0,
+    649.0
    ],
    "human_run": [
     290.0,
     649.0
    ],
-   "human_codes": {
-    "K39": 9
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    295.0,
-    649.0
-   ],
-   "solver_support": [
-    19.0,
-    39.0
-   ],
-   "solver_bearing": [
-    19.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 8,
-    "CHANNEL_U_34": 1
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     657.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
   },
   {
    "opening_id": 7062498,
-   "type": "PORTA",
    "wall": 8079814,
    "role": "above",
-   "width_cm": 121.0,
-   "sill": -0.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    58.0,
+    19.0
+   ],
    "human_support": [
     29.0,
     49.0
+   ],
+   "solver_run": [
+    785.0,
+    984.0
    ],
    "human_run": [
     815.0,
     1014.0
    ],
-   "human_codes": {
-    "K39": 5
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    785.0,
-    984.0
-   ],
-   "solver_support": [
-    59.0,
-    19.0
-   ],
-   "solver_bearing": [
-    58.0,
-    19.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 5
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621475,
-   "type": "PORTA",
-   "wall": 8079818,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    49.0,
-    39.0
-   ],
-   "human_run": [
-    420.0,
-    599.0
-   ],
-   "human_codes": {
-    "K34": 4,
-    "K39": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    420.0,
-    594.0
-   ],
-   "solver_support": [
-    48.995,
-    34.005
-   ],
-   "solver_bearing": [
-    46.995,
-    33.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 5
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6621603,
-   "type": "PORTA",
-   "wall": 8079818,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    39.0,
-    54.0
-   ],
-   "human_run": [
-    685.0,
-    869.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 3
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    685.0,
-    869.0
-   ],
-   "solver_support": [
-    39.003,
-    53.997
-   ],
-   "solver_bearing": [
-    38.0,
-    53.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 3,
-    "CHANNEL_U_39": 2
-   },
-   "classification": "EXACT_MATCH"
-  },
-  {
-   "opening_id": 6620076,
-   "type": "JANELA",
-   "wall": 8079821,
-   "role": "above",
-   "width_cm": 61.0,
-   "sill": 160.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    39.0,
-    14.0
-   ],
-   "human_run": [
-    265.0,
-    379.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    275.0,
-    394.0
-   ],
-   "solver_support": [
-    29.002,
-    28.998
-   ],
-   "solver_bearing": [
-    28.0,
-    27.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 3
-   },
-   "classification": "SOLVER_BETTER"
-  },
-  {
-   "opening_id": 6620076,
-   "type": "JANELA",
-   "wall": 8079821,
-   "role": "below",
-   "width_cm": 61.0,
-   "sill": 160.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 141.0,
-   "human_support": [
-    39.0,
-    14.0
-   ],
-   "human_run": [
-    265.0,
-    379.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 1
-   },
-   "solver_course": 7,
-   "solver_z": 141,
-   "solver_run_human_axis": [
-    275.0,
-    394.0
-   ],
-   "solver_support": [
-    29.002,
-    28.998
-   ],
-   "solver_bearing": [
-    28.002,
-    26.998
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 3
-   },
-   "classification": "SOLVER_BETTER"
-  },
-  {
-   "opening_id": 6661879,
-   "type": "PORTA",
-   "wall": 8079823,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    19.0,
-    39.0
-   ],
-   "human_run": [
-    170.0,
-    319.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    140.0,
-    319.0
-   ],
-   "solver_support": [
-    49.003,
-    38.997
-   ],
-   "solver_bearing": [
-    48.0,
-    38.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 1,
-    "CHANNEL_U_34": 4
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6632347,
-   "type": "PORTA",
-   "wall": 8079823,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    39.0,
-    19.0
-   ],
-   "human_run": [
-    405.0,
-    554.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 2
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    405.0,
-    584.0
-   ],
-   "solver_support": [
-    39.003,
-    48.997
-   ],
-   "solver_bearing": [
-    38.0,
-    48.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 4,
-    "CHANNEL_U_39": 1
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
-  },
-  {
-   "opening_id": 6672349,
-   "type": "PORTA",
-   "wall": 8079827,
-   "role": "above",
-   "width_cm": 91.0,
-   "sill": -0.0,
-   "head": 221.0,
-   "solver_status": "CHANNEL",
-   "human_status": "CHANNEL",
-   "human_z": 221.0,
-   "human_support": [
-    4.0,
-    19.0
-   ],
-   "human_run": [
-    500.0,
-    614.0
-   ],
-   "human_codes": {
-    "K39": 2,
-    "K34": 1
-   },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    500.0,
-    619.0
-   ],
-   "solver_support": [
-    4.003,
-    23.997
-   ],
-   "solver_bearing": [
-    4.0,
-    23.0
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 3
-   },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 6627438,
-   "type": "PORTA",
    "wall": 8079829,
    "role": "above",
-   "width_cm": 101.0,
-   "sill": -0.0,
-   "head": 221.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 11,
    "human_z": 221.0,
+   "solver_support_effective": [
+    19.0,
+    33.0
+   ],
    "human_support": [
     34.0,
     39.0
+   ],
+   "solver_run": [
+    235.0,
+    409.0
    ],
    "human_run": [
     235.02,
     409.01
    ],
-   "human_codes": {
-    "K39": 3,
-    "K19": 1,
-    "K34": 1
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 11,
-   "solver_z": 221,
-   "solver_run_human_axis": [
-    235.0,
-    374.0
-   ],
-   "solver_support": [
-    34.022,
-    3.988
-   ],
-   "solver_bearing": [
-    32.0,
-    3.988
-   ],
-   "solver_codes": {
-    "CHANNEL_U_34": 4
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "VALID_ALTERNATIVE"
+   "node_parity": [
+    [
+     382.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   },
   {
    "opening_id": 7742173,
-   "type": "ABERTURA",
    "wall": 8079829,
    "role": "above",
-   "width_cm": 61.0,
-   "sill": 80.0,
-   "head": 171.0,
    "solver_status": "HEAD_OFF_GRID",
    "human_status": "NO_CHANNEL",
-   "classification": "NOT_COMPARABLE"
+   "classification": "NOT_COMPARABLE",
+   "reasons": [
+    "off_grid_needs_rule_51_8"
+   ]
   },
   {
    "opening_id": 7742173,
-   "type": "ABERTURA",
    "wall": 8079829,
    "role": "below",
-   "width_cm": 61.0,
-   "sill": 80.0,
-   "head": 171.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
+   "solver_course": 3,
    "human_z": 61.0,
+   "solver_support_effective": [
+    33.013,
+    57.987
+   ],
    "human_support": [
     34.0,
     19.0
+   ],
+   "solver_run": [
+    375.0,
+    529.0
    ],
    "human_run": [
     375.01,
     489.01
    ],
-   "human_codes": {
-    "K34": 1,
-    "K39": 2
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 3,
-   "solver_z": 61,
-   "solver_run_human_axis": [
-    390.0,
-    509.0
-   ],
-   "solver_support": [
-    19.013,
-    38.987
-   ],
-   "solver_bearing": [
-    19.0,
-    37.987
-   ],
-   "solver_codes": {
-    "CHANNEL_U_39": 3
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     577.0,
+     false,
+     false
+    ],
+    [
+     382.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
   },
   {
-   "opening_id": 7719511,
-   "type": "JANELA",
-   "wall": 8079859,
+   "opening_id": 6672349,
+   "wall": 8079827,
    "role": "above",
-   "width_cm": 66.0,
-   "sill": 40.0,
-   "head": 91.0,
-   "solver_status": "HEAD_OFF_GRID",
-   "human_status": "NO_CHANNEL",
-   "classification": "NOT_COMPARABLE"
-  },
-  {
-   "opening_id": 7719511,
-   "type": "JANELA",
-   "wall": 8079859,
-   "role": "below",
-   "width_cm": 66.0,
-   "sill": 40.0,
-   "head": 91.0,
    "solver_status": "CHANNEL",
    "human_status": "CHANNEL",
-   "human_z": 21.0,
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    4.0,
+    23.0
+   ],
    "human_support": [
     4.0,
-    9.0
+    19.0
+   ],
+   "solver_run": [
+    500.0,
+    619.0
    ],
    "human_run": [
-    15.51,
-    94.51
+    500.0,
+    614.0
    ],
-   "human_codes": {
-    "K39": 2
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
    },
-   "solver_course": 1,
-   "solver_z": 21,
-   "solver_run_human_axis": [
-    15.5,
-    115.0
-   ],
-   "solver_support": [
-    4.013,
-    29.487
-   ],
-   "solver_bearing": [
-    4.013,
-    26.987
-   ],
-   "solver_codes": {
-    "CHANNEL_U_CUT": 2,
-    "CHANNEL_U_39": 1,
-    "CHANNEL_U_34": 1
+   "stagger_below_target": {
+    "solver": 1,
+    "human": 0
    },
-   "classification": "PHYSICALLY_EQUIVALENT"
+   "node_parity": [
+    [
+     492.0,
+     false,
+     false
+    ],
+    [
+     657.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "KNOWN_LIMITATION",
+   "reasons": [
+    "effective_support_below_9cm_same_as_human"
+   ]
+  },
+  {
+   "opening_id": 6616555,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    57.994
+   ],
+   "human_support": [
+    59.0,
+    74.0
+   ],
+   "solver_run": [
+    70.0,
+    309.0
+   ],
+   "human_run": [
+    50.01,
+    324.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     352.0,
+     false,
+     true
+    ],
+    [
+     7.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6616555,
+   "wall": 8079809,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    19.0,
+    37.995
+   ],
+   "human_support": [
+    74.0,
+    94.0
+   ],
+   "solver_run": [
+    90.0,
+    289.0
+   ],
+   "human_run": [
+    35.01,
+    344.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     352.0,
+     true,
+     false
+    ],
+    [
+     7.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6616547,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 220.0,
+   "solver_support_effective": [
+    53.0,
+    42.0
+   ],
+   "human_support": [
+    74.0,
+    59.0
+   ],
+   "solver_run": [
+    400.0,
+    639.0
+   ],
+   "human_run": [
+    380.01,
+    654.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     697.0,
+     false,
+     false
+    ],
+    [
+     352.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6616539,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    53.0,
+    42.0
+   ],
+   "human_support": [
+    59.0,
+    74.0
+   ],
+   "solver_run": [
+    745.0,
+    984.0
+   ],
+   "human_run": [
+    740.01,
+    1014.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1042.0,
+     false,
+     true
+    ],
+    [
+     697.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6617398,
+   "wall": 8079809,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    19.0,
+    38.0
+   ],
+   "human_support": [
+    73.99,
+    59.01
+   ],
+   "solver_run": [
+    1125.0,
+    1324.0
+   ],
+   "human_run": [
+    1070.01,
+    1344.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1042.0,
+     false,
+     true
+    ],
+    [
+     1387.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 7719511,
+   "wall": 8079859,
+   "role": "above",
+   "solver_status": "HEAD_OFF_GRID",
+   "human_status": "NO_CHANNEL",
+   "classification": "NOT_COMPARABLE",
+   "reasons": [
+    "off_grid_needs_rule_51_8"
+   ]
+  },
+  {
+   "opening_id": 7719511,
+   "wall": 8079859,
+   "role": "below",
+   "solver_status": "MISSING",
+   "human_status": "CHANNEL",
+   "classification": "KNOWN_LIMITATION",
+   "reasons": [
+    "solver_non_modular_span_over_opening"
+   ]
+  },
+  {
+   "opening_id": 6621639,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    42.0,
+    57.995
+   ],
+   "human_support": [
+    24.0,
+    34.0
+   ],
+   "solver_run": [
+    35.0,
+    229.0
+   ],
+   "human_run": [
+    55.01,
+    204.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     7.0,
+     true,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6621689,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    53.0,
+    52.004
+   ],
+   "human_support": [
+    34.0,
+    24.0
+   ],
+   "solver_run": [
+    480.0,
+    679.0
+   ],
+   "human_run": [
+    500.01,
+    649.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     697.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
+  },
+  {
+   "opening_id": 6621699,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    53.0,
+    52.0
+   ],
+   "human_support": [
+    19.0,
+    44.0
+   ],
+   "solver_run": [
+    825.0,
+    1024.0
+   ],
+   "human_run": [
+    860.01,
+    1014.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1042.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6621711,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    23.0,
+    42.0
+   ],
+   "human_support": [
+    44.0,
+    14.0
+   ],
+   "solver_run": [
+    1090.0,
+    1249.0
+   ],
+   "human_run": [
+    1070.01,
+    1219.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1042.0,
+     false,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "node_parity_differs"
+   ]
+  },
+  {
+   "opening_id": 6919324,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "FREE_TO_TOP",
+   "human_status": "NO_CHANNEL",
+   "free_to_top_gaps": [
+    [
+     11,
+     -1,
+     0.0,
+     20.0
+    ],
+    [
+     11,
+     1,
+     0.0,
+     80.0
+    ],
+    [
+     12,
+     -1,
+     0.0,
+     35.0
+    ],
+    [
+     12,
+     1,
+     0.0,
+     80.0
+    ]
+   ],
+   "pieces_inside": [],
+   "classification": "NORMATIVE_DECISION",
+   "reasons": [
+    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
+   ]
+  },
+  {
+   "opening_id": 6919219,
+   "wall": 8079790,
+   "role": "above",
+   "solver_status": "FREE_TO_TOP",
+   "human_status": "NO_CHANNEL",
+   "free_to_top_gaps": [
+    [
+     11,
+     -1,
+     0.0,
+     80.0
+    ],
+    [
+     11,
+     1,
+     0.0,
+     20.0
+    ],
+    [
+     12,
+     -1,
+     0.0,
+     80.0
+    ],
+    [
+     12,
+     1,
+     0.0,
+     35.0
+    ]
+   ],
+   "pieces_inside": [],
+   "classification": "NORMATIVE_DECISION",
+   "reasons": [
+    "user_rule_opens_only_the_opening_human_opens_to_node_faces"
+   ]
+  },
+  {
+   "opening_id": 6661879,
+   "wall": 8079823,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    48.0,
+    38.0
+   ],
+   "human_support": [
+    19.0,
+    39.0
+   ],
+   "solver_run": [
+    140.0,
+    319.0
+   ],
+   "human_run": [
+    170.0,
+    319.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     362.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
+  },
+  {
+   "opening_id": 6632347,
+   "wall": 8079823,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    48.0
+   ],
+   "human_support": [
+    39.0,
+    19.0
+   ],
+   "solver_run": [
+    405.0,
+    584.0
+   ],
+   "human_run": [
+    405.0,
+    554.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 5,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     362.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6621475,
+   "wall": 8079818,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    46.995,
+    33.0
+   ],
+   "human_support": [
+    49.0,
+    39.0
+   ],
+   "solver_run": [
+    420.0,
+    594.0
+   ],
+   "human_run": [
+    420.0,
+    599.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     412.0,
+     false,
+     false
+    ],
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6621603,
+   "wall": 8079818,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    38.0,
+    53.0
+   ],
+   "human_support": [
+    39.0,
+    54.0
+   ],
+   "solver_run": [
+    685.0,
+    869.0
+   ],
+   "human_run": [
+    685.0,
+    869.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 1,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6588577,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    46.993,
+    37.0
+   ],
+   "human_support": [
+    48.98,
+    1028.98
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6588577,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    27.993,
+    27.987
+   ],
+   "human_support": [
+    28.98,
+    209.0
+   ],
+   "solver_run": [
+    35.0,
+    434.0
+   ],
+   "human_run": [
+    35.01,
+    414.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 2,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     7.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6589819,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    28.0,
+    42.997
+   ],
+   "human_support": [
+    258.99,
+    838.99
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6589819,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    38.003,
+    37.997
+   ],
+   "human_support": [
+    238.99,
+    19.01
+   ],
+   "solver_run": [
+    35.0,
+    434.0
+   ],
+   "human_run": [
+    35.01,
+    414.01
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 2,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     7.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6646280,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    22.993,
+    17.0
+   ],
+   "human_support": [
+    448.98,
+    618.98
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target",
+    "support_below_human"
+   ]
+  },
+  {
+   "opening_id": 6646280,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 3,
+   "human_z": 61.0,
+   "solver_support_effective": [
+    47.993,
+    18.987
+   ],
+   "human_support": [
+    28.98,
+    203.99
+   ],
+   "solver_run": [
+    415.0,
+    839.0
+   ],
+   "human_run": [
+    435.01,
+    819.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6599856,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    31.0,
+    38.0
+   ],
+   "human_support": [
+    633.99,
+    433.99
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6599856,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 3,
+   "human_z": 61.0,
+   "solver_support_effective": [
+    48.003,
+    37.997
+   ],
+   "human_support": [
+    213.99,
+    19.0
+   ],
+   "solver_run": [
+    415.0,
+    839.0
+   ],
+   "human_run": [
+    435.01,
+    819.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
+  },
+  {
+   "opening_id": 6608319,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    51.993,
+    24.007
+   ],
+   "human_support": [
+    838.98,
+    259.0
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6608319,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    37.993,
+    38.007
+   ],
+   "human_support": [
+    13.99,
+    239.0
+   ],
+   "solver_run": [
+    815.0,
+    1214.0
+   ],
+   "human_run": [
+    840.0,
+    1213.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1242.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain"
+   ]
+  },
+  {
+   "opening_id": 6607561,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    41.993,
+    46.0
+   ],
+   "human_support": [
+    1028.98,
+    49.0
+   ],
+   "solver_run": [
+    15.0,
+    1234.0
+   ],
+   "human_run": [
+    15.01,
+    1233.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 16,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     642.0,
+     true,
+     true
+    ],
+    [
+     7.0,
+     false,
+     false
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6607561,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    27.993,
+    28.007
+   ],
+   "human_support": [
+    203.99,
+    29.0
+   ],
+   "solver_run": [
+    815.0,
+    1214.0
+   ],
+   "human_run": [
+    840.0,
+    1213.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1242.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6597131,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    46.993,
+    32.0
+   ],
+   "human_support": [
+    49.0,
+    994.01
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6597131,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    27.993,
+    28.007
+   ],
+   "human_support": [
+    29.0,
+    244.0
+   ],
+   "solver_run": [
+    1270.0,
+    1669.0
+   ],
+   "human_run": [
+    1269.99,
+    1683.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1242.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6640648,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    33.993,
+    43.0
+   ],
+   "human_support": [
+    259.0,
+    804.01
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6640648,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    37.993,
+    38.007
+   ],
+   "human_support": [
+    239.0,
+    54.0
+   ],
+   "solver_run": [
+    1270.0,
+    1669.0
+   ],
+   "human_run": [
+    1269.99,
+    1683.99
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1242.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6599933,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    46.983,
+    14.0
+   ],
+   "human_support": [
+    433.99,
+    599.02
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target",
+    "support_below_human"
+   ]
+  },
+  {
+   "opening_id": 6599933,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 3,
+   "human_z": 61.0,
+   "solver_support_effective": [
+    32.983,
+    48.017
+   ],
+   "human_support": [
+    18.99,
+    199.02
+   ],
+   "solver_run": [
+    1650.0,
+    2039.0
+   ],
+   "human_run": [
+    1664.99,
+    2034.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 1
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1842.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "min_support_gain",
+    "fewer_joint_coincidences"
+   ]
+  },
+  {
+   "opening_id": 6644707,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    13.993,
+    38.0
+   ],
+   "human_support": [
+    599.0,
+    434.01
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target",
+    "support_below_human"
+   ]
+  },
+  {
+   "opening_id": 6644707,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 3,
+   "human_z": 61.0,
+   "solver_support_effective": [
+    47.993,
+    38.007
+   ],
+   "human_support": [
+    184.0,
+    34.01
+   ],
+   "solver_run": [
+    1650.0,
+    2039.0
+   ],
+   "human_run": [
+    1664.99,
+    2034.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 1
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     1842.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "SOLVER_BETTER",
+   "reasons": [
+    "fewer_joint_coincidences"
+   ]
+  },
+  {
+   "opening_id": 6636362,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    51.987,
+    24.007
+   ],
+   "human_support": [
+    804.0,
+    259.01
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6636362,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    37.993,
+    38.007
+   ],
+   "human_support": [
+    34.0,
+    239.01
+   ],
+   "solver_run": [
+    2015.0,
+    2414.0
+   ],
+   "human_run": [
+    2019.99,
+    2414.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
+  },
+  {
+   "opening_id": 6636306,
+   "wall": 8079777,
+   "role": "above",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 11,
+   "human_z": 221.0,
+   "solver_support_effective": [
+    41.993,
+    45.996
+   ],
+   "human_support": [
+    994.01,
+    49.0
+   ],
+   "solver_run": [
+    1250.0,
+    2434.0
+   ],
+   "human_run": [
+    1249.99,
+    2434.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 12,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     false,
+     false
+    ],
+    [
+     1842.0,
+     true,
+     true
+    ],
+    [
+     1242.0,
+     false,
+     false
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "VALID_ALTERNATIVE",
+   "reasons": [
+    "more_stagger_below_target"
+   ]
+  },
+  {
+   "opening_id": 6636306,
+   "wall": 8079777,
+   "role": "below",
+   "solver_status": "CHANNEL",
+   "human_status": "CHANNEL",
+   "solver_course": 4,
+   "human_z": 81.0,
+   "solver_support_effective": [
+    28.003,
+    27.997
+   ],
+   "human_support": [
+    224.01,
+    29.0
+   ],
+   "solver_run": [
+    2015.0,
+    2414.0
+   ],
+   "human_run": [
+    2019.99,
+    2414.0
+   ],
+   "joint_coincidences": {
+    "solver": 0,
+    "human": 0
+   },
+   "stagger_below_target": {
+    "solver": 0,
+    "human": 0
+   },
+   "node_parity": [
+    [
+     2442.0,
+     true,
+     true
+    ]
+   ],
+   "local_bond_problems": [],
+   "classification": "PHYSICALLY_EQUIVALENT",
+   "reasons": []
   }
  ],
- "findings": {
-  "CHANNEL_THROUGH_T_SUPPORTED_PATTERN": 4,
-  "CHANNEL_SUPPORT_LIMITED": 7,
-  "CHANNEL_HEAD_OFF_GRID": 2
- },
  "validation": {
-  "MISSING_REQUIRED_CHANNEL": 0,
+  "MISSING_REQUIRED_CHANNEL": 1,
   "EXTRA_CHANNEL": 0,
   "CHANNEL_WRONG_COURSE": 0,
   "CHANNEL_INVADES_OPENING": 0,
   "CHANNEL_COLLISION": 0,
-  "CHANNEL_SUPPORT_BELOW_POLICY": 5,
+  "CHANNEL_SUPPORT_BELOW_POLICY": 3,
+  "CHANNEL_OPENING_OVERCUT": 0,
+  "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+  "CHANNEL_ORPHAN_PIECE": 0,
   "channel_top_expected": 40,
   "channel_top_matched": 40,
   "channel_bottom_expected": 23,
-  "channel_bottom_matched": 23,
-  "channel_pieces": 317,
-  "channel_cut_pieces": 6
+  "channel_bottom_matched": 22,
+  "channel_pieces": 319,
+  "channel_cut_pieces": 5
+ },
+ "findings": {
+  "CHANNEL_SUPPORT_LIMITED:VALID_ALTERNATIVE": 4,
+  "CHANNEL_HEAD_OFF_GRID:NEEDS_RULE": 2,
+  "CHANNEL_SUPPORT_LIMITED:KNOWN_LIMITATION": 1,
+  "MISSING_REQUIRED_CHANNEL:ACTUAL_ERROR": 1,
+  "CHANNEL_THROUGH_T_SUPPORTED_PATTERN:SUPPORTED_PATTERN": 4
+ },
+ "channel_tie_parity_trials": {
+  "accepted": [
+   {
+    "node_index": 32,
+    "wall_idx": 4,
+    "opening_index": 0,
+    "role": "above",
+    "side": null
+   }
+  ],
+  "rejected": [
+   {
+    "node_index": 6,
+    "wall_idx": 6,
+    "opening_index": 0,
+    "role": "above",
+    "side": "l",
+    "reason": "gate_compensator_consecutive:142->154"
+   }
+  ]
  }
 }

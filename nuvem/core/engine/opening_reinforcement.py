@@ -181,6 +181,18 @@ def _eligible(candidate, wall_dir):
     return code in COMMON_TO_CHANNEL or code in COMPENSATOR_CODES or is_channel_code(code)
 
 
+def _physical_key(candidate):
+    """Chave CANONICA e fisica de uma peca numa fiada (auditoria 2026-09-14:
+    nada de `id()` nem ordem de dict no contrato - o Revit roda IronPython).
+    Duas pecas com a mesma chave na mesma fiada ocupariam o mesmo volume."""
+    o = candidate["origin_world"]
+    x_dir = candidate.get("x_dir")
+    direction = "%.4f,%.4f" % (x_dir.X, x_dir.Y) if x_dir is not None else "-"
+    return "%s|%s|%s|%.5f|%.5f|%.5f|%.4f|%s|%s" % (
+        candidate.get("logical_code"), candidate.get("wall_idx"), candidate.get("secondary_wall_idx"),
+        o.X, o.Y, o.Z, candidate.get("length_cm") or 0.0, direction, candidate.get("placement_reason") or "")
+
+
 def _wall_strip_pieces(course_pieces, walls_to_create, wall_idx):
     """Pecas de UMA fiada fisica que ocupam a faixa da parede, com extensao
     no eixo (cm). Transversais (amarracao da outra parede) entram como
@@ -206,7 +218,7 @@ def _wall_strip_pieces(course_pieces, walls_to_create, wall_idx):
             lo, hi = center - half, center + half
         rows.append({"cand": cand, "lo": lo, "hi": hi, "along": _along(cand, wall_dir),
                      "eligible": _eligible(cand, wall_dir), "tie": _is_tie(cand)})
-    rows.sort(key=lambda r: (round(r["lo"], 4), round(r["hi"], 4)))
+    rows.sort(key=lambda r: (round(r["lo"], 4), round(r["hi"], 4), _physical_key(r["cand"])))
     return rows
 
 
@@ -249,24 +261,70 @@ def _jamb_node_bounded(walls_to_create, nodes, wall_idx, opening, side, max_cm):
     return False
 
 
-def _jamb_tie_bounded(course_candidates, walls_to_create, wall_idx, opening, course_band, num_courses,
-                      side, gap_cm, tol_ft):
-    """Sem grafo: True se, em alguma fiada que atravessa o vao, a peca
-    imediatamente fora da jamba `side` e' amarracao de no'."""
-    t_lo = _ft_to_cm(opening[0])
-    t_hi = _ft_to_cm(opening[1])
-    for ci in range(num_courses):
-        z_lo, z_hi = course_band(ci)
-        if not _opening_active(opening, z_lo, z_hi, tol_ft):
-            continue
-        rows = _wall_strip_pieces(course_candidates.get(ci) or [], walls_to_create, wall_idx)
-        if side < 0:
-            near = [r for r in rows if r["hi"] <= t_lo + gap_cm and t_lo - r["hi"] <= gap_cm]
-        else:
-            near = [r for r in rows if r["lo"] >= t_hi - gap_cm and r["lo"] - t_hi <= gap_cm]
-        if any(r["tie"] for r in near):
-            return True
-    return False
+def free_to_top_openings(walls_to_create, openings_per_wall, nodes, course_band, num_courses, base_z_abs,
+                         policy=None):
+    """Passagens livres ate' o topo (51.9), decididas pela GEOMETRIA (vao sem
+    peitoril com as duas jambas a <= `tie_bounded_max_jamb_to_node_cm` do eixo
+    de um no' L/T/X real), ANTES do solve.
+
+    Correcao P0 da auditoria independente (2026-09-14): a versao anterior
+    decidia depois do solve e REMOVIA peca inteira que tocasse o vao nas
+    fiadas acima do topo - peca que cruzava a jamba sumia e a parede ficava
+    aberta alem das jambas (vao 227-473 aberto 208-488). Agora o chamador
+    resolve o motor com o vao estendido ate' o topo (`openings_extended_to_top`)
+    e o recorte das jambas e' o MESMO do resto da altura da porta.
+    Devolve [{"wall_idx", "opening_index", "from_course"}] em ordem estavel."""
+    policy = channel_policy(policy)
+    if not policy.get("free_to_top_tie_bounded_passages") or not nodes or num_courses <= 0:
+        return []
+    tol_ft = _cm_to_ft(policy["grid_tolerance_cm"])
+    joint_ft = _cm_to_ft(policy["grid_joint_allowance_cm"])
+    top_z = course_band(num_courses - 1)[1]
+    max_cm = policy["tie_bounded_max_jamb_to_node_cm"]
+    out = []
+    for wall_idx in range(len(walls_to_create)):
+        openings = openings_per_wall[wall_idx] if wall_idx < len(openings_per_wall) else []
+        for oi, opening in enumerate(openings):
+            _t_lo, _t_hi, sill_z, head_z = opening
+            if (sill_z - base_z_abs) > tol_ft or head_z >= top_z - tol_ft:
+                continue
+            above_ci = _course_for_head(head_z, course_band, num_courses, tol_ft, joint_ft)
+            if above_ci is None:
+                continue
+            if (_jamb_node_bounded(walls_to_create, nodes, wall_idx, opening, -1, max_cm) and
+                    _jamb_node_bounded(walls_to_create, nodes, wall_idx, opening, +1, max_cm)):
+                out.append({"wall_idx": wall_idx, "opening_index": oi, "from_course": above_ci})
+    return out
+
+
+def openings_extended_to_top(openings_per_wall, free_to_top, course_band, num_courses):
+    """Copia de `openings_per_wall` com o topo das passagens livres levado ao
+    topo da ultima fiada (o motor passa a tratar o vao como porta ate' o topo)."""
+    if not free_to_top or num_courses <= 0:
+        return openings_per_wall
+    top_z = course_band(num_courses - 1)[1]
+    marked = set((f["wall_idx"], f["opening_index"]) for f in free_to_top)
+    out = []
+    for wall_idx, openings in enumerate(openings_per_wall):
+        row = []
+        for oi, opening in enumerate(openings):
+            if (wall_idx, oi) in marked:
+                row.append((opening[0], opening[1], opening[2], max(opening[3], top_z)))
+            else:
+                row.append(opening)
+        out.append(row)
+    return out
+
+
+def _jamb_outside_gap_cm(rows, t_jamb, side, reach_cm=80.0):
+    """Distancia da jamba ate' a peca mais proxima do lado de FORA do vao
+    (qualquer peca da faixa, inclusive amarracao transversal). `reach_cm`
+    quando nao ha' peca nenhuma ate' essa distancia."""
+    if side < 0:
+        edges = [r["hi"] for r in rows if t_jamb - reach_cm <= r["hi"] <= t_jamb + 0.5]
+        return max(0.0, t_jamb - max(edges)) if edges else reach_cm
+    edges = [r["lo"] for r in rows if t_jamb - 0.5 <= r["lo"] <= t_jamb + reach_cm]
+    return max(0.0, min(edges) - t_jamb) if edges else reach_cm
 
 
 def _extend_run(rows, i0, i1, t_lo, t_hi, policy, cross=None):
@@ -527,7 +585,8 @@ def _tie_split_rows(row, walls_to_create, wall_idx, adjacent_joints, policy):
 
 
 def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
-                               num_courses, base_z_abs, policy=None, nodes=None, catalog=None):
+                               num_courses, base_z_abs, policy=None, nodes=None, catalog=None,
+                               free_to_top=None):
     """Planeja CHANNEL sobre fiadas fisicas ja' resolvidas.
 
     `course_candidates`: {course_index: [candidato]} (NAO e' mutado).
@@ -535,7 +594,11 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
     `openings_per_wall[wi]`: [(t_lo_ft, t_hi_ft, sill_z_abs_ft, head_z_abs_ft)].
     `nodes` (grafo de encontros) habilita a deteccao de passagem livre pela
     distancia jamba -> no'; `catalog` (codigo -> entrada com length_cm e
-    cells_local) habilita a travessia de T.
+    cells_local) habilita a travessia de T. `free_to_top`: decisoes de
+    `free_to_top_openings` JA' aplicadas ao solve (vao estendido ate' o topo).
+    O planejador NUNCA remove peca: passagem livre detectada sem ter sido
+    aplicada ao solve vira `FREE_TO_TOP_NOT_PRESOLVED` (erro) e nao recebe
+    canaleta superior.
 
     Devolve {"course_candidates": novo dict (listas novas, dicts trocados so'
     onde houve reforco), "runs", "openings", "findings", "free_to_top",
@@ -549,7 +612,12 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
     runs = []
     openings_report = []
     findings = []
-    free_to_top = []
+    presolved = free_to_top is not None
+    decided = (list(free_to_top) if presolved else
+               free_to_top_openings(walls_to_create, openings_per_wall, nodes, course_band, num_courses,
+                                    base_z_abs, policy))
+    decided_keys = dict(((f["wall_idx"], f["opening_index"]), f) for f in decided)
+    free_to_top = [dict(f) for f in decided] if presolved else []
     top_z = course_band(num_courses - 1)[1] if num_courses > 0 else None
 
     for wall_idx in range(len(walls_to_create)):
@@ -557,7 +625,6 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
         if not openings:
             continue
         demands = {}   # course_index -> [(opening_index, role)]
-        removals = {}  # course_index -> [(t_lo_cm, t_hi_cm)]
         for oi, opening in enumerate(openings):
             t_lo, t_hi, sill_z, head_z = opening
             rec = {"wall_idx": wall_idx, "opening_index": oi,
@@ -576,22 +643,15 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                  "classification": "NEEDS_RULE", "wall_idx": wall_idx, "opening_index": oi,
                                  "detail": "topo do vao fora da grade de fiadas; nenhuma canaleta superior planejada"})
             else:
-                bounded = False
-                if policy.get("free_to_top_tie_bounded_passages") and not rec["has_sill"] and nodes:
-                    max_cm = policy["tie_bounded_max_jamb_to_node_cm"]
-                    bounded = (_jamb_node_bounded(walls_to_create, nodes, wall_idx, opening, -1, max_cm) and
-                               _jamb_node_bounded(walls_to_create, nodes, wall_idx, opening, +1, max_cm))
-                elif policy.get("free_to_top_tie_bounded_passages") and not rec["has_sill"]:
-                    gap_cm = policy["tie_bounded_gap_cm"]
-                    bounded = (_jamb_tie_bounded(course_candidates, walls_to_create, wall_idx, opening,
-                                                 course_band, num_courses, -1, gap_cm, tol_ft) and
-                               _jamb_tie_bounded(course_candidates, walls_to_create, wall_idx, opening,
-                                                 course_band, num_courses, +1, gap_cm, tol_ft))
-                if bounded:
+                decision = decided_keys.get((wall_idx, oi))
+                if decision is not None and presolved:
                     rec["above"] = {"status": "FREE_TO_TOP", "course_index": above_ci}
-                    for ci in range(above_ci, num_courses):
-                        removals.setdefault(ci, []).append((_ft_to_cm(t_lo), _ft_to_cm(t_hi)))
-                    free_to_top.append({"wall_idx": wall_idx, "opening_index": oi, "from_course": above_ci})
+                elif decision is not None:
+                    rec["above"] = {"status": "FREE_TO_TOP_NOT_PRESOLVED", "course_index": above_ci}
+                    findings.append({"code": "FREE_TO_TOP_NOT_PRESOLVED", "severity": SEVERITY_ERROR,
+                                     "classification": "ACTUAL_ERROR", "wall_idx": wall_idx, "opening_index": oi,
+                                     "detail": "passagem livre precisa do vao estendido ate' o topo no solve; "
+                                               "nenhuma peca removida"})
                 else:
                     rec["above"] = {"status": "PLANNED", "course_index": above_ci}
                     demands.setdefault(above_ci, []).append((oi, ROLE_ABOVE_OPENING))
@@ -607,22 +667,6 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                     rec["below"] = {"status": "PLANNED", "course_index": below_ci}
                     demands.setdefault(below_ci, []).append((oi, ROLE_BELOW_SILL))
             openings_report.append(rec)
-
-        # ---- remocao das pecas acima de passagem livre (antes das corridas)
-        for ci in sorted(removals):
-            spans = removals[ci]
-            rows = _wall_strip_pieces(out_cc[ci], walls_to_create, wall_idx)
-            drop = set()
-            for r in rows:
-                if r["tie"] or not r["along"]:
-                    continue
-                if any(r["hi"] > lo + 0.5 and r["lo"] < hi - 0.5 for lo, hi in spans):
-                    drop.add(id(r["cand"]))
-            if drop:
-                out_cc[ci] = [c for c in out_cc[ci] if id(c) not in drop]
-                for item in free_to_top:
-                    if item["wall_idx"] == wall_idx:
-                        item.setdefault("removed_by_course", {})[ci] = len(drop)
 
         # ---- corridas por fiada
         for ci in sorted(demands):
@@ -706,6 +750,7 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                 def _cross(j, support_cm, rows=rows, ci=ci, t_lo=t_lo, t_hi=t_hi):
                     row = rows[j]
                     tie = row["cand"]
+                    geometric_support_cm = support_cm
                     # Apoio EFETIVO: o que fica sobre alvenaria da fiada de baixo
                     # (um vazio junto a' jamba nao apoia nada).
                     if ci > 0:
@@ -742,14 +787,23 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                                "como no BUTANTA humano)"})
                     crossings.append({"course_index": ci, "main_wall_idx": wall_idx,
                                       "incoming_wall_idx": tie.get("wall_idx"), "node_index": tie.get("node_index"),
+                                      "opening_index": oi, "role": role,
+                                      "geometric_support_cm": round(geometric_support_cm, 3),
                                       "removed": tie, "added": abut,
                                       "lo_cm": round(row["lo"], 3), "hi_cm": round(row["hi"], 3)})
                     return 1
 
                 i0, i1, lim_l, lim_r = _extend_run(rows, hits[0], hits[-1], t_lo, t_hi, policy, cross=_cross)
+                # No' e orientacao da amarracao que limitou a corrida (usado pela
+                # tentativa de paridade do CHANNEL, wall_modeling).
+                blockers = {}
+                for side, lim, j in (("l", lim_l, i0 - 1), ("r", lim_r, i1 + 1)):
+                    if lim == "JUNCTION_TIE" and 0 <= j < len(rows):
+                        blockers[side] = {"node_index": rows[j]["cand"].get("node_index"),
+                                          "along": bool(rows[j]["along"])}
                 # por IDENTIDADE da linha: conversoes de demandas seguintes
                 # podem inserir linhas e deslocar indices.
-                spans.append([rows[i0], rows[i1], oi, role, lim_l, lim_r])
+                spans.append([rows[i0], rows[i1], oi, role, lim_l, lim_r, blockers])
             if not spans:
                 continue
 
@@ -793,9 +847,10 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                          "detail": "canaleta cortada de {:.1f} cm (< {:.1f} cm observado)".format(
                                              piece["instance_length_cm"], policy["observed_min_cut_length_cm"])})
                     for src in g:
-                        replacements[id(src["cand"])] = (id(g[0]["cand"]), piece)
+                        replacements[_physical_key(src["cand"])] = (_physical_key(g[0]["cand"]), piece,
+                                                                    round(g[0]["lo"], 4))
                 for sp in run["items"]:
-                    oi, role, lim_l, lim_r = sp[2], sp[3], sp[4], sp[5]
+                    oi, role, lim_l, lim_r, blockers = sp[2], sp[3], sp[4], sp[5], sp[6]
                     opening = openings[oi]
                     t_lo = _ft_to_cm(opening[0])
                     t_hi = _ft_to_cm(opening[1])
@@ -812,44 +867,57 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                     rec[side_key] = {"status": "CHANNEL", "course_index": ci, "run_id": run_id,
                                      "support_l_cm": support_l, "support_r_cm": support_r,
                                      "bearing_l_cm": bearing_l, "bearing_r_cm": bearing_r,
-                                     "limited_l": lim_l, "limited_r": lim_r}
+                                     "limited_l": lim_l, "limited_r": lim_r,
+                                     "blocker_l": blockers.get("l"), "blocker_r": blockers.get("r")}
                     for side, sup, bearing, lim in (("L", support_l, bearing_l, lim_l),
                                                     ("R", support_r, bearing_r, lim_r)):
                         if sup < policy["min_support_cm"] - 1e-6:
-                            # 19 cm e' PREFERENCIAL (decisao do usuario 2026-09-14):
-                            # apoio menor, mas sobre alvenaria real, e' valido.
+                            # 19 cm e' PREFERENCIAL (decisao B). Classificacao objetiva
+                            # (auditoria 2026-09-14): sem assentamento = erro; abaixo do
+                            # limiar de verga-na-canaleta (9 cm) = limitacao conhecida;
+                            # entre 9 cm e o preferencial, assentado = alternativa.
+                            if bearing <= 0.5:
+                                classification = "ACTUAL_ERROR"
+                            elif min(sup, bearing) < policy["convert_along_tie_when_support_below_cm"] - 1e-6:
+                                classification = "KNOWN_LIMITATION"
+                            else:
+                                classification = "VALID_ALTERNATIVE"
                             findings.append({"code": "CHANNEL_SUPPORT_LIMITED", "severity": SEVERITY_WARNING,
-                                             "classification": ("VALID_ALTERNATIVE" if bearing > 0.5
-                                                                else "ACTUAL_ERROR"),
+                                             "classification": classification,
                                              "wall_idx": wall_idx, "opening_index": oi, "course_index": ci,
                                              "role": role, "side": side, "support_cm": sup,
                                              "bearing_cm": bearing, "limited_by": lim})
                 runs.append(record)
-            crossed = dict((id(x["removed"]), x) for x in crossings
+            crossed = dict((_physical_key(x["removed"]), x) for x in crossings
                            if x["course_index"] == ci and x["main_wall_idx"] == wall_idx)
-            split_removed = set(id(x["removed"]) for x in tie_conversions
+            split_removed = set(_physical_key(x["removed"]) for x in tie_conversions
                                 if x["course_index"] == ci and x["wall_idx"] == wall_idx and x["mode"] == "SPLIT")
             if replacements or crossed:
-                present = set(id(c) for c in out_cc[ci])
+                present = set(_physical_key(c) for c in out_cc[ci])
                 rebuilt = []
                 for cand in out_cc[ci]:
-                    if id(cand) in split_removed:
+                    key = _physical_key(cand)
+                    if key in split_removed:
                         continue
-                    if id(cand) in crossed:
-                        rebuilt.append(crossed[id(cand)]["added"])
+                    if key in crossed:
+                        rebuilt.append(crossed[key]["added"])
                         continue
-                    rep = replacements.get(id(cand))
+                    rep = replacements.get(key)
                     if rep is None:
                         rebuilt.append(cand)
-                    elif rep[0] == id(cand):
+                    elif rep[0] == key:
                         rebuilt.append(rep[1])
                 # grupos cuja primeira peca e' o trecho atravessado (pseudo,
-                # nao existe na fiada original)
+                # nao existe na fiada original): ordem canonica (corrida, eixo)
                 seen = set()
-                for key in sorted(replacements, key=lambda k: replacements[k][1]["reinforcement"]["run_id"]):
-                    head_id, piece = replacements[key]
-                    if head_id not in present and id(piece) not in seen:
-                        seen.add(id(piece))
+                heads = sorted(set((rep[1]["reinforcement"]["run_id"], rep[2], rep[0])
+                                   for rep in replacements.values() if rep[0] not in present))
+                by_head = dict((rep[0], rep[1]) for rep in replacements.values())
+                for _run_id, _lo, head_key in heads:
+                    piece = by_head[head_key]
+                    piece_key = _physical_key(piece)
+                    if piece_key not in seen:
+                        seen.add(piece_key)
                         rebuilt.append(piece)
                 out_cc[ci] = rebuilt
 
@@ -864,19 +932,31 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
 
 
 def validate_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
-                                   num_courses, base_z_abs, free_to_top=None, policy=None):
+                                   num_courses, base_z_abs, free_to_top=None, policy=None,
+                                   reference_course_candidates=None):
     """Validador INDEPENDENTE do planejador (recalcula a demanda a partir das
     aberturas e confere as pecas). Devolve {"counts": {...}, "items": [...]}.
 
     MISSING_REQUIRED_CHANNEL / EXTRA_CHANNEL / CHANNEL_WRONG_COURSE /
-    CHANNEL_INVADES_OPENING / CHANNEL_COLLISION / CHANNEL_SUPPORT_BELOW_POLICY."""
+    CHANNEL_INVADES_OPENING / CHANNEL_COLLISION / CHANNEL_SUPPORT_BELOW_POLICY.
+
+    Abertura real x jambas (auditoria 2026-09-14): `CHANNEL_OPENING_OVERCUT`
+    quando o vazio junto a uma jamba (distancia ate' a peca mais proxima do
+    lado de fora) e' maior que na referencia - a mesma fiada antes do reforco
+    (`reference_course_candidates`) ou, acima de uma passagem livre, a fiada
+    de mesma paridade logo abaixo do topo do vao. `CHANNEL_FREE_TO_TOP_NOT_OPEN`
+    quando sobra peca dentro do vao acima de uma passagem livre;
+    `CHANNEL_ORPHAN_PIECE` para compensador solto (sem vizinha contigua) nessas
+    fiadas. Nao basta nao haver peca DENTRO do vao."""
     policy = channel_policy(policy)
     tol_ft = _cm_to_ft(policy["grid_tolerance_cm"])
     joint_ft = _cm_to_ft(policy["grid_joint_allowance_cm"])
     gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     exempt = set((f["wall_idx"], f["opening_index"]) for f in (free_to_top or []))
+    ftt_from = dict(((f["wall_idx"], f["opening_index"]), f["from_course"]) for f in (free_to_top or []))
     counts = {"MISSING_REQUIRED_CHANNEL": 0, "EXTRA_CHANNEL": 0, "CHANNEL_WRONG_COURSE": 0,
               "CHANNEL_INVADES_OPENING": 0, "CHANNEL_COLLISION": 0, "CHANNEL_SUPPORT_BELOW_POLICY": 0,
+              "CHANNEL_OPENING_OVERCUT": 0, "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0, "CHANNEL_ORPHAN_PIECE": 0,
               "channel_top_expected": 0, "channel_top_matched": 0,
               "channel_bottom_expected": 0, "channel_bottom_matched": 0, "channel_pieces": 0,
               "channel_cut_pieces": 0}
@@ -896,11 +976,60 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                 if ci is not None:
                     demand_courses.setdefault(wi, {}).setdefault(ci, []).append(span + (ROLE_BELOW_SILL, oi))
 
+    # ---- abertura real x jambas
+    for wi in range(len(walls_to_create)):
+        openings = openings_per_wall[wi] if wi < len(openings_per_wall) else []
+        for oi, opening in enumerate(openings):
+            t_lo = _ft_to_cm(opening[0])
+            t_hi = _ft_to_cm(opening[1])
+            from_ci = ftt_from.get((wi, oi))
+            for ci in range(num_courses):
+                z_lo, z_hi = course_band(ci)
+                upper = from_ci is not None and ci >= from_ci
+                if not upper and not _opening_active(opening, z_lo, z_hi, tol_ft):
+                    continue
+                rows = _wall_strip_pieces(course_candidates.get(ci) or [], walls_to_create, wi)
+                ref_rows = None
+                if upper:
+                    ref_ci = next((cj for cj in range(from_ci - 1, -1, -1)
+                                   if cj % 2 == ci % 2 and _opening_active(opening, *(course_band(cj) + (tol_ft,)))),
+                                  None)
+                    if ref_ci is not None:
+                        ref_rows = _wall_strip_pieces(course_candidates.get(ref_ci) or [], walls_to_create, wi)
+                    inside = [r for r in rows if r["hi"] > t_lo + 0.5 and r["lo"] < t_hi - 0.5]
+                    if inside:
+                        counts["CHANNEL_FREE_TO_TOP_NOT_OPEN"] += len(inside)
+                        items.append({"code": "CHANNEL_FREE_TO_TOP_NOT_OPEN", "wall_idx": wi, "course_index": ci,
+                                      "opening_index": oi,
+                                      "pieces": [[round(r["lo"], 3), round(r["hi"], 3)] for r in inside]})
+                    for k, r in enumerate(rows):
+                        if not r["along"] or r["tie"] or r["hi"] - r["lo"] >= 9.5:
+                            continue
+                        left_ok = k > 0 and 0.0 <= r["lo"] - rows[k - 1]["hi"] <= gap
+                        right_ok = k + 1 < len(rows) and 0.0 <= rows[k + 1]["lo"] - r["hi"] <= gap
+                        if not left_ok and not right_ok:
+                            counts["CHANNEL_ORPHAN_PIECE"] += 1
+                            items.append({"code": "CHANNEL_ORPHAN_PIECE", "wall_idx": wi, "course_index": ci,
+                                          "opening_index": oi, "lo_cm": round(r["lo"], 3),
+                                          "hi_cm": round(r["hi"], 3), "piece": r["cand"].get("logical_code")})
+                elif reference_course_candidates is not None:
+                    ref_rows = _wall_strip_pieces(reference_course_candidates.get(ci) or [], walls_to_create, wi)
+                if ref_rows is None:
+                    continue
+                for side, t_jamb in ((-1, t_lo), (1, t_hi)):
+                    now = _jamb_outside_gap_cm(rows, t_jamb, side)
+                    ref = _jamb_outside_gap_cm(ref_rows, t_jamb, side)
+                    if now > ref + 0.5:
+                        counts["CHANNEL_OPENING_OVERCUT"] += 1
+                        items.append({"code": "CHANNEL_OPENING_OVERCUT", "wall_idx": wi, "course_index": ci,
+                                      "opening_index": oi, "side": "L" if side < 0 else "R",
+                                      "gap_cm": round(now, 3), "reference_gap_cm": round(ref, 3)})
+
     for ci in range(num_courses):
         pieces = course_candidates.get(ci) or []
         z_lo, z_hi = course_band(ci)
-        channel_ids = set(id(c) for c in pieces if is_channel_code(c.get("logical_code")))
-        counts["channel_pieces"] += len(channel_ids)
+        channel_idx = set(i for i, c in enumerate(pieces) if is_channel_code(c.get("logical_code")))
+        counts["channel_pieces"] += len(channel_idx)
         counts["channel_cut_pieces"] += sum(1 for c in pieces if c.get("logical_code") == CHANNEL_U_CUT)
         for wi in range(len(walls_to_create)):
             rows = _wall_strip_pieces(pieces, walls_to_create, wi)
@@ -969,11 +1098,11 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                         items.append({"code": "EXTRA_CHANNEL", "wall_idx": wi, "course_index": ci,
                                       "lo_cm": lo, "hi_cm": hi, "pieces": len(comp)})
         # colisao envolvendo canaleta (mesma fiada)
-        if channel_ids:
+        if channel_idx:
             boxes = [_candidate_obb(c) for c in pieces]
             aabbs = [_obb_aabb(b) for b in boxes]
             for i, j in sorted(_collision_candidate_pairs(range(len(pieces)), aabbs, 0.0)):
-                if id(pieces[i]) not in channel_ids and id(pieces[j]) not in channel_ids:
+                if i not in channel_idx and j not in channel_idx:
                     continue
                 if _obb_min_overlap(boxes[i], boxes[j]) > BOND_COLLISION_EPS_FT:
                     counts["CHANNEL_COLLISION"] += 1

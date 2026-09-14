@@ -6408,7 +6408,11 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 # Regra 30.8 (2026-09-14) - folga residual em trecho fechado por dois nos
 # (ver o uso em solve_wall_free_fill). 2,0 cm = maior folga medida no humano
 # (anel de shaft do BUTANTA: 1,0 cm na parede de 115, 2,0 cm nas de 86).
-RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
+# DESLIGADA por default desde a auditoria independente de 2026-09-14: ligada,
+# fecha paredes antes vazias do TGD mas a regua de benchmark acusa regressao
+# critica de COVERAGE_ROW_MOSTLY_EMPTY (V1 171 -> 232, V2 86 -> 92). O vao
+# 7719511 fica como limitacao conhecida da estrategia CHANNEL.
+RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False
 RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
 
 

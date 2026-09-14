@@ -3743,6 +3743,18 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     enabled = ARM_ROLE_SAFE_REPAIR_ENABLED if arm_role_safe_repair is None else arm_role_safe_repair
     b19_enabled = (B19_RESIDUAL_FILL_REPAIR_ENABLED if b19_residual_fill_repair is None
                   else b19_residual_fill_repair)
+    # PASSAGEM LIVRE ATE' O TOPO (51.9, correcao P0 2026-09-14): decidida pela
+    # geometria ANTES do solve; o motor resolve com o vao estendido ate' o
+    # topo, entao as jambas sao recortadas pelo mesmo mecanismo do resto da
+    # altura da porta. O pos-passe recebe as aberturas ORIGINAIS.
+    original_openings_per_wall = openings_per_wall
+    free_to_top = _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                        num_courses, opening_reinforcement_strategy,
+                                        opening_reinforcement_policy)
+    if free_to_top:
+        from core.engine import opening_reinforcement as _reinforcement
+        openings_per_wall = _reinforcement.openings_extended_to_top(
+            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses)
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,
@@ -3773,11 +3785,20 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
             result = parity_outcome["final_result"]
         result["tie_parity_search"] = {"flips": parity_outcome["flips"], "tried": parity_outcome["tried"]}
 
+    if opening_reinforcement_strategy is not None and result.get("error") is None:
+        channel_parity = _channel_tie_parity_trials(
+            nodes, walls_to_create, original_openings_per_wall, catalog, base_z_abs, num_courses, result,
+            _rebuild, opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top)
+        if channel_parity["changed"]:
+            result = channel_parity["final_result"]
+        result["channel_tie_parity_trials"] = {"accepted": channel_parity["accepted"],
+                                               "rejected": channel_parity["rejected"]}
+
     if not enabled or result.get("error") is not None:
         return _apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
-            openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy)
+            original_openings_per_wall, catalog, base_z_abs, num_courses,
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3811,12 +3832,216 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
 
     return _apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
-        openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy)
+        original_openings_per_wall, catalog, base_z_abs, num_courses,
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+
+
+def _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                          policy, free_to_top):
+    """Plano + validacao CHANNEL provisorios (sem mutar `result`) e as
+    grandezas que a tentativa de paridade nao pode piorar."""
+    from core.engine import opening_reinforcement as _reinforcement
+    band = _free_to_top_band(catalog, base_z_abs)
+    plan = _reinforcement.plan_channel_reinforcement(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, band, num_courses,
+        base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
+    validation = _reinforcement.validate_channel_reinforcement(
+        plan["course_candidates"], walls_to_create, openings_per_wall, band, num_courses, base_z_abs,
+        free_to_top=plan["free_to_top"], policy=plan["policy"],
+        reference_course_candidates=result.get("course_candidates"))
+    counts = validation["counts"]
+    error_codes = ("MISSING_REQUIRED_CHANNEL", "EXTRA_CHANNEL", "CHANNEL_WRONG_COURSE", "CHANNEL_INVADES_OPENING",
+                   "CHANNEL_COLLISION", "CHANNEL_OPENING_OVERCUT", "CHANNEL_FREE_TO_TOP_NOT_OPEN",
+                   "CHANNEL_ORPHAN_PIECE")
+    supports = {}
+    for rec in plan["openings"]:
+        for role in ("above", "below"):
+            side = rec.get(role) or {}
+            if side.get("status") == "CHANNEL":
+                for key in ("l", "r"):
+                    supports[(rec["wall_idx"], rec["opening_index"], role, key)] = min(
+                        side["support_%s_cm" % key], side["bearing_%s_cm" % key])
+    audits = result.get("wall_bond_audits") or {}
+    compensator_pairs, stagger_below = _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses)
+    return {
+        "plan": plan,
+        "compensator_consecutive": compensator_pairs,
+        "stagger_below_target": stagger_below,
+        "errors": sum(counts.get(code, 0) for code in error_codes),
+        "supports": supports,
+        "bond_reproved": sum(1 for a in audits.values() if not a.get("ok")),
+        "continuous_joints": sum(1 for a in audits.values() for p in a.get("problems") or []
+                                 if "CONTINUOUS_VERTICAL_JOINT" in str(p)),
+        "non_modular": len(result.get("non_modular") or []),
+        "collisions": len(result.get("collisions") or []),
+        "door_void": len(result.get("door_void_violations") or []),
+    }
+
+
+def _channel_trial_joint_quality(result, walls_to_create, catalog, num_courses):
+    """Grandezas de qualidade de junta que a tentativa de paridade nao pode
+    piorar, com as MESMAS definicoes da regua de benchmark (validate_
+    compensators / validate_prism): pares de compensadores encostados (folga
+    <= 5 cm) e juntas cujo vizinho mais proximo na fiada seguinte fica entre
+    1 e 10 cm (MIN_JOINT_STAGGER_TARGET_CM)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    courses = result.get("course_candidates") or {}
+    pairs = stagger = 0
+    for wall_idx in range(len(walls_to_create)):
+        joints_by_course = {}
+        for ci in range(num_courses):
+            rows = [r for r in _reinforcement._wall_strip_pieces(courses.get(ci) or [], walls_to_create, wall_idx)
+                    if r["along"] and r["cand"].get("wall_idx") == wall_idx]
+            joints = []
+            for a, b in zip(rows, rows[1:]):
+                gap = b["lo"] - a["hi"]
+                entry_a = catalog.get(a["cand"].get("logical_code")) or {}
+                entry_b = catalog.get(b["cand"].get("logical_code")) or {}
+                if gap <= 5.0 and entry_a.get("is_compensator") and entry_b.get("is_compensator"):
+                    pairs += 1
+                if 0.0 <= gap <= 5.0:
+                    joints.append((a["hi"] + b["lo"]) / 2.0)
+            joints_by_course[ci] = joints
+        for ci in range(num_courses - 1):
+            upper = joints_by_course.get(ci + 1) or []
+            for joint in joints_by_course.get(ci) or []:
+                if upper:
+                    nearest = min(abs(joint - other) for other in upper)
+                    if 1.0 < nearest < MIN_JOINT_STAGGER_TARGET_CM:
+                        stagger += 1
+    return pairs, stagger
+
+
+def _channel_tie_parity_candidates(metrics, policy):
+    """Nos T cuja paridade deixou a canaleta com apoio GEOMETRICO entre 0,5 cm
+    e o limiar de conversao (9 cm) diante da amarracao TRANSVERSAL da parede
+    que chega - parando ali ou atravessando o T so' por falta de assentamento.
+    A travessia com a jamba na face (apoio geometrico <= 0,5, regra 51.6) nao
+    e' candidata. Ordem canonica."""
+    from core.engine import opening_reinforcement as _reinforcement
+    policy = _reinforcement.channel_policy(policy)
+    limit = policy["convert_along_tie_when_support_below_cm"]
+    found = {}
+    for rec in metrics["plan"]["openings"]:
+        for role in ("above", "below"):
+            side = rec.get(role) or {}
+            if side.get("status") != "CHANNEL":
+                continue
+            for key in ("l", "r"):
+                blocker = side.get("blocker_%s" % key)
+                support = side["support_%s_cm" % key]
+                if blocker and not blocker["along"] and blocker.get("node_index") is not None \
+                        and 0.5 < support < limit - 1e-6:
+                    found.setdefault(blocker["node_index"], (rec["wall_idx"], rec["opening_index"], role, key))
+    for crossing in metrics["plan"].get("node_crossings") or []:
+        if crossing.get("node_index") is not None and 0.5 < crossing.get("geometric_support_cm", 0.0) < limit:
+            found.setdefault(crossing["node_index"], (crossing["main_wall_idx"], crossing["opening_index"],
+                                                      "above" if crossing["role"] == "ABOVE_OPENING" else "below",
+                                                      None))
+    return [(node_index, found[node_index]) for node_index in sorted(found)]
+
+
+def _channel_tie_parity_trials(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                               result, rebuild_fn, strategy, policy, free_to_top):
+    """TENTATIVA DE PARIDADE DO CHANNEL (auditoria 2026-09-14, vao 6627438).
+
+    O humano, diante da amarracao transversal de um T a poucos cm da jamba,
+    usou a paridade OPOSTA do no' naquela fiada (a principal passa com a K34
+    ao longo sobre o no', apoio 39 cm). A conversao de amarracao ao longo
+    (51.7) so' existe quando a amarracao ao longo esta' la'; com a paridade do
+    motor a peca do no' e' transversal e a corrida parava com 4 cm. Aqui o
+    no' candidato tem a marca `_tie_parity_flip` invertida, o motor e'
+    RECONSTRUIDO (mesmo mecanismo de search_tie_parity) e o plano CHANNEL e'
+    refeito. Aceita so' se: o apoio daquele lado chega a >= 9 cm; nenhum outro
+    apoio de canaleta cai abaixo do preferencial (19 cm); erros do validador CHANNEL, paredes
+    reprovadas, juntas corridas, trechos nao modulares, colisoes, invasoes de
+    vao, compensadores encostados e desencontros abaixo do alvo nao aumentam
+    (BUTANTA: a inversao do no' de W018 foi rejeitada por +12 compensadores
+    encostados). Senao reverte. Evidencia conflitante registrada (6672349:
+    o humano parou com 4 cm) - por isso e' tentativa com gates, nunca regra."""
+    empty = {"changed": False, "accepted": [], "rejected": [], "final_result": result}
+    if strategy is None:
+        return empty
+    base = _channel_plan_metrics(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                 num_courses, policy, free_to_top)
+    candidates = _channel_tie_parity_candidates(base, policy)
+    if not candidates:
+        return empty
+    from core.engine import opening_reinforcement as _reinforcement
+    min_support_cm = _reinforcement.channel_policy(policy)["min_support_cm"]
+    accepted, rejected = [], []
+    current, current_metrics = result, base
+    for node_index, target in candidates:
+        node = nodes[node_index]
+        node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+        trial = rebuild_fn()
+        reason = None
+        if trial.get("error") is not None:
+            reason = "trial_error"
+        else:
+            metrics = _channel_plan_metrics(trial, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                            num_courses, policy, free_to_top)
+            wall_idx, opening_index, role, key = target
+            keys = [(wall_idx, opening_index, role, k) for k in (("l", "r") if key is None else (key,))]
+            after = [metrics["supports"].get(k) for k in keys]
+            if any(v is None or v < 9.0 - 1e-6 for v in after):
+                reason = "target_support_not_reached:{}".format(after)
+            else:
+                for gate in ("errors", "bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
+                             "compensator_consecutive", "stagger_below_target"):
+                    if metrics[gate] > current_metrics[gate]:
+                        reason = "gate_{}:{}->{}".format(gate, current_metrics[gate], metrics[gate])
+                        break
+                if reason is None:
+                    for k, before in sorted(current_metrics["supports"].items()):
+                        now = metrics["supports"].get(k)
+                        if k in keys:
+                            continue
+                        # 19 cm e' preferencial: cair acima dele nao piora o reforco.
+                        if now is None or (now < before - 0.5 and now < min_support_cm - 1e-6):
+                            reason = "support_drop:{}:{}->{}".format(k, before, now)
+                            break
+        record = {"node_index": node_index, "wall_idx": target[0], "opening_index": target[1],
+                  "role": target[2], "side": target[3]}
+        if reason is None:
+            current, current_metrics = trial, metrics
+            accepted.append(record)
+        else:
+            node["_tie_parity_flip"] = not node.get("_tie_parity_flip", False)
+            if not node["_tie_parity_flip"]:
+                node.pop("_tie_parity_flip", None)
+            rejected.append(dict(record, reason=reason))
+    return {"changed": bool(accepted), "accepted": accepted, "rejected": rejected, "final_result": current}
+
+
+def _free_to_top_band(catalog, base_z_abs):
+    step, _error = _course_height_ft(catalog, None)
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+    return _band
+
+
+def _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                          strategy, policy):
+    """Decisoes de passagem livre (so' CHANNEL). None/estrategia desconhecida
+    -> [] (a estrategia desconhecida continua sendo rejeitada no pos-passe)."""
+    if strategy is None:
+        return []
+    from core.engine import opening_reinforcement as _reinforcement
+    if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+        return []
+    step, _error = _course_height_ft(catalog, None)
+    if step is None:
+        return []
+    return _reinforcement.free_to_top_openings(
+        walls_to_create, openings_per_wall, nodes, _free_to_top_band(catalog, base_z_abs), num_courses,
+        base_z_abs, policy)
 
 
 def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
-                                 base_z_abs, num_courses, strategy, policy=None):
+                                 base_z_abs, num_courses, strategy, policy=None, free_to_top=None):
     """Pos-passe da estrategia de reforco. None devolve `result` intacto."""
     if strategy is None:
         return result
@@ -3838,13 +4063,14 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     t_plan = time.time()
     plan = _reinforcement.plan_channel_reinforcement(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
-        base_z_abs, policy=policy, nodes=nodes, catalog=catalog)
+        base_z_abs, policy=policy, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
     t_validate = time.time()
     result["course_candidates_before_reinforcement"] = result.get("course_candidates")
     result["course_candidates"] = plan.pop("course_candidates")
     plan["validation"] = _reinforcement.validate_channel_reinforcement(
         result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
-        free_to_top=plan["free_to_top"], policy=plan["policy"])
+        free_to_top=plan["free_to_top"], policy=plan["policy"],
+        reference_course_candidates=result["course_candidates_before_reinforcement"])
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
@@ -3852,9 +4078,55 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     result["wall_bond_audits"] = audit_all_walls_bond_quality(
         walls_to_create, result["course_candidates"], audit_catalog, num_courses,
         openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    _unify_candidates_with_courses(result, _reinforcement)
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
+    return result
+
+
+def _unify_candidates_with_courses(result, reinforcement_module):
+    """FONTE UNICA DE VERDADE depois do pos-passe (auditoria 2026-09-14):
+    `result["candidates"]` passa a ser o conjunto de pecas FISICAS distintas de
+    `course_candidates` (chave canonica, ordem por fiada/chave), e
+    `result["collisions"]` aponta para essa lista (pares herdados do solve cujas
+    duas pecas continuam existindo + pares que envolvem canaleta, medidos por
+    fiada). O estado anterior fica em `*_before_reinforcement`. So' roda com
+    estrategia de reforco: o legado continua byte a byte."""
+    key_of = reinforcement_module._physical_key
+    before = result.get("candidates") or []
+    result["candidates_before_reinforcement"] = before
+    result["collisions_before_reinforcement"] = result.get("collisions") or []
+    flat, index = [], {}
+    course_indices = {}
+    for ci in sorted(result.get("course_candidates") or {}):
+        for cand in result["course_candidates"][ci]:
+            key = key_of(cand)
+            if key not in index:
+                index[key] = len(flat)
+                flat.append(cand)
+            course_indices.setdefault(key, []).append(ci)
+    pairs = set()
+    for i, j in result["collisions_before_reinforcement"]:
+        if i < len(before) and j < len(before):
+            a, b = index.get(key_of(before[i])), index.get(key_of(before[j]))
+            if a is not None and b is not None and a != b:
+                pairs.add((min(a, b), max(a, b)))
+    for ci in sorted(result.get("course_candidates") or {}):
+        pieces = result["course_candidates"][ci]
+        channel = set(k for k, c in enumerate(pieces) if reinforcement_module.is_channel_code(c.get("logical_code")))
+        if not channel:
+            continue
+        rm = reinforcement_module
+        boxes = [rm._candidate_obb(c) for c in pieces]
+        aabbs = [rm._obb_aabb(b) for b in boxes]
+        for i, j in sorted(rm._collision_candidate_pairs(range(len(pieces)), aabbs, 0.0)):
+            if (i in channel or j in channel) and rm._obb_min_overlap(boxes[i], boxes[j]) > rm.BOND_COLLISION_EPS_FT:
+                a, b = index[key_of(pieces[i])], index[key_of(pieces[j])]
+                if a != b:
+                    pairs.add((min(a, b), max(a, b)))
+    result["candidates"] = flat
+    result["collisions"] = sorted(pairs)
     return result
 
 
@@ -9338,36 +9610,31 @@ SETUP_THICKNESS_SCAN_MAX_LINES = 900
 
 REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 
-# ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14, decisao do usuario: CHANNEL
-# e' estrategia oficial; LINTEL_COUNTERLINTEL faz parte da arquitetura mas
-# ainda nao existe). (valor salvo, rotulo, implementada). "NONE" = modulacao
-# legada sem reforco. Uma estrategia nao implementada aparece para deixar a
-# expansao visivel, mas bloqueia o botao executar.
+# ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14). (valor salvo, rotulo,
+# implementada). "NONE" = modulacao legada sem reforco e e' o DEFAULT
+# (auditoria independente 2026-09-14): CHANNEL so' com escolha EXPLICITA do
+# usuario - instalacao antiga, preferencia ausente/corrompida ou valor
+# desconhecido continuam no fluxo legado, sem exigir familia de canaleta. Uma
+# estrategia nao implementada aparece para deixar a expansao visivel, mas
+# bloqueia o botao executar.
 OPENING_REINFORCEMENT_UI_OPTIONS = (
-    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
     ("NONE", "Sem reforco de aberturas (modulacao legada)", True),
+    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
     ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
 )
-DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "CHANNEL"
+DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "NONE"
 
 
 def _opening_reinforcement_strategy_from_ui_value(value):
-    """Valor salvo na tela -> `opening_reinforcement_strategy` do motor.
-    Desconhecido/nao implementado nunca vira estrategia silenciosamente."""
+    """Valor escolhido na tela -> `opening_reinforcement_strategy` do motor.
+    Ausente/desconhecido -> None (legado); nao implementado -> ValueError
+    (nunca vira estrategia silenciosamente)."""
     for key, _label, implemented in OPENING_REINFORCEMENT_UI_OPTIONS:
         if key == value:
             if not implemented:
                 raise ValueError("estrategia de reforco de aberturas '{}' ainda nao implementada".format(value))
             return None if key == "NONE" else key
-    return _opening_reinforcement_strategy_from_ui_value(DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
-
-
-def _remembered_opening_reinforcement_strategy():
-    value = _recall_setup_defaults().get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
-    try:
-        return _opening_reinforcement_strategy_from_ui_value(value)
-    except ValueError:
-        return _opening_reinforcement_strategy_from_ui_value(DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
+    return None
 
 
 class _SetupForm(Form):
@@ -12893,7 +13160,8 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
                                wall_error_rows, catalog=None, catalog_missing=None,
                                wall_segment_geometry=None, initial_solve_result=None,
                                initial_create_result=None, precreated_event=None,
-                               precreated_handler=None, created_cuts_by_axis=None):
+                               precreated_handler=None, created_cuts_by_axis=None,
+                               opening_reinforcement_strategy=None):
     """Cria o ExternalEvent + handler (_PostCreationEventHandler) e mostra a
     janela unica de modulacao (_PostCreationForm) - guarda a referencia em
     _ACTIVE_MODELESS_WINDOWS pelo mesmo motivo/cuidado documentado no topo
@@ -12962,9 +13230,11 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     handler.wall_height_ft = wall_height_ft
     handler.catalog = catalog
     handler.catalog_missing = catalog_missing
-    # Estrategia escolhida na Tela de Configuracao (lembrada entre execucoes;
-    # o fluxo "paredes existentes" usa a ultima escolha).
-    handler.opening_reinforcement_strategy = _remembered_opening_reinforcement_strategy()
+    # Estrategia escolhida na Tela de Configuracao DESTA execucao, recebida
+    # do chamador - nunca relida do disco (a preferencia salva so' pre-seleciona
+    # o combo). Sem escolha explicita (fluxo de paredes existentes, tela
+    # antiga) = None = legado.
+    handler.opening_reinforcement_strategy = opening_reinforcement_strategy
     handler.error_rows = wall_error_rows
     handler.solve_result = initial_solve_result
     handler.create_result = initial_create_result
@@ -17324,7 +17594,9 @@ def main():
                     selected_level, base_z_abs, wall_height_ft, wall_error_rows,
                     catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
                     precreated_event=stage2_external_event, precreated_handler=stage2_handler,
-                    created_cuts_by_axis=created_cuts_by_axis
+                    created_cuts_by_axis=created_cuts_by_axis,
+                    opening_reinforcement_strategy=_opening_reinforcement_strategy_from_ui_value(
+                        setup.get("opening_reinforcement"))
                 )
             except Exception as ex:
                 # NUNCA mostrar `summary` (o resumo da Etapa 1, "tudo certo")
