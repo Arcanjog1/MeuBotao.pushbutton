@@ -8330,3 +8330,49 @@ não degradado) em vez de emitir pastilha nas duas famílias. Essa mudança mexe
 peça de nó e atinge também TGD e TP1 (31 e 35 ocorrências no censo), portanto
 exige o ciclo completo do gate de não-regressão antes de entrar — registrada
 aqui como defeito localizado com causa, não corrigida nesta rodada.
+
+### 58.2 Correção no nó — IMPLEMENTADA E **DESLIGADA** pelo gate de não-regressão
+
+`CORNER_DEGRADED_TIE_CODES = ("B34",) + CORNER_SINGLE_ELEMENT_CODES` e
+`CORNER_DEGRADED_PREFERS_TIE_BLOCK` (`core/engine/wall_stepper.py`): o elemento
+único do encontro degradado passa a tentar o **bloco de amarração antes do
+compensador** — exatamente a escada que o cruzamento em X já usa
+(`X_INTERSECTION_DEGRADED_CODES`), e nunca B19. Quando o bloco é escolhido, a
+família oposta recebe a peça **curta** (`CORNER_DEGRADED_ALTERNATES_TIE`), e o
+B34 usa a origem assimétrica (vazado menor voltado para o nó), como no T normal.
+
+**Por que a família oposta não pode ficar vazia:** deixar `course_b = None` (o
+"recuo" que o humano faz) não reproduz o humano no solver — o preenchimento
+daquela fiada recomeça do zero e **refaz a mesma face** do bloco de amarração.
+Medido no TP1 V1: `PRISM_CONTINUOUS_JOINT` 16 → 72, com a junta em t=34,5 cm
+repetida em 14 de 17 fiadas em quatro paredes.
+
+**Medido (head do PR #42 → com a regra ligada):**
+
+| Corpus | Métrica | PR #42 | Com a 58.2 |
+|---|---|---|---|
+| BUTANTÃ | Pastilhas de T degradado | 30 | **0** |
+| BUTANTÃ | `C09` como peça extrema da fiada | 40 | **10** |
+| BUTANTÃ | Vazado menor do B34 desalinhado | 316 | **283** |
+| BUTANTÃ | Especiais (fiadas 0–11) | 808 | **802** |
+| BUTANTÃ | Buracos / sem apoio / colisões / não-modular | 10 / 0 / 0 / 0 | 10 / 0 / 0 / 0 |
+| TGD V2 | `COMPENSATOR_CONSECUTIVE` | 407 | 396 |
+| TGD V2 | `PRISM_CONTINUOUS_JOINT` | 53 | **55** |
+| TP1 V1 | `COMPENSATOR_CONSECUTIVE` | 825 | 815 |
+| TP1 V1 | `PRISM_STAGGER_BELOW_TARGET` | 1.689 | 1.267 |
+| TP1 V1 | `PRISM_CONTINUOUS_JOINT` | 16 | **32** |
+
+**Veredito: não entra ligada.** Junta corrida é a regra #1, e o corpus legado
+dobra (`PRISM_CONTINUOUS_JOINT` 16 → 32 no TP1). A chave fica em `False`; com
+ela desligada o resultado é **idêntico**, métrica por métrica, ao head do PR #42
+(verificado no BUTANTÃ: nenhuma diferença). Os cinco testes de
+`tests/test_degraded_node_tie_block.py` exercitam a regra pela chave, inclusive o
+vermelho (pastilha de 9 cm nas duas famílias) e a garantia de que boneca curta
+continua recebendo compensador.
+
+**Causa do resíduo, para quem continuar:** as juntas corridas que sobram caem em
+**fronteira de banda** — onde duas fiadas vizinhas pertencem à mesma família
+(A/B) porque a banda de abertura mudou —, e ali a face do bloco de amarração se
+repete. O caminho é alternar o elemento do nó degradado pela fiada FÍSICA e não
+pela família lógica, ou submeter a escolha do nó à mesma tentativa por parede da
+seção 56.2.

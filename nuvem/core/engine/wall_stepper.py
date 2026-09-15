@@ -1441,11 +1441,33 @@ def _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
 # abertura ou PONTA SEM AMARRACAO) nao se aplica aqui. "canaleta ou
 # compensador, conforme o espaco disponivel", pedido explicito do usuario.
 CORNER_SINGLE_ELEMENT_CODES = ("C09", "C04")
+# SECAO 58 (2026-09-15, missao BUTANTA): quando o lado curto do encontro na
+# verdade TEM espaco para a peca de amarracao, o elemento unico nao deve ser
+# uma pastilha. Medido no BUTANTA: no no' 46 a boneca tem 175 cm livres e o
+# solver punha C09 de 9 cm, porque quem reprovava era a parede PRINCIPAL
+# (27 cm dos 34 exigidos) e o ramo degradado so' olhava compensador. O
+# projeto humano poe B34 nessas mesmas pontas e nunca termina uma fiada com
+# C09 (0 em 383 pontas). E' a MESMA escada que o X degradado ja' usa
+# (X_INTERSECTION_DEGRADED_CODES): bloco de amarracao primeiro, compensador
+# depois, NUNCA B19.
+CORNER_DEGRADED_TIE_CODES = ("B34",) + CORNER_SINGLE_ELEMENT_CODES
+# DESLIGADA (gate global de nao-regressao, 2026-09-15). Corrige o defeito medido
+# no BUTANTA - vazado menor 316 -> 283, especiais 808 -> 802, pastilhas de T
+# degradado 30 -> 0, portoes duros intactos - mas custa PRISM_CONTINUOUS_JOINT
+# no corpus legado: TP1 V1 16 -> 32 e TGD V2 53 -> 55, em juntas de FRONTEIRA DE
+# BANDA, onde duas fiadas vizinhas caem na mesma familia e a face do bloco de
+# amarracao se repete. Junta corrida e' regra #1: nao entra ligada enquanto essa
+# causa nao for tratada. Ver secao 58 de REGRAS_MODULACAO_BLOCOS.md.
+CORNER_DEGRADED_PREFERS_TIE_BLOCK = False
+# Com bloco de amarracao, a familia oposta recebe a peca CURTA: cobre as duas
+# fiadas e deixa as faces em posicoes diferentes. Deixar a familia oposta vazia
+# e' pior (o preenchimento dela refaz a mesma face: TP1 V1 16 -> 72).
+CORNER_DEGRADED_ALTERNATES_TIE = True
 
 
 def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, course,
                                      wall_idx, secondary_wall_idx, node_index,
-                                     placement_reason="CORNER_DEGRADED", nodes=None):
+                                     placement_reason="CORNER_DEGRADED", nodes=None, codes=None):
     """UM UNICO elemento (o maior entre C09/C04 que caiba no espaco real
     disponivel - NUNCA B19 por padrao, ver CORNER_SINGLE_ELEMENT_CODES)
     para fechar uma parede curta demais para o B34 normal num encontro (L
@@ -1484,8 +1506,11 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
                     return _make_block_candidate(
                         "B19", b19_entry, course, origin, dir_away, "B19_RESIDUAL_FILL",
                         node_index=node_index, wall_idx=wall_idx, secondary_wall_idx=secondary_wall_idx)
+    if codes is None:
+        codes = (CORNER_DEGRADED_TIE_CODES if CORNER_DEGRADED_PREFERS_TIE_BLOCK
+                 else CORNER_SINGLE_ELEMENT_CODES)
     best_code = None
-    for code in CORNER_SINGLE_ELEMENT_CODES:
+    for code in codes:
         entry = catalog.get(code)
         if entry is None or not entry.get("length_cm"):
             continue
@@ -1495,9 +1520,16 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
     if best_code is None:
         return None
     entry = catalog[best_code]
-    half_len_ft = _cm_to_ft(entry["length_cm"]) / 2.0
-    origin = contact_point + dir_away * half_len_ft
-    return _make_block_candidate(best_code, entry, course, origin, dir_away,
+    if best_code == "B34" and entry.get("cells_local"):
+        # Peca de AMARRACAO: o vazado menor tem de ficar voltado para o no',
+        # como no T/L nao degradado - a origem simetrica serve para a
+        # pastilha, nao para o bloco que amarra.
+        origin, x_dir = _asymmetric_bond_origin_and_axis(
+            entry, contact_point, dir_away, _block_smaller_cell_sign(entry))
+    else:
+        origin = contact_point + dir_away * (_cm_to_ft(entry["length_cm"]) / 2.0)
+        x_dir = dir_away
+    return _make_block_candidate(best_code, entry, course, origin, x_dir,
                                  placement_reason,
                                  node_index=node_index, wall_idx=wall_idx,
                                  secondary_wall_idx=secondary_wall_idx)
@@ -1617,6 +1649,22 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
             catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
             placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes
         )
+        if (CORNER_DEGRADED_ALTERNATES_TIE and single_a is not None
+                and single_a.get("logical_code") == CORNER_DEGRADED_TIE_CODES[0]):
+            # SECAO 58: com bloco de AMARRACAO (nao pastilha), repetir a MESMA
+            # peca nas duas familias poe a mesma face em todas as fiadas -
+            # junta corrida (regra #1), pega por
+            # test_channel_audit_fixes::test_continuous_passage_...
+            # A familia oposta recebe a peca CURTA (a pastilha de sempre), o
+            # que mantem a cobertura das duas fiadas e deixa as faces em
+            # posicoes diferentes. Deixar a familia oposta VAZIA nao serve: o
+            # preenchimento dela recomeca do zero e refaz a MESMA face do
+            # bloco de amarracao (medido no TP1 V1: PRISM_CONTINUOUS_JOINT
+            # 16 -> 72, junta em t=34,5cm repetida em 14 de 17 fiadas).
+            single_b = _corner_single_element_candidate(
+                catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
+                placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes,
+                codes=CORNER_SINGLE_ELEMENT_CODES)
         if single_a is None or single_b is None:
             return {"ok": False,
                     "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem "
@@ -2098,8 +2146,12 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     for node_index, course_a, course_b in solved:
         if node_index in rejected:
             continue
-        candidates.append(course_a)
-        candidates.append(course_b)
+        # Uma familia pode ficar SEM peca de no' (secao 58: o encontro
+        # degradado amarra numa fiada e RECUA na outra) - a reserva de
+        # `_node_default_reservation_cm` cuida do espaco na fiada que recua.
+        for candidate in (course_a, course_b):
+            if candidate is not None:
+                candidates.append(candidate)
     outcome = {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts,
                "tie_parity_flips": [], "tie_parity_conflicts": []}
     if (_parity_pass and ABUTTING_TIE_PARITY_ENABLED and end_to_node is not None
