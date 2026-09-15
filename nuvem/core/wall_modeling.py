@@ -3750,7 +3750,13 @@ def _physical_support_final(result, catalog, walls_to_create, openings_per_wall,
     return result
 
 
-def _orient_small_voids_final(result, catalog):
+def _b34_run_arrangement_legacy_enabled():
+    from core.engine import b34_run_arrangement as _runs
+    return _runs.B34_RUN_ARRANGEMENT_LEGACY
+
+
+def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_per_wall=None,
+                              arrange=False, nodes=None, end_to_node=None):
     """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
     sobre as fiadas FISICAS finais (depois de reparos e do reforco de
     aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
@@ -3769,6 +3775,24 @@ def _orient_small_voids_final(result, catalog):
     summary = {"rotated": 0, "passes": 0}
     if _small_void.SMALL_VOID_ORIENTATION_ENABLED:
         summary = _small_void.orient_small_voids(course_candidates, catalog)
+    if arrange and walls_to_create:
+        # SECAO 60: arranjo conjunto das corridas (mesmas pecas, outra ordem) e
+        # nova orientacao sobre a ordem escolhida. So' estrategia CHANNEL por
+        # padrao; o legado continua identico a' main.
+        from core.engine import b34_run_arrangement as _runs
+        ties = None
+        if nodes is not None and end_to_node is not None:
+            # as MESMAS posicoes de amarracao que a auditoria usa para
+            # HALF_BLOCK_NEAR_TIE (regra #2)
+            ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+                        for wi in range(len(walls_to_create)))
+        arrangement = _runs.arrange_b34_runs(
+            course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
+            half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM)
+        result["b34_run_arrangement"] = arrangement
+        if arrangement.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
+            again = _small_void.orient_small_voids(course_candidates, catalog)
+            summary["rotated_after_arrangement"] = again.get("rotated", 0)
     violations = _small_void.b34_small_void_violations(course_candidates, catalog)
     summary["after"] = len(violations)
     summary["violations"] = violations
@@ -3898,7 +3922,8 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
             original_openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog),
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+            walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
             catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
     repair_outcome = repair_arm_role_isolated_edges(
@@ -3934,7 +3959,8 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
         original_openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog),
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+        walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
         catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
 
@@ -4216,6 +4242,11 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
             result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
             free_to_top=plan["free_to_top"], policy=plan["policy"],
             reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    # Vazado menor (secao 52) e arranjo das corridas (secao 60) ANTES da
+    # reauditoria: o arranjo move juntas dentro das corridas, e a auditoria de
+    # amarracao tem de ver a geometria final. A orientacao nao muda junta.
+    _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall, arrange=True,
+                              nodes=nodes, end_to_node=end_to_node)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
@@ -4223,7 +4254,6 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     result["wall_bond_audits"] = audit_all_walls_bond_quality(
         walls_to_create, result["course_candidates"], audit_catalog, num_courses,
         openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
-    _orient_small_voids_final(result, catalog)
     _unify_candidates_with_courses(result, _reinforcement)
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}

@@ -8411,3 +8411,131 @@ como preferência e dois **não** devem existir.
 
 **Régua a preservar:** um validador que reprova o projeto humano de referência
 está errado, não o projeto. Foi o caso em três dos cinco pedidos.
+
+## 60. Arranjo conjunto das corridas de preenchimento — vazado menor do B34 (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 60.1 Censo das 316 violações que restavam (BUTANTÃ, 34 paredes, fiadas 0–11)
+
+Régua `b34rule` (a mesma do Revit real, que bateu exatamente com a bancada:
+157 + 118 + 24 + 17). `VIOLA:<código>` é a peça **vizinha** que cobre o centro do
+vazado menor.
+
+| Vizinha sob o vazado menor | Solver | Humano |
+|---|---|---|
+| B39 (não tem vazado menor) | **157** | 2 |
+| B34 | 118 | 20 |
+| B54 (célula lateral, não a central) | 24 | 2 |
+| B19 | 17 | 17 |
+
+Contexto: 290 das 316 são preenchimento × preenchimento (nenhuma das duas é peça
+de nó); 24 são B34 de preenchimento sobre o B54 do T.
+
+**Geometria que decide o que a rotação consegue** (vazado menor do B34 a
+9,1 cm do centro, 10,75 cm de largura, tolerância 1,5 cm): contra outro B34 só
+há duas janelas — mesma orientação com deslocamento |o| ≤ 6,9 cm, ou orientação
+**oposta** com 11,4 ≤ |o| ≤ 25,1 cm. Contra B39/B19 nenhuma orientação serve.
+Nenhum dos 118 B34×B34 estava "empilhado mal orientado": 114 estavam na janela
+de orientação oposta e 99 B34 violavam **nas duas** vizinhas — sinal de conflito
+entre a fiada de baixo e a de cima, que rotação não resolve.
+
+### 60.2 Mecanismo humano (medido peça a peça)
+
+Parede 8284543, trecho 815–964 cm, fiada par: o solver assentava
+`B34> B39 B39 B34<`; o humano assenta `B34> B34> B39 B39` — **as mesmas peças,
+outra ordem** —, encaixando a corrida de B34 na da fiada ímpar
+(`B19 B34< B34< B39 B39`), deslocada ~20 cm e girada 180°. No trecho 670–724 cm
+o humano faz `B34 B19` onde o solver faz `B19 B34`. Em outras paredes o humano
+muda a **composição** (B34 de ajuste em vez de `B39 … C09`) — isso não é
+reordenação e fica fora desta seção.
+
+### 60.3 Regra implementada
+
+`core/engine/b34_run_arrangement.py`, chamado por `_orient_small_voids_final`
+(`core/wall_modeling.py`) no fluxo CHANNEL: orientação §52 → arranjo §60 →
+orientação de novo, **antes** da reauditoria de amarração (o arranjo move juntas
+dentro das corridas; a orientação não).
+
+1. Fiadas físicas com a mesma fileira, peça por peça, formam uma **família**;
+   cada par de famílias vizinhas entra com a sua multiplicidade.
+2. Corrida = peças encostadas que são **bloco vazado de alvenaria ou compensador
+   do catálogo**, `STANDARD_FILL`, fora de nó, nunca canaleta, e que não aparecem
+   em fiada de outra família — em **todas** as fiadas da família.
+3. Para cada corrida: ordens **distintas** das mesmas peças (mesmas pontas,
+   mesmas juntas), orientação dos B34 por descida coordenada; fica a ordem que
+   reduz **estritamente** o vazado menor sem piorar **nenhuma** guarda.
+4. Repete até estabilizar (≤ 3 passadas): a escolha de uma corrida enxerga a das
+   vizinhas — a diferença para a tentativa rejeitada da §57, que decidia cada
+   corrida uma vez só contra vizinhas que ainda iam se mover.
+
+**Guardas (não podem subir):** face repetida entre fiadas vizinhas; junta
+empilhada em 3+ fiadas; compensadores encostados (regra #2 e 56.2); compensador
+longo (≥ 6 cm) como peça extrema (§58); **meio bloco junto de amarração**, com as
+mesmas posições (`_wall_tie_t_positions_cm`) e a mesma constante
+(`HALF_BLOCK_TIE_ADJACENCY_CM`) da auditoria `HALF_BLOCK_NEAR_TIE`.
+
+Geometria lida das `cells_world` (célula menor, §52): nenhum código de família,
+parede ou cota fixa. Custo local medido numa janela de 60 cm em volta do trecho
+(delta exato: as outras famílias ficam paradas durante a avaliação).
+
+### 60.4 Medido — BUTANTÃ no fluxo real do botão (17 fiadas)
+
+| Métrica | Sem §60 | Com §60 |
+|---|---|---|
+| Vazado menor — validador de produção (todas as fiadas) | 508 | **312 (−39%)** |
+| Vazado menor — régua 2-D, fiadas 0–11 (humano 41) | 316 | **234** |
+| B34 sobre B39 | 157 | **113** |
+| B34 sobre B34 | 118 | **80** |
+| Peças fixas (canaleta, nó, reparo de vão) — posição peça a peça | 2.002 | **2.002 idênticas** |
+| Buracos / NON_MODULAR / colisões / apoio | 20 / 0 / 0 / 0 | 20 / 0 / 0 / 0 |
+| Paredes reprovadas na amarração | 3 | 3 |
+| Especiais / `C09+C09` / sob janela | 808 / 11 / 1 | 808 / 11 / 1 |
+| Tempo de solve (bancada) | 7,7 s | 13,2 s |
+
+Idempotente: uma segunda passada não encontra melhoria.
+
+### 60.5 Corpus legado
+
+| Corpus | Como entregue (só CHANNEL) | Forçado no legado (`B34_RUN_ARRANGEMENT_LEGACY`) |
+|---|---|---|
+| TP1 V1 | idêntico ao PR #42 em todos os achados | idêntico em todos os achados |
+| TGD V2 | idêntico ao PR #42 em todos os achados | `PRISM_CONTINUOUS_JOINT` 53 → **51**; `PRISM_JOINT_STACK` 5 = 5; `PRISM_STAGGER_BELOW_TARGET` 712 → 751 (preferência, §56.2); categorias idênticas |
+
+Fica **desligado no legado** porque o legado não refaz a auditoria de amarração
+depois do solve. Forçado, não cria junta corrida — remove duas.
+
+### 60.6 Dois defeitos encontrados durante a integração (corrigidos antes de medir)
+
+- **Template de comprimento vivo**: o comprimento de cada código vinha da própria
+  peça da fileira; quando a busca escrevia um B39 naquela posição, o "B34" passava
+  a ter 39 cm. Efeito medido: trecho da parede 8284502 deslocado 5 cm, buracos
+  20 → 77. Correção: template é cópia congelada.
+- **Canaleta tratada como preenchimento**: a canaleta do reforço herda a etiqueta
+  `STANDARD_FILL` da peça que substituiu, e os códigos `CHANNEL_*` não estão no
+  catálogo de alvenaria. O arranjo reordenou canaletas da fiada 3 da parede
+  8284502 e levou um B19 para cima de uma amarração (`HALF_BLOCK_NEAR_TIE`,
+  reprovadas 3 → 4). Correção: só é móvel bloco vazado ou compensador do catálogo,
+  nunca código de canaleta.
+
+### 60.7 Determinismo
+
+Mesma entrada: reprodutível. Sentido e ordem das paredes: sensibilidade
+pré-existente (main e PR #42), sem parede nova envolvida. **Translação**: com a
+§60 desligada, a translação já muda 39 canaletas da parede 0 (fiadas 3 e 11 —
+`U_34 U_39 U_39` × `U_39 U_39 U_34`), **igual na main**; o desempate está no
+planejador CHANNEL. A §60 recebe entradas diferentes naquela parede e amplia a
+diferença na mesma parede (312 × 304 violações no total). Uma margem numérica nas
+tolerâncias foi testada para essa causa, não mudou nenhuma saída e foi revertida.
+
+### 60.8 O que continua aberto
+
+- **234 × 41** do humano na régua 2-D. O resíduo inclui composição (o humano usa
+  B34 de ajuste onde o solver usa `B39 … C09`), a pastilha do nó degradado (§58.2,
+  desligada) e B34 sobre a célula lateral do B54 de T (22).
+- Custo: +5,5 s por solve na bancada.
+
+**Testes:** `tests/test_b34_run_arrangement.py` — vermelho (orientação sozinha
+deixa o trecho real desalinhado), verde (reproduz a ordem humana e alinha),
+mesmas peças/pontas/juntas e peças fixas paradas, idempotência, canaleta nunca
+se move, chave desligada não toca nada, guarda de meio bloco igual à da auditoria
+e com controle (sem amarração o meio bloco cairia a 35 cm; com amarração em 44 cm
+o arranjo escolhe outra ordem e ainda alinha).
