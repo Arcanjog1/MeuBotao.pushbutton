@@ -8384,6 +8384,46 @@ repete. O caminho é alternar o elemento do nó degradado pela fiada FÍSICA e n
 pela família lógica, ou submeter a escolha do nó à mesma tentativa por parede da
 seção 56.2.
 
+### 58.3 A Â§58.2 ligada sÃ³ no fluxo CHANNEL â€” e a condiÃ§Ã£o que falta para o legado (2026-09-15)
+
+Revisitada sobre as Â§60â€“62, **por fiada fÃ­sica** e com a rÃ©gua estrita do
+benchmark (junta interna alinhada entre duas fiadas **consecutivas**, tolerÃ¢ncia
+1,5 cm, sem ponta de parede nem borda de vÃ£o):
+
+| BUTANTÃƒ (17 fiadas, fiadas 0â€“11) | Sem 58.2 | **Com 58.2** | Humano |
+|---|---|---|---|
+| Juntas alinhadas em fiadas consecutivas | 26 | **4** | 205 |
+| Vazado menor â€” validador de produÃ§Ã£o | 186 | **159** | â€” |
+| Vazado menor â€” rÃ©gua 2-D | 139 | **112** | 41 |
+| B34 sobre B39 | 85 | **54** | 2 |
+| Especiais | 767 | **761** | 500 |
+| Buracos / colisÃµes / apoio / auditoria recalculada | 20 / 0 / 0 / 3 | **20 / 0 / 0 / 3** | â€” |
+
+Na BUTANTÃƒ a Â§58.2 **reduz** as juntas alinhadas (as paredes do nÃ³ degradado:
+8284580 10 â†’ 0, 8284563 4 â†’ 0, 8284558 6 â†’ 2, 8284562 6 â†’ 2).
+
+**CondiÃ§Ã£o que falta para ligar no legado â€” medida no TP1 V1** (as juntas
+corridas novas caem todas em fronteira de banda, fiadas 7/8, 10/11 e 12/13):
+
+1. **PeÃ§a de nÃ³ repetida em duas fiadas vizinhas** (W052, W054, W055, W056): o B34
+   de amarraÃ§Ã£o do nÃ³ aparece em 0â€“34 cm nas duas fiadas da fronteira; a face
+   em 34,5 cm se repete.
+2. **PeÃ§a de nÃ³ ausente numa das fiadas** (W035, W045, W066, W075): fiada 7 com
+   `C09` de nÃ³ + `B39` terminando em 49 cm; fiada 8 sem peÃ§a de nÃ³, preenchimento
+   comeÃ§ando na reserva com `B34` terminando tambÃ©m em 49 cm â€” face em 49,5 cm
+   alinhada.
+
+A BUTANTÃƒ nÃ£o tem essa combinaÃ§Ã£o de banda Ã— nÃ³ degradado; o TP1 tem. A regra
+do nÃ³ degradado precisa decidir o elemento **pela fiada fÃ­sica atravÃ©s das
+fronteiras de banda** antes de valer no legado.
+
+**Implementado:** `CHANNEL_DEGRADED_TIE_BLOCK_ENABLED` (`core/wall_modeling.py`)
+liga `CORNER_DEGRADED_PREFERS_TIE_BLOCK` **sÃ³ durante** o solve com estratÃ©gia de
+reforÃ§o â€” o mesmo mecanismo das tolerÃ¢ncias da Â§30.9 â€” e restaura no fim. A chave
+global continua `False`; o legado (`strategy=None`) fica idÃªntico.
+`tests/test_degraded_node_tie_block.py` confere o escopo (ligada no CHANNEL,
+nunca vista ligada no legado, restaurada depois).
+
 ## 59. Validadores pedidos pela missão — referência humana medida e nível correto (2026-09-15)
 
 A missão pediu cinco validadores novos. Antes de escrevê-los, cada um foi medido

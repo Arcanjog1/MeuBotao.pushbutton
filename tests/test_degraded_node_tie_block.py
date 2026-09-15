@@ -124,3 +124,25 @@ def test_pastilha_still_used_when_the_stub_has_no_room_for_a_block():
     finally:
         ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK = before
     assert candidate_a["logical_code"] == "C04"
+
+
+def test_channel_solve_turns_the_tie_block_on_only_during_the_call_and_legacy_never():
+    """Secao 58.2 no fluxo CHANNEL: ligada so' enquanto dura o solve com
+    estrategia de reforco; o legado (strategy=None) nunca a ve ligada."""
+    seen = []
+    original = m._solve_building_blocks_all_courses_impl
+
+    def spy(*args, **kwargs):
+        seen.append((kwargs.get("opening_reinforcement_strategy"), ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK))
+        return {"course_candidates": {}}
+
+    before = ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK
+    m._solve_building_blocks_all_courses_impl = spy
+    try:
+        m.solve_building_blocks_all_courses([], [], {}, [], CATALOG, 0.0, 2)
+        m.solve_building_blocks_all_courses([], [], {}, [], CATALOG, 0.0, 2,
+                                            opening_reinforcement_strategy="CHANNEL")
+    finally:
+        m._solve_building_blocks_all_courses_impl = original
+    assert seen == [(None, False), ("CHANNEL", True)]
+    assert ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK is before is False

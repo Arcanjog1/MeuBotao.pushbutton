@@ -3687,6 +3687,16 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
 CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
 
 
+# SECAO 58.2 no fluxo CHANNEL (2026-09-15): escada de amarracao no no' degradado
+# (B34 antes de pastilha). Sobre as secoes 60-62, na BUTANTA: vazado menor 186 ->
+# 159, especiais 767 -> 761, juntas alinhadas em fiadas consecutivas (regua do
+# PRISM_CONTINUOUS_JOINT) 26 -> 4; auditoria, apoio, buracos e colisoes iguais.
+# NAO no legado: no TP1 V1 cria juntas alinhadas em fronteira de banda (peca de
+# no' repetida em duas fiadas vizinhas, ou ausente numa delas) - condicao
+# registrada na secao 58.3, ainda nao tratada. O legado continua identico.
+CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
+
+
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
     """Wrapper de desempenho: com estrategia de reforco ativa, liga o memo de
@@ -3705,9 +3715,13 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
     saved_tolerances = (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
                         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
+    saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
     if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
         _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
+    if CHANNEL_DEGRADED_TIE_BLOCK_ENABLED:
+        # SECAO 58.2 so' no fluxo CHANNEL (ver a constante)
+        _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = True
     try:
         result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                                          catalog, base_z_abs, num_courses, **kwargs)
@@ -3716,8 +3730,10 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         _stepper_memo.OBB_MEMO = None
         (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
          _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
+        _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
     if isinstance(result, dict):
         result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
+        result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
     return result
