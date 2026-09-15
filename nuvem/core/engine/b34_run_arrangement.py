@@ -48,6 +48,15 @@ B34_RUN_ARRANGEMENT_ENABLED = True
 # O legado (strategy=None) fica IDENTICO a' main por padrao: ele nao refaz a
 # auditoria de amarracao depois do solve. Ligar so' para medir o corpus legado.
 B34_RUN_ARRANGEMENT_LEGACY = False
+# SECAO 64.2: as pecas do REPARO de abertura (`OPENING_REPAIR_FILL`) entram nas
+# corridas - jamba -> no' como UMA unidade. O reparo e' preenchimento comum para
+# todos os efeitos (wall_stepper, OPENING_REPAIR_PLACEMENT_REASON), mas ficava
+# congelado: a corrida parava na primeira peca de reparo e o arranjo nao
+# alcancava as pecas junto da jamba. As pontas da corrida continuam fixas (a
+# face da jamba nao se move); a orientacao dos compensadores e a validacao
+# CHANNEL sao refeitas depois (secao 64.1) e entram na aceitacao por parede.
+B34_RUN_OPENING_REPAIR_MOVABLE = True
+_MOVABLE_REASONS = ("STANDARD_FILL", "OPENING_REPAIR_FILL")
 MAX_ARRANGEMENTS_PER_RUN = 240
 # SECAO 61: composicao de MESMO comprimento (a ate' 2 pecas trocadas, sem mais
 # especiais), aceita por dominancia e, por parede, pelos validadores de producao.
@@ -490,7 +499,10 @@ class _Wall(object):
             return False
         if not (_sva._is_hollow_masonry(cand, self.catalog) or cat.get("is_compensator")):
             return False
-        return (cand.get("placement_reason") == "STANDARD_FILL" and cand.get("node_index") is None
+        reason = cand.get("placement_reason")
+        movable_reason = (reason in _MOVABLE_REASONS) if B34_RUN_OPENING_REPAIR_MOVABLE \
+            else reason == "STANDARD_FILL"
+        return (movable_reason and cand.get("node_index") is None
                 and bool(cand.get("length_cm"))
                 and all(self.course_fam.get(cc) == family for cc in courses))
 
@@ -1231,24 +1243,38 @@ def _restore_wall(course_candidates, snapshot):
 
 
 def _validation_worse(after, before):
-    """Qualquer tipo de problema da auditoria que aumenta, ou apoio pior."""
+    """Qualquer tipo de problema da auditoria que aumenta, apoio pior, qualquer
+    problema CHANNEL que aumenta ou canaleta casada que some."""
     if after is None or before is None:
         return False
     for kind, count in (after.get("audit") or {}).items():
         if count > (before.get("audit") or {}).get(kind, 0):
             return True
-    return after.get("unsupported", 0) > before.get("unsupported", 0)
+    if (after.get("unsupported") or 0) > (before.get("unsupported") or 0):
+        return True
+    channel_after, channel_before = after.get("channel"), before.get("channel")
+    if channel_after is not None and channel_before is not None:
+        for kind, count in sorted(channel_after.items()):
+            if kind == "matched":
+                if any(a < b for a, b in zip(count, channel_before.get("matched") or (0, 0))):
+                    return True
+            elif count > channel_before.get(kind, 0):
+                return True
+    return False
 
 
 def _fill_codes(course_candidates, catalog):
     """Codigos que o solver ja' usa como preenchimento comum (bloco vazado ou
-    compensador) em alguma parede - a composicao nunca inventa familia nova."""
+    compensador) em alguma parede - a composicao nunca inventa familia nova.
+    Com B34_RUN_OPENING_REPAIR_MOVABLE, as pecas do reparo de abertura contam
+    (sao as mesmas pecas moveis das corridas)."""
+    reasons = _MOVABLE_REASONS if B34_RUN_OPENING_REPAIR_MOVABLE else ("STANDARD_FILL",)
     codes = set()
     for c in course_candidates or {}:
         for cand in course_candidates[c] or ():
             code = cand.get("logical_code")
             cat = (catalog or {}).get(code) or {}
-            if cand.get("placement_reason") != "STANDARD_FILL" or cand.get("node_index") is not None:
+            if cand.get("placement_reason") not in reasons or cand.get("node_index") is not None:
                 continue
             if cat.get("is_channel") or _is_channel_code(code):
                 continue
@@ -1298,15 +1324,18 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
             # anterior (so' recalcula a auditoria, que e' por parede)
             checked_before = validate_wall(wi, support=support_total is None)
             if support_total is not None:
-                checked_before["unsupported"] = support_total
+                checked_before["unsupported"], checked_before["channel"] = support_total
         moved, rotated, created, removed = _write_back(wall, base_fam, course_candidates, catalog)
         checked_after = validate_wall(wi) if validate_wall is not None else None
         if checked_after is not None:
-            support_total = checked_after["unsupported"]
+            if checked_after.get("channel") is None and checked_before is not None:
+                # parede sem abertura: a validacao CHANNEL nao muda
+                checked_after["channel"] = checked_before.get("channel")
+            support_total = (checked_after["unsupported"], checked_after.get("channel"))
         if _validation_worse(checked_after, checked_before):
             # a busca e' um modelo; quem decide e' o validador de producao
             _restore_wall(course_candidates, snapshot)
-            support_total = checked_before["unsupported"]
+            support_total = (checked_before["unsupported"], checked_before.get("channel"))
             summary["walls_rejected_by_validation"].append(
                 {"wall_idx": wi, "before": checked_before, "after": checked_after})
             after = before

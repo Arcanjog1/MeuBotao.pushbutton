@@ -664,3 +664,89 @@ def test_orientation_lower_bound_never_exceeds_the_exact_minimum_and_restores_si
         s.side = side
     assert bound <= best
     assert bound < total()  # e informa: abaixo do custo atual
+
+
+# --- secao 64.2: jamba -> no' como uma unidade ----------------------------------
+# Fixture = trecho REAL da parede 8284534 do BUTANTA (jamba da porta 8078996 ->
+# no' T), transladado para a jamba em t=141: as pecas do REPARO da abertura
+# (R) ficavam congeladas e partiam a corrida - `B39R C04R B39 C09` na impar
+# (95 cm) nao podia virar `B39 B19 B34` (mesmo comprimento, sem especial).
+_JAMB_NODE_WALLS = [(seg(0, 0, 345, 0), ft(14.0), (False, False)), (seg(0, 900, 60, 900), ft(14.0), (False, False))]
+_JAMB_NODE_OPENINGS = [[(ft(0.0), ft(141.0), ft(0.0), ft(221.0))], []]
+_JN_EVEN = [("B19", 141, 160, "R"), ("C04", 161, 165, "R"), ("B39", 166, 205, ""), ("C09", 206, 215, ""),
+            ("B54", 216, 270, "N"), ("B39", 271, 310, ""), ("B34", 311, 345, "R")]
+_JN_ODD = [("B39", 141, 180, "R"), ("C04", 181, 185, "R"), ("B39", 186, 225, ""), ("C09", 226, 235, ""),
+           ("B39", 251, 290, ""), ("B39", 291, 330, ""), ("C09", 331, 340, "R"), ("C04", 341, 345, "R")]
+_JN_REASON = {"R": "OPENING_REPAIR_FILL", "N": "T_INTERSECTION_MAIN", "": "STANDARD_FILL"}
+
+
+def _jamb_node_wall():
+    cc = {}
+    for c in range(10):
+        cc[c] = [m._place_pier_layout([(code, a, b)], CATALOG, P0, DIRECTION, c, 0,
+                                      node_index=(5 if kind == "N" else None),
+                                      placement_reason=_JN_REASON[kind])[0]
+                 for code, a, b, kind in (_JN_ODD if c % 2 else _JN_EVEN)]
+    cc[0].extend(m._place_pier_layout([("B19", 0, 19)], CATALOG, m.XYZ(0.0, ft(900.0), 0.0), DIRECTION, 0, 1))
+    sva.orient_small_voids(cc, CATALOG)
+    return cc
+
+
+def _wall0(cc, course):
+    return sorted((round(m._candidate_extent_on_wall_axis(x, P0, DIRECTION)[0], 3),
+                   round(m._candidate_extent_on_wall_axis(x, P0, DIRECTION)[1], 3), x["logical_code"],
+                   x.get("node_index")) for x in cc[course] if x.get("wall_idx") == 0)
+
+
+def _wall0_specials(cc):
+    return sum(1 for c in cc for x in cc[c]
+               if x.get("wall_idx") == 0 and (CATALOG.get(x["logical_code"]) or {}).get("is_compensator"))
+
+
+def _arrange_jamb_node(cc, movable):
+    old = R.B34_RUN_OPENING_REPAIR_MOVABLE
+    R.B34_RUN_OPENING_REPAIR_MOVABLE = movable
+    try:
+        summary = R.arrange_b34_runs(cc, _JAMB_NODE_WALLS, _JAMB_NODE_OPENINGS, CATALOG)
+    finally:
+        R.B34_RUN_OPENING_REPAIR_MOVABLE = old
+    sva.orient_small_voids(cc, CATALOG)
+    return summary
+
+
+def test_red_frozen_repair_pieces_keep_the_specials_between_jamb_and_node():
+    cc = _jamb_node_wall()
+    specials, rows = _wall0_specials(cc), dict((c, _wall0(cc, c)) for c in cc)
+    _arrange_jamb_node(cc, movable=False)
+    assert _wall0_specials(cc) == specials
+    assert dict((c, _wall0(cc, c)) for c in cc) == rows
+
+
+def test_green_repair_pieces_in_the_run_trade_specials_without_touching_jamb_node_or_opening():
+    cc = _jamb_node_wall()
+    specials, violations = _wall0_specials(cc), _violations(cc)
+    before = dict((c, _wall0(cc, c)) for c in cc)
+    summary = _arrange_jamb_node(cc, movable=True)
+    assert summary["compositions"] >= 1
+    assert _wall0_specials(cc) < specials
+    assert _violations(cc) <= violations
+    for c in cc:
+        row = _wall0(cc, c)
+        assert row[0][0] == before[c][0][0]                   # face da jamba no mesmo lugar
+        assert row[-1][1] == before[c][-1][1]                 # mesma ponta
+        assert all(lo >= 141.0 - 1e-6 for lo, _hi, _code, _node in row)   # nada entra no vao
+        assert [x for x in row if x[3] is not None] == [x for x in before[c] if x[3] is not None]  # no' intacto
+        assert all(row[i][1] <= row[i + 1][0] + 1e-6 for i in range(len(row) - 1))  # sem sobreposicao
+        covered = sum(hi - lo for lo, hi, _code, _node in row)
+        assert abs(covered - sum(hi - lo for lo, hi, _code, _node in before[c])) <= len(row) + len(before[c])
+
+
+def test_validation_counts_channel_problems_and_lost_matched_channels():
+    base = {"audit": {}, "unsupported": 0, "channel": {"CHANNEL_SUPPORT_BELOW_POLICY": 4, "matched": (40, 23)}}
+    worse_support = {"audit": {}, "unsupported": 0, "channel": {"CHANNEL_SUPPORT_BELOW_POLICY": 5, "matched": (40, 23)}}
+    lost_match = {"audit": {}, "unsupported": 0, "channel": {"CHANNEL_SUPPORT_BELOW_POLICY": 4, "matched": (39, 23)}}
+    same = {"audit": {}, "unsupported": 0, "channel": {"CHANNEL_SUPPORT_BELOW_POLICY": 4, "matched": (40, 23)}}
+    assert R._validation_worse(worse_support, base)
+    assert R._validation_worse(lost_match, base)
+    assert not R._validation_worse(same, base)
+    assert not R._validation_worse({"audit": {}, "unsupported": 0, "channel": None}, base)

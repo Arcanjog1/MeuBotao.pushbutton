@@ -3767,14 +3767,16 @@ def _physical_support_final(result, catalog, walls_to_create, openings_per_wall,
 
 
 def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog, num_courses,
-                            nodes, end_to_node, band):
+                            nodes, end_to_node, band, plan=None, base_z_abs=0.0):
     """Aceitacao EXATA das secoes 60/61 por parede: a busca e' um modelo 1-D, mas
     a parede so' fica alterada se a AUDITORIA DE AMARRACAO desta parede (mesmo
     catalogo com canaletas usado logo depois) e o APOIO FISICO (secao 53, total)
     nao pioram em nenhum tipo de problema."""
     from core.engine import physical_support as _support
+    from core.engine import opening_reinforcement as _reinforcement
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
+    state = {"channel_measured": False}
 
     def validate(wall_idx, support=True):
         course_candidates = result.get("course_candidates") or {}
@@ -3785,11 +3787,24 @@ def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog,
         for problem in audit.get("problems") or ():
             kind = str(problem).split(":")[0]
             kinds[kind] = kinds.get(kind, 0) + 1
-        unsupported = None
+        unsupported = channel = None
         if support:
             unsupported = len(_support.unsupported_pieces(course_candidates, walls_to_create,
                                                           openings_per_wall, band))
-        return {"audit": kinds, "unsupported": unsupported}
+        has_openings = bool(openings_per_wall and wall_idx < len(openings_per_wall) and openings_per_wall[wall_idx])
+        if plan is not None and (not state["channel_measured"] or has_openings):
+            # validacao CHANNEL completa (secao 64.2): o arranjo nao move canaleta,
+            # mas muda as pecas junto da jamba em que ela se apoia. Parede sem
+            # abertura nao muda a contagem - o arranjo carrega a anterior.
+            state["channel_measured"] = True
+            counts = _reinforcement.validate_channel_reinforcement(
+                course_candidates, walls_to_create, openings_per_wall, band, num_courses, base_z_abs,
+                free_to_top=plan.get("free_to_top"), policy=plan.get("policy"),
+                reference_course_candidates=result.get("course_candidates_before_reinforcement"),
+                nodes=nodes).get("counts") or {}
+            channel = dict((k, v) for k, v in counts.items() if k.isupper())
+            channel["matched"] = (counts.get("channel_top_matched", 0), counts.get("channel_bottom_matched", 0))
+        return {"audit": kinds, "unsupported": unsupported, "channel": channel}
     return validate
 
 
@@ -4319,7 +4334,7 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
                               nodes=nodes, end_to_node=end_to_node,
                               validate_wall=_channel_wall_validator(
                                   result, walls_to_create, openings_per_wall, catalog, num_courses,
-                                  nodes, end_to_node, _band))
+                                  nodes, end_to_node, _band, plan, base_z_abs))
     _arrangement = result.get("b34_run_arrangement") or {}
     if (_arrangement.get("runs_changed") or _arrangement.get("compositions") or _arrangement.get("moved")
             or _arrangement.get("created") or _arrangement.get("removed")):
