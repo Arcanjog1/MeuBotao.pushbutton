@@ -8748,3 +8748,167 @@ planejador CHANNEL (§60.7). Solve no Revit: 116 s.
 vermelho (gulosa e reordenação ficam em 10), verde (DP leva a 0 sem mudar
 posição de nenhuma peça nem orientação de nó), teto de banda devolve a parede à
 §52, idempotência.
+
+## 63. Orientação conjunta na avaliação das ordens e composições (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 63.1 Achado — censo das 112 violações que restavam (régua 2-D, fiadas 0–11)
+
+| Categoria física (censo por violação) | Violações |
+|---|---|
+| perto de nó (< 60 cm) **e** ponta de parede (< 40 cm), sem jamba | 25 |
+| peça de nó (B54 do T) junto de jamba | 22 |
+| jamba + peça de reparo de vão (`OPENING_REPAIR_FILL`) | 15 + 7 |
+| corrida livre | 15 |
+| jamba sem reparo | 11 |
+| outras combinações (sob janela, sobre vão, ...) | 17 |
+
+A maior categoria, lida peça a peça contra o humano (parede **8284574**, 224 cm,
+nó T em t=0 nas fiadas ímpares):
+
+```
+SOLVER par   B39@15 B39@55 B39@95 B39@135 B39@175 C09@215
+SOLVER ímpar B34(nó)@0 B34<@35 B39@70 B39@110 B39@150 B34>@190
+HUMANO       fiadas com corridas de B34 nas duas paridades, deslocadas 15 cm e
+             giradas (lado oposto) — nenhuma peça de 9 cm na ponta
+```
+
+Força bruta das duas fiadas juntas (todas as ordens e composições de mesmo
+comprimento): existe `B34 B39 B39 B39 B34 B19` na par (troca **B39 + B39 + C09
+→ B34 + B34 + B19**, mesmo comprimento, **sem especial**) com **0** violações,
+0 faces coincidentes, 0 juntas empilhadas e sem compensador longo na ponta.
+
+### 63.2 Causa (medida)
+
+A §60/§61 avaliava cada ordem girando só os B34 **da família do trecho**, um de
+cada vez. Essa composição valia **32** (pior que as 16 atuais) e era descartada:
+chegar a 0 exige girar **junto** o B34 da fiada ímpar logo acima (20 cm de
+distância) — cada inversão isolada fica em 32 ou sobe para 64. A DP da §62 gira
+mas não reordena. Além disso a troca tira **3** peças e a §61 parava em 2.
+
+### 63.3 Regra
+
+- `_best_sides(joint=True)`: os B34 móveis das **famílias vizinhas** ao alcance
+  (40 cm) também giram, e há inversão **em pares** (famílias diferentes, centros
+  a até 25 cm).
+- Duas etapas (custo): a descida barata avalia **todas** as ordens; a conjunta só
+  reavalia as **4** que passam nas guardas geométricas (não dependem de
+  orientação), não dominaram e cujo **limite inferior** de vazado
+  (`_violations_lower_bound`: só conta o vazado que nenhuma combinação de lado da
+  fonte e da peça que a cobre alinha) ainda pode dominar — ordenadas por esse
+  limite. K = 8 e K = 16 dão o mesmo resultado; a conjunta em todas as ordens
+  também (e custava 342 s).
+- `COMPOSITION_MAX_REMOVED` 2 → 3. Sem a orientação conjunta o 3 não muda nada
+  na BUTANTÃ (medido).
+- Custo: o teste de inversão mede só o **delta exato** (pares fonte × peça que
+  cobre envolvendo as peças invertidas) — mesma assinatura de todas as peças.
+
+### 63.4 Medido — BUTANTÃ no fluxo real (17 fiadas)
+
+| Métrica | antes (§62 + §58.3) | **§63** |
+|---|---|---|
+| Vazado menor — validador de produção | 159 | **123** |
+| Vazado menor — régua 2-D, fiadas 0–11 | 112 | **98** |
+| Especiais fiadas 0–11 | 761 | **755** |
+| Peças / buracos / colisões / não modular | 9.049 / 20 / 0 / 0 | **9.049 / 20 / 0 / 0** |
+| Apoio / auditoria recalculada / `C09+C09` | 0 / 3 / 3 | **0 / 3 / 3** |
+| Compensador com lado fechado errado | 0 | **0** |
+| Validação CHANNEL (todas as contagens) | — | **idêntica** |
+| TGD V2 / TP1 V1 (achados por código) | — | **idênticos** |
+
+Determinismo (mesmo teste de §60.7): violações menores nas quatro entradas
+(normal 123, transladado 123, invertido 139, permutado 143 contra 159 / 151 /
+167 / 171). Invertido e permutado diferem **menos** do normal que antes; o
+transladado continua diferindo **só na parede 0** (o desempate pré-existente do
+planejador CHANNEL), agora em 113 peças contra 91 — mesma parede, mesma origem.
+
+Revit real (34 paredes, criação completa, execuções 13 e 14 — a 14 com a
+otimização de custo, mesma assinatura): 9.049 criadas, 0 falhas, 0 divergências
+de leitura, projeto humano não modificado, vazado menor 123 = bancada. Solve no
+Revit 125 s → 397 s na primeira versão → **210 s** com o delta exato.
+
+**Testes**: ponta **real** da parede 8284574 (vermelho com a descida antiga,
+verde com a conjunta: 0 violações, um especial a menos, mesmas pontas, nó
+intacto, idempotente); limite inferior ≤ mínimo exato por força bruta num trecho
+real e restaura os lados; a §62 fica isolada da §63 nos testes dela; a guarda de
+meio bloco junto a amarração passa a usar a posição **medida** da melhor ordem
+sem guarda.
+
+## 64. Arranjo e aberturas — jamba → nó como uma unidade (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 64.1 A Etapa 4D e a validação CHANNEL depois do arranjo
+
+O arranjo (§60–63) move e cria compensadores **depois** que a Etapa 4D decidiu o
+lado fechado, e a validação CHANNEL guardada era a de **antes** do arranjo.
+Quando o arranjo muda peças, a orientação dos compensadores é recalculada da
+posição final (`orient_compensator_candidates`, fonte da verdade, idempotente) e
+a validação CHANNEL é refeita. Na BUTANTÃ de hoje nada muda (0 reorientados,
+assinatura idêntica); com peças de reparo no arranjo, **3** compensadores
+ficavam com o lado fechado virado para a alvenaria sem este passo.
+
+### 64.2 Peças de reparo de abertura nas corridas — jamba → nó
+
+**Achado (parede 8284534, jamba da porta 8078996 → nó T):**
+
+```
+par    B19(R) C04(R) B39 C09 | B54(nó)        (75 cm entre jamba e nó)
+ímpar  B39(R) C04(R) B39 C09 | braço do T     (95 cm)
+```
+
+As peças do **reparo** da abertura (`OPENING_REPAIR_FILL`, marcadas R) são
+preenchimento comum para todos os efeitos, mas ficavam **congeladas**: a corrida
+parava nelas e o arranjo só via `B39 C09`. Com elas, a ímpar vira `B39 B19 B34`
+(mesmo comprimento, **dois especiais a menos**), sem mexer na face da jamba nem
+no nó.
+
+**Regra:** `B34_RUN_OPENING_REPAIR_MOVABLE` — as peças de reparo entram nas
+corridas e no conjunto de códigos da composição; as pontas da corrida continuam
+fixas (a face da jamba nunca se move, nada entra no vão). A aceitação exata por
+parede passa a incluir a **validação CHANNEL completa** (qualquer problema que
+aumenta ou canaleta casada que some reprova a parede), medida só nas paredes com
+abertura. A Etapa 4D reorienta depois (§64.1).
+
+**Medido — BUTANTÃ (bancada, 17 fiadas):**
+
+| Métrica | §63 | **§64.2** | Humano |
+|---|---|---|---|
+| Vazado menor — validador de produção | 123 | **68** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 98 | **43** | 41 |
+| Especiais fiadas 0–11 | 755 | **594** | 500 |
+| Especiais a até 60 cm de jamba | 521 | **373** | — |
+| `C04+C09` / `C09+C09` | 139 / 3 | **81 / 3** | — / 0 |
+| Peças | 9.049 | **8.958** | — |
+| Buracos / colisões / não modular / apoio | 20 / 0 / 0 / 0 | **20 / 0 / 0 / 0** | — |
+| Auditoria recalculada | 3 | **3 (mesmas)** | — |
+| `MISSING_UNDER_WINDOW` | 0 | **0** | — |
+| Validação CHANNEL (todas as contagens) | — | **idêntica** | — |
+| Compensador com lado fechado errado | 0 | **0** (15 reorientados pela §64.1) | — |
+| Paredes rejeitadas pela validação exata | 0 | **0** | — |
+
+Comparador por lado de vão (60 cm a partir da jamba, fiadas 0–11, bancada):
+`SOLVER_WORSE` 51 → **37**, `PHYSICALLY_EQUIVALENT` 25 → **36**, `SOLVER_BETTER`
+10 → **12**; especiais nas regiões 606 → **443** (humano 354). **Nenhum lado piora
+de classe.** A cobertura cai 2–5 cm em 7 lados: é a junta caindo exatamente na
+borda da região de 60 cm (buracos reais idênticos: 20 / 2.566 cm).
+
+TGD V2 e TP1 V1: achados por código **idênticos** (fluxo só CHANNEL).
+Determinismo: invertido difere **menos** do normal (11.498 → 10.692 peças);
+transladado igual à §63 (só a parede 0); permutado 4.020 → 4.036 — nenhuma parede
+nova sensível, o acréscimo está nas duas paredes que já dependiam da ordem
+(8284502, 8284526).
+
+`test_channel_reinforcement::test_door_gets_channel_course_on_head...`: a regra
+"nenhuma junta nova contra o legado" é do **planejador de reforço** e passa a
+ser medida com o arranjo desligado; o fluxo completo verifica os mesmos trechos
+cobertos em toda fiada, auditoria limpa e especiais ≤ legado. Na parede do teste
+o arranjo troca pastilhas por meio bloco nas jambas: especiais 27 → 16, vazado
+menor 33 → 4.
+
+### 64.3 O que continua aberto
+
+Régua 2-D: **43** contra **41** do humano. Por parede, o solver é melhor que o
+humano em 5 paredes (8284562 5×15, 8284502 6×10, 8284534 0×8, 8284589 e
+8284590 0×4) e pior em 9 (32 violações). A maior (8284557, 514 cm, T no meio
+com B54): as fiadas 4–5 usam outra posição de B39 que as 0–3 e as violações
+ficam na **interface entre bandas** — o humano usa uma só corrida de B39 em
+todas as fiadas. Coordenar a composição entre famílias de bandas diferentes é o
+próximo passo; não é limitação física (o humano resolve).
