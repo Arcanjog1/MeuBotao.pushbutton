@@ -8217,3 +8217,52 @@ o solver, e **nunca** usa B54 longe de encontro: o B54 é peça de amarração d
 não preenchimento. Implementar "B54 domina B34+B19" colocaria B54 onde o humano
 nunca põe. Registrado como conflito resolvido a favor do projeto humano; nada foi
 alterado no motor por esta seção.
+
+## 57. Fileira de B34 entre fiadas — HIPÓTESE MEDIDA E REJEITADA (2026-09-15)
+
+O vazado menor desalinhado (seção 52) é o defeito dominante que resta: 613
+violações no solver contra 41 no humano (BUTANTÃ R08_LT, 34 paredes de
+alvenaria, 17 fiadas). A hipótese testada foi: *reordenar as peças dentro de
+cada corrida* — mesmo trecho, mesmas peças, mesmo comprimento, só a ORDEM muda —
+para o B34 cair sobre B34 da fiada vizinha, como o humano faz nas pontas.
+
+Implementado como passe reversível (`b34_row_layout.py` + `_reorder_b34_rows_final`),
+com quatro arranjos canônicos por corrida (atual, vazado menor no início, no fim,
+dividido nas duas pontas), custo independente de orientação e portão global
+sobre o resultado inteiro. **Medido e revertido:**
+
+| Fiadas | Corridas | Reordenadas | Violações 52 s/ passe → c/ passe | Juntas empilhadas 3+ s/ → c/ |
+|---|---|---|---|---|
+| 13 | 1.131 | 121 | 473 → **483** | 100 → **120** |
+| 17 (altura real) | 1.176 | 122 | 613 → **669** | 101 → **121** |
+
+O passe **piora a própria métrica que deveria melhorar** nos dois tamanhos, além
+de empilhar juntas. Causa física: a corrida não é independente — mover o B34 para
+a ponta o encosta na peça de nó da fiada vizinha, que é justamente onde a fiada
+oposta está deslocada meio módulo; o ganho local de uma corrida é pago pela
+corrida vizinha. Código removido da árvore conforme o adendo (reverter ou deixar
+explicitamente desligado). Nada no motor mudou por esta seção.
+
+### 57.1 Régua medida — junta repetida NÃO é junta empilhada
+
+A tentativa anterior deste passe foi barrada por "faces repetidas entre fiadas
+vizinhas", e a medição contra o humano mostrou que essa métrica é **falsa
+guarda**:
+
+| Métrica (34 paredes, fiadas 0–11) | Humano | Solver |
+|---|---|---|
+| Faces internas totais | 11.663 | 12.077 |
+| Faces repetidas na fiada vizinha | 1.116 (**9,6%**) | 807 (**6,7%**) |
+| Juntas que sobem exatamente 2 fiadas | 19 | 2 |
+| Juntas que sobem exatamente 3 fiadas | 19 | 4 |
+| Juntas que sobem 4+ fiadas (jamba/nó) | 135 | 100 |
+
+O humano repete face entre fiadas vizinhas **mais** que o solver (9,6% × 6,7%) e
+mesmo assim tem 6× menos vazado menor desalinhado. A quase totalidade das
+repetições dos dois lados são colunas de jamba e de nó, que sobem a parede
+inteira por construção. Portanto:
+
+- **face repetida entre duas fiadas não é defeito** e não pode ser usada como
+  guarda de aceitação (seria mais rígida que o projeto humano de referência);
+- a guarda correta é a **junta empilhada em 3+ fiadas** fora de jamba/nó, que é o
+  que os achados `PRISM_CONTINUOUS_JOINT` e `PRISM_JOINT_STACK` auditam.
