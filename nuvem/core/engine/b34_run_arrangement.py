@@ -766,33 +766,61 @@ class _Wall(object):
                     continue
                 low, high = min(involved), max(involved)
                 band = max(band, high - low)
-                factors[high].append((f, i))
+                factors[high].append((f, i, sorted(involved)))
         if band > ORIENTATION_DP_MAX_BAND:
             return 0
         slots_of = [self.fam[f][i] for _mid, f, i in variables]
         current = [s.side for s in slots_of]
-
-        def factor_cost(at, state, start):
-            for n, side in enumerate(state):
-                slots_of[start + n].side = side
-            return sum(self._source_violations(f, i, weights_by_family) for f, i in factors[at])
-
+        # TABELA por fator: custo para cada combinacao dos lados das variaveis
+        # envolvidas (no maximo a fonte e os B34 que podem cobrir o vazado).
+        # A DP so' consulta a tabela - nada de geometria dentro do laco.
+        tables = collections.defaultdict(list)
         current_cost = 0
-        for n in range(len(slots_of)):
-            current_cost += sum(self._source_violations(f, i, weights_by_family) for f, i in factors[n])
-        keep = band  # variaveis guardadas no estado, alem da atual
-        layer = {(): (0, None)}
+        for at in sorted(factors):
+            for f, i, positions in factors[at]:
+                table = []
+                for mask in range(1 << len(positions)):
+                    for bit, q in enumerate(positions):
+                        slots_of[q].side = 1 if (mask >> bit) & 1 else -1
+                    table.append(self._source_violations(f, i, weights_by_family))
+                for q in positions:
+                    slots_of[q].side = current[q]
+                tables[at].append((positions, table))
+                mask = 0
+                for bit, q in enumerate(positions):
+                    if current[q] > 0:
+                        mask |= 1 << bit
+                current_cost += table[mask]
+
+        def factor_cost(at, full):
+            total = 0
+            for positions, table in tables.get(at, ()):
+                mask = 0
+                for bit, q in enumerate(positions):
+                    if (full >> (at - q)) & 1:
+                        mask |= 1 << bit
+                total += table[mask]
+            return total
+
+        # Estado = MASCARA DE BITS das ultimas `band` variaveis: bit j = lado da
+        # variavel n-j (1 = lado positivo). Mesmo resultado da versao com tuplas,
+        # mas aritmetica inteira - o IronPython 2.7 do Revit roda a DP ~3x mais
+        # rapido so' com a tabela de fatores e bem mais com a mascara.
+        keep_mask = (1 << band) - 1
+        layer = {0: (0, None)}
         history = []
         for n in range(len(slots_of)):
             nxt = {}
-            for state, (cost, _prev) in layer.items():
-                for side in (-1, 1):
-                    full = state + (side,)
-                    start = n - len(full) + 1
-                    total = cost + factor_cost(n, full, start)
-                    trimmed = full[len(full) - keep:] if keep else ()
-                    if trimmed not in nxt or total < nxt[trimmed][0]:
-                        nxt[trimmed] = (total, (state, side))
+            # ordem ORDENADA: empate entre caminhos de mesmo custo decide igual em
+            # qualquer runtime (dict do IronPython 2.7 nao guarda ordem de insercao)
+            for state, (cost, _prev) in sorted(layer.items()):
+                shifted = state << 1
+                for bit in (0, 1):
+                    full = shifted | bit
+                    total = cost + factor_cost(n, full)
+                    key = full & keep_mask
+                    if key not in nxt or total < nxt[key][0]:
+                        nxt[key] = (total, (state, bit))
             history.append(nxt)
             layer = nxt
         best_state = min(sorted(layer), key=lambda st: layer[st][0])
@@ -804,8 +832,8 @@ class _Wall(object):
         chosen = [0] * len(slots_of)
         state = best_state
         for n in range(len(slots_of) - 1, -1, -1):
-            _total, (prev, side) = history[n][state]
-            chosen[n] = side
+            _total, (prev, bit) = history[n][state]
+            chosen[n] = 1 if bit else -1
             state = prev
         changed = 0
         for slot, side, old in zip(slots_of, chosen, current):

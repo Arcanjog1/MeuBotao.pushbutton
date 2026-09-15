@@ -8661,21 +8661,47 @@ reordenaÃ§Ã£o (Â§60) e da composiÃ§Ã£o (Â§61):
 
 SÃ³ gira peÃ§as: contorno, juntas, cobertura e apoio nÃ£o mudam por construÃ§Ã£o.
 
-### 62.3 Medido â€” BUTANTÃƒ no fluxo real (17 fiadas)
+### 62.3 Medido — BUTANTÃ no fluxo real (17 fiadas), DP exata corrigida
 
-| MÃ©trica | Desligado | Â§60 + Â§61 | **Â§60 + Â§61 + Â§62** | Humano |
+| Métrica | Desligado | §60 + §61 | **§60 + §61 + §62** | Humano |
 |---|---|---|---|---|
-| Vazado menor â€” validador de produÃ§Ã£o | 508 | 259 | **219** | â€” |
-| Vazado menor â€” rÃ©gua 2-D, fiadas 0â€“11 | 316 | 195 | **163** | 41 |
-| B34 Ã— B34 | 118 | 80 | **46** | 20 |
-| B34 Ã— B39 / B54 / B19 | 157 / 24 / 17 | 84 / 22 / 9 | 86 / 22 / 9 | 2 / 2 / 17 |
-| PeÃ§as / buracos / NON_MODULAR / colisÃµes | 9.088 / 20 / 0 / 0 | 9.055 / 20 / 0 / 0 | **9.055 / 20 / 0 / 0** | â€” |
-| Apoio fÃ­sico / auditoria recalculada | 0 / 3 | 0 / 3 | **0 / 3 (mesmos)** | â€” |
+| Vazado menor — validador de produção | 508 | 259 | **186** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 316 | 195 | **139** | 41 |
+| B34 × B34 | 118 | 80 | **23** | 20 |
+| B34 × B39 / B54 / B19 | 157 / 24 / 17 | 84 / 22 / 9 | 85 / 22 / 9 | 2 / 2 / 17 |
+| Peças / buracos / colisões | 9.088 / 20 / 0 | 9.055 / 20 / 0 | **9.055 / 20 / 0** | — |
+| Apoio físico / auditoria recalculada | 0 / 3 | 0 / 3 | **0 / 3 (mesmos)** | — |
 | Especiais / `C09+C09` | 808 / 11 | 767 / 3 | **767 / 3** | 500 / 0 |
-| PeÃ§as fixas (canaleta, nÃ³, reparo) | â€” | idÃªnticas | **idÃªnticas** | â€” |
-| Solve (bancada) | 7,9 s | 16,5 s | 17,7 s | â€” |
+| Peças fixas (canaleta, nó, reparo) | — | idênticas | **idênticas** | — |
+| Solve (bancada) | 7,9 s | 16,5 s | 16,6 s | — |
 
-78 orientaÃ§Ãµes trocadas; nenhuma parede rejeitada pela validaÃ§Ã£o exata.
+68 orientações trocadas; nenhuma parede rejeitada pela validação exata.
+
+### 62.4 Defeito encontrado na validação do Revit real (corrigido)
+
+A primeira versão desta seção media 163 na bancada e **195 no Revit** — a DP
+praticamente não agia no IronPython 2.7 (1 orientação trocada contra 78).
+Isolando o modelo 1-D da parede 12 e rodando **a mesma função com a mesma
+entrada** nos dois runtimes, o IronPython calculava "ótimo" 152 contra custo
+atual 34 — impossível, porque a atribuição atual é um caminho da própria DP.
+
+Causa (nos **dois** runtimes): o corte do estado `full[len(full) - keep:]` com o
+estado ainda mais curto que `keep` vira fatiamento **negativo** e pega só as
+últimas peças, fundindo estados diferentes. O caminho que sobrevivia dependia da
+ordem de iteração do dicionário — o Python 3 guarda a ordem de inserção e achava
+por sorte caminhos bons; o 2.7 não. Correção: o estado só é cortado quando passa
+de `keep`, e as camadas são percorridas em ordem **ordenada** (empates decidem
+igual em qualquer runtime). Com a DP exata o resultado **melhorou** (163 → 139).
+
+Custo: a DP exata guarda até 2^banda estados. Fatores pré-calculados em tabela
+(cada fator envolve no máximo a fonte e os B34 que podem cobrir o vazado) e
+estado como **máscara de bits** — resultado idêntico (mesmo hash de todas as
+peças) — levaram a parede 12 no IronPython de 4,21 s para **0,57 s**.
+
+**Paridade bancada × Revit (só solve):** 68 orientações trocadas nos dois, 10
+composições, 73 peças criadas e 106 removidas nos dois, 9.055 peças; das 9.055
+linhas, 91 diferem — todas canaletas da parede 0, o desempate pré-existente do
+planejador CHANNEL (§60.7). Solve no Revit: 116 s.
 
 **Testes** (`tests/test_b34_run_arrangement.py`) sobre a parede **real** 8284579
 (209 cm, B34 de nÃ³ nas duas pontas, 17 fiadas) no estado em que a Â§52 travou:
