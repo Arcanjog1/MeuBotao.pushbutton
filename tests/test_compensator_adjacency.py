@@ -175,3 +175,30 @@ def test_trial_is_skipped_when_no_compensator_touches_a_node_compensator():
     base = _fill([_piece("B39", 40.0), _piece("C09", 80.0)])
     chosen, calls = _trial(base, _fill([]), node)
     assert chosen is base and calls == [False] and "compensator_node_trial" not in chosen
+
+
+# ---------------------------------------------------------------------------
+# Determinismo do escolhedor da secao 56.2 - caso REAL capturado na parede
+# 8284580 do BUTANTA: planta normal x transladada (+1000, +500 cm). Mesma
+# composicao de entrada; as juntas da fiada oposta diferem so' por ruido
+# numerico (1e-13 cm). Antes do arredondamento do travamento, a escolha trocava
+# (C09 ... B34 x C04 ... B39).
+# ---------------------------------------------------------------------------
+_TIE_NORMAL = {'layout': [('B34', 0.0, 34.0), ('B39', 35.0, 74.0), ('B39', 75.0, 114.0), ('B39', 115.0, 154.0), ('C09', 155.0, 164.0)], 'pier': 164.00000000861957, 'seg_start': 35.000000000000036, 'left': 'B34', 'right': 'C09', 'avoid': [54.50000000000004, 94.50000000000004, 134.50000000000003, 14.50000000000004, 174.50000000861962, 54.50000000000007, 94.50000000000006, 134.50000000000009, 174.50000000430987]}
+_TIE_TRANSLATED = {'layout': [('B34', 0.0, 34.0), ('B39', 35.0, 74.0), ('B39', 75.0, 114.0), ('B39', 115.0, 154.0), ('C09', 155.0, 164.0)], 'pier': 164.00000000861988, 'seg_start': 35.000000000000036, 'left': 'B34', 'right': 'C09', 'avoid': [54.50000000000016, 94.50000000000016, 134.50000000000017, 14.500000000000162, 174.50000000861974, 54.49999999999996, 94.49999999999997, 134.5, 174.50000000430987]}
+
+
+def _tie_choice(case):
+    ws._COMPENSATOR_NODE_TRIAL[0] = True
+    try:
+        out = ws._layout_avoiding_compensator_against_node(
+            case["layout"], case["pier"], CATALOG, 0.0, 0.0, case["seg_start"], case["left"], case["right"],
+            [], case["avoid"], course_label="B", allow_compensators=True,
+            leading_is_open=False, trailing_is_open=False)
+    finally:
+        ws._COMPENSATOR_NODE_TRIAL[0] = False
+    return [code for code, _a, _b in out]
+
+
+def test_node_compensator_chooser_is_not_decided_by_numeric_noise():
+    assert _tie_choice(_TIE_NORMAL) == _tie_choice(_TIE_TRANSLATED)

@@ -5876,9 +5876,13 @@ def _layout_avoiding_compensator_against_node(layout, pier_cm, catalog, leading_
             avoid_positions_cm) if avoid_positions_cm else 0
         stagger = _layout_min_joint_stagger_cm(candidate, seg_start_cm, avoid_positions_cm)
         trava = MIN_JOINT_STAGGER_TARGET_CM if stagger is None else min(stagger, MIN_JOINT_STAGGER_TARGET_CM)
+        # travamento ARREDONDADO (1e-6 cm): entre composicoes espelhadas ele e'
+        # matematicamente igual, e sem arredondar o ruido numerico (ex.: planta
+        # transladada) decidia o empate - medido na parede 8284580 do BUTANTA,
+        # C04 no inicio ou no fim do trecho conforme a translacao.
         return (_layout_compensator_touching_node(candidate, catalog, left_code, right_code),
                 sum(1 for code, _a, _b in candidate if _is_compensator_code(code, catalog)),
-                _layout_compensator_run_excess(candidate, catalog), coincide, -trava)
+                _layout_compensator_run_excess(candidate, catalog), coincide, -round(trava, 6))
 
     best, best_score = layout, _score(layout)
     alternatives = [_mirrored_layout(layout)]
