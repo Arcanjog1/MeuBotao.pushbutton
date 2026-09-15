@@ -8383,3 +8383,31 @@ continua recebendo compensador.
 repete. O caminho é alternar o elemento do nó degradado pela fiada FÍSICA e não
 pela família lógica, ou submeter a escolha do nó à mesma tentativa por parede da
 seção 56.2.
+
+## 59. Validadores pedidos pela missão — referência humana medida e nível correto (2026-09-15)
+
+A missão pediu cinco validadores novos. Antes de escrevê-los, cada um foi medido
+contra o projeto humano no mesmo recorte (34 paredes de alvenaria, fiadas 0–11,
+6.018 peças no humano × 6.263 no solver). O resultado **muda o nível de três
+deles** e **refuta dois**:
+
+| Validador pedido | Humano | Solver | Nível correto |
+|---|---|---|---|
+| `ADJACENT_COMPENSATORS` (compensadores de código idêntico encostados) | 6 (todos `C09D`, deitado) | 9 | **Preferência.** Só o par `C09+C09` em pé é zero no humano — esse é obrigatório e já é tratado pela seção 56.2. |
+| `SPECIAL_CLUSTER` (dois especiais a ≤ 40 cm) | **109** | 158 | **Preferência.** O humano agrupa especiais com frequência; contar como erro reprovaria o projeto de referência. |
+| `MID_WALL_HALF_BLOCK` (B19 fora de jamba/ponta) | **320** | 292 | **Refutado.** O humano usa *mais* meio-bloco no meio da parede que o solver. Não é defeito. |
+| `REPLACEABLE_COMPOSITE_BY_B54` (`B34+B19` onde caberia B54) | 107 | 81 | **Refutado** (seção 56.3). O humano usa mais, e nunca põe B54 longe de nó (172/172 a ≤ 35 cm). |
+| `CHANNEL_ALIGNMENT_ERROR` | — | — | Não medido nesta rodada; a validação CHANNEL existente já cobre canaleta faltante, extra, em fiada errada, invadindo vão e colidindo (40/40 superiores e 23/23 inferiores no Revit real). |
+
+**Por que não foram ligados ao benchmark nesta rodada.** O veredito de cada
+corpus é calculado contra um *golden* armazenado, e `new_codes` conta como
+regressão crítica (`golden/compare.py::_critical_regressions`). Adicionar
+qualquer código novo faria BUTANTÃ, TGD e TP1 aparecerem como REGRESSÃO — e o
+adendo desta missão **proíbe atualizar golden/baseline** para compensar. Os
+contadores ficam na bancada de medição (`delta_metrics.py`, `physmetrics.py`),
+que é onde a matriz de não-regressão desta missão foi produzida, e a fiação no
+benchmark fica para depois do gate, já com o **nível** desta tabela — dois deles
+como preferência e dois **não** devem existir.
+
+**Régua a preservar:** um validador que reprova o projeto humano de referência
+está errado, não o projeto. Foi o caso em três dos cinco pedidos.
