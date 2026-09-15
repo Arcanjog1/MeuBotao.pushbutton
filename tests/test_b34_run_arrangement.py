@@ -750,3 +750,43 @@ def test_validation_counts_channel_problems_and_lost_matched_channels():
     assert R._validation_worse(lost_match, base)
     assert not R._validation_worse(same, base)
     assert not R._validation_worse({"audit": {}, "unsupported": 0, "channel": None}, base)
+
+
+# --- secao 65: passes de arranjo -> orientacao ---------------------------------
+
+def _passes_with(monkeypatch, changes_per_pass):
+    """Roda `_orient_small_voids_final` com um arranjo falso que diz ter mexido
+    (ou nao) em peca a cada passe; devolve (chamadas, resumo)."""
+    calls = []
+
+    def fake(course_candidates, *args, **kwargs):
+        index = len(calls)
+        moved = changes_per_pass[index] if index < len(changes_per_pass) else 0
+        calls.append(kwargs.get("only_walls"))
+        return {"runs_changed": 1 if moved else 0, "moved": moved, "compositions": 0,
+                "created": 0, "removed": 0, "walls": [{"wall_idx": 0}] if moved else [],
+                "before": {"violations": 9}, "after": {"violations": 9 - moved}}
+    monkeypatch.setattr(R, "arrange_b34_runs", fake)
+    cc = _wall_8284574_end()
+    result = {"course_candidates": cc}
+    m._orient_small_voids_final(result, CATALOG, WALL_224, [[], []], arrange=True)
+    return calls, result["b34_run_arrangement"]
+
+
+def test_arrangement_stops_when_a_pass_moves_nothing(monkeypatch):
+    calls, summary = _passes_with(monkeypatch, [0])
+    assert len(calls) == 1 and summary["passes"] == 1
+
+
+def test_second_pass_runs_only_over_the_walls_the_first_moved(monkeypatch):
+    calls, summary = _passes_with(monkeypatch, [2, 0])
+    assert len(calls) == 2
+    assert calls[0] is None and calls[1] == set([0])   # o primeiro ve' tudo
+    assert summary["passes"] == 2 and summary["moved"] == 2
+    assert summary["before"]["violations"] == 9 and summary["after"]["violations"] == 9
+
+
+def test_number_of_passes_is_capped(monkeypatch):
+    calls, summary = _passes_with(monkeypatch, [1] * 10)
+    assert len(calls) == m.B34_RUN_ARRANGEMENT_PASSES == 3
+    assert summary["passes"] == 3 and summary["moved"] == 3

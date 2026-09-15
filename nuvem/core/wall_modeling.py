@@ -3808,6 +3808,32 @@ def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog,
     return validate
 
 
+# SECAO 65: passes de arranjo -> orientacao (ver o laco em `_orient_small_voids_final`)
+B34_RUN_ARRANGEMENT_PASSES = 3
+
+
+def _merge_arrangement_pass(total, current):
+    """Soma os contadores dos passes; `before` e' do primeiro, `after` do ultimo."""
+    if total is None:
+        merged = dict(current)
+        merged["passes"] = 1
+        return merged
+    merged = dict(total)
+    merged["passes"] = total.get("passes", 1) + 1
+    for key, value in current.items():
+        if key in ("before",):
+            continue
+        if key == "after":
+            merged["after"] = value
+        elif isinstance(value, (int, float)) and isinstance(merged.get(key), (int, float)):
+            merged[key] = merged[key] + value
+        elif isinstance(value, list) and isinstance(merged.get(key), list):
+            merged[key] = merged[key] + value
+        else:
+            merged[key] = value
+    return merged
+
+
 def _reorient_compensators_after_arrangement(course_candidates, walls_to_create, openings_per_wall, catalog):
     """Roda `orient_compensator_candidates` sobre as pecas finais (sem repetir
     objeto compartilhado entre fiadas) e devolve quantas mudaram de lado."""
@@ -3858,26 +3884,41 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             # HALF_BLOCK_NEAR_TIE (regra #2)
             ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
                         for wi in range(len(walls_to_create)))
-        arrangement = _runs.arrange_b34_runs(
-            course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
-            half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
-            validate_wall=validate_wall)
+        # SECAO 65: arranjo -> orientacao -> arranjo... A orientacao (gulosa da
+        # secao 52 e exata da 62) roda DEPOIS da busca de ordem e abre ordens que
+        # antes nao valiam - medido na parede 8284557 (5 familias de banda): duas
+        # familias caem de 7 para 3 violacoes. Para quando um passe nao mexe em
+        # peca nenhuma (o segundo passe leva o vazado de 68 para 52 na BUTANTA; o
+        # terceiro nao muda nada).
+        arrangement, touched = None, None
+        for _pass in range(B34_RUN_ARRANGEMENT_PASSES):
+            current = _runs.arrange_b34_runs(
+                course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
+                half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
+                validate_wall=validate_wall, only_walls=touched)
+            # o passe seguinte so' precisa olhar as paredes que este mexeu: a
+            # orientacao so' muda onde a geometria mudou
+            touched = set(item["wall_idx"] for item in (current.get("walls") or ()))
+            pieces_changed = bool(current.get("runs_changed") or current.get("compositions")
+                                  or current.get("moved") or current.get("created")
+                                  or current.get("removed"))
+            if pieces_changed:
+                # ETAPA 4D de novo, sobre a posicao FINAL: a orientacao dos
+                # compensadores (lado fechado voltado para a abertura) foi decidida
+                # antes do arranjo, que move e cria compensadores. Medido: com pecas
+                # de reparo de vao nas corridas, 3 compensadores ficavam com o lado
+                # fechado errado junto da abertura. A funcao e' a fonte da verdade e
+                # recalcula tudo da posicao real (idempotente).
+                current["compensators_reoriented"] = _reorient_compensators_after_arrangement(
+                    course_candidates, walls_to_create, openings_per_wall, catalog)
+            if current.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
+                again = _small_void.orient_small_voids(course_candidates, catalog)
+                summary["rotated_after_arrangement"] = (summary.get("rotated_after_arrangement", 0)
+                                                        + again.get("rotated", 0))
+            arrangement = _merge_arrangement_pass(arrangement, current)
+            if not pieces_changed:
+                break
         result["b34_run_arrangement"] = arrangement
-        pieces_changed = bool(arrangement.get("runs_changed") or arrangement.get("compositions")
-                              or arrangement.get("moved") or arrangement.get("created")
-                              or arrangement.get("removed"))
-        if pieces_changed:
-            # ETAPA 4D de novo, sobre a posicao FINAL: a orientacao dos
-            # compensadores (lado fechado voltado para a abertura) foi decidida
-            # antes do arranjo, que move e cria compensadores. Medido: com pecas
-            # de reparo de vao nas corridas, 3 compensadores ficavam com o lado
-            # fechado errado junto da abertura. A funcao e' a fonte da verdade e
-            # recalcula tudo da posicao real (idempotente).
-            arrangement["compensators_reoriented"] = _reorient_compensators_after_arrangement(
-                course_candidates, walls_to_create, openings_per_wall, catalog)
-        if arrangement.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
-            again = _small_void.orient_small_voids(course_candidates, catalog)
-            summary["rotated_after_arrangement"] = again.get("rotated", 0)
     violations = _small_void.b34_small_void_violations(course_candidates, catalog)
     summary["after"] = len(violations)
     summary["violations"] = violations

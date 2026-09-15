@@ -1285,7 +1285,8 @@ def _fill_codes(course_candidates, catalog):
 
 def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, catalog=None,
                      tolerance_cm=_sva.SMALL_VOID_ALIGN_TOLERANCE_CM, tie_positions_by_wall=None,
-                     half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None):
+                     half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None,
+                     only_walls=None):
     """Aplica o arranjo conjunto. Devolve o resumo por parede alterada e os
     totais das guardas antes/depois (as guardas nunca pioram por construcao)."""
     summary = {"walls_changed": 0, "runs_changed": 0, "moved": 0, "rotated": 0,
@@ -1301,6 +1302,9 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
     summary.update({"compositions": 0, "created": 0, "removed": 0, "walls_rejected_by_validation": []})
     support_total = None
     for wi in sorted(rows_by_wall):
+        if only_walls is not None and wi not in only_walls:
+            # passe seguinte (secao 65): so' as paredes que o passe anterior mexeu
+            continue
         wall = _Wall(wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
                      ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
                      half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes)
