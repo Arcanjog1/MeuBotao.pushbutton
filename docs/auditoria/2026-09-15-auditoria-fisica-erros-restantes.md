@@ -29,15 +29,36 @@ de a seção correspondente entrar em `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
 - Não abriu monitoramento, check-in nem polling (proibido pelo `CLAUDE.md`).
 - Não fez merge.
 
-**Validador documental (`tools/documentation/validate.py --base 55e990d`).**
-Executado. Na árvore limpa da `main` ele já acusa
-`official revision is not integrated: 8a93a27a` — falha **pré-existente**, não
-causada por esta branch. Com esta entrega ele acusa mais três: reconciliar
-`docs/PROJECT_STATUS.md` e exigir checkpoint em `docs/checkpoints/`. **As três
-ficam deliberadamente abertas**: os dois caminhos são exatamente os que a
-sessão principal está editando no PR #42, e a instrução desta missão é não
-criar conflito. Este relatório é anexo de auditoria, não entrega de código — a
-reconciliação documental cabe ao fechamento do #42.
+**Validador documental / CI `check-status-doc` — falha conhecida e assumida.**
+
+O gate falha nesta branch com quatro erros. Dois são de natureza diferente e
+vale separar:
+
+1. `docs/PROJECT_STATUS.md: main changed; fetch and reconcile before publishing`
+   — **pré-existente na `main`, não causado por esta branch.** O
+   `PROJECT_STATUS.md` da `main` declara `"main": "61d4f6c"`, mas a `main` real
+   é `55e990d` (o merge do #41 não reconciliou o próprio painel). Enquanto isso
+   não for corrigido, **qualquer** PR aberto a partir da `main` atual reprova
+   neste gate, independente do conteúdo. O PR #42 reconcilia
+   (`observed_utc` 2026-09-15, `main` → `55e990d`, #41 para `official`).
+2. `delivery must reconcile docs/PROJECT_STATUS.md` + os dois de checkpoint —
+   consequência de `validate.py`: **se qualquer arquivo mudou em relação à
+   base, o painel e um checkpoint passam a ser obrigatórios.** Não há isenção
+   para entrega documental nem para anexo de auditoria.
+
+**Os quatro ficam deliberadamente abertos.** Satisfazê-los exige editar
+`docs/PROJECT_STATUS.md` exatamente no bloco JSON que o PR #42 também edita
+(`observed_utc`, `main`, fim de `official`, `candidates`) — conflito textual
+quase certo entre os dois PRs, que é precisamente o que esta missão mandou
+evitar. A ordem natural resolve sem custo: **#42 mescla primeiro e reconcilia o
+painel; esta branch rebaseia na nova `main` e só então recebe painel e
+checkpoint**, sem conflito. Até lá o vermelho é esperado e não indica defeito no
+relatório.
+
+> Nota de método: rodando `validate.py` num clone **raso**, aparece também
+> `official revision is not integrated: 8a93a27a`. É **artefato do clone**
+> (o objeto existe, o histórico não), não uma falha da `main` — a CI, com
+> `fetch-depth: 0`, não reporta esse erro. Registrado aqui porque induz ao erro.
 
 ## 1. Método, proveniência e o que é reproduzível
 
