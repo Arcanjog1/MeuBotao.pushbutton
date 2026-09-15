@@ -3704,6 +3704,32 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     return result
 
 
+def _orient_small_voids_final(result, catalog):
+    """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
+    sobre as fiadas FISICAS finais (depois de reparos e do reforco de
+    aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
+    vazado menor dele com o vazado menor/central da peca da fiada vizinha -
+    mesmo contorno, mesmas juntas, mesmas colisoes. Peca de no' (L/T/X) mantem
+    a orientacao da secao 5. `result["small_void_alignment"]` registra girados,
+    violacoes antes/depois e a lista final (validador independente)."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    if result.get("small_void_alignment") is not None:
+        return result
+    course_candidates = result.get("course_candidates")
+    if not course_candidates:
+        return result
+    from core.engine import small_void_alignment as _small_void
+    summary = {"rotated": 0, "passes": 0}
+    if _small_void.SMALL_VOID_ORIENTATION_ENABLED:
+        summary = _small_void.orient_small_voids(course_candidates, catalog)
+    violations = _small_void.b34_small_void_violations(course_candidates, catalog)
+    summary["after"] = len(violations)
+    summary["violations"] = violations
+    result["small_void_alignment"] = summary
+    return result
+
+
 def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -3823,10 +3849,10 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
                                                "timing": channel_parity.get("timing")}
 
     if not enabled or result.get("error") is not None:
-        return _apply_opening_reinforcement(
+        return _orient_small_voids_final(_apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
             original_openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3858,10 +3884,10 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
-    return _apply_opening_reinforcement(
+    return _orient_small_voids_final(_apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
         original_openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog)
 
 
 CHANNEL_TRIAL_CHEAP_GATES = ("bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
@@ -4149,6 +4175,7 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     result["wall_bond_audits"] = audit_all_walls_bond_quality(
         walls_to_create, result["course_candidates"], audit_catalog, num_courses,
         openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    _orient_small_voids_final(result, catalog)
     _unify_candidates_with_courses(result, _reinforcement)
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}

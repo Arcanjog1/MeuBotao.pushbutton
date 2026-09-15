@@ -441,6 +441,9 @@ aberta (CR-S1).**
   menor entre Fiada A e Fiada B quando usado como preenchimento comum
   arbitrário (fora de um encontro L/T) — a orientação usada é uma
   convenção fixa, não otimizada por alinhamento cruzado entre fiadas.
+  **ATUALIZADO 2026-09-15 (seção 52):** a orientação passou a ser
+  escolhida pelo alinhamento do vazado menor com a fiada vizinha; fica
+  pendente só o resíduo que exige mudar a POSIÇÃO do B34.
   Diferente do L_CORNER/T-degradado, onde o alinhamento É garantido e
   validado (seção 5).
 - **Desencontro de junta vertical** entre Fiada A e Fiada B nos trechos de
@@ -2348,8 +2351,9 @@ não esteja em `created_instances`.
 ### 18.5 — B34 só entra com o vão menor sob controle
 
 - **Status**: `PARCIAL` — garantido e validado em L_CORNER e T degradado
-  (seção 5); **não** garantido no B34 de meio de parede (limitação já
-  registrada na seção 6).
+  (seção 5); **ATUALIZADO 2026-09-15**: no B34 de meio de parede a
+  orientação agora é escolhida pelo alinhamento cruzado entre fiadas
+  (seção 52); o resíduo que pede mudança de posição continua pendente.
 - **Regra**: sempre que houver B34 na amarração, o vão menor entre os
   blocos envolvidos fica alinhado. O B34 não pode ser usado só para
   preencher espaço de forma arbitrária — a posição dele faz parte da
@@ -7884,3 +7888,63 @@ BUTANTÃ 34 paredes e em 6 fixtures, `tests/test_channel_audit_fixes.py`):
 5. **Gates baratos antes do planejamento** na tentativa (a decisão aceita/rejeita
    não muda; só a ordem em que o motivo é encontrado).
 Instrumentação permanente: `result["channel_tie_parity_trials"]["timing"]`.
+
+## 52. Vazado menor do B34 alinhado entre fiadas — B34 de meio de parede (2026-09-15)
+
+**Regra (usuário, 2026-09-15):** se existe um B34 numa fiada, a fiada
+vizinha (de cima e de baixo) precisa preservar o **vazado menor** dele: a
+peça de alvenaria vazada que cobre o centro do vazado menor do B34 tem de
+oferecer ali também um vazado menor (outro B34 ou o vazado central do B54).
+Vale para o B34 de encontro (seção 5, já garantido) **e para o B34 de meio
+de parede**, que era a limitação registrada nas seções 6 e 18.5.
+
+**Geometria real das famílias (medida no Revit, seção transversal a meia
+espessura, eixo local X a partir do centro):**
+
+| Família | Vazados (cm, local X) | Vazado menor |
+|---|---|---|
+| B39 | [-17,-1,25] [1,25,17] | não tem (iguais) |
+| B34 | [-14,5,-3,75] [-1,25,14,5] | [-14,5,-3,75] = 10,75 cm, lado **negativo** |
+| B54 | [-24,5,-8,75] [-6,25,6,25] [8,75,24,5] | central, 12,5 cm |
+| B19 | [-7,7] | não tem (uma célula) |
+| C09/C04, canaletas | sem vazado a meia altura | fora da regra |
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, 34 paredes de alvenaria, só
+leitura):** de 2.541 pares B34 × peça vazada da fiada vizinha, **2.500**
+têm o vazado menor sobre vazado menor (2.192 sobre B34, 308 sobre o central
+do B54); 41 exceções. O humano consegue isso pela **orientação** do B34
+(rotação; espelhamento é raro): em corridas de B34 deslocadas 20 cm entre
+fiadas, o B34 de uma fiada fica girado 180° em relação ao da outra.
+
+**Estado anterior (lote do botão no doc de teste, Revit real):** 2.460
+violações em 3.426 pares — a orientação do B34 de preenchimento era uma
+convenção fixa.
+
+**Implementação:** `core/engine/small_void_alignment.py`.
+- O "vazado menor" é geométrico: a célula de menor área de `cells_world`
+  quando ela é menor que 0,9 × a seguinte. Nenhum código, parede, ID ou
+  coordenada entra na regra.
+- `b34_small_void_violations(course_candidates)` é o validador
+  (`result["small_void_alignment"]["violations"]`). Sem peça vazada na
+  vizinha (compensador, canaleta, vão, topo), não há restrição.
+- `orient_small_voids` gira 180° em torno do centro os B34 que **não** são
+  peça de nó (a orientação do nó é da seção 5) quando isso reduz
+  estritamente as violações locais. Contorno, juntas, colisões e cobertura
+  ficam idênticos por construção. Guloso, determinístico (ordem por chave
+  física), idempotente.
+- Chamado por `_orient_small_voids_final` (`core/wall_modeling.py`) nas
+  duas saídas de `_solve_building_blocks_all_courses_impl` e, com a
+  estratégia CHANNEL, **antes** de `_unify_candidates_with_courses` (a
+  chave física da fonte única inclui a direção da peça).
+- Flag `SMALL_VOID_ORIENTATION_ENABLED = True`.
+
+**Medido (bancada offline do doc de teste, 34 paredes, 13 fiadas):**
+violações 2.000 → 294 em 0,3 s, sem mudar contorno nem juntas. As 294
+restantes pedem mudança de **posição** (não de orientação) e continuam
+registradas como limitação. Benchmark TGD/TP1 (V1/V2): ver checkpoint da
+missão — a orientação não altera nenhum achado (contorno idêntico).
+
+**Testes:** `tests/test_b34_small_void_alignment.py` — vermelho sem o
+passe, verde com ele, peça de nó nunca gira, rotação rígida, invariância a
+translação/ordem/sentido, controle do validador (deslocado 20 cm e girado
+alinha; mesma orientação viola), sem restrição sem vizinho vazado.
