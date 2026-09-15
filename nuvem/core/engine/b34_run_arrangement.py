@@ -49,6 +49,14 @@ B34_RUN_ARRANGEMENT_ENABLED = True
 # auditoria de amarracao depois do solve. Ligar so' para medir o corpus legado.
 B34_RUN_ARRANGEMENT_LEGACY = False
 MAX_ARRANGEMENTS_PER_RUN = 240
+# SECAO 61: composicao de MESMO comprimento (a ate' 2 pecas trocadas, sem mais
+# especiais), aceita por dominancia e, por parede, pelos validadores de producao.
+B34_RUN_COMPOSITION_ENABLED = True
+MAX_COMPOSITIONS_PER_RUN = 40
+MAX_ARRANGEMENTS_PER_COMPOSITION = 60
+COMPOSITION_MAX_REMOVED = 2
+COMPOSITION_MAX_ADDED = 3
+JOINT_REGULAR_TOLERANCE_CM = 0.05
 MAX_PASSES = 3
 RUN_MAX_GAP_CM = 2.5
 FACE_TOLERANCE_CM = 0.6
@@ -116,6 +124,30 @@ def _void_geometry(cand, p0, wall_dir, lo, hi):
     t_cell = ((pt.X - p0.X) * wall_dir.X + (pt.Y - p0.Y) * wall_dir.Y) * CM_PER_FT
     half = float(cell["size_local"][0]) * CM_PER_FT / 2.0
     return t_cell - (lo + hi) / 2.0, half
+
+
+def _catalog_template(code, catalog):
+    """Slot-modelo de `code` lido do CATALOGO (celulas locais, em pes, eixo X da
+    peca ao longo da parede) - para codigos que ainda nao existem na parede."""
+    entry = (catalog or {}).get(code) or {}
+    length = float(entry.get("length_cm") or 0.0)
+    if length <= 0.0:
+        return None
+    s = _Slot()
+    s.code, s.lo, s.hi = code, 0.0, length
+    s.compensator = bool(entry.get("is_compensator"))
+    cells = entry.get("cells_local") or []
+    s.hollow = bool(cells) and not s.compensator
+    if len(cells) >= 2:
+        ordered = sorted(cells, key=lambda c: float(c["size_local"][0]) * float(c["size_local"][1]))
+        a0 = float(ordered[0]["size_local"][0]) * float(ordered[0]["size_local"][1])
+        a1 = float(ordered[1]["size_local"][0]) * float(ordered[1]["size_local"][1])
+        if a0 <= _sva.SMALL_VOID_MAX_AREA_RATIO * a1:
+            s.void_off = float(ordered[0]["center_local"][0]) * CM_PER_FT
+            s.void_half = float(ordered[0]["size_local"][0]) * CM_PER_FT / 2.0
+            s.orientable = len(cells) == 2
+    s.side = (1 if (s.void_off or 0.0) >= 0.0 else -1) if s.orientable else 0
+    return s
 
 
 def _void_center(slot):
@@ -208,10 +240,19 @@ def _coincident(fa, fb):
 
 
 def _compensator_guard(slots, wall_len):
+    """Compensadores encostados (regra #2 e 56.2)."""
     n = 0
     for a, b in zip(slots, slots[1:]):
         if a.compensator and b.compensator and 0.0 <= b.lo - a.hi <= TOUCH_TOLERANCE_CM:
             n += 1
+    return n
+
+
+def _long_compensator_extremes(slots, wall_len):
+    """Compensador LONGO como peca extrema da parede (secao 58). Guarda separada
+    da de compensadores encostados: somadas, a busca trocava um par encostado
+    por um C09 na ponta - e o humano nao faz nenhuma das duas."""
+    n = 0
     if slots:
         first, last = slots[0], slots[-1]
         if first.compensator and first.hi - first.lo >= LONG_COMPENSATOR_MIN_CM and \
@@ -275,6 +316,45 @@ def _runs(slots):
     return out
 
 
+def _combinations_with_replacement(items, size):
+    """itertools.combinations_with_replacement (existe no 2.7, mas mantido
+    explicito e deterministico)."""
+    out = []
+
+    def rec(start, cur):
+        if len(cur) == size:
+            out.append(tuple(cur))
+            return
+        for i in range(start, len(items)):
+            cur.append(items[i])
+            rec(i, cur)
+            cur.pop()
+    rec(0, [])
+    return out
+
+
+def _multiset_orders(counts, n, cap):
+    keys = sorted(counts)
+    counts = dict(counts)
+    out, cur = [], []
+
+    def rec():
+        if len(out) >= cap:
+            return
+        if len(cur) == n:
+            out.append(tuple(cur))
+            return
+        for k in keys:
+            if counts[k]:
+                counts[k] -= 1
+                cur.append(k)
+                rec()
+                cur.pop()
+                counts[k] += 1
+    rec()
+    return out
+
+
 def _arrangements(slots, run):
     """Ordens DISTINTAS do multiconjunto de codigos, geradas direto (sem varrer
     n!), em ordem lexicografica, com teto."""
@@ -303,12 +383,13 @@ def _arrangements(slots, run):
 
 class _Wall(object):
     def __init__(self, wall_idx, rows, walls_to_create, openings_per_wall, catalog, tol_cm,
-                 ties=None, half_code=None, half_tie_gap_cm=0.0):
+                 ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=()):
         self.wall_idx = wall_idx
         self.tol = tol_cm
         self.ties = list(ties or [])
         self.half_code = half_code
         self.half_tie_gap = half_tie_gap_cm
+        self.fill_codes = sorted(fill_codes or ())
         self.p0, self.dir, self.length = _axis(walls_to_create, wall_idx)
         self.edges = []
         ops = (openings_per_wall or [])
@@ -414,7 +495,9 @@ class _Wall(object):
         near = list(_in_window(self.fam[f], window[0], window[1]))
         cp = _compensator_guard(near, self.length) * self.count[f]
         ht = _half_blocks_near_ties(near, self.ties, self.half_code, self.half_tie_gap) * self.count[f]
-        return v, co, cp, ht
+        # extremo da parede: olha a fileira inteira (a janela pode nao conter a ponta)
+        ex = _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
+        return v, co, cp, ht, ex
 
     def totals(self):
         v = co = cp = 0
@@ -422,12 +505,13 @@ class _Wall(object):
             v += k * _violations_between(self.fam[a], self.fam[b], self.tol)
             co += k * _coincident(_internal_faces(self.fam[a], self.length, self.edges),
                                   _internal_faces(self.fam[b], self.length, self.edges))
-        ht = 0
+        ht = ex = 0
         for f in self.fam:
             cp += _compensator_guard(self.fam[f], self.length) * self.count[f]
+            ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
             ht += _half_blocks_near_ties(self.fam[f], self.ties, self.half_code, self.half_tie_gap) * self.count[f]
         return {"violations": v, "coincident_faces": co, "compensator_guard": cp,
-                "half_block_near_tie": ht,
+                "long_compensator_extremes": ex, "half_block_near_tie": ht,
                 "stacked_joints": _stacks(self.fam, self.course_fam, self.length, self.edges)}
 
     # ------------------------------------------------------------ busca
@@ -491,7 +575,7 @@ class _Wall(object):
                     self._apply(f, run, codes, [s.side or 1 for s in orig])
                     self._best_sides(f, run)
                     cost = self._local(f, run)
-                    if cost[0] < ref[0] and cost[1] <= ref[1] and cost[2] <= ref[2] and cost[3] <= ref[3]:
+                    if cost[0] < ref[0] and all(cost[k] <= ref[k] for k in range(1, len(ref))):
                         moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
                         ranked.append((cost, moved, index, self._snap(f, run)))
                     self._restore(f, run, orig)
@@ -512,6 +596,125 @@ class _Wall(object):
 
     def _arrangements_for(self, f, run):
         return _arrangements(self.fam[f], run)
+
+    # ------------------------------------------------------------ composicao (secao 61)
+    def _tpl(self, code):
+        if code not in self.template:
+            tpl = _catalog_template(code, self.catalog)
+            if tpl is None:
+                return None
+            self.template[code] = tpl
+        return self.template[code]
+
+    def _neighbour_multisets(self, codes, joint):
+        """Multiconjuntos a ate' COMPOSITION_MAX_REMOVED pecas trocadas por ate'
+        COMPOSITION_MAX_ADDED pecas de MESMO comprimento (juntas incluidas), sem
+        aumentar o numero de especiais (compensadores). Ordem deterministica."""
+        units = {}
+        for code in self.fill_codes:
+            tpl = self._tpl(code)
+            if tpl is not None:
+                units[code] = int(round((tpl.hi - tpl.lo + joint) * 10.0))
+        if any(c not in units for c in codes):
+            return []
+        base = collections.Counter(codes)
+        pool = sorted(units)
+        adds = []
+        for size in range(1, COMPOSITION_MAX_ADDED + 1):
+            adds.extend(_combinations_with_replacement(pool, size))
+        removes = []
+        for size in range(1, COMPOSITION_MAX_REMOVED + 1):
+            for rem in _combinations_with_replacement(sorted(base), size):
+                need = collections.Counter(rem)
+                if all(base[k] >= v for k, v in need.items()):
+                    removes.append(rem)
+        seen, out = set(), []
+        for rem in removes:
+            total = sum(units[k] for k in rem)
+            specials = sum(1 for k in rem if self._tpl(k).compensator)
+            for add in adds:
+                if sorted(add) == sorted(rem) or sum(units[k] for k in add) != total:
+                    continue
+                if sum(1 for k in add if self._tpl(k).compensator) > specials:
+                    continue
+                new = base - collections.Counter(rem) + collections.Counter(add)
+                key = tuple(sorted(new.elements()))
+                if key not in seen:
+                    seen.add(key)
+                    out.append(key)
+                    if len(out) >= MAX_COMPOSITIONS_PER_RUN:
+                        return out
+        return out
+
+    def _splice(self, f, run, codes, joint):
+        slots = self.fam[f]
+        cur = slots[run[0]].lo
+        new = []
+        for code in codes:
+            tpl = self._tpl(code)
+            s = tpl.copy()
+            s.lo, s.hi = cur, cur + (tpl.hi - tpl.lo)
+            s.movable, s.node = True, False
+            new.append(s)
+            cur = s.hi + joint
+        self.fam[f] = slots[:run[0]] + new + slots[run[-1] + 1:]
+        return list(range(run[0], run[0] + len(new)))
+
+    def _compose(self, f, run):
+        slots = self.fam[f]
+        gaps = [slots[run[k + 1]].lo - slots[run[k]].hi for k in range(len(run) - 1)]
+        if not gaps or any(abs(g - gaps[0]) > JOINT_REGULAR_TOLERANCE_CM for g in gaps):
+            return False
+        joint = gaps[0]
+        codes = [slots[i].code for i in run]
+        ref = self._local(f, run)
+        ref_specials = sum(1 for i in run if slots[i].compensator)
+        if ref[0] == 0 and ref_specials == 0:
+            return False  # nada a ganhar: dominancia exige menos vazado ou menos especiais
+        original = list(slots)
+        best = None
+        for ms_index, multiset in enumerate(self._neighbour_multisets(codes, joint)):
+            specials = sum(1 for code in multiset if self._tpl(code).compensator)
+            counts = collections.Counter(multiset)
+            for arr_index, order in enumerate(_multiset_orders(counts, len(multiset),
+                                                                MAX_ARRANGEMENTS_PER_COMPOSITION)):
+                new_run = self._splice(f, run, order, joint)
+                self._best_sides(f, new_run)
+                cost = self._local(f, new_run)
+                guards_ok = all(cost[k] <= ref[k] for k in range(1, len(ref)))
+                dominates = ((cost[0] < ref[0] and specials <= ref_specials)
+                             or (cost[0] <= ref[0] and specials < ref_specials))
+                if guards_ok and dominates:
+                    key = (cost[0], specials, len(order), ms_index, arr_index)
+                    if best is None or key < best[0]:
+                        best = (key, [x.copy() for x in self.fam[f]])
+                self.fam[f] = list(original)
+        if best is None:
+            return False
+        stacks_ref = _stacks(self.fam, self.course_fam, self.length, self.edges)
+        self.fam[f] = best[1]
+        if _stacks(self.fam, self.course_fam, self.length, self.edges) <= stacks_ref:
+            return True
+        self.fam[f] = original
+        return False
+
+    def compose(self):
+        """Uma composicao aceita muda os indices da familia: recomeca as corridas
+        dela. Teto de iteracoes por parede, deterministico."""
+        if not B34_RUN_COMPOSITION_ENABLED or not self.fill_codes:
+            return 0
+        accepted = 0
+        for f in sorted(self.fam):
+            for _guard in range(64):
+                changed = False
+                for run in _runs(self.fam[f]):
+                    if self._compose(f, run):
+                        accepted += 1
+                        changed = True
+                        break
+                if not changed:
+                    break
+        return accepted
 
 
 def _collect_rows(course_candidates, walls_to_create):
@@ -554,70 +757,186 @@ def _translate(cand, delta_cm, wall_dir):
     cand["cells_world"] = cells
 
 
-def _write_back(wall, base_fam, changed_runs):
-    """Leva a ordem escolhida para os candidatos reais de TODAS as fiadas da
-    familia: cada objeto so' troca de lugar (e gira), nenhum e' recriado."""
-    moved = rotated = 0
+def _runs_by_start(slots):
+    return dict((round(slots[r[0]].lo, 3), r) for r in _runs(slots))
+
+
+def _write_back(wall, base_fam, course_candidates, catalog):
+    """Leva o estado final do modelo para os candidatos reais, trecho a trecho
+    (identificado pela ponta inicial, que nunca muda): reaproveita o objeto
+    quando o codigo coincide (so' move/gira), cria peca nova com o construtor do
+    solver quando falta e remove a que sobra."""
+    from core.engine.wall_stepper import _place_pier_layout
+    moved = rotated = created = removed = 0
     done = set()
-    for f, run in sorted(changed_runs):
-        new = wall.fam[f]
-        for c in sorted(wall.course_fam):
-            if wall.course_fam[c] != f:
+    for f in sorted(wall.fam):
+        old, new = base_fam[f], wall.fam[f]
+        old_runs, new_runs = _runs_by_start(old), _runs_by_start(new)
+        for start in sorted(old_runs):
+            orun, nrun = old_runs[start], new_runs.get(start)
+            if nrun is None:
                 continue
-            entries = wall.rows[c]
-            pools = collections.defaultdict(list)
-            for i in run:
-                pools[entries[i][0].get("logical_code")].append(entries[i][0])
-            for i in run:
-                cand = pools[new[i].code].pop(0)
-                if id(cand) in done:
+            if [(old[i].code, round(old[i].lo, 3), old[i].side) for i in orun] == \
+                    [(new[i].code, round(new[i].lo, 3), new[i].side) for i in nrun]:
+                continue
+            for c in sorted(wall.course_fam):
+                if wall.course_fam[c] != f:
                     continue
-                done.add(id(cand))
-                lo, hi = _extent_cm(cand, wall.p0, wall.dir)
-                delta = new[i].lo - lo
-                if abs(delta) > 1e-6:
-                    _translate(cand, delta, wall.dir)
-                    moved += 1
-                if new[i].orientable:
-                    off, _half = _void_geometry(cand, wall.p0, wall.dir, new[i].lo, new[i].hi)
-                    side = 1 if (off or 0.0) >= 0.0 else -1
-                    if side != new[i].side:
-                        _sva.rotate_candidate_180(cand)
-                        rotated += 1
-    return moved, rotated
+                originals = [wall.rows[c][i][0] for i in orun]
+                model = originals[0]
+                pools = collections.defaultdict(list)
+                for cand in originals:
+                    pools[cand.get("logical_code")].append(cand)
+                for i in nrun:
+                    slot = new[i]
+                    if pools[slot.code]:
+                        cand = pools[slot.code].pop(0)
+                        if id(cand) not in done:
+                            done.add(id(cand))
+                            lo, _hi = _extent_cm(cand, wall.p0, wall.dir)
+                            if abs(slot.lo - lo) > 1e-6:
+                                _translate(cand, slot.lo - lo, wall.dir)
+                                moved += 1
+                    else:
+                        cand = _place_pier_layout([(slot.code, slot.lo, slot.hi)], catalog, wall.p0, wall.dir,
+                                                  model.get("course"), wall.wall_idx)[0]
+                        for key in ("course_variant",):
+                            if key in model:
+                                cand[key] = model[key]
+                        course_candidates[c].append(cand)
+                        done.add(id(cand))
+                        created += 1
+                    if slot.orientable and id(cand) in done:
+                        lo, hi = _extent_cm(cand, wall.p0, wall.dir)
+                        off, _half = _void_geometry(cand, wall.p0, wall.dir, lo, hi)
+                        if (1 if (off or 0.0) >= 0.0 else -1) != slot.side:
+                            _sva.rotate_candidate_180(cand)
+                            rotated += 1
+                for leftovers in pools.values():
+                    for cand in leftovers:
+                        lst = course_candidates[c]
+                        for k in range(len(lst)):
+                            if lst[k] is cand:
+                                del lst[k]
+                                removed += 1
+                                break
+    return moved, rotated, created, removed
+
+
+def _snapshot_wall(course_candidates, wall_idx):
+    lists = []
+    geometry = {}
+    for c in sorted(course_candidates or {}):
+        lst = course_candidates[c]
+        if any(cand.get("wall_idx") == wall_idx for cand in lst):
+            lists.append((c, list(lst)))
+            for cand in lst:
+                if cand.get("wall_idx") == wall_idx and id(cand) not in geometry:
+                    geometry[id(cand)] = (cand, cand["origin_world"], list(cand.get("cells_world") or []),
+                                          cand.get("x_dir"), cand.get("y_dir"), cand.get("rotation_deg"))
+    return lists, geometry
+
+
+def _restore_wall(course_candidates, snapshot):
+    lists, geometry = snapshot
+    for c, saved in lists:
+        course_candidates[c][:] = saved
+    for cand, origin, cells, x_dir, y_dir, rotation in geometry.values():
+        cand["origin_world"], cand["cells_world"] = origin, cells
+        cand["x_dir"], cand["y_dir"], cand["rotation_deg"] = x_dir, y_dir, rotation
+
+
+def _validation_worse(after, before):
+    """Qualquer tipo de problema da auditoria que aumenta, ou apoio pior."""
+    if after is None or before is None:
+        return False
+    for kind, count in (after.get("audit") or {}).items():
+        if count > (before.get("audit") or {}).get(kind, 0):
+            return True
+    return after.get("unsupported", 0) > before.get("unsupported", 0)
+
+
+def _fill_codes(course_candidates, catalog):
+    """Codigos que o solver ja' usa como preenchimento comum (bloco vazado ou
+    compensador) em alguma parede - a composicao nunca inventa familia nova."""
+    codes = set()
+    for c in course_candidates or {}:
+        for cand in course_candidates[c] or ():
+            code = cand.get("logical_code")
+            cat = (catalog or {}).get(code) or {}
+            if cand.get("placement_reason") != "STANDARD_FILL" or cand.get("node_index") is not None:
+                continue
+            if cat.get("is_channel") or _is_channel_code(code):
+                continue
+            if _sva._is_hollow_masonry(cand, catalog) or cat.get("is_compensator"):
+                codes.add(code)
+    return sorted(codes)
 
 
 def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, catalog=None,
                      tolerance_cm=_sva.SMALL_VOID_ALIGN_TOLERANCE_CM, tie_positions_by_wall=None,
-                     half_block_code=None, half_block_tie_gap_cm=0.0):
+                     half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None):
     """Aplica o arranjo conjunto. Devolve o resumo por parede alterada e os
     totais das guardas antes/depois (as guardas nunca pioram por construcao)."""
     summary = {"walls_changed": 0, "runs_changed": 0, "moved": 0, "rotated": 0,
                "before": {"violations": 0, "coincident_faces": 0, "compensator_guard": 0,
-                          "half_block_near_tie": 0, "stacked_joints": 0},
+                          "long_compensator_extremes": 0, "half_block_near_tie": 0, "stacked_joints": 0},
                "after": {"violations": 0, "coincident_faces": 0, "compensator_guard": 0,
-                         "half_block_near_tie": 0, "stacked_joints": 0},
+                         "long_compensator_extremes": 0, "half_block_near_tie": 0, "stacked_joints": 0},
                "walls": []}
     if not B34_RUN_ARRANGEMENT_ENABLED or not course_candidates or XYZ is None:
         return summary
     rows_by_wall = _collect_rows(course_candidates, walls_to_create)
+    fill_codes = _fill_codes(course_candidates, catalog)
+    summary.update({"compositions": 0, "created": 0, "removed": 0, "walls_rejected_by_validation": []})
+    support_total = None
     for wi in sorted(rows_by_wall):
         wall = _Wall(wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
                      ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
-                     half_tie_gap_cm=half_block_tie_gap_cm)
+                     half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes)
         before = wall.totals()
         base_fam = dict((f, [s.copy() for s in slots]) for f, slots in wall.fam.items())
         changed = wall.optimize() if before["violations"] else set()
-        after = wall.totals() if changed else before
+        compositions = wall.compose()
+        if not changed and not compositions:
+            for key in summary["before"]:
+                summary["before"][key] += before[key]
+                summary["after"][key] += before[key]
+            continue
+        after = wall.totals()
+        snapshot = _snapshot_wall(course_candidates, wi)
+        checked_before = None
+        if validate_wall is not None:
+            # o apoio fisico e' global: o "antes" desta parede e' o "depois" da
+            # anterior (so' recalcula a auditoria, que e' por parede)
+            checked_before = validate_wall(wi, support=support_total is None)
+            if support_total is not None:
+                checked_before["unsupported"] = support_total
+        moved, rotated, created, removed = _write_back(wall, base_fam, course_candidates, catalog)
+        checked_after = validate_wall(wi) if validate_wall is not None else None
+        if checked_after is not None:
+            support_total = checked_after["unsupported"]
+        if _validation_worse(checked_after, checked_before):
+            # a busca e' um modelo; quem decide e' o validador de producao
+            _restore_wall(course_candidates, snapshot)
+            support_total = checked_before["unsupported"]
+            summary["walls_rejected_by_validation"].append(
+                {"wall_idx": wi, "before": checked_before, "after": checked_after})
+            after = before
+            moved = rotated = created = removed = 0
+            compositions = 0
+            changed = set()
         for key in summary["before"]:
             summary["before"][key] += before[key]
             summary["after"][key] += after[key]
-        if not changed:
+        if not changed and not compositions:
             continue
-        moved, rotated = _write_back(wall, base_fam, changed)
         summary["walls_changed"] += 1
         summary["runs_changed"] += len(changed)
+        summary["compositions"] += compositions
         summary["moved"] += moved
         summary["rotated"] += rotated
+        summary["created"] += created
+        summary["removed"] += removed
         summary["walls"].append({"wall_idx": wi, "before": before, "after": after})
     return summary

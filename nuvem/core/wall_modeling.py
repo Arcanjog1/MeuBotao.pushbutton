@@ -3750,13 +3750,40 @@ def _physical_support_final(result, catalog, walls_to_create, openings_per_wall,
     return result
 
 
+def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog, num_courses,
+                            nodes, end_to_node, band):
+    """Aceitacao EXATA das secoes 60/61 por parede: a busca e' um modelo 1-D, mas
+    a parede so' fica alterada se a AUDITORIA DE AMARRACAO desta parede (mesmo
+    catalogo com canaletas usado logo depois) e o APOIO FISICO (secao 53, total)
+    nao pioram em nenhum tipo de problema."""
+    from core.engine import physical_support as _support
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+
+    def validate(wall_idx, support=True):
+        course_candidates = result.get("course_candidates") or {}
+        audit = audit_wall_bond_quality(
+            wall_idx, walls_to_create, course_candidates, audit_catalog, num_courses,
+            openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+        kinds = {}
+        for problem in audit.get("problems") or ():
+            kind = str(problem).split(":")[0]
+            kinds[kind] = kinds.get(kind, 0) + 1
+        unsupported = None
+        if support:
+            unsupported = len(_support.unsupported_pieces(course_candidates, walls_to_create,
+                                                          openings_per_wall, band))
+        return {"audit": kinds, "unsupported": unsupported}
+    return validate
+
+
 def _b34_run_arrangement_legacy_enabled():
     from core.engine import b34_run_arrangement as _runs
     return _runs.B34_RUN_ARRANGEMENT_LEGACY
 
 
 def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_per_wall=None,
-                              arrange=False, nodes=None, end_to_node=None):
+                              arrange=False, nodes=None, end_to_node=None, validate_wall=None):
     """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
     sobre as fiadas FISICAS finais (depois de reparos e do reforco de
     aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
@@ -3788,7 +3815,8 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
                         for wi in range(len(walls_to_create)))
         arrangement = _runs.arrange_b34_runs(
             course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
-            half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM)
+            half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
+            validate_wall=validate_wall)
         result["b34_run_arrangement"] = arrangement
         if arrangement.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
             again = _small_void.orient_small_voids(course_candidates, catalog)
@@ -4246,7 +4274,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     # reauditoria: o arranjo move juntas dentro das corridas, e a auditoria de
     # amarracao tem de ver a geometria final. A orientacao nao muda junta.
     _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall, arrange=True,
-                              nodes=nodes, end_to_node=end_to_node)
+                              nodes=nodes, end_to_node=end_to_node,
+                              validate_wall=_channel_wall_validator(
+                                  result, walls_to_create, openings_per_wall, catalog, num_courses,
+                                  nodes, end_to_node, _band))
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())

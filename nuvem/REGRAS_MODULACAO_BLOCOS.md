@@ -8539,3 +8539,88 @@ mesmas peças/pontas/juntas e peças fixas paradas, idempotência, canaleta nunc
 se move, chave desligada não toca nada, guarda de meio bloco igual à da auditoria
 e com controle (sem amarração o meio bloco cairia a 35 cm; com amarração em 44 cm
 o arranjo escolhe outra ordem e ainda alinha).
+
+## 61. Composição de mesmo comprimento nas corridas + aceitação exata por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 61.1 O que a seção 60 não alcança
+
+Depois do arranjo por reordenação (§60) restavam 234 violações (régua 2-D):
+113 B34 sobre B39, 80 B34×B34 em conflito de orientação, 22 sobre a célula
+lateral do B54 de nó e 19 sobre B19. Comparando fileira a fileira com o humano,
+o resíduo é de **composição**: onde o solver usa `B34 + C04` ou `B39 … C09`, o
+humano usa outra combinação de peças no mesmo comprimento — e com menos
+especiais (humano 500 × solver 808).
+
+**Hipótese medida e descartada nesta rodada — paridade do nó:** em 14 dos 29
+nós T comparáveis o solver põe o B54 na família de fiada oposta à do humano.
+Parecia a causa (162 das 234 violações a até 250 cm de um nó "trocado"), mas
+normalizando pelo número de B34 de preenchimento perto de cada grupo a taxa de
+violação perto dos nós **trocados** (0,08–0,25) é **menor** que perto dos de
+paridade igual (0,28–0,32). Nada mudou no motor por isso.
+
+### 61.2 Regra
+
+Para cada corrida de preenchimento com juntas regulares (`core/engine/b34_run_arrangement.py`,
+`_Wall.compose`):
+
+1. multiconjuntos a até **2 peças trocadas por até 3**, de **mesmo comprimento**
+   (comprimento + junta), só com códigos que o solver **já usa** como
+   preenchimento (nenhuma família nova), e **nunca com mais compensadores**;
+2. para cada um, as ordens distintas (teto) e a orientação dos B34;
+3. aceita por **dominância**: vazado menor e especiais não pioram e ao menos um
+   melhora, com as mesmas guardas da §60 — agora com "compensadores encostados"
+   e "compensador longo na ponta da parede" como guardas **separadas** (somadas,
+   a busca trocava um par `C09+C09` por um C09 na ponta, medido na fixture).
+
+**Aceitação exata por parede.** A busca é um modelo 1-D; quem decide é o
+validador de produção. Cada parede alterada passa pela **auditoria de amarração
+daquela parede** (com o catálogo de canaletas) e pelo **apoio físico total**
+(§53), antes × depois. Se qualquer tipo de problema aumentar, a parede volta ao
+estado anterior por snapshot (listas de fiada e geometria de cada peça). Isso
+também protege a §60, que usa a mesma escrita.
+
+Peça nova é criada com o construtor do solver (`_place_pier_layout`), com o
+`course_variant` da peça original do trecho; a que sobra é removida.
+
+### 61.3 Medido — BUTANTÃ no fluxo real do botão (17 fiadas)
+
+| Métrica | Desligado | Só §60 | **§60 + §61** | Humano |
+|---|---|---|---|---|
+| Vazado menor — validador de produção | 508 | 312 | **259** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 316 | 234 | **195** | 41 |
+| B34 sobre B39 | 157 | 113 | **84** | 2 |
+| B34 sobre B19 | 17 | 19 | **9** | 17 |
+| Especiais (fiadas 0–11) | 808 | 808 | **767** | 500 |
+| `C09+C09` encostados | 11 | 11 | **3** | 0 |
+| `C04+C09` encostados | 161 | 161 | **139** | — |
+| Peças | 9.088 | 9.088 | 9.055 | 6.018* |
+| Buracos / NON_MODULAR / colisões | 20 / 0 / 0 | 20 / 0 / 0 | **20 / 0 / 0** | — |
+| Apoio físico (`UNSUPPORTED_*`) | 0 / 0 | 0 / 0 | **0 / 0** | — |
+| Auditoria de amarração **recalculada** | 3 (`CONTINUOUS_VERTICAL_JOINT`) | 3 | **3 (mesmos)** | — |
+| Peças fixas (canaleta, nó, reparo) | — | idênticas | **idênticas** | — |
+| Sub-preenchimento sob janela | 1 | 1 | 1 | — |
+| Paredes rejeitadas pela validação exata | — | — | 0 | — |
+| Tempo de solve (bancada) | 7,8 s | 14,7 s | 16,7 s | — |
+
+\* humano medido só nas fiadas 0–11 das 34 paredes.
+
+**Lição de medição:** a métrica `BOND_REPROVED_WALLS` da bancada lê a auditoria
+**armazenada** no resultado. Num experimento que troca peças fora do fluxo, ela
+fica desatualizada — a regressão `REPEATED_VERTICAL_COMPENSATOR_STRIP` de um
+protótipo só apareceu recalculando a auditoria. As medições desta seção usam a
+auditoria recalculada.
+
+### 61.4 O que continua aberto
+
+- **195 × 41** na régua 2-D. Restam 80 conflitos de orientação B34×B34, 84 B34
+  sobre B39, 22 sobre a célula lateral do B54 de T e 9 sobre B19.
+- Especiais **767 × 500**.
+- Custo: +8,9 s por solve na bancada em relação ao estado sem arranjo.
+
+**Testes** (`tests/test_b34_run_arrangement.py`): vermelho (sem composição
+nenhuma ordem das mesmas peças alinha o B34 isolado), verde (troca de mesmo
+comprimento remove a violação e um especial, sem família nova), peças criadas
+inteiras do catálogo no mesmo vão com juntas de 1 cm e `course_variant`,
+validação exata que **rejeita e restaura a parede idêntica** (listas e geometria),
+validação que aceita quando nada piora, e o par `C09+C09` nunca trocado por C09
+na ponta.

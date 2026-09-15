@@ -198,3 +198,112 @@ def _slot(lo, hi):
     s = R._Slot()
     s.code, s.lo, s.hi = "B19", lo, hi
     return s
+
+
+# ---------------------------------------------------------------------------
+# SECAO 61 - composicao de mesmo comprimento + aceitacao exata por parede
+# ---------------------------------------------------------------------------
+EVEN_ALL_B39 = [("B39", 0, 39), ("B39", 40, 79), ("B39", 80, 119), ("B39", 120, 159), ("B39", 160, 199)]
+ODD_B34_C04 = [("B19", 0, 19), ("B39", 20, 59), ("B39", 60, 99), ("B34", 100, 134), ("C04", 135, 139),
+               ("B39", 140, 179), ("B19", 180, 199)]
+
+
+def _composition_case():
+    cc = dict((c, _row(EVEN_ALL_B39 if c % 2 == 0 else ODD_B34_C04, c)) for c in range(6))
+    for c in cc:
+        for cand in cc[c]:
+            cand["course_variant"] = c % 2
+    sva.orient_small_voids(cc, CATALOG)
+    return cc
+
+
+def _with_composition(enabled, fn):
+    old = R.B34_RUN_COMPOSITION_ENABLED
+    R.B34_RUN_COMPOSITION_ENABLED = enabled
+    try:
+        return fn()
+    finally:
+        R.B34_RUN_COMPOSITION_ENABLED = old
+
+
+def test_red_without_composition_no_order_of_the_same_pieces_aligns_the_lonely_b34():
+    cc = _composition_case()
+    before = _violations(cc)
+    _with_composition(False, lambda: R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG))
+    sva.orient_small_voids(cc, CATALOG)
+    assert before > 0 and _violations(cc) == before
+
+
+def test_green_same_length_composition_removes_the_violation_and_a_special():
+    cc = _composition_case()
+    before = _violations(cc)
+    specials_before = sum(1 for c in cc for x in cc[c] if CATALOG[x["logical_code"]]["is_compensator"])
+    summary = _with_composition(True, lambda: R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG))
+    sva.orient_small_voids(cc, CATALOG)
+    specials_after = sum(1 for c in cc for x in cc[c] if CATALOG[x["logical_code"]]["is_compensator"])
+    assert summary["compositions"] >= 1
+    assert _violations(cc) < before
+    assert specials_after < specials_before
+    # nunca inventa familia: so' codigos que ja' eram preenchimento
+    assert set(x["logical_code"] for c in cc for x in cc[c]) <= {"B19", "B34", "B39", "C04"}
+
+
+def test_created_pieces_are_whole_catalog_pieces_filling_the_same_span():
+    cc = _composition_case()
+    before = dict((c, _codes_by_t(cc, c, t_max=1e9)) for c in cc)
+    _with_composition(True, lambda: R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG))
+    for c in cc:
+        after = _codes_by_t(cc, c, t_max=1e9)
+        assert after[0][0] == before[c][0][0] and after[-1][1] == before[c][-1][1]
+        for lo, hi, code in after:
+            assert abs((hi - lo) - CATALOG[code]["length_cm"]) < 1e-6
+        for (a_lo, a_hi, _x), (b_lo, _b_hi, _y) in zip(after, after[1:]):
+            assert abs((b_lo - a_hi) - 1.0) < 1e-6
+        assert all(x.get("course_variant") == c % 2 for x in cc[c])
+
+
+def test_exact_validation_rejects_and_restores_the_wall_exactly():
+    """A busca e' um modelo; quem decide e' o validador de producao. Se ele
+    acusar piora, a parede volta EXATAMENTE ao estado anterior."""
+    cc = _composition_case()
+    lists_before = dict((c, list(cc[c])) for c in cc)
+    geometry_before = dict((id(x), (x["origin_world"].X, x["origin_world"].Y, x["x_dir"].X, x["x_dir"].Y))
+                           for c in cc for x in cc[c])
+    calls = []
+
+    def validator(wall_idx, support=True):
+        calls.append(wall_idx)
+        # "antes" limpo, "depois" com um problema novo de auditoria
+        return {"audit": {} if len(calls) == 1 else {"REPEATED_VERTICAL_COMPENSATOR_STRIP": 1},
+                "unsupported": 0}
+
+    summary = _with_composition(True, lambda: R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG,
+                                                                 validate_wall=validator))
+    assert summary["walls_rejected_by_validation"] and summary["walls_changed"] == 0
+    for c in cc:
+        assert [id(x) for x in cc[c]] == [id(x) for x in lists_before[c]]
+        for x in cc[c]:
+            assert (x["origin_world"].X, x["origin_world"].Y, x["x_dir"].X, x["x_dir"].Y) == geometry_before[id(x)]
+
+
+def test_exact_validation_accepts_when_nothing_gets_worse():
+    cc = _composition_case()
+    before = _violations(cc)
+    summary = _with_composition(True, lambda: R.arrange_b34_runs(
+        cc, WALLS, OPENINGS, CATALOG, validate_wall=lambda wi, support=True: {"audit": {}, "unsupported": 0}))
+    sva.orient_small_voids(cc, CATALOG)
+    assert not summary["walls_rejected_by_validation"] and _violations(cc) < before
+
+
+def test_adjacent_compensator_pair_is_never_traded_for_a_c09_at_the_wall_end():
+    """As duas guardas sao separadas: somadas, a busca trocava o par C09+C09
+    encostado por um C09 na ponta da parede (medido nesta fixture)."""
+    even = [("B39", 0, 39), ("B39", 40, 79), ("C09", 80, 89), ("C09", 90, 99), ("B39", 100, 139), ("B39", 140, 179)]
+    odd = [("B34", 0, 34), ("B39", 35, 74), ("B39", 75, 114), ("B39", 115, 154), ("B19", 155, 174), ("C04", 175, 179)]
+    cc = dict((c, _row(even if c % 2 == 0 else odd, c)) for c in range(6))
+    sva.orient_small_voids(cc, CATALOG)
+    _with_composition(True, lambda: R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG))
+    for c in cc:
+        row = _codes_by_t(cc, c, t_max=1e9)
+        first = row[0]
+        assert not (first[2] == "C09" and first[0] <= 2.0), (c, row)
