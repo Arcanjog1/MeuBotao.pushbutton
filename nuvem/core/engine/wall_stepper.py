@@ -112,6 +112,7 @@ __all__ = [
     "_pier_remaining_snapped_cm", "_pier_ordered_layout", "_absorbed_segment_rule2_layout",
     "WALL_FILL_MEMO", "WALL_FILL_MEMO_STATS", "OBB_MEMO",
     "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
+    "physical_tolerance_trial",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
     "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
@@ -6085,6 +6086,73 @@ def _candidate_extents_on_wall(candidates, wall_p0, wall_dir):
     return extents
 
 
+COMPENSATOR_PAIR_FUSION_ENABLED = True
+
+
+def fuse_adjacent_equal_compensators(candidates, start_index, wall_p0, wall_dir, catalog):
+    """REGRA #2, complemento (2026-09-15, missao BUTANTA): dois compensadores
+    IGUAIS encostados (uma junta entre eles) cujo vao total e' exatamente o
+    comprimento de OUTRO compensador do catalogo viram essa peca so'
+    (catalogo atual: C04 + 1 + C04 = 9 = C09). Nasce na fronteira entre o
+    reparo de vao e o preenchimento comum, que se resolvem separados
+    (BUTANTA: C04 de reparo + C04 de preenchimento contra o B54 do no'). O
+    humano nunca usa C04+C04 (0 em 202 corridas de pecas pequenas, 34
+    paredes). Fundir so' REMOVE uma junta: nao cria coincidencia de junta,
+    nao muda contorno nem cobertura. Peca de no' nunca entra. Complementa
+    `_merge_adjacent_compensator_pairs`, que so' funde dentro de um trecho e
+    so' em peca nao compensadora. Muta `candidates[start_index:]` no lugar e
+    devolve o numero de fusoes."""
+    if not COMPENSATOR_PAIR_FUSION_ENABLED:
+        return 0
+    comp_by_length = []
+    for code, entry in catalog.items():
+        if entry.get("is_compensator") and not entry.get("is_channel"):
+            comp_by_length.append((float(entry["length_cm"]), code))
+    comp_by_length.sort()
+    fused = 0
+    changed = True
+    while changed:
+        changed = False
+        tail = candidates[start_index:]
+        items = []
+        for cand in tail:
+            entry = catalog.get(cand.get("logical_code")) or {}
+            if not entry.get("is_compensator") or cand.get("node_index") is not None:
+                continue
+            t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+            items.append((min(t_lo, t_hi), max(t_lo, t_hi), cand))
+        items.sort(key=lambda item: (item[0], item[1]))
+        for (a_lo, a_hi, a), (b_lo, b_hi, b) in zip(items, items[1:]):
+            if a.get("logical_code") != b.get("logical_code") or a.get("course") != b.get("course"):
+                continue
+            if a.get("course_variant") != b.get("course_variant"):
+                continue
+            if abs((b_lo - a_hi) - BLOCK_JOINT_CM) > PIER_LAYOUT_TOLERANCE_CM:
+                continue
+            span = b_hi - a_lo
+            target = None
+            for length, code in comp_by_length:
+                if code != a.get("logical_code") and abs(length - span) <= PIER_LAYOUT_TOLERANCE_CM:
+                    target = code
+                    break
+            if target is None:
+                continue
+            placed = _place_pier_layout(
+                [(target, 0.0, span)], catalog, wall_p0 + wall_dir * _cm_to_ft(a_lo), wall_dir,
+                a.get("course"), a.get("wall_idx"), placement_reason=a.get("placement_reason") or "STANDARD_FILL",
+            )[0]
+            placed["course_variant"] = a.get("course_variant")
+            placed["fused_from"] = [a.get("logical_code"), b.get("logical_code")]
+            pos_a = start_index + next(i for i, c in enumerate(tail) if c is a)
+            pos_b = start_index + next(i for i, c in enumerate(tail) if c is b)
+            candidates[pos_a] = placed
+            del candidates[pos_b]
+            fused += 1
+            changed = True
+            break
+    return fused
+
+
 def _region_bounds_for_run(first, last, extents, seg_lo_cm, seg_hi_cm,
                            opening_intervals_cm):
     """A regiao de reparo de um "run" de pecas derrubadas (indices `first`
@@ -6436,13 +6504,131 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 # 7719511 fica como limitacao conhecida da estrategia CHANNEL.
 RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False
 RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
+# Tentativa por parede (2026-09-15, missao BUTANTA): com a regra ligada, a
+# parede e' resolvida com e sem a absorcao e so' fica com a absorcao quando ela
+# FECHA trecho fora do modulo sem criar coincidencia de junta nova (regra #1).
+# Medido no TGD V1: sem a tentativa, a absorcao num trecho que contem um vao
+# (W131) trocava 1 cm fora do modulo por 120 cm apos o recorte da porta, e numa
+# parede curta com a peca de no' igual nas duas fiadas (W151) enchia as duas
+# familias contra a MESMA face do no' (16 juntas continuas).
+_RESIDUAL_ABSORPTION_SUPPRESSED = [False]
+
+
+def _jamb_noise_tolerance_enabled():
+    from core.engine import continuous_modulation as _cm
+    return _cm.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED
+
+
+def _residual_absorption_active():
+    return RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not _RESIDUAL_ABSORPTION_SUPPRESSED[0]
+
+
+def _non_modular_length_cm(fill_result):
+    return sum(max(0.0, float(item.get("current_length_cm") or 0.0))
+               for item in (fill_result.get("non_modular") or []))
+
+
+def _placed_length_cm(fill_result):
+    return sum(float(c.get("length_cm") or 0.0) for c in (fill_result.get("candidates") or []))
+
+
+def _fill_is_physically_better(trial, base):
+    """Criterio unico das tentativas de tolerancia fisica: nunca cria
+    coincidencia de junta nova (regra #1) e (a) assenta ESTRITAMENTE mais
+    parede, ou (b) assenta o mesmo e fecha trecho fora do modulo. O
+    comprimento fora do modulo sozinho nao decide: a lista de trechos muda de
+    granularidade quando um trecho fecha e os pilaretes de jamba aparecem
+    (anel com janela: 48 cm num trecho so' sem a tolerancia, 80 cm em quatro
+    pilaretes com ela, e 31 cm de parede a mais assentada)."""
+    nm_t, nm_b = _non_modular_length_cm(trial), _non_modular_length_cm(base)
+    ac_t = len(trial.get("alignment_conflicts") or [])
+    ac_b = len(base.get("alignment_conflicts") or [])
+    placed_t, placed_b = _placed_length_cm(trial), _placed_length_cm(base)
+    better = ac_t <= ac_b and (placed_t > placed_b + 0.5 or (abs(placed_t - placed_b) <= 0.5 and nm_t < nm_b - 0.5))
+    return better, {
+        "non_modular_cm_with": round(nm_t, 2), "non_modular_cm_without": round(nm_b, 2),
+        "alignment_conflicts_with": ac_t, "alignment_conflicts_without": ac_b,
+        "placed_cm_with": round(_placed_length_cm(trial), 2),
+        "placed_cm_without": round(_placed_length_cm(base), 2)}
+
+
+def _absorption_leaves_opposite_family_open(fill_result, min_fraction=0.5):
+    """True quando a absorcao fechou um trecho numa familia (A/B) e a familia
+    OPOSTA continua fora do modulo em pelo menos metade desse MESMO trecho: a
+    parede sairia com fiadas alternadas vazias (medido no TGD: fiadas impares
+    fechadas e pares vazias em 4 paredes da V2 e 6 da V1). Pilarete de jamba
+    fora do modulo na familia oposta (anel com janela: 19,5 cm de um trecho de
+    124) nao conta, nem trecho que o recorte de vao marcou com `conflict`
+    (ABERTURA_NAO_COMPATIVEL/SEM_ESPACO): esses sao problemas do vao, que os
+    reparos seguintes ainda tratam."""
+    for absorbed in fill_result.get("residual_absorptions") or ():
+        a_lo, a_hi = absorbed.get("seg_start_cm"), absorbed.get("seg_end_cm")
+        if a_lo is None or a_hi is None or a_hi - a_lo <= 1e-6:
+            continue
+        open_cm = 0.0
+        for item in fill_result.get("non_modular") or ():
+            if item.get("course") == absorbed.get("course") or item.get("conflict") is not None:
+                continue
+            n_lo, n_hi = item.get("seg_start_cm"), item.get("seg_end_cm")
+            if n_lo is None or n_hi is None:
+                continue
+            open_cm += max(0.0, min(a_hi, max(n_lo, n_hi)) - max(a_lo, min(n_lo, n_hi)))
+        if open_cm >= min_fraction * (a_hi - a_lo):
+            return True
+    return False
+
+
+def physical_tolerance_trial(solve_fn):
+    """Regra 30.8 e tolerancia de ruido de jamba (51.13) com TENTATIVA por
+    parede. `solve_fn()` resolve a parede com o estado atual das chaves.
+    Para cada tolerancia LIGADA que de fato decidiu algo nesta parede
+    (absorcao registrada / contador de uso), resolve de novo sem ela e fica
+    com a versao com a tolerancia so' se `_fill_is_physically_better`. Ordem
+    fixa (30.8 e depois jamba), deterministica. Decisoes em
+    `result["physical_tolerance_trial"]`."""
+    from core.engine import continuous_modulation as _cm
+    decisions = []
+    suppressed = []
+    uses_before = _cm.JAMB_SEGMENT_NOISE_USES[0]
+    result = solve_fn()
+    jamb_used = _cm.JAMB_SEGMENT_NOISE_USES[0] > uses_before
+    try:
+        if RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and result.get("residual_absorptions"):
+            _RESIDUAL_ABSORPTION_SUPPRESSED[0] = True
+            uses_mark = _cm.JAMB_SEGMENT_NOISE_USES[0]
+            without = solve_fn()
+            better, info = _fill_is_physically_better(result, without)
+            info["opposite_family_left_open"] = _absorption_leaves_opposite_family_open(result)
+            better = better and not info["opposite_family_left_open"]
+            info.update({"tolerance": "RESIDUAL_NODE_BOUNDED_ABSORPTION", "accepted": better})
+            decisions.append(info)
+            if better:
+                _RESIDUAL_ABSORPTION_SUPPRESSED[0] = False
+            else:
+                result = without
+                suppressed.append("residual")
+                jamb_used = _cm.JAMB_SEGMENT_NOISE_USES[0] > uses_mark
+        if _cm.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED and jamb_used:
+            _cm.JAMB_SEGMENT_NOISE_SUPPRESSED[0] = True
+            without = solve_fn()
+            better, info = _fill_is_physically_better(result, without)
+            info.update({"tolerance": "JAMB_SEGMENT_NOISE", "accepted": better})
+            decisions.append(info)
+            if not better:
+                result = without
+    finally:
+        _RESIDUAL_ABSORPTION_SUPPRESSED[0] = False
+        _cm.JAMB_SEGMENT_NOISE_SUPPRESSED[0] = False
+    if decisions:
+        result["physical_tolerance_trial"] = decisions
+    return result
 
 
 def _residual_node_bounded_absorption(pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open,
                                       kind_left, kind_right, seg_start_cm, seg_end_cm):
     """Regra 30.8 (ver solve_wall_free_fill): (seg_start, seg_end, pier, folga)
     quando o trecho entre dois nos absorve a folga; None caso contrario."""
-    if not (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open and not trailing_is_open
+    if not (_residual_absorption_active() and not leading_is_open and not trailing_is_open
             and pier_cm > 0 and kind_left in ("WALL_START", "MIDSPAN_HI")
             and kind_right in ("WALL_END", "MIDSPAN_LO")
             and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
@@ -7143,6 +7329,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     prefer_avoiding=(course == "B" or variant_index > 0),
                 )
                 candidates[variant_candidates_start:] = recut["candidates"]
+                fuse_adjacent_equal_compensators(candidates, variant_candidates_start, p0, wall_dir, catalog)
                 non_modular.extend(recut["non_modular"])
                 opening_cut_removals.extend(recut["removed"])
                 opening_repair_regions_used.extend(recut["regions"])
@@ -8819,7 +9006,8 @@ def _plain_clone(value):
 def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg, midspan_arg,
                         allow_compensators, variants_per_course, opening_strategy, seed):
     parts = [repr(wall_idx), repr(len(walls_arg)), repr(allow_compensators), repr(variants_per_course),
-             repr(opening_strategy)]
+             repr(opening_strategy), repr(bool(RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED)),
+             repr(bool(_jamb_noise_tolerance_enabled()))]
     line = walls_arg[wall_idx][0]
     p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
     parts.append("|".join(repr(v) for v in (p0.X, p0.Y, p0.Z, p1.X, p1.Y, p1.Z, walls_arg[wall_idx][1])))
@@ -9048,13 +9236,13 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                 if key in memo:
                     WALL_FILL_MEMO_STATS["hits"] += 1
                     return _plain_clone(memo[key])
-            computed = solve_wall_free_fill(
+            computed = physical_tolerance_trial(lambda: solve_wall_free_fill(
                 wall_idx, walls_arg, nodes, end_to_node, openings_arg,
                 by_end_arg, midspan_arg, catalog, allow_compensators,
                 variants_per_course=variants_per_course,
                 opening_strategy=opening_strategy,
                 cross_band_joint_seed=seed,
-            )
+            ))
             if memo is not None:
                 WALL_FILL_MEMO_STATS["misses"] += 1
                 memo[key] = _plain_clone(computed)
@@ -9246,11 +9434,11 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
     # nunca mais `range(len(walls_to_create))`, que seguia a ordem em que as
     # paredes sairam do CAD.
     for wall_idx in order_walls_for_processing(walls_to_create):
-        result = solve_wall_free_fill(
+        result = physical_tolerance_trial(lambda: solve_wall_free_fill(
             wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
             node_candidates_by_wall_end, node_midspan_by_wall_course, catalog, allow_compensators,
             opening_strategy=opening_strategy,
-        )
+        ))
         candidates.extend(result["candidates"])
         jamb_exceptions.extend(result["jamb_exceptions"])
         non_modular.extend(result["non_modular"])

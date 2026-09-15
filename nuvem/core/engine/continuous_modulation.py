@@ -127,10 +127,27 @@ MIN_REPAIR_SEGMENT_CM = PIER_MODULE_CM - 1.0
 # recompoe paredes do TP1 que ja' fechavam (estrategia None deixa de ser igual
 # a' main). Mantida como parametro explicito, nunca implicito.
 JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = False
+# Tentativa por parede (2026-09-15): `wall_stepper.physical_tolerance_trial`
+# resolve a parede com e sem a tolerancia quando ela DECIDIU algum trecho
+# (contador abaixo) e so' fica com ela se o resultado for fisicamente melhor.
+JAMB_SEGMENT_NOISE_SUPPRESSED = [False]
+JAMB_SEGMENT_NOISE_USES = [0]
 
 
 def _jamb_segment_noise_tolerance_cm():
-    return PIER_PHYSICAL_FIT_TOLERANCE_CM if JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED else 0.0
+    if JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED and not JAMB_SEGMENT_NOISE_SUPPRESSED[0]:
+        return PIER_PHYSICAL_FIT_TOLERANCE_CM
+    return 0.0
+
+
+def _accepts_segment(length_cm, min_length_cm):
+    """Trecho solido aceito? Conta quando SO' a tolerancia de ruido aceitou."""
+    if length_cm >= min_length_cm:
+        return True
+    if length_cm >= min_length_cm - _jamb_segment_noise_tolerance_cm():
+        JAMB_SEGMENT_NOISE_USES[0] += 1
+        return True
+    return False
 
 
 def classify_extent_against_openings(t_start_cm, t_end_cm, opening_intervals_cm,
@@ -307,7 +324,7 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
         # BUTANTA 6627438): com JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED a
         # pastilha nao e' descartada (tolerancia FISICA de colocacao).
         # DESLIGADO por default (auditoria 2026-09-14): muda o legado do TP1.
-        if seg_hi - cursor_cm >= min_length_cm - _jamb_segment_noise_tolerance_cm():
+        if _accepts_segment(seg_hi - cursor_cm, min_length_cm):
             segments.append(entry)
         elif seg_hi - cursor_cm > OPENING_FIT_TOLERANCE_CM:
             undersized.append(entry)
@@ -320,7 +337,7 @@ def region_solid_subsegments(region, opening_intervals_cm, joint_cm=BLOCK_JOINT_
         "trailing_open": not region.get("right_anchor_is_block"),
         "left_opening": left_opening, "right_opening": None,
     }
-    if hi_cm - cursor_cm >= min_length_cm - _jamb_segment_noise_tolerance_cm():
+    if _accepts_segment(hi_cm - cursor_cm, min_length_cm):
         segments.append(entry)
     elif hi_cm - cursor_cm > OPENING_FIT_TOLERANCE_CM:
         undersized.append(entry)

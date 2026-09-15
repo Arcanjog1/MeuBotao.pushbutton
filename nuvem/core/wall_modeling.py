@@ -3679,13 +3679,23 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
     return best
 
 
+# Tolerancias fisicas da regra 30.8 e do ruido de jamba (51.13), COM a
+# tentativa por parede de `wall_stepper.physical_tolerance_trial`, ligadas SO'
+# durante a estrategia de reforco de aberturas (CHANNEL, opt-in - secao 30.9).
+# O motor legado (estrategia None, congelado pelo benchmark) continua identico
+# ao da main: as chaves globais do modulo seguem desligadas.
+CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
+
+
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
     """Wrapper de desempenho: com estrategia de reforco ativa, liga o memo de
     preenchimento por parede (`wall_stepper.WALL_FILL_MEMO`, chave canonica das
-    entradas, resultado identico) so' durante esta chamada. Legado (None) nao
-    muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
+    entradas, resultado identico) so' durante esta chamada, e as tolerancias
+    fisicas com tentativa (`CHANNEL_PHYSICAL_TOLERANCES_ENABLED`, secao 30.9).
+    Legado (None) nao muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
     from core.engine import wall_stepper as _stepper_memo
+    from core.engine import continuous_modulation as _cm_flags
     if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
         return _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                                        catalog, base_z_abs, num_courses, **kwargs)
@@ -3693,14 +3703,50 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     _stepper_memo.OBB_MEMO = {}
     _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
     _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
+    saved_tolerances = (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+                        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
+    if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
+        _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
+        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
     try:
         result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                                          catalog, base_z_abs, num_courses, **kwargs)
     finally:
         _stepper_memo.WALL_FILL_MEMO = None
         _stepper_memo.OBB_MEMO = None
+        (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
+    if isinstance(result, dict):
+        result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
+    return result
+
+
+def _physical_support_final(result, catalog, walls_to_create, openings_per_wall, base_z_abs):
+    """APOIO FISICO ENTRE FIADAS (secao 53, 2026-09-15): validador somente
+    leitura sobre o resultado FINAL - `result["physical_support"]` com as
+    contagens `UNSUPPORTED_SMALL_BLOCK`/`UNSUPPORTED_BLOCK` e os itens. Ver
+    `core/engine/physical_support.py`. Idempotente."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    if result.get("physical_support") is not None or not result.get("course_candidates"):
+        return result
+    from core.engine import physical_support as _support
+    course_height_ft, _err = _course_height_ft(catalog, None)
+    block_height_ft, _err2 = _block_height_ft(catalog, None)
+    if course_height_ft is None or block_height_ft is None:
+        return result
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs or 0.0, course_index, course_height_ft, block_height_ft)
+
+    items = _support.unsupported_pieces(result["course_candidates"], walls_to_create,
+                                        openings_per_wall, _band)
+    counts = {"UNSUPPORTED_SMALL_BLOCK": 0, "UNSUPPORTED_BLOCK": 0}
+    for item in items:
+        counts[item["kind"]] += 1
+    result["physical_support"] = {"counts": counts, "items": items}
     return result
 
 
@@ -3849,10 +3895,11 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
                                                "timing": channel_parity.get("timing")}
 
     if not enabled or result.get("error") is not None:
-        return _orient_small_voids_final(_apply_opening_reinforcement(
+        return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
             original_openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog)
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog),
+            catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3884,10 +3931,11 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
-    return _orient_small_voids_final(_apply_opening_reinforcement(
+    return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
         original_openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog)
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog),
+        catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
 
 CHANNEL_TRIAL_CHEAP_GATES = ("bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",

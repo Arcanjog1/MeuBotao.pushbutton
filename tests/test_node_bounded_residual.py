@@ -34,12 +34,17 @@ NUM_COURSES = 14
 
 @contextlib.contextmanager
 def absorption(enabled):
-    before = ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED
+    """Liga/desliga a 30.8 nos DOIS caminhos: a chave global do modulo e a
+    ativacao dentro da estrategia CHANNEL (secao 30.9, 2026-09-15). Com a
+    CHANNEL ligando as tolerancias por conta propria, o vermelho "sem
+    absorcao" precisa desligar tambem essa ativacao."""
+    before = (ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
     ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = enabled
+    m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED = enabled
     try:
         yield
     finally:
-        ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = before
+        ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED = before
 
 
 def ring_lines():

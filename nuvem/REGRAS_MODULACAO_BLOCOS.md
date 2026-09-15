@@ -5238,6 +5238,10 @@ formalizar/implementar a política. Relatório completo:
 > conhecida** da estratégia CHANNEL (canaleta inferior ausente sobre trecho não
 > modular). O conhecimento abaixo continua registrado; religar exige nova
 > decisão.
+>
+> **ATUALIZADO 2026-09-15 (seção 30.9)**: a chave global continua desligada (legado
+> idêntico à main), mas a estratégia CHANNEL liga a 30.8 com TENTATIVA por parede;
+> os defeitos que motivaram o desligamento foram reproduzidos e barrados pelos gates.
 
 **Quando**: um trecho de preenchimento limitado por nó dos DOIS lados (início/fim
 de parede em L/T/X ou nó de meio de parede — nunca jamba nem ponta livre) não
@@ -5301,6 +5305,69 @@ Mantida a alternância 30.5.
   sobe 10% e 3 paredes perdem ≤ 210 cm líquidos
   (`evidence/2026-09-14-channel-regressao-cobertura-tgd.txt`). Baselines não
   regravados.
+
+### 30.9 CONHECIMENTO DE AMARRAÇÃO — TENTATIVA COM GATES (implementada, 2026-09-15) — tolerâncias físicas (30.8 e ruído de jamba) só valem quando a parede fica fisicamente melhor
+
+**Pedido do usuário (missão BUTANTÃ, 2026-09-15)**: corrigir os resíduos
+NON_MODULAR que o humano resolve (buracos em pilaretes e no anel de shaft), sem
+trocar erro, sem regressão crítica e sem mascarar validador.
+
+**Por que a 30.8 e a tolerância de jamba (51.13/51.14) tinham sido desligadas**:
+ligadas sem controle, mudavam o legado e o benchmark. Medido nesta missão, parede
+a parede (TGD/TP1, V1/V2), com a 30.8 ligada sem tentativa:
+
+| Defeito | Onde | Causa |
+|---|---|---|
+| B19 perdido em 5 fiadas (20 cm por fiada) | TGD V1, parede de 146 cm com porta | a absorção desloca as peças de um trecho que CONTÉM o vão; o recorte da porta deixa a sobra fora do módulo |
+| 16 juntas contínuas + 8 compensadores consecutivos | TGD V1, parede curta com a mesma peça de nó nas duas fiadas | as duas famílias enchem contra a MESMA face do nó |
+| fiadas alternadas vazias | TGD V2 (4 paredes) e V1 (6) | a absorção fecha uma família e a oposta continua fora do módulo no mesmo trecho |
+
+Com a tolerância de jamba ligada sem tentativa: duas paredes do TGD V1 perdem 221
+e 75 cm assentados (efeito dos eixos sobrepostos da topologia histórica: a
+pastilha de 4 cm aceita na parede vizinha, 12,8 cm ao lado, colide com peças da
+parede processada depois); a V2 não tem esse efeito.
+
+**REGRA (implementada)** — `wall_stepper.physical_tolerance_trial`, chamada em
+volta de cada `solve_wall_free_fill` do fluxo por parede:
+1. resolve a parede com as tolerâncias ligadas;
+2. se a 30.8 absorveu algum trecho, resolve de novo sem ela e só fica com a
+   absorção quando: nenhuma coincidência de junta nova (`alignment_conflicts`,
+   regra #1), comprimento assentado estritamente maior (ou igual com menos
+   trecho fora do módulo) e a família oposta NÃO continua fora do módulo em
+   metade ou mais do trecho absorvido (trechos marcados pelo recorte de vão com
+   `conflict` não contam: são problema do vão, tratados depois);
+3. se a tolerância de jamba decidiu algum trecho (contador
+   `JAMB_SEGMENT_NOISE_USES`), resolve sem ela e aplica o mesmo critério.
+Ordem fixa, determinística; decisões em `result["physical_tolerance_trial"]`
+do preenchimento da parede.
+
+**Escopo (decisão desta missão)**: as tolerâncias com tentativa são ligadas
+SOMENTE durante a estratégia de reforço de aberturas CHANNEL
+(`CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True` em `core/wall_modeling.py`,
+restauradas no `finally`). O motor legado (estratégia None, congelado pelo
+benchmark) continua com as chaves globais desligadas — é o motivo da opção B
+da auditoria de 2026-09-14 (não mudar o legado). Medido com as tolerâncias e a
+tentativa ligadas no legado (para registro, NÃO ativado): TGD V1 descoberto
+198.325 → 180.765 cm, sem regressão crítica; TGD V2 185.814 → 151.540 cm, mas
+`COVERAGE_ROW_MOSTLY_EMPTY` 86 → 92 por reclassificação (as 12 fiadas novas são
+iguais ou melhores, em paredes que deixaram de ser `COVERAGE_PARTIAL_WALL`) e
+categoria compensadores 62 → 63. Levar para o legado exige decisão sobre a régua.
+
+**Evidência BUTANTÃ (bancada offline do doc de teste, 34 paredes, 13 fiadas,
+CHANNEL)**:
+
+| Métrica | Sem tolerâncias | Com tolerâncias + tentativa | Humano |
+|---|---|---|---|
+| Buracos (trecho sem peça fora de vão) | 94 (3.754 cm) | 10 (872 cm) | 71 |
+| Trechos NON_MODULAR | 78 | 0 | — |
+| Peças sem apoio (régua da seção 53) | 50 | 0 | 9 |
+| MISSING_REQUIRED_CHANNEL | 1 | 0 | — |
+
+Os 10 buracos restantes coincidem com vazios do humano (passagem livre até o
+topo, pilaretes de 5 e 15 cm). **Testes**: `tests/test_physical_tolerance_trial.py`
+(critério, família oposta, jamba, restauração das chaves) e
+`tests/test_node_bounded_residual.py` (anel de shaft com e sem a tolerância,
+agora desligando também a ativação na CHANNEL no vermelho).
 
 ## 32. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
 segurança para candidatos de papel; SAFE REPAIR ATIVADO em produção
@@ -7948,3 +8015,60 @@ missão — a orientação não altera nenhum achado (contorno idêntico).
 passe, verde com ele, peça de nó nunca gira, rotação rígida, invariância a
 translação/ordem/sentido, controle do validador (deslocado 20 cm e girado
 alinha; mesma orientação viola), sem restrição sem vizinho vazado.
+
+## 53. Apoio físico entre fiadas — validador `UNSUPPORTED_SMALL_BLOCK` (2026-09-15)
+
+**Pedido do usuário (missão BUTANTÃ)**: peça pequena "voando" (B19/C09/C04 sem
+apoio) não pode sair do solver; o validador deve ser calibrado no humano e não
+pode apagar peça necessária.
+
+**Régua (implementada, somente leitura)** — `core/engine/physical_support.py`,
+chamada por `_physical_support_final` sobre o resultado FINAL:
+- para cada peça da fiada c ≥ 1, mede na linha de centro dela a fração do
+  comprimento sobre alguma peça da fiada c−1 (qualquer parede) e a fração sobre
+  vão ativo na faixa da fiada c−1 da parede dona ou secundária;
+- reporta quando as DUAS frações são menores que 0,5
+  (`SUPPORT_MIN_FRACTION`): `UNSUPPORTED_SMALL_BLOCK` (comprimento ≤ 19,5 cm) ou
+  `UNSUPPORTED_BLOCK`;
+- canaleta ou peça sobre abertura não conta como sem apoio: é reforço, auditado
+  pela estratégia de aberturas.
+
+Resultado em `result["physical_support"]` (`counts`, `items` em ordem
+determinística). Nada é alterado: a correção é feita na causa (30.9, 54).
+
+**Calibração**: humano BUTANTÃ 1º PAV, 34 paredes, fiadas 0–12, mesma régua:
+9 peças, todas em pilarete de passagem e topo de vão. Lote anterior do botão
+no doc de teste: 116. Bancada (CHANNEL, 34 paredes, 13 fiadas): 52 sem as
+tolerâncias (cantos B34 do anel de shaft sobre fiada vazia), 0 com 30.9.
+
+**Testes**: `tests/test_physical_support_audit.py` (peça voando reportada, apoio
+≥ metade não reportado, peça sobre vão ativo não reportada e vão fora da faixa
+não desculpa, apoio de parede perpendicular conta, ordem determinística).
+
+## 54. Compensadores iguais encostados viram o compensador do vão total (2026-09-15)
+
+**REGRA OBRIGATÓRIA (complemento da regra #2, implementada)**: dois
+compensadores IGUAIS encostados (uma junta entre eles) cujo vão total é
+exatamente o comprimento de OUTRO compensador do catálogo viram essa peça só.
+No catálogo atual: C04 + 1 + C04 = 9 = C09.
+
+**Evidência**: humano BUTANTÃ, 202 corridas de peças pequenas em 34 paredes:
+zero C04+C04. No solver, o par nasce na fronteira entre o reparo de vão
+(`OPENING_REPAIR_FILL`) e o preenchimento comum, resolvidos separados — por
+exemplo C04 de reparo + C04 de preenchimento contra o B54 de um nó (parede de
+2.929 cm, fiadas 6 e 8). `_merge_adjacent_compensator_pairs` só funde dentro de
+um trecho e só em peça não compensadora, por isso não via o caso.
+
+**Implementação**: `fuse_adjacent_equal_compensators`
+(`core/engine/wall_stepper.py`), logo depois de `_recut_openings_and_repair`
+em cada variante, antes de medir as juntas finais. Peça de nó nunca entra;
+códigos diferentes, junta diferente de 1 cm ou alvo não compensador (C09 + C09
+= 19 = B19) ficam como estão — o B19 continua sob a guarda de ponta aberta da
+seção 2. Fundir só remove uma junta: não cria coincidência, não muda contorno
+nem cobertura.
+
+**Medido**: bancada BUTANTÃ C04+C04 encostados 7 → 0. Benchmark legado:
+`COMPENSATOR_CONSECUTIVE` TP1 936 → 881, TGD V2 472 → 464; nenhum outro achado
+muda e os vereditos são idênticos. **Testes**:
+`tests/test_physical_tolerance_trial.py` (fusão, nó, códigos mistos, junta
+larga, alvo não compensador, início da variante).
