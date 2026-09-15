@@ -8384,43 +8384,43 @@ repete. O caminho é alternar o elemento do nó degradado pela fiada FÍSICA e n
 pela família lógica, ou submeter a escolha do nó à mesma tentativa por parede da
 seção 56.2.
 
-### 58.3 A Â§58.2 ligada sÃ³ no fluxo CHANNEL â€” e a condiÃ§Ã£o que falta para o legado (2026-09-15)
+### 58.3 A §58.2 ligada só no fluxo CHANNEL — e a condição que falta para o legado (2026-09-15)
 
-Revisitada sobre as Â§60â€“62, **por fiada fÃ­sica** e com a rÃ©gua estrita do
-benchmark (junta interna alinhada entre duas fiadas **consecutivas**, tolerÃ¢ncia
-1,5 cm, sem ponta de parede nem borda de vÃ£o):
+Revisitada sobre as §60–62, **por fiada física** e com a régua estrita do
+benchmark (junta interna alinhada entre duas fiadas **consecutivas**, tolerância
+1,5 cm, sem ponta de parede nem borda de vão):
 
-| BUTANTÃƒ (17 fiadas, fiadas 0â€“11) | Sem 58.2 | **Com 58.2** | Humano |
+| BUTANTÃ (17 fiadas, fiadas 0–11) | Sem 58.2 | **Com 58.2** | Humano |
 |---|---|---|---|
 | Juntas alinhadas em fiadas consecutivas | 26 | **4** | 205 |
-| Vazado menor â€” validador de produÃ§Ã£o | 186 | **159** | â€” |
-| Vazado menor â€” rÃ©gua 2-D | 139 | **112** | 41 |
+| Vazado menor — validador de produção | 186 | **159** | — |
+| Vazado menor — régua 2-D | 139 | **112** | 41 |
 | B34 sobre B39 | 85 | **54** | 2 |
 | Especiais | 767 | **761** | 500 |
-| Buracos / colisÃµes / apoio / auditoria recalculada | 20 / 0 / 0 / 3 | **20 / 0 / 0 / 3** | â€” |
+| Buracos / colisões / apoio / auditoria recalculada | 20 / 0 / 0 / 3 | **20 / 0 / 0 / 3** | — |
 
-Na BUTANTÃƒ a Â§58.2 **reduz** as juntas alinhadas (as paredes do nÃ³ degradado:
+Na BUTANTÃ a §58.2 **reduz** as juntas alinhadas (as paredes do nó degradado:
 8284580 10 â†’ 0, 8284563 4 â†’ 0, 8284558 6 â†’ 2, 8284562 6 â†’ 2).
 
-**CondiÃ§Ã£o que falta para ligar no legado â€” medida no TP1 V1** (as juntas
+**Condição que falta para ligar no legado — medida no TP1 V1** (as juntas
 corridas novas caem todas em fronteira de banda, fiadas 7/8, 10/11 e 12/13):
 
-1. **PeÃ§a de nÃ³ repetida em duas fiadas vizinhas** (W052, W054, W055, W056): o B34
-   de amarraÃ§Ã£o do nÃ³ aparece em 0â€“34 cm nas duas fiadas da fronteira; a face
+1. **Peça de nó repetida em duas fiadas vizinhas** (W052, W054, W055, W056): o B34
+   de amarração do nó aparece em 0–34 cm nas duas fiadas da fronteira; a face
    em 34,5 cm se repete.
-2. **PeÃ§a de nÃ³ ausente numa das fiadas** (W035, W045, W066, W075): fiada 7 com
-   `C09` de nÃ³ + `B39` terminando em 49 cm; fiada 8 sem peÃ§a de nÃ³, preenchimento
-   comeÃ§ando na reserva com `B34` terminando tambÃ©m em 49 cm â€” face em 49,5 cm
+2. **Peça de nó ausente numa das fiadas** (W035, W045, W066, W075): fiada 7 com
+   `C09` de nó + `B39` terminando em 49 cm; fiada 8 sem peça de nó, preenchimento
+   começando na reserva com `B34` terminando também em 49 cm — face em 49,5 cm
    alinhada.
 
-A BUTANTÃƒ nÃ£o tem essa combinaÃ§Ã£o de banda Ã— nÃ³ degradado; o TP1 tem. A regra
-do nÃ³ degradado precisa decidir o elemento **pela fiada fÃ­sica atravÃ©s das
+A BUTANTÃ não tem essa combinação de banda × nó degradado; o TP1 tem. A regra
+do nó degradado precisa decidir o elemento **pela fiada física através das
 fronteiras de banda** antes de valer no legado.
 
 **Implementado:** `CHANNEL_DEGRADED_TIE_BLOCK_ENABLED` (`core/wall_modeling.py`)
-liga `CORNER_DEGRADED_PREFERS_TIE_BLOCK` **sÃ³ durante** o solve com estratÃ©gia de
-reforÃ§o â€” o mesmo mecanismo das tolerÃ¢ncias da Â§30.9 â€” e restaura no fim. A chave
-global continua `False`; o legado (`strategy=None`) fica idÃªntico.
+liga `CORNER_DEGRADED_PREFERS_TIE_BLOCK` **só durante** o solve com estratégia de
+reforço — o mesmo mecanismo das tolerâncias da §30.9 — e restaura no fim. A chave
+global continua `False`; o legado (`strategy=None`) fica idêntico.
 `tests/test_degraded_node_tie_block.py` confere o escopo (ligada no CHANNEL,
 nunca vista ligada no legado, restaurada depois).
 
@@ -8665,41 +8665,41 @@ validação exata que **rejeita e restaura a parede idêntica** (listas e geomet
 validação que aceita quando nada piora, e o par `C09+C09` nunca trocado por C09
 na ponta.
 
-## 62. OrientaÃ§Ã£o Ã³tima exata dos B34 de preenchimento por parede (2026-09-15, IMPLEMENTADO, sÃ³ CHANNEL)
+## 62. Orientação ótima exata dos B34 de preenchimento por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
 
 ### 62.1 Achado
 
-Dos 195 que restavam depois das Â§60/Â§61 (rÃ©gua 2-D), 80 eram B34Ã—B34 **na
-janela de orientaÃ§Ã£o oposta** â€” geometricamente alinhÃ¡veis. Medindo o mÃ­nimo
-exato de violaÃ§Ãµes sÃ³ por orientaÃ§Ã£o, com as posiÃ§Ãµes fixas e **os B34 de nÃ³
-fixos** (Â§5): a busca exaustiva em janelas chegou a 217 e a programaÃ§Ã£o
-dinÃ¢mica exata a **198**, contra 259 da orientaÃ§Ã£o gulosa (modelo 1-D). Girar
-blocos contÃ­guos da cadeia com melhora estrita chegou sÃ³ a 251 â€” hipÃ³tese
+Dos 195 que restavam depois das §60/§61 (régua 2-D), 80 eram B34×B34 **na
+janela de orientação oposta** — geometricamente alinháveis. Medindo o mínimo
+exato de violações só por orientação, com as posições fixas e **os B34 de nó
+fixos** (§5): a busca exaustiva em janelas chegou a 217 e a programação
+dinâmica exata a **198**, contra 259 da orientação gulosa (modelo 1-D). Girar
+blocos contíguos da cadeia com melhora estrita chegou só a 251 — hipótese
 descartada.
 
-**Causa:** a Â§52 gira uma peÃ§a (ou um par) por vez e sÃ³ aceita melhora estrita.
-Em corridas longas de B34 encadeadas entre fiadas, a orientaÃ§Ã£o precisa alternar
-ao longo da cadeia inteira; um trecho "fora de fase" â€” tÃ­pico entre B34 de nÃ³
-fixos nas duas pontas e numa fiada Ãºnica de fronteira de banda â€” sÃ³ se corrige
-girando vÃ¡rias peÃ§as ao mesmo tempo.
+**Causa:** a §52 gira uma peça (ou um par) por vez e só aceita melhora estrita.
+Em corridas longas de B34 encadeadas entre fiadas, a orientação precisa alternar
+ao longo da cadeia inteira; um trecho "fora de fase" — típico entre B34 de nó
+fixos nas duas pontas e numa fiada única de fronteira de banda — só se corrige
+girando várias peças ao mesmo tempo.
 
 ### 62.2 Regra
 
 `_Wall.orient_exact` (`core/engine/b34_run_arrangement.py`), depois da
-reordenaÃ§Ã£o (Â§60) e da composiÃ§Ã£o (Â§61):
+reordenação (§60) e da composição (§61):
 
-- variÃ¡veis = orientaÃ§Ã£o dos B34 **de preenchimento** (mÃ³veis) de cada famÃ­lia
-  de fiada; peÃ§a de nÃ³, reparo de vÃ£o e canaleta ficam fixas;
-- fator = violaÃ§Ãµes de um B34-fonte; depende sÃ³ da orientaÃ§Ã£o dele e dos B34 que
-  podem cobrir o vazado dele (a menos de meia peÃ§a). Em ordem de posiÃ§Ã£o, cada
-  fator envolve variÃ¡veis vizinhas â†’ DP com estado = orientaÃ§Ã£o das Ãºltimas *k*
-  variÃ¡veis (*k* = largura de banda);
-- aceita sÃ³ se o Ã³timo for **estritamente** menor; banda acima de
-  `ORIENTATION_DP_MAX_BAND = 12` deixa a parede para a Â§52;
-- a gravaÃ§Ã£o gira tambÃ©m B34 isolado (fora de corrida) e passa pela mesma
-  aceitaÃ§Ã£o exata por parede da Â§61. A Â§52 roda de novo em 2-D depois.
+- variáveis = orientação dos B34 **de preenchimento** (móveis) de cada família
+  de fiada; peça de nó, reparo de vão e canaleta ficam fixas;
+- fator = violações de um B34-fonte; depende só da orientação dele e dos B34 que
+  podem cobrir o vazado dele (a menos de meia peça). Em ordem de posição, cada
+  fator envolve variáveis vizinhas → DP com estado = orientação das últimas *k*
+  variáveis (*k* = largura de banda);
+- aceita só se o ótimo for **estritamente** menor; banda acima de
+  `ORIENTATION_DP_MAX_BAND = 12` deixa a parede para a §52;
+- a gravação gira também B34 isolado (fora de corrida) e passa pela mesma
+  aceitação exata por parede da §61. A §52 roda de novo em 2-D depois.
 
-SÃ³ gira peÃ§as: contorno, juntas, cobertura e apoio nÃ£o mudam por construÃ§Ã£o.
+Só gira peças: contorno, juntas, cobertura e apoio não mudam por construção.
 
 ### 62.3 Medido — BUTANTÃ no fluxo real (17 fiadas), DP exata corrigida
 
@@ -8744,7 +8744,7 @@ linhas, 91 diferem — todas canaletas da parede 0, o desempate pré-existente d
 planejador CHANNEL (§60.7). Solve no Revit: 116 s.
 
 **Testes** (`tests/test_b34_run_arrangement.py`) sobre a parede **real** 8284579
-(209 cm, B34 de nÃ³ nas duas pontas, 17 fiadas) no estado em que a Â§52 travou:
-vermelho (gulosa e reordenaÃ§Ã£o ficam em 10), verde (DP leva a 0 sem mudar
-posiÃ§Ã£o de nenhuma peÃ§a nem orientaÃ§Ã£o de nÃ³), teto de banda devolve a parede Ã 
-Â§52, idempotÃªncia.
+(209 cm, B34 de nó nas duas pontas, 17 fiadas) no estado em que a §52 travou:
+vermelho (gulosa e reordenação ficam em 10), verde (DP leva a 0 sem mudar
+posição de nenhuma peça nem orientação de nó), teto de banda devolve a parede à
+§52, idempotência.
