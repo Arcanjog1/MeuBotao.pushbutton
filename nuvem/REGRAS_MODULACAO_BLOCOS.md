@@ -8006,9 +8006,17 @@ convenção fixa.
 - Flag `SMALL_VOID_ORIENTATION_ENABLED = True`.
 
 **Medido (bancada offline do doc de teste, 34 paredes, 13 fiadas):**
-violações 2.000 → 294 em 0,3 s, sem mudar contorno nem juntas. As 294
-restantes pedem mudança de **posição** (não de orientação) e continuam
-registradas como limitação. Benchmark TGD/TP1 (V1/V2): ver checkpoint da
+violações 2.000 → 294 em 0,3 s, sem mudar contorno nem juntas.
+
+**Giro em par (2026-09-15, implementado)**: dois B34 sobrepostos em fiadas
+vizinhas, deslocados 15–20 cm, cada um com uma peça sem vazado menor do outro
+lado, só alinham girando os DOIS juntos — girar um só troca uma violação por
+outra e o passe guloso para. Depois do passe individual, `orient_small_voids`
+testa cada par (peça móvel, vizinha móvel sobreposta na fiada de cima) e gira
+os dois quando a soma das violações locais cai estritamente. Bancada:
+294 → 264. As restantes pedem mudança de **posição** (exemplo medido: pilarete
+entre jamba e nó B54 em que qualquer orientação deixa um vazado menor sobre
+B19 ou sobre o nó) e continuam registradas como limitação. Benchmark TGD/TP1 (V1/V2): ver checkpoint da
 missão — a orientação não altera nenhum achado (contorno idêntico).
 
 **Testes:** `tests/test_b34_small_void_alignment.py` — vermelho sem o

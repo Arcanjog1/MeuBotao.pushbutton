@@ -292,5 +292,44 @@ def orient_small_voids(course_candidates, catalog=None, is_fixed=None,
                     rotated.add(id(cand))
             else:
                 rotate_candidate_180(cand)
+    # GIRO EM PAR (2026-09-15): dois B34 sobrepostos em fiadas vizinhas com
+    # deslocamento de 15-20 cm so' alinham os DOIS vazados menores girando os
+    # dois juntos (humano: corridas de B34 deslocadas entre fiadas com
+    # orientacao oposta). Girar um so' nao reduz estritamente a violacao e o
+    # passe guloso acima para. Aqui, para cada par (peca movel, vizinha movel
+    # sobreposta na fiada de cima), gira os dois quando a soma das violacoes
+    # locais cai estritamente. Mesma ordem deterministica.
+    pair_passes = 0
+    changed = True
+    by_id = dict((id(cand), (cand, courses)) for cand, courses in movable)
+    while changed and pair_passes < max_passes:
+        changed = False
+        pair_passes += 1
+        for cand, courses in movable:
+            partners = []
+            for course_index in courses:
+                for neighbor in index.near(course_index + 1, cand):
+                    entry = by_id.get(id(neighbor))
+                    if entry is None or neighbor is cand:
+                        continue
+                    partners.append(entry)
+            partners.sort(key=lambda item: (item[1][0], _physical_key(item[0])))
+            for other, other_courses in partners:
+                current = _local_cost(index, cand, courses, tol_ft) + _local_cost(index, other, other_courses, tol_ft)
+                if current == 0:
+                    continue
+                rotate_candidate_180(cand)
+                rotate_candidate_180(other)
+                flipped = _local_cost(index, cand, courses, tol_ft) + _local_cost(index, other, other_courses, tol_ft)
+                if flipped < current:
+                    changed = True
+                    for piece in (cand, other):
+                        if id(piece) in rotated:
+                            rotated.discard(id(piece))
+                        else:
+                            rotated.add(id(piece))
+                else:
+                    rotate_candidate_180(cand)
+                    rotate_candidate_180(other)
     after = len(b34_small_void_violations(course_candidates, catalog, tolerance_cm))
-    return {"rotated": len(rotated), "passes": passes, "before": before, "after": after}
+    return {"rotated": len(rotated), "passes": passes, "pair_passes": pair_passes, "before": before, "after": after}

@@ -134,3 +134,40 @@ def test_sem_peca_vazada_vizinha_nao_ha_restricao():
     comp = m._make_block_candidate("C09", CATALOG["C09"], "B", X(ft(10.0), 0.0, 0.0), X(1.0, 0.0, 0.0), "STANDARD_FILL")
     assert not sva.b34_small_void_violations({0: [a], 1: [comp]}, CATALOG)
     assert not sva.b34_small_void_violations({0: [a]}, CATALOG)
+
+
+def _piece_at(code, start_cm, course_label):
+    entry = CATALOG[code]
+    return m._place_pier_layout([(code, start_cm, start_cm + entry["length_cm"])], CATALOG,
+                                m.XYZ(0.0, 0.0, 0.0), m.XYZ(1.0, 0.0, 0.0), course_label, 0)[0]
+
+
+def _pair_only_case():
+    """Dois B34 sobrepostos (deslocados 15 cm) em fiadas vizinhas, cada um com
+    um B39 do outro lado: girar UM so' troca uma violacao por outra; girar os
+    DOIS juntos alinha os dois vazados menores (padrao humano de corrida de
+    B34 deslocada com orientacao oposta)."""
+    a = _piece_at("B34", 0.0, "A")      # vazado menor a esquerda (6,8 cm)
+    b = _piece_at("B34", 15.0, "B")     # vazado menor a esquerda (21,8 cm)
+    sva.rotate_candidate_180(b)         # comeca a direita (42,2 cm): errado
+    courses = {0: [a, _piece_at("B39", 35.0, "A")], 1: [_piece_at("B39", -25.0, "B"), b]}
+    return courses, a, b
+
+
+def test_pair_rotation_red_single_flips_cannot_fix():
+    courses, a, b = _pair_only_case()
+    before = len(sva.b34_small_void_violations(courses, CATALOG))
+    assert before == 2
+    for piece in (a, b):
+        sva.rotate_candidate_180(piece)
+        assert len(sva.b34_small_void_violations(courses, CATALOG)) >= before
+        sva.rotate_candidate_180(piece)
+
+
+def test_pair_rotation_green_aligns_both_small_voids():
+    courses, a, b = _pair_only_case()
+    summary = sva.orient_small_voids(courses, CATALOG)
+    assert summary["before"] == 2 and summary["after"] == 0
+    cell_a = sva.candidate_small_cell(a)["point"].X * 30.48
+    cell_b = sva.candidate_small_cell(b)["point"].X * 30.48
+    assert abs(cell_a - 27.2) < 0.2 and abs(cell_b - 21.8) < 0.2
