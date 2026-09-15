@@ -87,6 +87,9 @@ PAIR_FLIP_REACH_CM = 25.0
 # ainda pode dominar - ordenadas por esse limite. K=4 ja' da' o mesmo resultado
 # de K=8/16 e da conjunta em todas.
 REFINE_TOP_K = 4
+# alcance para achar as fontes cobertas por uma peca (centro do vazado a ate'
+# ~9 cm do centro do B34; folga para qualquer peca do catalogo)
+COVER_REACH_CM = 30.0
 MAX_PASSES = 3
 RUN_MAX_GAP_CM = 2.5
 FACE_TOLERANCE_CM = 0.6
@@ -218,10 +221,17 @@ def _covering(slots, t):
 
 
 def _in_window(slots, lo, hi):
+    """Pecas que tocam [lo, hi], em ordem (fatia: `lo` tambem e' crescente -
+    uma lista em vez de gerador, que custava uma volta Python por peca)."""
     i = _first_hi_at_least(slots, lo)
-    while i < len(slots) and slots[i].lo <= hi:
-        yield slots[i]
-        i += 1
+    low, high = i, len(slots)
+    while low < high:
+        middle = (low + high) // 2
+        if slots[middle].lo <= hi:
+            low = middle + 1
+        else:
+            high = middle
+    return slots[i:low]
 
 
 def _violations_between(lower, upper, tol_cm, window=None):
@@ -616,7 +626,7 @@ class _Wall(object):
         se sobrepoem ao trecho. Inverter UMA peca so' muda violacoes perto dela:
         cada teste mede a janela da propria peca em TODAS as interfaces."""
         slots = self.fam[f]
-        pieces = [slots[i] for i in run if slots[i].orientable]
+        pieces = [(slots[i], f) for i in run if slots[i].orientable]
         if joint and NEIGHBOUR_FLIPS_ENABLED and run:
             lo = slots[run[0]].lo - NEIGHBOUR_REACH_CM
             hi = slots[run[-1]].hi + NEIGHBOUR_REACH_CM
@@ -625,19 +635,24 @@ class _Wall(object):
                     continue
                 for slot in _in_window(self.fam[other], lo, hi):
                     if slot.orientable and slot.movable:
-                        pieces.append(slot)
-        interfaces = sorted(self.weights.items())
+                        pieces.append((slot, other))
+        # interfaces de cada familia: inverter pecas das familias `families` so'
+        # muda essas parcelas (as outras sao iguais antes e depois do teste)
+        touching = collections.defaultdict(list)
+        for (a, b), k in sorted(self.weights.items()):
+            touching[a].append((a, b, k))
+            if b != a:
+                touching[b].append((a, b, k))
 
-        def cost(window):
-            return sum(k * _violations_between(self.fam[a], self.fam[b], self.tol, window)
-                       for (a, b), k in interfaces)
+        def cost(items):
+            return self._flip_cost(items, touching)
         for _round in range(4):
             improved = False
-            for slot in pieces:
-                window = (slot.lo - WINDOW_PAD_CM, slot.hi + WINDOW_PAD_CM)
-                before = cost(window)
+            for item in pieces:
+                slot = item[0]
+                before = cost((item,))
                 slot.side = -slot.side
-                if cost(window) < before:
+                if cost((item,)) < before:
                     improved = True
                 else:
                     slot.side = -slot.side
@@ -646,32 +661,57 @@ class _Wall(object):
             if not improved:
                 break
 
+    def _flip_cost(self, items, touching):
+        """Violacoes que PODEM mudar quando as pecas `items` [(slot, familia)]
+        giram: cada peca como FONTE (contra a peca que cobre o vazado dela) e
+        cada fonte que ELA cobre. Inverter so' muda o centro do vazado da propria
+        peca, entao a diferenca antes/depois e' exatamente a da janela inteira.
+        Chave por (interface, sentido, fonte): cada fonte tem uma cobertura so'."""
+        counted = {}
+        for p, g in items:
+            for a, b, k in touching.get(g, ()):
+                for direction, (src_family, dst_family) in enumerate(((a, b), (b, a))):
+                    if src_family == g:
+                        key = (a, b, direction, id(p))
+                        if key not in counted:
+                            t = _void_center(p)
+                            h = _covering(self.fam[dst_family], t)
+                            counted[key] = k if (h is not None and _offers(h, t, self.tol) is False) else 0
+                    if dst_family == g:
+                        for q in _in_window(self.fam[src_family], p.lo - COVER_REACH_CM, p.hi + COVER_REACH_CM):
+                            if not q.orientable:
+                                continue
+                            key = (a, b, direction, id(q))
+                            if key in counted:
+                                continue
+                            t = _void_center(q)
+                            if _covering(self.fam[dst_family], t) is not p:
+                                continue
+                            counted[key] = k if _offers(p, t, self.tol) is False else 0
+        return sum(counted.values())
+
     def _pair_flips(self, pieces, cost):
         """Inverte DUAS pecas de FAMILIAS DIFERENTES, uma sobre a outra (centros a
         ate' PAIR_FLIP_REACH_CM), de uma vez - primeira melhora, ordem fixa.
         Minimo local medido na parede 8284574 (ponta junto a no' T): o vazado
         menor do B34 da fiada par so' alinha se o B34 da impar logo acima girar
         JUNTO - cada inversao isolada fica em 32 ou sobe para 64; o par vai a 0."""
-        family_of = {}
-        for f in self.fam:
-            for slot in self.fam[f]:
-                family_of[id(slot)] = f
-        ordered = sorted(pieces, key=lambda sl: (sl.lo, family_of.get(id(sl), -1)))
+        ordered = sorted(pieces, key=lambda item: (item[0].lo, item[1]))
         for a in range(len(ordered)):
-            pa = ordered[a]
+            pa, fa = ordered[a]
             mid_a = (pa.lo + pa.hi) / 2.0
             for b in range(a + 1, len(ordered)):
-                pb = ordered[b]
+                pb, fb = ordered[b]
                 if (pb.lo + pb.hi) / 2.0 - mid_a > PAIR_FLIP_REACH_CM:
                     break
-                if family_of.get(id(pa)) == family_of.get(id(pb)):
+                if fa == fb:
                     continue
-                window = (min(pa.lo, pb.lo) - WINDOW_PAD_CM, max(pa.hi, pb.hi) + WINDOW_PAD_CM)
-                before = cost(window)
+                pair = (ordered[a], ordered[b])
+                before = cost(pair)
                 if before == 0:
                     continue
                 pa.side, pb.side = -pa.side, -pb.side
-                if cost(window) < before:
+                if cost(pair) < before:
                     return True
                 pa.side, pb.side = -pa.side, -pb.side
         return False
