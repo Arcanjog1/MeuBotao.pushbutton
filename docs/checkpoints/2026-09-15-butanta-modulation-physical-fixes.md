@@ -163,3 +163,136 @@ nenhuma faltante, extra, em fiada errada, invadindo vão ou colidindo.
 - **Determinismo**: sentido das paredes, ordem de entrada e ruído numérico mudam
   empates de composição — pré-existente na main.
 - **Regressão final**: 1.237 passaram, 3 falhas históricas da main.
+
+## 7. Gate global de não-regressão (adendo) — BASE `55e990d` × PR #42
+
+Evidência completa em `docs/checkpoints/evidence/2026-09-15-matriz-main-x-pr42.txt`
+(gerada por `delta_metrics.py` sobre árvores congeladas `C:/mbase` e `C:/mbpr`,
+nenhuma gravação nos repositórios medidos).
+
+### BUTANTÃ — 34 paredes de alvenaria, 13 fiadas, estratégia CHANNEL
+
+| Métrica | BASE | PR #42 | Δ |
+|---|---|---|---|
+| Vazado menor do B34 desalinhado | 1.931 | 316 | **−1.615** |
+| `NON_MODULAR` | 78 | 0 | **−78** |
+| Buracos | 94 (3.754 cm) | 10 (872 cm) | **−84 (−2.882 cm)** |
+| `MISSING_REQUIRED_CHANNEL` | 1 | 0 | −1 |
+| Colisões | 0 | 0 | 0 |
+| Peças sem apoio | — | 0 | — |
+| Paredes reprovadas na amarração | 3 | 3 | 0 |
+| `C09+C09` encostados | 11 | 9 | −2 |
+| `C09+C04` encostados | 98 | 119 | +21 |
+| Especiais (fiadas 0–11) | 714 | 808 | +94 |
+| `SPECIAL_CLUSTER` (≤40 cm) | 11 | 11 | 0 |
+| `MID_WALL_HALF_BLOCK` | 5 | 5 | 0 |
+| `REPLACEABLE_COMPOSITE_BY_B54` | 59 | 65 | +6 |
+| Tempo de solve | 3,1 s | 5,6 s | +2,5 s |
+
+### TGD V2 — benchmark oficial, estratégia legada
+
+| Achado | BASE | PR #42 | Δ |
+|---|---|---|---|
+| `COMPENSATOR_CONSECUTIVE` | 472 | 407 | **−65** |
+| `COMPENSATOR_EXCESS_IN_RUN` | 454 | 428 | **−26** |
+| `COMPENSATOR_VERTICAL_STRIP` | 86 | 84 | −2 |
+| `PRISM_STAGGER_BELOW_TARGET` | 739 | 712 | −27 |
+| `PRISM_CONTINUOUS_JOINT` / `PRISM_JOINT_STACK` | 53 / 5 | 53 / 5 | 0 |
+| Cobertura, aberturas, posições, junções | iguais | iguais | 0 |
+| Veredito do benchmark | REGRESSÃO | REGRESSÃO | inalterado |
+
+### TP1 V1 — benchmark oficial, estratégia legada
+
+| Achado | BASE | PR #42 | Δ |
+|---|---|---|---|
+| `COMPENSATOR_CONSECUTIVE` | 936 | 825 | **−111** |
+| `COMPENSATOR_EXCESS_IN_RUN` | 933 | 909 | **−24** |
+| `COMPENSATOR_VERTICAL_STRIP` | 149 | 147 | −2 |
+| `PRISM_CONTINUOUS_JOINT` | 16 | 16 | 0 |
+| `PRISM_STAGGER_BELOW_TARGET` | 1.539 | 1.689 | **+150** |
+| Demais categorias | iguais | iguais | 0 |
+| Veredito do benchmark | REGRESSÃO CRÍTICA | REGRESSÃO CRÍTICA | inalterado |
+
+### Classificação das pioras
+
+| Piora | Classe | Justificativa medida |
+|---|---|---|
+| TP1 `PRISM_STAGGER_BELOW_TARGET` +150 | **C — validador/preferência mais rígido que a referência física** | O travamento de 10 cm (18.6) é preferência, não regra: no projeto humano 7% das juntas ficam abaixo de 10 cm e 244 são exatamente coincidentes, contra 30 do solver. `PRISM_CONTINUOUS_JOINT`, que audita o defeito real, não se move (16 → 16). |
+| BUTANTÃ especiais 714 → 808 e `C09+C04` 98 → 119 | **A — regressão física real, localizada** | Causa medida na seção 58: o ramo degradado do T emitia pastilha de 9 cm nas duas famílias. Corrigida nesta sessão (ver item 8). |
+| BUTANTÃ `REPLACEABLE_COMPOSITE_BY_B54` 59 → 65 | **B — mudança de regra legítima** | A seção 56.3 mediu que `B34+B19` no envelope de 54 cm é o que o humano faz **mais** que o solver (107 × 81); o validador conta um padrão que a referência física aprova. |
+| Tempo 3,1 s → 5,6 s | **B** | Custo das tentativas por parede (30.9, 56.2), que só re-resolvem a parede que apresenta o defeito. |
+
+Nenhuma piora ficou nas classes A-não-corrigida ou E-desconhecida.
+
+## 8. Regras desta rodada
+
+### 8.1 Aceitas (ligadas) — seção 56
+
+| Regra | Onde | Efeito medido |
+|---|---|---|
+| 56.1 — regra #2 em todo trecho da Fiada A | `RULE2_ON_EVERY_COURSE_A_SEGMENT` | TGD V2 `COMPENSATOR_CONSECUTIVE` 464→412; TP1 881→830 |
+| 56.2 — compensador do preenchimento não encosta em compensador de nó, por **tentativa por parede** | `compensator_node_adjacency_trial` | BUTANTÃ `C09+C09` 20→9; prisma intacto |
+
+Ligada direto na escolha de composição, a 56.2 reprovava o corpus (TGD V2
+`PRISM_CONTINUOUS_JOINT` 53→87). Com a tentativa, o prisma volta a 53.
+
+### 8.2 Medidas e **rejeitadas**
+
+| Hipótese | Seção | Por quê |
+|---|---|---|
+| Fileira de B34 (reordenar corridas) | 57 | Piora a própria métrica: 473→483 (13 fiadas) e 613→669 (17 fiadas); empilha junta 100→120. Código removido. |
+| B19 no meio da parede é erro | 56.3 | Humano usa **mais** (103 × 35 do solver). |
+| `B54` domina `B34+B19` | 56.3 | Humano usa `B34+B19` **mais** (107 × 81) e nunca põe B54 longe de nó (172/172 a ≤35 cm). |
+| Travamento de 10 cm como guarda | 56.2 | No humano 7% das juntas ficam abaixo de 10 cm, 244 coincidentes. |
+| Compensador longo não é peça extrema (no preenchimento) | 58.1 | Alcança 6 de 40 casos; guardas recusam os 6; forçada piora `C09` 494→500. |
+
+### 8.3 Implementada e **desligada** — seção 58.2
+
+Escada de amarração no nó degradado (`B34` antes de compensador, como o X já
+faz). Corrige o defeito no BUTANTÃ (pastilhas de T degradado 30→0, `C09` extremo
+40→10, vazado menor 316→283, especiais 808→802, portões duros intactos), mas
+custa `PRISM_CONTINUOUS_JOINT` no corpus legado (TP1 16→32, TGD 53→55) em juntas
+de fronteira de banda. `CORNER_DEGRADED_PREFERS_TIE_BLOCK = False`; com a chave
+desligada o BUTANTÃ sai **idêntico**, métrica por métrica, ao head anterior.
+
+## 9. Determinismo
+
+| Variação da entrada | main `55e990d` | branch |
+|---|---|---|
+| mesma entrada, processo novo | reprodutível | reprodutível (mesmo hash) |
+| translação (+1000, +500 cm) | — | **invariante** (mesmo hash) |
+| sentido das paredes invertido | 8.890 → 8.916 peças | 9.088 → 9.117 |
+| ordem das paredes invertida | 8.890 → 8.885 | 9.088 → 9.084 |
+
+A sensibilidade a sentido e ordem é **pré-existente na main**, com a mesma
+magnitude; a branch não a introduz nem a agrava.
+
+## 10. Revit real — rodada com as regras da seção 56
+
+| Execução | Peças | Substituição | Falhas | Releitura | Humano modificado | Assinatura das linhas |
+|---|---|---|---|---|---|---|
+| run4 (código anterior) | 9.088 | 9.088 → 9.088 | 0 | 0 | não | `ca0cf689…` |
+| run5 | 9.088 | 9.088 → 9.088 | 0 | 0 | não | `113c6b26…` |
+| run6 | 9.088 | 9.088 → 9.088 | 0 | 0 | não | `113c6b26…` |
+| run7 | 9.088 | 9.088 → 9.088 | 0 | 0 | não | `113c6b26…` |
+
+**Idempotência**: runs 5, 6 e 7 têm assinatura de linhas idêntica — o mesmo
+código aplicado três vezes seguidas produz exatamente a mesma modulação e
+substitui 9.088 por 9.088 sem falha. O `IsModified` do projeto humano foi
+`False` antes e depois de cada execução.
+
+**Medido no Revit real (34 paredes, fiadas 0–11):**
+
+| Métrica | Humano | run4 | run7 |
+|---|---|---|---|
+| Pares de compensadores encostados | 105 | 158 | **147** |
+| Pares IGUAIS encostados | 6 (`C09D+C09D`) | 20 (`C09+C09`) | **9** |
+| `C09+C09` | **0** | 20 | **9** |
+| Vazado menor do B34 desalinhado | 41 | 320 | 316 |
+| Especiais | 500 | 808 | 808 |
+| `C09` como peça extrema | 0 | 39 | 39 |
+
+A correção da seção 56 é visível na peça física: o par de compensadores iguais,
+que o humano nunca usa, cai pela metade. O `C09` extremo e o excesso de
+especiais continuam abertos — causa localizada na seção 58, correção pronta e
+desligada pelo gate.
