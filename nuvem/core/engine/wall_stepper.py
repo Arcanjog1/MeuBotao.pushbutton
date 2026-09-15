@@ -6885,8 +6885,9 @@ def compensator_node_adjacency_trial(solve_fn, catalog, wall_p0, wall_dir, wall_
         trial, wall_p0, wall_dir, wall_length_cm, opening_edges_cm)
     # O travamento de 10 cm (regra 18.6) NAO entra como guarda: medido no
     # humano, 7% das juntas ficam abaixo de 10 cm (244 delas coincidentes),
-    # enquanto compensador encostado em compensador nao aparece nenhuma vez em
-    # 6.018 pecas. A coincidencia de junta continua sendo guarda.
+    # enquanto C09 encostado em C09 nao aparece nenhuma vez em 6.018 pecas (os
+    # 6 pares de codigo identico do humano sao todos do compensador DEITADO,
+    # C09D, que o solver nao emite). A coincidencia de junta continua guarda.
     accepted = (coincidences_trial <= coincidences_base
                 and _fill_adjacent_compensator_pairs(trial, catalog, wall_p0, wall_dir)
                 <= _fill_adjacent_compensator_pairs(base, catalog, wall_p0, wall_dir)

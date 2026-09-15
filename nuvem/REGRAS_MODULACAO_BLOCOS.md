@@ -8135,9 +8135,16 @@ por esta seção.
 ## 56. Compensadores encostados — regra #2 na Fiada A e compensador contra peça de nó (2026-09-15)
 
 **Evidência humana (BUTANTÃ R08_LT, 1º PAV, 34 paredes de alvenaria, 6.018
-peças, fiadas 0–11):** ZERO pares de compensadores IGUAIS encostados
-(`C09+C09` e `C04+C04`). O humano encosta apenas C04 com C09 — 97 vezes. O
-solver tinha 20 pares `C09+C09`.
+peças, fiadas 0–11):** ZERO pares `C09+C09` e ZERO pares `C04+C04` encostados —
+o humano encosta C04 com C09, 97 vezes. O solver tinha 20 pares `C09+C09`.
+
+**Precisão da medida (corrigida 2026-09-15):** o humano *tem* 6 pares de
+compensadores de código idêntico encostados, mas todos são
+`COMPENSADOR 14x19x9 (deitado)` (`C09D`, 62 peças no projeto) — peça **deitada**,
+que o solver não emite nenhuma vez. A regra abaixo trata do compensador **em
+pé** encostado em outro igual, que é o que o solver produzia; a afirmação
+genérica "nenhum par de compensadores iguais" não se sustenta e foi substituída
+por esta.
 
 **Duas causas medidas:**
 

@@ -2,9 +2,10 @@
 """Compensadores encostados (secao 56 de REGRAS_MODULACAO_BLOCOS.md).
 
 Evidencia humana (BUTANTA R08_LT, 1o PAV, 34 paredes, 6.018 pecas): ZERO pares
-de compensadores iguais encostados (C09+C09 e C04+C04); o humano so' encosta
-C04 com C09 (97 vezes). O solver tinha 20 pares C09+C09, nascidos de duas
-causas:
+C09+C09 e ZERO pares C04+C04 encostados; o humano encosta C04 com C09 (97
+vezes). Os 6 pares de codigo identico que o humano tem sao todos do compensador
+DEITADO (C09D), peca que o solver nao emite. O solver tinha 20 pares C09+C09,
+nascidos de duas causas:
 
 1. o guloso da Fiada A nunca olhou a regra #2 (compensador em sequencia) fora
    do trecho absorvido pela 30.8 - parede de 100 cm entre dois cantos L:
