@@ -57,6 +57,15 @@ MAX_ARRANGEMENTS_PER_COMPOSITION = 60
 COMPOSITION_MAX_REMOVED = 2
 COMPOSITION_MAX_ADDED = 3
 JOINT_REGULAR_TOLERANCE_CM = 0.05
+# SECAO 62: orientacao otima exata por parede. A descida gulosa da secao 52 gira
+# uma peca (ou um par) por vez e para quando nenhuma melhora sozinha; em corridas
+# longas de B34 encadeadas entre fiadas a orientacao tem de alternar ao longo da
+# cadeia inteira, e um trecho "fora de fase" so' se corrige girando varias pecas
+# juntas. A DP enxerga isso: o custo de cada B34-fonte depende so' da orientacao
+# dele e dos B34 que podem cobrir o vazado dele (a menos de meia peca), entao,
+# em ordem de posicao, cada fator envolve variaveis vizinhas.
+B34_ORIENTATION_DP_ENABLED = True
+ORIENTATION_DP_MAX_BAND = 12
 MAX_PASSES = 3
 RUN_MAX_GAP_CM = 2.5
 FACE_TOLERANCE_CM = 0.6
@@ -698,6 +707,113 @@ class _Wall(object):
         self.fam[f] = original
         return False
 
+    # ------------------------------------------------------------ orientacao exata (secao 62)
+    def _source_violations(self, f, i, weights_by_family):
+        """Violacoes em que o B34 (f, i) e' a FONTE, contra as familias vizinhas,
+        ja' multiplicadas pela quantidade de interfaces."""
+        p = self.fam[f][i]
+        t = _void_center(p)
+        n = 0
+        for other, k in weights_by_family.get(f, ()):
+            h = _covering(self.fam[other], t)
+            if h is not None and _offers(h, t, self.tol) is False:
+                n += k
+        return n
+
+    def orient_exact(self):
+        """Orientacao otima dos B34 de preenchimento (movel, orientavel) desta
+        parede. Devolve quantas orientacoes mudaram (0 se o otimo nao for
+        ESTRITAMENTE melhor ou se a banda passar do teto)."""
+        if not B34_ORIENTATION_DP_ENABLED:
+            return 0
+        weights_by_family = collections.defaultdict(list)
+        for (a, b), k in sorted(self.weights.items()):
+            weights_by_family[a].append((b, k))
+            if a != b:
+                weights_by_family[b].append((a, k))
+        variables = []
+        for f in sorted(self.fam):
+            for i, slot in enumerate(self.fam[f]):
+                if slot.orientable and slot.movable and slot.void_off is not None:
+                    variables.append((slot.mid, f, i))
+        if not variables:
+            return 0
+        variables.sort()
+        position = dict(((f, i), n) for n, (_mid, f, i) in enumerate(variables))
+        # fatores: um por B34-fonte (variavel ou fixo) que dependa de alguma variavel
+        factors = collections.defaultdict(list)
+        band = 0
+        for f in sorted(self.fam):
+            for i, slot in enumerate(self.fam[f]):
+                if not slot.orientable or slot.void_off is None:
+                    continue
+                involved = set()
+                if (f, i) in position:
+                    involved.add(position[(f, i)])
+                saved = slot.side
+                for side in (-1, 1):
+                    slot.side = side
+                    t = _void_center(slot)
+                    for other, _k in weights_by_family.get(f, ()):
+                        j = _first_hi_at_least(self.fam[other], t)
+                        if j < len(self.fam[other]) and self.fam[other][j].lo - 1e-6 <= t and \
+                                (other, j) in position:
+                            involved.add(position[(other, j)])
+                    if (f, i) not in position:
+                        break  # fonte fixa: o lado dela nao muda
+                slot.side = saved
+                if not involved:
+                    continue
+                low, high = min(involved), max(involved)
+                band = max(band, high - low)
+                factors[high].append((f, i))
+        if band > ORIENTATION_DP_MAX_BAND:
+            return 0
+        slots_of = [self.fam[f][i] for _mid, f, i in variables]
+        current = [s.side for s in slots_of]
+
+        def factor_cost(at, state, start):
+            for n, side in enumerate(state):
+                slots_of[start + n].side = side
+            return sum(self._source_violations(f, i, weights_by_family) for f, i in factors[at])
+
+        current_cost = 0
+        for n in range(len(slots_of)):
+            current_cost += sum(self._source_violations(f, i, weights_by_family) for f, i in factors[n])
+        keep = band  # variaveis guardadas no estado, alem da atual
+        layer = {(): (0, None)}
+        history = []
+        for n in range(len(slots_of)):
+            nxt = {}
+            for state, (cost, _prev) in layer.items():
+                for side in (-1, 1):
+                    full = state + (side,)
+                    start = n - len(full) + 1
+                    total = cost + factor_cost(n, full, start)
+                    trimmed = full[len(full) - keep:] if keep else ()
+                    if trimmed not in nxt or total < nxt[trimmed][0]:
+                        nxt[trimmed] = (total, (state, side))
+            history.append(nxt)
+            layer = nxt
+        best_state = min(sorted(layer), key=lambda st: layer[st][0])
+        best_cost = layer[best_state][0]
+        if best_cost >= current_cost:
+            for slot, side in zip(slots_of, current):
+                slot.side = side
+            return 0
+        chosen = [0] * len(slots_of)
+        state = best_state
+        for n in range(len(slots_of) - 1, -1, -1):
+            _total, (prev, side) = history[n][state]
+            chosen[n] = side
+            state = prev
+        changed = 0
+        for slot, side, old in zip(slots_of, chosen, current):
+            slot.side = side
+            if side != old:
+                changed += 1
+        return changed
+
     def compose(self):
         """Uma composicao aceita muda os indices da familia: recomeca as corridas
         dela. Teto de iteracoes por parede, deterministico."""
@@ -814,13 +930,43 @@ def _write_back(wall, base_fam, course_candidates, catalog):
                             rotated += 1
                 for leftovers in pools.values():
                     for cand in leftovers:
+                        done.add(id(cand))
                         lst = course_candidates[c]
                         for k in range(len(lst)):
                             if lst[k] is cand:
                                 del lst[k]
                                 removed += 1
                                 break
+    rotated += _sync_orientation(wall, base_fam, done)
     return moved, rotated, created, removed
+
+
+def _sync_orientation(wall, base_fam, done):
+    """Gira os candidatos cujo slot manteve codigo e posicao mas mudou de lado
+    (orientacao exata, secao 62) - inclusive B34 isolado, que nao forma corrida.
+    Casamento por (codigo, posicao): as listas podem ter mudado de tamanho."""
+    rotated = 0
+    for f in sorted(wall.fam):
+        old_index = dict(((s.code, round(s.lo, 3)), i) for i, s in enumerate(base_fam[f]))
+        for slot in wall.fam[f]:
+            if not slot.orientable:
+                continue
+            i = old_index.get((slot.code, round(slot.lo, 3)))
+            if i is None or base_fam[f][i].side == slot.side:
+                continue
+            for c in sorted(wall.course_fam):
+                if wall.course_fam[c] != f or i >= len(wall.rows[c]):
+                    continue
+                cand = wall.rows[c][i][0]
+                if id(cand) in done:
+                    continue
+                done.add(id(cand))
+                lo, hi = _extent_cm(cand, wall.p0, wall.dir)
+                off, _half = _void_geometry(cand, wall.p0, wall.dir, lo, hi)
+                if (1 if (off or 0.0) >= 0.0 else -1) != slot.side:
+                    _sva.rotate_candidate_180(cand)
+                    rotated += 1
+    return rotated
 
 
 def _snapshot_wall(course_candidates, wall_idx):
@@ -898,7 +1044,10 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
         base_fam = dict((f, [s.copy() for s in slots]) for f, slots in wall.fam.items())
         changed = wall.optimize() if before["violations"] else set()
         compositions = wall.compose()
-        if not changed and not compositions:
+        oriented = wall.orient_exact() if wall.totals()["violations"] else 0
+        if oriented:
+            summary["orientation_dp_changes"] = summary.get("orientation_dp_changes", 0) + oriented
+        if not changed and not compositions and not oriented:
             for key in summary["before"]:
                 summary["before"][key] += before[key]
                 summary["after"][key] += before[key]
@@ -924,12 +1073,12 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
                 {"wall_idx": wi, "before": checked_before, "after": checked_after})
             after = before
             moved = rotated = created = removed = 0
-            compositions = 0
+            compositions = oriented = 0
             changed = set()
         for key in summary["before"]:
             summary["before"][key] += before[key]
             summary["after"][key] += after[key]
-        if not changed and not compositions:
+        if not changed and not compositions and not oriented:
             continue
         summary["walls_changed"] += 1
         summary["runs_changed"] += len(changed)

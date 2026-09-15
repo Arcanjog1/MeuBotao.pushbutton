@@ -8624,3 +8624,61 @@ inteiras do catálogo no mesmo vão com juntas de 1 cm e `course_variant`,
 validação exata que **rejeita e restaura a parede idêntica** (listas e geometria),
 validação que aceita quando nada piora, e o par `C09+C09` nunca trocado por C09
 na ponta.
+
+## 62. OrientaÃ§Ã£o Ã³tima exata dos B34 de preenchimento por parede (2026-09-15, IMPLEMENTADO, sÃ³ CHANNEL)
+
+### 62.1 Achado
+
+Dos 195 que restavam depois das Â§60/Â§61 (rÃ©gua 2-D), 80 eram B34Ã—B34 **na
+janela de orientaÃ§Ã£o oposta** â€” geometricamente alinhÃ¡veis. Medindo o mÃ­nimo
+exato de violaÃ§Ãµes sÃ³ por orientaÃ§Ã£o, com as posiÃ§Ãµes fixas e **os B34 de nÃ³
+fixos** (Â§5): a busca exaustiva em janelas chegou a 217 e a programaÃ§Ã£o
+dinÃ¢mica exata a **198**, contra 259 da orientaÃ§Ã£o gulosa (modelo 1-D). Girar
+blocos contÃ­guos da cadeia com melhora estrita chegou sÃ³ a 251 â€” hipÃ³tese
+descartada.
+
+**Causa:** a Â§52 gira uma peÃ§a (ou um par) por vez e sÃ³ aceita melhora estrita.
+Em corridas longas de B34 encadeadas entre fiadas, a orientaÃ§Ã£o precisa alternar
+ao longo da cadeia inteira; um trecho "fora de fase" â€” tÃ­pico entre B34 de nÃ³
+fixos nas duas pontas e numa fiada Ãºnica de fronteira de banda â€” sÃ³ se corrige
+girando vÃ¡rias peÃ§as ao mesmo tempo.
+
+### 62.2 Regra
+
+`_Wall.orient_exact` (`core/engine/b34_run_arrangement.py`), depois da
+reordenaÃ§Ã£o (Â§60) e da composiÃ§Ã£o (Â§61):
+
+- variÃ¡veis = orientaÃ§Ã£o dos B34 **de preenchimento** (mÃ³veis) de cada famÃ­lia
+  de fiada; peÃ§a de nÃ³, reparo de vÃ£o e canaleta ficam fixas;
+- fator = violaÃ§Ãµes de um B34-fonte; depende sÃ³ da orientaÃ§Ã£o dele e dos B34 que
+  podem cobrir o vazado dele (a menos de meia peÃ§a). Em ordem de posiÃ§Ã£o, cada
+  fator envolve variÃ¡veis vizinhas â†’ DP com estado = orientaÃ§Ã£o das Ãºltimas *k*
+  variÃ¡veis (*k* = largura de banda);
+- aceita sÃ³ se o Ã³timo for **estritamente** menor; banda acima de
+  `ORIENTATION_DP_MAX_BAND = 12` deixa a parede para a Â§52;
+- a gravaÃ§Ã£o gira tambÃ©m B34 isolado (fora de corrida) e passa pela mesma
+  aceitaÃ§Ã£o exata por parede da Â§61. A Â§52 roda de novo em 2-D depois.
+
+SÃ³ gira peÃ§as: contorno, juntas, cobertura e apoio nÃ£o mudam por construÃ§Ã£o.
+
+### 62.3 Medido â€” BUTANTÃƒ no fluxo real (17 fiadas)
+
+| MÃ©trica | Desligado | Â§60 + Â§61 | **Â§60 + Â§61 + Â§62** | Humano |
+|---|---|---|---|---|
+| Vazado menor â€” validador de produÃ§Ã£o | 508 | 259 | **219** | â€” |
+| Vazado menor â€” rÃ©gua 2-D, fiadas 0â€“11 | 316 | 195 | **163** | 41 |
+| B34 Ã— B34 | 118 | 80 | **46** | 20 |
+| B34 Ã— B39 / B54 / B19 | 157 / 24 / 17 | 84 / 22 / 9 | 86 / 22 / 9 | 2 / 2 / 17 |
+| PeÃ§as / buracos / NON_MODULAR / colisÃµes | 9.088 / 20 / 0 / 0 | 9.055 / 20 / 0 / 0 | **9.055 / 20 / 0 / 0** | â€” |
+| Apoio fÃ­sico / auditoria recalculada | 0 / 3 | 0 / 3 | **0 / 3 (mesmos)** | â€” |
+| Especiais / `C09+C09` | 808 / 11 | 767 / 3 | **767 / 3** | 500 / 0 |
+| PeÃ§as fixas (canaleta, nÃ³, reparo) | â€” | idÃªnticas | **idÃªnticas** | â€” |
+| Solve (bancada) | 7,9 s | 16,5 s | 17,7 s | â€” |
+
+78 orientaÃ§Ãµes trocadas; nenhuma parede rejeitada pela validaÃ§Ã£o exata.
+
+**Testes** (`tests/test_b34_run_arrangement.py`) sobre a parede **real** 8284579
+(209 cm, B34 de nÃ³ nas duas pontas, 17 fiadas) no estado em que a Â§52 travou:
+vermelho (gulosa e reordenaÃ§Ã£o ficam em 10), verde (DP leva a 0 sem mudar
+posiÃ§Ã£o de nenhuma peÃ§a nem orientaÃ§Ã£o de nÃ³), teto de banda devolve a parede Ã 
+Â§52, idempotÃªncia.

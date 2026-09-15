@@ -307,3 +307,97 @@ def test_adjacent_compensator_pair_is_never_traded_for_a_c09_at_the_wall_end():
         row = _codes_by_t(cc, c, t_max=1e9)
         first = row[0]
         assert not (first[2] == "C09" and first[0] <= 2.0), (c, row)
+
+
+# ---------------------------------------------------------------------------
+# SECAO 62 - orientacao otima exata (DP) - fixture = parede REAL 8284579 do
+# BUTANTA (209 cm, B34 de no' nas duas pontas, 17 fiadas), no estado em que a
+# orientacao gulosa da secao 52 travou com 10 violacoes.
+# ---------------------------------------------------------------------------
+WALL_209 = [(seg(0, 0, 209, 0), ft(14.0), (False, False))]
+_E02 = [("B39", 15, 54, 0, False), ("B34", 55, 89, 1, False), ("B34", 90, 124, 1, False),
+        ("B34", 125, 159, 1, False), ("B34", 160, 194, -1, False)]
+_O13 = [("B34", 0, 34, -1, True), ("B34", 35, 69, 1, False), ("B34", 70, 104, -1, False),
+        ("B34", 105, 139, -1, False), ("B34", 140, 174, 1, False), ("B34", 175, 209, 1, True)]
+_E4 = [("B39", 15, 54, 0, False), ("B34", 55, 89, -1, False), ("B34", 90, 124, 1, False),
+       ("B34", 125, 159, -1, False), ("B34", 160, 194, -1, False)]
+_OUP = [("B34", 0, 34, -1, True), ("B34", 35, 69, 1, False), ("B34", 70, 104, 1, False),
+        ("B34", 105, 139, 1, False), ("B34", 140, 174, 1, False), ("B34", 175, 209, 1, True)]
+_EUP = [("B39", 15, 54, 0, False), ("B34", 55, 89, -1, False), ("B34", 90, 124, -1, False),
+        ("B34", 125, 159, -1, False), ("B34", 160, 194, -1, False)]
+
+
+def _real_row(spec, course):
+    out = []
+    for code, a, b, side, node in spec:
+        cand = m._place_pier_layout([(code, a, b)], CATALOG, P0, DIRECTION, course, 0,
+                                    node_index=(3 if node else None),
+                                    placement_reason=("T_INTERSECTION_INCOMING" if node else "STANDARD_FILL"))[0]
+        if code == "B34" and side > 0:
+            sva.rotate_candidate_180(cand)
+        out.append(cand)
+    return out
+
+
+def _wall_8284579():
+    spec = {0: _E02, 2: _E02, 1: _O13, 3: _O13, 4: _E4}
+    for c in range(5, 17):
+        spec[c] = _OUP if c % 2 == 1 else _EUP
+    cc = dict((c, _real_row(spec[c], c)) for c in range(17))
+    sva.orient_small_voids(cc, CATALOG)
+    return cc
+
+
+def _run(cc, dp=True, band=None):
+    old = (R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND)
+    R.B34_ORIENTATION_DP_ENABLED = dp
+    R.B34_RUN_COMPOSITION_ENABLED = False
+    if band is not None:
+        R.ORIENTATION_DP_MAX_BAND = band
+    try:
+        summary = R.arrange_b34_runs(cc, WALL_209, OPENINGS, CATALOG)
+    finally:
+        R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND = old
+    sva.orient_small_voids(cc, CATALOG)
+    return summary
+
+
+def _geometry(cc):
+    return dict((c, sorted((round(m._candidate_extent_on_wall_axis(x, P0, DIRECTION)[0], 3), x["logical_code"],
+                            x.get("node_index")) for x in cc[c])) for c in cc)
+
+
+def _node_sides(cc):
+    return [(c, round(x["x_dir"].X, 3)) for c in sorted(cc) for x in cc[c] if x.get("node_index") is not None]
+
+
+def test_red_real_wall_greedy_orientation_and_reordering_stay_stuck():
+    cc = _wall_8284579()
+    stuck = _violations(cc)
+    assert stuck == 10
+    _run(cc, dp=False)
+    assert _violations(cc) == stuck
+
+
+def test_green_exact_orientation_aligns_the_real_wall_without_touching_geometry_or_nodes():
+    cc = _wall_8284579()
+    geometry, nodes = _geometry(cc), _node_sides(cc)
+    summary = _run(cc, dp=True)
+    assert summary.get("orientation_dp_changes")
+    assert _violations(cc) == 0
+    assert _geometry(cc) == geometry      # so' giro: mesmas pecas, mesmas posicoes
+    assert _node_sides(cc) == nodes       # peca de no' mantem a orientacao (secao 5)
+
+
+def test_band_ceiling_leaves_the_wall_to_the_greedy_pass():
+    cc = _wall_8284579()
+    summary = _run(cc, dp=True, band=0)
+    assert not summary.get("orientation_dp_changes")
+    assert _violations(cc) == 10
+
+
+def test_exact_orientation_is_idempotent():
+    cc = _wall_8284579()
+    _run(cc, dp=True)
+    again = _run(cc, dp=True)
+    assert not again.get("orientation_dp_changes") and _violations(cc) == 0
