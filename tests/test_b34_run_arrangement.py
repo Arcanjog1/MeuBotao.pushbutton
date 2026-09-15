@@ -401,3 +401,80 @@ def test_exact_orientation_is_idempotent():
     _run(cc, dp=True)
     again = _run(cc, dp=True)
     assert not again.get("orientation_dp_changes") and _violations(cc) == 0
+
+
+# ---------------------------------------------------------------------------
+# SECAO 62.4 - a DP tem de achar o MINIMO EXATO, independente da ordem das
+# familias. Fixture = trecho real 35-120 cm da parede 12 do BUTANTA (modelo 1-D
+# das familias de fiada), onde a primeira versao da DP cortava o estado com
+# fatiamento negativo e, no IronPython, achava "otimo" pior que o atual.
+# ---------------------------------------------------------------------------
+_DP_SLICE = {'tol': 1.5, 'weights': [[0, 1, 2], [1, 0, 1], [1, 2, 1], [2, 3, 1], [3, 4, 2], [4, 3, 1], [4, 5, 2], [5, 4, 1], [5, 6, 3], [6, 5, 2]], 'fam': {0: [{'lo': 15.0, 'hi': 54.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 55.0, 'hi': 89.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 90.0, 'hi': 124.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}], 1: [{'lo': 35.0, 'hi': 74.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 75.0, 'hi': 109.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 110.0, 'hi': 144.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}], 2: [{'lo': 15.0, 'hi': 54.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 55.0, 'hi': 89.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 90.0, 'hi': 124.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}], 3: [{'lo': 35.0, 'hi': 74.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 75.0, 'hi': 109.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 110.0, 'hi': 144.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}], 4: [{'lo': 15.0, 'hi': 54.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 55.0, 'hi': 89.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 90.0, 'hi': 124.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}], 5: [{'lo': 35.0, 'hi': 69.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 70.0, 'hi': 104.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 105.0, 'hi': 139.0, 'code': 'B34', 'side': 1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': 9.125, 'void_half': 5.375, 'compensator': False}], 6: [{'lo': 15.0, 'hi': 54.0, 'code': 'B39', 'side': 0, 'movable': True, 'node': False, 'hollow': True, 'orientable': False, 'void_off': None, 'void_half': None, 'compensator': False}, {'lo': 55.0, 'hi': 89.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}, {'lo': 90.0, 'hi': 124.0, 'code': 'B34', 'side': -1, 'movable': True, 'node': False, 'hollow': True, 'orientable': True, 'void_off': -9.125, 'void_half': 5.375, 'compensator': False}]}}
+
+
+def _slice_wall(family_order):
+    import collections as _c
+    w = object.__new__(R._Wall)
+    w.wall_idx, w.tol = 0, _DP_SLICE["tol"]
+    w.fam = {}
+    for f in family_order:
+        slots = []
+        for sd in _DP_SLICE["fam"][f]:
+            s = R._Slot()
+            for k, v in sd.items():
+                setattr(s, k, v)
+            slots.append(s)
+        w.fam[f] = slots
+    w.weights = _c.Counter(dict(((a, b), k) for a, b, k in _DP_SLICE["weights"]))
+    return w
+
+
+def _slice_total(w):
+    import collections as _c
+    by_family = _c.defaultdict(list)
+    for (a, b), k in sorted(w.weights.items()):
+        by_family[a].append((b, k))
+        if a != b:
+            by_family[b].append((a, k))
+    return sum(w._source_violations(f, i, by_family) for f in sorted(w.fam)
+               for i, s in enumerate(w.fam[f]) if s.orientable)
+
+
+def _slice_variables(w):
+    return [w.fam[f][i] for f in sorted(w.fam) for i, s in enumerate(w.fam[f])
+            if s.orientable and s.movable and s.void_off is not None]
+
+
+def test_dp_orientation_reaches_the_brute_force_minimum_on_a_real_slice():
+    import itertools
+    w = _slice_wall(sorted(_DP_SLICE["fam"]))
+    variables = _slice_variables(w)
+    assert 10 <= len(variables) <= 16
+    original = [s.side for s in variables]
+    best = None
+    for combo in itertools.product((-1, 1), repeat=len(variables)):
+        for s, side in zip(variables, combo):
+            s.side = side
+        value = _slice_total(w)
+        best = value if best is None or value < best else best
+    for s, side in zip(variables, original):
+        s.side = side
+    before = _slice_total(w)
+    assert best < before  # ha' o que ganhar: o teste nao passa a' toa
+    w.orient_exact()
+    assert _slice_total(w) == best
+
+
+def test_dp_orientation_does_not_depend_on_family_order():
+    """Propriedade de determinismo: a mesma DP para qualquer ordem das familias.
+    (Nao reproduz sozinho o defeito do IronPython - la' a ordem que importava era
+    a das camadas da DP; esse caso e' pego pelo teste de forca bruta acima, que
+    FALHA com a versao antiga, e pela execucao isolada no Revit da secao 62.4.)"""
+    results = []
+    orders = [sorted(_DP_SLICE["fam"]), sorted(_DP_SLICE["fam"], reverse=True),
+              sorted(_DP_SLICE["fam"], key=lambda f: (f % 3, f))]
+    for order in orders:
+        w = _slice_wall(order)
+        w.orient_exact()
+        results.append((_slice_total(w), [s.side for s in _slice_variables(w)]))
+    assert results[0] == results[1] == results[2]
