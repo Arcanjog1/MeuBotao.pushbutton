@@ -8912,3 +8912,33 @@ com B54): as fiadas 4–5 usam outra posição de B39 que as 0–3 e as violaç�
 ficam na **interface entre bandas** — o humano usa uma só corrida de B39 em
 todas as fiadas. Coordenar a composição entre famílias de bandas diferentes é o
 próximo passo; não é limitação física (o humano resolve).
+
+## 65. O arranjo roda de novo depois da orientação (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+**Achado.** A orientação — gulosa (§52) e exata (§62) — roda **depois** da busca
+de ordem, e muda o que cada ordem vale. Medido na parede **8284557** (514 cm, nó
+T no meio, **5 famílias de fiada**: as bandas superiores repetem outra linha):
+no estado final, duas famílias caem de **7 para 3** violações só reordenando a
+corrida, com todas as guardas intactas — e nada reavaliava isso.
+
+**Regra.** `_orient_small_voids_final` repete `arranjo → Etapa 4D → orientação`
+até `B34_RUN_ARRANGEMENT_PASSES = 3`, parando assim que um passe não mexe em
+nenhuma peça. Do segundo passe em diante o arranjo só olha as paredes que o
+passe anterior mexeu (`only_walls`) — a orientação só muda onde a geometria
+mudou; mesma assinatura de todas as peças, solve 70 s → 54 s na bancada.
+
+**Medido — BUTANTÃ (bancada, 17 fiadas):** vazado menor do validador de produção
+**68 → 53**; régua 2-D das fiadas 0–11 **43 → 35** (humano **41** — o solver
+passa a ficar **abaixo** do humano nessa régua). Especiais 594, peças 8.958,
+buracos 20, colisões 0, apoio 0, auditoria 3 (as mesmas), `MISSING_UNDER_WINDOW`
+0, contagens CHANNEL e orientação dos compensadores idênticas, 0 paredes
+rejeitadas pela validação exata. Segundo passe: 7 paredes mexidas, 2
+composições, 41 peças movidas; terceiro passe: nada.
+
+TGD V2 e TP1 V1 idênticos. Determinismo: transladado igual (só a parede 0),
+invertido 10.692 → **10.663** e permutado 4.036 → **4.030** peças diferentes do
+normal — nenhuma parede nova sensível.
+
+**Testes**: o laço para quando um passe não mexe em peça; o segundo passe recebe
+exatamente as paredes que o primeiro mexeu; o teto de passes é respeitado.
+
