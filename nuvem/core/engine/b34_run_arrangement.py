@@ -54,7 +54,10 @@ MAX_ARRANGEMENTS_PER_RUN = 240
 B34_RUN_COMPOSITION_ENABLED = True
 MAX_COMPOSITIONS_PER_RUN = 40
 MAX_ARRANGEMENTS_PER_COMPOSITION = 60
-COMPOSITION_MAX_REMOVED = 2
+# 3 desde a secao 63.2: `B39 B39 C09 -> B34 B34 B19` (ponta da parede 8284574
+# junto a no' T, sem especial) so' existe tirando 3 pecas; sem a orientacao
+# conjunta da 63 o 3 nao muda nada na BUTANTA (medido)
+COMPOSITION_MAX_REMOVED = 3
 COMPOSITION_MAX_ADDED = 3
 JOINT_REGULAR_TOLERANCE_CM = 0.05
 # SECAO 62: orientacao otima exata por parede. A descida gulosa da secao 52 gira
@@ -66,6 +69,24 @@ JOINT_REGULAR_TOLERANCE_CM = 0.05
 # em ordem de posicao, cada fator envolve variaveis vizinhas.
 B34_ORIENTATION_DP_ENABLED = True
 ORIENTATION_DP_MAX_BAND = 12
+# SECAO 63: orientacao CONJUNTA na avaliacao de cada ordem/composicao (60/61).
+# A descida antiga girava so' os B34 da familia do trecho, um por vez; a ordem
+# que o humano usa pode exigir girar JUNTO o B34 da fiada vizinha (vizinhos) e
+# dois B34 de uma vez (pares). Medido na ponta da parede 8284574: a composicao
+# sem especial valia 32 (pior que as 16 atuais) na descida antiga e 0 com os dois
+# giros juntos. A 62 (DP) gira mas nao reordena - nenhuma das duas achava sozinha.
+NEIGHBOUR_FLIPS_ENABLED = True
+NEIGHBOUR_REACH_CM = 40.0
+# pares de inversao (ver `_Wall._pair_flips`)
+PAIR_FLIPS_ENABLED = True
+PAIR_FLIP_REACH_CM = 25.0
+# Duas etapas (custo: conjunta em todas as ordens = 342 s na bancada, contra
+# 19 s): a descida barata avalia TODAS as ordens; a conjunta so' reavalia as
+# REFINE_TOP_K que passam nas guardas geometricas (nao dependem de orientacao),
+# nao dominaram, e cujo LIMITE INFERIOR de vazado (`_violations_lower_bound`)
+# ainda pode dominar - ordenadas por esse limite. K=4 ja' da' o mesmo resultado
+# de K=8/16 e da conjunta em todas.
+REFINE_TOP_K = 4
 MAX_PASSES = 3
 RUN_MAX_GAP_CM = 2.5
 FACE_TOLERANCE_CM = 0.6
@@ -213,6 +234,43 @@ def _violations_between(lower, upper, tol_cm, window=None):
             t = _void_center(p)
             h = _covering(dst, t)
             if h is not None and _offers(h, t, tol_cm) is False:
+                count += 1
+    return count
+
+
+def _violations_lower_bound(lower, upper, tol_cm, window=None):
+    """Limite INFERIOR das violacoes sobre qualquer orientacao das pecas moveis:
+    conta so' o vazado que nenhuma combinacao de lado (da fonte e da peca que a
+    cobre, quando moveis e orientaveis) alinha. Ignora o acoplamento entre pares
+    (uma peca e' fonte e cobertura ao mesmo tempo), por isso e' so' limite."""
+    count = 0
+    for src, dst in ((lower, upper), (upper, lower)):
+        pieces = src if window is None else _in_window(src, window[0], window[1])
+        for p in pieces:
+            if not p.orientable:
+                continue
+            p_sides = (-1, 1) if p.movable else (p.side,)
+            saved_p = p.side
+            aligned = False
+            for p_side in p_sides:
+                p.side = p_side
+                t = _void_center(p)
+                h = _covering(dst, t)
+                if h is None:
+                    aligned = True
+                    break
+                h_sides = (-1, 1) if (h.orientable and h.movable) else (h.side,)
+                saved_h = h.side
+                for h_side in h_sides:
+                    h.side = h_side
+                    if _offers(h, t, tol_cm) is not False:
+                        aligned = True
+                        break
+                h.side = saved_h
+                if aligned:
+                    break
+            p.side = saved_p
+            if not aligned:
                 count += 1
     return count
 
@@ -495,9 +553,11 @@ class _Wall(object):
         faces_f = _internal_faces(self.fam[f], self.length, self.edges, window)
         wider = (window[0] - FACE_TOLERANCE_CM, window[1] + FACE_TOLERANCE_CM)
         for (a, b), k in self.weights.items():
+            # vazado: TODAS as interfaces na janela - um vizinho girado junto
+            # pode mexer na interface dele com uma terceira familia
+            v += k * _violations_between(self.fam[a], self.fam[b], self.tol, window)
             if f not in (a, b):
                 continue
-            v += k * _violations_between(self.fam[a], self.fam[b], self.tol, window)
             other = b if a == f else a
             if other != f:
                 co += k * _coincident(faces_f, _internal_faces(self.fam[other], self.length, self.edges, wider))
@@ -507,6 +567,11 @@ class _Wall(object):
         # extremo da parede: olha a fileira inteira (a janela pode nao conter a ponta)
         ex = _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
         return v, co, cp, ht, ex
+
+    def _local_bound(self, f, run):
+        window = self._window(f, run)
+        return sum(k * _violations_lower_bound(self.fam[a], self.fam[b], self.tol, window)
+                   for (a, b), k in sorted(self.weights.items()))
 
     def totals(self):
         v = co = cp = 0
@@ -545,29 +610,71 @@ class _Wall(object):
         for i, s in zip(run, snap):
             self.fam[f][i] = s.copy()
 
-    def _best_sides(self, f, run):
-        """Descida coordenada na orientacao dos B34 do trecho. Inverter UMA peca
-        so' muda violacoes perto dela: cada teste mede so' a janela da propria
-        peca (delta exato, as demais pecas ficam paradas durante o teste)."""
+    def _best_sides(self, f, run, joint=False):
+        """Descida coordenada na orientacao dos B34 do trecho - e, com
+        NEIGHBOUR_FLIPS_ENABLED, dos B34 de preenchimento das outras familias que
+        se sobrepoem ao trecho. Inverter UMA peca so' muda violacoes perto dela:
+        cada teste mede a janela da propria peca em TODAS as interfaces."""
         slots = self.fam[f]
-        pieces = [i for i in run if slots[i].orientable]
-        touching = [(a, b, k) for (a, b), k in self.weights.items() if f in (a, b)]
+        pieces = [slots[i] for i in run if slots[i].orientable]
+        if joint and NEIGHBOUR_FLIPS_ENABLED and run:
+            lo = slots[run[0]].lo - NEIGHBOUR_REACH_CM
+            hi = slots[run[-1]].hi + NEIGHBOUR_REACH_CM
+            for other in sorted(self.fam):
+                if other == f:
+                    continue
+                for slot in _in_window(self.fam[other], lo, hi):
+                    if slot.orientable and slot.movable:
+                        pieces.append(slot)
+        interfaces = sorted(self.weights.items())
 
         def cost(window):
             return sum(k * _violations_between(self.fam[a], self.fam[b], self.tol, window)
-                       for a, b, k in touching)
+                       for (a, b), k in interfaces)
         for _round in range(4):
             improved = False
-            for i in pieces:
-                window = (slots[i].lo - WINDOW_PAD_CM, slots[i].hi + WINDOW_PAD_CM)
+            for slot in pieces:
+                window = (slot.lo - WINDOW_PAD_CM, slot.hi + WINDOW_PAD_CM)
                 before = cost(window)
-                slots[i].side = -slots[i].side
+                slot.side = -slot.side
                 if cost(window) < before:
                     improved = True
                 else:
-                    slots[i].side = -slots[i].side
+                    slot.side = -slot.side
+            if joint and PAIR_FLIPS_ENABLED and not improved:
+                improved = self._pair_flips(pieces, cost)
             if not improved:
                 break
+
+    def _pair_flips(self, pieces, cost):
+        """Inverte DUAS pecas de FAMILIAS DIFERENTES, uma sobre a outra (centros a
+        ate' PAIR_FLIP_REACH_CM), de uma vez - primeira melhora, ordem fixa.
+        Minimo local medido na parede 8284574 (ponta junto a no' T): o vazado
+        menor do B34 da fiada par so' alinha se o B34 da impar logo acima girar
+        JUNTO - cada inversao isolada fica em 32 ou sobe para 64; o par vai a 0."""
+        family_of = {}
+        for f in self.fam:
+            for slot in self.fam[f]:
+                family_of[id(slot)] = f
+        ordered = sorted(pieces, key=lambda sl: (sl.lo, family_of.get(id(sl), -1)))
+        for a in range(len(ordered)):
+            pa = ordered[a]
+            mid_a = (pa.lo + pa.hi) / 2.0
+            for b in range(a + 1, len(ordered)):
+                pb = ordered[b]
+                if (pb.lo + pb.hi) / 2.0 - mid_a > PAIR_FLIP_REACH_CM:
+                    break
+                if family_of.get(id(pa)) == family_of.get(id(pb)):
+                    continue
+                window = (min(pa.lo, pb.lo) - WINDOW_PAD_CM, max(pa.hi, pb.hi) + WINDOW_PAD_CM)
+                before = cost(window)
+                if before == 0:
+                    continue
+                pa.side, pb.side = -pa.side, -pb.side
+                if cost(window) < before:
+                    return True
+                pa.side, pb.side = -pa.side, -pb.side
+        return False
 
     def optimize(self):
         runs = [(f, r) for f in sorted(self.fam) for r in _runs(self.fam[f])]
@@ -576,32 +683,71 @@ class _Wall(object):
             changed = False
             for f, run in runs:
                 orig = self._snap(f, run)
+                neighbour_sides = self._neighbour_sides(f, run)
                 ref = self._local(f, run)
                 if ref[0] == 0:
                     continue
-                ranked = []
+                ranked, pool = [], []
+                sides0 = [s.side or 1 for s in orig]
                 for index, codes in enumerate(self._arrangements_for(f, run)):
-                    self._apply(f, run, codes, [s.side or 1 for s in orig])
+                    self._apply(f, run, codes, sides0)
                     self._best_sides(f, run)
                     cost = self._local(f, run)
-                    if cost[0] < ref[0] and all(cost[k] <= ref[k] for k in range(1, len(ref))):
-                        moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
-                        ranked.append((cost, moved, index, self._snap(f, run)))
+                    if all(cost[k] <= ref[k] for k in range(1, len(ref))):
+                        if cost[0] < ref[0]:
+                            moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
+                            ranked.append((cost, moved, index, self._snap(f, run), self._neighbour_sides(f, run)))
+                        else:
+                            bound = self._local_bound(f, run)
+                            if bound < ref[0]:
+                                pool.append((bound, cost[0], index, codes))
                     self._restore(f, run, orig)
+                    self._set_neighbour_sides(neighbour_sides)
+                if REFINE_TOP_K and (NEIGHBOUR_FLIPS_ENABLED or PAIR_FLIPS_ENABLED):
+                    for _bound, _v, index, codes in sorted(pool)[:REFINE_TOP_K]:
+                        self._apply(f, run, codes, sides0)
+                        self._best_sides(f, run, joint=True)
+                        cost = self._local(f, run)
+                        if cost[0] < ref[0]:
+                            moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
+                            ranked.append((cost, moved, index, self._snap(f, run), self._neighbour_sides(f, run)))
+                        self._restore(f, run, orig)
+                        self._set_neighbour_sides(neighbour_sides)
                 if not ranked:
                     continue
                 ranked.sort(key=lambda item: (item[0], item[1], item[2]))
                 stacks_ref = _stacks(self.fam, self.course_fam, self.length, self.edges)
-                for _cost, _moved, _index, snap in ranked:
+                for _cost, _moved, _index, snap, sides in ranked:
                     self._restore(f, run, snap)
+                    self._set_neighbour_sides(sides)
                     if _stacks(self.fam, self.course_fam, self.length, self.edges) <= stacks_ref:
                         changed = True
                         changed_runs.add((f, tuple(run)))
                         break
                     self._restore(f, run, orig)
+                    self._set_neighbour_sides(neighbour_sides)
             if not changed:
                 break
         return changed_runs
+
+    def _neighbour_sides(self, f, run):
+        """[(slot, lado)] dos B34 de preenchimento das OUTRAS familias ao alcance."""
+        if not NEIGHBOUR_FLIPS_ENABLED or not run:
+            return []
+        lo = self.fam[f][run[0]].lo - NEIGHBOUR_REACH_CM
+        hi = self.fam[f][run[-1]].hi + NEIGHBOUR_REACH_CM
+        out = []
+        for other in sorted(self.fam):
+            if other == f:
+                continue
+            for slot in _in_window(self.fam[other], lo, hi):
+                if slot.orientable and slot.movable:
+                    out.append((slot, slot.side))
+        return out
+
+    def _set_neighbour_sides(self, sides):
+        for slot, side in sides:
+            slot.side = side
 
     def _arrangements_for(self, f, run):
         return _arrangements(self.fam[f], run)
@@ -681,30 +827,54 @@ class _Wall(object):
         if ref[0] == 0 and ref_specials == 0:
             return False  # nada a ganhar: dominancia exige menos vazado ou menos especiais
         original = list(slots)
+        neighbour_sides = self._neighbour_sides(f, run)
         best = None
+        pool = []
+
+        def consider(order, specials, ms_index, arr_index, joint_sides):
+            new_run = self._splice(f, run, order, joint)
+            self._best_sides(f, new_run, joint=joint_sides)
+            cost = self._local(f, new_run)
+            guards_ok = all(cost[k] <= ref[k] for k in range(1, len(ref)))
+            dominates = ((cost[0] < ref[0] and specials <= ref_specials)
+                         or (cost[0] <= ref[0] and specials < ref_specials))
+            found = None
+            bound = None
+            if guards_ok and not dominates and not joint_sides:
+                bound = self._local_bound(f, new_run)
+            if guards_ok and dominates:
+                found = ((cost[0], specials, len(order), ms_index, arr_index),
+                         [x.copy() for x in self.fam[f]], self._neighbour_sides(f, new_run))
+            self.fam[f] = list(original)
+            self._set_neighbour_sides(neighbour_sides)
+            return found, guards_ok, bound
         for ms_index, multiset in enumerate(self._neighbour_multisets(codes, joint)):
             specials = sum(1 for code in multiset if self._tpl(code).compensator)
             counts = collections.Counter(multiset)
             for arr_index, order in enumerate(_multiset_orders(counts, len(multiset),
                                                                 MAX_ARRANGEMENTS_PER_COMPOSITION)):
-                new_run = self._splice(f, run, order, joint)
-                self._best_sides(f, new_run)
-                cost = self._local(f, new_run)
-                guards_ok = all(cost[k] <= ref[k] for k in range(1, len(ref)))
-                dominates = ((cost[0] < ref[0] and specials <= ref_specials)
-                             or (cost[0] <= ref[0] and specials < ref_specials))
-                if guards_ok and dominates:
-                    key = (cost[0], specials, len(order), ms_index, arr_index)
-                    if best is None or key < best[0]:
-                        best = (key, [x.copy() for x in self.fam[f]])
-                self.fam[f] = list(original)
+                found, guards_ok, bound = consider(order, specials, ms_index, arr_index, False)
+                if found is not None:
+                    if best is None or found[0] < best[0]:
+                        best = found
+                elif guards_ok and bound is not None and (
+                        (bound < ref[0] and specials <= ref_specials)
+                        or (bound <= ref[0] and specials < ref_specials)):
+                    pool.append((bound, specials, ms_index, arr_index, tuple(order)))
+        if REFINE_TOP_K and (NEIGHBOUR_FLIPS_ENABLED or PAIR_FLIPS_ENABLED):
+            for _bound, specials, ms_index, arr_index, order in sorted(pool)[:REFINE_TOP_K]:
+                found, _ok, _v2 = consider(list(order), specials, ms_index, arr_index, True)
+                if found is not None and (best is None or found[0] < best[0]):
+                    best = found
         if best is None:
             return False
         stacks_ref = _stacks(self.fam, self.course_fam, self.length, self.edges)
         self.fam[f] = best[1]
+        self._set_neighbour_sides(best[2])
         if _stacks(self.fam, self.course_fam, self.length, self.edges) <= stacks_ref:
             return True
         self.fam[f] = original
+        self._set_neighbour_sides(neighbour_sides)
         return False
 
     # ------------------------------------------------------------ orientacao exata (secao 62)

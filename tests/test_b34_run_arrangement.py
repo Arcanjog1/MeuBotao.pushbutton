@@ -171,10 +171,43 @@ def _b19_extents(cc, course):
     return [(lo, hi) for lo, hi, code in _codes_by_t(cc, course, t_max=1e9) if code == "B19"]
 
 
+def _without_joint_orientation():
+    """Contexto: secao 60/61 sem a orientacao conjunta da secao 63."""
+    class _Off(object):
+        def __enter__(self):
+            self.old = (R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED)
+            R.NEIGHBOUR_FLIPS_ENABLED = R.PAIR_FLIPS_ENABLED = False
+
+        def __exit__(self, *exc):
+            R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED = self.old
+    return _Off()
+
+
 def test_control_without_ties_the_best_order_puts_the_half_block_at_35cm():
     cc = _odd_b19_at_the_end()
-    R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG)
+    with _without_joint_orientation():
+        R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG)
     assert _b19_extents(cc, 1) == [(35.0, 54.0)]
+
+
+def test_arrangement_keeps_the_half_block_off_a_tie_where_the_unguarded_best_order_puts_it():
+    """Com a secao 63 a melhor ordem sem guarda muda de lugar: a amarracao vai
+    para DENTRO do meio bloco dessa ordem (medido, nao fixado) e o arranjo tem de
+    escolher outra, ainda alinhando."""
+    free = _odd_b19_at_the_end()
+    R.arrange_b34_runs(free, WALLS, OPENINGS, CATALOG)
+    lo, hi = _b19_extents(free, 1)[0]
+    ties = {0: [(lo + hi) / 2.0]}
+    gap = m.HALF_BLOCK_TIE_ADJACENCY_CM
+    cc = _odd_b19_at_the_end()
+    before = _violations(cc)
+    R.arrange_b34_runs(cc, WALLS, OPENINGS, CATALOG, tie_positions_by_wall=ties,
+                       half_block_code="B19", half_block_tie_gap_cm=gap)
+    sva.orient_small_voids(cc, CATALOG)
+    assert _violations(cc) < before
+    for course in (1, 3, 5):
+        for b_lo, b_hi in _b19_extents(cc, course):
+            assert R._half_blocks_near_ties([_slot(b_lo, b_hi)], ties[0], "B19", gap) == 0
 
 
 def test_arrangement_keeps_the_half_block_off_a_tie_and_still_aligns():
@@ -348,16 +381,21 @@ def _wall_8284579():
     return cc
 
 
-def _run(cc, dp=True, band=None):
-    old = (R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND)
+def _run(cc, dp=True, band=None, joint=False):
+    """Secao 62 isolada por padrao (sem composicao e sem a orientacao conjunta
+    da secao 63, que sozinha ja' destrava parte desta parede)."""
+    old = (R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND,
+           R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED)
     R.B34_ORIENTATION_DP_ENABLED = dp
     R.B34_RUN_COMPOSITION_ENABLED = False
+    R.NEIGHBOUR_FLIPS_ENABLED = R.PAIR_FLIPS_ENABLED = joint
     if band is not None:
         R.ORIENTATION_DP_MAX_BAND = band
     try:
         summary = R.arrange_b34_runs(cc, WALL_209, OPENINGS, CATALOG)
     finally:
-        R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND = old
+        (R.B34_ORIENTATION_DP_ENABLED, R.B34_RUN_COMPOSITION_ENABLED, R.ORIENTATION_DP_MAX_BAND,
+         R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED) = old
     sva.orient_small_voids(cc, CATALOG)
     return summary
 
@@ -528,3 +566,101 @@ def test_arrangement_without_changes_does_not_rerun_compensator_orientation(monk
     m._orient_small_voids_final(result, CATALOG, _JAMB_WALLS, _JAMB_OPENINGS, arrange=True)
     assert comp["mirrored"] == "sentinela"
     assert "compensators_reoriented" not in result["b34_run_arrangement"]
+
+
+# --- secao 63: orientacao conjunta na avaliacao das ordens/composicoes ---------
+# Fixture = ponta REAL da parede 8284574 do BUTANTA (224 cm, no' T em t=0 nas
+# fiadas impares): par `B39 x5 + C09` depois do braco do no'; impar
+# `B34(no') B34 B39 B39 B39 B34`. Existe `B34 B39 B39 B39 B34 B19` na par (troca
+# B39+B39+C09 por B34+B34+B19: mesmo comprimento, sem especial) com 0 violacoes,
+# mas so' se o B34 da impar logo acima girar JUNTO - a descida de uma peca por
+# vez avaliava a composicao em 32 (pior que as 16 atuais) e a descartava.
+# segunda parede, isolada: o projeto usa B19 (a composicao so' troca por pecas
+# que o projeto ja' usa - `_fill_codes`)
+WALL_224 = [(seg(0, 0, 224, 0), ft(14.0), (False, False)), (seg(0, 500, 60, 500), ft(14.0), (False, False))]
+_END_EVEN = [("B39", 15, 54, 0, False), ("B39", 55, 94, 0, False), ("B39", 95, 134, 0, False),
+             ("B39", 135, 174, 0, False), ("B39", 175, 214, 0, False), ("C09", 215, 224, 0, False)]
+_END_ODD = [("B34", 0, 34, -1, True), ("B34", 35, 69, -1, False), ("B39", 70, 109, 0, False),
+            ("B39", 110, 149, 0, False), ("B39", 150, 189, 0, False), ("B34", 190, 224, 1, False)]
+
+
+def _wall_8284574_end():
+    cc = dict((c, _real_row(_END_ODD if c % 2 else _END_EVEN, c)) for c in range(9))
+    other = m._place_pier_layout([("B19", 0, 19)], CATALOG, m.XYZ(0.0, ft(500.0), 0.0), DIRECTION, 0, 1)
+    cc[0].extend(other)
+    sva.orient_small_voids(cc, CATALOG)
+    return cc
+
+
+def _arrange_224(cc, joint):
+    old = (R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED)
+    R.NEIGHBOUR_FLIPS_ENABLED = R.PAIR_FLIPS_ENABLED = joint
+    try:
+        summary = R.arrange_b34_runs(cc, WALL_224, [[], []], CATALOG)
+    finally:
+        R.NEIGHBOUR_FLIPS_ENABLED, R.PAIR_FLIPS_ENABLED = old
+    sva.orient_small_voids(cc, CATALOG)
+    return summary
+
+
+def _specials(cc):
+    return sum(1 for c in cc for x in cc[c] if (CATALOG.get(x["logical_code"]) or {}).get("is_compensator"))
+
+
+def _extent_224(cc, course):
+    p0, _p1, direction, _l, _t = m._wall_axis_and_length(WALL_224, 0)
+    spans = [m._candidate_extent_on_wall_axis(x, p0, direction) for x in cc[course] if x.get("wall_idx") == 0]
+    return round(min(a for a, _b in spans), 3), round(max(b for _a, b in spans), 3)
+
+
+def test_red_wall_end_composition_is_discarded_with_one_piece_flips():
+    cc = _wall_8284574_end()
+    before = _violations(cc)
+    assert before > 0
+    _arrange_224(cc, joint=False)
+    assert _violations(cc) == before
+
+
+def test_green_joint_orientation_accepts_the_wall_end_composition_without_specials():
+    cc = _wall_8284574_end()
+    specials, ends = _specials(cc), dict((c, _extent_224(cc, c)) for c in cc)
+    nodes = _node_sides(cc)
+    summary = _arrange_224(cc, joint=True)
+    assert summary["compositions"] >= 1
+    assert _violations(cc) == 0
+    assert _specials(cc) < specials                       # o C09 da ponta sai
+    assert dict((c, _extent_224(cc, c)) for c in cc) == ends
+    assert _node_sides(cc) == nodes
+
+
+def test_joint_orientation_result_is_idempotent_on_the_wall_end():
+    cc = _wall_8284574_end()
+    _arrange_224(cc, joint=True)
+    signature = _geometry(cc)
+    again = _arrange_224(cc, joint=True)
+    assert again["runs_changed"] == 0 and not again.get("compositions")
+    assert _geometry(cc) == signature and _violations(cc) == 0
+
+
+def test_orientation_lower_bound_never_exceeds_the_exact_minimum_and_restores_sides():
+    """O limite da secao 63 so' decide QUEM a orientacao conjunta reavalia: se
+    passar do minimo exato, descartaria uma ordem boa. Forca bruta no trecho real."""
+    import itertools
+    w = _slice_wall(sorted(_DP_SLICE["fam"]))
+    variables = _slice_variables(w)
+    original = [s.side for s in variables]
+
+    def total():
+        return sum(k * R._violations_between(w.fam[a], w.fam[b], w.tol) for (a, b), k in sorted(w.weights.items()))
+    bound = sum(k * R._violations_lower_bound(w.fam[a], w.fam[b], w.tol) for (a, b), k in sorted(w.weights.items()))
+    assert [s.side for s in variables] == original
+    best = None
+    for combo in itertools.product((-1, 1), repeat=len(variables)):
+        for s, side in zip(variables, combo):
+            s.side = side
+        value = total()
+        best = value if best is None or value < best else best
+    for s, side in zip(variables, original):
+        s.side = side
+    assert bound <= best
+    assert bound < total()  # e informa: abaixo do custo atual
