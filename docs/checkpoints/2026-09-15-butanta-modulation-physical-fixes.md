@@ -8,7 +8,7 @@
   "head": "23dfcb7f494b4568980339784ece17b6fb70a668",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
   "veredito": "PARTIAL — REMAINING LIMITATIONS PRECISELY EXPLAINED",
   "objective": "Corrigir a modulação real no Revit comparando o projeto humano BUTANTÃ R08_LT (somente leitura) com o doc de teste 'butanta testes', sem hardcode, sem mascarar validador e sem corromper a referência humana.",
   "changes": [
@@ -103,7 +103,7 @@
 
 - `origin/main` = `55e990d962ed22ae1021f0d335db197607bddda1` (merge do PR
   [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41)), confirmado por fetch.
-- Branch `claude/butanta-modulation-physical-fixes` criada dessa main. Sem merge.
+- Branch `claude/butanta-modulation-physical-fixes` criada dessa main. PR draft [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42), sem merge.
 
 ## 2. Documentos Revit
 
