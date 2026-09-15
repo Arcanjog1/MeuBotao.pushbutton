@@ -8131,3 +8131,89 @@ ficaram fora do código; os números estão no checkpoint da missão.
 vazado menor + peças de nó + bandas vizinhas), ou decidir normativamente a
 prioridade entre a regra 52 e a redução de especiais. Nada foi alterado no motor
 por esta seção.
+
+## 56. Compensadores encostados — regra #2 na Fiada A e compensador contra peça de nó (2026-09-15)
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, 34 paredes de alvenaria, 6.018
+peças, fiadas 0–11):** ZERO pares de compensadores IGUAIS encostados
+(`C09+C09` e `C04+C04`). O humano encosta apenas C04 com C09 — 97 vezes. O
+solver tinha 20 pares `C09+C09`.
+
+**Duas causas medidas:**
+
+| Causa | Casos | Onde |
+|---|---|---|
+| O guloso da Fiada A nunca olhou a regra #2 fora do trecho absorvido pela 30.8 | 6 | trecho fechado dos dois lados (ex.: parede de 100 cm entre dois cantos L: `B39+C09+C09+C04` em vez de `C09+B39+C09+C04`) |
+| Compensador da ponta do preenchimento encostando no compensador de uma peça de NÓ (T degradado) | 11 | ponta do trecho contra o nó |
+| Reparo de vão na jamba junto a nó | 3 | jamba |
+
+### 56.1 REGRA OBRIGATÓRIA (implementada) — regra #2 em TODO trecho da Fiada A
+
+`RULE2_ON_EVERY_COURSE_A_SEGMENT = True` (`core/engine/wall_stepper.py`): o
+complemento da 30.8 (`_absorbed_segment_rule2_layout`) passa a valer para
+qualquer trecho da Fiada A, não só o absorvido. A Fiada B já fazia isso pela
+busca de desencontro.
+
+**Medido** — BUTANTÃ: nenhum efeito isolado (os 6 casos precisam também da
+56.2); TGD V2: `COMPENSATOR_CONSECUTIVE` 464 → 412 e `PRISM_STAGGER_BELOW_TARGET`
+739 → 702, prisma e demais achados iguais; TP1 V1: `COMPENSATOR_CONSECUTIVE`
+881 → 830, `PRISM_STAGGER_BELOW_TARGET` 1.539 → 1.559.
+
+### 56.2 REGRA COM TENTATIVA POR PAREDE (implementada) — compensador não encosta em compensador de nó
+
+`compensator_node_adjacency_trial` (`core/engine/wall_stepper.py`): quando o
+preenchimento de uma parede tem compensador encostado num compensador de peça
+de nó, a parede é resolvida **de novo** com a regra ligada
+(`_layout_avoiding_compensator_against_node`: composição espelhada, bypass de
+tier e `first_code` do mesmo trecho) e só fica com a versão nova se:
+
+1. o encosto diminui estritamente;
+2. **não** aumentam as faces de peça repetidas entre as fiadas A e B da mesma
+   parede (regra #1);
+3. não aumentam pares de compensadores encostados, trecho fora do módulo nem
+   `alignment_conflicts`, e não diminui o comprimento assentado.
+
+**Por que com tentativa**: ligada direto na escolha de composição, a regra
+reprovou o corpus — TGD V2 `PRISM_CONTINUOUS_JOINT` 53 → 87 e `PRISM_JOINT_STACK`
+5 → 8 —, porque trocar a composição move juntas que o recorte de vão e a fiada
+oposta só resolvem depois. Com a tentativa, o prisma volta a 53/5.
+
+**Travamento de 10 cm (18.6) não é guarda desta regra**, por evidência humana:
+no humano 7% das juntas ficam a menos de 10 cm da junta vizinha (244 delas
+exatamente coincidentes, contra 30 do solver), enquanto compensador encostado em
+compensador igual não aparece nenhuma vez. Consequência registrada: TP1 V1
+`PRISM_STAGGER_BELOW_TARGET` 1.539 → 1.689 (preferência), com
+`PRISM_CONTINUOUS_JOINT` inalterado em 16.
+
+**Medido com as duas regras (BASE `55e990d` → branch):**
+
+| Corpus | Métrica | BASE | Com 56.1 + 56.2 |
+|---|---|---|---|
+| BUTANTÃ (34 paredes, 13 fiadas) | `C09+C09` encostados | 11 | 9 |
+| BUTANTÃ | ramo anterior desta branch | 20 | 9 |
+| TGD V2 | `COMPENSATOR_CONSECUTIVE` | 472 | 407 |
+| TGD V2 | `PRISM_CONTINUOUS_JOINT` / `PRISM_JOINT_STACK` | 53 / 5 | 53 / 5 |
+| TP1 V1 | `COMPENSATOR_CONSECUTIVE` | 936 | 825 |
+| TP1 V1 | `PRISM_CONTINUOUS_JOINT` | 16 | 16 |
+
+**Testes:** `tests/test_compensator_adjacency.py` (vermelho/verde da 56.1 numa
+parede de 100 cm entre dois cantos; espelhamento preserva envelope e juntas; a
+56.2 só age dentro da tentativa; tentativa aceita, recusa e é pulada).
+
+### 56.3 CONFLITO MEDIDO — B19 no meio da parede e B34+B19 onde caberia B54 NÃO são erro
+
+O pedido de tratar como erro (a) B19 no meio da parede e (b) `B34+B19` onde
+cabe um B54 foi **medido contra o humano e não se sustenta**:
+
+| Métrica (34 paredes, fiadas 0–11) | Humano | Solver |
+|---|---|---|
+| B19 fora de jamba/ponta/nó ("meio de parede") | 103 | 35 |
+| `B34 + junta + B19` ocupando exatamente 54 cm | 107 | 81 |
+| B19 a mais de 60 cm de qualquer nó | 171 | 126 |
+| B54 a até 35 cm de um nó | 172 de 172 (100%) | 168 de 168 (100%) |
+
+O humano usa **mais** B19 no meio e **mais** `B34+B19` no envelope de 54 cm que
+o solver, e **nunca** usa B54 longe de encontro: o B54 é peça de amarração de nó,
+não preenchimento. Implementar "B54 domina B34+B19" colocaria B54 onde o humano
+nunca põe. Registrado como conflito resolvido a favor do projeto humano; nada foi
+alterado no motor por esta seção.
