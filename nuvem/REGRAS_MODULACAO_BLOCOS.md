@@ -8266,3 +8266,67 @@ inteira por construção. Portanto:
   guarda de aceitação (seria mais rígida que o projeto humano de referência);
 - a guarda correta é a **junta empilhada em 3+ fiadas** fora de jamba/nó, que é o
   que os achados `PRISM_CONTINUOUS_JOINT` e `PRISM_JOINT_STACK` auditam.
+
+## 58. Pastilha de 9 cm na amarração do nó degradado — DEFEITO LOCALIZADO (2026-09-15)
+
+**Evidência humana (BUTANTÃ R08_LT, 34 paredes de alvenaria, 383 pontas de
+fiada analisadas):** o humano **nunca** termina uma parede com um C09 (9 cm).
+Terminar com C04 (4 cm) ele aceita — 12 vezes. O solver termina com C09 **40
+vezes**.
+
+| Peça extrema da fiada | Humano | Solver |
+|---|---|---|
+| `C09` | **0** | **40** |
+| `C04` | 12 | 21 |
+| `B34` (amarração) | maioria | 393 |
+
+**Causa medida — não é o preenchimento, é a peça de nó.** Classificando as 40 por
+`placement_reason`:
+
+| Origem | Casos | É peça de nó? |
+|---|---|---|
+| `T_INTERSECTION_INCOMING_DEGRADED` | 30 | sim |
+| `L_CORNER_DEGRADED` | 3 | sim |
+| `STANDARD_FILL` | 7 | não |
+
+Ou seja **33 das 40 são a pastilha do nó degradado**: quando a boneca do T não
+tem os 34 cm exigidos para um B34, `solve_t_intersection` cai no ramo 2 e põe um
+compensador único (`_corner_single_element_candidate`) **nas duas famílias de
+fiada, em todas as fiadas** — nó 46 da parede 26 tem 11 pastilhas, uma por fiada.
+
+**O que o humano faz nessas mesmas pontas** (medido peça a peça nas 6 pontas onde
+o solver põe pastilha):
+
+| Parede | Ponta | Humano |
+|---|---|---|
+| 8284558 | 494 cm | `B34` em 4 fiadas, **recua** em 8 |
+| 8284562 | 494 cm | `B34` em 4, `B19` em 4, recua em 4 |
+| 8284563 | 499 cm | `B34` em 6, recua em 6 |
+| 8284580 | 209 cm | `B34` em 6, recua em 6 |
+| 8284584 | 0 e 115 cm | `B34` em 4, `B19` em 2, especial em 1, recua em 5 |
+
+O humano **alterna**: amarra com bloco inteiro numa família e na outra **recua**,
+cedendo a ponta à parede que cruza — que fisicamente já ocupa aquele espaço no
+encontro em T. Ele nunca preenche o resto com uma pastilha de 9 cm.
+
+### 58.1 Tentativa no preenchimento — MEDIDA E REVERTIDA
+
+Foi implementada (e revertida) a regra "compensador longo não é a peça extrema da
+parede" no nível da composição, com tentativa por parede e as mesmas guardas da
+56.2. **Resultado medido no BUTANTÃ:**
+
+- o detector alcança apenas **6 dos 40** casos — os outros 34 não passam pela
+  escolha de composição, são peça de nó;
+- nos 6, a regra remove o compensador da ponta (6 → 0), mas as guardas **recusam
+  os 6** por assentar 1 cm a menos de parede (389 → 388 cm), sem nenhum outro
+  ganho;
+- com a regra **forçada** (sem tentativa), o total de `C09` **piora**: 494 → 500.
+
+Hipótese rejeitada; nada permaneceu no motor. O defeito real está no ramo
+degradado de `solve_t_intersection` / `_corner_single_element_candidate`
+(`core/engine/wall_stepper.py`), e a correção correta é **alternar o papel da
+ponta** (amarrar numa família, recuar na outra, como a 30.5/30.7 já faz no nó
+não degradado) em vez de emitir pastilha nas duas famílias. Essa mudança mexe em
+peça de nó e atinge também TGD e TP1 (31 e 35 ocorrências no censo), portanto
+exige o ciclo completo do gate de não-regressão antes de entrar — registrada
+aqui como defeito localizado com causa, não corrigida nesta rodada.
