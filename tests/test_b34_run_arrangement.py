@@ -478,3 +478,53 @@ def test_dp_orientation_does_not_depend_on_family_order():
         w.orient_exact()
         results.append((_slice_total(w), [s.side for s in _slice_variables(w)]))
     assert results[0] == results[1] == results[2]
+
+
+# --- secao 64: orientacao dos compensadores depois do arranjo -----------------
+
+_JAMB_WALLS = [(seg(0, 0, 400, 0), ft(14.0), (False, False))]
+_JAMB_OPENINGS = [[(ft(100.0), ft(150.0), ft(0.0), ft(210.0))]]
+
+
+def _compensator_at(center_cm):
+    return {"wall_idx": 0, "origin_world": m.XYZ(ft(center_cm), 0.0, 0.0), "x_dir": m.XYZ(1.0, 0.0, 0.0),
+            "y_dir": m.XYZ(0.0, 1.0, 0.0), "length_cm": 5.0, "width_cm": 14.0, "course": "A",
+            "logical_code": "C04"}
+
+
+def _required_mirror(cand):
+    p0, _p1, direction, _l, _t = m._wall_axis_and_length(_JAMB_WALLS, 0)
+    return m._compensator_required_mirror(cand, [(100.0, 150.0)], p0, direction)
+
+
+def test_arrangement_that_moves_a_compensator_to_the_other_jamb_reorients_its_closed_side(monkeypatch):
+    """A Etapa 4D orienta o compensador (lado fechado para a abertura) ANTES do
+    arranjo; se o arranjo leva a peca para a outra jamba, o lado fechado fica
+    virado para a alvenaria. Medido na BUTANTA com pecas de reparo de vao nas
+    corridas: 3 compensadores assim. A 4D tem de rodar de novo na posicao final."""
+    comp = _compensator_at(97.5)
+    m.orient_compensator_candidates([comp], _JAMB_WALLS, _JAMB_OPENINGS, CATALOG)
+    before = comp["mirrored"]
+
+    def fake_arrangement(course_candidates, *args, **kwargs):
+        comp["origin_world"] = m.XYZ(ft(152.5), 0.0, 0.0)  # mesma peca, outra jamba
+        return {"runs_changed": 1, "compositions": 0, "moved": 1, "created": 0, "removed": 0}
+    monkeypatch.setattr(R, "arrange_b34_runs", fake_arrangement)
+    result = {"course_candidates": {0: [comp], 1: [comp]}}  # objeto compartilhado entre fiadas
+    m._orient_small_voids_final(result, CATALOG, _JAMB_WALLS, _JAMB_OPENINGS, arrange=True)
+
+    required = _required_mirror(comp)
+    assert required is not None and required != before  # o teste nao passa a' toa
+    assert comp["mirrored"] is required
+    assert result["b34_run_arrangement"]["compensators_reoriented"] == 1
+
+
+def test_arrangement_without_changes_does_not_rerun_compensator_orientation(monkeypatch):
+    comp = _compensator_at(97.5)
+    comp["mirrored"] = "sentinela"  # a 4D escreveria um bool
+    monkeypatch.setattr(R, "arrange_b34_runs", lambda *a, **k: {
+        "runs_changed": 0, "compositions": 0, "moved": 0, "created": 0, "removed": 0})
+    result = {"course_candidates": {0: [comp]}}
+    m._orient_small_voids_final(result, CATALOG, _JAMB_WALLS, _JAMB_OPENINGS, arrange=True)
+    assert comp["mirrored"] == "sentinela"
+    assert "compensators_reoriented" not in result["b34_run_arrangement"]

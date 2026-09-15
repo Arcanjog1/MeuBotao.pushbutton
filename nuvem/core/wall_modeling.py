@@ -3793,6 +3793,20 @@ def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog,
     return validate
 
 
+def _reorient_compensators_after_arrangement(course_candidates, walls_to_create, openings_per_wall, catalog):
+    """Roda `orient_compensator_candidates` sobre as pecas finais (sem repetir
+    objeto compartilhado entre fiadas) e devolve quantas mudaram de lado."""
+    seen, flat = set(), []
+    for course_index in sorted(course_candidates or {}):
+        for cand in course_candidates[course_index] or ():
+            if id(cand) not in seen:
+                seen.add(id(cand))
+                flat.append(cand)
+    before = dict((id(c), bool(c.get("mirrored"))) for c in flat)
+    orient_compensator_candidates(flat, walls_to_create, openings_per_wall, catalog)
+    return sum(1 for c in flat if bool(c.get("mirrored")) != before[id(c)])
+
+
 def _b34_run_arrangement_legacy_enabled():
     from core.engine import b34_run_arrangement as _runs
     return _runs.B34_RUN_ARRANGEMENT_LEGACY
@@ -3834,6 +3848,18 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
             validate_wall=validate_wall)
         result["b34_run_arrangement"] = arrangement
+        pieces_changed = bool(arrangement.get("runs_changed") or arrangement.get("compositions")
+                              or arrangement.get("moved") or arrangement.get("created")
+                              or arrangement.get("removed"))
+        if pieces_changed:
+            # ETAPA 4D de novo, sobre a posicao FINAL: a orientacao dos
+            # compensadores (lado fechado voltado para a abertura) foi decidida
+            # antes do arranjo, que move e cria compensadores. Medido: com pecas
+            # de reparo de vao nas corridas, 3 compensadores ficavam com o lado
+            # fechado errado junto da abertura. A funcao e' a fonte da verdade e
+            # recalcula tudo da posicao real (idempotente).
+            arrangement["compensators_reoriented"] = _reorient_compensators_after_arrangement(
+                course_candidates, walls_to_create, openings_per_wall, catalog)
         if arrangement.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
             again = _small_void.orient_small_voids(course_candidates, catalog)
             summary["rotated_after_arrangement"] = again.get("rotated", 0)
@@ -4294,6 +4320,15 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
                               validate_wall=_channel_wall_validator(
                                   result, walls_to_create, openings_per_wall, catalog, num_courses,
                                   nodes, end_to_node, _band))
+    _arrangement = result.get("b34_run_arrangement") or {}
+    if (_arrangement.get("runs_changed") or _arrangement.get("compositions") or _arrangement.get("moved")
+            or _arrangement.get("created") or _arrangement.get("removed")):
+        # a validacao CHANNEL guardada foi feita ANTES do arranjo: refaz sobre a
+        # geometria final para o relatorio nao mentir
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+            free_to_top=plan["free_to_top"], policy=plan["policy"],
+            reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
