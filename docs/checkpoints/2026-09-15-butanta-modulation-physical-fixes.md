@@ -296,3 +296,40 @@ A correção da seção 56 é visível na peça física: o par de compensadores 
 que o humano nunca usa, cai pela metade. O `C09` extremo e o excesso de
 especiais continuam abertos — causa localizada na seção 58, correção pronta e
 desligada pelo gate.
+
+## 11. Regressão consolidada e classificação das falhas
+
+`1.250 passaram, 3 falharam` (43 min, `pytest tests/ -q -p no:randomly`). As três
+foram executadas também no worktree da BASE (`55e990d`) e **falham
+identicamente lá**:
+
+| Falha | Classe | Evidência |
+|---|---|---|
+| `test_benchmark_baselines[torre_easy_lo_r00_tp1]` | **D — baseline defasado** | falha na main |
+| `test_benchmark_baselines_versionado[torre_easy_lo_r00_tgd-v2]` | **D — baseline defasado** | falha na main |
+| `test_perf_trace_stall_sampler` | **ambiente** | `ctypes.PyDLL("kernel32")` no Windows; falha na main |
+
+Nenhum baseline, golden, threshold, `reference_score` ou snapshot histórico foi
+alterado nesta missão.
+
+## 12. Comparador humano × solver (88 lados de vão, fiadas 0–11)
+
+| Classe | Lote anterior | Lote atual |
+|---|---|---|
+| `EXACT_MATCH` | 0 | 0 |
+| `PHYSICALLY_EQUIVALENT` | 25 | 25 |
+| `SOLVER_BETTER` | 10 | 10 |
+| `VALID_ALTERNATIVE` | 2 | 2 |
+| `SOLVER_WORSE` | 51 | 51 |
+
+Idêntico entre os dois lotes: as regras da seção 56 atuam no corpo da parede, não
+na região de jamba (seção 55, ainda aberta).
+
+## 13. `MISSING_UNDER_WINDOW` — artefato de limiar, não vazio físico
+
+O único vão marcado (parede 8284584, vão de 66 cm, peitoril 40 cm) tem **94,7%**
+de cobertura nas fiadas abaixo do peitoril; o **humano tem 95,5% no mesmo vão**,
+e o limiar da métrica é 95%. Os 3,5 cm "faltantes" são **juntas de argamassa**: o
+solver usa uma peça a mais que o humano naquele trecho, logo uma junta a mais.
+Com limiar de 92% os dois dão zero vãos reprovados. O valor é o mesmo na BASE e
+no PR — não é regressão, e o limiar **não** foi alterado.
