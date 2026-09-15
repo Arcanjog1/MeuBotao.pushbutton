@@ -5352,6 +5352,10 @@ tentativa ligadas no legado (para registro, NÃO ativado): TGD V1 descoberto
 `COVERAGE_ROW_MOSTLY_EMPTY` 86 → 92 por reclassificação (as 12 fiadas novas são
 iguais ou melhores, em paredes que deixaram de ser `COVERAGE_PARTIAL_WALL`) e
 categoria compensadores 62 → 63. Levar para o legado exige decisão sobre a régua.
+Consequência registrada: nas paredes em que uma tolerância é aceita, a CHANNEL
+deixa de ter exatamente as mesmas juntas do legado fora das corridas de
+canaleta (a comparação "CHANNEL × legado" da seção 51.3 continua valendo onde
+nenhuma tolerância atua).
 
 **Evidência BUTANTÃ (bancada offline do doc de teste, 34 paredes, 13 fiadas,
 CHANNEL)**:
@@ -8080,3 +8084,50 @@ nem cobertura.
 muda e os vereditos são idênticos. **Testes**:
 `tests/test_physical_tolerance_trial.py` (fusão, nó, códigos mistos, junta
 larga, alvo não compensador, início da variante).
+
+## 55. Especiais junto da jamba — pilarete refeito só em parte (2026-09-15, DOCUMENTADO — pendência de código aberta)
+
+**Medido (humano BUTANTÃ × solver, 34 paredes, fiadas 0–11)**: o humano usa 500
+compensadores/pastilhas (C04 244, C09 256); o lote do botão no doc de teste usa
+808 (C04 329, C09 479). A maior diferença está nos pilaretes entre jamba e nó.
+
+**Causa raiz (medida)**: a modulação CONTÍNUA põe peças no trecho inteiro
+entre dois nós, atravessando o vão; o recorte derruba o que invade o vão e o
+reparo refaz **só a sobra junto da jamba**, mantendo as peças contínuas entre a
+jamba e o nó. Exemplo: porta com jamba a 75 cm de um nó B54 — o solver deixa
+B19 + C04 + B39 + C09 numa fiada e B39 + C04 + B39 + C09 na outra; o humano
+assenta B39 + B34 e B19 + B39 + B34 (zero especiais), e o próprio solver de
+pilarete, chamado sobre o pilarete inteiro, devolve exatamente a solução humana.
+
+**Tentativas medidas nesta missão (bancada, 34 paredes, 13 fiadas) — NENHUMA
+integrada, porque todas trocam erro**:
+
+| Variante | Especiais 0–11 | Violações do vazado menor B34 | Paredes reprovadas |
+|---|---|---|---|
+| Sem mudança | 835 | 264 | 3 |
+| Refaz o pilarete inteiro nas duas famílias, sem conferência | 550 | 476 | 6 |
+| Idem, fronteira de nó tratada como fechada | 551 | 341 | 3 |
+| Só a Fiada B, sem coincidência de junta | 700 | 334 | 3 |
+| Tentativa por parede com conferência local de junta e de B34 | 804 | 287 | 3 |
+| Seleção GLOBAL por parede (resolve com e sem; libera só as paredes que melhoram sem piorar nada) | 778 | 261 | 3 |
+
+**Por que troca erro**: trocar compensador por bloco vazado (B39/B19) cria
+restrição de vazado menor que o compensador não criava (B34 sobre compensador
+está fora da regra 52; sobre B39 é violação). O humano concilia as duas regras
+escolhendo a composição do pilarete junto com a orientação e com as peças de
+nó; a conferência local do motor não enxerga as peças de nó nem as fiadas de
+outra banda.
+
+**Por que a seleção global também não foi integrada**: é a única variante sem
+troca de erro (5 paredes liberadas; buracos, NON_MODULAR, apoio, canaleta
+obrigatória e colisões iguais), mas (1) quebra o contrato da seção 51.3 — a
+CHANNEL passaria a ter juntas que o legado não tem
+(`test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically`)
+—, (2) ligá-la também no legado muda o benchmark congelado e (3) triplica o
+tempo de cálculo (bancada 7 → 19 s) para 7% menos especiais. Protótipo e teste
+ficaram fora do código; os números estão no checkpoint da missão.
+
+**Pendência**: refazer o pilarete inteiro com um critério conjunto (especiais +
+vazado menor + peças de nó + bandas vizinhas), ou decidir normativamente a
+prioridade entre a regra 52 e a redução de especiais. Nada foi alterado no motor
+por esta seção.
