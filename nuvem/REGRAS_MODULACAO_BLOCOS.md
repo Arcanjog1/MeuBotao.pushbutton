@@ -9044,3 +9044,50 @@ real (parede de 604 cm, T em t=177 com a peça de nó terminando em 204, jamba e
   segurança, teto do deslocamento **total** e a ordem de prioridade
   (padrão vertical acima de especiais);
 - controle: posição já boa não se move.
+
+## 67. Fronteira de banda da parede 8284557 — LIMITAÇÃO MEDIDA, não falha de busca (2026-09-16)
+
+O maior resíduo de vazado menor da BUTANTÃ estava na parede **8284557** (514 cm,
+nó T no meio). Depois das §60–66 ela tem **4** violações. A investigação pedida
+(coordenação entre bandas) mediu o seguinte:
+
+**Estrutura.** A parede tem 5 famílias de fiada: `{0: (0,2), 1: (1,3), 2: (4),
+3: (5,7,9,11,13,15), 4: (6,8,10,12,14,16)}`. A fiada **4** é uma família
+sozinha: é a **fronteira** entre a banda de baixo (0/1) e a de cima (3/4). As
+interfaces que ainda violam são `(1,2)` e `(2,3)`, **peso 1 cada**; as internas
+das bandas — `(3,4)` peso 6 e `(0,1)` peso 2 — estão **limpas**.
+
+**Cada família, sozinha, já está no ótimo local.** Reordenando qualquer corrida
+de qualquer família (todas as ordens, com a melhor orientação de cada uma), o
+melhor custo local é igual ao atual em todas elas.
+
+**A fronteira não consegue casar com as duas bandas ao mesmo tempo.**
+Enumerando os layouts da família 2 e aplicando a **orientação exata (DP §62)** a
+cada um, os pares alcançáveis são:
+
+| `(1,2)` | `(2,3)` | soma |
+|---|---|---|
+| 0 | 4 | **4** |
+| 2 | 2 | **4** |
+| 4 | 0 | **4** |
+| 2 | 4 | 6 |
+| 4 | 2 | 6 |
+
+A soma é **invariante em 4**: casar perfeitamente com uma banda custa
+exatamente o mesmo contra a outra, porque as duas bandas têm corridas de B34 em
+**fase diferente** e uma única fiada só pode ter uma fase.
+
+**Coordenar as famílias juntas também não baixa de 4.** Busca conjunta sobre
+todas as 5 famílias (K = 8 layouts cada, 32.768 combinações, avaliando o total
+da parede) — melhor resultado **4**.
+
+**Por que não mudar a fase de uma banda inteira.** Trocar a fase da banda de
+cima limparia as duas interfaces de peso 1 e sujaria a interface interna de
+**peso 6**: o solver já escolhe o mínimo de custo. A escolha atual (2+2) é a
+cost-minimal.
+
+**Conclusão: limitação física real desta geometria**, com prova por enumeração,
+não falha de busca. Uma coordenação entre bandas foi implementada e medida
+(top-K por família, pares e trios, guardas preservadas): **ganho zero em toda a
+BUTANTÃ** — a mesma assinatura de peças — e por isso **não foi mantida no
+motor**, para não pagar busca que não paga.
