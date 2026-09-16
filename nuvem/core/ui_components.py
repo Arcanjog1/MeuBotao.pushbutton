@@ -138,7 +138,7 @@ class UiComponents(object):
         context = self.panel("Bottom", 108)
         context.BackColor = self.color("Background")
         holder._strategy = self.label("", 30, True)
-        holder._families = self.label("○ Famílias ainda não verificadas", 40)
+        holder._families = self.label("○ Famílias\n   ainda não verificadas", 40)
         holder._families.ForeColor = self.color("TextSecondary")
         context.Controls.Add(holder._families)
         context.Controls.Add(holder._strategy)
@@ -683,7 +683,7 @@ class UiComponents(object):
         form._ui_families.Text = "\r\n".join(lines)
         if hasattr(form, "_plan_preview"):
             form._plan_preview._families.Text = ("✕ {} família(s) ausente(s)".format(len(missing)) if missing else
-                "✓ {} família(s) disponível(is)".format(len(catalog)) if catalog else "○ Famílias ainda não verificadas")
+                "✓ {} família(s) disponível(is)".format(len(catalog)) if catalog else "○ Famílias\n   ainda não verificadas")
 
     def existing_setup(self, wall_count, level_name, height_m, opening_count):
         form = self.new("Form")
@@ -780,7 +780,7 @@ class UiComponents(object):
         total = sum(state.counts.values()) if state.counts is not None else "—"
         form._ui_plan_metrics._summary.Text = "{} paredes · {} aberturas · {} blocos planejados".format(
             len(h.walls_to_create or []), len(h.all_openings or []), total)
-        form._ui_banner.Text = "Modulação pronta. " + state.reason if state.can_create else state.reason
+        form._ui_banner.Text = "✓ Modulação pronta. " + state.reason if state.can_create else "! " + state.reason
         form._ui_banner.ForeColor = self.ns["UI_OK" if state.can_create else "UI_ERROR"]
         form._create_button.Enabled = state.can_create
         self.ns["_style_secondary_button"](form._solve_button)

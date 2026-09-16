@@ -86,3 +86,6 @@ def style_grid(grid):
             occupied = sum(grid.Columns[i].Width for i in range(grid.Columns.Count - 1))
             grid.Columns[grid.Columns.Count - 1].Width = max(90, grid.ClientSize.Width - occupied)
     grid.Resize += fit
+    grid.HandleCreated += fit
+    grid.VisibleChanged += fit
+    fit(None, None)
