@@ -152,3 +152,20 @@ def test_existing_strategy_flows_explicitly_and_invalidates_incompatible_cache()
 def test_stale_geometry_error_has_next_action():
     text = friendly_error("BETA BLOQUEADO: eixo deslocado/rotacionado")
     assert "selecione as paredes novamente" in text and "reanalise" in text
+
+
+def test_busy_blocks_competing_actions_and_new_plan_requires_new_review():
+    window, handler = form()
+    window._review_check.Checked = True
+    window._delete_button.Enabled = True
+    window._ux.busy(window, 4)
+    assert not window._delete_button.Enabled
+    assert not window._errors_grid.Enabled
+    assert not window._debug_color_check.Enabled
+    assert not window._review_check.Enabled
+    handler.solve_result = result()
+    window._on_solve_done("solve", None)
+    assert window._errors_grid.Enabled
+    assert window._review_check.Enabled
+    assert not window._review_check.Checked
+    assert not window._delete_button.Enabled

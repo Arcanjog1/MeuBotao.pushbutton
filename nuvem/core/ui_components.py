@@ -349,6 +349,10 @@ class UiComponents(object):
         form._ui_progress._set_expanded(True)
         form.ControlBox = False
         form._fix_button.Enabled = False
+        for control in (form._errors_grid, form._delete_button, form._review_check,
+                        form._debug_color_check, form._debug_filter_both,
+                        form._debug_filter_a, form._debug_filter_b):
+            control.Enabled = False
         form._create_button.Enabled = False
         form._solve_button.Enabled = False
 
@@ -383,6 +387,11 @@ class UiComponents(object):
         form.AcceptButton = form._create_button
         form._create_button.Focus()
         self.set_step(form._ui_header, 4, state.reason)
+        form._errors_grid.Enabled = True
+        form._review_check.Enabled = True
+        # A new plan still needs creation and human review before deletion.
+        form._review_check.Checked = False
+        form._delete_button.Enabled = False
 
     def failed(self, form, detail):
         form._ui_state.failed(detail)
@@ -396,6 +405,7 @@ class UiComponents(object):
         form.ControlBox = True
         form._ui_tabs.SelectedIndex = 1
         self.set_step(form._ui_header, form._ui_state.step, form._ui_state.reason)
+        form._errors_grid.Enabled = True
 
     def completed(self, form):
         state, h = form._ui_state, form._handler
@@ -417,6 +427,9 @@ class UiComponents(object):
         form.AcceptButton = form._ui_close
         form._ui_close.Focus()
         self.set_step(form._ui_header, 6, text)
+        form._errors_grid.Enabled = True
+        form._review_check.Enabled = True
+        form._update_delete_enabled()
 
     def selection_prompt(self, count):
         """Modal preparation only; actual picking remains native Revit."""
