@@ -1795,3 +1795,7 @@ main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.
 ## 2026-09-16 — UI candidata, isolada do PR #42
 
 [Redesign UI/UX](checkpoints/2026-09-16-ui-redesign.md): WinForms, revisão do plano antes da criação, logs recolhíveis e relatório; motor preservado. PARTIAL, smoke Revit/DPI pendentes, sem merge.
+
+## 2026-09-16 — segunda rodada UI: referência visual e tema escuro
+
+[Redesign compacto escuro](checkpoints/2026-09-16-dark-ui-redesign.md): vídeo estudado, wireframes prévios, preview contextual, agrupamento e relatório amigável; 307 testes PASS e ensaio WinForms local. PARTIAL; Revit/DPI nativo pendentes. Mesmo PR #44 draft, sem merge e sem alteração do #42.

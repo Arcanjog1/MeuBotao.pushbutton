@@ -1,8 +1,13 @@
-# Redesign da experiência — entrega candidata
+# Redesign da experiência — primeira entrega candidata
+
+Registro histórico da primeira versão. A entrega visual atual, baseada no vídeo,
+está em [redesign compacto escuro](2026-09-16-dark-ui-redesign.md).
+Os testes e SHAs abaixo permanecem vinculados à primeira versão.
 
 ```json
 {
   "date": "2026-09-16",
+  "scope": "historical",
   "branch": "codex/modulacao-automatica-ui-redesign",
   "head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
