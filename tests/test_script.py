@@ -3092,8 +3092,8 @@ def _make_post_creation_handler(error_rows=None, catalog=None, catalog_missing=N
 
 
 @case
-def test_janela_de_resultado_monta_a_tela_unica_sem_abas():
-    # pedido explicito do usuario: nada de abas, tudo numa tela so'.
+def test_janela_de_resultado_organiza_revisao_plano_e_resultado():
+    # Redesign: áreas da mesma janela, mantendo a lista e os callbacks.
     report = {
         "title": "Automacao concluida - 12 parede(s) criada(s)",
         "subtitle": "Layer 'PAREDES'",
@@ -3110,13 +3110,16 @@ def test_janela_de_resultado_monta_a_tela_unica_sem_abas():
          "problem_text": "largura de abertura fora da modulacao", "auto_fixable": False, "fix_plan": None},
     ])
     form = m._PostCreationForm(report, None, handler, [revit_stubs.ElementId(1), revit_stubs.ElementId(2)])
-    tabs = [c for c in form.descendants() if isinstance(c, revit_stubs.TabControl)]
-    assert tabs == [], tabs
+    assert len(form._ui_tabs.pages) == 3
+    form._ui_tabs.buttons[1].PerformClick()
+    assert form._ui_tabs.SelectedIndex == 1
+    assert form._ui_tabs.pages[1].Visible
+    assert not form._ui_tabs.pages[0].Visible
     grids = [c for c in form.descendants() if isinstance(c, revit_stubs.ListView)]
-    assert len(grids) == 1
-    assert grids[0].Items.Count == 2
-    for row in grids[0].Items:
-        assert len(row.SubItems) == len(grids[0].Columns), len(row.SubItems)
+    assert len(grids) == 2  # problemas e quantidades do plano
+    assert form._errors_grid.Items.Count == 2
+    for row in form._errors_grid.Items:
+        assert len(row.SubItems) == len(form._errors_grid.Columns), len(row.SubItems)
     # log inicial ja' traz resumo/ocorrencias - nao existe mais aba separada
     assert "PAREDES" in form._log_box.Text
     assert "algo falhou" in form._log_box.Text
@@ -3133,7 +3136,7 @@ def test_janela_de_resultado_sem_erros_libera_lancar_blocos_direto():
     # sem erro nenhum para ajustar, "Lancar Blocos" ja' libera sozinho - nao
     # faz sentido obrigar um clique em "Ajustar Erros" sem nada a fazer.
     assert form._solve_button.Enabled is True
-    assert "nenhum eixo fora da modulacao" in form._errors_status.Text.lower()
+    assert "Nenhuma pendência" in form._errors_status.Text
 
 
 @case
@@ -3883,7 +3886,7 @@ def test_wall_review_form_so_dispara_modulacao_apos_clique_no_botao():
     assert stage2_calls == [] and error_calls == []
     assert handler.on_done is None and handler.action is None
     assert form._start_button.Enabled is True
-    assert form._start_button.Text == "Iniciar Modulacao das Paredes"
+    assert form._start_button.Text == "Analisar paredes"
 
     # clique: so' PREPARA o handler (action="analyze") e dispara o evento
     # (Execute() roda depois, quando o Revit processar o ExternalEvent -
@@ -3929,7 +3932,7 @@ def test_wall_review_form_erro_na_analise_nao_fecha_a_janela_nem_chama_etapa2():
     assert stage2_calls == [], "erro na analise nao pode disparar a Etapa 2"
     assert error_calls == ["Exception()"]
     assert form._start_button.Enabled is True
-    assert form._start_button.Text == "Iniciar Modulacao das Paredes"
+    assert form._start_button.Text == "Analisar paredes"
     assert "Exception()" in form._status_label.Text
 
 
@@ -5750,6 +5753,8 @@ def test_select_existing_walls_for_modulation_monta_estrutura_a_partir_da_seleca
     fake_uidoc = revit_stubs._Inert()
     fake_uidoc.Selection = _FakeSelectionForPick(refs)
 
+    original_prompt = m._ui.selection_prompt
+    m._ui.selection_prompt = lambda count: "pick"
     original_doc, original_uidoc = m.doc, m.uidoc
     m.doc, m.uidoc = fake_doc, fake_uidoc
     try:
@@ -5758,6 +5763,7 @@ def test_select_existing_walls_for_modulation_monta_estrutura_a_partir_da_seleca
         )
     finally:
         m.doc, m.uidoc = original_doc, original_uidoc
+        m._ui.selection_prompt = original_prompt
 
     assert len(walls_to_create) == 3, walls_to_create
     assert wall_ids == [wall1.Id, wall2.Id, wall3.Id]

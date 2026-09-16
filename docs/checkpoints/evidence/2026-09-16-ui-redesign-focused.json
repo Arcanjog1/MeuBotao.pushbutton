@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-16T12:19:13.587624+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "8113143b375f6e2ccd211e0289a5bf133f4d90d3",
+  "tree": "244b6f917eb4a45b5bf39790310371f841b53412",
+  "status_before": "?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.txt\n?? docs/checkpoints/evidence/2026-09-16-ui-scope.json\n?? tools/documentation/check_ui_scope.py",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-ui-redesign-focused.txt",
+  "pid": 6492,
+  "exit_code": 0,
+  "elapsed_seconds": 95.373,
+  "status_after": "M docs/ui-preview/01-fonte.png\n M tools/ui_preview.py\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-focused.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.txt\n?? docs/checkpoints/evidence/2026-09-16-ui-scope.json\n?? docs/ui-preview/before/\n?? tools/documentation/check_ui_scope.py",
+  "log_sha256": "a1525f9fb053e576547d8ee8a37a5071e8fb31bf03600013f9e81eab8abea45a"
+}
