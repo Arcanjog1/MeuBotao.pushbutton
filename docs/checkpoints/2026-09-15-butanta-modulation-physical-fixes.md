@@ -551,3 +551,13 @@ melhor da missão (era 25 / 10 / 2 / 51 no início).
 TGD V2 e TP1 V1 **idênticos** ao commit anterior (3.681 e 4.043 achados):
 o microajuste e a guarda só existem sob chamada explícita, e `strategy=None`
 continua byte a byte igual à main.
+
+### 15.8 Regressão consolidada (16/09, sobre o head final)
+
+`1.298 passaram, 3 falharam` em 40:31. As **três** são as mesmas que falham na
+main `55e990d` (classe D: dois baselines de benchmark defasados; ambiente: o
+amostrador de stall com `ctypes.PyDLL` no Windows). Zero falhas novas; nenhum
+baseline, golden, threshold ou `reference_score` alterado; nenhum `skip`/`xfail`.
+Evidências: `docs/checkpoints/evidence/2026-09-16-regressao-consolidada.txt` e
+`docs/checkpoints/evidence/2026-09-16-aplicacao-revit-secao-66.txt`.
+
