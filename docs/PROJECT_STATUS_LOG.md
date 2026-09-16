@@ -1790,3 +1790,8 @@ geométrica), 30.8 desligada (7719511 limitação), off-grid e cinta de topo
 pendentes. Solve CHANNEL no Revit 44,6 s → 24,2 s com resultado idêntico.
 0 ACTUAL_ERROR / 0 WORSE / 0 NORMATIVE_DECISION; Revit 7.222→7.222; legado =
 main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.
+
+
+## 2026-09-16 — UI candidata, isolada do PR #42
+
+[Redesign UI/UX](checkpoints/2026-09-16-ui-redesign.md): WinForms, revisão do plano antes da criação, logs recolhíveis e relatório; motor preservado. PARTIAL, smoke Revit/DPI pendentes, sem merge.
