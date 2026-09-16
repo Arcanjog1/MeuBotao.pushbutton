@@ -441,6 +441,9 @@ aberta (CR-S1).**
   menor entre Fiada A e Fiada B quando usado como preenchimento comum
   arbitrário (fora de um encontro L/T) — a orientação usada é uma
   convenção fixa, não otimizada por alinhamento cruzado entre fiadas.
+  **ATUALIZADO 2026-09-15 (seção 52):** a orientação passou a ser
+  escolhida pelo alinhamento do vazado menor com a fiada vizinha; fica
+  pendente só o resíduo que exige mudar a POSIÇÃO do B34.
   Diferente do L_CORNER/T-degradado, onde o alinhamento É garantido e
   validado (seção 5).
 - **Desencontro de junta vertical** entre Fiada A e Fiada B nos trechos de
@@ -2348,8 +2351,9 @@ não esteja em `created_instances`.
 ### 18.5 — B34 só entra com o vão menor sob controle
 
 - **Status**: `PARCIAL` — garantido e validado em L_CORNER e T degradado
-  (seção 5); **não** garantido no B34 de meio de parede (limitação já
-  registrada na seção 6).
+  (seção 5); **ATUALIZADO 2026-09-15**: no B34 de meio de parede a
+  orientação agora é escolhida pelo alinhamento cruzado entre fiadas
+  (seção 52); o resíduo que pede mudança de posição continua pendente.
 - **Regra**: sempre que houver B34 na amarração, o vão menor entre os
   blocos envolvidos fica alinhado. O B34 não pode ser usado só para
   preencher espaço de forma arbitrária — a posição dele faz parte da
@@ -5234,6 +5238,10 @@ formalizar/implementar a política. Relatório completo:
 > conhecida** da estratégia CHANNEL (canaleta inferior ausente sobre trecho não
 > modular). O conhecimento abaixo continua registrado; religar exige nova
 > decisão.
+>
+> **ATUALIZADO 2026-09-15 (seção 30.9)**: a chave global continua desligada (legado
+> idêntico à main), mas a estratégia CHANNEL liga a 30.8 com TENTATIVA por parede;
+> os defeitos que motivaram o desligamento foram reproduzidos e barrados pelos gates.
 
 **Quando**: um trecho de preenchimento limitado por nó dos DOIS lados (início/fim
 de parede em L/T/X ou nó de meio de parede — nunca jamba nem ponta livre) não
@@ -5297,6 +5305,73 @@ Mantida a alternância 30.5.
   sobe 10% e 3 paredes perdem ≤ 210 cm líquidos
   (`evidence/2026-09-14-channel-regressao-cobertura-tgd.txt`). Baselines não
   regravados.
+
+### 30.9 CONHECIMENTO DE AMARRAÇÃO — TENTATIVA COM GATES (implementada, 2026-09-15) — tolerâncias físicas (30.8 e ruído de jamba) só valem quando a parede fica fisicamente melhor
+
+**Pedido do usuário (missão BUTANTÃ, 2026-09-15)**: corrigir os resíduos
+NON_MODULAR que o humano resolve (buracos em pilaretes e no anel de shaft), sem
+trocar erro, sem regressão crítica e sem mascarar validador.
+
+**Por que a 30.8 e a tolerância de jamba (51.13/51.14) tinham sido desligadas**:
+ligadas sem controle, mudavam o legado e o benchmark. Medido nesta missão, parede
+a parede (TGD/TP1, V1/V2), com a 30.8 ligada sem tentativa:
+
+| Defeito | Onde | Causa |
+|---|---|---|
+| B19 perdido em 5 fiadas (20 cm por fiada) | TGD V1, parede de 146 cm com porta | a absorção desloca as peças de um trecho que CONTÉM o vão; o recorte da porta deixa a sobra fora do módulo |
+| 16 juntas contínuas + 8 compensadores consecutivos | TGD V1, parede curta com a mesma peça de nó nas duas fiadas | as duas famílias enchem contra a MESMA face do nó |
+| fiadas alternadas vazias | TGD V2 (4 paredes) e V1 (6) | a absorção fecha uma família e a oposta continua fora do módulo no mesmo trecho |
+
+Com a tolerância de jamba ligada sem tentativa: duas paredes do TGD V1 perdem 221
+e 75 cm assentados (efeito dos eixos sobrepostos da topologia histórica: a
+pastilha de 4 cm aceita na parede vizinha, 12,8 cm ao lado, colide com peças da
+parede processada depois); a V2 não tem esse efeito.
+
+**REGRA (implementada)** — `wall_stepper.physical_tolerance_trial`, chamada em
+volta de cada `solve_wall_free_fill` do fluxo por parede:
+1. resolve a parede com as tolerâncias ligadas;
+2. se a 30.8 absorveu algum trecho, resolve de novo sem ela e só fica com a
+   absorção quando: nenhuma coincidência de junta nova (`alignment_conflicts`,
+   regra #1), comprimento assentado estritamente maior (ou igual com menos
+   trecho fora do módulo) e a família oposta NÃO continua fora do módulo em
+   metade ou mais do trecho absorvido (trechos marcados pelo recorte de vão com
+   `conflict` não contam: são problema do vão, tratados depois);
+3. se a tolerância de jamba decidiu algum trecho (contador
+   `JAMB_SEGMENT_NOISE_USES`), resolve sem ela e aplica o mesmo critério.
+Ordem fixa, determinística; decisões em `result["physical_tolerance_trial"]`
+do preenchimento da parede.
+
+**Escopo (decisão desta missão)**: as tolerâncias com tentativa são ligadas
+SOMENTE durante a estratégia de reforço de aberturas CHANNEL
+(`CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True` em `core/wall_modeling.py`,
+restauradas no `finally`). O motor legado (estratégia None, congelado pelo
+benchmark) continua com as chaves globais desligadas — é o motivo da opção B
+da auditoria de 2026-09-14 (não mudar o legado). Medido com as tolerâncias e a
+tentativa ligadas no legado (para registro, NÃO ativado): TGD V1 descoberto
+198.325 → 180.765 cm, sem regressão crítica; TGD V2 185.814 → 151.540 cm, mas
+`COVERAGE_ROW_MOSTLY_EMPTY` 86 → 92 por reclassificação (as 12 fiadas novas são
+iguais ou melhores, em paredes que deixaram de ser `COVERAGE_PARTIAL_WALL`) e
+categoria compensadores 62 → 63. Levar para o legado exige decisão sobre a régua.
+Consequência registrada: nas paredes em que uma tolerância é aceita, a CHANNEL
+deixa de ter exatamente as mesmas juntas do legado fora das corridas de
+canaleta (a comparação "CHANNEL × legado" da seção 51.3 continua valendo onde
+nenhuma tolerância atua).
+
+**Evidência BUTANTÃ (bancada offline do doc de teste, 34 paredes, 13 fiadas,
+CHANNEL)**:
+
+| Métrica | Sem tolerâncias | Com tolerâncias + tentativa | Humano |
+|---|---|---|---|
+| Buracos (trecho sem peça fora de vão) | 94 (3.754 cm) | 10 (872 cm) | 71 |
+| Trechos NON_MODULAR | 78 | 0 | — |
+| Peças sem apoio (régua da seção 53) | 50 | 0 | 9 |
+| MISSING_REQUIRED_CHANNEL | 1 | 0 | — |
+
+Os 10 buracos restantes coincidem com vazios do humano (passagem livre até o
+topo, pilaretes de 5 e 15 cm). **Testes**: `tests/test_physical_tolerance_trial.py`
+(critério, família oposta, jamba, restauração das chaves) e
+`tests/test_node_bounded_residual.py` (anel de shaft com e sem a tolerância,
+agora desligando também a ativação na CHANNEL no vermelho).
 
 ## 32. `CR-BLOCK-ARM-ROLE-CANDIDATE-SAFETY-CONTRACT` — contrato geral de
 segurança para candidatos de papel; SAFE REPAIR ATIVADO em produção
@@ -7884,3 +7959,1088 @@ BUTANTÃ 34 paredes e em 6 fixtures, `tests/test_channel_audit_fixes.py`):
 5. **Gates baratos antes do planejamento** na tentativa (a decisão aceita/rejeita
    não muda; só a ordem em que o motivo é encontrado).
 Instrumentação permanente: `result["channel_tie_parity_trials"]["timing"]`.
+
+## 52. Vazado menor do B34 alinhado entre fiadas — B34 de meio de parede (2026-09-15)
+
+**Regra (usuário, 2026-09-15):** se existe um B34 numa fiada, a fiada
+vizinha (de cima e de baixo) precisa preservar o **vazado menor** dele: a
+peça de alvenaria vazada que cobre o centro do vazado menor do B34 tem de
+oferecer ali também um vazado menor (outro B34 ou o vazado central do B54).
+Vale para o B34 de encontro (seção 5, já garantido) **e para o B34 de meio
+de parede**, que era a limitação registrada nas seções 6 e 18.5.
+
+**Geometria real das famílias (medida no Revit, seção transversal a meia
+espessura, eixo local X a partir do centro):**
+
+| Família | Vazados (cm, local X) | Vazado menor |
+|---|---|---|
+| B39 | [-17,-1,25] [1,25,17] | não tem (iguais) |
+| B34 | [-14,5,-3,75] [-1,25,14,5] | [-14,5,-3,75] = 10,75 cm, lado **negativo** |
+| B54 | [-24,5,-8,75] [-6,25,6,25] [8,75,24,5] | central, 12,5 cm |
+| B19 | [-7,7] | não tem (uma célula) |
+| C09/C04, canaletas | sem vazado a meia altura | fora da regra |
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, 34 paredes de alvenaria, só
+leitura):** de 2.541 pares B34 × peça vazada da fiada vizinha, **2.500**
+têm o vazado menor sobre vazado menor (2.192 sobre B34, 308 sobre o central
+do B54); 41 exceções. O humano consegue isso pela **orientação** do B34
+(rotação; espelhamento é raro): em corridas de B34 deslocadas 20 cm entre
+fiadas, o B34 de uma fiada fica girado 180° em relação ao da outra.
+
+**Estado anterior (lote do botão no doc de teste, Revit real):** 2.460
+violações em 3.426 pares — a orientação do B34 de preenchimento era uma
+convenção fixa.
+
+**Implementação:** `core/engine/small_void_alignment.py`.
+- O "vazado menor" é geométrico: a célula de menor área de `cells_world`
+  quando ela é menor que 0,9 × a seguinte. Nenhum código, parede, ID ou
+  coordenada entra na regra.
+- `b34_small_void_violations(course_candidates)` é o validador
+  (`result["small_void_alignment"]["violations"]`). Sem peça vazada na
+  vizinha (compensador, canaleta, vão, topo), não há restrição.
+- `orient_small_voids` gira 180° em torno do centro os B34 que **não** são
+  peça de nó (a orientação do nó é da seção 5) quando isso reduz
+  estritamente as violações locais. Contorno, juntas, colisões e cobertura
+  ficam idênticos por construção. Guloso, determinístico (ordem por chave
+  física), idempotente.
+- Chamado por `_orient_small_voids_final` (`core/wall_modeling.py`) nas
+  duas saídas de `_solve_building_blocks_all_courses_impl` e, com a
+  estratégia CHANNEL, **antes** de `_unify_candidates_with_courses` (a
+  chave física da fonte única inclui a direção da peça).
+- Flag `SMALL_VOID_ORIENTATION_ENABLED = True`.
+
+**Medido (bancada offline do doc de teste, 34 paredes, 13 fiadas):**
+violações 2.000 → 294 em 0,3 s, sem mudar contorno nem juntas.
+
+**Giro em par (2026-09-15, implementado)**: dois B34 sobrepostos em fiadas
+vizinhas, deslocados 15–20 cm, cada um com uma peça sem vazado menor do outro
+lado, só alinham girando os DOIS juntos — girar um só troca uma violação por
+outra e o passe guloso para. Depois do passe individual, `orient_small_voids`
+testa cada par (peça móvel, vizinha móvel sobreposta na fiada de cima) e gira
+os dois quando a soma das violações locais cai estritamente. Bancada:
+294 → 264. As restantes pedem mudança de **posição** (exemplo medido: pilarete
+entre jamba e nó B54 em que qualquer orientação deixa um vazado menor sobre
+B19 ou sobre o nó) e continuam registradas como limitação. Benchmark TGD/TP1 (V1/V2): ver checkpoint da
+missão — a orientação não altera nenhum achado (contorno idêntico).
+
+**Testes:** `tests/test_b34_small_void_alignment.py` — vermelho sem o
+passe, verde com ele, peça de nó nunca gira, rotação rígida, invariância a
+translação/ordem/sentido, controle do validador (deslocado 20 cm e girado
+alinha; mesma orientação viola), sem restrição sem vizinho vazado.
+
+## 53. Apoio físico entre fiadas — validador `UNSUPPORTED_SMALL_BLOCK` (2026-09-15)
+
+**Pedido do usuário (missão BUTANTÃ)**: peça pequena "voando" (B19/C09/C04 sem
+apoio) não pode sair do solver; o validador deve ser calibrado no humano e não
+pode apagar peça necessária.
+
+**Régua (implementada, somente leitura)** — `core/engine/physical_support.py`,
+chamada por `_physical_support_final` sobre o resultado FINAL:
+- para cada peça da fiada c ≥ 1, mede na linha de centro dela a fração do
+  comprimento sobre alguma peça da fiada c−1 (qualquer parede) e a fração sobre
+  vão ativo na faixa da fiada c−1 da parede dona ou secundária;
+- reporta quando as DUAS frações são menores que 0,5
+  (`SUPPORT_MIN_FRACTION`): `UNSUPPORTED_SMALL_BLOCK` (comprimento ≤ 19,5 cm) ou
+  `UNSUPPORTED_BLOCK`;
+- canaleta ou peça sobre abertura não conta como sem apoio: é reforço, auditado
+  pela estratégia de aberturas.
+
+Resultado em `result["physical_support"]` (`counts`, `items` em ordem
+determinística). Nada é alterado: a correção é feita na causa (30.9, 54).
+
+**Calibração**: humano BUTANTÃ 1º PAV, 34 paredes, fiadas 0–12, mesma régua:
+9 peças, todas em pilarete de passagem e topo de vão. Lote anterior do botão
+no doc de teste: 116. Bancada (CHANNEL, 34 paredes, 13 fiadas): 52 sem as
+tolerâncias (cantos B34 do anel de shaft sobre fiada vazia), 0 com 30.9.
+
+**Testes**: `tests/test_physical_support_audit.py` (peça voando reportada, apoio
+≥ metade não reportado, peça sobre vão ativo não reportada e vão fora da faixa
+não desculpa, apoio de parede perpendicular conta, ordem determinística).
+
+## 54. Compensadores iguais encostados viram o compensador do vão total (2026-09-15)
+
+**REGRA OBRIGATÓRIA (complemento da regra #2, implementada)**: dois
+compensadores IGUAIS encostados (uma junta entre eles) cujo vão total é
+exatamente o comprimento de OUTRO compensador do catálogo viram essa peça só.
+No catálogo atual: C04 + 1 + C04 = 9 = C09.
+
+**Evidência**: humano BUTANTÃ, 202 corridas de peças pequenas em 34 paredes:
+zero C04+C04. No solver, o par nasce na fronteira entre o reparo de vão
+(`OPENING_REPAIR_FILL`) e o preenchimento comum, resolvidos separados — por
+exemplo C04 de reparo + C04 de preenchimento contra o B54 de um nó (parede de
+2.929 cm, fiadas 6 e 8). `_merge_adjacent_compensator_pairs` só funde dentro de
+um trecho e só em peça não compensadora, por isso não via o caso.
+
+**Implementação**: `fuse_adjacent_equal_compensators`
+(`core/engine/wall_stepper.py`), logo depois de `_recut_openings_and_repair`
+em cada variante, antes de medir as juntas finais. Peça de nó nunca entra;
+códigos diferentes, junta diferente de 1 cm ou alvo não compensador (C09 + C09
+= 19 = B19) ficam como estão — o B19 continua sob a guarda de ponta aberta da
+seção 2. Fundir só remove uma junta: não cria coincidência, não muda contorno
+nem cobertura.
+
+**Medido**: bancada BUTANTÃ C04+C04 encostados 7 → 0. Benchmark legado:
+`COMPENSATOR_CONSECUTIVE` TP1 936 → 881, TGD V2 472 → 464; nenhum outro achado
+muda e os vereditos são idênticos. **Testes**:
+`tests/test_physical_tolerance_trial.py` (fusão, nó, códigos mistos, junta
+larga, alvo não compensador, início da variante).
+
+## 55. Especiais junto da jamba — pilarete refeito só em parte (2026-09-15, DOCUMENTADO — pendência de código aberta)
+
+**Medido (humano BUTANTÃ × solver, 34 paredes, fiadas 0–11)**: o humano usa 500
+compensadores/pastilhas (C04 244, C09 256); o lote do botão no doc de teste usa
+808 (C04 329, C09 479). A maior diferença está nos pilaretes entre jamba e nó.
+
+**Causa raiz (medida)**: a modulação CONTÍNUA põe peças no trecho inteiro
+entre dois nós, atravessando o vão; o recorte derruba o que invade o vão e o
+reparo refaz **só a sobra junto da jamba**, mantendo as peças contínuas entre a
+jamba e o nó. Exemplo: porta com jamba a 75 cm de um nó B54 — o solver deixa
+B19 + C04 + B39 + C09 numa fiada e B39 + C04 + B39 + C09 na outra; o humano
+assenta B39 + B34 e B19 + B39 + B34 (zero especiais), e o próprio solver de
+pilarete, chamado sobre o pilarete inteiro, devolve exatamente a solução humana.
+
+**Tentativas medidas nesta missão (bancada, 34 paredes, 13 fiadas) — NENHUMA
+integrada, porque todas trocam erro**:
+
+| Variante | Especiais 0–11 | Violações do vazado menor B34 | Paredes reprovadas |
+|---|---|---|---|
+| Sem mudança | 835 | 264 | 3 |
+| Refaz o pilarete inteiro nas duas famílias, sem conferência | 550 | 476 | 6 |
+| Idem, fronteira de nó tratada como fechada | 551 | 341 | 3 |
+| Só a Fiada B, sem coincidência de junta | 700 | 334 | 3 |
+| Tentativa por parede com conferência local de junta e de B34 | 804 | 287 | 3 |
+| Seleção GLOBAL por parede (resolve com e sem; libera só as paredes que melhoram sem piorar nada) | 778 | 261 | 3 |
+
+**Por que troca erro**: trocar compensador por bloco vazado (B39/B19) cria
+restrição de vazado menor que o compensador não criava (B34 sobre compensador
+está fora da regra 52; sobre B39 é violação). O humano concilia as duas regras
+escolhendo a composição do pilarete junto com a orientação e com as peças de
+nó; a conferência local do motor não enxerga as peças de nó nem as fiadas de
+outra banda.
+
+**Por que a seleção global também não foi integrada**: é a única variante sem
+troca de erro (5 paredes liberadas; buracos, NON_MODULAR, apoio, canaleta
+obrigatória e colisões iguais), mas (1) quebra o contrato da seção 51.3 — a
+CHANNEL passaria a ter juntas que o legado não tem
+(`test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically`)
+—, (2) ligá-la também no legado muda o benchmark congelado e (3) triplica o
+tempo de cálculo (bancada 7 → 19 s) para 7% menos especiais. Protótipo e teste
+ficaram fora do código; os números estão no checkpoint da missão.
+
+**Pendência**: refazer o pilarete inteiro com um critério conjunto (especiais +
+vazado menor + peças de nó + bandas vizinhas), ou decidir normativamente a
+prioridade entre a regra 52 e a redução de especiais. Nada foi alterado no motor
+por esta seção.
+
+## 56. Compensadores encostados — regra #2 na Fiada A e compensador contra peça de nó (2026-09-15)
+
+**Evidência humana (BUTANTÃ R08_LT, 1º PAV, 34 paredes de alvenaria, 6.018
+peças, fiadas 0–11):** ZERO pares `C09+C09` e ZERO pares `C04+C04` encostados —
+o humano encosta C04 com C09, 97 vezes. O solver tinha 20 pares `C09+C09`.
+
+**Precisão da medida (corrigida 2026-09-15):** o humano *tem* 6 pares de
+compensadores de código idêntico encostados, mas todos são
+`COMPENSADOR 14x19x9 (deitado)` (`C09D`, 62 peças no projeto) — peça **deitada**,
+que o solver não emite nenhuma vez. A regra abaixo trata do compensador **em
+pé** encostado em outro igual, que é o que o solver produzia; a afirmação
+genérica "nenhum par de compensadores iguais" não se sustenta e foi substituída
+por esta.
+
+**Duas causas medidas:**
+
+| Causa | Casos | Onde |
+|---|---|---|
+| O guloso da Fiada A nunca olhou a regra #2 fora do trecho absorvido pela 30.8 | 6 | trecho fechado dos dois lados (ex.: parede de 100 cm entre dois cantos L: `B39+C09+C09+C04` em vez de `C09+B39+C09+C04`) |
+| Compensador da ponta do preenchimento encostando no compensador de uma peça de NÓ (T degradado) | 11 | ponta do trecho contra o nó |
+| Reparo de vão na jamba junto a nó | 3 | jamba |
+
+### 56.1 REGRA OBRIGATÓRIA (implementada) — regra #2 em TODO trecho da Fiada A
+
+`RULE2_ON_EVERY_COURSE_A_SEGMENT = True` (`core/engine/wall_stepper.py`): o
+complemento da 30.8 (`_absorbed_segment_rule2_layout`) passa a valer para
+qualquer trecho da Fiada A, não só o absorvido. A Fiada B já fazia isso pela
+busca de desencontro.
+
+**Medido** — BUTANTÃ: nenhum efeito isolado (os 6 casos precisam também da
+56.2); TGD V2: `COMPENSATOR_CONSECUTIVE` 464 → 412 e `PRISM_STAGGER_BELOW_TARGET`
+739 → 702, prisma e demais achados iguais; TP1 V1: `COMPENSATOR_CONSECUTIVE`
+881 → 830, `PRISM_STAGGER_BELOW_TARGET` 1.539 → 1.559.
+
+### 56.2 REGRA COM TENTATIVA POR PAREDE (implementada) — compensador não encosta em compensador de nó
+
+`compensator_node_adjacency_trial` (`core/engine/wall_stepper.py`): quando o
+preenchimento de uma parede tem compensador encostado num compensador de peça
+de nó, a parede é resolvida **de novo** com a regra ligada
+(`_layout_avoiding_compensator_against_node`: composição espelhada, bypass de
+tier e `first_code` do mesmo trecho) e só fica com a versão nova se:
+
+1. o encosto diminui estritamente;
+2. **não** aumentam as faces de peça repetidas entre as fiadas A e B da mesma
+   parede (regra #1);
+3. não aumentam pares de compensadores encostados, trecho fora do módulo nem
+   `alignment_conflicts`, e não diminui o comprimento assentado.
+
+**Por que com tentativa**: ligada direto na escolha de composição, a regra
+reprovou o corpus — TGD V2 `PRISM_CONTINUOUS_JOINT` 53 → 87 e `PRISM_JOINT_STACK`
+5 → 8 —, porque trocar a composição move juntas que o recorte de vão e a fiada
+oposta só resolvem depois. Com a tentativa, o prisma volta a 53/5.
+
+**Travamento de 10 cm (18.6) não é guarda desta regra**, por evidência humana:
+no humano 7% das juntas ficam a menos de 10 cm da junta vizinha (244 delas
+exatamente coincidentes, contra 30 do solver), enquanto compensador encostado em
+compensador igual não aparece nenhuma vez. Consequência registrada: TP1 V1
+`PRISM_STAGGER_BELOW_TARGET` 1.539 → 1.689 (preferência), com
+`PRISM_CONTINUOUS_JOINT` inalterado em 16.
+
+**Medido com as duas regras (BASE `55e990d` → branch):**
+
+| Corpus | Métrica | BASE | Com 56.1 + 56.2 |
+|---|---|---|---|
+| BUTANTÃ (34 paredes, 13 fiadas) | `C09+C09` encostados | 11 | 9 |
+| BUTANTÃ | ramo anterior desta branch | 20 | 9 |
+| TGD V2 | `COMPENSATOR_CONSECUTIVE` | 472 | 407 |
+| TGD V2 | `PRISM_CONTINUOUS_JOINT` / `PRISM_JOINT_STACK` | 53 / 5 | 53 / 5 |
+| TP1 V1 | `COMPENSATOR_CONSECUTIVE` | 936 | 825 |
+| TP1 V1 | `PRISM_CONTINUOUS_JOINT` | 16 | 16 |
+
+**Testes:** `tests/test_compensator_adjacency.py` (vermelho/verde da 56.1 numa
+parede de 100 cm entre dois cantos; espelhamento preserva envelope e juntas; a
+56.2 só age dentro da tentativa; tentativa aceita, recusa e é pulada).
+
+### 56.3 CONFLITO MEDIDO — B19 no meio da parede e B34+B19 onde caberia B54 NÃO são erro
+
+O pedido de tratar como erro (a) B19 no meio da parede e (b) `B34+B19` onde
+cabe um B54 foi **medido contra o humano e não se sustenta**:
+
+| Métrica (34 paredes, fiadas 0–11) | Humano | Solver |
+|---|---|---|
+| B19 fora de jamba/ponta/nó ("meio de parede") | 103 | 35 |
+| `B34 + junta + B19` ocupando exatamente 54 cm | 107 | 81 |
+| B19 a mais de 60 cm de qualquer nó | 171 | 126 |
+| B54 a até 35 cm de um nó | 172 de 172 (100%) | 168 de 168 (100%) |
+
+O humano usa **mais** B19 no meio e **mais** `B34+B19` no envelope de 54 cm que
+o solver, e **nunca** usa B54 longe de encontro: o B54 é peça de amarração de nó,
+não preenchimento. Implementar "B54 domina B34+B19" colocaria B54 onde o humano
+nunca põe. Registrado como conflito resolvido a favor do projeto humano; nada foi
+alterado no motor por esta seção.
+
+## 57. Fileira de B34 entre fiadas — HIPÓTESE MEDIDA E REJEITADA (2026-09-15)
+
+O vazado menor desalinhado (seção 52) é o defeito dominante que resta: 613
+violações no solver contra 41 no humano (BUTANTÃ R08_LT, 34 paredes de
+alvenaria, 17 fiadas). A hipótese testada foi: *reordenar as peças dentro de
+cada corrida* — mesmo trecho, mesmas peças, mesmo comprimento, só a ORDEM muda —
+para o B34 cair sobre B34 da fiada vizinha, como o humano faz nas pontas.
+
+Implementado como passe reversível (`b34_row_layout.py` + `_reorder_b34_rows_final`),
+com quatro arranjos canônicos por corrida (atual, vazado menor no início, no fim,
+dividido nas duas pontas), custo independente de orientação e portão global
+sobre o resultado inteiro. **Medido e revertido:**
+
+| Fiadas | Corridas | Reordenadas | Violações 52 s/ passe → c/ passe | Juntas empilhadas 3+ s/ → c/ |
+|---|---|---|---|---|
+| 13 | 1.131 | 121 | 473 → **483** | 100 → **120** |
+| 17 (altura real) | 1.176 | 122 | 613 → **669** | 101 → **121** |
+
+O passe **piora a própria métrica que deveria melhorar** nos dois tamanhos, além
+de empilhar juntas. Causa física: a corrida não é independente — mover o B34 para
+a ponta o encosta na peça de nó da fiada vizinha, que é justamente onde a fiada
+oposta está deslocada meio módulo; o ganho local de uma corrida é pago pela
+corrida vizinha. Código removido da árvore conforme o adendo (reverter ou deixar
+explicitamente desligado). Nada no motor mudou por esta seção.
+
+### 57.1 Régua medida — junta repetida NÃO é junta empilhada
+
+A tentativa anterior deste passe foi barrada por "faces repetidas entre fiadas
+vizinhas", e a medição contra o humano mostrou que essa métrica é **falsa
+guarda**:
+
+| Métrica (34 paredes, fiadas 0–11) | Humano | Solver |
+|---|---|---|
+| Faces internas totais | 11.663 | 12.077 |
+| Faces repetidas na fiada vizinha | 1.116 (**9,6%**) | 807 (**6,7%**) |
+| Juntas que sobem exatamente 2 fiadas | 19 | 2 |
+| Juntas que sobem exatamente 3 fiadas | 19 | 4 |
+| Juntas que sobem 4+ fiadas (jamba/nó) | 135 | 100 |
+
+O humano repete face entre fiadas vizinhas **mais** que o solver (9,6% × 6,7%) e
+mesmo assim tem 6× menos vazado menor desalinhado. A quase totalidade das
+repetições dos dois lados são colunas de jamba e de nó, que sobem a parede
+inteira por construção. Portanto:
+
+- **face repetida entre duas fiadas não é defeito** e não pode ser usada como
+  guarda de aceitação (seria mais rígida que o projeto humano de referência);
+- a guarda correta é a **junta empilhada em 3+ fiadas** fora de jamba/nó, que é o
+  que os achados `PRISM_CONTINUOUS_JOINT` e `PRISM_JOINT_STACK` auditam.
+
+## 58. Pastilha de 9 cm na amarração do nó degradado — DEFEITO LOCALIZADO (2026-09-15)
+
+**Evidência humana (BUTANTÃ R08_LT, 34 paredes de alvenaria, 383 pontas de
+fiada analisadas):** o humano **nunca** termina uma parede com um C09 (9 cm).
+Terminar com C04 (4 cm) ele aceita — 12 vezes. O solver termina com C09 **40
+vezes**.
+
+| Peça extrema da fiada | Humano | Solver |
+|---|---|---|
+| `C09` | **0** | **40** |
+| `C04` | 12 | 21 |
+| `B34` (amarração) | maioria | 393 |
+
+**Causa medida — não é o preenchimento, é a peça de nó.** Classificando as 40 por
+`placement_reason`:
+
+| Origem | Casos | É peça de nó? |
+|---|---|---|
+| `T_INTERSECTION_INCOMING_DEGRADED` | 30 | sim |
+| `L_CORNER_DEGRADED` | 3 | sim |
+| `STANDARD_FILL` | 7 | não |
+
+Ou seja **33 das 40 são a pastilha do nó degradado**: quando a boneca do T não
+tem os 34 cm exigidos para um B34, `solve_t_intersection` cai no ramo 2 e põe um
+compensador único (`_corner_single_element_candidate`) **nas duas famílias de
+fiada, em todas as fiadas** — nó 46 da parede 26 tem 11 pastilhas, uma por fiada.
+
+**O que o humano faz nessas mesmas pontas** (medido peça a peça nas 6 pontas onde
+o solver põe pastilha):
+
+| Parede | Ponta | Humano |
+|---|---|---|
+| 8284558 | 494 cm | `B34` em 4 fiadas, **recua** em 8 |
+| 8284562 | 494 cm | `B34` em 4, `B19` em 4, recua em 4 |
+| 8284563 | 499 cm | `B34` em 6, recua em 6 |
+| 8284580 | 209 cm | `B34` em 6, recua em 6 |
+| 8284584 | 0 e 115 cm | `B34` em 4, `B19` em 2, especial em 1, recua em 5 |
+
+O humano **alterna**: amarra com bloco inteiro numa família e na outra **recua**,
+cedendo a ponta à parede que cruza — que fisicamente já ocupa aquele espaço no
+encontro em T. Ele nunca preenche o resto com uma pastilha de 9 cm.
+
+### 58.1 Tentativa no preenchimento — MEDIDA E REVERTIDA
+
+Foi implementada (e revertida) a regra "compensador longo não é a peça extrema da
+parede" no nível da composição, com tentativa por parede e as mesmas guardas da
+56.2. **Resultado medido no BUTANTÃ:**
+
+- o detector alcança apenas **6 dos 40** casos — os outros 34 não passam pela
+  escolha de composição, são peça de nó;
+- nos 6, a regra remove o compensador da ponta (6 → 0), mas as guardas **recusam
+  os 6** por assentar 1 cm a menos de parede (389 → 388 cm), sem nenhum outro
+  ganho;
+- com a regra **forçada** (sem tentativa), o total de `C09` **piora**: 494 → 500.
+
+Hipótese rejeitada; nada permaneceu no motor. O defeito real está no ramo
+degradado de `solve_t_intersection` / `_corner_single_element_candidate`
+(`core/engine/wall_stepper.py`), e a correção correta é **alternar o papel da
+ponta** (amarrar numa família, recuar na outra, como a 30.5/30.7 já faz no nó
+não degradado) em vez de emitir pastilha nas duas famílias. Essa mudança mexe em
+peça de nó e atinge também TGD e TP1 (31 e 35 ocorrências no censo), portanto
+exige o ciclo completo do gate de não-regressão antes de entrar — registrada
+aqui como defeito localizado com causa, não corrigida nesta rodada.
+
+### 58.2 Correção no nó — IMPLEMENTADA E **DESLIGADA** pelo gate de não-regressão
+
+`CORNER_DEGRADED_TIE_CODES = ("B34",) + CORNER_SINGLE_ELEMENT_CODES` e
+`CORNER_DEGRADED_PREFERS_TIE_BLOCK` (`core/engine/wall_stepper.py`): o elemento
+único do encontro degradado passa a tentar o **bloco de amarração antes do
+compensador** — exatamente a escada que o cruzamento em X já usa
+(`X_INTERSECTION_DEGRADED_CODES`), e nunca B19. Quando o bloco é escolhido, a
+família oposta recebe a peça **curta** (`CORNER_DEGRADED_ALTERNATES_TIE`), e o
+B34 usa a origem assimétrica (vazado menor voltado para o nó), como no T normal.
+
+**Por que a família oposta não pode ficar vazia:** deixar `course_b = None` (o
+"recuo" que o humano faz) não reproduz o humano no solver — o preenchimento
+daquela fiada recomeça do zero e **refaz a mesma face** do bloco de amarração.
+Medido no TP1 V1: `PRISM_CONTINUOUS_JOINT` 16 → 72, com a junta em t=34,5 cm
+repetida em 14 de 17 fiadas em quatro paredes.
+
+**Medido (head do PR #42 → com a regra ligada):**
+
+| Corpus | Métrica | PR #42 | Com a 58.2 |
+|---|---|---|---|
+| BUTANTÃ | Pastilhas de T degradado | 30 | **0** |
+| BUTANTÃ | `C09` como peça extrema da fiada | 40 | **10** |
+| BUTANTÃ | Vazado menor do B34 desalinhado | 316 | **283** |
+| BUTANTÃ | Especiais (fiadas 0–11) | 808 | **802** |
+| BUTANTÃ | Buracos / sem apoio / colisões / não-modular | 10 / 0 / 0 / 0 | 10 / 0 / 0 / 0 |
+| TGD V2 | `COMPENSATOR_CONSECUTIVE` | 407 | 396 |
+| TGD V2 | `PRISM_CONTINUOUS_JOINT` | 53 | **55** |
+| TP1 V1 | `COMPENSATOR_CONSECUTIVE` | 825 | 815 |
+| TP1 V1 | `PRISM_STAGGER_BELOW_TARGET` | 1.689 | 1.267 |
+| TP1 V1 | `PRISM_CONTINUOUS_JOINT` | 16 | **32** |
+
+**Veredito: não entra ligada.** Junta corrida é a regra #1, e o corpus legado
+dobra (`PRISM_CONTINUOUS_JOINT` 16 → 32 no TP1). A chave fica em `False`; com
+ela desligada o resultado é **idêntico**, métrica por métrica, ao head do PR #42
+(verificado no BUTANTÃ: nenhuma diferença). Os cinco testes de
+`tests/test_degraded_node_tie_block.py` exercitam a regra pela chave, inclusive o
+vermelho (pastilha de 9 cm nas duas famílias) e a garantia de que boneca curta
+continua recebendo compensador.
+
+**Causa do resíduo, para quem continuar:** as juntas corridas que sobram caem em
+**fronteira de banda** — onde duas fiadas vizinhas pertencem à mesma família
+(A/B) porque a banda de abertura mudou —, e ali a face do bloco de amarração se
+repete. O caminho é alternar o elemento do nó degradado pela fiada FÍSICA e não
+pela família lógica, ou submeter a escolha do nó à mesma tentativa por parede da
+seção 56.2.
+
+### 58.3 A §58.2 ligada só no fluxo CHANNEL — e a condição que falta para o legado (2026-09-15)
+
+Revisitada sobre as §60–62, **por fiada física** e com a régua estrita do
+benchmark (junta interna alinhada entre duas fiadas **consecutivas**, tolerância
+1,5 cm, sem ponta de parede nem borda de vão):
+
+| BUTANTÃ (17 fiadas, fiadas 0–11) | Sem 58.2 | **Com 58.2** | Humano |
+|---|---|---|---|
+| Juntas alinhadas em fiadas consecutivas | 26 | **4** | 205 |
+| Vazado menor — validador de produção | 186 | **159** | — |
+| Vazado menor — régua 2-D | 139 | **112** | 41 |
+| B34 sobre B39 | 85 | **54** | 2 |
+| Especiais | 767 | **761** | 500 |
+| Buracos / colisões / apoio / auditoria recalculada | 20 / 0 / 0 / 3 | **20 / 0 / 0 / 3** | — |
+
+Na BUTANTÃ a §58.2 **reduz** as juntas alinhadas (as paredes do nó degradado:
+8284580 10 â†’ 0, 8284563 4 â†’ 0, 8284558 6 â†’ 2, 8284562 6 â†’ 2).
+
+**Condição que falta para ligar no legado — medida no TP1 V1** (as juntas
+corridas novas caem todas em fronteira de banda, fiadas 7/8, 10/11 e 12/13):
+
+1. **Peça de nó repetida em duas fiadas vizinhas** (W052, W054, W055, W056): o B34
+   de amarração do nó aparece em 0–34 cm nas duas fiadas da fronteira; a face
+   em 34,5 cm se repete.
+2. **Peça de nó ausente numa das fiadas** (W035, W045, W066, W075): fiada 7 com
+   `C09` de nó + `B39` terminando em 49 cm; fiada 8 sem peça de nó, preenchimento
+   começando na reserva com `B34` terminando também em 49 cm — face em 49,5 cm
+   alinhada.
+
+A BUTANTÃ não tem essa combinação de banda × nó degradado; o TP1 tem. A regra
+do nó degradado precisa decidir o elemento **pela fiada física através das
+fronteiras de banda** antes de valer no legado.
+
+**Implementado:** `CHANNEL_DEGRADED_TIE_BLOCK_ENABLED` (`core/wall_modeling.py`)
+liga `CORNER_DEGRADED_PREFERS_TIE_BLOCK` **só durante** o solve com estratégia de
+reforço — o mesmo mecanismo das tolerâncias da §30.9 — e restaura no fim. A chave
+global continua `False`; o legado (`strategy=None`) fica idêntico.
+`tests/test_degraded_node_tie_block.py` confere o escopo (ligada no CHANNEL,
+nunca vista ligada no legado, restaurada depois).
+
+## 59. Validadores pedidos pela missão — referência humana medida e nível correto (2026-09-15)
+
+A missão pediu cinco validadores novos. Antes de escrevê-los, cada um foi medido
+contra o projeto humano no mesmo recorte (34 paredes de alvenaria, fiadas 0–11,
+6.018 peças no humano × 6.263 no solver). O resultado **muda o nível de três
+deles** e **refuta dois**:
+
+| Validador pedido | Humano | Solver | Nível correto |
+|---|---|---|---|
+| `ADJACENT_COMPENSATORS` (compensadores de código idêntico encostados) | 6 (todos `C09D`, deitado) | 9 | **Preferência.** Só o par `C09+C09` em pé é zero no humano — esse é obrigatório e já é tratado pela seção 56.2. |
+| `SPECIAL_CLUSTER` (dois especiais a ≤ 40 cm) | **109** | 158 | **Preferência.** O humano agrupa especiais com frequência; contar como erro reprovaria o projeto de referência. |
+| `MID_WALL_HALF_BLOCK` (B19 fora de jamba/ponta) | **320** | 292 | **Refutado.** O humano usa *mais* meio-bloco no meio da parede que o solver. Não é defeito. |
+| `REPLACEABLE_COMPOSITE_BY_B54` (`B34+B19` onde caberia B54) | 107 | 81 | **Refutado** (seção 56.3). O humano usa mais, e nunca põe B54 longe de nó (172/172 a ≤ 35 cm). |
+| `CHANNEL_ALIGNMENT_ERROR` | — | — | Não medido nesta rodada; a validação CHANNEL existente já cobre canaleta faltante, extra, em fiada errada, invadindo vão e colidindo (40/40 superiores e 23/23 inferiores no Revit real). |
+
+**Por que não foram ligados ao benchmark nesta rodada.** O veredito de cada
+corpus é calculado contra um *golden* armazenado, e `new_codes` conta como
+regressão crítica (`golden/compare.py::_critical_regressions`). Adicionar
+qualquer código novo faria BUTANTÃ, TGD e TP1 aparecerem como REGRESSÃO — e o
+adendo desta missão **proíbe atualizar golden/baseline** para compensar. Os
+contadores ficam na bancada de medição (`delta_metrics.py`, `physmetrics.py`),
+que é onde a matriz de não-regressão desta missão foi produzida, e a fiação no
+benchmark fica para depois do gate, já com o **nível** desta tabela — dois deles
+como preferência e dois **não** devem existir.
+
+**Régua a preservar:** um validador que reprova o projeto humano de referência
+está errado, não o projeto. Foi o caso em três dos cinco pedidos.
+
+## 60. Arranjo conjunto das corridas de preenchimento — vazado menor do B34 (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 60.1 Censo das 316 violações que restavam (BUTANTÃ, 34 paredes, fiadas 0–11)
+
+Régua `b34rule` (a mesma do Revit real, que bateu exatamente com a bancada:
+157 + 118 + 24 + 17). `VIOLA:<código>` é a peça **vizinha** que cobre o centro do
+vazado menor.
+
+| Vizinha sob o vazado menor | Solver | Humano |
+|---|---|---|
+| B39 (não tem vazado menor) | **157** | 2 |
+| B34 | 118 | 20 |
+| B54 (célula lateral, não a central) | 24 | 2 |
+| B19 | 17 | 17 |
+
+Contexto: 290 das 316 são preenchimento × preenchimento (nenhuma das duas é peça
+de nó); 24 são B34 de preenchimento sobre o B54 do T.
+
+**Geometria que decide o que a rotação consegue** (vazado menor do B34 a
+9,1 cm do centro, 10,75 cm de largura, tolerância 1,5 cm): contra outro B34 só
+há duas janelas — mesma orientação com deslocamento |o| ≤ 6,9 cm, ou orientação
+**oposta** com 11,4 ≤ |o| ≤ 25,1 cm. Contra B39/B19 nenhuma orientação serve.
+Nenhum dos 118 B34×B34 estava "empilhado mal orientado": 114 estavam na janela
+de orientação oposta e 99 B34 violavam **nas duas** vizinhas — sinal de conflito
+entre a fiada de baixo e a de cima, que rotação não resolve.
+
+### 60.2 Mecanismo humano (medido peça a peça)
+
+Parede 8284543, trecho 815–964 cm, fiada par: o solver assentava
+`B34> B39 B39 B34<`; o humano assenta `B34> B34> B39 B39` — **as mesmas peças,
+outra ordem** —, encaixando a corrida de B34 na da fiada ímpar
+(`B19 B34< B34< B39 B39`), deslocada ~20 cm e girada 180°. No trecho 670–724 cm
+o humano faz `B34 B19` onde o solver faz `B19 B34`. Em outras paredes o humano
+muda a **composição** (B34 de ajuste em vez de `B39 … C09`) — isso não é
+reordenação e fica fora desta seção.
+
+### 60.3 Regra implementada
+
+`core/engine/b34_run_arrangement.py`, chamado por `_orient_small_voids_final`
+(`core/wall_modeling.py`) no fluxo CHANNEL: orientação §52 → arranjo §60 →
+orientação de novo, **antes** da reauditoria de amarração (o arranjo move juntas
+dentro das corridas; a orientação não).
+
+1. Fiadas físicas com a mesma fileira, peça por peça, formam uma **família**;
+   cada par de famílias vizinhas entra com a sua multiplicidade.
+2. Corrida = peças encostadas que são **bloco vazado de alvenaria ou compensador
+   do catálogo**, `STANDARD_FILL`, fora de nó, nunca canaleta, e que não aparecem
+   em fiada de outra família — em **todas** as fiadas da família.
+3. Para cada corrida: ordens **distintas** das mesmas peças (mesmas pontas,
+   mesmas juntas), orientação dos B34 por descida coordenada; fica a ordem que
+   reduz **estritamente** o vazado menor sem piorar **nenhuma** guarda.
+4. Repete até estabilizar (≤ 3 passadas): a escolha de uma corrida enxerga a das
+   vizinhas — a diferença para a tentativa rejeitada da §57, que decidia cada
+   corrida uma vez só contra vizinhas que ainda iam se mover.
+
+**Guardas (não podem subir):** face repetida entre fiadas vizinhas; junta
+empilhada em 3+ fiadas; compensadores encostados (regra #2 e 56.2); compensador
+longo (≥ 6 cm) como peça extrema (§58); **meio bloco junto de amarração**, com as
+mesmas posições (`_wall_tie_t_positions_cm`) e a mesma constante
+(`HALF_BLOCK_TIE_ADJACENCY_CM`) da auditoria `HALF_BLOCK_NEAR_TIE`.
+
+Geometria lida das `cells_world` (célula menor, §52): nenhum código de família,
+parede ou cota fixa. Custo local medido numa janela de 60 cm em volta do trecho
+(delta exato: as outras famílias ficam paradas durante a avaliação).
+
+### 60.4 Medido — BUTANTÃ no fluxo real do botão (17 fiadas)
+
+| Métrica | Sem §60 | Com §60 |
+|---|---|---|
+| Vazado menor — validador de produção (todas as fiadas) | 508 | **312 (−39%)** |
+| Vazado menor — régua 2-D, fiadas 0–11 (humano 41) | 316 | **234** |
+| B34 sobre B39 | 157 | **113** |
+| B34 sobre B34 | 118 | **80** |
+| Peças fixas (canaleta, nó, reparo de vão) — posição peça a peça | 2.002 | **2.002 idênticas** |
+| Buracos / NON_MODULAR / colisões / apoio | 20 / 0 / 0 / 0 | 20 / 0 / 0 / 0 |
+| Paredes reprovadas na amarração | 3 | 3 |
+| Especiais / `C09+C09` / sob janela | 808 / 11 / 1 | 808 / 11 / 1 |
+| Tempo de solve (bancada) | 7,7 s | 13,2 s |
+
+Idempotente: uma segunda passada não encontra melhoria.
+
+### 60.5 Corpus legado
+
+| Corpus | Como entregue (só CHANNEL) | Forçado no legado (`B34_RUN_ARRANGEMENT_LEGACY`) |
+|---|---|---|
+| TP1 V1 | idêntico ao PR #42 em todos os achados | idêntico em todos os achados |
+| TGD V2 | idêntico ao PR #42 em todos os achados | `PRISM_CONTINUOUS_JOINT` 53 → **51**; `PRISM_JOINT_STACK` 5 = 5; `PRISM_STAGGER_BELOW_TARGET` 712 → 751 (preferência, §56.2); categorias idênticas |
+
+Fica **desligado no legado** porque o legado não refaz a auditoria de amarração
+depois do solve. Forçado, não cria junta corrida — remove duas.
+
+### 60.6 Dois defeitos encontrados durante a integração (corrigidos antes de medir)
+
+- **Template de comprimento vivo**: o comprimento de cada código vinha da própria
+  peça da fileira; quando a busca escrevia um B39 naquela posição, o "B34" passava
+  a ter 39 cm. Efeito medido: trecho da parede 8284502 deslocado 5 cm, buracos
+  20 → 77. Correção: template é cópia congelada.
+- **Canaleta tratada como preenchimento**: a canaleta do reforço herda a etiqueta
+  `STANDARD_FILL` da peça que substituiu, e os códigos `CHANNEL_*` não estão no
+  catálogo de alvenaria. O arranjo reordenou canaletas da fiada 3 da parede
+  8284502 e levou um B19 para cima de uma amarração (`HALF_BLOCK_NEAR_TIE`,
+  reprovadas 3 → 4). Correção: só é móvel bloco vazado ou compensador do catálogo,
+  nunca código de canaleta.
+
+### 60.7 Determinismo
+
+Mesma entrada: reprodutível. Sentido e ordem das paredes: sensibilidade
+pré-existente (main e PR #42), sem parede nova envolvida. **Translação**: com a
+§60 desligada, a translação já muda 39 canaletas da parede 0 (fiadas 3 e 11 —
+`U_34 U_39 U_39` × `U_39 U_39 U_34`), **igual na main**; o desempate está no
+planejador CHANNEL. A §60 recebe entradas diferentes naquela parede e amplia a
+diferença na mesma parede (312 × 304 violações no total). Uma margem numérica nas
+tolerâncias foi testada para essa causa, não mudou nenhuma saída e foi revertida.
+
+### 60.8 O que continua aberto
+
+- **234 × 41** do humano na régua 2-D. O resíduo inclui composição (o humano usa
+  B34 de ajuste onde o solver usa `B39 … C09`), a pastilha do nó degradado (§58.2,
+  desligada) e B34 sobre a célula lateral do B54 de T (22).
+- Custo: +5,5 s por solve na bancada.
+
+**Testes:** `tests/test_b34_run_arrangement.py` — vermelho (orientação sozinha
+deixa o trecho real desalinhado), verde (reproduz a ordem humana e alinha),
+mesmas peças/pontas/juntas e peças fixas paradas, idempotência, canaleta nunca
+se move, chave desligada não toca nada, guarda de meio bloco igual à da auditoria
+e com controle (sem amarração o meio bloco cairia a 35 cm; com amarração em 44 cm
+o arranjo escolhe outra ordem e ainda alinha).
+
+## 61. Composição de mesmo comprimento nas corridas + aceitação exata por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 61.1 O que a seção 60 não alcança
+
+Depois do arranjo por reordenação (§60) restavam 234 violações (régua 2-D):
+113 B34 sobre B39, 80 B34×B34 em conflito de orientação, 22 sobre a célula
+lateral do B54 de nó e 19 sobre B19. Comparando fileira a fileira com o humano,
+o resíduo é de **composição**: onde o solver usa `B34 + C04` ou `B39 … C09`, o
+humano usa outra combinação de peças no mesmo comprimento — e com menos
+especiais (humano 500 × solver 808).
+
+**Hipótese medida e descartada nesta rodada — paridade do nó:** em 14 dos 29
+nós T comparáveis o solver põe o B54 na família de fiada oposta à do humano.
+Parecia a causa (162 das 234 violações a até 250 cm de um nó "trocado"), mas
+normalizando pelo número de B34 de preenchimento perto de cada grupo a taxa de
+violação perto dos nós **trocados** (0,08–0,25) é **menor** que perto dos de
+paridade igual (0,28–0,32). Nada mudou no motor por isso.
+
+### 61.2 Regra
+
+Para cada corrida de preenchimento com juntas regulares (`core/engine/b34_run_arrangement.py`,
+`_Wall.compose`):
+
+1. multiconjuntos a até **2 peças trocadas por até 3**, de **mesmo comprimento**
+   (comprimento + junta), só com códigos que o solver **já usa** como
+   preenchimento (nenhuma família nova), e **nunca com mais compensadores**;
+2. para cada um, as ordens distintas (teto) e a orientação dos B34;
+3. aceita por **dominância**: vazado menor e especiais não pioram e ao menos um
+   melhora, com as mesmas guardas da §60 — agora com "compensadores encostados"
+   e "compensador longo na ponta da parede" como guardas **separadas** (somadas,
+   a busca trocava um par `C09+C09` por um C09 na ponta, medido na fixture).
+
+**Aceitação exata por parede.** A busca é um modelo 1-D; quem decide é o
+validador de produção. Cada parede alterada passa pela **auditoria de amarração
+daquela parede** (com o catálogo de canaletas) e pelo **apoio físico total**
+(§53), antes × depois. Se qualquer tipo de problema aumentar, a parede volta ao
+estado anterior por snapshot (listas de fiada e geometria de cada peça). Isso
+também protege a §60, que usa a mesma escrita.
+
+Peça nova é criada com o construtor do solver (`_place_pier_layout`), com o
+`course_variant` da peça original do trecho; a que sobra é removida.
+
+### 61.3 Medido — BUTANTÃ no fluxo real do botão (17 fiadas)
+
+| Métrica | Desligado | Só §60 | **§60 + §61** | Humano |
+|---|---|---|---|---|
+| Vazado menor — validador de produção | 508 | 312 | **259** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 316 | 234 | **195** | 41 |
+| B34 sobre B39 | 157 | 113 | **84** | 2 |
+| B34 sobre B19 | 17 | 19 | **9** | 17 |
+| Especiais (fiadas 0–11) | 808 | 808 | **767** | 500 |
+| `C09+C09` encostados | 11 | 11 | **3** | 0 |
+| `C04+C09` encostados | 161 | 161 | **139** | — |
+| Peças | 9.088 | 9.088 | 9.055 | 6.018* |
+| Buracos / NON_MODULAR / colisões | 20 / 0 / 0 | 20 / 0 / 0 | **20 / 0 / 0** | — |
+| Apoio físico (`UNSUPPORTED_*`) | 0 / 0 | 0 / 0 | **0 / 0** | — |
+| Auditoria de amarração **recalculada** | 3 (`CONTINUOUS_VERTICAL_JOINT`) | 3 | **3 (mesmos)** | — |
+| Peças fixas (canaleta, nó, reparo) | — | idênticas | **idênticas** | — |
+| Sub-preenchimento sob janela | 1 | 1 | 1 | — |
+| Paredes rejeitadas pela validação exata | — | — | 0 | — |
+| Tempo de solve (bancada) | 7,8 s | 14,7 s | 16,7 s | — |
+
+\* humano medido só nas fiadas 0–11 das 34 paredes.
+
+**Lição de medição:** a métrica `BOND_REPROVED_WALLS` da bancada lê a auditoria
+**armazenada** no resultado. Num experimento que troca peças fora do fluxo, ela
+fica desatualizada — a regressão `REPEATED_VERTICAL_COMPENSATOR_STRIP` de um
+protótipo só apareceu recalculando a auditoria. As medições desta seção usam a
+auditoria recalculada.
+
+### 61.4 O que continua aberto
+
+- **195 × 41** na régua 2-D. Restam 80 conflitos de orientação B34×B34, 84 B34
+  sobre B39, 22 sobre a célula lateral do B54 de T e 9 sobre B19.
+- Especiais **767 × 500**.
+- Custo: +8,9 s por solve na bancada em relação ao estado sem arranjo.
+
+**Testes** (`tests/test_b34_run_arrangement.py`): vermelho (sem composição
+nenhuma ordem das mesmas peças alinha o B34 isolado), verde (troca de mesmo
+comprimento remove a violação e um especial, sem família nova), peças criadas
+inteiras do catálogo no mesmo vão com juntas de 1 cm e `course_variant`,
+validação exata que **rejeita e restaura a parede idêntica** (listas e geometria),
+validação que aceita quando nada piora, e o par `C09+C09` nunca trocado por C09
+na ponta.
+
+## 62. Orientação ótima exata dos B34 de preenchimento por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 62.1 Achado
+
+Dos 195 que restavam depois das §60/§61 (régua 2-D), 80 eram B34×B34 **na
+janela de orientação oposta** — geometricamente alinháveis. Medindo o mínimo
+exato de violações só por orientação, com as posições fixas e **os B34 de nó
+fixos** (§5): a busca exaustiva em janelas chegou a 217 e a programação
+dinâmica exata a **198**, contra 259 da orientação gulosa (modelo 1-D). Girar
+blocos contíguos da cadeia com melhora estrita chegou só a 251 — hipótese
+descartada.
+
+**Causa:** a §52 gira uma peça (ou um par) por vez e só aceita melhora estrita.
+Em corridas longas de B34 encadeadas entre fiadas, a orientação precisa alternar
+ao longo da cadeia inteira; um trecho "fora de fase" — típico entre B34 de nó
+fixos nas duas pontas e numa fiada única de fronteira de banda — só se corrige
+girando várias peças ao mesmo tempo.
+
+### 62.2 Regra
+
+`_Wall.orient_exact` (`core/engine/b34_run_arrangement.py`), depois da
+reordenação (§60) e da composição (§61):
+
+- variáveis = orientação dos B34 **de preenchimento** (móveis) de cada família
+  de fiada; peça de nó, reparo de vão e canaleta ficam fixas;
+- fator = violações de um B34-fonte; depende só da orientação dele e dos B34 que
+  podem cobrir o vazado dele (a menos de meia peça). Em ordem de posição, cada
+  fator envolve variáveis vizinhas → DP com estado = orientação das últimas *k*
+  variáveis (*k* = largura de banda);
+- aceita só se o ótimo for **estritamente** menor; banda acima de
+  `ORIENTATION_DP_MAX_BAND = 12` deixa a parede para a §52;
+- a gravação gira também B34 isolado (fora de corrida) e passa pela mesma
+  aceitação exata por parede da §61. A §52 roda de novo em 2-D depois.
+
+Só gira peças: contorno, juntas, cobertura e apoio não mudam por construção.
+
+### 62.3 Medido — BUTANTÃ no fluxo real (17 fiadas), DP exata corrigida
+
+| Métrica | Desligado | §60 + §61 | **§60 + §61 + §62** | Humano |
+|---|---|---|---|---|
+| Vazado menor — validador de produção | 508 | 259 | **186** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 316 | 195 | **139** | 41 |
+| B34 × B34 | 118 | 80 | **23** | 20 |
+| B34 × B39 / B54 / B19 | 157 / 24 / 17 | 84 / 22 / 9 | 85 / 22 / 9 | 2 / 2 / 17 |
+| Peças / buracos / colisões | 9.088 / 20 / 0 | 9.055 / 20 / 0 | **9.055 / 20 / 0** | — |
+| Apoio físico / auditoria recalculada | 0 / 3 | 0 / 3 | **0 / 3 (mesmos)** | — |
+| Especiais / `C09+C09` | 808 / 11 | 767 / 3 | **767 / 3** | 500 / 0 |
+| Peças fixas (canaleta, nó, reparo) | — | idênticas | **idênticas** | — |
+| Solve (bancada) | 7,9 s | 16,5 s | 16,6 s | — |
+
+68 orientações trocadas; nenhuma parede rejeitada pela validação exata.
+
+### 62.4 Defeito encontrado na validação do Revit real (corrigido)
+
+A primeira versão desta seção media 163 na bancada e **195 no Revit** — a DP
+praticamente não agia no IronPython 2.7 (1 orientação trocada contra 78).
+Isolando o modelo 1-D da parede 12 e rodando **a mesma função com a mesma
+entrada** nos dois runtimes, o IronPython calculava "ótimo" 152 contra custo
+atual 34 — impossível, porque a atribuição atual é um caminho da própria DP.
+
+Causa (nos **dois** runtimes): o corte do estado `full[len(full) - keep:]` com o
+estado ainda mais curto que `keep` vira fatiamento **negativo** e pega só as
+últimas peças, fundindo estados diferentes. O caminho que sobrevivia dependia da
+ordem de iteração do dicionário — o Python 3 guarda a ordem de inserção e achava
+por sorte caminhos bons; o 2.7 não. Correção: o estado só é cortado quando passa
+de `keep`, e as camadas são percorridas em ordem **ordenada** (empates decidem
+igual em qualquer runtime). Com a DP exata o resultado **melhorou** (163 → 139).
+
+Custo: a DP exata guarda até 2^banda estados. Fatores pré-calculados em tabela
+(cada fator envolve no máximo a fonte e os B34 que podem cobrir o vazado) e
+estado como **máscara de bits** — resultado idêntico (mesmo hash de todas as
+peças) — levaram a parede 12 no IronPython de 4,21 s para **0,57 s**.
+
+**Paridade bancada × Revit (só solve):** 68 orientações trocadas nos dois, 10
+composições, 73 peças criadas e 106 removidas nos dois, 9.055 peças; das 9.055
+linhas, 91 diferem — todas canaletas da parede 0, o desempate pré-existente do
+planejador CHANNEL (§60.7). Solve no Revit: 116 s.
+
+**Testes** (`tests/test_b34_run_arrangement.py`) sobre a parede **real** 8284579
+(209 cm, B34 de nó nas duas pontas, 17 fiadas) no estado em que a §52 travou:
+vermelho (gulosa e reordenação ficam em 10), verde (DP leva a 0 sem mudar
+posição de nenhuma peça nem orientação de nó), teto de banda devolve a parede à
+§52, idempotência.
+
+## 63. Orientação conjunta na avaliação das ordens e composições (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 63.1 Achado — censo das 112 violações que restavam (régua 2-D, fiadas 0–11)
+
+| Categoria física (censo por violação) | Violações |
+|---|---|
+| perto de nó (< 60 cm) **e** ponta de parede (< 40 cm), sem jamba | 25 |
+| peça de nó (B54 do T) junto de jamba | 22 |
+| jamba + peça de reparo de vão (`OPENING_REPAIR_FILL`) | 15 + 7 |
+| corrida livre | 15 |
+| jamba sem reparo | 11 |
+| outras combinações (sob janela, sobre vão, ...) | 17 |
+
+A maior categoria, lida peça a peça contra o humano (parede **8284574**, 224 cm,
+nó T em t=0 nas fiadas ímpares):
+
+```
+SOLVER par   B39@15 B39@55 B39@95 B39@135 B39@175 C09@215
+SOLVER ímpar B34(nó)@0 B34<@35 B39@70 B39@110 B39@150 B34>@190
+HUMANO       fiadas com corridas de B34 nas duas paridades, deslocadas 15 cm e
+             giradas (lado oposto) — nenhuma peça de 9 cm na ponta
+```
+
+Força bruta das duas fiadas juntas (todas as ordens e composições de mesmo
+comprimento): existe `B34 B39 B39 B39 B34 B19` na par (troca **B39 + B39 + C09
+→ B34 + B34 + B19**, mesmo comprimento, **sem especial**) com **0** violações,
+0 faces coincidentes, 0 juntas empilhadas e sem compensador longo na ponta.
+
+### 63.2 Causa (medida)
+
+A §60/§61 avaliava cada ordem girando só os B34 **da família do trecho**, um de
+cada vez. Essa composição valia **32** (pior que as 16 atuais) e era descartada:
+chegar a 0 exige girar **junto** o B34 da fiada ímpar logo acima (20 cm de
+distância) — cada inversão isolada fica em 32 ou sobe para 64. A DP da §62 gira
+mas não reordena. Além disso a troca tira **3** peças e a §61 parava em 2.
+
+### 63.3 Regra
+
+- `_best_sides(joint=True)`: os B34 móveis das **famílias vizinhas** ao alcance
+  (40 cm) também giram, e há inversão **em pares** (famílias diferentes, centros
+  a até 25 cm).
+- Duas etapas (custo): a descida barata avalia **todas** as ordens; a conjunta só
+  reavalia as **4** que passam nas guardas geométricas (não dependem de
+  orientação), não dominaram e cujo **limite inferior** de vazado
+  (`_violations_lower_bound`: só conta o vazado que nenhuma combinação de lado da
+  fonte e da peça que a cobre alinha) ainda pode dominar — ordenadas por esse
+  limite. K = 8 e K = 16 dão o mesmo resultado; a conjunta em todas as ordens
+  também (e custava 342 s).
+- `COMPOSITION_MAX_REMOVED` 2 → 3. Sem a orientação conjunta o 3 não muda nada
+  na BUTANTÃ (medido).
+- Custo: o teste de inversão mede só o **delta exato** (pares fonte × peça que
+  cobre envolvendo as peças invertidas) — mesma assinatura de todas as peças.
+
+### 63.4 Medido — BUTANTÃ no fluxo real (17 fiadas)
+
+| Métrica | antes (§62 + §58.3) | **§63** |
+|---|---|---|
+| Vazado menor — validador de produção | 159 | **123** |
+| Vazado menor — régua 2-D, fiadas 0–11 | 112 | **98** |
+| Especiais fiadas 0–11 | 761 | **755** |
+| Peças / buracos / colisões / não modular | 9.049 / 20 / 0 / 0 | **9.049 / 20 / 0 / 0** |
+| Apoio / auditoria recalculada / `C09+C09` | 0 / 3 / 3 | **0 / 3 / 3** |
+| Compensador com lado fechado errado | 0 | **0** |
+| Validação CHANNEL (todas as contagens) | — | **idêntica** |
+| TGD V2 / TP1 V1 (achados por código) | — | **idênticos** |
+
+Determinismo (mesmo teste de §60.7): violações menores nas quatro entradas
+(normal 123, transladado 123, invertido 139, permutado 143 contra 159 / 151 /
+167 / 171). Invertido e permutado diferem **menos** do normal que antes; o
+transladado continua diferindo **só na parede 0** (o desempate pré-existente do
+planejador CHANNEL), agora em 113 peças contra 91 — mesma parede, mesma origem.
+
+Revit real (34 paredes, criação completa, execuções 13 e 14 — a 14 com a
+otimização de custo, mesma assinatura): 9.049 criadas, 0 falhas, 0 divergências
+de leitura, projeto humano não modificado, vazado menor 123 = bancada. Solve no
+Revit 125 s → 397 s na primeira versão → **210 s** com o delta exato.
+
+**Testes**: ponta **real** da parede 8284574 (vermelho com a descida antiga,
+verde com a conjunta: 0 violações, um especial a menos, mesmas pontas, nó
+intacto, idempotente); limite inferior ≤ mínimo exato por força bruta num trecho
+real e restaura os lados; a §62 fica isolada da §63 nos testes dela; a guarda de
+meio bloco junto a amarração passa a usar a posição **medida** da melhor ordem
+sem guarda.
+
+## 64. Arranjo e aberturas — jamba → nó como uma unidade (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+### 64.1 A Etapa 4D e a validação CHANNEL depois do arranjo
+
+O arranjo (§60–63) move e cria compensadores **depois** que a Etapa 4D decidiu o
+lado fechado, e a validação CHANNEL guardada era a de **antes** do arranjo.
+Quando o arranjo muda peças, a orientação dos compensadores é recalculada da
+posição final (`orient_compensator_candidates`, fonte da verdade, idempotente) e
+a validação CHANNEL é refeita. Na BUTANTÃ de hoje nada muda (0 reorientados,
+assinatura idêntica); com peças de reparo no arranjo, **3** compensadores
+ficavam com o lado fechado virado para a alvenaria sem este passo.
+
+### 64.2 Peças de reparo de abertura nas corridas — jamba → nó
+
+**Achado (parede 8284534, jamba da porta 8078996 → nó T):**
+
+```
+par    B19(R) C04(R) B39 C09 | B54(nó)        (75 cm entre jamba e nó)
+ímpar  B39(R) C04(R) B39 C09 | braço do T     (95 cm)
+```
+
+As peças do **reparo** da abertura (`OPENING_REPAIR_FILL`, marcadas R) são
+preenchimento comum para todos os efeitos, mas ficavam **congeladas**: a corrida
+parava nelas e o arranjo só via `B39 C09`. Com elas, a ímpar vira `B39 B19 B34`
+(mesmo comprimento, **dois especiais a menos**), sem mexer na face da jamba nem
+no nó.
+
+**Regra:** `B34_RUN_OPENING_REPAIR_MOVABLE` — as peças de reparo entram nas
+corridas e no conjunto de códigos da composição; as pontas da corrida continuam
+fixas (a face da jamba nunca se move, nada entra no vão). A aceitação exata por
+parede passa a incluir a **validação CHANNEL completa** (qualquer problema que
+aumenta ou canaleta casada que some reprova a parede), medida só nas paredes com
+abertura. A Etapa 4D reorienta depois (§64.1).
+
+**Medido — BUTANTÃ (bancada, 17 fiadas):**
+
+| Métrica | §63 | **§64.2** | Humano |
+|---|---|---|---|
+| Vazado menor — validador de produção | 123 | **68** | — |
+| Vazado menor — régua 2-D, fiadas 0–11 | 98 | **43** | 41 |
+| Especiais fiadas 0–11 | 755 | **594** | 500 |
+| Especiais a até 60 cm de jamba | 521 | **373** | — |
+| `C04+C09` / `C09+C09` | 139 / 3 | **81 / 3** | — / 0 |
+| Peças | 9.049 | **8.958** | — |
+| Buracos / colisões / não modular / apoio | 20 / 0 / 0 / 0 | **20 / 0 / 0 / 0** | — |
+| Auditoria recalculada | 3 | **3 (mesmas)** | — |
+| `MISSING_UNDER_WINDOW` | 0 | **0** | — |
+| Validação CHANNEL (todas as contagens) | — | **idêntica** | — |
+| Compensador com lado fechado errado | 0 | **0** (15 reorientados pela §64.1) | — |
+| Paredes rejeitadas pela validação exata | 0 | **0** | — |
+
+Comparador por lado de vão (60 cm a partir da jamba, fiadas 0–11, bancada):
+`SOLVER_WORSE` 51 → **37**, `PHYSICALLY_EQUIVALENT` 25 → **36**, `SOLVER_BETTER`
+10 → **12**; especiais nas regiões 606 → **443** (humano 354). **Nenhum lado piora
+de classe.** A cobertura cai 2–5 cm em 7 lados: é a junta caindo exatamente na
+borda da região de 60 cm (buracos reais idênticos: 20 / 2.566 cm).
+
+TGD V2 e TP1 V1: achados por código **idênticos** (fluxo só CHANNEL).
+Determinismo: invertido difere **menos** do normal (11.498 → 10.692 peças);
+transladado igual à §63 (só a parede 0); permutado 4.020 → 4.036 — nenhuma parede
+nova sensível, o acréscimo está nas duas paredes que já dependiam da ordem
+(8284502, 8284526).
+
+`test_channel_reinforcement::test_door_gets_channel_course_on_head...`: a regra
+"nenhuma junta nova contra o legado" é do **planejador de reforço** e passa a
+ser medida com o arranjo desligado; o fluxo completo verifica os mesmos trechos
+cobertos em toda fiada, auditoria limpa e especiais ≤ legado. Na parede do teste
+o arranjo troca pastilhas por meio bloco nas jambas: especiais 27 → 16, vazado
+menor 33 → 4.
+
+### 64.3 O que continua aberto
+
+Régua 2-D: **43** contra **41** do humano. Por parede, o solver é melhor que o
+humano em 5 paredes (8284562 5×15, 8284502 6×10, 8284534 0×8, 8284589 e
+8284590 0×4) e pior em 9 (32 violações). A maior (8284557, 514 cm, T no meio
+com B54): as fiadas 4–5 usam outra posição de B39 que as 0–3 e as violações
+ficam na **interface entre bandas** — o humano usa uma só corrida de B39 em
+todas as fiadas. Coordenar a composição entre famílias de bandas diferentes é o
+próximo passo; não é limitação física (o humano resolve).
+
+## 65. O arranjo roda de novo depois da orientação (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+**Achado.** A orientação — gulosa (§52) e exata (§62) — roda **depois** da busca
+de ordem, e muda o que cada ordem vale. Medido na parede **8284557** (514 cm, nó
+T no meio, **5 famílias de fiada**: as bandas superiores repetem outra linha):
+no estado final, duas famílias caem de **7 para 3** violações só reordenando a
+corrida, com todas as guardas intactas — e nada reavaliava isso.
+
+**Regra.** `_orient_small_voids_final` repete `arranjo → Etapa 4D → orientação`
+até `B34_RUN_ARRANGEMENT_PASSES = 3`, parando assim que um passe não mexe em
+nenhuma peça. Do segundo passe em diante o arranjo só olha as paredes que o
+passe anterior mexeu (`only_walls`) — a orientação só muda onde a geometria
+mudou; mesma assinatura de todas as peças, solve 70 s → 54 s na bancada.
+
+**Medido — BUTANTÃ (bancada, 17 fiadas):** vazado menor do validador de produção
+**68 → 53**; régua 2-D das fiadas 0–11 **43 → 35** (humano **41** — o solver
+passa a ficar **abaixo** do humano nessa régua). Especiais 594, peças 8.958,
+buracos 20, colisões 0, apoio 0, auditoria 3 (as mesmas), `MISSING_UNDER_WINDOW`
+0, contagens CHANNEL e orientação dos compensadores idênticas, 0 paredes
+rejeitadas pela validação exata. Segundo passe: 7 paredes mexidas, 2
+composições, 41 peças movidas; terceiro passe: nada.
+
+TGD V2 e TP1 V1 idênticos. Determinismo: transladado igual (só a parede 0),
+invertido 10.692 → **10.663** e permutado 4.036 → **4.030** peças diferentes do
+normal — nenhuma parede nova sensível.
+
+**Testes**: o laço para quando um passe não mexe em peça; o segundo passe recebe
+exatamente as paredes que o primeiro mexeu; o teto de passes é respeitado.
+
+## 66. Microajuste da POSIÇÃO da abertura — ETAPA 3B por qualidade (2026-09-15, IMPLEMENTADO, sob chamada)
+
+> Regra nova pedida pelo usuário em 2026-09-15: *"a posição original da abertura
+> não é absoluta"*. A Etapa 3B já deslocava abertura para tornar uma parede
+> **viável** (`plan_axis_opening_fix`, opção 1 "shift", teto de 5 cm); esta seção
+> acrescenta o deslocamento por **qualidade**, com teto de 10 cm.
+
+### 66.1 Achado — medido na BUTANTÃ, não deduzido
+
+Censo das faixas entre a peça de **nó** e a jamba (34 paredes, fiadas 0–11): 41
+faixas em que sobra entre 20 e 35 cm — espaço em que um `B34` + junta (35 cm)
+**não cabe**. O caso mais claro é a parede **8284543**, porta 8079002, jamba em
+t = 469 cm, em 6 fiadas:
+
+```
+fiada par    B54(nó)@385 … termina em 439 | C09@440  B19@450 | VÃO      (30 cm)
+fiada ímpar  B39@420                      | C09@460          | VÃO
+
+com a abertura 5 cm adiante (jamba em 474):
+fiada par    B54(nó)@385                  | B34@440          | VÃO      (35 cm)
+fiada ímpar  B34@420                      | B19@455          | VÃO
+```
+
+Do outro lado do vão o residual muda junto: onde havia `B19 + B34` passa a
+fechar `C09 + C04` — a "peça menor/pastilha" que o usuário previu.
+
+### 66.2 Regra
+
+**Régua do padrão vertical** (`strip_filler_pieces`): peças de **acerto**
+(compensador, pastilha ou meio bloco) dentro das faixas entre uma peça de nó e a
+jamba, somadas em todas as fiadas. É **geometria, não nome de peça**: a faixa
+entre a amarração e o vão deveria fechar com alvenaria inteira.
+
+**Detecção** (`detect_candidates`) → `OPENING_MICRO_ADJUSTMENT_REQUIRED`:
+aberturas cuja vizinhança tem peça de acerto na faixa ou vazado menor
+desalinhado na parede. É diagnóstico, nunca erro.
+
+**Busca** — para cada abertura suspeita:
+
+1. `feasible_offsets`: ±10 cm, passo de 1 cm, **menor primeiro**, recusando o que
+   sai da parede, encosta noutra abertura ou chega perto de nó; o teto vale para
+   o deslocamento **total** desde a posição do projeto (a abertura não passeia
+   10 cm por execução);
+2. `piers_close`: pré-triagem **aritmética da própria Etapa 3B** — os dois
+   pilaretes têm de fechar com blocos. Na BUTANTÃ sobrevivem só os múltiplos do
+   módulo (`PIER_MODULE_CM` = 5 cm): 21 candidatos viram 5;
+3. `plan_opening_micro_adjustments`: cada sobrevivente é avaliado com um **solve
+   real do CLUSTER** (a parede da abertura e as ligadas a ela por nó — a posição
+   pode existir para a modulação das vizinhas);
+4. `choose_offset`: **portões duros primeiro** (colisão, apoio, não modular,
+   preflight de abertura, auditoria de amarração e validação CHANNEL — nenhum
+   pode piorar), depois **qualidade** na ordem: vazado menor → padrão vertical →
+   meio bloco desnecessário → compensador/pastilha → aglomerado de especiais →
+   não modular; **empate fica com o menor deslocamento, e o 0 vence qualquer
+   empate** (não mover sem ganho real).
+
+Nada disso roda sozinho dentro do solve: quem chama é a Etapa 3B / o harness, e
+a abertura só se move no Revit **depois** de o vencedor ser escolhido. Largura,
+altura, peitoril e nível nunca mudam — só a posição longitudinal na própria
+parede. O projeto humano é somente leitura: nunca se move abertura nele.
+
+### 66.3 Medido — BUTANTÃ (bancada, 17 fiadas, 6 aberturas examinadas das 24 detectadas)
+
+| Abertura | Deslocamento | Peças de acerto na faixa | Especiais (cluster) |
+|---|---|---|---|
+| 8284546 vão 0 | **+5 cm** | 22 → 18 | 148 → 141 |
+| 8284534 vão 1 | **+5 cm** | 57 → 51 | 105 → 94 |
+| 8284534 vão 2 | **+5 cm** | 57 → 51 | 105 → 94 |
+| 8284543 vão 0 | **+10 cm** | 24 → 12 | 45 → 45 |
+| 8284526 vão 3 | **+5 cm** | 34 → 31 | 135 → 135 |
+| 8284515 vão 5 | **0** (nada a ganhar) | 50 → 50 | 135 → 135 |
+
+Aplicando os cinco e re-resolvendo o prédio inteiro:
+
+| Métrica | antes | **depois** |
+|---|---|---|
+| Vazado menor — validador de produção | 53 | **49** |
+| Vazado menor — régua 2-D, fiadas 0–11 | 35 | **31** (humano 41) |
+| Especiais fiadas 0–11 | 594 | **559** |
+| `C04+C09` encostados | 81 | **65** |
+| Peças de acerto nas faixas amarração→jamba | 237 | **206** |
+| Peças | 8.958 | **8.926** |
+| Buracos / colisões / apoio / não modular | 20 / 0 / 0 / 0 | **20 / 0 / 0 / 0** |
+| Auditoria recalculada / `MISSING_UNDER_WINDOW` | 3 / 0 | **3 / 0** |
+
+O deslocamento de **+10 cm** na 8284543 não é preferência: +5 e +10 empatam nas
+peças de acerto (12), e o +10 fica com um especial a menos — a ordem de
+prioridade decide, e o menor deslocamento só vale como último critério.
+
+### 66.4 Testes
+
+`tests/test_opening_micro_adjust.py` — fixture **física** equivalente ao caso
+real (parede de 604 cm, T em t=177 com a peça de nó terminando em 204, jamba em
+234, vão de 91 cm; os dois pilaretes só fecham nessa geometria):
+
+- **vermelho**: na posição do projeto a fiada fecha a faixa com `B19 + C09`;
+- **verde**: com o deslocamento **que a busca escolhe** (o valor não está escrito
+  no teste) a mesma faixa fecha com um `B34` inteiro e nenhum portão piora;
+- réguas, pré-triagem aritmética (com os números reais da 8284543), guardas de
+  segurança, teto do deslocamento **total** e a ordem de prioridade
+  (padrão vertical acima de especiais);
+- controle: posição já boa não se move.

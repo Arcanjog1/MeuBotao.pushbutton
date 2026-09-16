@@ -78,6 +78,22 @@ def physical_signature(result, walls):
     return hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
 
 
+def _covered(rows, gap_cm=2.5):
+    """Trechos cobertos da fileira (juntas de ate' `gap_cm` contam como cobertas)."""
+    out = []
+    for r in sorted(rows, key=lambda r: r["lo"]):
+        if out and r["lo"] <= out[-1][1] + gap_cm:
+            out[-1][1] = max(out[-1][1], r["hi"])
+        else:
+            out.append([r["lo"], r["hi"]])
+    return [(round(a, 1), round(b, 1)) for a, b in out]
+
+
+def _specials(result):
+    return sum(1 for v in result["course_candidates"].values() for c in v
+               if (sb.CATALOG.get(c["logical_code"]) or {}).get("is_compensator"))
+
+
 def channel_count(result):
     return sum(1 for v in result["course_candidates"].values() for c in v if orf.is_channel_code(c["logical_code"]))
 
@@ -132,11 +148,26 @@ def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically
     rec = res["opening_reinforcement"]["openings"][0]
     assert rec["above"]["status"] == "CHANNEL" and rec["below"] is None
     assert rec["above"]["support_l_cm"] >= 19.0 - 1e-6 and rec["above"]["support_r_cm"] >= 19.0 - 1e-6
-    # ocupacao identica: a canaleta toma o lugar das pecas (mesmas pontas)
+    # ocupacao identica: a canaleta toma o lugar das pecas (mesmas pontas). Regra
+    # do PLANEJADOR de reforco - medida com o arranjo das corridas (secoes 60-64,
+    # que roda depois e troca juntas de proposito) desligado.
+    from core.engine import b34_run_arrangement as _runs
+    saved = _runs.B34_RUN_ARRANGEMENT_ENABLED
+    _runs.B34_RUN_ARRANGEMENT_ENABLED = False
+    try:
+        planned, _w, _n2, _o2 = solve(lines, ops)
+    finally:
+        _runs.B34_RUN_ARRANGEMENT_ENABLED = saved
     for ci in range(NUM_COURSES):
         a = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(legacy, walls, 0, ci)]
-        b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(res, walls, 0, ci)]
+        b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(planned, walls, 0, ci)]
         assert [x for x in b if x not in a] == []  # nenhuma junta nova
+    # fluxo completo (com o arranjo): mesmos trechos cobertos em toda fiada (mesmas
+    # pontas, nada entra no vao), auditoria limpa e sem mais especiais que o legado
+    for ci in range(NUM_COURSES):
+        assert _covered(strip(res, walls, 0, ci)) == _covered(strip(legacy, walls, 0, ci)), ci
+    assert res["wall_bond_audits"][0].get("problems") in ([], None)
+    assert _specials(res) <= _specials(legacy)
 
 
 def test_window_gets_channel_on_head_and_one_course_under_sill():
