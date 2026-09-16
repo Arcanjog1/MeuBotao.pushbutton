@@ -222,3 +222,42 @@ def test_control_a_position_already_as_good_is_not_moved():
                if oma.piers_close((span[0] + d, span[1] + d), [], WALL_CM)]
     record = oma.choose_offset(dict(_CANDIDATE, span_cm=list(span)), evaluate, [0.0] + [d for d in offsets if d == 0.0])
     assert record["chosen_offset_cm"] == 0.0 and record["applied"] is False
+
+
+# --- secao 66.4: guarda de interferencia antes de mover -------------------------
+
+def _plan_with_guard(guard, monkeypatch):
+    """Planejamento com um avaliador de mentira (barato) e a guarda do chamador."""
+    course_candidates, walls, openings = _solve([(JAMB_CM, JAMB_CM + OPENING_CM)])[0]["course_candidates"], None, None
+    result, walls, openings = _solve([(JAMB_CM, JAMB_CM + OPENING_CM)])
+    seen = []
+
+    def evaluate(wall_idx, opening_index, offset_cm, exact=True):
+        seen.append(round(offset_cm, 1))
+        fillers = 0 if offset_cm else 10        # qualquer deslocamento parece melhor
+        return {"gates": {}, "quality": {"small_void": 0, "strip_fillers": fillers,
+                                         "mid_wall_half_blocks": 0, "specials": 0,
+                                         "special_clusters": 0, "non_modular": 0}}
+    plan = oma.plan_micro_adjustments(result["course_candidates"], walls, openings, CATALOG,
+                                      evaluate, max_course=11, max_openings=2, offset_allowed=guard)
+    return plan, seen
+
+
+def test_the_guard_keeps_a_blocked_offset_out_of_the_search(monkeypatch):
+    """Um deslocamento que a varredura recusa nao chega a ser avaliado nem
+    escolhido - e fica registrado no candidato."""
+    blocked = {5.0}
+
+    def guard(wall_idx, opening_index, offset_cm):
+        return offset_cm not in blocked
+    plan, seen = _plan_with_guard(guard, monkeypatch)
+    assert 5.0 not in seen                       # nem avaliado
+    for record in plan["records"]:
+        assert record["chosen_offset_cm"] != 5.0
+    required = [c for c in plan["required"] if c.get("blocked_offsets_cm")]
+    assert required and 5.0 in required[0]["blocked_offsets_cm"]
+
+
+def test_without_the_guard_the_same_offset_is_reachable():
+    plan, seen = _plan_with_guard(None, None)
+    assert 5.0 in seen

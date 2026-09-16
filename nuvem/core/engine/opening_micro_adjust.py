@@ -268,11 +268,14 @@ def choose_offset(candidate, evaluate, offsets, verify=None):
 
 def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall, catalog,
                            evaluate, node_positions_by_wall=None, max_course=None,
-                           max_openings=None, moved_so_far_cm=None):
+                           max_openings=None, moved_so_far_cm=None, offset_allowed=None):
     """ETAPA 3B - microajuste de posicao por QUALIDADE.
 
     1. detecta as aberturas com o defeito (OPENING_MICRO_ADJUSTMENT_REQUIRED);
-    2. enumera os deslocamentos seguros e passa a pre-triagem aritmetica;
+    2. enumera os deslocamentos seguros, passa a pre-triagem aritmetica e, quando
+       o chamador da' `offset_allowed(wall_idx, opening_index, offset_cm)`, a
+       GUARDA DE INTERFERENCIA do modelo (varredura da abertura ate' a posicao
+       final contra os elementos reais - so' o chamador enxerga o Revit);
     3. manda o chamador avaliar cada um com um solve REAL da regiao afetada
        (`evaluate(wall_idx, opening_index, offset_cm)` -> {"gates", "quality"});
     4. escolhe o melhor - empate fica com o menor deslocamento, e o 0 vence
@@ -299,6 +302,11 @@ def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall
                                    (node_positions_by_wall or {}).get(wall_idx),
                                    already_moved_cm=moved)
         offsets = [d for d in offsets if piers_close((span[0] + d, span[1] + d), others, wall_length_cm)]
+        if offset_allowed is not None:
+            blocked = [d for d in offsets if d and not offset_allowed(wall_idx, candidate["opening_index"], d)]
+            if blocked:
+                candidate["blocked_offsets_cm"] = sorted(blocked)
+            offsets = [d for d in offsets if d not in blocked]
         if len(offsets) <= 1:
             continue          # so' a posicao atual fecha: nada a decidir
         opening_index = candidate["opening_index"]
