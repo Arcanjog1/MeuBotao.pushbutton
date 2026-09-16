@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "OPENING_SOLID_BELOW_SILL_MISSING = 0 (a folga e' junta); e o contador cru de sub-preenchimento registra a folga como junta.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "Junta de argamassa de ate' ~1,6cm sob o peitoril e' JUNTA, nao vazio: MISSING_UNDER_WINDOW cru conta como se fosse buraco.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

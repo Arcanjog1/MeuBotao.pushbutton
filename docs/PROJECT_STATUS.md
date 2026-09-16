@@ -1,11 +1,11 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CHANNEL integrado); SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge do #41); SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-14T21:12:19+00:00",
-  "main": "61d4f6ce7133bd8ea8613ed1f398895b8536e101",
+  "observed_utc": "2026-09-16T14:05:00+00:00",
+  "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
       "pr": 32,
@@ -42,6 +42,10 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
     {
       "pr": 40,
       "head": "64404af6fdde91aaf9b8dafdb32708a29cdcf0db"
+    },
+    {
+      "pr": 41,
+      "head": "1aff5e02104a3508c4eeb2b78e2d103929ca233b"
     }
   ],
   "candidates": [
@@ -70,9 +74,34 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
     },
     {
-      "pr": 41,
-      "branch": "claude/channel-post-merge-doc-fix",
-      "head": "359651793675afe858483dd6df6585b5ad48be2c"
+      "pr": 42,
+      "branch": "claude/butanta-modulation-physical-fixes",
+      "head": "7784c918f06993985802e8732a3200767e20e376"
+    },
+    {
+      "pr": 43,
+      "branch": "claude/tender-carson-0t631s",
+      "head": "35fb8893dba9c97839ac9aff8c143f8230fff8e8"
+    },
+    {
+      "pr": 44,
+      "branch": "codex/modulacao-automatica-ui-redesign",
+      "head": "78a79fc1cbd47873b8e24ab1c6a8ee456f10623d"
+    },
+    {
+      "pr": 45,
+      "branch": "claude/laughing-einstein-cl3cen",
+      "head": "6808570881ac3d77bdc8c43c1a1cf22ac2c7f911"
+    },
+    {
+      "pr": 46,
+      "branch": "codex/modulation-ui-premium-redesign",
+      "head": "ca301c34da730b8fea7ef5bd7256a36f81a51e42"
+    },
+    {
+      "pr": 47,
+      "branch": "claude/ci-fast-gate-and-test-performance",
+      "head": "d933e9e16e1d64275fb900dbee36067292c833c9"
     }
   ]
 }
@@ -80,17 +109,18 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | `61d4f6ce7133bd8ea8613ed1f398895b8536e101` (merge do **#40**, estratégia CHANNEL); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| MAIN / HEAD observado | `55e990d962ed22ae1021f0d335db197607bddda1` (merge do **#41**, docs-only); antes 61d4f6c (#40, CHANNEL), 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
-| Candidato desta sessão | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD `3596517` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only**: nenhuma mudança de produção, benchmark, baseline ou norma — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| Candidatos em curso (sessões paralelas) | **Produção/solver:** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) HEAD `7784c91` e [#43](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/43) HEAD `35fb889` (anexo de análise ao #42) — conteúdo normativo e métricas são dos próprios PRs; este painel não os reproduz. **UI/UX:** [#44](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44) HEAD `78a79fc` e [#46](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46) HEAD `ca301c3`. **Auditoria/benchmark/CI:** [#45](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/45) HEAD `6808570` e [#47](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/47) — ver linha abaixo. Integrado nesta rodada: #41 (docs-only) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
+| CI e performance da suíte (#47) | **BENCHMARK / TEST COVERAGE / CI — NÃO é mudança de produção** (só `tests/`, `.github/workflows/`, `nuvem/benchmark/corpus_butanta/` e `docs/audits/`; `nuvem/core/**`, `Script.py`, UI, REGRAS, golden e baseline intocados). **FAST gate no CI**: `pytest -m "not slow"` = **1.268 testes em 22,00 s** (job 31 s), antes ~12,8 min; **FULL** manual (`workflow_dispatch`) com a suíte inteira + `runner.py --all --check`; o check documental não foi tocado. Marcador `slow` corrigido: 31 → **39** testes — os 5 de `test_block_arm_role_prism_stagger` e os 3 de `test_block_node_fill_revalidation` (T18/T19/T20 dividem `_CORPUS_CACHE`, e o T19 isolado mede **264,48 s**). `test_benchmark_baselines` com fixture de sessão: **712,24 s → 472,24 s (−240 s)**, cinco solves em vez de onze, equivalência provada (vereditos e mensagens de falha idênticos). Suíte completa no HEAD: **2 falharam / 1.305 passaram em 37min41s** — as mesmas 2 falhas da main, zero falha nova, zero `skip`/`xfail` novo. Corpus BUTANTÃ preparado em `nuvem/benchmark/corpus_butanta/` (10 fixtures, 8 grupos) **sem gabarito** e **fora de `projects/`**, para não mexer no portão de corpus com o #42 em voo. Relatório: [CI e performance](audits/2026-09-16-ci-fast-gate-e-performance.md) |
 | Bloqueadores | CHANNEL: integrado na main pelo #40. Pendentes: topo/peitoril fora da grade (51.8), cinta de topo (10.7), 30.8 (7719511); verga/contraverga não iniciada. Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md); antes [CHANNEL — fechamento final e merge](checkpoints/2026-09-14-channel-final-merge.md) |
-| CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
+| Último checkpoint | [CI rápido e performance da suíte](checkpoints/2026-09-16-ci-fast-gate-e-performance.md) (testes/CI, produção zero); antes [reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| CI | Validação documental (`check-project-status.yml`) **+ FAST gate de testes** (`fast-tests.yml`, `pytest -m "not slow"`, 1.268 testes em 22 s) a cada push/PR, e **FULL** manual (`full-tests.yml`: suíte inteira + `runner.py --all --check`). Ambos entram pelo PR [#47](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/47). Recomendação original em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
 | Próximo objetivo | Decisões E (topo/peitoril fora da grade) e F (cinta de topo); LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).

@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "O alinhamento e' atingido girando os dois B34 juntos, e o resultado e' invariante a translacao, a ordem de entrada e ao sentido dos endpoints.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 52 - existe configuracao em que nenhum giro individual alinha; a decisao e' sobre o PAR de fiadas, nao sobre uma peca.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "Menor deslocamento vence; 0 vence empate; o deslocamento TOTAL desde a posicao do projeto nunca passa de 10cm em execucoes repetidas; largura, altura, peitoril e nivel nao mudam.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 66 - entre a peca de no' e a jamba sobra 20-35cm: um B34 mais junta (35cm) nao cabe e a fiada fecha com peca de acerto. Deslocar o vao em multiplo do modulo (5cm) abre espaco.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

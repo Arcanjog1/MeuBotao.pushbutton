@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "Zero par C04+C04 encostado; o vao coberto e' identico ao de antes da fusao; peca de no' nunca e' fundida.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 54 - dois compensadores iguais encostados viram o compensador do vao total (C04+C04 -> C09), mesmo vao, uma peca.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

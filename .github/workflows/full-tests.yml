@@ -1,0 +1,54 @@
+# FULL - a suite inteira, incluindo os testes `slow` que resolvem o corpus
+# real (TP1/TGD V1 e V2) com o solver de verdade.
+#
+# Roda SOB DEMANDA (`workflow_dispatch`). Nao ha' cron aqui de proposito:
+# este repositorio nao tem nenhum workflow agendado, e inventar um horario
+# seria decisao de processo, nao de codigo. Para tornar noturno basta
+# acrescentar um bloco `schedule:` a este `on:`.
+#
+# FALHAS CONHECIDAS na main `55e990d` (medidas em 2026-09-16, Linux,
+# CPython 3.11 - `2 failed, 1241 passed in 2380.72s`):
+#
+#   test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+#   test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+#
+# Sao os dois gates de corpus humano, vermelhos na main desde antes desta
+# missao. Estao registrados aqui para que "2 falhas" nunca seja um numero
+# decorado: enquanto nao forem resolvidos, este workflow termina vermelho -
+# de proposito. Nenhum `skip`/`xfail` foi criado para escondê-los.
+#
+# `test_perf_trace_stall_sampler` falha em WINDOWS e passa em Linux
+# (`sys.platform == "win32"` dentro do teste): relatos de 3 falhas vem de
+# execucoes no Windows. Known failures sem plataforma nao sao conferiveis.
+name: Suite completa (FULL)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout da revisao avaliada
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar pytest
+        run: python -m pip install --disable-pip-version-check --quiet pytest
+
+      - name: Suite completa, com os testes de corpus
+        run: python -m pytest -q -p no:cacheprovider --durations=30
+
+      - name: Regressao do benchmark (runner --check)
+        run: python3 nuvem/benchmark/runner.py --all --check

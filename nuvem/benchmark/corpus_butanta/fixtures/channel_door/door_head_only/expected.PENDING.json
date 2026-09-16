@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "Uma canaleta na fiada do topo do vao; zero canaleta abaixo; zero peca de alvenaria dentro do vao ate' a verga.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 41/51 - porta recebe canaleta no topo do vao (47/47 medidos) e nunca canaleta inferior: nao existe peitoril.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

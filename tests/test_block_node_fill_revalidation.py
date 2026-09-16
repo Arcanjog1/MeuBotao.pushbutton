@@ -555,6 +555,19 @@ def test_t17_safe_repair_ligado_mantem_o_invariante_e_e_deterministico():
 
 # =====================================================================
 # T18 / T19 / T20 - corpus real (TP1/TGD) via nuvem.benchmark.solver_bridge
+#
+# `slow`: os TRES resolvem o corpus real, e o custo NAO e' de um deles - e'
+# do grupo. `_CORPUS_CACHE` e' compartilhado, entao quem roda primeiro paga
+# os 4 solves (TGD off/on + TP1 off/on) e os outros dois saem de graca. Por
+# isso a medicao da main `55e990d` mostrou 255,49s em T18 e 0,18s em T19/T20:
+# nao e' que T19 e T20 sejam baratos, e' que T18 chegou antes.
+#
+# Consequencia pratica: marcar SO' o T18 nao tiraria nada do portao rapido -
+# o custo simplesmente migraria para o T19. Os tres carregam o marcador
+# porque os tres, isolados, pagam o corpus (verificado rodando T19 sozinho).
+#
+# O marcador nao muda logica, assercao nem resultado: `-m "not slow"` pula,
+# `pytest tests/test_block_node_fill_revalidation.py` continua rodando tudo.
 # =====================================================================
 _CORPUS_CACHE = {}
 
@@ -572,6 +585,7 @@ def _corpus(project_id, enabled):
     return _CORPUS_CACHE[key]
 
 
+@pytest.mark.slow
 def test_t18_candidato_aceito_permanece_seguro_no_corpus():
     """Contrato de seguranca (PR #12) preservado: com a metade simetrica, todo
     candidato ACEITO continua resolvendo o prisma forcado da parede alvo e
@@ -596,6 +610,7 @@ def test_t18_candidato_aceito_permanece_seguro_no_corpus():
         assert tentadas_on is not None
 
 
+@pytest.mark.slow
 def test_t19_candidato_rejeitado_nao_e_liberado_indevidamente():
     """Nenhum candidato ARM pode passar a ACEITO com NODE-FILL ligado (ON,
     o unico estado que roda em producao) por causa de um efeito colateral
@@ -638,6 +653,7 @@ def test_t19_candidato_rejeitado_nao_e_liberado_indevidamente():
             assert c.get("reason"), c
 
 
+@pytest.mark.slow
 def test_t20_caso_real_tp1_junta_b19_b39_em_cima_da_peca_de_no():
     """Estado de PRODUCAO do TP1 no medidor no'|fill desta CR - trancado no
     valor medido, nunca afrouxado.
