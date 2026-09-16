@@ -11,9 +11,15 @@ TOKENS = {
     "TextPrimary": (234, 238, 243), "TextSecondary": (173, 185, 198),
     "Hover": (66, 123, 184), "Pressed": (42, 87, 136),
 }
-SPACING = (4, 8, 12, 16, 24, 32)
+SPACING = (4, 8, 12, 16, 20, 24, 32)
+RADIUS = {"Control": 4, "Panel": 6, "Preview": 8}
+CONTROL_HEIGHT = {"Compact": 28, "Default": 32, "Action": 36}
 TYPE = {"Title": 14, "SectionTitle": 10, "FieldLabel": 9,
-        "Body": 9, "HelperText": 8.25, "Status": 9}
+        "Body": 9, "HelperText": 8.25, "Caption": 8.25, "StepLabel": 9, "Status": 9}
+TOKENS.update({"Surface0": TOKENS["Background"], "Surface1": TOKENS["Surface"],
+               "Surface2": TOKENS["SurfaceAlt"], "PrimaryHover": TOKENS["Hover"],
+               "Stone": (99, 110, 119), "StoneTop": (125, 137, 145),
+               "StoneSide": (68, 80, 91), "Reinforcement": (83, 139, 188)})
 
 
 def friendly_problem(detail):
@@ -36,6 +42,10 @@ def friendly_problem(detail):
 def activity_text(detail):
     text = str(detail or "")
     lower = text.lower()
+    if "graph" in lower or "grafo" in lower:
+        return "Organizando os encontros entre paredes…"
+    if "catalog" in lower or "catálogo" in lower:
+        return "Verificando as famílias disponíveis…"
     if any(x in lower for x in ("physical", "candidate", "prism", "cross_band", "junction", "solver 18", "etapa 3b")):
         return "Calculando modulação…"
     return text.replace("solver", "cálculo").replace("Solver", "Cálculo")

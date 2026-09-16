@@ -64,8 +64,23 @@ def style_grid(grid):
         finally:
             brush.Dispose()
     grid.DrawColumnHeader += header
-    grid.DrawItem += lambda sender, args: setattr(args, "DrawDefault", True)
-    grid.DrawSubItem += lambda sender, args: setattr(args, "DrawDefault", True)
+    grid.DrawItem += lambda sender, args: setattr(args, "DrawDefault", False)
+    def cell(sender, args):
+        selected = bool(args.Item.Selected)
+        brush = SolidBrush(Color.FromArgb(*TOKENS["Primary" if selected else "Surface"]))
+        try:
+            args.Graphics.FillRectangle(brush, args.Bounds)
+            color = Color.FromArgb(*TOKENS["TextPrimary"]) if selected else args.Item.ForeColor
+            if color.IsEmpty:
+                color = Color.FromArgb(*TOKENS["TextPrimary"])
+            bounds = args.Bounds
+            bounds.X += 6
+            bounds.Width = max(1, bounds.Width - 8)
+            TextRenderer.DrawText(args.Graphics, args.SubItem.Text, grid.Font, bounds,
+                                  color, TextFormatFlags(4 | 32 | 32768))
+        finally:
+            brush.Dispose()
+    grid.DrawSubItem += cell
     def fit(sender, args):
         if grid.Columns.Count:
             occupied = sum(grid.Columns[i].Width for i in range(grid.Columns.Count - 1))

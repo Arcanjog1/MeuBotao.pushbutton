@@ -1,71 +1,104 @@
 # -*- coding: utf-8 -*-
-"""Illustrative drawing only. No model reads, layout solver or physical rules."""
+"""Local vector illustration. Never reads Revit or runs physical layout rules."""
 from .ui_state import TOKENS
 
 
 def attach_preview(canvas, kind="cad"):
     canvas._preview_kind = kind
-    canvas.AccessibleName = "Prévia ilustrativa, sem escala; não representa o plano calculado"
+    canvas.AccessibleName = "Prévia ilustrativa; não representa o plano calculado. A geometria final será calculada a partir do modelo."
 
     def set_kind(value):
         canvas._preview_kind = value
         canvas.Invalidate()
     canvas._set_kind = set_kind
     try:
-        from System.Drawing import Color, Pen, SolidBrush, Rectangle
+        from System import Array
+        from System.Drawing import Color, Pen, SolidBrush, RectangleF, PointF, Font, FontStyle
+        from System.Drawing.Drawing2D import SmoothingMode
     except ImportError:
-        return  # Test doubles do not provide a drawing surface.
+        return
 
     def paint(sender, args):
         g = args.Graphics
         w, h = canvas.ClientSize.Width, canvas.ClientSize.Height
         if w < 80 or h < 80:
             return
-        scale = min((w - 32) / 240.0, (h - 32) / 200.0)
-        x0, y0 = (w - 240 * scale) / 2, (h - 200 * scale) / 2
-        mode = canvas._preview_kind
-        brushes = {k: SolidBrush(Color.FromArgb(*TOKENS[k]))
-                   for k in ("SurfaceAlt", "Background", "Primary", "TextSecondary")}
-        pen = Pen(Color.FromArgb(*TOKENS["Border"]), max(1.0, scale))
-        accent = Pen(Color.FromArgb(*TOKENS["Primary"]), max(2.0, 2 * scale))
-        def rect(x, y, width, height):
-            return Rectangle(int(x0 + x * scale), int(y0 + y * scale),
-                             max(1, int(width * scale)), max(1, int(height * scale)))
-        def fill(key, x, y, width, height):
-            g.FillRectangle(brushes[key], rect(x, y, width, height))
-        def outline(p, x, y, width, height):
-            g.DrawRectangle(p, rect(x, y, width, height))
+        scale = min((w - 16) / 280.0, (h - 16) / 245.0)
+        x0, y0 = (w - 280 * scale) / 2, min(32, max(8, (h - 245 * scale) / 3))
+        state = g.Save()
+        g.TranslateTransform(float(x0), float(y0))
+        g.ScaleTransform(float(scale), float(scale))
+        g.SmoothingMode = SmoothingMode(4)
+        brushes = {k: SolidBrush(Color.FromArgb(*v)) for k, v in TOKENS.items()}
+        pens = {k: Pen(Color.FromArgb(*TOKENS[k]), 1.0) for k in ("Border", "Background", "TextSecondary", "Reinforcement")}
+        font = Font("Segoe UI", 9.0, FontStyle(0))
+        def polygon(key, points):
+            g.FillPolygon(brushes[key], Array[PointF]([PointF(float(x), float(y)) for x, y in points]))
+        def rect(key, x, y, width, height):
+            g.FillRectangle(brushes[key], RectangleF(float(x), float(y), float(width), float(height)))
+        def line(key, x, y, xx, yy):
+            g.DrawLine(pens[key], float(x), float(y), float(xx), float(yy))
+        def text(value, x, y, key="TextSecondary"):
+            g.DrawString(value, font, brushes[key], PointF(float(x), float(y)))
         try:
+            mode = canvas._preview_kind
+            polygon("Background", [(16, 193), (232, 193), (270, 172), (56, 172)])
+            for y in (42, 76, 110, 144, 178):
+                line("Border", 8, y, 272, y)
             if mode == "cad":
-                for x in (10, 18, 100, 108):
-                    outline(pen, x, 32, 2, 120)
-                for y in (32, 40, 144, 152):
-                    outline(pen, 10, y, 100, 2)
-                fill("Primary", 144, 32, 14, 126)
-                fill("Primary", 144, 32, 80, 14)
-                fill("Primary", 144, 144, 80, 14)
-                fill("TextSecondary", 119, 92, 15, 3)
+                for x in (20, 28, 96, 104):
+                    line("TextSecondary", x, 58, x, 156)
+                for y in (58, 66, 148, 156):
+                    line("TextSecondary", 20, y, 104, y)
+                line("Reinforcement", 119, 108, 144, 108)
+                line("Reinforcement", 137, 102, 144, 108)
+                line("Reinforcement", 137, 114, 144, 108)
+                rect("Stone", 158, 58, 18, 106)
+                rect("Stone", 158, 58, 83, 18)
+                rect("Stone", 158, 146, 83, 18)
+                polygon("StoneTop", [(158, 58), (174, 46), (257, 46), (241, 58)])
+                polygon("StoneSide", [(241, 58), (257, 46), (257, 64), (241, 76)])
+                text("01  Desenho CAD", 12, 203)
+                text("02  Paredes", 156, 203)
             else:
-                # A schematic wall silhouette, not a generated bond pattern.
-                fill("SurfaceAlt", 12, 24, 216, 150)
-                outline(pen, 12, 24, 216, 150)
-                if mode in ("blocks", "channel", "none"):
-                    for y in range(24, 174, 25):
-                        for x in range(12, 228, 36):
-                            outline(pen, x, y, 36, 25)
-                fill("Background", 86, 65, 68, 62)
-                outline(pen, 86, 65, 68, 62)
+                # Generic elevation, not computed bond or a construction detail.
+                polygon("StoneSide", [(241, 48), (259, 35), (259, 174), (241, 187)])
+                polygon("StoneTop", [(25, 48), (43, 35), (259, 35), (241, 48)])
+                rect("Stone", 25, 48, 216, 139)
+                for row in range(7):
+                    y = 48 + row * 20
+                    line("Background", 25, y, 241, y)
+                    offset = 0 if row % 2 == 0 else 18
+                    for x in range(25 + offset, 242, 36):
+                        line("Background", x, y, x, min(187, y + 20))
+                rect("Background", 93, 90, 76, 59)
+                polygon("StoneSide", [(93, 90), (105, 82), (105, 141), (93, 149)])
+                polygon("StoneTop", [(93, 149), (105, 141), (181, 141), (169, 149)])
                 if mode == "channel":
-                    fill("Primary", 65, 49, 110, 14)
-                    fill("Primary", 65, 129, 110, 14)
-                if mode == "selection":
-                    outline(accent, 6, 18, 228, 162)
-                    for x in (2, 230):
-                        for y in (14, 176):
-                            fill("Primary", x, y, 8, 8)
+                    for y in (70, 150):
+                        rect("Reinforcement", 61, y, 144, 18)
+                        polygon("Primary", [(61, y), (71, y - 7), (215, y - 7), (205, y)])
+                        for x in (97, 133, 169):
+                            line("Background", x, y + 1, x, y + 17)
+                    line("Reinforcement", 206, 78, 266, 78)
+                    line("Reinforcement", 206, 158, 266, 158)
+                    text("01", 246, 60, "TextPrimary")
+                    text("02", 246, 160, "TextPrimary")
+                    text("01  Canaleta superior", 25, 206)
+                    text("02  Canaleta inferior", 25, 225)
+                elif mode == "selection":
+                    for x, y in ((21, 44), (237, 44), (21, 183), (237, 183)):
+                        rect("Primary", x, y, 8, 8)
+                    text("Seleção de paredes no modelo", 25, 212)
+                elif mode == "none":
+                    text("Alvenaria sem reforço de abertura", 25, 212)
+                else:
+                    text("Composição ilustrativa da alvenaria", 25, 212)
         finally:
-            pen.Dispose()
-            accent.Dispose()
+            g.Restore(state)
+            font.Dispose()
+            for pen in pens.values():
+                pen.Dispose()
             for brush in brushes.values():
                 brush.Dispose()
     canvas.Paint += paint
