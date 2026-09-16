@@ -289,3 +289,74 @@ def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall
     return {"enabled": True, "required": required, "records": records, "applied": applied,
             "counts": {"OPENING_MICRO_ADJUSTMENT_REQUIRED": len(required),
                        "OPENING_MICRO_ADJUSTMENT_APPLIED": len(applied)}}
+
+
+def mid_wall_half_blocks(course_candidates, walls_to_create, openings_per_wall, catalog,
+                         half_block_code=None, near_cm=2.0, max_course=None):
+    """MEIO BLOCO DESNECESSARIO (prioridade 11): meio bloco que nao encosta em
+    jamba, nem em ponta de parede, nem em peca de no'. O humano usa meio bloco
+    MAIS que o solver (secao 56.3), entao isto e' preferencia de qualidade, nunca
+    portao."""
+    from core.engine.wall_stepper import HALF_BLOCK_CODE
+    code_wanted = half_block_code or HALF_BLOCK_CODE
+    total = 0
+    for course in sorted(course_candidates or {}):
+        if max_course is not None and course > max_course:
+            continue
+        by_wall = {}
+        for cand in course_candidates[course] or ():
+            wall_idx = cand.get("wall_idx")
+            if wall_idx is None or wall_idx >= len(walls_to_create or ()):
+                continue
+            by_wall.setdefault(wall_idx, []).append(cand)
+        for wall_idx, cands in by_wall.items():
+            p0, _p1, direction, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+            length_cm = _ft_to_cm(length_ft)
+            edges = []
+            for opening in (openings_per_wall[wall_idx] if wall_idx < len(openings_per_wall or ()) else ()):
+                edges.extend([_cm(opening[0]), _cm(opening[1])])
+            spans = []
+            for cand in cands:
+                lo, hi = _extent(cand, p0, direction)
+                spans.append((lo, hi, cand))
+            spans.sort()
+            for index, (lo, hi, cand) in enumerate(spans):
+                if cand.get("logical_code") != code_wanted or cand.get("node_index") is not None:
+                    continue
+                if any(abs(lo - edge) <= near_cm or abs(hi - edge) <= near_cm for edge in edges):
+                    continue
+                if lo <= near_cm or hi >= length_cm - near_cm:
+                    continue
+                neighbours = []
+                if index:
+                    neighbours.append(spans[index - 1][2])
+                if index + 1 < len(spans):
+                    neighbours.append(spans[index + 1][2])
+                if any(other.get("node_index") is not None for other in neighbours):
+                    continue
+                total += 1
+    return total
+
+
+def special_clusters(course_candidates, walls_to_create, catalog, window_cm=40.0, max_course=None):
+    """AGLOMERADO DE ESPECIAIS (prioridade 13): pares de compensador/pastilha a
+    menos de `window_cm` um do outro na mesma fiada."""
+    total = 0
+    for course in sorted(course_candidates or {}):
+        if max_course is not None and course > max_course:
+            continue
+        by_wall = {}
+        for cand in course_candidates[course] or ():
+            wall_idx = cand.get("wall_idx")
+            if wall_idx is None or wall_idx >= len(walls_to_create or ()):
+                continue
+            if not ((catalog or {}).get(cand.get("logical_code")) or {}).get("is_compensator"):
+                continue
+            by_wall.setdefault(wall_idx, []).append(cand)
+        for wall_idx, cands in by_wall.items():
+            p0, _p1, direction, _length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+            centres = sorted(sum(_extent(cand, p0, direction)) / 2.0 for cand in cands)
+            for a, b in zip(centres, centres[1:]):
+                if b - a <= window_cm:
+                    total += 1
+    return total

@@ -3808,6 +3808,126 @@ def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog,
     return validate
 
 
+def _micro_adjust_cluster(wall_idx, nodes, wall_count):
+    """Paredes ligadas a esta por um no' (secao 66: quem decide e' o CLUSTER, nao
+    a parede sozinha - a posicao da abertura pode existir para a modulacao das
+    vizinhas)."""
+    out = set([wall_idx])
+    for node in nodes or ():
+        members = set(arm[0] for arm in (node.get("arms") or ()))
+        for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+            if isinstance(node.get(key), int):
+                members.add(node[key])
+        for other in (node.get("crossing_walls") or ()):
+            if isinstance(other, int):
+                members.add(other)
+        if wall_idx in members:
+            out |= members
+    return sorted(w for w in out if 0 <= w < wall_count)
+
+
+def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, band, wall_idx):
+    """(portoes duros, qualidade) de um solve - a ordem da secao 66."""
+    from core.engine import opening_micro_adjust as _micro
+    from core.engine import physical_support as _support
+    from core.engine import small_void_alignment as _small_void
+    course_candidates = result.get("course_candidates") or {}
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    gates = {"colisoes": len(result.get("collisions") or []),
+             "nao_modular": len(result.get("non_modular") or []),
+             "sem_apoio": len(_support.unsupported_pieces(course_candidates, walls_to_create,
+                                                          openings_per_wall, band))}
+    preflight = result.get("beta_preflight") or {}
+    gates["abertura_violada"] = len(preflight.get("opening_violations") or [])
+    audits = result.get("wall_bond_audits") or []
+    if isinstance(audits, dict):
+        audits = list(audits.values())
+    for audit in audits:
+        if not isinstance(audit, dict):
+            continue
+        for problem in audit.get("problems") or ():
+            kind = str(problem).split(":")[0]
+            gates[kind] = gates.get(kind, 0) + 1
+    counts = ((result.get("opening_reinforcement") or {}).get("validation") or {}).get("counts") or {}
+    for key, value in counts.items():
+        if key.isupper():
+            gates["CHANNEL_" + key] = value
+    spans = []
+    if wall_idx < len(openings_per_wall or ()):
+        spans = [(_ft_to_cm(o[0]), _ft_to_cm(o[1])) for o in openings_per_wall[wall_idx]]
+    quality = {
+        "small_void": len(_small_void.b34_small_void_violations(course_candidates, catalog)),
+        "strip_fillers": _micro.strip_filler_pieces(course_candidates, wall_idx, walls_to_create,
+                                                    spans, catalog),
+        "mid_wall_half_blocks": _micro.mid_wall_half_blocks(course_candidates, walls_to_create,
+                                                            openings_per_wall, catalog),
+        "specials": sum(1 for pieces in course_candidates.values() for cand in pieces
+                        if (catalog.get(cand.get("logical_code")) or {}).get("is_compensator")),
+        "special_clusters": _micro.special_clusters(course_candidates, walls_to_create, catalog),
+        "non_modular": len(result.get("non_modular") or []),
+    }
+    return {"gates": gates, "quality": quality}
+
+
+def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                   base_z_abs, num_courses, result, moved_so_far_cm=None,
+                                   max_openings=None, **solve_kwargs):
+    """ETAPA 3B por QUALIDADE (secao 66): planeja o deslocamento longitudinal de
+    cada abertura suspeita, avaliando cada candidato com um solve REAL do
+    CLUSTER local (a parede e as ligadas a ela por no'). NAO move nada - devolve
+    o plano para o chamador aplicar no modelo e, depois, no Revit."""
+    from core.engine import opening_micro_adjust as _micro
+    if not _micro.OPENING_MICRO_ADJUST_ENABLED:
+        return {"enabled": False, "required": [], "records": [], "applied": [],
+                "counts": {"OPENING_MICRO_ADJUSTMENT_REQUIRED": 0,
+                           "OPENING_MICRO_ADJUSTMENT_APPLIED": 0}}
+    step, _step_error = _course_height_ft(catalog, result.get("candidates") or [])
+    height = (step - _cm_to_ft(COURSE_JOINT_CM)) if step else None
+
+    def band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    def evaluate(wall_idx, opening_index, offset_cm):
+        cluster = _micro_adjust_cluster(wall_idx, nodes, len(walls_to_create))
+        sub_walls = [walls_to_create[i] for i in cluster]
+        sub_openings = []
+        for i in cluster:
+            row = list(openings_per_wall[i]) if i < len(openings_per_wall or ()) else []
+            if i == wall_idx and offset_cm:
+                delta = _cm_to_ft(offset_cm)
+                row = [((o[0] + delta, o[1] + delta) + tuple(o[2:])) if j == opening_index else o
+                       for j, o in enumerate(row)]
+            sub_openings.append(row)
+        sub_walls, junction_map = extend_wall_ends_to_junctions(sub_walls, JUNCTION_FACE_SEARCH_FT)
+        sub_nodes, sub_end_to_node = build_wall_graph(sub_walls, junction_map)
+        local = solve_building_blocks_all_courses(
+            sub_nodes, sub_walls, sub_end_to_node, sub_openings, catalog, base_z_abs, num_courses,
+            **solve_kwargs)
+        if not isinstance(local, dict) or local.get("error") is not None:
+            return None
+        return _micro_adjust_measure(local, sub_walls, sub_openings, catalog, band,
+                                     cluster.index(wall_idx))
+
+    return _micro.plan_micro_adjustments(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, catalog,
+        evaluate, node_positions_by_wall=dict(
+            (wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+            for wi in range(len(walls_to_create))),
+        max_course=None, max_openings=max_openings, moved_so_far_cm=moved_so_far_cm)
+
+
+def shift_opening_in_plan(openings_per_wall, wall_idx, opening_index, offset_cm):
+    """Aplica UM deslocamento no modelo de planejamento (copia; nao toca no
+    Revit). Largura, altura, peitoril e nivel ficam iguais - so' a posicao
+    longitudinal muda."""
+    delta = _cm_to_ft(offset_cm)
+    out = [list(row) for row in openings_per_wall]
+    opening = out[wall_idx][opening_index]
+    out[wall_idx][opening_index] = (opening[0] + delta, opening[1] + delta) + tuple(opening[2:])
+    return out
+
+
 # SECAO 65: passes de arranjo -> orientacao (ver o laco em `_orient_small_voids_final`)
 B34_RUN_ARRANGEMENT_PASSES = 3
 
