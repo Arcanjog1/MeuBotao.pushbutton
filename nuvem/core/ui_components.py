@@ -274,7 +274,11 @@ class UiComponents(object):
             def walk(control):
                 if type(control).__name__ == "Button":
                     style_disabled_button(control)
-                for child in control.Controls:
+                children = list(control.Controls)
+                if all(isinstance(c.Top, (int, float)) and isinstance(c.Left, (int, float)) for c in children):
+                    children.sort(key=lambda c: (c.Top, c.Left))
+                for index, child in enumerate(children):
+                    child.TabIndex = index
                     walk(child)
             walk(form)
         form.Shown += disabled_styles
@@ -674,6 +678,7 @@ class UiComponents(object):
         self.fit_stack(result_content)
         pages[2].Controls.Add(result_content)
         form.AcceptButton = form._solve_button
+        form.CancelButton = close
         review_row.Height = 48
         form._review_check.AutoSize = False
         form._review_check.Dock = self.ns["DockStyle"].Fill

@@ -3116,7 +3116,7 @@ def test_janela_de_resultado_organiza_revisao_plano_e_resultado():
     assert form._ui_tabs.pages[1].Visible
     assert not form._ui_tabs.pages[0].Visible
     grids = [c for c in form.descendants() if isinstance(c, revit_stubs.ListView)]
-    assert len(grids) == 2  # problemas e quantidades do plano
+    assert len(grids) == 3  # problemas, famílias verificadas e quantidades do plano
     assert form._errors_grid.Items.Count == 2
     for row in form._errors_grid.Items:
         assert len(row.SubItems) == len(form._errors_grid.Columns), len(row.SubItems)

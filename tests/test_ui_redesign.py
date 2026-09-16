@@ -8,6 +8,60 @@ m = load_script.load()
 from core.ui_state import ModulationUiState, creation_gate, planned_counts, friendly_error, wall_label
 
 
+def test_family_list_distinguishes_verified_missing_and_pending():
+    window, handler = form("CHANNEL")
+    handler.catalog = {"B39": {}}
+    handler.channel_catalog_missing = [{"logical_code": "CHANNEL_U_19", "family_name": "Canaleta 19", "type_name": "14"}]
+    window._ux.update_families(window)
+    rows = list(window._ui_family_grid.Items)
+    assert rows[0].Text == "✓ Pronta"
+    assert rows[1].Text == "✕ Ausente"
+    assert "ausente" in window._plan_preview._families.Text
+    handler.catalog = {}
+    handler.channel_catalog_missing = []
+    window._ux.update_families(window)
+    assert "ainda não verificadas" in window._plan_preview._families.Text
+
+
+def test_reanalysis_hides_stale_quantities_until_new_result():
+    window, handler = form()
+    handler.solve_result = result()
+    window._ux.solved(window)
+    window._ux.busy(window, 3)
+    assert not window._ui_piece_grid.Visible
+    assert not window._ui_plan_metrics.Visible
+    assert not window._ui_tabs.bar.Enabled
+    window._ux.solved(window)
+    assert window._ui_piece_grid.Visible
+    assert window._ui_plan_metrics.Visible
+
+
+def test_stepper_updates_with_review_and_creation_state():
+    window, handler = form()
+    handler.solve_result = result()
+    window._ux.solved(window)
+    assert window._ui_header._stepper._step == 4
+    assert "atual" in window._ui_header._stepper._items[3].AccessibleName
+    window._ux.busy(window, 5)
+    assert window._ui_header._stepper._step == 5
+    assert "futura" in window._ui_header._stepper._items[5].AccessibleName
+
+
+def test_future_adjustment_summary_is_absent_without_evidence():
+    window, handler = form()
+    assert not window._ui_adjustments.Visible
+    report = {"kpis": [], "issues": [], "log": "", "automatic_adjustments": [{"id": "example"}]}
+    window = m._PostCreationForm(report, None, handler, [])
+    assert window._ui_adjustments.Visible
+    assert "1 ajuste" in window._ui_adjustments.Text
+
+
+def test_activity_translates_actual_events_without_fake_percentages():
+    from core.ui_state import activity_text
+    assert activity_text("building junction graph") == "Organizando os encontros entre paredes…"
+    assert activity_text("loading catalog") == "Verificando as famílias disponíveis…"
+
+
 def result(**extra):
     data = dict(candidates=[{"logical_code": "B39", "course": "A"}],
                 course_candidates={0: [{"logical_code": "B39"}], 1: [{"logical_code": "B19"}]},
