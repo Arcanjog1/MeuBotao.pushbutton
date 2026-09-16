@@ -3888,8 +3888,17 @@ def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings
     def band(course_index):
         return _course_z_band(base_z_abs, course_index, step, height)
 
-    def evaluate(wall_idx, opening_index, offset_cm):
+    cache = {}
+
+    def evaluate(wall_idx, opening_index, offset_cm, exact=True):
         cluster = _micro_adjust_cluster(wall_idx, nodes, len(walls_to_create))
+        # CHAVE FISICA (nunca id() nem ordem de lista): as paredes do cluster, o
+        # vao movido e o deslocamento. Sem deslocamento o resultado nao depende de
+        # QUAL vao estava sendo estudado - e' o mesmo solve para todos eles.
+        key = (tuple(cluster), num_courses, bool(exact),
+               None if not offset_cm else (wall_idx, opening_index, round(offset_cm, 3)))
+        if key in cache:
+            return cache[key]
         sub_walls = [walls_to_create[i] for i in cluster]
         sub_openings = []
         for i in cluster:
@@ -3901,13 +3910,25 @@ def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings
             sub_openings.append(row)
         sub_walls, junction_map = extend_wall_ends_to_junctions(sub_walls, JUNCTION_FACE_SEARCH_FT)
         sub_nodes, sub_end_to_node = build_wall_graph(sub_walls, junction_map)
-        local = solve_building_blocks_all_courses(
-            sub_nodes, sub_walls, sub_end_to_node, sub_openings, catalog, base_z_abs, num_courses,
-            **solve_kwargs)
+        from core.engine import b34_run_arrangement as _runs_module
+        saved_arrangement = _runs_module.B34_RUN_ARRANGEMENT_ENABLED
+        if not exact:
+            # RANKING barato: sem o arranjo das secoes 60-65, que responde por
+            # ~80% do solve. Todos os offsets sao medidos do mesmo jeito, entao a
+            # ordem e' comparavel; o vencedor e' reavaliado com o fluxo completo.
+            _runs_module.B34_RUN_ARRANGEMENT_ENABLED = False
+        try:
+            local = solve_building_blocks_all_courses(
+                sub_nodes, sub_walls, sub_end_to_node, sub_openings, catalog, base_z_abs, num_courses,
+                **solve_kwargs)
+        finally:
+            _runs_module.B34_RUN_ARRANGEMENT_ENABLED = saved_arrangement
         if not isinstance(local, dict) or local.get("error") is not None:
             return None
-        return _micro_adjust_measure(local, sub_walls, sub_openings, catalog, band,
-                                     cluster.index(wall_idx))
+        measured = _micro_adjust_measure(local, sub_walls, sub_openings, catalog, band,
+                                         cluster.index(wall_idx))
+        cache[key] = measured
+        return measured
 
     return _micro.plan_micro_adjustments(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, catalog,

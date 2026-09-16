@@ -216,11 +216,16 @@ def _quality_tuple(quality):
     return tuple((quality or {}).get(key, 0) for key in QUALITY_ORDER)
 
 
-def choose_offset(candidate, evaluate, offsets):
+def choose_offset(candidate, evaluate, offsets, verify=None):
     """Avalia cada offset com `evaluate(offset) -> {"gates": {...},
     "quality": {...}}` e devolve o vencedor. O offset 0 e' a referencia: um
     deslocamento so' vence se NENHUM portao piorar e a qualidade for
-    ESTRITAMENTE melhor; empate fica com o menor deslocamento (logo, com 0)."""
+    ESTRITAMENTE melhor; empate fica com o menor deslocamento (logo, com 0).
+
+    `verify(offset)`, quando dado, e' a avaliacao CARA (o fluxo completo): o
+    ranking usa a barata e o VENCEDOR e' confirmado com ela antes de virar
+    plano. Sem a confirmacao, um deslocamento que so' parece melhor no modelo
+    barato entraria no modelo real - medido: 2 de 3 propostas caem aqui."""
     base = evaluate(0.0)
     if base is None:
         return None
@@ -240,10 +245,25 @@ def choose_offset(candidate, evaluate, offsets):
         if key < best_key:
             best, best_key = {"offset_cm": offset, "gates": result["gates"],
                               "quality": result["quality"]}, key
+    confirmed = None
+    if verify is not None and best["offset_cm"] != 0.0:
+        exact_base = verify(0.0)
+        exact_best = verify(best["offset_cm"])
+        confirmed = {"offset_cm": best["offset_cm"], "before": exact_base, "after": exact_best}
+        if (exact_base is None or exact_best is None
+                or _worse_gates(exact_best["gates"], exact_base["gates"])
+                or not _quality_tuple(exact_best["quality"]) < _quality_tuple(exact_base["quality"])):
+            confirmed["rejected"] = True
+            best = {"offset_cm": 0.0, "gates": exact_base["gates"] if exact_base else base["gates"],
+                    "quality": exact_base["quality"] if exact_base else base["quality"]}
+        else:
+            tried[0] = {"offset_cm": 0.0, "gates": exact_base["gates"], "quality": exact_base["quality"]}
+            best = {"offset_cm": best["offset_cm"], "gates": exact_best["gates"],
+                    "quality": exact_best["quality"]}
     return {"wall_idx": candidate["wall_idx"], "opening_index": candidate["opening_index"],
             "span_cm": candidate["span_cm"], "reasons": candidate["reasons"],
             "chosen_offset_cm": best["offset_cm"], "before": tried[0], "after": best,
-            "tried": tried, "applied": best["offset_cm"] != 0.0}
+            "tried": tried, "confirmed": confirmed, "applied": best["offset_cm"] != 0.0}
 
 
 def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall, catalog,
@@ -281,8 +301,10 @@ def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall
         offsets = [d for d in offsets if piers_close((span[0] + d, span[1] + d), others, wall_length_cm)]
         if len(offsets) <= 1:
             continue          # so' a posicao atual fecha: nada a decidir
-        record = choose_offset(candidate, lambda offset: evaluate(wall_idx, candidate["opening_index"], offset),
-                               offsets)
+        opening_index = candidate["opening_index"]
+        record = choose_offset(
+            candidate, lambda offset: evaluate(wall_idx, opening_index, offset, False), offsets,
+            verify=lambda offset: evaluate(wall_idx, opening_index, offset, True))
         if record is not None:
             records.append(record)
     applied = [r for r in records if r["applied"]]
