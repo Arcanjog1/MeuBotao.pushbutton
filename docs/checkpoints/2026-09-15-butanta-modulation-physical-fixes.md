@@ -435,7 +435,23 @@ violações de abertura 0, amarração reprovada 3 (as mesmas). Vazado menor no
 Revit **49** = bancada 49. Planejamento no Revit: 711 s; solve 374 s; criação
 447 s.
 
-### 14.8 O que continua aberto
+### 14.8 Regressão consolidada (uma vez, no fim, sobre o commit final)
+
+ em 38 min (worktree congelado do head). As **três**
+falham **identicamente na main**  (verificado no worktree da BASE, 4
+min):
+
+| Falha | Classe |
+|---|---|
+|  | **D** — baseline defasado, já falha na main |
+|  | **D** — idem |
+|  | **ambiente** —  no Windows, já falha na main |
+
+Zero falhas novas. Nenhum baseline, golden, threshold ou  foi
+alterado; nenhum / novo. Evidência:
+.
+
+### 14.9 O que continua aberto
 
 - **Vazado menor**: régua 2-D 35 (31 com os 5 vãos deslocados) contra 41 do
   humano. Por parede o solver é melhor que o humano em 5 e pior em 9; a maior
