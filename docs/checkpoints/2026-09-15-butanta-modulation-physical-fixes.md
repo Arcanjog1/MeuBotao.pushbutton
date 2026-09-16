@@ -5,11 +5,11 @@
   "date": "2026-09-15",
   "scope": "current",
   "branch": "claude/butanta-modulation-physical-fixes",
-  "head": "23dfcb7f494b4568980339784ece17b6fb70a668",
+  "head": "9e807be",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "PARTIAL — REMAINING LIMITATIONS PRECISELY EXPLAINED",
+  "veredito": "READY FOR REVIEW — NO CRITICAL REGRESSION",
   "objective": "Corrigir a modulação real no Revit comparando o projeto humano BUTANTÃ R08_LT (somente leitura) com o doc de teste 'butanta testes', sem hardcode, sem mascarar validador e sem corromper a referência humana.",
   "changes": [
     "nuvem/core/engine/small_void_alignment.py (novo): validador do vazado menor entre fiadas e passe de orientação 180° dos B34 que não são peça de nó.",
@@ -333,3 +333,118 @@ e o limiar da métrica é 95%. Os 3,5 cm "faltantes" são **juntas de argamassa*
 solver usa uma peça a mais que o humano naquele trecho, logo uma junta a mais.
 Com limiar de 92% os dois dão zero vãos reprovados. O valor é o mesmo na BASE e
 no PR — não é regressão, e o limiar **não** foi alterado.
+
+## 14. Rodada das seções 60–66 — arranjo das corridas e microajuste de abertura (2026-09-15, tarde/noite)
+
+Commits: `155c018`, `cf42f01`, `a3c2401`, `0928ba0` (§60–62), `135114a`,
+`a4e554a` (§58.3), `de32e66` (desempate da §56.2), `33e4b19` (§64.1), `00c0206`
+(docs), `ce46d62` (§63), `cc2e4fd` (custo), `c6840f4` (§64.2), `8c78df2` (docs),
+`742099d` (§65), `861acb8` (docs), `a1822b2` + `d116c36` (§66), `9e807be` (docs).
+
+### 14.1 O que entrou
+
+| Seção | Regra | Vazado menor (validador de produção) |
+|---|---|---|
+| 60 | arranjo conjunto das corridas (mesmas peças, outra ordem) | 508 → 312 |
+| 61 | composição de mesmo comprimento + aceitação exata por parede | 312 → 259 |
+| 62 | orientação ótima exata por parede (DP com tabela de fatores e máscara de bits) | 259 → 186 |
+| 58.3 | escada de amarração no nó degradado **só** no fluxo CHANNEL | 186 → 159 |
+| 64.1 | Etapa 4D e validação CHANNEL refeitas **depois** do arranjo | idêntico (pré-requisito da 64.2) |
+| 63 | orientação **conjunta** (vizinhos + pares) com limite inferior | 159 → 123 |
+| 64.2 | peças de reparo de abertura nas corridas (jamba → nó como uma unidade) | 123 → 68 |
+| 65 | o arranjo roda de novo **depois** da orientação, até 3 passes | 68 → **53** |
+| 66 | microajuste da posição da abertura (5 vãos deslocados) | 53 → **49** |
+
+As seções 60–65 mudam **só o motor**; a 66 muda a **posição de 5 aberturas do
+documento de teste** (o projeto humano nunca é tocado).
+
+### 14.2 Gate global — BASE `55e990d` × PR `faec108` × FINAL
+
+Evidência: `docs/checkpoints/evidence/2026-09-15-matriz-main-x-pr42-final.txt`.
+
+| BUTANTÃ (34 paredes, 13 fiadas, CHANNEL) | MAIN | PR #42 | FINAL (motor) |
+|---|---|---|---|
+| Vazado menor do B34 desalinhado | 1.931 | 316 | **34** |
+| `NON_MODULAR` | 78 | 0 | **0** |
+| Buracos | 94 (3.754 cm) | 10 (872 cm) | **10 (872 cm)** |
+| Peças sem apoio | — | 0 | **0** |
+| Colisões / paredes reprovadas na amarração | 0 / 3 | 0 / 3 | **0 / 3** |
+| `MISSING_REQUIRED_CHANNEL` | 1 | 0 | **0** |
+| Especiais (fiadas 0–11) | 714 | 808 | **594** |
+| `C09+C09` / `C09+C04` encostados | 11 / 98 | 9 / 119 | **3 / 47** |
+| `MISSING_UNDER_WINDOW` | 1 | 1 | **0** (régua corrigida; crua ainda 1) |
+
+TGD V2 e TP1 V1: **idênticos ao PR #42 em todos os achados** — tudo é do fluxo
+CHANNEL e o legado (`strategy=None`) continua byte a byte igual.
+
+### 14.3 Pioras classificadas
+
+| Métrica | MAIN | FINAL | Humano (mesma régua) | Classe |
+|---|---|---|---|---|
+| `MID_WALL_HALF_BLOCK` | 5 | 45 | **103** (limite superior) | **B** — padrão do humano (§56.3/§59) |
+| `REPLACEABLE_COMPOSITE_BY_B54` | 59 | 127 | **107** | **B** — `B54` não domina `B34+B19`; vem das composições que tiraram 214 especiais |
+| Solve (bancada 13 fiadas) | 3,1 s | 43,3 s | — | **B** — busca nova; no Revit 125 s → 342 s |
+| Sensibilidade à ordem da entrada | — | +10 peças | — | **B** — nenhuma parede nova sensível |
+
+Nenhuma piora de classe A (real) ou E (desconhecida).
+
+### 14.4 Determinismo
+
+| Entrada | Vazado menor | Peças diferentes do normal (base → final) |
+|---|---|---|
+| normal (processo novo) | 53 | reprodutível |
+| transladado (+1000, +500 cm) | 53 | 182 → 226 — **só a parede 0**, empate pré-existente do planejador CHANNEL |
+| sentido invertido | 56 | 11.498 → **10.663** |
+| ordem permutada | 61 | 4.020 → **4.030**, nas mesmas paredes |
+
+### 14.5 Revit real — idempotência do motor final (commit `742099d`)
+
+| Execução | Peças | Carimbadas antes → depois | Lotes | Falhas | Releitura | Humano modificado | Assinatura |
+|---|---|---|---|---|---|---|---|
+| run19 | 8.958 | 8.958 → 8.958 | 1 | 0 | 0/8.958 | não | `c6dea739…` |
+| run20 | 8.958 | 8.958 → 8.958 | 1 | 0 | 0/8.958 | não | `c6dea739…` |
+| run21 | 8.958 | 8.958 → 8.958 | 1 | 0 | 0/8.958 | não | `c6dea739…` |
+
+Assinatura idêntica nas três, **um único lote** (zero órfãos), `IsModified` do
+humano `False` antes e depois, nada salvo. Vazado menor no Revit **53** =
+bancada. Solve 342–407 s, criação ~460 s.
+
+### 14.6 Comparador humano × solver (88 lados de vão, fiadas 0–11, Revit real)
+
+| Classe | Lote anterior | Lote §64 | **Lote final (§66)** |
+|---|---|---|---|
+| `PHYSICALLY_EQUIVALENT` | 25 | 36 | **38** |
+| `SOLVER_BETTER` | 10 | 12 | **13** |
+| `VALID_ALTERNATIVE` | 2 | 3 | **3** |
+| `SOLVER_WORSE` | 51 | 37 | **34** |
+
+Nenhum lado piora de classe. Especiais nas regiões de jamba: 606 → **443**
+(humano 354).
+
+### 14.7 Revit real — §66 aplicada (5 aberturas movidas)
+
+`r_micro.py` planejou no Revit exatamente o mesmo que a bancada (24
+`OPENING_MICRO_ADJUSTMENT_REQUIRED`, 6 examinadas, 5 aplicadas: +5, +5, +5, +10,
++5 cm) e moveu as cinco instâncias no TARGET dentro de uma Transaction. Para
+cada uma, o deslocamento **real medido depois do move** bate com o planejado
+(5,0 / 5,0 / 5,0 / 10,0 / 5,0 cm). `IsModified` do humano `False` antes e depois.
+
+Lote refeito sobre a geometria nova (run22): **8.926 peças**, um único lote, 0
+falhas, 0 divergências de releitura, colisões 0, não modular 0, preflight ok,
+violações de abertura 0, amarração reprovada 3 (as mesmas). Vazado menor no
+Revit **49** = bancada 49. Planejamento no Revit: 711 s; solve 374 s; criação
+447 s.
+
+### 14.8 O que continua aberto
+
+- **Vazado menor**: régua 2-D 35 (31 com os 5 vãos deslocados) contra 41 do
+  humano. Por parede o solver é melhor que o humano em 5 e pior em 9; a maior
+  (8284557) tem as violações na **interface entre famílias de banda** — não é
+  limitação física.
+- **Especiais**: 594 (559 com a §66) contra 500 do humano.
+- **Tempo**: solve no Revit 342 s (era 125 s antes do arranjo); o planejamento da
+  §66 custa mais 711 s por execução, e por isso não roda dentro do solve.
+- **`MISSING_UNDER_WINDOW` cru** continua 1, pelo motivo da seção 13.
+- **§66**: as guardas de segurança cobrem ponta de parede, outras aberturas da
+  mesma parede e distância a nó; **não** verificam colisão com famílias que não
+  sejam aberturas.
