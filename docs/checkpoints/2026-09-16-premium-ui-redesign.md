@@ -7,7 +7,7 @@
   "branch": "codex/modulation-ui-premium-redesign",
   "head": "ddb24c27b13d15ec0876ce0ece6ed5b35b4d8e36",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46",
   "objective": "Reconstruir a apresentação da Modulação Automática como tool dialog compacto: componentes, hierarquia, prévia, navegação e estados, preservando a execução e a física.",
   "changes": [
     "Abas por texto e sublinhado, stepper de seis etapas, escolhas de origem compactas e modo avançado recolhido.",
@@ -276,7 +276,7 @@ Reconciliar semanticamente após o encerramento da sessão física.
 
 ## 10. Draft e fechamento
 
-Draft separado, contra main, sem merge. URL será registrada após criação.
+[PR #46 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46), separado e contra main, sem merge.
 O status oficial continua main `55e990d`; esta UI é candidata.
 O arquivo `UI_PREMIUM_DESIGN.md`, esta comparação, as imagens e o manifesto
 cobrem os 36 itens de entrega, distinguindo implementação, ensaio e pendência.
