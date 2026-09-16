@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "COMPENSATOR_CONSECUTIVE = 0 nesta parede, em todas as fiadas.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 56.2 - dois compensadores de mesmo codigo em pe encostados sao proibidos: medido 0 no projeto humano.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

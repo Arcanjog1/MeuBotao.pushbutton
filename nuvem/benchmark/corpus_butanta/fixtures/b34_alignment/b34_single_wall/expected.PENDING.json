@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "Para todo B34 de preenchimento e toda fiada vizinha, a peca de alvenaria que cobre o centro do vazado menor oferece vazado menor ou vazado central naquele ponto. Contador de violacoes = 0.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 52 - o vazado MENOR de um B34 de meio de parede tem de cair sobre um vazado menor (B34) ou sobre o vazado central de um B54 na fiada vizinha. Peca de no' nunca gira.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

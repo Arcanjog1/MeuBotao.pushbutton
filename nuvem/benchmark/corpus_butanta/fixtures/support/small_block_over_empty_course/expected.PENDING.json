@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "UNSUPPORTED_SMALL_BLOCK = 0 fora de vao; peca com metade ou mais de apoio nunca e' acusada; apoio vindo de parede perpendicular conta; a ordem do relato e' deterministica.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 53 - peca pequena nao pode ficar suspensa sobre fiada vazia; peca sobre vao ativo e' reforco, nao falta de apoio.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

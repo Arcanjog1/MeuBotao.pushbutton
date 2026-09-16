@@ -1,0 +1,199 @@
+{
+ "catalog": {
+  "B19": {
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      0.0,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    }
+   ],
+   "code": "B19",
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 19.0,
+   "width_cm": 14.0
+  },
+  "B34": {
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -10.2,
+      0.0
+     ],
+     "size_cm": [
+      10.7,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      7.4,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    }
+   ],
+   "code": "B34",
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": true,
+   "length_cm": 34.0,
+   "width_cm": 14.0
+  },
+  "B39": {
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -9.9,
+      0.0
+     ],
+     "size_cm": [
+      15.7,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      9.9,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    }
+   ],
+   "code": "B39",
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": false,
+   "length_cm": 39.0,
+   "width_cm": 14.0
+  },
+  "B54": {
+   "cells_local_cm": [
+    {
+     "center_cm": [
+      -19.5,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      0.0,
+      0.0
+     ],
+     "size_cm": [
+      12.5,
+      8.0
+     ]
+    },
+    {
+     "center_cm": [
+      19.5,
+      0.0
+     ],
+     "size_cm": [
+      15.8,
+      8.0
+     ]
+    }
+   ],
+   "code": "B54",
+   "height_cm": 19.0,
+   "is_compensator": false,
+   "is_special_bond": true,
+   "length_cm": 54.0,
+   "width_cm": 14.0
+  },
+  "C04": {
+   "cells_local_cm": [],
+   "code": "C04",
+   "height_cm": 19.0,
+   "is_compensator": true,
+   "is_special_bond": false,
+   "length_cm": 4.0,
+   "width_cm": 14.0
+  },
+  "C09": {
+   "cells_local_cm": [],
+   "code": "C09",
+   "height_cm": 19.0,
+   "is_compensator": true,
+   "is_special_bond": false,
+   "length_cm": 9.0,
+   "width_cm": 14.0
+  }
+ },
+ "metadata": {
+  "derived_from": "principio fisico medido no BUTANTA R08_LT; nenhuma identidade, ElementId ou coordenada do projeto",
+  "generator": "nuvem/benchmark/corpus_butanta/build_fixtures.py",
+  "notes": "janela de 120cm, peitoril 100, verga 220",
+  "synthetic": true,
+  "wall_height_cm": 260.0
+ },
+ "orphan_blocks": [],
+ "project_id": "butanta_channel_window",
+ "schema_version": 2,
+ "settings": {
+  "base_z_cm": 0.0,
+  "block_height_cm": 19.0,
+  "course_step_cm": 20.0,
+  "expected_rows": 13,
+  "num_courses": 13,
+  "wall_thickness_cm": 14.0,
+  "walls_already_extended": false
+ },
+ "source": "input",
+ "walls": [
+  {
+   "angle_deg": 0.0,
+   "base_z_cm": 0.0,
+   "end_cm": [
+    300.0,
+    0.0
+   ],
+   "height_cm": 260.0,
+   "id": "A",
+   "junctions": [],
+   "key": "W|0.0,0.0|300.0,0.0|t14.0",
+   "length_cm": 300.0,
+   "openings": [
+    {
+     "confidence": "synthetic",
+     "head_cm": 220.0,
+     "height_cm": 120.0,
+     "id": "A-O01",
+     "key": "W|0.0,0.0|300.0,0.0|t14.0|O|90.0-210.0|s100.0",
+     "kind": "window",
+     "sill_cm": 100.0,
+     "source_element_id": null,
+     "t_end_cm": 210.0,
+     "t_start_cm": 90.0,
+     "width_cm": 120.0
+    }
+   ],
+   "rows": [],
+   "source_element_ids": [],
+   "start_cm": [
+    0.0,
+    0.0
+   ],
+   "thickness_cm": 14.0
+  }
+ ]
+}

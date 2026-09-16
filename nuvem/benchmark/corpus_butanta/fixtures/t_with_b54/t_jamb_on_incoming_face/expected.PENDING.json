@@ -1,0 +1,9 @@
+{
+ "assertion_when_frozen": "Canaleta cobre o no'; nenhuma peca de amarracao fica suspensa sobre o vao (TIE_OVER_SPAN = 0); PRISM_CONTINUOUS_JOINT = 0.",
+ "authorization_required": "captura de referencia + --save-baseline, em missao separada, depois do #42 estabilizar",
+ "confidence": "NONE",
+ "principle": "REGRAS 51 - com a jamba na face da parede que chega, a canaleta cruza o no' (como o humano faz) e o B54 da principal que ficaria sobre o vao e' dividido, sem criar junta alinhada nova.",
+ "reference_kind": null,
+ "status": "PENDING_REFERENCE",
+ "why_pending": "O PR #42 ainda esta' mudando a fisica. Gravar expected a partir da saida corrente congelaria um estado em movimento e faria codigo novo contar como regressao critica (golden/compare.py::_critical_regressions)."
+}

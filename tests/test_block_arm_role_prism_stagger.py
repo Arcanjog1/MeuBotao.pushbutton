@@ -39,6 +39,8 @@ usada por `tests/regression/test_benchmark_baselines.py`.
 import sys
 import os
 
+import pytest
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import load_script  # noqa: E402
@@ -87,6 +89,21 @@ def _wall_by_id(result_project, wall_id):
     return next(w for w in result_project["walls"] if w["id"] == wall_id)
 
 
+# ------------------------------------------------------------------ slow
+# TODOS os testes deste modulo chamam `_run()`, que resolve o TP1 INTEIRO
+# com o solver real - nao ha' fixture sintetica para eles (ver o cabecalho
+# do modulo: a topologia de mais de 2 paredes por no' e' o que reproduz o
+# defeito). Medido na main `55e990d` (Linux, CPython 3.11,
+# `pytest --durations`): 162,26s + 81,55s + 80,77s + 80,62s + 80,49s =
+# 485,7s, ou seja 20% da suite inteira em 5 testes.
+#
+# Sem o marcador eles entravam em `pytest -m "not slow"` e faziam o portao
+# rapido custar minutos em vez de segundos. O marcador NAO muda logica,
+# assercao nem resultado - so' a classificacao de execucao: `-m "not slow"`
+# pula, `pytest tests/test_block_arm_role_prism_stagger.py` continua
+# rodando tudo, como sempre.
+
+
 # ============================================================
 # G1/G2/G3 - caso minimo real: W076/TP1, pier de UM bloco so' entre dois
 # L_CORNER que usam a MESMA peca (B34, 34cm) - a coincidencia de junta e'
@@ -98,6 +115,7 @@ def _wall_by_id(result_project, wall_id):
 # (`alignment_conflicts`), em vez de nunca ter sido checado.
 # ============================================================
 
+@pytest.mark.slow
 def test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair():
     """Historico (G1/G2/G3 - ver cabecalho do modulo): a coincidencia de
     34,5cm em W076 era GEOMETRICAMENTE FORCADA para qualquer FILL, porque
@@ -153,6 +171,7 @@ def test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair():
 # consegue mesmo ASSIM encontrar uma composicao sem coincidencia.
 # ============================================================
 
+@pytest.mark.slow
 def test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado():
     _, _, _, result_project = _run("torre_easy_lo_r00_tp1")
     wall = _wall_by_id(result_project, "W041")
@@ -173,6 +192,7 @@ def test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado():
 # desencontro.
 # ============================================================
 
+@pytest.mark.slow
 def test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada():
     _, _, _, result_project = _run("torre_easy_lo_r00_tp1")
     for wall_id in ("W022", "W093"):
@@ -190,6 +210,7 @@ def test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada():
 # desencontro nao pode depender de nada nao-deterministico).
 # ============================================================
 
+@pytest.mark.slow
 def test_determinismo_w076_w041_duas_rodadas_identicas():
     _, _, _, result_project_1 = _run("torre_easy_lo_r00_tp1")
     _, _, _, result_project_2 = _run("torre_easy_lo_r00_tp1")
@@ -215,6 +236,7 @@ def test_determinismo_w076_w041_duas_rodadas_identicas():
 # vao.
 # ============================================================
 
+@pytest.mark.slow
 def test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao():
     from nuvem.benchmark import analysis
 
