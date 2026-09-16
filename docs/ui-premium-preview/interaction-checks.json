@@ -1,0 +1,37 @@
+{
+  "kind": "Native WinForms/pythonnet fixtures; synthetic data, not Revit smoke or native DPI",
+  "checks": [
+    "native selector responds to Up/Down and preserves Enter/Esc form actions",
+    "native menu selects NONE and CHANNEL through original validation callbacks",
+    "preview follows source and strategy",
+    "tab button changes visible page",
+    "radio groups stay independent",
+    "missing family expands inline and blocks solve",
+    "backend critical gate disables create",
+    "technical code hidden from friendly report",
+    "cancelled wall analysis remains on the same screen"
+  ],
+  "result": "PASS",
+  "renders": {
+    "existing": {
+      "width": 860,
+      "height": 570
+    },
+    "channel": {
+      "width": 860,
+      "height": 640
+    },
+    "missing_family": {
+      "width": 860,
+      "height": 640
+    },
+    "critical_gate": {
+      "width": 860,
+      "height": 640
+    },
+    "cancelled": {
+      "width": 860,
+      "height": 620
+    }
+  }
+}

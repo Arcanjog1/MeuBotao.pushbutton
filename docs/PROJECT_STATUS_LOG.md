@@ -1799,3 +1799,8 @@ main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.
 ## 2026-09-16 — segunda rodada UI: referência visual e tema escuro
 
 [Redesign compacto escuro](checkpoints/2026-09-16-dark-ui-redesign.md): vídeo estudado, wireframes prévios, preview contextual, agrupamento e relatório amigável; 307 testes PASS e ensaio WinForms local. PARTIAL; Revit/DPI nativo pendentes. Mesmo PR #44 draft, sem merge e sem alteração do #42.
+
+
+## 2026-09-16 — UI premium em branch separada
+
+HEAD avaliado `ddb24c2`, base main `55e990d`. [Checkpoint](checkpoints/2026-09-16-premium-ui-redesign.md): redesign de componentes, 312 testes, WinForms nativo e matriz de escala; PARTIAL sem smoke Revit/DPI nativo. Sem merge e sem intervenção no #42.

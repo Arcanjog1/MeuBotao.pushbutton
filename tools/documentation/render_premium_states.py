@@ -39,6 +39,15 @@ selector._build_menu().Items[1].PerformClick()
 assert setup._reinforcement_combo.SelectedIndex == 1
 assert "Canaletas" in selector.Text
 assert setup._setup_preview._canvas._preview_kind == "channel"
+from System import Array, Object
+from System.Reflection import BindingFlags
+from System.Windows.Forms import KeyEventArgs, Keys
+key_method = selector.GetType().GetMethod("OnKeyDown", BindingFlags(36))
+key_method.Invoke(selector, Array[Object]([KeyEventArgs(Keys(38))]))
+assert setup._reinforcement_combo.SelectedIndex == 0
+key_method.Invoke(selector, Array[Object]([KeyEventArgs(Keys(40))]))
+assert setup._reinforcement_combo.SelectedIndex == 1
+assert setup.AcceptButton == setup._run_button and setup.CancelButton is not None
 results["channel"] = render(setup, out / "08-channel.png")
 # Group isolation matters: wall mode must not uncheck opening detection.
 setup._openings_auto.Checked = True
@@ -74,7 +83,7 @@ window.Dispose()
 
 (out / "interaction-checks.json").write_text(json.dumps({
     "kind": "Native WinForms/pythonnet fixtures; synthetic data, not Revit smoke or native DPI",
-    "checks": ["native menu selects NONE and CHANNEL through original validation callbacks", "preview follows source and strategy", "tab button changes visible page",
+    "checks": ["native selector responds to Up/Down and preserves Enter/Esc form actions", "native menu selects NONE and CHANNEL through original validation callbacks", "preview follows source and strategy", "tab button changes visible page",
                "radio groups stay independent", "missing family expands inline and blocks solve",
                "backend critical gate disables create", "technical code hidden from friendly report",
                "cancelled wall analysis remains on the same screen"],

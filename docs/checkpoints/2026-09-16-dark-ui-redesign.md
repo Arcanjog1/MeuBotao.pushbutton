@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-16",
-  "scope": "current",
+  "scope": "historical",
   "branch": "codex/modulacao-automatica-ui-redesign",
   "head": "ec5142402577520496fe144e08d02749338b695f",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
@@ -43,6 +43,8 @@
   ]
 }
 ```
+
+> Entrega anterior do #44. Nesta branch, sucedida pelo [redesign premium](2026-09-16-premium-ui-redesign.md). O registro original de evidência permanece preservado.
 
 ## Veredito
 
