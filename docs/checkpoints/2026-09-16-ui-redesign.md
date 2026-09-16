@@ -4,9 +4,9 @@
 {
   "date": "2026-09-16",
   "branch": "codex/modulacao-automatica-ui-redesign",
-  "head": "c7db0fe8f75b564ddfbe2eb46d9e7af1b5db2ae7",
+  "head": "5fff01b1b2b7614036f0ec363797a3b598613453",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44",
   "objective": "Redesenhar UI/UX em WinForms, com revisão explícita do plano, sem alterar motor, backend de execução ou PR #42.",
   "changes": [
     "core/ui_state.py e core/ui_components.py: estado e componentes de apresentação reutilizáveis.",
@@ -15,14 +15,14 @@
     "Regras: registrar somente contrato UX, com substituição explícita da antiga criação automática; status reconciliado ao merge #41."
   ],
   "tests": [
-    "299 passed: tests/test_ui_redesign.py, tests/test_channel_ui_and_family_gate.py, tests/test_script.py, nuvem/tests/test_progress.py; Windows CPython 3.14.6/pytest 9.1.1, 94.60s; evidence/2026-09-16-ui-redesign-focused.json e .txt.",
+    "300 passed: tests/test_ui_redesign.py, tests/test_channel_ui_and_family_gate.py, tests/test_script.py, nuvem/tests/test_progress.py; Windows CPython 3.14.6/pytest 9.1.1, 84.40s; evidence/2026-09-16-ui-redesign-final-focused.json e .txt.",
     "39 passed na seleção de testes de UI, configuração, gates, docking e paredes existentes.",
     "Renderização WinForms real fora do Revit: Python 3.13/pythonnet 3.1.0; sete estados, comparação anterior, Scale 1/1.25/1.5/1.75/2 e janela 740x520. Não equivale a DPI nativo nem smoke Revit.",
     "check_ui_scope.py: 188 definições fora da UI intactas; handler completo e funções de threading/pump/timer intactos; engine/benchmark/loader sem diff.",
     "Suíte completa em andamento na captura 2026-09-16-ui-redesign-suite; não declarada PASS neste checkpoint provisório."
   ],
   "known_failures": [
-    "Nenhuma falha nos 299 testes focados finais; um DeprecationWarning herdado de codecs.open.",
+    "Nenhuma falha nos 300 testes focados finais; um DeprecationWarning herdado de codecs.open.",
     "Smoke no Revit e escala nativa Windows ainda não executados; limitações funcionais descritas abaixo."
   ],
   "physical_deltas": ["Não aplicável: solver, validadores físicos, catálogo, criação, transações e geometria não alterados."],
@@ -39,13 +39,15 @@
     {"path": "nuvem/core/ui_state.py"},
     {"path": "nuvem/core/ui_components.py"},
     {"path": "tests/test_ui_redesign.py"},
-    {"path": "docs/checkpoints/evidence/2026-09-16-ui-redesign-focused.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-16-ui-redesign-final-focused.json"},
     {"path": "docs/checkpoints/evidence/2026-09-16-ui-scope.json"}
   ]
 }
 ```
 
 ## Veredito
+
+PR draft: [#44](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44).
 
 **PARTIAL — LIMITATIONS EXPLAINED.** Candidato revisável; não declarar
 smoke no Revit nem DPI nativo como aprovados. Não houve merge ou instalação
@@ -55,7 +57,7 @@ do candidato no botão em uso. A sessão do #42 permanece independente.
 
 - `origin/main` inicial e última observada: `55e990d962ed22ae1021f0d335db197607bddda1`.
 - Branch: `codex/modulacao-automatica-ui-redesign`.
-- HEAD avaliado: `c7db0fe8f75b564ddfbe2eb46d9e7af1b5db2ae7`.
+- HEAD avaliado: `5fff01b1b2b7614036f0ec363797a3b598613453`.
 - Checkout: `C:\Users\CIVIX\modulacao-ui-redesign`; o diretório originalmente
   fornecido pertence a outro repositório e contém trabalho de outras sessões.
 - Stack preservado: WinForms + CPython/pythonnet, pyRevit, ExternalEvent.
@@ -122,19 +124,19 @@ ou alteração de amarração. [Prova por AST e diff](evidence/2026-09-16-ui-sco
 
 ## Testes e procedência
 
-[Captura focada](evidence/2026-09-16-ui-redesign-focused.json) e
-[saída integral](evidence/2026-09-16-ui-redesign-focused.txt): **299 passed**,
+[Captura focada final](evidence/2026-09-16-ui-redesign-final-focused.json) e
+[saída integral](evidence/2026-09-16-ui-redesign-final-focused.txt): **300 passed**,
 Windows, Python 3.14.6, pytest 9.1.1. Inclui teste_script inteiro, UI,
 NONE/CHANNEL, catálogo ausente e progresso.
 Os 4 FAIL iniciais eram expectativas anteriores da UI (sem abas, rótulo antigo,
 seleção sem simular confirmação); foram atualizadas explicitamente, mantendo
 as asserções de dados/dispatch. Não foram suprimidos testes físicos.
 
-A captura focada é de `8113143`; `8113143..c7db0fe` muda somente renderizador,
+A captura focada final é de `5fff01b`; a anterior (299 passed) é de `8113143`. `8113143..c7db0fe` muda somente renderizador,
 imagens e verificador documental, comprovável por diff. A suíte completa foi
 iniciada em `76b758b`; o único delta de produção posterior é abrir a seção de
 famílias ausentes e mostrar a instrução no cabeçalho (3 linhas), coberto pela
-execução focada final. Nenhum teste de domínio mudou entre esses HEADs.
+execução focada final. Nenhum teste de domínio mudou entre esses HEADs. A revisão `5fff01b` acrescenta somente desabilitação de ações concorrentes durante loading e um teste de UI; captura focada final concluída: 300 passed. A equivalência dos arquivos de domínio entre a suíte completa e o HEAD final é literal (nenhum diff em engine/benchmark nem no handler de execução).
 
 ## Limitações restantes e riscos
 
