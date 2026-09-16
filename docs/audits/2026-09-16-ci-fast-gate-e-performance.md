@@ -196,9 +196,89 @@ O relatório do PR #45 estimou economia de **≈390 s**. O real é **240 s**: eu
 havia somado o tempo *total* das asserções não versionadas em vez do que
 efetivamente se elimina. O número correto é este, medido.
 
-## 8. Suíte completa
+## 8. Suíte completa — HEAD estabilizado
 
-Ver a seção **Medição final** no fim deste documento.
+Uma execução, no HEAD com tudo aplicado:
+
+```
+2 failed, 1305 passed in 2261.33s (0:37:41)
+
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+```
+
+| | main `55e990d` | HEAD desta branch |
+|---|---:|---:|
+| Testes | 1.243 | **1.307** (+64 do corpus novo) |
+| Passaram | 1.241 | **1.305** |
+| Falharam | 2 | **2 - as mesmas** |
+| Tempo | 2.380,72 s | 2.261,33 s |
+
+**Zero falha nova. Zero `skip`/`xfail` novo.** Os 64 testes do corpus BUTANTA
+entraram todos verdes.
+
+### Falhas classificadas por plataforma
+
+| Falha | Plataforma | Estado |
+|---|---|---|
+| `test_benchmark_baselines[torre_easy_lo_r00_tp1]` - `JUNCTION_MISSING_BINDING` 8 para 9 | **Linux e Windows** | falha **identica na main**; gate de corpus vermelho desde antes desta missao |
+| `test_benchmark_baselines[torre_easy_lo_r00_tgd-v2]` - `compensators` 61 para 62 | **Linux e Windows** | idem |
+| `test_perf_trace_stall_sampler` | **so Windows** (`sys.platform == "win32"` dentro do teste) | **passou aqui**, como na main - e a terceira falha dos relatos feitos no Windows |
+
+Nenhuma delas foi mascarada: as duas primeiras estao registradas no cabecalho
+do `full-tests.yml`, e o workflow FULL termina vermelho por causa delas, de
+proposito, ate serem resolvidas.
+
+### Leitura honesta do tempo total
+
+O ganho da fixture e de ~234 s, mas a suite inteira caiu so 119,4 s. **Nao e
+contradicao - e o container.** Os testes pesados que nao mudaram rodaram mais
+devagar nesta passada:
+
+| Teste (inalterado) | main | HEAD | |
+|---|---:|---:|---:|
+| `test_t18_candidato_aceito_permanece_seguro_no_corpus` | 255,49 s | 269,91 s | +5,6% |
+| `test_determinismo_w076_w041_duas_rodadas_identicas` | 162,26 s | 176,93 s | +9,0% |
+| `test_t52_determinismo_duas_execucoes_separadas` | 163,90 s | 175,75 s | +7,2% |
+| `test_t16_execucao_repetida_e_deterministica` | 93,14 s | 100,34 s | +7,7% |
+| **soma dos 12 testes pesados comuns** | **1.348,0 s** | **1.443,3 s** | **+7,1%** |
+
+Nenhum desses arquivos foi tocado por esta missao, entao os +7,1% sao deriva
+do ambiente (CPU compartilhada, medicoes concorrentes nesta sessao).
+
+Na **mesma** execucao, o arquivo do benchmark caiu de 692,5 s para **458,1 s**:
+
+> a economia da fixture e real e maior que o delta do total; ela so esta
+> parcialmente encoberta por um container ~7% mais lento nesta passada.
+
+Por isso o numero a citar como ganho e o **medido isoladamente, antes x depois
+no mesmo ambiente: 712,24 s para 472,24 s (-240 s)** - nao o delta do total,
+que mistura deriva de maquina.
+
+### 15 mais lentos no HEAD
+
+```
+269.91s call     tests/test_block_node_fill_revalidation.py::test_t18_candidato_aceito_permanece_seguro_no_corpus
+233.29s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+176.93s call     tests/test_block_arm_role_prism_stagger.py::test_determinismo_w076_w041_duas_rodadas_identicas
+175.75s call     tests/test_block_b19_residual_fill_implementation.py::test_t52_determinismo_duas_execucoes_separadas
+100.34s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t16_execucao_repetida_e_deterministica
+95.69s call     tests/test_block_b19_residual_fill_implementation.py::test_t49_tp1_fingerprint_identico_com_e_sem_b19
+95.28s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_determinismo_da_correcao
+88.92s call     tests/test_block_arm_role_prism_stagger.py::test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao
+88.90s call     tests/test_block_arm_role_prism_stagger.py::test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada
+88.68s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+88.60s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tp1-v2]
+88.59s call     tests/test_block_arm_role_prism_stagger.py::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair
+88.23s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_fronteira_de_banda_deixa_de_criar_junta_continua[torre_easy_lo_r00_tp1]
+87.66s call     tests/test_block_b19_residual_fill_implementation.py::test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade
+87.14s call     tests/test_block_arm_role_prism_stagger.py::test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado
+```
+
+O perfil nao mudou de natureza: os caros continuam sendo **testes de
+determinismo e de corpus que resolvem a planta inteira duas ou mais vezes**.
+O custo e inerente ao que provam - agora estao todos atras do marcador `slow`,
+fora do portao rapido.
 
 ## 9. Corpus BUTANTÃ — estrutura, sem gabarito
 
