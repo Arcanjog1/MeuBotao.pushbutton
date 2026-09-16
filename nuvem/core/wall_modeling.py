@@ -3872,7 +3872,7 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
 
 def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
                                    base_z_abs, num_courses, result, moved_so_far_cm=None,
-                                   max_openings=None, **solve_kwargs):
+                                   max_openings=None, offset_allowed=None, **solve_kwargs):
     """ETAPA 3B por QUALIDADE (secao 66): planeja o deslocamento longitudinal de
     cada abertura suspeita, avaliando cada candidato com um solve REAL do
     CLUSTER local (a parede e as ligadas a ela por no'). NAO move nada - devolve
@@ -3935,7 +3935,8 @@ def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings
         evaluate, node_positions_by_wall=dict(
             (wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
             for wi in range(len(walls_to_create))),
-        max_course=None, max_openings=max_openings, moved_so_far_cm=moved_so_far_cm)
+        max_course=None, max_openings=max_openings, moved_so_far_cm=moved_so_far_cm,
+        offset_allowed=offset_allowed)
 
 
 def shift_opening_in_plan(openings_per_wall, wall_idx, opening_index, offset_cm):
