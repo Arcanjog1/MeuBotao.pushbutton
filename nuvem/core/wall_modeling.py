@@ -9115,12 +9115,13 @@ from System import Action
 # tenham a mesma linguagem visual, em vez das cores padrao do WinForms.
 from core.ui_state import TOKENS as _UI_TOKENS, elapsed_text as _ui_elapsed_text
 from core.ui_state import creation_gate as _ui_creation_gate, wall_label as _ui_wall_label
+from core.ui_state import friendly_problem as _ui_problem, activity_text as _ui_activity
 from core.ui_components import UiComponents
 
 UI_BG = Color.FromArgb(*_UI_TOKENS["Background"])
 UI_PANEL = Color.FromArgb(*_UI_TOKENS["Surface"])
-UI_HEADER = Color.FromArgb(*_UI_TOKENS["TextPrimary"])
-UI_TEXT = UI_HEADER
+UI_HEADER = Color.FromArgb(*_UI_TOKENS["Background"])
+UI_TEXT = Color.FromArgb(*_UI_TOKENS["TextPrimary"])
 UI_MUTED = Color.FromArgb(*_UI_TOKENS["TextSecondary"])
 UI_ACCENT = Color.FromArgb(*_UI_TOKENS["Primary"])
 UI_OK = Color.FromArgb(*_UI_TOKENS["Success"])
@@ -9523,7 +9524,7 @@ class _ProgressConsole(object):
             "ok": self._UI_OK, "warn": self._UI_WARN, "error": UI_ERROR,
         }.get(kind, self._UI_TEXT)
         try:
-            self._status_label.Text = text.replace("Solver 18", "Modulação").replace("solver", "cálculo")
+            self._status_label.Text = _ui_activity(text)
             self._status_label.ForeColor = color
             with _perf.span("console.set_status DoEvents"):
                 self._pump_ui()
@@ -9550,7 +9551,7 @@ class _ProgressConsole(object):
             self._progress_bar.Style = ProgressBarStyle.Continuous
             self._progress_bar.Maximum = 100
             self._progress_bar.Value = pct
-            self._detail_label.Text = "{} de {} · {}%  {}".format(done, total, pct, detail or "")
+            self._detail_label.Text = "{} de {} · {}%  {}".format(done, total, pct, _ui_activity(detail))
             self._touch(detail or "")
             with _perf.span("console.set_progress DoEvents"):
                 self._pump_ui()
@@ -9571,7 +9572,7 @@ class _ProgressConsole(object):
             # (ou incriminado) com timestamp.
             self._progress_bar.MarqueeAnimationSpeed = 30
             if detail:
-                self._detail_label.Text = detail
+                self._detail_label.Text = _ui_activity(detail)
             self._touch(detail or "")
             with _perf.span("console.set_indeterminate DoEvents"):
                 self._pump_ui()
@@ -12243,7 +12244,7 @@ class _PostCreationForm(Form):
             self._errors_status.Text = "Analisar Paredes: nenhum eixo fora da modulacao."
 
         self._errors_grid = _styled_listview([
-            ("Parede", 170), ("Problema", 470), ("Situação / ação", 200),
+            ("Parede", 105), ("Problema", 415), ("Situação / ação", 180),
         ])
         self._errors_grid.MultiSelect = False
         self._errors_grid.SelectedIndexChanged += self._on_error_row_selected
@@ -12510,9 +12511,10 @@ class _PostCreationForm(Form):
     # ---------------------------------------------- erros / ajustar erros
     def _populate_error_rows(self, error_rows):
         self._errors_grid.Items.Clear()
-        for row in error_rows:
-            item = ListViewItem(_ui_wall_label(row))
-            item.SubItems.Add(row["problem_text"])
+        for number, row in enumerate(error_rows, 1):
+            item = ListViewItem("Parede {}".format(number))
+            item.SubItems.Add(_ui_problem(row["problem_text"]))
+            item.ToolTipText = "{} — {}".format(_ui_wall_label(row), row["problem_text"])
             item.SubItems.Add(
                 "Corrigido" if row.get("resolved")
                 else ("Ajuste disponível · visualizar" if row["auto_fixable"] else "Revisar · visualizar")
@@ -12523,6 +12525,8 @@ class _PostCreationForm(Form):
             )
             item.Tag = list(row["wall_ids"])
             self._errors_grid.Items.Add(item)
+        if hasattr(self, "_ux"):
+            self._ux.refresh_issues(self)
 
     def _on_error_row_selected(self, sender, args):
         selected = self._errors_grid.SelectedItems
@@ -12770,7 +12774,7 @@ class _PostCreationForm(Form):
             return False
 
     def _on_solve_click(self, sender, args):
-        self._ux.busy(self, 4)
+        self._ux.busy(self, 3)
         self._set_busy(self._solve_button, "Calculando...")
         console = self._solve_console
         console.log("Iniciando Solver 18 (lancamento de blocos X->T->L->jambs->trechos livres)...")
@@ -13537,7 +13541,7 @@ class _WallReviewForm(Form):
         _ui.walls(self, stage1_report, body, start_bar, footer)
 
     def _on_start_click(self, sender, args):
-        self._ux.set_step(self._ui_header, 3, "Analisando paredes. Acompanhe o progresso abaixo.")
+        self._ux.set_step(self._ui_header, 2, "Analisando paredes. Acompanhe o progresso abaixo.")
         if self._external_event is None:
             self._status_label.ForeColor = self._UI_WARN
             self._status_label.Text = "Canal de aplicacao indisponivel nesta execucao."
