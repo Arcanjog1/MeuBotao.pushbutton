@@ -1,10 +1,10 @@
 REGRESSAO CONSOLIDADA - head 9e807be (secoes 60-66)
 py -3 -m pytest tests -q (worktree congelado C:/mbfim)
 1296 passaram, 3 falharam em 38:48
-As TRES falham IDENTICAMENTE na main 55e990d (verificado no worktree C:/mbase, 4:15):
-  test_benchmark_baselines[torre_easy_lo_r00_tp1]            classe D - baseline defasado
+As TRES falham IDENTICAMENTE na main 55e990d (worktree C:/mbase, 4:15):
+  test_benchmark_baselines[torre_easy_lo_r00_tp1]               classe D - baseline defasado
   test_benchmark_baselines_versionado[torre_easy_lo_r00_tgd-v2] classe D - baseline defasado
-  test_perf_trace_stall_sampler                              ambiente - ctypes.PyDLL no Windows
+  test_perf_trace_stall_sampler                                 ambiente - ctypes.PyDLL no Windows
 Nenhum baseline, golden, threshold ou reference_score foi alterado. Nenhum skip/xfail novo.
 
 .................................................. [ 77%]

@@ -437,19 +437,20 @@ Revit **49** = bancada 49. Planejamento no Revit: 711 s; solve 374 s; criação
 
 ### 14.8 Regressão consolidada (uma vez, no fim, sobre o commit final)
 
- em 38 min (worktree congelado do head). As **três**
-falham **identicamente na main**  (verificado no worktree da BASE, 4
-min):
+`1.296 passaram, 3 falharam` em 38 min (worktree congelado do head `9e807be`).
+As **três** falham **identicamente na main `55e990d`** — verificado rodando
+exatamente essas três no worktree da BASE (4 min):
 
 | Falha | Classe |
 |---|---|
-|  | **D** — baseline defasado, já falha na main |
-|  | **D** — idem |
-|  | **ambiente** —  no Windows, já falha na main |
+| `test_benchmark_baselines[torre_easy_lo_r00_tp1]` | **D** — baseline defasado, já falha na main |
+| `test_benchmark_baselines_versionado[torre_easy_lo_r00_tgd-v2]` | **D** — idem |
+| `test_perf_trace_stall_sampler` | **ambiente** — `ctypes.PyDLL` no Windows, já falha na main |
 
-Zero falhas novas. Nenhum baseline, golden, threshold ou  foi
-alterado; nenhum / novo. Evidência:
-.
+Zero falhas novas (o total subiu de 1.250 para 1.299 casos com os testes desta
+rodada). Nenhum baseline, golden, threshold ou `reference_score` foi alterado;
+nenhum `skip`/`xfail` novo. Evidência:
+`docs/checkpoints/evidence/2026-09-15-regressao-consolidada-60-66.txt`.
 
 ### 14.9 O que continua aberto
 
