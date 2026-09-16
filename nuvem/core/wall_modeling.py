@@ -10119,16 +10119,16 @@ class _SetupForm(Form):
     def _validate(self, pending_thickness=None):
         problems = []
         if not self._selected_layer:
-            problems.append("escolha o Layer das paredes")
+            problems.append("Selecione o layer de paredes")
         thicknesses, error = self._checked_thicknesses_cm(pending_thickness)
         if error:
             problems.append(error)
         elif not thicknesses:
-            problems.append("marque ao menos uma espessura")
+            problems.append("Selecione ao menos uma espessura de parede para continuar")
         if self._level_combo.SelectedItem is None:
-            problems.append("escolha o Nivel")
+            problems.append("Selecione um nível")
         if self._parsed_height_m() is None:
-            problems.append("informe uma altura valida em metros (ex.: 2.80)")
+            problems.append("Informe uma altura válida em metros (ex.: 2,80)")
         reinforcement_option = self._selected_reinforcement_option()
         if reinforcement_option is not None and not reinforcement_option[2]:
             problems.append("reforco de aberturas '{}' ainda nao implementado - escolha CHANNEL".format(
@@ -10136,22 +10136,12 @@ class _SetupForm(Form):
 
         if problems:
             self._status.ForeColor = UI_WARN
-            self._status.Text = "Falta: " + "; ".join(problems) + "."
+            self._status.Text = "! " + ". ".join(problems) + "."
             _set_button_enabled(self._run_button, False)
             return False
 
         self._status.ForeColor = UI_MUTED
-        self._status.Text = (
-            "Layer '{}' | {} espessura(s): {} | Nivel '{}' | altura {:.2f}m | "
-            "portas/janelas: {} | paredes: {}".format(
-                self._selected_layer, len(thicknesses),
-                ", ".join("%gcm" % t for t in thicknesses),
-                self._level_combo.SelectedItem, self._parsed_height_m(),
-                "selecionar no modelo" if self._openings_pick.Checked else "deteccao automatica",
-                "continuas com recortes" if self._wall_mode_continuous.Checked
-                else "segmentadas pelas aberturas"
-            )
-        )
+        self._status.Text = "✓ Configuração pronta para criar paredes."
         _set_button_enabled(self._run_button, True)
         return True
 

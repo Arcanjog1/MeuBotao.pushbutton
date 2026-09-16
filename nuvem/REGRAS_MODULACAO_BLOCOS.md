@@ -7525,6 +7525,19 @@ colisão. Seleção CAD/existentes/união deve ser exclusiva; reforço e modo de
 aberturas continuam grupos independentes. Descoberta: pedido do usuário e
 ensaio WinForms/pythonnet fora do Revit; sem nova medição de amarração.
 
+**Atualização oficial de UX — terceiro pedido de 2026-09-16:** tool dialog
+compacto, abas por texto/sublinhado, stepper de seis etapas, uma ação primária
+por estado e prévia ilustrativa com identificação do reforço superior/inferior.
+A frase visível passa a ser “Prévia ilustrativa”; o contexto explica que a
+geometria final vem do modelo. Não há garantia física no desenho ilustrativo.
+Famílias devem distinguir ✓ disponível, ✕ ausente e ○ ainda não verificada,
+sempre com texto além da cor. Reanálise não pode exibir quantidades antigas
+como resultado atual; dados de ajustes automáticos só aparecem se fornecidos.
+Progresso traduz eventos existentes, sem percentuais ou fases fictícias.
+Descoberta: orientação explícita do usuário e ensaio local WinForms. Nenhuma
+medição de amarração. Candidato: `codex/modulation-ui-premium-redesign`;
+smoke Revit e DPI nativo continuam dependentes de validação específica.
+
 ## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
 
 > **STATUS: IMPLEMENTADO — estratégia OFICIAL** (decisão do usuário 2026-09-14,
