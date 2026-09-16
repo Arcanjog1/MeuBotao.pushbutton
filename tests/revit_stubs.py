@@ -560,7 +560,7 @@ class _Control(object):
     _EVENTS = (
         "Click", "FormClosed", "SelectedIndexChanged", "TextChanged",
         "CheckedChanged", "ItemCheck", "KeyDown", "Shown", "Load",
-        "SelectedValueChanged", "DoubleClick", "Resize",
+        "SelectedValueChanged", "DoubleClick", "Resize", "SizeChanged",
     )
 
     def __init__(self, *args, **kwargs):

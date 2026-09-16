@@ -7513,6 +7513,18 @@ interação; nenhuma regra física de amarração ou critério do solver é alte
 Implementação candidata: branch `codex/modulacao-automatica-ui-redesign`.
 Validação real em Revit/DPI consta como pendência no relatório de entrega.
 
+**Atualização oficial de UX — 2026-09-16, segundo pedido com referência de
+vídeo (não é regra física):** configuração compacta com preview ilustrativo,
+tema escuro prioritário, ordem Configuração → Paredes → Modulação → Revisão
+→ Criação → Resultado. Revisão nessa sequência significa conferência do plano
+calculado; a análise geométrica de paredes continua antes do cálculo.
+IDs e diagnósticos internos ficam nos detalhes técnicos. A lista principal usa
+numeração local da ocorrência, preservando os IDs reais para seleção/zoom.
+Esquemas não representam o plano físico nem validam amarração, CHANNEL ou
+colisão. Seleção CAD/existentes/união deve ser exclusiva; reforço e modo de
+aberturas continuam grupos independentes. Descoberta: pedido do usuário e
+ensaio WinForms/pythonnet fora do Revit; sem nova medição de amarração.
+
 ## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
 
 > **STATUS: IMPLEMENTADO — estratégia OFICIAL** (decisão do usuário 2026-09-14,

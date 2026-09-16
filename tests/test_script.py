@@ -3110,9 +3110,11 @@ def test_janela_de_resultado_organiza_revisao_plano_e_resultado():
          "problem_text": "largura de abertura fora da modulacao", "auto_fixable": False, "fix_plan": None},
     ])
     form = m._PostCreationForm(report, None, handler, [revit_stubs.ElementId(1), revit_stubs.ElementId(2)])
-    tabs = [c for c in form.descendants() if isinstance(c, revit_stubs.TabControl)]
-    assert len(tabs) == 1
-    assert tabs[0].TabPages.Count == 3
+    assert len(form._ui_tabs.pages) == 3
+    form._ui_tabs.buttons[1].PerformClick()
+    assert form._ui_tabs.SelectedIndex == 1
+    assert form._ui_tabs.pages[1].Visible
+    assert not form._ui_tabs.pages[0].Visible
     grids = [c for c in form.descendants() if isinstance(c, revit_stubs.ListView)]
     assert len(grids) == 2  # problemas e quantidades do plano
     assert form._errors_grid.Items.Count == 2
@@ -3134,7 +3136,7 @@ def test_janela_de_resultado_sem_erros_libera_lancar_blocos_direto():
     # sem erro nenhum para ajustar, "Lancar Blocos" ja' libera sozinho - nao
     # faz sentido obrigar um clique em "Ajustar Erros" sem nada a fazer.
     assert form._solve_button.Enabled is True
-    assert "nenhum eixo fora da modulacao" in form._errors_status.Text.lower()
+    assert "Nenhuma pendência" in form._errors_status.Text
 
 
 @case

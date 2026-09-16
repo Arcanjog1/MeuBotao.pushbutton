@@ -179,3 +179,64 @@ def test_missing_family_opens_inline_details_on_construction():
     assert window._ui_family_disclosure._expanded
     assert "Faltam famílias" in window._ui_header._instruction.Text
     assert not window._solve_button.Enabled
+
+
+def test_dark_review_keeps_ids_and_internal_codes_only_in_details():
+    window, handler = form()
+    handler.error_rows = [{"wall_idx": 42, "wall_ids": [7719511], "problem_text": "W043 PRISM collision",
+                           "auto_fixable": False}]
+    window._populate_error_rows(handler.error_rows)
+    item = window._errors_grid.Items[0]
+    assert item.Text == "Parede 1"
+    assert item.Tag == [7719511]
+    assert "sobreposição" in str(item.SubItems[1])
+    assert "7719511" in window._ui_technical_issues.Text
+    assert "W043 PRISM collision" in window._ui_technical_issues.Text
+
+
+def test_skipped_analysis_never_looks_like_clean_validation():
+    handler = m._PostCreationEventHandler()
+    window = m._PostCreationForm({"kpis": [], "issues": [], "log": "", "wall_analysis_skipped": True}, None, handler, [])
+    assert "não executada" in window._errors_status.Text
+
+
+def test_busy_disables_tabs_and_replaces_ready_banner():
+    window, handler = form()
+    handler.solve_result = result()
+    window._ux.solved(window)
+    window._ux.busy(window, 5)
+    assert window._ui_state.status == "creating"
+    assert not window._ui_tabs.bar.Enabled
+    assert "Criando" in window._ui_banner.Text
+    window._ux.failed(window, "erro")
+    assert window._ui_tabs.bar.Enabled
+
+
+def test_repeated_plan_shows_cached_lot_without_model_query():
+    window, handler = form()
+    handler.solve_result = result()
+    handler.create_result = {"created_count": 123}
+    window._ux.solved(window)
+    assert window._create_button.Text == "Atualizar modulação"
+    assert "123" in window._ui_banner.Text
+    assert "substituído" in window._ui_banner.Text
+
+
+def test_preview_tracks_strategy_without_changing_configuration():
+    from core.ui_components import UiComponents
+    ui = UiComponents(m.__dict__)
+    preview = ui.preview("none")
+    preview._set_kind("channel")
+    assert preview._canvas._preview_kind == "channel"
+    assert "não representa o plano" in preview._canvas.AccessibleName
+
+
+def test_final_summary_preserves_failures_and_secondary_report():
+    window, handler = form()
+    handler.solve_result = result()
+    window._ux.solved(window)
+    handler.create_result = {"created_count": 12, "failures": ["PRISM W043"]}
+    window._ux.completed(window)
+    assert "pendências" in window._ui_result_title.Text
+    assert "1 falha" in window._ui_result_counts.Text
+    assert "PRISM" not in window._ui_result.Text
