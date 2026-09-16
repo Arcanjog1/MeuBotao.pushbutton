@@ -108,3 +108,87 @@ def stepper(ui):
     separator(strip)
     update(1)
     return strip
+
+
+def dropdown(ui, source, caption):
+    """Native menu/button presentation over the unchanged ComboBox data contract.
+
+    All existing validation and selection handlers still run on `source`.
+    No replacement configuration store or backend query is introduced.
+    """
+    def open_menu():
+        return None  # Offline controls have no native menu surface.
+    button = ui.button("", lambda s, e: open_menu())
+    button.Dock = ui.ns["DockStyle"].Top
+    button.Height = 32
+    button.AccessibleName = caption
+    button._source_combo = source
+    source.Visible = False
+    button.Controls.Add(source)
+    button.FlatAppearance.BorderColor = ui.color("Border")
+    button.BackColor = ui.color("SurfaceAlt")
+
+    def sync(sender=None, args=None):
+        selected = source.SelectedItem
+        button.Text = str(selected) if selected is not None else str(source.Text or "Selecionar")
+    source.SelectedIndexChanged += sync
+    sync()
+    try:
+        from System.Drawing import ContentAlignment, Point, Color, Pen
+        from System.Windows.Forms import ContextMenuStrip, ToolStripMenuItem, AccessibleRole, Keys
+    except ImportError:
+        return button
+    button.TextAlign = ContentAlignment(16)  # MiddleLeft
+    button.Padding = ui.ns["Padding"](8, 0, 28, 0)
+    button.AccessibleRole = AccessibleRole(46)  # ComboBox
+    source.EnabledChanged += lambda s, e: setattr(button, "Enabled", source.Enabled)
+    button.Enabled = source.Enabled
+    menu = ContextMenuStrip()
+    menu.BackColor, menu.ForeColor = ui.color("SurfaceAlt"), ui.color("TextPrimary")
+    menu.ShowImageMargin = False
+    button._menu = menu
+
+    def choose(index):
+        source.SelectedIndex = index
+        button.Focus()
+
+    def build_menu():
+        for item in list(menu.Items):
+            item.Dispose()
+        menu.Items.Clear()
+        menu.Font = button.Font
+        for i in range(source.Items.Count):
+            item = ToolStripMenuItem(str(source.Items[i]))
+            item.Checked = source.SelectedIndex == i
+            item.BackColor, item.ForeColor = menu.BackColor, menu.ForeColor
+            item.Click += lambda s, e, index=i: choose(index)
+            menu.Items.Add(item)
+        return menu
+    button._build_menu = build_menu
+
+    def open_menu():
+        build_menu().Show(button, Point(0, button.Height))
+
+    def key(sender, args):
+        code = int(args.KeyCode)
+        if args.Alt and code == int(Keys(40)):
+            open_menu()
+        elif code in (38, 40) and source.Items.Count:
+            choose(max(0, min(source.Items.Count - 1, source.SelectedIndex + (1 if code == 40 else -1))))
+        else:
+            return
+        args.Handled, args.SuppressKeyPress = True, True
+    button.KeyDown += key
+    button.GotFocus += lambda s, e: setattr(button.FlatAppearance, "BorderColor", ui.color("Primary"))
+    button.LostFocus += lambda s, e: setattr(button.FlatAppearance, "BorderColor", ui.color("Border"))
+    def arrow(sender, args):
+        pen = Pen(ui.color("TextSecondary"), 1.4)
+        try:
+            x, y = button.Width - 18, button.Height // 2
+            args.Graphics.DrawLine(pen, x - 4, y - 2, x, y + 2)
+            args.Graphics.DrawLine(pen, x, y + 2, x + 4, y - 2)
+        finally:
+            pen.Dispose()
+    button.Paint += arrow
+    button.Disposed += lambda s, e: menu.Dispose()
+    return button

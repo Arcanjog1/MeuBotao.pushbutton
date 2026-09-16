@@ -31,6 +31,14 @@ render(setup, out / "02-configuracao-channel.png")
 setup._setup_tabs.buttons[1].PerformClick()
 assert setup._setup_tabs.SelectedIndex == 1
 assert setup._setup_preview._canvas._preview_kind == "channel"
+selector = setup._reinforcement_combo._presentation
+selector._build_menu().Items[0].PerformClick()
+assert setup._reinforcement_combo.SelectedIndex == 0
+assert setup._setup_preview._canvas._preview_kind == "none"
+selector._build_menu().Items[1].PerformClick()
+assert setup._reinforcement_combo.SelectedIndex == 1
+assert "Canaletas" in selector.Text
+assert setup._setup_preview._canvas._preview_kind == "channel"
 results["channel"] = render(setup, out / "08-channel.png")
 # Group isolation matters: wall mode must not uncheck opening detection.
 setup._openings_auto.Checked = True
@@ -66,7 +74,7 @@ window.Dispose()
 
 (out / "interaction-checks.json").write_text(json.dumps({
     "kind": "Native WinForms/pythonnet fixtures; synthetic data, not Revit smoke or native DPI",
-    "checks": ["preview follows source and strategy", "tab button changes visible page",
+    "checks": ["native menu selects NONE and CHANNEL through original validation callbacks", "preview follows source and strategy", "tab button changes visible page",
                "radio groups stay independent", "missing family expands inline and blocks solve",
                "backend critical gate disables create", "technical code hidden from friendly report",
                "cancelled wall analysis remains on the same screen"],

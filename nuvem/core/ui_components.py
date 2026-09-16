@@ -7,7 +7,7 @@ layer. It does not introduce another event loop, thread or framework.
 from .ui_state import STEPS, TYPE, TOKENS, ModulationUiState, family_rows, wall_label
 from .ui_preview_panel import attach_preview
 from .ui_native_style import style_input, style_grid, style_disabled_button
-from .ui_chrome import underline, separator, choice, stepper
+from .ui_chrome import underline, separator, choice, stepper, dropdown
 
 
 class TabDeck(object):
@@ -82,7 +82,7 @@ class UiComponents(object):
             control.BackColor = self.color("SurfaceAlt")
             control.Font = self.ns["_ui_font"](TYPE["Body"])
         if kind == "ComboBox":
-            control.FlatStyle = self.ns["FlatStyle"].Flat
+            control.FlatStyle = self.ns["FlatStyle"].Popup
         if kind in ("RadioButton", "CheckBox"):
             control.UseVisualStyleBackColor = False
             if not getattr(control, "_premium_choice", False):
@@ -103,62 +103,20 @@ class UiComponents(object):
         title.ForeColor = self.color("TextSecondary")
         title.Padding = self.ns["Padding"](0, 2, 0, 2)
         input_kind = type(control).__name__
-        if input_kind in ("ComboBox", "TextBox"):
-            shell = self.panel("Top", 30)
-            shell.BackColor = self.color("SurfaceAlt")
-            control.Dock = getattr(self.ns["DockStyle"], "None")
-            if input_kind == "TextBox":
-                try:
-                    from System.Windows.Forms import BorderStyle
-                    control.BorderStyle = BorderStyle(0)
-                except ImportError:
-                    pass
-            shell.Controls.Add(control)
-            # Retain the original input and all its handlers. Cropping native
-            # combo edges and drawing a local arrow does not replace selection.
-            arrow = None
-            if input_kind == "ComboBox":
-                crop = self.panel()
-                crop.Dock = getattr(self.ns["DockStyle"], "None")
-                crop.BackColor = self.color("SurfaceAlt")
-                crop.Controls.Add(control)
-                shell.Controls.Add(crop)
-                arrow = self.button("⌄", lambda s, e: setattr(control, "DroppedDown", True))
-                arrow.Dock = self.ns["DockStyle"].Right
-                arrow.Width = 28
-                arrow.TabStop = False
-                arrow.FlatAppearance.BorderSize = 0
-                arrow.BackColor = self.color("SurfaceAlt")
-                arrow.AccessibleName = "Abrir " + caption
-                shell.Controls.Add(arrow)
-            def layout_input(sender=None, args=None):
-                width = shell.ClientSize.Width
-                if not isinstance(width, (int, float)) or width <= 0:
-                    return
-                control.Left = -1 if input_kind == "ComboBox" else 8
-                control.Top = max(2, (shell.Height - control.Height) // 2)
-                control.Width = max(30, width + 2 if arrow else width - 16)
-                if arrow:
-                    crop.Left = 0
-                    crop.Top = max(2, (shell.Height - control.Height) // 2)
-                    crop.Width = max(30, width - arrow.Width)
-                    crop.Height = max(18, control.Height - 2)
-                    control.Top = -1
-                    control.Width = crop.Width + arrow.Width + 2
-            shell.Resize += layout_input
-            # Mask top/bottom native border without obstructing text or input.
-            if arrow:
-                for dock in ("Top", "Bottom"):
-                    edge = self.panel(dock, 1)
-                    edge.BackColor = self.color("SurfaceAlt")
-                    shell.Controls.Add(edge)
-            row.Controls.Add(shell)
+        if input_kind == "ComboBox":
+            presentation = dropdown(self, control, caption)
+            row.Controls.Add(presentation)
+            control._presentation = presentation
         else:
             row.Controls.Add(control)
         row.Controls.Add(title)
         self.theme(row)
-        if input_kind in ("ComboBox", "TextBox"):
-            shell.BackColor = self.color("SurfaceAlt")
+        if input_kind == "TextBox":
+            try:
+                from System.Windows.Forms import BorderStyle
+                control.BorderStyle = BorderStyle(1)
+            except ImportError:
+                pass
         return row
 
     def fit_stack(self, panel):
