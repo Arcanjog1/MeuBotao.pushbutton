@@ -1,11 +1,11 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CHANNEL integrado); SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge do #41); SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-14T21:12:19+00:00",
-  "main": "61d4f6ce7133bd8ea8613ed1f398895b8536e101",
+  "observed_utc": "2026-09-16T13:05:00+00:00",
+  "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
       "pr": 32,
@@ -42,6 +42,10 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
     {
       "pr": 40,
       "head": "64404af6fdde91aaf9b8dafdb32708a29cdcf0db"
+    },
+    {
+      "pr": 41,
+      "head": "1aff5e02104a3508c4eeb2b78e2d103929ca233b"
     }
   ],
   "candidates": [
@@ -70,9 +74,24 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
     },
     {
-      "pr": 41,
-      "branch": "claude/channel-post-merge-doc-fix",
-      "head": "359651793675afe858483dd6df6585b5ad48be2c"
+      "pr": 42,
+      "branch": "claude/butanta-modulation-physical-fixes",
+      "head": "7724ab68d7a695062605c96ae9ef81a27428ee1e"
+    },
+    {
+      "pr": 43,
+      "branch": "claude/tender-carson-0t631s",
+      "head": "35fb8893dba9c97839ac9aff8c143f8230fff8e8"
+    },
+    {
+      "pr": 44,
+      "branch": "codex/modulacao-automatica-ui-redesign",
+      "head": "b5c28fc0635f5660277dcfcce7e8444e1bdc8234"
+    },
+    {
+      "pr": 45,
+      "branch": "claude/laughing-einstein-cl3cen",
+      "head": "15f1d7726bff3316921132756eb43b2b5c3607e7"
     }
   ]
 }
@@ -80,17 +99,18 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | `61d4f6ce7133bd8ea8613ed1f398895b8536e101` (merge do **#40**, estratégia CHANNEL); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| MAIN / HEAD observado | `55e990d962ed22ae1021f0d335db197607bddda1` (merge do **#41**, docs-only); antes 61d4f6c (#40, CHANNEL), 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
-| Candidato desta sessão | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD `3596517` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only**: nenhuma mudança de produção, benchmark, baseline ou norma — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| Candidatos em curso (sessões paralelas) | **Produção/solver:** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) `claude/butanta-modulation-physical-fixes` HEAD `7724ab6` (correções físicas do BUTANTÃ; conteúdo normativo e métricas são do próprio PR — este painel não os reproduz) e [#43](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/43) HEAD `35fb889` (anexo de análise ao #42). **UI/UX:** [#44](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44) HEAD `b5c28fc`. **Auditoria/benchmark/CI:** [#45](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/45) HEAD `15f1d77` — ver linha abaixo. Integrado nesta rodada: #41 (docs-only) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
+| Auditoria de benchmark / cobertura / CI (#45) | **BENCHMARK / TEST COVERAGE / CI — NÃO é mudança de produção** (um arquivo novo em `docs/audits/`; zero alteração em `nuvem/core/**`, solver, UI, regras físicas, golden ou baseline). Concluída: veredito **BENCHMARK PARTIAL — GAPS IDENTIFIED**. Suíte completa medida na main `55e990d` em **Linux/CPython 3.11: 2 falharam, 1.241 passaram em 39min40s** — as duas são os gates de corpus `test_benchmark_baselines[torre_easy_lo_r00_tp1]` e `[torre_easy_lo_r00_tgd-v2]`. A 3ª falha citada nos checkpoints (`test_perf_trace_stall_sampler`) é **específica de Windows** (`sys.platform == "win32"`) e não ocorre em Linux: known-failures precisam registrar plataforma. Marcador `slow` incompleto — 6 testes de corpus sem o marcador somam 741,2 s; depois de marcá-los, o **FAST gate roda ~1.206 testes em ~30 s**. `test_benchmark_baselines` repete o mesmo solve por asserção (82,95 / 82,46 / 82,45 s em TP1, 692,5 s no arquivo): fixture/cache de sessão economiza ≈390 s. Relatório: [auditoria](audits/2026-09-16-auditoria-benchmark-cobertura.md) |
 | Bloqueadores | CHANNEL: integrado na main pelo #40. Pendentes: topo/peitoril fora da grade (51.8), cinta de topo (10.7), 30.8 (7719511); verga/contraverga não iniciada. Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md); antes [CHANNEL — fechamento final e merge](checkpoints/2026-09-14-channel-final-merge.md) |
-| CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
+| Último checkpoint | [Auditoria do benchmark e da cobertura de regressão](checkpoints/2026-09-16-auditoria-benchmark-cobertura.md) (auditoria, produção zero); antes [reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| CI | Só validação documental (`check-status-doc`) — **nenhum workflow executa `pytest` nem `runner --check`**, confirmado na auditoria do #45. Proposta com custo medido (FAST ~30 s / MEDIUM ~5 min / FULL 39min40s): [auditoria §10.1](audits/2026-09-16-auditoria-benchmark-cobertura.md); recomendação anterior em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
 | Próximo objetivo | Decisões E (topo/peitoril fora da grade) e F (cinta de topo); LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
 PR da consolidação: [#36](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/36).
