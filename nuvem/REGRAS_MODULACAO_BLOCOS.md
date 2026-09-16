@@ -8942,3 +8942,105 @@ normal — nenhuma parede nova sensível.
 **Testes**: o laço para quando um passe não mexe em peça; o segundo passe recebe
 exatamente as paredes que o primeiro mexeu; o teto de passes é respeitado.
 
+## 66. Microajuste da POSIÇÃO da abertura — ETAPA 3B por qualidade (2026-09-15, IMPLEMENTADO, sob chamada)
+
+> Regra nova pedida pelo usuário em 2026-09-15: *"a posição original da abertura
+> não é absoluta"*. A Etapa 3B já deslocava abertura para tornar uma parede
+> **viável** (`plan_axis_opening_fix`, opção 1 "shift", teto de 5 cm); esta seção
+> acrescenta o deslocamento por **qualidade**, com teto de 10 cm.
+
+### 66.1 Achado — medido na BUTANTÃ, não deduzido
+
+Censo das faixas entre a peça de **nó** e a jamba (34 paredes, fiadas 0–11): 41
+faixas em que sobra entre 20 e 35 cm — espaço em que um `B34` + junta (35 cm)
+**não cabe**. O caso mais claro é a parede **8284543**, porta 8079002, jamba em
+t = 469 cm, em 6 fiadas:
+
+```
+fiada par    B54(nó)@385 … termina em 439 | C09@440  B19@450 | VÃO      (30 cm)
+fiada ímpar  B39@420                      | C09@460          | VÃO
+
+com a abertura 5 cm adiante (jamba em 474):
+fiada par    B54(nó)@385                  | B34@440          | VÃO      (35 cm)
+fiada ímpar  B34@420                      | B19@455          | VÃO
+```
+
+Do outro lado do vão o residual muda junto: onde havia `B19 + B34` passa a
+fechar `C09 + C04` — a "peça menor/pastilha" que o usuário previu.
+
+### 66.2 Regra
+
+**Régua do padrão vertical** (`strip_filler_pieces`): peças de **acerto**
+(compensador, pastilha ou meio bloco) dentro das faixas entre uma peça de nó e a
+jamba, somadas em todas as fiadas. É **geometria, não nome de peça**: a faixa
+entre a amarração e o vão deveria fechar com alvenaria inteira.
+
+**Detecção** (`detect_candidates`) → `OPENING_MICRO_ADJUSTMENT_REQUIRED`:
+aberturas cuja vizinhança tem peça de acerto na faixa ou vazado menor
+desalinhado na parede. É diagnóstico, nunca erro.
+
+**Busca** — para cada abertura suspeita:
+
+1. `feasible_offsets`: ±10 cm, passo de 1 cm, **menor primeiro**, recusando o que
+   sai da parede, encosta noutra abertura ou chega perto de nó; o teto vale para
+   o deslocamento **total** desde a posição do projeto (a abertura não passeia
+   10 cm por execução);
+2. `piers_close`: pré-triagem **aritmética da própria Etapa 3B** — os dois
+   pilaretes têm de fechar com blocos. Na BUTANTÃ sobrevivem só os múltiplos do
+   módulo (`PIER_MODULE_CM` = 5 cm): 21 candidatos viram 5;
+3. `plan_opening_micro_adjustments`: cada sobrevivente é avaliado com um **solve
+   real do CLUSTER** (a parede da abertura e as ligadas a ela por nó — a posição
+   pode existir para a modulação das vizinhas);
+4. `choose_offset`: **portões duros primeiro** (colisão, apoio, não modular,
+   preflight de abertura, auditoria de amarração e validação CHANNEL — nenhum
+   pode piorar), depois **qualidade** na ordem: vazado menor → padrão vertical →
+   meio bloco desnecessário → compensador/pastilha → aglomerado de especiais →
+   não modular; **empate fica com o menor deslocamento, e o 0 vence qualquer
+   empate** (não mover sem ganho real).
+
+Nada disso roda sozinho dentro do solve: quem chama é a Etapa 3B / o harness, e
+a abertura só se move no Revit **depois** de o vencedor ser escolhido. Largura,
+altura, peitoril e nível nunca mudam — só a posição longitudinal na própria
+parede. O projeto humano é somente leitura: nunca se move abertura nele.
+
+### 66.3 Medido — BUTANTÃ (bancada, 17 fiadas, 6 aberturas examinadas das 24 detectadas)
+
+| Abertura | Deslocamento | Peças de acerto na faixa | Especiais (cluster) |
+|---|---|---|---|
+| 8284546 vão 0 | **+5 cm** | 22 → 18 | 148 → 141 |
+| 8284534 vão 1 | **+5 cm** | 57 → 51 | 105 → 94 |
+| 8284534 vão 2 | **+5 cm** | 57 → 51 | 105 → 94 |
+| 8284543 vão 0 | **+10 cm** | 24 → 12 | 45 → 45 |
+| 8284526 vão 3 | **+5 cm** | 34 → 31 | 135 → 135 |
+| 8284515 vão 5 | **0** (nada a ganhar) | 50 → 50 | 135 → 135 |
+
+Aplicando os cinco e re-resolvendo o prédio inteiro:
+
+| Métrica | antes | **depois** |
+|---|---|---|
+| Vazado menor — validador de produção | 53 | **49** |
+| Vazado menor — régua 2-D, fiadas 0–11 | 35 | **31** (humano 41) |
+| Especiais fiadas 0–11 | 594 | **559** |
+| `C04+C09` encostados | 81 | **65** |
+| Peças de acerto nas faixas amarração→jamba | 237 | **206** |
+| Peças | 8.958 | **8.926** |
+| Buracos / colisões / apoio / não modular | 20 / 0 / 0 / 0 | **20 / 0 / 0 / 0** |
+| Auditoria recalculada / `MISSING_UNDER_WINDOW` | 3 / 0 | **3 / 0** |
+
+O deslocamento de **+10 cm** na 8284543 não é preferência: +5 e +10 empatam nas
+peças de acerto (12), e o +10 fica com um especial a menos — a ordem de
+prioridade decide, e o menor deslocamento só vale como último critério.
+
+### 66.4 Testes
+
+`tests/test_opening_micro_adjust.py` — fixture **física** equivalente ao caso
+real (parede de 604 cm, T em t=177 com a peça de nó terminando em 204, jamba em
+234, vão de 91 cm; os dois pilaretes só fecham nessa geometria):
+
+- **vermelho**: na posição do projeto a fiada fecha a faixa com `B19 + C09`;
+- **verde**: com o deslocamento **que a busca escolhe** (o valor não está escrito
+  no teste) a mesma faixa fecha com um `B34` inteiro e nenhum portão piora;
+- réguas, pré-triagem aritmética (com os números reais da 8284543), guardas de
+  segurança, teto do deslocamento **total** e a ordem de prioridade
+  (padrão vertical acima de especiais);
+- controle: posição já boa não se move.
