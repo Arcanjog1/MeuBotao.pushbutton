@@ -14,6 +14,8 @@ ou `docs/PROJECT_STATUS.md` foi alterado. Nenhum merge foi feito.
 | Testes coletados na main | **1.243** (`pytest --collect-only -q`) |
 | Arquivos de teste | 55 (`tests/` 41, `tests/regression/` 9 + `conftest.py`, `nuvem/tests/` 3, `tools/documentation/` 2) |
 | Marcados `slow` | 20 declarações (**31 testes** após parametrização) (`tests/regression/test_benchmark_baselines.py`, `test_block_b19_*`, `test_cross_band_*`, `test_block_arm_role_candidate_safety_contract`, `test_script`) |
+| Suíte completa medida | **2 falharam, 1.241 passaram em 2.380,72 s (39min40s)** — Linux, CPython 3.11 |
+| Falhas na main | `test_benchmark_baselines[torre_easy_lo_r00_tp1]` e `[torre_easy_lo_r00_tgd-v2]` |
 | `skip`/`xfail` | 7 pontos, todos condicionais (fixture/corpus/baseline ausente, `skipif` de plataforma) — **nenhum `xfail` mascarando defeito** |
 
 ## 2. PR #42 observado (somente leitura)
@@ -380,78 +382,152 @@ alguém reconciliar o status.
 
 Números medidos nesta auditoria (CPython 3.11, container Linux).
 
-**FAST GATE** — a cada push, alvo ≤ 3 min
+**FAST GATE** — a cada push, **≈ 30 s medidos**
 
 ```
-pytest -m "not slow" -q -p no:cacheprovider \
-       --deselect tests/regression/test_benchmark_baselines.py
+pytest -q -p no:cacheprovider \
+       -m "not slow" \
+       --deselect tests/test_block_node_fill_revalidation.py::test_t18_candidato_aceito_permanece_seguro_no_corpus \
+       --deselect tests/test_block_arm_role_prism_stagger.py
 ```
 
-1.212 testes (31 desmarcados por `-m "not slow"`). Cobre motor headless, validadores red/green, PRISMA, aberturas,
-CHANNEL, B19, determinismo por unidade, UI/travamento. É o gate que faltava.
+1.206 testes. As duas linhas de `--deselect` são o conserto provisório do
+marcador `slow` incompleto (§11.2): sem elas o mesmo comando leva **12,8 min**,
+porque 6 testes de corpus não estão marcados. A correção definitiva é
+acrescentar `@pytest.mark.slow` nesses 6 — uma linha por teste — e aí o gate
+volta a ser só `-m "not slow"`.
 
-**MEDIUM GATE** — a cada PR, alvo ≤ 15 min
+Cobre motor headless, validadores red/green, PRISMA, aberturas, CHANNEL, B19,
+determinismo por unidade, UI/travamento. É o gate que faltava, e ele cabe
+folgado em qualquer push.
+
+**MEDIUM GATE** — a cada PR, **≈ 5 min** (≈ 3,5 min com a fixture de sessão)
 
 - FAST GATE, mais
-- `pytest tests/regression/test_benchmark_baselines.py -k "piloto_sintetico or tp1"`
-  (TP1 é o corpus mais barato dos dois humanos)
+- os 6 testes de corpus deselecionados acima (741 s hoje — é a parte cara)
+- `pytest tests/regression/test_benchmark_baselines.py -k "piloto_sintetico or torre_easy_lo_r00_tp1"`
+  (TP1 custa 82 s por asserção, TGD 47 s — mas TP1 é o que hoje falha, logo é
+  o que precisa estar no gate)
 - `python3 nuvem/benchmark/runner.py --run torre_easy_lo_r00_tp1 --check`
 - o workflow documental que já existe.
 
-**NIGHTLY / FULL** — diário na main e antes de merge autorizado
+**NIGHTLY / FULL** — diário na main e antes de merge autorizado — **39min40s medidos**
 
 - suíte inteira, incluindo `slow` (TGD V1+V2, TP1 V1+V2)
 - `runner.py --all --check`
 - lote de determinismo de planta inteira (§9.2), quando existir
 - publicação das métricas físicas do corpus BUTANTÃ (§12), quando existir.
 
-**Regra que o CI precisa herdar do processo:** as 3 falhas hoje conhecidas
-(TP1 V1, TGD V2, `test_perf_trace_stall_sampler` no Windows) precisam virar
-uma lista explícita de *known failures* versionada e conferida pelo CI — e
-não um número decorado ("3 = main") repetido de checkpoint em checkpoint. Ver
-§13.
+**Regra que o CI precisa herdar do processo:** as falhas conhecidas precisam
+virar uma lista explícita de *known failures* versionada e conferida pelo CI,
+não um número decorado ("3 = main") repetido de checkpoint em checkpoint. E a
+lista tem que registrar a plataforma: **nesta medição em Linux deram 2 falhas,
+não 3** — `test_perf_trace_stall_sampler` passou aqui e só falha no Windows
+(`sys.platform == "win32"`). Um número global sem plataforma não é
+conferível. Ver §13.
 
 ## 11. Performance dos testes
 
-### 11.1 Medição
+### 11.1 Medição executada
 
-`pytest -q --durations=60` sobre a main `55e990d`, container Linux, CPython
-3.11. Ver §"Medição" no fim deste relatório para os números finais.
+`pytest -q --durations=60 -p no:cacheprovider` sobre a main `55e990d`,
+container Linux, CPython 3.11, sem paralelismo.
 
-O que a medição já mostra sem ambiguidade: os **11 testes de
-`test_benchmark_baselines.py` dominam a suíte inteira**. São 11 de 1.243
-testes (0,9%) e consomem a maior parte do relógio.
+```
+2 failed, 1241 passed in 2380.72s (0:39:40)
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+```
 
-### 11.2 Causa concreta e evitável: solve duplicado
+**Distribuição do tempo**
 
-`runner.run_project()` **não tem cache**. Os três testes
-`test_projeto_nao_regrediu_contra_o_baseline`,
-`test_nenhum_validador_quebra_no_projeto` e `test_o_solver_produz_alguma_coisa`
-são parametrizados pelos mesmos 3 projetos e **cada um chama
-`runner.run_project(project_id)` do zero**. São **3 solves completos por
-projeto para produzir 3 asserções sobre o mesmo resultado** — mais 1 por régua
-versionada. Uma fixture de escopo de sessão (`@pytest.fixture(scope="session")`
-parametrizada por `(project_id, version)`) cortaria o custo do gate de corpus
-em cerca de 3×, **sem mudar uma única asserção**.
+| Grupo | Tempo | % da suíte |
+|---|---:|---:|
+| 31 testes marcados `slow` | **1.611,6 s** | 67,7% |
+| 6 testes de corpus **não marcados** `slow` | **741,2 s** | 31,1% |
+| **os outros 1.206 testes** | **≈ 28 s** | **1,2%** |
 
-*(Esta auditoria não altera testes. Fica registrado como a primeira
-otimização a fazer depois do PR #42.)*
+### 11.2 O achado que corrige a proposta de CI
 
-### 11.3 Testes duplicados / candidatos a fixture menor
+**Seis testes consomem 96% do que sobraria num `pytest -m "not slow"`.** Eles
+rodam o solver real sobre TP1/TGD e **não têm o marcador**:
+
+| Tempo | Teste | Marcado `slow`? |
+|---:|---|---|
+| **255,49 s** | `test_block_node_fill_revalidation::test_t18_candidato_aceito_permanece_seguro_no_corpus` | **não** |
+| **162,26 s** | `test_block_arm_role_prism_stagger::test_determinismo_w076_w041_duas_rodadas_identicas` | **não** |
+| 81,55 s | `test_block_arm_role_prism_stagger::test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao` | **não** |
+| 80,77 s | `test_block_arm_role_prism_stagger::test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado` | **não** |
+| 80,62 s | `test_block_arm_role_prism_stagger::test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada` | **não** |
+| 80,49 s | `test_block_arm_role_prism_stagger::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair` | **não** |
+
+Consequência prática: `pytest -m "not slow"` hoje leva **≈ 12,8 min**, não os
+3 min que o marcador promete. Corrigir o marcador nesses 6 testes (ou
+deselecioná-los no gate) leva o FAST GATE para **≈ 30 s cobrindo 1.206
+testes** — a diferença entre um gate que roda a cada push e um que ninguém
+aguenta.
+
+*O marcador `slow` está, portanto, incompleto: ele descreve a intenção, não o
+custo real. Esta auditoria não altera testes; fica registrado como correção
+de uma linha por arquivo.*
+
+### 11.3 Os 10 mais lentos da suíte
+
+| # | Tempo | Teste | `slow`? |
+|---|---:|---|---|
+| 1 | 255,49 s | `test_block_node_fill_revalidation::test_t18_...corpus` | não |
+| 2 | 221,56 s | `test_benchmark_baselines::..._versionado[torre_easy_lo_r00_tgd-v2]` | sim |
+| 3 | 163,90 s | `test_block_b19_residual_fill::test_t52_determinismo_duas_execucoes_separadas` | sim |
+| 4 | 162,26 s | `test_block_arm_role_prism_stagger::test_determinismo_w076_w041_...` | não |
+| 5 | 93,18 s | `test_cross_band_joint_propagation_cr_g12::test_determinismo_da_correcao` | sim |
+| 6 | 93,14 s | `test_block_arm_role_candidate_safety_contract::test_t16_execucao_repetida_e_deterministica` | sim |
+| 7 | 89,20 s | `test_block_b19_residual_fill::test_t49_tp1_fingerprint_identico_com_e_sem_b19` | sim |
+| 8 | 85,92 s | `test_cross_band_...::test_fronteira_de_banda_deixa_de_criar_junta_continua[tp1]` | sim |
+| 9 | 82,95 s | `test_benchmark_baselines::test_projeto_nao_regrediu_contra_o_baseline[tp1]` | sim |
+| 10 | 82,47 s | `test_benchmark_baselines::..._versionado[torre_easy_lo_r00_tp1-v2]` | sim |
+
+**Padrão:** os mais caros são, quase todos, **testes de determinismo e de
+corpus que resolvem a planta inteira duas ou mais vezes**. O custo é inerente
+ao que provam — o problema não é que existam, é que estão misturados com
+testes de 20 ms sem uma separação confiável.
+
+### 11.4 Trabalho duplicado, medido
+
+**`test_benchmark_baselines.py`: 692,5 s no total.** `runner.run_project()`
+não tem cache, e os três testes parametrizados pelos mesmos projetos chamam-no
+do zero cada um. Os números mostram isso com nitidez — as três asserções sobre
+TP1 custam praticamente o mesmo, porque cada uma refaz o mesmo solve:
+
+```
+82,95 s  test_projeto_nao_regrediu_contra_o_baseline[tp1]
+82,46 s  test_o_solver_produz_alguma_coisa[tp1]
+82,45 s  test_nenhum_validador_quebra_no_projeto[tp1]
+```
+
+e em TGD, idem: 46,74 / 46,91 / 46,97 s. Uma fixture de escopo de sessão
+por `(project_id, version)` elimina ~2/3 desse tempo — **cerca de 390 s** —
+**sem mudar uma única asserção**.
+
+O mesmo padrão aparece em `test_block_arm_role_prism_stagger`: quatro testes
+`w010`/`w041`/`w022_w093`/`w076` a ~80 s cada, todos sobre o mesmo TP1.
+
+### 11.5 Outros candidatos a fixture menor
 
 | Situação | Observação |
 |---|---|
-| `test_block_fit_tolerance_c04.py` (55) + `test_block_fit_tolerance_c04_jamb_guard.py` (73) = 128 testes para uma tolerância | muita parametrização sobre a mesma geometria; candidato natural a fixture compartilhada |
-| `test_script.py` (262) | maior arquivo único; mistura pareamento, grafo, solver, UI e criação. Dois `slow` aqui (`INV_PAIR_002` com 2.868 linhas, `INV_PAIR_003`) são os únicos caros |
-| `test_golden_benchmark.py` (90) | rápido e sintético — **fast gate** |
-| `test_block_b19_residual_fill_implementation.py` (76, 6 `slow`) | os 6 `slow` rodam o corpus; os outros 70 são fixtures — separar já está feito pelo marcador |
-| `tests/scale_bench.py`, `tests/solver_bench.py` | não são testes; `solver_bench` é importado como *loader do motor* por 10 arquivos de teste. `scale_bench.py` (320 linhas) **não é importado por nenhum teste** — ferramenta órfã |
+| `test_block_fit_tolerance_c04.py` (55) + `..._jamb_guard.py` (73) = 128 testes | **nenhum aparece entre os 60 mais lentos** — são baratos; a duplicação aqui é de leitura, não de tempo |
+| `test_script.py` (262) | só dois testes caros (`INV_PAIR_002` e `INV_PAIR_003`, ~27,7 s cada), ambos já marcados `slow` |
+| `test_golden_benchmark.py` (90) | nenhum entre os mais lentos — **fast gate** |
+| `tests/scale_bench.py` | **não é importado por nenhum teste** — ferramenta órfã (320 linhas) |
+| `tests/solver_bench.py` | não é teste, mas é o *loader do motor* de 10 arquivos de teste — não remover |
 
-### 11.4 Divisão recomendada
+### 11.6 Divisão recomendada, com custo medido
 
-- **FAST**: tudo que não é `slow` — inclui os 84 do CHANNEL, os 163 de
-  amarração, os 133 de abertura, os 23 red/green de validador.
-- **FULL**: os 20 `slow` + `runner.py --all --check`.
+| Gate | Conteúdo | Custo medido / estimado |
+|---|---|---|
+| **FAST** | 1.206 testes (`not slow` + os 6 remarcados) | **≈ 30 s** |
+| **MEDIUM** | FAST + `test_benchmark_baselines` de `piloto` e `tp1` + os 6 de corpus | ≈ 5 min (≈ 3,5 min com a fixture de sessão) |
+| **FULL** | suíte inteira + `runner.py --all --check` | **39min40s** hoje; ≈ 33 min com a fixture de sessão |
 
 ## 12. Corpus permanente do BUTANTÃ — proposta
 
@@ -522,7 +598,7 @@ CR com autorização de baseline.
 | # | Buraco | Por que é crítico |
 |---|---|---|
 | **B1** | **Nenhum CI executa `pytest`.** 1.243 testes dependem de execução manual. | Toda a §5 desta matriz vale zero enquanto ninguém rodar a suíte. É o buraco que anula todos os outros. |
-| **B2** | **O gate de corpus está vermelho na main.** `test_benchmark_baselines[torre_easy_lo_r00_tp1]` e `[torre_easy_lo_r00_tgd-v2]` falham em `55e990d` (confirmado nesta auditoria). | Um teste que já falha não distingue regressão nova de regressão velha. O único gate de corpus do repositório está, na prática, desligado para dois dos três projetos. |
+| **B2** | **O gate de corpus está vermelho na main.** Suíte completa medida em `55e990d`: **2 falharam, 1.241 passaram em 39min40s** — as duas falhas são `test_benchmark_baselines[torre_easy_lo_r00_tp1]` e `[torre_easy_lo_r00_tgd-v2]`. | Um teste que já falha não distingue regressão nova de regressão velha. O único gate de corpus do repositório está, na prática, desligado para dois dos três projetos. |
 | **B3** | **O BUTANTÃ não tem corpus.** Todas as métricas das correções físicas em curso vivem em scripts de evidência. | Uma regressão de vazado menor, apoio, especiais ou microajuste **não seria detectada por nenhum teste**. |
 | **B4** | **`delta_metrics.py` e `physmetrics.py` não existem no repositório.** A §59 do PR #42 os nomeia como "onde a matriz de não-regressão desta missão foi produzida". | A bancada que produziu os números de aceitação do PR não é versionada. Os números não são reprodutíveis por outra sessão. |
 | **B5** | **`OPENING_BLOCK_INSIDE_WINDOW` (NÍVEL 1, crítico) sem nenhum teste.** | Mesma classe de "bloco dentro de porta", que tem 4 arquivos. Bloco dentro de janela é erro físico grave e silencioso. |
@@ -530,13 +606,14 @@ CR com autorização de baseline.
 | **B7** | **§66 (microajuste) sem chamador de produção.** `plan_opening_micro_adjustments` não é chamada por nenhum código do botão; os 5 vãos foram movidos por script. | A regra existe, foi medida no Revit, e não está no fluxo. Nenhum teste de integração pode existir ainda. |
 | **B8** | **Duas réguas para o vazado menor** (336 externa × 264 motor no mesmo lote), sem teste que as concilie. | O número que decide a aceitação do PR depende de qual régua se usa. |
 | **B9** | **Testes permanentes dependem de `docs/checkpoints/evidence/*.json`** e pulam em silêncio se o arquivo sumir. | `skip` silencioso é pior que falha: a suíte fica verde sem testar. |
+| **B11** | **O marcador `slow` está incompleto.** Seis testes de corpus (255 s + 5×~81 s = 741 s) não o têm, então `-m "not slow"` custa 12,8 min em vez de 30 s. | Torna o FAST GATE inviável na prática — e como ninguém roda a suíte, o defeito nunca apareceu. |
 | **B10** | **`ERROR_HISTORY.md` desatualizado**: lista `MirrorElement` deixa órfãs como "NÃO corrigido", mas `test_mirror_in_place.py` prova que `MirrorElements(..., mirrorCopies=False)` já corrigiu. | Documento de memória que mente em uma linha perde autoridade nas outras. |
 
 ## 15. Testes que hoje dão FALSA CONFIANÇA
 
 | Teste / artefato | Por que a confiança é falsa |
 |---|---|
-| **"regressão consolidada: 1.296 passaram, 3 falharam = main"** | As 3 falhas incluem **os dois gates de corpus humano**. Dizer "igual à main" é verdade e, ao mesmo tempo, esconde que o gate de não-regressão de TP1 e TGD V2 está inoperante desde antes deste PR. |
+| **"regressão consolidada: 1.296 passaram, 3 falharam = main"** | As 3 falhas incluem **os dois gates de corpus humano** — confirmado aqui: em Linux a main dá exatamente essas 2 (a terceira é a do `perf_trace` em Windows). Dizer "igual à main" é verdade e, ao mesmo tempo, esconde que o gate de não-regressão de TP1 e TGD V2 está inoperante desde antes deste PR. |
 | **`test_golden_benchmark.py` (90 testes)** | O maior arquivo depois de `test_script.py`, e o cabeçalho é explícito: *"NÃO importa nada de `core/engine/*` — este benchmark é sobre o formato de SAÍDA, nunca sobre o motor que a produz"*. 90 testes verdes não dizem nada sobre modulação. |
 | **`piloto_sintetico_2x2`** | Entra nas 11 parametrizações do gate de corpus e tem `reference_type: SOLVER_GENERATED_ONLY`, `confidence: NONE`. O baseline dele é a saída do próprio solver: prova reprodutibilidade, **nunca correção**. Um terço das linhas do gate de corpus é auto-referente. |
 | **Baselines V1 (`LEGACY_BASELINE`)** | O manifesto avisa: *"Snapshot congelado de uma execução ANTERIOR DO PRÓPRIO SOLVER. Prova reprodutibilidade/determinismo, NUNCA correção."* Passar contra baseline não é estar certo. |
@@ -551,8 +628,8 @@ CR com autorização de baseline.
 | Ordem | Ação | Por quê |
 |---|---|---|
 | **P0** | Consertar ou classificar formalmente as 2 falhas de baseline (TP1 V1, TGD V2) e criar uma lista versionada de *known failures* conferida por script | Sem isso, nenhum gate de corpus tem significado — e todo checkpoint futuro repete "3 = main" sem conferir |
-| **P0** | Ligar `pytest -m "not slow"` como FAST GATE no CI | Transforma 1.212 testes existentes em proteção real, custo próximo de zero |
-| **P1** | Fixture de sessão em `test_benchmark_baselines.py` (elimina ~3 solves duplicados por projeto) | Torna o MEDIUM GATE viável dentro de um PR |
+| **P0** | Acrescentar `@pytest.mark.slow` aos 6 testes de corpus não marcados (§11.2) e ligar o FAST GATE no CI | **Medido: 1.206 testes em ≈ 30 s.** Sem a remarcação o mesmo gate custa 12,8 min |
+| **P1** | Fixture de sessão em `test_benchmark_baselines.py` | **Medido: 692,5 s no arquivo, com 3 solves idênticos por projeto (82,95 / 82,46 / 82,45 s em TP1). Economia ≈ 390 s** |
 | **P1** | Versionar a bancada de medição (`delta_metrics.py`, `physmetrics.py`, `b34rule.py`, `channel_strict_compare.py`) como pacote em `nuvem/benchmark/` com testes próprios | Sem isso os números de aceitação do PR #42 não são reprodutíveis |
 | **P1** | Red/green para `OPENING_BLOCK_INSIDE_WINDOW`, `JUNCTION_HALF_BLOCK_ADJACENT`, `POSITION_OFF_AXIS`, `POSITION_BAD_ORIENTATION`, `PRISM_JOINT_STACK` | Cinco códigos NÍVEL 1 sem teste; o padrão red/green já existe no arquivo |
 | **P2** | Criar o corpus BUTANTÃ (§12), começando por `b34_alignment`, `opening_adjustment` e `support` | São as três áreas em desenvolvimento ativo e as três sem nenhuma proteção |
@@ -570,7 +647,7 @@ CR com autorização de baseline.
 | As correções §60–65 quebrarem quando forem estendidas do CHANNEL para o legado | **alta** | **alto** | os corpora legados hoje **não** exercitam esse código; exigir baseline novo antes da extensão |
 | Métricas de aceitação não reprodutíveis por outra sessão | **certa** hoje | médio | versionar a bancada (P1) |
 | Validador novo reprovar o projeto humano de referência | média | **alto** | a régua da §59 (medir o humano antes de definir o nível) precisa virar regra de processo, não achado de uma missão |
-| Suíte voltar a 40–70 min e ser abandonada | média | médio | FAST/MEDIUM/FULL (P0/P1) + fixture de sessão |
+| Suíte ser abandonada por custo | **já aconteceu** — 39min40s medidos hoje | médio | FAST/MEDIUM/FULL (P0/P1) + remarcar os 6 + fixture de sessão |
 | Baseline ser regravado para "fazer o teste passar" | baixa | **crítico** | já proibido no `DEVELOPMENT_PROCESS.md`; o CI precisa conferir que `baseline.json` só muda em commit que declare o quê |
 | Confiança no check verde do GitHub | **alta** | médio | renomear o workflow para deixar claro que é documental, e adicionar o FAST GATE ao lado |
 | Duas réguas de vazado menor divergirem | média | médio | teste que concilie `b34rule` externa × contador do motor |
@@ -595,7 +672,14 @@ O que falta é estrutural, não cosmético:
 3. **a área em desenvolvimento ativo (B34, apoio, especiais, microajuste) é
    exatamente a que não tem corpus permanente** — as métricas que decidem a
    aceitação do PR #42 vivem em scripts de evidência, e dois dos módulos que
-   as produziram não estão no repositório.
+   as produziram não estão no repositório;
+4. **o marcador `slow` está incompleto**, o que faz o gate rápido custar
+   12,8 min em vez de 30 s — defeito que só não incomoda porque ninguém roda
+   a suíte.
+
+A boa notícia da medição: **1.206 dos 1.243 testes rodam em ≈ 28 s.** A
+proteção mais valiosa que falta não é cara nem demorada de ligar — é uma
+linha de workflow e seis linhas de marcador.
 
 A régua não está errada. Ela está **desligada nos pontos que mais importam
 agora**.
@@ -604,3 +688,78 @@ agora**.
 
 ## Medição
 
+Comando, ambiente e resultado integral da execução que sustenta os números
+das seções 1, 11, 14, 16 e 17.
+
+```
+$ python3 -m pytest -q --durations=60 -p no:cacheprovider
+```
+
+Ambiente: container Linux (`Linux 6.18.44-fc-v33`), CPython 3.11, pytest 9.1.1,
+sem paralelismo, `origin/main` = `55e990d962ed22ae1021f0d335db197607bddda1`,
+árvore limpa.
+
+Resultado:
+
+```
+2 failed, 1241 passed in 2380.72s (0:39:40)
+
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+FAILED tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+```
+
+Contagem de seleção:
+
+```
+$ python3 -m pytest --collect-only -q                  ->  1243 tests
+$ python3 -m pytest --collect-only -q -m "not slow"    ->  1212/1243 (31 deselected)
+$ python3 -m pytest --collect-only -q -m "slow"        ->  31/1243
+```
+
+### 30 durações mais altas (de `--durations=60`)
+
+```
+255.49s call     tests/test_block_node_fill_revalidation.py::test_t18_candidato_aceito_permanece_seguro_no_corpus
+221.56s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]
+163.90s call     tests/test_block_b19_residual_fill_implementation.py::test_t52_determinismo_duas_execucoes_separadas
+162.26s call     tests/test_block_arm_role_prism_stagger.py::test_determinismo_w076_w041_duas_rodadas_identicas
+93.18s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_determinismo_da_correcao
+93.14s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t16_execucao_repetida_e_deterministica
+89.20s call     tests/test_block_b19_residual_fill_implementation.py::test_t49_tp1_fingerprint_identico_com_e_sem_b19
+85.92s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_fronteira_de_banda_deixa_de_criar_junta_continua[torre_easy_lo_r00_tp1]
+82.95s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]
+82.47s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tp1-v2]
+82.46s call     tests/regression/test_benchmark_baselines.py::test_o_solver_produz_alguma_coisa[torre_easy_lo_r00_tp1]
+82.45s call     tests/regression/test_benchmark_baselines.py::test_nenhum_validador_quebra_no_projeto[torre_easy_lo_r00_tp1]
+81.55s call     tests/test_block_arm_role_prism_stagger.py::test_w010_tp1_com_abertura_nenhum_bloco_invade_o_vao
+81.53s call     tests/test_block_b19_residual_fill_implementation.py::test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade
+80.77s call     tests/test_block_arm_role_prism_stagger.py::test_w041_tp1_prisma_resolvido_de_verdade_nao_so_reportado
+80.62s call     tests/test_block_arm_role_prism_stagger.py::test_w022_w093_tp1_cobertura_do_arm_role_consistency_preservada
+80.49s call     tests/test_block_arm_role_prism_stagger.py::test_w076_tp1_coincidencia_de_contorno_foi_resolvida_pelo_arm_safe_repair
+47.71s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_fronteira_de_banda_deixa_de_criar_junta_continua[torre_easy_lo_r00_tgd]
+46.97s call     tests/regression/test_benchmark_baselines.py::test_nenhum_validador_quebra_no_projeto[torre_easy_lo_r00_tgd]
+46.91s call     tests/regression/test_benchmark_baselines.py::test_o_solver_produz_alguma_coisa[torre_easy_lo_r00_tgd]
+46.74s call     tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tgd]
+45.35s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t1_t9_candidato_seguro_e_aceito_no_tgd_real
+45.27s call     tests/test_block_arm_role_candidate_safety_contract.py::test_t10_fallback_original_para_candidatos_inseguros_no_tgd_real
+45.23s call     tests/test_block_b19_residual_fill_implementation.py::test_t50_tgd_zero_candidatos_elegiveis_limite_de_escopo_conhecido
+42.14s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_reproducer_pre_fix_tem_junta_continua_na_fronteira_de_banda[torre_easy_lo_r00_tp1]
+27.75s call     tests/test_script.py::test_INV_PAIR_003_desempate_final_invariante_a_renumeracao
+27.73s call     tests/test_script.py::test_INV_PAIR_002_2868_linhas_mescladas_invariante_a_permutacao
+24.75s call     tests/test_cross_band_joint_propagation_cr_g12.py::test_reproducer_pre_fix_tem_junta_continua_na_fronteira_de_banda[torre_easy_lo_r00_tgd]
+6.31s call     tests/test_block_b19_residual_fill_implementation.py::test_t53_arm_role_safe_repair_false_desliga_tudo_contrato_preservado
+5.15s call     tools/documentation/test_capture_validation.py::CaptureTests::test_timeout_stops_child_as_well_as_parent
+```
+
+O corte da lista de 60 ficou em 0,14 s: **tudo que não aparece nela custa
+menos que isso**. Daí a conta da §11.1 — 1.206 testes somam ≈ 28 s.
+
+### Observação sobre a diferença para o número do PR #42
+
+O PR #42 relata `1.296 passaram, 3 falharam em 38 min` (Windows, CPython
+3.14.7, sobre o head do PR). Esta medição dá `1.241 passaram, 2 falharam em
+39min40s` (Linux, CPython 3.11, sobre a main). As diferenças são explicáveis e
+**não indicam divergência**: o head do PR tem ~90 testes a mais, e a terceira
+falha de lá (`test_perf_trace_stall_sampler`) é condicionada a
+`sys.platform == "win32"` e portanto não ocorre aqui. As **duas** falhas de
+baseline são idênticas nos dois relatos.
