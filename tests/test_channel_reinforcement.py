@@ -153,11 +153,20 @@ def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically
     # que roda depois e troca juntas de proposito) desligado.
     from core.engine import b34_run_arrangement as _runs
     saved = _runs.B34_RUN_ARRANGEMENT_ENABLED
+    # SECAO 68 desligada pelo MESMO motivo ja' escrito acima para as secoes
+    # 60-64: ela e' uma mudanca de MODULACAO exclusiva do fluxo CHANNEL (o
+    # reparo de abertura compoe a faixa jamba->ancora inteira em vez de aceitar
+    # a primeira composicao que fecha), entao muda junta de proposito. O que
+    # esta linha isola e' o PLANEJADOR de reforco: com as duas desligadas, a
+    # canaleta tem de tomar o lugar das pecas sem mover nenhuma junta.
+    saved_clean = m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED
     _runs.B34_RUN_ARRANGEMENT_ENABLED = False
+    m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = False
     try:
         planned, _w, _n2, _o2 = solve(lines, ops)
     finally:
         _runs.B34_RUN_ARRANGEMENT_ENABLED = saved
+        m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = saved_clean
     for ci in range(NUM_COURSES):
         a = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(legacy, walls, 0, ci)]
         b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(planned, walls, 0, ci)]

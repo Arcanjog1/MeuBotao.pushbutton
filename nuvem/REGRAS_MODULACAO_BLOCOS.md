@@ -9145,3 +9145,100 @@ não falha de busca. Uma coordenação entre bandas foi implementada e medida
 (top-K por família, pares e trios, guardas preservadas): **ganho zero em toda a
 BUTANTÃ** — a mesma assinatura de peças — e por isso **não foi mantida no
 motor**, para não pagar busca que não paga.
+
+## 68. A faixa jamba → âncora é composta como UMA unidade (2026-09-16, IMPLEMENTADO, só CHANNEL)
+
+**Evidência humana (revisão visual de 2026-09-16).** Na parede 8284534 o solver
+fecha a faixa entre a jamba da porta e a peça de nó do encontro com
+`B19 + C04 + B39 + C09` — meio bloco, pastilha e compensador — enquanto o
+projeto humano fecha a **mesma faixa** com `B39 + B34`. O deslocamento da
+abertura (§66) já tinha sido aplicado e mesmo assim a sequência de peças de
+acerto continuava: mover o vão sem melhorar a composição não é sucesso.
+
+**Causa medida.** O pipeline modula a parede inteira primeiro (modulação
+contínua, sem aberturas) e depois recorta os vãos e reconstrói só o que caiu.
+A região de reparo (`opening_repair_regions`) é ancorada na **última peça que
+sobreviveu** de cada lado, e o laço que a resolve aceitava a **primeira
+composição que fechasse**; a expansão da janela (`OPENING_REPAIR_MAX_EXTRA_BLOCKS`,
+3 peças por lado) só era gasta quando o reparo **falhava**. Fechando *mal* — com
+peça de acerto — o resultado era aceito na hora e as peças vizinhas herdadas da
+modulação contínua ficavam congeladas, inclusive um compensador colocado antes
+de a abertura existir. Na fiada 0 da 8284534 a janela de reparo tinha **25 cm**
+(do vão até a primeira peça sobrevivente) e 25 cm só fecha como `B19 + C04`; o
+`C09` a 40 cm dali nem era reavaliado. Classificação: **alternativa NÃO gerada**
+— a faixa jamba→âncora nunca era composta como uma unidade.
+
+**Regra.** No fluxo CHANNEL, o laço de reparo continua expandindo dentro do
+**mesmo orçamento que já existia** e fica com a MELHOR composição, não com a
+primeira que fecha. Qualidade, MENOR é melhor:
+
+1. compensadores/pastilhas;
+2. vazado das peças de amarração desalinhado da fiada oposta;
+3. meio blocos;
+4. peças de amarração usadas como enchimento;
+5. número de peças.
+
+A ordem é a prioridade física: **um B34 a mais nunca perde para um
+compensador**. Nenhuma regra de peça nova — todo candidato continua saindo de
+`_pier_ordered_layout`/`_pier_layout_avoiding_joints`, com os tiers, a regra #1
+(desencontro de junta) e o alinhamento de vazio intactos. É regra de
+PREFERÊNCIA: onde nenhuma composição fecha sem peça de acerto (medido: a faixa
+de 290 cm entre a ponta da parede e o nó, e a de 65 cm depois do microajuste), a
+peça de acerto continua lá.
+
+**Guarda.** A expansão não pode engolir peça que **outro reparo da mesma fiada
+já substituiu** — sem isso, duas peças `OPENING_REPAIR_FILL` se sobrepõem
+(3 colisões medidas na parede 8284502). Vale também para a expansão por falha,
+que tinha o mesmo risco latente.
+
+**Onde a flag vive.** `wall_stepper.OPENING_REPAIR_PREFER_CLEAN_ACTIVE`, ligada
+por `wall_modeling.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED` dentro de
+`_solve_building_blocks_all_courses_impl` — o denominador comum das duas portas
+de entrada do solver. Ligar no wrapper de desempenho fazia a MESMA entrada dar
+resultados diferentes com e sem memo (`test_performance_memo_and_caches_give_
+identical_result` pegou). Legado (`strategy=None`) não passa por aqui.
+
+**Medido na BUTANTÃ (bancada, 34 paredes, 17 fiadas, CHANNEL):** C09 429 → 373,
+C04 297 → 231, B19 413 → 395, B34 2.277 → 2.364, peças 8.958 → 8.860,
+compensadores adjacentes 69 → 42 (humano 97), meio bloco no meio da parede
+45 → 28 (humano 103), solve 34,2 s → 27,8 s. Colisões 0, não modular 0, sem
+apoio 0/0. **Custo medido:** vazado menor do B34 35 → 60 (humano 41) e
+aglomerado de especiais 11 → 16 — há mais B34 no modelo e o alinhamento entre
+fiadas deles é decidido depois, pelas §52/§60-§65.
+
+## 69. Coordenação A/B do vazado menor — IMPLEMENTADA, MEDIDA e NÃO MANTIDA (2026-09-16)
+
+Depois da §68 o vazado menor do B34 subiu de 35 para 68 na BUTANTÃ (fiadas 0–11,
+taxa 2,3% → 4,2%; humano 41 = 2,5%). **Censo das 62 violações:** a peça que viola
+nasceu em `STANDARD_FILL` 33 e em `OPENING_REPAIR_FILL` 29; o vizinho da fiada
+oposta é B39 42, B19 17, B34 3; **49 das 62 são B34 de fiada ÍMPAR contra uma
+fiada PAR** — a família resolvida em segundo lugar, que já recebe a geometria da
+primeira; 28 a ≤60 cm de uma jamba, 30 a ≤60 cm de um nó, 17 longe das duas.
+
+**O que foi implementado e medido.** A família A passou a acumular, junto com os
+vazios, as **âncoras** de vazado menor (posição do vazado menor da própria peça e
+do vazado central quando o número de células é ímpar, lidos da ÁREA e da POSIÇÃO
+das células do catálogo — nunca por nome de bloco). A família B recebia essas
+âncoras e contava quantos vazados menores seus ficariam **sem par**, entrando no
+ranking depois da regra #2 e da regra #1 e antes da trava/alinhamento genérico,
+com o mesmo termo na DP da busca exata. Duas variantes foram medidas: assumindo
+orientação fixa e considerando **as duas orientações possíveis** do B34.
+
+**Resultado: piorou.** Vazado 68 → **90** (4,2% → 5,7%), idêntico nas duas
+variantes. O critério não é inerte — ele trocou o layout escolhido **178 vezes**
+em 3.388 chamadas com âncora —, mas a troca degrada o resultado final.
+
+**Por quê.** A compatibilidade do vazado depende da **orientação** do B34, que só
+é decidida depois, pelas §52/§62, sobre a geometria final das duas famílias; e a
+composição escolhida para agradar às âncoras muda as **juntas**, tirando liberdade
+das §60/§62/§65 que rodam em seguida. O critério local otimiza um proxy que não é
+a função que o otimizador global depois persegue — e a regra #1 (junta
+desencontrada), absoluta por decisão do usuário, continua na frente de qualquer
+alinhamento.
+
+**Conclusão:** limitação de ARQUITETURA, não de busca. A coordenação foi removida
+do motor (mesmo tratamento da §67). A §68 permanece. Uma proposta mínima está no
+checkpoint: estender a §62 (DP exata de orientação, que já vê as duas famílias
+prontas) para escolher **orientação + composição equivalente de mesmo
+comprimento** dentro da corrida — a troca que a §61 já sabe fazer —, com
+aceitação por dominância global.

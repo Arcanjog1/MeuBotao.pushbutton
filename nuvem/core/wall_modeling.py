@@ -3696,6 +3696,13 @@ CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
 # registrada na secao 58.3, ainda nao tratada. O legado continua identico.
 CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
 
+# SECAO 68 (2026-09-16): no fluxo CHANNEL, a regiao de reparo de abertura
+# continua expandindo dentro do orcamento que ja' existia
+# (OPENING_REPAIR_MAX_EXTRA_BLOCKS) e fica com a MELHOR composicao em vez da
+# primeira que fecha - ver wall_stepper.OPENING_REPAIR_PREFER_CLEAN_ACTIVE.
+# Legado (`strategy=None`) nao passa por aqui: continua identico a' main.
+CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -3734,6 +3741,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     if isinstance(result, dict):
         result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
         result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
+        result["channel_repair_prefer_clean"] = bool(CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
     return result
@@ -4069,6 +4077,29 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
 
 
 def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                           catalog, base_z_abs, num_courses, **kwargs):
+    """SECAO 68 (2026-09-16) - PONTO UNICO onde a preferencia por composicao
+    limpa no reparo de abertura e' ligada/desligada, conforme a ESTRATEGIA
+    desta chamada. Fica AQUI, e nao no wrapper de desempenho, porque esta e' a
+    funcao por onde as DUAS portas de entrada passam (o wrapper com memo e a
+    chamada direta da impl): com a flag so' no wrapper, a MESMA entrada dava
+    resultados diferentes pelas duas portas - exatamente o que
+    `test_performance_memo_and_caches_give_identical_result` cobra (e pegou).
+    Legado (`strategy=None`) deixa a flag desligada: continua igual a' main."""
+    from core.engine import wall_stepper as _stepper_repair
+    saved_repair_clean = _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE
+    _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
+    try:
+        return _solve_building_blocks_all_courses_impl_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
+            num_courses, **kwargs)
+    finally:
+        _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
+
+
+def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                       variants_per_course=1,

@@ -6094,6 +6094,54 @@ def _merge_intervals_cm(intervals, tolerance_cm=1e-6):
 # assim e' uma parede em que a arquitetura brigou muito com a modulacao.
 OPENING_REPAIR_PLACEMENT_REASON = "OPENING_REPAIR_FILL"
 
+# SECAO 68 (2026-09-16) - A COMPOSICAO JAMBA->ANCORA E' UMA UNIDADE.
+# A regiao de reparo de uma abertura so' era EXPANDIDA quando o trecho NAO
+# fechava (ver OPENING_REPAIR_MAX_EXTRA_BLOCKS). Quando ela fechava MAL - com
+# meio bloco + pastilha, por exemplo - a primeira composicao que fechasse era
+# aceita na hora, e as pecas vizinhas herdadas da modulacao CONTINUA (inclusive
+# um compensador colocado antes da abertura existir) ficavam congeladas: a
+# faixa jamba->ancora nunca era composta como UMA unidade.
+# Medido na parede 8284534 do BUTANTA (evidencia humana de 2026-09-16): a faixa
+# de 75cm entre a jamba da porta e o no' do encontro sai `B19+C04+B39+C09`,
+# enquanto `_pier_ordered_layout(75)` para a MESMA faixa da' `B39+B34` - que e'
+# exatamente o que o projeto humano faz ali. A janela de reparo tinha 25cm (do
+# vao ate' a primeira peca sobrevivente) e 25cm so' fecha com `B19+C04`.
+# Com a flag ligada o laco continua expandindo DENTRO DO MESMO ORCAMENTO que ja'
+# existia e fica com a MELHOR composicao, nao com a primeira que fecha. NENHUMA
+# regra de peca nova: todo candidato continua saindo de `_pier_ordered_layout`/
+# `_pier_layout_avoiding_joints`, com os tiers, a regra #1 (desencontro de junta)
+# e o alinhamento de vazio intactos.
+# Ligada SO' no fluxo CHANNEL (wall_modeling.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED);
+# o legado (`strategy=None`) continua byte a byte igual a' main.
+OPENING_REPAIR_PREFER_CLEAN_ACTIVE = False
+
+
+def _repair_solution_quality(solution, catalog):
+    """Qualidade de uma solucao de reparo (MENOR e' melhor):
+
+        (compensadores/pastilhas,
+         meio blocos,
+         pecas de amarracao usadas como enchimento,
+         numero de pecas)
+
+    A ORDEM e' a prioridade fisica: primeiro sumir com o compensador/pastilha/
+    meio bloco, e so' entao preferir bloco inteiro a B34/B54. Assim um B34 a
+    mais NUNCA perde para um compensador - a inversao que a evidencia humana
+    de 2026-09-16 mostrou (o humano fecha com B34 a mesma faixa em que o solver
+    punha C09+B19)."""
+    comp = half = special = pieces = 0
+    for _sub, layout in solution or []:
+        for code, _start, _end in layout or []:
+            entry = catalog.get(code) or {}
+            if entry.get("is_compensator"):
+                comp += 1
+            elif code == HALF_BLOCK_CODE:
+                half += 1
+            elif entry.get("is_special_bond"):
+                special += 1
+            pieces += 1
+    return (comp, half, special, pieces)
+
 
 def _is_acerto_code(code, catalog):
     """True para as pecas que existem para FECHAR a conta, nao para
@@ -6555,6 +6603,9 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
             # no lugar seria abrir um buraco na parede para "resolver" um
             # problema que continua sem solucao.
             expansion_absorbed = set()
+            best_solution = None
+            best_quality = None
+            best_state = None
             while True:
                 # Um run pode ter crescido ate' encostar no proximo: nesse
                 # caso os dois viram UMA regiao so' (e' o caso do PILARETE
@@ -6573,8 +6624,38 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     avoid_joint_positions_cm, target_void_positions_cm, prefer_avoiding,
                 )
                 if not failures:
-                    solved = candidate_solution
-                    break
+                    if not OPENING_REPAIR_PREFER_CLEAN_ACTIVE:
+                        solved = candidate_solution
+                        break
+                    # SECAO 68: a primeira composicao que fecha nao e'
+                    # necessariamente a melhor. Guarda esta e continua
+                    # expandindo dentro do orcamento que ja' existia.
+                    quality = _repair_solution_quality(candidate_solution, catalog)
+                    if best_solution is None or quality < best_quality:
+                        best_solution = candidate_solution
+                        best_quality = quality
+                        best_state = (first, last, merged_upto, set(expansion_absorbed))
+                    if quality[0] == 0 and quality[1] == 0:
+                        break          # sem peca de acerto: nao ha' o que melhorar
+                    grew = False
+                    # NUNCA engolir peca que um reparo ANTERIOR desta mesma
+                    # fiada ja' substituiu: a esquerda desta regiao pode ser o
+                    # territorio de outra (medido - duas pecas
+                    # OPENING_REPAIR_FILL sobrepostas na parede 8284502).
+                    if (first > 0 and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS
+                            and (first - 1) not in absorbed):
+                        first -= 1
+                        grow_left += 1
+                        expansion_absorbed.add(first)
+                        grew = True
+                    if last < len(extents) - 1 and grow_right < OPENING_REPAIR_MAX_EXTRA_BLOCKS:
+                        last += 1
+                        grow_right += 1
+                        expansion_absorbed.add(last)
+                        grew = True
+                    if not grew:
+                        break
+                    continue
                 # Item 22: expandir SO' pelo lado que falhou, uma peca por
                 # vez. Uma sobra entre DOIS vaos (os dois lados abertos) nao
                 # tem lado para expandir - o tamanho dela e' consequencia
@@ -6584,7 +6665,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                 want_right = any(f.get("right_opening") is None for f in failures)
                 moved = False
                 if (want_left and first > 0
-                        and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS):
+                        and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS
+                        and (first - 1) not in absorbed):
                     first -= 1
                     grow_left += 1
                     expansion_absorbed.add(first)
@@ -6597,6 +6679,16 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     moved = True
                 if not moved:
                     break
+
+            if solved is None and best_solution is not None:
+                # SECAO 68: volta para a janela da MELHOR composicao (as pecas
+                # engolidas por expansoes piores nunca chegam a ser absorvidas).
+                solved = best_solution
+                first, last, merged_upto, expansion_absorbed = best_state
+                region = _region_bounds_for_run(
+                    first, last, extents, record["seg_start_cm"], record["seg_end_cm"],
+                    opening_intervals_cm,
+                )
 
             expansion_absorbed -= removed_set
             if solved is not None:
