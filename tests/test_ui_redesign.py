@@ -21,6 +21,10 @@ def test_family_list_distinguishes_verified_missing_and_pending():
     handler.channel_catalog_missing = []
     window._ux.update_families(window)
     assert "ainda não verificadas" in window._plan_preview._families.Text
+    handler.catalog = {"B39": {}}
+    window._ux.update_families(window)
+    assert "ainda não verificadas" in window._plan_preview._families.Text
+    assert list(window._ui_family_grid.Items)[-1].Text == "○ Pendente"
 
 
 def test_reanalysis_hides_stale_quantities_until_new_result():

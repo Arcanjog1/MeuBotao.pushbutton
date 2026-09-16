@@ -676,13 +676,19 @@ class UiComponents(object):
             row.ForeColor = self.color("Success" if status == "OK" else "Danger")
             form._ui_family_grid.Items.Add(row)
         form._ui_family_grid.ShowItemToolTips = True
-        if handler.opening_reinforcement_strategy == "CHANNEL" and not handler.channel_catalog and not handler.channel_catalog_missing:
+        channel_pending = (handler.opening_reinforcement_strategy == "CHANNEL"
+                           and not handler.channel_catalog and not handler.channel_catalog_missing)
+        if channel_pending:
             lines.append("Canaletas: verificação pendente. O backend confere as famílias antes do cálculo.")
+            pending_row = self.ns["ListViewItem"]("○ Pendente")
+            pending_row.SubItems.Add("Famílias de canaleta")
+            form._ui_family_grid.Items.Add(pending_row)
         if missing:
             lines.append("Carregue as famílias indicadas em Inserir > Carregar família e reabra a modulação.")
         form._ui_families.Text = "\r\n".join(lines)
         if hasattr(form, "_plan_preview"):
             form._plan_preview._families.Text = ("✕ {} família(s) ausente(s)".format(len(missing)) if missing else
+                "○ Canaletas\n   ainda não verificadas" if channel_pending else
                 "✓ {} família(s) disponível(is)".format(len(catalog)) if catalog else "○ Famílias\n   ainda não verificadas")
 
     def existing_setup(self, wall_count, level_name, height_m, opening_count):
