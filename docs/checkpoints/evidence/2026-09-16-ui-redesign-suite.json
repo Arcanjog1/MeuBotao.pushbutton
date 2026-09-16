@@ -1,0 +1,30 @@
+{
+  "started_utc": "2026-09-16T12:18:06.319720+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "76b758b4a9fd343f709280003571c39535bf5a9a",
+  "tree": "9db83920b2f9fdf393e2460c744c18d8b73589f2",
+  "status_before": "",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-n",
+    "4",
+    "--dist",
+    "loadfile",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 5400,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-ui-redesign-suite.txt",
+  "pid": 17776,
+  "exit_code": 1,
+  "elapsed_seconds": 1274.683,
+  "status_after": "M docs/checkpoints/2026-09-16-ui-redesign.md\n?? docs/checkpoints/evidence/2026-09-16-ui-pr42-overlap.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.txt\n?? tools/documentation/render_ui_states.py",
+  "log_sha256": "1d91076aa2c1a03ac192bf8d90f18d50f517447a6874f2dc3ef0280bb8afc99c"
+}

@@ -4,7 +4,7 @@
 {
   "date": "2026-09-16",
   "branch": "codex/modulacao-automatica-ui-redesign",
-  "head": "5fff01b1b2b7614036f0ec363797a3b598613453",
+  "head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44",
   "objective": "Redesenhar UI/UX em WinForms, com revisão explícita do plano, sem alterar motor, backend de execução ou PR #42.",
@@ -15,14 +15,17 @@
     "Regras: registrar somente contrato UX, com substituição explícita da antiga criação automática; status reconciliado ao merge #41."
   ],
   "tests": [
-    "300 passed: tests/test_ui_redesign.py, tests/test_channel_ui_and_family_gate.py, tests/test_script.py, nuvem/tests/test_progress.py; Windows CPython 3.14.6/pytest 9.1.1, 84.40s; evidence/2026-09-16-ui-redesign-final-focused.json e .txt.",
+    "301 passed / 1 warning em 61.63s, exit 0: evidence/2026-09-16-ui-redesign-delivery-focused.json e .txt; tests/test_ui_redesign.py, tests/test_channel_ui_and_family_gate.py, tests/test_script.py, nuvem/tests/test_progress.py; Windows CPython 3.14.6/pytest 9.1.1.",
     "39 passed na seleção de testes de UI, configuração, gates, docking e paredes existentes.",
-    "Renderização WinForms real fora do Revit: Python 3.13/pythonnet 3.1.0; sete estados, comparação anterior, Scale 1/1.25/1.5/1.75/2 e janela 740x520. Não equivale a DPI nativo nem smoke Revit.",
+    "Renderização WinForms real fora do Revit: Python 3.13/pythonnet 3.1.0; dez estados, comparação anterior, Scale 1/1.25/1.5/1.75/2 e janela 740x520. Não equivale a DPI nativo nem smoke Revit.",
     "check_ui_scope.py: 188 definições fora da UI intactas; handler completo e funções de threading/pump/timer intactos; engine/benchmark/loader sem diff.",
-    "Suíte completa em andamento na captura 2026-09-16-ui-redesign-suite; não declarada PASS neste checkpoint provisório."
+    "Suíte completa: 1228 passed / 3 failed / 1 warning, 1273.64s, exit 1; py -3 -m pytest tests -q -n 4 --dist loadfile -p no:cacheprovider em 76b758b; evidence/2026-09-16-ui-redesign-suite.json e .txt."
   ],
   "known_failures": [
-    "Nenhuma falha nos 300 testes focados finais; um DeprecationWarning herdado de codecs.open.",
+    "test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]: JUNCTION_MISSING_BINDING 8→9; mesma asserção documentada na main.",
+    "test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]: compensators 61→62; mesma asserção documentada na main.",
+    "test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas: UnboundLocalError ctypes, tests/test_perf_trace_stall_sampler.py:96, Windows; falha já documentada na main.",
+    "Um DeprecationWarning herdado de codecs.open.",
     "Smoke no Revit e escala nativa Windows ainda não executados; limitações funcionais descritas abaixo."
   ],
   "physical_deltas": ["Não aplicável: solver, validadores físicos, catálogo, criação, transações e geometria não alterados."],
@@ -32,14 +35,15 @@
     "Manter WinForms e callbacks existentes; não alterar threading nem implementar lógica física na apresentação."
   ],
   "decisions_pending": ["Reconciliar com #42 após seu encerramento; executar smoke Revit/DPI antes de considerar pronto."],
-  "next_steps": ["Concluir captura da suíte e publicar PR draft; nenhum merge.", "Executar checklist manual em checkout de teste isolado do #42."],
+  "next_steps": ["Revisar PR draft; reconciliar após #42, sem merge nesta missão.", "Executar checklist manual em checkout de teste isolado do #42."],
   "references": [
     {"path": "docs/PROJECT_STATUS.md"},
     {"path": "docs/UI_REDESIGN.md"},
     {"path": "nuvem/core/ui_state.py"},
     {"path": "nuvem/core/ui_components.py"},
     {"path": "tests/test_ui_redesign.py"},
-    {"path": "docs/checkpoints/evidence/2026-09-16-ui-redesign-final-focused.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-16-ui-redesign-delivery-focused.json"},
+    {"path": "docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json"},
     {"path": "docs/checkpoints/evidence/2026-09-16-ui-scope.json"}
   ]
 }
@@ -57,7 +61,7 @@ do candidato no botão em uso. A sessão do #42 permanece independente.
 
 - `origin/main` inicial e última observada: `55e990d962ed22ae1021f0d335db197607bddda1`.
 - Branch: `codex/modulacao-automatica-ui-redesign`.
-- HEAD avaliado: `5fff01b1b2b7614036f0ec363797a3b598613453`.
+- HEAD avaliado: `20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136`.
 - Checkout: `C:\Users\CIVIX\modulacao-ui-redesign`; o diretório originalmente
   fornecido pertence a outro repositório e contém trabalho de outras sessões.
 - Stack preservado: WinForms + CPython/pythonnet, pyRevit, ExternalEvent.
@@ -98,6 +102,9 @@ o Revit. Não representam resultado real de modulação.
 | Plano | Sem parada antes de criar | [quantidades e ação explícita](../ui-preview/05-plano.png) |
 | Criação | Console/log | [atividade e contagem](../ui-preview/06-criacao.png) |
 | Resultado | Popup e log | [relatório na janela](../ui-preview/07-resultado.png) |
+| Família ausente | Popup | [instrução e lista abertas](../ui-preview/08-familia-ausente.png) |
+| Gate crítico | Revisão técnica | [criação bloqueada](../ui-preview/09-gate-critico.png) |
+| Cancelamento | Avanço para próxima tela | [análise interrompida na etapa](../ui-preview/10-cancelamento.png) |
 
 [Janela mínima 740×520](../ui-preview/small-740x520.png),
 [125%](../ui-preview/scale-1.25.png), [150%](../ui-preview/scale-1.5.png),
@@ -118,25 +125,51 @@ idênticos à base. O loader já sincroniza recursivamente `core/`, incluindo os
 dois módulos novos. Não foi alterado ou instalado na extensão local.
 
 Outros arquivos: testes de UI e seus dublês, `tools/ui_preview.py`,
-`tools/documentation/check_ui_scope.py`, documentação, imagens e evidências.
+`tools/documentation/check_ui_scope.py`, `tools/documentation/render_ui_states.py`,
+documentação, imagens e evidências.
 O arquivo de regras recebe apenas o contrato UX oficial, sem novo conhecimento
 ou alteração de amarração. [Prova por AST e diff](evidence/2026-09-16-ui-scope.json).
 
 ## Testes e procedência
 
-[Captura focada final](evidence/2026-09-16-ui-redesign-final-focused.json) e
-[saída integral](evidence/2026-09-16-ui-redesign-final-focused.txt): **300 passed**,
+[Captura focada final](evidence/2026-09-16-ui-redesign-delivery-focused.json) e
+[saída integral](evidence/2026-09-16-ui-redesign-delivery-focused.txt): **301 passed,
+1 warning, 61.63s**, exit 0.
 Windows, Python 3.14.6, pytest 9.1.1. Inclui teste_script inteiro, UI,
 NONE/CHANNEL, catálogo ausente e progresso.
 Os 4 FAIL iniciais eram expectativas anteriores da UI (sem abas, rótulo antigo,
 seleção sem simular confirmação); foram atualizadas explicitamente, mantendo
 as asserções de dados/dispatch. Não foram suprimidos testes físicos.
 
-A captura focada final é de `5fff01b`; a anterior (299 passed) é de `8113143`. `8113143..c7db0fe` muda somente renderizador,
-imagens e verificador documental, comprovável por diff. A suíte completa foi
-iniciada em `76b758b`; o único delta de produção posterior é abrir a seção de
-famílias ausentes e mostrar a instrução no cabeçalho (3 linhas), coberto pela
-execução focada final. Nenhum teste de domínio mudou entre esses HEADs. A revisão `5fff01b` acrescenta somente desabilitação de ações concorrentes durante loading e um teste de UI; captura focada final concluída: 300 passed. A equivalência dos arquivos de domínio entre a suíte completa e o HEAD final é literal (nenhum diff em engine/benchmark nem no handler de execução).
+A captura focada final é de `20d7e39`; as anteriores registram 299 testes em
+`8113143` e 300 em `5fff01b`. A suíte completa foi iniciada em `76b758b`, com
+árvore limpa. Depois dela, os deltas de produção foram: abertura/instrução de
+família ausente (`8113143`), bloqueio de ações concorrentes durante loading
+(`5fff01b`) e preservação da referência Python do painel de famílias (`20d7e39`).
+Todos são de apresentação e estão cobertos pela captura focada final.
+Nenhum teste de domínio mudou entre esses HEADs. Engine/benchmark/loader têm
+diff vazio; o handler de execução continua idêntico por AST.
+
+A renderização nativa adicional encontrou um erro que os dublês não expunham:
+recuperar o painel por `Controls[index]` devolvia um wrapper pythonnet sem o
+método Python auxiliar. A correção conserva a referência original; as três
+renderizações de erro/cancelamento passaram após o ajuste. Esse ensaio é do
+pythonnet local, não prova de compatibilidade do runtime embutido do pyRevit.
+
+[Suíte completa](evidence/2026-09-16-ui-redesign-suite.json),
+[log integral](evidence/2026-09-16-ui-redesign-suite.txt): **1228 passed,
+3 failed, 1 warning, 1273.64s**. Não é PASS. As três falhas coincidem por nome
+e asserção com o [checkpoint oficial anterior](2026-09-14-channel-final-merge.md):
+
+| Teste | Asserção observada |
+|---|---|
+| `test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]` | `JUNCTION_MISSING_BINDING`: 8 → 9 |
+| `test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]` | `compensators`: 61 → 62 |
+| `test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas` | `UnboundLocalError: ctypes` no Windows, linha 96 |
+
+Não foi feita nova execução completa da base nesta missão: a atribuição histórica
+usa o checkpoint oficial e a identidade do código de domínio. Baselines e testes
+dessas falhas não foram alterados. O warning é `codecs.open` obsoleto.
 
 ## Limitações restantes e riscos
 
@@ -165,9 +198,33 @@ execução focada final. Nenhum teste de domínio mudou entre esses HEADs. A rev
 8. **PR #42:** sobreposição textual em `wall_modeling.py`, regras e status.
    Reaplicar apenas os hooks de UI depois de preservar o solver do #42; nunca
    resolver por substituição integral de arquivo. Nenhum commit nesta branch
-   usa o #42 como ancestral.
+   usa o #42 como ancestral. Na observação `7724ab6` do #42, a comparação de
+   funções por AST encontrou **zero funções alteradas em comum** em
+   `wall_modeling.py`; [mapa de sobreposição](evidence/2026-09-16-ui-pr42-overlap.json).
+   Isso reduz o risco textual, mas não substitui a reconciliação após o #42.
 
 ## Smoke e integração
+
+| Critério de aceitação do pedido | Evidência / situação |
+|---|---|
+| 1. Fluxo inteiro mapeado | Inventário e mapa de callbacks, incluindo loader/fallbacks/união |
+| 2. Wizard claro | Seis etapas lógicas, cabeçalho persistente, áreas de revisão/plano/resultado |
+| 3. Estratégia clara | NONE/CHANNEL, família pendente/ausente/disponível, LINTEL não selecionável |
+| 4. Paredes existentes | Instrução, confirmação da seleção, coleta automática e reforço explícito |
+| 5. Progresso informativo | Contador, percentual, etapa e tempo nos callbacks; fase CAD permanece pendente |
+| 6. Erros acionáveis | Gates/famílias/geometria desatualizada nas telas principais; fallbacks legados permanecem |
+| 7. Logs secundários | Recolhidos por padrão |
+| 8. Resultado final | Relatório em áreas de resultados, validação, avisos, retenções, famílias e desempenho |
+| 9. DPI | Render e Scale ensaiados; Windows/Revit nativo pendente |
+| 10. Nenhum solver alterado | Diff vazio de engine/benchmark, 188 definições e handler intactos |
+| 11. Nenhuma regra física na UI | Adaptação dos resultados e gates emitidos; nenhum cálculo geométrico |
+| 12. Loading/cancelamento | Testes de estados, ausência de auto-criação, cancelamento e concorrência; smoke Revit pendente |
+| 13. Fluxo anterior | 301 testes focados, incluindo test_script completo; mudança intencional somente na interação documentada |
+| 14. Smoke manual | **Não executado no Revit; não está PASS** |
+
+Consulta de API usada apenas para apresentação do nome do documento:
+[Document.Title — Revit API Docs 2027](https://www.revitapidocs.com/2027/6cbb045c-a145-04f2-0a26-1ac9285c4d17.htm).
+As ações de seleção/zoom continuam usando os callbacks já existentes.
 
 Checklist em [UI_REDESIGN](../UI_REDESIGN.md#smoke-manual-obrigatório-registrar-evidência-não-presumir-pass),
 todo pendente no Revit. Revisar o draft, reconciliar após #42 e executar esse

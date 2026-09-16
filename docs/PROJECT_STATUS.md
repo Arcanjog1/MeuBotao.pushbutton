@@ -4,7 +4,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
 
 ```json
 {
-  "observed_utc": "2026-09-16T12:22:31.088337+00:00",
+  "observed_utc": "2026-09-16T12:44:04.122514+00:00",
   "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
@@ -79,7 +79,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
     },
     {
       "branch": "codex/modulacao-automatica-ui-redesign",
-      "head": "5fff01b1b2b7614036f0ec363797a3b598613453",
+      "head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
       "pr": 44
     }
   ]
@@ -91,7 +91,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
 | MAIN / HEAD observado | `55e990d962ed22ae1021f0d335db197607bddda1` (merge documental do **#41**; #40 CHANNEL em `61d4f6c`); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
 | Documentação oficial pós-CHANNEL | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD final `1aff5e0`, integrado em `55e990d` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only**: nenhuma mudança de produção, benchmark, baseline ou norma — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
-| UI candidata | `codex/modulacao-automatica-ui-redesign`, HEAD avaliado `5fff01b`, [PR #44 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44): etapas, plano antes da criação, logs recolhíveis, relatório, seleção e famílias. **PARTIAL**, smoke Revit/DPI e fase inicial CAD pendentes; nenhuma mudança física. [Entrega](checkpoints/2026-09-16-ui-redesign.md). Sem merge. |
+| UI candidata | `codex/modulacao-automatica-ui-redesign`, HEAD avaliado `20d7e39`, [PR #44 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44): etapas, plano antes da criação, logs recolhíveis, relatório, seleção e famílias. **PARTIAL**, smoke Revit/DPI e fase inicial CAD pendentes; nenhuma mudança física. [Entrega](checkpoints/2026-09-16-ui-redesign.md). Sem merge. |
 | Solver #42 | Aberto, `claude/butanta-modulation-physical-fixes`; observação de HEAD no JSON acima. Não é base da UI, não integrado nem validado por esta entrega. Reconciliar somente após encerramento do #42. |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |
