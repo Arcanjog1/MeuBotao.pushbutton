@@ -169,3 +169,13 @@ def test_busy_blocks_competing_actions_and_new_plan_requires_new_review():
     assert window._review_check.Enabled
     assert not window._review_check.Checked
     assert not window._delete_button.Enabled
+
+
+def test_missing_family_opens_inline_details_on_construction():
+    handler = m._PostCreationEventHandler()
+    handler.catalog_missing = [{"logical_code": "B39", "family_name": "Bloco 39",
+                                "type_name": "39", "reason": "Ausente"}]
+    window = m._PostCreationForm({"kpis": [], "issues": [], "log": ""}, None, handler, [])
+    assert window._ui_family_disclosure._expanded
+    assert "Faltam famílias" in window._ui_header._instruction.Text
+    assert not window._solve_button.Enabled

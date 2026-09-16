@@ -217,7 +217,8 @@ class UiComponents(object):
         family_box.Font = self.ns["_ui_font"](9.5)
         family_box.WordWrap = True
         form._ui_families = family_box
-        pages[0].Controls.Add(self.expandable(family_box, "Famílias e reforço", False, 200))
+        family_disclosure = self.expandable(family_box, "Famílias e reforço", False, 200)
+        pages[0].Controls.Add(family_disclosure)
 
         plan = self.ns["_monospace_textbox"]("Analise a modulação para ver a quantidade de blocos por peça e por todas as fiadas.")
         plan.Font = self.ns["_ui_font"](10)
@@ -280,7 +281,9 @@ class UiComponents(object):
         form.Controls.Add(form._ui_header)
         form._footer_note.Text = "Relatório e logs disponíveis na aba Resultado e relatório."
         self.update_families(form)
-        form._ui_family_disclosure = pages[0].Controls[1]
+        # Hold the original Python wrapper: retrieving Controls[index] may
+        # produce a new pythonnet wrapper without our presentation attributes.
+        form._ui_family_disclosure = family_disclosure
         if form._handler.catalog_missing:
             form._ui_family_disclosure._set_expanded(True)
             self.set_step(form._ui_header, 3, "Faltam famílias. Carregue os tipos indicados abaixo e reabra a modulação.")
