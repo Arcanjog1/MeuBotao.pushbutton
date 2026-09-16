@@ -281,6 +281,9 @@ class UiComponents(object):
         form._footer_note.Text = "Relatório e logs disponíveis na aba Resultado e relatório."
         self.update_families(form)
         form._ui_family_disclosure = pages[0].Controls[1]
+        if form._handler.catalog_missing:
+            form._ui_family_disclosure._set_expanded(True)
+            self.set_step(form._ui_header, 3, "Faltam famílias. Carregue os tipos indicados abaixo e reabra a modulação.")
         # Give the result a scrollable content extent so expanding both
         # disclosures cannot reduce the report to zero height.
         result_content = self.panel("Top", 720)
