@@ -9045,6 +9045,60 @@ real (parede de 604 cm, T em t=177 com a peça de nó terminando em 204, jamba e
   (padrão vertical acima de especiais);
 - controle: posição já boa não se move.
 
+### 66.3 Custo do planejamento — perfil antes de otimizar
+
+Perfil do planejamento na bancada (6 aberturas examinadas das 24 detectadas):
+
+| Parte | Medida |
+|---|---|
+| Aberturas detectadas (`REQUIRED`) | 24 |
+| Deslocamentos seguros enumerados | 126 |
+| Descartados pela pré-triagem aritmética (`piers_close`) | 96 (76%) |
+| Solves de cluster | 30 (1,9 s cada) |
+| Tempo em solves de cluster | 57,1 s de 58,3 s (**98%**) |
+| Detecção | 0,1 s |
+
+**Duas etapas.** O *ranking* passa a usar um solve **barato** do cluster (sem o
+arranjo das §60–65, que é ~80% do solve) e o **vencedor é confirmado com o fluxo
+completo** antes de virar plano. Sem a confirmação, **2 de 3** propostas do
+ranking barato entrariam erradas — e no Revit real a confirmação reprovou
+exatamente 2 das 3 (`8284546` vão 0 e `8284522` vão 2).
+
+**Cache por chave física** (paredes do cluster, vão, deslocamento, fiadas) —
+nunca `id()` nem ordem de lista.
+
+| | antes | **depois** |
+|---|---|---|
+| Planejamento (bancada) | 57,3 s | **24,8 s** |
+| Planejamento (Revit real) | 711 s | **211 s** |
+| Decisões | — | **idênticas** |
+
+**Medido e descartado** (não entrou no motor): filtro aritmético por *mínimo de
+peças de acerto* no pilarete/faixa. Com as juntas de contorno corretas
+(`comprimento + 1 − bordas_com_junta`), a conta diz **custo 0** para os pilaretes
+da 8284534 tanto em 0 quanto em +5 — e mesmo assim o solve real ganha 3 peças de
+acerto com +5. O mínimo teórico não prevê o que o assentamento faz: o filtro
+descartava ganho real. Também descartado: ranquear só na parede da abertura
+(perde o vencedor).
+
+### 66.4 Guarda de interferência e marca de idempotência
+
+**Guarda.** `plan_micro_adjustments` aceita
+`offset_allowed(wall_idx, opening_index, offset)`. Quem enxerga o Revit é o
+chamador: ele varre o envelope da abertura **da posição atual até a final** e
+recusa o deslocamento que atravesse porta, janela, pilar, viga, generic model,
+mobiliário, casework, equipamento ou **outra parede** — ignorando a parede
+anfitriã e as peças do próprio lote. Não basta a posição final estar livre: o
+caminho também tem de estar. O deslocamento recusado **não chega a ser avaliado**
+(não gasta solve) e fica registrado em `blocked_offsets_cm`.
+
+**Marca.** Cada abertura movida recebe, no próprio elemento
+(`MICROAJUSTE off=±X`), o deslocamento **acumulado desde a posição original do
+projeto**. O planejamento lê a marca e passa `moved_so_far_cm`, de modo que o
+teto de 10 cm vale para o total e **não por execução** — sem isso a abertura
+passearia 10 cm a cada rodada. Execuções seguintes sobre um modelo já ajustado
+não movem nada de novo.
+
 ## 67. Fronteira de banda da parede 8284557 — LIMITAÇÃO MEDIDA, não falha de busca (2026-09-16)
 
 O maior resíduo de vazado menor da BUTANTÃ estava na parede **8284557** (514 cm,
