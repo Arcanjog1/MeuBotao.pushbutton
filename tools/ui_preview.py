@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tests"))
@@ -31,6 +32,8 @@ for name in list(sys.modules):
 sys.modules.update(real_modules)
 
 source = (ROOT / "nuvem/core/wall_modeling.py").read_text(encoding="utf-8")
+if "--before" in sys.argv:
+    source = subprocess.check_output(["git", "show", "55e990d962ed22ae1021f0d335db197607bddda1:nuvem/core/wall_modeling.py"], cwd=ROOT).decode("utf-8")
 ns = dict(m.__dict__)
 start = source.index('import clr\nclr.AddReference("System.Windows.Forms")')
 end = source.index('def build_report_highlights(', start)
@@ -79,6 +82,7 @@ def render(form, output, scale=1.0):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", required=True)
+    parser.add_argument("--before", action="store_true")
     args = parser.parse_args()
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -98,6 +102,11 @@ def main():
     results = {}
     for name, window in forms:
         results[name] = render(window, out / (name + ".png"))
+    if args.before:
+        for _, window in forms:
+            window.Dispose()
+        print(json.dumps(results))
+        return
     form._ux.solved(form)
     form._solve_console.mark_complete("Análise concluída. Confira o plano de blocos.")
     results["05-plano"] = render(form, out / "05-plano.png")
