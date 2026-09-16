@@ -465,3 +465,89 @@ nenhum `skip`/`xfail` novo. Evidência:
 - **§66**: as guardas de segurança cobrem ponta de parede, outras aberturas da
   mesma parede e distância a nó; **não** verificam colisão com famílias que não
   sejam aberturas.
+
+## 15. Fechamento — 8284557, custo da §66, guarda de interferência e aplicação no Revit (2026-09-16)
+
+Commits: `278fdaa` (custo da §66), `04fb124` (guarda), `8e3ad56` (correção do
+kwarg), `126cf7b` + `0b3c2a4` (docs §66.3/§66.4/§67).
+
+### 15.1 8284557 — limitação medida, não falha de busca
+
+Ver §67 das regras. A fiada 4 é uma família sozinha, fronteira entre as bandas;
+as interfaces que violam são `(1,2)` e `(2,3)`, peso 1 cada, e as internas das
+bandas — peso 6 e 2 — estão limpas. Enumerando os layouts da fronteira com a
+orientação exata aplicada a cada um, os pares alcançáveis são **(0,4), (2,2) e
+(4,0)**: a soma é **invariante em 4**. Busca conjunta sobre as 5 famílias
+(K = 8, 32.768 combinações) também para em 4. Trocar a fase de uma banda inteira
+limparia duas interfaces de peso 1 e sujaria uma de peso 6 — a escolha atual é a
+de menor custo.
+
+Uma coordenação entre bandas foi implementada e medida: **ganho zero em toda a
+BUTANTÃ** (assinatura de peças idêntica). Não foi mantida no motor.
+
+### 15.2 §66 — custo
+
+| | antes | **depois** |
+|---|---|---|
+| Planejamento (bancada, 6 aberturas) | 57,3 s | **24,8 s** |
+| Planejamento (Revit real) | 711 s | **211 s** |
+| Solves de cluster | 30 (1,9 s) | 34 (0,7 s) |
+| Decisões | — | **idênticas** |
+
+Duas etapas (ranking barato sem o arranjo + confirmação exata do vencedor) e
+cache por chave física. **A confirmação não é enfeite**: no Revit real ela
+reprovou **2 das 3** propostas do ranking barato (`8284546` vão 0 e `8284522`
+vão 2). Duas tentativas de atalho foram medidas e **descartadas** por mudarem
+decisões: filtro aritmético por mínimo de peças de acerto e ranking só na parede
+da abertura.
+
+### 15.3 Guarda de interferência
+
+`offset_allowed` recusa o deslocamento cuja **varredura** (posição atual →
+final) atravesse porta, janela, pilar, viga, generic model, mobiliário, casework,
+equipamento ou outra parede — ignorando a parede anfitriã e as peças do próprio
+lote. O recusado não é avaliado e fica em `blocked_offsets_cm`. Na BUTANTÃ,
+**nenhum** dos deslocamentos avaliados foi bloqueado (0 bloqueios nas três
+execuções).
+
+### 15.4 Idempotência da posição da abertura
+
+Cada abertura movida carrega no próprio elemento a marca `MICROAJUSTE off=±X`
+com o deslocamento **acumulado desde a posição original do projeto**. O
+planejamento lê a marca (`moved_so_far_cm`), de modo que o teto de 10 cm vale
+para o **total**. As 5 aberturas movidas em 15/09 foram semeadas com o valor já
+aplicado (5/5/5/10/5 cm); a 8284534 vão 0 recebeu +5 cm nesta rodada e ficou
+marcada.
+
+### 15.5 Aplicação REAL no TARGET — três execuções completas
+
+Cada execução: ler marcas → resolver → planejar (com guarda) → mover →
+**recoletar a geometria do modelo** → re-resolver → recriar o lote → releitura.
+
+| Execução | Requeridas | Movidas | Planejadas | Criadas | Carimbadas | Lotes | Falhas | Releitura | Assinatura |
+|---|---|---|---|---|---|---|---|---|---|
+| run1 | 24 | 0 | 8.923 | **8.923** | 8.926 → 8.923 | 1 | 0 | **0/8.923** | `a3b6abf6ba4b` |
+| run2 | 24 | 0 | 8.923 | **8.923** | 8.923 → 8.923 | 1 | 0 | **0/8.923** | `a3b6abf6ba4b` |
+| run3 | 24 | 0 | 8.923 | **8.923** | 8.923 → 8.923 | 1 | 0 | **0/8.923** | `a3b6abf6ba4b` |
+
+`planejadas == criadas` nas três; **um único lote** (zero órfãos); colisões 0,
+não modular 0, preflight ok, violações de abertura 0; **zero deriva** (nenhuma
+abertura se moveu de novo, marcas idênticas); `IsModified` do humano **False**
+antes e depois; TARGET `IsModified=True` (não salvo, para inspeção visual).
+
+### 15.6 Medido no lote final (Revit real)
+
+| Régua (fiadas 0–12, 34 paredes) | Humano | **Lote final** |
+|---|---|---|
+| Vazado menor do B34 desalinhado | 41 | **33** |
+| `C09` no escopo da régua | 62 | 182 (era 241) |
+
+Comparador humano por lado de vão (88 lados): `PHYSICALLY_EQUIVALENT` **38**,
+`SOLVER_BETTER` **13**, `VALID_ALTERNATIVE` **3**, `SOLVER_WORSE` **34** — o
+melhor da missão (era 25 / 10 / 2 / 51 no início).
+
+### 15.7 Corpora legados
+
+TGD V2 e TP1 V1 **idênticos** ao commit anterior (3.681 e 4.043 achados):
+o microajuste e a guarda só existem sob chamada explícita, e `strategy=None`
+continua byte a byte igual à main.
