@@ -789,7 +789,7 @@ class TabPage(_Control):
 class TabControl(_Control):
     def __init__(self, *args, **kwargs):
         _Control.__init__(self, *args, **kwargs)
-        self.TabPages = _ControlCollection()
+        self.TabPages = self.Controls  # WinForms exposes pages as child controls.
         self.SelectedIndex = 0
 
 

@@ -7488,6 +7488,31 @@ a substituição.
 
 ---
 
+## UX-20260916 — contrato de revisão antes da criação
+
+**REGRA OBRIGATÓRIA — orientação explícita do usuário no pedido de redesign
+de UI de 2026-09-15, retomado em 2026-09-16.** Trata exclusivamente da
+interação; nenhuma regra física de amarração ou critério do solver é alterado.
+
+- O cálculo apresenta o plano e as quantidades antes de criar blocos.
+  A criação exige a ação explícita **Criar blocos no Revit**.
+- **CONFLITO RESOLVIDO:** a orientação de 2026-08-27 de criar automaticamente
+  ao terminar o cálculo fica substituída por essa revisão prévia. O motor e
+  os dados planejados permanecem os mesmos.
+- Erro crítico já emitido pelo backend desabilita a criação; avisos não
+  recebem novos critérios físicos na interface. Gates continuam no backend.
+- NONE e CHANNEL são escolhas explícitas. Verga/contraverga não é oferecida
+  como funcional. A ausência de preferência mantém NONE.
+- Antes de recriar, explicar que o lote anterior será substituído e confirmar.
+- Cancelar análise/ajustes preserva o que já foi aplicado; informar isso ao
+  usuário. Não prometer rollback que o backend não oferece.
+- Contagens não disponíveis devem aparecer como indisponíveis, nunca como zero
+  ou sucesso presumido. Logs técnicos são secundários; falhas e retenções
+  continuam visíveis no relatório.
+
+Implementação candidata: branch `codex/modulacao-automatica-ui-redesign`.
+Validação real em Revit/DPI consta como pendência no relatório de entrega.
+
 ## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
 
 > **STATUS: IMPLEMENTADO — estratégia OFICIAL** (decisão do usuário 2026-09-14,
