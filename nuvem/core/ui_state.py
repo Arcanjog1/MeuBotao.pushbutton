@@ -2,15 +2,43 @@
 """Presentation of existing backend results. No Revit, geometry or solver imports."""
 from collections import Counter
 
-STEPS = ("Configuração", "Paredes", "Revisão", "Modulação", "Criação", "Resultado")
+STEPS = ("Configuração", "Paredes", "Modulação", "Revisão", "Criação", "Resultado")
 TOKENS = {
-    "Primary": (32, 91, 157), "Success": (25, 112, 75),
-    "Warning": (146, 83, 12), "Danger": (175, 42, 42),
-    "Surface": (255, 255, 255), "Background": (244, 246, 248),
-    "Border": (214, 221, 229), "TextPrimary": (32, 44, 58),
-    "TextSecondary": (83, 99, 117), "Hover": (24, 72, 126),
-    "Pressed": (18, 54, 95),
+    "Primary": (55, 108, 166), "Success": (115, 198, 157),
+    "Warning": (232, 187, 107), "Danger": (240, 139, 139),
+    "Surface": (39, 45, 53), "Background": (30, 35, 42),
+    "SurfaceAlt": (47, 54, 63), "Border": (66, 75, 86),
+    "TextPrimary": (234, 238, 243), "TextSecondary": (173, 185, 198),
+    "Hover": (66, 123, 184), "Pressed": (42, 87, 136),
 }
+SPACING = (4, 8, 12, 16, 24, 32)
+TYPE = {"Title": 14, "SectionTitle": 10, "FieldLabel": 9,
+        "Body": 9, "HelperText": 8.25, "Status": 9}
+
+
+def friendly_problem(detail):
+    """Translate presentation only; raw diagnostics remain in technical details."""
+    text = str(detail or "")
+    lower = text.lower()
+    for words, message in (
+        (("modificada", "deslocado", "rotacionado"), "Parede modificada. Selecione novamente e reanalise antes de criar."),
+        (("prism", "collision", "colisão", "sobrepos"), "Possível sobreposição de blocos. Revise no modelo."),
+        (("junction", "cross_band", "binding", "amarra"), "Problema de amarração. Revise o encontro das paredes."),
+        (("abertura", "opening", "vao", "vão"), "Abertura requer revisão. Confira posição e dimensões."),
+        (("famil", "famíl", "catalog"), "Família necessária não encontrada. Confira a lista de famílias."),
+        (("pilarete", "boneca", "curto"), "Trecho curto de parede requer revisão."),
+    ):
+        if any(word in lower for word in words):
+            return message
+    return "Parede requer revisão. Visualize no modelo e consulte os detalhes."
+
+
+def activity_text(detail):
+    text = str(detail or "")
+    lower = text.lower()
+    if any(x in lower for x in ("physical", "candidate", "prism", "cross_band", "junction", "solver 18", "etapa 3b")):
+        return "Calculando modulação…"
+    return text.replace("solver", "cálculo").replace("Solver", "Cálculo")
 
 
 def elapsed_text(seconds):
@@ -68,7 +96,7 @@ def wall_label(row):
 
 
 def family_rows(catalog, missing):
-    rows = [("OK", code, "Disponível") for code in sorted(catalog or {})]
+    rows = [("OK", code.replace("CHANNEL_U_", "Canaleta ").replace("CHANNEL_", "Canaleta "), "Disponível") for code in sorted(catalog or {})]
     rows.extend(("Ausente", m.get("logical_code", ""),
                  "{} / {} — {}".format(m.get("family_name", ""), m.get("type_name", ""),
                                        m.get("reason", "Carregue a família no projeto"))) for m in missing or [])
@@ -86,7 +114,7 @@ class ModulationUiState(object):
         self.result = None
 
     def start(self, step):
-        self.step, self.status, self.can_create = step, "loading", False
+        self.step, self.status, self.can_create = step, {2: "analyzing", 3: "solving", 5: "creating"}.get(step, "loading"), False
 
     def solved(self, result, missing=(), channel_missing=()):
         self.result = result
@@ -121,7 +149,7 @@ class ModulationUiState(object):
             lines.append("Quantidade de todas as fiadas: indisponível neste resultado. Reanalise para atualizar.")
         else:
             lines.append("{} blocos planejados (todas as fiadas)".format(sum(counts.values())))
-            lines.extend("  {}: {}".format(k, counts[k]) for k in sorted(counts))
+            lines.extend("  {}: {}".format(k.replace("CHANNEL_U_", "Canaleta ").replace("CHANNEL_", "Canaleta "), counts[k]) for k in sorted(counts))
         if creation is not None:
             lines.extend(["{} bloco(s) criado(s)".format(creation.get("created_count", 0)),
                           "Falhas de criação: {}".format(len(creation.get("failures") or []))])
@@ -130,7 +158,7 @@ class ModulationUiState(object):
         preflight = result.get("beta_preflight") or {}
         if preflight and not preflight.get("ok"):
             for key in ("errors", "opening_violations", "collisions"):
-                lines.extend("Crítico: {}".format(item) for item in preflight.get(key) or [])
+                lines.extend("Crítico: " + friendly_problem(item) for item in preflight.get(key) or [])
         lines.extend(["", "AVISOS / REVISÃO",
                       "Colisões relatadas: {}".format(len(result.get("collisions") or [])),
                       "Violações de aberturas relatadas: {}".format(len(result.get("door_void_violations") or [])),
@@ -138,14 +166,14 @@ class ModulationUiState(object):
                           1 for a in (result.get("wall_bond_audits") or {}).values() if not a.get("ok")))])
         lines.extend(["", "PAREDES NÃO MODULADAS"])
         retained = result.get("unmodulated_walls") or []
-        lines.extend("Eixo {} (temporário): {}".format(w.get("wall_idx"), w.get("reason", "Revisar")) for w in retained)
+        lines.extend("Parede retida {}: {}".format(i, friendly_problem(w.get("reason"))) for i, w in enumerate(retained, 1))
         if not retained:
             lines.append("Nenhuma retenção informada pelo motor.")
         if creation:
-            lines.extend(str(f) for f in creation.get("failures") or [])
-        for row in handler.error_rows or []:
+            lines.extend(friendly_problem(f) for f in creation.get("failures") or [])
+        for number, row in enumerate(handler.error_rows or [], 1):
             lines.append("{} — {}: {}".format("Corrigido" if row.get("resolved") else "Requer revisão",
-                                              wall_label(row), row.get("problem_text", "")))
+                                              "Parede {}".format(number), friendly_problem(row.get("problem_text", ""))))
         lines.extend(["", "FAMÍLIAS"])
         families = dict(handler.catalog or {})
         families.update(handler.channel_catalog or {})
