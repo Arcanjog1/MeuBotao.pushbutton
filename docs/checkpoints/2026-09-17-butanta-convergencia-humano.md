@@ -1,7 +1,9 @@
 # PR #42 — Convergência com o projeto humano (2026-09-17)
 
-Branch `claude/butanta-modulation-physical-fixes`, base `2521d1e` (§71), HEAD desta missão
-`cf0277e`. **Não mergeado, PR continua draft.** Legado (`strategy=None`) byte-idêntico do começo
+Branch `claude/butanta-modulation-physical-fixes`, base `2521d1e` (§71), último commit de motor
+`2c55211` (§74). **Não mergeado, PR continua draft.** **Status: READY FOR FINAL REVIT SMOKE** — todo
+o offline está verde; a aplicação real no Revit ficou PENDENTE por bloqueio modal sem acesso humano
+(§7.10). Legado (`strategy=None`) byte-idêntico do começo
 ao fim: 8.939 peças, assinatura `0a2704e4faaf`.
 
 Régua de tudo neste documento: **as 34 paredes de alvenaria do BUTANTÃ R08_LT, 1º PAV, fiadas
@@ -576,6 +578,216 @@ então a sensibilidade residual do projeto real **não vem da regra de posse do 
 
 ---
 
+## 7.10 RESTAURAÇÃO CONTROLADA DO TARGET — PASSO 1 FEITO, 2 a 10 BLOQUEADOS
+
+Autorização de 2026-09-17: tratar o purge/reset do TARGET como **restauração controlada** (10
+checagens obrigatórias) e só então aplicar a §74 no Revit (run 1 / run 2 / run 3 se preciso).
+
+**Executado: só o passo 1.** Os passos 2 a 10 e a aplicação **não foram executados**. O Revit
+bloqueou o canal MCP com um modal e o usuário não estava na máquina para dispensá-lo. **Nada foi
+salvo, nada foi apagado, nada foi movido** — o arquivo em disco continua exatamente como estava.
+
+### PRE_RESET — leitura real feita às 14:21, ANTES do modal (`q_preflight.py`, só leitura)
+
+| campo | valor |
+|---|---|
+| TARGET | `butanta testes` — `C:\Users\twitc\Desktop\CIVIX\butanta testes.rvt` |
+| `IsModified` do TARGET | `true` (memória diverge do disco; o disco tem a modulação salva) |
+| HUMANO | `BUTANTÃ - R08_LT (...) (1)` — **`IsModified = false`** |
+| documento ativo (na leitura) | o HUMANO — por isso `q_activate.py` foi chamado em seguida |
+| lotes carimbados | **1 lote**, `20260917-022526`, **8.737 peças** |
+| paredes | 46 |
+| marcas `MICROAJUSTE off=` | 3 — `8078984 +10,0`, `8078986 +10,0`, `8079001 +10,0` |
+| transação no TARGET | possível (`Transaction.Start()/RollBack()` OK) |
+
+**Deslocamento das aberturas vigiadas, conferido contra `aberturas_originais.json`:**
+
+| abertura | original (cm) | estado atual (cm) | Δ |
+|---|---|---|---|
+| 8078992 / 93 / 94 / 95 | — | idêntico | **0,000** |
+| 8078996 / 97 | — | idêntico | **0,000** |
+| 8079002 | — | idêntico | **0,000** |
+| **8079001** | 363,99 · 1137,00 | 373,99 · 1137,00 | **+10,000** |
+
+Ou seja: das 44 aberturas, **3 estão deslocadas 10 cm** (as três com marca), total 30 cm — é
+exatamente o que a §66 aplicou nas execuções de madrugada. É esse deslocamento que o
+`r_reset_vaos.py` desfaria.
+
+### Check 1 — cópia de segurança do TARGET salvo: **FEITO E VERIFICADO**
+
+```
+C:\Users\twitc\Desktop\CIVIX\_backup_missao_s74\butanta testes (BACKUP pre-reset 2026-09-17).rvt
+181.641.216 bytes · mtime preservado 2026-09-17 09:40:09
+sha256 30cdec3bae86f34cfa735f08921e0b747d9509cd984091171b53518a27dfd2f1  (idêntico ao original)
+```
+
+O Revit ainda mantém os próprios backups rotativos na pasta (`butanta testes.0001..0007.rvt`);
+o `.0007` é de 16/09 20:12, **anterior** ao lote atual — não foi usado nem tocado.
+
+### O bloqueio — evidência, não suposição
+
+`journal.0078.txt`, 17-Sep-2026 14:21:58, logo depois do `Jrn.Activate "[butanta testes.rvt]"`:
+
+```
+Jrn.Data "Interrupt" , "SaveReminder" , ""
+' TaskDialog "Você não salvou seu projeto recentemente. O que deseja fazer?"
+'Id : TaskDialog_Project_Not_Saved_Recently
+'CommonButtons : Cancel
+'Command Links: 1001 Salvar o projeto | 1002 Salvar e definir intervalos | 1003 Não salve e defina intervalos
+'DefaultButton : 1001
+```
+
+O modal roda no laço de mensagens do Revit e **congela o evento externo do pyRevit** — toda
+chamada MCP fica enfileirada. O censo PRE_RESET ficou 13 min na fila sem executar; um `ping`
+trivial também não voltou. Não há saída pela API: quem está bloqueado é o próprio canal.
+
+Duas tentativas de dispensar o modal por automação de UI (P/Invoke e depois UI Automation, esta
+última **só para enumerar** as janelas) foram **negadas pelo classificador de permissões**. Não
+insisti nem tentei contornar.
+
+### Checagens 2 a 10 — não executadas
+
+| # | checagem | status |
+|---|---|---|
+| 1 | cópia de segurança do TARGET salvo | ✅ **feito**, sha256 conferido |
+| 2 | remover SOMENTE elementos carimbados/owned | ⏸ pendente — script pronto: `rv/r_purga.py` |
+| 3 | confirmar 0 peças owned restantes | ⏸ pendente |
+| 4 | confirmar 0 lotes antigos/órfãos | ⏸ pendente — órfão = instância de família do catálogo do plugin SEM carimbo |
+| 5 | executar `r_reset_vaos.py` | ⏸ pendente |
+| 6 | provar as 44 aberturas na coordenada original | ⏸ pendente — `rv/q_censo_estado.py` mede Δ por abertura |
+| 7 | confirmar 0 deslocamentos residuais | ⏸ pendente |
+| 8 | não alterar o HUMANO | ✅ até aqui: `IsModified = false` em toda leitura |
+| 9 | preflight/fingerprint do estado resetado | ⏸ pendente |
+| 10 | só prosseguir se tudo bater | ⏸ **não prossegui** |
+
+### O que falta rodar, na ordem (tudo já escrito e revisado)
+
+```bash
+sh rv/run.sh q_activate.py        # ativa o TARGET (o r_apply exige doc ativo)
+sh rv/run.sh q_censo_estado.py    # PRE_RESET: carimbadas, lotes, órfãos, Δ das 44 aberturas
+sh rv/run.sh r_purga.py           # checks 2-4 (mesma regra de carimbo do r_apply)
+sh rv/run.sh r_reset_vaos.py      # check 5
+sh rv/run.sh q_censo_estado.py    # POST_RESET: checks 6-7 (0 deslocamento, 0 marca)
+sh rv/run.sh q_preflight.py       # check 9
+sh rv/run.sh r_apply.py           # §74 run 1  (~17 min)
+sh rv/run.sh r_apply.py           # §74 run 2  (~17 min)
+sh rv/run.sh r_apply.py           # run 3 só se a run 2 ainda mover abertura
+```
+
+`r_purga.py` é novo nesta rodada e usa **exatamente** `wm._parse_block_lot_stamp` — a mesma
+definição de "peça do plugin" que o `r_apply.py` usa — para não sobrar órfão nem tocar em nada do
+humano. Ele aborta antes de qualquer escrita se `H.IsModified` não for `False`.
+
+**A aplicação real da §74 no Revit continua PENDENTE.** Nenhum número de Revit desta seção foi
+estimado: o que está aqui foi lido do modelo às 14:21 ou do journal.
+
+---
+
+## 7.11 VALIDAÇÃO OFFLINE DA §74 — TUDO VERDE (HEAD `2c55211`)
+
+Com o Revit fora do ar, tudo que **não** depende dele foi refeito na HEAD atual.
+
+### Auditoria do código — a mudança é uma linha de comparação
+
+| pergunta | resposta |
+|---|---|
+| quantos pontos do motor usam a tolerância nova? | **um** — `wall_stepper.py:1494`, dentro de `_t_intersection_room_ok` |
+| alguma constante mudou? | **nenhuma**. `PIER_PHYSICAL_FIT_TOLERANCE_CM = PIER_LAYOUT_TOLERANCE_CM = MODULATION_WHOLE_CM_TOLERANCE_CM = 0,05 cm`, intocadas desde `2521d1e` |
+| constante nova? | **não** |
+| padrão do motor | `T_ROOM_PHYSICAL_TOLERANCE = False` — sem a flag, o epsilon histórico `1e-6` ft |
+| quem liga | só `wall_modeling`, e só quando `opening_reinforcement_strategy is not None` **e** `CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`; salva/restaura no `finally` |
+| algum hard gate foi tocado? | **não** — colisão, não-modular, apoio físico e invasão de vão não passam por essa função |
+
+### A folga real dos 37 T, reproduzida na HEAD (`folga_t.py`)
+
+| nó | principal | chega | espaço mín. | falta p/ B54 | veredito |
+|---|---|---|---|---|---|
+| 28 | 8284502 | 8284562 | 6,995 cm | **20,005 cm** | reprova — e continua reprovando |
+| 22 | 8284502 | 8284558 | 7,004 cm | **19,997 cm** | reprova |
+| 30 | 8284554 | 8284563 | 11,988 cm | **15,012 cm** | reprova |
+| 18 | 8284552 | 8284554 | 12,004 cm | **14,997 cm** | reprova |
+| 19 | 8284588 | 8284557 | 22,999 cm | **4,001 cm** | reprova |
+| 20 | 8284586 | 8284557 | 22,999 cm | **4,001 cm** | reprova |
+| 39 | 8284587 | 8284573 | 22,999 cm | **4,001 cm** | reprova |
+| **24** | 8284526 | 8284559 | 26,988 cm | **0,012 cm** (0,12 mm) | ruído → passa com a §74 |
+| **44** | 8284515 | 8284579 | 26,9965 cm | **0,0035 cm** (35 µm) | ruído → passa com a §74 |
+| **46** | 8284515 | 8284580 | 26,9965 cm | **0,0035 cm** (35 µm) | ruído → passa com a §74 |
+| 12 | 8284515 | 8284546 | 27,0035 cm | **sobra 35 µm** | já passava |
+| 26 | 8284526 | 8284560 | 27,0120 cm | **sobra 0,12 mm** | já passava |
+
+O argumento inteiro está nas quatro últimas linhas: **nas MESMAS paredes principais** (8284515 e
+8284526) há nós que passam e nós que reprovam **pela mesma magnitude, só que com o sinal
+contrário do arredondamento**. Não é geometria decidindo — é ruído.
+
+E o salto é grande: do maior caso de ruído (0,012 cm) até o próximo caso **real** (4,001 cm) há
+**3,99 cm de vazio**. Não existe precipício perto da tolerância escolhida.
+
+### Saturação — provada peça a peça, não por totais
+
+| tolerância | T que passam | peças | divergência | 8284580 | hard gates | sha256 do conjunto de peças |
+|---|---|---|---|---|---|---|
+| base `1e-6` ft | 27 | 5.971 | 1.707,7 | 204,7 | 0/0/0/0 | `18debf95e200c057` |
+| 0,01 cm | 29 | 5.948 | 1.502,2 | 3,3 | 0/0/0/0 | `c677f313beb18acd` |
+| **0,05 cm** | **30** | **5.944** | **1.502,2** | **3,3** | 0/0/0/0 | **`bc261fe485de635a`** |
+| 0,10 cm | 30 | 5.944 | 1.502,2 | 3,3 | 0/0/0/0 | **`bc261fe485de635a`** |
+| 0,30 cm | 30 | 5.944 | 1.502,2 | 3,3 | 0/0/0/0 | **`bc261fe485de635a`** |
+
+0,05 / 0,10 / 0,30 cm produzem o **mesmo conjunto de peças, byte a byte**. Multiplicar a
+tolerância por 6 não muda uma única peça — porque o próximo caso está a 4 cm.
+
+### A flag implementada É a tolerância medida
+
+O snapshot gerado pelo caminho real da §74 (`snap_s74.json`, flag do motor ligada pelo
+`wall_modeling`) tem o **mesmo sha256** `bc261fe485de635a` do snapshot gerado pelo monkeypatch de
+0,05 cm. A implementação não é "parecida" com o que foi medido: é idêntica. Hard gates do
+snapshot: **colisões 0 · não-modular 0 · sem apoio 0 · invasão de vão 0**.
+
+### Legado — byte-idêntico
+
+```
+strategy=None      pecas=8939   assinatura=0a2704e4faaf   (igual à baseline pré-§74)
+strategy=CHANNEL   pecas=8723   assinatura=af8df620f686
+```
+
+### Determinismo
+
+```
+repeticao 1        pecas=8723 assinatura=ead54a24a375 IGUAL
+repeticao 2        pecas=8723 assinatura=ead54a24a375 IGUAL
+ordem invertida    pecas=8728 assinatura=fce75125ebe7 DIFERENTE
+ordem embaralhada  pecas=8750 assinatura=d5a135154cb1 DIFERENTE
+```
+
+Repetir dá geometria idêntica. A sensibilidade à ordem de entrada é **anterior a esta missão** e
+da mesma ordem de grandeza de sempre (base `2521d1e` 8.837 → 8.836/8.851; antes da §74
+8.750 → 8.746/8.768; agora 8.723 → 8.728/8.750) — ver §7.9.
+
+### Suíte
+
+```
+tests/ (sem regression)   1195 passaram · 0 falharam · 1 desmarcado · 28m43s
+focada (4 arquivos)         58 passaram · 4m26s
+```
+
+O único teste desmarcado é `test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas`,
+que falha com `UnboundLocalError: ctypes` **igual em `main` (55e990d) e na base do PR (`2521d1e`)** —
+defeito herdado, fora do escopo, não escondido.
+
+### Comparação com o humano, no estado final offline
+
+| | peças | B39 | B34 | B54 | B19 | C09 | C04 |
+|---|---|---|---|---|---|---|---|
+| HUMANO | 6.018 | 3.061 | 1.619 | 172 | 328 | 243 | 244 |
+| solver antes da §74 | 5.971 | 3.175 | 1.548 | 168 | 371 | 247 | 150 |
+| **solver com a §74** | **5.944** | **3.209** | **1.498** | **184** | **349** | **242** | **150** |
+
+Os 184 B54 continuam **todos em encontro T** (`B54ctx={'TEE': 184}`) — nenhum foi parar fora de
+amarração. A parede **8284580 saiu do top 20** (divergência 204,7 → 3,3); o novo topo é
+8284589/8284590 com 124,0, que são o caso já documentado em §7 (o humano não constrói essas
+paredes inteiras).
+
+---
+
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
 
 Nenhum destes foi codificado.
@@ -705,26 +917,53 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
 
 ## 10. ENTREGA
 
-**Branch** `claude/butanta-modulation-physical-fixes` · **HEAD** `697f764` ·
+**Branch** `claude/butanta-modulation-physical-fixes` · último commit de motor `2c55211` (§74) ·
 **PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.
 
 Arquivos tocados desde `2521d1e` (base desta missão):
 
 ```
- .../2026-09-17-butanta-convergencia-humano.md      | 558 +++++++++++++++++++++
- nuvem/REGRAS_MODULACAO_BLOCOS.md                   | 134 +++++
- nuvem/core/engine/wall_stepper.py                  | 279 +++++++++++
- nuvem/core/wall_modeling.py                        |  15 +
- tests/test_node_region_ownership.py                | 255 ++++++++++
- tests/test_tie_parity_fill_balance.py              | 238 +++++++++
- 6 files changed, 1479 insertions(+)
+ docs/checkpoints/2026-09-17-butanta-convergencia-humano.md  |  730 +++++++++++++
+ nuvem/REGRAS_MODULACAO_BLOCOS.md                            |  220 +++++
+ nuvem/core/engine/wall_stepper.py                           |  343 ++++++-
+ nuvem/core/wall_modeling.py                                 |   26 +
+ tests/test_node_region_ownership.py                         |  255 +++++
+ tests/test_t_room_physical_tolerance.py                     |  183 +++++
+ tests/test_tie_parity_fill_balance.py                       |  238 +++++
+ 7 files changed, 1993 insertions(+), 2 deletions(-)
 ```
 
-**Estado do Revit ao fim:** documento `butanta testes` aberto e ativo, com o lote único
-`20260917-022526` de 8.737 peças. **Atenção:** o documento foi SALVO — o lembrete
-"Projeto não recentemente salvo" que travou a sessão foi dispensado por uma das opções de salvar,
-não por *Cancelar*. Nada se perdeu (o lote está íntegro), mas o arquivo em disco passou a conter a
-modulação. O HUMANO nunca recebeu Transaction: `IsModified = False` em todas as verificações.
+### Estado do Revit — congelado, não tocado
+
+Última leitura possível: **17/09 14:21**, antes do modal. Documento `butanta testes` aberto, com o
+lote único `20260917-022526` de 8.737 peças (a modulação **anterior** à §74, gerada na madrugada) e
+3 aberturas deslocadas 10 cm pela §66. **Esse arquivo foi salvo em disco** — o lembrete de
+salvamento que travou a sessão da madrugada foi dispensado por uma opção de salvar, não por
+*Cancelar*. Existe agora uma cópia de segurança verificada por sha256 (§7.10).
+
+Desde então: **nenhuma escrita, nenhum purge, nenhum reset, nenhum save**. O modal
+`TaskDialog_Project_Not_Saved_Recently` continua aberto e o canal MCP continua congelado. O HUMANO
+nunca recebeu Transaction — `IsModified = false` em todas as leituras.
+
+### STATUS: **READY FOR FINAL REVIT SMOKE**
+
+| frente | estado |
+|---|---|
+| motor (§72 + §74) | implementado, medido, auditado |
+| suíte completa | 1.195 passaram, 0 falharam |
+| suíte focada | 58 passaram |
+| legado (`strategy=None`) | byte-idêntico — `0a2704e4faaf` |
+| hard gates | 0 / 0 / 0 / 0 |
+| saturação da tolerância | provada peça a peça (0,05 = 0,10 = 0,30) |
+| determinismo | repetição byte-idêntica |
+| convergência com o humano | divergência 1.707,7 → 1.502,2; 8284580 204,7 → 3,3 |
+| **restauração controlada do TARGET** | **passo 1 de 10 feito — 2 a 10 PENDENTES** |
+| **aplicação da §74 no Revit (run 1/2/3)** | **PENDENTE — bloqueio modal, sem acesso humano** |
+| **readback / screenshots / lote único no Revit** | **PENDENTE** |
+
+**Não está pronto para merge** e não foi declarado como tal. O que falta é execução real no Revit,
+não código: a sequência exata está em §7.10. Quando o modal for dispensado em *Cancelar* /
+*Não salvar*, retomar por `q_activate.py` e seguir a lista.
 
 **Capturas:** 22 imagens (11 casos × HUMANO/TARGET) em `scratchpad/shots/`, com realce local
-aplicado (`*_hi.png`).
+aplicado (`*_hi.png`) — são do estado **anterior** à §74; as de depois fazem parte do smoke pendente.

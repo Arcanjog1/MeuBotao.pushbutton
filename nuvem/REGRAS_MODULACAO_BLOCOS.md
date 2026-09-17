@@ -9462,3 +9462,19 @@ topo do ranking de divergência.
 Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`.
 Testes: `tests/test_t_room_physical_tolerance.py` (10, fixture sintética com a
 falta pedida em centésimos de milímetro — nenhum id do projeto).
+
+**Saturação provada peça a peça.** Não é só o total que coincide: os conjuntos de
+peças gerados com 0,05 cm, 0,10 cm e 0,30 cm têm o **mesmo sha256**
+(`bc261fe485de635a`, 5.944 peças). E o snapshot produzido pelo caminho real da
+flag (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED` → `T_ROOM_PHYSICAL_TOLERANCE`)
+tem esse mesmo sha256 — a implementação é exatamente a tolerância medida.
+Multiplicar a tolerância por 6 não muda uma peça porque **o próximo caso real
+está a 4,001 cm** (nós 19/20/39), 3,99 cm depois do maior caso de ruído.
+
+> **Validação no Revit: PENDENTE.** Todos os números acima são da bancada offline
+> sobre a geometria real extraída do TARGET. A aplicação da §74 no modelo (purge
+> controlado, reset das 44 aberturas, run 1/run 2, readback, lote único) **não foi
+> executada**: o Revit ficou travado no modal `TaskDialog_Project_Not_Saved_Recently`
+> sem operador para dispensá-lo. Ver `docs/checkpoints/2026-09-17-butanta-convergencia-humano.md`
+> §7.10 para o estado congelado e a sequência exata que falta rodar.
+
