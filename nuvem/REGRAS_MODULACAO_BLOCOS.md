@@ -9376,3 +9376,89 @@ LIMITATIONS); enquanto não for corrigido, a §72 não exercita a combinação.
 Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`
 antes e depois. Testes: `tests/test_tie_parity_fill_balance.py` (10, fixture
 sintética de duas T — nenhum id de parede do projeto).
+
+## 73. Bloco de ajuste perto da ponta do trecho — MEDIDA e REJEITADA (2026-09-17)
+
+Hipótese (§4/§37 do pedido do usuário): entre layouts que empatam nas regras,
+preferir o que mantém o B34 perto das pontas do trecho. Evidência humana real:
+**93,7% dos B34 do humano** estão na primeira, segunda, penúltima ou última
+posição do trecho; só 6,3% ficam enterrados no meio (no solver eram 20,0% antes
+da §72 e 12,4% depois).
+
+Implementada como último termo do desempate de `_pier_layout_avoiding_joints`
+e também testada **antes** da trava e do alinhamento de vazio.
+
+**Medida: resultado IDÊNTICO nos dois casos.** O desempate nunca dispara. Os
+103 B34 enterrados no meio são todos `STANDARD_FILL` decididos pelo COMPRIMENTO
+do trecho, não por empate entre candidatos — não há o que desempatar.
+**Rejeitada e removida.**
+
+## 74. O teste de espaço do T compara com tolerância FÍSICA (2026-09-17, IMPLEMENTADO, só CHANNEL)
+
+`_t_intersection_room_ok` pergunta *"cabe um B54 centrado no nó?"* e reprova
+quando o espaço medido fica abaixo de `T_INTERSECTION_B54_HALF_ROOM_FT` (27 cm
+para cada lado). A comparação usava `+ 1e-6` **pés** — **0,3 micrômetro**. Isso
+não é tolerância física, é o epsilon de ponto flutuante: a junta de argamassa do
+próprio sistema tem 10 mm, e a geometria do encontro chega com ruído acumulado de
+várias conversões pés↔cm (a mesma causa-raiz que `modulation_math.py` já
+documenta como FIT_TOLERANCE_NOISE/C04).
+
+**Evidência (BUTANTÃ R08_LT, 1º PAV, 37 encontros T).** Dez T reprovam o teste.
+**Sete reprovam por margem real** — falta 4, 15 ou 20 cm, e a degradação está
+correta. Os outros **três reprovam por ruído**:
+
+| nó | principal × chega | espaço | falta |
+|---|---|---|---|
+| 24 | 8284526 × 8284559 | 26,9880 cm | **0,12 mm** |
+| 44 | 8284515 × 8284579 | 26,9965 cm | **0,035 mm** |
+| 46 | 8284515 × 8284580 | 26,9965 cm | **0,035 mm** |
+
+E a prova de que é ruído, e não geometria, é que **na mesma parede principal
+existem nós idênticos que PASSAM pela mesma margem**, só que com o sinal
+contrário do arredondamento:
+
+| nó | principal × chega | espaço | sobra |
+|---|---|---|---|
+| 12 | 8284515 × 8284546 | 27,0035 cm | +0,035 mm → passa |
+| 26 | 8284526 × 8284560 | 27,0120 cm | +0,12 mm → passa |
+
+A mesma situação física estava sendo decidida pelo **sinal do ruído de
+arredondamento da planta**. Isto **não afrouxa o portão — torna o portão
+consistente**. Quem não cabe de verdade (4 cm ou mais de falta) continua
+reprovando exatamente como antes, e isso é testado.
+
+**A tolerância é `PIER_PHYSICAL_FIT_TOLERANCE_CM` (0,05 cm)**, a constante que o
+motor já define para esta pergunta exata — *"o quanto uma peça JÁ MATERIALIZADA
+pode ultrapassar o limite FÍSICO real do trecho"*. **Nenhum número novo foi
+inventado.** Medido: o resultado **satura em 0,05 cm** — 0,05, 0,10 e 0,30 cm dão
+saída idêntica, porque o próximo caso real está a 4 cm de distância. Não há
+precipício por perto.
+
+Flag `T_ROOM_PHYSICAL_TOLERANCE`, ligada só no fluxo CHANNEL por
+`wall_modeling.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`.
+
+**Resultado (34 paredes de alvenaria, fiadas 0–11):**
+
+| | HUMANO | antes | **§74** |
+|---|---|---|---|
+| divergência de composição por parede | 0 | 1.706 | **1.500** |
+| peças | 6.018 | 5.971 | **5.944** |
+| B39 | 3.061 | 3.175 | 3.209 |
+| B34 | 1.619 | 1.548 | 1.498 |
+| B19 | 328 | 371 | **349** |
+| C09 | 254 | 247 | **242** |
+| C04 | 244 | 150 | 150 |
+| B54 (todos em T) | 172 | 168 | 184 |
+| incompatibilidade de vazado do B34 | 2,5% | 4,9% | **4,1%** |
+| T que cabem | — | 27 | 30 |
+| colisões / não-modular / sem apoio / invasão | — | 0/0/0/0 | **0/0/0/0** |
+| tempo do solve | — | 21 s | 21 s |
+
+**Parede 8284580: 204,7 → 3,3** — a composição passa a ser `48 B39 + 11 B34 +
+1 B19` contra os `48 B39 + 12 B34` do humano. **8284515: 82,5 → 78,4.**
+**Duas paredes melhoram, ZERO pioram, 32 ficam idênticas.** A 8284580 sai do
+topo do ranking de divergência.
+
+Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`.
+Testes: `tests/test_t_room_physical_tolerance.py` (10, fixture sintética com a
+falta pedida em centésimos de milímetro — nenhum id do projeto).

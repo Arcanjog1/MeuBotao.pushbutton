@@ -190,6 +190,7 @@ __all__ = [
     "_abutting_same_course_tie_pairs", "_tie_parity_node_movable", "_tie_parity_apply",
     "_node_walls", "_wall_course_free_segments_cm", "_tie_parity_fill_proxy", "_tie_parity_component_options",
     "_apply_abutting_tie_parity",
+    "T_ROOM_PHYSICAL_TOLERANCE", "_t_intersection_room_tolerance_ft",
     "TIE_PARITY_FILL_BALANCE", "TIE_PARITY_FILL_BALANCE_MAX_ROUNDS",
     "TIE_PARITY_FILL_BALANCE_MAX_TRIALS", "_tie_parity_fill_layout_cost",
     "_search_tie_parity_fill_balance",
@@ -1367,6 +1368,64 @@ def _clip_range_by_midspan_neighbours(walls_to_create, nodes, wall_idx, t_ft, sa
             lo_ft = max(lo_ft, t_other + reserve_ft)
     return lo_ft, hi_ft
 
+# ==========================================
+# SECAO 74 (2026-09-17): o teste de espaco do T compara com tolerancia FISICA.
+#
+# `_t_intersection_room_ok` pergunta "cabe um B54 centrado no no'?" e reprova
+# quando o espaco medido fica abaixo de T_INTERSECTION_B54_HALF_ROOM_FT (27 cm
+# para cada lado). A comparacao usava `+ 1e-6` PES - 0,3 MICROMETRO. Isso nao e'
+# uma tolerancia fisica, e' o epsilon de ponto flutuante: a junta de argamassa
+# do proprio sistema tem 10 mm, o bloco tem tolerancia de fabricacao, e a
+# geometria do encontro vem de `extend_wall_ends_to_junctions` com ruido
+# acumulado de varias conversoes pes<->cm (exatamente a causa-raiz que
+# modulation_math.py ja' documenta como FIT_TOLERANCE_NOISE/C04).
+#
+# O EFEITO MEDIDO (BUTANTA R08_LT, 1o PAV, 37 encontros T, 2026-09-17): dez T
+# reprovam o teste. SETE reprovam por margem real - falta 4, 15 ou 20 cm, e a
+# degradacao esta' correta. Os outros TRES reprovam por RUIDO:
+#
+#   no' 24 (8284526 x 8284559): espaco 26,9880 cm - falta 0,12 mm
+#   no' 44 (8284515 x 8284579): espaco 26,9965 cm - falta 0,035 mm
+#   no' 46 (8284515 x 8284580): espaco 26,9965 cm - falta 0,035 mm
+#
+# E a prova de que e' ruido, e nao geometria, e' que na MESMA parede principal
+# existem nos identicos que PASSAM pela mesma margem, so' que com o sinal
+# contrario do arredondamento:
+#
+#   no' 12 (8284515 x 8284546): espaco 27,0035 cm - sobra 0,035 mm -> passa
+#   no' 26 (8284526 x 8284560): espaco 27,0120 cm - sobra 0,12 mm  -> passa
+#
+# Ou seja: a mesma situacao fisica estava sendo decidida pelo SINAL do ruido de
+# arredondamento da planta. Isto NAO afrouxa o portao - torna o portao
+# consistente. Quem nao cabe de verdade (4 cm ou mais de falta) continua
+# reprovando exatamente como antes.
+#
+# A tolerancia usada e' PIER_PHYSICAL_FIT_TOLERANCE_CM (0,05 cm), a constante
+# que o motor ja' define para esta pergunta exata - "o quanto uma peca JA'
+# MATERIALIZADA pode ultrapassar o limite FISICO real do trecho"
+# (modulation_math.py). Nenhum numero novo foi inventado. Medido: o resultado
+# SATURA em 0,05 cm - 0,05, 0,10 e 0,30 cm dao saida identica, porque o proximo
+# caso real esta' a 4 cm de distancia. Nao ha' precipicio por perto.
+#
+# RESULTADO (34 paredes de alvenaria, fiadas 0-11): divergencia de composicao
+# por parede 1.706 -> 1.500; parede 8284580 de 204,7 -> 3,3 (a composicao passa
+# a ser 48 B39 + 11 B34 + 1 B19 contra os 48 B39 + 12 B34 do humano); 8284515 de
+# 82,5 -> 78,4; DUAS paredes melhoram, ZERO pioram, 32 ficam identicas. B54 de
+# 168 para 184, TODOS ainda em T (nenhum fora de amarracao). Hard gates
+# 0/0/0/0 antes e depois. Tempo do solve inalterado.
+# ==========================================
+T_ROOM_PHYSICAL_TOLERANCE = False
+
+
+def _t_intersection_room_tolerance_ft():
+    """Tolerancia da comparacao de espaco do T, em pes. Sem a secao 74, o
+    epsilon historico de ponto flutuante; com ela, a tolerancia FISICA que o
+    motor ja' usa para peca materializada."""
+    if not T_ROOM_PHYSICAL_TOLERANCE:
+        return 1e-6
+    return PIER_PHYSICAL_FIT_TOLERANCE_CM / 100.0 * FEET_PER_METER
+
+
 def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
                                     nodes=None, end_to_node=None, node_index=None):
     """Mede o espaco fisico real neste no' T - so' MEDE, nunca decide nem
@@ -1432,9 +1491,10 @@ def _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
                                                  nodes=nodes, end_to_node=end_to_node, node_index=node_index)
     if assessment is None:
         return True  # sem paredes identificadas, o chamador ja' vai reportar erro por outro motivo
-    if min(assessment["room_plus_ft"], assessment["room_minus_ft"]) + 1e-6 < T_INTERSECTION_B54_HALF_ROOM_FT:
+    tolerancia_ft = _t_intersection_room_tolerance_ft()   # SECAO 74
+    if min(assessment["room_plus_ft"], assessment["room_minus_ft"]) + tolerancia_ft < T_INTERSECTION_B54_HALF_ROOM_FT:
         return False
-    return assessment["room_incoming_ft"] + 1e-6 >= CORNER_B34_ROOM_FT
+    return assessment["room_incoming_ft"] + tolerancia_ft >= CORNER_B34_ROOM_FT
 
 
 # Ordem de preferencia do elemento UNICO que fecha uma parede curta demais

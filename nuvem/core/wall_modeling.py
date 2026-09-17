@@ -3714,6 +3714,12 @@ CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
 # por aqui: continua identico a' main.
 CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
 
+# SECAO 74 (2026-09-17): no fluxo CHANNEL, o teste de espaco do encontro T
+# compara com tolerancia FISICA (PIER_PHYSICAL_FIT_TOLERANCE_CM, 0,05 cm) em vez
+# do epsilon de ponto flutuante de 1e-6 pes - ver wall_stepper.
+# T_ROOM_PHYSICAL_TOLERANCE. Legado (`strategy=None`) nao passa por aqui.
+CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -4112,6 +4118,10 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED)
     saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
     _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
+    saved_room_tol = _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE
+    _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED)
     try:
         return _solve_building_blocks_all_courses_impl_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
@@ -4121,6 +4131,7 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
         _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
         _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
+        _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = saved_room_tol
 
 
 def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,
