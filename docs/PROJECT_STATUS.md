@@ -1,10 +1,10 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do #41; CHANNEL do #40 permanece integrado). SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-17 (main `55e990d`, merge documental do #41; CHANNEL do #40 permanece integrado). SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-16T13:43:34.181678+00:00",
+  "observed_utc": "2026-09-17T17:29:32.400613+00:00",
   "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
@@ -75,7 +75,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
     },
     {
       "pr": 42,
-      "head": "7724ab68d7a695062605c96ae9ef81a27428ee1e"
+      "head": "759bcd453dae3dabba4acee4b3bdaabca875237c"
     },
     {
       "branch": "codex/modulacao-automatica-ui-redesign",
@@ -84,7 +84,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
     },
     {
       "branch": "codex/modulation-ui-premium-redesign",
-      "head": "ddb24c27b13d15ec0876ce0ece6ed5b35b4d8e36",
+      "head": "9ed2234524da41fc2cc00d01aeee1b72d175f771",
       "pr": 46
     }
   ]
@@ -97,7 +97,7 @@ Painel reconciliado por fetch em 2026-09-16 (main `55e990d`, merge documental do
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
 | Documentação oficial pós-CHANNEL | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD final `1aff5e0`, integrado em `55e990d` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only**: nenhuma mudança de produção, benchmark, baseline ou norma — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
 | UI candidata | `codex/modulacao-automatica-ui-redesign`, HEAD avaliado `ec51424`, [PR #44 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44): referência visual estudada, tema grafite, preview contextual, configuração agrupada, revisão explícita e relatório recolhido. 307 testes focados PASS, ensaio WinForms local PASS. **PARTIAL**, smoke Revit/DPI nativo e fase inicial CAD pendentes; nenhuma mudança física. [Entrega atual](checkpoints/2026-09-16-dark-ui-redesign.md). Sem merge. |
-| UI premium candidata | `codex/modulation-ui-premium-redesign`, HEAD avaliado `ddb24c2`: [PR #46 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46), abas underline, stepper, seletores escuros, preview vetorial, revisão/famílias, execução dedicada. 312 testes PASS; 30 ensaios de escala + fontes; smoke Revit/DPI nativo pendentes. **PARTIAL**, sem merge. [Entrega](checkpoints/2026-09-16-premium-ui-redesign.md). |
+| UI premium candidata | `codex/modulation-ui-premium-redesign`, HEAD avaliado `9ed2234`: [PR #46 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46). UI premium, estados de microajuste confirmado e contadores; 319 testes PASS, 11 fixtures nativas e 30 ensaios de escala. Adaptador pós-42 e smoke Revit/DPI nativo pendentes. **PARTIAL**, sem merge; host/solver/regras intocados nesta missão. [Entrega](checkpoints/2026-09-17-ui-post42-preparation.md). |
 | Solver #42 | Aberto, `claude/butanta-modulation-physical-fixes`; observação de HEAD no JSON acima. Não é base da UI, não integrado nem validado por esta entrega. Reconciliar somente após encerramento do #42. |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |

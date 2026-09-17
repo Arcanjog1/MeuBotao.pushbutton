@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-16",
-  "scope": "current",
+  "scope": "historical",
   "branch": "codex/modulation-ui-premium-redesign",
   "head": "ddb24c27b13d15ec0876ce0ece6ed5b35b4d8e36",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
