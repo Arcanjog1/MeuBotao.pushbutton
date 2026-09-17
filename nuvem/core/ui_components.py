@@ -537,8 +537,8 @@ class UiComponents(object):
         form._ui_plan = plan
         plan.Dock = self.ns["DockStyle"].Fill
         plan.TabStop = False
-        content = self.panel()
-        pages[1].AutoScroll = False
+        content = self.panel("Top", 300)
+        pages[1].AutoScroll = True
         form._ui_piece_grid = self.ns["_styled_listview"]([("Peça", 200), ("Quantidade", 100)])
         style_grid(form._ui_piece_grid)
         piece_panel = self.panel()
@@ -566,6 +566,12 @@ class UiComponents(object):
         pages[1].Controls.Add(content)
         form._ui_banner = self.label("Aguardando análise.", 58, True)
         pages[1].Controls.Add(form._ui_banner)
+        def fit_plan(sender, args):
+            height = pages[1].ClientSize.Height
+            if isinstance(height, (int, float)):
+                content.Height = max(int(280 * self.display_scale(form)), height - form._ui_banner.Height)
+        pages[1].SizeChanged += fit_plan
+        form.Shown += fit_plan
 
         result = self.ns["_monospace_textbox"]("O resultado será exibido após a criação dos blocos.")
         result.WordWrap = True
