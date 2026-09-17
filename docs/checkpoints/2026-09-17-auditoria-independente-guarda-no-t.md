@@ -43,6 +43,10 @@ editada (ver "pendência" abaixo).
     "LACUNA DE PREFLIGHT: o procedimento de purga (purge_bench/purge_only em docs/checkpoints/evidence/2026-09-14-channel-revit/_harness/r_channel.py e q08_diag.py) REGISTRA 'remaining' mas nao AFIRMA que e' zero; exclusao parcial (elemento pinado, membro de grupo) deixa o run seguir sobre modelo sujo. Checklist independente na secao 11 do relatorio."
   ],
   "next_steps": [
+    "RECONCILIACAO 2026-09-17 (docs/RECONCILIACAO_74_2026-09-17.md): esta sessao E' a Conta 2. Nao existe patch §74 aqui, nenhum apply no Revit foi rodado e nao ha' acesso ao Revit nesta sessao. A ordem 'PARE ANTES DO PROXIMO APPLY' precisa chegar a' sessao que de fato ia roda-lo.",
+    "MEDIDO: ruido real da medicao do no' T = 9,5923e-12 cm (2.592 amostras, 12 angulos x 6 origens x 6 origens x 2 sentidos, espaco exato de 27,000/34,000 cm). A tolerancia atual (3,048e-05 cm) ja' tem 3,2 milhoes de vezes de folga sobre ele; 0,05 cm seria 5,2 bilhoes de vezes. Trocar A por 0,05 cm nao absorve ruido - muda a fronteira semantica na faixa submilimetrica (0,035 mm, 0,12 mm e 0,05 cm passam de REPROVA para APROVA; 4, 15 e 20 cm reprovam nos dois casos).",
+    "ENTREGUE: tools/preflight/purge_guard.py + test_purge_guard.py (7 testes) - assert_purge_clean aborta com PurgeNotCleanError se remaining != 0, se removed divergir da contagem inicial, se o total cair mais que removed, ou se o documento HUMANO for tocado. Fora de nuvem/ e fora do _harness (que e' registro versionado de entrega passada); integracao de 2 linhas documentada na secao 5 da reconciliacao.",
+
     "Apresentar a §74 (arquivo + SHA) para o veredito ser reemitido em nome dela, se ela existir fora do que foi buscado por fetch.",
     "Decidir sobre as tres pendencias acima: registro da regra de amarracao, fallback do capture_export e assercao remaining == 0 na purga."
   ],
