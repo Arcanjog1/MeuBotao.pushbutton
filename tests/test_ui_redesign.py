@@ -53,11 +53,45 @@ def test_stepper_updates_with_review_and_creation_state():
 
 def test_future_adjustment_summary_is_absent_without_evidence():
     window, handler = form()
-    assert not window._ui_adjustments.Visible
+    assert "Aberturas movidas: —" in window._ui_adjustments.Text
     report = {"kpis": [], "issues": [], "log": "", "automatic_adjustments": [{"id": "example"}]}
     window = m._PostCreationForm(report, None, handler, [])
-    assert window._ui_adjustments.Visible
-    assert "1 ajuste" in window._ui_adjustments.Text
+    assert "Aberturas movidas: —" in window._ui_adjustments.Text
+    assert "ajustada automaticamente" not in window._ui_adjustments.Text
+
+
+def test_execution_snapshot_requires_confirmation_and_rejects_stale_events():
+    window, handler = form()
+    payload = dict(run_id="run-1", revision=0, walls_analyzed=34, openings_moved=2,
+                   adjustment_status="planned", warnings=1, hard_gates=0)
+    assert window._ux.present_execution(window, payload, new_run=True)
+    assert "Aberturas movidas: —" in window._ui_adjustments.Text
+    payload.update(revision=1, adjustment_status="confirmed")
+    assert window._ux.present_execution(window, payload)
+    assert "Aberturas movidas: 2" in window._ui_adjustments.Text
+    assert not window._ux.present_execution(window, dict(payload, revision=0))
+    assert not window._ux.present_execution(window, dict(payload, run_id="old", revision=10))
+    window._ux.busy(window, 3)
+    assert "Aberturas movidas: —" in window._ui_adjustments.Text
+    assert not window._ux.present_execution(window, dict(payload, revision=2))
+
+
+@pytest.mark.parametrize("value", [None, -1, True, "4", 1.5])
+def test_invalid_counts_do_not_claim_confirmed_movement(value):
+    from core.ui_execution import ExecutionPresentation
+    state = ExecutionPresentation("run")
+    state.update(dict(run_id="run", revision=0, adjustment_status="confirmed", openings_moved=value))
+    assert "Aberturas movidas: —" in state.summary()
+    assert "ajustada automaticamente" not in state.summary()
+
+
+def test_presentation_cannot_release_a_physical_gate():
+    window, handler = form()
+    handler.solve_result = result(beta_preflight={"ok": False})
+    window._ux.solved(window)
+    window._ux.present_execution(window, dict(run_id="run", revision=0, hard_gates=0,
+                                 adjustment_status="confirmed", openings_moved=1), new_run=True)
+    assert not window._create_button.Enabled
 
 
 def test_activity_translates_actual_events_without_fake_percentages():

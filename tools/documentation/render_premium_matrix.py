@@ -6,6 +6,7 @@ Screenshots contain synthetic data and are not an in-Revit smoke test.
 import json
 from pathlib import Path
 import runpy
+import argparse
 
 ROOT = Path(__file__).resolve().parents[2]
 p = runpy.run_path(str(ROOT / "tools/ui_preview.py"))
@@ -13,7 +14,9 @@ from System.Drawing import Font, Size, SizeF, Bitmap, Rectangle
 from System.Drawing.Imaging import ImageFormat
 from System.Windows.Forms import AutoScaleMode, Application
 
-out = ROOT / "docs/ui-premium-preview/matrix"
+parser = argparse.ArgumentParser()
+parser.add_argument("--out", default="docs/ui-premium-preview/matrix")
+out = ROOT / parser.parse_args().out
 out.mkdir(parents=True, exist_ok=True)
 Application.EnableVisualStyles()
 ns = p["ns"]

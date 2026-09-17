@@ -5,6 +5,7 @@ The small namespace adapter reuses the host's pythonnet enum compatibility
 layer. It does not introduce another event loop, thread or framework.
 """
 from .ui_state import STEPS, TYPE, TOKENS, ModulationUiState, family_rows, wall_label
+from .ui_execution import ExecutionPresentation
 from .ui_preview_panel import attach_preview
 from .ui_native_style import style_input, style_grid, style_disabled_button
 from .ui_chrome import underline, separator, choice, stepper, dropdown
@@ -506,12 +507,12 @@ class UiComponents(object):
         pages = tabs.pages
         form._ui_pages = pages
         form._ui_analysis_skipped = bool(report.get("wall_analysis_skipped"))
-        # Optional future presentation data, without generating adjustment plans.
-        adjustments = report.get("automatic_adjustments")
-        form._ui_adjustments = self.label("", 34)
-        form._ui_adjustments.Visible = bool(adjustments)
-        if adjustments:
-            form._ui_adjustments.Text = "✓ {} ajuste(s) automático(s) informado(s).".format(len(adjustments))
+        # Optional host adapter; never interpret solver plans as Revit movement.
+        snapshot = report.get("ui_execution") or {}
+        form._ui_execution = ExecutionPresentation(snapshot.get("run_id"))
+        form._ui_execution.update(snapshot)
+        form._ui_adjustments = self.label(form._ui_execution.summary(), 86)
+        form._ui_adjustments.AccessibleName = "Análise e microajuste: dados confirmados da execução"
         # Existing error grid, zoom, fix, pause and cancel callbacks preserved.
         errors_panel.Dock = self.ns["DockStyle"].Fill
         pages[0].Controls.Add(errors_panel)
@@ -559,6 +560,8 @@ class UiComponents(object):
                                      ("Paredes selecionadas", len(form._handler.walls_to_create), self.ns["UI_TEXT"]),
                                      ("Aberturas detectadas", len(form._handler.all_openings), self.ns["UI_TEXT"])])
         form._ui_plan_metrics = metrics
+        metrics.Height = 104
+        metrics._summary.Height = 104
         content.Controls.Add(metrics)
         pages[1].Controls.Add(content)
         form._ui_banner = self.label("Aguardando análise.", 58, True)
@@ -632,6 +635,8 @@ class UiComponents(object):
         result_content.Controls.Add(form._ui_result_counts)
         form._ui_result_title = self.label("Resultado da modulação", 42, True)
         form._ui_result_title.Font = self.ns["_ui_font"](14, True)
+        form._ui_execution_result = self.label(form._ui_execution.summary(), 86)
+        result_content.Controls.Add(form._ui_execution_result)
         result_content.Controls.Add(form._ui_result_title)
         self.fit_stack(result_content)
         pages[2].Controls.Add(result_content)
@@ -726,7 +731,29 @@ class UiComponents(object):
         form.ShowDialog()
         return form.result
 
+    def present_execution(self, form, snapshot, new_run=False):
+        """UI-thread hook for the post-PR42 adapter; does not control creation gates."""
+        if new_run:
+            form._ui_execution = ExecutionPresentation(snapshot.get("run_id"))
+        if not form._ui_execution.update(snapshot):
+            return False
+        summary = form._ui_execution.summary()
+        form._ui_adjustments.Text = summary
+        form._ui_execution_result.Text = summary
+        if form._ui_state.status in ("ready", "error", "success", "warning"):
+            self.execution_plan_summary(form)
+        return True
+
+    def execution_plan_summary(self, form):
+        counts = form._ui_state.counts
+        total = sum(counts.values()) if counts is not None else "—"
+        form._ui_plan_metrics._summary.Text = "{} blocos planejados\n{}".format(total, form._ui_execution.summary())
+
     def busy(self, form, step):
+        if step == 3:
+            form._ui_execution = ExecutionPresentation()
+            form._ui_adjustments.Text = form._ui_execution.summary()
+            form._ui_execution_result.Text = form._ui_execution.summary()
         form._ui_state.start(step)
         message = "Criando blocos no Revit…" if step == 5 else "Calculando modulação…"
         self.set_step(form._ui_header, step, message)
@@ -775,7 +802,7 @@ class UiComponents(object):
             scale = self.display_scale(form)
             form._plan_preview.Visible = width >= 800 * scale and height >= 540 * scale
         self.update_families(form)
-        form._ui_plan.Text = state.report_text(h).replace("\n", "\r\n")
+        form._ui_plan.Text = (form._ui_execution.details() + "\n\n" + state.report_text(h)).replace("\n", "\r\n")
         form._ui_plan.SelectionStart = 0
         form._ui_plan.SelectionLength = 0
         form._ui_piece_grid.Items.Clear()
@@ -783,9 +810,7 @@ class UiComponents(object):
             row = self.ns["ListViewItem"](code.replace("CHANNEL_U_", "Canaleta ").replace("CHANNEL_", "Canaleta "))
             row.SubItems.Add(str(count))
             form._ui_piece_grid.Items.Add(row)
-        total = sum(state.counts.values()) if state.counts is not None else "—"
-        form._ui_plan_metrics._summary.Text = "{} paredes · {} aberturas · {} blocos planejados".format(
-            len(h.walls_to_create or []), len(h.all_openings or []), total)
+        self.execution_plan_summary(form)
         form._ui_banner.Text = "✓ Modulação pronta. " + state.reason if state.can_create else "! " + state.reason
         form._ui_banner.ForeColor = self.ns["UI_OK" if state.can_create else "UI_ERROR"]
         form._create_button.Enabled = state.can_create
@@ -841,7 +866,7 @@ class UiComponents(object):
         text = {"success": "✓ Modulação concluída. Confira os blocos no Revit.",
                 "warning": "! Criação concluída com pendências. Revise o relatório.",
                 "error": "! A criação não foi concluída. Consulte as falhas no relatório."}[state.status]
-        form._ui_result.Text = (text + "\n\n" + state.report_text(h, h.create_result)).replace("\n", "\r\n")
+        form._ui_result.Text = (text + "\n\n" + form._ui_execution.details() + "\n\n" + state.report_text(h, h.create_result)).replace("\n", "\r\n")
         form._ui_result.Text += "\r\n" + form._solve_console._elapsed_label.Text
         created = h.create_result or {}
         form._ui_result_title.Text = {"success": "✓ Modulação concluída", "warning": "! Concluída com pendências",
