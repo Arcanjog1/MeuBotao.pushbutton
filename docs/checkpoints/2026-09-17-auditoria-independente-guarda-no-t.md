@@ -1,12 +1,19 @@
 # Checkpoint — auditoria adversarial independente da guarda de espaço do nó T
 
-Missão paralela de auditoria. **Produção, solver e PR #42 intocados**:
+Missão paralela de auditoria. **`scope: historical`** — este checkpoint
+registra a entrega da auditoria no HEAD avaliado `3d4c687`; a entrega
+corrente desta sessão é
+[`2026-09-17-reconciliacao-74-purge-guard.md`](2026-09-17-reconciliacao-74-purge-guard.md),
+que cobre o código adicionado depois (`tools/preflight/`).
+
+**Produção, solver e PR #42 intocados**:
 `git diff --stat 3d4c687 -- nuvem/` vazio. Nenhuma regra física foi
 editada (ver "pendência" abaixo).
 
 ```json
 {
   "date": "2026-09-17",
+  "scope": "historical",
   "branch": "claude/jolly-ritchie-0bq5f6",
   "head": "3d4c687d14830c39fdf13a1b87bb0fcb76221db0",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
