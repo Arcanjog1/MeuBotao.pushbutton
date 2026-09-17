@@ -698,33 +698,41 @@ Com o Revit fora do ar, tudo que **não** depende dele foi refeito na HEAD atual
 | quem liga | só `wall_modeling`, e só quando `opening_reinforcement_strategy is not None` **e** `CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`; salva/restaura no `finally` |
 | algum hard gate foi tocado? | **não** — colisão, não-modular, apoio físico e invasão de vão não passam por essa função |
 
-### A folga real dos 37 T, reproduzida na HEAD (`folga_t.py`)
+### A folga real dos 37 T — hoje reproduzível pelo corpus versionado (§7.12)
 
 | nó | principal | chega | espaço mín. | falta p/ B54 | veredito |
 |---|---|---|---|---|---|
-| 28 | 8284502 | 8284562 | 6,995 cm | **20,005 cm** | reprova — e continua reprovando |
-| 22 | 8284502 | 8284558 | 7,004 cm | **19,997 cm** | reprova |
-| 30 | 8284554 | 8284563 | 11,988 cm | **15,012 cm** | reprova |
-| 18 | 8284552 | 8284554 | 12,004 cm | **14,997 cm** | reprova |
-| 19 | 8284588 | 8284557 | 22,999 cm | **4,001 cm** | reprova |
-| 20 | 8284586 | 8284557 | 22,999 cm | **4,001 cm** | reprova |
-| 39 | 8284587 | 8284573 | 22,999 cm | **4,001 cm** | reprova |
-| **24** | 8284526 | 8284559 | 26,988 cm | **0,012 cm** (0,12 mm) | ruído → passa com a §74 |
-| **44** | 8284515 | 8284579 | 26,9965 cm | **0,0035 cm** (35 µm) | ruído → passa com a §74 |
-| **46** | 8284515 | 8284580 | 26,9965 cm | **0,0035 cm** (35 µm) | ruído → passa com a §74 |
+| 28 | 8284502 | 8284562 | 6,9952 cm | **20,0048 cm** | reprova — e continua reprovando |
+| 22 | 8284502 | 8284558 | 7,0035 cm | **19,9965 cm** | reprova |
+| 30 | 8284554 | 8284563 | 11,9880 cm | **15,0120 cm** | reprova |
+| 18 | 8284552 | 8284554 | 12,0035 cm | **14,9965 cm** | reprova |
+| 19 | 8284588 | 8284557 | 22,9989 cm | **4,0011 cm** | reprova |
+| 20 | 8284586 | 8284557 | 22,9989 cm | **4,0011 cm** | reprova |
+| 39 | 8284587 | 8284573 | 22,9989 cm | **4,0011 cm** | reprova |
+| **24** | 8284526 | 8284559 | 26,9880 cm | **0,012 cm** (0,12 mm) | variação de modelagem → passa com a §74 |
+| **44** | 8284515 | 8284579 | 26,9965 cm | **0,003487 cm** (35 µm) | variação de modelagem → passa com a §74 |
+| **46** | 8284515 | 8284580 | 26,9965 cm | **0,003487 cm** (35 µm) | variação de modelagem → passa com a §74 |
 | 12 | 8284515 | 8284546 | 27,0035 cm | **sobra 35 µm** | já passava |
 | 26 | 8284526 | 8284560 | 27,0120 cm | **sobra 0,12 mm** | já passava |
 
 O argumento inteiro está nas quatro últimas linhas: **nas MESMAS paredes principais** (8284515 e
 8284526) há nós que passam e nós que reprovam **pela mesma magnitude, só que com o sinal
-contrário do arredondamento**. Não é geometria decidindo — é ruído.
+contrário**. Não é geometria decidindo — é variação submilimétrica de modelagem.
 
-E o salto é grande: do maior caso de ruído (0,012 cm) até o próximo caso **real** (4,001 cm) há
-**3,99 cm de vazio**. Não existe precipício perto da tolerância escolhida.
+**A §74 é mudança semântica e deliberada, não conserto de ruído numérico.** Ela introduz uma
+tolerância física controlada de **0,05 cm** na decisão de `room_ok` e com isso **amplia em até
+0,05 cm a fronteira histórica de cabe/não-cabe**. O epsilon anterior de `1e-6` ft (0,3 µm)
+continua sendo a descrição correta do que havia antes — só que ele era epsilon de ponto flutuante,
+enquanto o que a geometria traz é variação REAL de modelagem, na casa do centésimo de milímetro.
+
+**Por que 0,05 cm — a justificativa:** a maior variação de modelagem observada no corpus é
+**0,013251 cm**; a tolerância adotada é **3,8×** isso. O primeiro caso materialmente insuficiente
+exige **4,001054 cm** — razão de **80×** entre a tolerância e a falta real seguinte. É essa
+separação que justifica o valor.
 
 ### Saturação — provada peça a peça, não por totais
 
-| tolerância | T que passam | peças | divergência | 8284580 | hard gates | sha256 do conjunto de peças |
+| tolerância | T que passam | peças | divergência | 8284580 | hard gates | digest da bancada (16 hex) |
 |---|---|---|---|---|---|---|
 | base `1e-6` ft | 27 | 5.971 | 1.707,7 | 204,7 | 0/0/0/0 | `18debf95e200c057` |
 | 0,01 cm | 29 | 5.948 | 1.502,2 | 3,3 | 0/0/0/0 | `c677f313beb18acd` |
@@ -734,6 +742,17 @@ E o salto é grande: do maior caso de ruído (0,012 cm) até o próximo caso **r
 
 0,05 / 0,10 / 0,30 cm produzem o **mesmo conjunto de peças, byte a byte**. Multiplicar a
 tolerância por 6 não muda uma única peça — porque o próximo caso está a 4 cm.
+
+> **Os digests desta tabela são da bancada, não do repositório.** Têm 16 hex (não são
+> sha256) e vêm do formato ad-hoc de `scratchpad/corpus.dump`, que não é versionado. A
+> versão auditável destes mesmos fatos está em §7.12, com `S74_SNAPSHOT_V1` e sha256
+> completo. A coluna de divergência também é medição de bancada: reproduzi-la exigiria a
+> composição humana das 34 paredes, que o corpus deliberadamente não versiona (§8).
+
+**O que a saturação prova e o que ela não prova.** Prova que **não há precipício perto da
+fronteira**: o resultado é insensível à tolerância numa faixa de 6×. **Não** justifica o valor
+0,05 cm — a justificativa é a acima: variação de modelagem máxima **0,013251 cm**, tolerância
+**3,8×** essa variação, primeiro caso materialmente insuficiente **4,001054 cm**, razão de **80×**.
 
 ### A flag implementada É a tolerância medida
 
@@ -785,6 +804,99 @@ Os 184 B54 continuam **todos em encontro T** (`B54ctx={'TEE': 184}`) — nenhum 
 amarração. A parede **8284580 saiu do top 20** (divergência 204,7 → 3,3); o novo topo é
 8284589/8284590 com 124,0, que são o caso já documentado em §7 (o humano não constrói essas
 paredes inteiras).
+
+---
+
+## 7.12 CORPUS DA §74 VERSIONADO — EVIDÊNCIA, NÃO NORMA
+
+A auditoria independente do commit `2c55211` fechou em **SUPPORTED WITH LIMITATIONS**. A única
+limitação material era esta: a geometria do BUTANTÃ sobre a qual todos os números da §74 foram
+medidos **não estava versionada**, então nada disso era reproduzível de fora do ambiente. É
+exatamente essa limitação que esta missão fecha.
+
+| item | caminho |
+|---|---|
+| corpus (geometria mínima) | `reference_projects/butanta_r08_lt/s74_corpus/` — `geometry.json`, `t_nodes.json`, `wall_8284580.json`, `snapshot_v1.json` |
+| biblioteca que lê o corpus e chama o motor REAL | `tools/audit/s74_corpus.py` |
+| extrator (regera o corpus) | `tools/audit/extract_butanta_corpus.py` |
+| testes | `tests/test_s74_corpus_butanta.py` |
+| runner de auditoria | `tools/audit/audit_s74_corpus.py` — `python tools/audit/audit_s74_corpus.py` imprime PASS/FAIL caso a caso |
+
+**STATUS: EVIDÊNCIA / NÃO NORMA.** O corpus existe para reproduzir as medições da §74. A modulação
+humana ali registrada **não** vira golden: o projeto humano continua sendo referência medida e,
+onde viola regra do produto, não é copiado (§8.1).
+
+Nenhuma decisão de "cabe / não cabe" é reimplementada na bancada: a biblioteca entrega o corpus às
+funções reais do motor (`assign_openings_to_walls`, `extend_wall_ends_to_junctions`,
+`build_wall_graph`, `_t_intersection_room_assessment`, `_t_intersection_room_ok`,
+`solve_building_blocks_all_courses`). Diff de motor desta missão: **zero** — nenhum `.py` sob
+`nuvem/` foi tocado e `PIER_PHYSICAL_FIT_TOLERANCE_CM` continua intocada.
+
+### Reproduzido pelo corpus versionado
+
+34 paredes de alvenaria · 44 aberturas · 37 encontros T. Dez T reprovam o teste de espaço sem a
+§74; **três passam a caber com ela** — nós de bancada **24, 44 e 46**, faltando respectivamente
+**0,012 cm**, **0,003487 cm** e **0,003487 cm**. Os controles na MESMA parede principal já
+passavam pela mesma magnitude com sinal contrário: nó **12** (sobra 0,003487 cm, mesma principal
+dos nós 44/46) e nó **26** (sobra 0,012 cm, mesma principal do nó 24). Os **sete** restantes
+continuam reprovando: **4,001054 cm** (nós 19/20/39), **15,012** e **14,997 cm** (nós 30 e 18),
+**20,005** e **19,997 cm** (nós 28 e 22).
+
+Parede 8284580 (chave `W27` no corpus): humano `48 B39 + 12 B34` (60 peças); solver **sem** a §74
+`14 B39 + 51 B34 + 5 C09 + 1 B19`, divergência **204,7**; solver **com** a §74 `48 B39 + 11 B34 +
+1 B19`, divergência **3,3**.
+
+Saturação sobre o conjunto físico das 17 fiadas (hash `S74_SNAPSHOT_V1`):
+
+| tolerância | peças | sha256 do conjunto físico |
+|---|---|---|
+| flag desligada | 8.750 | `b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067` |
+| **0,05 cm** | **8.723** | `0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13` |
+| 0,10 cm | 8.723 | **o mesmo sha256** |
+| 0,30 cm | 8.723 | **o mesmo sha256** |
+
+Hard gates **0/0/0/0** (colisões · não-modular · sem apoio · invasão de vão) em todos os casos.
+Legado (`strategy=None`) byte-idêntico: **8.939 peças, assinatura `0a2704e4faaf`**. Suíte completa
+do repo com o corpus: **1.234 passaram · 0 falharam** (eram 1.195 antes destes testes).
+
+**O legado ficou auditável.** `strategy=None` não entra no fluxo CHANNEL, então a §74 não
+pode alcançá-lo. Isso era alegação de bancada; agora está no corpus como dois casos
+(`legacy_cases`): **8.939 peças, `sha256 3ba22aa08913ac5d…`, idêntico com a flag ligada e
+desligada**.
+
+**O que este corpus NÃO cobre, declarado no próprio corpus.** `_t_intersection_room_ok` é
+uma **conjunção**: exige espaço para o B54 na parede principal **e** espaço para o B34 na
+que chega. Aqui só a primeira perna é exercida — a boneca mais apertada dos 37 T tem
+**69,0002 cm** contra **34 cm** exigidos, folga de 35 cm. A segunda perna não tem cobertura
+de regressão neste corpus; o bloco `coverage` de `t_nodes.json` declara isso e um teste
+confere a declaração. A perna do B54 é justamente a que a §74 muda.
+
+**A regra histórica continua intacta.** O verificador do acervo
+(`tools/documentation/verify_reference_inventory.py`) exige que
+`nuvem/REGRAS_MODULACAO_BLOCOS.md` seja *append-only* em relação à base protegida. Conferido:
+o arquivo de hoje ainda **começa exatamente** pelo conteúdo de `2521d1e`, a base deste PR — a
+§74 foi reescrita dentro do texto que este próprio PR acrescentou, não sobre regra herdada.
+
+**Método: um grafo novo por solve.** O motor grava nos próprios nós a marca de decisão
+única da §72. Reaproveitar o mesmo grafo entre configurações faria a busca de paridade
+rodar de verdade só na primeira e ser curto-circuitada nas seguintes — compararia coisas
+diferentes. Medido: com grafo novo por solve os hashes são **os mesmos**, ou seja, isto não
+muda resultado nenhum; muda a validade do método.
+
+A maior variação de modelagem medida neste corpus é **0,013251 cm** (comprimento de parede
+0,013251 cm · ponta de parede 0,013054 cm · espaço medido no T 0,013251 cm). A tolerância de
+0,05 cm é **3,8×** esse valor e fica **80×** abaixo do primeiro caso materialmente insuficiente
+(4,001054 cm).
+
+### O que isto NÃO declara
+
+- **O smoke real no Revit continua PENDENTE.** O bloqueio é o modal
+  `TaskDialog_Project_Not_Saved_Recently`, sem acesso de operador para dispensá-lo (§7.10).
+  Nenhum número de Revit foi estimado aqui.
+- **Nada disto declara a §74 "totalmente auditada".** Versionar o corpus remove a limitação
+  material apontada; o veredito sobre o corpus novo cabe à **auditoria independente**, que ainda
+  não se pronunciou sobre ele. Até lá, o status permanece **SUPPORTED WITH LIMITATIONS**, com o
+  smoke de Revit em aberto.
 
 ---
 
@@ -950,7 +1062,7 @@ nunca recebeu Transaction — `IsModified = false` em todas as leituras.
 | frente | estado |
 |---|---|
 | motor (§72 + §74) | implementado, medido, auditado |
-| suíte completa | 1.195 passaram, 0 falharam |
+| suíte completa | 1.234 passaram, 0 falharam (1.195 antes do corpus) |
 | suíte focada | 58 passaram |
 | legado (`strategy=None`) | byte-idêntico — `0a2704e4faaf` |
 | hard gates | 0 / 0 / 0 / 0 |

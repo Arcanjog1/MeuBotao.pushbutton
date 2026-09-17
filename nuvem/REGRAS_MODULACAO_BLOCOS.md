@@ -9399,13 +9399,23 @@ do trecho, não por empate entre candidatos — não há o que desempatar.
 quando o espaço medido fica abaixo de `T_INTERSECTION_B54_HALF_ROOM_FT` (27 cm
 para cada lado). A comparação usava `+ 1e-6` **pés** — **0,3 micrômetro**. Isso
 não é tolerância física, é o epsilon de ponto flutuante: a junta de argamassa do
-próprio sistema tem 10 mm, e a geometria do encontro chega com ruído acumulado de
-várias conversões pés↔cm (a mesma causa-raiz que `modulation_math.py` já
-documenta como FIT_TOLERANCE_NOISE/C04).
+próprio sistema tem 10 mm, e a geometria do encontro chega da planta com o
+centímetro inteiro afastado por centésimos de milímetro.
+
+**A §74 introduz uma tolerância física controlada de 0,05 cm na decisão de
+`room_ok`**, para absorver as variações submilimétricas de MODELAGEM observadas no
+corpus. **A mudança é semântica e deliberada, não conserto de cálculo**: a
+fronteira histórica de cabe/não-cabe foi **ampliada em até 0,05 cm**. O erro de
+cálculo puro é ordens de grandeza menor que isso; o que a tolerância absorve é
+variação real de modelagem. No corpus medido, a maior variação de modelagem
+observada foi **0,013251 cm** e o próximo caso materialmente insuficiente exigia
+**4,001054 cm** — a separação entre variação de modelagem e falta física real
+continua grande.
 
 **Evidência (BUTANTÃ R08_LT, 1º PAV, 37 encontros T).** Dez T reprovam o teste.
 **Sete reprovam por margem real** — falta 4, 15 ou 20 cm, e a degradação está
-correta. Os outros **três reprovam por ruído**:
+correta. Os outros **três reprovam por falta submilimétrica**, dentro da faixa de
+variação de modelagem medida:
 
 | nó | principal × chega | espaço | falta |
 |---|---|---|---|
@@ -9413,40 +9423,56 @@ correta. Os outros **três reprovam por ruído**:
 | 44 | 8284515 × 8284579 | 26,9965 cm | **0,035 mm** |
 | 46 | 8284515 × 8284580 | 26,9965 cm | **0,035 mm** |
 
-E a prova de que é ruído, e não geometria, é que **na mesma parede principal
+E a prova de que não é a geometria decidindo é que **na mesma parede principal
 existem nós idênticos que PASSAM pela mesma margem**, só que com o sinal
-contrário do arredondamento:
+contrário:
 
 | nó | principal × chega | espaço | sobra |
 |---|---|---|---|
 | 12 | 8284515 × 8284546 | 27,0035 cm | +0,035 mm → passa |
 | 26 | 8284526 × 8284560 | 27,0120 cm | +0,12 mm → passa |
 
-A mesma situação física estava sendo decidida pelo **sinal do ruído de
-arredondamento da planta**. Isto **não afrouxa o portão — torna o portão
-consistente**. Quem não cabe de verdade (4 cm ou mais de falta) continua
-reprovando exatamente como antes, e isso é testado.
+A mesma situação física estava sendo decidida pelo **sinal da variação
+submilimétrica de modelagem da planta**. A fronteira se desloca em até 0,05 cm e
+passa a ser consistente entre nós fisicamente iguais. Quem não cabe de verdade
+(4 cm ou mais de falta) continua reprovando exatamente como antes, e isso é
+testado.
 
 **A tolerância é `PIER_PHYSICAL_FIT_TOLERANCE_CM` (0,05 cm)**, a constante que o
 motor já define para esta pergunta exata — *"o quanto uma peça JÁ MATERIALIZADA
 pode ultrapassar o limite FÍSICO real do trecho"*. **Nenhum número novo foi
-inventado.** Medido: o resultado **satura em 0,05 cm** — 0,05, 0,10 e 0,30 cm dão
-saída idêntica, porque o próximo caso real está a 4 cm de distância. Não há
-precipício por perto.
+inventado.**
+
+**Por que 0,05 cm — a justificativa, medida no corpus:**
+
+| régua | valor |
+|---|---|
+| maior variação de modelagem observada | **0,013251 cm** (comprimento de parede 0,013251 cm · ponta de parede 0,013054 cm · espaço medido no T 0,013251 cm) |
+| tolerância adotada | **0,05 cm = 3,8×** essa variação |
+| primeiro caso materialmente insuficiente | **4,001054 cm** (nós 19/20/39) |
+| razão entre a tolerância e a falta real seguinte | **80×** |
+
+A tolerância cobre com folga tudo que é variação de modelagem e fica 80 vezes
+abaixo da primeira falta física real. **A saturação medida (0,05 = 0,10 = 0,30 cm
+dando o mesmo conjunto físico) NÃO justifica o valor**: ela prova apenas que **não
+há precipício perto da fronteira**.
 
 Flag `T_ROOM_PHYSICAL_TOLERANCE`, ligada só no fluxo CHANNEL por
 `wall_modeling.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`.
 
-**Resultado (34 paredes de alvenaria, fiadas 0–11):**
+**Resultado (34 paredes de alvenaria, fiadas 0–11).** A coluna HUMANO e a linha de
+divergência são **medição de bancada** sobre a extração do projeto humano, que não é
+versionada: o corpus guarda a composição humana de **uma** parede (a 8284580), não das
+34. As demais linhas são reproduzíveis pelo corpus.
 
 | | HUMANO | antes | **§74** |
 |---|---|---|---|
-| divergência de composição por parede | 0 | 1.706 | **1.500** |
+| divergência de composição por parede (bancada) | 0 | 1.707,7 | **1.502,2** |
 | peças | 6.018 | 5.971 | **5.944** |
 | B39 | 3.061 | 3.175 | 3.209 |
 | B34 | 1.619 | 1.548 | 1.498 |
 | B19 | 328 | 371 | **349** |
-| C09 | 254 | 247 | **242** |
+| C09 | 243 | 247 | **242** |
 | C04 | 244 | 150 | 150 |
 | B54 (todos em T) | 172 | 168 | 184 |
 | incompatibilidade de vazado do B34 | 2,5% | 4,9% | **4,1%** |
@@ -9464,12 +9490,54 @@ Testes: `tests/test_t_room_physical_tolerance.py` (10, fixture sintética com a
 falta pedida em centésimos de milímetro — nenhum id do projeto).
 
 **Saturação provada peça a peça.** Não é só o total que coincide: os conjuntos de
-peças gerados com 0,05 cm, 0,10 cm e 0,30 cm têm o **mesmo sha256**
-(`bc261fe485de635a`, 5.944 peças). E o snapshot produzido pelo caminho real da
-flag (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED` → `T_ROOM_PHYSICAL_TOLERANCE`)
-tem esse mesmo sha256 — a implementação é exatamente a tolerância medida.
-Multiplicar a tolerância por 6 não muda uma peça porque **o próximo caso real
-está a 4,001 cm** (nós 19/20/39), 3,99 cm depois do maior caso de ruído.
+peças gerados com 0,05 cm, 0,10 cm e 0,30 cm são **o mesmo conjunto físico**. A
+medição original usou o formato ad-hoc da bancada (digest de 16 hex
+`bc261fe485de635a`, **não** um sha256 e **não** reproduzível pelo repositório); a
+versão auditável é o `S74_SNAPSHOT_V1` da tabela abaixo. E o snapshot produzido pelo
+caminho real da flag (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED` →
+`T_ROOM_PHYSICAL_TOLERANCE`) tem exatamente o mesmo hash — a implementação é a
+tolerância medida.
+Multiplicar a tolerância por 6 não muda uma peça porque **o próximo caso
+materialmente insuficiente está a 4,001054 cm** (nós 19/20/39). Isto mede a
+ausência de precipício; a escolha do 0,05 cm está na tabela de justificativa
+acima.
+
+**Corpus versionado — EVIDÊNCIA, NÃO NORMA.** A geometria do BUTANTÃ sobre a qual
+estes números foram medidos passou a ser versionada em
+`reference_projects/butanta_r08_lt/s74_corpus/` (`geometry.json`, `t_nodes.json`,
+`wall_8284580.json`, `snapshot_v1.json`). Ela é lida por `tools/audit/s74_corpus.py`,
+que entrega os dados às FUNÇÕES REAIS do motor — nenhuma decisão de cabe/não-cabe é
+reimplementada na bancada — e é regerada por `tools/audit/extract_butanta_corpus.py`.
+Testes: `tests/test_s74_corpus_butanta.py`. Runner de auditoria:
+`tools/audit/audit_s74_corpus.py` — `python tools/audit/audit_s74_corpus.py`, medido
+em 40 casos, 40 PASS, 0 FAIL. **STATUS: EVIDÊNCIA / NÃO NORMA** — a modulação humana ali registrada
+é referência medida, nunca golden.
+
+Reproduzido pelo corpus versionado: 34 paredes de alvenaria, 44 aberturas, 37
+encontros T; dez T reprovam sem a §74; três passam a caber com ela (nós de bancada
+24, 44 e 46, faltando 0,012 cm / 0,003487 cm / 0,003487 cm); os sete restantes
+continuam reprovando (4,001054 cm nos nós 19/20/39; 15,012 e 14,997 cm nos nós 30 e
+18; 20,005 e 19,997 cm nos nós 28 e 22). Parede 8284580 (chave `W27` no corpus):
+humano `48 B39 + 12 B34` (60 peças); solver sem a §74 `14 B39 + 51 B34 + 5 C09 +
+1 B19`, divergência 204,7; solver com a §74 `48 B39 + 11 B34 + 1 B19`, divergência
+3,3. Saturação sobre o conjunto físico das 17 fiadas (hash `S74_SNAPSHOT_V1`):
+
+| tolerância | peças | sha256 do conjunto físico |
+|---|---|---|
+| flag desligada | 8.750 | `b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067` |
+| **0,05 cm** | **8.723** | `0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13` |
+| 0,10 cm | 8.723 | **o mesmo sha256** |
+| 0,30 cm | 8.723 | **o mesmo sha256** |
+
+Hard gates 0/0/0/0 (colisões · não-modular · sem apoio · invasão de vão) em todos os
+casos. Legado (`strategy=None`) **byte-idêntico e agora auditável pelo repositório**: 8.939 peças, `sha256 3ba22aa08913ac5d…` — **o mesmo com a flag ligada e desligada**, porque `strategy=None` não entra no fluxo CHANNEL (casos `legacy_cases` em `snapshot_v1.json`, cobertos por `test_o_legado_e_identico_com_e_sem_a_flag_da_secao_74`). Suíte completa do repo com o corpus: **1.234 passaram, 0
+falharam** (eram 1.195 antes destes testes; o único desmarcado é o defeito herdado de
+`test_perf_trace_stall_sampler`, idêntico em `main`).
+
+**Auditoria independente do commit `2c55211`: SUPPORTED WITH LIMITATIONS.** A única
+limitação material apontada era exatamente a ausência deste corpus — sem ele, nada
+acima era reproduzível de fora. É essa limitação que o corpus versionado fecha; o
+veredito sobre o corpus novo cabe à própria auditoria independente.
 
 > **Validação no Revit: PENDENTE.** Todos os números acima são da bancada offline
 > sobre a geometria real extraída do TARGET. A aplicação da §74 no modelo (purge

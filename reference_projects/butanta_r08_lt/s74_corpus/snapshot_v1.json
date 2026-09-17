@@ -1,0 +1,184 @@
+{
+ "schema_version": 1,
+ "status": "EVIDENCE_NOT_NORM",
+ "normalization": "S74_SNAPSHOT_V1",
+ "normalization_note": "Conjunto FISICO de pecas, normalizado para ser comparavel entre\nexecucoes e entre maquinas.\n\nS74_SNAPSHOT_V1: uma linha por peca,\n    \"<fiada>|<chave da parede>|<codigo>|<x>|<y>|<dx>|<dy>|<comprimento>|<espelhada>\"\ncom x/y em cm arredondados a 4 casas, direcao a 6 casas e comprimento a 3;\nlinhas ordenadas. Nao entra nenhum identificador de execucao, tempo,\nponteiro ou indice de lista - so' fisica.",
+ "legacy_bench_hash": {
+  "value": "bc261fe485de635a",
+  "nota": "hash citado no checkpoint; vinha do formato ad-hoc da bancada (scratchpad/corpus.dump), que nao esta' versionado. O hash auditavel e' o S74_SNAPSHOT_V1 abaixo."
+ },
+ "cases": [
+  {
+   "label": "flag_off",
+   "tolerance_cm": null,
+   "pieces": 8750,
+   "sha256": "b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067",
+   "ruler_pieces": 5971,
+   "ruler_codes": {
+    "B19": 371,
+    "B34": 1548,
+    "B39": 3175,
+    "B54": 168,
+    "C04": 150,
+    "C09": 247,
+    "K34": 38,
+    "K39": 268,
+    "KV": 6
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  },
+  {
+   "label": "tol_0_05",
+   "tolerance_cm": 0.05,
+   "pieces": 8723,
+   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
+   "ruler_pieces": 5944,
+   "ruler_codes": {
+    "B19": 349,
+    "B34": 1498,
+    "B39": 3209,
+    "B54": 184,
+    "C04": 150,
+    "C09": 242,
+    "K34": 38,
+    "K39": 268,
+    "KV": 6
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  },
+  {
+   "label": "tol_0_10",
+   "tolerance_cm": 0.1,
+   "pieces": 8723,
+   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
+   "ruler_pieces": 5944,
+   "ruler_codes": {
+    "B19": 349,
+    "B34": 1498,
+    "B39": 3209,
+    "B54": 184,
+    "C04": 150,
+    "C09": 242,
+    "K34": 38,
+    "K39": 268,
+    "KV": 6
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  },
+  {
+   "label": "tol_0_30",
+   "tolerance_cm": 0.3,
+   "pieces": 8723,
+   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
+   "ruler_pieces": 5944,
+   "ruler_codes": {
+    "B19": 349,
+    "B34": 1498,
+    "B39": 3209,
+    "B54": 184,
+    "C04": 150,
+    "C09": 242,
+    "K34": 38,
+    "K39": 268,
+    "KV": 6
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  }
+ ],
+ "opening_variant_cases": [
+  {
+   "variant": "post_micro_adjustment_s66",
+   "label": "flag_off",
+   "pieces": 8737,
+   "sha256": "45a718826eb1c5036e15d34356a95053c65ce81afe549e4925d705c6a9842b74",
+   "ruler_pieces": 5958,
+   "ruler_codes": {
+    "B19": 380,
+    "B34": 1534,
+    "B39": 3189,
+    "B54": 168,
+    "C04": 151,
+    "C09": 223,
+    "K34": 37,
+    "K39": 268,
+    "KV": 8
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  },
+  {
+   "variant": "post_micro_adjustment_s66",
+   "label": "tol_0_05",
+   "pieces": 8710,
+   "sha256": "317e99a472352438c17671fd9842a8554a21119fbc5828b84bd0643c4d81ef0b",
+   "ruler_pieces": 5931,
+   "ruler_codes": {
+    "B19": 358,
+    "B34": 1484,
+    "B39": 3223,
+    "B54": 184,
+    "C04": 151,
+    "C09": 218,
+    "K34": 37,
+    "K39": 268,
+    "KV": 8
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   }
+  }
+ ],
+ "legacy_cases": [
+  {
+   "label": "strategy_none_flag_off",
+   "strategy": null,
+   "pieces": 8939,
+   "sha256": "3ba22aa08913ac5d9582ba2e5920da8d42f8daff44c999516dc4cac4ee889588",
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 78,
+    "unsupported": 67,
+    "opening_invasion": 0
+   }
+  },
+  {
+   "label": "strategy_none_flag_on",
+   "strategy": null,
+   "pieces": 8939,
+   "sha256": "3ba22aa08913ac5d9582ba2e5920da8d42f8daff44c999516dc4cac4ee889588",
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 78,
+    "unsupported": 67,
+    "opening_invasion": 0
+   }
+  }
+ ]
+}

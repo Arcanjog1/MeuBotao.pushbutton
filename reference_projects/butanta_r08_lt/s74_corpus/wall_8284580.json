@@ -1,0 +1,64 @@
+{
+ "schema_version": 1,
+ "status": "EVIDENCE_NOT_NORM",
+ "wall_key": "W27",
+ "provenance": {
+  "revit_element_id": 8284580,
+  "human_source": "human_1pav.clean.json (extracao read-only do projeto humano)",
+  "nota": "a composicao humana aqui e' EVIDENCIA de uma unica parede, para medir a divergencia do caso; nao e' gabarito nem norma - ver reference_projects/README.md"
+ },
+ "human_counts": {
+  "B39": 48,
+  "B34": 12,
+  "Z_END_ZONE": 12
+ },
+ "metric": "divergence(H, S) definida em tools/audit/s74_corpus.py: 100*comp/tot_h + 2*livre + 1*esp",
+ "expected": {
+  "flag_off": {
+   "solver_counts": {
+    "B34": 51,
+    "Z_END_ZONE": 17,
+    "Z_FREE_MID_WALL": 34,
+    "C09": 5,
+    "B39": 14,
+    "B19": 1
+   },
+   "divergence": {
+    "div": 204.7,
+    "comp_delta": 79,
+    "free_mid_delta": 34,
+    "esp_delta": 5,
+    "human_pieces": 60
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   },
+   "pieces_in_ruler": 5971
+  },
+  "flag_on": {
+   "solver_counts": {
+    "B34": 11,
+    "Z_END_ZONE": 11,
+    "B39": 48,
+    "B19": 1
+   },
+   "divergence": {
+    "div": 3.3,
+    "comp_delta": 2,
+    "free_mid_delta": 0,
+    "esp_delta": 0,
+    "human_pieces": 60
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0
+   },
+   "pieces_in_ruler": 5944
+  }
+ }
+}
