@@ -9242,3 +9242,112 @@ checkpoint: estender a §62 (DP exata de orientação, que já vê as duas famí
 prontas) para escolher **orientação + composição equivalente de mesmo
 comprimento** dentro da corrida — a troca que a §61 já sabe fazer —, com
 aceitação por dominância global.
+
+## 70. Fileira de B34 antes do compensador — MEDIDA e REJEITADA (2026-09-16)
+
+Hipótese: quando o trecho fecha com `B19 + B39 + C09` e também fecharia com uma
+fileira de `B34`, preferir a fileira (o padrão que o humano mostra na parede
+8284551). Implementada atrás de `SPECIAL_BOND_ROW_BEFORE_COMPENSATOR`.
+
+**Medida (BUTANTÃ, 34 paredes, fiadas 0-11):** sem teto, a preferência vira B34
+em todo trecho com sobra pequena — B34 1.632 → 2.008 (humano 1.619) e o vazado
+menor triplica (4,2% → 8,7%). Com teto de 2 peças ainda custava 88 violações de
+vazado contra 68. **Rejeitada e removida.** O padrão humano existe, mas não é
+"fileira de B34 sempre que couber": ver §72, onde a mesma troca aparece como
+consequência do comprimento do trecho, não como regra de composição.
+
+## 71. A quantidade de compensadores entra no desempate (2026-09-16, IMPLEMENTADO, só CHANNEL)
+
+`_pier_layout_avoiding_joints._score` passou de
+`(comp_excess, joint_coinc, -trava, -align)` para
+`(comp_excess, joint_coinc, n_comp, -trava, -align)`; a DP de
+`_pier_full_search_layout` usa a mesma tupla. Regra #2 e regra #1 continuam na
+frente — o número de compensadores só desempata entre candidatos que já
+empataram nas duas. Flag `COMPENSATOR_COUNT_IN_TIEBREAK`, ligada só no fluxo
+CHANNEL por `wall_modeling.CHANNEL_COMPENSATOR_TIEBREAK_ENABLED`.
+
+**Medida:** C09 288 → 272, C04 179 → 177, peças 6.037 → 6.026, aglomerado de
+especiais 16 → 11, hard gates inalterados, tempo estável.
+
+## 72. A paridade do nó é escolhida pelo que ela deixa para preencher (2026-09-17, IMPLEMENTADO, só CHANNEL)
+
+**Fenômeno físico.** Num encontro, só UMA das duas paredes ocupa a região do nó
+em cada fiada; a outra para na fronteira e volta a ocupar na fiada seguinte.
+Qual fiada de qual parede fica com a região é uma escolha livre — as duas
+alternativas são amarrações corretas. Mas ela não é neutra: decide o
+**comprimento do trecho livre** que sobra para cada fiada preencher.
+
+**E o comprimento decide sozinho a composição.** Com junta de 1 cm, fechar um
+trecho de L cm com n peças exige `soma(comprimento_i + 1) = L + 1`, ou seja,
+trocar `L+1` em moedas de B39=40, B34=35, B19=20, C09=10, C04=5. O resto módulo
+40 determina quanto do trecho **não pode** ser B39:
+
+| resto | composição mínima |
+|---|---|
+| 0  | só B39 |
+| 35 | 1 B34 |
+| 30 | 2 B34 (ou B19+C09) |
+| 25 | 3 B34 (ou B19+C04) |
+| 20 | 4 B34 (ou 1 B19) |
+| 15 | 5 B34 (ou C09+C04) |
+| 10 | 6 B34 (ou 1 C09) |
+| 5  | 7 B34 (ou 1 C04) |
+
+**Evidência medida (BUTANTÃ R08_LT, 1º PAV, 34 paredes, fiadas 0-11):**
+
+- parede **8284579** (209 cm, T nas duas pontas): o humano dá o nó da esquerda a
+  uma fiada e o da direita à outra — as duas ficam com 159 cm livres, que fecham
+  com 4 B39 exatos. O solver dava os dois nós à mesma fiada: 179 cm de um lado
+  (4 B34) e 174 cm do outro (5 B34). Mesma parede, mesma amarração, 8 B34 no
+  lugar de 0.
+- parede **8284557** (514 cm, 3 T): humano 4 trechos de 234/194 cm (1 B34 cada),
+  solver 4 trechos de 214 cm (5 B34 cada) — 132 B34 contra 36 do humano.
+- no corpus humano a paridade é **23 nós numa fiada e 23 na outra (50/50)**; no
+  solver era **37/10**, porque a convenção por PAPEL (no T a principal hospeda
+  sempre na mesma fiada) é global e ignora o preenchimento.
+- o preenchimento em si já estava certo: o custo real do solver ficava a +411
+  peças não-B39 do mínimo aritmético dos seus próprios trechos, contra +381 do
+  humano. **Quem estava errado era o conjunto de comprimentos.**
+
+**Implementação.** `_search_tie_parity_fill_balance` (wall_stepper.py) roda
+depois de `_apply_abutting_tie_parity` (regra #1, que tem precedência) e varre
+os nós T/X em ordem geométrica, invertendo os que reduzem ESTRITAMENTE o custo
+aritmético dos trechos livres que deixam:
+`(trechos que não fecham, especiais, B34, peças)` — comparação lexicográfica,
+sem pesos. Especiais antes de B34 é o que o próprio humano faz (parede 8284551,
+trecho de 609 cm: ele usa 10 B39 + 6 B34, nenhum especial, onde o solver usava
+14 B39 + 1 B34 + C09 + C04). A decisão é **única por planta** (monotonia: vale
+para as bandas seguintes e para os rebuilds dos reparos) e a regra #1 roda de
+novo depois dela. Custo: uma re-solução dos NÓS por tentativa, nenhum
+preenchimento — ~2 s para 34 paredes em CPython.
+
+**Guarda do alcance da verga.** Um nó a menos de um bloco da jamba de uma
+abertura **não** é invertido: naquela fiada a canaleta da abertura converte ou
+recua a peça de amarração (`plan_channel_reinforcement`, `tie_conversions` /
+`CHANNEL_THROUGH_T_PATTERN`), e a fiada que hospeda a amarração deixa de ser
+escolha livre. Medido: invertendo um T a 27 cm da jamba na parede 8284526, a
+contraverga da fiada 3 ficou com 615-644 no lugar da amarração 635-669 e a
+fiada 4 passou a ter um B34 com 41% de apoio. **O defeito é da conversão
+canaleta × amarração e existe independentemente desta seção** (ver KNOWN
+LIMITATIONS); enquanto não for corrigido, a §72 não exercita a combinação.
+
+**Medida final (fiadas 0-11, 34 paredes):**
+
+| | HUMANO | antes | §72 |
+|---|---|---|---|
+| peças | 6.018 | 6.026 | **5.983** |
+| B39 | 3.061 | 3.066 | 3.180 |
+| B34 | 1.619 | 1.660 | 1.527 |
+| B19 | 328 | 364 | 377 |
+| C09 | 243 | 272 | 289 |
+| C04 | 244 | 177 | 128 |
+| especiais (soma) | 815 | 813 | **794** |
+| cobertura B39 | 61,8% | 61,3% | 63,5% |
+| trechos com resto bom (0 ou 35) | 33,5% | 33,3% | **38,9%** |
+| perda do preenchimento (peças não-B39 acima do mínimo) | +381 | +411 | **+253** |
+| paridade igual à do humano | — | 26/45 | **28/45** |
+| colisões / não-modular / sem apoio / invasão | — | 0/0/0/0 | **0/0/0/0** |
+
+Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`
+antes e depois. Testes: `tests/test_tie_parity_fill_balance.py` (10, fixture
+sintética de duas T — nenhum id de parede do projeto).

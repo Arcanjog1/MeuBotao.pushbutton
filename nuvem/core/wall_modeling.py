@@ -3707,6 +3707,13 @@ CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = True
 # que usa MENOS compensadores - ver wall_stepper.COMPENSATOR_COUNT_IN_TIEBREAK.
 CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
 
+# SECAO 72 (2026-09-17): no fluxo CHANNEL, a paridade de cada no' T/X e'
+# escolhida pelo COMPRIMENTO do trecho livre que ela deixa para cada fiada
+# preencher, e nao so' pela convencao de papel - ver
+# wall_stepper.TIE_PARITY_FILL_BALANCE. Legado (`strategy=None`) nao passa
+# por aqui: continua identico a' main.
+CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -4099,6 +4106,12 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
         and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
+    saved_parity_balance = _stepper_repair.TIE_PARITY_FILL_BALANCE
+    _stepper_repair.TIE_PARITY_FILL_BALANCE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED)
+    saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
+    _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
     try:
         return _solve_building_blocks_all_courses_impl_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
@@ -4106,6 +4119,8 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     finally:
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
         _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
+        _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
+        _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
 
 
 def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,

@@ -190,6 +190,10 @@ __all__ = [
     "_abutting_same_course_tie_pairs", "_tie_parity_node_movable", "_tie_parity_apply",
     "_node_walls", "_wall_course_free_segments_cm", "_tie_parity_fill_proxy", "_tie_parity_component_options",
     "_apply_abutting_tie_parity",
+    "TIE_PARITY_FILL_BALANCE", "TIE_PARITY_FILL_BALANCE_MAX_ROUNDS",
+    "TIE_PARITY_FILL_BALANCE_MAX_TRIALS", "_pier_arith_coins", "_pier_arith_best",
+    "_tie_parity_fill_arith_cost", "_search_tie_parity_fill_balance",
+    "_tie_parity_node_under_opening_reach", "TIE_PARITY_FILL_ALL_OPENINGS",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
     "WALL_GROUP_SHIFT_MAX_CM", "WALL_GROUP_SHIFT_VERIFY_BUDGET",
@@ -2158,6 +2162,12 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             and walls_to_create):
         outcome = _apply_abutting_tie_parity(
             outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    # SECAO 72: depois da paridade que resolve junta corrida (acima, regra #1),
+    # a paridade que decide o comprimento do trecho livre de cada fiada.
+    if (_parity_pass and TIE_PARITY_FILL_BALANCE and end_to_node is not None
+            and walls_to_create):
+        outcome = _search_tie_parity_fill_balance(
+            outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
     return outcome
 
 
@@ -2732,6 +2742,279 @@ def _apply_abutting_tie_parity(outcome, nodes, walls_to_create, catalog, opening
     current["tie_parity_flips"] = list(accepted)
     current["tie_parity_conflicts"] = _residual(coincidences, conflicts)
     return current
+
+
+# ==========================================
+# SECAO 72 (2026-09-17): A PARIDADE DO NO' E' ESCOLHIDA PELO QUE ELA DEIXA
+# PARA PREENCHER.
+#
+# FENOMENO FISICO. Num encontro, so' UMA das duas paredes pode ocupar a
+# regiao do no' em cada fiada; a outra para na fronteira e volta a ocupar na
+# fiada seguinte. QUAL fiada de QUAL parede fica com a regiao e' uma escolha
+# livre (as duas alternativas sao amarracoes corretas) - e' a "inversao A/B"
+# que `_tie_parity_flip` ja' implementa. Mas ela NAO e' neutra: ela decide o
+# COMPRIMENTO do trecho livre que sobra para cada fiada preencher.
+#
+# E o comprimento decide sozinho a composicao. Com junta de BLOCK_JOINT_CM,
+# um trecho de L cm fechado por n pecas satisfaz soma(comprimento_i + junta)
+# = L + junta: fechar um trecho e' trocar esse valor em "moedas" de
+# (comprimento do bloco + junta). Com o catalogo padrao (B39=40, B34=35,
+# B19=20, C09=10, C04=5) o resto modulo 40 determina quanto do trecho NAO
+# pode ser B39 - resto 0 fecha so' com bloco inteiro, resto 35 pede 1 B34,
+# resto 5 pede 7 B34 ou 1 pastilha.
+#
+# EVIDENCIA MEDIDA (BUTANTA R08_LT, 1o PAV, 2026-09-17, 34 paredes de
+# alvenaria, fiadas 0-11):
+#   - parede 8284579 (209cm, T nas duas pontas): o humano da' o no' da
+#     ESQUERDA a uma fiada e o da DIREITA a' outra - as duas ficam com 159cm
+#     livres, que fecham com 4 B39 exatos. O solver dava os DOIS nos a' mesma
+#     fiada: 179cm de um lado (4 B34) e 174cm do outro (5 B34). Mesma parede,
+#     mesma amarracao, 8 B34 no lugar de 0.
+#   - parede 8284557 (514cm, 3 T): humano 4 trechos de 234/194cm (1 B34 cada),
+#     solver 4 trechos de 214cm (5 B34 cada) - 132 B34 contra 36 do humano.
+#   - no corpus humano a paridade e' 23 nos numa fiada e 23 na outra (50/50);
+#     no solver era 37/10, porque a convencao por PAPEL (no T a principal
+#     hospeda sempre na mesma fiada) e' global e ignora o preenchimento.
+#
+# O QUE ESTA PARTE FAZ: depois de resolver os nos (e depois da paridade das
+# pecas ENCOSTADAS, que resolve junta corrida e tem precedencia), varre os
+# nos T/X em ordem geometrica e inverte os que REDUZEM ESTRITAMENTE o custo
+# aritmetico dos trechos livres que eles deixam. O custo e' o MELHOR que cada
+# comprimento permite - funcao pura de L, sem preencher nada:
+#   (trechos que nao fecham, especiais, B34, pecas)
+# Especiais antes de B34 e' o que o proprio humano faz: na parede 8284551,
+# trecho de 609cm, ele usa 10 B39 + 6 B34 (nenhum especial) onde o solver
+# usava 14 B39 + 1 B34 + C09 + C04.
+#
+# NAO e' um score com pesos: e' comparacao lexicografica com aceitacao so'
+# por melhora estrita. Nao inventa peca, nao move abertura, nao muda o codigo
+# nem a posicao de nenhuma amarracao - so' troca em qual fiada cada no'
+# hospeda a sua. Nos ja' invertidos pela paridade das pecas encostadas nao
+# sao tocados (aquela decisao resolve regra #1 e vem antes); cantos L tambem
+# nao (papel coordenado por `_coordinate_arm_role_nodes`).
+#
+# Custo: uma re-solucao dos NOS por tentativa (nenhum preenchimento), ~5ms em
+# CPython no projeto de 34 paredes; a varredura inteira roda em ~2s.
+# TIE_PARITY_FILL_BALANCE_MAX_TRIALS limita o pior caso.
+# ==========================================
+TIE_PARITY_FILL_BALANCE = False
+TIE_PARITY_FILL_BALANCE_MAX_ROUNDS = 16
+TIE_PARITY_FILL_BALANCE_MAX_TRIALS = 1200
+# Conjunto COMPLETO de aberturas da planta, publicado por
+# wall_modeling._solve_building_blocks_all_courses_impl. A paridade e'
+# decidida na PRIMEIRA banda de fiadas, e nessa chamada
+# `openings_per_wall` traz so' as aberturas ATIVAS naquela faixa de altura
+# (embaixo do peitoril a lista vem vazia) - a guarda de alcance de verga
+# precisa enxergar todas.
+TIE_PARITY_FILL_ALL_OPENINGS = None
+
+_PIER_ARITH_MEMO = {}
+
+
+def _pier_arith_coins(catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
+    """[(unidades, especial, e_b34)] - o catalogo de preenchimento comum
+    convertido em moedas de PIER_MODULE_CM. `unidades` ja' inclui a junta de
+    saida da peca (mesma convencao de `_greedy_fill_blocks`)."""
+    coins = []
+    for code in _pier_codes_by_len_desc(catalog, allow_compensators, pool=COMMON_FILL_BLOCK_CODES):
+        entry = catalog.get(code) or {}
+        step = entry.get("length_cm", 0.0) + BLOCK_JOINT_CM
+        units = int(round(step / float(PIER_MODULE_CM)))
+        if units <= 0 or abs(units * PIER_MODULE_CM - step) > 1e-6:
+            continue
+        especial = bool(entry.get("is_compensator")) or code == HALF_BLOCK_CODE
+        coins.append((units, bool(especial), code == MID_WALL_BLOCK_CODE))
+    return tuple(sorted(set(coins)))
+
+
+def _pier_arith_best(remaining_cm, coins):
+    """(especiais, B34, pecas) da MELHOR composicao que fecha `remaining_cm`
+    (convencao de `_pier_ordered_layout`), ou None se nao fecha.
+
+    Funcao PURA do comprimento: nao olha parede, no', fiada nem vizinho.
+    Minimiza, nesta ordem: especiais -> B34 -> pecas."""
+    units = int(round(remaining_cm / float(PIER_MODULE_CM)))
+    if units < 0 or abs(units * PIER_MODULE_CM - remaining_cm) > PIER_FIT_TOLERANCE_CM:
+        return None
+    hit = _PIER_ARITH_MEMO.get((coins, units))
+    if hit is not None:
+        return None if hit == "X" else hit
+    INF = (1 << 20, 1 << 20, 1 << 20)
+    dp = [INF] * (units + 1)
+    dp[0] = (0, 0, 0)
+    for v in range(1, units + 1):
+        melhor = INF
+        for u, especial, e_b34 in coins:
+            if u > v or dp[v - u] == INF:
+                continue
+            e, b, n = dp[v - u]
+            cand = (e + (1 if especial else 0), b + (1 if e_b34 else 0), n + 1)
+            if cand < melhor:
+                melhor = cand
+        dp[v] = melhor
+    for v in range(units + 1):
+        _PIER_ARITH_MEMO[(coins, v)] = dp[v] if dp[v] != INF else "X"
+    return dp[units] if dp[units] != INF else None
+
+
+def _tie_parity_fill_arith_cost(wall_idxs, nodes, walls_to_create, end_to_node, candidates,
+                                coins):
+    """(trechos que nao fecham, especiais, B34, pecas) somado sobre os trechos
+    livres das duas fiadas das paredes `wall_idxs`, pelo POTENCIAL aritmetico
+    de cada comprimento. Funcao pura."""
+    by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
+    midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    fail = esp = b34 = pieces = 0
+    for wall_idx in sorted(wall_idxs):
+        for course in ("A", "B"):
+            for pier_cm, lead_cm, trail_cm, _lo, _tr in _wall_course_free_segments_cm(
+                    wall_idx, course, nodes, walls_to_create, end_to_node, by_end, midspan):
+                remaining = _pier_remaining_cm(pier_cm, lead_cm, trail_cm)
+                if remaining <= PIER_LAYOUT_TOLERANCE_CM:
+                    if remaining < -PIER_LAYOUT_TOLERANCE_CM:
+                        fail += 1
+                    continue
+                best = _pier_arith_best(remaining, coins)
+                if best is None:
+                    fail += 1
+                    continue
+                esp += best[0]
+                b34 += best[1]
+                pieces += best[2]
+    return (fail, esp, b34, pieces)
+
+
+def _tie_parity_node_under_opening_reach(node, walls_to_create, openings_per_wall, catalog):
+    """A paridade deste no' NAO e' livre: a verga/contraverga de uma abertura
+    vizinha alcanca a regiao dele.
+
+    Quando o no' fica a menos de um bloco da jamba, a canaleta da abertura
+    precisa atravessar o no' naquela fiada, e o reforco CONVERTE (ou recua) a
+    peca de amarracao que estiver ali - ver `plan_channel_reinforcement`
+    (tie_conversions / CHANNEL_THROUGH_T_PATTERN). A fiada que hospeda a
+    amarracao deixa de ser uma escolha livre: e' a que o reforco permitir.
+
+    Medido em 2026-09-17 (BUTANTA, parede 8284526, T a 27cm da jamba do vao
+    464-615): invertendo esse no', a canaleta de contraverga da fiada 3 ficou
+    com 615-644 no lugar da amarracao 635-669 e a fiada 4 passou a ter um B34
+    com 41% de apoio. O defeito e' da conversao canaleta x amarracao (existe
+    independentemente desta secao); enquanto ele nao for corrigido, a secao 72
+    nao exercita essa combinacao - nunca esconde o caso, so' nao o cria."""
+    alcance = 0.0
+    for code in _pier_codes_by_len_desc(catalog, True, pool=COMMON_FILL_BLOCK_CODES):
+        alcance = max(alcance, (catalog.get(code) or {}).get("length_cm", 0.0))
+    alcance += BLOCK_JOINT_CM
+    for wall_idx in sorted(_node_walls(node)):
+        if wall_idx is None or wall_idx >= len(walls_to_create):
+            continue
+        vaos = (openings_per_wall or {}).get(wall_idx) if isinstance(openings_per_wall, dict) else None
+        if vaos is None:
+            try:
+                vaos = openings_per_wall[wall_idx]
+            except (IndexError, TypeError):
+                vaos = None
+        if not vaos:
+            continue
+        p0, _p1, direction, _length_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+        ponto = node.get("point")
+        if ponto is None:
+            continue
+        t_cm = ((ponto.X - p0.X) * direction.X + (ponto.Y - p0.Y) * direction.Y)             / FEET_PER_METER * 100.0
+        for vao in vaos:
+            t_lo_cm = vao[0] / FEET_PER_METER * 100.0
+            t_hi_cm = vao[1] / FEET_PER_METER * 100.0
+            if t_lo_cm - alcance <= t_cm <= t_hi_cm + alcance:
+                return True
+    return False
+
+
+def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, openings_per_wall,
+                                    end_to_node):
+    """Secao 72: inverte a paridade dos nos T/X que deixam trechos livres
+    aritmeticamente piores. Muta `nodes` IN PLACE (marca `_tie_parity_flip`)
+    e devolve o resultado dos nos ja' re-resolvido. Determinista."""
+    coins = _pier_arith_coins(catalog)
+    if not coins:
+        return outcome
+    # DECISAO UNICA (monotonia): a paridade e' escolhida na PRIMEIRA vez que
+    # os nos sao resolvidos e vale para todas as bandas seguintes e para os
+    # rebuilds dos reparos - a mesma regra do pino de papel e do SAFE REPAIR.
+    # Sem isto a busca roda de novo a cada banda, partindo de um estado ja'
+    # invertido, e o conjunto final de inversoes deixa de ser o que foi
+    # medido (medido em 2026-09-17: dois B34 com 41% de apoio na parede
+    # 8284526, onde as duas fiadas vizinhas passaram a reservar regioes de
+    # no' DIFERENTES).
+    if any(node.get("_tie_parity_fill_done") for node in nodes):
+        return outcome
+    todas = set(range(len(walls_to_create)))
+
+    def _custo(result):
+        return _tie_parity_fill_arith_cost(todas, nodes, walls_to_create, end_to_node,
+                                           result["candidates"], coins)
+
+    base = _custo(outcome)
+    intocaveis = set(outcome.get("tie_parity_flips") or ())
+    movable = [i for i, node in enumerate(nodes)
+               if node.get("kind") in ("T_INTERSECTION", "X_INTERSECTION")
+               and i not in intocaveis and not node.get("_arm_role_pinned")
+               and not _tie_parity_node_under_opening_reach(
+                   node, walls_to_create,
+                   TIE_PARITY_FILL_ALL_OPENINGS if TIE_PARITY_FILL_ALL_OPENINGS is not None
+                   else openings_per_wall, catalog)]
+    movable.sort(key=lambda i: _canonical_node_sort_key(nodes[i]) + (i,))
+    escolhidos = []
+    tentativas = 0
+    for _round in range(TIE_PARITY_FILL_BALANCE_MAX_ROUNDS):
+        melhor = None
+        for node_index in movable:
+            if node_index in escolhidos or tentativas >= TIE_PARITY_FILL_BALANCE_MAX_TRIALS:
+                continue
+            node = nodes[node_index]
+            antes = bool(node.get("_tie_parity_flip"))
+            tentativas += 1
+            node["_tie_parity_flip"] = not antes
+            try:
+                trial = solve_all_intersections(nodes, walls_to_create, catalog,
+                                                openings_per_wall=openings_per_wall,
+                                                end_to_node=end_to_node, _parity_pass=False)
+                custo = _custo(trial)
+            finally:
+                if antes:
+                    node["_tie_parity_flip"] = True
+                else:
+                    node.pop("_tie_parity_flip", None)
+            if custo[0] <= base[0] and custo < base and (melhor is None or custo < melhor[0]):
+                melhor = (custo, node_index)
+        if melhor is None:
+            break
+        base, node_index = melhor
+        node = nodes[node_index]
+        if node.get("_tie_parity_flip"):
+            node.pop("_tie_parity_flip", None)
+        else:
+            node["_tie_parity_flip"] = True
+        escolhidos.append(node_index)
+    for node in nodes:
+        node["_tie_parity_fill_done"] = True
+    if not escolhidos:
+        return outcome
+    final = solve_all_intersections(nodes, walls_to_create, catalog,
+                                    openings_per_wall=openings_per_wall,
+                                    end_to_node=end_to_node, _parity_pass=False)
+    final["tie_parity_flips"] = list(outcome.get("tie_parity_flips") or ())
+    final["tie_parity_conflicts"] = list(outcome.get("tie_parity_conflicts") or ())
+    # A REGRA #1 TEM A ULTIMA PALAVRA: a paridade das pecas ENCOSTADAS foi
+    # planejada sobre a paridade ANTERIOR; com os nos invertidos aqui, as
+    # juntas NO'|FILL de cada fiada mudaram e o plano precisa ser refeito.
+    # Sem esta segunda passada, medido em 2026-09-17, a parede 8284526 ficava
+    # com duas fiadas vizinhas reservando regioes de no' diferentes no mesmo
+    # T (dois B34 com 41% de apoio).
+    if ABUTTING_TIE_PARITY_ENABLED:
+        final = _apply_abutting_tie_parity(
+            final, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    final["tie_parity_fill_flips"] = list(escolhidos)
+    final["tie_parity_fill_cost"] = list(base)
+    return final
 
 
 def _tie_parity_score(result):
