@@ -293,8 +293,9 @@ quebra com `UnboundLocalError: cannot access local variable 'ctypes'` — o pró
 (`2521d1e`): **1 falha, 3 passaram** nos três. Não foi corrigida aqui por estar fora do escopo desta
 missão; fica registrada, não escondida.
 
-Corrida completa desselecionando só esse teste:
-**1.175 passaram, 0 falharam, 1 desselecionado, em 28 min 15 s.**
+Corrida completa desselecionando só esse teste, na HEAD final (com os 10 testes novos de
+`test_node_region_ownership.py`): **1.185 passaram, 0 falharam, 1 desselecionado, em 27 min 54 s.**
+Nenhum teste, baseline ou golden foi alterado para passar.
 
 ---
 
