@@ -53,6 +53,15 @@ def parede_entre_dois_T(comprimento_cm, braco_cm=150.0):
             seg(comprimento_cm, -braco_cm, comprimento_cm, braco_cm)]
 
 
+def _nos_resolvidos(lines):
+    walls = [(line, ft(14.0), (False, False)) for line in lines]
+    walls, jm = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
+    nodes, e2n = m.build_wall_graph(walls, jm)
+    per_wall = dict((i, []) for i in range(len(walls)))
+    out = m.solve_all_intersections(nodes, walls, CATALOG, per_wall, e2n, _parity_pass=False)
+    return walls, nodes, e2n, out
+
+
 def resolve(lines, openings=None, catalog=None):
     walls = [(line, ft(14.0), (False, False)) for line in lines]
     walls, jm = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
@@ -95,27 +104,29 @@ def buracos(walls, res, wall_idx=0, folga_cm=2.5):
 
 
 # ------------------------------------------------------- 1. funcao pura
-def test_melhor_composicao_e_funcao_pura_do_comprimento():
-    """`_pier_arith_best` so' depende do comprimento - e acerta a aritmetica."""
-    coins = ws._pier_arith_coins(CATALOG)
-    esperado = {
-        160.0: (0, 0, 4),     # 4 x B39 exatos
-        195.0: (0, 1, 5),     # 4 x B39 + 1 B34
-        180.0: (0, 4, 5),     # resto 20: 4 B34 saem mais baratos que 1 B19
-        175.0: (0, 5, 5),     # resto 15
-        40.0: (0, 0, 1),
-    }
-    for restante, alvo in sorted(esperado.items()):
-        assert ws._pier_arith_best(restante, coins) == alvo, restante
-    # nao fecha: nao e' multiplo do modulo
-    assert ws._pier_arith_best(163.0, coins) is None
+def test_custo_da_paridade_e_funcao_pura_dos_trechos():
+    """O custo so' depende dos trechos que a paridade deixa - mesma entrada,
+    mesmo resultado, e ele conta o que diz que conta."""
+    walls, nodes, e2n, out = _nos_resolvidos(parede_entre_dois_T(235.0))
+    a = ws._tie_parity_fill_layout_cost({0}, nodes, walls, e2n, out["candidates"], CATALOG)
+    b = ws._tie_parity_fill_layout_cost({0}, nodes, walls, e2n, out["candidates"], CATALOG)
+    assert a == b and len(a) == 5
+    assert a[0] == 0                      # a parede medida fecha nas duas fiadas
+    assert a[1] == 0                      # nenhuma cadeia de compensador (regra #2)
+    # os bracos da fixture tem comprimento nao-modular de proposito: o custo
+    # SEPARA isso em `fail`, o primeiro termo, em vez de esconder.
+    todas = ws._tie_parity_fill_layout_cost(set(range(len(walls))), nodes, walls, e2n,
+                                            out["candidates"], CATALOG)
+    assert todas[0] > 0
 
 
-def test_melhor_composicao_nao_olha_nada_alem_do_comprimento():
-    coins = ws._pier_arith_coins(CATALOG)
-    a = ws._pier_arith_best(235.0, coins)
-    b = ws._pier_arith_best(235.0, coins)
-    assert a == b and a is not None
+def test_custo_prefere_especial_zero_antes_de_b34():
+    """A ordem lexicografica e' (falhas, regra #2, especiais, B34, pecas):
+    trocar um especial por B34 e' sempre uma melhora, o contrario nunca."""
+    walls, nodes, e2n, out = _nos_resolvidos(parede_entre_dois_T(235.0))
+    c = ws._tie_parity_fill_layout_cost({0}, nodes, walls, e2n, out["candidates"], CATALOG)
+    assert (c[0], c[1], c[2], c[3] - 1, c[4]) < c          # menos B34 e' melhor
+    assert (c[0], c[1], c[2] - 1, c[3] + 5, c[4]) < c      # menos especial vence mais B34
 
 
 # ------------------------------------------- 2. o principio (RED/GREEN)

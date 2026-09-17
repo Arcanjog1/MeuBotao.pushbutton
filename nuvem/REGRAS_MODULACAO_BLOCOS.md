@@ -9312,9 +9312,22 @@ trocar `L+1` em moedas de B39=40, B34=35, B19=20, C09=10, C04=5. O resto módulo
 **Implementação.** `_search_tie_parity_fill_balance` (wall_stepper.py) roda
 depois de `_apply_abutting_tie_parity` (regra #1, que tem precedência) e varre
 os nós T/X em ordem geométrica, invertendo os que reduzem ESTRITAMENTE o custo
-aritmético dos trechos livres que deixam:
-`(trechos que não fecham, especiais, B34, peças)` — comparação lexicográfica,
-sem pesos. Especiais antes de B34 é o que o próprio humano faz (parede 8284551,
+dos trechos livres que deixam. Cada trecho é montado com o layout PADRÃO do
+sistema de tiers (`_pier_ordered_layout`) e o custo é
+`(trechos que não fecham, excesso da regra #2, especiais, B34, peças)` —
+comparação lexicográfica, sem pesos.
+
+**Por que o layout real e não o ótimo aritmético.** As duas versões foram
+medidas (2026-09-17). O ótimo aritmético é 10× mais barato mas só prevê o
+resultado real em 10 das 34 paredes (erro médio de 7 peças), porque ignora o
+desencontro de junta e os tiers; o layout real deixa a divergência por parede
+em **1.809** contra **1.841** do aritmético e **2.575** de antes da seção, com
+C09 250 (humano 243) contra 289. O custo de tempo (35 s contra 18 s) foi pago
+com um memo do layout por trecho — `(comprimento, juntas de contorno, pontas
+abertas)` é tudo de que ele depende, e a mesma tupla se repete aos milhares
+durante a varredura: **23 s**, mais rápido que os 27 s de antes da seção.
+Avaliar só as paredes do nó testado (busca local) seria ainda mais barato mas
+piora a divergência para 1.970 — ficou a global. Especiais antes de B34 é o que o próprio humano faz (parede 8284551,
 trecho de 609 cm: ele usa 10 B39 + 6 B34, nenhum especial, onde o solver usava
 14 B39 + 1 B34 + C09 + C04). A decisão é **única por planta** (monotonia: vale
 para as bandas seguintes e para os rebuilds dos reparos) e a regra #1 roda de
@@ -9335,17 +9348,18 @@ LIMITATIONS); enquanto não for corrigido, a §72 não exercita a combinação.
 
 | | HUMANO | antes | §72 |
 |---|---|---|---|
-| peças | 6.018 | 6.026 | **5.983** |
-| B39 | 3.061 | 3.066 | 3.180 |
-| B34 | 1.619 | 1.660 | 1.527 |
-| B19 | 328 | 364 | 377 |
-| C09 | 243 | 272 | 289 |
-| C04 | 244 | 177 | 128 |
-| especiais (soma) | 815 | 813 | **794** |
-| cobertura B39 | 61,8% | 61,3% | 63,5% |
-| trechos com resto bom (0 ou 35) | 33,5% | 33,3% | **38,9%** |
-| perda do preenchimento (peças não-B39 acima do mínimo) | +381 | +411 | **+253** |
-| paridade igual à do humano | — | 26/45 | **28/45** |
+| peças | 6.018 | 6.026 | **5.980** |
+| B39 | 3.061 | 3.066 | 3.205 |
+| B34 | 1.619 | 1.660 | 1.511 |
+| B19 | 328 | 364 | 373 |
+| C09 | 243 | 272 | **250** |
+| C04 | 244 | 177 | 160 |
+| especiais (soma) | 815 | 813 | **783** |
+| cobertura B39 | 61,8% | 61,3% | 64,0% |
+| trechos com resto bom (0 ou 35) | 33,5% | 33,3% | **38,0%** |
+| perda do preenchimento (peças não-B39 acima do mínimo) | +381 | +411 | **+248** |
+| **divergência de composição por parede (soma)** | — | 2.575 | **1.809** |
+| tempo do solve (bancada, 34 paredes) | — | 27 s | **23 s** |
 | colisões / não-modular / sem apoio / invasão | — | 0/0/0/0 | **0/0/0/0** |
 
 Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`
