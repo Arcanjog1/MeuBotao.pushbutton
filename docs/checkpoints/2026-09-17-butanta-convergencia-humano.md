@@ -219,6 +219,117 @@ As duas que pioraram, olhadas peça a peça:
 
 ---
 
+## 7.1 A PRÓXIMA CAUSA SISTÊMICA (diagnosticada, não corrigida)
+
+Os dois maiores resíduos — a 8284580 (205 dos 1.706 pontos) e as três gêmeas de 99 cm — têm a
+**mesma** causa: o modelo de trechos livres que a §72 usa
+(`_wall_course_free_segments_cm`) devolve o MESMO par de comprimentos para as duas paridades,
+enquanto o preenchimento realizado fica com comprimentos diferentes.
+
+- **8284580**: o modelo diz A=184 / B=164 cm; o preenchimento real fica com 139 e 184 cm. Inverter
+  qualquer um dos dois nós não muda o custo — a §72 fica cega.
+- **8284586/7/8**: o modelo dá `(0, 2, 6, 4, 2)` idêntico nas duas paridades; o preenchimento real
+  tem 8 peças, não 6.
+
+O motor JÁ registra o resíduo: `alignment_conflicts` aponta exatamente essas quatro paredes
+(índices 2, 28, 29, 30), curso B, `coincidence_count: 1` cada. No caso da 8284586 o trecho da fiada
+B tem **14 cm** (35 → 49) e a coincidência é o PRÓPRIO FIM do trecho — nenhuma composição de 14 cm
+a evita. Na fiada A existiria alternativa (`B39+B19+C09`, juntas em 54,5 e 74,5, sem tocar os
+49,5), mas ela põe um B19 fora de ponta aberta, que a regra da §2 proíbe. **É um conflito real entre
+a regra #1 e a regra do meio-bloco**, e o motor resolve a favor da regra do meio-bloco e registra.
+
+**O que ficou sem explicação.** Não consegui, nesta sessão, isolar POR QUE as duas visões
+divergem. Descartei: eixo estendido (a 8284580 e a 8284586 têm eixo estendido igual ao original,
+sem deslocamento), memo de preenchimento (resultado idêntico com o memo forçado a errar sempre) e
+não-idempotência de `solve_all_intersections` (sete chamadas seguidas dão candidatos idênticos).
+Fica como a primeira coisa a investigar.
+
+**Recomendação para a próxima rodada:** fazer o modelo de trechos da §72 usar a extensão REAL das
+peças de nó (inclusive quando o encontro degrada) em vez das reservas padrão. Sem isso a §72 não
+enxerga ganho nessas paredes. A alternativa — mudar o PAPEL no T (quem é principal e quem chega) —
+é mudança arquitetural e não deve ser feita sem decisão sua.
+
+---
+
+## 7.2 SUÍTE COMPLETA
+
+`pytest tests/ -q --ignore=tests/regression` no HEAD `cf0277e`:
+**1 falha, 797 passaram em 27 min 33 s** (a corrida parou na falha por causa do `-x`).
+
+A falha é **HERDADA e não tem relação com o motor**:
+`tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas`
+quebra com `UnboundLocalError: cannot access local variable 'ctypes'` — o próprio teste importa
+`ctypes` dentro de um ramo e usa noutro. Reproduzida idêntica em `main` (`55e990d`) e na base do PR
+(`2521d1e`): **1 falha, 3 passaram** nos três. Não foi corrigida aqui por estar fora do escopo desta
+missão; fica registrada, não escondida.
+
+Corrida completa desselecionando só esse teste:
+**1.175 passaram, 0 falharam, 1 desselecionado, em 28 min 15 s.**
+
+---
+
+## 7.3 EXECUÇÃO REAL NO REVIT
+
+Três aplicações encadeadas no documento `butanta testes` (46 paredes, 34 de alvenaria), partindo das
+aberturas devolvidas às posições ORIGINAIS do arquivo (as marcas de microajuste da entrega anterior
+foram apagadas antes, para a execução começar do mesmo estado da bancada).
+
+| | run 1 | run 2 | run 3 |
+|---|---|---|---|
+| lote anterior removido | 8.866 (1 lote) | 8.743 (1 lote) | 8.737 (1 lote) |
+| peças resolvidas | 8.750 | 8.743 | 8.737 |
+| microajuste: exigidas / aplicadas / bloqueadas | 24 / **2** / 1 | 24 / **1** / 0 | 24 / **0** / 0 |
+| peças após remover/recolocar | 8.743 | 8.737 | 8.737 |
+| **criadas** | **8.743** | **8.737** | **8.737** |
+| falhas de criação | **0** | **0** | **0** |
+| readback conferido / divergências | 8.743 / **0** | 8.737 / **0** | 8.737 / **0** |
+| `planned == created` | **sim** | **sim** | **sim** |
+| lote único | `20260917-015101` | `20260917-020931` | `20260917-022526` |
+| HUMANO modificado | **não** | **não** | **não** |
+| tempo | 18 min 25 s | 18 min 22 s | 15 min 52 s |
+
+**Idempotência provada:** o run 3 moveu **zero** aberturas e criou exatamente as mesmas 8.737 peças
+do run 2. A convergência foi 2 → 1 → 0 deslocamentos (a §66 examina no máximo 6 aberturas por
+execução). Deslocamento total: **3 aberturas**, sem acúmulo.
+
+**Geometria real conferida contra a bancada** (extração do lote final, mesma régua de fiadas 0–11):
+
+| | bancada | Revit real |
+|---|---|---|
+| peças | 5.971 | 5.958 |
+| B39 | 3.175 | 3.189 |
+| B34 | 1.548 | 1.534 |
+| B19 | 371 | 380 |
+| C09 | 247 | **223** |
+| C04 | 150 | 151 |
+| divergência por parede | 1.706 | 1.739 |
+| juntas contínuas (régua geométrica) | 0 | 0 |
+
+A diferença são exatamente as 3 aberturas que a §66 moveu (a bancada resolve com as posições
+originais). O resultado real ficou **melhor em compensador**: C09 223 contra 254 do humano.
+
+O TARGET ficou **aberto, ativo, modificado e NÃO salvo**, como pedido. O HUMANO nunca recebeu
+Transaction: `IsModified` = False antes e depois das três execuções e de toda a extração.
+
+### Comparação visual — interrompida por um diálogo do Revit
+
+Os 10 enquadramentos (T, cruz, porta, janela, B54, B34, aglomerado de especiais, pano liso e as duas
+paredes com defeito conhecido) foram montados e a captura começou; saíram as duas primeiras imagens
+(`A_T_8284579_target.png` e `A_T_8284579_humano.png`). Na segunda, o Revit abriu o lembrete modal
+**"Projeto não recentemente salvo"**, que bloqueia a API — nenhuma chamada MCP responde enquanto ele
+estiver na tela.
+
+As quatro opções do diálogo são: *Salvar o projeto*, *Salvar o projeto e definir intervalos de
+lembrete*, *Não salve e defina intervalos de lembrete* e *Cancelar*. **Duas delas salvariam o
+TARGET**, contra a regra explícita da missão. Dispensá-lo por automação de janela foi bloqueado
+pela política de permissões desta sessão, e por dentro do Revit não dá — é ele que trava o MCP.
+
+**O lote NÃO corre risco**: as 8.737 peças estão no documento aberto e o diálogo não altera nada.
+Basta clicar em **Cancelar** (ou *Não salve e defina intervalos de lembrete*) para liberar o Revit e
+a captura recomeça de onde parou com `py -3 shoot_all72.py`.
+
+---
+
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
 
 Nenhum destes foi codificado.
