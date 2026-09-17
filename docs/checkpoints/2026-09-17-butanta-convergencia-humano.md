@@ -168,6 +168,7 @@ As duas que pioraram, olhadas peça a peça:
 | §72 avaliando só as paredes do nó (busca local) | divergência 1.970, 22 s | 40% mais rápido mas perde 160 pontos de divergência; resolvido com memo de layout (23 s, 1.809) |
 | §72 estendida aos cantos L | divergência 1.706 → 1.761, especiais 768 → 775 | piora medida; revertido |
 | §73 B34 perto da ponta como desempate | resultado IDÊNTICO | os 103 B34 enterrados no meio são `STANDARD_FILL` decididos pelo comprimento, não por empate — o desempate nunca dispara |
+| §72 avaliada com o conjunto COMPLETO de aberturas (em vez da fatia da banda) | divergência 1.706 → 2.142; a 8284579 volta a 222 | com todas as aberturas os nós degradam a amarração e o modelo perde a informação que fazia a decisão certa; a fatia da banda 0 (a mais restrita) decide melhor |
 
 ---
 
@@ -327,6 +328,186 @@ pela política de permissões desta sessão, e por dentro do Revit não dá — 
 **O lote NÃO corre risco**: as 8.737 peças estão no documento aberto e o diálogo não altera nada.
 Basta clicar em **Cancelar** (ou *Não salve e defina intervalos de lembrete*) para liberar o Revit e
 a captura recomeça de onde parou com `py -3 shoot_all72.py`.
+
+---
+
+## 7.35 MÉTRICAS FINAIS — SOBRE A GEOMETRIA REAL DO REVIT
+
+Fiadas 0–11, 34 paredes de alvenaria. A coluna FINAL é a **geometria extraída do lote criado no
+Revit**, não a da bancada.
+
+| | HUMANO | MAIN | PR42 ANTES | FINAL |
+|---|---|---|---|---|
+| peças | 6.018 | 6.115 | 6.026 | **5.958** |
+| B39 | 3.061 | 3.140 | 3.066 | 3.189 |
+| B34 | 1.619 | 1.487 | 1.660 | 1.534 |
+| B54 | 172 | 168 | 168 | 168 |
+| B19 | 328 | 291 | 364 | 380 |
+| C09 | 254 | 422 | 272 | **223** |
+| C04 | 244 | 292 | 177 | 151 |
+| especiais (B19+C09+C04) | 826 | 1.005 | 813 | **754** |
+| **divergência total** | 0 | 3.080 | 2.575 | **1.727** |
+| divergência média por parede | 0 | 90,6 | 75,7 | **50,8** |
+| cobertura de B39 | 61,8% | 63,6% | 61,3% | 63,6% |
+| B34 end-zone | 35,4% | — | 35,1% | 38,3% |
+| B34 junction-zone | 1,9% | — | 0,0% | 0,4% |
+| B34 center-junction-zone | 11,0% | — | 7,4% | 9,6% |
+| B34 free-mid-wall | 42,4% | — | 43,1% | 37,4% |
+| **B34 a menos de 20 cm de um nó** | 50,3% | — | 45,1% | **50,2%** |
+| B54 em T / cruz / outro | 172 / 0 / 0 | 168/0/0 | 168/0/0 | **168 / 0 / 0** |
+| compensador a ≤20 cm de um B54 | 6,2% | — | 11,8% | 10,2% |
+| B19+B34 no envelope de um B54 | 107 | — | 139 | 149 |
+| aberturas deslocadas / cm total | 0 | — | — | **3 / 30 cm** |
+| junta isolada coincidente (régua geométrica) | 169 | — | 1 | 1 |
+| maior corrida de junta (idem) | 12 | — | 2 | 2 |
+| junta contínua ≥4 fiadas (idem) | 21 | 0 | 0 | 0 |
+| **paredes reprovadas pelo auditor do motor** | — | — | 4 | **4** |
+| incompatibilidade de vazado do B34 | 41 (2,5%) | — | 71 (4,3%) | 65 (4,2%) |
+| B19 em meio de parede | 103 | — | 20 | 63 |
+| aglomerado de especiais | 0 | — | 11 | 17 |
+| colunas de compensador (peças / % dos especiais) | 27 (230 / 28%) | — | 12 (103 / 13%) | 13 (114 / 15%) |
+| colisões / não-modular / sem apoio / invasão | — | 0/**78**/0/0 | 0/0/0/0 | **0/0/0/0** |
+| tempo do solve (bancada) | — | 3 s | 27 s | **21 s** |
+
+**Efeito medido da correção sobre os comprimentos** (é a cadeia causal, não correlação):
+
+- **208 das 406 fiadas-parede (51%)** mudaram o conjunto de comprimentos dos seus trechos livres;
+- trechos com resto bom (fecham só com bloco inteiro, ou com 1 B34): **33,3% → 38,7%** (+64);
+- **245 trechos passaram a exigir MENOS bloco de ajuste**, 103 passaram a exigir mais (líquido +142).
+
+---
+
+## 7.4 A REGRA DE POSSE DA REGIÃO DO NÓ — AUDITORIA
+
+**Como o motor decide.** Duas decisões encadeadas, as duas puramente geométricas:
+
+1. **O papel**, em `wall_pairing.py`: quando a PONTA de uma parede encosta no MEIO do vão de outra
+   (`_classify_point_along_wall` → `T_INTERSECTION`), a que continua vira `main_wall_idx` e a que
+   encosta vira `incoming_wall_idx`. Perto de uma ponta da outra, vira `L_CORNER`. Não olha
+   ElementId, ordem de entrada, camada nem sentido do eixo — só a posição do ponto de encontro ao
+   longo do vão da vizinha.
+2. **A fiada**, em `solve_t_intersection`: convenção fixa **por papel** — `B54` na principal vai
+   para a **Fiada A**, `B34` na que chega vai para a **Fiada B**. Está escrito na própria docstring
+   que "a inversão A/B que a seção 11 permite fica para a Etapa 7 decidir".
+
+**Por que dava 37/10.** A fase é função pura do PAPEL, e o papel é função pura da geometria. Uma
+parede que é principal em vários T hospeda sempre na mesma fiada. No BUTANTÃ, 8284515 é principal
+em 6 T, 8284502 e 8284522 em 4 cada: a fase fica correlacionada pela planta inteira e o balanço
+global vai para 37/10. O humano decide nó a nó e fica em **23/23**.
+
+**Qual informação física a §72 usa.** Só o comprimento que cada paridade deixa para preencher, e
+o layout padrão do sistema de tiers sobre esse comprimento. Não usa id, nem ordem, nem orientação.
+
+**Sensibilidades, medidas:**
+
+| a decisão depende de… | resposta | como foi medido |
+|---|---|---|
+| ordem de entrada das paredes | **não** (na fixture) | 5 permutações → assinatura física idêntica |
+| inversão das pontas do eixo | **não** | mesma assinatura lida ao contrário |
+| translação da planta | **não** | mesma assinatura |
+| repetição | **não** | mesma geometria |
+| ElementId / wall id | **não** | a fixture sintética não tem id nenhum |
+| **banda de fiadas em que roda** | **SIM** | ver abaixo |
+
+**A dependência de banda é real e é física.** `_t_intersection_room_ok` consulta as aberturas para
+decidir se a peça de amarração cabe, e `openings_per_wall` chega fatiado por banda de altura. Na
+parede de 209 cm entre dois T o contorno da ponta muda com a fatia:
+
+| aberturas vistas | contorno da ponta 1 (A / B) |
+|---|---|
+| todas | 200 / 200 |
+| nenhuma | 195 / 175 |
+| fatia da banda 0 | 200 / 200 |
+
+Isso está **certo**: a amarração não cabe onde há porta, e cabe acima da verga. A consequência é que
+a §72, que decide uma vez para a planta inteira, decide na banda mais restrita. **Testei avaliar a
+decisão com o conjunto COMPLETO de aberturas: piora** (divergência 1.706 → 2.142, e a 8284579
+volta a 222). Rejeitado — está na tabela de experimentos.
+
+---
+
+## 7.5 TOP 20 NO ESTADO FINAL, COM A CAUSA CLASSIFICADA
+
+Sobre a geometria REAL do Revit (divergência total 1.727):
+
+| parede | div | nós com fase ≠ humano | causa |
+|---|---|---|---|
+| 8284580 | 204,7 | 1 | NODE_REGION_OWNERSHIP |
+| 8284589 | 124,0 | 1 | NODE_REGION_OWNERSHIP |
+| 8284590 | 124,0 | 0 | REQUIRED_SPECIAL |
+| 8284561 | 112,0 | 1 | NODE_REGION_OWNERSHIP |
+| 8284552 | 109,9 | 2 | NODE_REGION_OWNERSHIP + B54_CONTEXT |
+| 8284502 | 105,0 | 1 | NODE_REGION_OWNERSHIP + OPENING_OFFSET |
+| 8284539 | 93,3 | 1 | NODE_REGION_OWNERSHIP + PROJECT_SPECIFIC_HUMAN_PATTERN |
+| 8284574 | 90,9 | 1 | NODE_REGION_OWNERSHIP + PROJECT_SPECIFIC_HUMAN_PATTERN |
+| 8284548 | 84,2 | 1 | NODE_REGION_OWNERSHIP |
+| 8284515 | 82,5 | 5 | NODE_REGION_OWNERSHIP + B54_CONTEXT |
+| 8284522 | 81,3 | 1 | NODE_REGION_OWNERSHIP |
+| 8284562 | 76,6 | 1 | NODE_REGION_OWNERSHIP |
+| 8284558 | 59,3 | 0 | B34_DISTRIBUTION |
+| 8284546 | 58,1 | 4 | NODE_REGION_OWNERSHIP + OPENING_OFFSET |
+| 8284526 | 44,6 | 2 | NODE_REGION_OWNERSHIP + B54_CONTEXT |
+| 8284591 | 42,9 | 1 | NODE_REGION_OWNERSHIP |
+| 8284586 | 33,3 | 0 | UNEXPLAINED |
+| 8284587 | 33,3 | 0 | UNEXPLAINED |
+| 8284588 | 33,3 | 1 | NODE_REGION_OWNERSHIP |
+| 8284584 | 32,3 | 0 | PROJECT_SPECIFIC_HUMAN_PATTERN |
+
+**Contagem:** NODE_REGION_OWNERSHIP **15**, B54_CONTEXT 3, PROJECT_SPECIFIC_HUMAN_PATTERN 3,
+OPENING_OFFSET 2, UNEXPLAINED 2, REQUIRED_SPECIAL 1, B34_DISTRIBUTION 1.
+
+**A causa-raiz continua sendo a mesma** — e ela ainda responde por 15 das 20 piores paredes.
+
+### Por que a 8284580 não tem mais ganho por paridade
+
+Medido na fatia da banda 0: o nó de t=202 **não concede amarração a nenhuma das duas fiadas**
+(contorno 200/200 nas duas), porque a parede vizinha tem portas nessa altura. Inverter qualquer um
+dos dois nós apenas troca os rótulos nas pontas — o par de comprimentos {184, 164} é **invariante**
+e o custo dá exatamente igual, `(0, 0, 10, 1, 3)` antes e depois. Nas bandas acima das vergas o nó
+passa a conceder, mas a decisão já está congelada (é única por planta, por construção).
+
+O resíduo dessa parede **não é de paridade**: ela é a que CHEGA nos dois T
+(`incoming_wall_idx` nos dois), então preenche os 209 cm inteiros em toda fiada. A alavanca é o
+**papel no T**, que é mudança arquitetural e não foi feita.
+
+---
+
+## 7.6 O CASO 75 cm → 70 cm (§13) — RESOLVIDO
+
+Parede 8284534, região entre o vão que termina em 595 e o T em 697. A abertura ficou em **offset 0**
+e a composição saiu **peça por peça igual à do humano**, apenas trocada entre as famílias de fiada
+(o que não é físico):
+
+```
+HUMANO f0   B39@595-634  B34@635-669  B54@670-724  B34@725-759
+FINAL  f1   B39@595-634  B34@635-669  B54@670-724  B34@725-759
+HUMANO f1   B19@595-614  B39@615-654  B34@655-689  B34@705-739  B39@740-779
+FINAL  f0   B19@595-614  B39@615-654  B34@655-689  B34@705-739  B39@740-779
+```
+
+É exatamente o `B39 + B34` junto da amarração `B54` que a missão pedia. As aberturas dessa parede
+**não são mais movidas** pela §66.
+
+---
+
+## 7.7 MICROAJUSTE (§66) — SWEEP COM O MOTOR FINAL
+
+Deslocando SÓ a abertura 8079001 (parede 8284546, a que a §66 moveu na execução real), de −10 a
++10 cm em passos de `PIER_MODULE_CM`, e medindo a parede inteira depois do solve completo:
+
+| offset | peças | B39 | B34 | B19 | C09 | C04 | especiais | não-modular | colisões |
+|---|---|---|---|---|---|---|---|---|---|
+| −10 | 291 | 195 | 57 | 3 | 9 | 3 | 15 | 0 | 0 |
+| −5 | 290 | 191 | 62 | 2 | 11 | 0 | 13 | 0 | 0 |
+| **0** | 292 | 193 | 60 | 0 | **13** | 2 | 15 | 0 | 0 |
+| +5 | 291 | 192 | 60 | 3 | 10 | 0 | 13 | 0 | 0 |
+| **+10 (a §66 escolheu este)** | 291 | **195** | 57 | 3 | **7** | 3 | **13** | 0 | 0 |
+
+**O offset escolhido é o melhor da faixa**: empata em B39 com o extremo oposto e tem quase metade
+dos C09 do offset 0. Offset 0 era candidato real e perdeu por mérito, não por arredondamento.
+
+O caso que motivou a suspeita na rodada anterior (parede 8284534, +5 com 7 C09 contra 1 no offset 0)
+**deixou de existir**: a §66 não move mais as aberturas dessa parede (ver §7.6).
 
 ---
 
