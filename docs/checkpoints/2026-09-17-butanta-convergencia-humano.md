@@ -10,6 +10,30 @@ do motor entra na classificação).
 
 ---
 
+## 0. VEREDITO — CAUSA-RAIZ FINAL
+
+**A narrativa não mudou: o maior erro sistêmico restante era — e continua sendo — a distribuição
+dos comprimentos dos trechos, provocada pela posse da região dos nós.**
+
+Nada maior apareceu. Duas rodadas de investigação depois, com a correção (§72) já aplicada e medida
+na geometria real do Revit, essa causa ainda explica **15 das 20** paredes mais divergentes. As
+outras cinco se dividem entre um especial genuinamente exigido pelo comprimento (1), distribuição de
+B34 (1), padrão humano não aprovado (1) e duas paredes de 99 cm cuja causa não foi isolada.
+
+O que a correção alcançou: divergência de composição por parede **3.080 (main) → 2.575 → 1.727**,
+com **zero** regressão de hard gate e o solve **mais rápido** que antes.
+
+O que sobra e por quê:
+
+- **8284580** (205 dos 1.727 pontos) — a parede CHEGA nos dois T, então preenche os 209 cm inteiros
+  em toda fiada. Medido: na banda em que a decisão é tomada, o nó não concede amarração a nenhuma
+  das duas fiadas e o par de comprimentos é **invariante** à inversão — não há ganho de paridade a
+  extrair. A alavanca é o **papel no T**, mudança arquitetural, não feita.
+- **3 paredes** dependem do padrão humano de coluna de compensador na jamba, que **não foi
+  codificado** por conflitar com a regra #1.
+
+---
+
 ## 1. ROOT CAUSES ENCONTRADAS
 
 ### 1.1 A composição de um trecho é função EXATA do comprimento
@@ -331,7 +355,7 @@ a captura recomeça de onde parou com `py -3 shoot_all72.py`.
 
 ---
 
-## 7.35 MÉTRICAS FINAIS — SOBRE A GEOMETRIA REAL DO REVIT
+## 7.4 MÉTRICAS FINAIS — SOBRE A GEOMETRIA REAL DO REVIT
 
 Fiadas 0–11, 34 paredes de alvenaria. A coluna FINAL é a **geometria extraída do lote criado no
 Revit**, não a da bancada.
@@ -377,7 +401,7 @@ Revit**, não a da bancada.
 
 ---
 
-## 7.4 A REGRA DE POSSE DA REGIÃO DO NÓ — AUDITORIA
+## 7.5 A REGRA DE POSSE DA REGIÃO DO NÓ — AUDITORIA
 
 **Como o motor decide.** Duas decisões encadeadas, as duas puramente geométricas:
 
@@ -426,7 +450,7 @@ volta a 222). Rejeitado — está na tabela de experimentos.
 
 ---
 
-## 7.5 TOP 20 NO ESTADO FINAL, COM A CAUSA CLASSIFICADA
+## 7.6 TOP 20 NO ESTADO FINAL, COM A CAUSA CLASSIFICADA
 
 Sobre a geometria REAL do Revit (divergência total 1.727):
 
@@ -472,7 +496,7 @@ O resíduo dessa parede **não é de paridade**: ela é a que CHEGA nos dois T
 
 ---
 
-## 7.6 O CASO 75 cm → 70 cm (§13) — RESOLVIDO
+## 7.7 O CASO 75 cm → 70 cm (§13) — RESOLVIDO
 
 Parede 8284534, região entre o vão que termina em 595 e o T em 697. A abertura ficou em **offset 0**
 e a composição saiu **peça por peça igual à do humano**, apenas trocada entre as famílias de fiada
@@ -490,7 +514,7 @@ FINAL  f0   B19@595-614  B39@615-654  B34@655-689  B34@705-739  B39@740-779
 
 ---
 
-## 7.7 MICROAJUSTE (§66) — SWEEP COM O MOTOR FINAL
+## 7.8 MICROAJUSTE (§66) — SWEEP COM O MOTOR FINAL
 
 Deslocando SÓ a abertura 8079001 (parede 8284546, a que a §66 moveu na execução real), de −10 a
 +10 cm em passos de `PIER_MODULE_CM`, e medindo a parede inteira depois do solve completo:
@@ -511,6 +535,21 @@ O caso que motivou a suspeita na rodada anterior (parede 8284534, +5 com 7 C09 c
 
 ---
 
+## 7.9 DESEMPENHO E DETERMINISMO
+
+**Custo da §72, medido por dentro:** a busca de paridade gasta **1,51 s** de um solve de 29,5 s
+(**5,1%**), em 56 chamadas — só a primeira faz a busca, as outras 55 batem na guarda de decisão
+única. O solve completo na bancada é **21 s**, contra 27 s antes da seção (o memo de layout por
+trecho pagou o custo com folga).
+
+**Determinismo:** repetir o solve dá geometria byte-idêntica. Permutar a ordem de entrada das
+paredes muda o resultado — **mas isso é anterior a esta missão**: base `2521d1e` 8.837 → 8.836/8.851;
+final 8.750 → 8.746/8.768, mesma ordem de grandeza. Na fixture sintética a §72 é invariante a cinco
+permutações, à inversão das pontas, à translação e à repetição (`tests/test_node_region_ownership.py`),
+então a sensibilidade residual do projeto real **não vem da regra de posse do nó**.
+
+---
+
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
 
 Nenhum destes foi codificado.
@@ -525,7 +564,80 @@ Nenhum destes foi codificado.
 
 ---
 
-## 9. RESPOSTAS ÀS PERGUNTAS DA MISSÃO
+## 8.1 PADRÕES PENDENTES — LISTA CONSOLIDADA
+
+Nenhum destes foi codificado. Todos conflitam com uma regra atual do produto ou dependem de
+decisão sua.
+
+| # | padrão | evidência | conflito |
+|---|---|---|---|
+| 1 | **Coluna vertical de compensador ancorada na jamba** | 27 colunas, 230 peças = **28% de todos os especiais do humano**; 26 em jamba, 1 em ponta, **0 em meio de parede** | implica aceitar junta vertical controlada — conflita com a regra #1 |
+| 2 | **Junta contínua tolerada** | humano tem **21 juntas de 4+ fiadas (máx 12)** e 4,6% das juntas coincidindo com a fiada de baixo; solver tem 0 | a regra #1 do produto é MAIS dura que o projeto de referência |
+| 3 | **Compensadores encostados** | humano 97 pares (C04+C09), solver 38 | consequência do padrão 1; conflita com a regra #2 |
+| 4 | **B19 em meio de parede** | humano 103, solver 63 | já registrado como não-defeito na §56.3; sem conflito, só divergência |
+| 5 | **B34 nas pontas do trecho** | humano 93,7% na 1ª/2ª/penúltima/última posição | não é codificável como desempate — ver §73 rejeitada |
+
+**Decisão do produto que este relatório registra explicitamente:** a regra #1 (junta vertical
+contínua proibida) permanece como está. O produto pode ser mais restritivo que a referência; o
+projeto humano não é gabarito quando viola regra do produto. Os casos ficam classificados como
+`HUMAN_PROJECT_SPECIFIC` / `PENDING_PRODUCT_DECISION`, nunca copiados.
+
+---
+
+## 9. RESPOSTAS OBRIGATÓRIAS — FECHAMENTO
+
+1. **A posse da região dos nós era realmente a maior causa sistêmica?**
+   **Sim, e continua sendo.** Ela explica **15 das 20** paredes mais divergentes no estado final.
+   A convenção era fixa por papel (B54 → Fiada A na principal, B34 → Fiada B na que chega), o que
+   correlaciona a fase pela planta inteira: 37/10 contra 23/23 do humano.
+
+2. **Quanto da divergência caiu por causa dela?**
+   Divergência total **2.575 → 1.727 (−33%)**; média por parede **75,7 → 50,8**. Contra a `main`
+   (3.080) a queda é de **44%**. Seis das 20 piores saíram do top 20 (8284557 302→0, 8284579 222→0,
+   8284567 164→0).
+
+3. **Quantos trechos mudaram de comprimento?**
+   **208 das 406 fiadas-parede (51%)** mudaram o conjunto de comprimentos dos seus trechos livres.
+
+4. **Quantos passaram a aceitar mais B39?**
+   **245 trechos passaram a exigir MENOS bloco de ajuste** (103 passaram a exigir mais, líquido
+   +142). Trechos com resto bom: **33,3% → 38,7%**.
+
+5. **Onde os B34 ficaram depois da correção?**
+   38,3% em ponta de parede, 9,6% em nó central, 0,4% em nó de extremidade, 14,3% em vão,
+   37,4% em meio de parede livre. **A menos de 20 cm de um nó: 50,2% — o humano tem 50,3%.**
+
+6. **B54 continua restrito a T/+?**
+   **Sim. 168 peças, todas em T, todas a menos de 20 cm de um nó.** Zero em cruz, zero fora de
+   amarração. O humano: 172, idêntico. A nova divisão dos trechos não alterou nenhum contexto.
+
+7. **Quantos C09/C04 próximos de B54 ainda existem e por quê?**
+   Dos 374 compensadores, **10,2% estão a ≤20 cm de um B54** (humano 6,2%; antes da correção 11,8%).
+   A causa é o comprimento residual do trecho entre a amarração e a próxima fronteira — são
+   consequência do comprimento, não de regra de nó nem de microajuste: nos 105 trechos em que
+   sobrou especial existindo alternativa limpa, a alternativa custaria ≥1 B34 a mais, e o próprio
+   humano nunca paga isso (0 de 105 casos dele).
+
+8. **O §66 ainda move alguma abertura para uma posição com modulação final pior?**
+   **Não, nos casos medidos.** Sweep completo da abertura que ele moveu (8079001): o offset escolhido
+   (+10) tem **7 C09 contra 13 no offset 0** e mais B39. O caso que levantou a suspeita
+   (parede 8284534) deixou de existir: ele não move mais aquelas aberturas, e a composição saiu
+   peça por peça igual à do humano.
+
+9. **Quantas diferenças restantes são peculiaridades humanas não aprovadas?**
+   **3 das 20** piores paredes têm `PROJECT_SPECIFIC_HUMAN_PATTERN` como causa (coluna de
+   compensador na jamba). No total da planta, o padrão responde por **28% dos especiais do humano**
+   (230 de 826 peças) contra 15% do solver — é a maior diferença estrutural que sobra e depende de
+   decisão sua.
+
+10. **Alguma nova violação de hard gate foi introduzida?**
+    **NÃO.** Colisões 0, não-modular 0, peças sem apoio 0, invasão de abertura 0 — nas três
+    execuções reais no Revit e na bancada. A `main` tinha 78 não-modular. As 4 paredes que o auditor
+    de amarração reprova são **as mesmas antes e depois** desta missão.
+
+---
+
+## 9.1 RESPOSTAS DA RODADA ANTERIOR (mantidas)
 
 1. **B39 virou o bloco predominante?** Sim: cobertura 61,3% → 63,4% (humano 61,8%), 3.175 peças
    contra 3.061 do humano.
@@ -556,3 +668,31 @@ Nenhum destes foi codificado.
 14. **Custo de desempenho?** Nenhum: solve 27 s → 21 s na bancada.
 15. **O que falta depende de regra não aprovada?** Sim, o maior item: a **coluna de compensador na
     jamba** (28% dos especiais do humano) e a tolerância dele a junta corrida controlada.
+
+---
+
+## 10. ENTREGA
+
+**Branch** `claude/butanta-modulation-physical-fixes` · **HEAD** `697f764` ·
+**PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.
+
+Arquivos tocados desde `2521d1e` (base desta missão):
+
+```
+ .../2026-09-17-butanta-convergencia-humano.md      | 558 +++++++++++++++++++++
+ nuvem/REGRAS_MODULACAO_BLOCOS.md                   | 134 +++++
+ nuvem/core/engine/wall_stepper.py                  | 279 +++++++++++
+ nuvem/core/wall_modeling.py                        |  15 +
+ tests/test_node_region_ownership.py                | 255 ++++++++++
+ tests/test_tie_parity_fill_balance.py              | 238 +++++++++
+ 6 files changed, 1479 insertions(+)
+```
+
+**Estado do Revit ao fim:** documento `butanta testes` aberto e ativo, com o lote único
+`20260917-022526` de 8.737 peças. **Atenção:** o documento foi SALVO — o lembrete
+"Projeto não recentemente salvo" que travou a sessão foi dispensado por uma das opções de salvar,
+não por *Cancelar*. Nada se perdeu (o lote está íntegro), mas o arquivo em disco passou a conter a
+modulação. O HUMANO nunca recebeu Transaction: `IsModified = False` em todas as verificações.
+
+**Capturas:** 22 imagens (11 casos × HUMANO/TARGET) em `scratchpad/shots/`, com realce local
+aplicado (`*_hi.png`).
