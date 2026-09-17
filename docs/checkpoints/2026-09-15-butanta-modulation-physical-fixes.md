@@ -3,9 +3,9 @@
 ```json
 {
   "date": "2026-09-15",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/butanta-modulation-physical-fixes",
-  "head": "9e807be",
+  "head": "9e807bea0250a0bd045502c820cffa5cbbd90893",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",

@@ -1,5 +1,114 @@
 # PR #42 — Convergência com o projeto humano (2026-09-17)
 
+```json
+{
+  "date": "2026-09-17",
+  "scope": "current",
+  "branch": "claude/butanta-modulation-physical-fixes",
+  "head": "4bf431f0378db61b45f24b2b94fbe5b1e0194add",
+  "base": "55e990d962ed22ae1021f0d335db197607bddda1",
+  "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
+  "veredito": "READY FOR FINAL REVIT SMOKE - offline verde, aplicacao real no Revit PENDENTE",
+  "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
+  "changes": [
+    "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
+    "nuvem/core/wall_modeling.py: flags CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED e CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED, com salvar/restaurar no finally.",
+    "tests/test_tie_parity_fill_balance.py e tests/test_node_region_ownership.py (novos): a cadeia causal posse do no' -> comprimento -> composicao, em fixture sintetica.",
+    "tests/test_t_room_physical_tolerance.py (novo): a secao 74 em fixture sintetica, com a falta pedida em centesimos de milimetro e nenhum id do projeto.",
+    "reference_projects/butanta_r08_lt/s74_corpus/ (novo): corpus auditavel da secao 74 - geometria minima (34 paredes, 44 aberturas, catalogo real), os 37 encontros T com o espaco medido e o veredito com e sem a flag, o caso da parede 8284580 e os hashes S74_SNAPSHOT_V1 por tolerancia. STATUS: EVIDENCIA / NAO NORMA.",
+    "tools/audit/s74_corpus.py, tools/audit/extract_butanta_corpus.py e tools/audit/audit_s74_corpus.py (novos): biblioteca que entrega o corpus as funcoes REAIS do motor, extrator que regera o corpus e runner PASS/FAIL da auditoria.",
+    "tests/test_s74_corpus_butanta.py (novo): 39 testes sobre o corpus versionado.",
+    "tools/documentation/verify_reference_inventory.py: aceita o terceiro projeto do acervo e passa a exigir inclusao (todo JSON publicado esta' inventariado) em vez de igualdade, agora que um acervo vive fora de docs/revit_reference_extraction/.",
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secoes 70 a 74 (70 e 73 medidas e rejeitadas); a 74 redigida como tolerancia fisica controlada, nao como correcao de ruido numerico.",
+    "docs/checkpoints/2026-09-17-butanta-convergencia-humano.md: relatorio da missao."
+  ],
+  "tests": [
+    "Suite completa (tests/, sem regression): 1.231 passaram, 0 falharam, 1 desmarcado.",
+    "tests/test_s74_corpus_butanta.py: 39 passaram (33 em 0,3 s; 6 marcados slow rodam o solver real das 34 paredes).",
+    "tools/audit/audit_s74_corpus.py: 40 casos, 40 PASS, 0 FAIL.",
+    "Legado (strategy=None) byte-identico e agora auditavel: 8.939 pecas, sha256 3ba22aa08913ac5d..., o mesmo com a flag ligada e desligada.",
+    "Determinismo: repetir o solve da geometria identica; permutar a ordem de entrada muda o resultado - comportamento anterior a esta missao.",
+    "Saturacao da tolerancia: 0,05 / 0,10 / 0,30 cm produzem o mesmo conjunto fisico (sha256 0a42e2ec4fee65a4...), com a flag desligada em b152406adb779655..."
+  ],
+  "known_failures": [
+    "test_perf_trace_stall_sampler::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas falha com UnboundLocalError (ctypes) igual em main 55e990d e na base do PR - defeito herdado, desmarcado e nao escondido.",
+    "A aplicacao da secao 74 no Revit NAO foi executada: o Revit ficou travado no modal TaskDialog_Project_Not_Saved_Recently sem operador para dispensa-lo. Purge, reset das 44 aberturas, run 1/run 2, readback e capturas finais continuam PENDENTES.",
+    "Quatro paredes continuam reprovadas pelo auditor de junta do proprio motor, as mesmas antes e depois desta missao.",
+    "O corpus exerce so' a perna do B54 de _t_intersection_room_ok; a perna do B34 nao tem cobertura de regressao ali (boneca mais apertada 69,0002 cm contra 34 exigidos) - declarado no bloco coverage de t_nodes.json."
+  ],
+  "physical_deltas": [
+    "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
+    "Secao 74, medida pelo corpus versionado: 37 encontros T, dez reprovam o teste de espaco sem ela, tres passam a caber com ela (faltavam 0,012 / 0,003487 / 0,003487 cm) e sete continuam reprovando (4,001054 / 15,012 / 14,9965 / 20,0048 / 19,9965 cm).",
+    "Parede 8284580: divergencia 204,7 -> 3,3; composicao 14 B39 + 51 B34 + 5 C09 + 1 B19 -> 48 B39 + 11 B34 + 1 B19, contra 48 B39 + 12 B34 do humano.",
+    "Hard gates 0/0/0/0 (colisoes, nao-modular, sem apoio, invasao de vao) em todos os casos."
+  ],
+  "decisions_taken": [
+    "A tolerancia da secao 74 e' a constante fisica que o motor ja' definia (PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm): nenhuma constante nova, nenhuma alterada.",
+    "A mudanca e' semantica e deliberada - a fronteira de cabe/nao-cabe foi ampliada em ate' 0,05 cm. A justificativa e' a separacao medida entre variacao de modelagem (0,013251 cm) e o primeiro caso materialmente insuficiente (4,001054 cm), NAO a saturacao.",
+    "O corpus e' EVIDENCIA, nao NORMA: so' a composicao humana de UMA parede foi versionada, como testemunha do caso 8284580.",
+    "Peculiaridades humanas medidas (coluna vertical de compensador na jamba, junta vertical continua) NAO foram codificadas - seguem pendentes de aprovacao."
+  ],
+  "decisions_pending": [
+    "Executar a restauracao controlada do TARGET e a aplicacao da secao 74 no Revit (run 1/run 2/run 3 se preciso), com readback e capturas.",
+    "Aprovar ou recusar os padroes humanos descobertos, principalmente a coluna vertical de compensador na jamba (28% dos especiais do projeto humano).",
+    "Veredito da auditoria independente sobre o corpus versionado."
+  ],
+  "next_steps": [
+    "Quando houver operador no Revit: dispensar o modal em Cancelar, rodar q_activate, censo PRE_RESET, purga, reset das aberturas, censo POST_RESET, preflight e as runs.",
+    "Ancorar room_min de pelo menos um no' contra uma medicao independente do motor, para fechar tambem o lado da MEDICAO da auditoria.",
+    "Manter o PR #42 em draft ate' o smoke real e a revisao humana."
+  ],
+  "references": [
+    {
+      "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md"
+    },
+    {
+      "path": "nuvem/core/engine/wall_stepper.py"
+    },
+    {
+      "path": "nuvem/core/wall_modeling.py"
+    },
+    {
+      "path": "tests/test_s74_corpus_butanta.py"
+    },
+    {
+      "path": "tests/test_t_room_physical_tolerance.py"
+    },
+    {
+      "path": "tools/audit/s74_corpus.py"
+    },
+    {
+      "path": "tools/audit/audit_s74_corpus.py"
+    },
+    {
+      "path": "tools/audit/extract_butanta_corpus.py"
+    },
+    {
+      "path": "reference_projects/butanta_r08_lt/s74_corpus/README.md"
+    },
+    {
+      "path": "reference_projects/butanta_r08_lt/s74_corpus/geometry.json"
+    },
+    {
+      "path": "reference_projects/butanta_r08_lt/s74_corpus/t_nodes.json"
+    },
+    {
+      "path": "reference_projects/butanta_r08_lt/s74_corpus/wall_8284580.json"
+    },
+    {
+      "path": "reference_projects/butanta_r08_lt/s74_corpus/snapshot_v1.json"
+    },
+    {
+      "path": "reference_projects/inventory.json"
+    },
+    {
+      "path": "docs/PROJECT_STATUS.md"
+    }
+  ]
+}
+```
+
 Branch `claude/butanta-modulation-physical-fixes`, base `2521d1e` (§71), último commit de motor
 `2c55211` (§74). **Não mergeado, PR continua draft.** **Status: READY FOR FINAL REVIT SMOKE** — todo
 o offline está verde; a aplicação real no Revit ficou PENDENTE por bloqueio modal sem acesso humano
