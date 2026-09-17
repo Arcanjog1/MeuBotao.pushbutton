@@ -1,0 +1,266 @@
+# PR #42 — Convergência com o projeto humano (2026-09-17)
+
+Branch `claude/butanta-modulation-physical-fixes`, base `2521d1e` (§71), HEAD desta missão
+`cf0277e`. **Não mergeado, PR continua draft.** Legado (`strategy=None`) byte-idêntico do começo
+ao fim: 8.939 peças, assinatura `0a2704e4faaf`.
+
+Régua de tudo neste documento: **as 34 paredes de alvenaria do BUTANTÃ R08_LT, 1º PAV, fiadas
+0–11**, humano e solver medidos pela MESMA função geométrica (`scratchpad/corpus.py` — nenhum campo
+do motor entra na classificação).
+
+---
+
+## 1. ROOT CAUSES ENCONTRADAS
+
+### 1.1 A composição de um trecho é função EXATA do comprimento
+
+Com junta de 1 cm, fechar um trecho de L cm com n peças exige
+`soma(comprimento_i + 1) = L + 1` — ou seja, trocar `L+1` em moedas de
+**B39=40, B34=35, B19=20, C09=10, C04=5**. O resto módulo 40 decide sozinho quanto do trecho **não
+pode** ser B39:
+
+| resto | composição mínima |
+|---|---|
+| 0 | só B39 |
+| 35 | 1 B34 |
+| 30 | 2 B34 (ou B19+C09) |
+| 25 | 3 B34 (ou B19+C04) |
+| 20 | 4 B34 (ou 1 B19) |
+| 15 | 5 B34 (ou C09+C04) |
+| 10 | 6 B34 (ou 1 C09) |
+| 5 | 7 B34 (ou 1 C04) |
+
+**O preenchimento do solver já estava certo.** Medido contra o mínimo aritmético dos seus próprios
+trechos: solver **+411** peças não-B39 acima do mínimo, humano **+381**. Quem estava errado era o
+**conjunto de comprimentos**.
+
+### 1.2 Quem define o comprimento é a paridade do nó — e ela era uma convenção global
+
+Num encontro, só UMA das duas paredes ocupa a região do nó em cada fiada. Qual fiada de qual parede
+é uma escolha **livre** (as duas alternativas são amarrações corretas), mas ela decide o comprimento
+que sobra para cada fiada preencher. O motor fixava isso por PAPEL (no T, a principal hospeda sempre
+na mesma fiada).
+
+- **parede 8284579** (209 cm, T nas duas pontas): o humano dá o nó da esquerda a uma fiada e o da
+  direita à outra — as duas ficam com **159 cm**, que fecham com **4 B39 exatos**. O solver dava os
+  dois nós à mesma fiada: 179 cm de um lado (4 B34) e 174 do outro (5 B34). Mesma parede, mesma
+  amarração, **8 B34 no lugar de 0**.
+- **parede 8284557** (514 cm, 3 T): humano 4 trechos de 234/194 cm (1 B34 cada), solver 4 trechos de
+  214 cm (5 B34 cada) — **132 B34 contra 36**.
+- no corpus humano a paridade é **23 nós numa fiada e 23 na outra (50/50)**; no solver era **37/10**.
+
+→ implementado como **§72** (três commits).
+
+### 1.3 A métrica global escondia o problema
+
+Antes da correção, as contagens por código do solver e do humano eram quase idênticas
+(B39 3.066 × 3.061, B34 1.660 × 1.619) **enquanto paredes individuais estavam 132 B34 × 36**. O erro
+se compensava entre paredes. A métrica que enxerga isso é a **divergência de composição por parede**
+(soma, sobre as 34 paredes, de `|Δcódigo|` normalizada pelas peças humanas da parede, mais peso para
+B34 em meio de parede e para especiais).
+
+---
+
+## 2. PADRÕES HUMANOS APRENDIDOS (medidos, viraram régua)
+
+1. **Taxa de troca compensador × B34.** Entre composições que fecham o MESMO trecho, o humano usa a
+   limpa (só B39/B34) **apenas quando ela custa ZERO B34 a mais**: 628 trechos limpos contra 22 com
+   especial nesse caso; com custo ≥1 B34, **0 de 105** foram limpos. O solver faz o mesmo (99,3%).
+2. **B54 é peça funcional de amarração.** Humano: **172, todos em T, todos a menos de 20 cm de um
+   nó**. Solver: 168, idem. Nenhum B54 suspeito em nenhum dos dois.
+3. **Paridade de nó escolhida caso a caso** (50/50), nunca por regra global.
+
+---
+
+## 3. REGRAS IMPLEMENTADAS
+
+### §72 — A paridade do nó é escolhida pelo que ela deixa para preencher
+
+`_search_tie_parity_fill_balance` roda depois de `_apply_abutting_tie_parity` (regra #1, que
+continua tendo a última palavra) e varre os nós T/X em ordem geométrica, invertendo os que **reduzem
+estritamente** o custo dos trechos livres que deixam. Cada trecho é montado com o layout PADRÃO do
+sistema de tiers e o custo é
+
+```
+(trechos que não fecham, excesso da regra #2, nº de peças, especiais, B34)
+```
+
+comparação lexicográfica, sem pesos. **Decisão única por planta** (monotonia); a regra #1 roda de
+novo depois dela.
+
+**Guarda do alcance da verga:** um nó a menos de um bloco da jamba de uma abertura **não** é
+invertido — ali a canaleta converte/recua a amarração e a paridade não é livre.
+
+Detalhamento, evidência e as três ordens comparadas: `nuvem/REGRAS_MODULACAO_BLOCOS.md` §72.
+
+---
+
+## 4. MÉTRICAS — HUMANO × MAIN × PR42 ANTES × FINAL
+
+Fiadas 0–11, 34 paredes de alvenaria.
+
+| | HUMANO | MAIN (`55e990d`) | PR42 ANTES (`2521d1e`) | FINAL (`cf0277e`) |
+|---|---|---|---|---|
+| peças | 6.018 | 6.115 | 6.026 | **5.971** |
+| B39 | 3.061 | 3.140 | 3.066 | 3.175 |
+| B34 | 1.619 | 1.487 | 1.660 | 1.548 |
+| B54 | 172 | 168 | 168 | 168 |
+| B19 | 328 | 291 | 364 | 371 |
+| C09 | 254 | 422 | 272 | **247** |
+| C04 | 244 | 292 | 177 | **150** |
+| especiais (B19+C09+C04) | 826 | 1.005 | 813 | **768** |
+| cobertura de B39 | 61,8% | 63,6% | 61,3% | 63,4% |
+| B39 por metro de fiada | 1,146 | — | 1,147 | 1,188 |
+| B34 por metro de fiada | 0,606 | — | 0,621 | 0,579 |
+| **divergência por parede (soma)** | 0 | 3.080 | 2.575 | **1.706** |
+| trechos livres com resto bom (0/35) | 33,5% | — | 33,3% | **38,3%** |
+| trechos com especial existindo alternativa limpa | **105** | — | 137 | **105** |
+| B34 a menos de 20 cm de um nó | 50,3% | — | 45,1% | **51,2%** |
+| B34 em meio de parede livre | 42,4% | — | 43,1% | 37,1% |
+| B34 enterrado no meio do trecho | 6,3% | — | 20,0% | 12,4% |
+| B54 em T / cruz / outro | 172/0/0 | — | 168/0/0 | 168/0/0 |
+| junta isolada coincidente (não estrutural, fiadas 0–11) | 169 | — | 1 | 1 |
+| junta vertical contínua ≥4 fiadas (régua geométrica, exclui verticais estruturais) | **21** | 0 | 0 | 0 |
+| maior corrida de junta (mesma régua) | 12 | — | 2 | 2 |
+| **paredes reprovadas pelo auditor do motor (17 fiadas, inclui contorno de nó)** | — | — | **4** | **4** |
+| incompatibilidade de vazado do B34 | 41 (2,5%) | — | 71 (4,3%) | 76 (4,9%) |
+| aglomerado de especiais | 0 | — | 11 | 17 |
+| colisões / não-modular / sem apoio / invasão | — | 0/**78**/0/0 | 0/0/0/0 | **0/0/0/0** |
+| tempo do solve (bancada) | — | 3 s | 27 s | **21 s** |
+
+---
+
+## 5. TOP 20 PAREDES — ANTES E DEPOIS
+
+Soma do top 20: **2.268 → 1.604 (−29%)**. Seis paredes saíram do top 20:
+
+| parede | antes | depois | |
+|---|---|---|---|
+| 8284557 | 302,0 | 0,0 | saiu |
+| 8284579 | 222,0 | 0,0 | saiu |
+| 8284567 | 164,2 | 0,0 | saiu |
+| 8284551 | 162,7 | 12,0 | saiu |
+| 8284563 | 142,1 | 3,2 | saiu |
+| 8284554 | 70,6 | 3,1 | saiu |
+| 8284548 | 70,0 | 84,2 | **piorou** |
+| 8284522 | 69,2 | 81,3 | **piorou** |
+
+Entraram no top 20 (já estavam logo abaixo): 8284580, 8284591, 8284586, 8284587, 8284588, 8284584.
+
+As duas que pioraram, olhadas peça a peça:
+
+- **8284522** piorou de verdade: B39 262 → 234 (humano 264), B34 82 → 116 (humano 87),
+  C04 22 → 11 (humano 40). A paridade escolhida ali afastou a parede do humano — é o preço local do
+  ganho global de −29% no top 20.
+- **8284548** é artefato da métrica: a composição praticamente não mudou
+  (B39 76 → 77, B34 64 → 63, B19 17 → 15, C09 5 → 5); o que subiu foi o termo de B34 em meio de
+  parede dentro da fórmula da divergência.
+
+---
+
+## 6. EXPERIMENTOS REJEITADOS
+
+| experimento | resultado | por que foi rejeitado |
+|---|---|---|
+| §70 fileira de B34 antes do compensador | B34 1.632 → 2.008 (humano 1.619), vazado 4,2% → 8,7% | vira B34 em todo trecho com sobra; com teto de 2 peças ainda custava 88 violações de vazado contra 68 |
+| §72 com custo aritmético (ótimo teórico do comprimento) | divergência 1.841; C09 289 | só prevê o resultado real em 10 das 34 paredes (erro médio 7 peças) — ignora tiers e desencontro |
+| §72 com B34 antes de especiais na ordem do custo | divergência 2.606 | pior que não fazer nada (2.575): maximiza B39 além do humano e paga em compensador |
+| §72 avaliando só as paredes do nó (busca local) | divergência 1.970, 22 s | 40% mais rápido mas perde 160 pontos de divergência; resolvido com memo de layout (23 s, 1.809) |
+| §72 estendida aos cantos L | divergência 1.706 → 1.761, especiais 768 → 775 | piora medida; revertido |
+| §73 B34 perto da ponta como desempate | resultado IDÊNTICO | os 103 B34 enterrados no meio são `STANDARD_FILL` decididos pelo comprimento, não por empate — o desempate nunca dispara |
+
+---
+
+## 7. LIMITAÇÕES CONHECIDAS (medidas, não escondidas)
+
+0. **Quatro paredes continuam reprovadas pelo auditor de amarração do motor** — igual antes e
+   depois da §72, então não é regressão desta missão, mas continua em aberto:
+   - **8284522**: `CONTINUOUS_VERTICAL_JOINT` em X≈434,5 cm, 14 fiadas;
+   - **8284586 / 8284587 / 8284588** (três paredes gêmeas de 99 cm, entre um canto e um T):
+     junta corrida em X≈49,5 cm nas **17 fiadas**. Aqui o solver escolhe `B34+B34` onde o humano usa
+     `C04+C09` alternando de posição por fiada — a escolha "mais limpa" do solver é justamente a que
+     cria a junta corrida, e a do humano é a que a evita. **É um caso concreto de compensador
+     NECESSÁRIO**, e o auditor o pega.
+
+     Geometria da 8284586 (99 cm, canto em 7, T em 57, ponta livre em 99):
+     ```
+     solver  f0  B34@15-49  B34@50-84  C09@85-94  C04@95-99     -> junta em 49,5
+     solver  f1  B34@0-34   C04@35-39  C09@40-49  [nó] B34@65-99 -> contorno em 49,5
+     humano  f0  C04@15-19  C09@20-29  B34@30-64
+     humano  f1  B34@0-34   C04@35-39  C09@40-49
+     ```
+     Não é paridade: o custo da §72 dá exatamente o mesmo valor `(0, 2, 6, 4, 2)` nas duas
+     paridades dos nós dessa parede, e um dos três nós é canto L (fora do alcance da §72) e outro é
+     ponta livre. É o preenchimento desta topologia (99 cm entre canto, T e ponta livre) que precisa
+     ser revisto.
+
+1. **Parede 8284580 — 205 dos 1.706 pontos de divergência restantes.** Ela é a parede que CHEGA nos
+   dois T (`incoming_wall_idx` nos dois nós), então preenche os 209 cm inteiros em toda fiada (resto
+   10 → 6 B34). O humano alterna qual ponta cede e fica com 159/194 cm. A §72 não resolve: o modelo
+   de trechos livres reporta o MESMO par de comprimentos para as duas paridades. A alavanca aqui é o
+   **papel no T** (quem é principal e quem chega), não a paridade — mudança arquitetural, fora do
+   escopo desta missão.
+2. **Conflito canaleta × amarração (pré-existente).** Invertendo um T a 27 cm da jamba na parede
+   8284526, a contraverga da fiada 3 ficou com 615–644 no lugar da amarração 635–669 e a fiada 4
+   ficou com um B34 com 41% de apoio. O defeito é da conversão em `plan_channel_reinforcement` e
+   existe independentemente da §72; enquanto não for corrigido, a §72 não exercita a combinação
+   (guarda do alcance da verga).
+3. **Dependência da ordem de entrada das paredes (pré-existente).** Repetir o solve dá geometria
+   idêntica; permutar a ordem das paredes de entrada muda o resultado — base `2521d1e`:
+   8.837 → 8.836/8.851; final: 8.750 → 8.746/8.768. Mesma ordem de grandeza antes e depois.
+4. **Vazado menor do B34: 4,3% → 4,9%** (humano 2,5%). A §72 piorou em 5 violações absolutas.
+   O `alignment_conflicts` do motor (trechos em que nenhuma composição evitava a coincidência) subiu
+   de 70 para 82 — sem efeito na geometria final: a régua geométrica dá 1 coincidência isolada e
+   0 juntas contínuas nos dois estados.
+5. **Aglomerado de especiais: 11 → 17** (humano 0).
+6. **Microajuste (§66) pode escolher pior que offset 0.** Mapa medido na parede 8284534 movendo as
+   4 aberturas juntas: offset 0 e −5 dão 1 C09; **+5 dá 7 C09**; ±10 dão 54–62 C09. Só múltiplos de
+   5 fecham (`PIER_MODULE_CM`).
+
+---
+
+## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
+
+Nenhum destes foi codificado.
+
+| padrão | frequência | exemplos | impacto | interpretação sugerida |
+|---|---|---|---|---|
+| **Coluna vertical de compensador** | 27 colunas, **230 peças = 28% de todos os especiais dele**; 26 ancoradas numa JAMBA, 1 numa ponta, **0 no meio da parede** | 8284574 x=220 C04 em 12 fiadas; 8284515 x=970 C04 em 11 fiadas | o solver tem 13 colunas (15%), **2 delas no meio da parede** | COMMON_PATTERN. O humano empurra a sobra não-modular para uma coluna encostada numa vertical que JÁ existe e mantém o resto do pano limpo. Implicaria aceitar junta corrida controlada ali — contraria a regra #1 como está escrita |
+| **Junta coincidente tolerada** | 4,6% das juntas do humano coincidem com a fiada de baixo; **21 juntas contínuas ≥4 fiadas, máx 12** | 8284526 seis verticais de 7 fiadas | solver tem 0 | A regra #1 do produto é MAIS dura que o projeto de referência |
+| **B19 no meio da parede** | humano 103, solver 22 | — | — | já registrado na §56.3; confirma que não é defeito |
+| **Compensadores encostados** | humano 97 pares (C04+C09), solver 42 | — | — | consequência das colunas |
+| **B34 nas pontas do trecho** | humano 93,7% na 1ª/2ª/penúltima/última posição, 6,3% no meio | — | solver 12,4% no meio | COMMON_PATTERN, mas o desempate não alcança (ver §73 rejeitada): depende do comprimento do trecho, não de escolha entre empates |
+
+---
+
+## 9. RESPOSTAS ÀS PERGUNTAS DA MISSÃO
+
+1. **B39 virou o bloco predominante?** Sim: cobertura 61,3% → 63,4% (humano 61,8%), 3.175 peças
+   contra 3.061 do humano.
+2. **B54 está restrito a T/cruz?** Sim: 168, **todos em T**, todos a menos de 20 cm de um nó.
+3. **B54 suspeito fora desses contextos?** **Nenhum**, nem no solver nem no humano.
+4. **Onde os B34 estão?** 37,7% em ponta de parede, 10,5% em nó central, 14,3% em vão, 37,1% em meio
+   de parede livre; 51,2% a menos de 20 cm de um nó.
+5. **Aproximaram-se da distribuição humana?** Sim em todas as bandas: 0–20 cm de um nó 45,1% →
+   51,2% (humano 50,3%); >100 cm 10,5% → 8,1% (humano 7,4%).
+6. **Quantos B34 no meio sem justificativa?** 103 enterrados no meio do trecho (12,4%), contra 65
+   (6,3%) do humano — 38 a mais.
+7. **Compensadores evitáveis removidos?** Trechos com especial existindo alternativa limpa:
+   137 → 105, **exatamente o número do humano**.
+8. **Quantos dos restantes são necessários?** Dos 105, **todos** pela régua do próprio humano (a
+   alternativa limpa custaria ≥1 B34 a mais, e ele nunca paga isso). Mais 399 trechos em que
+   nenhuma composição só de B39/B34 fecha o comprimento.
+9. **Compensadores perto de B54?** 8,3% a menos de 20 cm de um B54 (antes 11,8%; humano 6,2%).
+10. **B19+B34 que poderiam ser B54?** 121 no envelope de 54 cm (humano 107, antes 139) — a diferença
+    é pequena e o humano também faz.
+11. **O microajuste move para pior que offset 0?** **Sim**, medido: na 8284534, +5 dá 7 C09 contra 1
+    em offset 0.
+12. **A 8284522 ainda viola a regra #1?** **Sim, pelo auditor do motor** — `CONTINUOUS_VERTICAL_JOINT`
+    em X≈434,5 cm, 14 fiadas. Inalterado pela §72 (era assim antes também). Pela régua geométrica
+    deste relatório (fiadas 0–11, excluindo verticais estruturais) ela aparece limpa: **as duas
+    réguas medem coisas diferentes e as duas estão no relatório** — a do auditor inclui o contorno
+    da peça de nó, que é onde essa junta está.
+13. **Taxa de incompatibilidade do B34?** 4,9% (76 de 1.548); humano 2,5%.
+14. **Custo de desempenho?** Nenhum: solve 27 s → 21 s na bancada.
+15. **O que falta depende de regra não aprovada?** Sim, o maior item: a **coluna de compensador na
+    jamba** (28% dos especiais do humano) e a tolerância dele a junta corrida controlada.
