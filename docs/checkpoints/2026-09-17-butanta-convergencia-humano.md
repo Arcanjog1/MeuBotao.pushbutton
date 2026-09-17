@@ -18,7 +18,12 @@ dos comprimentos dos trechos, provocada pela posse da região dos nós.**
 Nada maior apareceu. Duas rodadas de investigação depois, com a correção (§72) já aplicada e medida
 na geometria real do Revit, essa causa ainda explica **15 das 20** paredes mais divergentes. As
 outras cinco se dividem entre um especial genuinamente exigido pelo comprimento (1), distribuição de
-B34 (1), padrão humano não aprovado (1) e duas paredes de 99 cm cuja causa não foi isolada.
+B34 (1), padrão humano não aprovado (1) e duas paredes de 99 cm que, olhadas peça a peça, são
+**diferença de escopo entre os documentos** — o humano não constrói metade daquelas paredes.
+
+**20% da divergência que resta não é defeito de modulação**: 100 pontos são as três paredes de 99 cm
+que o humano não constrói inteiras, e 248 são duas paredes em que o solver está *melhor* que o
+humano (fecha com um B34 onde ele usa `C04+C09`).
 
 O que a correção alcançou: divergência de composição por parede **3.080 (main) → 2.575 → 1.727**,
 com **zero** regressão de hard gate e o solve **mais rápido** que antes.
@@ -480,6 +485,26 @@ Sobre a geometria REAL do Revit (divergência total 1.727):
 **Contagem:** NODE_REGION_OWNERSHIP **15**, B54_CONTEXT 3, PROJECT_SPECIFIC_HUMAN_PATTERN 3,
 OPENING_OFFSET 2, UNEXPLAINED 2, REQUIRED_SPECIAL 1, B34_DISTRIBUTION 1.
 
+### Correção: parte do resíduo não é defeito
+
+Depois de classificar, fui olhar peça a peça as duas linhas `UNEXPLAINED` e encontrei outra coisa.
+
+**8284586 / 8284587 / 8284588 — o humano não constrói a parede inteira.** Medido diretamente nas
+peças (não pela atribuição de parede): no trecho 60 → 99 cm dessas paredes, nas fiadas 0 e 1, o
+humano tem **ZERO peças** e o solver tem 4. Somando as 12 fiadas, o humano cobre **588 cm** de cada
+uma e o solver **1.002 cm** — ele constrói cerca de **metade** do eixo. Não é qualidade de
+amarração: é **diferença de escopo entre os dois documentos**. As três somam **100 dos 1.727**
+pontos (5,8%) e devem ser lidas como `HUMAN_PROJECT_SPECIFIC`, não como defeito do solver.
+
+**8284589 / 8284590 — o solver está melhor.** H = `{B39:6, B34:12, C09:12, C04:12}` (42 peças),
+S = `{B34:24}` (24 peças): o humano fecha com `C04+C09` onde o solver fecha com um B34, **sem
+nenhum especial**. Divergência de 124 cada, mas a favor do solver. São mais **248 pontos (14,4%)**
+que não são defeito.
+
+**Ou seja: 348 dos 1.727 pontos (20%) da divergência que resta não são erro de modulação.** A
+cobertura total é praticamente idêntica (humano 210.461 cm, solver 212.243 cm, **+0,8%**), e a
+diferença está concentrada nessas três paredes.
+
 **A causa-raiz continua sendo a mesma** — e ela ainda responde por 15 das 20 piores paredes.
 
 ### Por que a 8284580 não tem mais ganho por paridade
@@ -623,6 +648,12 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
    (+10) tem **7 C09 contra 13 no offset 0** e mais B39. O caso que levantou a suspeita
    (parede 8284534) deixou de existir: ele não move mais aquelas aberturas, e a composição saiu
    peça por peça igual à do humano.
+
+8.5 **Quanto do resíduo não é defeito?**
+   **20% dos 1.727 pontos.** 100 são as três paredes de 99 cm que o humano **não constrói
+   inteiras** (ele cobre 588 cm de cada, o solver 1.002 cm — medido peça a peça, não por
+   atribuição), e 248 são duas paredes em que o **solver está melhor** (fecha com um B34 onde o
+   humano usa `C04+C09`). A cobertura total é praticamente igual: +0,8%.
 
 9. **Quantas diferenças restantes são peculiaridades humanas não aprovadas?**
    **3 das 20** piores paredes têm `PROJECT_SPECIFIC_HUMAN_PATTERN` como causa (coluna de
