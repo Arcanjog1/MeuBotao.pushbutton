@@ -10,7 +10,7 @@ editada (ver "pendência" abaixo).
   "branch": "claude/jolly-ritchie-0bq5f6",
   "head": "3d4c687d14830c39fdf13a1b87bb0fcb76221db0",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/48",
   "objective": "Tentar REFUTAR, de forma independente, a tese de que o motor so' forca a amarracao especial no no' T quando ha' espaco fisico real, e de que as tolerancias envolvidas sao ruido de calculo e nunca licenca para invadir vao. Auditar PIER_PHYSICAL_FIT_TOLERANCE_CM, as conversoes cm<->pes, _t_intersection_room_ok, monotonicidade, invariancia, faltas reais, legado e o procedimento de purga.",
   "changes": [
     "tests/test_t_room_physical_guard_independent_audit.py: NOVO. 11 verificacoes adversariais; constantes fisicas redigitadas do bloco (B54=54 -> 27cm por lado, B34=34, tolerancia 0,05cm), oraculo recalculado do zero, geometria montada em coordenadas de MUNDO e so' depois convertida para o parametro t de cada parede.",
