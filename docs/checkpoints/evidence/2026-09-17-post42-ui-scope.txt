@@ -1,0 +1,13 @@
+{
+  "baseline": "ca301c34da730b8fea7ef5bd7256a36f81a51e42",
+  "changed": [
+    "nuvem/core/ui_components.py",
+    "nuvem/core/ui_execution.py",
+    "tests/test_ui_redesign.py",
+    "tools/documentation/check_post42_ui_scope.py",
+    "tools/documentation/render_post42_ui.py",
+    "tools/documentation/render_premium_matrix.py"
+  ],
+  "unexpected": [],
+  "host_solver_rules_unchanged": true
+}

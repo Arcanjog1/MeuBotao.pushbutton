@@ -1,0 +1,49 @@
+{
+  "kind": "Synthetic native WinForms; no Revit operations",
+  "renders": {
+    "planned": {
+      "width": 860,
+      "height": 640
+    },
+    "applying": {
+      "width": 860,
+      "height": 640
+    },
+    "confirmed": {
+      "width": 860,
+      "height": 640
+    },
+    "confirmed-plan": {
+      "width": 860,
+      "height": 640
+    },
+    "confirmed-result": {
+      "width": 860,
+      "height": 640
+    },
+    "not_required": {
+      "width": 860,
+      "height": 640
+    },
+    "failed": {
+      "width": 860,
+      "height": 640
+    },
+    "cancelled": {
+      "width": 860,
+      "height": 640
+    },
+    "gate": {
+      "width": 860,
+      "height": 640
+    },
+    "error": {
+      "width": 860,
+      "height": 640
+    },
+    "progress": {
+      "width": 860,
+      "height": 640
+    }
+  }
+}

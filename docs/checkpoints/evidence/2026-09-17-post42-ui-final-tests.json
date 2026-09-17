@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-17T17:28:45.962888+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "9ed2234524da41fc2cc00d01aeee1b72d175f771",
+  "tree": "f3d9aa13de90658dd49c7d439f746e834f0b7cec",
+  "status_before": "?? docs/UI_POST_PR42.md\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.txt\n?? docs/ui-post42-preview/",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 300,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-17-post42-ui-final-tests.txt",
+  "pid": 13296,
+  "exit_code": 0,
+  "elapsed_seconds": 69.462,
+  "status_after": "M  docs/PROJECT_STATUS.md\nA  docs/UI_POST_PR42.md\nM  docs/checkpoints/2026-09-16-premium-ui-redesign.md\nA  docs/checkpoints/2026-09-17-ui-post42-preparation.md\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-final-scope.json\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-final-scope.txt\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.json\nAM docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.txt\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-focused.json\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-focused.txt\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-scope.json\nA  docs/checkpoints/evidence/2026-09-17-post42-ui-scope.txt\nA  docs/ui-post42-preview/01-fonte.png\nA  docs/ui-post42-preview/02-configuracao.png\nA  docs/ui-post42-preview/03-paredes.png\nA  docs/ui-post42-preview/04-revisao.png\nA  docs/ui-post42-preview/05-plano.png\nA  docs/ui-post42-preview/06-criacao.png\nA  docs/ui-post42-preview/07-resultado.png\nA  docs/ui-post42-preview/error.png\nA  docs/ui-post42-preview/gate.png\nA  docs/ui-post42-preview/manifest.json\nA  docs/ui-post42-preview/matrix/results.json\nA  docs/ui-post42-preview/matrix/review-1366x768-100pct.png\nA  docs/ui-post42-preview/matrix/review-1366x768-125pct.png\nA  docs/ui-post42-preview/matrix/review-1366x768-150pct.png\nA  docs/ui-post42-preview/matrix/review-1366x768-175pct.png\nA  docs/ui-post42-preview/matrix/review-1366x768-200pct.png\nA  docs/ui-post42-preview/matrix/review-1920x1080-100pct.png\nA  docs/ui-post42-preview/matrix/review-1920x1080-125pct.png\nA  docs/ui-post42-preview/matrix/review-1920x1080-150pct.png\nA  docs/ui-post42-preview/matrix/review-1920x1080-175pct.png\nA  docs/ui-post42-preview/matrix/review-1920x1080-200pct.png\nA  docs/ui-post42-preview/matrix/review-2560x1440-100pct.png\nA  docs/ui-post42-preview/matrix/review-2560x1440-125pct.png\nA  docs/ui-post42-preview/matrix/review-2560x1440-150pct.png\nA  docs/ui-post42-preview/matrix/review-2560x1440-175pct.png\nA  docs/ui-post42-preview/matrix/review-2560x1440-200pct.png\nA  docs/ui-post42-preview/matrix/setup-1366x768-100pct.png\nA  docs/ui-post42-preview/matrix/setup-1366x768-125pct.png\nA  docs/ui-post42-preview/matrix/setup-1366x768-150pct.png\nA  docs/ui-post42-preview/matrix/setup-1366x768-175pct.png\nA  docs/ui-post42-preview/matrix/setup-1366x768-200pct.png\nA  docs/ui-post42-preview/matrix/setup-1920x1080-100pct.png\nA  docs/ui-post42-preview/matrix/setup-1920x1080-125pct.png\nA  docs/ui-post42-preview/matrix/setup-1920x1080-150pct.png\nA  docs/ui-post42-preview/matrix/setup-1920x1080-175pct.png\nA  docs/ui-post42-preview/matrix/setup-1920x1080-200pct.png\nA  docs/ui-post42-preview/matrix/setup-2560x1440-100pct.png\nA  docs/ui-post42-preview/matrix/setup-2560x1440-125pct.png\nA  docs/ui-post42-preview/matrix/setup-2560x1440-150pct.png\nA  docs/ui-post42-preview/matrix/setup-2560x1440-175pct.png\nA  docs/ui-post42-preview/matrix/setup-2560x1440-200pct.png\nA  docs/ui-post42-preview/microajuste-applying.png\nA  docs/ui-post42-preview/microajuste-cancelled.png\nA  docs/ui-post42-preview/microajuste-confirmed.png\nA  docs/ui-post42-preview/microajuste-failed.png\nA  docs/ui-post42-preview/microajuste-not_required.png\nA  docs/ui-post42-preview/microajuste-planned.png\nA  docs/ui-post42-preview/microajuste-plano.png\nA  docs/ui-post42-preview/microajuste-resultado.png\nA  docs/ui-post42-preview/progress.png\nA  docs/ui-post42-preview/render.json\nA  docs/ui-post42-preview/scale-1.25.png\nA  docs/ui-post42-preview/scale-1.5.png\nA  docs/ui-post42-preview/scale-1.75.png\nA  docs/ui-post42-preview/scale-1.png\nA  docs/ui-post42-preview/scale-2.png\nA  docs/ui-post42-preview/small-740x520.png\nA  docs/ui-post42-preview/states.json",
+  "log_sha256": "b7cab2820f3a4b84f58ceef23a15a8dcb1e7477be69b9f3c6c7acd997e035a27"
+}

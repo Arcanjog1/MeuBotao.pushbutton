@@ -1,0 +1,22 @@
+{
+  "base": "55e990d962ed22ae1021f0d335db197607bddda1",
+  "head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
+  "changed_definitions": [
+    "_PostCreationForm",
+    "_ProgressConsole",
+    "_SetupForm",
+    "_WallReviewForm",
+    "_WallSourceModeForm",
+    "_build_section_label",
+    "_select_existing_walls_for_modulation",
+    "_style_primary_button",
+    "_style_secondary_button",
+    "run_modulation_on_existing_walls"
+  ],
+  "unexpected_definitions": [],
+  "engine_benchmark_loader_changed": [],
+  "entire_external_event_handler_ast_unchanged": true,
+  "threading_dispatch_pump_and_timer_methods_unchanged": true,
+  "unchanged_top_level_definitions": 188,
+  "ok": true
+}

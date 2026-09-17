@@ -68,8 +68,9 @@ def test_user_chose_channel_is_channel():
     assert m._opening_reinforcement_strategy_from_ui_value(result["opening_reinforcement"]) == "CHANNEL"
 
 
-def test_unimplemented_lintel_is_visible_but_blocks_execution():
+def test_unimplemented_lintel_is_hidden_and_injected_value_blocks_execution():
     form = _form()
+    assert form._reinforcement_combo.Items.Count == 2
     form._reinforcement_combo.SelectedIndex = _index_of("LINTEL_COUNTERLINTEL")
     assert form._validate() is False
     assert form._run_button.Enabled is False

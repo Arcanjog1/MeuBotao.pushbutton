@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-16T12:42:43.644225+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
+  "tree": "8078ce4572bc75026e3b9b388c1d32f9688d8d37",
+  "status_before": "M docs/checkpoints/2026-09-16-ui-redesign.md\n?? docs/checkpoints/evidence/2026-09-16-ui-pr42-overlap.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.txt\n?? docs/ui-preview/08-familia-ausente.png\n?? docs/ui-preview/09-gate-critico.png\n?? docs/ui-preview/10-cancelamento.png\n?? tools/documentation/render_ui_states.py",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-ui-redesign-delivery-focused.txt",
+  "pid": 21228,
+  "exit_code": 0,
+  "elapsed_seconds": 62.256,
+  "status_after": "M docs/checkpoints/2026-09-16-ui-redesign.md\n M docs/checkpoints/evidence/2026-09-16-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-16-ui-pr42-overlap.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-delivery-focused.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-delivery-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.json\n?? docs/checkpoints/evidence/2026-09-16-ui-redesign-suite.txt\n?? docs/ui-preview/08-familia-ausente.png\n?? docs/ui-preview/09-gate-critico.png\n?? docs/ui-preview/10-cancelamento.png\n?? tools/documentation/render_ui_states.py",
+  "log_sha256": "83414db412fc1f1dc1d36958338e7f243cb98aeedcfc49926154149466e646c1"
+}

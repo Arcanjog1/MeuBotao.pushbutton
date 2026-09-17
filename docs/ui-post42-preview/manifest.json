@@ -1,0 +1,234 @@
+{
+  "head": "9ed2234524da41fc2cc00d01aeee1b72d175f771",
+  "kind": "Synthetic native WinForms; no Revit smoke or native Windows DPI",
+  "files": [
+    {
+      "path": "docs/ui-post42-preview/01-fonte.png",
+      "sha256": "7a6a745adace29c9b046095e8cb361129f164d3447e69aef9e33e67a8bb6b485"
+    },
+    {
+      "path": "docs/ui-post42-preview/02-configuracao.png",
+      "sha256": "92cff7932410fdb3434cb47de0353dbee2a6da02eee88d3e62bcddc296cf4810"
+    },
+    {
+      "path": "docs/ui-post42-preview/03-paredes.png",
+      "sha256": "ee11a0cd8601a574b7ffa4ed62bf4c6809e97c787bb66e16d50afec89afdeff1"
+    },
+    {
+      "path": "docs/ui-post42-preview/04-revisao.png",
+      "sha256": "c1c228193714d4477ecec62a5aad48a57c7c68fec2e902658706a56209a128cf"
+    },
+    {
+      "path": "docs/ui-post42-preview/05-plano.png",
+      "sha256": "55fd2e6a1ab45ea59ef18ebdcc27afe7c87b0f30c0e67d61260f6a9af99f8cd1"
+    },
+    {
+      "path": "docs/ui-post42-preview/06-criacao.png",
+      "sha256": "e824e29d6354e07e79dbf3c203d5801feedeada92502e2cd531a5e1c3f81baa3"
+    },
+    {
+      "path": "docs/ui-post42-preview/07-resultado.png",
+      "sha256": "210c49d7c211bc494a3e3d7d45680d8f79c2f4b48191a4ac773f32255bc0b005"
+    },
+    {
+      "path": "docs/ui-post42-preview/error.png",
+      "sha256": "c0b189ec7857e83bce3e0f08044c5cd18055dd1335e40848ded214c9b7759f9d"
+    },
+    {
+      "path": "docs/ui-post42-preview/gate.png",
+      "sha256": "00a49f20097566b0dca958c30eb08bd7b8b526cc98295b053d87c6c6d151c6e9"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/results.json",
+      "sha256": "21a8e018ea0a7a8129c0be86e9746df88a4406c10cabf65533d6cab0dc3af4dc"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1366x768-100pct.png",
+      "sha256": "bd71956bd8d9bde380819081d50dd2e5df55a2c56ccc9bcaed33866b18926700"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1366x768-125pct.png",
+      "sha256": "c8fb48bc7468410197334776503c22da2bbb589d375916d4643fafdbfb0574fe"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1366x768-150pct.png",
+      "sha256": "2b20e6d2b575be35176639b08e14d5bc06ab569c71c4c37427b038bea289c6de"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1366x768-175pct.png",
+      "sha256": "feddccb44c8b9d500f7e1418c5073317717065854936d05af69b6a8333ce3d55"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1366x768-200pct.png",
+      "sha256": "5132c211f84748626c37191069608ece4edd50409ee46eb09c2a58897b4336e1"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1920x1080-100pct.png",
+      "sha256": "bd71956bd8d9bde380819081d50dd2e5df55a2c56ccc9bcaed33866b18926700"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1920x1080-125pct.png",
+      "sha256": "a7f464d51c9e167e5ab9b8f5b7c6a4960a18479bf507dd65433a249d6c113e08"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1920x1080-150pct.png",
+      "sha256": "b50020bddb02f098620847161a60b7f1697c13ac855f1274591b9277773d81b1"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1920x1080-175pct.png",
+      "sha256": "0a912ce2abd55b29be771f668a08f534e0e58f353a0852b3bd1af56588f7793d"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-1920x1080-200pct.png",
+      "sha256": "1acd46b0b5de2af9f3370afc7bad031540bde9679b01ca8e47d2f20272010258"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-2560x1440-100pct.png",
+      "sha256": "bd71956bd8d9bde380819081d50dd2e5df55a2c56ccc9bcaed33866b18926700"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-2560x1440-125pct.png",
+      "sha256": "a7f464d51c9e167e5ab9b8f5b7c6a4960a18479bf507dd65433a249d6c113e08"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-2560x1440-150pct.png",
+      "sha256": "b50020bddb02f098620847161a60b7f1697c13ac855f1274591b9277773d81b1"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-2560x1440-175pct.png",
+      "sha256": "45d172a2313cb6cd0daf604dcebcb6c7479f8758f3e1def9feac3a1a66cb43f3"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/review-2560x1440-200pct.png",
+      "sha256": "4f160f94ff85af3406c9b632bfc3186d61c3ee6c785e73b382598f4fc38f685f"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1366x768-100pct.png",
+      "sha256": "558250a3b32d436702d7f5962dfa27a07ba463a3ba9b640cbcc77eb965f9372a"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1366x768-125pct.png",
+      "sha256": "b85d4d4c1a15bac59cca1fde53ce57afc8fa8d7af98f0df591b5542ef10e50fe"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1366x768-150pct.png",
+      "sha256": "65ba78f29f284bd43b9a71609037eb8f5fce49b3c0971b4f75b86ebca613b677"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1366x768-175pct.png",
+      "sha256": "13a9fda263048bb9fe8ec3e64900bdf7b2508651633c3d1936dad42a87365094"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1366x768-200pct.png",
+      "sha256": "bcd9054e47e1e139220f9e4110ffb9071a3bc9929222f4f75fba004e41d08438"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1920x1080-100pct.png",
+      "sha256": "558250a3b32d436702d7f5962dfa27a07ba463a3ba9b640cbcc77eb965f9372a"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1920x1080-125pct.png",
+      "sha256": "7a0fc39d9b4877d0bb79aa92b33ff8e10386bb92faff258bb87aae0aef95aefe"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1920x1080-150pct.png",
+      "sha256": "35c53ebdd98394d38768e127ad8a8b7a4c272d467107946f8c11abcf6e6a5278"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1920x1080-175pct.png",
+      "sha256": "3bdf3a312a8eb1d38a52bbee1eda839d6fe5ed86d3e86fcff847f3e35d3b6aa4"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-1920x1080-200pct.png",
+      "sha256": "8c8acd77bafa588643ffdd4e9d1a4fa3707cb70d189de194b6efa5a8ab5ba0a0"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-2560x1440-100pct.png",
+      "sha256": "558250a3b32d436702d7f5962dfa27a07ba463a3ba9b640cbcc77eb965f9372a"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-2560x1440-125pct.png",
+      "sha256": "7a0fc39d9b4877d0bb79aa92b33ff8e10386bb92faff258bb87aae0aef95aefe"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-2560x1440-150pct.png",
+      "sha256": "35c53ebdd98394d38768e127ad8a8b7a4c272d467107946f8c11abcf6e6a5278"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-2560x1440-175pct.png",
+      "sha256": "c8269bfd5f03aaed05b25d02007d59d342cfed43d980ad4df2028503fafdaed5"
+    },
+    {
+      "path": "docs/ui-post42-preview/matrix/setup-2560x1440-200pct.png",
+      "sha256": "88c2ff2cef284c6a3956c23ddc85e04589267fbdc801703372f0166b7e276055"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-applying.png",
+      "sha256": "3387753c6f3f7c610d6218dabc56a7275b57147c186c610c5bf11a1099399f77"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-cancelled.png",
+      "sha256": "2fb53279cd952c5f410cf4f550f6850d07f2943ef749ebbb02ceae539c1d1394"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-confirmed.png",
+      "sha256": "8083d502879b4edeefb14759e9fcd6b13634a2953b7ab05531af38f2f88257ba"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-failed.png",
+      "sha256": "d14dbb90d68d825f62234d27821ad0ce5772b6347c85941975f9b390eb244513"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-not_required.png",
+      "sha256": "abc494dc218851a7ab75c7987dc06637eac33c55de7f076827e935c60e381bd9"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-planned.png",
+      "sha256": "dbde03aa82d50b76201ceb2aeb266db22dabfb68e3945880bb6af54bad91cdbc"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-plano.png",
+      "sha256": "fe1b53c76dbbdefa727b2fe048a9beb3ddc47f1414d97341685fcc34983e8c12"
+    },
+    {
+      "path": "docs/ui-post42-preview/microajuste-resultado.png",
+      "sha256": "6c16c798bd3f870dc28b35c9b20aa1f04de585256eeffa20f800270eb3e90ef5"
+    },
+    {
+      "path": "docs/ui-post42-preview/progress.png",
+      "sha256": "c6a0cd37e75b152c8f5f42e77fb095eb22942670678f09a4e0b98354784f4bfa"
+    },
+    {
+      "path": "docs/ui-post42-preview/render.json",
+      "sha256": "4b0010c9ed3f4d665bd539def3458313030a0347335cbdfc6d8591b01e6de73b"
+    },
+    {
+      "path": "docs/ui-post42-preview/scale-1.25.png",
+      "sha256": "301093a96764eb3cfcdb2156bfdafc6dae1a4c7eff78f44fa33e76a80d06d124"
+    },
+    {
+      "path": "docs/ui-post42-preview/scale-1.5.png",
+      "sha256": "4866db9c574f8f16d18d43cd65f7075a8da88815e9f11d1b9ac1ab3ae63a27cf"
+    },
+    {
+      "path": "docs/ui-post42-preview/scale-1.75.png",
+      "sha256": "2502709b6c5cb589ae3caa67e914ff58877e196b01c0815d8d40880bec025655"
+    },
+    {
+      "path": "docs/ui-post42-preview/scale-1.png",
+      "sha256": "bd71956bd8d9bde380819081d50dd2e5df55a2c56ccc9bcaed33866b18926700"
+    },
+    {
+      "path": "docs/ui-post42-preview/scale-2.png",
+      "sha256": "0a4baf876931a3f91dd1b2a361015fb510c80bc0f6db5b58256b02d118e2a1ce"
+    },
+    {
+      "path": "docs/ui-post42-preview/small-740x520.png",
+      "sha256": "051d7b6e22ad176c4ad8613b21cc318c67caa3d1354a7c18797ef564b61ffa2f"
+    },
+    {
+      "path": "docs/ui-post42-preview/states.json",
+      "sha256": "ae38ff5a2f5cb757a85d4c9cccbc041ea4da832b47c88c11eff1bb12adef068a"
+    }
+  ]
+}
