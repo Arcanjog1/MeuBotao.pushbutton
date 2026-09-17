@@ -7,6 +7,7 @@ baseline/golden e PR #42 não tocados. Nenhum apply no Revit.
 ```json
 {
   "date": "2026-09-17",
+  "scope": "historical",
   "branch": "claude/jolly-ritchie-0bq5f6",
   "head": "50c231ebd8c53f584af90c16f716691f92e09c81",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",

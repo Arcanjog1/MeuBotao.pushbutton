@@ -118,7 +118,7 @@ Painel reconciliado por fetch em 2026-09-17 (main `55e990d`, merge do #41 — co
 | Bloqueadores | CHANNEL: integrado na main pelo #40. Pendentes: topo/peitoril fora da grade (51.8), cinta de topo (10.7), 30.8 (7719511); verga/contraverga não iniciada. Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Reconciliação da §74 e guarda da purga](checkpoints/2026-09-17-reconciliacao-74-purge-guard.md); antes [Auditoria independente da guarda de espaço do nó T](checkpoints/2026-09-17-auditoria-independente-guarda-no-t.md) |
+| Último checkpoint | [Auditoria do patch real da §74 (`2c55211`)](checkpoints/2026-09-17-auditoria-secao-74-patch.md); antes [Reconciliação da §74 e guarda da purga](checkpoints/2026-09-17-reconciliacao-74-purge-guard.md) |
 | CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
 | Próximo objetivo | Decisões E (topo/peitoril fora da grade) e F (cinta de topo); LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 
