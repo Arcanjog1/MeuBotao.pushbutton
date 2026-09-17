@@ -24,6 +24,14 @@ A missão pede o veredito sobre a **§74**. Busca em camadas, conforme
 | `git log --all` por "seção 73/74" | nenhum commit |
 | `r_reset_vaos.py` em todo o histórico e no disco | **não existe** |
 
+**Busca refeita em clone completo.** A primeira varredura rodou num clone
+**raso** (`git rev-parse --is-shallow-repository` = true, 252 commits
+alcançáveis) — a mesma armadilha que o `PROJECT_STATUS.md` já registra
+para a leitura de 2026-09-12 sobre o PR #34. Depois de `git fetch
+--unshallow` (**480 commits**), as buscas por §73/§74 e por
+`r_reset_vaos` foram **repetidas** sobre o histórico inteiro: o resultado
+não mudou — o único acerto é o commit desta própria auditoria.
+
 Não inventei a regra (proibição explícita do `CLAUDE.md`). O que foi
 auditado é o **objeto físico que os dez itens da missão descrevem**: a
 guarda de espaço no nó T (`_t_intersection_room_ok`) e a guarda física de
