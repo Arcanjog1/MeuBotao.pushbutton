@@ -3703,6 +3703,10 @@ CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
 # Legado (`strategy=None`) nao passa por aqui: continua identico a' main.
 CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = True
 
+# SECAO 71 (2026-09-16): entre variantes que empatam nas regras #2 e #1, ganha a
+# que usa MENOS compensadores - ver wall_stepper.COMPENSATOR_COUNT_IN_TIEBREAK.
+CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -4088,15 +4092,20 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     Legado (`strategy=None`) deixa a flag desligada: continua igual a' main."""
     from core.engine import wall_stepper as _stepper_repair
     saved_repair_clean = _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE
+    saved_tiebreak = _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK
     _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
         and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
+    _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
     try:
         return _solve_building_blocks_all_courses_impl_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
             num_courses, **kwargs)
     finally:
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
+        _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
 
 
 def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,

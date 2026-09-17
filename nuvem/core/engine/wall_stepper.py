@@ -3957,6 +3957,18 @@ MAX_COMPENSATORS_PER_TRECHO = 1
 # o humano resolve sempre a favor da fileira de B34.
 MAX_SPECIAL_BOND_PER_TRECHO = 1
 
+# SECAO 71 (2026-09-16): CONTAGEM de compensadores no desempate entre variantes
+# do mesmo trecho. A regra #2 (`_layout_compensator_run_excess`) ja' proibia
+# compensador em SEQUENCIA e a regra #1 ja' vinha antes de tudo, mas quando dois
+# layouts EMPATAVAM nas duas o desempate era so' trava/alinhamento generico - a
+# quantidade de compensadores nao entrava. Medido no lote da BUTANTA: 62 trechos
+# de 69 cm fechavam `B19+B39+C09` tendo `B34+B34` disponivel com a MESMA
+# coincidencia de junta (zero nos dois). E' a classe que o usuario nomeou:
+# compensador EVITAVEL escolhido porque a composicao foi decidida sem olhar a
+# fiada vizinha. Entra DEPOIS das duas regras absolutas e ANTES da trava e do
+# alinhamento, que e' a hierarquia pedida. So' no fluxo CHANNEL.
+COMPENSATOR_COUNT_IN_TIEBREAK = False
+
 
 def _pier_codes_by_len_desc(catalog, allow_compensators, exclude=(), pool=OPENING_JAMB_BLOCK_CODES):
     """Codigos de `pool` disponiveis no catalogo, ordenados do MAIOR para o
@@ -5285,7 +5297,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
     # dp[v] = {estado: (valor, estado_anterior, codigo_usado)}
     inicial = (False, 0, 0, 0, 0)
     dp = [dict() for _ in range(total_u + 1)]
-    dp[0][inicial] = ((0, 0, -MIN_JOINT_STAGGER_TARGET_CM, 0, 0), None, None)
+    dp[0][inicial] = ((0, 0, 0, -MIN_JOINT_STAGGER_TARGET_CM, 0, 0), None, None)
 
     for v in range(total_u):
         nivel = dp[v]
@@ -5293,7 +5305,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
             continue
         for estado, (valor, _prev, _code) in sorted(nivel.items()):
             prev_comp, n_comp, n_half, n_special, n_misplaced = estado
-            excesso, coinc, neg_trava, neg_align, n_pecas = valor
+            excesso, coinc, usados_comp, neg_trava, neg_align, n_pecas = valor
             for passo_u, code, entry in passos:
                 v2 = v + passo_u
                 if v2 > total_u:
@@ -5319,6 +5331,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
                 novo_valor = (
                     excesso + (1 if (is_comp and prev_comp) else 0),
                     coinc + (coinc_por_u[v] if v else 0),
+                    usados_comp + ((1 if is_comp else 0) if COMPENSATOR_COUNT_IN_TIEBREAK else 0),
                     max(neg_trava, -trava_por_u[v]) if v else neg_trava,
                     neg_align - _align_ganho(v, code, entry),
                     n_pecas + 1,
@@ -5467,12 +5480,17 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
         stagger = _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid_positions_cm)
         trava = MIN_JOINT_STAGGER_TARGET_CM if stagger is None else min(
             stagger, MIN_JOINT_STAGGER_TARGET_CM)
-        return (comp_excess, joint_coinc, -trava, -align)
+        # SECAO 71: quantos compensadores/pastilhas o layout usa. Zero quando a
+        # secao esta' desligada, entao a ordem fica identica a' anterior.
+        n_comp = (sum(1 for code, _a, _b in layout
+                      if (catalog.get(code) or {}).get("is_compensator"))
+                  if COMPENSATOR_COUNT_IN_TIEBREAK else 0)
+        return (comp_excess, joint_coinc, n_comp, -trava, -align)
 
     best = baseline
     best_score = _score(baseline)
     max_align = len(target_void_positions_cm) if target_void_positions_cm else 0
-    perfect_score = (0, 0, -MIN_JOINT_STAGGER_TARGET_CM, -max_align)
+    perfect_score = (0, 0, 0, -MIN_JOINT_STAGGER_TARGET_CM, -max_align)
     if best_score == perfect_score:
         return best
 
