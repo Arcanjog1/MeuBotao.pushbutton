@@ -980,6 +980,17 @@ que chega. Aqui só a primeira perna é exercida — a boneca mais apertada dos 
 de regressão neste corpus; o bloco `coverage` de `t_nodes.json` declara isso e um teste
 confere a declaração. A perna do B54 é justamente a que a §74 muda.
 
+**Os dois verificadores do repositório, medidos.** `tools/documentation/validate.py` — o
+único check de CI — **passa**: `PASS: versioned documentation, commit provenance and explicit
+local links`. Ele estava vermelho desde antes desta rodada (faltava o bloco de metadados deste
+checkpoint, o `head` de 2026-09-15 tinha 7 caracteres e o `PROJECT_STATUS.md` apontava para a
+cabeça da missão anterior); os três foram corrigidos. `verify_reference_inventory.py` passa em
+toda a parte de acervo — portais versionados, arquivos sob o `primary_path`, JSON válido,
+sha256 e `source_commit` conferidos, contagem por projeto — e para na regra de *protected
+paths*, que proíbe qualquer mudança em `tests/` e `nuvem/core`. Essa regra é do PR #35, que era
+só de acervo; o #42 é um PR de solver e muda os dois por definição. A checagem de acervo, que é
+a que este corpus toca, está verde.
+
 **A regra histórica continua intacta.** O verificador do acervo
 (`tools/documentation/verify_reference_inventory.py`) exige que
 `nuvem/REGRAS_MODULACAO_BLOCOS.md` seja *append-only* em relação à base protegida. Conferido:
