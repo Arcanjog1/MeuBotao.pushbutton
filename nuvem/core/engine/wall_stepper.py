@@ -2781,7 +2781,7 @@ def _apply_abutting_tie_parity(outcome, nodes, walls_to_create, catalog, opening
 # nos T/X em ordem geometrica e inverte os que REDUZEM ESTRITAMENTE o custo
 # dos trechos livres que eles deixam. Cada trecho e' montado com o layout
 # PADRAO do sistema de tiers (`_pier_ordered_layout`), e o custo e'
-#   (trechos que nao fecham, excesso da regra #2, especiais, B34, pecas)
+#   (trechos que nao fecham, excesso da regra #2, pecas, especiais, B34)
 # Especiais antes de B34 e' o que o proprio humano faz: na parede 8284551,
 # trecho de 609cm, ele usa 10 B39 + 6 B34 (nenhum especial) onde o solver
 # usava 14 B39 + 1 B34 + C09 + C04.
@@ -2814,22 +2814,28 @@ _TIE_PARITY_LAYOUT_MEMO = {}
 def _tie_parity_fill_layout_cost(wall_idxs, nodes, walls_to_create, end_to_node, candidates,
                                  catalog,
                                  allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
-    """(trechos que nao fecham, excesso da regra #2, especiais, B34, pecas)
+    """(trechos que nao fecham, excesso da regra #2, pecas, especiais, B34)
     somado sobre os trechos livres das duas fiadas das paredes `wall_idxs`.
 
     Cada trecho e' montado com o layout PADRAO do sistema de tiers
     (`_pier_ordered_layout`, os mesmos tiers de sempre) - nao e' o
     preenchimento final (sem desencontro de junta, sem aberturas), so' o
-    suficiente para comparar DUAS paridades do mesmo trecho. Especiais
-    (compensador/pastilha/meio-bloco) antes de B34 e' a ordem que o proprio
-    humano segue: medido no corpus, ele so' troca compensador por B34 quando
-    a troca custa ZERO B34 a mais (628 trechos limpos contra 22 com especial
-    nesse caso; acima disso, 0 de 105). Funcao pura.
+    suficiente para comparar DUAS paridades do mesmo trecho. Funcao pura.
 
-    Medido em 2026-09-17 contra a alternativa aritmetica (o otimo teorico de
-    cada comprimento): o layout real preve melhor o que o solver vai fazer
-    (C09 244 x 289, especiais 777 x 794, trechos evitaveis 111 x 120,
-    B34 1.596 x 1.527 contra 1.619 do humano)."""
+    POR QUE O NUMERO DE PECAS VEM ANTES DE ESPECIAIS E B34: para um mesmo
+    comprimento, menos pecas significa pecas MAIORES - e' a mesma coisa que
+    "use o maximo de B39" (secao 2), so' que sem precisar de um termo
+    separado para cada codigo, e ja' penaliza compensador e pastilha por
+    serem as pecas mais curtas. Medido em 2026-09-17, a divergencia de
+    composicao por parede contra o humano: 1.706 com pecas na frente, 1.809
+    com especiais na frente, 2.606 com B34 na frente (antes da secao 72:
+    2.575). Com pecas na frente, o numero de trechos que ficaram com
+    especial existindo alternativa limpa bate EXATAMENTE o do humano (105).
+
+    Medido tambem contra o otimo aritmetico de cada comprimento (o teto
+    teorico, 10x mais barato): ele so' preve o resultado real em 10 das 34
+    paredes (erro medio de 7 pecas) porque ignora os tiers e o desencontro
+    de junta."""
     by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
     midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
     fail = excess = especiais = b34 = pieces = 0
@@ -2872,7 +2878,7 @@ def _tie_parity_fill_layout_cost(wall_idxs, nodes, walls_to_create, end_to_node,
                 especiais += somas[1]
                 b34 += somas[2]
                 pieces += somas[3]
-    return (fail, excess, especiais, b34, pieces)
+    return (fail, excess, pieces, especiais, b34)
 
 
 def _tie_parity_node_under_opening_reach(node, walls_to_create, openings_per_wall, catalog):

@@ -120,13 +120,16 @@ def test_custo_da_paridade_e_funcao_pura_dos_trechos():
     assert todas[0] > 0
 
 
-def test_custo_prefere_especial_zero_antes_de_b34():
-    """A ordem lexicografica e' (falhas, regra #2, especiais, B34, pecas):
-    trocar um especial por B34 e' sempre uma melhora, o contrario nunca."""
+def test_ordem_do_custo_e_pecas_depois_especiais_depois_b34():
+    """(falhas, regra #2, pecas, especiais, B34): menos pecas e' sempre
+    melhor - para o mesmo comprimento, menos pecas quer dizer pecas maiores,
+    que e' a preferencia por B39 sem precisar de um termo por codigo."""
     walls, nodes, e2n, out = _nos_resolvidos(parede_entre_dois_T(235.0))
     c = ws._tie_parity_fill_layout_cost({0}, nodes, walls, e2n, out["candidates"], CATALOG)
-    assert (c[0], c[1], c[2], c[3] - 1, c[4]) < c          # menos B34 e' melhor
-    assert (c[0], c[1], c[2] - 1, c[3] + 5, c[4]) < c      # menos especial vence mais B34
+    assert (c[0], c[1], c[2] - 1, c[3] + 3, c[4] + 3) < c   # menos pecas vence tudo
+    assert (c[0], c[1], c[2], c[3] - 1, c[4] + 3) < c       # depois, menos especiais
+    assert (c[0], c[1], c[2], c[3], c[4] - 1) < c           # por ultimo, menos B34
+    assert (c[0], c[1] + 1, 0, 0, 0) > c                    # regra #2 continua na frente
 
 
 # ------------------------------------------- 2. o principio (RED/GREEN)

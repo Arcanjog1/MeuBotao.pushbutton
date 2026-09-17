@@ -9314,8 +9314,17 @@ depois de `_apply_abutting_tie_parity` (regra #1, que tem precedência) e varre
 os nós T/X em ordem geométrica, invertendo os que reduzem ESTRITAMENTE o custo
 dos trechos livres que deixam. Cada trecho é montado com o layout PADRÃO do
 sistema de tiers (`_pier_ordered_layout`) e o custo é
-`(trechos que não fecham, excesso da regra #2, especiais, B34, peças)` —
+`(trechos que não fecham, excesso da regra #2, peças, especiais, B34)` —
 comparação lexicográfica, sem pesos.
+
+**Por que o número de peças vem antes de especiais e B34.** Para um mesmo
+comprimento, menos peças significa peças MAIORES — é a mesma coisa que "use o
+máximo de B39" (§2), sem precisar de um termo por código, e já penaliza
+compensador e pastilha por serem as peças mais curtas. Medida a divergência de
+composição por parede contra o humano nas três ordens: **1.706** com peças na
+frente, 1.809 com especiais na frente, 2.606 com B34 na frente (antes da §72:
+2.575). Com peças na frente, o número de trechos que ficaram com especial
+existindo alternativa limpa bate **exatamente** o do humano (105 e 105).
 
 **Por que o layout real e não o ótimo aritmético.** As duas versões foram
 medidas (2026-09-17). O ótimo aritmético é 10× mais barato mas só prevê o
@@ -9348,18 +9357,20 @@ LIMITATIONS); enquanto não for corrigido, a §72 não exercita a combinação.
 
 | | HUMANO | antes | §72 |
 |---|---|---|---|
-| peças | 6.018 | 6.026 | **5.980** |
-| B39 | 3.061 | 3.066 | 3.205 |
-| B34 | 1.619 | 1.660 | 1.511 |
-| B19 | 328 | 364 | 373 |
-| C09 | 243 | 272 | **250** |
-| C04 | 244 | 177 | 160 |
-| especiais (soma) | 815 | 813 | **783** |
-| cobertura B39 | 61,8% | 61,3% | 64,0% |
-| trechos com resto bom (0 ou 35) | 33,5% | 33,3% | **38,0%** |
-| perda do preenchimento (peças não-B39 acima do mínimo) | +381 | +411 | **+248** |
-| **divergência de composição por parede (soma)** | — | 2.575 | **1.809** |
-| tempo do solve (bancada, 34 paredes) | — | 27 s | **23 s** |
+| peças | 6.018 | 6.026 | **5.971** |
+| B39 | 3.061 | 3.066 | 3.175 |
+| B34 | 1.619 | 1.660 | 1.548 |
+| B19 | 328 | 364 | 371 |
+| C09 | 243 | 272 | **247** |
+| C04 | 244 | 177 | 150 |
+| especiais (soma) | 815 | 813 | **768** |
+| cobertura B39 | 61,8% | 61,3% | 63,4% |
+| trechos com resto bom (0 ou 35) | 33,5% | 33,3% | **38,3%** |
+| trechos com especial existindo alternativa limpa | **105** | 137 | **105** |
+| **divergência de composição por parede (soma)** | — | 2.575 | **1.706** |
+| B34 a menos de 20 cm de um nó | 50,3% | 45,1% | **51,2%** |
+| B34 em meio de parede livre | 42,4% | 43,1% | 37,1% |
+| tempo do solve (bancada, 34 paredes) | — | 27 s | **21 s** |
 | colisões / não-modular / sem apoio / invasão | — | 0/0/0/0 | **0/0/0/0** |
 
 Legado (`strategy=None`) byte-idêntico: 8.939 peças, assinatura `0a2704e4faaf`
