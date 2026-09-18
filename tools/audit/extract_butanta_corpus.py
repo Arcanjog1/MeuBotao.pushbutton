@@ -270,12 +270,18 @@ def main():
     chave_caso = por_id[CASO]
 
     casos = {}
-    for rotulo, ligada in (("flag_off", False), ("flag_on", True)):
-        ctx_s, res = S.solve_on_fresh_context(geo, ligada)
+    # flag_off / flag_on: o PRODUTO com e sem a secao 74.
+    # flag_off_motor_pre_regra76: sem a secao 74 E sem a D1 da regra 76 - e' o
+    # contrafactual que isola o efeito da secao 74 como ela foi auditada: com a
+    # D1 ligada, o no' 46 e' resgatado como L degradado mesmo sem a secao 74.
+    for rotulo, ligada, d1 in (("flag_off", False, None), ("flag_on", True, None),
+                               ("flag_off_motor_pre_regra76", False, False)):
+        ctx_s, res = S.solve_on_fresh_context(geo, ligada, regra76_d1=d1)
         rows = S.solver_rows(ctx_s, res, geo)
         Sc = S.wall_counts(rows, geo, chave_caso)
         casos[rotulo] = {"solver_counts": Sc, "divergence": S.divergence(H, Sc),
                          "hard_gates": S.hard_gates(res),
+                         "compensator_as_junction_bond": len(res.get("compensator_as_junction_bond") or []),
                          "pieces_in_ruler": len(rows)}
 
     caso = {
@@ -304,8 +310,11 @@ def main():
                           "(scratchpad/corpus.dump), que nao esta' versionado. O hash "
                           "auditavel e' o S74_SNAPSHOT_V1 abaixo.")},
              "cases": []}
-    for rotulo, tol in (("flag_off", None), ("tol_0_05", 0.05), ("tol_0_10", 0.10), ("tol_0_30", 0.30)):
-        if tol is None:
+    for rotulo, tol in (("flag_off", None), ("flag_off_motor_pre_regra76", None), ("tol_0_05", 0.05),
+                        ("tol_0_10", 0.10), ("tol_0_30", 0.30)):
+        if rotulo == "flag_off_motor_pre_regra76":
+            ctx_s, res = S.solve_on_fresh_context(geo, False, regra76_d1=False)
+        elif tol is None:
             ctx_s, res = S.solve_on_fresh_context(geo, False)
         elif abs(tol - S.tolerance_cm()) < 1e-12:
             ctx_s, res = S.solve_on_fresh_context(geo, True)      # caminho do PRODUTO
@@ -319,7 +328,8 @@ def main():
                                "sha256": S.snapshot_sha256(linhas_s),
                                "ruler_pieces": len(rows),
                                "ruler_codes": contagem_de_codigos(rows),
-                               "hard_gates": S.hard_gates(res)})
+                               "hard_gates": S.hard_gates(res),
+                               "compensator_as_junction_bond": len(res.get("compensator_as_junction_bond") or [])})
 
     # A MESMA medida sobre a variante pos-microajuste (secao 66): e' o estado
     # sobre o qual a varredura de tolerancia do checkpoint mediu os totais.

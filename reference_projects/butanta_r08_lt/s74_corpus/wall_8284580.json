@@ -16,18 +16,16 @@
  "expected": {
   "flag_off": {
    "solver_counts": {
-    "B34": 51,
-    "Z_END_ZONE": 17,
-    "Z_FREE_MID_WALL": 34,
-    "C09": 5,
-    "B39": 14,
+    "B34": 11,
+    "Z_END_ZONE": 11,
+    "B39": 48,
     "B19": 1
    },
    "divergence": {
-    "div": 204.7,
-    "comp_delta": 79,
-    "free_mid_delta": 34,
-    "esp_delta": 5,
+    "div": 3.3,
+    "comp_delta": 2,
+    "free_mid_delta": 0,
+    "esp_delta": 0,
     "human_pieces": 60
    },
    "hard_gates": {
@@ -37,7 +35,8 @@
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
    },
-   "pieces_in_ruler": 5967
+   "compensator_as_junction_bond": 9,
+   "pieces_in_ruler": 5953
   },
   "flag_on": {
    "solver_counts": {
@@ -60,7 +59,34 @@
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
    },
-   "pieces_in_ruler": 5940
+   "compensator_as_junction_bond": 6,
+   "pieces_in_ruler": 5930
+  },
+  "flag_off_motor_pre_regra76": {
+   "solver_counts": {
+    "B34": 51,
+    "Z_END_ZONE": 17,
+    "Z_FREE_MID_WALL": 34,
+    "C09": 5,
+    "B39": 14,
+    "B19": 1
+   },
+   "divergence": {
+    "div": 204.7,
+    "comp_delta": 79,
+    "free_mid_delta": 34,
+    "esp_delta": 5,
+    "human_pieces": 60
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 16,
+   "pieces_in_ruler": 5967
   }
  }
 }

@@ -119,14 +119,22 @@ justifica o valor — ela prova apenas que não há precipício perto da frontei
   extra.
 - `metric` — a definição da divergência, implementada em
   [`tools/audit/s74_corpus.py`](../../../tools/audit/s74_corpus.py).
-- `expected.flag_off` / `expected.flag_on` — `solver_counts`, `divergence`
-  (`div`, `comp_delta`, `free_mid_delta`, `esp_delta`, `human_pieces`), `hard_gates`
-  e `pieces_in_ruler`:
+- `expected.flag_off` / `expected.flag_on` / `expected.flag_off_motor_pre_regra76` —
+  `solver_counts`, `divergence` (`div`, `comp_delta`, `free_mid_delta`, `esp_delta`,
+  `human_pieces`), `hard_gates`, `compensator_as_junction_bond` (regra 76, contagem
+  do solve inteiro) e `pieces_in_ruler`:
 
 | | Composição do solver | Divergência |
 |---|---|---|
-| sem a seção 74 | 14 B39 + 51 B34 + 5 C09 + 1 B19 | 204,7 |
-| com a seção 74 | 48 B39 + 11 B34 + 1 B19 | 3,3 |
+| sem a seção 74, motor anterior à regra 76 (`flag_off_motor_pre_regra76`) | 14 B39 + 51 B34 + 5 C09 + 1 B19 | 204,7 |
+| sem a seção 74, motor atual (`flag_off`) | 48 B39 + 11 B34 + 1 B19 | 3,3 |
+| com a seção 74 (`flag_on`, o produto) | 48 B39 + 11 B34 + 1 B19 | 3,3 |
+
+O efeito isolado da seção 74 é medido contra `flag_off_motor_pre_regra76` (seção 74
+**e** correção D1 da regra 76 desligadas — o motor que a auditoria independente
+conferiu; o hash dele é o `flag_off` antigo, `c06f91a0…`). Com a D1 ligada, o nó 46 já
+degrada para L mesmo sem a seção 74 e o `flag_off` do produto cai para 3,3: é efeito
+da regra 76, declarado aqui em vez de apagar o contrafactual.
 
 ### snapshot_v1.json — SAÍDA MEDIDA
 
@@ -138,17 +146,23 @@ justifica o valor — ela prova apenas que não há precipício perto da frontei
   formato ad-hoc da bancada, que não está versionado. O hash auditável é o
   S74_SNAPSHOT_V1.
 - `cases` — `label`, `tolerance_cm`, `pieces`, `sha256`, `ruler_pieces`,
-  `ruler_codes` e `hard_gates`:
+  `ruler_codes`, `hard_gates` e `compensator_as_junction_bond` (regra 76):
 
-| Caso | Peças | sha256 |
-|---|---|---|
-| `flag_off` | 8746 | `c06f91a0b9848681…` |
-| `tol_0_05` | 8719 | `320ba395683cc762…` |
-| `tol_0_10` | 8719 | o MESMO `320ba395683cc762…` |
-| `tol_0_30` | 8719 | o MESMO `320ba395683cc762…` |
+| Caso | Peças | sha256 | compensador-amarração |
+|---|---|---|---|
+| `flag_off` | 8732 | `a18b0dcae8549ff7…` | 9 |
+| `flag_off_motor_pre_regra76` | 8746 | `c06f91a0b9848681…` (o `flag_off` anterior à regra 76) | 16 |
+| `tol_0_05` | 8709 | `16a7ffa992be7cb2…` | 6 |
+| `tol_0_10` | 8709 | o MESMO `16a7ffa992be7cb2…` | 6 |
+| `tol_0_30` | 8709 | o MESMO `16a7ffa992be7cb2…` | 6 |
+
+  Antes da regra 76 o produto (`tol_0_05`) tinha 8719 peças, `320ba395683cc762…`, e 11
+  compensadores exercendo função de amarração. Com a correção D1 a régua mede
+  B34 +24, B39 −14, B19 −10, C09 −6, C04 −4, B54 0 (5940 → 5930 peças).
 
 - `opening_variant_cases` — a mesma medida sobre a variante
-  `post_micro_adjustment_s66` (8733 peças com a flag desligada, 8706 com 0,05 cm).
+  `post_micro_adjustment_s66` (8719 peças com a flag desligada, 8696 com 0,05 cm;
+  antes da regra 76: 8733 e 8706).
 
 Os portões duros (colisões, não-modular, sem apoio, invasão de vão) ficam
 **0 / 0 / 0 / 0** em todos os casos gravados.

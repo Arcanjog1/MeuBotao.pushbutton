@@ -118,7 +118,8 @@ class Bancada(object):
     def solucao(self, rotulo):
         """Solve REAL memorizado - cada configuracao roda uma unica vez.
 
-        'off' e 'on' usam a flag do PRODUTO; '0.10' e '0.30' usam a varredura de saturacao
+        'off' e 'on' usam a flag do PRODUTO; 'pre76' desliga tambem a D1 da regra 76 (motor
+        anterior a' regra 76); '0.10' e '0.30' usam a varredura de saturacao
         (troca so' o parametro da tolerancia, nunca a constante nem a decisao do motor).
         """
         if rotulo not in self._solucoes:
@@ -127,6 +128,8 @@ class Bancada(object):
                 self._solucoes[rotulo] = S.solve(self.ctx, False, geo=self.geo)
             elif rotulo == "on":
                 self._solucoes[rotulo] = S.solve(self.ctx, True, geo=self.geo)
+            elif rotulo == "pre76":
+                self._solucoes[rotulo] = S.solve(self.ctx, False, geo=self.geo, regra76_d1=False)
             else:
                 with S.forced_tolerance_cm(float(rotulo)):
                     self._solucoes[rotulo] = S.solve(self.ctx, True, geo=self.geo)
@@ -334,25 +337,31 @@ def caso_10_parede_8284580(rel, B):
     humano = B.parede["human_counts"]
     chave = B.parede["wall_key"]
     divs = {}
-    for rotulo, solve_id in (("flag_off", "off"), ("flag_on", "on")):
+    for rotulo, solve_id, estado in (
+            ("flag_off", "off", "a flag desligada"),
+            ("flag_on", "on", "a flag ligada"),
+            ("flag_off_motor_pre_regra76", "pre76", "a flag desligada, motor anterior a' regra 76")):
         res = B.solucao(solve_id)
         contagem = S.wall_counts(S.solver_rows(B.ctx, res, B.geo), B.geo, chave)
         esperado = B.parede["expected"][rotulo]
         medida = S.divergence(humano, contagem)
         divs[rotulo] = medida["div"]
         ok = contagem == esperado["solver_counts"] and medida == esperado["divergence"]
-        estado = "desligada" if rotulo == "flag_off" else "ligada"
-        rel.caso("10.%s" % ("off" if rotulo == "flag_off" else "on"),
-                 "parede 8284580 (%s) com a flag %s" % (chave, estado),
+        rel.caso("10.%s" % solve_id,
+                 "parede 8284580 (%s) com %s" % (chave, estado),
                  ok, "divergencia %.1f (corpus %.1f) | %s" % (
                      medida["div"], esperado["divergence"]["div"], _resumo_pecas(contagem)))
         if not ok:
             rel.nota("contagem medida: %r" % (contagem,))
-    ok_salto = divs.get("flag_off", 0.0) > 200.0 and divs.get("flag_on", 999.0) < 5.0
+    antes = divs.get("flag_off_motor_pre_regra76", 0.0)
+    ok_salto = antes > 200.0 and divs.get("flag_on", 999.0) < 5.0
     rel.caso("10.3", "a secao 74 aproxima o solver do humano", ok_salto,
              "divergencia %.1f -> %.1f sobre %d pecas humanas" % (
-                 divs.get("flag_off", float("nan")), divs.get("flag_on", float("nan")),
+                 antes, divs.get("flag_on", float("nan")),
                  sum(v for k, v in humano.items() if not k.startswith("Z_"))))
+    rel.nota("o efeito isolado da secao 74 e' medido contra o motor anterior a' regra 76: com a "
+             "correcao D1 da regra 76 o no' 46 ja' degrada para L sem a secao 74 e o flag_off do "
+             "produto tambem da' %.1f" % divs.get("flag_off", float("nan")))
     rel.nota("a composicao humana e' EVIDENCIA de uma parede, nao gabarito nem norma")
 
 

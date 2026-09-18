@@ -1007,6 +1007,16 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 # sobreposicao, blocos fora do limite da parede ou modulacoes forcadas".
 T_INTERSECTION_B54_HALF_ROOM_FT = _cm_to_ft(54.0 / 2.0)
 CORNER_B34_ROOM_FT = _cm_to_ft(34.0)
+# REGRA 76 / CORRECAO D1 (desligada no motor; ligada so' no fluxo CHANNEL por
+# wall_modeling.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED): no passo
+# "degrada para L" do T, medir o espaco a partir do CONTATO onde o B34
+# realmente comeca. O bloco e' posto em `point - l_dir * meia_espessura_da_que_
+# chega` e se estende 34 cm em l_dir: cobre o quadrado do no' + (34 - meia
+# espessura) no sentido livre. O teste historico exige 34 a partir do PONTO -
+# meia espessura a mais do que a peca ocupa. Medido no BUTANTA: nos 22 (pilar de
+# 34 cm entre duas janelas) e 30 (27,014 cm) cabem com B34 real - o que o humano
+# faz - e sem a correcao caiam no C09 como peca do no'.
+T_DEGRADED_L_ROOM_FROM_CONTACT = False
 # Regra 11.14 (2026-09-11, decisao do usuario sobre a evidencia humana de
 # BUTANTA): RESERVA DE CANTO POR FIADA. Ao medir o espaco de uma parede para a
 # peca de um encontro, a reserva na OUTRA ponta da mesma parede deixa de ser o
@@ -1933,6 +1943,22 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
                 l_dir = main_dir
             elif assessment["room_minus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT:
                 l_dir = main_dir.Negate()
+            elif T_DEGRADED_L_ROOM_FROM_CONTACT:
+                # CORRECAO D1 (regra 76) - so' quando o teste historico nao acha lado
+                # nenhum (nos que ja' degradam para L nao mudam): o B34 ocupa
+                # (34 - meia espessura) no sentido livre e a meia espessura do
+                # outro lado (dentro do quadrado do no'), com a MESMA tolerancia
+                # fisica do teste do T (secao 74).
+                _t_p0, _t_p1, _t_d, _t_l, thick_i_room = _wall_axis_and_length(walls_to_create, inc_idx)
+                half_i = thick_i_room / 2.0
+                tol = _t_intersection_room_tolerance_ft()
+                need = CORNER_B34_ROOM_FT - half_i
+                if (assessment["room_plus_ft"] + tol >= need
+                        and assessment["room_minus_ft"] + tol >= half_i):
+                    l_dir = main_dir
+                elif (assessment["room_minus_ft"] + tol >= need
+                        and assessment["room_plus_ft"] + tol >= half_i):
+                    l_dir = main_dir.Negate()
             if l_dir is not None:
                 # O "arm_point" de um L_CORNER de verdade fica do lado
                 # OPOSTO de onde a peca se estende (extend_wall_ends_to_

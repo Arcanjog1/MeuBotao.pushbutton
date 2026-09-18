@@ -3696,6 +3696,14 @@ CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
 # registrada na secao 58.3, ainda nao tratada. O legado continua identico.
 CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
 
+# REGRA 76 (2026-09-18) no fluxo CHANNEL: o passo "degrada para L" do T mede o
+# espaco a partir do CONTATO onde o B34 realmente comeca (ver
+# wall_stepper.T_DEGRADED_L_ROOM_FROM_CONTACT). Sem isso, pilares de 34 cm entre
+# duas aberturas caiam na escada do elemento unico e a familia oposta recebia um
+# C09 como peca do no' - compensador exercendo funcao de amarracao. Legado
+# (`strategy=None`) nao passa por aqui.
+CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = True
+
 # SECAO 68 (2026-09-16): no fluxo CHANNEL, a regiao de reparo de abertura
 # continua expandindo dentro do orcamento que ja' existia
 # (OPENING_REPAIR_MAX_EXTRA_BLOCKS) e fica com a MELHOR composicao em vez da
@@ -3740,6 +3748,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     saved_tolerances = (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
                         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
     saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
+    saved_degraded_l_contact = _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT
+    if CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED:
+        _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = True   # REGRA 76
     if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
         _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
@@ -3755,11 +3766,14 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
          _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
+        _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = saved_degraded_l_contact
     if isinstance(result, dict):
         # REGRA 76 - hard gate: compensador nunca exerce funcao de amarracao.
         # Somente leitura; so' no fluxo com estrategia de reforco.
         result["compensator_as_junction_bond"] = _stepper_memo.compensator_as_junction_bond(
             result.get("course_candidates"), nodes, walls_to_create)
+        result["channel_t_degraded_l_room_from_contact"] = bool(
+            CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
         result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
         result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
         result["channel_repair_prefer_clean"] = bool(CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)

@@ -11,6 +11,31 @@
   {
    "label": "flag_off",
    "tolerance_cm": null,
+   "pieces": 8732,
+   "sha256": "a18b0dcae8549ff7cb071035e6872e4a4a5f4e4b811cf8060c568fc2ceb8ac8f",
+   "ruler_pieces": 5953,
+   "ruler_codes": {
+    "B19": 356,
+    "B34": 1519,
+    "B39": 3213,
+    "B54": 168,
+    "C04": 151,
+    "C09": 242,
+    "K34": 37,
+    "K39": 267
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 9
+  },
+  {
+   "label": "flag_off_motor_pre_regra76",
+   "tolerance_cm": null,
    "pieces": 8746,
    "sha256": "c06f91a0b984868100ad09b22b8ed612fe8e17124eb23904e909b3fa4369fde6",
    "ruler_pieces": 5967,
@@ -30,21 +55,22 @@
     "unsupported": 0,
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
-   }
+   },
+   "compensator_as_junction_bond": 16
   },
   {
    "label": "tol_0_05",
    "tolerance_cm": 0.05,
-   "pieces": 8719,
-   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
-   "ruler_pieces": 5940,
+   "pieces": 8709,
+   "sha256": "16a7ffa992be7cb2a22026fab5eca716a3e88ccb15c0f24bcbbf448fc2014b1f",
+   "ruler_pieces": 5930,
    "ruler_codes": {
-    "B19": 346,
-    "B34": 1503,
-    "B39": 3210,
+    "B19": 336,
+    "B34": 1527,
+    "B39": 3196,
     "B54": 184,
-    "C04": 151,
-    "C09": 242,
+    "C04": 147,
+    "C09": 236,
     "K34": 37,
     "K39": 267
    },
@@ -54,21 +80,22 @@
     "unsupported": 0,
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
-   }
+   },
+   "compensator_as_junction_bond": 6
   },
   {
    "label": "tol_0_10",
    "tolerance_cm": 0.1,
-   "pieces": 8719,
-   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
-   "ruler_pieces": 5940,
+   "pieces": 8709,
+   "sha256": "16a7ffa992be7cb2a22026fab5eca716a3e88ccb15c0f24bcbbf448fc2014b1f",
+   "ruler_pieces": 5930,
    "ruler_codes": {
-    "B19": 346,
-    "B34": 1503,
-    "B39": 3210,
+    "B19": 336,
+    "B34": 1527,
+    "B39": 3196,
     "B54": 184,
-    "C04": 151,
-    "C09": 242,
+    "C04": 147,
+    "C09": 236,
     "K34": 37,
     "K39": 267
    },
@@ -78,21 +105,22 @@
     "unsupported": 0,
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
-   }
+   },
+   "compensator_as_junction_bond": 6
   },
   {
    "label": "tol_0_30",
    "tolerance_cm": 0.3,
-   "pieces": 8719,
-   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
-   "ruler_pieces": 5940,
+   "pieces": 8709,
+   "sha256": "16a7ffa992be7cb2a22026fab5eca716a3e88ccb15c0f24bcbbf448fc2014b1f",
+   "ruler_pieces": 5930,
    "ruler_codes": {
-    "B19": 346,
-    "B34": 1503,
-    "B39": 3210,
+    "B19": 336,
+    "B34": 1527,
+    "B39": 3196,
     "B54": 184,
-    "C04": 151,
-    "C09": 242,
+    "C04": 147,
+    "C09": 236,
     "K34": 37,
     "K39": 267
    },
@@ -102,23 +130,24 @@
     "unsupported": 0,
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
-   }
+   },
+   "compensator_as_junction_bond": 6
   }
  ],
  "opening_variant_cases": [
   {
    "variant": "post_micro_adjustment_s66",
    "label": "flag_off",
-   "pieces": 8733,
-   "sha256": "a5d2f64a20ee1fc0d76b3172d50abd3a77dc2fc9e3b5dc662d7bc88d3755ca05",
-   "ruler_pieces": 5954,
+   "pieces": 8719,
+   "sha256": "d7162f547de7ae0a1fc5d1b30ec2cf606aa1e53e25676f74f14a7eedfc8abb2a",
+   "ruler_pieces": 5940,
    "ruler_codes": {
-    "B19": 377,
-    "B34": 1539,
-    "B39": 3190,
+    "B19": 365,
+    "B34": 1505,
+    "B39": 3227,
     "B54": 168,
     "C04": 152,
-    "C09": 223,
+    "C09": 218,
     "K34": 36,
     "K39": 267,
     "KV": 2
@@ -134,16 +163,16 @@
   {
    "variant": "post_micro_adjustment_s66",
    "label": "tol_0_05",
-   "pieces": 8706,
-   "sha256": "acbde534c6c25d04ec3b639a12b7b2d51ad6fd5343b545c5d43efb75d8b292ec",
-   "ruler_pieces": 5927,
+   "pieces": 8696,
+   "sha256": "03127688684219ce73c8440c4e758682ec5f04b84391aea9a7bfd79081945ed4",
+   "ruler_pieces": 5917,
    "ruler_codes": {
-    "B19": 355,
-    "B34": 1489,
-    "B39": 3224,
+    "B19": 345,
+    "B34": 1513,
+    "B39": 3210,
     "B54": 184,
-    "C04": 152,
-    "C09": 218,
+    "C04": 148,
+    "C09": 212,
     "K34": 36,
     "K39": 267,
     "KV": 2

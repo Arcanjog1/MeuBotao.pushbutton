@@ -265,13 +265,23 @@ def forced_tolerance_cm(valor_cm):
 
 
 # ============================================================= solve completo
-def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CHANNEL"):
+def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CHANNEL",
+          regra76_d1=None):
     """Solve REAL das 34 paredes. A secao 74 e' ligada/desligada pela flag do
     PRODUTO (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`), nao por monkeypatch:
-    e' o mesmo caminho que o botao percorre no Revit."""
+    e' o mesmo caminho que o botao percorre no Revit.
+
+    `regra76_d1` (None = o que o produto faz) liga/desliga a correcao D1 da
+    regra 76 pela flag do PRODUTO (`CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_
+    ENABLED`). Serve para reproduzir o motor ANTERIOR a' regra 76: com a D1, o
+    contrafactual "sem a secao 74" resgata o no' 46 como L degradado, entao o
+    efeito isolado da secao 74 so' aparece contra o motor sem a D1."""
     m, _ws = engine()
     antes = m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED
+    antes_d1 = m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED
     m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = bool(physical_tolerance)
+    if regra76_d1 is not None:
+        m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = bool(regra76_d1)
     try:
         res = m.solve_building_blocks_all_courses(
             ctx["nodes"], ctx["walls"], ctx["e2n"], ctx["openings_per_wall"],
@@ -280,11 +290,13 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
             opening_reinforcement_strategy=strategy)
     finally:
         m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = antes
+        m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = antes_d1
     res["num_courses"] = courses
     return res
 
 
-def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strategy="CHANNEL"):
+def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strategy="CHANNEL",
+                           regra76_d1=None):
     """Solve sobre um grafo de nos NOVO - e' assim que se deve medir.
 
     O motor MUTA os nos durante o solve: a secao 72 grava nos proprios nos uma
@@ -298,7 +310,8 @@ def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strat
     Devolve (ctx, res) porque a regua precisa do ctx que produziu o resultado.
     """
     ctx = build_context(geo)
-    return ctx, solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy)
+    return ctx, solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy,
+                      regra76_d1=regra76_d1)
 
 
 def hard_gates(res):

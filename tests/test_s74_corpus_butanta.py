@@ -60,6 +60,8 @@ def _solve(rotulo, geo=None):
             cache[rotulo] = S.solve_on_fresh_context(alvo, False)
         elif rotulo in ("on", "variante_on"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, True)
+        elif rotulo == "pre_regra76":
+            cache[rotulo] = S.solve_on_fresh_context(alvo, False, regra76_d1=False)
         elif rotulo.startswith("legado_"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
                                                      strategy=None)
@@ -262,19 +264,28 @@ def test_a_flag_e_restaurada_depois_de_cada_consulta():
 def test_a_parede_8284580_muda_de_composicao_com_a_secao_74():
     """A composicao humana e TESTEMUNHA de uma parede, nao alvo: o teste nao
     exige que o solver chegue perto dela. Confere que composicao e divergencia
-    MEDIDAS batem com o corpus e que os dois estados diferem entre si."""
+    MEDIDAS batem com o corpus e que os estados diferem entre si.
+
+    O efeito isolado da secao 74 e' medido contra `flag_off_motor_pre_regra76`
+    (secao 74 E correcao D1 da regra 76 desligadas - o motor que a auditoria
+    independente conferiu). Com a D1 ligada, o `flag_off` do produto ja' resgata o
+    no' 46 como L degradado e a parede fica igual a `flag_on`: isso e' da regra 76,
+    nao da secao 74, e fica declarado aqui em vez de apagar o contrafactual."""
     H = CASO["human_counts"]
     medidas = {}
-    for rotulo in ("flag_off", "flag_on"):
-        ctx_s, res = _solve("off" if rotulo == "flag_off" else "on")
+    for rotulo, chave in (("flag_off", "off"), ("flag_on", "on"),
+                          ("flag_off_motor_pre_regra76", "pre_regra76")):
+        ctx_s, res = _solve(chave)
         contagem = S.wall_counts(S.solver_rows(ctx_s, res, GEO), GEO, CASO["wall_key"])
         esperado = CASO["expected"][rotulo]
         assert contagem == esperado["solver_counts"], (rotulo, contagem)
         medidas[rotulo] = S.divergence(H, contagem)
         assert medidas[rotulo] == esperado["divergence"], (rotulo, medidas[rotulo])
-    # comparacao entre os DOIS estados medidos - sem limiar absoluto contra o humano
-    assert medidas["flag_on"]["div"] < medidas["flag_off"]["div"]
-    assert medidas["flag_on"]["comp_delta"] < medidas["flag_off"]["comp_delta"]
+    # comparacao entre estados medidos - sem limiar absoluto contra o humano
+    antes = medidas["flag_off_motor_pre_regra76"]
+    assert medidas["flag_on"]["div"] < antes["div"]
+    assert medidas["flag_on"]["comp_delta"] < antes["comp_delta"]
+    assert medidas["flag_off"] == medidas["flag_on"], "com a D1 o no' 46 ja' degrada para L sem a secao 74"
 
 
 @pytest.mark.slow
@@ -300,6 +311,18 @@ def test_a_tolerancia_satura_o_conjunto_fisico_e_por_isso_nao_ha_precipicio():
         assert len(linhas) == gravado["pieces"], rotulo
     assert hashes["tol_0_05"] == hashes["tol_0_10"] == hashes["tol_0_30"]
     assert hashes["flag_off"] != hashes["tol_0_05"]
+
+
+@pytest.mark.slow
+def test_o_contrafactual_anterior_a_regra_76_continua_reproduzivel():
+    """O `flag_off` auditado antes da regra 76 e' o caso
+    `flag_off_motor_pre_regra76` de agora: mesmo hash, mesmas pecas."""
+    ctx_s, res = _solve("pre_regra76")
+    linhas = S.normalized_snapshot(ctx_s, res)
+    gravado = [c for c in SNAP["cases"] if c["label"] == "flag_off_motor_pre_regra76"][0]
+    assert S.snapshot_sha256(linhas) == gravado["sha256"]
+    assert len(linhas) == gravado["pieces"]
+    assert S.hard_gates(res) == gravado["hard_gates"]
 
 
 @pytest.mark.slow
