@@ -2,14 +2,14 @@
 
 ```json
 {
-  "date": "2026-09-17",
+  "date": "2026-09-18",
   "scope": "current",
   "branch": "claude/butanta-modulation-physical-fixes",
-  "head": "4bf431f0378db61b45f24b2b94fbe5b1e0194add",
+  "head": "74c019ef924a8b4d0742518bf1cfd09aa38ee978",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "READY FOR FINAL REVIT SMOKE - offline verde, aplicacao real no Revit PENDENTE",
+  "veredito": "BLOCKED -> corrigido offline pela regra 75 - RE-SMOKE NO REVIT PENDENTE de revisao humana da causa e do patch",
   "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
   "changes": [
     "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
@@ -21,21 +21,23 @@
     "tests/test_s74_corpus_butanta.py (novo): 39 testes sobre o corpus versionado.",
     "tools/documentation/verify_reference_inventory.py: aceita o terceiro projeto do acervo e passa a exigir inclusao (todo JSON publicado esta' inventariado) em vez de igualdade, agora que um acervo vive fora de docs/revit_reference_extraction/.",
     "nuvem/REGRAS_MODULACAO_BLOCOS.md: secoes 70 a 74 (70 e 73 medidas e rejeitadas); a 74 redigida como tolerancia fisica controlada, nao como correcao de ruido numerico.",
-    "docs/checkpoints/2026-09-17-butanta-convergencia-humano.md: relatorio da missao."
+    "docs/checkpoints/2026-09-17-butanta-convergencia-humano.md: relatorio da missao.",
+    "nuvem/core/engine/opening_reinforcement.py: REGRA 75 - conversao de amarracao em canaleta desligada, travessia 51.6 suspensa por padrao, validador channel_as_junction_bond; nuvem/core/wall_modeling.py: hard gate no resultado.",
+    "tests/test_channel_never_bonds.py (novo) + pares padrao/override em test_channel_reinforcement/test_channel_audit_fixes/test_node_bounded_residual: cada mecanismo vetado tem mutante que obriga o gate a acusar.",
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 75 (append-only); corpus da secao 74 re-fotografado pos-75 (t_nodes.json byte-identico)."
   ],
   "tests": [
-    "Suite completa (tests/, sem regression): 1.231 passaram, 0 falharam, 1 desmarcado.",
-    "tests/test_s74_corpus_butanta.py: 39 passaram (33 em 0,3 s; 6 marcados slow rodam o solver real das 34 paredes).",
-    "tools/audit/audit_s74_corpus.py: 40 casos, 40 PASS, 0 FAIL.",
-    "Legado (strategy=None) byte-identico e agora auditavel: 8.939 pecas, sha256 3ba22aa08913ac5d..., o mesmo com a flag ligada e desligada.",
-    "Determinismo: repetir o solve da geometria identica; permutar a ordem de entrada muda o resultado - comportamento anterior a esta missao.",
-    "Saturacao da tolerancia: 0,05 / 0,10 / 0,30 cm produzem o mesmo conjunto fisico (sha256 320ba395683cc762...), com a flag desligada em c06f91a0b9848681..."
+    "Suite completa (tests/, sem regression): 1.244 passaram, 0 falharam, 1 desmarcado.",
+    "tests/test_s74_corpus_butanta.py: 39 passaram; runner audit_s74_corpus: 40 casos PASS com o gate CHANNEL_AS_JUNCTION_BOND = 0 no caso 11.",
+    "Canal: 77 passaram; regra 75: 7 passaram; focada secao 72/74: 58 passaram.",
+    "Legado byte-identico: strategy=None 8.939 pecas, assinatura 0a2704e4faaf; sha S74_SNAPSHOT_V1 do legado 3ba22aa08913... identico com e sem a flag.",
+    "Saturacao preservada pos-75: 0,05 / 0,10 / 0,30 cm -> mesmo sha256 320ba395683c..."
   ],
   "known_failures": [
-    "test_perf_trace_stall_sampler::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas falha com UnboundLocalError (ctypes) igual em main 55e990d e na base do PR - defeito herdado, desmarcado e nao escondido.",
-    "A aplicacao da secao 74 no Revit NAO foi executada: o Revit ficou travado no modal TaskDialog_Project_Not_Saved_Recently sem operador para dispensa-lo. Purge, reset das 44 aberturas, run 1/run 2, readback e capturas finais continuam PENDENTES.",
-    "Quatro paredes continuam reprovadas pelo auditor de junta do proprio motor, as mesmas antes e depois desta missao.",
-    "O corpus exerce so' a perna do B54 de _t_intersection_room_ok; a perna do B34 nao tem cobertura de regressao ali (boneca mais apertada 69,0002 cm contra 34 exigidos) - declarado no bloco coverage de t_nodes.json."
+    "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
+    "O lote 20260918-014103 aberto no Revit e' o REPROVADO pela revisao visual (canaleta como amarracao); o re-smoke com a regra 75 esta' PENDENTE de revisao humana do patch.",
+    "Conflito registrado: regra 51.6 (travessia com evidencia humana) x regra 75 - suspensa por padrao, reativacao e' decisao de usuario (secao 7.13).",
+    "A perna B34 de _t_intersection_room_ok segue sem cobertura no corpus (declarado)."
   ],
   "physical_deltas": [
     "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
@@ -55,9 +57,9 @@
     "Veredito da auditoria independente sobre o corpus versionado."
   ],
   "next_steps": [
-    "Quando houver operador no Revit: dispensar o modal em Cancelar, rodar q_activate, censo PRE_RESET, purga, reset das aberturas, censo POST_RESET, preflight e as runs.",
-    "Ancorar room_min de pelo menos um no' contra uma medicao independente do motor, para fechar tambem o lado da MEDICAO da auditoria.",
-    "Manter o PR #42 em draft ate' o smoke real e a revisao humana."
+    "Revisao humana da causa-raiz e do patch da regra 75 (secao 7.13).",
+    "Depois da aprovacao: re-smoke no Revit - purga controlada, reset das 44 aberturas, runs ate' convergir, readback com CHANNEL_AS_JUNCTION_BOND = 0, capturas novas dos encontros que tinham o erro.",
+    "Decidir o destino da regra 51.6 (mantida suspensa ou reativada por decisao de usuario)."
   ],
   "references": [
     {
@@ -104,6 +106,12 @@
     },
     {
       "path": "docs/PROJECT_STATUS.md"
+    },
+    {
+      "path": "tests/test_channel_never_bonds.py"
+    },
+    {
+      "path": "nuvem/core/engine/opening_reinforcement.py"
     }
   ]
 }
