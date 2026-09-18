@@ -9712,3 +9712,85 @@ só metadado, canaleta fora do escopo, empate de área, compensador em dois nós
 área coberta e não distância, consistência com um oráculo independente de amostragem sobre o
 solver), `tests/test_regra76_d1_t_degradado.py` (D1 e seu mutante),
 `tests/test_regra76_corpus_butanta.py` (os 6 casos fixados, D1 nos nós 22/30, 8284580, legado).
+
+### 76.1 Nó sem amarração válida fica NÃO RESOLVIDO — dois gates independentes (2026-09-18, IMPLEMENTADO, decisão do usuário)
+
+Decisão do usuário sobre os 6 casos pendentes da §76 (nós 28/47/48): **não** forçar zero com
+composição que viole outra regra. Recuo (abre buraco), B19 como amarração (conflita com
+2026-08-21), outro braço do L e mover a abertura além do limite aprovado continuam **recusados**.
+Se nenhuma peça funcional aprovada cabe, o resultado correto é
+**`MISSING_REQUIRED_JUNCTION_BOND` e revisão humana** — nunca uma falsa amarração.
+
+**Dois resultados independentes (não misturar):**
+
+- **`COMPENSATOR_AS_JUNCTION_BOND`** = **o compensador está exercendo indevidamente a função
+  estrutural do nó**: o motor o **designou** peça de amarração (razão
+  `L_CORNER*`/`T_INTERSECTION*`/`X_INTERSECTION*`/`CORNER*`). `occupied_nodes` fica como
+  diagnóstico geométrico. Aceitável: vazio.
+- **`MISSING_REQUIRED_JUNCTION_BOND`** = **nenhuma peça estrutural válida de amarração está
+  presente** — **geometria (autoridade)**: em cada nó L/T/X e fiada em que
+  o encontro existe, precisa haver **peça de amarração válida ocupando a região do nó**:
+  código aprovado (`JUNCTION_BOND_CODES` = B34/B54, as mesmas que o motor já reconhece como
+  amarração real), de uma parede do nó, cobrindo a região **inteira** (só uma faixa de 0,05 cm na
+  borda pode faltar), **com apoio** e **modular** (comprimento do catálogo, fora de trecho
+  não-modular). Não havendo, a fiada é registrada com o motivo (`EMPTY_REGION`, `NO_BOND_PIECE`,
+  `BOND_PIECE_PARTIAL`, `BOND_PIECE_UNSUPPORTED`, `BOND_PIECE_NON_MODULAR`), todos os ocupantes e
+  `HUMAN_REVIEW`. Pode ser > 0: é caso legítimo de revisão, não falha do gate.
+
+São problemas diferentes: um nó pode ter C09 presente e ainda ser
+`MISSING_REQUIRED_JUNCTION_BOND` (é o caso dos nós 28/47/48). A peça de **maior área deixou de ser critério** (o nó 47, fiada 2, tinha um C09 designado cobrindo
+64% e um C09 de reparo cobrindo 25% — nenhum dos dois amarra). Compensador perto, encostado ou
+dentro da região **nunca** resolve o nó; encostado numa amarração válida continua permitido
+(`[B54][C09][B39]`). Nenhum critério usa distância.
+
+| situação | exemplo no BUTANTÃ | `COMPENSATOR_AS_JUNCTION_BOND` | `MISSING_REQUIRED_JUNCTION_BOND` |
+|---|---|---|---|
+| A — CORRIGIDO: peça funcional correta presente | nós 22 e 30 | — | — |
+| B — VÁLIDO: compensador próximo da amarração, só como ajuste | nós 5, 0 e 3 (imagens 06/07/08) | — | — |
+| C — NÃO RESOLVIDO: não há peça funcional válida sob as regras atuais; o C09 no lugar é `JUNCTION_UNRESOLVED_FILL` | nós 28, 47 e 48 | — | acusa |
+| (histórico) compensador DESIGNADO peça do nó | o motor anterior à regra 76 (11 casos) | acusa | acusa |
+
+**O encontro existe?** Não existe numa fiada em que uma abertura ativa — as do **solve**, com as
+passagens livres até o topo estendidas (51.9) — cobre a região do nó ao longo de uma parede do nó.
+É o caso do nó 46 nas fiadas 11–16: passagem livre contínua aprovada em 2026-09-14, sem pilar
+acima das portas (`not_required`, não amarração faltante).
+
+**Correção no ponto de decisão (fluxo CHANNEL).** Quando a escada de peça de nó degradado só
+consegue fechar o espaço com compensador, ele sai com a razão **`JUNCTION_UNRESOLVED_FILL`**
+(mesmo padrão do `B19_RESIDUAL_FILL`: guarda o `node_index`, nunca prova amarração) em vez de ser
+designado peça do nó (`COMPENSATOR_NODE_PIECE_UNDESIGNATED`, ligada só no CHANNEL por
+`CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED`). As peças são **as mesmas** — só a classificação muda.
+O compensador continua **ocupando a posição do nó** para quem protege essa posição
+(`NODE_POSITION_FILL_REASONS`): a canaleta não o absorve nem passa por cima, e ele vence o
+preenchimento comum numa colisão — exatamente como antes. Nenhuma regra nova de canaleta; uma
+canaleta que herdasse essa razão seria acusada pelo gate da regra 75. O legado segue byte a byte.
+O microajuste da §66 ganhou o portão `MISSING_REQUIRED_JUNCTION_BOND` (deslocamento que tire a
+amarração de um nó é rejeitado), calculado ali mesmo quando o resultado não traz a chave.
+
+**Revisão adversarial (3 revisores independentes) — corrigido antes do commit:** (1) sem a
+posição de nó, uma etapa posterior (a canaleta) consumia o compensador marcado como não resolvido
+em casos estreitos (abertura de até 12 cm entre a face do canto e uma janela na fiada da canaleta:
+88 de 1.440 casos dirigidos) — depois da correção, **0 perdas em 1.440 casos dirigidos** (e 0 de
+192) e **0 perdas em 800 casos aleatórios**; fixado em regressão. Não é regra nova de produto: é
+só a preservação do estado NÃO RESOLVIDO através do pipeline; (2) `non_modular` do motor grava a família ("A"/"B")
+por banda — o gate recebe a fiada física (`_non_modular_by_physical_course`); (3) "cobre a região
+inteira" é exato (todo ponto a mais de 0,05 cm da borda coberto; antes um orçamento de área
+aceitava 0,20 cm numa face); (4) a região é medida na faixa de **alvenaria** (parede de 19 com
+bloco de 14 deixava de acusar falso); (5) custo linear (0,05–0,09 s no BUTANTÃ).
+
+**Limites declarados:** T **não ortogonal** — a peça de ponta reta da parede que chega não cobre o
+losango da região e a fiada vai para revisão (`BOND_PIECE_PARTIAL`); encontro que o grafo
+classifica como `AMBIGUOUS` (ex.: L a 60°) não é L/T/X e não é auditado. Nenhum dos dois ocorre no
+BUTANTÃ.
+
+**Medido no BUTANTÃ (corpus versionado, produto):** peças idênticas (sha S74 `16a7ffa992be7cb2…`,
+o mesmo da §76); `COMPENSATOR_AS_JUNCTION_BOND` **0**; `MISSING_REQUIRED_JUNCTION_BOND` **6** —
+nó 28 T fiadas 5/7/9 (`BOND_PIECE_PARTIAL`: C09 64% + B34 de preenchimento 29%), canto 47 fiadas
+2/4 e canto 48 fiada 3 (`NO_BOND_PIECE`: só C09 e peças de reparo); 844 fiadas-nó verificadas,
+838 com amarração válida, 6 sem encontro (nó 46). Nós 22 e 30 continuam corrigidos. Portões duros
+0/0/0/0; `CHANNEL_AS_JUNCTION_BOND` 0.
+
+Testes: `tests/test_missing_required_junction_bond.py` (A–F do usuário e mais, 131),
+`tests/test_compensator_never_bonds.py` reescrito na semântica nova (109, com oráculo
+independente em grade), `tests/test_regra761_revisao_do_gate.py` (os achados da revisão, 15),
+`tests/test_regra76_corpus_butanta.py` (12) e `tests/test_regra76_d1_t_degradado.py` (7).
