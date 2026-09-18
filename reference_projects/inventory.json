@@ -115,6 +115,32 @@
       ],
       "status": "EVIDENCE_NOT_NORM",
       "reproduction": "PARTIAL_RAW_OR_INTERMEDIATE_INPUTS_ABSENT"
+    },
+    {
+      "id": "butanta_r08_lt_s74_corpus",
+      "source_commit": "399bc6914d5f3f0ad9881eb5109365fd3cef1654",
+      "primary_path": "reference_projects/butanta_r08_lt/s74_corpus",
+      "portal": "reference_projects/butanta_r08_lt/s74_corpus/README.md",
+      "files": [
+        {
+          "path": "reference_projects/butanta_r08_lt/s74_corpus/geometry.json",
+          "sha256": "362ff646feba9bcd49a87c9bcfbfbda5cbf192ecc81ec566ac415e4de09f8ba1"
+        },
+        {
+          "path": "reference_projects/butanta_r08_lt/s74_corpus/t_nodes.json",
+          "sha256": "7f4ac0c9afedb2df7bcfa0cf071f0818bb0ff7e08c5a21ccf3166cccfed17202"
+        },
+        {
+          "path": "reference_projects/butanta_r08_lt/s74_corpus/wall_8284580.json",
+          "sha256": "0164656467faac731fc37fa02cc543b4d429a90df9378e77c5bd1b1abe8a2532"
+        },
+        {
+          "path": "reference_projects/butanta_r08_lt/s74_corpus/snapshot_v1.json",
+          "sha256": "e628b3665e426e79c88b2e36913659290464b9acc6b413654ce559595cd49810"
+        }
+      ],
+      "status": "EVIDENCE_NOT_NORM",
+      "reproduction": "AUDITABLE_FROM_REPO_RAW_INPUTS_ABSENT"
     }
   ],
   "hash_format": "SHA-256 of UTF-8 text with LF line endings"
