@@ -35,7 +35,8 @@
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
    },
-   "compensator_as_junction_bond": 9,
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 9,
    "pieces_in_ruler": 5953
   },
   "flag_on": {
@@ -59,7 +60,8 @@
     "opening_invasion": 0,
     "channel_as_junction_bond": 0
    },
-   "compensator_as_junction_bond": 6,
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 6,
    "pieces_in_ruler": 5930
   },
   "flag_off_motor_pre_regra76": {
@@ -86,6 +88,7 @@
     "channel_as_junction_bond": 0
    },
    "compensator_as_junction_bond": 16,
+   "missing_required_junction_bond": 16,
    "pieces_in_ruler": 5967
   }
  }

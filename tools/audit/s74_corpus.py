@@ -266,7 +266,7 @@ def forced_tolerance_cm(valor_cm):
 
 # ============================================================= solve completo
 def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CHANNEL",
-          regra76_d1=None):
+          regra76_d1=None, regra76_nao_resolvido=None):
     """Solve REAL das 34 paredes. A secao 74 e' ligada/desligada pela flag do
     PRODUTO (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`), nao por monkeypatch:
     e' o mesmo caminho que o botao percorre no Revit.
@@ -275,13 +275,21 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
     regra 76 pela flag do PRODUTO (`CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_
     ENABLED`). Serve para reproduzir o motor ANTERIOR a' regra 76: com a D1, o
     contrafactual "sem a secao 74" resgata o no' 46 como L degradado, entao o
-    efeito isolado da secao 74 so' aparece contra o motor sem a D1."""
+    efeito isolado da secao 74 so' aparece contra o motor sem a D1.
+
+    `regra76_nao_resolvido` (None = produto) liga/desliga a regra 76.1 pela flag
+    do PRODUTO (`CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED`): compensador da
+    escada de no' deixa de ser designado amarracao. So' classificacao - as
+    pecas sao as mesmas."""
     m, _ws = engine()
     antes = m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED
     antes_d1 = m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED
+    antes_761 = m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED
     m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = bool(physical_tolerance)
     if regra76_d1 is not None:
         m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = bool(regra76_d1)
+    if regra76_nao_resolvido is not None:
+        m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED = bool(regra76_nao_resolvido)
     try:
         res = m.solve_building_blocks_all_courses(
             ctx["nodes"], ctx["walls"], ctx["e2n"], ctx["openings_per_wall"],
@@ -291,12 +299,13 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
     finally:
         m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = antes
         m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = antes_d1
+        m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED = antes_761
     res["num_courses"] = courses
     return res
 
 
 def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strategy="CHANNEL",
-                           regra76_d1=None):
+                           regra76_d1=None, regra76_nao_resolvido=None):
     """Solve sobre um grafo de nos NOVO - e' assim que se deve medir.
 
     O motor MUTA os nos durante o solve: a secao 72 grava nos proprios nos uma
@@ -311,7 +320,7 @@ def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strat
     """
     ctx = build_context(geo)
     return ctx, solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy,
-                      regra76_d1=regra76_d1)
+                      regra76_d1=regra76_d1, regra76_nao_resolvido=regra76_nao_resolvido)
 
 
 def hard_gates(res):

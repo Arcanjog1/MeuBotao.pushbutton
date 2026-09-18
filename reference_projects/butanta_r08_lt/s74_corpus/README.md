@@ -121,8 +121,9 @@ justifica o valor — ela prova apenas que não há precipício perto da frontei
   [`tools/audit/s74_corpus.py`](../../../tools/audit/s74_corpus.py).
 - `expected.flag_off` / `expected.flag_on` / `expected.flag_off_motor_pre_regra76` —
   `solver_counts`, `divergence` (`div`, `comp_delta`, `free_mid_delta`, `esp_delta`,
-  `human_pieces`), `hard_gates`, `compensator_as_junction_bond` (regra 76, contagem
-  do solve inteiro) e `pieces_in_ruler`:
+  `human_pieces`), `hard_gates`, `compensator_as_junction_bond` (regra 76: compensador
+  DESIGNADO amarração) e `missing_required_junction_bond` (regra 76.1: fiada de nó sem
+  amarração válida) - contagens do solve inteiro - e `pieces_in_ruler`:
 
 | | Composição do solver | Divergência |
 |---|---|---|
@@ -131,7 +132,7 @@ justifica o valor — ela prova apenas que não há precipício perto da frontei
 | com a seção 74 (`flag_on`, o produto) | 48 B39 + 11 B34 + 1 B19 | 3,3 |
 
 O efeito isolado da seção 74 é medido contra `flag_off_motor_pre_regra76` (seção 74
-**e** correção D1 da regra 76 desligadas — o motor que a auditoria independente
+**e** regra 76 (D1 e 76.1) desligadas — o motor que a auditoria independente
 conferiu; o hash dele é o `flag_off` antigo, `c06f91a0…`). Com a D1 ligada, o nó 46 já
 degrada para L mesmo sem a seção 74 e o `flag_off` do produto cai para 3,3: é efeito
 da regra 76, declarado aqui em vez de apagar o contrafactual.
@@ -146,15 +147,22 @@ da regra 76, declarado aqui em vez de apagar o contrafactual.
   formato ad-hoc da bancada, que não está versionado. O hash auditável é o
   S74_SNAPSHOT_V1.
 - `cases` — `label`, `tolerance_cm`, `pieces`, `sha256`, `ruler_pieces`,
-  `ruler_codes`, `hard_gates` e `compensator_as_junction_bond` (regra 76):
+  `ruler_codes`, `hard_gates`, `compensator_as_junction_bond` e
+  `missing_required_junction_bond`:
 
-| Caso | Peças | sha256 | compensador-amarração |
-|---|---|---|---|
-| `flag_off` | 8732 | `a18b0dcae8549ff7…` | 9 |
-| `flag_off_motor_pre_regra76` | 8746 | `c06f91a0b9848681…` (o `flag_off` anterior à regra 76) | 16 |
-| `tol_0_05` | 8709 | `16a7ffa992be7cb2…` | 6 |
-| `tol_0_10` | 8709 | o MESMO `16a7ffa992be7cb2…` | 6 |
-| `tol_0_30` | 8709 | o MESMO `16a7ffa992be7cb2…` | 6 |
+| Caso | Peças | sha256 | compensador designado | fiada de nó sem amarração |
+|---|---|---|---|---|
+| `flag_off` | 8732 | `a18b0dcae8549ff7…` | 0 | 9 |
+| `flag_off_motor_pre_regra76` | 8746 | `c06f91a0b9848681…` (o `flag_off` anterior à regra 76) | 16 | 16 |
+| `tol_0_05` | 8709 | `16a7ffa992be7cb2…` | 0 | 6 |
+| `tol_0_10` | 8709 | o MESMO `16a7ffa992be7cb2…` | 0 | 6 |
+| `tol_0_30` | 8709 | o MESMO `16a7ffa992be7cb2…` | 0 | 6 |
+
+  Regra 76.1: o compensador que fecha um nó sem amarração válida deixou de ser designado
+  amarração — as peças (e os hashes) são as mesmas; as 6 fiadas do produto (nó 28 T fiadas
+  5/7/9, cantos 47 fiadas 2/4 e 48 fiada 3) ficam em `missing_required_junction_bond` para
+  revisão humana. No motor anterior à regra 76 cada compensador designado era exatamente
+  uma fiada de nó sem amarração (16 e 16).
 
   Antes da regra 76 o produto (`tol_0_05`) tinha 8719 peças, `320ba395683cc762…`, e 11
   compensadores exercendo função de amarração. Com a correção D1 a régua mede

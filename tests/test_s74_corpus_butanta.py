@@ -61,7 +61,8 @@ def _solve(rotulo, geo=None):
         elif rotulo in ("on", "variante_on"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, True)
         elif rotulo == "pre_regra76":
-            cache[rotulo] = S.solve_on_fresh_context(alvo, False, regra76_d1=False)
+            cache[rotulo] = S.solve_on_fresh_context(alvo, False, regra76_d1=False,
+                                                     regra76_nao_resolvido=False)
         elif rotulo.startswith("legado_"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
                                                      strategy=None)

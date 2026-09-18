@@ -129,7 +129,8 @@ class Bancada(object):
             elif rotulo == "on":
                 self._solucoes[rotulo] = S.solve(self.ctx, True, geo=self.geo)
             elif rotulo == "pre76":
-                self._solucoes[rotulo] = S.solve(self.ctx, False, geo=self.geo, regra76_d1=False)
+                self._solucoes[rotulo] = S.solve(self.ctx, False, geo=self.geo, regra76_d1=False,
+                                                  regra76_nao_resolvido=False)
             else:
                 with S.forced_tolerance_cm(float(rotulo)):
                     self._solucoes[rotulo] = S.solve(self.ctx, True, geo=self.geo)
