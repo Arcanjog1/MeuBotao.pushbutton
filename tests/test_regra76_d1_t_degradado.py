@@ -58,23 +58,55 @@ def _ocupantes(res, walls, nodes):
 def test_com_a_d1_o_pilar_amarra_com_b34_nas_duas_familias():
     res, walls, nodes, _o = solve(*pilar_34())
     assert res["compensator_as_junction_bond"] == []
+    # Esta fixture sintetica tem blocos sem apoio (fiadas 2, 4 e 12 do no'): o
+    # MISSING acusa essas fiadas por BOND_PIECE_UNSUPPORTED (regra F - peca sem
+    # apoio nao conta como amarracao). Nenhuma fiada fica sem B34/B54 inteiro.
+    motivos = set(f["reason"] for f in res["missing_required_junction_bond"])
+    assert motivos <= {"BOND_PIECE_UNSUPPORTED"}, motivos
     ocup = _ocupantes(res, walls, nodes)
     for ci in range(4, 11):   # faixa da janela
         assert ocup[ci] is not None and ocup[ci][0] == "B34", (ci, ocup[ci])
         assert ocup[ci][1].startswith("T_INTERSECTION_DEGRADED_L"), (ci, ocup[ci])
 
 
-def test_mutante_sem_a_d1_o_c09_volta_a_ser_peca_do_no_e_o_gate_acusa():
-    antes = m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED
-    m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = False
+def _solve_com(d1, nao_resolvido):
+    antes = (m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED, m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
+    m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = d1
+    m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED = nao_resolvido
     try:
-        res, walls, nodes, _o = solve(*pilar_34())
+        return solve(*pilar_34())
     finally:
-        m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = antes
+        (m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED, m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED) = antes
+
+
+def test_mutante_sem_a_d1_o_no_fica_sem_amarracao_e_o_missing_acusa():
+    """Sem a D1 o B34 nao entra na familia oposta: a escada fecha o espaco com
+    C09, que (regra 76.1) NAO e' designado amarracao - o no' fica NAO RESOLVIDO."""
+    res, walls, nodes, _o = _solve_com(False, True)
+    assert res["compensator_as_junction_bond"] == []
+    falta = [f for f in res["missing_required_junction_bond"] if f["reason"] != "BOND_PIECE_UNSUPPORTED"]
+    assert falta, "sem a D1 falta amarracao no pilar - o MISSING tem de acusar"
+    for f in falta:
+        assert f["node_kind"] == "T_INTERSECTION"
+        assert any(o["logical_code"] == "C09" and o["placement_reason"] == "JUNCTION_UNRESOLVED_FILL"
+                   for o in f["occupants"]), f
+        assert not any(o["logical_code"] in ("B34", "B54") and o["coverage"] > 0.99 for o in f["occupants"])
+
+
+def test_mutante_sem_a_d1_e_sem_a_76_1_o_c09_volta_a_ser_designado_e_os_dois_acusam():
+    res, walls, nodes, _o = _solve_com(False, False)
     gate = res["compensator_as_junction_bond"]
-    assert gate, "sem a D1 o compensador volta a amarrar - o gate tem de acusar"
+    assert gate, "o motor voltou a designar o C09 amarracao - o gate tem de acusar"
     assert all(v["logical_code"] in ("C04", "C09") for v in gate)
-    assert all("OCCUPIES_NODE_REGION" in v["evidence"] for v in gate)
+    assert all(v["evidence"] == ["DESIGNATED_NODE_PIECE"] for v in gate)
+    acusadas = set((f["course_index"], f["node_index"]) for f in res["missing_required_junction_bond"])
+    assert set((v["course_index"], v["node_index"]) for v in gate) <= acusadas
+
+
+def test_a_76_1_so_muda_a_classificacao_nunca_as_pecas():
+    com, walls, _n, _o = _solve_com(False, True)
+    sem, _w, _n2, _o2 = _solve_com(False, False)
+    assert tcr.physical_signature(com, walls) == tcr.physical_signature(sem, walls)
 
 
 def test_a_d1_nao_muda_no_que_ja_degradava_para_l():
@@ -93,12 +125,16 @@ def test_a_d1_nao_muda_no_que_ja_degradava_para_l():
     assert tcr.physical_signature(com, walls) == tcr.physical_signature(sem, walls)
 
 
-def test_a_d1_nasce_desligada_no_motor_e_so_o_channel_liga():
+def test_a_d1_e_a_76_1_nascem_desligadas_no_motor_e_so_o_channel_liga():
     assert ws.T_DEGRADED_L_ROOM_FROM_CONTACT is False
+    assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
     assert m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED is True
+    assert m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED is True
     res, _w, _n, _o = solve(*pilar_34(), strategy=None)
     assert "compensator_as_junction_bond" not in res
+    assert "missing_required_junction_bond" not in res
     assert ws.T_DEGRADED_L_ROOM_FROM_CONTACT is False
+    assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
 
 
 def test_candidatas_pendentes_seguem_desligadas():

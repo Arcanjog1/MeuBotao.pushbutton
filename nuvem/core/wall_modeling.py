@@ -3252,14 +3252,18 @@ def _cross_band_seed_for_band(course_indices, solved_course_joints,
 
 
 TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+# REGRA 76.1: o compensador de no' nao resolvido continua ocupando a posicao do
+# no' (vence o preenchimento comum numa colisao, como antes da 76.1).
+NODE_POSITION_FILL_REASONS = ("JUNCTION_UNRESOLVED_FILL",)
 
 
 def _is_tie_candidate(candidate):
-    """True quando o candidato e' peca de AMARRACAO (encontro L/T/X, em
-    qualquer variacao incluindo as degradadas) - por oposicao ao
+    """True quando o candidato OCUPA A POSICAO DO NO': peca de AMARRACAO
+    (encontro L/T/X, em qualquer variacao incluindo as degradadas) ou o
+    compensador de no' nao resolvido (regra 76.1) - por oposicao ao
     preenchimento comum (`STANDARD_FILL`) e ao jamb de abertura."""
     reason = str(candidate.get("placement_reason") or "")
-    return any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
+    return reason in NODE_POSITION_FILL_REASONS or any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
 
 
 def _wall_length_cm_for_absorption(walls_to_create, wall_idx):
@@ -3704,6 +3708,12 @@ CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
 # (`strategy=None`) nao passa por aqui.
 CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = True
 
+# REGRA 76.1 (2026-09-18, decisao do usuario) no fluxo CHANNEL: compensador que
+# a escada de peca de no' usa para fechar o espaco deixa de ser DESIGNADO
+# amarracao (wall_stepper.COMPENSATOR_NODE_PIECE_UNDESIGNATED); a fiada fica em
+# MISSING_REQUIRED_JUNCTION_BOND para revisao humana. Legado nao passa por aqui.
+CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED = True
+
 # SECAO 68 (2026-09-16): no fluxo CHANNEL, a regiao de reparo de abertura
 # continua expandindo dentro do orcamento que ja' existia
 # (OPENING_REPAIR_MAX_EXTRA_BLOCKS) e fica com a MELHOR composicao em vez da
@@ -3749,8 +3759,11 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
                         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
     saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
     saved_degraded_l_contact = _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT
+    saved_undesignated = _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED
     if CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED:
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = True   # REGRA 76
+    if CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED:
+        _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = True   # REGRA 76.1
     if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
         _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
@@ -3767,11 +3780,21 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
          _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = saved_degraded_l_contact
+        _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = saved_undesignated
     if isinstance(result, dict):
-        # REGRA 76 - hard gate: compensador nunca exerce funcao de amarracao.
-        # Somente leitura; so' no fluxo com estrategia de reforco.
+        # REGRA 76 - hard gate: compensador nunca DESIGNADO amarracao.
+        # REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND: fiada de no' sem peca de
+        # amarracao valida (geometria). Somente leitura; so' no fluxo CHANNEL.
         result["compensator_as_junction_bond"] = _stepper_memo.compensator_as_junction_bond(
             result.get("course_candidates"), nodes, walls_to_create)
+        audit = _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog,
+                                           base_z_abs, num_courses,
+                                           kwargs.get("opening_reinforcement_policy"),
+                                           kwargs.get("variants_per_course") or 1)
+        result["missing_required_junction_bond"] = audit["missing"]
+        result["junction_bond_audit"] = {"checked": audit["checked"], "valid": audit["valid"],
+                                         "not_required": audit["not_required"]}
+        result["channel_unresolved_junction_fill"] = bool(CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
         result["channel_t_degraded_l_room_from_contact"] = bool(
             CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
         result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
@@ -3780,6 +3803,69 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
     return result
+
+
+def _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                              free_to_top, policy):
+    """As aberturas que o SOLVE usa: as passagens livres ate' o topo (51.9) e as
+    continuas estendidas. Ponto unico - a impl e o gate da regra 76.1 leem o
+    MESMO modelo de aberturas."""
+    if not free_to_top:
+        return openings_per_wall
+    from core.engine import opening_reinforcement as _reinforcement
+    return _reinforcement.openings_extended_to_top(
+        openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
+        passages=_reinforcement.continuous_free_passages(
+            walls_to_create, openings_per_wall, nodes, free_to_top, policy))
+
+
+def _non_modular_by_physical_course(result, variants_per_course=1):
+    """`non_modular` com "course" = FIADA FISICA. O motor grava a FAMILIA
+    ("A"/"B") por banda; aqui cada entrada vira uma por fiada fisica da propria
+    banda, com a mesma regra da montagem das fiadas (letra por paridade,
+    variante por (fiada // 2) % variants_per_course)."""
+    out = []
+    vpc = variants_per_course or 1
+    band_of = {}
+    todas = set()
+    for band in result.get("bands") or []:
+        courses = list(band.get("course_indices") or [])
+        todas.update(courses)
+        for entry in ((band.get("result") or {}).get("non_modular") or []):
+            band_of[id(entry)] = courses
+    if not todas:
+        todas = set(result.get("course_candidates") or {})
+    for entry in result.get("non_modular") or []:
+        course = entry.get("course")
+        if not isinstance(course, str):
+            out.append(dict(entry))
+            continue
+        # entrada sem banda conhecida: todas as fiadas fisicas da familia
+        for ci in band_of.get(id(entry), sorted(todas)):
+            if course != ("A" if ci % 2 == 0 else "B"):
+                continue
+            vi = entry.get("variant_index")
+            if vi is not None and (ci // 2) % vpc != vi:
+                continue
+            out.append(dict(entry, course=ci))
+    return out
+
+
+def _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                               num_courses, policy, variants_per_course=1):
+    """REGRA 76.1 sobre o resultado FINAL: o encontro existe na fiada (com as
+    aberturas do SOLVE) e tem peca de amarracao valida? Ver
+    wall_stepper.junction_bond_audit."""
+    from core.engine import wall_stepper as _bond_gate
+    if not isinstance(result, dict) or result.get("error") is not None or not result.get("course_candidates"):
+        return {"checked": 0, "valid": 0, "not_required": [], "missing": []}
+    free_to_top = (result.get("opening_reinforcement") or {}).get("free_to_top")
+    solve_openings = _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                               num_courses, free_to_top, policy)
+    return _bond_gate.junction_bond_audit(
+        result["course_candidates"], nodes, walls_to_create, solve_openings,
+        _free_to_top_band(catalog, base_z_abs), (result.get("physical_support") or {}).get("items"),
+        _non_modular_by_physical_course(result, variants_per_course), catalog, OPENING_COURSE_BAND_TOLERANCE_FT)
 
 
 def _physical_support_final(result, catalog, walls_to_create, openings_per_wall, base_z_abs):
@@ -3893,6 +3979,17 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
         from core.engine import wall_stepper as _bond_gate
         gates["COMPENSATOR_AS_JUNCTION_BOND"] = len(_bond_gate.compensator_as_junction_bond(
             course_candidates, nodes, walls_to_create))
+    # REGRA 76.1: deslocamento que tire a amarracao valida de um no' (fiada
+    # nova sem amarracao) piora este portao e e' rejeitado. Resultado sem a
+    # chave (fluxo sem reforco): calculado aqui, com as mesmas aberturas/faixa.
+    if result.get("missing_required_junction_bond") is not None:
+        gates["MISSING_REQUIRED_JUNCTION_BOND"] = len(result["missing_required_junction_bond"])
+    elif nodes is not None:
+        from core.engine import wall_stepper as _bond_gate
+        gates["MISSING_REQUIRED_JUNCTION_BOND"] = len(_bond_gate.missing_required_junction_bond(
+            course_candidates, nodes, walls_to_create, openings_per_wall, band,
+            _support.unsupported_pieces(course_candidates, walls_to_create, openings_per_wall, band),
+            _non_modular_by_physical_course(result), catalog, OPENING_COURSE_BAND_TOLERANCE_FT))
     audits = result.get("wall_bond_audits") or []
     if isinstance(audits, dict):
         audits = list(audits.values())
@@ -4234,12 +4331,9 @@ def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_
     free_to_top = _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
                                         num_courses, opening_reinforcement_strategy,
                                         opening_reinforcement_policy)
-    if free_to_top:
-        from core.engine import opening_reinforcement as _reinforcement
-        openings_per_wall = _reinforcement.openings_extended_to_top(
-            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
-            passages=_reinforcement.continuous_free_passages(
-                walls_to_create, openings_per_wall, nodes, free_to_top, opening_reinforcement_policy))
+    openings_per_wall = _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog,
+                                                  base_z_abs, num_courses, free_to_top,
+                                                  opening_reinforcement_policy)
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,

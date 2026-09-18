@@ -88,6 +88,12 @@ TIE_SPLIT_CODE = "TIE_SPLIT"
 STANDARD_CHANNEL_BY_LENGTH = ((39.0, CHANNEL_U_39), (34.0, CHANNEL_U_34), (19.0, CHANNEL_U_19))
 
 TIE_REASON_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+# REGRA 76.1: o compensador que fecha um no' sem amarracao valida
+# (wall_stepper.JUNCTION_UNRESOLVED_FILL_REASON) deixou de ser DESIGNADO
+# amarracao, mas continua OCUPANDO a posicao do no': a canaleta nunca o absorve,
+# nunca passa por cima dele e a corrida para nele - exatamente como antes da
+# 76.1. Nenhuma regra nova de canaleta.
+NODE_POSITION_FILL_REASONS = ("JUNCTION_UNRESOLVED_FILL",)
 
 SEVERITY_ERROR = "ERROR"
 SEVERITY_WARNING = "WARNING"
@@ -175,8 +181,10 @@ def is_channel_code(code):
 
 
 def _is_tie(candidate):
+    """Peca que ocupa a posicao do no': amarracao (qualquer variacao) ou o
+    compensador de no' nao resolvido (regra 76.1)."""
     reason = str(candidate.get("placement_reason") or "")
-    return any(reason.startswith(p) for p in TIE_REASON_PREFIXES)
+    return reason in NODE_POSITION_FILL_REASONS or any(reason.startswith(p) for p in TIE_REASON_PREFIXES)
 
 
 def channel_as_junction_bond(course_candidates, report=None):

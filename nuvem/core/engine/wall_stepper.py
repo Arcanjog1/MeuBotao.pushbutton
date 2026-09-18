@@ -1574,19 +1574,37 @@ JUNCTION_BOND_B19_FALLBACK = False
 L_CORNER_OTHER_ARM_OWNS = False
 
 
-# ---- REGRA 76 - validador funcional (somente leitura) ----------------------
-# Pergunta que o gate faz: "este compensador esta' ASSUMINDO a funcao da
-# amarracao?" - nunca "esta' perto da amarracao?". Duas evidencias, por FUNCAO:
-#   1. METADADO: o motor designou o compensador como peca do no' (node_index
-#      do no' + razao da familia L_CORNER/T_INTERSECTION/X_INTERSECTION/CORNER);
-#   2. GEOMETRIA (autoridade): o compensador e' o OCUPANTE da regiao do no' -
-#      a interseccao das faixas de espessura das paredes do encontro, o unico
-#      lugar fisico que so' existe no encontro e onde a peca que amarra
-#      precisa estar. Ocupante = a peca das paredes do no' que cobre a maior
-#      AREA dessa regiao na fiada. Num EMPATE de area o compensador divide a
-#      funcao e e' acusado - o veredito nunca depende do codigo da outra peca.
-# Um compensador ENCOSTADO na amarracao (fora da regiao do no') nao cobre area
-# nenhuma dela e nunca e' acusado - e' o [B54][C09][B39] valido.
+# REGRA 76.1 (2026-09-18, decisao do usuario): quando nenhuma peca de
+# amarracao aprovada cabe, o no' NAO esta' resolvido. A escada de peca de no'
+# ainda fecha o espaco com um compensador - recuo (abre buraco), B19 (conflita
+# com 2026-08-21), outro braco e mover a abertura foram medidos e RECUSADOS -
+# mas ele deixa de ser DESIGNADO amarracao: sai com a razao
+# JUNCTION_UNRESOLVED_FILL (ajuste, nunca amarracao - mesmo padrao do
+# B19_RESIDUAL_FILL, que guarda o node_index e nao prova amarracao) e o gate
+# MISSING_REQUIRED_JUNCTION_BOND acusa a fiada para revisao humana. Desligada
+# no motor; ligada so' no fluxo CHANNEL
+# (wall_modeling.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED).
+COMPENSATOR_NODE_PIECE_UNDESIGNATED = False
+JUNCTION_UNRESOLVED_FILL_REASON = "JUNCTION_UNRESOLVED_FILL"
+# Pecas de AMARRACAO aprovadas: as que o motor ja' reconhece como amarracao
+# REAL (ver `_b19_is_tie_piece`) - B34 e B54. B19, compensador e canaleta
+# nunca amarram um encontro.
+JUNCTION_BOND_CODES = ("B34", "B54")
+
+
+# ---- REGRA 76 / 76.1 - validadores funcionais (somente leitura) -------------
+# Dois resultados INDEPENDENTES (decisao do usuario, 2026-09-18):
+#  * COMPENSATOR_AS_JUNCTION_BOND - o motor DESIGNOU um compensador como peca
+#    de amarracao do no' (razao L_CORNER/T_INTERSECTION/X_INTERSECTION/CORNER).
+#  * MISSING_REQUIRED_JUNCTION_BOND - GEOMETRIA (autoridade): nesta fiada o
+#    encontro existe e NAO ha' peca de amarracao valida ocupando a regiao do
+#    no' (a interseccao das faixas de espessura das paredes do encontro, o
+#    unico lugar fisico onde a peca que amarra precisa estar). Valida = codigo
+#    aprovado, de uma parede do no', cobrindo a regiao INTEIRA, com apoio e
+#    modular. Compensador - perto, encostado ou dentro da regiao - nunca
+#    resolve o no'; a peca de maior area nao e' criterio.
+# Um compensador ENCOSTADO numa amarracao valida (o [B54][C09][B39]) nao
+# aparece em nenhum dos dois. Nenhum criterio usa distancia.
 COMPENSATOR_BOND_ROLE_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
 _BOND_GATE_NODE_KINDS = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION")
 
@@ -1631,9 +1649,11 @@ def _poly_area(poly):
     return abs(a) / 2.0
 
 
-def _node_region_polygon(node, walls_to_create):
+def _node_region_polygon(node, walls_to_create, band_width_ft=None):
     """Regiao do no' = interseccao das faixas de espessura das paredes do
-    encontro (quadrado no encontro ortogonal). Em pes, no plano XY."""
+    encontro (quadrado no encontro ortogonal). Em pes, no plano XY.
+    `band_width_ft` limita cada faixa a' largura da ALVENARIA (o bloco de
+    14 cm centrado numa parede de 19 so' ocupa 14) - None usa a espessura."""
     point = node.get("point")
     if point is None:
         return None
@@ -1654,7 +1674,7 @@ def _node_region_polygon(node, walls_to_create):
             return None
         nx, ny = -dy / length, dx / length
         c0 = nx * p0.X + ny * p0.Y
-        half = thickness / 2.0
+        half = (thickness if band_width_ft is None else min(thickness, band_width_ft)) / 2.0
         poly = _clip_half_plane(poly, nx, ny, c0 + half)
         if not poly:
             return None
@@ -1698,92 +1718,281 @@ def _bbox(poly):
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def compensator_as_junction_bond(course_candidates, nodes, walls_to_create):
-    """REGRA 76 - hard gate COMPENSATOR_AS_JUNCTION_BOND (aceitavel: vazio).
-
-    Devolve uma violacao por (fiada, compensador) que assume a funcao de
-    amarracao de um encontro L/T/X - por METADADO (designado peca do no') e/ou
-    por GEOMETRIA (ocupante da regiao do no'). `occupied_nodes` lista TODOS os
-    nos cuja regiao o compensador ocupa naquela fiada; `node_index`/`coverage`
-    sao os do no' designado, ou do no' em que ele cobre mais. Somente leitura."""
+def _bond_regions(nodes, walls_to_create, band_width_ft=None):
+    """{no': (poligono da regiao, area, paredes do no', bbox)} dos nos L/T/X."""
     regions = {}
     for ni, node in enumerate(nodes or []):
         if node.get("kind") not in _BOND_GATE_NODE_KINDS:
             continue
-        poly = _node_region_polygon(node, walls_to_create)
+        poly = _node_region_polygon(node, walls_to_create, band_width_ft)
         if not poly:
             continue
         area = _poly_area(poly)
         if area <= 0.0:
             continue
         regions[ni] = (poly, area, _node_wall_indices(node), _bbox(poly))
+    return regions
 
-    def _record(violations, ci, cand, ni):
-        return violations.setdefault((ci, id(cand)), {
-            "course_index": ci, "node_index": ni,
-            "node_kind": (nodes[ni].get("kind") if nodes and ni is not None and 0 <= ni < len(nodes)
-                          else None),
-            "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
-            "placement_reason": str(cand.get("placement_reason") or ""), "evidence": [],
-            "coverage": None, "occupied_nodes": [],
-            "origin_cm": [round(_ft_to_cm(cand["origin_world"].X), 3),
-                          round(_ft_to_cm(cand["origin_world"].Y), 3)]})
 
-    violations = {}
+def _region_overlaps(cand, regions):
+    """[(no', fracao da regiao coberta)] das regioes de no' que a peca cobre -
+    so' nos de que a parede da peca faz parte."""
+    out = []
+    cpoly = _candidate_polygon(cand)
+    cb = _bbox(cpoly)
+    for ni in sorted(regions):
+        poly, area, wall_set, box = regions[ni]
+        if cand.get("wall_idx") not in wall_set:
+            continue
+        if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+            continue
+        ov = _convex_overlap_area(cpoly, poly)
+        if ov > area * 1e-6:
+            out.append((ni, ov / area))
+    return out
+
+
+def _origin_cm(cand):
+    o = cand["origin_world"]
+    return [round(_ft_to_cm(o.X), 3), round(_ft_to_cm(o.Y), 3)]
+
+
+def compensator_as_junction_bond(course_candidates, nodes, walls_to_create):
+    """REGRA 76 - COMPENSATOR_AS_JUNCTION_BOND (aceitavel: vazio). Uma violacao
+    por compensador que o motor DESIGNOU peca de amarracao (razao de amarracao
+    de no'). `occupied_nodes` e' diagnostico geometrico: as regioes de no' que
+    ele cobre. Se o no' tem amarracao valida e' a outra pergunta -
+    `missing_required_junction_bond`. Somente leitura."""
+    regions = _bond_regions(nodes, walls_to_create)
+    out = []
     for ci in sorted(course_candidates or {}):
-        pieces = (course_candidates or {}).get(ci) or []
-        for cand in pieces:
-            if cand.get("logical_code") not in COMPENSATOR_BOND_GATE_CODES:
+        for cand in (course_candidates or {}).get(ci) or []:
+            code = cand.get("logical_code")
+            if code not in COMPENSATOR_BOND_GATE_CODES:
                 continue
             reason = str(cand.get("placement_reason") or "")
-            ni = cand.get("node_index")
-            if ni is not None and any(reason.startswith(p) for p in COMPENSATOR_BOND_ROLE_PREFIXES):
-                rec = _record(violations, ci, cand, ni)
-                if "DESIGNATED_NODE_PIECE" not in rec["evidence"]:
-                    rec["evidence"].append("DESIGNATED_NODE_PIECE")
-        for ni in sorted(regions):
-            poly, area, wall_set, box = regions[ni]
-            covers = []
-            for cand in pieces:
-                if cand.get("wall_idx") not in wall_set:
-                    continue
-                cpoly = _candidate_polygon(cand)
-                cb = _bbox(cpoly)
-                if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
-                    continue
-                ov = _convex_overlap_area(cpoly, poly)
-                if ov <= area * 1e-6:
-                    continue
-                covers.append((round(ov / area, 9), cand))
-            if not covers:
+            if not any(reason.startswith(p) for p in COMPENSATOR_BOND_ROLE_PREFIXES):
                 continue
-            top = max(c for c, _cand in covers)
-            for frac, cand in covers:
-                if frac < top or cand.get("logical_code") not in COMPENSATOR_BOND_GATE_CODES:
-                    continue
-                rec = _record(violations, ci, cand, ni)
-                if "OCCUPIES_NODE_REGION" not in rec["evidence"]:
-                    rec["evidence"].append("OCCUPIES_NODE_REGION")
-                rec["occupied_nodes"].append({"node_index": ni, "node_kind": nodes[ni].get("kind"),
-                                              "coverage": round(frac, 4)})
-    for rec in violations.values():
-        occ = rec["occupied_nodes"]
-        if not occ:
+            occ = [{"node_index": ni, "node_kind": nodes[ni].get("kind"), "coverage": round(f, 4)}
+                   for ni, f in _region_overlaps(cand, regions)]
+            ni = cand.get("node_index")
+            if ni is None and occ:
+                ni = sorted(occ, key=lambda o: (-o["coverage"], o["node_index"]))[0]["node_index"]
+            cov = None
+            for o in occ:
+                if o["node_index"] == ni:
+                    cov = o["coverage"]
+            out.append({
+                "course_index": ci, "node_index": ni,
+                "node_kind": (nodes[ni].get("kind") if nodes and ni is not None and 0 <= ni < len(nodes)
+                              else None),
+                "wall_idx": cand.get("wall_idx"), "logical_code": code, "placement_reason": reason,
+                "evidence": ["DESIGNATED_NODE_PIECE"], "coverage": cov, "occupied_nodes": occ,
+                "origin_cm": _origin_cm(cand)})
+    return sorted(out, key=lambda v: (v["course_index"], v["node_index"] if v["node_index"] is not None else -1,
+                                      v["origin_cm"][0], v["origin_cm"][1]))
+
+
+def _inset_convex(poly, d):
+    """Poligono convexo encolhido `d` para dentro em cada aresta (vazio se a
+    regiao for menor que 2d). Serve para "so' uma faixa de d na borda pode
+    faltar": a peca tem de cobrir TODO o poligono encolhido."""
+    n = len(poly)
+    area2 = sum(poly[i][0] * poly[(i + 1) % n][1] - poly[(i + 1) % n][0] * poly[i][1] for i in range(n))
+    sign = 1.0 if area2 > 0 else -1.0
+    out = list(poly)
+    for i in range(n):
+        ax, ay = poly[i]
+        bx, by = poly[(i + 1) % n]
+        ex, ey = bx - ax, by - ay
+        length = (ex * ex + ey * ey) ** 0.5
+        if length <= 0.0:
             continue
-        same = [o for o in occ if o["node_index"] == rec["node_index"]]
-        if "DESIGNATED_NODE_PIECE" in rec["evidence"] and same:
-            main = same[0]
-        elif "DESIGNATED_NODE_PIECE" in rec["evidence"]:
-            main = None
-        else:
-            main = sorted(occ, key=lambda o: (-o["coverage"], o["node_index"]))[0]
-        if main is not None:
-            rec["node_index"] = main["node_index"]
-            rec["node_kind"] = main["node_kind"]
-            rec["coverage"] = main["coverage"]
-    return sorted(violations.values(),
-                  key=lambda v: (v["course_index"], v["node_index"] if v["node_index"] is not None else -1,
-                                 v["origin_cm"][0], v["origin_cm"][1]))
+        # normal para FORA (anti-horario: (ey, -ex)); dentro: n.x <= n.a - d
+        nx, ny = sign * ey / length, sign * -ex / length
+        out = _clip_half_plane(out, nx, ny, nx * ax + ny * ay - d)
+        if not out:
+            return []
+    return out
+
+
+def _axis_t_range_ft(wall, poly):
+    """(t_min, t_max) do poligono projetado no eixo da parede (ft, a partir da
+    ponta 0 da linha - a mesma referencia de `openings_per_wall`)."""
+    line = wall[0]
+    p0 = line.GetEndPoint(0)
+    p1 = line.GetEndPoint(1)
+    dx, dy = p1.X - p0.X, p1.Y - p0.Y
+    length = (dx * dx + dy * dy) ** 0.5
+    ts = [((x - p0.X) * dx + (y - p0.Y) * dy) / length for x, y in poly]
+    return min(ts), max(ts)
+
+
+def _bond_piece_modular(cand, ci, catalog, spans_by_wall_course, walls_to_create, fit_cm):
+    """Peca de amarracao no comprimento NOMINAL do catalogo e fora de trecho
+    que o motor declarou nao-modular (`non_modular`) na mesma parede/fiada."""
+    entry = (catalog or {}).get(cand.get("logical_code")) or {}
+    nominal = entry.get("length_cm")
+    if nominal and abs(float(cand.get("length_cm") or 0.0) - float(nominal)) > fit_cm:
+        return False
+    spans = spans_by_wall_course.get((cand.get("wall_idx"), ci))
+    wi = cand.get("wall_idx")
+    if spans and wi is not None and 0 <= wi < len(walls_to_create):
+        t_lo, t_hi = _axis_t_range_ft(walls_to_create[wi], _candidate_polygon(cand))
+        t_lo, t_hi = _ft_to_cm(t_lo), _ft_to_cm(t_hi)
+        for a, b in spans:
+            if min(b, t_hi) - max(a, t_lo) > fit_cm:
+                return False
+    return True
+
+
+def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall=None,
+                        course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
+                        opening_tol_ft=0.0, fit_tol_cm=None):
+    """REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND, por no' L/T/X e fiada.
+
+    1. O ENCONTRO EXISTE nesta fiada? Nao existe quando uma abertura ativa na
+       fiada (use as aberturas do SOLVE - com as passagens livres estendidas
+       ate' o topo) cobre a regiao do no' ao longo de alguma parede do no':
+       aquela parede nao esta' ali -> `not_required`.
+    2. Existindo, ha' PECA DE AMARRACAO VALIDA ocupando a regiao? Valida =
+       codigo em JUNCTION_BOND_CODES, de uma parede do no', cobrindo a regiao
+       INTEIRA (so' uma faixa de `fit_tol_cm` na borda pode faltar), com apoio
+       (fora de `unsupported`, os itens de `physical_support`), no comprimento
+       nominal do catalogo e fora de trecho `non_modular`. Nao -> `missing`,
+       com o motivo e todos os ocupantes da regiao.
+    Compensador na regiao nunca resolve o no'; a maior area nao e' criterio.
+    A regiao e' medida na faixa de ALVENARIA: com `catalog`, cada faixa fica
+    limitada a' largura do bloco de amarracao (parede de 19 com bloco de 14).
+    `non_modular` usa a FIADA FISICA em "course" (o motor grava a familia por
+    banda - ver wall_modeling._non_modular_by_physical_course).
+    Somente leitura, geometria exata (recorte de poligono convexo)."""
+    fit_cm = PIER_PHYSICAL_FIT_TOLERANCE_CM if fit_tol_cm is None else float(fit_tol_cm)
+    fit_ft = _cm_to_ft(fit_cm)
+    larguras = [float(((catalog or {}).get(c) or {}).get("width_cm") or 0.0) for c in JUNCTION_BOND_CODES]
+    band_ft = _cm_to_ft(max(larguras)) if max(larguras) > 0.0 else None
+    regions = _bond_regions(nodes, walls_to_create, band_ft)
+    sem_apoio = {}
+    for it in unsupported or []:
+        p = it.get("point_cm")
+        if not p:
+            continue
+        key = (it.get("course"), it.get("wall_idx"), it.get("code"))
+        sem_apoio.setdefault(key, []).append((float(p[0]), float(p[1])))
+    spans = {}
+    for e in non_modular or []:
+        a, b = e.get("seg_start_cm"), e.get("seg_end_cm")
+        if a is None or b is None:
+            continue
+        spans.setdefault((e.get("wall_idx"), e.get("course")), []).append((min(a, b), max(a, b)))
+    by_course_wall = {}
+    for ci in course_candidates or {}:
+        for cand in (course_candidates or {}).get(ci) or []:
+            cpoly = _candidate_polygon(cand)
+            by_course_wall.setdefault((ci, cand.get("wall_idx")), []).append((cand, cpoly, _bbox(cpoly)))
+    checked = 0
+    valid = 0
+    not_required = []
+    missing = []
+    for ni in sorted(regions):
+        poly, area, wall_set, box = regions[ni]
+        node = nodes[ni]
+        nucleo = _inset_convex(poly, fit_ft) or poly
+        area_nucleo = _poly_area(nucleo)
+        walls_here = [w for w in sorted(wall_set) if 0 <= w < len(walls_to_create)]
+        extents = dict((w, _axis_t_range_ft(walls_to_create[w], poly)) for w in walls_here)
+        for ci in sorted(course_candidates or {}):
+            ausentes = []
+            if openings_per_wall is not None and course_band_ft is not None:
+                z_lo, z_hi = course_band_ft(ci)
+                for w in walls_here:
+                    t_lo, t_hi = extents[w]
+                    for row in (openings_per_wall[w] if w < len(openings_per_wall) else ()):
+                        if (min(row[3], z_hi) - max(row[2], z_lo)) <= opening_tol_ft:
+                            continue
+                        if row[0] <= t_lo + fit_ft and row[1] >= t_hi - fit_ft:
+                            ausentes.append(w)
+                            break
+            if ausentes:
+                not_required.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                                     "absent_walls": ausentes})
+                continue
+            checked += 1
+            ocup = []
+            for w in walls_here:
+                for cand, cpoly, cb in by_course_wall.get((ci, w), ()):
+                    if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+                        continue
+                    ov = _convex_overlap_area(cpoly, poly)
+                    if ov > area * 1e-6:
+                        ocup.append((ov / area, cand, cpoly))
+            ocup.sort(key=lambda fc: (-round(fc[0], 9), str(fc[1].get("logical_code")),
+                                      round(fc[1]["origin_world"].X, 9), round(fc[1]["origin_world"].Y, 9)))
+            bond = None
+            falhas = set()
+            for frac, cand, cpoly in ocup:
+                code = cand.get("logical_code")
+                if code not in JUNCTION_BOND_CODES:
+                    continue
+                # REGIAO INTEIRA: todo ponto a mais de fit da borda coberto
+                if _convex_overlap_area(cpoly, nucleo) < area_nucleo * (1.0 - 1e-9):
+                    falhas.add("BOND_PIECE_PARTIAL")
+                    continue
+                o = cand["origin_world"]
+                x_cm, y_cm = _ft_to_cm(o.X), _ft_to_cm(o.Y)
+                if any(abs(x_cm - px) <= 0.11 and abs(y_cm - py) <= 0.11
+                       for px, py in sem_apoio.get((ci, cand.get("wall_idx"), code), ())):
+                    falhas.add("BOND_PIECE_UNSUPPORTED")
+                    continue
+                if not _bond_piece_modular(cand, ci, catalog, spans, walls_to_create, fit_cm):
+                    falhas.add("BOND_PIECE_NON_MODULAR")
+                    continue
+                bond = cand
+                break
+            if bond is not None:
+                valid += 1
+                continue
+            if not ocup:
+                motivo = "EMPTY_REGION"
+            elif "BOND_PIECE_UNSUPPORTED" in falhas:
+                motivo = "BOND_PIECE_UNSUPPORTED"
+            elif "BOND_PIECE_NON_MODULAR" in falhas:
+                motivo = "BOND_PIECE_NON_MODULAR"
+            elif "BOND_PIECE_PARTIAL" in falhas:
+                motivo = "BOND_PIECE_PARTIAL"
+            else:
+                motivo = "NO_BOND_PIECE"
+            missing.append({
+                "course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                "walls": walls_here, "reason": motivo,
+                "classification": "MISSING_REQUIRED_JUNCTION_BOND", "review": "HUMAN_REVIEW",
+                "occupants": [{"logical_code": c.get("logical_code"), "coverage": round(f, 4),
+                               "placement_reason": str(c.get("placement_reason") or ""),
+                               "wall_idx": c.get("wall_idx"), "node_index": c.get("node_index"),
+                               "is_compensator": c.get("logical_code") in COMPENSATOR_BOND_GATE_CODES,
+                               "origin_cm": _origin_cm(c)} for f, c, _p in ocup]})
+    return {"checked": checked, "valid": valid, "not_required": not_required, "missing": missing}
+
+
+def missing_required_junction_bond(course_candidates, nodes, walls_to_create, openings_per_wall=None,
+                                   course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
+                                   opening_tol_ft=0.0, fit_tol_cm=None):
+    """REGRA 76.1 - hard gate de classificacao MISSING_REQUIRED_JUNCTION_BOND:
+    as fiadas de no' sem peca de amarracao valida (ver `junction_bond_audit`).
+    Pode ser > 0 quando a geometria nao admite amarracao sob as regras
+    aprovadas - e' caso legitimo de revisao humana, nunca mascarado."""
+    return junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall,
+                               course_band_ft, unsupported, non_modular, catalog,
+                               opening_tol_ft, fit_tol_cm)["missing"]
+
+
+def _node_piece_reason(code, placement_reason):
+    """REGRA 76.1: compensador que a escada de peca de no' usa para fechar o
+    espaco NAO e' designado amarracao quando COMPENSATOR_NODE_PIECE_UNDESIGNATED
+    vale - o no' fica sem amarracao nessa fiada (MISSING_REQUIRED_JUNCTION_BOND)."""
+    if COMPENSATOR_NODE_PIECE_UNDESIGNATED and code in COMPENSATOR_BOND_GATE_CODES:
+        return JUNCTION_UNRESOLVED_FILL_REASON
+    return placement_reason
 
 
 def _bond_ladder(codes):
@@ -1866,7 +2075,7 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
         origin = contact_point + dir_away * (_cm_to_ft(entry["length_cm"]) / 2.0)
         x_dir = dir_away
     return _make_block_candidate(best_code, entry, course, origin, x_dir,
-                                 placement_reason,
+                                 _node_piece_reason(best_code, placement_reason),
                                  node_index=node_index, wall_idx=wall_idx,
                                  secondary_wall_idx=secondary_wall_idx)
 
@@ -2123,7 +2332,8 @@ def _x_intersection_centered_candidate(catalog, point, x_dir, room_ft, course, w
             continue
         half_len_ft = _cm_to_ft(entry["length_cm"]) / 2.0
         if half_len_ft + joint_ft <= room_ft + 1e-6:
-            return _make_block_candidate(code, entry, course, point, x_dir, placement_reason,
+            return _make_block_candidate(code, entry, course, point, x_dir,
+                                         _node_piece_reason(code, placement_reason),
                                          node_index=node_index, wall_idx=wall_idx,
                                          secondary_wall_idx=secondary_wall_idx)
     return None
@@ -9663,7 +9873,7 @@ def _b19_is_tie_piece(candidate):
     posicionada como amarracao - nunca um B34/B54 que caiu ali por
     coincidencia do preenchimento comum)."""
     reason = str(candidate.get("placement_reason") or "")
-    return (candidate.get("logical_code") in ("B34", "B54")
+    return (candidate.get("logical_code") in JUNCTION_BOND_CODES
             and any(reason.startswith(p) for p in _B19_TIE_PLACEMENT_PREFIXES))
 
 
@@ -9779,6 +9989,7 @@ def _b19_residual_edge_candidates(nodes, walls_to_create, end_to_node, catalog, 
 # como sempre).
 _B19_REPAIR_DEGRADED_REASONS = frozenset((
     "L_CORNER_DEGRADED", "T_INTERSECTION_DEGRADED_L", "T_INTERSECTION_INCOMING_DEGRADED",
+    JUNCTION_UNRESOLVED_FILL_REASON,   # REGRA 76.1: a ponta degradou para um compensador
 ))
 
 
