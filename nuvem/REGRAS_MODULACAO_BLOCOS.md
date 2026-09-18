@@ -9613,3 +9613,102 @@ e `CHANNEL_SUPPORT_LIMITED` +5. Legado byte-idêntico.
 Testes: `tests/test_channel_never_bonds.py` (fixtures T/L, travessia, canaleta fora
 do envelope permitida, mutante que força o comportamento antigo e exige que o gate
 acuse `CHANNEL_AS_JUNCTION_BOND`).
+
+## 76. Compensador NUNCA exerce função de amarração (2026-09-18, IMPLEMENTADO: hard gate + correção D1; 6 casos PENDENTES de decisão)
+
+> **Compensadores C04/C09 são peças auxiliares de ajuste dimensional e nunca podem
+> assumir ou substituir a função de amarração de um encontro.**
+>
+> **A proximidade de um compensador com um nó não constitui violação; a violação é funcional.**
+
+Vale para L, T e X. `[B54 de amarração][C09 de ajuste][B39…]` é válido; C09 ocupando o
+lugar da peça que amarra é inválido — mesmo C09, mesma proximidade, função diferente.
+Se a peça de amarração correta não cabe, o nó **não está resolvido**
+(`MISSING_REQUIRED_JUNCTION_BOND` / `NEEDS_RULE`) — o compensador não o resolve.
+
+**Como o motor define função de amarração (o que o gate lê).**
+
+1. **Metadado (evidência):** o motor designa a peça do nó com `node_index` + razão da família
+   `L_CORNER* / T_INTERSECTION* / X_INTERSECTION* / CORNER*` → `DESIGNATED_NODE_PIECE`.
+2. **Geometria (autoridade):** a **região do nó** é a interseção das faixas de espessura das
+   paredes do encontro — o único lugar físico que só existe no encontro e onde a peça que amarra
+   precisa estar. Em cada fiada, o **ocupante** é a peça das paredes do nó que cobre a maior
+   **área** dessa região → `OCCUPIES_NODE_REGION`. Um compensador ocupante assume a função de
+   amarração, com ou sem rótulo. Num **empate** de área o compensador divide a função e é
+   acusado — o veredito nunca depende do código da outra peça. Um compensador encostado por
+   fora não cobre área nenhuma da região e nunca é acusado.
+
+Não há distância em lugar nenhum da definição.
+
+**Hard gate `COMPENSATOR_AS_JUNCTION_BOND`** — `wall_stepper.compensator_as_junction_bond(...)`,
+somente leitura, geometria exata (recorte de polígono convexo, não amostragem). Uma violação por
+(fiada, compensador); `occupied_nodes` lista todos os nós cuja região ele ocupa. Anexado ao
+resultado do solve CHANNEL em `result["compensator_as_junction_bond"]` (aceitável: vazio) e aos
+portões do microajuste da §66: um deslocamento que crie compensador-amarração **piora** o portão
+e é **rejeitado** por `_worse_gates` — offset inválido, não penalizado. O legado
+(`strategy=None`) não passa pelo fluxo CHANNEL e segue byte a byte (sha256 `3ba22aa08913ac5d…`).
+
+**Causa-raiz (medida, 11 casos no BUTANTÃ, todos C09, metadado e geometria concordam nos 11).**
+As três escadas de nó degradado terminavam em compensador e o **designavam peça do nó**:
+`_corner_single_element_candidate` ("UM ÚNICO elemento, o maior entre C09/C04 que caiba",
+L e T) e `_x_intersection_centered_candidate` (X). Dois mecanismos:
+
+- **T (8 casos, nós 22/28/30):** a principal tem abertura dos dois lados do nó; o T degrada, a
+  que chega recebe B34 numa família e, pela alternância da §58, a **peça curta** (C09) na outra.
+- **L (3 casos, nós 47/48):** o braço curto não comporta o B34 (janela a 19,5 cm da face externa
+  do canto) e a escada cai em C09 como peça de canto.
+
+**Censo humano (mesmo validador sobre as peças do projetista, z 1–270, por fatia real de
+10 cm).** **Zero** C04/C09 em pé ocupando região de nó. 79 compensadores em pé a no máximo 1,5 cm
+da região, por fora — o padrão válido `[amarração][compensador]` (contagem de censo, não
+critério do gate). 8 compensadores **deitados** (`C09D`/`C09DH`, 14×19×9, camadas de 9 cm de
+nivelamento: z 91–100 sobre a verga nos nós 47/48, z 171–180 no nó 30, z 261–270 no topo nos nós
+45/47/48/53/54) ocupam região de nó; o solver não emite peça deitada — registrados, fora do
+escopo, decisão do usuário se a regra deve valer para eles.
+
+**Correção D1 (ativa no fluxo CHANNEL).** O passo "degrada para L" do T exigia 34 cm a partir do
+**ponto** do nó, mas o B34 é posto a partir do **contato** (meia espessura atrás do ponto) e só
+ocupa 34 − meia espessura no lado livre. `T_DEGRADED_L_ROOM_FROM_CONTACT` mede a partir do
+contato, com a mesma tolerância física da §74, e só age quando o teste histórico não acha lado
+nenhum (nó que já degradava para L não muda). Resolve os nós 22 (pilar de 34 cm entre duas
+janelas) e 30 com **B34 real nas duas famílias** — o que o projeto humano faz — **sem regressão
+de portão nenhum**. A §72, a §74 (tolerância, `room_ok`, papel do T) e a paridade não mudam.
+
+Efeito medido (corpus versionado, produto): `COMPENSATOR_AS_JUNCTION_BOND` 11 → **6**; portões
+duros 0/0/0/0 e `CHANNEL_AS_JUNCTION_BOND` 0; régua 5.940 → 5.930 (B34 +24, B39 −14, B19 −10,
+C09 −6, C04 −4, B54 0); parede 8284580 continua `48 B39 + 11 B34 + 1 B19`, divergência 3,3.
+
+**Interação com a §74 (declarada, não escondida).** Com a D1 ligada, o contrafactual "sem a
+§74" também resgata o nó 46 como L degradado e a parede 8284580 dá 3,3 mesmo sem a §74. O efeito
+isolado da §74 continua reproduzível contra `flag_off_motor_pre_regra76` (§74 **e** D1
+desligadas; hash `c06f91a0…`, o `flag_off` auditado antes desta regra): 204,7 → 3,3.
+
+**Os 6 casos restantes (nó 28 T × fiadas 5/7/9; canto 47 × 2/4; canto 48 × 3) — PENDENTES DE
+DECISÃO DO USUÁRIO.** A causa é geométrica e nenhuma candidata automática é limpa sob as regras
+aprovadas (medido no corpus, fluxo CHANNEL):
+
+| candidata (desligada) | gate | buracos no encontro | não-modular | sem apoio |
+|---|---|---|---|---|
+| hoje (D1 ligada) | **6** | 0 | 0 | 0 |
+| R76 — família sem bloco recua | 0 | +6 | 12 | 4 |
+| D2 — B19 como peça do nó (padrão humano) | 0 | 0 | 6 | 1 |
+| D3 — o outro braço do L assume o canto | 0 | 0 (L) / +3 (nó 28) | 16 | 4 |
+
+- **Cantos 47/48:** do lado de fora do canto até a jamba há 19,5 cm. Nenhum bloco de amarração
+  fecha isso com a junta de 1 cm do sistema (B19 + 1 = 20). O humano usa **B19 com junta de
+  0,5 cm** — o que conflita com a decisão de 2026-08-21 ("nunca B19 em encontro") e com a junta
+  de 1 cm.
+- **Nó 28:** a principal, na faixa da janela, é só o quadrado do nó (pilar de 14 cm entre duas
+  janelas). O humano alterna **B34 / B19** ali.
+
+As três candidatas estão no código (`COMPENSATOR_NEVER_JUNCTION_BOND`,
+`JUNCTION_BOND_B19_FALLBACK`, `L_CORNER_OTHER_ARM_OWNS`), **desligadas**, medidas e documentadas.
+Nenhuma entra sem decisão. Enquanto isso o gate **acusa os 6** — não são mascarados; os testes
+os fixam para que não cresçam nem sumam em silêncio. A regra 76 **não está cumprida** no
+BUTANTÃ enquanto eles existirem.
+
+Testes: `tests/test_compensator_never_bonds.py` (validador: L/T/X válidos e inválidos, A × B,
+só metadado, canaleta fora do escopo, empate de área, compensador em dois nós, determinismo,
+área coberta e não distância, consistência com um oráculo independente de amostragem sobre o
+solver), `tests/test_regra76_d1_t_degradado.py` (D1 e seu mutante),
+`tests/test_regra76_corpus_butanta.py` (os 6 casos fixados, D1 nos nós 22/30, 8284580, legado).

@@ -5,11 +5,11 @@
   "date": "2026-09-18",
   "scope": "current",
   "branch": "claude/butanta-modulation-physical-fixes",
-  "head": "74c019ef924a8b4d0742518bf1cfd09aa38ee978",
+  "head": "cf9bf445b18f19013532da36c00925319a6e305b",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "BLOCKED -> corrigido offline pela regra 75 - RE-SMOKE NO REVIT PENDENTE de revisao humana da causa e do patch",
+  "veredito": "BLOCKED - regra 76: gate COMPENSATOR_AS_JUNCTION_BOND implementado e correcao D1 aplicada (11 -> 6); 6 casos sem solucao automatica limpa sob as regras aprovadas - decisao do usuario necessaria (secao 7.14). Revit nao executado nesta missao.",
   "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
   "changes": [
     "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
@@ -24,42 +24,57 @@
     "docs/checkpoints/2026-09-17-butanta-convergencia-humano.md: relatorio da missao.",
     "nuvem/core/engine/opening_reinforcement.py: REGRA 75 - conversao de amarracao em canaleta desligada, travessia 51.6 suspensa por padrao, validador channel_as_junction_bond; nuvem/core/wall_modeling.py: hard gate no resultado.",
     "tests/test_channel_never_bonds.py (novo) + pares padrao/override em test_channel_reinforcement/test_channel_audit_fixes/test_node_bounded_residual: cada mecanismo vetado tem mutante que obriga o gate a acusar.",
-    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 75 (append-only); corpus da secao 74 re-fotografado pos-75 (t_nodes.json byte-identico)."
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 75 (append-only); corpus da secao 74 re-fotografado pos-75 (t_nodes.json byte-identico).",
+    "nuvem/core/engine/wall_stepper.py: REGRA 76 - validador somente leitura compensator_as_junction_bond (metadado + ocupante de maior area da regiao do no', geometria exata, sem distancia; empate acusa o compensador; occupied_nodes); correcao D1 T_DEGRADED_L_ROOM_FROM_CONTACT (desligada no motor); candidatas R76/D2/D3 desligadas.",
+    "nuvem/core/wall_modeling.py: hard gate result['compensator_as_junction_bond'] no solve CHANNEL, D1 ligada so' no CHANNEL (CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED) e portao COMPENSATOR_AS_JUNCTION_BOND no microajuste da secao 66.",
+    "tests/test_compensator_never_bonds.py, tests/test_regra76_d1_t_degradado.py, tests/test_regra76_corpus_butanta.py (novos).",
+    "tools/audit/s74_corpus.py, extract_butanta_corpus.py, audit_s74_corpus.py e tests/test_s74_corpus_butanta.py: contrafactual flag_off_motor_pre_regra76 (secao 74 e D1 desligadas) para manter reproduzivel o efeito isolado da secao 74; contagem do gate por caso no corpus.",
+    "reference_projects/butanta_r08_lt/s74_corpus/ re-fotografado pos-76 (t_nodes.json byte-identico) e inventory.json.",
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 76 (append-only)."
   ],
   "tests": [
-    "Suite completa (tests/, sem regression): 1.244 passaram, 0 falharam, 1 desmarcado.",
-    "tests/test_s74_corpus_butanta.py: 39 passaram; runner audit_s74_corpus: 40 casos PASS com o gate CHANNEL_AS_JUNCTION_BOND = 0 no caso 11.",
-    "Canal: 77 passaram; regra 75: 7 passaram; focada secao 72/74: 58 passaram.",
-    "Legado byte-identico: strategy=None 8.939 pecas, assinatura 0a2704e4faaf; sha S74_SNAPSHOT_V1 do legado 3ba22aa08913... identico com e sem a flag.",
-    "Saturacao preservada pos-75: 0,05 / 0,10 / 0,30 cm -> mesmo sha256 320ba395683c..."
+    "Suite completa (tests/, sem regression): 1.307 passaram, 0 falharam, 1 desmarcado (test_perf_trace_stall_sampler, herdado).",
+    "Regra 76: test_compensator_never_bonds 50, test_regra76_d1_t_degradado 5, test_regra76_corpus_butanta 7, test_s74_corpus_butanta 40 - sem skip/xfail.",
+    "Focadas (no/L/T/X/canal/paridade/secao 72/74): 350 passaram; corpus secao 74 + regra 76: todos passam.",
+    "Commit 1 (so' validador + gate) verificado isolado: 108 passaram com os hashes ANTERIORES do corpus - o gate nao muda peca nenhuma.",
+    "Legado byte-identico: strategy=None 8.939 pecas, sha S74 3ba22aa08913... identico.",
+    "Secao 66: plano identico antes/depois (24 exigidos, 2 aplicados, 10 vetados)."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
-    "O lote 20260918-014103 aberto no Revit e' o REPROVADO pela revisao visual (canaleta como amarracao); o re-smoke com a regra 75 esta' PENDENTE de revisao humana do patch.",
-    "Conflito registrado: regra 51.6 (travessia com evidencia humana) x regra 75 - suspensa por padrao, reativacao e' decisao de usuario (secao 7.13).",
+    "REGRA 76 NAO CUMPRIDA no BUTANTA: COMPENSATOR_AS_JUNCTION_BOND = 6 (no' 28 T fiadas 5/7/9; canto 47 fiadas 2/4; canto 48 fiada 3) - pendentes de decisao do usuario.",
+    "Humano: 8 compensadores DEITADOS (C09D/C09DH) em regiao de no' - registro, fora do escopo (o solver nao emite peca deitada).",
+    "Re-smoke no Revit PENDENTE (o Revit nao foi aberto nesta missao); capturas DEPOIS pendentes.",
+    "Conflito registrado: regra 51.6 x regra 75 (secao 7.13) - inalterado.",
+    "O lote 20260918-014103 aberto no Revit continua sendo o REPROVADO pela revisao visual (canaleta como amarracao); nenhum lote novo foi criado.",
     "A perna B34 de _t_intersection_room_ok segue sem cobertura no corpus (declarado)."
   ],
   "physical_deltas": [
     "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
     "Secao 74, medida pelo corpus versionado: 37 encontros T, dez reprovam o teste de espaco sem ela, tres passam a caber com ela (faltavam 0,012 / 0,003487 / 0,003487 cm) e sete continuam reprovando (4,001054 / 15,012 / 14,9965 / 20,0048 / 19,9965 cm).",
     "Parede 8284580: divergencia 204,7 -> 3,3; composicao 14 B39 + 51 B34 + 5 C09 + 1 B19 -> 48 B39 + 11 B34 + 1 B19, contra 48 B39 + 12 B34 do humano.",
-    "Hard gates 0/0/0/0 (colisoes, nao-modular, sem apoio, invasao de vao) em todos os casos."
+    "Hard gates 0/0/0/0 (colisoes, nao-modular, sem apoio, invasao de vao) em todos os casos.",
+    "Regra 76 (corpus, produto): COMPENSATOR_AS_JUNCTION_BOND 11 -> 6 (T 8 -> 3, L 3 -> 3, X 0); hard gates 0/0/0/0; pecas 8.719 -> 8.709; regua B34 +24, B39 -14, B19 -10, C09 -6, C04 -4, B54 0; parede 8284580 inalterada (div 3,3)."
   ],
   "decisions_taken": [
     "A tolerancia da secao 74 e' a constante fisica que o motor ja' definia (PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm): nenhuma constante nova, nenhuma alterada.",
     "A mudanca e' semantica e deliberada - a fronteira de cabe/nao-cabe foi ampliada em ate' 0,05 cm. A justificativa e' a separacao medida entre variacao de modelagem (0,013251 cm) e o primeiro caso materialmente insuficiente (4,001054 cm), NAO a saturacao.",
     "O corpus e' EVIDENCIA, nao NORMA: so' a composicao humana de UMA parede foi versionada, como testemunha do caso 8284580.",
-    "Peculiaridades humanas medidas (coluna vertical de compensador na jamba, junta vertical continua) NAO foram codificadas - seguem pendentes de aprovacao."
+    "Peculiaridades humanas medidas (coluna vertical de compensador na jamba, junta vertical continua) NAO foram codificadas - seguem pendentes de aprovacao.",
+    "Regra 76: o gate e' funcional (metadado + ocupacao da regiao do no'), nunca por distancia; empate de area acusa o compensador.",
+    "Correcao D1 aplicada so' no CHANNEL e so' como fallback (no' que ja' degradava para L nao muda).",
+    "R76 (recuo), D2 (B19) e D3 (outro braco) medidas e mantidas DESLIGADAS: pioram portoes duros ou conflitam com a decisao de 2026-08-21.",
+    "Os 6 casos restantes continuam acusados e fixados em teste - nao mascarados."
   ],
   "decisions_pending": [
-    "Executar a restauracao controlada do TARGET e a aplicacao da secao 74 no Revit (run 1/run 2/run 3 se preciso), com readback e capturas.",
-    "Aprovar ou recusar os padroes humanos descobertos, principalmente a coluna vertical de compensador na jamba (28% dos especiais do projeto humano).",
-    "Veredito da auditoria independente sobre o corpus versionado."
+    "Regra 76, cantos 47/48 (janela a 19,5 cm da face externa): aceitar B19 como peca de canto com junta de 0,5 cm (padrao humano, conflita com 2026-08-21), outro braco assume o canto, ou mover a janela.",
+    "Regra 76, no' 28 (pilar de 14 cm entre duas janelas): B19 alternado com B34 (padrao humano) ou mover janela.",
+    "Se a regra 76 deve valer tambem para compensador DEITADO (C09D/C09DH) quando o solver passar a gerar camadas de nivelamento.",
+    "Destino da regra 51.6 (mantida suspensa ou reativada)."
   ],
   "next_steps": [
-    "Revisao humana da causa-raiz e do patch da regra 75 (secao 7.13).",
-    "Depois da aprovacao: re-smoke no Revit - purga controlada, reset das 44 aberturas, runs ate' convergir, readback com CHANNEL_AS_JUNCTION_BOND = 0, capturas novas dos encontros que tinham o erro.",
-    "Decidir o destino da regra 51.6 (mantida suspensa ou reativada por decisao de usuario)."
+    "Decisao do usuario sobre os 6 casos (secao 7.14); implementar a escolhida com o gate em zero.",
+    "Depois: re-smoke final no Revit - purga controlada, reset das aberturas, runs ate' convergir, readback com CHANNEL_AS_JUNCTION_BOND = 0 e COMPENSATOR_AS_JUNCTION_BOND = 0, capturas ANTES/DEPOIS dos nos 22/28/30/47/48."
   ],
   "references": [
     {
@@ -112,6 +127,15 @@
     },
     {
       "path": "nuvem/core/engine/opening_reinforcement.py"
+    },
+    {
+      "path": "tests/test_compensator_never_bonds.py"
+    },
+    {
+      "path": "tests/test_regra76_d1_t_degradado.py"
+    },
+    {
+      "path": "tests/test_regra76_corpus_butanta.py"
     }
   ]
 }
@@ -1086,6 +1110,99 @@ reprovado; a re-execução (purga controlada → reset → runs até convergir �
 com `CHANNEL_AS_JUNCTION_BOND=0` → capturas novas dos encontros) só ocorre depois da
 revisão humana da causa e do patch.
 
+## 7.14 REGRA 76 — COMPENSADOR NUNCA É AMARRAÇÃO (2026-09-18)
+
+> Compensadores C04/C09 são peças auxiliares de ajuste dimensional e nunca podem assumir ou
+> substituir a função de amarração de um encontro. A proximidade de um compensador com um nó
+> não constitui violação; a violação é funcional.
+
+**Estado: BLOCKED — 6 casos sem solução automática limpa sob as regras aprovadas; decisão do
+usuário necessária.** O gate está implementado e acusa; a correção D1 zerou 5 dos 11 casos sem
+regressão; os 6 restantes **não** foram mascarados. Revit **não** foi executado nesta missão.
+
+**Censo ANTES (HEAD `2904b1b`, fluxo CHANNEL, §74 ligada, feito antes de qualquer alteração de
+código):** 11 compensadores exercendo função de amarração, **todos C09**, **0 C04**, 0 em X (o
+BUTANTÃ não tem X). Metadado e geometria concordam nos 11 (cobertura da região do nó
+0,6421–0,6429: o C09 de 9 cm cobre 9 dos 14 cm). 476 compensadores perto de nó classificados
+`AUXILIARY_VALID`; 4 `UNRESOLVED` (peças de jamba encostadas no ocupante inválido). Mesmos 11
+na geometria original e na pós-§66.
+
+| parede (principal ← chega / braços) | nó | tipo | fiadas | peça | status | motivo |
+|---|---|---|---|---|---|---|
+| 8284502 ← 8284558 | 22 | T | 5, 7, 9 | C09 na 8284558 | **CORRIGIDO (D1)** | pilar de 34 cm entre janelas; B34 cabia a partir do contato |
+| 8284554 ← 8284563 | 30 | T | 5, 7 | C09 na 8284563 | **CORRIGIDO (D1)** | 27,014 cm livres; B34 cabia a partir do contato |
+| 8284502 ← 8284562 | 28 | T | 5, 7, 9 | C09 na 8284562 | **PENDENTE** | pilar de 14 cm entre duas janelas: só o quadrado do nó |
+| 8284584 × 8284589 | 47 | L | 2, 4 | C09 na 8284584 | **PENDENTE** | janela a 19,5 cm da face externa do canto |
+| 8284584 × 8284590 | 48 | L | 3 | C09 na 8284584 | **PENDENTE** | idem |
+
+**Causa-raiz:** as escadas de nó degradado (`_corner_single_element_candidate`, L e T;
+`_x_intersection_centered_candidate`, X) terminavam em C09/C04 e o **designavam peça do nó**.
+No T, a alternância da §58 dava a peça curta (C09) à família oposta ao B34; no L, o braço curto
+não comporta o B34.
+
+**Implementado:**
+
+- `wall_stepper.compensator_as_junction_bond(...)` — validador somente leitura, hard gate
+  `COMPENSATOR_AS_JUNCTION_BOND` (aceitável: vazio): metadado (`DESIGNATED_NODE_PIECE`) e
+  geometria exata (`OCCUPIES_NODE_REGION`, ocupante de maior área da região do nó; empate acusa
+  o compensador; `occupied_nodes` lista todos os nós ocupados). Nenhuma distância.
+- Fiação: `result["compensator_as_junction_bond"]` no solve CHANNEL; portão
+  `COMPENSATOR_AS_JUNCTION_BOND` no microajuste da §66 (offset que cria compensador-amarração é
+  rejeitado por `_worse_gates`).
+- Correção D1 (`T_DEGRADED_L_ROOM_FROM_CONTACT`, ligada só no CHANNEL por
+  `CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED`) — ver §76 do REGRAS.
+- Candidatas medidas e **desligadas** (pendentes de decisão): R76 (recuo), D2 (B19 como peça do
+  nó — conflita com a decisão de 2026-08-21), D3 (outro braço do L).
+
+**Métricas ANTES / DEPOIS (corpus versionado, produto):**
+
+| medida | ANTES (`2904b1b`) | DEPOIS |
+|---|---|---|
+| `COMPENSATOR_AS_JUNCTION_BOND` | 11 | **6** |
+| violações em T / L / X | 8 / 3 / 0 | 3 / 3 / 0 |
+| portões duros (colisão / não-modular / sem apoio / invasão) | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 |
+| `CHANNEL_AS_JUNCTION_BOND` | 0 | 0 |
+| peças (snapshot S74) | 8.719 | 8.709 |
+| régua B34 / B39 / B54 / B19 | 1.503 / 3.210 / 184 / 346 | 1.527 / 3.196 / 184 / 336 |
+| régua C09 / C04 | 242 / 151 | 236 / 147 |
+| parede 8284580 | 48 B39 + 11 B34 + 1 B19, div 3,3 | idem |
+| legado `strategy=None` | `3ba22aa08913ac5d…` | idêntico |
+
+**Censo humano (mesmo validador, peças do projetista, z 1–270, por fatia real de 10 cm):**
+**0** C04/C09 em pé ocupando região de nó; 79 compensadores em pé a até 1,5 cm da região, por
+fora (o padrão válido). **8** compensadores **deitados** (`C09D`/`C09DH`, 14×19×9, camadas de
+9 cm de nivelamento: z 91–100 sobre a verga nos nós 47/48, z 171–180 no nó 30, z 261–270 no topo
+nos nós 45/47/48/53/54) ocupam região de nó — o solver não emite peça deitada; registrados, fora do
+escopo, decisão do usuário se a regra deve valer para eles. Nos cantos 47/48 o humano usa **B19**
+como peça do canto nas fiadas 2 e 4 (o padrão da candidata D2).
+
+**§74 — interação declarada:** com a D1, o contrafactual "sem a §74" também resgata o nó 46 e a
+parede 8284580 dá 3,3 mesmo sem a §74. O efeito isolado da §74 continua reproduzível pelo caso
+`flag_off_motor_pre_regra76` do corpus (hash `c06f91a0…`, o `flag_off` auditado antes): 204,7 →
+3,3. Testes e runner passaram a usar esse caso.
+
+**§66:** plano idêntico antes e depois (24 exigidos, 2 aplicados: 8284546 +10 e 8284502 +10;
+10 offsets vetados nos dois); o portão novo aparece nos portões do plano.
+
+**Canaleta:** não tocada nesta missão (regra 75 intacta, gate `CHANNEL_AS_JUNCTION_BOND` = 0).
+
+**Testes:** suíte completa 1.307 passaram, 0 falharam (1 desmarcado, herdado); focadas 350;
+`test_compensator_never_bonds` 50 (L/T/X válidos e inválidos, A × B, só metadado, canaleta fora do
+escopo, empate de área, compensador em dois nós, determinismo, área e não distância, oráculo
+independente sobre o solver), `test_regra76_d1_t_degradado` 5 (com mutante),
+`test_regra76_corpus_butanta` 7, `test_s74_corpus_butanta` 40 — sem skip/xfail. O commit
+`7d7b3f0` (só validador + gate) foi verificado isolado contra os hashes **anteriores** do corpus:
+108 passaram, o gate não muda peça nenhuma.
+
+**Desempenho** (corpus, CHANNEL, 3 execuções): solve 21,7–22,4 s antes, 20,7–21,4 s depois; o
+validador custa ~0,1 s por solve; microajuste da §66 51 s → 52 s.
+
+**Evidência visual:** renders OFFLINE (não são capturas do Revit), peças do solver e do humano
+desenhadas a partir de dados medidos, em `scratchpad/shots_r76/` (não versionado): por nó
+`HUMANO`, `SOLVER_ANTES`, `SOLVER_ANTES_ANOTADO`, `SOLVER_DEPOIS`, `SOLVER_DEPOIS_ANOTADO` e as
+elevações de contexto; três exemplos válidos (`06`–`08`). Capturas DEPOIS no Revit:
+**PENDENTES** (o Revit não foi aberto nesta missão).
+
 ---
 
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
@@ -1216,6 +1333,8 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
 ---
 
 ## 10. ENTREGA
+
+> **Estado atual (2026-09-18, regra 76): BLOCKED — 6 casos pendentes de decisão do usuário; ver §7.14.** O status abaixo é o da rodada da §74 e fica como registro.
 
 **Branch** `claude/butanta-modulation-physical-fixes` · último commit de motor `2c55211` (§74) ·
 **PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.

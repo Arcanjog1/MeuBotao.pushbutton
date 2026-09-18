@@ -76,7 +76,7 @@ Painel reconciliado por fetch em 2026-09-15 (main `55e990d`, merge do #41 — re
     {
       "pr": 42,
       "branch": "claude/butanta-modulation-physical-fixes",
-      "head": "74c019ef924a8b4d0742518bf1cfd09aa38ee978"
+      "head": "cf9bf445b18f19013532da36c00925319a6e305b"
     }
   ]
 }
