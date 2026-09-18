@@ -7,6 +7,7 @@ em worktree isolado, somente leitura). Nenhum apply no Revit.
 ```json
 {
   "date": "2026-09-17",
+  "scope": "historical",
   "branch": "claude/jolly-ritchie-0bq5f6",
   "head": "d6cbec4d74bc52173a37602bccee2637a1cd49cd",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
