@@ -142,13 +142,13 @@ justifica o valor — ela prova apenas que não há precipício perto da frontei
 
 | Caso | Peças | sha256 |
 |---|---|---|
-| `flag_off` | 8750 | `b152406adb779655…` |
-| `tol_0_05` | 8723 | `0a42e2ec4fee65a4…` |
-| `tol_0_10` | 8723 | o MESMO `0a42e2ec4fee65a4…` |
-| `tol_0_30` | 8723 | o MESMO `0a42e2ec4fee65a4…` |
+| `flag_off` | 8746 | `c06f91a0b9848681…` |
+| `tol_0_05` | 8719 | `320ba395683cc762…` |
+| `tol_0_10` | 8719 | o MESMO `320ba395683cc762…` |
+| `tol_0_30` | 8719 | o MESMO `320ba395683cc762…` |
 
 - `opening_variant_cases` — a mesma medida sobre a variante
-  `post_micro_adjustment_s66` (8737 peças com a flag desligada, 8710 com 0,05 cm).
+  `post_micro_adjustment_s66` (8733 peças com a flag desligada, 8706 com 0,05 cm).
 
 Os portões duros (colisões, não-modular, sem apoio, invasão de vão) ficam
 **0 / 0 / 0 / 0** em todos os casos gravados.

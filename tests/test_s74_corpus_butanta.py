@@ -282,7 +282,8 @@ def test_os_hard_gates_continuam_zerados_com_a_secao_74():
     for rotulo in ("off", "on"):
         _ctx, res = _solve(rotulo)
         assert S.hard_gates(res) == {"collisions": 0, "non_modular": 0,
-                                     "unsupported": 0, "opening_invasion": 0}
+                                     "unsupported": 0, "opening_invasion": 0,
+                                     "channel_as_junction_bond": 0}
 
 
 # ================================================ 8. saturacao da tolerancia

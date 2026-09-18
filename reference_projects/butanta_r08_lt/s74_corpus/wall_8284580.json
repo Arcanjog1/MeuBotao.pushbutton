@@ -34,9 +34,10 @@
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    },
-   "pieces_in_ruler": 5971
+   "pieces_in_ruler": 5967
   },
   "flag_on": {
    "solver_counts": {
@@ -56,9 +57,10 @@
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    },
-   "pieces_in_ruler": 5944
+   "pieces_in_ruler": 5940
   }
  }
 }

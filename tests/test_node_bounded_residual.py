@@ -77,12 +77,22 @@ def test_ring_red_without_absorption_leaves_ring_empty_and_channel_missing():
 
 
 def test_ring_green_with_absorption_closes_every_course_and_channel_is_present():
+    """ATUALIZADO PELA REGRA 75 (2026-09-18): neste anel de 115 cm as corridas
+    de verga/contraverga esbarram nas pecas de CANTO - antes o motor convertia
+    o canto em canaleta para completar a corrida (MISSING == 0), o que a regra
+    75 proibe. Agora o conflito e' CLASSIFICADO (TIE_OVER_SPAN, NEEDS_RULE), o
+    canto fica e nenhuma canaleta assume papel de amarracao."""
     with absorption(True):
         res, walls = solve(ring_lines(), ring_window(), strategy=orf.OPENING_REINFORCEMENT_CHANNEL)
     counts = res["opening_reinforcement"]["validation"]["counts"]
-    assert counts["MISSING_REQUIRED_CHANNEL"] == 0
-    assert counts["channel_top_matched"] == counts["channel_top_expected"] == 1
-    assert counts["channel_bottom_matched"] == counts["channel_bottom_expected"] == 1
+    assert counts["MISSING_REQUIRED_CHANNEL"] == 2
+    assert all(f["detail"] == "TIE_OVER_SPAN" and f["classification"] == "NEEDS_RULE"
+               for f in res["opening_reinforcement"]["findings"]
+               if f["code"] == "MISSING_REQUIRED_CHANNEL")
+    assert res["channel_as_junction_bond"] == []
+    assert res["opening_reinforcement"]["tie_conversions"] == []
+    assert counts["channel_top_expected"] == counts["channel_bottom_expected"] == 1
+    assert counts["channel_top_matched"] == counts["channel_bottom_matched"] == 0
     assert counts["CHANNEL_INVADES_OPENING"] == 0 and counts["CHANNEL_COLLISION"] == 0
     assert not [s for s in res["non_modular"] if s.get("conflict") is None]
     assert res["residual_absorptions"]
@@ -158,9 +168,17 @@ def test_channel_run_is_contiguous_across_rule_30_8_boundary_joint(order):
     with absorption(True):
         res, _walls = solve(lines, openings, strategy=orf.OPENING_REINFORCEMENT_CHANNEL)
     counts = res["opening_reinforcement"]["validation"]["counts"]
-    assert counts["MISSING_REQUIRED_CHANNEL"] == 0
-    assert counts["channel_top_matched"] == counts["channel_top_expected"] == 1
-    assert counts["channel_bottom_matched"] == counts["channel_bottom_expected"] == 1
+    # REGRA 75 (2026-09-18): as corridas esbarram nas pecas de canto e o
+    # conflito e' classificado em vez de resolvido convertendo o canto em
+    # canaleta. A propriedade sob teste aqui - a junta de contorno da regra
+    # 30.8 nao quebra a corrida - fica coberta pela ausencia de qualquer
+    # MISSING que NAO seja o conflito de amarracao.
+    assert counts["MISSING_REQUIRED_CHANNEL"] == 2
+    assert all(f["detail"] == "TIE_OVER_SPAN"
+               for f in res["opening_reinforcement"]["findings"]
+               if f["code"] == "MISSING_REQUIRED_CHANNEL")
+    assert res["channel_as_junction_bond"] == []
+    assert counts["channel_top_expected"] == counts["channel_bottom_expected"] == 1
 
 
 def test_residual_above_limit_is_not_absorbed():

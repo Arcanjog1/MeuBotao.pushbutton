@@ -369,8 +369,7 @@ def escreve(nome, obj):
     if not os.path.isdir(S.CORPUS_DIR):
         os.makedirs(S.CORPUS_DIR)
     caminho = os.path.join(S.CORPUS_DIR, nome)
-    with open(caminho, "w", encoding="utf-8", newline="
-") as fh:
+    with open(caminho, "w", encoding="utf-8", newline=chr(10)) as fh:
         json.dump(obj, fh, indent=1, ensure_ascii=False, sort_keys=False)
         fh.write("\n")
     print("  %-22s %8d bytes" % (nome, os.path.getsize(caminho)))

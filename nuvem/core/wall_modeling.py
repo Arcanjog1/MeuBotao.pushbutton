@@ -4604,6 +4604,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
+    # REGRA 75 - hard gate: canaleta nunca exerce funcao de amarracao. So' o
+    # fluxo com estrategia de reforco passa por aqui; o legado segue byte a byte.
+    result["channel_as_junction_bond"] = _reinforcement.channel_as_junction_bond(
+        result.get("course_candidates"), plan)
     return result
 
 

@@ -306,7 +306,9 @@ def hard_gates(res):
     return {"collisions": len(res.get("collisions") or []),
             "non_modular": len(res.get("non_modular") or []),
             "unsupported": sup.get("UNSUPPORTED_BLOCK", 0) + sup.get("UNSUPPORTED_SMALL_BLOCK", 0),
-            "opening_invasion": len(res.get("opening_invasions") or [])}
+            "opening_invasion": len(res.get("opening_invasions") or []),
+            # REGRA 75 (2026-09-18): canaleta nunca exerce funcao de amarracao
+            "channel_as_junction_bond": len(res.get("channel_as_junction_bond") or [])}
 
 
 # ====================================================== REGUA DE COMPARACAO

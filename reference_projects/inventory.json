@@ -124,7 +124,7 @@
       "files": [
         {
           "path": "reference_projects/butanta_r08_lt/s74_corpus/geometry.json",
-          "sha256": "ee92ee21032422d93b7e75c63162d1fdbf28a7d5f3d4632e120ce67dedba6e89"
+          "sha256": "f0c636713ba693d01f170d3168de3b8176e6b4741e60276712f092297dc20242"
         },
         {
           "path": "reference_projects/butanta_r08_lt/s74_corpus/t_nodes.json",
@@ -132,11 +132,11 @@
         },
         {
           "path": "reference_projects/butanta_r08_lt/s74_corpus/wall_8284580.json",
-          "sha256": "de0b11292b235026fcfda98b95a331a6cf5f20a32d8b6fee88f58ec8edbd1da5"
+          "sha256": "5de630cb4229955344744d767a3fe26aada70e52814abc924067ea7c4f46891c"
         },
         {
           "path": "reference_projects/butanta_r08_lt/s74_corpus/snapshot_v1.json",
-          "sha256": "9e85b80e92553d001ffe10114a3b3a3ce6bd05600d29265e9a2adbc50b16ff8c"
+          "sha256": "02c7d01dcc1cb73d6494f19931509c577f503dc0e1e8d86bd684c06196bac04b"
         }
       ],
       "status": "EVIDENCE_NOT_NORM",

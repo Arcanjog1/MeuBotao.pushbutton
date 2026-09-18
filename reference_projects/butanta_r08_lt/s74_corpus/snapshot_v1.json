@@ -11,97 +11,97 @@
   {
    "label": "flag_off",
    "tolerance_cm": null,
-   "pieces": 8750,
-   "sha256": "b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067",
-   "ruler_pieces": 5971,
+   "pieces": 8746,
+   "sha256": "c06f91a0b984868100ad09b22b8ed612fe8e17124eb23904e909b3fa4369fde6",
+   "ruler_pieces": 5967,
    "ruler_codes": {
-    "B19": 371,
-    "B34": 1548,
-    "B39": 3175,
+    "B19": 368,
+    "B34": 1553,
+    "B39": 3176,
     "B54": 168,
-    "C04": 150,
+    "C04": 151,
     "C09": 247,
-    "K34": 38,
-    "K39": 268,
-    "KV": 6
+    "K34": 37,
+    "K39": 267
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   },
   {
    "label": "tol_0_05",
    "tolerance_cm": 0.05,
-   "pieces": 8723,
-   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
-   "ruler_pieces": 5944,
+   "pieces": 8719,
+   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
+   "ruler_pieces": 5940,
    "ruler_codes": {
-    "B19": 349,
-    "B34": 1498,
-    "B39": 3209,
+    "B19": 346,
+    "B34": 1503,
+    "B39": 3210,
     "B54": 184,
-    "C04": 150,
+    "C04": 151,
     "C09": 242,
-    "K34": 38,
-    "K39": 268,
-    "KV": 6
+    "K34": 37,
+    "K39": 267
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   },
   {
    "label": "tol_0_10",
    "tolerance_cm": 0.1,
-   "pieces": 8723,
-   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
-   "ruler_pieces": 5944,
+   "pieces": 8719,
+   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
+   "ruler_pieces": 5940,
    "ruler_codes": {
-    "B19": 349,
-    "B34": 1498,
-    "B39": 3209,
+    "B19": 346,
+    "B34": 1503,
+    "B39": 3210,
     "B54": 184,
-    "C04": 150,
+    "C04": 151,
     "C09": 242,
-    "K34": 38,
-    "K39": 268,
-    "KV": 6
+    "K34": 37,
+    "K39": 267
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   },
   {
    "label": "tol_0_30",
    "tolerance_cm": 0.3,
-   "pieces": 8723,
-   "sha256": "0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13",
-   "ruler_pieces": 5944,
+   "pieces": 8719,
+   "sha256": "320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05",
+   "ruler_pieces": 5940,
    "ruler_codes": {
-    "B19": 349,
-    "B34": 1498,
-    "B39": 3209,
+    "B19": 346,
+    "B34": 1503,
+    "B39": 3210,
     "B54": 184,
-    "C04": 150,
+    "C04": 151,
     "C09": 242,
-    "K34": 38,
-    "K39": 268,
-    "KV": 6
+    "K34": 37,
+    "K39": 267
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   }
  ],
@@ -109,49 +109,51 @@
   {
    "variant": "post_micro_adjustment_s66",
    "label": "flag_off",
-   "pieces": 8737,
-   "sha256": "45a718826eb1c5036e15d34356a95053c65ce81afe549e4925d705c6a9842b74",
-   "ruler_pieces": 5958,
+   "pieces": 8733,
+   "sha256": "a5d2f64a20ee1fc0d76b3172d50abd3a77dc2fc9e3b5dc662d7bc88d3755ca05",
+   "ruler_pieces": 5954,
    "ruler_codes": {
-    "B19": 380,
-    "B34": 1534,
-    "B39": 3189,
+    "B19": 377,
+    "B34": 1539,
+    "B39": 3190,
     "B54": 168,
-    "C04": 151,
+    "C04": 152,
     "C09": 223,
-    "K34": 37,
-    "K39": 268,
-    "KV": 8
+    "K34": 36,
+    "K39": 267,
+    "KV": 2
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   },
   {
    "variant": "post_micro_adjustment_s66",
    "label": "tol_0_05",
-   "pieces": 8710,
-   "sha256": "317e99a472352438c17671fd9842a8554a21119fbc5828b84bd0643c4d81ef0b",
-   "ruler_pieces": 5931,
+   "pieces": 8706,
+   "sha256": "acbde534c6c25d04ec3b639a12b7b2d51ad6fd5343b545c5d43efb75d8b292ec",
+   "ruler_pieces": 5927,
    "ruler_codes": {
-    "B19": 358,
-    "B34": 1484,
-    "B39": 3223,
+    "B19": 355,
+    "B34": 1489,
+    "B39": 3224,
     "B54": 184,
-    "C04": 151,
+    "C04": 152,
     "C09": 218,
-    "K34": 37,
-    "K39": 268,
-    "KV": 8
+    "K34": 36,
+    "K39": 267,
+    "KV": 2
    },
    "hard_gates": {
     "collisions": 0,
     "non_modular": 0,
     "unsupported": 0,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   }
  ],
@@ -165,7 +167,8 @@
     "collisions": 0,
     "non_modular": 78,
     "unsupported": 67,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   },
   {
@@ -177,7 +180,8 @@
     "collisions": 0,
     "non_modular": 78,
     "unsupported": 67,
-    "opening_invasion": 0
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
    }
   }
  ]

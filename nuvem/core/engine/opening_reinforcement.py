@@ -139,7 +139,14 @@ DEFAULT_CHANNEL_POLICY = {
     # canaleta: vira canaleta sem mudar a topologia do no' - B34/C09 com a
     # MESMA geometria; B54 dividido em duas canaletas com a junta nova o mais
     # longe possivel das juntas das fiadas vizinhas (minimo abaixo).
-    "convert_blocking_along_ties": True,
+    #
+    # REGRA 75 (2026-09-18, revisao visual humana): canaleta NUNCA exerce funcao
+    # de amarracao em nenhum no' (L, T ou X). A conversao acima trocava a PECA DE
+    # AMARRACAO por canaleta preservando so' a geometria - foi exatamente o que a
+    # revisao reprovou (U34 no canto do no' 48, 8284584 x 8284590). DESLIGADA por
+    # padrao: o conflito corrida x amarracao passa a ser CLASSIFICADO
+    # (TIE_OVER_SPAN -> MISSING_REQUIRED_CHANNEL, NEEDS_RULE) e a amarracao fica.
+    "convert_blocking_along_ties": False,
     # Limite de apoio para converter a amarracao AO LONGO que bloqueia a
     # corrida (topologia do no' preservada). BUTANTA 1o PAV: humano passa por
     # cima do no' com apoio que seria 4 cm (6627438, K34 sobre o no') e para
@@ -147,6 +154,12 @@ DEFAULT_CHANNEL_POLICY = {
     "convert_along_tie_when_support_below_cm": 9.0,
     "tie_split_lengths_cm": (39.0, 34.0, 29.0, 24.0, 19.0, 14.0, 9.0),
     "tie_split_min_stagger_cm": 1.5,
+    # REGRA 75 (2026-09-18): a travessia do T da regra 51.6 REMOVE o corpo do
+    # B34 da parede que chega sobre o no' (recuado para peca de encosto) - isso
+    # e' substituir amarracao por canaleta, o que a regra 75 proibe. SUSPENSA
+    # por padrao; a evidencia humana da 51.6 (KV sobre o no' em jamba na face)
+    # fica registrada e a reativacao e' decisao de usuario, nunca do solver.
+    "channel_may_cross_node_tie": False,
 }
 
 
@@ -164,6 +177,47 @@ def is_channel_code(code):
 def _is_tie(candidate):
     reason = str(candidate.get("placement_reason") or "")
     return any(reason.startswith(p) for p in TIE_REASON_PREFIXES)
+
+
+def channel_as_junction_bond(course_candidates, report=None):
+    """REGRA 75 - hard gate CHANNEL_AS_JUNCTION_BOND: nenhuma canaleta pode
+    exercer funcao de amarracao em encontro L, T ou X.
+
+    Deteccao por FUNCAO, nunca por distancia (uma canaleta pode passar rente a
+    um no' legitimamente):
+      1. peca final com codigo de canaleta carregando razao de peca de no'
+         (L_CORNER/T_INTERSECTION/X_INTERSECTION/CORNER) ou marcada como
+         amarracao convertida;
+      2. peca de travessia sobre o no' (CHANNEL_NODE_CROSSING / NODE_CROSSING);
+      3. registro de conversao de amarracao (tie_conversions) ou de travessia
+         (node_crossings) no laudo do reforco.
+
+    Devolve a lista de violacoes; o resultado aceitavel e' SEMPRE lista vazia.
+    """
+    violations = []
+    canal = set(CHANNEL_LOGICAL_TYPES) | set([TIE_SPLIT_CODE, CROSSING_CODE])
+    for ci in sorted(course_candidates or {}):
+        for cand in (course_candidates or {}).get(ci) or []:
+            code = cand.get("logical_code")
+            reason = str(cand.get("placement_reason") or "")
+            if code not in canal:
+                continue
+            if _is_tie(cand) or cand.get("converted_tie") or reason == "CHANNEL_NODE_CROSSING":
+                violations.append({"kind": "CHANNEL_PIECE_WITH_TIE_ROLE", "course_index": ci,
+                                   "logical_code": code, "placement_reason": reason,
+                                   "wall_idx": cand.get("wall_idx"),
+                                   "node_index": cand.get("node_index")})
+    rep = report or {}
+    for x in rep.get("tie_conversions") or []:
+        violations.append({"kind": "TIE_CONVERTED_TO_CHANNEL", "course_index": x.get("course_index"),
+                           "logical_code": x.get("code"), "mode": x.get("mode"),
+                           "wall_idx": x.get("wall_idx"), "node_index": x.get("node_index")})
+    for x in rep.get("node_crossings") or []:
+        violations.append({"kind": "CHANNEL_CROSSED_NODE_TIE", "course_index": x.get("course_index"),
+                           "wall_idx": x.get("main_wall_idx"),
+                           "incoming_wall_idx": x.get("incoming_wall_idx"),
+                           "node_index": x.get("node_index")})
+    return violations
 
 
 def _along(candidate, wall_dir):
@@ -979,6 +1033,9 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                             return 0
                         return _convert_along_tie(j)
                     if support_cm > policy["cross_tee_when_support_at_most_cm"] + 1e-6:
+                        return 0
+                    if not policy.get("channel_may_cross_node_tie"):
+                        # REGRA 75: nunca atravessar POR CIMA da amarracao do no'.
                         return 0
                     if not str(tie.get("placement_reason") or "").startswith(
                             "T_INTERSECTION_INCOMING"):

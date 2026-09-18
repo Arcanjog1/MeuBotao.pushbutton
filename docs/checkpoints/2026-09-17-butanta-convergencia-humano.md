@@ -29,7 +29,7 @@
     "tools/audit/audit_s74_corpus.py: 40 casos, 40 PASS, 0 FAIL.",
     "Legado (strategy=None) byte-identico e agora auditavel: 8.939 pecas, sha256 3ba22aa08913ac5d..., o mesmo com a flag ligada e desligada.",
     "Determinismo: repetir o solve da geometria identica; permutar a ordem de entrada muda o resultado - comportamento anterior a esta missao.",
-    "Saturacao da tolerancia: 0,05 / 0,10 / 0,30 cm produzem o mesmo conjunto fisico (sha256 0a42e2ec4fee65a4...), com a flag desligada em b152406adb779655..."
+    "Saturacao da tolerancia: 0,05 / 0,10 / 0,30 cm produzem o mesmo conjunto fisico (sha256 320ba395683cc762...), com a flag desligada em c06f91a0b9848681..."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas falha com UnboundLocalError (ctypes) igual em main 55e990d e na base do PR - defeito herdado, desmarcado e nao escondido.",
@@ -956,13 +956,14 @@ Parede 8284580 (chave `W27` no corpus): humano `48 B39 + 12 B34` (60 peças); so
 1 B19`, divergência **3,3**.
 
 Saturação sobre o conjunto físico das 17 fiadas (hash `S74_SNAPSHOT_V1`):
+(re-fotografada em 2026-09-18, pós-regra 75 — ver §7.13)
 
 | tolerância | peças | sha256 do conjunto físico |
 |---|---|---|
-| flag desligada | 8.750 | `b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067` |
-| **0,05 cm** | **8.723** | `0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13` |
-| 0,10 cm | 8.723 | **o mesmo sha256** |
-| 0,30 cm | 8.723 | **o mesmo sha256** |
+| flag desligada | 8.746 | `c06f91a0b984868100ad09b22b8ed612fe8e17124eb23904e909b3fa4369fde6` |
+| **0,05 cm** | **8.719** | `320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05` |
+| 0,10 cm | 8.719 | **o mesmo sha256** |
+| 0,30 cm | 8.719 | **o mesmo sha256** |
 
 Hard gates **0/0/0/0** (colisões · não-modular · sem apoio · invasão de vão) em todos os casos.
 Legado (`strategy=None`) byte-idêntico: **8.939 peças, assinatura `0a2704e4faaf`**. Suíte completa
@@ -1017,6 +1018,65 @@ A maior variação de modelagem medida neste corpus é **0,013251 cm** (comprime
   material apontada; o veredito sobre o corpus novo cabe à **auditoria independente**, que ainda
   não se pronunciou sobre ele. Até lá, o status permanece **SUPPORTED WITH LIMITATIONS**, com o
   smoke de Revit em aberto.
+
+---
+
+## 7.13 REGRA 75 — CANALETA NUNCA É AMARRAÇÃO (2026-09-18)
+
+A revisão visual humana do smoke **revogou** o `HUMAN VISUAL REVIEW: PASS`: no lote
+`20260918-014103` havia canaleta exercendo função de amarração. Estado passou a
+`BLOCKED — CHANNEL BLOCK USED AS JUNCTION BONDING` até esta correção.
+
+**Extensão medida no lote reprovado** (por função, nunca por distância):
+
+| parede | nó | tipo | fiada | canaleta | papel que ela assumiu | peça que deveria amarrar |
+|---|---|---|---|---|---|---|
+| 8284584 × 8284590 | 48 | L | 1 | `CHANNEL_U_34` | peça de canto (conversão `SAME_GEOMETRY`) | B34 `L_CORNER` |
+| 8284502 ← 8284558 | 22 | T | 3 | KV (travessia 51.6) | corpo do B34 da que chega, recuado p/ B19 | B34 `T_INTERSECTION_INCOMING` |
+| 8284502 ← 8284562 | 28 | T | 3 | KV (travessia 51.6) | idem | idem |
+| 8284502 ← 8284558 | 22 | T | 11 | KV (travessia 51.6) | idem | idem |
+| 8284502 ← 8284562 | 28 | T | 11 | KV (travessia 51.6) | idem | idem |
+
+Outros 14 casos de canaleta sobre região de encontro eram **passagem** por encontros
+com paredes fora da seleção de 34 (sem nó no grafo do solver) — cobertura, não
+amarração; o humano tem 52 coberturas equivalentes (31 na cinta da fiada 12).
+
+**Causa-raiz (em projeto, não acidente):** a política CHANNEL de 2026-09-14 convertia
+deliberadamente a peça de amarração em canaleta quando a corrida a sobrepunha
+(`_convert_along_tie`: B34→U34 `SAME_GEOMETRY`, B54→duas canaletas `SPLIT`) e a
+regra 51.6 atravessava o T removendo o corpo do B34 da que chega
+(`_cross`/`_crossing_row` + peça de encosto). Geometria preservada, função de
+amarração perdida.
+
+**Patch mínimo** (ver §75 do REGRAS): `convert_blocking_along_ties=False`,
+`channel_may_cross_node_tie=False` (51.6 **suspensa** — reativação é decisão de
+usuário), validador `channel_as_junction_bond` como **hard gate**
+`CHANNEL_AS_JUNCTION_BOND` (aceitável somente 0), presente no solve, no corpus, no
+runner e no harness de readback do Revit. §72/§74/§66 e o legado **intocados**
+(legado byte-idêntico: 8.939 / `0a2704e4faaf`; assinatura S74 do legado
+`3ba22aa08913ac5d…` idêntica com e sem flag).
+
+**Efeito medido** (bancada): gate 5 → **0**; hard gates 0/0/0/0; 8284580 continua
+`48 B39 + 11 B34 + 1 B19`, div 3,3; nós 24/44/46 seguem cabendo; totais deslocam
+−4 peças (8.723→8.719 na geometria original; 8.710→8.706 na final) porque as
+travessias deixaram de existir; conflitos agora **classificados**
+(`MISSING_REQUIRED_CHANNEL` ×1, `CHANNEL_SUPPORT_LIMITED` +5). O corpus da §74 foi
+re-fotografado pós-75 (saturação preservada: 0,05=0,10=0,30 → `320ba395683c…`).
+
+**Testes:** `tests/test_channel_never_bonds.py` (7) + pares padrão/override em
+`test_channel_reinforcement.py` e `test_channel_audit_fixes.py` — cada mecanismo tem
+um **mutante** que força o comportamento antigo e exige que o gate acuse; a peça
+forjada (K34 no papel de tie) é acusada e volta a zero com a peça certa.
+
+**Conflito registrado para decisão do usuário:** a regra 51.6 (travessia com
+evidência humana, aprovada em 2026-09-14) contradiz a regra 75 pela letra
+("substituição de B34/B54 no encontro"). Suspensa por padrão; os 4 lados afetados
+aparecem como conflito classificado. Reativar (ou não) é decisão de usuário.
+
+**RE-SMOKE NO REVIT: PENDENTE.** O lote `20260918-014103` aberto no Revit é o
+reprovado; a re-execução (purga controlada → reset → runs até convergir → readback
+com `CHANNEL_AS_JUNCTION_BOND=0` → capturas novas dos encontros) só ocorre depois da
+revisão humana da causa e do patch.
 
 ---
 

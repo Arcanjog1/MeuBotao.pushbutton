@@ -15,7 +15,7 @@
   "wall_height_cm": 340.0,
   "extraction_script": "tools/audit/extract_butanta_corpus.py",
   "engine_commit_s74": "2c55211632b96fbe1d3f31e9481df3ec8055cd6f",
-  "repo_commit_at_extraction": "6b0447543f82d0862a56d777a83408f863565002",
+  "repo_commit_at_extraction": "f7c208bc6b2499470646379bb1449f3411f39478",
   "raw_inputs_not_versioned": [
    {
     "file": "target_1pav.clean.json",

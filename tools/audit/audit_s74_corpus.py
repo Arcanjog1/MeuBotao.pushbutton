@@ -63,7 +63,8 @@ CAMPOS_ESPACO = ("room_plus_cm", "room_minus_cm", "room_min_cm", "room_incoming_
 TOL_MEDIDA_CM = 1e-6              # o corpus e o motor tem de bater nesta casa
 TOL_MODULO_CM = 1e-9              # "mesmo modulo" entre caso e controle
 FRONTEIRA_CM = 0.1                # |falta| <= 0,1 cm: onde a modelagem decide o veredito
-GATES_ZERADOS = {"collisions": 0, "non_modular": 0, "unsupported": 0, "opening_invasion": 0}
+GATES_ZERADOS = {"collisions": 0, "non_modular": 0, "unsupported": 0, "opening_invasion": 0,
+                 "channel_as_junction_bond": 0}
 TRANSLACAO_CM = (1234.0, -567.0)
 SATURACAO = (("flag_off", "off"), ("tol_0_05", "on"), ("tol_0_10", "0.10"), ("tol_0_30", "0.30"))
 MOTIVO_RAPIDO = "--rapido: solver completo (cerca de 30 s por configuracao) nao executado"
@@ -359,8 +360,10 @@ def caso_11_hard_gates(rel, B):
     for rotulo, solve_id in (("desligada", "off"), ("ligada", "on")):
         g = S.hard_gates(B.solucao(solve_id))
         rel.caso("11.%s" % solve_id, "hard gates com a flag %s" % rotulo, g == GATES_ZERADOS,
-                 "colisoes %d / nao-modular %d / sem apoio %d / invasao de vao %d" % (
-                     g["collisions"], g["non_modular"], g["unsupported"], g["opening_invasion"]))
+                 "colisoes %d / nao-modular %d / sem apoio %d / invasao de vao %d / "
+                 "canaleta-como-amarracao %d" % (
+                     g["collisions"], g["non_modular"], g["unsupported"], g["opening_invasion"],
+                     g["channel_as_junction_bond"]))
 
 
 def caso_12_saturacao(rel, B):

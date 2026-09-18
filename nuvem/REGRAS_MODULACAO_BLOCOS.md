@@ -9522,12 +9522,16 @@ humano `48 B39 + 12 B34` (60 peças); solver sem a §74 `14 B39 + 51 B34 + 5 C09
 1 B19`, divergência 204,7; solver com a §74 `48 B39 + 11 B34 + 1 B19`, divergência
 3,3. Saturação sobre o conjunto físico das 17 fiadas (hash `S74_SNAPSHOT_V1`):
 
+(Tabela re-fotografada em 2026-09-18, depois da regra 75 — os totais absolutos
+deslocam −4 peças porque as travessias/conversões deixaram de existir; a
+saturação e o delta da §74 permanecem idênticos.)
+
 | tolerância | peças | sha256 do conjunto físico |
 |---|---|---|
-| flag desligada | 8.750 | `b152406adb779655cf0f3d8fcc960f490ba3b8706bac090918de9e3cc3c60067` |
-| **0,05 cm** | **8.723** | `0a42e2ec4fee65a441dd749f5df555ae3be17c54bfd3d652952a803d8328ff13` |
-| 0,10 cm | 8.723 | **o mesmo sha256** |
-| 0,30 cm | 8.723 | **o mesmo sha256** |
+| flag desligada | 8.746 | `c06f91a0b984868100ad09b22b8ed612fe8e17124eb23904e909b3fa4369fde6` |
+| **0,05 cm** | **8.719** | `320ba395683cc76224c565278611c0f401fc334ff81f62e2c5339f18eb46da05` |
+| 0,10 cm | 8.719 | **o mesmo sha256** |
+| 0,30 cm | 8.719 | **o mesmo sha256** |
 
 Hard gates 0/0/0/0 (colisões · não-modular · sem apoio · invasão de vão) em todos os
 casos. Legado (`strategy=None`) **byte-idêntico e agora auditável pelo repositório**: 8.939 peças, `sha256 3ba22aa08913ac5d…` — **o mesmo com a flag ligada e desligada**, porque `strategy=None` não entra no fluxo CHANNEL (casos `legacy_cases` em `snapshot_v1.json`, cobertos por `test_o_legado_e_identico_com_e_sem_a_flag_da_secao_74`). Suíte completa do repo com o corpus: **1.234 passaram, 0
@@ -9546,3 +9550,66 @@ veredito sobre o corpus novo cabe à própria auditoria independente.
 > sem operador para dispensá-lo. Ver `docs/checkpoints/2026-09-17-butanta-convergencia-humano.md`
 > §7.10 para o estado congelado e a sequência exata que falta rodar.
 
+
+## 75. Canaleta NUNCA exerce função de amarração (2026-09-18, IMPLEMENTADO, hard gate)
+
+**Origem.** Revisão visual humana do smoke do PR #42 (2026-09-18). No lote aplicado no
+Revit havia um `CHANNEL_U_34` exercendo a função de peça de canto no nó 48
+(8284584 × 8284590, fiada 1) e quatro travessias de canaleta sobre o nó com a
+amarração da parede que chega recuada para peça de encosto (nós 22 e 28, fiadas 3 e
+11). O veredito `HUMAN VISUAL REVIEW: PASS` foi revogado por isso.
+
+**Regra.**
+
+> **Canaletas nunca podem exercer função de amarração em encontros L, T ou X.**
+> A função de amarração pertence exclusivamente aos blocos estruturais aprovados para o tipo de encontro.
+> Canaletas podem coexistir com o encontro como cinta/verga/contraverga, mas não podem substituir nem assumir a região estrutural reservada à peça de amarração.
+
+Vale para qualquer família de canaleta (`CHANNEL_U_39/34/19/CUT`, códigos `K*`), em
+qualquer papel: posse do nó, peça de amarração, peça transversal, substituição de
+B34/B54, divisão de B54 em canaletas ou travessia por cima da amarração. A restrição
+é de **função/topologia** — proximidade não é critério: uma canaleta pode passar
+rente a um nó, e pode atravessar a região de um encontro em fiada cuja amarração
+pertence à outra família de fiadas (a parede principal é contínua ali; quem amarra
+naquela fiada é a peça da outra parede).
+
+**O que mudou no motor (patch mínimo, 2026-09-18).**
+
+1. `opening_reinforcement.DEFAULT_CHANNEL_POLICY["convert_blocking_along_ties"]`
+   passou de `True` para **`False`**: a corrida de verga/contraverga que esbarra numa
+   peça de amarração **não a converte mais** em canaleta (nem `SAME_GEOMETRY`, nem
+   `SPLIT` de B54). O conflito é **classificado** — `TIE_OVER_SPAN` →
+   `MISSING_REQUIRED_CHANNEL` (`NEEDS_RULE`) — e a amarração fica.
+2. Política nova `"channel_may_cross_node_tie": False`: a travessia da regra 51.6
+   (canaleta atravessa o T removendo o corpo do B34 da parede que chega e recuando-o
+   para peça de encosto) está **SUSPENSA por padrão**, porque substitui amarração por
+   canaleta. A evidência humana da 51.6 (KV sobre o nó quando a jamba está na face do
+   T) permanece registrada na própria política; **reativá-la é decisão de usuário**,
+   nunca do solver. Enquanto suspensa, esses lados aparecem como
+   `CHANNEL_SUPPORT_LIMITED`/`MISSING_REQUIRED_CHANNEL` — conflito reportado, não
+   resolvido.
+3. Validador novo `opening_reinforcement.channel_as_junction_bond(...)`, ligado ao
+   resultado do solve CHANNEL como **hard gate `CHANNEL_AS_JUNCTION_BOND`**
+   (`result["channel_as_junction_bond"]`, aceitável **somente vazio**). Detecção por
+   **função**: (a) peça final com código de canaleta carregando razão de peça de nó
+   ou marca de amarração convertida; (b) peça de travessia sobre o nó; (c) registros
+   `tie_conversions`/`node_crossings` do laudo do reforço. Nunca por distância.
+   O legado (`strategy=None`) não passa pelo reforço e segue byte a byte.
+
+**Extensão medida no lote reprovado** (Revit, lote `20260918-014103`): 1 conversão
+(nó 48) + 4 travessias (nós 22 e 28 × fiadas 3 e 11). Os demais 14 casos de canaleta
+sobre região de encontro eram **passagem** por encontros com paredes fora da seleção
+de 34 (o solver não tem nó ali) — cobertura, não amarração. O projeto humano tem 52
+coberturas equivalentes (31 delas na cinta da fiada 12), o que confirma que o
+critério correto é função, não cobertura.
+
+**Efeito medido do patch** (bancada, geometria do estado final, flag da §74 ligada):
+`CHANNEL_AS_JUNCTION_BOND` 5 → **0**; hard gates continuam 0/0/0/0; parede 8284580
+continua `48 B39 + 11 B34 + 1 B19`, divergência 3,3; nós 24/44/46 da §74 continuam
+cabendo; régua 5.931 → 5.927 (−4 peças de travessia; +5 B34 de amarração restaurada;
+−3 B19 de encosto removido). Conflitos classificados: `MISSING_REQUIRED_CHANNEL` ×1
+e `CHANNEL_SUPPORT_LIMITED` +5. Legado byte-idêntico.
+
+Testes: `tests/test_channel_never_bonds.py` (fixtures T/L, travessia, canaleta fora
+do envelope permitida, mutante que força o comportamento antigo e exige que o gate
+acuse `CHANNEL_AS_JUNCTION_BOND`).
