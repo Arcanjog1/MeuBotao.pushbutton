@@ -944,6 +944,15 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 
     small_sign = _block_smaller_cell_sign(entry)
 
+    if (L_CORNER_OTHER_ARM_OWNS and COMPENSATOR_NEVER_JUNCTION_BOND
+            and b34_ok_a != b34_ok_b):
+        # CANDIDATA D3: a familia do braco sem espaco vai para o outro braco.
+        if not b34_ok_a:
+            wall_a_idx, point_a, dir_a = wall_b_idx, point_b, dir_b
+        else:
+            wall_b_idx, point_b, dir_b = wall_a_idx, point_a, dir_a
+        b34_ok_a = b34_ok_b = True
+
     if b34_ok_a:
         origin_a, x_a = _asymmetric_bond_origin_and_axis(entry, point_a, dir_a, small_sign)
         course_a = _make_block_candidate("B34", entry, "A", origin_a, x_a, "L_CORNER",
@@ -966,6 +975,12 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
             placement_reason="L_CORNER_DEGRADED", nodes=nodes
         )
 
+    if COMPENSATOR_NEVER_JUNCTION_BOND and (course_a is None) != (course_b is None):
+        # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58); a fiada
+        # fica registrada como amarracao faltante, nunca fechada por compensador.
+        return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b,
+                "degraded": True,
+                "missing_bond_courses": ["A"] if course_a is None else ["B"]}
     if course_a is None or course_b is None:
         return {"ok": False,
                 "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L "
@@ -1523,6 +1538,252 @@ CORNER_DEGRADED_TIE_CODES = ("B34",) + CORNER_SINGLE_ELEMENT_CODES
 # amarracao se repete. Junta corrida e' regra #1: nao entra ligada enquanto essa
 # causa nao for tratada. Ver secao 58 de REGRAS_MODULACAO_BLOCOS.md.
 CORNER_DEGRADED_PREFERS_TIE_BLOCK = False
+# REGRA 76 (2026-09-18): COMPENSADOR NUNCA EXERCE FUNCAO DE AMARRACAO.
+# Compensadores (C04/C09) sao pecas de AJUSTE DIMENSIONAL. As escadas de no'
+# degradado abaixo (L, T e X) terminavam em compensador e o designavam PECA DO
+# NO' - o no' era dado como resolvido POR CAUSA do C09. CANDIDATA R76
+# (PENDENTE DE APROVACAO, desligada - medida no BUTANTA: abre buraco em 6
+# regioes de no', nao-modular 0 -> 12, sem apoio 0 -> 4): o compensador sai das
+# escadas, a familia sem bloco de amarracao RECUA (a infraestrutura da secao 58
+# ja' suporta familia sem peca de no') e o no' registra essa fiada em
+# `missing_bond_courses` (MISSING_REQUIRED_JUNCTION_BOND). Sem bloco em NENHUMA
+# das familias o no' falha como sempre falhou. O gate abaixo
+# (`compensator_as_junction_bond`) vale com ou sem esta flag.
+# Compensador perto do no' continua permitido: a regra e' de FUNCAO.
+COMPENSATOR_NEVER_JUNCTION_BOND = False
+COMPENSATOR_BOND_GATE_CODES = ("C04", "C09")
+# CANDIDATA D2 (PENDENTE DE APROVACAO, desligada): B19 como peca de no' quando
+# o B34 nao cabe - e' o que o projeto humano faz nos nos 28 (T) e 47/48 (L) do
+# BUTANTA. CONFLITA com a decisao do usuario de 2026-08-21 ("nunca B19 em
+# encontro", ver CORNER_SINGLE_ELEMENT_CODES): so' liga com decisao explicita.
+JUNCTION_BOND_B19_FALLBACK = False
+# CANDIDATA D3 (PENDENTE DE APROVACAO, desligada): no L, o braco que nao comporta
+# o B34 CEDE a sua familia ao outro braco (o mesmo desfecho do mecanismo aprovado
+# "as duas fiadas na parede nao bloqueada", hoje disparado so' por bloqueio de
+# no' vizinho). Custo conhecido: o canto perde a alternancia naquelas fiadas.
+L_CORNER_OTHER_ARM_OWNS = False
+
+
+# ---- REGRA 76 - validador funcional (somente leitura) ----------------------
+# Pergunta que o gate faz: "este compensador esta' ASSUMINDO a funcao da
+# amarracao?" - nunca "esta' perto da amarracao?". Duas evidencias, por FUNCAO:
+#   1. METADADO: o motor designou o compensador como peca do no' (node_index
+#      do no' + razao da familia L_CORNER/T_INTERSECTION/X_INTERSECTION/CORNER);
+#   2. GEOMETRIA (autoridade): o compensador e' o OCUPANTE da regiao do no' -
+#      a interseccao das faixas de espessura das paredes do encontro, o unico
+#      lugar fisico que so' existe no encontro e onde a peca que amarra
+#      precisa estar. Ocupante = a peca das paredes do no' que cobre a maior
+#      AREA dessa regiao na fiada. Num EMPATE de area o compensador divide a
+#      funcao e e' acusado - o veredito nunca depende do codigo da outra peca.
+# Um compensador ENCOSTADO na amarracao (fora da regiao do no') nao cobre area
+# nenhuma dela e nunca e' acusado - e' o [B54][C09][B39] valido.
+COMPENSATOR_BOND_ROLE_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+_BOND_GATE_NODE_KINDS = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION")
+
+
+def _node_wall_indices(node):
+    walls = set()
+    for w, _e in (node.get("arms") or []):
+        walls.add(w)
+    for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+        if node.get(key) is not None:
+            walls.add(node[key])
+    for w in (node.get("crossing_walls") or ()):
+        if w is not None:
+            walls.add(w)
+    return walls
+
+
+def _clip_half_plane(poly, nx, ny, c):
+    """Sutherland-Hodgman: mantem os pontos com nx*x + ny*y <= c."""
+    out = []
+    n = len(poly)
+    for i in range(n):
+        p = poly[i]
+        q = poly[(i + 1) % n]
+        dp = nx * p[0] + ny * p[1] - c
+        dq = nx * q[0] + ny * q[1] - c
+        if dp <= 0.0:
+            out.append(p)
+        if (dp < 0.0 < dq) or (dq < 0.0 < dp):
+            t = dp / (dp - dq)
+            out.append((p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])))
+    return out
+
+
+def _poly_area(poly):
+    a = 0.0
+    n = len(poly)
+    for i in range(n):
+        x0, y0 = poly[i]
+        x1, y1 = poly[(i + 1) % n]
+        a += x0 * y1 - x1 * y0
+    return abs(a) / 2.0
+
+
+def _node_region_polygon(node, walls_to_create):
+    """Regiao do no' = interseccao das faixas de espessura das paredes do
+    encontro (quadrado no encontro ortogonal). Em pes, no plano XY."""
+    point = node.get("point")
+    if point is None:
+        return None
+    walls = [w for w in sorted(_node_wall_indices(node)) if 0 <= w < len(walls_to_create)]
+    if len(walls) < 2:
+        return None
+    half_max = max(walls_to_create[w][1] for w in walls)
+    r = 4.0 * half_max
+    poly = [(point.X - r, point.Y - r), (point.X + r, point.Y - r),
+            (point.X + r, point.Y + r), (point.X - r, point.Y + r)]
+    for w in walls:
+        line, thickness, _locks = walls_to_create[w]
+        p0 = line.GetEndPoint(0)
+        p1 = line.GetEndPoint(1)
+        dx, dy = p1.X - p0.X, p1.Y - p0.Y
+        length = (dx * dx + dy * dy) ** 0.5
+        if length <= 0.0:
+            return None
+        nx, ny = -dy / length, dx / length
+        c0 = nx * p0.X + ny * p0.Y
+        half = thickness / 2.0
+        poly = _clip_half_plane(poly, nx, ny, c0 + half)
+        if not poly:
+            return None
+        poly = _clip_half_plane(poly, -nx, -ny, -(c0 - half))
+        if not poly:
+            return None
+    return poly
+
+
+def _candidate_polygon(candidate):
+    o = candidate["origin_world"]
+    xd = candidate["x_dir"]
+    yd = candidate["y_dir"]
+    hl = _cm_to_ft(float(candidate["length_cm"])) / 2.0
+    hw = _cm_to_ft(float(candidate.get("width_cm") or 0.0)) / 2.0
+    return [(o.X + sx * hl * xd.X + sy * hw * yd.X, o.Y + sx * hl * xd.Y + sy * hw * yd.Y)
+            for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+
+
+def _convex_overlap_area(subject, convex):
+    """Area de `subject` recortado pelo poligono convexo `convex` (anti-horario
+    ou horario - a orientacao e' detectada)."""
+    n = len(convex)
+    sign = 1.0 if sum(convex[i][0] * convex[(i + 1) % n][1] - convex[(i + 1) % n][0] * convex[i][1]
+                      for i in range(n)) > 0 else -1.0
+    poly = list(subject)
+    for i in range(n):
+        ax, ay = convex[i]
+        bx, by = convex[(i + 1) % n]
+        # lado de dentro: esquerda da aresta (anti-horario)
+        nx, ny = sign * (by - ay), sign * -(bx - ax)
+        poly = _clip_half_plane(poly, nx, ny, nx * ax + ny * ay)
+        if not poly:
+            return 0.0
+    return _poly_area(poly)
+
+
+def _bbox(poly):
+    xs = [p[0] for p in poly]
+    ys = [p[1] for p in poly]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def compensator_as_junction_bond(course_candidates, nodes, walls_to_create):
+    """REGRA 76 - hard gate COMPENSATOR_AS_JUNCTION_BOND (aceitavel: vazio).
+
+    Devolve uma violacao por (fiada, compensador) que assume a funcao de
+    amarracao de um encontro L/T/X - por METADADO (designado peca do no') e/ou
+    por GEOMETRIA (ocupante da regiao do no'). `occupied_nodes` lista TODOS os
+    nos cuja regiao o compensador ocupa naquela fiada; `node_index`/`coverage`
+    sao os do no' designado, ou do no' em que ele cobre mais. Somente leitura."""
+    regions = {}
+    for ni, node in enumerate(nodes or []):
+        if node.get("kind") not in _BOND_GATE_NODE_KINDS:
+            continue
+        poly = _node_region_polygon(node, walls_to_create)
+        if not poly:
+            continue
+        area = _poly_area(poly)
+        if area <= 0.0:
+            continue
+        regions[ni] = (poly, area, _node_wall_indices(node), _bbox(poly))
+
+    def _record(violations, ci, cand, ni):
+        return violations.setdefault((ci, id(cand)), {
+            "course_index": ci, "node_index": ni,
+            "node_kind": (nodes[ni].get("kind") if nodes and ni is not None and 0 <= ni < len(nodes)
+                          else None),
+            "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+            "placement_reason": str(cand.get("placement_reason") or ""), "evidence": [],
+            "coverage": None, "occupied_nodes": [],
+            "origin_cm": [round(_ft_to_cm(cand["origin_world"].X), 3),
+                          round(_ft_to_cm(cand["origin_world"].Y), 3)]})
+
+    violations = {}
+    for ci in sorted(course_candidates or {}):
+        pieces = (course_candidates or {}).get(ci) or []
+        for cand in pieces:
+            if cand.get("logical_code") not in COMPENSATOR_BOND_GATE_CODES:
+                continue
+            reason = str(cand.get("placement_reason") or "")
+            ni = cand.get("node_index")
+            if ni is not None and any(reason.startswith(p) for p in COMPENSATOR_BOND_ROLE_PREFIXES):
+                rec = _record(violations, ci, cand, ni)
+                if "DESIGNATED_NODE_PIECE" not in rec["evidence"]:
+                    rec["evidence"].append("DESIGNATED_NODE_PIECE")
+        for ni in sorted(regions):
+            poly, area, wall_set, box = regions[ni]
+            covers = []
+            for cand in pieces:
+                if cand.get("wall_idx") not in wall_set:
+                    continue
+                cpoly = _candidate_polygon(cand)
+                cb = _bbox(cpoly)
+                if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+                    continue
+                ov = _convex_overlap_area(cpoly, poly)
+                if ov <= area * 1e-6:
+                    continue
+                covers.append((round(ov / area, 9), cand))
+            if not covers:
+                continue
+            top = max(c for c, _cand in covers)
+            for frac, cand in covers:
+                if frac < top or cand.get("logical_code") not in COMPENSATOR_BOND_GATE_CODES:
+                    continue
+                rec = _record(violations, ci, cand, ni)
+                if "OCCUPIES_NODE_REGION" not in rec["evidence"]:
+                    rec["evidence"].append("OCCUPIES_NODE_REGION")
+                rec["occupied_nodes"].append({"node_index": ni, "node_kind": nodes[ni].get("kind"),
+                                              "coverage": round(frac, 4)})
+    for rec in violations.values():
+        occ = rec["occupied_nodes"]
+        if not occ:
+            continue
+        same = [o for o in occ if o["node_index"] == rec["node_index"]]
+        if "DESIGNATED_NODE_PIECE" in rec["evidence"] and same:
+            main = same[0]
+        elif "DESIGNATED_NODE_PIECE" in rec["evidence"]:
+            main = None
+        else:
+            main = sorted(occ, key=lambda o: (-o["coverage"], o["node_index"]))[0]
+        if main is not None:
+            rec["node_index"] = main["node_index"]
+            rec["node_kind"] = main["node_kind"]
+            rec["coverage"] = main["coverage"]
+    return sorted(violations.values(),
+                  key=lambda v: (v["course_index"], v["node_index"] if v["node_index"] is not None else -1,
+                                 v["origin_cm"][0], v["origin_cm"][1]))
+
+
+def _bond_ladder(codes):
+    """A escada de peca de no' sem compensador quando a regra 76 vale."""
+    if not COMPENSATOR_NEVER_JUNCTION_BOND:
+        return codes
+    sem_comp = tuple(c for c in codes if c not in COMPENSATOR_BOND_GATE_CODES)
+    if JUNCTION_BOND_B19_FALLBACK and "B19" not in sem_comp:
+        sem_comp = sem_comp + ("B19",)
+    return sem_comp
 # Com bloco de amarracao, a familia oposta recebe a peca CURTA: cobre as duas
 # fiadas e deixa as faces em posicoes diferentes. Deixar a familia oposta vazia
 # e' pior (o preenchimento dela refaz a mesma face: TP1 V1 16 -> 72).
@@ -1573,6 +1834,7 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
     if codes is None:
         codes = (CORNER_DEGRADED_TIE_CODES if CORNER_DEGRADED_PREFERS_TIE_BLOCK
                  else CORNER_SINGLE_ELEMENT_CODES)
+    codes = _bond_ladder(codes)   # REGRA 76
     best_code = None
     for code in codes:
         entry = catalog.get(code)
@@ -1729,6 +1991,11 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
                 catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
                 placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes,
                 codes=CORNER_SINGLE_ELEMENT_CODES)
+        if COMPENSATOR_NEVER_JUNCTION_BOND and (single_a is None) != (single_b is None):
+            # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58).
+            return {"ok": True, "reason": None, "course_a": single_a, "course_b": single_b,
+                    "degraded": True,
+                    "missing_bond_courses": ["A"] if single_a is None else ["B"]}
         if single_a is None or single_b is None:
             return {"ok": False,
                     "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem "
@@ -1824,7 +2091,7 @@ def _x_intersection_centered_candidate(catalog, point, x_dir, room_ft, course, w
     exatamente -1cm no trecho seguinte. Por isso o teste e'
     `half_len_ft + BLOCK_JOINT_CM(em ft) <= room_ft`, nao so' `half_len_ft`."""
     joint_ft = _cm_to_ft(BLOCK_JOINT_CM)
-    for code in X_INTERSECTION_DEGRADED_CODES:
+    for code in _bond_ladder(X_INTERSECTION_DEGRADED_CODES):   # REGRA 76
         entry = catalog.get(code)
         if entry is None or not entry.get("length_cm"):
             continue
@@ -1914,6 +2181,11 @@ def solve_x_intersection(node, walls_to_create, catalog, node_index=None,
             catalog, point, dir_b, min(room_plus_b, room_minus_b), "B", wall_b_idx, wall_a_idx,
             node_index, "X_INTERSECTION_DEGRADED")
 
+    if COMPENSATOR_NEVER_JUNCTION_BOND and (course_a is None) != (course_b is None):
+        # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58).
+        return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b,
+                "degraded": True,
+                "missing_bond_courses": ["A"] if course_a is None else ["B"]}
     if course_a is None or course_b is None:
         return {"ok": False,
                 "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X "

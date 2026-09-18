@@ -3756,6 +3756,10 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
          _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
     if isinstance(result, dict):
+        # REGRA 76 - hard gate: compensador nunca exerce funcao de amarracao.
+        # Somente leitura; so' no fluxo com estrategia de reforco.
+        result["compensator_as_junction_bond"] = _stepper_memo.compensator_as_junction_bond(
+            result.get("course_candidates"), nodes, walls_to_create)
         result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
         result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
         result["channel_repair_prefer_clean"] = bool(CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
@@ -3851,7 +3855,8 @@ def _micro_adjust_cluster(wall_idx, nodes, wall_count):
     return sorted(w for w in out if 0 <= w < wall_count)
 
 
-def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, band, wall_idx):
+def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, band, wall_idx,
+                          nodes=None):
     """(portoes duros, qualidade) de um solve - a ordem da secao 66."""
     from core.engine import opening_micro_adjust as _micro
     from core.engine import physical_support as _support
@@ -3865,6 +3870,15 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
                                                           openings_per_wall, band))}
     preflight = result.get("beta_preflight") or {}
     gates["abertura_violada"] = len(preflight.get("opening_violations") or [])
+    # REGRA 76: um deslocamento que faca um compensador assumir a funcao de
+    # amarracao PIORA este portao e e' rejeitado por `_worse_gates` - offset
+    # INVALIDO, nao so' penalizado.
+    if result.get("compensator_as_junction_bond") is not None:
+        gates["COMPENSATOR_AS_JUNCTION_BOND"] = len(result["compensator_as_junction_bond"])
+    elif nodes is not None:
+        from core.engine import wall_stepper as _bond_gate
+        gates["COMPENSATOR_AS_JUNCTION_BOND"] = len(_bond_gate.compensator_as_junction_bond(
+            course_candidates, nodes, walls_to_create))
     audits = result.get("wall_bond_audits") or []
     if isinstance(audits, dict):
         audits = list(audits.values())
@@ -3951,7 +3965,7 @@ def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings
         if not isinstance(local, dict) or local.get("error") is not None:
             return None
         measured = _micro_adjust_measure(local, sub_walls, sub_openings, catalog, band,
-                                         cluster.index(wall_idx))
+                                         cluster.index(wall_idx), nodes=sub_nodes)
         cache[key] = measured
         return measured
 
