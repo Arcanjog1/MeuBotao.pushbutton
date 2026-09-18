@@ -41,7 +41,8 @@
     "Regra 76.1: test_missing_required_junction_bond 131, test_compensator_never_bonds 109 (com oraculo independente em grade), test_regra761_revisao_do_gate 15, test_regra76_corpus_butanta 12, test_regra76_d1_t_degradado 7.",
     "Canaleta consumindo o compensador nao resolvido (achado da revisao): 88/1.440 casos dirigidos antes da correcao; depois 0/1.440, 0/192 e 0/800 casos aleatorios - fixado em regressao.",
     "Auditoria do corpus da secao 74 (tools/audit/audit_s74_corpus.py): 41/41 PASS.",
-    "Legado byte-identico: strategy=None sha S74 3ba22aa08913... sem as chaves novas."
+    "Legado byte-identico: strategy=None sha S74 3ba22aa08913... sem as chaves novas.",
+    "Reverificacao final (2 agentes independentes, somente leitura): os 7 achados da revisao corrigidos, com controle negativo; conformidade com a decisao do usuario OK em todos os itens; 6 mutantes do gate pegos."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
@@ -49,7 +50,10 @@
     "Limites do gate: T nao ortogonal vai para revisao (peca de ponta reta nao cobre o losango); no' AMBIGUOUS nao e' auditado. Nenhum no BUTANTA.",
     "Humano: 8 compensadores DEITADOS (C09D/C09DH) em regiao de no' - registro, fora do escopo.",
     "O lote 20260918-014103 aberto no Revit continua sendo o REPROVADO; re-smoke no Revit PENDENTE.",
-    "Conflito registrado: regra 51.6 x regra 75 (secao 7.13) - inalterado."
+    "Conflito registrado: regra 51.6 x regra 75 (secao 7.13) - inalterado.",
+    "Gate MISSING (classificacao, nunca pecas): a mais de ~700 m da origem interna o ruido de ponto flutuante gera falso BOND_PIECE_PARTIAL (BUTANTA transladada 3 km: 6 -> 183). BUTANTA (<=33 m) e TORRE (<=99 m) nao afetadas. Nao corrigido nesta rodada (motor congelado).",
+    "Gate MISSING: trecho non_modular SEM_ESPACO invertido (pilar negativo) marca amarracao intacta como BOND_PIECE_NON_MODULAR (acusa a mais). So' ocorre com non_modular > 0, que ja' reprova portao duro; BUTANTA tem 0. Nao corrigido nesta rodada.",
+    "MISSING_REQUIRED_JUNCTION_BOND fica no resultado e no microajuste; nao aparece na interface do Revit nem bloqueia a criacao (mesmo nivel do gate da regra 76) - o smoke final le o gate no resultado."
   ],
   "physical_deltas": [
     "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
@@ -1277,6 +1281,20 @@ nó marcada "NÃO RESOLVIDO — peça funcional de amarração não cabe" (no 47
 ocupa 25% da região); exemplos válidos 06–08 no motor final; folha `00_RESUMO_A_B_C.png`
 (A corrigido 22/30, B válido 06/07/08, C não resolvido 28/47/48).
 Capturas no Revit: **PENDENTES** (smoke final).
+
+**Reverificação final** (2 agentes independentes, somente leitura, depois dos commits do motor):
+os 7 achados da revisão estão corrigidos — com controle negativo: sem a correção da posição de nó,
+12/192 casos voltam a mudar de física; com ela, 0. Física idêntica com a 76.1 ligada e desligada em
+1.632 casos dirigidos e 1.200 aleatórios (paredes de 14 e 19). Conformidade com a decisão do usuário:
+OK em todos os itens (sem id no motor, sem distância, golden só com as contagens novas, legado e
+§72/§74 intactos, nenhuma regra nova de canaleta, 6 mutantes do gate pegos).
+
+**Limites novos registrados (não corrigidos — motor congelado nesta rodada; só classificação, nunca
+peças; nenhum afeta o BUTANTÃ):** (1) a mais de ~700 m da origem interna o ruído de ponto flutuante
+gera falso `BOND_PIECE_PARTIAL` — medir em coordenadas locais ao nó resolve; (2) trecho `non_modular`
+`SEM_ESPACO` invertido (pilar negativo) marca amarração intacta como `BOND_PIECE_NON_MODULAR` — só
+ocorre com `non_modular > 0`, que já reprova portão duro. Menores: `unsupported_pieces` calculado duas
+vezes no microajuste legado; teste do pilar_34 aceita `BOND_PIECE_UNSUPPORTED` sem fixar as fiadas.
 
 ---
 

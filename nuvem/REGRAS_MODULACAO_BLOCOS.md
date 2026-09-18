@@ -9794,3 +9794,15 @@ Testes: `tests/test_missing_required_junction_bond.py` (A–F do usuário e mais
 `tests/test_compensator_never_bonds.py` reescrito na semântica nova (109, com oráculo
 independente em grade), `tests/test_regra761_revisao_do_gate.py` (os achados da revisão, 15),
 `tests/test_regra76_corpus_butanta.py` (12) e `tests/test_regra76_d1_t_degradado.py` (7).
+
+### 76.1.1 Limites do gate encontrados na reverificação (2026-09-18, REGISTRADOS, não corrigidos)
+
+Só classificação — nenhuma peça muda — e nenhum afeta o BUTANTÃ:
+
+- **Coordenadas longe da origem interna (> ~700 m):** a cobertura exata compara áreas calculadas em
+  coordenadas absolutas com tolerância relativa de 1e-9; o ruído de ponto flutuante gera falso
+  `BOND_PIECE_PARTIAL` (BUTANTÃ transladado 3 km: 6 → 183). Correção prevista: medir em coordenadas
+  locais ao nó.
+- **Trecho `non_modular` `SEM_ESPACO` invertido (pilar negativo):** normalizado por min/max, cai sobre a
+  amarração e a marca como `BOND_PIECE_NON_MODULAR` (acusa a mais). Só ocorre com `non_modular > 0`,
+  que já reprova portão duro.
