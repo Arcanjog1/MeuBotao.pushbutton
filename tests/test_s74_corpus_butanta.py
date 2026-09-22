@@ -56,19 +56,23 @@ def _solve(rotulo, geo=None):
     cache = _solve.__dict__.setdefault("cache", {})
     if rotulo not in cache:
         alvo = geo if geo is not None else GEO
+        # Todos os casos deste arquivo sao HISTORICOS (anteriores a' secao 77):
+        # medidos com o papel por fiada DESLIGADO, que reproduz o motor anterior
+        # byte a byte. A secao 77 tem os proprios casos (`course_aware_cases`).
+        pre77 = dict(papel_por_fiada=False)
         if rotulo in ("off", "variante_off"):
-            cache[rotulo] = S.solve_on_fresh_context(alvo, False)
+            cache[rotulo] = S.solve_on_fresh_context(alvo, False, **pre77)
         elif rotulo in ("on", "variante_on"):
-            cache[rotulo] = S.solve_on_fresh_context(alvo, True)
+            cache[rotulo] = S.solve_on_fresh_context(alvo, True, **pre77)
         elif rotulo == "pre_regra76":
             cache[rotulo] = S.solve_on_fresh_context(alvo, False, regra76_d1=False,
-                                                     regra76_nao_resolvido=False)
+                                                     regra76_nao_resolvido=False, **pre77)
         elif rotulo.startswith("legado_"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
-                                                     strategy=None)
+                                                     strategy=None, **pre77)
         else:
             with S.forced_tolerance_cm(float(rotulo)):
-                cache[rotulo] = S.solve_on_fresh_context(alvo, True)
+                cache[rotulo] = S.solve_on_fresh_context(alvo, True, **pre77)
     return cache[rotulo]
 
 
@@ -423,6 +427,37 @@ def test_o_legado_e_identico_com_e_sem_a_flag_da_secao_74():
     assert len(vistos) == 1, "o legado mudou com a flag - a secao 74 vazou para fora do CHANNEL"
     principais = dict((c["label"], c["sha256"]) for c in SNAP["cases"])
     assert vistos.pop() not in principais.values(), "legado e CHANNEL nao podem coincidir"
+
+
+# ============ 11.1 secao 77: variante NOVA, sem sobrescrever o historico
+@pytest.mark.slow
+def test_a_secao_77_e_uma_variante_nova_do_snapshot_e_o_historico_continua_intacto():
+    """`course_aware_cases`: o mesmo motor medido com a flag da secao 77 OFF e
+    ON, nas duas geometrias. OFF reproduz os casos historicos (tol_0_05); ON e'
+    a variante nova. Nenhum caso historico foi substituido."""
+    casos = SNAP.get("course_aware_cases") or []
+    assert len(casos) == 4, "o corpus precisa trazer OFF e ON para as duas geometrias"
+    historico = dict((c["label"], c["sha256"]) for c in SNAP["cases"])
+    historico_v = dict((c["label"], c["sha256"]) for c in SNAP.get("opening_variant_cases") or [])
+    for caso in casos:
+        geo = GEO if caso["variant"] == "original" else S.with_opening_variant(GEO, caso["variant"])
+        ctx, res = S.solve_on_fresh_context(geo, True, papel_por_fiada=bool(caso["flag_value"]))
+        linhas = S.normalized_snapshot(ctx, res)
+        assert S.snapshot_sha256(linhas) == caso["sha256"], caso["label"]
+        assert len(linhas) == caso["pieces"], caso["label"]
+        assert S.hard_gates(res) == caso["hard_gates"], caso["label"]
+        assert len(res["compensator_as_junction_bond"]) == caso["compensator_as_junction_bond"]
+        assert sorted([m["node_index"], m["course_index"]]
+                      for m in res["missing_required_junction_bond"]) == caso["missing"], caso["label"]
+        ref = historico if caso["variant"] == "original" else historico_v
+        if not caso["flag_value"]:
+            assert caso["sha256"] == ref["tol_0_05"], "OFF tem de reproduzir o historico"
+        else:
+            assert caso["sha256"] != ref["tol_0_05"], "ON e' fisicamente outra variante"
+            assert caso["missing"] == [[47, 2], [47, 4], [48, 3]]
+            assert caso["no_functional_junction"] == [[28, c] for c in range(4, 11)]
+    assert historico["tol_0_05"] == "16a7ffa992be7cb2a22026fab5eca716a3e88ccb15c0f24bcbbf448fc2014b1f"
+    assert historico_v["tol_0_05"] == "03127688684219ce73c8440c4e758682ec5f04b84391aea9a7bfd79081945ed4"
 
 
 # ================== 12. o inventario do acervo aponta para ESTES arquivos

@@ -472,7 +472,10 @@ class _Wall(object):
                  ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=()):
         self.wall_idx = wall_idx
         self.tol = tol_cm
-        self.ties = list(ties or [])
+        # SECAO 77: `ties` pode vir por fiada ({fiada: [t_cm]}) quando um no'
+        # da parede nao e' encontro em alguma fiada
+        self.ties_by_course = ties if isinstance(ties, dict) else None
+        self.ties = [] if isinstance(ties, dict) else list(ties or [])
         self.half_code = half_code
         self.half_tie_gap = half_tie_gap_cm
         self.fill_codes = sorted(fill_codes or ())
@@ -563,6 +566,15 @@ class _Wall(object):
                     self.template[s.code] = s.copy()
 
     # ------------------------------------------------------------ custo
+    def _half_near_ties(self, slots, f):
+        """HALF_BLOCK_NEAR_TIE da familia `f`: por fiada quando as posicoes de
+        amarracao dependem da fiada (secao 77), senao a conta de sempre."""
+        if self.ties_by_course is None:
+            return _half_blocks_near_ties(slots, self.ties, self.half_code, self.half_tie_gap) * self.count[f]
+        return sum(_half_blocks_near_ties(slots, self.ties_by_course.get(c) or [], self.half_code,
+                                          self.half_tie_gap)
+                   for c in sorted(self.course_fam) if self.course_fam[c] == f)
+
     def _window(self, f, run):
         slots = self.fam[f]
         return (slots[run[0]].lo - WINDOW_PAD_CM, slots[run[-1]].hi + WINDOW_PAD_CM)
@@ -585,7 +597,7 @@ class _Wall(object):
                 co += k * _coincident(faces_f, _internal_faces(self.fam[other], self.length, self.edges, wider))
         near = list(_in_window(self.fam[f], window[0], window[1]))
         cp = _compensator_guard(near, self.length) * self.count[f]
-        ht = _half_blocks_near_ties(near, self.ties, self.half_code, self.half_tie_gap) * self.count[f]
+        ht = self._half_near_ties(near, f)
         # extremo da parede: olha a fileira inteira (a janela pode nao conter a ponta)
         ex = _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
         return v, co, cp, ht, ex
@@ -605,7 +617,7 @@ class _Wall(object):
         for f in self.fam:
             cp += _compensator_guard(self.fam[f], self.length) * self.count[f]
             ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
-            ht += _half_blocks_near_ties(self.fam[f], self.ties, self.half_code, self.half_tie_gap) * self.count[f]
+            ht += self._half_near_ties(self.fam[f], f)
         return {"violations": v, "coincident_faces": co, "compensator_guard": cp,
                 "long_compensator_extremes": ex, "half_block_near_tie": ht,
                 "stacked_joints": _stacks(self.fam, self.course_fam, self.length, self.edges)}

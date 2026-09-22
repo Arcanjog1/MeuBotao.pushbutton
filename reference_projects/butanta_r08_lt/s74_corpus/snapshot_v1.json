@@ -218,5 +218,284 @@
     "channel_as_junction_bond": 0
    }
   }
- ]
+ ],
+ "course_aware_cases": [
+  {
+   "variant": "original",
+   "label": "course_aware_off",
+   "flag": "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
+   "flag_value": false,
+   "pieces": 8709,
+   "sha256": "16a7ffa992be7cb2a22026fab5eca716a3e88ccb15c0f24bcbbf448fc2014b1f",
+   "ruler_pieces": 5930,
+   "ruler_codes": {
+    "B34": 1527,
+    "B54": 184,
+    "B39": 3196,
+    "C04": 147,
+    "C09": 236,
+    "B19": 336,
+    "K39": 267,
+    "K34": 37
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 6,
+   "missing": [
+    [
+     28,
+     5
+    ],
+    [
+     28,
+     7
+    ],
+    [
+     28,
+     9
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     47,
+     4
+    ],
+    [
+     48,
+     3
+    ]
+   ],
+   "junction_bond_audit": {
+    "checked": 844,
+    "valid": 838,
+    "not_required": 6
+   },
+   "no_functional_junction": []
+  },
+  {
+   "variant": "original",
+   "label": "course_aware_on",
+   "flag": "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
+   "flag_value": true,
+   "pieces": 8706,
+   "sha256": "b7f41fb9d54ee89588d6704890cf615dbbef50ebfe54e17db066a043fea27ded",
+   "ruler_pieces": 5927,
+   "ruler_codes": {
+    "B34": 1505,
+    "B54": 184,
+    "B39": 3214,
+    "C04": 147,
+    "C09": 233,
+    "B19": 340,
+    "K39": 267,
+    "K34": 37
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 3,
+   "missing": [
+    [
+     47,
+     2
+    ],
+    [
+     47,
+     4
+    ],
+    [
+     48,
+     3
+    ]
+   ],
+   "junction_bond_audit": {
+    "checked": 837,
+    "valid": 834,
+    "not_required": 13
+   },
+   "no_functional_junction": [
+    [
+     28,
+     4
+    ],
+    [
+     28,
+     5
+    ],
+    [
+     28,
+     6
+    ],
+    [
+     28,
+     7
+    ],
+    [
+     28,
+     8
+    ],
+    [
+     28,
+     9
+    ],
+    [
+     28,
+     10
+    ]
+   ]
+  },
+  {
+   "variant": "post_micro_adjustment_s66",
+   "label": "course_aware_off",
+   "flag": "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
+   "flag_value": false,
+   "pieces": 8696,
+   "sha256": "03127688684219ce73c8440c4e758682ec5f04b84391aea9a7bfd79081945ed4",
+   "ruler_pieces": 5917,
+   "ruler_codes": {
+    "B34": 1513,
+    "B54": 184,
+    "B39": 3210,
+    "C04": 148,
+    "C09": 212,
+    "B19": 345,
+    "K39": 267,
+    "K34": 36,
+    "KV": 2
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 6,
+   "missing": [
+    [
+     28,
+     5
+    ],
+    [
+     28,
+     7
+    ],
+    [
+     28,
+     9
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     47,
+     4
+    ],
+    [
+     48,
+     3
+    ]
+   ],
+   "junction_bond_audit": {
+    "checked": 844,
+    "valid": 838,
+    "not_required": 6
+   },
+   "no_functional_junction": []
+  },
+  {
+   "variant": "post_micro_adjustment_s66",
+   "label": "course_aware_on",
+   "flag": "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
+   "flag_value": true,
+   "pieces": 8693,
+   "sha256": "22980c8cbef547aaa4826a7e6f78199e52c82746952050129a747179dfc9482e",
+   "ruler_pieces": 5914,
+   "ruler_codes": {
+    "B34": 1491,
+    "B54": 184,
+    "B39": 3228,
+    "C04": 148,
+    "C09": 209,
+    "B19": 349,
+    "K39": 267,
+    "K34": 36,
+    "KV": 2
+   },
+   "hard_gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": 0,
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0
+   },
+   "compensator_as_junction_bond": 0,
+   "missing_required_junction_bond": 3,
+   "missing": [
+    [
+     47,
+     2
+    ],
+    [
+     47,
+     4
+    ],
+    [
+     48,
+     3
+    ]
+   ],
+   "junction_bond_audit": {
+    "checked": 837,
+    "valid": 834,
+    "not_required": 13
+   },
+   "no_functional_junction": [
+    [
+     28,
+     4
+    ],
+    [
+     28,
+     5
+    ],
+    [
+     28,
+     6
+    ],
+    [
+     28,
+     7
+    ],
+    [
+     28,
+     8
+    ],
+    [
+     28,
+     9
+    ],
+    [
+     28,
+     10
+    ]
+   ]
+  }
+ ],
+ "course_aware_note": "Secao 77 (2026-09-22): papel funcional do encontro por fiada. Os casos `cases`, `opening_variant_cases` e `legacy_cases` sao HISTORICOS (motor anterior a' secao 77) e continuam reproduziveis com CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED=False; `course_aware_cases` e' a nova variante, medida com a flag OFF e ON no mesmo motor. Nenhum caso historico foi sobrescrito."
 }

@@ -3463,15 +3463,29 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
                                       prior_course_joints, band_of_course)
             if CROSS_BAND_JOINT_PROPAGATION_ENABLED else None
         )
-        result = solve_building_blocks(
-            nodes, walls_to_create, end_to_node, filtered_openings, catalog,
-            allow_compensators=allow_compensators, base_z_abs=base_z_abs,
-            variants_per_course=variants_per_course,
-            opening_strategy=opening_strategy,
-            progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-            stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
-        )
-        bands.append({"course_indices": list(course_indices), "result": result})
+        # SECAO 77: nos SEM encontro funcional em todas as fiadas desta banda
+        # (papel constante na banda - as bandas sao definidas pelas mesmas
+        # aberturas ativas que definem o papel)
+        from core.engine import wall_stepper as _stepper_band
+        saved_band_roles = _stepper_band.JUNCTION_BAND_ROLES
+        band_roles = _stepper_band.junction_band_roles(_stepper_band.JUNCTION_ROLE_TABLE, course_indices, nodes)
+        _stepper_band.JUNCTION_BAND_ROLES = band_roles
+        try:
+            result = solve_building_blocks(
+                nodes, walls_to_create, end_to_node, filtered_openings, catalog,
+                allow_compensators=allow_compensators, base_z_abs=base_z_abs,
+                variants_per_course=variants_per_course,
+                opening_strategy=opening_strategy,
+                progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+                stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
+            )
+        finally:
+            _stepper_band.JUNCTION_BAND_ROLES = saved_band_roles
+        band_entry = {"course_indices": list(course_indices), "result": result}
+        if band_roles:
+            band_entry["junction_roles_without_bond"] = sorted(
+                (ni, r.get("effective_role"), r.get("free_end_wall")) for ni, r in band_roles.items())
+        bands.append(band_entry)
         for course_index in course_indices:
             letter = "A" if course_index % 2 == 0 else "B"
             # Secao 11.7: dentro da familia (par/impar), qual das
@@ -3738,6 +3752,18 @@ CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
 # T_ROOM_PHYSICAL_TOLERANCE. Legado (`strategy=None`) nao passa por aqui.
 CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = True
 
+# SECAO 77 (2026-09-22): PAPEL FUNCIONAL DO ENCONTRO POR FIADA. A topologia
+# base do no' (T/L/X em planta) continua valendo; o papel EFETIVO e' avaliado
+# por fiada/banda com as aberturas ativas naquela altura (core/engine/
+# junction_role.py). Fiada em que uma abertura ativa consumiu a parede
+# principal do T dos dois lados (nenhum braco solido alem da regiao do no')
+# -> NAO existe T funcional ali: a parede que chega termina como PONTA LIVRE
+# na face da principal, pelas regras normais de termino, e a fiada sai do
+# denominador do gate MISSING_REQUIRED_JUNCTION_BOND (NO_FUNCTIONAL_JUNCTION).
+# Acima/abaixo das aberturas o T volta sozinho. Flag propria, so' CHANNEL;
+# OFF reproduz o motor anterior a esta secao (snapshots historicos).
+CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -3760,6 +3786,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
     saved_degraded_l_contact = _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT
     saved_undesignated = _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED
+    saved_role_by_course = _stepper_memo.JUNCTION_ROLE_BY_COURSE
+    if CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+        _stepper_memo.JUNCTION_ROLE_BY_COURSE = True   # SECAO 77
     if CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED:
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = True   # REGRA 76
     if CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED:
@@ -3781,6 +3810,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = saved_degraded_l_contact
         _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = saved_undesignated
+        _stepper_memo.JUNCTION_ROLE_BY_COURSE = saved_role_by_course
     if isinstance(result, dict):
         # REGRA 76 - hard gate: compensador nunca DESIGNADO amarracao.
         # REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND: fiada de no' sem peca de
@@ -3794,6 +3824,33 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         result["missing_required_junction_bond"] = audit["missing"]
         result["junction_bond_audit"] = {"checked": audit["checked"], "valid": audit["valid"],
                                          "not_required": audit["not_required"]}
+        # SECAO 77 - relatorio: fiadas-no' sem encontro funcional (papel
+        # recalculado pela geometria na auditoria)
+        result["junction_role_by_course"] = {
+            "enabled": bool(CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED),
+            "no_functional_junction": [(x["node_index"], x["course_index"], x.get("effective_role"),
+                                        x.get("free_end_wall"))
+                                       for x in audit["not_required"]
+                                       if x.get("reason") == _stepper_memo.NO_FUNCTIONAL_JUNCTION_REASON],
+            "free_end_not_composed": [(x["node_index"], x["course_index"]) for x in audit["missing"]
+                                      if x.get("reason") == "FREE_END_NOT_COMPOSED"]}
+        if CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+            # tabela compacta (papel efetivo por no' x fiada) e a contagem das
+            # flags de diagnostico, para chamadores externos e para o relatorio
+            tabela = _junction_roles_for_audit(nodes, walls_to_create, _effective_solve_openings(
+                nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                (result.get("opening_reinforcement") or {}).get("free_to_top"),
+                kwargs.get("opening_reinforcement_policy")), catalog, base_z_abs, num_courses) or {}
+            flags = {}
+            for r in tabela.values():
+                for f in r.get("stub_flags") or ():
+                    k = str(f).split(":")[0]
+                    flags[k] = flags.get(k, 0) + 1
+            result["junction_role_by_course"]["roles"] = dict(
+                ("%d:%d" % k, {"effective_role": r.get("effective_role"), "reason": r.get("reason"),
+                               "free_end_wall": r.get("free_end_wall"), "changed": bool(r.get("changed"))})
+                for k, r in tabela.items())
+            result["junction_role_by_course"]["flags"] = flags
         result["channel_unresolved_junction_fill"] = bool(CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
         result["channel_t_degraded_l_room_from_contact"] = bool(
             CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
@@ -3865,7 +3922,21 @@ def _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall
     return _bond_gate.junction_bond_audit(
         result["course_candidates"], nodes, walls_to_create, solve_openings,
         _free_to_top_band(catalog, base_z_abs), (result.get("physical_support") or {}).get("items"),
-        _non_modular_by_physical_course(result, variants_per_course), catalog, OPENING_COURSE_BAND_TOLERANCE_FT)
+        _non_modular_by_physical_course(result, variants_per_course), catalog, OPENING_COURSE_BAND_TOLERANCE_FT,
+        junction_roles=_junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs,
+                                                 num_courses))
+
+
+def _junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs, num_courses):
+    """SECAO 77: tabela de papel funcional por fiada para a AUDITORIA,
+    recalculada pela geometria (nunca a tabela que o solve usou - um solve
+    errado nao faz o gate concordar). None com a flag desligada."""
+    if not CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+        return None
+    from core.engine import wall_stepper as _bond_gate
+    return _bond_gate.junction_role_table(nodes, walls_to_create, solve_openings,
+                                          _free_to_top_band(catalog, base_z_abs), num_courses, catalog,
+                                          OPENING_COURSE_BAND_TOLERANCE_FT)
 
 
 def _physical_support_final(result, catalog, walls_to_create, openings_per_wall, base_z_abs):
@@ -3990,6 +4061,8 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
             course_candidates, nodes, walls_to_create, openings_per_wall, band,
             _support.unsupported_pieces(course_candidates, walls_to_create, openings_per_wall, band),
             _non_modular_by_physical_course(result), catalog, OPENING_COURSE_BAND_TOLERANCE_FT))
+        # (secao 77 so' existe no fluxo CHANNEL, cujo resultado traz a chave acima;
+        # este ramo nao monta tabela de papeis com as aberturas brutas)
     audits = result.get("wall_bond_audits") or []
     if isinstance(audits, dict):
         audits = list(audits.values())
@@ -4176,6 +4249,14 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             # HALF_BLOCK_NEAR_TIE (regra #2)
             ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
                         for wi in range(len(walls_to_create)))
+            # SECAO 77: parede com no' sem encontro em alguma fiada recebe
+            # {fiada: [t_cm]} (as mesmas posicoes que a auditoria usa)
+            n_courses = (max(course_candidates) + 1) if course_candidates else 0
+            for wi in range(len(walls_to_create)):
+                by_course = _wall_tie_t_positions_by_course_cm(wi, walls_to_create, nodes, end_to_node,
+                                                               n_courses)
+                if by_course is not None:
+                    ties[wi] = by_course
         # SECAO 65: arranjo -> orientacao -> arranjo... A orientacao (gulosa da
         # secao 52 e exata da 62) roda DEPOIS da busca de ordem e abre ordens que
         # antes nao valiam - medido na parede 8284557 (5 familias de banda): duas
@@ -4243,6 +4324,7 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED)
     saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
     _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
+    saved_role_table = _stepper_repair.JUNCTION_ROLE_TABLE
     saved_room_tol = _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE
     _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
@@ -4257,6 +4339,7 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
         _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
         _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = saved_room_tol
+        _stepper_repair.JUNCTION_ROLE_TABLE = saved_role_table
 
 
 def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,
@@ -4334,6 +4417,14 @@ def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_
     openings_per_wall = _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog,
                                                   base_z_abs, num_courses, free_to_top,
                                                   opening_reinforcement_policy)
+    # SECAO 77: papel funcional de cada no' em cada fiada, com as MESMAS
+    # aberturas do solve (ver wall_stepper.junction_role_table)
+    from core.engine import wall_stepper as _stepper_roles
+    _stepper_roles.JUNCTION_ROLE_TABLE = None
+    if _stepper_roles.JUNCTION_ROLE_BY_COURSE and _course_height_ft(catalog, None)[0] is not None:
+        _stepper_roles.JUNCTION_ROLE_TABLE = _stepper_roles.junction_role_table(
+            nodes, walls_to_create, openings_per_wall, _free_to_top_band(catalog, base_z_abs), num_courses,
+            catalog, OPENING_COURSE_BAND_TOLERANCE_FT)
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,
@@ -5270,6 +5361,51 @@ def _wall_midspan_node_t_positions_cm(wall_idx, walls_to_create, nodes):
     return positions
 
 
+def _wall_tie_t_positions_by_course_cm(wall_idx, walls_to_create, nodes, end_to_node, num_courses,
+                                       table=None):
+    """SECAO 77: {fiada: [t_cm]} - as mesmas posicoes de
+    `_wall_tie_t_positions_cm`, menos as dos nos que NAO sao encontro naquela
+    fiada. `table` = tabela de papeis explicita ({(no, fiada): registro} ou a
+    forma compacta publicada no resultado, {"no:fiada": {...}}); sem ela, a
+    tabela do solve corrente (wall_stepper.JUNCTION_ROLE_TABLE). None quando
+    nenhuma fiada muda (o chamador usa a lista unica de sempre)."""
+    from core.engine import wall_stepper as _ws_roles
+    if table is None:
+        table = _ws_roles.JUNCTION_ROLE_TABLE
+    if not table or not nodes:
+        return None
+    if any(isinstance(k, str) for k in table):
+        expandida = {}
+        for k, v in table.items():
+            try:
+                ni, ci = k.split(":")
+                expandida[(int(ni), int(ci))] = v
+            except (ValueError, AttributeError):
+                continue
+        table = expandida
+    p0, _p1, wall_dir, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+    length_cm = length_ft / FEET_PER_METER * 100.0
+    tagged = []
+    for ni, node in enumerate(nodes):
+        if wall_idx not in _midspan_node_wall_ids(node) or node.get("point") is None:
+            continue
+        tagged.append(((node["point"] - p0).DotProduct(wall_dir) / FEET_PER_METER * 100.0, ni))
+    for end_index in _axis_corner_end_sides(wall_idx, end_to_node, nodes):
+        tagged.append((0.0 if end_index == 0 else length_cm, end_to_node.get((wall_idx, end_index))))
+    out = {}
+    changed = False
+    for ci in range(num_courses):
+        keep = []
+        for t_cm, ni in tagged:
+            rec = table.get((ni, ci)) if ni is not None else None
+            if rec is not None and _ws_roles.junction_role_skips_bond(nodes[ni], rec):
+                changed = True
+                continue
+            keep.append(t_cm)
+        out[ci] = keep
+    return out if changed else None
+
+
 def _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node):
     """t_cm de TODA amarracao real (encontro L/T/X) que toca `wall_idx` -
     nas duas PONTAS (so' quando o no' de la' e' L_CORNER/T_INTERSECTION/
@@ -5328,7 +5464,7 @@ def _joint_is_opening_aligned_exempt(extent_a, extent_b, opening_edges_cm, lengt
 
 def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalog,
                             num_courses, openings_per_wall=None, nodes=None, end_to_node=None,
-                            course_candidates_index=None):
+                            course_candidates_index=None, junction_roles=None):
     """Validacao MULTI-FIADA de UMA parede - ver cabecalho da secao acima.
     Devolve {"ok": bool, "problems": [str,...], "penalty": float,
     "continuous_joints": [...], "alternating_joints": [...],
@@ -5362,6 +5498,11 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
             opening_edges_cm.append(op[1] / FEET_PER_METER * 100.0)
     node_t_positions_cm = _wall_midspan_node_t_positions_cm(wall_idx, walls_to_create, nodes)
     tie_t_positions_cm = _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node)
+    # SECAO 77: `junction_roles` explicita (chamador externo: a tabela publicada
+    # em result["junction_role_by_course"]["roles"]) ou, dentro do solve, a
+    # tabela do contexto
+    tie_by_course = _wall_tie_t_positions_by_course_cm(wall_idx, walls_to_create, nodes, end_to_node,
+                                                       num_courses, table=junction_roles)
 
     def _near_exempt_zone(t_cm):
         if t_cm <= BOND_STRIP_EDGE_EXEMPT_CM or t_cm >= length_cm - BOND_STRIP_EDGE_EXEMPT_CM:
@@ -5433,13 +5574,17 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                     and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
                     and _channel_covers_node(course_candidates.get(course_index) or [], nodes[node_index])):
                 continue
-            if code == HALF_BLOCK_CODE and tie_t_positions_cm:
+            # SECAO 77: nas fiadas em que o no' nao e' encontro, a ponta e'
+            # livre e a posicao dele nao conta como amarracao
+            ties_here = (tie_by_course.get(course_index, tie_t_positions_cm) if tie_by_course is not None
+                         else tie_t_positions_cm)
+            if code == HALF_BLOCK_CODE and ties_here:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):
                 # distancia do CORPO do B19 (nao so' do centro) ate' a
                 # amarracao mais proxima - 0 se a amarracao cair dentro do
                 # proprio intervalo da peca (nunca deveria acontecer, mas
                 # tratado do mesmo jeito: distancia zero, violacao clara).
-                for tie_t in tie_t_positions_cm:
+                for tie_t in ties_here:
                     if tie_t < t_start:
                         gap_cm = t_start - tie_t
                     elif tie_t > t_end:

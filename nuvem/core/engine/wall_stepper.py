@@ -1592,6 +1592,131 @@ JUNCTION_UNRESOLVED_FILL_REASON = "JUNCTION_UNRESOLVED_FILL"
 JUNCTION_BOND_CODES = ("B34", "B54")
 
 
+# ---- SECAO 77 - PAPEL FUNCIONAL DO ENCONTRO POR FIADA -----------------------
+# A topologia BASE do no' (wall_pairing, so' XY) continua valendo; o que muda
+# por fiada e' o PAPEL EFETIVO, respondido por `core.engine.junction_role` com
+# as MESMAS aberturas ativas do solve. Nas fiadas em que o no' deixa de ser
+# encontro (NONE_FREE_END / NONE_CONTINUOUS de meio de vao) o solve daquela
+# banda NAO cria peca de no' e a parede que sobra termina/passa pelas regras
+# NORMAIS de ponta livre/continuacao; a auditoria 76.1 recalcula o papel pela
+# geometria e tira a fiada do denominador (not_required, razao
+# NO_FUNCTIONAL_JUNCTION). O tipo do no' no grafo NAO muda.
+# Desligado no motor; ligado so' no fluxo CHANNEL por
+# wall_modeling.CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED.
+JUNCTION_ROLE_BY_COURSE = False
+# {(node_index, course_index): registro} do solve corrente (contexto; salvo e
+# restaurado por wall_modeling._solve_building_blocks_all_courses_impl)
+JUNCTION_ROLE_TABLE = None
+# {node_index: registro} dos nos SEM encontro funcional na BANDA em solve
+# (contexto; salvo e restaurado pelo laco de bandas)
+JUNCTION_BAND_ROLES = None
+NO_FUNCTIONAL_JUNCTION_REASON = "NO_FUNCTIONAL_JUNCTION"
+# Contexto (solve_wall_free_fill, por PAREDE em solve, restaurado em finally):
+# a ponta INICIAL da parede e' a ponta livre de um no' sem encontro (rente a'
+# face da vizinha) e a final nao -> a folga de modulacao (junta alternativa de
+# 1 cm) de um trecho com as duas pontas abertas vai para o FIM do trecho, e nao
+# para o inicio como a regra geral faz. Sem isso a peca da ponta ficava 1 cm
+# atras da face quando o no' esta' no inicio da parede (medido na fixture
+# node-at-start x node-at-end; secao 77.4). Limite registrado: com encontro
+# ATIVO na outra ponta e trecho nao modular, a unica junta negociavel e' a da
+# face (mesma regra de qualquer parede de ponta livre do motor).
+PIER_SLACK_PREFER_TRAILING = False
+
+
+def junction_role_table(nodes, walls_to_create, solve_openings, course_band_ft, num_courses, catalog,
+                        opening_tol_ft):
+    """{(node_index, course_index): registro de junction_role} - UMA regra para
+    o solve e para a auditoria: mesmas aberturas do solve, mesma faixa da
+    fiada, mesma regra de abertura ativa (sobreposicao > opening_tol_ft) e a
+    mesma regiao de no' da auditoria 76.1 (faixa limitada ao bloco de
+    amarracao). Funcao pura da geometria: a auditoria chama de novo em vez de
+    reaproveitar a tabela do solve (independencia do gate)."""
+    import sys as _sys
+    from core.engine import junction_role as _jr
+    if not nodes or not walls_to_create or solve_openings is None or course_band_ft is None:
+        return {}
+    larguras = [float(((catalog or {}).get(c) or {}).get("width_cm") or 0.0) for c in JUNCTION_BOND_CODES]
+    band_ft = _cm_to_ft(max(larguras)) if larguras and max(larguras) > 0.0 else None
+    tol = float(opening_tol_ft or 0.0)
+
+    def _active(sill, head, z_lo, z_hi):
+        return (min(head, z_hi) - max(sill, z_lo)) > tol
+
+    records = _jr.junction_roles(nodes, walls_to_create, solve_openings, course_band_ft, num_courses,
+                                 _sys.modules[__name__], opening_active=_active, band_width_ft=band_ft,
+                                 catalog=catalog)
+    return _jr.roles_index(records)
+
+
+def junction_role_skips_bond(node, record):
+    """True se o registro diz que o no' NAO e' encontro nesta fiada E o solve
+    sabe compor o que sobra pelas regras normais: so' NONE_FREE_END (a parede
+    do unico braco vivo termina LIVRE ali, na face da vizinha - regras normais
+    de termino). NONE_CONTINUOUS (a parede que chega foi consumida por uma
+    abertura ativa e a que passa continua) e' so' classificacao (secao 77.5):
+    a composicao da parede que passa por uma regiao de no' sem encontro nao
+    tem regra aprovada - medido no TORRE (CAD cru): consumir esse papel
+    trocava a segmentacao de paredes ja' nao modulares e deixava fiadas
+    vazias sob a fiada em que o encontro volta. O no' fica como a base."""
+    if record is None or node is None:
+        return False
+    # ESCOPO desta secao (decisao de produto 2026-09-22): o encontro em T cuja
+    # PRINCIPAL foi consumida pelas aberturas dos dois lados. O canto L com um
+    # braco consumido por abertura na quina e' classificado (NONE_FREE_END) e
+    # registrado, mas NAO consumido pelo solve nesta rodada: nao ha' caso no
+    # BUTANTA e no TORRE (CAD cru) os candidatos sao paredes nao modulares
+    # (77.5, PENDING_PRODUCT_DECISION).
+    if node.get("kind") != "T_INTERSECTION":
+        return False
+    if record.get("effective_role") == "NONE_FREE_END":
+        return record.get("free_end_wall") is not None
+    return False
+
+
+def junction_band_roles(table, course_indices, nodes):
+    """{node_index: registro} dos nos sem encontro funcional em TODAS as fiadas
+    da banda (o papel sai das aberturas ativas, entao e' constante na banda;
+    se nao for, o no' fica como esta' - conservador)."""
+    if not table or not course_indices or not nodes:
+        return None
+    out = {}
+    for ni, node in enumerate(nodes):
+        recs = [table.get((ni, ci)) for ci in course_indices]
+        if not recs or any(r is None or not junction_role_skips_bond(node, r) for r in recs):
+            continue
+        sig = set((r.get("effective_role"), r.get("free_end_wall"), tuple(r.get("continuous_walls") or ()))
+                  for r in recs)
+        if len(sig) != 1:
+            continue
+        out[ni] = recs[0]
+    return out
+
+
+def _band_role_without_bond(node_index):
+    roles = JUNCTION_BAND_ROLES
+    if not roles or node_index is None:
+        return None
+    return roles.get(node_index)
+
+
+def _band_role_signature(node_index):
+    rec = _band_role_without_bond(node_index)
+    if rec is None:
+        return None
+    return (rec.get("effective_role"), rec.get("free_end_wall"), tuple(rec.get("continuous_walls") or ()))
+
+
+def _band_role_free_end(wall_idx, end_index, end_to_node):
+    """True se, na banda em solve, a ponta `end_index` de `wall_idx` e' a
+    PONTA LIVRE de um no' sem encontro funcional (a peca deve ficar rente a'
+    face da vizinha - ver a folga de modulacao em `solve_wall_free_fill`)."""
+    if not JUNCTION_BAND_ROLES or end_to_node is None:
+        return False
+    node_index = end_to_node.get((wall_idx, end_index))
+    papel = _band_role_without_bond(node_index)
+    return papel is not None and papel.get("free_end_wall") == wall_idx
+
+
 # ---- REGRA 76 / 76.1 - validadores funcionais (somente leitura) -------------
 # Dois resultados INDEPENDENTES (decisao do usuario, 2026-09-18):
 #  * COMPENSATOR_AS_JUNCTION_BOND - o motor DESIGNOU um compensador como peca
@@ -1848,8 +1973,13 @@ def _bond_piece_modular(cand, ci, catalog, spans_by_wall_course, walls_to_create
 
 def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall=None,
                         course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
-                        opening_tol_ft=0.0, fit_tol_cm=None):
+                        opening_tol_ft=0.0, fit_tol_cm=None, junction_roles=None):
     """REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND, por no' L/T/X e fiada.
+
+    0. (secao 77) `junction_roles` = tabela de papel funcional por fiada
+       RECALCULADA pela geometria (junction_role_table): fiada em que o no'
+       nao e' encontro funcional -> `not_required` com razao
+       NO_FUNCTIONAL_JUNCTION, fora do denominador. Vem ANTES do passo 1.
 
     1. O ENCONTRO EXISTE nesta fiada? Nao existe quando uma abertura ativa na
        fiada (use as aberturas do SOLVE - com as passagens livres estendidas
@@ -1917,6 +2047,45 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
                 not_required.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
                                      "absent_walls": ausentes})
                 continue
+            # SECAO 77: o no' nao e' encontro funcional nesta fiada (papel
+            # recalculado pela geometria, nao lido do solve)
+            papel = junction_roles.get((ni, ci)) if junction_roles else None
+            if papel is not None and junction_role_skips_bond(node, papel):
+                # a isencao so' vale se a ponta livre foi COMPOSTA: a regiao do
+                # no' e' a ponta da parede que sobra e precisa estar coberta por
+                # ela (parede nao modular -> fiada vazia -> NAO isenta, nunca
+                # mascara: vira `missing` FREE_END_NOT_COMPOSED)
+                livre = papel.get("free_end_wall")
+                cobertura = 0.0
+                ocup_livre = []
+                for cand, cpoly, cb in by_course_wall.get((ci, livre), ()):
+                    if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+                        continue
+                    ov = _convex_overlap_area(cpoly, nucleo)
+                    if ov > area_nucleo * 1e-6:
+                        cobertura += ov
+                        ocup_livre.append((ov / area_nucleo, cand))
+                if cobertura + 1e-9 >= area_nucleo * (1.0 - 1e-6):
+                    not_required.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                                         "absent_walls": list(papel.get("absent_walls") or []),
+                                         "reason": NO_FUNCTIONAL_JUNCTION_REASON,
+                                         "effective_role": papel.get("effective_role"),
+                                         "free_end_wall": livre,
+                                         "continuous_walls": list(papel.get("continuous_walls") or [])})
+                    continue
+                checked += 1
+                missing.append({
+                    "course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                    "walls": walls_here, "reason": "FREE_END_NOT_COMPOSED",
+                    "classification": "MISSING_REQUIRED_JUNCTION_BOND", "review": "HUMAN_REVIEW",
+                    "effective_role": papel.get("effective_role"), "free_end_wall": livre,
+                    "coverage": round(cobertura / area_nucleo, 4) if area_nucleo else 0.0,
+                    "occupants": [{"logical_code": c.get("logical_code"), "coverage": round(f, 4),
+                                   "placement_reason": str(c.get("placement_reason") or ""),
+                                   "wall_idx": c.get("wall_idx"), "node_index": c.get("node_index"),
+                                   "is_compensator": c.get("logical_code") in COMPENSATOR_BOND_GATE_CODES,
+                                   "origin_cm": _origin_cm(c)} for f, c in ocup_livre]})
+                continue
             checked += 1
             ocup = []
             for w in walls_here:
@@ -1976,14 +2145,14 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
 
 def missing_required_junction_bond(course_candidates, nodes, walls_to_create, openings_per_wall=None,
                                    course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
-                                   opening_tol_ft=0.0, fit_tol_cm=None):
+                                   opening_tol_ft=0.0, fit_tol_cm=None, junction_roles=None):
     """REGRA 76.1 - hard gate de classificacao MISSING_REQUIRED_JUNCTION_BOND:
     as fiadas de no' sem peca de amarracao valida (ver `junction_bond_audit`).
     Pode ser > 0 quando a geometria nao admite amarracao sob as regras
     aprovadas - e' caso legitimo de revisao humana, nunca mascarado."""
     return junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall,
                                course_band_ft, unsupported, non_modular, catalog,
-                               opening_tol_ft, fit_tol_cm)["missing"]
+                               opening_tol_ft, fit_tol_cm, junction_roles=junction_roles)["missing"]
 
 
 def _node_piece_reason(code, placement_reason):
@@ -2678,8 +2847,12 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     solved = []          # (node_index, course_a, course_b)
     solved_by_node = {}  # regra 11.14: o que ja' esta' resolvido, para os cantos seguintes
     failures = []
+    role_skipped = []    # SECAO 77: (node_index, papel) sem encontro funcional nesta banda
     for node_index, node in enumerate(nodes):
         kind = node.get("kind")
+        if kind in _BOND_GATE_NODE_KINDS and _band_role_without_bond(node_index) is not None:
+            role_skipped.append((node_index, _band_role_without_bond(node_index).get("effective_role")))
+            continue
         if kind == "L_CORNER":
             result = solve_l_corner(node, walls_to_create, catalog, node_index=node_index,
                                     openings_per_wall=openings_per_wall,
@@ -2736,6 +2909,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             and walls_to_create):
         outcome = _search_tie_parity_fill_balance(
             outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    if role_skipped:
+        outcome["junction_role_skipped"] = role_skipped
     return outcome
 
 
@@ -5235,6 +5410,10 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
             alternativas.append((outro(leading_joint_cm), trailing_joint_cm))
         if abre_fim:
             alternativas.append((leading_joint_cm, outro(trailing_joint_cm)))
+        if abre_ini and abre_fim and PIER_SLACK_PREFER_TRAILING:
+            # SECAO 77.4: a ponta inicial e' a face de um no' sem encontro -
+            # a folga vai para o fim do trecho (peca rente a' face)
+            alternativas.reverse()
         if abre_ini and abre_fim:
             alternativas.append((outro(leading_joint_cm), outro(trailing_joint_cm)))
         for alt_lead, alt_trail in alternativas:
@@ -6841,6 +7020,12 @@ def _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, en
     node = nodes[node_index] if node_index is not None else None
     if node is None or node["kind"] in ("FREE_END", "STRAIGHT_CONTINUATION"):
         return 0.0, BLOCK_OPENING_JOINT_CM
+    # SECAO 77: nesta banda o no' nao e' encontro e esta parede e' a que
+    # sobra -> a ponta dela e' PONTA LIVRE (vai ate' a propria ponta, que o
+    # grafo ja' levou ate' a face externa da vizinha)
+    papel = _band_role_without_bond(node_index)
+    if papel is not None and papel.get("free_end_wall") == wall_idx:
+        return 0.0, BLOCK_OPENING_JOINT_CM
     # A reserva e' medida a partir do PONTO DO NO' (o encontro fisico), que
     # nao coincide com a ponta da parede: extend_wall_ends_to_junctions puxa
     # a ponta para ALEM do encontro, ate' a face oposta da vizinha (ver
@@ -6901,7 +7086,11 @@ def _index_node_candidates_midspan(nodes, intersection_candidates, walls_to_crea
     for node_index, node in enumerate(nodes):
         node_candidates = by_node.get(node_index) or []
         midspan_walls = _midspan_node_wall_ids(node)
+        papel = _band_role_without_bond(node_index)
         for wall_idx in midspan_walls:
+            if papel is not None and (papel.get("free_end_wall") == wall_idx
+                                      or wall_idx in (papel.get("continuous_walls") or ())):
+                continue   # SECAO 77: sem encontro nesta banda, a parede nao reserva o no'
             p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
             node_t_cm = (node["point"] - p0).DotProduct(wall_dir) / FEET_PER_METER * 100.0
             for course in ("A", "B"):
@@ -7938,6 +8127,33 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                          variants_per_course=1, opening_strategy=None,
                          cross_band_joint_seed=None, node_boundary_codes=None):
+    """Envelope de `_solve_wall_free_fill_impl` (secao 77.4): a folga de
+    modulacao rente a' face e' um contexto da PAREDE em solve - definido aqui
+    (a ponta inicial e' a ponta livre de um no' sem encontro nesta banda e a
+    final nao) e SEMPRE restaurado na saida, com ou sem excecao. Vale para
+    todos os trechos/subtrechos desta parede (inclusive o reparo continuo,
+    que refaz o subtrecho da face)."""
+    global PIER_SLACK_PREFER_TRAILING
+    saved = PIER_SLACK_PREFER_TRAILING
+    PIER_SLACK_PREFER_TRAILING = bool(
+        _band_role_free_end(wall_idx, 0, end_to_node)
+        and not _band_role_free_end(wall_idx, 1, end_to_node))
+    try:
+        return _solve_wall_free_fill_impl(
+            wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
+            node_candidates_by_wall_end, node_midspan_by_wall_course, catalog,
+            allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+            opening_strategy=opening_strategy, cross_band_joint_seed=cross_band_joint_seed,
+            node_boundary_codes=node_boundary_codes)
+    finally:
+        PIER_SLACK_PREFER_TRAILING = saved
+
+
+def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
+                               node_candidates_by_wall_end, node_midspan_by_wall_course,
+                               catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                               variants_per_course=1, opening_strategy=None,
+                               cross_band_joint_seed=None, node_boundary_codes=None):
     """Preenchimento comum (secao 13: 'no -> abertura, abertura ->
     abertura, abertura -> no') de UMA parede, nas duas FAMILIAS de fiada
     (par/impar - "A"/"B"). Para cada abertura, materializa tambem o bloco
@@ -10359,6 +10575,9 @@ def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, b
         if node is not None:
             state = sorted((k, repr(v)) for k, v in node.items() if k not in ("point", "arm_points"))
         parts.append(repr((end_index, node_index, state)))
+        # SECAO 77: um layout calculado com o no' ativo nunca serve para a
+        # mesma parede com o no' sem encontro (ponta livre) nesta banda
+        parts.append(repr((end_index, "junction_role", _band_role_signature(node_index))))
         for course in ("A", "B"):
             parts.append(repr((end_index, course, (by_end_arg or {}).get((wall_idx, end_index, course)))))
     for course in ("A", "B"):
