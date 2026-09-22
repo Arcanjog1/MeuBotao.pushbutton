@@ -9,7 +9,7 @@
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "READY FOR FINAL REVIT SMOKE - regras 76/76.1: COMPENSATOR_AS_JUNCTION_BOND 0 (nenhuma falsa amarracao); MISSING_REQUIRED_JUNCTION_BOND 6 (no' 28 T fiadas 5/7/9, cantos 47 fiadas 2/4 e 48 fiada 3) classificados NAO RESOLVIDO para revisao humana. Revit nao executado. Nao mergear.",
+  "veredito": "READY FOR FINAL REVIEW - smoke final REAL no Revit (2026-09-22, PC de casa, motor 37a0150 sem alteracao): 3 runs ate' convergir (8.709 -> 8.702 -> 8.696 pecas, run 3 = run 2), COMPENSATOR_AS_JUNCTION_BOND 0, MISSING_REQUIRED_JUNCTION_BOND 6 (os conhecidos: no' 28 fiadas 5/7/9, 47 fiadas 2/4, 48 fiada 3), portoes duros 0, criadas = planejadas, 0 falhas, readback 0. Nao mergear.",
   "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
   "changes": [
     "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
@@ -42,18 +42,21 @@
     "Canaleta consumindo o compensador nao resolvido (achado da revisao): 88/1.440 casos dirigidos antes da correcao; depois 0/1.440, 0/192 e 0/800 casos aleatorios - fixado em regressao.",
     "Auditoria do corpus da secao 74 (tools/audit/audit_s74_corpus.py): 41/41 PASS.",
     "Legado byte-identico: strategy=None sha S74 3ba22aa08913... sem as chaves novas.",
-    "Reverificacao final (2 agentes independentes, somente leitura): os 7 achados da revisao corrigidos, com controle negativo; conformidade com a decisao do usuario OK em todos os itens; 6 mutantes do gate pegos."
+    "Reverificacao final (2 agentes independentes, somente leitura): os 7 achados da revisao corrigidos, com controle negativo; conformidade com a decisao do usuario OK em todos os itens; 6 mutantes do gate pegos.",
+    "Smoke REAL no Revit 2026 (2026-09-22, PC de casa): restauracao controlada (backup sha256 ac4c6e20..., purga so' carimbadas 17.420 elementos, reset de 3 aberturas, POST_RESET 44/44, preflight OK) e 3 runs CHANNEL: 8.702 / 8.696 / 8.696 pecas criadas, 0 falhas, readback 0 divergencias; gates 0/0/0/0, CHANNEL 0, COMPENSATOR 0, MISSING 6; run 3 sem movimento (assinatura igual a' run 2). Evidencia em docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json.",
+    "Conferencia Revit x offline (mesmo HEAD, corpus pos-66): 8.640 de 8.696 pecas casam ate' 0,05 cm; 56 diferem so' na parede 8284502 fiadas 11-16 (mesmos codigos) - pre-existente desde f7c208b (smoke de 2026-09-18), plataforma."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
     "MISSING_REQUIRED_JUNCTION_BOND = 6 no BUTANTA (nos 28/47/48): geometria sem peca de amarracao aprovada - revisao humana / decisao de produto; NAO e' falha do gate.",
     "Limites do gate: T nao ortogonal vai para revisao (peca de ponta reta nao cobre o losango); no' AMBIGUOUS nao e' auditado. Nenhum no BUTANTA.",
     "Humano: 8 compensadores DEITADOS (C09D/C09DH) em regiao de no' - registro, fora do escopo.",
-    "O lote 20260918-014103 aberto no Revit continua sendo o REPROVADO; re-smoke no Revit PENDENTE.",
     "Conflito registrado: regra 51.6 x regra 75 (secao 7.13) - inalterado.",
     "Gate MISSING (classificacao, nunca pecas): a mais de ~700 m da origem interna o ruido de ponto flutuante gera falso BOND_PIECE_PARTIAL (BUTANTA transladada 3 km: 6 -> 183). BUTANTA (<=33 m) e TORRE (<=99 m) nao afetadas. Nao corrigido nesta rodada (motor congelado).",
     "Gate MISSING: trecho non_modular SEM_ESPACO invertido (pilar negativo) marca amarracao intacta como BOND_PIECE_NON_MODULAR (acusa a mais). So' ocorre com non_modular > 0, que ja' reprova portao duro; BUTANTA tem 0. Nao corrigido nesta rodada.",
-    "MISSING_REQUIRED_JUNCTION_BOND fica no resultado e no microajuste; nao aparece na interface do Revit nem bloqueia a criacao (mesmo nivel do gate da regra 76) - o smoke final le o gate no resultado."
+    "MISSING_REQUIRED_JUNCTION_BOND fica no resultado e no microajuste; nao aparece na interface do Revit nem bloqueia a criacao (mesmo nivel do gate da regra 76) - o smoke final le o gate no resultado.",
+    "Revit (IronPython) x offline (CPython): arranjo de uma corrida de B34 da parede 8284502, fiadas 11-16, sai diferente (56 pecas, mesmos codigos por fiada); pre-existente (tambem em f7c208b), nenhum gate afetado.",
+    "Modelo de vista 2229535 do projeto humano (filtro PARxx, 50% de transparencia) esmaece as pecas do plugin nas elevacoes PARxx - apresentacao, nao motor."
   ],
   "physical_deltas": [
     "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
@@ -81,7 +84,7 @@
     "Destino da regra 51.6 (mantida suspensa ou reativada)."
   ],
   "next_steps": [
-    "Smoke final no Revit: purga controlada, reset das aberturas, runs ate' convergir, readback com COMPENSATOR_AS_JUNCTION_BOND = 0, CHANNEL_AS_JUNCTION_BOND = 0 e MISSING_REQUIRED_JUNCTION_BOND = os 6 conhecidos, capturas ANTES/DEPOIS dos nos 22/28/30/47/48."
+    "Revisao final humana do PR #42 (draft): folha A/B/C e folhas por no' com capturas reais do Revit; decisao de produto para os nos 28/47/48 (NAO RESOLVIDO). Nao mergear sem essa revisao."
   ],
   "references": [
     {
@@ -149,6 +152,9 @@
     },
     {
       "path": "tests/test_regra761_revisao_do_gate.py"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json"
     }
   ]
 }
@@ -1280,7 +1286,7 @@ de todos os 5 nós no mesmo enquadramento, HUMANO e elevações de contexto; 28/
 nó marcada "NÃO RESOLVIDO — peça funcional de amarração não cabe" (no 47 também o C09 de reparo que
 ocupa 25% da região); exemplos válidos 06–08 no motor final; folha `00_RESUMO_A_B_C.png`
 (A corrigido 22/30, B válido 06/07/08, C não resolvido 28/47/48).
-Capturas no Revit: **PENDENTES** (smoke final).
+Capturas no Revit: **PENDENTES** (smoke final) — feitas em 2026-09-22, ver §7.16.
 
 **Reverificação final** (2 agentes independentes, somente leitura, depois dos commits do motor):
 os 7 achados da revisão estão corrigidos — com controle negativo: sem a correção da posição de nó,
@@ -1295,6 +1301,75 @@ gera falso `BOND_PIECE_PARTIAL` — medir em coordenadas locais ao nó resolve; 
 `SEM_ESPACO` invertido (pilar negativo) marca amarração intacta como `BOND_PIECE_NON_MODULAR` — só
 ocorre com `non_modular > 0`, que já reprova portão duro. Menores: `unsupported_pieces` calculado duas
 vezes no microajuste legado; teste do pilar_34 aceita `BOND_PIECE_UNSUPPORTED` sem fixar as fiadas.
+
+## 7.16 SMOKE FINAL REAL NO REVIT — PC DE CASA (2026-09-22)
+
+**Estado: READY FOR FINAL REVIEW** — o motor congelado (`37a0150`, sem nenhuma alteração)
+rodou no Revit real e reproduziu o resultado offline: `COMPENSATOR_AS_JUNCTION_BOND` **0**,
+`MISSING_REQUIRED_JUNCTION_BOND` **6** (exatamente os conhecidos), portões duros 0, criação e
+readback sem divergência, convergência em 3 runs. Não mergear.
+
+**Retomada em outro computador, sem confiar no estado anterior.** HEAD remoto do PR = HEAD
+local = `37a0150`. Revit 2026 (26.4.10.51), pyRevit 6.5.4; o botão instalado no pyRevit aponta
+para uma cópia antiga e **não** foi usado — o harness via MCP carrega o motor do clone do
+repositório (conferido pelo caminho do módulo em todas as runs). Máquina: 31,9 GB, 15 GB livres
+no início, sem trabalho pesado em paralelo. HUMANO aberto **somente leitura** (`IsModified`
+falso do início ao fim; nenhuma Transaction).
+
+**Restauração controlada (tudo conferido antes da primeira escrita):**
+
+| etapa | resultado |
+|---|---|
+| backup do TARGET | cópia de 181.641.216 bytes, sha256 `ac4c6e20…0411c1` (lida duas vezes) |
+| censo PRE_RESET | 1 lote antigo (`20260918-014103`, 8.710 peças — o reprovado); 3 aberturas a 10 cm com marca `MICROAJUSTE` |
+| purga (só carimbadas) | 8.710 peças + 8.710 subcomponentes `Cor` = 17.420; 17.651 → 231 instâncias; restantes 0, lotes 0, órfãos 0 |
+| reset das aberturas | 3 movidas de volta (referência versionada, sha `9c746c6d…`), 3 marcas limpas, 41 já no lugar |
+| POST_RESET + preflight | 44/44 exatas, 0 marcas, 0 lotes, transação de teste OK |
+
+**Runs (fluxo CHANNEL, 34 paredes, 44 aberturas, `max_openings` 6):**
+
+| run | 1º solve | §66 | peças finais | assinatura do harness | criadas / falhas / readback |
+|---|---|---|---|---|---|
+| 1 | 8.709 | 24 requeridas, 2 aplicadas (8284546 +10, 8284502 +10) | 8.702 | `3273ece6…` | 8.702 / 0 / 0 |
+| 2 | 8.702 | 1 aplicada (8284502 abertura 6, +10) | 8.696 | `233f9199…` | 8.696 / 0 / 0 |
+| 3 | 8.696 | **0 aplicadas** | 8.696 | `233f9199…` (= run 2) | 8.696 / 0 / 0 |
+
+Nas três runs: colisão / não modular / sem apoio / invasão de vão **0/0/0/0**,
+`CHANNEL_AS_JUNCTION_BOND` 0, `COMPENSATOR_AS_JUNCTION_BOND` 0, `MISSING_REQUIRED_JUNCTION_BOND`
+6 — nó 28 T fiadas 5/7/9 (`BOND_PIECE_PARTIAL`: C09 64% + B34 29%), nó 47 L fiadas 2/4
+(`NO_BOND_PIECE`: C09 64% + C09 de reparo 25%), nó 48 L fiada 3 (`NO_BOND_PIECE`: C09 64% + B19
+de reparo 25%). Os 6 C09 são `JUNCTION_UNRESOLVED_FILL`. Auditoria: 844 fiadas-nó, 838 válidas,
+nó 46 fiadas 11–16 sem encontro. **§66:** cada abertura andou uma vez, acumulado 10 cm (teto
+respeitado), sem acúmulo na run 3; a guarda de varredura recusou −10 cm em 8284546 (parede
+8284578 no caminho) e o plano escolheu +10 — mesma sequência do smoke de 2026-09-18.
+`bond_reproved` = 4 em todas as runs, igual a todas as execuções no Revit desde 2026-09-17
+(herdado, §72 inalterada).
+
+**Conferência Revit × motor offline** (mesmo HEAD, corpus da §74, variante pós-§66): 8.696 ×
+8.696 peças; 8.640 casam até 0,05 cm (desvio máximo 0,002 cm); **56 diferem só na parede 8284502,
+fiadas 11–16, acima das vergas** — mesmos códigos e contagens por fiada, arranjo de corrida de
+B34 diferente. É **pré-existente e de plataforma** (IronPython × CPython): a mesma diferença de 56
+peças aparece no smoke de 2026-09-18 (motor `f7c208b`, anterior às regras 75/76) contra o offline
+daquele commit. Nenhum gate muda e a região fica longe dos nós 22/28/30/47/48. Registrada, não
+corrigida (motor congelado).
+
+**Capturas reais do Revit** (anexadas na conversa): folha A/B/C — A corrigido 22/30, B válido
+06/07/08, C não resolvido 28/47/48 — e uma folha por nó com ANTES (render offline, rotulado),
+DEPOIS REAL (vista 3D temporária com caixa de corte na fiada e a região do nó projetada com os
+cantos de zoom devolvidos pelo Revit) e elevação real TARGET × HUMANO. As vistas 3D foram
+criadas só no TARGET e removidas (11 → 0). O modelo de vista do projeto humano esmaece peças sem
+o parâmetro do projeto humano (filtro `PARxx`, 50% de transparência) — igual nos dois
+documentos, não é defeito do motor.
+
+**Desempenho no Revit (IronPython):** solve 158–186 s, plano da §66 273–303 s, criação 441–447 s
+(~51 ms/peça), run completa 15,5–17,9 min. **Memória:** Revit 3,6 → 4,6 GB de working set,
+≥ 14 GB livres, pagefile 109 MB, 0 eventos de exaustão de recursos. **Modal** "projeto não salvo
+recentemente": handler temporário só para esse TaskDialog (resposta CANCELAR), 0 interceptações,
+removido no final.
+
+**Estado final:** TARGET aberto, ativo, modificado e **não salvo** (1 lote `20260922-094142`,
+8.696 peças; 3 aberturas a +10 cm com marca); HUMANO `IsModified` falso. Evidência:
+`docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json`.
 
 ---
 
@@ -1427,7 +1502,7 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
 
 ## 10. ENTREGA
 
-> **Estado atual (2026-09-18, regras 76/76.1): READY FOR FINAL REVIT SMOKE — nenhuma falsa amarração; nós 28/47/48 NÃO RESOLVIDOS para revisão humana; ver §7.15.** O status abaixo é o da rodada da §74 e fica como registro.
+> **Estado atual (2026-09-22, smoke real no Revit): READY FOR FINAL REVIEW — no Revit real, nenhuma falsa amarração (COMPENSATOR 0), nós 28/47/48 NÃO RESOLVIDOS (MISSING 6, os conhecidos), portões duros 0, convergência em 3 runs; ver §7.16.** O status abaixo é o da rodada da §74 e fica como registro.
 
 **Branch** `claude/butanta-modulation-physical-fixes` · último commit de motor `2c55211` (§74) ·
 **PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.
