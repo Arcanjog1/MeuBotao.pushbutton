@@ -118,7 +118,7 @@
     },
     {
       "id": "butanta_r08_lt_s74_corpus",
-      "source_commit": "399bc6914d5f3f0ad9881eb5109365fd3cef1654",
+      "source_commit": "373d3fcf379e006bcf7a5b962eeea6b48212bfcd",
       "primary_path": "reference_projects/butanta_r08_lt/s74_corpus",
       "portal": "reference_projects/butanta_r08_lt/s74_corpus/README.md",
       "files": [
@@ -136,7 +136,7 @@
         },
         {
           "path": "reference_projects/butanta_r08_lt/s74_corpus/snapshot_v1.json",
-          "sha256": "e628b3665e426e79c88b2e36913659290464b9acc6b413654ce559595cd49810"
+          "sha256": "c693723acb7c7f00bb9efe0e854b057edd2234826c8c50cd96c2d69265b04f4c"
         }
       ],
       "status": "EVIDENCE_NOT_NORM",
