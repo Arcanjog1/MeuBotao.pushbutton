@@ -5,11 +5,11 @@
   "date": "2026-09-18",
   "scope": "current",
   "branch": "claude/butanta-modulation-physical-fixes",
-  "head": "6100efb822bf5d9ae0baf54bde721d9e8444627f",
+  "head": "e5343f123505ad8a25be4e7189c1d4daf7963f10",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "READY FOR FINAL REVIEW - smoke final REAL no Revit (2026-09-22, PC de casa, motor 37a0150 sem alteracao): 3 runs ate' convergir (8.709 -> 8.702 -> 8.696 pecas, run 3 = run 2), COMPENSATOR_AS_JUNCTION_BOND 0, MISSING_REQUIRED_JUNCTION_BOND 6 (os conhecidos: no' 28 fiadas 5/7/9, 47 fiadas 2/4, 48 fiada 3), portoes duros 0, criadas = planejadas, 0 falhas, readback 0. Nao mergear.",
+  "veredito": "READY FOR FINAL REVIT SMOKE - secao 77 (papel funcional do encontro por fiada, flag CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED, so' CHANNEL): no' 28 sem T funcional nas fiadas 4-10 (ponta livre na face), MISSING 6 -> 3 (47x2, 47x4, 48x3), COMPENSATOR 0, portoes duros 0, so' a parede 8284562 muda; TORRE ON == OFF; flag OFF reproduz o historico. Revit nao executado com a flag. Nao mergear.",
   "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
   "changes": [
     "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
@@ -34,7 +34,10 @@
     "REGRA 76.1 (wall_stepper/wall_modeling/opening_reinforcement): dois gates independentes - COMPENSATOR_AS_JUNCTION_BOND (compensador DESIGNADO amarracao) e MISSING_REQUIRED_JUNCTION_BOND (geometria: o encontro existe e nao ha' B34/B54 de uma parede do no' cobrindo a regiao inteira, com apoio e modular). No ponto de decisao (so' CHANNEL) o compensador da escada de no' degradado sai JUNCTION_UNRESOLVED_FILL e segue ocupando a posicao do no' (NODE_POSITION_FILL_REASONS) - pecas identicas. Portao novo no microajuste da secao 66.",
     "tests/test_missing_required_junction_bond.py (novo, A-F do usuario), tests/test_regra761_revisao_do_gate.py (novo, achados da revisao), tests/test_compensator_never_bonds.py reescrito na semantica nova, test_regra76_* atualizados.",
     "Corpus da secao 74 com as contagens dos dois gates por caso (hashes fisicos inalterados) e inventory.json.",
-    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 76.1 (append-only)."
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 76.1 (append-only).",
+    "SECAO 77 (nuvem/core/engine/junction_role.py novo; wall_stepper/wall_modeling/b34_run_arrangement): papel funcional do encontro por fiada - braco morre so' por abertura ativa (tolerancia PIER_PHYSICAL_FIT_TOLERANCE_CM), ponta de parede nunca, toco na faixa nunca rebaixa, NONE_FREE_END exige perpendicularidade; o solve consome so' o T com a principal consumida dos dois lados (sem peca de no', ponta livre na face, folga de modulacao rente a' face, memo com o papel, posicoes de amarracao por fiada); a auditoria 76.1 recalcula o papel e tira a fiada do denominador (NO_FUNCTIONAL_JUNCTION). Flag propria; OFF reproduz o motor anterior byte a byte.",
+    "tools/audit/s74_corpus.py: parametro papel_por_fiada; snapshot_v1.json ganha `course_aware_cases` (OFF e ON, duas geometrias) sem sobrescrever os casos historicos; tests/test_secao77_papel_por_fiada.py (novo, fixtures A-K, transicao, memo, orientacao, overfit); tests/test_regra76_corpus_butanta.py e test_s74_corpus_butanta.py: casos historicos medidos com a flag OFF (expected inalterado) + testes novos para a flag ON.",
+    "nuvem/REGRAS_MODULACAO_BLOCOS.md: secao 77 (append-only)."
   ],
   "tests": [
     "Suite completa (tests/, sem regression): 1.519 passaram, 0 falharam, 1 desmarcado (test_perf_trace_stall_sampler, herdado), 29 min 40 s. Sem skip/xfail; nenhum golden/baseline alterado.",
@@ -44,7 +47,10 @@
     "Legado byte-identico: strategy=None sha S74 3ba22aa08913... sem as chaves novas.",
     "Reverificacao final (2 agentes independentes, somente leitura): os 7 achados da revisao corrigidos, com controle negativo; conformidade com a decisao do usuario OK em todos os itens; 6 mutantes do gate pegos.",
     "Smoke REAL no Revit 2026 (2026-09-22, PC de casa): restauracao controlada (backup sha256 ac4c6e20..., purga so' carimbadas 17.420 elementos, reset de 3 aberturas, POST_RESET 44/44, preflight OK) e 3 runs CHANNEL: 8.702 / 8.696 / 8.696 pecas criadas, 0 falhas, readback 0 divergencias; gates 0/0/0/0, CHANNEL 0, COMPENSATOR 0, MISSING 6; run 3 sem movimento (assinatura igual a' run 2). Evidencia em docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json.",
-    "Conferencia Revit x offline (mesmo HEAD, corpus pos-66): 8.640 de 8.696 pecas casam ate' 0,05 cm; 56 diferem so' na parede 8284502 fiadas 11-16 (mesmos codigos) - pre-existente desde f7c208b (smoke de 2026-09-18), plataforma."
+    "Conferencia Revit x offline (mesmo HEAD, corpus pos-66): 8.640 de 8.696 pecas casam ate' 0,05 cm; 56 diferem so' na parede 8284502 fiadas 11-16 (mesmos codigos) - pre-existente desde f7c208b (smoke de 2026-09-18), plataforma.",
+    "Secao 77: test_secao77_papel_por_fiada 43 passaram, 1 pulado; focados regras 74/75/76/76.1 e canaleta 318 passaram; corpus BUTANTA (test_regra76_corpus_butanta + test_s74_corpus_butanta) verdes com os casos historicos em flag OFF e os novos em flag ON. Suite completa (uma vez, pos-revisao): 1.714 passaram, 1 pulado, 4 desmarcados, 2 falhas pre-existentes em tests/regression/test_benchmark_baselines.py (TP1, TGD-v2; identicas no HEAD anterior).",
+    "IronPython 2.7.12 (engine do pyRevit, script puro): classificador 850/850 registros iguais ao CPython.",
+    "TORRE EASY TGD (CAD cru): flag ON == flag OFF byte a byte."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
@@ -56,7 +62,10 @@
     "Gate MISSING: trecho non_modular SEM_ESPACO invertido (pilar negativo) marca amarracao intacta como BOND_PIECE_NON_MODULAR (acusa a mais). So' ocorre com non_modular > 0, que ja' reprova portao duro; BUTANTA tem 0. Nao corrigido nesta rodada.",
     "MISSING_REQUIRED_JUNCTION_BOND fica no resultado e no microajuste; nao aparece na interface do Revit nem bloqueia a criacao (mesmo nivel do gate da regra 76) - o smoke final le o gate no resultado.",
     "Revit (IronPython) x offline (CPython): arranjo de uma corrida de B34 da parede 8284502, fiadas 11-16, sai diferente (56 pecas, mesmos codigos por fiada); pre-existente (tambem em f7c208b), nenhum gate afetado.",
-    "Modelo de vista 2229535 do projeto humano (filtro PARxx, 50% de transparencia) esmaece as pecas do plugin nas elevacoes PARxx - apresentacao, nao motor."
+    "Modelo de vista 2229535 do projeto humano (filtro PARxx, 50% de transparencia) esmaece as pecas do plugin nas elevacoes PARxx - apresentacao, nao motor.",
+    "Secao 77 - escopo: canto L com um braco consumido por abertura na quina e NONE_CONTINUOUS sao so' classificacao (TORRE: consumi-los trocava a segmentacao de paredes ja' nao modulares: +10 non_modular, 2 MISSING novos por peca sem apoio). PENDING_PRODUCT_DECISION.",
+    "Secao 77 - o preenchimento de ponta livre e' guloso a partir do inicio da parede: so' a face rente e' garantida nas duas orientacoes; a composicao interior nao espelha (pre-existente para qualquer parede livre).",
+    "Secao 77 - fiadas impares do no' 28 terminam com B39 na face (o humano usa B34): o termino normal vence por fisica (menos pecas, sem compensador, desencontro 20 cm)."
   ],
   "physical_deltas": [
     "34 paredes de alvenaria, fiadas 0-11, bancada sobre a geometria real: divergencia de composicao por parede 2.575 -> 1.727 com a secao 72 e 1.707,7 -> 1.502,2 com a 74.",
@@ -76,15 +85,18 @@
     "R76 (recuo), D2 (B19) e D3 (outro braco) medidas e mantidas DESLIGADAS: pioram portoes duros ou conflitam com a decisao de 2026-08-21.",
     "Os 6 casos restantes continuam acusados e fixados em teste - nao mascarados.",
     "Regra 76.1 (decisao do usuario): no' sem peca funcional aprovada fica NAO RESOLVIDO (MISSING_REQUIRED_JUNCTION_BOND) - nunca C09 fingindo amarracao; D2/D3/recuo/mover janela seguem DESLIGADOS.",
-    "COMPENSATOR_AS_JUNCTION_BOND = compensador exercendo indevidamente a funcao estrutural (designado); MISSING_REQUIRED_JUNCTION_BOND = nenhuma peca estrutural valida presente. Problemas diferentes."
+    "COMPENSATOR_AS_JUNCTION_BOND = compensador exercendo indevidamente a funcao estrutural (designado); MISSING_REQUIRED_JUNCTION_BOND = nenhuma peca estrutural valida presente. Problemas diferentes.",
+    "Secao 77 (decisao do usuario, 2026-09-22): topologia base em planta + papel funcional por fiada; T cuja principal foi consumida dos dois lados por aberturas ativas nao existe naquela fiada - a parede que chega termina livre na face. Nao e' heuristica do no' 28, nao e' limiar de 14 cm, nao flexibiliza amarracoes verdadeiras.",
+    "Tocos entre a tolerancia fisica e a menor peca continuam encontro (conservador; registro PENDING_PRODUCT_DECISION)."
   ],
   "decisions_pending": [
-    "Decisao de produto para os nos 28/47/48 (hoje NAO RESOLVIDO): nenhuma opcao automatica aprovada.",
     "Se a regra deve valer para compensador DEITADO (C09D/C09DH) quando o solver gerar camadas de nivelamento.",
-    "Destino da regra 51.6 (mantida suspensa ou reativada)."
+    "Destino da regra 51.6 (mantida suspensa ou reativada).",
+    "Decisao de produto para os nos 47/48 (L, a peca nao cabe): continuam MISSING.",
+    "Estender a secao 77 ao canto L com braco consumido e ao NONE_CONTINUOUS (hoje so' classificacao)."
   ],
   "next_steps": [
-    "Revisao final humana do PR #42 (draft): folha A/B/C e folhas por no' com capturas reais do Revit; decisao de produto para os nos 28/47/48 (NAO RESOLVIDO). Nao mergear sem essa revisao."
+    "Smoke final no Revit com a flag da secao 77 ligada (restauracao controlada, runs ate' convergir, readback, gates: MISSING = 3, NO_FUNCTIONAL_JUNCTION = 7, COMPENSATOR 0), capturas do no' 28 fiadas 3/4/10/11."
   ],
   "references": [
     {
@@ -155,6 +167,12 @@
     },
     {
       "path": "docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json"
+    },
+    {
+      "path": "nuvem/core/engine/junction_role.py"
+    },
+    {
+      "path": "tests/test_secao77_papel_por_fiada.py"
     }
   ]
 }
@@ -1371,6 +1389,82 @@ removido no final.
 8.696 peças; 3 aberturas a +10 cm com marca); HUMANO `IsModified` falso. Evidência:
 `docs/checkpoints/evidence/2026-09-22-revit-smoke-casa.json`.
 
+## 7.17 SEÇÃO 77 — PAPEL FUNCIONAL DO ENCONTRO POR FIADA (2026-09-22, IMPLEMENTADO sob flag, só CHANNEL)
+
+**Decisão de produto (usuário, 2026-09-22):** a topologia base em planta (T/L/X) continua; o
+papel funcional é avaliado por fiada/banda com as aberturas ativas naquela altura. Em um T, se as
+aberturas ativas consomem a principal dos dois lados da região do nó, **não existe T naquela
+fiada**: a parede que chega termina como ponta livre na face da principal, pelas regras normais
+de término; acima/abaixo das aberturas o T volta. Não é heurística do nó 28 nem "14 cm".
+
+**Estado: READY FOR FINAL REVIT SMOKE** (offline; Revit **não** executado nesta rodada). Não mergear.
+
+**Causa-raiz (medida):** o tipo do nó nasce uma vez em XY (`wall_pairing`) e o solver de T só
+tinha 4 saídas (T, degrada para L/D1, escada da boneca B34/C09/C04 "nunca B19", falha); o único
+critério de "encontro não existe" era "uma abertura cobre a região" (nó 46). No nó 28 (T 8284502 ←
+8284562), fiadas 4–10, a principal tem 0,013 / 0,00 cm além da região (janelas dos dois lados a
+14 cm): B34 degradado nas pares, `C09 JUNCTION_UNRESOLVED_FILL` nas ímpares → `MISSING` 5/7/9. O
+humano termina a 8284562 livre nas 7 fiadas (B19 pares / B34 ímpares) e volta ao T na fiada 11.
+Fiada c = [20c+1, 20c+20] cm; abertura ativa por sobreposição > 0,5 cm → fiadas 3 e 11 **não** são
+de janela.
+
+**Implementação** (`CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED`; §77 do REGRAS):
+`core/engine/junction_role.py` (classificador puro: braço só morre por abertura ativa; ponta de
+parede nunca; toco inteiro na faixa nunca rebaixa; `NONE_FREE_END` exige perpendicularidade;
+tolerância única `PIER_PHYSICAL_FIT_TOLERANCE_CM`); `wall_stepper`: tabela por solve, papel por
+banda, `solve_all_intersections` sem peça de nó, reserva de ponta livre, folga de modulação rente à
+face (`PIER_SLACK_PREFER_TRAILING`, contexto por parede com `finally` — correção do recuo de 1 cm), chave do memo, posições de
+amarração por fiada (HALF_BLOCK_NEAR_TIE e arranjo §60); auditoria 76.1 **recalcula** o papel pela
+geometria e tira a fiada do denominador com `NO_FUNCTIONAL_JUNCTION` — só se a ponta livre foi composta (senão `missing FREE_END_NOT_COMPOSED`, nunca mascara); §66 usa a mesma tabela.
+**Escopo:** só o T; canto L com braço consumido e `NONE_CONTINUOUS` ficam classificados
+(PENDING_PRODUCT_DECISION; ver TORRE). Nós 47/48 não são alcançados (os braços existem; passo 3).
+
+**Medido (offline, mesmo motor, flag OFF × ON):**
+
+| | OFF | ON |
+|---|---|---|
+| BUTANTÃ peças (pós-§66 / original) | 8.696 / 8.709 | 8.693 / 8.706 |
+| sha S74 | `03127688…` / `16a7ffa9…` (históricos reproduzidos) | `22980c8c…` / `b7f41fb9…` (variante nova `course_aware_cases`) |
+| `MISSING_REQUIRED_JUNCTION_BOND` | 6 | **3** (47×2, 47×4, 48×3) |
+| `NO_FUNCTIONAL_JUNCTION` | — | 7 (nó 28, fiadas 4–10) |
+| auditoria checadas/válidas/not_required | 844/838/6 | 837/834/13 |
+| `COMPENSATOR_AS_JUNCTION_BOND`; portões duros; canaleta | 0; 0/0/0/0; 0 | 0; 0/0/0/0; 0 |
+| paredes fisicamente alteradas | — | **1** (8284562: −22 B34, +18 B39, −3 C09, +4 B19; 97 fora / 94 dentro) |
+| nós 22/30, casos 06/07/08 | — | ocupação idêntica em todas as fiadas |
+| vazado menor | 52 / 63 | 44 / 55 |
+| §66 (plano offline das aberturas originais) | 24 req / 2 aplicadas (8284546 +10, 8284502 +10) | idêntico |
+| solve (s) | 22,2 / 19,6 | 21,9 / 20,7 (ruído); classificador 10–15 ms (mediana 14,5 ms), 2× por solve |
+| TORRE EASY TGD | — | **ON == OFF byte a byte** (nenhum T consumido; 3 L e 4 "T" de paralelas sobrepostas registrados) |
+
+Determinismo: dois solves ON dão o mesmo sha. IronPython 2.7.12 (pyRevit, script puro): 850/850
+registros iguais ao CPython, ~50 ms quente. Legado `strategy=None` inalterado (`3ba22aa0…`).
+
+**Fixtures** (`tests/test_secao77_papel_por_fiada.py`, 43 passam, 1 pulado): A duas janelas → `NONE_FREE_END`
+4–10, MISSING 0, ponta rente à face, sem C09/peça de nó; B sem janelas → T em todas (ON == OFF);
+C uma janela → L/D1 (ON == OFF); D afastadas 20/40, 40/20, 5/20, 20/0 → T/L (ON == OFF); E porta →
+sem encontro 0–10; F/G peitoril/verga na fronteira (80/79,4; 221/221,6); H/I nó no início × no
+fim → peça rente à face nas duas orientações, folga de 1 cm na ponta livre de verdade; J/K
+translação/inversão/ordem/lado → mesmo papel; transição 3→4 e 10→11 → amarração cabe, com apoio,
+sem compensador; memo (papel na chave); contexto restaurado; toco > tolerância continua encontro
+(registro); paralelas sobrepostas → papel base; L com braço consumido → classificado, não
+consumido (ON == OFF); overfit (largura, altura, peitoril, distância) → papel só da geometria.
+
+**B39 × B34 nas ímpares (item 12):** término normal (B39 na face): 8 peças/fiada, 0 compensadores,
+desencontro 20 cm, 16 vazados; B34 forçado: 9 peças, 1 C09/fiada, 16 cm, 22 vazados → fica o
+término normal; o B34 do humano preserva a grade da parede humana, não emerge por física.
+
+**Experimentos rejeitados:** consumir `NONE_CONTINUOUS` e o canto L (TORRE: +10 `non_modular` em
+paredes CAD já não modulares, 2 `MISSING` novos por peça sem apoio sobre fiada vazia, +26 vazados);
+matar braço pela ponta natural da parede (TORRE: 229 pares em 18 nós, nós inteiros virando ponta
+livre); "T" de paredes paralelas sobrepostas como ponta livre (sem face para terminar).
+
+**Suíte completa (uma vez, após a revisão adversarial):** `pytest tests` 1.714 passaram, 1 pulado, 4 desmarcados, 2 falhas em `tests/regression/test_benchmark_baselines.py` (TP1 e TGD-v2) — **pré-existentes**, reproduzidas idênticas no HEAD anterior extraído com `git archive` (historicamente a suíte roda com `--ignore=tests/regression`). Revisão adversarial (2 agentes, só leitura): nenhuma regressão material; objeções A (folga vazando) e B (isenção sem ponta composta) e C (tabela explícita na auditoria) corrigidas e fixadas em teste; D (precipício na tolerância física — decisão conservadora do usuário), E (recuo de 1 cm com encontro ativo na outra ponta e trecho não modular) e F (C04 das fiadas 1/3/11/13/15 pelo arranjo §60) registradas.
+
+**Limitações registradas:** o preenchimento de ponta livre é guloso a partir do início da parede
+(composição interior não espelha entre orientações — pré-existente; só a face rente é garantida);
+composição das ímpares (B39) difere do humano (B34); L/`NONE_CONTINUOUS` pendentes; tocos entre 0,05 cm e a
+menor peça continuam encontro (descontinuidade deliberada, registro PENDING); Revit não executado com a flag.
+
 ---
 
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
@@ -1502,7 +1596,7 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
 
 ## 10. ENTREGA
 
-> **Estado atual (2026-09-22, smoke real no Revit): READY FOR FINAL REVIEW — no Revit real, nenhuma falsa amarração (COMPENSATOR 0), nós 28/47/48 NÃO RESOLVIDOS (MISSING 6, os conhecidos), portões duros 0, convergência em 3 runs; ver §7.16.** O status abaixo é o da rodada da §74 e fica como registro.
+> **Estado atual (2026-09-22, seção 77): READY FOR FINAL REVIT SMOKE — papel funcional do encontro por fiada implementado sob flag (só CHANNEL); offline: nó 28 sem T funcional nas fiadas 4–10, MISSING 6 → 3, COMPENSATOR 0, portões 0, só a 8284562 muda, TORRE ON == OFF; Revit não executado com a flag; ver §7.17. O smoke real da §7.16 (motor anterior à §77) fica como registro.**
 
 **Branch** `claude/butanta-modulation-physical-fixes` · último commit de motor `2c55211` (§74) ·
 **PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.

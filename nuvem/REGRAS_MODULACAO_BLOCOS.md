@@ -9806,3 +9806,123 @@ Só classificação — nenhuma peça muda — e nenhum afeta o BUTANTÃ:
 - **Trecho `non_modular` `SEM_ESPACO` invertido (pilar negativo):** normalizado por min/max, cai sobre a
   amarração e a marca como `BOND_PIECE_NON_MODULAR` (acusa a mais). Só ocorre com `non_modular > 0`,
   que já reprova portão duro.
+
+## 77. Papel funcional do encontro POR FIADA — topologia base em planta, existência física por altura (2026-09-22, IMPLEMENTADO sob flag, só CHANNEL, decisão do usuário)
+
+**Decisão de produto (2026-09-22).** O tipo topológico definido em planta (`wall_pairing`: T, L, X)
+continua existindo como **topologia base**. O **papel funcional** do encontro é avaliado **por
+fiada/banda**, com a geometria vertical real e as aberturas ativas naquela altura. Em um T, se
+naquela fiada as aberturas ativas consumirem a parede principal **dos dois lados** da região do nó —
+de forma que não exista braço sólido funcional da principal —, então **não existe T funcional
+naquela fiada**: a parede que chega termina como **ponta livre** na face da principal, pelas regras
+normais de término (B19 permitido **porque não há T ali**, não porque B19 passou a ser permitido em
+T). Quando a principal volta a existir acima ou abaixo das aberturas, o T volta sozinho.
+
+Isto **não** é heurística do nó 28, **não** é "14 cm = ponta livre", **não** é "duas janelas = sem T"
+e **não** flexibiliza amarrações verdadeiras. A proibição de B19 em amarração T real continua valendo.
+
+### 77.1 Ordem das perguntas
+
+1. o encontro funcional **existe** nesta fiada? (este passo — `core/engine/junction_role.py`)
+2. se existe, qual é o **papel efetivo** (T/L/X)?
+3. qual peça de amarração é requerida e ela **cabe**? (`_t_intersection_room_ok`, D1, escada — §5, §58, §76)
+4. **compor**.
+
+Antes o motor pulava o passo 1: T global → tenta encaixar a peça → degrada → `C09` designado /
+`MISSING`. Medido no nó 28 do BUTANTÃ (T 8284502 ← 8284562, duas janelas a 14 cm): nas fiadas
+4–10 a principal tem 0,013 / 0,00 cm de corpo além da região do nó; o solver punha um B34
+degradado nas fiadas pares e `C09 JUNCTION_UNRESOLVED_FILL` nas ímpares (5/7/9 → `MISSING`). O
+projeto humano termina a 8284562 como ponta livre nas 7 fiadas (B19 nas pares, B34 nas ímpares) e
+volta ao T na fiada 11 (verga) e abaixo da fiada 4 (peitoril).
+
+### 77.2 Critério físico dos braços (sem limiar novo, sem id)
+
+Para cada nó L/T/X e cada fiada (`junction_role.junction_roles`):
+
+- faixa da fiada `[20c+1, 20c+20]` cm e abertura **ativa** por sobreposição > 0,5 cm — **as mesmas
+  regras do solve** (`_course_z_band`, `_opening_active_in_course_band`); aberturas do modelo do solve
+  (`_effective_solve_openings`, com as passagens livres), as mesmas que o gate 76.1 lê;
+- região do nó = `_node_region_polygon` (faixa limitada ao bloco de amarração, como na auditoria);
+- **braços pela topologia do grafo**: parede com a ponta no nó tem só o lado interno; principal do
+  T tem dois lados;
+- corpo sólido de cada braço = trecho sólido contíguo à região, até a próxima abertura ativa ou a
+  ponta da parede;
+- o braço **deixa de participar somente quando uma ABERTURA ATIVA consumiu esse corpo** (corpo
+  restante ≤ `PIER_PHYSICAL_FIT_TOLERANCE_CM` = 0,05 cm, a tolerância física da §74). **A ponta
+  natural de uma parede nunca desliga o braço**; parede inteira dentro da região (toco de
+  modelagem) nunca rebaixa o papel; `NONE_FREE_END` exige a parede que sobra **perpendicular** aos
+  braços consumidos (paredes paralelas sobrepostas do CAD cru não têm face para terminar);
+- papel efetivo = 3 braços → T; 2 perpendiculares → L; 2 colineares → `NONE_CONTINUOUS`; 1 →
+  `NONE_FREE_END`; abertura cobrindo a faixa inteira → `ABSENT` (o `not_required` que já existia).
+  O papel **só rebaixa** o tipo base, nunca promove.
+- Sensibilidade medida no BUTANTÃ: o resultado é o mesmo para qualquer tolerância entre 0,014 e
+  4,98 cm (não há corpo sólido entre 0,013 e 4,99 cm em 2.311 braços×fiada).
+
+### 77.3 Tocos entre a tolerância e a menor peça (decisão conservadora)
+
+Corpo sólido acima de 0,05 cm → o braço existe e o encontro continua; depois `room_ok`/fit/apoio/
+gates decidem se a peça cabe; se não couber → `MISSING_REQUIRED_JUNCTION_BOND`. Nenhuma política
+foi inventada para essa faixa: casos são registrados (`STUB_BELOW_MIN_UNIT`,
+`summarize()["pending_product_decision"]`) como **PENDING_PRODUCT_DECISION**. BUTANTÃ: 0 casos.
+
+### 77.4 O que o solve faz com `NONE_FREE_END` em T (flag `CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED`)
+
+- tabela de papéis calculada uma vez por solve com as aberturas do solve; **constante dentro de cada
+  banda** (as bandas são definidas pelo mesmo conjunto de aberturas ativas);
+- `solve_all_intersections` **não cria peça de nó** para o nó naquela banda (nem registra falha);
+- a parede que chega recebe a reserva de **ponta livre** (`_wall_end_default_start_cm` → 0, junta 0):
+  vai até a própria ponta, que o grafo já levou à face externa da principal; a principal não
+  preenche a boneca (reserva de meio de vão mantida);
+- **folga de modulação rente à face** (correção do recuo de 1 cm): quando a ponta livre está no
+  **início** da parede, a junta alternativa de 1 cm de um trecho com as duas pontas abertas vai para
+  o fim do trecho (`PIER_SLACK_PREFER_TRAILING`, contexto da **parede** em solve, restaurado em
+  `finally`), e a peça fica rente à face nas duas orientações. Limite registrado (revisão): com
+  encontro **ativo** na outra ponta e trecho não modular, a única junta negociável é a da face —
+  a mesma regra de qualquer parede de ponta livre do motor;
+- o papel da banda entra na **chave do memo** por parede (`_wall_fill_memo_key`);
+- `HALF_BLOCK_NEAR_TIE` e o arranjo das corridas B34 (§60) usam **posições de amarração por fiada**
+  (`_wall_tie_t_positions_by_course_cm`);
+- a auditoria 76.1 **recalcula o papel pela geometria** (`_junction_roles_for_audit`, nunca a tabela
+  do solve) e tira a fiada do denominador com razão **`NO_FUNCTIONAL_JUNCTION`** — não é
+  `MISSING`: não há encontro requerido. A isenção só vale se a ponta livre foi **composta**
+  (a região do nó coberta pela parede que sobra); parede não modular → fiada vazia → `missing`
+  com razão `FREE_END_NOT_COMPOSED` (nunca mascara; revisão adversarial). Ordem: existe? → `NOT_REQUIRED`/`NO_FUNCTIONAL_JUNCTION`;
+  se existe → peça válida? → `MISSING`; compensador na função? → `COMPENSATOR_AS_JUNCTION_BOND`.
+- o portão `MISSING` do microajuste (§66) e o ramo sem chave usam a mesma tabela.
+
+### 77.5 Escopo desta rodada e o que ficou só como classificação
+
+- **Só o T** com a principal consumida dos dois lados é consumido pelo solve. O **canto L** com um
+  braço consumido por abertura na quina e o `NONE_CONTINUOUS` (parede que chega consumida; a que
+  passa continua) são **classificados e registrados**, mas o nó fica como a base: não há caso no
+  BUTANTÃ e no TORRE (CAD cru) os candidatos são paredes já não modulares (94 cm, 131 cm com porta
+  a 6 cm da quina) — consumi-los trocava a segmentação e deixava fiadas vazias sob a fiada em que
+  o encontro volta (medido: +10 `non_modular`, 2 `MISSING` novos por peça sem apoio). Decisão de
+  produto pendente.
+- **Nós 47 e 48** (L) **não** são alcançados: os dois braços existem (5,51 e 15,49 cm além da
+  região); o problema deles é o passo 3 ("a peça cabe?") — continuam `MISSING`, sem D2/D3/recuo.
+
+### 77.6 Medido (offline, motor congelado + esta seção)
+
+| | BUTANTÃ OFF | BUTANTÃ ON |
+|---|---|---|
+| peças (pós-§66 / original) | 8.696 / 8.709 | 8.693 / 8.706 |
+| sha S74 (pós-§66 / original) | `03127688…` / `16a7ffa9…` (históricos) | `22980c8c…` / `b7f41fb9…` (variante nova) |
+| `MISSING_REQUIRED_JUNCTION_BOND` | 6 | **3** (47×2, 47×4, 48×3) |
+| `NO_FUNCTIONAL_JUNCTION` | — | 7 (nó 28, fiadas 4–10) |
+| auditoria checadas / válidas / not_required | 844 / 838 / 6 | 837 / 834 / 13 |
+| `COMPENSATOR_AS_JUNCTION_BOND`, portões duros | 0, 0/0/0/0 | 0, 0/0/0/0 |
+| paredes fisicamente alteradas | — | **1** (8284562: B34 −22, B39 +18, C09 −3, B19 +4; nas fiadas 1/3/11/13/15, com o T ativo, o C04 muda de [415,419] para [455,459] pelo arranjo §60 reagindo às fiadas 5/7/9 — −5/+5 C04) |
+| vazado menor (§69) | 52 / 63 | 44 / 55 |
+| nós 22/30, casos 06/07/08 | — | idênticos por fiada |
+
+TORRE EASY TGD (CAD cru): ON == OFF byte a byte (nenhum T consumido; 3 cantos L e 4 "T" de paredes
+paralelas sobrepostas registrados, não consumidos). Fixtures sintéticas (A–K, transição, memo,
+orientação, overfit): `tests/test_secao77_papel_por_fiada.py`. Classificador: ~10 ms por solve
+(CPython e IronPython 2.7, 850/850 registros iguais).
+
+**Composição das fiadas ímpares (B39 × B34 na face, medido na fixture do nó 28):** o término normal
+(B39 na face) dá 8 peças/fiada, 0 compensadores, desencontro de junta 20 cm acima e abaixo, 16
+vazados menores; forçar B34 na face dá 9 peças, 1 C09/fiada, desencontro 16 cm, 22 vazados. O B34
+do humano não emerge por princípio físico — ele preserva a grade de juntas da parede humana, que é
+outra. Fica o término normal.
