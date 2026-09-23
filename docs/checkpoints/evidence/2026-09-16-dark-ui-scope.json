@@ -1,0 +1,28 @@
+{
+  "base": "55e990d962ed22ae1021f0d335db197607bddda1",
+  "head": "ec5142402577520496fe144e08d02749338b695f",
+  "changed_definitions": [
+    "_PostCreationForm",
+    "_ProgressConsole",
+    "_SetupForm",
+    "_WallReviewForm",
+    "_WallSourceModeForm",
+    "_build_section_label",
+    "_select_existing_walls_for_modulation",
+    "_style_primary_button",
+    "_style_secondary_button",
+    "run_modulation_on_existing_walls"
+  ],
+  "unexpected_definitions": [],
+  "engine_benchmark_loader_changed": [],
+  "entire_external_event_handler_ast_unchanged": true,
+  "threading_dispatch_pump_and_timer_methods_unchanged": true,
+  "unchanged_top_level_definitions": 188,
+  "ok": true,
+  "previous_reviewed_head": "20d7e392e6aa9b9f98eeb9aafdaac6aa0d64c136",
+  "protected_diff_since_previous_review": [],
+  "new_presentation_modules": [
+    "nuvem/core/ui_native_style.py",
+    "nuvem/core/ui_preview_panel.py"
+  ]
+}

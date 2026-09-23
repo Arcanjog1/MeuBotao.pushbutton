@@ -9835,17 +9835,22 @@ from System import Action
 
 # Paleta unica da interface - definida uma vez para que todas as janelas
 # tenham a mesma linguagem visual, em vez das cores padrao do WinForms.
-UI_BG = Color.FromArgb(250, 250, 252)
-UI_PANEL = Color.FromArgb(255, 255, 255)
-UI_HEADER = Color.FromArgb(31, 41, 55)
-UI_TEXT = Color.FromArgb(31, 41, 55)
-UI_MUTED = Color.FromArgb(107, 114, 128)
-UI_ACCENT = Color.FromArgb(37, 99, 235)
-UI_OK = Color.FromArgb(16, 133, 88)
-UI_WARN = Color.FromArgb(180, 83, 9)
-UI_ERROR = Color.FromArgb(185, 28, 28)
-UI_LINE = Color.FromArgb(229, 231, 235)
-UI_SOFT = Color.FromArgb(243, 244, 246)
+from core.ui_state import TOKENS as _UI_TOKENS, elapsed_text as _ui_elapsed_text
+from core.ui_state import creation_gate as _ui_creation_gate, wall_label as _ui_wall_label
+from core.ui_state import friendly_problem as _ui_problem, activity_text as _ui_activity
+from core.ui_components import UiComponents
+
+UI_BG = Color.FromArgb(*_UI_TOKENS["Background"])
+UI_PANEL = Color.FromArgb(*_UI_TOKENS["Surface"])
+UI_HEADER = Color.FromArgb(*_UI_TOKENS["Background"])
+UI_TEXT = Color.FromArgb(*_UI_TOKENS["TextPrimary"])
+UI_MUTED = Color.FromArgb(*_UI_TOKENS["TextSecondary"])
+UI_ACCENT = Color.FromArgb(*_UI_TOKENS["Primary"])
+UI_OK = Color.FromArgb(*_UI_TOKENS["Success"])
+UI_WARN = Color.FromArgb(*_UI_TOKENS["Warning"])
+UI_ERROR = Color.FromArgb(*_UI_TOKENS["Danger"])
+UI_LINE = Color.FromArgb(*_UI_TOKENS["Border"])
+UI_SOFT = UI_BG
 
 # Severidades usadas nas ocorrencias do relatorio final (ver _ResultsForm):
 # rotulo mostrado na coluna + cor da linha.
@@ -9865,6 +9870,8 @@ def _style_primary_button(button):
     """Botao de acao principal - preenchido, sem borda 3D do WinForms."""
     button.FlatStyle = FlatStyle.Flat
     button.FlatAppearance.BorderSize = 0
+    button.FlatAppearance.MouseOverBackColor = Color.FromArgb(*_UI_TOKENS["Hover"])
+    button.FlatAppearance.MouseDownBackColor = Color.FromArgb(*_UI_TOKENS["Pressed"])
     button.BackColor = UI_ACCENT
     button.ForeColor = Color.White
     button.Font = _ui_font(9.5, True)
@@ -9876,6 +9883,8 @@ def _style_secondary_button(button):
     button.FlatStyle = FlatStyle.Flat
     button.FlatAppearance.BorderSize = 1
     button.FlatAppearance.BorderColor = UI_LINE
+    button.FlatAppearance.MouseOverBackColor = UI_SOFT
+    button.FlatAppearance.MouseDownBackColor = UI_LINE
     button.BackColor = UI_PANEL
     button.ForeColor = UI_TEXT
     button.Font = _ui_font(9.5)
@@ -9926,14 +9935,14 @@ def _build_section_label(text, hint=None):
     controles soltos numa sequencia de passos legivel."""
     holder = Panel()
     holder.Dock = DockStyle.Top
-    holder.Height = 42 if hint else 26
+    holder.Height = 68 if hint else 30
     holder.BackColor = UI_PANEL
 
     if hint:
         hint_label = Label()
         hint_label.Text = hint
         hint_label.Dock = DockStyle.Bottom
-        hint_label.Height = 18
+        hint_label.Height = 42
         hint_label.Font = _ui_font(8.25)
         hint_label.ForeColor = UI_MUTED
         holder.Controls.Add(hint_label)
@@ -10049,6 +10058,8 @@ def _styled_listview(columns, checkboxes=False):
 # processar essa mensagem no proximo DoEvents()).
 # ==========================================
 
+_ui = UiComponents(globals())
+
 SOLVER_SLOW_WARNING_SECONDS = 8.0
 SOLVER_WATCHDOG_INTERVAL_MS = 3000
 # Intervalo de espera (segundos) dos lacos "while should_pause_cb(): ..."
@@ -10128,7 +10139,12 @@ class _ProgressConsole(object):
 
         self._log_box = _monospace_textbox("")
 
-        self.panel.Controls.Add(self._log_box)
+        self._started_at = time.time()
+        self._elapsed_label = _ui.label("Tempo decorrido: 00:00", 26)
+        self._details = _ui.expandable(self._log_box, height=220)
+        self.panel.AutoScroll = True
+        self.panel.Controls.Add(self._details)
+        self.panel.Controls.Add(self._elapsed_label)
         self.panel.Controls.Add(top)
 
     def _pump_ui(self):
@@ -10227,10 +10243,10 @@ class _ProgressConsole(object):
         if self._invoke_if_needed(lambda: self.set_status(text, kind)):
             return
         color = {
-            "ok": self._UI_OK, "warn": self._UI_WARN, "error": self._UI_WARN,
+            "ok": self._UI_OK, "warn": self._UI_WARN, "error": UI_ERROR,
         }.get(kind, self._UI_TEXT)
         try:
-            self._status_label.Text = text
+            self._status_label.Text = _ui_activity(text)
             self._status_label.ForeColor = color
             with _perf.span("console.set_status DoEvents"):
                 self._pump_ui()
@@ -10244,7 +10260,10 @@ class _ProgressConsole(object):
         if self._invoke_if_needed(lambda: self.set_progress(done, total, detail)):
             return
         try:
-            total = max(1, int(total or 1))
+            if not total or total <= 0:
+                self.set_indeterminate(detail or "Processando; total ainda não informado.")
+                return
+            total = max(1, int(total))
             done = max(0, min(int(done or 0), total))
             pct = int(round(100.0 * done / total))
             if done > 0:
@@ -10254,7 +10273,7 @@ class _ProgressConsole(object):
             self._progress_bar.Style = ProgressBarStyle.Continuous
             self._progress_bar.Maximum = 100
             self._progress_bar.Value = pct
-            self._detail_label.Text = detail or "{}/{} processado(s) - {}%".format(done, total, pct)
+            self._detail_label.Text = "{} de {} · {}%  {}".format(done, total, pct, _ui_activity(detail))
             self._touch(detail or "")
             with _perf.span("console.set_progress DoEvents"):
                 self._pump_ui()
@@ -10275,7 +10294,7 @@ class _ProgressConsole(object):
             # (ou incriminado) com timestamp.
             self._progress_bar.MarqueeAnimationSpeed = 30
             if detail:
-                self._detail_label.Text = detail
+                self._detail_label.Text = _ui_activity(detail)
             self._touch(detail or "")
             with _perf.span("console.set_indeterminate DoEvents"):
                 self._pump_ui()
@@ -10307,6 +10326,7 @@ class _ProgressConsole(object):
     # ------------------------------------------------------------ watchdog
     def _touch(self, label):
         self._last_update_time = time.time()
+        self._elapsed_label.Text = "Tempo decorrido: " + _ui_elapsed_text(time.time() - self._started_at)
         if label:
             self._current_label = label
 
@@ -10314,6 +10334,7 @@ class _ProgressConsole(object):
         """Liga o vigia (ver cabecalho da secao) - seguro chamar mais de
         uma vez (para/recria)."""
         self.stop_watchdog()
+        self._started_at = time.time()
         self._last_update_time = time.time()
         self._last_watchdog_notice_time = 0.0
         try:
@@ -10411,8 +10432,8 @@ REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 # estrategia nao implementada aparece para deixar a expansao visivel, mas
 # bloqueia o botao executar.
 OPENING_REINFORCEMENT_UI_OPTIONS = (
-    ("NONE", "Sem reforco de aberturas (modulacao legada)", True),
-    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
+    ("NONE", "Sem reforço", True),
+    ("CHANNEL", "Canaletas (CHANNEL)", True),
     ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
 )
 DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "NONE"
@@ -10583,8 +10604,10 @@ class _SetupForm(Form):
         remembered_reinforcement = defaults.get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
         selected_reinforcement = 0
         for index, (key, label, _implemented) in enumerate(OPENING_REINFORCEMENT_UI_OPTIONS):
+            if not _implemented:
+                continue
             self._reinforcement_combo.Items.Add(label)
-            if key == remembered_reinforcement:
+            if key == remembered_reinforcement and _implemented:
                 selected_reinforcement = index
         self._reinforcement_combo.SelectedIndex = selected_reinforcement
         self._reinforcement_combo.SelectedIndexChanged += self._on_changed
@@ -10691,7 +10714,7 @@ class _SetupForm(Form):
         footer.Padding = Padding(16, 13, 16, 13)
 
         self._run_button = Button()
-        self._run_button.Text = "Executar"
+        self._run_button.Text = "Criar paredes"
         self._run_button.Dock = DockStyle.Right
         self._run_button.Width = 170
         _style_primary_button(self._run_button)
@@ -10738,6 +10761,7 @@ class _SetupForm(Form):
             self._layer_grid.Items[target_row].Selected = True
         self._reload_thicknesses(defaults.get("thicknesses_cm") or [])
         self._validate()
+        _ui.setup(self, body, left, right, footer)
 
     # ------------------------------------------------------------ estado
     @property
@@ -10817,16 +10841,16 @@ class _SetupForm(Form):
     def _validate(self, pending_thickness=None):
         problems = []
         if not self._selected_layer:
-            problems.append("escolha o Layer das paredes")
+            problems.append("Selecione o layer de paredes")
         thicknesses, error = self._checked_thicknesses_cm(pending_thickness)
         if error:
             problems.append(error)
         elif not thicknesses:
-            problems.append("marque ao menos uma espessura")
+            problems.append("Selecione ao menos uma espessura de parede para continuar")
         if self._level_combo.SelectedItem is None:
-            problems.append("escolha o Nivel")
+            problems.append("Selecione um nível")
         if self._parsed_height_m() is None:
-            problems.append("informe uma altura valida em metros (ex.: 2.80)")
+            problems.append("Informe uma altura válida em metros (ex.: 2,80)")
         reinforcement_option = self._selected_reinforcement_option()
         if reinforcement_option is not None and not reinforcement_option[2]:
             problems.append("reforco de aberturas '{}' ainda nao implementado - escolha CHANNEL".format(
@@ -10834,22 +10858,12 @@ class _SetupForm(Form):
 
         if problems:
             self._status.ForeColor = UI_WARN
-            self._status.Text = "Falta: " + "; ".join(problems) + "."
+            self._status.Text = "! " + ". ".join(problems) + "."
             _set_button_enabled(self._run_button, False)
             return False
 
         self._status.ForeColor = UI_MUTED
-        self._status.Text = (
-            "Layer '{}' | {} espessura(s): {} | Nivel '{}' | altura {:.2f}m | "
-            "portas/janelas: {} | paredes: {}".format(
-                self._selected_layer, len(thicknesses),
-                ", ".join("%gcm" % t for t in thicknesses),
-                self._level_combo.SelectedItem, self._parsed_height_m(),
-                "selecionar no modelo" if self._openings_pick.Checked else "deteccao automatica",
-                "continuas com recortes" if self._wall_mode_continuous.Checked
-                else "segmentadas pelas aberturas"
-            )
-        )
+        self._status.Text = "✓ Configuração pronta para criar paredes."
         _set_button_enabled(self._run_button, True)
         return True
 
@@ -12791,8 +12805,9 @@ class _PostCreationForm(Form):
     ver _show_post_creation_window) -> lista de erros (linha clicavel, da'
     zoom na parede) -> "Ajustar Erros" -> bloco "Lancar Blocos" -> bloco
     "Finalizar/Deletar Paredes" -> log no rodape. Substitui as antigas
-    _ResultsForm e _BlockWizardForm (ambas removidas), sem nenhuma
-    TabControl - tudo numa unica tela, pedido explicito do usuario."""
+    _ResultsForm e _BlockWizardForm (ambas removidas).
+    O redesign organiza revisão, plano e resultado
+    na mesma janela, mantendo callbacks e ExternalEvent existentes."""
 
     def __init__(self, report, external_event, handler, created_wall_ids_all):
         # OBRIGATORIO no engine CPython (pythonnet) - ver o mesmo comentario
@@ -12941,7 +12956,7 @@ class _PostCreationForm(Form):
             self._errors_status.Text = "Analisar Paredes: nenhum eixo fora da modulacao."
 
         self._errors_grid = _styled_listview([
-            ("Eixo", 60), ("Problema", 560), ("Situacao", 200),
+            ("Parede", 105), ("Problema", 415), ("Situação / ação", 180),
         ])
         self._errors_grid.MultiSelect = False
         self._errors_grid.SelectedIndexChanged += self._on_error_row_selected
@@ -12995,7 +13010,7 @@ class _PostCreationForm(Form):
         fix_row.Controls.Add(fix_gap)
 
         self._fix_button = Button()
-        self._fix_button.Text = "Ajustar Erros"
+        self._fix_button.Text = "Aplicar ajustes disponíveis"
         self._fix_button.Dock = DockStyle.Right
         self._fix_button.Width = 200
         self._fix_button.Enabled = auto_fixable_count > 0
@@ -13032,7 +13047,7 @@ class _PostCreationForm(Form):
 
         # --- Lancar Blocos: calcular ---
         self._solve_button = Button()
-        self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+        self._solve_button.Text = "Analisar modulação"
         self._solve_button.Dock = DockStyle.Top
         self._solve_button.Height = 34
         self._solve_button.Enabled = False
@@ -13064,7 +13079,7 @@ class _PostCreationForm(Form):
 
         # --- Lancar Blocos: criar ---
         self._create_button = Button()
-        self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
+        self._create_button.Text = "CRIAR BLOCOS NO REVIT"
         self._create_button.Dock = DockStyle.Top
         self._create_button.Height = 34
         self._create_button.Enabled = False
@@ -13202,17 +13217,19 @@ class _PostCreationForm(Form):
         if initial_log_parts:
             self._log_box.Text = "\r\n\r\n".join(p.replace("\n", "\r\n") for p in initial_log_parts)
 
+        _ui.post(self, report, errors_panel, debug_row, review_row)
         self._apply_catalog_status()
 
     # ---------------------------------------------- erros / ajustar erros
     def _populate_error_rows(self, error_rows):
         self._errors_grid.Items.Clear()
-        for row in error_rows:
-            item = ListViewItem("-" if row.get("wall_idx") is None else str(row["wall_idx"]))
-            item.SubItems.Add(row["problem_text"])
+        for number, row in enumerate(error_rows, 1):
+            item = ListViewItem("Parede {}".format(number))
+            item.SubItems.Add(_ui_problem(row["problem_text"]))
+            item.ToolTipText = "{} — {}".format(_ui_wall_label(row), row["problem_text"])
             item.SubItems.Add(
                 "Corrigido" if row.get("resolved")
-                else ("Auto-corrigivel" if row["auto_fixable"] else "Revisao manual")
+                else ("Ajuste disponível · visualizar" if row["auto_fixable"] else "Revisar · visualizar")
             )
             item.ForeColor = (
                 self._UI_OK if row.get("resolved")
@@ -13220,6 +13237,8 @@ class _PostCreationForm(Form):
             )
             item.Tag = list(row["wall_ids"])
             self._errors_grid.Items.Add(item)
+        if hasattr(self, "_ux"):
+            self._ux.refresh_issues(self)
 
     def _on_error_row_selected(self, sender, args):
         selected = self._errors_grid.SelectedItems
@@ -13288,6 +13307,9 @@ class _PostCreationForm(Form):
             self._pause_button.Visible = False
 
     def _on_fix_cancel_click(self, sender, args):
+        if not forms.alert("Interromper os ajustes? As alterações já aplicadas serão mantidas.",
+                           title="Cancelar ajustes", yes=True, no=True):
+            return
         # Mesma semantica do Cancelar de _WallReviewForm: so' PEDE, nunca
         # desfaz o que ja foi commitado (cada linha e' um SubTransaction
         # isolado - ver fix_all_wall_modulation_errors). `_fix_paused` e'
@@ -13407,14 +13429,7 @@ class _PostCreationForm(Form):
                     m["logical_code"], m["family_name"], m["type_name"]
                 ) for m in missing
             )
-            forms.alert(
-                "Nao e' possivel lancar os blocos ainda - {} familia(s)/tipo(s) do "
-                "catalogo fixo NAO estao carregadas neste projeto:\n\n{}\n\n"
-                "Carregue essa(s) familia(s)/tipo(s) no Revit (Inserir > Carregar "
-                "Familia), com EXATAMENTE esses nomes, e reabra a Tela 2 (reselecione "
-                "as paredes) para continuar.".format(len(missing), missing_lines),
-                title="Modulacao Automatica - Etapa 2: familia(s) de bloco faltando"
-            )
+            self._ui_tabs.SelectedIndex = 0
             return
 
         self._catalog_status.Text = "Catalogo: {} tipo(s) OK ({}).".format(
@@ -13471,6 +13486,7 @@ class _PostCreationForm(Form):
             return False
 
     def _on_solve_click(self, sender, args):
+        self._ux.busy(self, 3)
         self._set_busy(self._solve_button, "Calculando...")
         console = self._solve_console
         console.log("Iniciando Solver 18 (lancamento de blocos X->T->L->jambs->trechos livres)...")
@@ -13561,78 +13577,42 @@ class _PostCreationForm(Form):
         if not self._raise_action("solve", self._on_solve_done, self._solve_status):
             console.stop_watchdog()
             console.mark_failed("Falha ao disparar o Solver 18.")
-            self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+            self._ux.failed(self, "Não foi possível iniciar a análise.")
+            self._solve_button.Text = "Analisar modulação"
             self._solve_button.Enabled = True
 
-    def _on_solve_done(self, kind, error, auto_create=True):
+    def _on_solve_done(self, kind, error, auto_create=False):
+        """Present the plan. Creation always requires an explicit user action."""
         self._solve_console.stop_watchdog()
-        self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+        self._solve_button.Text = "Reanalisar modulação"
         self._solve_button.Enabled = True
         if kind == "error":
-            self._solve_status.Text = "Falha: {}".format(error)
-            self._solve_status.ForeColor = self._UI_WARN
-            self._solve_console.mark_failed("Solver 18 falhou: {}".format(error))
+            self._solve_console.mark_failed("Não foi possível analisar a modulação.")
+            self._ux.failed(self, error)
             return
         result = self._handler.solve_result
-        self._solve_console.mark_complete(
-            "Solver 18 concluido - {} candidato(s) de bloco calculado(s).".format(
-                len(result.get("candidates") or [])
-            )
-        )
+        self._solve_console.mark_complete("Análise concluída. Confira o plano de blocos.")
         report, _ready_to_create = self._format_block_solve_report(result, self._handler.catalog)
         self._append_log(report)
-        door_violations = result.get("door_void_violations") or []
-        wall_bond_audits = result.get("wall_bond_audits") or {}
-        reproved_bond_count = sum(1 for audit in wall_bond_audits.values() if not audit["ok"])
-        # REGRA REVISTA 2026-08-26: nenhum diagnostico (colisao, vao de
-        # porta, auditoria de amarracao) bloqueia mais o botao "criar" - o
-        # unico motivo para desabilita-lo agora e' nao haver candidato
-        # nenhum para criar. Os problemas continuam sendo mostrados aqui e
-        # no log, e as pecas envolvidas saem marcadas em vermelho depois de
-        # criadas (ver _execute_create) - nunca impedem a criacao.
-        self._solve_status.Text = (
-            "{} candidato(s), {} colisao(oes), {} violacao(oes) de vao de porta, "
-            "{} parede(s) reprovada(s) na auditoria de amarracao entre fiadas "
-            "[todos criados mesmo assim, marcados em vermelho para revisao]."
-        ).format(
-            len(result["candidates"]), len(result["collisions"]), len(door_violations),
-            reproved_bond_count
-        )
-        has_candidates = len(result["candidates"]) > 0
-        self._solve_status.ForeColor = self._UI_OK if has_candidates else self._UI_WARN
-        self._create_button.Enabled = has_candidates
-        if not has_candidates:
-            self._solve_status.Text += " Nenhum candidato de bloco calculado - veja o log, mais abaixo."
-            self._create_status.Text = "Nada para criar: o solver nao calculou nenhum candidato de bloco."
-            self._create_status.ForeColor = self._UI_WARN
-        elif door_violations or reproved_bond_count or result["collisions"]:
-            self._create_status.Text = (
-                "Pronto para criar. {} problema(s) encontrado(s) (colisao/vao de porta/amarracao) - "
-                "os blocos serao criados mesmo assim e as pecas/paredes envolvidas ficarao marcadas em "
-                "vermelho para revisao manual; nada e' bloqueado."
-            ).format(len(door_violations) + reproved_bond_count + len(result["collisions"]))
-            self._create_status.ForeColor = self._UI_WARN
-        else:
-            self._create_status.Text = "Pronto para criar."
-            self._create_status.ForeColor = self._UI_TEXT
-
-        # Pedido explicito do usuario (2026-08-27): a Etapa 2 nunca pode
-        # parar so' no calculo - "nao quero que o script apenas calcule,
-        # mostre sugestoes... os blocos precisam ser fisicamente inseridos
-        # no modelo do Revit". Assim que houver ao menos um candidato,
-        # dispara a criacao automaticamente, sem esperar um segundo clique
-        # manual em "Lancar Blocos - criar" (que continua existindo/
-        # habilitado, para o usuario poder re-disparar depois de um novo
-        # "Ajustar Erros"/recalculo). `auto_create=False` so' quando este
-        # metodo e' chamado para REPLAY de um solve_result em cache (janela
-        # reaberta com o MESMO conjunto de paredes - ver _show_post_creation_
-        # window/initial_solve_result) - nesse caso nunca cria sozinho, so'
-        # mostra o estado ja calculado (o replay de create_result, se
-        # houver, e' feito separadamente pelo chamador).
-        if has_candidates and auto_create:
-            self._on_create_click(None, None)
+        self._ux.solved(self)
 
     def _on_create_click(self, sender, args):
+        allowed, reason = _ui_creation_gate(self._handler.solve_result,
+                                           self._handler.catalog_missing,
+                                           self._handler.channel_catalog_missing)
+        if not allowed:
+            self._create_button.Enabled = False
+            self._ui_banner.Text = reason
+            return
+        previous = (self._handler.create_result or {}).get("created_count")
+        message = ("Modulação existente detectada: {} blocos. O lote anterior será substituído."
+                   .format(previous) if previous else
+                   "Os blocos do plano serão criados. Se estas paredes já tiverem um lote de modulação, "
+                   "o lote anterior será substituído.")
+        if not forms.alert(message + "\n\nContinuar com a criação?",
+                           title="Criar blocos no Revit", yes=True, no=True):
+            return
+        self._ux.busy(self, 5)
         self._set_busy(self._create_button, "Criando blocos...")
 
         # FEEDBACK AO VIVO DA ETAPA 5 (2026-08-27, relato do usuario: a
@@ -13672,17 +13652,21 @@ class _PostCreationForm(Form):
         if not self._raise_action("create", self._on_create_done, self._create_status):
             console.stop_watchdog()
             console.mark_failed("Falha ao disparar a criacao dos blocos.")
-            self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
-            self._create_button.Enabled = True
+            self._ux.failed(self, "Não foi possível iniciar a criação.")
+            self._create_button.Text = "CRIAR BLOCOS NO REVIT"
+            self._create_button.Enabled = False
+            self._solve_button.Enabled = True
 
     def _on_create_done(self, kind, error, show_summary_alert=True):
         self._solve_console.stop_watchdog()
-        self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
+        self._create_button.Text = "CRIAR BLOCOS NO REVIT"
         self._create_button.Enabled = True
         if kind == "error":
             self._solve_console.mark_failed("Falha ao criar os blocos: {}".format(error))
             self._create_status.Text = "Falha: {}".format(error)
             self._create_status.ForeColor = self._UI_WARN
+            self._ux.failed(self, error)
+            self._solve_button.Enabled = True
             return
         result = self._handler.create_result
         report_lines = ["=== Criacao dos blocos no Revit ==="]
@@ -13788,8 +13772,8 @@ class _PostCreationForm(Form):
         # chega ao usuario de qualquer jeito. So' dispara na execucao REAL
         # (nunca ao reabrir a janela com um create_result em cache - ver
         # _show_post_creation_window/initial_create_result).
-        if show_summary_alert:
-            self._show_final_block_summary_alert(result)
+        self._ux.completed(self)
+        self._solve_button.Enabled = True
 
     def _show_final_block_summary_alert(self, create_result):
         solve_result = self._handler.solve_result or {}
@@ -13997,7 +13981,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     # sucesso do `_PostCreationEventHandler` da ETAPA 1 (acao "analyze",
     # ver _execute_analyze) chega aqui via `self.on_done` marshalado de
     # volta pro thread de UI com `Control.BeginInvoke` (ui_invoke_cb) - ou,
-    # no botao "Pular para Modulacao dos Blocos", direto de um Click de
+    # no botao "Usar paredes atuais e continuar", direto de um Click de
     # WinForms - nenhum dos dois casos esta' mais dentro da execucao da
     # API do Revit (Execute() ja retornou), entao `ExternalEvent.Create`
     # AQUI lanca `InvalidOperationException`. O chamador (ver
@@ -14186,7 +14170,7 @@ class _WallReviewForm(Form):
         # self._cancel_button (gap encostado no botao Fill, botao Cancelar
         # na borda direita).
         self._start_button = Button()
-        self._start_button.Text = "Iniciar Modulacao das Paredes"
+        self._start_button.Text = "Analisar paredes"
         self._start_button.Dock = DockStyle.Fill
         _style_primary_button(self._start_button)
         self._start_button.Click += self._on_start_click
@@ -14205,7 +14189,7 @@ class _WallReviewForm(Form):
         # de novo. Continua exigindo confirmacao (ver _on_skip_click) porque
         # pula a validacao que detecta/corrige eixos fora da modulacao.
         self._skip_button = Button()
-        self._skip_button.Text = "Pular para Modulacao dos Blocos"
+        self._skip_button.Text = "Usar paredes atuais e continuar"
         self._skip_button.Dock = DockStyle.Right
         self._skip_button.Width = 240
         _style_secondary_button(self._skip_button)
@@ -14266,8 +14250,10 @@ class _WallReviewForm(Form):
         self.Controls.Add(footer)
         self.Controls.Add(cards)
         self.Controls.Add(header)
+        _ui.walls(self, stage1_report, body, start_bar, footer)
 
     def _on_start_click(self, sender, args):
+        self._ux.set_step(self._ui_header, 2, "Analisando paredes. Acompanhe o progresso abaixo.")
         if self._external_event is None:
             self._status_label.ForeColor = self._UI_WARN
             self._status_label.Text = "Canal de aplicacao indisponivel nesta execucao."
@@ -14403,7 +14389,7 @@ class _WallReviewForm(Form):
         except Exception as ex:
             self._console.stop_watchdog()
             self._start_button.Enabled = True
-            self._start_button.Text = "Iniciar Modulacao das Paredes"
+            self._start_button.Text = "Analisar paredes"
             self._cancel_button.Visible = False
             self._pause_button.Visible = False
             self._status_label.ForeColor = self._UI_WARN
@@ -14461,7 +14447,7 @@ class _WallReviewForm(Form):
         self._pause_button.Visible = False
         if kind == "error":
             self._start_button.Enabled = True
-            self._start_button.Text = "Iniciar Modulacao das Paredes"
+            self._start_button.Text = "Analisar paredes"
             self._status_label.ForeColor = self._UI_WARN
             self._status_label.Text = "Falha ao iniciar a modulacao: {}".format(error)
             self._console.mark_failed("FALHOU: {}".format(error))
@@ -14469,6 +14455,15 @@ class _WallReviewForm(Form):
                 self._on_start_error(error)
             return
         error_rows = self._handler.error_rows or []
+        if self._cancel_requested:
+            self._console.stop_watchdog()
+            self._console.set_status("Análise interrompida. Confira as paredes e analise novamente.", "warn")
+            self._start_button.Enabled = True
+            self._start_button.Text = "Analisar paredes"
+            self._skip_button.Enabled = True
+            self._pause_button.Visible = False
+            self._cancel_button.Visible = False
+            return
         total = len(error_rows)
         cancel_note = " (cancelado pelo usuario antes do fim)" if self._cancel_requested else ""
         self._console.log(
@@ -14538,7 +14533,7 @@ class _WallReviewForm(Form):
                 self._on_start_success(None)
         except Exception as ex:
             # Bug real reportado pelo usuario (2026-08-27): clicar em
-            # "Pular para Modulacao dos Blocos" -> "Sim" nao fazia
+            # "Usar paredes atuais e continuar" -> "Sim" nao fazia
             # absolutamente nada visivel quando algo dentro do callback
             # falhava - o Click do WinForms roda fora da execucao da API
             # do Revit, entao uma excecao aqui escapava direto sem
@@ -14550,7 +14545,7 @@ class _WallReviewForm(Form):
             self._console.mark_failed("FALHOU ao pular para a Tela 2: {}".format(detail))
             self._start_button.Enabled = True
             self._skip_button.Enabled = True
-            self._skip_button.Text = "Pular para Modulacao dos Blocos"
+            self._skip_button.Text = "Usar paredes atuais e continuar"
             forms.alert(
                 "Falha ao pular para a Tela 2 (Modulacao dos Blocos).\n\n"
                 "Erro: {}\n\n"
@@ -14717,8 +14712,8 @@ class _WallSourceModeForm(Form):
         self._rb_existing.GroupName = "wall_source_mode"
 
         desc_existing = Label()
-        desc_existing.Text = ("Pula a criacao e verificacao inicial - usa Walls "
-                              "ja modeladas no projeto, selecionadas a seguir.")
+        desc_existing.Text = ("Selecione as paredes no Revit. As aberturas serão detectadas "
+                              "automaticamente; depois, confira a seleção e inicie a análise.")
         desc_existing.Font = _ui_font(8.75)
         desc_existing.ForeColor = UI_MUTED
         desc_existing.Dock = DockStyle.Fill
@@ -14811,6 +14806,7 @@ class _WallSourceModeForm(Form):
         self.Controls.Add(body)
         self.Controls.Add(footer)
         self.Controls.Add(header)
+        _ui.source(self, body, footer)
 
     def _on_ok(self, sender, event):
         if self._rb_merge.Checked:
@@ -14895,23 +14891,12 @@ def _select_existing_walls_for_modulation():
                 preselected_walls.append(element)
     except Exception:
         preselected_walls = []
-    if preselected_walls:
-        use_selection = forms.alert(
-            "Ha' {} parede(s) ja' selecionada(s) no modelo.\n\nUsar essas "
-            "paredes na modulacao? (Nao = selecionar de novo no modelo)".format(
-                len(preselected_walls)),
-            title="Modulacao Automatica - Etapa 1: Selecao das paredes",
-            yes=True, no=True
-        )
-        if use_selection:
-            return _build_existing_walls_selection(preselected_walls)
+    selection_choice = _ui.selection_prompt(len(preselected_walls))
+    if selection_choice is None:
+        return None, None, None, None, None, 0
+    if selection_choice == "current":
+        return _build_existing_walls_selection(preselected_walls)
 
-    forms.alert(
-        "Selecione no modelo as paredes existentes que deseja modular e "
-        "clique em 'Concluir' na barra de opcoes do Revit (ou Esc para "
-        "cancelar).",
-        title="Modulacao Automatica - Etapa 1: Selecao das paredes"
-    )
     try:
         refs = uidoc.Selection.PickObjects(
             ObjectType.Element,
@@ -15044,6 +15029,13 @@ def run_modulation_on_existing_walls(preselected=None):
     output.print_md("**Coletando aberturas (portas/janelas) do projeto...**")
     all_openings, openings_source_note = collect_opening_instances("auto", None)
 
+    reinforcement_choice = _ui.existing_setup(
+        len(walls_to_create), selected_level.Name,
+        wall_height_ft / FEET_PER_METER, len(all_openings))
+    if reinforcement_choice is None:
+        return
+    execution_strategy = _opening_reinforcement_strategy_from_ui_value(reinforcement_choice)
+
     opening_diagnostics = {
         "clamped_opening_count": 0, "opening_center_gap_max_ft": 0.0,
         "opening_off_center_count": 0, "assignments": [], "unassigned_openings": [],
@@ -15084,7 +15076,7 @@ def run_modulation_on_existing_walls(preselected=None):
     # ExternalEvent.Create so' e' valido dentro da execucao da API, e
     # `_run_stage2_existing_walls` abaixo e' chamada ou de um
     # `Control.BeginInvoke` (fim da acao "analyze") ou direto de um Click
-    # de WinForms ("Pular para Modulacao dos Blocos") - nenhum dos dois
+    # de WinForms ("Usar paredes atuais e continuar") - nenhum dos dois
     # ainda esta' dentro dessa execucao).
     stage2_handler = _PostCreationEventHandler()
     stage2_external_event = ExternalEvent.Create(stage2_handler)
@@ -15110,7 +15102,7 @@ def run_modulation_on_existing_walls(preselected=None):
         # TUDO abaixo (montagem do log/report, cache de solve/create
         # anteriores e abertura da Tela 2) agora fica dentro de UM UNICO
         # try/except (bug real reportado pelo usuario, 2026-08-27: clicar
-        # em "Pular para Modulacao dos Blocos" -> "Sim" nao fazia
+        # em "Usar paredes atuais e continuar" -> "Sim" nao fazia
         # absolutamente nada visivel - a janela ficava com os botoes
         # desabilitados e nunca abria a Tela 2, sem NENHUM alerta de erro).
         # Antes, o try/except so' cobria a chamada a
@@ -15156,6 +15148,10 @@ def run_modulation_on_existing_walls(preselected=None):
             # mais.
             cache_key = _wall_ids_signature(wall_ids)
             cached_state = _LAST_MODULATION_STATE.get(cache_key) if cache_key else None
+            if cached_state:
+                cached_strategy = ((cached_state.get("solve_result") or {}).get("opening_reinforcement") or {}).get("strategy")
+                if cached_strategy != execution_strategy:
+                    cached_state = None
             cached_solve_result = None
             cached_create_result = None
             if cached_state:
@@ -15215,7 +15211,8 @@ def run_modulation_on_existing_walls(preselected=None):
                 selected_level, base_z_abs, wall_height_ft, wall_error_rows,
                 catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
                 initial_solve_result=cached_solve_result, initial_create_result=cached_create_result,
-                precreated_event=stage2_external_event, precreated_handler=stage2_handler
+                precreated_event=stage2_external_event, precreated_handler=stage2_handler,
+                opening_reinforcement_strategy=execution_strategy
             )
         except Exception as ex:
             # NUNCA mostrar um resumo de "tudo certo" (paredes selecionadas/
@@ -17783,7 +17780,7 @@ def main():
     def _run_stage2_modulation(wall_error_rows):
         # `wall_error_rows is None` (nunca `[]`, que e' o resultado legitimo
         # de "analisou e nao achou erro") e' o sinal de que o usuario clicou
-        # "Pular para Modulacao dos Blocos" em _WallReviewForm (2026-08-27) -
+        # "Usar paredes atuais e continuar" em _WallReviewForm (2026-08-27) -
         # a analise de erros de parede NUNCA rodou. `skipped_wall_analysis`
         # carrega essa distincao para o relatorio/janela da Tela 2 (ver
         # `report["wall_analysis_skipped"]` abaixo e

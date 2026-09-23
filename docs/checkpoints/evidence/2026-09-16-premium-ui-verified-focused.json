@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-16T13:41:53.596137+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "ddb24c27b13d15ec0876ce0ece6ed5b35b4d8e36",
+  "tree": "6efdc8bf9a59a316f2ff0be2b528fa74dd28428b",
+  "status_before": "M docs/PROJECT_STATUS.md\n M docs/PROJECT_STATUS_LOG.md\n M docs/checkpoints/2026-09-16-dark-ui-redesign.md\n M tools/documentation/render_premium_states.py\n?? docs/checkpoints/2026-09-16-premium-ui-redesign.md\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-scope.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-scope.json\n?? docs/ui-premium-preview/",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 300,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-premium-ui-verified-focused.txt",
+  "pid": 10280,
+  "exit_code": 0,
+  "elapsed_seconds": 71.204,
+  "status_after": "M docs/PROJECT_STATUS.md\n M docs/PROJECT_STATUS_LOG.md\n M docs/checkpoints/2026-09-16-dark-ui-redesign.md\n M tools/documentation/render_premium_states.py\n?? docs/checkpoints/2026-09-16-premium-ui-redesign.md\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-delivery-scope.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-verified-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-verified-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-verified-scope.json\n?? docs/ui-premium-preview/",
+  "log_sha256": "ddb68c98d8ff4b125d346bed0fb980c5483c39455452d5ee35e5d9cfbca478b5"
+}

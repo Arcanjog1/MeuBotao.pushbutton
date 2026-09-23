@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-17T17:26:21.689185+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "a6a07c394f128ae1b6b7ea5ad91e24103bbe9ebc",
+  "tree": "9da0c93b4687716f22baff7cbb2e0823d96f8f1a",
+  "status_before": "?? docs/ui-post42-preview/",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 300,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-17-post42-ui-focused.txt",
+  "pid": 21344,
+  "exit_code": 0,
+  "elapsed_seconds": 66.043,
+  "status_after": "?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.txt\n?? docs/ui-post42-preview/",
+  "log_sha256": "0dba6648f8c9f790a285600602156948df61286a3b59acb185fa41b08e4bb801"
+}

@@ -560,7 +560,7 @@ class _Control(object):
     _EVENTS = (
         "Click", "FormClosed", "SelectedIndexChanged", "TextChanged",
         "CheckedChanged", "ItemCheck", "KeyDown", "Shown", "Load",
-        "SelectedValueChanged", "DoubleClick", "Resize",
+        "SelectedValueChanged", "DoubleClick", "Resize", "SizeChanged",
     )
 
     def __init__(self, *args, **kwargs):
@@ -789,7 +789,7 @@ class TabPage(_Control):
 class TabControl(_Control):
     def __init__(self, *args, **kwargs):
         _Control.__init__(self, *args, **kwargs)
-        self.TabPages = _ControlCollection()
+        self.TabPages = self.Controls  # WinForms exposes pages as child controls.
         self.SelectedIndex = 0
 
 

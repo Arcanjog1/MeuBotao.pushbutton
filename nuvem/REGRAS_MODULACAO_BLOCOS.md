@@ -7563,6 +7563,56 @@ a substituição.
 
 ---
 
+## UX-20260916 — contrato de revisão antes da criação
+
+**REGRA OBRIGATÓRIA — orientação explícita do usuário no pedido de redesign
+de UI de 2026-09-15, retomado em 2026-09-16.** Trata exclusivamente da
+interação; nenhuma regra física de amarração ou critério do solver é alterado.
+
+- O cálculo apresenta o plano e as quantidades antes de criar blocos.
+  A criação exige a ação explícita **Criar blocos no Revit**.
+- **CONFLITO RESOLVIDO:** a orientação de 2026-08-27 de criar automaticamente
+  ao terminar o cálculo fica substituída por essa revisão prévia. O motor e
+  os dados planejados permanecem os mesmos.
+- Erro crítico já emitido pelo backend desabilita a criação; avisos não
+  recebem novos critérios físicos na interface. Gates continuam no backend.
+- NONE e CHANNEL são escolhas explícitas. Verga/contraverga não é oferecida
+  como funcional. A ausência de preferência mantém NONE.
+- Antes de recriar, explicar que o lote anterior será substituído e confirmar.
+- Cancelar análise/ajustes preserva o que já foi aplicado; informar isso ao
+  usuário. Não prometer rollback que o backend não oferece.
+- Contagens não disponíveis devem aparecer como indisponíveis, nunca como zero
+  ou sucesso presumido. Logs técnicos são secundários; falhas e retenções
+  continuam visíveis no relatório.
+
+Implementação candidata: branch `codex/modulacao-automatica-ui-redesign`.
+Validação real em Revit/DPI consta como pendência no relatório de entrega.
+
+**Atualização oficial de UX — 2026-09-16, segundo pedido com referência de
+vídeo (não é regra física):** configuração compacta com preview ilustrativo,
+tema escuro prioritário, ordem Configuração → Paredes → Modulação → Revisão
+→ Criação → Resultado. Revisão nessa sequência significa conferência do plano
+calculado; a análise geométrica de paredes continua antes do cálculo.
+IDs e diagnósticos internos ficam nos detalhes técnicos. A lista principal usa
+numeração local da ocorrência, preservando os IDs reais para seleção/zoom.
+Esquemas não representam o plano físico nem validam amarração, CHANNEL ou
+colisão. Seleção CAD/existentes/união deve ser exclusiva; reforço e modo de
+aberturas continuam grupos independentes. Descoberta: pedido do usuário e
+ensaio WinForms/pythonnet fora do Revit; sem nova medição de amarração.
+
+**Atualização oficial de UX — terceiro pedido de 2026-09-16:** tool dialog
+compacto, abas por texto/sublinhado, stepper de seis etapas, uma ação primária
+por estado e prévia ilustrativa com identificação do reforço superior/inferior.
+A frase visível passa a ser “Prévia ilustrativa”; o contexto explica que a
+geometria final vem do modelo. Não há garantia física no desenho ilustrativo.
+Famílias devem distinguir ✓ disponível, ✕ ausente e ○ ainda não verificada,
+sempre com texto além da cor. Reanálise não pode exibir quantidades antigas
+como resultado atual; dados de ajustes automáticos só aparecem se fornecidos.
+Progresso traduz eventos existentes, sem percentuais ou fases fictícias.
+Descoberta: orientação explícita do usuário e ensaio local WinForms. Nenhuma
+medição de amarração. Candidato: `codex/modulation-ui-premium-redesign`;
+smoke Revit e DPI nativo continuam dependentes de validação específica.
+
 ## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
 
 > **STATUS: IMPLEMENTADO — estratégia OFICIAL** (decisão do usuário 2026-09-14,

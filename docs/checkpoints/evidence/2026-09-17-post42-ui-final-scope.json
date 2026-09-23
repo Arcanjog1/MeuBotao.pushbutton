@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-09-17T17:29:03.559225+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "9ed2234524da41fc2cc00d01aeee1b72d175f771",
+  "tree": "f3d9aa13de90658dd49c7d439f746e834f0b7cec",
+  "status_before": "?? docs/UI_POST_PR42.md\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.txt\n?? docs/ui-post42-preview/",
+  "command": [
+    "py",
+    "-3",
+    "tools/documentation/check_post42_ui_scope.py"
+  ],
+  "timeout_seconds": 60,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-17-post42-ui-final-scope.txt",
+  "pid": 18580,
+  "exit_code": 0,
+  "elapsed_seconds": 0.152,
+  "status_after": "?? docs/UI_POST_PR42.md\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-scope.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-scope.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-final-tests.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.json\n?? docs/checkpoints/evidence/2026-09-17-post42-ui-scope.txt\n?? docs/ui-post42-preview/",
+  "log_sha256": "29d2caf1b09d36f0b02618ade9b8620f6eaa7261178e3d73b44f67e305cb82bd"
+}
