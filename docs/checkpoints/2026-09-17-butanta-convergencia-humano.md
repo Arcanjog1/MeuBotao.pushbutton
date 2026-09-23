@@ -9,7 +9,7 @@
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
   "main_observada": "55e990d962ed22ae1021f0d335db197607bddda1",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42",
-  "veredito": "READY FOR FINAL REVIT SMOKE - secao 77 (papel funcional do encontro por fiada, flag CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED, so' CHANNEL): no' 28 sem T funcional nas fiadas 4-10 (ponta livre na face), MISSING 6 -> 3 (47x2, 47x4, 48x3), COMPENSATOR 0, portoes duros 0, so' a parede 8284562 muda; TORRE ON == OFF; flag OFF reproduz o historico. Revit nao executado com a flag. Nao mergear.",
+  "veredito": "READY FOR FINAL REVIEW - smoke final REAL no Revit da secao 77 (2026-09-22 a noite, PC de casa, HEAD de8a304 conferido por sha256 dentro do Revit): 3 runs ate' convergir (8.706 -> 8.699 -> 8.693 pecas, run 3 = run 2), COMPENSATOR_AS_JUNCTION_BOND 0, MISSING_REQUIRED_JUNCTION_BOND 3 (so' no' 47 fiadas 2/4 e no' 48 fiada 3), NO_FUNCTIONAL_JUNCTION 7 (no' 28 fiadas 4-10), portoes duros 0, criadas = planejadas, 0 falhas, readback 0. Nao mergear sem autorizacao humana explicita.",
   "objective": "Convergir a modulacao CHANNEL com o projeto humano BUTANTA R08_LT medindo as reguas dele em vez de presumi-las, e versionar o corpus de geometria que torna as alegacoes da secao 74 reproduziveis fora do ambiente.",
   "changes": [
     "nuvem/core/engine/wall_stepper.py: secao 72 (a paridade do no e' escolhida pelo preenchimento que ela deixa) e secao 74 (o teste de espaco do T compara com a tolerancia fisica PIER_PHYSICAL_FIT_TOLERANCE_CM = 0,05 cm em vez do epsilon de 1e-6 pes); as duas desligadas por padrao e ligadas so' no fluxo CHANNEL.",
@@ -50,7 +50,8 @@
     "Conferencia Revit x offline (mesmo HEAD, corpus pos-66): 8.640 de 8.696 pecas casam ate' 0,05 cm; 56 diferem so' na parede 8284502 fiadas 11-16 (mesmos codigos) - pre-existente desde f7c208b (smoke de 2026-09-18), plataforma.",
     "Secao 77: test_secao77_papel_por_fiada 43 passaram, 1 pulado; focados regras 74/75/76/76.1 e canaleta 318 passaram; corpus BUTANTA (test_regra76_corpus_butanta + test_s74_corpus_butanta) verdes com os casos historicos em flag OFF e os novos em flag ON. Suite completa (uma vez, pos-revisao): 1.714 passaram, 1 pulado, 4 desmarcados, 2 falhas pre-existentes em tests/regression/test_benchmark_baselines.py (TP1, TGD-v2; identicas no HEAD anterior).",
     "IronPython 2.7.12 (engine do pyRevit, script puro): classificador 850/850 registros iguais ao CPython.",
-    "TORRE EASY TGD (CAD cru): flag ON == flag OFF byte a byte."
+    "TORRE EASY TGD (CAD cru): flag ON == flag OFF byte a byte.",
+    "Smoke real no Revit 2026 (IronPython 2.7.12) com a flag da secao 77 ligada: 3 runs, 8.693 pecas criadas com readback 0; todos os portoes duros zerados; conferencia com o offline: histograma de codigos identico e 8.639/8.693 pecas iguais ate' 0,05 cm (as 54 restantes na 8284502 fiadas 11-16, diferenca de plataforma pre-existente). Verificacao adversarial de 3 agentes somente leitura: PASSA/PASSA/PASSA."
   ],
   "known_failures": [
     "test_perf_trace_stall_sampler (ctypes) - herdado, identico em main, desmarcado.",
@@ -96,7 +97,8 @@
     "Estender a secao 77 ao canto L com braco consumido e ao NONE_CONTINUOUS (hoje so' classificacao)."
   ],
   "next_steps": [
-    "Smoke final no Revit com a flag da secao 77 ligada (restauracao controlada, runs ate' convergir, readback, gates: MISSING = 3, NO_FUNCTIONAL_JUNCTION = 7, COMPENSATOR 0), capturas do no' 28 fiadas 3/4/10/11."
+    "Autorizacao humana explicita para o merge do PR #42 (o PR segue OPEN/DRAFT; nenhum bloqueador tecnico aberto).",
+    "Depois do merge: reconciliar a UI (PR #46) e reabrir, se o usuario quiser, a decisao de produto dos nos 47/48 e a extensao da secao 77 ao canto L / NONE_CONTINUOUS."
   ],
   "references": [
     {
@@ -173,6 +175,9 @@
     },
     {
       "path": "tests/test_secao77_papel_por_fiada.py"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-22-revit-smoke-s77.json"
     }
   ]
 }
@@ -1467,6 +1472,87 @@ menor peça continuam encontro (descontinuidade deliberada, registro PENDING); R
 
 ---
 
+## 7.18 SMOKE FINAL REAL NO REVIT DA SEÇÃO 77 (2026-09-22, noite)
+
+**Estado: READY FOR FINAL REVIEW.** A flag `CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED` rodou no
+Revit real e reproduziu o resultado offline: `COMPENSATOR_AS_JUNCTION_BOND` **0**,
+`MISSING_REQUIRED_JUNCTION_BOND` **3**, `NO_FUNCTIONAL_JUNCTION` **7**, portões duros 0, criação e
+readback sem divergência, convergência em 3 runs. Evidência versionada em
+[`2026-09-22-revit-smoke-s77.json`](evidence/2026-09-22-revit-smoke-s77.json). Não mergear sem
+autorização humana.
+
+**Código conferido, não presumido.** HEAD `de8a304` (local == remoto, árvore limpa). O botão do
+pyRevit é um *loader* apontado para `main` e **não foi usado**; o harness via MCP importa o motor do
+clone do repositório e os **sha256 foram calculados dentro do Revit**: `wall_modeling.py`
+`8fcfaa20…`, `wall_stepper.py` `54d5a72f…`, `junction_role.py` `c1d5170a…`,
+`b34_run_arrangement.py` `281d17e0…` (cópia de trabalho em CRLF — o blob do HEAD é o mesmo conteúdo
+em LF, AST idêntica). Flag ligada, `PIER_PHYSICAL_FIT_TOLERANCE_CM` 0,05. Máquina: 31,9 GB, 14,3 GB
+livres, uma única instância do Revit (2026 26.4.10.51, pyRevit 6.5.4.26228+1146). HUMANO aberto
+**somente leitura** (`IsModified` falso do início ao fim; nenhuma Transaction).
+
+**Restauração controlada (tudo conferido antes da primeira escrita):**
+
+| etapa | resultado |
+|---|---|
+| backup do TARGET | 181.641.216 bytes, sha256 `58b7003e…3fba` |
+| censo PRE_RESET | 1 lote antigo (`20260922-094142`, 8.696 peças — o do smoke da §7.16); 3 aberturas a 10 cm com marca |
+| purga (só carimbadas) | alvos 8.696; o Revit apagou 17.392 (8.696 peças + 8.696 subcomponentes `Cor`); 17.623 → 231 instâncias; restantes 0, lotes 0, órfãos 0 |
+| reset das aberturas | 3 movidas de volta, 3 marcas limpas, 41 já no lugar |
+| POST_RESET + preflight | 44/44 exatas na origem, 0 marcas, 0 lotes, transação de teste OK |
+| modal | handler só do `TaskDialog_Project_Not_Saved_Recently` → CANCEL, instalado 22:08:39 e **removido 23:13:49**, **0 interceptações** |
+
+**Runs (fluxo CHANNEL, 34 paredes, 44 aberturas, `max_openings` 6):**
+
+| run | 1º solve | §66 | peças finais | assinatura | criadas / falhas / readback | lote |
+|---|---|---|---|---|---|---|
+| 1 | 8.706 (155 s) | 24 req / 2 aplicadas / 1 bloqueada | 8.699 (139 s) | `3b10e711…` | 8.699 / 0 / 0 | `20260922-221934` |
+| 2 | 8.699 (181 s) | 24 req / 1 aplicada | 8.693 (210 s) | `0de18576…` | 8.693 / 0 / 0 | `20260922-223828` |
+| 3 | 8.693 (208 s) | 24 req / **0 aplicadas** | 8.693 | `0de18576…` **(= run 2)** | 8.693 / 0 / 0 | `20260922-225600` |
+
+Nas três runs: colisão / não modular / sem apoio / invasão de vão **0/0/0/0**,
+`CHANNEL_AS_JUNCTION_BOND` 0, `COMPENSATOR_AS_JUNCTION_BOND` 0, `planned == created`,
+`creation_failures` 0, readback 0. Auditoria da 76.1: **837 checadas / 834 válidas / 13 não
+exigidas** (7 do nó 28 + 6 do nó 46 `ABSENT`, estas anteriores à §77). `bond_reproved` = 4, igual a
+todas as execuções no Revit desde 2026-09-17 (herdado, §72 inalterada). Vazado menor 2.698 → **44**.
+
+**Nó 28 — o que a §77 muda, lido peça a peça no modelo.** Papel efetivo por fiada: **T** em f0–f3,
+**`NONE_FREE_END`** em f4–f10, **T** de f11 em diante. Em f0/f2 a principal atravessa
+(`B54` `T_INTERSECTION_MAIN`); em f1/f3/f11 quem atravessa é a 8284562 (`B34`
+`T_INTERSECTION_INCOMING`, os 14 cm inteiros). Nas sete fiadas das janelas a principal **não existe**
+na região (o pilar de 14 cm entre as duas janelas é a própria região do nó) e a 8284562 termina com
+peça normal — `B19` nas pares, `B39` nas ímpares, `STANDARD_FILL` — **a 0,01 cm da face**: sem C09,
+sem peça de amarração falsa e sem recuo indevido. As duas transições (f3→f4 e f10→f11) foram
+capturadas no Revit.
+
+**Nós 47/48 continuam NÃO RESOLVIDOS** (causa diferente, a peça não cabe): nó 47 fiadas 2/4 e nó 48
+fiada 3 com `C09 JUNCTION_UNRESOLVED_FILL` 64% + peça de reparo 25% da região; nas demais fiadas
+`B34 L_CORNER` 100%. **Nós 22/30 inalterados** (B34 100%, `T_INTERSECTION_DEGRADED_L` alternando) e
+**casos válidos 06/07/08 inalterados** (amarração real ocupando 100% da região, compensador perto sem
+assumir função). **§66:** mesma política do smoke anterior — 24 requeridas, aplicadas 2 → 1 → 0, um
+bloqueio real (−10 cm na 8284546, parede 8284578 no caminho), três aberturas a +10 cm com
+`acumulado_cm` 10 e **sem acúmulo na run 3**.
+
+**Revit × offline (§74):** 8.693 × 8.693 peças, **histograma de códigos idêntico**, 8.639 casam até
+0,05 cm; as 54 restantes estão **todas** na 8284502, fiadas 11–16, acima das vergas — a mesma
+diferença de plataforma (IronPython × CPython no arranjo das corridas de B34) já registrada na
+§7.16, longe de todos os nós auditados.
+
+**Desempenho:** solve 139–210 s, plano da §66 292–377 s, criação 379–433 s; total por run 969 / 1.145
+/ 1.025 s; pico de 4,2 GB de working set.
+
+**Capturas reais do Revit** (anexadas na conversa): folha-resumo **A/B/C/D** (A — T funcional no nó 28
+f3/f11; B — sem encontro funcional f4–f10, com a elevação das duas transições TARGET × HUMANO;
+C — MISSING real 47/48; D — válidos 06/07/08), mais as folhas por nó e o contexto TARGET × HUMANO.
+As 12 vistas 3D temporárias foram criadas só no TARGET e removidas (12 → 0).
+
+**Verificação adversarial:** três agentes independentes, somente leitura, recalcularam portões,
+física peça a peça e protocolo — **PASSA / PASSA / PASSA**, zero violações bloqueantes.
+
+**Estado final:** TARGET aberto, ativo, modificado e **não salvo** (arquivo em disco intacto); HUMANO
+sem nenhuma Transaction durante o smoke.
+
+---
+
 ## 8. PADRÕES HUMANOS DESCOBERTOS — PENDENTES DE APROVAÇÃO
 
 Nenhum destes foi codificado.
@@ -1596,7 +1682,7 @@ projeto humano não é gabarito quando viola regra do produto. Os casos ficam cl
 
 ## 10. ENTREGA
 
-> **Estado atual (2026-09-22, seção 77): READY FOR FINAL REVIT SMOKE — papel funcional do encontro por fiada implementado sob flag (só CHANNEL); offline: nó 28 sem T funcional nas fiadas 4–10, MISSING 6 → 3, COMPENSATOR 0, portões 0, só a 8284562 muda, TORRE ON == OFF; Revit não executado com a flag; ver §7.17. O smoke real da §7.16 (motor anterior à §77) fica como registro.**
+> **Estado atual (2026-09-22, noite): READY FOR FINAL REVIEW — a seção 77 rodou no Revit real (HEAD `de8a304` conferido por hash): 3 runs convergiram em 8.693 peças, `MISSING_REQUIRED_JUNCTION_BOND` 3 (só 47 f2/f4 e 48 f3), `NO_FUNCTIONAL_JUNCTION` 7 (nó 28 f4–f10), `COMPENSATOR_AS_JUNCTION_BOND` 0, portões duros 0, criadas = planejadas, readback 0; nós 22/30 e casos 06/07/08 intactos. Ver §7.18. PR #42 segue OPEN/DRAFT — merge só com autorização humana explícita.**
 
 **Branch** `claude/butanta-modulation-physical-fixes` · último commit de motor `2c55211` (§74) ·
 **PR** [#42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) — **OPEN, draft, NÃO mergeado**.

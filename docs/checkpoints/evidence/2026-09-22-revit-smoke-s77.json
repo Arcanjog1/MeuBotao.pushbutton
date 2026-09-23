@@ -1,0 +1,1009 @@
+{
+ "schema": "revit_smoke_v1",
+ "data": "2026-09-22 (noite)",
+ "missao": "Smoke final real no Revit da secao 77 - papel funcional do encontro por fiada (flag CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED, so' CHANNEL)",
+ "maquina": "PC de casa (DESKTOP-DN5GO3F), 31,9 GB RAM, 14,3 GB livres no inicio, uma unica instancia do Revit",
+ "revit": "2026 26.4.10.51",
+ "pyrevit": "6.5.4.26228+1146",
+ "engine": "IronPython 2.7.12 (via MCP)",
+ "codigo": {
+  "head": "de8a30416ed40d8278f2ff9b93cc9b140c6f6804",
+  "carregado_de": "C:/Users/twitc/Documents/AgentOrchestrator/MeuBotao.pushbutton/nuvem (clone do repositorio); o loader do botao aponta para main e NAO foi usado",
+  "sha256_conferido_dentro_do_revit": {
+   "core/wall_modeling.py": "8fcfaa209f4a5973e0498e9abf218b908bf0fb42af7679727b308f6cab722c93",
+   "core/engine/wall_stepper.py": "54d5a72f1fb4e26dc2295171a8970bc77d06599712e7ff0026916f9d64cad1b0",
+   "core/engine/junction_role.py": "c1d5170a284b3fa940f6c3b35d10221bbe25db1f399849326e260868bb5b0563",
+   "core/engine/b34_run_arrangement.py": "281d17e0949f7eb97703bea4554c1a11a0b9e0dbbb7c0b8d3688e6d156254192 (copia de trabalho em CRLF; o blob do HEAD e' o mesmo conteudo em LF - AST identica, sem diferenca de codigo)"
+  },
+  "flag": "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = True (so' CHANNEL)",
+  "PIER_PHYSICAL_FIT_TOLERANCE_CM": 0.05
+ },
+ "documentos": {
+  "target": "C:/Users/twitc/Desktop/CIVIX/butanta testes.rvt",
+  "humano": "C:/Users/twitc/Desktop/CIVIX/BUTANTA - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO) (1).rvt",
+  "humano_somente_leitura": true
+ },
+ "backup_target": {
+  "arquivo": "C:/Users/twitc/Desktop/CIVIX/_backup_smoke77/butanta testes.PRE_SMOKE77.rvt",
+  "bytes": 181641216,
+  "sha256": "58b7003e68c48a249fd3b7fca53d602ac87114bc8138bc98f5e8ac3783173fba"
+ },
+ "pre_reset": {
+  "lote_antigo": {
+   "20260922-094142": 8696
+  },
+  "carimbadas": 8696,
+  "instancias": 17623,
+  "aberturas": 44,
+  "aberturas_exatas": 41,
+  "marcas": 3,
+  "paredes": 46
+ },
+ "purga": {
+  "alvos": 8696,
+  "apagados_pelo_revit": 17392,
+  "instancias_antes": 17623,
+  "instancias_depois": 231,
+  "carimbadas_depois": 0,
+  "lotes_depois": {},
+  "orfaos_depois": {},
+  "guarda": "alvo = so' o conjunto carimbado; o Revit apagou em cascata os subcomponentes 'Cor' (8.696 + 8.696 = 17.392); restaram 231 instancias nao-plugin, incluindo as 44 aberturas"
+ },
+ "reset": {
+  "movidas": [
+   {
+    "id": "8078984",
+    "delta_cm": 10.0
+   },
+   {
+    "id": "8078986",
+    "delta_cm": 10.0
+   },
+   {
+    "id": "8079001",
+    "delta_cm": 10.0
+   }
+  ],
+  "ja_no_lugar": 41,
+  "marcas_limpas": [
+   "8078984",
+   "8078986",
+   "8079001"
+  ]
+ },
+ "post_reset": {
+  "aberturas": 44,
+  "exatas": 44,
+  "deslocadas": 0,
+  "marcas": 0,
+  "lotes": {},
+  "carimbadas": 0
+ },
+ "preflight": {
+  "ok": true,
+  "lote_total": 0,
+  "marcas": {},
+  "transacao_teste": true,
+  "paredes": 46
+ },
+ "modal": {
+  "handler": "TaskDialog_Project_Not_Saved_Recently -> CANCEL",
+  "instalado": "2026-09-22 22:08:39",
+  "removido": "2026-09-22 23:13:49",
+  "intercepcoes": 0
+ },
+ "runs": [
+  {
+   "run": 1,
+   "solve_1_pecas": 8706,
+   "solve_1_s": 154.98,
+   "s66_requeridas": 24,
+   "s66_aplicadas": 2,
+   "s66_bloqueios": 1,
+   "s66_movidas": [
+    {
+     "abertura": "8079001",
+     "parede": "8284546",
+     "delta_cm": 10.0,
+     "acumulado_cm": 10.0,
+     "confere": true
+    },
+    {
+     "abertura": "8078984",
+     "parede": "8284502",
+     "delta_cm": 10.0,
+     "acumulado_cm": 10.0,
+     "confere": true
+    }
+   ],
+   "solve_final_pecas": 8699,
+   "solve_final_s": 139.43,
+   "assinatura": "3b10e711b45072687877935a11f6895aef1b18dcf30c7a13c8dc6fd3a047bf5d",
+   "criacao_s": 379.037,
+   "criadas": 8699,
+   "planejadas": 8699,
+   "falhas": 0,
+   "readback_checadas": 8699,
+   "readback_divergencias": 0,
+   "lote": [
+    "20260922-221934"
+   ],
+   "portoes": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_BLOCK": 0,
+     "UNSUPPORTED_SMALL_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0,
+    "compensator_as_junction_bond": 0,
+    "preflight_ok": true,
+    "bond_reproved_herdado": 4
+   },
+   "missing_required_junction_bond": [
+    [
+     47,
+     2,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     47,
+     4,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     48,
+     3,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284590"
+     ]
+    ]
+   ],
+   "no_functional_junction": [
+    [
+     28,
+     4,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     5,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     6,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     7,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     8,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     9,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     10,
+     "NONE_FREE_END"
+    ]
+   ],
+   "free_end_not_composed": [],
+   "auditoria_761_checadas_validas_naoexigidas": [
+    837,
+    834,
+    13
+   ],
+   "vazado_menor": {
+    "antes": 2706,
+    "depois": 48
+   },
+   "memoria_revit_ws_mb_pico": 4210.9,
+   "total_s": 969.17
+  },
+  {
+   "run": 2,
+   "solve_1_pecas": 8699,
+   "solve_1_s": 180.86,
+   "s66_requeridas": 24,
+   "s66_aplicadas": 1,
+   "s66_bloqueios": 0,
+   "s66_movidas": [
+    {
+     "abertura": "8078986",
+     "parede": "8284502",
+     "delta_cm": 10.0,
+     "acumulado_cm": 10.0,
+     "confere": true
+    }
+   ],
+   "solve_final_pecas": 8693,
+   "solve_final_s": 210.09,
+   "assinatura": "0de18576f2a5f52d06dc87213c154af9ccaa0e4a2e9c66267a96a9365c8fc93d",
+   "criacao_s": 422.846,
+   "criadas": 8693,
+   "planejadas": 8693,
+   "falhas": 0,
+   "readback_checadas": 8693,
+   "readback_divergencias": 0,
+   "lote": [
+    "20260922-223828"
+   ],
+   "portoes": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_BLOCK": 0,
+     "UNSUPPORTED_SMALL_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0,
+    "compensator_as_junction_bond": 0,
+    "preflight_ok": true,
+    "bond_reproved_herdado": 4
+   },
+   "missing_required_junction_bond": [
+    [
+     47,
+     2,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     47,
+     4,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     48,
+     3,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284590"
+     ]
+    ]
+   ],
+   "no_functional_junction": [
+    [
+     28,
+     4,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     5,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     6,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     7,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     8,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     9,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     10,
+     "NONE_FREE_END"
+    ]
+   ],
+   "free_end_not_composed": [],
+   "auditoria_761_checadas_validas_naoexigidas": [
+    837,
+    834,
+    13
+   ],
+   "vazado_menor": {
+    "antes": 2698,
+    "depois": 44
+   },
+   "memoria_revit_ws_mb_pico": 3909.8,
+   "total_s": 1145.072
+  },
+  {
+   "run": 3,
+   "solve_1_pecas": 8693,
+   "solve_1_s": 208.16,
+   "s66_requeridas": 24,
+   "s66_aplicadas": 0,
+   "s66_bloqueios": 0,
+   "s66_movidas": [],
+   "solve_final_pecas": 8693,
+   "solve_final_s": 208.16,
+   "assinatura": "0de18576f2a5f52d06dc87213c154af9ccaa0e4a2e9c66267a96a9365c8fc93d",
+   "criacao_s": 432.667,
+   "criadas": 8693,
+   "planejadas": 8693,
+   "falhas": 0,
+   "readback_checadas": 8693,
+   "readback_divergencias": 0,
+   "lote": [
+    "20260922-225600"
+   ],
+   "portoes": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_BLOCK": 0,
+     "UNSUPPORTED_SMALL_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "channel_as_junction_bond": 0,
+    "compensator_as_junction_bond": 0,
+    "preflight_ok": true,
+    "bond_reproved_herdado": 4
+   },
+   "missing_required_junction_bond": [
+    [
+     47,
+     2,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     47,
+     4,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284589"
+     ]
+    ],
+    [
+     48,
+     3,
+     "NO_BOND_PIECE",
+     [
+      "8284584",
+      "8284590"
+     ]
+    ]
+   ],
+   "no_functional_junction": [
+    [
+     28,
+     4,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     5,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     6,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     7,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     8,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     9,
+     "NONE_FREE_END"
+    ],
+    [
+     28,
+     10,
+     "NONE_FREE_END"
+    ]
+   ],
+   "free_end_not_composed": [],
+   "auditoria_761_checadas_validas_naoexigidas": [
+    837,
+    834,
+    13
+   ],
+   "vazado_menor": {
+    "antes": 2698,
+    "depois": 44
+   },
+   "memoria_revit_ws_mb_pico": 3858.4,
+   "total_s": 1024.548
+  }
+ ],
+ "convergencia": {
+  "assinatura_run2_igual_run3": true,
+  "run3_ajustes_aplicados": 0,
+  "pecas_finais": 8693,
+  "lote_final": "20260922-225600"
+ },
+ "no28_por_fiada": {
+  "papel_efetivo": {
+   "f0": "T",
+   "f1": "T",
+   "f2": "T",
+   "f3": "T",
+   "f4": "NONE_FREE_END",
+   "f5": "NONE_FREE_END",
+   "f6": "NONE_FREE_END",
+   "f7": "NONE_FREE_END",
+   "f8": "NONE_FREE_END",
+   "f9": "NONE_FREE_END",
+   "f10": "NONE_FREE_END",
+   "f11": "T",
+   "f12": "T",
+   "f13": "T",
+   "f14": "T",
+   "f15": "T",
+   "f16": "T"
+  },
+  "geometria": "no' em (1622,1087) cm; principal 8284502 corre em y (corpo x 1615..1629); a 8284562 chega em x e termina em x=1629; regiao do no' 14x14 cm; janelas ativas com peitoril 80 e topo 221 cm - o pilar de 14 cm entre elas E' a propria regiao do no'",
+  "leitura": "fiadas 0/2: B54 da principal atravessa (T_INTERSECTION_MAIN); fiadas 1/3/11: B34 da 8284562 atravessa (T_INTERSECTION_INCOMING); fiadas 4..10: nenhuma peca de junção - a 8284562 termina com B19 (pares) ou B39 (impares) de STANDARD_FILL a 0,01 cm da face",
+  "pecas": {
+   "0": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -12.01,
+      "fim_cm": -8.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "B54",
+      "ini_cm": -27.0,
+      "fim_cm": 27.0,
+      "motivo": "T_INTERSECTION_MAIN"
+     }
+    ]
+   },
+   "1": {
+    "principal_8284502": [
+     {
+      "codigo": "B34",
+      "ini_cm": 8.0,
+      "fim_cm": 42.0,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -47.0,
+      "fim_cm": -8.0,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "chega_8284562": [
+     {
+      "codigo": "B34",
+      "ini_cm": -27.01,
+      "fim_cm": 6.99,
+      "motivo": "T_INTERSECTION_INCOMING"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -32.01,
+      "fim_cm": -28.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "2": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -12.01,
+      "fim_cm": -8.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "B54",
+      "ini_cm": -27.0,
+      "fim_cm": 27.0,
+      "motivo": "T_INTERSECTION_MAIN"
+     }
+    ]
+   },
+   "3": {
+    "chega_8284562": [
+     {
+      "codigo": "B34",
+      "ini_cm": -27.01,
+      "fim_cm": 6.99,
+      "motivo": "T_INTERSECTION_INCOMING"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -32.01,
+      "fim_cm": -28.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "CHANNEL_U_34",
+      "ini_cm": 8.0,
+      "fim_cm": 42.0,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "CHANNEL_U_39",
+      "ini_cm": -47.0,
+      "fim_cm": -8.0,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "4": {
+    "chega_8284562": [
+     {
+      "codigo": "B19",
+      "ini_cm": -12.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "5": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -32.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "6": {
+    "chega_8284562": [
+     {
+      "codigo": "B19",
+      "ini_cm": -12.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "7": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -32.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "8": {
+    "chega_8284562": [
+     {
+      "codigo": "B19",
+      "ini_cm": -12.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "9": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -32.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "10": {
+    "chega_8284562": [
+     {
+      "codigo": "B19",
+      "ini_cm": -12.01,
+      "fim_cm": 6.99,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "11": {
+    "chega_8284562": [
+     {
+      "codigo": "B34",
+      "ini_cm": -27.01,
+      "fim_cm": 6.99,
+      "motivo": "T_INTERSECTION_INCOMING"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -32.01,
+      "fim_cm": -28.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "CHANNEL_U_34",
+      "ini_cm": -42.0,
+      "fim_cm": -8.0,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "CHANNEL_U_39",
+      "ini_cm": 8.0,
+      "fim_cm": 47.0,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "12": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -12.01,
+      "fim_cm": -8.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "B54",
+      "ini_cm": -27.0,
+      "fim_cm": 27.0,
+      "motivo": "T_INTERSECTION_MAIN"
+     }
+    ]
+   },
+   "13": {
+    "principal_8284502": [
+     {
+      "codigo": "B34",
+      "ini_cm": -42.0,
+      "fim_cm": -8.0,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": 8.0,
+      "fim_cm": 47.0,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "chega_8284562": [
+     {
+      "codigo": "B34",
+      "ini_cm": -27.01,
+      "fim_cm": 6.99,
+      "motivo": "T_INTERSECTION_INCOMING"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -32.01,
+      "fim_cm": -28.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "14": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -12.01,
+      "fim_cm": -8.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "B54",
+      "ini_cm": -27.0,
+      "fim_cm": 27.0,
+      "motivo": "T_INTERSECTION_MAIN"
+     }
+    ]
+   },
+   "15": {
+    "principal_8284502": [
+     {
+      "codigo": "B34",
+      "ini_cm": -42.0,
+      "fim_cm": -8.0,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": 8.0,
+      "fim_cm": 47.0,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "chega_8284562": [
+     {
+      "codigo": "B34",
+      "ini_cm": -27.01,
+      "fim_cm": 6.99,
+      "motivo": "T_INTERSECTION_INCOMING"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -72.01,
+      "fim_cm": -33.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -32.01,
+      "fim_cm": -28.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ]
+   },
+   "16": {
+    "chega_8284562": [
+     {
+      "codigo": "B39",
+      "ini_cm": -92.01,
+      "fim_cm": -53.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "B39",
+      "ini_cm": -52.01,
+      "fim_cm": -13.01,
+      "motivo": "STANDARD_FILL"
+     },
+     {
+      "codigo": "C04",
+      "ini_cm": -12.01,
+      "fim_cm": -8.01,
+      "motivo": "STANDARD_FILL"
+     }
+    ],
+    "principal_8284502": [
+     {
+      "codigo": "B54",
+      "ini_cm": -27.0,
+      "fim_cm": 27.0,
+      "motivo": "T_INTERSECTION_MAIN"
+     }
+    ]
+   }
+  }
+ },
+ "nos_47_48": {
+  "47": "fiadas 2 e 4: C09 JUNCTION_UNRESOLVED_FILL 64% + C09 de reparo 25% da regiao - MISSING mantido; fiadas 1/3/5: B34 L_CORNER 100%",
+  "48": "fiada 3: C09 JUNCTION_UNRESOLVED_FILL 64% + B19 de reparo 25% - MISSING mantido; fiadas 2/4: B34 L_CORNER 100%"
+ },
+ "nos_22_30": "fiadas 4/5/6: B34 100% T_INTERSECTION_DEGRADED_L alternando entre as duas paredes - inalterados pela secao 77 (o papel vira L nas fiadas das janelas, e L exige amarracao)",
+ "casos_validos": {
+  "06 (no' 5)": "B34 INCOMING / B54 MAIN alternando, 100% da regiao",
+  "07 (no' 0)": "B34 L_CORNER 100%",
+  "08 (no' 3)": "B34 L_CORNER 100%",
+  "compensator_as_junction_bond": 0,
+  "missing_required_junction_bond": 0
+ },
+ "conferencia_offline": {
+  "pecas_revit": 8693,
+  "pecas_offline": 8693,
+  "histograma_identico": true,
+  "iguais_ate_0_05_cm": 8639,
+  "divergentes": 54,
+  "divergentes_por_parede_fiada": {
+   "8284502:f11": 3,
+   "8284502:f12": 11,
+   "8284502:f13": 9,
+   "8284502:f14": 11,
+   "8284502:f15": 9,
+   "8284502:f16": 11
+  },
+  "nota": "divergencia pre-existente IronPython x CPython no arranjo das corridas de B34 da 8284502 acima das vergas - mesma regiao ja' registrada na secao 7.16; nenhum portao muda e nenhum no' auditado e' afetado"
+ },
+ "capturas": {
+  "pasta": "scratchpad/shots_s77 (nao versionado; folhas anexadas na conversa)",
+  "folhas": [
+   "00_RESUMO_A_B_C_D_S77",
+   "A_no28_T_FUNCIONAL",
+   "B_no28_SEM_ENCONTRO",
+   "C_no47_48_MISSING",
+   "D_casos_06_07_08",
+   "E_no22_30",
+   "F_no28_CONTEXTO_TARGET_x_HUMANO"
+  ],
+  "vistas_3d_temporarias": "12 criadas so' no TARGET e removidas (12 -> 0)"
+ },
+ "estado_final": {
+  "target": "aberto, ativo, IsModified=True, NAO salvo (arquivo em disco com mtime 2026-09-22 20:34:00)",
+  "humano": "IsModified=False do inicio ao fim do smoke (nenhuma Transaction). Depois do smoke a marca mudou por interacao manual do usuario no Revit; nada foi salvo e o arquivo em disco continua intacto",
+  "censo_final": {
+   "lotes": {
+    "20260922-225600": 8693
+   },
+   "carimbadas": 8693,
+   "aberturas": 44,
+   "marcas": 3,
+   "paredes": 46
+  }
+ },
+ "verificacao_adversarial": "3 agentes somente leitura recalcularam portoes, fisica peca a peca e protocolo: PASSA / PASSA / PASSA, zero violacoes bloqueantes",
+ "veredito": "READY FOR FINAL REVIEW"
+}
