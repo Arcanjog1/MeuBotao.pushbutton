@@ -244,6 +244,14 @@ pode invadir o vão real de uma porta sem peitoril (peitoril ≈ 0,
   lógica de fronteiras dos trechos.
 - Qualquer violação **bloqueia a criação dos blocos** (mesmo mecanismo de
   gate que colisões) — nunca é ignorada ou aplicada "mesmo assim".
+  **CONFLITO REGISTRADO — o que vale hoje (2026-09-23):** o princípio desta
+  seção continua absoluto (nenhuma peça no vão real da porta), mas a
+  *consequência* mudou duas vezes: no modo online sem beta, a revisão de
+  2026-08-26 (seção 14) passou a criar a peça e marcá-la em vermelho; no
+  **BETA CONTROLADO** vale a §48 — consequência operacional da OPÇÃO A: a peça
+  que invade o vão **não é criada**, o resto da planta segue, amarração
+  rejeitada fica **NÃO resolvida** com revisão humana, e só erro fatal do
+  plano bloqueia a RUN inteira.
 - Janelas (peitoril > 0 de verdade) **não** entram nesta regra — o vão
   delas só é excluído na faixa vertical real (ver seção 4).
 
@@ -1566,6 +1574,14 @@ nó, o resto da planta continua modulando e o caso aparece em
 `intersection_failures`, o canal que a Tela 2 já reporta parede a parede.
 Isto **não** silencia nada: um nó rejeitado nunca é descartado em silêncio.
 
+> **Nota (2026-09-23, §48 — consequência operacional da OPÇÃO A):** o
+> preflight deixou de ser gate de **lote** para violação localizada. A peça
+> que colide ou invade abertura **não é criada** e o resto da planta segue; se
+> ela era amarração, o nó/fiada fica como **amarração NÃO resolvida** (revisão
+> humana). Só erro **fatal** do plano ainda bloqueia a RUN inteira. O
+> raciocínio acima (resolver no nó é melhor do que depender do preflight)
+> continua válido.
+
 Este caso já estava descrito como pendência na docstring de
 `_drop_fill_colliding_with_ties` ("os dois tie: não há critério para eleger um
 vencedor sem quebrar a outra amarração"); a decisão do usuário é justamente o
@@ -1605,6 +1621,9 @@ Portanto a ordem passa a ser:
    e os B54 se interpenetram — o par é barrado pelo gate de colisão do
    preflight, nunca passa em silêncio. Resolver exige que a degradação para
    L respeite o vão de porta antes de aumentar a reserva.
+   *(Nota 2026-09-23, §48: "barrado pelo gate de colisão do preflight" passou a
+   significar "a peça colidente não é criada e a amarração do nó fica NÃO
+   resolvida, com revisão humana" — não bloqueia mais o lote inteiro.)*
 
    **BISSECÇÃO REPETIDA (2026-09-12, missão pré-Beta 2, após a regra 3.1 —
    sonda de vão não atravessa abertura):** a mesma reserva de meio B54 em
@@ -7431,8 +7450,51 @@ ocupar o volume real de uma porta sem peitoril no beta. Verificar candidatos
 por fiada fisica e abertura ativa em Z, inclusive de outra parede; OBB XY
 agregado sem filtro de altura nao conta instancias fisicas. O preflight
 tambem verifica colisoes, eixos, dimensoes e finitude. Usa a tolerancia
-existente de 0,1cm e bloqueia o lote INTEIRO antes de qualquer mutacao;
-nao filtra pecas de amarracao nem altera os resultados brutos do solver.
+existente de 0,1cm e NUNCA materializa a peca que ocupa o vao (consequencia
+operacional abaixo); nao altera os resultados brutos do solver. (Ate'
+2026-09-23 a consequencia era bloquear o lote INTEIRO antes de qualquer
+mutacao.)
+
+**CONSEQUENCIA OPERACIONAL (2026-09-23, OPCAO A escolhida pelo usuario no
+PR #49 - o PRINCIPIO acima NAO muda: nenhuma peca pode invadir porta):**
+nenhuma peca - comum, fechamento, B19, B34, B39, B54, compensador, canaleta
+ou amarracao - e' materializada ocupando o volume real de uma abertura alem
+da tolerancia de 0,1cm. NAO existe excecao do tipo "e' amarracao, entao pode
+invadir 5 mm". Mudou SO' o que acontece com a peca:
+
+- violacao LOCALIZADA (`OPENING_VOID_INVASION` - invasao do vao;
+  `PIECE_COLLISION` - colisao entre pecas): a peca afetada NAO e' criada e
+  as demais pecas validas continuam materializaveis. O bloqueio do lote
+  inteiro por violacao localizada NAO volta.
+- erro FATAL do plano (fiadas fisicas incompletas, geometria/cota/abertura
+  invalida, aberturas sem correspondencia, calculo sem assinatura atual):
+  continua bloqueando a RUN inteira antes de qualquer mutacao.
+- amarracao pulada NAO e' amarracao resolvida: o no'/parede/fiada fica
+  `BOND_UNRESOLVED` (AMARRACAO NAO RESOLVIDA), com revisao humana
+  obrigatoria e registro da peca, motivo, sobreposicao, encontro e fiada.
+  "RUN executavel" e "modulacao estruturalmente resolvida" sao estados
+  separados (`structurally_resolved` no resultado da criacao).
+- papel de amarracao = DECISAO DO SOLVER gravada na peca (`placement_reason`
+  de encontro L_CORNER / T_INTERSECTION / X_INTERSECTION / CORNER) E codigo
+  B34/B54 (regra 76). O codigo sozinho nao define papel: B34/B54 de
+  preenchimento/fechamento nao e' amarracao; o compensador de no' nao
+  resolvido (`JUNCTION_UNRESOLVED_FILL`, regra 76.1) e a canaleta (regra 75)
+  nunca sao amarracao.
+- INVARIANTE antes de criar: o preflight e' refeito so' com as pecas que
+  ficam (`verify_materialization`); se ainda houver invasao ou colisao, e'
+  FATAL - nunca criacao parcial.
+- contabilidade fechada: planejadas = criadas + puladas + falhas; cada pulo
+  leva parede, fiada, codigo, regra, motivo, sobreposicao, abertura, papel
+  estrutural e revisao humana.
+
+Implementacao: `structural_bond_role`, `materialization_plan`,
+`verify_materialization` em `core/wall_modeling.py`; testes em
+`tests/test_materializacao_e_estado_da_run.py` (casos A..H). Nenhuma regra do
+solver mudou: ele continua podendo propor a peca; ela so' nao e'
+materializada. Escopo: esta secao rege o BETA CONTROLADO (pacote offline
+verificado). O modo online sem beta nao roda este preflight e segue a regra
+revista de 2026-08-26 (cria e marca em vermelho) - pendencia registrada, nao
+alterada aqui.
 
 Paredes totalmente vazias, parcialmente nao modulares ou incompletamente
 criadas conservam referencias, coordenadas e motivo para revisao no

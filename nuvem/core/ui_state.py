@@ -94,8 +94,8 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
     if preflight.get("errors"):
         return False, "Criação bloqueada: o plano tem erro fatal. Corrija e analise novamente."
     impossiveis = localized_blockers(result)
-    puladas, violando = materialization_split(result)
-    explicado = bool(impossiveis) or bool(puladas) or bool(violando)
+    puladas, nao_resolvidas = materialization_split(result)
+    explicado = bool(impossiveis) or bool(puladas) or bool(nao_resolvidas)
     # FALHA FECHADA: laudo reprovado SEM dizer QUAIS peças estão envolvidas não
     # prova que o problema é localizado — a apresentação não pode liberar um
     # portão físico que ela não consegue explicar.
@@ -106,10 +106,10 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
     if explicado:
         partes = []
         if puladas:
-            partes.append("{} peça(s) não materializável(is) serão puladas e registradas".format(puladas))
-        if violando:
-            partes.append("{} amarração(ões) serão criadas com violação registrada "
-                          "para revisão humana".format(violando))
+            partes.append("{} peça(s) não serão criadas (invadem abertura ou colidem)".format(puladas))
+        if nao_resolvidas:
+            partes.append("{} amarração(ões) ficarão NÃO RESOLVIDAS — revisão humana obrigatória".format(
+                nao_resolvidas))
         if not partes:
             partes.append("{} ocorrência(s) localizada(s) registradas".format(impossiveis))
         return True, "Confira as quantidades e clique em Criar blocos no Revit. " + "; ".join(partes) + "."
@@ -119,32 +119,42 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
 def localized_blockers(result):
     """Ocorrências localizadas do preflight (invasão de vão ou colisão).
 
-    Não bloqueiam a RUN: cada uma é tratada individualmente — peça comum é
-    pulada, peça de amarração é criada e mandada para revisão humana."""
+    Não bloqueiam a RUN: a peça afetada não é criada (regra 48 — nenhuma peça
+    ocupa o volume real de uma abertura, sem exceção). Se ela era amarração, o
+    nó/fiada fica como amarração NÃO resolvida, com revisão humana."""
     preflight = (result or {}).get("beta_preflight") or {}
     return len(preflight.get("opening_violations") or []) + len(preflight.get("collisions") or [])
 
 
 def materialization_split(result):
-    """(a pular, materializadas com violação) segundo o contrato do motor.
+    """(peças que NÃO serão criadas, amarrações NÃO resolvidas) — contrato do motor.
 
     Sem o contrato (resultado antigo), devolve (None, None) — desconhecido nunca
     vira zero."""
     plano = (result or {}).get("materialization")
     if not isinstance(plano, dict):
         return None, None
-    return len(plano.get("impossible") or []), len(plano.get("violating") or [])
+    return len(plano.get("skipped") or []), len(plano.get("unresolved_bonds") or [])
+
+
+def unresolved_bonds(result, creation=None):
+    """Amarrações rejeitadas (a peça invadia abertura/colidia): NÃO resolvidas."""
+    if creation is not None and creation.get("unresolved_bonds") is not None:
+        return list(creation.get("unresolved_bonds") or [])
+    return list(((result or {}).get("materialization") or {}).get("unresolved_bonds") or [])
 
 
 def materialization_rows(result, creation=None):
     """Cada ocorrência com identificação completa, para a tela de revisão."""
     plano = (result or {}).get("materialization") or {}
     linhas = []
-    for rec in list(plano.get("impossible") or []) + list(plano.get("violating") or []):
-        linhas.append(u"Parede {} · fiada {} · {} · {} — {} [{}]".format(
+    for rec in list(plano.get("skipped") or []):
+        papel = rec.get("structural_role")
+        linhas.append(u"Parede {} · fiada {} · {} · {} — {}{} · não será criada{}".format(
             rec.get("wall_idx"), rec.get("course_index"), rec.get("logical_code") or "?",
             rec.get("rule_id"), rec.get("message"),
-            "materializável" if rec.get("materializable") else "não materializável"))
+            u" · sobreposição {:.2f} cm".format(rec["overlap_cm"]) if isinstance(rec.get("overlap_cm"), (int, float)) else "",
+            u" · AMARRAÇÃO ({}) — revisão humana".format(papel) if papel else ""))
     return linhas
 
 
@@ -162,7 +172,12 @@ def materialization_counts(result, creation=None):
         planejadas = sum(contagem.values()) if contagem else None
     criadas = (creation or {}).get("created_count")
     puladas = (creation or {}).get("skipped_count")
-    falhas = len((creation or {}).get("failures") or []) if creation else None
+    if creation is None:
+        falhas = None
+    elif creation.get("failed_count") is not None:
+        falhas = creation.get("failed_count")           # por PEÇA
+    else:
+        falhas = len(creation.get("failures") or [])
     return {"planejadas": planejadas, "criadas": criadas, "puladas": puladas, "falhas": falhas,
             "fecha": (None if None in (planejadas, criadas, puladas, falhas)
                       else planejadas == criadas + puladas + falhas)}
@@ -271,6 +286,13 @@ class ModulationUiState(object):
                          "aberturas consomem a parede principal; não é erro.)".format(sem_encontro))
         contas = materialization_counts(result, creation)
         if creation is not None:
+            resolvida = creation.get("structurally_resolved")
+            lines.extend(["", "ESTADO ESTRUTURAL",
+                          "  RUN executada: {}".format("sim" if creation.get("created_count") else "não"),
+                          "  Modulação estruturalmente resolvida: {}".format(
+                              "sim" if resolvida is True else ("NÃO — ver amarrações pendentes"
+                                                             if resolvida is False else "—"))])
+            lines.extend("  " + row["text"] for row in review_items(result)[:40])
             lines.extend(["", "MATERIALIZAÇÃO",
                           "  Planejados: {}".format(contas["planejadas"]),
                           "  Criados: {}".format(contas["criadas"]),
@@ -280,12 +302,11 @@ class ModulationUiState(object):
                               "sim" if contas["fecha"] else "NÃO — investigar")])
             lines.extend("  " + linha for linha in skipped_rows(creation)[:40])
         elif localized_blockers(result):
-            puladas, violando = materialization_split(result)
+            puladas, nao_resolvidas = materialization_split(result)
             lines.extend(["", "MATERIALIZAÇÃO",
-                          "  A pular (não materializáveis): {}".format(
-                              puladas if puladas is not None else "—"),
-                          "  Amarrações criadas com violação (revisão humana): {}".format(
-                              violando if violando is not None else "—")])
+                          "  Peças que NÃO serão criadas: {}".format(puladas if puladas is not None else "—"),
+                          "  Amarrações NÃO resolvidas (revisão humana obrigatória): {}".format(
+                              nao_resolvidas if nao_resolvidas is not None else "—")])
             lines.extend("  " + linha for linha in materialization_rows(result)[:40])
         for erro in fatal_errors(result):
             lines.append("  FATAL: {}".format(erro))
@@ -364,6 +385,15 @@ def review_items(result):
             "node": node, "course": course,
             "text": u"Encontro {} (nó {}), fiada {}: a peça de amarração não cabe — revise no modelo."
                     .format(kind, node, course),
+        })
+    # Opção A: amarração REJEITADA na materialização (invadia abertura/colidia)
+    # não é amarração resolvida — entra aqui, nunca some.
+    for item in unresolved_bonds(result):
+        rows.append({
+            "node": item.get("node_index"), "course": item.get("course_index"),
+            "text": u"Amarração NÃO resolvida (nó {}), fiada {}: {} {} rejeitado — {}.".format(
+                item.get("node_index"), item.get("course_index"), item.get("logical_code") or "?",
+                item.get("structural_role") or "", item.get("rejected_rule") or "invade abertura"),
         })
     return rows
 

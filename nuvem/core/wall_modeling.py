@@ -4973,85 +4973,129 @@ def _record_incomplete_wall_creation(solve_result, create_result, walls_to_creat
 
 
 # ==========================================
-# ETAPA 5 - MATERIALIZACAO SELETIVA (2026-09-23)
+# ETAPA 5 - MATERIALIZACAO SELETIVA (2026-09-23, OPCAO A do usuario)
 #
-# `controlled_beta_preflight` abaixo e' um laudo de LOTE ("Reject the batch,
-# never remove individual ties"). Para o diagnostico fisico no Revit isso e'
-# grosseiro demais: uma peca que invade um vao, ou um par que colide, zerava a
-# criacao das outras milhares de pecas VALIDAS do mesmo plano - o usuario nao
-# conseguia nem olhar a modulacao possivel.
+# `controlled_beta_preflight` (abaixo) mede, peca a peca, quem invade o volume
+# real de uma abertura ativa na fiada (regra 48) e quem colide com outra peca.
+# Quem decide o que fazer com esse laudo e' esta politica:
 #
-# A classificacao abaixo NAO decide fisica nenhuma e NAO recalcula nada: ela so'
-# le' o laudo que o preflight ja' produziu, peca a peca, e separa
-#   - FATAL (preflight["errors"]): o plano inteiro e' invalido (fiadas
-#     incompletas, geometria nao finita, altura de fiada indisponivel) - isso
-#     continua bloqueando a RUN inteira, como sempre;
-#   - IMPOSSIVEL POR PECA (opening_violations / collisions): a peca nao pode
-#     existir no modelo; so' ELA e' pulada, com motivo rastreavel;
-#   - o resto: criado normalmente (avisos e violacoes de regra continuam
-#     relatados pela auditoria, sem impedir a materializacao).
+#   FATAL (preflight["errors"])  -> plano inconsistente: bloqueia a RUN INTEIRA.
+#   invasao de abertura          -> a PECA nao e' criada. SEM EXCECAO: vale para
+#                                   B19, B34, B39, B54, compensador, canaleta,
+#                                   peca comum e peca de amarracao (regra 48:
+#                                   "nenhuma peca pode ocupar o volume real de
+#                                   uma porta").
+#   colisao entre pecas          -> uma das duas nao e' criada (a que NAO e'
+#                                   amarracao, quando so' uma e').
+#   todo o resto                 -> criado normalmente.
 #
-# GUARDA: peca de amarracao NUNCA entra como "pular". Um no' que nao amarra ja'
-# e' `missing_required_junction_bond` (regra 76.1, revisao humana) - pular a
-# amarracao silenciosamente inverteria essa regra.
-UNBUILDABLE_RULES = {
-    "opening_violations": ("OPENING_INVASION", "a peca invade o vao de uma abertura"),
-    "collisions": ("PIECE_COLLISION", "a peca colide com outra peca do mesmo lote"),
-}
+# AMARRACAO REJEITADA NAO E' AMARRACAO RESOLVIDA: se a peca pulada tinha papel
+# estrutural de amarracao, o no'/fiada sai como AMARRACAO NAO RESOLVIDA, com
+# revisao humana obrigatoria. A RUN pode terminar sem rollback e ainda ter
+# pendencia estrutural localizada - "RUN executavel" e "modulacao
+# estruturalmente resolvida" sao coisas diferentes e vao separadas no resultado.
+#
+# PAPEL DE AMARRACAO (structural_bond_role): o TIPO do bloco nao define o papel.
+# Vale a DECISAO DO SOLVER gravada na peca (`placement_reason` de encontro:
+# L_CORNER*, T_INTERSECTION*, X_INTERSECTION*, CORNER*) combinada com a regra 76
+# (so' B34/B54 amarram - compensador, B19 e canaleta nunca) e a regra 76.1
+# (JUNCTION_UNRESOLVED_FILL e' o compensador de no' NAO resolvido - nunca
+# amarracao). Um B34/B54 de preenchimento (STANDARD_FILL etc.) NAO e' amarracao.
+OPENING_INVASION_RULE_ID = "OPENING_VOID_INVASION"
+PIECE_COLLISION_RULE_ID = "PIECE_COLLISION"
+BOND_UNRESOLVED_STATUS = "BOND_UNRESOLVED"
+
+
+def structural_bond_role(candidate):
+    """Papel ESTRUTURAL de amarracao que o solver deu a' peca, ou None.
+
+    Nunca decide pelo codigo sozinho (ver bloco acima)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    from core.engine import wall_stepper as _stepper
+
+    reason = str((candidate or {}).get("placement_reason") or "")
+    code = (candidate or {}).get("logical_code")
+    if reason == _stepper.JUNCTION_UNRESOLVED_FILL_REASON:
+        return None                                   # regra 76.1: compensador de no'
+    if code not in _stepper.JUNCTION_BOND_CODES:
+        return None                                   # regra 76: so' B34/B54 amarram
+    if not any(reason.startswith(p) for p in _reinforcement.TIE_REASON_PREFIXES):
+        return None                                   # B34/B54 de preenchimento
+    return reason
 
 
 def materialization_plan(result, preflight=None):
-    """Classifica CADA ocorrencia do preflight, sem recalcular fisica nenhuma.
+    """Classifica o laudo do preflight peca a peca (somente leitura).
 
-    {"impossible": [...], "violating": [...], "fatal": [...]}
-      impossible -> peca comum provada impossivel: so' ela deixa de ser criada;
-      violating  -> peca de AMARRACAO que viola: e' criada (senao o no' perderia
-                    a amarracao) e vai para a revisao humana;
-      fatal      -> plano inconsistente: bloqueia a RUN inteira."""
+    {"skip": [(course_index, chave_fisica, registro)],   pecas NAO criadas
+     "unresolved_bonds": [registro],                     amarracoes nao resolvidas
+     "fatal": [erros]}                                   bloqueiam a RUN"""
     from core.engine import opening_reinforcement as _reinforcement
-    from core.engine import wall_stepper as _stepper
 
     result = result or {}
     preflight = preflight if preflight is not None else (result.get("beta_preflight") or {})
     sources = result.get("course_candidates") or {}
-    plano = {"impossible": [], "violating": [], "fatal": list(preflight.get("errors") or [])}
-    for bucket, (rule_id, descricao) in sorted(UNBUILDABLE_RULES.items()):
-        for registro in preflight.get(bucket) or []:
-            ci = registro.get("course_index")
-            idx = registro.get("candidate_index")
-            pecas = sources.get(ci) or []
-            if not isinstance(idx, int) or not (0 <= idx < len(pecas)):
-                continue
-            cand = pecas[idx]
-            amarracao = (_reinforcement._is_tie(cand)
-                         or cand.get("logical_code") in _stepper.JUNCTION_BOND_CODES)
-            rec = {
-                "rule_id": ("TIE_" + rule_id) if amarracao else rule_id,
-                "severity": "RULE_VIOLATION_VISUALIZABLE" if amarracao else "GEOMETRY_IMPOSSIBLE",
-                "materializable": bool(amarracao),
-                "needs_human_review": bool(amarracao),
-                "course_index": ci, "wall_idx": cand.get("wall_idx"),
-                "node_index": cand.get("node_index"),
-                "logical_code": cand.get("logical_code"),
-                "placement_reason": cand.get("placement_reason"),
-                "origin_cm": registro.get("origin_cm"), "z_cm": registro.get("z_cm"),
-                "overlap_cm": registro.get("overlap_cm"),
-                "opening_index": registro.get("opening_index"),
-                "message": (descricao + " - peca de amarracao: e' criada para nao apagar a "
-                            "amarracao do no', e o caso vai para revisao humana")
-                           if amarracao else descricao,
-            }
-            chave = (ci, _reinforcement._physical_key(cand))
-            (plano["violating"] if amarracao else plano["impossible"]).append((ci, chave[1], rec))
+    plano = {"skip": [], "unresolved_bonds": [], "fatal": list(preflight.get("errors") or [])}
+    ja = {}
+
+    def pular(ci, idx, rule_id, descricao, registro, extra=None):
+        pecas = sources.get(ci) or []
+        if not isinstance(idx, int) or not (0 <= idx < len(pecas)):
+            return
+        cand = pecas[idx]
+        chave = (ci, _reinforcement._physical_key(cand))
+        papel = structural_bond_role(cand)
+        if chave in ja:
+            ja[chave]["rules"].append(rule_id)            # mesma peca, mais de um motivo
+            return
+        rec = {
+            "rule_id": rule_id, "rules": [rule_id], "severity": "GEOMETRY_IMPOSSIBLE",
+            "materializable": False, "created": False,
+            "structural_role": papel, "requires_human_review": bool(papel),
+            "course_index": ci, "wall_idx": cand.get("wall_idx"),
+            "node_index": cand.get("node_index"), "logical_code": cand.get("logical_code"),
+            "placement_reason": cand.get("placement_reason"),
+            "origin_cm": registro.get("origin_cm"), "z_cm": registro.get("z_cm"),
+            "overlap_cm": registro.get("overlap_cm"),
+            "opening_index": registro.get("opening_index", registro.get("opening_wall_idx")),
+            "message": descricao,
+        }
+        if extra:
+            rec.update(extra)
+        ja[chave] = rec
+        plano["skip"].append((ci, chave[1], rec))
+        if papel:
+            plano["unresolved_bonds"].append({
+                "status": BOND_UNRESOLVED_STATUS, "requires_human_review": True,
+                "node_index": cand.get("node_index"), "course_index": ci,
+                "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+                "structural_role": papel, "rejected_rule": rule_id,
+                "overlap_cm": registro.get("overlap_cm"), "opening_index": rec["opening_index"],
+                "message": "amarracao NAO resolvida: a peca de amarracao foi rejeitada ({})".format(descricao),
+            })
+
+    # 1) regra 48 - invasao do volume real de abertura: a peca nunca e' criada
+    for registro in preflight.get("opening_violations") or []:
+        pular(registro.get("course_index"), registro.get("candidate_index"), OPENING_INVASION_RULE_ID,
+              "a peca ocupa o volume real de uma abertura (regra 48)", registro)
+
+    # 2) colisao entre duas pecas: some UMA delas - a que nao e' amarracao, se so' uma for
+    for registro in preflight.get("collisions") or []:
+        ci = registro.get("course_index")
+        i, j = registro.get("candidate_index"), registro.get("other_candidate_index")
+        pecas = sources.get(ci) or []
+        alvo = i
+        if (isinstance(j, int) and 0 <= j < len(pecas) and isinstance(i, int) and 0 <= i < len(pecas)
+                and structural_bond_role(pecas[i]) and not structural_bond_role(pecas[j])):
+            alvo = j
+        pular(ci, alvo, PIECE_COLLISION_RULE_ID, "a peca colide com outra peca do mesmo lote", registro,
+              {"collides_with_candidate_index": j if alvo == i else i})
     return plano
 
 
 def unbuildable_pieces(result, preflight=None):
-    """Pecas que NAO serao materializadas (peca comum provada impossivel).
-
-    Devolve [(course_index, chave_fisica, registro)]. Somente leitura: nao toca
-    no plano, no solver nem no documento."""
-    return materialization_plan(result, preflight)["impossible"]
+    """[(course_index, chave_fisica, registro)] das pecas que NAO serao criadas."""
+    return materialization_plan(result, preflight)["skip"]
 
 
 def unbuildable_keys(result, preflight=None):
@@ -5064,11 +5108,34 @@ def run_is_fatal(preflight):
     return bool((preflight or {}).get("errors"))
 
 
-def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
-    """Read-only physical gate. Reject the batch, never remove individual ties.
+def materialized_result(result, skip_keys):
+    """Copia rasa do resultado com SO' as pecas que serao criadas (mesmas fiadas)."""
+    from core.engine import opening_reinforcement as _reinforcement
 
-    Unlike the benchmark, this includes all active openings and all pairs,
-    even when two pieces share a node. It does not change either validator.
+    result = dict(result or {})
+    pular = set(skip_keys or ())
+    fontes = result.get("course_candidates") or {}
+    result["course_candidates"] = dict(
+        (ci, [c for c in pecas if (ci, _reinforcement._physical_key(c)) not in pular])
+        for ci, pecas in fontes.items())
+    return result
+
+
+def verify_materialization(result, walls_to_create, openings_per_wall, catalog, base_z_abs, skip_keys):
+    """INVARIANTE da regra 48 sobre o que REALMENTE vai ser criado: refaz o
+    preflight so' com as pecas que ficam. Tem de dar zero invasao e zero colisao."""
+    return controlled_beta_preflight(materialized_result(result, skip_keys), walls_to_create,
+                                     openings_per_wall, catalog, base_z_abs)
+
+
+def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
+    """Laudo fisico SOMENTE LEITURA, peca a peca (regra 48).
+
+    Mede invasao do volume real de abertura ativa na fiada e colisao entre
+    pecas, incluindo todas as aberturas e todos os pares (mesmo no mesmo no').
+    Nao decide nada: `materialization_plan` aplica a politica (erro fatal
+    bloqueia a RUN; cada ocorrencia localizada impede so' a PECA afetada).
+    Nao altera nenhum validador.
     """
     import math
     from core.engine.wall_stepper import _obb_aabb, _collision_candidate_pairs
@@ -6488,7 +6555,18 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                     entry = catalog.get(cand["logical_code"])
                     if entry is None:
                         done += 1  # conta para a barra nao parar em 99%
-                        continue  # ja reportado em missing_codes, uma vez, acima
+                        # contabilidade POR PECA: nenhuma peca some em silencio
+                        skipped_records.append({
+                            "course_index": course_index, "wall_idx": cand.get("wall_idx"),
+                            "node_index": cand.get("node_index"),
+                            "logical_code": cand.get("logical_code"),
+                            "placement_reason": cand.get("placement_reason"),
+                            "rule_id": "MISSING_FAMILY", "severity": "FAMILY_MISSING",
+                            "materializable": False, "created": False,
+                            "structural_role": structural_bond_role(cand),
+                            "requires_human_review": True,
+                            "message": "tipo ausente do catalogo - peca nao criada"})
+                        continue
                     symbol = entry["symbol"]
                     origin = cand["origin_world"]
                     # BUG REAL medido ao vivo (2026-08-21, primeiro teste via MCP
@@ -6673,7 +6751,7 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         "created_instances": created_instances, "perf": perf,
         # contabilidade explicita: planejadas = criadas + puladas + falhas
         "planned_total": perf["planned_total"], "skipped_count": len(skipped_records),
-        "skipped": skipped_records,
+        "skipped": skipped_records, "failed_count": perf.get("failed_count", 0),
     }
 
 
@@ -11934,7 +12012,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.action = None
         self.on_done = None
         self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
-        self._unbuildable = []      # pecas provadas impossiveis (ver unbuildable_pieces)
+        self._unbuildable = []      # pecas que NAO serao criadas (ver materialization_plan)
+        self._unresolved_bonds = []  # amarracoes rejeitadas: NAO resolvidas (revisao humana)
         # dados fixos desta execucao
         self.walls_to_create = []
         self.openings_per_wall = []
@@ -12547,8 +12626,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
             # contrato da materializacao para a apresentacao (nao recalcula fisica)
             plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
             self.solve_result["materialization"] = {
-                "impossible": [rec for _ci, _k, rec in plano_material["impossible"]],
-                "violating": [rec for _ci, _k, rec in plano_material["violating"]],
+                "skipped": [rec for _ci, _k, rec in plano_material["skip"]],
+                "unresolved_bonds": plano_material["unresolved_bonds"],
                 "fatal": plano_material["fatal"],
             }
         self._save_modulation_state_cache()
@@ -12618,10 +12697,25 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 raise ValueError("BETA BLOQUEADO (erro fatal do plano): {}. "
                                  "Nenhum bloco criado ou lote anterior removido.".format(
                                      "; ".join(str(e) for e in preflight["errors"])))
-            self._unbuildable = unbuildable_pieces(self.solve_result, preflight)
+            plano_material = materialization_plan(self.solve_result, preflight)
+            self._unbuildable = plano_material["skip"]
+            self._unresolved_bonds = plano_material["unresolved_bonds"]
+            # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
+            # so' com as pecas que ficam, o preflight tem de sair limpo. Se nao sair,
+            # a classificacao falhou - isso e' fatal, nunca criacao parcial.
+            conferencia = verify_materialization(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog,
+                self.base_z_abs, set((ci, chave) for ci, chave, _r in self._unbuildable))
+            if (conferencia.get("opening_violations") or conferencia.get("collisions")
+                    or conferencia.get("errors")):
+                raise ValueError("BETA BLOQUEADO (erro fatal): depois de separar as pecas impossiveis, "
+                                 "{} peca(s) ainda invadem abertura e {} colidem - nada foi criado.".format(
+                                     len(conferencia.get("opening_violations") or []),
+                                     len(conferencia.get("collisions") or [])))
             if self._unbuildable:
                 _perf.mark("create.materializacao seletiva",
                            puladas=len(self._unbuildable),
+                           amarracoes_nao_resolvidas=len(self._unresolved_bonds),
                            invasoes=len(preflight.get("opening_violations") or []),
                            colisoes=len(preflight.get("collisions") or []))
             self._require_current_beta_solve()
@@ -12668,6 +12762,22 @@ class _PostCreationEventHandler(IExternalEventHandler):
         else:
             with _perf.span("create.batch"):
                 self._execute_create_batch(app_doc)
+        # RUN executavel != modulacao estruturalmente resolvida (Opcao A)
+        if self.create_result is not None:
+            _nao_resolvidas = list(getattr(self, "_unresolved_bonds", None) or [])
+            # amarracao sem familia no catalogo tambem NAO foi criada: nao e' resolvida
+            for _rec in self.create_result.get("skipped") or []:
+                if _rec.get("rule_id") == "MISSING_FAMILY" and _rec.get("structural_role"):
+                    _nao_resolvidas.append({
+                        "status": BOND_UNRESOLVED_STATUS, "requires_human_review": True,
+                        "node_index": _rec.get("node_index"), "course_index": _rec.get("course_index"),
+                        "wall_idx": _rec.get("wall_idx"), "logical_code": _rec.get("logical_code"),
+                        "structural_role": _rec.get("structural_role"), "rejected_rule": "MISSING_FAMILY",
+                        "overlap_cm": None, "opening_index": None,
+                        "message": "amarracao NAO resolvida: familia ausente do catalogo"})
+            _faltando = list((self.solve_result or {}).get("missing_required_junction_bond") or [])
+            self.create_result["unresolved_bonds"] = _nao_resolvidas
+            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando)
         with _perf.span("create.save_modulation_state_cache"):
             self._save_modulation_state_cache()
         _resultado = self.create_result or {}

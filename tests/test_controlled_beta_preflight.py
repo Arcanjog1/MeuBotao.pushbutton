@@ -91,11 +91,19 @@ def test_incomplete_result_fails_closed(damage):
 
 
 def test_blocked_recalculation_cannot_delete_previous_batch_or_references():
+    """FATAL do plano (fiadas fisicas incompletas) bloqueia a RUN inteira antes
+    de QUALQUER acesso ao documento. A assinatura do calculo e' valida de
+    proposito: quem bloqueia aqui e' o laudo FATAL, nao a assinatura (a versao
+    anterior deste teste passava pela assinatura ausente - motivo errado).
+    Invasao LOCALIZADA de porta nao e' fatal: ver
+    test_materializacao_e_estado_da_run.py (casos A..H)."""
     result, walls, openings = fixture()
+    result["course_candidates"] = {}
     handler = m._PostCreationEventHandler()
     handler.controlled_beta = True
     handler.solve_result = result
     handler.walls_to_create, handler.openings_per_wall, handler.catalog = walls, openings, CATALOG
+    result["beta_input_signature"] = handler._beta_input_signature()
     previous = {"created_count": 1, "created_instances": [{"id": 99}]}
     handler.create_result = previous
 
@@ -103,9 +111,10 @@ def test_blocked_recalculation_cannot_delete_previous_batch_or_references():
         def __getattr__(self, name):
             pytest.fail("Preflight must run before ANY document access: " + name)
 
-    with pytest.raises(ValueError, match="BETA BLOQUEADO"):
+    with pytest.raises(ValueError, match="erro fatal do plano"):
         handler._execute_create(UntouchableDocument())
     assert handler.create_result is previous
+    assert handler.solve_result["beta_preflight"]["errors"]
     assert not handler.solve_result["beta_preflight"]["ok"]
     with pytest.raises(ValueError, match="BETA BLOQUEADO"):
         handler._execute_delete(UntouchableDocument())
