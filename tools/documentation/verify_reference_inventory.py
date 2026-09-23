@@ -41,12 +41,16 @@ def verify(root, protected_base):
             if current != original or hashlib.sha256(current).hexdigest() != entry['sha256']:
                 raise ValueError('published JSON changed: ' + path)
         counts[project['id']] = len(project['files'])
-    expected = {'torre_easy_lo_r00': 9, 'butanta_r08_lt': 14}
+    expected = {'torre_easy_lo_r00': 9, 'butanta_r08_lt': 14,
+                'butanta_r08_lt_s74_corpus': 4}
     if counts != expected:
         raise ValueError('reference inventory incomplete: ' + repr(counts))
+    # todo JSON publicado sob docs/revit_reference_extraction/ tem de estar inventariado;
+    # o inverso nao vale mais desde que um acervo passou a viver em reference_projects/
+    # (o corpus da secao 74), entao a checagem e' de inclusao, nao de igualdade.
     actual = {p for p in tracked if p.startswith('docs/revit_reference_extraction/') and p.endswith('.json')}
-    if actual != seen:
-        raise ValueError('JSON files missing from inventory: ' + repr(sorted(actual ^ seen)))
+    if actual - seen:
+        raise ValueError('JSON files missing from inventory: ' + repr(sorted(actual - seen)))
     protected = ['Script.py', 'script.py', 'nuvem/core', 'nuvem/benchmark', 'tests', '.github/workflows']
     changed = git(root, 'diff', '--name-only', protected_base, '--', *protected).decode('utf-8').strip()
     if changed:

@@ -112,6 +112,12 @@ __all__ = [
     "_pier_remaining_snapped_cm", "_pier_ordered_layout", "_absorbed_segment_rule2_layout",
     "WALL_FILL_MEMO", "WALL_FILL_MEMO_STATS", "OBB_MEMO",
     "RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED", "RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM",
+    "RULE2_ON_EVERY_COURSE_A_SEGMENT", "COMPENSATOR_NOT_TOUCHING_NODE_ENABLED",
+    "compensator_node_adjacency_trial", "_wall_trial_geometry", "COMPENSATOR_NODE_TRIAL_ENABLED",
+    "COMPENSATOR_NOT_TOUCHING_NODE_COURSE_A",
+    "_index_node_boundary_codes", "_mirrored_layout",
+    "_layout_avoiding_compensator_against_node",
+    "physical_tolerance_trial",
     "_layout_internal_joint_positions_cm", "_pier_boundary_joint_positions_cm",
     "_count_joint_coincidences_cm",
     "_wall_node_boundary_joints_cm", "_layout_joints_surviving_openings_cm",
@@ -184,6 +190,11 @@ __all__ = [
     "_abutting_same_course_tie_pairs", "_tie_parity_node_movable", "_tie_parity_apply",
     "_node_walls", "_wall_course_free_segments_cm", "_tie_parity_fill_proxy", "_tie_parity_component_options",
     "_apply_abutting_tie_parity",
+    "T_ROOM_PHYSICAL_TOLERANCE", "_t_intersection_room_tolerance_ft",
+    "TIE_PARITY_FILL_BALANCE", "TIE_PARITY_FILL_BALANCE_MAX_ROUNDS",
+    "TIE_PARITY_FILL_BALANCE_MAX_TRIALS", "_tie_parity_fill_layout_cost",
+    "_search_tie_parity_fill_balance",
+    "_tie_parity_node_under_opening_reach", "TIE_PARITY_FILL_ALL_OPENINGS",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
     "WALL_GROUP_SHIFT_MAX_CM", "WALL_GROUP_SHIFT_VERIFY_BUDGET",
@@ -933,6 +944,15 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 
     small_sign = _block_smaller_cell_sign(entry)
 
+    if (L_CORNER_OTHER_ARM_OWNS and COMPENSATOR_NEVER_JUNCTION_BOND
+            and b34_ok_a != b34_ok_b):
+        # CANDIDATA D3: a familia do braco sem espaco vai para o outro braco.
+        if not b34_ok_a:
+            wall_a_idx, point_a, dir_a = wall_b_idx, point_b, dir_b
+        else:
+            wall_b_idx, point_b, dir_b = wall_a_idx, point_a, dir_a
+        b34_ok_a = b34_ok_b = True
+
     if b34_ok_a:
         origin_a, x_a = _asymmetric_bond_origin_and_axis(entry, point_a, dir_a, small_sign)
         course_a = _make_block_candidate("B34", entry, "A", origin_a, x_a, "L_CORNER",
@@ -955,6 +975,12 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
             placement_reason="L_CORNER_DEGRADED", nodes=nodes
         )
 
+    if COMPENSATOR_NEVER_JUNCTION_BOND and (course_a is None) != (course_b is None):
+        # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58); a fiada
+        # fica registrada como amarracao faltante, nunca fechada por compensador.
+        return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b,
+                "degraded": True,
+                "missing_bond_courses": ["A"] if course_a is None else ["B"]}
     if course_a is None or course_b is None:
         return {"ok": False,
                 "reason": "Sem espaco fisico suficiente para B34 em um dos lados deste encontro em L "
@@ -981,6 +1007,16 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
 # sobreposicao, blocos fora do limite da parede ou modulacoes forcadas".
 T_INTERSECTION_B54_HALF_ROOM_FT = _cm_to_ft(54.0 / 2.0)
 CORNER_B34_ROOM_FT = _cm_to_ft(34.0)
+# REGRA 76 / CORRECAO D1 (desligada no motor; ligada so' no fluxo CHANNEL por
+# wall_modeling.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED): no passo
+# "degrada para L" do T, medir o espaco a partir do CONTATO onde o B34
+# realmente comeca. O bloco e' posto em `point - l_dir * meia_espessura_da_que_
+# chega` e se estende 34 cm em l_dir: cobre o quadrado do no' + (34 - meia
+# espessura) no sentido livre. O teste historico exige 34 a partir do PONTO -
+# meia espessura a mais do que a peca ocupa. Medido no BUTANTA: nos 22 (pilar de
+# 34 cm entre duas janelas) e 30 (27,014 cm) cabem com B34 real - o que o humano
+# faz - e sem a correcao caiam no C09 como peca do no'.
+T_DEGRADED_L_ROOM_FROM_CONTACT = False
 # Regra 11.14 (2026-09-11, decisao do usuario sobre a evidencia humana de
 # BUTANTA): RESERVA DE CANTO POR FIADA. Ao medir o espaco de uma parede para a
 # peca de um encontro, a reserva na OUTRA ponta da mesma parede deixa de ser o
@@ -1357,6 +1393,64 @@ def _clip_range_by_midspan_neighbours(walls_to_create, nodes, wall_idx, t_ft, sa
             lo_ft = max(lo_ft, t_other + reserve_ft)
     return lo_ft, hi_ft
 
+# ==========================================
+# SECAO 74 (2026-09-17): o teste de espaco do T compara com tolerancia FISICA.
+#
+# `_t_intersection_room_ok` pergunta "cabe um B54 centrado no no'?" e reprova
+# quando o espaco medido fica abaixo de T_INTERSECTION_B54_HALF_ROOM_FT (27 cm
+# para cada lado). A comparacao usava `+ 1e-6` PES - 0,3 MICROMETRO. Isso nao e'
+# uma tolerancia fisica, e' o epsilon de ponto flutuante: a junta de argamassa
+# do proprio sistema tem 10 mm, o bloco tem tolerancia de fabricacao, e a
+# geometria do encontro vem de `extend_wall_ends_to_junctions` com ruido
+# acumulado de varias conversoes pes<->cm (exatamente a causa-raiz que
+# modulation_math.py ja' documenta como FIT_TOLERANCE_NOISE/C04).
+#
+# O EFEITO MEDIDO (BUTANTA R08_LT, 1o PAV, 37 encontros T, 2026-09-17): dez T
+# reprovam o teste. SETE reprovam por margem real - falta 4, 15 ou 20 cm, e a
+# degradacao esta' correta. Os outros TRES reprovam por RUIDO:
+#
+#   no' 24 (8284526 x 8284559): espaco 26,9880 cm - falta 0,12 mm
+#   no' 44 (8284515 x 8284579): espaco 26,9965 cm - falta 0,035 mm
+#   no' 46 (8284515 x 8284580): espaco 26,9965 cm - falta 0,035 mm
+#
+# E a prova de que e' ruido, e nao geometria, e' que na MESMA parede principal
+# existem nos identicos que PASSAM pela mesma margem, so' que com o sinal
+# contrario do arredondamento:
+#
+#   no' 12 (8284515 x 8284546): espaco 27,0035 cm - sobra 0,035 mm -> passa
+#   no' 26 (8284526 x 8284560): espaco 27,0120 cm - sobra 0,12 mm  -> passa
+#
+# Ou seja: a mesma situacao fisica estava sendo decidida pelo SINAL do ruido de
+# arredondamento da planta. Isto NAO afrouxa o portao - torna o portao
+# consistente. Quem nao cabe de verdade (4 cm ou mais de falta) continua
+# reprovando exatamente como antes.
+#
+# A tolerancia usada e' PIER_PHYSICAL_FIT_TOLERANCE_CM (0,05 cm), a constante
+# que o motor ja' define para esta pergunta exata - "o quanto uma peca JA'
+# MATERIALIZADA pode ultrapassar o limite FISICO real do trecho"
+# (modulation_math.py). Nenhum numero novo foi inventado. Medido: o resultado
+# SATURA em 0,05 cm - 0,05, 0,10 e 0,30 cm dao saida identica, porque o proximo
+# caso real esta' a 4 cm de distancia. Nao ha' precipicio por perto.
+#
+# RESULTADO (34 paredes de alvenaria, fiadas 0-11): divergencia de composicao
+# por parede 1.706 -> 1.500; parede 8284580 de 204,7 -> 3,3 (a composicao passa
+# a ser 48 B39 + 11 B34 + 1 B19 contra os 48 B39 + 12 B34 do humano); 8284515 de
+# 82,5 -> 78,4; DUAS paredes melhoram, ZERO pioram, 32 ficam identicas. B54 de
+# 168 para 184, TODOS ainda em T (nenhum fora de amarracao). Hard gates
+# 0/0/0/0 antes e depois. Tempo do solve inalterado.
+# ==========================================
+T_ROOM_PHYSICAL_TOLERANCE = False
+
+
+def _t_intersection_room_tolerance_ft():
+    """Tolerancia da comparacao de espaco do T, em pes. Sem a secao 74, o
+    epsilon historico de ponto flutuante; com ela, a tolerancia FISICA que o
+    motor ja' usa para peca materializada."""
+    if not T_ROOM_PHYSICAL_TOLERANCE:
+        return 1e-6
+    return PIER_PHYSICAL_FIT_TOLERANCE_CM / 100.0 * FEET_PER_METER
+
+
 def _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
                                     nodes=None, end_to_node=None, node_index=None):
     """Mede o espaco fisico real neste no' T - so' MEDE, nunca decide nem
@@ -1422,9 +1516,10 @@ def _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
                                                  nodes=nodes, end_to_node=end_to_node, node_index=node_index)
     if assessment is None:
         return True  # sem paredes identificadas, o chamador ja' vai reportar erro por outro motivo
-    if min(assessment["room_plus_ft"], assessment["room_minus_ft"]) + 1e-6 < T_INTERSECTION_B54_HALF_ROOM_FT:
+    tolerancia_ft = _t_intersection_room_tolerance_ft()   # SECAO 74
+    if min(assessment["room_plus_ft"], assessment["room_minus_ft"]) + tolerancia_ft < T_INTERSECTION_B54_HALF_ROOM_FT:
         return False
-    return assessment["room_incoming_ft"] + 1e-6 >= CORNER_B34_ROOM_FT
+    return assessment["room_incoming_ft"] + tolerancia_ft >= CORNER_B34_ROOM_FT
 
 
 # Ordem de preferencia do elemento UNICO que fecha uma parede curta demais
@@ -1435,11 +1530,657 @@ def _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
 # abertura ou PONTA SEM AMARRACAO) nao se aplica aqui. "canaleta ou
 # compensador, conforme o espaco disponivel", pedido explicito do usuario.
 CORNER_SINGLE_ELEMENT_CODES = ("C09", "C04")
+# SECAO 58 (2026-09-15, missao BUTANTA): quando o lado curto do encontro na
+# verdade TEM espaco para a peca de amarracao, o elemento unico nao deve ser
+# uma pastilha. Medido no BUTANTA: no no' 46 a boneca tem 175 cm livres e o
+# solver punha C09 de 9 cm, porque quem reprovava era a parede PRINCIPAL
+# (27 cm dos 34 exigidos) e o ramo degradado so' olhava compensador. O
+# projeto humano poe B34 nessas mesmas pontas e nunca termina uma fiada com
+# C09 (0 em 383 pontas). E' a MESMA escada que o X degradado ja' usa
+# (X_INTERSECTION_DEGRADED_CODES): bloco de amarracao primeiro, compensador
+# depois, NUNCA B19.
+CORNER_DEGRADED_TIE_CODES = ("B34",) + CORNER_SINGLE_ELEMENT_CODES
+# DESLIGADA (gate global de nao-regressao, 2026-09-15). Corrige o defeito medido
+# no BUTANTA - vazado menor 316 -> 283, especiais 808 -> 802, pastilhas de T
+# degradado 30 -> 0, portoes duros intactos - mas custa PRISM_CONTINUOUS_JOINT
+# no corpus legado: TP1 V1 16 -> 32 e TGD V2 53 -> 55, em juntas de FRONTEIRA DE
+# BANDA, onde duas fiadas vizinhas caem na mesma familia e a face do bloco de
+# amarracao se repete. Junta corrida e' regra #1: nao entra ligada enquanto essa
+# causa nao for tratada. Ver secao 58 de REGRAS_MODULACAO_BLOCOS.md.
+CORNER_DEGRADED_PREFERS_TIE_BLOCK = False
+# REGRA 76 (2026-09-18): COMPENSADOR NUNCA EXERCE FUNCAO DE AMARRACAO.
+# Compensadores (C04/C09) sao pecas de AJUSTE DIMENSIONAL. As escadas de no'
+# degradado abaixo (L, T e X) terminavam em compensador e o designavam PECA DO
+# NO' - o no' era dado como resolvido POR CAUSA do C09. CANDIDATA R76
+# (PENDENTE DE APROVACAO, desligada - medida no BUTANTA: abre buraco em 6
+# regioes de no', nao-modular 0 -> 12, sem apoio 0 -> 4): o compensador sai das
+# escadas, a familia sem bloco de amarracao RECUA (a infraestrutura da secao 58
+# ja' suporta familia sem peca de no') e o no' registra essa fiada em
+# `missing_bond_courses` (MISSING_REQUIRED_JUNCTION_BOND). Sem bloco em NENHUMA
+# das familias o no' falha como sempre falhou. O gate abaixo
+# (`compensator_as_junction_bond`) vale com ou sem esta flag.
+# Compensador perto do no' continua permitido: a regra e' de FUNCAO.
+COMPENSATOR_NEVER_JUNCTION_BOND = False
+COMPENSATOR_BOND_GATE_CODES = ("C04", "C09")
+# CANDIDATA D2 (PENDENTE DE APROVACAO, desligada): B19 como peca de no' quando
+# o B34 nao cabe - e' o que o projeto humano faz nos nos 28 (T) e 47/48 (L) do
+# BUTANTA. CONFLITA com a decisao do usuario de 2026-08-21 ("nunca B19 em
+# encontro", ver CORNER_SINGLE_ELEMENT_CODES): so' liga com decisao explicita.
+JUNCTION_BOND_B19_FALLBACK = False
+# CANDIDATA D3 (PENDENTE DE APROVACAO, desligada): no L, o braco que nao comporta
+# o B34 CEDE a sua familia ao outro braco (o mesmo desfecho do mecanismo aprovado
+# "as duas fiadas na parede nao bloqueada", hoje disparado so' por bloqueio de
+# no' vizinho). Custo conhecido: o canto perde a alternancia naquelas fiadas.
+L_CORNER_OTHER_ARM_OWNS = False
+
+
+# REGRA 76.1 (2026-09-18, decisao do usuario): quando nenhuma peca de
+# amarracao aprovada cabe, o no' NAO esta' resolvido. A escada de peca de no'
+# ainda fecha o espaco com um compensador - recuo (abre buraco), B19 (conflita
+# com 2026-08-21), outro braco e mover a abertura foram medidos e RECUSADOS -
+# mas ele deixa de ser DESIGNADO amarracao: sai com a razao
+# JUNCTION_UNRESOLVED_FILL (ajuste, nunca amarracao - mesmo padrao do
+# B19_RESIDUAL_FILL, que guarda o node_index e nao prova amarracao) e o gate
+# MISSING_REQUIRED_JUNCTION_BOND acusa a fiada para revisao humana. Desligada
+# no motor; ligada so' no fluxo CHANNEL
+# (wall_modeling.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED).
+COMPENSATOR_NODE_PIECE_UNDESIGNATED = False
+JUNCTION_UNRESOLVED_FILL_REASON = "JUNCTION_UNRESOLVED_FILL"
+# Pecas de AMARRACAO aprovadas: as que o motor ja' reconhece como amarracao
+# REAL (ver `_b19_is_tie_piece`) - B34 e B54. B19, compensador e canaleta
+# nunca amarram um encontro.
+JUNCTION_BOND_CODES = ("B34", "B54")
+
+
+# ---- SECAO 77 - PAPEL FUNCIONAL DO ENCONTRO POR FIADA -----------------------
+# A topologia BASE do no' (wall_pairing, so' XY) continua valendo; o que muda
+# por fiada e' o PAPEL EFETIVO, respondido por `core.engine.junction_role` com
+# as MESMAS aberturas ativas do solve. Nas fiadas em que o no' deixa de ser
+# encontro (NONE_FREE_END / NONE_CONTINUOUS de meio de vao) o solve daquela
+# banda NAO cria peca de no' e a parede que sobra termina/passa pelas regras
+# NORMAIS de ponta livre/continuacao; a auditoria 76.1 recalcula o papel pela
+# geometria e tira a fiada do denominador (not_required, razao
+# NO_FUNCTIONAL_JUNCTION). O tipo do no' no grafo NAO muda.
+# Desligado no motor; ligado so' no fluxo CHANNEL por
+# wall_modeling.CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED.
+JUNCTION_ROLE_BY_COURSE = False
+# {(node_index, course_index): registro} do solve corrente (contexto; salvo e
+# restaurado por wall_modeling._solve_building_blocks_all_courses_impl)
+JUNCTION_ROLE_TABLE = None
+# {node_index: registro} dos nos SEM encontro funcional na BANDA em solve
+# (contexto; salvo e restaurado pelo laco de bandas)
+JUNCTION_BAND_ROLES = None
+NO_FUNCTIONAL_JUNCTION_REASON = "NO_FUNCTIONAL_JUNCTION"
+# Contexto (solve_wall_free_fill, por PAREDE em solve, restaurado em finally):
+# a ponta INICIAL da parede e' a ponta livre de um no' sem encontro (rente a'
+# face da vizinha) e a final nao -> a folga de modulacao (junta alternativa de
+# 1 cm) de um trecho com as duas pontas abertas vai para o FIM do trecho, e nao
+# para o inicio como a regra geral faz. Sem isso a peca da ponta ficava 1 cm
+# atras da face quando o no' esta' no inicio da parede (medido na fixture
+# node-at-start x node-at-end; secao 77.4). Limite registrado: com encontro
+# ATIVO na outra ponta e trecho nao modular, a unica junta negociavel e' a da
+# face (mesma regra de qualquer parede de ponta livre do motor).
+PIER_SLACK_PREFER_TRAILING = False
+
+
+def junction_role_table(nodes, walls_to_create, solve_openings, course_band_ft, num_courses, catalog,
+                        opening_tol_ft):
+    """{(node_index, course_index): registro de junction_role} - UMA regra para
+    o solve e para a auditoria: mesmas aberturas do solve, mesma faixa da
+    fiada, mesma regra de abertura ativa (sobreposicao > opening_tol_ft) e a
+    mesma regiao de no' da auditoria 76.1 (faixa limitada ao bloco de
+    amarracao). Funcao pura da geometria: a auditoria chama de novo em vez de
+    reaproveitar a tabela do solve (independencia do gate)."""
+    import sys as _sys
+    from core.engine import junction_role as _jr
+    if not nodes or not walls_to_create or solve_openings is None or course_band_ft is None:
+        return {}
+    larguras = [float(((catalog or {}).get(c) or {}).get("width_cm") or 0.0) for c in JUNCTION_BOND_CODES]
+    band_ft = _cm_to_ft(max(larguras)) if larguras and max(larguras) > 0.0 else None
+    tol = float(opening_tol_ft or 0.0)
+
+    def _active(sill, head, z_lo, z_hi):
+        return (min(head, z_hi) - max(sill, z_lo)) > tol
+
+    records = _jr.junction_roles(nodes, walls_to_create, solve_openings, course_band_ft, num_courses,
+                                 _sys.modules[__name__], opening_active=_active, band_width_ft=band_ft,
+                                 catalog=catalog)
+    return _jr.roles_index(records)
+
+
+def junction_role_skips_bond(node, record):
+    """True se o registro diz que o no' NAO e' encontro nesta fiada E o solve
+    sabe compor o que sobra pelas regras normais: so' NONE_FREE_END (a parede
+    do unico braco vivo termina LIVRE ali, na face da vizinha - regras normais
+    de termino). NONE_CONTINUOUS (a parede que chega foi consumida por uma
+    abertura ativa e a que passa continua) e' so' classificacao (secao 77.5):
+    a composicao da parede que passa por uma regiao de no' sem encontro nao
+    tem regra aprovada - medido no TORRE (CAD cru): consumir esse papel
+    trocava a segmentacao de paredes ja' nao modulares e deixava fiadas
+    vazias sob a fiada em que o encontro volta. O no' fica como a base."""
+    if record is None or node is None:
+        return False
+    # ESCOPO desta secao (decisao de produto 2026-09-22): o encontro em T cuja
+    # PRINCIPAL foi consumida pelas aberturas dos dois lados. O canto L com um
+    # braco consumido por abertura na quina e' classificado (NONE_FREE_END) e
+    # registrado, mas NAO consumido pelo solve nesta rodada: nao ha' caso no
+    # BUTANTA e no TORRE (CAD cru) os candidatos sao paredes nao modulares
+    # (77.5, PENDING_PRODUCT_DECISION).
+    if node.get("kind") != "T_INTERSECTION":
+        return False
+    if record.get("effective_role") == "NONE_FREE_END":
+        return record.get("free_end_wall") is not None
+    return False
+
+
+def junction_band_roles(table, course_indices, nodes):
+    """{node_index: registro} dos nos sem encontro funcional em TODAS as fiadas
+    da banda (o papel sai das aberturas ativas, entao e' constante na banda;
+    se nao for, o no' fica como esta' - conservador)."""
+    if not table or not course_indices or not nodes:
+        return None
+    out = {}
+    for ni, node in enumerate(nodes):
+        recs = [table.get((ni, ci)) for ci in course_indices]
+        if not recs or any(r is None or not junction_role_skips_bond(node, r) for r in recs):
+            continue
+        sig = set((r.get("effective_role"), r.get("free_end_wall"), tuple(r.get("continuous_walls") or ()))
+                  for r in recs)
+        if len(sig) != 1:
+            continue
+        out[ni] = recs[0]
+    return out
+
+
+def _band_role_without_bond(node_index):
+    roles = JUNCTION_BAND_ROLES
+    if not roles or node_index is None:
+        return None
+    return roles.get(node_index)
+
+
+def _band_role_signature(node_index):
+    rec = _band_role_without_bond(node_index)
+    if rec is None:
+        return None
+    return (rec.get("effective_role"), rec.get("free_end_wall"), tuple(rec.get("continuous_walls") or ()))
+
+
+def _band_role_free_end(wall_idx, end_index, end_to_node):
+    """True se, na banda em solve, a ponta `end_index` de `wall_idx` e' a
+    PONTA LIVRE de um no' sem encontro funcional (a peca deve ficar rente a'
+    face da vizinha - ver a folga de modulacao em `solve_wall_free_fill`)."""
+    if not JUNCTION_BAND_ROLES or end_to_node is None:
+        return False
+    node_index = end_to_node.get((wall_idx, end_index))
+    papel = _band_role_without_bond(node_index)
+    return papel is not None and papel.get("free_end_wall") == wall_idx
+
+
+# ---- REGRA 76 / 76.1 - validadores funcionais (somente leitura) -------------
+# Dois resultados INDEPENDENTES (decisao do usuario, 2026-09-18):
+#  * COMPENSATOR_AS_JUNCTION_BOND - o motor DESIGNOU um compensador como peca
+#    de amarracao do no' (razao L_CORNER/T_INTERSECTION/X_INTERSECTION/CORNER).
+#  * MISSING_REQUIRED_JUNCTION_BOND - GEOMETRIA (autoridade): nesta fiada o
+#    encontro existe e NAO ha' peca de amarracao valida ocupando a regiao do
+#    no' (a interseccao das faixas de espessura das paredes do encontro, o
+#    unico lugar fisico onde a peca que amarra precisa estar). Valida = codigo
+#    aprovado, de uma parede do no', cobrindo a regiao INTEIRA, com apoio e
+#    modular. Compensador - perto, encostado ou dentro da regiao - nunca
+#    resolve o no'; a peca de maior area nao e' criterio.
+# Um compensador ENCOSTADO numa amarracao valida (o [B54][C09][B39]) nao
+# aparece em nenhum dos dois. Nenhum criterio usa distancia.
+COMPENSATOR_BOND_ROLE_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+_BOND_GATE_NODE_KINDS = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION")
+
+
+def _node_wall_indices(node):
+    walls = set()
+    for w, _e in (node.get("arms") or []):
+        walls.add(w)
+    for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+        if node.get(key) is not None:
+            walls.add(node[key])
+    for w in (node.get("crossing_walls") or ()):
+        if w is not None:
+            walls.add(w)
+    return walls
+
+
+def _clip_half_plane(poly, nx, ny, c):
+    """Sutherland-Hodgman: mantem os pontos com nx*x + ny*y <= c."""
+    out = []
+    n = len(poly)
+    for i in range(n):
+        p = poly[i]
+        q = poly[(i + 1) % n]
+        dp = nx * p[0] + ny * p[1] - c
+        dq = nx * q[0] + ny * q[1] - c
+        if dp <= 0.0:
+            out.append(p)
+        if (dp < 0.0 < dq) or (dq < 0.0 < dp):
+            t = dp / (dp - dq)
+            out.append((p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])))
+    return out
+
+
+def _poly_area(poly):
+    a = 0.0
+    n = len(poly)
+    for i in range(n):
+        x0, y0 = poly[i]
+        x1, y1 = poly[(i + 1) % n]
+        a += x0 * y1 - x1 * y0
+    return abs(a) / 2.0
+
+
+def _node_region_polygon(node, walls_to_create, band_width_ft=None):
+    """Regiao do no' = interseccao das faixas de espessura das paredes do
+    encontro (quadrado no encontro ortogonal). Em pes, no plano XY.
+    `band_width_ft` limita cada faixa a' largura da ALVENARIA (o bloco de
+    14 cm centrado numa parede de 19 so' ocupa 14) - None usa a espessura."""
+    point = node.get("point")
+    if point is None:
+        return None
+    walls = [w for w in sorted(_node_wall_indices(node)) if 0 <= w < len(walls_to_create)]
+    if len(walls) < 2:
+        return None
+    half_max = max(walls_to_create[w][1] for w in walls)
+    r = 4.0 * half_max
+    poly = [(point.X - r, point.Y - r), (point.X + r, point.Y - r),
+            (point.X + r, point.Y + r), (point.X - r, point.Y + r)]
+    for w in walls:
+        line, thickness, _locks = walls_to_create[w]
+        p0 = line.GetEndPoint(0)
+        p1 = line.GetEndPoint(1)
+        dx, dy = p1.X - p0.X, p1.Y - p0.Y
+        length = (dx * dx + dy * dy) ** 0.5
+        if length <= 0.0:
+            return None
+        nx, ny = -dy / length, dx / length
+        c0 = nx * p0.X + ny * p0.Y
+        half = (thickness if band_width_ft is None else min(thickness, band_width_ft)) / 2.0
+        poly = _clip_half_plane(poly, nx, ny, c0 + half)
+        if not poly:
+            return None
+        poly = _clip_half_plane(poly, -nx, -ny, -(c0 - half))
+        if not poly:
+            return None
+    return poly
+
+
+def _candidate_polygon(candidate):
+    o = candidate["origin_world"]
+    xd = candidate["x_dir"]
+    yd = candidate["y_dir"]
+    hl = _cm_to_ft(float(candidate["length_cm"])) / 2.0
+    hw = _cm_to_ft(float(candidate.get("width_cm") or 0.0)) / 2.0
+    return [(o.X + sx * hl * xd.X + sy * hw * yd.X, o.Y + sx * hl * xd.Y + sy * hw * yd.Y)
+            for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+
+
+def _convex_overlap_area(subject, convex):
+    """Area de `subject` recortado pelo poligono convexo `convex` (anti-horario
+    ou horario - a orientacao e' detectada)."""
+    n = len(convex)
+    sign = 1.0 if sum(convex[i][0] * convex[(i + 1) % n][1] - convex[(i + 1) % n][0] * convex[i][1]
+                      for i in range(n)) > 0 else -1.0
+    poly = list(subject)
+    for i in range(n):
+        ax, ay = convex[i]
+        bx, by = convex[(i + 1) % n]
+        # lado de dentro: esquerda da aresta (anti-horario)
+        nx, ny = sign * (by - ay), sign * -(bx - ax)
+        poly = _clip_half_plane(poly, nx, ny, nx * ax + ny * ay)
+        if not poly:
+            return 0.0
+    return _poly_area(poly)
+
+
+def _bbox(poly):
+    xs = [p[0] for p in poly]
+    ys = [p[1] for p in poly]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _bond_regions(nodes, walls_to_create, band_width_ft=None):
+    """{no': (poligono da regiao, area, paredes do no', bbox)} dos nos L/T/X."""
+    regions = {}
+    for ni, node in enumerate(nodes or []):
+        if node.get("kind") not in _BOND_GATE_NODE_KINDS:
+            continue
+        poly = _node_region_polygon(node, walls_to_create, band_width_ft)
+        if not poly:
+            continue
+        area = _poly_area(poly)
+        if area <= 0.0:
+            continue
+        regions[ni] = (poly, area, _node_wall_indices(node), _bbox(poly))
+    return regions
+
+
+def _region_overlaps(cand, regions):
+    """[(no', fracao da regiao coberta)] das regioes de no' que a peca cobre -
+    so' nos de que a parede da peca faz parte."""
+    out = []
+    cpoly = _candidate_polygon(cand)
+    cb = _bbox(cpoly)
+    for ni in sorted(regions):
+        poly, area, wall_set, box = regions[ni]
+        if cand.get("wall_idx") not in wall_set:
+            continue
+        if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+            continue
+        ov = _convex_overlap_area(cpoly, poly)
+        if ov > area * 1e-6:
+            out.append((ni, ov / area))
+    return out
+
+
+def _origin_cm(cand):
+    o = cand["origin_world"]
+    return [round(_ft_to_cm(o.X), 3), round(_ft_to_cm(o.Y), 3)]
+
+
+def compensator_as_junction_bond(course_candidates, nodes, walls_to_create):
+    """REGRA 76 - COMPENSATOR_AS_JUNCTION_BOND (aceitavel: vazio). Uma violacao
+    por compensador que o motor DESIGNOU peca de amarracao (razao de amarracao
+    de no'). `occupied_nodes` e' diagnostico geometrico: as regioes de no' que
+    ele cobre. Se o no' tem amarracao valida e' a outra pergunta -
+    `missing_required_junction_bond`. Somente leitura."""
+    regions = _bond_regions(nodes, walls_to_create)
+    out = []
+    for ci in sorted(course_candidates or {}):
+        for cand in (course_candidates or {}).get(ci) or []:
+            code = cand.get("logical_code")
+            if code not in COMPENSATOR_BOND_GATE_CODES:
+                continue
+            reason = str(cand.get("placement_reason") or "")
+            if not any(reason.startswith(p) for p in COMPENSATOR_BOND_ROLE_PREFIXES):
+                continue
+            occ = [{"node_index": ni, "node_kind": nodes[ni].get("kind"), "coverage": round(f, 4)}
+                   for ni, f in _region_overlaps(cand, regions)]
+            ni = cand.get("node_index")
+            if ni is None and occ:
+                ni = sorted(occ, key=lambda o: (-o["coverage"], o["node_index"]))[0]["node_index"]
+            cov = None
+            for o in occ:
+                if o["node_index"] == ni:
+                    cov = o["coverage"]
+            out.append({
+                "course_index": ci, "node_index": ni,
+                "node_kind": (nodes[ni].get("kind") if nodes and ni is not None and 0 <= ni < len(nodes)
+                              else None),
+                "wall_idx": cand.get("wall_idx"), "logical_code": code, "placement_reason": reason,
+                "evidence": ["DESIGNATED_NODE_PIECE"], "coverage": cov, "occupied_nodes": occ,
+                "origin_cm": _origin_cm(cand)})
+    return sorted(out, key=lambda v: (v["course_index"], v["node_index"] if v["node_index"] is not None else -1,
+                                      v["origin_cm"][0], v["origin_cm"][1]))
+
+
+def _inset_convex(poly, d):
+    """Poligono convexo encolhido `d` para dentro em cada aresta (vazio se a
+    regiao for menor que 2d). Serve para "so' uma faixa de d na borda pode
+    faltar": a peca tem de cobrir TODO o poligono encolhido."""
+    n = len(poly)
+    area2 = sum(poly[i][0] * poly[(i + 1) % n][1] - poly[(i + 1) % n][0] * poly[i][1] for i in range(n))
+    sign = 1.0 if area2 > 0 else -1.0
+    out = list(poly)
+    for i in range(n):
+        ax, ay = poly[i]
+        bx, by = poly[(i + 1) % n]
+        ex, ey = bx - ax, by - ay
+        length = (ex * ex + ey * ey) ** 0.5
+        if length <= 0.0:
+            continue
+        # normal para FORA (anti-horario: (ey, -ex)); dentro: n.x <= n.a - d
+        nx, ny = sign * ey / length, sign * -ex / length
+        out = _clip_half_plane(out, nx, ny, nx * ax + ny * ay - d)
+        if not out:
+            return []
+    return out
+
+
+def _axis_t_range_ft(wall, poly):
+    """(t_min, t_max) do poligono projetado no eixo da parede (ft, a partir da
+    ponta 0 da linha - a mesma referencia de `openings_per_wall`)."""
+    line = wall[0]
+    p0 = line.GetEndPoint(0)
+    p1 = line.GetEndPoint(1)
+    dx, dy = p1.X - p0.X, p1.Y - p0.Y
+    length = (dx * dx + dy * dy) ** 0.5
+    ts = [((x - p0.X) * dx + (y - p0.Y) * dy) / length for x, y in poly]
+    return min(ts), max(ts)
+
+
+def _bond_piece_modular(cand, ci, catalog, spans_by_wall_course, walls_to_create, fit_cm):
+    """Peca de amarracao no comprimento NOMINAL do catalogo e fora de trecho
+    que o motor declarou nao-modular (`non_modular`) na mesma parede/fiada."""
+    entry = (catalog or {}).get(cand.get("logical_code")) or {}
+    nominal = entry.get("length_cm")
+    if nominal and abs(float(cand.get("length_cm") or 0.0) - float(nominal)) > fit_cm:
+        return False
+    spans = spans_by_wall_course.get((cand.get("wall_idx"), ci))
+    wi = cand.get("wall_idx")
+    if spans and wi is not None and 0 <= wi < len(walls_to_create):
+        t_lo, t_hi = _axis_t_range_ft(walls_to_create[wi], _candidate_polygon(cand))
+        t_lo, t_hi = _ft_to_cm(t_lo), _ft_to_cm(t_hi)
+        for a, b in spans:
+            if min(b, t_hi) - max(a, t_lo) > fit_cm:
+                return False
+    return True
+
+
+def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall=None,
+                        course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
+                        opening_tol_ft=0.0, fit_tol_cm=None, junction_roles=None):
+    """REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND, por no' L/T/X e fiada.
+
+    0. (secao 77) `junction_roles` = tabela de papel funcional por fiada
+       RECALCULADA pela geometria (junction_role_table): fiada em que o no'
+       nao e' encontro funcional -> `not_required` com razao
+       NO_FUNCTIONAL_JUNCTION, fora do denominador. Vem ANTES do passo 1.
+
+    1. O ENCONTRO EXISTE nesta fiada? Nao existe quando uma abertura ativa na
+       fiada (use as aberturas do SOLVE - com as passagens livres estendidas
+       ate' o topo) cobre a regiao do no' ao longo de alguma parede do no':
+       aquela parede nao esta' ali -> `not_required`.
+    2. Existindo, ha' PECA DE AMARRACAO VALIDA ocupando a regiao? Valida =
+       codigo em JUNCTION_BOND_CODES, de uma parede do no', cobrindo a regiao
+       INTEIRA (so' uma faixa de `fit_tol_cm` na borda pode faltar), com apoio
+       (fora de `unsupported`, os itens de `physical_support`), no comprimento
+       nominal do catalogo e fora de trecho `non_modular`. Nao -> `missing`,
+       com o motivo e todos os ocupantes da regiao.
+    Compensador na regiao nunca resolve o no'; a maior area nao e' criterio.
+    A regiao e' medida na faixa de ALVENARIA: com `catalog`, cada faixa fica
+    limitada a' largura do bloco de amarracao (parede de 19 com bloco de 14).
+    `non_modular` usa a FIADA FISICA em "course" (o motor grava a familia por
+    banda - ver wall_modeling._non_modular_by_physical_course).
+    Somente leitura, geometria exata (recorte de poligono convexo)."""
+    fit_cm = PIER_PHYSICAL_FIT_TOLERANCE_CM if fit_tol_cm is None else float(fit_tol_cm)
+    fit_ft = _cm_to_ft(fit_cm)
+    larguras = [float(((catalog or {}).get(c) or {}).get("width_cm") or 0.0) for c in JUNCTION_BOND_CODES]
+    band_ft = _cm_to_ft(max(larguras)) if max(larguras) > 0.0 else None
+    regions = _bond_regions(nodes, walls_to_create, band_ft)
+    sem_apoio = {}
+    for it in unsupported or []:
+        p = it.get("point_cm")
+        if not p:
+            continue
+        key = (it.get("course"), it.get("wall_idx"), it.get("code"))
+        sem_apoio.setdefault(key, []).append((float(p[0]), float(p[1])))
+    spans = {}
+    for e in non_modular or []:
+        a, b = e.get("seg_start_cm"), e.get("seg_end_cm")
+        if a is None or b is None:
+            continue
+        spans.setdefault((e.get("wall_idx"), e.get("course")), []).append((min(a, b), max(a, b)))
+    by_course_wall = {}
+    for ci in course_candidates or {}:
+        for cand in (course_candidates or {}).get(ci) or []:
+            cpoly = _candidate_polygon(cand)
+            by_course_wall.setdefault((ci, cand.get("wall_idx")), []).append((cand, cpoly, _bbox(cpoly)))
+    checked = 0
+    valid = 0
+    not_required = []
+    missing = []
+    for ni in sorted(regions):
+        poly, area, wall_set, box = regions[ni]
+        node = nodes[ni]
+        nucleo = _inset_convex(poly, fit_ft) or poly
+        area_nucleo = _poly_area(nucleo)
+        walls_here = [w for w in sorted(wall_set) if 0 <= w < len(walls_to_create)]
+        extents = dict((w, _axis_t_range_ft(walls_to_create[w], poly)) for w in walls_here)
+        for ci in sorted(course_candidates or {}):
+            ausentes = []
+            if openings_per_wall is not None and course_band_ft is not None:
+                z_lo, z_hi = course_band_ft(ci)
+                for w in walls_here:
+                    t_lo, t_hi = extents[w]
+                    for row in (openings_per_wall[w] if w < len(openings_per_wall) else ()):
+                        if (min(row[3], z_hi) - max(row[2], z_lo)) <= opening_tol_ft:
+                            continue
+                        if row[0] <= t_lo + fit_ft and row[1] >= t_hi - fit_ft:
+                            ausentes.append(w)
+                            break
+            if ausentes:
+                not_required.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                                     "absent_walls": ausentes})
+                continue
+            # SECAO 77: o no' nao e' encontro funcional nesta fiada (papel
+            # recalculado pela geometria, nao lido do solve)
+            papel = junction_roles.get((ni, ci)) if junction_roles else None
+            if papel is not None and junction_role_skips_bond(node, papel):
+                # a isencao so' vale se a ponta livre foi COMPOSTA: a regiao do
+                # no' e' a ponta da parede que sobra e precisa estar coberta por
+                # ela (parede nao modular -> fiada vazia -> NAO isenta, nunca
+                # mascara: vira `missing` FREE_END_NOT_COMPOSED)
+                livre = papel.get("free_end_wall")
+                cobertura = 0.0
+                ocup_livre = []
+                for cand, cpoly, cb in by_course_wall.get((ci, livre), ()):
+                    if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+                        continue
+                    ov = _convex_overlap_area(cpoly, nucleo)
+                    if ov > area_nucleo * 1e-6:
+                        cobertura += ov
+                        ocup_livre.append((ov / area_nucleo, cand))
+                if cobertura + 1e-9 >= area_nucleo * (1.0 - 1e-6):
+                    not_required.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                                         "absent_walls": list(papel.get("absent_walls") or []),
+                                         "reason": NO_FUNCTIONAL_JUNCTION_REASON,
+                                         "effective_role": papel.get("effective_role"),
+                                         "free_end_wall": livre,
+                                         "continuous_walls": list(papel.get("continuous_walls") or [])})
+                    continue
+                checked += 1
+                missing.append({
+                    "course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                    "walls": walls_here, "reason": "FREE_END_NOT_COMPOSED",
+                    "classification": "MISSING_REQUIRED_JUNCTION_BOND", "review": "HUMAN_REVIEW",
+                    "effective_role": papel.get("effective_role"), "free_end_wall": livre,
+                    "coverage": round(cobertura / area_nucleo, 4) if area_nucleo else 0.0,
+                    "occupants": [{"logical_code": c.get("logical_code"), "coverage": round(f, 4),
+                                   "placement_reason": str(c.get("placement_reason") or ""),
+                                   "wall_idx": c.get("wall_idx"), "node_index": c.get("node_index"),
+                                   "is_compensator": c.get("logical_code") in COMPENSATOR_BOND_GATE_CODES,
+                                   "origin_cm": _origin_cm(c)} for f, c in ocup_livre]})
+                continue
+            checked += 1
+            ocup = []
+            for w in walls_here:
+                for cand, cpoly, cb in by_course_wall.get((ci, w), ()):
+                    if cb[2] < box[0] or cb[0] > box[2] or cb[3] < box[1] or cb[1] > box[3]:
+                        continue
+                    ov = _convex_overlap_area(cpoly, poly)
+                    if ov > area * 1e-6:
+                        ocup.append((ov / area, cand, cpoly))
+            ocup.sort(key=lambda fc: (-round(fc[0], 9), str(fc[1].get("logical_code")),
+                                      round(fc[1]["origin_world"].X, 9), round(fc[1]["origin_world"].Y, 9)))
+            bond = None
+            falhas = set()
+            for frac, cand, cpoly in ocup:
+                code = cand.get("logical_code")
+                if code not in JUNCTION_BOND_CODES:
+                    continue
+                # REGIAO INTEIRA: todo ponto a mais de fit da borda coberto
+                if _convex_overlap_area(cpoly, nucleo) < area_nucleo * (1.0 - 1e-9):
+                    falhas.add("BOND_PIECE_PARTIAL")
+                    continue
+                o = cand["origin_world"]
+                x_cm, y_cm = _ft_to_cm(o.X), _ft_to_cm(o.Y)
+                if any(abs(x_cm - px) <= 0.11 and abs(y_cm - py) <= 0.11
+                       for px, py in sem_apoio.get((ci, cand.get("wall_idx"), code), ())):
+                    falhas.add("BOND_PIECE_UNSUPPORTED")
+                    continue
+                if not _bond_piece_modular(cand, ci, catalog, spans, walls_to_create, fit_cm):
+                    falhas.add("BOND_PIECE_NON_MODULAR")
+                    continue
+                bond = cand
+                break
+            if bond is not None:
+                valid += 1
+                continue
+            if not ocup:
+                motivo = "EMPTY_REGION"
+            elif "BOND_PIECE_UNSUPPORTED" in falhas:
+                motivo = "BOND_PIECE_UNSUPPORTED"
+            elif "BOND_PIECE_NON_MODULAR" in falhas:
+                motivo = "BOND_PIECE_NON_MODULAR"
+            elif "BOND_PIECE_PARTIAL" in falhas:
+                motivo = "BOND_PIECE_PARTIAL"
+            else:
+                motivo = "NO_BOND_PIECE"
+            missing.append({
+                "course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                "walls": walls_here, "reason": motivo,
+                "classification": "MISSING_REQUIRED_JUNCTION_BOND", "review": "HUMAN_REVIEW",
+                "occupants": [{"logical_code": c.get("logical_code"), "coverage": round(f, 4),
+                               "placement_reason": str(c.get("placement_reason") or ""),
+                               "wall_idx": c.get("wall_idx"), "node_index": c.get("node_index"),
+                               "is_compensator": c.get("logical_code") in COMPENSATOR_BOND_GATE_CODES,
+                               "origin_cm": _origin_cm(c)} for f, c, _p in ocup]})
+    return {"checked": checked, "valid": valid, "not_required": not_required, "missing": missing}
+
+
+def missing_required_junction_bond(course_candidates, nodes, walls_to_create, openings_per_wall=None,
+                                   course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
+                                   opening_tol_ft=0.0, fit_tol_cm=None, junction_roles=None):
+    """REGRA 76.1 - hard gate de classificacao MISSING_REQUIRED_JUNCTION_BOND:
+    as fiadas de no' sem peca de amarracao valida (ver `junction_bond_audit`).
+    Pode ser > 0 quando a geometria nao admite amarracao sob as regras
+    aprovadas - e' caso legitimo de revisao humana, nunca mascarado."""
+    return junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall,
+                               course_band_ft, unsupported, non_modular, catalog,
+                               opening_tol_ft, fit_tol_cm, junction_roles=junction_roles)["missing"]
+
+
+def _node_piece_reason(code, placement_reason):
+    """REGRA 76.1: compensador que a escada de peca de no' usa para fechar o
+    espaco NAO e' designado amarracao quando COMPENSATOR_NODE_PIECE_UNDESIGNATED
+    vale - o no' fica sem amarracao nessa fiada (MISSING_REQUIRED_JUNCTION_BOND)."""
+    if COMPENSATOR_NODE_PIECE_UNDESIGNATED and code in COMPENSATOR_BOND_GATE_CODES:
+        return JUNCTION_UNRESOLVED_FILL_REASON
+    return placement_reason
+
+
+def _bond_ladder(codes):
+    """A escada de peca de no' sem compensador quando a regra 76 vale."""
+    if not COMPENSATOR_NEVER_JUNCTION_BOND:
+        return codes
+    sem_comp = tuple(c for c in codes if c not in COMPENSATOR_BOND_GATE_CODES)
+    if JUNCTION_BOND_B19_FALLBACK and "B19" not in sem_comp:
+        sem_comp = sem_comp + ("B19",)
+    return sem_comp
+# Com bloco de amarracao, a familia oposta recebe a peca CURTA: cobre as duas
+# fiadas e deixa as faces em posicoes diferentes. Deixar a familia oposta vazia
+# e' pior (o preenchimento dela refaz a mesma face: TP1 V1 16 -> 72).
+CORNER_DEGRADED_ALTERNATES_TIE = True
 
 
 def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, course,
                                      wall_idx, secondary_wall_idx, node_index,
-                                     placement_reason="CORNER_DEGRADED", nodes=None):
+                                     placement_reason="CORNER_DEGRADED", nodes=None, codes=None):
     """UM UNICO elemento (o maior entre C09/C04 que caiba no espaco real
     disponivel - NUNCA B19 por padrao, ver CORNER_SINGLE_ELEMENT_CODES)
     para fechar uma parede curta demais para o B34 normal num encontro (L
@@ -1478,8 +2219,12 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
                     return _make_block_candidate(
                         "B19", b19_entry, course, origin, dir_away, "B19_RESIDUAL_FILL",
                         node_index=node_index, wall_idx=wall_idx, secondary_wall_idx=secondary_wall_idx)
+    if codes is None:
+        codes = (CORNER_DEGRADED_TIE_CODES if CORNER_DEGRADED_PREFERS_TIE_BLOCK
+                 else CORNER_SINGLE_ELEMENT_CODES)
+    codes = _bond_ladder(codes)   # REGRA 76
     best_code = None
-    for code in CORNER_SINGLE_ELEMENT_CODES:
+    for code in codes:
         entry = catalog.get(code)
         if entry is None or not entry.get("length_cm"):
             continue
@@ -1489,10 +2234,17 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
     if best_code is None:
         return None
     entry = catalog[best_code]
-    half_len_ft = _cm_to_ft(entry["length_cm"]) / 2.0
-    origin = contact_point + dir_away * half_len_ft
-    return _make_block_candidate(best_code, entry, course, origin, dir_away,
-                                 placement_reason,
+    if best_code == "B34" and entry.get("cells_local"):
+        # Peca de AMARRACAO: o vazado menor tem de ficar voltado para o no',
+        # como no T/L nao degradado - a origem simetrica serve para a
+        # pastilha, nao para o bloco que amarra.
+        origin, x_dir = _asymmetric_bond_origin_and_axis(
+            entry, contact_point, dir_away, _block_smaller_cell_sign(entry))
+    else:
+        origin = contact_point + dir_away * (_cm_to_ft(entry["length_cm"]) / 2.0)
+        x_dir = dir_away
+    return _make_block_candidate(best_code, entry, course, origin, x_dir,
+                                 _node_piece_reason(best_code, placement_reason),
                                  node_index=node_index, wall_idx=wall_idx,
                                  secondary_wall_idx=secondary_wall_idx)
 
@@ -1569,6 +2321,22 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
                 l_dir = main_dir
             elif assessment["room_minus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT:
                 l_dir = main_dir.Negate()
+            elif T_DEGRADED_L_ROOM_FROM_CONTACT:
+                # CORRECAO D1 (regra 76) - so' quando o teste historico nao acha lado
+                # nenhum (nos que ja' degradam para L nao mudam): o B34 ocupa
+                # (34 - meia espessura) no sentido livre e a meia espessura do
+                # outro lado (dentro do quadrado do no'), com a MESMA tolerancia
+                # fisica do teste do T (secao 74).
+                _t_p0, _t_p1, _t_d, _t_l, thick_i_room = _wall_axis_and_length(walls_to_create, inc_idx)
+                half_i = thick_i_room / 2.0
+                tol = _t_intersection_room_tolerance_ft()
+                need = CORNER_B34_ROOM_FT - half_i
+                if (assessment["room_plus_ft"] + tol >= need
+                        and assessment["room_minus_ft"] + tol >= half_i):
+                    l_dir = main_dir
+                elif (assessment["room_minus_ft"] + tol >= need
+                        and assessment["room_plus_ft"] + tol >= half_i):
+                    l_dir = main_dir.Negate()
             if l_dir is not None:
                 # O "arm_point" de um L_CORNER de verdade fica do lado
                 # OPOSTO de onde a peca se estende (extend_wall_ends_to_
@@ -1611,6 +2379,27 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
             catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
             placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes
         )
+        if (CORNER_DEGRADED_ALTERNATES_TIE and single_a is not None
+                and single_a.get("logical_code") == CORNER_DEGRADED_TIE_CODES[0]):
+            # SECAO 58: com bloco de AMARRACAO (nao pastilha), repetir a MESMA
+            # peca nas duas familias poe a mesma face em todas as fiadas -
+            # junta corrida (regra #1), pega por
+            # test_channel_audit_fixes::test_continuous_passage_...
+            # A familia oposta recebe a peca CURTA (a pastilha de sempre), o
+            # que mantem a cobertura das duas fiadas e deixa as faces em
+            # posicoes diferentes. Deixar a familia oposta VAZIA nao serve: o
+            # preenchimento dela recomeca do zero e refaz a MESMA face do
+            # bloco de amarracao (medido no TP1 V1: PRISM_CONTINUOUS_JOINT
+            # 16 -> 72, junta em t=34,5cm repetida em 14 de 17 fiadas).
+            single_b = _corner_single_element_candidate(
+                catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
+                placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes,
+                codes=CORNER_SINGLE_ELEMENT_CODES)
+        if COMPENSATOR_NEVER_JUNCTION_BOND and (single_a is None) != (single_b is None):
+            # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58).
+            return {"ok": True, "reason": None, "course_a": single_a, "course_b": single_b,
+                    "degraded": True,
+                    "missing_bond_courses": ["A"] if single_a is None else ["B"]}
         if single_a is None or single_b is None:
             return {"ok": False,
                     "reason": "Sem espaco fisico suficiente para B54/B34 neste encontro em T, nem "
@@ -1706,13 +2495,14 @@ def _x_intersection_centered_candidate(catalog, point, x_dir, room_ft, course, w
     exatamente -1cm no trecho seguinte. Por isso o teste e'
     `half_len_ft + BLOCK_JOINT_CM(em ft) <= room_ft`, nao so' `half_len_ft`."""
     joint_ft = _cm_to_ft(BLOCK_JOINT_CM)
-    for code in X_INTERSECTION_DEGRADED_CODES:
+    for code in _bond_ladder(X_INTERSECTION_DEGRADED_CODES):   # REGRA 76
         entry = catalog.get(code)
         if entry is None or not entry.get("length_cm"):
             continue
         half_len_ft = _cm_to_ft(entry["length_cm"]) / 2.0
         if half_len_ft + joint_ft <= room_ft + 1e-6:
-            return _make_block_candidate(code, entry, course, point, x_dir, placement_reason,
+            return _make_block_candidate(code, entry, course, point, x_dir,
+                                         _node_piece_reason(code, placement_reason),
                                          node_index=node_index, wall_idx=wall_idx,
                                          secondary_wall_idx=secondary_wall_idx)
     return None
@@ -1796,6 +2586,11 @@ def solve_x_intersection(node, walls_to_create, catalog, node_index=None,
             catalog, point, dir_b, min(room_plus_b, room_minus_b), "B", wall_b_idx, wall_a_idx,
             node_index, "X_INTERSECTION_DEGRADED")
 
+    if COMPENSATOR_NEVER_JUNCTION_BOND and (course_a is None) != (course_b is None):
+        # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58).
+        return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b,
+                "degraded": True,
+                "missing_bond_courses": ["A"] if course_a is None else ["B"]}
     if course_a is None or course_b is None:
         return {"ok": False,
                 "reason": "Sem espaco fisico suficiente para B54 em uma das paredes deste cruzamento em X "
@@ -2052,8 +2847,12 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     solved = []          # (node_index, course_a, course_b)
     solved_by_node = {}  # regra 11.14: o que ja' esta' resolvido, para os cantos seguintes
     failures = []
+    role_skipped = []    # SECAO 77: (node_index, papel) sem encontro funcional nesta banda
     for node_index, node in enumerate(nodes):
         kind = node.get("kind")
+        if kind in _BOND_GATE_NODE_KINDS and _band_role_without_bond(node_index) is not None:
+            role_skipped.append((node_index, _band_role_without_bond(node_index).get("effective_role")))
+            continue
         if kind == "L_CORNER":
             result = solve_l_corner(node, walls_to_create, catalog, node_index=node_index,
                                     openings_per_wall=openings_per_wall,
@@ -2092,14 +2891,26 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     for node_index, course_a, course_b in solved:
         if node_index in rejected:
             continue
-        candidates.append(course_a)
-        candidates.append(course_b)
+        # Uma familia pode ficar SEM peca de no' (secao 58: o encontro
+        # degradado amarra numa fiada e RECUA na outra) - a reserva de
+        # `_node_default_reservation_cm` cuida do espaco na fiada que recua.
+        for candidate in (course_a, course_b):
+            if candidate is not None:
+                candidates.append(candidate)
     outcome = {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts,
                "tie_parity_flips": [], "tie_parity_conflicts": []}
     if (_parity_pass and ABUTTING_TIE_PARITY_ENABLED and end_to_node is not None
             and walls_to_create):
         outcome = _apply_abutting_tie_parity(
             outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    # SECAO 72: depois da paridade que resolve junta corrida (acima, regra #1),
+    # a paridade que decide o comprimento do trecho livre de cada fiada.
+    if (_parity_pass and TIE_PARITY_FILL_BALANCE and end_to_node is not None
+            and walls_to_create):
+        outcome = _search_tie_parity_fill_balance(
+            outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    if role_skipped:
+        outcome["junction_role_skipped"] = role_skipped
     return outcome
 
 
@@ -2674,6 +3485,275 @@ def _apply_abutting_tie_parity(outcome, nodes, walls_to_create, catalog, opening
     current["tie_parity_flips"] = list(accepted)
     current["tie_parity_conflicts"] = _residual(coincidences, conflicts)
     return current
+
+
+# ==========================================
+# SECAO 72 (2026-09-17): A PARIDADE DO NO' E' ESCOLHIDA PELO QUE ELA DEIXA
+# PARA PREENCHER.
+#
+# FENOMENO FISICO. Num encontro, so' UMA das duas paredes pode ocupar a
+# regiao do no' em cada fiada; a outra para na fronteira e volta a ocupar na
+# fiada seguinte. QUAL fiada de QUAL parede fica com a regiao e' uma escolha
+# livre (as duas alternativas sao amarracoes corretas) - e' a "inversao A/B"
+# que `_tie_parity_flip` ja' implementa. Mas ela NAO e' neutra: ela decide o
+# COMPRIMENTO do trecho livre que sobra para cada fiada preencher.
+#
+# E o comprimento decide sozinho a composicao. Com junta de BLOCK_JOINT_CM,
+# um trecho de L cm fechado por n pecas satisfaz soma(comprimento_i + junta)
+# = L + junta: fechar um trecho e' trocar esse valor em "moedas" de
+# (comprimento do bloco + junta). Com o catalogo padrao (B39=40, B34=35,
+# B19=20, C09=10, C04=5) o resto modulo 40 determina quanto do trecho NAO
+# pode ser B39 - resto 0 fecha so' com bloco inteiro, resto 35 pede 1 B34,
+# resto 5 pede 7 B34 ou 1 pastilha.
+#
+# EVIDENCIA MEDIDA (BUTANTA R08_LT, 1o PAV, 2026-09-17, 34 paredes de
+# alvenaria, fiadas 0-11):
+#   - parede 8284579 (209cm, T nas duas pontas): o humano da' o no' da
+#     ESQUERDA a uma fiada e o da DIREITA a' outra - as duas ficam com 159cm
+#     livres, que fecham com 4 B39 exatos. O solver dava os DOIS nos a' mesma
+#     fiada: 179cm de um lado (4 B34) e 174cm do outro (5 B34). Mesma parede,
+#     mesma amarracao, 8 B34 no lugar de 0.
+#   - parede 8284557 (514cm, 3 T): humano 4 trechos de 234/194cm (1 B34 cada),
+#     solver 4 trechos de 214cm (5 B34 cada) - 132 B34 contra 36 do humano.
+#   - no corpus humano a paridade e' 23 nos numa fiada e 23 na outra (50/50);
+#     no solver era 37/10, porque a convencao por PAPEL (no T a principal
+#     hospeda sempre na mesma fiada) e' global e ignora o preenchimento.
+#
+# O QUE ESTA PARTE FAZ: depois de resolver os nos (e depois da paridade das
+# pecas ENCOSTADAS, que resolve junta corrida e tem precedencia), varre os
+# nos T/X em ordem geometrica e inverte os que REDUZEM ESTRITAMENTE o custo
+# dos trechos livres que eles deixam. Cada trecho e' montado com o layout
+# PADRAO do sistema de tiers (`_pier_ordered_layout`), e o custo e'
+#   (trechos que nao fecham, excesso da regra #2, pecas, especiais, B34)
+# Especiais antes de B34 e' o que o proprio humano faz: na parede 8284551,
+# trecho de 609cm, ele usa 10 B39 + 6 B34 (nenhum especial) onde o solver
+# usava 14 B39 + 1 B34 + C09 + C04.
+#
+# NAO e' um score com pesos: e' comparacao lexicografica com aceitacao so'
+# por melhora estrita. Nao inventa peca, nao move abertura, nao muda o codigo
+# nem a posicao de nenhuma amarracao - so' troca em qual fiada cada no'
+# hospeda a sua. Nos ja' invertidos pela paridade das pecas encostadas nao
+# sao tocados (aquela decisao resolve regra #1 e vem antes); cantos L tambem
+# nao (papel coordenado por `_coordinate_arm_role_nodes`).
+#
+# Custo: uma re-solucao dos NOS por tentativa (nenhum preenchimento), ~5ms em
+# CPython no projeto de 34 paredes; a varredura inteira roda em ~2s.
+# TIE_PARITY_FILL_BALANCE_MAX_TRIALS limita o pior caso.
+# ==========================================
+TIE_PARITY_FILL_BALANCE = False
+TIE_PARITY_FILL_BALANCE_MAX_ROUNDS = 16
+TIE_PARITY_FILL_BALANCE_MAX_TRIALS = 1200
+# Conjunto COMPLETO de aberturas da planta, publicado por
+# wall_modeling._solve_building_blocks_all_courses_impl. A paridade e'
+# decidida na PRIMEIRA banda de fiadas, e nessa chamada
+# `openings_per_wall` traz so' as aberturas ATIVAS naquela faixa de altura
+# (embaixo do peitoril a lista vem vazia) - a guarda de alcance de verga
+# precisa enxergar todas.
+TIE_PARITY_FILL_ALL_OPENINGS = None
+
+_TIE_PARITY_LAYOUT_MEMO = {}
+
+
+def _tie_parity_fill_layout_cost(wall_idxs, nodes, walls_to_create, end_to_node, candidates,
+                                 catalog,
+                                 allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
+    """(trechos que nao fecham, excesso da regra #2, pecas, especiais, B34)
+    somado sobre os trechos livres das duas fiadas das paredes `wall_idxs`.
+
+    Cada trecho e' montado com o layout PADRAO do sistema de tiers
+    (`_pier_ordered_layout`, os mesmos tiers de sempre) - nao e' o
+    preenchimento final (sem desencontro de junta, sem aberturas), so' o
+    suficiente para comparar DUAS paridades do mesmo trecho. Funcao pura.
+
+    POR QUE O NUMERO DE PECAS VEM ANTES DE ESPECIAIS E B34: para um mesmo
+    comprimento, menos pecas significa pecas MAIORES - e' a mesma coisa que
+    "use o maximo de B39" (secao 2), so' que sem precisar de um termo
+    separado para cada codigo, e ja' penaliza compensador e pastilha por
+    serem as pecas mais curtas. Medido em 2026-09-17, a divergencia de
+    composicao por parede contra o humano: 1.706 com pecas na frente, 1.809
+    com especiais na frente, 2.606 com B34 na frente (antes da secao 72:
+    2.575). Com pecas na frente, o numero de trechos que ficaram com
+    especial existindo alternativa limpa bate EXATAMENTE o do humano (105).
+
+    Medido tambem contra o otimo aritmetico de cada comprimento (o teto
+    teorico, 10x mais barato): ele so' preve o resultado real em 10 das 34
+    paredes (erro medio de 7 pecas) porque ignora os tiers e o desencontro
+    de junta."""
+    by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
+    midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    fail = excess = especiais = b34 = pieces = 0
+    for wall_idx in sorted(wall_idxs):
+        for course in ("A", "B"):
+            for pier_cm, lead_cm, trail_cm, leading_open, trailing_open in \
+                    _wall_course_free_segments_cm(wall_idx, course, nodes, walls_to_create,
+                                                  end_to_node, by_end, midspan):
+                if pier_cm < -PIER_LAYOUT_TOLERANCE_CM:
+                    fail += 1
+                    continue
+                # O layout de um trecho so' depende de (comprimento, juntas de
+                # contorno, pontas abertas) - a mesma tupla se repete aos
+                # milhares durante a varredura (cada tentativa reavalia a
+                # planta inteira). Memo de funcao pura, limpo a cada busca.
+                chave = (round(pier_cm, 4), round(lead_cm, 4), round(trail_cm, 4),
+                         bool(leading_open), bool(trailing_open), bool(allow_compensators))
+                somas = _TIE_PARITY_LAYOUT_MEMO.get(chave)
+                if somas is None:
+                    layout = _pier_ordered_layout(max(0.0, pier_cm), catalog, lead_cm, trail_cm,
+                                                  allow_compensators=allow_compensators,
+                                                  leading_open_override=leading_open,
+                                                  trailing_open_override=trailing_open)
+                    if layout is None:
+                        somas = None
+                    else:
+                        somas = (_layout_compensator_run_excess(layout, catalog),
+                                 sum(1 for code, _a, _b in layout
+                                     if (catalog.get(code) or {}).get("is_compensator")
+                                     or code == HALF_BLOCK_CODE),
+                                 sum(1 for code, _a, _b in layout if code == MID_WALL_BLOCK_CODE),
+                                 len(layout))
+                    _TIE_PARITY_LAYOUT_MEMO[chave] = somas if somas is not None else "X"
+                elif somas == "X":
+                    somas = None
+                if somas is None:
+                    fail += 1
+                    continue
+                excess += somas[0]
+                especiais += somas[1]
+                b34 += somas[2]
+                pieces += somas[3]
+    return (fail, excess, pieces, especiais, b34)
+
+
+def _tie_parity_node_under_opening_reach(node, walls_to_create, openings_per_wall, catalog):
+    """A paridade deste no' NAO e' livre: a verga/contraverga de uma abertura
+    vizinha alcanca a regiao dele.
+
+    Quando o no' fica a menos de um bloco da jamba, a canaleta da abertura
+    precisa atravessar o no' naquela fiada, e o reforco CONVERTE (ou recua) a
+    peca de amarracao que estiver ali - ver `plan_channel_reinforcement`
+    (tie_conversions / CHANNEL_THROUGH_T_PATTERN). A fiada que hospeda a
+    amarracao deixa de ser uma escolha livre: e' a que o reforco permitir.
+
+    Medido em 2026-09-17 (BUTANTA, parede 8284526, T a 27cm da jamba do vao
+    464-615): invertendo esse no', a canaleta de contraverga da fiada 3 ficou
+    com 615-644 no lugar da amarracao 635-669 e a fiada 4 passou a ter um B34
+    com 41% de apoio. O defeito e' da conversao canaleta x amarracao (existe
+    independentemente desta secao); enquanto ele nao for corrigido, a secao 72
+    nao exercita essa combinacao - nunca esconde o caso, so' nao o cria."""
+    alcance = 0.0
+    for code in _pier_codes_by_len_desc(catalog, True, pool=COMMON_FILL_BLOCK_CODES):
+        alcance = max(alcance, (catalog.get(code) or {}).get("length_cm", 0.0))
+    alcance += BLOCK_JOINT_CM
+    for wall_idx in sorted(_node_walls(node)):
+        if wall_idx is None or wall_idx >= len(walls_to_create):
+            continue
+        vaos = (openings_per_wall or {}).get(wall_idx) if isinstance(openings_per_wall, dict) else None
+        if vaos is None:
+            try:
+                vaos = openings_per_wall[wall_idx]
+            except (IndexError, TypeError):
+                vaos = None
+        if not vaos:
+            continue
+        p0, _p1, direction, _length_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+        ponto = node.get("point")
+        if ponto is None:
+            continue
+        t_cm = ((ponto.X - p0.X) * direction.X + (ponto.Y - p0.Y) * direction.Y)             / FEET_PER_METER * 100.0
+        for vao in vaos:
+            t_lo_cm = vao[0] / FEET_PER_METER * 100.0
+            t_hi_cm = vao[1] / FEET_PER_METER * 100.0
+            if t_lo_cm - alcance <= t_cm <= t_hi_cm + alcance:
+                return True
+    return False
+
+
+def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, openings_per_wall,
+                                    end_to_node):
+    """Secao 72: inverte a paridade dos nos T/X que deixam trechos livres
+    aritmeticamente piores. Muta `nodes` IN PLACE (marca `_tie_parity_flip`)
+    e devolve o resultado dos nos ja' re-resolvido. Determinista."""
+    # DECISAO UNICA (monotonia): a paridade e' escolhida na PRIMEIRA vez que
+    # os nos sao resolvidos e vale para todas as bandas seguintes e para os
+    # rebuilds dos reparos - a mesma regra do pino de papel e do SAFE REPAIR.
+    # Sem isto a busca roda de novo a cada banda, partindo de um estado ja'
+    # invertido, e o conjunto final de inversoes deixa de ser o que foi
+    # medido (medido em 2026-09-17: dois B34 com 41% de apoio na parede
+    # 8284526, onde as duas fiadas vizinhas passaram a reservar regioes de
+    # no' DIFERENTES).
+    if any(node.get("_tie_parity_fill_done") for node in nodes):
+        return outcome
+    _TIE_PARITY_LAYOUT_MEMO.clear()
+    todas = set(range(len(walls_to_create)))
+
+    def _custo(result):
+        return _tie_parity_fill_layout_cost(todas, nodes, walls_to_create, end_to_node,
+                                            result["candidates"], catalog)
+
+    base = _custo(outcome)
+    intocaveis = set(outcome.get("tie_parity_flips") or ())
+    movable = [i for i, node in enumerate(nodes)
+               if node.get("kind") in ("T_INTERSECTION", "X_INTERSECTION")
+               and i not in intocaveis and not node.get("_arm_role_pinned")
+               and not _tie_parity_node_under_opening_reach(
+                   node, walls_to_create,
+                   TIE_PARITY_FILL_ALL_OPENINGS if TIE_PARITY_FILL_ALL_OPENINGS is not None
+                   else openings_per_wall, catalog)]
+    movable.sort(key=lambda i: _canonical_node_sort_key(nodes[i]) + (i,))
+    escolhidos = []
+    tentativas = 0
+    for _round in range(TIE_PARITY_FILL_BALANCE_MAX_ROUNDS):
+        melhor = None
+        for node_index in movable:
+            if node_index in escolhidos or tentativas >= TIE_PARITY_FILL_BALANCE_MAX_TRIALS:
+                continue
+            node = nodes[node_index]
+            antes = bool(node.get("_tie_parity_flip"))
+            tentativas += 1
+            node["_tie_parity_flip"] = not antes
+            try:
+                trial = solve_all_intersections(nodes, walls_to_create, catalog,
+                                                openings_per_wall=openings_per_wall,
+                                                end_to_node=end_to_node, _parity_pass=False)
+                custo = _custo(trial)
+            finally:
+                if antes:
+                    node["_tie_parity_flip"] = True
+                else:
+                    node.pop("_tie_parity_flip", None)
+            if custo[0] <= base[0] and custo < base and (melhor is None or custo < melhor[0]):
+                melhor = (custo, node_index)
+        if melhor is None:
+            break
+        base, node_index = melhor
+        node = nodes[node_index]
+        if node.get("_tie_parity_flip"):
+            node.pop("_tie_parity_flip", None)
+        else:
+            node["_tie_parity_flip"] = True
+        escolhidos.append(node_index)
+    _TIE_PARITY_LAYOUT_MEMO.clear()
+    for node in nodes:
+        node["_tie_parity_fill_done"] = True
+    if not escolhidos:
+        return outcome
+    final = solve_all_intersections(nodes, walls_to_create, catalog,
+                                    openings_per_wall=openings_per_wall,
+                                    end_to_node=end_to_node, _parity_pass=False)
+    final["tie_parity_flips"] = list(outcome.get("tie_parity_flips") or ())
+    final["tie_parity_conflicts"] = list(outcome.get("tie_parity_conflicts") or ())
+    # A REGRA #1 TEM A ULTIMA PALAVRA: a paridade das pecas ENCOSTADAS foi
+    # planejada sobre a paridade ANTERIOR; com os nos invertidos aqui, as
+    # juntas NO'|FILL de cada fiada mudaram e o plano precisa ser refeito.
+    # Sem esta segunda passada, medido em 2026-09-17, a parede 8284526 ficava
+    # com duas fiadas vizinhas reservando regioes de no' diferentes no mesmo
+    # T (dois B34 com 41% de apoio).
+    if ABUTTING_TIE_PARITY_ENABLED:
+        final = _apply_abutting_tie_parity(
+            final, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    final["tie_parity_fill_flips"] = list(escolhidos)
+    final["tie_parity_fill_cost"] = list(base)
+    return final
 
 
 def _tie_parity_score(result):
@@ -3899,6 +4979,18 @@ MAX_COMPENSATORS_PER_TRECHO = 1
 # o humano resolve sempre a favor da fileira de B34.
 MAX_SPECIAL_BOND_PER_TRECHO = 1
 
+# SECAO 71 (2026-09-16): CONTAGEM de compensadores no desempate entre variantes
+# do mesmo trecho. A regra #2 (`_layout_compensator_run_excess`) ja' proibia
+# compensador em SEQUENCIA e a regra #1 ja' vinha antes de tudo, mas quando dois
+# layouts EMPATAVAM nas duas o desempate era so' trava/alinhamento generico - a
+# quantidade de compensadores nao entrava. Medido no lote da BUTANTA: 62 trechos
+# de 69 cm fechavam `B19+B39+C09` tendo `B34+B34` disponivel com a MESMA
+# coincidencia de junta (zero nos dois). E' a classe que o usuario nomeou:
+# compensador EVITAVEL escolhido porque a composicao foi decidida sem olhar a
+# fiada vizinha. Entra DEPOIS das duas regras absolutas e ANTES da trava e do
+# alinhamento, que e' a hierarquia pedida. So' no fluxo CHANNEL.
+COMPENSATOR_COUNT_IN_TIEBREAK = False
+
 
 def _pier_codes_by_len_desc(catalog, allow_compensators, exclude=(), pool=OPENING_JAMB_BLOCK_CODES):
     """Codigos de `pool` disponiveis no catalogo, ordenados do MAIOR para o
@@ -4318,6 +5410,10 @@ def _pier_ordered_layout(pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
             alternativas.append((outro(leading_joint_cm), trailing_joint_cm))
         if abre_fim:
             alternativas.append((leading_joint_cm, outro(trailing_joint_cm)))
+        if abre_ini and abre_fim and PIER_SLACK_PREFER_TRAILING:
+            # SECAO 77.4: a ponta inicial e' a face de um no' sem encontro -
+            # a folga vai para o fim do trecho (peca rente a' face)
+            alternativas.reverse()
         if abre_ini and abre_fim:
             alternativas.append((outro(leading_joint_cm), outro(trailing_joint_cm)))
         for alt_lead, alt_trail in alternativas:
@@ -5227,7 +6323,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
     # dp[v] = {estado: (valor, estado_anterior, codigo_usado)}
     inicial = (False, 0, 0, 0, 0)
     dp = [dict() for _ in range(total_u + 1)]
-    dp[0][inicial] = ((0, 0, -MIN_JOINT_STAGGER_TARGET_CM, 0, 0), None, None)
+    dp[0][inicial] = ((0, 0, 0, -MIN_JOINT_STAGGER_TARGET_CM, 0, 0), None, None)
 
     for v in range(total_u):
         nivel = dp[v]
@@ -5235,7 +6331,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
             continue
         for estado, (valor, _prev, _code) in sorted(nivel.items()):
             prev_comp, n_comp, n_half, n_special, n_misplaced = estado
-            excesso, coinc, neg_trava, neg_align, n_pecas = valor
+            excesso, coinc, usados_comp, neg_trava, neg_align, n_pecas = valor
             for passo_u, code, entry in passos:
                 v2 = v + passo_u
                 if v2 > total_u:
@@ -5261,6 +6357,7 @@ def _pier_full_search_layout(baseline, catalog, seg_start_cm, avoid_positions_cm
                 novo_valor = (
                     excesso + (1 if (is_comp and prev_comp) else 0),
                     coinc + (coinc_por_u[v] if v else 0),
+                    usados_comp + ((1 if is_comp else 0) if COMPENSATOR_COUNT_IN_TIEBREAK else 0),
                     max(neg_trava, -trava_por_u[v]) if v else neg_trava,
                     neg_align - _align_ganho(v, code, entry),
                     n_pecas + 1,
@@ -5409,12 +6506,17 @@ def _pier_layout_avoiding_joints(pier_cm, catalog, leading_joint_cm, trailing_jo
         stagger = _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid_positions_cm)
         trava = MIN_JOINT_STAGGER_TARGET_CM if stagger is None else min(
             stagger, MIN_JOINT_STAGGER_TARGET_CM)
-        return (comp_excess, joint_coinc, -trava, -align)
+        # SECAO 71: quantos compensadores/pastilhas o layout usa. Zero quando a
+        # secao esta' desligada, entao a ordem fica identica a' anterior.
+        n_comp = (sum(1 for code, _a, _b in layout
+                      if (catalog.get(code) or {}).get("is_compensator"))
+                  if COMPENSATOR_COUNT_IN_TIEBREAK else 0)
+        return (comp_excess, joint_coinc, n_comp, -trava, -align)
 
     best = baseline
     best_score = _score(baseline)
     max_align = len(target_void_positions_cm) if target_void_positions_cm else 0
-    perfect_score = (0, 0, -MIN_JOINT_STAGGER_TARGET_CM, -max_align)
+    perfect_score = (0, 0, 0, -MIN_JOINT_STAGGER_TARGET_CM, -max_align)
     if best_score == perfect_score:
         return best
 
@@ -5734,6 +6836,119 @@ def _index_node_candidates_by_wall_end(nodes, intersection_candidates, walls_to_
     return index
 
 
+def _index_node_boundary_codes(nodes, intersection_candidates, walls_to_create, end_to_node):
+    """{(wall_idx, end_index, course): codigo da peca de no' que define a borda}
+    - o PAR de `_index_node_candidates_by_wall_end` (que so' guarda a borda em
+    cm), com o codigo da peca que encosta no preenchimento. Usado pela regra
+    "compensador do preenchimento nao encosta em compensador de no'" (secao 56)."""
+    index = {}
+    by_node = _node_candidates_by_index(intersection_candidates)
+    for node_index, node in enumerate(nodes):
+        node_candidates = by_node.get(node_index)
+        if not node_candidates:
+            continue
+        involved = _node_involved_wall_ends(node, node_candidates, walls_to_create, end_to_node, node_index)
+        for wall_idx, end_index in involved.items():
+            p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+            for cand in node_candidates:
+                t_start_cm, t_end_cm = _candidate_extent_on_wall_axis(cand, p0, wall_dir)
+                border_cm = t_end_cm if end_index == 0 else t_start_cm
+                key = (wall_idx, end_index, cand["course"])
+                current = index.get(key)
+                if current is None or (end_index == 0 and border_cm > current[0]) or (
+                        end_index == 1 and border_cm < current[0]):
+                    index[key] = (border_cm, cand.get("logical_code"))
+    return dict((key, value[1]) for key, value in index.items())
+
+
+def _is_compensator_code(code, catalog):
+    return bool(((catalog or {}).get(code) or {}).get("is_compensator"))
+
+
+def _mirrored_layout(layout):
+    """Mesmas pecas, ordem invertida, mesmas juntas e mesmo envelope."""
+    if not layout:
+        return layout
+    joints = []
+    for (_c1, _s1, e1), (_c2, s2, _e2) in zip(layout, layout[1:]):
+        joints.append(s2 - e1)
+    out = []
+    cursor = layout[0][1]
+    for index, (code, start_cm, end_cm) in enumerate(reversed(layout)):
+        length = end_cm - start_cm
+        out.append((code, cursor, cursor + length))
+        cursor += length + (joints[len(joints) - 1 - index] if index < len(joints) else 0.0)
+    return out
+
+
+def _layout_compensator_touching_node(layout, catalog, left_code, right_code):
+    if not layout:
+        return 0
+    touching = 0
+    if _is_compensator_code(left_code, catalog) and _is_compensator_code(layout[0][0], catalog):
+        touching += 1
+    if _is_compensator_code(right_code, catalog) and _is_compensator_code(layout[-1][0], catalog):
+        touching += 1
+    return touching
+
+
+def _layout_avoiding_compensator_against_node(layout, pier_cm, catalog, leading_joint_cm, trailing_joint_cm,
+                                              seg_start_cm, left_code, right_code, opening_intervals_cm,
+                                              avoid_positions_cm, course_label=None,
+                                              allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                              leading_is_open=False, trailing_is_open=False):
+    """REGRA (secao 56, 2026-09-15): o compensador do preenchimento NAO encosta
+    no compensador de uma peca de no'. Medido no BUTANTA: 11 dos 20 pares
+    C09+C09 sao exatamente isso (a pastilha do T degradado com o compensador da
+    ponta do trecho); o projeto humano nao tem NENHUM par de compensadores
+    iguais encostados em 34 paredes e 6.018 pecas.
+
+    Tenta, nesta ordem: a composicao ESPELHADA (mesmas pecas, mesma aritmetica),
+    os bypass de tier e os `first_code` do mesmo trecho. So' troca quando o
+    encosto some, sem aumentar compensador, excesso da regra #2 nem
+    coincidencia de junta com a fiada oposta."""
+    if layout is None or not (COMPENSATOR_NOT_TOUCHING_NODE_ENABLED or _COMPENSATOR_NODE_TRIAL[0]):
+        return layout
+    if course_label == "A" and not COMPENSATOR_NOT_TOUCHING_NODE_COURSE_A:
+        return layout
+    if not _layout_compensator_touching_node(layout, catalog, left_code, right_code):
+        return layout
+
+    def _score(candidate):
+        coincide = _count_joint_coincidences_cm(
+            _layout_internal_joint_positions_cm(candidate, seg_start_cm),
+            avoid_positions_cm) if avoid_positions_cm else 0
+        stagger = _layout_min_joint_stagger_cm(candidate, seg_start_cm, avoid_positions_cm)
+        trava = MIN_JOINT_STAGGER_TARGET_CM if stagger is None else min(stagger, MIN_JOINT_STAGGER_TARGET_CM)
+        # travamento ARREDONDADO (1e-6 cm): entre composicoes espelhadas ele e'
+        # matematicamente igual, e sem arredondar o ruido numerico (ex.: planta
+        # transladada) decidia o empate - medido na parede 8284580 do BUTANTA,
+        # C04 no inicio ou no fim do trecho conforme a translacao.
+        return (_layout_compensator_touching_node(candidate, catalog, left_code, right_code),
+                sum(1 for code, _a, _b in candidate if _is_compensator_code(code, catalog)),
+                _layout_compensator_run_excess(candidate, catalog), coincide, -round(trava, 6))
+
+    best, best_score = layout, _score(layout)
+    alternatives = [_mirrored_layout(layout)]
+    alternatives.extend(_pier_forced_bypass_layouts(
+        pier_cm, catalog, leading_joint_cm, trailing_joint_cm, allow_compensators=allow_compensators,
+        leading_is_open=leading_is_open, trailing_is_open=trailing_is_open))
+    for code in _pier_codes_by_len_desc(catalog, allow_compensators, pool=OPENING_JAMB_BLOCK_CODES):
+        if code == HALF_BLOCK_CODE and not (leading_is_open or trailing_is_open):
+            continue
+        alternatives.append(_pier_ordered_layout(
+            pier_cm, catalog, leading_joint_cm, trailing_joint_cm, first_code=code,
+            allow_compensators=allow_compensators, leading_open_override=leading_is_open,
+            trailing_open_override=trailing_is_open))
+    for alternative in alternatives:
+        if not alternative:
+            continue
+        score = _score(alternative)
+        if score < best_score:
+            best, best_score = alternative, score
+    return best
+
+
 def _candidate_t_range_on_wall(candidate, wall_p0, wall_dir):
     """(t_start_cm, t_end_cm) que `candidate` ocupa ao longo do eixo de
     UMA parede (p0 + t*dir) - projeta o CENTRO no eixo e usa metade do
@@ -5805,6 +7020,12 @@ def _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, en
     node = nodes[node_index] if node_index is not None else None
     if node is None or node["kind"] in ("FREE_END", "STRAIGHT_CONTINUATION"):
         return 0.0, BLOCK_OPENING_JOINT_CM
+    # SECAO 77: nesta banda o no' nao e' encontro e esta parede e' a que
+    # sobra -> a ponta dela e' PONTA LIVRE (vai ate' a propria ponta, que o
+    # grafo ja' levou ate' a face externa da vizinha)
+    papel = _band_role_without_bond(node_index)
+    if papel is not None and papel.get("free_end_wall") == wall_idx:
+        return 0.0, BLOCK_OPENING_JOINT_CM
     # A reserva e' medida a partir do PONTO DO NO' (o encontro fisico), que
     # nao coincide com a ponta da parede: extend_wall_ends_to_junctions puxa
     # a ponta para ALEM do encontro, ate' a face oposta da vizinha (ver
@@ -5865,7 +7086,11 @@ def _index_node_candidates_midspan(nodes, intersection_candidates, walls_to_crea
     for node_index, node in enumerate(nodes):
         node_candidates = by_node.get(node_index) or []
         midspan_walls = _midspan_node_wall_ids(node)
+        papel = _band_role_without_bond(node_index)
         for wall_idx in midspan_walls:
+            if papel is not None and (papel.get("free_end_wall") == wall_idx
+                                      or wall_idx in (papel.get("continuous_walls") or ())):
+                continue   # SECAO 77: sem encontro nesta banda, a parede nao reserva o no'
             p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
             node_t_cm = (node["point"] - p0).DotProduct(wall_dir) / FEET_PER_METER * 100.0
             for course in ("A", "B"):
@@ -5922,6 +7147,54 @@ def _merge_intervals_cm(intervals, tolerance_cm=1e-6):
 # amarracao"), mas distinguivel no relatorio: uma parede com muitas pecas
 # assim e' uma parede em que a arquitetura brigou muito com a modulacao.
 OPENING_REPAIR_PLACEMENT_REASON = "OPENING_REPAIR_FILL"
+
+# SECAO 68 (2026-09-16) - A COMPOSICAO JAMBA->ANCORA E' UMA UNIDADE.
+# A regiao de reparo de uma abertura so' era EXPANDIDA quando o trecho NAO
+# fechava (ver OPENING_REPAIR_MAX_EXTRA_BLOCKS). Quando ela fechava MAL - com
+# meio bloco + pastilha, por exemplo - a primeira composicao que fechasse era
+# aceita na hora, e as pecas vizinhas herdadas da modulacao CONTINUA (inclusive
+# um compensador colocado antes da abertura existir) ficavam congeladas: a
+# faixa jamba->ancora nunca era composta como UMA unidade.
+# Medido na parede 8284534 do BUTANTA (evidencia humana de 2026-09-16): a faixa
+# de 75cm entre a jamba da porta e o no' do encontro sai `B19+C04+B39+C09`,
+# enquanto `_pier_ordered_layout(75)` para a MESMA faixa da' `B39+B34` - que e'
+# exatamente o que o projeto humano faz ali. A janela de reparo tinha 25cm (do
+# vao ate' a primeira peca sobrevivente) e 25cm so' fecha com `B19+C04`.
+# Com a flag ligada o laco continua expandindo DENTRO DO MESMO ORCAMENTO que ja'
+# existia e fica com a MELHOR composicao, nao com a primeira que fecha. NENHUMA
+# regra de peca nova: todo candidato continua saindo de `_pier_ordered_layout`/
+# `_pier_layout_avoiding_joints`, com os tiers, a regra #1 (desencontro de junta)
+# e o alinhamento de vazio intactos.
+# Ligada SO' no fluxo CHANNEL (wall_modeling.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED);
+# o legado (`strategy=None`) continua byte a byte igual a' main.
+OPENING_REPAIR_PREFER_CLEAN_ACTIVE = False
+
+
+def _repair_solution_quality(solution, catalog):
+    """Qualidade de uma solucao de reparo (MENOR e' melhor):
+
+        (compensadores/pastilhas,
+         meio blocos,
+         pecas de amarracao usadas como enchimento,
+         numero de pecas)
+
+    A ORDEM e' a prioridade fisica: primeiro sumir com o compensador/pastilha/
+    meio bloco, e so' entao preferir bloco inteiro a B34/B54. Assim um B34 a
+    mais NUNCA perde para um compensador - a inversao que a evidencia humana
+    de 2026-09-16 mostrou (o humano fecha com B34 a mesma faixa em que o solver
+    punha C09+B19)."""
+    comp = half = special = pieces = 0
+    for _sub, layout in solution or []:
+        for code, _start, _end in layout or []:
+            entry = catalog.get(code) or {}
+            if entry.get("is_compensator"):
+                comp += 1
+            elif code == HALF_BLOCK_CODE:
+                half += 1
+            elif entry.get("is_special_bond"):
+                special += 1
+            pieces += 1
+    return (comp, half, special, pieces)
 
 
 def _is_acerto_code(code, catalog):
@@ -6083,6 +7356,73 @@ def _candidate_extents_on_wall(candidates, wall_p0, wall_dir):
         t_a, t_b = _candidate_t_range_on_wall(candidate, wall_p0, wall_dir)
         extents.append((min(t_a, t_b), max(t_a, t_b)))
     return extents
+
+
+COMPENSATOR_PAIR_FUSION_ENABLED = True
+
+
+def fuse_adjacent_equal_compensators(candidates, start_index, wall_p0, wall_dir, catalog):
+    """REGRA #2, complemento (2026-09-15, missao BUTANTA): dois compensadores
+    IGUAIS encostados (uma junta entre eles) cujo vao total e' exatamente o
+    comprimento de OUTRO compensador do catalogo viram essa peca so'
+    (catalogo atual: C04 + 1 + C04 = 9 = C09). Nasce na fronteira entre o
+    reparo de vao e o preenchimento comum, que se resolvem separados
+    (BUTANTA: C04 de reparo + C04 de preenchimento contra o B54 do no'). O
+    humano nunca usa C04+C04 (0 em 202 corridas de pecas pequenas, 34
+    paredes). Fundir so' REMOVE uma junta: nao cria coincidencia de junta,
+    nao muda contorno nem cobertura. Peca de no' nunca entra. Complementa
+    `_merge_adjacent_compensator_pairs`, que so' funde dentro de um trecho e
+    so' em peca nao compensadora. Muta `candidates[start_index:]` no lugar e
+    devolve o numero de fusoes."""
+    if not COMPENSATOR_PAIR_FUSION_ENABLED:
+        return 0
+    comp_by_length = []
+    for code, entry in catalog.items():
+        if entry.get("is_compensator") and not entry.get("is_channel"):
+            comp_by_length.append((float(entry["length_cm"]), code))
+    comp_by_length.sort()
+    fused = 0
+    changed = True
+    while changed:
+        changed = False
+        tail = candidates[start_index:]
+        items = []
+        for cand in tail:
+            entry = catalog.get(cand.get("logical_code")) or {}
+            if not entry.get("is_compensator") or cand.get("node_index") is not None:
+                continue
+            t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+            items.append((min(t_lo, t_hi), max(t_lo, t_hi), cand))
+        items.sort(key=lambda item: (item[0], item[1]))
+        for (a_lo, a_hi, a), (b_lo, b_hi, b) in zip(items, items[1:]):
+            if a.get("logical_code") != b.get("logical_code") or a.get("course") != b.get("course"):
+                continue
+            if a.get("course_variant") != b.get("course_variant"):
+                continue
+            if abs((b_lo - a_hi) - BLOCK_JOINT_CM) > PIER_LAYOUT_TOLERANCE_CM:
+                continue
+            span = b_hi - a_lo
+            target = None
+            for length, code in comp_by_length:
+                if code != a.get("logical_code") and abs(length - span) <= PIER_LAYOUT_TOLERANCE_CM:
+                    target = code
+                    break
+            if target is None:
+                continue
+            placed = _place_pier_layout(
+                [(target, 0.0, span)], catalog, wall_p0 + wall_dir * _cm_to_ft(a_lo), wall_dir,
+                a.get("course"), a.get("wall_idx"), placement_reason=a.get("placement_reason") or "STANDARD_FILL",
+            )[0]
+            placed["course_variant"] = a.get("course_variant")
+            placed["fused_from"] = [a.get("logical_code"), b.get("logical_code")]
+            pos_a = start_index + next(i for i, c in enumerate(tail) if c is a)
+            pos_b = start_index + next(i for i, c in enumerate(tail) if c is b)
+            candidates[pos_a] = placed
+            del candidates[pos_b]
+            fused += 1
+            changed = True
+            break
+    return fused
 
 
 def _region_bounds_for_run(first, last, extents, seg_lo_cm, seg_hi_cm,
@@ -6317,6 +7657,9 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
             # no lugar seria abrir um buraco na parede para "resolver" um
             # problema que continua sem solucao.
             expansion_absorbed = set()
+            best_solution = None
+            best_quality = None
+            best_state = None
             while True:
                 # Um run pode ter crescido ate' encostar no proximo: nesse
                 # caso os dois viram UMA regiao so' (e' o caso do PILARETE
@@ -6335,8 +7678,38 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     avoid_joint_positions_cm, target_void_positions_cm, prefer_avoiding,
                 )
                 if not failures:
-                    solved = candidate_solution
-                    break
+                    if not OPENING_REPAIR_PREFER_CLEAN_ACTIVE:
+                        solved = candidate_solution
+                        break
+                    # SECAO 68: a primeira composicao que fecha nao e'
+                    # necessariamente a melhor. Guarda esta e continua
+                    # expandindo dentro do orcamento que ja' existia.
+                    quality = _repair_solution_quality(candidate_solution, catalog)
+                    if best_solution is None or quality < best_quality:
+                        best_solution = candidate_solution
+                        best_quality = quality
+                        best_state = (first, last, merged_upto, set(expansion_absorbed))
+                    if quality[0] == 0 and quality[1] == 0:
+                        break          # sem peca de acerto: nao ha' o que melhorar
+                    grew = False
+                    # NUNCA engolir peca que um reparo ANTERIOR desta mesma
+                    # fiada ja' substituiu: a esquerda desta regiao pode ser o
+                    # territorio de outra (medido - duas pecas
+                    # OPENING_REPAIR_FILL sobrepostas na parede 8284502).
+                    if (first > 0 and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS
+                            and (first - 1) not in absorbed):
+                        first -= 1
+                        grow_left += 1
+                        expansion_absorbed.add(first)
+                        grew = True
+                    if last < len(extents) - 1 and grow_right < OPENING_REPAIR_MAX_EXTRA_BLOCKS:
+                        last += 1
+                        grow_right += 1
+                        expansion_absorbed.add(last)
+                        grew = True
+                    if not grew:
+                        break
+                    continue
                 # Item 22: expandir SO' pelo lado que falhou, uma peca por
                 # vez. Uma sobra entre DOIS vaos (os dois lados abertos) nao
                 # tem lado para expandir - o tamanho dela e' consequencia
@@ -6346,7 +7719,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                 want_right = any(f.get("right_opening") is None for f in failures)
                 moved = False
                 if (want_left and first > 0
-                        and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS):
+                        and grow_left < OPENING_REPAIR_MAX_EXTRA_BLOCKS
+                        and (first - 1) not in absorbed):
                     first -= 1
                     grow_left += 1
                     expansion_absorbed.add(first)
@@ -6359,6 +7733,16 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     moved = True
                 if not moved:
                     break
+
+            if solved is None and best_solution is not None:
+                # SECAO 68: volta para a janela da MELHOR composicao (as pecas
+                # engolidas por expansoes piores nunca chegam a ser absorvidas).
+                solved = best_solution
+                first, last, merged_upto, expansion_absorbed = best_state
+                region = _region_bounds_for_run(
+                    first, last, extents, record["seg_start_cm"], record["seg_end_cm"],
+                    opening_intervals_cm,
+                )
 
             expansion_absorbed -= removed_set
             if solved is not None:
@@ -6434,15 +7818,291 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
 # fecha paredes antes vazias do TGD mas a regua de benchmark acusa regressao
 # critica de COVERAGE_ROW_MOSTLY_EMPTY (V1 171 -> 232, V2 86 -> 92). O vao
 # 7719511 fica como limitacao conhecida da estrategia CHANNEL.
+# Regra #2 (compensador em sequencia) tambem no preenchimento comum da Fiada A
+# - ver o uso em solve_wall_free_fill (2026-09-15, secao 56).
+RULE2_ON_EVERY_COURSE_A_SEGMENT = True
+COMPENSATOR_NOT_TOUCHING_NODE_ENABLED = False
+# So' na Fiada B: na Fiada A trocar a composicao move juntas que a Fiada B ainda
+# vai tentar desencontrar - medido no TGD V2 com a regra nas duas familias,
+# PRISM_CONTINUOUS_JOINT 53 -> 87 e PRISM_STAGGER_BELOW_TARGET 739 -> 825.
+COMPENSATOR_NOT_TOUCHING_NODE_COURSE_A = False
+_COMPENSATOR_NODE_TRIAL = [False]
+COMPENSATOR_NODE_TRIAL_ENABLED = True
 RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = False
 RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM = 2.0
+# Tentativa por parede (2026-09-15, missao BUTANTA): com a regra ligada, a
+# parede e' resolvida com e sem a absorcao e so' fica com a absorcao quando ela
+# FECHA trecho fora do modulo sem criar coincidencia de junta nova (regra #1).
+# Medido no TGD V1: sem a tentativa, a absorcao num trecho que contem um vao
+# (W131) trocava 1 cm fora do modulo por 120 cm apos o recorte da porta, e numa
+# parede curta com a peca de no' igual nas duas fiadas (W151) enchia as duas
+# familias contra a MESMA face do no' (16 juntas continuas).
+_RESIDUAL_ABSORPTION_SUPPRESSED = [False]
+
+
+def _jamb_noise_tolerance_enabled():
+    from core.engine import continuous_modulation as _cm
+    return _cm.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED
+
+
+def _residual_absorption_active():
+    return RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not _RESIDUAL_ABSORPTION_SUPPRESSED[0]
+
+
+def _non_modular_length_cm(fill_result):
+    return sum(max(0.0, float(item.get("current_length_cm") or 0.0))
+               for item in (fill_result.get("non_modular") or []))
+
+
+def _placed_length_cm(fill_result):
+    return sum(float(c.get("length_cm") or 0.0) for c in (fill_result.get("candidates") or []))
+
+
+def _fill_is_physically_better(trial, base):
+    """Criterio unico das tentativas de tolerancia fisica: nunca cria
+    coincidencia de junta nova (regra #1) e (a) assenta ESTRITAMENTE mais
+    parede, ou (b) assenta o mesmo e fecha trecho fora do modulo. O
+    comprimento fora do modulo sozinho nao decide: a lista de trechos muda de
+    granularidade quando um trecho fecha e os pilaretes de jamba aparecem
+    (anel com janela: 48 cm num trecho so' sem a tolerancia, 80 cm em quatro
+    pilaretes com ela, e 31 cm de parede a mais assentada)."""
+    nm_t, nm_b = _non_modular_length_cm(trial), _non_modular_length_cm(base)
+    ac_t = len(trial.get("alignment_conflicts") or [])
+    ac_b = len(base.get("alignment_conflicts") or [])
+    placed_t, placed_b = _placed_length_cm(trial), _placed_length_cm(base)
+    better = ac_t <= ac_b and (placed_t > placed_b + 0.5 or (abs(placed_t - placed_b) <= 0.5 and nm_t < nm_b - 0.5))
+    return better, {
+        "non_modular_cm_with": round(nm_t, 2), "non_modular_cm_without": round(nm_b, 2),
+        "alignment_conflicts_with": ac_t, "alignment_conflicts_without": ac_b,
+        "placed_cm_with": round(_placed_length_cm(trial), 2),
+        "placed_cm_without": round(_placed_length_cm(base), 2)}
+
+
+def _absorption_leaves_opposite_family_open(fill_result, min_fraction=0.5):
+    """True quando a absorcao fechou um trecho numa familia (A/B) e a familia
+    OPOSTA continua fora do modulo em pelo menos metade desse MESMO trecho: a
+    parede sairia com fiadas alternadas vazias (medido no TGD: fiadas impares
+    fechadas e pares vazias em 4 paredes da V2 e 6 da V1). Pilarete de jamba
+    fora do modulo na familia oposta (anel com janela: 19,5 cm de um trecho de
+    124) nao conta, nem trecho que o recorte de vao marcou com `conflict`
+    (ABERTURA_NAO_COMPATIVEL/SEM_ESPACO): esses sao problemas do vao, que os
+    reparos seguintes ainda tratam."""
+    for absorbed in fill_result.get("residual_absorptions") or ():
+        a_lo, a_hi = absorbed.get("seg_start_cm"), absorbed.get("seg_end_cm")
+        if a_lo is None or a_hi is None or a_hi - a_lo <= 1e-6:
+            continue
+        open_cm = 0.0
+        for item in fill_result.get("non_modular") or ():
+            if item.get("course") == absorbed.get("course") or item.get("conflict") is not None:
+                continue
+            n_lo, n_hi = item.get("seg_start_cm"), item.get("seg_end_cm")
+            if n_lo is None or n_hi is None:
+                continue
+            open_cm += max(0.0, min(a_hi, max(n_lo, n_hi)) - max(a_lo, min(n_lo, n_hi)))
+        if open_cm >= min_fraction * (a_hi - a_lo):
+            return True
+    return False
+
+
+def _fill_adjacent_compensator_pairs(fill_result, catalog, wall_p0, wall_dir, joint_tolerance_cm=1.6):
+    """Pares de compensadores encostados dentro do preenchimento desta parede,
+    por familia de fiada (o encosto com a peca de NO' aparece porque a peca de
+    no' nao esta' nesta lista - por isso a contagem usa tambem as bordas)."""
+    rows = {}
+    for cand in fill_result.get("candidates") or ():
+        if not ((catalog or {}).get(cand.get("logical_code")) or {}).get("is_compensator"):
+            continue
+        t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+        rows.setdefault((cand.get("course"), cand.get("course_variant")), []).append(
+            (min(t_lo, t_hi), max(t_lo, t_hi)))
+    pairs = 0
+    for items in rows.values():
+        items.sort()
+        for (a_lo, a_hi), (b_lo, _b_hi) in zip(items, items[1:]):
+            if 0.0 <= b_lo - a_hi <= joint_tolerance_cm:
+                pairs += 1
+    return pairs
+
+
+def _fill_compensators_touching_node_pieces(fill_result, catalog, wall_p0, wall_dir, node_pieces,
+                                            joint_tolerance_cm=1.6):
+    """Compensador do preenchimento encostado num compensador de peca de no'."""
+    if not node_pieces:
+        return 0
+    touching = 0
+    for cand in fill_result.get("candidates") or ():
+        if not ((catalog or {}).get(cand.get("logical_code")) or {}).get("is_compensator"):
+            continue
+        t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+        lo, hi = min(t_lo, t_hi), max(t_lo, t_hi)
+        for node_lo, node_hi, node_code in node_pieces:
+            if not ((catalog or {}).get(node_code) or {}).get("is_compensator"):
+                continue
+            if (0.0 <= lo - node_hi <= joint_tolerance_cm) or (0.0 <= node_lo - hi <= joint_tolerance_cm):
+                touching += 1
+                break
+    return touching
+
+
+def _fill_cross_family_joint_coincidences(fill_result, wall_p0, wall_dir, wall_length_cm, opening_edges_cm,
+                                          tol_cm=0.6):
+    """Faces de peca presentes nas DUAS familias (A e B) no mesmo ponto do eixo
+    - junta que se repete entre fiadas vizinhas. Face na borda de vao ou na
+    ponta da parede nao conta (a regra #1 as isenta)."""
+    ends = {"A": [], "B": []}
+    for cand in fill_result.get("candidates") or ():
+        family = cand.get("course")
+        if family not in ends:
+            continue
+        t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+        for t in (min(t_lo, t_hi), max(t_lo, t_hi)):
+            if t <= 1.0 or t >= wall_length_cm - 1.0:
+                continue
+            if any(abs(t - edge) <= 1.0 for edge in opening_edges_cm or ()):
+                continue
+            ends[family].append(t)
+    ends["B"].sort()
+    count = 0
+    for t in ends["A"]:
+        index = bisect.bisect_left(ends["B"], t - tol_cm)
+        if index < len(ends["B"]) and ends["B"][index] <= t + tol_cm:
+            count += 1
+    return count
+
+
+def _fill_joints_below_stagger_target(fill_result, wall_p0, wall_dir,
+                                      target_cm=MIN_JOINT_STAGGER_TARGET_CM, tol_cm=0.6):
+    """Quantas juntas internas de uma familia ficam a MENOS de `target_cm` da
+    junta mais proxima da familia oposta (regra 18.6 - travamento). Menor e'
+    melhor; a coincidencia exata ja' e' contada separadamente."""
+    ends = {"A": [], "B": []}
+    for cand in fill_result.get("candidates") or ():
+        family = cand.get("course")
+        if family not in ends:
+            continue
+        t_lo, t_hi = _candidate_t_range_on_wall(cand, wall_p0, wall_dir)
+        ends[family].append((min(t_lo, t_hi), max(t_lo, t_hi)))
+    joints = {}
+    for family, items in ends.items():
+        items.sort()
+        joints[family] = [(a_hi + b_lo) / 2.0 for (_a_lo, a_hi), (b_lo, _b_hi) in zip(items, items[1:])
+                          if 0.0 <= b_lo - a_hi <= 2.5]
+    count = 0
+    for family, other in (("A", "B"), ("B", "A")):
+        others = sorted(joints.get(other) or [])
+        if not others:
+            continue
+        for joint in joints.get(family) or []:
+            index = bisect.bisect_left(others, joint)
+            nearest = None
+            for candidate_index in (index - 1, index):
+                if 0 <= candidate_index < len(others):
+                    distance = abs(others[candidate_index] - joint)
+                    nearest = distance if nearest is None else min(nearest, distance)
+            if nearest is not None and tol_cm < nearest < target_cm:
+                count += 1
+    return count
+
+
+def compensator_node_adjacency_trial(solve_fn, catalog, wall_p0, wall_dir, wall_length_cm,
+                                     opening_edges_cm, node_pieces):
+    """SECAO 56: a regra "compensador do preenchimento nao encosta em
+    compensador de no'" e' uma TENTATIVA por parede. Resolve sem e com a regra
+    e so' fica com ela quando o encosto diminui ESTRITAMENTE e nada piora:
+    juntas repetidas entre as fiadas A e B, compensadores, trecho fora do
+    modulo e comprimento assentado.
+
+    Sem a tentativa a regra reprovou o corpus (TGD V2: PRISM_CONTINUOUS_JOINT
+    53 -> 87): trocar a composicao muda juntas que o recorte de vao e a fiada
+    oposta so' resolvem depois."""
+    base = solve_fn()
+    if not COMPENSATOR_NODE_TRIAL_ENABLED:
+        return base
+    touching = _fill_compensators_touching_node_pieces(base, catalog, wall_p0, wall_dir, node_pieces)
+    if not touching:
+        return base
+    _COMPENSATOR_NODE_TRIAL[0] = True
+    try:
+        trial = solve_fn()
+    finally:
+        _COMPENSATOR_NODE_TRIAL[0] = False
+    touching_trial = _fill_compensators_touching_node_pieces(trial, catalog, wall_p0, wall_dir, node_pieces)
+    if touching_trial >= touching:
+        return base
+    coincidences_base = _fill_cross_family_joint_coincidences(
+        base, wall_p0, wall_dir, wall_length_cm, opening_edges_cm)
+    coincidences_trial = _fill_cross_family_joint_coincidences(
+        trial, wall_p0, wall_dir, wall_length_cm, opening_edges_cm)
+    # O travamento de 10 cm (regra 18.6) NAO entra como guarda: medido no
+    # humano, 7% das juntas ficam abaixo de 10 cm (244 delas coincidentes),
+    # enquanto C09 encostado em C09 nao aparece nenhuma vez em 6.018 pecas (os
+    # 6 pares de codigo identico do humano sao todos do compensador DEITADO,
+    # C09D, que o solver nao emite). A coincidencia de junta continua guarda.
+    accepted = (coincidences_trial <= coincidences_base
+                and _fill_adjacent_compensator_pairs(trial, catalog, wall_p0, wall_dir)
+                <= _fill_adjacent_compensator_pairs(base, catalog, wall_p0, wall_dir)
+                and _non_modular_length_cm(trial) <= _non_modular_length_cm(base) + 0.5
+                and _placed_length_cm(trial) >= _placed_length_cm(base) - 0.5
+                and len(trial.get("alignment_conflicts") or []) <= len(base.get("alignment_conflicts") or []))
+    chosen = trial if accepted else base
+    chosen["compensator_node_trial"] = {"accepted": accepted, "touching_without": touching,
+                                        "touching_with": touching_trial,
+                                        "cross_family_joints_without": coincidences_base,
+                                        "cross_family_joints_with": coincidences_trial}
+    return chosen
+
+
+def physical_tolerance_trial(solve_fn):
+    """Regra 30.8 e tolerancia de ruido de jamba (51.13) com TENTATIVA por
+    parede. `solve_fn()` resolve a parede com o estado atual das chaves.
+    Para cada tolerancia LIGADA que de fato decidiu algo nesta parede
+    (absorcao registrada / contador de uso), resolve de novo sem ela e fica
+    com a versao com a tolerancia so' se `_fill_is_physically_better`. Ordem
+    fixa (30.8 e depois jamba), deterministica. Decisoes em
+    `result["physical_tolerance_trial"]`."""
+    from core.engine import continuous_modulation as _cm
+    decisions = []
+    suppressed = []
+    uses_before = _cm.JAMB_SEGMENT_NOISE_USES[0]
+    result = solve_fn()
+    jamb_used = _cm.JAMB_SEGMENT_NOISE_USES[0] > uses_before
+    try:
+        if RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and result.get("residual_absorptions"):
+            _RESIDUAL_ABSORPTION_SUPPRESSED[0] = True
+            uses_mark = _cm.JAMB_SEGMENT_NOISE_USES[0]
+            without = solve_fn()
+            better, info = _fill_is_physically_better(result, without)
+            info["opposite_family_left_open"] = _absorption_leaves_opposite_family_open(result)
+            better = better and not info["opposite_family_left_open"]
+            info.update({"tolerance": "RESIDUAL_NODE_BOUNDED_ABSORPTION", "accepted": better})
+            decisions.append(info)
+            if better:
+                _RESIDUAL_ABSORPTION_SUPPRESSED[0] = False
+            else:
+                result = without
+                suppressed.append("residual")
+                jamb_used = _cm.JAMB_SEGMENT_NOISE_USES[0] > uses_mark
+        if _cm.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED and jamb_used:
+            _cm.JAMB_SEGMENT_NOISE_SUPPRESSED[0] = True
+            without = solve_fn()
+            better, info = _fill_is_physically_better(result, without)
+            info.update({"tolerance": "JAMB_SEGMENT_NOISE", "accepted": better})
+            decisions.append(info)
+            if not better:
+                result = without
+    finally:
+        _RESIDUAL_ABSORPTION_SUPPRESSED[0] = False
+        _cm.JAMB_SEGMENT_NOISE_SUPPRESSED[0] = False
+    if decisions:
+        result["physical_tolerance_trial"] = decisions
+    return result
 
 
 def _residual_node_bounded_absorption(pier_cm, lead_cm, trail_cm, leading_is_open, trailing_is_open,
                                       kind_left, kind_right, seg_start_cm, seg_end_cm):
     """Regra 30.8 (ver solve_wall_free_fill): (seg_start, seg_end, pier, folga)
     quando o trecho entre dois nos absorve a folga; None caso contrario."""
-    if not (RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED and not leading_is_open and not trailing_is_open
+    if not (_residual_absorption_active() and not leading_is_open and not trailing_is_open
             and pier_cm > 0 and kind_left in ("WALL_START", "MIDSPAN_HI")
             and kind_right in ("WALL_END", "MIDSPAN_LO")
             and _pier_remaining_snapped_cm(pier_cm, lead_cm, trail_cm) is None):
@@ -6466,7 +8126,34 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                          variants_per_course=1, opening_strategy=None,
-                         cross_band_joint_seed=None):
+                         cross_band_joint_seed=None, node_boundary_codes=None):
+    """Envelope de `_solve_wall_free_fill_impl` (secao 77.4): a folga de
+    modulacao rente a' face e' um contexto da PAREDE em solve - definido aqui
+    (a ponta inicial e' a ponta livre de um no' sem encontro nesta banda e a
+    final nao) e SEMPRE restaurado na saida, com ou sem excecao. Vale para
+    todos os trechos/subtrechos desta parede (inclusive o reparo continuo,
+    que refaz o subtrecho da face)."""
+    global PIER_SLACK_PREFER_TRAILING
+    saved = PIER_SLACK_PREFER_TRAILING
+    PIER_SLACK_PREFER_TRAILING = bool(
+        _band_role_free_end(wall_idx, 0, end_to_node)
+        and not _band_role_free_end(wall_idx, 1, end_to_node))
+    try:
+        return _solve_wall_free_fill_impl(
+            wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
+            node_candidates_by_wall_end, node_midspan_by_wall_course, catalog,
+            allow_compensators=allow_compensators, variants_per_course=variants_per_course,
+            opening_strategy=opening_strategy, cross_band_joint_seed=cross_band_joint_seed,
+            node_boundary_codes=node_boundary_codes)
+    finally:
+        PIER_SLACK_PREFER_TRAILING = saved
+
+
+def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
+                               node_candidates_by_wall_end, node_midspan_by_wall_course,
+                               catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                               variants_per_course=1, opening_strategy=None,
+                               cross_band_joint_seed=None, node_boundary_codes=None):
     """Preenchimento comum (secao 13: 'no -> abertura, abertura ->
     abertura, abertura -> no') de UMA parede, nas duas FAMILIAS de fiada
     (par/impar - "A"/"B"). Para cada abertura, materializa tambem o bloco
@@ -6923,12 +8610,23 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                                                 alternativa, seg_start_cm, opening_intervals_cm),
                                             opposite_node_joints_cm) < colide:
                                         layout = alternativa
-                            if absorbed_segment:
+                            # REGRA #2 EM TODO TRECHO DA FIADA A (2026-09-15,
+                            # secao 56): o guloso da Fiada A nunca olhou
+                            # compensador em sequencia (a Fiada B sim). Antes
+                            # valia so' para o trecho absorvido pela 30.8.
+                            if RULE2_ON_EVERY_COURSE_A_SEGMENT or absorbed_segment:
                                 layout = _absorbed_segment_rule2_layout(
                                     layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
                                     opening_intervals_cm, opposite_node_joints_cm,
                                     allow_compensators=allow_compensators,
                                     leading_is_open=leading_is_open, trailing_is_open=trailing_is_open)
+                            layout = _layout_avoiding_compensator_against_node(
+                                layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                                (node_boundary_codes or {}).get((wall_idx, 0, course)) if kind_left == "WALL_START" else None,
+                                (node_boundary_codes or {}).get((wall_idx, 1, course)) if kind_right == "WALL_END" else None,
+                                opening_intervals_cm, opposite_node_joints_cm, course,
+                                allow_compensators=allow_compensators,
+                                leading_is_open=leading_is_open, trailing_is_open=trailing_is_open)
                         else:
                             # Variantes 1+ da PROPRIA familia A (secao 11.7):
                             # desencontram as juntas das variantes A anteriores
@@ -7014,6 +8712,18 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                             course_a_joint_positions_cm + own_family_joint_positions_cm
                             + course_a_boundary_joint_positions_cm
                             + own_family_boundary_joint_positions_cm,
+                            allow_compensators=allow_compensators,
+                            leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
+                        )
+                        layout = _layout_avoiding_compensator_against_node(
+                            layout, pier_cm, catalog, lead_cm, trail_cm, seg_start_cm,
+                            (node_boundary_codes or {}).get((wall_idx, 0, course)) if kind_left == "WALL_START" else None,
+                            (node_boundary_codes or {}).get((wall_idx, 1, course)) if kind_right == "WALL_END" else None,
+                            opening_intervals_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm
+                            + list(cross_band_joints_cm or []), course,
                             allow_compensators=allow_compensators,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
@@ -7143,6 +8853,7 @@ def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings
                     prefer_avoiding=(course == "B" or variant_index > 0),
                 )
                 candidates[variant_candidates_start:] = recut["candidates"]
+                fuse_adjacent_equal_compensators(candidates, variant_candidates_start, p0, wall_dir, catalog)
                 non_modular.extend(recut["non_modular"])
                 opening_cut_removals.extend(recut["removed"])
                 opening_repair_regions_used.extend(recut["regions"])
@@ -8378,7 +10089,7 @@ def _b19_is_tie_piece(candidate):
     posicionada como amarracao - nunca um B34/B54 que caiu ali por
     coincidencia do preenchimento comum)."""
     reason = str(candidate.get("placement_reason") or "")
-    return (candidate.get("logical_code") in ("B34", "B54")
+    return (candidate.get("logical_code") in JUNCTION_BOND_CODES
             and any(reason.startswith(p) for p in _B19_TIE_PLACEMENT_PREFIXES))
 
 
@@ -8494,6 +10205,7 @@ def _b19_residual_edge_candidates(nodes, walls_to_create, end_to_node, catalog, 
 # como sempre).
 _B19_REPAIR_DEGRADED_REASONS = frozenset((
     "L_CORNER_DEGRADED", "T_INTERSECTION_DEGRADED_L", "T_INTERSECTION_INCOMING_DEGRADED",
+    JUNCTION_UNRESOLVED_FILL_REASON,   # REGRA 76.1: a ponta degradou para um compensador
 ))
 
 
@@ -8816,10 +10528,42 @@ def _plain_clone(value):
     return out
 
 
+def _wall_trial_geometry(walls_arg, openings_arg, wall_idx):
+    """(p0, direcao, comprimento_cm, bordas de vao em cm) da parede."""
+    p0, _p1, wall_dir, length_ft, _thickness = _wall_axis_and_length(walls_arg, wall_idx)
+    edges = []
+    for opening in (openings_arg[wall_idx] if wall_idx < len(openings_arg or []) else None) or ():
+        edges.append(opening[0] / FEET_PER_METER * 100.0)
+        edges.append(opening[1] / FEET_PER_METER * 100.0)
+    return (p0, wall_dir, length_ft / FEET_PER_METER * 100.0, edges)
+
+
+def _index_node_pieces_on_wall(nodes, intersection_candidates, walls_to_create, end_to_node):
+    """{wall_idx: [(lo_cm, hi_cm, codigo)]} das pecas de NO' que ocupam a faixa
+    de cada parede - entrada da tentativa do compensador de no' (secao 56)."""
+    index = {}
+    by_node = _node_candidates_by_index(intersection_candidates)
+    for node_index, node in enumerate(nodes):
+        node_candidates = by_node.get(node_index)
+        if not node_candidates:
+            continue
+        involved = _node_involved_wall_ends(node, node_candidates, walls_to_create, end_to_node, node_index)
+        for wall_idx in involved:
+            p0, _p1, wall_dir, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+            for cand in node_candidates:
+                t_start_cm, t_end_cm = _candidate_extent_on_wall_axis(cand, p0, wall_dir)
+                index.setdefault(wall_idx, []).append(
+                    (min(t_start_cm, t_end_cm), max(t_start_cm, t_end_cm), cand.get("logical_code")))
+    for key in index:
+        index[key].sort()
+    return index
+
+
 def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, by_end_arg, midspan_arg,
                         allow_compensators, variants_per_course, opening_strategy, seed):
     parts = [repr(wall_idx), repr(len(walls_arg)), repr(allow_compensators), repr(variants_per_course),
-             repr(opening_strategy)]
+             repr(opening_strategy), repr(bool(RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED)),
+             repr(bool(_jamb_noise_tolerance_enabled()))]
     line = walls_arg[wall_idx][0]
     p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
     parts.append("|".join(repr(v) for v in (p0.X, p0.Y, p0.Z, p1.X, p1.Y, p1.Z, walls_arg[wall_idx][1])))
@@ -8831,6 +10575,9 @@ def _wall_fill_memo_key(wall_idx, walls_arg, nodes, end_to_node, openings_arg, b
         if node is not None:
             state = sorted((k, repr(v)) for k, v in node.items() if k not in ("point", "arm_points"))
         parts.append(repr((end_index, node_index, state)))
+        # SECAO 77: um layout calculado com o no' ativo nunca serve para a
+        # mesma parede com o no' sem encontro (ponta livre) nesta banda
+        parts.append(repr((end_index, "junction_role", _band_role_signature(node_index))))
         for course in ("A", "B"):
             parts.append(repr((end_index, course, (by_end_arg or {}).get((wall_idx, end_index, course)))))
     for course in ("A", "B"):
@@ -8956,6 +10703,12 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         midspan = _index_node_candidates_midspan(
             nodes, intersections["candidates"], walls_to_create, end_to_node
         )
+        node_boundary_codes = _index_node_boundary_codes(
+            nodes, intersections["candidates"], walls_to_create, end_to_node
+        )
+        node_pieces_for_trial = _index_node_pieces_on_wall(
+            nodes, intersections["candidates"], walls_to_create, end_to_node
+        )
 
     with _perf.span("order_walls_for_processing", walls=len(walls_to_create)):
         order = order_walls_for_processing(walls_to_create)
@@ -9048,13 +10801,15 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
                 if key in memo:
                     WALL_FILL_MEMO_STATS["hits"] += 1
                     return _plain_clone(memo[key])
-            computed = solve_wall_free_fill(
-                wall_idx, walls_arg, nodes, end_to_node, openings_arg,
-                by_end_arg, midspan_arg, catalog, allow_compensators,
-                variants_per_course=variants_per_course,
-                opening_strategy=opening_strategy,
-                cross_band_joint_seed=seed,
-            )
+            computed = physical_tolerance_trial(lambda: compensator_node_adjacency_trial(
+                lambda: solve_wall_free_fill(
+                    wall_idx, walls_arg, nodes, end_to_node, openings_arg,
+                    by_end_arg, midspan_arg, catalog, allow_compensators,
+                    variants_per_course=variants_per_course,
+                    opening_strategy=opening_strategy,
+                    cross_band_joint_seed=seed, node_boundary_codes=node_boundary_codes,
+                ), catalog, *(_wall_trial_geometry(walls_arg, openings_arg, wall_idx)
+                              + (node_pieces_for_trial.get(wall_idx) or [],))))
             if memo is not None:
                 WALL_FILL_MEMO_STATS["misses"] += 1
                 memo[key] = _plain_clone(computed)
@@ -9238,6 +10993,9 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
     node_midspan_by_wall_course = _index_node_candidates_midspan(
         nodes, intersection_candidates, walls_to_create, end_to_node
     )
+    node_boundary_codes = _index_node_boundary_codes(
+        nodes, intersection_candidates, walls_to_create, end_to_node
+    )
     candidates = []
     jamb_exceptions = []
     non_modular = []
@@ -9246,11 +11004,11 @@ def solve_all_wall_fill(walls_to_create, nodes, end_to_node, openings_per_wall,
     # nunca mais `range(len(walls_to_create))`, que seguia a ordem em que as
     # paredes sairam do CAD.
     for wall_idx in order_walls_for_processing(walls_to_create):
-        result = solve_wall_free_fill(
+        result = physical_tolerance_trial(lambda: solve_wall_free_fill(
             wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
             node_candidates_by_wall_end, node_midspan_by_wall_course, catalog, allow_compensators,
-            opening_strategy=opening_strategy,
-        )
+            opening_strategy=opening_strategy, node_boundary_codes=node_boundary_codes,
+        ))
         candidates.extend(result["candidates"])
         jamb_exceptions.extend(result["jamb_exceptions"])
         non_modular.extend(result["non_modular"])

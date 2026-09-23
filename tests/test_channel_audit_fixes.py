@@ -168,18 +168,38 @@ def test_red_engine_parity_leaves_4cm_before_incoming_tie(monkeypatch, jamb_lo, 
 @pytest.mark.parametrize("tolerance", [False, True])
 @pytest.mark.parametrize("jamb_lo,jamb_hi", [(269.0, 370.0), (269.022, 370.012)])
 def test_green_parity_trial_gives_along_tie_support_like_human(monkeypatch, tolerance, jamb_lo, jamb_hi):
+    """ATUALIZADO PELA REGRA 75 (2026-09-18). O desfecho "como o humano"
+    (apoio de 19 cm) dependia de o trial de paridade poder DIVIDIR o B54 do
+    no' em canaletas - que e' exatamente o que a regra 75 proibe. Sem essa
+    valvula o trial que poe a amarracao sobre a corrida e' recusado pelo
+    gate de erros, o apoio fica limitado e o conflito e' CLASSIFICADO. A
+    mecanica antiga continua testada logo abaixo, sob override explicito."""
     monkeypatch.setattr(cm, "JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED", tolerance)
     lines, ops = _door_next_to_tee(jamb_lo, jamb_hi)
     res, walls, _n, openings = solve(lines, ops)
     rein = res["opening_reinforcement"]
     above = rein["openings"][0]["above"]
-    assert above["support_r_cm"] >= 19.0 - 1e-6 and above["bearing_r_cm"] >= 19.0 - 1e-6
-    assert above["support_l_cm"] >= 19.0 - 1e-6
-    assert rein["node_crossings"] == []  # sem travessia: a principal passa (paridade)
-    assert res["channel_tie_parity_trials"]["accepted"]
-    assert all(a["ok"] for a in res["wall_bond_audits"].values())
-    for key in ("MISSING_REQUIRED_CHANNEL", "CHANNEL_OPENING_OVERCUT", "CHANNEL_INVADES_OPENING", "CHANNEL_COLLISION"):
+    assert rein["node_crossings"] == [] and rein["tie_conversions"] == []
+    assert res["channel_as_junction_bond"] == []
+    assert above["support_r_cm"] < 19.0 - 1e-6
+    assert any(f["code"] == "CHANNEL_SUPPORT_LIMITED" for f in rein["findings"])
+    for key in ("CHANNEL_OPENING_OVERCUT", "CHANNEL_INVADES_OPENING", "CHANNEL_COLLISION"):
         assert rein["validation"]["counts"][key] == 0
+
+
+@pytest.mark.parametrize("jamb_lo,jamb_hi", [(269.0, 370.0)])
+def test_green_parity_com_override_reproduz_o_humano_e_o_gate_acusa(monkeypatch, jamb_lo, jamb_hi):
+    """MUTANTE da regra 75 (conversao ao longo no trial): sob override a
+    mecanica antiga volta a dar o apoio de 19 cm do humano - e o hard gate
+    CHANNEL_AS_JUNCTION_BOND ACUSA a amarracao convertida."""
+    monkeypatch.setattr(cm, "JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED", False)
+    lines, ops = _door_next_to_tee(jamb_lo, jamb_hi)
+    res, walls, _n, openings = solve(lines, ops, policy={"convert_blocking_along_ties": True})
+    rein = res["opening_reinforcement"]
+    above = rein["openings"][0]["above"]
+    assert above["support_r_cm"] >= 19.0 - 1e-6 and above["bearing_r_cm"] >= 19.0 - 1e-6
+    assert res["channel_tie_parity_trials"]["accepted"]
+    assert res["channel_as_junction_bond"], "o gate tem de acusar a conversao"
 
 
 def test_parity_trial_never_runs_for_legacy_strategy():
@@ -189,11 +209,13 @@ def test_parity_trial_never_runs_for_legacy_strategy():
 
 
 def test_human_like_face_crossing_is_not_a_parity_candidate():
-    """Jamba na face da parede que chega (51.6): continua travessia de T."""
+    """Jamba na face da parede que chega: nem paridade, nem travessia (a 51.6
+    esta suspensa pela REGRA 75) - o conflito fica classificado."""
     lines, ops = tcr.tee(sill_cm=80.0)
     res, _w, _n, _o = solve(lines, ops)
-    assert len(res["opening_reinforcement"]["node_crossings"]) == 2
+    assert res["opening_reinforcement"]["node_crossings"] == []
     assert res["channel_tie_parity_trials"]["accepted"] == []
+    assert res["channel_as_junction_bond"] == []
 
 
 # ------------------------------------------------------- determinismo

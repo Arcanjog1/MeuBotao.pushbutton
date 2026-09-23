@@ -1,0 +1,849 @@
+{
+ "schema_version": 1,
+ "status": "EVIDENCE_NOT_NORM",
+ "measured_with": {
+  "engine_commit_s74": "2c55211632b96fbe1d3f31e9481df3ec8055cd6f",
+  "b54_half_room_cm": 27.0,
+  "b34_room_cm": 34.0,
+  "physical_tolerance_cm": 0.05
+ },
+ "modeling_variation": {
+  "note": "a geometria do projeto NAO e' exata: as paredes foram modeladas com variacao submilimetrica real. Duas medidas diferentes, as duas uteis:",
+  "max_modeling_deviation_cm": 0.013251,
+  "max_modeling_deviation_definition": "maior afastamento do centimetro inteiro observado na geometria do corpus (comprimento de parede, ponta de parede e espaco medido no T)",
+  "max_modeling_deviation_by_source_cm": {
+   "wall_length": 0.013251,
+   "wall_endpoint": 0.013054,
+   "t_room_min": 0.013251
+  },
+  "boundary_definition": "|falta para o B54| <= 0,1 cm - os T em que a variacao de modelagem chega a decidir o veredito",
+  "boundary_nodes": 5,
+  "max_abs_deviation_at_boundary_cm": 0.012,
+  "next_materially_insufficient_cm": 4.001054,
+  "ratio_tolerance_over_max_modeling_deviation": 3.77,
+  "ratio_next_over_tolerance": 80.0
+ },
+ "coverage": {
+  "b54_leg_exercised": true,
+  "b34_leg_exercised": false,
+  "min_room_incoming_cm": 69.000217,
+  "b34_required_cm": 34.0,
+  "note": "`_t_intersection_room_ok` e' uma CONJUNCAO: exige espaco para o B54 na parede principal E espaco para o B34 na que chega. Neste corpus so' a primeira perna e' exercida - a boneca mais apertada tem 69.0002 cm contra 34.0 cm exigidos, folga de 35.0 cm em todos os 37 T. Portanto a segunda perna NAO tem cobertura de regressao aqui, e isso esta' declarado em vez de escondido. A perna do B54 e' a que a secao 74 muda."
+ },
+ "t_nodes": [
+  {
+   "key": "T@1622.0,1087.0",
+   "position_cm": [
+    1621.9902688965954,
+    1087.0034867177667
+   ],
+   "main_wall_key": "W01",
+   "incoming_wall_key": "W18",
+   "room_plus_cm": 6.995206462019257,
+   "room_minus_cm": 7.012513311429553,
+   "room_min_cm": 6.995206462019257,
+   "room_incoming_cm": 460.00226889285005,
+   "shortfall_b54_cm": 20.004793537980742,
+   "shortfall_b34_cm": -426.00226889285005,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 28,
+    "main_revit_element_id": 8284502,
+    "incoming_revit_element_id": 8284562
+   }
+  },
+  {
+   "key": "T@1622.0,2287.0",
+   "position_cm": [
+    1621.9902688965933,
+    2287.0034867141494
+   ],
+   "main_wall_key": "W01",
+   "incoming_wall_key": "W14",
+   "room_plus_cm": 7.003486699312508,
+   "room_minus_cm": 26.987513286088085,
+   "room_min_cm": 7.003486699312508,
+   "room_incoming_cm": 460.01219767787677,
+   "shortfall_b54_cm": 19.996513300687493,
+   "shortfall_b34_cm": -426.01219767787677,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 22,
+    "main_revit_element_id": 8284502,
+    "incoming_revit_element_id": 8284558
+   }
+  },
+  {
+   "key": "T@782.0,652.0",
+   "position_cm": [
+    781.9869461849252,
+    652.003461066468
+   ],
+   "main_wall_key": "W12",
+   "incoming_wall_key": "W19",
+   "room_plus_cm": 27.01449069394249,
+   "room_minus_cm": 11.987999933263563,
+   "room_min_cm": 11.987999933263563,
+   "room_incoming_cm": 464.9965132823374,
+   "shortfall_b54_cm": 15.012000066736437,
+   "shortfall_b34_cm": -430.9965132823374,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 30,
+    "main_revit_element_id": 8284554,
+    "incoming_revit_element_id": 8284563
+   }
+  },
+  {
+   "key": "T@407.0,652.0",
+   "position_cm": [
+    406.98799999993525,
+    652.0034610664675
+   ],
+   "main_wall_key": "W11",
+   "incoming_wall_key": "W12",
+   "room_plus_cm": 12.00346106646923,
+   "room_minus_cm": 132.99902565119226,
+   "room_min_cm": 12.00346106646923,
+   "room_incoming_cm": 269.02193905050547,
+   "shortfall_b54_cm": 14.99653893353077,
+   "shortfall_b34_cm": -235.02193905050547,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 18,
+    "main_revit_element_id": 8284552,
+    "incoming_revit_element_id": 8284554
+   }
+  },
+  {
+   "key": "T@1192.0,1937.0",
+   "position_cm": [
+    1191.9869462860386,
+    1937.003486713661
+   ],
+   "main_wall_key": "W31",
+   "incoming_wall_key": "W13",
+   "room_plus_cm": 42.00000000023994,
+   "room_minus_cm": 22.998946282292913,
+   "room_min_cm": 22.998946282292913,
+   "room_incoming_cm": 480.00000000569986,
+   "shortfall_b54_cm": 4.001053717707087,
+   "shortfall_b34_cm": -446.00000000569986,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 19,
+    "main_revit_element_id": 8284588,
+    "incoming_revit_element_id": 8284557
+   }
+  },
+  {
+   "key": "T@1192.0,1437.0",
+   "position_cm": [
+    1191.9869462860395,
+    1437.003486707961
+   ],
+   "main_wall_key": "W29",
+   "incoming_wall_key": "W13",
+   "room_plus_cm": 42.000000000239076,
+   "room_minus_cm": 22.998946282294643,
+   "room_min_cm": 22.998946282294643,
+   "room_incoming_cm": 480.00000000569986,
+   "shortfall_b54_cm": 4.001053717705357,
+   "shortfall_b34_cm": -446.00000000569986,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 20,
+    "main_revit_element_id": 8284586,
+    "incoming_revit_element_id": 8284557
+   }
+  },
+  {
+   "key": "T@1192.0,737.0",
+   "position_cm": [
+    1191.9869462860402,
+    737.0034867173188
+   ],
+   "main_wall_key": "W30",
+   "incoming_wall_key": "W24",
+   "room_plus_cm": 42.000000000237996,
+   "room_minus_cm": 22.998946282295076,
+   "room_min_cm": 22.998946282295076,
+   "room_incoming_cm": 230.00370341854375,
+   "shortfall_b54_cm": 4.001053717704924,
+   "shortfall_b34_cm": -196.00370341854375,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": false,
+   "provenance": {
+    "bench_node_index": 39,
+    "main_revit_element_id": 8284587,
+    "incoming_revit_element_id": 8284573
+   }
+  },
+  {
+   "key": "T@642.0,7.0",
+   "position_cm": [
+    641.9879999999661,
+    7.00062202386837
+   ],
+   "main_wall_key": "W04",
+   "incoming_wall_key": "W15",
+   "room_plus_cm": 102.0120000000312,
+   "room_minus_cm": 26.987999999965798,
+   "room_min_cm": 26.987999999965798,
+   "room_incoming_cm": 460.00900000021363,
+   "shortfall_b54_cm": 0.01200000003420243,
+   "shortfall_b34_cm": -426.00900000021363,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 24,
+    "main_revit_element_id": 8284526,
+    "incoming_revit_element_id": 8284559
+   }
+  },
+  {
+   "key": "T@977.0,717.0",
+   "position_cm": [
+    976.9869461935449,
+    717.0034867176548
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W26",
+   "room_plus_cm": 37.99999999999613,
+   "room_minus_cm": 26.996513282334693,
+   "room_min_cm": 26.996513282334693,
+   "room_incoming_cm": 175.00000003076838,
+   "shortfall_b54_cm": 0.0034867176653072818,
+   "shortfall_b34_cm": -141.00000003076838,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 44,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284579
+   }
+  },
+  {
+   "key": "T@977.0,927.0",
+   "position_cm": [
+    976.9869461935444,
+    926.9999999994773
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W27",
+   "room_plus_cm": 26.999999999487947,
+   "room_minus_cm": 26.996513282334693,
+   "room_min_cm": 26.996513282334693,
+   "room_incoming_cm": 175.00000000861962,
+   "shortfall_b54_cm": 0.0034867176653072818,
+   "shortfall_b34_cm": -141.00000000861962,
+   "expected_ok_flag_off": false,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 46,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284580
+   }
+  },
+  {
+   "key": "T@977.0,1137.0",
+   "position_cm": [
+    976.9869461935443,
+    1136.999999999997
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W08",
+   "room_plus_cm": 27.003486718184934,
+   "room_minus_cm": 182.00348671818045,
+   "room_min_cm": 27.003486718184934,
+   "room_incoming_cm": 618.9979461849006,
+   "shortfall_b54_cm": -0.00348671818493429,
+   "shortfall_b34_cm": -584.9979461849006,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 12,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284546
+   }
+  },
+  {
+   "key": "T@987.0,7.0",
+   "position_cm": [
+    986.9879999989718,
+    7.000622023868833
+   ],
+   "main_wall_key": "W04",
+   "incoming_wall_key": "W16",
+   "room_plus_cm": 27.012000001025093,
+   "room_minus_cm": 101.98799999897449,
+   "room_min_cm": 27.012000001025093,
+   "room_incoming_cm": 460.0028646937899,
+   "shortfall_b54_cm": -0.012000001025093354,
+   "shortfall_b34_cm": -426.0028646937899,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 26,
+    "main_revit_element_id": 8284526,
+    "incoming_revit_element_id": 8284560
+   }
+  },
+  {
+   "key": "T@1192.0,487.0",
+   "position_cm": [
+    1191.9869462860406,
+    486.999783298775
+   ],
+   "main_wall_key": "W03",
+   "incoming_wall_key": "W24",
+   "room_plus_cm": 403.00332261055536,
+   "room_minus_cm": 31.996939084827822,
+   "room_min_cm": 31.996939084827822,
+   "room_incoming_cm": 230.00370341854375,
+   "shortfall_b54_cm": -4.996939084827822,
+   "shortfall_b34_cm": -196.00370341854375,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 40,
+    "main_revit_element_id": 8284522,
+    "incoming_revit_element_id": 8284573
+   }
+  },
+  {
+   "key": "T@782.0,717.0",
+   "position_cm": [
+    781.986946184925,
+    717.0034867176546
+   ],
+   "main_wall_key": "W19",
+   "incoming_wall_key": "W26",
+   "room_plus_cm": 37.999999999995204,
+   "room_minus_cm": 202.99651328182247,
+   "room_min_cm": 37.999999999995204,
+   "room_incoming_cm": 175.00000003076838,
+   "shortfall_b54_cm": -10.999999999995204,
+   "shortfall_b34_cm": -141.00000003076838,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 43,
+    "main_revit_element_id": 8284563,
+    "incoming_revit_element_id": 8284579
+   }
+  },
+  {
+   "key": "T@407.0,1137.0",
+   "position_cm": [
+    406.98799999993463,
+    1136.9999999999961
+   ],
+   "main_wall_key": "W08",
+   "incoming_wall_key": "W11",
+   "room_plus_cm": 82.99895193324903,
+   "room_minus_cm": 41.99899999993359,
+   "room_min_cm": 41.99899999993359,
+   "room_incoming_cm": 503.9999999999976,
+   "shortfall_b54_cm": -14.998999999933588,
+   "shortfall_b34_cm": -469.9999999999976,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 16,
+    "main_revit_element_id": 8284546,
+    "incoming_revit_element_id": 8284552
+   }
+  },
+  {
+   "key": "T@1142.0,1937.0",
+   "position_cm": [
+    1141.991949946312,
+    1937.003486713661
+   ],
+   "main_wall_key": "W07",
+   "incoming_wall_key": "W31",
+   "room_plus_cm": 46.99999999600068,
+   "room_minus_cm": 176.99651328646442,
+   "room_min_cm": 46.99999999600068,
+   "room_incoming_cm": 98.99894628253286,
+   "shortfall_b54_cm": -19.999999996000682,
+   "shortfall_b34_cm": -64.99894628253286,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 51,
+    "main_revit_element_id": 8284543,
+    "incoming_revit_element_id": 8284588
+   }
+  },
+  {
+   "key": "T@7.0,487.0",
+   "position_cm": [
+    6.988000000530934,
+    486.99978329877354
+   ],
+   "main_wall_key": "W06",
+   "incoming_wall_key": "W03",
+   "room_plus_cm": 186.99978329877496,
+   "room_minus_cm": 47.0002167012223,
+   "room_min_cm": 47.0002167012223,
+   "room_incoming_cm": 469.00100720121435,
+   "shortfall_b54_cm": -20.0002167012223,
+   "shortfall_b34_cm": -435.00100720121435,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 4,
+    "main_revit_element_id": 8284539,
+    "incoming_revit_element_id": 8284522
+   }
+  },
+  {
+   "key": "T@1142.0,2517.0",
+   "position_cm": [
+    1141.9919499463108,
+    2516.995492204404
+   ],
+   "main_wall_key": "W07",
+   "incoming_wall_key": "W10",
+   "room_plus_cm": 56.995492204278364,
+   "room_minus_cm": 378.00799450889076,
+   "room_min_cm": 56.995492204278364,
+   "room_incoming_cm": 625.0132514972944,
+   "shortfall_b54_cm": -29.995492204278364,
+   "shortfall_b34_cm": -591.0132514972944,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 15,
+    "main_revit_element_id": 8284543,
+    "incoming_revit_element_id": 8284551
+   }
+  },
+  {
+   "key": "T@1622.0,1687.0",
+   "position_cm": [
+    1621.9902688965942,
+    1687.0034867073969
+   ],
+   "main_wall_key": "W01",
+   "incoming_wall_key": "W23",
+   "room_plus_cm": 56.996486692798825,
+   "room_minus_cm": 57.00351330720016,
+   "room_min_cm": 56.996486692798825,
+   "room_incoming_cm": 410.0033226105549,
+   "shortfall_b54_cm": -29.996486692798825,
+   "shortfall_b34_cm": -376.0033226105549,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 38,
+    "main_revit_element_id": 8284502,
+    "incoming_revit_element_id": 8284567
+   }
+  },
+  {
+   "key": "T@1622.0,487.0",
+   "position_cm": [
+    1621.9902688965963,
+    486.9997832987756
+   ],
+   "main_wall_key": "W01",
+   "incoming_wall_key": "W03",
+   "room_plus_cm": 452.9991612749061,
+   "room_minus_cm": 57.00021670180023,
+   "room_min_cm": 57.00021670180023,
+   "room_incoming_cm": 469.0002616953833,
+   "shortfall_b54_cm": -30.000216701800227,
+   "shortfall_b34_cm": -435.0002616953833,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 5,
+    "main_revit_element_id": 8284502,
+    "incoming_revit_element_id": 8284522
+   }
+  },
+  {
+   "key": "T@407.0,487.0",
+   "position_cm": [
+    406.9879999999355,
+    486.999783298774
+   ],
+   "main_wall_key": "W03",
+   "incoming_wall_key": "W11",
+   "room_plus_cm": 62.00100720127886,
+   "room_minus_cm": 372.9999999999355,
+   "room_min_cm": 62.00100720127886,
+   "room_incoming_cm": 69.00021670122423,
+   "shortfall_b54_cm": -35.00100720127886,
+   "shortfall_b34_cm": -35.00021670122423,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 17,
+    "main_revit_element_id": 8284522,
+    "incoming_revit_element_id": 8284552
+   }
+  },
+  {
+   "key": "T@977.0,1482.0",
+   "position_cm": [
+    976.9869461935439,
+    1481.9999999992451
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W21",
+   "room_plus_cm": 72.00697343452967,
+   "room_minus_cm": 71.99302656546531,
+   "room_min_cm": 71.99302656546531,
+   "room_incoming_cm": 459.999994282512,
+   "shortfall_b54_cm": -44.993026565465314,
+   "shortfall_b34_cm": -425.999994282512,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 34,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284565
+   }
+  },
+  {
+   "key": "T@977.0,1827.0",
+   "position_cm": [
+    976.9869461935432,
+    1826.9999364225678
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W20",
+   "room_plus_cm": 182.00690985785732,
+   "room_minus_cm": 71.993090142138,
+   "room_min_cm": 71.993090142138,
+   "room_incoming_cm": 459.9999942825135,
+   "shortfall_b54_cm": -44.993090142138,
+   "shortfall_b34_cm": -425.9999942825135,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 32,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284564
+   }
+  },
+  {
+   "key": "T@642.0,487.0",
+   "position_cm": [
+    641.9879999999655,
+    486.99978329877433
+   ],
+   "main_wall_key": "W03",
+   "incoming_wall_key": "W15",
+   "room_plus_cm": 72.0120000000339,
+   "room_minus_cm": 81.99899279875105,
+   "room_min_cm": 72.0120000000339,
+   "room_incoming_cm": 460.00900000021363,
+   "shortfall_b54_cm": -45.01200000003389,
+   "shortfall_b34_cm": -426.00900000021363,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 23,
+    "main_revit_element_id": 8284522,
+    "incoming_revit_element_id": 8284559
+   }
+  },
+  {
+   "key": "T@1142.0,1087.0",
+   "position_cm": [
+    1141.991949946313,
+    1087.003486717766
+   ],
+   "main_wall_key": "W09",
+   "incoming_wall_key": "W18",
+   "room_plus_cm": 82.00348671718956,
+   "room_minus_cm": 81.99651328223085,
+   "room_min_cm": 81.99651328223085,
+   "room_incoming_cm": 460.00226889285005,
+   "shortfall_b54_cm": -54.99651328223085,
+   "shortfall_b34_cm": -426.00226889285005,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 27,
+    "main_revit_element_id": 8284548,
+    "incoming_revit_element_id": 8284562
+   }
+  },
+  {
+   "key": "T@1142.0,2287.0",
+   "position_cm": [
+    1141.9919499463113,
+    2287.0034867141485
+   ],
+   "main_wall_key": "W07",
+   "incoming_wall_key": "W14",
+   "room_plus_cm": 82.00348671402288,
+   "room_minus_cm": 81.99651328597709,
+   "room_min_cm": 81.99651328597709,
+   "room_incoming_cm": 460.01219767787677,
+   "shortfall_b54_cm": -54.99651328597709,
+   "shortfall_b34_cm": -426.01219767787677,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 21,
+    "main_revit_element_id": 8284543,
+    "incoming_revit_element_id": 8284558
+   }
+  },
+  {
+   "key": "T@987.0,487.0",
+   "position_cm": [
+    986.9879999989708,
+    486.99978329877473
+   ],
+   "main_wall_key": "W03",
+   "incoming_wall_key": "W16",
+   "room_plus_cm": 82.00200720224187,
+   "room_minus_cm": 181.98799999897287,
+   "room_min_cm": 82.00200720224187,
+   "room_incoming_cm": 460.0028646937899,
+   "shortfall_b54_cm": -55.00200720224187,
+   "shortfall_b34_cm": -426.0028646937899,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 25,
+    "main_revit_element_id": 8284522,
+    "incoming_revit_element_id": 8284560
+   }
+  },
+  {
+   "key": "T@497.0,1137.0",
+   "position_cm": [
+    496.9869519331837,
+    1136.9999999999964
+   ],
+   "main_wall_key": "W08",
+   "incoming_wall_key": "W05",
+   "room_plus_cm": 277.99999425174076,
+   "room_minus_cm": 82.99895193324909,
+   "room_min_cm": 82.99895193324909,
+   "room_incoming_cm": 108.99999999999969,
+   "shortfall_b54_cm": -55.99895193324909,
+   "shortfall_b34_cm": -74.99999999999969,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 8,
+    "main_revit_element_id": 8284546,
+    "incoming_revit_element_id": 8284534
+   }
+  },
+  {
+   "key": "T@497.0,1482.0",
+   "position_cm": [
+    496.9869519331829,
+    1481.9999999992444
+   ],
+   "main_wall_key": "W05",
+   "incoming_wall_key": "W21",
+   "room_plus_cm": 101.99999999924847,
+   "room_minus_cm": 101.99302656547408,
+   "room_min_cm": 101.99302656547408,
+   "room_incoming_cm": 459.999994282512,
+   "shortfall_b54_cm": -74.99302656547408,
+   "shortfall_b34_cm": -425.999994282512,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 33,
+    "main_revit_element_id": 8284534,
+    "incoming_revit_element_id": 8284565
+   }
+  },
+  {
+   "key": "T@497.0,1827.0",
+   "position_cm": [
+    496.9869519331823,
+    1826.9999364225673
+   ],
+   "main_wall_key": "W05",
+   "incoming_wall_key": "W20",
+   "room_plus_cm": 102.00690985784887,
+   "room_minus_cm": 101.99309014214742,
+   "room_min_cm": 101.99309014214742,
+   "room_incoming_cm": 459.9999942825135,
+   "shortfall_b54_cm": -74.99309014214742,
+   "shortfall_b34_cm": -425.9999942825135,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 31,
+    "main_revit_element_id": 8284534,
+    "incoming_revit_element_id": 8284564
+   }
+  },
+  {
+   "key": "T@497.0,2172.0",
+   "position_cm": [
+    496.9869519331816,
+    2171.995513281468
+   ],
+   "main_wall_key": "W05",
+   "incoming_wall_key": "W22",
+   "room_plus_cm": 102.00248671675305,
+   "room_minus_cm": 101.99651328324111,
+   "room_min_cm": 101.99651328324111,
+   "room_incoming_cm": 459.99999425172194,
+   "shortfall_b54_cm": -74.99651328324111,
+   "shortfall_b34_cm": -425.99999425172194,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 35,
+    "main_revit_element_id": 8284534,
+    "incoming_revit_element_id": 8284566
+   }
+  },
+  {
+   "key": "T@407.0,792.0",
+   "position_cm": [
+    406.9879999999351,
+    792.0024867176597
+   ],
+   "main_wall_key": "W11",
+   "incoming_wall_key": "W25",
+   "room_plus_cm": 132.99902565119226,
+   "room_minus_cm": 317.9975132823361,
+   "room_min_cm": 132.99902565119226,
+   "room_incoming_cm": 224.00893905054127,
+   "shortfall_b54_cm": -105.99902565119226,
+   "shortfall_b34_cm": -190.00893905054127,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 41,
+    "main_revit_element_id": 8284552,
+    "incoming_revit_element_id": 8284574
+   }
+  },
+  {
+   "key": "T@977.0,2517.0",
+   "position_cm": [
+    976.9869461935423,
+    2516.9954922044035
+   ],
+   "main_wall_key": "W10",
+   "incoming_wall_key": "W02",
+   "room_plus_cm": 138.01325148882356,
+   "room_minus_cm": 453.00000000847075,
+   "room_min_cm": 138.01325148882356,
+   "room_incoming_cm": 79.00246563970167,
+   "shortfall_b54_cm": -111.01325148882356,
+   "shortfall_b34_cm": -45.00246563970167,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 2,
+    "main_revit_element_id": 8284551,
+    "incoming_revit_element_id": 8284515
+   }
+  },
+  {
+   "key": "T@782.0,1137.0",
+   "position_cm": [
+    781.9869461849245,
+    1136.9999999999968
+   ],
+   "main_wall_key": "W08",
+   "incoming_wall_key": "W19",
+   "room_plus_cm": 167.99999999997718,
+   "room_minus_cm": 277.99999425174076,
+   "room_min_cm": 167.99999999997718,
+   "room_incoming_cm": 464.9965132823374,
+   "shortfall_b54_cm": -140.99999999997718,
+   "shortfall_b34_cm": -430.9965132823374,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 29,
+    "main_revit_element_id": 8284546,
+    "incoming_revit_element_id": 8284563
+   }
+  },
+  {
+   "key": "T@977.0,2172.0",
+   "position_cm": [
+    976.9869461935427,
+    2171.995513281468
+   ],
+   "main_wall_key": "W02",
+   "incoming_wall_key": "W22",
+   "room_plus_cm": 182.00348671676167,
+   "room_minus_cm": 181.99651328324111,
+   "room_min_cm": 181.99651328324111,
+   "room_incoming_cm": 459.99999425172194,
+   "shortfall_b54_cm": -154.99651328324111,
+   "shortfall_b34_cm": -425.99999425172194,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 36,
+    "main_revit_element_id": 8284515,
+    "incoming_revit_element_id": 8284566
+   }
+  },
+  {
+   "key": "T@782.0,927.0",
+   "position_cm": [
+    781.9869461849248,
+    926.999999999477
+   ],
+   "main_wall_key": "W19",
+   "incoming_wall_key": "W27",
+   "room_plus_cm": 202.9965132818225,
+   "room_minus_cm": 183.0000000005197,
+   "room_min_cm": 183.0000000005197,
+   "room_incoming_cm": 175.00000000861962,
+   "shortfall_b54_cm": -156.0000000005197,
+   "shortfall_b34_cm": -141.00000000861962,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 45,
+    "main_revit_element_id": 8284563,
+    "incoming_revit_element_id": 8284580
+   }
+  },
+  {
+   "key": "T@1192.0,1687.0",
+   "position_cm": [
+    1191.986946286039,
+    1687.003486707396
+   ],
+   "main_wall_key": "W13",
+   "incoming_wall_key": "W23",
+   "room_plus_cm": 222.999999999435,
+   "room_minus_cm": 223.00000000626486,
+   "room_min_cm": 222.999999999435,
+   "room_incoming_cm": 410.0033226105549,
+   "shortfall_b54_cm": -195.999999999435,
+   "shortfall_b34_cm": -376.0033226105549,
+   "expected_ok_flag_off": true,
+   "expected_ok_flag_on": true,
+   "provenance": {
+    "bench_node_index": 37,
+    "main_revit_element_id": 8284557,
+    "incoming_revit_element_id": 8284567
+   }
+  }
+ ]
+}

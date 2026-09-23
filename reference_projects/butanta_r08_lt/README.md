@@ -6,6 +6,8 @@ Merge [PR #35](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/35): 6c00f7
 
 65.747 peças; 142 aberturas; 8.931 canaletas; 286 cortados; 69 tipos dedicados carregados, zero instâncias.
 
+[Corpus auditável da seção 74](s74_corpus/README.md): geometria mínima do 1º pavimento (34 paredes, 44 aberturas, 37 encontros T), reproduzível sem Revit.
+
 ## Acervo primário mantido por compatibilidade
 
 - [01_family_catalog.json](../../docs/revit_reference_extraction/butanta-r08-lt/01_family_catalog.json)

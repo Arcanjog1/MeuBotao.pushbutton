@@ -3,6 +3,7 @@ STATUS: EVIDÊNCIA / NÃO NORMA.
 
 - [TORRE EASY-LO-R00](torre_easy_lo_r00/README.md): peças dedicadas de 9 cm.
 - [BUTANTÃ R08_LT — CIV0495](butanta_r08_lt/README.md): corridas de canaletas de 19 cm.
+- [BUTANTÃ R08_LT — corpus da seção 74](butanta_r08_lt/s74_corpus/README.md): geometria mínima auditável do teste do T.
 - [Comparação](COMPARISON.md).
 
 Cada pasta é um portal com catálogo, aberturas, peças, relações, padrões,

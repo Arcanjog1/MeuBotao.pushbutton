@@ -1,0 +1,1086 @@
+{
+ "schema": "revit_smoke_v1",
+ "data": "2026-09-22",
+ "maquina": "PC de casa (DESKTOP-DN5GO3F), 31,9 GB RAM",
+ "revit": "2026 26.4.10.51",
+ "pyrevit": "6.5.4.26228+1146",
+ "codigo": {
+  "pr_head_remoto": "37a015040b1500aa025c6e9293cda20e564517f3",
+  "head_local": "37a015040b1500aa025c6e9293cda20e564517f3",
+  "motor_carregado_de": "C:\\Users\\twitc\\Documents\\AgentOrchestrator\\MeuBotao.pushbutton\\nuvem\\core\\wall_modeling.py",
+  "nota": "harness via MCP do pyRevit carregando o motor do clone do repo; o botao instalado no pyRevit aponta para uma copia antiga e NAO foi usado"
+ },
+ "documentos": {
+  "target": "C:/Users/twitc/Desktop/CIVIX/butanta testes.rvt",
+  "humano": "C:/Users/twitc/Desktop/CIVIX/BUTANTA - R08_LT (TODOS OS PAVIMENTOS PARA ENVIO) (1).rvt",
+  "humano_somente_leitura": true
+ },
+ "backup_target": {
+  "arquivo": "C:/Users/twitc/Desktop/CIVIX/_backup_smoke_casa_20260922/butanta testes (BACKUP pre-smoke 2026-09-22).rvt",
+  "bytes": 181641216,
+  "sha256": "ac4c6e20f5303d19319637ccd36c5fe33ae3a0eaf89a2fa5ae11cf3c6e0411c1"
+ },
+ "pre_reset": {
+  "instancias": 17651,
+  "lotes": {
+   "20260918-014103": 8710
+  },
+  "carimbadas": 8710,
+  "marcas_microajuste": {
+   "8078984": "MICROAJUSTE off=+10.00",
+   "8078986": "MICROAJUSTE off=+10.00",
+   "8079001": "MICROAJUSTE off=+10.00"
+  },
+  "aberturas_deslocadas": {
+   "8078986": [
+    0.0,
+    -10.0,
+    10.0
+   ],
+   "8078984": [
+    0.0,
+    -10.0,
+    10.0
+   ],
+   "8079001": [
+    10.0,
+    0.0,
+    10.0
+   ]
+  },
+  "humano_modificado": false,
+  "target_modificado": false
+ },
+ "purga": {
+  "carimbadas_antes": 8710,
+  "apagados_pelo_revit": 17420,
+  "instancias_antes": 17651,
+  "instancias_depois": 231,
+  "carimbadas_depois": 0,
+  "lotes_depois": {},
+  "orfaos_depois": {},
+  "guarda": "remaining == 0; removidas = 8.710 pecas + 8.710 subcomponentes 'Cor'; 17.651 - 17.420 = 231"
+ },
+ "reset": {
+  "movidas": [
+   {
+    "id": "8078984",
+    "delta_cm": 10.0
+   },
+   {
+    "id": "8078986",
+    "delta_cm": 10.0
+   },
+   {
+    "id": "8079001",
+    "delta_cm": 10.0
+   }
+  ],
+  "marcas_limpas": [
+   "8078984",
+   "8078986",
+   "8079001"
+  ],
+  "ja_no_lugar": 41
+ },
+ "post_reset": {
+  "aberturas_exatas": 44,
+  "marcas": 0,
+  "lotes": 0,
+  "instancias": 231
+ },
+ "preflight": {
+  "lotes": 0,
+  "marcas": {},
+  "transacao_ok": true,
+  "paredes": 46
+ },
+ "runs": [
+  {
+   "arquivo": "r_apply_casa_run1.json",
+   "pecas_primeiro_solve": 8709,
+   "t_solve_s": 165.61,
+   "t_plano_66_s": 302.55,
+   "t_resolve_s": 158.17,
+   "t_criacao_s": 440.7,
+   "t_total_s": 1070.628,
+   "inicio": "08:56:44",
+   "fim": "09:14:35",
+   "purga_inicial": {
+    "removidas": 0,
+    "lotes": {},
+    "restantes": 0
+   },
+   "s66": {
+    "marcas_lidas": {},
+    "counts": {
+     "OPENING_MICRO_ADJUSTMENT_APPLIED": 2,
+     "OPENING_MICRO_ADJUSTMENT_REQUIRED": 24
+    },
+    "guarda": [
+     {
+      "bloqueado_por": [
+       [
+        "8284578",
+        "Paredes"
+       ]
+      ],
+      "wall_id": "8284546",
+      "opening_index": 0,
+      "offset_cm": -10.0
+     }
+    ],
+    "movidas": [
+     {
+      "element_id": "8079001",
+      "wall_id": "8284546",
+      "opening_index": 0,
+      "planejado_cm": 10.0,
+      "real_cm": 10.0,
+      "acumulado_cm": 10.0,
+      "confere": true
+     },
+     {
+      "element_id": "8078984",
+      "wall_id": "8284502",
+      "opening_index": 0,
+      "planejado_cm": 10.0,
+      "real_cm": 10.0,
+      "acumulado_cm": 10.0,
+      "confere": true
+     }
+    ]
+   },
+   "pecas": 8702,
+   "assinatura_harness_sha256": "3273ece67ce07e3c0bac7de2c8d22567a2a30fd497fcadc789f998bd24d328f3",
+   "gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_SMALL_BLOCK": 0,
+     "UNSUPPORTED_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "preflight_ok": true,
+    "CHANNEL_AS_JUNCTION_BOND": 0,
+    "COMPENSATOR_AS_JUNCTION_BOND": 0,
+    "MISSING_REQUIRED_JUNCTION_BOND": 6,
+    "bond_reproved_s72_heranca": 4
+   },
+   "junction_bond_audit": {
+    "checked": 844,
+    "valid": 838,
+    "not_required": [
+     [
+      46,
+      11
+     ],
+     [
+      46,
+      12
+     ],
+     [
+      46,
+      13
+     ],
+     [
+      46,
+      14
+     ],
+     [
+      46,
+      15
+     ],
+     [
+      46,
+      16
+     ]
+    ]
+   },
+   "missing": [
+    {
+     "no": 28,
+     "fiada": 5,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 7,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 9,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 2,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 4,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 48,
+     "fiada": 3,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284590"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B19",
+       0.2509,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    }
+   ],
+   "junction_unresolved_fill": [
+    "2:C09:8284584:n47",
+    "3:C09:8284584:n48",
+    "4:C09:8284584:n47",
+    "5:C09:8284562:n28",
+    "7:C09:8284562:n28",
+    "9:C09:8284562:n28"
+   ],
+   "criacao": {
+    "planejadas": 8702,
+    "criadas": 8702,
+    "falhas": 0,
+    "lotes": {
+     "20260922-090713": 8702
+    }
+   },
+   "readback": {
+    "conferidas": 8702,
+    "divergencias": 0
+   },
+   "memoria_revit_mb_por_etapa": [
+    [
+     "START",
+     3567.6,
+     2977.0
+    ],
+    [
+     "MODULE_LOADED",
+     3595.3,
+     3004.7
+    ],
+    [
+     "PURGE",
+     3599.3,
+     3008.7
+    ],
+    [
+     "INPUT",
+     3608.9,
+     3016.7
+    ],
+    [
+     "CATALOGS",
+     3607.1,
+     3016.7
+    ],
+    [
+     "SOLVED",
+     3643.0,
+     3362.1
+    ],
+    [
+     "PLANNED",
+     3914.3,
+     3634.6
+    ],
+    [
+     "MOVED",
+     3914.4,
+     3632.7
+    ],
+    [
+     "RECOLLECTED",
+     3914.7,
+     3632.7
+    ],
+    [
+     "RESOLVED",
+     3875.8,
+     3595.6
+    ],
+    [
+     "CREATED",
+     3971.2,
+     3688.5
+    ],
+    [
+     "READBACK",
+     3972.8,
+     3690.2
+    ],
+    [
+     "END",
+     3972.3,
+     3689.6
+    ]
+   ],
+   "humano_modificado_depois": false
+  },
+  {
+   "arquivo": "r_apply_casa_run2.json",
+   "pecas_primeiro_solve": 8702,
+   "t_solve_s": 167.19,
+   "t_plano_66_s": 272.57,
+   "t_resolve_s": 179.5,
+   "t_criacao_s": 446.778,
+   "t_total_s": 1072.695,
+   "inicio": "09:15:19",
+   "fim": "09:33:11",
+   "purga_inicial": {
+    "removidas": 8702,
+    "lotes": {
+     "20260922-090713": 8702
+    },
+    "restantes": 0
+   },
+   "s66": {
+    "marcas_lidas": {
+     "0:0": 10.0,
+     "7:0": 10.0
+    },
+    "counts": {
+     "OPENING_MICRO_ADJUSTMENT_APPLIED": 1,
+     "OPENING_MICRO_ADJUSTMENT_REQUIRED": 24
+    },
+    "guarda": [],
+    "movidas": [
+     {
+      "element_id": "8078986",
+      "wall_id": "8284502",
+      "opening_index": 6,
+      "planejado_cm": 10.0,
+      "real_cm": 10.0,
+      "acumulado_cm": 10.0,
+      "confere": true
+     }
+    ]
+   },
+   "pecas": 8696,
+   "assinatura_harness_sha256": "233f91994b4dd064fc2e98ce133a08629eb5c44b1ca83daaecb20dfa609b7c51",
+   "gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_SMALL_BLOCK": 0,
+     "UNSUPPORTED_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "preflight_ok": true,
+    "CHANNEL_AS_JUNCTION_BOND": 0,
+    "COMPENSATOR_AS_JUNCTION_BOND": 0,
+    "MISSING_REQUIRED_JUNCTION_BOND": 6,
+    "bond_reproved_s72_heranca": 4
+   },
+   "junction_bond_audit": {
+    "checked": 844,
+    "valid": 838,
+    "not_required": [
+     [
+      46,
+      11
+     ],
+     [
+      46,
+      12
+     ],
+     [
+      46,
+      13
+     ],
+     [
+      46,
+      14
+     ],
+     [
+      46,
+      15
+     ],
+     [
+      46,
+      16
+     ]
+    ]
+   },
+   "missing": [
+    {
+     "no": 28,
+     "fiada": 5,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 7,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 9,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 2,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 4,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 48,
+     "fiada": 3,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284590"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B19",
+       0.2509,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    }
+   ],
+   "junction_unresolved_fill": [
+    "2:C09:8284584:n47",
+    "3:C09:8284584:n48",
+    "4:C09:8284584:n47",
+    "5:C09:8284562:n28",
+    "7:C09:8284562:n28",
+    "9:C09:8284562:n28"
+   ],
+   "criacao": {
+    "planejadas": 8696,
+    "criadas": 8696,
+    "falhas": 0,
+    "lotes": {
+     "20260922-092544": 8696
+    }
+   },
+   "readback": {
+    "conferidas": 8696,
+    "divergencias": 0
+   },
+   "memoria_revit_mb_por_etapa": [
+    [
+     "START",
+     3974.1,
+     3691.6
+    ],
+    [
+     "MODULE_LOADED",
+     3977.6,
+     3694.9
+    ],
+    [
+     "PURGE",
+     3977.7,
+     3694.8
+    ],
+    [
+     "INPUT",
+     3989.0,
+     3705.4
+    ],
+    [
+     "CATALOGS",
+     3989.3,
+     3705.5
+    ],
+    [
+     "SOLVED",
+     4000.5,
+     3708.8
+    ],
+    [
+     "PLANNED",
+     4248.8,
+     3958.2
+    ],
+    [
+     "MOVED",
+     4249.4,
+     3956.8
+    ],
+    [
+     "RECOLLECTED",
+     4250.0,
+     3957.5
+    ],
+    [
+     "RESOLVED",
+     4195.5,
+     3904.0
+    ],
+    [
+     "CREATED",
+     4212.6,
+     3924.3
+    ],
+    [
+     "READBACK",
+     4213.2,
+     3925.0
+    ],
+    [
+     "END",
+     4212.6,
+     3924.3
+    ]
+   ],
+   "humano_modificado_depois": false
+  },
+  {
+   "arquivo": "r_apply_casa_run3.json",
+   "pecas_primeiro_solve": 8696,
+   "t_solve_s": 186.02,
+   "t_plano_66_s": 298.18,
+   "t_resolve_s": null,
+   "t_criacao_s": 442.312,
+   "t_total_s": 932.74,
+   "inicio": "09:33:32",
+   "fim": "09:49:05",
+   "purga_inicial": {
+    "removidas": 8696,
+    "lotes": {
+     "20260922-092544": 8696
+    },
+    "restantes": 0
+   },
+   "s66": {
+    "marcas_lidas": {
+     "0:6": 10.0,
+     "0:0": 10.0,
+     "7:0": 10.0
+    },
+    "counts": {
+     "OPENING_MICRO_ADJUSTMENT_APPLIED": 0,
+     "OPENING_MICRO_ADJUSTMENT_REQUIRED": 24
+    },
+    "guarda": [],
+    "movidas": []
+   },
+   "pecas": 8696,
+   "assinatura_harness_sha256": "233f91994b4dd064fc2e98ce133a08629eb5c44b1ca83daaecb20dfa609b7c51",
+   "gates": {
+    "collisions": 0,
+    "non_modular": 0,
+    "unsupported": {
+     "UNSUPPORTED_SMALL_BLOCK": 0,
+     "UNSUPPORTED_BLOCK": 0
+    },
+    "opening_invasion": 0,
+    "preflight_ok": true,
+    "CHANNEL_AS_JUNCTION_BOND": 0,
+    "COMPENSATOR_AS_JUNCTION_BOND": 0,
+    "MISSING_REQUIRED_JUNCTION_BOND": 6,
+    "bond_reproved_s72_heranca": 4
+   },
+   "junction_bond_audit": {
+    "checked": 844,
+    "valid": 838,
+    "not_required": [
+     [
+      46,
+      11
+     ],
+     [
+      46,
+      12
+     ],
+     [
+      46,
+      13
+     ],
+     [
+      46,
+      14
+     ],
+     [
+      46,
+      15
+     ],
+     [
+      46,
+      16
+     ]
+    ]
+   },
+   "missing": [
+    {
+     "no": 28,
+     "fiada": 5,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 7,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 28,
+     "fiada": 9,
+     "tipo": "T_INTERSECTION",
+     "motivo": "BOND_PIECE_PARTIAL",
+     "paredes": [
+      "8284502",
+      "8284562"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B34",
+       0.2858,
+       "STANDARD_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 2,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 47,
+     "fiada": 4,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284589"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "C09",
+       0.25,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    },
+    {
+     "no": 48,
+     "fiada": 3,
+     "tipo": "L_CORNER",
+     "motivo": "NO_BOND_PIECE",
+     "paredes": [
+      "8284584",
+      "8284590"
+     ],
+     "ocupantes": [
+      [
+       "C09",
+       0.6429,
+       "JUNCTION_UNRESOLVED_FILL"
+      ],
+      [
+       "B19",
+       0.2509,
+       "OPENING_REPAIR_FILL"
+      ]
+     ]
+    }
+   ],
+   "junction_unresolved_fill": [
+    "2:C09:8284584:n47",
+    "3:C09:8284584:n48",
+    "4:C09:8284584:n47",
+    "5:C09:8284562:n28",
+    "7:C09:8284562:n28",
+    "9:C09:8284562:n28"
+   ],
+   "criacao": {
+    "planejadas": 8696,
+    "criadas": 8696,
+    "falhas": 0,
+    "lotes": {
+     "20260922-094142": 8696
+    }
+   },
+   "readback": {
+    "conferidas": 8696,
+    "divergencias": 0
+   },
+   "memoria_revit_mb_por_etapa": [
+    [
+     "START",
+     4217.4,
+     3931.6
+    ],
+    [
+     "MODULE_LOADED",
+     4221.4,
+     3935.8
+    ],
+    [
+     "PURGE",
+     4223.8,
+     3937.7
+    ],
+    [
+     "INPUT",
+     4236.5,
+     3948.4
+    ],
+    [
+     "CATALOGS",
+     4236.6,
+     3948.4
+    ],
+    [
+     "SOLVED",
+     4215.4,
+     3923.0
+    ],
+    [
+     "PLANNED",
+     4496.4,
+     4202.4
+    ],
+    [
+     "CREATED",
+     4404.7,
+     4100.8
+    ],
+    [
+     "READBACK",
+     4406.4,
+     4102.8
+    ],
+    [
+     "END",
+     4405.5,
+     4101.8
+    ]
+   ],
+   "humano_modificado_depois": false
+  }
+ ],
+ "convergencia": {
+  "run2_igual_run3": true,
+  "movimentos_run3": 0
+ },
+ "conferencia_offline": {
+  "motor_offline": "37a0150, corpus s74 variante post_micro_adjustment_s66 (CPython)",
+  "pecas_offline": 8696,
+  "pecas_revit": 8696,
+  "sha_s74_offline": "03127688684219ce",
+  "iguais_ate_0_05_cm": 8640,
+  "diferentes": 56,
+  "desvio_max_casadas_cm": 0.0021,
+  "onde": "somente parede 8284502, fiadas 11-16 (acima das vergas, y 570-1044 cm): mesmos codigos e contagens por fiada, arranjo de corrida de B34 diferente (Revit runs_changed 29 x offline 28)",
+  "pre_existente": "a mesma diferenca de 56 pecas aparece no smoke de 2026-09-18 (outro PC, motor f7c208b, anterior as regras 75/76) contra o offline daquele commit - divergencia de plataforma IronPython x CPython, nao regressao; nenhum gate afetado; longe dos nos 22/28/30/47/48",
+  "entrada": "paredes identicas (1e-14 ft); aberturas identicas exceto 1 porta da parede 8284534 (corpus z 0-221, Revit deste PC z -1-220) - testado offline: nao explica a diferenca"
+ },
+ "modal": {
+  "handler": "DialogBoxShowing so' para TaskDialog_Project_Not_Saved_Recently -> CANCEL",
+  "log": [
+   "2026-09-22 08:49:41 INSTALADO (alvo=TaskDialog_Project_Not_Saved_Recently, resposta=CANCEL)",
+   "2026-09-22 10:10:37 REMOVIDO {\"removido\":true,\"estava_instalado\":true,\"intercepcoes\":0}"
+  ]
+ },
+ "capturas": {
+  "vistas_3d_temporarias_target": 11,
+  "removidas": 11,
+  "elevacoes_reais": "vistas PARxx existentes (so' zoom) no TARGET e no HUMANO",
+  "nota_visual": "o modelo de vista 2229535 do projeto humano (filtro PARxx, 50% de transparencia) esmaece pecas sem o parametro do projeto humano; igual nos dois documentos"
+ },
+ "memoria": [
+  "A_PRE_RUN1 08:56:26 free_GB=15,20 commit_used_GB=20,81/40,40 revit_WS_MB=3.568 revit_priv_MB=2.977 responding=True",
+  "B_POS_SOLVE1 08:59:39 free_GB=15,34 commit_used_GB=21,25/40,40 revit_WS_MB=3.674 revit_priv_MB=3.395 responding=False",
+  "C_POS_CREATE1 09:15:10 free_GB=14,85 commit_used_GB=21,70/40,40 revit_WS_MB=3.974 revit_priv_MB=3.691 responding=True",
+  "D_POS_RUN2 09:33:23 free_GB=14,93 commit_used_GB=21,82/40,40 revit_WS_MB=4.217 revit_priv_MB=3.932 responding=True",
+  "E_POS_RUN3 09:49:30 free_GB=14,56 commit_used_GB=22,02/40,40 revit_WS_MB=4.405 revit_priv_MB=4.103 responding=True",
+  "F_FINAL 10:10:48 free_GB=14,14 commit_used_GB=22,95/40,40 revit_WS_MB=4.582 revit_priv_MB=4.781 responding=True"
+ ],
+ "estado_final": {
+  "target_ativo": true,
+  "target_modificado": true,
+  "target_salvo": false,
+  "humano_modificado": false,
+  "lotes": {
+   "20260922-094142": 8696
+  },
+  "marcas_microajuste": {
+   "8078984": "MICROAJUSTE off=+10.00",
+   "8078986": "MICROAJUSTE off=+10.00",
+   "8079001": "MICROAJUSTE off=+10.00"
+  },
+  "aberturas_deslocadas": {
+   "8078986": [
+    0.0,
+    -10.0,
+    10.0
+   ],
+   "8078984": [
+    0.0,
+    -10.0,
+    10.0
+   ],
+   "8079001": [
+    10.0,
+    0.0,
+    10.0
+   ]
+  },
+  "instancias": 17623
+ },
+ "veredito": "READY FOR FINAL REVIEW"
+}
