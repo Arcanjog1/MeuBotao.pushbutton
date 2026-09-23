@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-18",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/butanta-modulation-physical-fixes",
   "head": "e5343f123505ad8a25be4e7189c1d4daf7963f10",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
@@ -179,7 +179,8 @@
     {
       "path": "docs/checkpoints/evidence/2026-09-22-revit-smoke-s77.json"
     }
-  ]
+  ],
+  "scope_nota": "registro do PR #42; no candidato de integracao o checkpoint corrente e' o da integracao"
 }
 ```
 

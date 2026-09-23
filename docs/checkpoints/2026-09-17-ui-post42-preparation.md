@@ -3,7 +3,7 @@
 ```json
 {
   "date": "2026-09-17",
-  "scope": "current",
+  "scope": "historical",
   "branch": "codex/modulation-ui-premium-redesign",
   "head": "9ed2234524da41fc2cc00d01aeee1b72d175f771",
   "base": "55e990d962ed22ae1021f0d335db197607bddda1",
@@ -87,7 +87,8 @@
     {
       "path": "docs/checkpoints/evidence/2026-09-17-post42-ui-final-scope.json"
     }
-  ]
+  ],
+  "scope_nota": "registro do PR #46; no candidato de integracao o checkpoint corrente e' o da integracao"
 }
 ```
 

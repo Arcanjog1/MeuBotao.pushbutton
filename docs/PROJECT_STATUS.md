@@ -80,17 +80,17 @@ Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integr
     },
     {
       "branch": "codex/modulacao-automatica-ui-redesign",
-      "head": "78a79fc1a2b6b0ae2a4a5f1f60b2f0dbb4a64c07",
+      "head": "78a79fc1cbd47873b8e24ab1c6a8ee456f10623d",
       "pr": 44
     },
     {
       "branch": "codex/modulation-ui-premium-redesign",
-      "head": "ae4586e0d7a0d0c5b2f7e3a1d9a2c4b6e8f0a1c3",
+      "head": "ae4586e0869442a36d5dbca18cb5d7abbf37b3fb",
       "pr": 46
     },
     {
       "branch": "integration/pr42-ui46-final",
-      "head": "<INTEGRATION_HEAD>",
+      "head": "48d3914aa647d22e0cec53de914a4e3f70eb7092",
       "nota": "candidato de integracao: #42 (motor) + #46 (UI premium); sem merge"
     }
   ]
