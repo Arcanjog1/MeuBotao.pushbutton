@@ -1,10 +1,10 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integração `integration/pr42-ui46-final` = motor do #42 + UI premium do #46). SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integração `integration/pr42-ui46-final` = motor do #42 + UI premium do #46 + OPÇÃO A da regra 48, PR #49). SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-23T00:40:00+00:00",
+  "observed_utc": "2026-09-23T16:55:21+00:00",
   "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
@@ -90,8 +90,9 @@ Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integr
     },
     {
       "branch": "integration/pr42-ui46-final",
-      "head": "48d3914aa647d22e0cec53de914a4e3f70eb7092",
-      "nota": "candidato de integracao: #42 (motor) + #46 (UI premium); sem merge"
+      "head": "0641b5bc46f3f66928bcec238ef2e45aa930bad4",
+      "pr": 49,
+      "nota": "candidato de integracao: #42 (motor) + #46 (UI premium) + OPCAO A da regra 48; sem merge"
     }
   ]
 }
@@ -102,7 +103,7 @@ Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integr
 | MAIN / HEAD observado | `55e990d962ed22ae1021f0d335db197607bddda1` (merge documental do **#41**; #40 CHANNEL em `61d4f6c`); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
 | Documentação oficial pós-CHANNEL | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD final `1aff5e0`, integrado em `55e990d` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only** — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
-| **Candidato de integração (esta sessão)** | Branch `integration/pr42-ui46-final` (base `55e990d`): **motor final do #42 + UI premium do #46** como entrega única. Merge sem perder lado nenhum — a física do #42 é autoridade e a UI do #46 é a referência visual; único conflito textual foi este painel. **DRAFT, sem merge** — [checkpoint](checkpoints/2026-09-23-integracao-42-46.md) |
+| **Candidato de integração (esta sessão)** | Branch `integration/pr42-ui46-final` (base `55e990d`): **motor final do #42 + UI premium do #46** como entrega única. Merge sem perder lado nenhum — a física do #42 é autoridade e a UI do #46 é a referência visual; único conflito textual foi este painel. **OPÇÃO A (usuário, 2026-09-23):** regra 48 sem exceção — peça que invade abertura não é criada (amarração inclusive); amarração rejeitada fica **NÃO resolvida** com revisão humana; só erro fatal bloqueia a RUN. Solver do #42 intacto. PR [#49](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/49) — [checkpoint](checkpoints/2026-09-23-integracao-42-46.md) |
 | Solver #42 (incorporado) | `claude/butanta-modulation-physical-fixes` HEAD `93f3885`, [PR #42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) draft: regras 52, 30.9, 53, 54, 55, 60–65 (arranjo das corridas), 66 (microajuste), 68, 71, 72, 74, **75/76/76.1** (canaleta e compensador nunca amarram; nó sem amarração válida fica NÃO RESOLVIDO) e **77** (papel funcional do encontro por fiada). Smoke real no Revit concluído (3 runs, 8.693 peças, readback 0, portões duros 0, `MISSING_REQUIRED_JUNCTION_BOND` 3, `NO_FUNCTIONAL_JUNCTION` 7) — [checkpoint §7.18](checkpoints/2026-09-17-butanta-convergencia-humano.md). READY FOR MERGE AUTHORIZATION |
 | UI candidata (anterior) | `codex/modulacao-automatica-ui-redesign`, HEAD avaliado `78a79fc`, [PR #44 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44): tema grafite, preview contextual, configuração agrupada. **Superada pelo #46** nesta integração; sem merge. [Entrega](checkpoints/2026-09-16-dark-ui-redesign.md) |
 | UI premium (incorporada) | `codex/modulation-ui-premium-redesign`, HEAD `ae4586e0`, [PR #46 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46): chrome premium, componentes reutilizáveis, estados de microajuste (planned/applying/confirmed/not_required/failed/cancelled), `run_id`/`revision` contra evento velho, matriz de escala. Incorporada ao candidato de integração; host/solver/regras intocados pelo #46. [Entrega](checkpoints/2026-09-17-ui-post42-preparation.md) |
