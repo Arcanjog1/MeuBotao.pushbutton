@@ -89,12 +89,93 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
         return False, "Analise a modulação antes de criar os blocos."
     if result.get("error"):
         return False, friendly_error(result["error"])
-    preflight = result.get("beta_preflight")
-    if preflight is not None and not preflight.get("ok"):
+    preflight = result.get("beta_preflight") or {}
+    # FATAL (plano inconsistente) impede a RUN inteira.
+    if preflight.get("errors"):
+        return False, "Criação bloqueada: o plano tem erro fatal. Corrija e analise novamente."
+    impossiveis = localized_blockers(result)
+    puladas, violando = materialization_split(result)
+    explicado = bool(impossiveis) or bool(puladas) or bool(violando)
+    # FALHA FECHADA: laudo reprovado SEM dizer QUAIS peças estão envolvidas não
+    # prova que o problema é localizado — a apresentação não pode liberar um
+    # portão físico que ela não consegue explicar.
+    if preflight and not preflight.get("ok", True) and not explicado:
         return False, "Criação bloqueada pela validação. Revise os problemas críticos."
     if not result.get("candidates"):
         return False, "Nenhum bloco planejado. Revise as paredes e analise novamente."
+    if explicado:
+        partes = []
+        if puladas:
+            partes.append("{} peça(s) não materializável(is) serão puladas e registradas".format(puladas))
+        if violando:
+            partes.append("{} amarração(ões) serão criadas com violação registrada "
+                          "para revisão humana".format(violando))
+        if not partes:
+            partes.append("{} ocorrência(s) localizada(s) registradas".format(impossiveis))
+        return True, "Confira as quantidades e clique em Criar blocos no Revit. " + "; ".join(partes) + "."
     return True, "Confira as quantidades e clique em Criar blocos no Revit."
+
+
+def localized_blockers(result):
+    """Ocorrências localizadas do preflight (invasão de vão ou colisão).
+
+    Não bloqueiam a RUN: cada uma é tratada individualmente — peça comum é
+    pulada, peça de amarração é criada e mandada para revisão humana."""
+    preflight = (result or {}).get("beta_preflight") or {}
+    return len(preflight.get("opening_violations") or []) + len(preflight.get("collisions") or [])
+
+
+def materialization_split(result):
+    """(a pular, materializadas com violação) segundo o contrato do motor.
+
+    Sem o contrato (resultado antigo), devolve (None, None) — desconhecido nunca
+    vira zero."""
+    plano = (result or {}).get("materialization")
+    if not isinstance(plano, dict):
+        return None, None
+    return len(plano.get("impossible") or []), len(plano.get("violating") or [])
+
+
+def materialization_rows(result, creation=None):
+    """Cada ocorrência com identificação completa, para a tela de revisão."""
+    plano = (result or {}).get("materialization") or {}
+    linhas = []
+    for rec in list(plano.get("impossible") or []) + list(plano.get("violating") or []):
+        linhas.append(u"Parede {} · fiada {} · {} · {} — {} [{}]".format(
+            rec.get("wall_idx"), rec.get("course_index"), rec.get("logical_code") or "?",
+            rec.get("rule_id"), rec.get("message"),
+            "materializável" if rec.get("materializable") else "não materializável"))
+    return linhas
+
+
+def fatal_errors(result):
+    """Erros que invalidam o plano inteiro (fiadas incompletas, geometria não
+    finita, altura de fiada indisponível)."""
+    return list(((result or {}).get("beta_preflight") or {}).get("errors") or [])
+
+
+def materialization_counts(result, creation=None):
+    """Contabilidade explícita: planejadas = criadas + puladas + falhas."""
+    planejadas = (creation or {}).get("planned_total")
+    if planejadas is None:
+        contagem = planned_counts(result)
+        planejadas = sum(contagem.values()) if contagem else None
+    criadas = (creation or {}).get("created_count")
+    puladas = (creation or {}).get("skipped_count")
+    falhas = len((creation or {}).get("failures") or []) if creation else None
+    return {"planejadas": planejadas, "criadas": criadas, "puladas": puladas, "falhas": falhas,
+            "fecha": (None if None in (planejadas, criadas, puladas, falhas)
+                      else planejadas == criadas + puladas + falhas)}
+
+
+def skipped_rows(creation):
+    """Cada peça pulada com motivo rastreável (parede, fiada, regra)."""
+    linhas = []
+    for row in (creation or {}).get("skipped") or []:
+        linhas.append(u"Parede {} · fiada {} · {} — {} ({})".format(
+            row.get("wall_idx"), row.get("course_index"), row.get("logical_code") or "?",
+            row.get("message") or "não materializável", row.get("rule_id") or "UNBUILDABLE"))
+    return linhas
 
 
 def wall_label(row):
@@ -188,6 +269,26 @@ class ModulationUiState(object):
         if sem_encontro:
             lines.append("  (Técnico: {} fiada(s) sem encontro funcional por projeto — "
                          "aberturas consomem a parede principal; não é erro.)".format(sem_encontro))
+        contas = materialization_counts(result, creation)
+        if creation is not None:
+            lines.extend(["", "MATERIALIZAÇÃO",
+                          "  Planejados: {}".format(contas["planejadas"]),
+                          "  Criados: {}".format(contas["criadas"]),
+                          "  Ignorados: {}".format(contas["puladas"]),
+                          "  Falhas de criação: {}".format(contas["falhas"]),
+                          "  Contabilidade fecha: {}".format(
+                              "sim" if contas["fecha"] else "NÃO — investigar")])
+            lines.extend("  " + linha for linha in skipped_rows(creation)[:40])
+        elif localized_blockers(result):
+            puladas, violando = materialization_split(result)
+            lines.extend(["", "MATERIALIZAÇÃO",
+                          "  A pular (não materializáveis): {}".format(
+                              puladas if puladas is not None else "—"),
+                          "  Amarrações criadas com violação (revisão humana): {}".format(
+                              violando if violando is not None else "—")])
+            lines.extend("  " + linha for linha in materialization_rows(result)[:40])
+        for erro in fatal_errors(result):
+            lines.append("  FATAL: {}".format(erro))
         lines.extend(["", "AVISOS / REVISÃO",
                       "Colisões relatadas: {}".format(len(result.get("collisions") or [])),
                       "Violações de aberturas relatadas: {}".format(len(result.get("door_void_violations") or [])),

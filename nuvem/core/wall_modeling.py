@@ -4093,6 +4093,40 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
     return {"gates": gates, "quality": quality}
 
 
+# ==========================================
+# ETAPA 3B (secao 66) NO FLUXO DO BOTAO - estado EXPLICITO
+#
+# Medido no codigo (2026-09-23): `plan_opening_micro_adjustments` e
+# `shift_opening_in_plan` NUNCA tiveram chamador dentro do repositorio - quem
+# sempre executou a Etapa 3B foi o harness do Revit, fora do produto. Nao e'
+# regressao: e' etapa nao integrada.
+#
+# O que falta para integrar (nenhuma dessas pecas existe hoje):
+#   1. um MOVEDOR transacional da abertura no modelo real (ElementTransformUtils
+#      .MoveElement + Regenerate + IsValidObject por elemento, na disciplina de
+#      `apply_axis_opening_fix`) - mover abertura ALTERA o projeto do usuario e
+#      exige autorizacao explicita, nao pode ser efeito colateral de "Analisar";
+#   2. a guarda de interferencia real (`offset_allowed`), que so' o chamador com
+#      acesso ao Revit consegue responder;
+#   3. persistencia do deslocamento acumulado por abertura (`moved_so_far_cm`),
+#      senao o teto de 10 cm vira 10 cm POR EXECUCAO.
+#
+# Enquanto isso, o estado e' explicito, deterministico e testavel: a UI diz
+# "nao avaliado nesta execucao" e NUNCA inventa "nao necessario" nem "ajustada".
+MICRO_ADJUST_IN_BUTTON_FLOW = False
+MICRO_ADJUST_OUT_OF_FLOW_REASON = (
+    "Etapa 3B (secao 66) fora do fluxo do botao: falta o movedor transacional da "
+    "abertura, a guarda de interferencia no modelo e a persistencia do deslocamento "
+    "acumulado. Rodar so' pelo harness, com autorizacao explicita.")
+
+
+def micro_adjust_flow_state():
+    """(status, motivo) da Etapa 3B para a apresentacao. Deterministico."""
+    if MICRO_ADJUST_IN_BUTTON_FLOW:
+        return "pending", None
+    return "not_evaluated", MICRO_ADJUST_OUT_OF_FLOW_REASON
+
+
 def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
                                    base_z_abs, num_courses, result, moved_so_far_cm=None,
                                    max_openings=None, offset_allowed=None, **solve_kwargs):
@@ -4936,6 +4970,98 @@ def _record_incomplete_wall_creation(solve_result, create_result, walls_to_creat
     create_result["retained_walls"] = [retained[wi] for wi in sorted(retained)]
     create_result["skipped_wall_idxs"] = sorted(retained)
     create_result["skipped_wall_count"] = len(retained)
+
+
+# ==========================================
+# ETAPA 5 - MATERIALIZACAO SELETIVA (2026-09-23)
+#
+# `controlled_beta_preflight` abaixo e' um laudo de LOTE ("Reject the batch,
+# never remove individual ties"). Para o diagnostico fisico no Revit isso e'
+# grosseiro demais: uma peca que invade um vao, ou um par que colide, zerava a
+# criacao das outras milhares de pecas VALIDAS do mesmo plano - o usuario nao
+# conseguia nem olhar a modulacao possivel.
+#
+# A classificacao abaixo NAO decide fisica nenhuma e NAO recalcula nada: ela so'
+# le' o laudo que o preflight ja' produziu, peca a peca, e separa
+#   - FATAL (preflight["errors"]): o plano inteiro e' invalido (fiadas
+#     incompletas, geometria nao finita, altura de fiada indisponivel) - isso
+#     continua bloqueando a RUN inteira, como sempre;
+#   - IMPOSSIVEL POR PECA (opening_violations / collisions): a peca nao pode
+#     existir no modelo; so' ELA e' pulada, com motivo rastreavel;
+#   - o resto: criado normalmente (avisos e violacoes de regra continuam
+#     relatados pela auditoria, sem impedir a materializacao).
+#
+# GUARDA: peca de amarracao NUNCA entra como "pular". Um no' que nao amarra ja'
+# e' `missing_required_junction_bond` (regra 76.1, revisao humana) - pular a
+# amarracao silenciosamente inverteria essa regra.
+UNBUILDABLE_RULES = {
+    "opening_violations": ("OPENING_INVASION", "a peca invade o vao de uma abertura"),
+    "collisions": ("PIECE_COLLISION", "a peca colide com outra peca do mesmo lote"),
+}
+
+
+def materialization_plan(result, preflight=None):
+    """Classifica CADA ocorrencia do preflight, sem recalcular fisica nenhuma.
+
+    {"impossible": [...], "violating": [...], "fatal": [...]}
+      impossible -> peca comum provada impossivel: so' ela deixa de ser criada;
+      violating  -> peca de AMARRACAO que viola: e' criada (senao o no' perderia
+                    a amarracao) e vai para a revisao humana;
+      fatal      -> plano inconsistente: bloqueia a RUN inteira."""
+    from core.engine import opening_reinforcement as _reinforcement
+    from core.engine import wall_stepper as _stepper
+
+    result = result or {}
+    preflight = preflight if preflight is not None else (result.get("beta_preflight") or {})
+    sources = result.get("course_candidates") or {}
+    plano = {"impossible": [], "violating": [], "fatal": list(preflight.get("errors") or [])}
+    for bucket, (rule_id, descricao) in sorted(UNBUILDABLE_RULES.items()):
+        for registro in preflight.get(bucket) or []:
+            ci = registro.get("course_index")
+            idx = registro.get("candidate_index")
+            pecas = sources.get(ci) or []
+            if not isinstance(idx, int) or not (0 <= idx < len(pecas)):
+                continue
+            cand = pecas[idx]
+            amarracao = (_reinforcement._is_tie(cand)
+                         or cand.get("logical_code") in _stepper.JUNCTION_BOND_CODES)
+            rec = {
+                "rule_id": ("TIE_" + rule_id) if amarracao else rule_id,
+                "severity": "RULE_VIOLATION_VISUALIZABLE" if amarracao else "GEOMETRY_IMPOSSIBLE",
+                "materializable": bool(amarracao),
+                "needs_human_review": bool(amarracao),
+                "course_index": ci, "wall_idx": cand.get("wall_idx"),
+                "node_index": cand.get("node_index"),
+                "logical_code": cand.get("logical_code"),
+                "placement_reason": cand.get("placement_reason"),
+                "origin_cm": registro.get("origin_cm"), "z_cm": registro.get("z_cm"),
+                "overlap_cm": registro.get("overlap_cm"),
+                "opening_index": registro.get("opening_index"),
+                "message": (descricao + " - peca de amarracao: e' criada para nao apagar a "
+                            "amarracao do no', e o caso vai para revisao humana")
+                           if amarracao else descricao,
+            }
+            chave = (ci, _reinforcement._physical_key(cand))
+            (plano["violating"] if amarracao else plano["impossible"]).append((ci, chave[1], rec))
+    return plano
+
+
+def unbuildable_pieces(result, preflight=None):
+    """Pecas que NAO serao materializadas (peca comum provada impossivel).
+
+    Devolve [(course_index, chave_fisica, registro)]. Somente leitura: nao toca
+    no plano, no solver nem no documento."""
+    return materialization_plan(result, preflight)["impossible"]
+
+
+def unbuildable_keys(result, preflight=None):
+    """set((course_index, chave_fisica)) - o que `create_building_blocks` pula."""
+    return set((ci, chave) for ci, chave, _rec in unbuildable_pieces(result, preflight))
+
+
+def run_is_fatal(preflight):
+    """So' o laudo FATAL do preflight impede a RUN inteira."""
+    return bool((preflight or {}).get("errors"))
 
 
 def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
@@ -6147,7 +6273,7 @@ def _discover_previous_lot(target_doc, owner_wall_uids):
 
 def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected_level, num_courses,
                            course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False,
-                           owner_uid_by_wall_idx=None, lot_tag=None):
+                           owner_uid_by_wall_idx=None, lot_tag=None, skip_keys=None):
     """Ponto de entrada da Etapa 5: cria no Revit, dentro de um unico
     TransactionGroup, as FamilyInstance correspondentes a `candidates` (ver
     solve_building_blocks), repetidas em `num_courses` FIADAS FISICAS
@@ -6252,6 +6378,29 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
             course_letter = "A" if course_index % 2 == 0 else "B"
             course_sources.append([c for c in candidates if c["course"] == course_letter])
     perf["planned_total"] = sum(len(source) for source in course_sources)
+
+    # MATERIALIZACAO SELETIVA (ver unbuildable_pieces): as pecas que o preflight
+    # provou impossiveis saem daqui com motivo, e SO' elas. `planned_total`
+    # continua sendo o plano inteiro - e' o que faz a conta fechar depois
+    # (planejadas = criadas + puladas + falhas).
+    skipped_records = []
+    if skip_keys:
+        from core.engine import opening_reinforcement as _reinforcement_skip
+        filtradas = []
+        for course_index, source in enumerate(course_sources):
+            mantidas = []
+            for cand in source:
+                chave = (course_index, _reinforcement_skip._physical_key(cand))
+                registro = skip_keys.get(chave) if isinstance(skip_keys, dict) else None
+                if chave in skip_keys:
+                    skipped_records.append(registro or {
+                        "course_index": course_index, "wall_idx": cand.get("wall_idx"),
+                        "logical_code": cand.get("logical_code"), "materializable": False,
+                        "rule_id": "UNBUILDABLE", "severity": "GEOMETRY_IMPOSSIBLE"})
+                    continue
+                mantidas.append(cand)
+            filtradas.append(mantidas)
+        course_sources = filtradas
 
     if stage_cb is not None:
         try:
@@ -6522,6 +6671,9 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         "created_count": created_count, "failures": failures,
         "course_height_ft": course_height_ft, "course_height_error": None,
         "created_instances": created_instances, "perf": perf,
+        # contabilidade explicita: planejadas = criadas + puladas + falhas
+        "planned_total": perf["planned_total"], "skipped_count": len(skipped_records),
+        "skipped": skipped_records,
     }
 
 
@@ -9871,6 +10023,9 @@ def _ui_execution_snapshot(run_id, revision, handler, solve_result=None, create_
         audits = list(audits.values())
     avisos = sum(1 for a in audits if isinstance(a, dict) and not a.get("ok", True))
     avisos += len(result.get("unmodulated_walls") or [])
+    status_3b, motivo_3b = micro_adjust_flow_state()
+    if adjustment_status == "not_evaluated":
+        adjustment_status = status_3b
     snapshot = {
         "run_id": run_id,
         "revision": revision,
@@ -9890,6 +10045,8 @@ def _ui_execution_snapshot(run_id, revision, handler, solve_result=None, create_
     if sem_encontro:
         partes.append("{} fiada(s) sem encontro funcional por projeto (secao 77) - nao sao erro.".format(
             sem_encontro))
+    if motivo_3b and adjustment_status == "not_evaluated":
+        partes.append(motivo_3b)
     if detail:
         partes.append(detail)
     if partes:
@@ -10981,6 +11138,37 @@ def _setup_defaults_path():
     return os.path.join(tempfile.gettempdir(), "modulacao_automatica_setup.json")
 
 
+def _existing_flow_defaults_path():
+    return os.path.join(tempfile.gettempdir(), "modulacao_automatica_paredes_existentes.json")
+
+
+def _recall_existing_flow_defaults():
+    """Escolhas da ultima execucao do fluxo de PAREDES EXISTENTES.
+
+    Arquivo proprio de proposito: este fluxo NAO herda os defaults do fluxo CAD
+    (layer/espessura/altura nao se aplicam aqui - nivel e altura vem das
+    proprias paredes). NUNCA lanca."""
+    try:
+        import json
+        with open(_existing_flow_defaults_path(), "r") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _remember_existing_flow_defaults(setup):
+    """Guarda a escolha desta execucao do fluxo de paredes existentes."""
+    try:
+        import json
+        with open(_existing_flow_defaults_path(), "w") as handle:
+            json.dump({"opening_reinforcement": (setup or {}).get("opening_reinforcement"),
+                       "level": (setup or {}).get("level"),
+                       "height_m": (setup or {}).get("height_m")}, handle)
+    except Exception:
+        pass
+
+
 def _recall_setup_defaults():
     """Le as escolhas da ultima execucao (Layer, espessuras, Nivel, altura,
     modo das aberturas, modo de geracao das paredes) para ja' vir
@@ -11418,11 +11606,22 @@ def _format_block_solve_report(result, catalog):
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
     beta = result.get("beta_preflight")
     if beta is not None:
+        impossiveis = unbuildable_pieces(result, beta)
+        if run_is_fatal(beta):
+            situacao = "RUN BLOQUEADA - erro fatal do plano"
+        elif impossiveis:
+            situacao = "materializacao seletiva - {} peca(s) impossivel(is) serao puladas".format(
+                len(impossiveis))
+        else:
+            situacao = "lote liberado pelo preflight"
         lines.append("BETA CONTROLADO: {}. {} invasoes de abertura, {} colisoes fisicas.".format(
-            "lote liberado pelo preflight" if beta["ok"] else "LOTE BLOQUEADO - nenhuma criacao permitida",
-            len(beta["opening_violations"]), len(beta["collisions"])))
-        for issue in beta["errors"] + beta["opening_violations"] + beta["collisions"]:
-            lines.append("  BETA: {}".format(issue))
+            situacao, len(beta["opening_violations"]), len(beta["collisions"])))
+        # VALIDATION (log estruturado, uma linha por ocorrencia impossivel)
+        for _ci, _chave, rec in impossiveis:
+            lines.append("  VALIDATION wall_id={wall_idx} course={course_index} rule_id={rule_id} "
+                         "severity={severity} code={logical_code} materializable=false: {message}".format(**rec))
+        for issue in beta["errors"]:
+            lines.append("  FATAL: {}".format(issue))
     retained = result.get("unmodulated_walls") or []
     lines.append("Paredes vazias ou parcialmente nao modulaveis, retidas para revisao manual: {}".format(len(retained)))
     for wall in retained:
@@ -11735,6 +11934,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.action = None
         self.on_done = None
         self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
+        self._unbuildable = []      # pecas provadas impossiveis (ver unbuildable_pieces)
         # dados fixos desta execucao
         self.walls_to_create = []
         self.openings_per_wall = []
@@ -12344,6 +12544,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
             self.solve_result["beta_preflight"] = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             self.solve_result["beta_input_signature"] = self._beta_input_signature()
+            # contrato da materializacao para a apresentacao (nao recalcula fisica)
+            plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
+            self.solve_result["materialization"] = {
+                "impossible": [rec for _ci, _k, rec in plano_material["impossible"]],
+                "violating": [rec for _ci, _k, rec in plano_material["violating"]],
+                "fatal": plano_material["fatal"],
+            }
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
@@ -12403,11 +12610,20 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             if self.solve_result is not None:
                 self.solve_result["beta_preflight"] = preflight
-            if not preflight["ok"]:
-                raise ValueError("BETA BLOQUEADO: {} invasoes de abertura, {} colisoes; {}. "
-                                 "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
-                                     len(preflight["opening_violations"]), len(preflight["collisions"]),
-                                     "; ".join(preflight["errors"])))
+            # FATAL (plano inconsistente) continua matando a RUN inteira. Violacao
+            # LOCALIZADA (invasao de vao / colisao) NAO mata mais as milhares de
+            # pecas validas: as pecas provadas impossiveis sao puladas uma a uma,
+            # com motivo rastreavel (ver unbuildable_pieces).
+            if run_is_fatal(preflight):
+                raise ValueError("BETA BLOQUEADO (erro fatal do plano): {}. "
+                                 "Nenhum bloco criado ou lote anterior removido.".format(
+                                     "; ".join(str(e) for e in preflight["errors"])))
+            self._unbuildable = unbuildable_pieces(self.solve_result, preflight)
+            if self._unbuildable:
+                _perf.mark("create.materializacao seletiva",
+                           puladas=len(self._unbuildable),
+                           invasoes=len(preflight.get("opening_violations") or []),
+                           colisoes=len(preflight.get("collisions") or []))
             self._require_current_beta_solve()
             _perf.mark("create.preflight END", ok=preflight["ok"])
             # One outer group restores even the committed cleanup transaction.
@@ -12420,16 +12636,22 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 with _perf.span("create.batch (beta)"):
                     self._execute_create_batch(app_doc)
                 result = self.create_result or {}
+                _pulados = set((ci, chave) for ci, chave, _r in (self._unbuildable or ()))
+                from core.engine import opening_reinforcement as _reinforcement_expected
                 expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
-                            for c in source]
+                            for c in source
+                            if (ci, _reinforcement_expected._physical_key(c)) not in _pulados]
                 instances = result.get("created_instances") or []
                 actual = [(item.get("course_index"), item.get("candidate_key")) for item in instances]
                 if (result.get("failures") or sorted(actual) != sorted(expected)
                         or result.get("created_count") != len(expected)
                         or len(set(item["id"] for item in instances)) != len(expected)
                         or any(app_doc.GetElement(item["id"]) is None for item in instances)):
-                    raise RuntimeError("BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas. {}".format(
-                        "; ".join(str(f) for f in result.get("failures", []))))
+                    raise RuntimeError(
+                        "BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas "
+                        "(planejadas {}, criadas {}, puladas {}). {}".format(
+                            result.get("planned_total"), result.get("created_count"),
+                            result.get("skipped_count"), "; ".join(str(f) for f in result.get("failures", []))))
                 with _perf.span("create.TransactionGroup.Assimilate"):
                     _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
             except Exception as _grupo_ex:
@@ -12628,6 +12850,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
             t_create_start = _perf_clock()
             create_options = {"strict_transactions": True} if self.controlled_beta else {}
+            # materializacao seletiva: so' as pecas provadas impossiveis
+            _pular = getattr(self, "_unbuildable", None)
+            if _pular:
+                create_options["skip_keys"] = dict(((ci, chave), rec) for ci, chave, rec in _pular)
             if owner_uid_by_wall_idx:
                 create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
                 create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
@@ -14014,7 +14240,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
                                wall_segment_geometry=None, initial_solve_result=None,
                                initial_create_result=None, precreated_event=None,
                                precreated_handler=None, created_cuts_by_axis=None,
-                               opening_reinforcement_strategy=None):
+                               opening_reinforcement_strategy=None, setup=None):
     """Cria o ExternalEvent + handler (_PostCreationEventHandler) e mostra a
     janela unica de modulacao (_PostCreationForm) - guarda a referencia em
     _ACTIVE_MODELESS_WINDOWS pelo mesmo motivo/cuidado documentado no topo
@@ -14088,6 +14314,10 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     # o combo). Sem escolha explicita (fluxo de paredes existentes, tela
     # antiga) = None = legado.
     handler.opening_reinforcement_strategy = opening_reinforcement_strategy
+    # FONTE DE VERDADE da Etapa 1 desta execucao (ver _run_config). A UI le'
+    # daqui para re-renderizar a configuracao; nao existe default nenhum no
+    # caminho de volta.
+    handler.setup = dict(setup or {})
     handler.error_rows = wall_error_rows
     handler.solve_result = initial_solve_result
     handler.create_result = initial_create_result
@@ -15107,10 +15337,23 @@ def run_modulation_on_existing_walls(preselected=None):
 
     reinforcement_choice = _ui.existing_setup(
         len(walls_to_create), selected_level.Name,
-        wall_height_ft / FEET_PER_METER, len(all_openings))
+        wall_height_ft / FEET_PER_METER, len(all_openings), _recall_existing_flow_defaults())
     if reinforcement_choice is None:
         return
     execution_strategy = _opening_reinforcement_strategy_from_ui_value(reinforcement_choice)
+    # Configuracao desta execucao: no fluxo de paredes existentes nivel e altura
+    # vem das proprias paredes, e a escolha do usuario e' a estrategia. Fica
+    # guardada (para a UI re-renderizar) e lembrada (para a proxima execucao).
+    run_setup = {
+        "origem": "paredes existentes",
+        "level": selected_level.Name,
+        "height_m": wall_height_ft / FEET_PER_METER,
+        "walls": len(walls_to_create),
+        "openings_mode": "auto",
+        "opening_reinforcement": reinforcement_choice,
+        "thicknesses_cm": sorted(set(round(_ft_to_cm(w[1]), 1) for w in walls_to_create)),
+    }
+    _remember_existing_flow_defaults(run_setup)
 
     opening_diagnostics = {
         "clamped_opening_count": 0, "opening_center_gap_max_ft": 0.0,
@@ -15288,7 +15531,7 @@ def run_modulation_on_existing_walls(preselected=None):
                 catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
                 initial_solve_result=cached_solve_result, initial_create_result=cached_create_result,
                 precreated_event=stage2_external_event, precreated_handler=stage2_handler,
-                opening_reinforcement_strategy=execution_strategy
+                opening_reinforcement_strategy=execution_strategy, setup=run_setup
             )
         except Exception as ex:
             # NUNCA mostrar um resumo de "tudo certo" (paredes selecionadas/

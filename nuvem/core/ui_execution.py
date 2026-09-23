@@ -56,9 +56,12 @@ class ExecutionPresentation(object):
     def summary(self):
         # Even a reported moved count cannot certify an uncommitted transaction.
         moved = self.metric("openings_moved") if self.data.get("adjustment_status") == "confirmed" else "—"
-        return "Paredes analisadas: {} · Aberturas movidas: {}\nAvisos: {} · Bloqueios críticos: {}\n{}\n{}".format(
+        # "Bloqueios críticos" era enganoso: essas ocorrências NÃO bloqueiam a
+        # criação. O que bloqueia a RUN inteira é erro fatal do plano — e só ele.
+        return ("Paredes analisadas: {} · Aberturas movidas: {}\n"
+                "Avisos: {} · Violações físicas registradas: {} · Bloqueios da RUN: {}\n{}\n{}").format(
             self.metric("walls_analyzed"), moved, self.metric("warnings"), self.metric("hard_gates"),
-            self.review_text(), self.adjustment_text())
+            self.metric("fatal_errors"), self.review_text(), self.adjustment_text())
 
     def details(self):
         return self.summary() + "\n\n" + str(self.data.get("detail") or "Aguardando dados confirmados desta execução.")

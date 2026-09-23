@@ -6,10 +6,40 @@ layer. It does not introduce another event loop, thread or framework.
 """
 from .ui_state import STEPS, TYPE, TOKENS, ModulationUiState, family_rows, wall_label
 from .ui_execution import ExecutionPresentation
-from .ui_state import review_summary as _ui_review_summary
+from .ui_state import (review_summary as _ui_review_summary,
+                       materialization_counts as _ui_material_counts,
+                       localized_blockers as _ui_localized_blockers)
 from .ui_preview_panel import attach_preview
 from .ui_native_style import style_input, style_grid, style_disabled_button
 from .ui_chrome import underline, separator, choice, stepper, dropdown
+
+
+def _ui_setup_text(setup):
+    """Resumo da Etapa 1 lido do ESTADO da execução. Sem estado, diz isso —
+    nunca inventa valor nem mostra default."""
+    if not setup:
+        return "Configuração desta execução: não informada pelo fluxo."
+    partes = []
+    if setup.get("level"):
+        partes.append("Nível: {}".format(setup["level"]))
+    if setup.get("height_m"):
+        partes.append("Altura: {:.2f} m".format(setup["height_m"]))
+    if setup.get("thicknesses_cm"):
+        partes.append("Espessuras: {} cm".format(", ".join(str(t) for t in setup["thicknesses_cm"])))
+    if setup.get("layer"):
+        partes.append("Layer: {}".format(setup["layer"]))
+    if setup.get("reference_layer"):
+        partes.append("Layer de referência: {}".format(setup["reference_layer"]))
+    if setup.get("openings_mode"):
+        partes.append("Aberturas: {}".format(
+            "detectadas automaticamente" if setup["openings_mode"] == "auto" else setup["openings_mode"]))
+    if setup.get("opening_reinforcement"):
+        partes.append("Reforço: {}".format(setup["opening_reinforcement"]))
+    if setup.get("wall_mode"):
+        partes.append("Paredes: {}".format(setup["wall_mode"]))
+    if setup.get("origem"):
+        partes.append("Origem: {}".format(setup["origem"]))
+    return "Configuração desta execução — " + " · ".join(partes)
 
 
 class TabDeck(object):
@@ -509,6 +539,13 @@ class UiComponents(object):
         form._ui_pages = pages
         form._ui_analysis_skipped = bool(report.get("wall_analysis_skipped"))
         # Optional host adapter; never interpret solver plans as Revit movement.
+        # CONFIGURAÇÃO DESTA EXECUÇÃO: o `Controls.Clear()` acima apaga o
+        # subtítulo e os cartões do host, que eram o único lugar onde a Etapa 1
+        # aparecia depois. Re-renderizamos a partir do ESTADO (handler.setup),
+        # nunca de defaults, dentro da própria página — empilhar mais um
+        # Dock.Top no form sobrepõe as seções recolhíveis.
+        form._ui_config = self.label(_ui_setup_text(getattr(form._handler, "setup", None)), 64)
+        form._ui_config.AccessibleName = "Configuração desta execução"
         snapshot = report.get("ui_execution") or {}
         form._ui_execution = ExecutionPresentation(snapshot.get("run_id"))
         form._ui_execution.update(snapshot)
@@ -516,8 +553,9 @@ class UiComponents(object):
         form._ui_adjustments.AccessibleName = "Análise e microajuste: dados confirmados da execução"
         # Existing error grid, zoom, fix, pause and cancel callbacks preserved.
         errors_panel.Dock = self.ns["DockStyle"].Fill
-        pages[0].Controls.Add(errors_panel)
+        pages[0].Controls.Add(errors_panel)          # Dock.Fill primeiro (convenção WinForms)
         pages[0].Controls.Add(form._ui_adjustments)
+        pages[0].Controls.Add(form._ui_config)
         form._errors_status.Height = 40
         style_grid(form._errors_grid)
         family_box = self.ns["_monospace_textbox"]("")
@@ -703,7 +741,7 @@ class UiComponents(object):
                 "○ Canaletas\n   ainda não verificadas" if channel_pending else
                 "✓ {} família(s) disponível(is)".format(len(catalog)) if catalog else "○ Famílias\n   ainda não verificadas")
 
-    def existing_setup(self, wall_count, level_name, height_m, opening_count):
+    def existing_setup(self, wall_count, level_name, height_m, opening_count, defaults=None):
         form = self.new("Form")
         form.Text = "Modulação Automática — paredes existentes"
         self.configure(form, 860, 580)
@@ -715,7 +753,9 @@ class UiComponents(object):
         combo.Dock = self.ns["DockStyle"].Top
         combo.Items.Add("Sem reforço")
         combo.Items.Add("Canaletas (CHANNEL)")
-        combo.SelectedIndex = 0
+        # Nunca nasce de default fixo quando existe escolha anterior desta máquina.
+        lembrado = (defaults or {}).get("opening_reinforcement")
+        combo.SelectedIndex = 1 if lembrado in ("CHANNEL", "Canaletas (CHANNEL)") else 0
         style_input(combo)
         body.Controls.Add(self.label("As famílias de canaleta serão conferidas antes do cálculo. Verga / contraverga: em desenvolvimento.", 70))
         body.Controls.Add(combo)
@@ -758,6 +798,10 @@ class UiComponents(object):
 
     def busy(self, form, step):
         if step == 3:
+            # Reanalisar é invalidação LEGÍTIMA (a configuração mudou ou o
+            # usuário pediu): os números da execução anterior não podem seguir
+            # na tela como se fossem os atuais. A CONFIGURAÇÃO não se perde —
+            # ela vive em `handler.setup` e é re-renderizada em `_ui_config`.
             form._ui_execution = ExecutionPresentation()
             form._ui_adjustments.Text = form._ui_execution.summary()
             form._ui_execution_result.Text = form._ui_execution.summary()
@@ -884,8 +928,10 @@ class UiComponents(object):
                                                   else "! Concluída com pendências"),
                                       "error": "✕ Criação não concluída"}[state.status]
         form._ui_result_title.ForeColor = self.ns["UI_OK" if state.status == "success" else "UI_WARN" if state.status == "warning" else "UI_ERROR"]
-        form._ui_result_counts.Text = "{} blocos criados · {} paredes · {} aberturas\n{} falha(s) de criação".format(
-            created.get("created_count", 0), len(h.walls_to_create or []), len(h.all_openings or []), len(created.get("failures") or []))
+        contas = _ui_material_counts(h.solve_result, created)
+        form._ui_result_counts.Text = "{} planejados · {} criados · {} ignorados\n{} paredes · {} aberturas · {} falha(s) de criação".format(
+            contas["planejadas"], contas["criadas"], contas["puladas"],
+            len(h.walls_to_create or []), len(h.all_openings or []), len(created.get("failures") or []))
         pending = sum(not row.get("resolved") for row in h.error_rows or [])
         # Mesma informação em TRÊS linhas: o painel de resultado do #46 foi
         # desenhado para essa altura; crescer a pilha sobrepõe as seções
