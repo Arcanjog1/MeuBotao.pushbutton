@@ -116,7 +116,7 @@ def test_blocked_recalculation_cannot_delete_previous_batch_or_references():
     assert handler.create_result is previous
     assert handler.solve_result["beta_preflight"]["errors"]
     assert not handler.solve_result["beta_preflight"]["ok"]
-    with pytest.raises(ValueError, match="BETA BLOQUEADO"):
+    with pytest.raises(ValueError, match="RUN BLOQUEADA"):
         handler._execute_delete(UntouchableDocument())
 
 

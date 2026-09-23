@@ -246,12 +246,12 @@ pode invadir o vão real de uma porta sem peitoril (peitoril ≈ 0,
   gate que colisões) — nunca é ignorada ou aplicada "mesmo assim".
   **CONFLITO REGISTRADO — o que vale hoje (2026-09-23):** o princípio desta
   seção continua absoluto (nenhuma peça no vão real da porta), mas a
-  *consequência* mudou duas vezes: no modo online sem beta, a revisão de
-  2026-08-26 (seção 14) passou a criar a peça e marcá-la em vermelho; no
-  **BETA CONTROLADO** vale a §48 — consequência operacional da OPÇÃO A: a peça
-  que invade o vão **não é criada**, o resto da planta segue, amarração
-  rejeitada fica **NÃO resolvida** com revisão humana, e só erro fatal do
-  plano bloqueia a RUN inteira.
+  *consequência* mudou: a revisão de 2026-08-26 (seção 14) chegou a criar a
+  peça e marcá-la em vermelho no modo online; desde 2026-09-23 vale a §48 nos
+  **dois canais** (beta offline e online) — consequência operacional da
+  OPÇÃO A: a peça que invade o vão **não é criada**, o resto da planta segue,
+  amarração rejeitada fica **NÃO resolvida** com revisão humana, e só erro
+  fatal do plano bloqueia a RUN inteira.
 - Janelas (peitoril > 0 de verdade) **não** entram nesta regra — o vão
   delas só é excluído na faixa vertical real (ver seção 4).
 
@@ -7506,10 +7506,22 @@ Implementacao: `structural_bond_role`, `materialization_plan`,
 `verify_materialization` em `core/wall_modeling.py`; testes em
 `tests/test_materializacao_e_estado_da_run.py` (casos A..H). Nenhuma regra do
 solver mudou: ele continua podendo propor a peca; ela so' nao e'
-materializada. Escopo: esta secao rege o BETA CONTROLADO (pacote offline
-verificado). O modo online sem beta nao roda este preflight e segue a regra
-revista de 2026-08-26 (cria e marca em vermelho) - pendencia registrada, nao
-alterada aqui.
+materializada.
+
+**ESCOPO UNIFICADO (2026-09-23, decisao do usuario):** esta secao e' regra
+ESTRUTURAL do produto e NAO depende do modo de distribuicao. Os dois canais -
+BETA_OFFLINE (pacote verificado por sha256) e ONLINE (baixado do GitHub) -
+passam pelo MESMO gate (`_PostCreationEventHandler._materialization_gate`:
+laudo -> FATAL bloqueia a RUN -> plano peca a peca -> conferencia do que fica),
+pelo mesmo laudo no calculo (`_execute_solve`) e pelo mesmo criterio de
+Finalizar (`finalize_allowed`). Uma fonte de verdade, dois modos de
+carregamento. O que difere entre os canais e' SO' a garantia transacional do
+beta (grupo externo que restaura o lote anterior se qualquer passo falhar).
+A regra revista de 2026-08-26 ("cria e marca em vermelho") deixou de valer
+para invasao de abertura em qualquer canal; continua valendo so' para
+colisao/auditoria de amarracao que o laudo nao classifica como impossivel.
+Testes: `tests/test_materializacao_e_estado_da_run.py` roda os casos A..H
+uma vez por canal (`CANAIS`).
 
 Paredes totalmente vazias, parcialmente nao modulares ou incompletamente
 criadas conservam referencias, coordenadas e motivo para revisao no

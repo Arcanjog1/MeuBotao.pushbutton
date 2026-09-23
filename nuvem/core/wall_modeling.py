@@ -5117,11 +5117,27 @@ def run_is_fatal(preflight):
     return bool((preflight or {}).get("errors"))
 
 
-def beta_finalize_allowed(solve_result):
-    """BETA: o Finalizar (excluir paredes de referencia) esta' liberado?
+def runtime_provenance():
+    """O que o loader registrou sobre a versao que ESTA' rodando (canal, branch,
+    commit, hash do pacote, estado do cache, caminhos). Vazio fora do botao."""
+    return dict(globals().get("RUNTIME_PROVENANCE") or {})
 
-    Violacao LOCALIZADA nao bloqueia mais a planta inteira (OPCAO A): a parede
-    com peca pulada fica RETIDA por `_record_incomplete_wall_creation`
+
+def runtime_provenance_line(prov=None):
+    prov = prov if prov is not None else runtime_provenance()
+    if not prov:
+        return "Versao: nao informada pelo loader (execucao fora do botao)."
+    return "Versao: canal={} branch={} commit={} cache={} pacote={}".format(
+        prov.get("CHANNEL", "?"), prov.get("SOURCE_BRANCH", "-"), prov.get("RESOLVED_COMMIT", "?"),
+        prov.get("CACHE_STATUS", "?"), (prov.get("PACKAGE_SHA") or "?")[:12])
+
+
+def finalize_allowed(solve_result):
+    """O Finalizar (excluir paredes de referencia) esta' liberado? Vale para os
+    DOIS canais (BETA offline e ONLINE) - mesma regra 48.
+
+    Violacao LOCALIZADA nao bloqueia a planta inteira (OPCAO A): a parede com
+    peca pulada fica RETIDA por `_record_incomplete_wall_creation`
     (INCOMPLETE_CREATION, referencia preservada - secao 48). Continua bloqueado
     com erro FATAL ou quando o conjunto criado nao foi conferido limpo."""
     solve_result = solve_result or {}
@@ -5129,6 +5145,9 @@ def beta_finalize_allowed(solve_result):
     if not preflight or preflight.get("errors"):
         return False
     return bool(preflight.get("ok") or solve_result.get("beta_materialization_verified"))
+
+
+beta_finalize_allowed = finalize_allowed      # nome antigo (compatibilidade)
 
 
 def materialized_result(result, skip_keys):
@@ -11720,6 +11739,7 @@ def _format_block_solve_report(result, catalog):
     candidates = result["candidates"]
     lines = []
     lines.append("=== Solver de blocos ===")
+    lines.append(runtime_provenance_line())
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
     beta = result.get("beta_preflight")
     if beta is not None:
@@ -11731,8 +11751,9 @@ def _format_block_solve_report(result, catalog):
                 len(impossiveis))
         else:
             situacao = "lote liberado pelo preflight"
-        lines.append("BETA CONTROLADO: {}. {} invasoes de abertura, {} colisoes fisicas.".format(
-            situacao, len(beta["opening_violations"]), len(beta["collisions"])))
+        lines.append("REGRA 48 (laudo fisico, mesmo nos dois canais): {}. {} invasoes de abertura, "
+                     "{} colisoes fisicas.".format(situacao, len(beta["opening_violations"]),
+                                                   len(beta["collisions"])))
         # VALIDATION (log estruturado, uma linha por ocorrencia impossivel)
         for _ci, _chave, rec in impossiveis:
             lines.append("  VALIDATION wall_id={wall_idx} course={course_index} rule_id={rule_id} "
@@ -12051,6 +12072,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.action = None
         self.on_done = None
         self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
+        self.runtime_provenance = runtime_provenance()   # canal/commit/cache do loader
         self._unbuildable = []      # pecas que NAO serao criadas (ver materialization_plan)
         self._unresolved_bonds = []  # amarracoes rejeitadas: NAO resolvidas (revisao humana)
         # dados fixos desta execucao
@@ -12658,17 +12680,19 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 opening_reinforcement_policy=self.opening_reinforcement_policy,
             )
         self.solve_result["num_courses"] = num_courses
-        if self.controlled_beta:
-            self.solve_result["beta_preflight"] = controlled_beta_preflight(
-                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
-            self.solve_result["beta_input_signature"] = self._beta_input_signature()
-            # contrato da materializacao para a apresentacao (nao recalcula fisica)
-            plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
-            self.solve_result["materialization"] = {
-                "skipped": [rec for _ci, _k, rec in plano_material["skip"]],
-                "unresolved_bonds": plano_material["unresolved_bonds"],
-                "fatal": plano_material["fatal"],
-            }
+        # REGRA 48 nos DOIS canais (BETA offline e ONLINE): o laudo fisico e o
+        # contrato da materializacao sao os mesmos - uma fonte de verdade, dois
+        # modos de carregamento. (Ate' 2026-09-23 so' o beta passava por aqui.)
+        self.solve_result["beta_preflight"] = controlled_beta_preflight(
+            self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+        self.solve_result["beta_input_signature"] = self._beta_input_signature()
+        # contrato da materializacao para a apresentacao (nao recalcula fisica)
+        plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
+        self.solve_result["materialization"] = {
+            "skipped": [rec for _ci, _k, rec in plano_material["skip"]],
+            "unresolved_bonds": plano_material["unresolved_bonds"],
+            "fatal": plano_material["fatal"],
+        }
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
@@ -12716,53 +12740,65 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
     def _require_current_beta_solve(self):
         if (self.solve_result or {}).get("beta_input_signature") != self._beta_input_signature():
-            raise ValueError("BETA BLOQUEADO: geometria/catalogo mudou ou calculo sem assinatura; calcule novamente.")
+            raise ValueError("RUN BLOQUEADA: geometria/catalogo mudou ou calculo sem assinatura; calcule novamente.")
+
+    def _materialization_gate(self):
+        """REGRA 48 - fonte UNICA de verdade, para os DOIS canais (BETA offline
+        e ONLINE). Laudo fisico -> erro FATAL bloqueia a RUN inteira -> plano
+        peca a peca (invasao/colisao NAO e' criada; amarracao pulada = NAO
+        resolvida) -> conferencia do conjunto que fica (sobra e' FATAL).
+        Nenhuma mutacao no documento acontece aqui."""
+        _perf.mark("create.preflight START")
+        if self.solve_result is not None:
+            self.solve_result["beta_materialization_verified"] = False
+        preflight = controlled_beta_preflight(
+            self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
+        if self.solve_result is not None:
+            self.solve_result["beta_preflight"] = preflight
+        # FATAL (plano inconsistente) mata a RUN inteira. Violacao LOCALIZADA
+        # (invasao de vao / colisao) NAO mata as milhares de pecas validas: as
+        # pecas provadas impossiveis sao puladas uma a uma, com motivo
+        # rastreavel (ver unbuildable_pieces).
+        if run_is_fatal(preflight):
+            raise ValueError("RUN BLOQUEADA (erro fatal do plano): {}. "
+                             "Nenhum bloco criado ou lote anterior removido.".format(
+                                 "; ".join(str(e) for e in preflight["errors"])))
+        plano_material = materialization_plan(self.solve_result, preflight)
+        self._unbuildable = plano_material["skip"]
+        self._unresolved_bonds = plano_material["unresolved_bonds"]
+        # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
+        # so' com as pecas que ficam, o preflight tem de sair limpo. Se nao sair,
+        # a classificacao falhou - isso e' fatal, nunca criacao parcial.
+        conferencia = verify_materialization(
+            self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog,
+            self.base_z_abs, set((ci, chave) for ci, chave, _r in self._unbuildable))
+        if (conferencia.get("opening_violations") or conferencia.get("collisions")
+                or conferencia.get("errors")):
+            raise ValueError("RUN BLOQUEADA (erro fatal): depois de separar as pecas impossiveis, "
+                             "{} peca(s) ainda invadem abertura e {} colidem - nada foi criado.".format(
+                                 len(conferencia.get("opening_violations") or []),
+                                 len(conferencia.get("collisions") or [])))
+        if self.solve_result is not None:
+            self.solve_result["beta_materialization_verified"] = True
+        if self._unbuildable:
+            _perf.mark("create.materializacao seletiva",
+                       puladas=len(self._unbuildable),
+                       amarracoes_nao_resolvidas=len(self._unresolved_bonds),
+                       invasoes=len(preflight.get("opening_violations") or []),
+                       colisoes=len(preflight.get("collisions") or []))
+        _perf.mark("create.preflight END", ok=preflight["ok"])
+        return preflight
 
     def _execute_create(self, app_doc):
         _perf.mark("create.entrou", beta=self.controlled_beta)
+        if self.controlled_beta and self.beta_transaction_error:
+            raise RuntimeError(self.beta_transaction_error)
+        # REGRA 48: o MESMO gate nos dois canais. O que difere abaixo e' so' a
+        # garantia transacional do beta (grupo externo que restaura o lote
+        # anterior se qualquer passo falhar) - nunca a regra estrutural.
+        self._materialization_gate()
+        self._require_current_beta_solve()
         if self.controlled_beta:
-            if self.beta_transaction_error:
-                raise RuntimeError(self.beta_transaction_error)
-            _perf.mark("create.preflight START")
-            if self.solve_result is not None:
-                self.solve_result["beta_materialization_verified"] = False
-            preflight = controlled_beta_preflight(
-                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
-            if self.solve_result is not None:
-                self.solve_result["beta_preflight"] = preflight
-            # FATAL (plano inconsistente) continua matando a RUN inteira. Violacao
-            # LOCALIZADA (invasao de vao / colisao) NAO mata mais as milhares de
-            # pecas validas: as pecas provadas impossiveis sao puladas uma a uma,
-            # com motivo rastreavel (ver unbuildable_pieces).
-            if run_is_fatal(preflight):
-                raise ValueError("BETA BLOQUEADO (erro fatal do plano): {}. "
-                                 "Nenhum bloco criado ou lote anterior removido.".format(
-                                     "; ".join(str(e) for e in preflight["errors"])))
-            plano_material = materialization_plan(self.solve_result, preflight)
-            self._unbuildable = plano_material["skip"]
-            self._unresolved_bonds = plano_material["unresolved_bonds"]
-            # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
-            # so' com as pecas que ficam, o preflight tem de sair limpo. Se nao sair,
-            # a classificacao falhou - isso e' fatal, nunca criacao parcial.
-            conferencia = verify_materialization(
-                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog,
-                self.base_z_abs, set((ci, chave) for ci, chave, _r in self._unbuildable))
-            if (conferencia.get("opening_violations") or conferencia.get("collisions")
-                    or conferencia.get("errors")):
-                raise ValueError("BETA BLOQUEADO (erro fatal): depois de separar as pecas impossiveis, "
-                                 "{} peca(s) ainda invadem abertura e {} colidem - nada foi criado.".format(
-                                     len(conferencia.get("opening_violations") or []),
-                                     len(conferencia.get("collisions") or [])))
-            if self.solve_result is not None:
-                self.solve_result["beta_materialization_verified"] = True
-            if self._unbuildable:
-                _perf.mark("create.materializacao seletiva",
-                           puladas=len(self._unbuildable),
-                           amarracoes_nao_resolvidas=len(self._unresolved_bonds),
-                           invasoes=len(preflight.get("opening_violations") or []),
-                           colisoes=len(preflight.get("collisions") or []))
-            self._require_current_beta_solve()
-            _perf.mark("create.preflight END", ok=preflight["ok"])
             # One outer group restores even the committed cleanup transaction.
             previous_result = self.create_result
             replacement = self._TransactionGroup(app_doc, "Beta - substitui lote completo de blocos")
@@ -13107,13 +13143,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def _execute_delete(self, app_doc):
         if self.controlled_beta and self.beta_transaction_error:
             raise RuntimeError(self.beta_transaction_error)
-        if self.controlled_beta and not beta_finalize_allowed(self.solve_result):
-            raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
-        if self.controlled_beta:
-            if self.create_result is None:
-                raise ValueError("BETA BLOQUEADO: lote ainda nao criado.")
-            self._require_current_beta_solve()
-            # A new solve cannot authorize deleting references based on an old batch.
+        # REGRA 48 nos DOIS canais: Finalizar so' com laudo sem erro fatal e
+        # conjunto criado conferido; a parede com peca pulada fica retida.
+        if not finalize_allowed(self.solve_result):
+            raise ValueError("RUN BLOQUEADA: preservar todas as paredes de referencia.")
+        if self.create_result is None:
+            raise ValueError("RUN BLOQUEADA: lote ainda nao criado.")
+        self._require_current_beta_solve()
+        # A new solve cannot authorize deleting references based on an old batch.
+        if self.walls_to_create:
             _record_incomplete_wall_creation(self.solve_result, self.create_result, self.walls_to_create)
         # NUNCA excluir a parede de referencia de um eixo que ficou SEM
         # bloco (reprovado na auditoria de amarracao entre fiadas - regra
@@ -14297,16 +14335,9 @@ class _PostCreationForm(Form):
         self._update_delete_enabled()
 
     def _update_delete_enabled(self):
-        if getattr(self._handler, "controlled_beta", False):
-            # mesmo criterio do backend (_execute_delete): pulo localizado nao
-            # trava a planta inteira; a parede afetada fica retida
-            solve_ok = beta_finalize_allowed(self._handler.solve_result)
-        else:
-            solve_ok = bool(
-                self._handler.solve_result
-                and len(self._handler.solve_result["collisions"]) == 0
-                and len(self._handler.solve_result.get("door_void_violations") or []) == 0
-            )
+        # mesmo criterio do backend (_execute_delete), nos dois canais: pulo
+        # localizado nao trava a planta inteira; a parede afetada fica retida
+        solve_ok = finalize_allowed(self._handler.solve_result)
         create_ok = bool(
             self._handler.create_result and self._handler.create_result.get("created_count", 0) > 0
         )

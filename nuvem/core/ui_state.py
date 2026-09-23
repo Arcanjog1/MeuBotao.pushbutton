@@ -254,7 +254,11 @@ class ModulationUiState(object):
         result = self.result or {}
         counts = self.counts
         strategy = "Canaletas (CHANNEL)" if self.strategy == "CHANNEL" else "Sem reforço"
-        lines = ["RESULTADOS", "Reforço: " + strategy,
+        prov = getattr(handler, "runtime_provenance", None) or {}
+        versao = ("Versão: canal={} branch={} commit={} cache={}".format(
+            prov.get("CHANNEL", "?"), prov.get("SOURCE_BRANCH", "-"), prov.get("RESOLVED_COMMIT", "?"),
+            prov.get("CACHE_STATUS", "?")) if prov else "Versão: não informada pelo loader.")
+        lines = ["RESULTADOS", versao, "Reforço: " + strategy,
                  "Paredes selecionadas: {}".format(len(handler.walls_to_create or [])),
                  "Aberturas detectadas: {}".format(len(handler.all_openings or []))]
         if counts is None:

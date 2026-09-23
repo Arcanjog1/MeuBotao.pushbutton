@@ -75,9 +75,14 @@ def cenario(pecas_por_fiada, porta=PORTA):
     return result, walls, openings
 
 
-@pytest.fixture
-def beta(monkeypatch):
-    """Handler REAL do beta com dubles transacionais (mesmos de test_beta_atomic_creation)."""
+CANAIS = ("BETA_OFFLINE", "ONLINE")
+
+
+@pytest.fixture(params=CANAIS)
+def beta(monkeypatch, request):
+    """Handler REAL com dubles transacionais (mesmos de test_beta_atomic_creation),
+    nos DOIS canais: BETA offline (controlled_beta=True) e ONLINE. A regra 48 e'
+    a MESMA - cada caso abaixo roda uma vez por canal."""
     status = SimpleNamespace(**{s: s for s in ("Started", "Committed", "RolledBack", "Uninitialized")})
     monkeypatch.setattr(DB, "TransactionStatus", status, raising=False)
     monkeypatch.setattr(m, "Transaction", Transaction)
@@ -85,7 +90,8 @@ def beta(monkeypatch):
 
     def montar(pecas_por_fiada, porta=PORTA):
         handler = m._PostCreationEventHandler()
-        handler.controlled_beta = True
+        handler.controlled_beta = request.param == "BETA_OFFLINE"
+        handler.canal = request.param
         result, walls, openings = cenario(pecas_por_fiada, porta)
         handler.solve_result, handler.walls_to_create, handler.openings_per_wall = result, walls, openings
         handler.catalog = dict((k, dict(v, symbol=SimpleNamespace(IsActive=True))) for k, v in CATALOG.items())
@@ -373,10 +379,43 @@ def test_contrato_de_materializacao_chega_a_apresentacao():
     assert any("NÃO resolvida (nó 41), fiada 7" in item["text"] for item in review_items(r))
 
 
-def test_o_beta_so_bloqueia_a_run_em_erro_fatal():
-    fonte = inspect.getsource(m._PostCreationEventHandler._execute_create)
-    assert "run_is_fatal(preflight)" in fonte
-    assert "materialization_plan(" in fonte and "verify_materialization(" in fonte
+def test_regra_48_tem_um_unico_gate_para_os_dois_canais():
+    """Uma fonte de verdade, dois modos de carregamento: o gate e' um metodo
+    so' e `_execute_create` o chama ANTES de qualquer ramo beta/online."""
+    gate = inspect.getsource(m._PostCreationEventHandler._materialization_gate)
+    assert "run_is_fatal(preflight)" in gate
+    assert "materialization_plan(" in gate and "verify_materialization(" in gate
+    criar = inspect.getsource(m._PostCreationEventHandler._execute_create)
+    assert criar.index("self._materialization_gate()") < criar.index("if self.controlled_beta:")
+    assert "controlled_beta_preflight(" not in criar          # nenhuma copia da regra por canal
+    solve = inspect.getsource(m._PostCreationEventHandler._execute_solve)
+    assert "if self.controlled_beta" not in solve
+    apagar = inspect.getsource(m._PostCreationEventHandler._execute_delete)
+    assert "finalize_allowed(self.solve_result)" in apagar and "controlled_beta and not finalize" not in apagar
+
+
+def test_canal_online_e_beta_produzem_o_mesmo_laudo_e_o_mesmo_plano():
+    """Mesmo resultado do solver -> mesmo laudo da regra 48 e mesmo plano, nos
+    dois canais (o contrato de materializacao nao depende do canal)."""
+    planos = {}
+    for canal in CANAIS:
+        handler = m._PostCreationEventHandler()
+        handler.controlled_beta = canal == "BETA_OFFLINE"
+        result, walls, openings = cenario([[bloco(40, node=41), bloco(100, "B39", "STANDARD_FILL")]])
+        handler.solve_result, handler.walls_to_create, handler.openings_per_wall = result, walls, openings
+        handler.catalog = dict(CATALOG)
+        handler.base_z_abs = 0.0
+        handler.wall_height_ft = ft(20)
+        handler._num_courses_for_wall_height = lambda *a, **k: (1, None)
+        handler.selected_level = None
+        handler._solve_building_blocks_all_courses = lambda *a, **k: result
+        handler._save_modulation_state_cache = lambda: None
+        handler._execute_solve()
+        planos[canal] = (handler.solve_result["beta_preflight"]["opening_violations"],
+                         handler.solve_result["materialization"]["skipped"],
+                         handler.solve_result["materialization"]["unresolved_bonds"])
+    assert planos["ONLINE"] == planos["BETA_OFFLINE"]
+    assert len(planos["ONLINE"][1]) == 1 and len(planos["ONLINE"][2]) == 1
 
 
 # ------------------------------------------------ contabilidade fechada

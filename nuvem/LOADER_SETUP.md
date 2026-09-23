@@ -138,15 +138,38 @@ código. Ela é pedida uma única vez por computador.
   a menos que ele seja revogado/expire (aí detecta o 401/403, apaga o
   token salvo e pede a senha de novo).
 - Uma cópia espelhada de todo o pacote `core/` baixado com sucesso fica em
-  cache local:
+  cache local, **com manifest** (`manifest.json`: commit, branch, sha256 de
+  cada arquivo e `package_sha`):
   ```
   %LOCALAPPDATA%\MeuBotaoPushbutton\pkg_cache\core\...
+  %LOCALAPPDATA%\MeuBotaoPushbutton\pkg_cache\manifest.json
   ```
-  Se a internet cair ou o GitHub estiver fora do ar, o loader roda essa
-  cópia em cache (avisando que pode estar desatualizada) em vez de
-  travar o botão. A sincronização só troca o cache antigo pelo novo
-  depois que **todos** os arquivos baixarem com sucesso — nunca fica pela
-  metade.
+  **Rastreabilidade (2026-09-23):** a cada clique o loader primeiro resolve o
+  **commit exato** que a branch aponta (`.../commits/main`, SHA completo) e
+  baixa a árvore **pinada nesse SHA**, nunca "o que estiver na branch".
+  - commit igual ao do manifest e todos os sha256 batendo → `cache=VALIDATED`
+    (nada é baixado);
+  - commit diferente, manifest ausente ou arquivo alterado/extra →
+    ressincroniza a árvore inteira → `cache=MISS`;
+  - sem internet → roda a cópia em cache **só se ela tiver manifest e os
+    hashes baterem** → `cache=OFFLINE_FALLBACK`, dizendo qual commit ela
+    representa (nunca diz que está atualizada). Cache antigo sem manifest não
+    roda mais: conecte uma vez para sincronizar.
+  A sincronização só troca o cache antigo pelo novo depois que **todos** os
+  arquivos baixarem com sucesso — nunca fica pela metade.
+- **Banner de versão:** no início de toda execução o loader imprime uma linha
+  inequívoca (também mostrada em "Versão:" no relatório da modulação):
+  ```
+  MODULAÇÃO AUTOMÁTICA
+  canal=ONLINE
+  branch=main
+  commit=<SHA COMPLETO>
+  cache=VALIDATED|MISS|OFFLINE_FALLBACK
+  CHANNEL=... SOURCE_BRANCH=... RESOLVED_COMMIT=... PACKAGE_SHA=... CACHE_STATUS=... LOADER_PATH=... CORE_PATH=...
+  ```
+  No pacote beta offline: `canal=BETA_OFFLINE`, `commit=<SHA>`,
+  `package_verified=true`. `PACKAGE_SHA` é o mesmo nos dois canais para o
+  mesmo commit (cobre só `core/`). Ver [RUNTIME_CANONICO.md](../docs/RUNTIME_CANONICO.md).
 
 ## Trocar a senha ou o token
 

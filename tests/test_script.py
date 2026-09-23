@@ -3294,6 +3294,11 @@ def test_execute_create_apaga_lote_anterior_antes_de_recriar():
     apaga o lote anterior POR COMPLETO antes de criar o novo - cada
     clique em "criar" e' uma SUBSTITUICAO atomica, nunca uma soma."""
     handler = m._PostCreationEventHandler()
+    # REGRA 48 (gate unico dos dois canais) e' testada em
+    # test_materializacao_e_estado_da_run.py; aqui o plano degenerado isola a
+    # mecanica do lote anterior, entao o gate e a assinatura sao dublados.
+    handler._materialization_gate = lambda: {"ok": True, "errors": [], "opening_violations": [], "collisions": []}
+    handler._require_current_beta_solve = lambda: None
     old_id_1, old_id_2 = revit_stubs.ElementId(101), revit_stubs.ElementId(102)
     handler.create_result = {
         "created_count": 2, "failures": [], "created_instances": [
@@ -3371,6 +3376,11 @@ def test_execute_create_volta_a_apagar_uma_a_uma_se_o_lote_for_recusado():
     nova e metade na antiga. Por isso, colecao recusada = cai no caminho
     antigo e apaga tudo que der, uma a uma."""
     handler = m._PostCreationEventHandler()
+    # REGRA 48 (gate unico dos dois canais) e' testada em
+    # test_materializacao_e_estado_da_run.py; aqui o plano degenerado isola a
+    # mecanica do lote anterior, entao o gate e a assinatura sao dublados.
+    handler._materialization_gate = lambda: {"ok": True, "errors": [], "opening_violations": [], "collisions": []}
+    handler._require_current_beta_solve = lambda: None
     old_ids = [revit_stubs.ElementId(201), revit_stubs.ElementId(202),
                revit_stubs.ElementId(203)]
     handler.create_result = {
@@ -3422,6 +3432,11 @@ def test_execute_create_cria_paredes_reprovadas_na_auditoria_de_amarracao_e_marc
     marcadas em VERMELHO na vista para revisao manual (mesmo mecanismo
     ja' usado para colisao entre pecas)."""
     handler = m._PostCreationEventHandler()
+    # REGRA 48 (gate unico dos dois canais) e' testada em
+    # test_materializacao_e_estado_da_run.py; aqui o plano degenerado isola a
+    # mecanica do lote anterior, entao o gate e a assinatura sao dublados.
+    handler._materialization_gate = lambda: {"ok": True, "errors": [], "opening_violations": [], "collisions": []}
+    handler._require_current_beta_solve = lambda: None
     handler.created_walls_by_axis = {
         0: [(revit_stubs.ElementId(1), "cad")],
         1: [(revit_stubs.ElementId(2), "cad")],
@@ -3500,6 +3515,10 @@ def test_execute_delete_preserva_parede_de_referencia_sem_bloco():
     "parede some sem explicacao" que a regra #4 probe. So' a parede de
     referencia de um eixo QUE RECEBEU bloco pode ser excluida."""
     handler = m._PostCreationEventHandler()
+    # Finalizar exige laudo da regra 48 sem erro fatal (nos dois canais); o
+    # plano degenerado deste teste isola a preservacao da parede sem bloco.
+    handler.solve_result = {"beta_preflight": {"ok": True, "errors": []}, "num_courses": 0}
+    handler._require_current_beta_solve = lambda: None
     wall_ref_0 = revit_stubs.ElementId(1)   # eixo 0: reprovado, sem bloco - PRESERVAR
     wall_ref_1 = revit_stubs.ElementId(2)   # eixo 1: aprovado, com bloco - pode excluir
     handler.created_walls_by_axis = {0: [(wall_ref_0, "cad")], 1: [(wall_ref_1, "cad")]}
@@ -5538,6 +5557,11 @@ def test_execute_create_cronometra_a_exclusao_do_lote_anterior():
     apaga tantos elementos quantos vai recriar. Ele entra em `perf_steps`
     com tempo e contagem, para aparecer no mesmo relatorio."""
     handler = m._PostCreationEventHandler()
+    # REGRA 48 (gate unico dos dois canais) e' testada em
+    # test_materializacao_e_estado_da_run.py; aqui o plano degenerado isola a
+    # mecanica do lote anterior, entao o gate e a assinatura sao dublados.
+    handler._materialization_gate = lambda: {"ok": True, "errors": [], "opening_violations": [], "collisions": []}
+    handler._require_current_beta_solve = lambda: None
     old_ids = [revit_stubs.ElementId(201), revit_stubs.ElementId(202)]
     handler.create_result = {
         "created_count": 2, "failures": [], "created_instances": [

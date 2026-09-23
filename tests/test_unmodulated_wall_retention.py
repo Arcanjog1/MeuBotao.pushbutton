@@ -64,6 +64,8 @@ def test_finalize_retains_empty_wall_even_if_creation_did_not_record_skips():
     retained_id, valid_id = revit_stubs.ElementId(1), revit_stubs.ElementId(2)
     handler = m._PostCreationEventHandler()
     handler.solve_result = solve(197.943)
+    handler.solve_result["beta_preflight"] = {"ok": True, "errors": []}   # regra 48: Finalizar exige laudo
+    handler._require_current_beta_solve = lambda: None
     handler.create_result = {"skipped_wall_idxs": []}
     handler.created_walls_by_axis = {0: [(retained_id, "cad")], 1: [(valid_id, "cad")]}
     handler.created_wall_ids_all = [retained_id, valid_id]

@@ -22,8 +22,10 @@ python -B -c "from beta_package import verify_beta_package; print(verify_beta_pa
 ```
 
 Instalacao futura em botao pyRevit separado `.pushbutton`, com todos os
-arquivos do pacote, nunca sobre o botao de producao. Confirmar no log
-`BETA CONTROLADO - pacote offline verificado` e o SHA completo acima.
+arquivos do pacote, nunca sobre o botao de producao. Confirmar no log o
+banner `MODULAÇÃO AUTOMÁTICA / canal=BETA_OFFLINE / commit=<SHA> /
+package_verified=true` (ate' 2026-09-23: `BETA CONTROLADO - pacote offline
+verificado`) e o SHA completo acima.
 Manifesto ausente/invalido, hash diferente ou tentativa de fallback: parar.
 Usar sessao nova do Revit para o ensaio futuro, sem janelas de modulacao
 anteriores; nao abrir o botao normal durante o ensaio do pacote fixo.

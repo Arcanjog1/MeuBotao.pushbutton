@@ -57,9 +57,12 @@ como gerar o token no GitHub e cifra-lo com a senha.
 
 import io
 import os
+import re
 import sys
 import json
 import shutil
+import hashlib
+import datetime
 import traceback
 
 import clr
@@ -573,14 +576,27 @@ CORE_CLOUD_DIR = "nuvem"
 CORE_REPO_PREFIX = CORE_CLOUD_DIR + "/core/"
 ENTRY_POINT_REPO_PATH = CORE_REPO_PREFIX + "wall_modeling.py"
 
-TREE_API_URL = "https://api.github.com/repos/{0}/{1}/git/trees/{2}?recursive=1".format(
+# RASTREABILIDADE (2026-09-23, pedido do usuario): o loader NUNCA mais baixa
+# "o que estiver na branch agora". Primeiro resolve o COMMIT exato que a
+# branch aponta (COMMIT_API_URL), depois lista e baixa a arvore PINADA nesse
+# commit (`ref=<sha>`), grava um manifest com o sha256 de cada arquivo no
+# cache e registra a proveniencia (RUNTIME_PROVENANCE) que o motor mostra no
+# relatorio. Assim dois computadores provam que rodam o MESMO SHA.
+COMMIT_API_URL = "https://api.github.com/repos/{0}/{1}/commits/{2}".format(
     GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH
 )
+CACHE_MANIFEST_NAME = "manifest.json"
 
 
-def _contents_api_url(repo_path):
+def _tree_api_url(ref):
+    return "https://api.github.com/repos/{0}/{1}/git/trees/{2}?recursive=1".format(
+        GITHUB_OWNER, GITHUB_REPO, ref
+    )
+
+
+def _contents_api_url(repo_path, ref):
     return "https://api.github.com/repos/{0}/{1}/contents/{2}?ref={3}".format(
-        GITHUB_OWNER, GITHUB_REPO, repo_path, GITHUB_BRANCH
+        GITHUB_OWNER, GITHUB_REPO, repo_path, ref
     )
 
 
@@ -999,14 +1015,29 @@ def _new_web_client(token, accept):
     return client
 
 
-def _list_remote_core_files(token):
+def _resolve_branch_commit(token):
+    """SHA COMPLETO do commit que GITHUB_BRANCH aponta AGORA. E' o unico
+    lugar em que o nome da branch e' usado: todo o resto e' pinado no SHA."""
+    client = _new_web_client(token, "application/vnd.github.sha")
+    try:
+        sha = client.DownloadString(COMMIT_API_URL).strip()
+    except WebException as web_error:
+        _raise_for_web_exception(web_error, "commit da branch " + GITHUB_BRANCH)
+        return ""  # nunca alcancado
+    if not re.match(r"^[0-9a-f]{40}$", sha):
+        raise RuntimeError("O GitHub nao devolveu um SHA de commit valido para a branch {0}: {1!r}".format(
+            GITHUB_BRANCH, sha[:80]))
+    return sha
+
+
+def _list_remote_core_files(token, ref):
     """Lista (recursivamente) todos os arquivos .py sob CORE_REPO_PREFIX no
-    branch configurado, via a API de arvore do Git (uma unica chamada, em
-    vez de uma por pasta) - devolve os PATHS completos (relativos a' raiz
-    do repositorio)."""
+    COMMIT `ref` (nunca na branch mutavel), via a API de arvore do Git (uma
+    unica chamada, em vez de uma por pasta) - devolve os PATHS completos
+    (relativos a' raiz do repositorio)."""
     client = _new_web_client(token, "application/vnd.github+json")
     try:
-        raw = client.DownloadString(TREE_API_URL)
+        raw = client.DownloadString(_tree_api_url(ref))
     except WebException as web_error:
         _raise_for_web_exception(web_error, "listagem da arvore core/")
         return []  # nunca alcancado - _raise_for_web_exception sempre levanta
@@ -1032,38 +1063,136 @@ def _list_remote_core_files(token):
     return files
 
 
-def _fetch_file_raw(token, repo_path):
+def _fetch_file_raw(token, repo_path, ref):
     client = _new_web_client(token, "application/vnd.github.raw")
     try:
-        return client.DownloadString(_contents_api_url(repo_path))
+        return client.DownloadString(_contents_api_url(repo_path, ref))
     except WebException as web_error:
         _raise_for_web_exception(web_error, repo_path)
 
 
+# --------------------------------------------------------------------
+# PROVENIENCIA E CACHE VERIFICAVEL
+# --------------------------------------------------------------------
+PROVENANCE_FIELDS = ("CHANNEL", "SOURCE_BRANCH", "RESOLVED_COMMIT", "PACKAGE_SHA",
+                     "CACHE_STATUS", "LOADER_PATH", "CORE_PATH")
+
+
+def _package_digest(hashes):
+    """Um unico sha256 do conjunto core/ (caminho + sha256 de cada .py, em
+    ordem). E' o MESMO calculo nos dois canais, so' sobre `core/...`, entao
+    o mesmo commit da' o mesmo PACKAGE_SHA no ONLINE e no BETA offline."""
+    linhas = ["{0} {1}".format(p, h) for p, h in sorted(hashes.items()) if p.startswith("core/")]
+    return hashlib.sha256("\n".join(linhas).encode("utf-8")).hexdigest()
+
+
+def _sha256_file(path):
+    with open(path, "rb") as handle:
+        return hashlib.sha256(handle.read()).hexdigest()
+
+
+def _read_cache_manifest():
+    path = os.path.join(PKG_CACHE_DIR, CACHE_MANIFEST_NAME)
+    if not os.path.isfile(path):
+        return None
+    try:
+        with io.open(path, "r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
+    except Exception:
+        return None
+    if not isinstance(manifest, dict) or not re.match(r"^[0-9a-f]{40}$", str(manifest.get("commit", ""))):
+        return None
+    return manifest
+
+
+def _verify_cache(manifest):
+    """True se TODOS os arquivos do manifest existem no cache com o sha256
+    registrado e nao ha' .py extra em core/ (um modulo velho sobrando seria
+    importado no lugar do certo)."""
+    hashes = (manifest or {}).get("sha256") or {}
+    if not hashes or "core/wall_modeling.py" not in hashes:
+        return False
+    for relative, expected in hashes.items():
+        target = os.path.join(PKG_CACHE_DIR, *relative.split("/"))
+        if not os.path.isfile(target) or _sha256_file(target) != expected:
+            return False
+    for parent, _dirs, files in os.walk(os.path.join(PKG_CACHE_DIR, "core")):
+        for name in files:
+            if name.endswith(".py"):
+                relative = os.path.relpath(os.path.join(parent, name), PKG_CACHE_DIR).replace(os.sep, "/")
+                if relative not in hashes:
+                    return False
+    return True
+
+
+def _loader_path():
+    try:
+        return os.path.abspath(__file__)
+    except Exception:
+        return "?"
+
+
+def _provenance(channel, branch, commit, package_sha, cache_status, core_path):
+    return {"CHANNEL": channel, "SOURCE_BRANCH": branch, "RESOLVED_COMMIT": commit,
+            "PACKAGE_SHA": package_sha, "CACHE_STATUS": cache_status,
+            "LOADER_PATH": _loader_path(), "CORE_PATH": core_path}
+
+
+def _provenance_banner(prov):
+    """Linha inequivoca no inicio da execucao - o que cada PC de fato roda."""
+    if prov.get("CHANNEL") == "BETA_OFFLINE":
+        cabeca = [u"MODULA\u00c7\u00c3O AUTOM\u00c1TICA", "canal=BETA_OFFLINE",
+                  "commit=" + str(prov.get("RESOLVED_COMMIT")), "package_verified=true"]
+    else:
+        cabeca = [u"MODULA\u00c7\u00c3O AUTOM\u00c1TICA", "canal=" + str(prov.get("CHANNEL")),
+                  "branch=" + str(prov.get("SOURCE_BRANCH")), "commit=" + str(prov.get("RESOLVED_COMMIT")),
+                  "cache=" + str(prov.get("CACHE_STATUS"))]
+    corpo = ["{0}={1}".format(campo, prov.get(campo)) for campo in PROVENANCE_FIELDS]
+    return u"\n".join(cabeca + corpo)
+
+
 def _sync_core_package(token):
-    """Baixa TODOS os .py de core/ (ver _list_remote_core_files) para
-    PKG_CACHE_TMP_DIR, mantendo a mesma estrutura de pastas (core/...), e
-    so' substitui PKG_CACHE_DIR de verdade se TODOS baixarem com sucesso -
-    uma falha no meio do caminho nunca deixa o cache local pela metade
-    (quem chama continua podendo usar a ultima sincronizacao boa
-    anterior). Devolve o path local de core/wall_modeling.py dentro do
-    cache atualizado.
-    """
-    files = _list_remote_core_files(token)
+    """Resolve o COMMIT da branch, confere o cache contra ele e so' baixa se
+    precisar. Devolve (path local de core/wall_modeling.py, proveniencia).
+
+    - cache com manifest do MESMO commit e todos os sha256 batendo ->
+      CACHE_STATUS=VALIDATED (nada e' baixado);
+    - commit diferente, manifest ausente ou arquivo alterado -> baixa a
+      arvore inteira PINADA no commit para PKG_CACHE_TMP_DIR e so' substitui
+      PKG_CACHE_DIR se TODOS baixarem (nunca fica pela metade) ->
+      CACHE_STATUS=MISS (atualizado agora).
+    Nunca: "main mudou -> cache antigo continua em silencio"."""
+    commit = _resolve_branch_commit(token)
+    entry_point = os.path.join(PKG_CACHE_DIR, "core", "wall_modeling.py")
+    cached = _read_cache_manifest()
+    if cached and cached.get("commit") == commit and _verify_cache(cached):
+        return entry_point, _provenance("ONLINE", GITHUB_BRANCH, commit, _package_digest(cached["sha256"]),
+                                        "VALIDATED", entry_point)
+
+    files = _list_remote_core_files(token, commit)
 
     if os.path.isdir(PKG_CACHE_TMP_DIR):
         shutil.rmtree(PKG_CACHE_TMP_DIR)
     os.makedirs(PKG_CACHE_TMP_DIR)
 
+    hashes = {}
     for repo_path in files:
         relative = repo_path[len(CORE_CLOUD_DIR) + 1:]  # "core/xxx/yyy.py"
         local_path = os.path.join(PKG_CACHE_TMP_DIR, *relative.split("/"))
         local_dir = os.path.dirname(local_path)
         if not os.path.isdir(local_dir):
             os.makedirs(local_dir)
-        content = _fetch_file_raw(token, repo_path)
-        with io.open(local_path, "w", encoding="utf-8") as fh:
+        content = _fetch_file_raw(token, repo_path, commit)
+        # newline="" preserva os bytes do blob (LF): o sha256 do cache e' o
+        # MESMO do pacote beta gerado por `git show` para este commit.
+        with io.open(local_path, "w", encoding="utf-8", newline="") as fh:
             fh.write(content)
+        hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    manifest = {"schema": 1, "channel": "ONLINE", "branch": GITHUB_BRANCH, "commit": commit,
+                "synced_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "sha256": hashes, "package_sha": _package_digest(hashes)}
+    with io.open(os.path.join(PKG_CACHE_TMP_DIR, CACHE_MANIFEST_NAME), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(manifest, indent=2, sort_keys=True))
 
     # so' agora, com TUDO baixado, troca o cache "de verdade" pelo novo -
     # esta e' a unica secao que pode deixar PKG_CACHE_DIR num estado
@@ -1074,17 +1203,20 @@ def _sync_core_package(token):
         shutil.rmtree(PKG_CACHE_DIR)
     os.rename(PKG_CACHE_TMP_DIR, PKG_CACHE_DIR)
 
-    return os.path.join(PKG_CACHE_DIR, "core", "wall_modeling.py")
+    return entry_point, _provenance("ONLINE", GITHUB_BRANCH, commit, manifest["package_sha"], "MISS", entry_point)
 
 
 def _entry_point_from_existing_cache():
-    """Fallback: usa a ultima sincronizacao local bem-sucedida (sem tentar
-    o GitHub de novo) - equivalente ao antigo `_load_cache()`, agora
-    apontando para a arvore inteira em vez de um unico arquivo."""
+    """Fallback SEM rede: usa a ultima sincronizacao local bem-sucedida, mas
+    so' se ela tiver manifest e todos os sha256 baterem - e nunca diz que
+    esta' atualizada (CACHE_STATUS=OFFLINE_FALLBACK, commit = o que o cache
+    representa). Cache antigo sem manifest ou corrompido NAO roda."""
     entry_point = os.path.join(PKG_CACHE_DIR, "core", "wall_modeling.py")
-    if os.path.isfile(entry_point):
-        return entry_point
-    return None
+    cached = _read_cache_manifest()
+    if not cached or not os.path.isfile(entry_point) or not _verify_cache(cached):
+        return None, None
+    return entry_point, _provenance("ONLINE", cached.get("branch", GITHUB_BRANCH), cached["commit"],
+                                    _package_digest(cached["sha256"]), "OFFLINE_FALLBACK", entry_point)
 
 
 def _load_entry_point():
@@ -1111,18 +1243,26 @@ def _load_entry_point():
         with io.open(verifier_path, "r", encoding="utf-8") as handle:
             exec(compile(handle.read(), verifier_path, "exec"), verifier)
         entry, head = verifier["verify_beta_package"](beta_directory)
+        with io.open(os.path.join(beta_directory, "beta-package.json"), "r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
         globals()["CONTROLLED_BETA"] = True
         globals()["CONTROLLED_BETA_HEAD"] = head
+        prov = _provenance("BETA_OFFLINE", manifest.get("branch", "-"), head,
+                           _package_digest(manifest.get("sha256") or {}), "VERIFIED_OFFLINE", entry)
+        globals()["RUNTIME_PROVENANCE"] = prov
         sys.dont_write_bytecode = True
         while beta_directory in sys.path:
             sys.path.remove(beta_directory)
         sys.path.insert(0, beta_directory)
-        print("BETA CONTROLADO - pacote offline verificado: " + head)
+        print(_provenance_banner(prov))
         return entry
     globals()["CONTROLLED_BETA"] = False
     token = _get_token()
     try:
-        return _sync_core_package(token)
+        entry, prov = _sync_core_package(token)
+        globals()["RUNTIME_PROVENANCE"] = prov
+        print(_provenance_banner(prov))
+        return entry
     except Exception as first_error:
         # 401/403 com token salvo = token expirado/revogado (ou o blob foi
         # trocado); sem token = rate limit do IP ou repositorio privado sem
@@ -1136,22 +1276,29 @@ def _load_entry_point():
             retry_token = _get_token(force_reprompt=True)
             if retry_token:
                 try:
-                    return _sync_core_package(retry_token)
+                    entry, prov = _sync_core_package(retry_token)
+                    globals()["RUNTIME_PROVENANCE"] = prov
+                    print(_provenance_banner(prov))
+                    return entry
                 except Exception as second_error:
                     first_error = second_error
 
-        cached_entry = _entry_point_from_existing_cache()
+        cached_entry, prov = _entry_point_from_existing_cache()
         if cached_entry:
+            globals()["RUNTIME_PROVENANCE"] = prov
+            print(_provenance_banner(prov))
             forms.alert(
-                "Nao foi possivel baixar a versao mais recente do GitHub:\n\n"
-                "{0}\n\nRodando a ultima copia em cache (pode estar "
-                "desatualizada).".format(first_error),
-                title="Modulacao Automatica - usando cache",
+                "Nao foi possivel confirmar no GitHub a versao atual da branch {1}:\n\n"
+                "{0}\n\nRodando a ultima copia VERIFICADA em cache (commit {2}). "
+                "Ela pode estar desatualizada - o commit acima e' o que esta' rodando.".format(
+                    first_error, GITHUB_BRANCH, prov["RESOLVED_COMMIT"]),
+                title="Modulacao Automatica - cache (commit {0})".format(prov["RESOLVED_COMMIT"][:12]),
             )
             return cached_entry
         forms.alert(
-            "Nao foi possivel baixar o script do GitHub e nao ha' copia em "
-            "cache neste computador:\n\n{0}".format(first_error),
+            "Nao foi possivel baixar o script do GitHub e nao ha' copia em cache "
+            "VERIFICAVEL neste computador (sem manifest ou com hash divergente - "
+            "um cache antigo nao roda mais sem prova de versao):\n\n{0}".format(first_error),
             title="Modulacao Automatica - erro",
         )
         sys.exit()
