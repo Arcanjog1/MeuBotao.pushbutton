@@ -271,7 +271,7 @@ class ModulationUiState(object):
         if preflight and not preflight.get("ok"):
             for key in ("errors", "opening_violations", "collisions"):
                 lines.extend("Crítico: " + friendly_problem(item) for item in preflight.get(key) or [])
-        pendentes = review_items(result)
+        pendentes = review_items(result, creation)
         lines.extend(["", "REVISÃO NECESSÁRIA (não é falha de criação)"])
         if pendentes:
             lines.extend("  " + row["text"] for row in pendentes)
@@ -287,19 +287,26 @@ class ModulationUiState(object):
         contas = materialization_counts(result, creation)
         if creation is not None:
             resolvida = creation.get("structurally_resolved")
+
+            def _n(valor):
+                return "—" if valor is None else valor
+            # a RUN foi executada quando a criacao terminou (mesmo com 0 pecas criadas)
             lines.extend(["", "ESTADO ESTRUTURAL",
-                          "  RUN executada: {}".format("sim" if creation.get("created_count") else "não"),
+                          "  RUN executada: sim — {} de {} peça(s) criada(s)".format(
+                              _n(contas["criadas"]), _n(contas["planejadas"])),
                           "  Modulação estruturalmente resolvida: {}".format(
-                              "sim" if resolvida is True else ("NÃO — ver amarrações pendentes"
+                              "sim" if resolvida is True else ("NÃO — {} pendência(s) listada(s) em "
+                                                             "REVISÃO NECESSÁRIA".format(len(pendentes))
                                                              if resolvida is False else "—"))])
-            lines.extend("  " + row["text"] for row in review_items(result)[:40])
             lines.extend(["", "MATERIALIZAÇÃO",
-                          "  Planejados: {}".format(contas["planejadas"]),
-                          "  Criados: {}".format(contas["criadas"]),
-                          "  Ignorados: {}".format(contas["puladas"]),
-                          "  Falhas de criação: {}".format(contas["falhas"]),
+                          "  Planejados: {}".format(_n(contas["planejadas"])),
+                          "  Criados: {}".format(_n(contas["criadas"])),
+                          "  Ignorados: {}".format(_n(contas["puladas"])),
+                          "  Falhas de criação: {}".format(_n(contas["falhas"])),
                           "  Contabilidade fecha: {}".format(
-                              "sim" if contas["fecha"] else "NÃO — investigar")])
+                              "sim" if contas["fecha"] is True else (
+                                  "NÃO — investigar" if contas["fecha"] is False
+                                  else "— (valor desconhecido)"))])
             lines.extend("  " + linha for linha in skipped_rows(creation)[:40])
         elif localized_blockers(result):
             puladas, nao_resolvidas = materialization_split(result)
@@ -316,8 +323,14 @@ class ModulationUiState(object):
                       "Paredes com amarração reprovada: {}".format(sum(
                           1 for a in (result.get("wall_bond_audits") or {}).values() if not a.get("ok")))])
         lines.extend(["", "PAREDES NÃO MODULADAS"])
-        retained = result.get("unmodulated_walls") or []
-        lines.extend("Parede retida {}: {}".format(i, friendly_problem(w.get("reason"))) for i, w in enumerate(retained, 1))
+        retained = ((creation or {}).get("retained_walls") if (creation or {}).get("retained_walls") is not None
+                    else result.get("unmodulated_walls")) or []
+        for i, w in enumerate(retained, 1):
+            if w.get("reason") == "INCOMPLETE_CREATION":
+                lines.append("Parede retida {}: criação incompleta — {} de {} peça(s) não criada(s); "
+                             "referência preservada.".format(i, w.get("missing_count"), w.get("planned_count")))
+            else:
+                lines.append("Parede retida {}: {}".format(i, friendly_problem(w.get("reason"))))
         if not retained:
             lines.append("Nenhuma retenção informada pelo motor.")
         if creation:
@@ -370,7 +383,7 @@ def hard_gate_total(result):
     return sum(count for _label, count in hard_gate_counts(result))
 
 
-def review_items(result):
+def review_items(result, creation=None):
     """Encontros que o motor entrega marcados para REVISAO HUMANA (regra 76.1).
 
     Nao inclui `NO_FUNCTIONAL_JUNCTION`: aquilo nao e' pendencia, e' a topologia
@@ -388,7 +401,7 @@ def review_items(result):
         })
     # Opção A: amarração REJEITADA na materialização (invadia abertura/colidia)
     # não é amarração resolvida — entra aqui, nunca some.
-    for item in unresolved_bonds(result):
+    for item in unresolved_bonds(result, creation):
         rows.append({
             "node": item.get("node_index"), "course": item.get("course_index"),
             "text": u"Amarração NÃO resolvida (nó {}), fiada {}: {} {} rejeitado — {}.".format(

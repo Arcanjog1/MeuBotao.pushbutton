@@ -5027,11 +5027,9 @@ def structural_bond_role(candidate):
 def materialization_plan(result, preflight=None):
     """Classifica o laudo do preflight peca a peca (somente leitura).
 
-    {"skip": [(course_index, chave_fisica, registro)],   pecas NAO criadas
+    {"skip": [(course_index, id(peca), registro)],      pecas NAO criadas
      "unresolved_bonds": [registro],                     amarracoes nao resolvidas
      "fatal": [erros]}                                   bloqueiam a RUN"""
-    from core.engine import opening_reinforcement as _reinforcement
-
     result = result or {}
     preflight = preflight if preflight is not None else (result.get("beta_preflight") or {})
     sources = result.get("course_candidates") or {}
@@ -5043,7 +5041,7 @@ def materialization_plan(result, preflight=None):
         if not isinstance(idx, int) or not (0 <= idx < len(pecas)):
             return
         cand = pecas[idx]
-        chave = (ci, _reinforcement._physical_key(cand))
+        chave = (ci, id(cand))          # IDENTIDADE da peca: duas pecas iguais sao duas pecas
         papel = structural_bond_role(cand)
         if chave in ja:
             ja[chave]["rules"].append(rule_id)            # mesma peca, mais de um motivo
@@ -5057,7 +5055,9 @@ def materialization_plan(result, preflight=None):
             "placement_reason": cand.get("placement_reason"),
             "origin_cm": registro.get("origin_cm"), "z_cm": registro.get("z_cm"),
             "overlap_cm": registro.get("overlap_cm"),
-            "opening_index": registro.get("opening_index", registro.get("opening_wall_idx")),
+            "vertical_overlap_cm": registro.get("vertical_overlap_cm"),
+            "opening_wall_idx": registro.get("opening_wall_idx"),
+            "opening_index": registro.get("opening_index"),
             "message": descricao,
         }
         if extra:
@@ -5071,6 +5071,7 @@ def materialization_plan(result, preflight=None):
                 "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
                 "structural_role": papel, "rejected_rule": rule_id,
                 "overlap_cm": registro.get("overlap_cm"), "opening_index": rec["opening_index"],
+                "opening_wall_idx": rec["opening_wall_idx"],
                 "message": "amarracao NAO resolvida: a peca de amarracao foi rejeitada ({})".format(descricao),
             })
 
@@ -5079,11 +5080,19 @@ def materialization_plan(result, preflight=None):
         pular(registro.get("course_index"), registro.get("candidate_index"), OPENING_INVASION_RULE_ID,
               "a peca ocupa o volume real de uma abertura (regra 48)", registro)
 
-    # 2) colisao entre duas pecas: some UMA delas - a que nao e' amarracao, se so' uma for
+    # 2) colisao entre duas pecas: some UMA delas - a que nao e' amarracao, se so' uma for.
+    #    Se uma das duas JA' saiu (invasao ou outra colisao), a colisao ja' esta'
+    #    resolvida: nenhuma peca valida a mais e' pulada e nenhuma amarracao
+    #    NAO resolvida falsa e' criada (achado da auditoria independente).
     for registro in preflight.get("collisions") or []:
         ci = registro.get("course_index")
         i, j = registro.get("candidate_index"), registro.get("other_candidate_index")
         pecas = sources.get(ci) or []
+        ja_saiu = [ja[(ci, id(pecas[k]))] for k in (i, j)
+                   if isinstance(k, int) and 0 <= k < len(pecas) and (ci, id(pecas[k])) in ja]
+        if ja_saiu:
+            ja_saiu[0]["rules"].append(PIECE_COLLISION_RULE_ID)
+            continue
         alvo = i
         if (isinstance(j, int) and 0 <= j < len(pecas) and isinstance(i, int) and 0 <= i < len(pecas)
                 and structural_bond_role(pecas[i]) and not structural_bond_role(pecas[j])):
@@ -5094,12 +5103,12 @@ def materialization_plan(result, preflight=None):
 
 
 def unbuildable_pieces(result, preflight=None):
-    """[(course_index, chave_fisica, registro)] das pecas que NAO serao criadas."""
+    """[(course_index, id(peca), registro)] das pecas que NAO serao criadas."""
     return materialization_plan(result, preflight)["skip"]
 
 
 def unbuildable_keys(result, preflight=None):
-    """set((course_index, chave_fisica)) - o que `create_building_blocks` pula."""
+    """set((course_index, id(peca))) - o que `create_building_blocks` pula."""
     return set((ci, chave) for ci, chave, _rec in unbuildable_pieces(result, preflight))
 
 
@@ -5108,15 +5117,30 @@ def run_is_fatal(preflight):
     return bool((preflight or {}).get("errors"))
 
 
-def materialized_result(result, skip_keys):
-    """Copia rasa do resultado com SO' as pecas que serao criadas (mesmas fiadas)."""
-    from core.engine import opening_reinforcement as _reinforcement
+def beta_finalize_allowed(solve_result):
+    """BETA: o Finalizar (excluir paredes de referencia) esta' liberado?
 
+    Violacao LOCALIZADA nao bloqueia mais a planta inteira (OPCAO A): a parede
+    com peca pulada fica RETIDA por `_record_incomplete_wall_creation`
+    (INCOMPLETE_CREATION, referencia preservada - secao 48). Continua bloqueado
+    com erro FATAL ou quando o conjunto criado nao foi conferido limpo."""
+    solve_result = solve_result or {}
+    preflight = solve_result.get("beta_preflight") or {}
+    if not preflight or preflight.get("errors"):
+        return False
+    return bool(preflight.get("ok") or solve_result.get("beta_materialization_verified"))
+
+
+def materialized_result(result, skip_keys):
+    """Copia rasa do resultado com SO' as pecas que serao criadas (mesmas fiadas).
+
+    `skip_keys` sao (fiada, id(peca)) - a identidade do objeto que
+    `create_building_blocks` recebe (o mesmo `course_candidates`)."""
     result = dict(result or {})
     pular = set(skip_keys or ())
     fontes = result.get("course_candidates") or {}
     result["course_candidates"] = dict(
-        (ci, [c for c in pecas if (ci, _reinforcement._physical_key(c)) not in pular])
+        (ci, [c for c in pecas if (ci, id(c)) not in pular])
         for ci, pecas in fontes.items())
     return result
 
@@ -5173,7 +5197,6 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
         return {"ok": False, "errors": ["Altura fisica invalida"], "opening_violations": [], "collisions": []}
     for ci, pieces in sorted(sources.items()):
         z0, z1 = _course_z_band(base_z_abs, ci, step, height)
-        active = _filter_openings_per_wall_for_band(openings_per_wall, z0, z1)
         for i, c in enumerate(pieces):
             vectors = [c[key] for key in ("origin_world", "x_dir", "y_dir")]
             values = [v for vector in vectors for v in (vector.X, vector.Y, vector.Z)]
@@ -5186,11 +5209,18 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
         if errors:
             return {"ok": False, "errors": errors, "opening_violations": violations, "collisions": collisions}
         boxes = [_candidate_obb(c) for c in pieces]
+        # REGRA 48 (OPCAO A): a abertura conta nesta fiada quando o vao REAL
+        # sobrepoe a faixa da fiada em Z alem da MESMA tolerancia de 0,1 cm usada
+        # em planta. Nunca a tolerancia de ruido de 0,5 cm que o solver usa para
+        # montar as bandas (OPENING_COURSE_BAND_TOLERANCE_CM): com ela, ate' 5 mm
+        # de peca ficavam dentro do vao sem aparecer no laudo. O solver nao muda.
         voids = []
-        for wi, openings in enumerate(active):
-            for opening in openings:
-                voids.append((wi, openings_per_wall[wi].index(opening),
-                              _door_void_obb(wi, walls_to_create, opening[0], opening[1])))
+        for wi, openings in enumerate(openings_per_wall):
+            for oi, opening in enumerate(openings):
+                vertical = min(opening[3], z1) - max(opening[2], z0)
+                if vertical <= BOND_COLLISION_EPS_FT:
+                    continue
+                voids.append((wi, oi, _door_void_obb(wi, walls_to_create, opening[0], opening[1]), vertical))
         all_boxes = boxes + [v[2] for v in voids]
         aabbs = [_obb_aabb(box) for box in all_boxes]
         for i, j in sorted(_collision_candidate_pairs(range(len(all_boxes)), aabbs, 0.0)):
@@ -5209,9 +5239,12 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
                 record.update(other_candidate_index=j, other_wall_idx=pieces[j].get("wall_idx"))
                 collisions.append(record)
             else:
-                wi, oi, _obb = voids[j - len(pieces)]
+                wi, oi, _obb, vertical = voids[j - len(pieces)]
+                # sobreposicao REAL em 3D = a menor das duas (planta x altura)
                 record.update(opening_wall_idx=wi, opening_index=oi,
-                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]])
+                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]],
+                              plan_overlap_cm=_ft_to_cm(overlap), vertical_overlap_cm=_ft_to_cm(vertical),
+                              overlap_cm=_ft_to_cm(min(overlap, vertical)))
                 violations.append(record)
     return {"ok": not violations and not collisions and not errors, "errors": errors,
             "opening_violations": violations, "collisions": collisions}
@@ -6415,10 +6448,17 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
     course_height_ft, height_error = _course_height_ft(catalog, height_source)
     if course_height_ft is None:
         perf["total_s"] = clock() - t_function_start
+        # contabilidade fechada tambem aqui: nada criado, todo o plano falhou
+        if course_candidates is not None:
+            planejadas = sum(len(course_candidates.get(ci) or []) for ci in range(num_courses))
+        else:
+            planejadas = sum(1 for ci in range(num_courses) for c in candidates or []
+                             if c.get("course") == ("A" if ci % 2 == 0 else "B"))
         return {
             "created_count": 0, "failures": [],
             "course_height_ft": None, "course_height_error": height_error,
             "created_instances": [], "perf": perf,
+            "planned_total": planejadas, "skipped_count": 0, "skipped": [], "failed_count": planejadas,
         }
 
     used_codes = sorted(set(c["logical_code"] for c in height_source))
@@ -6452,12 +6492,11 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
     # (planejadas = criadas + puladas + falhas).
     skipped_records = []
     if skip_keys:
-        from core.engine import opening_reinforcement as _reinforcement_skip
         filtradas = []
         for course_index, source in enumerate(course_sources):
             mantidas = []
             for cand in source:
-                chave = (course_index, _reinforcement_skip._physical_key(cand))
+                chave = (course_index, id(cand))
                 registro = skip_keys.get(chave) if isinstance(skip_keys, dict) else None
                 if chave in skip_keys:
                     skipped_records.append(registro or {
@@ -12685,6 +12724,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
             if self.beta_transaction_error:
                 raise RuntimeError(self.beta_transaction_error)
             _perf.mark("create.preflight START")
+            if self.solve_result is not None:
+                self.solve_result["beta_materialization_verified"] = False
             preflight = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             if self.solve_result is not None:
@@ -12712,6 +12753,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                  "{} peca(s) ainda invadem abertura e {} colidem - nada foi criado.".format(
                                      len(conferencia.get("opening_violations") or []),
                                      len(conferencia.get("collisions") or [])))
+            if self.solve_result is not None:
+                self.solve_result["beta_materialization_verified"] = True
             if self._unbuildable:
                 _perf.mark("create.materializacao seletiva",
                            puladas=len(self._unbuildable),
@@ -12731,10 +12774,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
                     self._execute_create_batch(app_doc)
                 result = self.create_result or {}
                 _pulados = set((ci, chave) for ci, chave, _r in (self._unbuildable or ()))
-                from core.engine import opening_reinforcement as _reinforcement_expected
                 expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
-                            for c in source
-                            if (ci, _reinforcement_expected._physical_key(c)) not in _pulados]
+                            for c in source if (ci, id(c)) not in _pulados]
                 instances = result.get("created_instances") or []
                 actual = [(item.get("course_index"), item.get("candidate_key")) for item in instances]
                 if (result.get("failures") or sorted(actual) != sorted(expected)
@@ -13066,7 +13107,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def _execute_delete(self, app_doc):
         if self.controlled_beta and self.beta_transaction_error:
             raise RuntimeError(self.beta_transaction_error)
-        if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
+        if self.controlled_beta and not beta_finalize_allowed(self.solve_result):
             raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
         if self.controlled_beta:
             if self.create_result is None:
@@ -14256,11 +14297,16 @@ class _PostCreationForm(Form):
         self._update_delete_enabled()
 
     def _update_delete_enabled(self):
-        solve_ok = bool(
-            self._handler.solve_result
-            and len(self._handler.solve_result["collisions"]) == 0
-            and len(self._handler.solve_result.get("door_void_violations") or []) == 0
-        )
+        if getattr(self._handler, "controlled_beta", False):
+            # mesmo criterio do backend (_execute_delete): pulo localizado nao
+            # trava a planta inteira; a parede afetada fica retida
+            solve_ok = beta_finalize_allowed(self._handler.solve_result)
+        else:
+            solve_ok = bool(
+                self._handler.solve_result
+                and len(self._handler.solve_result["collisions"]) == 0
+                and len(self._handler.solve_result.get("door_void_violations") or []) == 0
+            )
         create_ok = bool(
             self._handler.create_result and self._handler.create_result.get("created_count", 0) > 0
         )

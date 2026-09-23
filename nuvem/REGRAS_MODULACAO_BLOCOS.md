@@ -7483,6 +7483,21 @@ invadir 5 mm". Mudou SO' o que acontece com a peca:
 - INVARIANTE antes de criar: o preflight e' refeito so' com as pecas que
   ficam (`verify_materialization`); se ainda houver invasao ou colisao, e'
   FATAL - nunca criacao parcial.
+- tolerancia em Z: no laudo da regra 48 a abertura conta numa fiada quando o
+  vao REAL sobrepoe a faixa da fiada em mais de 0,1 cm - a MESMA tolerancia da
+  planta. A tolerancia de ruido de 0,5 cm (`OPENING_COURSE_BAND_TOLERANCE_CM`)
+  continua valendo SO' para o solver montar as bandas; no laudo ela deixava ate'
+  5 mm de peca dentro do vao sem registro (achado da auditoria independente,
+  reproduzido: verga a 221,4 cm x fiada a partir de 221 cm). A sobreposicao
+  registrada e' a real em 3D (a menor entre planta e altura).
+- colisao cuja outra peca ja' saiu (invasao ou outra colisao) esta' resolvida:
+  nenhuma peca valida a mais e' pulada e nenhuma amarracao NAO resolvida falsa
+  e' criada. O pulo e' por IDENTIDADE da peca (duas pecas iguais sao duas).
+- Finalizar (excluir paredes de referencia): pulo localizado NAO trava a
+  planta inteira. A parede com peca pulada fica RETIDA (`INCOMPLETE_CREATION`,
+  referencia preservada, realce vermelho); as paredes completas seguem.
+  Continua bloqueado com erro fatal ou com conjunto criado nao conferido
+  (`beta_finalize_allowed`).
 - contabilidade fechada: planejadas = criadas + puladas + falhas; cada pulo
   leva parede, fiada, codigo, regra, motivo, sobreposicao, abertura, papel
   estrutural e revisao humana.

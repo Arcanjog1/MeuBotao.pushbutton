@@ -59,10 +59,10 @@ COMPRIMENTO = {"B19": 19, "B34": 34, "B39": 39, "B54": 54, "C09": 9, "C04": 4}
 TIE = "T_INTERSECTION_DEGRADED_L"          # papel de no' dado pelo solver (no' 41 real)
 
 
-def bloco(x, code="B34", reason=TIE, node=5, wall=0):
+def bloco(x, code="B34", reason=TIE, node=5, wall=0, y=0):
     return {"wall_idx": wall, "logical_code": code, "length_cm": COMPRIMENTO[code],
             "width_cm": 14, "course": "A", "course_variant": 0,
-            "origin_world": m.XYZ(ft(x), 0, 0), "x_dir": m.XYZ(1, 0, 0), "y_dir": m.XYZ(0, 1, 0),
+            "origin_world": m.XYZ(ft(x), ft(y), 0), "x_dir": m.XYZ(1, 0, 0), "y_dir": m.XYZ(0, 1, 0),
             "node_index": node, "placement_reason": reason}
 
 
@@ -315,7 +315,7 @@ def test_pecas_impossiveis_sao_identificadas_uma_a_uma():
     for _ci, chave, rec in itens:
         assert rec["severity"] == "GEOMETRY_IMPOSSIBLE"
         assert rec["wall_idx"] is not None and rec["course_index"] in (0, 1)
-        assert isinstance(chave, str) and chave
+        assert isinstance(chave, int)          # identidade da peca (id), nunca chave fisica
     assert m.unbuildable_keys(r) == set((ci, k) for ci, k, _r in itens)
 
 
@@ -540,3 +540,181 @@ def test_resultado_final_mostra_a_contabilidade_e_o_estado_estrutural():
     assert "ESTADO ESTRUTURAL" in texto and "RUN executada: sim" in texto
     assert "Modulação estruturalmente resolvida: NÃO" in texto
     assert "NÃO resolvida (nó 41)" in texto
+
+
+# ============================ achados da auditoria independente (2026-09-23)
+def test_colisao_com_peca_ja_pulada_nao_pula_peca_valida_nem_cria_pendencia_falsa(beta):
+    """Amarracao valida (centro x=100: 83..117, fora da porta 30..80) colide com
+    a amarracao que invade a porta (centro x=70: 53..87). A invasora sai; a
+    colisao ja' esta' resolvida - a valida fica e NAO vira amarracao NAO resolvida."""
+    handler = beta([[bloco(100, node=7), bloco(70, node=8)]])
+    handler._execute_create(Document())
+    criacao = handler.create_result
+    assert criacao["created_count"] == 1 and criacao["skipped_count"] == 1
+    (_ci, criada), = pecas_criadas(handler)
+    assert criada["node_index"] == 7
+    assert [b["node_index"] for b in criacao["unresolved_bonds"]] == [8]
+    pulo, = criacao["skipped"]
+    assert pulo["rules"] == [m.OPENING_INVASION_RULE_ID, m.PIECE_COLLISION_RULE_ID]
+
+
+def test_colisao_resolvida_pela_invasao_no_plano_sem_ordem_privilegiada():
+    for i, j in ((0, 1), (1, 0)):
+        pf = {"ok": False, "errors": [],
+              "opening_violations": [{"course_index": 0, "candidate_index": 1}],
+              "collisions": [{"course_index": 0, "candidate_index": i, "other_candidate_index": j}]}
+        r = resultado(pf)
+        r["course_candidates"][0][0] = peca(code="B34", reason=TIE)
+        r["course_candidates"][0][1] = peca(code="B34", reason=TIE)
+        plano_m = m.materialization_plan(r, pf)
+        assert len(plano_m["skip"]) == 1 and len(plano_m["unresolved_bonds"]) == 1
+
+
+def _fiadas_com_alvo(fiada_alvo, total=12):
+    return [[bloco(150, "B39", "STANDARD_FILL")] + ([bloco(55, "B39", "STANDARD_FILL")] if ci == fiada_alvo else [])
+            for ci in range(total)]
+
+
+def test_regra_48_nao_tolera_5_mm_de_peca_dentro_do_vao_na_vertical(beta):
+    """Verga da porta a 221,4 cm; a fiada 11 comeca em 221 cm: 4 mm de peca
+    dentro do vao. A tolerancia de ruido de 0,5 cm do solver NAO vale para a
+    regra 48 - so' os 0,1 cm."""
+    handler = beta(_fiadas_com_alvo(11), porta=(30, 80, 0, 221.4))
+    handler._execute_create(Document())
+    criacao = handler.create_result
+    assert criacao["skipped_count"] == 1 and criacao["created_count"] == 12
+    pulo, = criacao["skipped"]
+    assert pulo["course_index"] == 11 and pulo["rule_id"] == m.OPENING_INVASION_RULE_ID
+    assert pulo["vertical_overlap_cm"] == pytest.approx(0.4, abs=1e-6)
+    assert pulo["overlap_cm"] == pytest.approx(0.4, abs=1e-6)     # sobreposicao real em 3D
+    assert conta_fecha(criacao)
+
+
+def test_encoste_vertical_dentro_de_0_1_cm_continua_permitido(beta):
+    handler = beta(_fiadas_com_alvo(11), porta=(30, 80, 0, 221.05))
+    handler._execute_create(Document())
+    assert handler.create_result["skipped_count"] == 0 and handler.create_result["created_count"] == 13
+
+
+def test_peitoril_3_mm_acima_da_fiada_tambem_e_invasao(beta):
+    handler = beta(_fiadas_com_alvo(5), porta=(30, 80, 119.7, 221.4))
+    handler._execute_create(Document())
+    pulo, = handler.create_result["skipped"]
+    assert pulo["course_index"] == 5
+    assert pulo["vertical_overlap_cm"] == pytest.approx(0.3, abs=1e-6)
+
+
+def test_registro_leva_a_parede_da_abertura():
+    result, walls, openings = cenario([[bloco(40)]])
+    pf = m.controlled_beta_preflight(result, walls, openings, CATALOG, 0.0)
+    (_ci, _k, rec), = m.materialization_plan(result, pf)["skip"]
+    assert rec["opening_wall_idx"] == 0 and rec["opening_index"] == 0
+    violacao, = pf["opening_violations"]
+    assert violacao["overlap_cm"] == pytest.approx(min(violacao["plan_overlap_cm"],
+                                                       violacao["vertical_overlap_cm"]))
+
+
+def test_duas_pecas_identicas_sao_duas_pecas(beta):
+    """Pular por identidade: duas pecas iguais invadindo = dois pulos;
+    duas pecas iguais colidindo fora da porta = um pulo e uma criada."""
+    handler = beta([[bloco(40, "B39", "STANDARD_FILL"), bloco(40, "B39", "STANDARD_FILL")],
+                    [bloco(120, "B39", "STANDARD_FILL"), bloco(120, "B39", "STANDARD_FILL")]])
+    handler._execute_create(Document())
+    criacao = handler.create_result
+    assert criacao["planned_total"] == 4
+    assert criacao["skipped_count"] == 3 and criacao["created_count"] == 1
+    assert conta_fecha(criacao)
+    plano_m = m.materialization_plan(handler.solve_result, handler.solve_result["beta_preflight"])
+    assert len(plano_m["skip"]) == 3 and len(criacao["skipped"]) == 3
+
+
+class _DocumentoComParedes(Document):
+    def __init__(self, paredes):
+        Document.__init__(self)
+        self.ActiveView = SimpleNamespace()
+        for pid in paredes:
+            self.elements[pid] = SimpleNamespace(Id=pid)
+
+    def Delete(self, ids):
+        for eid in (ids if isinstance(ids, (list, tuple, set)) else [ids]):
+            self.elements.pop(eid, None)
+
+
+def test_finalizar_depois_de_pulo_localizado_retem_so_a_parede_afetada(beta):
+    """Pulo localizado nao trava o Finalizar da planta inteira: a parede com
+    peca pulada fica retida (INCOMPLETE_CREATION); a parede completa sai."""
+    handler = beta([[bloco(40, node=41), bloco(100, "B39", "STANDARD_FILL"),
+                     bloco(100, "B39", "STANDARD_FILL", wall=1, y=200)]])
+    handler.walls_to_create = [(seg(0, 0, 199, 0), ft(14), (False, False)),
+                               (seg(0, 200, 199, 200), ft(14), (False, False))]
+    handler.openings_per_wall = [[tuple(ft(v) for v in PORTA)], []]
+    handler.solve_result["beta_input_signature"] = handler._beta_input_signature()
+    handler.created_walls_by_axis = {0: [(501, "cad")], 1: [(502, "cad")]}
+    handler.created_wall_ids_all = [501, 502]
+    realcadas = []
+    handler._apply_solid_color_override = lambda _v, ids, *a, **k: realcadas.extend(ids)
+    doc = _DocumentoComParedes([501, 502])
+    handler._execute_create(doc)
+    assert handler.create_result["skipped_count"] == 1
+    assert m.beta_finalize_allowed(handler.solve_result) is True
+    handler._execute_delete(doc)
+    assert 501 in doc.elements and 502 not in doc.elements
+    assert handler.create_result["deleted_wall_count"] == 1
+    retida, = handler.create_result["retained_walls"]
+    assert retida["wall_idx"] == 0 and retida["reason"] == "INCOMPLETE_CREATION"
+    assert 501 in realcadas and 502 not in realcadas      # a parede retida fica em vermelho
+
+
+def test_finalizar_continua_bloqueado_com_erro_fatal_ou_sem_conferencia():
+    assert m.beta_finalize_allowed({"beta_preflight": {"ok": True, "errors": []}}) is True
+    assert m.beta_finalize_allowed({"beta_preflight": {"ok": False, "errors": ["x"],
+                                                       "opening_violations": []},
+                                    "beta_materialization_verified": True}) is False
+    # laudo com pulos mas conjunto ainda nao conferido na criacao
+    assert m.beta_finalize_allowed({"beta_preflight": {"ok": False, "errors": [],
+                                                       "opening_violations": [{}]}}) is False
+    assert m.beta_finalize_allowed({}) is False
+
+
+def test_altura_de_fiada_indisponivel_ainda_fecha_a_contabilidade():
+    import revit_stubs
+    candidatos = [bloco(100, "B39", "STANDARD_FILL"), bloco(150, "B39", "STANDARD_FILL")]
+    criacao = m.create_building_blocks(revit_stubs._StubDoc(), candidatos, {}, base_z_abs=0.0,
+                                       selected_level=revit_stubs._Inert(), num_courses=1,
+                                       course_candidates={0: candidatos})
+    assert criacao["created_count"] == 0 and criacao["planned_total"] == 2
+    assert criacao["failed_count"] == 2 and conta_fecha(criacao)
+
+
+def test_relatorio_nao_repete_pendencias_e_diz_que_a_run_rodou_mesmo_com_zero_criadas():
+    estado = ModulationUiState(6, "CHANNEL")
+    estado.result = resultado({"ok": True, "errors": [], "opening_violations": [], "collisions": []})
+    estado.result["materialization"] = {
+        "skipped": [], "fatal": [],
+        "unresolved_bonds": [{"node_index": 41, "course_index": 0, "logical_code": "B34",
+                              "structural_role": TIE, "rejected_rule": "OPENING_VOID_INVASION"}]}
+    criacao = {"planned_total": 2, "created_count": 0, "skipped_count": 2, "failed_count": 0,
+               "failures": [], "structurally_resolved": False, "skipped": [],
+               "retained_walls": [{"wall_idx": 0, "reason": "INCOMPLETE_CREATION",
+                                   "missing_count": 2, "planned_count": 2}]}
+    texto = estado.report_text(_H(), criacao)
+    assert texto.count("NÃO resolvida (nó 41)") == 1
+    assert "RUN executada: sim — 0 de 2 peça(s) criada(s)" in texto
+    assert "criação incompleta — 2 de 2 peça(s) não criada(s)" in texto
+    assert "Nenhuma retenção informada pelo motor" not in texto
+
+
+def test_contabilidade_desconhecida_nao_vira_nao_fecha():
+    estado = ModulationUiState(6, "CHANNEL")
+    estado.result = resultado({"ok": True, "errors": [], "opening_violations": [], "collisions": []})
+    texto = estado.report_text(_H(), {"created_count": 0, "failures": []})
+    assert "Contabilidade fecha: — (valor desconhecido)" in texto
+    assert "Ignorados: —" in texto and "None" not in texto
+
+
+def test_pendencia_nascida_na_criacao_aparece_na_revisao():
+    from core.ui_state import review_items
+    criacao = {"unresolved_bonds": [{"node_index": 7, "course_index": 3, "logical_code": "B54",
+                                     "structural_role": "L_CORNER", "rejected_rule": "MISSING_FAMILY"}]}
+    textos = [r["text"] for r in review_items({}, criacao)]
+    assert any("nó 7" in t and "MISSING_FAMILY" in t for t in textos)
