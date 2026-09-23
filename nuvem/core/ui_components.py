@@ -887,11 +887,13 @@ class UiComponents(object):
         form._ui_result_counts.Text = "{} blocos criados · {} paredes · {} aberturas\n{} falha(s) de criação".format(
             created.get("created_count", 0), len(h.walls_to_create or []), len(h.all_openings or []), len(created.get("failures") or []))
         pending = sum(not row.get("resolved") for row in h.error_rows or [])
-        revisao = ("{} encontro(s) marcados para revisão humana (a peça de amarração não cabe).".format(pendentes)
-                   if pendentes else "Nenhum encontro marcado para revisão humana.")
-        critico = ("{} bloqueio(s) crítico(s) — veja o relatório.".format(portoes) if portoes
-                   else "Nenhum bloqueio crítico.")
-        form._ui_result_notes.Text = "{} parede(s) ainda requer(em) revisão.\n{}\n{}\n{}\nConfira o modelo e consulte o relatório antes de concluir.".format(
+        # Mesma informação em TRÊS linhas: o painel de resultado do #46 foi
+        # desenhado para essa altura; crescer a pilha sobrepõe as seções
+        # recolhíveis logo abaixo (defeito de integração visto na renderização).
+        revisao = ("{} encontro(s) para revisão humana".format(pendentes) if pendentes
+                   else "nenhum encontro para revisão humana")
+        critico = ("{} bloqueio(s) crítico(s)".format(portoes) if portoes else "nenhum bloqueio crítico")
+        form._ui_result_notes.Text = "{} parede(s) ainda requer(em) revisão · {} · {}.\n{}\nConfira o modelo e consulte o relatório antes de concluir.".format(
             pending, revisao, critico, form._solve_console._elapsed_label.Text)
         form._ui_tabs.SelectedIndex = 2
         form._ui_close.Enabled = True
