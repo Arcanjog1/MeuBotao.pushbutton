@@ -90,7 +90,7 @@ Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integr
     },
     {
       "branch": "integration/pr42-ui46-final",
-      "head": "0641b5bc46f3f66928bcec238ef2e45aa930bad4",
+      "head": "89384db96050c36d3d0df0f9600d75acf4373cfd",
       "pr": 49,
       "nota": "candidato de integracao: #42 (motor) + #46 (UI premium) + OPCAO A da regra 48; sem merge"
     }
