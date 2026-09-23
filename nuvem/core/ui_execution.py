@@ -39,13 +39,26 @@ class ExecutionPresentation(object):
             "failed": "! Microajuste falhou · confira o modelo e os detalhes",
             "cancelled": "! Microajuste interrompido · confira o modelo antes de continuar",
             "not_required": "○ Microajuste não necessário nesta análise",
+            # O fluxo do botao NAO roda a Etapa 3B (secao 66): dizer "nao
+            # necessario" seria inventar um veredito que o motor nao deu.
+            "not_evaluated": "○ Microajuste não avaliado nesta execução (Etapa 3B fora do fluxo do botão)",
         }.get(status, "○ Microajuste · confirmação ainda não recebida")
+
+    def review_text(self):
+        """Regra 76.1: encontros marcados para revisao humana. Nunca vira "erro"."""
+        pendentes = count(self.data.get("review_items"))
+        if pendentes is None:
+            return "Revisão humana: —"
+        if not pendentes:
+            return "Revisão humana: nenhum encontro pendente"
+        return "Revisão humana: {} encontro(s) a revisar".format(pendentes)
 
     def summary(self):
         # Even a reported moved count cannot certify an uncommitted transaction.
         moved = self.metric("openings_moved") if self.data.get("adjustment_status") == "confirmed" else "—"
-        return "Paredes analisadas: {} · Aberturas movidas: {}\nAvisos: {} · Bloqueios críticos: {}\n{}".format(
-            self.metric("walls_analyzed"), moved, self.metric("warnings"), self.metric("hard_gates"), self.adjustment_text())
+        return "Paredes analisadas: {} · Aberturas movidas: {}\nAvisos: {} · Bloqueios críticos: {}\n{}\n{}".format(
+            self.metric("walls_analyzed"), moved, self.metric("warnings"), self.metric("hard_gates"),
+            self.review_text(), self.adjustment_text())
 
     def details(self):
         return self.summary() + "\n\n" + str(self.data.get("detail") or "Aguardando dados confirmados desta execução.")

@@ -9840,6 +9840,64 @@ from core.ui_state import creation_gate as _ui_creation_gate, wall_label as _ui_
 from core.ui_state import friendly_problem as _ui_problem, activity_text as _ui_activity
 from core.ui_components import UiComponents
 
+from core.ui_state import (review_items as _ui_review_items,
+                           hard_gate_total as _ui_hard_gate_total,
+                           no_functional_junction_count as _ui_no_functional_junction)
+
+# ---------------------------------------------------------------- pos-PR #42
+# A UI premium (#46) deixou pronto `UiComponents.present_execution`, mas nada no
+# host publicava o snapshot. Este e' o adaptador: numeros REAIS do motor final,
+# com `run_id`/`revision` para que um evento atrasado de uma execucao anterior
+# nunca sobrescreva a execucao atual (ver ExecutionPresentation.update).
+_UI_RUN_SEQ = [0]
+
+
+def _ui_new_run_id():
+    _UI_RUN_SEQ[0] += 1
+    return "run-%d" % _UI_RUN_SEQ[0]
+
+
+def _ui_execution_snapshot(run_id, revision, handler, solve_result=None, create_result=None,
+                           adjustment_status="not_evaluated", openings_moved=None, detail=None):
+    """Snapshot completo (nunca delta) do que o motor REALMENTE entregou.
+
+    `adjustment_status` nasce "not_evaluated" de proposito: o fluxo do botao nao
+    executa a Etapa 3B da secao 66 (o planejador de microajuste so' e' chamado
+    pelo harness), entao a UI nao pode afirmar "abertura ajustada" nem "ajuste
+    nao necessario" - so' o que foi confirmado vira "confirmed"."""
+    result = solve_result or {}
+    audits = result.get("wall_bond_audits") or {}
+    if isinstance(audits, dict):
+        audits = list(audits.values())
+    avisos = sum(1 for a in audits if isinstance(a, dict) and not a.get("ok", True))
+    avisos += len(result.get("unmodulated_walls") or [])
+    snapshot = {
+        "run_id": run_id,
+        "revision": revision,
+        "walls_analyzed": len(getattr(handler, "walls_to_create", None) or []),
+        "warnings": avisos,
+        "hard_gates": _ui_hard_gate_total(result),
+        "review_items": len(_ui_review_items(result)),
+        "adjustment_status": adjustment_status,
+    }
+    if openings_moved is not None:
+        snapshot["openings_moved"] = openings_moved
+    partes = []
+    if create_result is not None:
+        partes.append("Criados: {} bloco(s); falhas de criacao: {}.".format(
+            create_result.get("created_count", 0), len(create_result.get("failures") or [])))
+    sem_encontro = _ui_no_functional_junction(result)
+    if sem_encontro:
+        partes.append("{} fiada(s) sem encontro funcional por projeto (secao 77) - nao sao erro.".format(
+            sem_encontro))
+    if detail:
+        partes.append(detail)
+    if partes:
+        snapshot["detail"] = " ".join(partes)
+    return snapshot
+
+
+
 UI_BG = Color.FromArgb(*_UI_TOKENS["Background"])
 UI_PANEL = Color.FromArgb(*_UI_TOKENS["Surface"])
 UI_HEADER = Color.FromArgb(*_UI_TOKENS["Background"])
@@ -12821,6 +12879,11 @@ class _PostCreationForm(Form):
         self._external_event = external_event
         self._handler = handler
         self._created_wall_count = len(created_wall_ids_all)
+        # pos-#42: identidade da execucao para a UI (ver _ui_execution_snapshot).
+        # Nasce definida aqui porque a criacao pode acontecer sobre um solve em
+        # cache, sem passar por _on_solve_click nesta abertura da janela.
+        self._ui_run_id = _ui_new_run_id()
+        self._ui_run_revision = -1
         # Capturadas como atributos de instancia (nao pelo nome do modulo)
         # pelo MESMO motivo ja documentado em _PostCreationEventHandler.
         # __init__/_ApplySuggestionsEventHandler (removida): metodos desta
@@ -13487,6 +13550,8 @@ class _PostCreationForm(Form):
 
     def _on_solve_click(self, sender, args):
         self._ux.busy(self, 3)
+        self._ui_run_id = _ui_new_run_id()      # pos-#42: identidade desta execucao
+        self._ui_run_revision = -1
         self._set_busy(self._solve_button, "Calculando...")
         console = self._solve_console
         console.log("Iniciando Solver 18 (lancamento de blocos X->T->L->jambs->trechos livres)...")
@@ -13595,6 +13660,12 @@ class _PostCreationForm(Form):
         report, _ready_to_create = self._format_block_solve_report(result, self._handler.catalog)
         self._append_log(report)
         self._ux.solved(self)
+        # pos-#42: a tela passa a mostrar os numeros reais desta execucao
+        self._ui_run_revision += 1
+        self._ux.present_execution(
+            self, _ui_execution_snapshot(self._ui_run_id, self._ui_run_revision, self._handler,
+                                         solve_result=result),
+            new_run=(self._ui_run_revision == 0))
 
     def _on_create_click(self, sender, args):
         allowed, reason = _ui_creation_gate(self._handler.solve_result,
@@ -13773,6 +13844,11 @@ class _PostCreationForm(Form):
         # (nunca ao reabrir a janela com um create_result em cache - ver
         # _show_post_creation_window/initial_create_result).
         self._ux.completed(self)
+        self._ui_run_revision += 1
+        self._ux.present_execution(
+            self, _ui_execution_snapshot(self._ui_run_id, self._ui_run_revision, self._handler,
+                                         solve_result=self._handler.solve_result,
+                                         create_result=result))
         self._solve_button.Enabled = True
 
     def _show_final_block_summary_alert(self, create_result):

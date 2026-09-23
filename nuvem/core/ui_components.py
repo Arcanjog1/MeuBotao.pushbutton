@@ -6,6 +6,7 @@ layer. It does not introduce another event loop, thread or framework.
 """
 from .ui_state import STEPS, TYPE, TOKENS, ModulationUiState, family_rows, wall_label
 from .ui_execution import ExecutionPresentation
+from .ui_state import review_summary as _ui_review_summary
 from .ui_preview_panel import attach_preview
 from .ui_native_style import style_input, style_grid, style_disabled_button
 from .ui_chrome import underline, separator, choice, stepper, dropdown
@@ -866,23 +867,32 @@ class UiComponents(object):
         self.end_busy_view(form)
         state, h = form._ui_state, form._handler
         form._ui_tabs.bar.Enabled = True
-        state.completed(h.create_result or {})
+        state.completed(h.create_result or {}, h.solve_result)
         if state.status == "success" and any(not r.get("resolved") for r in h.error_rows or []):
             state.status = "warning"
+        pendentes, portoes = _ui_review_summary(h.solve_result)
         text = {"success": "✓ Modulação concluída. Confira os blocos no Revit.",
-                "warning": "! Criação concluída com pendências. Revise o relatório.",
+                "warning": ("! Modulação concluída com revisão necessária. Confira os encontros indicados."
+                            if pendentes and not portoes else
+                            "! Criação concluída com pendências. Revise o relatório."),
                 "error": "! A criação não foi concluída. Consulte as falhas no relatório."}[state.status]
         form._ui_result.Text = (text + "\n\n" + form._ui_execution.details() + "\n\n" + state.report_text(h, h.create_result)).replace("\n", "\r\n")
         form._ui_result.Text += "\r\n" + form._solve_console._elapsed_label.Text
         created = h.create_result or {}
-        form._ui_result_title.Text = {"success": "✓ Modulação concluída", "warning": "! Concluída com pendências",
+        form._ui_result_title.Text = {"success": "✓ Modulação concluída",
+                                      "warning": ("! Concluída com revisão necessária" if pendentes and not portoes
+                                                  else "! Concluída com pendências"),
                                       "error": "✕ Criação não concluída"}[state.status]
         form._ui_result_title.ForeColor = self.ns["UI_OK" if state.status == "success" else "UI_WARN" if state.status == "warning" else "UI_ERROR"]
         form._ui_result_counts.Text = "{} blocos criados · {} paredes · {} aberturas\n{} falha(s) de criação".format(
             created.get("created_count", 0), len(h.walls_to_create or []), len(h.all_openings or []), len(created.get("failures") or []))
         pending = sum(not row.get("resolved") for row in h.error_rows or [])
-        form._ui_result_notes.Text = "{} parede(s) ainda requer(em) revisão.\n{}\nConfira o modelo e consulte o relatório antes de concluir.".format(
-            pending, form._solve_console._elapsed_label.Text)
+        revisao = ("{} encontro(s) marcados para revisão humana (a peça de amarração não cabe).".format(pendentes)
+                   if pendentes else "Nenhum encontro marcado para revisão humana.")
+        critico = ("{} bloqueio(s) crítico(s) — veja o relatório.".format(portoes) if portoes
+                   else "Nenhum bloqueio crítico.")
+        form._ui_result_notes.Text = "{} parede(s) ainda requer(em) revisão.\n{}\n{}\n{}\nConfira o modelo e consulte o relatório antes de concluir.".format(
+            pending, revisao, critico, form._solve_console._elapsed_label.Text)
         form._ui_tabs.SelectedIndex = 2
         form._ui_close.Enabled = True
         form._ui_progress._set_expanded(False)

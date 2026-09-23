@@ -141,12 +141,18 @@ class ModulationUiState(object):
         self.status, self.can_create = "cancelled", False
         self.reason = "Execução interrompida. Confira o estado das paredes antes de continuar."
 
-    def completed(self, result):
+    def completed(self, result, solve_result=None):
+        """`solve_result` (pos-#42) traz os itens de REVISAO HUMANA da regra 76.1:
+        com eles o desfecho e' "concluida com revisao necessaria", nunca "sucesso"."""
         self.step = 6
         self.status = ("error" if not result.get("created_count") or result.get("course_height_error")
                        else "warning" if result.get("failures") or result.get("skipped_wall_count")
                        or result.get("reproved_wall_count") or result.get("colliding_instance_count")
                        else "success")
+        pendentes, portoes = review_summary(solve_result if solve_result is not None else self.result)
+        if self.status == "success" and (pendentes or portoes):
+            self.status = "warning"
+
 
     def report_text(self, handler, creation=None):
         result = self.result or {}
@@ -169,6 +175,19 @@ class ModulationUiState(object):
         if preflight and not preflight.get("ok"):
             for key in ("errors", "opening_violations", "collisions"):
                 lines.extend("Crítico: " + friendly_problem(item) for item in preflight.get(key) or [])
+        pendentes = review_items(result)
+        lines.extend(["", "REVISÃO NECESSÁRIA (não é falha de criação)"])
+        if pendentes:
+            lines.extend("  " + row["text"] for row in pendentes)
+        else:
+            lines.append("  Nenhum encontro marcado para revisão humana.")
+        for label, count in hard_gate_counts(result):
+            if count:
+                lines.append("  Crítico: {} — {}".format(label, count))
+        sem_encontro = no_functional_junction_count(result)
+        if sem_encontro:
+            lines.append("  (Técnico: {} fiada(s) sem encontro funcional por projeto — "
+                         "aberturas consomem a parede principal; não é erro.)".format(sem_encontro))
         lines.extend(["", "AVISOS / REVISÃO",
                       "Colisões relatadas: {}".format(len(result.get("collisions") or [])),
                       "Violações de aberturas relatadas: {}".format(len(result.get("door_void_violations") or [])),
@@ -193,3 +212,68 @@ class ModulationUiState(object):
             lines.append("Canaletas: verificação pendente; será realizada pelo backend ao analisar.")
         lines.extend(["", "DESEMPENHO", "Tempo e operações detalhadas em Detalhes da execução."])
         return "\n".join(lines)
+
+# --------------------------------------------------------------- pos-PR #42
+# O motor final classifica tres desfechos diferentes no encontro entre paredes,
+# e a interface NAO pode achatar os tres num "tudo certo":
+#   - portao duro (colisao, fora do modulo, sem apoio, invasao de vao, canaleta
+#     ou compensador exercendo amarracao): o esperado e' ZERO - se aparecer, e'
+#     critico;
+#   - `missing_required_junction_bond` (regra 76.1): a peca de amarracao NAO
+#     cabe; o motor marca `review: HUMAN_REVIEW`. A criacao acontece, mas o caso
+#     precisa de REVISAO HUMANA - nunca e' "falha" nem "tudo perfeito";
+#   - `NO_FUNCTIONAL_JUNCTION` (secao 77): naquela fiada NAO EXISTE encontro
+#     funcional (as aberturas consumiram a principal dos dois lados). E' projeto,
+#     nao defeito: aparece so' nos detalhes tecnicos, nunca como erro.
+HARD_GATES = (
+    ("Colisões", "collisions"),
+    ("Trechos fora do módulo", "non_modular"),
+    ("Invasão de abertura", "door_void_violations"),
+    ("Canaleta exercendo amarração", "channel_as_junction_bond"),
+    ("Compensador exercendo amarração", "compensator_as_junction_bond"),
+)
+
+
+def hard_gate_counts(result):
+    """Portoes duros do motor final, com o nome que o usuario entende."""
+    result = result or {}
+    counts = [(label, len(result.get(key) or [])) for label, key in HARD_GATES]
+    support = (result.get("physical_support") or {}).get("counts") or {}
+    counts.append(("Peças sem apoio",
+                   sum(v for k, v in support.items() if str(k).startswith("UNSUPPORTED"))))
+    return counts
+
+
+def hard_gate_total(result):
+    return sum(count for _label, count in hard_gate_counts(result))
+
+
+def review_items(result):
+    """Encontros que o motor entrega marcados para REVISAO HUMANA (regra 76.1).
+
+    Nao inclui `NO_FUNCTIONAL_JUNCTION`: aquilo nao e' pendencia, e' a topologia
+    real da fiada (secao 77)."""
+    rows = []
+    for item in (result or {}).get("missing_required_junction_bond") or []:
+        node = item.get("node_index")
+        course = item.get("course_index")
+        kind = {"L_CORNER": "canto L", "T_INTERSECTION": "encontro em T",
+                "X_INTERSECTION": "cruzamento"}.get(item.get("node_kind"), "encontro")
+        rows.append({
+            "node": node, "course": course,
+            "text": u"Encontro {} (nó {}), fiada {}: a peça de amarração não cabe — revise no modelo."
+                    .format(kind, node, course),
+        })
+    return rows
+
+
+def no_functional_junction_count(result):
+    """Fiadas em que, por projeto, nao existe encontro funcional (secao 77)."""
+    role = (result or {}).get("junction_role_by_course") or {}
+    return len(role.get("no_functional_junction") or [])
+
+
+def review_summary(result):
+    """(itens de revisao, portoes duros) - o que a tela final tem de dizer."""
+    return len(review_items(result)), hard_gate_total(result)
+
