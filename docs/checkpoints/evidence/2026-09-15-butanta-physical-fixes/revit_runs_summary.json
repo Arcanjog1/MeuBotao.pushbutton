@@ -1,0 +1,271 @@
+{
+ "revit_runs": {
+  "r_run1": {
+   "signature": "47808bc6a16d97e00a2d62318fc67404bf6012f25b4e936c74fc9483f1976d61",
+   "pieces": 9088,
+   "codes": {
+    "CHANNEL_U_CUT": 4,
+    "C04": 384,
+    "CHANNEL_U_19": 3,
+    "B39": 5008,
+    "B34": 2232,
+    "B54": 260,
+    "CHANNEL_U_39": 260,
+    "C09": 581,
+    "B19": 304,
+    "CHANNEL_U_34": 52
+   },
+   "t_solve_s": 42.107,
+   "create": {
+    "lots": {
+     "20260915-021517": 9088
+    },
+    "failures": [],
+    "stamped_after": 9088,
+    "stamped_before": 0,
+    "created": 9088,
+    "t_s": 503.57
+   },
+   "readback_mismatches": 0,
+   "non_modular": 0,
+   "collisions": 0,
+   "opening_violations": 0,
+   "bond_reproved": 3,
+   "small_void": {
+    "after": 552,
+    "before": 3027,
+    "rotated": 586,
+    "passes": 3
+   },
+   "physical_support": {
+    "UNSUPPORTED_BLOCK": 0,
+    "UNSUPPORTED_SMALL_BLOCK": 0
+   },
+   "residual_absorptions": 56,
+   "channel_validation": {
+    "EXTRA_CHANNEL": 0,
+    "channel_pieces": 319,
+    "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+    "channel_bottom_matched": 23,
+    "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+    "CHANNEL_COLLISION": 0,
+    "channel_top_matched": 40,
+    "CHANNEL_ORPHAN_PIECE": 0,
+    "MISSING_REQUIRED_CHANNEL": 0,
+    "channel_bottom_expected": 23,
+    "CHANNEL_INVADES_OPENING": 0,
+    "CHANNEL_OPENING_OVERCUT": 0,
+    "channel_cut_pieces": 4,
+    "CHANNEL_WRONG_COURSE": 0,
+    "channel_top_expected": 40
+   },
+   "human_modified_before": false,
+   "human_modified_after": false,
+   "walls": 34,
+   "openings_detected": 44,
+   "openings_assigned": 44
+  },
+  "r_run2": {
+   "signature": "5f6dc513ce76764c502773af0dbae743084935f3f0690dc5225ab86d752e38d3",
+   "pieces": 9088,
+   "codes": {
+    "CHANNEL_U_CUT": 4,
+    "C04": 384,
+    "CHANNEL_U_19": 3,
+    "B39": 5008,
+    "B34": 2232,
+    "B54": 260,
+    "CHANNEL_U_39": 260,
+    "C09": 581,
+    "B19": 304,
+    "CHANNEL_U_34": 52
+   },
+   "t_solve_s": 53.069,
+   "create": {
+    "lots": {
+     "20260915-022732": 9088
+    },
+    "failures": [],
+    "stamped_after": 9088,
+    "stamped_before": 9088,
+    "created": 9088,
+    "t_s": 508.677
+   },
+   "readback_mismatches": 0,
+   "non_modular": 0,
+   "collisions": 0,
+   "opening_violations": 0,
+   "bond_reproved": 3,
+   "small_void": {
+    "rotated": 586,
+    "pair_passes": 3,
+    "passes": 3,
+    "after": 512,
+    "before": 3027
+   },
+   "physical_support": {
+    "UNSUPPORTED_BLOCK": 0,
+    "UNSUPPORTED_SMALL_BLOCK": 0
+   },
+   "residual_absorptions": 56,
+   "channel_validation": {
+    "EXTRA_CHANNEL": 0,
+    "channel_pieces": 319,
+    "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+    "channel_bottom_matched": 23,
+    "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+    "CHANNEL_COLLISION": 0,
+    "channel_top_matched": 40,
+    "CHANNEL_ORPHAN_PIECE": 0,
+    "MISSING_REQUIRED_CHANNEL": 0,
+    "channel_bottom_expected": 23,
+    "CHANNEL_INVADES_OPENING": 0,
+    "CHANNEL_OPENING_OVERCUT": 0,
+    "channel_cut_pieces": 4,
+    "CHANNEL_WRONG_COURSE": 0,
+    "channel_top_expected": 40
+   },
+   "human_modified_before": false,
+   "human_modified_after": false,
+   "walls": 34,
+   "openings_detected": 44,
+   "openings_assigned": 44
+  },
+  "r_run3b": {
+   "signature": "5f6dc513ce76764c502773af0dbae743084935f3f0690dc5225ab86d752e38d3",
+   "pieces": 9088,
+   "codes": {
+    "CHANNEL_U_CUT": 4,
+    "C04": 384,
+    "CHANNEL_U_19": 3,
+    "B39": 5008,
+    "B34": 2232,
+    "B54": 260,
+    "CHANNEL_U_39": 260,
+    "C09": 581,
+    "B19": 304,
+    "CHANNEL_U_34": 52
+   },
+   "t_solve_s": 54.757,
+   "create": {
+    "lots": {
+     "20260915-024741": 9088
+    },
+    "failures": [],
+    "stamped_after": 9088,
+    "stamped_before": 9083,
+    "created": 9088,
+    "t_s": 527.049
+   },
+   "readback_mismatches": 0,
+   "non_modular": 0,
+   "collisions": 0,
+   "opening_violations": 0,
+   "bond_reproved": 3,
+   "small_void": {
+    "rotated": 586,
+    "pair_passes": 3,
+    "passes": 3,
+    "after": 512,
+    "before": 3027
+   },
+   "physical_support": {
+    "UNSUPPORTED_BLOCK": 0,
+    "UNSUPPORTED_SMALL_BLOCK": 0
+   },
+   "residual_absorptions": 56,
+   "channel_validation": {
+    "EXTRA_CHANNEL": 0,
+    "channel_pieces": 319,
+    "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+    "channel_bottom_matched": 23,
+    "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+    "CHANNEL_COLLISION": 0,
+    "channel_top_matched": 40,
+    "CHANNEL_ORPHAN_PIECE": 0,
+    "MISSING_REQUIRED_CHANNEL": 0,
+    "channel_bottom_expected": 23,
+    "CHANNEL_INVADES_OPENING": 0,
+    "CHANNEL_OPENING_OVERCUT": 0,
+    "channel_cut_pieces": 4,
+    "CHANNEL_WRONG_COURSE": 0,
+    "channel_top_expected": 40
+   },
+   "human_modified_before": false,
+   "human_modified_after": false,
+   "walls": 34,
+   "openings_detected": 44,
+   "openings_assigned": 44
+  },
+  "r_run4": {
+   "signature": "5f6dc513ce76764c502773af0dbae743084935f3f0690dc5225ab86d752e38d3",
+   "pieces": 9088,
+   "codes": {
+    "CHANNEL_U_CUT": 4,
+    "C04": 384,
+    "CHANNEL_U_19": 3,
+    "B39": 5008,
+    "B34": 2232,
+    "B54": 260,
+    "CHANNEL_U_39": 260,
+    "C09": 581,
+    "B19": 304,
+    "CHANNEL_U_34": 52
+   },
+   "t_solve_s": 54.676,
+   "create": {
+    "lots": {
+     "20260915-025734": 9088
+    },
+    "failures": [],
+    "stamped_after": 9088,
+    "stamped_before": 9088,
+    "created": 9088,
+    "t_s": 519.771
+   },
+   "readback_mismatches": 0,
+   "non_modular": 0,
+   "collisions": 0,
+   "opening_violations": 0,
+   "bond_reproved": 3,
+   "small_void": {
+    "rotated": 586,
+    "pair_passes": 3,
+    "passes": 3,
+    "after": 512,
+    "before": 3027
+   },
+   "physical_support": {
+    "UNSUPPORTED_BLOCK": 0,
+    "UNSUPPORTED_SMALL_BLOCK": 0
+   },
+   "residual_absorptions": 56,
+   "channel_validation": {
+    "EXTRA_CHANNEL": 0,
+    "channel_pieces": 319,
+    "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0,
+    "channel_bottom_matched": 23,
+    "CHANNEL_SUPPORT_BELOW_POLICY": 4,
+    "CHANNEL_COLLISION": 0,
+    "channel_top_matched": 40,
+    "CHANNEL_ORPHAN_PIECE": 0,
+    "MISSING_REQUIRED_CHANNEL": 0,
+    "channel_bottom_expected": 23,
+    "CHANNEL_INVADES_OPENING": 0,
+    "CHANNEL_OPENING_OVERCUT": 0,
+    "channel_cut_pieces": 4,
+    "CHANNEL_WRONG_COURSE": 0,
+    "channel_top_expected": 40
+   },
+   "human_modified_before": false,
+   "human_modified_after": false,
+   "walls": 34,
+   "openings_detected": 44,
+   "openings_assigned": 44
+  }
+ },
+ "notes": {
+  "r_run1": "HEAD 4823114 (sem giro em par); purga dos lotes antigos (9.458 pecas do lote 20260914-191852)",
+  "r_run2_r_run3b_r_run4": "HEAD 23dfcb7 (codigo final); run3 original descartado (carregou patch experimental)"
+ }
+}

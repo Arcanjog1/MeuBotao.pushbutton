@@ -1,0 +1,57 @@
+{
+  "kind": "Offscreen WinForms; synthetic data; explicit Scale, not native Windows DPI",
+  "renders": {
+    "01-fonte": {
+      "width": 860,
+      "height": 570
+    },
+    "02-configuracao": {
+      "width": 860,
+      "height": 640
+    },
+    "03-paredes": {
+      "width": 860,
+      "height": 620
+    },
+    "04-revisao": {
+      "width": 860,
+      "height": 640
+    },
+    "05-plano": {
+      "width": 860,
+      "height": 640
+    },
+    "06-criacao": {
+      "width": 860,
+      "height": 640
+    },
+    "07-resultado": {
+      "width": 860,
+      "height": 640
+    },
+    "scale-1": {
+      "width": 860,
+      "height": 640
+    },
+    "scale-1.25": {
+      "width": 1071,
+      "height": 790
+    },
+    "scale-1.5": {
+      "width": 1282,
+      "height": 941
+    },
+    "scale-1.75": {
+      "width": 1493,
+      "height": 1091
+    },
+    "scale-2": {
+      "width": 1704,
+      "height": 1100
+    },
+    "small-740x520": {
+      "width": 740,
+      "height": 520
+    }
+  }
+}

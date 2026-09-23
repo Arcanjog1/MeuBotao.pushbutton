@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-16T13:35:07.531096+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "4c34efc813308d4446df4aab86a954875afcbeab",
+  "tree": "d9b30f70d207c9dd672a56cf3110ce704f5d2a33",
+  "status_before": "?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.txt\n?? docs/ui-premium-preview/",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 300,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-premium-ui-final-focused.txt",
+  "pid": 9224,
+  "exit_code": 0,
+  "elapsed_seconds": 65.966,
+  "status_after": "?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-final-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-premium-ui-scope.json\n?? docs/ui-premium-preview/",
+  "log_sha256": "9a4c6ee86257f41d3bbf5f2aadb2df52214ecec3e9417225b2b4f9d1e33c2437"
+}

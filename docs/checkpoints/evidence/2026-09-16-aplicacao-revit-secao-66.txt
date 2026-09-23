@@ -1,0 +1,9 @@
+APLICACAO REAL NO TARGET - secao 66 (2026-09-16)
+Cada execucao: ler marcas -> resolver -> planejar (com guarda) -> mover -> RECOLETAR a geometria
+do modelo -> re-resolver -> recriar o lote -> releitura peca a peca.
+Marcas de deslocamento acumulado lidas do proprio modelo (parede:vao -> cm): {"3:3": 5.0, "4:0": 5.0, "4:1": 5.0, "4:2": 5.0, "6:0": 10.0, "7:0": 5.0}
+Lote final no Revit: 20260916-103249 com 8923 pecas; projeto humano IsModified=False.
+
+run1  requeridas=24 aplicadas=0 movidas=0 bloqueios=0 | planejadas=8923 criadas=8923 carimbadas=8926->8923 lotes=1 falhas=0 releitura=0/8923 | assinatura=a3b6abf6ba4b pecas=8923 vazado=49 colisoes=0 nao_modular=0 preflight=True abertura_viol=0 | humano=False/False target_mod=True | solve=357s planejamento=257s criacao=350s total=971s
+run2  requeridas=24 aplicadas=0 movidas=0 bloqueios=0 | planejadas=8923 criadas=8923 carimbadas=8923->8923 lotes=1 falhas=0 releitura=0/8923 | assinatura=a3b6abf6ba4b pecas=8923 vazado=49 colisoes=0 nao_modular=0 preflight=True abertura_viol=0 | humano=False/False target_mod=True | solve=301s planejamento=208s criacao=339s total=853s
+run3  requeridas=24 aplicadas=0 movidas=0 bloqueios=0 | planejadas=8923 criadas=8923 carimbadas=8923->8923 lotes=1 falhas=0 releitura=0/8923 | assinatura=a3b6abf6ba4b pecas=8923 vazado=49 colisoes=0 nao_modular=0 preflight=True abertura_viol=0 | humano=False/False target_mod=True | solve=302s planejamento=213s criacao=337s total=857s

@@ -1,0 +1,32 @@
+{
+ "scope": "BUTANTA 1o PAV: humano R08_LT (somente leitura) x doc de teste 'butanta testes' (34 paredes de alvenaria, 44 aberturas)",
+ "human_vs_revit_final_courses_0_12": {
+  "holes": {"human": [71, 2953], "revit_final": [10, 872], "previous_lot": [215, 22451], "unit": "[quantidade, cm]"},
+  "unsupported_not_over_opening": {"human": 7, "revit_final": 0, "previous_lot": 116},
+  "window_underfill_openings": {"human": 0, "revit_final": 0, "previous_lot": 11},
+  "b34_small_void_violations_external": {"human": 41, "revit_final": 336, "previous_lot": 2460},
+  "specials_courses_0_11": {"human": {"C04": 244, "C09": 256}, "revit_final": {"C04": 329, "C09": 479}, "previous_lot": {"C04": 297, "C09": 389}},
+  "adjacent_specials_touching": {"human": {"C04+C09": 97}, "revit_run1": {"C09+C04": 136, "C04+C09": 25, "C09+C09": 22}},
+  "jamb_side_comparator": {"PHYSICALLY_EQUIVALENT": 25, "SOLVER_WORSE": 51, "SOLVER_BETTER": 10, "VALID_ALTERNATIVE": 2, "criterion": "SOLVER_WORSE = cobertura 12 cm menor que a humana ou especiais >= humano + 2 no pilarete de 60 cm junto da jamba, fiadas 0-11"}
+ },
+ "offline_bench_34_walls_13_courses_channel": {
+  "before_branch": {"holes": 94, "holes_cm": 3754, "non_modular": 78, "unsupported": 50, "missing_required_channel": 1, "b34_violations_engine": 2000, "C04_C04_touching": 7},
+  "final": {"holes": 10, "holes_cm": 872, "non_modular": 0, "unsupported": 0, "missing_required_channel": 0, "b34_violations_engine": 264, "C04_C04_touching": 0, "collisions": 0, "bond_reproved_walls": 3}
+ },
+ "benchmark_legacy": {
+  "baselines_slow": "9 passed / 2 failed - so' as falhas historicas da main (TP1 V1 JUNCTION_MISSING_BINDING 8->9; TGD V2 compensators 61->62)",
+  "fusion_C04_C04": {"COMPENSATOR_CONSECUTIVE": {"TP1": [936, 881], "TGD_V2": [472, 464]}, "verdicts": "iguais"},
+  "tolerances_with_trial_if_enabled_in_legacy_not_enabled": {"TGD_V1_uncovered_cm": [198325, 180765], "TGD_V2_uncovered_cm": [185814, 151540], "TGD_V2_COVERAGE_ROW_MOSTLY_EMPTY": [86, 92], "note": "12 fiadas novas iguais ou melhores, reclassificacao"}
+ },
+ "parity_revit_offline": {"exact_revit_axes": "assinatura identica", "json_axes_noise_1.4e-14_ft": "39 pecas de uma parede trocam B34 do inicio para o fim do trecho; pre-existente (igual com as mudancas desligadas)"},
+ "determinism_offline_17_courses": {
+  "three_processes": "identico",
+  "translate_1000_500_cm": "mesmas 9.103 pecas; 39 pecas mudam (mesmo empate por ruido numerico)",
+  "reverse_endpoints": "9.102 pecas (normal 9.103) - dependencia pre-existente: com as mudancas desligadas 8.905 x 8.903",
+  "permute_order": "9.087 pecas - pre-existente: com as mudancas desligadas 8.905 x 8.888"
+ },
+ "idempotence_revit": "run2 = run3b = run4: assinatura 5f6dc513..., 9.088 pecas, substituicao 9.088 -> 9.088, 0 falhas, 0 divergencias de releitura",
+ "rejected_experiments": {
+  "jamb_pier_whole_resolve": {"no_check": {"specials_0_11": 550, "b34": 476, "reproved": 6}, "closed_boundary": {"specials_0_11": 551, "b34": 341, "reproved": 3}, "course_B_only": {"specials_0_11": 700, "b34": 334}, "wall_trial_local_checks": {"specials_0_11": 804, "b34": 287}, "global_per_wall_selection": {"specials_0_11": 778, "b34": 261, "reason_not_integrated": "quebra o contrato 51.3 CHANNEL x legado, muda o legado se ligado nele e triplica o tempo"}, "baseline": {"specials_0_11": 835, "b34": 264, "reproved": 3}}
+ }
+}

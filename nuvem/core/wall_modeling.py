@@ -3252,14 +3252,18 @@ def _cross_band_seed_for_band(course_indices, solved_course_joints,
 
 
 TIE_PLACEMENT_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
+# REGRA 76.1: o compensador de no' nao resolvido continua ocupando a posicao do
+# no' (vence o preenchimento comum numa colisao, como antes da 76.1).
+NODE_POSITION_FILL_REASONS = ("JUNCTION_UNRESOLVED_FILL",)
 
 
 def _is_tie_candidate(candidate):
-    """True quando o candidato e' peca de AMARRACAO (encontro L/T/X, em
-    qualquer variacao incluindo as degradadas) - por oposicao ao
+    """True quando o candidato OCUPA A POSICAO DO NO': peca de AMARRACAO
+    (encontro L/T/X, em qualquer variacao incluindo as degradadas) ou o
+    compensador de no' nao resolvido (regra 76.1) - por oposicao ao
     preenchimento comum (`STANDARD_FILL`) e ao jamb de abertura."""
     reason = str(candidate.get("placement_reason") or "")
-    return any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
+    return reason in NODE_POSITION_FILL_REASONS or any(reason.startswith(p) for p in TIE_PLACEMENT_PREFIXES)
 
 
 def _wall_length_cm_for_absorption(walls_to_create, wall_idx):
@@ -3459,15 +3463,29 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
                                       prior_course_joints, band_of_course)
             if CROSS_BAND_JOINT_PROPAGATION_ENABLED else None
         )
-        result = solve_building_blocks(
-            nodes, walls_to_create, end_to_node, filtered_openings, catalog,
-            allow_compensators=allow_compensators, base_z_abs=base_z_abs,
-            variants_per_course=variants_per_course,
-            opening_strategy=opening_strategy,
-            progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
-            stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
-        )
-        bands.append({"course_indices": list(course_indices), "result": result})
+        # SECAO 77: nos SEM encontro funcional em todas as fiadas desta banda
+        # (papel constante na banda - as bandas sao definidas pelas mesmas
+        # aberturas ativas que definem o papel)
+        from core.engine import wall_stepper as _stepper_band
+        saved_band_roles = _stepper_band.JUNCTION_BAND_ROLES
+        band_roles = _stepper_band.junction_band_roles(_stepper_band.JUNCTION_ROLE_TABLE, course_indices, nodes)
+        _stepper_band.JUNCTION_BAND_ROLES = band_roles
+        try:
+            result = solve_building_blocks(
+                nodes, walls_to_create, end_to_node, filtered_openings, catalog,
+                allow_compensators=allow_compensators, base_z_abs=base_z_abs,
+                variants_per_course=variants_per_course,
+                opening_strategy=opening_strategy,
+                progress_cb=progress_cb, wall_start_cb=wall_start_cb, wall_result_cb=wall_result_cb,
+                stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
+            )
+        finally:
+            _stepper_band.JUNCTION_BAND_ROLES = saved_band_roles
+        band_entry = {"course_indices": list(course_indices), "result": result}
+        if band_roles:
+            band_entry["junction_roles_without_bond"] = sorted(
+                (ni, r.get("effective_role"), r.get("free_end_wall")) for ni, r in band_roles.items())
+        bands.append(band_entry)
         for course_index in course_indices:
             letter = "A" if course_index % 2 == 0 else "B"
             # Secao 11.7: dentro da familia (par/impar), qual das
@@ -3679,13 +3697,83 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
     return best
 
 
+# Tolerancias fisicas da regra 30.8 e do ruido de jamba (51.13), COM a
+# tentativa por parede de `wall_stepper.physical_tolerance_trial`, ligadas SO'
+# durante a estrategia de reforco de aberturas (CHANNEL, opt-in - secao 30.9).
+# O motor legado (estrategia None, congelado pelo benchmark) continua identico
+# ao da main: as chaves globais do modulo seguem desligadas.
+CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
+
+
+# SECAO 58.2 no fluxo CHANNEL (2026-09-15): escada de amarracao no no' degradado
+# (B34 antes de pastilha). Sobre as secoes 60-62, na BUTANTA: vazado menor 186 ->
+# 159, especiais 767 -> 761, juntas alinhadas em fiadas consecutivas (regua do
+# PRISM_CONTINUOUS_JOINT) 26 -> 4; auditoria, apoio, buracos e colisoes iguais.
+# NAO no legado: no TP1 V1 cria juntas alinhadas em fronteira de banda (peca de
+# no' repetida em duas fiadas vizinhas, ou ausente numa delas) - condicao
+# registrada na secao 58.3, ainda nao tratada. O legado continua identico.
+CHANNEL_DEGRADED_TIE_BLOCK_ENABLED = True
+
+# REGRA 76 (2026-09-18) no fluxo CHANNEL: o passo "degrada para L" do T mede o
+# espaco a partir do CONTATO onde o B34 realmente comeca (ver
+# wall_stepper.T_DEGRADED_L_ROOM_FROM_CONTACT). Sem isso, pilares de 34 cm entre
+# duas aberturas caiam na escada do elemento unico e a familia oposta recebia um
+# C09 como peca do no' - compensador exercendo funcao de amarracao. Legado
+# (`strategy=None`) nao passa por aqui.
+CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED = True
+
+# REGRA 76.1 (2026-09-18, decisao do usuario) no fluxo CHANNEL: compensador que
+# a escada de peca de no' usa para fechar o espaco deixa de ser DESIGNADO
+# amarracao (wall_stepper.COMPENSATOR_NODE_PIECE_UNDESIGNATED); a fiada fica em
+# MISSING_REQUIRED_JUNCTION_BOND para revisao humana. Legado nao passa por aqui.
+CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED = True
+
+# SECAO 68 (2026-09-16): no fluxo CHANNEL, a regiao de reparo de abertura
+# continua expandindo dentro do orcamento que ja' existia
+# (OPENING_REPAIR_MAX_EXTRA_BLOCKS) e fica com a MELHOR composicao em vez da
+# primeira que fecha - ver wall_stepper.OPENING_REPAIR_PREFER_CLEAN_ACTIVE.
+# Legado (`strategy=None`) nao passa por aqui: continua identico a' main.
+CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = True
+
+# SECAO 71 (2026-09-16): entre variantes que empatam nas regras #2 e #1, ganha a
+# que usa MENOS compensadores - ver wall_stepper.COMPENSATOR_COUNT_IN_TIEBREAK.
+CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
+
+# SECAO 72 (2026-09-17): no fluxo CHANNEL, a paridade de cada no' T/X e'
+# escolhida pelo COMPRIMENTO do trecho livre que ela deixa para cada fiada
+# preencher, e nao so' pela convencao de papel - ver
+# wall_stepper.TIE_PARITY_FILL_BALANCE. Legado (`strategy=None`) nao passa
+# por aqui: continua identico a' main.
+CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
+
+# SECAO 74 (2026-09-17): no fluxo CHANNEL, o teste de espaco do encontro T
+# compara com tolerancia FISICA (PIER_PHYSICAL_FIT_TOLERANCE_CM, 0,05 cm) em vez
+# do epsilon de ponto flutuante de 1e-6 pes - ver wall_stepper.
+# T_ROOM_PHYSICAL_TOLERANCE. Legado (`strategy=None`) nao passa por aqui.
+CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = True
+
+# SECAO 77 (2026-09-22): PAPEL FUNCIONAL DO ENCONTRO POR FIADA. A topologia
+# base do no' (T/L/X em planta) continua valendo; o papel EFETIVO e' avaliado
+# por fiada/banda com as aberturas ativas naquela altura (core/engine/
+# junction_role.py). Fiada em que uma abertura ativa consumiu a parede
+# principal do T dos dois lados (nenhum braco solido alem da regiao do no')
+# -> NAO existe T funcional ali: a parede que chega termina como PONTA LIVRE
+# na face da principal, pelas regras normais de termino, e a fiada sai do
+# denominador do gate MISSING_REQUIRED_JUNCTION_BOND (NO_FUNCTIONAL_JUNCTION).
+# Acima/abaixo das aberturas o T volta sozinho. Flag propria, so' CHANNEL;
+# OFF reproduz o motor anterior a esta secao (snapshots historicos).
+CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = True
+
+
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
     """Wrapper de desempenho: com estrategia de reforco ativa, liga o memo de
     preenchimento por parede (`wall_stepper.WALL_FILL_MEMO`, chave canonica das
-    entradas, resultado identico) so' durante esta chamada. Legado (None) nao
-    muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
+    entradas, resultado identico) so' durante esta chamada, e as tolerancias
+    fisicas com tentativa (`CHANNEL_PHYSICAL_TOLERANCES_ENABLED`, secao 30.9).
+    Legado (None) nao muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
     from core.engine import wall_stepper as _stepper_memo
+    from core.engine import continuous_modulation as _cm_flags
     if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
         return _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                                        catalog, base_z_abs, num_courses, **kwargs)
@@ -3693,18 +3781,602 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     _stepper_memo.OBB_MEMO = {}
     _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
     _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
+    saved_tolerances = (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+                        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
+    saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
+    saved_degraded_l_contact = _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT
+    saved_undesignated = _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED
+    saved_role_by_course = _stepper_memo.JUNCTION_ROLE_BY_COURSE
+    if CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+        _stepper_memo.JUNCTION_ROLE_BY_COURSE = True   # SECAO 77
+    if CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED:
+        _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = True   # REGRA 76
+    if CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED:
+        _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = True   # REGRA 76.1
+    if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
+        _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
+        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
+    if CHANNEL_DEGRADED_TIE_BLOCK_ENABLED:
+        # SECAO 58.2 so' no fluxo CHANNEL (ver a constante)
+        _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = True
     try:
         result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                                          catalog, base_z_abs, num_courses, **kwargs)
     finally:
         _stepper_memo.WALL_FILL_MEMO = None
         _stepper_memo.OBB_MEMO = None
+        (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
+        _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
+        _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = saved_degraded_l_contact
+        _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = saved_undesignated
+        _stepper_memo.JUNCTION_ROLE_BY_COURSE = saved_role_by_course
+    if isinstance(result, dict):
+        # REGRA 76 - hard gate: compensador nunca DESIGNADO amarracao.
+        # REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND: fiada de no' sem peca de
+        # amarracao valida (geometria). Somente leitura; so' no fluxo CHANNEL.
+        result["compensator_as_junction_bond"] = _stepper_memo.compensator_as_junction_bond(
+            result.get("course_candidates"), nodes, walls_to_create)
+        audit = _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog,
+                                           base_z_abs, num_courses,
+                                           kwargs.get("opening_reinforcement_policy"),
+                                           kwargs.get("variants_per_course") or 1)
+        result["missing_required_junction_bond"] = audit["missing"]
+        result["junction_bond_audit"] = {"checked": audit["checked"], "valid": audit["valid"],
+                                         "not_required": audit["not_required"]}
+        # SECAO 77 - relatorio: fiadas-no' sem encontro funcional (papel
+        # recalculado pela geometria na auditoria)
+        result["junction_role_by_course"] = {
+            "enabled": bool(CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED),
+            "no_functional_junction": [(x["node_index"], x["course_index"], x.get("effective_role"),
+                                        x.get("free_end_wall"))
+                                       for x in audit["not_required"]
+                                       if x.get("reason") == _stepper_memo.NO_FUNCTIONAL_JUNCTION_REASON],
+            "free_end_not_composed": [(x["node_index"], x["course_index"]) for x in audit["missing"]
+                                      if x.get("reason") == "FREE_END_NOT_COMPOSED"]}
+        if CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+            # tabela compacta (papel efetivo por no' x fiada) e a contagem das
+            # flags de diagnostico, para chamadores externos e para o relatorio
+            tabela = _junction_roles_for_audit(nodes, walls_to_create, _effective_solve_openings(
+                nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                (result.get("opening_reinforcement") or {}).get("free_to_top"),
+                kwargs.get("opening_reinforcement_policy")), catalog, base_z_abs, num_courses) or {}
+            flags = {}
+            for r in tabela.values():
+                for f in r.get("stub_flags") or ():
+                    k = str(f).split(":")[0]
+                    flags[k] = flags.get(k, 0) + 1
+            result["junction_role_by_course"]["roles"] = dict(
+                ("%d:%d" % k, {"effective_role": r.get("effective_role"), "reason": r.get("reason"),
+                               "free_end_wall": r.get("free_end_wall"), "changed": bool(r.get("changed"))})
+                for k, r in tabela.items())
+            result["junction_role_by_course"]["flags"] = flags
+        result["channel_unresolved_junction_fill"] = bool(CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
+        result["channel_t_degraded_l_room_from_contact"] = bool(
+            CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
+        result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
+        result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
+        result["channel_repair_prefer_clean"] = bool(CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
     return result
 
 
+def _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+                              free_to_top, policy):
+    """As aberturas que o SOLVE usa: as passagens livres ate' o topo (51.9) e as
+    continuas estendidas. Ponto unico - a impl e o gate da regra 76.1 leem o
+    MESMO modelo de aberturas."""
+    if not free_to_top:
+        return openings_per_wall
+    from core.engine import opening_reinforcement as _reinforcement
+    return _reinforcement.openings_extended_to_top(
+        openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
+        passages=_reinforcement.continuous_free_passages(
+            walls_to_create, openings_per_wall, nodes, free_to_top, policy))
+
+
+def _non_modular_by_physical_course(result, variants_per_course=1):
+    """`non_modular` com "course" = FIADA FISICA. O motor grava a FAMILIA
+    ("A"/"B") por banda; aqui cada entrada vira uma por fiada fisica da propria
+    banda, com a mesma regra da montagem das fiadas (letra por paridade,
+    variante por (fiada // 2) % variants_per_course)."""
+    out = []
+    vpc = variants_per_course or 1
+    band_of = {}
+    todas = set()
+    for band in result.get("bands") or []:
+        courses = list(band.get("course_indices") or [])
+        todas.update(courses)
+        for entry in ((band.get("result") or {}).get("non_modular") or []):
+            band_of[id(entry)] = courses
+    if not todas:
+        todas = set(result.get("course_candidates") or {})
+    for entry in result.get("non_modular") or []:
+        course = entry.get("course")
+        if not isinstance(course, str):
+            out.append(dict(entry))
+            continue
+        # entrada sem banda conhecida: todas as fiadas fisicas da familia
+        for ci in band_of.get(id(entry), sorted(todas)):
+            if course != ("A" if ci % 2 == 0 else "B"):
+                continue
+            vi = entry.get("variant_index")
+            if vi is not None and (ci // 2) % vpc != vi:
+                continue
+            out.append(dict(entry, course=ci))
+    return out
+
+
+def _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                               num_courses, policy, variants_per_course=1):
+    """REGRA 76.1 sobre o resultado FINAL: o encontro existe na fiada (com as
+    aberturas do SOLVE) e tem peca de amarracao valida? Ver
+    wall_stepper.junction_bond_audit."""
+    from core.engine import wall_stepper as _bond_gate
+    if not isinstance(result, dict) or result.get("error") is not None or not result.get("course_candidates"):
+        return {"checked": 0, "valid": 0, "not_required": [], "missing": []}
+    free_to_top = (result.get("opening_reinforcement") or {}).get("free_to_top")
+    solve_openings = _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                               num_courses, free_to_top, policy)
+    return _bond_gate.junction_bond_audit(
+        result["course_candidates"], nodes, walls_to_create, solve_openings,
+        _free_to_top_band(catalog, base_z_abs), (result.get("physical_support") or {}).get("items"),
+        _non_modular_by_physical_course(result, variants_per_course), catalog, OPENING_COURSE_BAND_TOLERANCE_FT,
+        junction_roles=_junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs,
+                                                 num_courses))
+
+
+def _junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs, num_courses):
+    """SECAO 77: tabela de papel funcional por fiada para a AUDITORIA,
+    recalculada pela geometria (nunca a tabela que o solve usou - um solve
+    errado nao faz o gate concordar). None com a flag desligada."""
+    if not CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+        return None
+    from core.engine import wall_stepper as _bond_gate
+    return _bond_gate.junction_role_table(nodes, walls_to_create, solve_openings,
+                                          _free_to_top_band(catalog, base_z_abs), num_courses, catalog,
+                                          OPENING_COURSE_BAND_TOLERANCE_FT)
+
+
+def _physical_support_final(result, catalog, walls_to_create, openings_per_wall, base_z_abs):
+    """APOIO FISICO ENTRE FIADAS (secao 53, 2026-09-15): validador somente
+    leitura sobre o resultado FINAL - `result["physical_support"]` com as
+    contagens `UNSUPPORTED_SMALL_BLOCK`/`UNSUPPORTED_BLOCK` e os itens. Ver
+    `core/engine/physical_support.py`. Idempotente."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    if result.get("physical_support") is not None or not result.get("course_candidates"):
+        return result
+    from core.engine import physical_support as _support
+    course_height_ft, _err = _course_height_ft(catalog, None)
+    block_height_ft, _err2 = _block_height_ft(catalog, None)
+    if course_height_ft is None or block_height_ft is None:
+        return result
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs or 0.0, course_index, course_height_ft, block_height_ft)
+
+    items = _support.unsupported_pieces(result["course_candidates"], walls_to_create,
+                                        openings_per_wall, _band)
+    counts = {"UNSUPPORTED_SMALL_BLOCK": 0, "UNSUPPORTED_BLOCK": 0}
+    for item in items:
+        counts[item["kind"]] += 1
+    result["physical_support"] = {"counts": counts, "items": items}
+    return result
+
+
+def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog, num_courses,
+                            nodes, end_to_node, band, plan=None, base_z_abs=0.0):
+    """Aceitacao EXATA das secoes 60/61 por parede: a busca e' um modelo 1-D, mas
+    a parede so' fica alterada se a AUDITORIA DE AMARRACAO desta parede (mesmo
+    catalogo com canaletas usado logo depois) e o APOIO FISICO (secao 53, total)
+    nao pioram em nenhum tipo de problema."""
+    from core.engine import physical_support as _support
+    from core.engine import opening_reinforcement as _reinforcement
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    state = {"channel_measured": False}
+
+    def validate(wall_idx, support=True):
+        course_candidates = result.get("course_candidates") or {}
+        audit = audit_wall_bond_quality(
+            wall_idx, walls_to_create, course_candidates, audit_catalog, num_courses,
+            openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+        kinds = {}
+        for problem in audit.get("problems") or ():
+            kind = str(problem).split(":")[0]
+            kinds[kind] = kinds.get(kind, 0) + 1
+        unsupported = channel = None
+        if support:
+            unsupported = len(_support.unsupported_pieces(course_candidates, walls_to_create,
+                                                          openings_per_wall, band))
+        has_openings = bool(openings_per_wall and wall_idx < len(openings_per_wall) and openings_per_wall[wall_idx])
+        if plan is not None and (not state["channel_measured"] or has_openings):
+            # validacao CHANNEL completa (secao 64.2): o arranjo nao move canaleta,
+            # mas muda as pecas junto da jamba em que ela se apoia. Parede sem
+            # abertura nao muda a contagem - o arranjo carrega a anterior.
+            state["channel_measured"] = True
+            counts = _reinforcement.validate_channel_reinforcement(
+                course_candidates, walls_to_create, openings_per_wall, band, num_courses, base_z_abs,
+                free_to_top=plan.get("free_to_top"), policy=plan.get("policy"),
+                reference_course_candidates=result.get("course_candidates_before_reinforcement"),
+                nodes=nodes).get("counts") or {}
+            channel = dict((k, v) for k, v in counts.items() if k.isupper())
+            channel["matched"] = (counts.get("channel_top_matched", 0), counts.get("channel_bottom_matched", 0))
+        return {"audit": kinds, "unsupported": unsupported, "channel": channel}
+    return validate
+
+
+def _micro_adjust_cluster(wall_idx, nodes, wall_count):
+    """Paredes ligadas a esta por um no' (secao 66: quem decide e' o CLUSTER, nao
+    a parede sozinha - a posicao da abertura pode existir para a modulacao das
+    vizinhas)."""
+    out = set([wall_idx])
+    for node in nodes or ():
+        members = set(arm[0] for arm in (node.get("arms") or ()))
+        for key in ("main_wall_idx", "incoming_wall_idx", "neighbor_wall_idx"):
+            if isinstance(node.get(key), int):
+                members.add(node[key])
+        for other in (node.get("crossing_walls") or ()):
+            if isinstance(other, int):
+                members.add(other)
+        if wall_idx in members:
+            out |= members
+    return sorted(w for w in out if 0 <= w < wall_count)
+
+
+def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, band, wall_idx,
+                          nodes=None):
+    """(portoes duros, qualidade) de um solve - a ordem da secao 66."""
+    from core.engine import opening_micro_adjust as _micro
+    from core.engine import physical_support as _support
+    from core.engine import small_void_alignment as _small_void
+    course_candidates = result.get("course_candidates") or {}
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    gates = {"colisoes": len(result.get("collisions") or []),
+             "nao_modular": len(result.get("non_modular") or []),
+             "sem_apoio": len(_support.unsupported_pieces(course_candidates, walls_to_create,
+                                                          openings_per_wall, band))}
+    preflight = result.get("beta_preflight") or {}
+    gates["abertura_violada"] = len(preflight.get("opening_violations") or [])
+    # REGRA 76: um deslocamento que faca um compensador assumir a funcao de
+    # amarracao PIORA este portao e e' rejeitado por `_worse_gates` - offset
+    # INVALIDO, nao so' penalizado.
+    if result.get("compensator_as_junction_bond") is not None:
+        gates["COMPENSATOR_AS_JUNCTION_BOND"] = len(result["compensator_as_junction_bond"])
+    elif nodes is not None:
+        from core.engine import wall_stepper as _bond_gate
+        gates["COMPENSATOR_AS_JUNCTION_BOND"] = len(_bond_gate.compensator_as_junction_bond(
+            course_candidates, nodes, walls_to_create))
+    # REGRA 76.1: deslocamento que tire a amarracao valida de um no' (fiada
+    # nova sem amarracao) piora este portao e e' rejeitado. Resultado sem a
+    # chave (fluxo sem reforco): calculado aqui, com as mesmas aberturas/faixa.
+    if result.get("missing_required_junction_bond") is not None:
+        gates["MISSING_REQUIRED_JUNCTION_BOND"] = len(result["missing_required_junction_bond"])
+    elif nodes is not None:
+        from core.engine import wall_stepper as _bond_gate
+        gates["MISSING_REQUIRED_JUNCTION_BOND"] = len(_bond_gate.missing_required_junction_bond(
+            course_candidates, nodes, walls_to_create, openings_per_wall, band,
+            _support.unsupported_pieces(course_candidates, walls_to_create, openings_per_wall, band),
+            _non_modular_by_physical_course(result), catalog, OPENING_COURSE_BAND_TOLERANCE_FT))
+        # (secao 77 so' existe no fluxo CHANNEL, cujo resultado traz a chave acima;
+        # este ramo nao monta tabela de papeis com as aberturas brutas)
+    audits = result.get("wall_bond_audits") or []
+    if isinstance(audits, dict):
+        audits = list(audits.values())
+    for audit in audits:
+        if not isinstance(audit, dict):
+            continue
+        for problem in audit.get("problems") or ():
+            kind = str(problem).split(":")[0]
+            gates[kind] = gates.get(kind, 0) + 1
+    counts = ((result.get("opening_reinforcement") or {}).get("validation") or {}).get("counts") or {}
+    for key, value in counts.items():
+        if key.isupper():
+            gates["CHANNEL_" + key] = value
+    spans = []
+    if wall_idx < len(openings_per_wall or ()):
+        spans = [(_ft_to_cm(o[0]), _ft_to_cm(o[1])) for o in openings_per_wall[wall_idx]]
+    quality = {
+        "small_void": len(_small_void.b34_small_void_violations(course_candidates, catalog)),
+        "strip_fillers": _micro.strip_filler_pieces(course_candidates, wall_idx, walls_to_create,
+                                                    spans, catalog),
+        "mid_wall_half_blocks": _micro.mid_wall_half_blocks(course_candidates, walls_to_create,
+                                                            openings_per_wall, catalog),
+        "specials": sum(1 for pieces in course_candidates.values() for cand in pieces
+                        if (catalog.get(cand.get("logical_code")) or {}).get("is_compensator")),
+        "special_clusters": _micro.special_clusters(course_candidates, walls_to_create, catalog),
+        "non_modular": len(result.get("non_modular") or []),
+    }
+    return {"gates": gates, "quality": quality}
+
+
+# ==========================================
+# ETAPA 3B (secao 66) NO FLUXO DO BOTAO - estado EXPLICITO
+#
+# Medido no codigo (2026-09-23): `plan_opening_micro_adjustments` e
+# `shift_opening_in_plan` NUNCA tiveram chamador dentro do repositorio - quem
+# sempre executou a Etapa 3B foi o harness do Revit, fora do produto. Nao e'
+# regressao: e' etapa nao integrada.
+#
+# O que falta para integrar (nenhuma dessas pecas existe hoje):
+#   1. um MOVEDOR transacional da abertura no modelo real (ElementTransformUtils
+#      .MoveElement + Regenerate + IsValidObject por elemento, na disciplina de
+#      `apply_axis_opening_fix`) - mover abertura ALTERA o projeto do usuario e
+#      exige autorizacao explicita, nao pode ser efeito colateral de "Analisar";
+#   2. a guarda de interferencia real (`offset_allowed`), que so' o chamador com
+#      acesso ao Revit consegue responder;
+#   3. persistencia do deslocamento acumulado por abertura (`moved_so_far_cm`),
+#      senao o teto de 10 cm vira 10 cm POR EXECUCAO.
+#
+# Enquanto isso, o estado e' explicito, deterministico e testavel: a UI diz
+# "nao avaliado nesta execucao" e NUNCA inventa "nao necessario" nem "ajustada".
+MICRO_ADJUST_IN_BUTTON_FLOW = False
+MICRO_ADJUST_OUT_OF_FLOW_REASON = (
+    "Etapa 3B (secao 66) fora do fluxo do botao: falta o movedor transacional da "
+    "abertura, a guarda de interferencia no modelo e a persistencia do deslocamento "
+    "acumulado. Rodar so' pelo harness, com autorizacao explicita.")
+
+
+def micro_adjust_flow_state():
+    """(status, motivo) da Etapa 3B para a apresentacao. Deterministico."""
+    if MICRO_ADJUST_IN_BUTTON_FLOW:
+        return "pending", None
+    return "not_evaluated", MICRO_ADJUST_OUT_OF_FLOW_REASON
+
+
+def plan_opening_micro_adjustments(nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                   base_z_abs, num_courses, result, moved_so_far_cm=None,
+                                   max_openings=None, offset_allowed=None, **solve_kwargs):
+    """ETAPA 3B por QUALIDADE (secao 66): planeja o deslocamento longitudinal de
+    cada abertura suspeita, avaliando cada candidato com um solve REAL do
+    CLUSTER local (a parede e as ligadas a ela por no'). NAO move nada - devolve
+    o plano para o chamador aplicar no modelo e, depois, no Revit."""
+    from core.engine import opening_micro_adjust as _micro
+    if not _micro.OPENING_MICRO_ADJUST_ENABLED:
+        return {"enabled": False, "required": [], "records": [], "applied": [],
+                "counts": {"OPENING_MICRO_ADJUSTMENT_REQUIRED": 0,
+                           "OPENING_MICRO_ADJUSTMENT_APPLIED": 0}}
+    step, _step_error = _course_height_ft(catalog, result.get("candidates") or [])
+    height = (step - _cm_to_ft(COURSE_JOINT_CM)) if step else None
+
+    def band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    cache = {}
+
+    def evaluate(wall_idx, opening_index, offset_cm, exact=True):
+        cluster = _micro_adjust_cluster(wall_idx, nodes, len(walls_to_create))
+        # CHAVE FISICA (nunca id() nem ordem de lista): as paredes do cluster, o
+        # vao movido e o deslocamento. Sem deslocamento o resultado nao depende de
+        # QUAL vao estava sendo estudado - e' o mesmo solve para todos eles.
+        key = (tuple(cluster), num_courses, bool(exact),
+               None if not offset_cm else (wall_idx, opening_index, round(offset_cm, 3)))
+        if key in cache:
+            return cache[key]
+        sub_walls = [walls_to_create[i] for i in cluster]
+        sub_openings = []
+        for i in cluster:
+            row = list(openings_per_wall[i]) if i < len(openings_per_wall or ()) else []
+            if i == wall_idx and offset_cm:
+                delta = _cm_to_ft(offset_cm)
+                row = [((o[0] + delta, o[1] + delta) + tuple(o[2:])) if j == opening_index else o
+                       for j, o in enumerate(row)]
+            sub_openings.append(row)
+        sub_walls, junction_map = extend_wall_ends_to_junctions(sub_walls, JUNCTION_FACE_SEARCH_FT)
+        sub_nodes, sub_end_to_node = build_wall_graph(sub_walls, junction_map)
+        from core.engine import b34_run_arrangement as _runs_module
+        saved_arrangement = _runs_module.B34_RUN_ARRANGEMENT_ENABLED
+        if not exact:
+            # RANKING barato: sem o arranjo das secoes 60-65, que responde por
+            # ~80% do solve. Todos os offsets sao medidos do mesmo jeito, entao a
+            # ordem e' comparavel; o vencedor e' reavaliado com o fluxo completo.
+            _runs_module.B34_RUN_ARRANGEMENT_ENABLED = False
+        try:
+            local = solve_building_blocks_all_courses(
+                sub_nodes, sub_walls, sub_end_to_node, sub_openings, catalog, base_z_abs, num_courses,
+                **solve_kwargs)
+        finally:
+            _runs_module.B34_RUN_ARRANGEMENT_ENABLED = saved_arrangement
+        if not isinstance(local, dict) or local.get("error") is not None:
+            return None
+        measured = _micro_adjust_measure(local, sub_walls, sub_openings, catalog, band,
+                                         cluster.index(wall_idx), nodes=sub_nodes)
+        cache[key] = measured
+        return measured
+
+    return _micro.plan_micro_adjustments(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, catalog,
+        evaluate, node_positions_by_wall=dict(
+            (wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+            for wi in range(len(walls_to_create))),
+        max_course=None, max_openings=max_openings, moved_so_far_cm=moved_so_far_cm,
+        offset_allowed=offset_allowed)
+
+
+def shift_opening_in_plan(openings_per_wall, wall_idx, opening_index, offset_cm):
+    """Aplica UM deslocamento no modelo de planejamento (copia; nao toca no
+    Revit). Largura, altura, peitoril e nivel ficam iguais - so' a posicao
+    longitudinal muda."""
+    delta = _cm_to_ft(offset_cm)
+    out = [list(row) for row in openings_per_wall]
+    opening = out[wall_idx][opening_index]
+    out[wall_idx][opening_index] = (opening[0] + delta, opening[1] + delta) + tuple(opening[2:])
+    return out
+
+
+# SECAO 65: passes de arranjo -> orientacao (ver o laco em `_orient_small_voids_final`)
+B34_RUN_ARRANGEMENT_PASSES = 3
+
+
+def _merge_arrangement_pass(total, current):
+    """Soma os contadores dos passes; `before` e' do primeiro, `after` do ultimo."""
+    if total is None:
+        merged = dict(current)
+        merged["passes"] = 1
+        return merged
+    merged = dict(total)
+    merged["passes"] = total.get("passes", 1) + 1
+    for key, value in current.items():
+        if key in ("before",):
+            continue
+        if key == "after":
+            merged["after"] = value
+        elif isinstance(value, (int, float)) and isinstance(merged.get(key), (int, float)):
+            merged[key] = merged[key] + value
+        elif isinstance(value, list) and isinstance(merged.get(key), list):
+            merged[key] = merged[key] + value
+        else:
+            merged[key] = value
+    return merged
+
+
+def _reorient_compensators_after_arrangement(course_candidates, walls_to_create, openings_per_wall, catalog):
+    """Roda `orient_compensator_candidates` sobre as pecas finais (sem repetir
+    objeto compartilhado entre fiadas) e devolve quantas mudaram de lado."""
+    seen, flat = set(), []
+    for course_index in sorted(course_candidates or {}):
+        for cand in course_candidates[course_index] or ():
+            if id(cand) not in seen:
+                seen.add(id(cand))
+                flat.append(cand)
+    before = dict((id(c), bool(c.get("mirrored"))) for c in flat)
+    orient_compensator_candidates(flat, walls_to_create, openings_per_wall, catalog)
+    return sum(1 for c in flat if bool(c.get("mirrored")) != before[id(c)])
+
+
+def _b34_run_arrangement_legacy_enabled():
+    from core.engine import b34_run_arrangement as _runs
+    return _runs.B34_RUN_ARRANGEMENT_LEGACY
+
+
+def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_per_wall=None,
+                              arrange=False, nodes=None, end_to_node=None, validate_wall=None):
+    """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
+    sobre as fiadas FISICAS finais (depois de reparos e do reforco de
+    aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
+    vazado menor dele com o vazado menor/central da peca da fiada vizinha -
+    mesmo contorno, mesmas juntas, mesmas colisoes. Peca de no' (L/T/X) mantem
+    a orientacao da secao 5. `result["small_void_alignment"]` registra girados,
+    violacoes antes/depois e a lista final (validador independente)."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    if result.get("small_void_alignment") is not None:
+        return result
+    course_candidates = result.get("course_candidates")
+    if not course_candidates:
+        return result
+    from core.engine import small_void_alignment as _small_void
+    summary = {"rotated": 0, "passes": 0}
+    if _small_void.SMALL_VOID_ORIENTATION_ENABLED:
+        summary = _small_void.orient_small_voids(course_candidates, catalog)
+    if arrange and walls_to_create:
+        # SECAO 60: arranjo conjunto das corridas (mesmas pecas, outra ordem) e
+        # nova orientacao sobre a ordem escolhida. So' estrategia CHANNEL por
+        # padrao; o legado continua identico a' main.
+        from core.engine import b34_run_arrangement as _runs
+        ties = None
+        if nodes is not None and end_to_node is not None:
+            # as MESMAS posicoes de amarracao que a auditoria usa para
+            # HALF_BLOCK_NEAR_TIE (regra #2)
+            ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+                        for wi in range(len(walls_to_create)))
+            # SECAO 77: parede com no' sem encontro em alguma fiada recebe
+            # {fiada: [t_cm]} (as mesmas posicoes que a auditoria usa)
+            n_courses = (max(course_candidates) + 1) if course_candidates else 0
+            for wi in range(len(walls_to_create)):
+                by_course = _wall_tie_t_positions_by_course_cm(wi, walls_to_create, nodes, end_to_node,
+                                                               n_courses)
+                if by_course is not None:
+                    ties[wi] = by_course
+        # SECAO 65: arranjo -> orientacao -> arranjo... A orientacao (gulosa da
+        # secao 52 e exata da 62) roda DEPOIS da busca de ordem e abre ordens que
+        # antes nao valiam - medido na parede 8284557 (5 familias de banda): duas
+        # familias caem de 7 para 3 violacoes. Para quando um passe nao mexe em
+        # peca nenhuma (o segundo passe leva o vazado de 68 para 52 na BUTANTA; o
+        # terceiro nao muda nada).
+        arrangement, touched = None, None
+        for _pass in range(B34_RUN_ARRANGEMENT_PASSES):
+            current = _runs.arrange_b34_runs(
+                course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
+                half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
+                validate_wall=validate_wall, only_walls=touched)
+            # o passe seguinte so' precisa olhar as paredes que este mexeu: a
+            # orientacao so' muda onde a geometria mudou
+            touched = set(item["wall_idx"] for item in (current.get("walls") or ()))
+            pieces_changed = bool(current.get("runs_changed") or current.get("compositions")
+                                  or current.get("moved") or current.get("created")
+                                  or current.get("removed"))
+            if pieces_changed:
+                # ETAPA 4D de novo, sobre a posicao FINAL: a orientacao dos
+                # compensadores (lado fechado voltado para a abertura) foi decidida
+                # antes do arranjo, que move e cria compensadores. Medido: com pecas
+                # de reparo de vao nas corridas, 3 compensadores ficavam com o lado
+                # fechado errado junto da abertura. A funcao e' a fonte da verdade e
+                # recalcula tudo da posicao real (idempotente).
+                current["compensators_reoriented"] = _reorient_compensators_after_arrangement(
+                    course_candidates, walls_to_create, openings_per_wall, catalog)
+            if current.get("runs_changed") and _small_void.SMALL_VOID_ORIENTATION_ENABLED:
+                again = _small_void.orient_small_voids(course_candidates, catalog)
+                summary["rotated_after_arrangement"] = (summary.get("rotated_after_arrangement", 0)
+                                                        + again.get("rotated", 0))
+            arrangement = _merge_arrangement_pass(arrangement, current)
+            if not pieces_changed:
+                break
+        result["b34_run_arrangement"] = arrangement
+    violations = _small_void.b34_small_void_violations(course_candidates, catalog)
+    summary["after"] = len(violations)
+    summary["violations"] = violations
+    result["small_void_alignment"] = summary
+    return result
+
+
 def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                           catalog, base_z_abs, num_courses, **kwargs):
+    """SECAO 68 (2026-09-16) - PONTO UNICO onde a preferencia por composicao
+    limpa no reparo de abertura e' ligada/desligada, conforme a ESTRATEGIA
+    desta chamada. Fica AQUI, e nao no wrapper de desempenho, porque esta e' a
+    funcao por onde as DUAS portas de entrada passam (o wrapper com memo e a
+    chamada direta da impl): com a flag so' no wrapper, a MESMA entrada dava
+    resultados diferentes pelas duas portas - exatamente o que
+    `test_performance_memo_and_caches_give_identical_result` cobra (e pegou).
+    Legado (`strategy=None`) deixa a flag desligada: continua igual a' main."""
+    from core.engine import wall_stepper as _stepper_repair
+    saved_repair_clean = _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE
+    saved_tiebreak = _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK
+    _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
+    _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
+    saved_parity_balance = _stepper_repair.TIE_PARITY_FILL_BALANCE
+    _stepper_repair.TIE_PARITY_FILL_BALANCE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED)
+    saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
+    _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
+    saved_role_table = _stepper_repair.JUNCTION_ROLE_TABLE
+    saved_room_tol = _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE
+    _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = bool(
+        kwargs.get("opening_reinforcement_strategy") is not None
+        and CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED)
+    try:
+        return _solve_building_blocks_all_courses_impl_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
+            num_courses, **kwargs)
+    finally:
+        _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
+        _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
+        _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
+        _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
+        _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = saved_room_tol
+        _stepper_repair.JUNCTION_ROLE_TABLE = saved_role_table
+
+
+def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses,
                                       allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                       variants_per_course=1,
@@ -3776,12 +4448,17 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     free_to_top = _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
                                         num_courses, opening_reinforcement_strategy,
                                         opening_reinforcement_policy)
-    if free_to_top:
-        from core.engine import opening_reinforcement as _reinforcement
-        openings_per_wall = _reinforcement.openings_extended_to_top(
-            openings_per_wall, free_to_top, _free_to_top_band(catalog, base_z_abs), num_courses,
-            passages=_reinforcement.continuous_free_passages(
-                walls_to_create, openings_per_wall, nodes, free_to_top, opening_reinforcement_policy))
+    openings_per_wall = _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog,
+                                                  base_z_abs, num_courses, free_to_top,
+                                                  opening_reinforcement_policy)
+    # SECAO 77: papel funcional de cada no' em cada fiada, com as MESMAS
+    # aberturas do solve (ver wall_stepper.junction_role_table)
+    from core.engine import wall_stepper as _stepper_roles
+    _stepper_roles.JUNCTION_ROLE_TABLE = None
+    if _stepper_roles.JUNCTION_ROLE_BY_COURSE and _course_height_ft(catalog, None)[0] is not None:
+        _stepper_roles.JUNCTION_ROLE_TABLE = _stepper_roles.junction_role_table(
+            nodes, walls_to_create, openings_per_wall, _free_to_top_band(catalog, base_z_abs), num_courses,
+            catalog, OPENING_COURSE_BAND_TOLERANCE_FT)
     result = _solve_building_blocks_all_courses_core(
         nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
         allow_compensators=allow_compensators, variants_per_course=variants_per_course,
@@ -3823,10 +4500,12 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
                                                "timing": channel_parity.get("timing")}
 
     if not enabled or result.get("error") is not None:
-        return _apply_opening_reinforcement(
+        return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
             original_openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+            walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
+            catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
     repair_outcome = repair_arm_role_isolated_edges(
         nodes, walls_to_create, catalog, num_courses,
@@ -3858,10 +4537,12 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
             if arm_role_safe_repair_signal is not None:
                 result["arm_role_safe_repair"] = arm_role_safe_repair_signal
 
-    return _apply_opening_reinforcement(
+    return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
         original_openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top)
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+        walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
+        catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
 
 CHANNEL_TRIAL_CHEAP_GATES = ("bond_reproved", "continuous_joints", "non_modular", "collisions", "door_void",
@@ -4142,6 +4823,23 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
             result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
             free_to_top=plan["free_to_top"], policy=plan["policy"],
             reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    # Vazado menor (secao 52) e arranjo das corridas (secao 60) ANTES da
+    # reauditoria: o arranjo move juntas dentro das corridas, e a auditoria de
+    # amarracao tem de ver a geometria final. A orientacao nao muda junta.
+    _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall, arrange=True,
+                              nodes=nodes, end_to_node=end_to_node,
+                              validate_wall=_channel_wall_validator(
+                                  result, walls_to_create, openings_per_wall, catalog, num_courses,
+                                  nodes, end_to_node, _band, plan, base_z_abs))
+    _arrangement = result.get("b34_run_arrangement") or {}
+    if (_arrangement.get("runs_changed") or _arrangement.get("compositions") or _arrangement.get("moved")
+            or _arrangement.get("created") or _arrangement.get("removed")):
+        # a validacao CHANNEL guardada foi feita ANTES do arranjo: refaz sobre a
+        # geometria final para o relatorio nao mentir
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+            free_to_top=plan["free_to_top"], policy=plan["policy"],
+            reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
@@ -4153,6 +4851,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
+    # REGRA 75 - hard gate: canaleta nunca exerce funcao de amarracao. So' o
+    # fluxo com estrategia de reforco passa por aqui; o legado segue byte a byte.
+    result["channel_as_junction_bond"] = _reinforcement.channel_as_junction_bond(
+        result.get("course_candidates"), plan)
     return result
 
 
@@ -4270,11 +4972,194 @@ def _record_incomplete_wall_creation(solve_result, create_result, walls_to_creat
     create_result["skipped_wall_count"] = len(retained)
 
 
-def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
-    """Read-only physical gate. Reject the batch, never remove individual ties.
+# ==========================================
+# ETAPA 5 - MATERIALIZACAO SELETIVA (2026-09-23, OPCAO A do usuario)
+#
+# `controlled_beta_preflight` (abaixo) mede, peca a peca, quem invade o volume
+# real de uma abertura ativa na fiada (regra 48) e quem colide com outra peca.
+# Quem decide o que fazer com esse laudo e' esta politica:
+#
+#   FATAL (preflight["errors"])  -> plano inconsistente: bloqueia a RUN INTEIRA.
+#   invasao de abertura          -> a PECA nao e' criada. SEM EXCECAO: vale para
+#                                   B19, B34, B39, B54, compensador, canaleta,
+#                                   peca comum e peca de amarracao (regra 48:
+#                                   "nenhuma peca pode ocupar o volume real de
+#                                   uma porta").
+#   colisao entre pecas          -> uma das duas nao e' criada (a que NAO e'
+#                                   amarracao, quando so' uma e').
+#   todo o resto                 -> criado normalmente.
+#
+# AMARRACAO REJEITADA NAO E' AMARRACAO RESOLVIDA: se a peca pulada tinha papel
+# estrutural de amarracao, o no'/fiada sai como AMARRACAO NAO RESOLVIDA, com
+# revisao humana obrigatoria. A RUN pode terminar sem rollback e ainda ter
+# pendencia estrutural localizada - "RUN executavel" e "modulacao
+# estruturalmente resolvida" sao coisas diferentes e vao separadas no resultado.
+#
+# PAPEL DE AMARRACAO (structural_bond_role): o TIPO do bloco nao define o papel.
+# Vale a DECISAO DO SOLVER gravada na peca (`placement_reason` de encontro:
+# L_CORNER*, T_INTERSECTION*, X_INTERSECTION*, CORNER*) combinada com a regra 76
+# (so' B34/B54 amarram - compensador, B19 e canaleta nunca) e a regra 76.1
+# (JUNCTION_UNRESOLVED_FILL e' o compensador de no' NAO resolvido - nunca
+# amarracao). Um B34/B54 de preenchimento (STANDARD_FILL etc.) NAO e' amarracao.
+OPENING_INVASION_RULE_ID = "OPENING_VOID_INVASION"
+PIECE_COLLISION_RULE_ID = "PIECE_COLLISION"
+BOND_UNRESOLVED_STATUS = "BOND_UNRESOLVED"
 
-    Unlike the benchmark, this includes all active openings and all pairs,
-    even when two pieces share a node. It does not change either validator.
+
+def structural_bond_role(candidate):
+    """Papel ESTRUTURAL de amarracao que o solver deu a' peca, ou None.
+
+    Nunca decide pelo codigo sozinho (ver bloco acima)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    from core.engine import wall_stepper as _stepper
+
+    reason = str((candidate or {}).get("placement_reason") or "")
+    code = (candidate or {}).get("logical_code")
+    if reason == _stepper.JUNCTION_UNRESOLVED_FILL_REASON:
+        return None                                   # regra 76.1: compensador de no'
+    if code not in _stepper.JUNCTION_BOND_CODES:
+        return None                                   # regra 76: so' B34/B54 amarram
+    if not any(reason.startswith(p) for p in _reinforcement.TIE_REASON_PREFIXES):
+        return None                                   # B34/B54 de preenchimento
+    return reason
+
+
+def materialization_plan(result, preflight=None):
+    """Classifica o laudo do preflight peca a peca (somente leitura).
+
+    {"skip": [(course_index, id(peca), registro)],      pecas NAO criadas
+     "unresolved_bonds": [registro],                     amarracoes nao resolvidas
+     "fatal": [erros]}                                   bloqueiam a RUN"""
+    result = result or {}
+    preflight = preflight if preflight is not None else (result.get("beta_preflight") or {})
+    sources = result.get("course_candidates") or {}
+    plano = {"skip": [], "unresolved_bonds": [], "fatal": list(preflight.get("errors") or [])}
+    ja = {}
+
+    def pular(ci, idx, rule_id, descricao, registro, extra=None):
+        pecas = sources.get(ci) or []
+        if not isinstance(idx, int) or not (0 <= idx < len(pecas)):
+            return
+        cand = pecas[idx]
+        chave = (ci, id(cand))          # IDENTIDADE da peca: duas pecas iguais sao duas pecas
+        papel = structural_bond_role(cand)
+        if chave in ja:
+            ja[chave]["rules"].append(rule_id)            # mesma peca, mais de um motivo
+            return
+        rec = {
+            "rule_id": rule_id, "rules": [rule_id], "severity": "GEOMETRY_IMPOSSIBLE",
+            "materializable": False, "created": False,
+            "structural_role": papel, "requires_human_review": bool(papel),
+            "course_index": ci, "wall_idx": cand.get("wall_idx"),
+            "node_index": cand.get("node_index"), "logical_code": cand.get("logical_code"),
+            "placement_reason": cand.get("placement_reason"),
+            "origin_cm": registro.get("origin_cm"), "z_cm": registro.get("z_cm"),
+            "overlap_cm": registro.get("overlap_cm"),
+            "vertical_overlap_cm": registro.get("vertical_overlap_cm"),
+            "opening_wall_idx": registro.get("opening_wall_idx"),
+            "opening_index": registro.get("opening_index"),
+            "message": descricao,
+        }
+        if extra:
+            rec.update(extra)
+        ja[chave] = rec
+        plano["skip"].append((ci, chave[1], rec))
+        if papel:
+            plano["unresolved_bonds"].append({
+                "status": BOND_UNRESOLVED_STATUS, "requires_human_review": True,
+                "node_index": cand.get("node_index"), "course_index": ci,
+                "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+                "structural_role": papel, "rejected_rule": rule_id,
+                "overlap_cm": registro.get("overlap_cm"), "opening_index": rec["opening_index"],
+                "opening_wall_idx": rec["opening_wall_idx"],
+                "message": "amarracao NAO resolvida: a peca de amarracao foi rejeitada ({})".format(descricao),
+            })
+
+    # 1) regra 48 - invasao do volume real de abertura: a peca nunca e' criada
+    for registro in preflight.get("opening_violations") or []:
+        pular(registro.get("course_index"), registro.get("candidate_index"), OPENING_INVASION_RULE_ID,
+              "a peca ocupa o volume real de uma abertura (regra 48)", registro)
+
+    # 2) colisao entre duas pecas: some UMA delas - a que nao e' amarracao, se so' uma for.
+    #    Se uma das duas JA' saiu (invasao ou outra colisao), a colisao ja' esta'
+    #    resolvida: nenhuma peca valida a mais e' pulada e nenhuma amarracao
+    #    NAO resolvida falsa e' criada (achado da auditoria independente).
+    for registro in preflight.get("collisions") or []:
+        ci = registro.get("course_index")
+        i, j = registro.get("candidate_index"), registro.get("other_candidate_index")
+        pecas = sources.get(ci) or []
+        ja_saiu = [ja[(ci, id(pecas[k]))] for k in (i, j)
+                   if isinstance(k, int) and 0 <= k < len(pecas) and (ci, id(pecas[k])) in ja]
+        if ja_saiu:
+            ja_saiu[0]["rules"].append(PIECE_COLLISION_RULE_ID)
+            continue
+        alvo = i
+        if (isinstance(j, int) and 0 <= j < len(pecas) and isinstance(i, int) and 0 <= i < len(pecas)
+                and structural_bond_role(pecas[i]) and not structural_bond_role(pecas[j])):
+            alvo = j
+        pular(ci, alvo, PIECE_COLLISION_RULE_ID, "a peca colide com outra peca do mesmo lote", registro,
+              {"collides_with_candidate_index": j if alvo == i else i})
+    return plano
+
+
+def unbuildable_pieces(result, preflight=None):
+    """[(course_index, id(peca), registro)] das pecas que NAO serao criadas."""
+    return materialization_plan(result, preflight)["skip"]
+
+
+def unbuildable_keys(result, preflight=None):
+    """set((course_index, id(peca))) - o que `create_building_blocks` pula."""
+    return set((ci, chave) for ci, chave, _rec in unbuildable_pieces(result, preflight))
+
+
+def run_is_fatal(preflight):
+    """So' o laudo FATAL do preflight impede a RUN inteira."""
+    return bool((preflight or {}).get("errors"))
+
+
+def beta_finalize_allowed(solve_result):
+    """BETA: o Finalizar (excluir paredes de referencia) esta' liberado?
+
+    Violacao LOCALIZADA nao bloqueia mais a planta inteira (OPCAO A): a parede
+    com peca pulada fica RETIDA por `_record_incomplete_wall_creation`
+    (INCOMPLETE_CREATION, referencia preservada - secao 48). Continua bloqueado
+    com erro FATAL ou quando o conjunto criado nao foi conferido limpo."""
+    solve_result = solve_result or {}
+    preflight = solve_result.get("beta_preflight") or {}
+    if not preflight or preflight.get("errors"):
+        return False
+    return bool(preflight.get("ok") or solve_result.get("beta_materialization_verified"))
+
+
+def materialized_result(result, skip_keys):
+    """Copia rasa do resultado com SO' as pecas que serao criadas (mesmas fiadas).
+
+    `skip_keys` sao (fiada, id(peca)) - a identidade do objeto que
+    `create_building_blocks` recebe (o mesmo `course_candidates`)."""
+    result = dict(result or {})
+    pular = set(skip_keys or ())
+    fontes = result.get("course_candidates") or {}
+    result["course_candidates"] = dict(
+        (ci, [c for c in pecas if (ci, id(c)) not in pular])
+        for ci, pecas in fontes.items())
+    return result
+
+
+def verify_materialization(result, walls_to_create, openings_per_wall, catalog, base_z_abs, skip_keys):
+    """INVARIANTE da regra 48 sobre o que REALMENTE vai ser criado: refaz o
+    preflight so' com as pecas que ficam. Tem de dar zero invasao e zero colisao."""
+    return controlled_beta_preflight(materialized_result(result, skip_keys), walls_to_create,
+                                     openings_per_wall, catalog, base_z_abs)
+
+
+def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalog, base_z_abs):
+    """Laudo fisico SOMENTE LEITURA, peca a peca (regra 48).
+
+    Mede invasao do volume real de abertura ativa na fiada e colisao entre
+    pecas, incluindo todas as aberturas e todos os pares (mesmo no mesmo no').
+    Nao decide nada: `materialization_plan` aplica a politica (erro fatal
+    bloqueia a RUN; cada ocorrencia localizada impede so' a PECA afetada).
+    Nao altera nenhum validador.
     """
     import math
     from core.engine.wall_stepper import _obb_aabb, _collision_candidate_pairs
@@ -4312,7 +5197,6 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
         return {"ok": False, "errors": ["Altura fisica invalida"], "opening_violations": [], "collisions": []}
     for ci, pieces in sorted(sources.items()):
         z0, z1 = _course_z_band(base_z_abs, ci, step, height)
-        active = _filter_openings_per_wall_for_band(openings_per_wall, z0, z1)
         for i, c in enumerate(pieces):
             vectors = [c[key] for key in ("origin_world", "x_dir", "y_dir")]
             values = [v for vector in vectors for v in (vector.X, vector.Y, vector.Z)]
@@ -4325,11 +5209,18 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
         if errors:
             return {"ok": False, "errors": errors, "opening_violations": violations, "collisions": collisions}
         boxes = [_candidate_obb(c) for c in pieces]
+        # REGRA 48 (OPCAO A): a abertura conta nesta fiada quando o vao REAL
+        # sobrepoe a faixa da fiada em Z alem da MESMA tolerancia de 0,1 cm usada
+        # em planta. Nunca a tolerancia de ruido de 0,5 cm que o solver usa para
+        # montar as bandas (OPENING_COURSE_BAND_TOLERANCE_CM): com ela, ate' 5 mm
+        # de peca ficavam dentro do vao sem aparecer no laudo. O solver nao muda.
         voids = []
-        for wi, openings in enumerate(active):
-            for opening in openings:
-                voids.append((wi, openings_per_wall[wi].index(opening),
-                              _door_void_obb(wi, walls_to_create, opening[0], opening[1])))
+        for wi, openings in enumerate(openings_per_wall):
+            for oi, opening in enumerate(openings):
+                vertical = min(opening[3], z1) - max(opening[2], z0)
+                if vertical <= BOND_COLLISION_EPS_FT:
+                    continue
+                voids.append((wi, oi, _door_void_obb(wi, walls_to_create, opening[0], opening[1]), vertical))
         all_boxes = boxes + [v[2] for v in voids]
         aabbs = [_obb_aabb(box) for box in all_boxes]
         for i, j in sorted(_collision_candidate_pairs(range(len(all_boxes)), aabbs, 0.0)):
@@ -4348,9 +5239,12 @@ def controlled_beta_preflight(result, walls_to_create, openings_per_wall, catalo
                 record.update(other_candidate_index=j, other_wall_idx=pieces[j].get("wall_idx"))
                 collisions.append(record)
             else:
-                wi, oi, _obb = voids[j - len(pieces)]
+                wi, oi, _obb, vertical = voids[j - len(pieces)]
+                # sobreposicao REAL em 3D = a menor das duas (planta x altura)
                 record.update(opening_wall_idx=wi, opening_index=oi,
-                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]])
+                              opening_cm=[_ft_to_cm(v) for v in openings_per_wall[wi][oi]],
+                              plan_overlap_cm=_ft_to_cm(overlap), vertical_overlap_cm=_ft_to_cm(vertical),
+                              overlap_cm=_ft_to_cm(min(overlap, vertical)))
                 violations.append(record)
     return {"ok": not violations and not collisions and not errors, "errors": errors,
             "opening_violations": violations, "collisions": collisions}
@@ -4693,6 +5587,51 @@ def _wall_midspan_node_t_positions_cm(wall_idx, walls_to_create, nodes):
     return positions
 
 
+def _wall_tie_t_positions_by_course_cm(wall_idx, walls_to_create, nodes, end_to_node, num_courses,
+                                       table=None):
+    """SECAO 77: {fiada: [t_cm]} - as mesmas posicoes de
+    `_wall_tie_t_positions_cm`, menos as dos nos que NAO sao encontro naquela
+    fiada. `table` = tabela de papeis explicita ({(no, fiada): registro} ou a
+    forma compacta publicada no resultado, {"no:fiada": {...}}); sem ela, a
+    tabela do solve corrente (wall_stepper.JUNCTION_ROLE_TABLE). None quando
+    nenhuma fiada muda (o chamador usa a lista unica de sempre)."""
+    from core.engine import wall_stepper as _ws_roles
+    if table is None:
+        table = _ws_roles.JUNCTION_ROLE_TABLE
+    if not table or not nodes:
+        return None
+    if any(isinstance(k, str) for k in table):
+        expandida = {}
+        for k, v in table.items():
+            try:
+                ni, ci = k.split(":")
+                expandida[(int(ni), int(ci))] = v
+            except (ValueError, AttributeError):
+                continue
+        table = expandida
+    p0, _p1, wall_dir, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+    length_cm = length_ft / FEET_PER_METER * 100.0
+    tagged = []
+    for ni, node in enumerate(nodes):
+        if wall_idx not in _midspan_node_wall_ids(node) or node.get("point") is None:
+            continue
+        tagged.append(((node["point"] - p0).DotProduct(wall_dir) / FEET_PER_METER * 100.0, ni))
+    for end_index in _axis_corner_end_sides(wall_idx, end_to_node, nodes):
+        tagged.append((0.0 if end_index == 0 else length_cm, end_to_node.get((wall_idx, end_index))))
+    out = {}
+    changed = False
+    for ci in range(num_courses):
+        keep = []
+        for t_cm, ni in tagged:
+            rec = table.get((ni, ci)) if ni is not None else None
+            if rec is not None and _ws_roles.junction_role_skips_bond(nodes[ni], rec):
+                changed = True
+                continue
+            keep.append(t_cm)
+        out[ci] = keep
+    return out if changed else None
+
+
 def _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node):
     """t_cm de TODA amarracao real (encontro L/T/X) que toca `wall_idx` -
     nas duas PONTAS (so' quando o no' de la' e' L_CORNER/T_INTERSECTION/
@@ -4751,7 +5690,7 @@ def _joint_is_opening_aligned_exempt(extent_a, extent_b, opening_edges_cm, lengt
 
 def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalog,
                             num_courses, openings_per_wall=None, nodes=None, end_to_node=None,
-                            course_candidates_index=None):
+                            course_candidates_index=None, junction_roles=None):
     """Validacao MULTI-FIADA de UMA parede - ver cabecalho da secao acima.
     Devolve {"ok": bool, "problems": [str,...], "penalty": float,
     "continuous_joints": [...], "alternating_joints": [...],
@@ -4785,6 +5724,11 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
             opening_edges_cm.append(op[1] / FEET_PER_METER * 100.0)
     node_t_positions_cm = _wall_midspan_node_t_positions_cm(wall_idx, walls_to_create, nodes)
     tie_t_positions_cm = _wall_tie_t_positions_cm(wall_idx, walls_to_create, nodes, end_to_node)
+    # SECAO 77: `junction_roles` explicita (chamador externo: a tabela publicada
+    # em result["junction_role_by_course"]["roles"]) ou, dentro do solve, a
+    # tabela do contexto
+    tie_by_course = _wall_tie_t_positions_by_course_cm(wall_idx, walls_to_create, nodes, end_to_node,
+                                                       num_courses, table=junction_roles)
 
     def _near_exempt_zone(t_cm):
         if t_cm <= BOND_STRIP_EDGE_EXEMPT_CM or t_cm >= length_cm - BOND_STRIP_EDGE_EXEMPT_CM:
@@ -4856,13 +5800,17 @@ def audit_wall_bond_quality(wall_idx, walls_to_create, course_candidates, catalo
                     and node_index is not None and nodes is not None and 0 <= node_index < len(nodes)
                     and _channel_covers_node(course_candidates.get(course_index) or [], nodes[node_index])):
                 continue
-            if code == HALF_BLOCK_CODE and tie_t_positions_cm:
+            # SECAO 77: nas fiadas em que o no' nao e' encontro, a ponta e'
+            # livre e a posicao dele nao conta como amarracao
+            ties_here = (tie_by_course.get(course_index, tie_t_positions_cm) if tie_by_course is not None
+                         else tie_t_positions_cm)
+            if code == HALF_BLOCK_CODE and ties_here:
                 # REDE DE SEGURANCA regra #2 (ver HALF_BLOCK_TIE_ADJACENCY_CM):
                 # distancia do CORPO do B19 (nao so' do centro) ate' a
                 # amarracao mais proxima - 0 se a amarracao cair dentro do
                 # proprio intervalo da peca (nunca deveria acontecer, mas
                 # tratado do mesmo jeito: distancia zero, violacao clara).
-                for tie_t in tie_t_positions_cm:
+                for tie_t in ties_here:
                     if tie_t < t_start:
                         gap_cm = t_start - tie_t
                     elif tie_t > t_end:
@@ -5425,7 +6373,7 @@ def _discover_previous_lot(target_doc, owner_wall_uids):
 
 def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected_level, num_courses,
                            course_candidates=None, progress_cb=None, stage_cb=None, strict_transactions=False,
-                           owner_uid_by_wall_idx=None, lot_tag=None):
+                           owner_uid_by_wall_idx=None, lot_tag=None, skip_keys=None):
     """Ponto de entrada da Etapa 5: cria no Revit, dentro de um unico
     TransactionGroup, as FamilyInstance correspondentes a `candidates` (ver
     solve_building_blocks), repetidas em `num_courses` FIADAS FISICAS
@@ -5500,10 +6448,17 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
     course_height_ft, height_error = _course_height_ft(catalog, height_source)
     if course_height_ft is None:
         perf["total_s"] = clock() - t_function_start
+        # contabilidade fechada tambem aqui: nada criado, todo o plano falhou
+        if course_candidates is not None:
+            planejadas = sum(len(course_candidates.get(ci) or []) for ci in range(num_courses))
+        else:
+            planejadas = sum(1 for ci in range(num_courses) for c in candidates or []
+                             if c.get("course") == ("A" if ci % 2 == 0 else "B"))
         return {
             "created_count": 0, "failures": [],
             "course_height_ft": None, "course_height_error": height_error,
             "created_instances": [], "perf": perf,
+            "planned_total": planejadas, "skipped_count": 0, "skipped": [], "failed_count": planejadas,
         }
 
     used_codes = sorted(set(c["logical_code"] for c in height_source))
@@ -5530,6 +6485,28 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
             course_letter = "A" if course_index % 2 == 0 else "B"
             course_sources.append([c for c in candidates if c["course"] == course_letter])
     perf["planned_total"] = sum(len(source) for source in course_sources)
+
+    # MATERIALIZACAO SELETIVA (ver unbuildable_pieces): as pecas que o preflight
+    # provou impossiveis saem daqui com motivo, e SO' elas. `planned_total`
+    # continua sendo o plano inteiro - e' o que faz a conta fechar depois
+    # (planejadas = criadas + puladas + falhas).
+    skipped_records = []
+    if skip_keys:
+        filtradas = []
+        for course_index, source in enumerate(course_sources):
+            mantidas = []
+            for cand in source:
+                chave = (course_index, id(cand))
+                registro = skip_keys.get(chave) if isinstance(skip_keys, dict) else None
+                if chave in skip_keys:
+                    skipped_records.append(registro or {
+                        "course_index": course_index, "wall_idx": cand.get("wall_idx"),
+                        "logical_code": cand.get("logical_code"), "materializable": False,
+                        "rule_id": "UNBUILDABLE", "severity": "GEOMETRY_IMPOSSIBLE"})
+                    continue
+                mantidas.append(cand)
+            filtradas.append(mantidas)
+        course_sources = filtradas
 
     if stage_cb is not None:
         try:
@@ -5617,7 +6594,18 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
                     entry = catalog.get(cand["logical_code"])
                     if entry is None:
                         done += 1  # conta para a barra nao parar em 99%
-                        continue  # ja reportado em missing_codes, uma vez, acima
+                        # contabilidade POR PECA: nenhuma peca some em silencio
+                        skipped_records.append({
+                            "course_index": course_index, "wall_idx": cand.get("wall_idx"),
+                            "node_index": cand.get("node_index"),
+                            "logical_code": cand.get("logical_code"),
+                            "placement_reason": cand.get("placement_reason"),
+                            "rule_id": "MISSING_FAMILY", "severity": "FAMILY_MISSING",
+                            "materializable": False, "created": False,
+                            "structural_role": structural_bond_role(cand),
+                            "requires_human_review": True,
+                            "message": "tipo ausente do catalogo - peca nao criada"})
+                        continue
                     symbol = entry["symbol"]
                     origin = cand["origin_world"]
                     # BUG REAL medido ao vivo (2026-08-21, primeiro teste via MCP
@@ -5800,6 +6788,9 @@ def create_building_blocks(target_doc, candidates, catalog, base_z_abs, selected
         "created_count": created_count, "failures": failures,
         "course_height_ft": course_height_ft, "course_height_error": None,
         "created_instances": created_instances, "perf": perf,
+        # contabilidade explicita: planejadas = criadas + puladas + falhas
+        "planned_total": perf["planned_total"], "skipped_count": len(skipped_records),
+        "skipped": skipped_records, "failed_count": perf.get("failed_count", 0),
     }
 
 
@@ -9113,17 +10104,85 @@ from System import Action
 
 # Paleta unica da interface - definida uma vez para que todas as janelas
 # tenham a mesma linguagem visual, em vez das cores padrao do WinForms.
-UI_BG = Color.FromArgb(250, 250, 252)
-UI_PANEL = Color.FromArgb(255, 255, 255)
-UI_HEADER = Color.FromArgb(31, 41, 55)
-UI_TEXT = Color.FromArgb(31, 41, 55)
-UI_MUTED = Color.FromArgb(107, 114, 128)
-UI_ACCENT = Color.FromArgb(37, 99, 235)
-UI_OK = Color.FromArgb(16, 133, 88)
-UI_WARN = Color.FromArgb(180, 83, 9)
-UI_ERROR = Color.FromArgb(185, 28, 28)
-UI_LINE = Color.FromArgb(229, 231, 235)
-UI_SOFT = Color.FromArgb(243, 244, 246)
+from core.ui_state import TOKENS as _UI_TOKENS, elapsed_text as _ui_elapsed_text
+from core.ui_state import creation_gate as _ui_creation_gate, wall_label as _ui_wall_label
+from core.ui_state import friendly_problem as _ui_problem, activity_text as _ui_activity
+from core.ui_components import UiComponents
+
+from core.ui_state import (review_items as _ui_review_items,
+                           hard_gate_total as _ui_hard_gate_total,
+                           no_functional_junction_count as _ui_no_functional_junction)
+
+# ---------------------------------------------------------------- pos-PR #42
+# A UI premium (#46) deixou pronto `UiComponents.present_execution`, mas nada no
+# host publicava o snapshot. Este e' o adaptador: numeros REAIS do motor final,
+# com `run_id`/`revision` para que um evento atrasado de uma execucao anterior
+# nunca sobrescreva a execucao atual (ver ExecutionPresentation.update).
+_UI_RUN_SEQ = [0]
+
+
+def _ui_new_run_id():
+    _UI_RUN_SEQ[0] += 1
+    return "run-%d" % _UI_RUN_SEQ[0]
+
+
+def _ui_execution_snapshot(run_id, revision, handler, solve_result=None, create_result=None,
+                           adjustment_status="not_evaluated", openings_moved=None, detail=None):
+    """Snapshot completo (nunca delta) do que o motor REALMENTE entregou.
+
+    `adjustment_status` nasce "not_evaluated" de proposito: o fluxo do botao nao
+    executa a Etapa 3B da secao 66 (o planejador de microajuste so' e' chamado
+    pelo harness), entao a UI nao pode afirmar "abertura ajustada" nem "ajuste
+    nao necessario" - so' o que foi confirmado vira "confirmed"."""
+    result = solve_result or {}
+    audits = result.get("wall_bond_audits") or {}
+    if isinstance(audits, dict):
+        audits = list(audits.values())
+    avisos = sum(1 for a in audits if isinstance(a, dict) and not a.get("ok", True))
+    avisos += len(result.get("unmodulated_walls") or [])
+    status_3b, motivo_3b = micro_adjust_flow_state()
+    if adjustment_status == "not_evaluated":
+        adjustment_status = status_3b
+    snapshot = {
+        "run_id": run_id,
+        "revision": revision,
+        "walls_analyzed": len(getattr(handler, "walls_to_create", None) or []),
+        "warnings": avisos,
+        "hard_gates": _ui_hard_gate_total(result),
+        "review_items": len(_ui_review_items(result)),
+        "adjustment_status": adjustment_status,
+    }
+    if openings_moved is not None:
+        snapshot["openings_moved"] = openings_moved
+    partes = []
+    if create_result is not None:
+        partes.append("Criados: {} bloco(s); falhas de criacao: {}.".format(
+            create_result.get("created_count", 0), len(create_result.get("failures") or [])))
+    sem_encontro = _ui_no_functional_junction(result)
+    if sem_encontro:
+        partes.append("{} fiada(s) sem encontro funcional por projeto (secao 77) - nao sao erro.".format(
+            sem_encontro))
+    if motivo_3b and adjustment_status == "not_evaluated":
+        partes.append(motivo_3b)
+    if detail:
+        partes.append(detail)
+    if partes:
+        snapshot["detail"] = " ".join(partes)
+    return snapshot
+
+
+
+UI_BG = Color.FromArgb(*_UI_TOKENS["Background"])
+UI_PANEL = Color.FromArgb(*_UI_TOKENS["Surface"])
+UI_HEADER = Color.FromArgb(*_UI_TOKENS["Background"])
+UI_TEXT = Color.FromArgb(*_UI_TOKENS["TextPrimary"])
+UI_MUTED = Color.FromArgb(*_UI_TOKENS["TextSecondary"])
+UI_ACCENT = Color.FromArgb(*_UI_TOKENS["Primary"])
+UI_OK = Color.FromArgb(*_UI_TOKENS["Success"])
+UI_WARN = Color.FromArgb(*_UI_TOKENS["Warning"])
+UI_ERROR = Color.FromArgb(*_UI_TOKENS["Danger"])
+UI_LINE = Color.FromArgb(*_UI_TOKENS["Border"])
+UI_SOFT = UI_BG
 
 # Severidades usadas nas ocorrencias do relatorio final (ver _ResultsForm):
 # rotulo mostrado na coluna + cor da linha.
@@ -9143,6 +10202,8 @@ def _style_primary_button(button):
     """Botao de acao principal - preenchido, sem borda 3D do WinForms."""
     button.FlatStyle = FlatStyle.Flat
     button.FlatAppearance.BorderSize = 0
+    button.FlatAppearance.MouseOverBackColor = Color.FromArgb(*_UI_TOKENS["Hover"])
+    button.FlatAppearance.MouseDownBackColor = Color.FromArgb(*_UI_TOKENS["Pressed"])
     button.BackColor = UI_ACCENT
     button.ForeColor = Color.White
     button.Font = _ui_font(9.5, True)
@@ -9154,6 +10215,8 @@ def _style_secondary_button(button):
     button.FlatStyle = FlatStyle.Flat
     button.FlatAppearance.BorderSize = 1
     button.FlatAppearance.BorderColor = UI_LINE
+    button.FlatAppearance.MouseOverBackColor = UI_SOFT
+    button.FlatAppearance.MouseDownBackColor = UI_LINE
     button.BackColor = UI_PANEL
     button.ForeColor = UI_TEXT
     button.Font = _ui_font(9.5)
@@ -9204,14 +10267,14 @@ def _build_section_label(text, hint=None):
     controles soltos numa sequencia de passos legivel."""
     holder = Panel()
     holder.Dock = DockStyle.Top
-    holder.Height = 42 if hint else 26
+    holder.Height = 68 if hint else 30
     holder.BackColor = UI_PANEL
 
     if hint:
         hint_label = Label()
         hint_label.Text = hint
         hint_label.Dock = DockStyle.Bottom
-        hint_label.Height = 18
+        hint_label.Height = 42
         hint_label.Font = _ui_font(8.25)
         hint_label.ForeColor = UI_MUTED
         holder.Controls.Add(hint_label)
@@ -9327,6 +10390,8 @@ def _styled_listview(columns, checkboxes=False):
 # processar essa mensagem no proximo DoEvents()).
 # ==========================================
 
+_ui = UiComponents(globals())
+
 SOLVER_SLOW_WARNING_SECONDS = 8.0
 SOLVER_WATCHDOG_INTERVAL_MS = 3000
 # Intervalo de espera (segundos) dos lacos "while should_pause_cb(): ..."
@@ -9406,7 +10471,12 @@ class _ProgressConsole(object):
 
         self._log_box = _monospace_textbox("")
 
-        self.panel.Controls.Add(self._log_box)
+        self._started_at = time.time()
+        self._elapsed_label = _ui.label("Tempo decorrido: 00:00", 26)
+        self._details = _ui.expandable(self._log_box, height=220)
+        self.panel.AutoScroll = True
+        self.panel.Controls.Add(self._details)
+        self.panel.Controls.Add(self._elapsed_label)
         self.panel.Controls.Add(top)
 
     def _pump_ui(self):
@@ -9505,10 +10575,10 @@ class _ProgressConsole(object):
         if self._invoke_if_needed(lambda: self.set_status(text, kind)):
             return
         color = {
-            "ok": self._UI_OK, "warn": self._UI_WARN, "error": self._UI_WARN,
+            "ok": self._UI_OK, "warn": self._UI_WARN, "error": UI_ERROR,
         }.get(kind, self._UI_TEXT)
         try:
-            self._status_label.Text = text
+            self._status_label.Text = _ui_activity(text)
             self._status_label.ForeColor = color
             with _perf.span("console.set_status DoEvents"):
                 self._pump_ui()
@@ -9522,7 +10592,10 @@ class _ProgressConsole(object):
         if self._invoke_if_needed(lambda: self.set_progress(done, total, detail)):
             return
         try:
-            total = max(1, int(total or 1))
+            if not total or total <= 0:
+                self.set_indeterminate(detail or "Processando; total ainda não informado.")
+                return
+            total = max(1, int(total))
             done = max(0, min(int(done or 0), total))
             pct = int(round(100.0 * done / total))
             if done > 0:
@@ -9532,7 +10605,7 @@ class _ProgressConsole(object):
             self._progress_bar.Style = ProgressBarStyle.Continuous
             self._progress_bar.Maximum = 100
             self._progress_bar.Value = pct
-            self._detail_label.Text = detail or "{}/{} processado(s) - {}%".format(done, total, pct)
+            self._detail_label.Text = "{} de {} · {}%  {}".format(done, total, pct, _ui_activity(detail))
             self._touch(detail or "")
             with _perf.span("console.set_progress DoEvents"):
                 self._pump_ui()
@@ -9553,7 +10626,7 @@ class _ProgressConsole(object):
             # (ou incriminado) com timestamp.
             self._progress_bar.MarqueeAnimationSpeed = 30
             if detail:
-                self._detail_label.Text = detail
+                self._detail_label.Text = _ui_activity(detail)
             self._touch(detail or "")
             with _perf.span("console.set_indeterminate DoEvents"):
                 self._pump_ui()
@@ -9585,6 +10658,7 @@ class _ProgressConsole(object):
     # ------------------------------------------------------------ watchdog
     def _touch(self, label):
         self._last_update_time = time.time()
+        self._elapsed_label.Text = "Tempo decorrido: " + _ui_elapsed_text(time.time() - self._started_at)
         if label:
             self._current_label = label
 
@@ -9592,6 +10666,7 @@ class _ProgressConsole(object):
         """Liga o vigia (ver cabecalho da secao) - seguro chamar mais de
         uma vez (para/recria)."""
         self.stop_watchdog()
+        self._started_at = time.time()
         self._last_update_time = time.time()
         self._last_watchdog_notice_time = 0.0
         try:
@@ -9689,8 +10764,8 @@ REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 # estrategia nao implementada aparece para deixar a expansao visivel, mas
 # bloqueia o botao executar.
 OPENING_REINFORCEMENT_UI_OPTIONS = (
-    ("NONE", "Sem reforco de aberturas (modulacao legada)", True),
-    ("CHANNEL", "CHANNEL - canaletas acima e abaixo das aberturas", True),
+    ("NONE", "Sem reforço", True),
+    ("CHANNEL", "Canaletas (CHANNEL)", True),
     ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
 )
 DEFAULT_OPENING_REINFORCEMENT_UI_VALUE = "NONE"
@@ -9861,8 +10936,10 @@ class _SetupForm(Form):
         remembered_reinforcement = defaults.get("opening_reinforcement", DEFAULT_OPENING_REINFORCEMENT_UI_VALUE)
         selected_reinforcement = 0
         for index, (key, label, _implemented) in enumerate(OPENING_REINFORCEMENT_UI_OPTIONS):
+            if not _implemented:
+                continue
             self._reinforcement_combo.Items.Add(label)
-            if key == remembered_reinforcement:
+            if key == remembered_reinforcement and _implemented:
                 selected_reinforcement = index
         self._reinforcement_combo.SelectedIndex = selected_reinforcement
         self._reinforcement_combo.SelectedIndexChanged += self._on_changed
@@ -9969,7 +11046,7 @@ class _SetupForm(Form):
         footer.Padding = Padding(16, 13, 16, 13)
 
         self._run_button = Button()
-        self._run_button.Text = "Executar"
+        self._run_button.Text = "Criar paredes"
         self._run_button.Dock = DockStyle.Right
         self._run_button.Width = 170
         _style_primary_button(self._run_button)
@@ -10016,6 +11093,7 @@ class _SetupForm(Form):
             self._layer_grid.Items[target_row].Selected = True
         self._reload_thicknesses(defaults.get("thicknesses_cm") or [])
         self._validate()
+        _ui.setup(self, body, left, right, footer)
 
     # ------------------------------------------------------------ estado
     @property
@@ -10095,16 +11173,16 @@ class _SetupForm(Form):
     def _validate(self, pending_thickness=None):
         problems = []
         if not self._selected_layer:
-            problems.append("escolha o Layer das paredes")
+            problems.append("Selecione o layer de paredes")
         thicknesses, error = self._checked_thicknesses_cm(pending_thickness)
         if error:
             problems.append(error)
         elif not thicknesses:
-            problems.append("marque ao menos uma espessura")
+            problems.append("Selecione ao menos uma espessura de parede para continuar")
         if self._level_combo.SelectedItem is None:
-            problems.append("escolha o Nivel")
+            problems.append("Selecione um nível")
         if self._parsed_height_m() is None:
-            problems.append("informe uma altura valida em metros (ex.: 2.80)")
+            problems.append("Informe uma altura válida em metros (ex.: 2,80)")
         reinforcement_option = self._selected_reinforcement_option()
         if reinforcement_option is not None and not reinforcement_option[2]:
             problems.append("reforco de aberturas '{}' ainda nao implementado - escolha CHANNEL".format(
@@ -10112,22 +11190,12 @@ class _SetupForm(Form):
 
         if problems:
             self._status.ForeColor = UI_WARN
-            self._status.Text = "Falta: " + "; ".join(problems) + "."
+            self._status.Text = "! " + ". ".join(problems) + "."
             _set_button_enabled(self._run_button, False)
             return False
 
         self._status.ForeColor = UI_MUTED
-        self._status.Text = (
-            "Layer '{}' | {} espessura(s): {} | Nivel '{}' | altura {:.2f}m | "
-            "portas/janelas: {} | paredes: {}".format(
-                self._selected_layer, len(thicknesses),
-                ", ".join("%gcm" % t for t in thicknesses),
-                self._level_combo.SelectedItem, self._parsed_height_m(),
-                "selecionar no modelo" if self._openings_pick.Checked else "deteccao automatica",
-                "continuas com recortes" if self._wall_mode_continuous.Checked
-                else "segmentadas pelas aberturas"
-            )
-        )
+        self._status.Text = "✓ Configuração pronta para criar paredes."
         _set_button_enabled(self._run_button, True)
         return True
 
@@ -10185,6 +11253,37 @@ class _SetupForm(Form):
 
 def _setup_defaults_path():
     return os.path.join(tempfile.gettempdir(), "modulacao_automatica_setup.json")
+
+
+def _existing_flow_defaults_path():
+    return os.path.join(tempfile.gettempdir(), "modulacao_automatica_paredes_existentes.json")
+
+
+def _recall_existing_flow_defaults():
+    """Escolhas da ultima execucao do fluxo de PAREDES EXISTENTES.
+
+    Arquivo proprio de proposito: este fluxo NAO herda os defaults do fluxo CAD
+    (layer/espessura/altura nao se aplicam aqui - nivel e altura vem das
+    proprias paredes). NUNCA lanca."""
+    try:
+        import json
+        with open(_existing_flow_defaults_path(), "r") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _remember_existing_flow_defaults(setup):
+    """Guarda a escolha desta execucao do fluxo de paredes existentes."""
+    try:
+        import json
+        with open(_existing_flow_defaults_path(), "w") as handle:
+            json.dump({"opening_reinforcement": (setup or {}).get("opening_reinforcement"),
+                       "level": (setup or {}).get("level"),
+                       "height_m": (setup or {}).get("height_m")}, handle)
+    except Exception:
+        pass
 
 
 def _recall_setup_defaults():
@@ -10624,11 +11723,22 @@ def _format_block_solve_report(result, catalog):
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
     beta = result.get("beta_preflight")
     if beta is not None:
+        impossiveis = unbuildable_pieces(result, beta)
+        if run_is_fatal(beta):
+            situacao = "RUN BLOQUEADA - erro fatal do plano"
+        elif impossiveis:
+            situacao = "materializacao seletiva - {} peca(s) impossivel(is) serao puladas".format(
+                len(impossiveis))
+        else:
+            situacao = "lote liberado pelo preflight"
         lines.append("BETA CONTROLADO: {}. {} invasoes de abertura, {} colisoes fisicas.".format(
-            "lote liberado pelo preflight" if beta["ok"] else "LOTE BLOQUEADO - nenhuma criacao permitida",
-            len(beta["opening_violations"]), len(beta["collisions"])))
-        for issue in beta["errors"] + beta["opening_violations"] + beta["collisions"]:
-            lines.append("  BETA: {}".format(issue))
+            situacao, len(beta["opening_violations"]), len(beta["collisions"])))
+        # VALIDATION (log estruturado, uma linha por ocorrencia impossivel)
+        for _ci, _chave, rec in impossiveis:
+            lines.append("  VALIDATION wall_id={wall_idx} course={course_index} rule_id={rule_id} "
+                         "severity={severity} code={logical_code} materializable=false: {message}".format(**rec))
+        for issue in beta["errors"]:
+            lines.append("  FATAL: {}".format(issue))
     retained = result.get("unmodulated_walls") or []
     lines.append("Paredes vazias ou parcialmente nao modulaveis, retidas para revisao manual: {}".format(len(retained)))
     for wall in retained:
@@ -10941,6 +12051,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.action = None
         self.on_done = None
         self.controlled_beta = bool(globals().get("CONTROLLED_BETA", False))
+        self._unbuildable = []      # pecas que NAO serao criadas (ver materialization_plan)
+        self._unresolved_bonds = []  # amarracoes rejeitadas: NAO resolvidas (revisao humana)
         # dados fixos desta execucao
         self.walls_to_create = []
         self.openings_per_wall = []
@@ -11550,6 +12662,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
             self.solve_result["beta_preflight"] = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             self.solve_result["beta_input_signature"] = self._beta_input_signature()
+            # contrato da materializacao para a apresentacao (nao recalcula fisica)
+            plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
+            self.solve_result["materialization"] = {
+                "skipped": [rec for _ci, _k, rec in plano_material["skip"]],
+                "unresolved_bonds": plano_material["unresolved_bonds"],
+                "fatal": plano_material["fatal"],
+            }
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
@@ -11605,15 +12724,43 @@ class _PostCreationEventHandler(IExternalEventHandler):
             if self.beta_transaction_error:
                 raise RuntimeError(self.beta_transaction_error)
             _perf.mark("create.preflight START")
+            if self.solve_result is not None:
+                self.solve_result["beta_materialization_verified"] = False
             preflight = controlled_beta_preflight(
                 self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog, self.base_z_abs)
             if self.solve_result is not None:
                 self.solve_result["beta_preflight"] = preflight
-            if not preflight["ok"]:
-                raise ValueError("BETA BLOQUEADO: {} invasoes de abertura, {} colisoes; {}. "
-                                 "Nenhum bloco criado ou lote anterior removido. Veja o relatorio do solver.".format(
-                                     len(preflight["opening_violations"]), len(preflight["collisions"]),
-                                     "; ".join(preflight["errors"])))
+            # FATAL (plano inconsistente) continua matando a RUN inteira. Violacao
+            # LOCALIZADA (invasao de vao / colisao) NAO mata mais as milhares de
+            # pecas validas: as pecas provadas impossiveis sao puladas uma a uma,
+            # com motivo rastreavel (ver unbuildable_pieces).
+            if run_is_fatal(preflight):
+                raise ValueError("BETA BLOQUEADO (erro fatal do plano): {}. "
+                                 "Nenhum bloco criado ou lote anterior removido.".format(
+                                     "; ".join(str(e) for e in preflight["errors"])))
+            plano_material = materialization_plan(self.solve_result, preflight)
+            self._unbuildable = plano_material["skip"]
+            self._unresolved_bonds = plano_material["unresolved_bonds"]
+            # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
+            # so' com as pecas que ficam, o preflight tem de sair limpo. Se nao sair,
+            # a classificacao falhou - isso e' fatal, nunca criacao parcial.
+            conferencia = verify_materialization(
+                self.solve_result, self.walls_to_create, self.openings_per_wall, self.catalog,
+                self.base_z_abs, set((ci, chave) for ci, chave, _r in self._unbuildable))
+            if (conferencia.get("opening_violations") or conferencia.get("collisions")
+                    or conferencia.get("errors")):
+                raise ValueError("BETA BLOQUEADO (erro fatal): depois de separar as pecas impossiveis, "
+                                 "{} peca(s) ainda invadem abertura e {} colidem - nada foi criado.".format(
+                                     len(conferencia.get("opening_violations") or []),
+                                     len(conferencia.get("collisions") or [])))
+            if self.solve_result is not None:
+                self.solve_result["beta_materialization_verified"] = True
+            if self._unbuildable:
+                _perf.mark("create.materializacao seletiva",
+                           puladas=len(self._unbuildable),
+                           amarracoes_nao_resolvidas=len(self._unresolved_bonds),
+                           invasoes=len(preflight.get("opening_violations") or []),
+                           colisoes=len(preflight.get("collisions") or []))
             self._require_current_beta_solve()
             _perf.mark("create.preflight END", ok=preflight["ok"])
             # One outer group restores even the committed cleanup transaction.
@@ -11626,16 +12773,20 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 with _perf.span("create.batch (beta)"):
                     self._execute_create_batch(app_doc)
                 result = self.create_result or {}
+                _pulados = set((ci, chave) for ci, chave, _r in (self._unbuildable or ()))
                 expected = [(ci, id(c)) for ci, source in self.solve_result["course_candidates"].items()
-                            for c in source]
+                            for c in source if (ci, id(c)) not in _pulados]
                 instances = result.get("created_instances") or []
                 actual = [(item.get("course_index"), item.get("candidate_key")) for item in instances]
                 if (result.get("failures") or sorted(actual) != sorted(expected)
                         or result.get("created_count") != len(expected)
                         or len(set(item["id"] for item in instances)) != len(expected)
                         or any(app_doc.GetElement(item["id"]) is None for item in instances)):
-                    raise RuntimeError("BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas. {}".format(
-                        "; ".join(str(f) for f in result.get("failures", []))))
+                    raise RuntimeError(
+                        "BETA BLOQUEADO: criacao incompleta ou instancias nao confirmadas "
+                        "(planejadas {}, criadas {}, puladas {}). {}".format(
+                            result.get("planned_total"), result.get("created_count"),
+                            result.get("skipped_count"), "; ".join(str(f) for f in result.get("failures", []))))
                 with _perf.span("create.TransactionGroup.Assimilate"):
                     _require_beta_transaction_status(replacement, replacement.Assimilate(), "Committed")
             except Exception as _grupo_ex:
@@ -11652,6 +12803,22 @@ class _PostCreationEventHandler(IExternalEventHandler):
         else:
             with _perf.span("create.batch"):
                 self._execute_create_batch(app_doc)
+        # RUN executavel != modulacao estruturalmente resolvida (Opcao A)
+        if self.create_result is not None:
+            _nao_resolvidas = list(getattr(self, "_unresolved_bonds", None) or [])
+            # amarracao sem familia no catalogo tambem NAO foi criada: nao e' resolvida
+            for _rec in self.create_result.get("skipped") or []:
+                if _rec.get("rule_id") == "MISSING_FAMILY" and _rec.get("structural_role"):
+                    _nao_resolvidas.append({
+                        "status": BOND_UNRESOLVED_STATUS, "requires_human_review": True,
+                        "node_index": _rec.get("node_index"), "course_index": _rec.get("course_index"),
+                        "wall_idx": _rec.get("wall_idx"), "logical_code": _rec.get("logical_code"),
+                        "structural_role": _rec.get("structural_role"), "rejected_rule": "MISSING_FAMILY",
+                        "overlap_cm": None, "opening_index": None,
+                        "message": "amarracao NAO resolvida: familia ausente do catalogo"})
+            _faltando = list((self.solve_result or {}).get("missing_required_junction_bond") or [])
+            self.create_result["unresolved_bonds"] = _nao_resolvidas
+            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando)
         with _perf.span("create.save_modulation_state_cache"):
             self._save_modulation_state_cache()
         _resultado = self.create_result or {}
@@ -11834,6 +13001,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
             t_create_start = _perf_clock()
             create_options = {"strict_transactions": True} if self.controlled_beta else {}
+            # materializacao seletiva: so' as pecas provadas impossiveis
+            _pular = getattr(self, "_unbuildable", None)
+            if _pular:
+                create_options["skip_keys"] = dict(((ci, chave), rec) for ci, chave, rec in _pular)
             if owner_uid_by_wall_idx:
                 create_options["owner_uid_by_wall_idx"] = owner_uid_by_wall_idx
                 create_options["lot_tag"] = time.strftime("%Y%m%d-%H%M%S")
@@ -11936,7 +13107,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
     def _execute_delete(self, app_doc):
         if self.controlled_beta and self.beta_transaction_error:
             raise RuntimeError(self.beta_transaction_error)
-        if self.controlled_beta and not (self.solve_result or {}).get("beta_preflight", {}).get("ok"):
+        if self.controlled_beta and not beta_finalize_allowed(self.solve_result):
             raise ValueError("BETA BLOQUEADO: preservar todas as paredes de referencia.")
         if self.controlled_beta:
             if self.create_result is None:
@@ -12069,8 +13240,9 @@ class _PostCreationForm(Form):
     ver _show_post_creation_window) -> lista de erros (linha clicavel, da'
     zoom na parede) -> "Ajustar Erros" -> bloco "Lancar Blocos" -> bloco
     "Finalizar/Deletar Paredes" -> log no rodape. Substitui as antigas
-    _ResultsForm e _BlockWizardForm (ambas removidas), sem nenhuma
-    TabControl - tudo numa unica tela, pedido explicito do usuario."""
+    _ResultsForm e _BlockWizardForm (ambas removidas).
+    O redesign organiza revisão, plano e resultado
+    na mesma janela, mantendo callbacks e ExternalEvent existentes."""
 
     def __init__(self, report, external_event, handler, created_wall_ids_all):
         # OBRIGATORIO no engine CPython (pythonnet) - ver o mesmo comentario
@@ -12084,6 +13256,11 @@ class _PostCreationForm(Form):
         self._external_event = external_event
         self._handler = handler
         self._created_wall_count = len(created_wall_ids_all)
+        # pos-#42: identidade da execucao para a UI (ver _ui_execution_snapshot).
+        # Nasce definida aqui porque a criacao pode acontecer sobre um solve em
+        # cache, sem passar por _on_solve_click nesta abertura da janela.
+        self._ui_run_id = _ui_new_run_id()
+        self._ui_run_revision = -1
         # Capturadas como atributos de instancia (nao pelo nome do modulo)
         # pelo MESMO motivo ja documentado em _PostCreationEventHandler.
         # __init__/_ApplySuggestionsEventHandler (removida): metodos desta
@@ -12219,7 +13396,7 @@ class _PostCreationForm(Form):
             self._errors_status.Text = "Analisar Paredes: nenhum eixo fora da modulacao."
 
         self._errors_grid = _styled_listview([
-            ("Eixo", 60), ("Problema", 560), ("Situacao", 200),
+            ("Parede", 105), ("Problema", 415), ("Situação / ação", 180),
         ])
         self._errors_grid.MultiSelect = False
         self._errors_grid.SelectedIndexChanged += self._on_error_row_selected
@@ -12273,7 +13450,7 @@ class _PostCreationForm(Form):
         fix_row.Controls.Add(fix_gap)
 
         self._fix_button = Button()
-        self._fix_button.Text = "Ajustar Erros"
+        self._fix_button.Text = "Aplicar ajustes disponíveis"
         self._fix_button.Dock = DockStyle.Right
         self._fix_button.Width = 200
         self._fix_button.Enabled = auto_fixable_count > 0
@@ -12310,7 +13487,7 @@ class _PostCreationForm(Form):
 
         # --- Lancar Blocos: calcular ---
         self._solve_button = Button()
-        self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+        self._solve_button.Text = "Analisar modulação"
         self._solve_button.Dock = DockStyle.Top
         self._solve_button.Height = 34
         self._solve_button.Enabled = False
@@ -12342,7 +13519,7 @@ class _PostCreationForm(Form):
 
         # --- Lancar Blocos: criar ---
         self._create_button = Button()
-        self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
+        self._create_button.Text = "CRIAR BLOCOS NO REVIT"
         self._create_button.Dock = DockStyle.Top
         self._create_button.Height = 34
         self._create_button.Enabled = False
@@ -12480,17 +13657,19 @@ class _PostCreationForm(Form):
         if initial_log_parts:
             self._log_box.Text = "\r\n\r\n".join(p.replace("\n", "\r\n") for p in initial_log_parts)
 
+        _ui.post(self, report, errors_panel, debug_row, review_row)
         self._apply_catalog_status()
 
     # ---------------------------------------------- erros / ajustar erros
     def _populate_error_rows(self, error_rows):
         self._errors_grid.Items.Clear()
-        for row in error_rows:
-            item = ListViewItem("-" if row.get("wall_idx") is None else str(row["wall_idx"]))
-            item.SubItems.Add(row["problem_text"])
+        for number, row in enumerate(error_rows, 1):
+            item = ListViewItem("Parede {}".format(number))
+            item.SubItems.Add(_ui_problem(row["problem_text"]))
+            item.ToolTipText = "{} — {}".format(_ui_wall_label(row), row["problem_text"])
             item.SubItems.Add(
                 "Corrigido" if row.get("resolved")
-                else ("Auto-corrigivel" if row["auto_fixable"] else "Revisao manual")
+                else ("Ajuste disponível · visualizar" if row["auto_fixable"] else "Revisar · visualizar")
             )
             item.ForeColor = (
                 self._UI_OK if row.get("resolved")
@@ -12498,6 +13677,8 @@ class _PostCreationForm(Form):
             )
             item.Tag = list(row["wall_ids"])
             self._errors_grid.Items.Add(item)
+        if hasattr(self, "_ux"):
+            self._ux.refresh_issues(self)
 
     def _on_error_row_selected(self, sender, args):
         selected = self._errors_grid.SelectedItems
@@ -12566,6 +13747,9 @@ class _PostCreationForm(Form):
             self._pause_button.Visible = False
 
     def _on_fix_cancel_click(self, sender, args):
+        if not forms.alert("Interromper os ajustes? As alterações já aplicadas serão mantidas.",
+                           title="Cancelar ajustes", yes=True, no=True):
+            return
         # Mesma semantica do Cancelar de _WallReviewForm: so' PEDE, nunca
         # desfaz o que ja foi commitado (cada linha e' um SubTransaction
         # isolado - ver fix_all_wall_modulation_errors). `_fix_paused` e'
@@ -12685,14 +13869,7 @@ class _PostCreationForm(Form):
                     m["logical_code"], m["family_name"], m["type_name"]
                 ) for m in missing
             )
-            forms.alert(
-                "Nao e' possivel lancar os blocos ainda - {} familia(s)/tipo(s) do "
-                "catalogo fixo NAO estao carregadas neste projeto:\n\n{}\n\n"
-                "Carregue essa(s) familia(s)/tipo(s) no Revit (Inserir > Carregar "
-                "Familia), com EXATAMENTE esses nomes, e reabra a Tela 2 (reselecione "
-                "as paredes) para continuar.".format(len(missing), missing_lines),
-                title="Modulacao Automatica - Etapa 2: familia(s) de bloco faltando"
-            )
+            self._ui_tabs.SelectedIndex = 0
             return
 
         self._catalog_status.Text = "Catalogo: {} tipo(s) OK ({}).".format(
@@ -12749,6 +13926,9 @@ class _PostCreationForm(Form):
             return False
 
     def _on_solve_click(self, sender, args):
+        self._ux.busy(self, 3)
+        self._ui_run_id = _ui_new_run_id()      # pos-#42: identidade desta execucao
+        self._ui_run_revision = -1
         self._set_busy(self._solve_button, "Calculando...")
         console = self._solve_console
         console.log("Iniciando Solver 18 (lancamento de blocos X->T->L->jambs->trechos livres)...")
@@ -12839,78 +14019,48 @@ class _PostCreationForm(Form):
         if not self._raise_action("solve", self._on_solve_done, self._solve_status):
             console.stop_watchdog()
             console.mark_failed("Falha ao disparar o Solver 18.")
-            self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+            self._ux.failed(self, "Não foi possível iniciar a análise.")
+            self._solve_button.Text = "Analisar modulação"
             self._solve_button.Enabled = True
 
-    def _on_solve_done(self, kind, error, auto_create=True):
+    def _on_solve_done(self, kind, error, auto_create=False):
+        """Present the plan. Creation always requires an explicit user action."""
         self._solve_console.stop_watchdog()
-        self._solve_button.Text = "Lancar Blocos - calcular (solver X->T->L->jambs->trechos livres)"
+        self._solve_button.Text = "Reanalisar modulação"
         self._solve_button.Enabled = True
         if kind == "error":
-            self._solve_status.Text = "Falha: {}".format(error)
-            self._solve_status.ForeColor = self._UI_WARN
-            self._solve_console.mark_failed("Solver 18 falhou: {}".format(error))
+            self._solve_console.mark_failed("Não foi possível analisar a modulação.")
+            self._ux.failed(self, error)
             return
         result = self._handler.solve_result
-        self._solve_console.mark_complete(
-            "Solver 18 concluido - {} candidato(s) de bloco calculado(s).".format(
-                len(result.get("candidates") or [])
-            )
-        )
+        self._solve_console.mark_complete("Análise concluída. Confira o plano de blocos.")
         report, _ready_to_create = self._format_block_solve_report(result, self._handler.catalog)
         self._append_log(report)
-        door_violations = result.get("door_void_violations") or []
-        wall_bond_audits = result.get("wall_bond_audits") or {}
-        reproved_bond_count = sum(1 for audit in wall_bond_audits.values() if not audit["ok"])
-        # REGRA REVISTA 2026-08-26: nenhum diagnostico (colisao, vao de
-        # porta, auditoria de amarracao) bloqueia mais o botao "criar" - o
-        # unico motivo para desabilita-lo agora e' nao haver candidato
-        # nenhum para criar. Os problemas continuam sendo mostrados aqui e
-        # no log, e as pecas envolvidas saem marcadas em vermelho depois de
-        # criadas (ver _execute_create) - nunca impedem a criacao.
-        self._solve_status.Text = (
-            "{} candidato(s), {} colisao(oes), {} violacao(oes) de vao de porta, "
-            "{} parede(s) reprovada(s) na auditoria de amarracao entre fiadas "
-            "[todos criados mesmo assim, marcados em vermelho para revisao]."
-        ).format(
-            len(result["candidates"]), len(result["collisions"]), len(door_violations),
-            reproved_bond_count
-        )
-        has_candidates = len(result["candidates"]) > 0
-        self._solve_status.ForeColor = self._UI_OK if has_candidates else self._UI_WARN
-        self._create_button.Enabled = has_candidates
-        if not has_candidates:
-            self._solve_status.Text += " Nenhum candidato de bloco calculado - veja o log, mais abaixo."
-            self._create_status.Text = "Nada para criar: o solver nao calculou nenhum candidato de bloco."
-            self._create_status.ForeColor = self._UI_WARN
-        elif door_violations or reproved_bond_count or result["collisions"]:
-            self._create_status.Text = (
-                "Pronto para criar. {} problema(s) encontrado(s) (colisao/vao de porta/amarracao) - "
-                "os blocos serao criados mesmo assim e as pecas/paredes envolvidas ficarao marcadas em "
-                "vermelho para revisao manual; nada e' bloqueado."
-            ).format(len(door_violations) + reproved_bond_count + len(result["collisions"]))
-            self._create_status.ForeColor = self._UI_WARN
-        else:
-            self._create_status.Text = "Pronto para criar."
-            self._create_status.ForeColor = self._UI_TEXT
-
-        # Pedido explicito do usuario (2026-08-27): a Etapa 2 nunca pode
-        # parar so' no calculo - "nao quero que o script apenas calcule,
-        # mostre sugestoes... os blocos precisam ser fisicamente inseridos
-        # no modelo do Revit". Assim que houver ao menos um candidato,
-        # dispara a criacao automaticamente, sem esperar um segundo clique
-        # manual em "Lancar Blocos - criar" (que continua existindo/
-        # habilitado, para o usuario poder re-disparar depois de um novo
-        # "Ajustar Erros"/recalculo). `auto_create=False` so' quando este
-        # metodo e' chamado para REPLAY de um solve_result em cache (janela
-        # reaberta com o MESMO conjunto de paredes - ver _show_post_creation_
-        # window/initial_solve_result) - nesse caso nunca cria sozinho, so'
-        # mostra o estado ja calculado (o replay de create_result, se
-        # houver, e' feito separadamente pelo chamador).
-        if has_candidates and auto_create:
-            self._on_create_click(None, None)
+        self._ux.solved(self)
+        # pos-#42: a tela passa a mostrar os numeros reais desta execucao
+        self._ui_run_revision += 1
+        self._ux.present_execution(
+            self, _ui_execution_snapshot(self._ui_run_id, self._ui_run_revision, self._handler,
+                                         solve_result=result),
+            new_run=(self._ui_run_revision == 0))
 
     def _on_create_click(self, sender, args):
+        allowed, reason = _ui_creation_gate(self._handler.solve_result,
+                                           self._handler.catalog_missing,
+                                           self._handler.channel_catalog_missing)
+        if not allowed:
+            self._create_button.Enabled = False
+            self._ui_banner.Text = reason
+            return
+        previous = (self._handler.create_result or {}).get("created_count")
+        message = ("Modulação existente detectada: {} blocos. O lote anterior será substituído."
+                   .format(previous) if previous else
+                   "Os blocos do plano serão criados. Se estas paredes já tiverem um lote de modulação, "
+                   "o lote anterior será substituído.")
+        if not forms.alert(message + "\n\nContinuar com a criação?",
+                           title="Criar blocos no Revit", yes=True, no=True):
+            return
+        self._ux.busy(self, 5)
         self._set_busy(self._create_button, "Criando blocos...")
 
         # FEEDBACK AO VIVO DA ETAPA 5 (2026-08-27, relato do usuario: a
@@ -12950,17 +14100,21 @@ class _PostCreationForm(Form):
         if not self._raise_action("create", self._on_create_done, self._create_status):
             console.stop_watchdog()
             console.mark_failed("Falha ao disparar a criacao dos blocos.")
-            self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
-            self._create_button.Enabled = True
+            self._ux.failed(self, "Não foi possível iniciar a criação.")
+            self._create_button.Text = "CRIAR BLOCOS NO REVIT"
+            self._create_button.Enabled = False
+            self._solve_button.Enabled = True
 
     def _on_create_done(self, kind, error, show_summary_alert=True):
         self._solve_console.stop_watchdog()
-        self._create_button.Text = "Lancar Blocos - criar no Revit (todas as fiadas ate o pe-direito)"
+        self._create_button.Text = "CRIAR BLOCOS NO REVIT"
         self._create_button.Enabled = True
         if kind == "error":
             self._solve_console.mark_failed("Falha ao criar os blocos: {}".format(error))
             self._create_status.Text = "Falha: {}".format(error)
             self._create_status.ForeColor = self._UI_WARN
+            self._ux.failed(self, error)
+            self._solve_button.Enabled = True
             return
         result = self._handler.create_result
         report_lines = ["=== Criacao dos blocos no Revit ==="]
@@ -13066,8 +14220,13 @@ class _PostCreationForm(Form):
         # chega ao usuario de qualquer jeito. So' dispara na execucao REAL
         # (nunca ao reabrir a janela com um create_result em cache - ver
         # _show_post_creation_window/initial_create_result).
-        if show_summary_alert:
-            self._show_final_block_summary_alert(result)
+        self._ux.completed(self)
+        self._ui_run_revision += 1
+        self._ux.present_execution(
+            self, _ui_execution_snapshot(self._ui_run_id, self._ui_run_revision, self._handler,
+                                         solve_result=self._handler.solve_result,
+                                         create_result=result))
+        self._solve_button.Enabled = True
 
     def _show_final_block_summary_alert(self, create_result):
         solve_result = self._handler.solve_result or {}
@@ -13138,11 +14297,16 @@ class _PostCreationForm(Form):
         self._update_delete_enabled()
 
     def _update_delete_enabled(self):
-        solve_ok = bool(
-            self._handler.solve_result
-            and len(self._handler.solve_result["collisions"]) == 0
-            and len(self._handler.solve_result.get("door_void_violations") or []) == 0
-        )
+        if getattr(self._handler, "controlled_beta", False):
+            # mesmo criterio do backend (_execute_delete): pulo localizado nao
+            # trava a planta inteira; a parede afetada fica retida
+            solve_ok = beta_finalize_allowed(self._handler.solve_result)
+        else:
+            solve_ok = bool(
+                self._handler.solve_result
+                and len(self._handler.solve_result["collisions"]) == 0
+                and len(self._handler.solve_result.get("door_void_violations") or []) == 0
+            )
         create_ok = bool(
             self._handler.create_result and self._handler.create_result.get("created_count", 0) > 0
         )
@@ -13232,7 +14396,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
                                wall_segment_geometry=None, initial_solve_result=None,
                                initial_create_result=None, precreated_event=None,
                                precreated_handler=None, created_cuts_by_axis=None,
-                               opening_reinforcement_strategy=None):
+                               opening_reinforcement_strategy=None, setup=None):
     """Cria o ExternalEvent + handler (_PostCreationEventHandler) e mostra a
     janela unica de modulacao (_PostCreationForm) - guarda a referencia em
     _ACTIVE_MODELESS_WINDOWS pelo mesmo motivo/cuidado documentado no topo
@@ -13275,7 +14439,7 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     # sucesso do `_PostCreationEventHandler` da ETAPA 1 (acao "analyze",
     # ver _execute_analyze) chega aqui via `self.on_done` marshalado de
     # volta pro thread de UI com `Control.BeginInvoke` (ui_invoke_cb) - ou,
-    # no botao "Pular para Modulacao dos Blocos", direto de um Click de
+    # no botao "Usar paredes atuais e continuar", direto de um Click de
     # WinForms - nenhum dos dois casos esta' mais dentro da execucao da
     # API do Revit (Execute() ja retornou), entao `ExternalEvent.Create`
     # AQUI lanca `InvalidOperationException`. O chamador (ver
@@ -13306,6 +14470,10 @@ def _show_post_creation_window(report, walls_to_create, openings_per_wall, creat
     # o combo). Sem escolha explicita (fluxo de paredes existentes, tela
     # antiga) = None = legado.
     handler.opening_reinforcement_strategy = opening_reinforcement_strategy
+    # FONTE DE VERDADE da Etapa 1 desta execucao (ver _run_config). A UI le'
+    # daqui para re-renderizar a configuracao; nao existe default nenhum no
+    # caminho de volta.
+    handler.setup = dict(setup or {})
     handler.error_rows = wall_error_rows
     handler.solve_result = initial_solve_result
     handler.create_result = initial_create_result
@@ -13464,7 +14632,7 @@ class _WallReviewForm(Form):
         # self._cancel_button (gap encostado no botao Fill, botao Cancelar
         # na borda direita).
         self._start_button = Button()
-        self._start_button.Text = "Iniciar Modulacao das Paredes"
+        self._start_button.Text = "Analisar paredes"
         self._start_button.Dock = DockStyle.Fill
         _style_primary_button(self._start_button)
         self._start_button.Click += self._on_start_click
@@ -13483,7 +14651,7 @@ class _WallReviewForm(Form):
         # de novo. Continua exigindo confirmacao (ver _on_skip_click) porque
         # pula a validacao que detecta/corrige eixos fora da modulacao.
         self._skip_button = Button()
-        self._skip_button.Text = "Pular para Modulacao dos Blocos"
+        self._skip_button.Text = "Usar paredes atuais e continuar"
         self._skip_button.Dock = DockStyle.Right
         self._skip_button.Width = 240
         _style_secondary_button(self._skip_button)
@@ -13544,8 +14712,10 @@ class _WallReviewForm(Form):
         self.Controls.Add(footer)
         self.Controls.Add(cards)
         self.Controls.Add(header)
+        _ui.walls(self, stage1_report, body, start_bar, footer)
 
     def _on_start_click(self, sender, args):
+        self._ux.set_step(self._ui_header, 2, "Analisando paredes. Acompanhe o progresso abaixo.")
         if self._external_event is None:
             self._status_label.ForeColor = self._UI_WARN
             self._status_label.Text = "Canal de aplicacao indisponivel nesta execucao."
@@ -13681,7 +14851,7 @@ class _WallReviewForm(Form):
         except Exception as ex:
             self._console.stop_watchdog()
             self._start_button.Enabled = True
-            self._start_button.Text = "Iniciar Modulacao das Paredes"
+            self._start_button.Text = "Analisar paredes"
             self._cancel_button.Visible = False
             self._pause_button.Visible = False
             self._status_label.ForeColor = self._UI_WARN
@@ -13739,7 +14909,7 @@ class _WallReviewForm(Form):
         self._pause_button.Visible = False
         if kind == "error":
             self._start_button.Enabled = True
-            self._start_button.Text = "Iniciar Modulacao das Paredes"
+            self._start_button.Text = "Analisar paredes"
             self._status_label.ForeColor = self._UI_WARN
             self._status_label.Text = "Falha ao iniciar a modulacao: {}".format(error)
             self._console.mark_failed("FALHOU: {}".format(error))
@@ -13747,6 +14917,15 @@ class _WallReviewForm(Form):
                 self._on_start_error(error)
             return
         error_rows = self._handler.error_rows or []
+        if self._cancel_requested:
+            self._console.stop_watchdog()
+            self._console.set_status("Análise interrompida. Confira as paredes e analise novamente.", "warn")
+            self._start_button.Enabled = True
+            self._start_button.Text = "Analisar paredes"
+            self._skip_button.Enabled = True
+            self._pause_button.Visible = False
+            self._cancel_button.Visible = False
+            return
         total = len(error_rows)
         cancel_note = " (cancelado pelo usuario antes do fim)" if self._cancel_requested else ""
         self._console.log(
@@ -13816,7 +14995,7 @@ class _WallReviewForm(Form):
                 self._on_start_success(None)
         except Exception as ex:
             # Bug real reportado pelo usuario (2026-08-27): clicar em
-            # "Pular para Modulacao dos Blocos" -> "Sim" nao fazia
+            # "Usar paredes atuais e continuar" -> "Sim" nao fazia
             # absolutamente nada visivel quando algo dentro do callback
             # falhava - o Click do WinForms roda fora da execucao da API
             # do Revit, entao uma excecao aqui escapava direto sem
@@ -13828,7 +15007,7 @@ class _WallReviewForm(Form):
             self._console.mark_failed("FALHOU ao pular para a Tela 2: {}".format(detail))
             self._start_button.Enabled = True
             self._skip_button.Enabled = True
-            self._skip_button.Text = "Pular para Modulacao dos Blocos"
+            self._skip_button.Text = "Usar paredes atuais e continuar"
             forms.alert(
                 "Falha ao pular para a Tela 2 (Modulacao dos Blocos).\n\n"
                 "Erro: {}\n\n"
@@ -13995,8 +15174,8 @@ class _WallSourceModeForm(Form):
         self._rb_existing.GroupName = "wall_source_mode"
 
         desc_existing = Label()
-        desc_existing.Text = ("Pula a criacao e verificacao inicial - usa Walls "
-                              "ja modeladas no projeto, selecionadas a seguir.")
+        desc_existing.Text = ("Selecione as paredes no Revit. As aberturas serão detectadas "
+                              "automaticamente; depois, confira a seleção e inicie a análise.")
         desc_existing.Font = _ui_font(8.75)
         desc_existing.ForeColor = UI_MUTED
         desc_existing.Dock = DockStyle.Fill
@@ -14089,6 +15268,7 @@ class _WallSourceModeForm(Form):
         self.Controls.Add(body)
         self.Controls.Add(footer)
         self.Controls.Add(header)
+        _ui.source(self, body, footer)
 
     def _on_ok(self, sender, event):
         if self._rb_merge.Checked:
@@ -14173,23 +15353,12 @@ def _select_existing_walls_for_modulation():
                 preselected_walls.append(element)
     except Exception:
         preselected_walls = []
-    if preselected_walls:
-        use_selection = forms.alert(
-            "Ha' {} parede(s) ja' selecionada(s) no modelo.\n\nUsar essas "
-            "paredes na modulacao? (Nao = selecionar de novo no modelo)".format(
-                len(preselected_walls)),
-            title="Modulacao Automatica - Etapa 1: Selecao das paredes",
-            yes=True, no=True
-        )
-        if use_selection:
-            return _build_existing_walls_selection(preselected_walls)
+    selection_choice = _ui.selection_prompt(len(preselected_walls))
+    if selection_choice is None:
+        return None, None, None, None, None, 0
+    if selection_choice == "current":
+        return _build_existing_walls_selection(preselected_walls)
 
-    forms.alert(
-        "Selecione no modelo as paredes existentes que deseja modular e "
-        "clique em 'Concluir' na barra de opcoes do Revit (ou Esc para "
-        "cancelar).",
-        title="Modulacao Automatica - Etapa 1: Selecao das paredes"
-    )
     try:
         refs = uidoc.Selection.PickObjects(
             ObjectType.Element,
@@ -14322,6 +15491,26 @@ def run_modulation_on_existing_walls(preselected=None):
     output.print_md("**Coletando aberturas (portas/janelas) do projeto...**")
     all_openings, openings_source_note = collect_opening_instances("auto", None)
 
+    reinforcement_choice = _ui.existing_setup(
+        len(walls_to_create), selected_level.Name,
+        wall_height_ft / FEET_PER_METER, len(all_openings), _recall_existing_flow_defaults())
+    if reinforcement_choice is None:
+        return
+    execution_strategy = _opening_reinforcement_strategy_from_ui_value(reinforcement_choice)
+    # Configuracao desta execucao: no fluxo de paredes existentes nivel e altura
+    # vem das proprias paredes, e a escolha do usuario e' a estrategia. Fica
+    # guardada (para a UI re-renderizar) e lembrada (para a proxima execucao).
+    run_setup = {
+        "origem": "paredes existentes",
+        "level": selected_level.Name,
+        "height_m": wall_height_ft / FEET_PER_METER,
+        "walls": len(walls_to_create),
+        "openings_mode": "auto",
+        "opening_reinforcement": reinforcement_choice,
+        "thicknesses_cm": sorted(set(round(_ft_to_cm(w[1]), 1) for w in walls_to_create)),
+    }
+    _remember_existing_flow_defaults(run_setup)
+
     opening_diagnostics = {
         "clamped_opening_count": 0, "opening_center_gap_max_ft": 0.0,
         "opening_off_center_count": 0, "assignments": [], "unassigned_openings": [],
@@ -14362,7 +15551,7 @@ def run_modulation_on_existing_walls(preselected=None):
     # ExternalEvent.Create so' e' valido dentro da execucao da API, e
     # `_run_stage2_existing_walls` abaixo e' chamada ou de um
     # `Control.BeginInvoke` (fim da acao "analyze") ou direto de um Click
-    # de WinForms ("Pular para Modulacao dos Blocos") - nenhum dos dois
+    # de WinForms ("Usar paredes atuais e continuar") - nenhum dos dois
     # ainda esta' dentro dessa execucao).
     stage2_handler = _PostCreationEventHandler()
     stage2_external_event = ExternalEvent.Create(stage2_handler)
@@ -14388,7 +15577,7 @@ def run_modulation_on_existing_walls(preselected=None):
         # TUDO abaixo (montagem do log/report, cache de solve/create
         # anteriores e abertura da Tela 2) agora fica dentro de UM UNICO
         # try/except (bug real reportado pelo usuario, 2026-08-27: clicar
-        # em "Pular para Modulacao dos Blocos" -> "Sim" nao fazia
+        # em "Usar paredes atuais e continuar" -> "Sim" nao fazia
         # absolutamente nada visivel - a janela ficava com os botoes
         # desabilitados e nunca abria a Tela 2, sem NENHUM alerta de erro).
         # Antes, o try/except so' cobria a chamada a
@@ -14434,6 +15623,10 @@ def run_modulation_on_existing_walls(preselected=None):
             # mais.
             cache_key = _wall_ids_signature(wall_ids)
             cached_state = _LAST_MODULATION_STATE.get(cache_key) if cache_key else None
+            if cached_state:
+                cached_strategy = ((cached_state.get("solve_result") or {}).get("opening_reinforcement") or {}).get("strategy")
+                if cached_strategy != execution_strategy:
+                    cached_state = None
             cached_solve_result = None
             cached_create_result = None
             if cached_state:
@@ -14493,7 +15686,8 @@ def run_modulation_on_existing_walls(preselected=None):
                 selected_level, base_z_abs, wall_height_ft, wall_error_rows,
                 catalog, catalog_missing, wall_segment_geometry=wall_segment_geometry,
                 initial_solve_result=cached_solve_result, initial_create_result=cached_create_result,
-                precreated_event=stage2_external_event, precreated_handler=stage2_handler
+                precreated_event=stage2_external_event, precreated_handler=stage2_handler,
+                opening_reinforcement_strategy=execution_strategy, setup=run_setup
             )
         except Exception as ex:
             # NUNCA mostrar um resumo de "tudo certo" (paredes selecionadas/
@@ -17061,7 +18255,7 @@ def main():
     def _run_stage2_modulation(wall_error_rows):
         # `wall_error_rows is None` (nunca `[]`, que e' o resultado legitimo
         # de "analisou e nao achou erro") e' o sinal de que o usuario clicou
-        # "Pular para Modulacao dos Blocos" em _WallReviewForm (2026-08-27) -
+        # "Usar paredes atuais e continuar" em _WallReviewForm (2026-08-27) -
         # a analise de erros de parede NUNCA rodou. `skipped_wall_analysis`
         # carrega essa distincao para o relatorio/janela da Tela 2 (ver
         # `report["wall_analysis_skipped"]` abaixo e

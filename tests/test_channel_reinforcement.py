@@ -78,6 +78,22 @@ def physical_signature(result, walls):
     return hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
 
 
+def _covered(rows, gap_cm=2.5):
+    """Trechos cobertos da fileira (juntas de ate' `gap_cm` contam como cobertas)."""
+    out = []
+    for r in sorted(rows, key=lambda r: r["lo"]):
+        if out and r["lo"] <= out[-1][1] + gap_cm:
+            out[-1][1] = max(out[-1][1], r["hi"])
+        else:
+            out.append([r["lo"], r["hi"]])
+    return [(round(a, 1), round(b, 1)) for a, b in out]
+
+
+def _specials(result):
+    return sum(1 for v in result["course_candidates"].values() for c in v
+               if (sb.CATALOG.get(c["logical_code"]) or {}).get("is_compensator"))
+
+
 def channel_count(result):
     return sum(1 for v in result["course_candidates"].values() for c in v if orf.is_channel_code(c["logical_code"]))
 
@@ -132,11 +148,35 @@ def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically
     rec = res["opening_reinforcement"]["openings"][0]
     assert rec["above"]["status"] == "CHANNEL" and rec["below"] is None
     assert rec["above"]["support_l_cm"] >= 19.0 - 1e-6 and rec["above"]["support_r_cm"] >= 19.0 - 1e-6
-    # ocupacao identica: a canaleta toma o lugar das pecas (mesmas pontas)
+    # ocupacao identica: a canaleta toma o lugar das pecas (mesmas pontas). Regra
+    # do PLANEJADOR de reforco - medida com o arranjo das corridas (secoes 60-64,
+    # que roda depois e troca juntas de proposito) desligado.
+    from core.engine import b34_run_arrangement as _runs
+    saved = _runs.B34_RUN_ARRANGEMENT_ENABLED
+    # SECAO 68 desligada pelo MESMO motivo ja' escrito acima para as secoes
+    # 60-64: ela e' uma mudanca de MODULACAO exclusiva do fluxo CHANNEL (o
+    # reparo de abertura compoe a faixa jamba->ancora inteira em vez de aceitar
+    # a primeira composicao que fecha), entao muda junta de proposito. O que
+    # esta linha isola e' o PLANEJADOR de reforco: com as duas desligadas, a
+    # canaleta tem de tomar o lugar das pecas sem mover nenhuma junta.
+    saved_clean = m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED
+    _runs.B34_RUN_ARRANGEMENT_ENABLED = False
+    m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = False
+    try:
+        planned, _w, _n2, _o2 = solve(lines, ops)
+    finally:
+        _runs.B34_RUN_ARRANGEMENT_ENABLED = saved
+        m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = saved_clean
     for ci in range(NUM_COURSES):
         a = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(legacy, walls, 0, ci)]
-        b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(res, walls, 0, ci)]
+        b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(planned, walls, 0, ci)]
         assert [x for x in b if x not in a] == []  # nenhuma junta nova
+    # fluxo completo (com o arranjo): mesmos trechos cobertos em toda fiada (mesmas
+    # pontas, nada entra no vao), auditoria limpa e sem mais especiais que o legado
+    for ci in range(NUM_COURSES):
+        assert _covered(strip(res, walls, 0, ci)) == _covered(strip(legacy, walls, 0, ci)), ci
+    assert res["wall_bond_audits"][0].get("problems") in ([], None)
+    assert _specials(res) <= _specials(legacy)
 
 
 def test_window_gets_channel_on_head_and_one_course_under_sill():
@@ -205,23 +245,46 @@ def test_compensators_merge_into_length_cut_channels(sequence, expected):
 
 
 # --------------------------------------------------------- encontros (T)
-def test_tee_jamb_on_incoming_face_channel_crosses_node_like_human():
+def test_tee_jamb_on_face_nao_atravessa_a_amarracao_regra_75():
+    """REGRA 75: canaleta nunca exerce funcao de amarracao. A jamba na face da
+    parede que chega NAO dispara mais a travessia da 51.6 (suspensa por
+    padrao): o B34 da parede que chega continua entrando na principal e o
+    conflito corrida x amarracao e' CLASSIFICADO, nunca resolvido com canaleta
+    sobre o no'."""
     lines, ops = tee(sill_cm=80.0)
     res, walls, _n, _o = solve(lines, ops)
     rein = res["opening_reinforcement"]
-    rec = rein["openings"][0]
-    assert rec["above"]["status"] == "CHANNEL" and rec["below"]["status"] == "CHANNEL"
-    assert rec["above"]["support_l_cm"] > 0 and rec["below"]["support_l_cm"] > 0
+    assert rein["node_crossings"] == []
+    assert rein["tie_conversions"] == []
+    assert res["channel_as_junction_bond"] == []
+    reasons = [c["placement_reason"] for v in res["course_candidates"].values() for c in v]
+    assert orf.CROSSING_ABUTMENT_REASON not in reasons
+    for ci in (3, 11):
+        incoming = strip(res, walls, 1, ci)
+        # a amarracao transversal continua entrando na principal nesta fiada
+        assert any(r["lo"] < 14.0 - 0.5 and r["cand"]["wall_idx"] == 1 for r in incoming)
+    # o conflito nao some: e' reportado como apoio limitado e/ou corrida faltando
+    assert any((f["code"] == "CHANNEL_SUPPORT_LIMITED" and f.get("support_cm", 99) <= 0.5)
+               or f["code"] == "MISSING_REQUIRED_CHANNEL" for f in rein["findings"])
+
+
+def test_travessia_51_6_so_sob_override_explicito_e_o_gate_acusa():
+    """MUTANTE da regra 75 (travessia): reativar a 51.6 por politica reproduz a
+    mecanica antiga E o hard gate CHANNEL_AS_JUNCTION_BOND ACUSA - prova de que
+    o detector pega o defeito real, por funcao e nao por distancia."""
+    lines, ops = tee(sill_cm=80.0)
+    res, walls, _n, _o = solve(lines, ops, policy={"channel_may_cross_node_tie": True})
+    rein = res["opening_reinforcement"]
     assert sorted(c["course_index"] for c in rein["node_crossings"]) == [3, 11]
     for crossing in rein["node_crossings"]:
         assert (crossing["removed_code"], crossing["added_code"]) == ("B34", "B19")
         ci = crossing["course_index"]
         incoming = strip(res, walls, 1, ci)
-        # a parede que chega nao entra mais na principal nesta fiada
         assert not any(r["lo"] < 14.0 - 0.5 and r["cand"]["wall_idx"] == 1 for r in incoming)
         assert any(r["cand"]["placement_reason"] == orf.CROSSING_ABUTMENT_REASON for r in incoming)
-    assert rein["validation"]["counts"]["MISSING_REQUIRED_CHANNEL"] == 0
-    assert res["wall_bond_audits"][0]["ok"]
+    gate = res["channel_as_junction_bond"]
+    assert len([v for v in gate if v["kind"] == "CHANNEL_CROSSED_NODE_TIE"]) == 2
+    assert gate, "o gate tem de FALHAR quando a canaleta atravessa a amarracao"
 
 
 def test_tee_crossing_disabled_leaves_no_bearing_finding_red_control():
@@ -232,12 +295,31 @@ def test_tee_crossing_disabled_leaves_no_bearing_finding_red_control():
     assert any(f["code"] == "CHANNEL_SUPPORT_LIMITED" and f["support_cm"] <= 0 for f in rein["findings"])
 
 
-def test_tee_main_b54_over_span_is_split_into_two_channels_without_new_aligned_joint():
+def test_b54_do_no_nao_e_dividido_em_canaletas_regra_75():
+    """REGRA 75: o B54 do no' fica INTEIRO, como B54, com a razao de no'. O
+    conflito com a corrida da contraverga e' classificado (TIE_OVER_SPAN),
+    nunca resolvido dividindo a amarracao em canaletas."""
     lines, ops = tee(sill_cm=100.0)
     res, walls, _n, _o = solve(lines, ops)
     rein = res["opening_reinforcement"]
-    rec = rein["openings"][0]
-    assert rec["below"]["status"] == "CHANNEL"
+    assert rein["tie_conversions"] == []
+    assert res["channel_as_junction_bond"] == []
+    b54 = [c for v in res["course_candidates"].values() for c in v
+           if c["logical_code"] == "B54"
+           and str(c.get("placement_reason") or "").startswith("T_INTERSECTION_MAIN")]
+    assert b54, "o B54 de no' tem de continuar existindo como B54"
+    assert any(f["code"] == "MISSING_REQUIRED_CHANNEL" and f["detail"] == "TIE_OVER_SPAN"
+               for f in rein["findings"])
+
+
+def test_split_do_b54_so_sob_override_e_o_gate_acusa():
+    """MUTANTE da regra 75 (split): sob override explicito a mecanica antiga
+    (B54 -> duas canaletas com junta desencontrada) continua funcionando E o
+    hard gate ACUSA a conversao."""
+    lines, ops = tee(sill_cm=100.0)
+    res, walls, _n, _o = solve(lines, ops, policy={"convert_blocking_along_ties": True})
+    rein = res["opening_reinforcement"]
+    assert rein["openings"][0]["below"]["status"] == "CHANNEL"
     splits = [x for x in rein["tie_conversions"] if x["mode"] == "SPLIT"]
     assert len(splits) == 1 and splits[0]["code"] == "B54"
     ci = splits[0]["course_index"]
@@ -248,7 +330,9 @@ def test_tee_main_b54_over_span_is_split_into_two_channels_without_new_aligned_j
     new_joint = splits[0]["parts_cm"][0][1] + 0.5
     assert min(abs(new_joint - j) for j in neighbours) >= 1.5
     assert any(abs(new_joint - j) < 1e-6 for j in joints)
-    assert all(a["ok"] for a in res["wall_bond_audits"].values())
+    gate = res["channel_as_junction_bond"]
+    assert any(v["kind"] == "TIE_CONVERTED_TO_CHANNEL" for v in gate)
+    assert gate, "o gate tem de FALHAR quando a amarracao vira canaleta"
 
 
 def test_tee_b54_split_disabled_is_reported_as_tie_over_span_red_control():
@@ -410,9 +494,16 @@ def _creation_catalog():
     return catalog
 
 
+# A mecanica de criacao da peca cortada (Comprimento_bloco) e' exercitada sob o
+# override da 51.6 porque, com a REGRA 75 por padrao, esta fixture nao produz
+# mais CHANNEL_U_CUT (as travessias eram a unica fonte de corte aqui). O que
+# esta' sob teste e' a CRIACAO, nao a regra do no'.
+_POLITICA_LEGADA_51_6 = {"channel_may_cross_node_tie": True}
+
+
 def test_create_sets_instance_length_for_length_cut_channel():
     lines, ops = tee(sill_cm=80.0)
-    res, walls, _n, _o = solve(lines, ops)
+    res, walls, _n, _o = solve(lines, ops, policy=_POLITICA_LEGADA_51_6)
     doc = revit_stubs._StubDoc()
     out = m.create_building_blocks(doc, res["candidates"], _creation_catalog(), 0.0, SimpleNamespace(),
                                    NUM_COURSES, course_candidates=res["course_candidates"])
@@ -428,7 +519,7 @@ def test_create_sets_instance_length_for_length_cut_channel():
 
 def test_create_fails_loudly_when_length_parameter_cannot_be_written(monkeypatch):
     lines, ops = tee(sill_cm=80.0)
-    res, _w, _n, _o = solve(lines, ops)
+    res, _w, _n, _o = solve(lines, ops, policy=_POLITICA_LEGADA_51_6)
     monkeypatch.setattr(revit_stubs._FakeWritableParam, "Set", lambda self, value: False)
     doc = revit_stubs._StubDoc()
     out = m.create_building_blocks(doc, res["candidates"], _creation_catalog(), 0.0, SimpleNamespace(),
@@ -454,8 +545,12 @@ def test_module_is_ironpython27_compatible():
 
 # ------------------------------------------ travessia de T: nao vaza (51.6)
 def test_through_t_pattern_is_classified_specifically():
+    """Classificacao propria da travessia - mecanica preservada SOB OVERRIDE
+    (por padrao a REGRA 75 suspende a travessia e nada disso aparece)."""
     lines, ops = tee(sill_cm=80.0)
-    res, _w, _n, _o = solve(lines, ops)
+    res0, _w0, _n0, _o0 = solve(lines, ops)
+    assert orf.CHANNEL_THROUGH_T_PATTERN not in [f["code"] for f in res0["opening_reinforcement"]["findings"]]
+    res, _w, _n, _o = solve(lines, ops, policy=_POLITICA_LEGADA_51_6)
     codes = [f["code"] for f in res["opening_reinforcement"]["findings"]]
     assert codes.count(orf.CHANNEL_THROUGH_T_PATTERN) == len(res["opening_reinforcement"]["node_crossings"]) == 2
     assert all(f["classification"] == "SUPPORTED_PATTERN" for f in res["opening_reinforcement"]["findings"]
@@ -482,7 +577,7 @@ def test_abutment_label_without_channel_covering_node_is_still_audited():
     """A isencao HALF_BLOCK_NEAR_TIE exige a canaleta cobrindo o no': a
     etiqueta sozinha nao isenta (auditor global intacto)."""
     lines, ops = tee(sill_cm=80.0)
-    res, walls, nodes, openings = solve(lines, ops)
+    res, walls, nodes, openings = solve(lines, ops, policy=_POLITICA_LEGADA_51_6)
     cc = dict((ci, list(v)) for ci, v in res["course_candidates"].items())
     for ci in (3, 11):
         cc[ci] = [dict(c, logical_code="B39") if orf.is_channel_code(c["logical_code"]) else c for c in cc[ci]]

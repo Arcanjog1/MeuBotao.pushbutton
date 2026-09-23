@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-09-16T13:00:43.029155+00:00",
+  "cwd": "C:\\Users\\CIVIX\\modulacao-ui-redesign",
+  "head": "ec5142402577520496fe144e08d02749338b695f",
+  "tree": "824620354faa5dc2e2edef7e522fb6ba9033fd37",
+  "status_before": "?? docs/ui-dark-preview/\n?? tools/documentation/render_dark_states.py",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_ui_redesign.py",
+    "tests/test_channel_ui_and_family_gate.py",
+    "tests/test_script.py",
+    "nuvem/tests/test_progress.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "timeout_seconds": 900,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-09-16-dark-ui-focused.txt",
+  "pid": 18856,
+  "exit_code": 0,
+  "elapsed_seconds": 70.272,
+  "status_after": "M docs/checkpoints/2026-09-16-ui-redesign.md\n?? docs/checkpoints/evidence/2026-09-16-dark-ui-focused.json\n?? docs/checkpoints/evidence/2026-09-16-dark-ui-focused.txt\n?? docs/checkpoints/evidence/2026-09-16-dark-ui-scope.json\n?? docs/ui-dark-preview/\n?? tools/documentation/render_dark_states.py",
+  "log_sha256": "0b6c00ca96f605b8e31765e18ff9428400e9925959bc77e13e73bd7ce2954e96"
+}

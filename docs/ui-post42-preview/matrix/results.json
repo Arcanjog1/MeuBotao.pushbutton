@@ -1,0 +1,486 @@
+{
+  "kind": "Synthetic WinForms bounds+font stress test, NOT native Windows DPI or Revit smoke",
+  "cases": [
+    {
+      "screen": "setup",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1366x768-100pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1366x768-100pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1366x768-125pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1366x768-125pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1366x768-150pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1366x768-150pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.75,
+      "size": [
+        1342,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1366x768-175pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 1.75,
+      "size": [
+        1342,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1366x768-175pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 2,
+      "size": [
+        1342,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1366x768-200pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1366,
+        768
+      ],
+      "scale": 2,
+      "size": [
+        1342,
+        704
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1366x768-200pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1920x1080-100pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1920x1080-100pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        800
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1920x1080-125pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        800
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1920x1080-125pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        960
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1920x1080-150pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        960
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1920x1080-150pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.75,
+      "size": [
+        1505,
+        1016
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1920x1080-175pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.75,
+      "size": [
+        1505,
+        1016
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1920x1080-175pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 2,
+      "size": [
+        1720,
+        1016
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-1920x1080-200pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 2,
+      "size": [
+        1720,
+        1016
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-1920x1080-200pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-2560x1440-100pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1,
+      "size": [
+        860,
+        640
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-2560x1440-100pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        800
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-2560x1440-125pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.25,
+      "size": [
+        1075,
+        800
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-2560x1440-125pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        960
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-2560x1440-150pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.5,
+      "size": [
+        1290,
+        960
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-2560x1440-150pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.75,
+      "size": [
+        1505,
+        1100
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-2560x1440-175pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 1.75,
+      "size": [
+        1505,
+        1100
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-2560x1440-175pct.png"
+    },
+    {
+      "screen": "setup",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 2,
+      "size": [
+        1720,
+        1100
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "setup-2560x1440-200pct.png"
+    },
+    {
+      "screen": "review",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "scale": 2,
+      "size": [
+        1720,
+        1100
+      ],
+      "primary_visible": true,
+      "primary_inside_footer": true,
+      "primary_minimum_size": true,
+      "screenshot": "review-2560x1440-200pct.png"
+    }
+  ],
+  "action_checks_pass": true
+}

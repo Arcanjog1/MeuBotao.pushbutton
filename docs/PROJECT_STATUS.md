@@ -1,11 +1,11 @@
 # PROJECT STATUS
 
-Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CHANNEL integrado); SHAs são observações datadas.
+Painel reconciliado por fetch em 2026-09-23 (main `55e990d`; candidato de integração `integration/pr42-ui46-final` = motor do #42 + UI premium do #46 + OPÇÃO A da regra 48, PR #49). SHAs são observações datadas.
 
 ```json
 {
-  "observed_utc": "2026-09-14T21:12:19+00:00",
-  "main": "61d4f6ce7133bd8ea8613ed1f398895b8536e101",
+  "observed_utc": "2026-09-23T16:55:21+00:00",
+  "main": "55e990d962ed22ae1021f0d335db197607bddda1",
   "official": [
     {
       "pr": 32,
@@ -42,6 +42,10 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
     {
       "pr": 40,
       "head": "64404af6fdde91aaf9b8dafdb32708a29cdcf0db"
+    },
+    {
+      "pr": 41,
+      "head": "1aff5e02104a3508c4eeb2b78e2d103929ca233b"
     }
   ],
   "candidates": [
@@ -70,9 +74,25 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
       "head": "5658e9c7e633a1f9a06e7d374f9a2d63ad22073f"
     },
     {
-      "pr": 41,
-      "branch": "claude/channel-post-merge-doc-fix",
-      "head": "359651793675afe858483dd6df6585b5ad48be2c"
+      "pr": 42,
+      "branch": "claude/butanta-modulation-physical-fixes",
+      "head": "93f38851836a861acbb48ce25decf8fc3c1b9850"
+    },
+    {
+      "branch": "codex/modulacao-automatica-ui-redesign",
+      "head": "78a79fc1cbd47873b8e24ab1c6a8ee456f10623d",
+      "pr": 44
+    },
+    {
+      "branch": "codex/modulation-ui-premium-redesign",
+      "head": "ae4586e0869442a36d5dbca18cb5d7abbf37b3fb",
+      "pr": 46
+    },
+    {
+      "branch": "integration/pr42-ui46-final",
+      "head": "89384db96050c36d3d0df0f9600d75acf4373cfd",
+      "pr": 49,
+      "nota": "candidato de integracao: #42 (motor) + #46 (UI premium) + OPCAO A da regra 48; sem merge"
     }
   ]
 }
@@ -80,16 +100,20 @@ Painel reconciliado por fetch em 2026-09-14 (main `61d4f6c`, merge do #40 — CH
 
 | Área | Estado |
 |---|---|
-| MAIN / HEAD observado | `61d4f6ce7133bd8ea8613ed1f398895b8536e101` (merge do **#40**, estratégia CHANNEL); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
+| MAIN / HEAD observado | `55e990d962ed22ae1021f0d335db197607bddda1` (merge documental do **#41**; #40 CHANNEL em `61d4f6c`); antes 0e41c8e (#39), ad46c61 (#38), 6439669 (#37), 21576ee (#36), 6c00f7e (#35), aa58d70 (#32) |
 | Solver oficial (main) | #37 (Beta 1 + scale-autofix: 8a.1, 11.10 revisada, 11.11, 11.13, 11.14, fileira de B34, filtro por layer (49), lote persistente (50)) + #38 (sonda de vão 3.1, licença 33.8, régua V2) + **#39** (paridade das amarrações encostadas, regra 33.9) + **#40** (estratégia de reforço de aberturas CHANNEL, regra 51). CHANNEL é **opt-in**: a Tela de Configuração abre em "Sem reforço", idêntico ao motor legado; verga/contraverga não implementada. Falhas históricas do benchmark: TP1 V1 JUNCTION 8→9 e TGD V2 compensators 61→62 |
-| Candidato desta sessão | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD `3596517` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only**: nenhuma mudança de produção, benchmark, baseline ou norma — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| Documentação oficial pós-CHANNEL | PR [#41](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/41) `claude/channel-post-merge-doc-fix` HEAD final `1aff5e0`, integrado em `55e990d` (base `61d4f6c`): **correção documental pós-merge do #40** — `channel-strategy-implementation.md` afirmava estado obsoleto de 6627438 (4 cm / VALID_ALTERNATIVE); o estado versionado é apoio efetivo 19/33 cm e `PHYSICALLY_EQUIVALENT`, e o caso de ~4 cm é 6672349 (`KNOWN_LIMITATION`). **Docs-only** — [checkpoint](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
+| **Candidato de integração (esta sessão)** | Branch `integration/pr42-ui46-final` (base `55e990d`): **motor final do #42 + UI premium do #46** como entrega única. Merge sem perder lado nenhum — a física do #42 é autoridade e a UI do #46 é a referência visual; único conflito textual foi este painel. **OPÇÃO A (usuário, 2026-09-23):** regra 48 sem exceção — peça que invade abertura não é criada (amarração inclusive); amarração rejeitada fica **NÃO resolvida** com revisão humana; só erro fatal bloqueia a RUN. Solver do #42 intacto. PR [#49](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/49) — [checkpoint](checkpoints/2026-09-23-integracao-42-46.md) |
+| Solver #42 (incorporado) | `claude/butanta-modulation-physical-fixes` HEAD `93f3885`, [PR #42](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/42) draft: regras 52, 30.9, 53, 54, 55, 60–65 (arranjo das corridas), 66 (microajuste), 68, 71, 72, 74, **75/76/76.1** (canaleta e compensador nunca amarram; nó sem amarração válida fica NÃO RESOLVIDO) e **77** (papel funcional do encontro por fiada). Smoke real no Revit concluído (3 runs, 8.693 peças, readback 0, portões duros 0, `MISSING_REQUIRED_JUNCTION_BOND` 3, `NO_FUNCTIONAL_JUNCTION` 7) — [checkpoint §7.18](checkpoints/2026-09-17-butanta-convergencia-humano.md). READY FOR MERGE AUTHORIZATION |
+| UI candidata (anterior) | `codex/modulacao-automatica-ui-redesign`, HEAD avaliado `78a79fc`, [PR #44 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/44): tema grafite, preview contextual, configuração agrupada. **Superada pelo #46** nesta integração; sem merge. [Entrega](checkpoints/2026-09-16-dark-ui-redesign.md) |
+| UI premium (incorporada) | `codex/modulation-ui-premium-redesign`, HEAD `ae4586e0`, [PR #46 draft](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/46): chrome premium, componentes reutilizáveis, estados de microajuste (planned/applying/confirmed/not_required/failed/cancelled), `run_id`/`revision` contra evento velho, matriz de escala. Incorporada ao candidato de integração; host/solver/regras intocados pelo #46. [Entrega](checkpoints/2026-09-17-ui-post42-preparation.md) |
 | Solver candidato (outros) | #31 5658e9c: NO-GO; #34 8a93a27 **está na main** — `8a93a27` e `8cdd33f` são ancestrais de `6439669` pela cadeia `8a93a27` → `0ffa8e9` … `41086e4` (Beta 1) → `2599355` → #37. A leitura de 2026-09-12 ("não ancestral") foi feita num clone raso (`git rev-parse --is-shallow-repository` = true, 252 commits alcançáveis) e corrigida na revisão do #38 após `git fetch --unshallow` ([estado](GITHUB_STATE_2026-09-12.md)) |
 | Beta Revit | Teste real do botão CPython feito na missão scale-autofix (8.399 blocos, 16/16 gates, `7bb176b`) e integrado; PASS do Beta continua decisão do usuário. 2026-09-14: CHANNEL criado no Revit real via handler (harness MCP, IronPython), não pelo clique no botão; Tela de Configuração ganhou a escolha da estratégia (testada offline) |
 | Benchmark | V1 (raiz) = HISTORICAL / topologia antiga (TGD 167 paredes); **V2** (`projects/*/v2/`) = topologia do motor atual (TGD 145 paredes / 234 nós / 91 aberturas), `runner.py --version v2` — [README](../nuvem/benchmark/README.md) |
 | Bloqueadores | CHANNEL: integrado na main pelo #40. Pendentes: topo/peitoril fora da grade (51.8), cinta de topo (10.7), 30.8 (7719511); verga/contraverga não iniciada. Herdados: fill|fill residual (TP1 16), W080/peça duplicada no TGD, COVERAGE do TGD; decisões 11.10/tier 6/regra #1×#2 — [backlog](BETA2_BACKLOG.md) |
 | Decisões | A/B, catálogo/cortes, topo, compensadores, fora do módulo, C2/G16 e CR-B D1–D5; [ADRs](decisions/README.md) |
 | Referências | [TORRE EASY/BUTANTÃ](../reference_projects/README.md): EVIDÊNCIA / NÃO NORMA |
-| Último checkpoint | [Reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md); antes [CHANNEL — fechamento final e merge](checkpoints/2026-09-14-channel-final-merge.md) |
+| Último checkpoint | [Missão BUTANTÃ — correções físicas da modulação](checkpoints/2026-09-15-butanta-modulation-physical-fixes.md); antes [reconciliação documental pós-merge do #40](checkpoints/2026-09-14-post-merge-doc-reconciliation.md) |
 | CI | Só validação documental; recomendação de pytest + `runner --check` em [CI_RECOMMENDATION_2026-09-12.md](CI_RECOMMENDATION_2026-09-12.md) |
 | Próximo objetivo | Decisões E (topo/peitoril fora da grade) e F (cinta de topo); LINTEL não iniciado; [pacote Beta 2](architecture/beta2-implementation-package.md) |
 

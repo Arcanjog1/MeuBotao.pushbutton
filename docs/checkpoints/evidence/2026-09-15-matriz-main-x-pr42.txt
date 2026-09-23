@@ -1,0 +1,91 @@
+MATRIZ DE NAO-REGRESSAO  BASE(main 55e990d) x PR #42 (faec108)
+gerada em 2026-09-15T13:53:13Z por scratchpad/delta_metrics.py + cmp_delta.py
+BUTANTA: bancada offline do doc de teste, 34 paredes de alvenaria, 13 fiadas, estrategia CHANNEL.
+TGD V2 / TP1 V1: benchmark oficial, estrategia legada (strategy=None).
+
+
+=== BUTANTA ===
+metrica                                                 MAIN          PR42   delta
+solve_s                                                  3.1           5.6   +2.5
+pieces                                                  6664          6822   +158
+B34_SMALL_VOID_MISALIGNMENT                             1931           316   -1615
+NON_MODULAR                                               78             0   -78
+HOLES                                                     94            10   -84
+HOLES_CM                                                3754           872   -2882
+UNSUPPORTED_SMALL_BLOCK                                    -             0   
+UNSUPPORTED_BLOCK                                          -             0   
+SPECIALS_0_11                                            714           808   +94
+ADJACENT_COMPENSATORS.C09+C04                             98           119   +21
+ADJACENT_COMPENSATORS.C04+C09                             19            19   +0
+ADJACENT_COMPENSATORS.C09+C09                             11             9   -2
+ADJACENT_COMPENSATORS.C04+C04                              7             -   
+SPECIAL_CLUSTER_40CM.C04+C04                              11            11   +0
+COLLISIONS                                                 0             0   +0
+BOND_REPROVED_WALLS                                        3             3   +0
+MISSING_REQUIRED_CHANNEL                                   1             0   -1
+CHANNEL_FINDINGS.CHANNEL_THROUGH_T_SUPPORTED_P             4             4   +0
+CHANNEL_FINDINGS.CHANNEL_SUPPORT_LIMITED                   5             6   +1
+CHANNEL_FINDINGS.CHANNEL_HEAD_OFF_GRID                     2             2   +0
+CHANNEL_FINDINGS.MISSING_REQUIRED_CHANNEL                  1             -   
+MISSING_UNDER_WINDOW                                       1             1   +0
+B34_DETAIL.OK:B34                                        406          1860   +1454
+B34_DETAIL.VIOLA:B34                                    1292           118   -1174
+B34_DETAIL.VIOLA:B39                                     533           157   -376
+B34_DETAIL.fora_de_escopo:C09                             44           245   +201
+B34_DETAIL.VIOLA:B19                                      41            17   -24
+B34_DETAIL.OK:B54                                        304           304   +0
+B34_DETAIL.VIOLA:B54                                      65            24   -41
+B34_DETAIL.fora_de_escopo:K34                             17            20   +3
+B34_DETAIL.fora_de_escopo:K39                             19            19   +0
+B34_DETAIL.fora_de_escopo:vazio                            2             1   -1
+MID_WALL_HALF_BLOCK                                        5             5   +0
+REPLACEABLE_COMPOSITE_BY_B54                              59            65   +6
+SPECIAL_CLUSTER                                           11            11   +0
+
+=== TGD_V2 ===
+metrica                                                 MAIN          PR42   delta
+verdict                                            REGRESSAO     REGRESSAO   
+findings_by_code.COMPENSATOR_AVOIDABLE                    55            55   +0
+findings_by_code.COMPENSATOR_CONSECUTIVE                 472           407   -65
+findings_by_code.COMPENSATOR_EXCESS_IN_RUN               454           428   -26
+findings_by_code.COMPENSATOR_VERTICAL_STRIP               86            84   -2
+findings_by_code.COVERAGE_GAP_IN_ROW                    1275          1275   +0
+findings_by_code.COVERAGE_MISSING_ROW                    142           142   +0
+findings_by_code.COVERAGE_PARTIAL_WALL                    32            32   +0
+findings_by_code.COVERAGE_ROW_MOSTLY_EMPTY                86            86   +0
+findings_by_code.COVERAGE_WALL_NOT_MODULATED              10            10   +0
+findings_by_code.JUNCTION_NOT_ALTERNATING                 16            16   +0
+findings_by_code.OPENING_BLOCK_CROSSES_JAMB               96            96   +0
+findings_by_code.OPENING_MISSING_COUNTER_LINTE            30            30   +0
+findings_by_code.OPENING_MISSING_LINTEL                   91            91   +0
+findings_by_code.OPENING_SOLID_BELOW_SILL_MISS            19            19   +0
+findings_by_code.POSITION_OVERLAP                        140           140   +0
+findings_by_code.PRISM_CONTINUOUS_JOINT                   53            53   +0
+findings_by_code.PRISM_JOINT_STACK                         5             5   +0
+findings_by_code.PRISM_STAGGER_BELOW_TARGET              739           712   -27
+categories.block_positions                                14            14   +0
+categories.compensators                                   62            62   +0
+categories.junctions                                       1             1   +0
+categories.openings                                        8             8   +0
+categories.prism                                           5             5   +0
+categories.wall_coverage                                  70            70   +0
+
+=== TP1_V1 ===
+metrica                                                 MAIN          PR42   delta
+verdict                                       REGRESSAO CRITICAREGRESSAO CRITICA   
+findings_by_code.COMPENSATOR_AVOIDABLE                    80            80   +0
+findings_by_code.COMPENSATOR_CONSECUTIVE                 936           825   -111
+findings_by_code.COMPENSATOR_EXCESS_IN_RUN               933           909   -24
+findings_by_code.COMPENSATOR_VERTICAL_STRIP              149           147   -2
+findings_by_code.COVERAGE_GAP_IN_ROW                     336           336   +0
+findings_by_code.JUNCTION_MISSING_BINDING                  9             9   +0
+findings_by_code.OPENING_MISSING_COUNTER_LINTE            21            21   +0
+findings_by_code.POSITION_OVERLAP                         11            11   +0
+findings_by_code.PRISM_CONTINUOUS_JOINT                   16            16   +0
+findings_by_code.PRISM_STAGGER_BELOW_TARGET             1539          1689   +150
+categories.block_positions                                 1             1   +0
+categories.compensators                                   76            76   +0
+categories.junctions                                       1             1   +0
+categories.openings                                        0             0   +0
+categories.prism                                           8             8   +0
+categories.wall_coverage                                  13            13   +0
