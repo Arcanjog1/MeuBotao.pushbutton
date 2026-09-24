@@ -139,3 +139,7 @@ Citar arquivo + SHA para seções de branches diferentes.
 Pedido de 2026-09-10 autoriza somente #33/#35 evidenciais e o PR consolidado
 sem mudança física/normativa, após gates; não permite mesclar Beta 1/#31/#34
 ou implementar estratégias novas.
+(Escopo: missão de 2026-09-10, encerrada. Beta 1 e #34 entraram na main pelo
+#37 em 2026-09-11; estado corrente em docs/PROJECT_STATUS.md. Continuam valendo
+a autorização por merge e a proibição de implementar estratégia pendente sem
+decisão - ver docs/START_HERE.md, "Invariantes permanentes".)

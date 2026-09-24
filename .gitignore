@@ -53,3 +53,7 @@ nuvem/benchmark/projects/*/*/result.json
 nuvem/benchmark/projects/*/*/findings.json
 nuvem/benchmark/projects/*/*/comparison.json
 nuvem/benchmark/projects/*/*/scoped_comparison.json
+
+# Pacotes de contexto e indices derivados (context_pack.py --output): reconstruiveis,
+# nunca fonte de verdade. Ver docs/agents/README.md.
+.cache/

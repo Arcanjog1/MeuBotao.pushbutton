@@ -6,6 +6,7 @@ Read-only. Does not approve domain rules or infer truth from prose.
 import argparse
 import datetime
 import hashlib
+import importlib.util
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -44,8 +45,18 @@ def documentation_only(path):
             path.startswith('.claude/skills/'))
 
 
+def context_module():
+    """Sibling context_pack.py (manifest and router checks), loaded by path."""
+    spec = importlib.util.spec_from_file_location('_documentation_context_pack',
+                                                  Path(__file__).with_name('context_pack.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def validate(root, base, main, require_current_main=False):
     errors = []
+    official_prs, candidate_prs = [], []
     tracked = set(git(root, 'ls-files').splitlines())
     changed = set(git(root, 'diff', '--name-only', base).splitlines())
 
@@ -93,6 +104,8 @@ def validate(root, base, main, require_current_main=False):
             if require_current_main:
                 require(observed == git(root, 'rev-parse', main),
                         STATUS + ': main changed; fetch and reconcile before publishing')
+            official_prs = [i['pr'] for i in state.get('official', []) if isinstance(i.get('pr'), int)]
+            candidate_prs = [i['pr'] for i in state.get('candidates', []) if isinstance(i.get('pr'), int)]
             for item in state.get('official', []):
                 if commit(item.get('head'), 'official'):
                     try:
@@ -182,6 +195,16 @@ def validate(root, base, main, require_current_main=False):
                 errors.append(path + ': link outside repository: ' + target)
                 continue
             require(relative in tracked and resolved.exists(), path + ': broken/untracked link: ' + target)
+
+    # Context manifest (paths, rule references, skill mirrors) and START_HERE as a router:
+    # no specific checkpoint and no PR described as unmerged when the status lists it as official.
+    context = context_module()
+    errors.extend(context.manifest_errors(root, tracked))
+    start = root / context.START_HERE
+    if start.is_file():
+        for finding in context.start_here_findings(start.read_text(encoding='utf-8'), official_prs, candidate_prs):
+            if finding['severity'] in ('ERROR', 'CONTRADICTION'):
+                errors.append(finding['id'] + ': ' + finding['message'] + ' [' + finding['evidence'] + ']')
     return errors
 
 
@@ -199,7 +222,8 @@ def main():
     for error in errors:
         print('ERROR:', error)
     if not errors:
-        print('PASS: versioned documentation, commit provenance and explicit local links')
+        print('PASS: versioned documentation, commit provenance, explicit local links, '
+              'context manifest and START_HERE router')
     return bool(errors)
 
 

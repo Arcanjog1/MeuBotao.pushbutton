@@ -14,5 +14,6 @@ nuvem/core/wall_modeling.py.
 - [Decisões pendentes](docs/decisions/README.md)
 - [Backlog A/B/C/D/E](docs/BETA2_BACKLOG.md)
 
-Beta 1: **CANDIDATO — VALIDAÇÃO REVIT PENDENTE**.
+Estado de Beta, PRs e candidatos: somente no [status](docs/PROJECT_STATUS.md)
+(observação datada). Contexto por tarefa: [docs/agents](docs/agents/README.md).
 Integração documental não aprova candidato de produção ou estratégia nova.
