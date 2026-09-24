@@ -44,9 +44,9 @@ LIMITS = [
 # closed ('regras #1 e #2' flags #2; write 'regras 1 e 2' or repeat the word).
 NOT_PR_QUALIFIED = re.compile(r'(?i)\b(?:regras?|rules?|se[cç][aã]o|se[cç][oõ]es|sections?|itens?|item|passos?|etapas?'
                               r'|steps?|fiadas?|courses?)[\s*_]+#\d+')
-LINK_TARGET = re.compile(r'\]\([^)]*\)')
-CODE_SPAN = re.compile(r'`[^`]*`')
-BLOCK_START = re.compile(r'^\s*(?:[-*+]\s|\d+[.)]\s|>|\||(?:[-*_]\s*){3,}$)')
+# Only a VALID inline link destination is masked (anything else renders literally and stays visible).
+LINK_TARGET = re.compile(r'\]\(\s*(?:<[^<>\n]*>|[^\s()<>]+)(?:\s+(?:"[^"]*"|\'[^\']*\'|\([^()]*\)))?\s*\)')
+BLOCK_START = re.compile(r'^\s*(?:[-*+]\s|\d+[.)]\s|>|\||<|(?:[-*_]\s*){3,}$|=+\s*$|-+\s*$)')
 # Confidence/status labels used in REGRAS headings (CLAUDE.md), surfaced per section in the package.
 LABELS = ('REGRA OBRIGATORIA', 'REGRA DO USUARIO', 'DECISAO DO USUARIO', 'PREFERENCIAL', 'EXCECAO PERMITIDA',
           'PADRAO OBSERVADO', 'CONFLITO', 'NEEDS_RULE', 'PENDENTE', 'PENDENCIA', 'DESLIGADO', 'DESLIGADA', 'SUSPENSA',
@@ -350,16 +350,54 @@ def is_ancestor(root, older, newer):
     return try_git(root, 'merge-base', '--is-ancestor', older, newer) is not None
 
 
-def mask_block(text):
-    """Blank out (keeping line breaks) link targets, inline code and qualified numbers of one block."""
+def blank(text):
+    return re.sub(r'[^\n]', ' ', text)
+
+
+def mask_code(text):
+    """Blank inline code like CommonMark: a backtick run closes only with a run of the same length;
+    an escaped backtick outside code is literal; an unmatched run stays visible (fails closed)."""
+    out, i = [], 0
+    while i < len(text):
+        if text[i] == '\\' and text[i + 1:i + 2] == '`':
+            out.append(text[i:i + 2])
+            i += 2
+            continue
+        if text[i] != '`':
+            out.append(text[i])
+            i += 1
+            continue
+        j = i
+        while j < len(text) and text[j] == '`':
+            j += 1
+        run = text[i:j]
+        close = re.compile(r'(?<!`)' + run + r'(?!`)').search(text, j)
+        if close:
+            out.append(blank(text[i:close.end()]))
+            i = close.end()
+        else:
+            out.append(run)
+            i = j
+    return ''.join(out)
+
+
+def mask_text(text):
+    """Blank qualified numbers ('regra #1'), valid link destinations and inline code, keeping line
+    breaks. Qualifiers are matched on the raw text, so code between word and number breaks them."""
     text = unicodedata.normalize('NFC', text)
-    for pattern in (LINK_TARGET, CODE_SPAN, NOT_PR_QUALIFIED):
-        text = pattern.sub(lambda m: re.sub(r'[^\n]', ' ', m.group(0)), text)
-    return text
+    if text.lstrip().startswith('|'):
+        return '|'.join(mask_text(cell) for cell in re.split(r'(?<!\\)\|', text))
+    text = NOT_PR_QUALIFIED.sub(lambda m: blank(m.group(0)), text)
+    text = LINK_TARGET.sub(lambda m: ']' + blank(m.group(0)[1:]), text)
+    return mask_code(text)
+
+
+def mask_block(text):
+    return '\n'.join(mask_text(line) for line in text.split('\n')) if text.lstrip().startswith('|') else mask_text(text)
 
 
 def pr_refs(text):
-    """PR numbers cited in (masked or raw) Markdown text: '#N' or 'PR#N'."""
+    """PR numbers cited in Markdown text: '#N' or 'PR#N' visible after masking."""
     return sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(mask_block(text))})
 
 
@@ -369,9 +407,9 @@ def start_here_findings(text, official, candidates):
     A section is historical when its heading STARTS with 'Histórico'; the exemption lasts until
     a heading of the same or higher level. Fenced code is ignored; headings are checked too.
     PR references and their state live in PROJECT_STATUS: any PR number (#N, PR#N) in the router
-    is an ERROR, whatever the wording. Masking (inline code, link targets, 'regra #1') is done per
-    block of continuation lines, so wrapping cannot hide or fake a number; blocks split at every
-    list/quote/table/rule marker, so a stray backtick cannot pair across unrelated lines.
+    is an ERROR, whatever the wording. Inline code, valid link destinations and 'regra #1' are
+    masked; a number is reported when visible under the per-line OR the per-block mask, so neither
+    line wrapping nor a stray backtick pairing across lines can hide it (fails closed).
     """
     findings = []
     history_level = None
@@ -415,7 +453,9 @@ def start_here_findings(text, official, candidates):
     for block in blocks:
         masked = mask_block('\n'.join(line for _, line in block)).split('\n')
         for (number, line), clean in zip(block, masked):
-            prs = sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(clean)})
+            # Fail closed: a number counts if visible under EITHER the per-block or the per-line mask.
+            prs = sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(clean)} |
+                         {int(m.group(1)) for m in RAW_PR_REF.finditer(mask_text(line))})
             if not prs:
                 continue
             where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates

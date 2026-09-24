@@ -447,7 +447,13 @@ class ReviewRegressionTests(Repository):
                      'Rodar `python3 tools/documentation/context_pack.py\n   state` (ver PR #40, já mesclado) e depois `git status`.',
                      '- Candidato: `claude/butanta-channel-reference-\n  implementation` do PR #40 `sem merge`.',
                      'Concluída a etapa #3, #40 foi mesclado na main.', 'Ver regra #3 e #40 (já mesclado).',
-                     'As regras #1 e #2 seguem pendentes.', '- item um com `crase solta\n- item dois PR #40` fim'):
+                     'As regras #1 e #2 seguem pendentes.', '- item um com `crase solta\n- item dois PR #40` fim',
+                     'Titulo com crase `x\n===\nPR #40 mesclado, ver `status`.', '<!-- crase ` -->\nPR #40 mesclado, ver `status`.',
+                     '    echo `a\nPR #40 mesclado, ver `status`.', 'A regra `R-3` #40 foi mesclada.',
+                     'Use \\` para crase literal; o PR #40 foi mesclado, ver `status`.',
+                     'Para crase use `` ` ``; PR #40 foi mesclado, ver `status`.', 'Digite ``` para abrir; PR #40 mesclado, ver `status`.',
+                     'Ver [nota](PR #40 mesclado).', '| x | y | z |\n|---|---|---|\n| `a | PR #40 | b` |',
+                     'Orientação do compensador (regra\n#3 da skill).'):  # fails closed: qualifier and number on one line
             findings = self.findings('# S\n\n' + text + '\n', (40, 41, 42, 33, 35))
             self.assertTrue(findings, text)
             self.assertTrue(all(f['id'] == 'START_HERE_PR_STATE' and f['severity'] == 'ERROR' for f in findings), text)
@@ -456,7 +462,7 @@ class ReviewRegressionTests(Repository):
     def test_rule_numbers_links_and_code_are_not_prs(self):
         for text in ('- Orientação do compensador (regra #3 da skill): o lado fechado fica voltado para a amarração.',
                      'A regra #1 (alinhamento vertical) segue pendente de código.', 'As regras 1 e 2 seguem pendentes.',
-                     'Regra #1 e regra #3: DOCUMENTADO - pendência de código aberta.', 'Orientação do compensador (regra\n#3 da skill).',
+                     'Regra #1 e regra #3: DOCUMENTADO - pendência de código aberta.',
                      'Vale a regra **#3** do compensador.', 'Sec\u0327a\u0303o #2 (texto em NFD).',
                      '- Seção 51 aprovada: [regra 51](../nuvem/REGRAS.md#51-channel).', 'Ver `git log #40` no terminal.',
                      'Na etapa #2 o fluxo segue.', '## Título sem numero', 'Parede W#80 citada no log.'):
@@ -612,6 +618,14 @@ class RealRepositoryEvals(unittest.TestCase):
     def setUpClass(cls):
         cls.cases = json.loads(EVALS.read_text(encoding='utf-8'))['cases']
         cls.head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip()
+
+    def test_start_here_router_is_clean(self):
+        # Separate from the state test so an expected pending-checkpoint failure cannot hide it.
+        status = validator.metadata((REPO / 'docs/PROJECT_STATUS.md').read_text(encoding='utf-8'))
+        findings = context.start_here_findings((REPO / context.START_HERE).read_text(encoding='utf-8'),
+                                               [i['pr'] for i in status.get('official', [])],
+                                               [i['pr'] for i in status.get('candidates', [])])
+        self.assertEqual([], findings)
 
     def test_manifest_and_inventory(self):
         self.assertEqual([], context.manifest_errors(REPO))

@@ -49,8 +49,8 @@ documentais; integração não transforma proposta em contrato aprovado.
 - Este roteador não aponta checkpoint específico nem cita número de PR (`#N`,
   `PR#N`) fora de uma seção cujo título comece com "Histórico": referências e
   estado de PR ficam no status. `validate.py` bloqueia os dois casos (não contam
-  "regra #1" e afins, alvos de link e código inline; enumeração "regras #1 e #2"
-  é acusada: escrever "regras 1 e 2").
+  `regra #1` e afins, alvos de link e código inline; a enumeração `regras #1 e #2`
+  é acusada: escrever `regras 1 e 2`).
 
 ## Busca por domínio e arquivos antigos
 
