@@ -20,7 +20,7 @@ documentais; integração não transforma proposta em contrato aprovado.
 | Pergunta | Fonte |
 |---|---|
 | Estado atual, PRs oficiais/candidatos, última entrega? | [PROJECT_STATUS](PROJECT_STATUS.md): JSON `official`/`candidates`, linhas "Último checkpoint" e "Bloqueadores"; `context_pack.py state` |
-| Onde está o solver? | reforço de aberturas CHANNEL: [opening_reinforcement.py](../nuvem/core/engine/opening_reinforcement.py) ([arquitetura](architecture/channel-strategy-implementation.md)); [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py); Script.py é entrada/loader ([runtime canônico](RUNTIME_CANONICO.md)) |
+| Onde está o solver? | [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py) (integração e gate `_materialization_gate`), reforço CHANNEL em [opening_reinforcement.py](../nuvem/core/engine/opening_reinforcement.py) ([arquitetura](architecture/channel-strategy-implementation.md)); módulos do #42 por domínio no [manifesto](agents/CONTEXT_MANIFEST.json); Script.py é entrada/loader ([runtime canônico](RUNTIME_CANONICO.md)) |
 | Quais regras valem? | [Índice](../rules/README.md), autoridade em [REGRAS](../nuvem/REGRAS_MODULACAO_BLOCOS.md), status por seção |
 | Que contexto carregar por domínio? | [Manifesto](agents/CONTEXT_MANIFEST.json) e [inventário de fontes](agents/SOURCE_INVENTORY.md) (navegação, não norma) |
 | Decisões do usuário? | [Registros PENDING](decisions/README.md) |
@@ -37,22 +37,25 @@ documentais; integração não transforma proposta em contrato aprovado.
   `--calibrate` exigem autorização específica. Não promover observação ou
   evidência humana a regra; não transportar apoio TORRE EASY para CHANNEL.
 - Nenhum check-in, polling ou monitoramento agendado por iniciativa própria.
-- Não iniciar Revit nem escrever em RVT sem autorização da missão; teste
-  headless, handler via MCP e clique no botão são evidências diferentes.
-  PASS do Beta é decisão do usuário.
+- Não iniciar Revit nem escrever em RVT sem autorização da missão; RVTs de
+  referência nunca são salvos; teste headless, handler via MCP e clique no
+  botão são evidências diferentes. PASS do Beta é decisão do usuário.
 - Documento integrado não autoriza implementar estratégia pendente (LINTEL /
   verga-contraverga, N1, C2, CR-B): ver [decisões](decisions/README.md).
-- Sem migração de imports. Seções numéricas colidem entre branches e até
-  dentro das REGRAS (ex.: `66.3`): citar arquivo + SHA + heading.
+- Seções numéricas colidem entre branches e até dentro das REGRAS (ex.:
+  `66.3`): citar arquivo + SHA + heading.
+- Sem migração de imports sem CR própria (ordem da consolidação de 2026-09-10,
+  mantida pelo protocolo de memória técnica de 2026-09-24).
 - Este roteador não aponta checkpoint específico nem estado de PR fora da
   seção Histórico; `validate.py` bloqueia a contradição.
 
 ## Busca por domínio e histórico
 
-Pairing/geometria: core/engine/geometry.py, wall_pairing.py e tolerances.py.
-UI/Revit: wall_modeling.py; API 2027 ao usar a API.
-Benchmark: REFERENCE_CORPUS/README pertinente. Bug: reproduzir → primeira
-divergência → causa → fix mínimo → testes.
+Pairing/geometria: nuvem/core/engine/geometry.py, wall_pairing.py e tolerances.py.
+UI: nuvem/core/ui_state.py, ui_components.py, ui_chrome.py, ui_execution.py,
+ui_preview_panel.py; integração com o Revit em wall_modeling.py; API 2027 ao usar a API.
+Benchmark: [REFERENCE_CORPUS.md](REFERENCE_CORPUS.md) e o README pertinente. Bug:
+reproduzir → primeira divergência → causa → fix mínimo → testes.
 [Log](PROJECT_STATUS_LOG.md), [arquivo](archive/README.md) e
 [status antigo](PROJECT_STATUS_2026-09-09_HISTORICAL.md) não substituem o status corrente.
 Ler erratas/escopo dos dumps humanos antes de reutilizar.
@@ -62,8 +65,8 @@ Ler erratas/escopo dos dumps humanos antes de reutilizar.
 Reconciliado em 2026-09-24 (main observada `15bacec`). O texto abaixo era
 verdadeiro quando escrito (missão de consolidação de 2026-09-10 e atualizações
 até 2026-09-14) e **não descreve o estado atual**: o PR #40 (CHANNEL, regra 51)
-foi mesclado em `61d4f6c` (2026-09-14), o #41 em `55e990d` e o #49 em `4bb88bb`
-(2026-09-23); a última entrega corrente está no status. As proibições sem prazo
+foi mesclado em `61d4f6c` (2026-09-14), o #41 em `55e990d` (2026-09-14) e o #49
+em `4bb88bb` (2026-09-23); a última entrega corrente está no status. As proibições sem prazo
 foram extraídas para "Invariantes permanentes"; a ordem "não implementar
 LINTEL" continua valendo porque a decisão segue pendente, não por esta missão.
 

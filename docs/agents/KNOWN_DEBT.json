@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "status": "INDEX_NOT_ACCEPTANCE",
+  "note": "Indice da divida conhecida aberta. Evidencia = arquivos citados; nao aceita divida, nao anistia regressao nova. Mudanca de contagem, de parede ou segunda ocorrencia e mudanca, nao a mesma divida. Validado por context_pack.py check.",
+  "observed_at_main": "15bacec9d5edc58beaf969c78c7c8d0802f8979e",
+  "entries": [
+    {
+      "id": "KD-01",
+      "title": "Benchmark TP1 (regua V1 HISTORICAL): JUNCTION_MISSING_BINDING acima do baseline",
+      "status": "OPEN",
+      "check": "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]",
+      "case": "torre_easy_lo_r00_tp1, regua V1",
+      "observed": "JUNCTION_MISSING_BINDING 8->9 (REGRESSAO CRITICA; historica, identica na main)",
+      "domains": [
+        "benchmark",
+        "amarracao"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        }
+      ],
+      "decision_pending": "Nenhuma aceitacao formal registrada; baseline nao regravado.",
+      "reproduced": {
+        "result": "FALHOU como registrado: JUNCTION_MISSING_BINDING 8->9 (assert da linha 68).",
+        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+      }
+    },
+    {
+      "id": "KD-02",
+      "title": "Benchmark TGD V2: COVERAGE_ROW_MOSTLY_EMPTY acima do baseline por reclassificacao apos a regra 78",
+      "status": "OPEN",
+      "check": "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]",
+      "case": "torre_easy_lo_r00_tgd, regua V2",
+      "observed": "COVERAGE_ROW_MOSTLY_EMPTY 86->92 desde 9376a36 (nenhuma fiada perdeu cobertura; compensadores 2217->2451)",
+      "domains": [
+        "benchmark",
+        "tolerancias_fechamento"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 28
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        }
+      ],
+      "decision_pending": "Decisao humana: regravar a regua V2 com --save-baseline em commit proprio, ou manter a falha documentada.",
+      "reproduced": {
+        "result": "FALHOU como registrado: COVERAGE_ROW_MOSTLY_EMPTY 86->92 (assert critico da linha 116).",
+        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+      }
+    },
+    {
+      "id": "KD-03",
+      "title": "Benchmark TGD V2: categoria compensators acima do baseline (mascarada pelo assert critico desde o ciclo 1)",
+      "status": "OPEN",
+      "check": "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]",
+      "case": "torre_easy_lo_r00_tgd, regua V2",
+      "observed": "compensators 61->62 na main antes do ciclo 1; o verdict passou de 'REGRESSAO' para 'REGRESSAO CRITICA' (KD-02)",
+      "domains": [
+        "benchmark",
+        "compensadores"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 28
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 39
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        }
+      ],
+      "decision_pending": "D9 (compensadores) nao corrigida; ciclo 3 so com autorizacao.",
+      "note": "Mesmo nodeid do KD-02: enquanto o assert critico falha antes, a categoria nao e reavaliada.",
+      "reproduced": {
+        "result": "Nao reavaliavel: o assert critico da linha 116 (KD-02) falha antes do assert de categoria.",
+        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+      }
+    },
+    {
+      "id": "KD-04",
+      "title": "Teste do amostrador de travamento falha (defeito do proprio teste, nao do solver)",
+      "status": "NEEDS_REVIEW",
+      "check": "tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas",
+      "case": "suite completa sem tests/regression",
+      "observed": "historica nos checkpoints (ambiente das sessoes anteriores); passou em Linux/Python 3.11.15 em 2026-09-24",
+      "domains": [
+        "governanca"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 26
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        }
+      ],
+      "reproduced": {
+        "result": "PASSOU nesta reproducao (Linux, Python 3.11.15), ao contrario do registrado nos checkpoints; provavel dependencia de ambiente.",
+        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+      },
+      "decision_pending": "Reproduzir no ambiente em que falhava antes de reclassificar; nao declarar corrigido."
+    },
+    {
+      "id": "KD-05",
+      "title": "D2 (serie forense): pilar do no 51 fechado com B19|B19 em vez de B54 alternado",
+      "status": "OPEN",
+      "check": "UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2) com a regua de nos do forense, nao versionada",
+      "case": "BUTANTA 34 eixos, no 51 (T, principal 8284515, chegada 8284580)",
+      "observed": "padrao por fiada xxxxxxxxxxxB antes e depois do ciclo 2 (MCP/HUMANO: BBBBBBBBBBBx)",
+      "domains": [
+        "amarracao",
+        "bonecas_pilaretes"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 29
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 40
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 36
+        }
+      ],
+      "decision_pending": "Ciclo proprio, com autorizacao.",
+      "note": "Serie D forense (D1-D16) nao e a serie D1-D3 das candidatas da secao 76 nem a D1-D6 do CR-B."
+    },
+    {
+      "id": "KD-06",
+      "title": "D3 (serie forense): fiadas 4-10 sem amarracao nos T sob/entre aberturas",
+      "status": "OPEN",
+      "check": "UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2)",
+      "case": "BUTANTA 34 eixos, nos 20/26 (8284502) e 28 (8284554)",
+      "observed": "nos 20/26 BBBBxxxxxxxB; no 28 BBBBxxxxxBBB (MCP tudo B)",
+      "domains": [
+        "amarracao",
+        "aberturas"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 29
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 40
+        }
+      ],
+      "decision_pending": "Ciclo proprio, com autorizacao."
+    },
+    {
+      "id": "KD-07",
+      "title": "Clique humano com o prompt do layer de referencia (regra 49.1) nao exercitado; import 1 PAV do doc de teste fora de escala",
+      "status": "OPEN",
+      "check": "acao humana; logica coberta por tests/test_corpus_selection_paredes_existentes.py",
+      "case": "doc de teste butanta testes, fluxo paredes existentes",
+      "observed": "provado pela API na copia CICLO2 (46 -> 34); nenhum clique humano",
+      "domains": [
+        "corpus_selecao",
+        "ui_revisao"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 23
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 38
+        }
+      ],
+      "decision_pending": "Corrigir o import '1 PAV' (escala e posicao) e usar o layer no clique humano."
+    },
+    {
+      "id": "KD-08",
+      "title": "Botao real e banner do loader nunca observados dentro do pyRevit",
+      "status": "OPEN",
+      "check": "acao humana; logica provada por tests/test_loader_provenance.py",
+      "case": "PC do usuario (pyRevit)",
+      "observed": "sem evidencia versionada do SHA que roda no botao",
+      "domains": [
+        "runtime_loader"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-runtime-canonico.md",
+          "line": 27
+        }
+      ],
+      "decision_pending": "Gerar pacote canonico do main final e ler o banner (commit=) nos PCs.",
+      "always": true
+    },
+    {
+      "id": "KD-09",
+      "title": "Trechos NON_MODULAR_UNRESOLVED no fluxo padrao sem layer de referencia (46 eixos)",
+      "status": "MITIGATED",
+      "check": "tests/test_tolerancias_fisicas_gerais.py",
+      "case": "BUTANTA 46 eixos, estrategia NONE",
+      "observed": "224 -> 96 (ciclo 1); 0 com layer de referencia (ciclo 2, 34 eixos)",
+      "domains": [
+        "tolerancias_fechamento",
+        "corpus_selecao"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
+          "line": 29
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 28
+        }
+      ],
+      "decision_pending": "Depende de o usuario apontar o layer de referencia."
+    },
+    {
+      "id": "KD-10",
+      "title": "Amarracoes NAO resolvidas do no 41: B34 T_INTERSECTION_DEGRADED_L a 0,5 cm dentro da porta (regra 48)",
+      "status": "NEEDS_REVIEW",
+      "check": "politica coberta por tests/test_materializacao_e_estado_da_run.py; sem teste nomeado para o caso",
+      "case": "BUTANTA 46 eixos, parede 8284539, no 41, 11 fiadas",
+      "observed": "11 pecas puladas (OPENING_VOID_INVASION), sobreposicao 0,49995 cm",
+      "domains": [
+        "aberturas",
+        "amarracao"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 80
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 162
+        }
+      ],
+      "decision_pending": "Revisao humana/projeto das amarracoes nao resolvidas."
+    },
+    {
+      "id": "KD-11",
+      "title": "Regra 76/76.1: nos sem amarracao valida (MISSING_REQUIRED_JUNCTION_BOND) pendentes de decisao do usuario",
+      "status": "OPEN",
+      "check": "tests/test_regra76_corpus_butanta.py::test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos",
+      "case": "BUTANTA, fluxo CHANNEL",
+      "observed": "6 nos (teste passa e fixa a divida; secao 77 altera a contagem)",
+      "domains": [
+        "amarracao",
+        "compensadores"
+      ],
+      "evidence": [
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "line": 9904
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        }
+      ],
+      "decision_pending": "Escolha entre as candidatas desligadas da secao 76 (nenhuma limpa sob as regras aprovadas).",
+      "reproduced": {
+        "result": "PASSOU (o teste fixa a contagem conhecida de 6 nos; nao significa divida quitada).",
+        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+      }
+    },
+    {
+      "id": "KD-12",
+      "title": "Etapa 3B da secao 66 (microajuste de abertura) nao e disparada pelo fluxo do botao",
+      "status": "OPEN",
+      "check": "UNKNOWN (estado micro_adjust_flow_state; teste nomeado nao localizado)",
+      "case": "fluxo do botao",
+      "observed": "UI mostra 'nao avaliado nesta execucao'",
+      "domains": [
+        "aberturas",
+        "ui_revisao"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 61
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 82
+        }
+      ],
+      "decision_pending": "Integrar exige mover aberturas no modelo do usuario: autorizacao explicita."
+    },
+    {
+      "id": "KD-13",
+      "title": "Os '371 bloqueios' da execucao do usuario (PC CIVIX) nao foram reproduzidos",
+      "status": "NEEDS_REVIEW",
+      "check": "UNKNOWN",
+      "case": "execucao do usuario em 2026-09-23",
+      "observed": "reproducao offline deu 11 invasoes de vao, nao 371",
+      "domains": [
+        "criacao_revit"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 62
+        },
+        {
+          "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
+          "line": 156
+        }
+      ],
+      "decision_pending": "Obter o log daquela execucao."
+    },
+    {
+      "id": "KD-14",
+      "title": "Backlog da comparacao forense nao iniciado: D6 verga/contraverga, D9-D13, D14, 3B, D16",
+      "status": "OPEN",
+      "check": "UNKNOWN: catalogo forense D1-D16 nao versionado",
+      "case": "BUTANTA",
+      "observed": "nao iniciado",
+      "domains": [
+        "vergas_lintel_cinta",
+        "compensadores",
+        "aberturas"
+      ],
+      "evidence": [
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 43
+        }
+      ],
+      "decision_pending": "Ciclo 3 somente com nova autorizacao."
+    },
+    {
+      "id": "KD-DOC-01",
+      "title": "Divida documental residual encontrada na auditoria F0 (nao corrigida nesta fatia)",
+      "status": "OPEN",
+      "check": "context_pack.py state / revisao humana",
+      "case": "documentos citados em evidence",
+      "observed": "skill .agents/cr-checkpoint cita .Codex/checkpoints (nao ignorado); heading 30.8 das REGRAS diz DESLIGADO apesar da regra 78; CURRENT_REFERENCE_SNAPSHOT linha 1 HISTORICAL x linha 29 ATUALIZADO; rules/junctions indexa ate a secao 39; tests/README documenta so run_tests.py; BETA2_BACKLOG com base 6c00f7e; JSON official do status mistura head do PR e commit de merge",
+      "domains": [
+        "governanca"
+      ],
+      "evidence": [
+        {
+          "path": ".agents/skills/cr-checkpoint/SKILL.md",
+          "line": 41
+        },
+        {
+          "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+          "line": 5250
+        },
+        {
+          "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+          "line": 29
+        },
+        {
+          "path": "rules/junctions/README.md"
+        },
+        {
+          "path": "tests/README.md",
+          "line": 22
+        },
+        {
+          "path": "docs/BETA2_BACKLOG.md",
+          "line": 2
+        }
+      ],
+      "decision_pending": "Cada item em entrega propria; a secao 30.8 so por acrescimo (verify_reference_inventory exige prefixo preservado)."
+    }
+  ]
+}

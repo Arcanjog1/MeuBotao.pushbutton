@@ -50,7 +50,26 @@ Segunda ocorrencia com o mesmo numero.
 ## 75. Canaleta NUNCA exerce funcao de amarracao
 
 Canaleta nao amarra; bond beam e U-block citados aqui.
+
+### Regra do meio-bloco (B19)
+
+Canaleta perto de B19 nao muda nada.
 """
+
+DEBT = {
+    'schema_version': 1,
+    'entries': [
+        {'id': 'KD-01', 'title': 'TP1 JUNCTION 8->9', 'status': 'OPEN', 'check': 'test_engine.py::test_tp1',
+         'case': 'TP1 V1', 'observed': '8->9', 'domains': ['canaletas'],
+         'evidence': [{'path': 'docs/checkpoints/2026-09-20-a.md', 'line': 3}]},
+        {'id': 'KD-02', 'title': 'abertura sem teste', 'status': 'OPEN', 'check': 'UNKNOWN', 'case': 'porta 1',
+         'observed': '11 puladas', 'domains': ['aberturas'], 'evidence': [{'path': 'engine.py'}]},
+        {'id': 'KD-03', 'title': 'corrigida', 'status': 'FIXED', 'check': 'UNKNOWN', 'case': 'x', 'observed': 'x',
+         'domains': ['canaletas'], 'evidence': [{'path': 'engine.py'}]},
+        {'id': 'KD-04', 'title': 'clique humano pendente', 'status': 'OPEN', 'check': 'acao humana', 'case': 'botao',
+         'observed': 'nao exercitado', 'domains': ['aberturas'], 'always': True, 'evidence': [{'path': 'engine.py'}]},
+    ],
+}
 
 MANIFEST = {
     'schema_version': 1,
@@ -70,7 +89,7 @@ MANIFEST = {
     'domains': [
         {'id': 'canaletas', 'title': 'Canaletas', 'aliases': ['canaleta', 'channel', 'U-block', 'bond beam'],
          'mandatory_rules': [{'number': '75'}], 'related_rules': [{'number': '1'}],
-         'code': ['engine.py'], 'tests': ['test_engine.py'], 'checks': ['python3 -m pytest test_engine.py -q']},
+         'code': ['engine.py'], 'tests': ['test_engine.py'], 'checks': ['python3 extra_check.py']},
         {'id': 'aberturas', 'title': 'Aberturas', 'aliases': ['abertura', 'vão', 'opening'],
          'mandatory_rules': [{'number': '48'}, {'number': '66.3', 'heading_contains': 'custo'}]},
     ],
@@ -95,6 +114,7 @@ class Repository(unittest.TestCase):
         self.write('.claude/skills/a/SKILL.md', 'skill\n')
         self.write('.agents/skills/a/SKILL.md', 'skill\n')
         self.manifest = json.loads(json.dumps(MANIFEST))
+        self.debt = json.loads(json.dumps(DEBT))
         self.git('add', '.')
         self.git('commit', '-q', '-m', 'base')
         self.base = self.git('rev-parse', 'HEAD')
@@ -116,6 +136,7 @@ class Repository(unittest.TestCase):
 
     def commit(self, message):
         self.write(context.MANIFEST, json.dumps(self.manifest, indent=2))
+        self.write(context.DEBT, json.dumps(self.debt, indent=2))
         self.git('add', '.')
         self.git('commit', '-q', '-m', message)
 
@@ -154,6 +175,13 @@ class RuleIndexTests(Repository):
         self.assertIn('48.1', context.section_text(RULES, by_id['48']))
         self.assertNotIn('48.1', context.section_text(RULES, by_id['48'], 'own'))
 
+    def test_unnumbered_heading_id_is_a_slug_and_survives_line_shifts(self):
+        before = {s['rule_id'] for s in context.rule_index(RULES)}
+        self.assertIn('H-regra-do-meio-bloco-b19', before)
+        shifted = RULES.replace('Preambulo.', 'Preambulo.\n\nLinha nova.\n')
+        after = {s['rule_id'] for s in context.rule_index(shifted)}
+        self.assertEqual(before, after)
+
     def test_resolution_requires_unique_match(self):
         index = context.rule_index(RULES)
         with self.assertRaisesRegex(ValueError, 'ambiguous'):
@@ -175,6 +203,23 @@ class ManifestTests(Repository):
         errors = context.manifest_errors(self.root)
         self.assertTrue(any('not found' in e and 'heading renamed' in e for e in errors), errors)
         self.assertTrue(any('not found' in e for e in validator.validate(self.root, 'HEAD', 'HEAD')))
+
+    def test_debt_registry_is_validated(self):
+        self.assertEqual([], context.manifest_errors(self.root))
+        self.debt['entries'][0].update(status='ACCEPTED', domains=['inexistente'])
+        self.debt['entries'][1]['evidence'] = [{'path': 'docs/absent.md'}]
+        self.debt['entries'][2]['evidence'] = [{'path': 'engine.py', 'line': 999}]
+        self.debt['entries'][3]['check'] = 'tests/absent.py::test_x'
+        self.commit('bad debt')
+        errors = ' | '.join(context.manifest_errors(self.root))
+        for message in ('invalid status ACCEPTED', 'unknown domain inexistente', 'evidence not tracked: docs/absent.md',
+                        'evidence line beyond end of file', 'check file not tracked: tests/absent.py'):
+            self.assertIn(message, errors)
+
+    def test_ambiguous_alias_is_rejected(self):
+        self.manifest['domains'][0]['aliases'].append('nó')
+        self.commit('alias nó normalizes to the preposition no')
+        self.assertTrue(any('ambiguous alias' in e for e in context.manifest_errors(self.root)))
 
     def test_path_groups_must_match_tracked_files(self):
         self.manifest['path_groups'] = [{'pattern': 'docs/CR_*.md', 'role': 'cr_report', 'status': 'HISTORICAL'}]
@@ -216,7 +261,10 @@ class StateTests(Repository):
         self.assertEqual(package['evaluated_commit'], self.git('rev-parse', 'HEAD'))
         self.assertEqual(state['last_checkpoint']['path'], 'docs/checkpoints/2026-09-20-a.md')
         self.assertTrue(state['status_main_is_current'] is False)
-        self.assertEqual(['TP1 JUNCTION 8->9 (historica)'], [d['text'] for d in package['known_debt']])
+        self.assertEqual(['TP1 JUNCTION 8->9 (historica)'],
+                         [d['text'] for d in package['known_failures_last_checkpoint']])
+        self.assertEqual(['KD-01', 'KD-02', 'KD-04'], [d['id'] for d in package['known_debt']],
+                         'state lists every open entry; FIXED is excluded')
         self.assertIn('Ciclo 3 somente com autorizacao', [n['text'] for n in package['next_action']])
         self.assertIn('Decisoes E e F', [n['text'] for n in package['next_action']])
         self.assertEqual(state['official_prs'], [40])
@@ -258,7 +306,10 @@ class PackageTests(Repository):
         self.assertEqual(['canaletas'], [d['id'] for d in package['domains']])
         self.assertEqual(['75'], [r['rule_id'] for r in package['rules']['mandatory']])
         self.assertEqual(['engine.py'], package['code'])
-        self.assertIn('python3 -m pytest test_engine.py -q', [c['command'] for c in package['required_checks']])
+        commands = [c['command'] for c in package['required_checks']]
+        self.assertIn('python3 -m pytest test_engine.py -q', commands)
+        self.assertEqual(1, len([c for c in commands if c.startswith('python3 -m pytest test_engine.py')]),
+                         'domain tests become one deduplicated pytest command')
         self.assertTrue(all(c['status'] == 'NOT_RUN' for c in package['required_checks']))
 
     def test_ctx03_english_alias_and_accents(self):
@@ -280,6 +331,25 @@ class PackageTests(Repository):
         self.assertIsNotNone(budget['expansion_reason'])
         self.assertEqual([], package['rules']['related'])
         self.assertTrue(all(item['reason'] == 'budget' for item in package['rules']['left_out']))
+
+    def test_debt_follows_selected_domains(self):
+        self.assertEqual(['KD-01', 'KD-04'], [d['id'] for d in self.pack(task='canaleta')['known_debt']])
+        self.assertEqual(['KD-02', 'KD-04'], [d['id'] for d in self.pack(task='abertura')['known_debt']])
+
+    def test_covered_sections_are_not_listed_twice(self):
+        self.manifest['domains'][1]['mandatory_rules'] = [{'number': '48.1'}, {'number': '48'}, {'number': '66', 'part': 'own'}]
+        self.commit('overlapping mandatory')
+        package = self.pack(task='abertura', budget=100000)
+        mandatory = [(r['rule_id'], r['part']) for r in package['rules']['mandatory']]
+        self.assertEqual([('48', 'full'), ('66', 'own')], mandatory, '48.1 is inside 48')
+        related = [r['rule_id'] for r in package['rules']['related']]
+        self.assertNotIn('48.1', related)
+        self.assertNotIn('66', related)
+
+    def test_bad_part_is_rejected(self):
+        self.manifest['domains'][0]['mandatory_rules'] = [{'number': '75', 'part': 'half'}]
+        self.commit('bad part')
+        self.assertTrue(any('part must be full or own' in e for e in context.manifest_errors(self.root)))
 
     def test_related_rules_ranked_and_mandatory_excluded(self):
         package = self.pack(task='canaleta', budget=100000)
@@ -336,7 +406,7 @@ class CleanSessionTests(Repository):
         self.assertEqual(package['observed_main'], self.git('rev-parse', 'HEAD'))
         self.assertEqual(package['state']['last_checkpoint']['path'], 'docs/checkpoints/2026-09-20-a.md')
         self.assertEqual('nuvem/REGRAS.md', package['rules']['path'])
-        self.assertTrue(package['known_debt'] and package['next_action'])
+        self.assertTrue(package['known_debt'] and package['known_failures_last_checkpoint'] and package['next_action'])
         self.assertFalse(package['worktree_dirty'])
 
 
@@ -368,7 +438,8 @@ class RealRepositoryEvals(unittest.TestCase):
         last = package['state']['last_checkpoint']
         self.assertTrue(last['path'] and (REPO / last['path']).is_file())
         self.assertEqual(last['date'], last['newest_current_date'])
-        self.assertTrue(package['known_debt'], 'known debt must come from the last checkpoint')
+        self.assertTrue(package['known_debt'], 'open entries of docs/agents/KNOWN_DEBT.json')
+        self.assertTrue(package['known_failures_last_checkpoint'], 'declared by the last checkpoint')
         self.assertTrue(package['next_action'])
         paths = [s['path'] for s in package['required_sources']]
         self.assertIn('nuvem/REGRAS_MODULACAO_BLOCOS.md', paths)
@@ -384,6 +455,10 @@ class RealRepositoryEvals(unittest.TestCase):
                 domains = [d['id'] for d in package['domains']]
                 for domain in expect.get('domains_include', []):
                     self.assertIn(domain, domains)
+                for domain in expect.get('domains_exclude', []):
+                    self.assertNotIn(domain, domains)
+                for debt in expect.get('debt_include', []):
+                    self.assertIn(debt, [d['id'] for d in package['known_debt']])
                 numbers = [r['number'] for r in package['rules']['mandatory']]
                 for number in expect.get('mandatory_rules_include', []):
                     self.assertIn(number, numbers)

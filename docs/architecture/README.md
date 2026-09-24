@@ -1,5 +1,8 @@
 # Arquitetura para o Beta 2
 STATUS: PROPOSTA — PENDING USER APPROVAL. Nada implementado nesta entrega.
+(Nota de 2026-09-24: "nesta entrega" = consolidação de 2026-09-10. Depois disso a
+estratégia CHANNEL foi aprovada e implementada — [channel-strategy-implementation.md](channel-strategy-implementation.md),
+regra 51, PR #40; o restante segue proposta.)
 
 1. [Motor e estratégias de reforço](opening-reinforcement-strategies.md)
 2. [Catálogo, HEIGHT_CUT e LENGTH_CUT](extended-block-catalog.md)

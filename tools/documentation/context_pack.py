@@ -23,6 +23,8 @@ import unicodedata
 
 
 MANIFEST = 'docs/agents/CONTEXT_MANIFEST.json'
+DEBT = 'docs/agents/KNOWN_DEBT.json'
+DEBT_STATUS = ('OPEN', 'MITIGATED', 'NEEDS_REVIEW', 'REOPENED', 'FIXED')
 INVENTORY = 'docs/agents/SOURCE_INVENTORY.md'
 START_HERE = 'docs/START_HERE.md'
 REPOSITORY = 'Arcanjog1/MeuBotao.pushbutton'
@@ -37,6 +39,10 @@ LIMITS = [
 ]
 UNMERGED = ('sem merge', 'ready for review', 'nao mesclad', 'aguardando merge', 'not merged',
             'unmerged', 'candidat', 'draft')
+# Aliases are matched as whole words; these would select domains by accident (pt-BR/EN function words).
+STOPWORDS = {'a', 'o', 'e', 'as', 'os', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas', 'um', 'uma',
+             'ao', 'se', 'ou', 'que', 'com', 'por', 'para', 'the', 'of', 'in', 'on', 'to', 'and', 'or', 'is', 'it', 'l',
+             't', 'x'}
 MERGED = ('ja esta na main', 'ja estao na main', 'mesclado na main', 'merged')
 HEADING = re.compile(r'^(#{1,6})\s+(.*?)\s*#*\s*$')
 NUMBER = re.compile(r'^(?:\*\*)?(\d+[a-z]?(?:\.\d+[a-z]?)*)\.?(?=[\s*`]|$)')
@@ -102,9 +108,11 @@ def rule_index(text):
     """Headings of the rules file with stable ids, ranges and hashes.
 
     A section spans until the next heading of the same or higher level, so a
-    '##' section includes its '###' subsections. Numbers repeated inside the
-    file get an occurrence suffix (@2, @3...) in file order; the heading text
-    disambiguates them in the manifest. Fenced code blocks are skipped.
+    '##' section includes its '###' subsections. The id is the section number
+    (or 'H-' + slug of an unnumbered title, so it survives line shifts); ids
+    repeated inside the file get an occurrence suffix (@2, @3...) in file
+    order and the heading text disambiguates them in the manifest. Fenced code
+    blocks are skipped.
     """
     lines = text.replace('\r\n', '\n').split('\n')
     heads = []
@@ -137,7 +145,7 @@ def rule_index(text):
         end, own = trimmed(head['line'], end), trimmed(head['line'], min(own, end))
         body = '\n'.join(lines[head['line'] - 1:end])
         own_body = '\n'.join(lines[head['line'] - 1:own])
-        key = head['number'] or 'L' + str(head['line'])
+        key = head['number'] or 'H-' + '-'.join(normalize(head['title']).split()[:8])
         seen[key] = seen.get(key, 0) + 1
         head.update(end=end, chars=len(body), sha256=sha256_text(body),
                     own_end=own, own_chars=len(own_body), own_sha256=sha256_text(own_body),
@@ -151,7 +159,7 @@ def section_text(text, section, part='full'):
 
 
 def resolve_rule(index, ref):
-    """Resolve {'number', 'heading_contains'?} to exactly one section or raise."""
+    """Resolve {'number', 'heading_contains'?, 'part'?} to exactly one section or raise."""
     number = str(ref.get('number', ''))
     needle = normalize(ref.get('heading_contains', ''))
     matches = [s for s in index if s['number'] == number and
@@ -160,7 +168,16 @@ def resolve_rule(index, ref):
         state = 'not found' if not matches else 'ambiguous (' + ', '.join(
             str(s['line']) for s in matches) + '); add heading_contains'
         raise ValueError('rule ref ' + json.dumps(ref, ensure_ascii=False) + ' ' + state)
+    if ref.get('part', 'full') not in ('full', 'own'):
+        raise ValueError('rule ref ' + json.dumps(ref, ensure_ascii=False) + ' part must be full or own')
     return matches[0]
+
+
+def covers(outer, outer_part, inner, inner_part):
+    """True when the text of (inner, part) is entirely inside (outer, part)."""
+    end = outer['end'] if outer_part == 'full' else outer['own_end']
+    inner_end = inner['end'] if inner_part == 'full' else inner['own_end']
+    return outer['line'] <= inner['line'] and inner_end <= end and (outer, outer_part) != (inner, inner_part)
 
 
 def public_section(section, domains=None, text=None, part='full'):
@@ -376,6 +393,24 @@ def select_domains(manifest, task, requested):
     return selected, domains
 
 
+def load_debt(root):
+    path = Path(root) / DEBT
+    return json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {'entries': []}
+
+
+def debt_for(root, domains):
+    """Open debt entries for the selected domains (all open entries when no domain is selected)."""
+    out = []
+    for entry in load_debt(root).get('entries', []):
+        if entry.get('status') == 'FIXED':
+            continue
+        if domains and not entry.get('always') and not set(entry.get('domains', [])) & set(domains):
+            continue
+        out.append({key: entry.get(key) for key in ('id', 'title', 'status', 'check', 'case', 'observed',
+                                                    'domains', 'evidence', 'decision_pending')})
+    return out
+
+
 def source_entry(root, source, tracked, dirty, head):
     path = source['path']
     item = {key: source.get(key) for key in ('id', 'path', 'role', 'authority', 'status', 'load')}
@@ -410,17 +445,33 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
         wanted += [s for s in domain.get('sources', []) if s not in wanted]
         for ref in domain.get('mandatory_rules', []):
             section = resolve_rule(index, ref)
-            mandatory.setdefault(section['rule_id'], (section, set()))[1].add(domain['id'])
+            key = (section['rule_id'], ref.get('part', 'full'))
+            mandatory.setdefault(key, (section, ref.get('part', 'full'), set()))[2].add(domain['id'])
         related_refs += domain.get('related_rules', [])
         code += [p for p in domain.get('code', []) if p not in code]
         tests += [p for p in domain.get('tests', []) if p not in tests]
         checks += [c for c in domain.get('checks', []) if c not in checks]
 
+    if tests:
+        checks.insert(len(manifest.get('governance_checks', [])), 'python3 -m pytest ' + ' '.join(tests) + ' -q')
     required = [source_entry(root, sources[s], tracked, ident['dirty_paths'], ident['evaluated_commit'])
                 for s in wanted]
     counted = sum(s.get('estimated_tokens', 0) for s in required if s['load'] == 'full')
-    mandatory_items = [public_section(section, owners, section_text(rules_text, section) if include_text else None)
-                       for section, owners in sorted(mandatory.values(), key=lambda v: v[0]['line'])]
+    # A section already inside another mandatory section (parent 'full') is not listed twice;
+    # its domains are credited to the covering section.
+    entries = sorted(mandatory.values(), key=lambda v: (v[0]['line'], v[1] != 'full'))
+    kept = []
+    for section, part, owners in entries:
+        outer = next((k for k in kept if covers(k[0], k[1], section, part)), None)
+        if outer:
+            outer[2].update(owners)
+        else:
+            kept.append((section, part, set(owners)))
+    mandatory_items = [public_section(section, owners, section_text(rules_text, section, part)
+                                      if include_text else None, part)
+                       for section, part, owners in kept]
+    in_mandatory = lambda section: any(covers(k[0], k[1], section, 'own') or
+                                       (k[0] is section and k[1] == 'own') for k in kept)
     mandatory_tokens = counted + sum(s['estimated_tokens'] for s in mandatory_items)
 
     terms = []
@@ -438,7 +489,7 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
             in_body = contains_term(body, term)
             heading_hits += in_title
             body_hits += in_body
-            if section['rule_id'] in mandatory or not (in_title or in_body):
+            if not (in_title or in_body) or in_mandatory(section):
                 continue
             scores[section['rule_id']] = scores.get(section['rule_id'], 0) + (3 if in_title else 0) + in_body
         search.append({'term': term, 'heading_hits': heading_hits, 'section_hits': body_hits})
@@ -447,7 +498,7 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
             section = resolve_rule(index, ref)
         except ValueError:
             continue
-        if section['rule_id'] not in mandatory:
+        if not in_mandatory(section):
             scores[section['rule_id']] = scores.get(section['rule_id'], 0) + 100
     by_id = {s['rule_id']: s for s in index}
     ranked = sorted(scores, key=lambda rid: (-scores[rid], by_id[rid]['line']))
@@ -463,7 +514,8 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
                              'lines': [section['line'], section['own_end']], 'reason': 'budget'})
 
     last = state['last_checkpoint_meta'] or {}
-    known_debt = [{'text': t, 'source': last['path']} for t in last.get('known_failures', [])] if last.get('path') else []
+    known_debt = debt_for(root, [d['id'] for d in selected])
+    declared = [{'text': t, 'source': last['path']} for t in last.get('known_failures', [])] if last.get('path') else []
     pending = [{'text': t, 'source': last['path']} for t in last.get('decisions_pending', [])] if last.get('path') else []
     decisions_dir = Path(root) / 'docs/decisions'
     for path in sorted(decisions_dir.glob('DECISION-*.md')) if decisions_dir.is_dir() else []:
@@ -500,7 +552,7 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
                   'search': {'terms': search,
                              'zero_hit_terms': [s['term'] for s in search if not s['section_hits']]}},
         'code': code, 'tests': tests,
-        'known_debt': known_debt, 'decisions_pending': pending,
+        'known_debt': known_debt, 'known_failures_last_checkpoint': declared, 'decisions_pending': pending,
         'required_checks': [{'command': c, 'status': 'NOT_RUN'} for c in checks],
         'consistency': findings,
         'next_action': next_action,
@@ -563,8 +615,15 @@ def render_markdown(package):
                ' (busca sem resultado nao prova ausencia)')
     for title, key in (('Codigo', 'code'), ('Testes', 'tests')):
         out += ['', '## ' + title] + (['- `' + p + '`' for p in package[key]] or ['- nenhum no manifesto'])
-    for title, key in (('Divida conhecida', 'known_debt'), ('Decisoes pendentes', 'decisions_pending'),
-                       ('Proxima acao', 'next_action')):
+    out += ['', '## Divida conhecida (' + DEBT + '; indice, nao aceite)']
+    for d in package['known_debt']:
+        out.append('- ' + d['id'] + ' [' + str(d['status']) + '] ' + str(d['title']) + ' — ' + str(d['observed']) +
+                   ' — check: `' + str(d['check']) + '` — evidencia: ' +
+                   ', '.join(e['path'] + (':' + str(e['line']) if e.get('line') else '') for e in d.get('evidence') or []))
+    if not package['known_debt']:
+        out.append('- nenhuma entrada aberta para estes dominios')
+    for title, key in (('Falhas declaradas no ultimo checkpoint', 'known_failures_last_checkpoint'),
+                       ('Decisoes pendentes', 'decisions_pending'), ('Proxima acao', 'next_action')):
         out += ['', '## ' + title] + (['- ' + i['text'] + ' (`' + i['source'] + '`)' for i in package[key]]
                                       or ['- nao registrado'])
     out += ['', '## Checks requeridos (NOT_RUN)'] + ['- `' + c['command'] + '`' for c in package['required_checks']]
@@ -666,6 +725,10 @@ def manifest_errors(root, tracked=None):
         label = MANIFEST + ': domain ' + str(domain.get('id'))
         if not domain.get('aliases'):
             errors.append(label + ': needs aliases')
+        for alias in domain.get('aliases', []):
+            flat = normalize(alias).strip()
+            if len(flat) < 2 or flat in STOPWORDS:
+                errors.append(label + ': ambiguous alias ' + json.dumps(alias, ensure_ascii=False))
         if not domain.get('mandatory_rules') and not domain.get('sources'):
             errors.append(label + ': needs mandatory_rules or sources')
         for sid in domain.get('sources', []):
@@ -683,6 +746,7 @@ def manifest_errors(root, tracked=None):
                 except ValueError as exc:
                     errors.append(label + ': ' + key + ': ' + str(exc) +
                                   ' (heading renamed? update the manifest)')
+    errors.extend(debt_errors(root, tracked, set(domain_ids)))
     mirrors = manifest.get('skill_mirrors')
     if mirrors:
         primary, mirror = mirrors['primary'].rstrip('/') + '/', mirrors['mirror'].rstrip('/') + '/'
@@ -698,6 +762,42 @@ def manifest_errors(root, tracked=None):
                 errors.append(MANIFEST + ': skill mirrors diverge without declared reason: ' + name)
             if same and name in intentional:
                 errors.append(MANIFEST + ': declared skill difference no longer exists: ' + name)
+    return errors
+
+
+def debt_errors(root, tracked, domain_ids):
+    path = Path(root) / DEBT
+    if not path.is_file():
+        return []
+    errors = []
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+    except ValueError as exc:
+        return [DEBT + ': ' + str(exc)]
+    ids = [e.get('id') for e in data.get('entries', [])]
+    if data.get('schema_version') != 1:
+        errors.append(DEBT + ': schema_version must be 1')
+    if len(ids) != len(set(ids)):
+        errors.append(DEBT + ': duplicated id')
+    for entry in data.get('entries', []):
+        label = DEBT + ': ' + str(entry.get('id'))
+        for key in ('id', 'title', 'status', 'check', 'case', 'observed', 'domains', 'evidence'):
+            if entry.get(key) in (None, '', []):
+                errors.append(label + ': missing ' + key)
+        if entry.get('status') not in DEBT_STATUS:
+            errors.append(label + ': invalid status ' + str(entry.get('status')))
+        for domain in entry.get('domains', []):
+            if domain not in domain_ids:
+                errors.append(label + ': unknown domain ' + str(domain))
+        check = str(entry.get('check', '')).split('::')[0]
+        if check.startswith(('tests/', 'tools/', 'nuvem/')) and check not in tracked:
+            errors.append(label + ': check file not tracked: ' + check)
+        for evidence in entry.get('evidence', []):
+            target = Path(root) / str(evidence.get('path'))
+            if evidence.get('path') not in tracked or not target.is_file():
+                errors.append(label + ': evidence not tracked: ' + str(evidence.get('path')))
+            elif evidence.get('line') and evidence['line'] > len(target.read_text(encoding='utf-8').splitlines()):
+                errors.append(label + ': evidence line beyond end of file: ' + str(evidence.get('path')))
     return errors
 
 

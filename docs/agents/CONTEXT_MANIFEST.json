@@ -1,0 +1,2346 @@
+{
+  "schema_version": 1,
+  "status": "NAVIGATION_NOT_NORM",
+  "note": "Catalogo de navegacao para agentes. A autoridade permanece em cada fonte; rules_path e a autoridade de dominio. Editar aqui e rodar: context_pack.py inventory --write && context_pack.py check.",
+  "rules_path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+  "status_path": "docs/PROJECT_STATUS.md",
+  "checkpoints_dir": "docs/checkpoints",
+  "level0": [
+    "AGENTS",
+    "CLAUDE",
+    "START_HERE",
+    "STATUS",
+    "PROCESS",
+    "RULES",
+    "DEBT"
+  ],
+  "governance_checks": [
+    "python3 -m unittest discover -s tools/documentation -p 'test_*.py'",
+    "python3 tools/documentation/validate.py --base <merge-base> --main origin/main --require-current-main"
+  ],
+  "sources": [
+    {
+      "id": "AGENTS",
+      "path": "AGENTS.md",
+      "role": "instruction",
+      "authority": "USER_INSTRUCTION",
+      "status": "CURRENT",
+      "load": "auto",
+      "single_source_for": "instrucoes de sessao para Codex (merge, monitoramento, regras de registro)",
+      "proposal": "preservar; manter alinhado a CLAUDE.md; ordem de 2026-09-10 anotada como escopo encerrado"
+    },
+    {
+      "id": "CLAUDE",
+      "path": "CLAUDE.md",
+      "role": "instruction",
+      "authority": "USER_INSTRUCTION",
+      "status": "CURRENT",
+      "load": "auto",
+      "single_source_for": "instrucoes de sessao para Claude Code (idioma, merge, busca progressiva, registro de amarracao)",
+      "proposal": "preservar; adaptador do host, sem copiar este protocolo"
+    },
+    {
+      "id": "START_HERE",
+      "path": "docs/START_HERE.md",
+      "role": "onboarding",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "full",
+      "single_source_for": "roteamento estavel e invariantes permanentes; nao guarda noticia",
+      "proposal": "reconciliado em 2026-09-24: roteador + secao Historico com escopo"
+    },
+    {
+      "id": "STATUS",
+      "path": "docs/PROJECT_STATUS.md",
+      "role": "status",
+      "authority": "DATED_STATE",
+      "status": "CURRENT",
+      "load": "summarized",
+      "single_source_for": "estado corrente datado: main observada, PRs oficiais/candidatos, ultimo checkpoint, bloqueadores, proximo objetivo",
+      "proposal": "preservar; state/pack extraem JSON e linhas-chave"
+    },
+    {
+      "id": "PROCESS",
+      "path": "docs/DEVELOPMENT_PROCESS.md",
+      "role": "process",
+      "authority": "PROCESS",
+      "status": "CURRENT",
+      "load": "full",
+      "single_source_for": "fluxo de CR, entrega documental verificavel, recuperacao de sessao",
+      "proposal": "preservar como processo central; nao criar processo concorrente"
+    },
+    {
+      "id": "RULES",
+      "path": "nuvem/REGRAS_MODULACAO_BLOCOS.md",
+      "role": "rule_authority",
+      "authority": "APPROVED_DOMAIN_RULE",
+      "status": "CURRENT",
+      "load": "by_section",
+      "single_source_for": "regras de modulacao (status por secao)",
+      "proposal": "preservar autoridade; indexar por numero+heading+sha256; numeros repetidos recebem @n"
+    },
+    {
+      "id": "CONTEXT_README",
+      "path": "docs/agents/README.md",
+      "role": "navigation",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "uso e limites do manifesto/pacote de contexto",
+      "proposal": "novo (F1)"
+    },
+    {
+      "id": "MANIFEST",
+      "path": "docs/agents/CONTEXT_MANIFEST.json",
+      "role": "navigation",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "catalogo de fontes, dominios, aliases, secoes obrigatorias e espelhos de skills",
+      "proposal": "novo (F1); fonte do inventario gerado"
+    },
+    {
+      "id": "EVALS",
+      "path": "docs/agents/RETRIEVAL_EVALS.json",
+      "role": "navigation",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "perguntas de recuperacao com resposta esperada",
+      "proposal": "novo (F1); rodado por test_context_pack.py"
+    },
+    {
+      "id": "RULES_INDEX",
+      "path": "rules/README.md",
+      "role": "rule_index",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "indice das regras por natureza (regra/evidencia/decisao)",
+      "proposal": "preservar como indice, sem copias de regra"
+    },
+    {
+      "id": "DECISIONS",
+      "path": "docs/decisions/README.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "decisoes do usuario pendentes/aprovadas (STATUS por registro)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "DECISION_OPENING_REINFORCEMENT",
+      "path": "docs/decisions/DECISION-OPENING-REINFORCEMENT.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "arquitetura de reforco de aberturas (CHANNEL aprovada; LINTEL pendente)",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_TOP_BOND_BEAM",
+      "path": "docs/decisions/DECISION-TOP-BOND-BEAM.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "cinta de topo",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_COMPENSATOR_LIMIT",
+      "path": "docs/decisions/DECISION-COMPENSATOR-LIMIT.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "teto/sequencia de compensadores",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_CATALOG_SCOPE",
+      "path": "docs/decisions/DECISION-CATALOG-SCOPE.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "catalogo e cortes",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_WALL_OUTSIDE_MODULE",
+      "path": "docs/decisions/DECISION-WALL-OUTSIDE-MODULE.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "parede fora do modulo",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_C2_G16",
+      "path": "docs/decisions/DECISION-C2-G16.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "criterio de vazio fisico global (C2/G16)",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "DECISION_CR_B",
+      "path": "docs/decisions/DECISION-CR-B.md",
+      "role": "decision",
+      "authority": "DECISION_RECORD",
+      "status": "PENDING",
+      "load": "full",
+      "single_source_for": "CR-B D1-D5 e escrita oficial",
+      "proposal": "preservar; STATUS no proprio registro"
+    },
+    {
+      "id": "CHECKPOINTS",
+      "path": "docs/checkpoints/",
+      "role": "checkpoint_set",
+      "authority": "DELIVERY_RECORD",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "evidencia imutavel por entrega (JSON validado); o ultimo e resolvido pelo status",
+      "proposal": "preservar; nunca editar checkpoint de outra sessao"
+    },
+    {
+      "id": "EVIDENCE",
+      "path": "docs/checkpoints/evidence/",
+      "role": "evidence",
+      "authority": "DELIVERY_RECORD",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "logs curtos com hash de validacoes capturadas",
+      "proposal": "preservar"
+    },
+    {
+      "id": "LOG",
+      "path": "docs/PROJECT_STATUS_LOG.md",
+      "role": "log",
+      "authority": "HISTORICAL_RECORD",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "historico cronologico de CRs (indice para checkpoints)",
+      "proposal": "preservar; so indices novos"
+    },
+    {
+      "id": "STATUS_2026_09_09",
+      "path": "docs/PROJECT_STATUS_2026-09-09_HISTORICAL.md",
+      "role": "status",
+      "authority": "HISTORICAL_RECORD",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "painel anterior a 2026-09-09",
+      "proposal": "preservar como historico"
+    },
+    {
+      "id": "REFERENCE_CORPUS",
+      "path": "docs/REFERENCE_CORPUS.md",
+      "role": "benchmark_contract",
+      "authority": "BENCHMARK_CONTRACT",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "contrato do corpus de referencia do benchmark",
+      "proposal": "preservar"
+    },
+    {
+      "id": "SNAPSHOT",
+      "path": "docs/CURRENT_REFERENCE_SNAPSHOT.md",
+      "role": "benchmark_snapshot",
+      "authority": "HISTORICAL_RECORD",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "ultimo estado medido oficialmente na data do snapshot (declara-se HISTORICAL)",
+      "proposal": "preservar; o nome \"CURRENT\" e historico; linha 29 ainda diz ATUALIZADO (contradicao interna registrada)"
+    },
+    {
+      "id": "BENCH_INDEX",
+      "path": "benchmark/README.md",
+      "role": "benchmark_index",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "portal do benchmark e escritas protegidas",
+      "proposal": "preservar como indice"
+    },
+    {
+      "id": "BENCH_MANUAL",
+      "path": "nuvem/benchmark/README.md",
+      "role": "benchmark_manual",
+      "authority": "BENCHMARK_CONTRACT",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "pipeline, comandos, reguas V1/V2, identidade e limitacoes do benchmark",
+      "proposal": "preservar; revisar secoes historicas sem confundir com funcionamento atual"
+    },
+    {
+      "id": "BENCH_MANIFEST",
+      "path": "nuvem/benchmark/golden/manifest.json",
+      "role": "benchmark_manifest",
+      "authority": "BENCHMARK_CONTRACT",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "projetos oficiais do benchmark",
+      "proposal": "preservar; escrita so com autorizacao"
+    },
+    {
+      "id": "KNOWLEDGE",
+      "path": "nuvem/benchmark/knowledge/",
+      "role": "knowledge_data",
+      "authority": "GENERATED_DATA",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "error_classes.json (gerado) e observed_patterns.json",
+      "proposal": "preservar; nao editar o catalogo gerado a mao"
+    },
+    {
+      "id": "PATTERNS",
+      "path": "nuvem/benchmark/patterns.py",
+      "role": "pattern_learning",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "aprendizagem de padroes das referencias humanas (rejeita source==\"solver\")",
+      "proposal": "preservar guarda anti-circular; dedupe por linhagem e desempate estavel ficam para a fatia F4"
+    },
+    {
+      "id": "REFS",
+      "path": "reference_projects/README.md",
+      "role": "reference_evidence",
+      "authority": "EVIDENCE_NOT_NORM",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "portais das referencias humanas TORRE EASY / BUTANTA",
+      "proposal": "preservar; evidencia, nao norma"
+    },
+    {
+      "id": "REFS_INVENTORY",
+      "path": "reference_projects/inventory.json",
+      "role": "reference_evidence",
+      "authority": "EVIDENCE_NOT_NORM",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "caminhos e hashes dos JSON primarios",
+      "proposal": "preservar; verify_reference_inventory.py"
+    },
+    {
+      "id": "REFS_PRIMARY",
+      "path": "docs/revit_reference_extraction/",
+      "role": "reference_evidence",
+      "authority": "EVIDENCE_NOT_NORM",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "JSON primarios extraidos do Revit (somente leitura)",
+      "proposal": "preservar; sem copias concorrentes"
+    },
+    {
+      "id": "RUNTIME",
+      "path": "docs/RUNTIME_CANONICO.md",
+      "role": "runtime",
+      "authority": "IMPLEMENTATION_DOC",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "loader rastreavel, gate unico de materializacao, pacote canonico",
+      "proposal": "preservar"
+    },
+    {
+      "id": "ARCH",
+      "path": "docs/architecture/README.md",
+      "role": "architecture",
+      "authority": "PROPOSAL",
+      "status": "PENDING",
+      "load": "on_demand",
+      "single_source_for": "arquitetura proposta (nao aprovada por integracao)",
+      "proposal": "preservar; linha 2 \"Nada implementado\" e anterior ao CHANNEL implementado (channel-strategy-implementation.md)"
+    },
+    {
+      "id": "ARCH_CHANNEL",
+      "path": "docs/architecture/channel-strategy-implementation.md",
+      "role": "architecture",
+      "authority": "IMPLEMENTATION_DOC",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "implementacao da estrategia CHANNEL (regra 51)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "ARCH_REINFORCEMENT",
+      "path": "docs/architecture/opening-reinforcement-strategies.md",
+      "role": "architecture",
+      "authority": "PROPOSAL",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "estrategias de reforco de aberturas",
+      "proposal": "preservar"
+    },
+    {
+      "id": "ARCH_CATALOG",
+      "path": "docs/architecture/extended-block-catalog.md",
+      "role": "architecture",
+      "authority": "PROPOSAL",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "catalogo estendido proposto",
+      "proposal": "preservar"
+    },
+    {
+      "id": "ARCH_FAMILY",
+      "path": "docs/architecture/revit-family-mapping.md",
+      "role": "architecture",
+      "authority": "PROPOSAL",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "mapeamento catalogo logico x familia Revit",
+      "proposal": "preservar"
+    },
+    {
+      "id": "ARCH_BETA2",
+      "path": "docs/architecture/beta2-implementation-package.md",
+      "role": "architecture",
+      "authority": "PROPOSAL",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "pacote de implementacao Beta 2",
+      "proposal": "preservar"
+    },
+    {
+      "id": "BACKLOG",
+      "path": "docs/BETA2_BACKLOG.md",
+      "role": "backlog",
+      "authority": "PROPOSAL",
+      "status": "PENDING",
+      "load": "on_demand",
+      "single_source_for": "backlog A-E do solver como snapshot de 2026-09-10 (base 6c00f7e)",
+      "proposal": "preservar; reclassificar itens apos #37-#49 e ciclos 1/2 em entrega propria"
+    },
+    {
+      "id": "CI_RECOMMENDATION",
+      "path": "docs/CI_RECOMMENDATION_2026-09-12.md",
+      "role": "governance",
+      "authority": "PROPOSAL",
+      "status": "PENDING",
+      "load": "on_demand",
+      "single_source_for": "recomendacao de pytest + runner --check no CI (nao aplicada)",
+      "proposal": "preservar; aplicacao exige autorizacao"
+    },
+    {
+      "id": "CI_WORKFLOW",
+      "path": ".github/workflows/check-project-status.yml",
+      "role": "governance",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "check documental unico (unittest das ferramentas + validate.py)",
+      "proposal": "preservar; alteracao exige revisao especifica"
+    },
+    {
+      "id": "DOC_TOOLS",
+      "path": "tools/documentation/",
+      "role": "tool",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "validate.py, capture_validation.py, audit_inventory.py, verify_reference_inventory.py, context_pack.py",
+      "proposal": "estender; nao duplicar validador"
+    },
+    {
+      "id": "TESTS",
+      "path": "tests/README.md",
+      "role": "test_suite",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "como rodar os testes do motor fora do Revit",
+      "proposal": "preservar"
+    },
+    {
+      "id": "TESTS_REGRESSION",
+      "path": "tests/regression/",
+      "role": "test_suite",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "regressao do benchmark (longa; falhas historicas registradas no checkpoint)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "LOADER_SETUP",
+      "path": "nuvem/LOADER_SETUP.md",
+      "role": "runtime",
+      "authority": "IMPLEMENTATION_DOC",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "configuracao do loader e rastreabilidade (2026-09-23)",
+      "proposal": "preservar; RUNTIME_CANONICO e o resumo corrente"
+    },
+    {
+      "id": "UI_PREMIUM_DESIGN",
+      "path": "docs/UI_PREMIUM_DESIGN.md",
+      "role": "ui_doc",
+      "authority": "IMPLEMENTATION_DOC",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "decisoes do redesign premium (#46, integrado pelo #49)",
+      "proposal": "preservar; linha 5 \"nenhum merge\" e historica"
+    },
+    {
+      "id": "UI_POST_PR42",
+      "path": "docs/UI_POST_PR42.md",
+      "role": "ui_doc",
+      "authority": "IMPLEMENTATION_DOC",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "preparacao da UI pos-#42 (integracao ocorreu pelo #49)",
+      "proposal": "preservar como historico da integracao"
+    },
+    {
+      "id": "UI_REDESIGN",
+      "path": "docs/UI_REDESIGN.md",
+      "role": "ui_doc",
+      "authority": "HISTORICAL_RECORD",
+      "status": "SUPERSEDED",
+      "load": "on_demand",
+      "single_source_for": "redesign do #44 (superado pelo #46)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "UI_VISUAL_REFERENCE",
+      "path": "docs/UI_VISUAL_REFERENCE.md",
+      "role": "ui_doc",
+      "authority": "HISTORICAL_RECORD",
+      "status": "SUPERSEDED",
+      "load": "on_demand",
+      "single_source_for": "referencia visual anterior (#44)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "DEBT",
+      "path": "docs/agents/KNOWN_DEBT.json",
+      "role": "debt_index",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "summarized",
+      "single_source_for": "indice de divida conhecida aberta (id, verificacao exata, caso, valores, evidencia); nao e aceite",
+      "proposal": "novo (F1); checkpoints continuam sendo a evidencia"
+    },
+    {
+      "id": "TESTS_RUNNER",
+      "path": "tests/run_tests.py",
+      "role": "test_suite",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "runner historico (so test_script.CASES); suite completa via pytest",
+      "proposal": "preservar"
+    },
+    {
+      "id": "NUVEM_TESTS",
+      "path": "nuvem/tests/README.md",
+      "role": "test_suite",
+      "authority": "HISTORICAL_RECORD",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "suite antiga (banner aponta tests/README.md)",
+      "proposal": "preservar"
+    },
+    {
+      "id": "SCRIPT",
+      "path": "Script.py",
+      "role": "entry",
+      "authority": "CODE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "entrada/loader do botao pyRevit",
+      "proposal": "preservar; nao migrar imports nesta fatia"
+    },
+    {
+      "id": "README",
+      "path": "README.md",
+      "role": "onboarding",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "portal do repositorio",
+      "proposal": "reconciliado: estado de Beta aponta para o status"
+    },
+    {
+      "id": "DESTINO",
+      "path": "DESTINO_GITHUB.md",
+      "role": "governance",
+      "authority": "NAVIGATION",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "mapeamento pasta local pyRevit -> repositorio",
+      "proposal": "preservar"
+    },
+    {
+      "id": "SKILLS_CLAUDE",
+      "path": ".claude/skills/",
+      "role": "skill",
+      "authority": "PROCEDURE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "skills do Claude (pesquisa, debugging, checkpoint, verificacao, modulacao)",
+      "proposal": "preservar; espelho verificado"
+    },
+    {
+      "id": "SKILLS_AGENTS",
+      "path": ".agents/skills/",
+      "role": "skill",
+      "authority": "PROCEDURE",
+      "status": "CURRENT",
+      "load": "on_demand",
+      "single_source_for": "skills do Codex (espelho)",
+      "proposal": "preservar; diferencas por host declaradas no manifesto"
+    },
+    {
+      "id": "ARCHIVE",
+      "path": "docs/archive/",
+      "role": "historical",
+      "authority": "HISTORICAL_RECORD",
+      "status": "HISTORICAL",
+      "load": "on_demand",
+      "single_source_for": "auditorias e benchmark antigos",
+      "proposal": "preservar"
+    }
+  ],
+  "path_groups": [
+    {
+      "pattern": "docs/CR_*.md",
+      "role": "cr_report",
+      "status": "HISTORICAL",
+      "note": "relatorios de CRs encerradas; a regra vigente esta nas REGRAS"
+    },
+    {
+      "pattern": "docs/BLOCK_*.md",
+      "role": "cr_report",
+      "status": "HISTORICAL",
+      "note": "relatorios finais de CRs de bloco"
+    },
+    {
+      "pattern": "docs/BENCH_*.md",
+      "role": "cr_report",
+      "status": "HISTORICAL",
+      "note": "CRs do benchmark"
+    },
+    {
+      "pattern": "docs/C04_*.md",
+      "role": "cr_report",
+      "status": "HISTORICAL",
+      "note": "revisao independente do PR #20"
+    },
+    {
+      "pattern": "docs/CHECKPOINT_*.md",
+      "role": "checkpoint_legacy",
+      "status": "HISTORICAL",
+      "note": "checkpoints anteriores ao formato JSON de docs/checkpoints/"
+    },
+    {
+      "pattern": "docs/GITHUB_STATE_*.md",
+      "role": "github_snapshot",
+      "status": "HISTORICAL",
+      "note": "estado Git/GitHub datado; o status e a fonte corrente"
+    },
+    {
+      "pattern": "docs/AUDITORIA_*.md",
+      "role": "audit",
+      "status": "HISTORICAL",
+      "note": "auditoria datada (declara-se HISTORICAL)"
+    },
+    {
+      "pattern": "docs/BETA_MAIN_SAFE*.md",
+      "role": "runbook",
+      "status": "HISTORICAL",
+      "note": "bancada main-safe de 2026-09-09"
+    },
+    {
+      "pattern": "docs/CONSOLIDATION_*.md",
+      "role": "consolidation",
+      "status": "HISTORICAL",
+      "note": "consolidacao de 2026-09-10 (PR #36)"
+    }
+  ],
+  "domains": [
+    {
+      "id": "amarracao",
+      "title": "Amarração funcional e encontros L/T/X (B34/B54, vão menor, regra #1/#2, papel e paridade do nó)",
+      "aliases": [
+        "amarração",
+        "amarrações",
+        "amarracao",
+        "amarrar",
+        "encontro",
+        "encontros",
+        "encontro em L",
+        "encontro em T",
+        "encontro em X",
+        "canto em L",
+        "cruzamento",
+        "junção",
+        "peça de amarração",
+        "peça de nó",
+        "vão menor",
+        "vazado menor",
+        "paridade do nó",
+        "giro do canto",
+        "B34",
+        "B54",
+        "bond",
+        "bonding",
+        "tie",
+        "ties",
+        "junction",
+        "junctions",
+        "corner",
+        "L_CORNER",
+        "T_INTERSECTION",
+        "X_INTERSECTION",
+        "JUNCTION_MISSING_BINDING",
+        "MISSING_REQUIRED_JUNCTION_BOND",
+        "NO_FUNCTIONAL_JUNCTION",
+        "BOND_UNRESOLVED"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "",
+          "heading_contains": "Regra do meio-bloco"
+        },
+        {
+          "number": "5"
+        },
+        {
+          "number": "11",
+          "part": "own"
+        },
+        {
+          "number": "11.10"
+        },
+        {
+          "number": "18.7"
+        },
+        {
+          "number": "18.10"
+        },
+        {
+          "number": "33.9"
+        },
+        {
+          "number": "35.1"
+        },
+        {
+          "number": "36.3"
+        },
+        {
+          "number": "52"
+        },
+        {
+          "number": "75"
+        },
+        {
+          "number": "76"
+        },
+        {
+          "number": "77",
+          "part": "own"
+        },
+        {
+          "number": "77.1"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "11.14"
+        },
+        {
+          "number": "18.1"
+        },
+        {
+          "number": "18.5"
+        },
+        {
+          "number": "18.9"
+        },
+        {
+          "number": "30.1"
+        },
+        {
+          "number": "30.5"
+        },
+        {
+          "number": "33.1"
+        },
+        {
+          "number": "36.2"
+        },
+        {
+          "number": "36.4"
+        },
+        {
+          "number": "72"
+        },
+        {
+          "number": "74"
+        }
+      ],
+      "sources": [
+        "REFS",
+        "DECISIONS"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/engine/junction_role.py",
+        "nuvem/core/engine/opening_reinforcement.py",
+        "nuvem/core/engine/wall_pairing.py",
+        "nuvem/core/engine/small_void_alignment.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/benchmark/validators/validate_junctions.py"
+      ],
+      "tests": [
+        "tests/test_script.py",
+        "tests/test_scale_autofix_rules.py",
+        "tests/test_block_arm_role_invariance.py",
+        "tests/test_block_arm_role_candidate_safety_contract.py",
+        "tests/test_block_arm_safe_repair_gate_fidelity.py",
+        "tests/test_solver_l_node_alternation_cr_s1.py",
+        "tests/test_corner_reserve_per_course.py",
+        "tests/test_tie_parity_local_search.py",
+        "tests/test_tie_parity_abutting_ties.py",
+        "tests/test_tie_parity_fill_balance.py",
+        "tests/test_node_region_ownership.py",
+        "tests/test_t_room_physical_tolerance.py",
+        "tests/test_s74_corpus_butanta.py",
+        "tests/test_channel_never_bonds.py",
+        "tests/test_channel_reinforcement.py",
+        "tests/test_compensator_never_bonds.py",
+        "tests/test_missing_required_junction_bond.py",
+        "tests/test_regra761_revisao_do_gate.py",
+        "tests/test_regra76_corpus_butanta.py",
+        "tests/test_regra76_d1_t_degradado.py",
+        "tests/test_secao77_papel_por_fiada.py",
+        "tests/test_degraded_node_tie_block.py",
+        "tests/test_block_b19_residual_fill_implementation.py",
+        "tests/test_room_probe_inside_opening.py",
+        "tests/test_b34_small_void_alignment.py",
+        "tests/regression/test_junction_elevation_identity_cr_v1.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "prisma_fiadas",
+      "title": "Prisma / juntas verticais e padrão de fiadas ímpares/pares (Fiada A/B, bandas de abertura)",
+      "aliases": [
+        "prisma",
+        "junta vertical",
+        "juntas verticais",
+        "junta corrida",
+        "junta contínua",
+        "junta empilhada",
+        "desencontro",
+        "travamento",
+        "alinhamento vertical",
+        "regra #1",
+        "fiadas pares",
+        "fiadas ímpares",
+        "Fiada A",
+        "Fiada B",
+        "banda de abertura",
+        "prism",
+        "stagger",
+        "vertical joint",
+        "continuous joint",
+        "PRISM_CONTINUOUS_JOINT",
+        "CONTINUOUS_VERTICAL_JOINT",
+        "FORBIDDEN_JOINT_ALIGNMENT"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "8"
+        },
+        {
+          "number": "8d"
+        },
+        {
+          "number": "",
+          "heading_contains": "PADRAO OBSERVADO E CONFIRMADO — a atribuicao das letras A/B"
+        },
+        {
+          "number": "11",
+          "part": "own"
+        },
+        {
+          "number": "11.5"
+        },
+        {
+          "number": "11.8"
+        },
+        {
+          "number": "18.4"
+        },
+        {
+          "number": "27.6"
+        },
+        {
+          "number": "33.1"
+        },
+        {
+          "number": "39.4"
+        },
+        {
+          "number": "57.1"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "16"
+        },
+        {
+          "number": "18.6"
+        },
+        {
+          "number": "27.1"
+        },
+        {
+          "number": "27.2"
+        },
+        {
+          "number": "27.3"
+        },
+        {
+          "number": "33.2"
+        },
+        {
+          "number": "33.3"
+        },
+        {
+          "number": "33.4"
+        },
+        {
+          "number": "33.9"
+        },
+        {
+          "number": "39.1"
+        },
+        {
+          "number": "52"
+        }
+      ],
+      "sources": [
+        "REFS"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/small_void_alignment.py",
+        "nuvem/core/engine/b34_run_arrangement.py",
+        "nuvem/core/engine/physical_support.py",
+        "nuvem/core/engine/modulation_math.py",
+        "nuvem/benchmark/validators/validate_prism.py"
+      ],
+      "tests": [
+        "tests/test_block_bonding.py",
+        "tests/test_bond_strip_adjacent_courses.py",
+        "tests/test_block_node_fill_revalidation.py",
+        "tests/test_block_arm_role_prism_stagger.py",
+        "tests/test_cross_band_joint_propagation_cr_g12.py",
+        "tests/test_tie_parity_abutting_ties.py",
+        "tests/test_forced_half_licence.py",
+        "tests/test_b34_small_void_alignment.py",
+        "tests/test_b34_run_arrangement.py",
+        "tests/test_compensator_adjacency.py",
+        "tests/test_compensator_tiebreak.py",
+        "tests/test_fill_prefers_b34_row_over_stacked_compensators.py",
+        "tests/test_physical_support_audit.py",
+        "tests/test_script.py",
+        "tests/regression/test_validators.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "bonecas_pilaretes",
+      "title": "Bonecas, pilaretes e trechos curtos perto de encontros (ponta livre, jamba → nó, B19 residual)",
+      "aliases": [
+        "boneca",
+        "bonecas",
+        "pilarete",
+        "pilaretes",
+        "trecho curto",
+        "trechos curtos",
+        "parede curta",
+        "paredes curtas",
+        "ponta livre",
+        "ponta aberta",
+        "jamba",
+        "jambas",
+        "meio-bloco",
+        "meio bloco",
+        "B19",
+        "pier",
+        "piers",
+        "free end",
+        "jamb",
+        "half block",
+        "B19_RESIDUAL_FILL"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "",
+          "heading_contains": "Regra do meio-bloco"
+        },
+        {
+          "number": "11.11"
+        },
+        {
+          "number": "11.13"
+        },
+        {
+          "number": "18.8"
+        },
+        {
+          "number": "18.12"
+        },
+        {
+          "number": "25.1"
+        },
+        {
+          "number": "35.1"
+        },
+        {
+          "number": "76.1"
+        },
+        {
+          "number": "78"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "",
+          "heading_contains": "T_INTERSECTION"
+        },
+        {
+          "number": "11.10"
+        },
+        {
+          "number": "11.14"
+        },
+        {
+          "number": "18.2"
+        },
+        {
+          "number": "18.9"
+        },
+        {
+          "number": "18.13"
+        },
+        {
+          "number": "25.3"
+        },
+        {
+          "number": "77",
+          "part": "own"
+        }
+      ],
+      "sources": [
+        "DECISION_WALL_OUTSIDE_MODULE"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/engine/junction_role.py",
+        "nuvem/core/engine/opening_micro_adjust.py",
+        "nuvem/core/wall_modeling.py"
+      ],
+      "tests": [
+        "tests/test_scale_autofix_rules.py",
+        "tests/test_free_end_reserve.py",
+        "tests/test_corner_reserve_per_course.py",
+        "tests/test_forced_half_licence.py",
+        "tests/test_script.py",
+        "tests/test_opening_repair_clean_composition.py",
+        "tests/test_opening_micro_adjust.py",
+        "tests/test_node_bounded_residual.py",
+        "tests/test_physical_tolerance_trial.py",
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_degraded_node_tie_block.py",
+        "tests/test_secao77_papel_por_fiada.py",
+        "tests/test_block_b19_residual_fill_implementation.py",
+        "tests/test_regra76_d1_t_degradado.py",
+        "tests/test_missing_required_junction_bond.py",
+        "tests/test_block_fit_tolerance_c04_jamb_guard.py",
+        "tests/test_unmodulated_wall_retention.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "aberturas",
+      "title": "Aberturas (portas/janelas): zona de exclusão, sonda de vão, peitoril, pipeline de aberturas e regra 48",
+      "aliases": [
+        "abertura",
+        "aberturas",
+        "vão",
+        "vãos",
+        "porta",
+        "portas",
+        "janela",
+        "janelas",
+        "peitoril",
+        "zona de exclusão",
+        "invasão",
+        "invade",
+        "sonda de vão",
+        "regra 48",
+        "OPÇÃO A",
+        "microajuste",
+        "opening",
+        "openings",
+        "door",
+        "window",
+        "sill",
+        "OPENING_VOID_INVASION"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "3"
+        },
+        {
+          "number": "4"
+        },
+        {
+          "number": "11.8"
+        },
+        {
+          "number": "23",
+          "part": "own"
+        },
+        {
+          "number": "23.2"
+        },
+        {
+          "number": "23.5b"
+        },
+        {
+          "number": "25.1"
+        },
+        {
+          "number": "25.2"
+        },
+        {
+          "number": "48"
+        },
+        {
+          "number": "66.2"
+        },
+        {
+          "number": "78"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "10.4"
+        },
+        {
+          "number": "10.5"
+        },
+        {
+          "number": "10.9"
+        },
+        {
+          "number": "18.2"
+        },
+        {
+          "number": "18.12"
+        },
+        {
+          "number": "18.13"
+        },
+        {
+          "number": "23.3"
+        },
+        {
+          "number": "23.4"
+        },
+        {
+          "number": "23.5"
+        },
+        {
+          "number": "25.3"
+        },
+        {
+          "number": "39.1"
+        },
+        {
+          "number": "39.4"
+        }
+      ],
+      "sources": [
+        "DECISION_OPENING_REINFORCEMENT",
+        "RUNTIME"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/continuous_modulation.py",
+        "nuvem/core/engine/wall_pairing.py",
+        "nuvem/core/ui_state.py",
+        "nuvem/core/engine/opening_audit.py",
+        "nuvem/core/engine/junction_role.py",
+        "nuvem/benchmark/validators/validate_openings.py"
+      ],
+      "tests": [
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_room_probe_inside_opening.py",
+        "tests/test_controlled_beta_preflight.py",
+        "tests/test_beta_atomic_creation.py",
+        "tests/test_script.py",
+        "tests/test_cross_band_joint_propagation_cr_g12.py",
+        "tests/test_opening_micro_adjust.py",
+        "tests/test_opening_repair_clean_composition.py",
+        "tests/test_opening_reconstruction_cr_a.py",
+        "tests/test_secao77_papel_por_fiada.py",
+        "tests/test_block_fit_tolerance_c04_jamb_guard.py",
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_unmodulated_wall_retention.py",
+        "tests/regression/test_validators.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "canaletas",
+      "title": "Canaletas / estratégia CHANNEL de reforço de aberturas (regra 51) e canaleta nunca amarra (75)",
+      "aliases": [
+        "canaleta",
+        "canaletas",
+        "bloco canaleta",
+        "bloco U",
+        "meia canaleta",
+        "corrida de canaleta",
+        "reforço de aberturas",
+        "reforço de abertura",
+        "CHANNEL",
+        "U-block",
+        "CHANNEL_AS_JUNCTION_BOND",
+        "OPENING_REINFORCEMENT_CHANNEL",
+        "FREE_TO_TOP"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "10.1"
+        },
+        {
+          "number": "10.7"
+        },
+        {
+          "number": "48"
+        },
+        {
+          "number": "51",
+          "part": "own"
+        },
+        {
+          "number": "51.1"
+        },
+        {
+          "number": "51.2"
+        },
+        {
+          "number": "51.3"
+        },
+        {
+          "number": "51.4"
+        },
+        {
+          "number": "51.6"
+        },
+        {
+          "number": "51.7"
+        },
+        {
+          "number": "51.8"
+        },
+        {
+          "number": "51.10"
+        },
+        {
+          "number": "75"
+        },
+        {
+          "number": "78"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "51.5"
+        },
+        {
+          "number": "51.9"
+        },
+        {
+          "number": "51.11"
+        },
+        {
+          "number": "51.12"
+        },
+        {
+          "number": "51.13"
+        },
+        {
+          "number": "51.14"
+        },
+        {
+          "number": "51.15"
+        },
+        {
+          "number": "41.1"
+        },
+        {
+          "number": "41.3"
+        },
+        {
+          "number": "41.4"
+        },
+        {
+          "number": "76.1"
+        }
+      ],
+      "sources": [
+        "ARCH_CHANNEL",
+        "DECISION_OPENING_REINFORCEMENT",
+        "ARCH_REINFORCEMENT",
+        "REFS"
+      ],
+      "code": [
+        "nuvem/core/engine/opening_reinforcement.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/opening_audit.py"
+      ],
+      "tests": [
+        "tests/test_channel_reinforcement.py",
+        "tests/test_channel_audit_fixes.py",
+        "tests/test_channel_never_bonds.py",
+        "tests/test_channel_ui_and_family_gate.py",
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_b34_run_arrangement.py",
+        "tests/test_opening_repair_clean_composition.py",
+        "tests/test_node_bounded_residual.py",
+        "tests/test_physical_tolerance_trial.py",
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_secao77_papel_por_fiada.py",
+        "tests/test_s74_corpus_butanta.py",
+        "tests/test_missing_required_junction_bond.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "vergas_lintel_cinta",
+      "title": "Vergas / contravergas (LINTEL_COUNTERLINTEL, não implementada) e cinta de topo (pendente)",
+      "aliases": [
+        "verga",
+        "vergas",
+        "contraverga",
+        "contravergas",
+        "cinta de topo",
+        "cinta",
+        "encunhamento",
+        "lintel",
+        "lintels",
+        "counterlintel",
+        "LINTEL_COUNTERLINTEL",
+        "bond beam",
+        "TOP_BOND_BEAM"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "10.1"
+        },
+        {
+          "number": "10.4"
+        },
+        {
+          "number": "10.7"
+        },
+        {
+          "number": "40.2"
+        },
+        {
+          "number": "40.7"
+        },
+        {
+          "number": "41.3"
+        },
+        {
+          "number": "41.4"
+        },
+        {
+          "number": "51.10"
+        },
+        {
+          "number": "75"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "REF-BETA2-20260910"
+        },
+        {
+          "number": "51",
+          "part": "own"
+        },
+        {
+          "number": "51.13"
+        },
+        {
+          "number": "40.8"
+        },
+        {
+          "number": "10.2"
+        },
+        {
+          "number": "10.3"
+        },
+        {
+          "number": "51.8"
+        }
+      ],
+      "sources": [
+        "DECISION_OPENING_REINFORCEMENT",
+        "DECISION_TOP_BOND_BEAM",
+        "ARCH_REINFORCEMENT",
+        "REFS"
+      ],
+      "code": [
+        "nuvem/core/engine/opening_reinforcement.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/opening_audit.py"
+      ],
+      "tests": [
+        "tests/test_channel_ui_and_family_gate.py",
+        "tests/test_channel_reinforcement.py",
+        "tests/test_script.py",
+        "tests/test_channel_never_bonds.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "compensadores",
+      "title": "Compensadores e pastilhas (C09/C04): teto, sequência, fusão, orientação; compensador nunca amarra (76)",
+      "aliases": [
+        "compensador",
+        "compensadores",
+        "pastilha",
+        "pastilhas",
+        "C09",
+        "C04",
+        "peça de acerto",
+        "peça de ajuste",
+        "compensator",
+        "compensators",
+        "COMPENSATOR_AS_JUNCTION_BOND",
+        "COMPENSATOR_CONSECUTIVE",
+        "ADJACENT_COMPENSATORS"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "2"
+        },
+        {
+          "number": "11.8"
+        },
+        {
+          "number": "12"
+        },
+        {
+          "number": "33.8"
+        },
+        {
+          "number": "54"
+        },
+        {
+          "number": "56"
+        },
+        {
+          "number": "58",
+          "part": "own"
+        },
+        {
+          "number": "58.3"
+        },
+        {
+          "number": "76"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "18.9"
+        },
+        {
+          "number": "25.3"
+        },
+        {
+          "number": "27.3"
+        },
+        {
+          "number": "55"
+        },
+        {
+          "number": "56.3"
+        },
+        {
+          "number": "58.2"
+        },
+        {
+          "number": "59"
+        },
+        {
+          "number": "71"
+        }
+      ],
+      "sources": [
+        "DECISION_COMPENSATOR_LIMIT"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/opening_reinforcement.py",
+        "nuvem/core/engine/modulation_math.py",
+        "nuvem/benchmark/validators/validate_compensators.py",
+        "nuvem/benchmark/validators/base.py"
+      ],
+      "tests": [
+        "tests/test_compensator_adjacency.py",
+        "tests/test_compensator_never_bonds.py",
+        "tests/test_missing_required_junction_bond.py",
+        "tests/test_regra761_revisao_do_gate.py",
+        "tests/test_regra76_corpus_butanta.py",
+        "tests/test_regra76_d1_t_degradado.py",
+        "tests/test_degraded_node_tie_block.py",
+        "tests/test_forced_half_licence.py",
+        "tests/test_block_node_fill_revalidation.py",
+        "tests/test_physical_tolerance_trial.py",
+        "tests/test_compensator_tiebreak.py",
+        "tests/test_fill_prefers_b34_row_over_stacked_compensators.py",
+        "tests/test_mirror_in_place.py",
+        "tests/test_beta_atomic_creation.py",
+        "tests/test_node_bounded_residual.py",
+        "tests/test_script.py",
+        "tests/regression/test_validators.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "catalogo",
+      "title": "Catálogo de blocos (B39/B34/B54/B19/C09/C04), família+tipo exatos, células e catálogo estendido",
+      "aliases": [
+        "catálogo",
+        "catálogo de blocos",
+        "família",
+        "famílias",
+        "tipo de bloco",
+        "B39",
+        "bloco inteiro",
+        "bloco cortado",
+        "célula",
+        "células",
+        "catalog",
+        "family mapping",
+        "FamilySymbol",
+        "LogicalBlockType"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "1"
+        },
+        {
+          "number": "",
+          "heading_contains": "Regra da fileira de B34"
+        },
+        {
+          "number": "",
+          "heading_contains": "Regra do meio-bloco"
+        },
+        {
+          "number": "24.9"
+        },
+        {
+          "number": "40.9"
+        },
+        {
+          "number": "51.11"
+        },
+        {
+          "number": "52"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "2",
+          "part": "own"
+        },
+        {
+          "number": "6"
+        },
+        {
+          "number": "10.5"
+        },
+        {
+          "number": "12",
+          "part": "own"
+        },
+        {
+          "number": "18.5"
+        },
+        {
+          "number": "18.6"
+        },
+        {
+          "number": "40.4"
+        },
+        {
+          "number": "40.8"
+        },
+        {
+          "number": "57"
+        },
+        {
+          "number": "70"
+        }
+      ],
+      "sources": [
+        "DECISION_CATALOG_SCOPE",
+        "ARCH_CATALOG",
+        "ARCH_FAMILY"
+      ],
+      "code": [
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/engine/modulation_math.py",
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/engine/small_void_alignment.py",
+        "nuvem/core/engine/b34_run_arrangement.py",
+        "nuvem/benchmark/extract/revit_catalog_dump.py",
+        "nuvem/benchmark/solver_bridge.py",
+        "nuvem/benchmark/analysis.py"
+      ],
+      "tests": [
+        "tests/regression/test_engine_constants_match.py",
+        "tests/test_channel_reinforcement.py",
+        "tests/test_channel_ui_and_family_gate.py",
+        "tests/test_b34_small_void_alignment.py",
+        "tests/test_b34_run_arrangement.py",
+        "tests/test_fill_prefers_b34_row_over_stacked_compensators.py",
+        "tests/test_block_b19_residual_fill_implementation.py",
+        "tests/test_block_bonding.py",
+        "tests/test_script.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "tolerancias_fechamento",
+      "title": "Tolerâncias físicas de fechamento e trechos NON_MODULAR_UNRESOLVED (regra 78)",
+      "aliases": [
+        "tolerância física",
+        "tolerâncias físicas",
+        "tolerância",
+        "tolerâncias",
+        "folga",
+        "resíduo",
+        "fora do módulo",
+        "trecho não modular",
+        "regra 78",
+        "absorção",
+        "NON_MODULAR_UNRESOLVED",
+        "NON_MODULAR_WALL",
+        "physical tolerance",
+        "PHYSICAL_MODULATION_TOLERANCES_ENABLED"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "78"
+        },
+        {
+          "number": "30.8"
+        },
+        {
+          "number": "30.9"
+        },
+        {
+          "number": "74"
+        },
+        {
+          "number": "51.13"
+        },
+        {
+          "number": "18.12"
+        },
+        {
+          "number": "18.8"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "51.14"
+        },
+        {
+          "number": "11.10"
+        },
+        {
+          "number": "48"
+        },
+        {
+          "number": "13.3"
+        },
+        {
+          "number": "25.4"
+        },
+        {
+          "number": "49.1"
+        },
+        {
+          "number": "76.1"
+        }
+      ],
+      "sources": [
+        "DECISION_WALL_OUTSIDE_MODULE"
+      ],
+      "code": [
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/ui_state.py",
+        "nuvem/core/engine/wall_stepper.py",
+        "nuvem/core/engine/continuous_modulation.py",
+        "nuvem/core/engine/modulation_math.py"
+      ],
+      "tests": [
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_physical_tolerance_trial.py",
+        "tests/test_node_bounded_residual.py",
+        "tests/test_t_room_physical_tolerance.py",
+        "tests/test_s74_corpus_butanta.py",
+        "tests/test_channel_audit_fixes.py",
+        "tests/test_block_fit_tolerance_c04.py",
+        "tests/test_block_fit_tolerance_c04_jamb_guard.py",
+        "tests/test_unmodulated_wall_retention.py",
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_corpus_selection_paredes_existentes.py",
+        "tests/test_secao77_papel_por_fiada.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "corpus_selecao",
+      "title": "Seleção do corpus: paredes existentes, união de paredes (8c) e filtro por layer de referência (49/49.1)",
+      "aliases": [
+        "corpus da RUN",
+        "seleção de paredes",
+        "paredes existentes",
+        "unir paredes",
+        "união de paredes",
+        "layer de referência",
+        "regra 49",
+        "eixos excluídos",
+        "existing walls",
+        "reference layer",
+        "corpus selection",
+        "ARQ-STR-BLOCO",
+        "DETECTED_AXES",
+        "SELECTED_AXES",
+        "EXCLUDED_AXES"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "49"
+        },
+        {
+          "number": "49.1"
+        },
+        {
+          "number": "8c"
+        },
+        {
+          "number": "15.3"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "8a",
+          "part": "own"
+        },
+        {
+          "number": "8b",
+          "part": "own"
+        },
+        {
+          "number": "48"
+        },
+        {
+          "number": "78"
+        },
+        {
+          "number": "18.8"
+        },
+        {
+          "number": "13.3"
+        },
+        {
+          "number": "38.5"
+        }
+      ],
+      "sources": [
+        "REFS"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_pairing.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/ui_components.py",
+        "nuvem/core/ui_state.py"
+      ],
+      "tests": [
+        "tests/test_corpus_selection_paredes_existentes.py",
+        "tests/test_reference_layer_filter.py",
+        "tests/test_script.py",
+        "tests/test_ui_redesign.py",
+        "tests/test_beta_tp1_region.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "wall_modeling",
+      "title": "Wall modeling: pareamento de faces, eixo, merge colinear, deduplicação e grafo de encontros (26.x)",
+      "aliases": [
+        "pareamento",
+        "pareamento de faces",
+        "par de faces",
+        "espessura",
+        "linha de centro",
+        "colinear",
+        "colineares",
+        "duplicata",
+        "duplicatas",
+        "deduplicação",
+        "grafo de encontros",
+        "linhas de esquadria",
+        "wall modeling",
+        "wall pairing",
+        "pairing",
+        "centerline",
+        "collinear",
+        "deduplicate",
+        "wall graph",
+        "find_wall_pairs",
+        "merge_collinear_fragments"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "26",
+          "part": "own"
+        },
+        {
+          "number": "26.1"
+        },
+        {
+          "number": "26.2"
+        },
+        {
+          "number": "26.3"
+        },
+        {
+          "number": "26.4"
+        },
+        {
+          "number": "26.8.1"
+        },
+        {
+          "number": "26.8.2"
+        },
+        {
+          "number": "26.8.6"
+        },
+        {
+          "number": "26.8.7.2"
+        },
+        {
+          "number": "26.8.7.6"
+        },
+        {
+          "number": "26.8.7.7"
+        },
+        {
+          "number": "26.8.8.3"
+        },
+        {
+          "number": "26.9.1"
+        },
+        {
+          "number": "26.9.2"
+        },
+        {
+          "number": "26.10.2"
+        },
+        {
+          "number": "26.10.3"
+        },
+        {
+          "number": "26.10.4"
+        },
+        {
+          "number": "26.10.5"
+        },
+        {
+          "number": "26.10.7"
+        },
+        {
+          "number": "8b",
+          "part": "own"
+        },
+        {
+          "number": "15",
+          "part": "own"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "25.5"
+        },
+        {
+          "number": "26.5"
+        },
+        {
+          "number": "26.6"
+        },
+        {
+          "number": "26.7"
+        },
+        {
+          "number": "15.1"
+        },
+        {
+          "number": "15.2"
+        },
+        {
+          "number": "15.3"
+        }
+      ],
+      "sources": [
+        "BENCH_MANUAL"
+      ],
+      "code": [
+        "nuvem/core/engine/wall_pairing.py",
+        "nuvem/core/engine/geometry.py",
+        "nuvem/core/engine/tolerances.py",
+        "nuvem/core/wall_modeling.py",
+        "nuvem/benchmark/wall_modeling_bridge.py",
+        "nuvem/benchmark/extract/wall_modeling_snapshot.py"
+      ],
+      "tests": [
+        "tests/test_script.py",
+        "tests/regression/test_wall_modeling_bridge.py",
+        "tests/regression/test_wall_modeling_snapshot_serialization.py",
+        "tests/regression/test_engine_constants_match.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "criacao_revit",
+      "title": "Criação no Revit: cotas/nível, fiadas, lote persistente, gate de materialização (regra 48) e revisão",
+      "aliases": [
+        "criação no Revit",
+        "criar blocos",
+        "lançar blocos",
+        "materialização",
+        "materializar",
+        "cota",
+        "cotas",
+        "nível de referência",
+        "origem vertical",
+        "lote persistente",
+        "carimbo",
+        "idempotência",
+        "idempotente",
+        "espelhamento",
+        "NewFamilyInstance",
+        "ProjectElevation",
+        "materialization gate",
+        "preflight"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "8"
+        },
+        {
+          "number": "8a"
+        },
+        {
+          "number": "15.3"
+        },
+        {
+          "number": "23.5b"
+        },
+        {
+          "number": "48"
+        },
+        {
+          "number": "50"
+        },
+        {
+          "number": "UX-20260916"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "3"
+        },
+        {
+          "number": "13.4"
+        },
+        {
+          "number": "12.1"
+        },
+        {
+          "number": "17.1"
+        },
+        {
+          "number": "17.2"
+        },
+        {
+          "number": "18.7"
+        },
+        {
+          "number": "40.10"
+        }
+      ],
+      "sources": [
+        "RUNTIME"
+      ],
+      "code": [
+        "nuvem/core/wall_modeling.py",
+        "nuvem/core/ui_state.py"
+      ],
+      "tests": [
+        "tests/test_level_internal_elevation.py",
+        "tests/test_block_lot_persistence.py",
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_controlled_beta_preflight.py",
+        "tests/test_beta_atomic_creation.py",
+        "tests/test_unmodulated_wall_retention.py",
+        "tests/test_mirror_in_place.py",
+        "tests/test_bench_z_origin.py",
+        "tests/test_script.py",
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_compensator_never_bonds.py",
+        "tests/test_channel_ui_and_family_gate.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "ui_revisao",
+      "title": "UI e contrato de revisão antes da criação (UX-20260916, UI premium do #46 integrada pelo #49)",
+      "aliases": [
+        "UI",
+        "interface",
+        "tela",
+        "tela de configuração",
+        "revisão antes da criação",
+        "contrato de revisão",
+        "prévia",
+        "stepper",
+        "tema escuro",
+        "relatório final",
+        "WinForms",
+        "ui_state",
+        "ui_components",
+        "ui_chrome",
+        "UX-20260916"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "UX-20260916"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "48"
+        },
+        {
+          "number": "49.1"
+        },
+        {
+          "number": "50"
+        },
+        {
+          "number": "78"
+        },
+        {
+          "number": "76.1"
+        },
+        {
+          "number": "13.2"
+        },
+        {
+          "number": "13.3"
+        },
+        {
+          "number": "18.8"
+        }
+      ],
+      "sources": [
+        "UI_PREMIUM_DESIGN",
+        "UI_POST_PR42"
+      ],
+      "code": [
+        "nuvem/core/ui_state.py",
+        "nuvem/core/ui_components.py",
+        "nuvem/core/ui_chrome.py",
+        "nuvem/core/ui_execution.py",
+        "nuvem/core/ui_preview_panel.py",
+        "nuvem/core/ui_native_style.py",
+        "nuvem/core/wall_modeling.py",
+        "tools/ui_preview.py",
+        "tools/documentation/check_ui_scope.py",
+        "tools/documentation/check_post42_ui_scope.py"
+      ],
+      "tests": [
+        "tests/test_ui_redesign.py",
+        "tests/test_channel_ui_and_family_gate.py",
+        "tests/test_analyze_sincrono_sem_thread.py",
+        "tests/test_console_pump_ui_thread_guard.py",
+        "tests/test_corpus_selection_paredes_existentes.py",
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_tolerancias_fisicas_gerais.py",
+        "tests/test_script.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "runtime_loader",
+      "title": "Loader e runtime canônico: Script.py, canais BETA_OFFLINE/ONLINE, pacote pinado por SHA, banner",
+      "aliases": [
+        "loader",
+        "runtime",
+        "runtime canônico",
+        "pacote beta",
+        "pacote canônico",
+        "banner",
+        "proveniência",
+        "cache do pacote",
+        "token cifrado",
+        "Script.py",
+        "beta_package",
+        "BETA_OFFLINE",
+        "pyRevit",
+        "pushbutton",
+        "botão"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "48"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "50"
+        },
+        {
+          "number": "3",
+          "part": "own"
+        }
+      ],
+      "sources": [
+        "RUNTIME",
+        "LOADER_SETUP",
+        "SCRIPT"
+      ],
+      "code": [
+        "Script.py",
+        "beta_package.py",
+        "tools/beta/build_package.py",
+        "nuvem/core/wall_modeling.py",
+        "ferramentas/cripto_token.py",
+        "ferramentas/gerar_token_cifrado.py"
+      ],
+      "tests": [
+        "tests/test_loader_provenance.py",
+        "tests/test_beta_package.py",
+        "tests/test_cripto_token.py",
+        "tests/test_materializacao_e_estado_da_run.py",
+        "tests/test_beta_atomic_creation.py"
+      ],
+      "checks": []
+    },
+    {
+      "id": "benchmark",
+      "title": "Benchmark e corpus de referência: gabarito humano, baselines, réguas V1/V2, validadores, regressão",
+      "aliases": [
+        "benchmark",
+        "gabarito",
+        "baseline",
+        "baselines",
+        "corpus de referência",
+        "régua V1",
+        "régua V2",
+        "piso de ruído",
+        "regressão",
+        "score",
+        "golden",
+        "runner.py",
+        "save-baseline",
+        "calibrate",
+        "TGD",
+        "TP1",
+        "reference corpus",
+        "fingerprint"
+      ],
+      "mandatory_rules": [
+        {
+          "number": "24"
+        },
+        {
+          "number": "59"
+        }
+      ],
+      "related_rules": [
+        {
+          "number": "10.9"
+        },
+        {
+          "number": "37",
+          "part": "own"
+        },
+        {
+          "number": "38",
+          "part": "own"
+        },
+        {
+          "number": "40",
+          "part": "own"
+        },
+        {
+          "number": "41",
+          "part": "own"
+        },
+        {
+          "number": "REF-BETA2-20260910"
+        }
+      ],
+      "sources": [
+        "REFERENCE_CORPUS",
+        "BENCH_INDEX",
+        "BENCH_MANUAL",
+        "BENCH_MANIFEST",
+        "KNOWLEDGE",
+        "PATTERNS",
+        "REFS",
+        "REFS_INVENTORY"
+      ],
+      "code": [
+        "nuvem/benchmark/runner.py",
+        "nuvem/benchmark/validators/base.py",
+        "nuvem/benchmark/golden/compare.py",
+        "nuvem/benchmark/golden/corpus.py",
+        "nuvem/benchmark/golden/fingerprint.py",
+        "nuvem/benchmark/golden/manifest.json",
+        "nuvem/benchmark/model.py",
+        "nuvem/benchmark/wall_modeling_bridge.py",
+        "nuvem/benchmark/solver_bridge.py",
+        "nuvem/benchmark/scoring.py",
+        "nuvem/benchmark/extract/revit_input_real_dump.py",
+        "nuvem/benchmark/extract/revit_catalog_dump.py",
+        "nuvem/benchmark/extract/input_from_snapshot.py",
+        "nuvem/benchmark/tools/run_reference_corpus.py",
+        "nuvem/benchmark/tools/build_version_manifest.py",
+        "nuvem/benchmark/tools/run_golden_compare.py",
+        "nuvem/benchmark/knowledge/error_classes.json",
+        "nuvem/core/engine/opening_audit.py"
+      ],
+      "tests": [
+        "tests/regression/test_benchmark_baselines.py",
+        "tests/regression/test_benchmark_infra.py",
+        "tests/regression/test_validators.py",
+        "tests/regression/test_reconstruct.py",
+        "tests/regression/test_wall_modeling_bridge.py",
+        "tests/regression/test_wall_modeling_snapshot_serialization.py",
+        "tests/regression/test_engine_constants_match.py",
+        "tests/regression/test_junction_elevation_identity_cr_v1.py",
+        "tests/regression/test_validator_coverage_expected_rows_cr_c1.py",
+        "tests/test_golden_benchmark.py",
+        "tests/test_bench_z_origin.py",
+        "tests/test_opening_reconstruction_cr_a.py"
+      ],
+      "checks": [
+        "python3 nuvem/benchmark/runner.py --all --check  # sai 1 em regressao; NAO usar --save-baseline/--calibrate sem autorizacao",
+        "python3 nuvem/benchmark/runner.py --all --check --version v2",
+        "python3 -m pytest tests/regression -q  # ~19 min; falhas historicas em docs/agents/KNOWN_DEBT.json"
+      ]
+    },
+    {
+      "id": "governanca",
+      "title": "Governança, processo e memória de contexto: status, checkpoints, merge, CI, decisões, handoff",
+      "aliases": [
+        "governança",
+        "processo",
+        "fluxo de CR",
+        "checkpoint",
+        "checkpoints",
+        "status do projeto",
+        "PROJECT_STATUS",
+        "START_HERE",
+        "onboarding",
+        "merge",
+        "PR",
+        "pull request",
+        "CI",
+        "validador documental",
+        "validate.py",
+        "recuperação de contexto",
+        "pacote de contexto",
+        "manifesto de contexto",
+        "handoff",
+        "nova sessão",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "context_pack",
+        "skills",
+        "decisões pendentes",
+        "entrega"
+      ],
+      "mandatory_rules": [],
+      "related_rules": [],
+      "sources": [
+        "DECISIONS",
+        "CHECKPOINTS",
+        "LOG",
+        "CI_WORKFLOW",
+        "CI_RECOMMENDATION",
+        "DOC_TOOLS",
+        "CONTEXT_README",
+        "MANIFEST",
+        "EVALS",
+        "SKILLS_CLAUDE",
+        "SKILLS_AGENTS"
+      ],
+      "code": [
+        "tools/documentation/validate.py",
+        "tools/documentation/context_pack.py",
+        "tools/documentation/audit_inventory.py",
+        "tools/documentation/verify_reference_inventory.py",
+        ".github/workflows/check-project-status.yml"
+      ],
+      "tests": [
+        "tools/documentation/test_validate.py",
+        "tools/documentation/test_context_pack.py",
+        "tools/documentation/test_capture_validation.py"
+      ],
+      "checks": [
+        "python3 tools/documentation/verify_reference_inventory.py --protected-base <merge-base>  # ao tocar acervo/portais"
+      ]
+    }
+  ],
+  "skill_mirrors": {
+    "primary": ".claude/skills",
+    "mirror": ".agents/skills",
+    "intentional_differences": {
+      "cr-checkpoint/SKILL.md": "troca de host: Codex/AGENTS.md/.Codex/checkpoints no espelho x Claude Code/CLAUDE.md/.claude/checkpoints (deriva registrada: .Codex/checkpoints nao e ignorado pelo .gitignore; corrigir em entrega propria)",
+      "revit-block-modulation/SKILL.md": "troca de host: AGENTS.md no espelho x CLAUDE.md (linhas 95 e 125)"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "started_utc": "2026-09-24T16:05:44.853413+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
+  "tree": "40885b13bc1f2d6b8e3df3990f7f765753ef656f",
+  "status_before": "",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]",
+    "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]",
+    "tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas",
+    "tests/test_regra76_corpus_butanta.py::test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos"
+  ],
+  "timeout_seconds": 2400,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-24-memoria-f1-divida-conhecida.txt",
+  "pid": 15371,
+  "exit_code": 1,
+  "elapsed_seconds": 521.702,
+  "status_after": "A docs/agents/CONTEXT_MANIFEST.json\n A docs/agents/KNOWN_DEBT.json\n A docs/agents/RETRIEVAL_EVALS.json\n A docs/agents/SOURCE_INVENTORY.md\n M tools/documentation/context_pack.py\n M tools/documentation/test_context_pack.py\n?? docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json\n?? docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt",
+  "log_sha256": "44880f6568041cab2d511ad5d970de0f3e9c5749cd9dbf911fcb9a414dd7084f"
+}

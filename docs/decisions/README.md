@@ -3,6 +3,9 @@
 Documentação aprovada para integração não significa contrato aprovado.
 STATUS permitido: PENDING / APPROVED / REJECTED / SUPERSEDED.
 Todos os registros desta entrega estão PENDING; nenhuma nova regra foi adotada.
+(Nota de 2026-09-24: desde 2026-09-14 a estratégia CHANNEL está aprovada como oficial,
+com as escolhas A–F registradas em [DECISION-OPENING-REINFORCEMENT](DECISION-OPENING-REINFORCEMENT.md);
+a arquitetura geral, LINTEL e os demais registros continuam PENDING.)
 
 | Decisão | O que precisa do usuário | Bloqueia |
 |---|---|---|
