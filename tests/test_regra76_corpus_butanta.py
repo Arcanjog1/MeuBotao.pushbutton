@@ -220,7 +220,13 @@ def test_secao_77_so_a_parede_8284562_muda_e_os_nos_22_30_e_os_validos_ficam_igu
 
 def test_o_legado_nao_ganha_os_gates_nem_muda():
     geo = S.geometry()
-    ctx, res = S.solve_on_fresh_context(geo, False, strategy=None)
+    # legado do PRODUTO (secao 78 ligada): nao ganha os gates da regra 76
+    ctx78, res78 = S.solve_on_fresh_context(geo, False, strategy=None)
+    assert "compensator_as_junction_bond" not in res78
+    assert "missing_required_junction_bond" not in res78
+    # legado HISTORICO (anterior a secao 78, tolerancias fisicas desligadas):
+    # continua byte a byte igual ao snapshot gravado
+    ctx, res = S.solve_on_fresh_context(geo, False, strategy=None, tolerancias_fisicas=False)
     assert "compensator_as_junction_bond" not in res
     assert "missing_required_junction_bond" not in res
     legado = S.snapshot_expected()["legacy_cases"][0]["sha256"]

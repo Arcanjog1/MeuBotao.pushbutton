@@ -3545,7 +3545,13 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         all_jamb_exceptions.extend(result["jamb_exceptions"])
         all_per_wall.extend(result.get("per_wall") or [])
         all_validations.extend(result.get("validations") or [])
-        all_non_modular.extend(result["non_modular"])
+        # cada trecho nao modular leva as FIADAS FISICAS da banda (secao 78).
+        # NO PROPRIO objeto, nunca numa copia: _non_modular_by_physical_course
+        # reconhece a banda de cada trecho por id(entry).
+        for span in result["non_modular"]:
+            if isinstance(span, dict):
+                span["course_indices"] = list(course_indices)
+            all_non_modular.append(span)
         all_alignment_conflicts.extend(result.get("alignment_conflicts") or [])
         for absorption in result.get("residual_absorptions") or []:
             all_residual_absorptions.append(dict(absorption, course_indices=list(course_indices)))
@@ -3697,12 +3703,22 @@ def _solve_building_blocks_all_courses_core(nodes, walls_to_create, end_to_node,
     return best
 
 
-# Tolerancias fisicas da regra 30.8 e do ruido de jamba (51.13), COM a
-# tentativa por parede de `wall_stepper.physical_tolerance_trial`, ligadas SO'
-# durante a estrategia de reforco de aberturas (CHANNEL, opt-in - secao 30.9).
-# O motor legado (estrategia None, congelado pelo benchmark) continua identico
-# ao da main: as chaves globais do modulo seguem desligadas.
-CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True
+# TOLERANCIAS FISICAS DE FECHAMENTO (secao 78, ciclo 1 de 2026-09-23, decisao
+# do usuario): a regra 30.8 (absorcao <= RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM
+# no no') e o ruido de jamba (51.13, PIER_PHYSICAL_FIT_TOLERANCE_CM), SEMPRE com
+# a tentativa por parede de `wall_stepper.physical_tolerance_trial` (30.9),
+# valem para QUALQUER estrategia de reforco de abertura - inclusive "Sem
+# reforco". Sao propriedade da alvenaria (junta fisica), nao do reforco: ate'
+# 2026-09-23 so' ligavam com CHANNEL e o caminho legado transformava um residuo
+# de poucos centimetros em TRECHO INTEIRO VAZIO (BUTANTA: 224 trechos, 189 m
+# de parede sem bloco em 12 fiadas). Ligadas em `_solve_building_blocks_all_
+# courses_impl` (ponto unico das duas portas de entrada). As regras de
+# ENCONTRO/COMPOSICAO/PARIDADE continuam so' CHANNEL (secoes 58.2, 68, 71,
+# 72, 74, 76, 76.1, 77). O que NAO fecha nem com as tolerancias vira
+# NON_MODULAR_UNRESOLVED (ver _unresolved_spans), nunca vazio em silencio.
+PHYSICAL_MODULATION_TOLERANCES_ENABLED = True
+# nome antigo (ate' 2026-09-23 significava "so' CHANNEL"); mantido como alias
+CHANNEL_PHYSICAL_TOLERANCES_ENABLED = PHYSICAL_MODULATION_TOLERANCES_ENABLED
 
 
 # SECAO 58.2 no fluxo CHANNEL (2026-09-15): escada de amarracao no no' degradado
@@ -3781,8 +3797,6 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     _stepper_memo.OBB_MEMO = {}
     _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
     _stepper_memo.WALL_FILL_MEMO_STATS["misses"] = 0
-    saved_tolerances = (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
-                        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
     saved_degraded_tie = _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK
     saved_degraded_l_contact = _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT
     saved_undesignated = _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED
@@ -3793,9 +3807,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = True   # REGRA 76
     if CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED:
         _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = True   # REGRA 76.1
-    if CHANNEL_PHYSICAL_TOLERANCES_ENABLED:
-        _stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
-        _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
+    # (as tolerancias fisicas de fechamento nao ficam mais aqui: valem para
+    # todas as estrategias - ver PHYSICAL_MODULATION_TOLERANCES_ENABLED e
+    # _solve_building_blocks_all_courses_impl)
     if CHANNEL_DEGRADED_TIE_BLOCK_ENABLED:
         # SECAO 58.2 so' no fluxo CHANNEL (ver a constante)
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = True
@@ -3805,8 +3819,6 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     finally:
         _stepper_memo.WALL_FILL_MEMO = None
         _stepper_memo.OBB_MEMO = None
-        (_stepper_memo.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
-         _cm_flags.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_tolerances
         _stepper_memo.CORNER_DEGRADED_PREFERS_TIE_BLOCK = saved_degraded_tie
         _stepper_memo.T_DEGRADED_L_ROOM_FROM_CONTACT = saved_degraded_l_contact
         _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = saved_undesignated
@@ -3854,7 +3866,7 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         result["channel_unresolved_junction_fill"] = bool(CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
         result["channel_t_degraded_l_room_from_contact"] = bool(
             CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
-        result["channel_physical_tolerances"] = bool(CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
+        result["channel_physical_tolerances"] = bool(PHYSICAL_MODULATION_TOLERANCES_ENABLED)
         result["channel_degraded_tie_block"] = bool(CHANNEL_DEGRADED_TIE_BLOCK_ENABLED)
         result["channel_repair_prefer_clean"] = bool(CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
@@ -4333,6 +4345,51 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
     return result
 
 
+NON_MODULAR_UNRESOLVED_STATUS = "NON_MODULAR_UNRESOLVED"
+NON_MODULAR_SPAN_RULE_ID = "NON_MODULAR_SPAN"
+
+
+def _unresolved_spans(result):
+    """Secao 78: cada trecho que NAO fechou nem com as tolerancias fisicas vira
+    um registro explicito (nunca vazio em silencio). Somente leitura do
+    `non_modular` do solver; os campos sao os que a revisao humana precisa."""
+    from core.engine import wall_stepper as _ws
+    out = []
+    for span in (result or {}).get("non_modular") or []:
+        if not isinstance(span, dict):
+            continue
+        length = float(span.get("current_length_cm") or 0.0)
+        # residuo = EXCESSO sobre o maior comprimento que fecha (o que a junta
+        # teria de absorver); a falta ate' o modulo seguinte vai em separado
+        # (bloco nao estica).
+        residual = float(span["delta_to_lower_cm"]) if span.get("delta_to_lower_cm") is not None else None
+        shortfall = float(span["delta_to_upper_cm"]) if span.get("delta_to_upper_cm") is not None else None
+        if length < 0:
+            reason = ("OVERLAPPING_RESERVATIONS: as reservas dos nos vizinhos se sobrepoem "
+                      "({:.1f} cm) - nao ha trecho fisico para preencher".format(length))
+        else:
+            reason = ("o trecho de {:.1f} cm nao fecha em modulo (valido mais proximo: {} / {} cm) nem com as "
+                      "tolerancias fisicas de fechamento (30.8: absorcao <= {:.1f} cm no no'; 51.13: ruido de "
+                      "jamba <= {:.1f} cm)".format(
+                          length, span.get("lower_valid_cm"), span.get("upper_valid_cm"),
+                          _ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM, _ws.PIER_PHYSICAL_FIT_TOLERANCE_CM))
+        out.append({
+            "status": NON_MODULAR_UNRESOLVED_STATUS, "rule_id": NON_MODULAR_SPAN_RULE_ID,
+            "requires_human_review": True,
+            "wall_idx": span.get("wall_idx"), "wall_id": None,
+            "course": span.get("course"), "course_indices": list(span.get("course_indices") or []),
+            "variant_index": span.get("variant_index"), "segment_index": span.get("segment_index"),
+            "start_cm": span.get("seg_start_cm"), "end_cm": span.get("seg_end_cm"),
+            "length_cm": length, "residual_cm": residual, "shortfall_cm": shortfall,
+            "lower_valid_cm": span.get("lower_valid_cm"), "upper_valid_cm": span.get("upper_valid_cm"),
+            # trecho marcado pelo recorte do vao (30.9: "problema do vao, tratado depois")
+            "conflict": span.get("conflict"),
+            "reason": reason + (" [conflito com o recorte do vao: {}]".format(span.get("conflict"))
+                                if span.get("conflict") is not None else ""),
+        })
+    return out
+
+
 def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
                                            catalog, base_z_abs, num_courses, **kwargs):
     """SECAO 68 (2026-09-16) - PONTO UNICO onde a preferencia por composicao
@@ -4363,11 +4420,26 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
         and CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED)
+    # SECAO 78: tolerancias FISICAS de fechamento (30.8 + 51.13, com a tentativa
+    # 30.9) em QUALQUER estrategia - inclusive "Sem reforco". Ponto unico das
+    # duas portas de entrada, como as flags acima.
+    from core.engine import continuous_modulation as _cm_phys
+    saved_physical = (_stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+                      _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED)
+    if PHYSICAL_MODULATION_TOLERANCES_ENABLED:
+        _stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
+        _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
     try:
-        return _solve_building_blocks_all_courses_impl_core(
+        result = _solve_building_blocks_all_courses_impl_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
             num_courses, **kwargs)
+        if isinstance(result, dict):
+            result["physical_modulation_tolerances"] = bool(PHYSICAL_MODULATION_TOLERANCES_ENABLED)
+            result["unresolved_spans"] = _unresolved_spans(result)
+        return result
     finally:
+        (_stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
+         _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_physical
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
         _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
         _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
@@ -11765,6 +11837,16 @@ def _format_block_solve_report(result, catalog):
     for wall in retained:
         lines.append("  - parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
                      "{start_cm} -> {end_cm}; PRESERVAR referencia.".format(**wall))
+    trechos = result.get("unresolved_spans") or []
+    lines.append("TRECHOS NAO RESOLVIDOS (NON_MODULAR_UNRESOLVED, revisao humana obrigatoria): {}".format(len(trechos)))
+    for span in trechos[:60]:
+        lines.append("  UNRESOLVED wall_id={} wall_idx={} course={} fiadas={} start={} end={} length={:.1f} "
+                     "residual={} rule_id={} status={}".format(
+                         span.get("wall_id"), span.get("wall_idx"), span.get("course"),
+                         span.get("course_indices"), span.get("start_cm"), span.get("end_cm"),
+                         span.get("length_cm") or 0.0, span.get("residual_cm"), span.get("rule_id"), span.get("status")))
+    if len(trechos) > 60:
+        lines.append("  ... e mais {}.".format(len(trechos) - 60))
 
     # Resumo do processamento PAREDE A PAREDE (ordem geometrica obrigatoria
     # + validacao final de cada uma antes de passar para a proxima).
@@ -12680,6 +12762,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 opening_reinforcement_policy=self.opening_reinforcement_policy,
             )
         self.solve_result["num_courses"] = num_courses
+        # SECAO 78: o trecho NAO resolvido leva o ElementId da parede de referencia
+        for _span in self.solve_result.get("unresolved_spans") or []:
+            _entries = (self.created_walls_by_axis or {}).get(_span.get("wall_idx")) or []
+            try:
+                _span["wall_id"] = _eid_int(_entries[0][0]) if _entries else None
+            except Exception:
+                _span["wall_id"] = None
         # REGRA 48 nos DOIS canais (BETA offline e ONLINE): o laudo fisico e o
         # contrato da materializacao sao os mesmos - uma fonte de verdade, dois
         # modos de carregamento. (Ate' 2026-09-23 so' o beta passava por aqui.)
@@ -12853,8 +12942,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
                         "overlap_cm": None, "opening_index": None,
                         "message": "amarracao NAO resolvida: familia ausente do catalogo"})
             _faltando = list((self.solve_result or {}).get("missing_required_junction_bond") or [])
+            _trechos = list((self.solve_result or {}).get("unresolved_spans") or [])
             self.create_result["unresolved_bonds"] = _nao_resolvidas
-            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando)
+            self.create_result["unresolved_spans"] = _trechos
+            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando or _trechos)
         with _perf.span("create.save_modulation_state_cache"):
             self._save_modulation_state_cache()
         _resultado = self.create_result or {}

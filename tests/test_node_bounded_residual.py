@@ -38,13 +38,18 @@ def absorption(enabled):
     ativacao dentro da estrategia CHANNEL (secao 30.9, 2026-09-15). Com a
     CHANNEL ligando as tolerancias por conta propria, o vermelho "sem
     absorcao" precisa desligar tambem essa ativacao."""
-    before = (ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
+    # Secao 78 (2026-09-23): o interruptor deixou de ser "so' CHANNEL" -
+    # `PHYSICAL_MODULATION_TOLERANCES_ENABLED` vale para toda estrategia.
+    before = (ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.PHYSICAL_MODULATION_TOLERANCES_ENABLED,
+              m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED)
     ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = enabled
+    m.PHYSICAL_MODULATION_TOLERANCES_ENABLED = enabled
     m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED = enabled
     try:
         yield
     finally:
-        ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED = before
+        (ws.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED, m.PHYSICAL_MODULATION_TOLERANCES_ENABLED,
+         m.CHANNEL_PHYSICAL_TOLERANCES_ENABLED) = before
 
 
 def ring_lines():

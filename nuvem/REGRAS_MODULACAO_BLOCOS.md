@@ -5360,10 +5360,11 @@ volta de cada `solve_wall_free_fill` do fluxo por parede:
 Ordem fixa, determinística; decisões em `result["physical_tolerance_trial"]`
 do preenchimento da parede.
 
-**Escopo (decisão desta missão)**: as tolerâncias com tentativa são ligadas
-SOMENTE durante a estratégia de reforço de aberturas CHANNEL
-(`CHANNEL_PHYSICAL_TOLERANCES_ENABLED = True` em `core/wall_modeling.py`,
-restauradas no `finally`). O motor legado (estratégia None, congelado pelo
+**Escopo (decisão desta missão — SUPERADA pela §78 em 2026-09-23)**: as
+tolerâncias com tentativa eram ligadas SOMENTE durante a estratégia CHANNEL
+(`CHANNEL_PHYSICAL_TOLERANCES_ENABLED`). Desde a §78 valem para QUALQUER
+estratégia (`PHYSICAL_MODULATION_TOLERANCES_ENABLED`, ligadas em
+`_solve_building_blocks_all_courses_impl`); o nome antigo é alias. O motor legado (estratégia None, congelado pelo
 benchmark) continua com as chaves globais desligadas — é o motivo da opção B
 da auditoria de 2026-09-14 (não mudar o legado). Medido com as tolerâncias e a
 tentativa ligadas no legado (para registro, NÃO ativado): TGD V1 descoberto
@@ -10065,3 +10066,56 @@ orientação, overfit): `tests/test_secao77_papel_por_fiada.py`. Classificador: 
 vazados menores; forçar B34 na face dá 9 peças, 1 C09/fiada, desencontro 16 cm, 22 vazados. O B34
 do humano não emerge por princípio físico — ele preserva a grade de juntas da parede humana, que é
 outra. Fica o término normal.
+
+## 78. Tolerâncias FÍSICAS de fechamento não dependem do reforço de abertura (2026-09-23, IMPLEMENTADO, decisão do usuário — ciclo 1 pós-forense)
+
+**Evidência (comparação forense BUTANTÃ, SCRIPT × MCP × HUMANO, 34 eixos × 12 fiadas):**
+parede sem bloco — SCRIPT 18.726 cm, MCP 451 cm, HUMANO 2.371 cm. Reprodução offline do
+solver: com estratégia "Sem reforço" (None) o caminho legado deixava **224 trechos
+`NON_MODULAR`** inteiramente vazios (pilares entre janelas, trechos sob peitoril e sobre
+verga, bonecas, o pilar de 54 cm entre duas portas); com CHANNEL os mesmos trechos fechavam,
+porque só ali ligavam as tolerâncias físicas da §30.9. Um resíduo de 1–2 cm virava a parede
+inteira vazia, em silêncio.
+
+**REGRA OBRIGATÓRIA:** reforço de abertura (`opening_reinforcement_strategy`: None/CHANNEL/
+futuras) e **tolerância física de fechamento** são conceitos separados. A escolha do reforço
+controla verga, contraverga, canaletas e as regras próprias do fluxo CHANNEL (58.2, 68, 71,
+72, 74, 76, 76.1, 77). Ela **não** decide se a junta física pode absorver um resíduo, se um
+trecho fecha dentro da tolerância, se a jamba aceita o ajuste permitido, nem se um ruído
+geométrico transforma a parede em vazio.
+
+**Implementação:** `PHYSICAL_MODULATION_TOLERANCES_ENABLED = True` (`core/wall_modeling.py`)
+liga, em `_solve_building_blocks_all_courses_impl` (ponto único das duas portas de entrada,
+com restauração no `finally`), as duas tolerâncias já comprovadas pelo motor:
+- **30.8** `RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED` — trecho entre dois nós absorve resíduo
+  ≤ `RESIDUAL_NODE_BOUNDED_ABSORPTION_MAX_CM` (2,0 cm) recuando as peças das faces do nó;
+- **51.13** `JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED` — ruído ≤ `PIER_PHYSICAL_FIT_TOLERANCE_CM`
+  no trecho sólido entre jamba e âncora;
+ambas sempre sob a **tentativa com gates da 30.9** (`physical_tolerance_trial`: só ficam
+quando a parede fica fisicamente melhor, sem junta coincidente nova). Nenhuma tolerância
+nova foi criada; nenhuma outra flag saiu do gate CHANNEL. A tolerância da §48 (0,1 cm,
+invasão de abertura) é outra e continua intocada: as tolerâncias de fechamento nunca
+distribuem folga em jamba nem em ponta livre (30.8), e o laudo da regra 48 continua valendo
+sobre o resultado.
+
+**Ordem de tentativa por trecho:** (1) combinação modular; (2) fechamento com as tolerâncias
+físicas; (3) reparo/resíduo permitido pelas regras estruturais; (4) só então **trecho NÃO
+resolvido**.
+
+**Trecho NÃO resolvido (`NON_MODULAR_UNRESOLVED`):** o que não fecha nem com as tolerâncias
+não recebe bloco inventado nem geometria forçada, e nunca some: `result["unresolved_spans"]`
+(`_unresolved_spans`) registra `wall_id`, `wall_idx`, `course` (família) e `course_indices`
+(fiadas físicas), `start_cm`, `end_cm`, `length_cm`, `residual_cm`, `rule_id =
+NON_MODULAR_SPAN`, `reason`, `status`, `requires_human_review = true`. Aparece no log do solver
+(`UNRESOLVED wall_id=...`), na REVISÃO NECESSÁRIA e no relatório da UI ("Trechos NÃO
+resolvidos"), entra em `structurally_resolved = false` da criação e a parede de referência
+continua retida (`NON_MODULAR_SPANS`). É pendência localizada: não bloqueia a RUN.
+
+**Medido (reprodução offline, cenário do SCRIPT = 46 eixos, 280 cm, 14 fiadas, sem reforço):**
+trechos não modulares 224 → 96; parede sem bloco 18.935 → 9.577 cm; jambas sem peça 198 → 154;
+blocos 7.762 → 8.194. Com os 34 eixos do corpus humano: 78 → 0 trechos, 2.637 → 30 cm. Os 96
+restantes são induzidos pelos nós T das 12 paredes que HUMANO/MCP não constroem (pendência
+separada, D5). CHANNEL não muda (0 trechos, 451 cm, 96,8 % de coincidência com o MCP). §74
+(`T_ROOM_PHYSICAL_TOLERANCE`) foi medida e NÃO altera os trechos — ficou no gate CHANNEL.
+Testes: `tests/test_tolerancias_fisicas_gerais.py` (casos 1–8).
+

@@ -112,7 +112,14 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
                 nao_resolvidas))
         if not partes:
             partes.append("{} ocorrência(s) localizada(s) registradas".format(impossiveis))
+        trechos = len(unresolved_spans(result))
+        if trechos:
+            partes.append("{} trecho(s) NÃO resolvido(s) ficarão sem bloco — revisão humana obrigatória".format(trechos))
         return True, "Confira as quantidades e clique em Criar blocos no Revit. " + "; ".join(partes) + "."
+    trechos = len(unresolved_spans(result))
+    if trechos:
+        return True, ("Confira as quantidades e clique em Criar blocos no Revit. {} trecho(s) NÃO resolvido(s) "
+                      "ficarão sem bloco — revisão humana obrigatória.".format(trechos))
     return True, "Confira as quantidades e clique em Criar blocos no Revit."
 
 
@@ -135,6 +142,25 @@ def materialization_split(result):
     if not isinstance(plano, dict):
         return None, None
     return len(plano.get("skipped") or []), len(plano.get("unresolved_bonds") or [])
+
+
+def unresolved_spans(result, creation=None):
+    """Trechos NÃO resolvidos (seção 78): não fecham nem com as tolerâncias físicas."""
+    if creation is not None and creation.get("unresolved_spans") is not None:
+        return list(creation.get("unresolved_spans") or [])
+    return list((result or {}).get("unresolved_spans") or [])
+
+
+def span_text(span):
+    parede = ("Parede {}".format(span.get("wall_id")) if span.get("wall_id") is not None
+              else "Eixo {}".format(span.get("wall_idx")))
+    fiadas = span.get("course_indices") or []
+    fiadas_txt = ("fiadas {}-{}".format(min(fiadas), max(fiadas)) if fiadas else "fiada {}".format(span.get("course")))
+    residual = span.get("residual_cm")
+    return (u"Trecho NÃO resolvido ({}, {}): {:.1f} cm de {:.1f} a {:.1f} cm, resíduo {} — "
+            u"revisão humana obrigatória.".format(
+                parede, fiadas_txt, span.get("length_cm") or 0.0, span.get("start_cm") or 0.0, span.get("end_cm") or 0.0,
+                ("{:.1f} cm".format(residual) if isinstance(residual, (int, float)) else "—")))
 
 
 def unresolved_bonds(result, creation=None):
@@ -329,6 +355,9 @@ class ModulationUiState(object):
         lines.extend(["", "PAREDES NÃO MODULADAS"])
         retained = ((creation or {}).get("retained_walls") if (creation or {}).get("retained_walls") is not None
                     else result.get("unmodulated_walls")) or []
+        trechos = unresolved_spans(result, creation)
+        lines.append("Trechos NÃO resolvidos (sem bloco, revisão humana obrigatória): {}".format(len(trechos)))
+        lines.extend("  " + span_text(span) for span in trechos[:40])
         for i, w in enumerate(retained, 1):
             if w.get("reason") == "INCOMPLETE_CREATION":
                 lines.append("Parede retida {}: criação incompleta — {} de {} peça(s) não criada(s); "
@@ -412,6 +441,10 @@ def review_items(result, creation=None):
                 item.get("node_index"), item.get("course_index"), item.get("logical_code") or "?",
                 item.get("structural_role") or "", item.get("rejected_rule") or "invade abertura"),
         })
+    # Seção 78: trecho que não fecha nem com as tolerâncias físicas — nunca some.
+    for span in unresolved_spans(result, creation):
+        rows.append({"node": None, "course": span.get("course"), "wall_idx": span.get("wall_idx"),
+                     "text": span_text(span)})
     return rows
 
 

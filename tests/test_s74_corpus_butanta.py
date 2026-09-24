@@ -68,6 +68,14 @@ def _solve(rotulo, geo=None):
             cache[rotulo] = S.solve_on_fresh_context(alvo, False, regra76_d1=False,
                                                      regra76_nao_resolvido=False, **pre77)
         elif rotulo.startswith("legado_"):
+            # legado HISTORICO (anterior a secao 78): tolerancias fisicas de
+            # fechamento desligadas, como o motor que gravou o snapshot.
+            cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
+                                                     strategy=None, tolerancias_fisicas=False,
+                                                     **pre77)
+        elif rotulo.startswith("legado78_"):
+            # legado do PRODUTO (secao 78 ligada): so a invariante "a secao 74
+            # nao alcanca o legado" e medida aqui, nunca o sha historico.
             cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
                                                      strategy=None, **pre77)
         else:
@@ -427,6 +435,14 @@ def test_o_legado_e_identico_com_e_sem_a_flag_da_secao_74():
     assert len(vistos) == 1, "o legado mudou com a flag - a secao 74 vazou para fora do CHANNEL"
     principais = dict((c["label"], c["sha256"]) for c in SNAP["cases"])
     assert vistos.pop() not in principais.values(), "legado e CHANNEL nao podem coincidir"
+    # secao 78 (2026-09-23): o legado do PRODUTO tem as tolerancias fisicas de
+    # fechamento ligadas; a invariante continua - a flag da secao 74 nao o muda.
+    ctx_a, res_a = _solve("legado78_off")
+    ctx_b, res_b = _solve("legado78_on")
+    sha_a = S.snapshot_sha256(S.normalized_snapshot(ctx_a, res_a))
+    sha_b = S.snapshot_sha256(S.normalized_snapshot(ctx_b, res_b))
+    assert sha_a == sha_b, "a secao 74 vazou para o legado (secao 78 ligada)"
+    assert sha_a not in principais.values(), "legado (78) e CHANNEL nao podem coincidir"
 
 
 # ============ 11.1 secao 77: variante NOVA, sem sobrescrever o historico
