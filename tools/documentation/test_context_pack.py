@@ -273,7 +273,7 @@ class StateTests(Repository):
         self.assertIn('Ciclo 3 somente com autorizacao', [n['text'] for n in package['next_action']])
         self.assertIn('Decisoes E e F', [n['text'] for n in package['next_action']])
         self.assertEqual(state['official_prs'], [40])
-        self.assertEqual(package['context_status'], 'INSUFFICIENT_CONTEXT')
+        self.assertEqual(package['context_status'], 'STATE_ONLY')
 
     def test_ctx01_main_moved_and_old_start_here(self):
         self.write('docs/START_HERE.md', '# Start\n\n| Candidato em teste? | PR #40 ready for review, sem merge. '
@@ -447,10 +447,12 @@ class ReviewRegressionTests(Repository):
     def test_round2_state_phrases(self):
         for text in ('O PR #40 não é mais um candidato.', 'O PR #40 deixou de ser um candidato.', 'O PR #40 não está mais em draft.',
                      'O PR #40 era candidato e foi mesclado.', 'O PR #40 (ex-candidato) está na main.', 'PR #40 is no longer draft',
-                     'PR #40 not a draft', 'O PR #40 promovido de candidato a oficial.'):
+                     'PR #40 not a draft', 'O PR #40 promovido de candidato a oficial.', 'O PR #40 foi squash, não tem merge commit.',
+                     'O PR #40 não tem merge conflicts.'):
             self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
         for text in ('O PR #40 foi promovido a candidato.', 'PR #40 promovido para candidato', 'PR #40 nunca foi mesclado',
-                     'PR #40 not yet merged', 'PR #40 não tem merge'):
+                     'PR #40 not yet merged', 'PR #40 não tem merge', 'O PR #40 é mais um candidato à main.',
+                     'Mais um candidato: o PR #40.'):
             self.assertTrue(self.findings('# S\n\n' + text + '\n'), text)
 
     def test_inline_backticks_do_not_open_a_fence(self):
@@ -486,6 +488,20 @@ class ReviewRegressionTests(Repository):
         errors = ' | '.join(context.manifest_errors(self.root))
         for part in ('unmapped_rules', 'not mapped to any domain: 80', 'not mapped to any domain: 81'):
             self.assertIn(part, errors)
+
+    def long_checkpoint(self, path, date, variant):
+        self.checkpoint(path, date, ['sem falhas'])
+        with (self.root / path).open('a', encoding='utf-8') as handle:
+            handle.write(''.join('Linha de relato %d sobre a entrega, igual entre as copias.\n' % i for i in range(40)))
+            handle.write('Variante: ' + variant + '\n')
+
+    def test_copied_checkpoint_keeps_its_own_introduction(self):
+        self.long_checkpoint('docs/checkpoints/2026-09-20-a.md', '2026-09-20', 'a')
+        self.commit('a longo')
+        self.long_checkpoint('docs/checkpoints/2026-09-20-b.md', '2026-09-20', 'b')
+        self.commit('b copiado de a, depois')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.assertIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))
 
     def test_renamed_old_checkpoint_is_not_newer(self):
         self.checkpoint('docs/checkpoints/2026-09-20-b.md', '2026-09-20', [])

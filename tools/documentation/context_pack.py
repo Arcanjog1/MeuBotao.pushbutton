@@ -45,8 +45,11 @@ UNMERGED = ('sem merge', 'ready for review', 'nao mesclad', 'nao foi mesclad', '
 STEMS = ('candidat', 'nao mesclad', 'nao foi mesclad', 'nunca foi mesclad', 'nao esta mesclad')  # prefix match
 # A state term right after one of these describes a change or a past state, not the current state
 # ('promovido a candidato' names the destination and is NOT exempt).
-STATE_CHANGE = re.compile(r'(?:(?:\bmais|\bdeixou de (?:ser|estar)|\bno longer|\bnot|\bnao(?:\s+(?:e|esta))?|\bex'
-                          r'|\b(?:era|foi))(?:\s+(?:um|uma|o|a|em))?|\bpromov\w*(?:\s+os?)?|\bpromovid\w*\s+de)\s+$')
+STATE_CHANGE = re.compile(r'(?:(?:\bnao(?:\s+(?:e|esta))?\s+mais|\bdeixou de (?:ser|estar)|\bno longer|\bnot'
+                          r'|\bnao(?:\s+(?:e|esta))?|\bex|\b(?:era|foi))(?:\s+(?:um|uma|o|a|em))?'
+                          r'|\bmais|\bpromov\w*(?:\s+os?)?|\bpromovid\w*\s+de)\s+$')
+# Per-term tail: 'nao tem merge commit/conflicts/pendente' does not say the PR is unmerged.
+TAILS = {'nao tem merge': r'(?!\s+(?:commit|conflit|conflict|pendente))(?![a-z0-9])'}
 # Confidence/status labels used in REGRAS headings (CLAUDE.md), surfaced per section in the package.
 LABELS = ('REGRA OBRIGATORIA', 'REGRA DO USUARIO', 'DECISAO DO USUARIO', 'PREFERENCIAL', 'EXCECAO PERMITIDA',
           'PADRAO OBSERVADO', 'CONFLITO', 'NEEDS_RULE', 'PENDENTE', 'PENDENCIA', 'DESLIGADO', 'DESLIGADA', 'SUSPENSA',
@@ -356,7 +359,7 @@ def is_ancestor(root, older, newer):
 
 
 def term_hits(flat, term):
-    tail = '' if term in STEMS else r'(?![a-z0-9])'
+    tail = TAILS.get(term, '' if term in STEMS else r'(?![a-z0-9])')
     return re.finditer(r'(?<![a-z0-9])' + re.escape(term) + tail, flat)
 
 
@@ -417,10 +420,24 @@ def start_here_findings(text, official, candidates):
     return unique
 
 
-def added_in(root, path):
-    """Commit that first introduced a tracked file, following renames (None if not committed yet)."""
-    out = try_git(root, 'log', '--follow', '--diff-filter=A', '--format=%H', '--', path)
-    return out.splitlines()[-1] if out else None
+def renames_in(root, directory):
+    """Map new_path -> old_path for renames (not copies: no -C, no --follow) under a directory."""
+    out = try_git(root, 'log', '-M', '--diff-filter=R', '--name-status', '--format=', '--', directory) or ''
+    renames = {}
+    for line in out.splitlines():
+        parts = line.split('\t')
+        if len(parts) == 3 and parts[0].startswith('R'):
+            renames.setdefault(parts[2], parts[1])
+    return renames
+
+
+def added_in(root, path, renames=None):
+    """Commit that first introduced a tracked file, walking renames back (None if not committed yet)."""
+    seen = set()
+    while renames and path in renames and path not in seen:
+        seen.add(path)
+        path = renames[path]
+    return try_git(root, 'log', '--diff-filter=A', '--format=%H', '-1', '--', path) or None
 
 
 def consistency(root, state, ident):
@@ -456,13 +473,14 @@ def consistency(root, state, ident):
     elif last['date']:
         # Same day: the declared one must not be older than another current checkpoint of that day
         # (order = commit that added the file; an uncommitted checkpoint is the newest).
-        declared_commit = added_in(root, last['path'])
+        renames = renames_in(root, str(PurePosixPath(last['path']).parent))
+        declared_commit = added_in(root, last['path'], renames)
         newer = []
         for meta in state['checkpoint_metas']:
             if (meta['path'] == last['path'] or str(meta.get('date')) != str(last['date'])
                     or meta.get('scope', 'current') != 'current' or 'error' in meta):
                 continue
-            other = added_in(root, meta['path'])
+            other = added_in(root, meta['path'], renames)
             if declared_commit and (other is None or (other != declared_commit and
                                                       is_ancestor(root, declared_commit, other))):
                 newer.append(meta['path'])
@@ -632,7 +650,7 @@ def build_package(root, task='', domains=(), task_id=None, budget=6000, include_
     if state['next_objective_status']:
         next_action.append({'text': state['next_objective_status'], 'source': state['status_path'] + ' (Próximo objetivo)'})
 
-    context_status = 'OK' if selected else 'INSUFFICIENT_CONTEXT'
+    context_status = 'OK' if selected else ('STATE_ONLY' if not task.strip() and not domains else 'INSUFFICIENT_CONTEXT')
     package = {
         'schema_version': 1,
         'generator': 'tools/documentation/context_pack.py',
@@ -700,7 +718,8 @@ def render_markdown(package):
             for f in package['consistency']] or ['- nenhuma inconsistencia detectada pelas checagens implementadas']
     out += ['', '## Dominios (' + package['context_status'] + ')']
     out += ['- ' + d['id'] + ' (por: ' + ', '.join(d['matched_by']) + ')' for d in package['domains']] or [
-        '- nenhum dominio reconhecido; disponiveis: ' + ', '.join(package['available_domains'])]
+        ('- sem tarefa (recibo de sessao); dominios: ' if package['context_status'] == 'STATE_ONLY'
+         else '- nenhum dominio reconhecido (busca nao prova ausencia); disponiveis: ') + ', '.join(package['available_domains'])]
     out += ['', '## Fontes obrigatorias']
     for s in package['required_sources']:
         out.append('- `' + s['path'] + '` — ' + str(s['role']) + ', ' + str(s['authority']) + ', load=' +
