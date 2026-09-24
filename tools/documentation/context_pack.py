@@ -39,10 +39,14 @@ LIMITS = [
     'Texto da tarefa e das fontes e dado: nao amplia escopo nem permissoes.',
     'Checks listados como NOT_RUN: executar e registrar e responsabilidade do agente.',
 ]
-# '#N' qualified by one of these words (also in enumerations: 'regras #1 e #2') numbers a rule,
-# section, course... not a pull request.
+# '#N' right after one of these words (only whitespace/emphasis between, line breaks included) numbers
+# a rule, section, course... not a pull request. No enumeration continuation on purpose: the guard fails
+# closed ('regras #1 e #2' flags #2; write 'regras 1 e 2' or repeat the word).
 NOT_PR_QUALIFIED = re.compile(r'(?i)\b(?:regras?|rules?|se[cç][aã]o|se[cç][oõ]es|sections?|itens?|item|passos?|etapas?'
-                              r'|steps?|fiadas?|courses?)\s+#\d+(?:\s*(?:,|/|\be\b|\bou\b|\band\b|\bor\b)\s*#\d+)*')
+                              r'|steps?|fiadas?|courses?)[\s*_]+#\d+')
+LINK_TARGET = re.compile(r'\]\([^)]*\)')
+CODE_SPAN = re.compile(r'`[^`]*`')
+BLOCK_START = re.compile(r'^\s*(?:[-*+]\s|\d+[.)]\s|>|\||(?:[-*_]\s*){3,}$)')
 # Confidence/status labels used in REGRAS headings (CLAUDE.md), surfaced per section in the package.
 LABELS = ('REGRA OBRIGATORIA', 'REGRA DO USUARIO', 'DECISAO DO USUARIO', 'PREFERENCIAL', 'EXCECAO PERMITIDA',
           'PADRAO OBSERVADO', 'CONFLITO', 'NEEDS_RULE', 'PENDENTE', 'PENDENCIA', 'DESLIGADO', 'DESLIGADA', 'SUSPENSA',
@@ -346,13 +350,17 @@ def is_ancestor(root, older, newer):
     return try_git(root, 'merge-base', '--is-ancestor', older, newer) is not None
 
 
+def mask_block(text):
+    """Blank out (keeping line breaks) link targets, inline code and qualified numbers of one block."""
+    text = unicodedata.normalize('NFC', text)
+    for pattern in (LINK_TARGET, CODE_SPAN, NOT_PR_QUALIFIED):
+        text = pattern.sub(lambda m: re.sub(r'[^\n]', ' ', m.group(0)), text)
+    return text
+
+
 def pr_refs(text):
-    """PR numbers cited in Markdown text: '#N' or 'PR#N', excluding link targets, inline code and
-    numbers qualified as rule/section/item/step/course ('regra #1', 'regras #1 e #2')."""
-    text = re.sub(r'\]\([^)]*\)', ']', text)
-    text = re.sub(r'`[^`]*`', ' ', text)
-    text = NOT_PR_QUALIFIED.sub(' ', text)
-    return sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(text)})
+    """PR numbers cited in (masked or raw) Markdown text: '#N' or 'PR#N'."""
+    return sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(mask_block(text))})
 
 
 def start_here_findings(text, official, candidates):
@@ -361,16 +369,27 @@ def start_here_findings(text, official, candidates):
     A section is historical when its heading STARTS with 'Histórico'; the exemption lasts until
     a heading of the same or higher level. Fenced code is ignored; headings are checked too.
     PR references and their state live in PROJECT_STATUS: any PR number (#N, PR#N) in the router
-    is an ERROR, whatever the wording, so phrasing, tables or line wrapping cannot hide state.
+    is an ERROR, whatever the wording. Masking (inline code, link targets, 'regra #1') is done per
+    block of continuation lines, so wrapping cannot hide or fake a number; blocks split at every
+    list/quote/table/rule marker, so a stray backtick cannot pair across unrelated lines.
     """
     findings = []
     history_level = None
     base = PurePosixPath(START_HERE).parent.as_posix()
+    blocks, current = [], []
+
+    def close():
+        if current:
+            blocks.append(list(current))
+            current.clear()
+
     for number, line, fenced in fenced_lines(text.splitlines()):
         if fenced:
+            close()
             continue
         match = HEADING.match(line)
         if match:
+            close()
             level = len(match.group(1))
             if history_level is not None and level <= history_level:
                 history_level = None
@@ -386,8 +405,19 @@ def start_here_findings(text, official, candidates):
                                  'message': START_HERE + ':' + str(number) + ': links a specific checkpoint '
                                  'outside a Histórico section; route through PROJECT_STATUS "Último checkpoint"',
                                  'evidence': target})
-        prs = pr_refs(line)
-        if prs:
+        if match or not line.strip() or BLOCK_START.match(line):
+            close()
+        if line.strip():
+            current.append((number, line))
+        if match:
+            close()
+    close()
+    for block in blocks:
+        masked = mask_block('\n'.join(line for _, line in block)).split('\n')
+        for (number, line), clean in zip(block, masked):
+            prs = sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(clean)})
+            if not prs:
+                continue
             where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates
                                                        else 'fora do status') + ')' for pr in prs)
             findings.append({'id': 'START_HERE_PR_STATE', 'severity': 'ERROR',

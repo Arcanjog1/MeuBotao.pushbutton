@@ -443,7 +443,11 @@ class ReviewRegressionTests(Repository):
         for text in ('O PR #40 não está mais sem merge.', 'Módulos do #42 por domínio no manifesto.', 'O PR#40 foi mesclado.',
                      'Os PRs #33 e #35 estão abertos.', '| PR | Na main? |\n|---|---|\n| #40 | sim |',
                      'PRs já mesclados na main:\n- #40 (CHANNEL)\n- #41', 'O PR #40 implementa a regra\n51. Foi mesclado.',
-                     '- Próximo passo: #40 aguardando merge.', 'Ver item: #40 mesclado.', 'PR #31 draft.'):
+                     '- Próximo passo: #40 aguardando merge.', 'Ver item: #40 mesclado.', 'PR #31 draft.',
+                     'Rodar `python3 tools/documentation/context_pack.py\n   state` (ver PR #40, já mesclado) e depois `git status`.',
+                     '- Candidato: `claude/butanta-channel-reference-\n  implementation` do PR #40 `sem merge`.',
+                     'Concluída a etapa #3, #40 foi mesclado na main.', 'Ver regra #3 e #40 (já mesclado).',
+                     'As regras #1 e #2 seguem pendentes.', '- item um com `crase solta\n- item dois PR #40` fim'):
             findings = self.findings('# S\n\n' + text + '\n', (40, 41, 42, 33, 35))
             self.assertTrue(findings, text)
             self.assertTrue(all(f['id'] == 'START_HERE_PR_STATE' and f['severity'] == 'ERROR' for f in findings), text)
@@ -451,8 +455,9 @@ class ReviewRegressionTests(Repository):
 
     def test_rule_numbers_links_and_code_are_not_prs(self):
         for text in ('- Orientação do compensador (regra #3 da skill): o lado fechado fica voltado para a amarração.',
-                     'A regra #1 (alinhamento vertical) segue pendente de código.', 'As regras #1 e #2 seguem pendentes.',
-                     'Regras #1 e #3: DOCUMENTADO - pendência de código aberta.', 'Nas fiadas #1 e #2 a amarração oficial vale.',
+                     'A regra #1 (alinhamento vertical) segue pendente de código.', 'As regras 1 e 2 seguem pendentes.',
+                     'Regra #1 e regra #3: DOCUMENTADO - pendência de código aberta.', 'Orientação do compensador (regra\n#3 da skill).',
+                     'Vale a regra **#3** do compensador.', 'Sec\u0327a\u0303o #2 (texto em NFD).',
                      '- Seção 51 aprovada: [regra 51](../nuvem/REGRAS.md#51-channel).', 'Ver `git log #40` no terminal.',
                      'Na etapa #2 o fluxo segue.', '## Título sem numero', 'Parede W#80 citada no log.'):
             self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)

@@ -196,8 +196,8 @@ def validate(root, base, main, require_current_main=False):
                 continue
             require(relative in tracked and resolved.exists(), path + ': broken/untracked link: ' + target)
 
-    # Context manifest (paths, rule references, skill mirrors) and START_HERE as a router:
-    # no specific checkpoint and no PR described as unmerged when the status lists it as official.
+    # Context manifest (paths, rule references, skill mirrors, mandatory-rule coverage, debt index) and
+    # START_HERE as a router: no specific checkpoint and no PR number (#N/PR#N) outside Histórico.
     context = context_module()
     errors.extend(context.manifest_errors(root, tracked))
     start = root / context.START_HERE
