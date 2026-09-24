@@ -318,6 +318,45 @@
           "18.7"
         ]
       }
+    },
+    {
+      "id": "WALL-NEG",
+      "question": "Sobreposicao de faces nao e amarracao",
+      "task": "Corrigir o critério de sobreposição mínima entre faces paralelas na detecção de paredes",
+      "expect": {
+        "domains_include": [
+          "wall_modeling"
+        ],
+        "domains_exclude": [
+          "amarracao"
+        ]
+      }
+    },
+    {
+      "id": "UI-STEPPER",
+      "question": "Stepper da UI",
+      "task": "O stepper compacto de seis etapas não destaca a etapa atual",
+      "expect": {
+        "domains_include": [
+          "ui_revisao"
+        ],
+        "mandatory_rules_include": [
+          "UX-20260916"
+        ]
+      }
+    },
+    {
+      "id": "PRISMA-NEG",
+      "question": "Termo generico do projeto",
+      "task": "Na alvenaria estrutural nenhuma junta vertical pode ficar corrida entre fiadas",
+      "expect": {
+        "domains_include": [
+          "prisma_fiadas"
+        ],
+        "domains_exclude": [
+          "corpus_selecao"
+        ]
+      }
     }
   ]
 }

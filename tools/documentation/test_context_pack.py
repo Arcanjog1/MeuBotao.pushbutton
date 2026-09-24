@@ -444,6 +444,58 @@ class ReviewRegressionTests(Repository):
         self.assertEqual([], self.findings('# S\n\nO PR #31 unmerged.\n'), "'merged' inside 'unmerged'")
         self.assertTrue(self.findings('# S\n\nO PR #40 continua sem merge.\n'))
 
+    def test_round2_state_phrases(self):
+        for text in ('O PR #40 não é mais um candidato.', 'O PR #40 deixou de ser um candidato.', 'O PR #40 não está mais em draft.',
+                     'O PR #40 era candidato e foi mesclado.', 'O PR #40 (ex-candidato) está na main.', 'PR #40 is no longer draft',
+                     'PR #40 not a draft', 'O PR #40 promovido de candidato a oficial.'):
+            self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
+        for text in ('O PR #40 foi promovido a candidato.', 'PR #40 promovido para candidato', 'PR #40 nunca foi mesclado',
+                     'PR #40 not yet merged', 'PR #40 não tem merge'):
+            self.assertTrue(self.findings('# S\n\n' + text + '\n'), text)
+
+    def test_inline_backticks_do_not_open_a_fence(self):
+        text = '# S\n\n```bash``` e o shell padrao.\n\n[cp](checkpoints/x.md). PR #40 sem merge.\n'
+        self.assertEqual(2, len(self.findings(text)))
+
+    def test_negated_label_is_not_reported(self):
+        self.assertEqual(['PADRAO OBSERVADO', 'NAO CONFIRMADO'],
+                         context.labels_of('### 41.4 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — apoio lateral'))
+        self.assertIn('CONFIRMADO', context.labels_of('### 25.3 PADRAO OBSERVADO CONFIRMADO - o residuo'))
+
+    def test_related_default_part_matches_the_package(self):
+        text = RULES.replace('### 48.1 Consequencia', '### 48.1 REGRA OBRIGATÓRIA — consequencia')
+        self.write('nuvem/REGRAS.md', text)
+        self.manifest['domains'][1]['mandatory_rules'] = [{'number': '66.3', 'heading_contains': 'custo'}]
+        self.manifest['domains'][0]['related_rules'] = [{'number': '48'}]
+        self.commit('related without part')
+        errors = ' | '.join(context.manifest_errors(self.root))
+        self.assertIn('not mapped to any domain: 48.1', errors)
+        self.manifest['domains'][0]['related_rules'] = [{'number': '48', 'part': 'full'}]
+        self.commit('related full')
+        self.assertEqual([], context.manifest_errors(self.root))
+
+    def test_bare_heading_related_ref_needs_part(self):
+        self.manifest['domains'][0]['related_rules'] = [{'number': '66'}]
+        self.commit('bare heading')
+        self.assertTrue(any('resolves to a bare heading' in e for e in context.manifest_errors(self.root)))
+
+    def test_unmapped_rules_errors_do_not_hide_coverage(self):
+        self.write('nuvem/REGRAS.md', RULES + '\n## 80. REGRA OBRIGATÓRIA — a\n\nx\n\n## 81. REGRA DO USUÁRIO — b\n\ny\n')
+        self.manifest['unmapped_rules'] = [{'number': '999', 'reason': 'x'}]
+        self.commit('bad unmapped')
+        errors = ' | '.join(context.manifest_errors(self.root))
+        for part in ('unmapped_rules', 'not mapped to any domain: 80', 'not mapped to any domain: 81'):
+            self.assertIn(part, errors)
+
+    def test_renamed_old_checkpoint_is_not_newer(self):
+        self.checkpoint('docs/checkpoints/2026-09-20-b.md', '2026-09-20', [])
+        self.status('checkpoints/2026-09-20-b.md')
+        self.commit('b declared')
+        self.git('mv', 'docs/checkpoints/2026-09-20-a.md', 'docs/checkpoints/2026-09-20-a-renomeado.md')
+        self.git('commit', '-q', '-m', 'rename old one')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.assertNotIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))
+
     def test_checkpoint_link_with_fragment_or_encoding(self):
         self.status('checkpoints/2026-09-20-a.md#resumo')
         self.commit('fragment')

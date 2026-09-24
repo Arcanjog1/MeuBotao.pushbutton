@@ -712,8 +712,11 @@
         "NONE_FREE_END",
         "NONE_CONTINUOUS",
         "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
-        "colisão",
-        "sobreposição",
+        "colisão de amarração",
+        "colisão entre peças",
+        "sobreposição de volume",
+        "bloco dentro do volume",
+        "peças no mesmo volume",
         "POSITION_OVERLAP",
         "PIECE_COLLISION",
         "vazados menores"
@@ -976,22 +979,30 @@
           "number": "53"
         },
         {
-          "number": "60"
+          "number": "60",
+          "part": "full"
         },
         {
-          "number": "61"
+          "number": "61",
+          "part": "full"
         },
         {
-          "number": "62"
+          "number": "62",
+          "part": "full"
         },
         {
-          "number": "63"
+          "number": "63",
+          "part": "full"
         },
         {
-          "number": "64"
+          "number": "64",
+          "part": "full"
         },
         {
           "number": "65"
+        },
+        {
+          "number": "67"
         },
         {
           "number": "68"
@@ -1252,7 +1263,12 @@
           "number": "39.4"
         },
         {
-          "number": "64"
+          "number": "64",
+          "part": "full"
+        },
+        {
+          "number": "66",
+          "part": "full"
         },
         {
           "number": "68"
@@ -1688,10 +1704,12 @@
           "number": "57"
         },
         {
-          "number": "60"
+          "number": "60",
+          "part": "full"
         },
         {
-          "number": "62"
+          "number": "62",
+          "part": "full"
         },
         {
           "number": "70"
@@ -1835,7 +1853,8 @@
         "DETECTED_AXES",
         "SELECTED_AXES",
         "EXCLUDED_AXES",
-        "alvenaria estrutural"
+        "layer de referência estrutural",
+        "não alvenaria estrutural"
       ],
       "mandatory_rules": [
         {
@@ -1918,7 +1937,9 @@
         "deduplicate",
         "wall graph",
         "find_wall_pairs",
-        "merge_collinear_fragments"
+        "merge_collinear_fragments",
+        "faces paralelas",
+        "detecção de paredes"
       ],
       "mandatory_rules": [
         {
@@ -2157,7 +2178,9 @@
         "revisão antes da criação",
         "contrato de revisão",
         "prévia",
-        "stepper de etapas",
+        "stepper compacto",
+        "stepper de seis etapas",
+        "stepper da UI",
         "tema escuro",
         "relatório final",
         "WinForms",
