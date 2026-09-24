@@ -84,10 +84,10 @@ No Windows, trocar `python3` por `py -3`. `--output` nunca sobrescreve;
 
 | id | severidade | significado |
 |---|---|---|
-| `START_HERE_PR_STATE` | ERROR | START_HERE cita `#N` com vocabulário de estado (merge, mesclado, candidato, draft, na main, integrado, aprovado, pendente...) fora do "Histórico"; a mensagem diz se o status o lista como oficial ou candidato. Contrato simples de propósito: sem lógica de negação, frase nenhuma sobre estado de PR fica no roteador |
+| `START_HERE_PR_STATE` | ERROR | um bloco do START_HERE (parágrafo, item de lista, linha de tabela ou heading) cita PR `#N` junto com vocabulário de estado (lista fechada pt-BR/EN: merge, mesclado, candidato, draft, na main, integrado, aberto, aprovado, pendente, em revisão, aguardando, oficial...) fora do "Histórico"; a mensagem diz se o status o lista como oficial ou candidato. Sem lógica de negação, de propósito. Não contam como PR: `#N` após "regra/seção/item/passo/etapa/fiada", âncoras de link e código inline. A lista é fechada: palavra de estado fora dela não é detectada |
 | `START_HERE_CHECKPOINT_LINK` | ERROR | START_HERE aponta checkpoint específico fora de uma seção cujo título começa com "Histórico" (a isenção vale até o próximo heading de nível igual ou maior; blocos de código são ignorados) |
 | `STATUS_MAIN_BEHIND` / `STATUS_MAIN_DIVERGED` | WARN / ERROR | main observada no status ≠ `origin/main` buscada |
-| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status: data maior, ou mesma data com `head` avaliado descendente do `head` declarado (imune a renomear/copiar/restaurar arquivos) |
+| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status: data maior, ou mesma data com `head` avaliado estritamente descendente do `head` declarado (imune a renomear/copiar/restaurar arquivos). Limite: checkpoint do mesmo dia com o mesmo `head` (entrega só documental) não é detectado |
 | `STATUS_NO_LAST_CHECKPOINT`, `LAST_CHECKPOINT_UNREADABLE` | ERROR | status sem checkpoint resolvível |
 | `MAIN_UNKNOWN` | WARN | `origin/main` indisponível (rodar `git fetch origin main`) |
 

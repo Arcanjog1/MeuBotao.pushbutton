@@ -20,7 +20,7 @@ documentais; integração não transforma proposta em contrato aprovado.
 | Pergunta | Fonte |
 |---|---|
 | Estado atual, PRs oficiais/candidatos, última entrega? | [PROJECT_STATUS](PROJECT_STATUS.md): JSON `official`/`candidates`, linhas "Último checkpoint" e "Bloqueadores"; `context_pack.py state` |
-| Onde está o solver? | [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py) (integração e gate `_materialization_gate`), reforço CHANNEL em [opening_reinforcement.py](../nuvem/core/engine/opening_reinforcement.py) ([arquitetura](architecture/channel-strategy-implementation.md)); módulos do #42 por domínio no [manifesto](agents/CONTEXT_MANIFEST.json); Script.py é entrada/loader ([runtime canônico](RUNTIME_CANONICO.md)) |
+| Onde está o solver? | [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py) (integração e gate `_materialization_gate`), reforço CHANNEL em [opening_reinforcement.py](../nuvem/core/engine/opening_reinforcement.py) ([arquitetura](architecture/channel-strategy-implementation.md)); módulos do motor (arranjo, papel do encontro, apoio físico, microajuste) por domínio no [manifesto](agents/CONTEXT_MANIFEST.json); Script.py é entrada/loader ([runtime canônico](RUNTIME_CANONICO.md)) |
 | Quais regras valem? | [Índice](../rules/README.md), autoridade em [REGRAS](../nuvem/REGRAS_MODULACAO_BLOCOS.md), status por seção |
 | Que contexto carregar por domínio? | [Manifesto](agents/CONTEXT_MANIFEST.json) e [inventário de fontes](agents/SOURCE_INVENTORY.md) (navegação, não norma) |
 | Decisões do usuário? | [Registros PENDING](decisions/README.md) |
@@ -48,8 +48,9 @@ documentais; integração não transforma proposta em contrato aprovado.
   mantida pelo protocolo de memória técnica de 2026-09-24).
 - Este roteador não aponta checkpoint específico nem descreve estado de PR fora
   de uma seção cujo título comece com "Histórico". `validate.py` bloqueia link
-  para checkpoint específico e frase que cite `#N` com vocabulário de estado
-  (merge, mesclado, candidato, draft, na main, integrado...) fora dessa seção.
+  para checkpoint específico e bloco (parágrafo, item de lista, linha de tabela)
+  que cite PR `#N` com vocabulário de estado (merge, mesclado, candidato, draft,
+  na main, integrado, aberto, em revisão...) fora dessa seção.
 
 ## Busca por domínio e arquivos antigos
 

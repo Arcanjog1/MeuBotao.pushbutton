@@ -452,6 +452,27 @@ class ReviewRegressionTests(Repository):
         for text in ('Módulos do #42 por domínio no manifesto.', 'Ver o #36 para a consolidação.'):
             self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
 
+    def test_pr_state_is_checked_per_logical_block(self):
+        official = (40, 41, 49)
+        for text in ('- "Em teste?": PR #40\n  `claude/butanta-channel-reference-implementation` (estratégia CHANNEL,\n  regras 30.8/51), ready for review, sem merge.',
+                     'O PR #40 (CHANNEL, regra 51)\nfoi mesclado em `61d4f6c`.', '- Os PRs #39, #38 e #37\n  já estão na main.',
+                     '| PR | Estado |\n|---|---|\n| #40 | mesclado |', 'PR #40 (ver o status). Continua sem merge.'):
+            self.assertTrue(self.findings('# S\n\n' + text + '\n', official), text)
+
+    def test_rule_numbers_links_and_code_are_not_prs(self):
+        for text in ('- Orientação do compensador (regra #3 da skill): o lado fechado fica voltado para a amarração.',
+                     'A regra #1 (alinhamento vertical) segue pendente de código.',
+                     '- Seção 51 aprovada: [regra 51](../nuvem/REGRAS.md#51-channel).',
+                     'Ver `git log #40` no terminal; nada pendente.', 'Na etapa #2 o fluxo segue aberto.'):
+            self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
+
+    def test_state_vocabulary_covers_inflections_and_english(self):
+        for text in ('A PR #40 está aberta.', 'Os PRs #33 e #35 estão abertos.', 'PRs #33 e #35 pendentes.', 'PR #40 open.',
+                     'PR #40 closed.', 'PR #40 approved.', 'PR #40 pending.', 'PR #40 was integrated.', 'PR #40 em revisão.',
+                     'PR #40 under review.', 'PR #40 aguardando autorização do usuário.', 'O PR #40 é oficial.',
+                     'PR #40 foi para a main.', 'PR #31 rejeitado.', 'PR #40 revertido.'):
+            self.assertTrue(self.findings('# S\n\n' + text + '\n', (40, 33, 35)), text)
+
     def test_inline_backticks_do_not_open_a_fence(self):
         text = '# S\n\n```bash``` e o shell padrao.\n\n[cp](checkpoints/x.md). PR #40 sem merge.\n'
         self.assertEqual(2, len(self.findings(text)))

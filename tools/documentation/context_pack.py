@@ -41,8 +41,12 @@ LIMITS = [
 ]
 # Any PR-state vocabulary. The router must not describe PR state outside 'Histórico' at all (the
 # state lives in PROJECT_STATUS), so there is no negation/phrasing logic to get wrong.
-PR_STATE = re.compile(r'(?<![a-z0-9])(?:(?:un)?merg\w*|mescl\w*|candidat\w*|draft|ready for review|na main|in main|no go'
-                      r'|integrad\w*|aberto|fechad\w*|aprovad\w*|pendente)(?![a-z0-9])')
+PR_STATE = re.compile(r'(?<![a-z0-9])(?:(?:un)?merg\w*|mescl\w*|candidat\w*|draft|rascunho|ready for review|review\w*'
+                      r'|revisao|revisad\w*|aguard\w*|awaiting|na main|a main|in main|on main|to main|no go|integra\w*'
+                      r'|abert[oa]s?|open(?:ed)?|fechad\w*|closed|aprovad\w*|approved|pendentes?|pending|landed'
+                      r'|rejeitad\w*|rejected|revert\w*|oficia\w*|official)(?![a-z0-9])')
+# '#N' that is a rule/section/item number, or part of a word/path/anchor, is not a PR reference.
+NOT_PR_BEFORE = re.compile(r'(?:\b(?:regras?|rules?|secao|secoes|section|item|itens|passo|etapa|fiada)\s*)$')
 # Confidence/status labels used in REGRAS headings (CLAUDE.md), surfaced per section in the package.
 LABELS = ('REGRA OBRIGATORIA', 'REGRA DO USUARIO', 'DECISAO DO USUARIO', 'PREFERENCIAL', 'EXCECAO PERMITIDA',
           'PADRAO OBSERVADO', 'CONFLITO', 'NEEDS_RULE', 'PENDENTE', 'PENDENCIA', 'DESLIGADO', 'DESLIGADA', 'SUSPENSA',
@@ -58,7 +62,8 @@ HEADING = re.compile(r'^(#{1,6})\s+(.*?)\s*#*\s*$')
 NUMBER = re.compile(r'^(?:\*\*)?(\d+[a-z]?(?:\.\d+[a-z]?)*)\.?(?=[\s*`]|$)')
 LABEL = re.compile(r'^(?:\*\*)?([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)(?=[\s*`]|$)')
 LINK = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
-PR_REF = re.compile(r'#([1-9][0-9]{0,4})\b')
+PR_REF = re.compile(r'(?<![a-z0-9/.#])#([1-9][0-9]{0,4})\b')
+LIST_ITEM = re.compile(r'^\s*(?:[-*+]|\d+[.)])\s')
 
 
 def _sibling(name):
@@ -350,22 +355,41 @@ def is_ancestor(root, older, newer):
     return try_git(root, 'merge-base', '--is-ancestor', older, newer) is not None
 
 
+def pr_refs(text):
+    """PR numbers cited in a block of Markdown (links, inline code and rule/section numbers excluded)."""
+    text = re.sub(r'\]\([^)]*\)', ']', text)
+    text = re.sub(r'`[^`]*`', ' ', text)
+    flat = flatten_pr(text)
+    return flat, sorted({int(m.group(1)) for m in PR_REF.finditer(flat) if not NOT_PR_BEFORE.search(flat[:m.start()])})
+
+
 def start_here_findings(text, official, candidates):
     """Router checks: no specific checkpoint link and no PR state outside a 'Histórico' section.
 
     A section is historical when its heading STARTS with 'Histórico'; the exemption lasts until
-    a heading of the same or higher level. Fenced code is ignored; heading lines are checked too.
-    Any sentence naming a PR (#N) together with state vocabulary is an ERROR: the state belongs
-    in PROJECT_STATUS. The message says whether it also contradicts the status.
+    a heading of the same or higher level. Fenced code is ignored; headings are checked too.
+    The PR rule is evaluated per logical block (paragraph, list item, table row, heading), so a
+    sentence wrapped over several lines is one unit: any block citing a PR (#N) together with
+    state vocabulary is an ERROR, because the state belongs in PROJECT_STATUS.
     """
     findings = []
     history_level = None
     base = PurePosixPath(START_HERE).parent.as_posix()
+    blocks, current = [], None
+
+    def close():
+        nonlocal current
+        if current:
+            blocks.append(current)
+        current = None
+
     for number, line, fenced in fenced_lines(text.splitlines()):
         if fenced:
+            close()
             continue
         match = HEADING.match(line)
         if match:
+            close()
             level = len(match.group(1))
             if history_level is not None and level <= history_level:
                 history_level = None
@@ -381,17 +405,25 @@ def start_here_findings(text, official, candidates):
                                  'message': START_HERE + ':' + str(number) + ': links a specific checkpoint '
                                  'outside a Histórico section; route through PROJECT_STATUS "Último checkpoint"',
                                  'evidence': target})
-        for sentence in re.split(r' \| |\. |; ', line):
-            flat = flatten_pr(sentence)
-            prs = sorted({int(m.group(1)) for m in PR_REF.finditer(flat)})
-            if not prs or not PR_STATE.search(flat):
+        if match or not line.strip() or line.lstrip().startswith('|') or LIST_ITEM.match(line):
+            close()
+            if match or line.lstrip().startswith('|'):
+                blocks.append((number, line))
                 continue
-            where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates
-                                                       else 'fora do status') + ')' for pr in prs)
-            findings.append({'id': 'START_HERE_PR_STATE', 'severity': 'ERROR',
-                             'message': START_HERE + ':' + str(number) + ': PR state outside a Histórico section; '
-                             'state belongs in PROJECT_STATUS. Status: ' + where,
-                             'evidence': sentence.strip()[:200]})
+            if not line.strip():
+                continue
+        current = (current[0], current[1] + ' ' + line.strip()) if current else (number, line.strip())
+    close()
+    for number, block in blocks:
+        flat, prs = pr_refs(block)
+        if not prs or not PR_STATE.search(flat):
+            continue
+        where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates
+                                                   else 'fora do status') + ')' for pr in prs)
+        findings.append({'id': 'START_HERE_PR_STATE', 'severity': 'ERROR',
+                         'message': START_HERE + ':' + str(number) + ': PR state outside a Histórico section; '
+                         'state belongs in PROJECT_STATUS. Status: ' + where,
+                         'evidence': block.strip()[:200]})
     unique = []
     for item in findings:
         if item not in unique:
