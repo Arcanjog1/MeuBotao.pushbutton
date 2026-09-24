@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-24T16:18:03.002767+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "a82dc0b1cb1d71fa65e03e7067996fcce315f4f3",
+  "tree": "8770ca664752d3d10e1dd5f68acc5e4aa670c57b",
+  "status_before": "",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--ignore=tests/regression"
+  ],
+  "timeout_seconds": 3600,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-24-memoria-f1-suite-sem-regression.txt",
+  "pid": 26647,
+  "exit_code": 0,
+  "elapsed_seconds": 3044.062,
+  "status_after": "",
+  "log_sha256": "4eb2f17a047b11f7b2681c7544e0cc86e8bc1ebf43518f2e14130a91ce1d2e50",
+  "note": "capturado em scratchpad com capture_validation.py; copiado para este nome (so o campo log foi ajustado); log_sha256 inalterado"
+}
