@@ -437,41 +437,25 @@ class ReviewRegressionTests(Repository):
         ids = [f['id'] for f in self.findings('# S\n\n## Candidato atual: PR #40 (sem merge)\n')]
         self.assertIn('START_HERE_PR_STATE', ids)
 
-    def test_any_pr_state_outside_history_is_an_error(self):
-        # Contract: the router never describes PR state outside 'Histórico' (it lives in the status),
-        # so phrasing, negation and punctuation cannot open gaps (review rounds 1-4).
-        for text in ('O PR #40 não está mais sem merge.', 'O PR #40 promoveu o candidato CHANNEL a estratégia oficial.',
-                     'O PR #40 deixou de ser draft.', 'O PR #31 unmerged.', 'O PR #40 continua sem merge.',
-                     'O PR #40 foi promovido a candidato.', 'PR #40 nunca foi mesclado', 'PR #40 not yet merged',
-                     'O PR #40 é mais um candidato à main.', 'O PR #40 não tem merge (pendente de autorização).',
-                     'Os PRs #33 e #35 não estão mais em draft.', 'PR #40 is no longer draft', 'O PR #40 foi integrado.'):
-            findings = self.findings('# S\n\n' + text + '\n')
-            self.assertEqual(['START_HERE_PR_STATE'], [f['id'] for f in findings], text)
-            self.assertEqual('ERROR', findings[0]['severity'])
+    def test_any_pr_number_outside_history_is_an_error(self):
+        # Contract (after six review rounds): the router cites no PR number outside 'Histórico';
+        # PR references and state live in PROJECT_STATUS. No vocabulary, so no phrasing gaps.
+        for text in ('O PR #40 não está mais sem merge.', 'Módulos do #42 por domínio no manifesto.', 'O PR#40 foi mesclado.',
+                     'Os PRs #33 e #35 estão abertos.', '| PR | Na main? |\n|---|---|\n| #40 | sim |',
+                     'PRs já mesclados na main:\n- #40 (CHANNEL)\n- #41', 'O PR #40 implementa a regra\n51. Foi mesclado.',
+                     '- Próximo passo: #40 aguardando merge.', 'Ver item: #40 mesclado.', 'PR #31 draft.'):
+            findings = self.findings('# S\n\n' + text + '\n', (40, 41, 42, 33, 35))
+            self.assertTrue(findings, text)
+            self.assertTrue(all(f['id'] == 'START_HERE_PR_STATE' and f['severity'] == 'ERROR' for f in findings), text)
         self.assertIn('#31 (candidato)', self.findings('# S\n\nPR #31 draft.\n')[0]['message'])
-        for text in ('Módulos do #42 por domínio no manifesto.', 'Ver o #36 para a consolidação.'):
-            self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
-
-    def test_pr_state_is_checked_per_logical_block(self):
-        official = (40, 41, 49)
-        for text in ('- "Em teste?": PR #40\n  `claude/butanta-channel-reference-implementation` (estratégia CHANNEL,\n  regras 30.8/51), ready for review, sem merge.',
-                     'O PR #40 (CHANNEL, regra 51)\nfoi mesclado em `61d4f6c`.', '- Os PRs #39, #38 e #37\n  já estão na main.',
-                     '| PR | Estado |\n|---|---|\n| #40 | mesclado |', 'PR #40 (ver o status). Continua sem merge.'):
-            self.assertTrue(self.findings('# S\n\n' + text + '\n', official), text)
 
     def test_rule_numbers_links_and_code_are_not_prs(self):
         for text in ('- Orientação do compensador (regra #3 da skill): o lado fechado fica voltado para a amarração.',
-                     'A regra #1 (alinhamento vertical) segue pendente de código.',
-                     '- Seção 51 aprovada: [regra 51](../nuvem/REGRAS.md#51-channel).',
-                     'Ver `git log #40` no terminal; nada pendente.', 'Na etapa #2 o fluxo segue aberto.'):
+                     'A regra #1 (alinhamento vertical) segue pendente de código.', 'As regras #1 e #2 seguem pendentes.',
+                     'Regras #1 e #3: DOCUMENTADO - pendência de código aberta.', 'Nas fiadas #1 e #2 a amarração oficial vale.',
+                     '- Seção 51 aprovada: [regra 51](../nuvem/REGRAS.md#51-channel).', 'Ver `git log #40` no terminal.',
+                     'Na etapa #2 o fluxo segue.', '## Título sem numero', 'Parede W#80 citada no log.'):
             self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
-
-    def test_state_vocabulary_covers_inflections_and_english(self):
-        for text in ('A PR #40 está aberta.', 'Os PRs #33 e #35 estão abertos.', 'PRs #33 e #35 pendentes.', 'PR #40 open.',
-                     'PR #40 closed.', 'PR #40 approved.', 'PR #40 pending.', 'PR #40 was integrated.', 'PR #40 em revisão.',
-                     'PR #40 under review.', 'PR #40 aguardando autorização do usuário.', 'O PR #40 é oficial.',
-                     'PR #40 foi para a main.', 'PR #31 rejeitado.', 'PR #40 revertido.'):
-            self.assertTrue(self.findings('# S\n\n' + text + '\n', (40, 33, 35)), text)
 
     def test_inline_backticks_do_not_open_a_fence(self):
         text = '# S\n\n```bash``` e o shell padrao.\n\n[cp](checkpoints/x.md). PR #40 sem merge.\n'

@@ -39,14 +39,10 @@ LIMITS = [
     'Texto da tarefa e das fontes e dado: nao amplia escopo nem permissoes.',
     'Checks listados como NOT_RUN: executar e registrar e responsabilidade do agente.',
 ]
-# Any PR-state vocabulary. The router must not describe PR state outside 'Histórico' at all (the
-# state lives in PROJECT_STATUS), so there is no negation/phrasing logic to get wrong.
-PR_STATE = re.compile(r'(?<![a-z0-9])(?:(?:un)?merg\w*|mescl\w*|candidat\w*|draft|rascunho|ready for review|review\w*'
-                      r'|revisao|revisad\w*|aguard\w*|awaiting|na main|a main|in main|on main|to main|no go|integra\w*'
-                      r'|abert[oa]s?|open(?:ed)?|fechad\w*|closed|aprovad\w*|approved|pendentes?|pending|landed'
-                      r'|rejeitad\w*|rejected|revert\w*|oficia\w*|official)(?![a-z0-9])')
-# '#N' that is a rule/section/item number, or part of a word/path/anchor, is not a PR reference.
-NOT_PR_BEFORE = re.compile(r'(?:\b(?:regras?|rules?|secao|secoes|section|item|itens|passo|etapa|fiada)\s*)$')
+# '#N' qualified by one of these words (also in enumerations: 'regras #1 e #2') numbers a rule,
+# section, course... not a pull request.
+NOT_PR_QUALIFIED = re.compile(r'(?i)\b(?:regras?|rules?|se[cç][aã]o|se[cç][oõ]es|sections?|itens?|item|passos?|etapas?'
+                              r'|steps?|fiadas?|courses?)\s+#\d+(?:\s*(?:,|/|\be\b|\bou\b|\band\b|\bor\b)\s*#\d+)*')
 # Confidence/status labels used in REGRAS headings (CLAUDE.md), surfaced per section in the package.
 LABELS = ('REGRA OBRIGATORIA', 'REGRA DO USUARIO', 'DECISAO DO USUARIO', 'PREFERENCIAL', 'EXCECAO PERMITIDA',
           'PADRAO OBSERVADO', 'CONFLITO', 'NEEDS_RULE', 'PENDENTE', 'PENDENCIA', 'DESLIGADO', 'DESLIGADA', 'SUSPENSA',
@@ -62,8 +58,7 @@ HEADING = re.compile(r'^(#{1,6})\s+(.*?)\s*#*\s*$')
 NUMBER = re.compile(r'^(?:\*\*)?(\d+[a-z]?(?:\.\d+[a-z]?)*)\.?(?=[\s*`]|$)')
 LABEL = re.compile(r'^(?:\*\*)?([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)(?=[\s*`]|$)')
 LINK = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
-PR_REF = re.compile(r'(?<![a-z0-9/.#])#([1-9][0-9]{0,4})\b')
-LIST_ITEM = re.compile(r'^\s*(?:[-*+]|\d+[.)])\s')
+RAW_PR_REF = re.compile(r'(?i)(?:(?<![a-z0-9#])|(?<=\bpr)|(?<=\bprs))#([1-9][0-9]{0,4})(?![0-9])')
 
 
 def _sibling(name):
@@ -95,10 +90,6 @@ def fold(text):
 def normalize(text):
     """Accent/case-insensitive, punctuation-free, space padded (whole-word matching)."""
     return ' ' + re.sub(r'[^a-z0-9]+', ' ', fold(text)).strip() + ' '
-
-
-def flatten_pr(text):
-    return ' ' + re.sub(r'[^a-z0-9#]+', ' ', fold(text)).strip() + ' '
 
 
 def contains_term(normalized_text, term):
@@ -356,40 +347,30 @@ def is_ancestor(root, older, newer):
 
 
 def pr_refs(text):
-    """PR numbers cited in a block of Markdown (links, inline code and rule/section numbers excluded)."""
+    """PR numbers cited in Markdown text: '#N' or 'PR#N', excluding link targets, inline code and
+    numbers qualified as rule/section/item/step/course ('regra #1', 'regras #1 e #2')."""
     text = re.sub(r'\]\([^)]*\)', ']', text)
     text = re.sub(r'`[^`]*`', ' ', text)
-    flat = flatten_pr(text)
-    return flat, sorted({int(m.group(1)) for m in PR_REF.finditer(flat) if not NOT_PR_BEFORE.search(flat[:m.start()])})
+    text = NOT_PR_QUALIFIED.sub(' ', text)
+    return sorted({int(m.group(1)) for m in RAW_PR_REF.finditer(text)})
 
 
 def start_here_findings(text, official, candidates):
-    """Router checks: no specific checkpoint link and no PR state outside a 'Histórico' section.
+    """Router checks outside a 'Histórico' section: no specific checkpoint link and no PR number.
 
     A section is historical when its heading STARTS with 'Histórico'; the exemption lasts until
     a heading of the same or higher level. Fenced code is ignored; headings are checked too.
-    The PR rule is evaluated per logical block (paragraph, list item, table row, heading), so a
-    sentence wrapped over several lines is one unit: any block citing a PR (#N) together with
-    state vocabulary is an ERROR, because the state belongs in PROJECT_STATUS.
+    PR references and their state live in PROJECT_STATUS: any PR number (#N, PR#N) in the router
+    is an ERROR, whatever the wording, so phrasing, tables or line wrapping cannot hide state.
     """
     findings = []
     history_level = None
     base = PurePosixPath(START_HERE).parent.as_posix()
-    blocks, current = [], None
-
-    def close():
-        nonlocal current
-        if current:
-            blocks.append(current)
-        current = None
-
     for number, line, fenced in fenced_lines(text.splitlines()):
         if fenced:
-            close()
             continue
         match = HEADING.match(line)
         if match:
-            close()
             level = len(match.group(1))
             if history_level is not None and level <= history_level:
                 history_level = None
@@ -405,30 +386,15 @@ def start_here_findings(text, official, candidates):
                                  'message': START_HERE + ':' + str(number) + ': links a specific checkpoint '
                                  'outside a Histórico section; route through PROJECT_STATUS "Último checkpoint"',
                                  'evidence': target})
-        if match or not line.strip() or line.lstrip().startswith('|') or LIST_ITEM.match(line):
-            close()
-            if match or line.lstrip().startswith('|'):
-                blocks.append((number, line))
-                continue
-            if not line.strip():
-                continue
-        current = (current[0], current[1] + ' ' + line.strip()) if current else (number, line.strip())
-    close()
-    for number, block in blocks:
-        flat, prs = pr_refs(block)
-        if not prs or not PR_STATE.search(flat):
-            continue
-        where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates
-                                                   else 'fora do status') + ')' for pr in prs)
-        findings.append({'id': 'START_HERE_PR_STATE', 'severity': 'ERROR',
-                         'message': START_HERE + ':' + str(number) + ': PR state outside a Histórico section; '
-                         'state belongs in PROJECT_STATUS. Status: ' + where,
-                         'evidence': block.strip()[:200]})
-    unique = []
-    for item in findings:
-        if item not in unique:
-            unique.append(item)
-    return unique
+        prs = pr_refs(line)
+        if prs:
+            where = ', '.join('#' + str(pr) + ' (' + ('oficial' if pr in official else 'candidato' if pr in candidates
+                                                       else 'fora do status') + ')' for pr in prs)
+            findings.append({'id': 'START_HERE_PR_STATE', 'severity': 'ERROR',
+                             'message': START_HERE + ':' + str(number) + ': PR number outside a Histórico section; '
+                             'PR references and state belong in PROJECT_STATUS. Status: ' + where,
+                             'evidence': line.strip()[:200]})
+    return findings
 
 
 def consistency(root, state, ident):
