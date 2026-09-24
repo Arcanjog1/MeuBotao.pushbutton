@@ -10847,6 +10847,160 @@ SETUP_THICKNESS_SCAN_MAX_LINES = 900
 
 REFERENCE_LAYER_NONE_LABEL = "(nenhum - usar so o layer das paredes)"
 
+# SECAO 49.1 (2026-09-24, ciclo 2 / D5): CORPUS DA RUN. Toda execucao registra
+# quantos eixos foram DETECTADOS, quantos foram SELECIONADOS para o solver e
+# quais foram EXCLUIDOS - com motivo, regra, layer de origem e resumo
+# geometrico de cada exclusao. Sem isso dois resultados nao sao comparaveis
+# (BUTANTA: 46 eixos num lote, 34 no outro, e ninguem sabia). A unica regra
+# de exclusao que existe e' a da secao 49 (cobertura pelo layer de referencia
+# estrutural); sem layer escolhido nada e' excluido e o registro diz isso.
+CORPUS_RULE_REFERENCE_LAYER = "REGRA_49_REFERENCE_LAYER_COVERAGE"
+CORPUS_RULE_NONE = "NONE"
+
+
+def _axis_geometry_summary(entry, coverage=None, min_coverage=None):
+    """Resumo geometrico de um eixo (cm, plano do nivel) para o registro do
+    corpus: comprimento, pontas, espessura e - quando medida - a cobertura."""
+    line, thickness_ft = entry[0], entry[1]
+    p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+    summary = {
+        "length_cm": round(_ft_to_cm(line.Length), 1),
+        "p0_cm": [round(_ft_to_cm(p0.X), 1), round(_ft_to_cm(p0.Y), 1)],
+        "p1_cm": [round(_ft_to_cm(p1.X), 1), round(_ft_to_cm(p1.Y), 1)],
+        "width_cm": round(_ft_to_cm(thickness_ft), 1),
+    }
+    if coverage is not None:
+        summary["coverage"] = round(float(coverage), 3)
+    if min_coverage is not None:
+        summary["min_coverage"] = float(min_coverage)
+    return summary
+
+
+def corpus_selection_record(mode, detected_axes, selected_axes, excluded, reference_layer=None,
+                            rule_id=None, trimmed=None, min_coverage=None):
+    """Registro do corpus da RUN (secao 49.1). `excluded` = lista de dicts
+    {axis_index, axis_key, wall_id, reason, rule_id, source_layer,
+    geometry_summary}. Somente leitura para quem consome (relatorio, UI)."""
+    excluded = list(excluded or [])
+    return {
+        "mode": mode,
+        "rule_id": rule_id or (CORPUS_RULE_REFERENCE_LAYER if excluded or reference_layer else CORPUS_RULE_NONE),
+        "reference_layer": reference_layer,
+        "min_coverage": (float(min_coverage) if min_coverage is not None
+                         else float(REFERENCE_LAYER_MIN_COVERAGE)),
+        "detected_axes": int(detected_axes),
+        "selected_axes": int(selected_axes),
+        "excluded_axes": len(excluded),
+        "excluded": excluded,
+        "trimmed": list(trimmed or []),
+    }
+
+
+def _wall_id_int(wall_id):
+    """ElementId -> int; um int (bancada/testes) passa direto; None fica None."""
+    if wall_id is None or isinstance(wall_id, int):
+        return wall_id
+    try:
+        return _eid_int(wall_id)
+    except Exception:
+        return None
+
+
+def select_existing_axes_by_reference_layer(walls_to_create, created_walls_by_axis, wall_ids,
+                                            reference_lines, source_layer, axis_keys=None,
+                                            min_coverage=None):
+    """SECAO 49 no fluxo de PAREDES EXISTENTES (secao 49.1): classifica cada
+    eixo pela cobertura geometrica das linhas do layer de referencia
+    estrutural (mesma funcao e mesmo limiar do fluxo CAD -> Walls), SEM
+    aparar (a Wall e' do usuario). Eixo com cobertura < limiar e' EXCLUIDO
+    do corpus ANTES do solver; os demais seguem intactos.
+
+    Devolve (walls_to_create, created_walls_by_axis, wall_ids, corpus): as
+    tres colecoes reindexadas 0..n-1 na ordem original e o registro do
+    corpus (corpus_selection_record). Sem `reference_lines` devolve a entrada
+    intacta e um registro sem exclusao (nunca se descarta no escuro). Nada
+    e' inferido por ID, nome, posicao ou contagem."""
+    walls_to_create = list(walls_to_create or [])
+    wall_ids = list(wall_ids or [])
+    detected = len(walls_to_create)
+    keys = list(axis_keys or [])
+    while len(keys) < detected:
+        keys.append("axis#{}".format(len(keys)))
+    if min_coverage is None:
+        min_coverage = REFERENCE_LAYER_MIN_COVERAGE
+    if not reference_lines:
+        corpus = corpus_selection_record("paredes existentes", detected, detected, [],
+                                         reference_layer=None, rule_id=CORPUS_RULE_NONE,
+                                         min_coverage=min_coverage)
+        return walls_to_create, dict(created_walls_by_axis or {}), wall_ids, corpus
+    _kept, report = clip_axes_to_reference_lines(walls_to_create, reference_lines,
+                                                 min_coverage=min_coverage, trim=False)
+    coverage = dict(report.get("coverage") or [])
+    dropped = dict((item["index"], item) for item in report.get("dropped") or [])
+    new_walls, new_by_axis, new_ids, excluded = [], {}, [], []
+    for idx, entry in enumerate(walls_to_create):
+        wall_id = wall_ids[idx] if idx < len(wall_ids) else None
+        if idx in dropped:
+            cov = dropped[idx]["coverage"]
+            excluded.append({
+                "axis_index": idx,
+                "axis_key": keys[idx],
+                "wall_id": _wall_id_int(wall_id),
+                "reason": ("cobertura {:.0f}% pelo layer de referencia estrutural '{}' < {:.0f}%: "
+                           "o eixo nao e' alvenaria estrutural (secao 49)".format(
+                               cov * 100.0, source_layer, min_coverage * 100.0)),
+                "rule_id": CORPUS_RULE_REFERENCE_LAYER,
+                "source_layer": source_layer,
+                "geometry_summary": _axis_geometry_summary(entry, cov, min_coverage),
+            })
+            continue
+        new_idx = len(new_walls)
+        new_walls.append(entry)
+        new_by_axis[new_idx] = list((created_walls_by_axis or {}).get(idx) or [])
+        if wall_id is not None or idx < len(wall_ids):
+            new_ids.append(wall_id)
+    corpus = corpus_selection_record("paredes existentes", detected, len(new_walls), excluded,
+                                     reference_layer=source_layer, rule_id=CORPUS_RULE_REFERENCE_LAYER,
+                                     min_coverage=min_coverage)
+    corpus["coverage"] = [(idx, round(float(c), 3)) for idx, c in sorted(coverage.items())]
+    return new_walls, new_by_axis, new_ids, corpus
+
+
+def _corpus_report_lines(corpus):
+    """Linhas do relatorio do solver para o corpus da RUN (secao 49.1)."""
+    if not corpus:
+        return ["CORPUS DA RUN: nao registrado (execucao anterior a' secao 49.1)."]
+    lines = ["CORPUS DA RUN: DETECTED_AXES={} SELECTED_AXES={} EXCLUDED_AXES={} regra={} layer={}".format(
+        corpus.get("detected_axes"), corpus.get("selected_axes"), corpus.get("excluded_axes"),
+        corpus.get("rule_id"), corpus.get("reference_layer") or "-")]
+    for item in corpus.get("excluded") or []:
+        geo = item.get("geometry_summary") or {}
+        lines.append("  EXCLUDED axis_key={} wall_id={} reason={} rule_id={} source_layer={} "
+                     "length={} coverage={}".format(
+                         item.get("axis_key"), item.get("wall_id"), item.get("reason"),
+                         item.get("rule_id"), item.get("source_layer"), geo.get("length_cm"),
+                         geo.get("coverage")))
+    for item in corpus.get("trimmed") or []:
+        lines.append("  TRIMMED axis_index={} length={} -> {}".format(
+            item.get("index"), item.get("length_cm"), item.get("new_length_cm")))
+    return lines
+
+
+def _wall_axis_key(wall_id):
+    """Chave estavel do eixo de uma Wall existente (UniqueId); cai para o
+    ElementId quando o documento nao devolve o elemento."""
+    try:
+        element = doc.GetElement(wall_id)
+        key = getattr(element, "UniqueId", None)
+        if key:
+            return str(key)
+    except Exception:
+        pass
+    try:
+        return "wall#{}".format(_eid_int(wall_id))
+    except Exception:
+        return "wall#?"
+
 # ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14). (valor salvo, rotulo,
 # implementada). "NONE" = modulacao legada sem reforco e e' o DEFAULT
 # (auditoria independente 2026-09-14): CHANNEL so' com escolha EXPLICITA do
@@ -11372,7 +11526,8 @@ def _remember_existing_flow_defaults(setup):
         with open(_existing_flow_defaults_path(), "w") as handle:
             json.dump({"opening_reinforcement": (setup or {}).get("opening_reinforcement"),
                        "level": (setup or {}).get("level"),
-                       "height_m": (setup or {}).get("height_m")}, handle)
+                       "height_m": (setup or {}).get("height_m"),
+                       "reference_layer": (setup or {}).get("reference_layer")}, handle)
     except Exception:
         pass
 
@@ -11812,6 +11967,7 @@ def _format_block_solve_report(result, catalog):
     lines = []
     lines.append("=== Solver de blocos ===")
     lines.append(runtime_provenance_line())
+    lines.extend(_corpus_report_lines(result.get("corpus_selection")))
     lines.append("Total de candidatos (1 par de fiadas A/B): {}".format(len(candidates)))
     beta = result.get("beta_preflight")
     if beta is not None:
@@ -12762,6 +12918,9 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 opening_reinforcement_policy=self.opening_reinforcement_policy,
             )
         self.solve_result["num_courses"] = num_courses
+        # SECAO 49.1: o corpus da RUN (detectados/selecionados/excluidos) viaja
+        # com o resultado - dois resultados so' sao comparaveis sabendo isto.
+        self.solve_result["corpus_selection"] = (getattr(self, "setup", None) or {}).get("corpus_selection")
         # SECAO 78: o trecho NAO resolvido leva o ElementId da parede de referencia
         for _span in self.solve_result.get("unresolved_spans") or []:
             _entries = (self.created_walls_by_axis or {}).get(_span.get("wall_idx")) or []
@@ -15619,6 +15778,64 @@ def run_modulation_on_existing_walls(preselected=None):
     if reinforcement_choice is None:
         return
     execution_strategy = _opening_reinforcement_strategy_from_ui_value(reinforcement_choice)
+
+    # SECAO 49.1 (2026-09-24): layer de referencia estrutural TAMBEM neste fluxo
+    # (opcional, explicito): o usuario pode apontar um import de CAD e o layer
+    # com as faces da alvenaria estrutural; cada eixo selecionado e' entao
+    # classificado pela cobertura (secao 49) e o que nao e' alvenaria fica FORA
+    # do corpus antes do solver - sem aparar. Sem escolha, nada muda e o
+    # registro do corpus diz "detectados = selecionados".
+    detected_axes = len(walls_to_create)
+    axis_keys = [_wall_axis_key(wid) for wid in wall_ids]
+    reference_layer = None
+    reference_lines = []
+    reference_prompt = getattr(_ui, "reference_layer_prompt", None)
+    reference_choice = reference_prompt(_recall_existing_flow_defaults()) if reference_prompt else "none"
+    if reference_choice is None:
+        return
+    if reference_choice == "pick":
+        try:
+            cad_ref = revit.pick_element("Selecione a importacao do CAD que tem as faces da alvenaria estrutural")
+        except Exception:
+            cad_ref = None
+        if cad_ref is None:
+            output.print_md("**Layer de referencia estrutural:** nenhum import selecionado - "
+                            "todas as paredes selecionadas seguem para a modulacao.")
+        else:
+            ref_options = Options()
+            ref_options.IncludeNonVisibleObjects = True
+            ref_geometry = cad_ref.get_Geometry(ref_options)
+            ref_lines_by_layer = {}
+            if ref_geometry is not None:
+                extract_lines_by_layer(ref_geometry, ref_lines_by_layer)
+            ordered = sorted(ref_lines_by_layer.keys(), key=lambda name: (-len(ref_lines_by_layer[name]), name))
+            labels = ["{} ({} linhas)".format(name, len(ref_lines_by_layer[name])) for name in ordered]
+            chosen = forms.SelectFromList.show(
+                labels, title="Layer de referencia estrutural (faces da alvenaria)",
+                button_name="Usar este layer", multiselect=False) if labels else None
+            if chosen:
+                reference_layer = ordered[labels.index(chosen)]
+                reference_lines = ref_lines_by_layer.get(reference_layer) or []
+            else:
+                output.print_md("**Layer de referencia estrutural:** nenhum layer escolhido - "
+                                "todas as paredes selecionadas seguem para a modulacao.")
+    walls_to_create, created_walls_by_axis, wall_ids, corpus_selection = select_existing_axes_by_reference_layer(
+        walls_to_create, created_walls_by_axis, wall_ids, reference_lines, reference_layer, axis_keys)
+    if reference_layer:
+        output.print_md(
+            "**Layer de referencia estrutural '{}'** (secao 49, sem aparar): {} eixo(s) detectados, "
+            "{} selecionado(s), {} excluido(s) por cobertura < {:.0f}%.".format(
+                reference_layer, corpus_selection["detected_axes"], corpus_selection["selected_axes"],
+                corpus_selection["excluded_axes"], REFERENCE_LAYER_MIN_COVERAGE * 100.0))
+        for item in corpus_selection["excluded"]:
+            output.print_md("- excluido: parede {} ({}), {} cm, cobertura {:.0f}%".format(
+                item["wall_id"], item["axis_key"], item["geometry_summary"]["length_cm"],
+                item["geometry_summary"]["coverage"] * 100.0))
+    if not walls_to_create:
+        forms.alert("Nenhuma parede selecionada e' alvenaria estrutural pelo layer de referencia '{}' - "
+                    "nada a modular.".format(reference_layer), exitscript=True)
+        return
+
     # Configuracao desta execucao: no fluxo de paredes existentes nivel e altura
     # vem das proprias paredes, e a escolha do usuario e' a estrategia. Fica
     # guardada (para a UI re-renderizar) e lembrada (para a proxima execucao).
@@ -15627,8 +15844,11 @@ def run_modulation_on_existing_walls(preselected=None):
         "level": selected_level.Name,
         "height_m": wall_height_ft / FEET_PER_METER,
         "walls": len(walls_to_create),
+        "detected_axes": detected_axes,
         "openings_mode": "auto",
         "opening_reinforcement": reinforcement_choice,
+        "reference_layer": reference_layer,
+        "corpus_selection": corpus_selection,
         "thicknesses_cm": sorted(set(round(_ft_to_cm(w[1]), 1) for w in walls_to_create)),
     }
     _remember_existing_flow_defaults(run_setup)
@@ -17698,6 +17918,7 @@ def main():
     # posicao. Sem layer escolhido (ou sem linhas nele) nada muda.
     reference_layer = setup.get("reference_layer")
     reference_report = None
+    detected_axes_cad = len(walls_to_create)
     if reference_layer and cad_lines_by_layer.get(reference_layer):
         before_ref = len(walls_to_create)
         walls_to_create, reference_report = clip_axes_to_reference_lines(
@@ -17718,6 +17939,23 @@ def main():
         for item in reference_report["trimmed"]:
             output.print_md("- aparado: eixo #{} de {:.0f} cm -> {:.0f} cm".format(
                 item["index"], item["length_cm"], item["new_length_cm"]))
+    # SECAO 49.1: corpus da RUN tambem no fluxo CAD -> Walls
+    if reference_report is not None:
+        _excluded_cad = [{
+            "axis_index": item["index"], "axis_key": "cad#{}".format(item["index"]), "wall_id": None,
+            "reason": ("cobertura {:.0f}% pelo layer de referencia estrutural '{}' < {:.0f}%: "
+                       "o eixo nao e' alvenaria estrutural (secao 49)".format(
+                           item["coverage"] * 100.0, reference_layer, REFERENCE_LAYER_MIN_COVERAGE * 100.0)),
+            "rule_id": CORPUS_RULE_REFERENCE_LAYER, "source_layer": reference_layer,
+            "geometry_summary": {"length_cm": round(item["length_cm"], 1), "coverage": round(item["coverage"], 3),
+                                 "min_coverage": float(REFERENCE_LAYER_MIN_COVERAGE)},
+        } for item in reference_report["dropped"]]
+        setup["corpus_selection"] = corpus_selection_record(
+            "cad", detected_axes_cad, len(walls_to_create), _excluded_cad, reference_layer=reference_layer,
+            rule_id=CORPUS_RULE_REFERENCE_LAYER, trimmed=reference_report["trimmed"])
+    else:
+        setup["corpus_selection"] = corpus_selection_record(
+            "cad", detected_axes_cad, len(walls_to_create), [], reference_layer=None, rule_id=CORPUS_RULE_NONE)
 
     # Paredes DETECTADAS no AutoCAD = pares validos (paralelismo + espessura
     # + sobreposicao + linhas de fechamento) encontrados por find_wall_pairs

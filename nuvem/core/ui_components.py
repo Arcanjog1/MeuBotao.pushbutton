@@ -778,6 +778,36 @@ class UiComponents(object):
         form.ShowDialog()
         return form.result
 
+    def reference_layer_prompt(self, defaults=None):
+        """Seção 49.1 — layer de referência estrutural no fluxo de paredes
+        existentes (opcional, explícito). Devolve "none", "pick" ou None
+        (cancelar). A escolha do import e do layer continua nativa do Revit."""
+        form = self.new("Form")
+        form.Text = "Modulação Automática — layer de referência estrutural"
+        self.configure(form, 860, 520)
+        form.StartPosition = self.ns["FORM_START_POSITION_CENTER_SCREEN"]
+        form.result = None
+        lembrado = (defaults or {}).get("reference_layer")
+        form.Controls.Add(self.label(
+            "Opcional (regra 49): aponte um import de CAD com as FACES da alvenaria estrutural.\n"
+            "Cada parede selecionada é classificada pela cobertura geométrica dessas linhas: parede com\n"
+            "cobertura abaixo de 30% não é alvenaria estrutural e fica FORA da modulação (registrada com o motivo).\n"
+            "Nenhuma parede é encurtada. Sem layer, todas as paredes selecionadas são moduladas.\n\n"
+            "O import precisa estar na escala e na posição das paredes.\n"
+            + ("Último layer usado nesta máquina: {}".format(lembrado) if lembrado else "Nenhum layer usado antes nesta máquina."), 200))
+        footer = self.panel("Bottom", 64)
+
+        def choose(value):
+            form.result = value
+            form.Close()
+        footer.Controls.Add(self.button("Cancelar", lambda s, e: choose(None)))
+        footer.Controls.Add(self.button("Escolher import e layer", lambda s, e: choose("pick"), bool(lembrado)))
+        footer.Controls.Add(self.button("Sem layer — modular todas", lambda s, e: choose("none"), not lembrado))
+        form.Controls.Add(footer)
+        form.Controls.Add(self.header(1, "Filtrar paredes não estruturais pelo layer de referência (opcional)."))
+        form.ShowDialog()
+        return form.result
+
     def present_execution(self, form, snapshot, new_run=False):
         """UI-thread hook for the post-PR42 adapter; does not control creation gates."""
         if new_run:

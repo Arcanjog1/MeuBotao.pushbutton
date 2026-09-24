@@ -7611,6 +7611,83 @@ a seleção é do usuário.
 projeto pronto: exatamente 34/12, margem ≥ 0,10 dos dois lados do limiar,
 tocos aparados 99→64 e 1039→~1000).
 
+## 49.1. Regra 49 no fluxo de PAREDES EXISTENTES e CORPUS DA RUN (2026-09-24, ciclo 2 / D5, IMPLEMENTADO)
+
+**Problema medido (comparação forense dos três Revit, 2026-09-23):** o
+resultado do SCRIPT (`TESTE PR49`) modulou **46** eixos e o MCP (`butanta
+testes`) **34** — e ninguém sabia disso ao comparar. Os 12 eixos a mais são
+exatamente as 12 paredes do layer arquitetônico que a seção 49 já havia
+identificado como **não alvenaria estrutural** (no projeto humano não há
+bloco ao longo delas — só a amarração da parede que as cruza, 0–3 peças; nas
+posições existe piso, viga TQS transversal sob a parede vizinha e ferros de
+graute do pilarete, nunca fiada de bloco). Elas entram no SCRIPT porque o
+fluxo "Utilizar paredes existentes" recebe **a seleção do usuário** (as 46
+Walls criadas do layer `Paredes`) e não tinha filtro nenhum; o MCP recebeu
+34 porque o harness de bancada selecionou as paredes com ≥ 20 blocos no
+projeto humano (critério de benchmark, não de produto). Impacto das 12:
+1.204 peças, 146 dos 224 trechos não modulares originais, 11 nós T falsos,
+as 11 B34 que invadiam porta e os 96 trechos `NON_MODULAR_UNRESOLVED` que
+sobraram após a seção 78.
+
+**Por que não há regra automática a partir da Wall:** medido de novo nas 46
+(tipo, espessura, altura, comprimento, orientação, aberturas hospedadas,
+pontas livres, encontros, nós T recebidos, layers alinhados dos cinco
+imports do doc de teste — `Paredes`, `Estrutura _1_`, `Substrato _2_`,
+`Pisos`, `ARQ-STR-PIL`, `ARQ-STR-VIG`): nenhum atributo separa os dois
+grupos. Exemplo decisivo: 8079849 (224 cm, ponta livre, sem abertura) é
+alvenaria no humano e suas gêmeas de 224 cm com ponta livre e sem abertura
+não são. Qualquer heurística por comprimento/ponta livre teria pelo menos 1
+falso positivo (e "≥ 20 blocos no humano" só existe na bancada).
+
+**A única regra geral e verificável continua sendo a da seção 49** —
+cobertura geométrica do eixo pelas faces da alvenaria estrutural (layer de
+referência): TP 34 / TN 12 / FP 0 / FN 0 nas 46 paredes reais, margem ≥ 0,10
+dos dois lados do limiar 0,30 (qualquer limiar em 0,08–0,41 separa o mesmo
+conjunto). No doc de teste o desenho estrutural existe (import `1 PAV`,
+layer `ARQ-STR-BLOCO`, 11.501 linhas) mas está a **1/10 da escala e
+deslocado ~494 m** (o "erro de layer" da seção 49) — por isso a regra não
+pode agir sozinha: precisa de um import **na escala e na posição das
+paredes**, escolhido pelo usuário. Preparado o import (escala do tipo ×10 e
+reposição pelo envelope, a mesma correção humana de 2026-09-10), a regra
+reproduz 34/12 a partir dos dados do próprio documento.
+
+**Regra (produto):**
+
+1. No fluxo "Utilizar paredes existentes", depois da Tela de Configuração,
+   o usuário pode apontar (opcional, explícito) um import de CAD e o layer
+   com as faces da alvenaria estrutural. Cada Wall selecionada é
+   classificada pela cobertura da seção 49 (mesma função, mesmo limiar):
+   cobertura < `REFERENCE_LAYER_MIN_COVERAGE` → **excluída do corpus antes
+   do solver**; as demais seguem **intactas** (nunca se apara uma Wall
+   existente: a geometria é do usuário — `clip_axes_to_reference_lines(...,
+   trim=False)`). Sem layer, nada é excluído.
+2. **Corpus da RUN** (`corpus_selection`, nos dois fluxos, no `solve_result`,
+   no relatório do solver e na UI): `DETECTED_AXES`, `SELECTED_AXES`,
+   `EXCLUDED_AXES` e, para cada exclusão, `axis_key` (UniqueId da Wall),
+   `wall_id`, `reason`, `rule_id` (`REGRA_49_REFERENCE_LAYER_COVERAGE`),
+   `source_layer` e `geometry_summary` (comprimento, pontas, espessura,
+   cobertura, limiar). Sem filtro o registro existe igual (`rule_id=NONE`,
+   detectados = selecionados). Nunca mais se comparam dois resultados sem
+   saber quantos eixos cada um usou.
+3. **Proibido**: lista de IDs, nome de projeto, coordenada ou contagem de
+   blocos como critério (teste `test_nenhuma_regra_de_producao_cita_id_
+   projeto_ou_coordenada` varre o código de produção sem comentários nem
+   strings).
+
+**Implementação:** `select_existing_axes_by_reference_layer`,
+`corpus_selection_record`, `_corpus_report_lines`, `_wall_axis_key`
+(`core/wall_modeling.py`); `reference_layer_prompt` (`core/ui_components.py`);
+`corpus_lines` (`core/ui_state.py`); `trim` em `clip_axes_to_reference_lines`
+(`core/engine/wall_pairing.py`). Testes: `tests/test_corpus_selection_
+paredes_existentes.py`.
+
+**Medido (BUTANTÃ, NONE, 280 cm, 14 fiadas, motor da seção 78):** 46 eixos →
+34 eixos pela regra: trechos `NON_MODULAR_UNRESOLVED` 96 → 0; vazio (34
+eixos × fiadas 0–11) 9.577 → 30 cm; jambas sem peça 154 → 64; B34
+planejadas invadindo porta 11 → 0; blocos 8.194 → 7.416; compensadores
+1.006 (12,3 %) → 864 (11,7 %); coincidência exata com o MCP 45,6 % → 54,7 %.
+Ver o checkpoint de 2026-09-24 (ciclo 2).
+
 ## 50. Lote PERSISTENTE de blocos — propriedade gravada na instância (2026-09-11, teste real do botão)
 
 **Travamento medido no teste real** (botão `teste-perf`, CPython, pacote

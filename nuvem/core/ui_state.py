@@ -235,6 +235,24 @@ def family_rows(catalog, missing):
     return rows
 
 
+def corpus_lines(result):
+    """Seção 49.1 — o corpus da RUN no relatório da UI: quantos eixos foram
+    detectados, quantos modulados, quantos excluídos e por quê."""
+    corpus = (result or {}).get("corpus_selection")
+    if not corpus:
+        return ["Eixos: corpus não registrado neste resultado."]
+    lines = ["Eixos: {} detectados · {} modulados · {} excluídos (regra {}{})".format(
+        corpus.get("detected_axes"), corpus.get("selected_axes"), corpus.get("excluded_axes"),
+        corpus.get("rule_id"), " — layer '{}'".format(corpus["reference_layer"]) if corpus.get("reference_layer") else "")]
+    for item in (corpus.get("excluded") or [])[:40]:
+        geo = item.get("geometry_summary") or {}
+        lines.append("  Excluído: parede {} (eixo {}, {} cm) — {}".format(
+            item.get("wall_id"), item.get("axis_key"), geo.get("length_cm"), item.get("reason")))
+    if len(corpus.get("excluded") or []) > 40:
+        lines.append("  … e mais {} excluído(s).".format(len(corpus["excluded"]) - 40))
+    return lines
+
+
 class ModulationUiState(object):
     def __init__(self, step=1, strategy=None):
         self.step = step
@@ -287,6 +305,7 @@ class ModulationUiState(object):
         lines = ["RESULTADOS", versao, "Reforço: " + strategy,
                  "Paredes selecionadas: {}".format(len(handler.walls_to_create or [])),
                  "Aberturas detectadas: {}".format(len(handler.all_openings or []))]
+        lines.extend(corpus_lines(result))
         if counts is None:
             lines.append("Quantidade de todas as fiadas: indisponível neste resultado. Reanalise para atualizar.")
         else:

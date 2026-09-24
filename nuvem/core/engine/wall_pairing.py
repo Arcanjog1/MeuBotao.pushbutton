@@ -1847,7 +1847,8 @@ def _covered_intervals_along_axis(p0, p1, half_thickness_ft, reference_lines, la
 
 def clip_axes_to_reference_lines(walls_to_create, reference_lines,
                                  min_coverage=REFERENCE_LAYER_MIN_COVERAGE,
-                                 lateral_slack_ft=REFERENCE_LAYER_LATERAL_SLACK_FT):
+                                 lateral_slack_ft=REFERENCE_LAYER_LATERAL_SLACK_FT,
+                                 trim=True):
     """Mantem, apara ou descarta cada eixo de `walls_to_create` pela cobertura
     das linhas de um layer de REFERENCIA (as faces da alvenaria estrutural,
     de outro desenho ou de outro layer do mesmo DWG).
@@ -1867,7 +1868,12 @@ def clip_axes_to_reference_lines(walls_to_create, reference_lines,
     Devolve (kept_axes, report) com report = {"kept": n, "dropped": [...],
     "trimmed": [...], "coverage": [(idx, fracao), ...]} onde cada item de
     dropped/trimmed e' um dict com o indice original, comprimento em cm e a
-    cobertura (e, no trimmed, o novo comprimento em cm)."""
+    cobertura (e, no trimmed, o novo comprimento em cm).
+
+    `trim=False` (secao 49.1, fluxo de PAREDES EXISTENTES): so' classifica -
+    descarta o eixo sem cobertura e mantem os demais INTACTOS (a Wall e'
+    geometria do usuario; nunca se encurta um eixo existente). `report[
+    "trimmed"]` fica vazio nesse modo."""
     report = {"kept": 0, "dropped": [], "trimmed": [], "coverage": []}
     if not reference_lines:
         report["kept"] = len(walls_to_create)
@@ -1887,7 +1893,7 @@ def clip_axes_to_reference_lines(walls_to_create, reference_lines,
             report["dropped"].append({"index": idx, "length_cm": length_cm, "coverage": ratio})
             continue
         t_lo, t_hi = intervals[0][0], intervals[-1][1]
-        if t_lo > 1e-6 or t_hi < length - 1e-6:
+        if trim and (t_lo > 1e-6 or t_hi < length - 1e-6):
             dx, dy = p1.X - p0.X, p1.Y - p0.Y
             ux, uy = dx / length, dy / length
             q0 = XYZ(p0.X + ux * t_lo, p0.Y + uy * t_lo, p0.Z)
