@@ -212,15 +212,21 @@ def _subplano():
     return model.assign_ids(projeto)
 
 
-def _resolve_subplano(enabled):
+def _resolve_subplano(enabled, regras_de_encontro=None):
+    """`regras_de_encontro` (secao 79): None = produto; False = o legado
+    anterior a' secao 79, o motor em que o defeito da CR-G12 foi medido."""
     projeto = _subplano()
     anterior = m.CROSS_BAND_JOINT_PROPAGATION_ENABLED
+    anterior_79 = m.JUNCTION_PHYSICAL_RULES_ENABLED
     m.CROSS_BAND_JOINT_PROPAGATION_ENABLED = enabled
+    if regras_de_encontro is not None:
+        m.JUNCTION_PHYSICAL_RULES_ENABLED = bool(regras_de_encontro)
     try:
         (solve_result, walls_to_create, nodes, openings_per_wall, catalog,
          base_z_ft, num_courses, _notes) = solver_bridge.run_solver(projeto)
     finally:
         m.CROSS_BAND_JOINT_PROPAGATION_ENABLED = anterior
+        m.JUNCTION_PHYSICAL_RULES_ENABLED = anterior_79
     result_project = from_solver.project_from_solver(
         "repro_g12d", solve_result, walls_to_create, nodes, openings_per_wall,
         catalog, base_z_ft, num_courses, metadata={})
@@ -231,8 +237,11 @@ def _resolve_subplano(enabled):
 
 def test_reproducer_minimo_falha_no_codigo_anterior():
     """PRE-FIX: as 3 paredes reais acusam a junta continua cross-band em
-    `(-401,5, 309,5)`, cotas 121/141, desencontro 0,00cm."""
-    identidades = _resolve_subplano(False)
+    `(-401,5, 309,5)`, cotas 121/141, desencontro 0,00cm. Medido no motor em
+    que o defeito existia: sem a CR-G12 e sem a secao 79 (2026-09-24 - com as
+    regras fisicas de encontro no legado as pecas de no' deste subplano mudam
+    e a junta deixa de nascer; o reproducer continua sendo o do motor antigo)."""
+    identidades = _resolve_subplano(False, regras_de_encontro=False)
     alvo = [(chave, cross) for chave, cross in identidades.items()
             if chave[0] == _SUBPLANO_PONTO and chave[1] == _SUBPLANO_COTAS]
     assert alvo, (

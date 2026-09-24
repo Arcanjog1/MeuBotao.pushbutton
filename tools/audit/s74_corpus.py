@@ -267,7 +267,7 @@ def forced_tolerance_cm(valor_cm):
 # ============================================================= solve completo
 def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CHANNEL",
           regra76_d1=None, regra76_nao_resolvido=None, papel_por_fiada=None,
-          tolerancias_fisicas=None):
+          tolerancias_fisicas=None, regras_de_encontro=None):
     """Solve REAL das 34 paredes. A secao 74 e' ligada/desligada pela flag do
     PRODUTO (`CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED`), nao por monkeypatch:
     e' o mesmo caminho que o botao percorre no Revit.
@@ -296,6 +296,12 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
     antes_78 = getattr(m, "PHYSICAL_MODULATION_TOLERANCES_ENABLED", None)
     if tolerancias_fisicas is not None and antes_78 is not None:
         m.PHYSICAL_MODULATION_TOLERANCES_ENABLED = bool(tolerancias_fisicas)
+    # `regras_de_encontro` (None = produto) liga/desliga a secao 79 pela flag do
+    # PRODUTO (`JUNCTION_PHYSICAL_RULES_ENABLED`): regras fisicas de encontro no
+    # caminho sem reforco. Os casos HISTORICOS do legado sao medidos com False.
+    antes_79 = getattr(m, "JUNCTION_PHYSICAL_RULES_ENABLED", None)
+    if regras_de_encontro is not None and antes_79 is not None:
+        m.JUNCTION_PHYSICAL_RULES_ENABLED = bool(regras_de_encontro)
     antes = m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED
     antes_d1 = m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED
     antes_761 = m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED
@@ -321,13 +327,15 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
             m.CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = antes_77
         if antes_78 is not None:
             m.PHYSICAL_MODULATION_TOLERANCES_ENABLED = antes_78
+        if antes_79 is not None:
+            m.JUNCTION_PHYSICAL_RULES_ENABLED = antes_79
     res["num_courses"] = courses
     return res
 
 
 def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strategy="CHANNEL",
                            regra76_d1=None, regra76_nao_resolvido=None, papel_por_fiada=None,
-                           tolerancias_fisicas=None):
+                           tolerancias_fisicas=None, regras_de_encontro=None):
     """Solve sobre um grafo de nos NOVO - e' assim que se deve medir.
 
     O motor MUTA os nos durante o solve: a secao 72 grava nos proprios nos uma
@@ -343,7 +351,8 @@ def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strat
     ctx = build_context(geo)
     return ctx, solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy,
                       regra76_d1=regra76_d1, regra76_nao_resolvido=regra76_nao_resolvido,
-                      papel_por_fiada=papel_por_fiada, tolerancias_fisicas=tolerancias_fisicas)
+                      papel_por_fiada=papel_por_fiada, tolerancias_fisicas=tolerancias_fisicas,
+                      regras_de_encontro=regras_de_encontro)
 
 
 def hard_gates(res):

@@ -1611,6 +1611,15 @@ JUNCTION_ROLE_TABLE = None
 # (contexto; salvo e restaurado pelo laco de bandas)
 JUNCTION_BAND_ROLES = None
 NO_FUNCTIONAL_JUNCTION_REASON = "NO_FUNCTIONAL_JUNCTION"
+# SECAO 79 - RASTREIO DA AMARRACAO (bond_trace). Contexto (dict ou None),
+# ligado por wall_modeling._solve_building_blocks_all_courses_impl: cada no'
+# L/T/X resolvido por `solve_all_intersections` (passada principal, nunca as
+# tentativas internas de paridade) grava aqui o que o passo do no' GEROU e os
+# testes fisicos que ele fez (espaco medido x exigido, tolerancia, passou?).
+# Chave (banda, no'); a banda vem de BOND_TRACE_BAND (tupla das fiadas FISICAS,
+# setada pelo laco de bandas). Somente observacao: nada aqui muda peca.
+BOND_TRACE = None
+BOND_TRACE_BAND = None
 # Contexto (solve_wall_free_fill, por PAREDE em solve, restaurado em finally):
 # a ponta INICIAL da parede e' a ponta livre de um no' sem encontro (rente a'
 # face da vizinha) e a final nao -> a folga de modulacao (junta alternativa de
@@ -2024,6 +2033,7 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
     valid = 0
     not_required = []
     missing = []
+    resolved = []   # SECAO 79: a peca que amarrou cada fiada (rastreio)
     for ni in sorted(regions):
         poly, area, wall_set, box = regions[ni]
         node = nodes[ni]
@@ -2120,6 +2130,10 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
                 break
             if bond is not None:
                 valid += 1
+                resolved.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),
+                                 "logical_code": bond.get("logical_code"),
+                                 "placement_reason": str(bond.get("placement_reason") or ""),
+                                 "wall_idx": bond.get("wall_idx"), "origin_cm": _origin_cm(bond)})
                 continue
             if not ocup:
                 motivo = "EMPTY_REGION"
@@ -2140,7 +2154,8 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
                                "wall_idx": c.get("wall_idx"), "node_index": c.get("node_index"),
                                "is_compensator": c.get("logical_code") in COMPENSATOR_BOND_GATE_CODES,
                                "origin_cm": _origin_cm(c)} for f, c, _p in ocup]})
-    return {"checked": checked, "valid": valid, "not_required": not_required, "missing": missing}
+    return {"checked": checked, "valid": valid, "not_required": not_required, "missing": missing,
+            "resolved": resolved}
 
 
 def missing_required_junction_bond(course_candidates, nodes, walls_to_create, openings_per_wall=None,
@@ -2249,8 +2264,59 @@ def _corner_single_element_candidate(catalog, contact_point, dir_away, room_ft, 
                                  secondary_wall_idx=secondary_wall_idx)
 
 
+def _ft_cm_round(value_ft):
+    return None if value_ft is None else round(_ft_to_cm(value_ft), 3)
+
+
+def _t_room_trace_step(node, walls_to_create, openings_per_wall, nodes, end_to_node, node_index, room_ok):
+    """SECAO 79 - passo T_B54_B34 do rastreio: espaco MEDIDO (cm) x EXIGIDO,
+    com a tolerancia da comparacao. Mesma medida de `_t_intersection_room_ok`."""
+    step = {"rule": "T_B54_B34", "codes": ["B54", "B34"], "passed": bool(room_ok),
+            "need_cm": {"main_each_side": _ft_cm_round(T_INTERSECTION_B54_HALF_ROOM_FT),
+                        "incoming": _ft_cm_round(CORNER_B34_ROOM_FT)},
+            "tolerance_cm": _ft_cm_round(_t_intersection_room_tolerance_ft())}
+    if openings_per_wall is None:
+        step["detail"] = "sem aberturas informadas: teste de espaco nao aplicado"
+        return step
+    assessment = _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
+                                                 nodes=nodes, end_to_node=end_to_node, node_index=node_index)
+    if assessment is None:
+        step["detail"] = "no' sem principal/chegada identificaveis"
+        return step
+    step["room_cm"] = {"main_plus": _ft_cm_round(assessment["room_plus_ft"]),
+                       "main_minus": _ft_cm_round(assessment["room_minus_ft"]),
+                       "incoming": _ft_cm_round(assessment["room_incoming_ft"])}
+    if not room_ok:
+        tol = _t_intersection_room_tolerance_ft()   # a MESMA comparacao de _t_intersection_room_ok
+        faltas = []
+        if min(assessment["room_plus_ft"], assessment["room_minus_ft"]) + tol < T_INTERSECTION_B54_HALF_ROOM_FT:
+            faltas.append("B54 centrado precisa de {:.2f} cm de cada lado na principal; ha' {:.3f} / {:.3f} "
+                          "(tolerancia {:.4f})".format(
+                              _ft_to_cm(T_INTERSECTION_B54_HALF_ROOM_FT), _ft_to_cm(assessment["room_plus_ft"]),
+                              _ft_to_cm(assessment["room_minus_ft"]), _ft_to_cm(tol)))
+        if assessment["room_incoming_ft"] + tol < CORNER_B34_ROOM_FT:
+            faltas.append("B34 da chegada precisa de {:.2f} cm; ha' {:.3f}".format(
+                _ft_to_cm(CORNER_B34_ROOM_FT), _ft_to_cm(assessment["room_incoming_ft"])))
+        step["detail"] = "; ".join(faltas) or "reprovado"
+    return step
+
+
 def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
                          nodes=None, end_to_node=None):
+    """Ver `_solve_t_intersection_steps`. Com o rastreio da secao 79 ligado
+    (BOND_TRACE), o resultado leva `trace`: os testes fisicos na ordem em que
+    foram feitos. Sem o rastreio, o resultado e' exatamente o de sempre."""
+    trace = [] if BOND_TRACE is not None else None
+    result = _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=node_index,
+                                         openings_per_wall=openings_per_wall, nodes=nodes,
+                                         end_to_node=end_to_node, trace=trace)
+    if trace is not None and isinstance(result, dict):
+        result["trace"] = trace
+    return result
+
+
+def _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
+                                nodes=None, end_to_node=None, trace=None):
     """Resolve o encontro em T (secao 11 do prompt): B54 na parede
     continua (mainWall, Fiada A) com a celula central no ponto do no' + B34
     na parede que chega (incomingWall, Fiada B) com o vao menor voltado
@@ -2304,8 +2370,12 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
         return {"ok": False, "reason": "No' T_INTERSECTION sem mainWall/incomingWall identificaveis.",
                 "course_a": None, "course_b": None}
 
-    if not _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
-                                   nodes=nodes, end_to_node=end_to_node, node_index=node_index):
+    room_ok = _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
+                                      nodes=nodes, end_to_node=end_to_node, node_index=node_index)
+    if trace is not None:
+        trace.append(_t_room_trace_step(node, walls_to_create, openings_per_wall, nodes, end_to_node,
+                                        node_index, room_ok))
+    if not room_ok:
         assessment = _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
                                                      nodes=nodes, end_to_node=end_to_node, node_index=node_index)
         point = assessment["point"]
@@ -2315,6 +2385,23 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
         room_i_ft = assessment["room_incoming_ft"]
 
         # 1) DEGRADA PARA L: B34 nos dois lados, se couberem.
+        if trace is not None:
+            _classic = (room_i_ft + 1e-6 >= CORNER_B34_ROOM_FT
+                        and max(assessment["room_plus_ft"], assessment["room_minus_ft"]) + 1e-6
+                        >= CORNER_B34_ROOM_FT)
+            _faltas = []
+            if room_i_ft + 1e-6 < CORNER_B34_ROOM_FT:
+                _faltas.append("B34 da chegada precisa de {:.2f} cm; ha' {:.3f}".format(
+                    _ft_to_cm(CORNER_B34_ROOM_FT), _ft_to_cm(room_i_ft)))
+            if max(assessment["room_plus_ft"], assessment["room_minus_ft"]) + 1e-6 < CORNER_B34_ROOM_FT:
+                _faltas.append("B34 da principal medido a partir do PONTO do no' precisa de {:.2f} cm num dos "
+                               "lados; ha' {:.3f} / {:.3f}".format(
+                                   _ft_to_cm(CORNER_B34_ROOM_FT), _ft_to_cm(assessment["room_plus_ft"]),
+                                   _ft_to_cm(assessment["room_minus_ft"])))
+            trace.append({"rule": "T_DEGRADED_L_B34", "codes": ["B34", "B34"], "passed": bool(_classic),
+                          "need_cm": {"main_one_side_from_point": _ft_cm_round(CORNER_B34_ROOM_FT),
+                                      "incoming": _ft_cm_round(CORNER_B34_ROOM_FT)},
+                          "detail": None if _classic else "; ".join(_faltas)})
         if room_i_ft + 1e-6 >= CORNER_B34_ROOM_FT:
             l_dir = None
             if assessment["room_plus_ft"] + 1e-6 >= CORNER_B34_ROOM_FT:
@@ -2337,6 +2424,14 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
                 elif (assessment["room_minus_ft"] + tol >= need
                         and assessment["room_plus_ft"] + tol >= half_i):
                     l_dir = main_dir.Negate()
+            if trace is not None and not trace[-1]["passed"] and room_i_ft + 1e-6 >= CORNER_B34_ROOM_FT:
+                trace.append({"rule": "T_DEGRADED_L_FROM_CONTACT", "codes": ["B34", "B34"],
+                              "enabled": bool(T_DEGRADED_L_ROOM_FROM_CONTACT), "passed": l_dir is not None,
+                              "tolerance_cm": _ft_cm_round(_t_intersection_room_tolerance_ft()),
+                              "detail": None if l_dir is not None else (
+                                  "regra 76 D1 desligada" if not T_DEGRADED_L_ROOM_FROM_CONTACT else
+                                  "nenhum lado da principal tem (34 - meia espessura) livre com a meia "
+                                  "espessura do outro lado")})
             if l_dir is not None:
                 # O "arm_point" de um L_CORNER de verdade fica do lado
                 # OPOSTO de onde a peca se estende (extend_wall_ends_to_
@@ -2395,6 +2490,14 @@ def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openin
                 catalog, contact_i, dir_i, room_i_ft, "B", inc_idx, main_idx, node_index,
                 placement_reason="T_INTERSECTION_INCOMING_DEGRADED", nodes=nodes,
                 codes=CORNER_SINGLE_ELEMENT_CODES)
+        if trace is not None:
+            trace.append({"rule": "T_SINGLE_ELEMENT", "codes": list(CORNER_DEGRADED_TIE_CODES
+                                                                   if CORNER_DEGRADED_PREFERS_TIE_BLOCK
+                                                                   else CORNER_SINGLE_ELEMENT_CODES),
+                          "passed": single_a is not None and single_b is not None,
+                          "chosen": {"A": (single_a or {}).get("logical_code"),
+                                     "B": (single_b or {}).get("logical_code")},
+                          "detail": "elemento unico na chegada (compensador nunca e' amarracao, regra 76)"})
         if COMPENSATOR_NEVER_JUNCTION_BOND and (single_a is None) != (single_b is None):
             # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58).
             return {"ok": True, "reason": None, "course_a": single_a, "course_b": single_b,
@@ -2787,6 +2890,32 @@ def _coordinate_arm_role_nodes(nodes):
     return sorted(set(conflicts))
 
 
+def _bond_trace_record(node_index, node, result, role=None):
+    """SECAO 79: grava (sobrescreve) o passo do no' desta banda em BOND_TRACE.
+    `generated` usa a convencao de familia do passo do no' (antes da paridade);
+    a familia FISICA de cada fiada sai do resultado final (bond_trace)."""
+    band = tuple(BOND_TRACE_BAND) if BOND_TRACE_BAND is not None else None
+    record = {"band": list(band) if band is not None else None, "node_index": node_index,
+              "kind": node.get("kind"), "main_wall_idx": node.get("main_wall_idx"),
+              "incoming_wall_idx": node.get("incoming_wall_idx"), "role_skipped": role,
+              "ok": None, "reason": None, "degraded": False, "steps": [], "generated": []}
+    if result is not None:
+        record.update({"ok": bool(result.get("ok")), "reason": result.get("reason"),
+                       "degraded": bool(result.get("degraded")), "steps": list(result.get("trace") or []),
+                       "missing_bond_courses": list(result.get("missing_bond_courses") or [])})
+        for cand in (result.get("course_a"), result.get("course_b")):
+            if not isinstance(cand, dict):
+                continue
+            o = cand.get("origin_world")
+            record["generated"].append({
+                "family": cand.get("course"), "code": cand.get("logical_code"),
+                "origin_cm": [round(_ft_to_cm(o.X), 4), round(_ft_to_cm(o.Y), 4)] if o is not None else None,
+                "rotation_deg": round(cand.get("rotation_deg") or 0.0, 1),
+                "placement_reason": str(cand.get("placement_reason") or ""),
+                "wall_idx": cand.get("wall_idx")})
+    BOND_TRACE[(band, node_index)] = record
+
+
 def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=None, end_to_node=None,
                             _parity_pass=True):
     """Roda o solver adequado (L/T/X) em TODOS os nos de `nodes` (ver
@@ -2852,6 +2981,9 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
         kind = node.get("kind")
         if kind in _BOND_GATE_NODE_KINDS and _band_role_without_bond(node_index) is not None:
             role_skipped.append((node_index, _band_role_without_bond(node_index).get("effective_role")))
+            if BOND_TRACE is not None and _parity_pass:
+                _bond_trace_record(node_index, node, None,
+                                   role=_band_role_without_bond(node_index).get("effective_role"))
             continue
         if kind == "L_CORNER":
             result = solve_l_corner(node, walls_to_create, catalog, node_index=node_index,
@@ -2867,6 +2999,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
                                           nodes=nodes, end_to_node=end_to_node)
         else:
             continue
+        if BOND_TRACE is not None and _parity_pass:
+            _bond_trace_record(node_index, node, result)
         if not result["ok"]:
             failures.append((node_index, result["reason"]))
             continue

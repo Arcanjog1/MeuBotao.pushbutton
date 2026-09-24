@@ -978,7 +978,8 @@ def test_J_solve_channel_no_degradado_e_missing_e_nunca_compensator(nome):
 
 @pytest.mark.parametrize("nome", DEGRADAM)
 def test_J_legado_nao_liga_nada_e_nao_ganha_as_chaves_novas(nome):
-    res, walls, nodes, _o = _solve(nome, None)
+    # legado HISTORICO (anterior a' secao 79)
+    res, walls, nodes, _o = _solve(nome, tcr.LEGADO_HISTORICO)
     ni = _no_do_encontro(nodes)
     cc = res["course_candidates"]
     for chave in CHAVES_76_1:
@@ -988,6 +989,29 @@ def test_J_legado_nao_liga_nada_e_nao_ganha_as_chaves_novas(nome):
     designados = [(ci, c) for ci in sorted(cc) for c in cc[ci] if _designado(c)]
     assert designados and all(c.get("node_index") == ni for _ci, c in designados)
     assert all(str(c["placement_reason"]).endswith("_DEGRADED") for _ci, c in designados)
+
+
+@pytest.mark.parametrize("nome", DEGRADAM)
+def test_J_legado_do_produto_ganha_os_gates_e_o_compensador_nao_e_designado(nome):
+    """SECAO 79: sem reforco, o MESMO no' degradado vem com os gates 76/76.1 e
+    o rastreio; o compensador que fecha o no' sai JUNCTION_UNRESOLVED_FILL
+    (nunca designado) e a fiada sem amarracao fica acusada - nunca silencio."""
+    res, walls, nodes, _o = _solve(nome, None)
+    for chave in ("compensator_as_junction_bond", "missing_required_junction_bond", "junction_bond_audit",
+                  "bond_trace"):
+        assert chave in res, chave
+    assert "channel_unresolved_junction_fill" not in res     # informacao do fluxo CHANNEL
+    assert res["compensator_as_junction_bond"] == []
+    cc = res["course_candidates"]
+    assert not [(ci, c) for ci in sorted(cc) for c in cc[ci] if _designado(c)]
+    ni = _no_do_encontro(nodes)
+    faltas = [v for v in res["missing_required_junction_bond"] if v["node_index"] == ni]
+    for ci, c in _fills(cc):
+        assert c.get("node_index") == ni
+        assert any(v["course_index"] == ci for v in faltas), (ci, faltas)
+    linhas = [r for r in res["bond_trace"] if r["node_index"] == ni]
+    assert linhas and all(r["classification"] for r in linhas)
+    assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
 
 
 def _projecao_missing(missing):
@@ -1034,7 +1058,7 @@ def test_J_microajuste_mede_o_portao_missing_e_rejeita_piora():
     # fluxo sem reforco: o resultado nao traz a chave, e o microajuste calcula o
     # MISSING ali mesmo (achado da revisao: antes o portao ficava sem evidencia
     # geometrica nesse caminho)
-    legado, walls_l, nodes_l, ops_l = _solve("T_boneca_curta", None)
+    legado, walls_l, nodes_l, ops_l = _solve("T_boneca_curta", tcr.LEGADO_HISTORICO)
     assert "missing_required_junction_bond" not in legado
     medida_l = m._micro_adjust_measure(legado, walls_l, ops_l, CAT, BANDA, incoming, nodes=nodes_l)
     from core.engine import physical_support as _ps

@@ -178,7 +178,9 @@ def test_as_razoes_de_posicao_de_no_estao_em_sincronia_com_o_motor():
 def test_o_microajuste_calcula_o_missing_quando_o_resultado_nao_traz_a_chave():
     """Achado da revisao (BAIXA): no fluxo sem reforco o portao da secao 66
     perdia a evidencia geometrica. Agora o MISSING e' calculado ali."""
-    res, walls, nodes, ops = tcr.solve([seg(0, 0, 402, 0), seg(0, 0, 0, 25)], [[], []], strategy=None,
+    # legado HISTORICO (anterior a' secao 79): o resultado nao traz a chave
+    res, walls, nodes, ops = tcr.solve([seg(0, 0, 402, 0), seg(0, 0, 0, 25)], [[], []],
+                                       strategy=tcr.LEGADO_HISTORICO,
                                        num_courses=14)
     assert "missing_required_junction_bond" not in res
     faixa = m._free_to_top_band(sb.CATALOG, 0.0)

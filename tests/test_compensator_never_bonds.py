@@ -1302,7 +1302,8 @@ def test_solver_legado_o_mesmo_compensador_segue_designado_e_A_o_acusa(nome, esc
     direto acusa exatamente os designados; B chamado direto acusa as mesmas
     fiadas-no'."""
     res_c, _walls_c, _nodes_c = _degradado(nome)
-    res_l, walls, nodes = _degradado(nome, None)
+    # legado HISTORICO (anterior a' secao 79, que liga a 76.1 tambem sem reforco)
+    res_l, walls, nodes = _degradado(nome, tcr.LEGADO_HISTORICO)
     for chave in ("compensator_as_junction_bond", "missing_required_junction_bond", "junction_bond_audit",
                   "channel_unresolved_junction_fill"):
         assert chave not in res_l
@@ -1446,7 +1447,10 @@ def test_corpus_legado_os_dois_gates_chamados_direto_iguais_ao_oraculo(nome):
     aqui que o oraculo de A tem designados de verdade (as fixtures que
     degradam)."""
     lines, ops = CORPUS[nome]
-    res, walls, nodes = _resolve(nome, lines, ops, strategy=None)
+    # legado HISTORICO (anterior a' secao 79): e' nele que o motor ainda designa
+    # o compensador - o oraculo de A so' tem designados de verdade aqui (a guarda
+    # de nao-vacuidade `test_corpus_nao_e_vacuo` mede o MESMO legado)
+    res, walls, nodes = _resolve(nome, lines, ops, strategy=tcr.LEGADO_HISTORICO)
     cc = res["course_candidates"]
     itens = (res.get("physical_support") or {}).get("items")
     nao_modular = _nao_modular_fisico(res)
@@ -1470,7 +1474,7 @@ def test_corpus_nao_e_vacuo():
         ausentes += len(res["junction_bond_audit"]["not_required"])
         validos += res["junction_bond_audit"]["valid"]
         tipos_fill |= set(nodes[c["node_index"]]["kind"] for _ci, c in _fills(res["course_candidates"]))
-        leg, _w, _n = _resolve(nome, *CORPUS[nome], strategy=None)
+        leg, _w, _n = _resolve(nome, *CORPUS[nome], strategy=tcr.LEGADO_HISTORICO)
         designados += sum(1 for _ci, c in _compensadores(leg["course_candidates"]) if _designada(c))
     assert set(["EMPTY_REGION", "NO_BOND_PIECE", "BOND_PIECE_UNSUPPORTED"]) <= motivos, motivos
     assert tipos_fill == set(TIPOS_DE_NO), tipos_fill

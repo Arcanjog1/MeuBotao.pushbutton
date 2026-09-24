@@ -39,7 +39,25 @@ def _cm(value_ft):
     return value_ft * 100.0 / m.FEET_PER_METER
 
 
+# SECAO 79 (2026-09-24): o caminho sem reforco ANTERIOR a' secao 79 (regras
+# fisicas de encontro 74/76 D1/76.1/77 e os gates 76/76.1 so' no CHANNEL). Os
+# testes que fixam aquele historico usam esta sentinela; `strategy=None` e' o
+# legado do PRODUTO (secao 79 ligada).
+LEGADO_HISTORICO = "LEGADO_ANTERIOR_A_SECAO_79"
+
+
 def solve(lines, openings, strategy=CHANNEL, policy=None, reverse=False, num_courses=NUM_COURSES):
+    if strategy == LEGADO_HISTORICO:
+        antes = m.JUNCTION_PHYSICAL_RULES_ENABLED
+        m.JUNCTION_PHYSICAL_RULES_ENABLED = False
+        try:
+            return _solve(lines, openings, None, policy, reverse, num_courses)
+        finally:
+            m.JUNCTION_PHYSICAL_RULES_ENABLED = antes
+    return _solve(lines, openings, strategy, policy, reverse, num_courses)
+
+
+def _solve(lines, openings, strategy, policy, reverse, num_courses):
     if reverse:
         lines = [m.Line.CreateBound(l.GetEndPoint(1), l.GetEndPoint(0)) for l in lines]
     walls = [(line, ft(14.0), (False, False)) for line in lines]

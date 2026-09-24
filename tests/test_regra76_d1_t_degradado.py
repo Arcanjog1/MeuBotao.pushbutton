@@ -130,9 +130,18 @@ def test_a_d1_e_a_76_1_nascem_desligadas_no_motor_e_so_o_channel_liga():
     assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
     assert m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED is True
     assert m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED is True
-    res, _w, _n, _o = solve(*pilar_34(), strategy=None)
+    # legado HISTORICO (anterior a' secao 79): nada liga, nenhuma chave nova
+    res, _w, _n, _o = solve(*pilar_34(), strategy=tcr.LEGADO_HISTORICO)
     assert "compensator_as_junction_bond" not in res
     assert "missing_required_junction_bond" not in res
+    assert ws.T_DEGRADED_L_ROOM_FROM_CONTACT is False
+    assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
+    # legado do PRODUTO (secao 79): D1 e 76.1 valem SO' durante o solve e os
+    # gates vao no resultado; as chaves do modulo voltam desligadas
+    assert m.JUNCTION_PHYSICAL_RULES_ENABLED is True
+    res79, _w79, _n79, _o79 = solve(*pilar_34(), strategy=None)
+    assert res79["compensator_as_junction_bond"] == []
+    assert "missing_required_junction_bond" in res79
     assert ws.T_DEGRADED_L_ROOM_FROM_CONTACT is False
     assert ws.COMPENSATOR_NODE_PIECE_UNDESIGNATED is False
 

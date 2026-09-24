@@ -10196,3 +10196,62 @@ separada, D5). CHANNEL não muda (0 trechos, 451 cm, 96,8 % de coincidência com
 (`T_ROOM_PHYSICAL_TOLERANCE`) foi medida e NÃO altera os trechos — ficou no gate CHANNEL.
 Testes: `tests/test_tolerancias_fisicas_gerais.py` (casos 1–8).
 
+## 79. Regras FÍSICAS de encontro não dependem do reforço de abertura (2026-09-24, IMPLEMENTADO, ciclo 3 pós-forense — D2/D3)
+
+**Problema medido (BUTANTÃ, corpus correto de 34 eixos, "Sem reforço", 280 cm).** Depois dos ciclos 1
+e 2 (§78, §49.1), 4 dos 37 encontros T continuavam sem amarração em 30 fiadas (0–11): nó 51
+(principal 8284515 × 8284580, pilar de 54 cm entre duas portas) em 11 fiadas; nós 20 e 26 (principal
+8284502) em 7 fiadas cada; nó 28 (8284554 × 8284563) em 5. HUMANO e MCP amarram todos. Em todas as
+fiadas o SCRIPT punha um **C09 na parede que chega**, designado peça do nó
+(`T_INTERSECTION_INCOMING_DEGRADED`), e a principal recebia preenchimento comum (B19|B19 no pilar de
+54 cm, com junta vertical contínua em 11 fiadas).
+
+**Causa-raiz (rastreio por nó/fiada, `bond_trace`).** O passo do nó T (`solve_t_intersection`) roda
+ANTES do preenchimento livre e mede o espaço físico sozinho — o preenchimento não "rouba" o envelope
+(hipótese de reserva geométrica descartada pelo rastreio: o passo do nó já reprova os testes de espaço antes de existir qualquer preenchimento, e o espaço medido para por abertura e reserva de nó vizinho, nunca por peça de preenchimento). As três regras que respondem "existe
+peça de amarração que cabe fisicamente?" estavam **ligadas só no fluxo CHANNEL** (mesmo defeito
+estrutural da §78):
+
+| nó | falta medida | regra que já existia no motor (só CHANNEL) |
+|---|---|---|
+| 51 | B54 centrado precisa de 27 cm de cada lado; há 27,000 / 26,997 cm | §74: a comparação usava epsilon de ponto flutuante (0,3 µm) no lugar da tolerância física de 0,05 cm |
+| 28 | B34 degradado medido do PONTO do nó precisa de 34 cm num lado; há 27,01 / 11,99 | §76 D1: o B34 é posto a partir do CONTATO — cabe com 27 + 7 |
+| 20 | 7,00 / 26,99 cm | §76 D1 com a tolerância da §74 (26,99 + 0,05 ≥ 27) |
+| 26 | a janela consome a principal dos DOIS lados (7,00 / 7,01 cm) nas fiadas 4–10 | §77: não existe T funcional nessas fiadas; a parede que chega termina como ponta livre composta |
+
+Nenhuma delas depende de canaleta: são geometria do encontro. **Paridade não é a causa** (medido:
+os 4 nós perdiam a amarração nas duas famílias; §72 continua só CHANNEL).
+
+**Regra.** No caminho sem reforço, as regras físicas de encontro seguem
+`JUNCTION_PHYSICAL_RULES_ENABLED` (ligado): §74 (tolerância física do teste de espaço do T), §76 D1
+(T degradado para L medido do contato), §76.1 (compensador que fecha o nó nunca é designado
+amarração — sai `JUNCTION_UNRESOLVED_FILL`) e §77 (papel funcional do encontro por fiada). No
+CHANNEL valem as chaves `CHANNEL_*` de sempre (ligadas). Ponto único:
+`_solve_building_blocks_all_courses_impl` (as duas portas de entrada), com restauração no `finally`.
+Os gates §76 (`COMPENSATOR_AS_JUNCTION_BOND`) e §76.1 (`MISSING_REQUIRED_JUNCTION_BOND`) passam a ir
+no resultado dos dois caminhos (`_attach_junction_gates`): nó sem amarração nunca fica silencioso,
+entra na revisão humana e em `structurally_resolved`. Continuam só CHANNEL: 58.2, 68, 71 e a paridade
+72. Regra 48 intocada: nenhuma peça de amarração entra em abertura; onde não há espaço físico o nó
+fica `MISSING_REQUIRED_JUNCTION_BOND` / `BOND_UNRESOLVED`.
+
+**Rastreio `bond_trace` (sempre ligado, somente observação).** Por nó L/T/X e fiada física:
+papel, paredes principal/chegada, espaço medido (cm), candidatos que o passo do nó GEROU (código,
+origem, rotação, razão, `accepted` na fiada), testes físicos reprovados (regra + detalhe), peça
+selecionada, `bond_resolved` e a classificação — `BOND_RESOLVED`, `NO_FUNCTIONAL_JUNCTION`,
+`BOND_CANDIDATE_NOT_GENERATED` (nenhuma amarração gerada; o motivo vem dos testes do passo do nó) ou
+`BOND_CANDIDATE_GENERATED_BUT_REJECTED` (gerada e ausente do resultado final, reprovada pela
+auditoria 76.1, ou pulada pela regra 48 na materialização). Resumo e pendências no relatório do
+solver (`AMARRACAO POR NO'/FIADA`).
+
+**Medido (BUTANTÃ, 34 eixos, NONE, 280 cm).** T amarrados 33/37 → 37/37; fiadas de T sem amarração
+30 → 0 (as 3 fiadas restantes da auditoria são dos cantos L 55/56 — casos 47/48 da §76, pendentes de
+decisão); gate §76 33 → 0; juntas verticais contínuas ≥ 3 fiadas 4 → 0 (a maior, 11 fiadas no pilar
+do nó 51, some); compensadores 864 → 828 (11,7 % → 11,2 %); jambas sem peça 64 → 60; coincidência
+exata com o MCP 51,7 % → 53,9 %; vazio 30 cm e 0 trechos não resolvidos inalterados; 0 invasões.
+Mudam 6 dos 50 nós: os 4 alvos e os nós 22 e 49 (T com falta submilimétrica da §74 que já
+degradavam para B34+B19 e passam a B54 alternado — como HUMANO e MCP). Nenhum L ou X muda.
+**Benchmark:** TP1 idêntico; TGD V2 com códigos críticos idênticos, mas a D1 amarra 32 fiadas-nó a
+mais (5 T, `MISSING_REQUIRED_JUNCTION_BOND` 935 → 903) ao custo de 4 faixas verticais de compensador
+em fiadas alternadas (categoria de compensadores 63 → 66 paredes; `COMPENSATOR_VERTICAL_STRIP`
+104 → 110; os demais códigos de compensador caem) — atribuído por sub-regra, baseline não regravado.
+Testes: `tests/test_regras_fisicas_de_encontro.py`.

@@ -3373,8 +3373,29 @@ ARM_ROLE_SAFE_REPAIR_ENABLED = True
 B19_RESIDUAL_FILL_REPAIR_ENABLED = True
 
 
-def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node, openings_per_wall,
-                                           catalog, base_z_abs, num_courses,
+def _solve_building_blocks_all_courses_pass(*args, **kwargs):
+    """SECAO 79: cada passada grava o seu PROPRIO rastreio (`bond_trace_steps`)
+    - o resultado escolhido depois (melhor passada, reconstrucao da paridade,
+    reparo aceito) leva os registros que o produziram, nunca os de uma
+    tentativa descartada. Sem rastreio ligado, identico a' funcao de sempre."""
+    from core.engine import wall_stepper as _st_trace
+    externo = _st_trace.BOND_TRACE
+    if externo is None:
+        return _solve_building_blocks_all_courses_pass_body(*args, **kwargs)
+    _st_trace.BOND_TRACE = {}
+    try:
+        result = _solve_building_blocks_all_courses_pass_body(*args, **kwargs)
+        if isinstance(result, dict):
+            result["bond_trace_steps"] = [rec for _k, rec in sorted(
+                _st_trace.BOND_TRACE.items(), key=lambda kv: (kv[0][0] or (), kv[0][1]))]
+        externo.update(_st_trace.BOND_TRACE)
+        return result
+    finally:
+        _st_trace.BOND_TRACE = externo
+
+
+def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                catalog, base_z_abs, num_courses,
                                            allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                            variants_per_course=1,
                                            band_cb=None, progress_cb=None,
@@ -3470,6 +3491,8 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
         saved_band_roles = _stepper_band.JUNCTION_BAND_ROLES
         band_roles = _stepper_band.junction_band_roles(_stepper_band.JUNCTION_ROLE_TABLE, course_indices, nodes)
         _stepper_band.JUNCTION_BAND_ROLES = band_roles
+        saved_trace_band = _stepper_band.BOND_TRACE_BAND
+        _stepper_band.BOND_TRACE_BAND = tuple(course_indices)   # SECAO 79 (rastreio)
         try:
             result = solve_building_blocks(
                 nodes, walls_to_create, end_to_node, filtered_openings, catalog,
@@ -3481,6 +3504,7 @@ def _solve_building_blocks_all_courses_pass(nodes, walls_to_create, end_to_node,
             )
         finally:
             _stepper_band.JUNCTION_BAND_ROLES = saved_band_roles
+            _stepper_band.BOND_TRACE_BAND = saved_trace_band
         band_entry = {"course_indices": list(course_indices), "result": result}
         if band_roles:
             band_entry["junction_roles_without_bond"] = sorted(
@@ -3780,6 +3804,26 @@ CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED = True
 # OFF reproduz o motor anterior a esta secao (snapshots historicos).
 CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = True
 
+# SECAO 79 (2026-09-24, ciclo 3 / D2-D3): REGRAS FISICAS DE ENCONTRO NAO
+# DEPENDEM DO REFORCO DE ABERTURA. Tolerancia fisica do teste de espaco do T
+# (74), T degradado para L medido do CONTATO (76 D1), compensador de no' nunca
+# designado amarracao (76.1) e papel funcional do encontro por fiada (77) sao
+# propriedade da GEOMETRIA do encontro - existencia e espaco fisico da peca de
+# amarracao -, nao do reforco. Ate' 2026-09-24 so' ligavam com CHANNEL e o
+# caminho "Sem reforco" perdia a amarracao do T (BUTANTA, corpus de 34: 4 T
+# sem amarracao em 30 fiadas - no' 51 por 0,035 mm, nos 20/28 porque o B34
+# degradado era medido do ponto e nao do contato, no' 26 porque a janela
+# consome a principal dos dois lados e o T nao existe nessas fiadas). No
+# caminho sem reforco estas regras seguem ESTE interruptor; no CHANNEL, as
+# chaves CHANNEL_* de sempre (ligadas). Os gates 76 (COMPENSATOR_AS_
+# JUNCTION_BOND) e 76.1 (MISSING_REQUIRED_JUNCTION_BOND) e o rastreio
+# `bond_trace` passam a ser anexados ao resultado nos dois caminhos: no' sem
+# amarracao nunca fica silencioso. NAO entram aqui (continuam so' CHANNEL):
+# 58.2, 68, 71 e a paridade 72.
+JUNCTION_PHYSICAL_RULES_ENABLED = True
+# rastreio da amarracao por no'/fiada (somente observacao)
+BOND_TRACE_ENABLED = True
+
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
                                       catalog, base_z_abs, num_courses, **kwargs):
@@ -3791,8 +3835,13 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     from core.engine import wall_stepper as _stepper_memo
     from core.engine import continuous_modulation as _cm_flags
     if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
-        return _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
-                                                       catalog, base_z_abs, num_courses, **kwargs)
+        result = _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node, openings_per_wall,
+                                                         catalog, base_z_abs, num_courses, **kwargs)
+        # SECAO 79: sem reforco, os gates 76/76.1 e o rastreio tambem vao no resultado
+        if kwargs.get("opening_reinforcement_strategy") is None and JUNCTION_PHYSICAL_RULES_ENABLED:
+            _attach_junction_gates(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                   num_courses, kwargs, role_by_course=True)
+        return result
     _stepper_memo.WALL_FILL_MEMO = {}
     _stepper_memo.OBB_MEMO = {}
     _stepper_memo.WALL_FILL_MEMO_STATS["hits"] = 0
@@ -3824,45 +3873,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
         _stepper_memo.COMPENSATOR_NODE_PIECE_UNDESIGNATED = saved_undesignated
         _stepper_memo.JUNCTION_ROLE_BY_COURSE = saved_role_by_course
     if isinstance(result, dict):
-        # REGRA 76 - hard gate: compensador nunca DESIGNADO amarracao.
-        # REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND: fiada de no' sem peca de
-        # amarracao valida (geometria). Somente leitura; so' no fluxo CHANNEL.
-        result["compensator_as_junction_bond"] = _stepper_memo.compensator_as_junction_bond(
-            result.get("course_candidates"), nodes, walls_to_create)
-        audit = _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog,
-                                           base_z_abs, num_courses,
-                                           kwargs.get("opening_reinforcement_policy"),
-                                           kwargs.get("variants_per_course") or 1)
-        result["missing_required_junction_bond"] = audit["missing"]
-        result["junction_bond_audit"] = {"checked": audit["checked"], "valid": audit["valid"],
-                                         "not_required": audit["not_required"]}
-        # SECAO 77 - relatorio: fiadas-no' sem encontro funcional (papel
-        # recalculado pela geometria na auditoria)
-        result["junction_role_by_course"] = {
-            "enabled": bool(CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED),
-            "no_functional_junction": [(x["node_index"], x["course_index"], x.get("effective_role"),
-                                        x.get("free_end_wall"))
-                                       for x in audit["not_required"]
-                                       if x.get("reason") == _stepper_memo.NO_FUNCTIONAL_JUNCTION_REASON],
-            "free_end_not_composed": [(x["node_index"], x["course_index"]) for x in audit["missing"]
-                                      if x.get("reason") == "FREE_END_NOT_COMPOSED"]}
-        if CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
-            # tabela compacta (papel efetivo por no' x fiada) e a contagem das
-            # flags de diagnostico, para chamadores externos e para o relatorio
-            tabela = _junction_roles_for_audit(nodes, walls_to_create, _effective_solve_openings(
-                nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
-                (result.get("opening_reinforcement") or {}).get("free_to_top"),
-                kwargs.get("opening_reinforcement_policy")), catalog, base_z_abs, num_courses) or {}
-            flags = {}
-            for r in tabela.values():
-                for f in r.get("stub_flags") or ():
-                    k = str(f).split(":")[0]
-                    flags[k] = flags.get(k, 0) + 1
-            result["junction_role_by_course"]["roles"] = dict(
-                ("%d:%d" % k, {"effective_role": r.get("effective_role"), "reason": r.get("reason"),
-                               "free_end_wall": r.get("free_end_wall"), "changed": bool(r.get("changed"))})
-                for k, r in tabela.items())
-            result["junction_role_by_course"]["flags"] = flags
+        # REGRA 76 / 76.1 / 77 + rastreio (secao 79): mesmo codigo nos dois caminhos
+        _attach_junction_gates(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                               num_courses, kwargs, role_by_course=CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED)
         result["channel_unresolved_junction_fill"] = bool(CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED)
         result["channel_t_degraded_l_room_from_contact"] = bool(
             CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED)
@@ -3872,6 +3885,232 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     if isinstance(result, dict) and result.get("channel_tie_parity_trials") is not None:
         result["channel_tie_parity_trials"]["wall_fill_memo"] = dict(_stepper_memo.WALL_FILL_MEMO_STATS)
     return result
+
+
+def _attach_junction_gates(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                           num_courses, kwargs, role_by_course=True):
+    """REGRA 76 - hard gate: compensador nunca DESIGNADO amarracao.
+    REGRA 76.1 - MISSING_REQUIRED_JUNCTION_BOND: fiada de no' sem peca de
+    amarracao valida (geometria). SECAO 77 - fiadas sem encontro funcional.
+    SECAO 79 - `bond_trace` por no'/fiada. Somente leitura; o mesmo codigo
+    para o caminho CHANNEL e para o caminho sem reforco (desde a secao 79)."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    from core.engine import wall_stepper as _stepper_gate
+    result["compensator_as_junction_bond"] = _stepper_gate.compensator_as_junction_bond(
+        result.get("course_candidates"), nodes, walls_to_create)
+    audit = _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog,
+                                       base_z_abs, num_courses,
+                                       kwargs.get("opening_reinforcement_policy"),
+                                       kwargs.get("variants_per_course") or 1,
+                                       role_by_course=bool(role_by_course))
+    result["missing_required_junction_bond"] = audit["missing"]
+    result["junction_bond_audit"] = {"checked": audit["checked"], "valid": audit["valid"],
+                                     "not_required": audit["not_required"]}
+    # SECAO 77 - relatorio: fiadas-no' sem encontro funcional (papel
+    # recalculado pela geometria na auditoria)
+    result["junction_role_by_course"] = {
+        "enabled": bool(role_by_course),
+        "no_functional_junction": [(x["node_index"], x["course_index"], x.get("effective_role"),
+                                    x.get("free_end_wall"))
+                                   for x in audit["not_required"]
+                                   if x.get("reason") == _stepper_gate.NO_FUNCTIONAL_JUNCTION_REASON],
+        "free_end_not_composed": [(x["node_index"], x["course_index"]) for x in audit["missing"]
+                                  if x.get("reason") == "FREE_END_NOT_COMPOSED"]}
+    if role_by_course:
+        # tabela compacta (papel efetivo por no' x fiada) e a contagem das
+        # flags de diagnostico, para chamadores externos e para o relatorio
+        tabela = _junction_roles_for_audit(nodes, walls_to_create, _effective_solve_openings(
+            nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
+            (result.get("opening_reinforcement") or {}).get("free_to_top"),
+            kwargs.get("opening_reinforcement_policy")), catalog, base_z_abs, num_courses,
+            enabled=True) or {}
+        flags = {}
+        for r in tabela.values():
+            for f in r.get("stub_flags") or ():
+                k = str(f).split(":")[0]
+                flags[k] = flags.get(k, 0) + 1
+        result["junction_role_by_course"]["roles"] = dict(
+            ("%d:%d" % k, {"effective_role": r.get("effective_role"), "reason": r.get("reason"),
+                           "free_end_wall": r.get("free_end_wall"), "changed": bool(r.get("changed"))})
+            for k, r in tabela.items())
+        result["junction_role_by_course"]["flags"] = flags
+    if result.get("bond_trace_steps") is not None:
+        result["bond_trace"] = _bond_trace_from_result(result, audit, nodes)
+    return result
+
+
+BOND_TRACE_RESOLVED = "BOND_RESOLVED"
+BOND_TRACE_NOT_REQUIRED = "NO_FUNCTIONAL_JUNCTION"
+BOND_TRACE_NOT_GENERATED = "BOND_CANDIDATE_NOT_GENERATED"
+BOND_TRACE_REJECTED = "BOND_CANDIDATE_GENERATED_BUT_REJECTED"
+
+
+def _bond_trace_from_result(result, audit, nodes):
+    """SECAO 79 - rastreio da amarracao por no' L/T/X e fiada FISICA:
+
+        node_index, node_kind, course, band, main_wall_idx, arriving_wall_idx,
+        room_cm (espaco medido pelo passo do T), candidates (o que o passo do
+        no' GEROU nesta banda: codigo, origem, rotacao, razao, `accepted` =
+        esta no resultado final), rejected (testes fisicos que reprovaram:
+        regra + detalhe), selected (a peca que ocupa a regiao do no' nesta
+        fiada), bond_resolved, classification, rejection_rule, rejection_detail.
+
+    classification: BOND_RESOLVED; NO_FUNCTIONAL_JUNCTION (secao 77, fora do
+    denominador); BOND_CANDIDATE_NOT_GENERATED (nenhuma peca de amarracao foi
+    gerada para esta fiada - o motivo vem dos testes do passo do no');
+    BOND_CANDIDATE_GENERATED_BUT_REJECTED (foi gerada e o resultado final nao
+    a tem ou a auditoria 76.1 a reprovou; a regra 48 e' acrescentada na
+    materializacao). Somente leitura."""
+    from core.engine import wall_stepper as _st
+    bond_codes = tuple(_st.JUNCTION_BOND_CODES)
+    steps = {}
+    for rec in result.get("bond_trace_steps") or []:
+        band = tuple(rec.get("band")) if rec.get("band") is not None else None
+        steps[(band, rec.get("node_index"))] = rec
+    band_of_course = {}
+    for band in result.get("bands") or []:
+        for ci in band.get("course_indices") or []:
+            band_of_course[ci] = tuple(band.get("course_indices") or [])
+    missing = dict(((x["node_index"], x["course_index"]), x) for x in audit.get("missing") or [])
+    not_req = dict(((x["node_index"], x["course_index"]), x) for x in audit.get("not_required") or [])
+    resolved = dict(((x["node_index"], x["course_index"]), x) for x in audit.get("resolved") or [])
+    course_candidates = result.get("course_candidates") or {}
+    node_pieces = {}
+    for ci, cands in course_candidates.items():
+        for cand in cands or []:
+            ni = cand.get("node_index")
+            if ni is None:
+                continue
+            node_pieces.setdefault((ni, ci), []).append(cand)
+
+    def _mesma(gen, cand):
+        """A peca final e' a gerada pelo passo do no'? Codigo igual e origem a
+        <= 0,05 cm (nunca chave arredondada: 12,35 e 12,34 sao a mesma peca)."""
+        o = cand.get("origin_world")
+        if o is None or not gen.get("origin_cm") or gen.get("code") != cand.get("logical_code"):
+            return False
+        return (abs(_ft_to_cm(o.X) - gen["origin_cm"][0]) <= 0.05
+                and abs(_ft_to_cm(o.Y) - gen["origin_cm"][1]) <= 0.05)
+
+    def _familia(ci):
+        # a montagem das fiadas: familia A nas fiadas pares, B nas impares
+        return "A" if ci % 2 == 0 else "B"
+
+    inversao = {}   # (banda, no') -> a paridade do no' foi invertida nesta banda?
+
+    def _invertido(band, ni, rec):
+        chave = (band, ni)
+        if chave not in inversao:
+            achado = None
+            for gen in rec.get("generated") or []:
+                for c in band or ():
+                    for cand in node_pieces.get((ni, c)) or []:
+                        if _mesma(gen, cand):
+                            achado = (_familia(c) != gen.get("family"))
+                            break
+                    if achado is not None:
+                        break
+                if achado is not None:
+                    break
+            if achado is None:   # nenhuma peca gerada ficou na banda: o estado final do no'
+                achado = bool((nodes[ni] if ni < len(nodes) else {}).get("_tie_parity_flip"))
+            inversao[chave] = achado
+        return inversao[chave]
+    rows = []
+    for ni, node in enumerate(nodes or []):
+        if node.get("kind") not in _st._BOND_GATE_NODE_KINDS:
+            continue
+        for ci in sorted(course_candidates):
+            band = band_of_course.get(ci)
+            rec = steps.get((band, ni)) or steps.get((None, ni)) or {}
+            room = None
+            rejected = []
+            for step in rec.get("steps") or []:
+                if step.get("room_cm") is not None and room is None:
+                    room = step.get("room_cm")
+                if not step.get("passed"):
+                    rejected.append({"rule": step.get("rule"), "codes": step.get("codes"),
+                                     "detail": step.get("detail")})
+            # `family` = familia FISICA da peca gerada (convencao do passo do no'
+            # corrigida pela paridade que o no' terminou tendo nesta banda);
+            # `accepted` por FIADA: True = a peca esta' nesta fiada; False = e' da
+            # familia desta fiada e nao esta'; None = e' da outra familia.
+            generated = []
+            for gen in rec.get("generated") or []:
+                familia = gen.get("family")
+                if familia in ("A", "B") and _invertido(band, ni, rec):
+                    familia = "B" if familia == "A" else "A"
+                if any(_mesma(gen, cand) for cand in node_pieces.get((ni, ci)) or []):
+                    aceita = True
+                elif familia == _familia(ci):
+                    aceita = False
+                else:
+                    aceita = None
+                generated.append(dict(gen, family=familia, convention_family=gen.get("family"), accepted=aceita))
+            pieces = node_pieces.get((ni, ci)) or []
+            row = {"node_index": ni, "node_kind": node.get("kind"), "course": ci,
+                   "band": list(band) if band is not None else None,
+                   "main_wall_idx": node.get("main_wall_idx"), "arriving_wall_idx": node.get("incoming_wall_idx"),
+                   "room_cm": room, "candidates": generated, "rejected": rejected,
+                   "node_step_ok": rec.get("ok"), "node_step_reason": rec.get("reason"),
+                   "selected": None, "bond_resolved": False, "classification": None,
+                   "rejection_rule": None, "rejection_detail": None}
+            key = (ni, ci)
+            if key in resolved:
+                row.update(bond_resolved=True, classification=BOND_TRACE_RESOLVED,
+                           selected={"code": resolved[key].get("logical_code"),
+                                     "placement_reason": resolved[key].get("placement_reason"),
+                                     "wall_idx": resolved[key].get("wall_idx")})
+            elif key in not_req:
+                row.update(bond_resolved=None, classification=BOND_TRACE_NOT_REQUIRED,
+                           rejection_rule=not_req[key].get("reason"),
+                           rejection_detail=not_req[key].get("effective_role"))
+            elif key in missing:
+                item = missing[key]
+                bond_here = [c for c in pieces if c.get("logical_code") in bond_codes]
+                dropped = [g for g in generated if g.get("code") in bond_codes and g.get("accepted") is False]
+                occupant = (item.get("occupants") or [{}])[0]
+                row["selected"] = {"code": occupant.get("logical_code"),
+                                   "placement_reason": occupant.get("placement_reason"),
+                                   "wall_idx": occupant.get("wall_idx")} if occupant else None
+                if bond_here:
+                    row.update(classification=BOND_TRACE_REJECTED, rejection_rule="AUDIT_" + str(item.get("reason")),
+                               rejection_detail="peca de amarracao gerada e presente, reprovada pela auditoria 76.1")
+                elif dropped:
+                    row.update(classification=BOND_TRACE_REJECTED, rejection_rule="DROPPED_AFTER_NODE_STEP",
+                               rejection_detail="gerada pelo passo do no' e ausente do resultado final: {}".format(
+                                   ", ".join(g.get("code") or "?" for g in dropped)))
+                else:
+                    row.update(classification=BOND_TRACE_NOT_GENERATED,
+                               rejection_rule=(rejected[-1]["rule"] if rejected else str(item.get("reason"))),
+                               rejection_detail="; ".join("{}: {}".format(r["rule"], r.get("detail") or "reprovado")
+                                                          for r in rejected) or str(item.get("reason")))
+            else:
+                row.update(bond_resolved=None, classification="NOT_CHECKED")
+            rows.append(row)
+    return rows
+
+
+def _bond_trace_apply_materialization(bond_trace, unresolved_bonds):
+    """SECAO 79: amarracao pulada pela regra 48 (invadia abertura/colidia) vira
+    BOND_CANDIDATE_GENERATED_BUT_REJECTED no rastreio, com a regra."""
+    idx = dict(((row.get("node_index"), row.get("course")), row) for row in bond_trace or [])
+    for rec in unresolved_bonds or []:
+        row = idx.get((rec.get("node_index"), rec.get("course_index")))
+        if row is None:
+            continue
+        row.update(bond_resolved=False, classification=BOND_TRACE_REJECTED,
+                   rejection_rule="REGRA_48_" + str(rec.get("rejected_rule") or "MATERIALIZACAO"),
+                   rejection_detail=rec.get("message"))
+    return bond_trace
+
+
+def _bond_trace_summary(bond_trace):
+    counts = {}
+    for row in bond_trace or []:
+        counts[row.get("classification")] = counts.get(row.get("classification"), 0) + 1
+    return counts
 
 
 def _effective_solve_openings(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
@@ -3921,7 +4160,7 @@ def _non_modular_by_physical_course(result, variants_per_course=1):
 
 
 def _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
-                               num_courses, policy, variants_per_course=1):
+                               num_courses, policy, variants_per_course=1, role_by_course=None):
     """REGRA 76.1 sobre o resultado FINAL: o encontro existe na fiada (com as
     aberturas do SOLVE) e tem peca de amarracao valida? Ver
     wall_stepper.junction_bond_audit."""
@@ -3936,14 +4175,16 @@ def _junction_bond_audit_final(result, nodes, walls_to_create, openings_per_wall
         _free_to_top_band(catalog, base_z_abs), (result.get("physical_support") or {}).get("items"),
         _non_modular_by_physical_course(result, variants_per_course), catalog, OPENING_COURSE_BAND_TOLERANCE_FT,
         junction_roles=_junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs,
-                                                 num_courses))
+                                                 num_courses, enabled=role_by_course))
 
 
-def _junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs, num_courses):
+def _junction_roles_for_audit(nodes, walls_to_create, solve_openings, catalog, base_z_abs, num_courses,
+                              enabled=None):
     """SECAO 77: tabela de papel funcional por fiada para a AUDITORIA,
     recalculada pela geometria (nunca a tabela que o solve usou - um solve
-    errado nao faz o gate concordar). None com a flag desligada."""
-    if not CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED:
+    errado nao faz o gate concordar). None com a flag desligada. `enabled`
+    (secao 79): a chave que o SOLVE usou; None = a do fluxo CHANNEL."""
+    if not (CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED if enabled is None else enabled):
         return None
     from core.engine import wall_stepper as _bond_gate
     return _bond_gate.junction_role_table(nodes, walls_to_create, solve_openings,
@@ -4417,9 +4658,23 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
     saved_role_table = _stepper_repair.JUNCTION_ROLE_TABLE
     saved_room_tol = _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE
+    # SECAO 79: sem reforco, as regras FISICAS de encontro seguem
+    # JUNCTION_PHYSICAL_RULES_ENABLED (no CHANNEL, as chaves CHANNEL_* de sempre,
+    # ligadas pelo wrapper). Ponto unico das duas portas de entrada.
+    junction_rules = bool(kwargs.get("opening_reinforcement_strategy") is None
+                          and JUNCTION_PHYSICAL_RULES_ENABLED)
     _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = bool(
-        kwargs.get("opening_reinforcement_strategy") is not None
-        and CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED)
+        (kwargs.get("opening_reinforcement_strategy") is not None
+         and CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED) or junction_rules)
+    saved_junction = (_stepper_repair.T_DEGRADED_L_ROOM_FROM_CONTACT,
+                      _stepper_repair.JUNCTION_ROLE_BY_COURSE,
+                      _stepper_repair.COMPENSATOR_NODE_PIECE_UNDESIGNATED)
+    if junction_rules:
+        _stepper_repair.T_DEGRADED_L_ROOM_FROM_CONTACT = True       # 76 D1
+        _stepper_repair.JUNCTION_ROLE_BY_COURSE = True              # 77
+        _stepper_repair.COMPENSATOR_NODE_PIECE_UNDESIGNATED = True  # 76.1
+    saved_bond_trace = _stepper_repair.BOND_TRACE
+    _stepper_repair.BOND_TRACE = {} if BOND_TRACE_ENABLED else None
     # SECAO 78: tolerancias FISICAS de fechamento (30.8 + 51.13, com a tentativa
     # 30.9) em QUALQUER estrategia - inclusive "Sem reforco". Ponto unico das
     # duas portas de entrada, como as flags acima.
@@ -4436,8 +4691,20 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         if isinstance(result, dict):
             result["physical_modulation_tolerances"] = bool(PHYSICAL_MODULATION_TOLERANCES_ENABLED)
             result["unresolved_spans"] = _unresolved_spans(result)
+            result["junction_physical_rules"] = bool(junction_rules or kwargs.get("opening_reinforcement_strategy")
+                                                     is not None)
+            if _stepper_repair.BOND_TRACE is not None and result.get("bond_trace_steps") is None:
+                # (a passada ja' anexa o seu rastreio; isto so' cobre um resultado
+                # remontado fora dela)
+                result["bond_trace_steps"] = [rec for _k, rec in sorted(
+                    _stepper_repair.BOND_TRACE.items(),
+                    key=lambda kv: (kv[0][0] or (), kv[0][1]))]
         return result
     finally:
+        _stepper_repair.BOND_TRACE = saved_bond_trace
+        (_stepper_repair.T_DEGRADED_L_ROOM_FROM_CONTACT,
+         _stepper_repair.JUNCTION_ROLE_BY_COURSE,
+         _stepper_repair.COMPENSATOR_NODE_PIECE_UNDESIGNATED) = saved_junction
         (_stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
          _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_physical
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
@@ -11993,6 +12260,18 @@ def _format_block_solve_report(result, catalog):
     for wall in retained:
         lines.append("  - parede {wall_idx}: {reason}; {length_cm:.3f}cm; "
                      "{start_cm} -> {end_cm}; PRESERVAR referencia.".format(**wall))
+    rastreio = result.get("bond_trace")
+    if rastreio is not None:
+        contas = _bond_trace_summary(rastreio)
+        lines.append("AMARRACAO POR NO'/FIADA (bond_trace, secao 79): " + ", ".join(
+            "{}={}".format(k, contas[k]) for k in sorted(contas, key=str)))
+        pendentes = [r for r in rastreio if r.get("classification") in (BOND_TRACE_NOT_GENERATED, BOND_TRACE_REJECTED)]
+        for row in pendentes[:60]:
+            lines.append("  BOND_TRACE node={} kind={} course={} classification={} rule={} selected={} detail={}".format(
+                row.get("node_index"), row.get("node_kind"), row.get("course"), row.get("classification"),
+                row.get("rejection_rule"), (row.get("selected") or {}).get("code"), row.get("rejection_detail")))
+        if len(pendentes) > 60:
+            lines.append("  ... e mais {}.".format(len(pendentes) - 60))
     trechos = result.get("unresolved_spans") or []
     lines.append("TRECHOS NAO RESOLVIDOS (NON_MODULAR_UNRESOLVED, revisao humana obrigatoria): {}".format(len(trechos)))
     for span in trechos[:60]:
@@ -12936,6 +13215,9 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.solve_result["beta_input_signature"] = self._beta_input_signature()
         # contrato da materializacao para a apresentacao (nao recalcula fisica)
         plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
+        if self.solve_result.get("bond_trace") is not None:
+            # SECAO 79: amarracao que a regra 48 vai pular NAO e' amarracao resolvida
+            _bond_trace_apply_materialization(self.solve_result["bond_trace"], plano_material["unresolved_bonds"])
         self.solve_result["materialization"] = {
             "skipped": [rec for _ci, _k, rec in plano_material["skip"]],
             "unresolved_bonds": plano_material["unresolved_bonds"],
@@ -13014,6 +13296,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         plano_material = materialization_plan(self.solve_result, preflight)
         self._unbuildable = plano_material["skip"]
         self._unresolved_bonds = plano_material["unresolved_bonds"]
+        if self.solve_result is not None and self.solve_result.get("bond_trace") is not None:
+            _bond_trace_apply_materialization(self.solve_result["bond_trace"], self._unresolved_bonds)
         # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
         # so' com as pecas que ficam, o preflight tem de sair limpo. Se nao sair,
         # a classificacao falhou - isso e' fatal, nunca criacao parcial.
