@@ -453,7 +453,12 @@ class ReviewRegressionTests(Repository):
                      'Use \\` para crase literal; o PR #40 foi mesclado, ver `status`.',
                      'Para crase use `` ` ``; PR #40 foi mesclado, ver `status`.', 'Digite ``` para abrir; PR #40 mesclado, ver `status`.',
                      'Ver [nota](PR #40 mesclado).', '| x | y | z |\n|---|---|---|\n| `a | PR #40 | b` |',
-                     'Orientação do compensador (regra\n#3 da skill).'):  # fails closed: qualifier and number on one line
+                     'Orientação do compensador (regra\n#3 da skill).',  # fails closed: qualifier and number on one line
+                     '- A razão do gate muda (de `row_coverage_regression:\n  <89|90>`, PR #40 mesclado, para `row_coverage_regression:<132|\n  133>`).',
+                     'Para todos os fragmentos `W046\n< 50` cm, o PR #40 foi mesclado; ver `status`.',
+                     '> A projeção é uma **cópia isolada** montada por `git checkout <branch> --\n> <arquivo>` num worktree (PR #40 já mesclado) e `git status` confirma.',
+                     '> Rodar `context_pack.py\n> state` (PR #40 já mesclado) e `git status`.',
+                     '> - Rodar `context_pack.py\n>   state` (PR #40 já mesclado) e `git status`.'):
             findings = self.findings('# S\n\n' + text + '\n', (40, 41, 42, 33, 35))
             self.assertTrue(findings, text)
             self.assertTrue(all(f['id'] == 'START_HERE_PR_STATE' and f['severity'] == 'ERROR' for f in findings), text)
