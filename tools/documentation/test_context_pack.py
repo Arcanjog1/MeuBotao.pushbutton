@@ -140,9 +140,9 @@ class Repository(unittest.TestCase):
         self.git('add', '.')
         self.git('commit', '-q', '-m', message)
 
-    def checkpoint(self, path, date, known, scope='current'):
+    def checkpoint(self, path, date, known, scope='current', head=None):
         data = {key: ['nao aplicavel: teste'] for key in validator.REQUIRED}
-        data.update(date=date, branch='test', head=self.base, base=self.base, pr='not-created', scope=scope,
+        data.update(date=date, branch='test', head=head or self.base, base=self.base, pr='not-created', scope=scope,
                     objective='teste', known_failures=known, next_steps=['Ciclo 3 somente com autorizacao'],
                     references=[{'path': 'engine.py'}])
         self.write(path, '# CP\n\n```json\n' + json.dumps(data) + '\n```\n')
@@ -283,9 +283,9 @@ class StateTests(Repository):
         self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
         findings = self.pack()['consistency']
         pr = [f for f in findings if f['id'] == 'START_HERE_PR_STATE']
-        self.assertEqual(1, len(pr), findings)
-        self.assertEqual('CONTRADICTION', pr[0]['severity'])
-        self.assertIn('PR #40', pr[0]['message'])
+        self.assertTrue(pr, findings)
+        self.assertTrue(all(f['severity'] == 'ERROR' for f in pr))
+        self.assertIn('#40 (oficial)', pr[0]['message'])
         links = [f for f in findings if f['id'] == 'START_HERE_CHECKPOINT_LINK']
         self.assertEqual(1, len(links), 'links inside Histórico are exempt')
         self.assertIn('STATUS_MAIN_BEHIND', self.ids(findings))
@@ -437,23 +437,20 @@ class ReviewRegressionTests(Repository):
         ids = [f['id'] for f in self.findings('# S\n\n## Candidato atual: PR #40 (sem merge)\n')]
         self.assertIn('START_HERE_PR_STATE', ids)
 
-    def test_state_change_phrases_are_not_contradictions(self):
+    def test_any_pr_state_outside_history_is_an_error(self):
+        # Contract: the router never describes PR state outside 'Histórico' (it lives in the status),
+        # so phrasing, negation and punctuation cannot open gaps (review rounds 1-4).
         for text in ('O PR #40 não está mais sem merge.', 'O PR #40 promoveu o candidato CHANNEL a estratégia oficial.',
-                     'O PR #40 deixou de ser draft.'):
+                     'O PR #40 deixou de ser draft.', 'O PR #31 unmerged.', 'O PR #40 continua sem merge.',
+                     'O PR #40 foi promovido a candidato.', 'PR #40 nunca foi mesclado', 'PR #40 not yet merged',
+                     'O PR #40 é mais um candidato à main.', 'O PR #40 não tem merge (pendente de autorização).',
+                     'Os PRs #33 e #35 não estão mais em draft.', 'PR #40 is no longer draft', 'O PR #40 foi integrado.'):
+            findings = self.findings('# S\n\n' + text + '\n')
+            self.assertEqual(['START_HERE_PR_STATE'], [f['id'] for f in findings], text)
+            self.assertEqual('ERROR', findings[0]['severity'])
+        self.assertIn('#31 (candidato)', self.findings('# S\n\nPR #31 draft.\n')[0]['message'])
+        for text in ('Módulos do #42 por domínio no manifesto.', 'Ver o #36 para a consolidação.'):
             self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
-        self.assertEqual([], self.findings('# S\n\nO PR #31 unmerged.\n'), "'merged' inside 'unmerged'")
-        self.assertTrue(self.findings('# S\n\nO PR #40 continua sem merge.\n'))
-
-    def test_round2_state_phrases(self):
-        for text in ('O PR #40 não é mais um candidato.', 'O PR #40 deixou de ser um candidato.', 'O PR #40 não está mais em draft.',
-                     'O PR #40 era candidato e foi mesclado.', 'O PR #40 (ex-candidato) está na main.', 'PR #40 is no longer draft',
-                     'PR #40 not a draft', 'O PR #40 promovido de candidato a oficial.', 'O PR #40 foi squash, não tem merge commit.',
-                     'O PR #40 não tem merge conflicts.'):
-            self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
-        for text in ('O PR #40 foi promovido a candidato.', 'PR #40 promovido para candidato', 'PR #40 nunca foi mesclado',
-                     'PR #40 not yet merged', 'PR #40 não tem merge', 'O PR #40 é mais um candidato à main.',
-                     'Mais um candidato: o PR #40.'):
-            self.assertTrue(self.findings('# S\n\n' + text + '\n'), text)
 
     def test_inline_backticks_do_not_open_a_fence(self):
         text = '# S\n\n```bash``` e o shell padrao.\n\n[cp](checkpoints/x.md). PR #40 sem merge.\n'
@@ -489,19 +486,18 @@ class ReviewRegressionTests(Repository):
         for part in ('unmapped_rules', 'not mapped to any domain: 80', 'not mapped to any domain: 81'):
             self.assertIn(part, errors)
 
-    def long_checkpoint(self, path, date, variant):
-        self.checkpoint(path, date, ['sem falhas'])
-        with (self.root / path).open('a', encoding='utf-8') as handle:
-            handle.write(''.join('Linha de relato %d sobre a entrega, igual entre as copias.\n' % i for i in range(40)))
-            handle.write('Variante: ' + variant + '\n')
-
-    def test_copied_checkpoint_keeps_its_own_introduction(self):
-        self.long_checkpoint('docs/checkpoints/2026-09-20-a.md', '2026-09-20', 'a')
-        self.commit('a longo')
-        self.long_checkpoint('docs/checkpoints/2026-09-20-b.md', '2026-09-20', 'b')
-        self.commit('b copiado de a, depois')
+    def test_same_day_order_follows_evaluated_heads(self):
+        # Copying, renaming or restoring a checkpoint file does not change which head it evaluated.
+        later = self.git('rev-parse', 'HEAD')
+        self.checkpoint('docs/checkpoints/2026-09-20-copia.md', '2026-09-20', ['sem falhas'])
+        self.commit('same head, added later')
         self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
-        self.assertIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))
+        self.assertNotIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))
+        self.checkpoint('docs/checkpoints/2026-09-20-copia.md', '2026-09-20', ['sem falhas'], head=later)
+        self.commit('later head')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        findings = [f for f in self.pack()['consistency'] if f['id'] == 'CHECKPOINT_NEWER_THAN_STATUS']
+        self.assertEqual(['docs/checkpoints/2026-09-20-copia.md'], [f['evidence'] for f in findings])
 
     def test_renamed_old_checkpoint_is_not_newer(self):
         self.checkpoint('docs/checkpoints/2026-09-20-b.md', '2026-09-20', [])
@@ -524,7 +520,7 @@ class ReviewRegressionTests(Repository):
         self.assertEqual('docs/checkpoints/2026-09-20-a.md', self.pack()['state']['last_checkpoint']['path'])
 
     def test_same_day_newer_checkpoint_is_reported(self):
-        self.checkpoint('docs/checkpoints/2026-09-20-z-newer.md', '2026-09-20', [])
+        self.checkpoint('docs/checkpoints/2026-09-20-z-newer.md', '2026-09-20', [], head=self.git('rev-parse', 'HEAD'))
         self.commit('same day, later')
         self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
         self.assertIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))

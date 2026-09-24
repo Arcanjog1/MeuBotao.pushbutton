@@ -84,15 +84,15 @@ No Windows, trocar `python3` por `py -3`. `--output` nunca sobrescreve;
 
 | id | severidade | significado |
 |---|---|---|
-| `START_HERE_PR_STATE` | CONTRADICTION | START_HERE descreve como "sem merge/candidato/draft" um PR que o status lista como oficial (frases de mudança de estado, como "não está mais sem merge", não contam) |
+| `START_HERE_PR_STATE` | ERROR | START_HERE cita `#N` com vocabulário de estado (merge, mesclado, candidato, draft, na main, integrado, aprovado, pendente...) fora do "Histórico"; a mensagem diz se o status o lista como oficial ou candidato. Contrato simples de propósito: sem lógica de negação, frase nenhuma sobre estado de PR fica no roteador |
 | `START_HERE_CHECKPOINT_LINK` | ERROR | START_HERE aponta checkpoint específico fora de uma seção cujo título começa com "Histórico" (a isenção vale até o próximo heading de nível igual ou maior; blocos de código são ignorados) |
 | `STATUS_MAIN_BEHIND` / `STATUS_MAIN_DIVERGED` | WARN / ERROR | main observada no status ≠ `origin/main` buscada |
-| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status (data maior, ou mesma data e adicionado depois) |
+| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status: data maior, ou mesma data com `head` avaliado descendente do `head` declarado (imune a renomear/copiar/restaurar arquivos) |
 | `STATUS_NO_LAST_CHECKPOINT`, `LAST_CHECKPOINT_UNREADABLE` | ERROR | status sem checkpoint resolvível |
 | `MAIN_UNKNOWN` | WARN | `origin/main` indisponível (rodar `git fetch origin main`) |
 
-São heurísticas estruturais: detectam as contradições catalogadas, não
-provam que o texto está semanticamente correto.
+São checagens estruturais: detectam os padrões catalogados, não provam que o
+texto está semanticamente correto.
 
 ## Manutenção
 

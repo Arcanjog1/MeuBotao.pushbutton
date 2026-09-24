@@ -46,10 +46,10 @@ documentais; integração não transforma proposta em contrato aprovado.
   `66.3`): citar arquivo + SHA + heading.
 - Sem migração de imports sem CR própria (ordem da consolidação de 2026-09-10,
   mantida pelo protocolo de memória técnica de 2026-09-24).
-- Este roteador não aponta checkpoint específico nem estado de PR fora de uma
-  seção cujo título comece com "Histórico". `validate.py` bloqueia link para
-  checkpoint específico e PR oficial descrito como sem merge/candidato/draft
-  (heurística de texto; não prova correção semântica).
+- Este roteador não aponta checkpoint específico nem descreve estado de PR fora
+  de uma seção cujo título comece com "Histórico". `validate.py` bloqueia link
+  para checkpoint específico e frase que cite `#N` com vocabulário de estado
+  (merge, mesclado, candidato, draft, na main, integrado...) fora dessa seção.
 
 ## Busca por domínio e arquivos antigos
 
