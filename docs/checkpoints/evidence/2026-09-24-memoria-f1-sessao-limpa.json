@@ -1,0 +1,25 @@
+{
+  "started_utc": "2026-09-24T19:03:29.585974+00:00",
+  "cwd": "/tmp/claude-0/-home-user-MeuBotao-pushbutton/4484bf45-6d62-529f-adce-edb49a3f7b23/scratchpad/sessao-limpa",
+  "head": "2e5a7123e57df21d26c54ea26f0449a3936deabd",
+  "tree": "75706578ff3b7e7a1607f6ccd5885597654acdd0",
+  "status_before": "",
+  "command": [
+    "env",
+    "-i",
+    "PATH=/usr/local/bin:/usr/bin:/bin",
+    "HOME=/tmp",
+    "bash",
+    "-c",
+    "echo \"== clone: $(git rev-parse HEAD) shallow=$(git rev-parse --is-shallow-repository) origin/main=$(git rev-parse origin/main)\"; echo \"== state\"; python3 tools/documentation/context_pack.py state --strict; echo \"state exit=$?\"; echo \"== pack\"; python3 tools/documentation/context_pack.py pack --task \"Canaleta pode servir de amarra\u00e7\u00e3o num encontro em T?\" --task-id DEMO-CTX-02; echo \"pack exit=$?\"; echo \"== verify\"; python3 tools/documentation/context_pack.py pack --task \"Canaleta pode servir de amarra\u00e7\u00e3o?\" --format json --output /tmp/demo-pacote.json >/dev/null && python3 tools/documentation/context_pack.py verify /tmp/demo-pacote.json; echo \"verify exit=$?\""
+  ],
+  "timeout_seconds": 600,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-24-memoria-f1-sessao-limpa.txt",
+  "pid": 3783,
+  "exit_code": 0,
+  "elapsed_seconds": 3.028,
+  "status_after": "",
+  "log_sha256": "63ea3a02b4bdcffbb37e73d29078cf0ec06bf6a50d0a2bbd0c33ba2bcd539888"
+}

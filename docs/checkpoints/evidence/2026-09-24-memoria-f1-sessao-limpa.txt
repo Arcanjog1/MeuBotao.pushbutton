@@ -1,0 +1,308 @@
+== clone: 2e5a7123e57df21d26c54ea26f0449a3936deabd shallow=false origin/main=15bacec9d5edc58beaf969c78c7c8d0802f8979e
+== state
+# Pacote de contexto — STATE
+
+Objetivo: (state: somente nivel 0)
+
+## Identidade
+- repository: `Arcanjog1/MeuBotao.pushbutton`
+- branch: `claude/new-session-9raf0t`
+- evaluated_commit: `2e5a7123e57df21d26c54ea26f0449a3936deabd`
+- evaluated_tree: `75706578ff3b7e7a1607f6ccd5885597654acdd0`
+- observed_main: `15bacec9d5edc58beaf969c78c7c8d0802f8979e`
+- merge_base: `15bacec9d5edc58beaf969c78c7c8d0802f8979e`
+- worktree_dirty: `False`
+- escopo: {"mode": "diagnostic", "production_changes_authorized": false, "revit_write_authorized": false, "merge_authorized": false, "authorization_ref": null, "note": "Declarado pelo chamador com --allow/--authorization-ref; nunca inferido do texto da tarefa."}
+
+## Estado (do status; observacao datada)
+- status observado: `15bacec9d5edc58beaf969c78c7c8d0802f8979e` em 2026-09-24T16:15:33+00:00 (atual: True)
+- PRs oficiais: #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #44, #46, #49
+- PRs candidatos: #7, #8, #21, #28, #30, #31, #43, #45, #47, #48
+- ultimo checkpoint: `docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md` (2026-09-24, head `95f368d4cad98ab791d43a875fb8e0bc3ba8d77e`)
+
+## Consistencia
+- nenhuma inconsistencia detectada pelas checagens implementadas
+
+## Dominios (STATE_ONLY)
+- sem tarefa (recibo de sessao); dominios: aberturas, amarracao, benchmark, bonecas_pilaretes, canaletas, catalogo, compensadores, corpus_selecao, criacao_revit, governanca, prisma_fiadas, runtime_loader, tolerancias_fechamento, ui_revisao, vergas_lintel_cinta, wall_modeling
+
+## Fontes obrigatorias
+- `AGENTS.md` — instruction, USER_INSTRUCTION, load=auto, sha256 `5bffab763a16`
+- `CLAUDE.md` — instruction, USER_INSTRUCTION, load=auto, sha256 `94d51d2a062c`
+- `docs/START_HERE.md` — onboarding, NAVIGATION, load=full, sha256 `367f3532cad2`
+- `docs/PROJECT_STATUS.md` — status, DATED_STATE, load=summarized, sha256 `012f49e06814`
+- `docs/DEVELOPMENT_PROCESS.md` — process, PROCESS, load=full, sha256 `44ae4e595575`
+- `nuvem/REGRAS_MODULACAO_BLOCOS.md` — rule_authority, APPROVED_DOMAIN_RULE, load=by_section, sha256 `8cfbd653c9a4`
+- `docs/agents/KNOWN_DEBT.json` — debt_index, NAVIGATION, load=summarized, sha256 `279ab25a10bb`
+
+## Regras obrigatorias (`nuvem/REGRAS_MODULACAO_BLOCOS.md` @ `2e5a7123e57d`)
+
+## Regras relacionadas (curadas sempre; demais por ranking de aliases dentro da meta)
+- nenhuma
+- termos sem resultado: nenhum (busca sem resultado nao prova ausencia)
+
+## Memoria de casos (NOT_AVAILABLE_F2)
+- Casos, contraexemplos e experimentos estruturados sao a fatia F2; lista vazia nao significa ausencia.
+
+## Codigo
+- nenhum no manifesto
+
+## Testes
+- nenhum no manifesto
+
+## Divida conhecida (docs/agents/KNOWN_DEBT.json; indice, nao aceite)
+- KD-01 [OPEN] Benchmark TP1 (regua V1 HISTORICAL): JUNCTION_MISSING_BINDING acima do baseline — JUNCTION_MISSING_BINDING 8->9 (REGRESSAO CRITICA; historica, identica na main) — check: `tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:23, docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:23, docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt
+- KD-02 [OPEN] Benchmark TGD V2: COVERAGE_ROW_MOSTLY_EMPTY acima do baseline por reclassificacao apos a regra 78 — COVERAGE_ROW_MOSTLY_EMPTY 86->92 desde 9376a36 (nenhuma fiada perdeu cobertura; compensadores 2217->2451) — check: `tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]` — evidencia: docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:28, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:23, docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt
+- KD-03 [OPEN] Benchmark TGD V2: categoria compensators acima do baseline (mascarada pelo assert critico desde o ciclo 1) — compensators: baseline 61; 62 na main antes do ciclo 1; 63 desde 9376a36 (regra 78). O verdict passou de 'REGRESSAO' para 'REGRESSAO CRITICA' (KD-02). — check: `tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]` — evidencia: docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:38, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:30, docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:28, docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt
+- KD-04 [NEEDS_REVIEW] Teste do amostrador de travamento falha (defeito do proprio teste, nao do solver) — historica nos checkpoints (ambiente das sessoes anteriores); passou em Linux/Python 3.11.15 em 2026-09-24 — check: `tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas` — evidencia: docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:26, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:23, docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt
+- KD-05 [OPEN] D2 (serie forense): pilar do no 51 fechado com B19|B19 em vez de B54 alternado — padrao por fiada xxxxxxxxxxxB antes e depois do ciclo 2 (MCP/HUMANO: BBBBBBBBBBBx) — check: `UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2) com a regua de nos do forense, nao versionada` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:29, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:40, docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:36
+- KD-06 [OPEN] D3 (serie forense): fiadas 4-10 sem amarracao nos T sob/entre aberturas — nos 20/26 BBBBxxxxxxxB; no 28 BBBBxxxxxBBB (MCP tudo B) — check: `UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2)` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:29, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:40
+- KD-07 [OPEN] Clique humano com o prompt do layer de referencia (regra 49.1) nao exercitado; import 1 PAV do doc de teste fora de escala — provado pela API na copia CICLO2 (46 -> 34); nenhum clique humano — check: `acao humana; logica coberta por tests/test_corpus_selection_paredes_existentes.py` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:23, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:38
+- KD-08 [OPEN] Botao real e banner do loader nunca observados dentro do pyRevit — sem evidencia versionada do SHA que roda no botao — check: `acao humana; logica provada por tests/test_loader_provenance.py` — evidencia: docs/checkpoints/2026-09-23-runtime-canonico.md:27
+- KD-09 [MITIGATED] Trechos NON_MODULAR_UNRESOLVED no fluxo padrao sem layer de referencia (46 eixos) — 224 -> 96 (ciclo 1); 0 com layer de referencia (ciclo 2, 34 eixos) — check: `tests/test_tolerancias_fisicas_gerais.py` — evidencia: docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:29, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:28
+- KD-10 [NEEDS_REVIEW] Amarracoes NAO resolvidas do no 41: B34 T_INTERSECTION_DEGRADED_L a 0,5 cm dentro da porta (regra 48) — 11 pecas puladas (OPENING_VOID_INVASION), sobreposicao 0,49995 cm — check: `tests/test_materializacao_e_estado_da_run.py::test_caso_B_amarracao_real_que_invade_porta_nao_e_criada_e_fica_nao_resolvida (fixture sintetica do no 41, 2 fiadas; o caso real de 11 fiadas no corpus de 46 eixos nao tem teste de corpus)` — evidencia: docs/checkpoints/2026-09-23-integracao-42-46.md:80, docs/checkpoints/2026-09-23-integracao-42-46.md:162, docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt
+- KD-11 [OPEN] Regra 76/76.1: nos sem amarracao valida (MISSING_REQUIRED_JUNCTION_BOND) pendentes de decisao do usuario — 3 pares (no, fiada) no produto com a secao 77 ligada: 47x2, 47x4, 48x3 (smoke Revit: MISSING_REQUIRED_JUNCTION_BOND 3); no motor anterior a secao 77 eram 6 pares em 3 nos (28x5/7/9, 47x2/4, 48x3), registro historico em test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos — check: `tests/test_regra76_corpus_butanta.py::test_secao_77_o_no_28_nao_e_encontro_nas_fiadas_das_janelas_e_sobram_os_cantos` — evidencia: nuvem/REGRAS_MODULACAO_BLOCOS.md:9904, tests/test_regra76_corpus_butanta.py:38, docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt
+- KD-12 [OPEN] Etapa 3B da secao 66 (microajuste de abertura) nao e disparada pelo fluxo do botao — UI mostra 'nao avaliado nesta execucao' — check: `tests/test_materializacao_e_estado_da_run.py::test_etapa_3b_tem_estado_explicito_e_deterministico (fixa o estado not_evaluated)` — evidencia: docs/checkpoints/2026-09-23-integracao-42-46.md:61, docs/checkpoints/2026-09-23-integracao-42-46.md:82, docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt
+- KD-13 [NEEDS_REVIEW] Os '371 bloqueios' da execucao do usuario (PC CIVIX) nao foram reproduzidos — reproducao offline deu 11 invasoes de vao, nao 371 — check: `UNKNOWN` — evidencia: docs/checkpoints/2026-09-23-integracao-42-46.md:62, docs/checkpoints/2026-09-23-integracao-42-46.md:156
+- KD-14 [OPEN] Backlog da comparacao forense nao iniciado: D6 verga/contraverga, D9-D13, D14, 3B, D16 — nao iniciado — check: `UNKNOWN: catalogo forense D1-D16 nao versionado` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:43
+- KD-DOC-01 [OPEN] Divida documental residual encontrada na auditoria F0 (nao corrigida nesta fatia) — skill .agents/cr-checkpoint cita .Codex/checkpoints (nao ignorado); heading 30.8 das REGRAS diz DESLIGADO apesar da regra 78; CURRENT_REFERENCE_SNAPSHOT linha 1 HISTORICAL x linha 29 ATUALIZADO; rules/junctions indexa ate a secao 39; tests/README documenta so run_tests.py; BETA2_BACKLOG com base 6c00f7e; JSON official do status mistura head do PR e commit de merge — check: `context_pack.py state / revisao humana` — evidencia: .agents/skills/cr-checkpoint/SKILL.md:41, nuvem/REGRAS_MODULACAO_BLOCOS.md:5250, docs/CURRENT_REFERENCE_SNAPSHOT.md:29, rules/junctions/README.md, tests/README.md:22, docs/BETA2_BACKLOG.md:2
+
+## Falhas declaradas no ultimo checkpoint
+- tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]: JUNCTION_MISSING_BINDING 8->9 (KD-01, historica, reproduzida). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]: COVERAGE_ROW_MOSTLY_EMPTY 86->92 (KD-02, reproduzida; mascara compensators 61->63, KD-03). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas: registrada como historica nos checkpoints anteriores, PASSOU em Linux/Python 3.11.15 (KD-04 NEEDS_REVIEW, nao declarada corrigida). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Demais dividas abertas indexadas em docs/agents/KNOWN_DEBT.json (KD-05..KD-14, KD-DOC-01), sem mudanca nesta entrega. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+
+## Decisoes pendentes
+- Autorizar (ou nao) PR/merge desta fatia na main. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Proxima fatia do protocolo (F2 memoria estruturada: casos, linhagem, importacao idempotente) - exige nova autorizacao. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Tornar o check documental obrigatorio e proteger a main (mudanca administrativa). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Carregadas do ciclo 2: corrigir o import '1 PAV' do doc de teste; baseline TGD V2 (regravar ou manter a falha); D2/D3 em ciclo proprio. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Divida documental KD-DOC-01 (espelho .Codex/checkpoints, heading 30.8 x regra 78, snapshot, rules/junctions, tests/README, backlog) em entregas proprias. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-C2-G16.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-CATALOG-SCOPE.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-COMPENSATOR-LIMIT.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-CR-B.md`)
+- STATUS: PENDING (arquitetura geral); CHANNEL aprovada como estratégia oficial em 2026-09-14 (`docs/decisions/DECISION-OPENING-REINFORCEMENT.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-TOP-BOND-BEAM.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-WALL-OUTSIDE-MODULE.md`)
+
+## Proxima acao
+- Revisao humana desta fatia e decisao sobre PR/merge. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Ciclo 3 do solver somente com nova autorizacao (D6 verga/contraverga, D9-D13, D14, 3B, D16); D2/D3 em ciclo proprio. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Ciclo 3 somente com nova autorização (D6 verga/contraverga, D9–D13, D14, 3B, D16); D2/D3 em ciclo próprio; decisões E (topo/peitoril fora da grade) e F (cinta de topo) pendentes; LINTEL não iniciado. Memória técnica: fatia F2 (memória estruturada) só com autorização. [Pacote Beta 2](architecture/beta2-implementation-package.md) e [backlog](BETA2_BACKLOG.md) são snapshots de 2026-09-10 (`docs/PROJECT_STATUS.md (Próximo objetivo)`)
+
+## Checks requeridos (NOT_RUN)
+- `python3 -m unittest discover -s tools/documentation -p 'test_*.py'`
+- `python3 tools/documentation/validate.py --base <merge-base> --main origin/main --require-current-main`
+
+## Orcamento
+- meta 6000, estimado 4044, obrigatorio 4044 (chars/4 (heuristica; nao e tokenizer))
+- obrigatorio acima da meta: False; truncado: False
+
+## Limites
+- Pacote derivado: nao e autoridade; a regra vale no arquivo/SHA citado.
+- Selecao por manifesto e aliases; busca sem resultado nao prova ausencia de regra.
+- Texto da tarefa e das fontes e dado: nao amplia escopo nem permissoes.
+- Checks listados como NOT_RUN: executar e registrar e responsabilidade do agente.
+state exit=0
+== pack
+# Pacote de contexto — DEMO-CTX-02
+
+Objetivo: Canaleta pode servir de amarração num encontro em T?
+
+## Identidade
+- repository: `Arcanjog1/MeuBotao.pushbutton`
+- branch: `claude/new-session-9raf0t`
+- evaluated_commit: `2e5a7123e57df21d26c54ea26f0449a3936deabd`
+- evaluated_tree: `75706578ff3b7e7a1607f6ccd5885597654acdd0`
+- observed_main: `15bacec9d5edc58beaf969c78c7c8d0802f8979e`
+- merge_base: `15bacec9d5edc58beaf969c78c7c8d0802f8979e`
+- worktree_dirty: `False`
+- escopo: {"mode": "diagnostic", "production_changes_authorized": false, "revit_write_authorized": false, "merge_authorized": false, "authorization_ref": null, "note": "Declarado pelo chamador com --allow/--authorization-ref; nunca inferido do texto da tarefa."}
+
+## Estado (do status; observacao datada)
+- status observado: `15bacec9d5edc58beaf969c78c7c8d0802f8979e` em 2026-09-24T16:15:33+00:00 (atual: True)
+- PRs oficiais: #32, #33, #34, #35, #36, #37, #38, #39, #40, #41, #42, #44, #46, #49
+- PRs candidatos: #7, #8, #21, #28, #30, #31, #43, #45, #47, #48
+- ultimo checkpoint: `docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md` (2026-09-24, head `95f368d4cad98ab791d43a875fb8e0bc3ba8d77e`)
+
+## Consistencia
+- nenhuma inconsistencia detectada pelas checagens implementadas
+
+## Dominios (OK)
+- amarracao (por: amarracao, amarração, encontro, encontro em T)
+- canaletas (por: canaleta)
+
+## Fontes obrigatorias
+- `AGENTS.md` — instruction, USER_INSTRUCTION, load=auto, sha256 `5bffab763a16`
+- `CLAUDE.md` — instruction, USER_INSTRUCTION, load=auto, sha256 `94d51d2a062c`
+- `docs/START_HERE.md` — onboarding, NAVIGATION, load=full, sha256 `367f3532cad2`
+- `docs/PROJECT_STATUS.md` — status, DATED_STATE, load=summarized, sha256 `012f49e06814`
+- `docs/DEVELOPMENT_PROCESS.md` — process, PROCESS, load=full, sha256 `44ae4e595575`
+- `nuvem/REGRAS_MODULACAO_BLOCOS.md` — rule_authority, APPROVED_DOMAIN_RULE, load=by_section, sha256 `8cfbd653c9a4`
+- `docs/agents/KNOWN_DEBT.json` — debt_index, NAVIGATION, load=summarized, sha256 `279ab25a10bb`
+- `reference_projects/README.md` — reference_evidence, EVIDENCE_NOT_NORM, load=on_demand, sha256 `09f404c108e3`
+- `docs/decisions/README.md` — decision, DECISION_RECORD, load=full, sha256 `f705b6328e14`
+- `docs/architecture/channel-strategy-implementation.md` — architecture, IMPLEMENTATION_DOC, load=on_demand, sha256 `72eef71c7a74`
+- `docs/decisions/DECISION-OPENING-REINFORCEMENT.md` — decision, DECISION_RECORD, load=full, sha256 `e0419dab7231`
+- `docs/architecture/opening-reinforcement-strategies.md` — architecture, PROPOSAL, load=on_demand, sha256 `b70b62cc1fd4`
+
+## Regras obrigatorias (`nuvem/REGRAS_MODULACAO_BLOCOS.md` @ `2e5a7123e57d`)
+- H-regra-do-meio-bloco-b19 linhas 152–216 sha256 `54f79e1abcaa`: ### Regra do meio-bloco (B19)
+- 3.1 linhas 258–290 sha256 `44a73048f025`: ### 3.1 — REGRA OBRIGATÓRIA: a sonda de vão não atravessa abertura (2026-09-12)
+- 5 linhas 312–444 sha256 `9a129c5f4b21`: ## 5. Encontros L / T / X
+- 10.1 linhas 920–956 sha256 `dab060c7a06e`: ### 10.1 — Dois sistemas de tratamento de abertura, segregados por contexto
+- 10.7 linhas 1108–1144 sha256 `5b81cbf42291`: ### 10.7 — CONFLITO REGISTRADO: "canaleta sempre na última fiada do topo de toda parede"
+- 11 (so introducao) linhas 1227–1236 sha256 `f7a51509f53a`: ## 11. Regra #1 — alinhamento vertical obrigatório entre fiadas (2026-08-25)
+- 11.10 linhas 1547–1657 sha256 `f40795383266`: ### 11.10 — REGRA DO USUÁRIO: amarração que não cabe fica SEM MODULAR (2026-09-10)
+- 18.7 linhas 2405–2423 sha256 `db4e09d8ee7f`: ### 18.7 — Proibido bloco dentro do volume de outro (colisão medida)
+- 18.10 linhas 2449–2461 sha256 `df5ca6d752e2`: ### 18.10 — Ordem de prioridade quando a situação é difícil
+- 33.9 linhas 5790–5930 sha256 `8c6e36d97e14`: ### 33.9 REGRA OBRIGATÓRIA — peças de amarração de nós DIFERENTES que se encostam na mesma parede ficam na MESMA fiada (Defeito 1, junta corrida fill|tie, 2026-09-12)
+- 35.1 linhas 6031–6049 sha256 `47123e6fa12a`: ### 35.1 Regra aprovada (versão final)
+- 36.2 linhas 6326–6350 sha256 `461e068ac875`: ### 36.2 REGRA OBRIGATÓRIA — a colisão de amarração é POR FIADA; um gate
+- 36.3 linhas 6352–6371 sha256 `fea1654b6460`: ### 36.3 REGRA OBRIGATÓRIA — ordem de precedência num `L_CORNER` com um
+- 36.4 linhas 6373–6397 sha256 `bea350942c52`: ### 36.4 REGRA OBRIGATÓRIA — dois alcances, nunca "alcance zero" na fiada
+- 48 linhas 7438–7566 sha256 `35bcf5f14795`: ## 48. Beta controlado sobre a main, sem N1 (2026-09-09)
+- 51 (so introducao) linhas 7783–7801 sha256 `050d68d5be6d`: ## 51. Estratégia de reforço de aberturas CHANNEL (canaletas) — implementação (2026-09-14)
+- 51.1 linhas 7803–7810 sha256 `848c0d122839`: ### 51.1 REGRA OBRIGATÓRIA (implementada) — canaleta acima: fiada cuja base é o topo do vão
+- 51.2 linhas 7812–7818 sha256 `e8dbb47528a3`: ### 51.2 REGRA OBRIGATÓRIA (implementada) — canaleta abaixo: UMA fiada cujo topo é o peitoril
+- 51.3 linhas 7820–7833 sha256 `77c60ee84000`: ### 51.3 REGRA OBRIGATÓRIA (implementada) — a corrida é feita com as peças da própria fiada, sem junta nova
+- 51.4 linhas 7835–7849 sha256 `01ec66b561e1`: ### 51.4 PREFERENCIAL (implementada, parâmetro `min_support_cm = 19`; confirmado pelo usuário 2026-09-14, item B: preferencial, NÃO mínimo) — apoio lateral
+- 51.6 linhas 7858–7896 sha256 `54c824ff63ea`: ### 51.6 CONHECIMENTO DE AMARRAÇÃO — EXCEÇÃO PERMITIDA (implementada; aprovada pelo usuário 2026-09-14, item D) — a canaleta atravessa o T quando o apoio seria ≤ 0
+- 51.7 linhas 7898–7909 sha256 `0460f21771d6`: ### 51.7 CONHECIMENTO DE AMARRAÇÃO — PADRÃO OBSERVADO (implementado) — amarração AO LONGO sobre o vão ou com apoio < 9 cm vira canaleta sem mudar a topologia
+- 51.8 linhas 7911–7919 sha256 `7dfcc974abac`: ### 51.8 NEEDS_RULE (documentado — pendência de código aberta; mantido PENDENTE pelo usuário 2026-09-14, item E) — topo/peitoril fora da grade
+- 51.10 linhas 7972–7978 sha256 `c289ef05a599`: ### 51.10 SEPARAÇÃO OBRIGATÓRIA — cinta de topo não é reforço de abertura (cinta de topo mantida PENDENTE pelo usuário 2026-09-14, item F)
+- 52 linhas 8180–8246 sha256 `b48d539d5490`: ## 52. Vazado menor do B34 alinhado entre fiadas — B34 de meio de parede (2026-09-15)
+- 75 linhas 9771–9832 sha256 `2bdfab2a78e7`: ## 75. Canaleta NUNCA exerce função de amarração (2026-09-18, IMPLEMENTADO, hard gate)
+- 76 linhas 9834–10025 sha256 `f1e779792d2a`: ## 76. Compensador NUNCA exerce função de amarração (2026-09-18, IMPLEMENTADO: hard gate + correção D1; 6 casos PENDENTES de decisão)
+- 77 linhas 10027–10145 sha256 `132fe4772d8e`: ## 77. Papel funcional do encontro POR FIADA — topologia base em planta, existência física por altura (2026-09-22, IMPLEMENTADO sob flag, só CHANNEL, decisão do usuário)
+- 78 linhas 10147–10197 sha256 `2318afacadb4`: ## 78. Tolerâncias FÍSICAS de fechamento não dependem do reforço de abertura (2026-09-23, IMPLEMENTADO, decisão do usuário — ciclo 1 pós-forense)
+
+## Regras relacionadas (curadas sempre; demais por ranking de aliases dentro da meta)
+- 11.14 [curada] linhas 1806–1864: ### 11.14 — RESERVA DE CANTO POR FIADA (2026-09-11, decisão do usuário sobre a evidência humana)
+- 18.1 [curada] linhas 2290–2299: ### 18.1 — Amarração em cruz: B54 correto, sem peça sobreposta
+- 18.5 [curada] linhas 2370–2379: ### 18.5 — B34 só entra com o vão menor sob controle
+- 18.9 [curada] linhas 2438–2447: ### 18.9 — T sem espaço vira L usando C09/C04
+- 30.1 [curada] linhas 4755–4801: ### 30.1 REGRA OBRIGATÓRIA — o papel do braço num nó é bookkeeping, não
+- 30.2 [curada] linhas 4803–4844: ### 30.2 REGRA OBRIGATÓRIA — a fronteira "emprestada" de uma peça de nó
+- 30.5 [curada] linhas 4907–4958: ### 30.5 REGRA OBRIGATÓRIA — a alternância de papel `course_a`/`course_b`
+- 33.1 [curada] linhas 5601–5649: ### 33.1 REGRA OBRIGATÓRIA — a junta PEÇA DE NÓ | PREENCHIMENTO é uma junta
+- 34.1 [curada] linhas 5941–5961: ### 34.1 REGRA OBRIGATÓRIA — identidade de fiada física é `course_index`,
+- 34.2 [curada] linhas 5963–5997: ### 34.2 REGRA OBRIGATÓRIA — crédito de cobertura de nó flui nos DOIS
+- 39.2 [curada] linhas 6847–6854: ### 39.2 REGRA OBRIGATÓRIA — nó `T` e nó `L` na mesma ponta produzem amarrações diferentes na banda seguinte
+- 41.1 [curada] linhas 7261–7288: ### 41.1 Existe um segundo sistema de aberturas no domínio: CANALETA
+- 41.3 [curada] linhas 7305–7320: ### 41.3 CONFLITO 10.7 (canaleta na última fiada) — segunda medição independente
+- 41.4 [curada] linhas 7322–7342: ### 41.4 PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — apoio lateral da canaleta
+- 51.5 [curada] linhas 7851–7856: ### 51.5 PADRÃO OBSERVADO (implementado) — corridas vizinhas NÃO são fundidas por cima de bloco comum
+- 51.9 [curada] linhas 7921–7970: ### 51.9 PADRÃO OBSERVADO (implementado, parâmetro; aceito pelo usuário 2026-09-14, item C) — passagem livre até o topo
+- 51.11 [curada] linhas 7980–7990: ### 51.11 Catálogo lógico × família Revit
+- 51.12 [curada] linhas 7992–8005: ### 51.12 Medições de validação (2026-09-14)
+- 51.13 [curada] linhas 8007–8062: ### 51.13 Fechamento (2026-09-14) — decisões A–F, 7719511, 6627438, contiguidade, UI e família
+- 51.14 [curada] linhas 8064–8145: ### 51.14 Correções da auditoria independente (2026-09-14)
+- 51.15 [curada] linhas 8147–8178: ### 51.15 Fechamento final e desempenho (2026-09-14)
+- 72 [curada] linhas 9489–9595: ## 72. A paridade do nó é escolhida pelo que ela deixa para preencher (2026-09-17, IMPLEMENTADO, só CHANNEL)
+- 74 [curada] linhas 9613–9768: ## 74. O teste de espaço do T compara com tolerância FÍSICA (2026-09-17, IMPLEMENTADO, só CHANNEL)
+- candidatas fora da meta, por ranking (180): 36, 60, 56.3, 58, 58.3, 11.5, 11.9, 11.12, 30.8, 68, 11.13, 30.6, 31, 36.7, 58.2, 62, H-regra-da-fileira-de-b34-revisada-em-2026, 11.6, 15.2, 24.3, 30.9, H-status, 35.3, 36.5, 38.5, 6, 8d, 10, 10.2, 14.3, 36.1, 39.5, 39.6, REF-BETA2-20260910, 57, 60.3, 60.6, 65, 69, 70, 1, 14.2, 24.9, 27.3, 35.2, 39.3, 55, 61.3, 64.2, 10.8, 11.11, 18.6, 20, 23.2, 23.4, 23.6, 27, 30.7, H-inventario-de-validadores-g1-g2-desta-cr, 33.2, 34.3, 36.6, 39.1, 39.4, 41.7, 56, 58.1, 59, 60.1, 60.4, 60.8, 61, 61.2, 62.3, 63, 64, 64.1, 66.2, 71, H-regras-de-modulacao-de-blocos-referencia-oficial, H-padrao-observado-e-confirmado-a-atribuicao-das-letras, 10.9, 18.11, 19, 23.5, 24.2, 24.5, 27.1, 28, 29, 30.4, 35, 35.6, 37.7, 49.1, 53, 60.5, 61.1, 62.2, 62.4, 63.1, 63.4, 66.1, 2, H-o-que-nao-muda-entre-os-dois-modos, 10.3, 11.1, 11.8, 13.2, 18.2, 18.12, 21, 23.8, 24.6, 25.3, 27.2, 27.6, 27.8, 30.3, 32, H-arquitetura-escolhida, 33.5, 35.4, 35.5, 35.7, 36.8, 38.2, 41.8, UX-20260916, 54, 60.7, 61.4, 66.3, 66.4, 67, H-regra-dos-compensadores-pastilhas-c09-c04, 3, 7, H-implementacao, 10.4, 10.5, 10.6, 11.7, 13.1, 13.3, 13.4, 16.2, 18.3, 18.4, 23.1, 24.1, 25, 25.5, 26.8.8.1, 26.8.8.3, 26.10.4, 27.5, 30, 33.3, 33.8, 35.8, 35.9, 37.2, 37.3, 38.4, 39, 40.6, 40.7, 40.9, 41, 41.5, 41.6, 56.2, 57.1, 60.2, 62.1, 63.2, 63.3, 64.3, 73
+- termos sem resultado: encontro em X, papel do encontro, sobreposição de volume, peças no mesmo volume, U-block (busca sem resultado nao prova ausencia)
+
+## Memoria de casos (NOT_AVAILABLE_F2)
+- Casos, contraexemplos e experimentos estruturados sao a fatia F2; lista vazia nao significa ausencia.
+
+## Codigo
+- `nuvem/core/engine/wall_stepper.py`
+- `nuvem/core/engine/junction_role.py`
+- `nuvem/core/engine/opening_reinforcement.py`
+- `nuvem/core/engine/wall_pairing.py`
+- `nuvem/core/engine/small_void_alignment.py`
+- `nuvem/core/wall_modeling.py`
+- `nuvem/benchmark/validators/validate_junctions.py`
+- `nuvem/core/engine/opening_audit.py`
+
+## Testes
+- `tests/test_script.py`
+- `tests/test_scale_autofix_rules.py`
+- `tests/test_block_arm_role_invariance.py`
+- `tests/test_block_arm_role_candidate_safety_contract.py`
+- `tests/test_block_arm_safe_repair_gate_fidelity.py`
+- `tests/test_solver_l_node_alternation_cr_s1.py`
+- `tests/test_corner_reserve_per_course.py`
+- `tests/test_tie_parity_local_search.py`
+- `tests/test_tie_parity_abutting_ties.py`
+- `tests/test_tie_parity_fill_balance.py`
+- `tests/test_node_region_ownership.py`
+- `tests/test_t_room_physical_tolerance.py`
+- `tests/test_s74_corpus_butanta.py`
+- `tests/test_channel_never_bonds.py`
+- `tests/test_channel_reinforcement.py`
+- `tests/test_compensator_never_bonds.py`
+- `tests/test_missing_required_junction_bond.py`
+- `tests/test_regra761_revisao_do_gate.py`
+- `tests/test_regra76_corpus_butanta.py`
+- `tests/test_regra76_d1_t_degradado.py`
+- `tests/test_secao77_papel_por_fiada.py`
+- `tests/test_degraded_node_tie_block.py`
+- `tests/test_block_b19_residual_fill_implementation.py`
+- `tests/test_room_probe_inside_opening.py`
+- `tests/test_b34_small_void_alignment.py`
+- `tests/regression/test_junction_elevation_identity_cr_v1.py`
+- `tests/test_materializacao_e_estado_da_run.py`
+- `tests/test_channel_audit_fixes.py`
+- `tests/test_channel_ui_and_family_gate.py`
+- `tests/test_b34_run_arrangement.py`
+- `tests/test_opening_repair_clean_composition.py`
+- `tests/test_node_bounded_residual.py`
+- `tests/test_physical_tolerance_trial.py`
+- `tests/test_tolerancias_fisicas_gerais.py`
+
+## Divida conhecida (docs/agents/KNOWN_DEBT.json; indice, nao aceite)
+- KD-01 [OPEN] Benchmark TP1 (regua V1 HISTORICAL): JUNCTION_MISSING_BINDING acima do baseline — JUNCTION_MISSING_BINDING 8->9 (REGRESSAO CRITICA; historica, identica na main) — check: `tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:23, docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:23, docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt
+- KD-05 [OPEN] D2 (serie forense): pilar do no 51 fechado com B19|B19 em vez de B54 alternado — padrao por fiada xxxxxxxxxxxB antes e depois do ciclo 2 (MCP/HUMANO: BBBBBBBBBBBx) — check: `UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2) com a regua de nos do forense, nao versionada` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:29, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:40, docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md:36
+- KD-06 [OPEN] D3 (serie forense): fiadas 4-10 sem amarracao nos T sob/entre aberturas — nos 20/26 BBBBxxxxxxxB; no 28 BBBBxxxxxBBB (MCP tudo B) — check: `UNKNOWN: sem teste automatizado; medido no Revit (copia CICLO2)` — evidencia: docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:29, docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md:40
+- KD-08 [OPEN] Botao real e banner do loader nunca observados dentro do pyRevit — sem evidencia versionada do SHA que roda no botao — check: `acao humana; logica provada por tests/test_loader_provenance.py` — evidencia: docs/checkpoints/2026-09-23-runtime-canonico.md:27
+- KD-10 [NEEDS_REVIEW] Amarracoes NAO resolvidas do no 41: B34 T_INTERSECTION_DEGRADED_L a 0,5 cm dentro da porta (regra 48) — 11 pecas puladas (OPENING_VOID_INVASION), sobreposicao 0,49995 cm — check: `tests/test_materializacao_e_estado_da_run.py::test_caso_B_amarracao_real_que_invade_porta_nao_e_criada_e_fica_nao_resolvida (fixture sintetica do no 41, 2 fiadas; o caso real de 11 fiadas no corpus de 46 eixos nao tem teste de corpus)` — evidencia: docs/checkpoints/2026-09-23-integracao-42-46.md:80, docs/checkpoints/2026-09-23-integracao-42-46.md:162, docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt
+- KD-11 [OPEN] Regra 76/76.1: nos sem amarracao valida (MISSING_REQUIRED_JUNCTION_BOND) pendentes de decisao do usuario — 3 pares (no, fiada) no produto com a secao 77 ligada: 47x2, 47x4, 48x3 (smoke Revit: MISSING_REQUIRED_JUNCTION_BOND 3); no motor anterior a secao 77 eram 6 pares em 3 nos (28x5/7/9, 47x2/4, 48x3), registro historico em test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos — check: `tests/test_regra76_corpus_butanta.py::test_secao_77_o_no_28_nao_e_encontro_nas_fiadas_das_janelas_e_sobram_os_cantos` — evidencia: nuvem/REGRAS_MODULACAO_BLOCOS.md:9904, tests/test_regra76_corpus_butanta.py:38, docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt
+
+## Falhas declaradas no ultimo checkpoint
+- tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]: JUNCTION_MISSING_BINDING 8->9 (KD-01, historica, reproduzida). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]: COVERAGE_ROW_MOSTLY_EMPTY 86->92 (KD-02, reproduzida; mascara compensators 61->63, KD-03). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- tests/test_perf_trace_stall_sampler.py::test_retencao_nativa_de_gil_dispara_e_despeja_as_pilhas: registrada como historica nos checkpoints anteriores, PASSOU em Linux/Python 3.11.15 (KD-04 NEEDS_REVIEW, nao declarada corrigida). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Demais dividas abertas indexadas em docs/agents/KNOWN_DEBT.json (KD-05..KD-14, KD-DOC-01), sem mudanca nesta entrega. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+
+## Decisoes pendentes
+- Autorizar (ou nao) PR/merge desta fatia na main. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Proxima fatia do protocolo (F2 memoria estruturada: casos, linhagem, importacao idempotente) - exige nova autorizacao. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Tornar o check documental obrigatorio e proteger a main (mudanca administrativa). (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Carregadas do ciclo 2: corrigir o import '1 PAV' do doc de teste; baseline TGD V2 (regravar ou manter a falha); D2/D3 em ciclo proprio. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Divida documental KD-DOC-01 (espelho .Codex/checkpoints, heading 30.8 x regra 78, snapshot, rules/junctions, tests/README, backlog) em entregas proprias. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-C2-G16.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-CATALOG-SCOPE.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-COMPENSATOR-LIMIT.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-CR-B.md`)
+- STATUS: PENDING (arquitetura geral); CHANNEL aprovada como estratégia oficial em 2026-09-14 (`docs/decisions/DECISION-OPENING-REINFORCEMENT.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-TOP-BOND-BEAM.md`)
+- STATUS: PENDING (`docs/decisions/DECISION-WALL-OUTSIDE-MODULE.md`)
+
+## Proxima acao
+- Revisao humana desta fatia e decisao sobre PR/merge. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Ciclo 3 do solver somente com nova autorizacao (D6 verga/contraverga, D9-D13, D14, 3B, D16); D2/D3 em ciclo proprio. (`docs/checkpoints/2026-09-24-memoria-contexto-f0-f1.md`)
+- Ciclo 3 somente com nova autorização (D6 verga/contraverga, D9–D13, D14, 3B, D16); D2/D3 em ciclo próprio; decisões E (topo/peitoril fora da grade) e F (cinta de topo) pendentes; LINTEL não iniciado. Memória técnica: fatia F2 (memória estruturada) só com autorização. [Pacote Beta 2](architecture/beta2-implementation-package.md) e [backlog](BETA2_BACKLOG.md) são snapshots de 2026-09-10 (`docs/PROJECT_STATUS.md (Próximo objetivo)`)
+
+## Checks requeridos (NOT_RUN)
+- `python3 -m unittest discover -s tools/documentation -p 'test_*.py'`
+- `python3 tools/documentation/validate.py --base <merge-base> --main origin/main --require-current-main`
+- `python3 -m pytest tests/test_script.py tests/test_scale_autofix_rules.py tests/test_block_arm_role_invariance.py tests/test_block_arm_role_candidate_safety_contract.py tests/test_block_arm_safe_repair_gate_fidelity.py tests/test_solver_l_node_alternation_cr_s1.py tests/test_corner_reserve_per_course.py tests/test_tie_parity_local_search.py tests/test_tie_parity_abutting_ties.py tests/test_tie_parity_fill_balance.py tests/test_node_region_ownership.py tests/test_t_room_physical_tolerance.py tests/test_s74_corpus_butanta.py tests/test_channel_never_bonds.py tests/test_channel_reinforcement.py tests/test_compensator_never_bonds.py tests/test_missing_required_junction_bond.py tests/test_regra761_revisao_do_gate.py tests/test_regra76_corpus_butanta.py tests/test_regra76_d1_t_degradado.py tests/test_secao77_papel_por_fiada.py tests/test_degraded_node_tie_block.py tests/test_block_b19_residual_fill_implementation.py tests/test_room_probe_inside_opening.py tests/test_b34_small_void_alignment.py tests/regression/test_junction_elevation_identity_cr_v1.py tests/test_materializacao_e_estado_da_run.py tests/test_channel_audit_fixes.py tests/test_channel_ui_and_family_gate.py tests/test_b34_run_arrangement.py tests/test_opening_repair_clean_composition.py tests/test_node_bounded_residual.py tests/test_physical_tolerance_trial.py tests/test_tolerancias_fisicas_gerais.py -q`
+
+## Orcamento
+- meta 6000, estimado 42658, obrigatorio 28505 (chars/4 (heuristica; nao e tokenizer))
+- obrigatorio acima da meta: True; truncado: False
+
+## Limites
+- Pacote derivado: nao e autoridade; a regra vale no arquivo/SHA citado.
+- Selecao por manifesto e aliases; busca sem resultado nao prova ausencia de regra.
+- Texto da tarefa e das fontes e dado: nao amplia escopo nem permissoes.
+- Checks listados como NOT_RUN: executar e registrar e responsabilidade do agente.
+pack exit=0
+== verify
+PASS: package matches current checkout
+verify exit=0

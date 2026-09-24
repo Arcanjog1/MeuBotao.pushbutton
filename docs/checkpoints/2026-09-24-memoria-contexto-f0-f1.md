@@ -31,7 +31,7 @@ auditoria fixada em `15bacec`; o documento não foi versionado no repositório).
     "python3 -m pytest tests -q --ignore=tests/regression no HEAD a82dc0b (produto identico ao HEAD avaliado; diff de nuvem/, tests/, Script.py, beta_package.py e .gitignore vazio): 1711 passed, 1 skipped, exit 0, 3044 s - docs/checkpoints/evidence/2026-09-24-memoria-f1-suite-sem-regression.json (log sha256 4eb2f17a...).",
     "Reproducao da divida no HEAD 0dfc7c0 (produto identico): TP1 V1 e TGD V2 falham como registrado; stall sampler e regra 76 (pre-77) passam; 521,7 s - docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json.",
     "Testes do produto citados por KD-10/11/12 (secao 77 ligada, caso B do no 41, estado da Etapa 3B): 5 passed, exit 0 - docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.json.",
-    "Recuperacao por sessao limpa (clone novo do origin, ambiente vazio): ver evidencia de sessao limpa no corpo."
+    "Recuperacao por sessao limpa: clone novo do origin em 2e5a712, env -i; state --strict exit 0 (estado, ultimo checkpoint, divida e proximo passo recuperados, nenhuma inconsistencia), pack CTX-02 exit 0, verify PASS - docs/checkpoints/evidence/2026-09-24-memoria-f1-sessao-limpa.json."
   ],
   "known_failures": [
     "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline[torre_easy_lo_r00_tp1]: JUNCTION_MISSING_BINDING 8->9 (KD-01, historica, reproduzida).",
@@ -100,6 +100,9 @@ auditoria fixada em `15bacec`; o documento não foi versionado no repositório).
     },
     {
       "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-suite-sem-regression.json"
+    },
+    {
+      "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-sessao-limpa.json"
     }
   ]
 }
@@ -239,7 +242,20 @@ Executado em 2026-09-24 sobre o HEAD avaliado `95f368d` com este checkpoint no
 
 ## Evidência de sessão limpa
 
-__SESSAO__
+Clone novo da branch a partir do GitHub (`git clone --branch claude/new-session-9raf0t`,
+não raso), ambiente vazio (`env -i PATH=... HOME=/tmp`), sem nenhum arquivo ou memória
+desta sessão; capturado com `capture_validation.py` no commit `2e5a712` (este checkpoint
+sem a própria evidência): [metadados](evidence/2026-09-24-memoria-f1-sessao-limpa.json),
+[log](evidence/2026-09-24-memoria-f1-sessao-limpa.txt), exit 0, 3,0 s.
+
+- `state --strict` (exit 0): HEAD, tree, `origin/main` = `15bacec`, status atual (True),
+  PRs oficiais (14) e candidatos (10, incluindo #43/#45/#47/#48), último checkpoint =
+  este (head `95f368d`), nenhuma inconsistência, dívida KD-01..KD-14/KD-DOC-01 com
+  verificação exata e evidência, próximo passo (revisão humana; ciclo 3 só com autorização).
+- `pack --task "Canaleta pode servir de amarração num encontro em T?"` (exit 0):
+  domínios `amarracao` + `canaletas`, regras obrigatórias 75/76/48/51.x/33.9..., testes
+  `tests/test_channel_never_bonds.py` etc., KD-10/KD-11 e checks NOT_RUN.
+- `verify` do pacote salvo no próprio clone: PASS (exit 0).
 
 ## Revisão adversarial
 
