@@ -42,14 +42,21 @@ No Windows, trocar `python3` por `py -3`. `--output` nunca sobrescreve;
 
 ## Contratos
 
+- **Cobertura das regras duras.** Todo heading das REGRAS rotulado
+  "REGRA OBRIGATÓRIA" ou "REGRA DO USUÁRIO" precisa estar num domínio
+  (obrigatória ou relacionada) ou em `unmapped_rules` com motivo; regra nova
+  sem mapeamento quebra `check`/`validate.py`.
 - **Regras obrigatórias por caminho determinístico.** Cada domínio lista
   seções por número + trecho do heading. A resolução exige correspondência
   única; número repetido no arquivo (ex.: `66.3`, `66.4`) recebe sufixo de
   ocorrência (`66.3@2`) e precisa de `heading_contains`. Heading renomeado
   quebra `check`/`validate.py` com mensagem explícita, em vez de sumir.
 - **Nunca truncar obrigatório.** O orçamento (padrão 6000 tokens, estimativa
-  `chars/4`) só limita seções *relacionadas*; se o obrigatório excede a meta,
-  o pacote marca `mandatory_over_budget` e `expansion_reason`.
+  `chars/4`) só limita as relacionadas achadas por ranking de aliases; as
+  relacionadas curadas no manifesto sempre saem (como ponteiros) e todas as
+  candidatas fora da meta são listadas. Se o obrigatório excede a meta, o
+  pacote marca `mandatory_over_budget` e `expansion_reason`. Cada seção traz
+  os rótulos do heading (`labels`: CONFLITO, PENDENTE, DESLIGADO...).
 - **Busca não prova ausência.** Termos sem resultado aparecem em
   `zero_hit_terms`; tarefa sem domínio reconhecido vira
   `INSUFFICIENT_CONTEXT` com os domínios disponíveis.
@@ -57,12 +64,19 @@ No Windows, trocar `python3` por `py -3`. `--output` nunca sobrescreve;
   texto (LF) e `source_commit`; `verify` acusa pacote velho.
 - **Estado por fonte corrente.** Último checkpoint = link da linha
   "Último checkpoint" do status, conferido contra o checkpoint `current` de
-  data mais recente. PRs oficiais/candidatos vêm do JSON do status.
+  data mais recente. PRs oficiais/candidatos vêm do JSON do status. `verify`
+  também acusa pacote gerado com outra `origin/main` ou antes de uma
+  inconsistência nova.
 - **Texto é dado.** O texto da tarefa e das fontes não amplia escopo:
   `--allow production|revit_write|merge` exige `--authorization-ref`
   (onde o usuário autorizou). Com `--include-text`, as seções saem
   delimitadas como DADOS.
 - **Determinismo.** Sem timestamp no pacote; mesma árvore → mesmo JSON.
+- **Memória de casos (F2) explícita.** `memory.status = NOT_AVAILABLE_F2`:
+  `related_cases`, `counterexamples` e `rejected_experiments` vazios não
+  significam ausência.
+- **Espelhos de skills.** Diferenças `.claude/skills` × `.agents/skills` são
+  declaradas como substituições exatas; qualquer outra deriva quebra o `check`.
 
 ## Checagens de consistência
 
@@ -70,10 +84,10 @@ No Windows, trocar `python3` por `py -3`. `--output` nunca sobrescreve;
 
 | id | severidade | significado |
 |---|---|---|
-| `START_HERE_PR_STATE` | CONTRADICTION | START_HERE descreve como "sem merge/candidato/draft" um PR que o status lista como oficial |
-| `START_HERE_CHECKPOINT_LINK` | ERROR | START_HERE aponta checkpoint específico fora de uma seção "Histórico" (roteador não guarda notícia) |
+| `START_HERE_PR_STATE` | CONTRADICTION | START_HERE descreve como "sem merge/candidato/draft" um PR que o status lista como oficial (frases de mudança de estado, como "não está mais sem merge", não contam) |
+| `START_HERE_CHECKPOINT_LINK` | ERROR | START_HERE aponta checkpoint específico fora de uma seção cujo título começa com "Histórico" (a isenção vale até o próximo heading de nível igual ou maior; blocos de código são ignorados) |
 | `STATUS_MAIN_BEHIND` / `STATUS_MAIN_DIVERGED` | WARN / ERROR | main observada no status ≠ `origin/main` buscada |
-| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status |
+| `CHECKPOINT_NEWER_THAN_STATUS` | WARN | existe checkpoint `current` mais novo que o declarado no status (data maior, ou mesma data e adicionado depois) |
 | `STATUS_NO_LAST_CHECKPOINT`, `LAST_CHECKPOINT_UNREADABLE` | ERROR | status sem checkpoint resolvível |
 | `MAIN_UNKNOWN` | WARN | `origin/main` indisponível (rodar `git fetch origin main`) |
 

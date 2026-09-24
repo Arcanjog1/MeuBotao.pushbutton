@@ -74,7 +74,7 @@
       "status": "OPEN",
       "check": "tests/regression/test_benchmark_baselines.py::test_projeto_nao_regrediu_contra_o_baseline_versionado[torre_easy_lo_r00_tgd-v2]",
       "case": "torre_easy_lo_r00_tgd, regua V2",
-      "observed": "compensators 61->62 na main antes do ciclo 1; o verdict passou de 'REGRESSAO' para 'REGRESSAO CRITICA' (KD-02)",
+      "observed": "compensators: baseline 61; 62 na main antes do ciclo 1; 63 desde 9376a36 (regra 78). O verdict passou de 'REGRESSAO' para 'REGRESSAO CRITICA' (KD-02).",
       "domains": [
         "benchmark",
         "compensadores"
@@ -82,15 +82,15 @@
       "evidence": [
         {
           "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
-          "line": 23
+          "line": 38
+        },
+        {
+          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
+          "line": 30
         },
         {
           "path": "docs/checkpoints/2026-09-23-ciclo1-tolerancias-fisicas.md",
           "line": 28
-        },
-        {
-          "path": "docs/checkpoints/2026-09-24-ciclo2-corpus-d5.md",
-          "line": 39
         },
         {
           "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
@@ -256,7 +256,7 @@
       "id": "KD-10",
       "title": "Amarracoes NAO resolvidas do no 41: B34 T_INTERSECTION_DEGRADED_L a 0,5 cm dentro da porta (regra 48)",
       "status": "NEEDS_REVIEW",
-      "check": "politica coberta por tests/test_materializacao_e_estado_da_run.py; sem teste nomeado para o caso",
+      "check": "tests/test_materializacao_e_estado_da_run.py::test_caso_B_amarracao_real_que_invade_porta_nao_e_criada_e_fica_nao_resolvida (fixture sintetica do no 41, 2 fiadas; o caso real de 11 fiadas no corpus de 46 eixos nao tem teste de corpus)",
       "case": "BUTANTA 46 eixos, parede 8284539, no 41, 11 fiadas",
       "observed": "11 pecas puladas (OPENING_VOID_INVASION), sobreposicao 0,49995 cm",
       "domains": [
@@ -271,17 +271,26 @@
         {
           "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
           "line": 162
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
         }
       ],
-      "decision_pending": "Revisao humana/projeto das amarracoes nao resolvidas."
+      "decision_pending": "Revisao humana/projeto das amarracoes nao resolvidas.",
+      "reproduced": {
+        "result": "PASSOU: o teste fixa o comportamento atual (a divida continua aberta).",
+        "head": "a82dc0b1cb1d71fa65e03e7067996fcce315f4f3",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
+      }
     },
     {
       "id": "KD-11",
       "title": "Regra 76/76.1: nos sem amarracao valida (MISSING_REQUIRED_JUNCTION_BOND) pendentes de decisao do usuario",
       "status": "OPEN",
-      "check": "tests/test_regra76_corpus_butanta.py::test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos",
+      "check": "tests/test_regra76_corpus_butanta.py::test_secao_77_o_no_28_nao_e_encontro_nas_fiadas_das_janelas_e_sobram_os_cantos",
       "case": "BUTANTA, fluxo CHANNEL",
-      "observed": "6 nos (teste passa e fixa a divida; secao 77 altera a contagem)",
+      "observed": "3 pares (no, fiada) no produto com a secao 77 ligada: 47x2, 47x4, 48x3 (smoke Revit: MISSING_REQUIRED_JUNCTION_BOND 3); no motor anterior a secao 77 eram 6 pares em 3 nos (28x5/7/9, 47x2/4, 48x3), registro historico em test_os_nos_sem_amarracao_valida_sao_exatamente_os_6_conhecidos",
       "domains": [
         "amarracao",
         "compensadores"
@@ -292,22 +301,26 @@
           "line": 9904
         },
         {
-          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+          "path": "tests/test_regra76_corpus_butanta.py",
+          "line": 34
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
         }
       ],
       "decision_pending": "Escolha entre as candidatas desligadas da secao 76 (nenhuma limpa sob as regras aprovadas).",
       "reproduced": {
-        "result": "PASSOU (o teste fixa a contagem conhecida de 6 nos; nao significa divida quitada).",
-        "head": "0dfc7c01a46bc3f1e54dcfea2ed1f614f7d75bb8",
-        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.json",
-        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-divida-conhecida.txt"
+        "result": "PASSOU: o teste fixa os 3 casos do produto (nao significa divida quitada).",
+        "head": "a82dc0b1cb1d71fa65e03e7067996fcce315f4f3",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
       }
     },
     {
       "id": "KD-12",
       "title": "Etapa 3B da secao 66 (microajuste de abertura) nao e disparada pelo fluxo do botao",
       "status": "OPEN",
-      "check": "UNKNOWN (estado micro_adjust_flow_state; teste nomeado nao localizado)",
+      "check": "tests/test_materializacao_e_estado_da_run.py::test_etapa_3b_tem_estado_explicito_e_deterministico (fixa o estado not_evaluated)",
       "case": "fluxo do botao",
       "observed": "UI mostra 'nao avaliado nesta execucao'",
       "domains": [
@@ -322,9 +335,18 @@
         {
           "path": "docs/checkpoints/2026-09-23-integracao-42-46.md",
           "line": 82
+        },
+        {
+          "path": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
         }
       ],
-      "decision_pending": "Integrar exige mover aberturas no modelo do usuario: autorizacao explicita."
+      "decision_pending": "Integrar exige mover aberturas no modelo do usuario: autorizacao explicita.",
+      "reproduced": {
+        "result": "PASSOU: o teste fixa o comportamento atual (a divida continua aberta).",
+        "head": "a82dc0b1cb1d71fa65e03e7067996fcce315f4f3",
+        "evidence": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.json",
+        "log": "docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt"
+      }
     },
     {
       "id": "KD-13",

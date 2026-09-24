@@ -238,9 +238,14 @@ class ManifestTests(Repository):
         self.write('.agents/skills/a/SKILL.md', 'codex variant\n')
         self.git('add', '.')
         self.assertTrue(any('diverge without declared reason' in e for e in context.manifest_errors(self.root)))
-        self.manifest['skill_mirrors']['intentional_differences'] = {'a/SKILL.md': 'frontmatter por host'}
+        self.manifest['skill_mirrors']['intentional_differences'] = {
+            'a/SKILL.md': {'reason': 'troca de host', 'replace': [['skill', 'codex variant']]}}
         self.commit('declared')
         self.assertEqual([], context.manifest_errors(self.root))
+        self.write('.claude/skills/a/SKILL.md', 'skill\nlinha nova so no primario\n')
+        self.git('add', '.')
+        self.assertTrue(any('beyond the declared replacements' in e for e in context.manifest_errors(self.root)))
+        self.write('.claude/skills/a/SKILL.md', 'skill\n')
         self.write('.agents/skills/a/SKILL.md', 'skill\n')
         self.git('add', '.')
         self.assertTrue(any('no longer exists' in e for e in context.manifest_errors(self.root)))
@@ -410,6 +415,117 @@ class CleanSessionTests(Repository):
         self.assertFalse(package['worktree_dirty'])
 
 
+class ReviewRegressionTests(Repository):
+    """Defects found by the adversarial review of 2026-09-24; each case failed before the fix."""
+
+    def findings(self, text, official=(40,), candidates=(31,)):
+        return context.start_here_findings(text, list(official), list(candidates))
+
+    def test_history_exemption_needs_heading_starting_with_historico(self):
+        text = '# S\n\n## Busca por domínio e histórico\n\n[cp](checkpoints/x.md). PR #40 ready for review, sem merge.\n'
+        ids = [f['id'] for f in self.findings(text)]
+        self.assertIn('START_HERE_CHECKPOINT_LINK', ids)
+        self.assertIn('START_HERE_PR_STATE', ids)
+
+    def test_history_exemption_covers_subsections_and_fences(self):
+        text = ('# S\n\n## Histórico\n\n### Roteador de 2026-09-20\n\n[cp](checkpoints/x.md)\n\n'
+                '```bash\n# comentario\n```\n\n[cp2](checkpoints/y.md) PR #40 sem merge.\n\n## Atual\n\nok\n')
+        self.assertEqual([], self.findings(text))
+        self.assertTrue(self.findings(text + '\n[cp3](checkpoints/z.md)\n'))
+
+    def test_heading_lines_are_checked(self):
+        ids = [f['id'] for f in self.findings('# S\n\n## Candidato atual: PR #40 (sem merge)\n')]
+        self.assertIn('START_HERE_PR_STATE', ids)
+
+    def test_state_change_phrases_are_not_contradictions(self):
+        for text in ('O PR #40 não está mais sem merge.', 'O PR #40 promoveu o candidato CHANNEL a estratégia oficial.',
+                     'O PR #40 deixou de ser draft.'):
+            self.assertEqual([], self.findings('# S\n\n' + text + '\n'), text)
+        self.assertEqual([], self.findings('# S\n\nO PR #31 unmerged.\n'), "'merged' inside 'unmerged'")
+        self.assertTrue(self.findings('# S\n\nO PR #40 continua sem merge.\n'))
+
+    def test_checkpoint_link_with_fragment_or_encoding(self):
+        self.status('checkpoints/2026-09-20-a.md#resumo')
+        self.commit('fragment')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        package = self.pack()
+        self.assertEqual('docs/checkpoints/2026-09-20-a.md', package['state']['last_checkpoint']['path'])
+        self.assertNotIn('LAST_CHECKPOINT_UNREADABLE', self.ids(package['consistency']))
+        self.status('checkpoints/2026%2D09%2D20-a.md')
+        self.commit('encoded')
+        self.assertEqual('docs/checkpoints/2026-09-20-a.md', self.pack()['state']['last_checkpoint']['path'])
+
+    def test_same_day_newer_checkpoint_is_reported(self):
+        self.checkpoint('docs/checkpoints/2026-09-20-z-newer.md', '2026-09-20', [])
+        self.commit('same day, later')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.assertIn('CHECKPOINT_NEWER_THAN_STATUS', self.ids(self.pack()['consistency']))
+
+    def test_string_fields_are_not_split_into_characters(self):
+        data = {key: 'nao aplicavel' for key in validator.REQUIRED}
+        data.update(date='2026-09-20', branch='t', head=self.base, base=self.base, pr='not-created',
+                    known_failures='nenhuma', next_steps='aguardar', references=[{'path': 'engine.py'}])
+        self.write('docs/checkpoints/2026-09-20-a.md', '# CP\n\n```json\n' + json.dumps(data) + '\n```\n')
+        self.commit('string fields')
+        package = self.pack()
+        self.assertEqual(['nenhuma'], [d['text'] for d in package['known_failures_last_checkpoint']])
+        self.assertIn('aguardar', [n['text'] for n in package['next_action']])
+
+    def test_worktree_rename_keeps_paths_intact(self):
+        (self.root / 'engine.py').rename(self.root / 'motor.py')
+        self.git('add', '-N', 'motor.py')
+        paths = context.dirty_paths(self.root)
+        self.assertIn('motor.py', paths)
+        self.assertNotIn('ine.py', paths)
+
+    def test_tilde_and_long_backtick_fences(self):
+        text = ('## 48. Beta\n\ntexto\n\n~~~markdown\n## 48. exemplo citado\n~~~\n\n'
+                '````markdown\n```json\n## 99. nao e heading\n```\n````\n\n## 49. Outra\n')
+        index = {s['rule_id']: s for s in context.rule_index(text)}
+        self.assertEqual({'48', '49'}, set(index))
+        self.assertGreater(index['48']['end'], 7, 'section 48 spans the quoted example')
+
+    def test_mandatory_labeled_rule_must_be_mapped(self):
+        self.write('nuvem/REGRAS.md', RULES + '\n### 75.1 REGRA OBRIGATÓRIA — nova regra sem dominio\n\nTexto.\n')
+        self.git('add', '.')
+        self.assertEqual([], context.manifest_errors(self.root), '75 full covers 75.1')
+        self.write('nuvem/REGRAS.md', RULES + '\n## 80. REGRA OBRIGATÓRIA — nova regra sem dominio\n\nTexto.\n')
+        self.git('add', '.')
+        self.assertTrue(any('not mapped to any domain: 80' in e for e in context.manifest_errors(self.root)))
+        self.manifest['unmapped_rules'] = [{'number': '80', 'reason': 'aguarda curadoria'}]
+        self.commit('declared unmapped')
+        self.assertEqual([], context.manifest_errors(self.root))
+
+    def test_verify_detects_main_moved(self):
+        package = self.pack(task='canaleta')
+        self.assertEqual([], context.verify_package(self.root, package))
+        self.git('commit', '-q', '--allow-empty', '-m', 'main advances')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.git('reset', '-q', '--soft', 'HEAD~1')
+        stale = context.verify_package(self.root, package)
+        self.assertTrue(any(s.startswith('observed_main') for s in stale), stale)
+
+    def test_inventory_does_not_depend_on_file_counts(self):
+        self.manifest['path_groups'] = [{'pattern': 'docs/CR_*.md', 'role': 'cr_report', 'status': 'HISTORICAL'}]
+        self.write('docs/CR_A.md', 'a\n')
+        self.commit('group')
+        self.assertEqual(0, self.cli('inventory', '--write'))
+        self.write('docs/CR_B.md', 'b\n')
+        self.git('add', '.')
+        self.assertEqual(0, self.cli('inventory', '--check'))
+
+    def test_inventory_shows_heading_refs(self):
+        self.manifest['domains'][0]['mandatory_rules'].append({'number': '', 'heading_contains': 'Regra do meio-bloco'})
+        self.commit('heading ref')
+        text = context.render_inventory(context.load_manifest(self.root))
+        self.assertIn('"Regra do meio-bloco"', text)
+
+    def test_package_marks_f2_memory_as_not_available(self):
+        memory = self.pack(task='canaleta')['memory']
+        self.assertEqual('NOT_AVAILABLE_F2', memory['status'])
+        self.assertEqual([], memory['related_cases'] + memory['counterexamples'] + memory['rejected_experiments'])
+
+
 REPO = HERE.parents[1]
 EVALS = REPO / 'docs/agents/RETRIEVAL_EVALS.json'
 
@@ -425,8 +541,7 @@ class RealRepositoryEvals(unittest.TestCase):
 
     def test_manifest_and_inventory(self):
         self.assertEqual([], context.manifest_errors(REPO))
-        tracked = subprocess.check_output(['git', 'ls-files'], cwd=REPO, text=True).splitlines()
-        self.assertEqual(context.render_inventory(context.load_manifest(REPO), tracked),
+        self.assertEqual(context.render_inventory(context.load_manifest(REPO)),
                          (REPO / context.INVENTORY).read_text(encoding='utf-8'),
                          'run: python3 tools/documentation/context_pack.py inventory --write')
 

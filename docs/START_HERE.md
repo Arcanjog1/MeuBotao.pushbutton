@@ -46,10 +46,12 @@ documentais; integração não transforma proposta em contrato aprovado.
   `66.3`): citar arquivo + SHA + heading.
 - Sem migração de imports sem CR própria (ordem da consolidação de 2026-09-10,
   mantida pelo protocolo de memória técnica de 2026-09-24).
-- Este roteador não aponta checkpoint específico nem estado de PR fora da
-  seção Histórico; `validate.py` bloqueia a contradição.
+- Este roteador não aponta checkpoint específico nem estado de PR fora de uma
+  seção cujo título comece com "Histórico". `validate.py` bloqueia link para
+  checkpoint específico e PR oficial descrito como sem merge/candidato/draft
+  (heurística de texto; não prova correção semântica).
 
-## Busca por domínio e histórico
+## Busca por domínio e arquivos antigos
 
 Pairing/geometria: nuvem/core/engine/geometry.py, wall_pairing.py e tolerances.py.
 UI: nuvem/core/ui_state.py, ui_components.py, ui_chrome.py, ui_execution.py,

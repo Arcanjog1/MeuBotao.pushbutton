@@ -78,7 +78,9 @@
           "75",
           "76",
           "33.9",
-          "52"
+          "52",
+          "48",
+          "77"
         ]
       }
     },
@@ -244,6 +246,76 @@
         ],
         "debt_include": [
           "KD-01"
+        ]
+      }
+    },
+    {
+      "id": "AMAR-48",
+      "question": "Amarracao rejeitada pela regra 48",
+      "task": "Investigar BOND_UNRESOLVED no nó T da parede 8284562",
+      "expect": {
+        "domains_include": [
+          "amarracao"
+        ],
+        "mandatory_rules_include": [
+          "48",
+          "3.1"
+        ],
+        "tests_include": [
+          "tests/test_materializacao_e_estado_da_run.py"
+        ],
+        "debt_include": [
+          "KD-10"
+        ]
+      }
+    },
+    {
+      "id": "AMAR-77",
+      "question": "Papel funcional por fiada",
+      "task": "Papel funcional do T por fiada quando as janelas consomem a principal",
+      "expect": {
+        "domains_include": [
+          "amarracao",
+          "aberturas"
+        ],
+        "mandatory_rules_include": [
+          "77"
+        ]
+      }
+    },
+    {
+      "id": "AMAR-NFE",
+      "question": "Codigo do papel do encontro",
+      "task": "NONE_FREE_END no nó 28",
+      "expect": {
+        "domains_include": [
+          "amarracao"
+        ],
+        "mandatory_rules_include": [
+          "77"
+        ]
+      }
+    },
+    {
+      "id": "UI-NEG",
+      "question": "wall_stepper nao e UI",
+      "task": "Refatorar _room_at_t_on_wall em wall_stepper",
+      "expect": {
+        "domains_exclude": [
+          "ui_revisao"
+        ]
+      }
+    },
+    {
+      "id": "COLISAO",
+      "question": "Sobreposicao de volume",
+      "task": "colisão entre peças no mesmo volume",
+      "expect": {
+        "domains_include": [
+          "amarracao"
+        ],
+        "mandatory_rules_include": [
+          "18.7"
         ]
       }
     }

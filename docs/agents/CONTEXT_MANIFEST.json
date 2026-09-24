@@ -374,7 +374,7 @@
       "path": "docs/architecture/opening-reinforcement-strategies.md",
       "role": "architecture",
       "authority": "PROPOSAL",
-      "status": "CURRENT",
+      "status": "PENDING",
       "load": "on_demand",
       "single_source_for": "estrategias de reforco de aberturas",
       "proposal": "preservar"
@@ -384,17 +384,17 @@
       "path": "docs/architecture/extended-block-catalog.md",
       "role": "architecture",
       "authority": "PROPOSAL",
-      "status": "CURRENT",
+      "status": "PENDING",
       "load": "on_demand",
       "single_source_for": "catalogo estendido proposto",
-      "proposal": "preservar"
+      "proposal": "preservar; CHANNEL_U_* implementados (CHANNEL), resto proposto"
     },
     {
       "id": "ARCH_FAMILY",
       "path": "docs/architecture/revit-family-mapping.md",
       "role": "architecture",
       "authority": "PROPOSAL",
-      "status": "CURRENT",
+      "status": "PENDING",
       "load": "on_demand",
       "single_source_for": "mapeamento catalogo logico x familia Revit",
       "proposal": "preservar"
@@ -404,7 +404,7 @@
       "path": "docs/architecture/beta2-implementation-package.md",
       "role": "architecture",
       "authority": "PROPOSAL",
-      "status": "CURRENT",
+      "status": "PENDING",
       "load": "on_demand",
       "single_source_for": "pacote de implementacao Beta 2",
       "proposal": "preservar"
@@ -487,7 +487,7 @@
       "status": "CURRENT",
       "load": "on_demand",
       "single_source_for": "decisoes do redesign premium (#46, integrado pelo #49)",
-      "proposal": "preservar; linha 5 \"nenhum merge\" e historica"
+      "proposal": "preservar; linha 6 \"nenhuma instalacao ou merge\" e historica"
     },
     {
       "id": "UI_POST_PR42",
@@ -704,9 +704,24 @@
         "JUNCTION_MISSING_BINDING",
         "MISSING_REQUIRED_JUNCTION_BOND",
         "NO_FUNCTIONAL_JUNCTION",
-        "BOND_UNRESOLVED"
+        "BOND_UNRESOLVED",
+        "papel funcional",
+        "papel do encontro",
+        "papel por fiada",
+        "encontro funcional",
+        "NONE_FREE_END",
+        "NONE_CONTINUOUS",
+        "CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED",
+        "colisão",
+        "sobreposição",
+        "POSITION_OVERLAP",
+        "PIECE_COLLISION",
+        "vazados menores"
       ],
       "mandatory_rules": [
+        {
+          "number": "3.1"
+        },
         {
           "number": "",
           "heading_contains": "Regra do meio-bloco"
@@ -734,7 +749,16 @@
           "number": "35.1"
         },
         {
+          "number": "36.2"
+        },
+        {
           "number": "36.3"
+        },
+        {
+          "number": "36.4"
+        },
+        {
+          "number": "48"
         },
         {
           "number": "52"
@@ -746,11 +770,7 @@
           "number": "76"
         },
         {
-          "number": "77",
-          "part": "own"
-        },
-        {
-          "number": "77.1"
+          "number": "77"
         }
       ],
       "related_rules": [
@@ -770,16 +790,22 @@
           "number": "30.1"
         },
         {
+          "number": "30.2"
+        },
+        {
           "number": "30.5"
         },
         {
           "number": "33.1"
         },
         {
-          "number": "36.2"
+          "number": "34.1"
         },
         {
-          "number": "36.4"
+          "number": "34.2"
+        },
+        {
+          "number": "39.2"
         },
         {
           "number": "72"
@@ -827,7 +853,8 @@
         "tests/test_block_b19_residual_fill_implementation.py",
         "tests/test_room_probe_inside_opening.py",
         "tests/test_b34_small_void_alignment.py",
-        "tests/regression/test_junction_elevation_identity_cr_v1.py"
+        "tests/regression/test_junction_elevation_identity_cr_v1.py",
+        "tests/test_materializacao_e_estado_da_run.py"
       ],
       "checks": []
     },
@@ -854,9 +881,16 @@
         "stagger",
         "vertical joint",
         "continuous joint",
+        "stacked joint",
+        "odd courses",
+        "even courses",
         "PRISM_CONTINUOUS_JOINT",
         "CONTINUOUS_VERTICAL_JOINT",
-        "FORBIDDEN_JOINT_ALIGNMENT"
+        "FORBIDDEN_JOINT_ALIGNMENT",
+        "família de fiadas",
+        "apoio físico",
+        "UNSUPPORTED_SMALL_BLOCK",
+        "arranjo das corridas"
       ],
       "mandatory_rules": [
         {
@@ -912,6 +946,9 @@
           "number": "27.3"
         },
         {
+          "number": "27.4"
+        },
+        {
           "number": "33.2"
         },
         {
@@ -924,10 +961,40 @@
           "number": "33.9"
         },
         {
+          "number": "34.1"
+        },
+        {
           "number": "39.1"
         },
         {
+          "number": "39.2"
+        },
+        {
           "number": "52"
+        },
+        {
+          "number": "53"
+        },
+        {
+          "number": "60"
+        },
+        {
+          "number": "61"
+        },
+        {
+          "number": "62"
+        },
+        {
+          "number": "63"
+        },
+        {
+          "number": "64"
+        },
+        {
+          "number": "65"
+        },
+        {
+          "number": "68"
         }
       ],
       "sources": [
@@ -1135,6 +1202,9 @@
           "number": "66.2"
         },
         {
+          "number": "77"
+        },
+        {
           "number": "78"
         }
       ],
@@ -1170,10 +1240,22 @@
           "number": "25.3"
         },
         {
+          "number": "25.4"
+        },
+        {
+          "number": "25.5"
+        },
+        {
           "number": "39.1"
         },
         {
           "number": "39.4"
+        },
+        {
+          "number": "64"
+        },
+        {
+          "number": "68"
         }
       ],
       "sources": [
@@ -1188,7 +1270,8 @@
         "nuvem/core/ui_state.py",
         "nuvem/core/engine/opening_audit.py",
         "nuvem/core/engine/junction_role.py",
-        "nuvem/benchmark/validators/validate_openings.py"
+        "nuvem/benchmark/validators/validate_openings.py",
+        "nuvem/core/engine/opening_micro_adjust.py"
       ],
       "tests": [
         "tests/test_materializacao_e_estado_da_run.py",
@@ -1605,6 +1688,12 @@
           "number": "57"
         },
         {
+          "number": "60"
+        },
+        {
+          "number": "62"
+        },
+        {
           "number": "70"
         }
       ],
@@ -1745,7 +1834,8 @@
         "ARQ-STR-BLOCO",
         "DETECTED_AXES",
         "SELECTED_AXES",
-        "EXCLUDED_AXES"
+        "EXCLUDED_AXES",
+        "alvenaria estrutural"
       ],
       "mandatory_rules": [
         {
@@ -1912,6 +2002,27 @@
           "number": "26.7"
         },
         {
+          "number": "26.8.7.5"
+        },
+        {
+          "number": "26.8.7.9"
+        },
+        {
+          "number": "26.8.8.5"
+        },
+        {
+          "number": "26.9.4"
+        },
+        {
+          "number": "26.9.6"
+        },
+        {
+          "number": "26.10.1"
+        },
+        {
+          "number": "26.10.8"
+        },
+        {
           "number": "15.1"
         },
         {
@@ -1961,7 +2072,10 @@
         "NewFamilyInstance",
         "ProjectElevation",
         "materialization gate",
-        "preflight"
+        "preflight",
+        "structurally_resolved",
+        "INCOMPLETE_CREATION",
+        "peça pulada"
       ],
       "mandatory_rules": [
         {
@@ -2043,14 +2157,18 @@
         "revisão antes da criação",
         "contrato de revisão",
         "prévia",
-        "stepper",
+        "stepper de etapas",
         "tema escuro",
         "relatório final",
         "WinForms",
         "ui_state",
         "ui_components",
         "ui_chrome",
-        "UX-20260916"
+        "UX-20260916",
+        "Modelador Externo",
+        "editor externo",
+        "recálculo incremental",
+        "propostas geométricas"
       ],
       "mandatory_rules": [
         {
@@ -2081,6 +2199,18 @@
         },
         {
           "number": "18.8"
+        },
+        {
+          "number": "19"
+        },
+        {
+          "number": "21"
+        },
+        {
+          "number": "28"
+        },
+        {
+          "number": "29"
         }
       ],
       "sources": [
@@ -2205,6 +2335,15 @@
         {
           "number": "37",
           "part": "own"
+        },
+        {
+          "number": "37.1"
+        },
+        {
+          "number": "37.2"
+        },
+        {
+          "number": "37.3"
         },
         {
           "number": "38",
@@ -2339,8 +2478,32 @@
     "primary": ".claude/skills",
     "mirror": ".agents/skills",
     "intentional_differences": {
-      "cr-checkpoint/SKILL.md": "troca de host: Codex/AGENTS.md/.Codex/checkpoints no espelho x Claude Code/CLAUDE.md/.claude/checkpoints (deriva registrada: .Codex/checkpoints nao e ignorado pelo .gitignore; corrigir em entrega propria)",
-      "revit-block-modulation/SKILL.md": "troca de host: AGENTS.md no espelho x CLAUDE.md (linhas 95 e 125)"
+      "cr-checkpoint/SKILL.md": {
+        "reason": "troca de host (deriva registrada em KD-DOC-01: .Codex/checkpoints nao e ignorado pelo .gitignore)",
+        "replace": [
+          [
+            "Claude Code",
+            "Codex"
+          ],
+          [
+            "CLAUDE.md",
+            "AGENTS.md"
+          ],
+          [
+            ".claude/checkpoints/",
+            ".Codex/checkpoints/"
+          ]
+        ]
+      },
+      "revit-block-modulation/SKILL.md": {
+        "reason": "troca de host (arquivo de instrucoes do agente)",
+        "replace": [
+          [
+            "CLAUDE.md",
+            "AGENTS.md"
+          ]
+        ]
+      }
     }
   }
 }

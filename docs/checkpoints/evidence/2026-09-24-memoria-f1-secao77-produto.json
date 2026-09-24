@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-09-24T17:01:02.673794+00:00",
+  "cwd": "/home/user/MeuBotao.pushbutton",
+  "head": "a82dc0b1cb1d71fa65e03e7067996fcce315f4f3",
+  "tree": "8770ca664752d3d10e1dd5f68acc5e4aa670c57b",
+  "status_before": "M docs/agents/CONTEXT_MANIFEST.json\n M docs/agents/RETRIEVAL_EVALS.json\n M docs/agents/SOURCE_INVENTORY.md\n M tools/documentation/context_pack.py\n M tools/documentation/test_context_pack.py",
+  "command": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_regra76_corpus_butanta.py::test_secao_77_o_no_28_nao_e_encontro_nas_fiadas_das_janelas_e_sobram_os_cantos",
+    "tests/test_materializacao_e_estado_da_run.py::test_caso_B_amarracao_real_que_invade_porta_nao_e_criada_e_fica_nao_resolvida",
+    "tests/test_materializacao_e_estado_da_run.py::test_etapa_3b_tem_estado_explicito_e_deterministico"
+  ],
+  "timeout_seconds": 1800,
+  "python": "3.11.15 (main, Mar  3 2026, 09:26:23) [GCC 13.3.0]",
+  "state": "completed",
+  "log": "2026-09-24-memoria-f1-secao77-produto.txt",
+  "pid": 29707,
+  "exit_code": 0,
+  "elapsed_seconds": 58.71,
+  "status_after": "M docs/PROJECT_STATUS.md\n M docs/START_HERE.md\n M docs/agents/CONTEXT_MANIFEST.json\n M docs/agents/KNOWN_DEBT.json\n M docs/agents/README.md\n M docs/agents/RETRIEVAL_EVALS.json\n M docs/agents/SOURCE_INVENTORY.md\n M tools/documentation/context_pack.py\n M tools/documentation/test_context_pack.py\n?? docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.json\n?? docs/checkpoints/evidence/2026-09-24-memoria-f1-secao77-produto.txt",
+  "log_sha256": "354ffda2077f98f4167c8506a22a76b2c1d177e0ecb7e4fc6d3dda1367408b43"
+}
