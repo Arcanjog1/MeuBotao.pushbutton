@@ -95,6 +95,9 @@ Validador independente (recalcula a demanda a partir das aberturas):
 - Topo/peitoril fora da grade sem solução (51.8, decisão E pendente).
 - Travessia de T produz junta na face da parede que chega em 3 fiadas (51.6),
   como no humano; aceita (decisão D) sem relaxar a auditoria global.
+  **Nota 2026-09-25:** a travessia (51.6) e a conversão ao longo (51.7) estão
+  desligadas desde a regra 75 (2026-09-18); D16 mediu que ambas removem a amarração
+  do nó — REGRAS §75.1, decisão humana pendente.
 - Apoio limitado é classificado pelo **assentamento real** na fiada de baixo
   (`bearing_*_cm`, 51.4): sem assentamento = `ACTUAL_ERROR`; abaixo de 9 cm =
   `KNOWN_LIMITATION`; entre 9 cm e o preferencial de 19 cm = `VALID_ALTERNATIVE`.

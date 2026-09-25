@@ -7862,6 +7862,11 @@ corridas se tocam — não há regra de "cinta intermediária" implementada.
 
 ### 51.6 CONHECIMENTO DE AMARRAÇÃO — EXCEÇÃO PERMITIDA (implementada; aprovada pelo usuário 2026-09-14, item D) — a canaleta atravessa o T quando o apoio seria ≤ 0
 
+> **Estado atual (nota de 2026-09-25, D16):** **SUSPENSA** desde 2026-09-18 pela §75
+> (`channel_may_cross_node_tie = False`; no NONE a §80.1 a torna fixa). A travessia remove a
+> B34/B54 do nó naquela fiada — medido no D16 (§75.1): T amarrados 37 → 35. O destino da
+> 51.6 (conflito entre a decisão D e a regra 75) é **decisão humana pendente**.
+
 **Quando**: a corrida precisa passar da jamba e o próximo elemento é a peça
 **transversal** da parede que chega a um T (`T_INTERSECTION_INCOMING`) e, sem
 atravessar, o apoio daquele lado seria **≤ 0 cm** (jamba na face da parede que
@@ -9835,6 +9840,73 @@ e `CHANNEL_SUPPORT_LIMITED` +5. Legado byte-idêntico.
 Testes: `tests/test_channel_never_bonds.py` (fixtures T/L, travessia, canaleta fora
 do envelope permitida, mutante que força o comportamento antigo e exige que o gate
 acuse `CHANNEL_AS_JUNCTION_BOND`).
+
+### 75.1 D16 — verga/contraverga que para no T (2026-09-25, INVESTIGADO, REVISÃO HUMANA; sem mudança de código)
+
+**Pergunta.** A canaleta de verga/contraverga pode atravessar a região de um T sem ser a
+amarração (o HUMANO atravessa e ganha apoio)? **Resposta medida: não, em nenhum caso do
+BUTANTÃ.** Ciclo D16, main `00f2afe`, BUTANTÃ 34 eixos, NONE e CHANNEL; ids do motor com o
+id forense f3 entre parênteses (T20 = motor 22, T26 = 28, T28 = 30, T22 = 24, T16 = 18,
+T51 = 46, L56 = 48).
+
+- **Todas as paradas estão na amarração da própria fiada.** As 14 corridas paradas no NONE
+  (13 no CHANNEL) param numa peça que é a amarração **selecionada** daquele nó e fiada
+  (`bond_trace` BOND_RESOLVED): 13 B34 `T_INTERSECTION_INCOMING` transversais (penetram até
+  a face oposta, 196/196 cm² do quadrado do nó) e 1 B34 `L_CORNER` ao longo sobre o vão
+  (L56, `TIE_OVER_SPAN`). Nenhuma parada em fiada `NO_FUNCTIONAL_JUNCTION` nem no C09
+  `JUNCTION_UNRESOLVED_FILL` da 76.1.
+- **Continuar colide** com a amarração em 27/27 casos (3 724 cm³ em cada T; 9 044 cm³ no
+  L56). Com a 76.1 a região do nó é exclusiva da B34/B54 em toda fiada com encontro
+  funcional: atravessá-la é sempre tirar a amarração. **Travessias seguras = 0.**
+- **A única travessia possível remove a amarração** (51.6: B34 da chegada recuada para B19
+  na face; 51.7: peça de nó virando canaleta). Protótipo com a 51.6 religada (modelo B):
+  paradas 14 → 8, lados com apoio < 4 cm 7 → 1, mas **T amarrados 37 → 35** (4 fiadas-nó
+  NO_BOND_PIECE: motor 22 e 28 × fiadas 3 e 11) e o gate 75 acusa 4
+  `CHANNEL_CROSSED_NODE_TIE`. Com o limite de 4 cm (o que o HUMANO faz no T28): 37 → 33.
+- **O HUMANO faz exatamente isso.** As 89 canaletas humanas em região de nó estão 89/89 em
+  fiada sem B34/B54 (nenhum bloco da chegada penetrando, nenhuma peça da principal
+  cobrindo o nó; 65 delas são a cinta da fiada 12, 32 em nós de paredes fora do corpus).
+  Só 5 são comparáveis ao D16 (verga/contraverga em T do corpus onde o motor para): T20
+  fiadas 3 e 11, T26 fiadas 3 e 11 (a B34 da chegada recuada para B19 na face — a 51.6) e
+  T28 fiada 11 (a peça de nó da principal virou canaleta — a 51.7). Nelas a parede que
+  chega só encosta (B19/B39 a −8 cm do eixo). As jambas humanas estão no mesmo lugar
+  (±0,01 cm); o apoio humano (T20 34 cm, T26 14 cm, T28 39 cm) vem de **atravessar** o nó
+  sem amarração naquela fiada. Nos outros nós em que o motor para (T22, T16) o HUMANO
+  também para.
+- **Com a amarração mantida, o SCRIPT já está no apoio máximo físico** nas 13 paradas de
+  T: a ponta fica na face do quadrado menos a junta de 1 cm. Varredura de 515
+  configurações por parada (penetração da chegada de −1 a 14 cm; B19/B34/B39/B54 da
+  principal deslocados ±30 cm): as 123 que cumprem a 76.1 deixam a canaleta entrar no
+  máximo 0,1 cm. Trocar a paridade não melhora (T26: nenhuma posição válida; T20: piora a
+  outra janela de 19 para −1 cm; T28: 4 cm). Peças de meia altura e canaleta J só existem
+  no acervo humano (seriam família nova) e não cabem empilhadas na fiada de 20 cm.
+- **Modelo A literal** (religar a 51.6 e vetar toda travessia que deixe o nó sem
+  amarração): sobram 0 travessias — idêntico à main. Nenhum modelo de travessia preserva
+  T amarrados e fiadas L sem amarração ao mesmo tempo (51.7 no L56: 3 → 4). O L56 é
+  bloqueado dos dois lados (L_CORNER do próprio 8284584 sobre o vão e L_CORNER do L55).
+- **Regra de papel × regra de ocupação.** A parada em qualquer peça de nó é da 51.4 original
+  (2026-09-14); a §75 só desligou as duas exceções (51.6/51.7) e criou o gate. No BUTANTÃ a
+  implementação **não** é mais restritiva que a intenção de papel. Das 14 paradas rotuladas
+  `RULE_75` no rastreio da §80, só **7** são efeito da política da §75 (os 6 lados com a
+  jamba na face do T em T20/T26 e o `TIE_OVER_SPAN` do L56); as outras 7 já paravam antes
+  (5 a 0,003–0,012 cm dos 19 cm preferenciais; 2 com ~4 cm) — o rótulo diz "parou na
+  amarração do nó", não "a §75 causou a parada".
+- **Divergências documentais registradas:** o parágrafo acima ("pode atravessar a região de
+  um encontro em fiada cuja amarração pertence à outra família") não se realiza em nó
+  funcional do grafo — com a 76.1 a região do nó é exclusiva da B34/B54 em toda fiada com
+  encontro funcional (vale só em fiada sem encontro funcional ou em nó de parede fora do
+  corpus); é o mecanismo humano do T28 fiada 11. A decisão D (2026-09-14) e o cabeçalho
+  da 51.6 seguiam como ativos; as §75–§77 usam ids do motor e a §79 ids f3.
+- Testes: `tests/test_d16_canaleta_no_t.py` (T20/T26/T28-like, NONE e CHANNEL, espelho,
+  colisão, mutante 51.6, modelo A, canaleta nunca amarra, nó não resolvido, regra 48).
+
+**Decisão pendente (usuário):** (1) manter a §75 como está — os 6 lados com a jamba na face
+do T continuam criados com apoio −1 cm (`SUPPORT_ACTUAL_ERROR`, revisão humana) e 2 com
+~4 cm (`KNOWN_LIMITATION`); ou (2) reativar a 51.6 aceitando fiada de T sem B34/B54
+(`BOND_UNRESOLVED`, T amarrados 37 → 35, gate 75 reclassificado); ou (3) resolver pela
+posição da abertura (Etapa 3B/§66, fora deste ciclo). Nenhuma regra de mínimo de apoio foi
+criada (4 e 19 cm são só métricas). Evidência: checkpoint
+`docs/checkpoints/2026-09-25-d16-canaleta-no-t.md`.
 
 ## 76. Compensador NUNCA exerce função de amarração (2026-09-18, IMPLEMENTADO: hard gate + correção D1; 6 casos PENDENTES de decisão)
 

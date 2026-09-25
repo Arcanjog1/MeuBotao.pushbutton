@@ -30,6 +30,7 @@ Estratégia B (CHANNEL) implementada como opt-in na branch `claude/butanta-chann
 - B: apoio de 19 cm é PREFERENCIAL, não mínimo.
 - C: abertura livre até o topo é válida (sem canaleta superior artificial).
 - D: o cruzamento de T do humano é válido — classificação `CHANNEL_THROUGH_T_SUPPORTED_PATTERN`, sem relaxar o auditor global.
+  **Nota 2026-09-25 (D16):** SUSPENSO desde 2026-09-18 pela regra 75 (canaleta nunca amarra). Medido no D16: a travessia remove a B34/B54 do nó naquela fiada (T amarrados 37 → 35 no BUTANTÃ); o conflito D × 75 é decisão humana pendente (REGRAS §75.1).
 - E: topo/peitoril fora da grade continua PENDENTE.
 - F: cinta de topo continua PENDENTE (TOP_BOND_BEAM ≠ OPENING_CHANNEL).
 Implementação: PR [#40](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/40), regras 51.13 e 51.14.
