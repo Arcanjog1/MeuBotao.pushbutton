@@ -122,11 +122,30 @@ def test_execution_receives_the_form_choice_never_the_disk():
 
 
 def test_missing_channel_families_with_none_keeps_legacy_working():
+    """SECAO 80 (decisao do usuario 2026-09-25): 'Sem reforco adicional' tem
+    verga/contraverga em canaleta, entao as familias de canaleta sao CONFERIDAS
+    (uma vez), mas a ausencia NAO bloqueia: a modulacao segue com blocos comuns
+    e a verga/contraverga sai *_UNRESOLVED (CHANNEL_FAMILY_MISSING)."""
     handler = m._PostCreationEventHandler()
     handler.opening_reinforcement_strategy = None
-    handler._load_channel_family_catalog = lambda doc: (_ for _ in ()).throw(AssertionError("nao deveria carregar"))
+    chamadas = []
+    missing = [{"logical_code": "CHANNEL_U_CUT", "family_name": "x", "type_name": "x", "reason": "MISSING"}]
+    handler._load_channel_family_catalog = lambda doc: chamadas.append(1) or ({}, missing)
     handler._ensure_opening_reinforcement_catalog(SimpleNamespace())
+    assert chamadas == [1]
+    assert handler._opening_structural_channel_available() is False
     assert handler._creation_catalog() is handler.catalog
+    # sem a secao 80 o None volta a nao carregar nada
+    antes = m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED
+    m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
+    try:
+        outro = m._PostCreationEventHandler()
+        outro.opening_reinforcement_strategy = None
+        outro._load_channel_family_catalog = lambda doc: (_ for _ in ()).throw(AssertionError("nao deveria carregar"))
+        outro._ensure_opening_reinforcement_catalog(SimpleNamespace())
+        assert outro._creation_catalog() is outro.catalog
+    finally:
+        m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes
 
 
 def test_missing_channel_families_with_channel_raises_explicit_error():

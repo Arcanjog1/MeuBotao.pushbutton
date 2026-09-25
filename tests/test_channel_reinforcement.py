@@ -42,18 +42,20 @@ def _cm(value_ft):
 # SECAO 79 (2026-09-24): o caminho sem reforco ANTERIOR a' secao 79 (regras
 # fisicas de encontro 74/76 D1/76.1/77 e os gates 76/76.1 so' no CHANNEL). Os
 # testes que fixam aquele historico usam esta sentinela; `strategy=None` e' o
-# legado do PRODUTO (secao 79 ligada).
+# legado do PRODUTO (secao 79 ligada). SECAO 80 (2026-09-25): o historico
+# tambem nao tinha verga/contraverga sem o CHANNEL - a sentinela desliga as duas.
 LEGADO_HISTORICO = "LEGADO_ANTERIOR_A_SECAO_79"
 
 
 def solve(lines, openings, strategy=CHANNEL, policy=None, reverse=False, num_courses=NUM_COURSES):
     if strategy == LEGADO_HISTORICO:
-        antes = m.JUNCTION_PHYSICAL_RULES_ENABLED
+        antes = (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED)
         m.JUNCTION_PHYSICAL_RULES_ENABLED = False
+        m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
         try:
             return _solve(lines, openings, None, policy, reverse, num_courses)
         finally:
-            m.JUNCTION_PHYSICAL_RULES_ENABLED = antes
+            m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes
     return _solve(lines, openings, strategy, policy, reverse, num_courses)
 
 
@@ -137,16 +139,51 @@ def passage():
 
 # ------------------------------------------------------------------ legado
 def test_legacy_strategy_none_is_byte_identical_and_has_no_channel():
+    """O legado HISTORICO (antes das secoes 79/80) continua sem canaleta e sem
+    pos-passe. SECAO 80 (decisao do usuario 2026-09-25): o NONE do PRODUTO
+    ('sem reforco ADICIONAL') tem verga e contraverga - ver o teste abaixo."""
     lines, ops = free_wall()
     walls = [(line, ft(14.0), (False, False)) for line in lines]
     walls, jm = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
     nodes, e2n = m.build_wall_graph(walls, jm)
-    plain = m.solve_building_blocks_all_courses(nodes, walls, e2n, ops, sb.CATALOG, 0.0, NUM_COURSES,
-                                                variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
-    explicit, walls2, _n, _o = solve(lines, ops, strategy=None)
-    assert physical_signature(plain, walls) == physical_signature(explicit, walls2)
+    antes = m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED
+    m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
+    try:
+        plain = m.solve_building_blocks_all_courses(nodes, walls, e2n, ops, sb.CATALOG, 0.0, NUM_COURSES,
+                                                    variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
+    finally:
+        m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes
+    explicit, walls2, _n, _o = solve(lines, ops, strategy=LEGADO_HISTORICO)
     assert channel_count(explicit) == 0
     assert "opening_reinforcement" not in explicit
+    assert channel_count(plain) == 0
+
+
+def test_product_none_has_lintel_and_sill_channel_only_in_those_courses():
+    """SECAO 80: sem reforco ADICIONAL, a canaleta aparece so' nas fiadas de
+    verga/contraverga e com o papel de abertura; todas as outras pecas sao as
+    do motor sem a secao 80 (a estrategia adicional nao entra)."""
+    lines, ops = free_wall()
+    produto, walls, _n, _o = solve(lines, ops, strategy=None)
+    antes = m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED
+    m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
+    try:
+        sem80, walls0, _n0, _o0 = solve(lines, ops, strategy=None)
+    finally:
+        m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes
+    plano = produto["opening_reinforcement"]
+    assert plano["strategy"] is None and plano["scope"] == m.OPENING_STRUCTURAL_SCOPE
+    fiadas = set(r["course_index"] for r in plano["runs"])
+    assert channel_count(produto) > 0 and fiadas
+    for ci, pecas in produto["course_candidates"].items():
+        canal = [c for c in pecas if orf.is_channel_code(c["logical_code"])]
+        if ci not in fiadas:
+            assert not canal, ci
+            assert sorted(orf._physical_key(c) for c in pecas) == sorted(
+                orf._physical_key(c) for c in sem80["course_candidates"][ci]), ci
+        for c in canal:
+            papeis = set(c["reinforcement"].get("roles") or [])
+            assert papeis and papeis <= set([orf.ROLE_ABOVE_OPENING, orf.ROLE_BELOW_SILL]), c["reinforcement"]
 
 
 def test_unknown_strategy_is_rejected_never_silently_ignored():
@@ -158,7 +195,9 @@ def test_unknown_strategy_is_rejected_never_silently_ignored():
 # ----------------------------------------------------------- porta/janela
 def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically():
     lines, ops = free_wall()
-    legacy, walls, _n, _o = solve(lines, ops, strategy=None)
+    # referencia SEM canaleta: o legado historico (desde a secao 80 o None do
+    # produto tambem tem verga/contraverga)
+    legacy, walls, _n, _o = solve(lines, ops, strategy=LEGADO_HISTORICO)
     res, walls, _n, _o = solve(lines, ops)
     door_head_course = 11  # base 1 + 11*20 = 221 = topo da porta
     over = codes_over(res, walls, 0, door_head_course, 200, 300)
@@ -363,7 +402,7 @@ def test_tee_b54_split_disabled_is_reported_as_tie_over_span_red_control():
 # ------------------------------------------------------------ excecoes
 def test_passage_with_both_jambs_on_junction_ties_is_free_to_top():
     lines, ops = passage()
-    legacy, walls, _n, _o = solve(lines, ops, strategy=None)
+    legacy, walls, _n, _o = solve(lines, ops, strategy=LEGADO_HISTORICO)
     res, walls, _n, _o = solve(lines, ops)
     rein = res["opening_reinforcement"]
     assert rein["openings"][0]["above"]["status"] == "FREE_TO_TOP"
@@ -576,12 +615,16 @@ def test_through_t_pattern_is_classified_specifically():
 
 
 def test_same_geometry_without_channel_keeps_the_normal_t():
+    """Sem a estrategia adicional o T continua normal. SECAO 80: a verga e a
+    contraverga em canaleta existem nas fiadas 11 e 3, e ainda assim a peca
+    transversal do T nessas fiadas e' B34 (regra 75 - a canaleta nao atravessa)."""
     lines, ops = tee(sill_cm=80.0)
     res, walls, _n, _o = solve(lines, ops, strategy=None)
     reasons = [c["placement_reason"] for v in res["course_candidates"].values() for c in v]
     assert orf.CROSSING_ABUTMENT_REASON not in reasons
     incoming = [r for ci in (3, 11) for r in strip(res, walls, 0, ci) if not r["along"]]
     assert incoming and all(r["cand"]["logical_code"] == "B34" for r in incoming)
+    assert channel_count(res) > 0 and res["channel_as_junction_bond"] == []
 
 
 def test_normal_t_away_from_opening_is_never_crossed():

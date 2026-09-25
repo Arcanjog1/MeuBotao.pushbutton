@@ -1018,6 +1018,11 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                         problem = "SPAN_NOT_COVERED"
                 if problem is not None:
                     rec[side_key] = {"status": "MISSING", "course_index": ci, "reason": problem}
+                    if problem == "TIE_OVER_SPAN":
+                        # rastreio (secao 80): QUAL amarracao impede a corrida (regra 75)
+                        rec[side_key]["tie_nodes"] = sorted(set(
+                            rows[i]["cand"].get("node_index") for i in hits
+                            if rows[i]["tie"] and rows[i]["cand"].get("node_index") is not None))
                     findings.append({"code": "MISSING_REQUIRED_CHANNEL", "severity": SEVERITY_ERROR,
                                      "classification": ("NEEDS_RULE" if problem == "TIE_OVER_SPAN"
                                                         else "ACTUAL_ERROR"),

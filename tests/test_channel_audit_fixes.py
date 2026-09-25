@@ -54,7 +54,7 @@ def test_rule_30_8_and_jamb_noise_tolerance_are_off_by_default():
                                              (224.5, 476.0)])
 def test_free_to_top_opens_exactly_the_opening_and_keeps_masonry_outside_the_jambs(jamb_lo, jamb_hi):
     lines, ops = _passage(jamb_lo, jamb_hi)
-    legacy, walls, _n, _o = solve(lines, ops, strategy=None)
+    legacy, walls, _n, _o = solve(lines, ops, strategy=tcr.LEGADO_HISTORICO)
     res, walls, _n, openings = solve(lines, ops)
     rein = res["opening_reinforcement"]
     assert rein["openings"][0]["above"]["status"] == "FREE_TO_TOP"
@@ -91,7 +91,7 @@ def test_planner_without_presolve_never_removes_pieces_red_control():
     """O P0: o planejador chamado direto (sem o vao estendido no solve) nao
     remove nada - reporta FREE_TO_TOP_NOT_PRESOLVED."""
     lines, ops = _passage(227.0, 473.0)
-    legacy, walls, nodes, openings = solve(lines, ops, strategy=None)
+    legacy, walls, nodes, openings = solve(lines, ops, strategy=tcr.LEGADO_HISTORICO)
     plan = orf.plan_channel_reinforcement(legacy["course_candidates"], walls, openings, _band(legacy), NUM_COURSES,
                                           0.0, nodes=nodes, catalog=tcr.sb.CATALOG)
     assert plan["openings"][0]["above"]["status"] == "FREE_TO_TOP_NOT_PRESOLVED"
@@ -236,7 +236,7 @@ def test_plan_is_independent_of_input_piece_order(fixture):
         lines, ops = tcr.free_wall()
     else:
         lines, ops = _passage(227.0, 473.0)
-    legacy, walls, nodes, openings = solve(lines, ops, strategy=None)
+    legacy, walls, nodes, openings = solve(lines, ops, strategy=tcr.LEGADO_HISTORICO)
     band = _band(legacy)
     sigs = set()
     for order in ("asis", "reversed", "rotated"):
@@ -290,7 +290,13 @@ def test_legacy_candidates_are_untouched():
                                                 variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
     explicit, _w, _n, _o = solve(lines, ops, strategy=None)
     assert [orf._physical_key(c) for c in plain["candidates"]] == [orf._physical_key(c) for c in explicit["candidates"]]
-    assert "candidates_before_reinforcement" not in explicit
+    # legado HISTORICO (antes da secao 80): sem pos-passe, candidates intocados
+    historico, _w2, _n2, _o2 = solve(lines, ops, strategy=tcr.LEGADO_HISTORICO)
+    assert "candidates_before_reinforcement" not in historico
+    # SECAO 80: o NONE do produto passa pelo pos-passe ESTRUTURAL (verga /
+    # contraverga) e a fonte unica candidates/collisions vale para ele tambem
+    assert explicit["opening_reinforcement"]["scope"] == m.OPENING_STRUCTURAL_SCOPE
+    assert "candidates_before_reinforcement" in explicit
 
 
 # ------------------------------------------ passagem livre CONTINUA (face a face)

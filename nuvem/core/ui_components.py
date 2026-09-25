@@ -34,7 +34,9 @@ def _ui_setup_text(setup):
         partes.append("Aberturas: {}".format(
             "detectadas automaticamente" if setup["openings_mode"] == "auto" else setup["openings_mode"]))
     if setup.get("opening_reinforcement"):
-        partes.append("Reforço: {}".format(setup["opening_reinforcement"]))
+        partes.append("Reforço: {}".format(
+            "Sem reforço adicional (verga e contraverga em canaleta)"
+            if setup["opening_reinforcement"] in ("NONE", None) else setup["opening_reinforcement"]))
     if setup.get("wall_mode"):
         partes.append("Paredes: {}".format(setup["wall_mode"]))
     if setup.get("origem"):
@@ -178,7 +180,7 @@ class UiComponents(object):
         separator(context, "top")
         def set_kind(value):
             canvas._set_kind(value)
-            holder._strategy.Text = {"channel": "Canaletas", "none": "Sem reforço", "cad": "Paredes a partir do CAD",
+            holder._strategy.Text = {"channel": "Canaletas", "none": "Sem reforço adicional", "cad": "Paredes a partir do CAD",
                                      "selection": "Paredes existentes", "blocks": "Plano de blocos"}.get(value, value)
         holder._set_kind = set_kind
         set_kind(kind)
@@ -394,9 +396,11 @@ class UiComponents(object):
         style_grid(form._layer_grid)
         def preview_changed(sender, args):
             preview._set_kind("channel" if form._reinforcement_combo.SelectedIndex == 1 else "none")
-            helper.Text = ("Canaleta superior em portas e janelas.\nCanaleta inferior em janelas com peitoril."
+            helper.Text = ("Verga e contraverga em canaleta, mais a estratégia adicional CHANNEL\n"
+                           "(passagem livre até o topo, paridade e arranjo da canaleta)."
                            if form._reinforcement_combo.SelectedIndex == 1 else
-                           "Aberturas sem reforço por canaletas.\nAs demais regras de modulação são mantidas.")
+                           "Verga (canaleta) em portas e janelas e contraverga em janelas com peitoril:\n"
+                           "reforço estrutural obrigatório. Sem a estratégia adicional CHANNEL.")
         form._reinforcement_combo.SelectedIndexChanged += preview_changed
         preview_changed(None, None)
         def page_changed(index):
@@ -715,7 +719,8 @@ class UiComponents(object):
         catalog = dict(handler.catalog or {})
         catalog.update(handler.channel_catalog or {})
         missing = list(handler.catalog_missing or []) + list(handler.channel_catalog_missing or [])
-        lines = ["Reforço: " + ("Canaletas (CHANNEL)" if handler.opening_reinforcement_strategy == "CHANNEL" else "Sem reforço")]
+        lines = ["Reforço: " + ("Canaletas (CHANNEL)" if handler.opening_reinforcement_strategy == "CHANNEL"
+                                else "Sem reforço adicional (verga e contraverga em canaleta)")]
         rows = family_rows(catalog, missing)
         lines.extend("{} — {}: {}".format(*row) for row in rows)
         form._ui_family_grid.Items.Clear()
@@ -726,7 +731,9 @@ class UiComponents(object):
             row.ForeColor = self.color("Success" if status == "OK" else "Danger")
             form._ui_family_grid.Items.Add(row)
         form._ui_family_grid.ShowItemToolTips = True
-        channel_pending = (handler.opening_reinforcement_strategy == "CHANNEL"
+        # SECAO 80: as canaletas de verga/contraverga sao conferidas nas DUAS opcoes
+        channel_pending = ((handler.opening_reinforcement_strategy == "CHANNEL"
+                            or getattr(handler, "opening_structural_enabled", False))
                            and not handler.channel_catalog and not handler.channel_catalog_missing)
         if channel_pending:
             lines.append("Canaletas: verificação pendente. O backend confere as famílias antes do cálculo.")
@@ -751,13 +758,13 @@ class UiComponents(object):
         combo = self.new("ComboBox")
         combo.DropDownStyle = self.ns["ComboBoxStyle"].DropDownList
         combo.Dock = self.ns["DockStyle"].Top
-        combo.Items.Add("Sem reforço")
+        combo.Items.Add("Sem reforço adicional")
         combo.Items.Add("Canaletas (CHANNEL)")
         # Nunca nasce de default fixo quando existe escolha anterior desta máquina.
         lembrado = (defaults or {}).get("opening_reinforcement")
         combo.SelectedIndex = 1 if lembrado in ("CHANNEL", "Canaletas (CHANNEL)") else 0
         style_input(combo)
-        body.Controls.Add(self.label("As famílias de canaleta serão conferidas antes do cálculo. Verga / contraverga: em desenvolvimento.", 70))
+        body.Controls.Add(self.label("Verga e contraverga em canaleta são reforço estrutural obrigatório nas duas opções; as famílias de canaleta são conferidas antes do cálculo.", 70))
         body.Controls.Add(combo)
         self.theme(combo)
         body.Controls.Add(self.label("Reforço das aberturas", 38, True))
@@ -874,7 +881,9 @@ class UiComponents(object):
         self.end_busy_view(form)
         h = form._handler
         state = form._ui_state
-        state.solved(h.solve_result, h.catalog_missing, h.channel_catalog_missing)
+        # SECAO 80: sem reforco adicional, canaleta ausente nao bloqueia a criacao
+        state.solved(h.solve_result, h.catalog_missing,
+                     h.channel_catalog_missing if h.opening_reinforcement_strategy else ())
         form._ui_tabs.bar.Enabled = True
         form._ui_piece_grid.Visible = True
         form._ui_plan_metrics.Visible = True

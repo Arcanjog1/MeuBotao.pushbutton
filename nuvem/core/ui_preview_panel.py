@@ -74,7 +74,8 @@ def attach_preview(canvas, kind="cad"):
                 rect("Background", 93, 90, 76, 59)
                 polygon("StoneSide", [(93, 90), (105, 82), (105, 141), (93, 149)])
                 polygon("StoneTop", [(93, 149), (105, 141), (181, 141), (169, 149)])
-                if mode == "channel":
+                if mode in ("channel", "none"):
+                    # SECAO 80: verga e contraverga em canaleta nas DUAS opcoes
                     for y in (70, 150):
                         rect("Reinforcement", 61, y, 144, 18)
                         polygon("Primary", [(61, y), (71, y - 7), (215, y - 7), (205, y)])
@@ -84,14 +85,12 @@ def attach_preview(canvas, kind="cad"):
                     line("Reinforcement", 206, 158, 266, 158)
                     text("01", 246, 60, "TextPrimary")
                     text("02", 246, 160, "TextPrimary")
-                    text("01  Canaleta superior", 25, 206)
-                    text("02  Canaleta inferior", 25, 225)
+                    text("01  Canaleta superior" if mode == "channel" else "01  Verga (canaleta)", 25, 206)
+                    text("02  Canaleta inferior" if mode == "channel" else "02  Contraverga (canaleta)", 25, 225)
                 elif mode == "selection":
                     for x, y in ((21, 44), (237, 44), (21, 183), (237, 183)):
                         rect("Primary", x, y, 8, 8)
                     text("Seleção de paredes no modelo", 25, 212)
-                elif mode == "none":
-                    text("Alvenaria sem reforço de abertura", 25, 212)
                 else:
                     text("Composição ilustrativa da alvenaria", 25, 212)
         finally:

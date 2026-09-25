@@ -115,11 +115,19 @@ def creation_gate(result, catalog_missing=(), channel_missing=()):
         trechos = len(unresolved_spans(result))
         if trechos:
             partes.append("{} trecho(s) NÃO resolvido(s) ficarão sem bloco — revisão humana obrigatória".format(trechos))
+        vergas = opening_reinforcement_pending(result)
+        if vergas:
+            partes.append("{} verga(s)/contraverga(s) NÃO resolvida(s) — revisão humana obrigatória".format(vergas))
         return True, "Confira as quantidades e clique em Criar blocos no Revit. " + "; ".join(partes) + "."
     trechos = len(unresolved_spans(result))
+    vergas = opening_reinforcement_pending(result)
+    avisos = []
     if trechos:
-        return True, ("Confira as quantidades e clique em Criar blocos no Revit. {} trecho(s) NÃO resolvido(s) "
-                      "ficarão sem bloco — revisão humana obrigatória.".format(trechos))
+        avisos.append("{} trecho(s) NÃO resolvido(s) ficarão sem bloco — revisão humana obrigatória".format(trechos))
+    if vergas:
+        avisos.append("{} verga(s)/contraverga(s) NÃO resolvida(s) — revisão humana obrigatória".format(vergas))
+    if avisos:
+        return True, "Confira as quantidades e clique em Criar blocos no Revit. " + "; ".join(avisos) + "."
     return True, "Confira as quantidades e clique em Criar blocos no Revit."
 
 
@@ -297,7 +305,8 @@ class ModulationUiState(object):
     def report_text(self, handler, creation=None):
         result = self.result or {}
         counts = self.counts
-        strategy = "Canaletas (CHANNEL)" if self.strategy == "CHANNEL" else "Sem reforço"
+        strategy = ("Canaletas (CHANNEL)" if self.strategy == "CHANNEL"
+                    else "Sem reforço adicional (verga e contraverga em canaleta)")
         prov = getattr(handler, "runtime_provenance", None) or {}
         versao = ("Versão: canal={} branch={} commit={} cache={}".format(
             prov.get("CHANNEL", "?"), prov.get("SOURCE_BRANCH", "-"), prov.get("RESOLVED_COMMIT", "?"),
@@ -464,7 +473,37 @@ def review_items(result, creation=None):
     for span in unresolved_spans(result, creation):
         rows.append({"node": None, "course": span.get("course"), "wall_idx": span.get("wall_idx"),
                      "text": span_text(span)})
+    # Seção 80: verga/contraverga sem solução — requisito estrutural, nunca some;
+    # criada sem assentamento num lado (51.4 ACTUAL_ERROR) — aviso para revisão.
+    for row in (result or {}).get("opening_structural_trace") or []:
+        onde = u"parede {}, abertura {}".format(
+            row.get("wall_id") if row.get("wall_id") is not None else u"#{}".format(row.get("wall_idx")),
+            row.get("opening_id") if row.get("opening_id") is not None else u"#{}".format(row.get("opening_index")))
+        for papel, prefixo in ((u"Verga", "lintel"), (u"Contraverga", "sill")):
+            status = str(row.get(prefixo + "_status") or "")
+            if status.endswith("_UNRESOLVED"):
+                rows.append({"node": None, "course": row.get(prefixo + "_course"), "wall_idx": row.get("wall_idx"),
+                             "text": u"{} NÃO resolvida ({}): {} — revise no modelo.".format(
+                                 papel, onde, row.get(prefixo + "_reason") or "?")})
+            elif status.endswith("_CREATED") and row.get(prefixo + "_requires_human_review"):
+                rows.append({"node": None, "course": row.get(prefixo + "_course"), "wall_idx": row.get("wall_idx"),
+                             "text": u"{} criada sem assentamento num lado ({}; apoio {} / {} cm; parada na amarração {}) "
+                                     u"— revise.".format(papel, onde, row.get(prefixo + "_left_support"),
+                                                         row.get(prefixo + "_right_support"),
+                                                         row.get(prefixo + "_junction_ids"))})
+    for item in (creation or {}).get("unresolved_opening_reinforcement") or []:
+        if item.get("role") == "CHANNEL_PIECE":
+            rows.append({"node": None, "course": item.get("course_index"), "wall_idx": item.get("wall_idx"),
+                         "text": u"Canaleta {} NÃO criada (parede #{}, fiada {}): {} — revise.".format(
+                             item.get("logical_code"), item.get("wall_idx"), item.get("course_index"),
+                             item.get("reason"))})
     return rows
+
+
+def opening_reinforcement_pending(result):
+    """Seção 80: vergas/contravergas sem solução no plano (não bloqueiam a criação)."""
+    return sum(1 for row in (result or {}).get("opening_structural_trace") or []
+               for prefixo in ("lintel", "sill") if str(row.get(prefixo + "_status") or "").endswith("_UNRESOLVED"))
 
 
 def no_functional_junction_count(result):

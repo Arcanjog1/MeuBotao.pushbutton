@@ -3823,6 +3823,27 @@ CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED = True
 JUNCTION_PHYSICAL_RULES_ENABLED = True
 # rastreio da amarracao por no'/fiada (somente observacao)
 BOND_TRACE_ENABLED = True
+# SECAO 80 (D6, decisao do usuario 2026-09-25) - REFORCO ESTRUTURAL DA ABERTURA.
+# Verga (fiada cuja base e' o topo do vao) e contraverga (fiada cujo topo e' o
+# peitoril, so' com peitoril acima da base) sao REQUISITOS ESTRUTURAIS da
+# modulacao, nao parte da estrategia adicional CHANNEL. Sem reforco ADICIONAL
+# (strategy=None) o motor roda o MESMO planejador de canaleta ja' provado no
+# CHANNEL (secao 51: fiada, codigos U39/U34/U19/U_CUT, orientacao, corrida peca
+# a peca ate' o apoio preferencial, paradas em amarracao - regra 75), com
+# free_to_top=[]: a passagem livre (51.9), a paridade da canaleta (51.14), o
+# arranjo 60-65 e as regras 58.2/68/71/72 continuam SO' no CHANNEL. Toda
+# abertura sai com status LINTEL_* / SILL_REINFORCEMENT_* no resultado
+# (`opening_structural_trace`). Desligada = motor historico sem verga
+# (sentinela LEGADO_HISTORICO dos testes).
+OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True
+OPENING_STRUCTURAL_SCOPE = "OPENING_STRUCTURAL"
+LINTEL_CREATED = "LINTEL_CREATED"
+LINTEL_NOT_REQUIRED = "LINTEL_NOT_REQUIRED"
+LINTEL_UNRESOLVED = "LINTEL_UNRESOLVED"
+SILL_REINFORCEMENT_CREATED = "SILL_REINFORCEMENT_CREATED"
+SILL_REINFORCEMENT_NOT_REQUIRED = "SILL_REINFORCEMENT_NOT_REQUIRED"
+SILL_REINFORCEMENT_UNRESOLVED = "SILL_REINFORCEMENT_UNRESOLVED"
+OPENING_REINFORCEMENT_STOP_RULE_75 = "RULE_75"
 
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
@@ -3831,7 +3852,9 @@ def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openi
     preenchimento por parede (`wall_stepper.WALL_FILL_MEMO`, chave canonica das
     entradas, resultado identico) so' durante esta chamada, e as tolerancias
     fisicas com tentativa (`CHANNEL_PHYSICAL_TOLERANCES_ENABLED`, secao 30.9).
-    Legado (None) nao muda nada. Ver `_solve_building_blocks_all_courses_impl`."""
+    Sem reforco ADICIONAL (None) o memo e as chaves do CHANNEL nao ligam (a verga e
+    a contraverga estruturais da secao 80 vem do pos-passe, nao daqui). Ver
+    `_solve_building_blocks_all_courses_impl`."""
     from core.engine import wall_stepper as _stepper_memo
     from core.engine import continuous_modulation as _cm_flags
     if kwargs.get("opening_reinforcement_strategy") is None or _stepper_memo.WALL_FILL_MEMO is not None:
@@ -4456,9 +4479,13 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
         for problem in audit.get("problems") or ():
             kind = str(problem).split(":")[0]
             gates[kind] = gates.get(kind, 0) + 1
-    counts = ((result.get("opening_reinforcement") or {}).get("validation") or {}).get("counts") or {}
+    _reinf = result.get("opening_reinforcement") or {}
+    counts = (_reinf.get("validation") or {}).get("counts") or {}
+    # SECAO 80: no reforco estrutural (sem reforco adicional) o apoio de 19 cm e'
+    # PREFERENCIAL (51.4 item B) - nunca vira portao do microajuste
+    _estrutural = _reinf.get("scope") == OPENING_STRUCTURAL_SCOPE
     for key, value in counts.items():
-        if key.isupper():
+        if key.isupper() and not (_estrutural and "SUPPORT_BELOW_POLICY" in key):
             gates["CHANNEL_" + key] = value
     spans = []
     if wall_idx < len(openings_per_wall or ()):
@@ -4855,9 +4882,18 @@ def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_
                                       stage_cb=None, opening_strategy=None,
                                       arm_role_safe_repair=None, b19_residual_fill_repair=None,
                                       tie_parity_search=None, opening_reinforcement_strategy=None,
-                                      opening_reinforcement_policy=None):
-    """ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14): `opening_reinforcement_
-    strategy=None` (default) mantem o comportamento anterior, byte a byte.
+                                      opening_reinforcement_policy=None,
+                                      opening_structural_channel_available=True):
+    """SECAO 80 (2026-09-25): com `opening_reinforcement_strategy=None` (sem
+    reforco ADICIONAL) o pos-passe aplica o reforco ESTRUTURAL da abertura -
+    verga e contraverga em canaleta - e nada mais da estrategia CHANNEL.
+    `opening_structural_channel_available=False` (familias de canaleta ausentes
+    no projeto): planeja e registra, mas nao converte peca - as vergas e
+    contravergas ficam *_UNRESOLVED (CHANNEL_FAMILY_MISSING), revisao humana.
+
+    ESTRATEGIA DE REFORCO DE ABERTURAS (2026-09-14): `opening_reinforcement_
+    strategy=None` (default) nao liga nada da estrategia adicional (ate' a secao
+    80 era o comportamento anterior byte a byte; hoje tem verga/contraverga).
     "CHANNEL" roda, DEPOIS de todo o solve/reparos, o pos-passe de
     core/engine/opening_reinforcement.py sobre as fiadas fisicas e grava o
     plano/validacao em result["opening_reinforcement"]. Nao ha' default A/B:
@@ -4973,7 +5009,8 @@ def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_
         return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
             _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
             original_openings_per_wall, catalog, base_z_abs, num_courses,
-            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+            opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top,
+            structural_channel_available=opening_structural_channel_available), catalog,
             walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
             catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
@@ -5010,7 +5047,8 @@ def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_
     return _physical_support_final(_orient_small_voids_final(_apply_opening_reinforcement(
         _record_unmodulated_walls(result, walls_to_create), nodes, walls_to_create, end_to_node,
         original_openings_per_wall, catalog, base_z_abs, num_courses,
-        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top), catalog,
+        opening_reinforcement_strategy, opening_reinforcement_policy, free_to_top=free_to_top,
+        structural_channel_available=opening_structural_channel_available), catalog,
         walls_to_create, original_openings_per_wall, arrange=_b34_run_arrangement_legacy_enabled()),
         catalog, walls_to_create, original_openings_per_wall, base_z_abs)
 
@@ -5253,9 +5291,17 @@ def _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, ba
 
 
 def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
-                                 base_z_abs, num_courses, strategy, policy=None, free_to_top=None):
-    """Pos-passe da estrategia de reforco. None devolve `result` intacto."""
+                                 base_z_abs, num_courses, strategy, policy=None, free_to_top=None,
+                                 structural_channel_available=True):
+    """Pos-passe do reforco de abertura. `strategy=None` (sem reforco ADICIONAL):
+    so' o reforco ESTRUTURAL da abertura (secao 80 - verga e contraverga); com a
+    secao 80 desligada, `result` intacto. "CHANNEL": o pos-passe completo da
+    estrategia adicional (que ja' inclui verga e contraverga)."""
     if strategy is None:
+        if OPENING_STRUCTURAL_REINFORCEMENT_ENABLED:
+            return _apply_opening_structural_reinforcement(
+                result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
+                num_courses, policy=policy, pieces_available=structural_channel_available)
         return result
     from core.engine import opening_reinforcement as _reinforcement
     if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
@@ -5321,11 +5367,423 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
-    # REGRA 75 - hard gate: canaleta nunca exerce funcao de amarracao. So' o
-    # fluxo com estrategia de reforco passa por aqui; o legado segue byte a byte.
+    # REGRA 75 - hard gate: canaleta nunca exerce funcao de amarracao (nos dois
+    # caminhos desde a secao 80; ver _apply_opening_structural_reinforcement).
     result["channel_as_junction_bond"] = _reinforcement.channel_as_junction_bond(
         result.get("course_candidates"), plan)
+    _attach_opening_structural_trace(result, plan, strategy, _band, pieces_applied=True,
+                                     base_z_abs=base_z_abs, num_courses=num_courses)
     return result
+
+
+def unresolved_opening_reinforcement(solve_result, create_result=None):
+    """SECAO 80: verga/contraverga que NAO ficou resolvida - linhas *_UNRESOLVED do
+    rastreio das aberturas e canaletas planejadas que nao foram criadas (familia
+    ausente ou pulada pela regra 48). Cada item com requires_human_review."""
+    itens = []
+    if not OPENING_STRUCTURAL_REINFORCEMENT_ENABLED:
+        return itens
+    for row in (solve_result or {}).get("opening_structural_trace") or []:
+        for papel, status_key, reason_key in (("LINTEL", "lintel_status", "lintel_reason"),
+                                              ("SILL", "sill_status", "sill_reason")):
+            if row.get(status_key) in (LINTEL_UNRESOLVED, SILL_REINFORCEMENT_UNRESOLVED):
+                itens.append({"role": papel, "status": row.get(status_key), "reason": row.get(reason_key),
+                              "wall_idx": row.get("wall_idx"), "wall_id": row.get("wall_id"),
+                              "opening_index": row.get("opening_index"), "opening_id": row.get("opening_id"),
+                              "top_cm": row.get("top_cm"), "sill_cm": row.get("sill_cm"),
+                              "requires_human_review": True})
+    from core.engine import opening_reinforcement as _reinforcement
+    for rec in (create_result or {}).get("skipped") or []:
+        if _reinforcement.is_channel_code(rec.get("logical_code")):
+            itens.append({"role": "CHANNEL_PIECE", "status": "NOT_CREATED", "reason": rec.get("rule_id"),
+                          "wall_idx": rec.get("wall_idx"), "course_index": rec.get("course_index"),
+                          "logical_code": rec.get("logical_code"), "requires_human_review": True})
+    return itens
+
+
+def opening_reinforcement_review(solve_result):
+    """SECAO 80: verga/contraverga CRIADA que pede revisao humana (apoio sem
+    assentamento num lado - classificacao ACTUAL_ERROR da 51.4, tipicamente a
+    corrida parada na amarracao de um T pela regra 75). Nao e' pendencia
+    estrutural (nenhum minimo novo de apoio); e' aviso para a revisao / D16."""
+    itens = []
+    for row in (solve_result or {}).get("opening_structural_trace") or []:
+        for papel in ("lintel", "sill"):
+            if (str(row.get(papel + "_status") or "").endswith("_CREATED")
+                    and row.get(papel + "_requires_human_review")):
+                itens.append({"role": papel.upper(), "status": row.get(papel + "_status"),
+                              "reason": row.get(papel + "_reason"), "wall_idx": row.get("wall_idx"),
+                              "wall_id": row.get("wall_id"), "opening_index": row.get("opening_index"),
+                              "opening_id": row.get("opening_id"),
+                              "left_support_cm": row.get(papel + "_left_support"),
+                              "right_support_cm": row.get(papel + "_right_support"),
+                              "junction_ids": row.get(papel + "_junction_ids"), "requires_human_review": True})
+    return itens
+
+
+def _opening_trace_apply_materialization(solve_result, plano):
+    """SECAO 80 + REGRA 48: canaleta de verga/contraverga que a materializacao
+    vai pular (invade o vao/colide) - a corrida NAO existe de fato: a linha do
+    rastreio vira *_UNRESOLVED com a regra, e o resumo e' refeito."""
+    rows = (solve_result or {}).get("opening_structural_trace") or []
+    if not rows or not plano:
+        return solve_result
+    from core.engine import opening_reinforcement as _reinforcement
+    por_id = {}
+    for _ci, pecas in ((solve_result or {}).get("course_candidates") or {}).items():
+        for cand in pecas or []:
+            por_id[id(cand)] = cand
+    corridas = {}
+    for _ci, pid, rec in plano.get("skip") or []:
+        cand = por_id.get(pid)
+        if cand is None or not _reinforcement.is_channel_code(cand.get("logical_code")):
+            continue
+        run_id = (cand.get("reinforcement") or {}).get("run_id")
+        if run_id and run_id not in corridas:
+            corridas[run_id] = rec.get("rule_id")
+    if not corridas:
+        return solve_result
+    for row in rows:
+        for papel, sem_solucao in (("lintel", LINTEL_UNRESOLVED), ("sill", SILL_REINFORCEMENT_UNRESOLVED)):
+            regra = corridas.get(row.get(papel + "_run_id"))
+            if regra and str(row.get(papel + "_status") or "").endswith("_CREATED"):
+                row.update({papel + "_status": sem_solucao, papel + "_reason": "REGRA_48_" + str(regra),
+                            papel + "_requires_human_review": True})
+                row["requires_human_review"] = True
+    solve_result["opening_structural_summary"] = _opening_structural_summary(
+        rows, solve_result.get("channel_stopped_by_junction"))
+    return solve_result
+
+
+def _fill_opening_trace_ids(solve_result, walls_to_create, all_openings, created_walls_by_axis):
+    """SECAO 80: ElementId da parede (como nos trechos da secao 78) e da abertura
+    (a instancia cujo centro cai no vao, projetado no eixo da parede) em cada linha
+    do rastreio e em cada parada da regra 75."""
+    rows = (solve_result or {}).get("opening_structural_trace") or []
+    ids = {}
+    for row in rows:
+        wi = row.get("wall_idx")
+        entries = (created_walls_by_axis or {}).get(wi) or []
+        try:
+            row["wall_id"] = _eid_int(entries[0][0]) if entries else None
+        except Exception:
+            row["wall_id"] = None
+        if wi is None or not walls_to_create or wi >= len(walls_to_create) or not all_openings:
+            continue   # (o wall_id ja' foi gravado; o ElementId da abertura exige a lista)
+        line = walls_to_create[wi][0]
+        p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)
+        dx, dy = p1.X - p0.X, p1.Y - p0.Y
+        comp = (dx * dx + dy * dy) ** 0.5
+        if comp < 1e-9:
+            continue
+        ux, uy = dx / comp, dy / comp
+        lo, hi = _cm_to_ft(row.get("start_cm") or 0.0), _cm_to_ft(row.get("end_cm") or 0.0)
+        melhor = None
+        for op in all_openings:
+            c = op.get("center_xy") if isinstance(op, dict) else None
+            if c is None:
+                continue
+            vx, vy = c.X - p0.X, c.Y - p0.Y
+            t = vx * ux + vy * uy
+            perp = abs(-vx * uy + vy * ux)
+            if lo - 0.05 <= t <= hi + 0.05 and perp < 1.0 and (melhor is None or perp < melhor[0]):
+                melhor = (perp, op.get("element_id"))
+        if melhor is not None:
+            row["opening_id"] = melhor[1]
+    for row in rows:
+        ids[(row.get("wall_idx"), row.get("opening_index"))] = (row.get("opening_id"), row.get("wall_id"))
+    for stop in (solve_result or {}).get("channel_stopped_by_junction") or []:
+        par = ids.get((stop.get("wall_idx"), stop.get("opening_index")))
+        if par is not None:
+            stop["opening_id"], stop["wall_id"] = par
+    return solve_result
+
+
+def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall,
+                                            catalog, base_z_abs, num_courses, policy=None, pieces_available=True):
+    """SECAO 80 - REFORCO ESTRUTURAL DA ABERTURA sem a estrategia adicional.
+
+    Verga e contraverga pelo MESMO planejador provado no CHANNEL
+    (`plan_channel_reinforcement`: fiada acima do topo / cujo topo e' o
+    peitoril, pecas da propria fiada convertidas em canaleta, corrida peca a
+    peca, parada em amarracao - regra 75), com `free_to_top=[]`: a passagem
+    livre 51.9 nao e' decidida aqui (continua so' no CHANNEL). Depois: a mesma
+    validacao da canaleta, a reauditoria com o catalogo logico de canaletas, a
+    fonte unica candidates/collisions e o gate da regra 75. NAO roda: 51.9,
+    51.14 (paridade por causa da canaleta), arranjo 60-65 e 58.2/68/71/72.
+
+    `pieces_available=False` (familias de canaleta ausentes no projeto): o
+    plano e' calculado e registrado, nenhuma peca e' convertida e toda verga /
+    contraverga que seria criada sai *_UNRESOLVED (CHANNEL_FAMILY_MISSING)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    if not isinstance(result, dict):
+        return result
+    if result.get("error") is not None:
+        result["opening_reinforcement"] = {"strategy": None, "scope": OPENING_STRUCTURAL_SCOPE,
+                                           "error": result.get("error")}
+        return result
+    step, height_error = _course_height_ft(catalog, result.get("candidates") or [])
+    if step is None:
+        result["opening_reinforcement"] = {"strategy": None, "scope": OPENING_STRUCTURAL_SCOPE,
+                                           "error": height_error}
+        return result
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    # REGRA 75 e' absoluta no reforco estrutural: nenhuma politica recebida pode
+    # religar a travessia de T (51.6) nem a conversao de amarracao (51.7)
+    politica = dict(policy or {})
+    politica["channel_may_cross_node_tie"] = False
+    politica["convert_blocking_along_ties"] = False
+    # O vazado menor (secao 52) e' decidido ANTES da conversao, sobre as mesmas
+    # pecas do motor sem a secao 80: fora das corridas de verga/contraverga
+    # nenhuma peca muda (nem a orientacao). A chamada de fora ve a marca e nao
+    # refaz.
+    _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall,
+                              arrange=_b34_run_arrangement_legacy_enabled())
+    t_plan = time.time()
+    plan = _reinforcement.plan_channel_reinforcement(
+        result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
+        base_z_abs, policy=politica, nodes=nodes, catalog=catalog, free_to_top=[])
+    plan["strategy"] = None
+    plan["scope"] = OPENING_STRUCTURAL_SCOPE
+    plan["pieces_applied"] = bool(pieces_available)
+    convertidas = plan.pop("course_candidates")
+    t_validate = time.time()
+    t_audit = t_validate
+    if pieces_available:
+        result["course_candidates_before_reinforcement"] = result.get("course_candidates")
+        result["course_candidates"] = convertidas
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+            free_to_top=plan["free_to_top"], policy=plan["policy"],
+            reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+        t_audit = time.time()
+        audit_catalog = dict(catalog)
+        audit_catalog.update(channel_logical_catalog())
+        result["wall_bond_audits_before_reinforcement"] = result.get("wall_bond_audits")
+        result["wall_bond_audits"] = audit_all_walls_bond_quality(
+            walls_to_create, result["course_candidates"], audit_catalog, num_courses,
+            openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+        _unify_candidates_with_courses(result, _reinforcement)
+        _alinhamento = result.get("small_void_alignment")
+        if isinstance(_alinhamento, dict):
+            # as violacoes do vazado menor sao relidas sobre as fiadas FINAIS (com
+            # as canaletas); a orientacao das pecas nao muda
+            from core.engine import small_void_alignment as _small_void
+            _alinhamento["violations"] = _small_void.b34_small_void_violations(result["course_candidates"], catalog)
+            _alinhamento["after"] = len(_alinhamento["violations"])
+    else:
+        plan["validation"] = None
+    plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
+                        "reaudit": round(time.time() - t_audit, 4)}
+    result["opening_reinforcement"] = plan
+    # REGRA 75 nos dois caminhos: canaleta de verga/contraverga nunca amarra
+    result["channel_as_junction_bond"] = _reinforcement.channel_as_junction_bond(
+        result.get("course_candidates"), plan)
+    _attach_opening_structural_trace(result, plan, None, _band, pieces_applied=bool(pieces_available),
+                                     base_z_abs=base_z_abs, num_courses=num_courses)
+    return result
+
+
+def _attach_opening_structural_trace(result, plan, strategy, course_band, pieces_applied=True,
+                                     base_z_abs=0.0, num_courses=None):
+    """SECAO 80 - rastreio por abertura (verga e contraverga, status, fiada,
+    codigos, corrida, apoio de cada lado, parada em amarracao) e a lista das
+    corridas paradas pela regra 75. Somente leitura do plano."""
+    rows, stops = _opening_structural_trace_rows(plan, strategy, course_band, pieces_applied,
+                                                 base_z_abs=base_z_abs, num_courses=num_courses)
+    result["opening_structural_trace"] = rows
+    result["channel_stopped_by_junction"] = stops
+    result["opening_structural_summary"] = _opening_structural_summary(rows, stops)
+    return result
+
+
+def _opening_structural_summary(rows, stops):
+    resumo = {}
+    for row in rows:
+        for chave in ("lintel_status", "sill_status"):
+            resumo[row[chave]] = resumo.get(row[chave], 0) + 1
+    resumo[OPENING_REINFORCEMENT_STOP_RULE_75] = len(stops or [])
+    return resumo
+
+
+def _opening_grid_cm(course_band, base_z_abs, num_courses, z_rel_cm):
+    """Bases REAIS (cm, relativas a' base da parede - a mesma referencia de
+    top_cm/sill_cm) da fiada logo abaixo e da logo acima de uma cota; None onde
+    a fiada nao existe."""
+    if not num_courses:
+        return None
+    z_abs = base_z_abs + _cm_to_ft(z_rel_cm)
+    bases = [course_band(ci)[0] for ci in range(int(num_courses))]
+    abaixo = [b for b in bases if b <= z_abs + 1e-9]
+    acima = [b for b in bases if b > z_abs + 1e-9]
+    return [round(_ft_to_cm(max(abaixo) - base_z_abs), 3) if abaixo else None,
+            round(_ft_to_cm(min(acima) - base_z_abs), 3) if acima else None]
+
+
+def _opening_rule48_overlap_cm(prefix, opening, rec, course_band, base_z_abs):
+    """REGRA 48: quanto o vao entra (cm) na fiada escolhida para a canaleta. O
+    planejador aceita a fiada com a tolerancia de grade (0,5 cm), a regra 48 so'
+    0,1 cm - acima disso a peca e' pulada na materializacao e a verga/contraverga
+    nao existe de fato."""
+    ci = rec.get("course_index")
+    if ci is None:
+        return 0.0
+    z_lo, z_hi = course_band(ci)
+    if prefix == "lintel":
+        return _ft_to_cm((base_z_abs + _cm_to_ft(opening.get("head_rel_cm") or 0.0)) - z_lo)
+    return _ft_to_cm(z_hi - (base_z_abs + _cm_to_ft(opening.get("sill_rel_cm") or 0.0)))
+
+
+def _opening_role_trace(prefix, role_code, rec, opening, runs, suporte, pieces_applied, course_band, stops,
+                        base_z_abs=0.0, num_courses=None, not_required_reason="NO_SILL_OPENING_TOUCHES_BASE"):
+    """Campos `<prefix>_*` de uma abertura (prefix = lintel | sill)."""
+    if prefix == "lintel":
+        criada, nao_requerida, sem_solucao = LINTEL_CREATED, LINTEL_NOT_REQUIRED, LINTEL_UNRESOLVED
+    else:
+        criada, nao_requerida, sem_solucao = (SILL_REINFORCEMENT_CREATED, SILL_REINFORCEMENT_NOT_REQUIRED,
+                                              SILL_REINFORCEMENT_UNRESOLVED)
+    out = {prefix + "_required": True, prefix + "_status": None, prefix + "_course": None,
+           prefix + "_codes": [], prefix + "_start": None, prefix + "_end": None,
+           prefix + "_left_support": None, prefix + "_right_support": None,
+           prefix + "_left_bearing": None, prefix + "_right_bearing": None,
+           prefix + "_support_classification": {"L": None, "R": None},
+           prefix + "_stopped_by_junction": False, prefix + "_junction_ids": [],
+           prefix + "_course_grid_cm": None, prefix + "_reason": None, prefix + "_requires_human_review": False,
+           prefix + "_run_id": None, prefix + "_run_opening_indices": []}
+    wall_idx, oi = opening.get("wall_idx"), opening.get("opening_index")
+    if rec is None:
+        # contraverga so' existe com peitoril acima da primeira fiada (secao 10.4:
+        # o vao que toca a fiada mais baixa e' porta - nunca exigir contraverga)
+        out.update({prefix + "_required": False, prefix + "_status": nao_requerida,
+                    prefix + "_reason": not_required_reason})
+        return out
+    status = rec.get("status")
+    out[prefix + "_course"] = rec.get("course_index")
+    if status == "CHANNEL":
+        from core.engine import wall_stepper as _stepper48
+        entra = _opening_rule48_overlap_cm(prefix, opening, rec, course_band, base_z_abs)
+        if entra > _stepper48.BOND_COLLISION_EPS_CM + 1e-6:
+            # a canaleta (ou o bloco comum) da fiada escolhida entraria no vao:
+            # a regra 48 pula a peca - verga/contraverga NAO existe de fato
+            cota = opening.get("head_rel_cm") if prefix == "lintel" else opening.get("sill_rel_cm")
+            out.update({prefix + "_status": sem_solucao, prefix + "_requires_human_review": True,
+                        prefix + "_reason": ("HEAD_IN_COURSE_RULE_48" if prefix == "lintel"
+                                             else "SILL_IN_COURSE_RULE_48"),
+                        prefix + "_course_grid_cm": _opening_grid_cm(course_band, base_z_abs, num_courses, cota),
+                        prefix + "_run_id": rec.get("run_id")})
+            return out
+        if not pieces_applied:
+            # familias ausentes: a corrida foi so' planejada, nenhuma peca existe
+            out.update({prefix + "_status": sem_solucao, prefix + "_reason": "CHANNEL_FAMILY_MISSING",
+                        prefix + "_requires_human_review": True})
+            return out
+        run = runs.get(rec.get("run_id")) or {}
+        classes = {"L": suporte.get((wall_idx, oi, role_code, "L")), "R": suporte.get((wall_idx, oi, role_code, "R"))}
+        # codigos/inicio/fim sao da CORRIDA (pode ser compartilhada por aberturas
+        # vizinhas na mesma fiada - ver *_run_id e *_run_opening_indices)
+        out.update({prefix + "_codes": [p.get("code") for p in run.get("pieces") or []],
+                    prefix + "_run_id": rec.get("run_id"),
+                    prefix + "_run_opening_indices": list(run.get("opening_indices") or []),
+                    prefix + "_start": run.get("lo_cm"), prefix + "_end": run.get("hi_cm"),
+                    prefix + "_left_support": rec.get("support_l_cm"), prefix + "_right_support": rec.get("support_r_cm"),
+                    prefix + "_left_bearing": rec.get("bearing_l_cm"), prefix + "_right_bearing": rec.get("bearing_r_cm"),
+                    prefix + "_support_classification": classes})
+        juncoes = []
+        for lado, limite, bloqueio, apoio, assento in (
+                ("L", rec.get("limited_l"), rec.get("blocker_l"), rec.get("support_l_cm"), rec.get("bearing_l_cm")),
+                ("R", rec.get("limited_r"), rec.get("blocker_r"), rec.get("support_r_cm"), rec.get("bearing_r_cm"))):
+            if limite != "JUNCTION_TIE":
+                continue
+            no = (bloqueio or {}).get("node_index")
+            juncoes.append(no)
+            stops.append({"channel_stopped_by_junction": True, "wall_idx": wall_idx, "opening_index": oi,
+                          "opening_id": None, "role": prefix.upper(), "side": lado, "junction_id": no,
+                          "remaining_support_cm": apoio, "bearing_cm": assento,
+                          "reason": OPENING_REINFORCEMENT_STOP_RULE_75})
+        out.update({prefix + "_stopped_by_junction": bool(juncoes), prefix + "_junction_ids": juncoes})
+        out[prefix + "_status"] = criada
+        if "ACTUAL_ERROR" in classes.values():
+            # a classificacao objetiva do apoio (51.4, auditoria 2026-09-14): sem
+            # assentamento num lado - fica criada e vai para revisao (sem minimo novo:
+            # nao entra em structurally_resolved; ver opening_reinforcement_review)
+            out.update({prefix + "_reason": "SUPPORT_ACTUAL_ERROR", prefix + "_requires_human_review": True})
+        return out
+    if status == "REACHES_WALL_TOP":
+        out.update({prefix + "_required": False, prefix + "_status": nao_requerida,
+                    prefix + "_reason": "NO_MASONRY_ABOVE_REACHES_WALL_TOP"})
+        return out
+    if status == "FREE_TO_TOP":
+        out.update({prefix + "_required": False, prefix + "_status": nao_requerida,
+                    prefix + "_reason": "FREE_TO_TOP_PASSAGE_51_9"})
+        return out
+    if status in ("HEAD_OFF_GRID", "SILL_OFF_GRID"):
+        cota = opening.get("head_rel_cm") if status == "HEAD_OFF_GRID" else opening.get("sill_rel_cm")
+        out.update({prefix + "_status": sem_solucao, prefix + "_reason": status + "_51_8",
+                    prefix + "_course_grid_cm": (_opening_grid_cm(course_band, base_z_abs, num_courses, cota)
+                                                 if cota is not None else None),
+                    prefix + "_requires_human_review": True})
+        return out
+    if status == "MISSING":
+        motivo = rec.get("reason")
+        out.update({prefix + "_status": sem_solucao, prefix + "_requires_human_review": True,
+                    prefix + "_reason": ("RULE_75_TIE_OVER_SPAN" if motivo == "TIE_OVER_SPAN" else motivo)})
+        if motivo == "TIE_OVER_SPAN":
+            nos = list(rec.get("tie_nodes") or [])
+            out.update({prefix + "_stopped_by_junction": True, prefix + "_junction_ids": nos})
+            for no in nos or [None]:
+                stops.append({"channel_stopped_by_junction": True, "wall_idx": wall_idx, "opening_index": oi,
+                              "opening_id": None, "role": prefix.upper(), "side": "SPAN", "junction_id": no,
+                              "remaining_support_cm": None, "bearing_cm": None,
+                              "reason": OPENING_REINFORCEMENT_STOP_RULE_75})
+        return out
+    out.update({prefix + "_status": sem_solucao, prefix + "_reason": status or "NOT_PLANNED",
+                prefix + "_requires_human_review": True})
+    return out
+
+
+def _opening_structural_trace_rows(plan, strategy, course_band, pieces_applied=True, base_z_abs=0.0,
+                                   num_courses=None):
+    from core.engine import opening_reinforcement as _reinforcement
+    runs = dict((r.get("run_id"), r) for r in plan.get("runs") or [])
+    suporte = {}
+    for f in plan.get("findings") or []:
+        if f.get("code") == "CHANNEL_SUPPORT_LIMITED":
+            suporte[(f.get("wall_idx"), f.get("opening_index"), f.get("role"), f.get("side"))] = f.get("classification")
+    tol = _cm_to_ft(((plan.get("policy") or {}).get("grid_tolerance_cm")) or 0.5)
+    try:
+        topo_fiada0 = course_band(0)[1]
+    except Exception:
+        topo_fiada0 = None
+    rows, stops = [], []
+    for o in plan.get("openings") or []:
+        tem_peitoril = bool(o.get("has_sill"))
+        motivo_sem_peitoril = "NO_SILL_OPENING_TOUCHES_BASE"
+        if (tem_peitoril and topo_fiada0 is not None
+                and base_z_abs + _cm_to_ft(o.get("sill_rel_cm") or 0.0) < topo_fiada0 - tol):
+            # SECAO 10.4: peitoril dentro da fiada mais baixa - o vao toca a fiada
+            # mais baixa, nao ha' alvenaria abaixo do peitoril: e' porta
+            tem_peitoril = False
+            motivo_sem_peitoril = "SILL_WITHIN_LOWEST_COURSE_10_4"
+        row = {"wall_idx": o.get("wall_idx"), "opening_index": o.get("opening_index"),
+               "wall_id": None, "opening_id": None,
+               "type": "WINDOW" if tem_peitoril else "DOOR",
+               "width_cm": round(o["t_hi_cm"] - o["t_lo_cm"], 3), "start_cm": o["t_lo_cm"], "end_cm": o["t_hi_cm"],
+               "sill_cm": o.get("sill_rel_cm"), "top_cm": o.get("head_rel_cm"),
+               "strategy": strategy or "NONE", "scope": plan.get("scope") or "CHANNEL"}
+        row.update(_opening_role_trace("lintel", _reinforcement.ROLE_ABOVE_OPENING, o.get("above"), o, runs,
+                                       suporte, pieces_applied, course_band, stops,
+                                       base_z_abs=base_z_abs, num_courses=num_courses))
+        row.update(_opening_role_trace("sill", _reinforcement.ROLE_BELOW_SILL, o.get("below") if tem_peitoril else None,
+                                       o, runs, suporte, pieces_applied, course_band, stops,
+                                       base_z_abs=base_z_abs, num_courses=num_courses,
+                                       not_required_reason=motivo_sem_peitoril))
+        row["requires_human_review"] = bool(row["lintel_requires_human_review"] or row["sill_requires_human_review"])
+        rows.append(row)
+    return rows, stops
 
 
 def _unify_candidates_with_courses(result, reinforcement_module):
@@ -5335,7 +5793,9 @@ def _unify_candidates_with_courses(result, reinforcement_module):
     `result["collisions"]` aponta para essa lista (pares herdados do solve cujas
     duas pecas continuam existindo + pares que envolvem canaleta, medidos por
     fiada). O estado anterior fica em `*_before_reinforcement`. So' roda com
-    estrategia de reforco: o legado continua byte a byte."""
+    estrategia de reforco e, desde a secao 80, no pos-passe estrutural sem
+    reforco adicional (so' o legado historico, com a secao 80 desligada, fica
+    intocado)."""
     key_of = reinforcement_module._physical_key
     before = result.get("candidates") or []
     result["candidates_before_reinforcement"] = before
@@ -11407,7 +11867,7 @@ def _wall_axis_key(wall_id):
 # estrategia nao implementada aparece para deixar a expansao visivel, mas
 # bloqueia o botao executar.
 OPENING_REINFORCEMENT_UI_OPTIONS = (
-    ("NONE", "Sem reforço", True),
+    ("NONE", "Sem reforço adicional", True),
     ("CHANNEL", "Canaletas (CHANNEL)", True),
     ("LINTEL_COUNTERLINTEL", "VERGA / CONTRAVERGA - NAO IMPLEMENTADA", False),
 )
@@ -12403,6 +12863,20 @@ def _format_block_solve_report(result, catalog):
                 row.get("rejection_rule"), (row.get("selected") or {}).get("code"), row.get("rejection_detail")))
         if len(pendentes) > 60:
             lines.append("  ... e mais {}.".format(len(pendentes) - 60))
+    rastreio_aberturas = result.get("opening_structural_trace")
+    if rastreio_aberturas is not None:
+        resumo = result.get("opening_structural_summary") or {}
+        lines.append("REFORCO ESTRUTURAL DAS ABERTURAS (verga/contraverga, secao 80): " + ", ".join(
+            "{}={}".format(k, resumo[k]) for k in sorted(resumo, key=str)))
+        for row in [r for r in rastreio_aberturas if r.get("requires_human_review")][:60]:
+            lines.append("  OPENING wall_idx={} opening={} id={} type={} top={} sill={} lintel={} ({}) "
+                         "sill_reinf={} ({})".format(
+                             row.get("wall_idx"), row.get("opening_index"), row.get("opening_id"), row.get("type"),
+                             row.get("top_cm"), row.get("sill_cm"), row.get("lintel_status"),
+                             row.get("lintel_reason"), row.get("sill_status"), row.get("sill_reason")))
+        paradas = result.get("channel_stopped_by_junction") or []
+        lines.append("  Corridas de canaleta paradas pela regra 75 (canaleta nunca atravessa amarracao): {}".format(
+            len(paradas)))
     trechos = result.get("unresolved_spans") or []
     lines.append("TRECHOS NAO RESOLVIDOS (NON_MODULAR_UNRESOLVED, revisao humana obrigatoria): {}".format(len(trechos)))
     for span in trechos[:60]:
@@ -13326,8 +13800,13 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 stage_cb=cbs.get("stage_cb"),
                 opening_reinforcement_strategy=self.opening_reinforcement_strategy,
                 opening_reinforcement_policy=self.opening_reinforcement_policy,
+                opening_structural_channel_available=(
+                    True if self.opening_reinforcement_strategy else self._opening_structural_channel_available()),
             )
         self.solve_result["num_courses"] = num_courses
+        # SECAO 80: o rastreio das aberturas leva os ElementIds da parede e da abertura
+        _fill_opening_trace_ids(self.solve_result, self.walls_to_create, getattr(self, "all_openings", None),
+                                self.created_walls_by_axis)
         # SECAO 49.1: o corpus da RUN (detectados/selecionados/excluidos) viaja
         # com o resultado - dois resultados so' sao comparaveis sabendo isto.
         self.solve_result["corpus_selection"] = (getattr(self, "setup", None) or {}).get("corpus_selection")
@@ -13346,6 +13825,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self.solve_result["beta_input_signature"] = self._beta_input_signature()
         # contrato da materializacao para a apresentacao (nao recalcula fisica)
         plano_material = materialization_plan(self.solve_result, self.solve_result["beta_preflight"])
+        # SECAO 80: verga/contraverga cuja canaleta a regra 48 vai pular NAO existe
+        _opening_trace_apply_materialization(self.solve_result, plano_material)
         if self.solve_result.get("bond_trace") is not None:
             # SECAO 79: amarracao que a regra 48 vai pular NAO e' amarracao resolvida
             _bond_trace_apply_materialization(self.solve_result["bond_trace"], plano_material["unresolved_bonds"])
@@ -13364,10 +13845,16 @@ class _PostCreationEventHandler(IExternalEventHandler):
         walls = tuple((xyz(line.GetEndPoint(0)), xyz(line.GetEndPoint(1)), thickness, tuple(locks))
                       for line, thickness, locks in self.walls_to_create)
         openings = tuple(tuple(tuple(op) for op in wall) for wall in self.openings_per_wall)
+        # canaleta: identidade ESTAVEL (o catalogo de canaletas pode ser relido entre
+        # calcular e criar; id() do simbolo mudaria a cada leitura)
         catalog = tuple((code, entry.get("length_cm"), entry.get("width_cm"), entry.get("height_cm"),
-                         id(entry.get("symbol"))) for code, entry in sorted(self._creation_catalog().items()))
+                         ("CH", str(entry.get("source_instance_id"))) if entry.get("is_channel")
+                         else id(entry.get("symbol")))
+                        for code, entry in sorted(self._creation_catalog().items()))
         return (walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level),
-                self.opening_reinforcement_strategy)
+                self.opening_reinforcement_strategy,
+                ("OPENING_STRUCTURAL", bool(OPENING_STRUCTURAL_REINFORCEMENT_ENABLED),
+                 self._opening_structural_channel_available()))
 
     def _ensure_opening_reinforcement_catalog(self, app_doc):
         """VALIDACAO DE FAMILIAS antes de calcular/criar (CHANNEL): carrega o
@@ -13376,6 +13863,16 @@ class _PostCreationEventHandler(IExternalEventHandler):
         parecida. Roda dentro do Execute (contexto de API valido)."""
         strategy = self.opening_reinforcement_strategy
         if not strategy:
+            # SECAO 80: sem reforco ADICIONAL, verga e contraverga continuam em
+            # canaleta - as familias sao conferidas UMA vez, sem bloquear: familia
+            # ausente = verga/contraverga *_UNRESOLVED (CHANNEL_FAMILY_MISSING),
+            # revisao humana; o resto da modulacao segue.
+            # (relida enquanto faltar alguma - o usuario pode carregar a familia e
+            # reanalisar; a assinatura BETA usa identidade estavel da canaleta)
+            if OPENING_STRUCTURAL_REINFORCEMENT_ENABLED and (
+                    not getattr(self, "channel_catalog_checked", False) or self.channel_catalog_missing):
+                self.channel_catalog, self.channel_catalog_missing = self._load_channel_family_catalog(app_doc)
+                self.channel_catalog_checked = True
             return
         from core.engine import opening_reinforcement as _reinforcement
         if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
@@ -13390,10 +13887,31 @@ class _PostCreationEventHandler(IExternalEventHandler):
                                                    item["type_name"], item["reason"])
                     for item in self.channel_catalog_missing)))
 
+    def _opening_structural_channel_available(self):
+        """SECAO 80: as QUATRO familias de canaleta estao no projeto (tudo ou
+        nada - o planejador pode pedir qualquer uma)."""
+        if not OPENING_STRUCTURAL_REINFORCEMENT_ENABLED:
+            return False
+        catalogo = getattr(self, "channel_catalog", None) or {}
+        if getattr(self, "channel_catalog_missing", None) or not set(CHANNEL_FAMILY_CATALOG_DEFINITIONS) <= set(catalogo):
+            return False
+        # mesma altura dos blocos (o mesmo arredondamento de _course_height_ft):
+        # canaleta com altura divergente faria a criacao inteira falhar
+        alturas_blocos = set(round(e.get("height_cm"), 3) for e in (self.catalog or {}).values()
+                             if isinstance(e, dict) and e.get("height_cm") is not None)
+        alturas_canal = set(round(e.get("height_cm"), 3) for e in catalogo.values()
+                            if isinstance(e, dict) and e.get("height_cm") is not None)
+        return not (alturas_blocos and alturas_canal and not alturas_canal <= alturas_blocos)
+
+    @property
+    def opening_structural_enabled(self):
+        return bool(OPENING_STRUCTURAL_REINFORCEMENT_ENABLED)
+
     def _creation_catalog(self):
         """Catalogo usado na CRIACAO: o fixo + canaletas quando a estrategia
-        CHANNEL esta' ativa (o solver de preenchimento nunca ve canaletas)."""
-        if not self.opening_reinforcement_strategy:
+        CHANNEL esta' ativa ou quando a verga/contraverga estrutural (secao 80)
+        carregou as familias (o solver de preenchimento nunca ve canaletas)."""
+        if not self.opening_reinforcement_strategy and not self._opening_structural_channel_available():
             return self.catalog
         merged = dict(self.catalog)
         merged.update(self.channel_catalog or {})
@@ -13425,6 +13943,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                              "Nenhum bloco criado ou lote anterior removido.".format(
                                  "; ".join(str(e) for e in preflight["errors"])))
         plano_material = materialization_plan(self.solve_result, preflight)
+        _opening_trace_apply_materialization(self.solve_result, plano_material)
         self._unbuildable = plano_material["skip"]
         self._unresolved_bonds = plano_material["unresolved_bonds"]
         if self.solve_result is not None and self.solve_result.get("bond_trace") is not None:
@@ -13517,9 +14036,15 @@ class _PostCreationEventHandler(IExternalEventHandler):
                         "message": "amarracao NAO resolvida: familia ausente do catalogo"})
             _faltando = list((self.solve_result or {}).get("missing_required_junction_bond") or [])
             _trechos = list((self.solve_result or {}).get("unresolved_spans") or [])
+            # SECAO 80: verga/contraverga sem solucao (ou canaleta que nao foi
+            # criada) tambem deixa a modulacao NAO resolvida estruturalmente
+            _reforco = unresolved_opening_reinforcement(self.solve_result, self.create_result)
             self.create_result["unresolved_bonds"] = _nao_resolvidas
             self.create_result["unresolved_spans"] = _trechos
-            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando or _trechos)
+            self.create_result["unresolved_opening_reinforcement"] = _reforco
+            # aviso sem minimo novo: criada, mas sem assentamento num lado (51.4)
+            self.create_result["opening_reinforcement_review"] = opening_reinforcement_review(self.solve_result)
+            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando or _trechos or _reforco)
         with _perf.span("create.save_modulation_state_cache"):
             self._save_modulation_state_cache()
         _resultado = self.create_result or {}
@@ -14748,9 +15273,12 @@ class _PostCreationForm(Form):
             new_run=(self._ui_run_revision == 0))
 
     def _on_create_click(self, sender, args):
+        # SECAO 80: sem reforco adicional, canaleta ausente nao bloqueia (a
+        # verga/contraverga sai *_UNRESOLVED); no CHANNEL continua bloqueando
         allowed, reason = _ui_creation_gate(self._handler.solve_result,
                                            self._handler.catalog_missing,
-                                           self._handler.channel_catalog_missing)
+                                           self._handler.channel_catalog_missing
+                                           if self._handler.opening_reinforcement_strategy else ())
         if not allowed:
             self._create_button.Enabled = False
             self._ui_banner.Text = reason
@@ -16383,6 +16911,12 @@ def run_modulation_on_existing_walls(preselected=None):
             if cached_state:
                 cached_strategy = ((cached_state.get("solve_result") or {}).get("opening_reinforcement") or {}).get("strategy")
                 if cached_strategy != execution_strategy:
+                    cached_state = None
+                elif (execution_strategy is None and OPENING_STRUCTURAL_REINFORCEMENT_ENABLED
+                      and ((cached_state.get("solve_result") or {}).get("opening_reinforcement") or {}).get(
+                          "scope") != OPENING_STRUCTURAL_SCOPE):
+                    # SECAO 80: resultado sem reforco anterior a' verga/contraverga
+                    # estrutural nao e' reaproveitado
                     cached_state = None
             cached_solve_result = None
             cached_create_result = None

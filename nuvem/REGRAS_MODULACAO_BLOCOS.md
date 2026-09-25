@@ -7792,6 +7792,11 @@ smoke Revit e DPI nativo continuam dependentes de validação específica.
 > Decisões A–F em 51.13; correções da auditoria em 51.14. Nada daqui vale para
 > verga/contraverga.
 >
+> **Atualização (2026-09-25, §80 — decisão do usuário, D6):** a verga e a contraverga em
+> canaleta desta seção (51.1–51.5) passaram a ser **reforço estrutural da abertura** e valem
+> também em "Sem reforço adicional" (`strategy=None`), que deixou de ser "motor legado byte a
+> byte". Continuam exclusivas do CHANNEL: 51.9, 51.14, 58.2, 68, 71, 72 e 60–65.
+>
 > **Evidência**: BUTANTÃ R08_LT (seção 41), medida de novo por abertura em
 > `docs/checkpoints/evidence/2026-09-14-channel-human-runs.json` (44 vãos do
 > 1º PAV, 126 lados de corrida) e confrontada com o solver em
@@ -10177,6 +10182,13 @@ controla verga, contraverga, canaletas e as regras próprias do fluxo CHANNEL (5
 trecho fecha dentro da tolerância, se a jamba aceita o ajuste permitido, nem se um ruído
 geométrico transforma a parede em vazio.
 
+> **Atualização (2026-09-25 — §79 e §80, decisões do usuário):** a lista acima está superada.
+> Desde a §79 as regras 74, 76 D1, 76.1 e 77 valem sem reforço (chave própria) e, desde a §80,
+> **verga e contraverga** também (reforço estrutural da abertura). A escolha da estratégia
+> controla hoje **só a estratégia ADICIONAL CHANNEL**: 51.9 (passagem livre), 51.14 (paridade da
+> canaleta), 58.2, 68, 71, 72, 60–65 (arranjo B34) e o memo. "Sem reforço" = "Sem reforço
+> adicional".
+
 **Implementação:** `PHYSICAL_MODULATION_TOLERANCES_ENABLED = True` (`core/wall_modeling.py`)
 liga, em `_solve_building_blocks_all_courses_impl` (ponto único das duas portas de entrada,
 com restauração no `finally`), as duas tolerâncias já comprovadas pelo motor:
@@ -10302,3 +10314,159 @@ mais (5 T, `MISSING_REQUIRED_JUNCTION_BOND` 935 → 903) ao custo de 4 faixas ve
 em fiadas alternadas (categoria de compensadores 63 → 66 paredes; `COMPENSATOR_VERTICAL_STRIP`
 104 → 110; os demais códigos de compensador caem) — atribuído por sub-regra, baseline não regravado.
 Testes: `tests/test_regras_fisicas_de_encontro.py`.
+
+
+## 80. Verga e contraverga são reforço ESTRUTURAL da abertura, independentes da estratégia CHANNEL (2026-09-25, IMPLEMENTADO, decisão do usuário — D6)
+
+**Decisão do usuário (2026-09-25, depois da investigação D6):** verga e contraverga passam a ser
+**requisitos estruturais da modulação** sempre que geometricamente aplicáveis. "Sem reforço"
+(`NONE`) deixa de significar "não existe verga nem contraverga" e passa a significar **"sem a
+estratégia ADICIONAL CHANNEL"** — na UI, **"Sem reforço adicional"**. O default continua `NONE`
+(não virou CHANNEL), a escolha manual não é exigida, e o pacote CHANNEL **não** é ligado no
+`NONE`. A investigação que precedeu a decisão (checkpoint
+`2026-09-25-pos-ciclo4-rastreio-l-e-d6`) mostrou que nenhuma regra anterior tornava
+verga/contraverga obrigatórias (a §78 dizia que a escolha do reforço as controlava) e que o
+`NONE` era o motor anterior à canaleta, não uma decisão de dispensar verga.
+
+**REGRA OBRIGATÓRIA — fronteira de responsabilidades:**
+
+- **Reforço estrutural da abertura (as duas opções):** verga (primeira fiada cuja base é o topo
+  do vão, ou uma junta acima — 51.1) e contraverga (uma fiada cujo topo é o peitoril, só com
+  peitoril acima da base — 51.2 e 10.4), em canaleta, com a **mesma** implementação já provada
+  no CHANNEL: peças da própria fiada convertidas (B39/B34/B19 → U39/U34/U19, compensador fundido
+  à vizinha ou U_CUT — 51.3), corrida peça a peça até o apoio **preferencial** de 19 cm (51.4,
+  item B — não é mínimo), parada em amarração de nó, ponta de parede ou vazio. A classificação
+  da canaleta de abertura (papel `ABOVE_OPENING`/`BELOW_SILL`) e o gate da regra 75 valem nos
+  dois caminhos.
+- **Estratégia ADICIONAL CHANNEL (só com CHANNEL):** passagem livre até o topo (51.9), paridade
+  por causa da canaleta (51.14), arranjo das corridas B34 (60–65) e as regras 58.2, 68, 71 e 72,
+  além do memo de desempenho. **Nenhuma delas liga no `NONE`** (teste com espiões).
+- **Continuam valendo em qualquer opção:** tolerâncias físicas (§78), regras físicas de
+  encontro (§79), regra 48, regra 75, gates 76/76.1.
+
+**Implementação:** `OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True`
+(`core/wall_modeling.py`). Com `strategy=None`, `_apply_opening_reinforcement` chama
+`_apply_opening_structural_reinforcement`: `plan_channel_reinforcement(..., free_to_top=[])`
+(sem 51.9), `validate_channel_reinforcement`, reauditoria com o catálogo lógico de canaletas,
+fonte única candidates/collisions e `channel_as_junction_bond` — o mesmo pós-passe do CHANNEL
+**sem** a paridade 51.14 e sem o arranjo 60–65. Nenhum solver novo, nenhuma dimensão nova. O
+legado histórico (sentinela `LEGADO_HISTORICO` dos testes, `reforco_estrutural=False` em
+`tools/audit/s74_corpus.py`) desliga a seção 80 junto com a 79.
+
+**Status por abertura** (`result["opening_structural_trace"]`, nos dois caminhos; resumo em
+`opening_structural_summary`):
+
+| verga | quando |
+|---|---|
+| `LINTEL_CREATED` | canaleta na fiada certa cobrindo o vão; apoio de cada lado registrado |
+| `LINTEL_NOT_REQUIRED` | não há alvenaria acima: vão alcança o topo da parede modulada (`NO_MASONRY_ABOVE_REACHES_WALL_TOP`) ou passagem livre 51.9 (`FREE_TO_TOP_PASSAGE_51_9`, só CHANNEL) |
+| `LINTEL_UNRESOLVED` | topo fora da grade de fiadas (`HEAD_OFF_GRID_51_8`, com `course_grid_cm`) — nunca canaleta na cota errada, nunca abertura movida, nunca peça cortada sem regra; amarração sobre o vão (`RULE_75_TIE_OVER_SPAN`); vão sem peças/cobertura; família de canaleta ausente (`CHANNEL_FAMILY_MISSING`). Sempre `requires_human_review = true` |
+
+`SILL_REINFORCEMENT_CREATED` / `_NOT_REQUIRED` (vão que toca a base — porta, 10.4) /
+`_UNRESOLVED` (peitoril fora da grade, `RULE_75_TIE_OVER_SPAN`, …) seguem a mesma lógica.
+Campos por abertura: `opening_id`, `wall_id`, `type` (DOOR/WINDOW, geométrico),
+`lintel_required`, `lintel_status`, `lintel_course`, `lintel_codes`, `lintel_start`/`_end`
+(corrida, cm ao longo da parede), `lintel_left_support`/`_right_support` (apoio da corrida além
+da jamba), `lintel_left_bearing`/`_right_bearing` (assentamento real), `lintel_support_
+classification` (a classificação objetiva já existente da 51.4: `VALID_ALTERNATIVE`,
+`KNOWN_LIMITATION`, `ACTUAL_ERROR` — `ACTUAL_ERROR` vai para revisão humana, sem criar mínimo
+novo), `lintel_stopped_by_junction`, `lintel_junction_ids`, `lintel_reason`; os mesmos
+`sill_*`; `strategy` (NONE/CHANNEL). Cada corrida parada por amarração vai para
+`result["channel_stopped_by_junction"]` (`channel_stopped_by_junction`, `junction_id`,
+`opening_id`, `role`, `side`, `remaining_support_cm`, `bearing_cm`, `reason = RULE_75`) — a
+canaleta **nunca** atravessa o nó em silêncio (D16 fica para ciclo próprio).
+
+**Regra 75 continua absoluta:** a canaleta de verga, contraverga, cinta ou topo nunca resolve
+L/T/X/CORNER; a auditoria 76.1 só aceita B34/B54 e o gate `channel_as_junction_bond` roda nos
+dois caminhos (teste não vácuo: canaleta posta no lugar da amarração do T nas fiadas da verga,
+da contraverga e do topo é reprovada pelos dois gates). **Regra 48:** as canaletas ocupam
+exatamente o intervalo das peças da própria fiada, fora do vão; o laudo e a materialização
+valem como para qualquer peça.
+
+**Host/UI:** sem reforço adicional as famílias de canaleta são conferidas sem bloquear (e
+relidas enquanto faltar alguma — o usuário carrega a família e reanalisa); se faltar alguma das
+quatro, ou se a altura da canaleta divergir da dos blocos, o solve recebe
+`opening_structural_channel_available = False`, nenhuma peça é convertida e toda
+verga/contraverga sai `*_UNRESOLVED` (`CHANNEL_FAMILY_MISSING`). No CHANNEL a ausência continua bloqueando ("CHANNEL BLOQUEADO").
+Verga/contraverga sem solução (ou canaleta não criada) entra em `unresolved_opening_
+reinforcement` e deixa `structurally_resolved = false`; aparece na revisão da UI. A assinatura
+BETA usa identidade estável para as canaletas; o cache só reaproveita resultado `NONE` com o
+escopo desta seção. Textos: "Sem reforço adicional"; a ajuda diz que verga e contraverga em
+canaleta são reforço estrutural obrigatório nas duas opções.
+
+**Medido (BUTANTÃ, 34 eixos, NONE, código final — bancada e cópia no Revit):**
+
+| | antes (main `bf0c7d0`) | depois |
+|---|---|---|
+| verga em canaleta (auditoria das 44 aberturas, Revit) | 0 (bloco comum 44/44) | 42 (2 em bloco: os topos fora da grade) |
+| contraverga em canaleta (Revit) | 0 (bloco comum 23/23) | 22 (1 em bloco: canto L 55/56) |
+| `LINTEL_CREATED` / `NOT_REQUIRED` / `UNRESOLVED` | — | 42 / 0 / 2 (topos 91 e 171 fora da grade) |
+| `SILL_*_CREATED` / `NOT_REQUIRED` / `UNRESOLVED` | — | 22 / 21 (portas) / 1 (regra 75, nó do canto L 56) |
+| corridas paradas pela regra 75 | — | 14 |
+| criadas sem assentamento num lado (51.4 `ACTUAL_ERROR`, revisão) | — | 6 (3 janelas de 151 cm junto aos T 22/28, verga e contraverga) |
+| match por papel com MCP / HUMANO | 2,3 % / 0 % | 95,5 % / 93,2 % |
+| match geométrico (5 cm) com MCP / HUMANO | 2,3 % / 0 % | 56,8 % (Revit; 59,1 % bancada) / 18,2 % |
+| canaleta como amarração (gate 75; 690 amarrações do Revit, todas B34/B54) | 0 | 0 |
+| peças no vão / puladas pela regra 48 | 0 / 0 | 0 / 0 |
+| T amarrados / fiadas L sem amarração | 37/37 / 3 | 37/37 / 3 |
+| compensadores (bancada / Revit) | 828 / 800 | 826 / 796 (C04 fundidos em U_CUT) |
+| vazio / trechos não modulares | 30 cm / 0 | 30 cm / 0 |
+| peças fora das corridas de verga/contraverga que mudaram | — | 0 (bancada: 321 trocadas 1:1; Revit: 7 034 idênticas com orientação, 323 trocadas 1:1 nas fiadas 3/4/7/11) |
+
+As diferenças com o HUMANO que ficam: as duas portas de 156 cm entre dois T (o HUMANO e o
+CHANNEL deixam passagem livre até o topo — 51.9, que continua só no CHANNEL; sem reforço
+adicional a alvenaria acima existe e recebe verga), e a contraverga da janela dos cantos L
+55/56 (regra 75 — também sem canaleta no MCP). Apoio lateral (menor lado por verga/contraverga
+em canaleta): mediana 29 cm, 6 abaixo de 4 cm e 8 abaixo de 19 cm (igual ao MCP; HUMANO: 0
+abaixo de 4 cm, 6 abaixo de 19) — as corridas param na amarração de um T vizinho, o HUMANO
+atravessa o nó (D16); sem regra nova. As canaletas que a auditoria geométrica encontra dentro de
+região de nó (Revit 36, MCP 33) estão todas em nós das paredes arquitetônicas excluídas do corpus
+(nenhum encontro das 34 paredes); o HUMANO atravessa 3 T reais (20, 26, 28). O CHANNEL não muda:
+assinatura física completa (posição, código, rotação, espelhamento, razão, nó) idêntica à main
+`bf0c7d0` no BUTANTÃ e no U dos cantos 55/56.
+Testes: `tests/test_opening_structural_reinforcement.py`.
+
+### 80.1 Revisão adversarial da implementação (2026-09-25, IMPLEMENTADO antes do commit)
+
+A revisão do código da §80 (30 achados confirmados de 33) mudou o seguinte — nenhum limiar novo,
+nenhuma dimensão nova:
+
+- **Regra 48 no rastreio.** A grade da 51.1/51.2 aceita 0,5 cm; a regra 48 só 0,1 cm. Um topo
+  (peitoril) que entra na fiada escolhida mais de 0,1 cm (ex.: topo 221,3 com a fiada em 221)
+  faria a canaleta ser pulada na materialização: o rastreio já diz `LINTEL_UNRESOLVED`
+  (`HEAD_IN_COURSE_RULE_48`) / `SILL_REINFORCEMENT_UNRESOLVED` (`SILL_IN_COURSE_RULE_48`), com
+  `course_grid_cm`. Além disso, o host reconcilia o rastreio com o plano de materialização
+  (`_opening_trace_apply_materialization`, em `_execute_solve` e no gate de criação): corrida de
+  canaleta com qualquer peça pulada pela regra 48 vira `*_UNRESOLVED` (`REGRA_48_<regra>`). A
+  verga nunca é declarada criada quando não existe.
+- **Independência real.** O vazado menor (§52) é decidido **antes** da conversão, sobre as
+  mesmas peças do motor sem a §80: fora das corridas de verga/contraverga nenhuma peça muda —
+  nem a rotação (teste com assinatura completa: posição, código, comprimento, direção local,
+  espelhamento). As violações do vazado menor são relidas sobre as fiadas finais.
+- **Política saneada.** Sem reforço adicional a política recebida nunca religa 51.6
+  (`channel_may_cross_node_tie`) nem 51.7 (`convert_blocking_along_ties`): regra 75 absoluta.
+- **Peitoril dentro da fiada mais baixa (10.4).** Peitoril abaixo do topo da primeira fiada
+  (menos a tolerância da grade) não tem fiada cujo topo seja o peitoril nem alvenaria abaixo: é
+  porta — `SILL_REINFORCEMENT_NOT_REQUIRED` (`SILL_WITHIN_LOWEST_COURSE_10_4`), `type = DOOR`.
+- **Apoio sem assentamento (51.4 `ACTUAL_ERROR`).** A verga/contraverga fica **criada** e vai
+  para `opening_reinforcement_review` (UI: "criada sem assentamento num lado … — revise"; relatório
+  de criação). **Não** entra em `structurally_resolved`: tornar isso pendência seria criar o
+  mínimo de apoio que a decisão proíbe neste ciclo (D16).
+- **Estado estrutural do CHANNEL (mudança INTENCIONAL).** As peças do CHANNEL são idênticas com
+  a §80 ligada ou desligada; o que muda é o estado: verga/contraverga `*_UNRESOLVED` também no
+  CHANNEL entra em `unresolved_opening_reinforcement` e deixa `structurally_resolved = false`
+  (antes o topo fora da grade passava calado). Com a §80 desligada a lista é vazia.
+- **Microajuste (§66).** No reforço estrutural o apoio de 19 cm é preferencial: a contagem
+  `SUPPORT_BELOW_POLICY` não vira portão do microajuste.
+- **Rastreio.** `course_grid_cm` usa as bases reais das fiadas (relativas à base da parede, a
+  mesma referência de `top_cm`/`sill_cm`; `None` onde não há fiada); `*_codes`/`*_start`/`*_end`
+  são da **corrida** (que pode ser compartilhada por aberturas vizinhas — `*_run_id`,
+  `*_run_opening_indices`); com famílias ausentes não há códigos, corrida nem paradas; a revisão
+  mostra o ElementId da parede e da abertura (ou o índice, marcado com `#`). A criação avisa, sem
+  bloquear, quantas vergas/contravergas ficaram sem solução.
+- **Semântica de `result["candidates"]`.** Sem reforço adicional ela passa a ser a lista final
+  com as canaletas (fonte única candidates/collisions, como no CHANNEL).
+- **Pendência registrada (não corrigida aqui):** a bancada de papel por bloco
+  (`benchmark`, `block_role`) ainda não reconhece códigos de canaleta — o papel de abertura é
+  medido pelo rastreio desta seção e pela auditoria das 44 aberturas.
+
