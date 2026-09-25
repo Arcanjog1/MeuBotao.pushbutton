@@ -9,7 +9,8 @@ parada em amarracao - regra 75) e NADA MAIS do CHANNEL: nem a passagem livre
 51.9, nem a paridade da canaleta 51.14, nem o arranjo 60-65, nem 58.2/68/71/72.
 Toda abertura sai com LINTEL_CREATED / LINTEL_NOT_REQUIRED / LINTEL_UNRESOLVED
 e SILL_REINFORCEMENT_* no rastreio `opening_structural_trace`, e cada corrida
-parada por uma amarracao fica em `channel_stopped_by_junction` (RULE_75).
+parada por uma amarracao fica em `channel_stopped_by_junction`, com a CAUSA
+(D16: CHANNEL_STOP_RULE_75 / _SUPPORT_RULE / _EXISTING_JUNCTION_PIECE / _GEOMETRY).
 
 Fixtures sinteticas (nenhum ID do projeto): parede livre com porta e janela,
 T com a jamba na face da parede que chega, passagem entre dois T, vao ate' o
@@ -218,7 +219,7 @@ def test_janela_junto_ao_l_impedida_pela_regra_75():
     assert linha["sill_stopped_by_junction"] is True and linha["sill_junction_ids"]
     assert linha["lintel_status"] == m.LINTEL_UNRESOLVED and linha["lintel_reason"] == "HEAD_OFF_GRID_51_8"
     paradas = [p for p in res["channel_stopped_by_junction"] if p["role"] == "SILL"]
-    assert paradas and all(p["reason"] == "RULE_75" and p["junction_id"] in linha["sill_junction_ids"]
+    assert paradas and all(p["reason"] == m.CHANNEL_STOP_RULE_75 and p["junction_id"] in linha["sill_junction_ids"]
                            for p in paradas)
     # as amarracoes dos cantos continuam as mesmas (a 76.1 nao muda)
     sem80, _w0, _n0, _o0 = _sem_80(*_u_55_56())
@@ -235,10 +236,10 @@ def test_abertura_junto_ao_t_registra_a_parada_pela_regra_75(estrategia):
     t = [i for i, n in enumerate(nodes) if n.get("kind") == "T_INTERSECTION"][0]
     assert t in linha["lintel_junction_ids"]
     paradas = [p for p in res["channel_stopped_by_junction"] if p["role"] == "LINTEL"]
-    assert paradas and paradas[0]["junction_id"] == t and paradas[0]["reason"] == "RULE_75"
+    assert paradas and paradas[0]["junction_id"] == t and paradas[0]["reason"] == m.CHANNEL_STOP_RULE_75
     assert paradas[0]["channel_stopped_by_junction"] is True
     assert paradas[0]["remaining_support_cm"] is not None
-    assert res["opening_structural_summary"]["RULE_75"] == len(res["channel_stopped_by_junction"])
+    assert res["opening_structural_summary"][m.CHANNEL_STOPS_AT_JUNCTION] == len(res["channel_stopped_by_junction"])
 
 
 # ----------------------------------------------------------------- canaleta nunca amarra

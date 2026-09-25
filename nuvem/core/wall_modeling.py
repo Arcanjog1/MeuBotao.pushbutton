@@ -3844,6 +3844,24 @@ SILL_REINFORCEMENT_CREATED = "SILL_REINFORCEMENT_CREATED"
 SILL_REINFORCEMENT_NOT_REQUIRED = "SILL_REINFORCEMENT_NOT_REQUIRED"
 SILL_REINFORCEMENT_UNRESOLVED = "SILL_REINFORCEMENT_UNRESOLVED"
 OPENING_REINFORCEMENT_STOP_RULE_75 = "RULE_75"
+# D16 (decisao do usuario 2026-09-25): a parada da corrida de canaleta num no' e'
+# rotulada pela CAUSA, nao toda como "regra 75". So' rastreio - nenhuma peca muda.
+#   RULE_75: a corrida continuaria pela politica anterior a' regra 75 (travessia do
+#            T da 51.6 com apoio <= cross_tee_when_support_at_most_cm, ou conversao
+#            da peca ao longo da 51.7 abaixo de convert_along_tie_when_support_below_cm)
+#            - so' para porque canaleta nunca e'/substitui amarracao;
+#   SUPPORT_RULE: o apoio preferencial da 51.4 ja' esta' atingido dentro da tolerancia
+#            da grade (grid_tolerance_cm) - a peca de no' e' so' a peca seguinte;
+#   EXISTING_JUNCTION_PIECE: parada da 51.4 original na peca de no' (existia antes da 75);
+#   GEOMETRY: a peca que ocupa a posicao do no' nao e' amarracao convertivel (C09 da
+#            76.1 ou peca transversal sobre o vao) - ocupacao fisica.
+CHANNEL_STOP_RULE_75 = "CHANNEL_STOP_RULE_75"
+CHANNEL_STOP_SUPPORT_RULE = "CHANNEL_STOP_SUPPORT_RULE"
+CHANNEL_STOP_EXISTING_JUNCTION_PIECE = "CHANNEL_STOP_EXISTING_JUNCTION_PIECE"
+CHANNEL_STOP_GEOMETRY = "CHANNEL_STOP_GEOMETRY"
+CHANNEL_STOP_CLASSES = (CHANNEL_STOP_RULE_75, CHANNEL_STOP_SUPPORT_RULE,
+                        CHANNEL_STOP_EXISTING_JUNCTION_PIECE, CHANNEL_STOP_GEOMETRY)
+CHANNEL_STOPS_AT_JUNCTION = "CHANNEL_STOPS_AT_JUNCTION"
 
 
 def solve_building_blocks_all_courses(nodes, walls_to_create, end_to_node, openings_per_wall,
@@ -5606,8 +5624,39 @@ def _opening_structural_summary(rows, stops):
     for row in rows:
         for chave in ("lintel_status", "sill_status"):
             resumo[row[chave]] = resumo.get(row[chave], 0) + 1
-    resumo[OPENING_REINFORCEMENT_STOP_RULE_75] = len(stops or [])
+    # D16: paradas em no' por CAUSA (o total continua disponivel)
+    resumo[CHANNEL_STOPS_AT_JUNCTION] = len(stops or [])
+    for classe in CHANNEL_STOP_CLASSES:
+        resumo[classe] = sum(1 for p in stops or [] if p.get("reason") == classe)
     return resumo
+
+
+def _channel_stop_class(blocker, support_cm, policy):
+    """D16: causa da parada da corrida de canaleta numa peca de no' (so' rastreio).
+    `blocker` = {"code", "placement_reason", "along"}; `support_cm` None na parada
+    sobre o vao (TIE_OVER_SPAN)."""
+    from core.engine import opening_reinforcement as _reinforcement
+    pol = _reinforcement.channel_policy(policy)
+    reason = str((blocker or {}).get("placement_reason") or "")
+    code = (blocker or {}).get("code")
+    along = bool((blocker or {}).get("along"))
+    if reason in _reinforcement.NODE_POSITION_FILL_REASONS:
+        return CHANNEL_STOP_GEOMETRY
+    convertivel = code in _reinforcement.COMMON_TO_CHANNEL or code in _reinforcement.COMPENSATOR_CODES \
+        or code == "B54"
+    if support_cm is None:
+        # peca de no' sobre o vao: so' a 51.7 (conversao AO LONGO) a transformaria
+        return CHANNEL_STOP_RULE_75 if (along and convertivel) else CHANNEL_STOP_GEOMETRY
+    if support_cm >= pol["min_support_cm"] - pol["grid_tolerance_cm"] - 1e-9:
+        return CHANNEL_STOP_SUPPORT_RULE
+    if along:
+        if convertivel and support_cm < pol["convert_along_tie_when_support_below_cm"] - 1e-6:
+            return CHANNEL_STOP_RULE_75
+        return CHANNEL_STOP_EXISTING_JUNCTION_PIECE
+    if reason.startswith("T_INTERSECTION_INCOMING") and \
+            support_cm <= pol["cross_tee_when_support_at_most_cm"] + 1e-6:
+        return CHANNEL_STOP_RULE_75
+    return CHANNEL_STOP_EXISTING_JUNCTION_PIECE
 
 
 def _opening_grid_cm(course_band, base_z_abs, num_courses, z_rel_cm):
@@ -5639,7 +5688,8 @@ def _opening_rule48_overlap_cm(prefix, opening, rec, course_band, base_z_abs):
 
 
 def _opening_role_trace(prefix, role_code, rec, opening, runs, suporte, pieces_applied, course_band, stops,
-                        base_z_abs=0.0, num_courses=None, not_required_reason="NO_SILL_OPENING_TOUCHES_BASE"):
+                        base_z_abs=0.0, num_courses=None, not_required_reason="NO_SILL_OPENING_TOUCHES_BASE",
+                        policy=None):
     """Campos `<prefix>_*` de uma abertura (prefix = lintel | sill)."""
     if prefix == "lintel":
         criada, nao_requerida, sem_solucao = LINTEL_CREATED, LINTEL_NOT_REQUIRED, LINTEL_UNRESOLVED
@@ -5703,7 +5753,10 @@ def _opening_role_trace(prefix, role_code, rec, opening, runs, suporte, pieces_a
             stops.append({"channel_stopped_by_junction": True, "wall_idx": wall_idx, "opening_index": oi,
                           "opening_id": None, "role": prefix.upper(), "side": lado, "junction_id": no,
                           "remaining_support_cm": apoio, "bearing_cm": assento,
-                          "reason": OPENING_REINFORCEMENT_STOP_RULE_75})
+                          "reason": _channel_stop_class(bloqueio, apoio, policy),
+                          "blocker_code": (bloqueio or {}).get("code"),
+                          "blocker_placement_reason": (bloqueio or {}).get("placement_reason"),
+                          "blocker_along": (bloqueio or {}).get("along")})
         out.update({prefix + "_stopped_by_junction": bool(juncoes), prefix + "_junction_ids": juncoes})
         out[prefix + "_status"] = criada
         if "ACTUAL_ERROR" in classes.values():
@@ -5729,16 +5782,29 @@ def _opening_role_trace(prefix, role_code, rec, opening, runs, suporte, pieces_a
         return out
     if status == "MISSING":
         motivo = rec.get("reason")
-        out.update({prefix + "_status": sem_solucao, prefix + "_requires_human_review": True,
-                    prefix + "_reason": ("RULE_75_TIE_OVER_SPAN" if motivo == "TIE_OVER_SPAN" else motivo)})
         if motivo == "TIE_OVER_SPAN":
             nos = list(rec.get("tie_nodes") or [])
-            out.update({prefix + "_stopped_by_junction": True, prefix + "_junction_ids": nos})
+            blockers = list(rec.get("tie_blockers") or [])
+            classes = []
             for no in nos or [None]:
+                bloqueio = ([b for b in blockers if b.get("node_index") == no] or [{}])[0]
+                classe = _channel_stop_class(bloqueio, None, policy)
+                classes.append(classe)
                 stops.append({"channel_stopped_by_junction": True, "wall_idx": wall_idx, "opening_index": oi,
                               "opening_id": None, "role": prefix.upper(), "side": "SPAN", "junction_id": no,
-                              "remaining_support_cm": None, "bearing_cm": None,
-                              "reason": OPENING_REINFORCEMENT_STOP_RULE_75})
+                              "remaining_support_cm": None, "bearing_cm": None, "reason": classe,
+                              "blocker_code": bloqueio.get("code"),
+                              "blocker_placement_reason": bloqueio.get("placement_reason"),
+                              "blocker_along": bloqueio.get("along")})
+            # a amarracao sobre o vao: RULE_75_TIE_OVER_SPAN so' quando a 51.7 a converteria
+            motivo_trace = ("RULE_75_TIE_OVER_SPAN" if CHANNEL_STOP_RULE_75 in classes
+                            else "TIE_OVER_SPAN_" + classes[0].replace("CHANNEL_STOP_", ""))
+            out.update({prefix + "_status": sem_solucao, prefix + "_requires_human_review": True,
+                        prefix + "_reason": motivo_trace,
+                        prefix + "_stopped_by_junction": True, prefix + "_junction_ids": nos})
+            return out
+        out.update({prefix + "_status": sem_solucao, prefix + "_requires_human_review": True,
+                    prefix + "_reason": motivo})
         return out
     out.update({prefix + "_status": sem_solucao, prefix + "_reason": status or "NOT_PLANNED",
                 prefix + "_requires_human_review": True})
@@ -5776,11 +5842,11 @@ def _opening_structural_trace_rows(plan, strategy, course_band, pieces_applied=T
                "strategy": strategy or "NONE", "scope": plan.get("scope") or "CHANNEL"}
         row.update(_opening_role_trace("lintel", _reinforcement.ROLE_ABOVE_OPENING, o.get("above"), o, runs,
                                        suporte, pieces_applied, course_band, stops,
-                                       base_z_abs=base_z_abs, num_courses=num_courses))
+                                       base_z_abs=base_z_abs, num_courses=num_courses, policy=plan.get("policy")))
         row.update(_opening_role_trace("sill", _reinforcement.ROLE_BELOW_SILL, o.get("below") if tem_peitoril else None,
                                        o, runs, suporte, pieces_applied, course_band, stops,
                                        base_z_abs=base_z_abs, num_courses=num_courses,
-                                       not_required_reason=motivo_sem_peitoril))
+                                       not_required_reason=motivo_sem_peitoril, policy=plan.get("policy")))
         row["requires_human_review"] = bool(row["lintel_requires_human_review"] or row["sill_requires_human_review"])
         rows.append(row)
     return rows, stops
@@ -12875,8 +12941,11 @@ def _format_block_solve_report(result, catalog):
                              row.get("top_cm"), row.get("sill_cm"), row.get("lintel_status"),
                              row.get("lintel_reason"), row.get("sill_status"), row.get("sill_reason")))
         paradas = result.get("channel_stopped_by_junction") or []
-        lines.append("  Corridas de canaleta paradas pela regra 75 (canaleta nunca atravessa amarracao): {}".format(
-            len(paradas)))
+        lines.append("  Corridas de canaleta paradas em peca de no' (canaleta nunca atravessa amarracao): {} - "
+                     "por causa: {}".format(len(paradas), ", ".join(
+                         "{}={}".format(classe.replace("CHANNEL_STOP_", ""),
+                                        sum(1 for p in paradas if p.get("reason") == classe))
+                         for classe in CHANNEL_STOP_CLASSES)))
     trechos = result.get("unresolved_spans") or []
     lines.append("TRECHOS NAO RESOLVIDOS (NON_MODULAR_UNRESOLVED, revisao humana obrigatoria): {}".format(len(trechos)))
     for span in trechos[:60]:

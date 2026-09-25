@@ -123,7 +123,7 @@ def test_t20_like_verga_e_contraverga_param_na_amarracao_da_fiada(estrategia, re
         centro = (bloqueio[0]["lo"] + bloqueio[0]["hi"]) / 2.0
         assert abs(centro - ((604.0 - T_NODE) if reverse else T_NODE)) < 0.6
     paradas = res["channel_stopped_by_junction"]
-    assert paradas and all(p["junction_id"] == t and p["reason"] == "RULE_75" for p in paradas)
+    assert paradas and all(p["junction_id"] == t and p["reason"] == m.CHANNEL_STOP_RULE_75 for p in paradas)
     assert res["channel_as_junction_bond"] == [] and res["missing_required_junction_bond"] == []
     assert _sem_48(res, walls, openings)
 
@@ -279,3 +279,63 @@ def test_parada_por_no_nao_depende_de_identificador():
                                                       orf.channel_as_junction_bond))
     assert "8284" not in fontes and "BUTANT" not in fontes.upper()
     assert not re.search(r"(node_index|wall_idx|opening_index)\s*==\s*\d", fontes)
+
+
+# ------------------------------------------------------------------ causa da parada (D16, so' rastreio)
+@pytest.mark.parametrize("estrategia", [None, tcr.CHANNEL])
+@pytest.mark.parametrize("jamba,classe", [
+    (FACE_R, "CHANNEL_STOP_RULE_75"),                  # apoio <= 0: a 51.6 atravessaria
+    (FACE_R + 5.0, "CHANNEL_STOP_EXISTING_JUNCTION_PIECE"),   # ~4 cm: parava antes da regra 75
+])
+def test_parada_e_rotulada_pela_causa(estrategia, jamba, classe):
+    res, _w, nodes, _o = _solve(_t20_like(jamba=jamba), estrategia)
+    t = _node(nodes)
+    paradas = [p for p in res["channel_stopped_by_junction"] if p["junction_id"] == t]
+    assert paradas and all(p["reason"] == getattr(m, classe) for p in paradas)
+    assert all(p["blocker_code"] in ws.JUNCTION_BOND_CODES and p["blocker_along"] is False for p in paradas)
+    resumo = res["opening_structural_summary"]
+    assert resumo[m.CHANNEL_STOPS_AT_JUNCTION] == len(res["channel_stopped_by_junction"])
+    assert sum(resumo[c] for c in m.CHANNEL_STOP_CLASSES) == resumo[m.CHANNEL_STOPS_AT_JUNCTION]
+
+
+def test_rotulo_da_parada_nao_muda_nenhuma_peca():
+    """So' rastreio: a assinatura fisica completa e' a mesma com a classificacao
+    trocada pela antiga (toda parada = RULE_75)."""
+    geo = _t26_like()
+    novo, walls, _n, _o = _solve(geo)
+    real = m._channel_stop_class
+    m._channel_stop_class = lambda *a, **k: m.OPENING_REINFORCEMENT_STOP_RULE_75
+    try:
+        antigo, walls0, _n0, _o0 = _solve(geo)
+    finally:
+        m._channel_stop_class = real
+    assert tcr.physical_signature(novo, walls) == tcr.physical_signature(antigo, walls0)
+    assert [p["reason"] for p in antigo["channel_stopped_by_junction"]] == \
+        [m.OPENING_REINFORCEMENT_STOP_RULE_75] * len(novo["channel_stopped_by_junction"])
+
+
+@pytest.mark.parametrize("bloqueio,apoio,classe", [
+    ({"code": "B34", "placement_reason": "T_INTERSECTION_INCOMING", "along": False}, -1.0, "CHANNEL_STOP_RULE_75"),
+    ({"code": "B34", "placement_reason": "T_INTERSECTION_INCOMING", "along": False}, 4.0,
+     "CHANNEL_STOP_EXISTING_JUNCTION_PIECE"),
+    ({"code": "B34", "placement_reason": "T_INTERSECTION_INCOMING", "along": False}, 18.988, "CHANNEL_STOP_SUPPORT_RULE"),
+    ({"code": "B54", "placement_reason": "T_INTERSECTION_MAIN", "along": True}, 4.0, "CHANNEL_STOP_RULE_75"),
+    ({"code": "B54", "placement_reason": "T_INTERSECTION_MAIN", "along": True}, 12.0,
+     "CHANNEL_STOP_EXISTING_JUNCTION_PIECE"),
+    ({"code": "C09", "placement_reason": "JUNCTION_UNRESOLVED_FILL", "along": True}, 2.0, "CHANNEL_STOP_GEOMETRY"),
+    ({"code": "B34", "placement_reason": "L_CORNER", "along": True}, None, "CHANNEL_STOP_RULE_75"),
+    ({"code": "B34", "placement_reason": "T_INTERSECTION_INCOMING", "along": False}, None, "CHANNEL_STOP_GEOMETRY"),
+])
+def test_classificacao_da_parada_segue_a_politica_existente(bloqueio, apoio, classe):
+    """RULE_75 so' onde a politica anterior (51.6 com apoio <= 0; 51.7 ao longo abaixo
+    de 9 cm) continuaria a corrida; SUPPORT_RULE onde o preferencial de 19 cm ja' esta'
+    atingido dentro da tolerancia da grade; GEOMETRY para ocupacao nao convertivel."""
+    assert m._channel_stop_class(bloqueio, apoio, None) == getattr(m, classe)
+
+
+def test_u_55_56_amarracao_sobre_o_vao_segue_como_regra_75():
+    res, _w, _n, _o = _solve(_u_55_56())
+    linha = res["opening_structural_trace"][0]
+    assert linha["sill_reason"] == "RULE_75_TIE_OVER_SPAN"
+    spans = [p for p in res["channel_stopped_by_junction"] if p["side"] == "SPAN"]
+    assert spans and all(p["reason"] == m.CHANNEL_STOP_RULE_75 and p["blocker_along"] for p in spans)

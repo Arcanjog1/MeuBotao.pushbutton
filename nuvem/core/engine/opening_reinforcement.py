@@ -1023,6 +1023,13 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                         rec[side_key]["tie_nodes"] = sorted(set(
                             rows[i]["cand"].get("node_index") for i in hits
                             if rows[i]["tie"] and rows[i]["cand"].get("node_index") is not None))
+                        # rastreio (D16): a peca de no' sobre o vao, para classificar a causa
+                        rec[side_key]["tie_blockers"] = [
+                            {"node_index": rows[i]["cand"].get("node_index"),
+                             "code": rows[i]["cand"].get("logical_code"),
+                             "placement_reason": str(rows[i]["cand"].get("placement_reason") or ""),
+                             "along": bool(rows[i]["along"])}
+                            for i in hits if rows[i]["tie"]]
                     findings.append({"code": "MISSING_REQUIRED_CHANNEL", "severity": SEVERITY_ERROR,
                                      "classification": ("NEEDS_RULE" if problem == "TIE_OVER_SPAN"
                                                         else "ACTUAL_ERROR"),
@@ -1085,7 +1092,9 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                 for side, lim, j in (("l", lim_l, i0 - 1), ("r", lim_r, i1 + 1)):
                     if lim == "JUNCTION_TIE" and 0 <= j < len(rows):
                         blockers[side] = {"node_index": rows[j]["cand"].get("node_index"),
-                                          "along": bool(rows[j]["along"])}
+                                          "along": bool(rows[j]["along"]),
+                                          "code": rows[j]["cand"].get("logical_code"),
+                                          "placement_reason": str(rows[j]["cand"].get("placement_reason") or "")}
                 # por IDENTIDADE da linha: conversoes de demandas seguintes
                 # podem inserir linhas e deslocar indices.
                 spans.append([rows[i0], rows[i1], oi, role, lim_l, lim_r, blockers])
