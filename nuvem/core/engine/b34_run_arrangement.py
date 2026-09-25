@@ -469,8 +469,14 @@ def _arrangements(slots, run):
 
 class _Wall(object):
     def __init__(self, wall_idx, rows, walls_to_create, openings_per_wall, catalog, tol_cm,
-                 ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=()):
+                 ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=(),
+                 joint_identity_guard=False):
         self.wall_idx = wall_idx
+        # SECAO 81.1: com a guarda, nenhuma troca pode criar junta coincidente
+        # entre fiadas vizinhas numa POSICAO onde ela nao existia (a guarda de
+        # contagem da janela aceitava trocar junta isenta junto da jamba por junta
+        # a prumo de verdade no meio da parede)
+        self.joint_guard = bool(joint_identity_guard)
         self.tol = tol_cm
         # SECAO 77: `ties` pode vir por fiada ({fiada: [t_cm]}) quando um no'
         # da parede nao e' encontro em alguma fiada
@@ -601,6 +607,31 @@ class _Wall(object):
         # extremo da parede: olha a fileira inteira (a janela pode nao conter a ponta)
         ex = _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
         return v, co, cp, ht, ex
+
+    def _coincident_positions(self, f, window):
+        """[(face, familia vizinha)] das faces da familia `f` na janela que
+        coincidem com uma face de uma familia de fiada VIZINHA (secao 81.1)."""
+        faces_f = _internal_faces(self.fam[f], self.length, self.edges, window)
+        wider = (window[0] - FACE_TOLERANCE_CM, window[1] + FACE_TOLERANCE_CM)
+        out = []
+        for other in sorted(set(b if a == f else a for (a, b) in self.weights if f in (a, b))):
+            if other == f:
+                continue
+            faces_o = _internal_faces(self.fam[other], self.length, self.edges, wider)
+            for face in faces_f:
+                if _has_value_near(faces_o, face, FACE_TOLERANCE_CM):
+                    out.append((face, other))
+        return out
+
+    def _creates_joint(self, f, window, ref_positions):
+        """True se a familia `f` passou a ter junta coincidente numa posicao
+        (contra uma familia vizinha) que nao existia em `ref_positions`."""
+        if not self.joint_guard:
+            return False
+        for face, other in self._coincident_positions(f, window):
+            if not any(o == other and abs(face - q) <= FACE_TOLERANCE_CM for q, o in ref_positions):
+                return True
+        return False
 
     def _local_bound(self, f, run):
         window = self._window(f, run)
@@ -751,13 +782,16 @@ class _Wall(object):
                 ref = self._local(f, run)
                 if ref[0] == 0:
                     continue
+                window = self._window(f, run)
+                ref_joints = self._coincident_positions(f, window) if self.joint_guard else ()
                 ranked, pool = [], []
                 sides0 = [s.side or 1 for s in orig]
                 for index, codes in enumerate(self._arrangements_for(f, run)):
                     self._apply(f, run, codes, sides0)
                     self._best_sides(f, run)
                     cost = self._local(f, run)
-                    if all(cost[k] <= ref[k] for k in range(1, len(ref))):
+                    if all(cost[k] <= ref[k] for k in range(1, len(ref))) and \
+                            not self._creates_joint(f, window, ref_joints):
                         if cost[0] < ref[0]:
                             moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
                             ranked.append((cost, moved, index, self._snap(f, run), self._neighbour_sides(f, run)))
@@ -772,7 +806,7 @@ class _Wall(object):
                         self._apply(f, run, codes, sides0)
                         self._best_sides(f, run, joint=True)
                         cost = self._local(f, run)
-                        if cost[0] < ref[0]:
+                        if cost[0] < ref[0] and not self._creates_joint(f, window, ref_joints):
                             moved = sum(1 for o, i in zip(orig, run) if o.code != self.fam[f][i].code)
                             ranked.append((cost, moved, index, self._snap(f, run), self._neighbour_sides(f, run)))
                         self._restore(f, run, orig)
@@ -894,12 +928,17 @@ class _Wall(object):
         neighbour_sides = self._neighbour_sides(f, run)
         best = None
         pool = []
+        # a composicao cobre o MESMO trecho (pontas fixas): a janela da corrida
+        # original contem a nova
+        window = self._window(f, run)
+        ref_joints = self._coincident_positions(f, window) if self.joint_guard else ()
 
         def consider(order, specials, ms_index, arr_index, joint_sides):
             new_run = self._splice(f, run, order, joint)
             self._best_sides(f, new_run, joint=joint_sides)
             cost = self._local(f, new_run)
-            guards_ok = all(cost[k] <= ref[k] for k in range(1, len(ref)))
+            guards_ok = all(cost[k] <= ref[k] for k in range(1, len(ref))) and \
+                not self._creates_joint(f, window, ref_joints)
             dominates = ((cost[0] < ref[0] and specials <= ref_specials)
                          or (cost[0] <= ref[0] and specials < ref_specials))
             found = None
@@ -1298,9 +1337,11 @@ def _fill_codes(course_candidates, catalog):
 def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, catalog=None,
                      tolerance_cm=_sva.SMALL_VOID_ALIGN_TOLERANCE_CM, tie_positions_by_wall=None,
                      half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None,
-                     only_walls=None):
+                     only_walls=None, joint_identity_guard=False):
     """Aplica o arranjo conjunto. Devolve o resumo por parede alterada e os
-    totais das guardas antes/depois (as guardas nunca pioram por construcao)."""
+    totais das guardas antes/depois (as guardas nunca pioram por construcao).
+    `joint_identity_guard` (secao 81.1): nenhuma troca cria junta coincidente
+    entre fiadas vizinhas numa posicao nova."""
     summary = {"walls_changed": 0, "runs_changed": 0, "moved": 0, "rotated": 0,
                "before": {"violations": 0, "coincident_faces": 0, "compensator_guard": 0,
                           "long_compensator_extremes": 0, "half_block_near_tie": 0, "stacked_joints": 0},
@@ -1319,7 +1360,8 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
             continue
         wall = _Wall(wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
                      ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
-                     half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes)
+                     half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes,
+                     joint_identity_guard=joint_identity_guard)
         before = wall.totals()
         base_fam = dict((f, [s.copy() for s in slots]) for f, slots in wall.fam.items())
         changed = wall.optimize() if before["violations"] else set()

@@ -39,9 +39,14 @@ def _lines(dx=0.0, dy=0.0, reverse=False, order=(0, 1, 2)):
     return [out[i] for i in order]
 
 
-def _solve(lines, courses=4, enabled=True):
+def _solve(lines, courses=4, enabled=True, general=None):
+    """`general=False` isola a secao 52 (so' orientacao): com as regras gerais de
+    composicao (secao 81) o arranjo 60-65 tambem recompõe as corridas."""
     before = sva.SMALL_VOID_ORIENTATION_ENABLED
+    before_general = m.GENERAL_COMPOSITION_QUALITY_ENABLED
     sva.SMALL_VOID_ORIENTATION_ENABLED = enabled
+    if general is not None:
+        m.GENERAL_COMPOSITION_QUALITY_ENABLED = general
     try:
         walls = [(line, ft(14.0), (False, False)) for line in lines]
         walls, jmap = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
@@ -50,6 +55,7 @@ def _solve(lines, courses=4, enabled=True):
                                                   variants_per_course=1)
     finally:
         sva.SMALL_VOID_ORIENTATION_ENABLED = before
+        m.GENERAL_COMPOSITION_QUALITY_ENABLED = before_general
     return res
 
 
@@ -65,18 +71,27 @@ def _signature(res):
 
 
 def test_red_orientacao_fixa_deixa_vazado_menor_desalinhado():
-    res = _solve(_lines(), enabled=False)
+    res = _solve(_lines(), enabled=False, general=False)
     assert res["small_void_alignment"]["after"] > 20, res["small_void_alignment"]["after"]
 
 
 def test_green_orientacao_reduz_violacoes_sem_mudar_contorno():
-    off = _solve(_lines(), enabled=False)
-    on = _solve(_lines(), enabled=True)
+    off = _solve(_lines(), enabled=False, general=False)
+    on = _solve(_lines(), enabled=True, general=False)
     assert on["small_void_alignment"]["after"] < off["small_void_alignment"]["after"] / 3.0
     assert on["small_void_alignment"]["rotated"] > 0
     # mesmas pecas, mesmas posicoes, mesmas juntas: so' a orientacao muda
     assert _signature(on) == _signature(off)
     assert len(on.get("collisions") or []) == len(off.get("collisions") or [])
+
+
+def test_regras_gerais_nao_pioram_o_vazado_menor_da_secao_52():
+    """SECAO 81: o arranjo geral (60-65) parte da orientacao da 52 e so' aceita
+    parede que nao piora - o vazado menor final nunca fica pior que o da 52 so'."""
+    so52 = _solve(_lines(), enabled=True, general=False)
+    geral = _solve(_lines(), enabled=True, general=True)
+    assert geral["small_void_alignment"]["after"] <= so52["small_void_alignment"]["after"]
+    assert len(geral.get("collisions") or []) == len(so52.get("collisions") or [])
 
 
 def test_peca_de_no_nunca_gira():

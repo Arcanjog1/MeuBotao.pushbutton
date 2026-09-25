@@ -225,10 +225,11 @@ def test_o_legado_nao_ganha_os_gates_nem_muda():
     ctx78, res78 = S.solve_on_fresh_context(geo, False, strategy=None)
     assert res78["compensator_as_junction_bond"] == []
     assert "missing_required_junction_bond" in res78
-    # legado HISTORICO (anterior as secoes 78, 79 e 80): continua byte a byte
+    # legado HISTORICO (anterior as secoes 78, 79, 80 e 81): continua byte a byte
     # igual ao snapshot gravado e sem os gates
     ctx, res = S.solve_on_fresh_context(geo, False, strategy=None, tolerancias_fisicas=False,
-                                        regras_de_encontro=False, reforco_estrutural=False)
+                                        regras_de_encontro=False, reforco_estrutural=False,
+                                        regras_gerais=False)
     assert "compensator_as_junction_bond" not in res
     assert "missing_required_junction_bond" not in res
     legado = S.snapshot_expected()["legacy_cases"][0]["sha256"]

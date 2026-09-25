@@ -3779,6 +3779,22 @@ CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = True
 # que usa MENOS compensadores - ver wall_stepper.COMPENSATOR_COUNT_IN_TIEBREAK.
 CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
 
+# SECAO 81 (D9/D10/D12/D13, 2026-09-25): REGRAS GERAIS DE QUALIDADE DE COMPOSICAO.
+# A ablacao regra a regra (BUTANTA 34 eixos) mostrou que a secao 71 (compensadores
+# no desempate) e o arranjo das corridas 60-65 (reordenacao, composicao de mesmo
+# comprimento, orientacao exata, orientacao conjunta, reparo movel, passes) nao
+# dependem de canaleta: ficavam so' no CHANNEL por "legado identico a' main". Valem
+# para QUALQUER estrategia (NONE incluido), com a mesma aceitacao exata por parede
+# (auditoria de amarracao + auditoria FINAL de encontro 76.1/77 + apoio fisico + plano
+# de verga/contraverga quando existe; o validador e' o mesmo do CHANNEL, que tambem
+# passa a recusar parede que deixe encontro faltando) e, so' aqui, a guarda de
+# identidade de junta (81.1).
+# NAO entram: 68 (reparo pela melhor composicao - cria junta a prumo em 11-12 fiadas
+# na 8284522, o erro que o MCP tem; o HUMANO aceita 2 compensadores ali), 58.2 (sem
+# efeito medido na BUTANTA; regressao registrada no legado) e 72 (paridade dos T,
+# ciclo proprio - D11). Desligar esta chave devolve o comportamento anterior.
+GENERAL_COMPOSITION_QUALITY_ENABLED = True
+
 # SECAO 72 (2026-09-17): no fluxo CHANNEL, a paridade de cada no' T/X e'
 # escolhida pelo COMPRIMENTO do trecho livre que ela deixa para cada fiada
 # preencher, e nao so' pela convencao de papel - ver
@@ -4392,7 +4408,7 @@ def _physical_support_final(result, catalog, walls_to_create, openings_per_wall,
 
 
 def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog, num_courses,
-                            nodes, end_to_node, band, plan=None, base_z_abs=0.0):
+                            nodes, end_to_node, band, plan=None, base_z_abs=0.0, role_by_course=None):
     """Aceitacao EXATA das secoes 60/61 por parede: a busca e' um modelo 1-D, mas
     a parede so' fica alterada se a AUDITORIA DE AMARRACAO desta parede (mesmo
     catalogo com canaletas usado logo depois) e o APOIO FISICO (secao 53, total)
@@ -4411,6 +4427,18 @@ def _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog,
         kinds = {}
         for problem in audit.get("problems") or ():
             kind = str(problem).split(":")[0]
+            kinds[kind] = kinds.get(kind, 0) + 1
+        # SECAO 81: estrutura antes de composicao - a auditoria FINAL de encontro
+        # (76.1/77) entra na aceitacao; o arranjo nunca pode criar encontro sem
+        # amarracao nem ponta livre mal composta (medido na fixture da D3: o
+        # arranjo recompunha a ponta livre da parede que chega com um C09)
+        sonda = dict(result)
+        if plan is not None:
+            sonda["opening_reinforcement"] = plan
+        for falta in _junction_bond_audit_final(sonda, nodes, walls_to_create, openings_per_wall, catalog,
+                                                base_z_abs, num_courses, (plan or {}).get("policy"),
+                                                role_by_course=role_by_course).get("missing") or ():
+            kind = "JUNCTION_MISSING:" + str(falta.get("reason"))
             kinds[kind] = kinds.get(kind, 0) + 1
         unsupported = channel = None
         if support:
@@ -4682,7 +4710,8 @@ def _b34_run_arrangement_legacy_enabled():
 
 
 def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_per_wall=None,
-                              arrange=False, nodes=None, end_to_node=None, validate_wall=None):
+                              arrange=False, nodes=None, end_to_node=None, validate_wall=None,
+                              joint_identity_guard=False):
     """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
     sobre as fiadas FISICAS finais (depois de reparos e do reforco de
     aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
@@ -4731,7 +4760,7 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             current = _runs.arrange_b34_runs(
                 course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
                 half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
-                validate_wall=validate_wall, only_walls=touched)
+                validate_wall=validate_wall, only_walls=touched, joint_identity_guard=joint_identity_guard)
             # o passe seguinte so' precisa olhar as paredes que este mexeu: a
             # orientacao so' muda onde a geometria mudou
             touched = set(item["wall_idx"] for item in (current.get("walls") or ()))
@@ -4823,9 +4852,10 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
         and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
+    # SECAO 81: a 71 e' regra GERAL de qualidade (vale em qualquer estrategia)
     _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = bool(
-        kwargs.get("opening_reinforcement_strategy") is not None
-        and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
+        (kwargs.get("opening_reinforcement_strategy") is not None and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
+        or GENERAL_COMPOSITION_QUALITY_ENABLED)
     saved_parity_balance = _stepper_repair.TIE_PARITY_FILL_BALANCE
     _stepper_repair.TIE_PARITY_FILL_BALANCE = bool(
         kwargs.get("opening_reinforcement_strategy") is not None
@@ -5320,6 +5350,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
             return _apply_opening_structural_reinforcement(
                 result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
                 num_courses, policy=policy, pieces_available=structural_channel_available)
+        if GENERAL_COMPOSITION_QUALITY_ENABLED and isinstance(result, dict) and result.get("error") is None:
+            # SECAO 81 sem a secao 80: o arranjo geral roda sobre as fiadas do solve
+            _general_composition_arrangement(result, nodes, walls_to_create, end_to_node, openings_per_wall,
+                                             catalog, base_z_abs, num_courses, plan=None)
         return result
     from core.engine import opening_reinforcement as _reinforcement
     if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
@@ -5364,7 +5398,8 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
                               nodes=nodes, end_to_node=end_to_node,
                               validate_wall=_channel_wall_validator(
                                   result, walls_to_create, openings_per_wall, catalog, num_courses,
-                                  nodes, end_to_node, _band, plan, base_z_abs))
+                                  nodes, end_to_node, _band, plan, base_z_abs,
+                                  role_by_course=CHANNEL_COURSE_AWARE_JUNCTION_ROLE_ENABLED))
     _arrangement = result.get("b34_run_arrangement") or {}
     if (_arrangement.get("runs_changed") or _arrangement.get("compositions") or _arrangement.get("moved")
             or _arrangement.get("created") or _arrangement.get("removed")):
@@ -5555,12 +5590,14 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
     politica = dict(policy or {})
     politica["channel_may_cross_node_tie"] = False
     politica["convert_blocking_along_ties"] = False
-    # O vazado menor (secao 52) e' decidido ANTES da conversao, sobre as mesmas
-    # pecas do motor sem a secao 80: fora das corridas de verga/contraverga
-    # nenhuma peca muda (nem a orientacao). A chamada de fora ve a marca e nao
-    # refaz.
-    _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall,
-                              arrange=_b34_run_arrangement_legacy_enabled())
+    if not GENERAL_COMPOSITION_QUALITY_ENABLED:
+        # O vazado menor (secao 52) e' decidido ANTES da conversao, sobre as mesmas
+        # pecas do motor sem a secao 80: fora das corridas de verga/contraverga
+        # nenhuma peca muda (nem a orientacao). A chamada de fora ve a marca e nao
+        # refaz. (Com a secao 81, orientacao e arranjo rodam DEPOIS da conversao,
+        # na mesma ordem do CHANNEL.)
+        _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall,
+                                  arrange=_b34_run_arrangement_legacy_enabled())
     t_plan = time.time()
     plan = _reinforcement.plan_channel_reinforcement(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
@@ -5578,6 +5615,22 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
             result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
             free_to_top=plan["free_to_top"], policy=plan["policy"],
             reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    if GENERAL_COMPOSITION_QUALITY_ENABLED:
+        # SECAO 81: vazado menor + arranjo 60-65 DEPOIS da conversao, com a mesma
+        # aceitacao exata por parede do CHANNEL (a validacao da verga/contraverga
+        # entra quando as canaletas existem); canaleta nunca entra nas corridas
+        _general_composition_arrangement(result, nodes, walls_to_create, end_to_node, openings_per_wall,
+                                         catalog, base_z_abs, num_courses,
+                                         plan=plan if pieces_available else None, reaudit=False)
+        _arranjo81 = result.get("b34_run_arrangement") or {}
+        if pieces_available and (_arranjo81.get("runs_changed") or _arranjo81.get("compositions")
+                                 or _arranjo81.get("moved") or _arranjo81.get("created")
+                                 or _arranjo81.get("removed")):
+            plan["validation"] = _reinforcement.validate_channel_reinforcement(
+                result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
+                free_to_top=plan["free_to_top"], policy=plan["policy"],
+                reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    if pieces_available:
         t_audit = time.time()
         audit_catalog = dict(catalog)
         audit_catalog.update(channel_logical_catalog())
@@ -5587,7 +5640,7 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
             openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
         _unify_candidates_with_courses(result, _reinforcement)
         _alinhamento = result.get("small_void_alignment")
-        if isinstance(_alinhamento, dict):
+        if isinstance(_alinhamento, dict) and not GENERAL_COMPOSITION_QUALITY_ENABLED:
             # as violacoes do vazado menor sao relidas sobre as fiadas FINAIS (com
             # as canaletas); a orientacao das pecas nao muda
             from core.engine import small_void_alignment as _small_void
@@ -5595,6 +5648,10 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
             _alinhamento["after"] = len(_alinhamento["violations"])
     else:
         plan["validation"] = None
+        if GENERAL_COMPOSITION_QUALITY_ENABLED:
+            # sem canaletas (familias ausentes) o arranjo geral tambem mexe nas fiadas
+            _general_composition_reaudit(result, nodes, walls_to_create, end_to_node, openings_per_wall,
+                                         catalog, num_courses)
     plan["timing_s"] = {"plan": round(t_validate - t_plan, 4), "validate": round(t_audit - t_validate, 4),
                         "reaudit": round(time.time() - t_audit, 4)}
     result["opening_reinforcement"] = plan
@@ -5603,6 +5660,63 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
         result.get("course_candidates"), plan)
     _attach_opening_structural_trace(result, plan, None, _band, pieces_applied=bool(pieces_available),
                                      base_z_abs=base_z_abs, num_courses=num_courses)
+    return result
+
+
+def _general_composition_arrangement(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                     base_z_abs, num_courses, plan=None, reaudit=True):
+    """SECAO 81: vazado menor (52) + arranjo das corridas (60-65) com a aceitacao exata
+    por parede (auditoria de amarracao, apoio fisico e - com `plan` - a validacao da
+    verga/contraverga), em qualquer estrategia. Idempotente pela marca
+    small_void_alignment. `reaudit=True` refaz a auditoria de amarracao e a fonte
+    unica candidates/collisions quando o arranjo mexeu em alguma peca."""
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    if result.get("small_void_alignment") is not None:
+        return result
+    step, _erro = _course_height_ft(catalog, result.get("candidates") or [])
+    if step is None:
+        return result
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+
+    def _band(course_index):
+        return _course_z_band(base_z_abs, course_index, step, height)
+
+    # SECAO 81.1: regra #1 antes da composicao - o arranjo geral nunca cria junta
+    # coincidente entre fiadas vizinhas numa posicao nova (medido no TP1: a guarda
+    # de contagem trocava juntas isentas junto da porta por junta a prumo de 7
+    # fiadas a 49,5 cm do T)
+    _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall, arrange=True,
+                              nodes=nodes, end_to_node=end_to_node, joint_identity_guard=True,
+                              validate_wall=_channel_wall_validator(
+                                  result, walls_to_create, openings_per_wall, catalog, num_courses,
+                                  nodes, end_to_node, _band, plan, base_z_abs,
+                                  role_by_course=bool(JUNCTION_PHYSICAL_RULES_ENABLED)))
+    arranjo = result.get("b34_run_arrangement") or {}
+    result["general_composition_quality"] = {"enabled": True, "rules": ["71", "60", "61", "62", "63", "64", "65"],
+                                             "arrangement_changed": bool(
+                                                 arranjo.get("runs_changed") or arranjo.get("compositions")
+                                                 or arranjo.get("moved") or arranjo.get("created")
+                                                 or arranjo.get("removed"))}
+    if reaudit and result["general_composition_quality"]["arrangement_changed"]:
+        _general_composition_reaudit(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                     num_courses)
+    return result
+
+
+def _general_composition_reaudit(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                 num_courses):
+    """Depois do arranjo geral (secao 81) sem pos-passe de canaleta: a auditoria de
+    amarracao e a fonte unica candidates/collisions passam a ver as fiadas finais."""
+    from core.engine import opening_reinforcement as _reinforcement
+    if not (result.get("general_composition_quality") or {}).get("arrangement_changed"):
+        return result
+    audit_catalog = dict(catalog)
+    audit_catalog.update(channel_logical_catalog())
+    result["wall_bond_audits"] = audit_all_walls_bond_quality(
+        walls_to_create, result["course_candidates"], audit_catalog, num_courses,
+        openings_per_wall=openings_per_wall, nodes=nodes, end_to_node=end_to_node)
+    _unify_candidates_with_courses(result, _reinforcement)
     return result
 
 

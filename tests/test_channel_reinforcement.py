@@ -44,18 +44,23 @@ def _cm(value_ft):
 # testes que fixam aquele historico usam esta sentinela; `strategy=None` e' o
 # legado do PRODUTO (secao 79 ligada). SECAO 80 (2026-09-25): o historico
 # tambem nao tinha verga/contraverga sem o CHANNEL - a sentinela desliga as duas.
+# SECAO 81 (2026-09-25): nem as regras gerais de composicao (71 + 60-65) - a
+# sentinela desliga as tres.
 LEGADO_HISTORICO = "LEGADO_ANTERIOR_A_SECAO_79"
 
 
 def solve(lines, openings, strategy=CHANNEL, policy=None, reverse=False, num_courses=NUM_COURSES):
     if strategy == LEGADO_HISTORICO:
-        antes = (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED)
+        antes = (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
+                 m.GENERAL_COMPOSITION_QUALITY_ENABLED)
         m.JUNCTION_PHYSICAL_RULES_ENABLED = False
         m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
+        m.GENERAL_COMPOSITION_QUALITY_ENABLED = False
         try:
             return _solve(lines, openings, None, policy, reverse, num_courses)
         finally:
-            m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes
+            (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
+             m.GENERAL_COMPOSITION_QUALITY_ENABLED) = antes
     return _solve(lines, openings, strategy, policy, reverse, num_courses)
 
 
@@ -159,10 +164,17 @@ def test_legacy_strategy_none_is_byte_identical_and_has_no_channel():
     assert channel_count(plain) == 0
 
 
-def test_product_none_has_lintel_and_sill_channel_only_in_those_courses():
+def test_product_none_has_lintel_and_sill_channel_only_in_those_courses(monkeypatch):
     """SECAO 80: sem reforco ADICIONAL, a canaleta aparece so' nas fiadas de
     verga/contraverga e com o papel de abertura; todas as outras pecas sao as
-    do motor sem a secao 80 (a estrategia adicional nao entra)."""
+    do motor sem a secao 80 (a estrategia adicional nao entra).
+
+    SECAO 81: a igualdade peca a peca fora das fiadas de verga/contraverga e'
+    da secao 80 ISOLADA - com as regras gerais de composicao ligadas o arranjo
+    60-65 roda depois da conversao e decide a parede inteira (as fiadas de
+    canaleta entram na paridade), entao a chave geral fica desligada aqui; o
+    contrato com ela ligada esta' em test_regras_gerais_composicao.py."""
+    monkeypatch.setattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", False)
     lines, ops = free_wall()
     produto, walls, _n, _o = solve(lines, ops, strategy=None)
     antes = m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED

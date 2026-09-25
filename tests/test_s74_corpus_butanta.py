@@ -70,11 +70,11 @@ def _solve(rotulo, geo=None):
         elif rotulo.startswith("legado_"):
             # legado HISTORICO (anterior a secao 78): tolerancias fisicas de
             # fechamento desligadas, como o motor que gravou o snapshot (e sem as
-            # secoes 79 e 80, que esse motor tambem nao tinha).
+            # secoes 79, 80 e 81, que esse motor tambem nao tinha).
             cache[rotulo] = S.solve_on_fresh_context(alvo, rotulo.endswith("_on"),
                                                      strategy=None, tolerancias_fisicas=False,
                                                      regras_de_encontro=False, reforco_estrutural=False,
-                                                     **pre77)
+                                                     regras_gerais=False, **pre77)
         elif rotulo.startswith("legado78_"):
             # legado do PRODUTO (secoes 78 e 79 ligadas): so a invariante "a flag
             # CHANNEL da secao 74 nao alcanca o legado" e medida aqui (desde a
