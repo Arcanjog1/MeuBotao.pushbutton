@@ -3954,7 +3954,15 @@ def _bond_trace_from_result(result, audit, nodes):
         no' GEROU nesta banda: codigo, origem, rotacao, razao, `accepted` =
         esta no resultado final), rejected (testes fisicos que reprovaram:
         regra + detalhe), selected (a peca que ocupa a regiao do no' nesta
-        fiada), bond_resolved, classification, rejection_rule, rejection_detail.
+        fiada), bond_resolved, classification, rejection_rule, rejection_detail,
+        status (BOND_UNRESOLVED quando falta amarracao) e requires_human_review.
+
+    Nos L (rastreio de L, 2026-09-24), por fiada FISICA: wall_a/wall_b (paredes
+    donas das familias fisicas A/B), available_space_a/available_space_b e
+    required_space (cm, a partir do CONTATO - a mesma medida que decide o B34),
+    contact_point (do braco dono desta fiada) e contact_point_a/_b, e o
+    candidato de amarracao desta fiada: candidate_code, candidate_origin,
+    candidate_rotation, candidate_generated, candidate_accepted, reject_reason.
 
     classification: BOND_RESOLVED; NO_FUNCTIONAL_JUNCTION (secao 77, fora do
     denominador); BOND_CANDIDATE_NOT_GENERATED (nenhuma peca de amarracao foi
@@ -3990,8 +3998,26 @@ def _bond_trace_from_result(result, audit, nodes):
         o = cand.get("origin_world")
         if o is None or not gen.get("origin_cm") or gen.get("code") != cand.get("logical_code"):
             return False
+        if gen.get("rotation_deg") is not None and cand.get("rotation_deg") is not None:
+            # mesma origem e rotacao diferente e' OUTRA peca (X: as duas B54 no ponto do no')
+            giro = abs(float(gen["rotation_deg"]) - float(cand["rotation_deg"])) % 360.0
+            if min(giro, 360.0 - giro) > 0.5:
+                return False
         return (abs(_ft_to_cm(o.X) - gen["origin_cm"][0]) <= 0.05
                 and abs(_ft_to_cm(o.Y) - gen["origin_cm"][1]) <= 0.05)
+
+    def _gemeas(gen, gens):
+        """Quantas pecas geradas tem o mesmo codigo, origem e rotacao (duas
+        familias na MESMA posicao - ex.: as duas fiadas do L na parede livre):
+        uma peca gemea nao diz qual familia ficou em qual fiada."""
+        n = 0
+        for h in gens:
+            if (h.get("code") == gen.get("code") and h.get("origin_cm") and gen.get("origin_cm")
+                    and abs(h["origin_cm"][0] - gen["origin_cm"][0]) <= 0.05
+                    and abs(h["origin_cm"][1] - gen["origin_cm"][1]) <= 0.05
+                    and abs((h.get("rotation_deg") or 0.0) - (gen.get("rotation_deg") or 0.0)) <= 0.5):
+                n += 1
+        return n
 
     def _familia(ci):
         # a montagem das fiadas: familia A nas fiadas pares, B nas impares
@@ -4003,7 +4029,8 @@ def _bond_trace_from_result(result, audit, nodes):
         chave = (band, ni)
         if chave not in inversao:
             achado = None
-            for gen in rec.get("generated") or []:
+            gens = rec.get("generated") or []
+            for gen in [g for g in gens if _gemeas(g, gens) == 1]:
                 for c in band or ():
                     for cand in node_pieces.get((ni, c)) or []:
                         if _mesma(gen, cand):
@@ -4026,9 +4053,27 @@ def _bond_trace_from_result(result, audit, nodes):
             rec = steps.get((band, ni)) or steps.get((None, ni)) or {}
             room = None
             rejected = []
+            conv = _familia(ci)   # familia de CONVENCAO do passo do no' para esta fiada
+            if node.get("kind") == "L_CORNER" and _invertido(band, ni, rec):
+                conv = "B" if conv == "A" else "A"
+            movidas = set(s.get("moved_family") for s in rec.get("steps") or []
+                          if s.get("rule") == "L_CORNER_OTHER_ARM_OWNS")
             for step in rec.get("steps") or []:
                 if step.get("room_cm") is not None and room is None:
                     room = step.get("room_cm")
+                if step.get("rule") in ("L_CORNER_B34", "L_SINGLE_ELEMENT"):
+                    # L: os testes sao POR BRACO; a fiada so' reprova pelo braco
+                    # dono da sua familia (a candidata D3 muda o dono)
+                    if step.get("rule") == "L_CORNER_B34" and conv in movidas:
+                        continue
+                    arm = (step.get("arms") or {}).get(conv) or {}
+                    if not arm.get("passed", True):
+                        rejected.append({"rule": step.get("rule"),
+                                         "codes": ["B34"] if step.get("rule") == "L_CORNER_B34" else step.get("codes"),
+                                         "detail": arm.get("reject_reason") or step.get("detail")})
+                    continue
+                if step.get("rule") == "L_CORNER_OTHER_ARM_OWNS":
+                    continue
                 if not step.get("passed"):
                     rejected.append({"rule": step.get("rule"), "codes": step.get("codes"),
                                      "detail": step.get("detail")})
@@ -4055,7 +4100,8 @@ def _bond_trace_from_result(result, audit, nodes):
                    "room_cm": room, "candidates": generated, "rejected": rejected,
                    "node_step_ok": rec.get("ok"), "node_step_reason": rec.get("reason"),
                    "selected": None, "bond_resolved": False, "classification": None,
-                   "rejection_rule": None, "rejection_detail": None}
+                   "rejection_rule": None, "rejection_detail": None,
+                   "status": None, "requires_human_review": False}
             key = (ni, ci)
             if key in resolved:
                 row.update(bond_resolved=True, classification=BOND_TRACE_RESOLVED,
@@ -4068,6 +4114,7 @@ def _bond_trace_from_result(result, audit, nodes):
                            rejection_detail=not_req[key].get("effective_role"))
             elif key in missing:
                 item = missing[key]
+                row.update(status=BOND_UNRESOLVED_STATUS, requires_human_review=True)
                 bond_here = [c for c in pieces if c.get("logical_code") in bond_codes]
                 dropped = [g for g in generated if g.get("code") in bond_codes and g.get("accepted") is False]
                 occupant = (item.get("occupants") or [{}])[0]
@@ -4082,14 +4129,93 @@ def _bond_trace_from_result(result, audit, nodes):
                                rejection_detail="gerada pelo passo do no' e ausente do resultado final: {}".format(
                                    ", ".join(g.get("code") or "?" for g in dropped)))
                 else:
+                    # L: a causa e' o primeiro teste reprovado (o espaco do braco dono);
+                    # T/X: o ultimo degrau da escada, como antes
+                    causa = rejected[0] if (node.get("kind") == "L_CORNER" and rejected) else (
+                        rejected[-1] if rejected else None)
                     row.update(classification=BOND_TRACE_NOT_GENERATED,
-                               rejection_rule=(rejected[-1]["rule"] if rejected else str(item.get("reason"))),
+                               rejection_rule=(causa["rule"] if causa else str(item.get("reason"))),
                                rejection_detail="; ".join("{}: {}".format(r["rule"], r.get("detail") or "reprovado")
                                                           for r in rejected) or str(item.get("reason")))
             else:
                 row.update(bond_resolved=None, classification="NOT_CHECKED")
+            if node.get("kind") == "L_CORNER":
+                row.update(_bond_trace_l_fields(rec, ci, conv, generated, bond_codes, row))
+                if row.get("available_space_a") is not None or row.get("available_space_b") is not None:
+                    # espaco por familia FISICA (o do passo do no' esta' na convencao)
+                    row["room_cm"] = {"arm_a": row["available_space_a"], "arm_b": row["available_space_b"]}
             rows.append(row)
     return rows
+
+
+def _bond_trace_l_fields(rec, ci, conv, generated, bond_codes, row):
+    """Rastreio de L (2026-09-24): os dados de espaco e o candidato de amarracao
+    da fiada FISICA `ci`, lidos do passo L_CORNER_B34 do no' (`conv` = familia
+    de convencao do passo do no' que corresponde a esta fiada). Somente leitura."""
+    fisica = "A" if ci % 2 == 0 else "B"
+    outra_conv = "B" if conv == "A" else "A"
+    conv_de = {fisica: conv, ("B" if fisica == "A" else "A"): outra_conv}
+    out = {"wall_a": None, "wall_b": None, "available_space_a": None, "available_space_b": None,
+           "required_space": None, "contact_point": None, "contact_point_a": None, "contact_point_b": None,
+           "candidate_code": None, "candidate_origin": None, "candidate_rotation": None,
+           "candidate_generated": None, "candidate_in_final_result": None, "candidate_accepted": None,
+           "reject_reason": None, "space_unit": "cm"}
+    passos = rec.get("steps") or []
+    step = None
+    for s in passos:
+        if s.get("rule") == "L_CORNER_B34":
+            step = s
+            break
+    if step is None:
+        # no' sem passo de L nesta banda (ex.: secao 77): so' o motivo da linha
+        if row.get("status") == BOND_UNRESOLVED_STATUS:
+            out["reject_reason"] = _bond_trace_row_reason(row)
+        return out
+    arms = dict((k, dict(v)) for k, v in (step.get("arms") or {}).items())
+    for s in passos:
+        # candidata D3 (desligada): a familia sem espaco passou a ser do outro braco
+        if s.get("rule") == "L_CORNER_OTHER_ARM_OWNS" and s.get("moved_family") in ("A", "B"):
+            fam = s["moved_family"]
+            origem = arms.get("B" if fam == "A" else "A") or {}
+            arms[fam] = {"wall_idx": s.get("to_wall_idx"), "available_space_cm": origem.get("available_space_cm"),
+                         "contact_point_cm": s.get("to_contact_point_cm"), "passed": True,
+                         "reject_reason": None, "moved_by": "L_CORNER_OTHER_ARM_OWNS"}
+    arm_a, arm_b, arm = arms.get(conv_de["A"]) or {}, arms.get(conv_de["B"]) or {}, arms.get(conv) or {}
+    out.update(wall_a=arm_a.get("wall_idx"), wall_b=arm_b.get("wall_idx"),
+               available_space_a=arm_a.get("available_space_cm"), available_space_b=arm_b.get("available_space_cm"),
+               required_space=step.get("required_space_cm"), contact_point=arm.get("contact_point_cm"),
+               contact_point_a=arm_a.get("contact_point_cm"), contact_point_b=arm_b.get("contact_point_cm"))
+    bond = [g for g in generated if g.get("family") == fisica and g.get("code") in bond_codes]
+    if bond:
+        g = bond[0]
+        presente = g.get("accepted") is True
+        # aceito = e' a amarracao desta fiada (presente e nao reprovada pela auditoria)
+        aceito = presente and row.get("bond_resolved") is not False
+        out.update(candidate_code=g.get("code"), candidate_origin=g.get("origin_cm"),
+                   candidate_rotation=g.get("rotation_deg"), candidate_generated=True,
+                   candidate_in_final_result=presente, candidate_accepted=aceito)
+        if not aceito:
+            out["reject_reason"] = _bond_trace_row_reason(row)
+    else:
+        falha_do_no = None
+        if rec.get("ok") is False and rec.get("reason"):
+            # o no' inteiro ficou sem solucao (o OUTRO braco nao comporta nem o menor
+            # elemento): o braco desta familia pode ter espaco e ainda assim ficar sem peca
+            falha_do_no = "L_CORNER_NO_SOLUTION: " + str(rec.get("reason"))
+        out.update(candidate_code="B34", candidate_generated=False, candidate_in_final_result=False,
+                   candidate_accepted=False,
+                   reject_reason=arm.get("reject_reason") or falha_do_no or _bond_trace_row_reason(row))
+    return out
+
+
+def _bond_trace_row_reason(row):
+    """'REGRA: detalhe' da linha, sem repetir a regra quando o detalhe ja' a traz."""
+    regra, detalhe = row.get("rejection_rule"), row.get("rejection_detail")
+    if not regra:
+        return None
+    if detalhe and str(detalhe).startswith(str(regra)):
+        return str(detalhe)
+    return "{}: {}".format(regra, detalhe or "")
 
 
 def _bond_trace_apply_materialization(bond_trace, unresolved_bonds):
@@ -4102,7 +4228,12 @@ def _bond_trace_apply_materialization(bond_trace, unresolved_bonds):
             continue
         row.update(bond_resolved=False, classification=BOND_TRACE_REJECTED,
                    rejection_rule="REGRA_48_" + str(rec.get("rejected_rule") or "MATERIALIZACAO"),
-                   rejection_detail=rec.get("message"))
+                   rejection_detail=rec.get("message"),
+                   status=BOND_UNRESOLVED_STATUS, requires_human_review=True)
+        if row.get("node_kind") == "L_CORNER" and row.get("candidate_generated"):
+            # gerada e presente no resultado do solver, pulada na materializacao
+            row.update(candidate_accepted=False,
+                       reject_reason="{}: {}".format(row["rejection_rule"], rec.get("message") or ""))
     return bond_trace
 
 

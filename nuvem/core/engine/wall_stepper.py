@@ -785,6 +785,59 @@ def _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_idx, contact_p
 
 def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
                    nodes=None, end_to_node=None, solved=None):
+    """Ver `_solve_l_corner_steps`. Com o rastreio da secao 79 ligado
+    (BOND_TRACE), o resultado leva `trace`: o espaco medido em cada braco x o
+    exigido, o ponto de contato e a saida de bloqueio usada (rastreio de L,
+    2026-09-24). Sem o rastreio, o resultado e' exatamente o de sempre."""
+    trace = [] if BOND_TRACE is not None else None
+    result = _solve_l_corner_steps(node, walls_to_create, catalog, node_index=node_index,
+                                   openings_per_wall=openings_per_wall, nodes=nodes,
+                                   end_to_node=end_to_node, solved=solved, trace=trace)
+    if trace is not None and isinstance(result, dict):
+        result["trace"] = trace
+    return result
+
+
+def _l_room_trace_step(openings_per_wall, wall_a_idx, wall_b_idx, point_a, point_b,
+                       room_a, room_b, ok_a, ok_b, block_exit):
+    """SECAO 79 - passo L_CORNER_B34 do rastreio (2026-09-24): espaco MEDIDO em
+    cada braco (cm, a partir do CONTATO - a mesma medida `_corner_wall_room_ft`
+    que decide o B34) x EXIGIDO (CORNER_B34_ROOM_FT), com a mesma comparacao
+    (+1e-6 ft), o ponto de contato de cada braco e a saida de bloqueio por
+    encontro vizinho usada. `arms` usa a familia de CONVENCAO do passo do no'
+    (A = course_a, B = course_b); a familia FISICA de cada fiada e' resolvida
+    no bond_trace. Somente observacao: nada aqui muda peca."""
+    need = _ft_cm_round(CORNER_B34_ROOM_FT)
+
+    def _arm(wall_idx, point, room, ok):
+        return {"wall_idx": wall_idx, "available_space_cm": _ft_cm_round(room),
+                "contact_point_cm": ([round(_ft_to_cm(point.X), 4), round(_ft_to_cm(point.Y), 4)]
+                                     if point is not None else None),
+                "passed": bool(ok), "reject_reason": None}
+
+    step = {"rule": "L_CORNER_B34", "codes": ["B34", "B34"], "passed": bool(ok_a and ok_b),
+            "required_space_cm": need, "need_cm": {"each_arm": need},
+            "tolerance_cm": round(_ft_to_cm(1e-6), 6),
+            "arms": {"A": _arm(wall_a_idx, point_a, room_a, ok_a), "B": _arm(wall_b_idx, point_b, room_b, ok_b)},
+            "block_exit": block_exit, "detail": None}
+    if openings_per_wall is None:
+        step["detail"] = "sem aberturas informadas: teste de espaco nao aplicado"
+        return step
+    step["room_cm"] = {"arm_a": _ft_cm_round(room_a), "arm_b": _ft_cm_round(room_b)}
+    faltas = []
+    for fam, wall_idx, room, ok in (("A", wall_a_idx, room_a, ok_a), ("B", wall_b_idx, room_b, ok_b)):
+        if ok:
+            continue
+        txt = "B34 da familia {} precisa de {:.2f} cm a partir do contato na parede {}; ha' {:.3f}".format(
+            fam, need, wall_idx, _ft_to_cm(room))
+        step["arms"][fam]["reject_reason"] = "L_CORNER_ROOM_INSUFFICIENT: " + txt
+        faltas.append(txt)
+    step["detail"] = "; ".join(faltas) or None
+    return step
+
+
+def _solve_l_corner_steps(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
+                          nodes=None, end_to_node=None, solved=None, trace=None):
     """Resolve o encontro em L (secao 10 do prompt): dois B34, um por
     fiada, cada um com a ponta do VAO MENOR encostada no no' (ver
     _asymmetric_bond_origin_and_axis) - e' o que faz as duas celulas
@@ -862,6 +915,7 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
     # checagem" - um teste depende de chamar SEM end_to_node para
     # reproduzir o comportamento historico de proposito
     # (test_solve_l_corner_considera_reserva_do_encontro_na_outra_ponta_da_mesma_parede).
+    _block_exit = None   # rastreio (secao 79): so' registro, nunca decide
     if nodes is not None and end_to_node is not None:
         busy_a = _corner_bond_blocking_courses(
             walls_to_create, nodes, wall_a_idx, point_a, dir_a,
@@ -870,6 +924,8 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
             walls_to_create, nodes, wall_b_idx, point_b, dir_b,
             CORNER_B34_ROOM_FT, node_index, solved=solved)
         blocked_a, blocked_b = bool(busy_a), bool(busy_b)
+        _block_exit = ("SEM_BLOQUEIO" if not (blocked_a or blocked_b)
+                       else "AS_DUAS_PAREDES_BLOQUEADAS" if (blocked_a and blocked_b) else None)
         if blocked_a != blocked_b:
             # CR-S1 (2026-09-07): ANTES de girar, TENTAR A TROCA de papeis.
             #
@@ -909,12 +965,13 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
                 # 1) A fiada que a parede bloqueada JA' tem esta' livre -
                 # nao ha' nada a fazer: o gate booleano antigo girava aqui
                 # sem necessidade nenhuma.
-                pass
+                _block_exit = "FIADA_JA_LIVRE"
             elif other_course not in busy_blocked:
                 # 2) TROCA de papeis: alternancia PRESERVADA, as duas
                 # paredes continuam com peca, so' trocam de fiada entre si.
                 wall_a_idx, point_a, dir_a, wall_b_idx, point_b, dir_b = (
                     wall_b_idx, point_b, dir_b, wall_a_idx, point_a, dir_a)
+                _block_exit = "TROCA_DE_PAPEIS"
             else:
                 # 3) As DUAS fiadas vao para a parede NAO bloqueada - de proposito,
                 # NAO e' uma troca (course_a<->course_b): aqui a troca de fato
@@ -932,6 +989,7 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
                 )
                 wall_a_idx, point_a, dir_a = unblocked_idx, unblocked_point, unblocked_dir
                 wall_b_idx, point_b, dir_b = unblocked_idx, unblocked_point, unblocked_dir
+                _block_exit = "AS_DUAS_FIADAS_NA_PAREDE_LIVRE"
 
     room_a = _corner_wall_room_ft(walls_to_create, openings_per_wall, wall_a_idx, point_a, dir_a,
                                   nodes=nodes, end_to_node=end_to_node, exclude_node_index=node_index,
@@ -941,17 +999,29 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
                                   course="B", solved=solved)
     b34_ok_a = room_a is None or room_a + 1e-6 >= CORNER_B34_ROOM_FT
     b34_ok_b = room_b is None or room_b + 1e-6 >= CORNER_B34_ROOM_FT
+    if trace is not None:
+        trace.append(_l_room_trace_step(openings_per_wall, wall_a_idx, wall_b_idx, point_a, point_b,
+                                        room_a, room_b, b34_ok_a, b34_ok_b, _block_exit))
 
     small_sign = _block_smaller_cell_sign(entry)
 
     if (L_CORNER_OTHER_ARM_OWNS and COMPENSATOR_NEVER_JUNCTION_BOND
             and b34_ok_a != b34_ok_b):
         # CANDIDATA D3: a familia do braco sem espaco vai para o outro braco.
+        _moved = "A" if not b34_ok_a else "B"            # rastreio: so' registro
+        _from_wall = wall_a_idx if not b34_ok_a else wall_b_idx
         if not b34_ok_a:
             wall_a_idx, point_a, dir_a = wall_b_idx, point_b, dir_b
         else:
             wall_b_idx, point_b, dir_b = wall_a_idx, point_a, dir_a
         b34_ok_a = b34_ok_b = True
+        if trace is not None:
+            _to_wall, _to_point = (wall_a_idx, point_a) if _moved == "A" else (wall_b_idx, point_b)
+            trace.append({"rule": "L_CORNER_OTHER_ARM_OWNS", "codes": ["B34"], "enabled": True, "passed": True,
+                          "moved_family": _moved, "from_wall_idx": _from_wall, "to_wall_idx": _to_wall,
+                          "to_contact_point_cm": [round(_ft_to_cm(_to_point.X), 4), round(_ft_to_cm(_to_point.Y), 4)],
+                          "detail": "candidata D3 ligada: a familia {} do braco sem espaco foi para a parede {}".format(
+                              _moved, _to_wall)})
 
     if b34_ok_a:
         origin_a, x_a = _asymmetric_bond_origin_and_axis(entry, point_a, dir_a, small_sign)
@@ -974,6 +1044,23 @@ def solve_l_corner(node, walls_to_create, catalog, node_index=None, openings_per
             catalog, point_b, dir_b, room_b, "B", wall_b_idx, wall_a_idx, node_index,
             placement_reason="L_CORNER_DEGRADED", nodes=nodes
         )
+    if trace is not None and not (b34_ok_a and b34_ok_b):
+        # por braco (familia de convencao): so' o braco SEM espaco recebe o
+        # elemento unico - preenchimento, nunca amarracao (regra 76)
+        _arms_se = {}
+        for _fam, _ok, _cand in (("A", b34_ok_a, course_a), ("B", b34_ok_b, course_b)):
+            _arms_se[_fam] = {"applies": not _ok,
+                              "chosen": (_cand or {}).get("logical_code") if not _ok else None,
+                              "passed": bool(_ok or _cand is not None)}
+        _falhou = [f for f in ("A", "B") if not _arms_se[f]["passed"]]
+        for f in _falhou:
+            _arms_se[f]["reject_reason"] = ("L_SINGLE_ELEMENT: nenhum elemento unico coube no braco sem espaco "
+                                            "da familia {}".format(f))
+        trace.append({"rule": "L_SINGLE_ELEMENT", "codes": list(CORNER_SINGLE_ELEMENT_CODES),
+                      "passed": not _falhou, "arms": _arms_se,
+                      "chosen": {"A": _arms_se["A"]["chosen"], "B": _arms_se["B"]["chosen"]},
+                      "detail": ("elemento unico (preenchimento, nunca amarracao - regra 76) no braco sem espaco"
+                                 if not _falhou else "; ".join(_arms_se[f]["reject_reason"] for f in _falhou))})
 
     if COMPENSATOR_NEVER_JUNCTION_BOND and (course_a is None) != (course_b is None):
         # REGRA 76: a familia sem bloco de amarracao RECUA (secao 58); a fiada
@@ -2890,10 +2977,12 @@ def _coordinate_arm_role_nodes(nodes):
     return sorted(set(conflicts))
 
 
-def _bond_trace_record(node_index, node, result, role=None):
-    """SECAO 79: grava (sobrescreve) o passo do no' desta banda em BOND_TRACE.
-    `generated` usa a convencao de familia do passo do no' (antes da paridade);
-    a familia FISICA de cada fiada sai do resultado final (bond_trace)."""
+def _bond_trace_record(node_index, node, result, role=None, into=None):
+    """SECAO 79: grava (sobrescreve) o passo do no' desta banda em BOND_TRACE
+    (ou em `into`, o registro local de uma re-resolucao da paridade, adotado
+    so' se a paridade aceitar aquela passada - `_bond_trace_adopt`).
+    `generated` usa a convencao de familia do passo do no'; a familia FISICA
+    de cada fiada sai do resultado final (bond_trace)."""
     band = tuple(BOND_TRACE_BAND) if BOND_TRACE_BAND is not None else None
     record = {"band": list(band) if band is not None else None, "node_index": node_index,
               "kind": node.get("kind"), "main_wall_idx": node.get("main_wall_idx"),
@@ -2913,7 +3002,21 @@ def _bond_trace_record(node_index, node, result, role=None):
                 "rotation_deg": round(cand.get("rotation_deg") or 0.0, 1),
                 "placement_reason": str(cand.get("placement_reason") or ""),
                 "wall_idx": cand.get("wall_idx")})
-    BOND_TRACE[(band, node_index)] = record
+    (BOND_TRACE if into is None else into)[(band, node_index)] = record
+
+
+def _bond_trace_adopt(result):
+    """SECAO 79: a re-resolucao ACEITA pela paridade (pecas encostadas 31/32 ou
+    comprimento do trecho 72) passa a ser a descrita pelo rastreio - sem isto o
+    passo gravado seria o da passada anterior a' paridade (um canto L invertido
+    por troca de arms ficaria com os bracos da convencao antiga). Somente
+    observacao."""
+    recs = result.pop("_bond_trace_records", None) if isinstance(result, dict) else None
+    if BOND_TRACE is None or not recs:
+        return
+    for chave, rec in recs.items():
+        rec["from_parity_pass"] = True
+        BOND_TRACE[chave] = rec
 
 
 def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=None, end_to_node=None,
@@ -2973,6 +3076,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     de `_coordinate_arm_role_nodes`) - quase sempre vazio; nao impede a
     modulacao, so' relata a excecao estrutural."""
     role_conflicts = _coordinate_arm_role_nodes(nodes)
+    # rastreio (secao 79) de uma re-resolucao da paridade: local, adotado so' se aceito
+    _trace_local = {} if (BOND_TRACE is not None and not _parity_pass) else None
     solved = []          # (node_index, course_a, course_b)
     solved_by_node = {}  # regra 11.14: o que ja' esta' resolvido, para os cantos seguintes
     failures = []
@@ -2984,6 +3089,9 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             if BOND_TRACE is not None and _parity_pass:
                 _bond_trace_record(node_index, node, None,
                                    role=_band_role_without_bond(node_index).get("effective_role"))
+            elif _trace_local is not None:
+                _bond_trace_record(node_index, node, None,
+                                   role=_band_role_without_bond(node_index).get("effective_role"), into=_trace_local)
             continue
         if kind == "L_CORNER":
             result = solve_l_corner(node, walls_to_create, catalog, node_index=node_index,
@@ -3001,6 +3109,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
             continue
         if BOND_TRACE is not None and _parity_pass:
             _bond_trace_record(node_index, node, result)
+        elif _trace_local is not None:
+            _bond_trace_record(node_index, node, result, into=_trace_local)
         if not result["ok"]:
             failures.append((node_index, result["reason"]))
             continue
@@ -3033,6 +3143,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
                 candidates.append(candidate)
     outcome = {"candidates": candidates, "failures": failures, "role_conflicts": role_conflicts,
                "tie_parity_flips": [], "tie_parity_conflicts": []}
+    if _trace_local is not None:
+        outcome["_bond_trace_records"] = _trace_local
     if (_parity_pass and ABUTTING_TIE_PARITY_ENABLED and end_to_node is not None
             and walls_to_create):
         outcome = _apply_abutting_tie_parity(
@@ -3611,6 +3723,7 @@ def _apply_abutting_tie_parity(outcome, nodes, walls_to_create, catalog, opening
         coincidences_after = _count(retry)
         if len(coincidences_after) < len(coincidences):
             current, coincidences = retry, coincidences_after
+            _bond_trace_adopt(retry)
             accepted.extend(flips)
             continue
         for node_index in flips:
@@ -3874,6 +3987,7 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
     final = solve_all_intersections(nodes, walls_to_create, catalog,
                                     openings_per_wall=openings_per_wall,
                                     end_to_node=end_to_node, _parity_pass=False)
+    _bond_trace_adopt(final)
     final["tie_parity_flips"] = list(outcome.get("tie_parity_flips") or ())
     final["tie_parity_conflicts"] = list(outcome.get("tie_parity_conflicts") or ())
     # A REGRA #1 TEM A ULTIMA PALAVRA: a paridade das pecas ENCOSTADAS foi

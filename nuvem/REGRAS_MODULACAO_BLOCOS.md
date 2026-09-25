@@ -9873,7 +9873,8 @@ L e T) e `_x_intersection_centered_candidate` (X). Dois mecanismos:
 - **T (8 casos, nós 22/28/30):** a principal tem abertura dos dois lados do nó; o T degrada, a
   que chega recebe B34 numa família e, pela alternância da §58, a **peça curta** (C09) na outra.
 - **L (3 casos, nós 47/48):** o braço curto não comporta o B34 (janela a 19,5 cm da face externa
-  do canto) e a escada cai em C09 como peça de canto.
+  no canto 47 e a 29,5 cm no canto 48 — os dois abaixo dos 34 cm do B34; correção de 2026-09-24,
+  ver abaixo) e a escada cai em C09 como peça de canto.
 
 **Censo humano (mesmo validador sobre as peças do projetista, z 1–270, por fatia real de
 10 cm).** **Zero** C04/C09 em pé ocupando região de nó. 79 compensadores em pé a no máximo 1,5 cm
@@ -9911,12 +9912,27 @@ aprovadas (medido no corpus, fluxo CHANNEL):
 | D2 — B19 como peça do nó (padrão humano) | 0 | 0 | 6 | 1 |
 | D3 — o outro braço do L assume o canto | 0 | 0 (L) / +3 (nó 28) | 16 | 4 |
 
-- **Cantos 47/48:** do lado de fora do canto até a jamba há 19,5 cm. Nenhum bloco de amarração
-  fecha isso com a junta de 1 cm do sistema (B19 + 1 = 20). O humano usa **B19 com junta de
-  0,5 cm** — o que conflita com a decisão de 2026-08-21 ("nunca B19 em encontro") e com a junta
-  de 1 cm.
+- **Cantos 47/48:** do lado de fora do canto até a jamba há **19,5 cm no canto 47 e 29,5 cm no
+  canto 48**. Nenhum bloco de amarração fecha isso com a junta de 1 cm do sistema (B19 + 1 = 20).
+  O humano usa **B19 com junta de 0,5 cm** — o que conflita com a decisão de 2026-08-21 ("nunca
+  B19 em encontro") e com a junta de 1 cm.
+  *(Correção de 2026-09-24, ciclo 4 pós-forense: o texto original dava 19,5 cm para os dois
+  cantos; o canto 48 tem 29,5 cm — medido pelo motor, 29,49 cm a partir do contato, e nos três
+  modelos, janela a 22,5 cm do eixo do nó. A conclusão não muda: 29,5 < 34, o B34 não cabe. A
+  aritmética "B19 + 1 = 20" vale para o canto 47 (19,5 cm); no canto 48 o B19 com a junta de 1 cm
+  caberia — o humano fecha ali com B19 + C09, os 0,5 cm restando na face externa — e o impedimento
+  é só a decisão "nunca B19 em encontro", não a falta de espaço para o B19.)*
 - **Nó 28:** a principal, na faixa da janela, é só o quadrado do nó (pilar de 14 cm entre duas
   janelas). O humano alterna **B34 / B19** ali.
+- **Decisão do usuário (2026-09-24, cantos 47/48 = nós forenses L 55/56, após o ciclo 4):** as 3
+  fiadas sem espaço físico (canto 47 × 2/4, canto 48 × 3) **continuam `BOND_UNRESOLVED`**
+  (`MISSING_REQUIRED_JUNCTION_BOND`, revisão humana, `structurally_resolved = false`): não forçar
+  amarração artificial, não criar B34/B54 onde não cabe, não reclassificar B19, C09, compensador ou
+  peça cortada como amarração e não copiar cegamente a solução humana. O ciclo 4 mostrou que nem o
+  humano tem B34/B54 nessas fiadas (usa B19 / B19 cortado atravessando o canto nas fiadas 2 e 4 dos
+  dois cantos) e que a falha é geral (a fixture sintética dá 3 fiadas também espelhada, invertida e
+  com as paredes trocadas — no espelho a distribuição entre os dois cantos troca com a paridade;
+  34 cm fecha, 33,9 cm não).
 
 As três candidatas estão no código (`COMPENSATOR_NEVER_JUNCTION_BOND`,
 `JUNCTION_BOND_B19_FALLBACK`, `L_CORNER_OTHER_ARM_OWNS`), **desligadas**, medidas e documentadas.
@@ -10241,7 +10257,38 @@ selecionada, `bond_resolved` e a classificação — `BOND_RESOLVED`, `NO_FUNCTI
 `BOND_CANDIDATE_NOT_GENERATED` (nenhuma amarração gerada; o motivo vem dos testes do passo do nó) ou
 `BOND_CANDIDATE_GENERATED_BUT_REJECTED` (gerada e ausente do resultado final, reprovada pela
 auditoria 76.1, ou pulada pela regra 48 na materialização). Resumo e pendências no relatório do
-solver (`AMARRACAO POR NO'/FIADA`).
+solver (`AMARRACAO POR NO'/FIADA`). Toda fiada sem amarração leva `status = BOND_UNRESOLVED` e
+`requires_human_review = true`.
+
+**Rastreio de L (2026-09-24, pedido do usuário após o ciclo 4).** O passo do canto L
+(`solve_l_corner`) grava o teste `L_CORNER_B34`: o espaço medido em cada braço a partir do
+**contato** (a mesma medida `_corner_wall_room_ft` que decide o B34, com a reserva da família
+daquele braço e o contexto dos nós já resolvidos), o exigido (`CORNER_B34_ROOM_FT` = 34 cm, mesma
+comparação), o ponto de contato de cada braço e a saída de bloqueio por vizinho usada; e, se
+houver, `L_SINGLE_ELEMENT` (o elemento único do braço sem espaço — preenchimento, nunca
+amarração) e `L_CORNER_OTHER_ARM_OWNS` (candidata desligada). Em cada linha L do `bond_trace`,
+por fiada física: `wall_a`/`wall_b` (paredes donas das famílias A/B), `available_space_a`,
+`available_space_b`, `required_space` (cm), `contact_point` (do braço dono da fiada) e
+`contact_point_a`/`_b`, e o candidato de amarração da fiada: `candidate_code`, `candidate_origin`,
+`candidate_rotation`, `candidate_generated` (o passo do nó gerou o B34 desta família),
+`candidate_in_final_result` (a peça está no resultado do solver), `candidate_accepted` (é a
+amarração desta fiada: presente e não reprovada pela auditoria 76.1 nem pulada pela regra 48) e
+`reject_reason` (`L_CORNER_ROOM_INSUFFICIENT: …` quando o braço dono não tem 34 cm;
+`L_CORNER_NO_SOLUTION: …` quando o outro braço não comporta nem o menor elemento e o nó fica sem
+solução; a regra da auditoria quando o B34 ficou e foi reprovado; a regra 48 quando foi pulado na
+materialização). Os testes do nó são **por braço**: a reprovação de espaço e do elemento único vale
+só para as fiadas da família do braço que falhou; `room_cm` das linhas L sai na família física; com
+a candidata D3 ligada, a família movida aparece no braço que de fato a recebeu. O casamento
+gerada×final exige código, origem **e rotação**, e peças gêmeas (as duas famílias na mesma
+posição) não decidem a inversão de família — isso vale para **todos** os nós e corrige também o
+rastreio dos X (as duas B54 nascem no ponto do nó com rotações 0 e 90: antes as duas saíam
+`accepted` na mesma fiada e a família podia sair invertida; classificação e peças não mudam). O
+passo gravado é o da passada **aceita** pela paridade (peças encostadas 31/32 e comprimento do
+trecho 72): as re-resoluções gravam num registro local, adotado só quando a paridade aceita a
+passada (`from_parity_pass`); antes o passo era sempre o da passada anterior à paridade. Somente
+observação: nenhuma peça muda (assinatura física completa idêntica com o rastreio ligado e
+desligado, 8 geometrias × NONE/CHANNEL na fixture e BUTANTÃ NONE/CHANNEL). Testes:
+`tests/test_bond_trace_l.py`.
 
 **Medido (BUTANTÃ, 34 eixos, NONE, 280 cm).** T amarrados 33/37 → 37/37; fiadas de T sem amarração
 30 → 0 (as 3 fiadas restantes da auditoria são dos cantos L 55/56 — casos 47/48 da §76, pendentes de
