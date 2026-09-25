@@ -97,7 +97,11 @@ Validador independente (recalcula a demanda a partir das aberturas):
   como no humano; aceita (decisão D) sem relaxar a auditoria global.
   **Nota 2026-09-25:** a travessia (51.6) e a conversão ao longo (51.7) estão
   desligadas desde a regra 75 (2026-09-18); D16 mediu que ambas removem a amarração
-  do nó — REGRAS §75.1, decisão humana pendente.
+  do nó — REGRAS §75.1. **Decidido 2026-09-25:** regra 75 mantida (51.6 não volta);
+  a parada é rotulada pela causa (`CHANNEL_STOP_RULE_75` / `_SUPPORT_RULE` /
+  `_EXISTING_JUNCTION_PIECE` / `_GEOMETRY`).
+- Desde 2026-09-25 (REGRAS §81) a 71 e o arranjo 60–65 são regras GERAIS de composição
+  (valem no NONE também); só 51.x, 58.2, 68 e 72 continuam exclusivas do CHANNEL.
 - Apoio limitado é classificado pelo **assentamento real** na fiada de baixo
   (`bearing_*_cm`, 51.4): sem assentamento = `ACTUAL_ERROR`; abaixo de 9 cm =
   `KNOWN_LIMITATION`; entre 9 cm e o preferencial de 19 cm = `VALID_ALTERNATIVE`.

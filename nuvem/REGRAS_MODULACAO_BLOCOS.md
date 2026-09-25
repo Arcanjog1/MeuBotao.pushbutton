@@ -7865,7 +7865,8 @@ corridas se tocam — não há regra de "cinta intermediária" implementada.
 > **Estado atual (nota de 2026-09-25, D16):** **SUSPENSA** desde 2026-09-18 pela §75
 > (`channel_may_cross_node_tie = False`; no NONE a §80.1 a torna fixa). A travessia remove a
 > B34/B54 do nó naquela fiada — medido no D16 (§75.1): T amarrados 37 → 35. O destino da
-> 51.6 (conflito entre a decisão D e a regra 75) é **decisão humana pendente**.
+> 51.6 (conflito entre a decisão D e a regra 75) foi **decidido pelo usuário em 2026-09-25: a 51.6
+> NÃO volta** — regra 75 mantida, AMARRAÇÃO VÁLIDA > CONTINUIDADE/APOIO (§75.1).
 
 **Quando**: a corrida precisa passar da jamba e o próximo elemento é a peça
 **transversal** da parede que chega a um T (`T_INTERSECTION_INCOMING`) e, sem
@@ -8613,6 +8614,10 @@ seção 56.2.
 
 ### 58.3 A §58.2 ligada só no fluxo CHANNEL — e a condição que falta para o legado (2026-09-15)
 
+> **Estado desde 2026-09-25 (§81): continua SÓ no CHANNEL.** Inerte na BUTANTÃ (nenhuma boneca
+> com espaço ≥ 34 cm chega à escada) e a regressão registrada no legado se repete: TP1
+> `PRISM_CONTINUOUS_JOINT` 16→32. Ver §81.
+
 Revisitada sobre as §60–62, **por fiada física** e com a régua estrita do
 benchmark (junta interna alinhada entre duas fiadas **consecutivas**, tolerância
 1,5 cm, sem ponta de parede nem borda de vão):
@@ -8680,6 +8685,10 @@ como preferência e dois **não** devem existir.
 está errado, não o projeto. Foi o caso em três dos cinco pedidos.
 
 ## 60. Arranjo conjunto das corridas de preenchimento — vazado menor do B34 (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
 
 ### 60.1 Censo das 316 violações que restavam (BUTANTÃ, 34 paredes, fiadas 0–11)
 
@@ -8809,6 +8818,10 @@ o arranjo escolhe outra ordem e ainda alinha).
 
 ## 61. Composição de mesmo comprimento nas corridas + aceitação exata por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
 
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
+
 ### 61.1 O que a seção 60 não alcança
 
 Depois do arranjo por reordenação (§60) restavam 234 violações (régua 2-D):
@@ -8894,6 +8907,10 @@ na ponta.
 
 ## 62. Orientação ótima exata dos B34 de preenchimento por parede (2026-09-15, IMPLEMENTADO, só CHANNEL)
 
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
+
 ### 62.1 Achado
 
 Dos 195 que restavam depois das §60/§61 (régua 2-D), 80 eram B34×B34 **na
@@ -8977,6 +8994,10 @@ posição de nenhuma peça nem orientação de nó), teto de banda devolve a par
 §52, idempotência.
 
 ## 63. Orientação conjunta na avaliação das ordens e composições (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
 
 ### 63.1 Achado — censo das 112 violações que restavam (régua 2-D, fiadas 0–11)
 
@@ -9062,6 +9083,10 @@ sem guarda.
 
 ## 64. Arranjo e aberturas — jamba → nó como uma unidade (2026-09-15, IMPLEMENTADO, só CHANNEL)
 
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
+
 ### 64.1 A Etapa 4D e a validação CHANNEL depois do arranjo
 
 O arranjo (§60–63) move e cria compensadores **depois** que a Etapa 4D decidiu o
@@ -9141,6 +9166,10 @@ todas as fiadas. Coordenar a composição entre famílias de bandas diferentes �
 próximo passo; não é limitação física (o humano resolve).
 
 ## 65. O arranjo roda de novo depois da orientação (2026-09-15, IMPLEMENTADO, só CHANNEL)
+
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
 
 **Achado.** A orientação — gulosa (§52) e exata (§62) — roda **depois** da busca
 de ordem, e muda o que cada ordem vale. Medido na parede **8284557** (514 cm, nó
@@ -9375,6 +9404,13 @@ motor**, para não pagar busca que não paga.
 
 ## 68. A faixa jamba → âncora é composta como UMA unidade (2026-09-16, IMPLEMENTADO, só CHANNEL)
 
+> **Estado desde 2026-09-25 (§81): continua SÓ no CHANNEL.** A melhor composição do reparo não
+> olha a regra #1 (o critério de vazado desalinhado descrito abaixo NÃO existe em
+> `_repair_solution_quality`): no NONE ela cria junta a prumo em 11–12 fiadas na BUTANTÃ
+> (8284522, `B19+B34` contra a junta do B54 do nó — o mesmo defeito do MCP; o HUMANO aceita
+> `B39+C04+C09` ali para desencontrar a junta) e multiplica `PRISM_CONTINUOUS_JOINT` nos
+> benchmarks (TGD V2 53→108, TP1 16→104). Extrair exige antes uma guarda de junta. Ver §81.
+
 **Evidência humana (revisão visual de 2026-09-16).** Na parede 8284534 o solver
 fecha a faixa entre a jamba da porta e a peça de nó do encontro com
 `B19 + C04 + B39 + C09` — meio bloco, pastilha e compensador — enquanto o
@@ -9484,6 +9520,10 @@ vazado contra 68. **Rejeitada e removida.** O padrão humano existe, mas não é
 consequência do comprimento do trecho, não como regra de composição.
 
 ## 71. A quantidade de compensadores entra no desempate (2026-09-16, IMPLEMENTADO, só CHANNEL)
+
+> **Estado desde 2026-09-25 (§81):** regra GERAL de qualidade de composição — vale em qualquer
+> estratégia (NONE incluído), com a mesma aceitação exata por parede e a guarda de identidade de
+> junta da §81.1. Ver §81.
 
 `_pier_layout_avoiding_joints._score` passou de
 `(comp_excess, joint_coinc, -trava, -align)` para
@@ -9841,7 +9881,7 @@ Testes: `tests/test_channel_never_bonds.py` (fixtures T/L, travessia, canaleta f
 do envelope permitida, mutante que força o comportamento antigo e exige que o gate
 acuse `CHANNEL_AS_JUNCTION_BOND`).
 
-### 75.1 D16 — verga/contraverga que para no T (2026-09-25, INVESTIGADO, REVISÃO HUMANA; sem mudança de código)
+### 75.1 D16 — verga/contraverga que para no T (2026-09-25, INVESTIGADO; DECIDIDO pelo usuário: regra 75 mantida; rótulo da parada corrigido)
 
 **Pergunta.** A canaleta de verga/contraverga pode atravessar a região de um T sem ser a
 amarração (o HUMANO atravessa e ganha apoio)? **Resposta medida: não, em nenhum caso do
@@ -9900,11 +9940,25 @@ T51 = 46, L56 = 48).
 - Testes: `tests/test_d16_canaleta_no_t.py` (T20/T26/T28-like, NONE e CHANNEL, espelho,
   colisão, mutante 51.6, modelo A, canaleta nunca amarra, nó não resolvido, regra 48).
 
-**Decisão pendente (usuário):** (1) manter a §75 como está — os 6 lados com a jamba na face
-do T continuam criados com apoio −1 cm (`SUPPORT_ACTUAL_ERROR`, revisão humana) e 2 com
-~4 cm (`KNOWN_LIMITATION`); ou (2) reativar a 51.6 aceitando fiada de T sem B34/B54
-(`BOND_UNRESOLVED`, T amarrados 37 → 35, gate 75 reclassificado); ou (3) resolver pela
-posição da abertura (Etapa 3B/§66, fora deste ciclo). Nenhuma regra de mínimo de apoio foi
+**Decisão do usuário (2026-09-25): MANTER A REGRA 75.** A 51.6 (e a 51.7) NÃO é reativada;
+nenhuma amarração B34/B54 válida é sacrificada para aumentar o apoio lateral e o comportamento
+HUMANO nos T20/T26/T28 não é copiado. Prioridade: **AMARRAÇÃO VÁLIDA > CONTINUIDADE/APOIO**.
+T amarrados continuam 37/37 e canaleta como amarração 0; os lados com apoio insuficiente
+seguem `REVISÃO HUMANA` (−1 cm, `SUPPORT_ACTUAL_ERROR`) ou `KNOWN_LIMITATION` (~4 cm). A
+Etapa 3B (posição da abertura, §66) pode ser avaliada no futuro. As opções que estavam em
+aberto eram: (1) manter a §75; (2) reativar a 51.6 (`BOND_UNRESOLVED`, T 37 → 35); (3) Etapa 3B.
+
+**Rastreio corrigido (mesma data, só classificação — nenhuma peça muda):** a parada deixou de
+ser rotulada `RULE_75` para toda peça de nó. O rastreio da §80 (`opening_structural_trace`,
+`reason` da parada + `blocker_code`/`blocker_placement_reason`/`blocker_along`) e o resumo
+(`opening_structural_summary`) separam a causa: `CHANNEL_STOP_RULE_75` (a continuação exigiria
+converter/atravessar a amarração — as exceções 51.6/51.7 que a §75 desligou),
+`CHANNEL_STOP_SUPPORT_RULE` (o apoio já alcança o preferencial da política — parar ali é da
+51.4), `CHANNEL_STOP_EXISTING_JUNCTION_PIECE` (peça de nó que nenhuma política histórica
+atravessaria) e `CHANNEL_STOP_GEOMETRY` (preenchimento de posição de nó). BUTANTÃ: NONE
+7 / 5 / 2 / 0, CHANNEL 7 / 4 / 2 / 0 (total `CHANNEL_STOPS_AT_JUNCTION` 14 / 13). O
+`TIE_OVER_SPAN` do L56 só se chama `RULE_75_TIE_OVER_SPAN` quando a causa é a §75; nos
+outros casos `TIE_OVER_SPAN_<causa>`. Nenhuma regra de mínimo de apoio foi
 criada (4 e 19 cm são só métricas). Evidência: checkpoint
 `docs/checkpoints/2026-09-25-d16-canaleta-no-t.md`.
 
@@ -10500,6 +10554,12 @@ Testes: `tests/test_opening_structural_reinforcement.py`.
 
 ### 80.1 Revisão adversarial da implementação (2026-09-25, IMPLEMENTADO antes do commit)
 
+> **Estado desde 2026-09-25 (§81):** com as regras gerais de composição ligadas, a orientação do
+> vazado menor e o arranjo 60–65 rodam DEPOIS da conversão de verga/contraverga também no NONE
+> (a ordem do CHANNEL, com a validação do plano na aceitação por parede). A garantia "fora das
+> corridas de verga/contraverga nenhuma peça muda em relação ao motor sem a §80" vale para a §80
+> ISOLADA (`GENERAL_COMPOSITION_QUALITY_ENABLED = False`); os testes que a fixam desligam a chave.
+
 A revisão do código da §80 (30 achados confirmados de 33) mudou o seguinte — nenhum limiar novo,
 nenhuma dimensão nova:
 
@@ -10542,3 +10602,138 @@ nenhuma dimensão nova:
   (`benchmark`, `block_role`) ainda não reconhece códigos de canaleta — o papel de abertura é
   medido pelo rastreio desta seção e pela auditoria das 44 aberturas.
 
+## 81. Regras GERAIS de qualidade de composição — extraídas do CHANNEL (2026-09-25, IMPLEMENTADO, D9/D10/D12/D13)
+
+**Decisão (ciclo D9/D10/D12/D13, pedido do usuário):** descobrir quais regras ligadas só no
+CHANNEL são, na verdade, regras gerais de qualidade da modulação e extrair SOMENTE essas, sem
+NONE → CHANNEL, sem mexer na paridade dos T (§72, D11), em verga/contraverga, regras 48, 75,
+76/76.1 ou nos cantos L55/56. Arquitetura resultante: **solver base + regras gerais de qualidade
+(esta seção) + estratégia CHANNEL opcional** (51.x, 58.2, 68, 72).
+
+**Chave:** `GENERAL_COMPOSITION_QUALITY_ENABLED = True` (`core/wall_modeling.py`). Liga, em
+qualquer estratégia:
+
+- **§71** — a quantidade de compensadores entra no desempate de `_pier_layout_avoiding_joints` e
+  da DP, depois das regras #2 e #1 (`COMPENSATOR_COUNT_IN_TIEBREAK`, ponto único da impl);
+- **§60–65** — arranjo das corridas (reordenação, composição de mesmo comprimento, orientação
+  exata e conjunta, peças de reparo móveis, passes), com a MESMA aceitação exata por parede do
+  CHANNEL: auditoria de amarração da parede, **auditoria final de encontro (76.1/77)**, apoio
+  físico (§53) e — quando existe — a validação do plano de verga/contraverga (§80); mais a
+  guarda de identidade de junta da §81.1. No NONE ele roda DEPOIS da conversão de
+  verga/contraverga (a ordem do CHANNEL); canaleta nunca entra nas corridas; peça de nó nunca se
+  move. Sem a §80 (legado) roda sobre as fiadas do solve, com a mesma aceitação.
+
+**Nenhuma dessas regras lê canaleta** (inventário regra a regra): o que as prendia ao CHANNEL
+era o lugar onde a chave era ligada (`strategy is not None`) e o motivo "legado idêntico à main"
+(§60: "o legado não refaz a auditoria" — obsoleto desde a §80, que reaudita no NONE).
+
+**Classificação e contribuição de cada regra** (BUTANTÃ 34 eixos, NONE, implementação; COMP =
+C04 + C09; "sem X" = seção 81 completa menos X):
+
+| Regra | Classificação | Extraída? | Medido |
+|---|---|---|---|
+| 60 | GENERAL_MODULATION_QUALITY | sim | só reordena (contagens iguais); base de 61–65 — sem 60–65: COMP 809, vazado 265 |
+| 61 | GENERAL_MODULATION_QUALITY | sim | composição de mesmo comprimento (`C09 C09 → B19`, `C09 + B34 → C04 + B39`): sem ela COMP 555 → 809 |
+| 62 | GENERAL_MODULATION_QUALITY | sim | orientação exata: sem ela vazado 35 → 68 (mesmas peças) |
+| 63 | GENERAL_MODULATION_QUALITY | sim | orientação conjunta: sem ela COMP 555 → 662, vazado 35 → 47 |
+| 64 | GENERAL_MODULATION_QUALITY | sim | reparo móvel (jamba → nó como unidade): sem ela COMP 555 → 752, vazado 35 → 107 |
+| 65 | GENERAL_MODULATION_QUALITY | sim | passes: sem eles COMP 555 → 579, vazado 35 → 45 |
+| 71 | GENERAL_MODULATION_QUALITY | sim | desempate por compensadores: sozinha 826 → 809; sem ela (com 60–65) 555 → 579 |
+| 68 | AMBIGUOUS | **não** | cria junta a prumo (regra #1): BUTANTÃ 8284522 em 11 fiadas; TGD V2 `PRISM_CONTINUOUS_JOINT` 53→108, TP1 16→104 |
+| 58.2 | GENERAL (nó) | **não** | inerte na BUTANTÃ; TP1 `PRISM_CONTINUOUS_JOINT` 16→32 (repete a regressão de 2026-09-15) |
+| 72 | fora do ciclo (D11) | **não** | paridade dos T — ciclo próprio; NONE nunca a liga (teste espião) |
+
+**Ablação a partir do NONE (BUTANTÃ, régua forense; junta a prumo nova = junta contínua ≥ 3 fiadas
+que não existia):**
+
+| Configuração | COMP | Vazado menor | Colunas comp. ≥ 4 | Juntas coincidentes | Junta a prumo nova | MCP exato |
+|---|---|---|---|---|---|---|
+| NONE (antes) | 826 | 251 | 117 | 5,27 % | — | 53,0 % |
+| + 71 | 809 | 274 | 114 | 5,28 % | 0 | 53,5 % |
+| + 68 | 558 | 386 | 74 | 5,58 % | **1 (11 fiadas)** | 56,9 % |
+| + 60–65 | 579 | 33 | 77 | 5,40 % | 0 | 55,9 % |
+| **+ 71 + 60–65 (esta seção)** | **555** | **35** | **73** | **5,41 %** | **0** | **57,0 %** |
+| + 71 + 68 + 60–65 (= CHANNEL − 72) | 449 | 55 | 60 | 5,64 % | 1 | 61,2 % |
+| CHANNEL | 392 | 47 | 52 | 5,84 % | 1 | 96,8 % |
+
+**BUTANTÃ NONE antes → depois:** B39 3.930 → 3.841; B34 1.797 → 1.898 (+101, todos de composição:
+amarração 472 → 472); B19 283 → 392; C04 366 → 255; C09 460 → 300; compensadores 826 (11,2 %) →
+555 (7,68 %) — HUMANO 487 (7,34 %), MCP 397 (5,65 %); colunas de compensador ≥ 4 fiadas 117 → 73
+(HUMANO 64, MCP 53); faixas verticais de compensador ≥ 4 11 → 3 (MCP 3); pares de especiais 449 →
+331; `C09+C09` onde cabe B19 9 → 2; vazado menor 251 → 35; juntas coincidentes 5,27 → 5,41 %
+(HUMANO 9,19 %, MCP 5,81 %); juntas contínuas ≥ 3 fiadas 46 → 46; aderência ao MCP 53,0/56,2 →
+57,0/59,9 % (exato/≤ 5 cm), ao HUMANO 19,3/28,4 → 21,1/30,3 %; jambas sem peça 60 → 59.
+
+**Benchmarks versionados** (baseline NÃO regravado; categoria `compensators` = paredes reprovadas):
+
+| Projeto | `compensators` baseline | antes (main) | **depois (§81)** | `prism` antes → depois | `PRISM_CONTINUOUS_JOINT` | `PRISM_STAGGER_BELOW_TARGET` | `COMPENSATOR_CONSECUTIVE` | `COMPENSATOR_VERTICAL_STRIP` |
+|---|---|---|---|---|---|---|---|---|
+| TGD V1 | 52 | 54 | **52** | 11 → 11 | 231 → 215 | 802 → 772 | 296 → 138 | 80 → 71 |
+| TGD V2 | 61 | 66 | **60** | 5 → 5 | 53 → 53 | 769 → 740 | 428 → 262 | 110 → 103 |
+| TP1 V1 | 74 | 76 | **66** | 8 → 4 | 16 → 4 | 1690 → 1734 | 851 → 471 | 149 → 132 |
+| TP1 V2 | 77 | 76 | **66** | 8 → 4 | 16 → 4 | 1690 → 1734 | 851 → 471 | 149 → 132 |
+| piloto 2x2 | 10 | 10 | **6** | 1 → 1 | 3 → 3 | 15 → 15 | 36 → 0 | 18 → 9 |
+
+As duas regressões de compensadores abertas desde o ciclo 3 ficam resolvidas (TGD V1 54 → 52 = baseline;
+TGD V2 66 → 60, abaixo do baseline 61) e o TP1 cai 76 → 66. Categoria `prism` não piora em nenhum projeto
+(TP1 8 → 4); `PRISM_CONTINUOUS_JOINT` não sobe em nenhum (TGD V1 231 → 215, TP1 16 → 4 — com a guarda
+§81.1). Custo medido: `PRISM_STAGGER_BELOW_TARGET` do TP1 1.690 → 1.734 (+2,6 %; nível 2, não reprova;
+nos TGD cai). Os achados CRÍTICOS de cada projeto são idênticos com e sem a seção (as regressões críticas
+conhecidas — TGD V2 e TP1 V1 — são anteriores e não mudam).
+
+**D9 — onde nascia o excesso** (compensadores por contexto, feição mais próxima a 45 cm; NONE
+antes → depois, HUMANO, MCP): junto de abertura 394 → **221** (284, 148); junto de nó 369 → **292**
+(185, 207 — o CHANNEL chega a 207 com a §72: o resto é paridade, D11); ponta livre 56 → 42 (13, 42);
+miolo 7 → 0 (5, 0). **B34 por papel** (antes → depois; HUMANO; MCP): amarração 472 → **472** (435;
+483 — nenhuma B34 de amarração foi trocada); miolo 846 → 876 (700; 687); fechamento de trecho
+332 → 392 (372; 403); junto de jamba 120 → 117 (78; 145); ponta livre 27 → 41 (30; 21). A correção é
+de composição, não de amarração.
+
+**D10 (8284580, fiada 0) e D12 (22 eixos equivalentes) são PARIDADE, não composição.** A parede
+de 209 cm tem T nas duas pontas; no NONE os dois T usam a mesma fiada e sobram 179/139 cm — a
+única composição limpa desses comprimentos é a que o solver escolhe. HUMANO (`B39 B39 B39 B39 B34`)
+e MCP (`B34 B39 B39 B39 B39`) alternam os dois T (sobram 159 cm = 4 B39). NONE antes
+`B39 B34 B34 B34 B34`, depois `B34 B39 B34 B34 B34` (mesmas peças, ordem do vazado menor). Só a
+§72 muda isso (CHANNEL − 72 volta ao padrão NONE). Nos 22 eixos: B34 906 → 930 e B39 1.299 →
+1.281 com esta seção; MCP 686/1.503, HUMANO 715/1.436, CHANNEL − 72 925/1.285 — o excesso de B34
+nos 22 eixos é da paridade. O aumento de B34 no prédio é a troca de pares de compensadores por
+bloco modular (§2 revisada: B34 é peça modular, não de acerto).
+
+**Estrutura preservada:** T amarrados 37/37, fiadas L sem amarração 3, `NON_MODULAR_UNRESOLVED`
+0, vazio 30 cm, peças no vão 0, canaleta como amarração 0, compensador como amarração 0,
+verga/contraverga com o mesmo resumo da §80, rastreio de amarração idêntico, auditoria
+`CONTINUOUS_VERTICAL_JOINT` 3 → 3; juntas contínuas ≥ 3 fiadas por identidade 46 → 46 (0 novas).
+CHANNEL: assinatura física completa idêntica à main na BUTANTÃ e no U 55/56. A auditoria final de
+encontro entrou no validador por parede, que é COMPARTILHADO: o CHANNEL só muda na fixture da D3
+com janela a 7 cm dos dois lados do T, onde o arranjo da main recompunha a ponta livre da parede
+que chega e deixava 3 fiadas `FREE_END_NOT_COMPOSED` — agora 0 (melhoria estrutural; teste
+`test_aceitacao_por_parede_nunca_cria_encontro_faltando`).
+
+**Revit (cópia `CICLO9_butanta_testes`, caminho do produto, NONE):** 7.220 peças planejadas =
+criadas, 0 puladas, 0 falhas; contra a cópia CICLO8 (main, mesmo caminho): compensadores 796 → 550,
+colunas de compensador ≥ 4 fiadas 111 → 72, aderência ao MCP 54,3 → 58,7 %; amarração por nó/fiada
+pela régua forense idêntica (T 462 → 462, L 141 → 141, nenhuma perdida). Ponta, sequência vertical
+e jamba conferidas peça a peça (checkpoint do ciclo); D10 igual ao offline (paridade).
+
+**Pendências:** §68 com guarda de junta (a regra #1 contra as fiadas vizinhas na melhor janela do
+reparo) é o próximo candidato — o ganho medido é grande (555 → 449 compensadores); estender a
+guarda da §81.1 ao CHANNEL (hoje ele mantém a aceitação histórica, idêntica à main); §72
+(paridade) explica D10/D12 e fica para o D11. Testes: `tests/test_regras_gerais_composicao.py`.
+
+### 81.1 Guarda de IDENTIDADE de junta no arranjo geral (2026-09-25, IMPLEMENTADO)
+
+**Achado (antes do commit, teste CR-G12 no TP1):** com as regras gerais, o total de
+`PRISM_CONTINUOUS_JOINT` do TP1 ficava igual (16), mas as juntas **mudavam de lugar**: a
+composição (61) trocava `B39 B34` por `B34 B39` na ponta de duas paredes junto de um T
+(`torre_easy_lo_r00_tp1` W056 t = 889,5 e W052 t = 2.299,5 — 49,5 cm do nó) e a junta da fiada
+ímpar caía em cima da junta da fiada par: **junta a prumo nova em 7 fiadas** (0–6). A guarda da
+janela comparava só a CONTAGEM ponderada de faces coincidentes; a troca removia coincidências junto
+da porta (compensador na jamba — isentas pela §11.8) e criava uma de verdade no meio da parede.
+
+**Regra:** no arranjo geral, nenhuma troca (reordenação ou composição) pode criar junta coincidente
+entre fiadas vizinhas numa **posição** (face × família vizinha) onde ela não existia — além das
+guardas de contagem. `arrange_b34_runs(..., joint_identity_guard=True)` só no caminho da §81; o
+CHANNEL mantém a aceitação histórica (assinatura idêntica à main). Na BUTANTÃ a guarda não bloqueia
+nada (assinatura NONE idêntica com e sem ela); no TP1 as duas juntas novas não nascem e
+`PRISM_CONTINUOUS_JOINT` fica 16 → 4 (sem a guarda: 16 → 16, só trocadas de lugar). Testes:
+`test_guarda_de_identidade_barra_junta_a_prumo_nova`, `test_none_usa_a_guarda_de_junta_e_o_channel_nao`.
