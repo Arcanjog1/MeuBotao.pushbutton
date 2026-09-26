@@ -222,17 +222,25 @@ def test_flag_desligada_por_padrao_no_motor():
     assert ws.TIE_PARITY_FILL_ALL_OPENINGS is None
 
 
-def test_decisao_e_unica_por_planta():
+def test_decisao_e_unica_por_planta(monkeypatch):
     """Monotonia: resolvida a paridade uma vez, as bandas seguintes nao
-    refazem a busca (senao o conjunto de inversoes deixa de ser o medido)."""
+    refazem a busca (senao o conjunto de inversoes deixa de ser o medido).
+    SECAO 82: a chamada seguinte DEVOLVE a decisao ja' tomada (lida do no'),
+    sem avaliar custo nenhum - a busca nao roda de novo."""
     linhas = parede_entre_dois_T(235.0)
     walls = [(line, ft(14.0), (False, False)) for line in linhas]
     walls, jm = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
     nodes, e2n = m.build_wall_graph(walls, jm)
     per_wall = dict((i, []) for i in range(len(walls)))
+    custos = []
+    real_custo = ws._tie_parity_fill_layout_cost
+    monkeypatch.setattr(ws, "_tie_parity_fill_layout_cost",
+                        lambda *a, **k: custos.append(1) or real_custo(*a, **k))
     with balance(True):
         primeiro = m.solve_all_intersections(nodes, walls, CATALOG, per_wall, e2n)
+        avaliados = len(custos)
         segundo = m.solve_all_intersections(nodes, walls, CATALOG, per_wall, e2n)
-    assert primeiro.get("tie_parity_fill_flips")
-    assert not segundo.get("tie_parity_fill_flips")
+    assert primeiro.get("tie_parity_fill_flips") and avaliados > 0
+    assert len(custos) == avaliados                      # a busca nao rodou de novo
+    assert segundo.get("tie_parity_fill_flips") == primeiro.get("tie_parity_fill_flips")
     assert all(n.get("_tie_parity_fill_done") for n in nodes)

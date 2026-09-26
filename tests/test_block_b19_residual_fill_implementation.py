@@ -1064,8 +1064,13 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     # O contrato do gate nao mudou: ZERO aceitas, todas rejeitadas por
     # `no_tie_covering_node`, sempre em pares (uma tentativa por atribuicao
     # de fiada). Mudar este numero exige explicar QUAL parede entrou ou saiu.
-    assert len(rejected) == 12, (len(rejected), sorted(set(r["wall_idx"] for r in rejected)))
-    assert sorted(set(r["wall_idx"] for r in rejected)) == [12, 13, 14, 15, 88, 90]
+    # 2026-09-25 (secao 82, paridade contextual dos T): os T 149 (paredes 88/93) e
+    # 153 (paredes 90/94) passam a ter a paridade invertida e as paredes 88 e 90
+    # deixam de ter residuo de B19 - saem do conjunto elegivel: 4 paredes, 8
+    # tentativas. O contrato do gate e' o mesmo (zero aceitas, todas por
+    # `no_tie_covering_node`).
+    assert len(rejected) == 8, (len(rejected), sorted(set(r["wall_idx"] for r in rejected)))
+    assert sorted(set(r["wall_idx"] for r in rejected)) == [12, 13, 14, 15]
     assert all(r["reason"] == "no_tie_covering_node" for r in rejected)
 
 

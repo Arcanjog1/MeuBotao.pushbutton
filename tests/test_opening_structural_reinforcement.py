@@ -278,17 +278,21 @@ def test_canaleta_no_lugar_da_amarracao_e_reprovada_pelos_dois_gates(papel):
 # ----------------------------------------------------------------- independencia do CHANNEL
 @pytest.mark.parametrize("geral", [True, False])
 def test_none_nao_liga_nenhuma_regra_da_estrategia_adicional(monkeypatch, geral):
-    """Durante o solve sem reforco adicional: 72, 68 e 58.2 desligadas; a busca
-    72 e a paridade 51.14 nunca rodam; 51.9 nao decide. SECAO 81: 71 e o arranjo
-    60-65 sao regras GERAIS de composicao - ligados no NONE com a chave geral
-    (o arranjo sempre com a aceitacao exata por parede) e desligados sem ela."""
+    """Durante o solve sem reforco adicional: 68 e 58.2 desligadas; a paridade
+    51.14 nunca roda; 51.9 nao decide. SECAO 81: 71 e o arranjo 60-65 sao regras
+    GERAIS de composicao - ligados no NONE com a chave geral (o arranjo sempre com
+    a aceitacao exata por parede) e desligados sem ela. SECAO 82: a busca de
+    paridade pelo preenchimento (72) tambem e' regra GERAL - no NONE ela roda com a
+    chave da 82 (aberturas da banda como fronteira + veto estrutural)."""
     monkeypatch.setattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", geral)
+    monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", geral)
     estados, arranjos, chamadas = [], [], []
     core = m._solve_building_blocks_all_courses_core
 
     def espia_core(*a, **k):
-        estados.append((ws.TIE_PARITY_FILL_BALANCE, ws.OPENING_REPAIR_PREFER_CLEAN_ACTIVE,
-                        ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK, ws.COMPENSATOR_COUNT_IN_TIEBREAK))
+        estados.append((ws.OPENING_REPAIR_PREFER_CLEAN_ACTIVE, ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK,
+                        ws.COMPENSATOR_COUNT_IN_TIEBREAK, ws.TIE_PARITY_FILL_BALANCE,
+                        ws.TIE_PARITY_FILL_OPENING_BOUNDARIES, ws.TIE_PARITY_STRUCTURAL_VETO))
         return core(*a, **k)
 
     orient = m._orient_small_voids_final
@@ -302,13 +306,17 @@ def test_none_nao_liga_nenhuma_regra_da_estrategia_adicional(monkeypatch, geral)
     monkeypatch.setattr(m, "_solve_building_blocks_all_courses_core", espia_core)
     monkeypatch.setattr(m, "_orient_small_voids_final", espia_orient)
     monkeypatch.setattr(m, "_channel_tie_parity_trials", lambda *a, **k: chamadas.append("51.14") or {})
-    monkeypatch.setattr(ws, "_search_tie_parity_fill_balance", lambda *a, **k: chamadas.append("72") or a[0])
+    real_busca = ws._search_tie_parity_fill_balance
+    monkeypatch.setattr(ws, "_search_tie_parity_fill_balance",
+                        lambda *a, **k: chamadas.append("72") or real_busca(*a, **k))
     lines, ops = tcr.tee(80.0)
     res, _w, _n, _o = solve(lines, ops, strategy=None)
-    assert estados and not any(any(e[:3]) for e in estados), estados  # 72, 68, 58.2
-    assert all(e[3] is geral for e in estados), estados                # 71 (geral)
+    assert estados and not any(any(e[:2]) for e in estados), estados  # 68, 58.2
+    assert all(e[2] is geral for e in estados), estados                # 71 (geral, 81)
+    assert all(e[3] is geral and e[4] is geral and e[5] is geral for e in estados), estados  # 72/82 (geral)
     assert arranjos and any(arranjos) is geral, arranjos               # 60-65 (geral)
-    assert chamadas == []                                              # 51.14 e busca 72
+    assert "51.14" not in chamadas                                     # 51.14 nunca
+    assert ("72" in chamadas) is geral, chamadas                       # busca 72 so' com a chave da 82
     assert res["opening_reinforcement"]["free_to_top"] == []           # 51.9
     assert "channel_tie_parity_trials" not in res
     assert _canaletas(res)                                             # e a verga existe

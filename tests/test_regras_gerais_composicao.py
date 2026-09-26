@@ -304,6 +304,9 @@ def test_channel_nao_muda_com_a_chave_geral(nome):
 
 
 def test_none_liga_so_71_e_60_65_nunca_68_58_2_ou_72(monkeypatch):
+    """Secao 81 isolada: com a chave da 82 desligada, o NONE liga 71 e 60-65 e nunca
+    68, 58.2 ou 72. (A 72 no NONE e' da secao 82 - ver test_paridade_contextual_t.py.)"""
+    monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", False)
     estados, arranjos, chamadas72 = [], [], []
     core = m._solve_building_blocks_all_courses_core
 
@@ -327,7 +330,7 @@ def test_none_liga_so_71_e_60_65_nunca_68_58_2_ou_72(monkeypatch):
     res, _w, _n, _o = tcr.solve(lines, ops, strategy=None)
     assert estados and all(e["71"] and not e["68"] and not e["72"] and not e["58.2"] for e in estados), estados
     assert arranjos and all(all(x) for x in arranjos)            # 60-65 com aceitacao exata + guarda de junta
-    assert chamadas72 == []                                      # 72 nunca no NONE
+    assert chamadas72 == []                                      # 72 nunca no NONE sem a 82
     assert res["general_composition_quality"]["enabled"] is True
     assert "channel_tie_parity_trials" not in res
 

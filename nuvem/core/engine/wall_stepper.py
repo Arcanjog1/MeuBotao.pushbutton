@@ -3587,6 +3587,160 @@ def _wall_course_free_segments_cm(wall_idx, course, nodes, walls_to_create, end_
     return segments
 
 
+def _wall_course_free_segments_abs_cm(wall_idx, course, nodes, walls_to_create, end_to_node,
+                                      by_end, midspan):
+    """SECAO 82: os MESMOS trechos de `_wall_course_free_segments_cm`, com a posicao
+    de inicio (cm, absoluta na parede) na frente: (inicio, pier, lead, trail,
+    ponta_inicial_aberta, ponta_final_aberta). Necessaria para comparar as juntas
+    das duas fiadas no mesmo referencial."""
+    length_cm = _wall_axis_and_length(walls_to_create, wall_idx)[3] / FEET_PER_METER * 100.0
+    border_0 = by_end.get((wall_idx, 0, course))
+    if border_0 is not None:
+        seg_start_cm, lead_cm, leading_open = border_0 + BLOCK_JOINT_CM, 0.0, False
+    else:
+        seg_start_cm, lead_cm = _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, 0)
+        leading_open = True
+    border_1 = by_end.get((wall_idx, 1, course))
+    if border_1 is not None:
+        seg_end_cm, trail_cm, trailing_open = border_1 - BLOCK_JOINT_CM, 0.0, False
+    else:
+        reservation_cm, trail_cm = _wall_end_default_start_cm(nodes, end_to_node, walls_to_create, wall_idx, 1)
+        seg_end_cm, trailing_open = length_cm - reservation_cm, True
+    cursor_cm, cursor_lead, cursor_open = seg_start_cm, lead_cm, leading_open
+    segments = []
+    for t_start_cm, t_end_cm in _merge_intervals_cm(midspan.get((wall_idx, course), [])):
+        segments.append((cursor_cm, t_start_cm - BLOCK_JOINT_CM - cursor_cm, cursor_lead, 0.0, cursor_open, False))
+        cursor_cm, cursor_lead, cursor_open = t_end_cm + BLOCK_JOINT_CM, 0.0, False
+    segments.append((cursor_cm, seg_end_cm - cursor_cm, cursor_lead, trail_cm, cursor_open, trailing_open))
+    return segments
+
+
+_TIE_PARITY_WALL_MEMO = {}
+
+
+def _tie_parity_wall_cost_with_stagger(segs_a, segs_b, catalog, allow_compensators, bordas_no_b=()):
+    """SECAO 82: custo de UMA parede com o desencontro de junta do preenchimento
+    real - a Fiada A pelo layout padrao e a Fiada B por `_pier_layout_avoiding_joints`
+    contra as juntas internas e de contorno da A (o mesmo que `solve_wall_free_fill`
+    faz). Devolve (trechos que nao fecham, excesso #2, juntas coincidentes #1, pecas,
+    especiais, B34, compensadores, pecas que nao sao o bloco inteiro) - a ordem da
+    decisao e' escolhida em `_tie_parity_fill_stagger_cost`. Sem isto a paridade que deixa as DUAS fiadas com o MESMO
+    comprimento parecia sempre boa, e o preenchimento real pagava o desencontro com
+    compensador ou deixava junta a prumo. Funcao pura com memo por parede.
+
+    `bordas_no_b`: as juntas NO'|FILL da Fiada B (bordas das pecas de no' dela nesta
+    parede, `_wall_node_boundary_joints_cm`). A Fiada A e' resolvida PRIMEIRO e so'
+    troca o layout padrao por um que as desencontre quando ele colide (a metade
+    simetrica NO'|FILL do preenchimento real); o que sobra e' junta a prumo. Medido
+    no TP1: sem este termo a paridade geral punha o B54 na Fiada B ao lado de
+    preenchimento da A que nao o desencontra - 32 juntas continuas novas, todas a
+    27 cm de um no' invertido (borda do B54 sobre B19|B34)."""
+    chave = (tuple(tuple(round(v, 3) if isinstance(v, float) else v for v in s) for s in segs_a),
+             tuple(tuple(round(v, 3) if isinstance(v, float) else v for v in s) for s in segs_b),
+             bool(allow_compensators), tuple(round(v, 3) for v in bordas_no_b))
+    memo = _TIE_PARITY_WALL_MEMO.get(chave)
+    if memo is not None:
+        return memo
+    fail = excess = coinc = pieces = especiais = b34 = comps = nao_inteiro = 0
+    inteiro = _tie_parity_full_block_code(catalog)
+
+    def _soma(layout):
+        exc = _layout_compensator_run_excess(layout, catalog)
+        esp = sum(1 for code, _a, _b in layout
+                  if (catalog.get(code) or {}).get("is_compensator") or code == HALF_BLOCK_CODE)
+        b = sum(1 for code, _a, _b in layout if code == MID_WALL_BLOCK_CODE)
+        c = sum(1 for code, _a, _b in layout if (catalog.get(code) or {}).get("is_compensator"))
+        n = sum(1 for code, _a, _b in layout if code != inteiro)
+        return exc, esp, b, len(layout), c, n
+
+    juntas_a = []
+    for inicio, pier, lead, trail, aberta_i, aberta_f in segs_a:
+        if pier < -PIER_LAYOUT_TOLERANCE_CM:
+            fail += 1
+            continue
+        layout = _pier_ordered_layout(max(0.0, pier), catalog, lead, trail,
+                                      allow_compensators=allow_compensators,
+                                      leading_open_override=aberta_i, trailing_open_override=aberta_f)
+        if layout is None:
+            fail += 1
+            continue
+        if bordas_no_b:
+            colide = _count_joint_coincidences_cm(
+                _layout_internal_joint_positions_cm(layout, inicio, aberta_i, aberta_f), bordas_no_b)
+            if colide:
+                alternativa = _pier_layout_avoiding_joints(max(0.0, pier), catalog, lead, trail, inicio,
+                                                           list(bordas_no_b), allow_compensators=allow_compensators,
+                                                           leading_is_open=aberta_i, trailing_is_open=aberta_f)
+                if alternativa is not None and _count_joint_coincidences_cm(
+                        _layout_internal_joint_positions_cm(alternativa, inicio, aberta_i, aberta_f),
+                        bordas_no_b) < colide:
+                    layout = alternativa
+            coinc += _count_joint_coincidences_cm(
+                _layout_internal_joint_positions_cm(layout, inicio, aberta_i, aberta_f), bordas_no_b)
+        exc, esp, b, n, c, ni = _soma(layout)
+        excess += exc; especiais += esp; b34 += b; pieces += n; comps += c; nao_inteiro += ni
+        juntas_a.extend(_layout_internal_joint_positions_cm(layout, inicio, aberta_i, aberta_f))
+        if not aberta_i:
+            juntas_a.append(inicio - BLOCK_JOINT_CM / 2.0)
+        if not aberta_f:
+            juntas_a.append(inicio + pier + BLOCK_JOINT_CM / 2.0)
+    for inicio, pier, lead, trail, aberta_i, aberta_f in segs_b:
+        if pier < -PIER_LAYOUT_TOLERANCE_CM:
+            fail += 1
+            continue
+        layout = _pier_layout_avoiding_joints(max(0.0, pier), catalog, lead, trail, inicio, juntas_a,
+                                              allow_compensators=allow_compensators,
+                                              leading_is_open=aberta_i, trailing_is_open=aberta_f)
+        if layout is None:
+            fail += 1
+            continue
+        exc, esp, b, n, c, ni = _soma(layout)
+        excess += exc; especiais += esp; b34 += b; pieces += n; comps += c; nao_inteiro += ni
+        coinc += _count_joint_coincidences_cm(
+            _layout_internal_joint_positions_cm(layout, inicio, aberta_i, aberta_f), juntas_a)
+    out = (fail, excess, coinc, pieces, especiais, b34, comps, nao_inteiro)
+    _TIE_PARITY_WALL_MEMO[chave] = out
+    return out
+
+
+def _tie_parity_fill_stagger_cost(wall_idxs, nodes, walls_to_create, end_to_node, candidates, catalog,
+                                  allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                  openings_per_wall=None):
+    """SECAO 82: soma de `_tie_parity_wall_cost_with_stagger` sobre as paredes
+    (as aberturas da banda como fronteira quando `openings_per_wall` vem), na ordem de
+    TIE_PARITY_FILL_COST_ORDER."""
+    by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
+    midspan_nos = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    midspan = midspan_nos
+    if openings_per_wall:
+        midspan = _tie_parity_midspan_with_openings(midspan_nos, openings_per_wall, len(walls_to_create))
+    total = [0] * 8
+    for wall_idx in sorted(wall_idxs):
+        segs_a = _wall_course_free_segments_abs_cm(wall_idx, "A", nodes, walls_to_create, end_to_node,
+                                                   by_end, midspan)
+        segs_b = _wall_course_free_segments_abs_cm(wall_idx, "B", nodes, walls_to_create, end_to_node,
+                                                   by_end, midspan)
+        bordas_no_b = _wall_node_boundary_joints_cm(wall_idx, "B", by_end, midspan_nos)
+        parede = _tie_parity_wall_cost_with_stagger(segs_a, segs_b, catalog, allow_compensators,
+                                                     tuple(sorted(bordas_no_b or ())))
+        for k in range(8):
+            total[k] += parede[k]
+    fail, excess, coinc, pieces, especiais, b34, comps, nao_inteiro = total
+    if TIE_PARITY_FILL_COST_ORDER == "compensadores":
+        return (fail, excess, coinc, comps, nao_inteiro, pieces, especiais, b34)
+    return (fail, excess, coinc, pieces, especiais, b34)
+
+
+def _tie_parity_full_block_code(catalog):
+    """O bloco inteiro do catalogo: o mais comprido do pool de preenchimento comum."""
+    melhor = None
+    for code in COMMON_FILL_BLOCK_CODES:
+        comp = (catalog.get(code) or {}).get("length_cm")
+        if comp and (melhor is None or comp > melhor[0]):
+            melhor = (comp, code)
+    return melhor[1] if melhor else None
+
+
 def _tie_parity_fill_proxy(wall_idxs, nodes, walls_to_create, end_to_node, candidates, catalog,
                            allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
     """Custo-proxy do preenchimento das paredes `wall_idxs` para UMA
@@ -3797,13 +3951,119 @@ TIE_PARITY_FILL_BALANCE_MAX_TRIALS = 1200
 # (embaixo do peitoril a lista vem vazia) - a guarda de alcance de verga
 # precisa enxergar todas.
 TIE_PARITY_FILL_ALL_OPENINGS = None
+# SECAO 82 (D11, 2026-09-25): as ABERTURAS ativas da banda em que a paridade e'
+# decidida viram FRONTEIRA dos trechos livres do custo (a peca encosta na jamba
+# sem junta). Sem isto o proxy montava, em modo continuo, trechos que atravessam
+# portas - comprimentos que nao existem - e errava justamente nos T entre jambas
+# (medido na BUTANTA com o solve completo: 4 escolhas erradas, uma delas criando
+# junta vertical de 11 fiadas colada numa porta). Ligada pela chave geral em
+# wall_modeling (GENERAL_TIE_PARITY_ENABLED); o CHANNEL mantem o custo calibrado.
+TIE_PARITY_FILL_OPENING_BOUNDARIES = False
+# Como o custo com aberturas entra na decisao (medido no D11):
+#   "banda"  - so' o custo com as aberturas da banda (as fiadas DENTRO do vao);
+#   "pareto" - a inversao tem de melhorar o custo com as aberturas E nao piorar o
+#              custo continuo (as fiadas acima da verga / abaixo do peitoril, onde a
+#              parede e' continua): uma inversao afeta TODAS as fiadas;
+#   "soma"   - soma dos dois custos;
+#   "veto"   - decide pelo custo CONTINUO (o da secao 72) e as aberturas da banda so'
+#              VETAM: a inversao nao pode piorar os trechos limitados por abertura.
+TIE_PARITY_FILL_OPENING_MODE = "veto"
+# SECAO 82: o custo da decisao modela o DESENCONTRO de junta entre as fiadas
+# (`_tie_parity_fill_stagger_cost`) - ligada pela chave geral em wall_modeling.
+TIE_PARITY_FILL_STAGGER = False
+# SECAO 82: ordem lexicografica do custo com desencontro (depois de trechos que nao
+# fecham, excesso #2 e juntas coincidentes #1):
+#   "pecas"         - pecas, especiais, B34 (a ordem da secao 72);
+#   "compensadores" - compensadores C04/C09, pecas que nao sao o bloco inteiro, pecas,
+#                     especiais, B34 (a regua medida no projeto humano, fase 7 do D11).
+TIE_PARITY_FILL_COST_ORDER = "compensadores"
+# Tipos de no' cuja paridade a busca pode inverter. O CHANNEL (secao 72) move T e X;
+# o caminho geral (secao 82) so' o T: a regra foi medida no projeto humano para T
+# (fase 7 do D11) e, no X - as duas paredes passam e a peca do no' fica no meio das
+# duas -, o preenchimento real desmentiu o modelo em 8 de 17 escolhas no TGD V1/V2
+# (junta a prumo) e criou corrida de compensador junto de jamba em 2 paredes.
+TIE_PARITY_FILL_NODE_KINDS = ("T_INTERSECTION", "X_INTERSECTION")
+# SECAO 82: estrutura antes de qualidade - uma inversao que cria falha de no',
+# conflito de papel ou interpenetracao nova entre pecas de no' e' recusada ANTES
+# do custo (a busca da 72 so' enxergava aritmetica de trecho).
+TIE_PARITY_STRUCTURAL_VETO = False
 
 _TIE_PARITY_LAYOUT_MEMO = {}
 
 
+def _tie_parity_openings_of_wall(openings_per_wall, wall_idx):
+    if isinstance(openings_per_wall, dict):
+        return openings_per_wall.get(wall_idx) or ()
+    try:
+        return openings_per_wall[wall_idx] or ()
+    except (IndexError, TypeError, KeyError):
+        return ()
+
+
+def _tie_parity_midspan_with_openings(midspan, openings_per_wall, wall_count):
+    """SECAO 82: os intervalos de meio de parede de `_index_node_candidates_midspan`
+    mais as ABERTURAS de `openings_per_wall` (as ativas na banda), nas duas fiadas.
+    O intervalo entra encolhido de uma junta de cada lado porque o trecho livre
+    desconta a junta de bloco das duas pontas, e na jamba a peca encosta sem
+    junta. Funcao pura (devolve um dict novo)."""
+    out = dict((key, list(val)) for key, val in midspan.items())
+    for wall_idx in range(wall_count):
+        for vao in _tie_parity_openings_of_wall(openings_per_wall, wall_idx):
+            lo_cm = vao[0] / FEET_PER_METER * 100.0 + BLOCK_JOINT_CM
+            hi_cm = vao[1] / FEET_PER_METER * 100.0 - BLOCK_JOINT_CM
+            if hi_cm <= lo_cm:
+                continue
+            for course in ("A", "B"):
+                out.setdefault((wall_idx, course), []).append((lo_cm, hi_cm))
+    return out
+
+
+def _tie_parity_structural_state(result, node_index, nodes):
+    """SECAO 82: o que uma inversao do no' `node_index` pode estragar na estrutura,
+    medido so' sobre o resultado dos NOS (nenhum preenchimento): nos que falharam,
+    conflitos de papel e pares de pecas de no' da MESMA fiada que se interpenetram
+    envolvendo os nos das paredes deste no' (os unicos que a inversao pode mexer:
+    ele e os cantos que leem a fiada dele - regra 11.14)."""
+    falhas = set(n for n, _motivo in (result.get("failures") or ()))
+    conflitos = len(result.get("role_conflicts") or ())
+    paredes = _node_walls(nodes[node_index])
+    vizinhos = set(i for i, n in enumerate(nodes) if paredes & _node_walls(n))
+    por_fiada = {}
+    for cand in result.get("candidates") or ():
+        por_fiada.setdefault(cand.get("course"), []).append(cand)
+    pares = set()
+    for _course, cands in sorted(por_fiada.items(), key=lambda kv: str(kv[0])):
+        for cand in cands:
+            ni = cand.get("node_index")
+            if ni not in vizinhos:
+                continue
+            obb = _candidate_obb(cand)
+            for outra in cands:
+                nj = outra.get("node_index")
+                if nj == ni or (min(ni, nj), max(ni, nj)) in pares:
+                    continue
+                if _obb_min_overlap(obb, _candidate_obb(outra)) > BOND_COLLISION_EPS_FT:
+                    pares.add((min(ni, nj), max(ni, nj)))
+    return falhas, conflitos, pares
+
+
+def _tie_parity_structural_worse(trial, reference, node_index, nodes):
+    """True (com o motivo) se `trial` piora a estrutura em relacao a `reference`."""
+    f_t, c_t, p_t = _tie_parity_structural_state(trial, node_index, nodes)
+    f_r, c_r, p_r = _tie_parity_structural_state(reference, node_index, nodes)
+    if f_t - f_r:
+        return "NODE_FAILED"
+    if c_t > c_r:
+        return "ROLE_CONFLICT"
+    if p_t - p_r:
+        return "NODE_PIECES_OVERLAP"
+    return None
+
+
 def _tie_parity_fill_layout_cost(wall_idxs, nodes, walls_to_create, end_to_node, candidates,
                                  catalog,
-                                 allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT):
+                                 allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
+                                 openings_per_wall=None):
     """(trechos que nao fecham, excesso da regra #2, pecas, especiais, B34)
     somado sobre os trechos livres das duas fiadas das paredes `wall_idxs`.
 
@@ -3825,9 +4085,14 @@ def _tie_parity_fill_layout_cost(wall_idxs, nodes, walls_to_create, end_to_node,
     Medido tambem contra o otimo aritmetico de cada comprimento (o teto
     teorico, 10x mais barato): ele so' preve o resultado real em 10 das 34
     paredes (erro medio de 7 pecas) porque ignora os tiers e o desencontro
-    de junta."""
+    de junta.
+
+    SECAO 82: com `openings_per_wall`, as aberturas (as ativas na banda da
+    decisao) viram fronteira dos trechos - ver _tie_parity_midspan_with_openings."""
     by_end = _index_node_candidates_by_wall_end(nodes, candidates, walls_to_create, end_to_node)
     midspan = _index_node_candidates_midspan(nodes, candidates, walls_to_create, end_to_node)
+    if openings_per_wall:
+        midspan = _tie_parity_midspan_with_openings(midspan, openings_per_wall, len(walls_to_create))
     fail = excess = especiais = b34 = pieces = 0
     for wall_idx in sorted(wall_idxs):
         for course in ("A", "B"):
@@ -3929,18 +4194,56 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
     # 8284526, onde as duas fiadas vizinhas passaram a reservar regioes de
     # no' DIFERENTES).
     if any(node.get("_tie_parity_fill_done") for node in nodes):
+        # SECAO 82: a decisao (unica) segue visivel nas chamadas seguintes - bandas,
+        # segundo passe e rebuilds devolvem o que foi decidido, lido do proprio no'
+        escolhidos_antes = [i for i, n in enumerate(nodes) if n.get("_tie_parity_fill_chosen")]
+        recusados_antes = [(i, n["_tie_parity_fill_rejected"]) for i, n in enumerate(nodes)
+                           if n.get("_tie_parity_fill_rejected")]
+        if escolhidos_antes:
+            outcome["tie_parity_fill_flips"] = escolhidos_antes
+        if recusados_antes:
+            outcome["tie_parity_fill_rejected"] = recusados_antes
         return outcome
     _TIE_PARITY_LAYOUT_MEMO.clear()
     todas = set(range(len(walls_to_create)))
+    # SECAO 82: aberturas ATIVAS NESTA BANDA como fronteira (no caminho geral);
+    # nunca o conjunto completo (medido em 2026-09-17: piora a decisao)
+    aberturas_do_custo = openings_per_wall if TIE_PARITY_FILL_OPENING_BOUNDARIES else None
+    modo = TIE_PARITY_FILL_OPENING_MODE if aberturas_do_custo else None
+    if modo == "continuo":
+        modo = None
+
+    funcao_custo = _tie_parity_fill_stagger_cost if TIE_PARITY_FILL_STAGGER else _tie_parity_fill_layout_cost
+    _TIE_PARITY_WALL_MEMO.clear()
 
     def _custo(result):
-        return _tie_parity_fill_layout_cost(todas, nodes, walls_to_create, end_to_node,
-                                            result["candidates"], catalog)
+        if modo is None:
+            return funcao_custo(todas, nodes, walls_to_create, end_to_node, result["candidates"], catalog)
+        com = funcao_custo(todas, nodes, walls_to_create, end_to_node,
+                           result["candidates"], catalog,
+                           openings_per_wall=aberturas_do_custo)
+        if modo == "banda":
+            return com
+        sem = funcao_custo(todas, nodes, walls_to_create, end_to_node,
+                           result["candidates"], catalog)
+        if modo == "soma":
+            return tuple(a + b for a, b in zip(com, sem))
+        if modo == "veto":
+            return (sem, com)
+        return (com, sem)   # pareto
+
+    def _melhora(custo, base_):
+        if modo in ("pareto", "veto"):
+            (com, sem), (bcom, bsem) = custo, base_
+            return com[0] <= bcom[0] and com < bcom and sem[0] <= bsem[0] and sem <= bsem
+        return custo[0] <= base_[0] and custo < base_
 
     base = _custo(outcome)
+    referencia = outcome
+    recusados = []
     intocaveis = set(outcome.get("tie_parity_flips") or ())
     movable = [i for i, node in enumerate(nodes)
-               if node.get("kind") in ("T_INTERSECTION", "X_INTERSECTION")
+               if node.get("kind") in TIE_PARITY_FILL_NODE_KINDS
                and i not in intocaveis and not node.get("_arm_role_pinned")
                and not _tie_parity_node_under_opening_reach(
                    node, walls_to_create,
@@ -3962,17 +4265,22 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
                 trial = solve_all_intersections(nodes, walls_to_create, catalog,
                                                 openings_per_wall=openings_per_wall,
                                                 end_to_node=end_to_node, _parity_pass=False)
-                custo = _custo(trial)
+                veto = (_tie_parity_structural_worse(trial, referencia, node_index, nodes)
+                        if TIE_PARITY_STRUCTURAL_VETO else None)
+                custo = None if veto else _custo(trial)
             finally:
                 if antes:
                     node["_tie_parity_flip"] = True
                 else:
                     node.pop("_tie_parity_flip", None)
-            if custo[0] <= base[0] and custo < base and (melhor is None or custo < melhor[0]):
-                melhor = (custo, node_index)
+            if veto:
+                recusados.append((node_index, veto))
+                continue
+            if _melhora(custo, base) and (melhor is None or custo < melhor[0]):
+                melhor = (custo, node_index, trial)
         if melhor is None:
             break
-        base, node_index = melhor
+        base, node_index, referencia = melhor
         node = nodes[node_index]
         if node.get("_tie_parity_flip"):
             node.pop("_tie_parity_flip", None)
@@ -3980,9 +4288,16 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
             node["_tie_parity_flip"] = True
         escolhidos.append(node_index)
     _TIE_PARITY_LAYOUT_MEMO.clear()
+    _TIE_PARITY_WALL_MEMO.clear()
     for node in nodes:
         node["_tie_parity_fill_done"] = True
+    for node_index in escolhidos:
+        nodes[node_index]["_tie_parity_fill_chosen"] = True
+    for node_index, motivo in recusados:
+        nodes[node_index]["_tie_parity_fill_rejected"] = motivo
     if not escolhidos:
+        if recusados:
+            outcome["tie_parity_fill_rejected"] = list(recusados)
         return outcome
     final = solve_all_intersections(nodes, walls_to_create, catalog,
                                     openings_per_wall=openings_per_wall,
@@ -4001,6 +4316,8 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
             final, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
     final["tie_parity_fill_flips"] = list(escolhidos)
     final["tie_parity_fill_cost"] = list(base)
+    final["tie_parity_fill_mode"] = modo
+    final["tie_parity_fill_rejected"] = list(recusados)
     return final
 
 
@@ -11210,6 +11527,10 @@ def process_walls_one_by_one(walls_to_create, nodes, end_to_node, openings_per_w
         "intersection_failures": intersections["failures"],
         "tie_parity_flips": list(intersections.get("tie_parity_flips") or []),
         "tie_parity_conflicts": list(intersections.get("tie_parity_conflicts") or []),
+        # SECAO 82: as inversoes da paridade pelo preenchimento (72/82) e as
+        # recusadas pelo veto estrutural chegam ao resultado (antes se perdiam)
+        "tie_parity_fill_flips": list(intersections.get("tie_parity_fill_flips") or []),
+        "tie_parity_fill_rejected": list(intersections.get("tie_parity_fill_rejected") or []),
         "jamb_exceptions": jamb_exceptions,
         "non_modular": non_modular,
         "alignment_conflicts": alignment_conflicts,

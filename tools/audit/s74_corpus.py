@@ -310,12 +310,16 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
     antes_80 = getattr(m, "OPENING_STRUCTURAL_REINFORCEMENT_ENABLED", None)
     if reforco_estrutural is not None and antes_80 is not None:
         m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = bool(reforco_estrutural)
-    # `regras_gerais` (None = produto) liga/desliga a secao 81 pela flag do
-    # PRODUTO (`GENERAL_COMPOSITION_QUALITY_ENABLED`): 71 + arranjo 60-65 em
-    # qualquer estrategia. Os casos HISTORICOS do legado sao medidos com False.
+    # `regras_gerais` (None = produto) liga/desliga as regras GERAIS de qualidade
+    # pelas flags do PRODUTO: secao 81 (`GENERAL_COMPOSITION_QUALITY_ENABLED`, 71 +
+    # arranjo 60-65) e secao 82 (`GENERAL_TIE_PARITY_ENABLED`, paridade contextual
+    # dos T). Os casos HISTORICOS do legado sao medidos com False.
     antes_81 = getattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", None)
     if regras_gerais is not None and antes_81 is not None:
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = bool(regras_gerais)
+    antes_82 = getattr(m, "GENERAL_TIE_PARITY_ENABLED", None)
+    if regras_gerais is not None and antes_82 is not None:
+        m.GENERAL_TIE_PARITY_ENABLED = bool(regras_gerais)
     antes = m.CHANNEL_T_ROOM_PHYSICAL_TOLERANCE_ENABLED
     antes_d1 = m.CHANNEL_T_DEGRADED_L_ROOM_FROM_CONTACT_ENABLED
     antes_761 = m.CHANNEL_UNRESOLVED_JUNCTION_FILL_ENABLED
@@ -347,6 +351,8 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
             m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = antes_80
         if antes_81 is not None:
             m.GENERAL_COMPOSITION_QUALITY_ENABLED = antes_81
+        if antes_82 is not None:
+            m.GENERAL_TIE_PARITY_ENABLED = antes_82
     res["num_courses"] = courses
     return res
 

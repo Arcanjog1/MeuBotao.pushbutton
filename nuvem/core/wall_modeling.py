@@ -3463,6 +3463,7 @@ def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_
     all_candidates, all_collisions = [], []
     all_intersection_failures, all_jamb_exceptions, all_non_modular = [], [], []
     all_tie_parity_flips, all_tie_parity_conflicts = [], []
+    all_tie_parity_fill_flips, all_tie_parity_fill_rejected = [], []
     all_alignment_conflicts = []
     all_residual_absorptions = []
     all_per_wall, all_validations = [], []
@@ -3566,6 +3567,8 @@ def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_
         all_intersection_failures.extend(result["intersection_failures"])
         all_tie_parity_flips.extend(result.get("tie_parity_flips") or [])
         all_tie_parity_conflicts.extend(result.get("tie_parity_conflicts") or [])
+        all_tie_parity_fill_flips.extend(result.get("tie_parity_fill_flips") or [])
+        all_tie_parity_fill_rejected.extend(result.get("tie_parity_fill_rejected") or [])
         all_jamb_exceptions.extend(result["jamb_exceptions"])
         all_per_wall.extend(result.get("per_wall") or [])
         all_validations.extend(result.get("validations") or [])
@@ -3618,6 +3621,9 @@ def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_
         "intersection_failures": all_intersection_failures,
         "tie_parity_flips": all_tie_parity_flips,
         "tie_parity_conflicts": all_tie_parity_conflicts,
+        # (cada banda devolve a mesma decisao unica - sem repeticao)
+        "tie_parity_fill_flips": sorted(set(all_tie_parity_fill_flips)),
+        "tie_parity_fill_rejected": sorted(set(tuple(x) for x in all_tie_parity_fill_rejected)),
         "jamb_exceptions": all_jamb_exceptions,
         "non_modular": all_non_modular,
         "alignment_conflicts": all_alignment_conflicts,
@@ -3801,6 +3807,41 @@ GENERAL_COMPOSITION_QUALITY_ENABLED = True
 # wall_stepper.TIE_PARITY_FILL_BALANCE. Legado (`strategy=None`) nao passa
 # por aqui: continua identico a' main.
 CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
+
+# SECAO 82 (D11, 2026-09-25): PARIDADE CONTEXTUAL DOS ENCONTROS T. A paridade de
+# cada T deixa de ser a convencao fixa por papel (a principal hospeda sempre na
+# mesma fiada) e passa a ser escolhida pelo que ela deixa para preencher - a busca
+# da secao 72, que nao le canaleta e so' ficava no CHANNEL por "legado identico a'
+# main" - sem reforco adicional, com os refinamentos medidos no caminho geral:
+# (1) estrutura antes de qualidade: veto de falha de no', conflito de papel e pecas
+# de no' se interpenetrando ANTES do custo, e a guarda do alcance da verga (sem ela
+# 4 T perdem verga); (2) o custo modela o DESENCONTRO de junta entre as fiadas e poe
+# os compensadores antes das pecas (a regua do projeto humano, fase 7 do D11);
+# (3) as aberturas ativas na banda so' VETAM; (4) so' encontros T - o X fica na
+# convencao; (5) SECAO 82.1 abaixo. O CHANNEL continua com o custo calibrado da 72
+# (identico a' main). Desligar esta chave devolve o comportamento anterior.
+GENERAL_TIE_PARITY_ENABLED = True
+# SECAO 82.1: o preenchimento REAL tem a ultima palavra. O custo da decisao e' um
+# modelo dos trechos; o preenchimento real (bandas, reparo de jamba, desencontro
+# NO'|FILL, trechos nao modulares) pode desmentir o modelo. Depois do solve, a
+# CONVENCAO (o mesmo pipeline sem a busca) e' resolvida uma vez e cada T invertido
+# fica invertido so' se a regiao dele (as paredes do no', ate'
+# TIE_PARITY_PRISM_RADIUS_CM) nao piora em NENHUMA regra dura:
+#   #1 - junta repetida em TIE_PARITY_PRISM_MIN_COURSES fiadas seguidas que a convencao
+#        nao tinha (TGD/TP1: 144/32 juntas novas, todas a 27-28 cm de um T invertido);
+#   cobertura - fiada SEM NENHUMA PECA entre fiadas preenchidas (criterio do validador
+#        COVERAGE_MISSING_ROW; TGD V1: parede nao modular com uma fiada vazia inteira);
+#   #2 - compensadores aglomerados junto do no' (mais de um por fiada e parede) acima
+#        dos da convencao (TGD V2: `C09 C04` encostados ao lado do T invertido,
+#        +17 COMPENSATOR_CONSECUTIVE, +19 EXCESS_IN_RUN).
+# O T que piora volta para a convencao e o pipeline re-resolve (no maximo
+# TIE_PARITY_PRISM_MAX_ROUNDS vezes). Comparar, e nao julgar em absoluto, e' o que
+# mantem as inversoes boas cujos compensadores/juntas ja' existem na convencao.
+TIE_PARITY_PRISM_CHECK_ENABLED = True
+TIE_PARITY_COMPARE_WITH_CONVENTION = True
+TIE_PARITY_PRISM_RADIUS_CM = 60.0
+TIE_PARITY_PRISM_MIN_COURSES = 3
+TIE_PARITY_PRISM_MAX_ROUNDS = 2
 
 # SECAO 74 (2026-09-17): no fluxo CHANNEL, o teste de espaco do encontro T
 # compara com tolerancia FISICA (PIER_PHYSICAL_FIT_TOLERANCE_CM, 0,05 cm) em vez
@@ -4857,9 +4898,21 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         (kwargs.get("opening_reinforcement_strategy") is not None and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
         or GENERAL_COMPOSITION_QUALITY_ENABLED)
     saved_parity_balance = _stepper_repair.TIE_PARITY_FILL_BALANCE
+    saved_parity_general = (_stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES,
+                            _stepper_repair.TIE_PARITY_STRUCTURAL_VETO,
+                            _stepper_repair.TIE_PARITY_FILL_STAGGER,
+                            _stepper_repair.TIE_PARITY_FILL_NODE_KINDS)
+    _paridade_geral = bool(kwargs.get("opening_reinforcement_strategy") is None and GENERAL_TIE_PARITY_ENABLED)
     _stepper_repair.TIE_PARITY_FILL_BALANCE = bool(
-        kwargs.get("opening_reinforcement_strategy") is not None
-        and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED)
+        (kwargs.get("opening_reinforcement_strategy") is not None
+         and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED) or _paridade_geral)
+    # SECAO 82: no caminho geral a busca ve as aberturas da banda e tem veto
+    # estrutural; o CHANNEL mantem o custo calibrado da 72
+    _stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES = _paridade_geral
+    _stepper_repair.TIE_PARITY_STRUCTURAL_VETO = _paridade_geral
+    _stepper_repair.TIE_PARITY_FILL_STAGGER = _paridade_geral
+    if _paridade_geral:
+        _stepper_repair.TIE_PARITY_FILL_NODE_KINDS = ("T_INTERSECTION",)
     saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
     _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
     saved_role_table = _stepper_repair.JUNCTION_ROLE_TABLE
@@ -4891,9 +4944,15 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         _stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED = True
         _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED = True
     try:
+        estado_inicial = (_tie_parity_node_snapshot(nodes)
+                          if _paridade_geral and TIE_PARITY_PRISM_CHECK_ENABLED else None)
         result = _solve_building_blocks_all_courses_impl_core(
             nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
             num_courses, **kwargs)
+        if _paridade_geral and TIE_PARITY_PRISM_CHECK_ENABLED:
+            result = _tie_parity_prism_rounds(
+                result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
+                num_courses, kwargs, estado_inicial=estado_inicial)
         if isinstance(result, dict):
             result["physical_modulation_tolerances"] = bool(PHYSICAL_MODULATION_TOLERANCES_ENABLED)
             result["unresolved_spans"] = _unresolved_spans(result)
@@ -4916,9 +4975,268 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
         _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
         _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
+        (_stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES,
+         _stepper_repair.TIE_PARITY_STRUCTURAL_VETO,
+         _stepper_repair.TIE_PARITY_FILL_STAGGER,
+         _stepper_repair.TIE_PARITY_FILL_NODE_KINDS) = saved_parity_general
         _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
         _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = saved_room_tol
         _stepper_repair.JUNCTION_ROLE_TABLE = saved_role_table
+
+
+def _tie_parity_prism_violations(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                 flipped):
+    """SECAO 82.1: [(no', parede, t_cm, fiadas)] - juntas verticais repetidas em
+    TIE_PARITY_PRISM_MIN_COURSES ou mais fiadas SEGUIDAS a ate' TIE_PARITY_PRISM_RADIUS_CM
+    de um no' invertido, em qualquer parede do no'. Mede o preenchimento REAL (course_candidates).
+    Junta entre pecas encostadas (folga <= BOND_MAX_ADJACENT_GAP_CM); isenta a junta que separa
+    peca pequena de fechamento (C04/C09/B19) encostada numa abertura ativa na fiada (secao 11.8).
+    Nenhum id: so' geometria."""
+    from core.engine import wall_stepper as _ws
+    course_candidates = (result or {}).get("course_candidates") or {}
+    if not course_candidates or not flipped:
+        return []
+    step, _erro = _course_height_ft(catalog, result.get("candidates") or [])
+    if step is None:
+        return []
+    height = step - _cm_to_ft(COURSE_JOINT_CM)
+    pequenas = set(getattr(_ws, "OPENING_ALIGNED_EXEMPT_CODES", ("C04", "C09", "B19")))
+    tol = float(getattr(_ws, "VERTICAL_JOINT_STAGGER_TOLERANCE_CM", 0.5))
+    paredes = set()
+    for node_index in flipped:
+        paredes |= set(w for w in _ws._node_walls(nodes[node_index]) if w is not None and 0 <= w < len(walls_to_create))
+    juntas = {}
+    for wall_idx in sorted(paredes):
+        p0, _p1, direcao, _len_ft, _esp = _ws._wall_axis_and_length(walls_to_create, wall_idx)
+        vaos = []
+        for vao in (openings_per_wall[wall_idx] if wall_idx < len(openings_per_wall or []) else None) or ():
+            vaos.append((vao[0] * 30.48, vao[1] * 30.48, vao[2], vao[3]))
+        for ci in sorted(course_candidates):
+            z_lo, z_hi = _course_z_band(base_z_abs, ci, step, height)
+            ativos = [(a, b) for a, b, zlo, zhi in vaos if min(z_hi, zhi) - max(z_lo, zlo) > _cm_to_ft(0.5)]
+            pecas = []
+            for cand in course_candidates[ci]:
+                if cand.get("wall_idx") != wall_idx:
+                    continue
+                lo_cm, hi_cm = _ws._candidate_extent_on_wall_axis(cand, p0, direcao)
+                pecas.append((lo_cm, hi_cm, cand.get("logical_code")))
+            pecas.sort()
+            js = []
+            for (a_lo, a_hi, a_code), (b_lo, b_hi, b_code) in zip(pecas, pecas[1:]):
+                if not (0.0 <= b_lo - a_hi <= BOND_MAX_ADJACENT_GAP_CM):
+                    continue
+                isenta = False
+                for lo_v, hi_v in ativos:
+                    if (a_code in pequenas and (abs(a_lo - hi_v) <= 1.5 or abs(a_hi - lo_v) <= 1.5)) or \
+                            (b_code in pequenas and (abs(b_lo - hi_v) <= 1.5 or abs(b_hi - lo_v) <= 1.5)):
+                        isenta = True
+                        break
+                if not isenta:
+                    js.append((a_hi + b_lo) / 2.0)
+            juntas[(wall_idx, ci)] = js
+    out = []
+    cursos = sorted(course_candidates)
+    for node_index in sorted(flipped):
+        node = nodes[node_index]
+        ponto = node.get("point")
+        if ponto is None:
+            continue
+        for wall_idx in sorted(set(_ws._node_walls(node)) & paredes):
+            p0, _p1, direcao, _len_ft, _esp = _ws._wall_axis_and_length(walls_to_create, wall_idx)
+            t_no = ((ponto.X - p0.X) * direcao.X + (ponto.Y - p0.Y) * direcao.Y) * 30.48
+            perto = [(ci, [j for j in juntas.get((wall_idx, ci), ()) if abs(j - t_no) <= TIE_PARITY_PRISM_RADIUS_CM])
+                     for ci in cursos]
+            achados = set()
+            for idx, (ci, js) in enumerate(perto):
+                for j in js:
+                    corrida = 1
+                    k = idx + 1
+                    while k < len(perto) and perto[k][0] == perto[k - 1][0] + 1 and \
+                            any(abs(j - j2) <= tol for j2 in perto[k][1]):
+                        corrida += 1
+                        k += 1
+                    if corrida >= TIE_PARITY_PRISM_MIN_COURSES:
+                        achados.add((round(j, 1), ci, corrida))
+            for j, ci, corrida in sorted(achados):
+                out.append({"node_index": node_index, "wall_idx": wall_idx, "t_cm": j, "from_course": ci,
+                            "courses": corrida})
+    return out
+
+
+def _tie_parity_empty_course_violations(result, nodes, walls_to_create, flipped):
+    """SECAO 82.1: [(no', parede, fiada)] - fiada SEM NENHUMA PECA numa parede de um no'
+    invertido, entre a primeira e a ultima fiada preenchidas dessa parede (o criterio do
+    validador COVERAGE_MISSING_ROW, medido no preenchimento REAL). Nenhum id: so' contagem."""
+    from core.engine import wall_stepper as _ws
+    course_candidates = (result or {}).get("course_candidates") or {}
+    if not course_candidates or not flipped:
+        return []
+    ocupadas = {}
+    for ci, cands in course_candidates.items():
+        for cand in cands:
+            wall_idx = cand.get("wall_idx")
+            if wall_idx is not None:
+                ocupadas.setdefault(wall_idx, set()).add(ci)
+    out = []
+    for node_index in sorted(flipped):
+        for wall_idx in sorted(w for w in _ws._node_walls(nodes[node_index])
+                               if w is not None and 0 <= w < len(walls_to_create)):
+            cheias = ocupadas.get(wall_idx) or set()
+            if not cheias:
+                continue
+            for ci in range(min(cheias), max(cheias) + 1):
+                if ci not in cheias:
+                    out.append({"node_index": node_index, "wall_idx": wall_idx, "course": ci,
+                                "kind": "COURSE_WITHOUT_PIECES"})
+    return out
+
+
+def _tie_parity_node_snapshot(nodes):
+    """Copia do estado dos nos (um nivel de lista/dict copiado) para resolver a
+    convencao sem herdar as marcas do solve geral."""
+    return [dict((k, list(v) if isinstance(v, list) else (dict(v) if isinstance(v, dict) else v))
+                 for k, v in node.items()) for node in nodes]
+
+
+def _tie_parity_node_restore(nodes, snapshot):
+    for node, estado in zip(nodes, snapshot):
+        node.clear()
+        node.update(estado)
+
+
+def _tie_parity_compensator_crowding(result, nodes, walls_to_create, catalog, flipped):
+    """SECAO 82.1 (regra #2 local): {no': excesso} - por no' invertido, soma sobre
+    (parede do no', fiada) de max(0, compensadores a ate' TIE_PARITY_PRISM_RADIUS_CM do
+    no' - 1), no preenchimento REAL. Nenhum id: so' geometria."""
+    from core.engine import wall_stepper as _ws
+    course_candidates = (result or {}).get("course_candidates") or {}
+    out = {}
+    for node_index in sorted(flipped):
+        node = nodes[node_index]
+        ponto = node.get("point")
+        if ponto is None:
+            continue
+        excesso = 0
+        for wall_idx in sorted(w for w in _ws._node_walls(node) if w is not None and 0 <= w < len(walls_to_create)):
+            p0, _p1, direcao, _len_ft, _esp = _ws._wall_axis_and_length(walls_to_create, wall_idx)
+            t_no = ((ponto.X - p0.X) * direcao.X + (ponto.Y - p0.Y) * direcao.Y) * 30.48
+            for ci in sorted(course_candidates):
+                n = 0
+                for cand in course_candidates[ci]:
+                    if cand.get("wall_idx") != wall_idx or \
+                            not (catalog.get(cand.get("logical_code")) or {}).get("is_compensator"):
+                        continue
+                    lo_cm, hi_cm = _ws._candidate_extent_on_wall_axis(cand, p0, direcao)
+                    if hi_cm >= t_no - TIE_PARITY_PRISM_RADIUS_CM and lo_cm <= t_no + TIE_PARITY_PRISM_RADIUS_CM:
+                        n += 1
+                excesso += max(0, n - 1)
+        out[node_index] = excesso
+    return out
+
+
+def _tie_parity_real_fill_violations(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
+                                     flipped):
+    """SECAO 82.1: as violacoes do preenchimento real na regiao de cada no' invertido
+    (regra #1, cobertura, regra #2), cada uma com uma identidade comparavel."""
+    out = []
+    for v in _tie_parity_prism_violations(result, nodes, walls_to_create, openings_per_wall, catalog,
+                                          base_z_abs, flipped):
+        out.append(dict(v, kind="PRISM_CONTINUOUS_JOINT",
+                        identity=(v["node_index"], "PRISM", v["wall_idx"], int(round(v["t_cm"])))))
+    for v in _tie_parity_empty_course_violations(result, nodes, walls_to_create, flipped):
+        out.append(dict(v, identity=(v["node_index"], "EMPTY", v["wall_idx"], v["course"])))
+    for node_index, excesso in sorted(_tie_parity_compensator_crowding(result, nodes, walls_to_create, catalog,
+                                                                       flipped).items()):
+        if excesso:
+            out.append({"node_index": node_index, "kind": "COMPENSATOR_SEQUENCE", "excess": excesso,
+                        "identity": (node_index, "CROWD")})
+    return out
+
+
+def _tie_parity_worse_than_convention(violacoes, violacoes_convencao):
+    """So' o que a convencao NAO tinha na mesma regiao (regra #2: mais excesso)."""
+    base = dict((v["identity"], v) for v in violacoes_convencao)
+    out = []
+    for v in violacoes:
+        antes = base.get(v["identity"])
+        if antes is None:
+            out.append(v)
+        elif v["kind"] == "COMPENSATOR_SEQUENCE" and v["excess"] > antes["excess"]:
+            out.append(dict(v, convention_excess=antes["excess"]))
+    return out
+
+
+def _tie_parity_convention_result(nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
+                                  num_courses, kwargs, estado_inicial):
+    """O preenchimento real da CONVENCAO (o mesmo pipeline sem a busca), resolvido
+    sobre o estado inicial dos nos; o estado do solve geral e' restaurado depois."""
+    from core.engine import wall_stepper as _ws
+    estado_geral = _tie_parity_node_snapshot(nodes)
+    salvo = (_ws.TIE_PARITY_FILL_BALANCE, _ws.BOND_TRACE)
+    _tie_parity_node_restore(nodes, estado_inicial)
+    _ws.TIE_PARITY_FILL_BALANCE = False
+    if _ws.BOND_TRACE is not None:
+        _ws.BOND_TRACE = {}
+    try:
+        return _solve_building_blocks_all_courses_impl_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses, **kwargs)
+    finally:
+        _ws.TIE_PARITY_FILL_BALANCE, _ws.BOND_TRACE = salvo
+        _tie_parity_node_restore(nodes, estado_geral)
+
+
+def _tie_parity_prism_rounds(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                             base_z_abs, num_courses, kwargs, estado_inicial=None):
+    """SECAO 82.1: verifica o preenchimento real e devolve a' convencao os T invertidos
+    pela paridade geral que deixaram junta a prumo na sua regiao ou uma fiada vazia
+    numa parede deles; re-resolve."""
+
+    if not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    revertidos = []
+    rodadas = 0
+    violacoes_finais = []
+    convencao = None
+    while True:
+        invertidos = [i for i, n in enumerate(nodes) if n.get("_tie_parity_fill_chosen") and n.get("_tie_parity_flip")]
+        violacoes = _tie_parity_real_fill_violations(result, nodes, walls_to_create, openings_per_wall, catalog,
+                                                     base_z_abs, invertidos)
+        if invertidos and estado_inicial is not None and TIE_PARITY_COMPARE_WITH_CONVENTION:
+            if convencao is None:
+                convencao = _tie_parity_convention_result(
+                    nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses,
+                    kwargs, estado_inicial)
+            if isinstance(convencao, dict) and convencao.get("error") is None:
+                violacoes = _tie_parity_worse_than_convention(
+                    violacoes, _tie_parity_real_fill_violations(convencao, nodes, walls_to_create,
+                                                                openings_per_wall, catalog, base_z_abs,
+                                                                invertidos))
+        violacoes = [dict((k, val) for k, val in v.items() if k != "identity") for v in violacoes]
+        violacoes_finais = violacoes
+        motivo = {}
+        for v in violacoes:
+            motivo.setdefault(v["node_index"], v["kind"])
+        culpados = sorted(motivo)
+        if not culpados or rodadas >= TIE_PARITY_PRISM_MAX_ROUNDS:
+            break
+        for node_index in culpados:
+            node = nodes[node_index]
+            node.pop("_tie_parity_flip", None)
+            node.pop("_tie_parity_fill_chosen", None)
+            node["_tie_parity_fill_rejected"] = motivo[node_index]
+            revertidos.append(node_index)
+        rodadas += 1
+        novo = _solve_building_blocks_all_courses_impl_core(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses, **kwargs)
+        if not isinstance(novo, dict) or novo.get("error") is not None:
+            break
+        result = novo
+    if isinstance(result, dict):
+        result["tie_parity_prism_check"] = {"rounds": rodadas, "reverted": revertidos,
+                                            "remaining": violacoes_finais}
+        if convencao is not None:
+            result["tie_parity_prism_check"]["compared_with_convention"] = True
+    return result
 
 
 def _solve_building_blocks_all_courses_impl_core(nodes, walls_to_create, end_to_node, openings_per_wall,

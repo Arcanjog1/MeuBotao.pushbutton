@@ -45,22 +45,24 @@ def _cm(value_ft):
 # legado do PRODUTO (secao 79 ligada). SECAO 80 (2026-09-25): o historico
 # tambem nao tinha verga/contraverga sem o CHANNEL - a sentinela desliga as duas.
 # SECAO 81 (2026-09-25): nem as regras gerais de composicao (71 + 60-65) - a
-# sentinela desliga as tres.
+# sentinela desliga as tres. SECAO 82 (2026-09-25): nem a paridade contextual dos T
+# - a sentinela desliga as quatro.
 LEGADO_HISTORICO = "LEGADO_ANTERIOR_A_SECAO_79"
 
 
 def solve(lines, openings, strategy=CHANNEL, policy=None, reverse=False, num_courses=NUM_COURSES):
     if strategy == LEGADO_HISTORICO:
         antes = (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
-                 m.GENERAL_COMPOSITION_QUALITY_ENABLED)
+                 m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED)
         m.JUNCTION_PHYSICAL_RULES_ENABLED = False
         m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = False
+        m.GENERAL_TIE_PARITY_ENABLED = False
         try:
             return _solve(lines, openings, None, policy, reverse, num_courses)
         finally:
             (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
-             m.GENERAL_COMPOSITION_QUALITY_ENABLED) = antes
+             m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED) = antes
     return _solve(lines, openings, strategy, policy, reverse, num_courses)
 
 

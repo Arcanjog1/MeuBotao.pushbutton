@@ -41,12 +41,16 @@ def _lines(dx=0.0, dy=0.0, reverse=False, order=(0, 1, 2)):
 
 def _solve(lines, courses=4, enabled=True, general=None):
     """`general=False` isola a secao 52 (so' orientacao): com as regras gerais de
-    composicao (secao 81) o arranjo 60-65 tambem recompõe as corridas."""
+    composicao (secao 81) o arranjo 60-65 tambem recompõe as corridas. Com `general`
+    informado a paridade contextual (secao 82) fica desligada - estes testes medem
+    orientacao e composicao sobre a MESMA paridade."""
     before = sva.SMALL_VOID_ORIENTATION_ENABLED
     before_general = m.GENERAL_COMPOSITION_QUALITY_ENABLED
+    before_parity = m.GENERAL_TIE_PARITY_ENABLED
     sva.SMALL_VOID_ORIENTATION_ENABLED = enabled
     if general is not None:
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = general
+        m.GENERAL_TIE_PARITY_ENABLED = False
     try:
         walls = [(line, ft(14.0), (False, False)) for line in lines]
         walls, jmap = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
@@ -56,6 +60,7 @@ def _solve(lines, courses=4, enabled=True, general=None):
     finally:
         sva.SMALL_VOID_ORIENTATION_ENABLED = before
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = before_general
+        m.GENERAL_TIE_PARITY_ENABLED = before_parity
     return res
 
 
@@ -95,8 +100,10 @@ def test_regras_gerais_nao_pioram_o_vazado_menor_da_secao_52():
 
 
 def test_peca_de_no_nunca_gira():
-    off = _solve(_lines(), enabled=False)
-    on = _solve(_lines(), enabled=True)
+    # a MESMA paridade nos dois solves: com a secao 82 a paridade e' escolhida pelo
+    # preenchimento real, que a orientacao (e o arranjo que depende dela) muda
+    off = _solve(_lines(), enabled=False, general=True)
+    on = _solve(_lines(), enabled=True, general=True)
 
     def nodes_rot(res):
         return sorted((ci, c["logical_code"], round(c["origin_world"].X * 30.48, 1),

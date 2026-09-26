@@ -100,9 +100,13 @@ def test_interruptor_liga_o_caminho_sem_reforco_e_as_chaves_do_modulo_seguem_des
     assert ws.BOND_TRACE is None and ws.BOND_TRACE_BAND is None
 
 
-def test_a_paridade_da_secao_72_nao_entra_na_secao_79(monkeypatch):
-    """Durante o solve sem reforco a busca de paridade por comprimento (72)
-    nunca e' chamada nem ligada; no CHANNEL ela continua ligada (controle)."""
+@pytest.mark.parametrize("paridade_geral", [False, True])
+def test_a_paridade_da_secao_72_nao_entra_na_secao_79(monkeypatch, paridade_geral):
+    """A secao 79 (regras fisicas de encontro sem reforco) nao liga a busca de
+    paridade por comprimento (72): sem a chave da secao 82 ela nunca e' chamada nem
+    ligada no NONE; com a 82 ela roda porque a 82 a liga (regra geral propria), com
+    o veto estrutural. No CHANNEL ela continua ligada (controle)."""
+    monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", paridade_geral)
     vistos = []
     original = ws._search_tie_parity_fill_balance
 
@@ -121,8 +125,12 @@ def test_a_paridade_da_secao_72_nao_entra_na_secao_79(monkeypatch):
     monkeypatch.setattr(ws, "solve_all_intersections", espia_all)
     lines, ops = _fixture("D3_um_lado")
     solve(lines, ops, strategy=None, num_courses=NUM)
-    assert estados and not any(estados), estados       # a chave da 72 fica desligada o solve inteiro
-    assert vistos == []                                # e a busca nunca roda
+    if paridade_geral:
+        assert estados and all(estados), estados       # ligada pela 82, o solve inteiro
+        assert vistos                                  # e a busca roda (uma decisao)
+    else:
+        assert estados and not any(estados), estados   # a chave da 72 fica desligada o solve inteiro
+        assert vistos == []                            # e a busca nunca roda
     del estados[:]
     solve(lines, ops, strategy=tcr.CHANNEL, num_courses=NUM)
     assert any(estados)                                # controle: no CHANNEL a 72 liga
