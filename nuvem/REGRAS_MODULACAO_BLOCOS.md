@@ -9538,6 +9538,11 @@ especiais 16 → 11, hard gates inalterados, tempo estável.
 
 ## 72. A paridade do nó é escolhida pelo que ela deixa para preencher (2026-09-17, IMPLEMENTADO, só CHANNEL)
 
+> **Estado (2026-09-25, D11):** sem reforço adicional a paridade dos T é escolhida pela regra GERAL da
+> **§82** (esta busca com veto estrutural, custo com desencontro e compensadores primeiro, aberturas que
+> só vetam, só T e o preenchimento real comparado com a convenção — §82.1). O CHANNEL continua com o
+> custo calibrado desta seção (T e X). Classificação da §72 no D11: MIXED.
+
 **Fenômeno físico.** Num encontro, só UMA das duas paredes ocupa a região do nó
 em cada fiada; a outra para na fronteira e volta a ocupar na fiada seguinte.
 Qual fiada de qual parede fica com a região é uma escolha livre — as duas
@@ -10737,3 +10742,167 @@ CHANNEL mantém a aceitação histórica (assinatura idêntica à main). Na BUTA
 nada (assinatura NONE idêntica com e sem ela); no TP1 as duas juntas novas não nascem e
 `PRISM_CONTINUOUS_JOINT` fica 16 → 4 (sem a guarda: 16 → 16, só trocadas de lugar). Testes:
 `test_guarda_de_identidade_barra_junta_a_prumo_nova`, `test_none_usa_a_guarda_de_junta_e_o_channel_nao`.
+
+## 82. Paridade CONTEXTUAL dos encontros T — regra geral (2026-09-25, IMPLEMENTADO, D11)
+
+**Pedido (ciclo D11):** achar a regra GERAL de escolha da paridade dos T — dirigida por uma função
+objetivo, sem copiar o MCP, sem copiar o HUMANO por id e sem simplesmente ligar a §72 no NONE —,
+sem §68, sem D14/3B, sem mexer em D6, D16/regra 75 ou nos cantos L55/L56.
+
+**Paridade (definição forense):** as fiadas em que a parede que CHEGA passa pelo eixo do nó (> 3 cm):
+par / ímpar / misto / nunca. Antes desta seção o NONE usava a **convenção fixa por papel** (a principal
+hospeda sempre na mesma fiada): 37 ímpar / 1 misto, contra HUMANO 17 par / 20 ímpar / 1 misto e MCP
+11 / 26 / 1.
+
+### Causa raiz e classificação da §72
+
+A §72 (busca gulosa global que inverte a paridade dos T/X pelo custo dos trechos livres) **não lê
+canaleta**: ficava só no CHANNEL por "legado idêntico à main". Ligada como está no NONE (ablação),
+ela reduz compensadores (555 → 509) mas cria **junta a prumo nova** junto de jamba (8284552, t = 614,
+nó f3 15): o custo foi calibrado com o reparo de jamba da §68 (a faixa jamba → âncora composta como
+unidade) e trata as aberturas como parede contínua; sem a §68 o reparo "primeira composição que
+fecha" deixa a borda do B54 sobre `B19|B34`. Também não modela o desencontro entre as fiadas (a Fiada B
+desencontra a A; a A só desvia das bordas de nó da B), põe **peças antes de compensadores** (aceita
+compensador onde o humano não aceita) e não vê o preenchimento real (trecho que o modelo fecha com
+compensador e o real classifica como não modular). **Classificação: MIXED** — o princípio (a paridade
+decide o comprimento do trecho livre, e o comprimento decide a composição) é GERAL; a calibração
+(custo contínuo, sem desencontro, peças primeiro) é CHANNEL_SPECIFIC.
+
+### Régua do projeto humano (fase 7, verificada por refutação)
+
+- Em cada trecho livre entre dois T consecutivos, a relação de fase humana é a de menor custo
+  lexicográfico **compensadores primeiro, depois peças que não são o bloco inteiro** (contando o B34 de
+  amarração forçado em cada cruzamento): HUMANO 25/25 arestas, MCP 23/25, convenção 14/25.
+- HUMANO e MCP concordam na fase RELATIVA em 19/21 pares acoplados; a fase ABSOLUTA diverge em
+  metade — soluções **espelhadas** (a fiada k de um é a fiada k xor 1 do outro).
+- As 18 divergências HUMANO × MCP são 2 blocos espelhados (14 + 2 nós) e 2 nós isolados (27, 51):
+  4 equivalentes (31–34, neutros através de jamba), 3 em que o humano é melhor no motor real (12, 27,
+  51) e 11 que nascem de 2 decisões de aresta (18–41, 24–26) em que o MCP/§72 aceitam compensador; o nó
+  18 fica preso pela guarda de verga.
+
+### Regra final (função objetivo, nesta ordem)
+
+1. **Restrições duras antes do custo:** nenhuma falha de nó nova, nenhum conflito de papel novo,
+   nenhuma interpenetração nova entre peças de nó (veto estrutural); nó a menos de um bloco + junta
+   (40 cm) de jamba fica na convenção (guarda de verga — sem ela 4 T perdem verga).
+2. **Custo por parede com desencontro** (`_tie_parity_fill_stagger_cost`, `TIE_PARITY_FILL_STAGGER`):
+   a Fiada A pelo layout padrão (desviando das bordas de nó da B quando colide, como o preenchimento
+   real) e a Fiada B por `_pier_layout_avoiding_joints` contra as juntas da A. Ordem lexicográfica
+   (`TIE_PARITY_FILL_COST_ORDER = "compensadores"`): trechos que não fecham, excesso da regra #2, juntas
+   coincidentes (regra #1), **compensadores**, peças que não são o bloco inteiro, peças, especiais, B34.
+3. **Aberturas ativas na banda só VETAM** (`TIE_PARITY_FILL_OPENING_MODE = "veto"`): decide o custo
+   contínuo; a inversão não pode piorar os trechos limitados por abertura.
+4. **Só encontros T** (`TIE_PARITY_FILL_NODE_KINDS`): no X as duas paredes passam e a peça do nó fica no
+   meio das duas; o preenchimento real desmentiu o modelo em 8 de 17 escolhas de X no TGD (junta a
+   prumo) e criou corrida de compensador junto de jamba em 2 paredes. O X fica na convenção (o CHANNEL
+   continua movendo T e X).
+5. **Busca determinística:** melhoria estrita, melhor inversão por rodada, ordem geométrica do nó,
+   decisão única por planta (vale para todas as bandas e rebuilds).
+6. **§82.1 — o preenchimento real, comparado com o da convenção, tem a última palavra** (abaixo).
+
+**LOCAL OU GLOBAL:** global com efeito local — cada inversão é avaliada contra o custo da planta
+inteira (uma inversão muda os trechos das duas paredes do nó e dos vizinhos), e a guarda 82.1 julga
+cada T na sua região (paredes do nó, até 60 cm).
+
+**Nenhum id:** a regra só lê geometria (comprimentos, juntas, aberturas, tipo de nó); teste
+`test_sem_hardcode` (nenhum número de 5+ dígitos, nome de projeto, HUMANO/MCP ou comparação por id no
+código das funções da seção).
+
+### 82.1 O preenchimento real tem a última palavra (comparado com a convenção)
+
+Depois do solve com a paridade geral, a **convenção** (o mesmo pipeline sem a busca, sobre o estado
+inicial dos nós) é resolvida uma vez; cada T invertido fica invertido só se a região dele (paredes do
+nó, até `TIE_PARITY_PRISM_RADIUS_CM` = 60 cm) **não piora em nenhuma regra dura** em relação à
+convenção:
+
+- **#1** — junta repetida em 3+ fiadas seguidas que a convenção não tinha (`PRISM_CONTINUOUS_JOINT`;
+  isenta a junta de peça pequena encostada em abertura, §11.8);
+- **cobertura** — fiada sem nenhuma peça entre fiadas preenchidas (`COURSE_WITHOUT_PIECES`, o critério
+  do validador `COVERAGE_MISSING_ROW`);
+- **#2** — compensadores aglomerados junto do nó (mais de um por fiada e parede) acima dos da convenção
+  (`COMPENSATOR_SEQUENCE`).
+
+O T que piora volta para a convenção (`_tie_parity_fill_rejected` com o motivo) e o pipeline
+re-resolve (no máximo 2 rodadas); `tie_parity_prism_check` = rodadas, revertidos, violações
+restantes. Comparar, e não julgar em absoluto, é o que mantém as inversões boas cujas juntas e
+compensadores já existem na convenção (no TP1 as juntas dos nós 149/153 existem nas duas paridades).
+A convenção interna é **idêntica peça a peça** (posição a 1e-4) ao solve com a chave desligada
+(BUTANTÃ 7.225 peças; teste `test_convencao_interna_e_o_solve_sem_a_paridade_geral`).
+
+Medido antes de cada guarda existir: TGD/TP1 144/32 juntas contínuas novas, todas a 27–28 cm de um T
+invertido (borda do B54 sobre `B19|B34`); TGD V1 uma parede não modular com a fiada B inteira vazia
+(8 fiadas, `COVERAGE_MISSING_ROW` crítico) ao inverter o T da ponta — o modelo fechava o trecho de
+136 cm com compensador, o real o classifica como não modular; TGD V2 `C09 C04` encostados ao lado do T
+invertido (+17 `COMPENSATOR_CONSECUTIVE`, +19 `COMPENSATOR_EXCESS_IN_RUN`).
+
+### Ablação (BUTANTÃ 34 eixos, NONE, régua forense)
+
+| Configuração | COMP | Junto de nó | B39 | B34 | Junta a prumo nova | MCP exato | HUMANO exato |
+|---|---|---|---|---|---|---|---|
+| NONE (main) | 555 | 292 | 3.841 | 1.898 | — | 57,0 % | 21,1 % |
+| + §72 como está | 509 | 230 | 4.098 | 1.616 | **1** | 88,5 % | 21,5 % |
+| + §82 peças primeiro | 491 | 213 | 4.055 | 1.675 | **1** | 77,7 % | 24,3 % |
+| **+ §82 compensadores primeiro (final)** | **479** | **202** | **4.032** | **1.707** | **0** | **71,7 %** | **23,3 %** |
+
+Modos das aberturas (custo peças primeiro): banda 468 / pareto 480 / soma 473 / veto 491 / contínuo
+509 compensadores — "banda" piora 19 de 278 salas no estresse, os outros não pioram nenhuma; o veto
+fica. Estresse sintético (salas fechadas na grade com paredes internas entre dois T, aberturas
+pseudo-aleatórias, 278 casos limpos): **7 melhores, 0 piores, −168 compensadores**.
+
+### Resultado
+
+**BUTANTÃ NONE (34 eixos):** compensadores 555 → **479** (7,68 → 6,72 %; HUMANO 487, MCP 397); junto
+de nó 292 → **202**; B39 3.841 → 4.032; B34 1.898 → 1.707 (amarração 472 → **472**, composição 1.426 →
+1.235); B19 392 → 377; C04 255 → 210; C09 300 → 269; colunas de compensador ≥ 4 fiadas 73 → 63; juntas
+contínuas 46 → 46 (**0 novas**); juntas coincidentes 5,41 → 5,54 %; divergência por eixo HUMANO 1.795 →
+1.134, MCP 1.161 → 360; aderência MCP 57,0 → 71,7 %, HUMANO 21,1 → 23,3 %. T 37/37, L 3, NMU 0, vazio 30
+cm, peças no vão 0, canaleta como amarração 0, gates 75/76 = 0. Inversões: 8 T (f3 2, 4, 33, 34, 35,
+48, 50, 58), nenhuma revertida pela 82.1.
+
+**22 eixos:** B34 930 → 702, B39 1.281 → 1.491, COMP 132 → 108 (HUMANO 715 / 1.436 / 158; MCP 686 /
+1.503 / 113); aderência MCP 47,0 → 80,3 %, HUMANO 16,4 → 17,9 %.
+
+**Paridade (38 T com paridade definida):** convenção 0 par / 37 ímpar / 1 misto → **8 / 29 / 1**
+(HUMANO 17 / 20 / 1, MCP 11 / 26 / 1). Consenso HUMANO = MCP em 20 T: segue 18, quebra 2 (f3 4 —
+compensadores primeiro: compensadores junto do nó 11 → 0 offline, 6 → 0 no Revit, com um C04 passando
+para o fechamento da jamba da porta a 47 cm; f3 15 — invertê-lo deixa junta a prumo na jamba sem a §68). Divergência em 18 T:
+segue o MCP em 15 e o HUMANO em 3. Coincidência de paridade MCP/SCRIPT 27 → 33, HUMANO/SCRIPT 21 → 21.
+
+**D10 (8284580, fiadas 0/1):** HUMANO `B39 B39 B39 B39 B34` / `B34 B39 B39 B39 B39`; MCP `B34 B39 B39 B39
+B39` / `B39 B39 B39 B39 B34`; antes (paridade A = convenção) `B34 B39 B34 B34 B34` / `B34 B34 B34 B34 B34
+B34`; paridade B (inverter f3 50) = arranjo do MCP; inverter f3 51 = arranjo do HUMANO (as duas
+alternativas são equivalentes e espelhadas: 4 B39 + o B34 da amarração por fiada, 0 compensador);
+depois = **arranjo do MCP** (escolha determinística entre os equivalentes).
+
+**Benchmark (baseline não regravado; categoria = paredes com achado; main → §82):**
+
+| Projeto | compensators | prism | `PRISM_CONTINUOUS_JOINT` (novas) | críticos | Inversões / revertidas |
+|---|---|---|---|---|---|
+| Piloto | 6 → 6 | 1 → 1 | 3 → 3 (0) | 11 → 11 | 0 |
+| TP1 V1 | 66 → 65 | 4 → 4 | 4 → 4 (0) | 24 → 24 | 14 / 5, 15 (#1) |
+| TP1 V2 | 66 → 65 | 4 → 4 | 4 → 4 (0) | — | 14 / 5, 15 (#1) |
+| TGD V1 | 52 → **51** | 11 → 11 | 215 → 215 (0) | 733 → 733 | 6 / 61 (cobertura), 169 (#2) |
+| TGD V2 | 60 → **59** | 5 → 5 | 53 → 53 (0) | 527 → 527 | 11 / 54, 82, 106, 114, 191 (#2) |
+
+Achados por código: TGD V1 todos os de compensador caem (`EXCESS_IN_RUN` 236 → 226); TP1
+`CONSECUTIVE` 471 → 453, `AVOIDABLE` 69 → 64, mas `PRISM_STAGGER_BELOW_TARGET` 1.734 → 1.823 (não
+crítico); TGD V2 `STAGGER_BELOW_TARGET` 740 → 651, mas `COMPENSATOR_CONSECUTIVE` 262 → 270 e
+`EXCESS_IN_RUN` 369 → 377 (resíduo — sem a 82.1 comparativa eram +17/+19; a guarda compara a contagem de compensadores por fiada junto do nó, não se eles ficam encostados — pendência). Tempo de solve
+2,7–4× o da main (a convenção é resolvida uma segunda vez quando há inversão).
+
+**Revit (cópia `CICLO10_butanta_testes`, caminho do produto, NONE):** 7.126 planejadas = 7.126 criadas,
+0 puladas/falhas, 0 invasões, 0 trechos não resolvidos, gates 75/76 = 0, as mesmas 3 fiadas L e as
+mesmas pendências de verga/contraverga; referências intocadas. O motor final (com a 82.1 comparativa) resolvido de
+novo na mesma cópia dá as mesmas contagens por código e as mesmas inversões; o solve leva 612 s no IronPython. Contra o CICLO9 (motor da main):
+compensadores 550 → 468, junto de nó 292 → 202, juntas contínuas 46 → 46 (0 novas), aderência MCP
+58,7 → 73,8 %, HUMANO 21,2 → 23,1 %; D10 = MCP; inversões e custo idênticos ao offline. Casos: D10;
+f3 2 (HUMANO = MCP: `B39 B39 B39 C04 B54 …` → `B39 B34 B34 B34 B34 …` = MCP, 14 compensadores junto do nó →
+0); f3 48 (HUMANO ≠ MCP: segue o MCP); f3 50/48 (dois T a 210 cm na mesma parede: os dois B54 na mesma
+fiada, como o MCP); f3 4 (porta a 47 cm do T: o C04 sai da parede que chega e vira fechamento de jamba).
+
+**Não muda:** CHANNEL (custo calibrado da 72, T e X, sem 82.1 — assinatura idêntica à main), §68 (não
+roda no NONE — teste espião), §81, D6, D16/regra 75, cantos L55/L56. Desligar
+`GENERAL_TIE_PARITY_ENABLED` devolve a main.
+
+**Pendências:** resíduo de `COMPENSATOR_CONSECUTIVE`/`EXCESS_IN_RUN` no TGD V2 (+8/+8); `PRISM_STAGGER_BELOW_TARGET` no TP1 (+89, não crítico); custo de tempo (segundo solve);
+X fora da regra geral (sem evidência humana; medido nocivo no TGD); o f3 15 depende da §68.
