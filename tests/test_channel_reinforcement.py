@@ -53,16 +53,19 @@ LEGADO_HISTORICO = "LEGADO_ANTERIOR_A_SECAO_79"
 def solve(lines, openings, strategy=CHANNEL, policy=None, reverse=False, num_courses=NUM_COURSES):
     if strategy == LEGADO_HISTORICO:
         antes = (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
-                 m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED)
+                 m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED,
+                 m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED)
         m.JUNCTION_PHYSICAL_RULES_ENABLED = False
         m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = False
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = False
         m.GENERAL_TIE_PARITY_ENABLED = False
+        m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED = False     # secao 83
         try:
             return _solve(lines, openings, None, policy, reverse, num_courses)
         finally:
             (m.JUNCTION_PHYSICAL_RULES_ENABLED, m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED,
-             m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED) = antes
+             m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_TIE_PARITY_ENABLED,
+             m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED) = antes
     return _solve(lines, openings, strategy, policy, reverse, num_courses)
 
 

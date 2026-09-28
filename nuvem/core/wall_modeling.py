@@ -3801,6 +3801,19 @@ CHANNEL_COMPENSATOR_TIEBREAK_ENABLED = True
 # ciclo proprio - D11). Desligar esta chave devolve o comportamento anterior.
 GENERAL_COMPOSITION_QUALITY_ENABLED = True
 
+# SECAO 83 (ciclo 11, 2026-09-28): a SECAO 68 (a faixa jamba->ancora e' composta
+# como UMA unidade: o reparo de abertura expande dentro do orcamento de sempre e
+# fica com a MELHOR composicao) vale no caminho GERAL, com a GUARDA DE JUNTA que
+# faltava: a qualidade de cada composicao comeca pelas juntas dela que coincidem
+# com as juntas ja' conhecidas da familia oposta (regra #1), antes das pecas de
+# acerto (wall_stepper.OPENING_REPAIR_JOINT_GUARD_ACTIVE). A ablacao da convergencia
+# mostrou que a 68 e' a regra que produz ~100 das 237 diferencas MCP x SCRIPT
+# (sobretudo junto de jamba); sem a guarda ela criava a junta a prumo da 8284522
+# (11 fiadas) que o MCP tem e o HUMANO evita. O CHANNEL continua com a 68
+# historica (CHANNEL_REPAIR_PREFER_CLEAN_ENABLED, sem a guarda). Desligar esta
+# chave devolve o comportamento anterior.
+GENERAL_REPAIR_PREFER_CLEAN_ENABLED = True
+
 # SECAO 72 (2026-09-17): no fluxo CHANNEL, a paridade de cada no' T/X e'
 # escolhida pelo COMPRIMENTO do trecho livre que ela deixa para cada fiada
 # preencher, e nao so' pela convencao de papel - ver
@@ -4889,10 +4902,17 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     Legado (`strategy=None`) deixa a flag desligada: continua igual a' main."""
     from core.engine import wall_stepper as _stepper_repair
     saved_repair_clean = _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE
+    saved_repair_guard = (_stepper_repair.OPENING_REPAIR_JOINT_GUARD_ACTIVE,
+                          _stepper_repair.OPENING_REPAIR_TIER_GATE_ACTIVE)
     saved_tiebreak = _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK
+    # SECAO 83: a 68 tambem no caminho geral, e ali com a guarda de junta
+    _reparo_geral = bool(kwargs.get("opening_reinforcement_strategy") is None
+                         and GENERAL_REPAIR_PREFER_CLEAN_ENABLED)
     _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = bool(
-        kwargs.get("opening_reinforcement_strategy") is not None
-        and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED)
+        (kwargs.get("opening_reinforcement_strategy") is not None
+         and CHANNEL_REPAIR_PREFER_CLEAN_ENABLED) or _reparo_geral)
+    _stepper_repair.OPENING_REPAIR_JOINT_GUARD_ACTIVE = _reparo_geral
+    _stepper_repair.OPENING_REPAIR_TIER_GATE_ACTIVE = _reparo_geral
     # SECAO 81: a 71 e' regra GERAL de qualidade (vale em qualquer estrategia)
     _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = bool(
         (kwargs.get("opening_reinforcement_strategy") is not None and CHANNEL_COMPENSATOR_TIEBREAK_ENABLED)
@@ -4955,6 +4975,7 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
                 num_courses, kwargs, estado_inicial=estado_inicial)
         if isinstance(result, dict):
             result["physical_modulation_tolerances"] = bool(PHYSICAL_MODULATION_TOLERANCES_ENABLED)
+            result["general_repair_prefer_clean"] = _reparo_geral
             result["unresolved_spans"] = _unresolved_spans(result)
             result["junction_physical_rules"] = bool(junction_rules or kwargs.get("opening_reinforcement_strategy")
                                                      is not None)
@@ -4973,6 +4994,8 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         (_stepper_repair.RESIDUAL_NODE_BOUNDED_ABSORPTION_ENABLED,
          _cm_phys.JAMB_SEGMENT_NOISE_TOLERANCE_ENABLED) = saved_physical
         _stepper_repair.OPENING_REPAIR_PREFER_CLEAN_ACTIVE = saved_repair_clean
+        (_stepper_repair.OPENING_REPAIR_JOINT_GUARD_ACTIVE,
+         _stepper_repair.OPENING_REPAIR_TIER_GATE_ACTIVE) = saved_repair_guard
         _stepper_repair.COMPENSATOR_COUNT_IN_TIEBREAK = saved_tiebreak
         _stepper_repair.TIE_PARITY_FILL_BALANCE = saved_parity_balance
         (_stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES,

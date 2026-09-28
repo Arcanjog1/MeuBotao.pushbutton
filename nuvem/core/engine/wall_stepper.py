@@ -7734,22 +7734,152 @@ OPENING_REPAIR_PLACEMENT_REASON = "OPENING_REPAIR_FILL"
 # o legado (`strategy=None`) continua byte a byte igual a' main.
 OPENING_REPAIR_PREFER_CLEAN_ACTIVE = False
 
+# SECAO 83 (2026-09-28) - a SECAO 68 no caminho GERAL, com GUARDA DE JUNTA.
+# A melhor composicao da faixa jamba->ancora (acima) so' olhava pecas de
+# acerto; o criterio "vazado/junta desalinhado da fiada oposta" descrito na
+# secao 68 nunca existiu no codigo. No NONE isso criava junta a prumo: medido
+# na BUTANTA (eixo 8284522, T a 407 cm e porta a 469 cm), a janela expandida
+# trocava `B34 B19` (junta a 449 cm) por `B19 B34` (junta a 434 cm, em cima da
+# face NO'|FILL do B54 da familia oposta) - junta continua em 11 fiadas. Com a
+# guarda, a qualidade de uma solucao comeca pelo numero de juntas INTERNAS
+# dela que coincidem com juntas JA' conhecidas da familia oposta (as internas
+# e as de contorno contra peca de no', ver `_repair_guard_joint_positions_cm`)
+# - a regra #1 antes de qualquer peca de acerto. So' a ESCOLHA entre
+# composicoes que a busca de sempre ja' produz muda: nenhuma posicao nova e'
+# gerada e a lista de juntas da busca/recorte continua a mesma (a de contorno
+# ali cria jamba em outro lugar - ver o comentario de course_a_boundary_joint_
+# positions_cm em solve_wall_free_fill). Ligada so' no caminho geral
+# (wall_modeling.GENERAL_REPAIR_PREFER_CLEAN_ENABLED); o CHANNEL mantem a
+# secao 68 historica (guarda desligada, assinatura igual a' main).
+OPENING_REPAIR_JOINT_GUARD_ACTIVE = False
+# SECAO 83 - GUARDA DE TIER (so' no caminho geral): a ordem de fechamento da
+# secao 2 (decisao do usuario de 2026-09-11) poe UM compensador por trecho
+# (tier 5) antes de uma FILEIRA de B34 (tier 5b); a qualidade da secao 68
+# inverte isso ("um B34 a mais nunca perde para um compensador"), o que no
+# CHANNEL e' aceito, mas no NONE trocaria `B39 C09 B19` por `B34 B34` nos
+# pilaretes entre dois vaos - o que a secao 70 mediu e rejeitou e o HUMANO nao
+# faz. Ver `_repair_tier_gate_blocks`.
+OPENING_REPAIR_TIER_GATE_ACTIVE = False
 
-def _repair_solution_quality(solution, catalog):
+
+def _repair_strip_codes(seg_cands, first, last, removed_set):
+    """SECAO 83: (esquerda, direita) - codigos das pecas da modulacao CONTINUA que
+    formam a FAIXA jamba->ancora de cada lado da primeira janela do reparo
+    [first, last]: da peca seguinte a' janela ate' a proxima peca derrubada por
+    outro vao (ou a ponta do trecho continuo). E' a unidade da secao 68: o que a
+    expansao daquele lado pode vir a engolir. Funcao pura."""
+    right = []
+    i = last + 1
+    while i < len(seg_cands) and i not in removed_set:
+        right.append(seg_cands[i].get("logical_code")); i += 1
+    left = []
+    i = first - 1
+    while i >= 0 and i not in removed_set:
+        left.append(seg_cands[i].get("logical_code")); i -= 1
+    return (left, right)
+
+
+def _repair_tier_gate_blocks(reference, candidate, catalog, strip_codes=((), ())):
+    """SECAO 83 (caminho geral): True quando `candidate` - uma composicao que a
+    secao 68 achou numa janela expandida - so' ganha da primeira composicao que
+    fechou (`reference`) virando FILEIRA de B34 numa faixa jamba->ancora que
+    fechava dentro do teto de compensadores. Ordem da secao 2: 1 compensador
+    (tier 5) antes da fileira (tier 5b, mais de MAX_SPECIAL_BOND_PER_TRECHO pecas
+    especiais num trecho). Avaliado POR SUBTRECHO do candidato: os compensadores da
+    referencia no mesmo span, mais as pecas da modulacao continua do lado que abre
+    para a ancora (`strip_codes` = (esquerda, direita), ver `_repair_strip_codes`;
+    um subtrecho entre dois vaos nao tem lado aberto). Se essa faixa ja' precisava
+    de 2+ compensadores (inclusive C09+C04 encostados), a fileira vem antes deles e
+    a 68 pode melhorar - medido: `B19 C04 ... B39 B39 B39 C09` de jamba a B54 vira
+    `B39 B34 B34 B34`, que o arranjo geral (61) recompoe em `B34 B39 B39 B39`; o
+    pilarete de 69 cm entre dois vaos (`B39 C09 B19`, 1 compensador) NAO vira
+    `B34 B34`. Pecas lidas do catalogo (`is_compensator`/`is_special_bond`), nunca
+    por codigo fixo. Funcao pura."""
+    if not OPENING_REPAIR_TIER_GATE_ACTIVE or reference is None or candidate is reference:
+        return False
+    is_comp = lambda code: bool((catalog.get(code) or {}).get("is_compensator"))
+    is_special = lambda code: bool((catalog.get(code) or {}).get("is_special_bond"))
+    left_codes, right_codes = strip_codes or ((), ())
+    for sub, layout in candidate or []:
+        if sum(1 for code, _a, _b in (layout or []) if is_special(code)) <= MAX_SPECIAL_BOND_PER_TRECHO:
+            continue
+        comp = 0
+        for ref_sub, ref_layout in reference or []:
+            if ref_sub["hi"] > sub["lo"] + 0.5 and ref_sub["lo"] < sub["hi"] - 0.5:
+                comp += sum(1 for code, _a, _b in (ref_layout or []) if is_comp(code))
+                if sum(1 for code, _a, _b in (ref_layout or []) if is_special(code)) > MAX_SPECIAL_BOND_PER_TRECHO:
+                    comp = MAX_COMPENSATORS_PER_TRECHO + 1     # a referencia ja' era fileira
+        if sub.get("left_opening") is None:
+            comp += sum(1 for code in left_codes or () if is_comp(code))
+        if sub.get("right_opening") is None:
+            comp += sum(1 for code in right_codes or () if is_comp(code))
+        if comp <= MAX_COMPENSATORS_PER_TRECHO:
+            return True
+    return False
+
+
+def _repair_guard_joint_positions_cm(course, avoid_joint_positions_cm, opposite_node_joints_cm,
+                                     course_a_boundary_joint_positions_cm):
+    """SECAO 83: juntas que a escolha da melhor composicao do reparo (secao 68)
+    nao pode repetir - as da busca (`avoid_joint_positions_cm`), mais as juntas
+    de contorno NO'|FILL da familia oposta: deduzidas da geometria das pecas
+    de no' (`opposite_node_joints_cm`, valem para as duas familias) e, na
+    familia B, tambem as de contorno REAIS da A. None quando a guarda esta'
+    desligada (a secao 68 historica). Funcao pura."""
+    if not OPENING_REPAIR_JOINT_GUARD_ACTIVE:
+        return None
+    return (list(avoid_joint_positions_cm or []) + list(opposite_node_joints_cm or [])
+            + (list(course_a_boundary_joint_positions_cm or []) if course == "B" else []))
+
+
+def _repair_guarded_window_solution(plan, catalog, allow_compensators, solution, guard_joint_positions_cm,
+                                    target_void_positions_cm):
+    """SECAO 83: numa janela EXPANDIDA do reparo (as que so' existem para a secao
+    68 procurar uma composicao melhor, ou porque a primeira nao fechou), a busca
+    de sempre nao conhece as juntas de contorno NO'|FILL da familia oposta e pode
+    devolver justamente a composicao que as repete (medido: `B19 B39` com a junta
+    em cima da face do B54 do no', quando `B39 B19` fecha a mesma janela). So'
+    quando a composicao da janela tem junta coincidente com a guarda, a janela e'
+    refeita desencontrando TAMBEM as juntas da guarda; a alternativa so' substitui
+    a original se fechar com MENOS juntas coincidentes. Sem coincidencia a janela
+    fica exatamente como a busca de sempre a devolveu. A primeira janela nunca
+    passa por aqui."""
+    if not _repair_solution_quality(solution, catalog, guard_joint_positions_cm)[0]:
+        return solution
+    alternative, failures = _solve_repair_subsegments(
+        plan, catalog, allow_compensators, guard_joint_positions_cm, target_void_positions_cm, True)
+    if failures or (_repair_solution_quality(alternative, catalog, guard_joint_positions_cm)[0]
+                    >= _repair_solution_quality(solution, catalog, guard_joint_positions_cm)[0]):
+        return solution
+    return alternative
+
+
+def _repair_solution_quality(solution, catalog, guard_joint_positions_cm=None):
     """Qualidade de uma solucao de reparo (MENOR e' melhor):
 
-        (compensadores/pastilhas,
+        (juntas coincidentes com a fiada oposta - SECAO 83, zero sem a guarda,
+         compensadores/pastilhas,
          meio blocos,
          pecas de amarracao usadas como enchimento,
          numero de pecas)
 
-    A ORDEM e' a prioridade fisica: primeiro sumir com o compensador/pastilha/
-    meio bloco, e so' entao preferir bloco inteiro a B34/B54. Assim um B34 a
-    mais NUNCA perde para um compensador - a inversao que a evidencia humana
-    de 2026-09-16 mostrou (o humano fecha com B34 a mesma faixa em que o solver
-    punha C09+B19)."""
-    comp = half = special = pieces = 0
-    for _sub, layout in solution or []:
+    A ORDEM e' a prioridade fisica: primeiro a regra #1 (nenhuma junta a prumo
+    nova - so' conta com a guarda da secao 83 ligada e juntas de referencia),
+    depois sumir com o compensador/pastilha/meio bloco, e so' entao preferir
+    bloco inteiro a B34/B54. Assim um B34 a mais NUNCA perde para um
+    compensador - a inversao que a evidencia humana de 2026-09-16 mostrou (o
+    humano fecha com B34 a mesma faixa em que o solver punha C09+B19) - e uma
+    composicao limpa NUNCA ganha criando junta a prumo (o humano aceita
+    `B39 C04 C09` para desencontrar a junta do B54 do no', secao 83)."""
+    comp = half = special = pieces = joints = 0
+    for sub, layout in solution or []:
+        if OPENING_REPAIR_JOINT_GUARD_ACTIVE and guard_joint_positions_cm and layout:
+            joints += _count_joint_coincidences_cm(
+                # a isencao de peca pequena encostada (C04/C09/B19) vale SO' contra
+                # ABERTURA - `leading_open` tambem e' True contra o braco de um no'
+                _layout_internal_joint_positions_cm(layout, sub["lo"], sub.get("left_opening") is not None,
+                                                    sub.get("right_opening") is not None),
+                guard_joint_positions_cm)
         for code, _start, _end in layout or []:
             entry = catalog.get(code) or {}
             if entry.get("is_compensator"):
@@ -7759,7 +7889,7 @@ def _repair_solution_quality(solution, catalog):
             elif entry.get("is_special_bond"):
                 special += 1
             pieces += 1
-    return (comp, half, special, pieces)
+    return (joints, comp, half, special, pieces)
 
 
 def _is_acerto_code(code, catalog):
@@ -8140,8 +8270,12 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                                allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
                                avoid_joint_positions_cm=None,
                                target_void_positions_cm=None,
-                               prefer_avoiding=False):
+                               prefer_avoiding=False,
+                               repair_guard_joint_positions_cm=None):
     """ETAPAS 6 a 11 para UMA fiada/variante de UMA parede.
+
+    `repair_guard_joint_positions_cm` (SECAO 83): juntas que a escolha da
+    melhor composicao da secao 68 nao pode repetir - None = secao 68 historica.
 
     `candidates` sao as pecas da modulacao CONTINUA desta fiada/variante;
     `seg_records` diz de qual trecho continuo cada faixa da lista saiu
@@ -8225,6 +8359,8 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
             best_solution = None
             best_quality = None
             best_state = None
+            tier_reference = None      # SECAO 83: a primeira composicao que fechou
+            tier_strip_codes = ((), ())
             while True:
                 # Um run pode ter crescido ate' encostar no proximo: nesse
                 # caso os dois viram UMA regiao so' (e' o caso do PILARETE
@@ -8242,6 +8378,11 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     plan, catalog, allow_compensators,
                     avoid_joint_positions_cm, target_void_positions_cm, prefer_avoiding,
                 )
+                if not failures and repair_guard_joint_positions_cm and (grow_left or grow_right):
+                    # SECAO 83: janela expandida cuja composicao criaria junta a prumo
+                    candidate_solution = _repair_guarded_window_solution(
+                        plan, catalog, allow_compensators, candidate_solution,
+                        repair_guard_joint_positions_cm, target_void_positions_cm)
                 if not failures:
                     if not OPENING_REPAIR_PREFER_CLEAN_ACTIVE:
                         solved = candidate_solution
@@ -8249,13 +8390,18 @@ def _recut_openings_and_repair(wall_idx, wall_p0, wall_dir, catalog, candidates,
                     # SECAO 68: a primeira composicao que fecha nao e'
                     # necessariamente a melhor. Guarda esta e continua
                     # expandindo dentro do orcamento que ja' existia.
-                    quality = _repair_solution_quality(candidate_solution, catalog)
-                    if best_solution is None or quality < best_quality:
+                    quality = _repair_solution_quality(candidate_solution, catalog,
+                                                       repair_guard_joint_positions_cm)
+                    if tier_reference is None:
+                        tier_reference = candidate_solution
+                        tier_strip_codes = _repair_strip_codes(seg_cands, first, last, removed_set)
+                    if (best_solution is None or quality < best_quality) and not _repair_tier_gate_blocks(
+                            tier_reference, candidate_solution, catalog, tier_strip_codes):
                         best_solution = candidate_solution
                         best_quality = quality
                         best_state = (first, last, merged_upto, set(expansion_absorbed))
-                    if quality[0] == 0 and quality[1] == 0:
-                        break          # sem peca de acerto: nao ha' o que melhorar
+                    if quality[0] == 0 and quality[1] == 0 and quality[2] == 0:
+                        break          # sem junta a prumo nem peca de acerto: nao ha' o que melhorar
                     grew = False
                     # NUNCA engolir peca que um reparo ANTERIOR desta mesma
                     # fiada ja' substituiu: a esquerda desta regiao pode ser o
@@ -9416,6 +9562,12 @@ def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, op
                         course_a_void_positions_cm if course == "B" else None
                     ),
                     prefer_avoiding=(course == "B" or variant_index > 0),
+                    # SECAO 83: guarda de junta da escolha da secao 68
+                    repair_guard_joint_positions_cm=_repair_guard_joint_positions_cm(
+                        course,
+                        (course_a_joint_positions_cm + own_family_joint_positions_cm
+                         if course == "B" else own_family_joint_positions_cm),
+                        opposite_node_joints_cm, course_a_boundary_joint_positions_cm),
                 )
                 candidates[variant_candidates_start:] = recut["candidates"]
                 fuse_adjacent_equal_compensators(candidates, variant_candidates_start, p0, wall_dir, catalog)

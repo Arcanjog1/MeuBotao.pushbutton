@@ -53,15 +53,19 @@ _CACHE = {}
 
 
 def _solve(nome, geral=True, estrategia=None, reverse=False):
+    """A secao 81 medida ISOLADA: a secao 83 (68 com guarda de junta) fica desligada nos
+    dois lados da comparacao - ela tambem troca compensador de jamba por bloco e, ligada
+    nos dois, esconderia o efeito da 81 (ver test_reparo_68_guarda_junta.py)."""
     chave = (nome, geral, estrategia, reverse)
     if chave not in _CACHE:
-        antes = m.GENERAL_COMPOSITION_QUALITY_ENABLED
+        antes = (m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED)
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = geral
+        m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED = False
         try:
             lines, ops = FIXTURES[nome]()
             _CACHE[chave] = tcr.solve(lines, ops, strategy=estrategia, reverse=reverse)
         finally:
-            m.GENERAL_COMPOSITION_QUALITY_ENABLED = antes
+            m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED = antes
     return _CACHE[chave]
 
 
@@ -304,9 +308,11 @@ def test_channel_nao_muda_com_a_chave_geral(nome):
 
 
 def test_none_liga_so_71_e_60_65_nunca_68_58_2_ou_72(monkeypatch):
-    """Secao 81 isolada: com a chave da 82 desligada, o NONE liga 71 e 60-65 e nunca
-    68, 58.2 ou 72. (A 72 no NONE e' da secao 82 - ver test_paridade_contextual_t.py.)"""
+    """Secao 81 isolada: com as chaves da 82 e da 83 desligadas, o NONE liga 71 e 60-65 e
+    nunca 68, 58.2 ou 72. (A 72 no NONE e' da secao 82 - ver test_paridade_contextual_t.py;
+    a 68 no NONE e' da secao 83 - ver test_reparo_68_guarda_junta.py.)"""
     monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", False)
+    monkeypatch.setattr(m, "GENERAL_REPAIR_PREFER_CLEAN_ENABLED", False)
     estados, arranjos, chamadas72 = [], [], []
     core = m._solve_building_blocks_all_courses_core
 

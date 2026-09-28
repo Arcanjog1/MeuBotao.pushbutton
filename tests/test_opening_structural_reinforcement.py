@@ -278,21 +278,25 @@ def test_canaleta_no_lugar_da_amarracao_e_reprovada_pelos_dois_gates(papel):
 # ----------------------------------------------------------------- independencia do CHANNEL
 @pytest.mark.parametrize("geral", [True, False])
 def test_none_nao_liga_nenhuma_regra_da_estrategia_adicional(monkeypatch, geral):
-    """Durante o solve sem reforco adicional: 68 e 58.2 desligadas; a paridade
+    """Durante o solve sem reforco adicional: 58.2 desligada; a paridade
     51.14 nunca roda; 51.9 nao decide. SECAO 81: 71 e o arranjo 60-65 sao regras
     GERAIS de composicao - ligados no NONE com a chave geral (o arranjo sempre com
     a aceitacao exata por parede) e desligados sem ela. SECAO 82: a busca de
     paridade pelo preenchimento (72) tambem e' regra GERAL - no NONE ela roda com a
-    chave da 82 (aberturas da banda como fronteira + veto estrutural)."""
+    chave da 82 (aberturas da banda como fronteira + veto estrutural). SECAO 83: a
+    68 (melhor composicao do reparo) roda no NONE com a chave da 83 e SEMPRE com a
+    guarda de junta."""
     monkeypatch.setattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", geral)
     monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", geral)
+    monkeypatch.setattr(m, "GENERAL_REPAIR_PREFER_CLEAN_ENABLED", geral)
     estados, arranjos, chamadas = [], [], []
     core = m._solve_building_blocks_all_courses_core
 
     def espia_core(*a, **k):
         estados.append((ws.OPENING_REPAIR_PREFER_CLEAN_ACTIVE, ws.CORNER_DEGRADED_PREFERS_TIE_BLOCK,
                         ws.COMPENSATOR_COUNT_IN_TIEBREAK, ws.TIE_PARITY_FILL_BALANCE,
-                        ws.TIE_PARITY_FILL_OPENING_BOUNDARIES, ws.TIE_PARITY_STRUCTURAL_VETO))
+                        ws.TIE_PARITY_FILL_OPENING_BOUNDARIES, ws.TIE_PARITY_STRUCTURAL_VETO,
+                        ws.OPENING_REPAIR_JOINT_GUARD_ACTIVE))
         return core(*a, **k)
 
     orient = m._orient_small_voids_final
@@ -311,7 +315,8 @@ def test_none_nao_liga_nenhuma_regra_da_estrategia_adicional(monkeypatch, geral)
                         lambda *a, **k: chamadas.append("72") or real_busca(*a, **k))
     lines, ops = tcr.tee(80.0)
     res, _w, _n, _o = solve(lines, ops, strategy=None)
-    assert estados and not any(any(e[:2]) for e in estados), estados  # 68, 58.2
+    assert estados and not any(e[1] for e in estados), estados          # 58.2
+    assert all(e[0] is geral and e[6] is geral for e in estados), estados  # 68 com guarda (geral, 83)
     assert all(e[2] is geral for e in estados), estados                # 71 (geral, 81)
     assert all(e[3] is geral and e[4] is geral and e[5] is geral for e in estados), estados  # 72/82 (geral)
     assert arranjos and any(arranjos) is geral, arranjos               # 60-65 (geral)

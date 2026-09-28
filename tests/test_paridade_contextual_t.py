@@ -218,20 +218,24 @@ def test_x_fica_na_convencao_no_caminho_geral():
     assert not any(nodes[i].get("_tie_parity_fill_chosen") for i in xs)
 
 
-def test_secao_68_nao_executa_com_a_paridade_geral(monkeypatch):
+@pytest.mark.parametrize("chave_83", [False, True])
+def test_secao_68_so_roda_com_a_chave_da_83_e_com_guarda(monkeypatch, chave_83):
+    """D11 foi calibrado sem a 68; a SECAO 83 a liga no NONE (chave propria) e
+    sempre com a guarda de junta. A paridade geral roda nos dois casos."""
     estados = []
     core = m._solve_building_blocks_all_courses_core
 
     def espia(*a, **k):
         estados.append((ws.OPENING_REPAIR_PREFER_CLEAN_ACTIVE, ws.TIE_PARITY_FILL_BALANCE,
-                        ws.TIE_PARITY_FILL_STAGGER))
+                        ws.TIE_PARITY_FILL_STAGGER, ws.OPENING_REPAIR_JOINT_GUARD_ACTIVE))
         return core(*a, **k)
 
     monkeypatch.setattr(m, "_solve_building_blocks_all_courses_core", espia)
+    monkeypatch.setattr(m, "GENERAL_REPAIR_PREFER_CLEAN_ENABLED", chave_83)
     lines, ops = sala(aberturas=((0, 95.0, 91.0, True),), **SALA_SEM_GANHO)
     tcr.solve(lines, ops, strategy=None, num_courses=4)
     assert estados
-    assert not any(e[0] for e in estados), "a secao 68 nao roda no NONE"
+    assert all(e[0] is chave_83 and e[3] is chave_83 for e in estados), "68 so' com a chave da 83, com guarda"
     assert all(e[1] and e[2] for e in estados), "a paridade geral roda no NONE"
 
 
