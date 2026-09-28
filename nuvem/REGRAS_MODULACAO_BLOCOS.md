@@ -9404,7 +9404,10 @@ motor**, para não pagar busca que não paga.
 
 ## 68. A faixa jamba → âncora é composta como UMA unidade (2026-09-16, IMPLEMENTADO, só CHANNEL)
 
-> **Estado desde 2026-09-25 (§81): continua SÓ no CHANNEL.** A melhor composição do reparo não
+> **Estado desde 2026-09-28 (§83): vale também no caminho GERAL, com guarda de junta e guarda de tier**
+> (`GENERAL_REPAIR_PREFER_CLEAN_ENABLED`); no CHANNEL continua a forma histórica abaixo. Ver §83.
+>
+> **Estado de 2026-09-25 a 2026-09-28 (§81): só no CHANNEL.** A melhor composição do reparo não
 > olha a regra #1 (o critério de vazado desalinhado descrito abaixo NÃO existe em
 > `_repair_solution_quality`): no NONE ela cria junta a prumo em 11–12 fiadas na BUTANTÃ
 > (8284522, `B19+B34` contra a junta do B54 do nó — o mesmo defeito do MCP; o HUMANO aceita
@@ -10721,7 +10724,8 @@ pela régua forense idêntica (T 462 → 462, L 141 → 141, nenhuma perdida). P
 e jamba conferidas peça a peça (checkpoint do ciclo); D10 igual ao offline (paridade).
 
 **Pendências:** §68 com guarda de junta (a regra #1 contra as fiadas vizinhas na melhor janela do
-reparo) é o próximo candidato — o ganho medido é grande (555 → 449 compensadores); estender a
+reparo) é o próximo candidato — o ganho medido é grande (555 → 449 compensadores) — **feito na §83
+(2026-09-28)**; estender a
 guarda da §81.1 ao CHANNEL (hoje ele mantém a aceitação histórica, idêntica à main); §72
 (paridade) explica D10/D12 e fica para o D11. Testes: `tests/test_regras_gerais_composicao.py`.
 
@@ -10901,8 +10905,140 @@ f3 2 (HUMANO = MCP: `B39 B39 B39 C04 B54 …` → `B39 B34 B34 B34 B34 …` = MC
 fiada, como o MCP); f3 4 (porta a 47 cm do T: o C04 sai da parede que chega e vira fechamento de jamba).
 
 **Não muda:** CHANNEL (custo calibrado da 72, T e X, sem 82.1 — assinatura idêntica à main), §68 (não
-roda no NONE — teste espião), §81, D6, D16/regra 75, cantos L55/L56. Desligar
-`GENERAL_TIE_PARITY_ENABLED` devolve a main.
+roda no NONE — teste espião; **desde a §83 (2026-09-28) roda, com guarda de junta e de tier**), §81, D6,
+D16/regra 75, cantos L55/L56. Desligar `GENERAL_TIE_PARITY_ENABLED` devolve a main.
 
 **Pendências:** resíduo de `COMPENSATOR_CONSECUTIVE`/`EXCESS_IN_RUN` no TGD V2 (+8/+8); `PRISM_STAGGER_BELOW_TARGET` no TP1 (+89, não crítico); custo de tempo (segundo solve);
 X fora da regra geral (sem evidência humana; medido nocivo no TGD); o f3 15 depende da §68.
+
+## 83. A §68 no caminho GERAL, com GUARDA DE JUNTA (2026-09-28, IMPLEMENTADO, ciclo 11 — convergência com o MCP)
+
+**Pedido (ciclo 11):** nova baseline SCRIPT × MCP × HUMANO sobre a main `1db4876`; descobrir por que o
+MCP ficou melhor e transformar a decisão em regra automática — sem copiar o MCP onde o HUMANO prova o
+contrário, uma classe de diferença por vez.
+
+**De onde veio o MCP (COMPROVADO):** o `butanta testes.rvt` salvo tem o lote `20260922-094142` (execução
+"casa run3", 22/09 09:41) — motor `37a0150` da branch `claude/butanta-modulation-physical-fixes`,
+estratégia **CHANNEL**, 340 cm (17 fiadas), 34 paredes, microajuste §66 já aplicado em 3 aberturas
+(+10 cm). O motor `37a0150` + CHANNEL, offline, reproduz esse MCP em 96,8 % exato / 98,6 % ≤ 5 cm; o
+CHANNEL da main, em 95,2 %. **O MCP não foi manual:** é a estratégia CHANNEL do motor. (As comparações
+D9–D11 usaram o lote `20260922-225600`, que nunca foi salvo; os dois lotes diferem em ~1 % das peças.)
+
+**Ablação (motor da main offline, BUTANTÃ 34 eixos, 280 cm, régua forense, fiadas 0–11):**
+
+| Configuração | vs MCP | vs HUMANO |
+|---|---|---|
+| NONE (produto) | 72,6 % | 23,3 % |
+| NONE + §68 | 78,5 % | 23,5 % |
+| NONE + §72 calibrada (CHANNEL) | 87,0 % | 21,5 % |
+| NONE + §68 + §72 cal. | 95,1 % | 22,8 % |
+| CHANNEL | 95,2 % | 22,8 % |
+| CHANNEL − §68 / − §72 | 87,2 % / 62,1 % | 21,6 % / 22,1 % |
+
+58.2, 71, 60 e a paridade de X não mudam nada. Das 237 unidades de diferença MCP × SCRIPT (trechos
+contíguos, Revit), 235 são reproduzidas exatamente pelo motor `37a0150` + CHANNEL: **100 só pela §68**
+(80 junto de jamba), 87 pela §72 calibrada (paridade — decisão D11, §82: compensadores primeiro pela
+régua humana), 35 pelas duas, 10 pela versão do motor, 5 por outras regras do CHANNEL/sem explicação.
+
+**Causa (COMPROVADA):** a §68 (a faixa jamba→âncora composta como UMA unidade) só rodava no CHANNEL
+porque, no NONE, criava junta a prumo (§81: "extrair exige antes uma guarda de junta"). Medido: a
+qualidade da §68 (`_repair_solution_quality`) só olhava peças de acerto — o critério "vazado/junta
+desalinhado da fiada oposta" descrito na §68 nunca existiu no código —, e a busca do reparo
+(`avoid_joint_positions_cm`) não conhece as juntas de CONTORNO nó|preenchimento da família oposta. No
+eixo 8284522 (T a 407 cm, porta a 469 cm) a janela expandida trocava `B34 B19` (junta a 449 cm) por
+`B19 B34` (junta a 434,5 cm, sobre a face do B54 do nó): junta contínua em 11 fiadas — o defeito que o
+MCP tem e que o HUMANO evita com `B39 C04 C09`. Havia ainda uma isenção indevida: a junta de B19/C04/C09
+encostado na ponta "aberta" do trecho é isenta da regra #1 só contra ABERTURA (§11.8), mas a
+`leading_open` do subtrecho de reparo também é verdadeira contra o braço de um nó.
+
+**Regra (REGRA OBRIGATÓRIA — regra #1 aplicada à escolha da §68):**
+
+1. **A §68 vale no caminho geral** (`wall_modeling.GENERAL_REPAIR_PREFER_CLEAN_ENABLED`, ponto único
+   `_solve_building_blocks_all_courses_impl`): o reparo de abertura continua expandindo dentro do
+   orçamento de sempre e fica com a MELHOR composição.
+2. **Qualidade = (juntas coincidentes, compensadores, meio blocos, especiais, peças)** — a regra #1
+   antes de qualquer peça de acerto: uma composição limpa NUNCA ganha criando junta a prumo; um
+   compensador nunca perde para uma junta a prumo. As juntas de referência
+   (`_repair_guard_joint_positions_cm`) são as da busca MAIS as de contorno nó|preenchimento da família
+   oposta (deduzidas das peças de nó; na família B também as reais da A). A isenção de peça pequena
+   encostada vale só contra abertura (`left_opening`/`right_opening`).
+3. **Janela expandida com junta coincidente é refeita** (`_repair_guarded_window_solution`) desencontrando
+   também as juntas da guarda; a alternativa só entra se fechar com menos coincidências. A PRIMEIRA janela
+   nunca muda (a busca e o recorte de sempre — a lista de contorno na busca do recorte já criou jamba em
+   outro lugar no TGD, ver `course_a_boundary_joint_positions_cm`).
+4. **Guarda de tier (só no caminho geral; §2 e §70):** a ordem de fechamento da §2 (decisão do usuário
+   de 2026-09-11) põe UM compensador (tier 5) antes da fileira de B34 (tier 5b); a qualidade da §68
+   inverte isso. No NONE, uma composição da §68 **não pode** virar fileira de B34 (mais de
+   `MAX_SPECIAL_BOND_PER_TRECHO` peças especiais num subtrecho) onde a **faixa jamba→âncora** fechava
+   dentro do teto de compensadores (`_repair_tier_gate_blocks`, avaliada por subtrecho do candidato: os
+   compensadores da primeira composição no mesmo span + as peças da modulação contínua do lado que abre
+   para a âncora, `_repair_strip_codes`). Se essa faixa já precisava de 2+ compensadores (inclusive
+   C09+C04 encostados), a fileira vem antes deles (5b antes de 7) e a §68 pode melhorar. Medido:
+   pilarete de 69 cm entre dois vãos fica `B39 C09 B19` (legado e HUMANO) em vez de `B34 B34` (MCP);
+   pilarete de 75 cm sai de `B19 B39 C09 C04` para `B19 B34 B19` / `B39 B34`; na W02 a faixa jamba→B54
+   (`B19 C04 … B39 B39 B39 C09`, 2 compensadores) vira `B39 B34 B34 B34`, que o arranjo geral (§61)
+   recompõe em `B34 B39 B39 B39` — igual ao MCP. Duas formas rejeitadas na medição: por subtrecho da
+   primeira janela (barrava a W02 porque a janela de 24 cm só via 1 compensador) e por região inteira
+   (liberava a fileira do pilarete com um compensador do outro lado do vão). **CONFLITO registrado
+   (§68 × §2/§70, CURRENT_DIFF_008):** o CHANNEL e o MCP usam a fileira também com 1 compensador; o
+   NONE segue a §2 até decisão do usuário.
+5. **CHANNEL inalterado:** mantém a §68 histórica, sem guarda (assinatura idêntica à main). Desligar a
+   chave devolve a main.
+
+**Nenhum id:** só geometria (juntas, faces de nó, aberturas). Testes:
+`tests/test_reparo_68_guarda_junta.py` (fixture genérica T + porta achada por varredura; vermelho sem a
+guarda; nunca junta a prumo nova; nunca mais compensador que o legado; janela refeita = `B39 B19`; ganho
+mantido = 0 compensador onde o legado tinha C04 + C09; qualidade com a regra #1 primeiro; isenção só
+contra abertura; CHANNEL idêntico; chave desligada = legado; determinismo; espelhamento; sem hardcode).
+
+**Medido (motor offline, BUTANTÃ 34 eixos, NONE, régua forense, fiadas 0–13; main → §83):** compensadores
+479 → **413** (6,72 → 5,84 %; MCP 400, HUMANO 487); junto de abertura 230 → **179** (MCP 148, HUMANO 284);
+junto de nó 202 → 192; colunas de compensador ≥ 4 fiadas 63 → 54 (MCP 53, HUMANO 64); pares de especiais
+326 → 276; B39 4.032 → 4.020; B34 1.707 → 1.743 (peças de nó do motor idênticas: 472 B34 + 218 B54 + 3 C09;
+pela régua BOND 472 → 477, OPENING 95 → 110, INTERIOR 705 → 729); B19 377 → 362; C04 210 → 165; C09 269 →
+248; **juntas contínuas ≥ 3 fiadas por identidade 46 → 46 (0 novas)**; juntas coincidentes 5,54 → 5,61 %;
+aderência ao MCP 72,6 → **77,4 %** (≤ 5 cm 75,2 → 79,9 %), ao HUMANO 23,3 → 23,6 %; verga/contraverga por
+papel igual (MCP 95,5 %), geométrica MCP 63,6 → 75,0 %; T 37/37, L 3 fiadas, NMU 0, peças em porta 0,
+canaleta como amarração 0, paridade idêntica (mesmas 8 inversões). Sem a guarda de junta: **1 junta contínua
+nova** (8284522, t = 434, 11 fiadas). Sem a guarda de tier: 390 compensadores, mas os pilaretes entre dois
+vãos viram fileira de B34 (§2 violada). CHANNEL: 100 % idêntico à main.
+
+**Benchmarks versionados (baseline NÃO regravado; categoria = paredes com achado; main → §83):**
+
+| Projeto | compensators | prism | `PRISM_CONTINUOUS_JOINT` (identidades novas) | críticos | `COMPENSATOR_CONSECUTIVE` | `COMPENSATOR_EXCESS_IN_RUN` | `PRISM_STAGGER_BELOW_TARGET` |
+|---|---|---|---|---|---|---|---|
+| Piloto 2x2 | 6 → 6 | 1 → 1 | 3 → 3 (0) | 11 → 11 | — | — | 15 → 29 (nível 2) |
+| TGD V1 | 51 → 51 | 11 → 11 | 215 → 215 (0) | 733 → 733 | 136 → 114 | 226 → 207 | 730 → 765 |
+| TGD V2 | 59 → **57** | 5 → 5 | 53 → 53 (0) | 527 → 527 | 270 → 240 | 377 → 347 | 651 → 601 |
+| TP1 V1 | 65 → 65 | 4 → 4 | 4 → 4 (0) | 24 → 24 | 453 → 419 | 660 → 618 | 1.823 → 1.763 |
+| TP1 V2 | 65 → 65 | 4 → 4 | 4 → 4 (0) | — | 453 → 419 | 660 → 618 | 1.823 → 1.763 |
+
+Nenhuma categoria piora; nenhuma identidade nova de junta contínua em nenhum projeto; críticos idênticos (os
+vereditos "REGRESSÃO CRÍTICA" do TP1 V1 e do TGD V2 são os históricos da main — `JUNCTION_MISSING_BINDING` 8→9 e
+`COVERAGE_ROW_MOSTLY_EMPTY` 86→92 — e não mudam). No TGD V2 a paridade §82 passa de 11 para 14 inversões (2
+revertidas pela 82.1 em vez de 5): o preenchimento real que a 82.1 compara agora inclui a §68; resíduo
+`COMPENSATOR_CONSECUTIVE` do D11 cai 270 → 240.
+`COMPENSATOR_AVOIDABLE` TGD V1 21 → 19, TP1 64 → 63; `COMPENSATOR_VERTICAL_STRIP` TGD V1 69 → 67, TP1 125 → 123.
+Custo medido: `PRISM_STAGGER_BELOW_TARGET` sobe no piloto (15 → 29) e no TGD V1 (730 → 765) — nível 2, não
+reprova; cai no TP1.
+
+**Revit (cópia `CICLO14_CAND83_butanta_testes`, caminho do produto, NONE, 280 cm, motor desta seção):** 7.068
+planejadas = 7.068 criadas, 0 puladas, 0 falhas, 0 invasões, 0 trechos não resolvidos, T 37/37 (bond_trace
+690 resolvidas), L 3 fiadas (nós 47/48, os mesmos), gates 75/76 = 0, mesmas pendências de verga/contraverga
+(8079026/8079027), mesmas 8 inversões de paridade; solve 547 s + criação 391 s no IronPython. Contra a cópia
+CICLO11 (main, mesmo caminho): compensadores 468 → **402** (MCP 400), junto de abertura 219 → 168, junto de nó
+202 → 192, B34 1.740 → 1.776 (BOND 472 → 477 pela régua; peças de nó do motor idênticas), B19 378 → 363, C04
+201 → 156, C09 267 → 246, juntas contínuas 46 → 46 (0 novas), aderência ao MCP **74,7 → 79,6 %** (≤ 5 cm 75,9 →
+80,7 %), ao HUMANO 23,1 → 23,4 %, verga/contraverga geométrica MCP 63,6 → 75,0 %; unidades de diferença MCP ×
+SCRIPT 237 → 160 (jamba 112 → 50). Referências `butanta testes` e `TESTE PR49` intocadas (IsModified False).
+
+**Testes:** `tests/test_reparo_68_guarda_junta.py` (25) + `test_opening_repair_clean_composition.py` (7) = 32;
+relacionados (espiões NONE/CHANNEL, paridade, composição, CHANNEL, encontros, vazado menor) 201; suíte
+completa 1 903 passaram, 1 falha histórica (test_perf_trace_stall_sampler), 1 pulado (pool de 4 processos por arquivo; test_block_arm_role_prism_stagger 5/5 e test_block_b19_residual_fill_implementation 76/76 rodados à parte, 67 e 66 min — a candidata terminou antes da main nos dois).
+
+
+**Não muda:** paridade (§82/§82.1), X na convenção, §81, D6/§80, regra 75/D16, cantos L55/L56, CHANNEL.
+
+**Pendências:** estender a guarda ao CHANNEL (hoje ele mantém a §68 histórica e a junta a prumo do MCP);
+paridade §72 × §82 continua sendo a maior diferença para o MCP (87 unidades) — decisão D11 aprovada
+(régua humana); o f3 15 (HUMANO = MCP = par) continua na convenção.

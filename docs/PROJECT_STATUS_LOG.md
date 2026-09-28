@@ -1804,3 +1804,7 @@ main; regressão 3/1206 = main. Merge normal autorizado pelo usuário.
 ## 2026-09-16 — UI premium em branch separada
 
 HEAD avaliado `ddb24c2`, base main `55e990d`. [Checkpoint](checkpoints/2026-09-16-premium-ui-redesign.md): redesign de componentes, 312 testes, WinForms nativo e matriz de escala; PARTIAL sem smoke Revit/DPI nativo. Sem merge e sem intervenção no #42.
+
+## 2026-09-28 — ciclo 11: convergência SCRIPT ↔ MCP, §83 (§68 no caminho geral com guarda de junta e de tier)
+
+[Checkpoint](checkpoints/2026-09-28-ciclo11-secao83-reparo-68-guarda-junta.md): nova baseline sobre `1db4876`, origem do MCP comprovada (CHANNEL do motor `37a0150`), tabela CURRENT_DIFF_001–021, correção da classe de maior impacto (§68 no NONE com guardas). Revit CICLO14 compensadores 468 → 402, MCP 74,7 → 79,6 %; benchmarks sem regressão; direto na main (`71e2fbc`).
