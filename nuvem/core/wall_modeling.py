@@ -4765,7 +4765,7 @@ def _b34_run_arrangement_legacy_enabled():
 
 def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_per_wall=None,
                               arrange=False, nodes=None, end_to_node=None, validate_wall=None,
-                              joint_identity_guard=False):
+                              joint_identity_guard=False, jamb_compensator_alignment=False):
     """VAZADO MENOR ENTRE FIADAS (secao 52, 2026-09-15): ultimo passo do solve,
     sobre as fiadas FISICAS finais (depois de reparos e do reforco de
     aberturas). Gira 180 graus o B34 de preenchimento quando isso alinha o
@@ -4837,6 +4837,33 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             arrangement = _merge_arrangement_pass(arrangement, current)
             if not pieces_changed:
                 break
+        if jamb_compensator_alignment:
+            # SECAO 84: passe FINAL so' de permutacao por cima do arranjo
+            # convergido - faixa de compensacao encostada e alinhada na jamba,
+            # fiadas da lateral em conjunto, com a mesma aceitacao por parede
+            census_before = _runs.jamb_strip_census(course_candidates, walls_to_create, openings_per_wall,
+                                                    catalog)
+            jamb = _runs.arrange_b34_runs(
+                course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
+                half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
+                validate_wall=validate_wall, joint_identity_guard=joint_identity_guard,
+                jamb_compensator_alignment=True)
+            if jamb.get("moved") or jamb.get("created") or jamb.get("removed"):
+                # ETAPA 4D sobre a posicao final (lado fechado do compensador
+                # voltado para a abertura) - mesma regra do arranjo
+                jamb["compensators_reoriented"] = _reorient_compensators_after_arrangement(
+                    course_candidates, walls_to_create, openings_per_wall, catalog)
+            conflicts = []
+            by_wall = jamb.get("jamb_conflicts_by_wall") or {}
+            for wi in sorted(by_wall):
+                conflicts.extend(by_wall[wi])
+            result["jamb_compensator_alignment"] = {
+                "enabled": True, "rule": "84", "sides_changed": jamb.get("jamb_sides_changed", 0),
+                "walls_changed": jamb.get("walls_changed", 0), "moved": jamb.get("moved", 0),
+                "walls_rejected_by_validation": [w.get("wall_idx") for w in
+                                                 jamb.get("walls_rejected_by_validation") or []],
+                "conflicts": conflicts, "census_before": census_before,
+                "census": _runs.jamb_strip_census(course_candidates, walls_to_create, openings_per_wall, catalog)}
         result["b34_run_arrangement"] = arrangement
     violations = _small_void.b34_small_void_violations(course_candidates, catalog)
     summary["after"] = len(violations)
@@ -5966,7 +5993,8 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
         _arranjo81 = result.get("b34_run_arrangement") or {}
         if pieces_available and (_arranjo81.get("runs_changed") or _arranjo81.get("compositions")
                                  or _arranjo81.get("moved") or _arranjo81.get("created")
-                                 or _arranjo81.get("removed")):
+                                 or _arranjo81.get("removed")
+                                 or (result.get("jamb_compensator_alignment") or {}).get("moved")):
             plan["validation"] = _reinforcement.validate_channel_reinforcement(
                 result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
                 free_to_top=plan["free_to_top"], policy=plan["policy"],
@@ -6027,18 +6055,23 @@ def _general_composition_arrangement(result, nodes, walls_to_create, end_to_node
     # coincidente entre fiadas vizinhas numa posicao nova (medido no TP1: a guarda
     # de contagem trocava juntas isentas junto da porta por junta a prumo de 7
     # fiadas a 49,5 cm do T)
+    # SECAO 84: faixa de compensacao encostada e alinhada na jamba (regra geral
+    # do caminho sem reforco adicional; o CHANNEL tem contrato proprio)
     _orient_small_voids_final(result, catalog, walls_to_create, openings_per_wall, arrange=True,
                               nodes=nodes, end_to_node=end_to_node, joint_identity_guard=True,
+                              jamb_compensator_alignment=True,
                               validate_wall=_channel_wall_validator(
                                   result, walls_to_create, openings_per_wall, catalog, num_courses,
                                   nodes, end_to_node, _band, plan, base_z_abs,
                                   role_by_course=bool(JUNCTION_PHYSICAL_RULES_ENABLED)))
     arranjo = result.get("b34_run_arrangement") or {}
-    result["general_composition_quality"] = {"enabled": True, "rules": ["71", "60", "61", "62", "63", "64", "65"],
+    result["general_composition_quality"] = {"enabled": True,
+                                             "rules": ["71", "60", "61", "62", "63", "64", "65", "84"],
                                              "arrangement_changed": bool(
                                                  arranjo.get("runs_changed") or arranjo.get("compositions")
                                                  or arranjo.get("moved") or arranjo.get("created")
-                                                 or arranjo.get("removed"))}
+                                                 or arranjo.get("removed")
+                                                 or (result.get("jamb_compensator_alignment") or {}).get("moved"))}
     if reaudit and result["general_composition_quality"]["arrangement_changed"]:
         _general_composition_reaudit(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
                                      num_courses)

@@ -101,6 +101,26 @@ terminando antes dela, ou com desalinhamento pequeno na extremidade — a
 modulação junto de abertura parte sempre dos limites geométricos exatos
 dela.
 
+## Faixa de compensação na jamba (REGRAS §84 — REGRA OBRIGATÓRIA, implementada no NONE)
+
+Correção do usuário (2026-09-28): compensador (C09) e pastilha (C04) junto de
+porta/janela ficam **encostados no vão** e na **mesma faixa vertical** em
+todas as fiadas da lateral — nunca alternando entre "junto do vão" e "20/40
+cm para dentro" (antes: `B54 | C09 | B19 | vão` numa fiada e
+`B39 | C09 | vão` na outra; depois: `B54 | B19 | C09 | vão`).
+
+- As fiadas da lateral são resolvidas **em conjunto**; só se **permutam** as
+  peças que a busca escolheu (nenhum compensador novo, contagem idêntica).
+- **Prisma dos vazados** pela geometria real (`cells_world`, 2,0 cm) é
+  restrição dura — alinhamento de vazado ≠ alinhamento de junta.
+- Isenção **só** da junta da própria faixa; nunca libera junta a prumo no
+  resto da parede. Peça de nó e canaleta nunca se movem.
+- O que não fecha fica registrado com o motivo
+  (`result["jamb_compensator_alignment"]["conflicts"]`: compensador atrás
+  de peça de nó, prisma que quebraria, junta nova).
+- B19 imediatamente atrás da faixa é EXCEÇÃO PERMITIDA da regra do
+  meio-bloco (REGRAS §2).
+
 ## Pilaretes — tratamento independente (REGRAS §18.2)
 
 **Status: pendência de código aberta.** O trecho entre duas aberturas tem

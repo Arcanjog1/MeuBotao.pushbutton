@@ -83,6 +83,15 @@ Verificar **individualmente** cada L/T/X/ponta:
 - Bloco `CORTADO` perto de abertura só é erro se não houver justificativa
   geométrica próxima (REGRAS §10.5).
 
+- **Faixa de compensação na jamba (REGRAS §84)**: em cada lateral com
+  compensador, ele fica encostado no vão e na mesma posição em todas as
+  fiadas — `result["jamb_compensator_alignment"]["census"]` (`alternating`
+  tem de tender a 0; `touching_all` sobe). Os casos restantes aparecem em
+  `conflicts` com o motivo (`FIXED_PIECE_BETWEEN`,
+  `PRISM_39_19_WOULD_BREAK`, `NEW_COINCIDENT_JOINT`, `STACKED_JOINT`) e são
+  revisão humana, não falha silenciosa. Conferir também que a contagem por
+  código não mudou (a regra só permuta).
+
 ## 7. Relatório final consolidado
 
 `build_final_modulation_report` junta as duas fontes de problema (Etapa

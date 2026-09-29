@@ -20,6 +20,7 @@ não foi resolvido (ou se está deliberadamente pendente) antes.
 | 2026-08-28 | Trechos de 469cm e 139cm caíam no tier de compensador embora existisse composição limpa (sem compensador) | guloso (`_greedy_fill_blocks`) nunca faz backtracking, só tenta 1 ordem fixa | tenta cada código do pool como primeiro bloco; se ainda falhar, busca exata (DP em décimos de cm, menos-peças-primeiro) | §16.2 |
 
 ## Bugs de relatório diagnosticados, ainda NÃO corrigidos
+| 2026-09-28 | Compensador/pastilha junto de porta/janela alternava de posição entre as fiadas (0 / 20 / 40 / 60 cm do vão) — 29 de 47 laterais no BUTANTÃ; prisma dos vazados 39/19 interrompido na jamba | trecho junto da jamba recomposto fiada a fiada: fiada A pelo guloso (fusão 9+9→B19 só na ponta aberta, B19 no vão e C09 para dentro); fiada B fugindo de propósito da junta do C09 da A (§11.8 só na validação); uma composição por paridade | passe FINAL de permutação por lateral, fiadas em conjunto, prisma pela geometria real como restrição dura, isenção só da junta da faixa; 29 → 2 laterais alternando, contagem de peças idêntica | §84 |
 
 Não afetam a geometria real dos blocos — afetam o que o usuário vê
 depois. Não assumir que estão corrigidos.
@@ -67,6 +68,10 @@ como "já resolvido":
 
 ## Regra alterada por pedido explícito do usuário (prioridade sempre da mais recente)
 
+- 2026-09-28 (§84): compensador/pastilha da lateral de abertura encostado
+  no vão e alinhado entre as fiadas (faixa vertical junto do vão); B19
+  imediatamente atrás da faixa passa a ser EXCEÇÃO PERMITIDA da regra do
+  meio-bloco (§2). Pendência de decisão: ligar também no CHANNEL.
 - 2026-08-25: prioridade de B19 sem ponta aberta rebaixada — compensador
   tentado antes dele, quando trecho tem as duas pontas fechadas (inverteu
   ordem anterior de 2026-08-21 a 2026-08-24). Ver BLOCKS.md.

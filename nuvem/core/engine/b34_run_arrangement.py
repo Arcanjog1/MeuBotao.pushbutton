@@ -112,11 +112,36 @@ WALL_END_TOLERANCE_CM = 2.0
 # uma fiada com ele, mas termina com C04 (secao 58).
 LONG_COMPENSATOR_MIN_CM = 6.0
 CM_PER_FT = 30.48
+# SECAO 84 (correcao do usuario, 2026-09-28): FAIXA DE COMPENSACAO NA JAMBA.
+# Compensador (C09) e pastilha (C04) junto de porta/janela ficam ENCOSTADOS no
+# vao e na MESMA faixa vertical em todas as fiadas da lateral, em vez de
+# alternar entre "junto do vao" e "20/40/60 cm para dentro". As fiadas da
+# lateral sao resolvidas EM CONJUNTO (familias de fiada), so' PERMUTANDO as
+# pecas moveis da corrida jamba -> primeira peca fixa (nenhuma peca criada ou
+# removida). Restricoes duras (nunca pioram): prisma dos vazados pela
+# geometria real das celulas, vazado menor do B34 (secao 52), compensadores
+# encostados, meio bloco perto de amarracao, compensador longo na ponta da
+# parede, junta coincidente NOVA fora da faixa e junta empilhada em 3+ fiadas.
+# A unica isencao e' a face INTERNA do compensador encostado na jamba.
+JAMB_COMPENSATOR_ALIGNMENT_ENABLED = True
+# alcance da corrida a partir da jamba = BOND_STRIP_OPENING_INFLUENCE_CM
+JAMB_REACH_CM = 60.0
+# encostado = OPENING_ALIGNED_TOUCH_TOLERANCE_CM (junta de 1 cm + arredondamento)
+JAMB_TOUCH_TOLERANCE_CM = 2.0
+# ponto logo DENTRO do vao para saber se a abertura corta esta fiada
+JAMB_INSIDE_PROBE_CM = 2.0
+# vazado alinhado entre fiadas: centro a ate' 2,0 cm do centro de um vazado da
+# peca de baixo/cima (aparelho corrido real: B19 sobre B39 = 0,9 cm; B34 x B39
+# chega a 1,75 cm - 1,5 cm cegava a medida)
+PRISM_ALIGNED_DC_MAX_CM = 2.0
+JAMB_MAX_ORDERS_PER_FAMILY = 120
+JAMB_JOINT_MAX_COMBINATIONS = 4096
+JAMB_DESCENT_ROUNDS = 4
 
 
 class _Slot(object):
     __slots__ = ("lo", "hi", "code", "side", "movable", "node", "hollow", "orientable",
-                 "void_off", "void_half", "compensator")
+                 "void_off", "void_half", "compensator", "cells", "cell_side")
 
     def __init__(self):
         self.lo = self.hi = 0.0
@@ -124,6 +149,10 @@ class _Slot(object):
         self.side = 0
         self.movable = self.node = self.hollow = self.orientable = self.compensator = False
         self.void_off = self.void_half = None
+        # SECAO 84: TODAS as celulas (deslocamento do centro de cada uma ate' o
+        # centro da peca, meia largura) na orientacao `cell_side`
+        self.cells = ()
+        self.cell_side = 0
 
     @property
     def mid(self):
@@ -168,6 +197,32 @@ def _void_geometry(cand, p0, wall_dir, lo, hi):
     return t_cell - (lo + hi) / 2.0, half
 
 
+def _cells_geometry(cand, p0, wall_dir, lo, hi):
+    """SECAO 84: ((deslocamento com sinal do centro de CADA celula ate' o centro
+    da peca, meia largura), ...) lidos das `cells_world` REAIS da peca - a
+    geometria da familia, nao uma suposicao pelo codigo."""
+    mid = (lo + hi) / 2.0
+    out = []
+    for cell in cand.get("cells_world") or []:
+        pt = cell["point"]
+        t_cell = ((pt.X - p0.X) * wall_dir.X + (pt.Y - p0.Y) * wall_dir.Y) * CM_PER_FT
+        out.append((t_cell - mid, float(cell["size_local"][0]) * CM_PER_FT / 2.0))
+    out.sort()
+    return tuple(out)
+
+
+def _cell_centers(slot):
+    """Centros (t_cm) das celulas de `slot` na orientacao ATUAL dele: a peca
+    orientavel (B34) girada 180 graus espelha as celulas em torno do centro."""
+    cells = slot.cells
+    if not cells:
+        return ()
+    mid = (slot.lo + slot.hi) / 2.0
+    if slot.orientable and slot.side and slot.cell_side and slot.side != slot.cell_side:
+        return tuple(mid - off for off, _half in cells)
+    return tuple(mid + off for off, _half in cells)
+
+
 def _catalog_template(code, catalog):
     """Slot-modelo de `code` lido do CATALOGO (celulas locais, em pes, eixo X da
     peca ao longo da parede) - para codigos que ainda nao existem na parede."""
@@ -189,6 +244,9 @@ def _catalog_template(code, catalog):
             s.void_half = float(ordered[0]["size_local"][0]) * CM_PER_FT / 2.0
             s.orientable = len(cells) == 2
     s.side = (1 if (s.void_off or 0.0) >= 0.0 else -1) if s.orientable else 0
+    s.cells = tuple(sorted((float(c["center_local"][0]) * CM_PER_FT, float(c["size_local"][0]) * CM_PER_FT / 2.0)
+                           for c in cells)) if s.hollow else ()
+    s.cell_side = s.side
     return s
 
 
@@ -470,8 +528,11 @@ def _arrangements(slots, run):
 class _Wall(object):
     def __init__(self, wall_idx, rows, walls_to_create, openings_per_wall, catalog, tol_cm,
                  ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=(),
-                 joint_identity_guard=False):
+                 joint_identity_guard=False, jamb_alignment=False):
         self.wall_idx = wall_idx
+        # SECAO 84: faixa de compensacao na jamba (so' quando o chamador liga)
+        self.jamb_alignment = bool(jamb_alignment) and JAMB_COMPENSATOR_ALIGNMENT_ENABLED
+        self.jamb_conflicts = []
         # SECAO 81.1: com a guarda, nenhuma troca pode criar junta coincidente
         # entre fiadas vizinhas numa POSICAO onde ela nao existia (a guarda de
         # contagem da janela aceitava trocar junta isenta junto da jamba por junta
@@ -487,10 +548,14 @@ class _Wall(object):
         self.fill_codes = sorted(fill_codes or ())
         self.p0, self.dir, self.length = _axis(walls_to_create, wall_idx)
         self.edges = []
+        self.openings_cm = []
         ops = (openings_per_wall or [])
         for op in (ops[wall_idx] if wall_idx < len(ops) else None) or ():
-            self.edges.extend([float(op[0]) * CM_PER_FT, float(op[1]) * CM_PER_FT])
+            lo_cm, hi_cm = float(op[0]) * CM_PER_FT, float(op[1]) * CM_PER_FT
+            self.edges.extend([lo_cm, hi_cm])
+            self.openings_cm.append((min(lo_cm, hi_cm), max(lo_cm, hi_cm)))
         self.edges.sort()
+        self.openings_cm.sort()
         self.rows = rows
         self.catalog = catalog or {}
         self._build()
@@ -526,6 +591,8 @@ class _Wall(object):
         s.orientable = _sva._is_orientable_small_void_piece(cand)
         s.void_off, s.void_half = _void_geometry(cand, self.p0, self.dir, lo, hi)
         s.side = (1 if (s.void_off or 0.0) >= 0.0 else -1) if s.orientable else 0
+        s.cells = _cells_geometry(cand, self.p0, self.dir, lo, hi) if s.hollow else ()
+        s.cell_side = s.side
         return s
 
     def _build(self):
@@ -649,9 +716,13 @@ class _Wall(object):
             cp += _compensator_guard(self.fam[f], self.length) * self.count[f]
             ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
             ht += self._half_near_ties(self.fam[f], f)
-        return {"violations": v, "coincident_faces": co, "compensator_guard": cp,
-                "long_compensator_extremes": ex, "half_block_near_tie": ht,
-                "stacked_joints": _stacks(self.fam, self.course_fam, self.length, self.edges)}
+        out = {"violations": v, "coincident_faces": co, "compensator_guard": cp,
+               "long_compensator_extremes": ex, "half_block_near_tie": ht,
+               "stacked_joints": _stacks(self.fam, self.course_fam, self.length, self.edges)}
+        if self.jamb_alignment:
+            out["jamb_compensator_distance"] = round(sum(self._jamb_distance(f) * self.count[f]
+                                                         for f in self.fam), 3)
+        return out
 
     # ------------------------------------------------------------ busca
     def _apply(self, f, run, codes, sides):
@@ -665,6 +736,7 @@ class _Wall(object):
             s.lo, s.hi, s.code = cur, cur + length, codes[k]
             s.compensator, s.hollow, s.orientable = tpl.compensator, tpl.hollow, tpl.orientable
             s.void_off, s.void_half = tpl.void_off, tpl.void_half
+            s.cells, s.cell_side = tpl.cells, tpl.cell_side
             s.side = sides[k] if tpl.orientable else 0
             cur += length + (gaps[k] if k < len(gaps) else 0.0)
 
@@ -1133,6 +1205,501 @@ class _Wall(object):
                     break
         return accepted
 
+    # ------------------------------------------------------------ faixa de jamba (secao 84)
+    def _active_jamb_edges(self, f):
+        """[(t_cm da borda, sentido)] das jambas ATIVAS na familia `f` - a fileira
+        nao tem peca logo dentro do vao (a abertura corta esta fiada). Sentido
+        -1: as pecas ficam antes da borda (borda inicial do vao); +1: depois."""
+        slots = self.fam[f]
+        out = []
+        for lo, hi in self.openings_cm:
+            if hi - lo <= 2.0 * JAMB_INSIDE_PROBE_CM:
+                continue
+            if _covering(slots, lo + JAMB_INSIDE_PROBE_CM) is None:
+                out.append((lo, -1))
+            if _covering(slots, hi - JAMB_INSIDE_PROBE_CM) is None:
+                out.append((hi, 1))
+        return out
+
+    @staticmethod
+    def _distance_to_edge(slot, edge, d):
+        """Distancia (cm) da face de `slot` voltada para a jamba ate' a borda
+        (0 = encostado, contando a junta dentro da tolerancia)."""
+        return (slot.lo - edge) if d > 0 else (edge - slot.hi)
+
+    def _strip_distance(self, f, i, edges):
+        """Distancia (cm) do compensador `self.fam[f][i]` ate' a jamba ativa mais
+        proxima do lado dele, SEM contar os compensadores entre ele e o vao: um
+        par C04+C09 encostado e' UMA faixa (os dois contam 0). None fora do
+        alcance de 2x JAMB_REACH_CM ou do lado errado da borda."""
+        slots = self.fam[f]
+        s = slots[i]
+        best = None
+        for edge, d in edges:
+            raw = self._distance_to_edge(s, edge, d)
+            if raw < -JAMB_TOUCH_TOLERANCE_CM or raw > 2.0 * JAMB_REACH_CM:
+                continue
+            strip = 0.0
+            k = i - d
+            while 0 <= k < len(slots):
+                q = slots[k]
+                if self._distance_to_edge(q, edge, d) < -JAMB_TOUCH_TOLERANCE_CM:
+                    break
+                if q.compensator:
+                    # comprimento do compensador + a junta do lado de fora dele
+                    strip += (slots[k + 1].lo - q.lo) if d > 0 else (q.hi - slots[k - 1].hi)
+                k -= d
+            dist = max(raw - strip, 0.0)
+            if best is None or dist < best:
+                best = dist
+        return best
+
+    def _jamb_distance(self, f):
+        """Soma das distancias dos compensadores da familia `f` ate' a jamba ativa
+        mais proxima do lado deles (teto JAMB_REACH_CM). Encostado (ou atras de
+        outro compensador encostado) conta 0 - a folga da junta nao penaliza."""
+        edges = self._active_jamb_edges(f)
+        if not edges:
+            return 0.0
+        total = 0.0
+        for i, s in enumerate(self.fam[f]):
+            if not s.compensator:
+                continue
+            best = self._strip_distance(f, i, edges)
+            if best is None or best <= JAMB_TOUCH_TOLERANCE_CM:
+                continue
+            total += min(best, JAMB_REACH_CM)
+        return round(total, 3)
+
+    def _jamb_strip_faces(self, f):
+        """Faces ISENTAS da familia `f`: as DUAS faces da junta interna da faixa
+        de compensadores (C09/C04) encostada numa jamba ativa - a do compensador
+        mais de dentro e a da peca vizinha do outro lado da mesma junta. Nao vale
+        para a junta seguinte (depois do B19/B39) nem para ponta de no'."""
+        out = []
+        edges = self._active_jamb_edges(f)
+        slots = self.fam[f]
+        for edge, d in edges:
+            i = self._touching_index(slots, edge, d)
+            if i is None or not slots[i].compensator:
+                continue
+            # anda pela faixa (compensadores encostados) ate' a ultima peca dela;
+            # as juntas ENTRE compensadores da faixa (C04|C09) tambem sao dela
+            j = i
+            while 0 <= j + d < len(slots) and slots[j + d].compensator:
+                gap = (slots[j + d].lo - slots[j].hi) if d > 0 else (slots[j].lo - slots[j + d].hi)
+                if gap > RUN_MAX_GAP_CM:
+                    break
+                out.extend([slots[j].hi, slots[j + d].lo] if d > 0 else [slots[j].lo, slots[j + d].hi])
+                j += d
+            last = slots[j]
+            out.append(last.hi if d > 0 else last.lo)
+            if 0 <= j + d < len(slots):
+                nxt = slots[j + d]
+                gap = (nxt.lo - last.hi) if d > 0 else (last.lo - nxt.hi)
+                if gap <= RUN_MAX_GAP_CM:
+                    out.append(nxt.lo if d > 0 else nxt.hi)
+        out.sort()
+        return out
+
+    @staticmethod
+    def _touching_index(slots, edge, d):
+        for i, s in enumerate(slots):
+            face = s.lo if d > 0 else s.hi
+            if abs(face - edge) <= JAMB_TOUCH_TOLERANCE_CM:
+                return i
+        return None
+
+    def _courses_of(self, f):
+        return [c for c in sorted(self.course_fam) if self.course_fam[c] == f]
+
+    def _jamb_units(self):
+        """({chave: [(familia, indices em ordem de posicao, [(borda, sentido)])]},
+        [conflitos de peca fixa]). A unidade e' a corrida MOVEL contigua que sai
+        da jamba (ate' JAMB_REACH_CM ou a primeira peca fixa: no', canaleta, verga)
+        e contem compensador. Num pilarete as corridas das duas jambas que se
+        sobrepoem viram UMA unidade (o compensador vai para a jamba mais perto)."""
+        units = collections.defaultdict(list)
+        blocked = []
+        for f in sorted(self.fam):
+            slots = self.fam[f]
+            per_edge = []
+            for edge, d in self._active_jamb_edges(f):
+                i0 = self._touching_index(slots, edge, d)
+                if i0 is None:
+                    continue
+                idx = []
+                j = i0
+                while 0 <= j < len(slots):
+                    s = slots[j]
+                    if self._distance_to_edge(s, edge, d) >= JAMB_REACH_CM or not s.movable:
+                        break
+                    if idx:
+                        prev = slots[idx[-1]]
+                        gap = (s.lo - prev.hi) if d > 0 else (prev.lo - s.hi)
+                        if gap < -FACE_TOLERANCE_CM or gap > RUN_MAX_GAP_CM:
+                            break
+                    idx.append(j)
+                    j += d
+                # compensador ao alcance, mas atras de peca fixa: permutar nao chega nele
+                behind = []
+                k = j
+                while 0 <= k < len(slots):
+                    s = slots[k]
+                    dist = self._distance_to_edge(s, edge, d)
+                    if dist >= JAMB_REACH_CM:
+                        break
+                    if s.compensator and dist >= -JAMB_TOUCH_TOLERANCE_CM:
+                        behind.append(k)
+                    k += d
+                if behind:
+                    blocked.append({"wall_idx": self.wall_idx, "edges_cm": [round(edge, 1)], "side": d,
+                                    "courses": self._courses_of(f),
+                                    "distance_cm": round(min(self._distance_to_edge(slots[k2], edge, d)
+                                                             for k2 in behind), 1),
+                                    "codes": [slots[k2].code for k2 in behind],
+                                    "reasons": ["FIXED_PIECE_BETWEEN"]})
+                if len(idx) < 2 or not any(slots[i].compensator for i in idx):
+                    continue
+                per_edge.append((sorted(idx), [(edge, d)]))
+            merged = []
+            for idx, edges in sorted(per_edge):
+                if merged and set(idx) & set(merged[-1][0]):
+                    merged[-1] = (sorted(set(idx) | set(merged[-1][0])), merged[-1][1] + edges)
+                else:
+                    merged.append((idx, edges))
+            for idx, edges in merged:
+                key = tuple(sorted((round(e, 1), d) for e, d in edges))
+                units[key].append((f, idx, edges))
+        return units, blocked
+
+    def _prism_misaligned(self, a, b, window):
+        """Vazados (centro de CADA celula, geometria real) de uma fiada que NAO
+        continuam na fiada vizinha: caem sobre peca macica (compensador), sobre
+        uma junta, ou a mais de PRISM_ALIGNED_DC_MAX_CM do centro de um vazado da
+        peca de cima/baixo. Canaleta e vao nao contam (nao sao prisma de bloco)."""
+        n = 0
+        for src, dst in ((a, b), (b, a)):
+            dst_slots = self.fam[dst]
+            for p in _in_window(self.fam[src], window[0], window[1]):
+                for c in _cell_centers(p):
+                    if c < window[0] or c > window[1]:
+                        continue
+                    h = _covering(dst_slots, c)
+                    if h is None:
+                        i = _first_hi_at_least(dst_slots, c)
+                        if 0 < i < len(dst_slots) and dst_slots[i].lo - dst_slots[i - 1].hi <= RUN_MAX_GAP_CM:
+                            n += 1  # vazado sobre a junta
+                        continue
+                    if _is_channel_code(h.code):
+                        continue
+                    cells = _cell_centers(h)
+                    if not cells or min(abs(c - q) for q in cells) > PRISM_ALIGNED_DC_MAX_CM:
+                        n += 1
+        return n
+
+    def _coincident_nonexempt(self, a, b, window):
+        """Faces da familia `a` na janela que coincidem com uma face da `b` - menos
+        a junta da faixa de jamba. Mesma leitura da auditoria de producao (secao
+        11.8): a junta da peca de fechamento encostada no vao e' isenta na PROPRIA
+        fiada, e isso ja' interrompe a sequencia vertical - vale quando a face e'
+        da faixa em pelo menos uma das duas fiadas (ex.: a junta entre as canaletas
+        da verga logo acima da faixa). So' a junta da faixa: nenhuma outra."""
+        faces_a = _internal_faces(self.fam[a], self.length, self.edges, window)
+        faces_b = _internal_faces(self.fam[b], self.length, self.edges,
+                                  (window[0] - FACE_TOLERANCE_CM, window[1] + FACE_TOLERANCE_CM))
+        strip_a, strip_b = self._jamb_strip_faces(a), self._jamb_strip_faces(b)
+        out = []
+        for face in faces_a:
+            if not _has_value_near(faces_b, face, FACE_TOLERANCE_CM):
+                continue
+            if _has_value_near(strip_a, face, FACE_TOLERANCE_CM) or \
+                    _has_value_near(strip_b, face, FACE_TOLERANCE_CM):
+                continue
+            out.append(face)
+        return out
+
+    def _stacks_nonexempt(self, window):
+        """Juntas NAO isentas que se repetem em 3+ fiadas seguidas, na janela."""
+        cache = {}
+        faces = {}
+        for c in sorted(self.course_fam):
+            f = self.course_fam[c]
+            if f not in cache:
+                strip = self._jamb_strip_faces(f)
+                cache[f] = [x for x in _internal_faces(self.fam[f], self.length, self.edges, window)
+                            if not _has_value_near(strip, x, FACE_TOLERANCE_CM)]
+            faces[c] = cache[f]
+        empty = []
+        n = 0
+        for c in sorted(faces):
+            for face in faces[c]:
+                if _has_value_near(faces.get(c - 1, empty), face, FACE_TOLERANCE_CM):
+                    continue
+                length, cc = 1, c
+                while _has_value_near(faces.get(cc + 1, empty), face, FACE_TOLERANCE_CM):
+                    length += 1
+                    cc += 1
+                if length >= 3:
+                    n += 1
+        return n
+
+    @staticmethod
+    def _unmatched(intervals_a, intervals_b):
+        """Compensadores de `a` sem compensador de `b` na mesma faixa vertical
+        (sobreposicao >= metade do menor): quebras da coluna entre as fiadas."""
+        n = 0
+        for lo, hi in intervals_a:
+            if not any(min(hi, hi2) - max(lo, lo2) >= 0.5 * min(hi - lo, hi2 - lo2)
+                       for lo2, hi2 in intervals_b):
+                n += 1
+        return n
+
+    def _jamb_measure(self, fams, idx_of, edges, pairs, window, base_codes):
+        dist = 0.0
+        comp_iv = {}
+        moved = 0
+        for f in fams:
+            ivs = []
+            for n_pos, i in enumerate(idx_of[f]):
+                s = self.fam[f][i]
+                if s.code != base_codes[f][n_pos]:
+                    moved += self.count[f]
+                if not s.compensator:
+                    continue
+                best = self._strip_distance(f, i, edges)
+                if best is not None and best > JAMB_TOUCH_TOLERANCE_CM:
+                    dist += min(best, JAMB_REACH_CM) * self.count[f]
+                ivs.append((s.lo, s.hi))
+            comp_iv[f] = ivs
+        breaks = 0
+        for a, b, k in pairs:
+            if a != b and a in comp_iv and b in comp_iv:
+                breaks += k * (self._unmatched(comp_iv[a], comp_iv[b]) + self._unmatched(comp_iv[b], comp_iv[a]))
+        cp = ht = ex = 0
+        wide = (window[0] - WINDOW_PAD_CM, window[1] + WINDOW_PAD_CM)
+        for f in fams:
+            near = _in_window(self.fam[f], wide[0], wide[1])
+            cp += _compensator_guard(near, self.length) * self.count[f]
+            ht += self._half_near_ties(near, f)
+            ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
+        sv = prism = 0
+        joints = set()
+        for a, b, k in pairs:
+            sv += k * _violations_between(self.fam[a], self.fam[b], self.tol, window)
+            prism += k * self._prism_misaligned(a, b, window)
+            if a != b:
+                for face in self._coincident_nonexempt(a, b, window):
+                    joints.add((round(face, 1), min(a, b), max(a, b)))
+        return {"dist": round(dist, 3), "breaks": breaks, "cp": cp, "ht": ht, "ex": ex, "sv": sv,
+                "prism": prism, "joints": joints, "stacks": self._stacks_nonexempt(window), "moved": moved}
+
+    @staticmethod
+    def _jamb_failures(m, base):
+        fails = []
+        if m["prism"] > base["prism"]:
+            fails.append("PRISM_39_19_WOULD_BREAK")
+        if m["sv"] > base["sv"]:
+            fails.append("B34_SMALL_VOID_WOULD_BREAK")
+        if m["cp"] > base["cp"]:
+            fails.append("ADJACENT_COMPENSATORS")
+        if m["ht"] > base["ht"]:
+            fails.append("HALF_BLOCK_NEAR_TIE")
+        if m["ex"] > base["ex"]:
+            fails.append("LONG_COMPENSATOR_AT_WALL_END")
+        if not m["joints"] <= base["joints"]:
+            fails.append("NEW_COINCIDENT_JOINT")
+        if m["stacks"] > base["stacks"]:
+            fails.append("STACKED_JOINT")
+        return fails
+
+    def _solve_jamb_unit(self, key, members):
+        """Resolve UMA lateral (ou pilarete) com TODAS as familias de fiada dela
+        juntas. Devolve True se mudou alguma peca."""
+        fams = [f for f, _idx, _edges in members]
+        idx_of = dict((f, idx) for f, idx, _edges in members)
+        edges = sorted(set((e, d) for _f, _idx, es in members for e, d in es))
+        lo = min(self.fam[f][idx_of[f][0]].lo for f in fams)
+        hi = max(self.fam[f][idx_of[f][-1]].hi for f in fams)
+        window = (lo - 1.0, hi + 1.0)
+        pairs = sorted((a, b, k) for (a, b), k in self.weights.items() if a in idx_of or b in idx_of)
+        orig = dict((f, self._snap(f, idx_of[f])) for f in fams)
+        base_codes = dict((f, [s.code for s in orig[f]]) for f in fams)
+        options = {}
+        for f in fams:
+            current = tuple((s.code, s.side if s.orientable else 0) for s in orig[f])
+            orders = _multiset_orders(collections.Counter(current), len(current), JAMB_MAX_ORDERS_PER_FAMILY)
+            if current in orders:
+                orders.remove(current)
+            options[f] = [current] + orders
+
+        def apply(assign):
+            for f in fams:
+                order = assign[f]
+                self._apply(f, idx_of[f], [c for c, _side in order], [side or 1 for _c, side in order])
+
+        def restore():
+            for f in fams:
+                self._restore(f, idx_of[f], orig[f])
+
+        memo = {}
+
+        def measure(assign):
+            sig = tuple(assign[f] for f in fams)
+            if sig not in memo:
+                apply(assign)
+                memo[sig] = self._jamb_measure(fams, idx_of, edges, pairs, window, base_codes)
+                restore()
+            return memo[sig]
+
+        def objective(m, assign):
+            return (m["dist"], m["breaks"], m["prism"], m["sv"], m["moved"],
+                    tuple(options[f].index(assign[f]) for f in fams))
+
+        start = dict((f, options[f][0]) for f in fams)
+        base = measure(start)
+        total = 1
+        for f in fams:
+            total *= len(options[f])
+        best = (objective(base, start), start)
+        best_any = best
+        if total <= JAMB_JOINT_MAX_COMBINATIONS:
+            assigns = [{}]
+            for f in fams:
+                assigns = [_merged(a, f, o) for a in assigns for o in options[f]]
+            candidates = assigns
+        else:
+            candidates = None
+        if candidates is not None:
+            for assign in candidates:
+                m = measure(assign)
+                obj = objective(m, assign)
+                if obj < best_any[0]:
+                    best_any = (obj, assign)
+                if not self._jamb_failures(m, base) and obj < best[0]:
+                    best = (obj, assign)
+        else:
+            current = dict(start)
+            for _round in range(JAMB_DESCENT_ROUNDS):
+                improved = False
+                for f in fams:
+                    for o in options[f]:
+                        trial = dict(current)
+                        trial[f] = o
+                        m = measure(trial)
+                        obj = objective(m, trial)
+                        if obj < best_any[0]:
+                            best_any = (obj, trial)
+                        if not self._jamb_failures(m, base) and obj < best[0]:
+                            best = (obj, trial)
+                            current = trial
+                            improved = True
+                if not improved:
+                    break
+        chosen_obj, chosen = best
+        changed = chosen_obj[:2] < objective(base, start)[:2]
+        # tudo o que usa `measure` (aplica, mede e RESTAURA) vem antes de aplicar
+        final = measure(chosen)
+        reasons = ["NO_PERMUTATION_REACHES_JAMB"]
+        detail = {}
+        if final["dist"] > 0.0 and best_any[0][0] < chosen_obj[0]:
+            blocked_by = measure(best_any[1])
+            reasons = self._jamb_failures(blocked_by, base) or reasons
+            new_joints = sorted(set(j[0] for j in blocked_by["joints"] - base["joints"]))
+            if new_joints:
+                detail["new_joint_faces_cm"] = new_joints
+            if blocked_by["prism"] > base["prism"]:
+                detail["prism_misaligned_delta"] = blocked_by["prism"] - base["prism"]
+        if changed:
+            apply(chosen)
+        if final["dist"] > 0.0:
+            # a faixa nao fechou: registra para revisao com o motivo real
+            for f in fams:
+                far = [self._strip_distance(f, i, edges) for i in idx_of[f] if self.fam[f][i].compensator]
+                far = [x for x in far if x is not None and x > JAMB_TOUCH_TOLERANCE_CM]
+                if far:
+                    self.jamb_conflicts.append({
+                        "wall_idx": self.wall_idx, "edges_cm": [round(e, 1) for e, _d in edges],
+                        "side": edges[0][1] if len(edges) == 1 else 0, "courses": self._courses_of(f),
+                        "distance_cm": round(min(far), 1), "codes": [self.fam[f][i].code for i in idx_of[f]],
+                        "reasons": reasons, "detail": dict(detail)})
+        return bool(changed)
+
+    def align_jamb_compensators(self):
+        """SECAO 84: faixa de compensacao na jamba, lateral por lateral, com as
+        fiadas em conjunto. Devolve quantas laterais mudaram; os casos que nao
+        fecham ficam em `self.jamb_conflicts` com o motivo."""
+        self.jamb_conflicts = []
+        if not self.jamb_alignment:
+            return 0
+        units, blocked = self._jamb_units()
+        self.jamb_conflicts.extend(blocked)
+        changed = 0
+        for key in sorted(units):
+            if self._solve_jamb_unit(key, units[key]):
+                changed += 1
+        return changed
+
+
+def _merged(assign, family, order):
+    out = dict(assign)
+    out[family] = order
+    return out
+
+
+def jamb_strip_census(course_candidates, walls_to_create, openings_per_wall, catalog=None):
+    """SECAO 84 - regua INDEPENDENTE do passe (validacao/relatorio): para cada
+    lateral de abertura, a distancia do compensador mais perto da jamba em cada
+    fiada em que a abertura corta a fileira. `alternating` = a lateral tem
+    compensador em alguma fiada e ele nao fica na mesma posicao em todas;
+    `touching_all` = em toda fiada com compensador ele encosta no vao."""
+    out = {"sides": 0, "sides_with_compensator": 0, "alternating": 0, "touching_all": 0, "details": []}
+    rows_by_wall = _collect_rows(course_candidates, walls_to_create)
+    ops = openings_per_wall or []
+    for wi in sorted(rows_by_wall):
+        openings = []
+        for op in (ops[wi] if wi < len(ops) else None) or ():
+            lo_cm, hi_cm = float(op[0]) * CM_PER_FT, float(op[1]) * CM_PER_FT
+            openings.append((min(lo_cm, hi_cm), max(lo_cm, hi_cm)))
+        if not openings:
+            continue
+        rows = rows_by_wall[wi]
+        for lo_cm, hi_cm in sorted(openings):
+            for edge, d in ((lo_cm, -1), (hi_cm, 1)):
+                per_course = {}
+                for c in sorted(rows):
+                    entries = rows[c]
+                    probe = edge + JAMB_INSIDE_PROBE_CM if d < 0 else edge - JAMB_INSIDE_PROBE_CM
+                    if any(elo - 1e-6 <= probe <= ehi + 1e-6 for _cand, elo, ehi, _cc in entries):
+                        continue  # a abertura nao corta esta fiada
+                    best = None
+                    for cand, elo, ehi, _cc in entries:
+                        entry = (catalog or {}).get(cand.get("logical_code")) or {}
+                        if not entry.get("is_compensator") or cand.get("wall_idx") != wi:
+                            continue
+                        dist = (elo - edge) if d > 0 else (edge - ehi)
+                        if -JAMB_TOUCH_TOLERANCE_CM <= dist < JAMB_REACH_CM and (best is None or dist < best):
+                            best = dist
+                    per_course[c] = None if best is None else max(0.0, round(best, 1))
+                if not per_course:
+                    continue
+                out["sides"] += 1
+                with_comp = [v for v in per_course.values() if v is not None]
+                if not with_comp:
+                    continue
+                out["sides_with_compensator"] += 1
+                touching = [v <= JAMB_TOUCH_TOLERANCE_CM for v in with_comp]
+                positions = set(0.0 if v <= JAMB_TOUCH_TOLERANCE_CM else v for v in with_comp)
+                alternating = len(positions) > 1
+                if alternating:
+                    out["alternating"] += 1
+                if all(touching):
+                    out["touching_all"] += 1
+                out["details"].append({"wall_idx": wi, "edge_cm": round(edge, 1), "side": d,
+                                       "distance_by_course": dict((str(c), v) for c, v in sorted(per_course.items())),
+                                       "alternating": alternating, "touching_all": all(touching)})
+    return out
+
 
 def _collect_rows(course_candidates, walls_to_create):
     """{wall_idx: {course: [(cand, lo, hi, courses)]}} ordenado por lo."""
@@ -1337,17 +1904,23 @@ def _fill_codes(course_candidates, catalog):
 def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, catalog=None,
                      tolerance_cm=_sva.SMALL_VOID_ALIGN_TOLERANCE_CM, tie_positions_by_wall=None,
                      half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None,
-                     only_walls=None, joint_identity_guard=False):
+                     only_walls=None, joint_identity_guard=False, jamb_compensator_alignment=False):
     """Aplica o arranjo conjunto. Devolve o resumo por parede alterada e os
     totais das guardas antes/depois (as guardas nunca pioram por construcao).
     `joint_identity_guard` (secao 81.1): nenhuma troca cria junta coincidente
-    entre fiadas vizinhas numa posicao nova."""
+    entre fiadas vizinhas numa posicao nova. `jamb_compensator_alignment`
+    (secao 84): faixa de compensacao encostada e alinhada na jamba."""
     summary = {"walls_changed": 0, "runs_changed": 0, "moved": 0, "rotated": 0,
                "before": {"violations": 0, "coincident_faces": 0, "compensator_guard": 0,
                           "long_compensator_extremes": 0, "half_block_near_tie": 0, "stacked_joints": 0},
                "after": {"violations": 0, "coincident_faces": 0, "compensator_guard": 0,
                          "long_compensator_extremes": 0, "half_block_near_tie": 0, "stacked_joints": 0},
                "walls": []}
+    jamb_on = bool(jamb_compensator_alignment) and JAMB_COMPENSATOR_ALIGNMENT_ENABLED
+    if jamb_on:
+        summary["before"]["jamb_compensator_distance"] = 0
+        summary["after"]["jamb_compensator_distance"] = 0
+        summary.update({"jamb_sides_changed": 0, "jamb_conflicts_by_wall": {}})
     if not B34_RUN_ARRANGEMENT_ENABLED or not course_candidates or XYZ is None:
         return summary
     rows_by_wall = _collect_rows(course_candidates, walls_to_create)
@@ -1361,15 +1934,26 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
         wall = _Wall(wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
                      ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
                      half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes,
-                     joint_identity_guard=joint_identity_guard)
+                     joint_identity_guard=joint_identity_guard, jamb_alignment=jamb_on)
         before = wall.totals()
         base_fam = dict((f, [s.copy() for s in slots]) for f, slots in wall.fam.items())
-        changed = wall.optimize() if before["violations"] else set()
-        compositions = wall.compose()
-        oriented = wall.orient_exact() if wall.totals()["violations"] else 0
+        aligned = 0
+        if jamb_on:
+            # SECAO 84 = passe FINAL so' de permutacao, por cima do arranjo ja'
+            # convergido (ordem 60, composicao 61, orientacao 62): a contagem de
+            # pecas e' a da busca, toda composicao que TIRA compensador ja'
+            # aconteceu (regra 5 do pedido) e nada depois desfaz a faixa
+            changed, compositions, oriented = set(), 0, 0
+            aligned = wall.align_jamb_compensators()
+        else:
+            changed = wall.optimize() if before["violations"] else set()
+            compositions = wall.compose()
+            oriented = wall.orient_exact() if wall.totals()["violations"] else 0
         if oriented:
             summary["orientation_dp_changes"] = summary.get("orientation_dp_changes", 0) + oriented
-        if not changed and not compositions and not oriented:
+        if jamb_on:
+            summary["jamb_conflicts_by_wall"][wi] = list(wall.jamb_conflicts)
+        if not changed and not compositions and not oriented and not aligned:
             for key in summary["before"]:
                 summary["before"][key] += before[key]
                 summary["after"][key] += before[key]
@@ -1400,11 +1984,19 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
             moved = rotated = created = removed = 0
             compositions = oriented = 0
             changed = set()
+            if jamb_on and aligned:
+                # a faixa desta parede nao passou no validador de producao
+                summary["jamb_conflicts_by_wall"][wi] = [{
+                    "wall_idx": wi, "edges_cm": [], "side": 0, "courses": [], "distance_cm": None,
+                    "codes": [], "reasons": ["PRODUCTION_VALIDATION_REJECTED"]}]
+            aligned = 0
         for key in summary["before"]:
             summary["before"][key] += before[key]
             summary["after"][key] += after[key]
-        if not changed and not compositions and not oriented:
+        if not changed and not compositions and not oriented and not aligned:
             continue
+        if jamb_on:
+            summary["jamb_sides_changed"] += aligned
         summary["walls_changed"] += 1
         summary["runs_changed"] += len(changed)
         summary["compositions"] += compositions

@@ -90,6 +90,22 @@ diferentes. Por isso `AMBIGUOUS` reserva espaço de amarração mesmo sem
 casar com T/X — ali existe peça de verdade, só que na outra faixa de
 altura (ver BONDING.md).
 
+## Faixa de compensação na jamba — medida no Revit (REGRAS §84, 2026-09-28)
+
+Arquivo de teste `butanta testes`, motor main `1db4876`, NONE, 14 fiadas.
+
+- **W1 (porta, jamba t = 79 cm, T no início do eixo)** — antes: fiada par
+  `B34(nó) | B34 | C09 | vão`, ímpar `B34 | C09 | B19 | vão` (C09 a 0 e a
+  20 cm do vão, vazado do B19 10,9 cm fora do vazado de baixo). Depois:
+  ímpar `B34 | B19 | C09 | vão` — C09 encostado nas 11 fiadas, vazado do
+  B19 a 0,9 cm do vazado de baixo.
+- **W0 (pilarete 975–1044 entre janelas)** — antes: `B39 | C09 | B19` sobre
+  `B19 | B39 | C09`; depois: `B39 | B19 | C09` — faixa de C09 na jamba de
+  1044 em todas as fiadas.
+- **Não é para mexer**: pilarete de 54 cm da W0 (800–854) fechado com
+  `B19 B34` sem compensador — a composição que tira compensador vem antes
+  do alinhamento.
+
 ## Como registrar um novo exemplo
 
 Sempre que uma medição nova (via MCP) ou uma parede modulada à mão pelo

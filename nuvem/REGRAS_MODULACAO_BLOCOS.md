@@ -214,6 +214,11 @@ para a regra revisada).
   construtiva (`placement_reason == "B19_RESIDUAL_FILL"`, marcado só
   depois de o candidato passar todos os hard gates) — ver seção 35 para o
   relatório completo, os hard gates e a medição contra TGD/TP1/Piloto.
+- **EXCEÇÃO PERMITIDA (2026-09-28, seção 84 — correção do usuário)**: o B19 pode ficar
+  **imediatamente atrás da faixa de compensação encostada no vão** (C09/C04 junto da jamba),
+  inclusive encostado numa peça de nó — desenho do usuário `B54 | B19 | C09 | vão`. É o mesmo
+  B19 de fechamento contra o vão, deslocado pela faixa; a proibição de B19 no meio de um trecho
+  corrido continua valendo em todo o resto. Ver seção 84.
 
 ### Regra dos compensadores/pastilhas (C09/C04)
 
@@ -1514,6 +1519,9 @@ regra #1 exige.
   empatar com as alternativas reais e vencia por ser o baseline.)
 - **Prioridade**: **EXCEÇÃO PERMITIDA** à regra #1 (seção 11), que continua
   obrigatória e bloqueante para todo o resto.
+- **Seção 84 (2026-09-28)**: a busca do gerador continua sem a isenção; o passe FINAL da faixa de
+  jamba (compensador/pastilha encostados e alinhados entre as fiadas) usa a isenção **só** da junta
+  da própria faixa — a mesma leitura da auditoria de produção. Ver seção 84.
 
 ### 11.9 — Bug real corrigido: `STRAIGHT_CONTINUATION` reservava espaço de uma amarração inexistente (2026-08-28)
 
@@ -11042,3 +11050,110 @@ completa 1 903 passaram, 1 falha histórica (test_perf_trace_stall_sampler), 1 p
 **Pendências:** estender a guarda ao CHANNEL (hoje ele mantém a §68 histórica e a junta a prumo do MCP);
 paridade §72 × §82 continua sendo a maior diferença para o MCP (87 unidades) — decisão D11 aprovada
 (régua humana); o f3 15 (HUMANO = MCP = par) continua na convenção.
+
+## 84. Faixa de compensação na JAMBA — compensador e pastilha encostados no vão e alinhados entre as fiadas (2026-09-28, IMPLEMENTADO, correção do usuário)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** (correção explícita do usuário em 2026-09-28, com imagem de
+  referência: janela com T à esquerda, lado esquerdo ajustado à mão). Vale no caminho **"Sem reforço
+  adicional"** (NONE, o padrão). No CHANNEL: **DOCUMENTADO — pendência de decisão do usuário** (o
+  CHANNEL tem contrato de identidade física próprio, §51.3/§81; ligar é uma linha em
+  `_apply_opening_reinforcement`).
+- **Como foi descoberto**: o usuário apontou no Revit (arquivo de teste `butanta testes`, 2026-09-28)
+  que o C09/C04 junto de portas e janelas mudava de posição fiada a fiada. Medido no dump da modulação
+  real (motor main `1db4876`, 34 paredes, 14 fiadas): **29 de 47 laterais** de abertura com compensador
+  alternavam (ex.: W1, porta, jamba t = 79 cm: fiada par `B34 | B34 | C09 | vão`, ímpar
+  `B34 | C09 | B19 | vão` — C09 a 0 e a 20 cm do vão; W0, pilarete 975–1044: `B39 | C09 | B19` sobre
+  `B19 | B39 | C09`). Reproduzido offline (CPython, `tools/audit/s74_corpus.py`, 7.126 peças, as mesmas
+  29 laterais).
+
+### A regra
+
+1. Em cada **lateral** de abertura as fiadas são resolvidas **em conjunto** (não fiada a fiada).
+2. Quando há compensador (C09) ou pastilha (C04) em fiadas sucessivas da lateral, eles ficam na
+   **mesma faixa vertical**, **encostados no vão** (com a junta de 1 cm prevista). Um par C04+C09
+   encostado é UMA faixa.
+3. O **prisma dos vazados** dos blocos de 39 e 19 (e de todos os vazados) é preservado — verificado
+   pela **geometria real** das células das famílias (`cells_world`), não pelo código da peça: vazado
+   alinhado = centro a até **2,0 cm** do centro de um vazado da peça da fiada vizinha (aparelho corrido
+   real: B19 sobre B39 = 0,9 cm; B34×B39 até 1,75 cm). Vazado sobre compensador maciço ou sobre junta =
+   prisma interrompido. **Alinhamento de vazado não é alinhamento de junta.**
+4. A amarração dos blocos principais é mantida. A **única** isenção é a junta da própria faixa (as duas
+   faces da junta interna do compensador encostado, e as juntas entre compensadores da faixa). Ela
+   **não** autoriza junta vertical contínua em nenhum outro ponto da parede (nem a junta seguinte, depois
+   do B19/B39).
+5. **Nenhum compensador é introduzido** em fiada que não precisa dele só para repetir a coluna: a regra
+   só **permuta** as peças que a busca já escolheu — nenhuma peça criada nem removida (contagem por
+   código idêntica).
+6. Sem C09+C09 (nem compensadores encostados novos) quando há solução com B19; as demais restrições de
+   combinação continuam valendo (§2, §58, regra #2).
+7. Posição/dimensão de abertura, comprimento e espessura de parede não mudam.
+8. Nenhuma peça invade abertura; verga, contraverga e canaletas intocadas (canaleta nunca é peça móvel
+   nem amarração, §75).
+9. Peças de nó (L/T/X) nunca se movem. Conflito geométrico real → **registrado para revisão**
+   (`result["jamb_compensator_alignment"]["conflicts"]`, com o motivo), nunca forçado.
+
+**Prioridade entre as soluções válidas** (as que preservam prisma e amarração): menor distância das
+compensações até o vão → melhor alinhamento vertical delas entre as fiadas → menos peças pequenas
+(constante numa permutação) → menos peças movidas.
+
+### Implementação
+
+- `nuvem/core/engine/b34_run_arrangement.py` — `_Wall.align_jamb_compensators` (passe **final** só de
+  permutação, `JAMB_COMPENSATOR_ALIGNMENT_ENABLED`):
+  - **unidade** = corrida MÓVEL contígua que sai da jamba ativa (a abertura corta aquela fiada) até
+    `JAMB_REACH_CM` = 60 cm ou até a primeira peça fixa (nó, canaleta); num **pilarete** as corridas das
+    duas jambas que se sobrepõem viram uma unidade (o compensador vai para a jamba mais perto);
+  - as famílias de fiada da mesma lateral são combinadas (produto das permutações do MESMO
+    multiconjunto de cada uma; descida coordenada acima de `JAMB_JOINT_MAX_COMBINATIONS`);
+  - **restrições duras** (nunca pioram contra o estado da busca): prisma pela geometria real
+    (`_prism_misaligned`), vazado menor do B34 (§52), compensadores encostados, meio bloco perto de
+    amarração (regra #2), compensador longo na ponta (§58), junta coincidente NOVA fora da faixa (§81.1)
+    e junta empilhada em 3+ fiadas;
+  - aceitação final por parede pelo **validador de produção** (auditoria de amarração, apoio físico,
+    verga/contraverga), com rollback; depois a ETAPA 4D reorienta os compensadores movidos.
+- `nuvem/core/wall_modeling.py` — `_orient_small_voids_final(..., jamb_compensator_alignment=True)`
+  chamado por `_general_composition_arrangement` (NONE). O passe roda **depois** dos 3 passes do arranjo
+  60–65 (ordem, composição, orientação) já convergidos: toda composição que TIRA compensador acontece
+  antes (medido: intercalar o alinhamento entre os passes bloqueava a composição `C09 B39 C04 → B19 B34`
+  do pilarete de 54 cm da W0 e deixava +12 C04/+12 C09 — por isso a ordem).
+- Régua independente `jamb_strip_census` (por lateral: distância do compensador ao vão em cada fiada,
+  `alternating`, `touching_all`) em `result["jamb_compensator_alignment"]["census"]` (e `census_before`).
+- Causa do comportamento anterior: o trecho entre a última peça e a jamba era recomposto fiada a fiada
+  (`_recut_openings_and_repair`); a fiada A usava o guloso (maior peça primeiro; a fusão 9+9→B19 só na
+  ponta aberta punha o B19 no vão e o C09 20 cm para dentro) e a fiada B **fugia** de propósito da junta
+  do C09 da fiada A (a isenção §11.8 vale só na validação); com uma composição por paridade o resultado
+  alternava. O arranjo 60–65 só reordenava por vazado menor do B34, e as guardas dele contavam a junta
+  do compensador encostado como coincidência.
+
+### Conflitos e exceções registrados
+
+- **§2 — "Regra do meio-bloco (B19)"**: EXCEÇÃO PERMITIDA — o B19 pode ficar **imediatamente atrás da
+  faixa de compensação encostada no vão**, inclusive encostado numa peça de nó (desenho do usuário:
+  `B54 | B19 | C09 | vão`). É o mesmo B19 de fechamento contra o vão, só deslocado pela faixa; a
+  proibição de B19 no meio de um trecho corrido continua valendo em todo o resto.
+- **§11.8**: a busca do gerador continua sem a isenção (§11.8 intacta); o passe da §83 usa a isenção
+  estreita **só** da junta da faixa — mesma leitura da auditoria de produção (a junta da peça de
+  fechamento encostada é isenta na própria fiada e isso interrompe a sequência vertical, inclusive
+  contra a junta entre canaletas da verga logo acima).
+- **Casos que não fecham por permutação** (registrados, `DOCUMENTADO — pendência de código aberta`):
+  `FIXED_PIECE_BETWEEN` (compensador atrás de peça de nó — só uma recomposição do trecho nó→jamba
+  resolveria), `PRISM_39_19_WOULD_BREAK` (C04 em uma paridade só: encostar desloca a fase da lateral e
+  quebra os vazados — o prisma prevalece), `NEW_COINCIDENT_JOINT`/`STACKED_JOINT` (encostar criaria junta
+  a prumo fora da faixa).
+
+### Medido (offline, BUTANTÃ NONE, 34 eixos, 280 cm/14 fiadas, variante `post_micro_adjustment_s66`)
+
+| Métrica | main `1db4876` | §83 |
+|---|---|---|
+| Peças / contagem por código | 7.126 | **7.126 idêntica** |
+| Laterais com compensador alternando | 29 | **2** |
+| Laterais com a faixa encostada em todas as fiadas | 13 | **30** |
+| Vazados interrompidos (planta, régua independente `cells_world`, 2 cm) | 1.649 | **1.373 (−17 %)** |
+| … a até 60 cm de uma jamba | 882 | **606 (−31 %)** |
+| Auditoria de produção (juntas contínuas / faixas / paredes reprovadas) | 3 / 0 / 3 | **3 / 0 / 3** |
+| Vazado menor B34 (§52) | 33 | **33** |
+| Hard gates / `missing_required_junction_bond` / inversões §82 | 0 / 3 / 8 | **0 / 3 / 8** |
+| Conflitos registrados | — | 16 (10 peça de nó, 5 prisma, 1 junta) |
+
+Testes: `tests/test_jamb_compensator_alignment.py` (fixture = trecho real da W1 com as células medidas no
+Revit).
