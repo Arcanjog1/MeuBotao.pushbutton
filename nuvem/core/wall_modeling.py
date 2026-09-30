@@ -3370,7 +3370,13 @@ ARM_ROLE_SAFE_REPAIR_ENABLED = True
 # contra um rebuild COMPLETO; ver docs/BLOCK_B19_RESIDUAL_FILL_
 # IMPLEMENTATION.md e nuvem/REGRAS_MODULACAO_BLOCOS.md para o veredito e a
 # medicao contra TGD/TP1/Piloto).
-B19_RESIDUAL_FILL_REPAIR_ENABLED = True
+# SECAO 85 (2026-09-29): DESLIGADO - "um B19 nao se torna valido apenas por
+# estar encostado em um B54 ... nao crie excecoes automaticas que permitam
+# novamente B19 no miolo" (instrucao mais recente do usuario, prevalece sobre a
+# excecao da secao 35). Medido: o gate da secao 35 aceitava ZERO candidatos em
+# TP1, TGD, piloto e BUTANTA - nenhuma peca muda; o mecanismo continua
+# testavel ligando a flag explicitamente.
+B19_RESIDUAL_FILL_REPAIR_ENABLED = False
 
 
 def _solve_building_blocks_all_courses_pass(*args, **kwargs):
@@ -4590,7 +4596,32 @@ def _micro_adjust_measure(result, walls_to_create, openings_per_wall, catalog, b
     spans = []
     if wall_idx < len(openings_per_wall or ()):
         spans = [(_ft_to_cm(o[0]), _ft_to_cm(o[1])) for o in openings_per_wall[wall_idx]]
+    # SECAO 85 (pedido do usuario, 2026-09-29): a ordem de qualidade do
+    # deslocamento comeca pela CONTINUIDADE dos vazados na altura inteira (regua
+    # por area livre comum real, colunas quebradas no cluster) e pela amarracao
+    # (junta a prumo em 3+ fiadas); depois B19 fora de fechamento; so' entao os
+    # criterios antigos (compensadores, especiais) - o menor deslocamento fica
+    # como ultimo desempate em `choose_offset`.
+    from core.engine import prism_free_area as _prism
+    from core.engine import b34_run_arrangement as _runs_census
+    columns = _prism.column_census(course_candidates, walls_to_create)
+    end_to_node = {}
+    for node_index, node in enumerate(nodes or ()):
+        for arm in (node.get("arms") or ()) if isinstance(node, dict) else ():
+            try:
+                end_to_node[(int(arm[0]), int(arm[1]))] = node_index
+            except (TypeError, ValueError, IndexError):
+                continue
+    ties = None
+    if nodes is not None:
+        ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+                    for wi in range(len(walls_to_create or ())))
+    half_blocks = _runs_census.half_block_census(course_candidates, walls_to_create, openings_per_wall,
+                                                 catalog, tie_positions_by_wall=ties, limit=0)
     quality = {
+        "prism_breaks": columns["broken"],
+        "stacked_joints": columns["stacked_joints_3plus"],
+        "b19_misplaced": half_blocks["misplaced"],
         "small_void": len(_small_void.b34_small_void_violations(course_candidates, catalog)),
         "strip_fillers": _micro.strip_filler_pieces(course_candidates, wall_idx, walls_to_create,
                                                     spans, catalog),
@@ -4718,8 +4749,289 @@ def shift_opening_in_plan(openings_per_wall, wall_idx, opening_index, offset_cm)
     return out
 
 
+# ==========================================
+# SECAO 85 - MOVEDOR TRANSACIONAL DO MICROAJUSTE (pedido do usuario, 2026-09-29)
+#
+# "Pode deslocar portas e janelas ate' 10 cm da posicao ORIGINAL ... a busca deve
+# manter a posicao original como referencia para impedir deslocamentos
+# cumulativos". A marca `MICROAJUSTE off=+5.00 orig=804.00,7.00` no comentario
+# da instancia guarda o deslocamento TOTAL ao longo da parede e a posicao
+# original (XY do ponto de insercao, cm) - a proxima execucao le a marca e o teto
+# vale para o total, nunca por execucao. Marca antiga sem `orig=` (secao 66,
+# harness de 2026-09-15) vale pelo `off=`.
+MICRO_ADJUST_MARK = "MICROAJUSTE"
+MICRO_ADJUST_MATCH_TOLERANCE_CM = 2.0
+
+
+def parse_micro_adjust_mark(comments):
+    """(off_cm, (x_cm, y_cm) ou None) da marca no comentario; (None, None) sem marca."""
+    text = comments or ""
+    i = text.find(MICRO_ADJUST_MARK)
+    if i < 0:
+        return None, None
+    off, orig = None, None
+    for token in text[i:].split("|")[0].split():
+        if token.startswith("off="):
+            try:
+                off = float(token[4:])
+            except ValueError:
+                off = None
+        elif token.startswith("orig="):
+            try:
+                xs, ys = token[5:].split(",")
+                orig = (float(xs), float(ys))
+            except ValueError:
+                orig = None
+    return off, orig
+
+
+def micro_adjust_mark_text(previous, off_cm, orig_xy_cm):
+    """Comentario com a marca atualizada; o resto do texto do usuario fica."""
+    mark = "%s off=%+.2f orig=%.2f,%.2f" % (MICRO_ADJUST_MARK, off_cm, orig_xy_cm[0], orig_xy_cm[1])
+    text = previous or ""
+    i = text.find(MICRO_ADJUST_MARK)
+    if i < 0:
+        return (text.strip() + " | " + mark) if text.strip() else mark
+    rest = text[i:]
+    j = rest.find("|")
+    tail = rest[j:] if j >= 0 else ""
+    return (text[:i] + mark + (" " + tail if tail else "")).strip()
+
+
+def _opening_axis_match(wall_idx, opening_index, walls_to_create, openings_per_wall, all_openings):
+    """O `op` de `all_openings` cujo centro projetado no eixo da parede cai no
+    centro do vao (wall_idx, opening_index) - tolerancia de 2 cm."""
+    centerline = walls_to_create[wall_idx][0]
+    p0 = centerline.GetEndPoint(0)
+    dir_xy = XYZ(centerline.Direction.X, centerline.Direction.Y, 0.0).Normalize()
+    t_lo, t_hi = openings_per_wall[wall_idx][opening_index][:2]
+    t_mid_cm = (t_lo + t_hi) / 2.0 * 30.48
+    best = None
+    for op in all_openings or ():
+        c = op.get("center_xy")
+        if c is None:
+            continue
+        off_axis = abs((c.X - p0.X) * dir_xy.Y - (c.Y - p0.Y) * dir_xy.X) * 30.48
+        if off_axis > 60.0:
+            continue
+        t = ((c.X - p0.X) * dir_xy.X + (c.Y - p0.Y) * dir_xy.Y) * 30.48
+        gap = abs(t - t_mid_cm)
+        if gap <= MICRO_ADJUST_MATCH_TOLERANCE_CM and (best is None or gap < best[0]):
+            best = (gap, op)
+    return (best[1], dir_xy) if best else (None, dir_xy)
+
+
+def opening_moved_so_far_cm(walls_to_create, openings_per_wall, all_openings, comments_by_id):
+    """{(wall_idx, opening_index): deslocamento TOTAL (cm, ao longo do eixo da
+    parede) desde a posicao original}, lido das marcas. Com `orig=` o total e'
+    medido da posicao real atual ate' a original (nada acumula por arredondamento)."""
+    out = {}
+    for wall_idx, row in enumerate(openings_per_wall or ()):
+        for opening_index in range(len(row or ())):
+            op, dir_xy = _opening_axis_match(wall_idx, opening_index, walls_to_create, openings_per_wall,
+                                             all_openings)
+            if op is None:
+                continue
+            off, orig = parse_micro_adjust_mark(comments_by_id.get(op.get("element_id")))
+            if off is None and orig is None:
+                continue
+            ins = op.get("insertion_xy") or op.get("center_xy")
+            if orig is not None and ins is not None:
+                moved = ((ins.X * 30.48 - orig[0]) * dir_xy.X + (ins.Y * 30.48 - orig[1]) * dir_xy.Y)
+            else:
+                moved = off or 0.0
+            out[(wall_idx, opening_index)] = round(moved, 3)
+    return out
+
+
+def apply_opening_micro_adjustments(target_doc, records, walls_to_create, openings_per_wall, all_openings,
+                                    moved_so_far_cm=None, ja_movidas=None, max_total_cm=None):
+    """Aplica NO MODELO os deslocamentos ESCOLHIDOS pelo planejador (secao 66 com
+    a ordem da secao 85). Roda dentro de uma Transacao aberta pelo chamador, com
+    um SubTransaction POR ABERTURA (a falha de uma nunca derruba as outras) e a
+    mesma rede de seguranca de `apply_pier_opening_nudges`: `Regenerate()` +
+    `IsValidObject`, hospedeira, largura/altura/peitoril e deslocamento real
+    conferidos; qualquer divergencia = RollBack daquela abertura.
+
+    So' a posicao ao longo da propria parede muda (sem rotacao, sem Z). Abertura
+    fixada (Pinned) nao e' movida. O teto vale para o deslocamento TOTAL desde a
+    posicao original (`moved_so_far_cm`), e cada abertura anda no maximo uma vez
+    (`ja_movidas`, paredes gemeas). Devolve (aplicados, falhas)."""
+    from core.engine import opening_micro_adjust as _micro
+    cap = _micro.MICRO_ADJUST_MAX_CM if max_total_cm is None else max_total_cm
+    aplicados, falhas = [], []
+    if ja_movidas is None:
+        ja_movidas = set()
+    for rec in records or ():
+        offset = float(rec.get("chosen_offset_cm") or 0.0)
+        if abs(offset) < 1e-6:
+            continue
+        wall_idx, opening_index = rec["wall_idx"], rec["opening_index"]
+        op, dir_xy = _opening_axis_match(wall_idx, opening_index, walls_to_create, openings_per_wall, all_openings)
+        if op is None:
+            falhas.append("parede %s vao %s: abertura nao localizada pelo eixo - nada movido"
+                          % (wall_idx, opening_index))
+            continue
+        eid = op.get("element_id")
+        if eid in ja_movidas:
+            falhas.append("abertura %s ja' deslocada por outra parede - ignorada" % eid)
+            continue
+        inst = target_doc.GetElement(op.get("element_id_obj")) if op.get("element_id_obj") is not None else None
+        if inst is None or not inst.IsValidObject:
+            falhas.append("abertura %s nao existe no modelo" % eid)
+            continue
+        if getattr(inst, "Pinned", False):
+            falhas.append("abertura %s esta' fixada (Pinned) - nao movida" % eid)
+            continue
+
+        def _snapshot(element):
+            loc = element.Location.Point if hasattr(element.Location, "Point") else None
+            host = element.Host.Id if getattr(element, "Host", None) is not None else None
+            params = []
+            for name in ("Largura_abertura", "Altura_abertura", "Peitoril"):
+                p = element.LookupParameter(name)
+                params.append(p.AsDouble() if p is not None and p.HasValue else None)
+            return loc, host, params
+
+        loc0, host0, params0 = _snapshot(inst)
+        if loc0 is None:
+            falhas.append("abertura %s sem LocationPoint - nao movida" % eid)
+            continue
+        vec = XYZ(dir_xy.X * offset / 30.48, dir_xy.Y * offset / 30.48, 0.0)
+        cmt = inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+        if cmt is None or cmt.IsReadOnly:
+            # sem a marca o teto deixaria de ser TOTAL (a proxima execucao nao
+            # saberia de onde a abertura saiu): nao move
+            falhas.append("abertura %s: comentario indisponivel para a marca da posicao original - nao movida" % eid)
+            continue
+        previous = cmt.AsString()
+        off_old, orig = parse_micro_adjust_mark(previous)
+        if orig is None:
+            # original = posicao atual menos o que a marca antiga (sem orig) ja' andou
+            back = (off_old or 0.0) / 30.48
+            orig = ((loc0.X - dir_xy.X * back) * 30.48, (loc0.Y - dir_xy.Y * back) * 30.48)
+        # teto sobre o TOTAL, medido da posicao VIVA ate' a original (a geometria em
+        # memoria pode estar velha); `moved_so_far_cm` do chamador so' reforca
+        live_total = (loc0.X * 30.48 - orig[0]) * dir_xy.X + (loc0.Y * 30.48 - orig[1]) * dir_xy.Y
+        before_total = live_total
+        hint = (moved_so_far_cm or {}).get((wall_idx, opening_index))
+        if hint is not None and abs(hint) > abs(before_total):
+            before_total = hint
+        if abs(before_total + offset) > cap + 1e-6:
+            falhas.append("abertura %s: %+.1f cm levaria o total a %+.1f cm da posicao original (teto %.0f cm)"
+                          " - nada movido" % (eid, offset, before_total + offset, cap))
+            continue
+        clash = _opening_move_interference(op, vec, all_openings)
+        if clash:
+            falhas.append("abertura %s: %+.1f cm chegaria a %.1f cm da abertura %s (minimo %.0f cm) - nada movido"
+                          % (eid, offset, clash[1], clash[0], _micro.MICRO_ADJUST_OPENING_GAP_MIN_CM))
+            continue
+        st = SubTransaction(target_doc)
+        st.Start()
+        try:
+            ElementTransformUtils.MoveElement(target_doc, inst.Id, vec)
+            target_doc.Regenerate()
+            if not inst.IsValidObject:
+                st.RollBack()
+                falhas.append("abertura %s deixou de existir apos mover %+.1f cm - desfeito" % (eid, offset))
+                continue
+            loc1, host1, params1 = _snapshot(inst)
+            moved = ((loc1.X - loc0.X) * dir_xy.X + (loc1.Y - loc0.Y) * dir_xy.Y) * 30.48
+            lateral = abs((loc1.X - loc0.X) * dir_xy.Y - (loc1.Y - loc0.Y) * dir_xy.X) * 30.48
+            problems = []
+            if abs(moved - offset) > 0.05 or lateral > 0.05 or abs(loc1.Z - loc0.Z) > 1e-6:
+                problems.append("deslocamento real %.2f cm (lateral %.2f)" % (moved, lateral))
+            if host1 != host0:
+                problems.append("hospedeira mudou")
+            if any(a is not None and (b is None or abs(a - b) > 1e-6) for a, b in zip(params0, params1)):
+                problems.append("largura/altura/peitoril mudou")
+            if problems:
+                st.RollBack()
+                falhas.append("abertura %s: %s - desfeito" % (eid, "; ".join(problems)))
+                continue
+            total = before_total + offset
+            if not cmt.Set(micro_adjust_mark_text(previous, total, orig)):
+                st.RollBack()
+                falhas.append("abertura %s: a marca da posicao original nao foi gravada - desfeito" % eid)
+                continue
+            st.Commit()
+            ja_movidas.add(eid)
+            aplicados.append({"element_id": eid, "wall_idx": wall_idx, "opening_index": opening_index,
+                              "offset_cm": offset, "total_from_original_cm": round(total, 3),
+                              "original_xy_cm": [round(orig[0], 2), round(orig[1], 2)],
+                              "from_xy_cm": [round(loc0.X * 30.48, 2), round(loc0.Y * 30.48, 2)],
+                              "to_xy_cm": [round(loc1.X * 30.48, 2), round(loc1.Y * 30.48, 2)]})
+        except Exception as ex:
+            try:
+                st.RollBack()
+            except Exception:
+                pass
+            falhas.append("abertura %s: falha ao mover (%s)" % (eid, ex))
+    return aplicados, falhas
+
+
+def _opening_move_interference(op, vec, all_openings):
+    """(ElementId, distancia_cm) da abertura de QUALQUER parede que o vao movido
+    de `vec` deixaria a menos de MICRO_ADJUST_OPENING_GAP_MIN_CM (segmentos da
+    largura de cada abertura, na planta); None se nao ha interferencia."""
+    from core.engine import opening_micro_adjust as _micro
+    gap = _micro.MICRO_ADJUST_OPENING_GAP_MIN_CM / 30.48
+
+    def segment(o, shift=None):
+        c, w, hd = o.get("center_xy"), o.get("width_ft"), o.get("hand_xy")
+        if c is None or not w or hd is None:
+            return None
+        if shift is not None:
+            c = c + shift
+        h = XYZ(hd.X, hd.Y, 0.0).Normalize()
+        return (XYZ(c.X - h.X * w / 2.0, c.Y - h.Y * w / 2.0, 0.0), XYZ(c.X + h.X * w / 2.0, c.Y + h.Y * w / 2.0, 0.0))
+
+    def seg_dist(a, b):
+        def pt_seg(p, s0, s1):
+            dx, dy = s1.X - s0.X, s1.Y - s0.Y
+            den = dx * dx + dy * dy
+            u = 0.0 if den <= 0 else max(0.0, min(1.0, ((p.X - s0.X) * dx + (p.Y - s0.Y) * dy) / den))
+            return ((p.X - s0.X - u * dx) ** 2 + (p.Y - s0.Y - u * dy) ** 2) ** 0.5
+        return min(pt_seg(a[0], b[0], b[1]), pt_seg(a[1], b[0], b[1]),
+                   pt_seg(b[0], a[0], a[1]), pt_seg(b[1], a[0], a[1]))
+    moved = segment(op, vec)
+    if moved is None:
+        return None
+    for other in all_openings or ():
+        if other is op or other.get("element_id") == op.get("element_id"):
+            continue
+        seg = segment(other)
+        if seg is None:
+            continue
+        before = seg_dist(segment(op), seg)
+        after = seg_dist(moved, seg)
+        if after < gap - 1e-9 and after < before - 1e-9:
+            return other.get("element_id"), round(after * 30.48, 1)
+    return None
+
+
+def shift_openings_in_memory(openings_per_wall, all_openings, walls_to_create, aplicados):
+    """Depois do Commit da transacao externa: leva o deslocamento aplicado para a
+    geometria em memoria (vao no eixo e centro/insercao do `op`)."""
+    out = openings_per_wall
+    for item in aplicados or ():
+        wall_idx, opening_index, offset = item["wall_idx"], item["opening_index"], item["offset_cm"]
+        op, dir_xy = _opening_axis_match(wall_idx, opening_index, walls_to_create, out, all_openings)
+        out = shift_opening_in_plan(out, wall_idx, opening_index, offset)
+        if op is None:
+            continue
+        vec = XYZ(dir_xy.X * offset / 30.48, dir_xy.Y * offset / 30.48, 0.0)
+        for key in ("center_xy", "insertion_xy", "bbox_center_xy"):
+            if op.get(key) is not None:
+                op[key] = op[key] + vec
+    return out
+
+
 # SECAO 65: passes de arranjo -> orientacao (ver o laco em `_orient_small_voids_final`)
 B34_RUN_ARRANGEMENT_PASSES = 3
+# SECAO 85: `result["prism_free_area"]` (regua do prisma pela area livre comum
+# real) junto do passe da jamba - relatorio, nunca muda peca
+PRISM_FREE_AREA_CENSUS_IN_RESULT = True
 
 
 def _merge_arrangement_pass(total, current):
@@ -4858,12 +5170,33 @@ def _orient_small_voids_final(result, catalog, walls_to_create=None, openings_pe
             for wi in sorted(by_wall):
                 conflicts.extend(by_wall[wi])
             result["jamb_compensator_alignment"] = {
-                "enabled": True, "rule": "84", "sides_changed": jamb.get("jamb_sides_changed", 0),
+                "enabled": True, "rule": "85", "sides_changed": jamb.get("jamb_sides_changed", 0),
                 "walls_changed": jamb.get("walls_changed", 0), "moved": jamb.get("moved", 0),
+                # SECAO 85: percurso obrigatorio de graute/vergalhao junto de cada jamba
+                "required_paths": jamb.get("required_paths"),
                 "walls_rejected_by_validation": [w.get("wall_idx") for w in
                                                  jamb.get("walls_rejected_by_validation") or []],
                 "conflicts": conflicts, "census_before": census_before,
-                "census": _runs.jamb_strip_census(course_candidates, walls_to_create, openings_per_wall, catalog)}
+                "census": _runs.jamb_strip_census(course_candidates, walls_to_create, openings_per_wall, catalog),
+                # SECAO 85: B19 so' em fechamento - o que sobrar fora e' registro
+                "half_block_census": _runs.half_block_census(course_candidates, walls_to_create,
+                                                             openings_per_wall, catalog,
+                                                             tie_positions_by_wall=ties)}
+            # SECAO 85.8: canaleta U34 + pastilha onde cabem U39 exatas vira U39
+            result["channel_run_cleanup"] = _runs.cleanup_channel_runs(course_candidates, walls_to_create, catalog)
+            if PRISM_FREE_AREA_CENSUS_IN_RESULT:
+                # SECAO 85: regua do prisma pela AREA livre comum real (celulas da
+                # familia), independente do passe - interface a interface e as
+                # colunas das jambas na altura inteira
+                from core.engine import prism_free_area as _prism
+                try:
+                    census = _prism.prism_census(course_candidates, walls_to_create, openings_per_wall)
+                    census["walls"] = [dict((k, w[k]) for k in ("wall_idx", "cells", "ok", "narrow", "interrupted",
+                                                               "jamb_columns"))
+                                       for w in census.get("walls") or ()]
+                    result["prism_free_area"] = census
+                except Exception as exc:  # regua de relatorio: nunca derruba o solve
+                    result["prism_free_area"] = {"error": repr(exc)}
         result["b34_run_arrangement"] = arrangement
     violations = _small_void.b34_small_void_violations(course_candidates, catalog)
     summary["after"] = len(violations)
@@ -13989,6 +14322,17 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 self._execute_delete(app_doc)
             elif action == "debug_view":
                 self._execute_debug_view(app_doc)
+            elif action == "micro_adjust":
+                # SECAO 85: planeja (ou recebe o plano pronto em
+                # `self.micro_adjust_plan`), move as aberturas no modelo com a
+                # marca da posicao original e re-resolve - so' por acao
+                # explicita, nunca como efeito colateral de calcular/criar
+                with _perf.span("refresh_geometry_from_document",
+                                axes=len(self.created_walls_by_axis or {})):
+                    self._refresh_geometry_from_document(app_doc)
+                self._ensure_opening_reinforcement_catalog(app_doc)
+                with _perf.span("_execute_micro_adjust"):
+                    self._execute_micro_adjust(app_doc)
         except Exception as ex:
             # Este except e' a UNICA rede de seguranca entre um bug do
             # script e uma excecao nao tratada chegando ate' o Revit -
@@ -14395,6 +14739,124 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._save_modulation_state_cache()
         if self.on_done:
             self.on_done("solve", None)
+
+    def _micro_adjust_records_from_plan(self, plan_records):
+        """Registros do planejador -> (parede, vao, offset no eixo DESTA execucao).
+        Um registro pode vir do planejador desta mesma geometria (wall_idx /
+        opening_index / chosen_offset_cm) ou de um plano calculado fora (harness,
+        mesma versao do motor) identificado pelo ElementId da abertura e pelo
+        deslocamento em XY global (`delta_xy_cm`) - a ordem das paredes e o
+        sentido do eixo podem ser outros aqui."""
+        out = []
+        for rec in plan_records or ():
+            if rec.get("element_id") is None or rec.get("delta_xy_cm") is None:
+                out.append(rec)
+                continue
+            target = str(rec["element_id"])
+            dx, dy = float(rec["delta_xy_cm"][0]), float(rec["delta_xy_cm"][1])
+            found = None
+            for wall_idx, row in enumerate(self.openings_per_wall or ()):
+                for opening_index in range(len(row or ())):
+                    op, dir_xy = _opening_axis_match(wall_idx, opening_index, self.walls_to_create,
+                                                     self.openings_per_wall, self.all_openings)
+                    if op is None or str(op.get("element_id")) != target:
+                        continue
+                    along = dx * dir_xy.X + dy * dir_xy.Y
+                    across = abs(dx * dir_xy.Y - dy * dir_xy.X)
+                    if across > 0.05:
+                        continue  # deslocamento fora do plano desta parede
+                    found = {"wall_idx": wall_idx, "opening_index": opening_index,
+                             "chosen_offset_cm": round(along, 3), "element_id": target,
+                             "source": rec.get("source", "plano externo")}
+                    break
+                if found:
+                    break
+            if found is None:
+                found = {"wall_idx": None, "opening_index": None, "chosen_offset_cm": 0.0,
+                         "element_id": target, "unresolved": True}
+            out.append(found)
+        return out
+
+    def _execute_micro_adjust(self, app_doc):
+        """SECAO 85 (pedido do usuario, 2026-09-29): deslocamento de aberturas
+        ate' 10 cm da posicao ORIGINAL, pela ordem de qualidade do pedido
+        (vazados continuos + amarracao, B19 so' em fechamento, menos
+        compensadores, menor deslocamento). Plano -> movedor transacional ->
+        geometria em memoria -> novo solve."""
+        comments_by_id = {}
+        for op in self.all_openings or ():
+            try:
+                inst = app_doc.GetElement(op.get("element_id_obj"))
+                cmt = inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS) if inst else None
+                comments_by_id[op.get("element_id")] = cmt.AsString() if cmt is not None else None
+            except Exception:
+                continue
+        moved = opening_moved_so_far_cm(self.walls_to_create, self.openings_per_wall, self.all_openings,
+                                        comments_by_id)
+        plan = getattr(self, "micro_adjust_plan", None)
+        self.micro_adjust_plan = None  # plano pronto vale para UMA execucao
+        if plan is None:
+            if not (self.solve_result or {}).get("course_candidates"):
+                saved = self.on_done
+                self.on_done = None
+                try:
+                    self._execute_solve()
+                finally:
+                    self.on_done = saved
+            num_courses = (self.solve_result or {}).get("num_courses") or 0
+            plan = plan_opening_micro_adjustments(
+                self.wall_graph_nodes, self.walls_to_create, self.wall_end_to_node, self.openings_per_wall,
+                self.catalog, self.base_z_abs, num_courses, self.solve_result, moved_so_far_cm=moved,
+                variants_per_course=PIER_LAYOUT_VARIANTS_PER_COURSE,
+                opening_reinforcement_strategy=self.opening_reinforcement_strategy)
+            records = plan.get("applied") or []
+        else:
+            records = self._micro_adjust_records_from_plan(plan.get("applied") or plan.get("records") or [])
+        unresolved = [r for r in records if r.get("unresolved")]
+        records = [r for r in records if not r.get("unresolved")]
+        aplicados, falhas = [], ["abertura %s: nao localizada nesta geometria" % r["element_id"] for r in unresolved]
+        # parede com recorte nativo (modo continuo) ou vao segmentado (peitoril/verga/pilaretes
+        # como Walls): mover so' a instancia deixaria o vazio da parede para tras - recusa
+        cut_walls = set(w for w, cuts in (self.created_cuts_by_axis or {}).items() if cuts)
+        seg_walls = set(w for w, segs in (self.wall_segment_geometry or {}).items() if len(segs or ()) > 1)
+        kept = []
+        for r in records:
+            if r.get("wall_idx") in cut_walls or r.get("wall_idx") in seg_walls:
+                falhas.append("parede %s: abertura com recorte/segmentacao da parede - mover exige refazer a parede;"
+                              " nao aplicado" % r.get("wall_idx"))
+                continue
+            kept.append(r)
+        records = kept
+        if records:
+            t = Transaction(app_doc, "Microajuste de aberturas (secao 85)")
+            t.Start()
+            try:
+                aplicados, more = apply_opening_micro_adjustments(
+                    app_doc, records, self.walls_to_create, self.openings_per_wall, self.all_openings,
+                    moved_so_far_cm=moved)
+                falhas.extend(more)
+                if aplicados:
+                    from Autodesk.Revit.DB import TransactionStatus
+                    if t.Commit() != TransactionStatus.Committed:
+                        falhas.append("transacao do microajuste nao confirmada pelo Revit - nada movido")
+                        aplicados = []
+                else:
+                    t.RollBack()
+            except Exception:
+                try:
+                    t.RollBack()
+                except Exception:
+                    pass
+                raise
+        if aplicados:
+            self.openings_per_wall = shift_openings_in_memory(self.openings_per_wall, self.all_openings,
+                                                              self.walls_to_create, aplicados)
+        self.micro_adjust_result = {"moved_so_far_cm": dict((str(k), v) for k, v in moved.items()),
+                                    "planned": records, "applied": aplicados, "failures": falhas,
+                                    "plan_counts": (plan or {}).get("counts")}
+        # a posicao nova e' a fonte da verdade: novo solve (on_done("solve"))
+        self.solve_result = None
+        self._execute_solve()
 
     def _beta_input_signature(self):
         def xyz(point):

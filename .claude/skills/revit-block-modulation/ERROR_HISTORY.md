@@ -20,6 +20,9 @@ não foi resolvido (ou se está deliberadamente pendente) antes.
 | 2026-08-28 | Trechos de 469cm e 139cm caíam no tier de compensador embora existisse composição limpa (sem compensador) | guloso (`_greedy_fill_blocks`) nunca faz backtracking, só tenta 1 ordem fixa | tenta cada código do pool como primeiro bloco; se ainda falhar, busca exata (DP em décimos de cm, menos-peças-primeiro) | §16.2 |
 
 ## Bugs de relatório diagnosticados, ainda NÃO corrigidos
+| 2026-09-30 | O script nunca gerava a grade de B34 que o usuário desenhou na W4 (pilarete 945–1144): mantinha `B19 B39 C09 B54` / `B39 B39 C09`, 14 vazados quebrados | cinco causas juntas: régua recusava menor sobre menor (8,986 < 8,99, ruído de 0,04 mm); lista de composições cortava os lados dos B34 e esgotava o orçamento com B19; fiada da verga fora da unidade; fiadas acima da porta nunca trocadas juntas; estágio A estourava o orçamento (4.158 > 4.096) e caía na descida fiada a fiada | tolerância geométrica 0,5 mm; lados uniformes/alternados, sem B19 primeiro; verga como membro (U39/U34, nunca encolhe); grade derivada da jamba de mesma paridade avaliada com todas as fiadas; triagem por falha intrínseca. Bancada: W4 14 → 0, W5 54 → 0, W2 13 → 0 | §85.9 |
+| 2026-09-30 | Isenção da junta do B19 de fechamento (11.8) aplicada sem restrição no recompositor empilhou o pilarete da W5 (`C04 B19 B39 B19` nas duas paridades, a prumo) | toda junta de um pilarete curto é "de fechamento" | isenta só contra junta que NÃO é de fechamento de B19 na outra fiada | §85.9 |
+| 2026-09-29 | Recompositor da lateral (1ª versão da §85) trocou o desenho do usuário no pilar direito da janela central (`B39 B39 C09` / `B19 B39 C09 B54`) por `B34 C09 B39 C04` | régua por INTERFACE contava 14 quebras no encontro B39×B54 (4,0 cm de largura comum), quebra que existe igual nas fiadas cheias — a troca só mudava a quebra de lugar | objetivo passou a ser coluna contínua na altura inteira + referência modular comum; células em coluna contínua 11.554 → 11.720 na planta | §85 |
 | 2026-09-28 | Compensador/pastilha junto de porta/janela alternava de posição entre as fiadas (0 / 20 / 40 / 60 cm do vão) — 29 de 47 laterais no BUTANTÃ; prisma dos vazados 39/19 interrompido na jamba | trecho junto da jamba recomposto fiada a fiada: fiada A pelo guloso (fusão 9+9→B19 só na ponta aberta, B19 no vão e C09 para dentro); fiada B fugindo de propósito da junta do C09 da A (§11.8 só na validação); uma composição por paridade | passe FINAL de permutação por lateral, fiadas em conjunto, prisma pela geometria real como restrição dura, isenção só da junta da faixa; 29 → 2 laterais alternando, contagem de peças idêntica | §84 |
 
 Não afetam a geometria real dos blocos — afetam o que o usuário vê
@@ -68,6 +71,11 @@ como "já resolvido":
 
 ## Regra alterada por pedido explícito do usuário (prioridade sempre da mais recente)
 
+- 2026-09-29 (§85): prioridade = vazados alinhados de verdade (área livre
+  comum, coluna na altura inteira); B19 só em fechamento (exceção da §35
+  revogada; §56.3 item (a) superado); composição de mesmo comprimento na
+  lateral (supera o "só permutação" da §84); aberturas podem andar até 10 cm
+  da posição original com largura preservada (conflito com §18.13 registrado).
 - 2026-09-28 (§84): compensador/pastilha da lateral de abertura encostado
   no vão e alinhado entre as fiadas (faixa vertical junto do vão); B19
   imediatamente atrás da faixa passa a ser EXCEÇÃO PERMITIDA da regra do

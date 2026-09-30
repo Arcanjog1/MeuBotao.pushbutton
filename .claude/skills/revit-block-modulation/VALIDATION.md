@@ -92,6 +92,16 @@ Verificar **individualmente** cada L/T/X/ponta:
   revisão humana, não falha silenciosa. Conferir também que a contagem por
   código não mudou (a regra só permuta).
 
+- **Prisma pela área / B19 / aberturas (REGRAS §85)**: `result["prism_free_area"]`
+  (interfaces ok/estreitas/interrompidas e colunas das jambas na altura
+  inteira), `prism_free_area.column_census` (células em coluna contínua,
+  quebradas, juntas a prumo em 3+ fiadas) e
+  `result["jamb_compensator_alignment"]["half_block_census"]` (B19 fora de
+  fechamento = incompatibilidade registrada, nunca aceita). Conferir sempre as
+  quatro coisas separadas: vazado contínuo, amarração, fechamento, sem
+  sobreposição/invasão. Aberturas movidas: `MICROAJUSTE off=… orig=…` no
+  comentário, total ≤ 10 cm da original, largura/altura/peitoril iguais.
+
 ## 7. Relatório final consolidado
 
 `build_final_modulation_report` junta as duas fontes de problema (Etapa

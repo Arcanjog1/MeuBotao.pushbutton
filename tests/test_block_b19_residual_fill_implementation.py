@@ -1038,6 +1038,19 @@ def _solver_bridge():
     return solver_bridge
 
 
+def _run_with_b19_repair(solver_bridge, input_project):
+    """SECAO 85 (2026-09-29): o reparo da secao 35 ficou DESLIGADO por padrao
+    (B19 nao vale so' por encostar em peca de no'); os testes do GATE ligam a
+    flag so' durante o solve e devolvem o valor anterior."""
+    module = solver_bridge.engine()
+    saved = module.B19_RESIDUAL_FILL_REPAIR_ENABLED
+    module.B19_RESIDUAL_FILL_REPAIR_ENABLED = True
+    try:
+        return solver_bridge.run_solver(input_project)
+    finally:
+        module.B19_RESIDUAL_FILL_REPAIR_ENABLED = saved
+
+
 @pytest.mark.slow
 def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     """RESULTADO HONESTO da revisao: o corpus TP1 tem 8 paredes com
@@ -1050,7 +1063,7 @@ def test_t48_tp1_zero_candidatos_aceitos_apos_gate_de_integridade():
     solver_bridge = _solver_bridge()
     input_project = json.load(open(_project_paths("torre_easy_lo_r00_tp1"), encoding="utf-8"))
     (solve_result, _walls, _nodes, _openings, _catalog,
-     _base_z_ft, _num_courses, _notes) = solver_bridge.run_solver(input_project)
+     _base_z_ft, _num_courses, _notes) = _run_with_b19_repair(solver_bridge, input_project)
     repair = solve_result.get("b19_residual_fill_repair") or {}
     assert repair.get("accepted") == []
     rejected = repair.get("rejected") or []
@@ -1092,11 +1105,12 @@ def test_t49_tp1_fingerprint_identico_com_e_sem_b19():
             "torre_easy_lo_r00_tp1", res, walls, nodes, openings, catalog, base_z, nc, metadata={})
         return gfp.component_fingerprints(proj)["walls_blocks"]
 
+    saved = module.B19_RESIDUAL_FILL_REPAIR_ENABLED
     try:
         fp_off = fp(False)
         fp_on = fp(True)
     finally:
-        module.B19_RESIDUAL_FILL_REPAIR_ENABLED = True
+        module.B19_RESIDUAL_FILL_REPAIR_ENABLED = saved
     assert fp_off == fp_on
 
 
@@ -1105,7 +1119,7 @@ def test_t50_tgd_zero_candidatos_elegiveis_limite_de_escopo_conhecido():
     solver_bridge = _solver_bridge()
     input_project = json.load(open(_project_paths("torre_easy_lo_r00_tgd"), encoding="utf-8"))
     (solve_result, _walls, _nodes, _openings, _catalog,
-     _base_z_ft, _num_courses, _notes) = solver_bridge.run_solver(input_project)
+     _base_z_ft, _num_courses, _notes) = _run_with_b19_repair(solver_bridge, input_project)
     repair = solve_result.get("b19_residual_fill_repair") or {}
     assert repair.get("accepted") == []
     assert repair.get("rejected") == []
@@ -1116,7 +1130,7 @@ def test_t51_piloto_sem_efeito():
     solver_bridge = _solver_bridge()
     input_project = json.load(open(_project_paths("piloto_sintetico_2x2"), encoding="utf-8"))
     (solve_result, _walls, _nodes, _openings, _catalog,
-     _base_z_ft, _num_courses, _notes) = solver_bridge.run_solver(input_project)
+     _base_z_ft, _num_courses, _notes) = _run_with_b19_repair(solver_bridge, input_project)
     repair = solve_result.get("b19_residual_fill_repair") or {}
     assert repair.get("accepted") == []
 

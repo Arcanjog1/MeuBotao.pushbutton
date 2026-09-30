@@ -219,6 +219,10 @@ para a regra revisada).
   inclusive encostado numa peça de nó — desenho do usuário `B54 | B19 | C09 | vão`. É o mesmo
   B19 de fechamento contra o vão, deslocado pela faixa; a proibição de B19 no meio de um trecho
   corrido continua valendo em todo o resto. Ver seção 84.
+- **2026-09-29 (seção 85 — correção do usuário, prevalece)**: B19 **só** em fechamento (jamba ativa,
+  ponta livre, ou logo atrás da faixa de compensação encostada no vão). **Encostar numa peça de nó
+  não basta** e nenhuma exceção automática devolve B19 ao miolo — a EXCEÇÃO APROVADA da seção 35
+  acima fica **revogada** (`B19_RESIDUAL_FILL_REPAIR_ENABLED = False`). Ver seção 85.2.
 
 ### Regra dos compensadores/pastilhas (C09/C04)
 
@@ -2519,6 +2523,10 @@ continuidade lógica entre elas.
   ficar sem peça só por causa da junta de contorno.
 
 ### 18.13 — Ajuste do pilarete: ALARGAR a abertura, não deslocá-la (2026-08-28)
+
+> **CONFLITO registrado em 2026-09-29 (seção 85.4)**: para qualidade da modulação o usuário autorizou
+> DESLOCAR portas e janelas até 10 cm da posição original, **preservando a largura**. Esta seção
+> continua valendo para o fechamento NÃO modular (inviabilidade).
 
 - **Status**: **IMPLEMENTADO (2026-08-28)** —
   `plan_pier_opening_widenings` / `apply_pier_opening_widenings`
@@ -8445,6 +8453,9 @@ parede de 100 cm entre dois cantos; espelhamento preserva envelope e juntas; a
 
 ### 56.3 CONFLITO MEDIDO — B19 no meio da parede e B34+B19 onde caberia B54 NÃO são erro
 
+> **SUPERADO em 2026-09-29 (seção 85.2)** quanto ao item (a): B19 no miolo passou a ser proibido por
+> instrução explícita do usuário. O item (b) (B54 não é preenchimento) continua valendo.
+
 O pedido de tratar como erro (a) B19 no meio da parede e (b) `B34+B19` onde
 cabe um B54 foi **medido contra o humano e não se sustenta**:
 
@@ -11157,3 +11168,301 @@ compensações até o vão → melhor alinhamento vertical delas entre as fiadas
 
 Testes: `tests/test_jamb_compensator_alignment.py` (fixture = trecho real da W1 com as células medidas no
 Revit).
+
+## 85. PRISMA pela área livre comum real, B19 só em fechamento, lateral recomposta e aberturas deslocadas até 10 cm da posição ORIGINAL (2026-09-29, IMPLEMENTADO, correção do usuário)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** (correção explícita do usuário em 2026-09-29, imagens 6–12 do
+  arquivo de teste `butanta testes`: janela central, trecho à direita da porta, B19 no miolo).
+  Vale no caminho **"Sem reforço adicional"** (NONE, o padrão), no mesmo passe final da §84.
+- **Como foi descoberto**: prints do usuário + medição da modulação criada no Revit (lote
+  `20260928-154349`, 7.126 peças) e reprodução offline (`tools/audit/s74_corpus.py`, variante
+  `post_micro_adjustment_s66`, porta 8078997 com peitoril −1/verga 220). As células foram lidas das
+  famílias do documento: B39 ±9,11 cm (15,76 de largura), B19 0 (13,99), B34 −9,11 (10,76) e +6,61
+  (15,76), B54 0 (12,50) e ±16,61 (15,76); todas 8,99 cm na espessura; C04/C09 maciços; canaleta sem
+  célula vertical.
+
+### 85.1 Prioridade: alinhamento vertical REAL dos vazados internos (graute/armadura)
+
+1. "Preservar o prisma" = manter os vazados alinhados na altura para a passagem de graute e armadura,
+   principalmente nas laterais de janela. São **quatro verificações separadas**: (a) continuidade dos
+   vazados — área livre comum pela geometria real das células (`cells_world`), obstruções (peça maciça,
+   junta); (b) amarração/desencontro de juntas; (c) fechamento dimensional; (d) sem sobreposição nem
+   invasão. **Alinhar vazado não é alinhar junta.**
+2. Régua (`nuvem/core/engine/prism_free_area.py`): largura comum ≥ `PRISM_MIN_COMMON_WIDTH_CM` = 8,99 cm
+   (a menor dimensão de célula do catálogo real — limiar **geométrico**, não dimensionamento: diâmetro de
+   barra e folga do projeto estrutural não são inventados). Centros "parecidos" não provam passagem.
+3. **Coluna contínua** (`column_census`): a célula e todas as que a continuam em TODAS as fiadas da
+   parede (abaixo e acima de janela, acima de porta), com a interseção **acumulada** ≥ limiar. Canaleta
+   (verga/contraverga) e vão são atravessados só pela **fase** — a passagem através da U não é declarada.
+4. **Uma correção só conta se não transferir a quebra do prisma para outro ponto.** Caso medido que
+   motivou a regra (W3, pilar direito da janela central, jamba t = 890 depois do +5 cm): a régua por
+   interface trocava o desenho de referência do usuário (ímpar `B39 | B39 | C09 | encontro`, par
+   `B19 | B39 | C09 | B54(nó)`) por `B34 | C09 | B39 | C04` (dois compensadores) porque contava 14
+   quebras no encontro B39 [930,969] × B54 [960,1014] (largura comum 4,0 cm) — quebra que existe igual
+   nas fiadas cheias abaixo e acima: a troca só a mudava de lugar. Com a coluna contínua como critério,
+   o desenho do usuário fica.
+
+### 85.2 B19 só em fechamento — REGRA OBRIGATÓRIA, sem exceção automática
+
+- B19 é admissível **só** (a) encostado numa jamba **ativa** daquela fiada, (b) numa ponta **livre** de
+  parede (sem amarração a até 20 cm naquela fiada), ou (c) **imediatamente atrás da faixa de
+  compensação encostada no vão** (forma estreita da §84, desenho `B54 | B19 | C09 | vão`).
+- **Encostar numa peça de nó não basta** ("um B19 não se torna válido apenas por estar encostado em um
+  B54"). Caso "B19 à esquerda do B54": trocar o B39 vizinho com o B19 (o B19 vai para o fechamento).
+- Implementação: `_Wall._half_block_admissible` (recompositor — `HALF_BLOCK_NOT_ADMISSIBLE` é falha
+  dura e o primeiro termo do objetivo) e régua independente `half_block_census` em
+  `result["jamb_compensator_alignment"]["half_block_census"]`; o que sobrar fora de fechamento é
+  **incompatibilidade registrada**, nunca aceita em silêncio.
+- **CONFLITO — §35 (EXCEÇÃO APROVADA de 2026-09-05, B19 residual de 15–20 cm encostado em peça de nó)**:
+  vale agora a instrução mais recente do usuário. `B19_RESIDUAL_FILL_REPAIR_ENABLED = False`. Medido: o
+  gate da §35 aceitava **zero** candidatos em TP1, TGD, piloto e BUTANTÃ — nenhuma peça muda; o
+  mecanismo continua testável ligando a flag (testes T48–T51 ligam-na explicitamente).
+- **CONFLITO — §56.3** ("B19 no meio da parede não é erro", medido contra o humano): **superado** pela
+  instrução de 2026-09-29 — B19 no miolo é proibido.
+- A EXCEÇÃO PERMITIDA da §84 (B19 atrás da faixa, mesmo encostado em nó) continua: é fechamento.
+
+### 85.3 Lateral recomposta com o prisma primeiro (substitui o "só permutação" da §84)
+
+- **Unidade**: a corrida móvel que sai da jamba até a primeira peça fixa (nó, canaleta), até
+  `JAMB_FULL_RUN_MAX_CM` = 240 cm / `JAMB_UNIT_MAX_PIECES` = 7 (a outra paridade também precisa alcançar
+  a faixa); pilarete = uma unidade. As famílias de fiada da lateral são resolvidas em conjunto.
+- **Candidatas**: a atual, as outras ordens das mesmas peças e as **composições de mesmo comprimento
+  com ±1 peça** de B39/B34/B19/C09/C04 (só com juntas uniformes; B34 nos dois sentidos).
+- **Objetivo** (lexicográfico): B19 fora de fechamento → **percurso obrigatório da jamba** (85.7) →
+  **células em coluna contínua na altura inteira** (máximo) → **referência modular comum** (juntas da corrida × fiada cheia de mesma paridade
+  mais próxima abaixo da abertura; a abertura recorta a grade, não reinicia a fase; porta não tem essa
+  referência) → colunas de vazado principal cheias e largura comum (85.7) → régua de prisma por interface →
+  distância dos compensadores ao vão (§84) → colunas de
+  compensador quebradas → nº de compensadores → nº de peças → vazado menor B34 → peças trocadas.
+- **Falhas duras** (nunca pioram): coluna contínua, prisma por interface, B19 inadmissível,
+  compensadores encostados, meio bloco perto de amarração, compensador longo na ponta, junta coincidente
+  NOVA fora da faixa (§81.1), junta a prumo em 3+ fiadas. Aceitação final por parede pelo validador de
+  produção (auditoria, apoio, verga/contraverga) com rollback.
+- Compensador que fecha contra um **encontro** (peça de nó encostada, ou a parede que cruza com
+  amarração a até 20 cm) é fechamento (desenho do usuário `B39 | B39 | C09 | encontro`), não é
+  registrado como "fora da jamba".
+- **CONFLITO — §84 item 5** ("nenhuma peça criada nem removida"): superado — a composição de mesmo
+  comprimento é permitida porque a continuidade dos vazados vem antes de "menos trocas" na prioridade
+  de 2026-09-29. Compensador novo só entra quando a coluna/referência/prisma melhora (termos
+  anteriores do objetivo); o custo fica medido abaixo.
+
+### 85.4 Aberturas: deslocamento de até 10 cm da posição ORIGINAL
+
+- **Autorização do usuário (2026-09-29)**: todas as portas e janelas deste projeto, sem confirmação por
+  ajuste; de preferência ao longo da parede; largura, altura e peitoril preservados; porta respeita o
+  piso; no plano da parede; sem alterar encontros nem bonecas necessárias; sem interferência;
+  deslocamento **total** medido da posição original; comparar alternativas. Prioridade: (1)
+  continuidade dos vazados + amarração, (2) coerência entre fiadas, (3) sem B19 no miolo, (4) menos
+  compensadores/pastilhas desnecessários, (5) menor deslocamento. Depois de qualquer movimento, a
+  região afetada é recalculada. **O 5 cm da janela central foi o teste pedido pelo usuário para aquele
+  caso — não é regra fixa.**
+- Implementação: planejador da §66 com a ordem nova (`QUALITY_ORDER` começa por `prism_breaks`,
+  `stacked_joints`, `b19_misplaced`; a detecção inclui colunas de jamba quebradas/estreitas), movedor
+  transacional `apply_opening_micro_adjustments` (SubTransaction por abertura, `Pinned` respeitado,
+  `MoveElement` só ao longo do eixo, `Regenerate` + `IsValidObject`, hospedeira, largura/altura/peitoril
+  e deslocamento real conferidos, rollback em qualquer divergência) e a marca
+  `MICROAJUSTE off=+5.00 orig=x,y` no comentário da instância — o teto vale para o total desde `orig`
+  (marca antiga sem `orig` vale pelo `off`). Ação explícita `micro_adjust` do handler (plano próprio ou
+  plano pronto por ElementId + deslocamento em XY global → mover → novo solve).
+  `MICRO_ADJUST_IN_BUTTON_FLOW` continua `False`: mover abertura nunca é efeito colateral de
+  calcular/criar.
+- **CONFLITO — §18.13** ("alargar a abertura, não deslocá-la"): para este pedido vale o deslocamento
+  com largura preservada (instrução mais recente). A §18.13 continua como ferramenta do fechamento NÃO
+  modular (inviabilidade), que é outro problema.
+
+### 85.5 Medido (offline, BUTANTÃ NONE, 34 eixos, 280 cm/14 fiadas, sem deslocar abertura)
+
+| Métrica | §84 (`77dd0be`, o que está no Revit) | §85 régua por interface | **§85 coluna contínua** |
+|---|---|---|---|
+| Células em coluna contínua (altura inteira) | 11.381 / 12.553 | 11.554 / 12.549 | **11.720 / 12.544** |
+| Células com coluna quebrada | 1.172 | 995 | **824 (−30 %)** |
+| Juntas a prumo em 3+ fiadas (todas, sem isenção) | 17 | 20 | 21 |
+| Interfaces estreitas / interrompidas (régua por área) | 365 / 111 | 243 / 99 | 247 / 112 |
+| Colunas de jamba ok / estreitas / quebradas (régua gulosa) | 65 / 19 / 4 | 72 / 14 / 2 | 73 / 11 / 4 |
+| B19 fora de fechamento | 28 | 28 | 28 |
+| C04 + C09 | 402 | 422 | 429 |
+| Peças | 7.068 | 7.087 | 7.083 |
+| Hard gates / `missing_required_junction_bond` | 0 / 3 | 0 / 3 | 0 / 3 |
+
+### 85.6 Incompatibilidades e pendências registradas
+
+- **W27/W33 (caixa de shaft de 115 cm)**: trecho de 64 cm entre a peça de nó e a parede que cruza, sem
+  abertura — o único fechamento sem B19 é `B54 + C09` (o B54 é peça de nó, §56.3); o solver usa
+  `B19 + B39 + C04`. 25 B19 fora de fechamento. `DOCUMENTADO — pendência de decisão do usuário`.
+- **W17** (3 B19 na ponta contra o encontro nas fiadas 5/7/9, onde o nó não amarra — §77): a régua
+  independente com nós FREE_END conta como fora de fechamento; a do solver (amarração por fiada) decide.
+- **Pilarete estreito com faixa nas duas jambas** (W0 800–854, 54 cm): `C09 | B39 | C04` em todas as
+  fiadas — vazados contínuos, mas o B39 do meio fica empilhado (as duas juntas dele são juntas de faixa,
+  isentas pela §11.8/§84). Conflito amarração × vazado registrado; `DOCUMENTADO — pendência de decisão
+  do usuário`.
+- **Fase acima/abaixo de abertura** (referência modular comum completa, inclusive fiadas acima de porta
+  e topo da W5): hoje só a coerência da corrida da jamba com a fiada cheia abaixo entra no objetivo.
+  `DOCUMENTADO — pendência de código aberta`.
+
+### 85.7 Pontos críticos primeiro, fiadas alternadas em conjunto e percurso obrigatório (segundo pedido de 2026-09-29)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** (pedido explícito do usuário, com duas imagens da lateral de porta da
+  W1 — composição original × correção dele).
+- **Diagnóstico confirmado no código e nos dados** (5 leitores independentes + revisão adversarial de cada
+  achado; 19 confirmados, 27 parciais, 2 refutados):
+  1. As 14 fiadas são agrupadas em **bandas** pela assinatura GLOBAL de aberturas (BUTANTÃ: 7 bandas) e cada
+     banda é resolvida do zero (`solve_building_blocks_all_courses` → `_pass_body`); entre bandas só passam
+     **juntas**, nunca vazados. Há UM layout por paridade por banda (`PIER_LAYOUT_VARIANTS_PER_COURSE = 1`).
+  2. As peças de nó (L/T/X) vêm primeiro; a paridade dos T é decidida uma vez, com custo sem termo de vazado —
+     o comprimento de cada pilarete por paridade (ex.: 45 cm nas pares, 64 cm nas ímpares na W1 t > 625) fica
+     fixado antes de qualquer preenchimento.
+  3. **A abertura é ponto de corte, não de projeto** (`continuous_first`): o trecho vai de nó a nó, guloso da
+     esquerda para a direita; depois o vão é recortado e só a sobra é refeita. O reparo (§68/§83) GERA a
+     composição do usuário (`B39 | C04`, `B19 | C04 | B39`), mas perde porque só conta peças dentro da janela.
+  4. As fiadas CHEIAS abaixo do peitoril e acima da verga divergem de fase: em 5 pilaretes de janela da W0/W3
+     elas ficam deslocadas **5 cm** (os B34 que absorvem o resíduo 545 = 27×20+5 trocam de posição entre as
+     bandas) — o pilar pode estar alinhado por dentro e ter 0 de 12 colunas contínuas na altura.
+  5. Nenhuma auditoria barrava a criação por prisma quebrado; a única barreira dura era a sobreposição de
+     caixas (regra 48). A régua por área existia só como relatório.
+  6. **Prova pela geometria SÓLIDA** (seção horizontal de cada família a meia altura, no Revit): os furos
+     reais coincidem exatamente com o catálogo × `GetTransform` das instâncias — B34 com vazados de 15,75 e
+     10,75 cm a +6,625/−9,125 cm do centro, sem espelhamento nas amostras da W1/W3/W4. Um catálogo exportado
+     com 3 casas decimais em PÉS (0,001 pé ≈ 0,03 cm) chegou a indicar 8,983 cm e foi DESCARTADO. Medido: a
+     coluna que passa pelo vazado menor do B34 sobre o maior do vizinho fica com **9,00 cm — no limiar**; por
+     isso a régua passou a preferir colunas de vazado PRINCIPAL cheias (13,9 cm) logo depois da contagem.
+- **Implementado no passe final (recompositor da lateral, `b34_run_arrangement.py`)**:
+  - **Percurso obrigatório** (`_jamb_path`): a coluna de vazados junto de cada jamba, seguida na altura
+    inteira (abaixo e acima da abertura; canaleta e vão só pela fase). Termo logo após o B19 no objetivo e
+    falha dura `PRISM_REQUIRED_PATH_WOULD_BREAK`; os percursos que continuam quebrados saem em
+    `result["jamb_compensator_alignment"]["required_paths"]["broken"]` e em `PRISM_REQUIRED_PATH_BROKEN` —
+    **nunca são declarados validados**.
+  - **Faixa reta não prova prisma**: o recompositor só sai sem procurar quando os percursos e TODAS as
+    células da unidade já são colunas contínuas.
+  - **Fiadas-ponte** (`JAMB_BRIDGE_ENABLED`): o par de fiadas cheias logo acima da verga e logo abaixo do
+    peitoril entra na unidade da lateral, de peça fixa a peça fixa (teto 240 cm / 7 peças) — "verifique o
+    trecho acima da porta"; a abertura não reinicia a modulação.
+  - **Colunas de vazado principal** (`PRISM_FULL_COLUMN_WIDTH_CM` = 13,9, a menor célula de bloco principal
+    real): depois da contagem de colunas contínuas, vence quem tem mais colunas CHEIAS e maior largura comum;
+    coluna que só passa pelo vazado menor do B34 vale menos.
+  - **Alternativas antes de consolidar** (`_staged_search`): estágio A = as K melhores composições das
+    fiadas da jamba com as fiadas-ponte transparentes; estágio B = recomposição das fiadas-ponte para cada
+    uma. Orçamento determinístico (`JAMB_ALT_TOPK`, `JAMB_ALT_MAX_EVAL`, `JAMB_BRIDGE_OPTIONS_MAX`); só roda
+    em unidade com defeito real.
+  - **Ordem por liberdade geométrica** (`_unit_priority`): pilarete entre duas aberturas primeiro, depois a
+    corrida mais curta; rodada limitada de **compatibilização** (`JAMB_COMPAT_ROUNDS`) para a unidade cujo
+    percurso quebrou depois que a vizinha mudou.
+- **Não implementado (pendência de código aberta, medida)**: a geração continua por bandas com fase
+  implícita — a unificação de fase das fiadas cheias abaixo/acima de TODAS as aberturas (corridas de nó a nó
+  de até 5,45 m, além do teto das unidades) e a recomposição da faixa superior junto do nó (fiada 11 com
+  canaleta parcial). Caso medido: W1, porta [534,625], lado t > 625 — a composição do usuário (`C04 | B39` /
+  `C04 | B19 | B39`) e a do script (`C09 | B34` / `C09 | B19 | B34`, B34 orientado) fecham TODAS as colunas
+  na altura inteira; a do usuário é melhor dentro do pilar (vazado principal sobre principal, 14 cm), a do
+  script mantém o percurso da jamba cheio (14 cm) porque as fiadas 11–13 acima da verga continuam com o B34
+  junto do T — deslocar a grade sobre a porta 5 cm (o desenho do usuário) só compensa se as fiadas 12 E 13 e a
+  canaleta parcial da 11 forem recompostas juntas até o outro lado. `DOCUMENTADO — pendência de código aberta`.
+
+### 85.8 Correções do usuário sobre o lote de 2026-09-29 (prints de 2026-09-30)
+
+- **REGRA OBRIGATÓRIA — vão menor do B34 quebra o prisma** (print da W0, janela 8079013: "observe o vão menor
+  do bloco 34 e o prisma sendo quebrado"). O vazado MENOR do B34 só pode ficar sobre/sob outro vazado menor de
+  B34 ou o vazado central do B54 (§52). Vazado menor sobre vazado PRINCIPAL da fiada vizinha é prisma quebrado,
+  mesmo que a área comum passe do limiar de 8,99 cm (dá 9,0 cm) — o limiar sozinho NÃO valida essa passagem.
+  Medido nas peças lidas do Revit: 33 casos no lote antigo → 134 no lote da §85 (W8 49, W1 31, W0 21, W6 11) —
+  o recompositor usava a §52 só como desempate. `DOCUMENTADO — pendência de código aberta`: §52 vira falha
+  dura no recompositor e a régua de coluna conta vazado menor sobre principal como quebra.
+- **REGRA OBRIGATÓRIA (confirma §84) — faixa de compensação numa jamba só, também em pilarete entre duas
+  aberturas** (prints da W5, pilarete 230–314): `C04 | B39 | B39` nas pares e `B39 | B39 | C04` nas ímpares é
+  erro (pastilha em zigue-zague, B39 andando 5 cm, vazados com 10,75 cm, junta desencontrada só 5 cm). Correto
+  medido: ímpares `C04 | B39 | B39`, pares `C04 | B19 | B39 | B19` (4 colunas com 14 cm, juntas a 20 cm).
+  Causa: as duas fiadas alternadas precisam mudar juntas e o orçamento da busca (400) caía para descida fiada a
+  fiada. `DOCUMENTADO — pendência de código aberta`.
+- **Pastilha atrás do B19 (`jamba | B19 | C04 | B34`) é erro**: a faixa encosta na jamba e o B19, se houver,
+  fica atrás dela (forma da §84) — W0 1175 e 2375. `DOCUMENTADO — pendência de código aberta`.
+- **Deslocamento de abertura e largura do pilarete** (decisão do usuário, 2026-09-30): NÃO há largura mínima
+  fixa — o pilarete aumenta ou diminui conforme o deslocamento das aberturas. O que decide é a modulação
+  resultante: o deslocamento só vale se o pilarete novo fecha com amarração e prisma (W0 805–844 ficou com 39 cm
+  e B39 empilhado → reprovado pela modulação, não pela largura) e sem criar faixa nova de compensação (W6 porta
+  8079002 ganhou pastilha nas duas jambas). `DOCUMENTADO — pendência de código aberta`.
+- **Regressão registrada**: W0 965–1034 tinha `B39 | B19 | C09` / `B19 | B39 | C09` no lote antigo (correto) e
+  virou `C04 | B34 | B19 | C09` / `B34 | B34` no lote da §85.
+- **REGRA OBRIGATÓRIA — pastilha da lateral encostada na jamba em TODAS as fiadas** (correção do usuário,
+  2026-09-30, W2 porta 8079009 [459–550]: "à direita da porta as pastilhas estão desalinhadas, acabando com o
+  prisma e o alinhamento dos vãos"). Medido: pares `C04 [550–554] | B39 | B39`, ímpares `B19 [550–569] |
+  C04 [570–574] | B39 [575–614]` — a pastilha alterna entre a jamba e 20 cm para dentro, fica sob uma coluna de
+  vazados e o B19 sobrepõe o B39 vizinho só 10 cm. Correto medido: ímpares `C04 [550–554] | B19 [555–574] |
+  B39 [575–614] | B54` (pastilha na jamba, B19 atrás dela, §84) → vazados alinhados ≤ 1 cm, juntas a 20 cm.
+  `DOCUMENTADO — pendência de código aberta`.
+- **REGRA OBRIGATÓRIA — B34 + pastilha onde cabe um B39 é erro; U34 + pastilha onde cabe U39 também**
+  (mesma correção): `C04 | B34` ocupa 4+1+34+1 = 40 cm, o mesmo que um B39 com a junta → vai o B39, alinhado
+  com a grade das fiadas de baixo. Medido na W2: fiada 13 `B34 [575–609] | C04 [610–614]` → `B39 [575–614]`;
+  verga (fiada 11) `U34 [415–449] … C04 [610–614]` → cinco `U39` exatas em 415–614. O mesmo padrão aparece na
+  W6 (porta 8079002): ímpares `C04 | B34` → `B39 [555–594]`; pares `C04 | B19 | B34 | B54` → `B19 [555–574] |
+  B39 [575–614] | B54`. `DOCUMENTADO — pendência de código aberta`.
+- **REGRA OBRIGATÓRIA — a grade do prisma não muda na altura** (mesma correção): B34 por 11 fiadas e B39 nas 3
+  últimas (ou o inverso) é proibido — repetido na W1 entre a porta 8079007 e o T (1205–1414): B34 nas fiadas
+  0–10 (1305 e 1325, com o vazado menor sobre vazado principal nas duas paridades) e C09 só nas fiadas 11–13. Todas as fiadas do trecho, abaixo, ao lado e acima da abertura, seguem o
+  mesmo prisma com os vãos alinhados na altura inteira. `DOCUMENTADO — pendência de código aberta`.
+- **REGRA OBRIGATÓRIA — B19 na caixa de shaft** (correção do usuário: "o maior problema é o B19"): nas paredes
+  de 115 cm entre cantos L (W27/W33) o B19 no miolo tem de sair. O único fechamento de 64 cm (canto → parede que
+  cruza) sem B19 e com uma só pastilha é `B54 + C09` — AUTORIZADO pelo usuário (2026-09-30) usar o B54 como
+  preenchimento nesse caso (exceção à §56.3 só para esse trecho). `DOCUMENTADO — pendência de código aberta`.
+
+### 85.9 Grade de B34 no lugar da pastilha (correção do usuário, 2026-09-30, desenho feito por ele no Revit)
+
+- **REGRA PREFERENCIAL (forte) — "o uso dos blocos 34 para uma melhor modulação é aconselhável"**: quando o
+  trecho não fecha na grade de 20 cm, em vez de pastilha (C09/C04) + B19, usar B34 EMPILHADOS entre as fiadas
+  com os vazados casados — vazado menor sobre vazado menor (§52) e vazado grande sobre vazado grande ou
+  principal — e a mesma grade continua acima da abertura (U34 na verga, B34 nas fiadas de cima).
+- Medido na W4, pilarete 945–1144 entre as portas 8078996 e 8078999 (encontro B54 em 1015–1069):
+  script `B19 | B39 | C09 | B54 | B34 | B39` (pares) e `B39 | B39 | C09 | cruza | B34 | B39 | B19` (ímpares);
+  desenho do usuário `B34 [945–979] | B34 [980–1014] | B54 | B34 | B39` e `B19 [945–964] | B34 [965–999] |
+  B34 [1000–1034] | cruza | B34 | B39 | B19` — mesmo comprimento (70 e 90 cm), SEM pastilha; com os B34
+  orientados, todos os vazados alinham (9 cm menor/menor, 14 cm grande/principal) e as juntas desencontram
+  15–20 cm.
+- Não contradiz a §85.8: B34 é bem-vindo quando os vazados casam; o erro é B34 com o vazado menor sobre vazado
+  principal, ou B34 + pastilha onde um B39 fecha.
+- **IMPLEMENTADO (2026-09-30)** em `nuvem/core/engine/b34_run_arrangement.py` e
+  `nuvem/core/engine/prism_free_area.py`, testes em `tests/test_jamb_compensator_alignment.py`
+  (`test_grade_de_b34_do_desenho_do_usuario_na_w4`, `test_pilarete_da_w5_como_o_usuario_corrigiu`,
+  `test_b34_vazado_menor_sobre_vazado_menor_passa_com_a_tolerancia_geometrica`). Cinco causas medidas na bancada
+  com as peças reais do lote 1, cada uma impedia a grade do usuário:
+  1. **Limiar da régua**: dois B34 em amarração (20 cm), um virado para cada lado, deixam 10,759 − 1,773 =
+     **8,986 cm** livres — 0,04 mm abaixo de 8,99. A régua contava toda coluna de vazado menor como quebrada.
+     REGRA: tolerância **geométrica** de 0,5 mm no limiar (`PRISM_WIDTH_TOLERANCE_CM`; limiar efetivo 8,94).
+     O vazado menor sobre vazado principal continua recusado pela 85.8, que não depende do limiar.
+  2. **Lista de composições**: os lados dos B34 eram só os 4 primeiros da árvore (nunca "todos para o lado −1"
+     com 3+ B34) e as ordens de `B19 + B34 + B39…` esgotavam o orçamento antes de `6 × B34`. Agora: lados
+     uniformes (+/−) e alternados; sem compensador e **sem B19** primeiro.
+  3. **Fiada da verga fora da unidade**: a fiada da canaleta logo acima (ou abaixo) do vão entra na unidade da
+     jamba; peça nova dentro da extensão original da canaleta vira U39/U34 (a verga **nunca encolhe**), o resto
+     segue a grade como bloco. B19/pastilha dentro da verga: não.
+  4. **Grade derivada**: as fiadas-ponte e a da verga **seguem a fiada da jamba de mesma paridade** — peças de
+     fechamento junto da jamba (B19, compensador) não sobem; sobre o vão a fiada fecha com B39/B34 exatos a
+     partir da junta original mais próxima que fecha (o menor número de B34, virados como os da grade). Uma
+     fiada sozinha nunca melhora (a coluna quebra na outra): a derivada é avaliada com TODAS juntas. A corrida
+     da ponte cresce primeiro até a peça fixa do lado do pilar e só depois sobre o vão
+     (`JAMB_BRIDGE_RUN_MAX_CM = 420`, 11 peças).
+  5. **Estágio A**: 66 × 63 = 4.158 combinações passavam do orçamento (4.096) e a busca caía na descida
+     fiada a fiada, que nunca troca as duas paridades juntas; e as combinações com pastilha nova ficavam no
+     topo. Agora: triagem por família das falhas intrínsecas (pastilha nova/fora da jamba, B19 fora de
+     fechamento, pastilhas vizinhas…) antes de combinar, ordenação por elas, e as métricas por interface
+     (vazado menor, faixa, prisma, juntas) respeitam as fiadas transparentes.
+  Resultado na bancada (fileiras reais): **W4** igual ao desenho do usuário (pilarete `B34 B34 | B54` /
+  `B19 B34 B34`, verga `U39 | U34 ×5 | B34`, fiadas 12–13 com 6 × B34) — 14 → 0 vazados quebrados.
+- **Junta do B19 de fechamento (11.8 no recompositor)**: a junta do B19 encostado na jamba, ou logo atrás da
+  faixa de compensadores encostada (exceção da §2), é isenta na guarda de junta do recompositor — mas **só contra
+  uma junta que não é de fechamento de B19 na outra fiada**: B19 sobre B19 continua proibido (sem isso o
+  pilarete da W5 virou `C04 | B19 | B39 | B19` nas duas paridades, a prumo — medido e recusado). Medido: W5,
+  pilarete 230–314, o desenho do usuário só falhava em `NEW_COINCIDENT_JOINT` contra as pontas das vergas da
+  fiada 11. Resultado: `C04 | B39 | B39` numa paridade e `C04 | B19 | B39 | B19` na outra — 54 → 0 quebrados.
+  (A atribuição das paridades é desempate: com a fiada 12 igual à 10 e a 13 seguindo a 9 é a mais contínua.)
+- **W2, porta 8079009** (85.8): na bancada sai exatamente a correção do usuário (ímpares `C04 | B19 | B39 | B54`,
+  pares `C04 | B39 | B39`, verga 5 × U39, fiada 13 com 5 × B39) — 13 → 0 quebrados.
+- **Continua `DOCUMENTADO — pendência de código aberta`** (medido na bancada, 2026-09-30):
+  - **W1, porta 8079007 [1114,1205]**: a fiada 12 vai de nó a nó (B54 1015–1069 e 1360–1414); entre o nó da
+    esquerda e a jamba sobram 135 cm, que não fecham com B39/B34 (40a + 35b ≠ 135). Os dois pilaretes da porta
+    estão com fases incompatíveis sobre o vão — pede coordenar as duas laterais da mesma abertura (ou a parede
+    de nó a nó), não uma lateral só.
+  - **W0, janela 8079013 e vizinhas**: as fiadas cheias abaixo das janelas (0–3) e acima (11–13) estão com
+    fases diferentes em 10 cm ao longo da parede inteira, e as pares cortadas pela janela saíram em três
+    famílias diferentes. É a "unificação de fase das fiadas cheias abaixo/acima de TODAS as aberturas" já
+    registrada na §85.7 — problema da parede, além do teto das unidades de jamba.
+
+Testes: `tests/test_jamb_compensator_alignment.py` (W1 real, pilar de referência do usuário, régua por
+área, B19 no miolo), `tests/test_opening_micro_adjust_mover.py` (marca, teto total, Pinned, plano
+externo por ElementId).

@@ -121,6 +121,40 @@ cm para dentro" (antes: `B54 | C09 | B19 | vão` numa fiada e
 - B19 imediatamente atrás da faixa é EXCEÇÃO PERMITIDA da regra do
   meio-bloco (REGRAS §2).
 
+## Prisma pela área, B19 só em fechamento e aberturas até 10 cm (REGRAS §85 — REGRA OBRIGATÓRIA, 2026-09-29)
+
+Correção do usuário (imagens 6–12, `butanta testes`): a prioridade é o
+**alinhamento vertical REAL dos vazados** (graute/armadura), validado
+separado de amarração, fechamento e sobreposição.
+
+- Régua por **área livre comum** das células reais (≥ 8,99 cm, limiar
+  geométrico do catálogo — nunca dimensionamento de armadura) e **coluna
+  contínua na altura inteira** (abaixo/acima de janela, acima de porta;
+  canaleta só pela fase). Correção que só muda a quebra de lugar **não conta**.
+- A lateral é **recomposta** (ordens + composições de mesmo comprimento ±1
+  peça): B19 fora de fechamento → coluna contínua → referência modular comum
+  (fiada cheia de mesma paridade abaixo da abertura) → prisma por interface →
+  faixa da §84 → menos compensadores.
+- **B19 só em fechamento**: jamba ativa, ponta livre, ou logo atrás da faixa
+  encostada no vão. Encostado em B54/peça de nó **não vale**; a exceção da §35
+  foi revogada (`B19_RESIDUAL_FILL_REPAIR_ENABLED = False`).
+- Compensador encostado num encontro (`B39 | B39 | C09 | encontro`) é
+  fechamento, não conflito de jamba.
+- **Aberturas**: deslocamento de até 10 cm da posição ORIGINAL (autorizado
+  pelo usuário para este projeto; largura/altura/peitoril preservados) pelo
+  planejador da §66 com a ordem nova (`prism_breaks`, `stacked_joints`,
+  `b19_misplaced` na frente) e pelo movedor `apply_opening_micro_adjustments`
+  (marca `MICROAJUSTE off=… orig=x,y`, teto sobre o total). Ação explícita
+  `micro_adjust`; nunca efeito colateral de calcular/criar.
+- **Grade de B34 (REGRAS §85.9, desenho do usuário na W4)**: B34 empilhado com
+  os vazados casados (menor sobre menor, grande sobre grande/principal) é
+  preferível a pastilha + B19; a fiada da verga e as fiadas-ponte SEGUEM a grade
+  da fiada da jamba de mesma paridade (U34 na verga quando faz parte da grade;
+  sobre o vão fecha com B39/B34 exatos). Limiar da régua com tolerância
+  geométrica de 0,5 mm (menor sobre menor dá 8,986 cm). Junta do B19 de
+  fechamento isenta só contra junta que não é de fechamento de B19 (B19 sobre
+  B19 = a prumo, proibido).
+
 ## Pilaretes — tratamento independente (REGRAS §18.2)
 
 **Status: pendência de código aberta.** O trecho entre duas aberturas tem

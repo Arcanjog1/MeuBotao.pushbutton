@@ -115,7 +115,7 @@ def strip_filler_pieces(course_candidates, wall_idx, walls_to_create, openings_c
 
 
 def detect_candidates(course_candidates, walls_to_create, openings_per_wall, catalog,
-                      max_course=None):
+                      max_course=None, limit=None):
     """OPENING_MICRO_ADJUSTMENT_REQUIRED: aberturas cuja vizinhanca mostra o
     defeito que um deslocamento pode resolver. Diagnostico, nunca erro."""
     violations = _sva.b34_small_void_violations(course_candidates, catalog)
@@ -125,16 +125,36 @@ def detect_candidates(course_candidates, walls_to_create, openings_per_wall, cat
         if wall_idx is None:
             continue
         near[wall_idx] += 1
+    from core.engine import prism_free_area as _prism
     out = []
     for wall_idx, openings in enumerate(openings_per_wall or ()):
         if not openings:
             continue
         _p0, _p1, _d, length_ft, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+        # SECAO 85: coluna de vazados de cada jamba na altura inteira (regua por
+        # area livre comum real) - quebrada/estreita e' o defeito que um
+        # deslocamento de ate' 10 cm pode resolver (a jamba volta para a grade
+        # modular das fiadas cheias)
+        try:
+            jamb_columns = _prism.wall_prism_report(course_candidates, walls_to_create, openings_per_wall,
+                                                    wall_idx)["jamb_columns"]
+        except Exception:
+            jamb_columns = []
         for opening_index, opening in enumerate(openings):
             span = (_cm(opening[0]), _cm(opening[1]))
             fillers = strip_filler_pieces(course_candidates, wall_idx, walls_to_create,
                                           [span], catalog, max_course=max_course)
             reasons = []
+            jamb_bad = 0
+            for col in jamb_columns[2 * opening_index:2 * opening_index + 2]:
+                if col.get("broken_at"):
+                    jamb_bad += 2
+                    reasons.append("coluna de vazados da jamba %.1f quebrada nas fiadas %s"
+                                   % (col["edge_cm"], col["broken_at"]))
+                elif col.get("narrow_at"):
+                    jamb_bad += 1
+                    reasons.append("coluna de vazados da jamba %.1f estreita (%.2f cm)"
+                                   % (col["edge_cm"], col.get("common_width_cm") or 0.0))
             if fillers:
                 reasons.append("pecas de acerto na faixa amarracao->jamba: %d" % fillers)
             if near.get(wall_idx):
@@ -142,9 +162,12 @@ def detect_candidates(course_candidates, walls_to_create, openings_per_wall, cat
             if reasons:
                 out.append({"wall_idx": wall_idx, "opening_index": opening_index,
                             "span_cm": [round(span[0], 1), round(span[1], 1)],
-                            "strip_fillers": fillers, "reasons": reasons})
-    out.sort(key=lambda item: (-item["strip_fillers"], item["wall_idx"], item["opening_index"]))
-    return out[:MICRO_ADJUST_MAX_OPENINGS]
+                            "strip_fillers": fillers, "jamb_columns_bad": jamb_bad, "reasons": reasons})
+    out.sort(key=lambda item: (-item["jamb_columns_bad"], -item["strip_fillers"], item["wall_idx"],
+                               item["opening_index"]))
+    # `limit` do chamador (secao 85: todas as aberturas da planta quando pedido);
+    # sem ele, o teto de sempre
+    return out[:(MICRO_ADJUST_MAX_OPENINGS if limit is None else limit)]
 
 
 def _cm(value_ft):
@@ -201,7 +224,12 @@ def piers_close(opening_span_cm, other_openings_cm, wall_length_cm):
             and pier_closes_with_blocks_cm(right_edge - t_hi, joint, joint))
 
 
-QUALITY_ORDER = ("small_void", "strip_fillers", "mid_wall_half_blocks", "specials",
+# SECAO 85 (pedido do usuario, 2026-09-29): (1) continuidade dos vazados na
+# altura inteira + amarracao, (2)/(3) B19 so' em fechamento, (4) menos
+# compensador/pastilha, (5) menor deslocamento (desempate de `choose_offset`).
+# As chaves novas vem na frente; as antigas mantem a ordem da secao 66.
+QUALITY_ORDER = ("prism_breaks", "stacked_joints", "b19_misplaced",
+                 "small_void", "strip_fillers", "mid_wall_half_blocks", "specials",
                  "special_clusters", "non_modular")
 
 
@@ -286,9 +314,9 @@ def plan_micro_adjustments(course_candidates, walls_to_create, openings_per_wall
     if not OPENING_MICRO_ADJUST_ENABLED:
         return {"enabled": False, "required": [], "records": [], "applied": [],
                 "counts": {"OPENING_MICRO_ADJUSTMENT_REQUIRED": 0, "OPENING_MICRO_ADJUSTMENT_APPLIED": 0}}
-    required = detect_candidates(course_candidates, walls_to_create, openings_per_wall, catalog,
-                                 max_course=max_course)
     limit = MICRO_ADJUST_MAX_OPENINGS if max_openings is None else max_openings
+    required = detect_candidates(course_candidates, walls_to_create, openings_per_wall, catalog,
+                                 max_course=max_course, limit=limit)
     records = []
     for candidate in required[:limit]:
         wall_idx = candidate["wall_idx"]
