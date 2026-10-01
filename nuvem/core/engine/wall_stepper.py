@@ -195,6 +195,9 @@ __all__ = [
     "TIE_PARITY_FILL_BALANCE_MAX_TRIALS", "_tie_parity_fill_layout_cost",
     "_search_tie_parity_fill_balance",
     "_tie_parity_node_under_opening_reach", "TIE_PARITY_FILL_ALL_OPENINGS",
+    # SECAO 86.2 - fase dos encontros por relacao de trecho + convencao de fachada
+    "_search_phase_relation_components", "_phase_exact_component", "_phase_segment_composition",
+    "_phase_outer_contour_corners", "_phase_revert_swapped_corner",
     "process_walls_one_by_one", "solve_all_wall_fill", "solve_building_blocks",
     # ---- ETAPA 3C - deslocamento de grupo de paredes conectadas ----
     "WALL_GROUP_SHIFT_MAX_CM", "WALL_GROUP_SHIFT_VERIFY_BUDGET",
@@ -3153,8 +3156,14 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
     # a paridade que decide o comprimento do trecho livre de cada fiada.
     if (_parity_pass and TIE_PARITY_FILL_BALANCE and end_to_node is not None
             and walls_to_create):
-        outcome = _search_tie_parity_fill_balance(
-            outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+        if PHASE_RELATION_COMPONENTS:
+            # SECAO 86.2: relacao de fase por trecho com busca exata por
+            # componente (inclui cantos L) + espelho pela convencao de fachada
+            outcome = _search_phase_relation_components(
+                outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+        else:
+            outcome = _search_tie_parity_fill_balance(
+                outcome, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
     if role_skipped:
         outcome["junction_role_skipped"] = role_skipped
     return outcome
@@ -4319,6 +4328,863 @@ def _search_tie_parity_fill_balance(outcome, nodes, walls_to_create, catalog, op
     final["tie_parity_fill_mode"] = modo
     final["tie_parity_fill_rejected"] = list(recusados)
     return final
+
+
+# ==========================================
+# SECAO 86.2 (2026-10-01) - FASE DOS ENCONTROS: RELACAO POR TRECHO (R4) E
+# CONVENCAO DE FACHADA (R2).
+# Pedido do usuario (2026-10-01): aproximar o projeto HUMANO BUTANTA R08_LT
+# ajustando as regras e o calculo, sem copia-lo. Regras oficiais em
+# nuvem/REGRAS_MODULACAO_BLOCOS.md secao 86.2.
+#
+# FENOMENO. Em cada encontro so' uma parede ocupa o quadrado do no' em cada
+# fiada; a FASE do no' diz qual. O que o preenchimento enxerga nao e' a fase
+# absoluta de um no', e' a RELACAO entre dois nos CONSECUTIVOS da mesma parede:
+# a parede ocupa os dois na MESMA fiada ou ALTERNA. A relacao decide o
+# comprimento dos dois trechos livres entre eles (fiada A e fiada B) e,
+# portanto, quantos C04/C09/B19 e B34 eles pedem.
+#
+# PADRAO OBSERVADO (BUTANTA R08_LT, 1o pav., medicao offline 2026-10-01):
+#   - trecho cego entre dois nos: o humano segue a relacao de menor custo em
+#     26/26 (D mod 40 <= 15 -> mesma fiada; >= 20 -> alterna); o motor 23/26;
+#   - parede entre dois cantos L: o humano usa a MESMA fiada nos dois cantos em
+#     9/9 (o motor, pela alternancia forcada da secao 30.5, em 1/9);
+#   - espelho: o componente central (13 nos) estava inteiro espelhado; a busca
+#     gulosa da 72/82 (um no' por vez, so' melhora estrita) nunca espelha um
+#     componente, porque o espelho custa o mesmo;
+#   - nos 8 cantos do contorno externo o humano poe, na fiada 0, a parede
+#     paralela ao lado maior da caixa envolvente do pavimento (8/8).
+#
+# O QUE ESTA PARTE FAZ (decisao unica por planta, como a 72):
+#   1. variaveis: a fase de cada no' de TIE_PARITY_FILL_NODE_KINDS (no caminho
+#      geral T e L de 2 bracos). T/X invertem pela marca `_tie_parity_flip`; o
+#      canto L pela troca de `arms` + pino (o mesmo mecanismo da 30.5/SAFE
+#      REPAIR), entao o resto do motor nao muda;
+#   2. custo de cada trecho entre nos consecutivos de uma parede, para os dois
+#      estados de cada no' (pecas REAIS do no' nos dois estados): fecho exato
+#      do trecho livre de cada fiada com o catalogo (primeiro C04+C09+B19,
+#      depois B34), teto por trecho, peso do trecho (cego/porta/janela);
+#   3. convencao de fachada como PREFERENCIA em cada canto do contorno externo
+#      (acima de trecho com janela, abaixo de trecho cego);
+#   4. busca EXATA por componente (branch-and-bound deterministico, ordem
+#      geometrica, base canonica) - a alternancia da 30.5 deixou de ser
+#      restricao; componente sem canto e sem no' fixo e' espelhado pela maioria
+#      dos nos (a parede paralela ao lado maior na fiada A); empate mantem;
+#   5. veto estrutural (falha de no' ou pecas de no' interpenetradas que o
+#      estado original nao tinha) devolve os nos culpados ao original e refaz;
+#   6. a paridade das pecas encostadas (regra #1) tem a ultima palavra e a
+#      82.1 continua julgando os T invertidos no preenchimento real.
+# Nenhum id: so' geometria, catalogo e aberturas.
+# ==========================================
+PHASE_RELATION_COMPONENTS = False
+# custo de um trecho (fecho exato): peca especial (C04/C09/B19) >> B34
+PHASE_RELATION_SPECIAL_COST = 100
+PHASE_RELATION_B34_COST = 1
+# teto do custo de um estado do trecho (as duas fiadas): um trecho que nao fecha
+# de jeito nenhum nao pode dominar a planta inteira
+PHASE_RELATION_COST_CAP = 400
+# peso do trecho pelas fiadas em que ele e' CONTINUO entre os dois nos (inteiros:
+# 4 = 1,0). Cego: as 13 fiadas. Janela (0,25): so' abaixo do peitoril e acima da
+# verga. Porta (0): a parede so' e' continua na fiada da verga (canaleta) e acima
+# dela - cada pilarete jamba-no' fecha sozinho e a soma das duas fiadas nao muda
+# com a fase; "a porta libera a fase" (humano: 14/20 trechos com porta seguem o
+# custo continuo, contra 26/26 dos cegos). Medido no corpus BUTANTA (bancada so'
+# do estagio de encontros): porta 0 -> 46/50 nos com a fase do humano; qualquer
+# peso de porta > 0 -> 42/50 ou menos.
+PHASE_RELATION_WEIGHT_BLIND = 4
+PHASE_RELATION_WEIGHT_DOOR = 0
+PHASE_RELATION_WEIGHT_WINDOW = 1
+# (R2) convencao de fachada: na fiada 0 a parede paralela ao lado maior da caixa
+# envolvente ocupa os cantos do contorno externo
+PHASE_RELATION_FACADE_CONVENTION = True
+# a convencao entra como PREFERENCIA em cada canto do contorno externo, com peso
+# ACIMA da preferencia de um trecho com janela (8 B34 x 2 estados x peso 1 = 16) e
+# ABAIXO da menor preferencia de um trecho cego (8 B34 x 2 x 4 = 64): nunca troca
+# bloco de um trecho cego por convencao, mas decide o que a janela deixa em
+# aberto (humano: 8/8 cantos; parede de fachada com janelas passando nos dois
+# cantos). 0 = so' o espelho por componente (sem preferencia por canto).
+PHASE_RELATION_FACADE_CORNER_WEIGHT = 48
+# guarda de alcance de verga (secao 72): T a menos de um bloco de uma jamba fica
+# na convencao. Desligada na 86.2: travava T que o humano inverte (W3 a 27 cm)
+PHASE_RELATION_OPENING_REACH_GUARD = False
+# orcamento do branch-and-bound por componente (expansoes); estourado, fica a
+# melhor solucao achada (determinista) e o resultado diz exact=False
+PHASE_RELATION_SEARCH_BUDGET = 300000
+# rodadas do veto estrutural (cada rodada devolve culpados a' convencao)
+PHASE_RELATION_STRUCTURAL_ROUNDS = 6
+
+_PHASE_DP_MEMO = {}
+
+
+def _phase_round(value):
+    """Arredondamento simetrico identico em CPython e IronPython."""
+    return int(math.floor(value + 0.5))
+
+
+def _phase_gcd(a, b):
+    a, b = abs(int(a)), abs(int(b))
+    while b:
+        a, b = b, a % b
+    return a
+
+
+def _phase_fill_modules(catalog):
+    """((modulo_cm, especial, b34), ...) das pecas do preenchimento comum, lidas
+    do catalogo: modulo = comprimento + junta; especial = compensador ou meio
+    bloco; b34 = bloco de ajuste."""
+    modules = []
+    for code in COMMON_FILL_BLOCK_CODES:
+        entry = catalog.get(code) or {}
+        length = entry.get("length_cm")
+        if not length:
+            continue
+        especial = 1 if (entry.get("is_compensator") or code == HALF_BLOCK_CODE) else 0
+        b34 = 1 if code == MID_WALL_BLOCK_CODE else 0
+        modules.append((_phase_round(float(length) + BLOCK_JOINT_CM), especial, b34))
+    modules.sort()
+    return tuple(modules)
+
+
+def _phase_segment_composition(pier_cm, catalog):
+    """(especiais, B34, pecas) MINIMOS (ordem lexicografica) para fechar EXATO um
+    trecho livre de `pier_cm` com as pecas do preenchimento comum (soma de
+    comprimento+junta = pier+junta, na grade do mdc dos modulos). None = nao
+    fecha (trecho negativo ou fora da grade). Funcao pura com memo por catalogo."""
+    modules = _phase_fill_modules(catalog)
+    grid = 0
+    for module, _e, _b in modules:
+        grid = _phase_gcd(grid, module)
+    if not modules or grid <= 0:
+        return None
+    units = _phase_round((pier_cm + BLOCK_JOINT_CM) / float(grid))
+    if units < 0:
+        return None
+    table = _PHASE_DP_MEMO.get(modules)
+    if table is None:
+        table = [(0, 0, 0)]
+        _PHASE_DP_MEMO[modules] = table
+    steps = [(module // grid, e, b) for module, e, b in modules]
+    while len(table) <= units:
+        v = len(table)
+        best = None
+        for step, e, b in steps:
+            if step > v or step <= 0:
+                continue
+            prev = table[v - step]
+            if prev is None:
+                continue
+            cand = (prev[0] + e, prev[1] + b, prev[2] + 1)
+            if best is None or cand < best:
+                best = cand
+        table.append(best)
+    return table[units]
+
+
+def _phase_segment_cost(pier_cm, catalog):
+    comp = _phase_segment_composition(pier_cm, catalog)
+    if comp is None:
+        return None
+    return PHASE_RELATION_SPECIAL_COST * comp[0] + PHASE_RELATION_B34_COST * comp[1]
+
+
+def _phase_node_walls(node):
+    walls = set(_node_walls(node))
+    if node.get("kind") == "L_CORNER" and node.get("neighbor_wall_idx") is not None:
+        walls.add(node["neighbor_wall_idx"])
+    return walls
+
+
+def _phase_is_bond_node(node):
+    kind = node.get("kind")
+    if kind == "L_CORNER":
+        return len(_phase_node_walls(node)) == 2
+    return kind in ("T_INTERSECTION", "X_INTERSECTION")
+
+
+def _phase_t_cm(walls_to_create, wall_idx, point):
+    return _ft_to_cm(_t_of_point_on_wall(walls_to_create, wall_idx, point))
+
+
+def _phase_wall_sequences(nodes, walls_to_create, bond):
+    """{parede: [(t_cm, no'), ...]} - os nos de amarracao ao longo de cada eixo,
+    em ordem de t (empate pela chave geometrica)."""
+    out = {}
+    for node_index in bond:
+        node = nodes[node_index]
+        point = node.get("point")
+        if point is None:
+            continue
+        for wall_idx in _phase_node_walls(node):
+            if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+                continue
+            out.setdefault(wall_idx, []).append((_phase_t_cm(walls_to_create, wall_idx, point), node_index))
+    for wall_idx in out:
+        out[wall_idx].sort(key=lambda item: (round(item[0], 6),) + _canonical_node_sort_key(nodes[item[1]])
+                           + (item[1],))
+    return out
+
+
+def _phase_node_border_cm(pieces, course, wall_idx, walls_to_create, node, t_node_cm, side):
+    """Onde as pecas do no' (desta fiada) terminam no eixo de `wall_idx`, do lado
+    `side` (+1: para t crescente; -1: decrescente). Conta qualquer peca do no'
+    que cruze a faixa do eixo (a da propria parede pelo comprimento, a da
+    perpendicular pela largura). Sem peca: a face da parede que cruza."""
+    p0, _p1, direction, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+    normal = _perp_dir(direction)
+    ends = []
+    tol_ft = _cm_to_ft(1.0)
+    for cand in pieces:
+        if cand.get("course") != course:
+            continue
+        origin = cand["origin_world"]
+        rel = XYZ(origin.X - p0.X, origin.Y - p0.Y, 0.0)
+        half_l = _cm_to_ft(cand["length_cm"]) / 2.0
+        half_w = _cm_to_ft(cand["width_cm"]) / 2.0
+        lat_half = abs(half_l * cand["x_dir"].DotProduct(normal)) + abs(half_w * cand["y_dir"].DotProduct(normal))
+        if abs(rel.DotProduct(normal)) > lat_half + tol_ft:
+            continue
+        lo_cm, hi_cm = _candidate_extent_on_wall_axis(cand, p0, direction)
+        ends.append(max(lo_cm, hi_cm) if side > 0 else min(lo_cm, hi_cm))
+    if ends:
+        return max(ends) if side > 0 else min(ends)
+    half = 0.0
+    for other in _phase_node_walls(node):
+        if other is None or other == wall_idx or not (0 <= other < len(walls_to_create)):
+            continue
+        half = max(half, _ft_to_cm(_wall_axis_and_length(walls_to_create, other)[4]) / 2.0)
+    return t_node_cm + side * half
+
+
+def _phase_edge_state_cost(wall_idx, ti, pieces_i, node_i, tj, pieces_j, node_j, walls_to_create, catalog):
+    """Custo de UM estado de um trecho (as duas fiadas): fecho exato do trecho
+    livre entre as pecas dos dois nos, com teto."""
+    total = 0
+    for course in ("A", "B"):
+        hi_i = _phase_node_border_cm(pieces_i, course, wall_idx, walls_to_create, node_i, ti, 1)
+        lo_j = _phase_node_border_cm(pieces_j, course, wall_idx, walls_to_create, node_j, tj, -1)
+        cost = _phase_segment_cost((lo_j - BLOCK_JOINT_CM) - (hi_i + BLOCK_JOINT_CM), catalog)
+        if cost is None:
+            return PHASE_RELATION_COST_CAP
+        total += cost
+    return min(total, PHASE_RELATION_COST_CAP)
+
+
+def _phase_edge_weight(wall_idx, t_lo_cm, t_hi_cm, all_openings, band_openings):
+    """(peso, tipo) do trecho pelo que existe entre os dois nos: porta = abertura
+    ativa na banda da decisao (a primeira fiada); janela = abertura que so'
+    aparece no conjunto completo."""
+    banda = [(min(a, b), max(a, b)) for a, b in
+             ((_ft_to_cm(v[0]), _ft_to_cm(v[1])) for v in _tie_parity_openings_of_wall(band_openings, wall_idx))]
+    tipos = set()
+    for vao in _tie_parity_openings_of_wall(all_openings, wall_idx):
+        a_cm, b_cm = _ft_to_cm(vao[0]), _ft_to_cm(vao[1])
+        lo_cm, hi_cm = min(a_cm, b_cm), max(a_cm, b_cm)
+        if hi_cm <= t_lo_cm or lo_cm >= t_hi_cm:
+            continue
+        porta = any(abs(lo_cm - x) <= 1.0 and abs(hi_cm - y) <= 1.0 for x, y in banda)
+        tipos.add("door" if porta else "window")
+    if "door" in tipos:
+        return PHASE_RELATION_WEIGHT_DOOR, "door"
+    if "window" in tipos:
+        return PHASE_RELATION_WEIGHT_WINDOW, "window"
+    return PHASE_RELATION_WEIGHT_BLIND, "blind"
+
+
+def _phase_passes_course_a(pieces, wall_idx, walls_to_create, t_node_cm):
+    """A parede `wall_idx` ocupa o quadrado do no' na fiada A (peca dela cobrindo
+    o ponto do no')?"""
+    p0, _p1, direction, _len, _thick = _wall_axis_and_length(walls_to_create, wall_idx)
+    for cand in pieces:
+        if cand.get("course") != "A" or cand.get("wall_idx") != wall_idx:
+            continue
+        lo_cm, hi_cm = _candidate_extent_on_wall_axis(cand, p0, direction)
+        if min(lo_cm, hi_cm) <= t_node_cm - 1.0 and max(lo_cm, hi_cm) >= t_node_cm + 1.0:
+            return True
+    return False
+
+
+def _phase_exact_component(order, pair_edges, unary, budget):
+    """Minimo EXATO de soma(custo das arestas) + soma(custo unario) sobre bits
+    0/1 das variaveis `order` (ordem da busca). `pair_edges`: [(u, v, custo se
+    bits iguais, custo se diferentes)]; `unary`: {v: (custo com 0, custo com 1)}.
+    Componente sem termo unario e' simetrico (espelho custa o mesmo): a primeira
+    variavel fica em 0. Branch-and-bound com cota pelo minimo de cada aresta
+    ainda aberta, semente gulosa, ordem fixa -> determinista. Devolve
+    ({v: bit}, custo, exato)."""
+    n = len(order)
+    if n == 0:
+        return {}, 0, True
+    pos = dict((v, k) for k, v in enumerate(order))
+    closing = [[] for _k in range(n)]
+    for u, v, c_eq, c_diff in pair_edges:
+        pu, pv = pos[u], pos[v]
+        if pu == pv:
+            continue
+        if pu < pv:
+            closing[pv].append((pu, c_eq, c_diff))
+        else:
+            closing[pu].append((pv, c_eq, c_diff))
+    un = [tuple(unary.get(v, (0, 0))) for v in order]
+    symmetric = not any(c0 or c1 for c0, c1 in un)
+    suffix = [0] * (n + 1)
+    for k in range(n - 1, -1, -1):
+        s = min(un[k])
+        for _p, c_eq, c_diff in closing[k]:
+            s += min(c_eq, c_diff)
+        suffix[k] = suffix[k + 1] + s
+
+    def _step_cost(k, b, bits):
+        c = un[k][b]
+        for p, c_eq, c_diff in closing[k]:
+            c += c_eq if bits[p] == b else c_diff
+        return c
+
+    seed = [0] * n
+    seed_cost = 0
+    for k in range(n):
+        choices = (0,) if (k == 0 and symmetric) else (0, 1)
+        melhor = None
+        for b in choices:
+            c = _step_cost(k, b, seed)
+            if melhor is None or c < melhor[0]:
+                melhor = (c, b)
+        seed[k] = melhor[1]
+        seed_cost += melhor[0]
+    best = [seed_cost, list(seed)]
+    state = {"expansions": 0, "exact": True}
+    bits = [0] * n
+
+    def _dfs(k, cost):
+        if cost + suffix[k] >= best[0]:
+            return
+        if k == n:
+            best[0] = cost
+            best[1] = list(bits)
+            return
+        if state["expansions"] >= budget:
+            state["exact"] = False
+            return
+        state["expansions"] += 1
+        choices = (0,) if (k == 0 and symmetric) else (0, 1)
+        for b in choices:
+            bits[k] = b
+            _dfs(k + 1, cost + _step_cost(k, b, bits))
+        bits[k] = 0
+
+    _dfs(0, 0)
+    return dict((order[k], best[1][k]) for k in range(n)), best[0], state["exact"]
+
+
+def _phase_long_axis(walls_to_create):
+    """Direcao do lado MAIOR da caixa envolvente dos eixos (X em empate)."""
+    xs, ys = [], []
+    for wall_idx in range(len(walls_to_create)):
+        p0, p1, _d, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+        xs.extend((p0.X, p1.X))
+        ys.extend((p0.Y, p1.Y))
+    if not xs:
+        return XYZ(1.0, 0.0, 0.0)
+    if (max(xs) - min(xs)) >= (max(ys) - min(ys)) - 1e-9:
+        return XYZ(1.0, 0.0, 0.0)
+    return XYZ(0.0, 1.0, 0.0)
+
+
+def _phase_outer_contour_corners(nodes, sequences):
+    """{no': (parede_que_chega, parede_que_sai)} - os vertices em que o CONTORNO
+    EXTERNO do grafo de encontros (nos de amarracao ligados pelos trechos de
+    eixo entre eles) muda de direcao. Percorre a face externa a partir do no'
+    de menor (x, y), sempre na curva mais a' direita (exterior a' direita);
+    becos (meia-volta) nao sao cantos. Funcao pura, so' geometria."""
+    adj = {}
+    for wall_idx in sorted(sequences):
+        seq = sequences[wall_idx]
+        for (_ta, na), (_tb, nb) in zip(seq, seq[1:]):
+            if na == nb:
+                continue
+            adj.setdefault(na, []).append((nb, wall_idx))
+            adj.setdefault(nb, []).append((na, wall_idx))
+    if not adj:
+        return {}
+
+    def _key(node_index):
+        return _canonical_node_sort_key(nodes[node_index]) + (node_index,)
+
+    def _angle(a, b):
+        pa, pb = nodes[a]["point"], nodes[b]["point"]
+        return math.atan2(pb.Y - pa.Y, pb.X - pa.X)
+
+    def _turn(a_in, a_out):
+        d = a_out - a_in
+        while d <= -math.pi:
+            d += 2.0 * math.pi
+        while d > math.pi:
+            d -= 2.0 * math.pi
+        if d < -math.pi + 1e-9:
+            d = math.pi     # meia-volta: o ruido de ponto flutuante nunca a vira "curva a' direita"
+        return d
+
+    start = min(adj, key=_key)
+    current, a_in = start, -math.pi / 2.0
+    first = None
+    steps = []
+    limit = 4 * sum(len(v) for v in adj.values()) + 8
+    for _i in range(limit):
+        options = sorted((_turn(a_in, _angle(current, nb)), _key(nb), wall_idx, nb)
+                         for nb, wall_idx in adj[current])
+        _t, _k, wall_idx, nb = options[0]
+        step = (current, nb, wall_idx)
+        if first is None:
+            first = step
+        elif step == first:
+            break
+        steps.append(step)
+        a_in = _angle(current, nb)
+        current = nb
+    corners = {}
+    for k in range(len(steps)):
+        a, b, w_in = steps[k]
+        _b2, c, w_out = steps[(k + 1) % len(steps)]
+        t = _turn(_angle(a, b), _angle(b, c))
+        if 1e-3 < abs(t) < math.pi - 1e-3 and b not in corners:
+            corners[b] = (w_in, w_out)
+    return corners
+
+
+def _phase_parallel_wall(walls_to_create, wall_idxs, axis):
+    """A parede de `wall_idxs` mais paralela a `axis` (None se nenhuma passa de
+    |cos| 0,9)."""
+    melhor = None
+    for wall_idx in sorted(w for w in wall_idxs if w is not None and 0 <= w < len(walls_to_create)):
+        direction = _wall_axis_and_length(walls_to_create, wall_idx)[2]
+        c = abs(direction.X * axis.X + direction.Y * axis.Y)
+        if c >= 0.9 and (melhor is None or c > melhor[0] + 1e-9):
+            melhor = (c, wall_idx)
+    return melhor[1] if melhor else None
+
+
+def _phase_toggle(node):
+    """Inverte a fase de UM no': T/X pela marca `_tie_parity_flip`, canto L pela
+    troca de `arms` (o mesmo de `_coordinate_arm_role_nodes`)."""
+    if node.get("kind") == "L_CORNER":
+        a0, a1 = node["arms"]
+        node["arms"] = [a1, a0]
+        node["neighbor_wall_idx"] = a0[0]
+        node["neighbor_end_index"] = a0[1]
+        return
+    if node.get("_tie_parity_flip"):
+        node.pop("_tie_parity_flip", None)
+    else:
+        node["_tie_parity_flip"] = True
+
+
+_PHASE_NODE_KEYS = ("arms", "neighbor_wall_idx", "neighbor_end_index", "_tie_parity_flip", "_arm_role_pinned")
+
+
+def _phase_save(nodes, indices):
+    out = {}
+    for node_index in indices:
+        node = nodes[node_index]
+        out[node_index] = dict((k, (list(node[k]) if isinstance(node[k], list) else node[k]))
+                               for k in _PHASE_NODE_KEYS if k in node)
+    return out
+
+
+def _phase_restore(nodes, saved):
+    for node_index, state in saved.items():
+        node = nodes[node_index]
+        for k in _PHASE_NODE_KEYS:
+            if k in state:
+                node[k] = list(state[k]) if isinstance(state[k], list) else state[k]
+            else:
+                node.pop(k, None)
+
+
+def _phase_structural_state(result):
+    """(nos que falharam, pares de nos com pecas da MESMA fiada interpenetradas)."""
+    falhas = set(n for n, _motivo in (result.get("failures") or ()))
+    por_fiada = {}
+    for cand in result.get("candidates") or ():
+        if cand.get("node_index") is None:
+            continue
+        por_fiada.setdefault(cand.get("course"), []).append(cand)
+    pares = set()
+    for course in sorted(por_fiada, key=lambda c: str(c)):
+        cands = por_fiada[course]
+        boxes = [(_obb_aabb(_candidate_obb(c)), c) for c in cands]
+        for i in range(len(boxes)):
+            box_i, ci = boxes[i]
+            for j in range(i + 1, len(boxes)):
+                box_j, cj = boxes[j]
+                ni, nj = ci.get("node_index"), cj.get("node_index")
+                if ni == nj:
+                    continue
+                if box_i[2] < box_j[0] or box_j[2] < box_i[0] or box_i[3] < box_j[1] or box_j[3] < box_i[1]:
+                    continue
+                if _obb_min_overlap(_candidate_obb(ci), _candidate_obb(cj)) > BOND_COLLISION_EPS_FT:
+                    pares.add((min(ni, nj), max(ni, nj)))
+    return falhas, pares
+
+
+def _phase_canonical_l_first(node, walls_to_create, axis):
+    """A parede que o canto L poe em `arms[0]` (fiada A) na BASE canonica da
+    busca: a mais paralela ao lado maior da caixa envolvente; empate pela ponta
+    mais distante do eixo de menor (x, y). So' geometria - a base nao depende
+    da ordem de entrada das paredes (a decisao final e' a mesma para qualquer
+    ordem)."""
+    melhor = None
+    for wall_idx, _end in node.get("arms") or []:
+        if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+            return None
+        p0, p1, direction, _len, _t = _wall_axis_and_length(walls_to_create, wall_idx)
+        c = round(abs(direction.X * axis.X + direction.Y * axis.Y), 6)
+        far = min((round(p0.X, 6), round(p0.Y, 6)), (round(p1.X, 6), round(p1.Y, 6)))
+        chave = (-c, far)
+        if melhor is None or chave < melhor[0]:
+            melhor = (chave, wall_idx)
+    return melhor[1] if melhor else None
+
+
+def _phase_relation_problem(nodes, walls_to_create, catalog, openings_per_wall, end_to_node, movable, bond):
+    """Monta o problema: tabelas de custo por trecho (pecas REAIS dos dois
+    estados de cada no', resolvidos com os cantos L pinados para a 30.5 nao
+    refazer os papeis) e o que a convencao de fachada precisa saber."""
+    movable_set = set(movable)
+
+    def _solve_state(toggle):
+        salvo = _phase_save(nodes, movable)
+        try:
+            for node_index in movable:
+                if toggle:
+                    _phase_toggle(nodes[node_index])
+                if nodes[node_index].get("kind") == "L_CORNER":
+                    nodes[node_index]["_arm_role_pinned"] = True
+            return solve_all_intersections(nodes, walls_to_create, catalog,
+                                           openings_per_wall=openings_per_wall,
+                                           end_to_node=end_to_node, _parity_pass=False)
+        finally:
+            _phase_restore(nodes, salvo)
+
+    pieces = {0: {}, 1: {}}
+    for state in (0, 1):
+        for cand in _solve_state(state == 1).get("candidates") or ():
+            ni = cand.get("node_index")
+            if ni is not None and (state == 0 or ni in movable_set):
+                pieces[state].setdefault(ni, []).append(cand)
+
+    def _pieces(node_index, state):
+        return pieces[state if node_index in movable_set else 0].get(node_index) or []
+
+    sequences = _phase_wall_sequences(nodes, walls_to_create, bond)
+    all_openings = TIE_PARITY_FILL_ALL_OPENINGS if TIE_PARITY_FILL_ALL_OPENINGS is not None else openings_per_wall
+    edges = []
+    for wall_idx in sorted(sequences):
+        seq = sequences[wall_idx]
+        for (ti, ni), (tj, nj) in zip(seq, seq[1:]):
+            if ni == nj:
+                continue
+            weight, tipo = _phase_edge_weight(wall_idx, ti, tj, all_openings, openings_per_wall)
+            table = {}
+            for bi in ((0, 1) if ni in movable_set else (0,)):
+                for bj in ((0, 1) if nj in movable_set else (0,)):
+                    table[(bi, bj)] = _phase_edge_state_cost(
+                        wall_idx, ti, _pieces(ni, bi), nodes[ni], tj, _pieces(nj, bj), nodes[nj],
+                        walls_to_create, catalog)
+            edges.append({"wall_idx": wall_idx, "i": ni, "j": nj, "t_i": ti, "t_j": tj,
+                          "weight": weight, "kind": tipo, "table": table})
+    passes = {}
+    for node_index in bond:
+        point = nodes[node_index].get("point")
+        if point is None:
+            continue
+        for wall_idx in _phase_node_walls(nodes[node_index]):
+            if wall_idx is None or not (0 <= wall_idx < len(walls_to_create)):
+                continue
+            t = _phase_t_cm(walls_to_create, wall_idx, point)
+            for state in ((0, 1) if node_index in movable_set else (0,)):
+                passes[(node_index, wall_idx, state)] = _phase_passes_course_a(
+                    _pieces(node_index, state), wall_idx, walls_to_create, t)
+    return {"edges": edges, "sequences": sequences, "passes": passes}
+
+
+def _phase_solve(problem, nodes, walls_to_create, movable, fixed=None):
+    """Decide os bits (1 = inverter em relacao a' base). (R4) a relacao de cada
+    par de nos consecutivos custa a soma dos dois estados que a realizam
+    (espelho-invariante) vezes o peso do trecho; trecho com no' fixo (`fixed`:
+    {no': bit}, demais nos fora de `movable` no bit 0) vira termo unario. (R2)
+    cada canto do contorno externo ganha a preferencia de fachada (termo
+    unario). Busca exata por componente (nos ligados por relacoes com
+    preferencia); componente sem termo unario (nenhum canto, nenhum no' fixo)
+    e' espelhado pela convencao: votos dos cantos, depois maioria dos nos (a
+    parede paralela ao lado maior ocupando o no' na fiada A); empate mantem a
+    base canonica."""
+    fixed = fixed or {}
+    movable_set = set(movable)
+    pair = {}
+    unary = {}
+    for e in problem["edges"]:
+        i, j, w, tab = e["i"], e["j"], e["weight"], e["table"]
+        if i in movable_set and j in movable_set:
+            # relacao pura: soma dos dois estados que a realizam (espelho-invariante)
+            c_eq = (tab[(0, 0)] + tab[(1, 1)]) * w
+            c_diff = (tab[(0, 1)] + tab[(1, 0)]) * w
+            if c_eq == c_diff:
+                continue
+            key = (min(i, j), max(i, j))
+            prev = pair.get(key, (0, 0))
+            pair[key] = (prev[0] + c_eq, prev[1] + c_diff)
+        elif i in movable_set or j in movable_set:
+            if i in movable_set:
+                v, fb = i, fixed.get(j, 0)
+                c0, c1 = tab[(0, fb)] * w * 2, tab[(1, fb)] * w * 2
+            else:
+                v, fb = j, fixed.get(i, 0)
+                c0, c1 = tab[(fb, 0)] * w * 2, tab[(fb, 1)] * w * 2
+            if c0 == c1:
+                continue
+            prev = unary.get(v, (0, 0))
+            unary[v] = (prev[0] + c0, prev[1] + c1)
+    long_axis = _phase_long_axis(walls_to_create)
+    corners = _phase_outer_contour_corners(nodes, problem["sequences"]) if PHASE_RELATION_FACADE_CONVENTION else {}
+    passes = problem["passes"]
+    if PHASE_RELATION_FACADE_CONVENTION and PHASE_RELATION_FACADE_CORNER_WEIGHT:
+        # convencao de fachada como PREFERENCIA nos cantos do contorno externo
+        for v in sorted(corners):
+            if v not in movable_set:
+                continue
+            wall_par = _phase_parallel_wall(walls_to_create, corners[v], long_axis)
+            if wall_par is None:
+                continue
+            ok0, ok1 = passes.get((v, wall_par, 0)), passes.get((v, wall_par, 1))
+            if bool(ok0) == bool(ok1):
+                continue
+            prev = unary.get(v, (0, 0))
+            unary[v] = (prev[0] + (0 if ok0 else PHASE_RELATION_FACADE_CORNER_WEIGHT),
+                        prev[1] + (0 if ok1 else PHASE_RELATION_FACADE_CORNER_WEIGHT))
+
+    def _key(node_index):
+        return _canonical_node_sort_key(nodes[node_index]) + (node_index,)
+
+    adj = dict((v, []) for v in movable)
+    for (i, j), (c_eq, c_diff) in pair.items():
+        if c_eq != c_diff:
+            adj[i].append(j)
+            adj[j].append(i)
+    components = []
+    seen = set()
+    for root in sorted(movable, key=_key):
+        if root in seen:
+            continue
+        order = []
+        frontier = [root]
+        seen.add(root)
+        while frontier:
+            frontier.sort(key=_key)
+            v = frontier.pop(0)
+            order.append(v)
+            for u in sorted(adj[v], key=_key):
+                if u not in seen:
+                    seen.add(u)
+                    frontier.append(u)
+        components.append(order)
+
+    def _votes(sol, candidates):
+        agora = espelho = 0
+        for node_index, wall_idx in candidates:
+            if wall_idx is None:
+                continue
+            b = sol[node_index]
+            now = passes.get((node_index, wall_idx, b))
+            mir = passes.get((node_index, wall_idx, 1 - b))
+            if now and not mir:
+                agora += 1
+            elif mir and not now:
+                espelho += 1
+        return agora, espelho
+
+    bits = {}
+    total = 0
+    exact = True
+    report = []
+    for order in components:
+        members = set(order)
+        edges = [(i, j, c_eq, c_diff) for (i, j), (c_eq, c_diff) in sorted(pair.items())
+                 if i in members and j in members]
+        un = dict((v, unary[v]) for v in order if v in unary and unary[v][0] != unary[v][1])
+        sol, cost, ok = _phase_exact_component(order, edges, un, PHASE_RELATION_SEARCH_BUDGET)
+        total += cost
+        exact = exact and ok
+        mirrored = False
+        motivo = None
+        if PHASE_RELATION_FACADE_CONVENTION and not un:
+            agora, espelho = _votes(sol, [(v, _phase_parallel_wall(walls_to_create, corners[v], long_axis))
+                                          for v in order if v in corners])
+            motivo = "FACADE_CORNERS"
+            if agora == espelho:
+                agora, espelho = _votes(sol, [(v, _phase_parallel_wall(
+                    walls_to_create, _phase_node_walls(nodes[v]), long_axis)) for v in order])
+                motivo = "NODE_MAJORITY"
+            if espelho > agora:
+                for v in order:
+                    sol[v] = 1 - sol[v]
+                mirrored = True
+            elif espelho == agora:
+                motivo = "TIE_KEEP"
+        bits.update(sol)
+        report.append({"nodes": sorted(order, key=_key), "cost": cost, "exact": ok,
+                       "mirrored": mirrored, "convention": motivo, "free": not un})
+    return bits, total, exact, report
+
+
+def _search_phase_relation_components(outcome, nodes, walls_to_create, catalog, openings_per_wall,
+                                      end_to_node):
+    """Secao 86.2: decide a fase de todos os nos de uma vez (relacao por trecho
+    com busca exata + convencao de fachada). Muta `nodes` IN PLACE (marcas
+    `_tie_parity_flip` nos T/X, troca de `arms` + pino nos L) e devolve o
+    resultado dos nos ja' re-resolvido. Decisao UNICA por planta: as bandas,
+    passes e rebuilds seguintes leem a decisao do proprio no'."""
+    if any(node.get("_phase_relation_done") for node in nodes):
+        # a decisao (unica) segue visivel: T/X invertidos e cantos L trocados
+        escolhidos_antes = [i for i, n in enumerate(nodes)
+                            if n.get("_tie_parity_fill_chosen") and n.get("_tie_parity_flip")]
+        trocados_antes = [i for i, n in enumerate(nodes) if n.get("_phase_relation_swapped")]
+        if escolhidos_antes:
+            outcome["tie_parity_fill_flips"] = escolhidos_antes
+        if trocados_antes:
+            outcome["phase_relation_swapped_corners"] = trocados_antes
+        return outcome
+    _PHASE_DP_MEMO.clear()
+    bond = [i for i, node in enumerate(nodes) if _phase_is_bond_node(node)]
+    kinds = tuple(TIE_PARITY_FILL_NODE_KINDS or ())
+    intocaveis = set(outcome.get("tie_parity_flips") or ())
+    all_openings = TIE_PARITY_FILL_ALL_OPENINGS if TIE_PARITY_FILL_ALL_OPENINGS is not None else openings_per_wall
+    movable = []
+    for node_index in bond:
+        node = nodes[node_index]
+        kind = node.get("kind")
+        if kind not in kinds or node_index in intocaveis or node.get("_arm_role_pinned"):
+            continue
+        if kind == "L_CORNER" and len(node.get("arms") or []) != 2:
+            continue
+        if kind != "L_CORNER" and node.get("_tie_parity_flip"):
+            continue
+        if PHASE_RELATION_OPENING_REACH_GUARD and kind != "L_CORNER" and _tie_parity_node_under_opening_reach(
+                node, walls_to_create, all_openings, catalog):
+            continue
+        movable.append(node_index)
+    for node in nodes:
+        node["_phase_relation_done"] = True
+        node["_tie_parity_fill_done"] = True
+    if not movable:
+        outcome["phase_relation"] = {"movable": 0}
+        return outcome
+    # BASE CANONICA: T na convencao do papel (principal na fiada A); canto L com
+    # a parede paralela ao lado maior em arms[0]. Assim um empate de custo (e o
+    # espelho sem voto) nao depende da ordem de entrada das paredes.
+    salvo_original = _phase_save(nodes, movable)
+    long_axis = _phase_long_axis(walls_to_create)
+    normalizados = set()
+    for node_index in movable:
+        node = nodes[node_index]
+        if node.get("kind") == "L_CORNER":
+            primeira = _phase_canonical_l_first(node, walls_to_create, long_axis)
+            if primeira is not None and node["arms"][0][0] != primeira:
+                _phase_toggle(node)
+                normalizados.add(node_index)
+    salvo_base = _phase_save(nodes, movable)
+    problem = _phase_relation_problem(nodes, walls_to_create, catalog, openings_per_wall, end_to_node,
+                                      movable, bond)
+    referencia = _phase_structural_state(outcome) if TIE_PARITY_STRUCTURAL_VETO else None
+    fixos = {}
+    vetados = []
+    final = None
+    estado = {}
+    total, exact, report = 0, True, []
+    for _round in range(max(1, PHASE_RELATION_STRUCTURAL_ROUNDS) + 1):
+        _phase_restore(nodes, salvo_base)
+        livres = [n for n in movable if n not in fixos]
+        bits, total, exact, report = _phase_solve(problem, nodes, walls_to_create, livres, fixos)
+        estado = dict(bits)
+        estado.update(fixos)
+        for node_index in movable:
+            if estado.get(node_index):
+                _phase_toggle(nodes[node_index])
+            if nodes[node_index].get("kind") == "L_CORNER":
+                nodes[node_index]["_arm_role_pinned"] = True
+        final = solve_all_intersections(nodes, walls_to_create, catalog,
+                                        openings_per_wall=openings_per_wall,
+                                        end_to_node=end_to_node, _parity_pass=False)
+        if referencia is None:
+            break
+        falhas, pares = _phase_structural_state(final)
+        culpados = set(falhas - referencia[0])
+        for par in pares - referencia[1]:
+            culpados.update(par)
+        # so' quem mudou em relacao ao estado ORIGINAL pode ser culpado
+        culpados = set(n for n in culpados if n in salvo_base and n not in fixos
+                       and bool(estado.get(n, 0)) != (n in normalizados))
+        if not culpados:
+            break
+        if _round >= PHASE_RELATION_STRUCTURAL_ROUNDS:
+            # sem convergir: a planta fica na convencao (nenhuma inversao)
+            _phase_restore(nodes, salvo_original)
+            final = None
+            vetados.extend((n, "STRUCTURAL_NOT_CONVERGED") for n in sorted(culpados))
+            break
+        for n in sorted(culpados):
+            vetados.append((n, "NODE_FAILED" if n in falhas else "NODE_PIECES_OVERLAP"))
+            fixos[n] = 1 if n in normalizados else 0
+    for node_index, motivo in vetados:
+        nodes[node_index]["_tie_parity_fill_rejected"] = motivo
+    if final is None:
+        outcome["phase_relation"] = {"movable": len(movable), "vetoed": vetados, "applied": False}
+        return outcome
+    _bond_trace_adopt(final)
+
+    def _key(i):
+        return _canonical_node_sort_key(nodes[i]) + (i,)
+    invertidos = sorted((n for n in movable if estado.get(n) and nodes[n].get("kind") != "L_CORNER"), key=_key)
+    trocados = sorted((n for n in movable if nodes[n].get("kind") == "L_CORNER"
+                       and bool(estado.get(n, 0)) != (n in normalizados)), key=_key)
+    for node_index in invertidos:
+        nodes[node_index]["_tie_parity_fill_chosen"] = True
+    for node_index in trocados:
+        # a 82.1 tambem julga o canto L trocado: guarda o estado original (o da
+        # 30.5) para `_phase_revert_swapped_corner` poder devolve-lo
+        nodes[node_index]["_phase_relation_swapped"] = True
+        nodes[node_index]["_tie_parity_fill_chosen"] = True
+        nodes[node_index]["_phase_relation_original"] = dict(
+            (k, v) for k, v in salvo_original[node_index].items()
+            if k in ("arms", "neighbor_wall_idx", "neighbor_end_index"))
+    final["tie_parity_flips"] = list(outcome.get("tie_parity_flips") or ())
+    final["tie_parity_conflicts"] = list(outcome.get("tie_parity_conflicts") or ())
+    # A REGRA #1 TEM A ULTIMA PALAVRA (como na secao 72)
+    if ABUTTING_TIE_PARITY_ENABLED:
+        final = _apply_abutting_tie_parity(
+            final, nodes, walls_to_create, catalog, openings_per_wall, end_to_node)
+    final["tie_parity_fill_flips"] = list(invertidos)
+    final["phase_relation_swapped_corners"] = list(trocados)
+    final["tie_parity_fill_rejected"] = list(vetados)
+    final["phase_relation"] = {
+        "movable": len(movable), "edges": len(problem["edges"]), "cost": total, "exact": exact,
+        "flipped": invertidos, "swapped_corners": trocados, "vetoed": vetados,
+        "components": report, "applied": True}
+    return final
+
+
+def _phase_revert_swapped_corner(node):
+    """SECAO 86.2 + 82.1: devolve um canto L trocado pela 86.2 ao estado original
+    (o da 30.5), mantendo o pino (a coordenacao das bandas seguintes nao o
+    refaz). True se havia troca a desfazer. T/X nao passam por aqui (a 82.1
+    desfaz a marca `_tie_parity_flip`)."""
+    if not node.get("_phase_relation_swapped"):
+        return False
+    original = node.get("_phase_relation_original") or {}
+    for k in ("arms", "neighbor_wall_idx", "neighbor_end_index"):
+        if k in original:
+            node[k] = list(original[k]) if isinstance(original[k], list) else original[k]
+    node.pop("_phase_relation_swapped", None)
+    node["_arm_role_pinned"] = True
+    return True
 
 
 def _tie_parity_score(result):

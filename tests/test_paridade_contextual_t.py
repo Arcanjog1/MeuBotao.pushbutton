@@ -58,14 +58,21 @@ SALA_COM_GANHO = dict(largura=800.0, altura=302.0, internas=(240.0, 580.0))
 SALA_SEM_GANHO = dict(largura=600.0, altura=242.0, internas=(300.0,))
 
 
-def resolve(fixture, geral=True, strategy=None, reverse=False, aberturas=()):
+def resolve(fixture, geral=True, strategy=None, reverse=False, aberturas=(), fase86=None):
+    """`fase86` (None = o produto): liga/desliga a SECAO 86.2 (fase por relacao de
+    trecho + convencao de fachada), que substitui a busca gulosa da 82 no caminho
+    geral. Os testes que fixam o contrato PROPRIO da 82 rodam com ela desligada."""
     antes = m.GENERAL_TIE_PARITY_ENABLED
+    antes_86 = m.GENERAL_PHASE_RELATION_ENABLED
     m.GENERAL_TIE_PARITY_ENABLED = geral
+    if fase86 is not None:
+        m.GENERAL_PHASE_RELATION_ENABLED = fase86
     try:
         lines, ops = sala(aberturas=aberturas, **fixture)
         return tcr.solve(lines, ops, strategy=strategy, reverse=reverse, num_courses=N_FIADAS)
     finally:
         m.GENERAL_TIE_PARITY_ENABLED = antes
+        m.GENERAL_PHASE_RELATION_ENABLED = antes_86
 
 
 def conta(res, codigos):
@@ -131,7 +138,9 @@ def test_paridade_contextual_reduz_compensadores_sem_criar_problema(com_ganho):
 
 
 def test_sem_ganho_a_convencao_fica(com_ganho):
-    _res, _walls, nodes, _o = resolve(SALA_SEM_GANHO, geral=True)
+    # contrato da busca gulosa da 82 (so' melhora estrita); com a 86.2 o espelho
+    # pela convencao de fachada pode inverter sem ganho - ver test_fase_relacao_86.py
+    _res, _walls, nodes, _o = resolve(SALA_SEM_GANHO, geral=True, fase86=False)
     assert invertidos(nodes) == []
 
 
@@ -186,7 +195,9 @@ def test_channel_mantem_o_custo_calibrado_da_72(monkeypatch):
 
 def test_caminho_geral_move_so_encontros_t(monkeypatch):
     """No caminho geral a busca so' inverte T; o X fica na convencao (o CHANNEL
-    continua movendo os dois)."""
+    continua movendo os dois). Contrato da 82: com a 86.2 ligada os cantos L
+    tambem entram (test_fase_relacao_86.py)."""
+    monkeypatch.setattr(m, "GENERAL_PHASE_RELATION_ENABLED", False)
     tipos = []
     real = ws._search_tie_parity_fill_balance
 
@@ -232,6 +243,8 @@ def test_secao_68_so_roda_com_a_chave_da_83_e_com_guarda(monkeypatch, chave_83):
 
     monkeypatch.setattr(m, "_solve_building_blocks_all_courses_core", espia)
     monkeypatch.setattr(m, "GENERAL_REPAIR_PREFER_CLEAN_ENABLED", chave_83)
+    # contrato da 82 (sem inversao nesta sala, a 82.1 nao resolve a convencao a parte)
+    monkeypatch.setattr(m, "GENERAL_PHASE_RELATION_ENABLED", False)
     lines, ops = sala(aberturas=((0, 95.0, 91.0, True),), **SALA_SEM_GANHO)
     tcr.solve(lines, ops, strategy=None, num_courses=4)
     assert estados

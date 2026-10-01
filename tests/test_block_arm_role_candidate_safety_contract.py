@@ -423,6 +423,10 @@ def test_t15_endpoints_invertidos_nao_muda_identificacao():
 # ============================================================
 
 def _run_tgd(enabled):
+    """Contrato do SAFE REPAIR sobre a coordenacao da 30.5: a SECAO 86.2 (fase por
+    relacao de trecho) decide e PINA os cantos L no caminho geral - com ela ligada
+    nao sobra aresta isolada para o SAFE REPAIR tentar (a 82.1 passa a ser a rede de
+    seguranca desses cantos, ver test_fase_relacao_86.py). Aqui ela fica desligada."""
     m.ARM_ROLE_SAFE_REPAIR_ENABLED = enabled
     paths = bench_runner.project_paths("torre_easy_lo_r00_tgd")
     input_project = json.load(open(paths["input"], encoding="utf-8"))
@@ -431,10 +435,15 @@ def _run_tgd(enabled):
     settings = input_project.get("settings") or {}
     base_z_ft = float(settings.get("base_z_cm") or 0.0) / 100.0 * F
     num_courses = int(settings.get("num_courses") or settings.get("expected_rows") or 15)
-    result = m.solve_building_blocks_all_courses(
-        nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_ft, num_courses,
-        variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE,
-    )
+    antes_86 = m.GENERAL_PHASE_RELATION_ENABLED
+    m.GENERAL_PHASE_RELATION_ENABLED = False
+    try:
+        result = m.solve_building_blocks_all_courses(
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_ft, num_courses,
+            variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE,
+        )
+    finally:
+        m.GENERAL_PHASE_RELATION_ENABLED = antes_86
     return result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_ft, num_courses
 
 
