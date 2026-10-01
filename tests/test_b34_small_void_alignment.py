@@ -75,6 +75,13 @@ def _signature(res):
     return sorted(out)
 
 
+def _b34_rotations(res):
+    return sorted((ci, round(c["origin_world"].X * 30.48, 1), round(c["origin_world"].Y * 30.48, 1),
+                   round(c["rotation_deg"], 1))
+                  for ci, cands in res["course_candidates"].items() for c in cands
+                  if c["logical_code"] == "B34")
+
+
 def test_red_orientacao_fixa_deixa_vazado_menor_desalinhado():
     res = _solve(_lines(), enabled=False, general=False)
     assert res["small_void_alignment"]["after"] > 20, res["small_void_alignment"]["after"]
@@ -84,7 +91,10 @@ def test_green_orientacao_reduz_violacoes_sem_mudar_contorno():
     off = _solve(_lines(), enabled=False, general=False)
     on = _solve(_lines(), enabled=True, general=False)
     assert on["small_void_alignment"]["after"] < off["small_void_alignment"]["after"] / 3.0
-    assert on["small_void_alignment"]["rotated"] > 0
+    # SECAO 86.3: na faixa de B34 equilibrada a orientacao inicial ja' sai pela
+    # convencao (semente da 52, mesma flag) e o guloso pode nao precisar girar
+    # nada - o que a 52 garante e' que a orientacao MUDOU em relacao a' fixa
+    assert on["small_void_alignment"]["rotated"] > 0 or _b34_rotations(on) != _b34_rotations(off)
     # mesmas pecas, mesmas posicoes, mesmas juntas: so' a orientacao muda
     assert _signature(on) == _signature(off)
     assert len(on.get("collisions") or []) == len(off.get("collisions") or [])
