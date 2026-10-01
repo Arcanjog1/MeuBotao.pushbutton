@@ -553,3 +553,141 @@ def test_pilarete_da_w5_como_o_usuario_corrigiu():
     even = set(tuple(x[:3] for x in _sided_row(cc, c, p0, d, 229, 315)) for c in range(0, 11, 2))
     assert len(odd) == 1 and len(even) == 1, (odd, even)
     assert set([odd.pop(), even.pop()]) == set([tuple(a), tuple(b)])
+
+
+def _w4_parede_inteira():
+    """W4_LOTE1 com as fiadas de mesma paridade em FAMILIAS diferentes, como no calculo completo (a
+    familia e' a fileira da parede inteira: la' a contraverga e a jamba da janela 109-250 separam as
+    pares em [0,2] / [4] / [6,8,10] e as impares em [1,3] / [5,7,9]). A diferenca fica longe do
+    pilarete (t ~ 300, fora do alcance de qualquer jamba)."""
+    far = {0: 300, 2: 300, 4: 310, 6: 320, 8: 320, 10: 320, 1: 300, 3: 300, 5: 310, 7: 310, 9: 310}
+    rows = {}
+    for c, layout in W4_LOTE1.items():
+        extra = [("B39", far[c], far[c] + 39, 0)] if c in far else []
+        rows[c] = extra + list(layout)
+    return rows
+
+
+def _w4_parede_inteira_resultado(twins=True, channel_fallback=True):
+    cc, walls, openings, p0, d, cat = _wall_rows(_w4_parede_inteira(), 1100.0, [(804.0, 945.0)])
+    # o motor recebe o catalogo do solve REAL: so' blocos, sem CHANNEL_* (a criacao e a auditoria e'
+    # que juntam as canaletas)
+    engine_cat = dict((k, v) for k, v in cat.items() if not k.startswith("CHANNEL"))
+    saved = (R.JAMB_TWIN_FAMILIES_ENABLED, R._channel_logical_entry)
+    R.JAMB_TWIN_FAMILIES_ENABLED = twins
+    if not channel_fallback:
+        R._channel_logical_entry = lambda code: {}
+    try:
+        _arrange_real(cc, walls, openings, engine_cat, [1042.0])
+    finally:
+        R.JAMB_TWIN_FAMILIES_ENABLED, R._channel_logical_entry = saved
+    return cc, p0, d
+
+
+def test_w4_parede_inteira_fiadas_gemeas_e_catalogo_sem_canaleta():
+    """85.9 (calculo completo x bancada, 2026-09-30): o calculo completo deixava a W4 inalterada (14 vazados
+    quebrados) embora a bancada curta desse o desenho do usuario. Duas causas medidas: (1) 5 familias na
+    unidade do pilarete (3 pares + 2 impares, 6 opcoes triadas cada: 6^5 = 7.776 > 4.096) -> descida
+    fiada a fiada, que nunca troca as fiadas de mesma paridade juntas; as GEMEAS andam juntas (6 x 6 = 36);
+    (2) o catalogo do solve nao tem canaleta -> a verga nao achava modelo de U34 e a grade derivada nao
+    fechava. Resultado = o mesmo desenho do usuario do teste da bancada."""
+    cc, p0, d = _w4_parede_inteira_resultado()
+    for c in range(0, 11, 2):
+        row = _sided_row(cc, c, p0, d, 940, 1070)
+        assert row == [("B34", 945, 979, 1), ("B34", 980, 1014, 1), ("B54", 1015, 1069, 0)], (c, row)
+    for c in range(1, 11, 2):
+        row = _sided_row(cc, c, p0, d, 940, 1070)
+        assert row == [("B19", 945, 964, 0), ("B34", 965, 999, -1), ("B34", 1000, 1034, -1)], (c, row)
+    assert _sided_row(cc, 11, p0, d, 826, 1040) == [
+        ("U34", 825, 859, 0), ("U34", 860, 894, 0), ("U34", 895, 929, 0), ("U34", 930, 964, 0),
+        ("U34", 965, 999, 0), ("B34", 1000, 1034, -1)], _sided_row(cc, 11, p0, d, 826, 1040)
+    assert [x[0] for x in _sided_row(cc, 12, p0, d, 806, 1013)] == ["B34"] * 6
+    assert [x[0] for x in _sided_row(cc, 13, p0, d, 826, 1033)] == ["B34"] * 6
+    # as pecas longe do pilarete (que so' separam as familias) ficam onde estavam
+    for c, t in ((0, 300), (4, 310), (6, 320), (1, 300), (5, 310)):
+        assert ("B39", t, t + 39, 0) in _sided_row(cc, c, p0, d, t - 1, t + 40), c
+
+
+def test_w4_parede_inteira_sem_gemeas_ou_sem_modelo_de_canaleta_fica_como_estava():
+    """Prova das duas causas: sem agrupar as gemeas, ou sem o modelo logico de canaleta, o pilarete fica
+    `B19 | B39 | C09 | B54` / `B39 | B39 | C09` (o C09 continua, nenhuma grade de B34)."""
+    for twins, channel_fallback in ((False, True), (True, False)):
+        cc, p0, d = _w4_parede_inteira_resultado(twins=twins, channel_fallback=channel_fallback)
+        even = [x[0] for x in _sided_row(cc, 0, p0, d, 940, 1070)]
+        odd = [x[0] for x in _sided_row(cc, 1, p0, d, 940, 1040)]
+        assert even == ["B19", "B39", "C09", "B54"], (twins, channel_fallback, even)
+        assert "C09" in odd, (twins, channel_fallback, odd)
+
+
+# W33 do 'butanta testes' (caixa de shaft, 115 cm entre dois cantos L, sem abertura) - fileiras REAIS do
+# calculo offline (motor c64c7f8): B34 de canto (no') numa ponta em cada paridade, B19 no miolo em TODAS
+# as fiadas, 28 vazados quebrados. Lado do B34 de canto = vazado menor voltado para a ponta.
+W33_SHAFT = dict(
+    [(c, [("B34", 0.0, 34.0, -1), ("B19", 35.5, 54.5, 0), ("B39", 55.5, 94.5, 0), ("C04", 95.5, 99.5, 0)])
+     for c in range(1, 14, 2)] +
+    [(c, [("C04", 15.5, 19.5, 0), ("B19", 20.5, 39.5, 0), ("B39", 40.5, 79.5, 0), ("B34", 81.0, 115.0, 1)])
+     for c in range(0, 14, 2)])
+
+
+def _shaft_w33(guard=True):
+    old = R.JAMB_SPECIAL_STRIP_GUARD_ENABLED
+    R.JAMB_SPECIAL_STRIP_GUARD_ENABLED = guard
+    try:
+        cc, walls, openings, p0, d, cat = _wall_rows(W33_SHAFT, 115.0, [], node_codes=("B34",))
+        _arrange_real(cc, walls, openings, cat, [0.0, 115.0])
+    finally:
+        R.JAMB_SPECIAL_STRIP_GUARD_ENABLED = old
+    audit = m.audit_wall_bond_quality(0, walls, cc, cat, 14, openings_per_wall=openings)
+    strips = [p for p in audit["problems"] if p.startswith("REPEATED_VERTICAL_COMPENSATOR_STRIP")]
+    return cc, p0, d, strips
+
+
+def test_caixa_de_shaft_w33_tira_o_b19_do_miolo_sem_faixa_vertical():
+    """85.8 (correcao do usuario: "o maior problema e' o B19"; B54 + C09 AUTORIZADO no trecho de 64 cm).
+    Causa medida no calculo offline: o recompositor trocava `B19 B39 C04` por `C09 | B54` (impares) e
+    `B54 | C09` (pares) - C09 sobre B54 a 2,5 cm, duas faixas verticais de peca especial - e o validador de
+    producao (`audit_wall_bond_quality`, REPEATED_VERTICAL_COMPENSATOR_STRIP) devolvia a parede inteira com
+    o B19 no miolo (walls_rejected_by_validation = [33]). Com a faixa como falha dura do recompositor: a
+    composicao da W27 vizinha (`B54 | C09` nas duas paridades, C09 fechando contra o encontro)."""
+    cc, p0, d, strips = _shaft_w33(guard=False)
+    assert len(strips) == 2, strips  # o que o validador de producao reprovava
+    cc, p0, d, strips = _shaft_w33(guard=True)
+    assert strips == [], strips
+    for c in range(14):
+        row = _sided_row(cc, c, p0, d, -1.0, 116.0)
+        assert "B19" not in [x[0] for x in row], (c, row)
+        want = ([("B34", 0, -1), ("B54", 35, 0), ("C09", 90, 0)] if c % 2 else
+                [("B54", 15, 0), ("C09", 70, 0), ("B34", 81, 1)])
+        assert [(x[0], x[3]) for x in row] == [(w[0], w[2]) for w in want], (c, row)
+        assert all(abs(x[1] - w[1]) <= 1 for x, w in zip(row, want)), (c, row)
+
+
+def test_faixa_vertical_do_recompositor_espelha_a_auditoria():
+    """A regua de faixa do recompositor usa os MESMOS parametros e a mesma contagem da auditoria de
+    producao (senao a busca volta a escolher o que o validador reprova)."""
+    assert R.STRIP_CLUSTER_TOLERANCE_CM == m.BOND_STRIP_CLUSTER_TOLERANCE_CM
+    assert R.STRIP_MIN_COURSES == m.BOND_STRIP_MIN_COURSES
+    assert R.STRIP_RATIO == m.BOND_STRIP_RATIO
+    assert R.STRIP_MIN_ADJACENT_COURSES == m.BOND_STRIP_MIN_ADJACENT_COURSES
+    assert R.STRIP_NODE_EXEMPT_CM == m.BOND_STRIP_NODE_EXEMPT_CM
+    assert R.STRIP_EDGE_EXEMPT_CM == m.BOND_STRIP_EDGE_EXEMPT_CM
+    assert R.STRIP_OPENING_INFLUENCE_CM == m.BOND_STRIP_OPENING_INFLUENCE_CM
+    bad = dict(
+        [(c, [("B34", 0.0, 34.0, -1), ("C09", 35.5, 44.5, 0), ("B54", 45.5, 99.5, 0)]) for c in range(1, 14, 2)] +
+        [(c, [("B54", 15.5, 69.5, 0), ("C09", 70.5, 79.5, 0), ("B34", 81.0, 115.0, 1)]) for c in range(0, 14, 2)])
+    for rows, expected in ((bad, 2), (W33_SHAFT, 0)):
+        cc, walls, openings, _p0, _d, cat = _wall_rows(rows, 115.0, [], node_codes=("B34",))
+        wall = R._Wall(0, R._collect_rows(cc, walls)[0], walls, openings, cat, 1.5, ties=[0.0, 115.0],
+                       jamb_alignment=True)
+        audit = m.audit_wall_bond_quality(0, walls, cc, cat, 14, openings_per_wall=openings)
+        assert wall._special_strips() == len(audit["compensator_strips"]) == expected
+    # denominador = fiadas do SOLVE (como a auditoria): parede com pecas so' nas fiadas 0..5 de 14 nao
+    # tem faixa (6/14 < metade) - contar so' as fiadas da parede bloquearia a busca sem motivo
+    part = dict((c, bad[c]) for c in range(6))
+    cc, walls, openings, _p0, _d, cat = _wall_rows(part, 115.0, [], node_codes=("B34",))
+    for c in range(6, 14):
+        cc[c] = []
+    wall = R._Wall(0, R._collect_rows(cc, walls)[0], walls, openings, cat, 1.5, ties=[0.0, 115.0],
+                   jamb_alignment=True, num_courses=14)
+    audit = m.audit_wall_bond_quality(0, walls, cc, cat, 14, openings_per_wall=openings)
+    assert wall._special_strips() == len(audit["compensator_strips"]) == 0

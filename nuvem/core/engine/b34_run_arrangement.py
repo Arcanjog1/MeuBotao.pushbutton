@@ -195,6 +195,25 @@ MAIN_CELL_MIN_CM = 13.0
 # `B54 + C09` no trecho de 64 cm do shaft).
 HALF_BLOCK_FIX_ENABLED = True
 HALF_BLOCK_FIX_EXTRA_CODES = ("B54",)
+# SECAO 85.8 (caixa de shaft, medido 2026-09-30): o validador de producao
+# (`audit_wall_bond_quality`) reprova REPEATED_VERTICAL_COMPENSATOR_STRIP -
+# peca especial do catalogo (B34/B54/C09/C04) na mesma regiao X em fiadas
+# ADJACENTES, fora das zonas isentas (ponta da parede, abertura, no' de meio de
+# parede). O recompositor nao conhecia essa regra: na W33 ele escolhia
+# `B34 | C09 | B54` (impares) sobre `B54 | C09 | B34` (pares) - C09 sobre B54
+# e B54 sobre C09 a ~2,5 cm, duas faixas (X~41,2 e X~73,7, 14 fiadas) - e a
+# parede inteira voltava por rollback com o B19 no miolo. Agora a contagem de
+# faixas e' falha dura (nunca aumenta), com os MESMOS parametros da auditoria
+# (espelhados aqui; `test_faixa_vertical_do_recompositor_espelha_a_auditoria`
+# confere).
+JAMB_SPECIAL_STRIP_GUARD_ENABLED = True
+STRIP_CLUSTER_TOLERANCE_CM = 6.0      # = wall_modeling.BOND_STRIP_CLUSTER_TOLERANCE_CM
+STRIP_MIN_COURSES = 3                 # = wall_modeling.BOND_STRIP_MIN_COURSES
+STRIP_RATIO = 0.5                     # = wall_modeling.BOND_STRIP_RATIO
+STRIP_MIN_ADJACENT_COURSES = 2        # = wall_modeling.BOND_STRIP_MIN_ADJACENT_COURSES
+STRIP_NODE_EXEMPT_CM = 60.0           # = wall_modeling.BOND_STRIP_NODE_EXEMPT_CM
+STRIP_EDGE_EXEMPT_CM = 25.0           # = continuous_modulation.BOND_STRIP_EDGE_EXEMPT_CM
+STRIP_OPENING_INFLUENCE_CM = 60.0     # = continuous_modulation.BOND_STRIP_OPENING_INFLUENCE_CM
 # SECAO 85.8: canaleta U34 + pastilha onde cabem U39 exatas vira U39 (verga da W2)
 CHANNEL_RUN_CLEANUP_ENABLED = True
 # SECAO 85.9 (desenho do usuario, 2026-09-30, W4 pilarete 945-1144): "o uso dos
@@ -229,6 +248,13 @@ JAMB_VERGA_MEMBER_ENABLED = True
 # lados parava antes do B54 do T e antes da junta que fecha)
 JAMB_BRIDGE_RUN_MAX_CM = 420.0
 JAMB_BRIDGE_RUN_MAX_PIECES = 11
+# SECAO 85.9 (calculo completo x bancada, W4 pilarete 945-1144): fiadas da jamba
+# GEMEAS na unidade (mesma paridade, mesmo trecho, mesma triagem) que so' viram
+# familias diferentes por causa do resto da parede entram juntas na combinacao do
+# estagio A quando a combinacao familia a familia passa do orcamento (medido: 5
+# familias, 6^5 = 7.776 > 4.096 -> descida fiada a fiada -> parede inalterada;
+# agrupadas 6 x 6 = 36 -> desenho do usuario)
+JAMB_TWIN_FAMILIES_ENABLED = True
 CHANNEL_OF_BLOCK = {"B39": "CHANNEL_U_39", "B34": "CHANNEL_U_34", "B19": "CHANNEL_U_19"}
 
 
@@ -264,6 +290,21 @@ def _is_channel_code(code):
         return bool(_reinforcement.is_channel_code(code))
     except Exception:  # pragma: no cover - modulo sempre presente no motor
         return str(code or "").upper().startswith("CHANNEL")
+
+
+def _channel_logical_entry(code):
+    """Entrada logica (sem Revit) da canaleta `code` - comprimento nominal, sem
+    celula vertical; {} quando o codigo nao e' canaleta conhecida."""
+    try:
+        from core.engine import opening_reinforcement as _reinforcement
+        spec = _reinforcement.CHANNEL_LOGICAL_TYPES.get(code)
+    except Exception:  # pragma: no cover - modulo sempre presente no motor
+        spec = None
+    if not spec:
+        return {}
+    return {"logical_code": code, "length_cm": spec["nominal_length_cm"], "height_cm": spec["height_cm"],
+            "width_cm": spec["width_cm"], "cells_local": [], "is_special_bond": False,
+            "is_compensator": False, "is_channel": True}
 
 
 def _axis(walls_to_create, wall_idx):
@@ -320,6 +361,12 @@ def _catalog_template(code, catalog):
     """Slot-modelo de `code` lido do CATALOGO (celulas locais, em pes, eixo X da
     peca ao longo da parede) - para codigos que ainda nao existem na parede."""
     entry = (catalog or {}).get(code) or {}
+    if not entry and _is_channel_code(code):
+        # SECAO 85.9: o catalogo do solve nao tem canaletas (so' a criacao e a
+        # auditoria as juntam) - a verga que segue a grade da jamba precisa do
+        # U34/U19 mesmo quando a parede ainda nao tem nenhum (medido: W4, verga da
+        # porta 8078996 so' com U39 -> `_grid_follow` sem modelo de U34 = None)
+        entry = _channel_logical_entry(code)
     length = float(entry.get("length_cm") or 0.0)
     if length <= 0.0:
         return None
@@ -621,8 +668,12 @@ def _arrangements(slots, run):
 class _Wall(object):
     def __init__(self, wall_idx, rows, walls_to_create, openings_per_wall, catalog, tol_cm,
                  ties=None, half_code=None, half_tie_gap_cm=0.0, fill_codes=(),
-                 joint_identity_guard=False, jamb_alignment=False):
+                 joint_identity_guard=False, jamb_alignment=False, num_courses=None):
         self.wall_idx = wall_idx
+        # SECAO 85.8 (caixa de shaft): total de fiadas do solve - o mesmo
+        # denominador da auditoria de faixa vertical (`_special_strips`)
+        self.num_courses = num_courses
+        self._strip_cache = None
         # SECAO 84: faixa de compensacao na jamba (so' quando o chamador liga)
         self.jamb_alignment = bool(jamb_alignment) and JAMB_COMPENSATOR_ALIGNMENT_ENABLED
         self.jamb_conflicts = []
@@ -1843,17 +1894,24 @@ class _Wall(object):
 
     def _derived_bridge_layouts(self, bridge_f, span0, orig_lists, active_f, spans, edges):
         """{familia-ponte: layout} - cada fiada-ponte/verga seguindo a grade da
-        fiada da jamba de MESMA paridade desta unidade (85.9)."""
+        fiada da jamba de MESMA paridade desta unidade (85.9). Com varias familias
+        de mesma paridade (a familia e' a fileira da PAREDE INTEIRA: no calculo
+        completo a W4 tem 3 familias pares e 2 impares no pilarete 945-1144), a
+        grade seguida e' a da fiada MAIS PROXIMA da ponte - a coluna passa por ela
+        - e nao a primeira da lista (a do pe' da parede)."""
         out = {}
         for fb in bridge_f:
             cb = self._courses_of(fb)
             if not cb:
                 continue
             run = orig_lists[fb][span0[fb][0]:span0[fb][1] + 1]
+            near = []
             for fa in active_f:
                 ca = self._courses_of(fa)
                 if not ca or (ca[0] - cb[0]) % 2:
                     continue
+                near.append((min(abs(x - y) for x in ca for y in cb), fa))
+            for _gap, fa in sorted(near):
                 arun = self.fam[fa][spans[fa][0]:spans[fa][1] + 1]
                 act = [(e, d) for e, d in edges
                        if any(abs(e - e2) < EDGE_TOLERANCE_CM and d == d2 for e2, d2 in self._active_jamb_edges(fa))]
@@ -2022,7 +2080,7 @@ class _Wall(object):
         return self._trace_column(seed[2], seed[1], restart=False)
 
     def _staged_search(self, fams, active_f, bridge_f, options, start, base, measure, objective,
-                       best, best_any, derive=None):
+                       best, best_any, derive=None, span0=None):
         """SECAO 85 - pontos criticos compatibilizados com alternativas: A) as
         JAMB_ALT_TOPK melhores combinacoes das fiadas da jamba, com as fiadas-ponte
         transparentes (so a fase atravessa); B) para cada uma, descida nas
@@ -2055,6 +2113,13 @@ class _Wall(object):
                 for f in active_f:
                     assigns = [_merged(a, f, o) for a in assigns for o in screened[f]]
             else:
+                twins = self._twin_groups(active_f, options, screened, span0)
+                if twins is not None:
+                    # 85.9 (calculo completo, W4): as fiadas GEMEAS no trecho andam
+                    # juntas - a mesma combinacao que a bancada (uma familia por
+                    # paridade) ve; a descida abaixo continua somando as dela
+                    for group in twins:
+                        assigns = [_merged_group(a, group, o) for a in assigns for o in screened[group[0]]]
                 current = dict(start)
                 for _round in range(JAMB_DESCENT_ROUNDS):
                     improved = False
@@ -2126,6 +2191,43 @@ class _Wall(object):
                 if not improved:
                     break
         return best, best_any
+
+    def _twin_groups(self, active_f, options, screened, span0=None):
+        """SECAO 85.9 (calculo completo, W4 pilarete 945-1144): [[familias]] das
+        fiadas da jamba GEMEAS nesta unidade - mesma paridade, mesmo trecho (mesmas
+        pontas da corrida, as mesmas opcoes na mesma ordem) e a mesma triagem. A
+        familia e' a fileira da PAREDE INTEIRA: fiadas que so' diferem longe da
+        unidade (na contraverga e na jamba da janela 109-250) viram familias
+        diferentes, e com 5 familias (3 pares + 2 impares, 6 opcoes triadas cada:
+        6^5 = 7.776 > 4.096) o estagio A caia na descida fiada a fiada, que nunca
+        troca as fiadas de mesma paridade juntas (medido: bancada curta com 2
+        familias = desenho do usuario; parede inteira com 5 = inalterada, 14
+        vazados quebrados; agrupadas: 6 x 6 = 36). None quando nao ha gemeas ou
+        quando a combinacao por grupo ainda passa de JAMB_ALT_MAX_EVAL."""
+        if not JAMB_TWIN_FAMILIES_ENABLED:
+            return None
+        groups = []
+        for f in active_f:
+            courses = self._courses_of(f)
+            parities = tuple(sorted(set(c % 2 for c in courses)))
+            ends = None
+            if span0 is not None and f in span0:
+                ends = (round(self.fam[f][span0[f][0]].lo, 1), round(self.fam[f][span0[f][1]].hi, 1))
+            key = (parities, ends, tuple(options[f]), tuple(screened[f]))
+            for gkey, members in groups:
+                if gkey == key:
+                    members.append(f)
+                    break
+            else:
+                groups.append((key, [f]))
+        if len(groups) == len(active_f):
+            return None
+        n = 1
+        for _key, members in groups:
+            n *= len(screened[members[0]])
+        if n > JAMB_ALT_MAX_EVAL:
+            return None
+        return [members for _key, members in groups]
 
     def _jamb_paths_ok(self, edges):
         return sum(1 for e, d in edges if self._jamb_path(e, d)[0])
@@ -2253,6 +2355,80 @@ class _Wall(object):
                     n += 1
         return n
 
+    def _special_strips(self):
+        """Faixas verticais de peca especial na parede INTEIRA - a mesma leitura
+        de REPEATED_VERTICAL_COMPENSATOR_STRIP da auditoria de producao: centro de
+        cada peca `is_special_bond`/`is_compensator` do catalogo (B34/B54/C09/C04;
+        B19 nao e' peca especial no catalogo) fora da ponta (25 cm), da abertura
+        (60 cm) e do no' de meio de parede (60 cm); agrupamento transitivo de
+        6 cm; faixa = 3+ fiadas, >= metade das fiadas do solve e 2+ fiadas
+        ADJACENTES (a repeticao so' na mesma paridade e' o padrao A/B, nao faixa).
+        Roda a cada medida da busca: codigo especial, isencao por posicao e nos
+        de meio de parede ficam em cache na parede (geometria fixa)."""
+        if not JAMB_SPECIAL_STRIP_GUARD_ENABLED or not self.course_fam:
+            return 0
+        cache = self._strip_cache
+        if cache is None:
+            ties = list(self.ties or [])
+            for lst in (self.ties_by_course or {}).values():
+                ties.extend(lst or [])
+            # no' de meio de parede (as pontas ja' tem a isencao propria)
+            midspan = sorted(set(round(t, 3) for t in ties if 0.5 < t < self.length - 0.5))
+            n_courses = max(self.num_courses or 0, len(self.course_fam), max(self.course_fam) + 1)
+            cache = self._strip_cache = ({}, {}, midspan, n_courses)
+        special, exempt, midspan, n_courses = cache
+        length, edges = self.length, self.edges
+        per_fam = {}
+        points = []
+        for c in sorted(self.course_fam):
+            f = self.course_fam[c]
+            centers = per_fam.get(f)
+            if centers is None:
+                centers = per_fam[f] = []
+                for s in self.fam[f]:
+                    code = s.code
+                    flag = special.get(code)
+                    if flag is None:
+                        cat = self.catalog.get(code) or {}
+                        flag = special[code] = (not _is_channel_code(code)
+                                                and bool(cat.get("is_special_bond") or cat.get("is_compensator")))
+                    if not flag:
+                        continue
+                    mid = round((s.lo + s.hi) / 2.0, 3)
+                    free = exempt.get(mid)
+                    if free is None:
+                        free = exempt[mid] = (
+                            mid <= STRIP_EDGE_EXEMPT_CM or mid >= length - STRIP_EDGE_EXEMPT_CM
+                            or any(abs(mid - e) <= STRIP_OPENING_INFLUENCE_CM for e in edges)
+                            or any(abs(mid - n) <= STRIP_NODE_EXEMPT_CM for n in midspan))
+                    if not free:
+                        centers.append(mid)
+            for t in centers:
+                points.append((t, c))
+        if not points:
+            return 0
+        points.sort()
+        clusters, cur = [], [points[0]]
+        for p in points[1:]:
+            if p[0] - cur[-1][0] <= STRIP_CLUSTER_TOLERANCE_CM:
+                cur.append(p)
+            else:
+                clusters.append(cur)
+                cur = [p]
+        clusters.append(cur)
+        n = 0
+        for cl in clusters:
+            courses = sorted(set(c for _t, c in cl))
+            if len(courses) < STRIP_MIN_COURSES or len(courses) / float(n_courses) < STRIP_RATIO:
+                continue
+            best = run = 1
+            for a, b in zip(courses, courses[1:]):
+                run = run + 1 if b == a + 1 else 1
+                best = max(best, run)
+            if best >= STRIP_MIN_ADJACENT_COURSES:
+                n += 1
+        return n
+
     @staticmethod
     def _unmatched(intervals_a, intervals_b):
         """Compensadores de `a` sem compensador de `b` na mesma faixa vertical
@@ -2318,7 +2494,8 @@ class _Wall(object):
                 "column": colstats[0], "colw": colstats[1], "colfull": colstats[2], "offjamb": offjamb,
                 "paths": self._jamb_paths_ok(edges),
                 "coh": self._coherence_mismatch(fams, span_of, window, edges),
-                "joints": joints, "stacks": self._stacks_nonexempt(window), "moved": moved}
+                "joints": joints, "stacks": self._stacks_nonexempt(window), "moved": moved,
+                "strips": self._special_strips()}
 
     @staticmethod
     def _jamb_failures(m, base):
@@ -2350,6 +2527,10 @@ class _Wall(object):
             fails.append("NEW_COINCIDENT_JOINT")
         if m["stacks"] > base["stacks"]:
             fails.append("STACKED_JOINT")
+        # 85.8 (caixa de shaft): a auditoria de producao reprova a parede com
+        # faixa vertical nova de peca especial - o recompositor tambem
+        if m.get("strips", 0) > base.get("strips", 0):
+            fails.append("REPEATED_SPECIAL_STRIP")
         return fails
 
     def _layout_options(self, f, span, extra_codes=()):
@@ -2560,7 +2741,7 @@ class _Wall(object):
         if bridge_f and active_f and total > JAMB_JOINT_MAX_COMBINATIONS:
             best, best_any = self._staged_search(fams, active_f, bridge_f, options, start, base, measure,
                                                  objective, best, best_any,
-                                                 derive=lambda a: derive(a, active_f, bridge_f))
+                                                 derive=lambda a: derive(a, active_f, bridge_f), span0=span0)
             total = 0  # resolvido pela busca em estagios
         candidates = None
         if total == 0:
@@ -2933,6 +3114,13 @@ def _side_patterns(order, tpl_of):
 def _merged(assign, family, order):
     out = dict(assign)
     out[family] = order
+    return out
+
+
+def _merged_group(assign, families, order):
+    out = dict(assign)
+    for family in families:
+        out[family] = order
     return out
 
 
@@ -3365,6 +3553,11 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
     fill_codes = _fill_codes(course_candidates, catalog)
     summary.update({"compositions": 0, "created": 0, "removed": 0, "walls_rejected_by_validation": []})
     support_total = None
+    # 85.8: fiadas do solve (denominador da regua de faixa vertical, como na auditoria)
+    try:
+        num_courses = max(int(c) for c in course_candidates) + 1
+    except (TypeError, ValueError):
+        num_courses = None
     for wi in sorted(rows_by_wall):
         if only_walls is not None and wi not in only_walls:
             # passe seguinte (secao 65): so' as paredes que o passe anterior mexeu
@@ -3372,7 +3565,8 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
         wall = _Wall(wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
                      ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
                      half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes,
-                     joint_identity_guard=joint_identity_guard, jamb_alignment=jamb_on)
+                     joint_identity_guard=joint_identity_guard, jamb_alignment=jamb_on,
+                     num_courses=num_courses)
         before = wall.totals()
         base_fam = dict((f, [s.copy() for s in slots]) for f, slots in wall.fam.items())
         aligned = 0

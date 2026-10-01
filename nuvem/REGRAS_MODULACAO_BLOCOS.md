@@ -11463,6 +11463,54 @@ Revit).
     famílias diferentes. É a "unificação de fase das fiadas cheias abaixo/acima de TODAS as aberturas" já
     registrada na §85.7 — problema da parede, além do teto das unidades de jamba.
 
+### 85.10 Rodada 2 no Revit (2026-10-01) — critérios do usuário e correções aplicadas sem mudar o script
+
+- **Pedido do usuário (2026-10-01)**: corrigir a modulação no Revit para inspeção, sem alterar o script nem publicar;
+  só o `butanta testes`, com recuperação do estado anterior; preservar a referência humana BUTANTÃ - R08_LT; sem mudar
+  dimensão/posição de paredes e aberturas; geometria real das famílias; **só correções que não criem regressão**;
+  trechos corrigidos visíveis em vistas.
+- **REGRA OBRIGATÓRIA (critério novo explícito) — apoio dos septos**: priorizar, junto com o prisma (continuidade
+  real dos furos), o alinhamento/apoio dos SEPTOS — a parte maciça entre dois vazados consecutivos de uma fiada
+  (septo do meio do bloco; na junta, as duas pontas + a argamassa formam um SEPTO DUPLO de ~6 cm centrado na junta)
+  apoiada em parte maciça da fiada de baixo. Medido: com 20 cm de desencontro o septo de ponta isolado cai 0,5 cm
+  sobre o vazado de baixo até no amarrado de B39 — a régua certa mede o septo duplo da junta, não a ponta isolada.
+- **REGRA OBRIGATÓRIA (reafirmada) — canaleta nunca serve de amarração**; **pilarete resolvido com as DUAS aberturas
+  e um par coerente de fiadas**; **nenhuma regressão em nenhum indicador** (prisma, vazado menor, septos, juntas
+  coincidentes/a prumo, pastilha fora da jamba, B19 fora de fechamento, faixa vertical de peça especial, canaleta
+  em nó). Uma correção que melhora o total mas cria um defeito novo em outro ponto fica PENDENTE (decisão técnica).
+- **Aplicado (2026-10-01)** — cópia de instâncias do lote 1 (mesma família/tipo), um TransactionGroup, régua
+  independente + verificadores adversariais + leitura de volta do Revit: W4 pilarete 945–1144 (desenho do usuário
+  da 85.9), W5 pilarete 230–314 (85.8 item 1), W2 porta 8079009 (85.8), W1 1305–1379 (B34 das ímpares com o vazado
+  menor sobre o menor), W33 shaft (B54 + C09, 85.8). Modelo inteiro: vazados quebrados 802 → 747, vazado menor
+  sobre principal 127 → 106, septos sem apoio 371 → 299, pastilhas 483 → 467, B19 fora de fechamento 25 → 11;
+  nenhuma parede piorou.
+- **CORREÇÃO DO USUÁRIO (2026-10-01, revisão da rodada 2, print da vista `S85 R2 W1 trecho 1205-1414`) — REGRA
+  OBRIGATÓRIA**: "os blocos de 34 têm que ir até o topo da parede, pois dessa forma estou perdendo o alinhamento dos
+  septos". Na W1 a rodada 2 corrigiu o pilarete (fiadas 0–10: pares `B39 B39 B39 | B34> [1325–1359] | B54`, ímpares
+  `B19 | B39 B39 B39 | B34< [1345–1379] | cruza`), mas as fiadas 11–13 continuaram com B39 deslocado e C09 junto do nó
+  (`… B39 [1330–1369] | C09 [1370–1379]` / `… B39 [1310–1349] | C09 [1350–1359] | B54`) — a coluna de B34 junto do T
+  para na fiada 10 e os septos de cima ficam fora dos de baixo. REGRA: a coluna de B34 (e a grade inteira do pilarete)
+  continua nas fiadas acima da verga e na própria verga até o topo da parede; a fase que não fecha sobre a porta é
+  absorvida SOBRE O VÃO (onde não há coluna de furo abaixo), nunca no pilarete. Mesmo princípio da 85.9 (W4).
+- **DECISÃO DO USUÁRIO (2026-10-01) sobre a W1 acima da porta 8079007**: entre o nó da esquerda (B54 1015–1069) e a
+  jamba (1205) sobram 135 cm, que não fecham com B39/B34 — levar a grade inteira do pilarete até o topo sem regressão
+  exigiria B54 como preenchimento sobre a porta (opção oferecida e RECUSADA pelo usuário). Escolha do usuário: só
+  B39/B34 (U39/U34 na verga) com a coluna de B34 junto do T até o topo — a diferença de fase fica nos 5 B34 sobre a
+  porta, aceitando que as colunas do pilarete junto da porta (t ≈ 1215 e 1255) quebrem na fiada 11/12 (régua
+  independente: furos quebrados 78 → 79, septos sem apoio 12 → 6, vazado menor sobre principal 11 → 10, pastilhas
+  64 → 61). REGRA (preferência do usuário): o alinhamento dos septos e a coluna de B34 junto do encontro valem mais
+  que a continuidade das colunas junto da porta quando as duas não cabem; B54 fora de nó NÃO é usado para fechar fase
+  sobre porta (a exceção do B54 continua só na caixa de shaft). **APLICADO no Revit (2026-10-01)**: fiada 13 `B39 |
+  B34>×5 | B39 B39 | B34<`, fiada 12 `B39 | B34<×5 | B39 | B34>`, verga `B39 | U34×5 (1090–1264) | B39 B39 | B34<`;
+  23 peças trocadas; leitura de volta: furos 78 → 79, septos sem apoio 12 → 6 (6 → 0 junto do T, fiadas 10–13),
+  vazado menor sobre principal 11 → 10, pastilhas 64 → 61; nenhuma outra parede mudou.
+- **Ficou pendente (decisão técnica do usuário)**: W27 (tira os 11 B19 do miolo mas +1 septo sem apoio); W6 porta
+  8079002 (a troca deixaria B39 embaixo e B34 nas fiadas 11–13 — a grade mudaria em cima; a jamba direita depende
+  de desfazer o deslocamento da porta); W0 janelas 1034–1175 e 8079013 (tiram o C04 solto atrás do B19 e 10 casos
+  de vazado menor sobre principal, mas criam 2 vazados menores sob principal ATRAVÉS da contraverga); W0 805–844
+  (pilarete de 39 cm causado pelo deslocamento das janelas — exige mover abertura); W1 fiadas 11–13 (fase
+  incompatível sobre a porta 8079007 — §85.9); fases abaixo/acima das janelas da W0 (§85.7/85.9).
+
 Testes: `tests/test_jamb_compensator_alignment.py` (W1 real, pilar de referência do usuário, régua por
 área, B19 no miolo), `tests/test_opening_micro_adjust_mover.py` (marca, teto total, Pinned, plano
 externo por ElementId).
