@@ -3840,6 +3840,18 @@ CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED = True
 # convencao; (5) SECAO 82.1 abaixo. O CHANNEL continua com o custo calibrado da 72
 # (identico a' main). Desligar esta chave devolve o comportamento anterior.
 GENERAL_TIE_PARITY_ENABLED = True
+# SECAO 86.2 (2026-10-01, pedido do usuario: aproximar o projeto HUMANO BUTANTA
+# R08_LT ajustando as regras, sem copia-lo): no caminho geral (dentro da chave da
+# secao 82) a fase dos encontros deixa de ser decidida no' a no' pela busca gulosa
+# e passa a ser decidida de uma vez - RELACAO por trecho entre nos consecutivos
+# (custo exato dos trechos livres; INCLUI os cantos L: a alternancia forcada da
+# 30.5 vira preferencia de custo) com busca exata por componente, mais a
+# CONVENCAO DE FACHADA (na fiada 0 a parede paralela ao lado maior ocupa os cantos
+# do contorno externo) - ver wall_stepper.PHASE_RELATION_COMPONENTS. Bancada so' do
+# estagio de encontros no corpus BUTANTA: fase do humano em 46/50 nos (28/50 sem).
+# A 82.1 continua valendo sobre os T invertidos. Desligar esta chave devolve o
+# comportamento da secao 82.
+GENERAL_PHASE_RELATION_ENABLED = True
 # SECAO 82.1: o preenchimento REAL tem a ultima palavra. O custo da decisao e' um
 # modelo dos trechos; o preenchimento real (bandas, reparo de jamba, desencontro
 # NO'|FILL, trechos nao modulares) pode desmentir o modelo. Depois do solve, a
@@ -5281,8 +5293,11 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     saved_parity_general = (_stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES,
                             _stepper_repair.TIE_PARITY_STRUCTURAL_VETO,
                             _stepper_repair.TIE_PARITY_FILL_STAGGER,
-                            _stepper_repair.TIE_PARITY_FILL_NODE_KINDS)
+                            _stepper_repair.TIE_PARITY_FILL_NODE_KINDS,
+                            _stepper_repair.PHASE_RELATION_COMPONENTS)
     _paridade_geral = bool(kwargs.get("opening_reinforcement_strategy") is None and GENERAL_TIE_PARITY_ENABLED)
+    # SECAO 86.2: fase por relacao de trecho + convencao de fachada (inclui cantos L)
+    _fase_86 = bool(_paridade_geral and GENERAL_PHASE_RELATION_ENABLED)
     _stepper_repair.TIE_PARITY_FILL_BALANCE = bool(
         (kwargs.get("opening_reinforcement_strategy") is not None
          and CHANNEL_TIE_PARITY_FILL_BALANCE_ENABLED) or _paridade_geral)
@@ -5292,7 +5307,9 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
     _stepper_repair.TIE_PARITY_STRUCTURAL_VETO = _paridade_geral
     _stepper_repair.TIE_PARITY_FILL_STAGGER = _paridade_geral
     if _paridade_geral:
-        _stepper_repair.TIE_PARITY_FILL_NODE_KINDS = ("T_INTERSECTION",)
+        _stepper_repair.TIE_PARITY_FILL_NODE_KINDS = (("T_INTERSECTION", "L_CORNER") if _fase_86
+                                                      else ("T_INTERSECTION",))
+    _stepper_repair.PHASE_RELATION_COMPONENTS = _fase_86
     saved_parity_openings = _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS
     _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = openings_per_wall
     saved_role_table = _stepper_repair.JUNCTION_ROLE_TABLE
@@ -5361,7 +5378,8 @@ def _solve_building_blocks_all_courses_impl(nodes, walls_to_create, end_to_node,
         (_stepper_repair.TIE_PARITY_FILL_OPENING_BOUNDARIES,
          _stepper_repair.TIE_PARITY_STRUCTURAL_VETO,
          _stepper_repair.TIE_PARITY_FILL_STAGGER,
-         _stepper_repair.TIE_PARITY_FILL_NODE_KINDS) = saved_parity_general
+         _stepper_repair.TIE_PARITY_FILL_NODE_KINDS,
+         _stepper_repair.PHASE_RELATION_COMPONENTS) = saved_parity_general
         _stepper_repair.TIE_PARITY_FILL_ALL_OPENINGS = saved_parity_openings
         _stepper_repair.T_ROOM_PHYSICAL_TOLERANCE = saved_room_tol
         _stepper_repair.JUNCTION_ROLE_TABLE = saved_role_table
@@ -5560,9 +5578,14 @@ def _tie_parity_convention_result(nodes, walls_to_create, end_to_node, openings_
     _ws.TIE_PARITY_FILL_BALANCE = False
     if _ws.BOND_TRACE is not None:
         _ws.BOND_TRACE = {}
+    # SECAO 86.2: a resolucao da convencao e' uma comparacao INTERNA (os cantos L
+    # trocados pela 86.2 tambem a disparam, ate' num retangulo sem T); o progresso
+    # dela nao e' anunciado como etapa do solver (a tela veria cada etapa duas vezes)
+    silenciosa = dict((k, v) for k, v in kwargs.items()
+                      if k not in ("band_cb", "progress_cb", "wall_start_cb", "wall_result_cb", "stage_cb"))
     try:
         return _solve_building_blocks_all_courses_impl_core(
-            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses, **kwargs)
+            nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs, num_courses, **silenciosa)
     finally:
         _ws.TIE_PARITY_FILL_BALANCE, _ws.BOND_TRACE = salvo
         _tie_parity_node_restore(nodes, estado_geral)
@@ -5581,7 +5604,9 @@ def _tie_parity_prism_rounds(result, nodes, walls_to_create, end_to_node, openin
     violacoes_finais = []
     convencao = None
     while True:
-        invertidos = [i for i, n in enumerate(nodes) if n.get("_tie_parity_fill_chosen") and n.get("_tie_parity_flip")]
+        # SECAO 86.2: o canto L trocado pela fase por relacao tambem e' julgado
+        invertidos = [i for i, n in enumerate(nodes) if n.get("_tie_parity_fill_chosen")
+                      and (n.get("_tie_parity_flip") or n.get("_phase_relation_swapped"))]
         violacoes = _tie_parity_real_fill_violations(result, nodes, walls_to_create, openings_per_wall, catalog,
                                                      base_z_abs, invertidos)
         if invertidos and estado_inicial is not None and TIE_PARITY_COMPARE_WITH_CONVENTION:
@@ -5602,10 +5627,12 @@ def _tie_parity_prism_rounds(result, nodes, walls_to_create, end_to_node, openin
         culpados = sorted(motivo)
         if not culpados or rodadas >= TIE_PARITY_PRISM_MAX_ROUNDS:
             break
+        from core.engine import wall_stepper as _ws_fase
         for node_index in culpados:
             node = nodes[node_index]
             node.pop("_tie_parity_flip", None)
             node.pop("_tie_parity_fill_chosen", None)
+            _ws_fase._phase_revert_swapped_corner(node)   # SECAO 86.2 (canto L)
             node["_tie_parity_fill_rejected"] = motivo[node_index]
             revertidos.append(node_index)
         rodadas += 1

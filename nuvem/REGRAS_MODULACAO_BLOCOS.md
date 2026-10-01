@@ -4973,6 +4973,12 @@ estendida no futuro a nós com mais de 2 braços participando).
   `docs/BLOCK_ARM_ROLE_INVARIANCE.md` (relatório
   `CR-BLOCK-ARM-ROLE-CONSISTENCY`, veredito NECESSITA AJUSTE — ver 29.6).
 
+- **ATUALIZAÇÃO (2026-10-01, §86.2) — CONFLITO com o projeto humano BUTANTÃ R08_LT**: o humano usa a
+  MESMA fiada nos dois cantos de uma parede entre dois L em 9/9. Pelo pedido do usuário de 2026-10-01, no
+  caminho geral (chave `GENERAL_PHASE_RELATION_ENABLED`) esta alternância vira PREFERÊNCIA DE CUSTO (a
+  relação de menor custo dos trechos livres vence); no CHANNEL e com a chave desligada ela continua
+  obrigatória. Ver §86.2.
+
 ### 30.6 PADRÃO OBSERVADO, AINDA NÃO CONFIRMADO — coordenação de papel
 pode dessincronizar a alternância do vão menor (B34/B54) entre fiadas em
 paredes cujas duas pontas são `L_CORNER` (`DOCUMENTADO — pendência de
@@ -5108,6 +5114,10 @@ e a ímpar NUNCA têm junta coincidente. Dois mecanismos:
   autorização explícita chegou nesta CR seguinte — ver seção 31 abaixo
   para a causa PROVADA (não mais hipótese), a política formalizada, e o
   motivo pelo qual a implementação tentada foi revertida antes do commit.
+
+- **ATUALIZAÇÃO (2026-10-01, §86.2)**: confirmado no BUTANTÃ R08_LT para trecho cego — as 9 paredes
+  entre dois L ficam na mesma fiada nos dois cantos quando essa é a relação de menor custo (26/26 trechos
+  cegos seguem o custo). Implementado no caminho geral pela §86.2.
 
 ## 31. `CR-BLOCK-ARM-ROLE-HUMAN-POLICY` — causa provada do prisma forçado
 em paredes curtas; política formalizada; implementação tentada e
@@ -11514,3 +11524,115 @@ Revit).
 Testes: `tests/test_jamb_compensator_alignment.py` (W1 real, pilar de referência do usuário, régua por
 área, B19 no miolo), `tests/test_opening_micro_adjust_mover.py` (marca, teto total, Pinned, plano
 externo por ElementId).
+
+## 86. Aproximacao do projeto humano BUTANTA R08_LT (2026-10-01)
+
+**Pedido do usuário (2026-10-01):** "observe e analise como foi feito no projeto HUMANO (BUTANTA R08_LT) e
+tente chegar no resultado mais próximo possível AJUSTANDO AS REGRAS e como o CÁLCULO de modulação funciona,
+sem copiá-lo". Fonte das medições: análise offline do 1º pavimento (humano normalizado sem a folga de 1 cm,
+`human_rows_unpad.json`; 34 paredes, 50 encontros = 37 T + 13 L; síntese dos analistas de 2026-10-01). Nada
+foi alterado no Revit. Cada regra desta seção fica atrás de uma chave própria, ligada.
+
+### 86.2 Fase dos encontros — relação por trecho (R4) e convenção de fachada (R2) (IMPLEMENTADO no caminho geral, chave `GENERAL_PHASE_RELATION_ENABLED`)
+
+**Definições.** *Fase* do nó = qual parede ocupa o quadrado do nó em cada fiada (só uma por fiada).
+*Relação* entre dois nós CONSECUTIVOS da mesma parede = a parede ocupa os dois na **mesma fiada** ou
+**alterna**. A relação decide o comprimento dos dois trechos livres entre eles (fiada A e fiada B) e,
+portanto, quantos C04/C09/B19 e B34 eles pedem; a fase absoluta só escolhe o espelho.
+
+**PADRÃO OBSERVADO (humano, medido):**
+- Trecho cego (sem porta nem janela) entre dois nós: o humano usa a relação de menor custo em **26/26**
+  (forma fechada: `D_eixos mod 40 <= 15` → mesma fiada; `>= 20` → alterna); o motor anterior, 23/26
+  (errava W14, W16 e W11 n41–n18).
+- Parede entre dois cantos L: **mesma fiada nos dois cantos em 9/9** (W0, W3, W5, W8, W16, W27, W31, W32,
+  W33 — índices 0-based); o motor anterior, 1/9 (catavento forçado pela §30.5). Ex.: W16 (494 cm) o humano
+  fecha sem nenhum C04; o motor anterior usava 12.
+- Trecho com porta: o humano segue o custo contínuo em só 14/20 — **a porta libera a fase** (nas fiadas da
+  porta cada pilarete jamba→nó fecha sozinho e a soma das duas fiadas não muda com a fase; a parede só é
+  contínua na verga e acima dela). Trecho com janela: segue em 7/9.
+- Espelho: o componente central (13 nós) estava inteiro espelhado no motor; a busca gulosa da §72/§82 (um nó
+  por vez, só melhora estrita) nunca espelha um componente, porque o espelho custa o mesmo.
+- **Convenção de fachada:** nos 8 cantos do contorno externo o humano põe, NA FIADA 0, a parede paralela ao
+  lado maior da caixa envolvente do pavimento (aqui Y; **8/8**; o motor anterior, 5/8). As paredes de
+  fachada com janelas (W0, W3) mantêm os DOIS cantos nessa convenção mesmo contra a preferência de custo
+  dos trechos com janela.
+
+**REGRA (implementada, `wall_stepper._search_phase_relation_components`, chamada em
+`solve_all_intersections` no lugar da busca gulosa §72/§82 quando `PHASE_RELATION_COMPONENTS`):**
+1. Variáveis: a fase de cada nó T e de cada canto L de 2 braços (`TIE_PARITY_FILL_NODE_KINDS` passa a
+   `("T_INTERSECTION", "L_CORNER")`); o X continua na convenção (§82). T/X invertem pela marca
+   `_tie_parity_flip`; o L pela troca de `arms` + pino `_arm_role_pinned` (o mesmo mecanismo da §30.5 /
+   SAFE REPAIR), então o resto do motor não muda.
+2. Base canônica (para a decisão não depender da ordem de entrada das paredes): T com a principal na fiada
+   A; L com a parede mais paralela ao lado maior em `arms[0]`.
+3. Custo de cada trecho entre nós consecutivos, nos 4 estados dos dois nós, com as **peças reais** dos nós
+   nos dois estados (inclui T degradado): fecho EXATO do trecho livre de cada fiada com o catálogo
+   (`_phase_segment_composition`, mínimo lexicográfico de C04+C09+B19 e depois B34), custo
+   `100·especiais + 1·B34`, teto 400 por estado. Peso do trecho pelas fiadas contínuas: cego 1,0; janela
+   0,25; **porta 0**.
+4. Relação pura: custo(mesma) = soma dos dois estados que a realizam (espelho-invariante); trecho com nó
+   fixo vira termo unário. **A alternância da §30.5 deixa de ser restrição** e vira uma preferência que o
+   custo pode vencer (CONFLITO abaixo).
+5. Convenção de fachada como **preferência em cada canto** do contorno externo (contorno = face externa do
+   grafo de nós ligados pelos trechos de eixo; canto = vértice em que o contorno muda de direção; um T em
+   que o contorno segue reto não é canto), com peso 48 — ACIMA da preferência de um trecho com janela
+   (8 B34 × 2 estados × 0,25 → 16) e ABAIXO da menor preferência de um trecho cego (8 B34 × 2 × 1 → 64):
+   nunca troca bloco de trecho cego por convenção, mas decide o que a janela deixa em aberto.
+6. Busca EXATA por componente (nós ligados por relações com preferência): branch-and-bound determinístico,
+   ordem geométrica, semente gulosa, orçamento `PHASE_RELATION_SEARCH_BUDGET` (estourado → melhor achada e
+   `exact=False` no resultado). Componente sem termo unário (nenhum canto, nenhum nó fixo) é espelhado
+   pela convenção: votos dos cantos, depois maioria dos nós (a parede paralela ao lado maior ocupando o nó
+   na fiada A); empate mantém a base canônica.
+7. Veto estrutural: falha de nó nova ou peças de nó interpenetradas que o estado original não tinha
+   devolvem os nós culpados ao estado original (fixos) e a busca é refeita (até 6 rodadas; sem convergir,
+   a planta fica toda na convenção).
+8. Depois: a paridade das peças encostadas (regra #1) tem a última palavra (como na §72) e a **§82.1**
+   continua julgando cada T invertido E cada canto L trocado (marcados `_tie_parity_fill_chosen`; o L guarda
+   o estado original em `_phase_relation_original` e volta a ele, pinado, se a sua região piorar em regra
+   dura — `_phase_revert_swapped_corner`) contra o preenchimento real da convenção. A resolução da
+   convenção é comparação interna: não anuncia etapas na tela (`stage_cb`/`band_cb` silenciados).
+9. Decisão ÚNICA por planta (marca `_phase_relation_done` nos nós): bandas, passes e rebuilds leem a
+   decisão do próprio nó. Nenhum id: só geometria, catálogo e aberturas.
+
+**Medido (bancada só do estágio de encontros, sem preenchimento, corpus versionado
+`reference_projects/butanta_r08_lt/s74_corpus/geometry.json`, aberturas na posição ORIGINAL, banda da
+fiada 0, caminho geral):** nós com a fase (fiada 0) do humano **28/50 → 46/50** (T 21 → 36 de 38; L 7 → 10
+de 12). Erram: n33/n34 (W20 entre W4 e W1, componente só com portas, decidido pela maioria dos nós) e os
+cantos n53/n54 do shaft (W31/W32 de 72 cm: o humano faz o retângulo clássico com 4 especiais + 2 B34
+contra 2 B34 da alternância — contra o custo). Sensibilidade: qualquer peso de porta > 0 → ≤ 42/50; janela
+entre 0,1 e 0,4 e peso de canto entre 48 e 400 → 46/50; guarda de alcance de verga da §72 ligada → 36/50
+(travava T que o humano inverte, W3 a 27 cm da jamba) — por isso `PHASE_RELATION_OPENING_REACH_GUARD =
+False`. Invariância: ordem invertida das paredes, pontas trocadas e translação → 0 nós diferentes.
+Determinismo: 2 execuções iguais. Busca exata em todos os componentes (orçamento não estourado).
+
+**CONFLITO (registrado, a orientação mais recente prevalece):**
+- **§30.5 (REGRA OBRIGATÓRIA de alternância de papel entre os dois L da mesma parede) × humano 9/9 "mesma
+  fiada"**. Pelo pedido do usuário de 2026-10-01 (aproximar o humano ajustando as regras), no caminho
+  geral com a chave ligada a §30.5 vira PREFERÊNCIA DE CUSTO e a §30.7 (padrão observado "o humano às
+  vezes concentra as duas peças de canto na mesma fiada") fica confirmada para trecho cego de menor
+  custo. A §30.5 nasceu para evitar a fronteira "emprestada" (§29.2, `COVERAGE_MISSING_ROW`): rodar a
+  regressão TGD/TP1 antes de mesclar. O CHANNEL e a chave desligada mantêm a §30.5 intacta.
+- **§85.8 shaft (B54+C09 como preenchimento autorizado) × humano (retângulo clássico, sem B54 no miolo da
+  W33)**: a 86.2 reproduz 2 dos 4 cantos do shaft (o custo pede alternância nas paredes de 72 cm).
+  PENDENTE — perguntar ao usuário se a solução humana substitui a exceção.
+- **§72 guarda de alcance de verga** (T a menos de um bloco de jamba fica na convenção) — desligada SÓ na
+  86.2; a guarda nasceu de um defeito de conversão canaleta × amarração medido em 2026-09-17, antes da
+  regra 75 (canaleta nunca amarra). Integrador: conferir apoio físico (`UNSUPPORTED_BLOCK`) e
+  `channel_as_junction_bond` nos T junto de jamba depois do solve completo.
+
+**PENDÊNCIAS (DOCUMENTADO — pendência de código aberta):**
+- Componente separado só por portas e sem canto (n33/n34): a maioria dos nós erra; o humano propaga a
+  alternância ao longo da W1/W4 (trechos de 345 cm) — regra não localizada que não piore os outros trechos
+  com porta (W6, W8, W2 n25–n40, onde o humano NÃO segue o custo).
+- Medir no solve completo quantos T invertidos a §82.1 devolve à convenção (`tie_parity_prism_check`).
+- **Interação com o SAFE REPAIR (§30/§34):** os cantos L decididos pela 86.2 ficam pinados, então o SAFE
+  REPAIR (que só tenta arestas isoladas NÃO pinadas) deixa de agir sobre eles; a rede de segurança desses
+  cantos passa a ser a §82.1 (que agora também julga o canto L trocado). Medir no TGD/TP1 se algum prisma
+  forçado que o SAFE REPAIR resolvia volta (`arm_role_safe_repair` vazio com a chave ligada).
+
+Testes: `tests/test_fase_relacao_86.py` (tabela mod 40 com D ∈ {140, 165, 195, 210, 250, 285, 345, 400, 405,
+430, 480}; retângulo clássico × catavento da §30.5; convenção de fachada nos dois sentidos; espelho com
+custo idêntico; porta libera a fase; busca exata × força bruta; contorno de planta em L; invariância e
+determinismo; integração com o caminho geral; a §82.1 devolvendo o canto L trocado). Os testes que fixam o
+contrato PRÓPRIO da busca gulosa (§82, `test_paridade_contextual_t.py`; §79, `test_regras_fisicas_de_encontro.py`)
+e do SAFE REPAIR no TGD (`test_block_arm_role_candidate_safety_contract.py`) rodam com a 86.2 desligada.

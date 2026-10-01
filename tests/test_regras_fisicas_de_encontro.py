@@ -105,8 +105,11 @@ def test_a_paridade_da_secao_72_nao_entra_na_secao_79(monkeypatch, paridade_gera
     """A secao 79 (regras fisicas de encontro sem reforco) nao liga a busca de
     paridade por comprimento (72): sem a chave da secao 82 ela nunca e' chamada nem
     ligada no NONE; com a 82 ela roda porque a 82 a liga (regra geral propria), com
-    o veto estrutural. No CHANNEL ela continua ligada (controle)."""
+    o veto estrutural. No CHANNEL ela continua ligada (controle). Contrato da 72/82:
+    a SECAO 86.2 (que substitui a busca gulosa no caminho geral) fica desligada aqui -
+    ver test_fase_relacao_86.py."""
     monkeypatch.setattr(m, "GENERAL_TIE_PARITY_ENABLED", paridade_geral)
+    monkeypatch.setattr(m, "GENERAL_PHASE_RELATION_ENABLED", False)
     vistos = []
     original = ws._search_tie_parity_fill_balance
 
