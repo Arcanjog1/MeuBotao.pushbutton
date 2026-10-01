@@ -11556,6 +11556,80 @@ está marcado CONFLITO. As subseções 86.2–86.10 seguem a numeração das reg
   para a geometria do corpus 0,0005 cm), comentários `MICROAJUSTE` limpos; plano em
   `evidence/2026-10-01-s86-aproximacao-humano/revert_plan.json`.
 
+### 86.3 Faixa de B34 EQUILIBRADA entre as duas âncoras de uma corrida nó-a-nó (amarração — PADRÃO OBSERVADO; IMPLEMENTADO no escopo nó-a-nó sem abertura)
+
+**Como foi descoberto:** extração do projeto humano (leitura do Revit → `human_rows_unpad.json`), corridas só de
+B34/B39 separadas nos B54, fiadas 0–11; comparação com o nosso `readback_r2_depois_w1A`. Âncoras: **P** = ponta que
+passa sobre a parede que cruza (peça de canto B34 dentro do nó), **S** = ponta que para contra a face da parede que
+cruza, **N** = B54 da principal no T, **G** = vão do T (a parede que chega entra na principal).
+
+**PADRÃO OBSERVADO (amarração):**
+- Os B34 de AJUSTE do preenchimento (os que não são peça de nó) formam **faixas verticais coladas nas DUAS âncoras**,
+  com **|kE − kD| ≤ 1**; os B39 ficam no miolo. Nunca todos numa ponta quando K ≥ 2.
+  - P..P com 5 B34 (canto + 3 de ajuste + canto): humano **2+3 em 44/44** fiadas; nosso 1+4 em 33/33.
+  - S..S com 3: humano **1+2 em 42/42**; nosso 0+3 em 30/32.
+  - G..S com 3: humano 2+1 ou 1+2 em 18/18; nosso 3+0 ou 0+3 em 15/15.
+  - N..P com 4: humano 2+2 (11) ou 1+3 (7); nosso 0+4 (5) ou 3+1 (12).
+  - Recontagem própria (2026-10-01, corridas nó-a-nó puras B34/B39 com K ≥ 1 de ajuste, por fiada): **247 de 265
+    equilibradas (93%)**; as 18 desequilibradas estão na W3 (670–979, K=2 em 2+0) e na W10.
+- **Largura k constante nas fiadas**: a faixa junto de cada âncora tem o MESMO número k de B34 de ajuste nas fiadas
+  pares e ímpares; contando a peça de canto, a fiada que PASSA tem **k+1** B34 e a que PARA tem **k** (humano 97,5%,
+  nosso 87,2%). No T, largura junto ao B54 = largura junto ao vão (humano 0/0 em 33, 1/1 em 21, 2/2 em 4).
+- **Vazado menor sobre vazado menor** dentro da faixa: as fiadas estão deslocadas 20 cm em cada âncora (P×S e N×G
+  diferem 20 cm) e o humano orienta P e N com o vazado menor para a âncora, S e G para dentro (P 347/348, S 187/187,
+  G 83%, N 91%) — assim o vazado menor de uma fiada cai no vazado menor da outra (humano 96%, nosso 90%). Grupos de
+  B34 seguidos: pares humano 282 × nosso 163, quádruplos 18 × 55.
+- Exemplos medidos: W21 (494 cm entre dois T) f0 `B34< B34< | 8×B39 | B34> B34> B34>`, f1 `B34> | 9×B39 | B34< B34<`
+  (nosso: `B34< | 8×B39 | B34>×4` e `9×B39 | B34<×3`); W14 igual; W22 (444 cm, misto) f0 `B34< B34< | 9×B39`, f1
+  `B34> | 9×B39 | B34>`. É a mesma composição que a §2 já registrava ("`B34 + 9×B39 + B34 B34`"), agora com a
+  POSIÇÃO de cada peça.
+
+**PADRÃO OBSERVADO AINDA NÃO CONFIRMADO — lado do B34 ímpar (K ímpar):** o humano põe a faixa maior no **fim do eixo**
+(sentido dos eixos do corpus) em ~73% das fiadas de corridas de K ímpar (155/212) e em 7 das 8 paredes de 494 cm
+(W13, W14, W15, W16, W19, W20, W21 — o analista de corridas contou 8/8 no subconjunto dele), mas faz o contrário em
+W17, W22 e em parte das corridas de W0, W2, W7 e W12. Nenhuma regra geométrica simples (direção em planta, tipo do nó,
+lado da fachada) explicou os dois grupos. Fica como **desempate configurável**.
+
+**Implementação (`nuvem/core/engine/wall_stepper.py`):**
+- `BALANCED_B34_STRIP_ENABLED = True` (liga a regra) e `BALANCED_B34_STRIP_ODD_AT_AXIS_END = True` (desempate do
+  ímpar: fim do eixo; `False` = início, que reproduz a W22).
+- `_balanced_b34_strip_counts(K)` — divisão (kE, kD) com diferença ≤ 1. É função pura de K: as fiadas A e B da mesma
+  corrida têm o mesmo K (as âncoras alternam P/S e N/G, o comprimento muda 0 ou 40 cm) e recebem a mesma divisão —
+  é o "K e divisão calculados uma vez por corrida".
+- `_balanced_b34_strip_layout` — reordena a composição JÁ escolhida pelos tiers de `_pier_ordered_layout` (nenhuma
+  peça nova, nenhum tier alterado, mesmo início e fim) em `[B34]*kE + B39… + [B34]*kD`. Só composição pura B39/B34.
+- `_balanced_b34_strip_segment_layout` — chamada em `_solve_wall_free_fill_impl` nas fiadas A e B, antes de publicar
+  juntas/vazios. Só troca quando: trecho nó-a-nó (WALL_START/MIDSPAN_HI → WALL_END/MIDSPAN_LO, nenhuma ponta
+  aberta/livre), **nenhuma abertura dentro do trecho na ALTURA INTEIRA da parede** (a banda abaixo do peitoril
+  recebe a lista de aberturas filtrada; o motor consulta a lista completa pela pilha
+  `_push_balanced_strip_wall_openings`, empilhada em `solve_building_blocks_all_courses` — sem isso a grade
+  trocaria entre a banda de baixo e a da janela, o risco de septos desta seção), **regra #1 intacta** (nenhuma junta
+  coincidente nova contra a mesma lista que o caminho normal da fiada evita) e travamento (regra 18.6) não pior.
+- `_balanced_b34_strip_orient` — orientação INICIAL dos B34 da faixa pela convenção acima (âncora MAIOR — a peça de
+  âncora desta fiada avança mais que a da fiada oposta, P/N — vazado menor para a âncora; MENOR — S/G — para dentro).
+  Necessária porque o guloso da §52 gira uma peça por vez e parava num ótimo local, e o arranjo 60-65 (§81) então
+  desfazia a faixa. Os passes de vazado menor continuam decidindo depois (sem violação, não mexem). É semente da
+  §52: com `SMALL_VOID_ORIENTATION_ENABLED = False` o B34 fica na convenção fixa histórica.
+- Verificado no solve real das mini-plantas do corpus (só as paredes envolvidas, sem aberturas, estratégia None):
+  W14 e W21 saem **idênticas ao humano** (códigos, posições ±1 cm e lado do vazado menor de cada B34); W22 idêntica com
+  o desempate no início; a W9 até o T de meio de parede (âncoras N/G) idêntica; a W4 (sem as aberturas) reproduz
+  as faixas humanas junto dos quatro nós.
+- Testes: `tests/test_b34_balanced_strip.py` (divisão, composição × fileiras humanas W14/W21/W22 e W9 até o T —
+  âncoras N/G —, guardas, solve real das mini-plantas, k+1, janela acima do peitoril, determinismo). `tests/test_b34_small_void_alignment.py`
+  (teste GREEN da §52) passou a aceitar que a orientação mude pela semente da 86.3 em vez do giro guloso.
+
+**Compatibilidade:** sem conflito com a §2 (fileira de B34 — mesma composição/tiers), §23.4(a) (as faixas de fiadas
+vizinhas ficam deslocadas 15–20 cm: só repetição na mesma paridade, nunca `REPEATED_VERTICAL_COMPENSATOR_STRIP`),
+§52/§60-65 (orientação e arranjo continuam valendo), §85.9 (grade de B34) e §85.10 (coluna de B34 até o topo).
+
+**Pendências (DOCUMENTADO — pendência de código aberta):**
+1. Estender a corridas COM abertura (jamba como âncora): na simulação generalizada os septos sem apoio pioraram de
+   265 para 375 em W0/W2/W3, o que a §85.10 proíbe ("nenhuma regressão"). Só com gate de septos/prisma por parede.
+2. Regra do lado do B34 ímpar (ver acima) e B34 único entre jamba e B54 (a síntese manda decidir pela grade da
+   fiada cheia, R6).
+3. Efeito esperado no placar (oráculo dos analistas, não somável): +5,3 pp nas 11 paredes ponta a ponta com a
+   paridade atual; com a paridade corrigida (R2/R4) 29,7% → 38,3–40,1%. Medir no integrador.
+
 ### 86.5 Altura: 13 fiadas e calço (R5)
 
 - O humano termina 26 paredes em z = 261 (13 fiadas) e leva as 8 do núcleo (x 537–984, y 645–1144) a 270 com
@@ -11605,3 +11679,4 @@ síntese versionada):
 - **Estado do código (2026-10-01, ainda NÃO integrado na branch de trabalho)**: R3 implementada (branch
   `worktree-wf_ff7686b5-095-2`, commits e48d38c/fea1b17); R2/R4, R7A/R8 em implementação; R6/R10 e R9 na fila.
   R1 e R5 aplicadas no `butanta testes` (dados, sem código).
+

@@ -3500,6 +3500,10 @@ def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_
         _stepper_band.JUNCTION_BAND_ROLES = band_roles
         saved_trace_band = _stepper_band.BOND_TRACE_BAND
         _stepper_band.BOND_TRACE_BAND = tuple(course_indices)   # SECAO 79 (rastreio)
+        # SECAO 86.3: a faixa de B34 equilibrada so' vale em trecho sem abertura
+        # na ALTURA INTEIRA - a banda recebe a lista filtrada, o motor consulta a
+        # completa por esta pilha
+        _stepper_band._push_balanced_strip_wall_openings(openings_per_wall)
         try:
             result = solve_building_blocks(
                 nodes, walls_to_create, end_to_node, filtered_openings, catalog,
@@ -3510,6 +3514,7 @@ def _solve_building_blocks_all_courses_pass_body(nodes, walls_to_create, end_to_
                 stage_cb=stage_cb, cross_band_joint_seed=cross_band_seed,
             )
         finally:
+            _stepper_band._pop_balanced_strip_wall_openings()
             _stepper_band.JUNCTION_BAND_ROLES = saved_band_roles
             _stepper_band.BOND_TRACE_BAND = saved_trace_band
         band_entry = {"course_indices": list(course_indices), "result": result}

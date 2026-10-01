@@ -8833,6 +8833,262 @@ def _interval_inside_any_span(a_cm, b_cm, spans):
     return False
 
 
+# SECAO 86.3 (REGRAS_MODULACAO_BLOCOS.md, 2026-10-01): FAIXA DE B34 EQUILIBRADA
+# entre as duas ancoras de uma corrida no'-a-no'. PADRAO OBSERVADO no humano
+# BUTANTA R08_LT (1o pav.): os B34 de ajuste do preenchimento formam faixas
+# coladas nas DUAS ancoras, |kE - kD| <= 1, com os B39 no miolo (P..P com 5 B34
+# = 2+3 em 44/44 fiadas; S..S com 3 = 1+2 em 42/42). O guloso/busca exata
+# poe os B39 primeiro e empurra todos os B34 para o fim (nosso 1+4 / 0+3).
+# So' reordena a MESMA composicao (nenhuma peca nova, mesmos inicio/fim, juntas
+# uniformes) e so' em trecho fechado por no' dos dois lados SEM abertura dentro
+# (estender a trechos com abertura e' pendencia: na simulacao generalizada os
+# septos pioraram de 265 para 375 em W0/W2/W3).
+BALANCED_B34_STRIP_ENABLED = True
+# Desempate do B34 IMPAR (K impar): True = a faixa maior fica no FIM do eixo
+# (humano: 7 das 8 paredes de 494 cm, ~73% das fiadas de K impar); False = no
+# inicio do eixo (W22/W17 do humano). Configuravel - secao 86.3.
+BALANCED_B34_STRIP_ODD_AT_AXIS_END = True
+# "Sem abertura" vale para a ALTURA INTEIRA da parede, nao so' para a banda em
+# solve: `solve_building_blocks_all_courses` resolve cada banda de aberturas com
+# a lista FILTRADA (abaixo do peitoril a janela "nao existe"), e aplicar a faixa
+# so' nessas fiadas criaria uma troca de grade entre bandas junto da janela -
+# exatamente o risco de septos da 86.3. A pilha guarda o `openings_per_wall`
+# COMPLETO durante cada banda (push/pop sem local novo no chamador).
+_BALANCED_B34_STRIP_WALL_OPENINGS = []
+
+
+def _push_balanced_strip_wall_openings(openings_per_wall):
+    _BALANCED_B34_STRIP_WALL_OPENINGS.append(openings_per_wall)
+
+
+def _pop_balanced_strip_wall_openings():
+    if _BALANCED_B34_STRIP_WALL_OPENINGS:
+        _BALANCED_B34_STRIP_WALL_OPENINGS.pop()
+
+
+def _balanced_strip_wall_opening_intervals_cm(wall_idx):
+    """Intervalos (cm) de TODAS as aberturas da parede (todas as bandas) quando
+    o solve corre por `solve_building_blocks_all_courses`; [] fora dele."""
+    if not _BALANCED_B34_STRIP_WALL_OPENINGS:
+        return []
+    full = _BALANCED_B34_STRIP_WALL_OPENINGS[-1] or []
+    if wall_idx is None or not (0 <= wall_idx < len(full)):
+        return []
+    return [(op[0] / FEET_PER_METER * 100.0, op[1] / FEET_PER_METER * 100.0)
+            for op in (full[wall_idx] or [])]
+
+
+def _balanced_b34_strip_counts(n_b34, odd_at_axis_end=None):
+    """(k_inicio, k_fim) da faixa equilibrada para `n_b34` B34 de ajuste
+    (secao 86.3): divisao com diferenca <= 1, o impar do lado escolhido por
+    BALANCED_B34_STRIP_ODD_AT_AXIS_END. Funcao pura - e' o "K e divisao
+    calculados uma vez por corrida": as fiadas A e B da mesma corrida tem o
+    mesmo K (as pontas alternam passa/para, o comprimento muda em multiplos de
+    40 cm ou nao muda) e recebem, por construcao, a mesma divisao."""
+    if odd_at_axis_end is None:
+        odd_at_axis_end = BALANCED_B34_STRIP_ODD_AT_AXIS_END
+    n_b34 = max(0, int(n_b34))
+    menor = n_b34 // 2
+    maior = n_b34 - menor
+    if odd_at_axis_end:
+        return menor, maior
+    return maior, menor
+
+
+def _balanced_b34_strip_layout(layout, catalog, odd_at_axis_end=None):
+    """Reordena um layout de preenchimento PURO B39/B34 (lista ordenada
+    [(codigo, start_cm, end_cm), ...], a mesma de `_pier_ordered_layout`) em
+    [B34]*kE + demais pecas (na ordem original) + [B34]*kD - secao 86.3.
+
+    Devolve None quando nao se aplica: layout vazio, alguma peca que nao seja
+    B34 de ajuste (MID_WALL_BLOCK_CODE) ou bloco comum (compensador, meio
+    bloco ou outra peca especial ficam de fora), nenhum B34, ou juntas que nao
+    sejam todas BLOCK_JOINT_CM (layout que nao veio do encadeamento padrao).
+    Mesma posicao inicial e final do layout recebido (a composicao nao muda)."""
+    if not layout:
+        return None
+    b34 = []
+    outras = []
+    for code, _start, _end in layout:
+        entry = (catalog or {}).get(code) or {}
+        if not entry.get("length_cm"):
+            return None
+        if code == MID_WALL_BLOCK_CODE and entry.get("is_special_bond"):
+            b34.append(code)
+        elif (entry.get("is_compensator") or entry.get("is_special_bond")
+              or code == HALF_BLOCK_CODE):
+            return None
+        else:
+            outras.append(code)
+    if not b34:
+        return None
+    for i in range(1, len(layout)):
+        if abs((layout[i][1] - layout[i - 1][2]) - BLOCK_JOINT_CM) > PIER_LAYOUT_TOLERANCE_CM:
+            return None
+    k_ini, k_fim = _balanced_b34_strip_counts(len(b34), odd_at_axis_end)
+    ordem = [MID_WALL_BLOCK_CODE] * k_ini + outras + [MID_WALL_BLOCK_CODE] * k_fim
+    pos = layout[0][1]
+    novo = []
+    for code in ordem:
+        comp_cm = catalog[code]["length_cm"]
+        novo.append((code, pos, pos + comp_cm))
+        pos += comp_cm + BLOCK_JOINT_CM
+    if abs(novo[-1][2] - layout[-1][2]) > PIER_LAYOUT_TOLERANCE_CM:
+        return None
+    return novo
+
+
+def _segment_has_opening(seg_start_cm, seg_end_cm, opening_intervals_cm):
+    for interval in opening_intervals_cm or []:
+        a_cm = min(interval[0], interval[1])
+        b_cm = max(interval[0], interval[1])
+        if a_cm < seg_end_cm - OPENING_OVERLAP_TOLERANCE_CM and b_cm > seg_start_cm + OPENING_OVERLAP_TOLERANCE_CM:
+            return True
+    return False
+
+
+def _balanced_b34_strip_segment_layout(layout, catalog, seg_start_cm, seg_end_cm, kind_left, kind_right,
+                                       leading_is_open, trailing_is_open, opening_intervals_cm,
+                                       avoid_joint_positions_cm, wall_idx=None):
+    """Secao 86.3 aplicada a UM trecho de `solve_wall_free_fill`: troca
+    `layout` pela faixa equilibrada (`_balanced_b34_strip_layout`) SO' quando
+
+      - a regra esta' ligada (BALANCED_B34_STRIP_ENABLED);
+      - o trecho e' no'-a-no' dos dois lados (WALL_START/MIDSPAN_HI ->
+        WALL_END/MIDSPAN_LO, nenhuma ponta aberta/livre);
+      - nenhuma abertura cai dentro do trecho (escopo inicial da 86.3) - nem
+        as da banda em solve (`opening_intervals_cm`) nem as das OUTRAS bandas
+        da mesma parede (`_balanced_strip_wall_opening_intervals_cm`);
+      - a reordenacao NAO cria coincidencia de junta nova contra
+        `avoid_joint_positions_cm` (regra #1 - mesma lista que o caminho
+        normal desta fiada evita) nem reduz o travamento (regra 18.6,
+        saturado em MIN_JOINT_STAGGER_TARGET_CM).
+
+    Em qualquer outro caso devolve `layout` intocado (mesmo objeto)."""
+    if not BALANCED_B34_STRIP_ENABLED or not layout or len(layout) < 2:
+        return layout
+    if leading_is_open or trailing_is_open:
+        return layout
+    if kind_left not in ("WALL_START", "MIDSPAN_HI") or kind_right not in ("WALL_END", "MIDSPAN_LO"):
+        return layout
+    if _segment_has_opening(seg_start_cm, seg_end_cm, list(opening_intervals_cm or [])
+                            + _balanced_strip_wall_opening_intervals_cm(wall_idx)):
+        return layout
+    novo = _balanced_b34_strip_layout(layout, catalog)
+    if novo is None or [c for c, _a, _b in novo] == [c for c, _a, _b in layout]:
+        return layout
+    avoid = list(avoid_joint_positions_cm or [])
+    if avoid:
+        antes = _count_joint_coincidences_cm(_layout_internal_joint_positions_cm(layout, seg_start_cm), avoid)
+        depois = _count_joint_coincidences_cm(_layout_internal_joint_positions_cm(novo, seg_start_cm), avoid)
+        if depois > antes:
+            return layout
+        trava_antes = _layout_min_joint_stagger_cm(layout, seg_start_cm, avoid)
+        trava_depois = _layout_min_joint_stagger_cm(novo, seg_start_cm, avoid)
+        trava_antes = MIN_JOINT_STAGGER_TARGET_CM if trava_antes is None else min(
+            trava_antes, MIN_JOINT_STAGGER_TARGET_CM)
+        trava_depois = MIN_JOINT_STAGGER_TARGET_CM if trava_depois is None else min(
+            trava_depois, MIN_JOINT_STAGGER_TARGET_CM)
+        if trava_depois < trava_antes - 1e-6:
+            return layout
+    return novo
+
+
+# Diferenca minima (cm) entre a peca de ancora desta fiada e a da fiada oposta
+# para dizer qual delas e' a MAIOR (P x S, B54 x vao do T diferem 20 cm).
+BALANCED_B34_STRIP_ANCHOR_DIFF_CM = 5.0
+# Alcance (cm) para achar, na fiada oposta, a reserva de meio de parede do MESMO no'
+# (B54 = no' +-27, vao do T = no' +-7).
+BALANCED_B34_STRIP_ANCHOR_REACH_CM = 30.0
+
+
+def _balanced_strip_anchor_is_big(wall_idx, course, end_index, kind, anchor_cm,
+                                  node_candidates_by_wall_end, node_midspan_by_wall_course):
+    """True quando a peca de ancora DESTA fiada avanca mais para dentro da parede
+    que a da fiada oposta no mesmo no' (ponta que passa P / B54 N), False quando
+    avanca menos (ponta que para S / vao do T G), None quando nao da' para saber.
+    `anchor_cm` e' a face da ancora (inicio do trecho - junta, ou fim + junta)."""
+    other = "B" if course == "A" else "A"
+    if kind in ("WALL_START", "WALL_END"):
+        other_cm = (node_candidates_by_wall_end or {}).get((wall_idx, end_index, other))
+    else:
+        other_cm = None
+        for lo_cm, hi_cm in _merge_intervals_cm(
+                (node_midspan_by_wall_course or {}).get((wall_idx, other), [])):
+            edge_cm = hi_cm if end_index == 0 else lo_cm
+            reach = BALANCED_B34_STRIP_ANCHOR_REACH_CM
+            if lo_cm - reach <= anchor_cm <= hi_cm + reach and (
+                    other_cm is None or abs(edge_cm - anchor_cm) < abs(other_cm - anchor_cm)):
+                other_cm = edge_cm
+    if other_cm is None or abs(anchor_cm - other_cm) < BALANCED_B34_STRIP_ANCHOR_DIFF_CM:
+        return None
+    return anchor_cm > other_cm if end_index == 0 else anchor_cm < other_cm
+
+
+def _balanced_b34_strip_orient(placed, layout, catalog, course, wall_idx, kind_left, kind_right,
+                               seg_start_cm, seg_end_cm, leading_is_open, trailing_is_open,
+                               opening_intervals_cm, node_candidates_by_wall_end, node_midspan_by_wall_course):
+    """Secao 86.3 - orientacao INICIAL dos B34 de uma faixa equilibrada, pela
+    convencao que o humano usa e que o motor ja' seguia (P com o vazado menor
+    para a ponta, S e G para dentro, N para o B54): na ancora MAIOR (a peca de
+    ancora avanca mais que a da fiada oposta) o vazado menor da faixa olha para
+    a ancora; na MENOR, para dentro. Com o deslocamento de 20 cm entre fiadas
+    isso poe vazado menor sobre vazado menor nas duas faixas. Sem isto o guloso
+    da secao 52 para num otimo local (gira uma peca por vez) e o arranjo 60-65
+    desfaz a faixa. Os passes de vazado menor continuam decidindo depois - aqui
+    so' o ponto de partida. `placed` (saida de `_place_pier_layout` para
+    `layout`) e' devolvido com os B34 girados in-place quando se aplica."""
+    if not BALANCED_B34_STRIP_ENABLED or not placed or not layout or len(placed) != len(layout):
+        return placed
+    from core.engine import small_void_alignment as _sva
+    if not _sva.SMALL_VOID_ORIENTATION_ENABLED:
+        # semente da secao 52: com a orientacao do vazado menor desligada o B34
+        # de preenchimento fica na convencao fixa historica
+        return placed
+    if leading_is_open or trailing_is_open:
+        return placed
+    if kind_left not in ("WALL_START", "MIDSPAN_HI") or kind_right not in ("WALL_END", "MIDSPAN_LO"):
+        return placed
+    if _segment_has_opening(seg_start_cm, seg_end_cm, list(opening_intervals_cm or [])
+                            + _balanced_strip_wall_opening_intervals_cm(wall_idx)):
+        return placed
+    balanced = _balanced_b34_strip_layout(layout, catalog)
+    if balanced is None or [c for c, _a, _b in balanced] != [c for c, _a, _b in layout]:
+        return placed
+    big_start = _balanced_strip_anchor_is_big(
+        wall_idx, course, 0, kind_left, seg_start_cm - BLOCK_JOINT_CM,
+        node_candidates_by_wall_end, node_midspan_by_wall_course)
+    big_end = _balanced_strip_anchor_is_big(
+        wall_idx, course, 1, kind_right, seg_end_cm + BLOCK_JOINT_CM,
+        node_candidates_by_wall_end, node_midspan_by_wall_course)
+    n = len(layout)
+    k_ini = 0
+    while k_ini < n and layout[k_ini][0] == MID_WALL_BLOCK_CODE:
+        k_ini += 1
+    for i in range(n):
+        if layout[i][0] != MID_WALL_BLOCK_CODE:
+            continue
+        at_start = i < k_ini
+        big = big_start if at_start else big_end
+        if big is None:
+            continue
+        # Com x_dir = sentido do eixo (padrao de `_place_pier_layout`), o vazado
+        # menor fica do lado do INICIO quando a celula menor do catalogo tem x
+        # local negativo (familia real e catalogo dos testes).
+        small = _block_smaller_cell(catalog.get(MID_WALL_BLOCK_CODE) or {})
+        default_toward_start = small is None or small["center_local"][0] <= 0.0
+        want_small_toward_start = (big if at_start else not big)
+        if want_small_toward_start == default_toward_start:
+            continue
+        cand = placed[i]
+        flipped = _make_block_candidate(
+            cand["logical_code"], catalog[cand["logical_code"]], cand["course"], cand["origin_world"],
+            cand["x_dir"] * -1.0, cand["placement_reason"], node_index=cand.get("node_index"),
+            wall_idx=cand.get("wall_idx"), secondary_wall_idx=cand.get("secondary_wall_idx"))
+        cand.update(flipped)
+    return placed
+
+
 def solve_wall_free_fill(wall_idx, walls_to_create, nodes, end_to_node, openings_per_wall,
                          node_candidates_by_wall_end, node_midspan_by_wall_course,
                          catalog, allow_compensators=BLOCK_COMPENSATORS_ENABLED_BY_DEFAULT,
@@ -9367,6 +9623,16 @@ def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, op
                             allow_compensators=allow_compensators,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
+                        # SECAO 86.3: faixa de B34 equilibrada nas duas ancoras
+                        # (trecho no'-a-no' sem abertura), ANTES de publicar as
+                        # juntas/vazios para a Fiada B. Sem local novo nesta funcao
+                        # (IronPython - ver a nota da regra 30.8 acima).
+                        layout = _balanced_b34_strip_segment_layout(
+                            layout, catalog, seg_start_cm, seg_end_cm, kind_left, kind_right,
+                            leading_is_open, trailing_is_open, opening_intervals_cm,
+                            opposite_node_joints_cm + list(cross_band_joints_cm or [])
+                            + own_family_joint_positions_cm + own_family_boundary_joint_positions_cm,
+                            wall_idx=wall_idx)
                         if layout:
                             # Juntas INTERNAS (sem isencao, pelo mesmo motivo do
                             # `_score` de _pier_layout_avoiding_joints: a Fiada B
@@ -9438,6 +9704,16 @@ def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, op
                             allow_compensators=allow_compensators,
                             leading_is_open=leading_is_open, trailing_is_open=trailing_is_open,
                         )
+                        # SECAO 86.3: mesma faixa equilibrada da Fiada A (mesmo K,
+                        # mesma divisao), aceita so' sem junta nova contra a A.
+                        layout = _balanced_b34_strip_segment_layout(
+                            layout, catalog, seg_start_cm, seg_end_cm, kind_left, kind_right,
+                            leading_is_open, trailing_is_open, opening_intervals_cm,
+                            course_a_joint_positions_cm + own_family_joint_positions_cm
+                            + course_a_boundary_joint_positions_cm
+                            + own_family_boundary_joint_positions_cm
+                            + list(cross_band_joints_cm or []),
+                            wall_idx=wall_idx)
                         if layout:
                             # Sem isencao aqui tambem - esta lista alimenta a
                             # BUSCA das variantes seguintes (ver acima).
@@ -9504,10 +9780,16 @@ def _solve_wall_free_fill_impl(wall_idx, walls_to_create, nodes, end_to_node, op
                                 "seg_start_cm": seg_start_cm, "seg_end_cm": seg_end_cm,
                                 "coincidence_count": residual,
                             })
-                    placed = _place_pier_layout(
-                        layout, catalog, origin, wall_dir, course, wall_idx,
-                        placement_reason="STANDARD_FILL",
-                    )
+                    # SECAO 86.3: orientacao inicial da faixa equilibrada (P/N com
+                    # o vazado menor para a ancora, S/G para dentro)
+                    placed = _balanced_b34_strip_orient(
+                        _place_pier_layout(
+                            layout, catalog, origin, wall_dir, course, wall_idx,
+                            placement_reason="STANDARD_FILL",
+                        ),
+                        layout, catalog, course, wall_idx, kind_left, kind_right, seg_start_cm, seg_end_cm,
+                        leading_is_open, trailing_is_open, opening_intervals_cm,
+                        node_candidates_by_wall_end, node_midspan_by_wall_course)
                     for placed_cand in placed:
                         placed_cand["course_variant"] = variant_index
                     variant_seg_records.append({
