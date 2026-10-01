@@ -55,17 +55,23 @@ _CACHE = {}
 def _solve(nome, geral=True, estrategia=None, reverse=False):
     """A secao 81 medida ISOLADA: a secao 83 (68 com guarda de junta) fica desligada nos
     dois lados da comparacao - ela tambem troca compensador de jamba por bloco e, ligada
-    nos dois, esconderia o efeito da 81 (ver test_reparo_68_guarda_junta.py)."""
+    nos dois, esconderia o efeito da 81 (ver test_reparo_68_guarda_junta.py). A cinta de
+    topo (secao 86.7) tambem fica desligada: as contagens aqui sao da composicao de BLOCO
+    por fiada (a cinta funde o compensador da ultima fiada numa canaleta - ver
+    tests/test_top_bond_beam.py)."""
     chave = (nome, geral, estrategia, reverse)
     if chave not in _CACHE:
-        antes = (m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED)
+        antes = (m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED,
+                 m.TOP_BOND_BEAM_ENABLED)
         m.GENERAL_COMPOSITION_QUALITY_ENABLED = geral
         m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED = False
+        m.TOP_BOND_BEAM_ENABLED = False
         try:
             lines, ops = FIXTURES[nome]()
             _CACHE[chave] = tcr.solve(lines, ops, strategy=estrategia, reverse=reverse)
         finally:
-            m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED = antes
+            (m.GENERAL_COMPOSITION_QUALITY_ENABLED, m.GENERAL_REPAIR_PREFER_CLEAN_ENABLED,
+             m.TOP_BOND_BEAM_ENABLED) = antes
     return _CACHE[chave]
 
 

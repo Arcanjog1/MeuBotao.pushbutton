@@ -20,8 +20,9 @@ Sistema fisico (evidencia BUTANTA R08_LT, regra 51 de REGRAS_MODULACAO_BLOCOS.md
 - a corrida passa das jambas ate' o apoio preferencial e para em peca de
   amarracao de no' (B54/B34 de L/T/X), fim de parede ou vazio - nunca troca
   nem move uma amarracao;
-- cinta de topo (TOP_BOND_BEAM) e' mecanismo SEPARADO e NAO e' gerada aqui
-  (decisao pendente, DECISION-TOP-BOND-BEAM).
+- cinta de topo (TOP_BOND_BEAM) e' mecanismo SEPARADO do reforco de abertura
+  (51.10): `plan_top_bond_beam` (SECAO 86.7, variante A - bloco de amarracao
+  no quadrado do no') roda DEPOIS de verga/contraverga, com ocupacao unica.
 
 Compativel com IronPython 2.7 (sem f-string, sem math.isfinite).
 """
@@ -48,6 +49,9 @@ OPENING_REINFORCEMENT_STRATEGIES = (OPENING_REINFORCEMENT_CHANNEL,)
 
 ROLE_ABOVE_OPENING = "ABOVE_OPENING"
 ROLE_BELOW_SILL = "BELOW_SILL"
+# SECAO 86.7 (2026-10-01): cinta de topo - mecanismo SEPARADO do reforco de
+# abertura (51.10: TOP_BOND_BEAM != OPENING_CHANNEL), ver plan_top_bond_beam.
+ROLE_TOP_BOND_BEAM = "TOP_BOND_BEAM"
 
 CHANNEL_U_39 = "CHANNEL_U_39"
 CHANNEL_U_34 = "CHANNEL_U_34"
@@ -108,6 +112,17 @@ DEFAULT_CHANNEL_POLICY = {
     # Evidencia BUTANTA 1o PAV: 119/126 lados >= 19; os menores estao
     # encostados em no'/fim de parede. NAO e' o >=9 de verga (TORRE EASY).
     "min_support_cm": 19.0,
+    # SECAO 86.8 (2026-10-01, PADRAO OBSERVADO no BUTANTA R08_LT humano): verga de
+    # vao >= large_span_cm pede apoio preferencial >= min_support_large_span_cm de
+    # cada lado (humano 10/10 lados livres dos vaos de 141 cm com 59/74 cm; vao
+    # < 140 continua com os 19 cm acima). So' o ALVO da extensao peca a peca
+    # (_extend_run) - continua parando em no', fim de parede e vazio, e os
+    # achados/validacao de apoio continuam medidos contra min_support_cm (nenhum
+    # minimo novo). So' a verga (a contraverga humana de 151 cm tem 29 cm).
+    # `large_span_cm = None` desliga.
+    "large_span_cm": 140.0,
+    "min_support_large_span_cm": 40.0,
+    "large_span_roles": (ROLE_ABOVE_OPENING,),
     # Tolerancia de cota para "base da fiada = topo do vao" / "topo da
     # fiada = peitoril" (mesma ordem de OPENING_COURSE_BAND_TOLERANCE_CM).
     "grid_tolerance_cm": 0.5,
@@ -178,6 +193,14 @@ def channel_policy(overrides=None):
 
 def is_channel_code(code):
     return code in CHANNEL_LOGICAL_TYPES
+
+
+def is_top_bond_beam_piece(candidate):
+    """Canaleta cujo UNICO papel e' a cinta de topo (SECAO 86.7). A canaleta de
+    verga/contraverga que cai na ultima fiada continua com o papel de abertura
+    (ocupacao unica, 51.10) e NAO e' peca da cinta."""
+    rein = (candidate or {}).get("reinforcement") or {}
+    return list(rein.get("roles") or []) == [ROLE_TOP_BOND_BEAM]
 
 
 def _is_tie(candidate):
@@ -596,12 +619,26 @@ def _jamb_outside_gap_cm(rows, t_jamb, side, reach_cm=80.0):
     return max(0.0, min(edges) - t_jamb) if edges else reach_cm
 
 
-def _extend_run(rows, i0, i1, t_lo, t_hi, policy, cross=None):
-    """Estende [i0, i1] (indices em `rows`) peca a peca ate' o apoio
-    preferencial. `cross(j, support_cm)` pode transformar a amarracao `rows[j]`
-    em trecho atravessavel (devolve True). Devolve (i0, i1, lim_esq, lim_dir)."""
-    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
+def preferred_support_cm(t_lo, t_hi, role, policy):
+    """Apoio PREFERENCIAL (alvo da extensao) de uma corrida: min_support_cm
+    (51.4) ou, na verga de vao grande, min_support_large_span_cm (SECAO 86.8,
+    padrao observado no humano BUTANTA R08_LT). Nunca e' minimo."""
     need = policy["min_support_cm"]
+    large = policy.get("large_span_cm")
+    if large is None or role not in tuple(policy.get("large_span_roles") or ()):
+        return need
+    if (t_hi - t_lo) >= large - policy.get("grid_tolerance_cm", 0.5):
+        return max(need, policy.get("min_support_large_span_cm") or need)
+    return need
+
+
+def _extend_run(rows, i0, i1, t_lo, t_hi, policy, cross=None, need_cm=None):
+    """Estende [i0, i1] (indices em `rows`) peca a peca ate' o apoio
+    preferencial (`need_cm`; None = min_support_cm). `cross(j, support_cm)` pode
+    transformar a amarracao `rows[j]` em trecho atravessavel (devolve True).
+    Devolve (i0, i1, lim_esq, lim_dir)."""
+    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
+    need = policy["min_support_cm"] if need_cm is None else need_cm
     limits = [None, None]
     while t_lo - rows[i0]["lo"] < need - 1e-6:
         j = i0 - 1
@@ -1085,7 +1122,10 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                       "lo_cm": round(row["lo"], 3), "hi_cm": round(row["hi"], 3)})
                     return 1
 
-                i0, i1, lim_l, lim_r = _extend_run(rows, hits[0], hits[-1], t_lo, t_hi, policy, cross=_cross)
+                # SECAO 86.8: verga de vao grande estende ate' o apoio preferencial maior
+                need_cm = preferred_support_cm(t_lo, t_hi, role, policy)
+                i0, i1, lim_l, lim_r = _extend_run(rows, hits[0], hits[-1], t_lo, t_hi, policy, cross=_cross,
+                                                   need_cm=need_cm)
                 # No' e orientacao da amarracao que limitou a corrida (usado pela
                 # tentativa de paridade do CHANNEL, wall_modeling).
                 blockers = {}
@@ -1097,7 +1137,7 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                           "placement_reason": str(rows[j]["cand"].get("placement_reason") or "")}
                 # por IDENTIDADE da linha: conversoes de demandas seguintes
                 # podem inserir linhas e deslocar indices.
-                spans.append([rows[i0], rows[i1], oi, role, lim_l, lim_r, blockers])
+                spans.append([rows[i0], rows[i1], oi, role, lim_l, lim_r, blockers, need_cm])
             if not spans:
                 continue
 
@@ -1162,7 +1202,9 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                      "support_l_cm": support_l, "support_r_cm": support_r,
                                      "bearing_l_cm": bearing_l, "bearing_r_cm": bearing_r,
                                      "limited_l": lim_l, "limited_r": lim_r,
-                                     "blocker_l": blockers.get("l"), "blocker_r": blockers.get("r")}
+                                     "blocker_l": blockers.get("l"), "blocker_r": blockers.get("r"),
+                                     # SECAO 86.8: alvo da extensao (19 ou, vao grande, 40)
+                                     "preferred_support_cm": sp[7]}
                     for side, sup, bearing, lim in (("L", support_l, bearing_l, lim_l),
                                                     ("R", support_r, bearing_r, lim_r)):
                         if sup < policy["min_support_cm"] - 1e-6:
@@ -1226,6 +1268,295 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
             "node_crossings": crossings, "tie_conversions": tie_conversions}
 
 
+# ==========================================================================
+# SECAO 86.7 (2026-10-01) - CINTA DE TOPO (TOP_BOND_BEAM), VARIANTE A
+#
+# Padrao observado no humano BUTANTA R08_LT (1o PAV): a f12 e' cinta de canaleta
+# em 34/34 paredes (33 com 100% canaleta), copiando a grade da fiada par (f0 e'
+# a de melhor encaixe em 34/34; B39->U39 282, B34->U34 133, compensador fundido
+# em U39/U_CUT 25), sem fiada de bloco entre a verga (f11) e a cinta (38/38
+# vaos). Implementado na VARIANTE A (pedido do usuario relatado em 2026-10-01:
+# canaleta nunca serve de amarracao): no quadrado de cada no' continua o BLOCO
+# de amarracao. A variante B (identica ao humano, canaleta sobre o no' e
+# B54 -> U34+U19 no no') fica so' DOCUMENTADA - nao ha' codigo para ela.
+# ==========================================================================
+TOP_BOND_BEAM_VARIANT_A = "A_TIE_BLOCK_AT_NODE"
+TOP_BOND_BEAM_NODE_KINDS = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION")
+DEFAULT_TOP_BOND_BEAM_POLICY = {
+    "policy_version": "TOP-BOND-BEAM-2026-10-01-BUTANTA-R08-VARIANT-A",
+    "variant": TOP_BOND_BEAM_VARIANT_A,
+    # B54 que NAO e' amarracao (preenchimento - ex.: caixa de shaft, 85.8) vira
+    # U34+U19 com a junta nova o mais longe possivel das juntas da fiada de baixo
+    # (humano: B54 -> U34+U19 7x / U19+U34 4x). Sem desencontro minimo fica B54.
+    "split_b54_lengths_cm": (34.0, 19.0),
+    # peca de preenchimento que invade o quadrado do no' mais que isto fica bloco
+    "node_square_margin_cm": 0.5,
+}
+
+
+def top_bond_beam_policy(overrides=None):
+    policy = dict(DEFAULT_TOP_BOND_BEAM_POLICY)
+    for key, value in (overrides or {}).items():
+        policy[key] = value
+    return policy
+
+
+def _node_squares_cm(walls_to_create, nodes, wall_idx):
+    """[(lo, hi, node_index, kind)] em cm no eixo de `wall_idx`: o QUADRADO de
+    cada encontro L/T/X real da parede (eixo do no' +- meia espessura da outra
+    parede). So' geometria do grafo - nunca id/coordenada."""
+    squares = []
+    if not nodes:
+        return squares
+    own_cm = _ft_to_cm(walls_to_create[wall_idx][1])
+    for node, t_ft in _wall_junction_nodes_and_ts_ft(walls_to_create, nodes, wall_idx):
+        kind = node.get("kind")
+        if kind not in TOP_BOND_BEAM_NODE_KINDS:
+            continue
+        other_cm = _node_other_wall_thickness_cm(walls_to_create, node, wall_idx) or own_cm
+        node_index = None
+        for k, nd in enumerate(nodes):
+            if nd is node:
+                node_index = k
+                break
+        t = _ft_to_cm(t_ft)
+        squares.append((t - other_cm / 2.0, t + other_cm / 2.0, node_index, kind))
+    squares.sort(key=lambda s: (round(s[0], 4), round(s[1], 4)))
+    return squares
+
+
+def _square_hit(lo, hi, squares, margin):
+    for square in squares:
+        if hi > square[0] + margin and lo < square[1] - margin:
+            return square
+    return None
+
+
+def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=None, channel_overrides=None,
+                       policy=None, course_index=None):
+    """SECAO 86.7 - CINTA DE TOPO na ULTIMA fiada (num_courses - 1), variante A.
+
+    A fiada ja' resolvida pelo motor vira canaleta continua (tambem sobre os
+    vaos) trocando PECA A PECA - ela ja' e' a grade da fiada de mesma paridade
+    abaixo (medido no nosso BUTANTA de 13 fiadas: 373/385 pecas da f12 fora dos
+    vaos com a pegada de uma peca da f0, 364/385 da f10): B39->U39, B34->U34,
+    B19->U19 (MEIA CANALETA), compensador fundido a' vizinha contigua (U39/U_CUT,
+    51.3) e B54 que NAO e' amarracao dividido em U34+U19. Juntas, amarracoes e
+    paridade nao mudam; fundir so' REMOVE junta.
+
+    Variante A: no QUADRADO de cada no' L/T/X continua o BLOCO de amarracao
+    (B34/B54 da parede e a peca transversal da outra) e nenhuma peca de
+    preenchimento que invada o quadrado vira canaleta - canaleta nunca serve de
+    amarracao (regra 75). Canaleta de verga/contraverga ja' na ultima fiada fica
+    como esta', com o papel de abertura (ocupacao unica, 51.10). Passagem livre
+    (51.9) e vao ate' o topo nao tem pecas nessa fiada: a cinta e' interrompida.
+
+    Nao muta `course_candidates`. Devolve {"course_candidates", "course_index",
+    "variant", "runs", "findings", "counts", "policy", "role"}. Deterministico
+    (ordem por parede e eixo; chave fisica canonica)."""
+    pol = top_bond_beam_policy(policy)
+    cpol = channel_policy(channel_overrides)
+    piece_policy = dict(cpol)
+    piece_policy["policy_version"] = pol["policy_version"]
+    split_policy = dict(cpol)
+    split_policy["tie_split_lengths_cm"] = tuple(pol["split_b54_lengths_cm"])
+    gap = cpol["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
+    margin = pol["node_square_margin_cm"]
+    out_cc = dict((ci, list(pcs or [])) for ci, pcs in (course_candidates or {}).items())
+    counts = {"source_pieces_converted": 0, "channel_pieces": 0, "by_code": {}, "kept_tie": 0,
+              "kept_at_node": 0, "kept_ineligible": 0, "shared_with_opening": 0, "b54_split": 0,
+              "walls_with_beam": 0}
+    findings = []
+    report = {"role": ROLE_TOP_BOND_BEAM, "variant": pol["variant"], "policy": pol, "course_index": None,
+              "runs": [], "findings": findings, "counts": counts, "course_candidates": out_cc}
+    if num_courses <= 0:
+        return report
+    ci = (num_courses - 1) if course_index is None else int(course_index)
+    report["course_index"] = ci
+    pieces = out_cc.get(ci) or []
+    if not pieces:
+        return report
+    below = (out_cc.get(ci - 1) or []) if ci > 0 else []
+    removed = set()
+    inserted = {}
+    for wall_idx in range(len(walls_to_create)):
+        rows = _wall_strip_pieces(pieces, walls_to_create, wall_idx)
+        if not rows:
+            continue
+        squares = _node_squares_cm(walls_to_create, nodes, wall_idx)
+        below_joints = None
+        sequences = [[]]
+        for r in rows:
+            cand = r["cand"]
+            code = cand.get("logical_code")
+            own = cand.get("wall_idx") == wall_idx
+            new_rows = None
+            if own and r["along"] and not r["tie"]:
+                if is_channel_code(code):
+                    counts["shared_with_opening"] += 1
+                elif _square_hit(r["lo"], r["hi"], squares, margin) is not None:
+                    square = _square_hit(r["lo"], r["hi"], squares, margin)
+                    counts["kept_at_node"] += 1
+                    findings.append({"code": "TOP_BOND_BEAM_BLOCK_KEPT_AT_NODE", "severity": SEVERITY_INFO,
+                                     "classification": "RULE_75_VARIANT_A", "wall_idx": wall_idx,
+                                     "course_index": ci, "node_index": square[2], "node_kind": square[3],
+                                     "logical_code": code, "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3),
+                                     "detail": "peca no quadrado do no' fica bloco (canaleta nunca amarra)"})
+                elif code in COMMON_TO_CHANNEL or code in COMPENSATOR_CODES:
+                    new_rows = [r]
+                elif code == "B54":
+                    if below_joints is None:
+                        below_joints = _row_joints_cm(_wall_strip_pieces(below, walls_to_create, wall_idx),
+                                                      cpol["contiguous_gap_cm"])
+                    parts = _tie_split_rows(r, walls_to_create, wall_idx, below_joints, split_policy)
+                    if parts is None:
+                        counts["kept_ineligible"] += 1
+                        findings.append({"code": "TOP_BOND_BEAM_B54_SPLIT_NO_STAGGER", "severity": SEVERITY_WARNING,
+                                         "classification": "NEEDS_RULE", "wall_idx": wall_idx, "course_index": ci,
+                                         "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3),
+                                         "detail": "B54 de preenchimento sem divisao U34+U19 com desencontro"})
+                    else:
+                        counts["b54_split"] += 1
+                        new_rows = parts
+                else:
+                    counts["kept_ineligible"] += 1
+            elif own and r["tie"]:
+                counts["kept_tie"] += 1
+            elif own:
+                counts["kept_ineligible"] += 1
+            if new_rows is None:
+                if sequences[-1]:
+                    sequences.append([])
+                continue
+            if sequences[-1] and new_rows[0]["lo"] - sequences[-1][-1]["hi"] > gap:
+                sequences.append([])
+            sequences[-1].extend(new_rows)
+        sequences = [s for s in sequences if s]
+        if sequences:
+            counts["walls_with_beam"] += 1
+        for seq in sequences:
+            lo, hi = seq[0]["lo"], seq[-1]["hi"]
+            record = {"run_id": "W{}:C{}:TOP:{:.1f}-{:.1f}".format(wall_idx, ci, lo, hi), "wall_idx": wall_idx,
+                      "course_index": ci, "lo_cm": round(lo, 3), "hi_cm": round(hi, 3),
+                      "roles": [ROLE_TOP_BOND_BEAM], "opening_indices": [], "pieces": []}
+            for group in _group_run_members(seq, cpol):
+                piece = _channel_candidate_from_group(group, walls_to_create, wall_idx, record, piece_policy)
+                piece["reinforcement"]["source_codes"] = [
+                    ("B54_SPLIT" if g.get("split_of") is not None else g["cand"].get("logical_code"))
+                    for g in group]
+                record["pieces"].append({"code": piece["logical_code"], "lo_cm": round(group[0]["lo"], 3),
+                                         "hi_cm": round(group[-1]["hi"], 3),
+                                         "source_codes": list(piece["reinforcement"]["source_codes"])})
+                if piece["logical_code"] == CHANNEL_U_CUT and \
+                        piece["instance_length_cm"] < cpol["observed_min_cut_length_cm"] - 1e-6:
+                    findings.append({"code": "CHANNEL_CUT_BELOW_OBSERVED_MIN", "severity": SEVERITY_WARNING,
+                                     "classification": "NEEDS_RULE", "wall_idx": wall_idx, "course_index": ci,
+                                     "run_id": record["run_id"], "role": ROLE_TOP_BOND_BEAM,
+                                     "detail": "canaleta cortada de {:.1f} cm (< {:.1f} cm observado)".format(
+                                         piece["instance_length_cm"], cpol["observed_min_cut_length_cm"])})
+                counts["channel_pieces"] += 1
+                counts["by_code"][piece["logical_code"]] = counts["by_code"].get(piece["logical_code"], 0) + 1
+                anchor = _physical_key(group[0].get("split_of") or group[0]["cand"])
+                inserted.setdefault(anchor, []).append(piece)
+                for src in group:
+                    removed.add(_physical_key(src.get("split_of") or src["cand"]))
+            report["runs"].append(record)
+    counts["source_pieces_converted"] = len(removed)
+    if inserted:
+        rebuilt = []
+        done = set()
+        for cand in pieces:
+            key = _physical_key(cand)
+            if key in inserted:
+                if key not in done:
+                    done.add(key)
+                    rebuilt.extend(inserted[key])
+                continue
+            if key in removed:
+                continue
+            rebuilt.append(cand)
+        out_cc[ci] = rebuilt
+    return report
+
+
+def lintel_beam_relation(openings_report, beam_course):
+    """SECAO 86.7 - relacao verga x cinta por abertura (so' leitura do plano):
+    quantas fiadas de BLOCO ficam entre a verga e a cinta (humano: 0 em 38/38
+    vaos com topo 221, verga na f11 e cinta na f12 com 13 fiadas)."""
+    out = []
+    if beam_course is None:
+        return out
+    for rec in openings_report or []:
+        above = rec.get("above") or {}
+        lintel = above.get("course_index")
+        if above.get("status") != "CHANNEL" or lintel is None:
+            continue
+        out.append({"wall_idx": rec.get("wall_idx"), "opening_index": rec.get("opening_index"),
+                    "lintel_course": lintel, "beam_course": beam_course,
+                    "block_courses_between": max(0, beam_course - lintel - 1),
+                    "lintel_is_beam_course": lintel == beam_course})
+    return out
+
+
+def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index, policy=None):
+    """Auditoria INDEPENDENTE da cinta de topo (SECAO 86.7), refeita da geometria:
+
+    - TOP_BOND_BEAM_WRONG_COURSE: peca da cinta fora da ultima fiada;
+    - TOP_BOND_BEAM_TIE_ROLE: peca da cinta com razao/marca de amarracao (regra 75);
+    - TOP_BOND_BEAM_CHANNEL_AT_NODE: peca da cinta invadindo o quadrado de um no'
+      L/T/X (variante A: sempre zero);
+    - TOP_BOND_BEAM_BLOCK_NOT_CONVERTED: bloco comum/compensador/B54 de
+      preenchimento da parede na ultima fiada, fora do quadrado de no', que nao
+      virou canaleta.
+    Devolve {"counts", "items"}."""
+    pol = top_bond_beam_policy(policy)
+    margin = pol["node_square_margin_cm"]
+    counts = {"TOP_BOND_BEAM_WRONG_COURSE": 0, "TOP_BOND_BEAM_TIE_ROLE": 0, "TOP_BOND_BEAM_CHANNEL_AT_NODE": 0,
+              "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED": 0, "beam_pieces": 0}
+    items = []
+    for ci in sorted(course_candidates or {}):
+        for cand in course_candidates.get(ci) or []:
+            if not is_top_bond_beam_piece(cand):
+                continue
+            counts["beam_pieces"] += 1
+            if ci != course_index:
+                counts["TOP_BOND_BEAM_WRONG_COURSE"] += 1
+                items.append({"code": "TOP_BOND_BEAM_WRONG_COURSE", "course_index": ci,
+                              "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code")})
+            if _is_tie(cand) or cand.get("converted_tie"):
+                counts["TOP_BOND_BEAM_TIE_ROLE"] += 1
+                items.append({"code": "TOP_BOND_BEAM_TIE_ROLE", "course_index": ci,
+                              "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+                              "placement_reason": cand.get("placement_reason")})
+    if course_index is None:
+        return {"counts": counts, "items": items}
+    pieces = (course_candidates or {}).get(course_index) or []
+    for wall_idx in range(len(walls_to_create)):
+        rows = _wall_strip_pieces(pieces, walls_to_create, wall_idx)
+        if not rows:
+            continue
+        squares = _node_squares_cm(walls_to_create, nodes, wall_idx)
+        for r in rows:
+            cand = r["cand"]
+            if cand.get("wall_idx") != wall_idx or not r["along"]:
+                continue
+            code = cand.get("logical_code")
+            square = _square_hit(r["lo"], r["hi"], squares, margin)
+            if is_top_bond_beam_piece(cand):
+                if square is not None:
+                    counts["TOP_BOND_BEAM_CHANNEL_AT_NODE"] += 1
+                    items.append({"code": "TOP_BOND_BEAM_CHANNEL_AT_NODE", "wall_idx": wall_idx,
+                                  "course_index": course_index, "node_index": square[2],
+                                  "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3)})
+            elif (not r["tie"] and square is None
+                  and (code in COMMON_TO_CHANNEL or code in COMPENSATOR_CODES or code == "B54")):
+                counts["TOP_BOND_BEAM_BLOCK_NOT_CONVERTED"] += 1
+                items.append({"code": "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED", "wall_idx": wall_idx,
+                              "course_index": course_index, "logical_code": code,
+                              "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3)})
+    return {"counts": counts, "items": items}
+
+
 def validate_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
                                    num_courses, base_z_abs, free_to_top=None, policy=None,
                                    reference_course_candidates=None, nodes=None, strip_cache=None):
@@ -1257,7 +1588,7 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
               "CHANNEL_OPENING_OVERCUT": 0, "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0, "CHANNEL_ORPHAN_PIECE": 0,
               "channel_top_expected": 0, "channel_top_matched": 0,
               "channel_bottom_expected": 0, "channel_bottom_matched": 0, "channel_pieces": 0,
-              "channel_cut_pieces": 0}
+              "channel_cut_pieces": 0, "top_bond_beam_pieces": 0}
     items = []
     top_z = course_band(num_courses - 1)[1] if num_courses > 0 else None
     demand_courses = {}  # wall_idx -> {course: [(t_lo, t_hi, role, oi)]}
@@ -1375,13 +1706,18 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
         channel_idx = set(i for i, c in enumerate(pieces) if is_channel_code(c.get("logical_code")))
         counts["channel_pieces"] += len(channel_idx)
         counts["channel_cut_pieces"] += sum(1 for c in pieces if c.get("logical_code") == CHANNEL_U_CUT)
+        counts["top_bond_beam_pieces"] += sum(1 for c in pieces if is_top_bond_beam_piece(c))
         for wi in range(len(walls_to_create)):
             rows = cached_strip_rows(strip_cache, "now", buckets, ci, wi, walls_to_create)
-            along_channel = [r for r in rows if r["along"] and is_channel_code(r["cand"].get("logical_code"))
-                             and r["cand"].get("wall_idx") == wi]
+            along_all = [r for r in rows if r["along"] and is_channel_code(r["cand"].get("logical_code"))
+                         and r["cand"].get("wall_idx") == wi]
+            # SECAO 86.7: a canaleta da CINTA DE TOPO nao e' reforco de abertura - nao
+            # conta como canaleta sem demanda (WRONG_COURSE/EXTRA); invasao de vao e
+            # colisao continuam valendo para ela (auditoria propria: top_bond_beam_audit)
+            along_channel = [r for r in along_all if not is_top_bond_beam_piece(r["cand"])]
             demands = demand_courses.get(wi, {}).get(ci, [])
             # invasao de vao ativo nesta fiada
-            for r in along_channel:
+            for r in along_all:
                 for oi, opening in enumerate(openings_per_wall[wi]):
                     if not _opening_active(opening, z_lo, z_hi, tol_ft):
                         continue
@@ -1404,11 +1740,14 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
                     # apoio medido na corrida contigua de canaletas
                     idx = [i for i, r in enumerate(rows) if r in over]
                     i0, i1 = idx[0], idx[-1]
+                    # (a cinta de topo encostada na verga da ultima fiada nao e' apoio da verga)
                     while i0 - 1 >= 0 and rows[i0 - 1]["along"] and is_channel_code(
-                            rows[i0 - 1]["cand"].get("logical_code")) and rows[i0]["lo"] - rows[i0 - 1]["hi"] <= gap:
+                            rows[i0 - 1]["cand"].get("logical_code")) and rows[i0]["lo"] - rows[i0 - 1]["hi"] <= gap \
+                            and not is_top_bond_beam_piece(rows[i0 - 1]["cand"]):
                         i0 -= 1
                     while i1 + 1 < len(rows) and rows[i1 + 1]["along"] and is_channel_code(
-                            rows[i1 + 1]["cand"].get("logical_code")) and rows[i1 + 1]["lo"] - rows[i1]["hi"] <= gap:
+                            rows[i1 + 1]["cand"].get("logical_code")) and rows[i1 + 1]["lo"] - rows[i1]["hi"] <= gap \
+                            and not is_top_bond_beam_piece(rows[i1 + 1]["cand"]):
                         i1 += 1
                     for side, sup in (("L", t_lo - rows[i0]["lo"]), ("R", rows[i1]["hi"] - t_hi)):
                         if sup < policy["min_support_cm"] - 1e-6:

@@ -5,8 +5,10 @@ REFORCO ESTRUTURAL da abertura, independentes da estrategia adicional CHANNEL.
 "Sem reforco adicional" (strategy=None) roda o MESMO planejador de canaleta
 provado no CHANNEL (secao 51: fiada acima do topo / cujo topo e' o peitoril,
 pecas da fiada convertidas em canaleta, corrida ate' o apoio preferencial,
-parada em amarracao - regra 75) e NADA MAIS do CHANNEL: nem a passagem livre
-51.9, nem a paridade da canaleta 51.14, nem o arranjo 60-65, nem 58.2/68/71/72.
+parada em amarracao - regra 75) e NADA MAIS do CHANNEL: nem a paridade da
+canaleta 51.14, nem o arranjo 60-65, nem 58.2/68/71/72. (SECAO 86.8, 2026-10-01:
+a passagem livre 51.9 passou a valer tambem aqui; SECAO 86.7: a cinta de topo e'
+mecanismo separado, nos dois caminhos.)
 Toda abertura sai com LINTEL_CREATED / LINTEL_NOT_REQUIRED / LINTEL_UNRESOLVED
 e SILL_REINFORCEMENT_* no rastreio `opening_structural_trace`, e cada corrida
 parada por uma amarracao fica em `channel_stopped_by_junction`, com a CAUSA
@@ -168,17 +170,26 @@ def test_vao_ate_o_topo_da_parede_nao_requer_verga(estrategia):
     assert linha["lintel_required"] is False
     assert linha["lintel_status"] == m.LINTEL_NOT_REQUIRED
     assert linha["lintel_reason"] == "NO_MASONRY_ABOVE_REACHES_WALL_TOP"
-    assert not _canaletas(res)
+    # nenhuma canaleta de abertura (a cinta de topo da secao 86.7 fica fora do vao)
+    assert not [c for c in _canaletas(res) if not orf.is_top_bond_beam_piece(c)]
+    assert not tcr.codes_over(res, _w, 0, NUM - 1, 200, 300)
 
 
-def test_passagem_livre_so_no_channel_e_o_none_mantem_alvenaria_com_verga():
-    """51.9 continua SO' no CHANNEL (a decisao do usuario nao a liga no None):
-    no CHANNEL a porta entre dois T fica aberta ate' o topo (NOT_REQUIRED); sem
-    reforco adicional a alvenaria acima existe, entao a verga e' exigida."""
-    chan, _w, _n, _o = _solve("passage", tcr.CHANNEL)
-    linha = _linhas(chan)[0]
-    assert linha["lintel_status"] == m.LINTEL_NOT_REQUIRED and linha["lintel_reason"] == "FREE_TO_TOP_PASSAGE_51_9"
-    none, walls, _n2, openings = _solve("passage", None)
+def test_passagem_livre_nos_dois_caminhos_e_sem_a_chave_86_8_o_none_mantem_verga(monkeypatch):
+    """SECAO 86.8 (2026-10-01): a 51.9 (aceita pelo usuario, item C) vale tambem
+    sem reforco adicional - a porta entre dois T fica aberta ate' o topo
+    (NOT_REQUIRED) nos dois caminhos. Com FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED
+    desligada volta o comportamento da secao 80: sem reforco adicional a
+    alvenaria acima existe, entao a verga e' exigida."""
+    for estrategia in (tcr.CHANNEL, None):
+        res, _w, _n, _o = _solve("passage", estrategia)
+        linha = _linhas(res)[0]
+        assert linha["lintel_status"] == m.LINTEL_NOT_REQUIRED, estrategia
+        assert linha["lintel_reason"] == "FREE_TO_TOP_PASSAGE_51_9", estrategia
+        assert res["opening_reinforcement"]["free_to_top"], estrategia
+    monkeypatch.setattr(m, "FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED", False)
+    lines, ops = tcr.passage()
+    none, walls, _n2, openings = solve(lines, ops, strategy=None, num_courses=NUM)
     assert none["opening_reinforcement"]["free_to_top"] == []
     linha = _linhas(none)[0]
     assert linha["lintel_required"] is True and linha["lintel_status"] == m.LINTEL_CREATED
@@ -342,7 +353,10 @@ def test_none_e_o_motor_sem_a_secao_80_mais_o_planejador_de_abertura(monkeypatch
     plano = orf.plan_channel_reinforcement(base["course_candidates"], walls0, openings0,
                                            m._free_to_top_band(CAT, 0.0), NUM, 0.0, nodes=nodes0,
                                            catalog=CAT, free_to_top=[])
-    esperado = dict(base, course_candidates=plano["course_candidates"])
+    # SECAO 86.7: e a cinta de topo sobre as fiadas ja' com verga/contraverga
+    cinta = orf.plan_top_bond_beam(plano["course_candidates"], walls0, NUM, nodes=nodes0)
+    assert produto["top_bond_beam"]["counts"] == cinta["counts"]
+    esperado = dict(base, course_candidates=cinta["course_candidates"])
     assert tcr.physical_signature(produto, walls) == tcr.physical_signature(esperado, walls0)
     # inclusive a rotacao do vazado menor (secao 52) e o espelhamento: fora das
     # corridas de verga/contraverga nenhuma peca muda

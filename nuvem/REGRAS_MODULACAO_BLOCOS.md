@@ -7855,6 +7855,10 @@ achado `CHANNEL_CUT_BELOW_OBSERVED_MIN` (NEEDS_RULE).
 
 ### 51.4 PREFERENCIAL (implementada, parâmetro `min_support_cm = 19`; confirmado pelo usuário 2026-09-14, item B: preferencial, NÃO mínimo) — apoio lateral
 
+> **Atualização (2026-10-01, §86.8 — PADRÃO OBSERVADO):** na **verga** de vão ≥ 140 cm o apoio preferencial
+> passa a 40 cm (humano BUTANTÃ: 10/10 lados livres dos vãos de 141 cm com 59/74 cm). Continua preferencial;
+> achados e validação continuam contra os 19 cm.
+
 A corrida cobre o vão inteiro e se estende **peça inteira a peça inteira** até o
 apoio (jamba → ponta da corrida) ≥ 19 cm de cada lado. Para em amarração de nó,
 fim de parede ou vazio; apoio menor vira `CHANNEL_SUPPORT_LIMITED` (nunca some).
@@ -7947,6 +7951,9 @@ sendo a do motor legado.
 
 ### 51.9 PADRÃO OBSERVADO (implementado, parâmetro; aceito pelo usuário 2026-09-14, item C) — passagem livre até o topo
 
+> **Atualização (2026-10-01, §86.8):** vale também sem a estratégia CHANNEL (reforço estrutural da §80), pela
+> chave `FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED` — corrige a restrição "51.9 só no CHANNEL" da §80.
+
 Vão **sem peitoril** cujas **duas** jambas ficam a ≤ 28,5 cm (meio B54 + folga)
 do eixo de um nó L/T/X real da parede: não recebe canaleta e fica aberto até o
 topo. Evidência: PAR28 (6919219, 6919324; 6/6 em todos os níveis) — as únicas duas
@@ -7997,6 +8004,11 @@ para a geometria equivalente ao padrão comprovado:
 - **Confiança**: `REGRA APROVADA` para a geometria detectada; 1 ocorrência medida.
 
 ### 51.10 SEPARAÇÃO OBRIGATÓRIA — cinta de topo não é reforço de abertura (cinta de topo mantida PENDENTE pelo usuário 2026-09-14, item F)
+
+> **Atualização (2026-10-01, §86.7):** a cinta de topo passou a ser gerada (variante A: bloco de amarração no
+> quadrado do nó) como mecanismo SEPARADO do reforço de abertura, nos dois caminhos, pela chave
+> `TOP_BOND_BEAM_ENABLED`. A separação de papéis (`TOP_BOND_BEAM` ≠ `ABOVE_OPENING`) e a ocupação única abaixo
+> continuam valendo; `DECISION-TOP-BOND-BEAM` ainda precisa do registro literal da decisão do usuário.
 
 A estratégia CHANNEL **não gera** `TOP_BOND_BEAM`: o conflito 10.7/41.3 continua
 aberto (`DECISION-TOP-BOND-BEAM`). Canaleta humana na última fiada é classificada
@@ -10491,7 +10503,8 @@ verga/contraverga obrigatórias (a §78 dizia que a escolha do reforço as contr
   item B — não é mínimo), parada em amarração de nó, ponta de parede ou vazio. A classificação
   da canaleta de abertura (papel `ABOVE_OPENING`/`BELOW_SILL`) e o gate da regra 75 valem nos
   dois caminhos.
-- **Estratégia ADICIONAL CHANNEL (só com CHANNEL):** passagem livre até o topo (51.9), paridade
+- **Estratégia ADICIONAL CHANNEL (só com CHANNEL):** passagem livre até o topo (51.9 — desde 2026-10-01 também
+  sem CHANNEL, §86.8), paridade
   por causa da canaleta (51.14), arranjo das corridas B34 (60–65) e as regras 58.2, 68, 71 e 72,
   além do memo de desempenho. **Nenhuma delas liga no `NONE`** (teste com espiões).
 - **Continuam valendo em qualquer opção:** tolerâncias físicas (§78), regras físicas de
@@ -11514,3 +11527,119 @@ Revit).
 Testes: `tests/test_jamb_compensator_alignment.py` (W1 real, pilar de referência do usuário, régua por
 área, B19 no miolo), `tests/test_opening_micro_adjust_mover.py` (marca, teto total, Pinned, plano
 externo por ElementId).
+
+## 86. Aproximacao do projeto humano BUTANTA R08_LT (2026-10-01)
+
+> **Pedido do usuário (2026-10-01):** "observe e analise como foi feito no projeto HUMANO (BUTANTA R08_LT) e tente
+> chegar no resultado mais próximo possível AJUSTANDO AS REGRAS e como o CÁLCULO de modulação funciona, sem
+> copiá-lo". Fonte das medições: análise offline do 1º PAV (human_rows_unpad.json = caixa da família menos 1 cm de
+> cada lado; 34 paredes, 44 aberturas, 50 encontros), sem tocar no Revit. Cada subseção 86.x é de um cluster de
+> regras; números do humano com o rótulo de confiança que merecem.
+
+### 86.7 CINTA DE TOPO (TOP_BOND_BEAM) na última fiada — VARIANTE A: bloco de amarração no quadrado do nó (2026-10-01, IMPLEMENTADO, chave `TOP_BOND_BEAM_ENABLED = True`)
+
+**PADRÃO OBSERVADO (humano BUTANTÃ R08_LT, 1º PAV, medição offline 2026-10-01; analistas "estrutura global" e
+"openings_vh"):**
+
+- A fiada 12 (z 241–260) é **cinta de canaleta em 34/34 paredes**; 33 delas são 100 % canaleta (a W24 tem 1 C04 de
+  ponta livre). 559 peças: U39 354, U34 184, U19 15, U_CUT 5 + 1 C04. As faltas são só os quadrados dos encontros
+  (16 cm) e a passagem livre da W1 (t 1394–1800, §51.9).
+- A cinta **copia peça a peça a grade da fiada par**: a f0 é a fiada de melhor encaixe em 34/34 paredes; 416/558
+  canaletas têm um bloco de fiada par exatamente embaixo (±1,5 cm) — fora dos vãos, 87,8 %. Trocas medidas:
+  B39→U39 282, B34→U34 133, B54→U34+U19 11/16 (U34+U19 7×, U19+U34 4×), C04/C09→U39 17, C04/C09→U_CUT 8.
+- O dono de cada nó na f12 é o mesmo da f0 em 99/100 incidências.
+- **Sem fiada de bloco entre a verga e a cinta**: 38/38 vãos com topo 221 têm verga na f11 e cinta logo acima, na
+  f12 (canaleta dupla sobre o vão). O pavimento humano tem 13 fiadas (f0–f12) + calço de C09 deitado em 8 paredes.
+- No humano a canaleta da cinta **passa sobre o nó** em 46–48 de 50 encontros (é a "variante B").
+
+**REGRA (pedido do usuário relatado em 2026-10-01 — "canaleta nunca serve de amarração", reafirmando a §75 e a
+§85.10) — VARIANTE A, a implementada:**
+
+1. A **última fiada** da parede (`num_courses − 1`) vira canaleta contínua, também sobre os vãos, trocando **peça
+   a peça** a fiada já resolvida pelo motor: B39→U39, B34→U34, B19→U19 (MEIA CANALETA 14x19x19), compensador
+   fundido à vizinha contígua em U39/U_CUT pela §51.3 (fundir só remove junta), B54 que **não** é amarração
+   (preenchimento, ex.: caixa de shaft §85.8) dividido em U34+U19 com a junta nova o mais longe possível das juntas
+   da fiada de baixo (mínimo 1,5 cm; sem divisão → fica B54 e achado `TOP_BOND_BEAM_B54_SPLIT_NO_STAGGER`).
+   Juntas, amarrações e paridade não mudam.
+2. **No quadrado de cada nó L/T/X continua o BLOCO de amarração** (B34/B54 da parede e a peça transversal da
+   outra). Nenhuma peça de preenchimento que invada o quadrado (eixo do nó ± meia espessura da outra parede) vira
+   canaleta — fica bloco, com achado informativo `TOP_BOND_BEAM_BLOCK_KEPT_AT_NODE`. Canaleta nunca amarra.
+3. **Ocupação única (§51.10)**: verga/contraverga que já caiu na última fiada fica como está, com o papel de
+   abertura (`ABOVE_OPENING`); a cinta cobre o resto da fiada (`TOP_BOND_BEAM`), nunca duas peças nem dois papéis.
+4. Passagem livre (§51.9) e vão até o topo não têm peças nessa fiada: a cinta é interrompida ali.
+5. Com 13 fiadas e topo dos vãos em 221 a verga fica na f11 e a cinta na f12 — a "verga direto sob a cinta" sai sem
+   código especial (o integrador resolve o pavimento com 13 fiadas). Com 14 fiadas sobra uma fiada de bloco entre
+   as duas (relatado em `lintel_beam[].block_courses_between = 1`).
+
+**Por que troca no lugar (e não copia a f0/f10):** no nosso motor a última fiada já é a grade da fiada de mesma
+paridade abaixo. Medido offline no nosso BUTANTÃ de 13 fiadas (`rows_base13.json`, sem rodar o solve): 373/385
+peças da f12 fora dos vãos têm a pegada de uma peça da f0 (364/385 da f10); por pegada contra a cinta humana, a
+troca no lugar casa 118 peças, copiar a f10 casaria 92 e copiar a f0, 108.
+
+**VARIANTE B (igual ao humano) — DOCUMENTADA, NÃO implementada (sem código, desligada):** canaleta da cinta
+passando sobre o nó (B54→U34+U19 também no nó, dono do nó da f0). Exige decisão explícita do usuário e isenção do
+gate 75 (`channel_as_junction_bond`) e da exclusividade de nó da §76.1 **só** para o papel `TOP_BOND_BEAM`.
+Estimativa dos analistas: a variante A perde ~46–70 peças de semelhança em relação à B.
+
+**Implementação:** `opening_reinforcement.plan_top_bond_beam` (planejador), `top_bond_beam_audit` (auditoria
+independente: `TOP_BOND_BEAM_WRONG_COURSE`, `_TIE_ROLE`, `_CHANNEL_AT_NODE` — sempre 0 na variante A —,
+`_BLOCK_NOT_CONVERTED`), `lintel_beam_relation`; `wall_modeling._apply_top_bond_beam`, chamado nos **dois
+caminhos** (None/§80 e CHANNEL) depois da verga, da contraverga e do arranjo (§81/§60–65) e antes da reauditoria
+de amarração. A validação da canaleta não conta a cinta como canaleta sem demanda (`CHANNEL_WRONG_COURSE`/
+`EXTRA_CHANNEL`), mas invasão de vão e colisão continuam valendo para ela. Resultado em `result["top_bond_beam"]`
+(contagens, corridas, achados, relação verga × cinta, auditoria e a última fiada de bloco em `source_course`).
+**REGRA OBRIGATÓRIA (achado na implementação): a cinta nunca decide a paridade dos nós** — as medidas da §82.1
+rodam sobre o resultado FINAL; com a cinta, a fusão dos compensadores escondia o excesso da regra #2 e virava a
+paridade do L da CR-S1 (`tests/test_solver_l_node_alternation_cr_s1.py`). Por isso a §82.1 lê a última fiada como
+ela era antes da cinta (`_without_top_bond_beam`). Famílias de canaleta ausentes (as mesmas 4 da
+verga; a U19 é `MEIA CANALETA - 14x19x19` em `CHANNEL_FAMILY_CATALOG_DEFINITIONS`) → nada muda
+(`applied = False`, `CHANNEL_FAMILY_MISSING`). Pendente: confirmar no Revit que a MEIA CANALETA está carregada no
+`butanta testes` (o nosso motor nunca tinha colocado uma U19).
+
+**Conflitos / atualizações registrados:**
+
+- §51.10 ("a estratégia CHANNEL não gera TOP_BOND_BEAM", cinta PENDENTE no item F de 2026-09-14): a cinta passa a
+  ser gerada como mecanismo **separado** do reforço de abertura, nos dois caminhos; a separação de papéis e a
+  ocupação única continuam.
+- §10.7/§41.3 (CONFLITO "canaleta sempre na última fiada"): neste pavimento do BUTANTÃ a cinta está em 34/34
+  paredes; no prédio inteiro as medições anteriores dão 39–74 % — o conflito geral continua registrado; a chave
+  `TOP_BOND_BEAM_ENABLED` permite desligar por projeto.
+- `docs/decisions/DECISION-TOP-BOND-BEAM.md` continua PENDING no repositório: esta subseção não substitui o
+  registro da autorização literal do usuário (data, opção A, escopo) — cabe a quem integra.
+- §75/§85.10 ("canaleta em nó" sem regressão): na variante A a cinta não acrescenta canaleta em nó.
+
+Testes: `tests/test_top_bond_beam.py` (troca 1:1 sem junta nova, canaleta dupla sobre o vão, bloco de amarração no
+quadrado do nó em T e L, validação, ocupação única com a verga na última fiada, chave desligada, legado, famílias
+ausentes, determinismo, planejador isolado com fusão de compensador e B54 de preenchimento, mutante da variante B
+acusado pela auditoria e pela regra 75).
+
+**Como medir (integrador):** solve NONE de 13 fiadas e `r4_score.py`; conferir `result["top_bond_beam"]["audit"]`
+(CHANNEL_AT_NODE 0, TIE_ROLE 0), `channel_as_junction_bond` vazio, 76.1 igual ao estado sem a cinta e a semelhança
+da f12 (simulação dos analistas: +1,7 pp com a paridade de hoje, ~+2,8 pp com a paridade corrigida).
+
+### 86.8 Passagem livre também sem CHANNEL e apoio preferencial de 40 cm para verga de vão ≥ 140 cm (2026-10-01, IMPLEMENTADO)
+
+**(a) Passagem livre (§51.9) sem a estratégia CHANNEL — chave `FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED = True`.**
+PADRÃO OBSERVADO: o humano não tem verga, cinta nem bloco acima das duas portas de 156 cm da W1 (t 1394–1800, jambas
+a 27 cm dos T) — o nosso NONE tinha verga e duas fiadas de bloco ali (~32 peças sem par). A 51.9 já tinha sido
+aceita pelo usuário (item C, 2026-09-14), mas a §80 a deixou exclusiva do CHANNEL. **Correção (CONFLITO §80 × §51.9
+resolvido a favor da 51.9):** `_presolve_free_to_top` decide a passagem livre também com `strategy=None` (só com a
+§80 ligada) e o reforço estrutural recebe as decisões (`free_to_top`), com o mesmo vão estendido no solve, a mesma
+passagem contínua de face de nó a face de nó e a mesma validação. Desligada = comportamento da §80.
+
+**(b) Apoio preferencial da verga por vão — política `large_span_cm = 140`, `min_support_large_span_cm = 40`,
+`large_span_roles = (ABOVE_OPENING,)`.** PADRÃO OBSERVADO (1 projeto, ainda não confirmado em outros): vãos de
+141 cm (W3.3, W4.0–W4.3) têm 10/10 lados livres com apoio de 59/74 cm; vãos < 140 cm continuam com 14–54 cm (27/29
+lados livres ≥ 19 cm). Regra: na verga de vão ≥ 140 cm o alvo da extensão peça a peça (`_extend_run`) passa de 19
+para 40 cm. É **preferencial**, não mínimo (decisão B de 2026-09-14): continua parando em nó, fim de parede e vazio;
+achados (`CHANNEL_SUPPORT_LIMITED`) e validação (`CHANNEL_SUPPORT_BELOW_POLICY`) continuam medidos contra os 19 cm;
+parar numa amarração já com ≥ 19 cm recebe o rótulo `CHANNEL_STOP_SUPPORT_RULE` (nunca regra 75). A contraverga não
+muda (humano: 141 cm com 74–94 cm, mas 151 cm com 29 cm — sem regra monótona). O alvo fica gravado por abertura em
+`openings[].above/below.preferred_support_cm`. `large_span_cm = None` desliga. Atualiza a §51.4.
+
+Testes: `tests/test_top_bond_beam.py` (passagem livre no NONE e com a chave desligada, presolve pelas duas chaves,
+alvo por vão e papel, verga de 141 cm com ≥ 40 cm nos dois lados, vão de 121 cm idêntico) e
+`tests/test_d16_canaleta_no_t.py` (janela de 145 cm a 40 cm do T: para no nó com ≥ 19 cm, rótulo SUPPORT_RULE).
+
+**Como medir (integrador):** W1 t1394–1800 sem peças acima das portas no NONE; W4.0/W4.1 com apoio 59/74 (os
+analistas preveem as duas vergas idênticas ao humano); contagem de `CHANNEL_STOPS_AT_JUNCTION` com o novo rótulo.
