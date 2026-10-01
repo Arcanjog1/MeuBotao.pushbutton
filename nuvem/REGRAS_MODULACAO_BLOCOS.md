@@ -11578,9 +11578,10 @@ lado da fachada) explicou os dois grupos. Fica como **desempate configurável**.
   §52: com `SMALL_VOID_ORIENTATION_ENABLED = False` o B34 fica na convenção fixa histórica.
 - Verificado no solve real das mini-plantas do corpus (só as paredes envolvidas, sem aberturas, estratégia None):
   W14 e W21 saem **idênticas ao humano** (códigos, posições ±1 cm e lado do vazado menor de cada B34); W22 idêntica com
-  o desempate no início; a W4 (sem as aberturas) reproduz as faixas humanas junto dos quatro nós.
-- Testes: `tests/test_b34_balanced_strip.py` (divisão, composição × fileiras humanas W14/W21/W22, guardas, solve
-  real das mini-plantas, k+1, janela acima do peitoril, determinismo). `tests/test_b34_small_void_alignment.py`
+  o desempate no início; a W9 até o T de meio de parede (âncoras N/G) idêntica; a W4 (sem as aberturas) reproduz
+  as faixas humanas junto dos quatro nós.
+- Testes: `tests/test_b34_balanced_strip.py` (divisão, composição × fileiras humanas W14/W21/W22 e W9 até o T —
+  âncoras N/G —, guardas, solve real das mini-plantas, k+1, janela acima do peitoril, determinismo). `tests/test_b34_small_void_alignment.py`
   (teste GREEN da §52) passou a aceitar que a orientação mude pela semente da 86.3 em vez do giro guloso.
 
 **Compatibilidade:** sem conflito com a §2 (fileira de B34 — mesma composição/tiers), §23.4(a) (as faixas de fiadas
