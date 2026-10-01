@@ -1,0 +1,326 @@
+# Síntese: regras para aproximar o "butanta testes" do humano BUTANTÃ R08_LT (1º pavimento)
+
+**Convenções usadas aqui**
+- W<n> é o índice começando em 0, igual ao de human_rows/readback.
+- O analista de encontros numerava a partir de 1. Converti os números dele: W17 → W16, W25 → W24, W28/W32/W33/W34 → W27/W31/W32/W33.
+- nNN é o id do nó no motor (butanta_dump.json). São os mesmos ids da §75, por exemplo os nós 22 e 28.
+- Os ganhos são oráculos aplicados sobre o NOSSO layout atual, sem rodar o solver de novo. Eles não somam de forma linear.
+
+## 0. Base de medição (pré-requisito, sem risco)
+
+O human_rows.json guarda a caixa da família, com 1 cm a mais de cada lado: B39 aparece com 41 cm, B34 com 36, C04 com 6. Os 6 analistas confirmaram isso.
+
+**Linha de base corrigida**
+- Semelhança: 1429 de 6634 = **21,5%**, não 7,9%.
+- Precisão: 1429 de 7100 = 20,1%.
+
+**Humano normalizado na régua**
+- Juntas coincidentes não isentas: 0 → 36. Todas encostam numa fiada de canaleta ou de calço. Isentando essas fiadas, ficam 0.
+- stacks3: 0 → 6.
+- Furos quebrados: 921 → 348 quando a coluna termina naturalmente na cinta e no calço. Na faixa comum f0–f11 o nosso tem 467.
+
+**Mudanças nos scripts (não no motor)**
+- r4_compare_human.py e r2_eval.py: ler `s85a_glob/human_rows_unpad.json` ou aplicar lo+1 / hi-1.
+- Casamento 1-para-1 pelo centro (±2 cm), mesmo código e mesmo lado do vazado menor.
+- Publicar sempre quatro números: F1 de peça, F1 de juntas, assinatura de fiada e concordância de paridade por encontro. O `run_enc.py` está em `s85a_metric/`.
+- r2_eval `comps_off_jamb`: aceitar compensador encostado (±2,5 cm) na face da parede que cruza, no B54 ou no vão do T. Isso tira cerca de 115 falsos positivos do humano.
+- Régua do prisma v2: a coluna termina sem quebra na cinta e no calço. No motor isso fica em `nuvem/core/engine/prism_free_area.py` `_target_course` (l.169) / `cell_continuity` (l.138).
+- Conferir também `nuvem/benchmark/golden/metrics.py`.
+
+## 1. Contradições entre os analistas e como resolvi
+
+1. **Fase absoluta.** "A parede V passa na f0" acerta só 63% contado encontro a encontro. Já a convenção de fachada aplicada por componente acerta 8/8 cantos externos e 36/50 nós. As duas medidas são compatíveis: a regra só vale para escolher o espelho do componente inteiro, depois que as relações de fase estão decididas. "Vertical" (analista de encontros) e "paralela a Y" (analista global) são a mesma convenção.
+2. **Onde fica um B34 único entre jamba e B54.** Conferi no humano normalizado. Com 2 peças ("B39 B34 B54" / "B19 B34 B54") o B34 fica junto do B54: 62 casos. Com 4–5 peças ("B34 B39 B39 B39 B54") ele fica na jamba: 24 casos. O nosso dá 72 junto do nó, 12 na jamba e 6 no meio, e erra as corridas longas (16+6 casos de "B39×3 B34 B54"). A regra "nunca encosta no B54 (21/21)" do analista de corridas vale só para as corridas longas e foi descartada. Quem decide a posição é a grade da fiada cheia (regra R6), não uma prioridade fixa.
+3. **Achado 1 do pedido é só parcial.** A f12 é cinta em 34/34 paredes; 33 delas são 100% canaleta e a W24 tem 1 C04 na ponta livre. A f13 de C09_DEITADO existe só em 8 paredes (W7 parcial, W18, W25, W26, W27, W31, W32, W33), 57 peças.
+4. **Canaleta sobre o nó junto da jamba (n22/n28 f3/f11, n8 f4; W0 em t=642 e t=1842).** É exatamente a travessia que o usuário REPROVOU na revisão visual do PR #42, origem da §75, e manteve reprovada na D16 (§75.1). Fica bloqueada, sem exceção.
+
+## 2. Regras, em ordem de ganho e risco
+
+### R1. Aberturas na posição ORIGINAL (ganho alto, risco baixo, quase sem código)
+- **Regra:** nenhuma abertura é deslocada para a modulação fechar. O desvio é absorvido na jamba, por faixa de C04/C09, par C09+C04 / B34 ou grade de B34.
+- **Evidência:** humano 44/44 na posição original; nosso 19 deslocadas, 12 de 10 cm e 7 de 5 cm.
+- **Ganho:**
+  - Revocação perto de abertura movida 22,6% contra 67,5% perto de abertura original: +380 a +540 peças, ou +5,8 a +8,2 pp.
+  - Zona de jamba das 19 aberturas: hoje 12% igual.
+  - Acaba com pilaretes de 39/44/59 cm que o humano não tem.
+- **Conflitos:**
+  - Confirma a §25.1, que é REGRA OBRIGATÓRIA.
+  - A §85.4 (até 10 cm) é só uma autorização: fica desligada neste modo.
+  - A §85.10 ("sem mudar posição") foi superada pelo pedido de hoje.
+- **Ação:**
+  - No butanta testes, desfazer os 19 deslocamentos usando a marca `MICROAJUSTE ... orig=x,y`, com `apply_opening_micro_adjustments` no sentido inverso.
+  - Manter `MICRO_ADJUST_IN_BUTTON_FLOW = False` (wall_modeling.py l.4658) e o planejador da §66/§85.4 fora do fluxo.
+  - Junto com o veto da §66: nunca deixar a jamba a menos de 5 cm da face de um nó. Caso real: W11 → apoio -1 cm.
+- **Efeito colateral bom:** os T com menos de 27 cm de espaço voltam aos espaços do humano (n18 12 cm com C04@+10 em todas as fiadas; n30) sem regra nova.
+
+### R2. Espelhamento da fase por COMPONENTE, pela convenção de fachada (ganho alto, risco baixo)
+- **Regra geral:**
+  1. Decididas as relações de fase entre encontros, montar o grafo de nós ligados por trechos de parede sem abertura.
+  2. Cada componente pode ser espelhado inteiro sem mudar o custo de preenchimento.
+  3. Escolher o espelho em que, NA FIADA 0, a parede paralela ao lado maior da caixa envolvente do pavimento ocupa os cantos do contorno externo.
+  4. Componente sem canto externo: decide a maioria dos nós. Empate: fica como está.
+  5. Nenhum id na decisão.
+- **Evidência:**
+  - Humano 8/8 cantos externos, nosso 5/8.
+  - O componente central de 13 nós (W7/W1/W4/W5/W10/W11/W18/W24/W25/W26) está inteiro espelhado no nosso: 11/13 nós.
+  - A busca da §72/§82 inverte um nó por vez, só com melhora estrita, e por isso nunca espelha um componente.
+- **Ganho:**
+  - Nós com a fase do humano: 27 → 36/50.
+  - Semelhança 21,5% → 28,1%, robusto. Só o componente central já dá 29,0%.
+- **Motor:**
+  - wall_stepper.py: novo `_mirror_phase_components_by_facade(...)` em `solve_all_intersections` (l.3022), depois de `_coordinate_arm_role_nodes` (l.2876) e de `_search_tie_parity_fill_balance` (l.4183).
+  - Espelhar = alternar `_tie_parity_flip` nos T/X via `_flip_course` (l.1294) e trocar arms[0]/arms[1] nos L_CORNER.
+  - Decisão única por planta, marcada no nó como na §72, para valer em todas as bandas.
+  - Gates da §82.1: juntas novas, cobertura, compensador junto do nó e guarda de verga.
+- **Teste:** `tests/test_phase_component_mirror.py`.
+  - Planta sintética de 2 cômodos.
+  - Parede Y passa na f0 nos 4 cantos externos.
+  - Custo de preenchimento idêntico antes e depois.
+  - Determinismo em 2 execuções.
+
+### R3. Faixa de B34 EQUILIBRADA entre as duas âncoras (ganho alto, risco médio)
+- **Regra geral:**
+  - Numa corrida entre duas âncoras (ponta que passa P, ponta que para S, B54 N, vão do T G), os B34 de ajuste formam faixas verticais coladas nas âncoras.
+  - A largura k da faixa é a mesma em todas as fiadas: na fiada que passa há k+1 B34, contando a peça de canto; na que encosta há k.
+  - Divisão |kE − kD| ≤ 1: nunca todos numa ponta quando K ≥ 2. Os B39 ficam no miolo.
+  - O B34 ímpar fica no fim do eixo, nas duas fiadas. É desempate configurável: 8/8 paredes de 494 cm, mas W18/W22/W23 fazem o contrário.
+  - Orientação (já igual ao humano): P com vazado menor para a ponta, S e G para dentro, N para o B54.
+- **Evidência:**
+  - P..P com 5 B34: humano 2+3 em 44/44, nosso 1+4 em 33/33.
+  - S..S com 3: humano 1+2 em 42/42.
+  - k_passa = k_encosta + 1: humano 97,5%, nosso 87,2%.
+  - Vazado menor sobre vazado menor: humano 96%, nosso 90%.
+  - Pares de B34: humano 282, nosso 163. Quádruplos: humano 18, nosso 55.
+- **Ganho:**
+  - +5,3 pp nas 11 paredes ponta a ponta, sem mudar a régua.
+  - +6,9 pp em todas as corridas.
+  - Com a paridade corrigida: 29,7% → 38,3–40,1%.
+  - Simulação em 16 paredes cegas: 569 → 1455 de 2123 peças.
+- **Risco:** generalizada, a simulação piorou os septos de 265 para 375 em W0/W2/W3, o que a §85.10 proíbe ("nenhuma regressão"). Implementar primeiro só em trechos nó-a-nó sem abertura.
+- **Conflitos:** nenhum. É compatível com §85.9 (grade de B34) e §85.10 (coluna de B34 até o topo).
+- **Motor:**
+  - wall_stepper.py: novo `_balanced_b34_strip_layout(layout, kind_l, kind_r, kE, kD)`, que reordena a composição já achada por `_pier_ordered_layout` (l.5854), `_continuous_segment_layout` (l.7937), `_greedy_fill_blocks` (l.5576) e `_exact_fill_blocks` (l.5661). Hoje elas põem o B39 primeiro e empurram os B34 para o fim.
+  - K e a divisão são calculados UMA vez por corrida em `_solve_wall_free_fill_impl` (l.8863), para as fiadas A e B saírem coerentes.
+  - Não dá para fazer isso no `b34_run_arrangement.optimize` (l.943): ele só aceita melhora estrita e o par (1,4)→(2,3) exige mover as duas famílias juntas.
+- **Teste:** `tests/test_b34_balanced_strip.py`.
+  - Parede de 494 cm entre T: (2,3) na fiada que passa e (1,2) na que encosta; orientação; invariante k+1.
+  - Fixture: fileiras humanas da W14/W21.
+  - Parede de 444 cm: misto.
+
+### R4. Relação de fase por trecho para TODOS os tipos de nó, incluindo L-L (ganho médio, risco médio, CONFLITO com a §30.5)
+- **Regra geral:**
+  - Entre dois nós consecutivos da mesma parede, "mesma fiada" ou "alterna" é escolhido pelo custo lexicográfico dos trechos livres: primeiro C04+C09+B19, depois o número de B34.
+  - Fecho exato: soma(L+1) = d+1−offA−offB, com off = −7 para a ponta que passa e +8 para a que não passa; no T, 28 com B54 e 8 sem.
+  - Forma fechada para trecho cego, que serve de oráculo de teste: D_eixos mod 40 ≤ 15 → mesma fiada; ≥ 20 → alterna. Humano 26/26, nosso 23/26 (erra W14, W16 e W11 n41–n18).
+  - Trecho com janela: peso 0,25. Trecho com porta: peso 1.
+- **Evidência:** parede entre dois L: humano na mesma fase em 9/9 (W0, W3, W5, W8, W16, W27, W31, W32, W33), nosso 1/9.
+  - Exemplo W16: o humano não usa C04; o nosso usa 12 C04.
+  - W14/W16 do nosso: 24 C04.
+- **Ganho:** com a R2, 36 → 42/50 nós e 29,0–32,1%. É sensível aos pesos (28,3% com porta 0,5). Teto da paridade perfeita: 35,1%.
+- **Conflitos:**
+  - **§30.5 (REGRA OBRIGATÓRIA de alternância de papel)**: contrariada 9/9.
+  - **§30.7 (PADRÃO OBSERVADO)**: já previa isso. Proposta: a 30.5 vira preferência de custo e a 30.7 é promovida.
+  - Atenção: a 30.5 nasceu para evitar o bug da fronteira emprestada (§29.2). Rodar a regressão TGD/TP1.
+  - Precisa de "ok" do usuário.
+- **Motor:**
+  - wall_stepper.py: incluir L_CORNER em `TIE_PARITY_FILL_NODE_KINDS` (l.3985).
+  - Em `_tie_parity_fill_layout_cost` (l.4063): termo "compensadores em trecho sem jamba" antes de `pieces`.
+  - `_arm_role_coordination_graph` (l.2827): `parity = want_diff ^ role_p ^ role_q`, no lugar do 1 fixo.
+  - Rever `_tie_parity_node_under_opening_reach` (l.4139). Ele trava o T da W3 a 27 cm da jamba (t=642 e t=987) e deixa a W14 em "alterna".
+  - Trocar a busca gulosa por busca exata: um bit por componente de arestas cegas, ≤ 23 bits, branch-and-bound ou recozimento com semente fixa, determinístico.
+- **Teste:** `tests/test_phase_relation_cost.py`.
+  - Tabela mod 40 com D ∈ {140, 165, 195, 210, 250, 285, 345, 400, 405, 430, 480}.
+  - Retângulo do shaft com os dois cantos na mesma fiada.
+
+### R5. Altura = 13 fiadas pela face inferior da laje, com calço quando sobra ≥ 9 cm (precisão alta, risco baixo; medir no Revit antes)
+- **Regra:**
+  - Número de fiadas = floor(H_estrutural / 20).
+  - Se sobrar ≥ 9 cm, entra uma camada de C09 deitado (C09 cortado nas pontas) acima da última fiada.
+  - No humano: 26 paredes terminam em z=261; 8 paredes do núcleo (x 537–984, y 645–1144) chegam a 270 com calço. O nosso tem 280 / 14 fiadas.
+- **Ganho:** −568 peças sem par; a precisão vai de 20,1% para 21,9%. O calço acrescenta 57 peças.
+- **Ação:**
+  - Medir no Revit a cota inferior das lajes.
+  - Ajustar a altura das paredes no butanta testes para 260 / 270. O usuário autorizou alterar qualquer coisa no butanta testes; registrar a autorização conforme a §29.
+  - Motor: `num_courses_for_wall_height` (wall_modeling.py l.8808) continua floor(H/20), mais o calço novo.
+- **Conflitos:** §51.8 (PENDENTE) se o calço for usado sobre vão fora da grade. Família: ver seção 4.
+
+### R6. Jamba fechada pela sobra da grade (ganho médio, risco baixo)
+- **Regra geral:**
+  - A zona da jamba continua a grade da fiada cheia de mesma paridade abaixo do peitoril. Em porta e em boneca, a referência é a peça fixa do nó.
+  - A sobra até a face da jamba fecha assim: 0 → nada; 4 → C04; 9 → C09; 14 → C09+C04 (C09 na face); 19 → B19; 24 → C04 + B19 atrás; 29 → C09 + B19 atrás; 34 → B34.
+  - O compensador sempre encosta no vão. O B19 fica na jamba ou logo atrás da faixa.
+  - Disso saem as formas humanas N / K-C04 / K-C09 / A.
+- **Proibido** (REGRA OBRIGATÓRIA da §85.8, com código pendente): compensador isolado seguido de B34 quando compensador menor + B39 fecha. C09|B34 vira C04|B39. Humano 0 casos; nosso 22 fiadas × jamba (W1 79, W1 625, W8 280, W8 444).
+- **Pilarete:**
+  - É a grade cortada nas duas jambas, com no máximo uma faixa e o B19 alternando na outra jamba.
+  - P = 54 vira "B39|C04|C09 / B19|B34" (B34 com o vazado menor sobre a faixa). Isso resolve a pendência da §85.6.
+- **Evidência:**
+  - Humano segue o catálogo em 244/254 (96%), nosso em 103/126.
+  - Orientação do B34 na jamba: 95/95 humano, 37/37 nosso. É invariante; só travar com teste.
+- **Ganho:** +2 a +5 pp somado à R1. Os pilaretes de 69/54 cm da W0/W3 dão +150 a +250 peças.
+- **Motor (b34_run_arrangement.py):**
+  - `_solve_jamb_unit` (l.2439): termo `closure_mismatch` depois de b19/sv e antes de −paths. O desvio do catálogo conta como defeito, para a unidade não sair por "settled".
+  - `_layout_options` (l.2355): gerar a candidata do catálogo explicitamente.
+  - `_jamb_failures` (l.2324): falha dura `B34_PLUS_COMPENSATOR_WHERE_B39_FITS`.
+  - `_coherence_mismatch` (l.2164): estender a referência a portas e bonecas.
+  - `_jamb_units` (l.1522) / `_grid_follow` (l.1743): compor o pilarete com as duas jambas ao mesmo tempo.
+- **Teste:** `tests/test_jamb_remnant_catalog.py`, com as 8 sobras e as 14 composições humanas de pilarete. Somar ao `tests/test_jamb_compensator_alignment.py` o invariante de orientação do B34.
+
+### R7. Cinta de topo na última fiada (f12) (ganho médio; DEPENDE DE DECISÃO DO USUÁRIO)
+- **Regra:**
+  - A última fiada inteira é canaleta contínua, também por cima dos vãos.
+  - Copia peça a peça a grade da fiada par (f0): B39→U39, B34→U34, B19→U19, B54→U34+U19, compensador fundido em U39/U_CUT (§51.3).
+  - Não há fiada de bloco entre a verga (f11) e a cinta.
+  - O dono de cada nó na f12 é o mesmo da f0 (99/100).
+- **Ganho:**
+  - +1,7 pp com a paridade de hoje.
+  - +2,8 pp com a paridade corrigida.
+  - Até cerca de +6 pp se a f0 ficar igual à humana.
+  - Furos quebrados do nosso: −281.
+- **Conflitos:**
+  - DECISION-TOP-BOND-BEAM está PENDING.
+  - §10.7/§41.3: CONFLITO aberto. Neste pavimento a cinta aparece em 34/34 paredes; no prédio inteiro, em 39–74%.
+  - §51.10.
+  - §75/§76.1: a canaleta da cinta passa sobre 46 nós e exerce a amarração.
+  - §85.10: "canaleta em nó" sobe de 2 para 27 e conta como regressão se a régua não isentar o papel da cinta.
+- **Duas variantes para o usuário escolher:**
+  - (A) **Compatível com a §75**: no quadrado do nó continua o bloco de amarração (B34/B54) e o resto da fiada vira canaleta. Perde cerca de 46–70 peças de semelhança em relação a (B).
+  - (B) **Igual ao humano**: EXCEÇÃO PERMITIDA à §75 só para o papel TOP_BOND_BEAM.
+- **Motor:**
+  - opening_reinforcement.py: novo `plan_top_bond_beam`, reaproveitando `COMMON_TO_CHANNEL` (l.74), `_tie_split_rows` (l.821) e `_group_run_members` (l.657).
+  - Chamar em `_apply_opening_reinforcement` (wall_modeling.py l.6042), nos dois caminhos (None e CHANNEL), depois da verga/contraverga, com ocupação única (§51.10).
+  - Só na variante B: isentar TOP_BOND_BEAM em `channel_as_junction_bond` (l.190) e no gate da §76.1.
+  - Exceção: passagem livre (R8).
+- **Teste:** `tests/test_top_bond_beam.py`, cobrindo conversão 1:1, B54→U34+U19, fusão de compensador, ocupação única com ABOVE_OPENING e a isenção restrita ao papel.
+
+### R8. Passagem livre também sem estratégia CHANNEL, e apoio maior para vão grande (ganho pequeno, risco baixo)
+- **Passagem livre (§51.9, já aceita pelo usuário no item C):**
+  - Vão sem peitoril com as duas jambas a ≤ 28,5 cm de nós fica sem verga, sem cinta e sem bloco acima.
+  - Caso: W1 t1394–1800, cerca de −32 peças sem par.
+  - Motor: `_presolve_free_to_top` (wall_modeling.py l.6025) não pode devolver [] quando strategy é None.
+  - Conflito: §80 deixou a 51.9 exclusiva do CHANNEL. Registrar a correção.
+- **Apoio da verga:**
+  - Vão ≥ 140 cm pede apoio ≥ 40 cm. Humano 10/10 lados nos vãos de 141 cm; vão < 140 continua com 19 cm.
+  - Motor: `DEFAULT_CHANNEL_POLICY` (l.105) com `large_span_cm = 140` e `min_support_large_span_cm = 40`; `_extend_run` (l.599).
+  - Registrar na §51.4 como PADRÃO OBSERVADO.
+  - Ganho: +3 a +10 peças; W4.0 e W4.1 ficam idênticas ao humano.
+
+### R9. Tocos e ponta livre (ganho pequeno)
+- **Tocos:**
+  - Trecho de eixo de no máximo 40 cm além da face de uma parede perpendicular, sem abertura e sem outra parede, é sobra da conversão CAD→Walls e não é modulado. O nó vira L.
+  - Casos: W7 (40 cm), W29/W30/W31 (35 cm). São 77 peças que o humano não tem, nos nós n19, n20, n39 e n51.
+  - Ação: estender o corte da extração. O corpus da §49 já tem `meta.corpus.trimmed`, hoje vazio. Alternativa: aparar no butanta testes (autorizado hoje).
+  - Rótulo: PADRÃO OBSERVADO (4/4).
+- **Ponta livre:**
+  - Coluna de C04 em todas as fiadas, com a faixa de B34 no nó da outra ponta.
+  - Só um caso, W24: PADRÃO OBSERVADO AINDA NÃO CONFIRMADO.
+  - Motor: `_axis_free_end_sides` (l.259) e `_wall_end_default_start_cm` (l.7556).
+
+### R10. Orientação do C09 na jamba (sem efeito na semelhança; acerto construtivo)
+- O humano põe 129/129 C09 com o +X local apontando para LONGE do vão. O nosso põe 129/129 ao contrário.
+- A §12 registra como NÃO confirmada a premissa `COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED = True` (wall_modeling.py l.7872).
+- Ação:
+  1. Conferir no Revit pela geometria sólida da família qual lado é fechado.
+  2. Se confirmar, a constante vira False.
+  3. Isentar o C04 em `_compensator_required_mirror` (l.7882); a peça é simétrica, e o humano usa 46 de um jeito e 72 do outro.
+
+## 3. Bloqueado, ou só com decisão explícita do usuário
+
+1. **Canaleta de verga/contraverga contínua sobre o nó quando a jamba encosta no nó** (n22/n28 f3/f11, n8 f4): **BLOQUEADA**. A §75 e a §75.1/D16 foram decididas pelo usuário exatamente sobre esses nós. A exceção da §51.6 foi superada pela §75. Mostrar ao usuário que o humano faz isso, mas não implementar.
+2. **Fiada partida de 9 cm (H9) + C09 deitado em topo fora da grade** (W11 topo 171, W27 topo 91; cerca de 20 peças): §51.8 PENDENTE (item E), em conflito com a solução de duas fiadas de 9 cm do COSTA BEACH (§10.2).
+3. **Cinta f12** (R7) e a escolha de variante: DECISION-TOP-BOND-BEAM.
+4. **§30.5 → preferência de custo** (R4).
+5. **Shaft W27/W33**: o usuário autorizou B54+C09 como preenchimento (§85.8, exceção à §56.3), e isso já foi aplicado na rodada 2. O humano resolve com os dois cantos na mesma fiada (retângulo clássico) e sem B54 no miolo da W33. É CONFLITO: perguntar se a solução humana, que vem com a R4, substitui a exceção.
+6. **Canaleta J** (14 peças, W10 f1 e W18 f9, escada/patamar): não sai da planta e a §51.11 diz que não é usada. Fora do escopo.
+
+## 4. Famílias e tipos
+
+**Já mapeados** (B39, B34, B19, B54, PASTILHA 14x19X4, COMPENSADOR 14x19x9, CANALETA INTEIRA/34, BLOCO CANALETA CORTADO 14x19xVAR):
+- A MEIA CANALETA 14x19x19 (U19) está no §51.11, mas o nosso nunca colocou uma. Confirmar que existe no butanta testes; a R7 precisa dela.
+- **Bug provável:** 3 CHANNEL_U_CUT aparecem com 39 cm no readback e se sobrepõem 14 cm à vizinha (W7 f7/f11, W10 f11). Conferir o parâmetro de instância `Comprimento_bloco` no Revit.
+
+**Usados pelo humano e SEM código no motor** (o grep não acha DEITADO, CHANNEL_J nem _H9). A presença no butanta testes não dá para conferir offline: rodar `list_families`; se faltar, carregar do R08_LT.
+
+| Família | Peças | Usada por |
+|---|---|---|
+| COMPENSADOR 14x19x9 (deitado) | 62 | R5 / 51.8 |
+| COMPENSADOR CORTADO 14x19x9 (deitado) | 8 | R5 / 51.8 |
+| COMPENSADOR CORTADO - 14xVARx9 | 1 | 51.8 |
+| BLOCO 34 CORTADO - 14x9x34 | 4 | 51.8 |
+| MEIO BLOCO CORTADO - 14x9x19 | 4 | 51.8 |
+| BLOCO 54 CORTADO - 14x9x54 | 2 | 51.8 |
+| BLOCO INTEIRO CORTADO - 14x9x39 | 1 | 51.8 |
+| CANALETA J - 14x9-19x19 | 13 | fora do escopo |
+| CANALETA J CORTADA | 1 | fora do escopo |
+
+Para usar qualquer uma delas é preciso criar o código e a altura de 9 cm no catálogo (wall_modeling).
+
+## 5. Plano de execução
+
+Uma etapa por vez, sempre com a mesma medição.
+
+1. **Etapa 0:** régua v2 (seção 0). Linha de base: F1 de peça 20,8–21,5%, F1 de juntas 26,3%, assinatura 61,1%, paridade por encontro 53%.
+2. **Etapa 1:** R1 no Revit (desfazer as 19 aberturas) e solve NONE headless pelo MCP, com 1 processo Python por vez e OPENBLAS_NUM_THREADS=1. Medir.
+3. **Etapa 2:** R2 (espelho por componente).
+4. **Etapa 3:** R3 só em trechos sem abertura; depois estender com gate.
+5. **Etapa 4:** R4, depois do "ok" para a §30.5, mais a regressão TGD/TP1.
+6. **Etapa 5:** R5 (medir as lajes e ajustar as alturas no butanta testes) e R7 conforme a decisão.
+7. **Etapa 6:** R6 e R8.
+8. **Etapa 7:** R9 e R10.
+
+**Gates em cada etapa:**
+- r2_eval v2 por parede, sem regressão em nenhum indicador (§85.10): prisma, vazado menor, septos, juntas, pastilha fora da jamba, B19 fora de fechamento, faixa e canaleta em nó. A única isenção é a decidida para a cinta.
+- `py -3 -m pytest tests/test_script.py -q` mais os testes novos.
+- Determinismo: 2 execuções iguais.
+
+**Meta realista:**
+- R1+R2: cerca de 28–30%.
+- R4: cerca de 32%.
+- R3: cerca de 38–40%.
+- R5–R7: cerca de 40–46%.
+
+Para comparar: o oráculo de paridade + aberturas + cinta por trecho dá 40,2–40,9%, ou 46–49% contando o efeito das aberturas. O oráculo otimista de fase do trecho dá 60,8%.
+
+## 6. Registro obrigatório em `nuvem/REGRAS_MODULACAO_BLOCOS.md`
+
+O CLAUDE.md exige registrar todo conhecimento de amarração. Proponho uma seção nova, §86, com fonte "medição offline BUTANTÃ R08_LT 1º pav., 2026-10-01" e números deste relatório.
+
+**Regras de amarração, como PADRÃO OBSERVADO:**
+- R2 (convenção de fachada por componente);
+- R3 (faixa equilibrada e k+1);
+- R4 (relação de fase por custo e tabela mod 40);
+- R6 (catálogo de sobra, 96%);
+- R8 (apoio ≥ 40 para vão ≥ 140);
+- R9 (tocos).
+
+**Conflitos a registrar:**
+- §30.5 × humano 9/9, promovendo a §30.7;
+- §75 × cinta e canaleta sobre o nó;
+- §85.8 shaft × humano;
+- §80 × §51.9;
+- régua "pastilha fora da jamba" × compensador encostado no nó.
+
+**Atualizações em seções existentes:**
+- §10.7/§41.3: medição de 34/34 paredes neste pavimento;
+- §12: evidência 129/129;
+- §85.6: pilarete de 54 resolvido;
+- §25.1: reconfirmada (44/44).
+
+Tudo que ainda não estiver no código vai marcado "DOCUMENTADO - pendência de código aberta".
+
+**Arquivos de apoio** (offline, nada foi alterado no Revit nem no repositório):
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_glob/` (human_rows_unpad.json, junc.py, comps.py, model3.py, sim2.py);
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_nodes/`;
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_jambs/`;
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_ovh/`;
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_runs/` (simstrip.py);
+- `C:/Users/CIVIX/AppData/Local/Temp/s85a_metric/` (m_common.py, m_sim.py, run_enc.py).
+
+**Regras e motor:**
+- `C:/Users/CIVIX/OneDrive/Área de Trabalho/Scripts.extension/MinhaAba.tab/MeuPainel.panel/MeuBotao.pushbutton/.claude/worktrees/revit-solver-perf-diagnosis-6dfd89/nuvem/REGRAS_MODULACAO_BLOCOS.md`
+- `.../docs/decisions/DECISION-TOP-BOND-BEAM.md`
+- `.../nuvem/core/engine/wall_stepper.py`
+- `.../nuvem/core/engine/b34_run_arrangement.py`
+- `.../nuvem/core/engine/opening_reinforcement.py`
+- `.../nuvem/core/engine/prism_free_area.py`
+- `.../nuvem/core/wall_modeling.py`

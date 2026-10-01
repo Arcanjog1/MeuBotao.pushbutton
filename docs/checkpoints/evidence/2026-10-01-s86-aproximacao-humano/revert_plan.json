@@ -1,0 +1,230 @@
+[
+ {
+  "element_id": 8078984,
+  "delta_xy_cm": [
+   0.0,
+   10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+10.00"
+ },
+ {
+  "element_id": 8078986,
+  "delta_xy_cm": [
+   0.0,
+   10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+10.00"
+ },
+ {
+  "element_id": 8078987,
+  "delta_xy_cm": [
+   0.0,
+   5.0
+  ],
+  "sill_now": 80.0,
+  "h_now": 141.0,
+  "sill_orig": 80.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+5.00 orig=1622.00,2189.00"
+ },
+ {
+  "element_id": 8078989,
+  "delta_xy_cm": [
+   0.0,
+   -10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-10.00 orig=1622.00,1804.01"
+ },
+ {
+  "element_id": 8078990,
+  "delta_xy_cm": [
+   0.0,
+   -10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-10.00 orig=1622.00,2014.01"
+ },
+ {
+  "element_id": 8078991,
+  "delta_xy_cm": [
+   -10.0,
+   0.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+10.00 orig=123.99,7.00"
+ },
+ {
+  "element_id": 8078993,
+  "delta_xy_cm": [
+   -5.0,
+   0.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+5.00 orig=804.00,7.00"
+ },
+ {
+  "element_id": 8078995,
+  "delta_xy_cm": [
+   10.0,
+   0.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 220.99999999999966,
+  "com": "MICROAJUSTE off=-10.00 orig=1484.00,6.99"
+ },
+ {
+  "element_id": 8078996,
+  "delta_xy_cm": [
+   -0.0,
+   5.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 221.0000000000003,
+  "com": "MICROAJUSTE off=+5.00 orig=497.00,1643.99"
+ },
+ {
+  "element_id": 8079001,
+  "delta_xy_cm": [
+   -10.0,
+   -0.0
+  ],
+  "sill_now": 160.0,
+  "h_now": 61.0,
+  "sill_orig": 160.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+10.00"
+ },
+ {
+  "element_id": 8079002,
+  "delta_xy_cm": [
+   0.0,
+   -5.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-5.00 orig=1142.01,2429.00"
+ },
+ {
+  "element_id": 8079003,
+  "delta_xy_cm": [
+   0.0,
+   10.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+10.00 orig=1142.01,2174.00"
+ },
+ {
+  "element_id": 8079008,
+  "delta_xy_cm": [
+   -5.0,
+   0.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 220.9999999999995,
+  "com": "MICROAJUSTE off=+5.00 orig=710.00,651.99"
+ },
+ {
+  "element_id": 8079009,
+  "delta_xy_cm": [
+   10.0,
+   0.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-10.00 orig=499.99,486.99"
+ },
+ {
+  "element_id": 8079010,
+  "delta_xy_cm": [
+   10.0,
+   0.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 220.99999999999983,
+  "com": "MICROAJUSTE off=-10.00 orig=745.00,486.99"
+ },
+ {
+  "element_id": 8079013,
+  "delta_xy_cm": [
+   0.0,
+   -10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-10.00 orig=1622.00,625.00"
+ },
+ {
+  "element_id": 8079014,
+  "delta_xy_cm": [
+   0.0,
+   -10.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-10.00 orig=1622.00,815.01"
+ },
+ {
+  "element_id": 8079015,
+  "delta_xy_cm": [
+   0.0,
+   -5.0
+  ],
+  "sill_now": 100.0,
+  "h_now": 121.0,
+  "sill_orig": 100.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=-5.00 orig=1622.00,1360.01"
+ },
+ {
+  "element_id": 8079019,
+  "delta_xy_cm": [
+   0.0,
+   5.0
+  ],
+  "sill_now": 0.0,
+  "h_now": 221.0,
+  "sill_orig": 0.0,
+  "head_orig": 221.0,
+  "com": "MICROAJUSTE off=+5.00 orig=407.01,580.00"
+ }
+]

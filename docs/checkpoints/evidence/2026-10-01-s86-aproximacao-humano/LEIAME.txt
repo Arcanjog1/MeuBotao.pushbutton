@@ -1,0 +1,31 @@
+# Evidência — §86 aproximação do projeto humano BUTANTÃ R08_LT (2026-10-01)
+
+Dados e scripts da rodada 4 (comparação do `butanta testes` com o humano). Somente leitura da referência.
+
+| Arquivo | O que é |
+|---|---|
+| `human_rows_unpad.json` | Humano (1º pav. do R08_LT) no formato de fileiras `{"<parede>:<fiada>": [[lo, hi, código, células, id]]}`, caixa normalizada (−1 cm de cada lado), índice de parede = corpus de 34 eixos |
+| `r4_ref_extract.py` | Extração somente-leitura das peças e aberturas do R08_LT no Revit (IronPython, via MCP) |
+| `r4_human_rows.py` | Converte a extração em fileiras por parede/fiada |
+| `r4_score.py` | Placar: F1 de peças 1:1 e qualidade f0–11 (candidato × humano) |
+| `r2_eval.py` | Régua independente de qualidade (furos/prisma, vazado menor, septos, juntas, pastilhas, B19, faixas, canaleta em nó) |
+| `export_r4.py`, `sol_to_rows.py`, `run_r4.sh` | Cálculo completo offline com o motor de um checkout (aberturas originais, `COURSES` fiadas) → fileiras → placar |
+| `placar_base13.txt`, `placar_base14.txt` | Placar do motor 88a67c8 com aberturas originais, 13 e 14 fiadas |
+| `revert_plan.json` | As 19 aberturas que o microajuste deslocou e o deslocamento de volta aplicado no `butanta testes` |
+| `r4_revit_prep.py` | Script aplicado no `butanta testes` (aberturas na posição original + paredes 260 cm) |
+| `r4_synthesis.txt` | Síntese da análise do humano (regras R1–R10 com números, conflitos e plano) |
+
+Arquivos grandes mantidos só no checkpoint local `.claude/checkpoints/2026-10-01-s86-humano/` (não versionado):
+
+| Arquivo | SHA-256 |
+|---|---|
+| `ref_1pav.json` (extração bruta, 6 634 peças) | `d1aa39b9e8735c9b865cd921ac82464950e05162128b63da2d4d8e572ca067bb` |
+| `human_rows_unpad.json` (versionado aqui) | `faf7f3e86bf5280cc3f144de72de878d10393124b14eb53a9501fbb9633945cf` |
+| `sol_base13.json` | `e4bd08b62f095b996ffcaff6cd4041edb6acc6efc814f1b933075728d22d5d55` |
+| `sol_base14.json` | `3c332021ca2ae792ea77a3de683133bf12f96da8ec6e28111f208ebfb442b41f` |
+| `rows_base13.json` | `35d31751ba99266eb0772134ed583ac9339d1872e25d3dc6d8b05152d2341f11` |
+| `rows_base14.json` | `355e1e9ff3ba5ffaf4bbb94b60c7e086b012aee4e711a5a21b69ed84a6ec24ab` |
+| `r4_analysis.json` (achados dos 6 analistas + síntese) | `bfe533a0fe7557ed41b6201fb4ff9bdaaf16adc90da56811a6a565ff8858906d` |
+
+Os scripts usam caminhos da máquina de trabalho (`%TEMP%/s85r4`); `r4_score.py` lê `human_rows_unpad.json` da
+própria pasta.

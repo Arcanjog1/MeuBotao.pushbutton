@@ -11514,3 +11514,94 @@ Revit).
 Testes: `tests/test_jamb_compensator_alignment.py` (W1 real, pilar de referência do usuário, régua por
 área, B19 no miolo), `tests/test_opening_micro_adjust_mover.py` (marca, teto total, Pinned, plano
 externo por ElementId).
+
+## 86. Aproximacao do projeto humano BUTANTA R08_LT (2026-10-01)
+
+Pedido do usuário (2026-10-01): "observe e analise como foi feito no projeto HUMANO (BUTANTÃ - R08_LT, 1º
+pavimento — basicamente a mesma planta do `butanta testes`; a posição das aberturas pode ter mudado) e tente
+chegar no resultado mais próximo possível AJUSTANDO AS REGRAS e como o CÁLCULO de modulação funciona, SEM
+COPIÁ-LO; pode alterar qualquer coisa no `butanta testes`". A referência humana é só lida (nunca alterada).
+Toda regra desta seção é **PADRÃO OBSERVADO no humano** (fonte: extração somente-leitura do R08_LT no Revit,
+6 634 peças do 1º pavimento, 44 aberturas, 2026-10-01) até o usuário confirmar; o que contraria regra anterior
+está marcado CONFLITO. As subseções 86.2–86.10 seguem a numeração das regras R2–R10 da síntese da análise
+(`docs/checkpoints/evidence/2026-10-01-s86-aproximacao-humano/r4_synthesis.txt`).
+
+### 86.0 Régua da comparação com o humano (medição, não regra de modulação)
+
+- O humano extraído guarda a caixa da família com 1 cm a mais de cada lado (B39 aparece com 41 cm). A comparação
+  usa as fileiras normalizadas (`human_rows_unpad.json`): peça igual = mesma parede e fiada, mesmo código
+  normalizado (canaleta pelo comprimento, `_H9` → base), mesmo lado do vazado menor no B34 e centro a ±2 cm,
+  casamento 1:1; publica precisão, revocação e F1 (`r4_score.py`). Qualidade pela régua independente
+  (`r2_eval.py`) nas fiadas 0–11 (a 12 do humano é cinta).
+- **Medido (2026-10-01)** — F1 de peças contra o humano:
+
+  | Estado | F1 | Peças (candidato) | Furos quebrados f0–11 | Septos sem apoio | Pastilhas |
+  |---|---|---|---|---|---|
+  | `butanta testes` no Revit (rodada 2 + W1, 19 aberturas deslocadas, 14 fiadas) | 20,8 % | 7 100 | 467 | 265 | — |
+  | Motor 88a67c8, aberturas ORIGINAIS, 14 fiadas | 24,2 % | 7 062 | 669 | 264 | 393 |
+  | Motor 88a67c8, aberturas ORIGINAIS, 13 fiadas | 26,4 % | 6 492 | 630 | 239 | 387 |
+  | HUMANO (piso de ruído da régua) | — | 6 634 | 407 | 60 | 486 |
+
+- Maior perda medida: paredes inteiras com as fiadas pares/ímpares trocadas em relação ao humano (W18 sai idêntica
+  ao humano com a fase invertida; W15, W20, W24, W25, W26 em 0 %) — ver 86.2.
+
+### 86.1 Aberturas na posição ORIGINAL (R1) — REGRA OBRIGATÓRIA (reconfirma a §25.1)
+
+- O humano tem 44/44 aberturas na posição original; o `butanta testes` tinha 19 deslocadas pelo microajuste
+  (12 de 10 cm e 7 de 5 cm). Perto de abertura deslocada a revocação era 22,6 % contra 67,5 % perto de abertura
+  original, e o deslocamento criava pilaretes de 39/44/59 cm que o humano não tem.
+- REGRA: nenhuma abertura é deslocada para a modulação fechar; o desvio é absorvido na jamba (86.6). A §85.4
+  (deslocamento até 10 cm) fica só como autorização desligada; `MICRO_ADJUST_IN_BUTTON_FLOW = False`.
+- **APLICADO no `butanta testes` (2026-10-01)**: as 19 aberturas voltaram à posição original (desvio máximo das 44
+  para a geometria do corpus 0,0005 cm), comentários `MICROAJUSTE` limpos; plano em
+  `evidence/2026-10-01-s86-aproximacao-humano/revert_plan.json`.
+
+### 86.5 Altura: 13 fiadas e calço (R5)
+
+- O humano termina 26 paredes em z = 261 (13 fiadas) e leva as 8 do núcleo (x 537–984, y 645–1144) a 270 com
+  uma camada de C09 deitado (57 peças) sobre a cinta (W7 parcial, W18, W25, W26, W27, W31, W32, W33).
+- REGRA (PADRÃO OBSERVADO): número de fiadas = floor(H / 20); sobrando ≥ 9 cm, camada de C09 deitado.
+- **APLICADO no `butanta testes` (2026-10-01)**: as 46 paredes passaram de 280 para 260 cm (13 fiadas).
+  **DOCUMENTADO - pendência de código aberta**: a camada de C09 deitado (família `COMPENSADOR 14x19x9 (deitado)`
+  existe no arquivo, sem código no catálogo); as 8 paredes do núcleo ficam em 260 até o calço existir.
+
+### 86.11 Índice das regras R1–R10, bloqueios e conflitos (estado em 2026-10-01)
+
+Resumo para nada se perder se uma subseção ainda não estiver integrada (detalhe e números em cada 86.x e na
+síntese versionada):
+
+- **R2 (86.2) — espelho da fase por COMPONENTE pela convenção de fachada (AMARRAÇÃO, PADRÃO OBSERVADO)**: decididas
+  as relações de fase entre encontros, cada componente do grafo (nós ligados por trechos sem abertura) pode ser
+  espelhado inteiro sem mudar o custo de preenchimento; escolhe-se o espelho em que, na fiada 0, a parede paralela
+  ao lado maior da caixa do pavimento ocupa os cantos do contorno externo. Humano 8/8 cantos externos, nosso 5/8;
+  componente central de 13 nós inteiro espelhado no nosso. Nós com a fase do humano 27 → 36/50 (oráculo).
+- **R4 (86.2) — relação de fase por trecho para TODOS os tipos de nó, incluindo L–L (AMARRAÇÃO)**: "mesma fiada" ou
+  "alterna" entre dois nós consecutivos pelo custo lexicográfico dos trechos livres (C04+C09+B19 primeiro, depois
+  B34); trecho cego: D_eixos mod 40 ≤ 15 → mesma fiada, ≥ 20 → alterna (humano 26/26). Parede entre dois L: humano
+  na mesma fase 9/9, nosso 1/9. **CONFLITO com a §30.5 (REGRA OBRIGATÓRIA de alternância de papel)** — o humano a
+  contraria 9/9; proposta: §30.5 vira preferência de custo e a §30.7 é promovida. Precisa de "ok" do usuário.
+- **R3 (86.3) — faixa de B34 EQUILIBRADA entre as duas âncoras (AMARRAÇÃO)**: |kE − kD| ≤ 1, largura k igual em
+  todas as fiadas (k+1 na fiada que passa contando a peça de canto), B39 no miolo, B34 ímpar no fim do eixo.
+  P..P com 5 B34: humano 2+3 em 44/44, nosso 1+4 em 33/33.
+- **R6 (86.6) — jamba fechada pela sobra da grade**: 0 nada; 4 C04; 9 C09; 14 C09+C04 (C09 na face); 19 B19; 24
+  C04+B19; 29 C09+B19; 34 B34; compensador sempre encostado no vão. Proibido C09|B34 onde C04|B39 fecha (humano 0
+  casos, nosso 22). Humano segue o catálogo em 244/254. Pilarete P = 54: "B39|C04|C09 / B19|B34".
+- **R7 (86.7) — cinta de topo na última fiada**: f12 é canaleta contínua em 34/34 paredes do humano (copia a grade da
+  f0; dono do nó na f12 = dono na f0, 99/100). **CONFLITO com a §75/§76.1** (canaleta nunca amarra): o humano passa
+  a cinta sobre 48/50 nós. Variante A (em implementação, compatível com "canaleta nunca serve de amarração", pedido
+  do usuário de 2026-10-01): bloco de amarração no quadrado do nó e o resto canaleta. Variante B (igual ao humano)
+  exige EXCEÇÃO à §75 só para TOP_BOND_BEAM — decisão do usuário.
+- **R8 (86.8)** — passagem livre (§51.9) também sem CHANNEL (**CONFLITO com a §80**, que a deixou só no CHANNEL);
+  verga de vão ≥ 140 cm com apoio ≥ 40 cm (humano 10/10).
+- **R9 (86.9) — tocos**: trecho de eixo ≤ 40 cm além da face de uma parede perpendicular, sem abertura nem outra
+  parede, é sobra da conversão CAD→Walls e não é modulado (W7, W29/W30/W31; 77 peças que o humano não tem).
+- **R10 (86.10) — orientação do C09 na jamba**: humano 129/129 com o +X local para LONGE do vão, nosso 129/129 ao
+  contrário; a premissa da §12 (`COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED`) segue NÃO confirmada.
+- **BLOQUEADO (decisão já tomada pelo usuário)**: canaleta de verga/contraverga contínua sobre o nó quando a jamba
+  encosta no nó (n22/n28 f3/f11, n8 f4) — o humano faz, a §75/§75.1 (D16) proíbe; não implementar.
+- **PENDENTE**: fiada partida de 9 cm (H9) + C09 deitado em topo fora da grade (W11 171, W27 91; §51.8); shaft
+  W27/W33 — o humano fecha com os dois cantos na mesma fiada, sem B54 no miolo, CONFLITO com a exceção B54+C09 da
+  §85.8 (perguntar se a solução humana, que vem com a R4, substitui a exceção); canaleta J (escada) fora do escopo.
+- **Estado do código (2026-10-01, ainda NÃO integrado na branch de trabalho)**: R3 implementada (branch
+  `worktree-wf_ff7686b5-095-2`, commits e48d38c/fea1b17); R2/R4, R7A/R8 em implementação; R6/R10 e R9 na fila.
+  R1 e R5 aplicadas no `butanta testes` (dados, sem código).
