@@ -6525,7 +6525,12 @@ def test_fiadas_de_mesma_paridade_repetem_com_o_default():
         nodes, walls, end_to_node, [[]], CATALOG, ft(0.0), 15,
     )
     assert res["error"] is None
-    cc = res["course_candidates"]
+    # SECAO 86.7 (2026-10-01): a ultima fiada (14) e' a CINTA DE TOPO - troca peca a
+    # peca da grade por canaleta. A GRADE dela (a fiada de bloco de antes da troca)
+    # continua igual a' da fiada 0; a troca em si e' coberta por test_top_bond_beam.py
+    if res.get("top_bond_beam"):
+        assert res["top_bond_beam"]["course_index"] == 14 and res["top_bond_beam"]["counts"]["channel_pieces"]
+    cc = m._without_top_bond_beam(res)["course_candidates"]
 
     def assinatura(ci):
         return sorted(

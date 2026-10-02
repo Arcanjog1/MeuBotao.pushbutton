@@ -234,6 +234,11 @@ def test_t_realmente_sem_espaco_fica_nao_resolvido_com_motivo_e_sem_invadir_aber
 def test_t_longe_de_abertura_fica_identico_com_e_sem_a_secao_79():
     novo, walls, _n, _o, _pf, ni = _solve("normal")
     velho, walls_v, _n2, _o2, _pf2, _ni2 = _solve("normal", tcr.LEGADO_HISTORICO)
+    # SECAO 86.7: o produto tem a cinta de topo (mecanismo separado, que o legado
+    # historico nao tem): o legado com a cinta aplicada por cima e' identico
+    cinta = orf.plan_top_bond_beam(velho["course_candidates"], walls_v, velho["num_courses"], nodes=_n2)
+    assert novo["top_bond_beam"]["counts"] == cinta["counts"]
+    velho = dict(velho, course_candidates=cinta["course_candidates"])
     assert tcr.physical_signature(novo, walls) == tcr.physical_signature(velho, walls_v)
     assert _pecas_do_no(novo, ni) == _pecas_do_no(velho, ni)     # mesma paridade, mesma peca
     assert novo["missing_required_junction_bond"] == []

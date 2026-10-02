@@ -221,13 +221,20 @@ def _mini_rows(wall, odd_at_end=True, enabled=True, openings=()):
     idx = MINI[wall]
     sub = dict(GEO, walls=[GEO["walls"][i] for i in idx], openings=list(openings))
     antes = (ws.BALANCED_B34_STRIP_ENABLED, ws.BALANCED_B34_STRIP_ODD_AT_AXIS_END)
+    # 2 fiadas de BLOCO: a cinta de topo (86.7) trocaria a ultima por canaleta - aqui
+    # so' interessa a faixa de B34 das fiadas de bloco
+    cinta_antes = getattr(m, "TOP_BOND_BEAM_ENABLED", None)
     ws.BALANCED_B34_STRIP_ENABLED = enabled
     ws.BALANCED_B34_STRIP_ODD_AT_AXIS_END = odd_at_end
+    if cinta_antes is not None:
+        m.TOP_BOND_BEAM_ENABLED = False
     try:
         ctx = S.build_context(sub)
         res = S.solve(ctx, True, geo=sub, courses=2, strategy=None)
     finally:
         ws.BALANCED_B34_STRIP_ENABLED, ws.BALANCED_B34_STRIP_ODD_AT_AXIS_END = antes
+        if cinta_antes is not None:
+            m.TOP_BOND_BEAM_ENABLED = cinta_antes
     wi = len(idx) - 1
     line = ctx["walls"][wi][0]
     p0, p1 = line.GetEndPoint(0), line.GetEndPoint(1)

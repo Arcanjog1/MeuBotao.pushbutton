@@ -128,6 +128,12 @@ def channel_count(result):
     return sum(1 for v in result["course_candidates"].values() for c in v if orf.is_channel_code(c["logical_code"]))
 
 
+def opening_channel_count(result):
+    """Canaletas de REFORCO DE ABERTURA (sem a cinta de topo da secao 86.7)."""
+    return sum(1 for v in result["course_candidates"].values() for c in v
+               if orf.is_channel_code(c["logical_code"]) and not orf.is_top_bond_beam_piece(c))
+
+
 # --------------------------------------------------------------- fixtures
 def free_wall():
     """Parede livre de 600 cm: porta [200,300] e janela [400,520] peitoril 100."""
@@ -192,8 +198,19 @@ def test_product_none_has_lintel_and_sill_channel_only_in_those_courses(monkeypa
     assert plano["strategy"] is None and plano["scope"] == m.OPENING_STRUCTURAL_SCOPE
     fiadas = set(r["course_index"] for r in plano["runs"])
     assert channel_count(produto) > 0 and fiadas
+    # SECAO 86.7: a ultima fiada e' a do motor sem a secao 80 com a CINTA DE TOPO
+    # (troca peca a peca, papel TOP_BOND_BEAM) - mecanismo separado da abertura
+    topo = NUM_COURSES - 1
+    assert topo not in fiadas
+    esperado_topo = orf.plan_top_bond_beam(sem80["course_candidates"], walls0, NUM_COURSES,
+                                           nodes=_n0)["course_candidates"][topo]
     for ci, pecas in produto["course_candidates"].items():
         canal = [c for c in pecas if orf.is_channel_code(c["logical_code"])]
+        if ci == topo:
+            assert canal and all(orf.is_top_bond_beam_piece(c) for c in canal)
+            assert sorted(orf._physical_key(c) for c in pecas) == sorted(
+                orf._physical_key(c) for c in esperado_topo)
+            continue
         if ci not in fiadas:
             assert not canal, ci
             assert sorted(orf._physical_key(c) for c in pecas) == sorted(
@@ -268,9 +285,17 @@ def test_window_gets_channel_on_head_and_one_course_under_sill():
         assert counts[key] == 0, key
 
 
-def test_top_course_above_window_is_not_a_second_channel():
-    """Cinta de topo e' mecanismo separado: CHANNEL nao duplica o reforco."""
+def test_top_course_above_window_is_not_a_second_channel(monkeypatch):
+    """Cinta de topo e' mecanismo separado: CHANNEL nao duplica o reforco.
+    SECAO 86.7: a ultima fiada (13) e' a CINTA DE TOPO (papel TOP_BOND_BEAM, nunca
+    ABOVE_OPENING) e a fiada entre a verga e a cinta (12) continua de bloco; com a
+    chave da cinta desligada, nenhuma canaleta acima da verga."""
     lines, ops = free_wall()
+    res, walls, _n, _o = solve(lines, ops)
+    assert not any(orf.is_channel_code(c) for c in codes_over(res, walls, 0, 12, 0, 600))
+    topo = [r["cand"] for r in strip(res, walls, 0, 13)]
+    assert topo and all(orf.is_top_bond_beam_piece(c) for c in topo)
+    monkeypatch.setattr(m, "TOP_BOND_BEAM_ENABLED", False)
     res, walls, _n, _o = solve(lines, ops)
     for ci in (12, 13):
         assert not any(orf.is_channel_code(c) for c in codes_over(res, walls, 0, ci, 0, 600))
@@ -426,7 +451,9 @@ def test_passage_with_both_jambs_on_junction_ties_is_free_to_top():
     for ci in (11, 12, 13):
         assert codes_over(legacy, walls, 0, ci, 227, 473)  # legado fecha acima do vao
         assert codes_over(res, walls, 0, ci, 227, 473) == []
-    assert channel_count(res) == 0
+    # nenhuma canaleta de abertura (a cinta de topo da secao 86.7, fora do vao, e'
+    # outro mecanismo e e' interrompida na passagem)
+    assert opening_channel_count(res) == 0
     assert rein["validation"]["counts"]["MISSING_REQUIRED_CHANNEL"] == 0
 
 
@@ -466,7 +493,10 @@ def test_opening_reaching_wall_top_gets_no_top_channel():
     res, _w, _n, _o = solve(lines, [[(ft(200), ft(300), ft(0), ft(280))]])
     rec = res["opening_reinforcement"]["openings"][0]
     assert rec["above"]["status"] == "REACHES_WALL_TOP"
-    assert channel_count(res) == 0
+    # nenhuma canaleta de abertura; a cinta de topo (86.7) fica fora do vao
+    assert opening_channel_count(res) == 0
+    assert codes_over(res, _w, 0, NUM_COURSES - 1, 200, 300) == []
+    assert res["opening_reinforcement"]["validation"]["counts"]["CHANNEL_INVADES_OPENING"] == 0
 
 
 # ---------------------------------------------------------- validador

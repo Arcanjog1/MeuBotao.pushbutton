@@ -173,11 +173,27 @@ def test_t28_like_jamba_a_5_cm_da_face_para_com_o_apoio_que_sobra():
 
 
 def test_jamba_longe_do_no_nao_para():
-    res, walls, nodes, openings = _solve(_t20_like(jamba=FACE_R + 40.0))
+    # SECAO 86.8: a janela de 145 cm e' vao grande (apoio preferencial de 40 cm na
+    # verga); o contrato original da D16 (alvo de 19 cm) e' medido com a regra desligada
+    lines, ops = _t20_like(jamba=FACE_R + 40.0)
+    res, walls, nodes, openings = tcr.solve(lines, ops, strategy=None, policy={"large_span_cm": None})
     linha = res["opening_structural_trace"][0]
     assert linha["lintel_stopped_by_junction"] is False and linha["sill_stopped_by_junction"] is False
     assert min(linha["lintel_left_support"], linha["lintel_right_support"]) >= 19.0 - 1e-6
     assert res["channel_stopped_by_junction"] == []
+
+
+def test_jamba_longe_do_no_verga_de_vao_grande_para_no_no_com_o_apoio_preferencial_51_4():
+    """SECAO 86.8: com o alvo de 40 cm a verga da janela de 145 cm segue ate' a
+    amarracao do T a 40 cm; para la' com >= 19 cm (o preferencial da 51.4 ja'
+    atingido - rotulo SUPPORT_RULE, nunca regra 75) e a contraverga nao muda."""
+    res, walls, nodes, openings = _solve(_t20_like(jamba=FACE_R + 40.0))
+    linha = res["opening_structural_trace"][0]
+    assert linha["sill_stopped_by_junction"] is False
+    assert min(linha["lintel_left_support"], linha["lintel_right_support"]) >= 19.0 - 1e-6
+    for parada in res["channel_stopped_by_junction"]:
+        assert parada["role"] == "LINTEL" and parada["reason"] == m.CHANNEL_STOP_SUPPORT_RULE, parada
+    assert _sem_48(res, walls, openings)
 
 
 # ------------------------------------------------------------------ reserva geometrica do no'

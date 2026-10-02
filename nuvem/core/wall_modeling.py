@@ -3929,6 +3929,22 @@ BOND_TRACE_ENABLED = True
 # (`opening_structural_trace`). Desligada = motor historico sem verga
 # (sentinela LEGADO_HISTORICO dos testes).
 OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True
+# SECAO 86.7 (2026-10-01, aproximacao do humano BUTANTA R08_LT) - CINTA DE TOPO
+# (TOP_BOND_BEAM), VARIANTE A: a ULTIMA fiada vira canaleta continua (tambem
+# sobre os vaos) trocando peca a peca a grade ja' resolvida (B39->U39,
+# B34->U34, B19->U19, compensador fundido em U39/U_CUT), mas no quadrado de
+# cada no' L/T/X continua o BLOCO de amarracao - canaleta nunca amarra (regra
+# 75). Mecanismo SEPARADO do reforco de abertura, nos dois caminhos (None e
+# CHANNEL), depois da verga/contraverga e do arranjo, com ocupacao unica
+# (51.10). Precisa das familias de canaleta (as mesmas da verga). Desligada =
+# ultima fiada de bloco, como antes. Ver opening_reinforcement.plan_top_bond_beam.
+TOP_BOND_BEAM_ENABLED = True
+# SECAO 86.8 (2026-10-01) - PASSAGEM LIVRE (51.9, aceita pelo usuario no item C)
+# tambem sem a estrategia adicional CHANNEL: vao sem peitoril com as duas jambas
+# a <= 28,5 cm de nos fica sem verga, sem cinta e sem alvenaria acima (humano
+# W1 t1394-1800). Corrige a restricao da secao 80 (51.9 so' no CHANNEL). So' com
+# a secao 80 ligada (reforco estrutural). Desligada = comportamento da secao 80.
+FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED = True
 OPENING_STRUCTURAL_SCOPE = "OPENING_STRUCTURAL"
 LINTEL_CREATED = "LINTEL_CREATED"
 LINTEL_NOT_REQUIRED = "LINTEL_NOT_REQUIRED"
@@ -5540,10 +5556,27 @@ def _tie_parity_compensator_crowding(result, nodes, walls_to_create, catalog, fl
     return out
 
 
+def _without_top_bond_beam(result):
+    """SECAO 86.7: a cinta de topo e' pos-passe que COPIA a grade da ultima fiada;
+    ela nunca pode decidir a paridade dos nos. As medidas da 82.1 leem a ultima
+    fiada como ela era ANTES da cinta (`top_bond_beam.source_course`) - sem isso a
+    fusao dos compensadores na canaleta escondia o excesso da regra #2 e virava a
+    paridade de um no' (medido no L da CR-S1)."""
+    beam = (result or {}).get("top_bond_beam") or {}
+    fonte = beam.get("source_course")
+    if fonte is None or beam.get("course_index") is None:
+        return result
+    course_candidates = dict(result.get("course_candidates") or {})
+    course_candidates[beam["course_index"]] = fonte
+    return dict(result, course_candidates=course_candidates)
+
+
 def _tie_parity_real_fill_violations(result, nodes, walls_to_create, openings_per_wall, catalog, base_z_abs,
                                      flipped):
     """SECAO 82.1: as violacoes do preenchimento real na regiao de cada no' invertido
-    (regra #1, cobertura, regra #2), cada uma com uma identidade comparavel."""
+    (regra #1, cobertura, regra #2), cada uma com uma identidade comparavel.
+    A grade medida e' a de bloco (sem a cinta de topo da secao 86.7)."""
+    result = _without_top_bond_beam(result)
     out = []
     for v in _tie_parity_prism_violations(result, nodes, walls_to_create, openings_per_wall, catalog,
                                           base_z_abs, flipped):
@@ -6056,12 +6089,15 @@ def _free_to_top_band(catalog, base_z_abs):
 
 def _presolve_free_to_top(nodes, walls_to_create, openings_per_wall, catalog, base_z_abs, num_courses,
                           strategy, policy):
-    """Decisoes de passagem livre (so' CHANNEL). None/estrategia desconhecida
-    -> [] (a estrategia desconhecida continua sendo rejeitada no pos-passe)."""
-    if strategy is None:
-        return []
+    """Decisoes de passagem livre (51.9). CHANNEL: sempre. None (sem reforco
+    adicional): so' com a secao 80 e FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED (SECAO
+    86.8); senao []. Estrategia desconhecida -> [] (continua sendo rejeitada no
+    pos-passe)."""
     from core.engine import opening_reinforcement as _reinforcement
-    if strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
+    if strategy is None:
+        if not (OPENING_STRUCTURAL_REINFORCEMENT_ENABLED and FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED):
+            return []
+    elif strategy not in _reinforcement.OPENING_REINFORCEMENT_STRATEGIES:
         return []
     step, _error = _course_height_ft(catalog, None)
     if step is None:
@@ -6080,9 +6116,11 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     estrategia adicional (que ja' inclui verga e contraverga)."""
     if strategy is None:
         if OPENING_STRUCTURAL_REINFORCEMENT_ENABLED:
+            # SECAO 86.8: as passagens livres decididas antes do solve (51.9 sem CHANNEL)
             return _apply_opening_structural_reinforcement(
                 result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog, base_z_abs,
-                num_courses, policy=policy, pieces_available=structural_channel_available)
+                num_courses, policy=policy, pieces_available=structural_channel_available,
+                free_to_top=free_to_top)
         if GENERAL_COMPOSITION_QUALITY_ENABLED and isinstance(result, dict) and result.get("error") is None:
             # SECAO 81 sem a secao 80: o arranjo geral roda sobre as fiadas do solve
             _general_composition_arrangement(result, nodes, walls_to_create, end_to_node, openings_per_wall,
@@ -6142,6 +6180,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
             result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
             free_to_top=plan["free_to_top"], policy=plan["policy"],
             reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    # SECAO 86.7: cinta de topo DEPOIS da verga/contraverga e do arranjo (copia a
+    # grade final da ultima fiada) e ANTES da reauditoria de amarracao
+    _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
+                         base_z_abs, pieces_available=True)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
@@ -6286,17 +6328,20 @@ def _fill_opening_trace_ids(solve_result, walls_to_create, all_openings, created
 
 
 def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_to_node, openings_per_wall,
-                                            catalog, base_z_abs, num_courses, policy=None, pieces_available=True):
+                                            catalog, base_z_abs, num_courses, policy=None, pieces_available=True,
+                                            free_to_top=None):
     """SECAO 80 - REFORCO ESTRUTURAL DA ABERTURA sem a estrategia adicional.
 
     Verga e contraverga pelo MESMO planejador provado no CHANNEL
     (`plan_channel_reinforcement`: fiada acima do topo / cujo topo e' o
     peitoril, pecas da propria fiada convertidas em canaleta, corrida peca a
-    peca, parada em amarracao - regra 75), com `free_to_top=[]`: a passagem
-    livre 51.9 nao e' decidida aqui (continua so' no CHANNEL). Depois: a mesma
-    validacao da canaleta, a reauditoria com o catalogo logico de canaletas, a
-    fonte unica candidates/collisions e o gate da regra 75. NAO roda: 51.9,
-    51.14 (paridade por causa da canaleta), arranjo 60-65 e 58.2/68/71/72.
+    peca, parada em amarracao - regra 75), com as passagens livres 51.9 JA'
+    decididas antes do solve (`free_to_top`; SECAO 86.8 - [] com
+    FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED desligada). Depois: a mesma validacao
+    da canaleta, a cinta de topo (SECAO 86.7), a reauditoria com o catalogo
+    logico de canaletas, a fonte unica candidates/collisions e o gate da regra
+    75. NAO roda: 51.14 (paridade por causa da canaleta), arranjo 60-65 (so'
+    pela secao 81) e 58.2/68/71/72.
 
     `pieces_available=False` (familias de canaleta ausentes no projeto): o
     plano e' calculado e registrado, nenhuma peca e' convertida e toda verga /
@@ -6334,7 +6379,7 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
     t_plan = time.time()
     plan = _reinforcement.plan_channel_reinforcement(
         result.get("course_candidates") or {}, walls_to_create, openings_per_wall, _band, num_courses,
-        base_z_abs, policy=politica, nodes=nodes, catalog=catalog, free_to_top=[])
+        base_z_abs, policy=politica, nodes=nodes, catalog=catalog, free_to_top=list(free_to_top or []))
     plan["strategy"] = None
     plan["scope"] = OPENING_STRUCTURAL_SCOPE
     plan["pieces_applied"] = bool(pieces_available)
@@ -6364,6 +6409,10 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
                 result["course_candidates"], walls_to_create, openings_per_wall, _band, num_courses, base_z_abs,
                 free_to_top=plan["free_to_top"], policy=plan["policy"],
                 reference_course_candidates=result["course_candidates_before_reinforcement"], nodes=nodes)
+    # SECAO 86.7: cinta de topo DEPOIS da verga/contraverga e do arranjo geral (copia
+    # a grade final da ultima fiada) e ANTES da reauditoria de amarracao
+    _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
+                         base_z_abs, pieces_available=bool(pieces_available))
     if pieces_available:
         t_audit = time.time()
         audit_catalog = dict(catalog)
@@ -6394,6 +6443,49 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
         result.get("course_candidates"), plan)
     _attach_opening_structural_trace(result, plan, None, _band, pieces_applied=bool(pieces_available),
                                      base_z_abs=base_z_abs, num_courses=num_courses)
+    return result
+
+
+def _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall, course_band, num_courses,
+                         base_z_abs, pieces_available=True):
+    """SECAO 86.7 - CINTA DE TOPO (variante A) sobre as fiadas FINAIS do reforco.
+
+    Chamado nos dois caminhos (None/secao 80 e CHANNEL) depois da verga, da
+    contraverga e do arranjo, antes da reauditoria de amarracao: a ultima fiada
+    vira canaleta peca a peca (`plan_top_bond_beam`), com o bloco de amarracao
+    mantido no quadrado de cada no' e a verga/contraverga ja' existente nela
+    intacta (ocupacao unica, 51.10). Refaz a validacao da canaleta (a cinta nao
+    conta como canaleta sem demanda) e grava `result["top_bond_beam"]` com o
+    plano, a relacao verga x cinta por abertura e a auditoria independente.
+    Familias de canaleta ausentes: nada muda (`applied = False`)."""
+    if not TOP_BOND_BEAM_ENABLED or not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    from core.engine import opening_reinforcement as _reinforcement
+    if not pieces_available:
+        result["top_bond_beam"] = {"enabled": True, "applied": False, "reason": "CHANNEL_FAMILY_MISSING",
+                                   "role": _reinforcement.ROLE_TOP_BOND_BEAM,
+                                   "variant": _reinforcement.TOP_BOND_BEAM_VARIANT_A}
+        return result
+    t0 = time.time()
+    antes = result.get("course_candidates") or {}
+    beam = _reinforcement.plan_top_bond_beam(antes, walls_to_create, num_courses,
+                                             nodes=nodes, channel_overrides=(plan or {}).get("policy"))
+    result["course_candidates"] = beam.pop("course_candidates")
+    # a ultima fiada de BLOCO (so' ela): as medidas da paridade 82.1 leem a grade
+    # sem a cinta (_without_top_bond_beam) - a cinta nunca decide paridade
+    beam["source_course"] = list(antes.get(beam["course_index"]) or []) if beam["course_index"] is not None else None
+    beam["enabled"] = True
+    beam["applied"] = bool(beam["counts"]["channel_pieces"])
+    beam["lintel_beam"] = _reinforcement.lintel_beam_relation((plan or {}).get("openings"), beam["course_index"])
+    beam["audit"] = _reinforcement.top_bond_beam_audit(result["course_candidates"], walls_to_create, nodes,
+                                                       beam["course_index"], policy=beam["policy"])
+    if plan is not None and beam["applied"]:
+        plan["validation"] = _reinforcement.validate_channel_reinforcement(
+            result["course_candidates"], walls_to_create, openings_per_wall, course_band, num_courses, base_z_abs,
+            free_to_top=plan.get("free_to_top"), policy=plan.get("policy"),
+            reference_course_candidates=result.get("course_candidates_before_reinforcement"), nodes=nodes)
+    beam["timing_s"] = round(time.time() - t0, 4)
+    result["top_bond_beam"] = beam
     return result
 
 
@@ -14905,7 +14997,9 @@ class _PostCreationEventHandler(IExternalEventHandler):
         return (walls, openings, catalog, self.base_z_abs, self.wall_height_ft, id(self.selected_level),
                 self.opening_reinforcement_strategy,
                 ("OPENING_STRUCTURAL", bool(OPENING_STRUCTURAL_REINFORCEMENT_ENABLED),
-                 self._opening_structural_channel_available()))
+                 self._opening_structural_channel_available()),
+                # SECAO 86.7/86.8: a cinta de topo e a passagem livre sem CHANNEL mudam as pecas
+                ("SECAO_86", bool(TOP_BOND_BEAM_ENABLED), bool(FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED)))
 
     def _ensure_opening_reinforcement_catalog(self, app_doc):
         """VALIDACAO DE FAMILIAS antes de calcular/criar (CHANNEL): carrega o
@@ -17968,6 +18062,11 @@ def run_modulation_on_existing_walls(preselected=None):
                           "scope") != OPENING_STRUCTURAL_SCOPE):
                     # SECAO 80: resultado sem reforco anterior a' verga/contraverga
                     # estrutural nao e' reaproveitado
+                    cached_state = None
+                elif (TOP_BOND_BEAM_ENABLED and (execution_strategy is not None
+                                                 or OPENING_STRUCTURAL_REINFORCEMENT_ENABLED)
+                      and "top_bond_beam" not in (cached_state.get("solve_result") or {})):
+                    # SECAO 86.7: resultado anterior a' cinta de topo nao e' reaproveitado
                     cached_state = None
             cached_solve_result = None
             cached_create_result = None

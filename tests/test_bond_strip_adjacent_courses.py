@@ -270,9 +270,17 @@ def _bancada_com_solver_real():
     walls, junction_map = m.extend_wall_ends_to_junctions(walls, m.JUNCTION_FACE_SEARCH_FT)
     nodes, ends = m.build_wall_graph(walls, junction_map)
     openings = [[], []]
-    res = m.solve_building_blocks_all_courses(
-        nodes, walls, ends, openings, CATALOG, ft(612.0), NUM_COURSES,
-        variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
+    # o caso real reproduzido e' de BLOCO em todas as fiadas (B34 nas 9 fiadas
+    # pares 0..16): a cinta de topo da secao 86.7 (fiada 16 em canaleta) fica
+    # desligada nesta bancada do auditor de faixa vertical
+    antes = m.TOP_BOND_BEAM_ENABLED
+    m.TOP_BOND_BEAM_ENABLED = False
+    try:
+        res = m.solve_building_blocks_all_courses(
+            nodes, walls, ends, openings, CATALOG, ft(612.0), NUM_COURSES,
+            variants_per_course=m.PIER_LAYOUT_VARIANTS_PER_COURSE)
+    finally:
+        m.TOP_BOND_BEAM_ENABLED = antes
     return walls, nodes, ends, openings, res["course_candidates"]
 
 
