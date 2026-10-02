@@ -1787,6 +1787,12 @@ Teste: `tests/test_free_end_reserve.py`.
 > sempre tratou C09/C04 como maciços, sem nenhuma noção de orientação
 > (seção 1). Confirme contra a família real na próxima sessão com acesso
 > ao Revit; se sair invertido, é UMA constante para trocar.
+>
+> **Atualização (2026-10-01, §86.10)**: o humano BUTANTÃ R08_LT tem 129/129
+> C09 da jamba com o +X local para LONGE do vão (o motor tinha 129/129 ao
+> contrário) — a premissa foi invertida pela chave
+> `COMPENSATOR_ORIENTATION_FROM_HUMAN_R08` (ligada) e a pastilha C04, simétrica,
+> ficou isenta. A confirmação pela geometria sólida da família continua pendente.
 
 Pedido explícito do usuário: "o compensador possui um lado aberto e um
 lado fechado... o lado fechado deve estar sempre voltado para a
@@ -11317,7 +11323,9 @@ Revit).
 - **Pilarete estreito com faixa nas duas jambas** (W0 800–854, 54 cm): `C09 | B39 | C04` em todas as
   fiadas — vazados contínuos, mas o B39 do meio fica empilhado (as duas juntas dele são juntas de faixa,
   isentas pela §11.8/§84). Conflito amarração × vazado registrado; `DOCUMENTADO — pendência de decisão
-  do usuário`.
+  do usuário`. **Atualização (2026-10-01, §86.6)**: o humano fecha esse pilarete pela sobra da grade —
+  `B39 | C04 | C09` / `B19 | B34` (B34 com o vazado menor sobre a faixa); implementado pelo catálogo da sobra
+  (forma A, chave `JAMB_HUMAN_A_FORM_ENABLED`, CONFLITO com §84 item 3 / §85.8 registrado na 86.6).
 - **Fase acima/abaixo de abertura** (referência modular comum completa, inclusive fiadas acima de porta
   e topo da W5): hoje só a coerência da corrida da jamba com a fiada cheia abaixo entra no objetivo.
   `DOCUMENTADO — pendência de código aberta`.
@@ -11396,6 +11404,8 @@ Revit).
   fiada. `DOCUMENTADO — pendência de código aberta`.
 - **Pastilha atrás do B19 (`jamba | B19 | C04 | B34`) é erro**: a faixa encosta na jamba e o B19, se houver,
   fica atrás dela (forma da §84) — W0 1175 e 2375. `DOCUMENTADO — pendência de código aberta`.
+  **Atualização (2026-10-02, §86.6)**: coberto pelo termo `closure` do recompositor da jamba (compensador
+  atrás da 1ª peça que não fecha contra encontro = fechamento fora do catálogo).
 - **Deslocamento de abertura e largura do pilarete** (decisão do usuário, 2026-09-30): NÃO há largura mínima
   fixa — o pilarete aumenta ou diminui conforme o deslocamento das aberturas. O que decide é a modulação
   resultante: o deslocamento só vale se o pilarete novo fecha com amarração e prisma (W0 805–844 ficou com 39 cm
@@ -11415,7 +11425,10 @@ Revit).
   com a grade das fiadas de baixo. Medido na W2: fiada 13 `B34 [575–609] | C04 [610–614]` → `B39 [575–614]`;
   verga (fiada 11) `U34 [415–449] … C04 [610–614]` → cinco `U39` exatas em 415–614. O mesmo padrão aparece na
   W6 (porta 8079002): ímpares `C04 | B34` → `B39 [555–594]`; pares `C04 | B19 | B34 | B54` → `B19 [555–574] |
-  B39 [575–614] | B54`. `DOCUMENTADO — pendência de código aberta`.
+  B39 [575–614] | B54`. `DOCUMENTADO — pendência de código aberta`. **Atualização (2026-10-02, §86.6)**:
+  IMPLEMENTADO para os blocos no recompositor da jamba — falha dura `B34_PLUS_COMPENSATOR_WHERE_B39_FITS`
+  (compensador isolado + B34 onde o compensador menor + B39 fecha: `C04 | B34` → `B39`, `C09 | B34` →
+  `C04 | B39`); a canaleta (U34 + pastilha → U39) segue no `cleanup_channel_runs`.
 - **REGRA OBRIGATÓRIA — a grade do prisma não muda na altura** (mesma correção): B34 por 11 fiadas e B39 nas 3
   últimas (ou o inverso) é proibido — repetido na W1 entre a porta 8079007 e o T (1205–1414): B34 nas fiadas
   0–10 (1305 e 1325, com o vazado menor sobre vazado principal nas duas paridades) e C09 só nas fiadas 11–13. Todas as fiadas do trecho, abaixo, ao lado e acima da abertura, seguem o
@@ -11766,6 +11779,88 @@ vizinhas ficam deslocadas 15–20 cm: só repetição na mesma paridade, nunca `
   **DOCUMENTADO - pendência de código aberta**: a camada de C09 deitado (família `COMPENSADOR 14x19x9 (deitado)`
   existe no arquivo, sem código no catálogo); as 8 paredes do núcleo ficam em 260 até o calço existir.
 
+### 86.6 Jamba fechada pela SOBRA da grade (R6) — AMARRAÇÃO, PADRÃO OBSERVADO; IMPLEMENTADO no recompositor da jamba (chaves ligadas)
+
+- **Como foi descoberto**: medição offline somente-leitura do R08_LT (fileiras normalizadas
+  `human_rows_unpad.json`, 2026-10-01) pelo analista de jambas (`s85a_jambs/remnant.py`, `pil.py`,
+  `b34orient.py`) e conferência na síntese (seção R6). Nada foi medido de novo no Revit nesta etapa.
+- **PADRÃO OBSERVADO (humano 244/254 fiadas × jamba de janela = 96 %; o motor 103/126)**: a zona da jamba
+  **continua a grade da fiada CHEIA de mesma paridade abaixo do peitoril** (a abertura só recorta a grade). O
+  pedaço da peça da grade que a face da jamba corta — a **sobra**, do lado da alvenaria — fecha sempre com as
+  mesmas peças, contadas **a partir da face** (o compensador SEMPRE encosta no vão; o B19 fica na jamba ou logo
+  atrás da faixa):
+
+  | Sobra (cm) | 0 | 4 | 9 | 14 | 19 | 24 | 29 | 34 |
+  |---|---|---|---|---|---|---|---|---|
+  | Fechamento (da face para dentro) | a peça da grade continua | C04 | C09 | C09 + C04 (C09 na face) | B19 | C04 + B19 | C09 + B19 | B34 |
+
+  Com a amarração de 20 cm as duas paridades ficam aos pares (4/24, 9/29, 14/34, 19/0): nas sobras 14/34 sai a
+  **forma A** do humano — `C09 C04` encostados com o C09 na face numa paridade e `B34` com o vazado MENOR voltado
+  para o vão (sobre a faixa) na outra.
+- **REGRA OBRIGATÓRIA (85.8, agora com código) — PROIBIDO**: compensador ISOLADO colado num B34 quando o
+  compensador menor + B39 fecha o mesmo comprimento: `C09 | B34` (44 cm) vira `C04 | B39`; `C04 | B34` (39 cm)
+  vira `B39`. Humano 0 casos; o motor 22 fiadas × jamba (W1 79 e 625, W8 280 e 444). O par `C09 + C04` com B34
+  (forma A) não conta.
+- **Pilarete entre janelas**: é a grade cortada nas DUAS jambas (as duas resolvidas juntas, uma unidade).
+  Humano, pilaretes medidos (fiada par / ímpar, da esquerda para a direita; `>`/`<` = vazado menor do B34 para
+  t crescente/decrescente):
+  - P = 54: W0 800–854 `B39 C04 C09` / `B19 B34>` (B34 com o vazado menor sobre a faixa); W0 1630–1684 o
+    espelho `C09 C04 B39` / `B34< B19`; W0 2000–2054 `B19 B34<` / `B34> B19` (grade de B34, sem pastilha).
+    **Resolve a pendência da §85.6** (W0 800–854, que o motor deixava `C09 | B39 | C04` em todas as fiadas).
+  - P = 69: W0 395–464 e 2175–2244, W3 395–464 e 1355–1424 `B19 B39 C09` / `B39 B19 C09` (ou o espelho);
+    W3 205–274 e 1165–1234 `C09 B39 B19` / `C09 B19 B39`; W0 205–274 `B19 B34> C04 C09` / `B34> B34>`;
+    W0 975–1044 `C09 C04 B34> B19` / `B34< B34<`; W0 1440–1509 `C04 B39 B19 C04` / `C04 B19 B39 C04`.
+  - P = 84 (W5 230–314) `B39 B39 C04` / `B19 B39 B19 C04`; P = 114 (W0 1185–1299) `C09 B19 B54 B19 C09` /
+    `C09 B39 B39 C09`.
+  - "No máximo UMA faixa de compensadores no pilarete" vale só **sem fiada cheia de referência** (pilarete
+    entre portas): com referência quem decide é a sobra — o humano tem faixa nas duas jambas (W0 1440–1509,
+    W0 1185–1299).
+- **Orientação do B34 encostado na jamba — invariante** (humano 95/95, motor 37/37): vazado menor **para o vão**
+  quando a fiada vizinha tem faixa de compensador encostada na mesma jamba (humano 35), **para longe do vão**
+  quando ela tem B19 (humano 60). Travado por teste.
+- **Porta / boneca (sem fiada cheia abaixo)**: a síntese indica a peça fixa do nó como referência; o código exige
+  só a **forma** do catálogo (faixa encostada com o C09 na face: `C04`, `C09` ou `C09 C04`; no máximo um B19 logo
+  atrás dela — `C09 C04 B19` = 34 é B34; nenhum compensador atrás da 1ª peça que não feche contra encontro, a
+  "pastilha atrás do B19" da 85.8). **DOCUMENTADO — pendência de código aberta**: referência pela peça fixa do nó
+  em porta e boneca (com 2 peças o humano põe o B34 junto do B54, `B39 B34 B54`, 62 casos; com 4–5 peças, na
+  jamba, `B34 B39 B39 B39 B54`, 24 casos — a regra de posição ainda não está fechada para porta) e a extensão do
+  termo `coh` (§85) para porta e boneca.
+- **CONFLITO registrado — forma A × §84 item 3 / §85.8**: o vazado menor do B34 da forma A fica sobre/sob a faixa
+  MACIÇA (§84 item 3: "vazado sobre compensador maciço = prisma interrompido"; §85.8: o vazado menor só sobre vazado
+  menor ou central do B54) e o par `C09 + C04` é de compensadores encostados (§84 item 6). O humano faz assim em
+  100 % das sobras 14/34 (35/35 B34) e a §84 item 2 já tratava o par C04+C09 encostado como UMA faixa. Decisão
+  desta etapa (pedido de 2026-10-01 de aproximar o humano): **implementado LIGADO** atrás da chave
+  `JAMB_HUMAN_A_FORM_ENABLED` — o vazado menor sobre a faixa vira célula MORTA (fora da contagem de colunas, do
+  prisma por interface e da semente do percurso obrigatório) e o par C09+C04 com o C09 na face não conta como
+  compensadores encostados. Desligar a chave volta ao comportamento anterior (as sobras 14/34 e o pilarete de 54
+  deixam de seguir o catálogo). **Pendente de confirmação do usuário.**
+- **Implementação** (`nuvem/core/engine/b34_run_arrangement.py`, recompositor da jamba `_solve_jamb_unit`):
+  - `JAMB_REMNANT_CATALOG` (+ `JAMB_REMNANT_TOLERANCE_CM` = 1,5) e `JAMB_REMNANT_CATALOG_ENABLED`: termo `closure`
+    do objetivo (`_closure_mismatch` / `_closure_defect` / `_jamb_remnant`) logo depois do percurso obrigatório
+    (§85.7) e antes da contagem de colunas; a sobra é medida na fileira de referência **como estava antes da
+    busca** (`_frozen_ref`: a fiada-ponte abaixo do peitoril que passa a seguir a jamba não vira a referência de
+    si mesma) e "cortada pela abertura" é medido logo dentro do vão. Peça da grade de nó, canaleta ou compensador:
+    nada a exigir. A unidade com fechamento fora do catálogo deixa de sair por "settled".
+  - `JAMB_B34_COMPENSATOR_GUARD_ENABLED`: `_b34_comp_where_b39_fits` = termo `b34c` (logo depois do vazado menor)
+    + falha dura `B34_PLUS_COMPENSATOR_WHERE_B39_FITS` (intrínseca, entra na triagem do estágio A).
+  - `JAMB_CATALOG_CANDIDATES_ENABLED` (`_catalog_candidates`, até 24): na unidade com defeito de fechamento entram
+    explicitamente a grade da fiada cheia copiada peça a peça com o fechamento do catálogo nas jambas (as duas do
+    pilarete ao mesmo tempo) e, sem referência, cada fechamento do catálogo + B39/B34 exatos; com defeito de
+    fechamento a ponte/verga segue a grade das alternativas (estágios A/B).
+  - `JAMB_COLUMN_GUARD_COUNTS_BROKEN`: a falha dura `PRISM_COLUMN_WOULD_BREAK` passou a contar células QUEBRADAS
+    a mais (antes: células em coluna a menos). Medido (W1, porta [79,170]): `C04 | B39` / `C04 | B19 | B39` (o
+    humano) com a verga seguindo a grade só "perdia" as 2 células do B34 da fiada 11 que viram canaleta — nenhuma
+    coluna quebrava e a contagem antiga recusava a troca.
+- **Efeitos medidos nos testes existentes** (2026-10-02, bancada): T com porta (`test_regras_gerais_composicao`,
+  15 cm entre o nó e a jamba) — a faixa `C09 C04 | vão` vira `C04 C09 | vão` (só a ordem; C09 na face); porta a
+  489 cm com T (`test_reparo_68_guarda_junta`, caminho legado) — `vão | B19 | C09 | B39 | C04` (pastilha atrás do
+  B19) é recomposto como na §83: compensadores 16 → 0, juntas contínuas [479, 489] → [489].
+- **Medição no pavimento**: não rodada nesta etapa (limite de memória da máquina) — o integrador mede com
+  `run_r4.sh <repo> <tag> 13` (F1 e qualidade contra o humano, régua da 86.0).
+- Testes: `tests/test_jamb_remnant_catalog.py` (catálogo, as 8 sobras na fileira de referência e numa janela, a
+  proibição C09|B34, os pilaretes de 54 do humano com e sem a forma A, idempotência/determinismo, o invariante de
+  orientação do B34 e a 86.10); `tests/test_jamb_compensator_alignment.py` continua verde.
+
 ### 86.7 CINTA DE TOPO (TOP_BOND_BEAM) na última fiada — VARIANTE A: bloco de amarração no quadrado do nó (2026-10-01, IMPLEMENTADO, chave `TOP_BOND_BEAM_ENABLED = True`)
 
 **PADRÃO OBSERVADO (humano BUTANTÃ R08_LT, 1º PAV, medição offline 2026-10-01; analistas "estrutura global" e
@@ -11948,6 +12043,27 @@ DOCUMENTADO - pendência de código aberta:** o humano fecha a ponta livre com u
 outra ponta (4 na f0, 3 na f1). O nosso: f0 `B34 B39×4 C09 B19`, f1 `B39×5 C09`. Motor: `_axis_free_end_sides` e
 `_wall_end_default_start_cm` (`core/engine/wall_stepper.py`). Não implementado — um caso só não sustenta regra.
 
+### 86.10 Orientação do C09 na jamba (R10) — PADRÃO OBSERVADO; IMPLEMENTADO (chave ligada); confirmação pela geometria sólida PENDENTE
+
+- **Como foi descoberto**: `s85a_jambs/comporient.py` (2026-10-01) — para cada C04/C09 encostado numa jamba, o
+  BasisX da instância (`ref_1pav.json`, transformação lida do Revit, com a flag de espelhamento) comparado com o
+  lado da abertura. Humano: **129/129 C09 com o +X local apontando para LONGE do vão**; o motor (lido de volta do
+  `butanta testes`): 129/129 ao contrário. C04: humano 46 de um jeito e 72 do outro — a pastilha é simétrica.
+- **Regra (segue o humano)**: `COMPENSATOR_ORIENTATION_FROM_HUMAN_R08 = True` (`nuvem/core/wall_modeling.py`) →
+  `COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED = False`: todo C09 encostado em abertura inverte o
+  espelhamento de antes (+X final para longe do vão). Lido junto com a regra do usuário da §12 ("lado fechado
+  sempre voltado para a abertura"), o humano indica que o lado FECHADO da família é o −X local — a premissa que a
+  §12 registrou como não confirmada.
+- **C04 isento** (`COMPENSATOR_SYMMETRIC_CODES = ("C04",)`): `_compensator_required_mirror` devolve None e a
+  pastilha fica sem espelhar, como o compensador longe de abertura.
+- **Pendente**: conferir no Revit, pela geometria SÓLIDA da família COMPENSADOR 14x19x9 (seção horizontal a meia
+  altura, como na §85.7 item 6), qual extremidade é fechada. Confirmado → a chave pode ser removida deixando a
+  constante em False; refutado → desligar a chave (volta à premissa True).
+- Sem efeito na semelhança de peças (a régua da 86.0 não olha espelhamento); acerto construtivo.
+- Testes: `tests/test_jamb_remnant_catalog.py` (`test_c09_na_jamba_com_o_mais_x_para_longe_do_vao_como_o_humano`,
+  `test_pastilha_c04_e_simetrica_e_nao_e_espelhada`); os testes da §12 em `tests/test_script.py` e da §64 em
+  `tests/test_b34_run_arrangement.py` passaram a usar o C09 (relativos à premissa, valem com qualquer valor dela).
+
 ### 86.11 Índice das regras R1–R10, bloqueios e conflitos (estado em 2026-10-01)
 
 Resumo para nada se perder se uma subseção ainda não estiver integrada (detalhe e números em cada 86.x e na
@@ -11988,3 +12104,4 @@ síntese versionada):
 - **Estado do código (2026-10-01, ainda NÃO integrado na branch de trabalho)**: R3 implementada (branch
   `worktree-wf_ff7686b5-095-2`, commits e48d38c/fea1b17); R2/R4, R7A/R8 em implementação; R6/R10 e R9 na fila.
   R1 e R5 aplicadas no `butanta testes` (dados, sem código).
+

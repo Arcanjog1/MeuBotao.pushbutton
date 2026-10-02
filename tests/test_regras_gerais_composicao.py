@@ -183,7 +183,12 @@ def test_regiao_proxima_ao_t_amarracao_preservada():
     assert no(com) == no(sem)
     assert com["missing_required_junction_bond"] == [] and com["channel_as_junction_bond"] == []
     faixa = lambda res, w, ci: [c for c, a, b, al in _fiada(res, w, 0, ci) if 329 < a < 344]
-    assert [faixa(com, walls, ci) for ci in range(10)] == [faixa(sem, walls0, ci) for ci in range(10)]
+    for ci in range(10):
+        # mesmas pecas; desde a secao 86.6 o par C09+C04 da faixa fica com o C09 NA FACE da
+        # jamba (344) - o recompositor da jamba so' troca a ordem dos dois (junta da faixa)
+        assert sorted(faixa(com, walls, ci)) == sorted(faixa(sem, walls0, ci)), ci
+        if sorted(faixa(com, walls, ci)) == ["C04", "C09"]:
+            assert faixa(com, walls, ci) == ["C04", "C09"], ci
 
 
 # ------------------------------------------------------------------ prisma

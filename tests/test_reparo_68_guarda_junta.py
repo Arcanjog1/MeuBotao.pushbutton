@@ -122,11 +122,14 @@ def test_janela_expandida_e_refeita_desencontrando_a_face_do_no():
 
 
 def test_ganho_da_68_mantido_com_a_guarda():
-    """Porta a 489: o legado fecha com C04 + C09 nas duas fiadas; a 68 com guarda fecha
-    sem compensador e sem junta a prumo."""
+    """Porta a 489: o legado fechava com C04 + C09 nas duas fiadas; a 68 com guarda fecha
+    sem compensador e sem junta a prumo. Desde a secao 86.6 (fechamento da jamba pela forma
+    do catalogo: `vao | B19 | C09 | B39 | C04` = pastilha atras do B19, 85.8) o recompositor
+    da jamba chega a' mesma composicao tambem no legado (medido: 16 -> 0 compensadores,
+    juntas continuas [479, 489] -> [489]) - o ganho continua, so' deixou de ser exclusivo."""
     res, walls = _solve(489.0)
     assert _compensadores(res, walls, 489.0) == 0
-    assert _compensadores(*_solve(489.0, "legado"), 489.0) > 0
+    assert _compensadores(res, walls, 489.0) <= _compensadores(*_solve(489.0, "legado"), 489.0)
     assert not (_juntas_continuas(res, walls) - _juntas_continuas(*_solve(489.0, "legado")))
 
 

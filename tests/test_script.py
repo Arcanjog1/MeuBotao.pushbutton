@@ -1997,7 +1997,9 @@ def test_pier_ordered_layout_nunca_devolve_dois_compensadores_iguais_adjacentes(
 # 2026-08-25): lado fechado sempre voltado para a abertura.
 # ------------------------------------------------------------------------
 
-def _comp_candidate(wall_idx, center_cm, length_cm, x_dir=(1.0, 0.0, 0.0), code="C04"):
+# SECAO 86.10: o C04 (pastilha) e' SIMETRICO e nao recebe orientacao exigida -
+# a regra de lado fechado/aberto e' exercitada com o C09
+def _comp_candidate(wall_idx, center_cm, length_cm, x_dir=(1.0, 0.0, 0.0), code="C09"):
     return {
         "wall_idx": wall_idx, "origin_world": XYZ(ft(center_cm), 0.0, 0.0),
         "x_dir": XYZ(*x_dir), "y_dir": XYZ(0.0, 1.0, 0.0),
@@ -2062,10 +2064,11 @@ def test_orient_compensator_candidates_corrige_todos_de_uma_vez():
     openings_per_wall = [[(ft(100.0), ft(150.0), ft(0.0), ft(210.0))]]
     catalog = {
         "C04": {"is_compensator": True, "length_cm": 4.0},
+        "C09": {"is_compensator": True, "length_cm": 9.0},
         "B39": {"is_compensator": False, "length_cm": 39.0},
     }
-    comp_needs_mirror = _comp_candidate(0, 152.5, 5.0, code="C04")
-    comp_no_mirror = _comp_candidate(0, 97.5, 5.0, code="C04")
+    comp_needs_mirror = _comp_candidate(0, 152.5, 5.0, code="C09")
+    comp_no_mirror = _comp_candidate(0, 97.5, 5.0, code="C09")
     comp_far = _comp_candidate(0, 300.0, 4.0, code="C04")
     # os dois JA' vem com um valor ERRADO (o OPOSTO do que deveriam ter,
     # qualquer que seja a premissa fisica) de uma rodada anterior - a

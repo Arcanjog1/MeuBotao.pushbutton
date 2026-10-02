@@ -7993,7 +7993,19 @@ def audit_all_walls_bond_quality(walls_to_create, course_candidates, catalog, nu
 # ficar aberto/fechado, a partir da posicao da abertura, ja' esta' certa -
 # so' a premissa de "qual lado a familia usa por padrao" pode estar
 # invertida).
-COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED = True
+#
+# SECAO 86.10 (R10, PADRAO OBSERVADO no humano BUTANTA R08_LT, 2026-10-01): o
+# humano poe 129/129 C09 encostados na jamba com o +X local (BasisX da
+# instancia) apontando para LONGE do vao; o nosso, com a premissa True, punha
+# 129/129 ao contrario. Chave ligada = segue o humano (premissa False: o lado
+# fechado e' o -X local e fica voltado para o vao). A confirmacao pela
+# geometria SOLIDA da familia no Revit continua PENDENTE (secao 12 / 86.10).
+COMPENSATOR_ORIENTATION_FROM_HUMAN_R08 = True
+COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED = not COMPENSATOR_ORIENTATION_FROM_HUMAN_R08
+# SECAO 86.10: compensador SIMETRICO (a pastilha C04 nao tem lado aberto/
+# fechado - o humano usa 46 de um jeito e 72 do outro): nenhuma orientacao
+# exigida, fica sem espelhar como o compensador longe de abertura.
+COMPENSATOR_SYMMETRIC_CODES = ("C04",)
 
 # Um compensador so' fica ENCOSTADO DE VERDADE (sem junta de argamassa)
 # contra uma ABERTURA real - contra outro bloco ha' sempre BLOCK_JOINT_CM
@@ -8011,7 +8023,10 @@ def _compensator_required_mirror(candidate, opening_intervals_cm, wall_p0, wall_
     - um compensador de preenchimento comum, longe de qualquer abertura,
     fica com `mirrored=False`, nunca espelhado sem motivo). Caso
     contrario, devolve o valor exigido de `mirrored` (True/False) para que
-    o lado FECHADO da peca fique voltado para a abertura."""
+    o lado FECHADO da peca fique voltado para a abertura. Compensador
+    simetrico (`COMPENSATOR_SYMMETRIC_CODES`, secao 86.10): None."""
+    if candidate.get("logical_code") in COMPENSATOR_SYMMETRIC_CODES:
+        return None
     t_lo, t_hi = _candidate_t_range_on_wall(candidate, wall_p0, wall_dir)
     closed_toward_wall_plus_t = None
     for gap_lo, gap_hi in opening_intervals_cm:

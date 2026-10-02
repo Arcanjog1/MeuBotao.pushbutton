@@ -240,7 +240,9 @@ JAMB_CLOSURE_B19_JOINT_EXEMPT = True
 # o estagio A ordena primeiro por elas - antes `B19 | B34 | C04 | C09` (pastilha
 # nova) ficava no topo e empurrava a grade de B34 do usuario para o 88o lugar
 JAMB_INTRINSIC_FAILURES = ("NEW_COMPENSATOR", "COMPENSATOR_OFF_JAMB", "HALF_BLOCK_NOT_ADMISSIBLE",
-                           "ADJACENT_COMPENSATORS", "HALF_BLOCK_NEAR_TIE", "LONG_COMPENSATOR_AT_WALL_END")
+                           "ADJACENT_COMPENSATORS", "HALF_BLOCK_NEAR_TIE", "LONG_COMPENSATOR_AT_WALL_END",
+                           # 86.6: depende so' das fiadas da jamba
+                           "B34_PLUS_COMPENSATOR_WHERE_B39_FITS")
 JAMB_VERGA_MEMBER_ENABLED = True
 # a corrida da ponte/verga cresce PRIMEIRO ate' a peca fixa do lado do pilar e so'
 # depois sobre o vao, com teto proprio (W1: a grade da porta 8079007 so' fecha
@@ -256,6 +258,45 @@ JAMB_BRIDGE_RUN_MAX_PIECES = 11
 # agrupadas 6 x 6 = 36 -> desenho do usuario)
 JAMB_TWIN_FAMILIES_ENABLED = True
 CHANNEL_OF_BLOCK = {"B39": "CHANNEL_U_39", "B34": "CHANNEL_U_34", "B19": "CHANNEL_U_19"}
+# SECAO 86.6 (R6, PADRAO OBSERVADO no humano BUTANTA R08_LT, 2026-10-01): JAMBA FECHADA PELA SOBRA DA
+# GRADE. Na janela a zona da jamba continua a grade da fiada CHEIA de mesma paridade abaixo do peitoril;
+# o pedaco da peca da grade que a jamba corta (sobra, da face da jamba ate' a junta da grade) fecha
+# sempre com as mesmas pecas, a partir da face (compensador encostado no vao, B19 atras da faixa). Humano
+# 244/254 fiadas x jamba (96 %), nosso 103/126. Termo `closure` do objetivo (logo depois do percurso
+# obrigatorio) e a unidade deixa de sair por "settled" quando o fechamento desvia do catalogo. Porta /
+# boneca / pilarete entre portas (sem fiada cheia abaixo): so' a forma do catalogo (sem referencia, ver
+# 86.6) e, no pilarete SEM referencia, no maximo UMA faixa de compensadores (com referencia quem decide e'
+# a sobra: o humano tem pilarete com faixa nas duas jambas, W0 1440-1509 `C04 B19 B39 C04`).
+JAMB_REMNANT_CATALOG_ENABLED = True
+JAMB_REMNANT_CATALOG = {0: (), 4: ("C04",), 9: ("C09",), 14: ("C09", "C04"), 19: ("B19",),
+                        24: ("C04", "B19"), 29: ("C09", "B19"), 34: ("B34",)}
+# sobra medida x chave do catalogo (as faces de jamba caem no modulo de 5 cm; 1 cm de junta + folga)
+JAMB_REMNANT_TOLERANCE_CM = 1.5
+# SECAO 85.8 (REGRA OBRIGATORIA do usuario, pendencia de codigo) / 86.6: compensador ISOLADO colado num
+# B34 movel onde o compensador menor + B39 fecha o mesmo comprimento (C09|B34 = C04|B39, C04|B34 = B39).
+# Humano 0 casos; nosso 22 fiadas x jamba (W1 79/625, W8 280/444). Falha dura (nunca aumenta) + termo do
+# objetivo logo depois do vazado menor. O par C09+C04 com B34 (forma A na grade de B34) nao conta.
+JAMB_B34_COMPENSATOR_GUARD_ENABLED = True
+# SECAO 86.6: candidatas do catalogo geradas EXPLICITAMENTE na unidade com defeito de fechamento (antes so'
+# apareciam se coubessem no orcamento das composicoes de +-1 peca): a grade da fiada cheia de baixo com o
+# fechamento do catalogo nas jambas e, sem referencia, fechamento do catalogo + B39/B34 exatos (pilarete:
+# as duas jambas ao mesmo tempo, P=54 -> `B39|C04|C09` / `B19|B34`, `B19|B34` / `B34|B19`).
+JAMB_CATALOG_CANDIDATES_ENABLED = True
+JAMB_CATALOG_CANDIDATES_MAX = 24
+# SECAO 86.6 - FORMA A do humano (sobra 14/34: `C09 C04` encostados com o C09 na face numa paridade, `B34`
+# com o vazado menor voltado para o vao na outra; humano 35/35 B34 na jamba sobre faixa = vazado menor para o
+# vao). E' o catalogo da sobra nas sobras 14 e 34 e o pilarete de 54 (`B39|C04|C09` / `B19|B34`, 85.6).
+# Ligada: o par C09+C04 encostado na jamba (C09 na face) nao conta como compensadores encostados (a 84 item 2
+# ja' tratava o par como UMA faixa) e o vazado menor do B34 sobre a faixa e' celula MORTA (fora da contagem de
+# colunas, do prisma por interface e da semente do percurso obrigatorio; as outras celulas continuam com a
+# regua de sempre). CONFLITO registrado na 86.6 com 84 item 3 / 85.8 ("vazado sobre peca macica") - desligar
+# esta chave volta ao comportamento anterior (as sobras 14/34 deixam de seguir o catalogo).
+JAMB_HUMAN_A_FORM_ENABLED = True
+# SECAO 86.6: a falha dura PRISM_COLUMN_WOULD_BREAK conta celulas QUEBRADAS a mais, nao celulas em coluna a
+# menos. Medido (W1, porta [79,170], fiadas 0-11): `C04 | B39` / `C04 | B19 | B39` (o humano) com a verga
+# seguindo a grade so' "perdia" as 2 celulas do B34 da fiada 11 que viram canaleta (U39) - nenhuma coluna
+# quebrava, e a contagem antiga recusava a troca.
+JAMB_COLUMN_GUARD_COUNTS_BROKEN = True
 
 
 class _Slot(object):
@@ -680,6 +721,8 @@ class _Wall(object):
         self.broken_paths = []
         # SECAO 85: fiadas ignoradas pelas reguas de coluna (estagio A da busca)
         self._transparent = frozenset()
+        # SECAO 86.6: fileiras da unidade antes da busca (referencia do termo `closure`)
+        self._frozen_ref = None
         self.verga_changes = []
         # SECAO 81.1: com a guarda, nenhuma troca pode criar junta coincidente
         # entre fiadas vizinhas numa POSICAO onde ela nao existia (a guarda de
@@ -1987,6 +2030,8 @@ class _Wall(object):
                         c = (iv[0] + iv[1]) / 2.0
                         if c < window[0] or c > window[1]:
                             continue
+                        if JAMB_HUMAN_A_FORM_ENABLED and self._dead_small_cell(src, p, iv, [dst_slots]):
+                            continue  # 86.6 (forma A): celula morta (vazado menor sobre a faixa)
                         if via is not None:
                             h = _covering(self.fam[via], c)
                             if h is None or not _is_channel_code(h.code):
@@ -2070,6 +2115,8 @@ class _Wall(object):
                 if _is_channel_code(q.code):
                     continue
                 for lo2, hi2 in self._cell_intervals(q):
+                    if JAMB_HUMAN_A_FORM_ENABLED and self._dead_cell_at_course(c, q, (lo2, hi2)):
+                        continue  # 86.6 (forma A): celula morta nao e' semente
                     dist = (lo2 - edge) if d > 0 else (edge - hi2)
                     if -0.5 <= dist <= JAMB_PATH_REACH_CM and (seed is None or dist < seed[0]):
                         seed = (dist, (lo2, hi2), c)
@@ -2243,10 +2290,15 @@ class _Wall(object):
         avaliadas em CADA fiada da familia com a regua unica `_trace_column`
         (mesma definicao da regua independente `column_census`: uma troca que so'
         muda a quebra de lugar nao conta; vazado menor sobre principal quebra)."""
+        return self._column_stats_full(fams, window)[:3]
+
+    def _column_stats_full(self, fams, window):
+        """`_column_stats` + celulas QUEBRADAS (avaliadas e nao continuas) - 86.6."""
         courses = sorted(self.course_fam)
         n = 0
         width_sum = 0.0
         full = 0
+        broken = 0
         for f in fams:
             member_courses = [c for c in courses if self.course_fam[c] == f]
             if not member_courses:
@@ -2254,41 +2306,29 @@ class _Wall(object):
             for p in _in_window(self.fam[f], window[0], window[1]):
                 for iv in self._cell_intervals(p):
                     for c0 in member_courses:
+                        if JAMB_HUMAN_A_FORM_ENABLED and self._dead_cell_at_course(c0, p, iv):
+                            continue  # 86.6 (forma A): celula morta (vazado menor sobre a faixa)
                         ok, narrowest = self._trace_column(c0, iv, restart=True)
                         if not ok:
+                            broken += 1
                             continue
                         n += 1
                         width_sum += narrowest
                         if narrowest >= PRISM_FULL_COLUMN_WIDTH_CM - 1e-6:
                             full += 1
-        return n, round(width_sum, 2), full
+        return n, round(width_sum, 2), full, broken
 
     def _coherence_mismatch(self, fams, spans, window, edges):
         """SECAO 85 - referencia modular comum: as juntas da corrida da unidade
         contra as da fiada CHEIA de mesma paridade mais proxima ABAIXO da abertura
         (a abertura so' recorta a grade; nao reinicia a fase). Porta (sem fiada
         cheia abaixo) nao tem referencia aqui: vale 0."""
-        courses = sorted(self.course_fam)
         edge_ts = [e for e, _d in edges]
         n = 0
         for f in fams:
-            member = [c for c in courses if self.course_fam[c] == f]
-            if not member:
-                continue
             i0, i1 = spans[f]
             lo, hi = self.fam[f][i0].lo, self.fam[f][i1].hi
-            ref = None
-            for r in range(member[0] - 2, -1, -2):
-                if r not in self.course_fam:
-                    continue
-                rf = self.course_fam[r]
-                slots = self.fam[rf]
-                if any(_covering(slots, t) is None for t in edge_ts):
-                    continue  # a abertura tambem corta essa fiada
-                if any(_is_channel_code(s.code) for s in _in_window(slots, lo, hi)):
-                    continue
-                ref = slots
-                break
+            ref = self._reference_slots(f, lo, hi, edge_ts)
             if ref is None:
                 continue
             inside = (lo + 0.5, hi - 0.5)
@@ -2300,6 +2340,293 @@ class _Wall(object):
             mism += sum(1 for x in theirs if not _has_value_near(mine, x, FACE_TOLERANCE_CM))
             n += mism * self.count[f]
         return n
+
+    def _reference_slots(self, f, lo, hi, edge_ts, frozen=False, edges=None):
+        """Fileira CHEIA de mesma paridade mais proxima ABAIXO da abertura (a referencia
+        modular dos termos `coh` e `closure`): nao cortada pela abertura nas bordas
+        `edge_ts` e sem canaleta (contraverga) no trecho [lo, hi]. None sem ela (porta).
+        `frozen` (86.6, termo `closure`): a fileira como estava ANTES da busca da
+        unidade - a jamba segue a grade de baixo; a fiada-ponte abaixo do peitoril que
+        passa a seguir a jamba (85.9) nao vira a referencia dela mesma. `edges`
+        [(borda, sentido)] (86.6): "cortada" e' medido logo DENTRO do vao (o ponto da
+        propria borda e' coberto pela peca encostada na jamba e fazia a fiada cortada da
+        porta passar por referencia)."""
+        member = self._courses_of(f)
+        if not member:
+            return None
+        frozen_fam = getattr(self, "_frozen_ref", None) if frozen else None
+        probes = edge_ts if edges is None else [e - d * JAMB_INSIDE_PROBE_CM for e, d in edges]
+        for r in range(member[0] - 2, -1, -2):
+            if r not in self.course_fam:
+                continue
+            rf = self.course_fam[r]
+            slots = frozen_fam[rf] if frozen_fam and rf in frozen_fam else self.fam[rf]
+            if any(_covering(slots, t) is None for t in probes):
+                continue  # a abertura tambem corta essa fiada
+            if any(_is_channel_code(s.code) for s in _in_window(slots, lo, hi)):
+                continue
+            return slots
+        return None
+
+    # ------------------------------------------------------------ secao 86.6 (R6)
+    @staticmethod
+    def _jamb_remnant(ref, edge, d):
+        """SECAO 86.6: (sobra, codigo da peca da grade) da fileira de referencia `ref`
+        cortada pela face da jamba (edge, d). Sobra = o pedaco da peca que contem a
+        face, do lado da alvenaria (a parte que fica), arredondado para a chave do
+        catalogo; 0 = a face cai na junta e a propria peca da grade continua. None
+        quando a face nao cai no modulo do catalogo, ou quando a peca da grade e' de
+        no', canaleta ou compensador (nao ha' grade de bloco a continuar)."""
+        tol = JAMB_TOUCH_TOLERANCE_CM
+        host = None
+        for s in _in_window(ref, edge - 1.0, edge + 1.0):
+            if s.lo + tol < edge < s.hi - tol:
+                host = s
+                break
+        if host is None:
+            side = [s for s in ref if (s.lo >= edge - tol if d > 0 else s.hi <= edge + tol)]
+            if not side:
+                return None
+            host = side[0] if d > 0 else side[-1]
+            if abs((host.lo if d > 0 else host.hi) - edge) > tol:
+                return None
+            raw = 0.0
+        else:
+            raw = (host.hi - edge) if d > 0 else (edge - host.lo)
+        if host.node or host.compensator or _is_channel_code(host.code):
+            return None
+        if raw == 0.0:
+            return 0, host.code
+        for key in sorted(JAMB_REMNANT_CATALOG):
+            if key and abs(raw - key) <= JAMB_REMNANT_TOLERANCE_CM:
+                return key, host.code
+        return None
+
+    def _closure_run(self, f, edge, d, limit=4):
+        """Indices das pecas contiguas da familia `f` a partir da peca encostada na
+        face da jamba (edge, d), para dentro da alvenaria (ate' `limit` pecas)."""
+        slots = self.fam[f]
+        i = self._touching_index(slots, edge, d)
+        if i is None:
+            return []
+        out = [i]
+        j = i + d
+        while 0 <= j < len(slots) and len(out) < limit:
+            prev, q = slots[out[-1]], slots[j]
+            gap = (q.lo - prev.hi) if d > 0 else (prev.lo - q.hi)
+            if gap < -FACE_TOLERANCE_CM or gap > RUN_MAX_GAP_CM:
+                break
+            out.append(j)
+            j += d
+        return out
+
+    def _free_from_jamb(self, f, edge, d):
+        """Comprimento livre (cm) da face da jamba ate' a primeira peca fixa (ou o fim
+        da corrida contigua) na familia `f`."""
+        slots = self.fam[f]
+        run = self._closure_run(f, edge, d, limit=len(slots))
+        far = edge
+        for k in run:
+            if not slots[k].movable:
+                break
+            far = slots[k].hi if d > 0 else slots[k].lo
+        return abs(far - edge)
+
+    def _closure_defect(self, f, edge, d, ref):
+        """SECAO 86.6: 1 se o fechamento da familia `f` na jamba (edge, d) desvia do
+        catalogo da sobra. Com a fileira cheia de referencia (janela) o fechamento
+        esperado e' o da sobra medida nela; sem referencia (porta, boneca, pilarete
+        entre portas) so' a FORMA do catalogo: faixa de compensadores encostada com o
+        C09 na face (C04 | C09 | C09+C04), no maximo um B19 atras dela (C09+C04+B19 = 34
+        e' B34) e nenhum compensador atras da 1a peca que nao feche contra encontro."""
+        slots = self.fam[f]
+        run = self._closure_run(f, edge, d)
+        if not run or not slots[run[0]].movable:
+            return 0
+        codes = [slots[k].code for k in run]
+        if ref is not None:
+            rem = self._jamb_remnant(ref, edge, d)
+            if rem is not None:
+                r, grid_code = rem
+                expected = list(JAMB_REMNANT_CATALOG[r])
+                if not expected:
+                    tpl = self._tpl(grid_code)
+                    free = self._free_from_jamb(f, edge, d) + JAMB_REMNANT_TOLERANCE_CM
+                    if tpl is None or tpl.hi - tpl.lo > free:
+                        return 0  # a peca da grade nao cabe antes da peca fixa: nada a exigir
+                    return 0 if codes[0] == grid_code else 1
+                if r > self._free_from_jamb(f, edge, d) + JAMB_REMNANT_TOLERANCE_CM:
+                    return 0  # a sobra nao cabe antes da peca fixa: nada a exigir
+                if codes[:len(expected)] != expected:
+                    return 1
+                if len(run) > len(expected):
+                    nxt = slots[run[len(expected)]]
+                    if nxt.compensator or nxt.code == "B19":
+                        return 1
+                return 0
+        comps = []
+        for k in run:
+            if not slots[k].compensator:
+                break
+            comps.append(slots[k].code)
+        if tuple(comps) not in ((), ("C04",), ("C09",), ("C09", "C04")):
+            return 1
+        if len(comps) == 2 and len(run) > 2 and slots[run[2]].code == "B19":
+            return 1
+        for k in run[len(comps) + 1:]:
+            if slots[k].compensator and not self._node_closure(f, k):
+                return 1
+        return 0
+
+    def _jamb_strip_at(self, f, edge, d):
+        """True se a peca encostada na jamba (edge, d) e' compensador (faixa)."""
+        slots = self.fam[f]
+        i = self._touching_index(slots, edge, d)
+        return i is not None and slots[i].compensator
+
+    def _family_active_edges(self, f, edges):
+        act = self._active_jamb_edges(f)
+        return [(e, d) for e, d in edges
+                if any(abs(e - e2) < EDGE_TOLERANCE_CM and d == d2 for e2, d2 in act)]
+
+    def _closure_mismatch(self, fams, spans, edges):
+        """SECAO 86.6: fiadas x jamba da unidade cujo fechamento desvia do catalogo
+        da sobra (`_closure_defect`), mais, no pilarete SEM fileira cheia de
+        referencia, a regra do humano de no maximo UMA faixa de compensadores: faixa
+        nas duas jambas na mesma fiada, ou em jambas diferentes conforme a fiada
+        (zigue-zague, 85.8). Com referencia quem decide e' a sobra (o humano tem
+        pilarete de janela com faixa nas duas jambas: W0 1440-1509)."""
+        if not JAMB_REMNANT_CATALOG_ENABLED or not edges:
+            return 0
+        edge_ts = [e for e, _d in edges]
+        n = 0
+        strip_edges = collections.Counter()
+        for f in fams:
+            active = self._family_active_edges(f, edges)
+            if not active:
+                continue
+            i0, i1 = spans[f]
+            lo, hi = self.fam[f][i0].lo, self.fam[f][i1].hi
+            ref = self._reference_slots(f, lo, hi, edge_ts, frozen=True, edges=edges)
+            here = []
+            for e, d in active:
+                n += self._closure_defect(f, e, d, ref) * self.count[f]
+                if ref is None and self._jamb_strip_at(f, e, d):
+                    here.append(round(e, 1))
+            if len(here) >= 2:
+                n += self.count[f]
+            for e in here:
+                strip_edges[e] += self.count[f]
+        if len(strip_edges) >= 2:
+            n += min(strip_edges.values())
+        return n
+
+    def _family_closure_defect(self, f, span, edges):
+        """A familia `f` (corrida `span`) desvia do catalogo em alguma jamba, tem
+        compensador + B34 onde B39 fecha, ou (sem referencia) tem faixa nas duas
+        jambas."""
+        active = self._family_active_edges(f, edges)
+        if not active:
+            return False
+        if JAMB_B34_COMPENSATOR_GUARD_ENABLED and self._b34_comp_where_b39_fits(f, None, span) > 0:
+            return True
+        if not JAMB_REMNANT_CATALOG_ENABLED:
+            return False
+        i0, i1 = span
+        ref = self._reference_slots(f, self.fam[f][i0].lo, self.fam[f][i1].hi, [e for e, _d in edges],
+                                    frozen=True, edges=edges)
+        if any(self._closure_defect(f, e, d, ref) for e, d in active):
+            return True
+        return ref is None and sum(1 for e, d in active if self._jamb_strip_at(f, e, d)) >= 2
+
+    def _b34_comp_where_b39_fits(self, f, window, span=None):
+        """SECAO 85.8 / 86.6: compensadores ISOLADOS (nenhum outro compensador
+        encostado) colados num B34 MOVEL quando o compensador menor + B39 fecha o
+        mesmo comprimento: C09|B34 (44 cm) = C04|B39; C04|B34 (39 cm) = B39. O par
+        C09+C04 com B34 (forma A na grade de B34, 11 casos no humano) nao conta."""
+        if not JAMB_B34_COMPENSATOR_GUARD_ENABLED:
+            return 0
+        t39, t34 = self._tpl("B39"), self._tpl("B34")
+        if t39 is None or t34 is None:
+            return 0
+        u39, u34 = t39.hi - t39.lo, t34.hi - t34.lo
+        comp_lengths = []
+        for code in ("C04", "C09"):
+            tpl = self._tpl(code)
+            if tpl is not None and tpl.compensator:
+                comp_lengths.append(tpl.hi - tpl.lo)
+        slots = self.fam[f]
+        lo_i, hi_i = (0, len(slots) - 1) if span is None else span
+        n = 0
+        for i in range(lo_i, hi_i + 1):
+            s = slots[i]
+            if not s.compensator:
+                continue
+            if window is not None and (s.hi < window[0] or s.lo > window[1]):
+                continue
+            nbs = []
+            for j in (i - 1, i + 1):
+                if 0 <= j < len(slots):
+                    q = slots[j]
+                    gap = (q.lo - s.hi) if j > i else (s.lo - q.hi)
+                    if -FACE_TOLERANCE_CM <= gap <= RUN_MAX_GAP_CM:
+                        nbs.append(q)
+            if any(q.compensator for q in nbs):
+                continue
+            if not any(q.code == "B34" and q.movable for q in nbs):
+                continue
+            length = s.hi - s.lo
+            # comp + junta + B34 = (comp menor + junta) + B39, ou so' B39
+            fits = abs(length + 1.0 + u34 - u39) <= EDGE_TOLERANCE_CM or any(
+                c < length - 0.5 and abs(length + u34 - u39 - c) <= EDGE_TOLERANCE_CM for c in comp_lengths)
+            if fits:
+                n += 1
+        return n
+
+    def _dead_small_cell(self, f, p, iv, nb_slots_list):
+        """SECAO 86.6 (chave JAMB_HUMAN_A_FORM_ENABLED - CONFLITO registrado com
+        84 item 3 / 85.8): celula `iv` = vazado MENOR do B34 `p` encostado numa jamba
+        ativa da familia `f`, voltado para o vao, com compensador (faixa macica) na
+        fileira vizinha sobre/sob ele - forma A do humano; nao e' coluna nem quebra."""
+        if not JAMB_HUMAN_A_FORM_ENABLED or p.code != "B34" or not p.orientable:
+            return False
+        if iv[1] - iv[0] >= SMALL_CELL_MAX_CM:
+            return False
+        c = (iv[0] + iv[1]) / 2.0
+        for edge, d in self._active_jamb_edges(f):
+            face = p.lo if d > 0 else p.hi
+            if abs(face - edge) > JAMB_TOUCH_TOLERANCE_CM or (c - p.mid) * d >= 0.0:
+                continue
+            for nb in nb_slots_list:
+                h = _covering(nb, c) if nb is not None else None
+                if h is not None and h.compensator:
+                    return True
+        return False
+
+    def _a_form_strip_pairs(self, f, window):
+        """SECAO 86.6 (chave JAMB_HUMAN_A_FORM_ENABLED): pares `C09 | C04` da faixa
+        encostada numa jamba ativa com o C09 NA FACE (sobra 14 do catalogo), so' os
+        da janela `window` - os mesmos que `_compensator_guard` contou nela."""
+        slots = self.fam[f]
+        n = 0
+        for edge, d in self._active_jamb_edges(f):
+            if edge < window[0] or edge > window[1]:
+                continue
+            i = self._touching_index(slots, edge, d)
+            if i is None or slots[i].code != "C09" or not (0 <= i + d < len(slots)):
+                continue
+            q = slots[i + d]
+            gap = (q.lo - slots[i].hi) if d > 0 else (slots[i].lo - q.hi)
+            if q.code == "C04" and 0.0 <= gap <= TOUCH_TOLERANCE_CM:
+                n += 1
+        return n
+
+    def _dead_cell_at_course(self, c0, p, iv):
+        f = self.course_fam.get(c0)
+        if f is None or not JAMB_HUMAN_A_FORM_ENABLED:
+            return False
+        nbs = [self.fam[self.course_fam[x]] for x in (c0 - 1, c0 + 1) if x in self.course_fam]
+        return self._dead_small_cell(f, p, iv, nbs)
 
     def _coincident_nonexempt(self, a, b, window):
         """Faces da familia `a` na janela que coincidem com uma face da `b` - menos
@@ -2476,6 +2803,8 @@ class _Wall(object):
         for f in fams:
             near = _in_window(self.fam[f], wide[0], wide[1])
             cp += _compensator_guard(near, self.length) * self.count[f]
+            if JAMB_HUMAN_A_FORM_ENABLED:
+                cp -= self._a_form_strip_pairs(f, wide) * self.count[f]  # 86.6 (forma A)
             ht += self._half_near_ties(near, f)
             ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
             b19 += self._half_blocks_misplaced(f, window) * self.count[f]
@@ -2488,12 +2817,16 @@ class _Wall(object):
             if a != b:
                 for face in self._coincident_nonexempt(a, b, window):
                     joints.add((round(face, 1), min(a, b), max(a, b)))
-        colstats = self._column_stats(fams, window)
+        colstats = self._column_stats_full(fams, window)
+        # 86.6: compensador isolado + B34 onde compensador menor + B39 fecha (85.8)
+        b34c = sum(self._b34_comp_where_b39_fits(f, window) * self.count[f] for f in fams)
         return {"dist": round(dist, 3), "breaks": breaks, "cp": cp, "ht": ht, "ex": ex, "sv": sv,
                 "prism": self._prism_bad(pairs3, window), "b19": b19, "comps": comps, "pieces": pieces,
-                "column": colstats[0], "colw": colstats[1], "colfull": colstats[2], "offjamb": offjamb,
+                "column": colstats[0], "colw": colstats[1], "colfull": colstats[2], "colbroken": colstats[3],
+                "offjamb": offjamb,
                 "paths": self._jamb_paths_ok(edges),
                 "coh": self._coherence_mismatch(fams, span_of, window, edges),
+                "closure": self._closure_mismatch(fams, span_of, edges), "b34c": b34c,
                 "joints": joints, "stacks": self._stacks_nonexempt(window), "moved": moved,
                 "strips": self._special_strips()}
 
@@ -2511,7 +2844,12 @@ class _Wall(object):
             fails.append("COMPENSATOR_OFF_JAMB")
         if m.get("paths", 0) < base.get("paths", 0):
             fails.append("PRISM_REQUIRED_PATH_WOULD_BREAK")
-        if m["column"] < base["column"]:
+        if JAMB_COLUMN_GUARD_COUNTS_BROKEN:
+            # 86.6: coluna QUEBRADA a mais (a celula que deixa de existir porque a
+            # peca virou canaleta da verga que segue a grade nao e' quebra)
+            if m.get("colbroken", 0) > base.get("colbroken", 0):
+                fails.append("PRISM_COLUMN_WOULD_BREAK")
+        elif m["column"] < base["column"]:
             fails.append("PRISM_COLUMN_WOULD_BREAK")
         if m["prism"] > base["prism"]:
             fails.append("PRISM_WOULD_BREAK")
@@ -2531,6 +2869,9 @@ class _Wall(object):
         # faixa vertical nova de peca especial - o recompositor tambem
         if m.get("strips", 0) > base.get("strips", 0):
             fails.append("REPEATED_SPECIAL_STRIP")
+        # 86.6 / 85.8 (REGRA OBRIGATORIA): compensador + B34 onde compensador menor + B39 fecha
+        if m.get("b34c", 0) > base.get("b34c", 0):
+            fails.append("B34_PLUS_COMPENSATOR_WHERE_B39_FITS")
         return fails
 
     def _layout_options(self, f, span, extra_codes=()):
@@ -2594,6 +2935,119 @@ class _Wall(object):
                             return out
         return out
 
+    def _catalog_candidates(self, f, span, edges):
+        """SECAO 86.6: candidatas do CATALOGO DA SOBRA para a corrida `span` da
+        familia `f` (tuplas de (codigo, lado), mesmas pontas). Janela: a fileira
+        cheia de referencia copiada peca a peca, com o fechamento do catalogo em cada
+        jamba (B39/B34 exatos no miolo quando a grade de baixo nao bate nas pontas).
+        Sem referencia (porta, boneca, pilarete entre portas): cada fechamento do
+        catalogo na(s) jamba(s) + B39/B34 exatos ate' a outra ponta - no pilarete as
+        DUAS jambas ao mesmo tempo, com no maximo uma faixa de compensadores (P=54:
+        `B39 C04 C09`, `B19 B34`, `B34 B19`; P=69: `B39 B19 C09` / `B19 B39 C09`)."""
+        if not JAMB_CATALOG_CANDIDATES_ENABLED:
+            return []
+        i0, i1 = span
+        run = self.fam[f][i0:i1 + 1]
+        if not run or any(_is_channel_code(sl.code) or not sl.movable for sl in run):
+            return []
+        gaps = [run[k + 1].lo - run[k].hi for k in range(len(run) - 1)]
+        joint = sorted(gaps)[len(gaps) // 2] if gaps else 1.0
+        if any(abs(g - joint) > JOINT_REGULAR_TOLERANCE_CM for g in gaps):
+            return []
+        lens = {}
+        for code in ("B39", "B34", "B19", "C09", "C04"):
+            tpl = self._tpl(code)
+            if tpl is None:
+                return []
+            lens[code] = tpl.hi - tpl.lo
+        lo, hi = run[0].lo, run[-1].hi
+        active = self._family_active_edges(f, edges)
+        left = [e for e, d in active if d > 0 and abs(lo - e) <= JAMB_TOUCH_TOLERANCE_CM]
+        right = [e for e, d in active if d < 0 and abs(hi - e) <= JAMB_TOUCH_TOLERANCE_CM]
+        if not left and not right:
+            return []
+        side = next((sl.side for sl in run if sl.orientable and sl.side), 1)
+        cat = JAMB_REMNANT_CATALOG
+        keys = sorted(cat)
+
+        def closures(r_left, r_right):
+            head = [(c, None) for c in cat[r_left]] if r_left is not None else []
+            tail = [(c, None) for c in reversed(cat[r_right])] if r_right is not None else []
+            a = lo + (r_left + joint if r_left else 0.0)
+            b = hi - (r_right + joint if r_right else 0.0)
+            return head, tail, b - a
+
+        def middles(length):
+            """[[(codigo, lado|None)]] do miolo de `length` cm (pecas + juntas internas)."""
+            if abs(length + joint) <= EDGE_TOLERANCE_CM:
+                return [[]]
+            if length <= EDGE_TOLERANCE_CM:
+                return []
+            fill = self._fill_exact(length + joint, joint, side)
+            if fill is None:
+                return []
+            fill = [(c, None) for c, _s in fill]
+            out = [fill]
+            if any(c == "B34" for c, _s in fill) and any(c == "B39" for c, _s in fill):
+                out.append(list(reversed(fill)))
+            return out
+
+        seqs = []
+        ref = self._reference_slots(f, lo, hi, [e for e, _d in edges], frozen=True, edges=edges)
+        if ref is not None:
+            rl = self._jamb_remnant(ref, left[0], 1) if left else None
+            rr = self._jamb_remnant(ref, right[0], -1) if right else None
+            if (rl is not None or not left) and (rr is not None or not right):
+                head, tail, length = closures(rl[0] if rl else None, rr[0] if rr else None)
+                a = lo + (rl[0] + joint if rl and rl[0] else 0.0)
+                b = a + length
+                mid = [s for s in ref if s.lo >= a - EDGE_TOLERANCE_CM and s.hi <= b + EDGE_TOLERANCE_CM]
+                copy = None
+                if abs(length + joint) <= EDGE_TOLERANCE_CM:
+                    copy = []
+                elif (mid and abs(mid[0].lo - a) <= EDGE_TOLERANCE_CM and abs(mid[-1].hi - b) <= EDGE_TOLERANCE_CM
+                      and all(not s.node and not s.compensator and s.code in lens for s in mid)
+                      and all(abs((q.lo - p.hi) - joint) <= 0.3 for p, q in zip(mid, mid[1:]))):
+                    copy = [(s.code, s.side if s.orientable else 0) for s in mid]
+                if copy is not None:
+                    seqs.append(head + copy + tail)
+                else:
+                    seqs.extend(head + m + tail for m in middles(length))
+        else:
+            for r_left in (keys if left else [None]):
+                for r_right in (keys if right else [None]):
+                    hl = [c for c in (cat[r_left] if r_left is not None else ()) if c in ("C04", "C09")]
+                    hr = [c for c in (cat[r_right] if r_right is not None else ()) if c in ("C04", "C09")]
+                    if hl and hr:
+                        continue  # pilarete: no maximo uma faixa
+                    head, tail, length = closures(r_left, r_right)
+                    seqs.extend(head + m + tail for m in middles(length))
+        out, seen = [], set()
+        current = tuple((s.code, s.side if s.orientable else 0) for s in run)
+        for seq in seqs:
+            codes = [c for c, _s in seq]
+            if not codes or abs(sum(lens[c] for c in codes) + joint * (len(codes) - 1) - (hi - lo)) > EDGE_TOLERANCE_CM:
+                continue
+            free = [k for k, (c, s) in enumerate(seq) if s is None and self._tpl(c).orientable]
+            for pat in ((1,), (-1,), (1, -1), (-1, 1)):
+                sides = []
+                for k, (c, s) in enumerate(seq):
+                    if k in free:
+                        sides.append(pat[free.index(k) % len(pat)])
+                    elif s is None:
+                        sides.append(0)
+                    else:
+                        sides.append(s)
+                cand = tuple(zip(codes, sides))
+                if cand not in seen and cand != current:
+                    seen.add(cand)
+                    out.append(cand)
+                if not free:
+                    break
+            if len(out) >= JAMB_CATALOG_CANDIDATES_MAX:
+                break
+        return out[:JAMB_CATALOG_CANDIDATES_MAX]
+
     def _splice_layout(self, f, span, layout, joint):
         """Troca a corrida `span` por `layout` (mesmas pontas); devolve o novo span.
         Com o MESMO numero de pecas preserva a sequencia real de juntas (indice a
@@ -2629,6 +3083,8 @@ class _Wall(object):
         pairs = sorted((a, b, k) for (a, b), k in self.weights.items() if a in span0 or b in span0)
         pairs3 = self._prism_pairs(set(fams))
         orig_lists = dict((f, list(self.fam[f])) for f in fams)
+        # 86.6: o termo `closure` le a referencia como estava antes da busca
+        self._frozen_ref = orig_lists
         joints = {}
         for f in fams:
             run = self.fam[f][span0[f][0]:span0[f][1] + 1]
@@ -2636,6 +3092,12 @@ class _Wall(object):
             joints[f] = sorted(gaps)[len(gaps) // 2] if gaps else 1.0
         base_codes = dict((f, [s.code for s in self.fam[f][span0[f][0]:span0[f][1] + 1]]) for f in fams)
         options = dict((f, self._layout_options(f, span0[f], extra_codes)) for f in fams)
+        if JAMB_CATALOG_CANDIDATES_ENABLED and edges and \
+                any(self._family_closure_defect(f, span0[f], edges) for f in fams):
+            # 86.6: as candidatas do catalogo entram logo depois da atual (desempate)
+            for f in fams:
+                extra = [c for c in self._catalog_candidates(f, span0[f], edges) if c not in options[f]]
+                options[f][1:1] = extra
 
         def apply(assign):
             spans = {}
@@ -2693,9 +3155,13 @@ class _Wall(object):
             # 85.8: vazado menor do B34 fora de vazado menor/central (sv) e' prisma
             # quebrado - vem logo depois do B19; a faixa encostada na jamba (dist)
             # vem antes da soma de larguras
-            return (m["b19"], m["sv"], -m["paths"], -m["column"], m["coh"], -m["colfull"], m["dist"],
-                    -m["colw"], m["prism"], m["breaks"], m["comps"], m["pieces"], m["moved"],
-                    tuple(options[f].index(assign[f]) for f in fams))
+            # 86.6: `b34c` (compensador + B34 onde B39 fecha, REGRA OBRIGATORIA da
+            # 85.8) junto do vazado menor; `closure` (catalogo da sobra, PADRAO
+            # OBSERVADO no humano) depois do percurso obrigatorio da jamba (85.7) e
+            # antes da contagem de colunas. Os dois valem 0 com as chaves desligadas.
+            return (m["b19"], m["sv"], m["b34c"], -m["paths"], m["closure"], -m["column"], m["coh"],
+                    -m["colfull"], m["dist"], -m["colw"], m["prism"], m["breaks"], m["comps"], m["pieces"],
+                    m["moved"], tuple(options[f].index(assign[f]) for f in fams))
 
         start = dict((f, options[f][0]) for f in fams)
         base = measure(start)
@@ -2705,9 +3171,16 @@ class _Wall(object):
         # sao colunas continuas na altura inteira
         all_cells = sum(len(self._cell_intervals(p)) * self.count[f] for f in fams
                         for p in _in_window(self.fam[f], window[0], window[1]))
+        if JAMB_HUMAN_A_FORM_ENABLED:
+            all_cells -= sum(1 for f in fams for c0 in self._courses_of(f)
+                             for p in _in_window(self.fam[f], window[0], window[1])
+                             for iv in self._cell_intervals(p) if self._dead_cell_at_course(c0, p, iv))
+        # 86.6: fechamento fora do catalogo / compensador + B34 tambem e' defeito
         settled = (base["prism"] == 0 and base["b19"] == 0 and base["dist"] == 0.0 and base["breaks"] == 0
-                   and base["paths"] == len(edges) and base["column"] >= all_cells)
+                   and base["paths"] == len(edges) and base["column"] >= all_cells
+                   and base["closure"] == 0 and base["b34c"] == 0)
         if settled:
+            self._frozen_ref = None
             return False
         total = 1
         for f in fams:
@@ -2718,7 +3191,8 @@ class _Wall(object):
                     if not any(abs(e - edge) < EDGE_TOLERANCE_CM and dd == d
                                for e, dd in self._active_jamb_edges(f) for edge, d in es)]
         active_f = [f for f in fams if f not in bridge_f]
-        defect = (base["paths"] < len(edges) or base["b19"] > 0 or base["dist"] > 0.0 or base["prism"] > 0)
+        defect = (base["paths"] < len(edges) or base["b19"] > 0 or base["dist"] > 0.0 or base["prism"] > 0
+                  or base["closure"] > 0 or base["b34c"] > 0)
         if bridge_f and active_f and total > JAMB_JOINT_MAX_COMBINATIONS and not defect:
             # sem defeito na lateral: so' as fiadas da jamba (ponte fica como esta')
             fams_search = active_f
@@ -2738,7 +3212,11 @@ class _Wall(object):
                         best = (obj, assign)
                 total = 0
             del fams_search
-        if bridge_f and active_f and total > JAMB_JOINT_MAX_COMBINATIONS:
+        # 86.6: com defeito de fechamento (catalogo / compensador + B34) a ponte/verga
+        # tem de seguir a grade das alternativas (estagios A/B) mesmo quando as
+        # combinacoes cabem na busca exaustiva - la' a derivada so' via a melhor
+        catalog_defect = base["closure"] > 0 or base["b34c"] > 0
+        if bridge_f and active_f and (total > JAMB_JOINT_MAX_COMBINATIONS or catalog_defect):
             best, best_any = self._staged_search(fams, active_f, bridge_f, options, start, base, measure,
                                                  objective, best, best_any,
                                                  derive=lambda a: derive(a, active_f, bridge_f), span0=span0)
@@ -2794,13 +3272,14 @@ class _Wall(object):
                 if not self._jamb_failures(m, base) and obj < best[0]:
                     best = (obj, trial)
         chosen_obj, chosen = best
-        changed = chosen_obj[:12] < base_obj[:12]
+        # ate' `pieces` (86.6: dois termos novos - b34c e closure)
+        changed = chosen_obj[:14] < base_obj[:14]
         # tudo o que usa `measure` (aplica, mede e RESTAURA) vem antes de aplicar
         final = measure(chosen)
         reasons = ["NO_LAYOUT_REACHES_JAMB"]
         detail = {}
         blocked = final["dist"] > 0.0 or final["b19"] > 0 or final["prism"] > 0 or final["paths"] < len(edges)
-        if blocked and best_any[0][:9] < chosen_obj[:9]:
+        if blocked and best_any[0][:11] < chosen_obj[:11]:  # ate' `prism`
             blocked_by = measure(best_any[1])
             reasons = self._jamb_failures(blocked_by, base) or reasons
             new_joints = sorted(set(j[0] for j in blocked_by["joints"] - base["joints"]))
@@ -2838,6 +3317,7 @@ class _Wall(object):
                     "codes": [self.fam[f][i].code for i in range(i0, i1 + 1)],
                     "reasons": reasons + (["HALF_BLOCK_NOT_ADMISSIBLE_REMAINS"] if misplaced else []),
                     "detail": dict(detail)})
+        self._frozen_ref = None
         return bool(changed)
 
     def align_jamb_compensators(self):

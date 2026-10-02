@@ -527,7 +527,7 @@ _JAMB_OPENINGS = [[(ft(100.0), ft(150.0), ft(0.0), ft(210.0))]]
 def _compensator_at(center_cm):
     return {"wall_idx": 0, "origin_world": m.XYZ(ft(center_cm), 0.0, 0.0), "x_dir": m.XYZ(1.0, 0.0, 0.0),
             "y_dir": m.XYZ(0.0, 1.0, 0.0), "length_cm": 5.0, "width_cm": 14.0, "course": "A",
-            "logical_code": "C04"}
+            "logical_code": "C09"}  # 86.10: o C04 e' simetrico (sem orientacao exigida)
 
 
 def _required_mirror(cand):
