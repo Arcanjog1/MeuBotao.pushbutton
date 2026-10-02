@@ -258,6 +258,12 @@ def corpus_lines(result):
             item.get("wall_id"), item.get("axis_key"), geo.get("length_cm"), item.get("reason")))
     if len(corpus.get("excluded") or []) > 40:
         lines.append("  … e mais {} excluído(s).".format(len(corpus["excluded"]) - 40))
+    # Seção 86.9 — tocos de eixo aparados (a parede termina na face da que cruza).
+    for item in [it for it in (corpus.get("trimmed") or []) if it.get("rule_id") == "REGRA_86_9_STUB_TRIM"][:40]:
+        lines.append("  Toco aparado: parede {} (eixo {}, ponta {}) — {} cm além da face da parede #{} "
+                     "({} → {} cm, seção 86.9)".format(
+                         item.get("wall_id"), item.get("index"), item.get("end_index"), item.get("trimmed_cm"),
+                         item.get("crossing_wall_index"), item.get("length_cm"), item.get("new_length_cm")))
     return lines
 
 

@@ -92,12 +92,22 @@ def snapshot_expected():
 
 
 # ================================================== reconstrucao da geometria
-def build_context(geo, translate=(0.0, 0.0), order=None, swap_ends=()):
+def build_context(geo, translate=(0.0, 0.0), order=None, swap_ends=(), stub_trim=None):
     """Reconstroi o contexto do motor a partir da geometria versionada.
 
     `translate` (cm), `order` (permutacao da lista de paredes) e `swap_ends`
     (chaves de parede com as pontas invertidas) existem para os testes de
     invariancia - nao mudam a fisica, so' como a geometria e' apresentada.
+
+    `stub_trim` (None = o que o produto faz, chave `STUB_TRIM_ENABLED` do motor)
+    liga/desliga a secao 86.9: tocos de eixo <= 40 cm alem da face da parede que
+    cruza sao aparados ANTES de extend/grafo, como no fluxo de paredes
+    existentes. Os casos HISTORICOS (secoes 74/76, anteriores a' 86.9) sao
+    medidos com False. O que foi aparado fica em `ctx["stub_trims"]` (motor) e
+    `ctx["corpus_trimmed"]` (formato do corpus da secao 49.1); ATENCAO a' regua:
+    uma ponta 0 aparada anda o p0 do eixo - `ctx["original_axes"]` guarda os
+    eixos de entrada e `ctx["openings_per_wall_original"]` as aberturas no
+    referencial deles.
     """
     m, _ws = engine()
     XYZ, Line = m.XYZ, m.Line
@@ -137,11 +147,20 @@ def build_context(geo, translate=(0.0, 0.0), order=None, swap_ends=()):
             "opening_off_center_count": 0, "assignments": [], "unassigned_openings": []}
     openings_per_wall = m.assign_openings_to_walls(walls_to_create, ops, diag)
     original = list(walls_to_create)
+    original_openings = list(openings_per_wall)
+    # SECAO 86.9 (R9): mesmo ponto do fluxo de paredes existentes - antes do grafo
+    # (motor anterior a' 86.9, sem a funcao: nada a aparar)
+    stub_trims, corpus_trimmed = [], []
+    if getattr(m, "trim_wall_end_stubs", None) is not None:
+        walls_to_create, openings_per_wall, stub_trims = m.trim_wall_end_stubs(
+            walls_to_create, openings_per_wall, enabled=stub_trim)
+        corpus_trimmed = m.stub_trim_corpus_items(stub_trims, None, keys)
     extended, jmap = m.extend_wall_ends_to_junctions(walls_to_create, m.JUNCTION_FACE_SEARCH_FT)
     nodes, e2n = m.build_wall_graph(extended, jmap)
     return {"walls": extended, "original_axes": original, "nodes": nodes, "e2n": e2n,
-            "openings_per_wall": openings_per_wall, "keys": keys, "ops": ops, "diag": diag,
-            "translate": (dx, dy)}
+            "openings_per_wall": openings_per_wall, "openings_per_wall_original": original_openings,
+            "stub_trims": stub_trims, "corpus_trimmed": corpus_trimmed,
+            "keys": keys, "ops": ops, "diag": diag, "translate": (dx, dy)}
 
 
 def with_opening_variant(geo, nome):
@@ -366,8 +385,11 @@ def solve(ctx, physical_tolerance, geo=None, courses=COURSES_SOLVE, strategy="CH
 def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strategy="CHANNEL",
                            regra76_d1=None, regra76_nao_resolvido=None, papel_por_fiada=None,
                            tolerancias_fisicas=None, regras_de_encontro=None, reforco_estrutural=None,
-                           regras_gerais=None):
+                           regras_gerais=None, stub_trim=None):
     """Solve sobre um grafo de nos NOVO - e' assim que se deve medir.
+
+    `stub_trim` (None = produto) vai para build_context (secao 86.9); o que foi
+    aparado viaja em `res["corpus_selection"]["trimmed"]`, como no produto.
 
     O motor MUTA os nos durante o solve: a secao 72 grava nos proprios nos uma
     marca de decisao unica por planta (`_tie_parity_fill_done`) e a inversao de
@@ -379,12 +401,19 @@ def solve_on_fresh_context(geo, physical_tolerance, courses=COURSES_SOLVE, strat
 
     Devolve (ctx, res) porque a regua precisa do ctx que produziu o resultado.
     """
-    ctx = build_context(geo)
-    return ctx, solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy,
-                      regra76_d1=regra76_d1, regra76_nao_resolvido=regra76_nao_resolvido,
-                      papel_por_fiada=papel_por_fiada, tolerancias_fisicas=tolerancias_fisicas,
-                      regras_de_encontro=regras_de_encontro, reforco_estrutural=reforco_estrutural,
-                      regras_gerais=regras_gerais)
+    ctx = build_context(geo, stub_trim=stub_trim)
+    res = solve(ctx, physical_tolerance, geo=geo, courses=courses, strategy=strategy,
+                regra76_d1=regra76_d1, regra76_nao_resolvido=regra76_nao_resolvido,
+                papel_por_fiada=papel_por_fiada, tolerancias_fisicas=tolerancias_fisicas,
+                regras_de_encontro=regras_de_encontro, reforco_estrutural=reforco_estrutural,
+                regras_gerais=regras_gerais)
+    m, _ws = engine()
+    if getattr(m, "corpus_selection_record", None) is not None and "corpus_selection" not in res:
+        n_axes = len(ctx["walls"])
+        res["corpus_selection"] = m.corpus_selection_record(
+            "corpus s74", n_axes, n_axes, [], reference_layer=None, rule_id=m.CORPUS_RULE_NONE,
+            trimmed=ctx.get("corpus_trimmed"))
+    return ctx, res
 
 
 def hard_gates(res):

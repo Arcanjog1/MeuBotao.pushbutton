@@ -11794,3 +11794,77 @@ síntese versionada):
   `worktree-wf_ff7686b5-095-2`, commits e48d38c/fea1b17); R2/R4, R7A/R8 em implementação; R6/R10 e R9 na fila.
   R1 e R5 aplicadas no `butanta testes` (dados, sem código).
 
+### 86.9 Tocos de eixo além da face da parede que cruza (R9) — PADRÃO OBSERVADO (5/5); IMPLEMENTADO, chave `STUB_TRIM_ENABLED`
+
+**Como foi descoberto (2026-10-01/02, offline, só leitura):** fileiras do humano (`human_rows_unpad.json`, extração do
+R08_LT) comparadas com a geometria do corpus (`reference_projects/butanta_r08_lt/s74_corpus/geometry.json`). O humano
+modula a W07 só até **999 cm** (o eixo tem 1039 e passa **40 cm** além da face da W31), as W29, W30 e W31 só até
+**64 cm** (eixos de 99 que passam **35 cm** além da face da W13, W24 e W13) e começa a W09 em **5 cm** (o eixo começa
+5 cm além da face da W29: f0 humana `B34[5-39]`, nossa `B34[0-34]`, saindo 5 cm para fora do canto). O nosso motor
+modulava os tocos: são as ~77 peças que o humano não tem nos nós n19, n20, n39 e n51 (numeração do grafo do corpus
+sem o corte), mais o B34 sobrando na W09. A W09 (5 cm) não estava na síntese — apareceu na verificação.
+- Índices: as chaves do corpus (W01–W34) são 1-based; nos índices 0-based de `human_rows_unpad.json`/`rows_*.json`
+  W07 = 6, W09 = 8, W29 = 28, W30 = 29, W31 = 30. A síntese (`r4_synthesis.txt`, R9) cita "W7, W29/W30/W31" pelas
+  chaves; a "W24" da ponta livre na mesma síntese é o índice 0-based 24 (chave W25).
+
+**PADRÃO OBSERVADO (encontro/amarração, 5/5 no BUTANTA — 40, 35, 35, 35 e 5 cm):** um trecho de eixo de no máximo
+**40 cm além da FACE de uma parede perpendicular**, **sem abertura** e **sem outra parede encostando nele**, é sobra da
+conversão CAD→Walls e **NÃO é modulado**: a parede termina na face da que cruza, como num canto — o T vira **L** (num
+cruzamento "+" com toco, vira T de parede que chega). Medido no grafo do corpus (só o corte, sem solve): T 37 → 33,
+L 13 → 17, pontas livres 5 → 1 (sobra só a ponta livre de verdade, W25/índice 24). Mini-planta real W09 + W13 + W29 + W31
+(4 fiadas, sem aberturas): a W29 sai `C09|C04|B34` na f0 e `B34|C09|C04` na f1, terminando em 64 cm como o humano
+(o humano põe o C04 antes do C09 — ordem do compensador é assunto da R6/86.6, não desta regra).
+
+**Decisões de implementação (DEDUÇÃO, não medidas no humano — revisar se aparecer caso contrário):**
+- Abaixo de **1 cm** (`STUB_TRIM_MIN_CM`) não é toco: é variação de modelagem (o corpus mede 0,013 cm) e mexer no eixo
+  por centésimos mudaria a composição à toa. Limite máximo com folga de medida de 0,05 cm (40,05 corta; 41 não).
+- A face que conta é a da parede perpendicular **mais próxima da ponta** cujo eixo cruza o trecho da parede (e que
+  passa fisicamente ali). Se outra parede chega no meio do "toco", ela é um encontro de verdade e o que sobra além
+  DELA é que é toco.
+- **Não é toco** (nada é cortado): abertura da própria parede entrando no trecho; outra parede (fora a que cruza)
+  encostando no trecho pela lateral, atravessando-o ou na ponta (pegada com a espessura + 5 cm de contato; a outra
+  metade de uma parede dividida no nó, que só encosta na LINHA da face, não conta — folga de 0,5 cm); ponta travada
+  por testa do CAD (`locks`: o desenho diz que a parede acaba ali); parede sem corpo do outro lado (aba de ≤ 40 cm
+  que só nasce na parede que cruza — cortar apagaria a parede); corpo do outro lado também ≤ 40 cm com a outra ponta
+  livre (peça curta ambígua).
+- Determinístico e invariante à ordem das paredes e ao sentido do eixo: tudo é decidido sobre a geometria de ENTRADA
+  para todas as pontas e aplicado no fim (as duas pontas de uma parede podem ser cortadas).
+
+**Implementação (`nuvem/core/engine/wall_pairing.py`):**
+- Chaves: `STUB_TRIM_ENABLED = True`, `STUB_TRIM_MAX_CM = 40.0`, `STUB_TRIM_MIN_CM = 1.0`, `STUB_TRIM_TOLERANCE_CM`,
+  `STUB_TRIM_FACE_CLEARANCE_CM`, `STUB_TRIM_CONTACT_TOLERANCE_FT`, `STUB_TRIM_RULE_ID = "REGRA_86_9_STUB_TRIM"`.
+  A chave mora no módulo do motor (`core.engine.wall_pairing`), não em `wall_modeling`.
+- `find_wall_end_stubs` (só mede), `trim_wall_end_stubs(walls, openings_per_wall, enabled=None, max_cm=None)` (corta
+  o eixo até a face e REANCORA o t das aberturas no novo p0 quando a ponta 0 é cortada; nunca muta a entrada) e
+  `stub_trim_corpus_items` (itens do corpus).
+- Chamado ANTES de `extend_wall_ends_to_junctions`/`build_wall_graph`, de modo que o solve inteiro (encontros,
+  preenchimento, materialização) veja o L: em `run_modulation_on_existing_walls` (logo depois de
+  `assign_openings_to_walls`), em `_PostCreationEventHandler._refresh_geometry_from_document` →
+  `_reapply_stub_trims` (a Wall do Revit **não** é aparada e o refresh a relê antes de toda ação; o corte é refeito e
+  as aberturas só andam pela DIFERENÇA de corte da ponta 0 — sem deriva entre refreshes; no fluxo CAD→Walls, cujas
+  Walls nascem com o toco, o primeiro refresh corta e reancora uma vez) e na bancada `tools/audit/s74_corpus.py`
+  (`build_context(..., stub_trim=None)`, `None` = produto).
+- Registro: o que foi aparado vai para `corpus_selection["trimmed"]` (secao 49.1, hoje vazio no fluxo de paredes
+  existentes) com `rule_id`, parede, ponta, cm aparados, parede que cruza e comprimentos; aparece no relatório
+  (`TRIMMED axis_index=… rule_id=REGRA_86_9_STUB_TRIM … trimmed_cm=…`), na UI ("Toco aparado: …") e no output do
+  fluxo. Na bancada: `ctx["stub_trims"]`, `ctx["corpus_trimmed"]` e `res["corpus_selection"]`.
+- NÃO aplicado: na criação das Walls do fluxo CAD→Walls (`main`) — as Walls continuam fiéis ao CAD e a modulação corta
+  no refresh —; nas pontes antigas de benchmark (`nuvem/benchmark/*`); o pipeline headless via MCP precisa chamar
+  `trim_wall_end_stubs` entre `assign_openings_to_walls` e `extend_wall_ends_to_junctions`.
+- Os casos HISTÓRICOS da bancada (seções 74 e 76: `tests/test_s74_corpus_butanta.py`,
+  `tests/test_regra76_corpus_butanta.py`, `tools/audit/audit_s74_corpus.py`) passam `stub_trim=False` — os 37 T e os
+  snapshots foram medidos antes desta regra.
+- Régua do integrador: a W09 tem a ponta 0 cortada (o p0 anda 5 cm). Quem mede `t` a partir do p0 de `ctx["walls"]`
+  (ex.: `sol_to_rows.py` via `walls_cm`) deve usar `ctx["original_axes"]` e `ctx["openings_per_wall_original"]` para
+  ficar no referencial do humano.
+- Testes: `tests/test_stub_trim_86_9.py` (35/40 cm viram L; 41 não; < 1 cm não; abertura no toco; parede encostada;
+  continuação colinear; aba; ponta travada; parede dividida no nó; face mais próxima; invariância a ordem e sentido;
+  reancoragem das aberturas; refresh sem deriva nos dois fluxos; corpus/relatório/UI; corpus BUTANTA — os 5 tocos e
+  os 4 T que viram L —; mini-planta real W13 + W29).
+
+**Ponta LIVRE (W25 = índice 24; a síntese chama de "W24") — PADRÃO OBSERVADO AINDA NÃO CONFIRMADO (1 caso),
+DOCUMENTADO - pendência de código aberta:** o humano fecha a ponta livre com uma **coluna de C04 em todas as fiadas**
+(f0 `B34 B34 B34 B34 B39 B39 C04[220-224]`, f1 `B34 B34 B34 B39 B39 B19 C04[220-224]`) e põe a faixa de B34 no nó da
+outra ponta (4 na f0, 3 na f1). O nosso: f0 `B34 B39×4 C09 B19`, f1 `B39×5 C09`. Motor: `_axis_free_end_sides` e
+`_wall_end_default_start_cm` (`core/engine/wall_stepper.py`). Não implementado — um caso só não sustenta regra.
+
