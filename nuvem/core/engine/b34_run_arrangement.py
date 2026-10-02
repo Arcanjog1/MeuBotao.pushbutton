@@ -265,7 +265,8 @@ CHANNEL_OF_BLOCK = {"B39": "CHANNEL_U_39", "B34": "CHANNEL_U_34", "B19": "CHANNE
 # 244/254 fiadas x jamba (96 %), nosso 103/126. Termo `closure` do objetivo (logo depois do percurso
 # obrigatorio) e a unidade deixa de sair por "settled" quando o fechamento desvia do catalogo. Porta /
 # boneca / pilarete entre portas (sem fiada cheia abaixo): so' a forma do catalogo (sem referencia, ver
-# 86.6) e, no pilarete, no maximo UMA faixa de compensadores.
+# 86.6) e, no pilarete SEM referencia, no maximo UMA faixa de compensadores (com referencia quem decide e'
+# a sobra: o humano tem pilarete com faixa nas duas jambas, W0 1440-1509 `C04 B19 B39 C04`).
 JAMB_REMNANT_CATALOG_ENABLED = True
 JAMB_REMNANT_CATALOG = {0: (), 4: ("C04",), 9: ("C09",), 14: ("C09", "C04"), 19: ("B19",),
                         24: ("C04", "B19"), 29: ("C09", "B19"), 34: ("B34",)}
@@ -283,13 +284,14 @@ JAMB_B34_COMPENSATOR_GUARD_ENABLED = True
 JAMB_CATALOG_CANDIDATES_ENABLED = True
 JAMB_CATALOG_CANDIDATES_MAX = 24
 # SECAO 86.6 - FORMA A do humano (sobra 14/34: `C09 C04` encostados com o C09 na face numa paridade, `B34`
-# com o vazado menor voltado para o vao na outra; 10 jambas, 35 B34s, 100 % deterministico). CONFLITO com
-# regras do usuario - DESLIGADA ate' decisao: (a) o par C09+C04 e' "compensadores encostados" novo (regra #2,
-# 84 item 6) e (b) o vazado MENOR do B34 fica sobre/sob a faixa macica da jamba = "vazado sobre peca macica"
-# (85.1/85.8). Ligada: o par C09+C04 encostado na jamba (C09 na face) nao conta como compensadores
-# encostados e o vazado menor do B34 sobre a faixa e' celula MORTA (fora da contagem de colunas, do prisma
-# por interface e da semente do percurso obrigatorio; as outras celulas continuam com a regua de sempre).
-JAMB_HUMAN_A_FORM_ENABLED = False
+# com o vazado menor voltado para o vao na outra; humano 35/35 B34 na jamba sobre faixa = vazado menor para o
+# vao). E' o catalogo da sobra nas sobras 14 e 34 e o pilarete de 54 (`B39|C04|C09` / `B19|B34`, 85.6).
+# Ligada: o par C09+C04 encostado na jamba (C09 na face) nao conta como compensadores encostados (a 84 item 2
+# ja' tratava o par como UMA faixa) e o vazado menor do B34 sobre a faixa e' celula MORTA (fora da contagem de
+# colunas, do prisma por interface e da semente do percurso obrigatorio; as outras celulas continuam com a
+# regua de sempre). CONFLITO registrado na 86.6 com 84 item 3 / 85.8 ("vazado sobre peca macica") - desligar
+# esta chave volta ao comportamento anterior (as sobras 14/34 deixam de seguir o catalogo).
+JAMB_HUMAN_A_FORM_ENABLED = True
 # SECAO 86.6: a falha dura PRISM_COLUMN_WOULD_BREAK conta celulas QUEBRADAS a mais, nao celulas em coluna a
 # menos. Medido (W1, porta [79,170], fiadas 0-11): `C04 | B39` / `C04 | B19 | B39` (o humano) com a verga
 # seguindo a grade so' "perdia" as 2 celulas do B34 da fiada 11 que viram canaleta (U39) - nenhuma coluna
@@ -2029,7 +2031,7 @@ class _Wall(object):
                         if c < window[0] or c > window[1]:
                             continue
                         if JAMB_HUMAN_A_FORM_ENABLED and self._dead_small_cell(src, p, iv, [dst_slots]):
-                            continue  # 86.6 (chave desligada): celula morta da forma A
+                            continue  # 86.6 (forma A): celula morta (vazado menor sobre a faixa)
                         if via is not None:
                             h = _covering(self.fam[via], c)
                             if h is None or not _is_channel_code(h.code):
@@ -2114,7 +2116,7 @@ class _Wall(object):
                     continue
                 for lo2, hi2 in self._cell_intervals(q):
                     if JAMB_HUMAN_A_FORM_ENABLED and self._dead_cell_at_course(c, q, (lo2, hi2)):
-                        continue  # 86.6 (chave desligada): celula morta nao e' semente
+                        continue  # 86.6 (forma A): celula morta nao e' semente
                     dist = (lo2 - edge) if d > 0 else (edge - hi2)
                     if -0.5 <= dist <= JAMB_PATH_REACH_CM and (seed is None or dist < seed[0]):
                         seed = (dist, (lo2, hi2), c)
@@ -2305,7 +2307,7 @@ class _Wall(object):
                 for iv in self._cell_intervals(p):
                     for c0 in member_courses:
                         if JAMB_HUMAN_A_FORM_ENABLED and self._dead_cell_at_course(c0, p, iv):
-                            continue  # 86.6 (chave desligada): celula morta da forma A
+                            continue  # 86.6 (forma A): celula morta (vazado menor sobre a faixa)
                         ok, narrowest = self._trace_column(c0, iv, restart=True)
                         if not ok:
                             broken += 1
@@ -2373,7 +2375,8 @@ class _Wall(object):
         cortada pela face da jamba (edge, d). Sobra = o pedaco da peca que contem a
         face, do lado da alvenaria (a parte que fica), arredondado para a chave do
         catalogo; 0 = a face cai na junta e a propria peca da grade continua. None
-        quando a face nao cai no modulo do catalogo."""
+        quando a face nao cai no modulo do catalogo, ou quando a peca da grade e' de
+        no', canaleta ou compensador (nao ha' grade de bloco a continuar)."""
         tol = JAMB_TOUCH_TOLERANCE_CM
         host = None
         for s in _in_window(ref, edge - 1.0, edge + 1.0):
@@ -2384,11 +2387,16 @@ class _Wall(object):
             side = [s for s in ref if (s.lo >= edge - tol if d > 0 else s.hi <= edge + tol)]
             if not side:
                 return None
-            grid = side[0] if d > 0 else side[-1]
-            if abs((grid.lo if d > 0 else grid.hi) - edge) > tol:
+            host = side[0] if d > 0 else side[-1]
+            if abs((host.lo if d > 0 else host.hi) - edge) > tol:
                 return None
-            return 0, grid.code
-        raw = (host.hi - edge) if d > 0 else (edge - host.lo)
+            raw = 0.0
+        else:
+            raw = (host.hi - edge) if d > 0 else (edge - host.lo)
+        if host.node or host.compensator or _is_channel_code(host.code):
+            return None
+        if raw == 0.0:
+            return 0, host.code
         for key in sorted(JAMB_REMNANT_CATALOG):
             if key and abs(raw - key) <= JAMB_REMNANT_TOLERANCE_CM:
                 return key, host.code
@@ -2440,11 +2448,15 @@ class _Wall(object):
             rem = self._jamb_remnant(ref, edge, d)
             if rem is not None:
                 r, grid_code = rem
-                if r > self._free_from_jamb(f, edge, d) + JAMB_REMNANT_TOLERANCE_CM:
-                    return 0  # a sobra nao cabe antes da peca fixa: nada a exigir
                 expected = list(JAMB_REMNANT_CATALOG[r])
                 if not expected:
+                    tpl = self._tpl(grid_code)
+                    free = self._free_from_jamb(f, edge, d) + JAMB_REMNANT_TOLERANCE_CM
+                    if tpl is None or tpl.hi - tpl.lo > free:
+                        return 0  # a peca da grade nao cabe antes da peca fixa: nada a exigir
                     return 0 if codes[0] == grid_code else 1
+                if r > self._free_from_jamb(f, edge, d) + JAMB_REMNANT_TOLERANCE_CM:
+                    return 0  # a sobra nao cabe antes da peca fixa: nada a exigir
                 if codes[:len(expected)] != expected:
                     return 1
                 if len(run) > len(expected):
@@ -2479,9 +2491,11 @@ class _Wall(object):
 
     def _closure_mismatch(self, fams, spans, edges):
         """SECAO 86.6: fiadas x jamba da unidade cujo fechamento desvia do catalogo
-        da sobra (`_closure_defect`), mais, no pilarete, a regra do humano de no
-        maximo UMA faixa de compensadores: faixa nas duas jambas na mesma fiada, ou
-        em jambas diferentes conforme a fiada (zigue-zague, 85.8)."""
+        da sobra (`_closure_defect`), mais, no pilarete SEM fileira cheia de
+        referencia, a regra do humano de no maximo UMA faixa de compensadores: faixa
+        nas duas jambas na mesma fiada, ou em jambas diferentes conforme a fiada
+        (zigue-zague, 85.8). Com referencia quem decide e' a sobra (o humano tem
+        pilarete de janela com faixa nas duas jambas: W0 1440-1509)."""
         if not JAMB_REMNANT_CATALOG_ENABLED or not edges:
             return 0
         edge_ts = [e for e, _d in edges]
@@ -2497,7 +2511,7 @@ class _Wall(object):
             here = []
             for e, d in active:
                 n += self._closure_defect(f, e, d, ref) * self.count[f]
-                if self._jamb_strip_at(f, e, d):
+                if ref is None and self._jamb_strip_at(f, e, d):
                     here.append(round(e, 1))
             if len(here) >= 2:
                 n += self.count[f]
@@ -2509,7 +2523,8 @@ class _Wall(object):
 
     def _family_closure_defect(self, f, span, edges):
         """A familia `f` (corrida `span`) desvia do catalogo em alguma jamba, tem
-        compensador + B34 onde B39 fecha, ou tem faixa nas duas jambas."""
+        compensador + B34 onde B39 fecha, ou (sem referencia) tem faixa nas duas
+        jambas."""
         active = self._family_active_edges(f, edges)
         if not active:
             return False
@@ -2522,7 +2537,7 @@ class _Wall(object):
                                     frozen=True, edges=edges)
         if any(self._closure_defect(f, e, d, ref) for e, d in active):
             return True
-        return sum(1 for e, d in active if self._jamb_strip_at(f, e, d)) >= 2
+        return ref is None and sum(1 for e, d in active if self._jamb_strip_at(f, e, d)) >= 2
 
     def _b34_comp_where_b39_fits(self, f, window, span=None):
         """SECAO 85.8 / 86.6: compensadores ISOLADOS (nenhum outro compensador
@@ -2569,8 +2584,8 @@ class _Wall(object):
         return n
 
     def _dead_small_cell(self, f, p, iv, nb_slots_list):
-        """SECAO 86.6 (chave JAMB_HUMAN_A_FORM_ENABLED, desligada - CONFLITO
-        com 85.1/85.8): celula `iv` = vazado MENOR do B34 `p` encostado numa jamba
+        """SECAO 86.6 (chave JAMB_HUMAN_A_FORM_ENABLED - CONFLITO registrado com
+        84 item 3 / 85.8): celula `iv` = vazado MENOR do B34 `p` encostado numa jamba
         ativa da familia `f`, voltado para o vao, com compensador (faixa macica) na
         fileira vizinha sobre/sob ele - forma A do humano; nao e' coluna nem quebra."""
         if not JAMB_HUMAN_A_FORM_ENABLED or p.code != "B34" or not p.orientable:
@@ -2588,12 +2603,15 @@ class _Wall(object):
                     return True
         return False
 
-    def _a_form_strip_pairs(self, f):
+    def _a_form_strip_pairs(self, f, window):
         """SECAO 86.6 (chave JAMB_HUMAN_A_FORM_ENABLED): pares `C09 | C04` da faixa
-        encostada numa jamba ativa com o C09 NA FACE (sobra 14 do catalogo)."""
+        encostada numa jamba ativa com o C09 NA FACE (sobra 14 do catalogo), so' os
+        da janela `window` - os mesmos que `_compensator_guard` contou nela."""
         slots = self.fam[f]
         n = 0
         for edge, d in self._active_jamb_edges(f):
+            if edge < window[0] or edge > window[1]:
+                continue
             i = self._touching_index(slots, edge, d)
             if i is None or slots[i].code != "C09" or not (0 <= i + d < len(slots)):
                 continue
@@ -2786,7 +2804,7 @@ class _Wall(object):
             near = _in_window(self.fam[f], wide[0], wide[1])
             cp += _compensator_guard(near, self.length) * self.count[f]
             if JAMB_HUMAN_A_FORM_ENABLED:
-                cp -= self._a_form_strip_pairs(f) * self.count[f]  # 86.6 (chave desligada)
+                cp -= self._a_form_strip_pairs(f, wide) * self.count[f]  # 86.6 (forma A)
             ht += self._half_near_ties(near, f)
             ex += _long_compensator_extremes(self.fam[f], self.length) * self.count[f]
             b19 += self._half_blocks_misplaced(f, window) * self.count[f]
