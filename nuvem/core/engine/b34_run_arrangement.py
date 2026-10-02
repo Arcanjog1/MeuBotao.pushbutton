@@ -268,6 +268,12 @@ CHANNEL_OF_BLOCK = {"B39": "CHANNEL_U_39", "B34": "CHANNEL_U_34", "B19": "CHANNE
 # 86.6) e, no pilarete SEM referencia, no maximo UMA faixa de compensadores (com referencia quem decide e'
 # a sobra: o humano tem pilarete com faixa nas duas jambas, W0 1440-1509 `C04 B19 B39 C04`).
 JAMB_REMNANT_CATALOG_ENABLED = True
+# 86.6 (integracao 2026-10-02) - TRAVA DE PRISMA POR PAREDE da guarda B34+compensador: a parede so' fica
+# com a troca C09|B34 -> C04|B39 se as celulas QUEBRADAS da parede inteira (regua `_trace_column`) nao
+# aumentarem; senao a parede e' recalculada com a guarda desligada (prisma primeiro, pedido do usuario /
+# 85.10). Medido no BUTANTA: sem a trava a guarda tirava do orcamento a grade de B34 do pilarete da W4
+# (desenho do usuario, 85.9) e a verga/cinta acima quebravam 70 celulas de coluna.
+JAMB_B34_GUARD_PRISM_GATE = True
 JAMB_REMNANT_CATALOG = {0: (), 4: ("C04",), 9: ("C09",), 14: ("C09", "C04"), 19: ("B19",),
                         24: ("C04", "B19"), 29: ("C09", "B19"), 34: ("B34",)}
 # sobra medida x chave do catalogo (as faces de jamba caem no modulo de 5 cm; 1 cm de junta + folga)
@@ -2292,6 +2298,10 @@ class _Wall(object):
         muda a quebra de lugar nao conta; vazado menor sobre principal quebra)."""
         return self._column_stats_full(fams, window)[:3]
 
+    def wall_broken_cells(self):
+        """86.6 (trava de prisma): celulas QUEBRADAS de todas as familias da parede."""
+        return self._column_stats_full(sorted(self.fam), (-1e9, 1e9))[3]
+
     def _column_stats_full(self, fams, window):
         """`_column_stats` + celulas QUEBRADAS (avaliadas e nao continuas) - 86.6."""
         courses = sorted(self.course_fam)
@@ -4006,6 +4016,27 @@ def _fill_codes(course_candidates, catalog):
     return sorted(codes)
 
 
+def _jamb_guard_prism_gate(wall, make_wall, summary):
+    """86.6 - trava de prisma por parede (JAMB_B34_GUARD_PRISM_GATE): refaz a parede com a guarda
+    B34+compensador DESLIGADA e fica com a versao de MENOS celulas quebradas (empate: a com a guarda)."""
+    global JAMB_B34_COMPENSATOR_GUARD_ENABLED
+    with_guard = wall.wall_broken_cells()
+    alt = make_wall()
+    JAMB_B34_COMPENSATOR_GUARD_ENABLED = False
+    try:
+        alt_aligned = alt.align_jamb_compensators()
+    finally:
+        JAMB_B34_COMPENSATOR_GUARD_ENABLED = True
+    without = alt.wall_broken_cells()
+    if without < with_guard:
+        alt._jamb_aligned = alt_aligned
+        summary.setdefault("jamb_b34_guard_prism_gate", []).append(
+            {"wall_idx": alt.wall_idx, "broken_with_guard": with_guard,
+             "broken_without_guard": without})
+        return alt
+    return wall
+
+
 def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, catalog=None,
                      tolerance_cm=_sva.SMALL_VOID_ALIGN_TOLERANCE_CM, tie_positions_by_wall=None,
                      half_block_code=None, half_block_tie_gap_cm=0.0, validate_wall=None,
@@ -4058,6 +4089,14 @@ def arrange_b34_runs(course_candidates, walls_to_create, openings_per_wall, cata
             changed, compositions, oriented = set(), 0, 0
             paths_before = wall.required_paths()
             aligned = wall.align_jamb_compensators()
+            if aligned and JAMB_B34_GUARD_PRISM_GATE and JAMB_B34_COMPENSATOR_GUARD_ENABLED:
+                wall = _jamb_guard_prism_gate(wall, lambda: _Wall(
+                    wi, rows_by_wall[wi], walls_to_create, openings_per_wall, catalog, tolerance_cm,
+                    ties=(tie_positions_by_wall or {}).get(wi), half_code=half_block_code,
+                    half_tie_gap_cm=half_block_tie_gap_cm, fill_codes=fill_codes,
+                    joint_identity_guard=joint_identity_guard, jamb_alignment=jamb_on,
+                    num_courses=num_courses), summary)
+                aligned = getattr(wall, "_jamb_aligned", aligned)
             paths_after = wall.required_paths()
         else:
             changed = wall.optimize() if before["violations"] else set()

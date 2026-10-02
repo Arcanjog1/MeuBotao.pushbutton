@@ -11861,6 +11861,8 @@ vizinhas ficam deslocadas 15–20 cm: só repetição na mesma paridade, nunca `
   proibição C09|B34, os pilaretes de 54 do humano com e sem a forma A, idempotência/determinismo, o invariante de
   orientação do B34 e a 86.10); `tests/test_jamb_compensator_alignment.py` continua verde.
 
+**Integração (2026-10-02) — TRAVA DE PRISMA POR PAREDE (`JAMB_B34_GUARD_PRISM_GATE = True`), REGRA OBRIGATÓRIA (prisma primeiro, pedido do usuário da rodada 2 / §85.10):** medido no cálculo completo do BUTANTÃ (13 fiadas, aberturas originais), a parte da R6 que muda o resultado é a guarda `B34_PLUS_COMPENSATOR_WHERE_B39_FITS` (C09|B34 → C04|B39): ela dá todo o ganho (W1 35 → 48 %, W2 43 → 52 %, F1 54,5 → 56,2 %), mas na W4 tirava do orçamento da busca a grade de B34 do pilarete desenhado pelo usuário (§85.9) e a verga/cinta acima passavam para a grade de 40 (+70 células de coluna quebradas). O catálogo da sobra e a forma A não mudaram nenhuma peça deste pavimento (A/B idênticos). Correção: depois do alinhamento da jamba, a parede é refeita com a guarda desligada e fica a versão com MENOS células quebradas na parede inteira (régua `_trace_column`; empate fica com a guarda). Resultado: F1 56,2 %, furos quebrados 427 → 417, septos 110 → 107, W4 intacta. Custo: o alinhamento da jamba roda duas vezes nas paredes alteradas (cálculo offline 450 → 850 s).
+
 ### 86.7 CINTA DE TOPO (TOP_BOND_BEAM) na última fiada — VARIANTE A: bloco de amarração no quadrado do nó (2026-10-01, IMPLEMENTADO, chave `TOP_BOND_BEAM_ENABLED = True`)
 
 **PADRÃO OBSERVADO (humano BUTANTÃ R08_LT, 1º PAV, medição offline 2026-10-01; analistas "estrutura global" e
