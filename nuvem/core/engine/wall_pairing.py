@@ -59,6 +59,11 @@ __all__ = [
     "scan_candidate_thicknesses_cm", "compute_detection_tolerance_ft",
     "WALL_GRAPH_NODE_SNAP_TOLERANCE_M", "WALL_GRAPH_NODE_SNAP_TOLERANCE_FT",
     "WALL_GRAPH_PERPENDICULAR_TOLERANCE", "WALL_GRAPH_COLLINEAR_TOLERANCE",
+    # ---- secao 86.9 (R9): tocos de eixo alem da face da parede que cruza ----
+    "STUB_TRIM_ENABLED", "STUB_TRIM_MAX_CM", "STUB_TRIM_MIN_CM",
+    "STUB_TRIM_TOLERANCE_CM", "STUB_TRIM_FACE_CLEARANCE_CM",
+    "STUB_TRIM_CONTACT_TOLERANCE_FT", "STUB_TRIM_RULE_ID",
+    "find_wall_end_stubs", "trim_wall_end_stubs", "stub_trim_corpus_items",
     # ---- associacao abertura -> parede (extraido junto com a "arquitetura
     # do modelador externo", 2026-08-26 - ver build_capture_payload em
     # ModulacaoAutomatica/.../core/capture_export.py, que serializa as
@@ -1324,6 +1329,279 @@ def build_wall_graph(walls_to_create, junction_map,
         })
 
     return nodes, end_to_node
+
+
+# ==========================================
+# SECAO 86.9 (R9, 2026-10-02) - TOCOS DE EIXO ALEM DA FACE DA PAREDE QUE CRUZA
+#
+# Ver `nuvem/REGRAS_MODULACAO_BLOCOS.md`, secao 86.9. PADRAO OBSERVADO no
+# projeto HUMANO BUTANTA R08_LT (1o pavimento): um trecho de eixo de no maximo
+# 40 cm alem da FACE de uma parede perpendicular, sem abertura e sem outra
+# parede encostando nele, e' sobra da conversao CAD -> Walls e NAO e' modulado:
+# a parede termina na face da que cruza, como num canto (o no' vira L; um T de
+# parede que passa vira T de parede que chega). Casos medidos: W07 (40 cm),
+# W29/W30/W31 (35 cm) e W09 (5 cm) - o humano nao coloca nenhuma peca no toco.
+#
+# O corte acontece ANTES de extend_wall_ends_to_junctions/build_wall_graph, de
+# modo que o solve inteiro (encontros, preenchimento, materializacao) veja o L.
+# A parede do Revit NAO e' alterada (o corte e' so' no eixo em memoria).
+#
+# Decisao 100% geometrica, calculada sobre a geometria de ENTRADA para todas
+# as pontas de uma vez e aplicada no fim - nao depende da ordem das paredes
+# nem do sentido do eixo (o toco e' o mesmo, so' muda qual end_index o guarda).
+# ==========================================
+
+# Chave da regra (secao 86.9). Desligada, nada e' aparado.
+STUB_TRIM_ENABLED = True
+# Maior toco aparado (cm alem da face da parede que cruza). 41 cm nao e' toco.
+STUB_TRIM_MAX_CM = 40.0
+# Abaixo disto a "sobra" e' variacao de modelagem (o corpus mede 0,013 cm), nao
+# toco - mexer no eixo por centesimos mudaria a composicao do solver a toa.
+STUB_TRIM_MIN_CM = 1.0
+# Folga de medida no limite maximo e no teste de abertura dentro do toco.
+STUB_TRIM_TOLERANCE_CM = 0.05
+# A regiao do toco comeca esta distancia ALEM da face, para que uma parede que
+# so' encosta na linha da face (ex.: a outra metade de uma parede dividida no
+# no') nao conte como "parede encostando no toco".
+STUB_TRIM_FACE_CLEARANCE_CM = 0.5
+# Folga de contato lateral/na ponta: parede a ate' isto do toco conta como
+# encostada (mesma tolerancia de agrupamento de nos do grafo, 5 cm).
+STUB_TRIM_CONTACT_TOLERANCE_FT = WALL_GRAPH_NODE_SNAP_TOLERANCE_FT
+STUB_TRIM_RULE_ID = "REGRA_86_9_STUB_TRIM"
+
+
+def _stub_cm_to_ft(value_cm):
+    return float(value_cm) / 100.0 * FEET_PER_METER
+
+
+def _stub_ft_to_cm(value_ft):
+    return float(value_ft) / FEET_PER_METER * 100.0
+
+
+def _stub_axis_frame(line):
+    """(p0, p1, u, comprimento) do eixo achatado em Z=0; u None se degenerado."""
+    a = line.GetEndPoint(0)
+    b = line.GetEndPoint(1)
+    p0 = XYZ(a.X, a.Y, 0.0)
+    p1 = XYZ(b.X, b.Y, 0.0)
+    vec = p1 - p0
+    length = vec.GetLength()
+    if length < 1e-9:
+        return p0, p1, None, 0.0
+    return p0, p1, vec.Normalize(), length
+
+
+def _stub_rect(p0, u, t_a, t_b, half_width):
+    """Retangulo orientado (cx, cy, ux, uy, meia_u, meia_n) do trecho [t_a, t_b]
+    do eixo (p0, u) com meia largura `half_width`."""
+    tm = (t_a + t_b) / 2.0
+    return (p0.X + u.X * tm, p0.Y + u.Y * tm, u.X, u.Y,
+            abs(t_b - t_a) / 2.0, half_width)
+
+
+def _stub_rects_overlap(r1, r2):
+    """Teste de eixo separador entre dois retangulos orientados 2D. Encostar
+    exatamente na borda NAO e' sobrepor (folga de 1e-9 ft)."""
+    dx = r2[0] - r1[0]
+    dy = r2[1] - r1[1]
+    for (ax, ay) in ((r1[2], r1[3]), (-r1[3], r1[2]), (r2[2], r2[3]), (-r2[3], r2[2])):
+        rad = 0.0
+        for r in (r1, r2):
+            rad += r[4] * abs(r[2] * ax + r[3] * ay) + r[5] * abs(-r[3] * ax + r[2] * ay)
+        if abs(dx * ax + dy * ay) >= rad - 1e-9:
+            return False
+    return True
+
+
+def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None):
+    """Lista os TOCOS (secao 86.9) das pontas de `walls_to_create`, sem alterar
+    nada. Cada item: {"wall_idx", "end_index", "crossing_wall_idx", "stub_ft",
+    "stub_cm", "length_cm", "new_length_cm"} (`new_length_cm` ja' desconta os
+    tocos das DUAS pontas da parede, quando houver dois).
+
+    Uma ponta e' toco quando, ao mesmo tempo:
+      1. nao e' travada por testa do CAD (`locks`) - a testa diz que a parede
+         acaba ali de proposito, nao e' sobra da conversao;
+      2. o cruzamento MAIS PROXIMO para tras (dentro da propria parede) com o
+         eixo de uma parede PERPENDICULAR que passa por ali deixa a ponta
+         entre STUB_TRIM_MIN_CM e STUB_TRIM_MAX_CM (+ tolerancia) alem da face
+         dessa parede;
+      3. nenhuma abertura desta parede (`openings_per_wall`, t a partir do p0
+         do eixo de entrada) entra no toco;
+      4. nenhuma OUTRA parede (fora a que cruza) encosta no toco - pela
+         lateral, pela ponta ou atravessando-o (pegada com a espessura).
+    `openings_per_wall` None = nenhuma abertura conhecida."""
+    if max_cm is None:
+        max_cm = STUB_TRIM_MAX_CM
+    max_ft = _stub_cm_to_ft(float(max_cm) + STUB_TRIM_TOLERANCE_CM)
+    min_ft = _stub_cm_to_ft(STUB_TRIM_MIN_CM)
+    clear_ft = _stub_cm_to_ft(STUB_TRIM_FACE_CLEARANCE_CM)
+    open_tol_ft = _stub_cm_to_ft(STUB_TRIM_TOLERANCE_CM)
+    contact_ft = STUB_TRIM_CONTACT_TOLERANCE_FT
+
+    frames = []
+    footprints = []
+    for line, thickness_ft, _locks in walls_to_create:
+        p0, p1, u, length = _stub_axis_frame(line)
+        frames.append((p0, p1, u, length))
+        footprints.append(None if u is None else _stub_rect(p0, u, 0.0, length, thickness_ft / 2.0))
+
+    found = []
+    n = len(walls_to_create)
+    for idx in range(n):
+        p0, p1, u, length = frames[idx]
+        if u is None:
+            continue
+        thickness_ft = walls_to_create[idx][1]
+        locks = walls_to_create[idx][2] or (False, False)
+        for end_index in (0, 1):
+            if locks[end_index]:
+                continue
+            if end_index == 0:
+                p_end, outward = p0, XYZ(-u.X, -u.Y, 0.0)
+            else:
+                p_end, outward = p1, u
+            best = None
+            for k in range(n):
+                if k == idx:
+                    continue
+                kp0, _kp1, ku, k_len = frames[k]
+                if ku is None:
+                    continue
+                if abs(u.DotProduct(ku)) > WALL_GRAPH_PERPENDICULAR_TOLERANCE:
+                    continue  # so' parede perpendicular forma a face do toco
+                hit = _line_2d_intersection(p_end, outward, kp0, ku)
+                if hit is None:
+                    continue
+                behind = -(hit - p_end).DotProduct(outward)
+                if behind <= 1e-9 or behind >= length - 1e-9:
+                    continue  # o eixo dela nao cruza o trecho desta parede
+                s = (hit - kp0).DotProduct(ku)
+                margin = thickness_ft / 2.0 + WALL_GRAPH_NODE_SNAP_TOLERANCE_FT
+                if s < -margin or s > k_len + margin:
+                    continue  # ela nao passa por ali - so' o prolongamento dela
+                key = (round(behind, 9), round(walls_to_create[k][1], 9))
+                if best is None or key < best[0]:
+                    best = (key, behind, k)
+            if best is None:
+                continue
+            _key, behind, k = best
+            k_thickness_ft = walls_to_create[k][1]
+            beyond = behind - k_thickness_ft / 2.0
+            if beyond < min_ft or beyond > max_ft:
+                continue
+            # CORPO da parede do outro lado da que cruza (da face de perto ate'
+            # a outra ponta). Sem corpo (aba de 40 cm que so' nasce na parede
+            # que cruza) nao ha' toco: aparar apagaria a parede inteira.
+            body_ft = length - behind - k_thickness_ft / 2.0
+            if body_ft <= max(min_ft, contact_ft):
+                continue
+            if end_index == 1:
+                t_face, t_end, t_far = length - beyond, length, 0.0
+                region = _stub_rect(p0, u, t_face + clear_ft, t_end + contact_ft,
+                                    thickness_ft / 2.0 + contact_ft)
+            else:
+                t_face, t_end, t_far = beyond, 0.0, length
+                region = _stub_rect(p0, u, -contact_ft, t_face - clear_ft,
+                                    thickness_ft / 2.0 + contact_ft)
+            if body_ft <= max_ft:
+                # Corpo tambem curto: so' e' toco se a OUTRA ponta for encontro
+                # (encosta noutra parede). Duas pontas curtas e livres sao uma
+                # peca curta ambigua - nenhuma das duas e' aparada.
+                far_region = _stub_rect(p0, u, t_far - contact_ft, t_far + contact_ft,
+                                        thickness_ft / 2.0 + contact_ft)
+                if not any(footprints[j] is not None and j != idx and j != k
+                           and _stub_rects_overlap(far_region, footprints[j])
+                           for j in range(n)):
+                    continue
+            lo, hi = min(t_face, t_end), max(t_face, t_end)
+            row = []
+            if openings_per_wall is not None and idx < len(openings_per_wall):
+                row = openings_per_wall[idx] or []
+            if any(op[1] > lo + open_tol_ft and op[0] < hi - open_tol_ft for op in row):
+                continue  # abertura no toco: e' parede de verdade, nao sobra
+            touching = False
+            for j in range(n):
+                if j == idx or j == k or footprints[j] is None:
+                    continue
+                if _stub_rects_overlap(region, footprints[j]):
+                    touching = True
+                    break
+            if touching:
+                continue  # outra parede encosta no toco: e' trecho entre encontros
+            found.append({
+                "wall_idx": idx, "end_index": end_index, "crossing_wall_idx": k,
+                "stub_ft": beyond, "stub_cm": round(_stub_ft_to_cm(beyond), 2),
+                "length_cm": round(_stub_ft_to_cm(length), 2),
+            })
+    cut_by_wall = {}
+    for item in found:
+        cut_by_wall[item["wall_idx"]] = cut_by_wall.get(item["wall_idx"], 0.0) + item["stub_ft"]
+    for item in found:
+        length_ft = frames[item["wall_idx"]][3]
+        item["new_length_cm"] = round(_stub_ft_to_cm(length_ft - cut_by_wall[item["wall_idx"]]), 2)
+    found.sort(key=lambda it: (it["wall_idx"], it["end_index"]))
+    return found
+
+
+def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, max_cm=None):
+    """Apara os tocos da secao 86.9 (ver find_wall_end_stubs). Devolve
+    (walls, openings_per_wall, tocos): `walls` com o eixo de cada parede
+    encurtado ate' a face da parede que cruza (as duas pontas, se for o caso),
+    `openings_per_wall` com o t das aberturas reancorado no NOVO p0 quando a
+    ponta 0 foi aparada (o t e' medido a partir do p0 do eixo), e a lista de
+    tocos aparados. Desligada (`enabled` False, ou None com STUB_TRIM_ENABLED
+    False) devolve copias intactas e lista vazia. Nunca muta a entrada."""
+    walls = list(walls_to_create or [])
+    openings = None if openings_per_wall is None else list(openings_per_wall)
+    if enabled is None:
+        enabled = STUB_TRIM_ENABLED
+    if not enabled or not walls:
+        return walls, openings, []
+    stubs = find_wall_end_stubs(walls, openings, max_cm=max_cm)
+    cuts = {}
+    for item in stubs:
+        cuts.setdefault(item["wall_idx"], {})[item["end_index"]] = item["stub_ft"]
+    for idx in sorted(cuts):
+        line, thickness_ft, locks = walls[idx]
+        a = line.GetEndPoint(0)
+        b = line.GetEndPoint(1)
+        _p0, _p1, u, _length = _stub_axis_frame(line)
+        cut0 = cuts[idx].get(0, 0.0)
+        cut1 = cuts[idx].get(1, 0.0)
+        new_a = XYZ(a.X + u.X * cut0, a.Y + u.Y * cut0, a.Z) if cut0 else a
+        new_b = XYZ(b.X - u.X * cut1, b.Y - u.Y * cut1, b.Z) if cut1 else b
+        walls[idx] = (Line.CreateBound(new_a, new_b), thickness_ft, locks)
+        if cut0 and openings is not None and idx < len(openings) and openings[idx]:
+            openings[idx] = [tuple([op[0] - cut0, op[1] - cut0] + list(op[2:]))
+                             for op in openings[idx]]
+    return walls, openings, stubs
+
+
+def stub_trim_corpus_items(stubs, wall_ids=None, axis_keys=None):
+    """Itens de `corpus["trimmed"]` (secao 49.1) para os tocos da secao 86.9 -
+    mesmo formato dos aparados da secao 49 (index/length_cm/new_length_cm),
+    mais a ponta, os cm aparados, a parede que cruza e a regra."""
+    items = []
+    for item in stubs or []:
+        idx = item["wall_idx"]
+        wall_id = wall_ids[idx] if wall_ids is not None and idx < len(wall_ids) else None
+        items.append({
+            "index": idx,
+            "axis_key": (axis_keys[idx] if axis_keys is not None and idx < len(axis_keys) else None),
+            "wall_id": wall_id,
+            "end_index": item["end_index"],
+            "length_cm": item["length_cm"],
+            "new_length_cm": item["new_length_cm"],
+            "trimmed_cm": item["stub_cm"],
+            "trimmed_ft": item["stub_ft"],
+            "crossing_wall_index": item["crossing_wall_idx"],
+            "rule_id": STUB_TRIM_RULE_ID,
+            "reason": ("toco de {:.1f} cm alem da face da parede #{} - sem abertura e sem outra "
+                       "parede encostando: sobra da conversao CAD -> Walls, o no' vira L "
+                       "(secao 86.9)".format(item["stub_cm"], item["crossing_wall_idx"])),
+        })
+    return items
 
 
 def build_plan_bounds(lines, margin_ft):

@@ -30,7 +30,7 @@ GEO = S.geometry()
 EXP = S.t_nodes_expected()
 CASO = S.wall_case()
 SNAP = S.snapshot_expected()
-CTX = S.build_context(GEO)
+CTX = S.build_context(GEO, stub_trim=False)  # historico: anterior a secao 86.9
 POR_INDICE = dict((r["provenance"]["bench_node_index"], r) for r in EXP["t_nodes"])
 
 # apelidos do relatorio -> o que cada no' e'
@@ -59,7 +59,7 @@ def _solve(rotulo, geo=None):
         # Todos os casos deste arquivo sao HISTORICOS (anteriores a' secao 77):
         # medidos com o papel por fiada DESLIGADO, que reproduz o motor anterior
         # byte a byte. A secao 77 tem os proprios casos (`course_aware_cases`).
-        pre77 = dict(papel_por_fiada=False)
+        pre77 = dict(papel_por_fiada=False, stub_trim=False)  # e anterior a secao 86.9 (tocos)
         if rotulo in ("off", "variante_off"):
             cache[rotulo] = S.solve_on_fresh_context(alvo, False, **pre77)
         elif rotulo in ("on", "variante_on"):
@@ -245,12 +245,12 @@ def test_a_variacao_de_modelagem_e_medida_na_propria_geometria():
 
 # ================================ 6. o veredito nao depende da apresentacao
 def test_o_veredito_nao_muda_com_translacao():
-    ctx2 = S.build_context(GEO, translate=(1234.0, -567.0))
+    ctx2 = S.build_context(GEO, translate=(1234.0, -567.0), stub_trim=False)
     _compara_vereditos(ctx2)
 
 
 def test_o_veredito_nao_muda_invertendo_as_pontas_da_principal():
-    ctx2 = S.build_context(GEO, swap_ends=(_no(46)["main_wall_key"],))
+    ctx2 = S.build_context(GEO, swap_ends=(_no(46)["main_wall_key"],), stub_trim=False)
     _compara_vereditos(ctx2)
 
 
@@ -346,7 +346,7 @@ def test_o_contrafactual_anterior_a_regra_76_continua_reproduzivel():
 def test_o_snapshot_normalizado_e_estavel_na_repeticao():
     ctx_s, res = _solve("on")
     a = S.snapshot_sha256(S.normalized_snapshot(ctx_s, res))
-    b = S.snapshot_sha256(S.normalized_snapshot(S.build_context(GEO), res))
+    b = S.snapshot_sha256(S.normalized_snapshot(S.build_context(GEO, stub_trim=False), res))
     assert a == b
 
 
@@ -461,7 +461,7 @@ def test_a_secao_77_e_uma_variante_nova_do_snapshot_e_o_historico_continua_intac
     historico_v = dict((c["label"], c["sha256"]) for c in SNAP.get("opening_variant_cases") or [])
     for caso in casos:
         geo = GEO if caso["variant"] == "original" else S.with_opening_variant(GEO, caso["variant"])
-        ctx, res = S.solve_on_fresh_context(geo, True, papel_por_fiada=bool(caso["flag_value"]))
+        ctx, res = S.solve_on_fresh_context(geo, True, papel_por_fiada=bool(caso["flag_value"]), stub_trim=False)
         linhas = S.normalized_snapshot(ctx, res)
         assert S.snapshot_sha256(linhas) == caso["sha256"], caso["label"]
         assert len(linhas) == caso["pieces"], caso["label"]

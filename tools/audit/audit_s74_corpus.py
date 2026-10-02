@@ -87,7 +87,7 @@ class Bancada(object):
         self.exp = S.t_nodes_expected()
         self.parede = S.wall_case()
         self.snap = S.snapshot_expected()
-        self.ctx = S.build_context(self.geo)
+        self.ctx = S.build_context(self.geo, stub_trim=False)  # historico: anterior a secao 86.9
         self.por_indice = dict((r["provenance"]["bench_node_index"], r) for r in self.exp["t_nodes"])
         self.b54_cm, self.b34_cm = S.exige_cm()
         self.tol_cm = S.tolerance_cm()
@@ -317,7 +317,7 @@ def caso_08_separacao(rel, B):
 
 def caso_09_invariancia(rel, B):
     base = _mapa_vereditos(B.ctx)
-    ctx_t = S.build_context(B.geo, translate=TRANSLACAO_CM)
+    ctx_t = S.build_context(B.geo, translate=TRANSLACAO_CM, stub_trim=False)
     mapa_t = _mapa_vereditos(ctx_t)
     dif_t = _diferencas(base, mapa_t)
     rel.caso("09.1", "translacao nao muda nenhum veredito", not dif_t and len(mapa_t) == len(base),
@@ -325,7 +325,7 @@ def caso_09_invariancia(rel, B):
                  len(base), len(dif_t), TRANSLACAO_CM[0], TRANSLACAO_CM[1]))
 
     principal = B.no(46)["main_wall_key"]
-    ctx_s = S.build_context(B.geo, swap_ends=(principal,))
+    ctx_s = S.build_context(B.geo, swap_ends=(principal,), stub_trim=False)
     mapa_s = _mapa_vereditos(ctx_s)
     dif_s = _diferencas(base, mapa_s)
     rel.caso("09.2", "inverter as pontas da principal nao muda nada",

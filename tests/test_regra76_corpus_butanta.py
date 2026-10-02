@@ -48,7 +48,8 @@ def _solve(nome):
         geo = S.geometry()
         if nome.startswith("pos_micro"):
             geo = S.with_opening_variant(geo, "post_micro_adjustment_s66")
-        cache[nome] = (geo,) + S.solve_on_fresh_context(geo, True, papel_por_fiada=nome.endswith("_77"))
+        cache[nome] = (geo,) + S.solve_on_fresh_context(geo, True, papel_por_fiada=nome.endswith("_77"),
+                                                            stub_trim=False)
     return cache[nome]
 
 
@@ -161,7 +162,8 @@ def test_a_regra_76_1_so_classifica_as_pecas_sao_as_do_corpus():
     gravado = [c for c in S.snapshot_expected()["cases"] if c["label"] == "tol_0_05"][0]
     assert S.snapshot_sha256(S.normalized_snapshot(ctx, res)) == gravado["sha256"]
     # contrafactual da 76.1 no motor anterior a' secao 77 (papel por fiada OFF)
-    ctx2, res2 = S.solve_on_fresh_context(geo, True, regra76_nao_resolvido=False, papel_por_fiada=False)
+    ctx2, res2 = S.solve_on_fresh_context(geo, True, regra76_nao_resolvido=False, papel_por_fiada=False,
+                                          stub_trim=False)
     assert S.snapshot_sha256(S.normalized_snapshot(ctx2, res2)) == gravado["sha256"]
     # sem a 76.1 os mesmos 6 C09 voltam a ser designados amarracao
     assert sorted((v["node_index"], v["course_index"]) for v in res2["compensator_as_junction_bond"]) == \
@@ -222,14 +224,14 @@ def test_o_legado_nao_ganha_os_gates_nem_muda():
     geo = S.geometry()
     # legado do PRODUTO (secoes 78 e 79 ligadas): desde a secao 79 os gates das
     # regras 76/76.1 valem sem reforco - e nenhum compensador e' designado
-    ctx78, res78 = S.solve_on_fresh_context(geo, False, strategy=None)
+    ctx78, res78 = S.solve_on_fresh_context(geo, False, strategy=None, stub_trim=False)
     assert res78["compensator_as_junction_bond"] == []
     assert "missing_required_junction_bond" in res78
     # legado HISTORICO (anterior as secoes 78, 79, 80 e 81): continua byte a byte
     # igual ao snapshot gravado e sem os gates
     ctx, res = S.solve_on_fresh_context(geo, False, strategy=None, tolerancias_fisicas=False,
                                         regras_de_encontro=False, reforco_estrutural=False,
-                                        regras_gerais=False)
+                                        regras_gerais=False, stub_trim=False)
     assert "compensator_as_junction_bond" not in res
     assert "missing_required_junction_bond" not in res
     legado = S.snapshot_expected()["legacy_cases"][0]["sha256"]

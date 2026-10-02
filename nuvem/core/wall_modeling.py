@@ -12850,8 +12850,14 @@ def _corpus_report_lines(corpus):
                          item.get("rule_id"), item.get("source_layer"), geo.get("length_cm"),
                          geo.get("coverage")))
     for item in corpus.get("trimmed") or []:
-        lines.append("  TRIMMED axis_index={} length={} -> {}".format(
-            item.get("index"), item.get("length_cm"), item.get("new_length_cm")))
+        line = "  TRIMMED axis_index={} length={} -> {}".format(
+            item.get("index"), item.get("length_cm"), item.get("new_length_cm"))
+        if item.get("rule_id") == STUB_TRIM_RULE_ID:
+            # SECAO 86.9: toco alem da face da parede que cruza (ponta e cm aparados)
+            line += " rule_id={} wall_id={} end={} trimmed_cm={} crossing_axis={}".format(
+                item.get("rule_id"), item.get("wall_id"), item.get("end_index"),
+                item.get("trimmed_cm"), item.get("crossing_wall_index"))
+        lines.append(line)
     return lines
 
 
@@ -14326,6 +14332,10 @@ class _PostCreationEventHandler(IExternalEventHandler):
         self._extend_wall_ends_to_junctions = extend_wall_ends_to_junctions
         self._build_wall_graph = build_wall_graph
         self._JUNCTION_FACE_SEARCH_FT = JUNCTION_FACE_SEARCH_FT
+        # SECAO 86.9: o refresh rele a Wall (com o toco) - o corte e' refeito
+        # pela mesma regra antes do grafo (ver _reapply_stub_trims).
+        self._trim_wall_end_stubs = trim_wall_end_stubs
+        self._stub_trim_cuts = None
 
         # Rede de seguranca ADICIONAL para o mesmo problema (ver
         # _LiveUpdaterBase, onde este padrao foi diagnosticado e provado ao
@@ -14520,6 +14530,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
         nao resolve mais, ou perdeu LocationCurve) e' deixado como estava -
         nunca derruba o refresh dos demais eixos nem lanca excecao."""
         any_updated = False
+        refreshed_axes = set()  # SECAO 86.9: eixos relidos (ver _reapply_stub_trims)
         for wall_idx, entries in self.created_walls_by_axis.items():
             if not entries or wall_idx >= len(self.walls_to_create):
                 continue
@@ -14571,6 +14582,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
 
                 self.walls_to_create[wall_idx] = (new_centerline, thickness_ft, locked_ends)
                 self.wall_segment_geometry[wall_idx] = new_segments
+                refreshed_axes.add(wall_idx)
                 any_updated = True
             except Exception:
                 if self.controlled_beta:
@@ -14578,6 +14590,7 @@ class _PostCreationEventHandler(IExternalEventHandler):
                 continue  # nunca derruba o refresh dos demais eixos
 
         if any_updated:
+            self._reapply_stub_trims(refreshed_axes)
             walls_ext, junction_map = self._extend_wall_ends_to_junctions(
                 self.walls_to_create, self._JUNCTION_FACE_SEARCH_FT
             )
@@ -14585,6 +14598,95 @@ class _PostCreationEventHandler(IExternalEventHandler):
             self.wall_graph_nodes, self.wall_end_to_node = self._build_wall_graph(
                 self.walls_to_create, junction_map
             )
+
+    def _previous_stub_trim_cuts(self):
+        """{wall_idx: {end_index: pes}} dos tocos (secao 86.9) ja' aparados no
+        eixo em memoria - do proprio handler ou, na primeira vez, do corpus da
+        RUN (itens `trimmed` da regra 86.9 gravados pelo fluxo que montou o
+        handler)."""
+        cuts = getattr(self, "_stub_trim_cuts", None)
+        if cuts is not None:
+            return cuts
+        cuts = {}
+        setup = getattr(self, "setup", None)
+        corpus = setup.get("corpus_selection") if isinstance(setup, dict) else None
+        for item in (corpus or {}).get("trimmed") or []:
+            if item.get("rule_id") != STUB_TRIM_RULE_ID or item.get("index") is None:
+                continue
+            cut_ft = item.get("trimmed_ft")
+            if cut_ft is None:
+                cut_ft = _cm_to_ft(item.get("trimmed_cm") or 0.0)
+            cuts.setdefault(item["index"], {})[item.get("end_index", 1)] = cut_ft
+        return cuts
+
+    def _reapply_stub_trims(self, refreshed=None):
+        """SECAO 86.9 depois do refresh: a Wall do Revit nao e' aparada, entao a
+        geometria relida traz o toco de volta - corta de novo, pela MESMA regra,
+        antes do grafo. As aberturas guardadas ja' estao no referencial do p0
+        aparado da vez anterior: so' a DIFERENCA de corte na ponta 0 (nova -
+        anterior) reancora o t - em regime (mesma geometria) nada muda, sem
+        deriva entre um refresh e outro.
+
+        `refreshed` = eixos que o refresh RELEU do documento (None = todos). Um
+        eixo que nao foi relido (Wall apagada/fora de escopo) continua com o
+        corte anterior na geometria: nada se desfaz nele."""
+        trim_fn = getattr(self, "_trim_wall_end_stubs", None)
+        if trim_fn is None or not self.walls_to_create:
+            return
+        n_walls = len(self.walls_to_create)
+        refreshed = set(range(n_walls)) if refreshed is None else set(refreshed)
+        previous = self._previous_stub_trim_cuts()
+        stored = list(self.openings_per_wall or [])
+        in_axis = []
+        for idx in range(n_walls):
+            row = list(stored[idx] or []) if idx < len(stored) else []
+            back = (previous.get(idx) or {}).get(0, 0.0) if idx in refreshed else 0.0
+            in_axis.append([tuple([op[0] + back, op[1] + back] + list(op[2:])) for op in row] if back else row)
+        walls, trimmed_openings, stubs = trim_fn(self.walls_to_create, in_axis)
+        now = {}
+        for item in stubs:
+            now.setdefault(item["wall_idx"], {})[item["end_index"]] = item["stub_ft"]
+        current, touched = {}, set()
+        for idx in range(n_walls):
+            before = previous.get(idx) or {}
+            cut = now.get(idx) or {}
+            if idx in refreshed:
+                if cut:
+                    current[idx] = dict(cut)
+                if before or cut:
+                    touched.add(idx)
+            else:
+                merged = dict(before)
+                for end_index, value in cut.items():
+                    merged[end_index] = merged.get(end_index, 0.0) + value
+                if merged:
+                    current[idx] = merged
+                if cut:
+                    touched.add(idx)
+        self._stub_trim_cuts = current
+        if not touched:
+            return
+        self.walls_to_create = walls
+        new_openings = list(stored)
+        for idx in sorted(touched):
+            if idx < len(new_openings) and trimmed_openings is not None and idx < len(trimmed_openings):
+                new_openings[idx] = trimmed_openings[idx]
+        self.openings_per_wall = new_openings
+        setup = getattr(self, "setup", None)
+        corpus = setup.get("corpus_selection") if isinstance(setup, dict) else None
+        if corpus is not None:
+            wall_ids = []
+            for idx in range(n_walls):
+                entries = (self.created_walls_by_axis or {}).get(idx) or []
+                wall_ids.append(_wall_id_int(entries[0][0]) if entries else None)
+            old_items = corpus.get("trimmed") or []
+            kept = [it for it in old_items if it.get("rule_id") == STUB_TRIM_RULE_ID
+                    and it.get("index") not in refreshed and it.get("index") not in now]
+            items = sorted(kept + stub_trim_corpus_items(stubs, wall_ids),
+                           key=lambda it: (it.get("index"), it.get("end_index")))
+            corpus = dict(corpus)
+            corpus["trimmed"] = [it for it in old_items if it.get("rule_id") != STUB_TRIM_RULE_ID] + items
+            setup["corpus_selection"] = corpus
 
     def _execute_analyze(self, app_doc):
         """Acao "analyze" - disparada pelo botao "Iniciar Modulacao" de
@@ -17950,6 +18052,22 @@ def run_modulation_on_existing_walls(preselected=None):
 
     opening_modulation_results = evaluate_opening_modulation(all_openings)
     opening_incompatible_modulation = [r for r in opening_modulation_results if not r["compatible"]]
+
+    # SECAO 86.9 (R9): toco de eixo <= STUB_TRIM_MAX_CM alem da face de uma parede
+    # perpendicular, sem abertura e sem outra parede, e' sobra da conversao CAD ->
+    # Walls - o eixo termina na face (o no' vira L) ANTES do grafo. A Wall do Revit
+    # nao muda; o corte vai para o corpus da RUN ("trimmed") e para o relatorio.
+    walls_to_create, openings_per_wall, stub_trims = trim_wall_end_stubs(walls_to_create, openings_per_wall)
+    if stub_trims:
+        _trim_items = stub_trim_corpus_items(stub_trims, [_wall_id_int(w) for w in wall_ids],
+                                             [_wall_axis_key(w) for w in wall_ids])
+        corpus_selection["trimmed"] = list(corpus_selection.get("trimmed") or []) + _trim_items
+        output.print_md("**Tocos de eixo aparados (secao 86.9)**: {} ponta(s) - a parede termina na face "
+                        "da que cruza.".format(len(stub_trims)))
+        for item in _trim_items:
+            output.print_md("- parede {} ponta {}: {:.1f} cm alem da face da parede #{} ({:.0f} -> {:.0f} cm)".format(
+                item["wall_id"], item["end_index"], item["trimmed_cm"], item["crossing_wall_index"],
+                item["length_cm"], item["new_length_cm"]))
 
     walls_to_create, junction_map = extend_wall_ends_to_junctions(walls_to_create, JUNCTION_FACE_SEARCH_FT)
     wall_graph_nodes, wall_end_to_node = build_wall_graph(walls_to_create, junction_map)
