@@ -3939,6 +3939,19 @@ OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True
 # (51.10). Precisa das familias de canaleta (as mesmas da verga). Desligada =
 # ultima fiada de bloco, como antes. Ver opening_reinforcement.plan_top_bond_beam.
 TOP_BOND_BEAM_ENABLED = True
+# SECAO 86.12 (correcao do usuario 2026-10-05, REGRA OBRIGATORIA) - A CANALETA
+# SEGUE A GRADE DA FIADA DE MESMA PARIDADE ABAIXO: em toda fiada com canaleta
+# (contraverga, verga, cinta 86.7), onde a fiada c-2 tem alvenaria as canaletas
+# repetem peca a peca as pecas dela (B39->U39, B34->U34, B19->U19, B54 de
+# preenchimento -> U34+U19, compensador fundido a' vizinha - 51.3); sobre o vao a
+# grade e' livre (U39/U34/U19 + no maximo um U_CUT, juntas desencontradas de
+# c-1/c+1) e o descasamento de fase fica ali, nunca no pilarete (85.10). Bloco de
+# amarracao no quadrado do no' (variante A / regra 75), corrida so' cresce (apoio
+# da verga nunca diminui). Passe final nos dois caminhos (None e CHANNEL), depois
+# da verga/contraverga, da cinta e do arranjo, antes da reauditoria. Desligada =
+# comportamento anterior. Ver core/engine/channel_grid_follow.py e a secao 86.12
+# de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+CHANNEL_GRID_FOLLOW_ENABLED = True
 # SECAO 86.8 (2026-10-01) - PASSAGEM LIVRE (51.9, aceita pelo usuario no item C)
 # tambem sem a estrategia adicional CHANNEL: vao sem peitoril com as duas jambas
 # a <= 28,5 cm de nos fica sem verga, sem cinta e sem alvenaria acima (humano
@@ -5562,12 +5575,18 @@ def _without_top_bond_beam(result):
     fiada como ela era ANTES da cinta (`top_bond_beam.source_course`) - sem isso a
     fusao dos compensadores na canaleta escondia o excesso da regra #2 e virava a
     paridade de um no' (medido no L da CR-S1)."""
+    # SECAO 86.12: o alinhamento das canaletas a' fiada c-2 tambem e' pos-passe -
+    # as fiadas que ele tocou voltam a ser lidas como eram antes dele
+    seguidas = ((result or {}).get("channel_grid_follow") or {}).get("source_courses") or {}
     beam = (result or {}).get("top_bond_beam") or {}
     fonte = beam.get("source_course")
-    if fonte is None or beam.get("course_index") is None:
+    if (fonte is None or beam.get("course_index") is None) and not seguidas:
         return result
     course_candidates = dict(result.get("course_candidates") or {})
-    course_candidates[beam["course_index"]] = fonte
+    for ci in sorted(seguidas):
+        course_candidates[ci] = seguidas[ci]
+    if fonte is not None and beam.get("course_index") is not None:
+        course_candidates[beam["course_index"]] = fonte
     return dict(result, course_candidates=course_candidates)
 
 
@@ -6184,6 +6203,10 @@ def _apply_opening_reinforcement(result, nodes, walls_to_create, end_to_node, op
     # grade final da ultima fiada) e ANTES da reauditoria de amarracao
     _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
                          base_z_abs, pieces_available=True)
+    # SECAO 86.12: canaletas (verga, contraverga, cinta) alinhadas a' grade da fiada
+    # de mesma paridade abaixo - passe final, antes da reauditoria
+    _apply_channel_grid_follow(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
+                               base_z_abs, catalog=catalog, pieces_available=True)
     t_audit = time.time()
     audit_catalog = dict(catalog)
     audit_catalog.update(channel_logical_catalog())
@@ -6413,6 +6436,9 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
     # a grade final da ultima fiada) e ANTES da reauditoria de amarracao
     _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
                          base_z_abs, pieces_available=bool(pieces_available))
+    # SECAO 86.12: canaletas alinhadas a' grade da fiada de mesma paridade abaixo
+    _apply_channel_grid_follow(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
+                               base_z_abs, catalog=catalog, pieces_available=bool(pieces_available))
     if pieces_available:
         t_audit = time.time()
         audit_catalog = dict(catalog)
@@ -6486,6 +6512,65 @@ def _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall
             reference_course_candidates=result.get("course_candidates_before_reinforcement"), nodes=nodes)
     beam["timing_s"] = round(time.time() - t0, 4)
     result["top_bond_beam"] = beam
+    return result
+
+
+def _apply_channel_grid_follow(result, plan, nodes, walls_to_create, openings_per_wall, course_band, num_courses,
+                               base_z_abs, catalog=None, pieces_available=True):
+    """SECAO 86.12 - as canaletas (verga, contraverga, cinta) repetem peca a peca a
+    grade da fiada de mesma paridade abaixo onde ela tem alvenaria; sobre o vao a
+    grade e' livre e absorve a fase (`channel_grid_follow.plan_channel_grid_follow`).
+
+    Passe final dos dois caminhos (None/secao 80 e CHANNEL): depois da verga, da
+    contraverga, da cinta (86.7) e do arranjo (60-65/84/85/86.6), antes da
+    reauditoria de amarracao e da validacao final. Atualiza as corridas/apoios do
+    plano (o rastreio das aberturas le o plano), refaz a validacao da canaleta e a
+    auditoria da cinta, e grava `result["channel_grid_follow"]` (janelas tocadas,
+    pecas trocadas, casos sem solucao e motivo, fiadas de antes em
+    `source_courses` - a paridade 82.1 mede a grade do motor, nunca a deste passe).
+    Familias de canaleta ausentes: nada muda (`applied = False`)."""
+    if not CHANNEL_GRID_FOLLOW_ENABLED or not isinstance(result, dict) or result.get("error") is not None:
+        return result
+    from core.engine import opening_reinforcement as _reinforcement
+    from core.engine import channel_grid_follow as _grid_follow
+    if not pieces_available:
+        result["channel_grid_follow"] = {"enabled": True, "applied": False, "reason": "CHANNEL_FAMILY_MISSING",
+                                         "section": _grid_follow.SECTION}
+        return result
+    t0 = time.time()
+    rep = _grid_follow.plan_channel_grid_follow(result.get("course_candidates") or {}, walls_to_create, num_courses,
+                                                nodes=nodes, channel_overrides=(plan or {}).get("policy"),
+                                                catalog=catalog)
+    result["course_candidates"] = rep.pop("course_candidates")
+    rep["applied"] = bool(rep["counts"]["windows_changed"])
+    rep["support_drops"] = []
+    if rep["applied"]:
+        if plan is not None:
+            rep["support_drops"] = _grid_follow.refresh_plan_records(plan, result["course_candidates"],
+                                                                     walls_to_create, rep["runs_touched"])
+            plan["validation"] = _reinforcement.validate_channel_reinforcement(
+                result["course_candidates"], walls_to_create, openings_per_wall, course_band, num_courses,
+                base_z_abs, free_to_top=plan.get("free_to_top"), policy=plan.get("policy"),
+                reference_course_candidates=result.get("course_candidates_before_reinforcement"), nodes=nodes)
+        beam = result.get("top_bond_beam")
+        if isinstance(beam, dict) and beam.get("course_index") is not None and "audit" in beam:
+            beam["audit"] = _reinforcement.top_bond_beam_audit(result["course_candidates"], walls_to_create, nodes,
+                                                               beam["course_index"], policy=beam.get("policy"))
+            if beam["course_index"] in rep["source_courses"] and isinstance(beam.get("counts"), dict):
+                # contagens da cinta sobre a fiada FINAL (o passe troca as pecas dela)
+                pecas = result["course_candidates"].get(beam["course_index"]) or []
+                da_cinta = [c for c in pecas if _reinforcement.is_top_bond_beam_piece(c)]
+                por_codigo = {}
+                for c in da_cinta:
+                    por_codigo[c.get("logical_code")] = por_codigo.get(c.get("logical_code"), 0) + 1
+                beam["counts"]["channel_pieces"] = len(da_cinta)
+                beam["counts"]["by_code"] = por_codigo
+                beam["counts"]["shared_with_opening"] = sum(
+                    1 for c in pecas if _reinforcement.is_channel_code(c.get("logical_code"))
+                    and not _reinforcement.is_top_bond_beam_piece(c))
+                beam["counts_source"] = "CHANNEL_GRID_FOLLOW_86_12"
+    rep["timing_s"] = round(time.time() - t0, 4)
+    result["channel_grid_follow"] = rep
     return result
 
 

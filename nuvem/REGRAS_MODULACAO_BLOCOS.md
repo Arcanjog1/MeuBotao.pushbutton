@@ -12109,4 +12109,105 @@ síntese versionada):
   W27/W33 — o humano fecha com os dois cantos na mesma fiada, sem B54 no miolo, CONFLITO com a exceção B54+C09 da
   §85.8 (perguntar se a solução humana, que vem com a R4, substitui a exceção); canaleta J (escada) fora do escopo.
 - **Estado (2026-10-05)**: R2/R4, R3, R6/R10 (com a trava de prisma por parede), R7A/R8 e R9 IMPLEMENTADAS e integradas na branch `claude/revit-butanta-modulation-8611b5` (commits 00cb84d, 1c63adf, 3c0aaf3, 7988968, 98b159f, cfb8a60; sem push). R1 e R5 aplicadas no `butanta testes`. **Recriado no Revit (2026-10-05)**: 6 428 peças planejadas = criadas, 0 falhas/colisões, leitura de volta idêntica ao cálculo (0,0 cm), F1 56,2 % contra o humano. Pendências de decisão do usuário: §30.5 × R4, cinta variante B, forma A da jamba (§84/§85.8), shaft W27/W33 (§85.8), calço/H9 (§51.8), lado fechado do C09 (R10).
+- **86.12 (2026-10-05, correção do usuário)** — a canaleta (contraverga, verga, cinta) segue peça a peça a grade da fiada c−2 onde ela tem alvenaria; sobre o vão a grade é livre e absorve a fase. REGRA OBRIGATÓRIA, IMPLEMENTADA (chave `CHANNEL_GRID_FOLLOW_ENABLED`); ver §86.12.
 
+### 86.12 A canaleta segue a grade da fiada de MESMA PARIDADE abaixo (correção do usuário 2026-10-05) — REGRA OBRIGATÓRIA; IMPLEMENTADO, chave `CHANNEL_GRID_FOLLOW_ENABLED = True`
+
+**Correção do usuário (2026-10-05, prints do Revit do `butanta testes`):** "algumas canaletas de 34 e 39 não estão
+alinhadas com a modulação abaixo dela, assim quebrando o prisma dos blocos".
+
+**Como foi descoberto:** prints do usuário + medição no resultado da §86 (leitura de volta do Revit,
+`readback_r4_final.json`, régua `diag_user.py`): de **621** canaletas que ficam sobre alvenaria da fiada c−2, **184**
+não coincidiam peça a peça com as peças da fiada c−2 — vergas (f11) e cintas (f12) de W0–W8, W10, W11, W17 e a
+contraverga da W0 (f4). Exemplos dos prints: sobre um pilarete `B34 [108-146] | B19 [146-165] | jamba` na f9 a verga
+punha `U39 [108-147]`; entre duas portas, sobre `B19 [295-315] | B39 | B19`, a verga punha U39 deslocada. Causa: a
+verga/cinta era a fiada que o motor resolveu como CONTÍNUA (sem a abertura embaixo) trocada peça a peça por canaleta
+(§51.3/§86.7); a grade do pilarete (§85.9/§85.10) não subia até ela.
+
+**REGRA OBRIGATÓRIA** (mesma linha da §85.10 — "a grade inteira do pilarete continua nas fiadas acima da verga e na
+própria verga até o topo; a fase que não fecha é absorvida SOBRE O VÃO, nunca no pilarete"):
+
+1. Em toda fiada c que tem canaleta (contraverga `BELOW_SILL`, verga `ABOVE_OPENING`, cinta `TOP_BOND_BEAM` da
+   §86.7), na extensão de cada corrida: onde a fiada de mesma paridade abaixo (r = c−2) tem alvenaria, as canaletas
+   repetem PEÇA A PEÇA as peças de r, com o mesmo início e fim: B39→U39, B34→U34, B19→U19 (MEIA CANALETA), B54 de
+   preenchimento → U34+U19 com a junta nova longe das juntas de c−1/c+1 (como a §86.7). Compensador C04/C09 de r:
+   fundido à canaleta vizinha pela §51.3 (C04+B34 = U39 exato; senão U_CUT); o compensador encostado no trecho livre
+   que não fecha comprimento padrão com a vizinha alinhada é absorvido pelo trecho livre (a junta do lado da grade
+   fica). Canaleta de r conta como o bloco equivalente.
+2. Onde r NÃO tem alvenaria (vão abaixo), a grade é livre: o trecho entre as duas partes alinhadas fecha com
+   U39/U34/U19 e no máximo UM U_CUT (mínimo duro 9 cm = menor corte humano da §51.3; abaixo de 19 cm conta como peça
+   minúscula), escolhido nesta ordem: juntas novas desencontradas das juntas das fiadas c−1 e c+1 (regra #1,
+   1,5 cm), sem U_CUT, sem U_CUT minúscula, menos peças, menos U19. O descasamento de fase fica ali. A escolha é
+   feita no sentido canônico do mundo (+X; parede vertical +Y) — não depende do sentido em que a parede foi
+   desenhada. As fiadas são processadas de baixo para cima: a cinta (f12) desencontra da verga (f11) já alinhada.
+3. No quadrado do nó continua o BLOCO de amarração (variante A / §75 — canaleta nunca amarra): o passe só troca
+   peças de preenchimento da própria parede entre duas paradas (amarração, peça de outra parede, quadrado de nó,
+   vão ativo na fiada, ponta de parede). Nunca cria canaleta em nó, nunca invade abertura, nunca colide — conferência
+   final independente por janela (sem sobreposição, dentro da janela, nenhuma canaleta no quadrado do nó, corrida
+   nunca encolhe); reprovada, a faixa fica como estava.
+4. Apoio da verga/contraverga (§51.4/§86.8): a corrida só CRESCE — peça de r que encosta na corrida vira canaleta
+   inteira; o apoio nunca diminui (o rastreio das aberturas é atualizado; queda vira `support_drops`).
+5. Os BLOCOS da própria fiada c na mesma faixa (entre a corrida e o nó/vão) também seguem r quando a grade de r é
+   limpa até lá (§85.10). Quando não é (a peça de r atravessa a parada), os blocos de c ficam e a diferença fecha
+   dentro da própria corrida, com o mesmo critério do trecho livre (`flank_mismatch` no relatório). Sobra < 9 cm
+   numa borda dura (jamba de vão ATIVO na fiada) fecha com o compensador da jamba (C04 / C09 / C09+C04 com o C09 na
+   face — §84/R6), achado `GRID_FOLLOW_JAMB_CLOSURE`.
+
+**Conflitos / atualizações registrados (a orientação mais recente do usuário prevalece):**
+
+- §51.3 ("a corrida é feita com as peças da própria fiada, sem junta nova; juntas não mudam") e §86.7 ("troca no
+  lugar; a última fiada já é a grade da fiada de mesma paridade abaixo"): ATUALIZADAS — na extensão da corrida as
+  juntas da canaleta passam a ser as da fiada c−2 (sobre alvenaria) e livres sobre o vão. Nós, amarrações e paridade
+  continuam intocados; a fusão de compensador da §51.3 continua valendo.
+- §85.9 (`_grid_follow` do arranjo: "B19/pastilha na verga: não"): a verga passa a receber U19 quando r tem B19 —
+  o exemplo do usuário `B34 | B19 | jamba` vira `U34 | U19`.
+- A paridade dos nós (§82.1) lê as fiadas como eram ANTES deste passe (`channel_grid_follow.source_courses`, em
+  `_without_top_bond_beam`): o alinhamento nunca decide paridade (mesma regra da cinta, §86.7).
+
+**Implementação:** `core/engine/channel_grid_follow.py` (`plan_channel_grid_follow`, `refresh_plan_records`) e
+`wall_modeling._apply_channel_grid_follow`, chamado nos dois caminhos (strategy None/§80 e CHANNEL) depois da verga/
+contraverga, da cinta (§86.7) e do arranjo (§60–65/§84/§85/§86.6), antes da reauditoria de amarração e da validação
+final; refaz a validação da canaleta e a auditoria da cinta. Resultado em `result["channel_grid_follow"]`:
+`counts` (janelas trocadas, peças removidas/criadas, canaletas criadas, blocos copiados de c−2, cortes, fechamentos
+de jamba, casos sem solução, faixas com ponta não limpa), `windows` (antes/depois de cada janela, trechos livres),
+`unresolved` (motivo), `findings`, `runs_touched`, `support_drops`, `source_courses`. Famílias de canaleta ausentes →
+nada muda (`applied = False`, `CHANNEL_FAMILY_MISSING`).
+
+**Casos sem solução** (a faixa fica como estava e entra em `unresolved` com o motivo):
+`NO_SAME_PARITY_COURSE_BELOW` (canaleta na f0/f1), `NO_MASONRY_BELOW_RUN` (corrida inteira sobre vazio de r),
+`NO_VALID_LAYOUT` (nenhuma janela fecha: sobra < 9 cm sem vizinha para fundir nem jamba dura), `FREE_SHORT_UNMERGED`,
+`B54_SPLIT_NO_STAGGER` (B54 de r sob verga/contraverga sem divisão U34+U19 desencontrada — a verga não pode ser
+interrompida por bloco; na cinta o B54 fica bloco com achado), `CHANNEL_BELOW_UNDER_BLOCK` (canaleta de r sob bloco
+de c sem catálogo), `INVARIANT_*` (conferência final reprovou).
+
+**Limitações / pendências registradas:** a régua `diag_user.py` (peça de c com o mesmo início e fim de UMA peça de
+c−2) conta como "desalinhada" a canaleta fundida a compensador (U_CUT de B19+C04, U39 de C04+B34) e a peça livre que
+absorveu o compensador da jamba — é a regra (§51.3), não defeito; a régua dos testes aceita a fusão. O U_CUT ainda é
+lido com 39 cm na leitura de volta do Revit (defeito da leitura, não da peça; o comprimento real está em
+`instance_length_cm`). Blocos da fiada c fora da faixa da corrida e fiadas de bloco entre a verga e a cinta (pavimento
+de 14 fiadas) NÃO são tocados por este passe (a §85.10 pede a grade até o topo — pendência de código aberta para as
+fiadas sem canaleta).
+
+**Medido (2026-10-05, offline, sem tocar no Revit):**
+
+- Mini-planta do corpus BUTANTÃ com aberturas (eixos 1, 3, 4, 5, 7, 9; os nós com eixos fora do subconjunto não
+  existem), 13 fiadas, strategy None: 12 janelas trocadas em 5 fiadas, 212 peças removidas / 252 criadas (231
+  canaletas, 21 blocos copiados da fiada c−2), 2 U_CUT novas, 0 sem solução; validação da canaleta limpa (21/21
+  vergas, 9/9 contravergas, 0 colisão, 0 invasão), `channel_as_junction_bond` vazio, auditorias de amarração
+  aprovadas, 0 peça sem apoio. Régua `diag_user.py`: 36/265 "desalinhadas" — TODAS fusão de compensador (34
+  compensadores de jamba absorvidos pela canaleta sobre o vão + 2 U_CUT de B19+C04); 0 canaleta cortando peça da
+  fiada c−2. Os mesmos 6 eixos na leitura de volta da §86: 60/224 (13 cortando peça de c−2, 25 meio sobre a borda do
+  vão, 22 fusões).
+- W4 (portas, pilarete com nó B54), f11 depois: `B34 | U39 U19 | U34×4 sobre a porta | U39 U34 | B54 | U34 U39 |
+  U34×4 | U19 U39 | B34 | …` — a verga repete a f9 em todos os pilaretes; a cinta (f12) repete a f10 e desencontra
+  as juntas da verga sobre as portas (`U39 U39 U39 U19` sobre `U34×4`).
+- Fixture sintética (`tests/test_channel_grid_follow_86_12.py`): pilarete `B34 | B19 | jamba` na f9 → verga
+  `U34 | U19`, nos dois caminhos (None e CHANNEL); com o eixo invertido (caminho None) a regra também vale.
+- NÃO medido aqui (memória da máquina): o pavimento completo — o integrador roda o cálculo completo e mede com
+  `diag_user.py` (esperado: só restam as fusões de compensador e os casos de `unresolved`) e `r4_score.py`.
+
+Testes: `tests/test_channel_grid_follow_86_12.py` (verga sobre pilarete `B34|B19|jamba` → `U34|U19`; toda canaleta
+segue a f c−2; cinta repete a f10 sobre o pilarete; fechamento sobre o vão com no máximo um U_CUT ≥ 9 cm; nó mantém o
+bloco, validação e materialização limpas; apoio não diminui; chave desligada = comportamento anterior; paridade 82.1
+lê as fiadas de antes; determinismo e entrada intocada; sentido do eixo invertido; unidades do trecho livre,
+espelhamento e divisão do B54).
