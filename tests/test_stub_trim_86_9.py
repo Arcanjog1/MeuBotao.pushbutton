@@ -66,6 +66,21 @@ def geometry_key(walls):
     return sorted(tuple(sorted(ends_cm(w))) for w in walls)
 
 
+# Correcao do usuario (2026-10-05): a 86.9 fica DESLIGADA no produto (os tocos sao modulados); estes
+# testes exercitam a funcao com a chave ligada.
+PADRAO_DO_PRODUTO = wp.STUB_TRIM_ENABLED
+
+
+@pytest.fixture(autouse=True)
+def _regra_86_9_ligada():
+    antes = wp.STUB_TRIM_ENABLED
+    wp.STUB_TRIM_ENABLED = True
+    try:
+        yield
+    finally:
+        wp.STUB_TRIM_ENABLED = antes
+
+
 @contextlib.contextmanager
 def chave(enabled):
     antes = wp.STUB_TRIM_ENABLED
@@ -132,7 +147,7 @@ def test_o_limite_e_parametro_e_a_chave_desliga_tudo():
         novas, _ab, tocos = m.trim_wall_end_stubs(walls, None)
     assert tocos == [] and geometry_key(novas) == geometry_key(walls)
     assert m.trim_wall_end_stubs(walls, None, enabled=False)[2] == []
-    assert wp.STUB_TRIM_ENABLED is True and wp.STUB_TRIM_MAX_CM == 40.0
+    assert PADRAO_DO_PRODUTO is False and wp.STUB_TRIM_MAX_CM == 40.0  # correcao do usuario 2026-10-05
 
 
 # ============================================== 2. quando NAO e' toco

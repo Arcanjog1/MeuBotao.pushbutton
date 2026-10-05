@@ -11978,6 +11978,9 @@ analistas preveem as duas vergas idênticas ao humano); contagem de `CHANNEL_STO
 
 ### 86.9 Tocos de eixo além da face da parede que cruza (R9) — PADRÃO OBSERVADO (5/5); IMPLEMENTADO, chave `STUB_TRIM_ENABLED`
 
+> **CORREÇÃO DO USUÁRIO (2026-10-05, revisão do pavimento recriado no Revit) — REGRA OBRIGATÓRIA, SUBSTITUI a regra abaixo:** "algumas paredes não foram moduladas porque no projeto humano não foi modulado" — corrigir. Os tocos de eixo além da face da parede que cruza **SÃO modulados** como qualquer trecho de parede (a parede do Revit existe e tem de receber blocos), mesmo que o humano não os module. `STUB_TRIM_ENABLED = False` (wall_pairing.py); a função `trim_wall_end_stubs` fica disponível só para estudo. O texto abaixo continua como registro do padrão observado no humano (não é mais regra).
+
+
 **Como foi descoberto (2026-10-01/02, offline, só leitura):** fileiras do humano (`human_rows_unpad.json`, extração do
 R08_LT) comparadas com a geometria do corpus (`reference_projects/butanta_r08_lt/s74_corpus/geometry.json`). O humano
 modula a W07 só até **999 cm** (o eixo tem 1039 e passa **40 cm** além da face da W31), as W29, W30 e W31 só até
@@ -12099,8 +12102,8 @@ síntese versionada):
   exige EXCEÇÃO à §75 só para TOP_BOND_BEAM — decisão do usuário.
 - **R8 (86.8)** — passagem livre (§51.9) também sem CHANNEL (**CONFLITO com a §80**, que a deixou só no CHANNEL);
   verga de vão ≥ 140 cm com apoio ≥ 40 cm (humano 10/10).
-- **R9 (86.9) — tocos**: trecho de eixo ≤ 40 cm além da face de uma parede perpendicular, sem abertura nem outra
-  parede, é sobra da conversão CAD→Walls e não é modulado (W7, W29/W30/W31; 77 peças que o humano não tem).
+- **R9 (86.9) — tocos**: o humano não modula o trecho de eixo ≤ 40 cm além da face da parede que cruza, mas a
+  **correção do usuário de 2026-10-05 manda modular** — regra desligada (os tocos são modulados).
 - **R10 (86.10) — orientação do C09 na jamba**: humano 129/129 com o +X local para LONGE do vão, nosso 129/129 ao
   contrário; a premissa da §12 (`COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED`) segue NÃO confirmada.
 - **BLOQUEADO (decisão já tomada pelo usuário)**: canaleta de verga/contraverga contínua sobre o nó quando a jamba

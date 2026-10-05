@@ -1352,7 +1352,9 @@ def build_wall_graph(walls_to_create, junction_map,
 # ==========================================
 
 # Chave da regra (secao 86.9). Desligada, nada e' aparado.
-STUB_TRIM_ENABLED = True
+# CORRECAO DO USUARIO (2026-10-05): os tocos SAO modulados ("algumas paredes nao foram moduladas porque no
+# projeto humano nao foi modulado" - corrigir). Desligada por padrao; a funcao continua disponivel.
+STUB_TRIM_ENABLED = False
 # Maior toco aparado (cm alem da face da parede que cruza). 41 cm nao e' toco.
 STUB_TRIM_MAX_CM = 40.0
 # Abaixo disto a "sobra" e' variacao de modelagem (o corpus mede 0,013 cm), nao
