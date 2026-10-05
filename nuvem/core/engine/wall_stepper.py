@@ -1612,6 +1612,103 @@ def _t_intersection_room_ok(node, walls_to_create, openings_per_wall,
     return assessment["room_incoming_ft"] + tolerancia_ft >= CORNER_B34_ROOM_FT
 
 
+# ==========================================
+# SECAO 86.15 (2026-10-05, nuvem/REGRAS_MODULACAO_BLOCOS.md): num T em que a
+# parede principal continua alem da que chega (toco), a peca da fiada em que
+# a principal PASSA nunca pode ter junta na face da parede que chega - e' ali
+# que a fiada oposta termina (na fiada da que chega a principal e' cortada
+# nas DUAS faces), e a junta vira junta a prumo em todas as fiadas (regra #1).
+#
+# CAUSA PROVADA (BUTANTA, paredes de 99 cm W29/W30/W31, mini-planta real
+# W29 + W09 + W13): o teste de espaco do B54 (`_t_intersection_room_ok`) usa
+# a reserva de PIOR CASO do canto na outra ponta da principal - os 34 cm do
+# B34 do canto nas DUAS fiadas - e media 23 cm do lado do canto (precisa de
+# 27). O T degradava para L: B34 na principal ANCORADO NA FACE da que chega
+# (`contact_main = ponto - l_dir * meia espessura`) e estendido para o toco.
+# A face de inicio desse B34 e' exatamente a face em que a fiada oposta
+# para: `B34>[15-49] | B34<[50-84]` sobre `C04[45-49] | (no') | B34>[65-99]`,
+# junta a prumo em X~49,5 nas 13 fiadas. A degradacao para L so' nao cria
+# essa junta quando a principal NAO tem alvenaria atras da face (L de
+# verdade, boneca de vao).
+#
+# A inconsistencia e' interna: o proprio canto ja' deixou o espaco do B54 -
+# `_corner_bond_blocking_courses` reserva 27 cm (meio B54) para o T na fiada
+# em que a principal recebe a peca dele, e por isso o canto poe o B34 dele
+# na OUTRA fiada (regra 11.14, reserva de canto POR FIADA). Na fiada do T
+# o canto so' ocupa o corpo da parede perpendicular (meia espessura).
+#
+# CORRECAO: quando o teste de pior caso reprova, a principal e' medida de
+# novo SO' na fiada em que a peca do T deita sobre ela (`_flip_course("A")`),
+# com a reserva por fiada da regra 11.14 (`_wall_reserved_range_ft(course=,
+# solved=)`, a mesma que os cantos ja' usam). Cabendo o B54 ali, o T e' o
+# T de verdade: B54 centrado no no' (a peca ATRAVESSA as duas faces, com a
+# celula central sobre o quadrado do no') + B34 na que chega - e o toco e o
+# trecho ate' o canto sao fechados pelo preenchimento comum (sobra). Se o
+# canto ja' resolvido deitar a peca DELE na mesma fiada, nada muda (o T
+# degrada como antes - nunca colisao). Medido no grafo do corpus BUTANTA
+# (34 paredes, sem solve): so' os 3 T das paredes de 99 cm (n19, n20, n39)
+# mudam - os outros 34 T ficam como estao.
+#
+# A busca de fase (86.2) tambem precisa saber disso: ver
+# `_phase_t_main_room_conflict` / T_MAIN_ROOM_PHASE_PENALTY (a mesma chave).
+#
+# False = comportamento anterior (teste so' no pior caso, busca de fase sem a
+# penalidade).
+T_MAIN_ROOM_IN_OWN_COURSE_ENABLED = True
+T_MAIN_ROOM_IN_OWN_COURSE_RULE_ID = "REGRA_86_15_T_PASSING_PIECE_CROSSES_FACE"
+
+
+def _t_main_room_in_own_course(node, walls_to_create, openings_per_wall, nodes, end_to_node,
+                               node_index, solved):
+    """SECAO 86.15: espaco (ft) da parede PRINCIPAL do T nos dois sentidos a
+    partir do ponto do no', so' na fiada em que a peca do T deita sobre ela
+    (`_flip_course("A", node)`), com a reserva POR FIADA da regra 11.14 nas
+    pontas (`solved` = {node_index: (course_a, course_b)} dos encontros ja'
+    resolvidos; canto ainda nao resolvido e' otimista, como em
+    `_node_lays_bond_on_wall_in_course` - quem o resolver depois enxerga o B54
+    deste T e troca de fiada). Tambem para no T/X vizinho de meio de vao
+    (`_clip_range_by_midspan_neighbours`), como o teste de pior caso. So' MEDE.
+    Devolve None sem principal identificavel, senao
+    {"course", "room_plus_ft", "room_minus_ft"}."""
+    main_idx = node.get("main_wall_idx")
+    if main_idx is None or node.get("point") is None:
+        return None
+    course = _flip_course("A", node)
+    t_main = _t_of_point_on_wall(walls_to_create, main_idx, node["point"])
+    main_range = _wall_reserved_range_ft(walls_to_create, nodes, end_to_node, main_idx,
+                                         course=course, solved=solved)
+    main_range = _clip_range_by_midspan_neighbours(walls_to_create, nodes, main_idx, t_main, main_range,
+                                                   exclude_node_index=node_index)
+    return {
+        "course": course,
+        "room_plus_ft": _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, 1, main_range),
+        "room_minus_ft": _room_at_t_on_wall(walls_to_create, openings_per_wall, main_idx, t_main, -1, main_range),
+    }
+
+
+def _t_intersection_room_ok_in_own_course(node, walls_to_create, openings_per_wall, nodes, end_to_node,
+                                          node_index, solved):
+    """SECAO 86.15: o T de verdade (B54 centrado na principal + B34 na que
+    chega) cabe quando a principal e' medida so' na fiada da peca do T (ver
+    `_t_main_room_in_own_course`)? A que chega continua medida como em
+    `_t_intersection_room_ok` (a peca dela fica na outra fiada). Devolve
+    (ok, medida_da_principal_ou_None)."""
+    if openings_per_wall is None or nodes is None or end_to_node is None or solved is None:
+        return False, None
+    assessment = _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
+                                                 nodes=nodes, end_to_node=end_to_node, node_index=node_index)
+    if assessment is None:
+        return False, None
+    own = _t_main_room_in_own_course(node, walls_to_create, openings_per_wall, nodes, end_to_node,
+                                     node_index, solved)
+    if own is None:
+        return False, None
+    tolerancia_ft = _t_intersection_room_tolerance_ft()   # SECAO 74
+    if min(own["room_plus_ft"], own["room_minus_ft"]) + tolerancia_ft < T_INTERSECTION_B54_HALF_ROOM_FT:
+        return False, own
+    return assessment["room_incoming_ft"] + tolerancia_ft >= CORNER_B34_ROOM_FT, own
+
+
 # Ordem de preferencia do elemento UNICO que fecha uma parede curta demais
 # para o B34 num encontro (L ou T degradado para L) - maior primeiro. SO'
 # compensador/pastilha, NUNCA B19 (corrigido 2026-08-21, o usuario apontou
@@ -2392,21 +2489,25 @@ def _t_room_trace_step(node, walls_to_create, openings_per_wall, nodes, end_to_n
 
 
 def solve_t_intersection(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
-                         nodes=None, end_to_node=None):
+                         nodes=None, end_to_node=None, solved=None):
     """Ver `_solve_t_intersection_steps`. Com o rastreio da secao 79 ligado
     (BOND_TRACE), o resultado leva `trace`: os testes fisicos na ordem em que
-    foram feitos. Sem o rastreio, o resultado e' exatamente o de sempre."""
+    foram feitos. Sem o rastreio, o resultado e' exatamente o de sempre.
+    `solved` ({node_index: (course_a, course_b)} dos encontros ja' resolvidos,
+    secao 86.15): quando dado, o espaco do B54 na principal tambem e' medido
+    so' na fiada da peca do T (reserva de canto por fiada, regra 11.14);
+    None = so' o teste de pior caso (comportamento anterior)."""
     trace = [] if BOND_TRACE is not None else None
     result = _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=node_index,
                                          openings_per_wall=openings_per_wall, nodes=nodes,
-                                         end_to_node=end_to_node, trace=trace)
+                                         end_to_node=end_to_node, trace=trace, solved=solved)
     if trace is not None and isinstance(result, dict):
         result["trace"] = trace
     return result
 
 
 def _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=None, openings_per_wall=None,
-                                nodes=None, end_to_node=None, trace=None):
+                                nodes=None, end_to_node=None, trace=None, solved=None):
     """Resolve o encontro em T (secao 11 do prompt): B54 na parede
     continua (mainWall, Fiada A) com a celula central no ponto do no' + B34
     na parede que chega (incomingWall, Fiada B) com o vao menor voltado
@@ -2465,6 +2566,24 @@ def _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=None,
     if trace is not None:
         trace.append(_t_room_trace_step(node, walls_to_create, openings_per_wall, nodes, end_to_node,
                                         node_index, room_ok))
+    room_in_own_course = False
+    if not room_ok and T_MAIN_ROOM_IN_OWN_COURSE_ENABLED and solved is not None:
+        # SECAO 86.15: o pior caso reprovou - a principal so' precisa do espaco
+        # do B54 na fiada em que a peca do T deita sobre ela (ver o cabecalho
+        # de T_MAIN_ROOM_IN_OWN_COURSE_ENABLED). Sem isto o T degradava para L
+        # com o B34 ancorado na face da que chega: junta a prumo nessa face.
+        room_in_own_course, _own = _t_intersection_room_ok_in_own_course(
+            node, walls_to_create, openings_per_wall, nodes, end_to_node, node_index, solved)
+        if trace is not None and room_in_own_course:
+            # so' quando muda a decisao: reprovado, o rastreio segue exatamente o
+            # de antes (T_B54_B34 -> degradacoes), que a secao 79 trava por teste
+            trace.append({"rule": "T_B54_ROOM_IN_OWN_COURSE", "codes": ["B54", "B34"],
+                          "rule_id": T_MAIN_ROOM_IN_OWN_COURSE_RULE_ID, "passed": True,
+                          "course": _own.get("course"),
+                          "room_cm": {"main_plus": _ft_cm_round(_own["room_plus_ft"]),
+                                      "main_minus": _ft_cm_round(_own["room_minus_ft"])},
+                          "detail": None})
+        room_ok = bool(room_in_own_course)
     if not room_ok:
         assessment = _t_intersection_room_assessment(node, walls_to_create, openings_per_wall,
                                                      nodes=nodes, end_to_node=end_to_node, node_index=node_index)
@@ -2630,7 +2749,10 @@ def _solve_t_intersection_steps(node, walls_to_create, catalog, node_index=None,
     course_b = _make_block_candidate("B34", b34, "B", origin_b, x_b, "T_INTERSECTION_INCOMING",
                                      node_index=node_index, wall_idx=inc_idx, secondary_wall_idx=main_idx)
 
-    return {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b}
+    result = {"ok": True, "reason": None, "course_a": course_a, "course_b": course_b}
+    if room_in_own_course:
+        result["room_in_own_course"] = True   # SECAO 86.15 (diagnostico)
+    return result
 
 
 # Mesmo teto do T (T_INTERSECTION_B54_HALF_ROOM_FT): o B54 de um X fica
@@ -3103,7 +3225,8 @@ def solve_all_intersections(nodes, walls_to_create, catalog, openings_per_wall=N
         elif kind == "T_INTERSECTION":
             result = solve_t_intersection(node, walls_to_create, catalog, node_index=node_index,
                                           openings_per_wall=openings_per_wall,
-                                          nodes=nodes, end_to_node=end_to_node)
+                                          nodes=nodes, end_to_node=end_to_node,
+                                          solved=solved_by_node)   # SECAO 86.15
         elif kind == "X_INTERSECTION":
             result = solve_x_intersection(node, walls_to_create, catalog, node_index=node_index,
                                           openings_per_wall=openings_per_wall,
@@ -4844,6 +4967,45 @@ def _phase_canonical_l_first(node, walls_to_create, axis):
     return melhor[1] if melhor else None
 
 
+# SECAO 86.15 na busca de fase (86.2): as tabelas de custo de cada trecho usam as
+# pecas dos dois estados UNIFORMES (todos os nos movimentaveis na base / todos
+# invertidos), em que a relacao canto x T e' a mesma - a relacao mista, a unica
+# em que o B54 do T cabe ou deixa de caber, nunca e' resolvida de verdade. Sem
+# isto a busca podia escolher a relacao em que o no' da ponta da principal deita
+# a peca dele na MESMA fiada do T (mini-planta W31 + W07 + W13: o T voltava a
+# degradar e a junta a prumo voltava). A penalidade vale um trecho que nao fecha
+# (PHASE_RELATION_COST_CAP) e so' entra quando o T DEPENDE da relacao: o pior
+# caso reprova, sem a peca daquele no' o B54 cabe na fiada do T, com ela nao.
+T_MAIN_ROOM_PHASE_PENALTY = PHASE_RELATION_COST_CAP
+
+
+def _phase_t_main_room_conflict(nodes, walls_to_create, openings_per_wall, end_to_node, wall_idx,
+                                t_index, t_state, movable_set, other_index, other_pieces):
+    """SECAO 86.15: True quando, no estado `t_state` do T `t_index` (principal =
+    `wall_idx`) e com as pecas `other_pieces` do no' `other_index` (uma PONTA da
+    principal), o B54 do T deixa de caber na fiada dele SO' por causa da peca
+    daquele no' - o T degradaria para L. Funcao pura (copia o no' do T)."""
+    node = nodes[t_index] if 0 <= t_index < len(nodes) else None
+    if (node is None or node.get("kind") != "T_INTERSECTION" or node.get("main_wall_idx") != wall_idx
+            or openings_per_wall is None or end_to_node is None):
+        return False
+    if other_index not in (end_to_node.get((wall_idx, 0)), end_to_node.get((wall_idx, 1))):
+        return False
+    if _t_intersection_room_ok(node, walls_to_create, openings_per_wall, nodes=nodes,
+                               end_to_node=end_to_node, node_index=t_index):
+        return False   # o T de verdade cabe no pior caso: nao depende da relacao
+    probe = dict(node)
+    if t_state and t_index in movable_set:
+        _phase_toggle(probe)
+    livre, _m = _t_intersection_room_ok_in_own_course(probe, walls_to_create, openings_per_wall, nodes,
+                                                      end_to_node, t_index, {other_index: ()})
+    if not livre:
+        return False   # nem sem a peca do vizinho cabe: a relacao nao muda nada
+    com, _m = _t_intersection_room_ok_in_own_course(probe, walls_to_create, openings_per_wall, nodes,
+                                                    end_to_node, t_index, {other_index: tuple(other_pieces or ())})
+    return not com
+
+
 def _phase_relation_problem(nodes, walls_to_create, catalog, openings_per_wall, end_to_node, movable, bond):
     """Monta o problema: tabelas de custo por trecho (pecas REAIS dos dois
     estados de cada no', resolvidos com os cantos L pinados para a 30.5 nao
@@ -4889,6 +5051,15 @@ def _phase_relation_problem(nodes, walls_to_create, catalog, openings_per_wall, 
                     table[(bi, bj)] = _phase_edge_state_cost(
                         wall_idx, ti, _pieces(ni, bi), nodes[ni], tj, _pieces(nj, bj), nodes[nj],
                         walls_to_create, catalog)
+                    if T_MAIN_ROOM_IN_OWN_COURSE_ENABLED and (
+                            _phase_t_main_room_conflict(nodes, walls_to_create, openings_per_wall, end_to_node,
+                                                        wall_idx, nj, bj, movable_set, ni, _pieces(ni, bi))
+                            or _phase_t_main_room_conflict(nodes, walls_to_create, openings_per_wall, end_to_node,
+                                                           wall_idx, ni, bi, movable_set, nj, _pieces(nj, bj))):
+                        # SECAO 86.15: nesta relacao o no' da ponta deita a peca
+                        # dele na fiada do T e o B54 nao cabe - o T degradaria
+                        # para L com junta a prumo na face da que chega
+                        table[(bi, bj)] += T_MAIN_ROOM_PHASE_PENALTY
             edges.append({"wall_idx": wall_idx, "i": ni, "j": nj, "t_i": ti, "t_j": tj,
                           "weight": weight, "kind": tipo, "table": table})
     passes = {}

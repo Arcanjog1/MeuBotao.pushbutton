@@ -9739,6 +9739,13 @@ continua grande.
 correta. Os outros **três reprovam por falta submilimétrica**, dentro da faixa de
 variação de modelagem medida:
 
+> **Nota (2026-10-05, §86.15 — CONFLITO registrado, vale a 86.15):** os três T de
+> "falta 4 cm" (nós 19, 20 e 39 — paredes de 99 cm W29/W30/W31) continuam
+> reprovando ESTE teste (pior caso), mas a degradação deles NÃO está correta: a
+> falta é só a reserva do canto da outra ponta, que na fiada da peça do T não
+> existe, e a degradação para L põe junta a prumo na face da que chega. Com a
+> §86.15 a principal é medida também na fiada do T e eles viram B54|B34.
+
 | nó | principal × chega | espaço | falta |
 |---|---|---|---|
 | 24 | 8284526 × 8284559 | 26,9880 cm | **0,12 mm** |
@@ -12303,3 +12310,108 @@ espelhamento e divisão do B54).
   `test_jamb_remnant_catalog.py`, `test_b34_run_arrangement.py` e `test_script.py` continuam verdes.
 
 - **Integração (2026-10-05) — SEGUNDA PASSADA DA JAMBA depois da §86.12** (`JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = True`, caminho geral): com as canaletas já alinhadas à grade, o passe da jamba roda de novo e, se mudar alguma peça, a §86.12 realinha as canaletas. Cálculo completo do BUTANTÃ (13 fiadas): compensador logo atrás de bloco encostado no vão 51 (Revit anterior) → 22 (86.13) → **20** (com a segunda passada; resolve a W2 porta 1160, que alternava a pastilha); furos quebrados 325 → 320; septos sem apoio 91 → 83. **Sem solução sem quebrar o prisma (prisma primeiro):** W0 pilarete 395–464 (contraverga da janela esquerda entra no pilarete na fiada 4), W3 janela 1565, W11 jamba 409, W27 (shaft). O caso W0 1630 que a régua lista é o pilarete de 54 do catálogo (faixa C04+C09 encostada no vão da direita), não é defeito.
+
+### 86.15 T com toco: a peça da fiada que PASSA atravessa a face da parede que chega — nunca junta nessa face (correção do usuário, 2026-10-05) — REGRA OBRIGATÓRIA (amarração, regra #1); IMPLEMENTADO (chave `T_MAIN_ROOM_IN_OWN_COURSE_ENABLED = True`)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** — AMARRAÇÃO (encontro T; junta vertical entre fiadas). É a regra #1 (junta a
+  prumo proibida) aplicada ao T em que a parede principal continua além da que chega (toco ou trecho de parede).
+- **Como foi descoberto**: com a correção do usuário de 2026-10-05 (§86.9 desligada, tocos modulados) a auditoria
+  final de amarração do Revit reprovou as três paredes de 99 cm do BUTANTÃ — W29, W30 e W31 (índices 0-based 28,
+  29, 30), cada uma com um T no meio (W13, W24 e W13 chegam em t = 50–64 cm) e um toco de 35 cm até a ponta
+  livre: `CONTINUOUS_VERTICAL_JOINT: junta corrida em X~49.5cm, em 13 fiadas`. Fileiras do cálculo
+  (`rows_r5jp2_13.json`; iguais em `rows_r237_13.json`, anterior à 86.9 — o defeito já existia): fiada em que a
+  principal passa `B34> [15–49] | B34< [50–84] | C09 [85–94] | C04 [95–99]`, fiada em que a que chega passa
+  `B34< [0–34] | C04 | C09 [40–49] | (nó 50–64) | B34> [65–99]` — a peça da fiada que passa começa exatamente na
+  face (49,5) onde a outra fiada termina. O humano (sem toco) faz `C04 [15–19] | C09 [20–29] | B34> [30–64]` /
+  `B34< [0–34] | C04 | C09 [40–49]`: a peça que passa ATRAVESSA a face.
+- **A regra**: num T, na fiada em que a parede que chega passa pelo nó, a principal é cortada nas DUAS faces dela.
+  Por isso, na fiada em que a principal passa, a peça da principal **nunca tem junta em nenhuma das duas faces da
+  que chega** — ela atravessa as duas faces (o B54 centrado no nó, com a célula central sobre o quadrado do nó e o
+  vazado menor do B34 da que chega), e o toco é fechado pela sobra (catálogo da §86.6: 4 → C04, 9 → C09,
+  14 → C09 + C04, 19 → B19, 24 → C04 + B19, 29 → C09 + B19, 34 → B34), sem junta coincidente nova nas fiadas
+  vizinhas.
+- **Causa provada** (reprodução mínima: mini-planta real W29 + W09 + W13, 13 fiadas, com aberturas — reproduz o
+  cálculo peça a peça — e a planta sintética do teste): o teste de espaço do B54 (`_t_intersection_room_ok`,
+  `nuvem/core/engine/wall_stepper.py`) usa a reserva de PIOR CASO do nó da outra ponta da principal — os 34 cm do
+  B34 do canto W09/W29 nas DUAS fiadas — e mede **23 cm** do lado do canto (precisa de 27; do lado do toco há 42).
+  O T degrada para L (`T_INTERSECTION_DEGRADED_L`): B34 na principal **ancorado na face da que chega**
+  (`contact_main = ponto − l_dir · meia espessura`) e estendido para o toco → `[50–84]`, cuja face de início (49,5)
+  é a face em que a fiada oposta para. A degradação para L só é coerente quando a principal não tem alvenaria atrás
+  dessa face (L de verdade, boneca de vão); num T ela põe a junta a prumo em todas as fiadas. A inconsistência é
+  interna: o próprio canto já deixava o espaço do B54 — `_corner_bond_blocking_courses` reserva 27 cm (meio B54)
+  para o T na fiada em que a principal recebe a peça dele e por isso o canto põe o B34 dele na OUTRA fiada (regra
+  11.14, reserva de canto por fiada); na fiada do T o canto só ocupa o corpo da perpendicular (14 cm) e sobram
+  **43 cm**.
+- **Implementação** (`nuvem/core/engine/wall_stepper.py`, chave `T_MAIN_ROOM_IN_OWN_COURSE_ENABLED`; False =
+  comportamento anterior; `T_MAIN_ROOM_IN_OWN_COURSE_RULE_ID = "REGRA_86_15_T_PASSING_PIECE_CROSSES_FACE"`):
+  - `_t_main_room_in_own_course` / `_t_intersection_room_ok_in_own_course`: quando o pior caso reprova, a principal
+    é medida de novo **só na fiada da peça do T** (`_flip_course("A", node)` — respeita a paridade invertida) com a
+    reserva por fiada da regra 11.14 (`_wall_reserved_range_ft(course=, solved=)`, a mesma dos cantos) e parando no
+    T/X vizinho de meio de vão; a que chega continua medida como antes. Cabendo o B54, o T é o T de verdade (B54
+    centrado + B34 na que chega, `T_INTERSECTION_MAIN`/`T_INTERSECTION_INCOMING`); o resultado leva
+    `room_in_own_course` e o rastreio da §79 ganha o passo `T_B54_ROOM_IN_OWN_COURSE`.
+  - `solve_all_intersections` passa `solved_by_node` para `solve_t_intersection(..., solved=)`. Canto já resolvido
+    com a peça dele deitada na mesma fiada → nada muda, o T degrada como antes (nunca colisão). Canto ainda não
+    resolvido → otimista, como na 11.14: quem o resolve depois enxerga o B54 e troca de fiada. Sem `solved`
+    (chamador antigo) só o pior caso.
+  - **Busca de fase (§86.2)** — `_phase_t_main_room_conflict` + `T_MAIN_ROOM_PHASE_PENALTY`
+    (= `PHASE_RELATION_COST_CAP`, um trecho que não fecha): as tabelas de custo da busca usam as peças dos dois
+    estados UNIFORMES (todos os nós na base / todos invertidos), em que a relação nó-da-ponta × T é sempre a mesma;
+    a relação mista nunca é resolvida de verdade. Na W31 isso escolhia a relação em que o B34 da ponta (a W31 é a
+    que CHEGA no T da W07, que também tem toco) deita na MESMA fiada do T — o B54 não cabia e a junta voltava
+    (reproduzido na mini-planta W31 + W07 + W13, com e sem aberturas). A penalidade entra no estado (bi, bj) do
+    trecho entre o T e um nó de PONTA da principal só quando o T depende da relação: o pior caso reprova, sem a
+    peça daquele nó o B54 cabe na fiada do T e com ela não.
+  - O fechamento do toco e do trecho até o canto é o preenchimento comum (a sobra); nada foi mexido nele.
+- **Medido** (o cálculo completo do pavimento NÃO foi rodado — memória da máquina):
+  - grafo do corpus BUTANTÃ (34 paredes, sem solve, tocos modulados como no produto): a medida na fiada do T só
+    resgata os **3 T das paredes de 99 cm** (W29 × W13, W30 × W24, W31 × W13; `T@1192,1437`, `T@1192,737`,
+    `T@1192,1937`); os outros 34 T ficam como estavam (os 3 de ruído da §74 já passam pela tolerância física).
+  - mini-planta W29 + W09 + W13 (13 fiadas, aberturas), só a troca do T: fiadas que passam `C04 [15–19] |
+    C09 [20–29] | B54 [30–84] | C09 [85–94] | C04 [95–99]`; fiadas que param inalteradas `B34< [0–34] | C09 |
+    C04 [45–49] | (nó) | B34> [65–99]`; auditoria da W29 reprovada → **aprovada**; conflitos de alinhamento 2 → 0;
+    W09 e W13 idênticas peça a peça. O lado do canto fica igual ao humano (`C04 [15–19] | C09 [20–29]`) e o B54 é
+    o `B34> [30–64]` do humano estendido sobre o toco.
+  - mini-plantas com a guarda da busca de fase (13 fiadas, aberturas): **W29** (+ W09 + W13), **W30** (+ W09 + W24)
+    e **W31** (+ W07 + W13) — as três aprovadas, `C09 [15–24] | C04 [25–29] | B54 [30–84] | C09 | C04` na fiada em
+    que a principal passa e `B34< [0–34] | C09 | C04 [45–49] | (nó) | B34> [65–99]` na outra; nenhuma auditoria
+    reprovada, 0 colisões, 0 conflitos de alinhamento. Na W31 só a troca do T não bastava (a busca de fase escolhia
+    a relação ruim; continuava `CONTINUOUS_VERTICAL_JOINT` em X~49,5) — é o que a guarda resolve. Na mini-planta da
+    W29 a guarda junta canto e T num componente da busca e o espelho de fachada passou a pôr a W29 passando o nó na
+    fiada 0 (a paridade do humano e do cálculo completo atual); a W09 ficou com 0 células de coluna quebradas
+    (antes 17) e uma junta a prumo de 3+ fiadas a mais pela régua do prisma (coluna de `C04` encostado na jamba
+    440 nas duas paridades — isenta pela auditoria, é a faixa da §86.13).
+  - **Custo de prisma (aceito — é o que o humano tem)**: a célula grande do B34 do canto (t ≈ 24, fiada que para)
+    fica sob os compensadores `[15–29]` da fiada que passa, exatamente como no humano. Por parede (W29/W30/W31 nas
+    mini-plantas): células em coluna contínua ~36–38 → 25–26, quebradas 12 → 19 (`column_census`); prisma por
+    interface: interrompidas 22 → 34. Não há
+    composição que atravesse as duas faces com célula sobre o nó e mantenha essa coluna: entre a face do canto
+    (14,5) e o B54 centrado (30) sobram 15 cm (só C09 + C04), e B39/B34/B54 deslocados ficam 1,6 cm ou mais fora
+    do vazado menor do B34 da que chega ou põem vazado menor sobre principal (§85.8).
+- **CONFLITO registrado (§74 × §86.15) — vale a 86.15**: a §74 lista os nós 19, 20 e 39 do corpus (falta de 4 cm —
+  são exatamente estes três T) entre os que "reprovam por margem real, e a degradação está correta". A medida
+  (23 de 27 cm) continua certa no PIOR CASO e o teste da §74 continua reprovando-os (`_t_intersection_room_ok`
+  não mudou; `tests/test_s74_corpus_butanta.py` intacto). O que a 86.15 acrescenta: a falta vem só da reserva do
+  canto, que na fiada do T não existe, e a degradação para L é que produz a junta a prumo reprovada no Revit.
+  Orientação mais recente do usuário (2026-10-05: tocos modulados, junta corrida corrigida) → B54|B34 nesses três.
+- **DOCUMENTADO — pendências de código abertas** (nenhum caso no BUTANTÃ):
+  1. Toco entre 10 e 20 cm além da face (o B54 centrado não cabe do lado do toco): o T continua degradando para L
+     e a junta a prumo fica na face de longe. Nenhuma peça do catálogo atravessa as duas faces com célula sobre o
+     nó nesse caso — decisão do usuário (aceitar a junta, célula desalinhada ou aparar o toco).
+  2. Canto (ou outro nó da ponta) forçado a deitar a peça dele na mesma fiada do T: o T degrada como antes.
+  3. Ordem do fechamento do toco (`C09 | C04` ou `C04 | C09` contra a ponta livre): segue o preenchimento comum e
+     muda com o sentido do eixo; a §86.6 diz "C09 na face" para a jamba e o humano fecha a ponta livre da W25 com
+     C04 (§86.9, 1 caso) — não decidido.
+  4. A paridade das peças encostadas (`_apply_abutting_tie_parity`, roda antes da busca de fase e trava os nós que
+     inverte) não conhece a 86.15; se ela inverter o T ou o nó da ponta para a relação ruim, o T volta a degradar
+     (sem colisão). No cálculo atual (`rows_r5jp2_13.json`) as três paredes já têm a relação certa (a principal
+     passa o nó na fiada em que a ponta é da W09/W07).
+- **Como o integrador mede**: cálculo completo do pavimento (13 fiadas, aberturas originais) e `wall_bond_audits`
+  das paredes 28, 29 e 30 — sem `CONTINUOUS_VERTICAL_JOINT` em X~49,5 —; `r4_score.py` (F1 contra o humano) e a
+  régua de prisma/colunas (`prism_free_area.column_census`) nas três.
+- Testes: `tests/test_junta_no_toco_86_15.py` (causa no grafo: pior caso 23 cm × fiada do T 43 cm; canto na mesma
+  fiada continua degradando e a paridade invertida volta a caber; solver de encontros B54 × B34 com a chave;
+  solve real sem junta corrida na face; toco fechado pela sobra; chave desligada reproduz a junta; determinismo;
+  eixo invertido e ordem das paredes; mini-plantas reais W29 + W09 + W13 e W31 + W07 + W13 — esta com e sem a
+  guarda da busca de fase —; guarda de fase só marca a relação ruim e não toca T que cabe no pior caso; corpus:
+  só os 3 T mudam; IronPython 2.7).
