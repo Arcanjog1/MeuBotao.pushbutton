@@ -1,0 +1,4 @@
+== r2379_13 (fiadas 13) 474s solve 469.3s pieces 6428 walls 34 size_mb 15.8 
+SEMELHANCA pecas: iguais 3561 | humano 6634 | candidato 6428 | precisao 55.4% revocacao 53.7% F1 54.5%
+QUALIDADE f0-11 candidato: {'broken': 427, 'sv': 12, 'septa_unsupported': 110, 'comps': 360, 'comps_off_jamb': 130, 'b19_misplaced': 0, 'joints_coincident_nonexempt': 0}
+QUALIDADE f0-11 humano   : {'broken': 407, 'sv': 33, 'septa_unsupported': 60, 'comps': 486, 'comps_off_jamb': 155, 'b19_misplaced': 12, 'joints_coincident_nonexempt': 13}

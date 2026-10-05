@@ -11576,6 +11576,11 @@ está marcado CONFLITO. As subseções 86.2–86.10 seguem a numeração das reg
   | `butanta testes` no Revit (rodada 2 + W1, 19 aberturas deslocadas, 14 fiadas) | 20,8 % | 7 100 | 467 | 265 | — |
   | Motor 88a67c8, aberturas ORIGINAIS, 14 fiadas | 24,2 % | 7 062 | 669 | 264 | 393 |
   | Motor 88a67c8, aberturas ORIGINAIS, 13 fiadas | 26,4 % | 6 492 | 630 | 239 | 387 |
+  | + R3 faixa de B34 equilibrada (86.3) | 35,3 % | 6 492 | 606 | 272 | 387 |
+  | + R2/R4 fase dos encontros (86.2) | 50,6 % | 6 496 | 433 | 190 | 354 |
+  | + R7A/R8 cinta de topo e passagem livre (86.7/86.8) | 54,4 % | 6 474 | 433 | 190 | 354 |
+  | + R9 tocos (86.9) | 54,5 % | 6 428 | 427 | 110 | 360 |
+  | + R6/R10 jambas com trava de prisma (86.6/86.10) = **criado no Revit em 2026-10-05** | **56,2 %** | 6 428 | 417 | 107 | 360 |
   | HUMANO (piso de ruído da régua) | — | 6 634 | 407 | 60 | 486 |
 
 - Maior perda medida: paredes inteiras com as fiadas pares/ímpares trocadas em relação ao humano (W18 sai idêntica
@@ -12103,7 +12108,5 @@ síntese versionada):
 - **PENDENTE**: fiada partida de 9 cm (H9) + C09 deitado em topo fora da grade (W11 171, W27 91; §51.8); shaft
   W27/W33 — o humano fecha com os dois cantos na mesma fiada, sem B54 no miolo, CONFLITO com a exceção B54+C09 da
   §85.8 (perguntar se a solução humana, que vem com a R4, substitui a exceção); canaleta J (escada) fora do escopo.
-- **Estado do código (2026-10-01, ainda NÃO integrado na branch de trabalho)**: R3 implementada (branch
-  `worktree-wf_ff7686b5-095-2`, commits e48d38c/fea1b17); R2/R4, R7A/R8 em implementação; R6/R10 e R9 na fila.
-  R1 e R5 aplicadas no `butanta testes` (dados, sem código).
+- **Estado (2026-10-05)**: R2/R4, R3, R6/R10 (com a trava de prisma por parede), R7A/R8 e R9 IMPLEMENTADAS e integradas na branch `claude/revit-butanta-modulation-8611b5` (commits 00cb84d, 1c63adf, 3c0aaf3, 7988968, 98b159f, cfb8a60; sem push). R1 e R5 aplicadas no `butanta testes`. **Recriado no Revit (2026-10-05)**: 6 428 peças planejadas = criadas, 0 falhas/colisões, leitura de volta idêntica ao cálculo (0,0 cm), F1 56,2 % contra o humano. Pendências de decisão do usuário: §30.5 × R4, cinta variante B, forma A da jamba (§84/§85.8), shaft W27/W33 (§85.8), calço/H9 (§51.8), lado fechado do C09 (R10).
 
