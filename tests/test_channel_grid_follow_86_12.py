@@ -47,12 +47,18 @@ def _solve(estrategia=None, follow=True, reverse=False):
     chave = (estrategia, follow, reverse)
     if chave not in _CACHE:
         antes = m.CHANNEL_GRID_FOLLOW_ENABLED
+        # contrato isolado da 86.12: a segunda passada da jamba (86.13, integracao) fica desligada aqui
+        segunda = getattr(m, "JAMB_SECOND_PASS_AFTER_GRID_FOLLOW", None)
         m.CHANNEL_GRID_FOLLOW_ENABLED = follow
+        if segunda is not None:
+            m.JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = False
         try:
             lines, ops = _janelas()
             _CACHE[chave] = tcr.solve(lines, ops, strategy=estrategia, num_courses=NUM, reverse=reverse)
         finally:
             m.CHANNEL_GRID_FOLLOW_ENABLED = antes
+            if segunda is not None:
+                m.JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = segunda
     return _CACHE[chave]
 
 

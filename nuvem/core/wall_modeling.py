@@ -3952,6 +3952,11 @@ TOP_BOND_BEAM_ENABLED = True
 # comportamento anterior. Ver core/engine/channel_grid_follow.py e a secao 86.12
 # de nuvem/REGRAS_MODULACAO_BLOCOS.md.
 CHANNEL_GRID_FOLLOW_ENABLED = True
+# SECAO 86.13 (integracao 2026-10-05): SEGUNDA passada da jamba (84/85/86.6/86.13) DEPOIS do alinhamento das
+# canaletas (86.12) no caminho geral, e a 86.12 de novo se a jamba mudou. Na primeira passada a verga ainda
+# nao seguia a grade e a ultima fiada ainda era bloco: o compensador na face era recusado por quebrar uma
+# coluna contra a junta da verga (W2 porta 1160, W0 395-464). False = so' a primeira passada.
+JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = True
 # SECAO 86.8 (2026-10-01) - PASSAGEM LIVRE (51.9, aceita pelo usuario no item C)
 # tambem sem a estrategia adicional CHANNEL: vao sem peitoril com as duas jambas
 # a <= 28,5 cm de nos fica sem verga, sem cinta e sem alvenaria acima (humano
@@ -6439,6 +6444,10 @@ def _apply_opening_structural_reinforcement(result, nodes, walls_to_create, end_
     # SECAO 86.12: canaletas alinhadas a' grade da fiada de mesma paridade abaixo
     _apply_channel_grid_follow(result, plan, nodes, walls_to_create, openings_per_wall, _band, num_courses,
                                base_z_abs, catalog=catalog, pieces_available=bool(pieces_available))
+    if (JAMB_SECOND_PASS_AFTER_GRID_FOLLOW and CHANNEL_GRID_FOLLOW_ENABLED and pieces_available
+            and GENERAL_COMPOSITION_QUALITY_ENABLED):
+        _jamb_second_pass_after_grid_follow(result, nodes, walls_to_create, end_to_node, openings_per_wall,
+                                            catalog, base_z_abs, num_courses, _band, plan)
     if pieces_available:
         t_audit = time.time()
         audit_catalog = dict(catalog)
@@ -6512,6 +6521,48 @@ def _apply_top_bond_beam(result, plan, nodes, walls_to_create, openings_per_wall
             reference_course_candidates=result.get("course_candidates_before_reinforcement"), nodes=nodes)
     beam["timing_s"] = round(time.time() - t0, 4)
     result["top_bond_beam"] = beam
+    return result
+
+
+def _jamb_second_pass_after_grid_follow(result, nodes, walls_to_create, end_to_node, openings_per_wall, catalog,
+                                        base_z_abs, num_courses, course_band, plan):
+    """SECAO 86.13 (JAMB_SECOND_PASS_AFTER_GRID_FOLLOW): refaz o passe da jamba (faixa de compensacao encostada e
+    alinhada, catalogo da sobra, compensador na face) sobre a geometria com as canaletas ja' alinhadas a' grade
+    (86.12) e, se alguma peca mudou, realinha as canaletas de novo. Mesma aceitacao exata por parede da primeira
+    passada. Resultado em `result["jamb_second_pass"]`."""
+    from core.engine import b34_run_arrangement as _runs
+    course_candidates = result.get("course_candidates")
+    if not course_candidates or not walls_to_create:
+        return result
+    ties = None
+    if nodes is not None and end_to_node is not None:
+        ties = dict((wi, _wall_tie_t_positions_cm(wi, walls_to_create, nodes, end_to_node))
+                    for wi in range(len(walls_to_create)))
+        n_courses = (max(course_candidates) + 1) if course_candidates else 0
+        for wi in range(len(walls_to_create)):
+            by_course = _wall_tie_t_positions_by_course_cm(wi, walls_to_create, nodes, end_to_node, n_courses)
+            if by_course is not None:
+                ties[wi] = by_course
+    validate = _channel_wall_validator(result, walls_to_create, openings_per_wall, catalog, num_courses, nodes,
+                                       end_to_node, course_band, plan, base_z_abs,
+                                       role_by_course=bool(JUNCTION_PHYSICAL_RULES_ENABLED))
+    jamb = _runs.arrange_b34_runs(
+        course_candidates, walls_to_create, openings_per_wall, catalog, tie_positions_by_wall=ties,
+        half_block_code=HALF_BLOCK_CODE, half_block_tie_gap_cm=HALF_BLOCK_TIE_ADJACENCY_CM,
+        validate_wall=validate, joint_identity_guard=True, jamb_compensator_alignment=True)
+    changed = bool(jamb.get("moved") or jamb.get("created") or jamb.get("removed"))
+    report = {"enabled": True, "changed": changed, "walls_changed": jamb.get("walls_changed", 0),
+              "moved": jamb.get("moved", 0), "created": jamb.get("created", 0), "removed": jamb.get("removed", 0),
+              "walls": [item.get("wall_idx") for item in (jamb.get("walls") or ())],
+              "rejected_by_validation": [item.get("wall_idx") for item in
+                                         (jamb.get("walls_rejected_by_validation") or ())]}
+    if changed:
+        report["compensators_reoriented"] = _reorient_compensators_after_arrangement(
+            course_candidates, walls_to_create, openings_per_wall, catalog)
+        result["channel_grid_follow_pass1"] = result.get("channel_grid_follow")
+        _apply_channel_grid_follow(result, plan, nodes, walls_to_create, openings_per_wall, course_band, num_courses,
+                                   base_z_abs, catalog=catalog, pieces_available=True)
+    result["jamb_second_pass"] = report
     return result
 
 
