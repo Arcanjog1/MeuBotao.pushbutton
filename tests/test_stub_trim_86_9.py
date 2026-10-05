@@ -466,3 +466,13 @@ def test_modulos_tocados_compativeis_com_ironpython27():
                 if any(x.annotation is not None for x in a.args + a.kwonlyargs) or getattr(no, "returns", None):
                     achados.append(("anotacao", getattr(no, "lineno", None)))
         assert not achados, (rel, achados[:10])
+
+
+def test_correcao_do_usuario_toco_modulado_e_so_a_sobra_minima_de_cad_e_aparada():
+    """Correcao do usuario (2026-10-05): com a 86.9 desligada (padrao do produto) o toco de 35 cm e' modulado;
+    so' a sobra de eixo de ate' STUB_OVERSHOOT_TRIM_MAX_CM (erro de CAD, ex.: 5 cm da W8 no BUTANTA) e' aparada."""
+    with chave(False):
+        assert m.trim_wall_end_stubs(planta_t_com_toco(35.0), None)[2] == []
+        tocos = m.trim_wall_end_stubs(planta_t_com_toco(5.0), None)[2]
+    assert len(tocos) == 1 and abs(tocos[0]["stub_ft"] * 30.48 - 5.0) < 0.5
+    assert wp.STUB_OVERSHOOT_TRIM_MAX_CM == 10.0

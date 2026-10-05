@@ -60,7 +60,7 @@ __all__ = [
     "WALL_GRAPH_NODE_SNAP_TOLERANCE_M", "WALL_GRAPH_NODE_SNAP_TOLERANCE_FT",
     "WALL_GRAPH_PERPENDICULAR_TOLERANCE", "WALL_GRAPH_COLLINEAR_TOLERANCE",
     # ---- secao 86.9 (R9): tocos de eixo alem da face da parede que cruza ----
-    "STUB_TRIM_ENABLED", "STUB_TRIM_MAX_CM", "STUB_TRIM_MIN_CM",
+    "STUB_TRIM_ENABLED", "STUB_OVERSHOOT_TRIM_MAX_CM", "STUB_TRIM_MAX_CM", "STUB_TRIM_MIN_CM",
     "STUB_TRIM_TOLERANCE_CM", "STUB_TRIM_FACE_CLEARANCE_CM",
     "STUB_TRIM_CONTACT_TOLERANCE_FT", "STUB_TRIM_RULE_ID",
     "find_wall_end_stubs", "trim_wall_end_stubs", "stub_trim_corpus_items",
@@ -1355,6 +1355,10 @@ def build_wall_graph(walls_to_create, junction_map,
 # CORRECAO DO USUARIO (2026-10-05): os tocos SAO modulados ("algumas paredes nao foram moduladas porque no
 # projeto humano nao foi modulado" - corrigir). Desligada por padrao; a funcao continua disponivel.
 STUB_TRIM_ENABLED = False
+# Com a regra desligada continua aparada SO' a sobra de eixo de ate' STUB_OVERSHOOT_TRIM_MAX_CM alem da face
+# (erro de desenho do CAD, nao e' parede): medido no BUTANTA, a sobra de 5 cm da W8 deslocava a parede inteira
+# e criava 80 septos sem apoio. None desliga tambem isso.
+STUB_OVERSHOOT_TRIM_MAX_CM = 10.0
 # Maior toco aparado (cm alem da face da parede que cruza). 41 cm nao e' toco.
 STUB_TRIM_MAX_CM = 40.0
 # Abaixo disto a "sobra" e' variacao de modelagem (o corpus mede 0,013 cm), nao
@@ -1558,6 +1562,10 @@ def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, m
     openings = None if openings_per_wall is None else list(openings_per_wall)
     if enabled is None:
         enabled = STUB_TRIM_ENABLED
+        if not enabled and STUB_OVERSHOOT_TRIM_MAX_CM:
+            # correcao do usuario (2026-10-05): tocos sao modulados; so' a sobra minima de CAD e' aparada
+            enabled = True
+            max_cm = STUB_OVERSHOOT_TRIM_MAX_CM if max_cm is None else min(max_cm, STUB_OVERSHOOT_TRIM_MAX_CM)
     if not enabled or not walls:
         return walls, openings, []
     stubs = find_wall_end_stubs(walls, openings, max_cm=max_cm)
