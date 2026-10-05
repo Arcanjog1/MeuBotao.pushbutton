@@ -12214,3 +12214,91 @@ segue a f c−2; cinta repete a f10 sobre o pilarete; fechamento sobre o vão co
 bloco, validação e materialização limpas; apoio não diminui; chave desligada = comportamento anterior; paridade 82.1
 lê as fiadas de antes; determinismo e entrada intocada; sentido do eixo invertido; unidades do trecho livre,
 espelhamento e divisão do B54).
+
+### 86.13 Compensador e pastilha ENCOSTADOS no vão e alinhados entre as fiadas — o B19 vai ATRÁS da faixa (correção do usuário, 2026-10-05) — REGRA OBRIGATÓRIA (reafirma §84 e §86.6); IMPLEMENTADO (chave `JAMB_COMPENSATOR_AT_FACE_ENABLED = True`)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** — AMARRAÇÃO (posição do compensador e do B19 de fechamento junto da jamba e
+  continuidade entre fiadas). Reafirma a §84 (itens 1–2: faixa encostada no vão e na mesma faixa vertical em
+  todas as fiadas da lateral), a §85.2 (B19 só em fechamento: na jamba ou logo atrás da faixa) e a §86.6
+  (catálogo da sobra contado **a partir da face**: 24 = C04 + B19 atrás, 29 = C09 + B19 atrás — "o compensador
+  SEMPRE encosta no vão"). Desenho do usuário (§84/§85): `B54 | B19 | C09 | vão`.
+- **Correção do usuário (2026-10-05, prints do Revit da recriação da §86)**: "algumas pastilhas não estão
+  alinhadas perto de aberturas" — o compensador ficava ATRÁS do B19/B39 (com o B19 encostado no vão) em fiadas
+  alternadas, e a pastilha mudava de posição fiada a fiada.
+- **A regra**: compensador (C04/C09) ao alcance da jamba (`JAMB_REACH_CM` = 60 cm) fica **encostado no vão**, na
+  **mesma faixa** em todas as fiadas da lateral; o B19 vai **atrás** dele. Proibido: `B54 | C09 | B19 | vão`,
+  `B39 | C09 | B19 | vão`, `vão | B19 | C04 | encontro`, pastilha solta atrás de bloco.
+  - **Não é o defeito** (não conta): a faixa encostada (`C04`, `C09`, `C09 C04` com o C09 na face — forma A); a
+    faixa da OUTRA jamba no pilarete; compensador atrás de peça FIXA (nó, canaleta — `FIXED_PIECE_BETWEEN`, §84:
+    a recomposição não alcança); compensador da **grade** (a fileira cheia de mesma paridade abaixo do peitoril
+    tem o mesmo compensador no mesmo lugar — a grade continua, §86.6); e o **fechamento de encontro atrás de
+    bloco inteiro** (`vão | B39 | C04 | B54(nó)`, §85 — a faixa ali é a do encontro, alinhada nas fiadas; o
+    `diag_user.py` lista esses casos, ex. W1 1010–1014, mas eles não são o defeito). Com um **B19** entre o
+    compensador e a face conta sempre, mesmo quando o compensador encosta num nó (W6, W2).
+  - **Prioridade**: o prisma (células quebradas pela régua `_trace_column`, percurso obrigatório da jamba,
+    vazado menor, prisma por interface) continua **falha dura contra o estado de partida**. Se as duas coisas
+    não couberem, **a lateral fica como está e o caso é registrado** (`jamb_conflicts`, motivo
+    `COMPENSATOR_NOT_AT_JAMB_FACE` + a falha que bloqueou).
+- **Como foi descoberto**: leitura de volta do Revit (`readback_r4_final.json`, 2026-10-05) com
+  `diag_user.py` (bloco "compensadores a até 45 cm do vão sem encostar": 44 itens). Casos: **W0** (janelas,
+  peitoril 80/100) fiadas 4/6/8/10 `B39 | C09 | B19 | vão` nos pilaretes de 69 cm 395–464, 975–1044 e
+  2175–2244 (o humano: `B19 B39 C09` / `B39 B19 C09`, §86.6); **W6** porta 469 fiadas 0–10 pares
+  `B54 [385–439] | C09 | B19 | vão` (o contrário do desenho do usuário); **W2** porta 1160, ímpares
+  `vão | B19 | C04 | parede que cruza` com o C04 na face nas pares; **W3** janela 1565 `vão | B19 | C09 | B34(nó)`
+  / `vão | B39 | C09 | canto`; **W27** (115 cm) `vão | B19 | C09 | canto`; print do usuário de um pilarete entre
+  janelas `B19 | C04 | B39` / `C04 | B39 | B19` (não está neste readback).
+- **Causa provada** (reprodução mínima; recompositor da jamba, `nuvem/core/engine/b34_run_arrangement.py`):
+  1. **W6 — o recompositor TIRAVA o C09 da face.** Mini-planta (`mini2.py` com as paredes 6,9,16,13,30,0 e
+     aberturas, 13 fiadas) reproduz o readback peça a peça. O estado que chega ao recompositor já é o desenho do
+     usuário nas pares (`B54 | B19 | C09 | vão`), com o C09 contra a parede que cruza nas ímpares; o objetivo
+     punha o percurso obrigatório (`paths`) antes da faixa (`dist`): com o C09 na face o percurso da jamba
+     (coluna logo atrás do C09) quebrava na **última fiada, ainda de BLOCO** durante o recompositor (5 × B34
+     sobre a porta — só depois vira cinta de topo U, §86.7, atravessada só pela fase); com o B19 na face ele
+     passava. Mesmas células em coluna (95) e quebradas (13) nas duas; `dist` 0 × 320. Na bancada montada com
+     as fileiras FINAIS do Revit (fiada 12 já canaleta) o recompositor escolhe o desenho do usuário — a diferença
+     é só a fiada de bloco que vira cinta.
+  2. **W0 2175–2244 — a forma certa não chegava ao estágio B.** Bancada com as fileiras do readback: a forma do
+     humano (prisma 0, colunas 57 → 78, quebradas 53 → 32, nenhuma falha dura) era medida no estágio A
+     (fiadas-ponte transparentes) mas ficava em **6º** no ranking; as 3 sementes (`JAMB_ALT_TOPK`) tinham as
+     duas paridades iguais (`B34 B34`, `B39 B19 C09`, `C09 B39 B19` nas duas — junta a prumo ENTRE fiadas da
+     jamba, `NEW_COINCIDENT_JOINT`/`STACKED_JOINT`), falha que a ponte/verga nunca conserta mas que o ranking não
+     contava como intrínseca → nenhuma passava no estágio B → lateral inalterada. (A mini-planta de 7 paredes
+     não reproduz o estado de partida da W0: lá ela já sai certa com e sem a chave.)
+- **Implementação** (chave `JAMB_COMPENSATOR_AT_FACE_ENABLED`, desligada = comportamento anterior):
+  - `_Wall._face_defects` (régua acima, 1 por jamba, pesada pelas fiadas da família);
+  - termo `face` do objetivo **logo depois do `b19`** (antes de vazado menor, percurso, catálogo e colunas);
+  - falha dura `COMPENSATOR_NOT_AT_JAMB_FACE` (nunca aumenta; intrínseca — entra na triagem do estágio A);
+  - unidade com o defeito não sai por "settled" e entra na busca de defeito;
+  - estágio A: as falhas **monótonas** da medida transparente (`JAMB_TRANSPARENT_MONOTONE_FAILURES` = junta nova,
+    vazado menor, prisma por interface — medidas só entre fiadas que a ponte não mexe, subconjunto da medida
+    completa) contam como intrínsecas no ranking das sementes;
+  - registro do "sem solução" (`COMPENSATOR_NOT_AT_JAMB_FACE` em `jamb_conflicts`, detalhe
+    `face_defects_before/after`).
+- **Medido** (bancada e mini-planta; o cálculo completo do pavimento NÃO foi rodado — memória da máquina):
+  - W6 (mini-planta): `B54 | B19 | C09 | vão` nas pares e `B39 | C09 | vão` nas ímpares — C09 em 460–469 nas 11
+    fiadas (desenho do usuário); chave desligada: `B54 | C09 | B19 | vão` (o readback).
+  - W0 (bancada do readback): 2175–2244 = a forma do humano; mini-planta da W0 (7 paredes) com a chave:
+    395–464, 975–1044, 2175–2244 com o C09 na face nas fiadas 5–10, 800–854 grade de B34 sem pastilha,
+    1440–1509 e 1185–1299 com a faixa nas faces.
+  - W1 `vão | B39 | C04 | B54` (fechamento de encontro): intacto.
+  - **Sem solução (registrados, prisma mantido)**: **W2** porta 1160 — com o C04 na face nas ímpares a coluna do
+    B19 (e a do vazado esquerdo do B54 das pares) cai na **junta entre as canaletas da verga** (U39 1135–1174 |
+    U 1175–1184, junta em 1174,5): +10 células quebradas e o percurso obrigatório perdido; **W3** janela 1565
+    (bancada do readback: nas ímpares 5/7/9 `vão | B19 | C09 | B34(nó)` a forma na face quebra o percurso
+    obrigatório contra a grade de B34 da fiada cheia de baixo; as pares `vão | B39 | C09 | canto` são fechamento
+    de encontro atrás de bloco inteiro e não contam; a mini-planta de 5 paredes, com a grade de 40 embaixo, já sai
+    `vão | C09 | B39 | canto` / `vão | C09 | B19 | B34(nó)` com e sem a chave); **W27** (o C09 na face põe o B19 junto da amarração do canto — `HALF_BLOCK_NEAR_TIE`, regra #2).
+- **DOCUMENTADO — pendências / decisões do usuário**:
+  1. O recompositor mede a **última fiada como bloco** embora a cinta de topo (§86.7) a troque por canaleta
+     depois (foi o que tirou o C09 da face na W6). Corrigir isso muda a régua de colunas da parede inteira e a
+     trava de prisma da §86.6 — fica para uma etapa própria.
+  2. A régua `_trace_column` conta como quebra a coluna que cai na **junta entre duas canaletas** da verga,
+     embora a §85.1 item 3 diga que a canaleta é atravessada só pela fase (é o que bloqueia a W2). Mudar isso é
+     mudar a régua do prisma — decisão do usuário.
+  3. Medição no pavimento: o integrador roda o cálculo completo e mede com `diag_user.py` (bloco dos
+     compensadores sem encostar) e `r4_score.py` (F1 contra o humano, régua da §86.0).
+- Testes: `tests/test_compensator_at_jamb_face_86_13.py` (régua e exceções, compensador da grade, W6 vermelho/
+  verde e prisma, W0 vermelho/verde = humano e prisma, W2 e W27 sem solução registrados com o prisma intacto,
+  pilarete de 64 do print, chave desligada, determinismo e idempotência); `test_jamb_compensator_alignment.py`,
+  `test_jamb_remnant_catalog.py`, `test_b34_run_arrangement.py` e `test_script.py` continuam verdes.
+
