@@ -242,7 +242,9 @@ JAMB_CLOSURE_B19_JOINT_EXEMPT = True
 JAMB_INTRINSIC_FAILURES = ("NEW_COMPENSATOR", "COMPENSATOR_OFF_JAMB", "HALF_BLOCK_NOT_ADMISSIBLE",
                            "ADJACENT_COMPENSATORS", "HALF_BLOCK_NEAR_TIE", "LONG_COMPENSATOR_AT_WALL_END",
                            # 86.6: depende so' das fiadas da jamba
-                           "B34_PLUS_COMPENSATOR_WHERE_B39_FITS")
+                           "B34_PLUS_COMPENSATOR_WHERE_B39_FITS",
+                           # 86.13: idem (vale 0 com JAMB_COMPENSATOR_AT_FACE_ENABLED desligada)
+                           "COMPENSATOR_NOT_AT_JAMB_FACE")
 JAMB_VERGA_MEMBER_ENABLED = True
 # a corrida da ponte/verga cresce PRIMEIRO ate' a peca fixa do lado do pilar e so'
 # depois sobre o vao, com teto proprio (W1: a grade da porta 8079007 so' fecha
@@ -303,6 +305,29 @@ JAMB_HUMAN_A_FORM_ENABLED = True
 # seguindo a grade so' "perdia" as 2 celulas do B34 da fiada 11 que viram canaleta (U39) - nenhuma coluna
 # quebrava, e a contagem antiga recusava a troca.
 JAMB_COLUMN_GUARD_COUNTS_BROKEN = True
+# SECAO 86.13 (correcao do usuario, 2026-10-05, prints do Revit: "algumas pastilhas nao estao alinhadas
+# perto de aberturas") - REGRA OBRIGATORIA que reafirma a 84 e a 86.6: compensador (C04/C09) ao alcance da
+# jamba (JAMB_REACH_CM) fica ENCOSTADO no vao, na MESMA faixa em todas as fiadas da lateral, e o B19 vai
+# ATRAS dele (`B54 | B19 | C09 | vao`, nunca `B54 | C09 | B19 | vao`). Medido no readback da secao 86
+# (W0 pilaretes de 69, W6 porta, W3, W2, W27): o compensador ficava atras do B19/B39 em fiadas alternadas.
+# Defeito (`_face_defects`): compensador ao alcance com um B19 entre ele e a face, ou solto (nao fecha
+# contra encontro) atras de bloco; o fechamento de encontro atras de bloco inteiro (`vao | B39 | C04 |
+# B54`) e o compensador da grade (fileira cheia de referencia) nao contam. Causas provadas (86.13):
+# (1) o objetivo so' via a faixa no termo `dist`, depois do percurso obrigatorio e das colunas - na W6
+# (mini-planta) o percurso obrigatorio so' passava pela ultima fiada de BLOCO (que depois vira cinta de
+# topo, 86.7) com o B19 na face e a busca TIRAVA o C09 da face; (2) no estagio A as combinacoes com junta
+# a prumo ENTRE fiadas da jamba (falha que a ponte/verga nunca conserta) ocupavam as JAMB_ALT_TOPK
+# sementes e a forma certa (6a no ranking da W0 2175-2244) nunca chegava ao estagio B. Ligada: falha dura
+# COMPENSATOR_NOT_AT_JAMB_FACE (fiadas x jamba com o defeito nunca aumentam; intrinseca), termo `face` do
+# objetivo logo depois do `b19`, e no ranking do estagio A as falhas MONOTONAS da medida transparente
+# (junta nova, vazado menor, prisma por interface entre fiadas que a ponte nao mexe) contam como
+# intrinsecas. O prisma continua falha dura contra o estado de partida: sem solucao que preserve os dois,
+# a lateral fica como esta' e o caso e' registrado (COMPENSATOR_NOT_AT_JAMB_FACE). Desligada = o
+# comportamento anterior.
+JAMB_COMPENSATOR_AT_FACE_ENABLED = True
+# falhas da medida transparente do estagio A que valem na medida completa (o conjunto medido com a ponte
+# transparente e' um SUBCONJUNTO do completo - a ponte/verga nunca tira essas falhas)
+JAMB_TRANSPARENT_MONOTONE_FAILURES = ("NEW_COINCIDENT_JOINT", "SMALL_VOID_WOULD_MISALIGN", "PRISM_WOULD_BREAK")
 
 
 class _Slot(object):
@@ -2185,9 +2210,16 @@ class _Wall(object):
                                 current, improved = trial, True
                     if not improved:
                         break
+            # 86.13: com as fiadas-ponte transparentes, junta nova / vazado menor / prisma por interface
+            # sao medidos SO' entre fiadas que a ponte/verga nao mexe (subconjunto da medida completa):
+            # falhar aqui e' falhar no estagio B. Antes essas combinacoes (as duas paridades iguais, a
+            # prumo) ocupavam as JAMB_ALT_TOPK sementes - W0 2175-2244: a forma certa era a 6a
+            ranked_out = JAMB_INTRINSIC_FAILURES + (JAMB_TRANSPARENT_MONOTONE_FAILURES
+                                                    if JAMB_COMPENSATOR_AT_FACE_ENABLED else ())
+
             def rank(a):
                 m = measure(a)
-                intrinsic = sum(1 for x in self._jamb_failures(m, base) if x in JAMB_INTRINSIC_FAILURES)
+                intrinsic = sum(1 for x in self._jamb_failures(m, base) if x in ranked_out)
                 return (intrinsic, objective(m, a))
 
             ranked = sorted(((rank(a), a) for a in assigns), key=lambda item: item[0])
@@ -2549,6 +2581,63 @@ class _Wall(object):
             return True
         return ref is None and sum(1 for e, d in active if self._jamb_strip_at(f, e, d)) >= 2
 
+    # ------------------------------------------------------------ secao 86.13
+    def _face_defects(self, f, edges, span=None):
+        """SECAO 86.13 (REGRA OBRIGATORIA, correcao do usuario de 2026-10-05): jambas ativas da familia
+        `f` (das `edges` da unidade) com compensador (C04/C09) AO ALCANCE da jamba (JAMB_REACH_CM) fora da
+        faixa encostada no vao: (a) com um B19 entre ele e a face - o B19 vai ATRAS da faixa (`B54 | C09 |
+        B19 | vao`, `B39 | C09 | B19 | vao`), mesmo quando o compensador encosta num no'; ou (b) solto
+        (nao fecha contra encontro, `_node_closure`) e separado da face por bloco. Conta 1 por jamba (o
+        chamador pesa pelas fiadas da familia). Nao contam: a faixa encostada (C04, C09, C09+C04), a faixa
+        da OUTRA jamba do pilarete, o compensador atras de peca FIXA (no', canaleta - FIXED_PIECE_BETWEEN:
+        a recomposicao nao alcanca), o compensador da GRADE (mesma posicao na fileira cheia de mesma
+        paridade abaixo do peitoril: a grade continua, 86.6) e o fechamento de encontro atras de bloco
+        inteiro (`vao | B39 | C04 | B54(no')`, secao 85 - a faixa ali e' a do encontro, alinhada nas
+        fiadas)."""
+        if not JAMB_COMPENSATOR_AT_FACE_ENABLED or not edges:
+            return 0
+        slots = self.fam[f]
+        active = self._family_active_edges(f, edges)
+        if not active:
+            return 0
+        ref = None
+        if JAMB_REMNANT_CATALOG_ENABLED:
+            if span is not None:
+                lo, hi = slots[span[0]].lo, slots[span[1]].hi
+            else:
+                lo, hi = min(e for e, _d in active) - JAMB_REACH_CM, max(e for e, _d in active) + JAMB_REACH_CM
+            ref = self._reference_slots(f, lo, hi, [e for e, _d in edges], frozen=True, edges=edges)
+        n = 0
+        for e, d in active:
+            i0 = self._touching_index(slots, e, d)
+            if i0 is None:
+                continue
+            k, prev, b19_between = i0, None, False
+            while 0 <= k < len(slots):
+                s = slots[k]
+                if not s.movable or self._distance_to_edge(s, e, d) >= JAMB_REACH_CM:
+                    break
+                if prev is not None:
+                    gap = (s.lo - prev.hi) if d > 0 else (prev.lo - s.hi)
+                    if gap < -FACE_TOLERANCE_CM or gap > RUN_MAX_GAP_CM:
+                        break
+                if s.compensator:
+                    sd = self._strip_distance(f, k, edges)
+                    off = sd is None or sd > JAMB_TOUCH_TOLERANCE_CM
+                    if off and ref is not None and any(
+                            q.compensator and abs(q.lo - s.lo) <= EDGE_TOLERANCE_CM
+                            and abs(q.hi - s.hi) <= EDGE_TOLERANCE_CM
+                            for q in _in_window(ref, s.lo - 1.0, s.hi + 1.0)):
+                        off = False  # compensador da grade (a fileira cheia de baixo tem o mesmo)
+                    if off and (b19_between or not self._node_closure(f, k)):
+                        n += 1
+                        break
+                elif s.code == "B19":
+                    b19_between = True
+                prev = s
+                k += d
+        return n
+
     def _b34_comp_where_b39_fits(self, f, window, span=None):
         """SECAO 85.8 / 86.6: compensadores ISOLADOS (nenhum outro compensador
         encostado) colados num B34 MOVEL quando o compensador menor + B39 fecha o
@@ -2830,7 +2919,9 @@ class _Wall(object):
         colstats = self._column_stats_full(fams, window)
         # 86.6: compensador isolado + B34 onde compensador menor + B39 fecha (85.8)
         b34c = sum(self._b34_comp_where_b39_fits(f, window) * self.count[f] for f in fams)
-        return {"dist": round(dist, 3), "breaks": breaks, "cp": cp, "ht": ht, "ex": ex, "sv": sv,
+        # 86.13: fiadas x jamba com compensador ao alcance fora da faixa encostada no vao
+        face = sum(self._face_defects(f, edges, span_of[f]) * self.count[f] for f in fams)
+        return {"dist": round(dist, 3), "breaks": breaks, "cp": cp, "ht": ht, "ex": ex, "sv": sv, "face": face,
                 "prism": self._prism_bad(pairs3, window), "b19": b19, "comps": comps, "pieces": pieces,
                 "column": colstats[0], "colw": colstats[1], "colfull": colstats[2], "colbroken": colstats[3],
                 "offjamb": offjamb,
@@ -2882,6 +2973,9 @@ class _Wall(object):
         # 86.6 / 85.8 (REGRA OBRIGATORIA): compensador + B34 onde compensador menor + B39 fecha
         if m.get("b34c", 0) > base.get("b34c", 0):
             fails.append("B34_PLUS_COMPENSATOR_WHERE_B39_FITS")
+        # 86.13 (REGRA OBRIGATORIA): compensador ao alcance da jamba fora da faixa encostada no vao
+        if m.get("face", 0) > base.get("face", 0):
+            fails.append("COMPENSATOR_NOT_AT_JAMB_FACE")
         return fails
 
     def _layout_options(self, f, span, extra_codes=()):
@@ -3169,9 +3263,12 @@ class _Wall(object):
             # 85.8) junto do vazado menor; `closure` (catalogo da sobra, PADRAO
             # OBSERVADO no humano) depois do percurso obrigatorio da jamba (85.7) e
             # antes da contagem de colunas. Os dois valem 0 com as chaves desligadas.
-            return (m["b19"], m["sv"], m["b34c"], -m["paths"], m["closure"], -m["column"], m["coh"],
-                    -m["colfull"], m["dist"], -m["colw"], m["prism"], m["breaks"], m["comps"], m["pieces"],
-                    m["moved"], tuple(options[f].index(assign[f]) for f in fams))
+            # 86.13: `face` (compensador ao alcance da jamba fora da faixa encostada no vao, REGRA
+            # OBRIGATORIA) logo depois do B19 - o prisma continua falha dura contra o estado de partida;
+            # vale 0 com JAMB_COMPENSATOR_AT_FACE_ENABLED desligada.
+            return (m["b19"], m.get("face", 0), m["sv"], m["b34c"], -m["paths"], m["closure"], -m["column"],
+                    m["coh"], -m["colfull"], m["dist"], -m["colw"], m["prism"], m["breaks"], m["comps"],
+                    m["pieces"], m["moved"], tuple(options[f].index(assign[f]) for f in fams))
 
         start = dict((f, options[f][0]) for f in fams)
         base = measure(start)
@@ -3188,7 +3285,7 @@ class _Wall(object):
         # 86.6: fechamento fora do catalogo / compensador + B34 tambem e' defeito
         settled = (base["prism"] == 0 and base["b19"] == 0 and base["dist"] == 0.0 and base["breaks"] == 0
                    and base["paths"] == len(edges) and base["column"] >= all_cells
-                   and base["closure"] == 0 and base["b34c"] == 0)
+                   and base["closure"] == 0 and base["b34c"] == 0 and base.get("face", 0) == 0)
         if settled:
             self._frozen_ref = None
             return False
@@ -3202,7 +3299,7 @@ class _Wall(object):
                                for e, dd in self._active_jamb_edges(f) for edge, d in es)]
         active_f = [f for f in fams if f not in bridge_f]
         defect = (base["paths"] < len(edges) or base["b19"] > 0 or base["dist"] > 0.0 or base["prism"] > 0
-                  or base["closure"] > 0 or base["b34c"] > 0)
+                  or base["closure"] > 0 or base["b34c"] > 0 or base.get("face", 0) > 0)
         if bridge_f and active_f and total > JAMB_JOINT_MAX_COMBINATIONS and not defect:
             # sem defeito na lateral: so' as fiadas da jamba (ponte fica como esta')
             fams_search = active_f
@@ -3282,14 +3379,15 @@ class _Wall(object):
                 if not self._jamb_failures(m, base) and obj < best[0]:
                     best = (obj, trial)
         chosen_obj, chosen = best
-        # ate' `pieces` (86.6: dois termos novos - b34c e closure)
-        changed = chosen_obj[:14] < base_obj[:14]
+        # ate' `pieces` (86.6: dois termos novos - b34c e closure; 86.13: face)
+        changed = chosen_obj[:15] < base_obj[:15]
         # tudo o que usa `measure` (aplica, mede e RESTAURA) vem antes de aplicar
         final = measure(chosen)
         reasons = ["NO_LAYOUT_REACHES_JAMB"]
         detail = {}
-        blocked = final["dist"] > 0.0 or final["b19"] > 0 or final["prism"] > 0 or final["paths"] < len(edges)
-        if blocked and best_any[0][:11] < chosen_obj[:11]:  # ate' `prism`
+        blocked = (final["dist"] > 0.0 or final["b19"] > 0 or final["prism"] > 0 or final["paths"] < len(edges)
+                   or final.get("face", 0) > 0)
+        if blocked and best_any[0][:12] < chosen_obj[:12]:  # ate' `prism`
             blocked_by = measure(best_any[1])
             reasons = self._jamb_failures(blocked_by, base) or reasons
             new_joints = sorted(set(j[0] for j in blocked_by["joints"] - base["joints"]))
@@ -3312,6 +3410,9 @@ class _Wall(object):
         detail["required_paths"] = len(edges)
         detail["required_paths_ok_before"] = base["paths"]
         detail["required_paths_ok_after"] = final["paths"]
+        if JAMB_COMPENSATOR_AT_FACE_ENABLED:
+            detail["face_defects_before"] = base.get("face", 0)
+            detail["face_defects_after"] = final.get("face", 0)
         for f in fams:
             i0, i1 = spans[f]
             far = [self._strip_distance(f, i, edges) for i in range(i0, i1 + 1)
@@ -3319,13 +3420,17 @@ class _Wall(object):
             far = [x for x in far if x is not None and x > JAMB_TOUCH_TOLERANCE_CM]
             misplaced = [self.fam[f][i].code for i in range(i0, i1 + 1)
                          if self.fam[f][i].code == "B19" and not self._half_block_admissible(f, i)]
-            if far or misplaced:
+            # 86.13: sem solucao que preserve o prisma, a lateral fica e o caso e' registrado
+            off_face = self._face_defects(f, edges, (i0, i1))
+            if far or misplaced or off_face:
                 self.jamb_conflicts.append({
                     "wall_idx": self.wall_idx, "edges_cm": [round(e, 1) for e, _d in edges],
                     "side": edges[0][1] if len(edges) == 1 else 0, "courses": self._courses_of(f),
                     "distance_cm": round(min(far), 1) if far else None,
                     "codes": [self.fam[f][i].code for i in range(i0, i1 + 1)],
-                    "reasons": reasons + (["HALF_BLOCK_NOT_ADMISSIBLE_REMAINS"] if misplaced else []),
+                    "reasons": reasons + (["HALF_BLOCK_NOT_ADMISSIBLE_REMAINS"] if misplaced else []) +
+                               (["COMPENSATOR_NOT_AT_JAMB_FACE"]
+                                if off_face and "COMPENSATOR_NOT_AT_JAMB_FACE" not in reasons else []),
                     "detail": dict(detail)})
         self._frozen_ref = None
         return bool(changed)
@@ -3477,13 +3582,16 @@ class _Wall(object):
             far = [x for x in far if x is not None and x > JAMB_TOUCH_TOLERANCE_CM]
             misplaced = [i for i in range(i0, i1 + 1)
                          if self.fam[f][i].code == "B19" and not self._half_block_admissible(f, i)]
-            if far or misplaced or broken_paths:
+            # 86.13: compensador ao alcance fora da faixa encostada que ficou (sem solucao)
+            off_face = self._face_defects(f, edges, (i0, i1))
+            if far or misplaced or broken_paths or off_face:
                 self.jamb_conflicts.append({
                     "wall_idx": self.wall_idx, "edges_cm": [round(e, 1) for e, _d in edges],
                     "side": edges[0][1] if len(edges) == 1 else 0, "courses": self._courses_of(f),
                     "distance_cm": round(min(far), 1) if far else None,
                     "codes": [self.fam[f][i].code for i in range(i0, i1 + 1)],
                     "reasons": (["COMPENSATOR_NOT_AT_JAMB"] if far else []) +
+                               (["COMPENSATOR_NOT_AT_JAMB_FACE"] if off_face else []) +
                                (["HALF_BLOCK_NOT_ADMISSIBLE"] if misplaced else []) +
                                (["PRISM_REQUIRED_PATH_BROKEN"] if broken_paths else []) +
                                list((getattr(self, "_unit_reasons", {}).get(key) or ([], {}))[0]),
