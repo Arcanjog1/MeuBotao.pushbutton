@@ -184,8 +184,13 @@ def test_product_none_has_lintel_and_sill_channel_only_in_those_courses(monkeypa
     da secao 80 ISOLADA - com as regras gerais de composicao ligadas o arranjo
     60-65 roda depois da conversao e decide a parede inteira (as fiadas de
     canaleta entram na paridade), entao a chave geral fica desligada aqui; o
-    contrato com ela ligada esta' em test_regras_gerais_composicao.py."""
+    contrato com ela ligada esta' em test_regras_gerais_composicao.py.
+
+    SECAO 86.12 (2026-10-05): o alinhamento das canaletas a' fiada c-2 muda de
+    proposito a verga, a contraverga e a cinta - fica desligado nesta comparacao
+    isolada (contrato em test_channel_grid_follow_86_12.py)."""
     monkeypatch.setattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", False)
+    monkeypatch.setattr(m, "CHANNEL_GRID_FOLLOW_ENABLED", False)
     lines, ops = free_wall()
     produto, walls, _n, _o = solve(lines, ops, strategy=None)
     antes = m.OPENING_STRUCTURAL_REINFORCEMENT_ENABLED
@@ -251,13 +256,18 @@ def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically
     # esta linha isola e' o PLANEJADOR de reforco: com as duas desligadas, a
     # canaleta tem de tomar o lugar das pecas sem mover nenhuma junta.
     saved_clean = m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED
+    # SECAO 86.12 desligada pelo mesmo motivo: a canaleta passa a seguir a grade da
+    # fiada c-2 (juntas novas de proposito, test_channel_grid_follow_86_12.py)
+    saved_follow = m.CHANNEL_GRID_FOLLOW_ENABLED
     _runs.B34_RUN_ARRANGEMENT_ENABLED = False
     m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = False
+    m.CHANNEL_GRID_FOLLOW_ENABLED = False
     try:
         planned, _w, _n2, _o2 = solve(lines, ops)
     finally:
         _runs.B34_RUN_ARRANGEMENT_ENABLED = saved
         m.CHANNEL_REPAIR_PREFER_CLEAN_ENABLED = saved_clean
+        m.CHANNEL_GRID_FOLLOW_ENABLED = saved_follow
     for ci in range(NUM_COURSES):
         a = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(legacy, walls, 0, ci)]
         b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(planned, walls, 0, ci)]

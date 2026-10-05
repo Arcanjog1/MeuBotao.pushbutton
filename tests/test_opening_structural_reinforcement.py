@@ -136,15 +136,27 @@ def test_janela_recebe_verga_e_contraverga(estrategia):
     assert _sem_invasao(res, walls, openings)
 
 
-def test_none_e_channel_dao_o_mesmo_papel_estrutural_na_mesma_parede():
+def test_none_e_channel_dao_o_mesmo_papel_estrutural_na_mesma_parede(monkeypatch):
     """Numa parede sem encontro (nada das regras do CHANNEL muda o layout ali),
     o reforco estrutural das duas opcoes e' identico: mesmas fiadas, codigos e
-    corridas."""
+    corridas.
+
+    SECAO 86.12 (2026-10-05): a verga/contraverga passa a seguir a fiada c-2, e a
+    jamba de cada estrategia fecha a seu modo (a 84 e' do caminho geral; o CHANNEL
+    tem contrato proprio) - o PAPEL estrutural (status e fiada) continua identico;
+    a identidade de codigos e corridas e' a da secao 80 sem a 86.12."""
     none, _w, _n, _o = _solve("free_wall", None)
     chan, _w2, _n2, _o2 = _solve("free_wall", tcr.CHANNEL)
+    papel = ("lintel_status", "lintel_course", "sill_status", "sill_course")
+    for a, b in zip(_linhas(none), _linhas(chan)):
+        assert [a[c] for c in papel] == [b[c] for c in papel]
+    monkeypatch.setattr(m, "CHANNEL_GRID_FOLLOW_ENABLED", False)
+    lines, ops = tcr.free_wall()
+    none0, _w3, _n3, _o3 = solve(lines, ops, strategy=None, num_courses=NUM)
+    chan0, _w4, _n4, _o4 = solve(lines, ops, strategy=tcr.CHANNEL, num_courses=NUM)
     campos = ("lintel_status", "lintel_course", "lintel_codes", "lintel_start", "lintel_end",
               "sill_status", "sill_course", "sill_codes", "sill_start", "sill_end")
-    for a, b in zip(_linhas(none), _linhas(chan)):
+    for a, b in zip(_linhas(none0), _linhas(chan0)):
         assert [a[c] for c in campos] == [b[c] for c in campos]
 
 
@@ -353,6 +365,9 @@ def test_none_e_o_motor_sem_a_secao_80_mais_o_planejador_de_abertura(monkeypatch
     (a ordem do CHANNEL) e podem mexer fora das corridas - ver §80.1/§81 e
     test_regras_gerais_composicao.py."""
     monkeypatch.setattr(m, "GENERAL_COMPOSITION_QUALITY_ENABLED", False)
+    # SECAO 86.12: o alinhamento das canaletas a' fiada c-2 tambem e' pos-passe (ver
+    # tests/test_channel_grid_follow_86_12.py) - fica fora desta composicao isolada
+    monkeypatch.setattr(m, "CHANNEL_GRID_FOLLOW_ENABLED", False)
     lines, ops = tcr.tee(80.0)
     produto, walls, nodes, openings = solve(lines, ops, strategy=None)
     base, walls0, nodes0, openings0 = _sem_80(lines, ops)

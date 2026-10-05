@@ -62,16 +62,20 @@ FIXTURES = {"free_wall": tcr.free_wall, "tee": lambda: tcr.tee(80.0), "l_corner"
 _CACHE = {}
 
 
-def _solve(nome, estrategia=None, beam=True, ftt=True, policy=None, num=NUM):
-    chave = (nome, estrategia, beam, ftt, repr(sorted((policy or {}).items())), num)
+def _solve(nome, estrategia=None, beam=True, ftt=True, policy=None, num=NUM, follow=True):
+    """`follow=False` desliga a SECAO 86.12 (canaleta segue a fiada c-2): o contrato
+    da 86.7 isolado (troca no lugar, fundir so' remove junta)."""
+    chave = (nome, estrategia, beam, ftt, repr(sorted((policy or {}).items())), num, follow)
     if chave not in _CACHE:
-        antes = (m.TOP_BOND_BEAM_ENABLED, m.FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED)
+        antes = (m.TOP_BOND_BEAM_ENABLED, m.FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED, m.CHANNEL_GRID_FOLLOW_ENABLED)
         m.TOP_BOND_BEAM_ENABLED, m.FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED = beam, ftt
+        m.CHANNEL_GRID_FOLLOW_ENABLED = follow
         try:
             lines, ops = FIXTURES[nome]()
             _CACHE[chave] = tcr.solve(lines, ops, strategy=estrategia, policy=policy, num_courses=num)
         finally:
-            m.TOP_BOND_BEAM_ENABLED, m.FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED = antes
+            (m.TOP_BOND_BEAM_ENABLED, m.FREE_TO_TOP_WITHOUT_CHANNEL_ENABLED,
+             m.CHANNEL_GRID_FOLLOW_ENABLED) = antes
     return _CACHE[chave]
 
 
@@ -111,8 +115,11 @@ def test_chaves_da_secao_86_ligadas_por_padrao():
 # ------------------------------------------------------------------ 86.7 cinta
 @pytest.mark.parametrize("estrategia", ESTRATEGIAS)
 def test_cinta_troca_a_ultima_fiada_peca_a_peca_sem_junta_nova(estrategia):
-    com, walls, _n, _o = _solve("free_wall", estrategia)
-    sem, walls0, _n0, _o0 = _solve("free_wall", estrategia, beam=False)
+    # contrato da 86.7 ISOLADO: a SECAO 86.12 (2026-10-05, correcao do usuario) muda de
+    # proposito a grade da cinta - segue a f10 sobre alvenaria e e' livre sobre o vao
+    # (tests/test_channel_grid_follow_86_12.py) - e por isso fica desligada aqui
+    com, walls, _n, _o = _solve("free_wall", estrategia, follow=False)
+    sem, walls0, _n0, _o0 = _solve("free_wall", estrategia, beam=False, follow=False)
     # as outras fiadas nao mudam
     for ci in range(TOP):
         assert _sig(com, ci) == _sig(sem, ci), ci
@@ -259,7 +266,14 @@ def test_cinta_nunca_decide_a_paridade_dos_nos():
     tes = [i for i, n in enumerate(nodes) if n.get("kind") == "T_INTERSECTION"]
     assert m._tie_parity_compensator_crowding(vista, nodes, walls, CAT, tes) == \
         m._tie_parity_compensator_crowding(sem, nodes0, walls0, CAT, tes)
-    assert m._without_top_bond_beam(sem) is sem                    # sem cinta: nada muda
+    # sem cinta so' voltam as fiadas que a SECAO 86.12 (alinhamento da verga) tocou
+    seguidas = (sem.get("channel_grid_follow") or {}).get("source_courses") or {}
+    vista_sem = m._without_top_bond_beam(sem)
+    if not seguidas:
+        assert vista_sem is sem                                    # sem cinta: nada muda
+    for ci in range(NUM):
+        esperado = seguidas.get(ci, sem["course_candidates"][ci])
+        assert _sig(vista_sem, ci) == sorted(orf._physical_key(c) for c in esperado), ci
 
 
 def test_cinta_e_deterministica():
